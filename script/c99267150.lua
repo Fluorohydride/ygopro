@@ -2,7 +2,7 @@
 function c99267150.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	Auxiliary.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),5,true)
+	aux.AddFusionProcFunRep(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),5,true)
 	--battle indestructable
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)

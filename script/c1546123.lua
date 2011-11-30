@@ -2,7 +2,7 @@
 function c1546123.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	Auxiliary.AddFusionProcCodeRep(c,70095154,3,false,true)
+	aux.AddFusionProcCodeRep(c,70095154,3,false,true)
 	--pierce
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)

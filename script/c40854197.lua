@@ -40,7 +40,7 @@ function c40854197.atkup(e,c)
 end
 function c40854197.descondition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return bit.band(c:GetPreviousPosition(),POS_FACEUP)~=0
+	return c:IsPreviousPosition(POS_FACEUP)
 end
 function c40854197.destarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -2,7 +2,7 @@
 function c85684223.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	Auxiliary.AddFusionProcCode2(c,23205979,59290628,true,true)
+	aux.AddFusionProcCode2(c,23205979,59290628,true,true)
 	--battle indestructable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
