@@ -182,6 +182,8 @@ struct processor {
 	card_set special_summoning;
 	card_list adjust_list;
 	card_set adjust_set;
+	card_set release_cards;
+	card_set release_cards_ex;
 	card_set destroy_set;
 	card_set battle_destroy_rep;
 	card_set fusion_materials;
@@ -301,8 +303,8 @@ public:
 	int32 filter_field_card(uint8 self, uint32 location, uint32 location2, group* pgroup);
 	int32 is_player_affected_by_effect(uint8 playerid, uint32 code);
 
-	int32 get_release_list(uint8 playerid, card_set* release_list);
-	int32 get_summon_release_list(card* target, card_set* release_list);
+	int32 get_release_list(uint8 playerid, card_set* release_list, card_set* ex_list);
+	int32 get_summon_release_list(card* target, card_set* release_list, card_set* ex_list);
 	int32 get_summon_count_limit(uint8 playerid);
 	int32 get_draw_count(uint8 playerid);
 	void get_ritual_material(uint8 playerid, card_set* material);
@@ -434,6 +436,8 @@ public:
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, ptr arg, ptr replace_type);
 	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min);
+	int32 select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max);
+	int32 select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max);
 	int32 toss_coin(uint16 step, uint8 playerid, uint8 count);
 	int32 toss_dice(uint16 step, uint8 playerid, uint8 count);
 
@@ -518,12 +522,14 @@ public:
 #define PROCESSOR_SELECT_CHAIN		16
 #define PROCESSOR_SELECT_PLACE		18
 #define PROCESSOR_SELECT_POSITION	19
-#define PROCESSOR_SELECT_TRIBUTE	20
+#define PROCESSOR_SELECT_TRIBUTE_P	20
 #define PROCESSOR_SORT_CHAIN		21
 #define PROCESSOR_SELECT_COUNTER	22
 #define PROCESSOR_SELECT_SUM		23
 #define PROCESSOR_SELECT_DISFIELD	24
 #define PROCESSOR_SORT_CARD			25
+#define PROCESSOR_SELECT_RELEASE	26
+#define PROCESSOR_SELECT_TRIBUTE	27
 #define PROCESSOR_POINT_EVENT		30
 #define PROCESSOR_QUICK_EFFECT		31
 #define PROCESSOR_IDLE_COMMAND		32
@@ -582,11 +588,12 @@ public:
 #define PROCESSOR_SELECT_POSITION_S	126
 #define PROCESSOR_SELECT_TRIBUTE_S	127
 #define PROCESSOR_SORT_CARDS_S		128
-#define PROCESSOR_SELECT_TARGET		129
-#define PROCESSOR_SELECT_FUSION		130
-#define PROCESSOR_SELECT_SYNCHRO	131
-#define PROCESSOR_SELECT_SUM_S		132
-#define PROCESSOR_SELECT_DISFIELD_S	133
+#define PROCESSOR_SELECT_RELEASE_S	129
+#define PROCESSOR_SELECT_TARGET		130
+#define PROCESSOR_SELECT_FUSION		131
+#define PROCESSOR_SELECT_SYNCHRO	132
+#define PROCESSOR_SELECT_SUM_S		133
+#define PROCESSOR_SELECT_DISFIELD_S	134
 #define PROCESSOR_SPSUMMON_S		135
 #define PROCESSOR_SPSUMMON_STEP_S	136
 #define PROCESSOR_SPSUMMON_COMP_S	137
@@ -612,6 +619,7 @@ public:
 #define HINT_ATTRIB				7
 #define HINT_CODE				8
 #define HINT_NUMBER				9
+#define HINT_CARD				10
 //Messages
 #define MSG_RETRY				1
 #define MSG_HINT				2

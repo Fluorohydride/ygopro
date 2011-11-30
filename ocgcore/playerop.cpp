@@ -258,14 +258,6 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 			}
 			c[v] = 1;
 		}
-		pduel->write_buffer8(MSG_CARD_SELECTED);
-		pduel->write_buffer8(playerid);
-		pduel->write_buffer8(returns.bvalue[0]);
-		card* pcard;
-		for(int32 i = 0; i < returns.bvalue[0]; ++i) {
-			pcard = core.select_cards[returns.bvalue[i + 1]];
-			pduel->write_buffer32(pcard->get_info_location());
-		}
 		return TRUE;
 	}
 }

@@ -1387,6 +1387,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		default:
 			break;
 		}
+		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {
@@ -1401,6 +1402,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		case irr::KEY_KEY_R: {
 			if(!event.KeyInput.PressedDown)
 				mainGame->textFont->setTransparency(true);
+			break;
+		}
+		case irr::KEY_ESCAPE: {
+			device->minimizeWindow();
 			break;
 		}
 		}

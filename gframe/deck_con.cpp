@@ -641,6 +641,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->textFont->setTransparency(true);
 			break;
 		}
+		case irr::KEY_ESCAPE: {
+			device->minimizeWindow();
+			break;
+		}
 		}
 		break;
 	}
@@ -690,9 +694,15 @@ void DeckBuilder::FilterCards() {
 			}
 			break;
 		}
-		case 2:
+		case 2: {
+			if(!(data.type & TYPE_SPELL))
+				continue;
+			if(filter_type2 && data.type != filter_type2)
+				continue;
+			break;
+		}
 		case 3: {
-			if(data.type & TYPE_MONSTER)
+			if(!(data.type & TYPE_TRAP))
 				continue;
 			if(filter_type2 && data.type != filter_type2)
 				continue;
@@ -723,7 +733,7 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
 	}
-	std::sort(results.begin(), results.end(), ClientCard::deck_sort_atk);
+	std::sort(results.begin(), results.end(), ClientCard::deck_sort_lv);
 	mainGame->cbCardClass->setSelected(0);
 	mainGame->cbAttribute->setSelected(0);
 	mainGame->cbRace->setSelected(0);
@@ -770,9 +780,15 @@ void DeckBuilder::FilterCardsFromResult() {
 			}
 			break;
 		}
-		case 2:
+		case 2: {
+			if(!(data.type & TYPE_SPELL))
+				continue;
+			if(filter_type2 && data.type != filter_type2)
+				continue;
+			break;
+		}
 		case 3: {
-			if(data.type & TYPE_MONSTER)
+			if(!(data.type & TYPE_TRAP))
 				continue;
 			if(filter_type2 && data.type != filter_type2)
 				continue;

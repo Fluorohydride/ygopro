@@ -130,38 +130,6 @@ bool ClientCard::client_card_sort(ClientCard* c1, ClientCard* c2) {
 			return c1->sequence < c2->sequence;
 	}
 }
-bool ClientCard::deck_sort_atk(code_pointer p1, code_pointer p2) {
-	if((p1->second.type & 0x7) != (p2->second.type & 0x7))
-		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
-	if((p1->second.type & 0x7) == 1) {
-		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
-		if(type1 != type2)
-			return type1 < type2;
-		if(p1->second.attack != p2->second.attack)
-			return p1->second.attack > p2->second.attack;
-		else return p1->first < p2->first;
-	}
-	if((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
-		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
-	return p1->first < p2->first;
-}
-bool ClientCard::deck_sort_def(code_pointer p1, code_pointer p2) {
-	if((p1->second.type & 0x7) != (p2->second.type & 0x7))
-		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
-	if((p1->second.type & 0x7) == 1) {
-		int type1 = (p1->second.type & 0x8020c0) ? (p1->second.type & 0x8020c1) : (p1->second.type & 0x31);
-		int type2 = (p2->second.type & 0x8020c0) ? (p2->second.type & 0x8020c1) : (p2->second.type & 0x31);
-		if(type1 != type2)
-			return type1 < type2;
-		if(p1->second.defence != p2->second.defence)
-			return p1->second.defence > p2->second.defence;
-		else return p1->first < p2->first;
-	}
-	if((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))
-		return (p1->second.type & 0xfffffff8) < (p2->second.type & 0xfffffff8);
-	return p1->first < p2->first;
-}
 bool ClientCard::deck_sort_lv(code_pointer p1, code_pointer p2) {
 	if((p1->second.type & 0x7) != (p2->second.type & 0x7))
 		return (p1->second.type & 0x7) < (p2->second.type & 0x7);
@@ -172,6 +140,10 @@ bool ClientCard::deck_sort_lv(code_pointer p1, code_pointer p2) {
 			return type1 < type2;
 		if(p1->second.level != p2->second.level)
 			return p1->second.level > p2->second.level;
+		if(p1->second.attack != p2->second.attack)
+			return p1->second.attack > p2->second.attack;
+		if(p1->second.defence != p2->second.defence)
+			return p1->second.defence > p2->second.defence;
 		else return p1->first < p2->first;
 	}
 	if((p1->second.type & 0xfffffff8) != (p2->second.type & 0xfffffff8))

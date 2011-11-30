@@ -1,0 +1,34 @@
+--巨竜の羽ばたき
+function c28596933.initial_effect(c)
+	--Activate
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(c28596933.target)
+	e1:SetOperation(c28596933.activate)
+	c:RegisterEffect(e1)
+end
+function c28596933.filter(c)
+	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:GetLevel()>=5 and c:IsAbleToHand()
+end
+function c28596933.dfilter(c)
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
+end
+function c28596933.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingTarget(c28596933.filter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectTarget(tp,c28596933.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local sg=Duel.GetMatchingGroup(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
+end
+function c28596933.activate(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		local sg=Duel.GetMatchingGroup(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
+		Duel.Destroy(sg,REASON_EFFECT)
+	end
+end

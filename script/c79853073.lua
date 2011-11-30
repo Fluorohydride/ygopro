@@ -1,0 +1,31 @@
+--サイファー·スカウター
+function c79853073.initial_effect(c)
+	--atkdef up
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(79853073,0))
+	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
+	e1:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e1:SetCondition(c79853073.con)
+	e1:SetOperation(c79853073.op)
+	c:RegisterEffect(e1)
+end
+function c79853073.con(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	return (c==a and d and d:IsRace(RACE_WARRIOR)) or (c==d and a:IsRace(RACE_WARRIOR))
+end
+function c79853073.op(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
+	e1:SetValue(2000)
+	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_UPDATE_DEFENCE)
+	c:RegisterEffect(e2)
+end

@@ -506,7 +506,7 @@ void field::remove_oath_effect(effect* reason_effect) {
 	for(auto oeit = effects.oath.begin(); oeit != effects.oath.end();) {
 		auto rm = oeit++;
 		if(rm->second == reason_effect) {
-			effect* peffect=rm->first;
+			effect* peffect = rm->first;
 			effects.oath.erase(rm);
 			if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
 				remove_effect(peffect);
@@ -854,42 +854,56 @@ int32 field::is_player_affected_by_effect(uint8 playerid, uint32 code) {
 	}
 	return FALSE;
 }
-int32 field::get_release_list(uint8 playerid, card_set* release_list) {
+int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* ex_list) {
 	card* pcard;
+	uint32 rcount = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
-		if(pcard && pcard->is_releaseable_by_nonsummon(playerid))
-			release_list->insert(pcard);
+		if(pcard && pcard->is_releaseable_by_nonsummon(playerid)) {
+			if(release_list)
+				release_list->insert(pcard);
+			pcard->operation_param = 1;
+			rcount++;
+		}
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
-		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_nonsummon(playerid))
-			release_list->insert(pcard);
+		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_nonsummon(playerid)) {
+			if(ex_list)
+				ex_list->insert(pcard);
+			pcard->operation_param = 1;
+			rcount++;
+		}
 	}
-	return release_list->size();
+	return rcount;
 }
-int32 field::get_summon_release_list(card* target, card_set* release_list) {
+int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list) {
 	uint8 p = target->current.controler;
 	card* pcard;
+	uint32 rcount = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[p].list_mzone[i];
-		if(pcard && pcard->is_releaseable_by_summon(p, target))
-			release_list->insert(pcard);
+		if(pcard && pcard->is_releaseable_by_summon(p, target)) {
+			if(release_list)
+				release_list->insert(pcard);
+			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
+				pcard->operation_param = 2;
+			else
+				pcard->operation_param = 1;
+			rcount += pcard->operation_param;
+		}
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - p].list_mzone[i];
-		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_summon(p, target))
-			release_list->insert(pcard);
-	}
-	uint32 rcount = 0;
-	card_set::iterator cit;
-	for(cit = release_list->begin(); cit != release_list->end(); ++cit) {
-		pcard = *cit;
-		if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
-			pcard->operation_param = 2;
-		else
-			pcard->operation_param = 1;
-		rcount += pcard->operation_param;
+		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_summon(p, target)) {
+			if(ex_list)
+				ex_list->insert(pcard);
+			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
+				pcard->operation_param = 2;
+			else
+				pcard->operation_param = 1;
+			rcount += pcard->operation_param;
+		}
 	}
 	return rcount;
 }
@@ -926,19 +940,17 @@ void field::get_ritual_material(uint8 playerid, card_set* material) {
 		        && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_nonsummon(playerid))
 			material->insert(pcard);
 	}
-	card_vector::iterator cit;
-	for(cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
+	for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
 		if(((*cit)->data.type & TYPE_MONSTER) && (*cit)->is_releaseable_by_nonsummon(playerid))
 			material->insert((*cit));
-	for(cit = player[playerid].list_grave.begin(); cit != player[playerid].list_grave.end(); ++cit)
+	for(auto cit = player[playerid].list_grave.begin(); cit != player[playerid].list_grave.end(); ++cit)
 		if(((*cit)->data.type & TYPE_MONSTER) && (*cit)->is_affected_by_effect(EFFECT_EXTRA_RITUAL_MATERIAL) && (*cit)->is_removeable(playerid))
 			material->insert((*cit));
 }
 void field::ritual_release(card_set* material) {
 	card_set rel;
 	card_set rem;
-	card_set::iterator cit;
-	for(cit = material->begin(); cit != material->end(); ++cit) {
+	for(auto cit = material->begin(); cit != material->end(); ++cit) {
 		if((*cit)->current.location == LOCATION_GRAVE)
 			rem.insert(*cit);
 		else
@@ -948,7 +960,7 @@ void field::ritual_release(card_set* material) {
 	send_to(&rem, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player, PLAYER_NONE, LOCATION_REMOVED, 0, POS_FACEUP);
 }
 void field::get_exceed_material(card* scard, card_set* material) {
-	card* pcard;
+	card* pcard = 0;
 	int32 playerid = scard->current.controler;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];

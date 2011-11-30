@@ -149,6 +149,8 @@ bool Game::RefreshExtra(int player, int flag, int use_cache) {
 bool Game::RefreshSingle(int player, int location, int sequence, int flag) {
 	int len = query_card(dInfo.pDuel, player, location, sequence, flag, (unsigned char*)queryBuffer, 0);
 	char* pbuf = netManager.send_buffer_ptr;
+	if(location == LOCATION_REMOVED && (queryBuffer[15] & POS_FACEDOWN))
+		return true;
 	NetManager::WriteInt8(pbuf, MSG_UPDATE_CARD);
 	NetManager::WriteInt8(pbuf, player);
 	NetManager::WriteInt8(pbuf, location);
@@ -652,8 +654,10 @@ void Game::Analyze(void* pd, char* engbuf) {
 			int cs = pbuf[10];
 			int cp = pbuf[11];
 			pbuf += 12;
+			if(cl == LOCATION_REMOVED && (cp & POS_FACEDOWN))
+				NetManager::WriteInt32(pbufw, 0);
 			mainGame->SendGameMessage(cc, offset, pbuf - offset);
-			if (!(cl & 0x90) && !((cl & 0x2c) && (cp & POS_FACEUP)))
+			if (!(cl & 0xb0) && !((cl & 0xc) && (cp & POS_FACEUP)))
 				NetManager::WriteInt32(pbufw, 0);
 			mainGame->SendGameMessage(1 - cc, offset, pbuf - offset);
 			if (cl != 0 && (cl & 0x80) == 0 && (cl != pl || pc != cc))

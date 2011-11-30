@@ -132,7 +132,7 @@ int32 field::process() {
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
-	case PROCESSOR_SELECT_TRIBUTE: {
+	case PROCESSOR_SELECT_TRIBUTE_P: {
 		if (select_tribute(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff)) {
 			core.units.pop_front();
 			return pduel->bufferlen;
@@ -175,6 +175,20 @@ int32 field::process() {
 			core.units.begin()->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
+	}
+	case PROCESSOR_SELECT_RELEASE: {
+		if (select_release_cards(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg1 >> 24) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff))
+			core.units.pop_front();
+		else
+			core.units.begin()->step++;
+		return pduel->bufferlen;
+	}
+	case PROCESSOR_SELECT_TRIBUTE: {
+		if (select_tribute_cards(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff))
+			core.units.pop_front();
+		else
+			core.units.begin()->step++;
+		return pduel->bufferlen;
 	}
 	case PROCESSOR_POINT_EVENT: {
 		if(process_point_event(it->step, it->arg1, it->arg2))
@@ -601,6 +615,22 @@ int32 field::process() {
 			core.units.begin()->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
+			core.units.pop_front();
+		}
+		return pduel->bufferlen;
+	}
+	case PROCESSOR_SELECT_RELEASE_S: {
+		if(it->step == 0) {
+			add_process(PROCESSOR_SELECT_RELEASE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
+			core.units.begin()->step++;
+		} else {
+			group* pgroup = pduel->new_group();
+			card* pcard;
+			for(int32 i = 0; i < returns.bvalue[0]; ++i) {
+				pcard = core.select_cards[returns.bvalue[i + 1]];
+				pgroup->container.insert(pcard);
+			}
+			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
 			core.units.pop_front();
 		}
 		return pduel->bufferlen;
