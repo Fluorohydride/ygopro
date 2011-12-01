@@ -338,6 +338,7 @@ int Game::EngineThread(void* pd) {
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
 		mainGame->lstLog->clear();
+		mainGame->logParam.clear();
 		mainGame->imgCard->setImage(0);
 		mainGame->stName->setText(L"");
 		mainGame->stDataInfo->setText(L"");
@@ -1065,6 +1066,7 @@ int Game::RecvThread(void* pd) {
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
 		mainGame->lstLog->clear();
+		mainGame->logParam.clear();
 		mainGame->imgCard->setImage(0);
 		mainGame->stName->setText(L"");
 		mainGame->stDataInfo->setText(L"");
@@ -1149,6 +1151,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		case HINT_OPSELECTED: {
 			myswprintf(textBuffer, L"对方选择了：[%ls]", mainGame->dataManager.GetDesc(data));
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
@@ -1164,6 +1167,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		case HINT_RACE: {
 			myswprintf(textBuffer, L"对方宣言了：[%ls]", DataManager::FormatRace(data));
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
@@ -1172,6 +1176,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		case HINT_ATTRIB: {
 			myswprintf(textBuffer, L"对方宣言了：[%ls]", DataManager::FormatAttribute(data));
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
@@ -1180,6 +1185,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		case HINT_CODE: {
 			myswprintf(textBuffer, L"对方宣言了：[%ls]", mainGame->dataManager.GetName(data));
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
@@ -1188,6 +1194,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		case HINT_NUMBER: {
 			myswprintf(textBuffer, L"对方选择了：[%d]", data);
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
@@ -1864,6 +1871,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		ClientCard* pcard;
 		myswprintf(textBuffer, L"翻开卡组上方%d张卡：", count);
 		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
 		mainGame->dField.selectable_cards.clear();
 		for (int i = 0; i < count; ++i) {
 			code = NetManager::ReadInt32(pbuf);
@@ -1875,6 +1883,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 				pcard->SetCode(code);
 			myswprintf(textBuffer, L"%d [%ls]", i, mainGame->dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(code);
 			float shift = -0.15f;
 			if (player == 1) shift = 0.15f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);
@@ -1895,6 +1904,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		ClientCard*  pcard;
 		myswprintf(textBuffer, L"确认%d张卡：", count);
 		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
 		for (int i = 0; i < count; ++i) {
 			code = NetManager::ReadInt32(pbuf);
 			c = mainGame->LocalPlayer(NetManager::ReadInt8(pbuf));
@@ -1905,6 +1915,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 				pcard->SetCode(code);
 			myswprintf(textBuffer, L"%d [%ls]", i, mainGame->dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(code);
 			if (l & 0x41) {
 				float shift = -0.15f;
 				if ((c == 0 && l == 0x40) || (c == 1 && l == 0x1)) shift = 0.15f;
@@ -2547,6 +2558,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 				mainGame->WaitFrameSignal(30);
 			myswprintf(textBuffer, L"[%ls](%ls,%d)成为对象", mainGame->dataManager.GetName(pcard->code), DataManager::FormatLocation(l), s);
 			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
 			pcard->is_highlighting = false;
 		}
 		return true;
@@ -3107,6 +3119,7 @@ int Game::ReplayThread(void* pd) {
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
 		mainGame->lstLog->clear();
+		mainGame->logParam.clear();
 		mainGame->imgCard->setImage(0);
 		mainGame->stName->setText(L"");
 		mainGame->stDataInfo->setText(L"");

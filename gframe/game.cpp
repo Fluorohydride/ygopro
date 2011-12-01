@@ -165,7 +165,7 @@ bool Game::Initialize() {
 	stText = env->addStaticText(L"", rect<s32>(15, 83, 296, 324), false, true, tabInfo, -1, false);
 	//log
 	irr::gui::IGUITab* tabLog =  wInfos->addTab(L"消息记录");
-	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, -1, false);
+	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(18);
 	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, L"清除记录");
 	btnSaveLog = env->addButton(rect<s32>(40, 300, 140, 325), tabLog, BUTTON_SAVE_LOG, L"保存记录");
@@ -603,6 +603,39 @@ void Game::LoadConfig() {
 }
 void Game::SaveConfig() {
 
+}
+void Game::ShowCardInfo(int code) {
+	CardData cd;
+	wchar_t formatBuffer[256];
+	dataManager.GetData(code, &cd);
+	imgCard->setImage(imageManager.GetTexture(code));
+	myswprintf(formatBuffer, L"%ls[%d]", dataManager.GetName(code), code);
+	stName->setText(formatBuffer);
+	if(cd.type & TYPE_MONSTER) {
+		myswprintf(formatBuffer, L"[%ls] %ls/%ls", DataManager::FormatType(cd.type), DataManager::FormatRace(cd.race), DataManager::FormatAttribute(cd.attribute));
+		stInfo->setText(formatBuffer);
+		formatBuffer[0] = L'[';
+		for(int i = 1; i <= cd.level; ++i)
+			formatBuffer[i] = L'★';
+		formatBuffer[cd.level + 1] = L']';
+		formatBuffer[cd.level + 2] = L' ';
+		if(cd.attack < 0 && cd.defence < 0)
+			myswprintf(&formatBuffer[cd.level + 3], L"?/?");
+		else if(cd.attack < 0)
+			myswprintf(&formatBuffer[cd.level + 3], L"?/%d", cd.defence);
+		else if(cd.defence < 0)
+			myswprintf(&formatBuffer[cd.level + 3], L"%d/?", cd.attack);
+		else
+			myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
+		stDataInfo->setText(formatBuffer);
+		stText->setRelativePosition(irr::core::position2di(15, 83));
+	} else {
+		myswprintf(formatBuffer, L"[%ls]", DataManager::FormatType(cd.type));
+		stInfo->setText(formatBuffer);
+		stDataInfo->setText(L"");
+		stText->setRelativePosition(irr::core::position2di(15, 60));
+	}
+	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
 }
 
 }

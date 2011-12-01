@@ -74,7 +74,8 @@ public:
 	void DrawDeckBd();
 	void LoadConfig();
 	void SaveConfig();
-
+	void ShowCardInfo(int code);
+	
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
 	bool SendByte(int player, char val);
@@ -123,7 +124,7 @@ public:
 	DeckManager deckManager;
 	Materials matManager;
 	Replay lastReplay;
-
+	std::vector<int> logParam;
 	unsigned short linePattern;
 	int waitFrame;
 	int signalFrame;
@@ -342,6 +343,7 @@ public:
 #define TAB_MODES					50
 #define BUTTON_SAVE_LOG				100
 #define BUTTON_CLEAR_LOG			101
+#define LISTBOX_LOG					102
 #define BUTTON_LAN_START_SERVER		110
 #define BUTTON_LAN_CANCEL_SERVER	111
 #define BUTTON_LAN_CONNECT			112

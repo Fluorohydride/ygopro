@@ -17,6 +17,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case BUTTON_CLEAR_LOG: {
 				mainGame->lstLog->clear();
+				mainGame->logParam.clear();
 				break;
 			}
 			case BUTTON_MODE_EXIT: {
@@ -759,6 +760,25 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->ebJoinPort->setText(formatBuffer);
 				break;
 			}
+			case LISTBOX_LOG: {
+				int sel = mainGame->lstLog->getSelected();
+				if(sel != -1 && mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+					mainGame->ShowCardInfo(mainGame->logParam[sel]);
+				}
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_LISTBOX_SELECTED_AGAIN: {
+			switch(id) {
+			case LISTBOX_LOG: {
+				int sel = mainGame->lstLog->getSelected();
+				if(sel != -1 && mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+					mainGame->wInfos->setActiveTab(0);
+				}
+				break;
+			}
 			}
 			break;
 		}
@@ -1285,36 +1305,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						for(auto cit = mcard->ownerTarget.begin(); cit != mcard->ownerTarget.end(); ++cit)
 							(*cit)->is_showtarget = true;
 					if(mcard->code) {
-						CardData cd;
-						mainGame->dataManager.GetData(mcard->code, &cd);
-						mainGame->imgCard->setImage(mainGame->imageManager.GetTexture(mcard->code));
-						myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
-						mainGame->stName->setText(formatBuffer);
-						if(cd.type & TYPE_MONSTER) {
-							myswprintf(formatBuffer, L"[%ls] %ls/%ls", DataManager::FormatType(cd.type), DataManager::FormatRace(cd.race), DataManager::FormatAttribute(cd.attribute));
-							mainGame->stInfo->setText(formatBuffer);
-							formatBuffer[0] = L'[';
-							for(int i = 1; i <= cd.level; ++i)
-								formatBuffer[i] = L'★';
-							formatBuffer[cd.level + 1] = L']';
-							formatBuffer[cd.level + 2] = L' ';
-							if(cd.attack < 0 && cd.defence < 0)
-								myswprintf(&formatBuffer[cd.level + 3], L"?/?");
-							else if(cd.attack < 0)
-								myswprintf(&formatBuffer[cd.level + 3], L"?/%d", cd.defence);
-							else if(cd.defence < 0)
-								myswprintf(&formatBuffer[cd.level + 3], L"%d/?", cd.attack);
-							else
-								myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
-							mainGame->stDataInfo->setText(formatBuffer);
-							mainGame->stText->setRelativePosition(irr::core::position2di(15, 83));
-						} else {
-							myswprintf(formatBuffer, L"[%ls]", DataManager::FormatType(cd.type));
-							mainGame->stInfo->setText(formatBuffer);
-							mainGame->stDataInfo->setText(L"");
-							mainGame->stText->setRelativePosition(irr::core::position2di(15, 60));
-						}
-						mainGame->SetStaticText(mainGame->stText, 270, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetText(mcard->code));
+						mainGame->ShowCardInfo(mcard->code);
 						if(mcard->location & 0xe) {
 							std::wstring str;
 							if(mcard->type & TYPE_MONSTER) {

@@ -3460,6 +3460,7 @@ int32 field::add_chain(uint16 step) {
 		clit->disable_player = PLAYER_NONE;
 		clit->replace_op = 0;
 		core.current_chain.push_back(*clit);
+		peffect->handler->create_relation(peffect);
 		if(peffect->cost) {
 			core.sub_solving_event.push_back(clit->evt);
 			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit->triggering_player, 0);
@@ -3491,7 +3492,6 @@ int32 field::add_chain(uint16 step) {
 				process_single_event();
 			}
 		}
-		clit->triggering_effect->handler->create_relation(clit->triggering_effect);
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
 			core.leave_confirmed.insert(peffect->handler);
 			if(!(peffect->handler->data.type & (TYPE_CONTINUOUS + TYPE_FIELD + TYPE_EQUIP))

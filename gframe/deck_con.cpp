@@ -579,37 +579,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			if(!is_draging && pre_code != hovered_code) {
 				if(hovered_code) {
-					CardData cd;
-					wchar_t formatBuffer[64];
-					mainGame->dataManager.GetData(hovered_code, &cd);
-					mainGame->imgCard->setImage(mainGame->imageManager.GetTexture(hovered_code));
-					myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(hovered_code), hovered_code);
-					mainGame->stName->setText(formatBuffer);
-					if(cd.type & TYPE_MONSTER) {
-						myswprintf(formatBuffer, L"[%ls] %ls/%ls", DataManager::FormatType(cd.type), DataManager::FormatRace(cd.race), DataManager::FormatAttribute(cd.attribute));
-						mainGame->stInfo->setText(formatBuffer);
-						formatBuffer[0] = L'[';
-						for(int i = 1; i <= cd.level; ++i)
-							formatBuffer[i] = L'★';
-						formatBuffer[cd.level + 1] = L']';
-						formatBuffer[cd.level + 2] = L' ';
-						if(cd.attack < 0 && cd.defence < 0)
-							myswprintf(&formatBuffer[cd.level + 3], L"?/?");
-						else if(cd.attack < 0)
-							myswprintf(&formatBuffer[cd.level + 3], L"?/%d", cd.defence);
-						else if(cd.defence < 0)
-							myswprintf(&formatBuffer[cd.level + 3], L"%d/?", cd.attack);
-						else
-							myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
-						mainGame->stDataInfo->setText(formatBuffer);
-						mainGame->stText->setRelativePosition(irr::core::position2di(15, 83));
-					} else {
-						myswprintf(formatBuffer, L"[%ls]", DataManager::FormatType(cd.type));
-						mainGame->stInfo->setText(formatBuffer);
-						mainGame->stDataInfo->setText(L"");
-						mainGame->stText->setRelativePosition(irr::core::position2di(15, 60));
-					}
-					mainGame->SetStaticText(mainGame->stText, 270, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetText(hovered_code));
+					mainGame->ShowCardInfo(hovered_code);
 				}
 				if(pre_code)
 					mainGame->imageManager.RemoveTexture(pre_code);

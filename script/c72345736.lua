@@ -44,7 +44,7 @@ function c72345736.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c72345736.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:GetCounter(0x3003)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=c:GetCounter(0x3003)end
+	if chk==0 then return c:GetCounter(0x3003)>0 and Duel.IsPlayerCanDraw(tp,c:GetCounter(0x3003)) end
 	local ct=e:GetLabel()
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ct)
