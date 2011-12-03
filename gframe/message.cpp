@@ -930,10 +930,9 @@ void Game::Analyze(void* pd, char* engbuf) {
 			break;
 		}
 		case MSG_MISSED_EFFECT: {
-			count = NetManager::ReadInt8(pbuf);
+			player = pbuf[0];
 			pbuf += 8;
-//			mainGame->SendGameMessage(0, offset, pbuf - offset);
-//			mainGame->SendGameMessage(1, offset, pbuf - offset);
+			mainGame->SendGameMessage(player, offset, pbuf - offset);
 			break;
 		}
 		case MSG_TOSS_COIN: {
@@ -2860,12 +2859,11 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		return true;
 	}
 	case MSG_MISSED_EFFECT: {
-		int count = NetManager::ReadInt8(pbuf);
-		int code, desc;
-		for (int i = 0; i < count; ++i) {
-			code = NetManager::ReadInt32(pbuf);
-			desc = NetManager::ReadInt32(pbuf);
-		}
+		NetManager::ReadInt32(pbuf);
+		int code = NetManager::ReadInt32(pbuf);
+		myswprintf(textBuffer, L"[%ls]错过时点", mainGame->dataManager.GetName(code));
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(code);
 		return true;
 	}
 	case MSG_TOSS_COIN: {
@@ -3550,9 +3548,8 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 			break;
 		}
 		case MSG_MISSED_EFFECT: {
-			count = NetManager::ReadInt8(pbuf);
 			pbuf += 8;
-//			SolveMessage(pd, offset, pbuf - offset);
+			SolveMessage(pd, offset, pbuf - offset);
 			break;
 		}
 		case MSG_TOSS_COIN: {

@@ -3756,23 +3756,15 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	return TRUE;
 }
 int32 field::break_effect() {
-	chain_list::iterator chit, rm;
-	chain_list missed;
 	core.hint_timing[0] = 0;
 	core.hint_timing[1] = 0;
-	for (chit = core.new_ochain.begin(); chit != core.new_ochain.end();) {
-		rm = chit++;
+	for (auto chit = core.new_ochain.begin(); chit != core.new_ochain.end();) {
+		auto rm = chit++;
 		if (!(rm->triggering_effect->flag & EFFECT_FLAG_DELAY)) {
-			missed.push_back(*rm);
+			pduel->write_buffer8(MSG_MISSED_EFFECT);
+			pduel->write_buffer32(rm->triggering_effect->handler->get_info_location());
+			pduel->write_buffer32(rm->triggering_effect->handler->data.code);
 			core.new_ochain.erase(rm);
-		}
-	}
-	if(missed.size()) {
-		pduel->write_buffer8(MSG_MISSED_EFFECT);
-		pduel->write_buffer8(missed.size());
-		for(chit = missed.begin(); chit != missed.end(); ++chit) {
-			pduel->write_buffer32(chit->triggering_effect->handler->data.code);
-			pduel->write_buffer32(chit->triggering_effect->description);
 		}
 	}
 	core.used_event.splice(core.used_event.end(), core.instant_event);
