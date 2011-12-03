@@ -44,9 +44,9 @@ struct optarget {
 };
 struct chain {
 	typedef std::map<uint32, optarget > opmap;
+	uint32 chain_type;
 	uint16 chain_id;
 	uint8 chain_count;
-	uint8 chain_type;
 	uint8 triggering_player;
 	uint8 triggering_controler;
 	uint8 triggering_location;
@@ -476,7 +476,8 @@ public:
 #define CHAININFO_DISABLE_REASON		0x200
 #define CHAININFO_DISABLE_PLAYER		0x400
 #define CHAININFO_CHAIN_ID				0x800
-#define CHAININFO_CHAIN_TYPE			0x1000
+#define CHAININFO_TYPE					0x1000
+#define CHAININFO_EXTTYPE				0x2000
 //Timing
 #define TIMING_DRAW_PHASE			0x1
 #define TIMING_STANDBY_PHASE		0x2

@@ -31,7 +31,7 @@ function c72677437.splimit(e,se,sp,st)
 	return not se:GetHandler():IsType(TYPE_MONSTER)
 end
 function c72677437.atkval(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsRace,tp,LOCATION_GRAVE,0,nil,RACE_REPTILE)*500
+	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,nil,RACE_REPTILE)*500
 end
 function c72677437.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)

@@ -1216,7 +1216,10 @@ int32 scriptlib::duel_get_chain_info(lua_State *L) {
 		case CHAININFO_CHAIN_ID:
 			lua_pushinteger(L, ch->chain_id);
 			break;
-		case CHAININFO_CHAIN_TYPE:
+		case CHAININFO_TYPE:
+			lua_pushinteger(L, (ch->chain_type & 0x7));
+			break;
+		case CHAININFO_EXTTYPE:
 			lua_pushinteger(L, ch->chain_type);
 			break;
 		default:

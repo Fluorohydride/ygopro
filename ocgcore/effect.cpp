@@ -247,6 +247,9 @@ int32 effect::is_activate_ready(uint8 playerid, event e, int32 neglect_cond, int
 	return TRUE;
 }
 int32 effect::is_condition_check(uint8 playerid, event e) {
+	if ((handler->current.location & LOCATION_ONFIELD)
+	        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+		return FALSE;
 	if(!condition)
 		return TRUE;
 	effect* oreason = pduel->game_field->core.reason_effect;

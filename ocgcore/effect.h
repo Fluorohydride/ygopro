@@ -148,6 +148,7 @@ public:
 #define EFFECT_FLAG_OATH			0x80000	//
 #define EFFECT_FLAG_SPSUM_PARAM		0x100000	//
 #define EFFECT_FLAG_REPEAT			0x200000	//
+#define EFFECT_FLAG_NO_TURN_RESET	0x400000	//
 
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//

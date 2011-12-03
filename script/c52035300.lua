@@ -17,11 +17,11 @@ function c52035300.initial_effect(c)
 	c:RegisterEffect(e2)
 	--Special Summon
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(52035300,0))
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_GRAVE)
-	e3:SetDescription(aux.Stringid(52035300,0))
 	e3:SetCondition(c52035300.condition)
 	e3:SetTarget(c52035300.target)
 	e3:SetOperation(c52035300.operation)
@@ -31,7 +31,7 @@ function c52035300.recon(e,c)
 	return not c:IsRace(RACE_WARRIOR)
 end
 function c52035300.filter(c)
-	return not c:IsRace(RACE_WARRIOR)
+	return c:IsType(TYPE_MONSTER) and not c:IsRace(RACE_WARRIOR)
 end
 function c52035300.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0

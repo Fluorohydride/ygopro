@@ -3176,14 +3176,12 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 	case 0: {
 		//Pre Draw
 		card* pcard;
-		event_list::iterator elit;
-		for(elit = core.used_event.begin(); elit != core.used_event.end(); ++elit) {
+		for(auto elit = core.used_event.begin(); elit != core.used_event.end(); ++elit) {
 			if(elit->event_cards)
 				pduel->delete_group((group*)elit->event_cards);
 		}
 		core.used_event.clear();
-		std::set<effect*>::iterator eit;
-		for(eit = core.reseted_effects.begin(); eit != core.reseted_effects.end(); ++eit) {
+		for(auto eit = core.reseted_effects.begin(); eit != core.reseted_effects.end(); ++eit) {
 			pduel->delete_effect(*eit);
 		}
 		core.reseted_effects.clear();
@@ -3214,8 +3212,9 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.spsummon_state[p] = 0;
 			core.attack_state[p] = 0;
 		}
-		for(field_effect::effect_collection::iterator rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
-			(*rit)->recharge();
+		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
+			if(!((*rit)->flag & EFFECT_FLAG_NO_TURN_RESET))
+				(*rit)->recharge();
 		infos.turn_id++;
 		core.summon_count[0] = 0;
 		core.summon_count[1] = 0;
@@ -3451,7 +3450,7 @@ int32 field::add_chain(uint16 step) {
 		core.chain_limit = 0;
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))
 			clit->flag |= CHAIN_DISABLE_EFFECT;
-		clit->chain_type = peffect->handler->get_type() & 0x7;
+		clit->chain_type = peffect->handler->get_type();
 		clit->chain_count = core.current_chain.size() + 1;
 		clit->target_cards = 0;
 		clit->target_player = PLAYER_NONE;

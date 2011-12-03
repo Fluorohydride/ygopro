@@ -1419,7 +1419,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		adjust_all();
 		if(core.current_chain.size() == 0) {
 			core.hint_timing[setplayer] |= TIMING_MSET;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, infos.turn_player);
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
 		return TRUE;
 	}
@@ -1481,7 +1481,7 @@ int32 field::sset(uint16 step, uint8 setplayer, card * target) {
 		adjust_all();
 		if(core.current_chain.size() == 0) {
 			core.hint_timing[setplayer] |= TIMING_SSET;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, infos.turn_player);
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
 	}
 	}

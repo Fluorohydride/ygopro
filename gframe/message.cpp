@@ -2175,6 +2175,8 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 			mainGame->gMutex.Lock();
 			mainGame->dField.RemoveCard(pc, pl, ps);
 			mainGame->gMutex.Unlock();
+			if(pcard == mainGame->dField.hovered_card)
+				mainGame->dField.hovered_card = 0;
 			delete pcard;
 		} else {
 			if (!(pl & 0x80) && !(cl & 0x80)) {
