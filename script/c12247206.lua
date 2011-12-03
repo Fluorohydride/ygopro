@@ -38,7 +38,7 @@ end
 function c12247206.sp(g,tp)
 	local sc=g:GetFirst()
 	while sc do
-		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 		sc=g:GetNext()
 	end
 end
@@ -46,7 +46,7 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local gg=Group.CreateGroup()
-	if ft1>0 and tc:IsRelateToEffect(e) then
+	if ft1>0 and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local g=Duel.GetMatchingGroup(c12247206.filter,tp,0x13,0,nil,tc:GetCode(),e,tp)
 		if g:GetCount()<=ft1 then c12247206.sp(g,tp)
 		else

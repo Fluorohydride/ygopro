@@ -12,10 +12,14 @@ function c10755984.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c10755984.condition)
 	e1:SetCost(c10755984.cost)
 	e1:SetTarget(c10755984.target)
 	e1:SetOperation(c10755984.operation)
 	c:RegisterEffect(e1)
+end
+function c10755984.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
 end
 function c10755984.costfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
