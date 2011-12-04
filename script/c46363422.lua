@@ -5,8 +5,8 @@ function c46363422.initial_effect(c)
 	--add counter
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e1:SetCode(EVENT_CHAIN_SOLVED)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EVENT_CHAIN_SOLVING)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetOperation(c46363422.acop)
 	c:RegisterEffect(e1)
 	--special summon

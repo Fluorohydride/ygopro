@@ -2585,12 +2585,16 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.sub_attack_target != (card*)0xffffffff) {
 			core.attacker->announce_count++;
 			core.attacker->attacked_count++;
-			if(core.attack_target) {
+			pduel->write_buffer8(MSG_ATTACK);
+			pduel->write_buffer32(core.attacker->get_info_location());
+			if(core.sub_attack_target) {
 				core.attacker->announced_cards[core.sub_attack_target->fieldid] = core.sub_attack_target;
 				core.attacker->attacked_cards[core.sub_attack_target->fieldid] = core.sub_attack_target;
+				pduel->write_buffer32(core.sub_attack_target->get_info_location());
 			} else {
 				core.attacker->announced_cards[0] = 0;
 				core.attacker->attacked_cards[0] = 0;
+				pduel->write_buffer32(0);
 			}
 			core.units.begin()->step = 9;
 			return FALSE;

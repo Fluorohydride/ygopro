@@ -26,8 +26,7 @@ function c22624373.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c22624373.descon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsFaceup() and c:IsAttack()
+	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK)
 end
 function c22624373.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
@@ -42,7 +41,7 @@ end
 function c22624373.desop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and c:IsPosition(POS_FACEUP_ATTACK) and tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 		Duel.Destroy(tc,REASON_EFFECT)
 		local e1=Effect.CreateEffect(c)

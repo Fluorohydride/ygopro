@@ -3,11 +3,13 @@ function c78422252.initial_effect(c)
 	--negate attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(78422252,0))
+	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BE_BATTLE_TARGET)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
 	e1:SetCondition(c78422252.condition)
-	e1:SetCost(c78422252.cost)
+	e1:SetTarget(c78422252.target)
 	e1:SetOperation(c78422252.operation)
 	c:RegisterEffect(e1)
 	--draw
@@ -25,9 +27,11 @@ end
 function c78422252.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end
-function c78422252.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(78422252)==0 end
-	e:GetHandler():RegisterFlagEffect(78422252,RESET_EVENT+0x1fe0000,0,0)
+function c78422252.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local tg=Duel.GetAttacker()
+	if chkc then return chkc==tg end
+	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(tg)
 end
 function c78422252.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DisableAttack()
