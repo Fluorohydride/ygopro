@@ -100,9 +100,13 @@ void Replay::SaveReplay(const wchar_t* name) {
 bool Replay::OpenReplay(const wchar_t* name) {
 	wchar_t fname[64];
 	myswprintf(fname, L"./replay/%ls", name);
-	char fname2[64];
+#ifdef WIN32
+	fp = _wfopen(fname, L"rb");
+#else
+	char fname2[256];
 	DataManager::EncodeUTF8(fname, fname2);
 	fp = fopen(fname2, "rb");
+#endif
 	if(!fp)
 		return false;
 	fseek(fp, 0, SEEK_END);
@@ -127,9 +131,13 @@ bool Replay::OpenReplay(const wchar_t* name) {
 bool Replay::CheckReplay(const wchar_t* name) {
 	wchar_t fname[64];
 	myswprintf(fname, L"./replay/%ls", name);
-	char fname2[64];
+#ifdef WIN32
+	fp = _wfopen(fname, L"rb");
+#else
+	char fname2[256];
 	DataManager::EncodeUTF8(fname, fname2);
 	fp = fopen(fname2, "rb");
+#endif
 	if(!fp)
 		return false;
 	fread(&pheader, sizeof(pheader), 1, fp);

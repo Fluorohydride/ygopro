@@ -2559,7 +2559,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 				mainGame->WaitFrameSignal(30);
 			myswprintf(textBuffer, L"[%ls](%ls,%d)成为对象", mainGame->dataManager.GetName(pcard->code), DataManager::FormatLocation(l), s);
 			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(0);
+			mainGame->logParam.push_back(pcard->code);
 			pcard->is_highlighting = false;
 		}
 		return true;

@@ -46,6 +46,7 @@ function c49597193.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local m=0
 	if a==e:GetHandler() then m=d:GetAttack()
 	else m=a:GetAttack() end
+	if m<0 then m=0 end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(m)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,m)
