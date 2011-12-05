@@ -14,7 +14,7 @@ function c48445393.desfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x24) and c:IsDestructable()
 end
 function c48445393.sfilter(c)
-	return c:IsSetCard(0x24) and c:IsAbleToGrave()
+	return c:IsSetCard(0x24) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function c48445393.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c48445393.desfilter(chkc) end
@@ -24,7 +24,7 @@ function c48445393.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c48445393.desfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TPGRAVE,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c48445393.activate(e,tp,eg,ep,ev,re,r,rp)

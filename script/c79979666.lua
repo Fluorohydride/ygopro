@@ -35,7 +35,7 @@ function c79979666.filter(c)
 	return not c:IsStatus(STATUS_LEAVE_CONFIRMED)
 end
 function c79979666.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c79979666.filter,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
+	return not Duel.IsExistingMatchingCard(c79979666.filter,tp,LOCATION_ONFIELD+LOCATION_HAND,0,1,e:GetHandler())
 end
 function c79979666.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

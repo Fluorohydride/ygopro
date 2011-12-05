@@ -34,7 +34,7 @@ function c55136228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c55136228.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c55136228.activate(e,tp,eg,ep,ev,re,r,rp)
-	local sg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS	local tc=Duel.GetFirstTarget()
+	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

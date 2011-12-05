@@ -23,6 +23,6 @@ end
 function c30683373.activate(e)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		Duel.Destroy(sg,REASON_EFFECT)
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
