@@ -2937,10 +2937,19 @@ int32 field::process_battle_command(uint16 step) {
 		core.units.begin()->peffect = (effect*)reason_card;
 		if(reason_card)
 			core.units.begin()->arg1 = reason_card->current.controler;
-		if(core.battle_damage[0])
+		if(core.battle_damage[0]) {
+			raise_single_event(core.attacker, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 0, core.battle_damage[0]);
+			if(core.attack_target)
+				raise_single_event(core.attack_target, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 0, core.battle_damage[0]);
 			raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 0, core.battle_damage[0]);
-		if(core.battle_damage[1])
-			raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1, core.battle_damage[0]);
+		}
+		if(core.battle_damage[1]) {
+			raise_single_event(core.attacker, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1, core.battle_damage[1]);
+			if(core.attack_target)
+				raise_single_event(core.attack_target, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1, core.battle_damage[1]);
+			raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1, core.battle_damage[1]);
+		}
+		process_single_event();
 		process_instant_event();
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_EVENT);

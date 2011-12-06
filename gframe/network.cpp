@@ -261,6 +261,16 @@ int NetManager::ListenThread(void* np) {
 			net->sRemote = accept(net->sListen, 0, 0);
 			continue;
 		}
+		int mode = ReadInt16(pbuf);
+		if(mode == 1 && (net->hInfo.no_chain_hint || net->hInfo.no_check_deck || net->hInfo.no_shuffle_deck || net->hInfo.no_shuffle_player || net->hInfo.attack_ft
+		                 || net->hInfo.start_lp != 8000 || net->hInfo.start_hand != 5 || net->hInfo.draw_count != 1 )) {
+			psbuf = net->send_buf;
+			WriteInt8(psbuf, 0x4);
+			send(net->sRemote, net->send_buf, 1, 0);
+			closesocket(net->sRemote);
+			net->sRemote = accept(net->sListen, 0, 0);
+			continue;
+		}
 		wchar_t cn = ReadInt16(pbuf);
 		int off = 0;
 		while(cn != 0 && off < 19) {
@@ -348,6 +358,7 @@ int NetManager::JoinThread(void* adr) {
 	}
 	char* pbuf = pnet->send_buf;
 	NetManager::WriteInt16(pbuf, PROTO_VERSION);
+	NetManager::WriteInt16(pbuf, mainGame->chkStOnly->isChecked() ? 1 : 0);
 	const wchar_t* pname = mainGame->ebJoinPass->getText();
 	int i = 0;
 	while(pname[i] != 0 && i < 19)
@@ -385,13 +396,17 @@ int NetManager::JoinThread(void* adr) {
 				wchar_t errorbuf[32];
 				myswprintf(errorbuf, L"当前版本(0x%X)与主机版本(0x%X)不匹配", PROTO_VERSION, (int)(*(short*)&pnet->recv_buf[1]));
 				mainGame->stModeStatus->setText(errorbuf);
-			} else if(pnet->recv_buf[0] == 0x2) {
+			} else if(pnet->recv_buf[0] == 0x2)
 				mainGame->stModeStatus->setText(L"无效卡组或者卡组不符合禁卡表规范");
-			} else
+			else if(pnet->recv_buf[0] == 0x3)
 				mainGame->stModeStatus->setText(L"密码错误");
+			else if(pnet->recv_buf[0] == 0x4)
+				mainGame->stModeStatus->setText(L"主机非标准对战模式，拒绝连接");
+			else mainGame->stModeStatus->setText(L"未知错误");
 		}
 		return 0;
 	}
+	mainGame->stModeStatus->setText(L"");
 	wchar_t* pn = (wchar_t*)&pnet->recv_buf[1];
 	int pi = 0;
 	while(pn[pi] && pi < 19) {

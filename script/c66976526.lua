@@ -52,7 +52,7 @@ function c66976526.cfilter(c,tp)
 	return c:IsSetCard(0x11) and c:IsControler(tp) and ((pp==0x1 and np==0x4) or (pp==0x4 and np==0x1) or (pp==0x8 and np==0x1))
 end
 function c66976526.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c85541675.cfilter,1,nil,tp)
+	return eg:IsExists(c66976526.cfilter,1,nil,tp)
 end
 function c66976526.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.IsPlayerCanDraw(tp,1) end

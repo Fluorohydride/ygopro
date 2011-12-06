@@ -213,6 +213,7 @@ public:
 	irr::gui::IGUIEditBox* ebJoinIP;
 	irr::gui::IGUIEditBox* ebJoinPort;
 	irr::gui::IGUIEditBox* ebJoinPass;
+	irr::gui::IGUICheckBox* chkStOnly;
 	irr::gui::IGUIButton* btnLanConnect;
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIButton* btnLoadReplay;
