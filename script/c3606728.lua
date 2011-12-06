@@ -49,6 +49,7 @@ function c3606728.efcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c3606728.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(3606728,1))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
@@ -59,7 +60,15 @@ function c3606728.efop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(c3606728.atktg)
 	e1:SetOperation(c3606728.atkop)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	c:GetReasonCard():RegisterEffect(e1)
+	rc:RegisterEffect(e1)
+	if not rc:IsType(TYPE_EFFECT) then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_CHANGE_TYPE)
+		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
+		rc:RegisterEffect(e2)
+	end
 end
 function c3606728.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ

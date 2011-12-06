@@ -14,7 +14,6 @@ function c72926163.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetLabelObject(e1)
 	e3:SetOperation(c72926163.sucop)
 	c:RegisterEffect(e3)
 	--multiatk
@@ -36,12 +35,15 @@ function c72926163.splimit(e,se,sp,st)
 end
 function c72926163.sucop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=e:GetLabelObject():GetLabelObject()
-	if tc:IsCode(89943723) then return end
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(tc:GetAttack()/2)
-	e1:SetReset(RESET_EVENT+0x1ff0000)
-	c:RegisterEffect(e1)
+	local g=c:GetMaterial()
+	local tc=g:GetFirst()
+	if tc:IsCode(89943723) or tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then tc=g:GetNext() end
+	if not tc:IsCode(89943723) then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(tc:GetAttack()/2)
+		e1:SetReset(RESET_EVENT+0x1ff0000)
+		c:RegisterEffect(e1)
+	end
 end

@@ -36,11 +36,11 @@ function c87624166.desfilter(c)
 	return c:GetAttackedCount()>0
 end
 function c87624166.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c87624166.desfilter,tp,LOCATION_MZONE,0,1,nil) end
-	local g=Duel.GetMatchingGroup(c87624166.desfilter,Duel.GetTurnPlayer(),LOCATION_MZONE,0,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c87624166.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(c87624166.desfilter,Duel.GetTurnPlayer(),LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c87624166.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c87624166.desfilter,Duel.GetTurnPlayer(),LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(c87624166.desfilter,Duel.GetTurnPlayer(),LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.Destroy(g,REASON_EFFECT)
 end
