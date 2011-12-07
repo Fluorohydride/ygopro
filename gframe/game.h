@@ -11,6 +11,7 @@
 #include "network.h"
 #include "deck_manager.h"
 #include "replay.h"
+#include "g_ime.h"
 #include <string>
 #include "../ocgcore/mtrandom.h"
 #include <unordered_map>
@@ -124,6 +125,7 @@ public:
 	DeckManager deckManager;
 	Materials matManager;
 	Replay lastReplay;
+	G_IME ime;
 	std::vector<int> logParam;
 	unsigned short linePattern;
 	int waitFrame;
@@ -161,6 +163,7 @@ public:
 	DeckBuilder deckBuilder;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
+	irr::video::SExposedVideoData vdata;
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
 	//GUI
@@ -329,6 +332,8 @@ public:
 	irr::gui::IGUIButton* btnReplaySwap;
 
 };
+
+extern Game* mainGame;
 
 }
 

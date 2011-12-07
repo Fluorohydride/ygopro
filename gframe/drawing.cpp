@@ -1,7 +1,5 @@
 #include "game.h"
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
 
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv) {

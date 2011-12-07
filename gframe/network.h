@@ -5,8 +5,6 @@
 #include <set>
 #include <vector>
 
-#define PROTO_VERSION 0x1011
-
 namespace ygo {
 
 struct HostInfo {
@@ -98,6 +96,8 @@ public:
 	static int JoinThread(void*);
 
 };
+
+extern const unsigned short PROTO_VERSION;
 
 }
 

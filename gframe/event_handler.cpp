@@ -3,8 +3,6 @@
 #include "network.h"
 #include "game.h"
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
 
 bool ClientField::OnEvent(const irr::SEvent& event) {

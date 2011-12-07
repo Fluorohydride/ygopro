@@ -1,8 +1,6 @@
 #include "image_manager.h"
 #include "game.h"
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
 
 bool ImageManager::Initial() {

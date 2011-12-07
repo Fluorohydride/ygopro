@@ -37,7 +37,7 @@ function c8062132.initial_effect(c)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
 	c:RegisterEffect(e5)
-	--special summon
+	--win
 	local e6=Effect.CreateEffect(c)
 	e6:SetDescription(aux.Stringid(8062132,1))
 	e6:SetCategory(CATEGORY_COUNTER)
@@ -63,12 +63,12 @@ function c8062132.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c8062132.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,true) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c8062132.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,true,POS_FACEUP)
 	end
 end
 function c8062132.ctop(e,tp,eg,ep,ev,re,r,rp)

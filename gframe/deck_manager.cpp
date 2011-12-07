@@ -3,8 +3,6 @@
 #include "game.h"
 #include <algorithm>
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
 
 void DeckManager::LoadLFList() {

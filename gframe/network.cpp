@@ -1,9 +1,9 @@
 #include "network.h"
 #include "game.h"
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
+
+const unsigned short PROTO_VERSION = 0x1011;
 
 bool NetManager::CreateHost() {
 	wchar_t* pstr;

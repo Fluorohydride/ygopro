@@ -7,9 +7,9 @@
 #include <dirent.h>
 #endif
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
+
+Game* mainGame;
 
 Game::Game() {
 }
@@ -43,6 +43,8 @@ bool Game::Initialize() {
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	vdata = driver->getExposedVideoData();
+	ime.Init(vdata);
 	imageManager.SetDevice(device);
 	if(!dataManager.LoadDates("cards.cdb"))
 		return false;

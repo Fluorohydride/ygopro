@@ -5,8 +5,6 @@
 #include <algorithm>
 #include "lzma/LzmaLib.h"
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
 
 Replay::Replay() {

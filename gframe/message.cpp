@@ -4,8 +4,6 @@
 #include <sys/time.h>
 #include <algorithm>
 
-extern ygo::Game* mainGame;
-
 #define MSG_REPLAY 		0xf0
 #define MSG_DUEL_END	0xf1
 

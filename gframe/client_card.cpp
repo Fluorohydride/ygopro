@@ -1,8 +1,6 @@
 #include "client_card.h"
 #include "game.h"
 
-extern ygo::Game* mainGame;
-
 namespace ygo {
 
 ClientCard::ClientCard() {

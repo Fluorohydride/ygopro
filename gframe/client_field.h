@@ -2,10 +2,11 @@
 #define CLIENT_FIELD_H
 
 #include "config.h"
-#include "client_card.h"
 #include <vector>
 
 namespace ygo {
+
+class ClientCard;
 
 struct ChainInfo{
 	irr::core::vector3df chain_pos;

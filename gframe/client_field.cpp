@@ -1,7 +1,6 @@
 #include "client_field.h"
+#include "client_card.h"
 #include "game.h"
-
-extern ygo::Game* mainGame;
 
 namespace ygo {
 

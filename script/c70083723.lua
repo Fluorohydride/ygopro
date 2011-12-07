@@ -22,5 +22,5 @@ function c70083723.filter(c)
 	return c:IsSetCard(0x2a) and c:IsType(TYPE_MONSTER)
 end
 function c70083723.atkval(e,c)
-	return Duel.GetMatchingGroupCount(c70083723.filter,tp,LOCATION_GRAVE,0,nil)*200
+	return Duel.GetMatchingGroupCount(c70083723.filter,c:GetControler(),LOCATION_GRAVE,0,nil)*200
 end

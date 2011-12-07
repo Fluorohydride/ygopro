@@ -1,8 +1,6 @@
 #include "config.h"
 #include "game.h"
 
-ygo::Game* mainGame;
-
 int main() {
 #ifdef _WIN32
 	WORD wVersionRequested;
@@ -13,10 +11,10 @@ int main() {
 #else
 #endif //_WIN32
 	ygo::Game _game;
-	mainGame = &_game;
-	if(!mainGame->Initialize())
+	ygo::mainGame = &_game;
+	if(!ygo::mainGame->Initialize())
 		return 0;
-	mainGame->MainLoop();
+	ygo::mainGame->MainLoop();
 #ifdef _WIN32
 	timeEndPeriod(1);
 	WSACleanup();
