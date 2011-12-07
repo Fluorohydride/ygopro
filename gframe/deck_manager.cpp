@@ -102,6 +102,10 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 	}
 	for(int i = 0; i < sidec; ++i) {
 		code = dbuf[mainc + i];
+		if(!mainGame->dataManager.GetData(code, &cd))
+			continue;
+		if(cd.type & TYPE_TOKEN)
+			continue;
 		if(deck.side.size() < 15)
 			deck.side.push_back(mainGame->dataManager.GetCodePointer(code));
 	}
