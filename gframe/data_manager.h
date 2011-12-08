@@ -25,7 +25,6 @@ public:
 	const wchar_t* GetSysString(int code);
 	const wchar_t* GetVictoryString(int code);
 	const wchar_t* GetCounterName(int code);
-	const wchar_t* GetSeriesName(int code);
 	const wchar_t* GetNumString(int num);
 	static int EncodeUTF8(const wchar_t * wsrc, char * str);
 	static int DecodeUTF8(const char * src, wchar_t * wstr);
@@ -35,7 +34,6 @@ public:
 	std::unordered_map<unsigned int, wchar_t*> _sysStrings;
 	std::unordered_map<unsigned int, wchar_t*> _counterStrings;
 	std::unordered_map<unsigned int, wchar_t*> _victoryStrings;
-	std::unordered_map<unsigned int, wchar_t*> _seriesStrings;
 	wchar_t numStrings[256][4];
 	
 	static wchar_t strBuffer[2048];

@@ -11,7 +11,6 @@
 #include "network.h"
 #include "deck_manager.h"
 #include "replay.h"
-#include "g_ime.h"
 #include <string>
 #include "../ocgcore/mtrandom.h"
 #include <unordered_map>
@@ -125,7 +124,7 @@ public:
 	DeckManager deckManager;
 	Materials matManager;
 	Replay lastReplay;
-	G_IME ime;
+
 	std::vector<int> logParam;
 	unsigned short linePattern;
 	int waitFrame;
@@ -163,7 +162,6 @@ public:
 	DeckBuilder deckBuilder;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
-	irr::video::SExposedVideoData vdata;
 	irr::scene::ISceneManager* smgr;
 	irr::scene::ICameraSceneNode* camera;
 	//GUI
@@ -264,6 +262,7 @@ public:
 	//announce card
 	irr::gui::IGUIWindow* wANCard;
 	irr::gui::IGUIEditBox* ebANCard;
+	irr::gui::IGUIListBox* lstANCard;
 	irr::gui::IGUIButton* btnANCardOK;
 	//announce attribute
 	irr::gui::IGUIWindow* wANAttribute;
@@ -303,15 +302,13 @@ public:
 	irr::gui::IGUIScrollBar* scrFilter;
 	irr::gui::IGUIComboBox* cbCardType;
 	irr::gui::IGUIComboBox* cbCardType2;
-	irr::gui::IGUIComboBox* cbCardClass;
 	irr::gui::IGUIComboBox* cbRace;
 	irr::gui::IGUIComboBox* cbAttribute;
 	irr::gui::IGUIComboBox* cbLimit;
 	irr::gui::IGUIEditBox* ebStar;
 	irr::gui::IGUIEditBox* ebAttack;
 	irr::gui::IGUIEditBox* ebDefence;
-	irr::gui::IGUIEditBox* ebCardCode;
-	irr::gui::IGUIButton* btnCodeDir;
+	irr::gui::IGUIEditBox* ebCardName;
 	irr::gui::IGUIButton* btnEffectFilter;
 	irr::gui::IGUIButton* btnStartFilter;
 	irr::gui::IGUIButton* btnResultFilter;
@@ -386,8 +383,10 @@ extern Game* mainGame;
 #define BUTTON_CMD_SHOWLIST			167
 #define BUTTON_ANNUMBER_OK			170
 #define BUTTON_ANCARD_OK			171
-#define CHECK_ATTRIBUTE				172
-#define CHECK_RACE					173
+#define EDITBOX_ANCARD				172
+#define LISTBOX_ANCARD				173
+#define CHECK_ATTRIBUTE				174
+#define CHECK_RACE					175
 #define BUTTON_BP					180
 #define BUTTON_M2					181
 #define BUTTON_EP					182
@@ -404,7 +403,6 @@ extern Game* mainGame;
 #define BUTTON_START_FILTER			212
 #define BUTTON_RESULT_FILTER		213
 #define SCROLL_FILTER				214
-#define BUTTON_GETCODE				215
 #define BUTTON_REPLAY_START			220
 #define BUTTON_REPLAY_PAUSE			221
 #define BUTTON_REPLAY_STEP			222

@@ -52,7 +52,10 @@ bool DataManager::LoadDates(const char* file) {
 			if(len) {
 				cs.text = new wchar_t[len + 1];
 				memcpy(cs.text, strBuffer, (len + 1)*sizeof(wchar_t));
-			} else cs.text = 0;
+			} else {
+				cs.text = new wchar_t[1];
+				cs.text[0] = 0;
+			}
 			for(int i = 14; i < 30; ++i) {
 				len = DecodeUTF8((const char*)sqlite3_column_text(pStmt, i), strBuffer);
 				if(len) {
@@ -98,12 +101,6 @@ bool DataManager::LoadDates(const char* file) {
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
 			_counterStrings[value] = pbuf;
-		} else if(!strcmp(strbuf, "series")) {
-			sscanf(&linebuf[7], "%x %s", &value, strbuf);
-			int len = DecodeUTF8(strbuf, strBuffer);
-			wchar_t* pbuf = new wchar_t[len + 1];
-			wcscpy(pbuf, strBuffer);
-			_seriesStrings[value] = pbuf;
 		}
 	}
 	fclose(fp);
@@ -181,12 +178,6 @@ const wchar_t* DataManager::GetVictoryString(int code) {
 const wchar_t* DataManager::GetCounterName(int code) {
 	auto csit = _counterStrings.find(code);
 	if(csit == _counterStrings.end())
-		return unknown_string;
-	return csit->second;
-}
-const wchar_t* DataManager::GetSeriesName(int code) {
-	auto csit = _seriesStrings.find(code);
-	if(csit == _seriesStrings.end())
 		return unknown_string;
 	return csit->second;
 }

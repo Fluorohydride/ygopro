@@ -97,6 +97,7 @@ public:
 	
 	irr::IrrlichtDevice* device;
 	irr::gui::IGUIElement* panel;
+	std::vector<int> ancard;
 	int hovered_controler;
 	int hovered_location;
 	int hovered_sequence;

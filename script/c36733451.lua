@@ -46,7 +46,7 @@ function c36733451.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c36733451.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_DESTROY)>0
-		and bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)>0
+		and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 		and e:GetHandler():GetPreviousControler()==tp
 end
 function c36733451.filter(c)
@@ -63,5 +63,6 @@ function c36733451.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end

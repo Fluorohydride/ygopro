@@ -1182,7 +1182,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		case HINT_CODE: {
 			myswprintf(textBuffer, L"对方宣言了：[%ls]", mainGame->dataManager.GetName(data));
 			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(0);
+			mainGame->logParam.push_back(data);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
@@ -1195,6 +1195,13 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
 			mainGame->PopupElement(mainGame->wACMessage, 20);
 			mainGame->WaitFrameSignal(40);
+			break;
+		}
+		case HINT_CARD: {
+			mainGame->showcardcode = data;
+			mainGame->showcarddif = 0;
+			mainGame->showcard = 1;
+			mainGame->WaitFrameSignal(30);
 			break;
 		}
 		}

@@ -102,7 +102,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 				mainGame->cbCardType->setSelected(0);
 				mainGame->cbCardType2->setSelected(0);
-				mainGame->cbCardClass->setSelected(0);
 				mainGame->cbAttribute->setSelected(0);
 				mainGame->cbRace->setSelected(0);
 				mainGame->ebAttack->setText(L"");
@@ -312,7 +311,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_ANCARD_OK: {
-				mainGame->dInfo.responseI = _wtoi(mainGame->ebANCard->getText());
+				int sel = mainGame->lstANCard->getSelected();
+				if(sel == -1)
+					break;
+				mainGame->dInfo.responseI = ancard[sel];
 				mainGame->SetResponseI();
 				mainGame->HideElement(mainGame->wANCard, true);
 				break;
@@ -819,6 +821,44 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 				} else if(mainGame->wModes->getActiveTab() == 2) {
 					mainGame->RefreshReplay();
+				}
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_CHANGED: {
+			switch(id) {
+			case EDITBOX_ANCARD: {
+				const wchar_t* pname = mainGame->ebANCard->getText();
+				if(pname[0] == 0 || pname[1] == 0)
+					break;
+				mainGame->lstANCard->clear();
+				ancard.clear();
+				for(auto cit = mainGame->dataManager._strings.begin(); cit != mainGame->dataManager._strings.end(); ++cit) {
+					if(wcsstr(cit->second.name, pname) != 0) {
+						mainGame->lstANCard->addItem(cit->second.name);
+						ancard.push_back(cit->first);
+					}
+				}
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_ENTER: {
+			switch(id) {
+			case EDITBOX_ANCARD: {
+				const wchar_t* pname = mainGame->ebANCard->getText();
+				if(pname[0] == 0)
+					break;
+				mainGame->lstANCard->clear();
+				ancard.clear();
+				for(auto cit = mainGame->dataManager._strings.begin(); cit != mainGame->dataManager._strings.end(); ++cit) {
+					if(wcsstr(cit->second.name, pname) != 0) {
+						mainGame->lstANCard->addItem(cit->second.name);
+						ancard.push_back(cit->first);
+					}
 				}
 				break;
 			}

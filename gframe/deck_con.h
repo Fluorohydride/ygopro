@@ -18,7 +18,6 @@ public:
 	long long filter_effect;
 	int filter_type;
 	int filter_type2;
-	int filter_series;
 	int filter_attrib;
 	int filter_race;
 	int filter_atktype;

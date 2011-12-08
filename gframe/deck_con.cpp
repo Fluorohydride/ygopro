@@ -76,7 +76,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_START_FILTER: {
 				filter_type = mainGame->cbCardType->getSelected();
 				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_series = mainGame->cbCardClass->getItemData(mainGame->cbCardClass->getSelected());
 				filter_lm = mainGame->cbLimit->getSelected();
 				if(filter_type > 1) {
 					FilterCards();
@@ -175,7 +174,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			case BUTTON_RESULT_FILTER: {
 				filter_type = mainGame->cbCardType->getSelected();
 				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_series = mainGame->cbCardClass->getItemData(mainGame->cbCardClass->getSelected());
 				filter_lm = mainGame->cbLimit->getSelected();
 				if(filter_type > 1) {
 					FilterCardsFromResult();
@@ -270,32 +268,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				}
 				FilterCardsFromResult();
 				break;
-			}
-			case BUTTON_GETCODE: {
-				const wchar_t* strcode = mainGame->ebCardCode->getText();
-				if(*strcode) {
-					int code = _wtoi(strcode);
-					auto it = mainGame->dataManager._datas.find(code);
-					if(it != mainGame->dataManager._datas.end()) {
-						results.clear();
-						results.push_back(it);
-						myswprintf(result_string, L"1");
-						mainGame->scrFilter->setVisible(false);
-						mainGame->scrFilter->setPos(0);
-						mainGame->cbCardClass->setSelected(0);
-						mainGame->cbAttribute->setSelected(0);
-						mainGame->cbRace->setSelected(0);
-						mainGame->cbLimit->setSelected(0);
-						mainGame->ebAttack->setText(L"");
-						mainGame->ebDefence->setText(L"");
-						mainGame->ebStar->setText(L"");
-						mainGame->ebCardCode->setText(L"");
-						filter_effect = 0;
-						for(int i = 0; i < 32; ++i)
-							mainGame->chkCategory[i]->setChecked(false);
-					}
-					break;
-				}
 			}
 			case BUTTON_CATEGORY_OK: {
 				filter_effect = 0;
@@ -629,8 +601,13 @@ int DeckBuilder::GetVal(const wchar_t * pstr) {
 }
 void DeckBuilder::FilterCards() {
 	results.clear();
-	for(code_pointer ptr = mainGame->dataManager._datas.begin(); ptr != mainGame->dataManager._datas.end(); ++ptr) {
+	const wchar_t* pstr = mainGame->ebCardName->getText();
+	if(pstr[0] == 0)
+		pstr = 0;
+	auto strpointer = mainGame->dataManager._strings.begin();
+	for(code_pointer ptr = mainGame->dataManager._datas.begin(); ptr != mainGame->dataManager._datas.end(); ++ptr, ++strpointer) {
 		CardDataC& data = ptr->second;
+		CardString& text = strpointer->second;
 		if(data.type & TYPE_TOKEN)
 			continue;
 		switch(filter_type) {
@@ -683,11 +660,8 @@ void DeckBuilder::FilterCards() {
 			if(!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1)
 				continue;
 		}
-		if(filter_series) {
-			uint32 settype = filter_series & 0xfff;
-			uint32 setsubtype = filter_series & 0xf000;
-			if (((data.setcode & 0xfff) != settype || ((data.setcode & 0xf000 & setsubtype) != setsubtype)) &&
-			        (((data.setcode >> 16) & 0xfff) != settype || ((data.setcode >> 16) & 0xf000 & setsubtype) != setsubtype))
+		if(pstr) {
+			if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
 				continue;
 		}
 		results.push_back(ptr);
@@ -702,7 +676,6 @@ void DeckBuilder::FilterCards() {
 		mainGame->scrFilter->setPos(0);
 	}
 	std::sort(results.begin(), results.end(), ClientCard::deck_sort_lv);
-	mainGame->cbCardClass->setSelected(0);
 	mainGame->cbAttribute->setSelected(0);
 	mainGame->cbRace->setSelected(0);
 	mainGame->cbLimit->setSelected(0);
@@ -715,6 +688,9 @@ void DeckBuilder::FilterCards() {
 }
 void DeckBuilder::FilterCardsFromResult() {
 	int offset = 0;
+	const wchar_t* pstr = mainGame->ebCardName->getText();
+	if(pstr[0] == 0)
+		pstr = 0;
 	for(int i = 0; i < results.size(); ++i) {
 		CardDataC& data = results[i]->second;
 		if(data.type & TYPE_TOKEN)
@@ -769,11 +745,9 @@ void DeckBuilder::FilterCardsFromResult() {
 		}
 		if(filter_effect && !(data.category & filter_effect))
 			continue;
-		if(filter_series) {
-			uint32 settype = filter_series & 0xfff;
-			uint32 setsubtype = filter_series & 0xf000;
-			if (((data.setcode & 0xfff) != settype || ((data.setcode & 0xf000 & setsubtype) != setsubtype)) &&
-			        (((data.setcode >> 16) & 0xfff) != settype || ((data.setcode >> 16) & 0xf000 & setsubtype) != setsubtype))
+		if(pstr) {
+			CardString& text = mainGame->dataManager._strings[data.code];
+			if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
 				continue;
 		}
 		results[offset] = results[i];
@@ -789,7 +763,6 @@ void DeckBuilder::FilterCardsFromResult() {
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
 	}
-	mainGame->cbCardClass->setSelected(0);
 	mainGame->cbAttribute->setSelected(0);
 	mainGame->cbRace->setSelected(0);
 	mainGame->cbLimit->setSelected(0);

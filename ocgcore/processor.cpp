@@ -531,13 +531,8 @@ int32 field::process() {
 	}
 	case PROCESSOR_TOSS_DICE: {
 		if (toss_dice(it->step, it->arg1, it->arg2)) {
-			pduel->write_buffer8(MSG_TOSS_DICE);
-			pduel->write_buffer8(it->arg1);
-			pduel->write_buffer8(it->arg2);
-			for(int32 i = 0; i < it->arg2; ++i) {
+			for(int32 i = 0; i < it->arg2; ++i)
 				pduel->lua->add_param(core.dice_result[i], PARAM_TYPE_INT);
-				pduel->write_buffer8(core.dice_result[i]);
-			}
 			core.units.pop_front();
 		} else
 			core.units.begin()->step++;
@@ -545,13 +540,8 @@ int32 field::process() {
 	}
 	case PROCESSOR_TOSS_COIN: {
 		if (toss_coin(it->step, it->arg1, it->arg2)) {
-			pduel->write_buffer8(MSG_TOSS_COIN);
-			pduel->write_buffer8(it->arg1);
-			pduel->write_buffer8(it->arg2);
-			for(int32 i = 0; i < it->arg2; ++i) {
+			for(int32 i = 0; i < it->arg2; ++i)
 				pduel->lua->add_param(core.coin_result[i], PARAM_TYPE_INT);
-				pduel->write_buffer8(core.coin_result[i]);
-			}
 			core.units.pop_front();
 		} else
 			core.units.begin()->step++;
