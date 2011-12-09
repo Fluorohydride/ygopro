@@ -13,7 +13,6 @@ function c28529976.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetOperation(c28529976.desop)
-	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--Destroy2
 	local e3=Effect.CreateEffect(c)
@@ -22,7 +21,6 @@ function c28529976.initial_effect(c)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetCondition(c28529976.descon2)
 	e3:SetOperation(c28529976.desop2)
-	e3:SetLabelObject(e1)
 	c:RegisterEffect(e3)
 end
 function c28529976.cfilter(c,e,tp)
@@ -56,18 +54,14 @@ function c28529976.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c28529976.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=e:GetLabelObject():GetLabelObject()
-	if not tc or tc:IsStatus(STATUS_DESTROY_CONFIRMED) then return end
-	if tc:IsRelateToCard(c) then
-		Duel.Destroy(tc, REASON_EFFECT)
+	local tc=e:GetHandler():GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
 function c28529976.descon2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsStatus(STATUS_DESTROY_CONFIRMED) then return false end
-	local tc=e:GetLabelObject():GetLabelObject()
-	return tc and eg:IsContains(tc) and tc:IsRelateToCard(c) and c:IsRelateToCard(tc)
+	local tc=e:GetHandler():GetFirstCardTarget()
+	return tc and eg:IsContains(tc)
 end
 function c28529976.desop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(), REASON_EFFECT)

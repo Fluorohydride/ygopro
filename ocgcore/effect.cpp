@@ -159,7 +159,7 @@ int32 effect::is_activateable(uint8 playerid, event e, int32 neglect_cond, int32
 				return FALSE;
 			if ((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE) && !(handler->current.location & range))
 				return FALSE;
-			if (!(flag & EFFECT_FLAG_CANNOT_DISABLE) && handler->is_status(STATUS_DISABLED))
+			if ((handler == owner) && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && handler->is_status(STATUS_DISABLED))
 				return FALSE;
 		}
 	}

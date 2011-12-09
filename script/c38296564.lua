@@ -2,7 +2,6 @@
 function c38296564.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -14,7 +13,6 @@ function c38296564.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetOperation(c38296564.desop)
-	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--Destroy2
 	local e3=Effect.CreateEffect(c)
@@ -23,7 +21,6 @@ function c38296564.initial_effect(c)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetCondition(c38296564.descon2)
 	e3:SetOperation(c38296564.desop2)
-	e3:SetLabelObject(e1)
 	c:RegisterEffect(e3)
 end
 function c38296564.filter(c)
@@ -40,9 +37,6 @@ function c38296564.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		c:SetCardTarget(tc)
-		e:SetLabelObject(tc)
-		c:CreateRelation(tc,RESET_EVENT+0x1fe0000)
-		tc:CreateRelation(c,RESET_EVENT+0x1020000)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -67,28 +61,24 @@ function c38296564.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c38296564.rcon(e)
-	return e:GetOwner():IsRelateToCard(e:GetHandler()) and not e:GetOwner():IsDisabled()
+	return e:GetOwner():IsHasCardTarget(e:GetHandler()) and not e:GetOwner():IsDisabled()
 end
 function c38296564.acon(e)
-	return e:GetOwner():IsRelateToCard(e:GetHandler()) and e:GetHandlerPlayer()==e:GetLabel()
+	return e:GetOwner():IsHasCardTarget(e:GetHandler()) and e:GetHandlerPlayer()==e:GetLabel()
 		and not e:GetOwner():IsDisabled()
 end
 function c38296564.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
 function c38296564.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=e:GetLabelObject():GetLabelObject()
-	if not tc or tc:IsStatus(STATUS_DESTROY_CONFIRMED) then return end
-	if tc:IsRelateToCard(c) then
-		Duel.Destroy(tc, REASON_EFFECT)
+	local tc=e:GetHandler():GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
 function c38296564.descon2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsStatus(STATUS_DESTROY_CONFIRMED) then return false end
-	local tc=e:GetLabelObject():GetLabelObject()
-	return tc and eg:IsContains(tc) and tc:IsRelateToCard(c) and c:IsRelateToCard(tc)
+	local tc=e:GetHandler():GetFirstCardTarget()
+	return tc and eg:IsContains(tc)
 end
 function c38296564.desop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(), REASON_EFFECT)

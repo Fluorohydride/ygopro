@@ -2880,6 +2880,8 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 			int res = NetManager::ReadInt8(pbuf);
 			wcscat(textBuffer, res ? L"[正面]" : L"[反面]");
 		}
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
 		mainGame->stACMessage->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->WaitFrameSignal(40);
@@ -2898,6 +2900,8 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 			*p++ = L']';
 		}
 		*p = 0;
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
 		mainGame->stACMessage->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wACMessage, 20);
 		mainGame->WaitFrameSignal(40);

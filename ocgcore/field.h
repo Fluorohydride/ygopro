@@ -438,8 +438,8 @@ public:
 	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min);
 	int32 select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max);
 	int32 select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max);
-	int32 toss_coin(uint16 step, uint8 playerid, uint8 count);
-	int32 toss_dice(uint16 step, uint8 playerid, uint8 count);
+	int32 toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count);
+	int32 toss_dice(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count);
 
 	int32 select_battle_command(uint16 step, uint8 playerid);
 	int32 select_idle_command(uint16 step, uint8 playerid);

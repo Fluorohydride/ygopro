@@ -253,7 +253,7 @@ uint32 card::get_type() {
 int32 card::get_base_attack(uint8 swap) {
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
-	if (temp.base_attack != 0xffffffff)
+	if (temp.base_attack != -1)
 		return temp.base_attack;
 	if(!swap && is_affected_by_effect(EFFECT_SWAP_BASE_AD))
 		return get_base_defence(TRUE);
@@ -271,13 +271,13 @@ int32 card::get_base_attack(uint8 swap) {
 	}
 	if (batk < 0)
 		batk = 0;
-	temp.base_attack = 0xffffffff;
+	temp.base_attack = -1;
 	return batk;
 }
 int32 card::get_attack(uint8 swap) {
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
-	if (temp.attack != 0xffffffff)
+	if (temp.attack != -1)
 		return temp.attack;
 	if(!swap && is_affected_by_effect(EFFECT_SWAP_AD))
 		return get_defence(TRUE);
@@ -332,14 +332,14 @@ int32 card::get_attack(uint8 swap) {
 		atk = final;
 	if (atk < 0)
 		atk = 0;
-	temp.base_attack = 0xffffffff;
-	temp.attack = 0xffffffff;
+	temp.base_attack = -1;
+	temp.attack = -1;
 	return atk;
 }
 int32 card::get_base_defence(uint8 swap) {
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
-	if (temp.base_attack != 0xffffffff)
+	if (temp.base_attack != -1)
 		return temp.base_defence;
 	if(!swap && is_affected_by_effect(EFFECT_SWAP_BASE_AD))
 		return get_base_attack(TRUE);
@@ -357,13 +357,13 @@ int32 card::get_base_defence(uint8 swap) {
 	}
 	if (bdef < 0)
 		bdef = 0;
-	temp.base_defence = 0xffffffff;
+	temp.base_defence = -1;
 	return bdef;
 }
 int32 card::get_defence(uint8 swap) {
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
-	if (temp.defence != 0xffffffff)
+	if (temp.defence != -1)
 		return temp.defence;
 	if(!swap && is_affected_by_effect(EFFECT_SWAP_AD))
 		return get_attack(TRUE);
@@ -418,8 +418,8 @@ int32 card::get_defence(uint8 swap) {
 		def = final;
 	if (def < 0)
 		def = 0;
-	temp.base_defence = 0xffffffff;
-	temp.defence = 0xffffffff;
+	temp.base_defence = -1;
+	temp.defence = -1;
 	return def;
 }
 uint32 card::get_level() {

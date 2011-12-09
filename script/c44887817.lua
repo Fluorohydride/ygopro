@@ -4,7 +4,6 @@ function c44887817.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c44887817.actarget)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
@@ -17,7 +16,6 @@ function c44887817.initial_effect(c)
 	e2:SetCost(c44887817.cost)
 	e2:SetTarget(c44887817.target)
 	e2:SetOperation(c44887817.operation)
-	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--Destroy
 	local e3=Effect.CreateEffect(c)
@@ -26,16 +24,7 @@ function c44887817.initial_effect(c)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetCondition(c44887817.descon)
 	e3:SetOperation(c44887817.desop)
-	e3:SetLabelObject(e1)
 	c:RegisterEffect(e3)
-end
-function c44887817.actarget(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local pg=e:GetLabelObject()
-	if pg then pg:DeleteGroup() end
-	local sg=Group.CreateGroup()
-	e:SetLabelObject(sg)
-	sg:KeepAlive()
 end
 function c44887817.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) end
@@ -65,24 +54,19 @@ end
 function c44887817.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	local sg=e:GetLabelObject():GetLabelObject()
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 		c:SetCardTarget(tc)
-		sg:AddCard(tc)
-		c:CreateRelation(tc,RESET_EVENT+0x1fe0000)
-		tc:CreateRelation(c,RESET_EVENT+0x1020000)
 	end
 end
-function c44887817.dfilter(c,rc,sg)
-	return sg:IsContains(c) and c:IsRelateToCard(rc) and rc:IsRelateToCard(c)
+function c44887817.dfilter(c,sg)
+	return sg:IsContains(c)
 end
 function c44887817.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsStatus(STATUS_DESTROY_CONFIRMED) then return false end
-	local sg=e:GetLabelObject():GetLabelObject()
-	return eg:FilterCount(c44887817.dfilter,nil,c,sg)>0
+	if c:GetCardTargetCount()==0 then return false end
+	return c:GetCardTarget():IsExists(c44887817.dfilter,1,nil,eg)
 end
 function c44887817.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(), REASON_EFFECT)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end

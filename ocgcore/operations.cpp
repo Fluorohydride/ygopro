@@ -3219,7 +3219,7 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 	}
 	return TRUE;
 }
-int32 field::toss_coin(uint16 step, uint8 playerid, uint8 count) {
+int32 field::toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count) {
 	switch(step) {
 	case 0: {
 		effect_set eset;
@@ -3247,7 +3247,7 @@ int32 field::toss_coin(uint16 step, uint8 playerid, uint8 count) {
 				core.coin_result[i] = pduel->get_next_integer(0, 1);
 				pduel->write_buffer8(core.coin_result[i]);
 			}
-			raise_event((card*)0, EVENT_TOSS_COIN_NEGATE, core.reason_effect, 0, core.reason_player, playerid, count);
+			raise_event((card*)0, EVENT_TOSS_COIN_NEGATE, reason_effect, 0, reason_player, playerid, count);
 			process_instant_event();
 			return FALSE;
 		} else {
@@ -3257,14 +3257,14 @@ int32 field::toss_coin(uint16 step, uint8 playerid, uint8 count) {
 		}
 	}
 	case 1: {
-		raise_event((card*)0, EVENT_TOSS_COIN, core.reason_effect, 0, core.reason_player, playerid, count);
+		raise_event((card*)0, EVENT_TOSS_COIN, reason_effect, 0, reason_player, playerid, count);
 		process_instant_event();
 		return TRUE;
 	}
 	}
 	return TRUE;
 }
-int32 field::toss_dice(uint16 step, uint8 playerid, uint8 count) {
+int32 field::toss_dice(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count) {
 	switch(step) {
 	case 0: {
 		effect_set eset;
@@ -3292,7 +3292,7 @@ int32 field::toss_dice(uint16 step, uint8 playerid, uint8 count) {
 				core.dice_result[i] = pduel->get_next_integer(1, 6);
 				pduel->write_buffer8(core.dice_result[i]);
 			}
-			raise_event((card*)0, EVENT_TOSS_DICE_NEGATE, core.reason_effect, 0, core.reason_player, playerid, count);
+			raise_event((card*)0, EVENT_TOSS_DICE_NEGATE, reason_effect, 0, reason_player, playerid, count);
 			process_instant_event();
 			return FALSE;
 		} else {
@@ -3302,7 +3302,7 @@ int32 field::toss_dice(uint16 step, uint8 playerid, uint8 count) {
 		}
 	}
 	case 1: {
-		raise_event((card*)0, EVENT_TOSS_DICE, core.reason_effect, 0, core.reason_player, playerid, count);
+		raise_event((card*)0, EVENT_TOSS_DICE, reason_effect, 0, reason_player, playerid, count);
 		process_instant_event();
 		return TRUE;
 	}

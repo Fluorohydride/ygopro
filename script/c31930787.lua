@@ -50,10 +50,10 @@ function c31930787.initial_effect(c)
 end
 function c31930787.filter(c,tp)
 	return c:IsType(TYPE_MONSTER) and bit.band(c:GetReason(),0x41)==0x41 and c:GetPreviousControler()==tp
-		and c:GetPreviousLocation()==LOCATION_MZONE and bit.band(c:GetPreviousPosition(),POS_FACEUP)~=0
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c31930787.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:FilterCount(c31930787.filter,nil,tp)>0
+	return eg:IsExists(c31930787.filter,1,nil,tp)
 end
 function c31930787.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

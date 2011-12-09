@@ -5,6 +5,7 @@ function c70861343.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,0x1c0)
 	e1:SetTarget(c70861343.target)
 	e1:SetOperation(c70861343.operation)
 	c:RegisterEffect(e1)
@@ -21,7 +22,7 @@ function c70861343.cfilter(c,e,tp)
 		and Duel.IsExistingMatchingCard(c70861343.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,lv+3,e,tp)
 end
 function c70861343.filter(c,lv,e,tp)
-	return c:GetLevel()<=lv and c:IsRace(RACE_BEAST+RACE_WINDBEAST+RACE_INSECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevelBelow(lv) and c:IsRace(RACE_BEAST+RACE_WINDBEAST+RACE_INSECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c70861343.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -34,6 +35,7 @@ end
 function c70861343.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c70861343.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e:GetLabel(),e,tp)
 	local tc=g:GetFirst()
@@ -43,8 +45,8 @@ function c70861343.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c70861343.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=c:GetFirstCardTarget()
-	if not tc or tc:IsStatus(STATUS_DESTROY_CONFIRMED) then return end
-	Duel.Destroy(tc,REASON_EFFECT)
+	local tc=e:GetHandler():GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end

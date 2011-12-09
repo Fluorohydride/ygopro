@@ -22,13 +22,16 @@ function c94283662.initial_effect(c)
 	e2:SetOperation(c94283662.thop)
 	c:RegisterEffect(e2)
 end
+function c94283662.dfilter(c)
+	return c:IsRace(RACE_FIEND) and c:IsDiscardable()
+end
 function c94283662.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 end
+	if chk==0 then return Duel.IsExistingMatchingCard(c94283662.dfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
 function c94283662.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=Duel.DiscardHand(tp,Card.IsRace,1,1,REASON_EFFECT+REASON_DISCARD,nil,RACE_FIEND)
+	local ct=Duel.DiscardHand(tp,c94283662.dfilter,1,1,REASON_EFFECT+REASON_DISCARD,nil)
 	if ct>0 and c:IsFaceup() and c:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

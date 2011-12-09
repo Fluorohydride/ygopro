@@ -406,6 +406,8 @@ public:
 	static int32 duel_announce_coin(lua_State *L);
 	static int32 duel_toss_coin(lua_State *L);
 	static int32 duel_toss_dice(lua_State *L);
+	static int32 duel_get_coin_result(lua_State *L);
+	static int32 duel_get_dice_result(lua_State *L);
 	static int32 duel_set_coin_result(lua_State *L);
 	static int32 duel_set_dice_result(lua_State *L);
 	

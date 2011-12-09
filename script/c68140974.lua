@@ -54,10 +54,10 @@ function c68140974.initial_effect(c)
 end
 function c68140974.filter(c,tp)
 	return c:IsType(TYPE_MONSTER) and bit.band(c:GetReason(),0x41)==0x41 and c:GetPreviousControler()==tp
-		and c:GetPreviousLocation()==LOCATION_MZONE and bit.band(c:GetPreviousPosition(),POS_FACEUP)~=0
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c68140974.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:FilterCount(c68140974.filter,nil,tp)>0
+	return eg:IsExists(c68140974.filter,1,nil,tp)
 end
 function c68140974.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -116,7 +116,7 @@ function c68140974.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c68140974.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return ep~=tp and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
 end
 function c68140974.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -126,7 +126,7 @@ function c68140974.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c68140974.negop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c68140974.negop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
 	local ec=eg:GetFirst()
 	if ec:IsRelateToEffect(e) then

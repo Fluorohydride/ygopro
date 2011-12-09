@@ -46,22 +46,15 @@ function c97077563.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c97077563.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=c:GetFirstCardTarget()
-	if not tc or not tc:IsLocation(LOCATION_MZONE)
-		or c:IsStatus(STATUS_DESTROY_CONFIRMED+STATUS_BATTLE_DESTROYED) then return end
-	Duel.Destroy(tc, REASON_EFFECT)
+	local tc=e:GetHandler():GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end
 function c97077563.descon2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsStatus(STATUS_DESTROY_CONFIRMED) then return false end
-	local tc=c:GetFirstCardTarget()
-	if tc and eg:IsContains(tc) and tc:IsReason(REASON_DESTROY) then
-		c:CancelCardTarget(tc)
-		return true
-	end
-	return false
+	local tc=e:GetHandler():GetFirstCardTarget()
+	return tc and eg:IsContains(tc) and tc:IsReason(REASON_DESTROY) end
 end
 function c97077563.desop2(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(), REASON_EFFECT)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end

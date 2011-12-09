@@ -15,7 +15,6 @@ function c90239723.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetOperation(c90239723.desop)
-	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--Pos limit
 	local e3=Effect.CreateEffect(c)
@@ -66,9 +65,8 @@ function c90239723.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c90239723.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=e:GetLabelObject():GetLabelObject()
-	if tc and not tc:IsStatus(STATUS_DESTROY_CONFIRMED) and tc:IsRelateToCard(c) then
+	local tc=e:GetHandler():GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

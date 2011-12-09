@@ -13,9 +13,8 @@ function c70828912.initial_effect(c)
 	--Destroy
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e2:SetCode(EVENT_DESTROY)
-	e2:SetOperation(c70828912.deoperation)
-	e2:SetLabelObject(e1)
+	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetOperation(c70828912.desop)
 	c:RegisterEffect(e2)
 end
 function c70828912.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -42,8 +41,6 @@ function c70828912.operation(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)==0 then return end
 		Duel.Equip(tp,c,tc)
 		--Add Equip limit
-		e:SetLabelObject(tc)
-		tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
@@ -53,10 +50,10 @@ function c70828912.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-function c70828912.deoperation(e,tp,eg,ep,ev,re,r,rp)
+function c70828912.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=e:GetLabelObject():GetLabelObject()
-	if tc and not tc:IsStatus(STATUS_DESTROY_CONFIRMED) and tc:IsRelateToCard(c) then
-		Duel.Destroy(tc, REASON_EFFECT)
+	local tc=c:GetFirstCardTarget()
+	if c:IsReason(REASON_DESTROY) and tc and tc:IsLocation(LOCATION_MZONE) then
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
