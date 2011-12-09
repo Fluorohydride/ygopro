@@ -17,7 +17,7 @@ function c26834022.condition(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL and Duel.IsChainInactivatable(ev)
 end
 function c26834022.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c98891840.filter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c26834022.filter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if eg:GetFirst():IsDestructable() then
 		eg:GetFirst():CreateEffectRelation(e)
@@ -26,7 +26,7 @@ function c26834022.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c26834022.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c98891840.filter,p,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c26834022.filter,p,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	Duel.NegateActivation(ev)
 	local ec=eg:GetFirst()
