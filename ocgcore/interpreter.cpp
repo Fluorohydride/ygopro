@@ -559,7 +559,7 @@ int32 interpreter::load_script(char* script_name) {
 	no_action++;
 	error = luaL_loadbuffer(current_state, (const char*) buffer, len, (const char*) script_name) || lua_pcall(current_state, 0, 0, 0);
 	if (error) {
-		sprintf(pduel->strbuffer, "%s", lua_tostring(current_state, -1));
+		sprintf(pduel->strbuffer, lua_tostring(current_state, -1));
 		handle_message(pduel, 1);
 		lua_pop(current_state, 1);
 		no_action--;

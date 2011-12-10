@@ -10,11 +10,11 @@ function c97234686.initial_effect(c)
 	e1:SetOperation(c97234686.activate)
 	c:RegisterEffect(e1)
 end
-function c97234686.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x19)
+function c97234686.filter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x19)
 end
 function c97234686.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c97234686.filter,1,nil)
+	return eg:IsExists(c97234686.filter,1,nil,tp)
 end
 function c97234686.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end

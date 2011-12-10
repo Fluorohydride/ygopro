@@ -40,7 +40,7 @@ end
 function c29590752.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and not tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		Duel.Destroy(tg,REASON_EFFECT)
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
 function c29590752.dcon(e,tp,eg,ep,ev,re,r,rp)

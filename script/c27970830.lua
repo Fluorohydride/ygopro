@@ -16,7 +16,7 @@ function c27970830.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
-	--special summon
+	--atkup
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_ATKCHANGE)
 	e4:SetDescription(aux.Stringid(27970830,0))
@@ -39,8 +39,9 @@ function c27970830.initial_effect(c)
 	c:RegisterEffect(e5)
 	--special summon
 	local e6=Effect.CreateEffect(c)
-	e6:SetCategory(CATEGORY_TOHAND)
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e6:SetDescription(aux.Stringid(27970830,2))
+	e6:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e6:SetType(EFFECT_TYPE_IGNITION)
 	e6:SetRange(LOCATION_SZONE)
 	e6:SetCost(c27970830.cost3)
@@ -112,7 +113,7 @@ end
 function c27970830.tg3(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetControler()==tp and chkc:GetLocation()==LOCATION_GRAVE and c27970830.filter3(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,0)>0
-		and Duel.IsExistingMatchingCard(c27970830.filter3,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(c27970830.filter3,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c27970830.filter3,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)

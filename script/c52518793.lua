@@ -19,7 +19,7 @@ function c52518793.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(LOCATION_MZONE,0)
+	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x19))
 	e3:SetValue(c52518793.atkval)
 	c:RegisterEffect(e3)
@@ -36,7 +36,7 @@ function c52518793.atkval(e,c)
 	return e:GetHandler():GetCounter(0x7)*100
 end
 function c52518793.cfilter(c,tp)
-	return c:GetPreviousLocation()==LOCATION_DECK
+	return c:IsPreviousLocation(LOCATION_DECK)
 end
 function c52518793.accon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c52518793.cfilter,1,nil,tp)

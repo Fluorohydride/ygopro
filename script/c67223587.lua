@@ -10,11 +10,11 @@ function c67223587.initial_effect(c)
 	e1:SetOperation(c67223587.activate)
 	c:RegisterEffect(e1)
 end
-function c67223587.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x19)
+function c67223587.cfilter(c,tp)
+	return c:IsFaceup() and c:GetSummonPlayer()==tp and c:IsSetCard(0x19)
 end
 function c67223587.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c67223587.cfilter,1,nil)
+	return eg:IsExists(c67223587.cfilter,1,nil,tp)
 end
 function c67223587.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

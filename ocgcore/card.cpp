@@ -44,7 +44,7 @@ card::card() {
 	owner = PLAYER_NONE;
 	operation_param = 0;
 	status = 0;
-	memset(&q_cache, 0, sizeof(query_cache));
+	memset(&q_cache, 0xff, sizeof(query_cache));
 	equiping_target = 0;
 	pre_equip_target = 0;
 	overlay_target = 0;
@@ -871,7 +871,6 @@ void card::reset(uint32 id, uint32 reset_type) {
 		}
 		if(id & 0x1fe0000) {
 			battled_cards.clear();
-			counters.clear();
 			reset_effect_count();
 			pr = field_effect.equal_range(EFFECT_DISABLE_FIELD);
 			for(; pr.first != pr.second; ++pr.first)
@@ -879,6 +878,7 @@ void card::reset(uint32 id, uint32 reset_type) {
 			set_status(STATUS_UNION, FALSE);
 		}
 		if(id & 0x57e0000) {
+			counters.clear();
 			for(cit = effect_target_owner.begin(); cit != effect_target_owner.end(); ++cit)
 				(*cit)->effect_target_cards.erase(this);
 			for(cit = effect_target_cards.begin(); cit != effect_target_cards.end(); ++cit)
@@ -1121,7 +1121,6 @@ void card::cancel_card_target(card* pcard) {
 	}
 }
 void card::filter_effect(int32 code, effect_set* eset, uint8 sort) {
-	card_set::iterator cit;
 	effect* peffect;
 	auto rg = single_effect.equal_range(code);
 	for (; rg.first != rg.second; ++rg.first) {
@@ -1129,7 +1128,7 @@ void card::filter_effect(int32 code, effect_set* eset, uint8 sort) {
 		if (peffect->is_available() && (!(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) || is_affect_by_effect(peffect)))
 			eset->add_item(peffect);
 	}
-	for (cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
+	for (auto cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
 		rg = (*cit)->equip_effect.equal_range(code);
 		for (; rg.first != rg.second; ++rg.first) {
 			peffect = rg.first->second;
@@ -1160,17 +1159,15 @@ void card::filter_single_continuous_effect(int32 code, effect_set* eset, uint8 s
 		eset->sort();
 }
 void card::filter_immune_effect() {
-	card_set::iterator cit;
 	effect* peffect;
 	immune_effect.clear();
-	pair<effect_container::iterator, effect_container::iterator> rg;
-	rg = single_effect.equal_range(EFFECT_IMMUNE_EFFECT);
+	auto rg = single_effect.equal_range(EFFECT_IMMUNE_EFFECT);
 	for (; rg.first != rg.second; ++rg.first) {
 		peffect = rg.first->second;
 		if (peffect->is_available())
 			immune_effect.add_item(peffect);
 	}
-	for (cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
+	for (auto cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
 		rg = (*cit)->equip_effect.equal_range(EFFECT_IMMUNE_EFFECT);
 		for (; rg.first != rg.second; ++rg.first) {
 			peffect = rg.first->second;
@@ -1187,10 +1184,8 @@ void card::filter_immune_effect() {
 	immune_effect.sort();
 }
 void card::filter_disable_related_cards() {
-	effect_indexer::iterator it;
-	effect* peffect;
-	for (it = indexer.begin(); it != indexer.end(); ++it) {
-		peffect = it->first;
+	for (auto it = indexer.begin(); it != indexer.end(); ++it) {
+		effect* peffect = it->first;
 		if (peffect->is_disable_related()) {
 			if (peffect->type & EFFECT_TYPE_FIELD)
 				pduel->game_field->update_disable_check_list(peffect);
@@ -1268,8 +1263,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 	return FALSE;
 }
 void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
-	std::pair<effect_container::iterator, effect_container::iterator> pr;
-	pr = field_effect.equal_range(EFFECT_SPSUMMON_PROC);
+	auto pr = field_effect.equal_range(EFFECT_SPSUMMON_PROC);
 	uint8 toplayer;
 	uint8 topos;
 	effect* peffect;
@@ -1285,21 +1279,20 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
 			topos = POS_FACEUP;
 			toplayer = playerid;
 		}
-		if(is_summonable(peffect) && pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
+		if(peffect->is_available() && is_summonable(peffect)
+			&& pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
 			peset->add_item(pr.first->second);
 	}
 }
 effect* card::is_affected_by_effect(int32 code) {
-	card_set::iterator cit;
 	effect* peffect;
-	pair<effect_container::iterator, effect_container::iterator> rg;
-	rg = single_effect.equal_range(code);
+	auto rg = single_effect.equal_range(code);
 	for (; rg.first != rg.second; ++rg.first) {
 		peffect = rg.first->second;
 		if (peffect->is_available() && (!(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) || is_affect_by_effect(peffect)))
 			return peffect;
 	}
-	for (cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
+	for (auto cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
 		rg = (*cit)->equip_effect.equal_range(code);
 		for (; rg.first != rg.second; ++rg.first) {
 			peffect = rg.first->second;
@@ -1317,17 +1310,15 @@ effect* card::is_affected_by_effect(int32 code) {
 	return 0;
 }
 effect* card::is_affected_by_effect(int32 code, card* target) {
-	card_set::iterator cit;
 	effect* peffect;
-	pair<effect_container::iterator, effect_container::iterator> rg;
-	rg = single_effect.equal_range(code);
+	auto rg = single_effect.equal_range(code);
 	for (; rg.first != rg.second; ++rg.first) {
 		peffect = rg.first->second;
 		if (peffect->is_available() && (!(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) || is_affect_by_effect(peffect))
 		        && peffect->get_value(target))
 			return peffect;
 	}
-	for (cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
+	for (auto cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
 		rg = (*cit)->equip_effect.equal_range(code);
 		for (; rg.first != rg.second; ++rg.first) {
 			peffect = rg.first->second;
@@ -1345,8 +1336,7 @@ effect* card::is_affected_by_effect(int32 code, card* target) {
 	return 0;
 }
 int32 card::fusion_check(group* fusion_m, card* cg, int32 chkf) {
-	effect_container::iterator ecit;
-	ecit = single_effect.find(EFFECT_FUSION_MATERIAL);
+	auto ecit = single_effect.find(EFFECT_FUSION_MATERIAL);
 	if(ecit == single_effect.end())
 		return FALSE;
 	effect* peffect = ecit->second;
@@ -1359,9 +1349,8 @@ int32 card::fusion_check(group* fusion_m, card* cg, int32 chkf) {
 	return pduel->lua->check_condition(peffect->condition, 4);
 }
 void card::fusion_select(uint8 playerid, group* fusion_m, card* cg, int32 chkf) {
-	effect_container::iterator ecit;
 	effect* peffect = 0;
-	ecit = single_effect.find(EFFECT_FUSION_MATERIAL);
+	auto ecit = single_effect.find(EFFECT_FUSION_MATERIAL);
 	if(ecit != single_effect.end())
 		peffect = ecit->second;
 	pduel->game_field->add_process(PROCESSOR_SELECT_FUSION, 0, peffect, fusion_m, playerid + (chkf << 16), (ptr)cg);
