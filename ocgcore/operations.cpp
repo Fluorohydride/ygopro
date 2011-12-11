@@ -5,6 +5,11 @@
  *      Author: Argon
  */
 #include "field.h"
+#include "duel.h"
+#include "card.h"
+#include "effect.h"
+#include "group.h"
+#include "interpreter.h"
 #include <algorithm>
 
 int32 field::negate_chain(uint8 chaincount) {

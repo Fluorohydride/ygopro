@@ -16,7 +16,7 @@ function c42671151.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c42671151.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,42671152,0,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,42671152,0,0x4011,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,ev)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
@@ -24,8 +24,8 @@ end
 function c42671151.activate(e,tp,eg,ep,ev,re,r,rp)
 	local rec=Duel.Recover(tp,ev,REASON_EFFECT)
 	if rec~=ev or Duel.GetLocationCount(tp,LOCATION_MZONE)==0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,42671152,0,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
-	local token=Duel.CreateToken(tp,42671152,0,0,0,1,RACE_FIEND,ATTRIBUTE_DARK)
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,42671152,0,0x4011,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
+	local token=Duel.CreateToken(tp,42671152)
 	Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)

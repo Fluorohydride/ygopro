@@ -11,7 +11,6 @@ function c99188141.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c99188141.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if (Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_MONSTER and not re:IsHasType(EFFECT_TYPE_ACTIVATE))
 		or not Duel.IsChainInactivatable(ev) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)

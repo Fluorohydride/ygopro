@@ -57,8 +57,7 @@ function c49680980.ccost(e,tp)
 	end
 end
 function c49680980.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
 		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_TRAP and Duel.IsChainInactivatable(ev)
 end
 function c49680980.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -68,15 +67,13 @@ end
 function c49680980.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if eg:GetFirst():IsDestructable() then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function c49680980.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	if ec:IsRelateToEffect(e) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

@@ -61,7 +61,7 @@ function c20529766.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c20529766.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)>TYPE_MONSTER then return end
+	if Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER then return end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if g:GetCount()==1 and g:GetFirst()==e:GetHandler() then

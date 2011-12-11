@@ -42,10 +42,8 @@ function c47297616.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c47297616.codisable(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local te=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
-	return (te:IsHasType(EFFECT_TYPE_ACTIVATE) or Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER)
-		and not c:IsStatus(STATUS_CHAINING) and Duel.IsChainInactivatable(ev)
+	return (re:IsHasType(EFFECT_TYPE_ACTIVATE) or Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER)
+		and not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.IsChainInactivatable(ev)
 end
 function c47297616.tgdisable(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -55,7 +53,7 @@ function c47297616.tgdisable(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
-function c47297616.opdisable(e,tp,eg,ep,ev,re,r,rp,chk)
+function c47297616.opdisable(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsFaceup() or c:GetDefence()<500 or c:GetAttack()< 500 or not c:IsRelateToEffect(e) or Duel.GetCurrentChain()~=ev+1 then
 		return

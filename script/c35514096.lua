@@ -18,7 +18,7 @@ function c35514096.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local t1=c:IsChainAttackable()
 	local t2=Duel.IsExistingTarget(c35514096.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 	local t3=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,1200,1200,4,RACE_MACHINE,ATTRIBUTE_LIGHT)
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,35514097,0,0x4011,1200,1200,4,RACE_MACHINE,ATTRIBUTE_LIGHT)
 	local op=0
 	if t1 or t2 or t3 then
 		local m={}
@@ -57,8 +57,8 @@ function c35514096.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	elseif e:GetLabel()==3 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0
-			or not Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,1200,1200,4,RACE_MACHINE,ATTRIBUTE_LIGHT) then return end
-		local token=Duel.CreateToken(tp,35514097,0,1200,1200,4,RACE_MACHINE,ATTRIBUTE_LIGHT)
+			or not Duel.IsPlayerCanSpecialSummonMonster(tp,35514097,0,0x4011,1200,1200,4,RACE_MACHINE,ATTRIBUTE_LIGHT) then return end
+		local token=Duel.CreateToken(tp,35514097)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	elseif e:GetLabel()==1 then
 		if c:IsRelateToBattle() then

@@ -54,8 +54,8 @@ function c85771019.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c85771019.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
-	if Duel.IsPlayerCanSpecialSummonMonster(tp,85771020,0,1800,1300,5,RACE_FAIRY,ATTRIBUTE_DARK) then
-		local token=Duel.CreateToken(tp,85771020,0,1800,1300,5,RACE_FAIRY,ATTRIBUTE_DARK)
+	if Duel.IsPlayerCanSpecialSummonMonster(tp,85771020,0,0x4011,1800,1300,5,RACE_FAIRY,ATTRIBUTE_DARK) then
+		local token=Duel.CreateToken(tp,85771020)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -65,8 +65,8 @@ function c85771019.spop(e,tp,eg,ep,ev,re,r,rp)
 		token:RegisterEffect(e1)
 	end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,85771021,0,1200,1200,3,RACE_FAIRY,ATTRIBUTE_DARK) then
-		local token=Duel.CreateToken(tp,85771021,0,1200,1200,3,RACE_FAIRY,ATTRIBUTE_DARK)
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,85771021,0,0x4011,1200,1200,3,RACE_FAIRY,ATTRIBUTE_DARK) then
+		local token=Duel.CreateToken(tp,85771021)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

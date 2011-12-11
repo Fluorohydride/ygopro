@@ -7,6 +7,12 @@
 #include <stdio.h>
 #include <string.h>
 #include "ocgapi.h"
+#include "duel.h"
+#include "card.h"
+#include "group.h"
+#include "effect.h"
+#include "field.h"
+#include "interpreter.h"
 #include <set>
 
 script_reader sreader = default_script_reader;

@@ -11,7 +11,6 @@
 #include <stdlib.h>
 #include <array>
 #include <algorithm>
-#include "effect.h"
 
 class effect;
 
@@ -52,6 +51,40 @@ struct effect_set {
 		return container[index];
 	}
 	std::array<effect*, 64> container;
+	int count;
+};
+
+struct effect_set_v {
+	effect_set_v(): count(0) {}
+	void add_item(effect* peffect) {
+		container.push_back(peffect);
+		count++;
+	}
+	void remove_item(int index) {
+		if(index >= count)
+			return;
+		container.erase(container.begin() + index);
+		count--;
+	}
+	void clear() {
+		container.clear();
+		count = 0;
+	}
+	void sort() {
+		if(count < 2)
+			return;
+		std::sort(container.begin(), container.begin() + count, effect_sort_id);
+	}
+	effect*& get_last() {
+		return container[count - 1];
+	}
+	effect*& operator[] (int index) {
+		return container[index];
+	}
+	effect*& at(int index) {
+		return container[index];
+	}
+	std::vector<effect*> container;
 	int count;
 };
 

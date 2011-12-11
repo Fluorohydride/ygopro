@@ -28,7 +28,7 @@ function c90200789.spfilter(c,lv,e,tp)
 end
 function c90200789.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(c90200789.filter,tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return Duel.IsExistingTarget(c90200789.filter1,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(c90200789.filter2,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g1=Duel.SelectTarget(tp,c90200789.filter1,tp,LOCATION_MZONE,0,1,1,nil)

@@ -9,9 +9,7 @@
 #define EFFECT_H_
 
 #include "common.h"
-#include "card.h"
-#include "duel.h"
-#include "group.h"
+#include "field.h"
 #include "effectset.h"
 #include <stdlib.h>
 #include <vector>
@@ -25,6 +23,7 @@ class group;
 class effect;
 struct event;
 struct effect_set;
+struct effect_set_v;
 
 class effect {
 public:
@@ -60,15 +59,15 @@ public:
 
 	int32 is_disable_related();
 	int32 is_available();
-	int32 is_activateable(uint8 playerid, event e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activateable(uint8 playerid, event& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_action_check(uint8 playerid);
-	int32 is_activate_ready(uint8 playerid, event e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
-	int32 is_condition_check(uint8 playerid, event e);
-	int32 is_activate_check(uint8 playerid, event e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activate_ready(uint8 playerid, event& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_condition_check(uint8 playerid, event& e);
+	int32 is_activate_check(uint8 playerid, event& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_target(card* pcard);
 	int32 is_target_player(uint8 playerid);
 	int32 is_player_effect_target(card* pcard);
-	int32 is_immuned(effect_set* effects);
+	int32 is_immuned(effect_set_v* effects);
 	int32 is_chainable(uint8 tp);
 	int32 reset(uint32 reset_level, uint32 reset_type);
 	void dec_count();
@@ -149,6 +148,7 @@ public:
 #define EFFECT_FLAG_SPSUM_PARAM		0x100000	//
 #define EFFECT_FLAG_REPEAT			0x200000	//
 #define EFFECT_FLAG_NO_TURN_RESET	0x400000	//
+#define EFFECT_FLAG_EVENT_PLAYER	0x800000	//
 
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//

@@ -6,6 +6,11 @@
  */
 
 #include "field.h"
+#include "duel.h"
+#include "card.h"
+#include "group.h"
+#include "effect.h"
+#include "interpreter.h"
 #include <iostream>
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
@@ -1372,7 +1377,7 @@ int32 field::is_player_can_flipsummon(uint8 playerid, card * pcard) {
 	}
 	return TRUE;
 }
-int32 field::is_player_can_spsummon_token(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data * pdata) {
+int32 field::is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data * pdata) {
 	temp_card->data = *pdata;
 	if(!is_player_can_spsummon(core.reason_effect, SUMMON_TYPE_SPECIAL, sumpos, playerid, toplayer, temp_card))
 		return FALSE;

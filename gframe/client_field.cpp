@@ -1,6 +1,7 @@
 #include "client_field.h"
 #include "client_card.h"
 #include "game.h"
+#include "../ocgcore/field.h"
 
 namespace ygo {
 
@@ -577,6 +578,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		}
 		break;
 	}
+	case 0:
 	case LOCATION_HAND: {
 		int count = hand[controler].size();
 		if (controler == 0) {

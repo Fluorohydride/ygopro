@@ -59,8 +59,8 @@ function c93130021.operation(e,tp,eg,ep,ev,re,r,rp)
 		local race=c:GetRace()
 		local att=c:GetAttribute()
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0
-			or not Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,atk,def,lv,race,att) then return end
-		local token=Duel.CreateToken(tp,93130022,0,atk,def,lv,race,att)
+			or not Duel.IsPlayerCanSpecialSummonMonster(tp,93130022,0,0x4011,atk,def,lv,race,att) then return end
+		local token=Duel.CreateToken(tp,93130022)
 		c:CreateRelation(token,RESET_EVENT+0x1fe0000)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(c)

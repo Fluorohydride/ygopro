@@ -6,6 +6,11 @@
  */
 
 #include "field.h"
+#include "duel.h"
+#include "card.h"
+#include "group.h"
+#include "effect.h"
+#include "interpreter.h"
 
 void field::add_process(uint16 type, uint16 step, effect* peffect, group* target, ptr arg1, ptr arg2) {
 	processor_unit new_unit;
@@ -1202,25 +1207,28 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(solve_effect && peffect->get_handler_player() != infos.turn_player)
 				continue;
-			if(!peffect->is_activateable(peffect->handler->current.controler, nil_event))
+			if(!peffect->is_activateable(peffect->get_handler_player(), nil_event))
 				continue;
-			if(peffect->get_handler_player() == infos.turn_player) {
-				solve_effect = peffect;
+			solve_effect = peffect;
+			if(peffect->get_handler_player() == infos.turn_player)
 				break;
-			} else {
-				if(!solve_effect)
-					solve_effect = peffect;
-			}
 		}
 		if(solve_effect) {
 			newchain.flag = 0;
 			newchain.chain_id = infos.field_id++;
 			newchain.evt = nil_event;
 			newchain.triggering_effect = solve_effect;
-			newchain.triggering_controler = solve_effect->handler->current.controler;
-			newchain.triggering_location = solve_effect->handler->current.location;
-			newchain.triggering_sequence = solve_effect->handler->current.sequence;
-			newchain.triggering_player = solve_effect->handler->current.controler;
+			if(solve_effect->flag & EFFECT_FLAG_FIELD_ONLY) {
+				newchain.triggering_controler = solve_effect->get_handler_player();
+				newchain.triggering_location = 0;
+				newchain.triggering_sequence = 0;
+				newchain.triggering_player = solve_effect->get_handler_player();
+			} else {
+				newchain.triggering_controler = solve_effect->handler->current.controler;
+				newchain.triggering_location = solve_effect->handler->current.location;
+				newchain.triggering_sequence = solve_effect->handler->current.sequence;
+				newchain.triggering_player = solve_effect->handler->current.controler;
+			}
 			core.new_chains.push_back(newchain);
 			solve_effect->handler->set_status(STATUS_CHAINING, TRUE);
 			core.select_chains.clear();
@@ -1524,10 +1532,12 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	case 2: {
 		//forced trigger
 		for (clit = core.new_fchain_s.begin(); clit != core.new_fchain_s.end(); ++clit) {
-			if(clit->triggering_effect->handler->current.reason & REASON_TEMPORARY)
-				clit->triggering_player = clit->triggering_effect->handler->previous.controler;
-			else
-				clit->triggering_player = clit->triggering_effect->handler->current.controler;
+			if(!(clit->triggering_effect->flag & EFFECT_FLAG_EVENT_PLAYER)) {
+				if(clit->triggering_effect->handler->current.reason & REASON_TEMPORARY)
+					clit->triggering_player = clit->triggering_effect->handler->previous.controler;
+				else
+					clit->triggering_player = clit->triggering_effect->handler->current.controler;
+			}
 			if(clit->triggering_effect->is_chainable(clit->triggering_player) && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
 				if(clit->triggering_player == infos.turn_player)
 					core.tpchain.push_back(*clit);
@@ -1553,10 +1563,12 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	case 4: {
 		//optional trigger
 		for (clit = core.new_ochain_s.begin(); clit != core.new_ochain_s.end(); ++clit) {
-			if(clit->triggering_effect->handler->current.reason & REASON_TEMPORARY)
-				clit->triggering_player = clit->triggering_effect->handler->previous.controler;
-			else
-				clit->triggering_player = clit->triggering_effect->handler->current.controler;
+			if(!(clit->triggering_effect->flag & EFFECT_FLAG_EVENT_PLAYER)) {
+				if(clit->triggering_effect->handler->current.reason & REASON_TEMPORARY)
+					clit->triggering_player = clit->triggering_effect->handler->previous.controler;
+				else
+					clit->triggering_player = clit->triggering_effect->handler->current.controler;
+			}
 			if(clit->triggering_effect->is_chainable(clit->triggering_player) && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
 				if(clit->triggering_player == infos.turn_player)
 					core.tpchain.push_back(*clit);
@@ -1910,7 +1922,9 @@ int32 field::process_instant_event() {
 			newchain.triggering_controler = peffect->handler->current.controler;
 			newchain.triggering_location = peffect->handler->current.location;
 			newchain.triggering_sequence = peffect->handler->current.sequence;
-			newchain.triggering_player = peffect->handler->current.controler;
+			if((peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && (elit->event_player == 0 || elit->event_player == 1))
+				newchain.triggering_player = elit->event_player;
+			else newchain.triggering_player = peffect->handler->current.controler;
 			core.new_fchain.push_back(newchain);
 		}
 		pr = effects.trigger_o_effect.equal_range(elit->event_code);
@@ -1926,7 +1940,9 @@ int32 field::process_instant_event() {
 			newchain.triggering_controler = peffect->handler->current.controler;
 			newchain.triggering_location = peffect->handler->current.location;
 			newchain.triggering_sequence = peffect->handler->current.sequence;
-			newchain.triggering_player = peffect->handler->current.controler;
+			if((peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && (elit->event_player == 0 || elit->event_player == 1))
+				newchain.triggering_player = elit->event_player;
+			else newchain.triggering_player = peffect->handler->current.controler;
 			core.new_ochain.push_back(newchain);
 		}
 		//instant_f
@@ -1942,7 +1958,9 @@ int32 field::process_instant_event() {
 				newchain.triggering_controler = peffect->handler->current.controler;
 				newchain.triggering_location = peffect->handler->current.location;
 				newchain.triggering_sequence = peffect->handler->current.sequence;
-				newchain.triggering_player = peffect->handler->current.controler;
+				if((peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && (elit->event_player == 0 || elit->event_player == 1))
+					newchain.triggering_player = elit->event_player;
+				else newchain.triggering_player = peffect->handler->current.controler;
 				core.instant_f_chain[peffect] = newchain;
 			}
 		}
@@ -2018,10 +2036,14 @@ int32 field::process_single_event() {
 				newchain.triggering_controler = peffect->handler->current.controler;
 				newchain.triggering_location = peffect->handler->current.location;
 				newchain.triggering_sequence = peffect->handler->current.sequence;
-				if(peffect->handler->current.reason & REASON_TEMPORARY)
-					newchain.triggering_player = peffect->handler->previous.controler;
-				else
-					newchain.triggering_player = newchain.triggering_controler;
+				if((peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && (elit->event_player == 0 || elit->event_player == 1))
+					newchain.triggering_player = elit->event_player;
+				else {
+					if(peffect->handler->current.reason & REASON_TEMPORARY)
+						newchain.triggering_player = peffect->handler->previous.controler;
+					else
+						newchain.triggering_player = newchain.triggering_controler;
+				}
 				if(core.flip_delayed && ev == EVENT_FLIP) {
 					if (peffect->type & EFFECT_TYPE_TRIGGER_O) {
 						core.new_ochain_b.push_back(newchain);
@@ -3462,7 +3484,8 @@ int32 field::add_chain(uint16 step) {
 		clit->disable_player = PLAYER_NONE;
 		clit->replace_op = 0;
 		core.current_chain.push_back(*clit);
-		peffect->handler->create_relation(peffect);
+		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY))
+			peffect->handler->create_relation(peffect);
 		if(peffect->cost) {
 			core.sub_solving_event.push_back(clit->evt);
 			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit->triggering_player, 0);
@@ -4074,7 +4097,7 @@ int32 field::adjust_step(uint16 step) {
 				pcard = player[tp].list_mzone[i];
 				if(!pcard) continue;
 				if((pcard->get_type()&TYPE_TRAPMONSTER) && pcard->is_affected_by_effect(EFFECT_DISABLE_TRAPMONSTER)) {
-					pcard->reset(RESET_LEAVE, RESET_EVENT);
+					pcard->reset(RESET_TURN_SET, RESET_EVENT);
 					refresh_location_info_instant();
 					move_to_field(pcard, tp, tp, LOCATION_SZONE, pcard->current.position);
 					core.units.begin()->arg1 = TRUE;

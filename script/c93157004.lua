@@ -165,11 +165,8 @@ function c93157004.eqlimit(e,c)
 	return e:GetOwner()==c and not c:IsDisabled()
 end
 function c93157004.discon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_MONSTER then return false end
-	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if (not Duel.IsChainInactivatable(ev)) or loc==LOCATION_DECK then return false end
-	return true
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+		and Duel.IsChainInactivatable(ev)
 end
 function c93157004.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetEquipGroup():IsExists(Card.IsAbleToGraveAsCost,1,nil) end

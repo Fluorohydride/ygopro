@@ -24,7 +24,7 @@ function c2148918.tgfilter(c,e,tp)
 	return c:IsFaceup() and c:IsControler(tp) and (not e or c:IsRelateToEffect(e))
 end
 function c2148918.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c2148918.tgfilter,1,nil,nil,1-tp) and Duel.IsExistingMatchingCard(c65150219.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return eg:IsExists(c2148918.tgfilter,1,nil,nil,1-tp) and Duel.IsExistingMatchingCard(c2148918.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c2148918.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

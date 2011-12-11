@@ -20,12 +20,6 @@ extern "C" {
 #endif
 }
 #include "common.h"
-#include "group.h"
-#include "card.h"
-#include "effect.h"
-#include "duel.h"
-#include "scriptlib.h"
-#include "ocgapi.h"
 #include <map>
 #include <list>
 

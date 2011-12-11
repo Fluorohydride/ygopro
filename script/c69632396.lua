@@ -19,15 +19,15 @@ function c69632396.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,500)
 end
 function c69632396.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return re:GetHandler():IsAbleToHand() end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	eg:GetFirst():CreateEffectRelation(e)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,eg,1,0,0)
+	if re:GetHandler():IsRelateToEffect(re) then
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,eg,1,0,0)
+	end
 end
 function c69632396.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	if ec:IsRelateToEffect(e) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		ec:CancelToGrave()
 		Duel.SendtoHand(ec,nil,REASON_EFFECT)
 	end

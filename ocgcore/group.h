@@ -9,8 +9,6 @@
 #define GROUP_H_
 
 #include "common.h"
-#include "card.h"
-#include "duel.h"
 #include <set>
 #include <list>
 

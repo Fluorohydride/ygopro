@@ -30,10 +30,7 @@ function c12298909.filter(c)
 	return c:IsOnField() and c:IsType(TYPE_MONSTER)
 end
 function c12298909.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if (not Duel.IsChainInactivatable(ev)) or loc==LOCATION_DECK then return false end
+	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) or not Duel.IsChainInactivatable(ev) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
 	return ex and tg~=nil and tc+tg:FilterCount(c12298909.filter,nil)-tg:GetCount()>0
 end
@@ -44,17 +41,13 @@ end
 function c12298909.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	local loc=eg:GetFirst():GetLocation()
-	if eg:GetFirst():IsDestructable() and loc~=LOCATION_DECK then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c12298909.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c12298909.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	local loc=ec:GetLocation()
-	if ec:IsRelateToEffect(e) and loc~=LOCATION_DECK then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

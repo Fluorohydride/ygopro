@@ -9,11 +9,6 @@
 #define OCGAPI_H_
 
 #include "common.h"
-#include "card.h"
-#include "group.h"
-#include "effect.h"
-#include "field.h"
-#include "interpreter.h"
 #ifdef WIN32
 #include <windows.h>
 #define DECL_DLLEXPORT __declspec(dllexport)
@@ -27,7 +22,6 @@ struct card_info;
 class group;
 class effect;
 class interpreter;
-struct event;
 
 typedef byte* (*script_reader)(const char*, int*);
 typedef uint32 (*card_reader)(uint32, card_data*);

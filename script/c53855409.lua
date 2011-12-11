@@ -47,15 +47,15 @@ function c53855409.tcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c53855409.ttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,400,400,1,RACE_WARRIOR,ATTRIBUTE_DARK) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,53855410,0,0x4011,400,400,1,RACE_WARRIOR,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
 function c53855409.top(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
-	if not Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,400,400,1,RACE_WARRIOR,ATTRIBUTE_DARK) then return end
+	if not Duel.IsPlayerCanSpecialSummonMonster(tp,53855410,0,0x4011,400,400,1,RACE_WARRIOR,ATTRIBUTE_DARK) then return end
 	for i=1,2 do
-		local token=Duel.CreateToken(tp,53855409+i,0,400,400,1,RACE_WARRIOR,ATTRIBUTE_DARK)
+		local token=Duel.CreateToken(tp,53855409+i)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 	end
 	Duel.SpecialSummonComplete()

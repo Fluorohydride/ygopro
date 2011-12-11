@@ -8,6 +8,11 @@
 #include <stdio.h>
 #include <iostream>
 #include "duel.h"
+#include "group.h"
+#include "card.h"
+#include "effect.h"
+#include "scriptlib.h"
+#include "ocgapi.h"
 #include "interpreter.h"
 
 static const struct luaL_reg bitlib[] = {
@@ -174,6 +179,7 @@ static const struct luaL_reg cardlib[] = {
 	{ "IsCanBeEffectTarget", scriptlib::card_is_can_be_effect_target },
 	{ "IsCanBeBattleTarget", scriptlib::card_is_can_be_battle_target },
 	{ "AddTrapMonsterAttribute", scriptlib::card_add_trap_monster_attribute },
+	{ "TrapMonsterBlock", scriptlib::card_trap_monster_block },
 	{ "CancelToGrave", scriptlib::card_cancel_to_grave },
 	{ "GetTributeRequirement", scriptlib::card_get_tribute_requirement },
 	{ NULL, NULL }

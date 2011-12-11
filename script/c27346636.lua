@@ -66,8 +66,7 @@ function c27346636.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.SendtoDeck(g1,nil,2,REASON_COST)
 end
 function c27346636.discon(e,tp,eg,ep,ev,re,r,rp)
-	local te,loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_LOCATION)
-	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev) and loc~=LOCATION_DECK
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
 end
 function c27346636.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
@@ -76,8 +75,7 @@ end
 function c27346636.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if eg:GetFirst():IsDestructable() then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
@@ -85,8 +83,7 @@ function c27346636.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsFaceup() or not c:IsRelateToEffect(e) then return end
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	if ec:IsRelateToEffect(e) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

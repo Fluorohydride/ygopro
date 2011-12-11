@@ -6,6 +6,13 @@
  */
 
 #include "scriptlib.h"
+#include "duel.h"
+#include "field.h"
+#include "card.h"
+#include "effect.h"
+#include "group.h"
+#include "ocgapi.h"
+
 int32 scriptlib::duel_get_lp(lua_State *L) {
 	check_param_count(L, 1);
 	int32 p = lua_tointeger(L, 1);
@@ -65,7 +72,7 @@ int32 scriptlib::duel_register_effect(lua_State *L) {
 	if(playerid != 0 && playerid != 1)
 		return 0;
 	duel* pduel = peffect->pduel;
-	if(peffect->type & 0x7f5)
+	if(peffect->type & 0x5f5)
 		return 0;
 	pduel->game_field->add_effect(peffect, playerid);
 	return 0;
@@ -278,24 +285,16 @@ int32 scriptlib::duel_sets(lua_State *L) {
 }
 int32 scriptlib::duel_create_token(lua_State *L) {
 	check_action_permission(L);
-	check_param_count(L, 8);
+	check_param_count(L, 2);
 	int32 playerid = lua_tointeger(L, 1);
+	int32 code = lua_tointeger(L, 2);
 	if(playerid != 0 && playerid != 1) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
 	duel* pduel = interpreter::get_duel_info(L);
-	card* pcard = pduel->new_card(0);
+	card* pcard = pduel->new_card(code);
 	pcard->owner = playerid;
-	pcard->data.code = lua_tointeger(L, 2);
-	pcard->data.alias = 0;
-	pcard->data.setcode = lua_tointeger(L, 3);
-	pcard->data.attack = lua_tointeger(L, 4);
-	pcard->data.defence = lua_tointeger(L, 5);
-	pcard->data.level = lua_tointeger(L, 6);
-	pcard->data.race = lua_tointeger(L, 7);
-	pcard->data.attribute = lua_tointeger(L, 8);
-	pcard->data.type = TYPE_MONSTER | TYPE_NORMAL | TYPE_TOKEN;
 	pcard->current.location = 0;
 	pcard->current.controler = playerid;
 	interpreter::card2value(L, pcard);
@@ -2514,19 +2513,20 @@ int32 scriptlib::duel_is_player_can_spsummon_monster(lua_State * L) {
 	dat.code = lua_tointeger(L, 2);
 	dat.alias = 0;
 	dat.setcode = lua_tointeger(L, 3);
-	dat.attack = lua_tointeger(L, 4);
-	dat.defence = lua_tointeger(L, 5);
-	dat.level = lua_tointeger(L, 6);
-	dat.race = lua_tointeger(L, 7);
-	dat.attribute = lua_tointeger(L, 8);
+	dat.type = lua_tointeger(L, 4);
+	dat.attack = lua_tointeger(L, 5);
+	dat.defence = lua_tointeger(L, 6);
+	dat.level = lua_tointeger(L, 7);
+	dat.race = lua_tointeger(L, 8);
+	dat.attribute = lua_tointeger(L, 9);
 	int32 pos = POS_FACEUP;
 	int32 toplayer = playerid;
-	if(lua_gettop(L) >= 9)
-		pos = lua_tointeger(L, 9);
 	if(lua_gettop(L) >= 10)
-		toplayer = lua_tointeger(L, 10);
+		pos = lua_tointeger(L, 10);
+	if(lua_gettop(L) >= 11)
+		toplayer = lua_tointeger(L, 11);
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushboolean(L, pduel->game_field->is_player_can_spsummon_token(playerid, toplayer, pos, &dat));
+	lua_pushboolean(L, pduel->game_field->is_player_can_spsummon_monster(playerid, toplayer, pos, &dat));
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_release(lua_State * L) {

@@ -179,6 +179,7 @@ public:
 	static int32 card_is_can_be_effect_target(lua_State *L);
 	static int32 card_is_can_be_battle_target(lua_State *L);
 	static int32 card_add_trap_monster_attribute(lua_State *L);
+	static int32 card_trap_monster_block(lua_State *L);
 	static int32 card_cancel_to_grave(lua_State *L);
 	static int32 card_get_tribute_requirement(lua_State *L);
 	//Effect functions

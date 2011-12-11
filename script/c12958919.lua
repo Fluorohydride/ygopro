@@ -28,7 +28,7 @@ function c12958919.initial_effect(c)
 end
 function c12958919.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,0,0x49,500,500,4,RACE_FIEND,ATTRIBUTE_DARK) end
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,12958920,0x49,0x4011,500,500,4,RACE_FIEND,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
@@ -37,10 +37,10 @@ function c12958919.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)
 	if ft>ct then ft=ct end
 	if ft==0 then return end
-	if not Duel.IsPlayerCanSpecialSummonMonster(tp,0,0x49,500,500,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
+	if not Duel.IsPlayerCanSpecialSummonMonster(tp,12958920,0x49,0x4011,500,500,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
 	local ctn=true
 	while ft>0 and ctn do
-		local token=Duel.CreateToken(tp,12958920,0x49,500,500,4,RACE_FIEND,ATTRIBUTE_DARK)
+		local token=Duel.CreateToken(tp,12958920)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		ft=ft-1
 		if ft==0 or not Duel.SelectYesNo(tp,aux.Stringid(12958919,2)) then ctn=false end

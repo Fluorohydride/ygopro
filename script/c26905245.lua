@@ -11,13 +11,16 @@ function c26905245.initial_effect(c)
 end
 function c26905245.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 
-		Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,0,3000,10,RACE_AQUA,ATTRIBUTE_WATER) end
+		Duel.IsPlayerCanSpecialSummonMonster(tp,26905245,0,0x21,0,3000,10,RACE_AQUA,ATTRIBUTE_WATER) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c26905245.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP_DEFENCE)==0 then return end
-	c:AddTrapMonsterAttribute(true)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,26905245,0,0x21,0,3000,10,RACE_AQUA,ATTRIBUTE_WATER) then return end
+	c:AddTrapMonsterAttribute(true,ATTRIBUTE_WATER,RACE_AQUA,10,0,3000)
+	Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP_DEFENCE)
+	c:TrapMonsterBlock()
 	--cannot attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

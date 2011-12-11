@@ -56,8 +56,8 @@ function c45041488.ccost(e,tp)
 	end
 end
 function c45041488.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.IsChainInactivatable(ev)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+		and Duel.IsChainInactivatable(ev)
 end
 function c45041488.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end
@@ -66,17 +66,13 @@ end
 function c45041488.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	local loc=eg:GetFirst():GetLocation()
-	if eg:GetFirst():IsDestructable() and loc~=LOCATION_DECK then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function c45041488.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	local loc=ec:GetLocation()
-	if ec:IsRelateToEffect(e) and loc~=LOCATION_DECK then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

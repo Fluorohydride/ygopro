@@ -6,6 +6,10 @@
  */
 
 #include "field.h"
+#include "duel.h"
+#include "effect.h"
+#include "card.h"
+
 #include <memory.h>
 #include <algorithm>
 

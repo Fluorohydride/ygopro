@@ -9,12 +9,7 @@
 #define DUEL_H_
 
 #include "common.h"
-#include "interpreter.h"
 #include "mtrandom.h"
-#include "field.h"
-#include "card.h"
-#include "effect.h"
-#include "group.h"
 #include <set>
 
 class card;

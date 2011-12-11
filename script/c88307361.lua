@@ -70,10 +70,8 @@ function c88307361.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
-	local loc,tg=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TARGET_CARDS)
-	if not tg:IsContains(c) then return false end
-	if (not Duel.IsChainInactivatable(ev)) or loc==LOCATION_DECK then return false end
-	return true
+	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
+	return tg:IsContains(c) and Duel.IsChainInactivatable(ev)
 end
 function c88307361.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,e:GetHandler(),RACE_FISH) end
@@ -83,17 +81,13 @@ end
 function c88307361.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-	local loc=eg:GetFirst():GetLocation()
-	if eg:GetFirst():IsDestructable() and loc~=LOCATION_DECK then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c88307361.disop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c88307361.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	local loc=ec:GetLocation()
-	if ec:IsRelateToEffect(e) and loc~=LOCATION_DECK then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

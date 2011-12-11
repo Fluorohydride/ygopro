@@ -9,10 +9,6 @@
 #define FIELD_H_
 
 #include "common.h"
-#include "duel.h"
-#include "card.h"
-#include "group.h"
-#include "effect.h"
 #include "effectset.h"
 #include <vector>
 #include <set>
@@ -34,7 +30,6 @@ struct event {
 	effect* reason_effect;
 	uint32 reason;
 	uint8 reason_player;
-
 };
 struct optarget {
 	group* op_cards;
@@ -191,9 +186,9 @@ struct processor {
 	card_set operated_set;
 	card_set discarded_set;
 	card_set destroy_canceled;
-	effect_set disfield_effects;
-	effect_set extraz_effects;
-	effect_set extraz_effects_e;
+	effect_set_v disfield_effects;
+	effect_set_v extraz_effects;
+	effect_set_v extraz_effects_e;
 	std::set<effect*> reseted_effects;
 	effect_vector delayed_tp;
 	effect_vector delayed_ntp;
@@ -337,7 +332,7 @@ public:
 	int32 is_player_can_sset(uint8 playerid, card* pcard);
 	int32 is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card* pcard);
 	int32 is_player_can_flipsummon(uint8 playerid, card* pcard);
-	int32 is_player_can_spsummon_token(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);
+	int32 is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);
 	int32 is_player_can_release(uint8 playerid, card* pcard);
 	int32 is_player_can_remove_counter(uint8 playerid, card* pcard, uint8 s, uint8 o, uint16 countertype, uint16 count, uint32 reason);
 	int32 is_player_can_remove_overlay_card(uint8 playerid, card* pcard, uint8 s, uint8 o, uint16 count, uint32 reason);

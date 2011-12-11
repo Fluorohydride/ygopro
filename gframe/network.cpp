@@ -3,7 +3,7 @@
 
 namespace ygo {
 
-const unsigned short PROTO_VERSION = 0x1013;
+const unsigned short PROTO_VERSION = 0x1014;
 
 bool NetManager::CreateHost() {
 	wchar_t* pstr;
@@ -142,7 +142,7 @@ bool NetManager::WaitClientResponse() {
 				mainGame->dInfo.responseB[i] = NetManager::ReadInt8(pbuf);
 			mainGame->SetResponseB(len);
 		} else {
-			mainGame->SendByte(mainGame->dInfo.resPlayer, MSG_RETRY);
+			mainGame->SendByte(mainGame->dInfo.resPlayer, 1);
 			retry = true;
 		}
 	} while(retry);

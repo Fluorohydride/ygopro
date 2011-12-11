@@ -26,7 +26,7 @@ function c24838456.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		local te=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT)
 		local tc=te:GetHandler()
 		ng:AddCard(tc)
-		if tc:IsDestructable() and tc:GetLocation()~=LOCATION_DECK then
+		if tc:IsDestructable() and tc:IsRelateToEffect(te) then
 			dg:AddCard(tc)
 		end
 	end
@@ -40,7 +40,7 @@ function c24838456.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.NegateActivation(i)
 		local te=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT)
 		local tc=te:GetHandler()
-		if tc:IsRelateToEffect(e) and tc:GetLocation()~=LOCATION_DECK then
+		if tc:IsRelateToEffect(e) and tc:IsRelateToEffect(te) then
 			dg:AddCard(tc)
 		end
 	end

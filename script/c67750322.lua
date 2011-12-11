@@ -26,6 +26,6 @@ function c67750322.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
-function c67750322.disop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c67750322.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
 end

@@ -86,9 +86,13 @@ void Replay::EndRecord() {
 void Replay::SaveReplay(const wchar_t* name) {
 	wchar_t fname[64];
 	myswprintf(fname, L"./replay/%ls.yrp", name);
-	char fname2[64];
+#ifdef WIN32
+	fp = _wfopen(fname, L"wb");
+#else
+	char fname2[256];
 	DataManager::EncodeUTF8(fname, fname2);
 	fp = fopen(fname2, "wb");
+#endif
 	if(!fp)
 		return;
 	fwrite(&pheader, sizeof(pheader), 1, fp);

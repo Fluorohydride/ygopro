@@ -1,4 +1,5 @@
 #include "game.h"
+#include "../ocgcore/field.h"
 
 namespace ygo {
 

@@ -63,13 +63,12 @@ function c92408984.operation1(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
-function c92408984.condition2(e,tp,eg,ep,ev,re,r,rp,chk)
+function c92408984.condition2(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	if not re:GetHandler():IsType(TYPE_TRAP) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not tg or not tg:IsExists(c92408984.cfilter,1,nil) then return false end
-	if (not Duel.IsChainInactivatable(ev)) then return false end
-	return true
+	return Duel.IsChainInactivatable(ev)
 end
 function c92408984.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
@@ -87,8 +86,7 @@ function c92408984.operation2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.NegateEffect(ev)
-	local ec=eg:GetFirst()
-	if ec:IsRelateToEffect(e) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

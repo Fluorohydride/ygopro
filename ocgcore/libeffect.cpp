@@ -6,6 +6,10 @@
  */
 
 #include "scriptlib.h"
+#include "duel.h"
+#include "field.h"
+#include "card.h"
+#include "effect.h"
 
 int32 scriptlib::effect_new(lua_State *L) {
 	check_param_count(L, 1);

@@ -14,11 +14,8 @@ function c26084285.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26084285.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ec=eg:GetFirst()
-	local te,loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_LOCATION)
-	if ep==tp or (not te:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_MONSTER)
-		or (not Duel.IsChainInactivatable(ev)) or loc==LOCATION_DECK then return false end
+	if ep==tp or (not re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_MONSTER)
+		or (not Duel.IsChainInactivatable(ev)) then return false end
 	local ex,tg,tc,p=Duel.GetOperationInfo(ev,CATEGORY_HANDES)
 	return ex and (p==ep or p==PLAYER_ALL)
 end
@@ -28,18 +25,14 @@ function c26084285.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c26084285.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-	local loc=eg:GetFirst():GetLocation()
-	if eg:GetFirst():IsDestructable() and loc~=LOCATION_DECK then
-		eg:GetFirst():CreateEffectRelation(e)
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c26084285.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c26084285.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	local loc=ec:GetLocation()
-	if ec:IsRelateToEffect(e) and loc~=LOCATION_DECK then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

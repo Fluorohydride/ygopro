@@ -15,37 +15,29 @@ function c29587993.initial_effect(c)
 end
 function c29587993.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsStatus(STATUS_BATTLE_DESTROYED) or c:IsStatus(STATUS_CHAINING) then return false end
-	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if (not Duel.IsChainInactivatable(ev)) or loc==LOCATION_DECK then return false end
-	return true
+	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and not c:IsStatus(STATUS_CHAINING) and Duel.IsChainInactivatable(ev)
 end
 function c29587993.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x37) and c:IsAbleToHand()
 end
 function c29587993.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnFIeld() and chkc:IsControler(tp) and c29587993.filter(chkc) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c29587993.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c29587993.filter,tp,LOCATION_ONFIELD,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c29587993.filter,tp,LOCATION_ONFIELD,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-	eg:GetFirst():CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	local loc=eg:GetFirst():GetLocation()
-	if eg:GetFirst():IsDestructable() and loc~=LOCATION_DECK then
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c29587993.disop(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+function c29587993.disop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	if not tc:IsLocation(LOCATION_HAND) then return end
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	local loc=ec:GetLocation()
-	if ec:IsRelateToEffect(e) and loc~=LOCATION_DECK then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

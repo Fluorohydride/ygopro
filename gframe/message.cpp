@@ -1,6 +1,8 @@
 #include "game.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/card.h"
+#include "../ocgcore/duel.h"
+#include "../ocgcore/field.h"
 #include <sys/time.h>
 #include <algorithm>
 

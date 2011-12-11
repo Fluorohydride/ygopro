@@ -6,6 +6,8 @@
  */
 
 #include "group.h"
+#include "card.h"
+#include "duel.h"
 
 group::group() {
 	scrtype = 2;

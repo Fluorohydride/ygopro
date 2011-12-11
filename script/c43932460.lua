@@ -21,8 +21,7 @@ function c43932460.synfilter(c)
 	return c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c43932460.discon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)~=LOCATION_DECK
-		and Duel.IsChainInactivatable(ev)
+	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.IsChainInactivatable(ev)
 end
 function c43932460.cfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToGraveAsCost()
@@ -36,8 +35,7 @@ end
 function c43932460.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if eg:GetFirst():IsDestructable() and not eg:GetFirst():IsLocation(LOCATION_DECK) then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
@@ -45,8 +43,7 @@ function c43932460.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsFaceup() or not c:IsRelateToEffect(e) then return end
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	if ec:IsRelateToEffect(e) and not ec:IsLocation(LOCATION_DECK) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

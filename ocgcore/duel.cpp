@@ -6,6 +6,12 @@
  */
 
 #include "duel.h"
+#include "interpreter.h"
+#include "field.h"
+#include "card.h"
+#include "effect.h"
+#include "group.h"
+#include "ocgapi.h"
 #include <memory.h>
 
 duel::duel() {

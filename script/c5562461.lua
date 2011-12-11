@@ -17,22 +17,18 @@ function c5562461.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	if Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_MONSTER and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	if not tg or not tg:IsExists(c5562461.cfilter,1,nil) then return false end
-	if (not Duel.IsChainInactivatable(ev)) then return false end
-	return true
+	return tg and tg:IsExists(c5562461.cfilter,1,nil) and Duel.IsChainInactivatable(ev)
 end
 function c5562461.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	if eg:GetFirst():IsDestructable() then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function c5562461.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	if ec:IsRelateToEffect(e) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

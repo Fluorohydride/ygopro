@@ -2,6 +2,7 @@
 #include "math.h"
 #include "network.h"
 #include "game.h"
+#include "../ocgcore/field.h"
 
 namespace ygo {
 

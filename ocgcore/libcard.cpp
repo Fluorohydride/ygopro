@@ -6,6 +6,11 @@
  */
 
 #include "scriptlib.h"
+#include "duel.h"
+#include "field.h"
+#include "card.h"
+#include "effect.h"
+#include "group.h"
 #include <iostream>
 
 int32 scriptlib::card_get_code(lua_State *L) {
@@ -1508,32 +1513,87 @@ int32 scriptlib::card_is_can_be_battle_target(lua_State *L) {
 	return 1;
 }
 int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
-	check_param_count(L, 2);
+	check_param_count(L, 7);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	int32 is_effect = lua_toboolean(L, 2);
+	int32 attribute = lua_tointeger(L, 3);
+	int32 race = lua_tointeger(L, 4);
+	int32 level = lua_tointeger(L, 5);
+	int32 atk = lua_tointeger(L, 6);
+	int32 def = lua_tointeger(L, 7);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = pcard->pduel;
+	//type
 	effect* peffect = pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
 	peffect->code = EFFECT_ADD_TYPE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
-	peffect->reset_flag = RESET_EVENT + 0x1fc0000;
-	if(is_effect)
-		peffect->value = TYPE_MONSTER + TYPE_EFFECT + TYPE_TRAPMONSTER;
-	else
-		peffect->value = TYPE_MONSTER + TYPE_NORMAL + TYPE_TRAPMONSTER;
+	peffect->reset_flag = RESET_EVENT + 0x47e0000;
+	peffect->value = TYPE_MONSTER | TYPE_TRAPMONSTER | (is_effect ? TYPE_EFFECT : TYPE_NORMAL);
 	pcard->add_effect(peffect);
+	//attribute
 	peffect = pduel->new_effect();
+	peffect->owner = pcard;
+	peffect->type = EFFECT_TYPE_SINGLE;
+	peffect->code = EFFECT_CHANGE_ATTRIBUTE;
+	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+	peffect->reset_flag = RESET_EVENT + 0x47e0000;
+	peffect->value = attribute;
+	pcard->add_effect(peffect);
+	//race
+	peffect = pduel->new_effect();
+	peffect->owner = pcard;
+	peffect->type = EFFECT_TYPE_SINGLE;
+	peffect->code = EFFECT_CHANGE_RACE;
+	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+	peffect->reset_flag = RESET_EVENT + 0x47e0000;
+	peffect->value = race;
+	pcard->add_effect(peffect);
+	//level
+	peffect = pduel->new_effect();
+	peffect->owner = pcard;
+	peffect->type = EFFECT_TYPE_SINGLE;
+	peffect->code = EFFECT_CHANGE_LEVEL;
+	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+	peffect->reset_flag = RESET_EVENT + 0x47e0000;
+	peffect->value = level;
+	pcard->add_effect(peffect);
+	//atk
+	peffect = pduel->new_effect();
+	peffect->owner = pcard;
+	peffect->type = EFFECT_TYPE_SINGLE;
+	peffect->code = EFFECT_SET_BASE_ATTACK;
+	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+	peffect->reset_flag = RESET_EVENT + 0x47e0000;
+	peffect->value = atk;
+	pcard->add_effect(peffect);
+	//def
+	peffect = pduel->new_effect();
+	peffect->owner = pcard;
+	peffect->type = EFFECT_TYPE_SINGLE;
+	peffect->code = EFFECT_SET_BASE_DEFENCE;
+	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+	peffect->reset_flag = RESET_EVENT + 0x47e0000;
+	peffect->value = def;
+	pcard->add_effect(peffect);
+	return 0;
+}
+int32 scriptlib::card_trap_monster_block(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	duel* pduel = pcard->pduel;
+	//extra block
+	effect* peffect = pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_FIELD;
 	peffect->range = LOCATION_MZONE;
 	peffect->code = EFFECT_USE_EXTRA_SZONE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
-	peffect->reset_flag = RESET_EVENT + 0x1fc0000;
+	peffect->reset_flag = RESET_EVENT + 0x5fe0000;
 	peffect->value = 1 + (0x10000 << pcard->previous.sequence);
 	pcard->add_effect(peffect);
-	return 0;
 }
 int32 scriptlib::card_cancel_to_grave(lua_State *L) {
 	check_param_count(L, 1);

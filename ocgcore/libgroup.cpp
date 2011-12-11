@@ -6,6 +6,10 @@
  */
 
 #include "scriptlib.h"
+#include "group.h"
+#include "card.h"
+#include "effect.h"
+#include "duel.h"
 
 int32 scriptlib::group_new(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);

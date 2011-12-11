@@ -6,6 +6,12 @@
  */
 
 #include "card.h"
+#include "field.h"
+#include "effect.h"
+#include "duel.h"
+#include "group.h"
+#include "interpreter.h"
+#include "ocgapi.h"
 #include <memory.h>
 #include <iostream>
 #include <algorithm>
@@ -29,9 +35,11 @@ bool card::card_operation_sort(card* c1, card* c2) {
 	}
 	if(c1->current.location != c2->current.location)
 		return c1->current.location < c2->current.location;
-	if(c1->current.location & LOCATION_OVERLAY)
-		return c1->overlay_target->current.sequence < c2->overlay_target->current.sequence;
-	else {
+	if(c1->current.location & LOCATION_OVERLAY) {
+		if(c1->overlay_target->current.sequence != c2->overlay_target->current.sequence)
+			return c1->overlay_target->current.sequence < c2->overlay_target->current.sequence;
+		else return c1->current.sequence < c2->current.sequence;
+	} else {
 		if(c1->current.location & 0x71)
 			return c1->current.sequence > c2->current.sequence;
 		else
@@ -1280,7 +1288,7 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
 			toplayer = playerid;
 		}
 		if(peffect->is_available() && is_summonable(peffect)
-			&& pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
+		        && pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
 			peset->add_item(pr.first->second);
 	}
 }

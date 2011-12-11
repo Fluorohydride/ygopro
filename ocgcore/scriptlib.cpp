@@ -5,6 +5,7 @@
  *      Author: Argon
  */
 #include "scriptlib.h"
+#include "duel.h"
 
 int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 retfalse) {
 	int32 result;
