@@ -28,7 +28,8 @@ public:
 	const wchar_t* GetNumString(int num);
 	static int EncodeUTF8(const wchar_t * wsrc, char * str);
 	static int DecodeUTF8(const char * src, wchar_t * wstr);
-
+	static int GetVal(const wchar_t* pstr);
+	
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
 	std::unordered_map<unsigned int, wchar_t*> _sysStrings;

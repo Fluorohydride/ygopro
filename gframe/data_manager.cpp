@@ -119,7 +119,8 @@ bool DataManager::GetData(int code, CardData* pData) {
 	auto cdit = _datas.find(code);
 	if(cdit == _datas.end())
 		return false;
-	*pData = *((CardData*)&cdit->second);
+	if(pData)
+		*pData = *((CardData*)&cdit->second);
 	return true;
 }
 code_pointer DataManager::GetCodePointer(int code) {
@@ -227,6 +228,14 @@ int DataManager::DecodeUTF8(const char * src, wchar_t * wstr) {
 	}
 	*wp = 0;
 	return wp - wstr;
+}
+int DataManager::GetVal(const wchar_t* pstr) {
+	int ret = 0;
+	while(*pstr >= L'0' && *pstr <= L'9') {
+		ret = ret * 10 + (*pstr - L'0');
+		pstr++;
+	}
+	return ret;
 }
 const wchar_t* DataManager::FormatLocation(int location) {
 	switch(location) {

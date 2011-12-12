@@ -182,6 +182,7 @@ static const struct luaL_reg cardlib[] = {
 	{ "TrapMonsterBlock", scriptlib::card_trap_monster_block },
 	{ "CancelToGrave", scriptlib::card_cancel_to_grave },
 	{ "GetTributeRequirement", scriptlib::card_get_tribute_requirement },
+	{ "GetBattleTarget", scriptlib::card_get_battle_target },
 	{ NULL, NULL }
 };
 

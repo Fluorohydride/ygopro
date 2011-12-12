@@ -88,25 +88,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_atktype = 1;
-						filter_atk = GetVal(pstr + 1);
+						filter_atk = DataManager::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_atktype = 1;
-						filter_atk = GetVal(pstr);
+						filter_atk = DataManager::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 2;
-							filter_atk = GetVal(pstr + 2);
+							filter_atk = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 3;
-							filter_atk = GetVal(pstr + 1);
+							filter_atk = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 4;
-							filter_atk = GetVal(pstr + 2);
+							filter_atk = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 5;
-							filter_atk = GetVal(pstr + 1);
+							filter_atk = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_atktype = 6;
@@ -117,25 +117,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_deftype = 1;
-						filter_def = GetVal(pstr + 1);
+						filter_def = DataManager::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_deftype = 1;
-						filter_def = GetVal(pstr);
+						filter_def = DataManager::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 2;
-							filter_def = GetVal(pstr + 2);
+							filter_def = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 3;
-							filter_def = GetVal(pstr + 1);
+							filter_def = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 4;
-							filter_def = GetVal(pstr + 2);
+							filter_def = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 5;
-							filter_def = GetVal(pstr + 1);
+							filter_def = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_deftype = 6;
@@ -146,25 +146,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_lvtype = 1;
-						filter_lv = GetVal(pstr + 1);
+						filter_lv = DataManager::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_lvtype = 1;
-						filter_lv = GetVal(pstr);
+						filter_lv = DataManager::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 2;
-							filter_lv = GetVal(pstr + 2);
+							filter_lv = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 3;
-							filter_lv = GetVal(pstr + 1);
+							filter_lv = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 4;
-							filter_lv = GetVal(pstr + 2);
+							filter_lv = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 5;
-							filter_lv = GetVal(pstr + 1);
+							filter_lv = DataManager::GetVal(pstr + 1);
 						}
 					} else filter_lvtype = 0;
 				}
@@ -186,25 +186,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_atktype = 1;
-						filter_atk = GetVal(pstr + 1);
+						filter_atk = DataManager::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_atktype = 1;
-						filter_atk = GetVal(pstr);
+						filter_atk = DataManager::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 2;
-							filter_atk = GetVal(pstr + 2);
+							filter_atk = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 3;
-							filter_atk = GetVal(pstr + 1);
+							filter_atk = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 4;
-							filter_atk = GetVal(pstr + 2);
+							filter_atk = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 5;
-							filter_atk = GetVal(pstr + 1);
+							filter_atk = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_atktype = 6;
@@ -215,25 +215,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_deftype = 1;
-						filter_def = GetVal(pstr + 1);
+						filter_def = DataManager::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_deftype = 1;
-						filter_def = GetVal(pstr);
+						filter_def = DataManager::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 2;
-							filter_def = GetVal(pstr + 2);
+							filter_def = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 3;
-							filter_def = GetVal(pstr + 1);
+							filter_def = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 4;
-							filter_def = GetVal(pstr + 2);
+							filter_def = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 5;
-							filter_def = GetVal(pstr + 1);
+							filter_def = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_deftype = 6;
@@ -244,25 +244,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_lvtype = 1;
-						filter_lv = GetVal(pstr + 1);
+						filter_lv = DataManager::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_lvtype = 1;
-						filter_lv = GetVal(pstr);
+						filter_lv = DataManager::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 2;
-							filter_lv = GetVal(pstr + 2);
+							filter_lv = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 3;
-							filter_lv = GetVal(pstr + 1);
+							filter_lv = DataManager::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 4;
-							filter_lv = GetVal(pstr + 2);
+							filter_lv = DataManager::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 5;
-							filter_lv = GetVal(pstr + 1);
+							filter_lv = DataManager::GetVal(pstr + 1);
 						}
 					} else filter_lvtype = 0;
 				}
@@ -276,6 +276,20 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					if(mainGame->chkCategory[i]->isChecked())
 						filter_effect |= filter;
 				mainGame->HideElement(mainGame->wCategories);
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_ENTER: {
+			switch(id) {
+			case SCROLL_KEYWORD: {
+				irr::SEvent me;
+				me.EventType = irr::EET_GUI_EVENT;
+				me.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
+				me.GUIEvent.Caller = mainGame->btnStartFilter;
+				me.GUIEvent.Element = mainGame->btnStartFilter;
+				device->postEventFromUser(me);
 				break;
 			}
 			}
@@ -591,17 +605,17 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	}
 	return false;
 }
-int DeckBuilder::GetVal(const wchar_t * pstr) {
-	int ret = 0;
-	while(*pstr >= L'0' && *pstr <= L'9') {
-		ret = ret * 10 + (*pstr - L'0');
-		pstr++;
-	}
-	return ret;
-}
 void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
+	int trycode = DataManager::GetVal(pstr);
+	if(mainGame->dataManager.GetData(trycode, 0)) {
+		results.push_back(mainGame->dataManager.GetCodePointer(trycode));
+		mainGame->scrFilter->setVisible(false);
+		mainGame->scrFilter->setPos(0);
+		myswprintf(result_string, L"%d", results.size());
+		return;
+	}
 	if(pstr[0] == 0)
 		pstr = 0;
 	auto strpointer = mainGame->dataManager._strings.begin();
@@ -689,6 +703,14 @@ void DeckBuilder::FilterCards() {
 void DeckBuilder::FilterCardsFromResult() {
 	int offset = 0;
 	const wchar_t* pstr = mainGame->ebCardName->getText();
+	int trycode = DataManager::GetVal(pstr);
+	if(mainGame->dataManager.GetData(trycode, 0)) {
+		results.push_back(mainGame->dataManager.GetCodePointer(trycode));
+		mainGame->scrFilter->setVisible(false);
+		mainGame->scrFilter->setPos(0);
+		myswprintf(result_string, L"%d", results.size());
+		return;
+	}
 	if(pstr[0] == 0)
 		pstr = 0;
 	for(int i = 0; i < results.size(); ++i) {

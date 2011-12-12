@@ -9,7 +9,6 @@ function c39823987.initial_effect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCondition(c39823987.descon)
 	e1:SetTarget(c39823987.destg)
 	e1:SetOperation(c39823987.desop)
@@ -31,15 +30,16 @@ function c39823987.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c39823987.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
 	local tc=e:GetHandler():GetReasonCard()
-	if chk==0 then return tc:IsLocation(LOCATION_MZONE) end
-	tc:CreateEffectRelation(e)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,tc:GetAttack()/2)
+	if tc:IsRelateToBattle() then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,tc:GetAttack()/2)
+	end
 end
 function c39823987.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetReasonCard()
-	if not tc:IsRelateToEffect(e) then return end
+	if not tc:IsRelateToBattle() then return end
 	local atk=tc:GetAttack()/2
 	if Duel.Destroy(tc,REASON_EFFECT)~=0 then
 		Duel.Damage(1-tp,atk,REASON_EFFECT)

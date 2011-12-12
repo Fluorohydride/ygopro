@@ -832,6 +832,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case EDITBOX_ANCARD: {
 				const wchar_t* pname = mainGame->ebANCard->getText();
+				int trycode = DataManager::GetVal(pname);
+				CardString cstr;
+				if(mainGame->dataManager.GetString(trycode, &cstr)) {
+					mainGame->lstANCard->clear();
+					ancard.clear();
+					mainGame->lstANCard->addItem(cstr.name);
+					ancard.push_back(trycode);
+					break;
+				}
 				if(pname[0] == 0 || pname[1] == 0)
 					break;
 				mainGame->lstANCard->clear();
@@ -851,6 +860,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case EDITBOX_ANCARD: {
 				const wchar_t* pname = mainGame->ebANCard->getText();
+				int trycode = DataManager::GetVal(pname);
+				CardString cstr;
+				if(mainGame->dataManager.GetString(trycode, &cstr)) {
+					mainGame->lstANCard->clear();
+					ancard.clear();
+					mainGame->lstANCard->addItem(cstr.name);
+					ancard.push_back(trycode);
+					break;
+				}
 				if(pname[0] == 0)
 					break;
 				mainGame->lstANCard->clear();

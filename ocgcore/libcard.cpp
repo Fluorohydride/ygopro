@@ -1611,3 +1611,15 @@ int32 scriptlib::card_get_tribute_requirement(lua_State *L) {
 	lua_pushinteger(L, (rcount >> 16) & 0xffff);
 	return 2;
 }
+int32 scriptlib::card_get_battle_target(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	duel* pduel = pcard->pduel;
+	if(pduel->game_field->core.attacker == pcard)
+		interpreter::card2value(L, pduel->game_field->core.attack_target);
+	else if(pduel->game_field->core.attack_target == pcard)
+		interpreter::card2value(L, pduel->game_field->core.attacker);
+	else lua_pushnil(L);
+	return 1;
+}
