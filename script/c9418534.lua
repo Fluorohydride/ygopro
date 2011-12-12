@@ -35,11 +35,13 @@ function c9418534.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetOperation(c9418534.desop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
 		e1:SetCountLimit(1)
 		tc:RegisterEffect(e1)
 	end
 end
 function c9418534.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	if Duel.GetTurnPlayer()==tp then
+		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	end
 end
