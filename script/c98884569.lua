@@ -13,7 +13,7 @@ function c98884569.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c98884569.condition(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)~=0 and e:GetHandler():IsReason(REASON_DESTROY)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_DESTROY)
 end
 function c98884569.filter(c,e,tp)
 	return (c:IsRace(RACE_PLANT) or c:GetCode()==73580471) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

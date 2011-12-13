@@ -1,7 +1,7 @@
 --漆黒のズムウォルト
 function c31919988.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),aux.NonTuner(Card.IsRace,RACE_INSECT),1)
+	aux.AddSynchroProcedure2(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),aux.NonTuner(Card.IsRace,RACE_INSECT))
 	c:EnableReviveLimit()
 	--indes
 	local e1=Effect.CreateEffect(c)

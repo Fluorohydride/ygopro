@@ -116,6 +116,53 @@ function Auxiliary.SynOperation(f1,f2,ct)
 				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
 			end
 end
+function Auxiliary.AddSynchroProcedure2(c,f1,f2)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetRange(LOCATION_EXTRA)
+	e1:SetCondition(Auxiliary.SynCondition2(f1,f2))
+	e1:SetOperation(Auxiliary.SynOperation2(f1,f2))
+	e1:SetValue(SUMMON_TYPE_SYNCHRO)
+	c:RegisterEffect(e1)
+end
+function Auxiliary.SynFilter1(c,syncard,lv,f1,f2)
+	local clv=c:GetLevel()
+	if clv==0 or clv>=lv then return false end
+	return c:IsType(TYPE_TUNER) and c:IsCanBeSynchroMaterial(syncard) and f1(c)
+		and Duel.IsExistingMatchingCard(Auxiliary.SynFilter2,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,1,c,syncard,lv-clv,f2)
+end
+function Auxiliary.SynFilter2(c,syncard,lv,f2)
+	return c:IsCanBeSynchroMaterial(syncard) and c:GetLevel()==lv and f2(c)
+end
+function Auxiliary.SynCondition2(f1,f2)
+	return	function(e,c,tuner)
+				if c==nil then return true end
+				local lv=c:GetLevel()
+				if tuner then return Auxiliary.SynFilter1(tuner,c,lv,f1,f2) end
+				return Duel.IsExistingMatchingCard(Auxiliary.SynFilter1,c:GetControler(),LOCATION_MZONE,LOCATION_MZONE,1,nil,c,lv,f1,f2)
+			end
+end
+function Auxiliary.SynOperation2(f1,f2)
+	return	function(e,tp,eg,ep,ev,re,r,rp,c,tuner)
+				local g=nil
+				local lv=c:GetLevel()
+				if tuner then
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
+					g=Duel.SelectMatchingCard(tp,Auxiliary.SynFilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,tuner,c,lv-tuner:GetLevel(),f2)
+				else
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
+					g=Duel.SelectMatchingCard(tp,Auxiliary.SynFilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,c,lv,f1,f2)
+					local sc=g:GetFirst()
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
+					local g2=Duel.SelectMatchingCard(tp,Auxiliary.SynFilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,sc,c,lv-sc:GetLevel(),f2)
+					g:AddCard(g2:GetFirst())
+				end
+				c:SetMaterial(g)
+				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
+			end
+end
 function Auxiliary.AddXyzProcedure(c,f,ct)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

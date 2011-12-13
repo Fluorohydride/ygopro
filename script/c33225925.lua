@@ -18,7 +18,7 @@ function c33225925.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetChainLimit(c33225925.chainlimit)
 end
 function c33225925.chainlimit(e,rp,tp)
-	return tp==rp
+	return tp==rp or not e:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c33225925.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

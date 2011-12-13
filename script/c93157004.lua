@@ -49,7 +49,7 @@ function c93157004.matfilter1(c,syncard)
 	return c:IsType(TYPE_TUNER) and c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard)
 end
 function c93157004.matfilter2(c,syncard)
-	return not c:IsType(TYPE_TUNER) and c:IsFaceup() and c:IsSetCard(0x30) and c:IsCanBeSynchroMaterial(syncard)
+	return c:IsNotTuner() and c:IsFaceup() and c:IsSetCard(0x30) and c:IsCanBeSynchroMaterial(syncard)
 end
 function c93157004.synfilter1(c,lv,g1,g2)
 	local tlv=c:GetLevel()
