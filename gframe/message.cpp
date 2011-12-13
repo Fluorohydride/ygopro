@@ -2528,21 +2528,27 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		mainGame->showcard = 0;
 		return true;
 	}
-	case MSG_CARD_SELECTED:
+	case MSG_CARD_SELECTED: {
+		return true;
+	}
 	case MSG_RANDOM_SELECTED: {
 		int player = NetManager::ReadInt8(pbuf);
 		int count = NetManager::ReadInt8(pbuf);
-		ClientCard* pcard;
+		ClientCard* pcards[10];
 		for (int i = 0; i < count; ++i) {
 			int c = mainGame->LocalPlayer(NetManager::ReadInt8(pbuf));
 			int l = NetManager::ReadInt8(pbuf);
 			int s = NetManager::ReadInt8(pbuf);
 			int ss = NetManager::ReadInt8(pbuf);
 			if ((l & 0x80) > 0)
-				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+				pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
 			else
-				pcard = mainGame->dField.GetCard(c, l, s);
+				pcards[i] = mainGame->dField.GetCard(c, l, s);
+			pcards[i]->is_highlighting = true;
 		}
+		mainGame->WaitFrameSignal(30);
+		for(int i = 0; i < count; ++i)
+			pcards[i]->is_highlighting = false;
 		return true;
 	}
 	case MSG_BECOME_TARGET: {

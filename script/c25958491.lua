@@ -1,7 +1,7 @@
 --エンシェント·ホーリー·ワイバーン
 function c25958491.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,c25958491.synfilter,aux.NonTuner(nil),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),aux.NonTuner(nil),1)
 	c:EnableReviveLimit()
 	--Atk update
 	local e1=Effect.CreateEffect(c)
@@ -22,9 +22,6 @@ function c25958491.initial_effect(c)
 	e2:SetTarget(c25958491.sumtg)
 	e2:SetOperation(c25958491.sumop)
 	c:RegisterEffect(e2)
-end
-function c25958491.synfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c25958491.atkval(e,c)
 	local cont=c:GetControler()

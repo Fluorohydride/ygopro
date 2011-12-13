@@ -53,5 +53,5 @@ function c29343734.atkfilter(c,att)
 	return c:IsFaceup() and c:IsAttribute(att)
 end
 function c29343734.val(e,c)
-	return Duel.GetMatchingGroupCount(c29343734.atkfilter,tp,0,LOCATION_MZONE,nil,c:GetAttribute())*300
+	return Duel.GetMatchingGroupCount(c29343734.atkfilter,c:GetControler(),0,LOCATION_MZONE,nil,c:GetAttribute())*300
 end

@@ -69,12 +69,12 @@ function c68184115.spfilter(c,e,tp)
 end
 function c68184115.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and e:GetHandler():IsFaceup()
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 and Duel.IsExistingTarget(c68184115.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 and Duel.IsExistingMatchingCard(c68184115.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c68184115.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,c68184115.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c68184115.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
