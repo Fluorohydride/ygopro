@@ -34,15 +34,18 @@ function c94243005.initial_effect(c)
 	e4:SetOperation(c94243005.thop)
 	c:RegisterEffect(e4)
 end
+function c94243005.ctfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
+end
 function c94243005.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=eg:FilterCount(Card.IsType,nil,TYPE_MONSTER)
+	local ct=eg:FilterCount(c94243005.ctfilter,nil)
 	if ct>0 then
 		e:GetHandler():AddCounter(0x13,ct)
 	end
 end
 function c94243005.spfilter(c,e,tp)
 	local lv=c:GetLevel()
-	return lv>0 and Duel.IsCanRemoveCounter(tp,1,0,0x13,lv,REASON_COST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return lv>0 and c:IsFaceup() and Duel.IsCanRemoveCounter(tp,1,0,0x13,lv,REASON_COST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c94243005.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and c94243005.spfilter(chkc,e,tp) end
