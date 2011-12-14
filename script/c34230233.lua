@@ -46,7 +46,7 @@ function c34230233.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c34230233.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and rp~=tp then
+	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and rp~=tp then
 		Duel.BreakEffect()
 		local hg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 		local cg=hg:RandomSelect(tp,1)

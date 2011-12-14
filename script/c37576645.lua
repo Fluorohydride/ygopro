@@ -24,6 +24,6 @@ function c37576645.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_SKIP_DP)
 	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,3)
+	e1:SetReset(RESET_PHASE+PHASE_END,5)
 	Duel.RegisterEffect(e1,tp)
 end
