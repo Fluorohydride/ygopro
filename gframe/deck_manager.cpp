@@ -58,23 +58,29 @@ bool DeckManager::CheckLFList(Deck& deck, int lfindex) {
 	if(deck.main.size() < 40 || deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15)
 		return false;
 	for(int i = 0; i < deck.main.size(); ++i) {
-		ccount[deck.main[i]->first]++;
-		dc = ccount[deck.main[i]->first];
-		auto it = list->find(deck.main[i]->first);
+		code_pointer cit = mainGame->dataManager.GetCodePointer(deck.main[i]->first);
+		int code = cit->second.alias ? cit->second.alias : cit->first;
+		ccount[code]++;
+		dc = ccount[code];
+		auto it = list->find(code);
 		if(dc > 3 || (it != list->end() && dc > it->second))
 			return false;
 	}
 	for(int i = 0; i < deck.extra.size(); ++i) {
-		ccount[deck.extra[i]->first]++;
-		dc = ccount[deck.extra[i]->first];
-		auto it = list->find(deck.extra[i]->first);
+		code_pointer cit = mainGame->dataManager.GetCodePointer(deck.extra[i]->first);
+		int code = cit->second.alias ? cit->second.alias : cit->first;
+		ccount[code]++;
+		dc = ccount[code];
+		auto it = list->find(code);
 		if(dc > 3 || (it != list->end() && dc > it->second))
 			return false;
 	}
 	for(int i = 0; i < deck.side.size(); ++i) {
-		ccount[deck.side[i]->first]++;
-		dc = ccount[deck.side[i]->first];
-		auto it = list->find(deck.side[i]->first);
+		code_pointer cit = mainGame->dataManager.GetCodePointer(deck.side[i]->first);
+		int code = cit->second.alias ? cit->second.alias : cit->first;
+		ccount[code]++;
+		dc = ccount[code];
+		auto it = list->find(code);
 		if(dc > 3 || (it != list->end() && dc > it->second))
 			return false;
 	}

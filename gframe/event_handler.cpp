@@ -1366,8 +1366,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(mcard->location & 0xe) {
 							std::wstring str;
 							if(mcard->type & TYPE_MONSTER) {
-								myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
-								str.append(formatBuffer);
+								if(!mcard->alias || mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10) {
+									myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
+									str.append(formatBuffer);
+								}
 								if(mcard->alias && mcard->alias != mcard->code) {
 									myswprintf(formatBuffer, L"\n(%ls[%d])", mainGame->dataManager.GetName(mcard->alias), mcard->alias);
 									str.append(formatBuffer);

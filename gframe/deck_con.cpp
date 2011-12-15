@@ -384,26 +384,30 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
-			if(hovered_pos == 4) {
-				int limit = 3;
-				if(filterList->count(hovered_code))
-					limit = (*filterList)[hovered_code];
-				for(int i = 0; i < mainGame->deckManager.deckhost.main.size(); ++i)
-					if(mainGame->deckManager.deckhost.main[i]->first == hovered_code)
-						limit--;
-				for(int i = 0; i < mainGame->deckManager.deckhost.extra.size(); ++i)
-					if(mainGame->deckManager.deckhost.extra[i]->first == hovered_code)
-						limit--;
-				for(int i = 0; i < mainGame->deckManager.deckhost.side.size(); ++i)
-					if(mainGame->deckManager.deckhost.side[i]->first == hovered_code)
-						limit--;
-				if(limit <= 0)
-					break;
-			}
 			click_pos = hovered_pos;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
 			draging_pointer = mainGame->dataManager.GetCodePointer(hovered_code);
+			int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
+			if(hovered_pos == 4) {
+				int limit = 3;
+				if(filterList->count(limitcode))
+					limit = (*filterList)[limitcode];
+				for(int i = 0; i < mainGame->deckManager.deckhost.main.size(); ++i)
+					if(mainGame->deckManager.deckhost.main[i]->first == limitcode
+					        || mainGame->deckManager.deckhost.main[i]->second.alias == limitcode)
+						limit--;
+				for(int i = 0; i < mainGame->deckManager.deckhost.extra.size(); ++i)
+					if(mainGame->deckManager.deckhost.extra[i]->first == limitcode
+					        || mainGame->deckManager.deckhost.extra[i]->second.alias == limitcode)
+						limit--;
+				for(int i = 0; i < mainGame->deckManager.deckhost.side.size(); ++i)
+					if(mainGame->deckManager.deckhost.side[i]->first == limitcode
+					        || mainGame->deckManager.deckhost.side[i]->second.alias == limitcode)
+						limit--;
+				if(limit <= 0)
+					break;
+			}
 			if(hovered_pos == 1)
 				mainGame->deckManager.deckhost.main.erase(mainGame->deckManager.deckhost.main.begin() + hovered_seq);
 			else if(hovered_pos == 2)
@@ -474,17 +478,21 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						is_draging = false;
 					}
 				} else {
+					int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
 					int limit = 3;
-					if(filterList->count(hovered_code))
-						limit = (*filterList)[hovered_code];
+					if(filterList->count(limitcode))
+						limit = (*filterList)[limitcode];
 					for(int i = 0; i < mainGame->deckManager.deckhost.main.size(); ++i)
-						if(mainGame->deckManager.deckhost.main[i]->first == hovered_code)
+						if(mainGame->deckManager.deckhost.main[i]->first == limitcode
+						        || mainGame->deckManager.deckhost.main[i]->second.alias == limitcode)
 							limit--;
 					for(int i = 0; i < mainGame->deckManager.deckhost.extra.size(); ++i)
-						if(mainGame->deckManager.deckhost.extra[i]->first == hovered_code)
+						if(mainGame->deckManager.deckhost.extra[i]->first == limitcode
+						        || mainGame->deckManager.deckhost.extra[i]->second.alias == limitcode)
 							limit--;
 					for(int i = 0; i < mainGame->deckManager.deckhost.side.size(); ++i)
-						if(mainGame->deckManager.deckhost.side[i]->first == hovered_code)
+						if(mainGame->deckManager.deckhost.side[i]->first == limitcode
+						        || mainGame->deckManager.deckhost.side[i]->second.alias == limitcode)
 							limit--;
 					if(limit <= 0)
 						break;

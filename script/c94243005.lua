@@ -67,7 +67,7 @@ function c94243005.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=c:GetCounter(0x13)
 	e:SetLabel(ct)
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp
 		and ct>0 and rp~=tp and bit.band(r,REASON_EFFECT)~=0
 end
 function c94243005.thfilter(c,lv)

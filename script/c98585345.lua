@@ -43,6 +43,13 @@ function c98585345.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c98585345.dfilter,tp,0,LOCATION_MZONE,nil)
 	Duel.Destroy(g,REASON_EFFECT)
 	local dg=Duel.GetOperatedGroup()
-	local s=dg:GetSum(Card.GetTextAttack)
-	Duel.Damage(1-tp,s,REASON_EFFECT)
+	local tc=dg:GetFirst()
+	local dam=0
+	while tc do
+		local atk=tc:GetTextAttack()
+		if atk<0 then atk=0 end
+		dam=dam+atk
+		tc=dg:GetNext()
+	end
+	Duel.Damage(1-tp,dam,REASON_EFFECT)
 end

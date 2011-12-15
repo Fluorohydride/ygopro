@@ -84,7 +84,8 @@ function c25343017.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local rg=e:GetLabelObject()
 	local act=e:GetLabel()
 	e:SetLabel(0)
-	if act==1 and e:GetHandler():GetFlagEffect(25343017) then return true
+	if act==1 and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+		and e:GetHandler():GetFlagEffect(25343017) then return true
 	else rg:Clear() return false end
 end
 function c25343017.spfilter(c,e,tp)

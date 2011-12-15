@@ -48,7 +48,7 @@ function c99659159.operation(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.SelectMatchingCard(tp,c99659159.filter,tp,LOCATION_HAND,0,1,1,nil)
 	if sg:GetCount()==0 then return end
 	local sc=sg:GetFirst()
-	Duel.Equip(tp,sc,tc,false)
+	Duel.Equip(tp,sc,tc,true)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)

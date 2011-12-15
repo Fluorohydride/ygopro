@@ -605,7 +605,7 @@ void Game::ShowCardInfo(int code) {
 	wchar_t formatBuffer[256];
 	dataManager.GetData(code, &cd);
 	imgCard->setImage(imageManager.GetTexture(code));
-	myswprintf(formatBuffer, L"%ls[%d]", dataManager.GetName(code), code);
+	myswprintf(formatBuffer, L"%ls", dataManager.GetName(code));
 	stName->setText(formatBuffer);
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", DataManager::FormatType(cd.type), DataManager::FormatRace(cd.race), DataManager::FormatAttribute(cd.attribute));
