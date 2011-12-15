@@ -23,6 +23,7 @@ function c98427577.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DisableAttack()
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsCanTurnSet() then
+		Duel.BreakEffect()
 		c:CancelToGrave()
 		Duel.ChangePosition(c,POS_FACEDOWN)
 		Duel.RaiseEvent(c,EVENT_SSET,e,REASON_EFFECT,tp,tp,0)

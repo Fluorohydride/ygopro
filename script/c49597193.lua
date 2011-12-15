@@ -35,21 +35,18 @@ function c49597193.splimit(e,se,sp,st)
 end
 function c49597193.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	return c:IsRelateToBattle() and ((c==a and d:GetLocation()==LOCATION_GRAVE) or (c==d and a:GetLocation()==LOCATION_GRAVE))
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c49597193.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	local m=0
-	if a==e:GetHandler() then m=d:GetAttack()
-	else m=a:GetAttack() end
-	if m<0 then m=0 end
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	local dam=bc:GetAttack()
+	if dam<0 then dam=0 end
 	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(m)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,m)
+	Duel.SetTargetParam(dam)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
 function c49597193.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

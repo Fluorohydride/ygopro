@@ -42,6 +42,7 @@ function c70780151.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local m=0
 	if a==e:GetHandler() then m=d:GetAttack()
 	else m=a:GetAttack() end
+	if m<0 then m=0 end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(m)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,m)

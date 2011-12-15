@@ -68,8 +68,6 @@ function c31829185.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)
-		c:CreateRelation(tc,RESET_EVENT+0x1fe0000)
-		tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
 		--Add Equip limit
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -91,5 +89,5 @@ end
 function c31829185.con(e)
 	local c=e:GetOwner()
 	local h=e:GetHandler()
-	return not h:IsRelateToCard(c) or (not c:IsDisabled() and c:IsRelateToCard(h))
+	return not c:IsDisabled() and c:IsHasCardTarget(h)
 end

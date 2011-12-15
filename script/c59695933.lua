@@ -18,7 +18,7 @@ function c59695933.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c59695933.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return eg:GetFirst():IsControlerCanBeChanged() end
+	if chk==0 then return eg:GetFirst():IsCanBeEffectTarget(e) and eg:GetFirst():IsControlerCanBeChanged() end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,eg,1,0,0)
 end

@@ -2655,12 +2655,16 @@ int32 field::process_battle_command(uint16 step) {
 				core.attacker->attacked_cards[0] = 0;
 			}
 			core.units.begin()->step = 9;
+			adjust_instant();
+			adjust_all();
 			return FALSE;
 		}
 		if(!core.select_cards.size() && !core.attacker->operation_param) {
 			core.attacker->announce_count++;
 			core.units.begin()->step = -1;
 			reset_phase(PHASE_DAMAGE);
+			adjust_instant();
+			adjust_all();
 			return FALSE;
 		}
 		add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, infos.turn_player, 30);
@@ -2679,6 +2683,8 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->announced_cards[0] = 0;
 		core.units.begin()->step = -1;
 		reset_phase(PHASE_DAMAGE);
+		adjust_instant();
+		adjust_all();
 		return FALSE;
 	}
 	case 10: {

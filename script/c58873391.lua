@@ -1,5 +1,5 @@
---デュアルスパーク
-function c33846209.initial_effect(c)
+--フィッシャーチャージ
+function c58873391.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
@@ -7,17 +7,17 @@ function c33846209.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1e0)
-	e1:SetCost(c33846209.cost)
-	e1:SetTarget(c33846209.target)
-	e1:SetOperation(c33846209.activate)
+	e1:SetCost(c58873391.cost)
+	e1:SetTarget(c58873391.target)
+	e1:SetOperation(c58873391.activate)
 	c:RegisterEffect(e1)
 end
-function c33846209.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c58873391.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	return true
 end
-function c33846209.costfilter(c,e,dg)
-	if c:IsFacedown() or c:GetLevel()~=4 or not c:IsType(TYPE_DUAL) then return false end
+function c58873391.costfilter(c,e,dg)
+	if not c:IsRace(RACE_FISH) then return false end
 	local a=0
 	if dg:IsContains(c) then a=1 end
 	if c:GetEquipCount()==0 then return dg:GetCount()-a>=1 end
@@ -29,18 +29,18 @@ function c33846209.costfilter(c,e,dg)
 	end
 	return dg:GetCount()-a>=1
 end
-function c33846209.tgfilter(c,e)
+function c58873391.tgfilter(c,e)
 	return c:IsDestructable() and c:IsCanBeEffectTarget(e)
 end
-function c33846209.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c58873391.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsDestructable() end
 	if chk==0 then
 		if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return false end
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
 			local rg=Duel.GetReleaseGroup(tp)
-			local dg=Duel.GetMatchingGroup(c33846209.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
-			local res=rg:IsExists(c33846209.costfilter,1,e:GetHandler(),e,dg)
+			local dg=Duel.GetMatchingGroup(c58873391.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
+			local res=rg:IsExists(c58873391.costfilter,1,e:GetHandler(),e,dg)
 			return res
 		else
 			return Duel.IsExistingTarget(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
@@ -49,9 +49,9 @@ function c33846209.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if e:GetLabel()==1 then
 		e:SetLabel(0)
 		local rg=Duel.GetReleaseGroup(tp)
-		local dg=Duel.GetMatchingGroup(c33846209.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
+		local dg=Duel.GetMatchingGroup(c58873391.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local sg=rg:FilterSelect(tp,c33846209.costfilter,1,1,e:GetHandler(),e,dg)
+		local sg=rg:FilterSelect(tp,c58873391.costfilter,1,1,e:GetHandler(),e,dg)
 		Duel.Release(sg,REASON_COST)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
@@ -59,7 +59,7 @@ function c33846209.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function c33846209.activate(e,tp,eg,ep,ev,re,r,rp)
+function c58873391.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		Duel.Draw(tp,1,REASON_EFFECT)

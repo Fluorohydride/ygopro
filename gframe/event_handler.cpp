@@ -1367,11 +1367,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							std::wstring str;
 							if(mcard->type & TYPE_MONSTER) {
 								if(!mcard->alias || mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10) {
-									myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
+									myswprintf(formatBuffer, L"%ls", mainGame->dataManager.GetName(mcard->code));
 									str.append(formatBuffer);
 								}
 								if(mcard->alias && mcard->alias != mcard->code) {
-									myswprintf(formatBuffer, L"\n(%ls[%d])", mainGame->dataManager.GetName(mcard->alias), mcard->alias);
+									myswprintf(formatBuffer, L"\n(%ls)", mainGame->dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
@@ -1389,10 +1389,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							} else {
-								myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
-								str.append(formatBuffer);
+								if(!mcard->alias || mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10) {
+									myswprintf(formatBuffer, L"%ls", mainGame->dataManager.GetName(mcard->code));
+									str.append(formatBuffer);
+								}
 								if(mcard->alias && mcard->alias != mcard->code) {
-									myswprintf(formatBuffer, L"\n%ls[%d]", mainGame->dataManager.GetName(mcard->alias), mcard->alias);
+									myswprintf(formatBuffer, L"\n%ls", mainGame->dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
 								if(mcard->counters.size()) {

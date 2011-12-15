@@ -3,7 +3,7 @@
 
 namespace ygo {
 
-const unsigned short PROTO_VERSION = 0x1014;
+const unsigned short PROTO_VERSION = 0x1015;
 
 bool NetManager::CreateHost() {
 	wchar_t* pstr;
