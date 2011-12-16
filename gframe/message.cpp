@@ -176,6 +176,10 @@ void Game::ReplayRefresh(int flag) {
 	len = query_field_card(dInfo.pDuel, 1, LOCATION_HAND, flag, (unsigned char*)queryBuffer, 0);
 	dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, queryBuffer);
 }
+void  Game::ReplayRefreshHand(int player, int flag) {
+	int len = query_field_card(dInfo.pDuel, player, LOCATION_HAND, flag, (unsigned char*)queryBuffer, 0);
+	dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_HAND, queryBuffer);
+}
 void Game::ReplayRefreshGrave(int player, int flag) {
 	int len = query_field_card(dInfo.pDuel, 0, LOCATION_GRAVE, flag, (unsigned char*)queryBuffer, 0);
 	dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_GRAVE, queryBuffer);
@@ -3300,7 +3304,7 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 				(*cit)->aniFrame = 5;
 			}
 			mainGame->WaitFrameSignal(20);
-			mainGame->ReplayRefresh();
+			mainGame->ReplayRefreshHand(player);
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				(*cit)->is_hovered = false;
 				mainGame->dField.MoveCard(*cit, 5);

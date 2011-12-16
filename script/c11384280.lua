@@ -13,8 +13,8 @@ function c11384280.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c11384280.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,aux.TRUE,1,nil) end
-	local sg=Duel.SelectReleaseGroup(tp,aux.TRUE,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
+	local sg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
 	Duel.Release(sg,REASON_COST)
 end
 function c11384280.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -23,7 +23,7 @@ function c11384280.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(500)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
 end
-function c11384280.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c11384280.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
 end

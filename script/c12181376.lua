@@ -27,4 +27,33 @@ function c12181376.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
+	local c=e:GetHandler()
+	--cannot trigger
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_TRIGGER)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetTargetRange(0,LOCATION_SZONE)
+	e1:SetTarget(c12181376.distg)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
+	--disable
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_DISABLE)
+	e2:SetTargetRange(0,LOCATION_SZONE)
+	e2:SetTarget(c12181376.distg)
+	e2:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e2,tp)
+	--disable trap monster
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+	e3:SetTargetRange(0,LOCATION_MZONE)
+	e3:SetTarget(c12181376.distg)
+	e3:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e3,tp)
+end
+function c12181376.distg(e,c)
+	return c:IsType(TYPE_TRAP)
 end

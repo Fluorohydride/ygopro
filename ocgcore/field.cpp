@@ -248,6 +248,10 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					pduel->write_buffer32(pcard->get_info_location());
 				}
 				return;
+			} else if(location == LOCATION_HAND) {
+				if(preplayer == playerid)
+					return;
+				remove_card(pcard);
 			} else {
 				if(location == LOCATION_GRAVE) {
 					if(pcard->current.sequence == player[pcard->current.controler].list_grave.size() - 1)

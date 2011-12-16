@@ -2371,7 +2371,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.to_ep = TRUE;
 		if(must_attack.size() || is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_M2))
 			core.to_m2 = FALSE;
-		if(must_attack.size() || is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_EP))
+		if(must_attack.size())
 			core.to_ep = FALSE;
 		add_process(PROCESSOR_SELECT_BATTLECMD, 0, 0, 0, infos.turn_player, 0);
 		return FALSE;
@@ -3517,10 +3517,11 @@ int32 field::add_chain(uint16 step) {
 			for(cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
 				(*cit)->create_relation(clit->triggering_effect);
 			if(clit->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
-				for(cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit) {
+				for(cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
 					raise_single_event(*cit, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, 0, clit->chain_count);
-				}
 				process_single_event();
+				if(clit->target_cards->container.size())
+					raise_event(&clit->target_cards->container, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
 			}
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {

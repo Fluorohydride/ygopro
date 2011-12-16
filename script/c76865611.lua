@@ -30,7 +30,7 @@ function c76865611.cona(e)
 	return e:GetHandler():IsAttack()
 end
 function c76865611.refval(e,re,val,r,rp,rc)
-	return rp~=e:GetHandler():GetControler()
+	return rp~=e:GetHandlerPlayer() and bit.band(r,REASON_EFFECT)~=0
 end
 function c76865611.check(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

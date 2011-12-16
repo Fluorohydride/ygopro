@@ -34,7 +34,7 @@ function c7478431.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c7478431.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(e) then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

@@ -2133,12 +2133,12 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 	return TRUE;
 }
 int32 field::send_to(uint16 step, group * targets, card * target) {
-	//uint8 playerid = (target->operation_param >> 16) & 0xff;
+	uint8 playerid = (target->operation_param >> 16) & 0xff;
 	uint8 dest = (target->operation_param >> 8) & 0xff;
 	//uint8 seq = (target->operation_param) & 0xff;
 	if(targets->container.find(target) == targets->container.end())
 		return TRUE;
-	if(target->current.location == dest) {
+	if(target->current.location == dest && target->current.controler == playerid) {
 		target->current.reason = target->temp.reason;
 		target->current.reason_effect = target->temp.reason_effect;
 		target->current.reason_player = target->temp.reason_player;
@@ -2178,8 +2178,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		if(reason & REASON_RULE)
 			return FALSE;
-		pair<effect_container::iterator, effect_container::iterator> pr;
-		pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
+		auto pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, targets, 0, 0);
 		return FALSE;

@@ -26,7 +26,7 @@ function c64697231.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(p,g)
 		local tg=g:Filter(Card.IsType,nil,TYPE_MONSTER)
 		if tg:GetCount()>0 then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+			Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
 			local sg=tg:Select(p,1,1,nil)
 			Duel.SendtoDeck(sg,nil,2,REASON_EFFECT)
 		end

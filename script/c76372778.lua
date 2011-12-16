@@ -12,16 +12,11 @@ function c76372778.initial_effect(c)
 	e1:SetOperation(c76372778.operation)
 	c:RegisterEffect(e1)
 end
-function c76372778.condition(e,tp,eg,ep,ev,re,r,rp,chk)
+function c76372778.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if c==a then
-		return d and d:IsStatus(STATUS_BATTLE_DESTROYED) and d:IsAbleToGraveAsCost()
-	else
-		return a:IsStatus(STATUS_BATTLE_DESTROYED) and a:IsAbleToGraveAsCost()
-	end
+	local bc=c:GetBattleTarget()
+	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and not bc:IsType(TYPE_TOKEN) and bc:GetLeaveFieldDest()==0
 end
 function c76372778.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -29,16 +24,15 @@ function c76372778.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c76372778.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if c==tc then tc=Duel.GetAttackTarget() end
-	if tc:IsRelateToBattle() then
+	local bc=c:GetBattleTarget()
+	if bc:IsRelateToBattle() then
 		local e1=Effect.CreateEffect(c)
 		e1:SetCode(EFFECT_SEND_REPLACE)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetTarget(c76372778.reptg)
 		e1:SetOperation(c76372778.repop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
-		tc:RegisterEffect(e1)
+		bc:RegisterEffect(e1)
 	end
 end
 function c76372778.reptg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -90,6 +90,7 @@ public:
 	bool RefreshExtra(int player, int flag = 0x181fff, int use_cache = 1);
 	bool RefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
 	void ReplayRefresh(int flag = 0x181fff);
+	void ReplayRefreshHand(int player, int flag = 0x181fff);
 	void ReplayRefreshGrave(int player, int flag = 0x181fff);
 	void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
 
