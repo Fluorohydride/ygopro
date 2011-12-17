@@ -41,6 +41,7 @@ function c69537999.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,HAND)
 end
 function c69537999.desop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c69537999.disfilter,tp,LOCATION_HAND,0,1,1,nil)
 	if g:GetCount()>0 then

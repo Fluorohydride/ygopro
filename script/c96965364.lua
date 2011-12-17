@@ -20,7 +20,7 @@ function c96965364.cfilter(c,e,tp)
 	return lv>0 and Duel.IsExistingMatchingCard(c96965364.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,e,tp)
 end
 function c96965364.spfilter(c,lv,e,tp)
-	return c:IsLevelBelow(lv) and c:IsRace(RACE_INSECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetLevel()==lv and c:IsRace(RACE_INSECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c96965364.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

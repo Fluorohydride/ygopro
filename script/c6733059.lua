@@ -86,6 +86,7 @@ function c6733059.dfilter(c,lv)
 	return c:IsFaceup() and c:GetLevel()==lv and c:IsDestructable()
 end
 function c6733059.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local lv=e:GetLabel()
 	if lv==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

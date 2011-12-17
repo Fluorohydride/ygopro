@@ -31,6 +31,7 @@ function c35577420.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 end
 function c35577420.rmop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)==0 then return end
 	local g=Duel.GetDecktopGroup(1-tp,1)
 	Duel.DisableShuffleCheck()

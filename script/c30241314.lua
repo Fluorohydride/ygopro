@@ -21,6 +21,7 @@ function c30241314.filter(c,e,sp)
 	return c:GetCode()==54493213 and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
 end
 function c30241314.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local cg=Duel.GetMatchingGroup(c30241314.filter,tp,LOCATION_DECK+LOCATION_HAND,0,nil,e,tp)
 	if cg:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		if Duel.SelectYesNo(tp, aux.Stringid(30241314,0)) then

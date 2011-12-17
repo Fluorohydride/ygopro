@@ -37,17 +37,14 @@ function c90200789.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,2,0,0)
 end
-function c90200789.tfilter(c,e)
-	return c:IsFaceup() and c:IsRelateToEffect(e)
-end
 function c90200789.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tg=g:Filter(c90200789.tfilter,nil,e)
+	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
 	if tg:GetCount()==0 then return end
 	Duel.SendtoGrave(tg,REASON_EFFECT)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
-	if not c:IsRelateToEffect(e) then return end
 	local tc=tg:GetFirst()
 	local lv=0
 	if tc:IsLocation(LOCATION_GRAVE) then lv=lv+tc:GetLevel() end

@@ -98,7 +98,7 @@ function c10000020.adval(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)*1000
 end
 function c10000020.atkfilter(c,e,tp)
-	return c:IsControler(tp) and c:IsPosition(POS_FACEUP_ATTACK) and (not e or c:IsRelateToEffect(e))
+	return c:GetSummonPlayer()==tp and c:IsPosition(POS_FACEUP_ATTACK) and (not e or c:IsRelateToEffect(e))
 end
 function c10000020.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c10000020.atkfilter,1,nil,nil,1-tp)
@@ -113,13 +113,14 @@ function c10000020.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=g:GetFirst()
 	while tc do
+		local preatk=tc:GetAttack()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(-2000)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
-		if tc:GetAttack()==0 then dg:AddCard(tc) end
+		if preatk~=0 and tc:GetAttack()==0 then dg:AddCard(tc) end
 		tc=g:GetNext()
 	end
 	Duel.Destroy(dg,REASON_EFFECT)

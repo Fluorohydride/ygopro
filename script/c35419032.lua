@@ -49,6 +49,7 @@ function c35419032.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c35419032.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if e:GetLabel()==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c35419032.afilter,tp,LOCATION_DECK,0,1,1,nil)

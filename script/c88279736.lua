@@ -25,6 +25,7 @@ function c88279736.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,0,0,1-tp,1)
 end
 function c88279736.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0,nil)
 	local sg=g:RandomSelect(ep,1)
 	Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)

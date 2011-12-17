@@ -580,7 +580,7 @@ function Auxiliary.FOperationFun2(f1,f2,insf)
 				local g1=nil
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 				if chkf~=PLAYER_NONE then
-					g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil)
+					g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil,chkf)
 				else g1=sg:Select(tp,1,1,nil) end
 				local tc1=g1:GetFirst()
 				sg:RemoveCard(tc1)
@@ -633,7 +633,7 @@ function Auxiliary.FOperationCodeRep(code,cc,sub,insf)
 				local sg=eg:Filter(Auxiliary.FConditionFilterCR,nil,code,sub)
 				local g1=nil
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-				if chkf~=PLAYER_NONE then g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil)
+				if chkf~=PLAYER_NONE then g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil,chkf)
 				else g1=sg:Select(tp,1,1,nil) end
 				local tc1=g1:GetFirst()
 				for i=1,cc-1 do
@@ -682,7 +682,7 @@ function Auxiliary.FOperationFunRep(f,cc,insf)
 					return
 				end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-				local g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil)
+				local g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil,chkf)
 				local tc1=g1:GetFirst()
 				sg:RemoveCard(tc1)
 				if cc>1 then

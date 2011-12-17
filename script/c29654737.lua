@@ -17,7 +17,7 @@ function c29654737.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c29654737.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1500) end
-	Duel.CheckLPCost(tp,1500)
+	Duel.PayLPCost(tp,1500)
 end
 function c29654737.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND)

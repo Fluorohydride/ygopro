@@ -75,6 +75,7 @@ function c64038662.eftg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	c64038662.select(e,tp,b1,b2)
 end
 function c64038662.efop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if e:GetLabel()==0 then return
 	elseif e:GetLabel()==1 then
 		local tc1=e:GetLabelObject()

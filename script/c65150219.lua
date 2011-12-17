@@ -1,4 +1,4 @@
---攻撃の無力化
+--機甲忍法フリーズ·ロック
 function c65150219.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -24,6 +24,7 @@ function c65150219.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer() and Duel.IsExistingMatchingCard(c65150219.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c65150219.activate(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.DisableAttack() then
 		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
 	end

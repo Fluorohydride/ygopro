@@ -50,6 +50,7 @@ function c43889633.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 end
 function c43889633.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
 		tc:RegisterFlagEffect(43889634,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)

@@ -10,7 +10,7 @@ function c47480070.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c47480070.val(e,c)
-	return Duel.GetMatchingGroupCount(c47480070.filter,c:GetControler(),LOCATION_ONFIELD,0,nil)*100
+	return Duel.GetMatchingGroupCount(c47480070.filter,c:GetControler(),LOCATION_MZONE,0,nil)*100
 end
 function c47480070.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x4)
