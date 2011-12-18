@@ -79,17 +79,17 @@ uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
 	if(query_flag & QUERY_CODE) *p++ = data.code;
 	if(query_flag & QUERY_POSITION) *p++ = get_info_location();
 	if(!use_cache) {
-		if(query_flag & QUERY_ALIAS) *p++ = get_code();
-		if(query_flag & QUERY_TYPE) *p++ = get_type();
-		if(query_flag & QUERY_LEVEL) *p++ = get_level();
-		if(query_flag & QUERY_RANK) *p++ = get_rank();
-		if(query_flag & QUERY_ATTRIBUTE) *p++ = get_attribute();
-		if(query_flag & QUERY_RACE) *p++ = get_race();
-		if(query_flag & QUERY_ATTACK) *p++ = get_attack();
-		if(query_flag & QUERY_DEFENCE) *p++ = get_defence();
-		if(query_flag & QUERY_BASE_ATTACK) *p++ = get_base_attack();
-		if(query_flag & QUERY_BASE_DEFENCE) *p++ = get_base_defence();
-		if(query_flag & QUERY_REASON) *p++ = current.reason;
+		if(query_flag & QUERY_ALIAS) q_cache.code = *p++ = get_code();
+		if(query_flag & QUERY_TYPE) q_cache.type = *p++ = get_type();
+		if(query_flag & QUERY_LEVEL) q_cache.level = *p++ = get_level();
+		if(query_flag & QUERY_RANK) q_cache.rank = *p++ = get_rank();
+		if(query_flag & QUERY_ATTRIBUTE) q_cache.attribute = *p++ = get_attribute();
+		if(query_flag & QUERY_RACE) q_cache.race = *p++ = get_race();
+		if(query_flag & QUERY_ATTACK) q_cache.attack = *p++ = get_attack();
+		if(query_flag & QUERY_DEFENCE) q_cache.defence = *p++ = get_defence();
+		if(query_flag & QUERY_BASE_ATTACK) q_cache.base_attack = *p++ = get_base_attack();
+		if(query_flag & QUERY_BASE_DEFENCE) q_cache.base_defence = *p++ = get_base_defence();
+		if(query_flag & QUERY_REASON) q_cache.reason = *p++ = current.reason;
 	} else {
 		if((query_flag & QUERY_ALIAS) && ((tdata = get_code()) != q_cache.alias)) {
 			q_cache.alias = tdata;
@@ -331,12 +331,12 @@ int32 card::get_attack(uint8 swap) {
 		final = effects[i]->get_value(this);
 		temp.attack = final;
 	}
-	if (final == -1)
+	if (final == -1) {
 		if (!rev)
 			atk = base + up + upc;
 		else
 			atk = base - up - upc;
-	else
+	} else
 		atk = final;
 	if (atk < 0)
 		atk = 0;
@@ -417,12 +417,12 @@ int32 card::get_defence(uint8 swap) {
 		final = effects[i]->get_value(this);
 		temp.defence = final;
 	}
-	if (final == -1)
+	if (final == -1) {
 		if (!rev)
 			def = base + up + upc;
 		else
 			def = base - up - upc;
-	else
+	} else
 		def = final;
 	if (def < 0)
 		def = 0;

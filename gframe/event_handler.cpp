@@ -1147,8 +1147,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->localAction.Set();
 					} else {
 						select_ready = true;
-						mainGame->stQMessage->setText(L"当前所选的卡已选择条件\n是否要继续选择？");
-						mainGame->PopupElement(mainGame->wQuery);
+						if(mainGame->dInfo.curMsg == MSG_SELECT_TRIBUTE) {
+							mainGame->stQMessage->setText(L"当前所选的卡已满足选择条件\n是否要继续选择？");
+							mainGame->PopupElement(mainGame->wQuery);
+						}
 					}
 				} else {
 					select_ready = false;

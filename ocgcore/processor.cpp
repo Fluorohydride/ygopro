@@ -2409,20 +2409,6 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker = core.attackable_cards[sel];
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, FALSE);
 			core.phase_action = TRUE;
-			//attack cost
-			effect_set eset;
-			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
-			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
-				pduel->lua->add_param(core.attacker, PARAM_TYPE_CARD);
-				pduel->lua->add_param(infos.turn_player, PARAM_TYPE_INT);
-				if(!eset[i]->check_value_condition(2))
-					continue;
-				if(eset[i]->cost) {
-					core.sub_solving_event.push_back(nil_event);
-					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
-				}
-			}
 			return FALSE;
 		} else {
 			core.units.begin()->step = 29;
@@ -2497,8 +2483,7 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 5: {
 		if(returns.ivalue[0]) {
-			core.attack_target = 0;
-			core.units.begin()->step = 6;
+			returns.ivalue[0] = -2;
 			return FALSE;
 		} else {
 			if(core.select_cards.size())
@@ -2513,7 +2498,27 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->step = -1;
 			return FALSE;
 		}
-		core.attack_target = core.select_cards[returns.bvalue[1]];
+		if(returns.ivalue[0] == -2)
+			core.attack_target = 0;
+		else
+			core.attack_target = core.select_cards[returns.bvalue[1]];
+		//core.units.begin()->arg1 ---> is rollbacked
+		if(!core.units.begin()->arg1) {
+			//attack cost
+			effect_set eset;
+			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
+			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
+			for(int32 i = 0; i < eset.count; ++i) {
+				pduel->lua->add_param(core.attacker, PARAM_TYPE_CARD);
+				pduel->lua->add_param(infos.turn_player, PARAM_TYPE_INT);
+				if(!eset[i]->check_value_condition(2))
+					continue;
+				if(eset[i]->cost) {
+					core.sub_solving_event.push_back(nil_event);
+					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
+				}
+			}
+		}
 		return FALSE;
 	}
 	case 7: {

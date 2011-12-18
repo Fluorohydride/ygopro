@@ -659,12 +659,16 @@ void Game::Analyze(void* pd, char* engbuf) {
 			int cs = pbuf[10];
 			int cp = pbuf[11];
 			pbuf += 12;
-			if(cl == LOCATION_REMOVED && (cp & POS_FACEDOWN))
+			if(cl == LOCATION_REMOVED && (cp & POS_FACEDOWN)) {
 				NetManager::WriteInt32(pbufw, 0);
-			mainGame->SendGameMessage(cc, offset, pbuf - offset);
-			if (!(cl & 0xb0) && !((cl & 0xc) && (cp & POS_FACEUP)))
-				NetManager::WriteInt32(pbufw, 0);
-			mainGame->SendGameMessage(1 - cc, offset, pbuf - offset);
+				mainGame->SendGameMessage(cc, offset, pbuf - offset);
+				mainGame->SendGameMessage(1 - cc, offset, pbuf - offset);
+			} else {
+				mainGame->SendGameMessage(cc, offset, pbuf - offset);
+				if (!(cl & 0xb0) && !((cl & 0xc) && (cp & POS_FACEUP)))
+					NetManager::WriteInt32(pbufw, 0);
+				mainGame->SendGameMessage(1 - cc, offset, pbuf - offset);
+			}
 			if (cl != 0 && (cl & 0x80) == 0 && (cl != pl || pc != cc))
 				mainGame->RefreshSingle(cc, cl, cs);
 			break;
@@ -2503,7 +2507,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		int ct = NetManager::ReadInt8(pbuf);
 		if (mainGame->dField.chains.size() > 1) {
 			if (mainGame->dField.last_chain)
-				mainGame->WaitFrameSignal(30);
+				mainGame->WaitFrameSignal(10);
 			for(int i = 0; i < 5; ++i) {
 				mainGame->dField.chains[ct - 1].solved = false;
 				mainGame->WaitFrameSignal(3);
@@ -3303,7 +3307,7 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 				(*cit)->is_hovered = false;
 				(*cit)->aniFrame = 5;
 			}
-			mainGame->WaitFrameSignal(20);
+			mainGame->WaitFrameSignal(10);
 			mainGame->ReplayRefreshHand(player);
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				(*cit)->is_hovered = false;

@@ -26,13 +26,13 @@ function c50755.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c50755.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		local tc=g:GetFirst()
-		if tc then Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) end
+		if tc then Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) end
 	end
 	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(1-tp,c50755.filter,1-tp,LOCATION_DECK,0,1,1,nil,e,1-tp)
 		local tc=g:GetFirst()
-		if tc then Duel.SpecialSummonStep(tc,0,1-tp,1-tp,false,false,POS_FACEUP) end
+		if tc then Duel.SpecialSummonStep(tc,0,1-tp,1-tp,false,false,POS_FACEUP_ATTACK) end
 	end
 	Duel.SpecialSummonComplete()
 end

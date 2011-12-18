@@ -15,7 +15,7 @@ function c34116027.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c34116027.filter(c)
-	return c:IsRace(RACE_DRAGON+RACE_WINDBEAST) and c:IsAbleToHand()
+	return c:IsLevelBelow(4) and c:IsRace(RACE_DRAGON+RACE_WINDBEAST) and c:IsAbleToHand()
 end
 function c34116027.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -35,7 +35,7 @@ function c94243005.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c94243005.ctfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsPreviousLocation(0x80+LOCATION_SZONE)
 end
 function c94243005.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=eg:FilterCount(c94243005.ctfilter,nil)
@@ -45,7 +45,7 @@ function c94243005.ctop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c94243005.spfilter(c,e,tp)
 	local lv=c:GetLevel()
-	return lv>0 and c:IsFaceup() and Duel.IsCanRemoveCounter(tp,1,0,0x13,lv,REASON_COST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return lv>3 and c:IsFaceup() and Duel.IsCanRemoveCounter(tp,1,0,0x13,lv,REASON_COST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c94243005.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and c94243005.spfilter(chkc,e,tp) end
