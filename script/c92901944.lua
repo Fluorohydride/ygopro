@@ -26,7 +26,7 @@ function c92901944.cfilter(c,tp)
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c92901944.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c92901944.cfilter,1,nil,tp)
+	return eg:IsExists(c92901944.cfilter,1,e:GetHandler(),tp)
 end
 function c92901944.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0		
