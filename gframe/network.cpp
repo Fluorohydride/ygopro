@@ -3,14 +3,13 @@
 
 namespace ygo {
 
-const unsigned short PROTO_VERSION = 0x1016;
+const unsigned short PROTO_VERSION = 0x1017;
 
-bool NetManager::CreateHost() {
+bool NetManager::CreateHost(int ipindex) {
 	wchar_t* pstr;
 	int wp;
 	hInfo.identifier = NETWORK_SERVER_ID;
 	hInfo.version = PROTO_VERSION;
-	hInfo.address = mainGame->netManager.local_addr;
 	for(wp = 0, pstr = (wchar_t*)mainGame->ebServerName->getText(); wp < 19 && pstr[wp]; ++wp)
 		hInfo.name[wp] = pstr[wp];
 	hInfo.port = serv_port;
@@ -35,7 +34,10 @@ bool NetManager::CreateHost() {
 	BOOL opt = TRUE;
 	setsockopt(sBHost, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
 	SOCKADDR_IN local;
-	local.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(ipindex == -1)
+		local.sin_addr.s_addr = htonl(INADDR_ANY);
+	else
+		local.sin_addr.s_addr = local_addr[ipindex];
 	local.sin_family = AF_INET;
 	local.sin_port = htons(7913);
 	if(::bind(sBHost, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
@@ -65,14 +67,17 @@ bool NetManager::CancelHost() {
 	closesocket(sListen);
 	is_creating_host = false;
 }
-bool NetManager::RefreshHost() {
+bool NetManager::RefreshHost(int ipindex) {
 	sBClient = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(sBClient == INVALID_SOCKET)
 		return false;
 	BOOL opt = TRUE;
 	setsockopt(sBClient, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
 	SOCKADDR_IN local;
-	local.sin_addr.s_addr = htonl(INADDR_ANY);
+	if(ipindex == -1)
+		local.sin_addr.s_addr = htonl(INADDR_ANY);
+	else
+		local.sin_addr.s_addr = local_addr[ipindex];
 	local.sin_family = AF_INET;
 	local.sin_port = htons(7912);
 	hReq.identifier = NETWORK_CLIENT_ID;
@@ -154,18 +159,26 @@ int NetManager::GetLocalAddress() {
 	hostent* host = gethostbyname(hname);
 	if(!host)
 		return 0;
-	return *(int*)host->h_addr_list[0];
+	int i = 0;
+	for(i = 0; i < 8; ++i) {
+		local_addr[i] = 0;
+		if(host->h_addr_list[i] == 0)
+			break;
+		local_addr[i] = *(unsigned int*)host->h_addr_list[i];
+	}
+	return i;
 }
 int NetManager::BroadcastServer(void* np) {
 	NetManager* net = (NetManager*)np;
 	SOCKADDR_IN sockTo;
-	sockTo.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 	sockTo.sin_family = AF_INET;
 	sockTo.sin_port = htons(7912);
 	int recvLen = recvfrom(net->sBHost, (char*)&net->hReq, sizeof(HostRequest), 0, 0, 0);
 	while(recvLen != 0 && recvLen != SOCKET_ERROR) {
-		if(recvLen == sizeof(HostRequest) && net->hReq.identifier == NETWORK_CLIENT_ID)
+		if(recvLen == sizeof(HostRequest) && net->hReq.identifier == NETWORK_CLIENT_ID) {
+			sockTo.sin_addr.s_addr = htonl(INADDR_BROADCAST);
 			sendto(net->sBHost, (const char*)&net->hInfo, sizeof(HostInfo), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
+		}
 		recvLen = recvfrom(net->sBHost, (char*)&net->hReq, sizeof(HostRequest), 0, 0, 0);
 	}
 	net->is_creating_host = false;
@@ -191,8 +204,8 @@ int NetManager::BroadcastClient(void* np) {
 	sockTo.sin_port = htons(7913);
 	fd_set fds;
 	timeval tv;
-	tv.tv_sec = 0;
-	tv.tv_usec = 500000;
+	tv.tv_sec = 1;
+	tv.tv_usec = 0;
 	FD_ZERO(&fds);
 	FD_SET(net->sBClient, &fds);
 	sendto(net->sBClient, (const char*)&net->hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
@@ -201,10 +214,13 @@ int NetManager::BroadcastClient(void* np) {
 	int result = select(0, &fds, 0, 0, &tv);
 	std::set<int> addrset;
 	net->hosts.clear();
+	SOCKADDR_IN sockFrom;
+	int sz = sizeof(SOCKADDR_IN);
 	while(result != 0 && result != SOCKET_ERROR) {
-		int recvLen = recvfrom(net->sBClient, (char*)&net->hInfo, sizeof(HostInfo), 0, 0, 0);
+		int recvLen = recvfrom(net->sBClient, (char*)&net->hInfo, sizeof(HostInfo), 0, (sockaddr*)&sockFrom, &sz);
 		if(recvLen == sizeof(HostInfo) && net->hInfo.identifier == NETWORK_SERVER_ID
-		        && net->hInfo.version == PROTO_VERSION && addrset.find(net->hInfo.address) == addrset.end()) {
+		        && net->hInfo.version == PROTO_VERSION && addrset.find(sockFrom.sin_addr.s_addr) == addrset.end()) {
+			net->hInfo.address = sockFrom.sin_addr.s_addr;
 			net->hosts.push_back(net->hInfo);
 		}
 		result = select(0, &fds, 0, 0, &tv);

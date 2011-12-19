@@ -38,7 +38,7 @@ bool Game::Initialize() {
 	dField.device = device;
 	deckBuilder.device = device;
 	memset(&dInfo, 0, sizeof(DuelInfo));
-	netManager.local_addr = NetManager::GetLocalAddress();
+	netManager.GetLocalAddress();
 	netManager.send_buffer_ptr = &netManager.send_buf[2];
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
@@ -52,8 +52,7 @@ bool Game::Initialize() {
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"[---]");
 	device->setResizable(false);
-	myswprintf(dataManager.strBuffer, L"模式选择(当前IP:%d.%d.%d.%d  版本:0x%X)", netManager.local_addr & 0xff, (netManager.local_addr >> 8) & 0xff,
-	           (netManager.local_addr >> 16) & 0xff, (netManager.local_addr >> 24) & 0xff, PROTO_VERSION);
+	myswprintf(dataManager.strBuffer, L"YGOPro Version:0x%X)", PROTO_VERSION);
 	wModeSelection = env->addWindow(rect<s32>(270, 100, 750, 490), false, dataManager.strBuffer);
 	wModeSelection->getCloseButton()->setVisible(false);
 	wModes = env->addTabControl(rect<s32>(5, 60, 475, 350), wModeSelection, false, true, TAB_MODES);
@@ -119,13 +118,23 @@ bool Game::Initialize() {
 	lstReplayList->setItemHeight(18);
 	btnLoadReplay = env->addButton(rect<s32>(180, 200, 280, 225), tabReplay, BUTTON_LOAD_REPLAY, L"载入录像");
 	env->addStaticText(L"昵称：", rect<s32>(10, 30, 90, 50), false, false, wModeSelection);
-	ebUsername = env->addEditBox(L"", rect<s32>(80, 25, 260, 50), true, wModeSelection);
+	ebUsername = env->addEditBox(L"", rect<s32>(80, 25, 240, 50), true, wModeSelection);
 	ebUsername->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(L"卡组：", rect<s32>(270, 30, 350, 50), false, false, wModeSelection);
-	cbDeckSel = env->addComboBox(rect<s32>(320, 25, 470, 50), wModeSelection, -1);
+	env->addStaticText(L"卡组：", rect<s32>(250, 30, 350, 50), false, false, wModeSelection);
+	cbDeckSel = env->addComboBox(rect<s32>(310, 25, 410, 50), wModeSelection, -1);
 	RefreshDeck(cbDeckSel);
-	btnDeckEdit = env->addButton(rect<s32>(410, 55, 470, 80), wModeSelection, BUTTON_DECK_EDIT, L"编辑");
+	btnDeckEdit = env->addButton(rect<s32>(420, 25, 470, 50), wModeSelection, BUTTON_DECK_EDIT, L"编辑");
 	stModeStatus = env->addStaticText(L"", rect<s32>(20, 360, 350, 380), false, false, wModeSelection);
+	env->addStaticText(L"IP选择：", rect<s32>(250, 55, 350, 80), false, false, wModeSelection);
+	cbIPList = env->addComboBox(rect<s32>(310, 55, 470, 75), wModeSelection, COMBOBOX_IPADDR);
+	int ipi = 0;
+	while(netManager.local_addr[ipi]) {
+		myswprintf(dataManager.strBuffer, L"%d.%d.%d.%d", netManager.local_addr[ipi] & 0xff, (netManager.local_addr[ipi] >> 8) & 0xff,
+		           (netManager.local_addr[ipi] >> 16) & 0xff, (netManager.local_addr[ipi] >> 24) & 0xff);
+		cbIPList->addItem(dataManager.strBuffer);
+		ipi++;
+	}
+	cbIPList->setSelected(0);
 	btnModeExit = env->addButton(rect<s32>(380, 355, 470, 380), wModeSelection, BUTTON_MODE_EXIT, L"退出");
 	//img
 	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);

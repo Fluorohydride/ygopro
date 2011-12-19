@@ -223,6 +223,7 @@ public:
 	irr::gui::IGUIComboBox* cbDeckSel;
 	irr::gui::IGUIButton* btnDeckEdit;
 	irr::gui::IGUIStaticText* stModeStatus;
+	irr::gui::IGUIComboBox* cbIPList;
 	irr::gui::IGUIButton* btnModeExit;
 	//message
 	irr::gui::IGUIWindow* wMessage;
@@ -348,6 +349,7 @@ extern Game* mainGame;
 #define BUTTON_SAVE_LOG				100
 #define BUTTON_CLEAR_LOG			101
 #define LISTBOX_LOG					102
+#define COMBOBOX_IPADDR				109
 #define BUTTON_LAN_START_SERVER		110
 #define BUTTON_LAN_CANCEL_SERVER	111
 #define BUTTON_LAN_CONNECT			112

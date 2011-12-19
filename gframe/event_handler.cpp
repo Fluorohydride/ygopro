@@ -42,7 +42,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->ebStartLP->setText(L"5");
 				if(_wtoi(mainGame->ebDrawCount->getText()) == 0)
 					mainGame->ebStartLP->setText(L"1");
-				if(mainGame->netManager.CreateHost()) {
+				if(mainGame->netManager.CreateHost(mainGame->cbIPList->getSelected())) {
 					mainGame->btnLanStartServer->setEnabled(false);
 					mainGame->btnLanCancelServer->setEnabled(true);
 					mainGame->btnLanConnect->setEnabled(false);
@@ -59,7 +59,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_REFRESH: {
-				if(mainGame->netManager.RefreshHost()) {
+				if(mainGame->netManager.RefreshHost(mainGame->cbIPList->getSelected())) {
 					mainGame->btnLanStartServer->setEnabled(false);
 					mainGame->btnLanConnect->setEnabled(false);
 					mainGame->btnRefreshList->setEnabled(false);
@@ -813,7 +813,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wModes->getActiveTab() == 1) {
 					if(mainGame->is_refreshing || mainGame->netManager.is_creating_host)
 						break;
-					if(mainGame->netManager.RefreshHost()) {
+					if(mainGame->netManager.RefreshHost(mainGame->cbIPList->getSelected())) {
 						mainGame->btnLanStartServer->setEnabled(false);
 						mainGame->btnLanConnect->setEnabled(false);
 						mainGame->btnRefreshList->setEnabled(false);

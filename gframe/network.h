@@ -33,7 +33,7 @@ struct HostRequest {
 
 class NetManager {
 public:
-	unsigned int local_addr;
+	unsigned int local_addr[8];
 	unsigned short serv_port;
 	unsigned int remote_addr;
 	unsigned short remote_port;
@@ -49,9 +49,9 @@ public:
 	char send_buf[4096];
 	char recv_buf[4096];
 
-	bool CreateHost();
+	bool CreateHost(int ipindex);
 	bool CancelHost();
-	bool RefreshHost();
+	bool RefreshHost(int ipindex);
 	bool JoinHost();
 	bool SendtoRemote(char* buf, int len);
 	bool WaitClientResponse();
@@ -89,7 +89,7 @@ public:
 		p++;
 	}
 
-	static int GetLocalAddress();
+	int GetLocalAddress();
 	static int BroadcastServer(void*);
 	static int BroadcastClient(void*);
 	static int ListenThread(void*);

@@ -11,7 +11,7 @@ function c9059700.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c9059700.cfilter(c)
-	return c:IsFaceup() and c:IsAttack() and c:IsSetCard(0xb)
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsSetCard(0xb)
 end
 function c9059700.condition(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp or not Duel.IsExistingMatchingCard(c9059700.cfilter,tp,LOCATION_MZONE,0,1,nil)

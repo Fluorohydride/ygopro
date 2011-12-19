@@ -25,7 +25,7 @@ end
 function c16255442.operation(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetFieldGroup(tp,LOCATION_HAND,0,nil)
 	local sct=sg:GetCount()
-	Duel.SendtoGrave(sg,REASON_EFFECT)
+	Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
 	local tg=Duel.GetMatchingGroup(c16255442.filter,tp,LOCATION_GRAVE,0,nil)
 	if tg:GetCount()>=sct then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
