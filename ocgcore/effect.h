@@ -21,7 +21,7 @@ class card;
 class duel;
 class group;
 class effect;
-struct event;
+struct tevent;
 struct effect_set;
 struct effect_set_v;
 
@@ -59,11 +59,11 @@ public:
 
 	int32 is_disable_related();
 	int32 is_available();
-	int32 is_activateable(uint8 playerid, event& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activateable(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_action_check(uint8 playerid);
-	int32 is_activate_ready(uint8 playerid, event& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
-	int32 is_condition_check(uint8 playerid, event& e);
-	int32 is_activate_check(uint8 playerid, event& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_condition_check(uint8 playerid, tevent& e);
+	int32 is_activate_check(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_target(card* pcard);
 	int32 is_target_player(uint8 playerid);
 	int32 is_player_effect_target(card* pcard);

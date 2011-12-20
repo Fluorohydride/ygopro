@@ -609,7 +609,7 @@ end
 function Auxiliary.FConditionCodeRep(code,cc,sub,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return gc:IsHasEffect() and g:IsExists(Card.IsCode,cc-1,nil,code) end
+				if gc then return gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) and g:IsExists(Card.IsCode,cc-1,nil,code) end
 				local g1=g:Filter(Card.IsCode,nil,code)
 				if not sub then
 					if chkf~=PLAYER_NONE then return g1:GetCount()>=cc and g1:FilterCount(Card.IsOnField,nil)~=0

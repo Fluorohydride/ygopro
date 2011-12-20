@@ -450,7 +450,7 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 		it = effects.aura_effect.insert(make_pair(peffect->code, peffect));
 	else {
 		if (peffect->type & EFFECT_TYPE_IGNITION)
-			it = effects.startup_effect.insert(make_pair(peffect->code, peffect));
+			it = effects.ignition_effect.insert(make_pair(peffect->code, peffect));
 		else if (peffect->type & EFFECT_TYPE_ACTIVATE)
 			it = effects.activate_effect.insert(make_pair(peffect->code, peffect));
 		else if (peffect->type & EFFECT_TYPE_TRIGGER_O && peffect->type & EFFECT_TYPE_FIELD)
@@ -458,9 +458,9 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 		else if (peffect->type & EFFECT_TYPE_TRIGGER_F && peffect->type & EFFECT_TYPE_FIELD)
 			it = effects.trigger_f_effect.insert(make_pair(peffect->code, peffect));
 		else if (peffect->type & EFFECT_TYPE_QUICK_O)
-			it = effects.instant_o_effect.insert(make_pair(peffect->code, peffect));
+			it = effects.quick_o_effect.insert(make_pair(peffect->code, peffect));
 		else if (peffect->type & EFFECT_TYPE_QUICK_F)
-			it = effects.instant_f_effect.insert(make_pair(peffect->code, peffect));
+			it = effects.quick_f_effect.insert(make_pair(peffect->code, peffect));
 		else if (peffect->type & EFFECT_TYPE_CONTINUOUS)
 			it = effects.continuous_effect.insert(make_pair(peffect->code, peffect));
 	}
@@ -484,7 +484,7 @@ void field::remove_effect(effect* peffect) {
 		effects.aura_effect.erase(it);
 	else {
 		if (peffect->type & EFFECT_TYPE_IGNITION)
-			effects.startup_effect.erase(it);
+			effects.ignition_effect.erase(it);
 		else if (peffect->type & EFFECT_TYPE_ACTIVATE)
 			effects.activate_effect.erase(it);
 		else if (peffect->type & EFFECT_TYPE_TRIGGER_O)
@@ -492,9 +492,9 @@ void field::remove_effect(effect* peffect) {
 		else if (peffect->type & EFFECT_TYPE_TRIGGER_F)
 			effects.trigger_f_effect.erase(it);
 		else if (peffect->type & EFFECT_TYPE_QUICK_O)
-			effects.instant_o_effect.erase(it);
+			effects.quick_o_effect.erase(it);
 		else if (peffect->type & EFFECT_TYPE_QUICK_F)
-			effects.instant_f_effect.erase(it);
+			effects.quick_f_effect.erase(it);
 		else if (peffect->type & EFFECT_TYPE_CONTINUOUS)
 			effects.continuous_effect.erase(it);
 	}
@@ -543,7 +543,7 @@ void field::reset_effect(uint32 id, uint32 reset_type) {
 				effects.aura_effect.erase(pit);
 			} else {
 				if (peffect->type & EFFECT_TYPE_IGNITION)
-					effects.startup_effect.erase(pit);
+					effects.ignition_effect.erase(pit);
 				else if (peffect->type & EFFECT_TYPE_ACTIVATE)
 					effects.activate_effect.erase(pit);
 				else if (peffect->type & EFFECT_TYPE_TRIGGER_O)
@@ -551,9 +551,9 @@ void field::reset_effect(uint32 id, uint32 reset_type) {
 				else if (peffect->type & EFFECT_TYPE_TRIGGER_F)
 					effects.trigger_f_effect.erase(pit);
 				else if (peffect->type & EFFECT_TYPE_QUICK_O)
-					effects.instant_o_effect.erase(pit);
+					effects.quick_o_effect.erase(pit);
 				else if (peffect->type & EFFECT_TYPE_QUICK_F)
-					effects.instant_f_effect.erase(pit);
+					effects.quick_f_effect.erase(pit);
 				else if (peffect->type & EFFECT_TYPE_CONTINUOUS)
 					effects.continuous_effect.erase(pit);
 			}
@@ -1074,7 +1074,7 @@ int32 field::check_lp_cost(uint8 playerid, uint32 lp) {
 		if(val <= 0)
 			return TRUE;
 	}
-	event e;
+	tevent e;
 	e.event_cards = 0;
 	e.event_player = playerid;
 	e.event_value = lp;
@@ -1121,12 +1121,10 @@ uint32 field::get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype
 	}
 	return count;
 }
-int32 field::effect_replace_check(uint32 code, event e) {
-	pair<effect_container::iterator, effect_container::iterator> pr;
-	pr = effects.continuous_effect.equal_range(code);
-	effect* peffect;
+int32 field::effect_replace_check(uint32 code, tevent& e) {
+	auto pr = effects.continuous_effect.equal_range(code);
 	for (; pr.first != pr.second; ++pr.first) {
-		peffect = pr.first->second;
+		effect* peffect = pr.first->second;
 		if(peffect->is_activateable(peffect->get_handler_player(), e))
 			return TRUE;
 	}
@@ -1407,7 +1405,7 @@ int32 field::is_player_can_remove_counter(uint8 playerid, card * pcard, uint8 s,
 	pair<effect_container::iterator, effect_container::iterator> pr;
 	pr = effects.continuous_effect.equal_range(EFFECT_RCOUNTER_REPLACE + countertype);
 	effect* peffect;
-	event e;
+	tevent e;
 	e.event_cards = 0;
 	e.event_player = playerid;
 	e.event_value = count;
@@ -1427,7 +1425,7 @@ int32 field::is_player_can_remove_overlay_card(uint8 playerid, card* pcard, uint
 	pair<effect_container::iterator, effect_container::iterator> pr;
 	pr = effects.continuous_effect.equal_range(EFFECT_OVERLAY_REMOVE_REPLACE);
 	effect* peffect;
-	event e;
+	tevent e;
 	e.event_cards = 0;
 	e.event_player = playerid;
 	e.event_value = min;

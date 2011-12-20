@@ -487,7 +487,7 @@ int32 field::pay_lp_cost(uint32 step, uint8 playerid, uint32 cost) {
 				return TRUE;
 		}
 		core.units.begin()->arg2 = val;
-		event e;
+		tevent e;
 		e.event_cards = 0;
 		e.event_player = playerid;
 		e.event_value = val;
@@ -529,7 +529,7 @@ int32 field::pay_lp_cost(uint32 step, uint8 playerid, uint32 cost) {
 			pduel->write_buffer32(cost);
 			return TRUE;
 		}
-		event e;
+		tevent e;
 		e.event_cards = 0;
 		e.event_player = playerid;
 		e.event_value = cost;
@@ -555,7 +555,7 @@ int32 field::remove_counter(uint16 step, uint32 reason, card* pcard, uint8 rplay
 		pair<effect_container::iterator, effect_container::iterator> pr;
 		pr = effects.continuous_effect.equal_range(EFFECT_RCOUNTER_REPLACE + countertype);
 		effect* peffect;
-		event e;
+		tevent e;
 		e.event_cards = 0;
 		e.event_player = rplayer;
 		e.event_value = count;
@@ -583,7 +583,7 @@ int32 field::remove_counter(uint16 step, uint32 reason, card* pcard, uint8 rplay
 	case 1: {
 		effect* peffect = core.select_effects[returns.ivalue[0]];
 		if(peffect) {
-			event e;
+			tevent e;
 			e.event_cards = 0;
 			e.event_player = rplayer;
 			e.event_value = count;
@@ -657,7 +657,7 @@ int32 field::remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 
 		pair<effect_container::iterator, effect_container::iterator> pr;
 		pr = effects.continuous_effect.equal_range(EFFECT_OVERLAY_REMOVE_REPLACE);
 		effect* peffect;
-		event e;
+		tevent e;
 		e.event_cards = 0;
 		e.event_player = rplayer;
 		e.event_value = min;
@@ -685,7 +685,7 @@ int32 field::remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 
 	case 1: {
 		effect* peffect = core.select_effects[returns.ivalue[0]];
 		if(peffect) {
-			event e;
+			tevent e;
 			e.event_cards = 0;
 			e.event_player = rplayer;
 			e.event_value = min + (max << 16);;
@@ -2713,7 +2713,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 		if(!replace_effect->target)
 			return TRUE;
 		card* target = (card*)arg1;
-		event e;
+		tevent e;
 		e.event_cards = targets;
 		e.event_player = replace_effect->get_handler_player();
 		e.event_value = 0;
@@ -2774,7 +2774,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 		return TRUE;
 	}
 	case 5: {
-		event e;
+		tevent e;
 		e.event_cards = targets;
 		e.event_player = replace_effect->get_handler_player();
 		e.event_value = 0;
@@ -2849,7 +2849,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 		if(!replace_effect->target)
 			return TRUE;
 		card* target = (card*)arg1;
-		event e;
+		tevent e;
 		e.event_cards = targets;
 		e.event_player = replace_effect->get_handler_player();
 		e.event_value = 0;
@@ -2891,7 +2891,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 		return TRUE;
 	}
 	case 12: {
-		event e;
+		tevent e;
 		e.event_cards = targets;
 		e.event_player = replace_effect->get_handler_player();
 		e.event_value = 0;
@@ -3228,7 +3228,7 @@ int32 field::toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, 
 	case 0: {
 		effect_set eset;
 		effect* peffect = 0;
-		event e;
+		tevent e;
 		e.event_cards = 0;
 		e.reason_effect = core.reason_effect;
 		e.reason_player = core.reason_player;
@@ -3273,7 +3273,7 @@ int32 field::toss_dice(uint16 step, effect* reason_effect, uint8 reason_player, 
 	case 0: {
 		effect_set eset;
 		effect* peffect = 0;
-		event e;
+		tevent e;
 		e.event_cards = 0;
 		e.reason_effect = core.reason_effect;
 		e.reason_player = core.reason_player;

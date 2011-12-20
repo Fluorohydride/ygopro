@@ -101,7 +101,7 @@ int32 effect::is_available() {
 	}
 	return TRUE;
 }
-int32 effect::is_activateable(uint8 playerid, event& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if (!(type & EFFECT_TYPE_ACTIONS))
 		return FALSE;
 	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (reset_count & 0xf00) == 0)
@@ -206,7 +206,7 @@ int32 effect::is_action_check(uint8 playerid) {
 	}
 	return TRUE;
 }
-int32 effect::is_activate_ready(uint8 playerid, event& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+int32 effect::is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if (!neglect_cond && condition) {
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
@@ -250,7 +250,7 @@ int32 effect::is_activate_ready(uint8 playerid, event& e, int32 neglect_cond, in
 	}
 	return TRUE;
 }
-int32 effect::is_condition_check(uint8 playerid, event& e) {
+int32 effect::is_condition_check(uint8 playerid, tevent& e) {
 	if ((handler->current.location & LOCATION_ONFIELD) && (type & EFFECT_TYPE_FIELD)
 	        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 		return FALSE;
@@ -280,7 +280,7 @@ int32 effect::is_condition_check(uint8 playerid, event& e) {
 	pduel->game_field->core.reason_player = op;
 	return TRUE;
 }
-int32 effect::is_activate_check(uint8 playerid, event& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+int32 effect::is_activate_check(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	pduel->game_field->save_lp_cost();
 	effect* oreason = pduel->game_field->core.reason_effect;
 	uint8 op = pduel->game_field->core.reason_player;

@@ -1601,6 +1601,7 @@ int32 scriptlib::card_trap_monster_block(lua_State *L) {
 	peffect->reset_flag = RESET_EVENT + 0x5fe0000;
 	peffect->value = 1 + (0x10000 << pcard->previous.sequence);
 	pcard->add_effect(peffect);
+	return 0;
 }
 int32 scriptlib::card_cancel_to_grave(lua_State *L) {
 	check_param_count(L, 1);

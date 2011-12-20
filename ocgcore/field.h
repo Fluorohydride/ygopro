@@ -22,7 +22,7 @@ class duel;
 class group;
 class effect;
 
-struct event {
+struct tevent {
 	uint32 event_code;
 	void* event_cards;
 	uint32 event_value;
@@ -53,7 +53,7 @@ struct chain {
 	int32 target_param;
 	effect* disable_reason;
 	uint8 disable_player;
-	event evt;
+	tevent evt;
 	opmap opinfos;
 	uint32 flag;
 	static bool chain_operation_sort(chain c1, chain c2);
@@ -81,12 +81,12 @@ struct field_effect {
 	typedef std::set<effect*> effect_collection;
 
 	effect_container aura_effect;
-	effect_container startup_effect;
+	effect_container ignition_effect;
 	effect_container activate_effect;
 	effect_container trigger_o_effect;
 	effect_container trigger_f_effect;
-	effect_container instant_o_effect;
-	effect_container instant_f_effect;
+	effect_container quick_o_effect;
+	effect_container quick_f_effect;
 	effect_container continuous_effect;
 	effect_indexer indexer;
 	oath_effects oath;
@@ -131,7 +131,7 @@ struct processor {
 	typedef std::vector<card*> card_vector;
 	typedef std::vector<uint32> option_vector;
 	typedef std::list<card*> card_list;
-	typedef std::list<event> event_list;
+	typedef std::list<tevent> event_list;
 	typedef std::list<chain> chain_list;
 	typedef std::map<effect*, chain> instant_f_list;
 	typedef std::vector<chain> chain_array;
@@ -172,7 +172,7 @@ struct processor {
 	chain_list new_ochain_b;
 	chain_list flip_chain_b;
 	chain_list new_chains;
-	instant_f_list instant_f_chain;
+	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
 	card_set special_summoning;
 	card_list adjust_list;
@@ -253,7 +253,7 @@ public:
 	typedef std::vector<card*> card_vector;
 	typedef std::vector<uint32> option_vector;
 	typedef std::list<card*> card_list;
-	typedef std::list<event> event_list;
+	typedef std::list<tevent> event_list;
 	typedef std::list<chain> chain_list;
 	typedef std::map<effect*, chain> instant_f_list;
 	typedef std::vector<chain> chain_array;
@@ -268,7 +268,7 @@ public:
 	field_effect effects;
 	processor core;
 	return_value returns;
-	event nil_event;
+	tevent nil_event;
 
 	static int32 field_used_count[32];
 	field(duel* pduel);
@@ -317,7 +317,7 @@ public:
 	int32 pay_lp_cost(uint32 step, uint8 playerid, uint32 cost);
 
 	uint32 get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype);
-	int32 effect_replace_check(uint32 code, event e);
+	int32 effect_replace_check(uint32 code, tevent& e);
 	int32 get_attack_target(card* pcard, card_vector* v, uint8 chain_attack = FALSE);
 	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min);
 	int32 check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min);
@@ -352,7 +352,7 @@ public:
 	void raise_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	void raise_event(card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	void raise_single_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value );
-	int32 check_event(uint32 code, event* pe = 0);
+	int32 check_event(uint32 code, tevent* pe = 0);
 	int32 check_hint_timing(effect* peffect);
 	int32 process_phase_event(int16 step, int32 phase_event);
 	int32 process_point_event(int16 step, int32 special, int32 skip_new);
