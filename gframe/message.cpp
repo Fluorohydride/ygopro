@@ -530,7 +530,7 @@ void Game::Analyze(void* pd, char* engbuf) {
 		case MSG_SELECT_CHAIN: {
 			player = NetManager::ReadInt8(pbuf);
 			count = NetManager::ReadInt8(pbuf);
-			pbuf += count * 12;
+			pbuf += 9 + count * 11;
 			mainGame->SendGameMessage(player, offset, pbuf - offset);
 			mainGame->WaitforResponse(player);
 			break;
@@ -1593,6 +1593,8 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		int selecting_player = NetManager::ReadInt8(pbuf);
 		int count = NetManager::ReadInt8(pbuf);
 		int specount = NetManager::ReadInt8(pbuf);
+		int hint0 = NetManager::ReadInt32(pbuf);
+		int hint1 = NetManager::ReadInt32(pbuf);
 		int c, l, s, code, desc;
 		ClientCard* pcard;
 		mainGame->dField.activatable_cards.clear();
@@ -3242,7 +3244,7 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 		case MSG_SELECT_CHAIN: {
 			player = NetManager::ReadInt8(pbuf);
 			count = NetManager::ReadInt8(pbuf);
-			pbuf += count * 12;
+			pbuf += 9 + count * 11;
 			return rep.ReadNextResponse();
 		}
 		case MSG_SELECT_PLACE:

@@ -939,7 +939,7 @@ int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_va
 		return COROUTINE_ERROR;
 	}
 }
-//Convert a pointer to a lua value, use "p"+pointer value as the name, +1 -0
+//Convert a pointer to a lua value, +1 -0
 void interpreter::card2value(lua_State* L, card* pcard) {
 	if (!pcard || pcard->ref_handle == 0)
 		lua_pushnil(L);
@@ -970,13 +970,12 @@ int32 interpreter::get_function_handle(lua_State* L, int32 index) {
 	return ref;
 }
 void interpreter::set_duel_info(lua_State* L, duel* pduel) {
-	lua_pushinteger(L, (ptr) pduel);
-	int32 ref = luaL_ref(L, LUA_REGISTRYINDEX);
-	lua_setglobal(L, "__duel");
+	lua_pushlightuserdata(L, pduel);
+	luaL_ref(L, LUA_REGISTRYINDEX);
 }
 duel* interpreter::get_duel_info(lua_State * L) {
-	lua_getglobal(L, "__duel");
-	ptr pduel = lua_tointeger(L, -1);
+	lua_rawgeti(L, LUA_REGISTRYINDEX, 3);
+	duel* pduel = (duel*)lua_topointer(L, -1);
 	lua_pop(L, 1);
-	return (duel*) pduel;
+	return pduel;
 }

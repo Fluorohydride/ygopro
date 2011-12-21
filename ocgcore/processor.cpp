@@ -2464,8 +2464,8 @@ int32 field::process_battle_command(uint16 step) {
 					return FALSE;
 				}
 			}
-			core.attack_target = 0;
-			core.units.begin()->step = 6;
+			returns.ivalue[0] = -2;
+			core.units.begin()->step = 5;
 			return FALSE;
 		}
 		if(core.units.begin()->arg2) {

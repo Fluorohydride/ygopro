@@ -241,7 +241,7 @@ function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g1=g:FilterSelect(tp,Auxiliary.FConditionFilter21,1,1,nil,code1,code2)
+					local g1=eg:FilterSelect(tp,Auxiliary.FConditionFilter21,1,1,nil,code1,code2)
 					Duel.SetFusionMaterial(g1)
 					return
 				end
