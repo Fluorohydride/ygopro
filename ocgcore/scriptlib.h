@@ -16,12 +16,6 @@ public:
 	static int32 check_param(lua_State* L, int32 param_type, int32 index, BOOL retfalse = FALSE);
 	static int32 check_param_count(lua_State* L, int32 count);
 	static int32 check_action_permission(lua_State* L);
-	//bit
-	static int32 bit_and(lua_State *L);
-	static int32 bit_or(lua_State *L);
-	static int32 bit_xor(lua_State *L);
-	static int32 bit_ls(lua_State *L);
-	static int32 bit_rs(lua_State *L);
 	
 	//card lib
 	static int32 card_get_code(lua_State *L);

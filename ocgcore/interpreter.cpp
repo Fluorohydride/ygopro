@@ -15,15 +15,7 @@
 #include "ocgapi.h"
 #include "interpreter.h"
 
-static const struct luaL_reg bitlib[] = {
-	{ "band", scriptlib::bit_and },
-	{ "bor", scriptlib::bit_or },
-	{ "bxor", scriptlib::bit_xor },
-	{ "bls", scriptlib::bit_ls },
-	{ "brs", scriptlib::bit_rs },
-	{ NULL, NULL }
-};
-static const struct luaL_reg cardlib[] = {
+static const struct luaL_Reg cardlib[] = {
 	{ "GetCode", scriptlib::card_get_code },
 	{ "GetOriginalCode", scriptlib::card_get_origin_code },
 	{ "IsSetCard", scriptlib::card_is_set_card },
@@ -187,7 +179,7 @@ static const struct luaL_reg cardlib[] = {
 	{ NULL, NULL }
 };
 
-static const struct luaL_reg effectlib[] = {
+static const struct luaL_Reg effectlib[] = {
 	{ "CreateEffect", scriptlib::effect_new },
 	{ "Clone", scriptlib::effect_clone },
 	{ "Reset", scriptlib::effect_reset },
@@ -232,7 +224,7 @@ static const struct luaL_reg effectlib[] = {
 	{ NULL, NULL }
 };
 
-static const struct luaL_reg grouplib[] = {
+static const struct luaL_Reg grouplib[] = {
 	{ "CreateGroup", scriptlib::group_new },
 	{ "KeepAlive", scriptlib::group_keep_alive },
 	{ "DeleteGroup", scriptlib::group_delete },
@@ -461,26 +453,26 @@ interpreter::interpreter(duel* pd) {
 	lua_setglobal(lua_state, "io");
 	lua_pushnil(lua_state);
 	lua_setglobal(lua_state, "os");
-	luaL_openlib(lua_state, "bit", bitlib, 0);
-	lua_pop(lua_state, 1);
+	lua_getglobal(lua_state, "bit32");
+	lua_setglobal(lua_state, "bit");
 	//open all libs
-	luaL_openlib(lua_state, "Card", cardlib, 0);
+	luaL_newlib(lua_state, cardlib);
 	lua_pushstring(lua_state, "__index");
 	lua_pushvalue(lua_state, -2);
 	lua_rawset(lua_state, -3);
-	lua_pop(lua_state, 1);
-	luaL_openlib(lua_state, "Effect", effectlib, 0);
+	lua_setglobal(lua_state, "Card");
+	luaL_newlib(lua_state, effectlib);
 	lua_pushstring(lua_state, "__index");
 	lua_pushvalue(lua_state, -2);
 	lua_rawset(lua_state, -3);
-	lua_pop(lua_state, 1);
-	luaL_openlib(lua_state, "Group", grouplib, 0);
+	lua_setglobal(lua_state, "Effect");
+	luaL_newlib(lua_state, grouplib);
 	lua_pushstring(lua_state, "__index");
 	lua_pushvalue(lua_state, -2);
 	lua_rawset(lua_state, -3);
-	lua_pop(lua_state, 1);
-	luaL_openlib(lua_state, "Duel", duellib, 0);
-	lua_pop(lua_state, 1);
+	lua_setglobal(lua_state, "Group");
+	luaL_newlib(lua_state, duellib);
+	lua_setglobal(lua_state, "Duel");
 	//extra scripts
 	load_script((char*) "constant.lua");
 	load_script((char*) "utility.lua");
@@ -519,7 +511,7 @@ void interpreter::register_effect(effect *peffect) {
 	peffect->ref_handle = luaL_ref(lua_state, LUA_REGISTRYINDEX);
 	//set metatable of pointer to base script
 	lua_rawgeti(lua_state, LUA_REGISTRYINDEX, peffect->ref_handle);
-	lua_getfield(lua_state, LUA_GLOBALSINDEX, "Effect");
+	lua_getglobal(lua_state, "Effect");
 	lua_setmetatable(lua_state, -2);
 	lua_pop(lua_state, 1);
 }
@@ -548,7 +540,7 @@ void interpreter::register_group(group *pgroup) {
 	pgroup->ref_handle = luaL_ref(lua_state, LUA_REGISTRYINDEX);
 	//set metatable of pointer to base script
 	lua_rawgeti(lua_state, LUA_REGISTRYINDEX, pgroup->ref_handle);
-	lua_getfield(lua_state, LUA_GLOBALSINDEX, "Group");
+	lua_getglobal(lua_state, "Group");
 	lua_setmetatable(lua_state, -2);
 	lua_pop(lua_state, 1);
 }
@@ -580,15 +572,15 @@ int32 interpreter::load_card_script(uint32 code) {
 	char class_name[20];
 	char script_name[20];
 	sprintf(class_name, "c%d", code);
-	lua_getfield(current_state, LUA_GLOBALSINDEX, class_name);
+	lua_getglobal(current_state, class_name);
 	//if script is not loaded, create and load it
 	if (lua_isnil(current_state, -1)) {
 		lua_pop(current_state, 1);
 		//create a table & set metatable
 		lua_createtable(current_state, 0, 0);
-		lua_setfield(current_state, LUA_GLOBALSINDEX, class_name);
-		lua_getfield(current_state, LUA_GLOBALSINDEX, class_name);
-		lua_getfield(current_state, LUA_GLOBALSINDEX, "Card");
+		lua_setglobal(current_state, class_name);
+		lua_getglobal(current_state, class_name);
+		lua_getglobal(current_state, "Card");
 		lua_setmetatable(current_state, -2);
 		lua_pushstring(current_state, "__index");
 		lua_pushvalue(current_state, -2);
@@ -923,7 +915,7 @@ int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_va
 	}
 	current_state = rthread;
 	push_param(rthread);
-	int32 result = lua_resume(rthread, param_count);
+	int32 result = lua_resume(rthread, 0, param_count);
 	if (result == 0) {
 		coroutines.erase(f);
 		if(yield_value)
@@ -979,10 +971,11 @@ int32 interpreter::get_function_handle(lua_State* L, int32 index) {
 }
 void interpreter::set_duel_info(lua_State* L, duel* pduel) {
 	lua_pushinteger(L, (ptr) pduel);
-	lua_rawseti(L, LUA_GLOBALSINDEX, 1);
+	int32 ref = luaL_ref(L, LUA_REGISTRYINDEX);
+	lua_setglobal(L, "__duel");
 }
 duel* interpreter::get_duel_info(lua_State * L) {
-	lua_rawgeti(L, LUA_GLOBALSINDEX, 1);
+	lua_getglobal(L, "__duel");
 	ptr pduel = lua_tointeger(L, -1);
 	lua_pop(L, 1);
 	return (duel*) pduel;

@@ -57,7 +57,7 @@ int32 scriptlib::duel_get_draw_count(lua_State *L) {
 }
 int32 scriptlib::duel_debug_message(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_getfield(L, LUA_GLOBALSINDEX, "tostring");
+	lua_getglobal(L, "tostring");
 	lua_pushvalue(L, -2);
 	lua_pcall(L, 1, 1, 0);
 	sprintf(pduel->strbuffer, "%s", lua_tostring(L, -1));

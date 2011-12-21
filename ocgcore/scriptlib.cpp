@@ -69,33 +69,3 @@ int32 scriptlib::check_action_permission(lua_State* L) {
 		luaL_error(L, "Action is not allowed here.");
 	return TRUE;
 }
-int32 scriptlib::bit_and(lua_State *L) {
-	int32 a = lua_tointeger(L, 1);
-	int32 b = lua_tointeger(L, 2);
-	lua_pushinteger(L, a & b);
-	return 1;
-}
-int32 scriptlib::bit_or(lua_State *L) {
-	int32 a = lua_tointeger(L, 1);
-	int32 b = lua_tointeger(L, 2);
-	lua_pushinteger(L, a | b);
-	return 1;
-}
-int32 scriptlib::bit_xor(lua_State *L) {
-	int32 a = lua_tointeger(L, 1);
-	int32 b = lua_tointeger(L, 2);
-	lua_pushinteger(L, a ^ b);
-	return 1;
-}
-int32 scriptlib::bit_ls(lua_State *L) {
-	int32 a = lua_tointeger(L, 1);
-	int32 b = lua_tointeger(L, 2);
-	lua_pushinteger(L, a << b);
-	return 1;
-}
-int32 scriptlib::bit_rs(lua_State *L) {
-	int32 a = lua_tointeger(L, 1);
-	int32 b = lua_tointeger(L, 2);
-	lua_pushinteger(L, a >> b);
-	return 1;
-}

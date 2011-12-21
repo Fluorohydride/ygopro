@@ -26,8 +26,8 @@ function c76573247.seqop(e,tp,eg,ep,ev,re,r,rp)
 	if (seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1))
 		or (seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1)) then
 		local flag=0
-		if seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1) then flag=bit.bor(flag,bit.bls(0x1,seq-1)) end
-		if seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1) then flag=bit.bor(flag,bit.bls(0x1,seq+1)) end
+		if seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1) then flag=bit.bor(flag,bit.lshift(0x1,seq-1)) end
+		if seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1) then flag=bit.bor(flag,bit.lshift(0x1,seq+1)) end
 		flag=bit.bxor(flag,0xff)
 		local s=Duel.SelectDisableField(tp,1,LOCATION_MZONE,0,flag)
 		local nseq=0
