@@ -1458,6 +1458,10 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		core.select_cards.clear();
 		for(auto cit = player[infos.turn_player].list_hand.begin(); cit != player[infos.turn_player].list_hand.end(); ++cit)
 			core.select_cards.push_back(*cit);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_SELECTMSG);
+		pduel->write_buffer8(infos.turn_player);
+		pduel->write_buffer32(501);
 		add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, infos.turn_player, hd - limit + ((hd - limit) << 16));
 		return FALSE;
 	}

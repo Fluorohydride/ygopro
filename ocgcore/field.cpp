@@ -358,10 +358,9 @@ void field::shuffle(uint8 playerid, uint8 location) {
 	if(svector.size() == 0)
 		return;
 	if(svector.size() > 1) {
-		card_vector::iterator cit;
 		uint32 i = 0, s = svector.size(), r;
-		for(i = 0; i < s; ++i) {
-			r = pduel->get_next_integer(0, s - 1);
+		for(i = 0; i < s - 1; ++i) {
+			r = pduel->get_next_integer(i, s - 1);
 			t = svector[i];
 			svector[i] = svector[r];
 			svector[r] = t;

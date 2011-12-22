@@ -18,7 +18,7 @@ function c91822647.filter1(c,e)
 	return c:IsSetCard(0x10) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function c91822647.filter2(c,e,tp)
-	return c:IsDefenceBelow(1000) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x10) and c:IsDefenceBelow(1000) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c91822647.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
