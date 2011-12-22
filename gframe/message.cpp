@@ -658,7 +658,7 @@ void Game::Analyze(void* pd, char* engbuf) {
 			int cl = pbuf[9];
 			int cs = pbuf[10];
 			int cp = pbuf[11];
-			pbuf += 12;
+			pbuf += 16;
 			if(cl == LOCATION_REMOVED && (cp & POS_FACEDOWN)) {
 				NetManager::WriteInt32(pbufw, 0);
 				mainGame->SendGameMessage(cc, offset, pbuf - offset);
@@ -671,18 +671,6 @@ void Game::Analyze(void* pd, char* engbuf) {
 			}
 			if (cl != 0 && (cl & 0x80) == 0 && (cl != pl || pc != cc))
 				mainGame->RefreshSingle(cc, cl, cs);
-			break;
-		}
-		case MSG_DESTROY: {
-			pbuf += 8;
-			mainGame->SendGameMessage(0, offset, pbuf - offset);
-			mainGame->SendGameMessage(1, offset, pbuf - offset);
-			break;
-		}
-		case MSG_RELEASE: {
-			pbuf += 8;
-			mainGame->SendGameMessage(0, offset, pbuf - offset);
-			mainGame->SendGameMessage(1, offset, pbuf - offset);
 			break;
 		}
 		case MSG_POS_CHANGE: {
@@ -2168,6 +2156,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		int cl = NetManager::ReadUInt8(pbuf);
 		int cs = NetManager::ReadInt8(pbuf);
 		int cp = NetManager::ReadInt8(pbuf);
+		int reason = NetManager::ReadInt32(pbuf);
 		if (pl == 0) {
 			ClientCard* pcard = new ClientCard();
 			pcard->position = cp;
@@ -2304,24 +2293,6 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 				mainGame->WaitFrameSignal(5);
 			}
 		}
-		return true;
-	}
-	case MSG_DESTROY: {
-		int code = NetManager::ReadInt32(pbuf);
-		int cc = mainGame->LocalPlayer(NetManager::ReadInt8(pbuf));
-		int cl = NetManager::ReadInt8(pbuf);
-		int cs = NetManager::ReadInt8(pbuf);
-		int cp = NetManager::ReadInt8(pbuf);
-		myswprintf(pdInfo->strEvent, L"卡片被破坏了");
-		return true;
-	}
-	case MSG_RELEASE: {
-		int code = NetManager::ReadInt32(pbuf);
-		int cc = mainGame->LocalPlayer(NetManager::ReadInt8(pbuf));
-		int cl = NetManager::ReadInt8(pbuf);
-		int cs = NetManager::ReadInt8(pbuf);
-		int cp = NetManager::ReadInt8(pbuf);
-		myswprintf(pdInfo->strEvent, L"卡片被解放了");
 		return true;
 	}
 	case MSG_POS_CHANGE: {
@@ -3348,30 +3319,18 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 			break;
 		}
 		case MSG_MOVE: {
-			int code = NetManager::ReadInt32(pbuf);
-			int pc = NetManager::ReadInt8(pbuf);
-			int pl = NetManager::ReadInt8(pbuf);
-			int ps = NetManager::ReadInt8(pbuf);
-			int pp = NetManager::ReadInt8(pbuf);
-			int cc = NetManager::ReadInt8(pbuf);
-			int cl = NetManager::ReadInt8(pbuf);
-			int cs = NetManager::ReadInt8(pbuf);
-			int cp = NetManager::ReadInt8(pbuf);
+			int pc = pbuf[4];
+			int pl = pbuf[5];
+			int ps = pbuf[6];
+			int pp = pbuf[7];
+			int cc = pbuf[8];
+			int cl = pbuf[9];
+			int cs = pbuf[10];
+			int cp = pbuf[11];
+			pbuf += 16;
 			SolveMessage(pd, offset, pbuf - offset);
 			if(pl != cl || pc != cc)
 				mainGame->ReplayRefreshSingle(cc, cl, cs);
-			break;
-		}
-		case MSG_DESTROY: {
-			pbuf += 8;
-			SolveMessage(pd, offset, pbuf - offset);
-			pauseable = false;
-			break;
-		}
-		case MSG_RELEASE: {
-			pbuf += 8;
-			SolveMessage(pd, offset, pbuf - offset);
-			pauseable = false;
 			break;
 		}
 		case MSG_POS_CHANGE: {

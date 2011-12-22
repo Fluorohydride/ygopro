@@ -1915,12 +1915,6 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 				continue;
 			}
 			(*cvit)->current.reason |= REASON_DESTROY;
-			pduel->write_buffer8(MSG_DESTROY);
-			pduel->write_buffer32((*cvit)->data.code);
-			pduel->write_buffer8((*cvit)->current.controler);
-			pduel->write_buffer8((*cvit)->current.location);
-			pduel->write_buffer8((*cvit)->current.sequence);
-			pduel->write_buffer8((*cvit)->current.position);
 			core.hint_timing[(*cvit)->current.controler] |= TIMING_DESTROY;
 			raise_single_event(*cvit, EVENT_DESTROY, (*cvit)->current.reason_effect, (*cvit)->current.reason, (*cvit)->current.reason_player, 0, 0);
 		}
@@ -2096,12 +2090,6 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 				continue;
 			}
 			(*cvit)->current.reason |= REASON_RELEASE;
-			pduel->write_buffer8(MSG_RELEASE);
-			pduel->write_buffer32((*cvit)->data.code);
-			pduel->write_buffer8((*cvit)->current.controler);
-			pduel->write_buffer8((*cvit)->current.location);
-			pduel->write_buffer8((*cvit)->current.sequence);
-			pduel->write_buffer8((*cvit)->current.position);
 			raise_single_event(*cvit, EVENT_RELEASE, (*cvit)->current.reason_effect, (*cvit)->current.reason, (*cvit)->current.reason_player, 0, 0);
 		}
 		adjust_instant();
@@ -2261,6 +2249,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pduel->write_buffer8(0);
 				pduel->write_buffer8(0);
 				pduel->write_buffer8(0);
+				pduel->write_buffer32((*cvit)->current.reason);
 				(*cvit)->previous.controler = (*cvit)->current.controler;
 				(*cvit)->previous.location = (*cvit)->current.location;
 				(*cvit)->previous.sequence = (*cvit)->current.sequence;
@@ -2302,6 +2291,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pduel->write_buffer8((*cvit)->current.location);
 			pduel->write_buffer8((*cvit)->current.sequence);
 			pduel->write_buffer8((*cvit)->current.position);
+			pduel->write_buffer32((*cvit)->current.reason);
 			(*cvit)->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
 			if((*cvit)->status & (STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED)) {
 				(*cvit)->set_status(STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED, FALSE);
@@ -2467,6 +2457,7 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 			pduel->write_buffer8(pcard->current.location);
 			pduel->write_buffer8(pcard->current.sequence);
 			pduel->write_buffer8(pcard->current.position);
+			pduel->write_buffer32(pcard->current.reason);
 			if(dest == LOCATION_HAND) {
 				tohand.insert(pcard);
 				raise_single_event(pcard, EVENT_TO_HAND, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
@@ -2586,6 +2577,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		pduel->write_buffer8(target->current.location);
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
+		pduel->write_buffer32(target->current.reason);
 		if((target->current.location != LOCATION_MZONE)) {
 			if(target->equiping_cards.size()) {
 				card_set::iterator csit, rm;

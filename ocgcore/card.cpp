@@ -632,6 +632,7 @@ void card::xyz_add(card* mat, card_set* des) {
 	pduel->write_buffer8(current.location | LOCATION_OVERLAY);
 	pduel->write_buffer8(current.sequence);
 	pduel->write_buffer8(current.position);
+	pduel->write_buffer32(REASON_XYZ + REASON_MATERIAL);
 	xyz_materials.push_back(mat);
 	for(auto cit = mat->equiping_cards.begin(); cit != mat->equiping_cards.end();) {
 		auto rm = cit++;

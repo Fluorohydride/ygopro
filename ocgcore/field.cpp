@@ -211,6 +211,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					pcard->previous.controler = preplayer;
 					pcard->current.controler = playerid;
 					pduel->write_buffer32(pcard->get_info_location());
+					pduel->write_buffer32(pcard->current.reason);
 					return;
 				} else
 					remove_card(pcard);
@@ -246,6 +247,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 				}
 				if(preplayer == playerid) {
 					pduel->write_buffer32(pcard->get_info_location());
+					pduel->write_buffer32(pcard->current.reason);
 				}
 				return;
 			} else if(location == LOCATION_HAND) {
@@ -263,6 +265,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					player[pcard->current.controler].list_grave.push_back(pcard);
 					reset_sequence(pcard->current.controler, LOCATION_GRAVE);
 					pduel->write_buffer32(pcard->get_info_location());
+					pduel->write_buffer32(pcard->current.reason);
 				} else if(location == LOCATION_REMOVED) {
 					if(pcard->current.sequence == player[pcard->current.controler].list_remove.size() - 1)
 						return;
@@ -273,6 +276,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					player[pcard->current.controler].list_remove.push_back(pcard);
 					reset_sequence(pcard->current.controler, LOCATION_REMOVED);
 					pduel->write_buffer32(pcard->get_info_location());
+					pduel->write_buffer32(pcard->current.reason);
 				} else {
 					pduel->write_buffer8(MSG_MOVE);
 					pduel->write_buffer32(pcard->data.code);
@@ -281,6 +285,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 					player[pcard->current.controler].list_extra.push_back(pcard);
 					reset_sequence(pcard->current.controler, LOCATION_EXTRA);
 					pduel->write_buffer32(pcard->get_info_location());
+					pduel->write_buffer32(pcard->current.reason);
 				}
 				return;
 			}

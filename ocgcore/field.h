@@ -650,8 +650,6 @@ public:
 #define MSG_NEW_TURN			40
 #define MSG_NEW_PHASE			41
 #define MSG_MOVE				50
-#define MSG_DESTROY				51
-#define MSG_RELEASE				52
 #define MSG_POS_CHANGE			53
 #define MSG_SET					54
 #define MSG_SWAP				55
