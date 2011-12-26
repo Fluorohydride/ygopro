@@ -58,7 +58,7 @@ CGUIImageButton::CGUIImageButton(IGUIEnvironment* environment, IGUIElement* pare
 	imageScale = core::vector2df(1.0f, 1.0f);
 }
 CGUIImageButton* CGUIImageButton::addImageButton(IGUIEnvironment *env, const core::rect<s32>& rectangle, IGUIElement* parent, s32 id) {
-	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : dynamic_cast<IGUIElement*>(env), id, rectangle);
+	CGUIImageButton* button = new CGUIImageButton(env, parent ? parent : 0, id, rectangle);
 	button->drop();
 	return button;
 }

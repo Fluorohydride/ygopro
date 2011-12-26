@@ -25,6 +25,7 @@ function c14466224.initial_effect(c)
 end
 function c14466224.spcon(e,c)
 	if c==nil then return true end
+	local tp=c:GetControler()
 	return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_MZONE,0,2,nil)
 		and Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE,0,1,nil)
 end

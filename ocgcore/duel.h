@@ -73,5 +73,6 @@ public:
 #define DUEL_TEST_MODE			0x01
 #define DUEL_ATTACK_FIRST_TURN	0x02
 #define DUEL_NO_CHAIN_HINT		0x04
+#define DUEL_ENABLE_PRIORITY	0x08
 
 #endif /* DUEL_H_ */

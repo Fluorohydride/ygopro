@@ -1664,14 +1664,15 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 7: {
-		/* Due to the new official rules, the priority of ignition effects when summon, special summon, flip summon is canceled
-		//ignition & quick effect
+		if(!(core.duel_options & DUEL_ENABLE_PRIORITY))
+			return FALSE;
+		// Due to the new official rules, the priority of ignition effects when summon, special summon, flip summon is canceled
+		// Use DUEL_ENABLE_PRIORITY to enable this feature (TCG)
+		// ignition effects
 		tevent e;
 		if(core.current_chain.size() == 0 &&
 		        (check_event(EVENT_SUMMON_SUCCESS, &e) || check_event(EVENT_SPSUMMON_SUCCESS, &e) || check_event(EVENT_FLIP_SUMMON_SUCCESS, &e))
 		        && e.reason_player == infos.turn_player) {
-			effect* peffect;
-			effect_container::iterator eit;
 			chain newchain;
 			tevent e;
 			e.event_cards = 0;
@@ -1680,12 +1681,13 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			e.reason_effect = 0;
 			e.reason = 0;
 			e.reason_player = PLAYER_NONE;
-			for(eit = effects.startup_effect.begin(); eit != effects.startup_effect.end(); ++eit) {
-				peffect = eit->second;
+			for(auto eit = effects.ignition_effect.begin(); eit != effects.ignition_effect.end(); ++eit) {
+				effect* peffect = eit->second;
 				e.event_code = peffect->code;
-				if(peffect->handler->current.location == LOCATION_MZONE && peffect->is_chainable() && peffect->is_activateable(infos.turn_player, e)) {
+				if(peffect->handler->current.location == LOCATION_MZONE && peffect->is_chainable(infos.turn_player)
+				        && peffect->is_activateable(infos.turn_player, e)) {
 					newchain.flag = 0;
-					newchain.chain_id = infos.chain_id++;
+					newchain.chain_id = infos.field_id++;
 					newchain.evt = e;
 					newchain.triggering_controler = peffect->handler->current.controler;
 					newchain.triggering_effect = peffect;
@@ -1696,7 +1698,6 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				}
 			}
 		}
-		*/
 		return FALSE;
 	}
 	case 8: {
