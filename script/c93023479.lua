@@ -13,6 +13,7 @@ function c93023479.initial_effect(c)
 end
 function c93023479.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+		and e:GetHandler():GetPreviousControler()==tp
 end
 function c93023479.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

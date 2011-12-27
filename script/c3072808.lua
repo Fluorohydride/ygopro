@@ -16,7 +16,7 @@ end
 c3072808[0]=true
 c3072808[1]=true
 function c3072808.condition(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0 and ev>=2000 and Duel.GetAttackTarget()==nil and c3072808[tp]
+	return ep==tp and bit.band(r,REASON_BATTLE)~=0 and ev>=2000 and Duel.GetAttackTarget()==nil and c3072808[tp]
 end
 function c3072808.filter(c,e,tp)
 	return c:IsLevelBelow(3) and c:IsSetCard(0x33) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
