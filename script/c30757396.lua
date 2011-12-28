@@ -24,6 +24,7 @@ function c30757396.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_SSET)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(c30757396.damcon2)
 	e2:SetTarget(c30757396.damtg2)
 	e2:SetOperation(c30757396.damop2)
 	c:RegisterEffect(e2)
@@ -41,6 +42,9 @@ function c30757396.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
 	Duel.Damage(p,ct*300,REASON_EFFECT)
+end
+function c30757396.damcon2(e,tp,eg,ep,ev,re,r,rp)
+	return rp~=tp
 end
 function c30757396.damtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

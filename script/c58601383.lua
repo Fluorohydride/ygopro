@@ -2,7 +2,7 @@
 function c58601383.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,97204936,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),1,true,true)
+	aux.AddFusionProcCodeFun(c,97204936,c58601383.ffilter,1,true,true)
 	--cannot be target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -22,6 +22,9 @@ function c58601383.initial_effect(c)
 end
 c58601383.material_count=1
 c58601383.material={97204936}
+function c58601383.ffilter(c)
+	return c:IsType(TYPE_SYNCHRO) and not c:IsType(TYPE_EFFECT)
+end
 function c58601383.efilter(e,re)
 	return re:GetOwner():IsType(TYPE_EFFECT)
 end

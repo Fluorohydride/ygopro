@@ -2529,6 +2529,18 @@ int32 field::process_battle_command(uint16 step) {
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
 		core.attack_state[infos.turn_player] = TRUE;
+		pduel->write_buffer8(MSG_ATTACK);
+		pduel->write_buffer32(core.attacker->get_info_location());
+		if(core.attack_target) {
+			raise_single_event(core.attack_target, EVENT_BE_BATTLE_TARGET, 0, 0, 0, 1 - infos.turn_player, 0);
+			raise_event(core.attack_target, EVENT_BE_BATTLE_TARGET, 0, 0, 0, 1 - infos.turn_player, 0);
+			pduel->write_buffer32(core.attack_target->get_info_location());
+		} else
+			pduel->write_buffer32(0);
+		if(core.attacker->current.location != LOCATION_MZONE) {
+			core.units.begin()->step = -1;
+			return FALSE;
+		}
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i])
 				core.pre_field[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid;
@@ -2540,14 +2552,6 @@ int32 field::process_battle_command(uint16 step) {
 			raise_single_event(core.attacker, EVENT_ATTACK_ANNOUNCE, 0, 0, 0, infos.turn_player, 0);
 			raise_event(core.attacker, EVENT_ATTACK_ANNOUNCE, 0, 0, 0, infos.turn_player, 0);
 		}
-		pduel->write_buffer8(MSG_ATTACK);
-		pduel->write_buffer32(core.attacker->get_info_location());
-		if(core.attack_target) {
-			raise_single_event(core.attack_target, EVENT_BE_BATTLE_TARGET, 0, 0, 0, 1 - infos.turn_player, 0);
-			raise_event(core.attack_target, EVENT_BE_BATTLE_TARGET, 0, 0, 0, 1 - infos.turn_player, 0);
-			pduel->write_buffer32(core.attack_target->get_info_location());
-		} else
-			pduel->write_buffer32(0);
 		core.units.begin()->arg2 = (core.attacker->current.controler << 16) + core.attacker->fieldid;
 		process_single_event();
 		process_instant_event();
