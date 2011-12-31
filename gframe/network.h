@@ -2,6 +2,7 @@
 #define NETWORK_H
 
 #include "config.h"
+#include <event2/event.h>
 #include <set>
 #include <vector>
 

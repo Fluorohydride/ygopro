@@ -23,6 +23,8 @@ function c25165047.initial_effect(c)
 	--Destroy replace
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetTarget(c25165047.desreptg)
 	c:RegisterEffect(e3)
