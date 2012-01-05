@@ -20,8 +20,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wMainMenu, false, mainGame->wLanWindow);
 				break;
 			}
+			case BUTTON_JOIN_HOST: {
+				break;
+			}
 			case BUTTON_JOIN_CANCEL: {
 				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wMainMenu);
+				break;
+			}
+			case BUTTON_CREATE_HOST: {
+				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wHostWindow);
+				break;
+			}
+			case BUTTON_HOST_CONFIRM: {
+				break;
+			}
+			case BUTTON_HOST_CANCEL: {
+				mainGame->HideElement(mainGame->wHostWindow, false, mainGame->wLanWindow);
 				break;
 			}
 			case BUTTON_DECK_EDIT: {

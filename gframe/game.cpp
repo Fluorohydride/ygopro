@@ -60,12 +60,12 @@ bool Game::Initialize() {
 	myswprintf(dataManager.strBuffer, L"YGOPro Version:0x%X)", PROTO_VERSION);
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 450), false, dataManager.strBuffer);
 	wMainMenu->getCloseButton()->setVisible(false);
-	btnLanMode = env->addButton(rect<s32>(10, 25, 270, 55), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
-	btnServerMode = env->addButton(rect<s32>(10, 60, 270, 90), wMainMenu, BUTTON_SERVER_MODE, dataManager.GetSysString(1201));
-	btnReplayMode = env->addButton(rect<s32>(10, 95, 270, 125), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202));
-	btnTestMode = env->addButton(rect<s32>(10, 130, 270, 160), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203));
-	btnDeckEdit = env->addButton(rect<s32>(10, 165, 270, 195), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204));
-	btnModeExit = env->addButton(rect<s32>(10, 200, 270, 230), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210));
+	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
+	btnServerMode = env->addButton(rect<s32>(10, 65, 270, 95), wMainMenu, BUTTON_SERVER_MODE, dataManager.GetSysString(1201));
+	btnReplayMode = env->addButton(rect<s32>(10, 100, 270, 130), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202));
+	btnTestMode = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203));
+	btnDeckEdit = env->addButton(rect<s32>(10, 170, 270, 200), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204));
+	btnModeExit = env->addButton(rect<s32>(10, 205, 270, 235), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210));
 	//lan mode
 	wLanWindow = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1200));
 	wLanWindow->getCloseButton()->setVisible(false);
@@ -87,49 +87,47 @@ bool Game::Initialize() {
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
 	btnCreateHost = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));
 	wLanWindow->setVisible(false);
+	//create host
+	wHostWindow = env->addWindow(rect<s32>(320, 100, 700, 520), false, dataManager.GetSysString(1224));
+	wHostWindow->getCloseButton()->setVisible(false);
+	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 30, 220, 50), false, false, wHostWindow);
+	cbRule = env->addComboBox(rect<s32>(140, 25, 300, 50), wHostWindow);
+	cbRule->addItem(dataManager.GetSysString(1240));
+	cbRule->addItem(dataManager.GetSysString(1241));
+	cbRule->addItem(dataManager.GetSysString(1242));
+	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 60, 220, 80), false, false, wHostWindow);
+	cbLFlist = env->addComboBox(rect<s32>(140, 55, 300, 80), wHostWindow);
+	for(int i = 0; i < deckManager._lfList.size(); ++i)
+		cbLFlist->addItem(deckManager._lfList[i].listName);
+	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wHostWindow);
+	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wHostWindow);
+	cbMatchMode->addItem(dataManager.GetSysString(1243));
+	cbMatchMode->addItem(dataManager.GetSysString(1244));
+	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 120, 320, 140), false, false, wHostWindow);
+	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 150, 320, 170), wHostWindow, -1, dataManager.GetSysString(1229));
+	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(20, 180, 320, 200), wHostWindow, -1, dataManager.GetSysString(1230));
+	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 210, 320, 230), false, false, wHostWindow);
+	myswprintf(dataManager.strBuffer, L"%d", 8000);
+	ebStartLP = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 205, 220, 230), true, wHostWindow);
+	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(1232), rect<s32>(20, 240, 320, 260), false, false, wHostWindow);
+	myswprintf(dataManager.strBuffer, L"%d", 5);
+	ebStartHand = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 235, 220, 260), true, wHostWindow);
+	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(1233), rect<s32>(20, 270, 320, 290), false, false, wHostWindow);
+	myswprintf(dataManager.strBuffer, L"%d", 1);
+	ebDrawCount = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 265, 220, 290), true, wHostWindow);
+	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 360, 220, 380), false, false, wHostWindow);
+	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 355, 250, 380), true, wHostWindow);
+	ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(1235), rect<s32>(10, 390, 220, 410), false, false, wHostWindow);
+	ebServerPass = env->addEditBox(L"", rect<s32>(110, 385, 250, 410), true, wHostWindow);
+	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wHostWindow, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
+	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wHostWindow, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
+	wHostWindow->setVisible(false);
 	/*	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(10, 10, 210, 30), tabLanS, -1, L"不检查卡组");
-		chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(10, 35, 210, 55), tabLanS, -1, L"开局不洗卡组");
-		chkNoShufflePlayer = env->addCheckBox(false, rect<s32>(10, 60, 210, 80), tabLanS, -1, L"主机固定先攻");
-		chkAttackFT = env->addCheckBox(false, rect<s32>(10, 85, 210, 105), tabLanS, -1, L"第一回合可以攻击");
-		chkNoChainHint = env->addCheckBox(false, rect<s32>(10, 110, 210, 130), tabLanS, -1, L"没有可用连锁时不等待");
-		env->addStaticText(L"起始ＬＰ：", rect<s32>(200, 10, 300, 30), false, false, tabLanS);
-		myswprintf(dataManager.strBuffer, L"%d", 8000);
-		ebStartLP = env->addEditBox(dataManager.strBuffer, rect<s32>(310, 10, 390, 30), true, tabLanS);
-		ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		env->addStaticText(L"起始手牌：", rect<s32>(200, 35, 300, 55), false, false, tabLanS);
-		myswprintf(dataManager.strBuffer, L"%d", 5);
-		ebStartHand = env->addEditBox(dataManager.strBuffer, rect<s32>(310, 35, 390, 55), true, tabLanS);
-		ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		env->addStaticText(L"每回合抽卡：", rect<s32>(200, 60, 300, 80), false, false, tabLanS);
-		myswprintf(dataManager.strBuffer, L"%d", 1);
-		ebDrawCount = env->addEditBox(dataManager.strBuffer, rect<s32>(310, 60, 390, 80), true, tabLanS);
-		ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		env->addStaticText(L"禁限卡表：", rect<s32>(200, 85, 300, 105), false, false, tabLanS);
-		cbLFlist = env->addComboBox(rect<s32>(310, 85, 450, 105), tabLanS);
-		for(int i = 0; i < deckManager._lfList.size(); ++i)
-			cbLFlist->addItem(deckManager._lfList[i].listName);
-		//env->addStaticText(L"决斗模式：", rect<s32>(200, 110, 300, 130), false, false, tabLanS);
-		cbMatchMode = env->addComboBox(rect<s32>(310, 110, 450, 130), tabLanS);
-		cbMatchMode->addItem(L"单局模式");
-		cbMatchMode->addItem(L"比赛模式");
-		cbMatchMode->setVisible(false);
-		//env->addStaticText(L"回合时间：", rect<s32>(200, 135, 300, 155), false, false, tabLanS);
-		cbTurnTime = env->addComboBox(rect<s32>(310, 135, 450, 155), tabLanS);
-		cbTurnTime->addItem(L"无限制");
-		cbTurnTime->addItem(L"５分钟");
-		cbTurnTime->addItem(L"３分钟");
-		cbTurnTime->addItem(L"１分钟");
-		cbTurnTime->setVisible(false);
-		env->addStaticText(L"游戏名：", rect<s32>(10, 205, 100, 225), false, false, tabLanS);
-		ebServerName = env->addEditBox(L"Game", rect<s32>(100, 205, 240, 225), true, tabLanS);
-		ebServerName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		env->addStaticText(L"密码：", rect<s32>(10, 230, 100, 250), false, false, tabLanS);
-		ebServerPass = env->addEditBox(L"", rect<s32>(100, 230, 240, 250), true, tabLanS);
-		ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-		btnLanStartServer = env->addButton(rect<s32>(350, 195, 460, 220), tabLanS, BUTTON_LAN_START_SERVER, L"建立主机");
-		btnLanCancelServer = env->addButton(rect<s32>(350, 225, 460, 250), tabLanS, BUTTON_LAN_CANCEL_SERVER, L"取消主机");
-		btnLanCancelServer->setEnabled(false);
-
 
 		lstReplayList = env->addListBox(rect<s32>(10, 10, 460, 190), tabReplay, LISTBOX_REPLAY_LIST, true);
 		lstReplayList->setItemHeight(18);
@@ -142,16 +140,6 @@ bool Game::Initialize() {
 		RefreshDeck(cbDeckSel);
 		btnDeckEdit = env->addButton(rect<s32>(420, 25, 470, 50), wModeSelection, BUTTON_DECK_EDIT, L"编辑");
 		stModeStatus = env->addStaticText(L"", rect<s32>(20, 360, 350, 380), false, false, wModeSelection);
-		env->addStaticText(L"IP选择：", rect<s32>(250, 55, 350, 80), false, false, wModeSelection);
-		cbIPList = env->addComboBox(rect<s32>(310, 55, 470, 75), wModeSelection, COMBOBOX_IPADDR);
-		int ipi = 0;
-		while(netManager.local_addr[ipi]) {
-			myswprintf(dataManager.strBuffer, L"%d.%d.%d.%d", netManager.local_addr[ipi] & 0xff, (netManager.local_addr[ipi] >> 8) & 0xff,
-			           (netManager.local_addr[ipi] >> 16) & 0xff, (netManager.local_addr[ipi] >> 24) & 0xff);
-			cbIPList->addItem(dataManager.strBuffer);
-			ipi++;
-		}
-		cbIPList->setSelected(0);
 
 		*/
 	//img
@@ -633,8 +621,6 @@ void Game::LoadConfig() {
 			DataManager::DecodeUTF8(valbuf, wstr);
 			p = gameConf.textfont;
 			DataManager::CopyStr(wstr, p, 255);
-			//guiFont = irr::gui::CGUITTFont::createTTFont(env, valbuf, 14);
-			//textFont = guiFont;
 		} else if(!strcmp(strbuf, "numfont")) {
 			DataManager::DecodeUTF8(valbuf, wstr);
 			p = gameConf.numfont;

@@ -16,15 +16,11 @@ bool NetManager::CreateHost(int ipindex) {
 	hInfo.name[wp] = 0;
 	hInfo.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
 	hInfo.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
-	hInfo.no_shuffle_player = mainGame->chkNoShufflePlayer->isChecked();
-	hInfo.attack_ft = mainGame->chkAttackFT->isChecked();
-	hInfo.no_chain_hint = mainGame->chkNoChainHint->isChecked();
 	hInfo.start_lp = _wtoi(mainGame->ebStartLP->getText());
 	hInfo.start_hand = _wtoi(mainGame->ebStartHand->getText());
 	hInfo.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 	hInfo.is_match = mainGame->cbMatchMode->getSelected() == 0 ? false : true;
 	hInfo.lfindex = mainGame->cbLFlist->getSelected();
-	hInfo.time_limit = mainGame->cbTurnTime->getSelected();
 	for(wp = 0, pstr = (wchar_t*)mainGame->cbLFlist->getItem(mainGame->cbLFlist->getSelected()); wp < 19 && pstr[wp]; ++wp)
 		hInfo.lflist[wp] = pstr[wp];
 	hInfo.lflist[wp] = 0;

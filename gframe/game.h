@@ -226,19 +226,18 @@ public:
 	irr::gui::IGUIButton* btnJoinCancel;
 	irr::gui::IGUIButton* btnCreateHost;
 	irr::gui::IGUIWindow* wHostWindow;
+	irr::gui::IGUIComboBox* cbLFlist;
+	irr::gui::IGUIComboBox* cbMatchMode;
+	irr::gui::IGUIComboBox* cbRule;
 	irr::gui::IGUIEditBox* ebStartLP;
 	irr::gui::IGUIEditBox* ebStartHand;
 	irr::gui::IGUIEditBox* ebDrawCount;
 	irr::gui::IGUIEditBox* ebServerName;
 	irr::gui::IGUIEditBox* ebServerPass;
-	irr::gui::IGUIComboBox* cbLFlist;
-	irr::gui::IGUIComboBox* cbMatchMode;
-	irr::gui::IGUIComboBox* cbTurnTime;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
-	irr::gui::IGUICheckBox* chkNoShufflePlayer;
-	irr::gui::IGUICheckBox* chkAttackFT;
-	irr::gui::IGUICheckBox* chkNoChainHint;
+	irr::gui::IGUIButton* btnHostConfirm;
+	irr::gui::IGUIButton* btnHostCancel;
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIButton* btnLoadReplay;
 	irr::gui::IGUIEditBox* ebUsername;
@@ -375,6 +374,8 @@ extern Game* mainGame;
 #define BUTTON_JOIN_HOST			111
 #define BUTTON_JOIN_CANCEL			112
 #define BUTTON_CREATE_HOST			113
+#define BUTTON_HOST_CONFIRM			114
+#define BUTTON_HOST_CANCEL			115
 #define BUTTON_MSG_OK				150
 #define BUTTON_YES					151
 #define BUTTON_NO					152
