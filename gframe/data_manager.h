@@ -26,9 +26,14 @@ public:
 	const wchar_t* GetVictoryString(int code);
 	const wchar_t* GetCounterName(int code);
 	const wchar_t* GetNumString(int num);
+	const wchar_t* FormatLocation(int location);
+	const wchar_t* FormatAttribute(int attribute);
+	const wchar_t* FormatRace(int race);
+	const wchar_t* FormatType(int type);
 	static int EncodeUTF8(const wchar_t * wsrc, char * str);
 	static int DecodeUTF8(const char * src, wchar_t * wstr);
 	static int GetVal(const wchar_t* pstr);
+	static int CopyStr(const wchar_t* src, wchar_t*& pstr, int maxlen);
 	
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
@@ -36,17 +41,13 @@ public:
 	std::unordered_map<unsigned int, wchar_t*> _counterStrings;
 	std::unordered_map<unsigned int, wchar_t*> _victoryStrings;
 	wchar_t numStrings[256][4];
+	wchar_t attBuffer[128];
+	wchar_t racBuffer[128];
+	wchar_t tpBuffer[128];
 	
 	static wchar_t strBuffer[2048];
-	static wchar_t attBuffer[128];
-	static wchar_t racBuffer[128];
-	static wchar_t tpBuffer[128];
 	static const wchar_t* unknown_string;
 	static const wchar_t* effect_strings[];
-	static const wchar_t* FormatLocation(int location);
-	static const wchar_t* FormatAttribute(int attribute);
-	static const wchar_t* FormatRace(int race);
-	static const wchar_t* FormatType(int type);
 };
 
 }

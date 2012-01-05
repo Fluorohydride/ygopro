@@ -1160,7 +1160,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 			break;
 		}
 		case HINT_RACE: {
-			myswprintf(textBuffer, L"对方宣言了：[%ls]", DataManager::FormatRace(data));
+			myswprintf(textBuffer, L"对方宣言了：[%ls]", mainGame->dataManager.FormatRace(data));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
@@ -1169,7 +1169,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 			break;
 		}
 		case HINT_ATTRIB: {
-			myswprintf(textBuffer, L"对方宣言了：[%ls]", DataManager::FormatAttribute(data));
+			myswprintf(textBuffer, L"对方宣言了：[%ls]", mainGame->dataManager.FormatAttribute(data));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(0);
 			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
@@ -1477,7 +1477,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 		if (pcard->code != code)
 			pcard->SetCode(code);
 		NetManager::ReadInt8(pbuf);
-		myswprintf(textBuffer, L"是否在[%ls]发动[%ls]的效果？", DataManager::FormatLocation(l), mainGame->dataManager.GetName(code));
+		myswprintf(textBuffer, L"是否在[%ls]发动[%ls]的效果？", mainGame->dataManager.FormatLocation(l), mainGame->dataManager.GetName(code));
 		mainGame->gMutex.Lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
 		mainGame->PopupElement(mainGame->wQuery);
@@ -2551,7 +2551,7 @@ bool Game::SolveMessage(void* pd, char* msg, int len) {
 				}
 			} else
 				mainGame->WaitFrameSignal(30);
-			myswprintf(textBuffer, L"[%ls](%ls,%d)成为对象", mainGame->dataManager.GetName(pcard->code), DataManager::FormatLocation(l), s);
+			myswprintf(textBuffer, L"[%ls](%ls,%d)成为对象", mainGame->dataManager.GetName(pcard->code), mainGame->dataManager.FormatLocation(l), s);
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(pcard->code);
 			pcard->is_highlighting = false;

@@ -793,7 +793,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					else
 						mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
-					myswprintf(formatBuffer, L"%ls[%d]", DataManager::FormatLocation(selectable_cards[i + pos]->location),
+					myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.FormatLocation(selectable_cards[i + pos]->location),
 					           selectable_cards[i + pos]->sequence + 1);
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					if(selectable_cards[i + pos]->is_selected)
@@ -895,7 +895,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
 					mainGame->stName->setText(formatBuffer);
 					if(cd.type & TYPE_MONSTER) {
-						myswprintf(formatBuffer, L"[%ls] %ls/%ls", DataManager::FormatType(cd.type), DataManager::FormatRace(cd.race), DataManager::FormatAttribute(cd.attribute));
+						myswprintf(formatBuffer, L"[%ls] %ls/%ls", mainGame->dataManager.FormatType(cd.type), mainGame->dataManager.FormatRace(cd.race), mainGame->dataManager.FormatAttribute(cd.attribute));
 						mainGame->stInfo->setText(formatBuffer);
 						formatBuffer[0] = L'[';
 						for(int i = 1; i <= cd.level; ++i)
@@ -913,7 +913,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stDataInfo->setText(formatBuffer);
 						mainGame->stText->setRelativePosition(irr::core::position2di(15, 83));
 					} else {
-						myswprintf(formatBuffer, L"[%ls]", DataManager::FormatType(cd.type));
+						myswprintf(formatBuffer, L"[%ls]", mainGame->dataManager.FormatType(cd.type));
 						mainGame->stInfo->setText(formatBuffer);
 						mainGame->stDataInfo->setText(L"");
 						mainGame->stText->setRelativePosition(irr::core::position2di(15, 60));
@@ -1376,7 +1376,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
-								myswprintf(formatBuffer, L"\n★%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), DataManager::FormatRace(mcard->race), DataManager::FormatAttribute(mcard->attribute));
+								myswprintf(formatBuffer, L"\n★%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), mainGame->dataManager.FormatRace(mcard->race), mainGame->dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {

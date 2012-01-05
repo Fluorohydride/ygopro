@@ -271,14 +271,14 @@ bool Game::Initialize() {
 	wANAttribute->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 7; filter <<= 1, ++i)
 		chkAttribute[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 80, 25 + (i / 4) * 25, 90 + (i % 4) * 80, 50 + (i / 4) * 25),
-		                                   wANAttribute, CHECK_ATTRIBUTE, DataManager::FormatAttribute(filter));
+		                                   wANAttribute, CHECK_ATTRIBUTE, dataManager.FormatAttribute(filter));
 	//announce attribute
 	wANRace = env->addWindow(rect<s32>(480, 200, 850, 385), false, L"请选择要宣言的种族：");
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 22; filter <<= 1, ++i)
 		chkRace[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
-		                              wANRace, CHECK_RACE, DataManager::FormatRace(filter));
+		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter));
 	//selection hint
 	stHintMsg = env->addStaticText(L"", rect<s32>(500, 60, 820, 90), true, false, 0, -1, false);
 	stHintMsg->setBackgroundColor(0xc0ffffff);
@@ -340,12 +340,12 @@ bool Game::Initialize() {
 	cbAttribute = env->addComboBox(rect<s32>(60, 26, 190, 46), wFilter, -1);
 	cbAttribute->addItem(L"(无)", 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
-		cbAttribute->addItem(DataManager::FormatAttribute(filter), filter);
+		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
 	env->addStaticText(L"种族：", rect<s32>(10, 51, 70, 71), false, false, wFilter);
 	cbRace = env->addComboBox(rect<s32>(60, 49, 190, 69), wFilter, -1);
 	cbRace->addItem(L"(无)", 0);
 	for(int filter = 0x1; filter != 0x400000; filter <<= 1)
-		cbRace->addItem(DataManager::FormatRace(filter), filter);
+		cbRace->addItem(dataManager.FormatRace(filter), filter);
 	env->addStaticText(L"攻击：", rect<s32>(205, 28, 280, 48), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 26, 340, 46), true, wFilter);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -617,7 +617,7 @@ void Game::ShowCardInfo(int code) {
 	myswprintf(formatBuffer, L"%ls", dataManager.GetName(code));
 	stName->setText(formatBuffer);
 	if(cd.type & TYPE_MONSTER) {
-		myswprintf(formatBuffer, L"[%ls] %ls/%ls", DataManager::FormatType(cd.type), DataManager::FormatRace(cd.race), DataManager::FormatAttribute(cd.attribute));
+		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		formatBuffer[0] = L'[';
 		for(int i = 1; i <= cd.level; ++i)
@@ -635,7 +635,7 @@ void Game::ShowCardInfo(int code) {
 		stDataInfo->setText(formatBuffer);
 		stText->setRelativePosition(irr::core::position2di(15, 83));
 	} else {
-		myswprintf(formatBuffer, L"[%ls]", DataManager::FormatType(cd.type));
+		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
 		stText->setRelativePosition(irr::core::position2di(15, 60));
