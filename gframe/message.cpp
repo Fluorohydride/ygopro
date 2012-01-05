@@ -347,7 +347,6 @@ int Game::EngineThread(void* pd) {
 		mainGame->stName->setText(L"");
 		mainGame->stDataInfo->setText(L"");
 		mainGame->stText->setText(L"");
-		mainGame->ShowElement(mainGame->wModeSelection);
 		mainGame->imageManager.ClearTexture();
 		mainGame->gMutex.Unlock();
 	}
@@ -1066,7 +1065,6 @@ int Game::RecvThread(void* pd) {
 		mainGame->stName->setText(L"");
 		mainGame->stDataInfo->setText(L"");
 		mainGame->stText->setText(L"");
-		mainGame->ShowElement(mainGame->wModeSelection);
 		mainGame->imageManager.ClearTexture();
 		mainGame->gMutex.Unlock();
 	}
@@ -3021,7 +3019,6 @@ int Game::ReplayThread(void* pd) {
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
 	mainGame->stText->setText(L"");
-	mainGame->lstServerList->clear();
 	mainGame->stModeStatus->setText(L"");
 	mainGame->btnReplayStart->setVisible(false);
 	mainGame->btnReplayPause->setVisible(true);
@@ -3029,12 +3026,6 @@ int Game::ReplayThread(void* pd) {
 	mainGame->dInfo.engLen = 0;
 	mainGame->dInfo.msgLen = 0;
 	mainGame->dInfo.is_local_host = false;
-	mainGame->btnLanStartServer->setEnabled(true);
-	mainGame->btnLanConnect->setEnabled(true);
-	mainGame->btnRefreshList->setEnabled(true);
-	mainGame->btnLoadReplay->setEnabled(true);
-	mainGame->btnDeckEdit->setEnabled(true);
-	mainGame->HideElement(mainGame->wModeSelection);
 	mainGame->dField.panel = 0;
 	mainGame->dField.hovered_card = 0;
 	mainGame->dField.clicked_card = 0;
@@ -3122,7 +3113,6 @@ int Game::ReplayThread(void* pd) {
 		mainGame->stName->setText(L"");
 		mainGame->stDataInfo->setText(L"");
 		mainGame->stText->setText(L"");
-		mainGame->ShowElement(mainGame->wModeSelection);
 		mainGame->imageManager.ClearTexture();
 		mainGame->gMutex.Unlock();
 	}

@@ -35,7 +35,6 @@ public:
 	int dragy;
 	code_pointer draging_pointer;
 	
-	irr::IrrlichtDevice* device;
 	std::unordered_map<int, int>* filterList;
 	std::vector<code_pointer> results;
 	wchar_t result_string[8];

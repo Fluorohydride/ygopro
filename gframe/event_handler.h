@@ -9,12 +9,10 @@ namespace ygo {
 
 class EventHandler : public irr::IEventReceiver {
 public:
-	EventHandler(irr::IrrlichtDevice* dev);
 	virtual bool OnEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);
 	void ShowMenu(int flag, int x, int y);
 	
-	irr::IrrlichtDevice* device;
 	irr::gui::IGUIElement* panel;
 	int hovered_controler;
 	int hovered_location;

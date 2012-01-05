@@ -10,129 +10,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
-		irr::gui::IGUIEnvironment* env = device->getGUIEnvironment();
+		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
-			case BUTTON_CLEAR_LOG: {
+				case BUTTON_CLEAR_LOG: {
 				mainGame->lstLog->clear();
 				mainGame->logParam.clear();
-				break;
-			}
-			case BUTTON_MODE_EXIT: {
-				mainGame->netManager.CancelHost();
-				mainGame->device->closeDevice();
-				break;
-			}
-			case BUTTON_LAN_START_SERVER: {
-				if(mainGame->cbDeckSel->getSelected() == -1)
-					break;
-				if(!mainGame->deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
-					mainGame->stModeStatus->setText(L"无效卡组");
-					break;
-				}
-				if(!mainGame->chkNoCheckDeck->isChecked()
-				        && !mainGame->deckManager.CheckLFList(mainGame->deckManager.deckhost, mainGame->cbLFlist->getSelected())) {
-					mainGame->stModeStatus->setText(L"无效卡组或者卡组不符合禁卡表规范");
-					break;
-				}
-				if(_wtoi(mainGame->ebStartLP->getText()) == 0)
-					mainGame->ebStartLP->setText(L"8000");
-				if(_wtoi(mainGame->ebStartHand->getText()) == 0)
-					mainGame->ebStartLP->setText(L"5");
-				if(_wtoi(mainGame->ebDrawCount->getText()) == 0)
-					mainGame->ebStartLP->setText(L"1");
-				if(mainGame->netManager.CreateHost(mainGame->cbIPList->getSelected())) {
-					mainGame->btnLanStartServer->setEnabled(false);
-					mainGame->btnLanCancelServer->setEnabled(true);
-					mainGame->btnLanConnect->setEnabled(false);
-					mainGame->btnRefreshList->setEnabled(false);
-					mainGame->btnLoadReplay->setEnabled(false);
-					mainGame->btnDeckEdit->setEnabled(false);
-					mainGame->stModeStatus->setText(L"等待连接...");
-				}
-				break;
-			}
-			case BUTTON_LAN_CANCEL_SERVER: {
-				mainGame->netManager.CancelHost();
-				mainGame->stModeStatus->setText(L"");
-				break;
-			}
-			case BUTTON_LAN_REFRESH: {
-				if(mainGame->netManager.RefreshHost(mainGame->cbIPList->getSelected())) {
-					mainGame->btnLanStartServer->setEnabled(false);
-					mainGame->btnLanConnect->setEnabled(false);
-					mainGame->btnRefreshList->setEnabled(false);
-					mainGame->btnLoadReplay->setEnabled(false);
-					mainGame->btnDeckEdit->setEnabled(false);
-				}
-				break;
-			}
-			case BUTTON_LAN_CONNECT: {
-				if(mainGame->cbDeckSel->getSelected() == -1)
-					break;
-				if(!mainGame->deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
-					mainGame->stModeStatus->setText(L"无效卡组");
-					break;
-				}
-				if(mainGame->netManager.JoinHost()) {
-					mainGame->btnLanStartServer->setEnabled(false);
-					mainGame->btnLanConnect->setEnabled(false);
-					mainGame->btnRefreshList->setEnabled(false);
-					mainGame->btnLoadReplay->setEnabled(false);
-					mainGame->btnDeckEdit->setEnabled(false);
-					mainGame->stModeStatus->setText(L"连接中...");
-				}
-				break;
-			}
-			case BUTTON_DECK_EDIT: {
-				if(mainGame->cbDeckSel->getSelected() == -1)
-					break;
-				if(!mainGame->deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
-					mainGame->stModeStatus->setText(L"无法载入卡组");
-					break;
-				}
-				mainGame->HideElement(mainGame->wModeSelection);
-				mainGame->is_building = true;
-				mainGame->wInfos->setVisible(true);
-				mainGame->wCardImg->setVisible(true);
-				mainGame->wDeckEdit->setVisible(true);
-				mainGame->wFilter->setVisible(true);
-				mainGame->deckBuilder.filterList = mainGame->deckManager._lfList[mainGame->cbLFlist->getSelected()].content;;
-				mainGame->cbDBLFList->setSelected(mainGame->cbLFlist->getSelected());
-				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
-				mainGame->cbCardType->setSelected(0);
-				mainGame->cbCardType2->setSelected(0);
-				mainGame->cbAttribute->setSelected(0);
-				mainGame->cbRace->setSelected(0);
-				mainGame->ebAttack->setText(L"");
-				mainGame->ebDefence->setText(L"");
-				mainGame->ebStar->setText(L"");
-				mainGame->cbCardType2->setEnabled(false);
-				mainGame->cbAttribute->setEnabled(false);
-				mainGame->cbRace->setEnabled(false);
-				mainGame->ebAttack->setEnabled(false);
-				mainGame->ebDefence->setEnabled(false);
-				mainGame->ebStar->setEnabled(false);
-				mainGame->deckBuilder.filter_effect = 0;
-				mainGame->deckBuilder.result_string[0] = L'0';
-				mainGame->deckBuilder.result_string[1] = 0;
-				mainGame->deckBuilder.results.clear();
-				mainGame->deckBuilder.is_draging = false;
-				mainGame->cbDBDecks->setSelected(mainGame->cbDeckSel->getSelected());
-				for(int i = 0; i < 32; ++i)
-					mainGame->chkCategory[i]->setChecked(false);
-				break;
-			}
-			case BUTTON_LOAD_REPLAY: {
-				if(mainGame->lstReplayList->getSelected() == -1)
-					break;
-				if(!mainGame->lastReplay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected()))) {
-					mainGame->stModeStatus->setText(L"录像损坏或丢失，无法播放");
-					break;
-				}
-				mainGame->stModeStatus->setText(L"");
-				Thread::NewThread(Game::ReplayThread, &mainGame->dInfo);
 				break;
 			}
 			case BUTTON_REPLAY_START: {
@@ -751,23 +635,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_LISTBOX_CHANGED: {
 			switch(id) {
-			case LISTBOX_SERVER_LIST: {
-				if(mainGame->lstServerList->getSelected() == -1)
-					break;
-				HostInfo& hi = mainGame->netManager.hosts[mainGame->lstServerList->getSelected()];
-				myswprintf(formatBuffer, L"%d.%d.%d.%d", hi.address & 0xff, (hi.address >> 8) & 0xff, (hi.address >> 16) & 0xff, (hi.address >> 24) & 0xff);
-				mainGame->ebJoinIP->setText(formatBuffer);
-				myswprintf(formatBuffer, L"%d", hi.port);
-				mainGame->ebJoinPort->setText(formatBuffer);
-				break;
-			}
-			case LISTBOX_LOG: {
-				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
-					mainGame->ShowCardInfo(mainGame->logParam[sel]);
-				}
-				break;
-			}
+
 			}
 			break;
 		}
@@ -806,27 +674,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 			}
-		}
-		case irr::gui::EGET_TAB_CHANGED: {
-			switch(id) {
-			case TAB_MODES: {
-				if(mainGame->wModes->getActiveTab() == 1) {
-					if(mainGame->is_refreshing || mainGame->netManager.is_creating_host)
-						break;
-					if(mainGame->netManager.RefreshHost(mainGame->cbIPList->getSelected())) {
-						mainGame->btnLanStartServer->setEnabled(false);
-						mainGame->btnLanConnect->setEnabled(false);
-						mainGame->btnRefreshList->setEnabled(false);
-						mainGame->btnLoadReplay->setEnabled(false);
-						mainGame->btnDeckEdit->setEnabled(false);
-					}
-				} else if(mainGame->wModes->getActiveTab() == 2) {
-					mainGame->RefreshReplay();
-				}
-				break;
-			}
-			}
-			break;
 		}
 		case irr::gui::EGET_EDITBOX_CHANGED: {
 			switch(id) {
@@ -1455,7 +1302,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			device->minimizeWindow();
+			mainGame->device->minimizeWindow();
 			break;
 		}
 		}
@@ -1624,11 +1471,11 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 	} else mainGame->btnSSet->setVisible(false);
 	if(flag & COMMAND_REPOS) {
 		if(clicked_card->position & POS_FACEDOWN)
-			mainGame->btnRepos->setText(L"反转召唤");
+			mainGame->btnRepos->setText(mainGame->dataManager.GetSysString(1154));
 		else if(clicked_card->position & POS_ATTACK)
-			mainGame->btnRepos->setText(L"守备表示");
+			mainGame->btnRepos->setText(mainGame->dataManager.GetSysString(1155));
 		else
-			mainGame->btnRepos->setText(L"攻击表示");
+			mainGame->btnRepos->setText(mainGame->dataManager.GetSysString(1156));
 		mainGame->btnRepos->setVisible(true);
 		mainGame->btnRepos->setRelativePosition(position2di(1, height));
 		height += 21;

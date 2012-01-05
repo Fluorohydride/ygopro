@@ -404,6 +404,7 @@ void Game::DrawGUI() {
 						for(int i = 0; i < 5; ++i)
 							btnCardSelect[i]->setDrawImage(true);
 					}
+					env->setFocus(guiFading);
 				} else
 					guiFading->setRelativePosition(irr::core::recti(fadingUL, fadingLR));
 			}
@@ -430,6 +431,8 @@ void Game::DrawGUI() {
 						for(int i = 0; i < 5; ++i)
 							btnCardSelect[i]->setDrawImage(true);
 					}
+					if(guiNext)
+						ShowElement(guiNext);
 				} else
 					guiFading->setRelativePosition(irr::core::recti(fadingUL, fadingLR));
 			}
@@ -547,7 +550,7 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
 	win->setVisible(true);
 }
-void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
+void Game::HideElement(irr::gui::IGUIElement * win, bool set_action, irr::gui::IGUIElement* next) {
 	if(fadingFrame || !win->isVisible())
 		return;
 	fadingSize = win->getRelativePosition();
@@ -560,6 +563,7 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
 	fadingFrame = 10;
 	autoFadeoutFrame = 0;
 	signalAction = set_action;
+	guiNext = next;
 	if(win == wPosSelect) {
 		btnPSAU->setDrawImage(false);
 		btnPSAD->setDrawImage(false);

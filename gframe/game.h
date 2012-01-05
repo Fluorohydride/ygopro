@@ -8,6 +8,7 @@
 #include "client_card.h"
 #include "client_field.h"
 #include "deck_con.h"
+#include "menu_handler.h"
 #include "network.h"
 #include "deck_manager.h"
 #include "replay.h"
@@ -16,6 +17,18 @@
 #include <unordered_map>
 
 namespace ygo {
+
+struct Config {
+	unsigned short antialias;
+	unsigned short serverport;
+	wchar_t lastip[20];
+	wchar_t lastport[10];
+	wchar_t nickname[20];
+	wchar_t gamename[20];
+	wchar_t lastdeck[64];
+	wchar_t textfont[256];
+	wchar_t numfont[256];
+};
 
 struct DuelInfo {
 	bool isStarted;
@@ -67,7 +80,7 @@ public:
 	void DrawGUI();
 	void DrawSpec();
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
-	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
+	void HideElement(irr::gui::IGUIElement* element, bool set_action = false, irr::gui::IGUIElement* next = 0);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(int code, position2di pos, std::unordered_map<int, int>* lflist);
@@ -119,6 +132,7 @@ public:
 	Signal localMessage;
 	Signal localResponse;
 	Signal localAction;
+	Config gameConf;
 	NetManager netManager;
 	DataManager dataManager;
 	ImageManager imageManager;
@@ -133,6 +147,7 @@ public:
 	bool isFadein;
 	bool signalAction;
 	irr::gui::IGUIElement* guiFading;
+	irr::gui::IGUIElement* guiNext;
 	int fadingFrame;
 	irr::core::recti fadingSize;
 	irr::core::vector2di fadingUL;
@@ -161,6 +176,7 @@ public:
 	DuelInfo dInfo;
 	ClientField dField;
 	DeckBuilder deckBuilder;
+	MenuHandler menuHandler;
 	irr::IrrlichtDevice* device;
 	irr::video::IVideoDriver* driver;
 	irr::scene::ISceneManager* smgr;
@@ -193,10 +209,23 @@ public:
 	irr::gui::IGUIButton* btnClearLog;
 	irr::gui::IGUIButton* btnSaveLog;
 	//main menu
-	irr::gui::IGUIWindow* wModeSelection;
-	irr::gui::IGUITabControl* wModes;
-	irr::gui::IGUIButton* btnLanStartServer;
-	irr::gui::IGUIButton* btnLanCancelServer;
+	irr::gui::IGUIWindow* wMainMenu;
+	irr::gui::IGUIButton* btnLanMode;
+	irr::gui::IGUIButton* btnServerMode;
+	irr::gui::IGUIButton* btnReplayMode;
+	irr::gui::IGUIButton* btnTestMode;
+	irr::gui::IGUIButton* btnDeckEdit;
+	irr::gui::IGUIButton* btnModeExit;
+	irr::gui::IGUIWindow* wLanWindow;
+	irr::gui::IGUIEditBox* ebNickName;
+	irr::gui::IGUIListBox* lstHostList;
+	irr::gui::IGUIEditBox* ebJoinIP;
+	irr::gui::IGUIEditBox* ebJoinPort;
+	irr::gui::IGUIEditBox* ebJoinPass;
+	irr::gui::IGUIButton* btnJoinHost;
+	irr::gui::IGUIButton* btnJoinCancel;
+	irr::gui::IGUIButton* btnCreateHost;
+	irr::gui::IGUIWindow* wHostWindow;
 	irr::gui::IGUIEditBox* ebStartLP;
 	irr::gui::IGUIEditBox* ebStartHand;
 	irr::gui::IGUIEditBox* ebDrawCount;
@@ -210,21 +239,12 @@ public:
 	irr::gui::IGUICheckBox* chkNoShufflePlayer;
 	irr::gui::IGUICheckBox* chkAttackFT;
 	irr::gui::IGUICheckBox* chkNoChainHint;
-	irr::gui::IGUIListBox* lstServerList;
-	irr::gui::IGUIButton* btnRefreshList;
-	irr::gui::IGUIEditBox* ebJoinIP;
-	irr::gui::IGUIEditBox* ebJoinPort;
-	irr::gui::IGUIEditBox* ebJoinPass;
-	irr::gui::IGUICheckBox* chkStOnly;
-	irr::gui::IGUIButton* btnLanConnect;
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIButton* btnLoadReplay;
 	irr::gui::IGUIEditBox* ebUsername;
 	irr::gui::IGUIComboBox* cbDeckSel;
-	irr::gui::IGUIButton* btnDeckEdit;
 	irr::gui::IGUIStaticText* stModeStatus;
 	irr::gui::IGUIComboBox* cbIPList;
-	irr::gui::IGUIButton* btnModeExit;
 	//message
 	irr::gui::IGUIWindow* wMessage;
 	irr::gui::IGUIStaticText* stMessage;
@@ -345,73 +365,71 @@ extern Game* mainGame;
 #define COMMAND_ATTACK		0x0040
 #define COMMAND_LIST		0x0080
 
-#define TAB_MODES					50
-#define BUTTON_SAVE_LOG				100
-#define BUTTON_CLEAR_LOG			101
-#define LISTBOX_LOG					102
-#define COMBOBOX_IPADDR				109
-#define BUTTON_LAN_START_SERVER		110
-#define BUTTON_LAN_CANCEL_SERVER	111
-#define BUTTON_LAN_CONNECT			112
-#define BUTTON_LAN_REFRESH			113
-#define BUTTON_LOAD_REPLAY			114
-#define BUTTON_DECK_EDIT			115
-#define BUTTON_MODE_EXIT			116
-#define LISTBOX_SERVER_LIST			117
-#define LISTBOX_REPLAY_LIST			118
-#define BUTTON_MSG_OK				120
-#define BUTTON_YES					121
-#define BUTTON_NO					122
-#define BUTTON_POS_AU				130
-#define BUTTON_POS_AD				131
-#define BUTTON_POS_DU				132
-#define BUTTON_POS_DD				133
-#define BUTTON_OPTION_PREV			140
-#define BUTTON_OPTION_NEXT			141
-#define BUTTON_OPTION_OK			142
-#define BUTTON_CARD_0				150
-#define BUTTON_CARD_1				151
-#define BUTTON_CARD_2				152
-#define BUTTON_CARD_3				153
-#define BUTTON_CARD_4				154
-#define SCROLL_CARD_SELECT			155
-#define BUTTON_CARD_SEL_OK			156
-#define BUTTON_CMD_ACTIVATE			160
-#define BUTTON_CMD_SUMMON			161
-#define BUTTON_CMD_SPSUMMON			162
-#define BUTTON_CMD_MSET				163
-#define BUTTON_CMD_SSET				164
-#define BUTTON_CMD_REPOS			165
-#define BUTTON_CMD_ATTACK			166
-#define BUTTON_CMD_SHOWLIST			167
-#define BUTTON_ANNUMBER_OK			170
-#define BUTTON_ANCARD_OK			171
-#define EDITBOX_ANCARD				172
-#define LISTBOX_ANCARD				173
-#define CHECK_ATTRIBUTE				174
-#define CHECK_RACE					175
-#define BUTTON_BP					180
-#define BUTTON_M2					181
-#define BUTTON_EP					182
-#define BUTTON_CATEGORY_OK			200
-#define COMBOBOX_DBLFLIST			201
-#define COMBOBOX_DBDECKS			202
-#define BUTTON_CLEAR_DECK			203
-#define BUTTON_SAVE_DECK			204
-#define BUTTON_SAVE_DECK_AS			205
-#define BUTTON_DBEXIT				206
-#define BUTTON_SORT_DECK			207
-#define COMBOBOX_MAINTYPE			210
-#define BUTTON_EFFECT_FILTER		211
-#define BUTTON_START_FILTER			212
-#define BUTTON_RESULT_FILTER		213
-#define SCROLL_FILTER				214
-#define SCROLL_KEYWORD				215
-#define BUTTON_REPLAY_START			220
-#define BUTTON_REPLAY_PAUSE			221
-#define BUTTON_REPLAY_STEP			222
-#define BUTTON_REPLAY_EXIT			223
-#define BUTTON_REPLAY_SWAP			224
-#define BUTTON_REPLAY_SAVE			230
-#define BUTTON_REPLAY_CANCEL		231
+#define BUTTON_LAN_MODE				100
+#define BUTTON_SERVER_MODE			101
+#define BUTTON_REPLAY_MODE			102
+#define BUTTON_TEST_MODE			103
+#define BUTTON_DECK_EDIT			104
+#define BUTTON_MODE_EXIT			105
+#define LISTBOX_LAN_HOST			110
+#define BUTTON_JOIN_HOST			111
+#define BUTTON_JOIN_CANCEL			112
+#define BUTTON_CREATE_HOST			113
+#define BUTTON_MSG_OK				150
+#define BUTTON_YES					151
+#define BUTTON_NO					152
+#define BUTTON_POS_AU				160
+#define BUTTON_POS_AD				161
+#define BUTTON_POS_DU				162
+#define BUTTON_POS_DD				163
+#define BUTTON_OPTION_PREV			170
+#define BUTTON_OPTION_NEXT			171
+#define BUTTON_OPTION_OK			172
+#define BUTTON_CARD_0				180
+#define BUTTON_CARD_1				181
+#define BUTTON_CARD_2				182
+#define BUTTON_CARD_3				183
+#define BUTTON_CARD_4				184
+#define SCROLL_CARD_SELECT			185
+#define BUTTON_CARD_SEL_OK			186
+#define BUTTON_CMD_ACTIVATE			190
+#define BUTTON_CMD_SUMMON			191
+#define BUTTON_CMD_SPSUMMON			192
+#define BUTTON_CMD_MSET				193
+#define BUTTON_CMD_SSET				194
+#define BUTTON_CMD_REPOS			195
+#define BUTTON_CMD_ATTACK			196
+#define BUTTON_CMD_SHOWLIST			197
+#define BUTTON_ANNUMBER_OK			200
+#define BUTTON_ANCARD_OK			201
+#define EDITBOX_ANCARD				202
+#define LISTBOX_ANCARD				203
+#define CHECK_ATTRIBUTE				204
+#define CHECK_RACE					205
+#define BUTTON_BP					210
+#define BUTTON_M2					211
+#define BUTTON_EP					212
+#define BUTTON_CLEAR_LOG			220
+#define LISTBOX_LOG					221
+#define BUTTON_CATEGORY_OK			250
+#define COMBOBOX_DBLFLIST			251
+#define COMBOBOX_DBDECKS			252
+#define BUTTON_CLEAR_DECK			253
+#define BUTTON_SAVE_DECK			254
+#define BUTTON_SAVE_DECK_AS			255
+#define BUTTON_DBEXIT				256
+#define BUTTON_SORT_DECK			257
+#define COMBOBOX_MAINTYPE			260
+#define BUTTON_EFFECT_FILTER		261
+#define BUTTON_START_FILTER			262
+#define BUTTON_RESULT_FILTER		263
+#define SCROLL_FILTER				264
+#define SCROLL_KEYWORD				265
+#define BUTTON_REPLAY_START			270
+#define BUTTON_REPLAY_PAUSE			271
+#define BUTTON_REPLAY_STEP			272
+#define BUTTON_REPLAY_EXIT			273
+#define BUTTON_REPLAY_SWAP			274
+#define BUTTON_REPLAY_SAVE			280
+#define BUTTON_REPLAY_CANCEL		281
 #endif // GAME_H

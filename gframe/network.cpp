@@ -184,16 +184,6 @@ int NetManager::BroadcastServer(void* np) {
 	net->is_creating_host = false;
 	shutdown(net->sBHost, SD_BOTH);
 	closesocket(net->sBHost);
-	if(!mainGame->is_closing) {
-		mainGame->gMutex.Lock();
-		mainGame->btnLanStartServer->setEnabled(true);
-		mainGame->btnLanCancelServer->setEnabled(false);
-		mainGame->btnLanConnect->setEnabled(true);
-		mainGame->btnRefreshList->setEnabled(true);
-		mainGame->btnLoadReplay->setEnabled(true);
-		mainGame->btnDeckEdit->setEnabled(true);
-		mainGame->gMutex.Unlock();
-	}
 	return 0;
 }
 int NetManager::BroadcastClient(void* np) {
@@ -209,7 +199,6 @@ int NetManager::BroadcastClient(void* np) {
 	FD_ZERO(&fds);
 	FD_SET(net->sBClient, &fds);
 	sendto(net->sBClient, (const char*)&net->hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
-	mainGame->lstServerList->clear();
 	mainGame->is_refreshing = true;
 	int result = select(0, &fds, 0, 0, &tv);
 	std::set<int> addrset;
@@ -236,14 +225,7 @@ int NetManager::BroadcastClient(void* np) {
 		        && it->start_lp == 8000 && it->start_hand == 5 && it->draw_count == 1)
 			mode = L"标准设定";
 		else mode = L"自定义设定";
-		myswprintf(tbuf, L"[%ls][%ls]%ls", mode, it->lflist, it->name);
-		mainGame->lstServerList->addItem(tbuf);
 	}
-	mainGame->btnLanStartServer->setEnabled(true);
-	mainGame->btnLanConnect->setEnabled(true);
-	mainGame->btnRefreshList->setEnabled(true);
-	mainGame->btnLoadReplay->setEnabled(true);
-	mainGame->btnDeckEdit->setEnabled(true);
 	mainGame->gMutex.Unlock();
 	mainGame->is_refreshing = false;
 	closesocket(net->sBClient);
@@ -343,7 +325,7 @@ int NetManager::ListenThread(void* np) {
 		mainGame->dInfo.engLen = 0;
 		mainGame->dInfo.msgLen = 0;
 		mainGame->dField.Clear();
-		mainGame->HideElement(mainGame->wModeSelection);
+
 		mainGame->gMutex.Unlock();
 		mainGame->WaitFrameSignal(10);
 		closesocket(net->sBHost);
@@ -363,18 +345,13 @@ int NetManager::JoinThread(void* adr) {
 	if(connect(pnet->sRemote, (sockaddr*)&server, sizeof(sockaddr)) == SOCKET_ERROR) {
 		closesocket(pnet->sRemote);
 		if(!mainGame->is_closing) {
-			mainGame->btnLanStartServer->setEnabled(true);
-			mainGame->btnLanConnect->setEnabled(true);
-			mainGame->btnRefreshList->setEnabled(true);
-			mainGame->btnLoadReplay->setEnabled(true);
-			mainGame->btnDeckEdit->setEnabled(true);
 			mainGame->stModeStatus->setText(L"无法连接至主机");
 		}
 		return 0;
 	}
 	char* pbuf = pnet->send_buf;
 	NetManager::WriteInt16(pbuf, PROTO_VERSION);
-	NetManager::WriteInt16(pbuf, mainGame->chkStOnly->isChecked() ? 1 : 0);
+	NetManager::WriteInt16(pbuf, 1);
 	const wchar_t* pname = mainGame->ebJoinPass->getText();
 	int i = 0;
 	while(pname[i] != 0 && i < 19)
@@ -401,11 +378,6 @@ int NetManager::JoinThread(void* adr) {
 	if(result == SOCKET_ERROR || pnet->recv_buf[0] != 0) {
 		closesocket(pnet->sRemote);
 		if(!mainGame->is_closing) {
-			mainGame->btnLanStartServer->setEnabled(true);
-			mainGame->btnLanConnect->setEnabled(true);
-			mainGame->btnRefreshList->setEnabled(true);
-			mainGame->btnLoadReplay->setEnabled(true);
-			mainGame->btnDeckEdit->setEnabled(true);
 			if(result == SOCKET_ERROR)
 				mainGame->stModeStatus->setText(L"网络连接发生错误");
 			else if(pnet->recv_buf[0] == 0x1) {
@@ -438,18 +410,11 @@ int NetManager::JoinThread(void* adr) {
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
 	mainGame->stText->setText(L"");
-	mainGame->lstServerList->clear();
 	mainGame->stModeStatus->setText(L"");
 	mainGame->dInfo.engLen = 0;
 	mainGame->dInfo.msgLen = 0;
 	mainGame->dInfo.is_local_host = false;
 	mainGame->dField.Clear();
-	mainGame->btnLanStartServer->setEnabled(true);
-	mainGame->btnLanConnect->setEnabled(true);
-	mainGame->btnRefreshList->setEnabled(true);
-	mainGame->btnLoadReplay->setEnabled(true);
-	mainGame->btnDeckEdit->setEnabled(true);
-	mainGame->HideElement(mainGame->wModeSelection);
 	mainGame->gMutex.Unlock();
 	mainGame->WaitFrameSignal(10);
 	Thread::NewThread(Game::RecvThread, &mainGame->dInfo);

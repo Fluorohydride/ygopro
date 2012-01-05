@@ -6,8 +6,7 @@
 namespace ygo {
 
 void DeckManager::LoadLFList() {
-	LFList cur;
-	std::unordered_map<int, int>* curMap = 0;
+	LFList* cur;
 	FILE* fp = fopen("lflist.conf", "r");
 	char linebuf[256];
 	wchar_t strBuffer[256];
@@ -24,11 +23,13 @@ void DeckManager::LoadLFList() {
 			if(linebuf[0] == '!') {
 				sa = DataManager::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
 				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
-				memcpy(cur.listName, (const void*)strBuffer, 40);
-				cur.listName[sa] = 0;
-				curMap = new std::unordered_map<int, int>;
-				cur.content = curMap;
-				_lfList.push_back(cur);
+				LFList newlist;
+				_lfList.push_back(newlist);
+				cur = &_lfList[_lfList.size() - 1];
+				memcpy(cur->listName, (const void*)strBuffer, 40);
+				cur->listName[sa] = 0;
+				cur->content = new std::unordered_map<int, int>;
+				cur->hash = 0x7dfcee6a;
 				continue;
 			}
 			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
@@ -43,13 +44,16 @@ void DeckManager::LoadLFList() {
 			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
 			linebuf[p] = 0;
 			count = atoi(&linebuf[sa]);
-			(*curMap)[code] = count;
+			(*cur->content)[code] = count;
+			cur->hash = cur->hash ^ ((code<<18) | (code>>14)) ^ ((code<<(27+count)) | (code>>(5-count)));
 		}
 		fclose(fp);
 	}
-	myswprintf(cur.listName, L"无限制");
-	cur.content = new std::unordered_map<int, int>;
-	_lfList.push_back(cur);
+	LFList nolimit;
+	myswprintf(nolimit.listName, L"无限制");
+	nolimit.hash = 0;
+	nolimit.content = new std::unordered_map<int, int>;
+	_lfList.push_back(nolimit);
 }
 bool DeckManager::CheckLFList(Deck& deck, int lfindex) {
 	std::unordered_map<int, int> ccount;

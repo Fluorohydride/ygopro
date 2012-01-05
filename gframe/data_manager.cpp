@@ -2,12 +2,7 @@
 #include <stdio.h>
 namespace ygo {
 const wchar_t* DataManager::unknown_string = L"???";
-const wchar_t* DataManager::effect_strings[] = {
-	L"魔陷破坏", L"怪兽破坏", L"卡片除外", L"送去墓地", L"返回手牌", L"返回卡组", L"手牌破坏", L"卡组破坏",
-	L"抽卡辅助", L"卡组检索", L"卡片回收", L"表示形式", L"控制权  ", L"攻守变化", L"穿刺伤害", L"多次攻击",
-	L"攻击限制", L"直接攻击", L"特殊召唤", L"衍生物  ", L"种族相关", L"属性相关", L"LP伤害  ", L"LP回复  ",
-	L"破坏耐性", L"效果耐性", L"指示物  ", L"幸运    ", L"融合相关", L"同调相关", L"超量相关", L"效果无效"
-};
+
 wchar_t DataManager::strBuffer[2048];
 
 bool DataManager::LoadDates(const char* file) {
@@ -18,6 +13,8 @@ bool DataManager::LoadDates(const char* file) {
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
+	for(int i = 0; i < 2048; ++i)
+		_sysStrings[i] = 0;
 	CardDataC cd;
 	CardString cs;
 	for(int i = 0; i < 16; ++i) cs.desc[i] = 0;
@@ -160,10 +157,9 @@ const wchar_t* DataManager::GetDesc(int strCode) {
 	return unknown_string;
 }
 const wchar_t* DataManager::GetSysString(int code) {
-	auto csit = _sysStrings.find(code);
-	if(csit == _sysStrings.end())
+	if(code < 0 || code >= 2048 || _sysStrings[code] == 0)
 		return unknown_string;
-	return csit->second;
+	return _sysStrings[code];
 }
 const wchar_t* DataManager::GetVictoryString(int code) {
 	auto csit = _victoryStrings.find(code);

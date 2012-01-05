@@ -37,9 +37,10 @@ public:
 	
 	std::unordered_map<unsigned int, CardDataC> _datas;
 	std::unordered_map<unsigned int, CardString> _strings;
-	std::unordered_map<unsigned int, wchar_t*> _sysStrings;
 	std::unordered_map<unsigned int, wchar_t*> _counterStrings;
 	std::unordered_map<unsigned int, wchar_t*> _victoryStrings;
+	
+	wchar_t* _sysStrings[2048];
 	wchar_t numStrings[256][4];
 	wchar_t attBuffer[128];
 	wchar_t racBuffer[128];
@@ -47,7 +48,6 @@ public:
 	
 	static wchar_t strBuffer[2048];
 	static const wchar_t* unknown_string;
-	static const wchar_t* effect_strings[];
 };
 
 }

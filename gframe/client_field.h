@@ -95,7 +95,6 @@ public:
 	void check_sel_sum_t(std::set<ClientCard*>& left, int acc);
 	bool check_sum(std::set<ClientCard*>& testlist, std::set<ClientCard*>::iterator index, int acc, int count);
 	
-	irr::IrrlichtDevice* device;
 	irr::gui::IGUIElement* panel;
 	std::vector<int> ancard;
 	int hovered_controler;

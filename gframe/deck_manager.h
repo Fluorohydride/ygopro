@@ -9,6 +9,7 @@
 namespace ygo {
 
 struct LFList {
+	unsigned int hash;
 	wchar_t listName[20];
 	std::unordered_map<int, int>* content;
 };

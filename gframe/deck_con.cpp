@@ -9,7 +9,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
-		irr::gui::IGUIEnvironment* env = device->getGUIEnvironment();
+		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -62,11 +62,14 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->wFilter->setVisible(false);
 				mainGame->wCardImg->setVisible(false);
 				mainGame->wInfos->setVisible(false);
-				mainGame->cbDeckSel->setSelected(mainGame->cbDBDecks->getSelected());
-				mainGame->PopupElement(mainGame->wModeSelection);
-				mainGame->device->setEventReceiver(&mainGame->dField);
+				mainGame->PopupElement(mainGame->wMainMenu);
+				mainGame->device->setEventReceiver(&mainGame->menuHandler);
 				mainGame->imageManager.ClearTexture();
 				mainGame->scrFilter->setVisible(false);
+				wchar_t* p = mainGame->gameConf.lastdeck;
+				if(mainGame->cbDBDecks->getSelected() != -1) {
+					DataManager::CopyStr(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()), p, 63);
+				}
 				break;
 			}
 			case BUTTON_EFFECT_FILTER: {
@@ -289,7 +292,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				me.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
 				me.GUIEvent.Caller = mainGame->btnStartFilter;
 				me.GUIEvent.Element = mainGame->btnStartFilter;
-				device->postEventFromUser(me);
+				mainGame->device->postEventFromUser(me);
 				break;
 			}
 			}
@@ -590,7 +593,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			SEvent e = event;
 			e.MouseInput.Event = irr::EMIE_MOUSE_MOVED;
-			device->postEventFromUser(e);
+			mainGame->device->postEventFromUser(e);
 			break;
 		}
 		}
@@ -604,7 +607,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::KEY_ESCAPE: {
-			device->minimizeWindow();
+			mainGame->device->minimizeWindow();
 			break;
 		}
 		}
