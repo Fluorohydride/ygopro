@@ -216,6 +216,7 @@ public:
 	irr::gui::IGUIButton* btnTestMode;
 	irr::gui::IGUIButton* btnDeckEdit;
 	irr::gui::IGUIButton* btnModeExit;
+	//lan
 	irr::gui::IGUIWindow* wLanWindow;
 	irr::gui::IGUIEditBox* ebNickName;
 	irr::gui::IGUIListBox* lstHostList;
@@ -225,7 +226,8 @@ public:
 	irr::gui::IGUIButton* btnJoinHost;
 	irr::gui::IGUIButton* btnJoinCancel;
 	irr::gui::IGUIButton* btnCreateHost;
-	irr::gui::IGUIWindow* wHostWindow;
+	//create host
+	irr::gui::IGUIWindow* wCreateHost;
 	irr::gui::IGUIComboBox* cbLFlist;
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;
@@ -238,12 +240,21 @@ public:
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
 	irr::gui::IGUIButton* btnHostCancel;
+	//host(single)
+	irr::gui::IGUIWindow* wHostSingle;
+	irr::gui::IGUIButton* btnHostSingleDuelist;
+	irr::gui::IGUIButton* btnHostSingleOB;
+	irr::gui::IGUIStaticText* stHostSingleDuelist[2];
+	irr::gui::IGUIStaticText* stHostSingleOB[8];
+	irr::gui::IGUIStaticText* stHostSingleRule;
+	irr::gui::IGUICheckBox* chkHostSingleReady[2];
+	irr::gui::IGUIComboBox* cbDeckSelect;
+	irr::gui::IGUIButton* btnHostSingleReady;
+	irr::gui::IGUIButton* btnHostSingleStart;
+	irr::gui::IGUIButton* btnHostSingleCancel;
+	//replay
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIButton* btnLoadReplay;
-	irr::gui::IGUIEditBox* ebUsername;
-	irr::gui::IGUIComboBox* cbDeckSel;
-	irr::gui::IGUIStaticText* stModeStatus;
-	irr::gui::IGUIComboBox* cbIPList;
 	//message
 	irr::gui::IGUIWindow* wMessage;
 	irr::gui::IGUIStaticText* stMessage;
@@ -376,61 +387,66 @@ extern Game* mainGame;
 #define BUTTON_CREATE_HOST			113
 #define BUTTON_HOST_CONFIRM			114
 #define BUTTON_HOST_CANCEL			115
-#define BUTTON_MSG_OK				150
-#define BUTTON_YES					151
-#define BUTTON_NO					152
-#define BUTTON_POS_AU				160
-#define BUTTON_POS_AD				161
-#define BUTTON_POS_DU				162
-#define BUTTON_POS_DD				163
-#define BUTTON_OPTION_PREV			170
-#define BUTTON_OPTION_NEXT			171
-#define BUTTON_OPTION_OK			172
-#define BUTTON_CARD_0				180
-#define BUTTON_CARD_1				181
-#define BUTTON_CARD_2				182
-#define BUTTON_CARD_3				183
-#define BUTTON_CARD_4				184
-#define SCROLL_CARD_SELECT			185
-#define BUTTON_CARD_SEL_OK			186
-#define BUTTON_CMD_ACTIVATE			190
-#define BUTTON_CMD_SUMMON			191
-#define BUTTON_CMD_SPSUMMON			192
-#define BUTTON_CMD_MSET				193
-#define BUTTON_CMD_SSET				194
-#define BUTTON_CMD_REPOS			195
-#define BUTTON_CMD_ATTACK			196
-#define BUTTON_CMD_SHOWLIST			197
-#define BUTTON_ANNUMBER_OK			200
-#define BUTTON_ANCARD_OK			201
-#define EDITBOX_ANCARD				202
-#define LISTBOX_ANCARD				203
-#define CHECK_ATTRIBUTE				204
-#define CHECK_RACE					205
-#define BUTTON_BP					210
-#define BUTTON_M2					211
-#define BUTTON_EP					212
-#define BUTTON_CLEAR_LOG			220
-#define LISTBOX_LOG					221
-#define BUTTON_CATEGORY_OK			250
-#define COMBOBOX_DBLFLIST			251
-#define COMBOBOX_DBDECKS			252
-#define BUTTON_CLEAR_DECK			253
-#define BUTTON_SAVE_DECK			254
-#define BUTTON_SAVE_DECK_AS			255
-#define BUTTON_DBEXIT				256
-#define BUTTON_SORT_DECK			257
-#define COMBOBOX_MAINTYPE			260
-#define BUTTON_EFFECT_FILTER		261
-#define BUTTON_START_FILTER			262
-#define BUTTON_RESULT_FILTER		263
-#define SCROLL_FILTER				264
-#define SCROLL_KEYWORD				265
-#define BUTTON_REPLAY_START			270
-#define BUTTON_REPLAY_PAUSE			271
-#define BUTTON_REPLAY_STEP			272
-#define BUTTON_REPLAY_EXIT			273
-#define BUTTON_REPLAY_SWAP			274
-#define BUTTON_REPLAY_SAVE			280
-#define BUTTON_REPLAY_CANCEL		281
+#define BUTTON_HS_DUELIST			120
+#define BUTTON_HS_OBSERVER			121
+#define BUTTON_HS_READY				122
+#define BUTTON_HS_START				123
+#define BUTTON_HS_CANCEL			124
+#define BUTTON_MSG_OK				200
+#define BUTTON_YES					201
+#define BUTTON_NO					202
+#define BUTTON_POS_AU				210
+#define BUTTON_POS_AD				211
+#define BUTTON_POS_DU				212
+#define BUTTON_POS_DD				213
+#define BUTTON_OPTION_PREV			220
+#define BUTTON_OPTION_NEXT			221
+#define BUTTON_OPTION_OK			222
+#define BUTTON_CARD_0				230
+#define BUTTON_CARD_1				231
+#define BUTTON_CARD_2				232
+#define BUTTON_CARD_3				233
+#define BUTTON_CARD_4				234
+#define SCROLL_CARD_SELECT			235
+#define BUTTON_CARD_SEL_OK			236
+#define BUTTON_CMD_ACTIVATE			240
+#define BUTTON_CMD_SUMMON			241
+#define BUTTON_CMD_SPSUMMON			242
+#define BUTTON_CMD_MSET				243
+#define BUTTON_CMD_SSET				244
+#define BUTTON_CMD_REPOS			245
+#define BUTTON_CMD_ATTACK			246
+#define BUTTON_CMD_SHOWLIST			247
+#define BUTTON_ANNUMBER_OK			250
+#define BUTTON_ANCARD_OK			251
+#define EDITBOX_ANCARD				252
+#define LISTBOX_ANCARD				253
+#define CHECK_ATTRIBUTE				254
+#define CHECK_RACE					255
+#define BUTTON_BP					260
+#define BUTTON_M2					261
+#define BUTTON_EP					262
+#define BUTTON_CLEAR_LOG			270
+#define LISTBOX_LOG					271
+#define BUTTON_CATEGORY_OK			300
+#define COMBOBOX_DBLFLIST			301
+#define COMBOBOX_DBDECKS			302
+#define BUTTON_CLEAR_DECK			303
+#define BUTTON_SAVE_DECK			304
+#define BUTTON_SAVE_DECK_AS			305
+#define BUTTON_DBEXIT				306
+#define BUTTON_SORT_DECK			307
+#define COMBOBOX_MAINTYPE			310
+#define BUTTON_EFFECT_FILTER		311
+#define BUTTON_START_FILTER			312
+#define BUTTON_RESULT_FILTER		313
+#define SCROLL_FILTER				314
+#define SCROLL_KEYWORD				315
+#define BUTTON_REPLAY_START			320
+#define BUTTON_REPLAY_PAUSE			321
+#define BUTTON_REPLAY_STEP			322
+#define BUTTON_REPLAY_EXIT			323
+#define BUTTON_REPLAY_SWAP			324
+#define BUTTON_REPLAY_SAVE			330
+#define BUTTON_REPLAY_CANCEL		331
 #endif // GAME_H

@@ -211,19 +211,11 @@ int Game::EngineThread(void* pd) {
 	mainGame->lastReplay.BeginRecord();
 	mainGame->lastReplay.WriteHeader(rh);
 	mainGame->rnd.reset(seed);
-	if(mainGame->netManager.hInfo.no_shuffle_player || mainGame->rnd.real() < 0.5) {
-		pdInfo->is_host_player[0] = true;
-		pdInfo->is_host_player[1] = false;
-		pdInfo->is_first_turn = true;
-		mainGame->lastReplay.WriteData(pdInfo->hostname, 40, false);
-		mainGame->lastReplay.WriteData(pdInfo->clientname, 40, false);
-	} else {
-		pdInfo->is_host_player[0] = false;
-		pdInfo->is_host_player[1] = true;
-		pdInfo->is_first_turn = false;
-		mainGame->lastReplay.WriteData(pdInfo->clientname, 40, false);
-		mainGame->lastReplay.WriteData(pdInfo->hostname, 40, false);
-	}
+	pdInfo->is_host_player[0] = false;
+	pdInfo->is_host_player[1] = true;
+	pdInfo->is_first_turn = false;
+	mainGame->lastReplay.WriteData(pdInfo->clientname, 40, false);
+	mainGame->lastReplay.WriteData(pdInfo->hostname, 40, false);
 	if(!mainGame->netManager.hInfo.no_shuffle_deck) {
 		for(int i = 0; i < mainGame->deckManager.deckhost.main.size(); ++i) {
 			int swap = mainGame->rnd.real() * mainGame->deckManager.deckhost.main.size();
@@ -251,10 +243,6 @@ int Game::EngineThread(void* pd) {
 	set_player_info(pdInfo->pDuel, 0, hi.start_lp, hi.start_hand, hi.draw_count);
 	set_player_info(pdInfo->pDuel, 1, hi.start_lp, hi.start_hand, hi.draw_count);
 	int opt = 0;
-	if(mainGame->netManager.hInfo.no_chain_hint)
-		opt |= DUEL_NO_CHAIN_HINT;
-	if(mainGame->netManager.hInfo.attack_ft)
-		opt |= DUEL_ATTACK_FIRST_TURN;
 	mainGame->lastReplay.WriteInt32(hi.start_lp, false);
 	mainGame->lastReplay.WriteInt32(hi.start_hand, false);
 	mainGame->lastReplay.WriteInt32(hi.draw_count, false);
@@ -3019,7 +3007,6 @@ int Game::ReplayThread(void* pd) {
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
 	mainGame->stText->setText(L"");
-	mainGame->stModeStatus->setText(L"");
 	mainGame->btnReplayStart->setVisible(false);
 	mainGame->btnReplayPause->setVisible(true);
 	mainGame->btnReplayStep->setVisible(false);

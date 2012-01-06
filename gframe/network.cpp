@@ -19,11 +19,6 @@ bool NetManager::CreateHost(int ipindex) {
 	hInfo.start_lp = _wtoi(mainGame->ebStartLP->getText());
 	hInfo.start_hand = _wtoi(mainGame->ebStartHand->getText());
 	hInfo.draw_count = _wtoi(mainGame->ebDrawCount->getText());
-	hInfo.is_match = mainGame->cbMatchMode->getSelected() == 0 ? false : true;
-	hInfo.lfindex = mainGame->cbLFlist->getSelected();
-	for(wp = 0, pstr = (wchar_t*)mainGame->cbLFlist->getItem(mainGame->cbLFlist->getSelected()); wp < 19 && pstr[wp]; ++wp)
-		hInfo.lflist[wp] = pstr[wp];
-	hInfo.lflist[wp] = 0;
 	sBHost = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(sBHost == INVALID_SOCKET)
 		return false;
@@ -217,8 +212,7 @@ int NetManager::BroadcastClient(void* np) {
 	std::vector<HostInfo>::iterator it;
 	mainGame->gMutex.Lock();
 	for(it = net->hosts.begin(); it != net->hosts.end(); ++it) {
-		if(!it->no_check_deck && !it->no_shuffle_deck && !it->no_shuffle_deck && !it->attack_ft && !it->no_chain_hint
-		        && it->start_lp == 8000 && it->start_hand == 5 && it->draw_count == 1)
+		if(!it->no_check_deck && !it->no_shuffle_deck && it->start_lp == 8000 && it->start_hand == 5 && it->draw_count == 1)
 			mode = L"标准设定";
 		else mode = L"自定义设定";
 	}
@@ -256,8 +250,7 @@ int NetManager::ListenThread(void* np) {
 			continue;
 		}
 		int mode = ReadInt16(pbuf);
-		if(mode == 1 && (net->hInfo.no_chain_hint || net->hInfo.no_check_deck || net->hInfo.no_shuffle_deck || net->hInfo.no_shuffle_player || net->hInfo.attack_ft
-		                 || net->hInfo.start_lp != 8000 || net->hInfo.start_hand != 5 || net->hInfo.draw_count != 1 )) {
+		if(mode == 1 && (net->hInfo.no_check_deck || net->hInfo.no_shuffle_deck || net->hInfo.start_lp != 8000 || net->hInfo.start_hand != 5 || net->hInfo.draw_count != 1 )) {
 			psbuf = net->send_buf;
 			WriteInt8(psbuf, 0x4);
 			send(net->sRemote, net->send_buf, 1, 0);
@@ -290,22 +283,13 @@ int NetManager::ListenThread(void* np) {
 		int maincount = ReadInt16(pbuf);
 		int sidecount = ReadInt16(pbuf);
 		mainGame->deckManager.LoadDeck(mainGame->deckManager.deckclient, (int*)pbuf, maincount, sidecount);
-		if(!net->hInfo.no_check_deck && !mainGame->deckManager.CheckLFList(mainGame->deckManager.deckclient, net->hInfo.lfindex)) {
-			psbuf = net->send_buf;
-			WriteInt8(psbuf, 0x2);
-			send(net->sRemote, net->send_buf, 1, 0);
-			closesocket(net->sRemote);
-			net->sRemote = accept(net->sListen, 0, 0);
-			continue;
-		}
 		psbuf = net->send_buf;
 		WriteInt8(psbuf, 0);
-		const wchar_t* ln = mainGame->ebUsername->getText();
 		int li = 0;
-		while(ln[li] && li < 19) {
-			mainGame->dInfo.hostname[li] = ln[li];
-			WriteInt16(psbuf, ln[li++]);
-		}
+//		while(ln[li] && li < 19) {
+//			mainGame->dInfo.hostname[li] = ln[li];
+//			WriteInt16(psbuf, ln[li++]);
+//		}
 		mainGame->dInfo.hostname[li] = 0;
 		WriteInt16(psbuf, 0);
 		send(net->sRemote, net->send_buf, 3 + li * 2, 0);
@@ -317,7 +301,6 @@ int NetManager::ListenThread(void* np) {
 		mainGame->stInfo->setText(L"");
 		mainGame->stDataInfo->setText(L"");
 		mainGame->stText->setText(L"");
-		mainGame->stModeStatus->setText(L"");
 		mainGame->dInfo.engLen = 0;
 		mainGame->dInfo.msgLen = 0;
 		mainGame->dField.Clear();
@@ -341,7 +324,7 @@ int NetManager::JoinThread(void* adr) {
 	if(connect(pnet->sRemote, (sockaddr*)&server, sizeof(sockaddr)) == SOCKET_ERROR) {
 		closesocket(pnet->sRemote);
 		if(!mainGame->is_closing) {
-			mainGame->stModeStatus->setText(L"无法连接至主机");
+//			mainGame->stModeStatus->setText(L"无法连接至主机");
 		}
 		return 0;
 	}
@@ -354,7 +337,7 @@ int NetManager::JoinThread(void* adr) {
 		NetManager::WriteInt16(pbuf, pname[i++]);
 	NetManager::WriteInt16(pbuf, 0);
 	i = 0;
-	pname = mainGame->ebUsername->getText();
+//	pname = mainGame->ebUsername->getText();
 	while(pname[i] != 0 && i < 19) {
 		mainGame->dInfo.hostname[i] = pname[i];
 		NetManager::WriteInt16(pbuf, pname[i++]);
@@ -373,24 +356,7 @@ int NetManager::JoinThread(void* adr) {
 	int result = recv(pnet->sRemote, pnet->recv_buf, 4096, 0);
 	if(result == SOCKET_ERROR || pnet->recv_buf[0] != 0) {
 		closesocket(pnet->sRemote);
-		if(!mainGame->is_closing) {
-			if(result == SOCKET_ERROR)
-				mainGame->stModeStatus->setText(L"网络连接发生错误");
-			else if(pnet->recv_buf[0] == 0x1) {
-				wchar_t errorbuf[32];
-				myswprintf(errorbuf, L"当前版本(0x%X)与主机版本(0x%X)不匹配", PROTO_VERSION, (int)(*(short*)&pnet->recv_buf[1]));
-				mainGame->stModeStatus->setText(errorbuf);
-			} else if(pnet->recv_buf[0] == 0x2)
-				mainGame->stModeStatus->setText(L"无效卡组或者卡组不符合禁卡表规范");
-			else if(pnet->recv_buf[0] == 0x3)
-				mainGame->stModeStatus->setText(L"密码错误");
-			else if(pnet->recv_buf[0] == 0x4)
-				mainGame->stModeStatus->setText(L"主机非标准对战模式，拒绝连接");
-			else mainGame->stModeStatus->setText(L"未知错误");
-		}
-		return 0;
 	}
-	mainGame->stModeStatus->setText(L"");
 	wchar_t* pn = (wchar_t*)&pnet->recv_buf[1];
 	int pi = 0;
 	while(pn[pi] && pi < 19) {
@@ -406,7 +372,7 @@ int NetManager::JoinThread(void* adr) {
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
 	mainGame->stText->setText(L"");
-	mainGame->stModeStatus->setText(L"");
+//	mainGame->stModeStatus->setText(L"");
 	mainGame->dInfo.engLen = 0;
 	mainGame->dInfo.msgLen = 0;
 	mainGame->dInfo.is_local_host = false;

@@ -28,14 +28,29 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CREATE_HOST: {
-				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wHostWindow);
+				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wCreateHost);
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
 				break;
 			}
 			case BUTTON_HOST_CANCEL: {
-				mainGame->HideElement(mainGame->wHostWindow, false, mainGame->wLanWindow);
+				mainGame->HideElement(mainGame->wCreateHost, false, mainGame->wLanWindow);
+				break;
+			}
+			case BUTTON_HS_DUELIST: {
+				break;
+			}
+			case BUTTON_HS_OBSERVER: {
+				break;
+			}
+			case BUTTON_HS_READY: {
+				break;
+			}
+			case BUTTON_HS_START: {
+				break;
+			}
+			case BUTTON_HS_CANCEL: {
 				break;
 			}
 			case BUTTON_DECK_EDIT: {
@@ -164,6 +179,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		}
+		break;
+	}
+	case irr::EET_USER_EVENT: {
 		break;
 	}
 	}

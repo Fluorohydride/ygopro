@@ -46,7 +46,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->setSelected(sel);
 				else {
 					mainGame->cbDBDecks->addItem(dname);
-					mainGame->cbDeckSel->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
 				mainGame->deckManager.SaveDeck(mainGame->deckManager.deckhost, dname);

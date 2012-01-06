@@ -13,19 +13,15 @@ struct HostInfo {
 	unsigned short version;
 	unsigned int address;
 	unsigned short port;
-	wchar_t name[20];
+	char name[32];
+	unsigned char rule;
+	unsigned char mode;
+	unsigned int lflist;
 	bool no_check_deck;
 	bool no_shuffle_deck;
-	bool no_shuffle_player;
-	bool attack_ft;
-	bool no_chain_hint;
-	int start_lp;
+	unsigned int start_lp;
 	unsigned char start_hand;
 	unsigned char draw_count;
-	wchar_t lflist[20];
-	bool is_match;
-	unsigned char lfindex;
-	unsigned char time_limit;
 };
 
 struct HostRequest {
