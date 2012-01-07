@@ -249,6 +249,7 @@ public:
 	irr::gui::IGUIStaticText* stHostSingleRule;
 	irr::gui::IGUICheckBox* chkHostSingleReady[2];
 	irr::gui::IGUIComboBox* cbDeckSelect;
+	irr::gui::IGUIButton* btnHostSingleKick[10];
 	irr::gui::IGUIButton* btnHostSingleReady;
 	irr::gui::IGUIButton* btnHostSingleStart;
 	irr::gui::IGUIButton* btnHostSingleCancel;
@@ -392,6 +393,7 @@ extern Game* mainGame;
 #define BUTTON_HS_READY				122
 #define BUTTON_HS_START				123
 #define BUTTON_HS_CANCEL			124
+#define BUTTON_HS_KICK				125
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202

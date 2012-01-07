@@ -32,6 +32,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				mainGame->HideElement(mainGame->wCreateHost, false, mainGame->wHostSingle);
 				break;
 			}
 			case BUTTON_HOST_CANCEL: {
@@ -45,6 +46,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HS_READY: {
+				break;
+			}
+			case BUTTON_HS_KICK: {
 				break;
 			}
 			case BUTTON_HS_START: {

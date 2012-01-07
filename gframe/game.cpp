@@ -69,6 +69,7 @@ bool Game::Initialize() {
 	//lan mode
 	wLanWindow = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1200));
 	wLanWindow->getCloseButton()->setVisible(false);
+	wLanWindow->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1220), rect<s32>(10, 30, 220, 50), false, false, wLanWindow);
 	ebNickName = env->addEditBox(gameConf.nickname, rect<s32>(110, 25, 450, 50), true, wLanWindow);
 	ebNickName->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
@@ -86,10 +87,10 @@ bool Game::Initialize() {
 	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
 	btnCreateHost = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));
-	wLanWindow->setVisible(false);
 	//create host
 	wCreateHost = env->addWindow(rect<s32>(320, 100, 700, 520), false, dataManager.GetSysString(1224));
 	wCreateHost->getCloseButton()->setVisible(false);
+	wCreateHost->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
 	cbRule->addItem(dataManager.GetSysString(1240));
@@ -126,22 +127,30 @@ bool Game::Initialize() {
 	ebServerPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
-	wCreateHost->setVisible(false);
-	//create host
-	wHostSingle = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1245));
+	//host(single)
+	wHostSingle = env->addWindow(rect<s32>(220, 120, 800, 480), false, dataManager.GetSysString(1245));
 	wHostSingle->getCloseButton()->setVisible(false);
-	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1246));
-	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(120, 30, 320, 50), true, false, wHostSingle);
-	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(120, 55, 320, 75), true, false, wHostSingle);
-	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(330, 30, 350, 50), wHostSingle, -1, L"");
+	wHostSingle->setVisible(false);
+	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 50), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1246));
+	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(140, 30, 340, 50), true, false, wHostSingle);
+	btnHostSingleKick[0] = env->addButton(rect<s32>(115, 30, 135, 50), wHostSingle, BUTTON_HS_KICK, L"×");
+	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(140, 55, 340, 75), true, false, wHostSingle);
+	btnHostSingleKick[1] = env->addButton(rect<s32>(115, 55, 135, 75), wHostSingle, BUTTON_HS_KICK, L"×");
+	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(350, 30, 370, 50), wHostSingle, -1, L"");
 	chkHostSingleReady[0]->setEnabled(false);
-	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(330, 55, 350, 75), wHostSingle, -1, L"");
+	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(350, 55, 370, 75), wHostSingle, -1, L"");
 	chkHostSingleReady[1]->setEnabled(false);
-	btnHostSingleOB = env->addButton(rect<s32>(10, 80, 110, 105), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1247));
-	for(int i = 0; i < 8; ++i)
-		stHostSingleOB[i] = env->addStaticText(L"", rect<s32>(120, 80 + 25 * i, 320, 100 + 25 * i), true, false, wHostSingle);
-	btnHostSingleStart = env->addButton(rect<s32>(460, 355, 570, 380), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1215));
-	btnHostSingleCancel = env->addButton(rect<s32>(460, 385, 570, 410), wHostSingle, BUTTON_HS_CANCEL, dataManager.GetSysString(1212));
+	btnHostSingleOB = env->addButton(rect<s32>(10, 90, 110, 110), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1247));
+	for(int i = 0; i < 8; ++i) {
+		stHostSingleOB[i] = env->addStaticText(L"", rect<s32>(140, 90 + 25 * i, 340, 110 + 25 * i), true, false, wHostSingle);
+		btnHostSingleKick[i + 2] = env->addButton(rect<s32>(115, 90 + 25 * i, 135, 110 + 25 * i), wHostSingle, BUTTON_HS_KICK, L"×");
+	}
+	stHostSingleRule = env->addStaticText(L"", rect<s32>(380, 30, 560, 330), false, true, wHostSingle);
+	env->addStaticText(dataManager.GetSysString(1248), rect<s32>(380, 190, 560, 210), false, false, wHostSingle);
+	cbDeckSelect = env->addComboBox(rect<s32>(380, 215, 560, 240), wHostSingle);
+	btnHostSingleReady = env->addButton(rect<s32>(450, 250, 560, 275), wHostSingle, BUTTON_HS_READY, dataManager.GetSysString(1249));
+	btnHostSingleStart = env->addButton(rect<s32>(330, 315, 440, 340), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1215));
+	btnHostSingleCancel = env->addButton(rect<s32>(450, 315, 560, 340), wHostSingle, BUTTON_HS_CANCEL, dataManager.GetSysString(1212));
 	//img
 	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
@@ -171,7 +180,7 @@ bool Game::Initialize() {
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);
 	//info
-	irr::gui::IGUITab* tabInfo = wInfos->addTab(L"卡片信息");
+	irr::gui::IGUITab* tabInfo = wInfos->addTab(dataManager.GetSysString(1270));
 	stName = env->addStaticText(L"", rect<s32>(10, 10, 287, 32), true, false, tabInfo, -1, false);
 	stName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	stInfo = env->addStaticText(L"", rect<s32>(15, 37, 296, 60), false, true, tabInfo, -1, false);
@@ -180,27 +189,25 @@ bool Game::Initialize() {
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stText = env->addStaticText(L"", rect<s32>(15, 83, 296, 324), false, true, tabInfo, -1, false);
 	//log
-	irr::gui::IGUITab* tabLog =  wInfos->addTab(L"消息记录");
+	irr::gui::IGUITab* tabLog =  wInfos->addTab(dataManager.GetSysString(1271));
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
 	lstLog->setItemHeight(18);
-	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, L"清除记录");
-//	btnSaveLog = env->addButton(rect<s32>(40, 300, 140, 325), tabLog, BUTTON_SAVE_LOG, L"保存记录");
-//	btnSaveLog->setVisible(false);
+	btnClearLog = env->addButton(rect<s32>(160, 300, 260, 325), tabLog, BUTTON_CLEAR_LOG, dataManager.GetSysString(1272));
 	//system
-	irr::gui::IGUITab* tabSystem = wInfos->addTab(L"系统设定");
-	chkAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, L"自动选择卡片位置");
+	irr::gui::IGUITab* tabSystem = wInfos->addTab(dataManager.GetSysString(1273));
+	chkAutoPos = env->addCheckBox(false, rect<s32>(20, 20, 280, 45), tabSystem, -1, dataManager.GetSysString(1274));
 	chkAutoPos->setChecked(true);
-	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, L"↑随机选择位置");
-	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, L"自动排列连锁顺序");
+	chkRandomPos = env->addCheckBox(false, rect<s32>(40, 50, 300, 75), tabSystem, -1, dataManager.GetSysString(1275));
+	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
 	chkAutoChain->setChecked(true);
-	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, L"没有可连锁的卡时延迟回应");
+	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
 	//message (310)
-	wMessage = env->addWindow(rect<s32>(490, 200, 840, 340), false, L"消息");
+	wMessage = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(1216));
 	wMessage->getCloseButton()->setVisible(false);
 	wMessage->setVisible(false);
 	stMessage =  env->addStaticText(L"", rect<s32>(20, 20, 350, 100), false, true, wMessage, -1, false);
 	stMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	btnMsgOK = env->addButton(rect<s32>(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, L"确定");
+	btnMsgOK = env->addButton(rect<s32>(130, 105, 220, 130), wMessage, BUTTON_MSG_OK, dataManager.GetSysString(1211));
 	//auto fade message (310)
 	wACMessage = env->addWindow(rect<s32>(490, 240, 840, 300), false, L"");
 	wACMessage->getCloseButton()->setVisible(false);
@@ -210,24 +217,24 @@ bool Game::Initialize() {
 	stACMessage->setBackgroundColor(0xc0c0c0ff);
 	stACMessage->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	//yes/no (310)
-	wQuery = env->addWindow(rect<s32>(490, 200, 840, 340), false, L"请选择：");
+	wQuery = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(560));
 	wQuery->getCloseButton()->setVisible(false);
 	wQuery->setVisible(false);
 	stQMessage =  env->addStaticText(L"", rect<s32>(20, 20, 350, 100), false, true, wQuery, -1, false);
 	stQMessage->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	btnYes = env->addButton(rect<s32>(100, 105, 150, 130), wQuery, BUTTON_YES, L"是");
-	btnNo = env->addButton(rect<s32>(200, 105, 250, 130), wQuery, BUTTON_NO, L"否");
+	btnYes = env->addButton(rect<s32>(100, 105, 150, 130), wQuery, BUTTON_YES, dataManager.GetSysString(1213));
+	btnNo = env->addButton(rect<s32>(200, 105, 250, 130), wQuery, BUTTON_NO, dataManager.GetSysString(1214));
 	//options (310)
 	wOptions = env->addWindow(rect<s32>(490, 200, 840, 340), false, L"");
 	wOptions->getCloseButton()->setVisible(false);
 	wOptions->setVisible(false);
 	stOptions =  env->addStaticText(L"", rect<s32>(20, 20, 350, 100), false, true, wOptions, -1, false);
 	stOptions->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
-	btnOptionOK = env->addButton(rect<s32>(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, L"确定");
+	btnOptionOK = env->addButton(rect<s32>(130, 105, 220, 130), wOptions, BUTTON_OPTION_OK, dataManager.GetSysString(1211));
 	btnOptionp = env->addButton(rect<s32>(20, 105, 60, 130), wOptions, BUTTON_OPTION_PREV, L"<<<");
 	btnOptionn = env->addButton(rect<s32>(290, 105, 330, 130), wOptions, BUTTON_OPTION_NEXT, L">>>");
 	//pos select
-	wPosSelect = env->addWindow(rect<s32>(340, 200, 935, 410), false, L"请选择表示形式");
+	wPosSelect = env->addWindow(rect<s32>(340, 200, 935, 410), false, dataManager.GetSysString(561));
 	wPosSelect->getCloseButton()->setVisible(false);
 	wPosSelect->setVisible(false);
 	btnPSAU = irr::gui::CGUIImageButton::addImageButton(env, rect<s32>(10, 45, 150, 185), wPosSelect, BUTTON_POS_AU);
@@ -242,9 +249,8 @@ bool Game::Initialize() {
 	btnPSDD->setImageScale(core::vector2df(0.5, 0.5));
 	btnPSDD->setImageRotation(270);
 	btnPSDD->setImage(imageManager.tCover, rect<s32>(0, 0, 177, 254));
-	//announce number
 	//card select
-	wCardSelect = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"请选择卡");
+	wCardSelect = env->addWindow(rect<s32>(320, 100, 1000, 400), false, L"");
 	wCardSelect->getCloseButton()->setVisible(false);
 	wCardSelect->setVisible(false);
 	for(int i = 0; i < 5; ++i) {
@@ -255,14 +261,14 @@ bool Game::Initialize() {
 		btnCardSelect[i]->setImageScale(core::vector2df(0.6f, 0.6f));
 	}
 	scrCardList = env->addScrollBar(true, rect<s32>(30, 235, 650, 255), wCardSelect, SCROLL_CARD_SELECT);
-	btnSelectOK = env->addButton(rect<s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, L"确定");
+	btnSelectOK = env->addButton(rect<s32>(300, 265, 380, 290), wCardSelect, BUTTON_CARD_SEL_OK, dataManager.GetSysString(1211));
 	//announce number
 	wANNumber = env->addWindow(rect<s32>(550, 200, 780, 295), false, L"");
 	wANNumber->getCloseButton()->setVisible(false);
 	wANNumber->setVisible(false);
 	cbANNumber =  env->addComboBox(rect<s32>(40, 30, 190, 50), wANNumber, -1);
 	cbANNumber->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnANNumberOK = env->addButton(rect<s32>(80, 60, 150, 85), wANNumber, BUTTON_ANNUMBER_OK, L"确定");
+	btnANNumberOK = env->addButton(rect<s32>(80, 60, 150, 85), wANNumber, BUTTON_ANNUMBER_OK, dataManager.GetSysString(1211));
 	//announce card
 	wANCard = env->addWindow(rect<s32>(560, 170, 770, 370), false, L"");
 	wANCard->getCloseButton()->setVisible(false);
@@ -270,16 +276,16 @@ bool Game::Initialize() {
 	ebANCard = env->addEditBox(L"", rect<s32>(20, 25, 190, 45), true, wANCard, EDITBOX_ANCARD);
 	ebANCard->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	lstANCard = env->addListBox(rect<s32>(20, 50, 190, 160), wANCard, LISTBOX_ANCARD, true);
-	btnANCardOK = env->addButton(rect<s32>(60, 165, 150, 190), wANCard, BUTTON_ANCARD_OK, L"确定");
+	btnANCardOK = env->addButton(rect<s32>(60, 165, 150, 190), wANCard, BUTTON_ANCARD_OK, dataManager.GetSysString(1211));
 	//announce attribute
-	wANAttribute = env->addWindow(rect<s32>(500, 200, 830, 285), false, L"请选择要宣言的属性：");
+	wANAttribute = env->addWindow(rect<s32>(500, 200, 830, 285), false, dataManager.GetSysString(562));
 	wANAttribute->getCloseButton()->setVisible(false);
 	wANAttribute->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 7; filter <<= 1, ++i)
 		chkAttribute[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 80, 25 + (i / 4) * 25, 90 + (i % 4) * 80, 50 + (i / 4) * 25),
 		                                   wANAttribute, CHECK_ATTRIBUTE, dataManager.FormatAttribute(filter));
 	//announce attribute
-	wANRace = env->addWindow(rect<s32>(480, 200, 850, 385), false, L"请选择要宣言的种族：");
+	wANRace = env->addWindow(rect<s32>(480, 200, 850, 385), false, dataManager.GetSysString(563));
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
 	for(int filter = 0x1, i = 0; i < 22; filter <<= 1, ++i)
@@ -310,67 +316,67 @@ bool Game::Initialize() {
 	//deck edit
 	wDeckEdit = env->addStaticText(L"", rect<s32>(309, 8, 605, 130), true, false, 0, -1, true);
 	wDeckEdit->setVisible(false);
-	env->addStaticText(L"禁限卡表：", rect<s32>(10, 9, 100, 29), false, false, wDeckEdit);
+	env->addStaticText(dataManager.GetSysString(1300), rect<s32>(10, 9, 100, 29), false, false, wDeckEdit);
 	cbDBLFList = env->addComboBox(rect<s32>(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBLFLIST);
-	env->addStaticText(L"卡组列表：", rect<s32>(10, 39, 100, 59), false, false, wDeckEdit);
+	env->addStaticText(dataManager.GetSysString(1301), rect<s32>(10, 39, 100, 59), false, false, wDeckEdit);
 	cbDBDecks = env->addComboBox(rect<s32>(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
 	for(int i = 0; i < deckManager._lfList.size(); ++i)
 		cbDBLFList->addItem(deckManager._lfList[i].listName);
-	btnSaveDeck = env->addButton(rect<s32>(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, L"保存");
+	btnSaveDeck = env->addButton(rect<s32>(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302));
 	ebDeckname = env->addEditBox(L"", rect<s32>(80, 65, 220, 90), true, wDeckEdit, -1);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnSaveDeckAs = env->addButton(rect<s32>(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, L"另存");
-	btnClearDeck = env->addButton(rect<s32>(225, 95, 290, 116), wDeckEdit, BUTTON_CLEAR_DECK, L"清空");
-	btnSortDeck = env->addButton(rect<s32>(155, 95, 220, 116), wDeckEdit, BUTTON_SORT_DECK, L"排序");
-	btnDBExit = env->addButton(rect<s32>(10, 95, 90, 116), wDeckEdit, BUTTON_DBEXIT, L"退出编辑");
+	btnSaveDeckAs = env->addButton(rect<s32>(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, dataManager.GetSysString(1303));
+	btnClearDeck = env->addButton(rect<s32>(225, 95, 290, 116), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
+	btnSortDeck = env->addButton(rect<s32>(155, 95, 220, 116), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
+	btnDBExit = env->addButton(rect<s32>(10, 95, 90, 116), wDeckEdit, BUTTON_DBEXIT, dataManager.GetSysString(1306));
 	//filters
 	wFilter = env->addStaticText(L"", rect<s32>(610, 8, 1020, 130), true, false, 0, -1, true);
 	wFilter->setVisible(false);
-	env->addStaticText(L"卡种：", rect<s32>(10, 5, 70, 25), false, false, wFilter);
+	env->addStaticText(dataManager.GetSysString(1311), rect<s32>(10, 5, 70, 25), false, false, wFilter);
 	cbCardType = env->addComboBox(rect<s32>(60, 3, 120, 23), wFilter, COMBOBOX_MAINTYPE);
-	cbCardType->addItem(L"(无)");
-	cbCardType->addItem(L"怪兽");
-	cbCardType->addItem(L"魔法");
-	cbCardType->addItem(L"陷阱");
+	cbCardType->addItem(dataManager.GetSysString(1310));
+	cbCardType->addItem(dataManager.GetSysString(1312));
+	cbCardType->addItem(dataManager.GetSysString(1313));
+	cbCardType->addItem(dataManager.GetSysString(1314));
 	cbCardType2 = env->addComboBox(rect<s32>(130, 3, 190, 23), wFilter, -1);
-	cbCardType2->addItem(L"(无)", 0);
-	env->addStaticText(L"限制：", rect<s32>(205, 5, 280, 25), false, false, wFilter);
+	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
+	env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 5, 280, 25), false, false, wFilter);
 	cbLimit = env->addComboBox(rect<s32>(260, 3, 390, 23), wFilter, -1);
-	cbLimit->addItem(L"(无)");
-	cbLimit->addItem(L"禁止");
-	cbLimit->addItem(L"限制");
-	cbLimit->addItem(L"准限制");
-	env->addStaticText(L"属性：", rect<s32>(10, 28, 70, 48), false, false, wFilter);
+	cbLimit->addItem(dataManager.GetSysString(1310));
+	cbLimit->addItem(dataManager.GetSysString(1316));
+	cbLimit->addItem(dataManager.GetSysString(1317));
+	cbLimit->addItem(dataManager.GetSysString(1318));
+	env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 28, 70, 48), false, false, wFilter);
 	cbAttribute = env->addComboBox(rect<s32>(60, 26, 190, 46), wFilter, -1);
-	cbAttribute->addItem(L"(无)", 0);
+	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x80; filter <<= 1)
 		cbAttribute->addItem(dataManager.FormatAttribute(filter), filter);
-	env->addStaticText(L"种族：", rect<s32>(10, 51, 70, 71), false, false, wFilter);
+	env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 51, 70, 71), false, false, wFilter);
 	cbRace = env->addComboBox(rect<s32>(60, 49, 190, 69), wFilter, -1);
-	cbRace->addItem(L"(无)", 0);
+	cbRace->addItem(dataManager.GetSysString(1310), 0);
 	for(int filter = 0x1; filter != 0x400000; filter <<= 1)
 		cbRace->addItem(dataManager.FormatRace(filter), filter);
-	env->addStaticText(L"攻击：", rect<s32>(205, 28, 280, 48), false, false, wFilter);
+	env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 28, 280, 48), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 26, 340, 46), true, wFilter);
 	ebAttack->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(L"守备：", rect<s32>(205, 51, 280, 71), false, false, wFilter);
+	env->addStaticText(dataManager.GetSysString(1323), rect<s32>(205, 51, 280, 71), false, false, wFilter);
 	ebDefence = env->addEditBox(L"", rect<s32>(260, 49, 340, 69), true, wFilter);
 	ebDefence->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(L"星数：", rect<s32>(10, 74, 80, 94), false, false, wFilter);
+	env->addStaticText(dataManager.GetSysString(1324), rect<s32>(10, 74, 80, 94), false, false, wFilter);
 	ebStar = env->addEditBox(L"", rect<s32>(60, 72, 140, 92), true, wFilter);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(L"关键字：", rect<s32>(205, 74, 280, 94), false, false, wFilter);
+	env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 74, 280, 94), false, false, wFilter);
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, SCROLL_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, L"效果");
-	btnStartFilter = env->addButton(rect<s32>(205, 96, 290, 118), wFilter, BUTTON_START_FILTER, L"重新搜索");
-	btnResultFilter = env->addButton(rect<s32>(305, 96, 390, 118), wFilter, BUTTON_RESULT_FILTER, L"搜索结果");
+	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
+	btnStartFilter = env->addButton(rect<s32>(165, 96, 270, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
+	btnResultFilter = env->addButton(rect<s32>(285, 96, 390, 118), wFilter, BUTTON_RESULT_FILTER, dataManager.GetSysString(1328));
 	wCategories = env->addWindow(rect<s32>(630, 60, 1000, 270), false, dataManager.strBuffer);
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);
 	wCategories->setDraggable(false);
 	wCategories->setVisible(false);
-	btnCategoryOK = env->addButton(rect<s32>(135, 175, 235, 200), wCategories, BUTTON_CATEGORY_OK, L"确定");
+	btnCategoryOK = env->addButton(rect<s32>(135, 175, 235, 200), wCategories, BUTTON_CATEGORY_OK, dataManager.GetSysString(1211));
 	for(int i = 0; i < 32; ++i)
 		chkCategory[i] = env->addCheckBox(false, recti(10 + (i % 4) * 90, 10 + (i / 4) * 20, 100 + (i % 4) * 90, 30 + (i / 4) * 20), wCategories, -1, dataManager.GetSysString(1100 + i));
 	scrFilter = env->addScrollBar(false, recti(999, 161, 1019, 629), 0, SCROLL_FILTER);
@@ -378,23 +384,22 @@ bool Game::Initialize() {
 	scrFilter->setSmallStep(1);
 	scrFilter->setVisible(false);
 	//replay save
-	//yes/no (310)
-	wReplaySave = env->addWindow(rect<s32>(510, 200, 820, 320), false, L"是否要保存Replay？");
+	wReplaySave = env->addWindow(rect<s32>(510, 200, 820, 320), false, dataManager.GetSysString(1340));
 	wReplaySave->getCloseButton()->setVisible(false);
 	wReplaySave->setVisible(false);
-	env->addStaticText(L"Replay文件：", rect<s32>(20, 25, 290, 45), false, false, wReplaySave);
+	env->addStaticText(dataManager.GetSysString(1342), rect<s32>(20, 25, 290, 45), false, false, wReplaySave);
 	ebRSName =  env->addEditBox(L"", rect<s32>(20, 50, 290, 70), true, wReplaySave, -1);
 	ebRSName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	btnRSYes = env->addButton(rect<s32>(70, 80, 140, 105), wReplaySave, BUTTON_REPLAY_SAVE, L"保存");
-	btnRSNo = env->addButton(rect<s32>(170, 80, 240, 105), wReplaySave, BUTTON_REPLAY_CANCEL, L"取消");
+	btnRSYes = env->addButton(rect<s32>(70, 80, 140, 105), wReplaySave, BUTTON_REPLAY_SAVE, dataManager.GetSysString(1341));
+	btnRSNo = env->addButton(rect<s32>(170, 80, 240, 105), wReplaySave, BUTTON_REPLAY_CANCEL, dataManager.GetSysString(1212));
 	//replay control
 	wReplay = env->addStaticText(L"", rect<s32>(205, 143, 295, 273), true, false, 0, -1, true);
 	wReplay->setVisible(false);
-	btnReplayStart = env->addButton(rect<s32>(5, 5, 85, 25), wReplay, BUTTON_REPLAY_START, L"播放");
-	btnReplayPause = env->addButton(rect<s32>(5, 30, 85, 50), wReplay, BUTTON_REPLAY_PAUSE, L"暂停");
-	btnReplayStep = env->addButton(rect<s32>(5, 55, 85, 75), wReplay, BUTTON_REPLAY_STEP, L"下一步");
-	btnReplaySwap = env->addButton(rect<s32>(5, 80, 85, 100), wReplay, BUTTON_REPLAY_SWAP, L"切换视角");
-	btnReplayExit = env->addButton(rect<s32>(5, 105, 85, 125), wReplay, BUTTON_REPLAY_EXIT, L"退出");
+	btnReplayStart = env->addButton(rect<s32>(5, 5, 85, 25), wReplay, BUTTON_REPLAY_START, dataManager.GetSysString(1343));
+	btnReplayPause = env->addButton(rect<s32>(5, 30, 85, 50), wReplay, BUTTON_REPLAY_PAUSE, dataManager.GetSysString(1344));
+	btnReplayStep = env->addButton(rect<s32>(5, 55, 85, 75), wReplay, BUTTON_REPLAY_STEP, dataManager.GetSysString(1345));
+	btnReplaySwap = env->addButton(rect<s32>(5, 80, 85, 100), wReplay, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
+	btnReplayExit = env->addButton(rect<s32>(5, 105, 85, 125), wReplay, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
 	device->setEventReceiver(&menuHandler);
 	LoadConfig();
 	env->getSkin()->setFont(guiFont);
@@ -452,11 +457,11 @@ void Game::MainLoop() {
 		if(waitFrame >= 0) {
 			waitFrame++;
 			if(waitFrame % 90 == 0) {
-				stHintMsg->setText(L"等待对方行动中...");
+				stHintMsg->setText(dataManager.GetSysString(1350));
 			} else if(waitFrame % 90 == 30) {
-				stHintMsg->setText(L" 等待对方行动中....");
+				stHintMsg->setText(dataManager.GetSysString(1351));
 			} else if(waitFrame % 90 == 60) {
-				stHintMsg->setText(L"  等待对方行动中.....");
+				stHintMsg->setText(dataManager.GetSysString(1352));
 			}
 		}
 		driver->endScene();
