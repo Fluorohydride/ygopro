@@ -133,9 +133,9 @@ bool Game::Initialize() {
 	wHostSingle->setVisible(false);
 	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 50), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1246));
 	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(140, 30, 340, 50), true, false, wHostSingle);
-	btnHostSingleKick[0] = env->addButton(rect<s32>(115, 30, 135, 50), wHostSingle, BUTTON_HS_KICK, L"×");
+	btnHostSingleKick[0] = env->addButton(rect<s32>(115, 30, 135, 50), wHostSingle, BUTTON_HS_KICK, L"X");
 	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(140, 55, 340, 75), true, false, wHostSingle);
-	btnHostSingleKick[1] = env->addButton(rect<s32>(115, 55, 135, 75), wHostSingle, BUTTON_HS_KICK, L"×");
+	btnHostSingleKick[1] = env->addButton(rect<s32>(115, 55, 135, 75), wHostSingle, BUTTON_HS_KICK, L"X");
 	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(350, 30, 370, 50), wHostSingle, -1, L"");
 	chkHostSingleReady[0]->setEnabled(false);
 	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(350, 55, 370, 75), wHostSingle, -1, L"");
@@ -143,7 +143,7 @@ bool Game::Initialize() {
 	btnHostSingleOB = env->addButton(rect<s32>(10, 90, 110, 110), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1247));
 	for(int i = 0; i < 8; ++i) {
 		stHostSingleOB[i] = env->addStaticText(L"", rect<s32>(140, 90 + 25 * i, 340, 110 + 25 * i), true, false, wHostSingle);
-		btnHostSingleKick[i + 2] = env->addButton(rect<s32>(115, 90 + 25 * i, 135, 110 + 25 * i), wHostSingle, BUTTON_HS_KICK, L"×");
+		btnHostSingleKick[i + 2] = env->addButton(rect<s32>(115, 90 + 25 * i, 135, 110 + 25 * i), wHostSingle, BUTTON_HS_KICK, L"X");
 	}
 	stHostSingleRule = env->addStaticText(L"", rect<s32>(380, 30, 560, 330), false, true, wHostSingle);
 	env->addStaticText(dataManager.GetSysString(1248), rect<s32>(380, 190, 560, 210), false, false, wHostSingle);
