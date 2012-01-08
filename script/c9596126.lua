@@ -1,5 +1,6 @@
 --カオス·ソーサラー
 function c9596126.initial_effect(c)
+	c:EnableReviveLimit()
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(9596126,0))
@@ -22,7 +23,6 @@ function c9596126.initial_effect(c)
 	e2:SetTarget(c9596126.rmtg)
 	e2:SetOperation(c9596126.rmop)
 	c:RegisterEffect(e2)
-	c:EnableReviveLimit()
 end
 function c9596126.spfilter(c,att)
 	return c:IsAttribute(att) and c:IsAbleToRemoveAsCost()

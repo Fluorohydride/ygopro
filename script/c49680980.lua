@@ -45,6 +45,7 @@ function c49680980.ccost(e,tp)
 		select=select+1
 	end
 	if select==0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local g=g1:Select(tp,1,1,nil)
 		Duel.SendtoGrave(g,REASON_COST)
 	elseif select==1 then

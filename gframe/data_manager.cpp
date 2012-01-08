@@ -25,6 +25,7 @@ bool DataManager::LoadDates(const char* file) {
 			return Error(pDB, pStmt);
 		else if(step == SQLITE_ROW) {
 			cd.code = sqlite3_column_int(pStmt, 0);
+			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
 			cd.setcode = sqlite3_column_int(pStmt, 3);
 			cd.type = sqlite3_column_int(pStmt, 4);

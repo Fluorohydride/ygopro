@@ -3254,6 +3254,10 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.normalsummon_state[p] = 0;
 			core.flipsummon_state[p] = 0;
 			core.spsummon_state[p] = 0;
+			core.summoned_cards_pt[p].clear();
+			core.normalsummoned_cards_pt[p].clear();
+			core.spsummoned_cards_pt[p].clear();
+			core.flipsummoned_cards_pt[p].clear();
 			core.attack_state[p] = 0;
 		}
 		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)

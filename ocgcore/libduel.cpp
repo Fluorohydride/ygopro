@@ -2682,6 +2682,50 @@ int32 scriptlib::duel_check_phase_activity(lua_State *L) {
 	lua_pushboolean(L, pduel->game_field->core.phase_action);
 	return 1;
 }
+int32 scriptlib::duel_get_summoned_cards_this_turn(lua_State *L) {
+	check_param_count(L, 1);
+	int32 playerid = lua_tointeger(L, 1);
+	if(playerid != 0 && playerid != 1)
+		return 0;
+	duel* pduel = interpreter::get_duel_info(L);
+	group* newgroup = pduel->new_group();
+	newgroup->container = pduel->game_field->core.summoned_cards_pt[playerid];
+	interpreter::group2value(L, newgroup);
+	return 1;
+}
+int32 scriptlib::duel_get_normal_summoned_cards_this_turn(lua_State *L) {
+	check_param_count(L, 1);
+	int32 playerid = lua_tointeger(L, 1);
+	if(playerid != 0 && playerid != 1)
+		return 0;
+	duel* pduel = interpreter::get_duel_info(L);
+	group* newgroup = pduel->new_group();
+	newgroup->container = pduel->game_field->core.normalsummoned_cards_pt[playerid];
+	interpreter::group2value(L, newgroup);
+	return 1;
+}
+int32 scriptlib::duel_get_spsummoned_cards_this_turn(lua_State *L) {
+	check_param_count(L, 1);
+	int32 playerid = lua_tointeger(L, 1);
+	if(playerid != 0 && playerid != 1)
+		return 0;
+	duel* pduel = interpreter::get_duel_info(L);
+	group* newgroup = pduel->new_group();
+	newgroup->container = pduel->game_field->core.spsummoned_cards_pt[playerid];
+	interpreter::group2value(L, newgroup);
+	return 1;
+}
+int32 scriptlib::duel_get_flip_summoned_cards_this_turn(lua_State *L) {
+	check_param_count(L, 1);
+	int32 playerid = lua_tointeger(L, 1);
+	if(playerid != 0 && playerid != 1)
+		return 0;
+	duel* pduel = interpreter::get_duel_info(L);
+	group* newgroup = pduel->new_group();
+	newgroup->container = pduel->game_field->core.flipsummoned_cards_pt[playerid];
+	interpreter::group2value(L, newgroup);
+	return 1;
+}
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 2);

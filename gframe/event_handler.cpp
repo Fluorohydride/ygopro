@@ -14,7 +14,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
-				case BUTTON_CLEAR_LOG: {
+			case BUTTON_CLEAR_LOG: {
 				mainGame->lstLog->clear();
 				mainGame->logParam.clear();
 				break;
@@ -736,38 +736,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				ClientCard* mcard = selectable_cards[id - BUTTON_CARD_0 + pos];
 				if(mcard->code) {
-					CardData cd;
-					mainGame->dataManager.GetData(mcard->code, &cd);
-					mainGame->imgCard->setImage(mainGame->imageManager.GetTexture(mcard->code));
-					myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.GetName(mcard->code), mcard->code);
-					mainGame->stName->setText(formatBuffer);
-					if(cd.type & TYPE_MONSTER) {
-						myswprintf(formatBuffer, L"[%ls] %ls/%ls", mainGame->dataManager.FormatType(cd.type), mainGame->dataManager.FormatRace(cd.race), mainGame->dataManager.FormatAttribute(cd.attribute));
-						mainGame->stInfo->setText(formatBuffer);
-						formatBuffer[0] = L'[';
-						for(int i = 1; i <= cd.level; ++i)
-							formatBuffer[i] = L'★';
-						formatBuffer[cd.level + 1] = L']';
-						formatBuffer[cd.level + 2] = L' ';
-						if(cd.attack < 0 && cd.defence < 0)
-							myswprintf(&formatBuffer[cd.level + 3], L"?/?");
-						else if(cd.attack < 0)
-							myswprintf(&formatBuffer[cd.level + 3], L"?/%d", cd.defence);
-						else if(cd.defence < 0)
-							myswprintf(&formatBuffer[cd.level + 3], L"%d/?", cd.attack);
-						else
-							myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
-						mainGame->stDataInfo->setText(formatBuffer);
-						mainGame->stText->setRelativePosition(irr::core::position2di(15, 83));
-					} else {
-						myswprintf(formatBuffer, L"[%ls]", mainGame->dataManager.FormatType(cd.type));
-						mainGame->stInfo->setText(formatBuffer);
-						mainGame->stDataInfo->setText(L"");
-						mainGame->stText->setRelativePosition(irr::core::position2di(15, 60));
-					}
-					mainGame->SetStaticText(mainGame->stText, 270, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetText(mcard->code));
+					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->stTip->setVisible(false);
 					mainGame->imgCard->setImage(mainGame->imageManager.tCover);
 					mainGame->stName->setText(L"");
 					mainGame->stInfo->setText(L"");

@@ -49,6 +49,7 @@ function c80367387.ccost(e,tp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 		local g=g2:Select(tp,1,1,nil)
 		Duel.ConfirmCards(1-tp,g)
+		Duel.ShuffleHand(tp)
 	else
 		Duel.Destroy(e:GetHandler(),REASON_RULE)
 	end

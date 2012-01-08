@@ -236,6 +236,7 @@ public:
 	irr::gui::IGUIEditBox* ebDrawCount;
 	irr::gui::IGUIEditBox* ebServerName;
 	irr::gui::IGUIEditBox* ebServerPass;
+	irr::gui::IGUICheckBox* chkEnablePriority;
 	irr::gui::IGUICheckBox* chkNoCheckDeck;
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
@@ -245,11 +246,11 @@ public:
 	irr::gui::IGUIButton* btnHostSingleDuelist;
 	irr::gui::IGUIButton* btnHostSingleOB;
 	irr::gui::IGUIStaticText* stHostSingleDuelist[2];
-	irr::gui::IGUIStaticText* stHostSingleOB[8];
-	irr::gui::IGUIStaticText* stHostSingleRule;
 	irr::gui::IGUICheckBox* chkHostSingleReady[2];
+	irr::gui::IGUIButton* btnHostSingleKick[2];
 	irr::gui::IGUIComboBox* cbDeckSelect;
-	irr::gui::IGUIButton* btnHostSingleKick[10];
+	irr::gui::IGUIStaticText* stHostSingleRule;
+	irr::gui::IGUIStaticText* stHostSingleOB;
 	irr::gui::IGUIButton* btnHostSingleReady;
 	irr::gui::IGUIButton* btnHostSingleStart;
 	irr::gui::IGUIButton* btnHostSingleCancel;

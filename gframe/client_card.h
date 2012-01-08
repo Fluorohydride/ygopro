@@ -29,6 +29,7 @@ struct CardDataC {
 	unsigned int race;
 	int attack;
 	int defence;
+	unsigned int ot;
 	unsigned int category;
 };
 struct CardString {

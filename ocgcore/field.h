@@ -186,6 +186,10 @@ struct processor {
 	card_set operated_set;
 	card_set discarded_set;
 	card_set destroy_canceled;
+	card_set summoned_cards_pt[2];
+	card_set normalsummoned_cards_pt[2];
+	card_set spsummoned_cards_pt[2];
+	card_set flipsummoned_cards_pt[2];
 	effect_set_v disfield_effects;
 	effect_set_v extraz_effects;
 	effect_set_v extraz_effects_e;

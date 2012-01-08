@@ -1124,6 +1124,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		core.summoning_card = 0;
 		core.summon_state[sumplayer] = TRUE;
 		core.normalsummon_state[sumplayer] = TRUE;
+		core.summoned_cards_pt[sumplayer].insert(target);
+		core.normalsummoned_cards_pt[sumplayer].insert(target);
 		raise_event(target, EVENT_SUMMON, proc, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
@@ -1212,6 +1214,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		target->current.position = POS_FACEUP_ATTACK;
 		core.phase_action = TRUE;
 		core.flipsummon_state[sumplayer] = TRUE;
+		core.flipsummoned_cards_pt[sumplayer].insert(target);
 		pduel->write_buffer8(MSG_FLIPSUMMONING);
 		pduel->write_buffer32(target->data.code);
 		pduel->write_buffer8(target->current.controler);
@@ -1411,6 +1414,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			set_control(target, setplayer, 0, 0);
 		core.phase_action = TRUE;
 		core.normalsummon_state[setplayer] = TRUE;
+		core.normalsummoned_cards_pt[setplayer].insert(target);
 		target->set_status(STATUS_SUMMON_TURN, TRUE);
 		pduel->write_buffer8(MSG_SET);
 		pduel->write_buffer32(target->data.code);
@@ -1601,6 +1605,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(target->current.position);
 		core.spsummoning_card = 0;
 		core.spsummon_state[sumplayer] = TRUE;
+		core.spsummoned_cards_pt[sumplayer].insert(target);
 		raise_event(target, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
@@ -1712,6 +1717,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!targets)
 			core.special_summoning.insert(target);
 		target->enable_field_effect(FALSE);
+		core.spsummoned_cards_pt[target->summon_player].insert(target);
 		core.spsummon_state[target->summon_player] = TRUE;
 		core.hint_timing[target->summon_player] |= TIMING_SPSUMMON;
 		move_to_field(target, target->summon_player, playerid, LOCATION_MZONE, positions);

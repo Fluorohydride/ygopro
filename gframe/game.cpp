@@ -96,28 +96,30 @@ bool Game::Initialize() {
 	cbRule->addItem(dataManager.GetSysString(1240));
 	cbRule->addItem(dataManager.GetSysString(1241));
 	cbRule->addItem(dataManager.GetSysString(1242));
+	cbRule->addItem(dataManager.GetSysString(1243));
 	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
 	for(int i = 0; i < deckManager._lfList.size(); ++i)
 		cbLFlist->addItem(deckManager._lfList[i].listName);
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
-	cbMatchMode->addItem(dataManager.GetSysString(1243));
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
-	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
-	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 150, 320, 170), wCreateHost, -1, dataManager.GetSysString(1229));
-	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(20, 180, 320, 200), wCreateHost, -1, dataManager.GetSysString(1230));
+	cbMatchMode->addItem(dataManager.GetSysString(1245));
+	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 120, 360, 140), wCreateHost, -1, dataManager.GetSysString(1236));
+	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
+	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 180, 170, 200), wCreateHost, -1, dataManager.GetSysString(1229));
+	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 210, 320, 230), false, false, wCreateHost);
 	myswprintf(dataManager.strBuffer, L"%d", 8000);
-	ebStartLP = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 205, 220, 230), true, wCreateHost);
+	ebStartLP = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 210, 220, 230), true, wCreateHost);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1232), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
 	myswprintf(dataManager.strBuffer, L"%d", 5);
-	ebStartHand = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 235, 220, 260), true, wCreateHost);
+	ebStartHand = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 240, 220, 260), true, wCreateHost);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1233), rect<s32>(20, 270, 320, 290), false, false, wCreateHost);
 	myswprintf(dataManager.strBuffer, L"%d", 1);
-	ebDrawCount = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 265, 220, 290), true, wCreateHost);
+	ebDrawCount = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 270, 220, 290), true, wCreateHost);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 360, 220, 380), false, false, wCreateHost);
 	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 355, 250, 380), true, wCreateHost);
@@ -128,29 +130,27 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	//host(single)
-	wHostSingle = env->addWindow(rect<s32>(220, 120, 800, 480), false, dataManager.GetSysString(1245));
+	wHostSingle = env->addWindow(rect<s32>(270, 120, 750, 420), false, dataManager.GetSysString(1250));
 	wHostSingle->getCloseButton()->setVisible(false);
 	wHostSingle->setVisible(false);
-	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 50), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1246));
-	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(140, 30, 340, 50), true, false, wHostSingle);
-	btnHostSingleKick[0] = env->addButton(rect<s32>(115, 30, 135, 50), wHostSingle, BUTTON_HS_KICK, L"X");
-	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(140, 55, 340, 75), true, false, wHostSingle);
-	btnHostSingleKick[1] = env->addButton(rect<s32>(115, 55, 135, 75), wHostSingle, BUTTON_HS_KICK, L"X");
-	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(350, 30, 370, 50), wHostSingle, -1, L"");
+	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1251));
+	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(40, 65, 240, 85), true, false, wHostSingle);
+	btnHostSingleKick[0] = env->addButton(rect<s32>(10, 65, 30, 85), wHostSingle, BUTTON_HS_KICK, L"X");
+	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(250, 65, 270, 85), wHostSingle, -1, L"");
 	chkHostSingleReady[0]->setEnabled(false);
-	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(350, 55, 370, 75), wHostSingle, -1, L"");
+	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(40, 90, 240, 110), true, false, wHostSingle);
+	btnHostSingleKick[1] = env->addButton(rect<s32>(10, 90, 30, 110), wHostSingle, BUTTON_HS_KICK, L"X");
+	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(250, 90, 270, 110), wHostSingle, -1, L"");
 	chkHostSingleReady[1]->setEnabled(false);
-	btnHostSingleOB = env->addButton(rect<s32>(10, 90, 110, 110), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1247));
-	for(int i = 0; i < 8; ++i) {
-		stHostSingleOB[i] = env->addStaticText(L"", rect<s32>(140, 90 + 25 * i, 340, 110 + 25 * i), true, false, wHostSingle);
-		btnHostSingleKick[i + 2] = env->addButton(rect<s32>(115, 90 + 25 * i, 135, 110 + 25 * i), wHostSingle, BUTTON_HS_KICK, L"X");
-	}
-	stHostSingleRule = env->addStaticText(L"", rect<s32>(380, 30, 560, 330), false, true, wHostSingle);
-	env->addStaticText(dataManager.GetSysString(1248), rect<s32>(380, 190, 560, 210), false, false, wHostSingle);
-	cbDeckSelect = env->addComboBox(rect<s32>(380, 215, 560, 240), wHostSingle);
-	btnHostSingleReady = env->addButton(rect<s32>(450, 250, 560, 275), wHostSingle, BUTTON_HS_READY, dataManager.GetSysString(1249));
-	btnHostSingleStart = env->addButton(rect<s32>(330, 315, 440, 340), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1215));
-	btnHostSingleCancel = env->addButton(rect<s32>(450, 315, 560, 340), wHostSingle, BUTTON_HS_CANCEL, dataManager.GetSysString(1212));
+	btnHostSingleOB = env->addButton(rect<s32>(10, 120, 110, 145), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1252));
+	myswprintf(dataManager.strBuffer, L"%ls%d", dataManager.GetSysString(1253), 0);
+	stHostSingleOB = env->addStaticText(dataManager.strBuffer, rect<s32>(10, 150, 270, 170), false, false, wHostSingle);
+	stHostSingleRule = env->addStaticText(L"", rect<s32>(280, 30, 460, 230), false, true, wHostSingle);
+	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 185, 110, 205), false, false, wHostSingle);
+	cbDeckSelect = env->addComboBox(rect<s32>(120, 180, 270, 205), wHostSingle);
+	btnHostSingleReady = env->addButton(rect<s32>(120, 215, 270, 240), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1255));
+	btnHostSingleStart = env->addButton(rect<s32>(230, 260, 340, 285), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1215));
+	btnHostSingleCancel = env->addButton(rect<s32>(350, 260, 460, 285), wHostSingle, BUTTON_HS_CANCEL, dataManager.GetSysString(1212));
 	//img
 	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
@@ -673,7 +673,9 @@ void Game::ShowCardInfo(int code) {
 	wchar_t formatBuffer[256];
 	dataManager.GetData(code, &cd);
 	imgCard->setImage(imageManager.GetTexture(code));
-	myswprintf(formatBuffer, L"%ls", dataManager.GetName(code));
+	if(cd.alias != 0 && (cd.alias - code < 10 || code - cd.alias < 10))
+		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
+	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
 	stName->setText(formatBuffer);
 	if(cd.type & TYPE_MONSTER) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));

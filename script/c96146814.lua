@@ -2,7 +2,7 @@
 function c96146814.initial_effect(c)
 	--adchange
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(96146814,1))
+	e1:SetDescription(aux.Stringid(96146814,0))
 	e1:SetCategory(CATEGORY_POSITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
