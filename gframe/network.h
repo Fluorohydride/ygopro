@@ -45,18 +45,27 @@ struct CTOS_CreateGame {
 struct CTOS_JoinGame {
 	unsigned int gameid;
 };
-struct CTOS_ExitGame {
-};
-struct CTOS_HS_Command {
-	unsigned char cmd;
-};
 
 struct STOC_CreateGame {
 	unsigned int gameid;
 };
 struct STOC_JoinGame {
+	HostInfo info;
+	bool is_host;
 };
 struct STOC_ExitGame {
+};
+struct STOC_HS_PlayerEnter {
+	unsigned short name[20];
+};
+struct STOC_HS_PlayerChange {
+	unsigned char status;
+};
+struct STOC_HS_ReadyChange {
+	unsigned char ready;
+};
+struct STOC_HS_WatchChange {
+	unsigned short watch_count;
 };
 
 class NetManager {
@@ -138,18 +147,20 @@ extern const unsigned short PROTO_VERSION;
 #define CTOS_CREATE_GAME	0x11
 #define CTOS_JOIN_GAME		0x12
 #define CTOS_EXIT_GAME		0x13
-#define CTOS_HS_COMMAND		0x14
-#define HS_COMMAND_TODUELIST	0x1
-#define HS_COMMAND_TOOBSERVER	0x2
-#define HS_COMMAND_READY		0x3
-#define HS_COMMAND_KICK1		0x4
-#define HS_COMMAND_KICK2		0x5
-#define HS_COMMAND_START		0x6
+#define CTOS_HS_TODUELIST	0x20
+#define CTOS_HS_TOOBSERVER	0x21
+#define CTOS_HS_READY		0x22
+#define CTOS_HS_KICK1		0x23
+#define CTOS_HS_KICK2		0x24
+#define CTOS_HS_START		0x25
 
 #define STOC_CREATE_GAME	0x11
-#define STOC_JION_GAME		0x12
+#define STOC_JOIN_GAME		0x12
 #define STOC_EXIT_GAME		0x13
-#define STOC_
+#define STOC_HS_PLAYER_ENTER	0x20
+#define STOC_HS_PLAYER_CHANGE	0x21
+#define STOC_HS_READY_CHANGE	0x22
+#define STOC_HS_WATCH_CHANGE	0x23
 
 #define MODE_SINGLE		0x1
 #define MODE_MATCH		0x2

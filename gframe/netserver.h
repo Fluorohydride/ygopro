@@ -8,6 +8,8 @@
 #include <event2/buffer.h>
 #include <event2/thread.h>
 #include "network.h"
+#include "data_manager.h"
+#include "deck_manager.h"
 #include <array>
 #include <set>
 #include <unordered_map>
@@ -59,6 +61,7 @@ public:
 public:
 	DuelPlayer* players[6];
 	bool ready[6];
+	Deck pdeck[6];
 	std::set<DuelPlayer*> observers;
 	DuelPlayer* host_player;
 	HostInfo host_info;

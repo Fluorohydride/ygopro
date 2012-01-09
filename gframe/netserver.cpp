@@ -119,7 +119,17 @@ void NetServer::HandleCTOSPacket(DuelPlayer& dp, char* data, unsigned int len) {
 	}
 	case CTOS_EXIT_GAME:
 		break;
-	case CTOS_HS_COMMAND:
+	case CTOS_HS_TODUELIST:
+		break;
+	case CTOS_HS_TOOBSERVER:
+		break;
+	case CTOS_HS_READY:
+		break;
+	case CTOS_HS_KICK1:
+		break;
+	case CTOS_HS_KICK2:
+		break;
+	case CTOS_HS_START:
 		break;
 	}
 }
