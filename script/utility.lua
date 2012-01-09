@@ -151,6 +151,7 @@ function Auxiliary.SynOperation2(f1,f2)
 				if tuner then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 					g=Duel.SelectMatchingCard(tp,Auxiliary.SynFilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,tuner,c,lv-tuner:GetLevel(),f2)
+					g:AddCard(tuner)
 				else
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 					g=Duel.SelectMatchingCard(tp,Auxiliary.SynFilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,c,lv,f1,f2)

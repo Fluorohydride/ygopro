@@ -6,7 +6,7 @@ project "gframe"
     files { "**.cpp", "**.cc", "**.c", "**.h" }
     excludes "lzma/**"
     includedirs { "../ocgcore" }
-    links { "ocgcore", "clzma", "irrlicht", "freetype", "sqlite3", "lua" }
+    links { "ocgcore", "clzma", "irrlicht", "freetype", "sqlite3", "lua" , "event"}
 
     configuration "windows"
         links { "opengl32", "wsock32", "winmm", "gdi32", "kernel32", "user32" }

@@ -9,11 +9,7 @@
 namespace ygo {
 
 struct HostInfo {
-	unsigned short identifier;
-	unsigned short version;
-	unsigned int address;
-	unsigned short port;
-	char name[32];
+	unsigned short name[20];
 	unsigned char rule;
 	unsigned char mode;
 	unsigned int lflist;
@@ -24,8 +20,43 @@ struct HostInfo {
 	unsigned char draw_count;
 };
 
+struct HostPacket {
+	unsigned short identifier;
+	unsigned short version;
+	unsigned int address;
+	unsigned short port;
+	HostInfo host;
+};
+
 struct HostRequest {
 	unsigned short identifier;
+};
+
+struct CTOS_Response {
+};
+struct CTOS_ChangeDeck {
+};
+struct CTOS_PlayerInfo {
+	unsigned short name[20];
+};
+struct CTOS_CreateGame {
+	HostInfo info;
+};
+struct CTOS_JoinGame {
+	unsigned int gameid;
+};
+struct CTOS_ExitGame {
+};
+struct CTOS_HS_Command {
+	unsigned char cmd;
+};
+
+struct STOC_CreateGame {
+	unsigned int gameid;
+};
+struct STOC_JoinGame {
+};
+struct STOC_ExitGame {
 };
 
 class NetManager {
@@ -100,4 +131,26 @@ extern const unsigned short PROTO_VERSION;
 
 #define NETWORK_SERVER_ID	0x7428
 #define NETWORK_CLIENT_ID	0xdef6
+
+#define CTOS_RESPONSE		0x1
+#define CTOS_CHANGEDECK		0x2
+#define CTOS_PLAYER_INFO	0x10
+#define CTOS_CREATE_GAME	0x11
+#define CTOS_JOIN_GAME		0x12
+#define CTOS_EXIT_GAME		0x13
+#define CTOS_HS_COMMAND		0x14
+#define HS_COMMAND_TODUELIST	0x1
+#define HS_COMMAND_TOOBSERVER	0x2
+#define HS_COMMAND_READY		0x3
+#define HS_COMMAND_KICK1		0x4
+#define HS_COMMAND_KICK2		0x5
+#define HS_COMMAND_START		0x6
+
+#define STOC_CREATE_GAME	0x11
+#define STOC_JION_GAME		0x12
+#define STOC_EXIT_GAME		0x13
+#define STOC_
+
+#define MODE_SINGLE		0x1
+#define MODE_MATCH		0x2
 #endif //NETWORK_H

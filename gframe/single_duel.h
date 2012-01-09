@@ -5,7 +5,7 @@
 
 namespace ygo {
 
-class SingleDuel {
+class SingleDuel: public DuelMode {
 	
 };
 

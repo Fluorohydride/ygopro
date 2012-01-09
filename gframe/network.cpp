@@ -8,17 +8,6 @@ const unsigned short PROTO_VERSION = 0x1020;
 bool NetManager::CreateHost(int ipindex) {
 	wchar_t* pstr;
 	int wp;
-	hInfo.identifier = NETWORK_SERVER_ID;
-	hInfo.version = PROTO_VERSION;
-	for(wp = 0, pstr = (wchar_t*)mainGame->ebServerName->getText(); wp < 19 && pstr[wp]; ++wp)
-		hInfo.name[wp] = pstr[wp];
-	hInfo.port = serv_port;
-	hInfo.name[wp] = 0;
-	hInfo.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
-	hInfo.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
-	hInfo.start_lp = _wtoi(mainGame->ebStartLP->getText());
-	hInfo.start_hand = _wtoi(mainGame->ebStartHand->getText());
-	hInfo.draw_count = _wtoi(mainGame->ebDrawCount->getText());
 	sBHost = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if(sBHost == INVALID_SOCKET)
 		return false;
@@ -196,15 +185,6 @@ int NetManager::BroadcastClient(void* np) {
 	net->hosts.clear();
 	SOCKADDR_IN sockFrom;
 	int sz = sizeof(SOCKADDR_IN);
-	while(result != 0 && result != SOCKET_ERROR) {
-		int recvLen = recvfrom(net->sBClient, (char*)&net->hInfo, sizeof(HostInfo), 0, (sockaddr*)&sockFrom, &sz);
-		if(recvLen == sizeof(HostInfo) && net->hInfo.identifier == NETWORK_SERVER_ID
-		        && net->hInfo.version == PROTO_VERSION && addrset.find(sockFrom.sin_addr.s_addr) == addrset.end()) {
-			net->hInfo.address = sockFrom.sin_addr.s_addr;
-			net->hosts.push_back(net->hInfo);
-		}
-		result = select(0, &fds, 0, 0, &tv);
-	}
 	if(mainGame->is_closing)
 		return 0;
 	wchar_t tbuf[256];

@@ -3248,7 +3248,8 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 			break;
 		}
 		case MSG_SHUFFLE_HAND: {
-			player = mainGame->LocalPlayer(NetManager::ReadInt8(pbuf));
+			int oplayer = NetManager::ReadInt8(pbuf);
+			player = mainGame->LocalPlayer(oplayer);
 			mainGame->WaitFrameSignal(5);
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				(*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
@@ -3258,7 +3259,7 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 				(*cit)->aniFrame = 5;
 			}
 			mainGame->WaitFrameSignal(10);
-			mainGame->ReplayRefreshHand(player);
+			mainGame->ReplayRefreshHand(oplayer);
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 				(*cit)->is_hovered = false;
 				mainGame->dField.MoveCard(*cit, 5);
