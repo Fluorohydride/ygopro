@@ -269,7 +269,7 @@ void ClientField::UpdateFieldCard(int controler, int location, char* data) {
 		return;
 	int len;
 	for(cit = lst->begin(); cit != lst->end(); ++cit) {
-		len = NetManager::ReadInt32(data);
+		len = BufferIO::ReadInt32(data);
 		if(len > 8)
 			(*cit)->UpdateInfo(data);
 		data += len - 4;

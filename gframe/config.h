@@ -14,7 +14,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include "mytimer.h"
+#include "bufferio.h"
 #include "mymutex.h"
 #include "mysignal.h"
 #include "mythread.h"

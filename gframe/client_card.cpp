@@ -41,42 +41,42 @@ void ClientCard::SetCode(int code) {
 	this->code = code;
 }
 void ClientCard::UpdateInfo(char* buf) {
-	int flag = NetManager::ReadInt32(buf);
+	int flag = BufferIO::ReadInt32(buf);
 	if(flag == 0)
 		return;
 	int pdata;
 	if(flag & QUERY_CODE) {
-		pdata = NetManager::ReadInt32(buf);
+		pdata = BufferIO::ReadInt32(buf);
 		if(location == LOCATION_HAND && controler == 1 && pdata != code)
 			mainGame->dField.MoveCard(this, 5);
 		code = pdata;
 	}
 	if(flag & QUERY_POSITION)
-		pdata = NetManager::ReadInt32(buf);
+		pdata = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_ALIAS)
-		alias = NetManager::ReadInt32(buf);
+		alias = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_TYPE)
-		type = NetManager::ReadInt32(buf);
+		type = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LEVEL) {
-		pdata = NetManager::ReadInt32(buf);
+		pdata = BufferIO::ReadInt32(buf);
 		if(pdata && level != pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
 	}
 	if(flag & QUERY_RANK) {
-		pdata = NetManager::ReadInt32(buf);
+		pdata = BufferIO::ReadInt32(buf);
 		if(pdata && rank != pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
 		}
 	}
 	if(flag & QUERY_ATTRIBUTE)
-		attribute = NetManager::ReadInt32(buf);
+		attribute = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_RACE)
-		race = NetManager::ReadInt32(buf);
+		race = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_ATTACK) {
-		attack = NetManager::ReadInt32(buf);
+		attack = BufferIO::ReadInt32(buf);
 		if(attack < 0) {
 			atkstring[0] = '?';
 			atkstring[1] = 0;
@@ -84,7 +84,7 @@ void ClientCard::UpdateInfo(char* buf) {
 			myswprintf(atkstring, L"%d", attack);
 	}
 	if(flag & QUERY_DEFENCE) {
-		defence = NetManager::ReadInt32(buf);
+		defence = BufferIO::ReadInt32(buf);
 		if(defence < 0) {
 			defstring[0] = '?';
 			defstring[1] = 0;
@@ -92,15 +92,15 @@ void ClientCard::UpdateInfo(char* buf) {
 			myswprintf(defstring, L"%d", defence);
 	}
 	if(flag & QUERY_BASE_ATTACK)
-		base_attack = NetManager::ReadInt32(buf);
+		base_attack = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_BASE_DEFENCE)
-		base_defence = NetManager::ReadInt32(buf);
+		base_defence = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_REASON)
-		reason = NetManager::ReadInt32(buf);
+		reason = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_IS_DISABLED)
-		is_disabled = NetManager::ReadInt32(buf);
+		is_disabled = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_IS_PUBLIC)
-		is_public = NetManager::ReadInt32(buf);
+		is_public = BufferIO::ReadInt32(buf);
 }
 void ClientCard::ClearTarget() {
 	for(auto cit = cardTarget.begin(); cit != cardTarget.end(); ++cit)

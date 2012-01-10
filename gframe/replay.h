@@ -33,7 +33,7 @@ public:
 	void SaveReplay(const wchar_t* name);
 	bool OpenReplay(const wchar_t* name);
 	bool CheckReplay(const wchar_t* name);
-	bool ReadNextResponse();
+	bool ReadNextResponse(unsigned char resp[64]);
 	void ReadHeader(ReplayHeader& header);
 	void ReadData(void* data, unsigned int length);
 	int ReadInt32();

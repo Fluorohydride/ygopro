@@ -17,67 +17,7 @@ int Game::LocalPlayer(int player) {
 const wchar_t* Game::LocalName(int local_player) {
 	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
 }
-bool Game::SendByte(int player, char val) {
-	netManager.send_buf[2] = val;
-	return SendGameMessage(player, netManager.send_buffer_ptr, 1);
-}
-bool Game::SendGameMessage(int player, char* buf, int len) {
-	*(short*)(buf - 2) = len;
-	if(dInfo.is_host_player[player]) {
-		gBuffer.Lock();
-		memcpy(&msgBuffer[dInfo.msgLen], buf - 2, len + 2);
-		dInfo.msgLen += len + 2;
-		localMessage.Set();
-		gBuffer.Unlock();
-		return true;
-	} else {
-		return netManager.SendtoRemote(buf - 2, len + 2);
-	}
-}
-bool Game::WaitforResponse(int player) {
-	if(!SendByte(1 - player, MSG_WAITING))
-		return false;
-	dInfo.resPlayer = player;
-	if(dInfo.is_host_player[player]) {
-		localResponse.Wait();
-		return true;
-	} else {
-		return netManager.WaitClientResponse();
-	}
-}
-void Game::SetResponseI() {
-	if(dInfo.is_responsed)
-		return;
-	dInfo.is_responsed = true;
-	if(dInfo.is_local_host) {
-		set_responsei(dInfo.pDuel, dInfo.responseI);
-		lastReplay.WriteInt8(1, false);
-		lastReplay.WriteInt32(dInfo.responseI);
-	} else {
-		char* pbuf = netManager.send_buf;
-		NetManager::WriteInt8(pbuf, 1);
-		NetManager::WriteInt32(pbuf, dInfo.responseI);
-		netManager.SendtoRemote(netManager.send_buf, 5);
-	}
-}
-void Game::SetResponseB(int len) {
-	if(dInfo.is_responsed)
-		return;
-	dInfo.is_responsed = true;
-	if(dInfo.is_local_host) {
-		set_responseb(dInfo.pDuel, (byte*)dInfo.responseB);
-		lastReplay.WriteInt8(2, false);
-		lastReplay.WriteInt8(len, false);
-		lastReplay.WriteData(dInfo.responseB, len);
-	} else {
-		char* pbuf = netManager.send_buf;
-		NetManager::WriteInt8(pbuf, 2);
-		NetManager::WriteInt8(pbuf, len);
-		for(int i = 0; i < len; ++i)
-			pbuf[i] = dInfo.responseB[i];
-		netManager.SendtoRemote(netManager.send_buf, 2 + len);
-	}
-}
+/*
 bool Game::RefreshMzone(int player, int flag, int use_cache) {
 	int len = query_field_card(dInfo.pDuel, player, LOCATION_MZONE, flag, (unsigned char*)queryBuffer, use_cache);
 	char* pbuf = netManager.send_buffer_ptr;
@@ -3564,5 +3504,5 @@ bool Game::AnalyzeReplay(void* pd, char* engbuf) {
 	}
 	return true;
 }
-
+*/
 }

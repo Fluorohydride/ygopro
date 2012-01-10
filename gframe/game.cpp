@@ -5,6 +5,7 @@
 #ifndef WIN32
 #include <sys/types.h>
 #include <dirent.h>
+#include "replay.h"
 #endif
 
 namespace ygo {
@@ -36,9 +37,8 @@ bool Game::Initialize() {
 	always_chain = false;
 	ignore_chain = false;
 	is_building = false;
+	exit_window = 0;
 	memset(&dInfo, 0, sizeof(DuelInfo));
-	netManager.GetLocalAddress();
-	netManager.send_buffer_ptr = &netManager.send_buf[2];
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -412,10 +412,7 @@ bool Game::Initialize() {
 	return true;
 }
 void Game::MainLoop() {
-	int fps = 0;
 	wchar_t cap[256];
-	gTimer.Reset();
-	float st, ed;
 	is_closing = false;
 	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
@@ -427,11 +424,14 @@ void Game::MainLoop() {
 	light->getLightData().AmbientColor = SColorf(1.0f, 1.0f, 1.0f);
 	light->getLightData().DiffuseColor = SColorf(0.0f, 0.0f, 0.0f);
 	float atkframe = 0.1f;
+	irr::ITimer* timer = device->getTimer();
+	timer->setTime(0);
+	int fps = 0;
+	unsigned int last_time = 0, cur_time = 0;
 	while(device->run()) {
 		linePattern = (linePattern << 1) | (linePattern >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
-		st = gTimer.GetElapsedTime();
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		if(imageManager.tBackGround)
 			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getSize().Width, imageManager.tBackGround->getSize().Height));
@@ -454,6 +454,11 @@ void Game::MainLoop() {
 			if(!signalFrame)
 				frameSignal.Set();
 		}
+		if(exit_window && !fadingFrame) {
+			irr::SEvent sevt;
+			sevt.EventType = irr::EET_USER_EVENT;
+			sevt.UserEvent.UserData1 = UEVENT_TOWINDOW;
+		}
 		if(waitFrame >= 0) {
 			waitFrame++;
 			if(waitFrame % 90 == 0) {
@@ -466,24 +471,22 @@ void Game::MainLoop() {
 		}
 		driver->endScene();
 		fps++;
-		ed = gTimer.GetElapsedTime();
-		if(ed - st < 16900) {
-			gTimer.Wait(16900 + st - ed);
-		}
-		if(ed >= 1000000.0f) {
+		cur_time = timer->getTime();
+		if(cur_time < fps * 17 - 20)
+#ifdef _WIN32
+			Sleep(20);
+#else
+			usleep(20000000);
+#endif
+		if(cur_time >= 1000) {
 			myswprintf(cap, L"FPS: %d", fps);
 			device->setWindowCaption(cap);
 			fps = 0;
-			gTimer.Reset();
+			cur_time -= 1000;
+			timer->setTime(0);
 		}
 	}
 	is_closing = true;
-	shutdown(netManager.sBHost, SD_BOTH);
-	closesocket(netManager.sBHost);
-	shutdown(netManager.sListen, SD_BOTH);
-	closesocket(netManager.sListen);
-	shutdown(netManager.sRemote, SD_BOTH);
-	closesocket(netManager.sRemote);
 	SaveConfig();
 	device->drop();
 }

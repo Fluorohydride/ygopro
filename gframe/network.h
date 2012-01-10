@@ -2,7 +2,6 @@
 #define NETWORK_H
 
 #include "config.h"
-#include <event2/event.h>
 #include <set>
 #include <vector>
 
@@ -51,7 +50,7 @@ struct STOC_CreateGame {
 };
 struct STOC_JoinGame {
 	HostInfo info;
-	bool is_host;
+	unsigned char type;
 };
 struct STOC_ExitGame {
 };
@@ -66,72 +65,6 @@ struct STOC_HS_ReadyChange {
 };
 struct STOC_HS_WatchChange {
 	unsigned short watch_count;
-};
-
-class NetManager {
-public:
-	unsigned int local_addr[8];
-	unsigned short serv_port;
-	unsigned int remote_addr;
-	unsigned short remote_port;
-	bool is_creating_host;
-	SOCKET sBHost;
-	SOCKET sBClient;
-	SOCKET sListen;
-	SOCKET sRemote;
-	HostInfo hInfo;
-	HostRequest hReq;
-	std::vector<HostInfo> hosts;
-	char* send_buffer_ptr;
-	char send_buf[4096];
-	char recv_buf[4096];
-
-	bool CreateHost(int ipindex);
-	bool CancelHost();
-	bool RefreshHost(int ipindex);
-	bool JoinHost();
-	bool SendtoRemote(char* buf, int len);
-	bool WaitClientResponse();
-
-	inline static int ReadInt32(char*& p) {
-		int ret = *(int*)p;
-		p += 4;
-		return ret;
-	}
-	inline static short ReadInt16(char*& p) {
-		short ret = *(short*)p;
-		p += 2;
-		return ret;
-	}
-	inline static char ReadInt8(char*& p) {
-		char ret = *(char*)p;
-		p++;
-		return ret;
-	}
-	inline static unsigned char ReadUInt8(char*& p) {
-		unsigned char ret = *(unsigned char*)p;
-		p++;
-		return ret;
-	}
-	inline static void WriteInt32(char*& p, int val) {
-		(*(int*)p) = val;
-		p += 4;
-	}
-	inline static void WriteInt16(char*& p, short val) {
-		(*(short*)p) = val;
-		p += 2;
-	}
-	inline static void WriteInt8(char*& p, char val) {
-		*p = val;
-		p++;
-	}
-
-	int GetLocalAddress();
-	static int BroadcastServer(void*);
-	static int BroadcastClient(void*);
-	static int ListenThread(void*);
-	static int JoinThread(void*);
-
 };
 
 extern const unsigned short PROTO_VERSION;
@@ -161,6 +94,11 @@ extern const unsigned short PROTO_VERSION;
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_READY_CHANGE	0x22
 #define STOC_HS_WATCH_CHANGE	0x23
+
+#define PLAYERCHANGE_READY		0x1
+#define PLAYERCHANGE_NOTREADY	0x2
+#define PLAYERCHANGE_LEAVE		0x3
+#define PLAYERCHANGE_OBSERVE	0x4
 
 #define MODE_SINGLE		0x1
 #define MODE_MATCH		0x2

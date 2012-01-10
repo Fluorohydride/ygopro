@@ -9,7 +9,6 @@
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
-#include "network.h"
 #include "deck_manager.h"
 #include "replay.h"
 #include <string>
@@ -38,10 +37,7 @@ struct DuelInfo {
 	bool is_first_turn;
 	bool is_local_host;
 	bool is_responsed;
-	long pDuel;
 	int resPlayer;
-	int responseI;
-	char responseB[64];
 	int lp[2];
 	int engFlag;
 	int engLen;
@@ -91,12 +87,7 @@ public:
 	
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
-	bool SendByte(int player, char val);
-	bool SendGameMessage(int player, char* buf, int len);
-	bool WaitforResponse(int player);
-	void SetResponseI();
-	void SetResponseB(int len);
-	bool RefreshMzone(int player, int flag = 0x181fff, int use_cache = 1);
+/*	bool RefreshMzone(int player, int flag = 0x181fff, int use_cache = 1);
 	bool RefreshSzone(int player, int flag = 0x181fff, int use_cache = 1);
 	bool RefreshHand(int player, int flag = 0x181fff, int use_cache = 1);
 	bool RefreshGrave(int player, int flag = 0x181fff, int use_cache = 1);
@@ -116,7 +107,7 @@ public:
 	static int GameThread(void*);
 	static bool SolveMessage(void*, char*, int);
 	static int ReplayThread(void* pd);
-	static bool AnalyzeReplay(void*, char*);
+	static bool AnalyzeReplay(void*, char*);*/
 
 	//
 	char msgBuffer[0x1000];
@@ -125,7 +116,6 @@ public:
 	bool is_closing;
 	bool is_refreshing;
 	mtrandom rnd;
-	Timer gTimer;
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;
@@ -133,7 +123,6 @@ public:
 	Signal localResponse;
 	Signal localAction;
 	Config gameConf;
-	NetManager netManager;
 	DataManager dataManager;
 	ImageManager imageManager;
 	DeckManager deckManager;
@@ -160,6 +149,7 @@ public:
 	int showcardp;
 	int is_attacking;
 	int attack_sv;
+	irr::gui::IGUIElement* exit_window;
 	irr::core::vector3df atk_r;
 	irr::core::vector3df atk_t;
 	float atkdy;
@@ -367,6 +357,9 @@ public:
 extern Game* mainGame;
 
 }
+
+#define UEVENT_EXIT			0x1
+#define UEVENT_TOWINDOW		0x2
 
 #define COMMAND_ACTIVATE	0x0001
 #define COMMAND_SUMMON		0x0002

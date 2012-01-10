@@ -1,4 +1,3 @@
-#include "game.h"
 #include "replay.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/card.h"
@@ -146,19 +145,17 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	fclose(fp);
 	return pheader.id == 0x31707279 && pheader.version >= 0x1008;
 }
-bool Replay::ReadNextResponse() {
+bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	char resType = *pdata++;
 	if(pdata - replay_data >= replay_size)
 		return false;
 	if(resType == 1) {
-		mainGame->dInfo.responseI = *((int*)pdata);
+		*((int*)resp) = *((int*)pdata);
 		pdata += 4;
-		set_responsei(mainGame->dInfo.pDuel, mainGame->dInfo.responseI);
 	} else if(resType = 2) {
 		int len = *pdata++;
 		for(int i = 0; i < len; ++i)
-			mainGame->dInfo.responseB[i] = *pdata++;
-		set_responseb(mainGame->dInfo.pDuel, (byte*)mainGame->dInfo.responseB);
+			resp[i] = *pdata++;
 	} else
 		return false;
 	return true;
