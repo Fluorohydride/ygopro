@@ -1,5 +1,7 @@
 #include "config.h"
 #include "menu_handler.h"
+#include "netserver.h"
+#include "duelclient.h"
 #include "game.h"
 
 namespace ygo {
@@ -21,6 +23,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
+				mainGame->btnCreateHost->setEnabled(false);
+				mainGame->btnJoinHost->setEnabled(false);
+				mainGame->btnJoinCancel->setEnabled(false);
 				break;
 			}
 			case BUTTON_JOIN_CANCEL: {
@@ -28,11 +33,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CREATE_HOST: {
+				mainGame->btnHostConfirm->setEnabled(true);
+				mainGame->btnHostCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wCreateHost);
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				mainGame->HideElement(mainGame->wCreateHost, false, mainGame->wHostSingle);
+				if(NetServer::StartServer(mainGame->gameConf.serverport))
+					break;
+				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+					NetServer::StopServer();
+					break;
+				}
+				mainGame->btnHostConfirm->setEnabled(false);
+				mainGame->btnHostCancel->setEnabled(false);
 				break;
 			}
 			case BUTTON_HOST_CANCEL: {

@@ -44,7 +44,8 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	bufferevent* bev = bufferevent_socket_new(net_evbase, fd, BEV_OPT_CLOSE_ON_FREE);
 	DuelPlayer dp;
 	dp.name[0] = 0;
-	dp.output = bufferevent_get_output(bev);
+	dp.type = 0xff;
+	dp.bev = bev;
 	users[bev] = dp;
 	bufferevent_setcb(bev, ServerEchoRead, NULL, ServerEchoEvent, NULL);
 	bufferevent_enable(bev, EV_READ | EV_WRITE);
@@ -77,8 +78,17 @@ void NetServer::ServerEchoEvent(bufferevent* bev, short events, void* ctx) {
 int NetServer::ServerThread(void* param) {
 	event_base_dispatch(net_evbase);
 	event_base_free(net_evbase);
+	for(auto bit = users.begin(); bit != users.end(); ++bit)
+		bufferevent_free(bit->first);
 	net_evbase = 0;
 	return 0;
+}
+void NetServer::DisconnectPlayer(DuelPlayer* dp) {
+	auto bit = users.find(dp->bev);
+	if(bit != users.end()) {
+		users.erase(bit);
+		bufferevent_free(dp->bev);
+	}
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	char* pdata = data;
@@ -106,12 +116,30 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 			duel_mode = new MatchDuel;
 		}
 		duel_mode->host_info = pkt->info;
+		for(int i = 0; i < 20; ++i) {
+			duel_mode->name[i] = pkt->name[i];
+			duel_mode->pass[i] = pkt->pass[i];
+		}
 	}
 	case CTOS_JOIN_GAME: {
-		if(dp->game)
-			return;
-		if(!duel_mode)
-			return;
+		if(pktType != CTOS_CREATE_GAME) {
+			if((dp->game && dp->type != 0xff) || !duel_mode) {
+				STOC_JoinFail scjf;
+				scjf.reason = 0;
+				SendPacketToPlayer(dp, STOC_JOIN_FAIL, scjf);
+				break;
+			}
+			CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
+			wchar_t jpass[20];
+			for(int i = 0; i < 20; ++i) jpass[i] = pkt->pass[i];
+			jpass[20] = 0;
+			if(wcscmp(jpass, duel_mode->pass)) {
+				STOC_JoinFail scjf;
+				scjf.reason = 1;
+				SendPacketToPlayer(dp, STOC_JOIN_FAIL, scjf);
+				break;
+			}
+		}
 		dp->game = duel_mode;
 		if(!duel_mode->players[0] && !duel_mode->players[1] && duel_mode->observers.size() == 0)
 			duel_mode->host_player = dp;
@@ -141,14 +169,14 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 			duel_mode->observers.insert(dp);
 			dp->type = NETPLAYER_TYPE_OBSERVER;
 			scjg.type |= NETPLAYER_TYPE_OBSERVER;
-			STOC_HS_ReadyChange scrc;
-			scrc.ready = duel_mode->observers.size();
+			STOC_HS_WatchChange scwc;
+			scwc.watch_count = duel_mode->observers.size();
 			if(duel_mode->players[0])
-				NetServer::SendPacketToPlayer(duel_mode->players[0], STOC_HS_READY_CHANGE, scrc);
+				NetServer::SendPacketToPlayer(duel_mode->players[0], STOC_HS_WATCH_CHANGE, scwc);
 			if(duel_mode->players[1])
-				NetServer::SendPacketToPlayer(duel_mode->players[1], STOC_HS_READY_CHANGE, scrc);
+				NetServer::SendPacketToPlayer(duel_mode->players[1], STOC_HS_WATCH_CHANGE, scwc);
 			for(auto pit = duel_mode->observers.begin(); pit != duel_mode->observers.end(); ++pit)
-				NetServer::SendPacketToPlayer(*pit, STOC_HS_READY_CHANGE, scrc);
+				NetServer::SendPacketToPlayer(*pit, STOC_HS_WATCH_CHANGE, scwc);
 		}
 		NetServer::SendPacketToPlayer(dp, STOC_JOIN_GAME, scjg);
 		if(duel_mode->players[0]) {
@@ -174,9 +202,9 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 			}
 		}
 		if(duel_mode->observers.size()) {
-			STOC_HS_ReadyChange scrc;
-			scrc.ready = duel_mode->observers.size();
-			NetServer::SendPacketToPlayer(dp, STOC_HS_READY_CHANGE, scrc);
+			STOC_HS_WatchChange scwc;
+			scwc.watch_count = duel_mode->observers.size();
+			NetServer::SendPacketToPlayer(dp, STOC_HS_WATCH_CHANGE, scwc);
 		}
 		break;
 	}
