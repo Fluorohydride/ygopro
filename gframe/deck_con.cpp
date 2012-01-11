@@ -1,5 +1,8 @@
 #include "config.h"
 #include "deck_con.h"
+#include "data_manager.h"
+#include "deck_manager.h"
+#include "image_manager.h"
 #include "game.h"
 #include <algorithm>
 
@@ -14,19 +17,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				mainGame->deckManager.deckhost.main.clear();
-				mainGame->deckManager.deckhost.extra.clear();
-				mainGame->deckManager.deckhost.side.clear();
+				deckManager.deckhost.main.clear();
+				deckManager.deckhost.extra.clear();
+				deckManager.deckhost.side.clear();
 				break;
 			}
 			case BUTTON_SORT_DECK: {
-				std::sort(mainGame->deckManager.deckhost.main.begin(), mainGame->deckManager.deckhost.main.end(), ClientCard::deck_sort_lv);
-				std::sort(mainGame->deckManager.deckhost.extra.begin(), mainGame->deckManager.deckhost.extra.end(), ClientCard::deck_sort_lv);
-				std::sort(mainGame->deckManager.deckhost.side.begin(), mainGame->deckManager.deckhost.side.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.deckhost.main.begin(), deckManager.deckhost.main.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.deckhost.extra.begin(), deckManager.deckhost.extra.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.deckhost.side.begin(), deckManager.deckhost.side.end(), ClientCard::deck_sort_lv);
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
-				mainGame->deckManager.SaveDeck(mainGame->deckManager.deckhost, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+				deckManager.SaveDeck(deckManager.deckhost, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
 				mainGame->stACMessage->setText(L"保存成功");
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
@@ -48,7 +51,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				mainGame->deckManager.SaveDeck(mainGame->deckManager.deckhost, dname);
+				deckManager.SaveDeck(deckManager.deckhost, dname);
 				mainGame->ebDeckname->setText(L"");
 				mainGame->stACMessage->setText(L"保存成功");
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -63,11 +66,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->wInfos->setVisible(false);
 				mainGame->PopupElement(mainGame->wMainMenu);
 				mainGame->device->setEventReceiver(&mainGame->menuHandler);
-				mainGame->imageManager.ClearTexture();
+				imageManager.ClearTexture();
 				mainGame->scrFilter->setVisible(false);
-				wchar_t* p = mainGame->gameConf.lastdeck;
 				if(mainGame->cbDBDecks->getSelected() != -1) {
-					DataManager::CopyStr(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()), p, 63);
+					BufferIO::CopyWStr(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()), mainGame->gameConf.lastdeck, 64);
 				}
 				break;
 			}
@@ -90,25 +92,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_atktype = 1;
-						filter_atk = DataManager::GetVal(pstr + 1);
+						filter_atk = BufferIO::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_atktype = 1;
-						filter_atk = DataManager::GetVal(pstr);
+						filter_atk = BufferIO::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 2;
-							filter_atk = DataManager::GetVal(pstr + 2);
+							filter_atk = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 3;
-							filter_atk = DataManager::GetVal(pstr + 1);
+							filter_atk = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 4;
-							filter_atk = DataManager::GetVal(pstr + 2);
+							filter_atk = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 5;
-							filter_atk = DataManager::GetVal(pstr + 1);
+							filter_atk = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_atktype = 6;
@@ -119,25 +121,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_deftype = 1;
-						filter_def = DataManager::GetVal(pstr + 1);
+						filter_def = BufferIO::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_deftype = 1;
-						filter_def = DataManager::GetVal(pstr);
+						filter_def = BufferIO::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 2;
-							filter_def = DataManager::GetVal(pstr + 2);
+							filter_def = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 3;
-							filter_def = DataManager::GetVal(pstr + 1);
+							filter_def = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 4;
-							filter_def = DataManager::GetVal(pstr + 2);
+							filter_def = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 5;
-							filter_def = DataManager::GetVal(pstr + 1);
+							filter_def = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_deftype = 6;
@@ -148,25 +150,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_lvtype = 1;
-						filter_lv = DataManager::GetVal(pstr + 1);
+						filter_lv = BufferIO::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_lvtype = 1;
-						filter_lv = DataManager::GetVal(pstr);
+						filter_lv = BufferIO::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 2;
-							filter_lv = DataManager::GetVal(pstr + 2);
+							filter_lv = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 3;
-							filter_lv = DataManager::GetVal(pstr + 1);
+							filter_lv = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 4;
-							filter_lv = DataManager::GetVal(pstr + 2);
+							filter_lv = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 5;
-							filter_lv = DataManager::GetVal(pstr + 1);
+							filter_lv = BufferIO::GetVal(pstr + 1);
 						}
 					} else filter_lvtype = 0;
 				}
@@ -188,25 +190,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_atktype = 1;
-						filter_atk = DataManager::GetVal(pstr + 1);
+						filter_atk = BufferIO::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_atktype = 1;
-						filter_atk = DataManager::GetVal(pstr);
+						filter_atk = BufferIO::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 2;
-							filter_atk = DataManager::GetVal(pstr + 2);
+							filter_atk = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 3;
-							filter_atk = DataManager::GetVal(pstr + 1);
+							filter_atk = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_atktype = 4;
-							filter_atk = DataManager::GetVal(pstr + 2);
+							filter_atk = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_atktype = 5;
-							filter_atk = DataManager::GetVal(pstr + 1);
+							filter_atk = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_atktype = 6;
@@ -217,25 +219,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_deftype = 1;
-						filter_def = DataManager::GetVal(pstr + 1);
+						filter_def = BufferIO::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_deftype = 1;
-						filter_def = DataManager::GetVal(pstr);
+						filter_def = BufferIO::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 2;
-							filter_def = DataManager::GetVal(pstr + 2);
+							filter_def = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 3;
-							filter_def = DataManager::GetVal(pstr + 1);
+							filter_def = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_deftype = 4;
-							filter_def = DataManager::GetVal(pstr + 2);
+							filter_def = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_deftype = 5;
-							filter_def = DataManager::GetVal(pstr + 1);
+							filter_def = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'?') {
 						filter_deftype = 6;
@@ -246,25 +248,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				else {
 					if(*pstr == L'=') {
 						filter_lvtype = 1;
-						filter_lv = DataManager::GetVal(pstr + 1);
+						filter_lv = BufferIO::GetVal(pstr + 1);
 					} else if(*pstr >= L'0' && *pstr <= L'9') {
 						filter_lvtype = 1;
-						filter_lv = DataManager::GetVal(pstr);
+						filter_lv = BufferIO::GetVal(pstr);
 					} else if(*pstr == L'>') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 2;
-							filter_lv = DataManager::GetVal(pstr + 2);
+							filter_lv = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 3;
-							filter_lv = DataManager::GetVal(pstr + 1);
+							filter_lv = BufferIO::GetVal(pstr + 1);
 						}
 					} else if(*pstr == L'<') {
 						if(*(pstr + 1) == L'=') {
 							filter_lvtype = 4;
-							filter_lv = DataManager::GetVal(pstr + 2);
+							filter_lv = BufferIO::GetVal(pstr + 2);
 						} else {
 							filter_lvtype = 5;
-							filter_lv = DataManager::GetVal(pstr + 1);
+							filter_lv = BufferIO::GetVal(pstr + 1);
 						}
 					} else filter_lvtype = 0;
 				}
@@ -300,11 +302,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_COMBO_BOX_CHANGED: {
 			switch(id) {
 			case COMBOBOX_DBLFLIST: {
-				filterList = mainGame->deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
+				filterList = deckManager._lfList[mainGame->cbDBLFList->getSelected()].content;
 				break;
 			}
 			case COMBOBOX_DBDECKS: {
-				mainGame->deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+				deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
 				break;
 			}
 			case COMBOBOX_MAINTYPE: {
@@ -389,33 +391,33 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			click_pos = hovered_pos;
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
-			draging_pointer = mainGame->dataManager.GetCodePointer(hovered_code);
+			draging_pointer = dataManager.GetCodePointer(hovered_code);
 			int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
 			if(hovered_pos == 4) {
 				int limit = 3;
 				if(filterList->count(limitcode))
 					limit = (*filterList)[limitcode];
-				for(int i = 0; i < mainGame->deckManager.deckhost.main.size(); ++i)
-					if(mainGame->deckManager.deckhost.main[i]->first == limitcode
-					        || mainGame->deckManager.deckhost.main[i]->second.alias == limitcode)
+				for(int i = 0; i < deckManager.deckhost.main.size(); ++i)
+					if(deckManager.deckhost.main[i]->first == limitcode
+					        || deckManager.deckhost.main[i]->second.alias == limitcode)
 						limit--;
-				for(int i = 0; i < mainGame->deckManager.deckhost.extra.size(); ++i)
-					if(mainGame->deckManager.deckhost.extra[i]->first == limitcode
-					        || mainGame->deckManager.deckhost.extra[i]->second.alias == limitcode)
+				for(int i = 0; i < deckManager.deckhost.extra.size(); ++i)
+					if(deckManager.deckhost.extra[i]->first == limitcode
+					        || deckManager.deckhost.extra[i]->second.alias == limitcode)
 						limit--;
-				for(int i = 0; i < mainGame->deckManager.deckhost.side.size(); ++i)
-					if(mainGame->deckManager.deckhost.side[i]->first == limitcode
-					        || mainGame->deckManager.deckhost.side[i]->second.alias == limitcode)
+				for(int i = 0; i < deckManager.deckhost.side.size(); ++i)
+					if(deckManager.deckhost.side[i]->first == limitcode
+					        || deckManager.deckhost.side[i]->second.alias == limitcode)
 						limit--;
 				if(limit <= 0)
 					break;
 			}
 			if(hovered_pos == 1)
-				mainGame->deckManager.deckhost.main.erase(mainGame->deckManager.deckhost.main.begin() + hovered_seq);
+				deckManager.deckhost.main.erase(deckManager.deckhost.main.begin() + hovered_seq);
 			else if(hovered_pos == 2)
-				mainGame->deckManager.deckhost.extra.erase(mainGame->deckManager.deckhost.extra.begin() + hovered_seq);
+				deckManager.deckhost.extra.erase(deckManager.deckhost.extra.begin() + hovered_seq);
 			else if(hovered_pos == 3)
-				mainGame->deckManager.deckhost.side.erase(mainGame->deckManager.deckhost.side.begin() + hovered_seq);
+				deckManager.deckhost.side.erase(deckManager.deckhost.side.begin() + hovered_seq);
 			is_draging = true;
 			break;
 		}
@@ -425,18 +427,18 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			is_draging = false;
 			if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)))
 				hovered_pos = 0;
-			if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && mainGame->deckManager.deckhost.main.size() < 60) {
-				if(hovered_seq < mainGame->deckManager.deckhost.main.size())
-					mainGame->deckManager.deckhost.main.insert(mainGame->deckManager.deckhost.main.begin() + hovered_seq, draging_pointer);
-				else mainGame->deckManager.deckhost.main.push_back(draging_pointer);
-			} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && mainGame->deckManager.deckhost.extra.size() < 15) {
-				if(hovered_seq < mainGame->deckManager.deckhost.extra.size())
-					mainGame->deckManager.deckhost.extra.insert(mainGame->deckManager.deckhost.extra.begin() + hovered_seq, draging_pointer);
-				else mainGame->deckManager.deckhost.extra.push_back(draging_pointer);
-			} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && mainGame->deckManager.deckhost.side.size() < 15) {
-				if(hovered_seq < mainGame->deckManager.deckhost.side.size())
-					mainGame->deckManager.deckhost.side.insert(mainGame->deckManager.deckhost.side.begin() + hovered_seq, draging_pointer);
-				else mainGame->deckManager.deckhost.side.push_back(draging_pointer);
+			if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.deckhost.main.size() < 60) {
+				if(hovered_seq < deckManager.deckhost.main.size())
+					deckManager.deckhost.main.insert(deckManager.deckhost.main.begin() + hovered_seq, draging_pointer);
+				else deckManager.deckhost.main.push_back(draging_pointer);
+			} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.deckhost.extra.size() < 15) {
+				if(hovered_seq < deckManager.deckhost.extra.size())
+					deckManager.deckhost.extra.insert(deckManager.deckhost.extra.begin() + hovered_seq, draging_pointer);
+				else deckManager.deckhost.extra.push_back(draging_pointer);
+			} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.deckhost.side.size() < 15) {
+				if(hovered_seq < deckManager.deckhost.side.size())
+					deckManager.deckhost.side.insert(deckManager.deckhost.side.begin() + hovered_seq, draging_pointer);
+				else deckManager.deckhost.side.push_back(draging_pointer);
 			}
 			break;
 		}
@@ -446,37 +448,37 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;
 			if(!is_draging)
-				draging_pointer = mainGame->dataManager.GetCodePointer(hovered_code);
+				draging_pointer = dataManager.GetCodePointer(hovered_code);
 			if(hovered_pos == 1) {
 				if(!is_draging)
-					mainGame->deckManager.deckhost.main.erase(mainGame->deckManager.deckhost.main.begin() + hovered_seq);
-				else if(mainGame->deckManager.deckhost.side.size() < 15) {
-					mainGame->deckManager.deckhost.side.push_back(draging_pointer);
+					deckManager.deckhost.main.erase(deckManager.deckhost.main.begin() + hovered_seq);
+				else if(deckManager.deckhost.side.size() < 15) {
+					deckManager.deckhost.side.push_back(draging_pointer);
 					is_draging = false;
 				}
 			} else if(hovered_pos == 2) {
 				if(!is_draging)
-					mainGame->deckManager.deckhost.extra.erase(mainGame->deckManager.deckhost.extra.begin() + hovered_seq);
-				else if(mainGame->deckManager.deckhost.side.size() < 15) {
-					mainGame->deckManager.deckhost.side.push_back(draging_pointer);
+					deckManager.deckhost.extra.erase(deckManager.deckhost.extra.begin() + hovered_seq);
+				else if(deckManager.deckhost.side.size() < 15) {
+					deckManager.deckhost.side.push_back(draging_pointer);
 					is_draging = false;
 				}
 			} else if(hovered_pos == 3) {
 				if(!is_draging)
-					mainGame->deckManager.deckhost.side.erase(mainGame->deckManager.deckhost.side.begin() + hovered_seq);
+					deckManager.deckhost.side.erase(deckManager.deckhost.side.begin() + hovered_seq);
 				else {
-					if((draging_pointer->second.type & 0x802040) && mainGame->deckManager.deckhost.extra.size() < 15) {
-						mainGame->deckManager.deckhost.extra.push_back(draging_pointer);
+					if((draging_pointer->second.type & 0x802040) && deckManager.deckhost.extra.size() < 15) {
+						deckManager.deckhost.extra.push_back(draging_pointer);
 						is_draging = false;
-					} else if(!(draging_pointer->second.type & 0x802040) && mainGame->deckManager.deckhost.main.size() < 60) {
-						mainGame->deckManager.deckhost.main.push_back(draging_pointer);
+					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.deckhost.main.size() < 60) {
+						deckManager.deckhost.main.push_back(draging_pointer);
 						is_draging = false;
 					}
 				}
 			} else {
 				if(is_draging) {
-					if(mainGame->deckManager.deckhost.side.size() < 15) {
-						mainGame->deckManager.deckhost.side.push_back(draging_pointer);
+					if(deckManager.deckhost.side.size() < 15) {
+						deckManager.deckhost.side.push_back(draging_pointer);
 						is_draging = false;
 					}
 				} else {
@@ -484,24 +486,24 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					int limit = 3;
 					if(filterList->count(limitcode))
 						limit = (*filterList)[limitcode];
-					for(int i = 0; i < mainGame->deckManager.deckhost.main.size(); ++i)
-						if(mainGame->deckManager.deckhost.main[i]->first == limitcode
-						        || mainGame->deckManager.deckhost.main[i]->second.alias == limitcode)
+					for(int i = 0; i < deckManager.deckhost.main.size(); ++i)
+						if(deckManager.deckhost.main[i]->first == limitcode
+						        || deckManager.deckhost.main[i]->second.alias == limitcode)
 							limit--;
-					for(int i = 0; i < mainGame->deckManager.deckhost.extra.size(); ++i)
-						if(mainGame->deckManager.deckhost.extra[i]->first == limitcode
-						        || mainGame->deckManager.deckhost.extra[i]->second.alias == limitcode)
+					for(int i = 0; i < deckManager.deckhost.extra.size(); ++i)
+						if(deckManager.deckhost.extra[i]->first == limitcode
+						        || deckManager.deckhost.extra[i]->second.alias == limitcode)
 							limit--;
-					for(int i = 0; i < mainGame->deckManager.deckhost.side.size(); ++i)
-						if(mainGame->deckManager.deckhost.side[i]->first == limitcode
-						        || mainGame->deckManager.deckhost.side[i]->second.alias == limitcode)
+					for(int i = 0; i < deckManager.deckhost.side.size(); ++i)
+						if(deckManager.deckhost.side[i]->first == limitcode
+						        || deckManager.deckhost.side[i]->second.alias == limitcode)
 							limit--;
 					if(limit <= 0)
 						break;
-					if((draging_pointer->second.type & 0x802040) && mainGame->deckManager.deckhost.extra.size() < 15) {
-						mainGame->deckManager.deckhost.extra.push_back(draging_pointer);
-					} else if(!(draging_pointer->second.type & 0x802040) && mainGame->deckManager.deckhost.main.size() < 60) {
-						mainGame->deckManager.deckhost.main.push_back(draging_pointer);
+					if((draging_pointer->second.type & 0x802040) && deckManager.deckhost.extra.size() < 15) {
+						deckManager.deckhost.extra.push_back(draging_pointer);
+					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.deckhost.main.size() < 60) {
+						deckManager.deckhost.main.push_back(draging_pointer);
 					}
 				}
 			}
@@ -514,45 +516,45 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
 				int lx = 10, px, py = (y - 164) / 68;
 				hovered_pos = 1;
-				if(mainGame->deckManager.deckhost.main.size() > 40)
-					lx = (mainGame->deckManager.deckhost.main.size() - 41) / 4 + 11;
+				if(deckManager.deckhost.main.size() > 40)
+					lx = (deckManager.deckhost.main.size() - 41) / 4 + 11;
 				if(x >= 750)
 					px = lx - 1;
 				else px = (x - 314) * (lx - 1) / 436;
-				if(py*lx + px >= mainGame->deckManager.deckhost.main.size()) {
+				if(py*lx + px >= deckManager.deckhost.main.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
 					hovered_seq = py * lx + px;
-					hovered_code = mainGame->deckManager.deckhost.main[hovered_seq]->first;
+					hovered_code = deckManager.deckhost.main[hovered_seq]->first;
 				}
 			} else if(x >= 314 && x <= 794 && y >= 466 && y <= 530) {
-				int lx = mainGame->deckManager.deckhost.extra.size();
+				int lx = deckManager.deckhost.extra.size();
 				hovered_pos = 2;
 				if(lx < 10)
 					lx = 10;
 				if(x >= 750)
 					hovered_seq = lx - 1;
 				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= mainGame->deckManager.deckhost.extra.size()) {
+				if(hovered_seq >= deckManager.deckhost.extra.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
-					hovered_code = mainGame->deckManager.deckhost.extra[hovered_seq]->first;
+					hovered_code = deckManager.deckhost.extra[hovered_seq]->first;
 				}
 			} else if (x >= 314 && x <= 794 && y >= 564 && y <= 628) {
-				int lx = mainGame->deckManager.deckhost.side.size();
+				int lx = deckManager.deckhost.side.size();
 				hovered_pos = 3;
 				if(lx < 10)
 					lx = 10;
 				if(x >= 750)
 					hovered_seq = lx - 1;
 				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= mainGame->deckManager.deckhost.side.size()) {
+				if(hovered_seq >= deckManager.deckhost.side.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
-					hovered_code = mainGame->deckManager.deckhost.side[hovered_seq]->first;
+					hovered_code = deckManager.deckhost.side[hovered_seq]->first;
 				}
 			} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
 				hovered_pos = 4;
@@ -576,7 +578,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->ShowCardInfo(hovered_code);
 				}
 				if(pre_code)
-					mainGame->imageManager.RemoveTexture(pre_code);
+					imageManager.RemoveTexture(pre_code);
 			}
 			break;
 		}
@@ -618,9 +620,9 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 void DeckBuilder::FilterCards() {
 	results.clear();
 	const wchar_t* pstr = mainGame->ebCardName->getText();
-	int trycode = DataManager::GetVal(pstr);
-	if(mainGame->dataManager.GetData(trycode, 0)) {
-		auto ptr = mainGame->dataManager.GetCodePointer(trycode);
+	int trycode = BufferIO::GetVal(pstr);
+	if(dataManager.GetData(trycode, 0)) {
+		auto ptr = dataManager.GetCodePointer(trycode);
 		results.push_back(ptr);
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
@@ -629,8 +631,8 @@ void DeckBuilder::FilterCards() {
 	}
 	if(pstr[0] == 0)
 		pstr = 0;
-	auto strpointer = mainGame->dataManager._strings.begin();
-	for(code_pointer ptr = mainGame->dataManager._datas.begin(); ptr != mainGame->dataManager._datas.end(); ++ptr, ++strpointer) {
+	auto strpointer = dataManager._strings.begin();
+	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
 		CardDataC& data = ptr->second;
 		CardString& text = strpointer->second;
 		if(data.type & TYPE_TOKEN)
@@ -714,10 +716,10 @@ void DeckBuilder::FilterCards() {
 void DeckBuilder::FilterCardsFromResult() {
 	int offset = 0;
 	const wchar_t* pstr = mainGame->ebCardName->getText();
-	int trycode = DataManager::GetVal(pstr);
-	if(mainGame->dataManager.GetData(trycode, 0)) {
+	int trycode = BufferIO::GetVal(pstr);
+	if(dataManager.GetData(trycode, 0)) {
 		results.clear();
-		auto ptr = mainGame->dataManager.GetCodePointer(trycode);
+		auto ptr = dataManager.GetCodePointer(trycode);
 		results.push_back(ptr);
 		mainGame->scrFilter->setVisible(false);
 		mainGame->scrFilter->setPos(0);
@@ -781,7 +783,7 @@ void DeckBuilder::FilterCardsFromResult() {
 		if(filter_effect && !(data.category & filter_effect))
 			continue;
 		if(pstr) {
-			CardString& text = mainGame->dataManager._strings[data.code];
+			CardString& text = dataManager._strings[data.code];
 			if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
 				continue;
 		}

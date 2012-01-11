@@ -2,6 +2,7 @@
 #include "menu_handler.h"
 #include "netserver.h"
 #include "duelclient.h"
+#include "deck_manager.h"
 #include "game.h"
 
 namespace ygo {
@@ -9,7 +10,8 @@ namespace ygo {
 bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
-		s32 id = event.GUIEvent.Caller->getID();
+		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
+		s32 id = caller->getID();
 		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
@@ -39,7 +41,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
-				if(NetServer::StartServer(mainGame->gameConf.serverport))
+				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
 				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
 					NetServer::StopServer();
@@ -59,10 +61,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HS_OBSERVER: {
 				break;
 			}
-			case BUTTON_HS_READY: {
-				break;
-			}
 			case BUTTON_HS_KICK: {
+				int id = caller - static_cast<IGUIElement*>(mainGame->btnHostSingleKick[0]);
+				if(id == 0)
+					DuelClient::SendPacketToServer(CTOS_HS_KICK1);
+				else
+					DuelClient::SendPacketToServer(CTOS_HS_KICK2);
 				break;
 			}
 			case BUTTON_HS_START: {
@@ -74,14 +78,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(mainGame->cbDBDecks->getSelected() != -1)
-					mainGame->deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->is_building = true;
 				mainGame->wInfos->setVisible(true);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wDeckEdit->setVisible(true);
 				mainGame->wFilter->setVisible(true);
-				mainGame->deckBuilder.filterList = mainGame->deckManager._lfList[0].content;;
+				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;;
 				mainGame->cbDBLFList->setSelected(0);
 				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 				mainGame->cbCardType->setSelected(0);
@@ -109,12 +113,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			/*			case BUTTON_LAN_START_SERVER: {
 							if(mainGame->cbDeckSel->getSelected() == -1)
 								break;
-							if(!mainGame->deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
+							if(!deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
 								mainGame->stModeStatus->setText(L"无效卡组");
 								break;
 							}
 							if(!mainGame->chkNoCheckDeck->isChecked()
-							        && !mainGame->deckManager.CheckLFList(mainGame->deckManager.deckhost, mainGame->cbLFlist->getSelected())) {
+							        && !deckManager.CheckLFList(deckManager.deckhost, mainGame->cbLFlist->getSelected())) {
 								mainGame->stModeStatus->setText(L"无效卡组或者卡组不符合禁卡表规范");
 								break;
 							}
@@ -153,7 +157,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						case BUTTON_LAN_CONNECT: {
 							if(mainGame->cbDeckSel->getSelected() == -1)
 								break;
-							if(!mainGame->deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
+							if(!deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
 								mainGame->stModeStatus->setText(L"无效卡组");
 								break;
 							}
@@ -181,9 +185,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						*/
 			}
 		}
+		case irr::gui::EGET_CHECKBOX_CHANGED: {
+			switch(id) {
+			case CHECKBOX_HS_READY: {
+				if(!caller->isEnabled())
+					break;
+				DuelClient::SendPacketToServer(CTOS_HS_READY);
+				break;
+			}
+			}
+			break;
+		}
 		break;
 		}
-		return false;
+		break;
 	}
 	case irr::EET_KEY_INPUT_EVENT: {
 		switch(event.KeyInput.Key) {

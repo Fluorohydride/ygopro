@@ -44,8 +44,8 @@ function c98358303.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 		if c:IsRelateToEffect(e) then
-			c:RegisterFlagEffect(98358303,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,2)
-			tc:RegisterFlagEffect(98358303,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,2)
+			c:RegisterFlagEffect(98358303,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,2)
+			tc:RegisterFlagEffect(98358303,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,2)
 			e:SetLabelObject(tc)
 		end
 	end
@@ -53,7 +53,7 @@ end
 function c98358303.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject():GetLabelObject()
 	local c=e:GetHandler()
-	return tc and Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=tc:GetTurnID()
+	return tc and Duel.GetTurnCount()~=tc:GetTurnID()
 		and c:GetFlagEffect(98358303)~=0 and tc:GetFlagEffect(98358303)~=0
 end
 function c98358303.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

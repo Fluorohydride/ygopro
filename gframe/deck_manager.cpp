@@ -5,6 +5,8 @@
 
 namespace ygo {
 
+DeckManager deckManager;
+
 void DeckManager::LoadLFList() {
 	LFList* cur;
 	FILE* fp = fopen("lflist.conf", "r");
@@ -21,7 +23,7 @@ void DeckManager::LoadLFList() {
 				continue;
 			int p = 0, sa = 0, code, count;
 			if(linebuf[0] == '!') {
-				sa = DataManager::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
+				sa = BufferIO::DecodeUTF8((const char*)(&linebuf[1]), strBuffer);
 				while(strBuffer[sa - 1] == L'\r' || strBuffer[sa - 1] == L'\n' ) sa--;
 				LFList newlist;
 				_lfList.push_back(newlist);
@@ -62,7 +64,7 @@ bool DeckManager::CheckLFList(Deck& deck, int lfindex) {
 	if(deck.main.size() < 40 || deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15)
 		return false;
 	for(int i = 0; i < deck.main.size(); ++i) {
-		code_pointer cit = mainGame->dataManager.GetCodePointer(deck.main[i]->first);
+		code_pointer cit = dataManager.GetCodePointer(deck.main[i]->first);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -71,7 +73,7 @@ bool DeckManager::CheckLFList(Deck& deck, int lfindex) {
 			return false;
 	}
 	for(int i = 0; i < deck.extra.size(); ++i) {
-		code_pointer cit = mainGame->dataManager.GetCodePointer(deck.extra[i]->first);
+		code_pointer cit = dataManager.GetCodePointer(deck.extra[i]->first);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -80,7 +82,7 @@ bool DeckManager::CheckLFList(Deck& deck, int lfindex) {
 			return false;
 	}
 	for(int i = 0; i < deck.side.size(); ++i) {
-		code_pointer cit = mainGame->dataManager.GetCodePointer(deck.side[i]->first);
+		code_pointer cit = dataManager.GetCodePointer(deck.side[i]->first);
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
 		dc = ccount[code];
@@ -98,24 +100,24 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 	CardData cd;
 	for(int i = 0; i < mainc; ++i) {
 		code = dbuf[i];
-		if(!mainGame->dataManager.GetData(code, &cd))
+		if(!dataManager.GetData(code, &cd))
 			continue;
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		else if(cd.type & 0x802040 && deck.extra.size() < 15) {
-			deck.extra.push_back(mainGame->dataManager.GetCodePointer(code));
+			deck.extra.push_back(dataManager.GetCodePointer(code));
 		} else if(deck.main.size() < 60) {
-			deck.main.push_back(mainGame->dataManager.GetCodePointer(code));
+			deck.main.push_back(dataManager.GetCodePointer(code));
 		}
 	}
 	for(int i = 0; i < sidec; ++i) {
 		code = dbuf[mainc + i];
-		if(!mainGame->dataManager.GetData(code, &cd))
+		if(!dataManager.GetData(code, &cd))
 			continue;
 		if(cd.type & TYPE_TOKEN)
 			continue;
 		if(deck.side.size() < 15)
-			deck.side.push_back(mainGame->dataManager.GetCodePointer(code));
+			deck.side.push_back(dataManager.GetCodePointer(code));
 	}
 }
 

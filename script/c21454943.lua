@@ -61,6 +61,6 @@ function c21454943.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetValue(e:GetLabel())
 	tc:RegisterEffect(e1)
 	local e2=e1:Clone()
-	e1:SetCode(EFFECT_UPDATE_DEFENCE)
+	e2:SetCode(EFFECT_UPDATE_DEFENCE)
 	tc:RegisterEffect(e2)
 end

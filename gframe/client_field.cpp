@@ -1,5 +1,7 @@
 #include "client_field.h"
 #include "client_card.h"
+#include "data_manager.h"
+#include "image_manager.h"
 #include "game.h"
 #include "../ocgcore/field.h"
 
@@ -320,12 +322,12 @@ void ClientField::ShowSelectCard(bool buttonok) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 			else
-				mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover);
+				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
+				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);;
 				if(selectable_cards[i]->controler)
@@ -351,12 +353,12 @@ void ClientField::ShowSelectCard(bool buttonok) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 			else
-				mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover);
+				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
+				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);
 				if(selectable_cards[i]->controler)

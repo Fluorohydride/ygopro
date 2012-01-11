@@ -32,6 +32,8 @@ public:
 	void SaveDeck(Deck& deck, const wchar_t* name);
 };
 
+extern DeckManager deckManager;
+
 }
 
 #endif //DECKMANAGER_H

@@ -10,7 +10,7 @@ Replay::Replay() {
 	is_recording = false;
 	is_replaying = false;
 	replay_data = new unsigned char[0x20000];
-	comp_data = new unsigned char[0x1000];
+	comp_data = new unsigned char[0x2000];
 }
 Replay::~Replay() {
 	delete replay_data;
@@ -133,17 +133,18 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	wchar_t fname[64];
 	myswprintf(fname, L"./replay/%ls", name);
 #ifdef WIN32
-	fp = _wfopen(fname, L"rb");
+	FILE* rfp = _wfopen(fname, L"rb");
 #else
 	char fname2[256];
-	DataManager::EncodeUTF8(fname, fname2);
-	fp = fopen(fname2, "rb");
+	BufferIO::EncodeUTF8(fname, fname2);
+	FILE* rfp = fopen(fname2, "rb");
 #endif
-	if(!fp)
+	if(!rfp)
 		return false;
-	fread(&pheader, sizeof(pheader), 1, fp);
-	fclose(fp);
-	return pheader.id == 0x31707279 && pheader.version >= 0x1008;
+	ReplayHeader rheader;
+	fread(&rheader, sizeof(ReplayHeader), 1, rfp);
+	fclose(rfp);
+	return rheader.id == 0x31707279 && rheader.version >= 0x1020;
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
 	char resType = *pdata++;

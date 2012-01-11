@@ -1,9 +1,7 @@
 #include "network.h"
-#include "game.h"
 
 namespace ygo {
 
-const unsigned short PROTO_VERSION = 0x1020;
 /*
 int NetManager::GetLocalAddress() {
 	char hname[256];

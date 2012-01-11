@@ -59,4 +59,6 @@ using namespace video;
 using namespace io;
 using namespace gui;
 
+extern const unsigned short PRO_VERSION;
+
 #endif

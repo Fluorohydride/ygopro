@@ -8,7 +8,6 @@
 namespace ygo {
 
 class ImageManager {
-
 public:
 	bool Initial();
 	void SetDevice(irr::IrrlichtDevice* dev);
@@ -16,7 +15,7 @@ public:
 	void RemoveTexture(int code);
 	irr::video::ITexture* GetTexture(int code);
 	irr::video::ITexture* GetTextureThumb(int code);
-	
+
 	std::unordered_map<int, irr::video::ITexture*> tMap;
 	std::unordered_map<int, irr::video::ITexture*> tThumb;
 	irr::IrrlichtDevice* device;
@@ -35,6 +34,8 @@ public:
 	irr::video::ITexture* tLim;
 	irr::video::ITexture* tBackGround;
 };
+
+extern ImageManager imageManager;
 
 }
 

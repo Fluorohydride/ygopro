@@ -1,7 +1,8 @@
 #include "image_manager.h"
-#include "game.h"
 
 namespace ygo {
+	
+ImageManager imageManager;
 
 bool ImageManager::Initial() {
 	tCover = driver->getTexture("textures/cover.jpg");
@@ -24,15 +25,6 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	driver = dev->getVideoDriver();
 }
 void ImageManager::ClearTexture() {
-	mainGame->matManager.mCard.setTexture(0, 0);
-	mainGame->imgCard->setImage(0);
-	mainGame->btnPSAU->setImage();
-	mainGame->btnPSDU->setImage();
-	mainGame->btnCardSelect[0]->setImage();
-	mainGame->btnCardSelect[1]->setImage();
-	mainGame->btnCardSelect[2]->setImage();
-	mainGame->btnCardSelect[3]->setImage();
-	mainGame->btnCardSelect[4]->setImage();
 	for(auto tit = tMap.begin(); tit != tMap.end(); ++tit) {
 		if(tit->second)
 			driver->removeTexture(tit->second);

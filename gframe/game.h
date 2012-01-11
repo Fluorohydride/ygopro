@@ -2,15 +2,10 @@
 #define GAME_H
 
 #include "config.h"
-#include "data_manager.h"
-#include "image_manager.h"
-#include "materials.h"
 #include "client_card.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
-#include "deck_manager.h"
-#include "replay.h"
 #include <string>
 #include "../ocgcore/mtrandom.h"
 #include <unordered_map>
@@ -59,9 +54,6 @@ struct DuelInfo {
 class Game {
 
 public:
-	Game();
-	~Game();
-
 	bool Initialize();
 	void MainLoop();
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
@@ -84,6 +76,7 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code);
+	void ClearTextures();
 	
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
@@ -113,21 +106,13 @@ public:
 	char msgBuffer[0x1000];
 	char queryBuffer[0x1000];
 
-	bool is_closing;
-	bool is_refreshing;
 	mtrandom rnd;
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;
-	Signal localMessage;
-	Signal localResponse;
 	Signal localAction;
 	Config gameConf;
-	DataManager dataManager;
-	ImageManager imageManager;
-	DeckManager deckManager;
-	Materials matManager;
-	Replay lastReplay;
+	DuelInfo dInfo;
 
 	std::vector<int> logParam;
 	unsigned short linePattern;
@@ -135,6 +120,7 @@ public:
 	int signalFrame;
 	bool isFadein;
 	bool signalAction;
+	int actionParam;
 	irr::gui::IGUIElement* guiFading;
 	irr::gui::IGUIElement* guiNext;
 	int fadingFrame;
@@ -163,7 +149,6 @@ public:
 
 	bool is_building;
 
-	DuelInfo dInfo;
 	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
@@ -241,7 +226,6 @@ public:
 	irr::gui::IGUIComboBox* cbDeckSelect;
 	irr::gui::IGUIStaticText* stHostSingleRule;
 	irr::gui::IGUIStaticText* stHostSingleOB;
-	irr::gui::IGUIButton* btnHostSingleReady;
 	irr::gui::IGUIButton* btnHostSingleStart;
 	irr::gui::IGUIButton* btnHostSingleCancel;
 	//replay
@@ -384,10 +368,10 @@ extern Game* mainGame;
 #define BUTTON_HOST_CANCEL			115
 #define BUTTON_HS_DUELIST			120
 #define BUTTON_HS_OBSERVER			121
-#define BUTTON_HS_READY				122
-#define BUTTON_HS_START				123
-#define BUTTON_HS_CANCEL			124
-#define BUTTON_HS_KICK				125
+#define BUTTON_HS_START				122
+#define BUTTON_HS_CANCEL			123
+#define BUTTON_HS_KICK				124
+#define CHECKBOX_HS_READY			125
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202

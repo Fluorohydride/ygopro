@@ -1,4 +1,7 @@
 #include "game.h"
+#include "materials.h"
+#include "image_manager.h"
+#include "deck_manager.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {

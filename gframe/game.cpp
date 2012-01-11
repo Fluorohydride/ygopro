@@ -1,6 +1,10 @@
 #include "config.h"
 #include "game.h"
-#include "network.h"
+#include "image_manager.h"
+#include "data_manager.h"
+#include "deck_manager.h"
+#include "replay.h"
+#include "materials.h"
 
 #ifndef WIN32
 #include <sys/types.h>
@@ -8,14 +12,12 @@
 #include "replay.h"
 #endif
 
+const unsigned short PRO_VERSION = 0x1020;
+
 namespace ygo {
 
 Game* mainGame;
 
-Game::Game() {
-}
-Game::~Game() {
-}
 bool Game::Initialize() {
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -43,9 +45,9 @@ bool Game::Initialize() {
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
 	imageManager.SetDevice(device);
-	if(!dataManager.LoadDates("cards.cdb"))
-		return false;
 	if(!imageManager.Initial())
+		return false;
+	if(!dataManager.LoadDates("cards.cdb"))
 		return false;
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
@@ -57,8 +59,9 @@ bool Game::Initialize() {
 	device->setWindowCaption(L"[---]");
 	device->setResizable(false);
 	//main menu
-	myswprintf(dataManager.strBuffer, L"YGOPro Version:0x%X)", PROTO_VERSION);
-	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 450), false, dataManager.strBuffer);
+	wchar_t strbuf[256];
+	myswprintf(strbuf, L"YGOPro Version:0x%X)", PRO_VERSION);
+	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 450), false, strbuf);
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
 	btnServerMode = env->addButton(rect<s32>(10, 65, 270, 95), wMainMenu, BUTTON_SERVER_MODE, dataManager.GetSysString(1201));
@@ -110,16 +113,16 @@ bool Game::Initialize() {
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 180, 170, 200), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 210, 320, 230), false, false, wCreateHost);
-	myswprintf(dataManager.strBuffer, L"%d", 8000);
-	ebStartLP = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 210, 220, 230), true, wCreateHost);
+	myswprintf(strbuf, L"%d", 8000);
+	ebStartLP = env->addEditBox(strbuf, rect<s32>(140, 210, 220, 230), true, wCreateHost);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1232), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
-	myswprintf(dataManager.strBuffer, L"%d", 5);
-	ebStartHand = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 240, 220, 260), true, wCreateHost);
+	myswprintf(strbuf, L"%d", 5);
+	ebStartHand = env->addEditBox(strbuf, rect<s32>(140, 240, 220, 260), true, wCreateHost);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1233), rect<s32>(20, 270, 320, 290), false, false, wCreateHost);
-	myswprintf(dataManager.strBuffer, L"%d", 1);
-	ebDrawCount = env->addEditBox(dataManager.strBuffer, rect<s32>(140, 270, 220, 290), true, wCreateHost);
+	myswprintf(strbuf, L"%d", 1);
+	ebDrawCount = env->addEditBox(strbuf, rect<s32>(140, 270, 220, 290), true, wCreateHost);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 360, 220, 380), false, false, wCreateHost);
 	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 355, 250, 380), true, wCreateHost);
@@ -136,11 +139,11 @@ bool Game::Initialize() {
 	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1251));
 	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(40, 65, 240, 85), true, false, wHostSingle);
 	btnHostSingleKick[0] = env->addButton(rect<s32>(10, 65, 30, 85), wHostSingle, BUTTON_HS_KICK, L"X");
-	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(250, 65, 270, 85), wHostSingle, -1, L"");
+	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(250, 65, 270, 85), wHostSingle, CHECKBOX_HS_READY, L"");
 	chkHostSingleReady[0]->setEnabled(false);
 	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(40, 90, 240, 110), true, false, wHostSingle);
 	btnHostSingleKick[1] = env->addButton(rect<s32>(10, 90, 30, 110), wHostSingle, BUTTON_HS_KICK, L"X");
-	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(250, 90, 270, 110), wHostSingle, -1, L"");
+	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(250, 90, 270, 110), wHostSingle, CHECKBOX_HS_READY, L"");
 	chkHostSingleReady[1]->setEnabled(false);
 	btnHostSingleOB = env->addButton(rect<s32>(10, 120, 110, 145), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1252));
 	myswprintf(dataManager.strBuffer, L"%ls%d", dataManager.GetSysString(1253), 0);
@@ -148,7 +151,6 @@ bool Game::Initialize() {
 	stHostSingleRule = env->addStaticText(L"", rect<s32>(280, 30, 460, 230), false, true, wHostSingle);
 	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 185, 110, 205), false, false, wHostSingle);
 	cbDeckSelect = env->addComboBox(rect<s32>(120, 180, 270, 205), wHostSingle);
-	btnHostSingleReady = env->addButton(rect<s32>(120, 215, 270, 240), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1255));
 	btnHostSingleStart = env->addButton(rect<s32>(230, 260, 340, 285), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1215));
 	btnHostSingleCancel = env->addButton(rect<s32>(350, 260, 460, 285), wHostSingle, BUTTON_HS_CANCEL, dataManager.GetSysString(1212));
 	//img
@@ -413,7 +415,6 @@ bool Game::Initialize() {
 }
 void Game::MainLoop() {
 	wchar_t cap[256];
-	is_closing = false;
 	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.81f, 0.44f, -0.42f, 0.42f, 1.0f, 100.0f);
@@ -427,7 +428,7 @@ void Game::MainLoop() {
 	irr::ITimer* timer = device->getTimer();
 	timer->setTime(0);
 	int fps = 0;
-	unsigned int last_time = 0, cur_time = 0;
+	unsigned int cur_time = 0;
 	while(device->run()) {
 		linePattern = (linePattern << 1) | (linePattern >> 15);
 		atkframe += 0.1f;
@@ -476,7 +477,7 @@ void Game::MainLoop() {
 #ifdef _WIN32
 			Sleep(20);
 #else
-			usleep(20000000);
+			usleep(20000);
 #endif
 		if(cur_time >= 1000) {
 			myswprintf(cap, L"FPS: %d", fps);
@@ -486,7 +487,6 @@ void Game::MainLoop() {
 			timer->setTime(0);
 		}
 	}
-	is_closing = true;
 	SaveConfig();
 	device->drop();
 }
@@ -546,7 +546,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 			continue;
 		dirp->d_name[len - 4] = 0;
 		wchar_t wname[256];
-		DataManager::DecodeUTF8(dirp->d_name, wname);
+		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		cbDeck->addItem(wname);
 	}
 #endif
@@ -565,7 +565,7 @@ void Game::RefreshReplay() {
 	if(fh == INVALID_HANDLE_VALUE)
 		return;
 	do {
-		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && lastReplay.CheckReplay(fdataw.cFileName)) {
+		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) && Replay::CheckReplay(fdataw.cFileName)) {
 			lstReplayList->addItem(fdataw.cFileName);
 		}
 	} while(FindNextFileW(fh, &fdataw));
@@ -580,7 +580,7 @@ void Game::RefreshReplay() {
 		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".yrp") != 0)
 			continue;
 		wchar_t wname[256];
-		DataManager::DecodeUTF8(dirp->d_name, wname);
+		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		if(lastReplay.CheckReplay(dirp->d_name));
 		lstReplayList->addItem(wname);
 	}
@@ -594,7 +594,6 @@ void Game::LoadConfig() {
 	char strbuf[32];
 	char valbuf[256];
 	wchar_t wstr[256];
-	wchar_t* p;
 	int value;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
@@ -614,35 +613,28 @@ void Game::LoadConfig() {
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "nickname")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.nickname;
-			DataManager::CopyStr(wstr, p, 19);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
 		} else if(!strcmp(strbuf, "gamename")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.gamename;
-			DataManager::CopyStr(wstr, p, 19);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.gamename, 20);
 		} else if(!strcmp(strbuf, "lastdeck")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.lastdeck;
-			DataManager::CopyStr(wstr, p, 63);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 		} else if(!strcmp(strbuf, "textfont")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.textfont;
-			DataManager::CopyStr(wstr, p, 255);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
 		} else if(!strcmp(strbuf, "numfont")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.numfont;
-			DataManager::CopyStr(wstr, p, 255);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
 		} else if(!strcmp(strbuf, "servport")) {
 			gameConf.serverport = atoi(valbuf);
 		} else if(!strcmp(strbuf, "lastip")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.lastip;
-			DataManager::CopyStr(wstr, p, 19);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.lastip, 20);
 		} else if(!strcmp(strbuf, "lastport")) {
-			DataManager::DecodeUTF8(valbuf, wstr);
-			p = gameConf.lastport;
-			DataManager::CopyStr(wstr, p, 9);
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.lastport, 20);
 		}
 	}
 	fclose(fp);
@@ -652,22 +644,21 @@ void Game::SaveConfig() {
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
-	wchar_t* p = gameConf.nickname;
-	DataManager::CopyStr(ebNickName->getText(), p, 20);
-	DataManager::EncodeUTF8(gameConf.nickname, linebuf);
+	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
+	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	fprintf(fp, "nickname = %s\n", linebuf);
-	DataManager::EncodeUTF8(gameConf.gamename, linebuf);
+	BufferIO::EncodeUTF8(gameConf.gamename, linebuf);
 	fprintf(fp, "gamename = %s\n", linebuf);
-	DataManager::EncodeUTF8(gameConf.lastdeck, linebuf);
+	BufferIO::EncodeUTF8(gameConf.lastdeck, linebuf);
 	fprintf(fp, "lastdeck = %s\n", linebuf);
-	DataManager::EncodeUTF8(gameConf.textfont, linebuf);
+	BufferIO::EncodeUTF8(gameConf.textfont, linebuf);
 	fprintf(fp, "textfont = %s\n", linebuf);
-	DataManager::EncodeUTF8(gameConf.numfont, linebuf);
+	BufferIO::EncodeUTF8(gameConf.numfont, linebuf);
 	fprintf(fp, "numfont = %s\n", linebuf);
 	fprintf(fp, "serverport = %d\n", gameConf.serverport);
-	DataManager::EncodeUTF8(gameConf.lastip, linebuf);
+	BufferIO::EncodeUTF8(gameConf.lastip, linebuf);
 	fprintf(fp, "lastip = %s\n", linebuf);
-	DataManager::EncodeUTF8(gameConf.lastport, linebuf);
+	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	fclose(fp);
 }
@@ -705,6 +696,18 @@ void Game::ShowCardInfo(int code) {
 		stText->setRelativePosition(irr::core::position2di(15, 60));
 	}
 	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
+}
+void Game::ClearTextures() {
+	matManager.mCard.setTexture(0, 0);
+	mainGame->imgCard->setImage(0);
+	mainGame->btnPSAU->setImage();
+	mainGame->btnPSDU->setImage();
+	mainGame->btnCardSelect[0]->setImage();
+	mainGame->btnCardSelect[1]->setImage();
+	mainGame->btnCardSelect[2]->setImage();
+	mainGame->btnCardSelect[3]->setImage();
+	mainGame->btnCardSelect[4]->setImage();
+	imageManager.ClearTexture();
 }
 
 }

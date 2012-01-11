@@ -46,6 +46,10 @@ struct CTOS_JoinGame {
 	unsigned int gameid;
 	unsigned short pass[20];
 };
+struct STOC_DeckError {
+	unsigned char reason;
+	unsigned int code;
+};
 struct STOC_CreateGame {
 	unsigned int gameid;
 };
@@ -63,15 +67,15 @@ struct STOC_JoinFail {
 };
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
+	unsigned char pos;
 };
 struct STOC_HS_PlayerChange {
+	//pos<<4 | state
 	unsigned char status;
 };
 struct STOC_HS_WatchChange {
 	unsigned short watch_count;
 };
-
-extern const unsigned short PROTO_VERSION;
 
 }
 
@@ -91,10 +95,13 @@ extern const unsigned short PROTO_VERSION;
 #define CTOS_HS_KICK2		0x24
 #define CTOS_HS_START		0x25
 
+#define STOC_GAME_MSG		0x1
+#define STOC_DECK_ERROR		0x2
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
 #define STOC_EXIT_GAME		0x13
 #define STOC_JOIN_FAIL		0x14
+#define STOC_GAME_START		0x15
 #define STOC_HS_PLAYER_ENTER	0x20
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22

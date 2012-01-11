@@ -3,6 +3,8 @@
 #include "network.h"
 #include "game.h"
 #include "duelclient.h"
+#include "data_manager.h"
+#include "image_manager.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {
@@ -66,11 +68,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_SAVE: {
 				if(mainGame->ebRSName->getText()[0] == 0)
 					break;
-				mainGame->lastReplay.SaveReplay(mainGame->ebRSName->getText());
+				mainGame->actionParam = 1;
 				mainGame->HideElement(mainGame->wReplaySave, true);
 				break;
 			}
 			case BUTTON_REPLAY_CANCEL: {
+				mainGame->actionParam = 0;
 				mainGame->HideElement(mainGame->wReplaySave, true);
 				break;
 			}
@@ -150,7 +153,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionn->setVisible(true);
 				if(selected_option == 0)
 					mainGame->btnOptionp->setVisible(false);
-				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetDesc(select_options[selected_option]));
+				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
 			case BUTTON_OPTION_NEXT: {
@@ -158,7 +161,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->btnOptionp->setVisible(true);
 				if(selected_option == select_options.size() - 1)
 					mainGame->btnOptionn->setVisible(false);
-				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetDesc(select_options[selected_option]));
+				mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[selected_option]));
 				break;
 			}
 			case BUTTON_OPTION_OK: {
@@ -214,7 +217,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 						mainGame->localAction.Set();
 					} else {
-						mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetDesc(select_options[0]));
+						mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[0]));
 						selected_option = 0;
 						command_card = clicked_card;
 						mainGame->btnOptionp->setVisible(false);
@@ -463,7 +466,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							}
 							mainGame->HideElement(mainGame->wCardSelect, true);
 						} else {
-							mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)mainGame->dataManager.GetDesc(select_options[0]));
+							mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(select_options[0]));
 							selected_option = 0;
 							mainGame->btnOptionp->setVisible(false);
 							mainGame->btnOptionn->setVisible(true);
@@ -635,11 +638,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				int pos = mainGame->scrCardList->getPos() / 10;
 				for(int i = 0; i < 5; ++i) {
 					if(selectable_cards[i + pos]->code)
-						mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.GetTexture(selectable_cards[i + pos]->code));
+						mainGame->btnCardSelect[i]->setImage(imageManager.GetTexture(selectable_cards[i + pos]->code));
 					else
-						mainGame->btnCardSelect[i]->setImage(mainGame->imageManager.tCover);
+						mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
-					myswprintf(formatBuffer, L"%ls[%d]", mainGame->dataManager.FormatLocation(selectable_cards[i + pos]->location),
+					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location),
 					           selectable_cards[i + pos]->sequence + 1);
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					if(selectable_cards[i + pos]->is_selected)
@@ -657,9 +660,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case EDITBOX_ANCARD: {
 				const wchar_t* pname = mainGame->ebANCard->getText();
-				int trycode = DataManager::GetVal(pname);
+				int trycode = BufferIO::GetVal(pname);
 				CardString cstr;
-				if(mainGame->dataManager.GetString(trycode, &cstr)) {
+				if(dataManager.GetString(trycode, &cstr)) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -670,7 +673,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				mainGame->lstANCard->clear();
 				ancard.clear();
-				for(auto cit = mainGame->dataManager._strings.begin(); cit != mainGame->dataManager._strings.end(); ++cit) {
+				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						mainGame->lstANCard->addItem(cit->second.name);
 						ancard.push_back(cit->first);
@@ -685,9 +688,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case EDITBOX_ANCARD: {
 				const wchar_t* pname = mainGame->ebANCard->getText();
-				int trycode = DataManager::GetVal(pname);
+				int trycode = BufferIO::GetVal(pname);
 				CardString cstr;
-				if(mainGame->dataManager.GetString(trycode, &cstr)) {
+				if(dataManager.GetString(trycode, &cstr)) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -698,7 +701,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				mainGame->lstANCard->clear();
 				ancard.clear();
-				for(auto cit = mainGame->dataManager._strings.begin(); cit != mainGame->dataManager._strings.end(); ++cit) {
+				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						mainGame->lstANCard->addItem(cit->second.name);
 						ancard.push_back(cit->first);
@@ -716,7 +719,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mcard->code) {
 					mainGame->ShowCardInfo(mcard->code);
 				} else {
-					mainGame->imgCard->setImage(mainGame->imageManager.tCover);
+					mainGame->imgCard->setImage(imageManager.tCover);
 					mainGame->stName->setText(L"");
 					mainGame->stInfo->setText(L"");
 					mainGame->stDataInfo->setText(L"");
@@ -970,7 +973,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::SetResponseB(respbuf, selectable_cards.size());
 					mainGame->localAction.Set();
 				} else {
-					myswprintf(formatBuffer, L"请移除%d个[%ls]:", select_counter_count, mainGame->dataManager.GetCounterName(select_counter_type));
+					myswprintf(formatBuffer, L"请移除%d个[%ls]:", select_counter_count, dataManager.GetCounterName(select_counter_type));
 					mainGame->stHintMsg->setText(formatBuffer);
 				}
 				break;
@@ -1169,19 +1172,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						if(mcard->location & 0xe) {
 							std::wstring str;
 							if(mcard->type & TYPE_MONSTER) {
-								myswprintf(formatBuffer, L"%ls", mainGame->dataManager.GetName(mcard->code));
+								myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
-									myswprintf(formatBuffer, L"\n(%ls)", mainGame->dataManager.GetName(mcard->alias));
+									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
-								myswprintf(formatBuffer, L"\n★%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), mainGame->dataManager.FormatRace(mcard->race), mainGame->dataManager.FormatAttribute(mcard->attribute));
+								myswprintf(formatBuffer, L"\n★%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-										myswprintf(formatBuffer, L"\n[%ls]：%d", mainGame->dataManager.GetCounterName(ctit->first), ctit->second);
+										myswprintf(formatBuffer, L"\n[%ls]：%d", dataManager.GetCounterName(ctit->first), ctit->second);
 										str.append(formatBuffer);
 									}
 								}
@@ -1190,15 +1193,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									str.append(formatBuffer);
 								}
 							} else {
-								myswprintf(formatBuffer, L"%ls", mainGame->dataManager.GetName(mcard->code));
+								myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
-									myswprintf(formatBuffer, L"\n%ls", mainGame->dataManager.GetName(mcard->alias));
+									myswprintf(formatBuffer, L"\n%ls", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-										myswprintf(formatBuffer, L"\n[%ls]：%d", mainGame->dataManager.GetCounterName(ctit->first), ctit->second);
+										myswprintf(formatBuffer, L"\n[%ls]：%d", dataManager.GetCounterName(ctit->first), ctit->second);
 										str.append(formatBuffer);
 									}
 								}
@@ -1214,7 +1217,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						mainGame->stTip->setVisible(false);
-						mainGame->imgCard->setImage(mainGame->imageManager.tCover);
+						mainGame->imgCard->setImage(imageManager.tCover);
 						mainGame->stName->setText(L"");
 						mainGame->stInfo->setText(L"");
 						mainGame->stDataInfo->setText(L"");
@@ -1473,11 +1476,11 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 	} else mainGame->btnSSet->setVisible(false);
 	if(flag & COMMAND_REPOS) {
 		if(clicked_card->position & POS_FACEDOWN)
-			mainGame->btnRepos->setText(mainGame->dataManager.GetSysString(1154));
+			mainGame->btnRepos->setText(dataManager.GetSysString(1154));
 		else if(clicked_card->position & POS_ATTACK)
-			mainGame->btnRepos->setText(mainGame->dataManager.GetSysString(1155));
+			mainGame->btnRepos->setText(dataManager.GetSysString(1155));
 		else
-			mainGame->btnRepos->setText(mainGame->dataManager.GetSysString(1156));
+			mainGame->btnRepos->setText(dataManager.GetSysString(1156));
 		mainGame->btnRepos->setVisible(true);
 		mainGame->btnRepos->setRelativePosition(position2di(1, height));
 		height += 21;

@@ -77,6 +77,13 @@ public:
 	static int ServerThread(void* param);
 	static void DisconnectPlayer(DuelPlayer* dp);
 	static void HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len);
+	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto) {
+		char* p = net_server_write;
+		BufferIO::WriteInt16(p, 1);
+		BufferIO::WriteInt8(p, proto);
+		last_sent = 3;
+		bufferevent_write(dp->bev, net_server_write, last_sent);
+	}
 	template<typename ST>
 	static void SendPacketToPlayer(DuelPlayer* dp, unsigned char proto, ST& st) {
 		char* p = net_server_write;
@@ -84,7 +91,7 @@ public:
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
-		evbuffer_add(bufferevent_get_output(dp->bev), net_server_write, last_sent);
+		bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		char* p = net_server_write;
@@ -92,10 +99,10 @@ public:
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, buffer, len);
 		last_sent = len + 3;
-		evbuffer_add(bufferevent_get_output(dp->bev), net_server_write, last_sent);
+		bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
-		evbuffer_add(bufferevent_get_output(dp->bev), net_server_write, last_sent);
+		bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 };
 

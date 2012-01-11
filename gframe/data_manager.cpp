@@ -1,9 +1,11 @@
 #include "data_manager.h"
 #include <stdio.h>
-namespace ygo {
-const wchar_t* DataManager::unknown_string = L"???";
 
+namespace ygo {
+	
+const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[2048];
+DataManager dataManager;
 
 bool DataManager::LoadDates(const char* file) {
 	sqlite3* pDB;
@@ -36,12 +38,12 @@ bool DataManager::LoadDates(const char* file) {
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
 			_datas.insert(std::make_pair(cd.code, cd));
-			len = DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), strBuffer);
+			len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), strBuffer);
 			if(len) {
 				cs.name = new wchar_t[len + 1];
 				memcpy(cs.name, strBuffer, (len + 1)*sizeof(wchar_t));
 			} else cs.name = 0;
-			len = DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), strBuffer);
+			len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), strBuffer);
 			if(len) {
 				cs.text = new wchar_t[len + 1];
 				memcpy(cs.text, strBuffer, (len + 1)*sizeof(wchar_t));
@@ -50,7 +52,7 @@ bool DataManager::LoadDates(const char* file) {
 				cs.text[0] = 0;
 			}
 			for(int i = 14; i < 30; ++i) {
-				len = DecodeUTF8((const char*)sqlite3_column_text(pStmt, i), strBuffer);
+				len = BufferIO::DecodeUTF8((const char*)sqlite3_column_text(pStmt, i), strBuffer);
 				if(len) {
 					cs.desc[i - 14] = new wchar_t[len + 1];
 					memcpy(cs.desc[i - 14], strBuffer, (len + 1)*sizeof(wchar_t));
@@ -78,19 +80,19 @@ bool DataManager::LoadDates(const char* file) {
 		sscanf(linebuf, "!%s", strbuf);
 		if(!strcmp(strbuf, "system")) {
 			sscanf(&linebuf[7], "%d %s", &value, strbuf);
-			int len = DecodeUTF8(strbuf, strBuffer);
+			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
 			_sysStrings[value] = pbuf;
 		} else if(!strcmp(strbuf, "victory")) {
 			sscanf(&linebuf[8], "%x %s", &value, strbuf);
-			int len = DecodeUTF8(strbuf, strBuffer);
+			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
 			_victoryStrings[value] = pbuf;
 		} else if(!strcmp(strbuf, "counter")) {
 			sscanf(&linebuf[8], "%x %s", &value, strbuf);
-			int len = DecodeUTF8(strbuf, strBuffer);
+			int len = BufferIO::DecodeUTF8(strbuf, strBuffer);
 			wchar_t* pbuf = new wchar_t[len + 1];
 			wcscpy(pbuf, strBuffer);
 			_counterStrings[value] = pbuf;
@@ -102,7 +104,7 @@ bool DataManager::LoadDates(const char* file) {
 	return true;
 }
 bool DataManager::Error(sqlite3* pDB, sqlite3_stmt* pStmt) {
-	DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
+	BufferIO::DecodeUTF8(sqlite3_errmsg(pDB), strBuffer);
 	if(pStmt)
 		sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
@@ -177,68 +179,6 @@ const wchar_t* DataManager::GetCounterName(int code) {
 const wchar_t* DataManager::GetNumString(int num) {
 	return numStrings[num];
 }
-int DataManager::EncodeUTF8(const wchar_t * wsrc, char * str) {
-	char* pstr = str;
-	while(*wsrc != 0) {
-		if(*wsrc < 0x80) {
-			*str = *wsrc;
-			++str;
-		} else if(*wsrc < 0x800) {
-			str[0] = (*wsrc >> 6) & 0x1f | 0xc0;
-			str[1] = (*wsrc) & 0x3f | 0x80;
-			str += 2;
-		} else {
-			str[0] = (*wsrc >> 12) & 0xf | 0xe0;
-			str[1] = (*wsrc >> 6) & 0x3f | 0x80;
-			str[2] = (*wsrc) & 0x3f | 0x80;
-			str += 3;
-		}
-		wsrc++;
-	}
-	*str = 0;
-	return str - pstr;
-}
-int DataManager::DecodeUTF8(const char * src, wchar_t * wstr) {
-	char* p = (char*)src;
-	wchar_t* wp = wstr;
-	while(*p != 0) {
-		if((*p & 0x80) == 0) {
-			*wp = *p;
-			p++;
-		} else if((*p & 0xe0) == 0xc0) {
-			*wp = (((int)p[0] & 0x1f) << 6) | ((int)p[1] & 0x3f);
-			p += 2;
-		} else if((*p & 0xf0) == 0xe0) {
-			*wp = (((int)p[0] & 0xf) << 12) | (((int)p[1] & 0x3f) << 6) | ((int)p[2] & 0x3f);
-			p += 3;
-		} else if((*p & 0xf8) == 0xf0) {
-			*wp = (((int)p[0] & 0x7) << 18) | (((int)p[1] & 0x3f) << 12) | (((int)p[2] & 0x3f) << 6) | ((int)p[3] & 0x3f);
-			p += 4;
-		} else
-			p++;
-		wp++;
-	}
-	*wp = 0;
-	return wp - wstr;
-}
-int DataManager::GetVal(const wchar_t* pstr) {
-	int ret = 0;
-	while(*pstr >= L'0' && *pstr <= L'9') {
-		ret = ret * 10 + (*pstr - L'0');
-		pstr++;
-	}
-	return ret;
-}
-int DataManager::CopyStr(const wchar_t* src, wchar_t*& pstr, int maxlen) {
-	int l = 0;
-	while(src[l] && l < maxlen) {
-		pstr[l] = src[l];
-		l++;
-	}
-	pstr += l;
-	*pstr = 0;
-	return l;
-}
 const wchar_t* DataManager::FormatLocation(int location) {
 	int filter = 1, i = 1000;
 	while(filter != location) {
@@ -255,7 +195,7 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 	int filter = 1, i = 1010;
 	for(; filter != 0x80; filter <<= 1, ++i) {
 		if(attribute & filter) {
-			CopyStr(GetSysString(i), p, 16);
+			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
 			*++p = 0;
 		}
@@ -269,7 +209,7 @@ const wchar_t* DataManager::FormatRace(int race) {
 	int filter = 1, i = 1020;
 	for(; filter != 0x800000; filter <<= 1, ++i) {
 		if(race & filter) {
-			CopyStr(GetSysString(i), p, 16);
+			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
 			*++p = 0;
 		}
@@ -283,7 +223,7 @@ const wchar_t* DataManager::FormatType(int type) {
 	int filter = 1, i = 1050;
 	for(; filter != 0x1000000; filter <<= 1, ++i) {
 		if(type & filter) {
-			CopyStr(GetSysString(i), p, 16);
+			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
 			*++p = 0;
 		}
