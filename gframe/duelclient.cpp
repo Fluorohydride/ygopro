@@ -13,7 +13,7 @@ char DuelClient::duel_client_read[0x2000];
 char DuelClient::duel_client_write[0x2000];
 bool DuelClient::is_closing = false;
 
-bool DuelClient::StartClient(unsigned int ip, unsigned short port) {
+bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
 		return false;
 	sockaddr_in sin;
@@ -25,7 +25,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port) {
 	sin.sin_addr.s_addr = htonl(ip);
 	sin.sin_port = htons(port);
 	client_bev = bufferevent_socket_new(client_base, -1, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setcb(client_bev, ClientRead, NULL, ClientEvent, NULL);
+	bufferevent_setcb(client_bev, ClientRead, NULL, ClientEvent, (void*)create_game);
 	if (bufferevent_socket_connect(client_bev, (sockaddr*)&sin, sizeof(sin)) < 0) {
 		bufferevent_free(client_bev);
 		return false;
@@ -63,25 +63,33 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 		len -= packet_len + 2;
 	}
 }
-void DuelClient::ClientEvent(bufferevent *bev, short events, void *ptr) {
+void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
+		bool create_game = (bool)ctx;
 		mainGame->HideElement(mainGame->wCreateHost);
 		mainGame->WaitFrameSignal(10);
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
-		CTOS_CreateGame cscg;
-		BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
-		BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
-		cscg.info.rule = mainGame->cbRule->getSelected();
-		cscg.info.mode = mainGame->cbMatchMode->getSelected();
-		cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
-		cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
-		cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
-		cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
-		cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
-		cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
-		SendPacketToServer(CTOS_CREATE_GAME, cscg);
+		if(create_game) {
+			CTOS_CreateGame cscg;
+			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
+			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
+			cscg.info.rule = mainGame->cbRule->getSelected();
+			cscg.info.mode = mainGame->cbMatchMode->getSelected();
+			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
+			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
+			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
+			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
+			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
+			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
+			SendPacketToServer(CTOS_CREATE_GAME, cscg);
+		} else {
+			CTOS_JoinGame csjg;
+			csjg.gameid = 0;
+			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
+			SendPacketToServer(CTOS_JOIN_GAME, csjg);
+		}
 		bufferevent_enable(bev, EV_READ);
 		connect_state = 2;
 	} else if (events & BEV_EVENT_ERROR) {

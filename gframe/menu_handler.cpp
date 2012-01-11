@@ -190,6 +190,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case CHECKBOX_HS_READY: {
 				if(!caller->isEnabled())
 					break;
+				mainGame->env->setFocus(mainGame->wHostSingle);
 				DuelClient::SendPacketToServer(CTOS_HS_READY);
 				break;
 			}

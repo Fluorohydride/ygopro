@@ -25,10 +25,10 @@ private:
 	static char duel_client_write[0x2000];
 	static bool is_closing;
 public:
-	static bool StartClient(unsigned int ip, unsigned short port);
+	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void StopClient(bool is_exiting = false);
 	static void ClientRead(bufferevent* bev, void* ctx);
-	static void ClientEvent(bufferevent *bev, short events, void *ptr);
+	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread(void* param);
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
 	static void SetResponseI(int respI);
