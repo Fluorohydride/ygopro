@@ -11,6 +11,7 @@
 #include "group.h"
 #include "effect.h"
 #include "interpreter.h"
+#include "ocgapi.h"
 
 void field::add_process(uint16 type, uint16 step, effect* peffect, group* target, ptr arg1, ptr arg2) {
 	processor_unit new_unit;
@@ -2987,7 +2988,8 @@ int32 field::process_battle_command(uint16 step) {
 			pduel->write_buffer8(0);
 		}
 		core.units.begin()->peffect = damchange;
-		core.temp_var[0] = reason_card->current.controler;
+		if(reason_card)
+			core.temp_var[0] = reason_card->current.controler;
 		if(!reason_card)
 			core.temp_var[1] = 0;
 		else if(reason_card == core.attacker)

@@ -1160,9 +1160,11 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		adjust_instant();
 		if(target->material_cards.size()) {
 			for(auto mit = target->material_cards.begin(); mit != target->material_cards.end(); ++mit)
-				raise_single_event(*mit, EVENT_BE_MATERIAL, proc, 0, sumplayer, sumplayer, 0);
+				raise_single_event(*mit, EVENT_BE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
 		}
+		raise_event(&target->material_cards, EVENT_BE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
 		process_single_event();
+		process_instant_event();
 		return false;
 	}
 	case 17: {
@@ -1635,11 +1637,15 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 	case 16: {
 		pduel->write_buffer8(MSG_SPSUMMONED);
 		adjust_instant();
+		effect* proc = core.units.begin()->peffect;
+		int32 matreason = proc->value == SUMMON_TYPE_SYNCHRO ? REASON_SYNCHRO : proc->value == SUMMON_TYPE_XYZ ? REASON_XYZ : REASON_SPSUMMON;
 		if(target->material_cards.size()) {
 			for(auto mit = target->material_cards.begin(); mit != target->material_cards.end(); ++mit)
-				raise_single_event(*mit, EVENT_BE_MATERIAL, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
+				raise_single_event(*mit, EVENT_BE_MATERIAL, proc, matreason, sumplayer, sumplayer, 0);
 		}
+		raise_event(&target->material_cards, EVENT_BE_MATERIAL, proc, matreason, sumplayer, sumplayer, 0);
 		process_single_event();
+		process_instant_event();
 		return false;
 	}
 	case 17: {
@@ -1775,13 +1781,16 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		for(cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			if(!((*cit)->current.position & POS_FACEDOWN))
 				raise_single_event(*cit, EVENT_SPSUMMON_SUCCESS, (*cit)->current.reason_effect, 0, (*cit)->current.reason_player, (*cit)->summon_player, 0);
-			if(((*cit)->summon_type & 0x3000000) && (*cit)->material_cards.size()) {
-				card_set::iterator mit;
-				for(mit = (*cit)->material_cards.begin(); mit != (*cit)->material_cards.end(); ++mit)
-					raise_single_event(*mit, EVENT_BE_MATERIAL, core.reason_effect, 0, core.reason_player, (*cit)->summon_player, 0);
+			int32 summontype = (*cit)->summon_type & 0x3000000;
+			if(summontype && (*cit)->material_cards.size()) {
+				int32 matreason = (summontype & SUMMON_TYPE_FUSION) ? REASON_FUSION : (summontype & SUMMON_TYPE_RITUAL) ? REASON_RITUAL : 0;
+				for(auto mit = (*cit)->material_cards.begin(); mit != (*cit)->material_cards.end(); ++mit)
+					raise_single_event(*mit, EVENT_BE_MATERIAL, core.reason_effect, matreason, core.reason_player, (*cit)->summon_player, 0);
+				raise_event(&((*cit)->material_cards), EVENT_BE_MATERIAL, core.reason_effect, matreason, core.reason_player, (*cit)->summon_player, 0);
 			}
 		}
 		process_single_event();
+		process_instant_event();
 		return FALSE;
 	}
 	case 3: {
