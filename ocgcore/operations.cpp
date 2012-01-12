@@ -981,7 +981,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			else {
 				if(min == 0 && get_useable_count(sumplayer, LOCATION_MZONE) > 0 ) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 90);
-					core.temp_var[0] = (void*)required;
+					core.temp_var[0] = required;
 					core.units.begin()->step = 19;
 				} else
 					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, required);
@@ -1031,7 +1031,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			returns.ivalue[0] = FALSE;
 			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
 			if(pextra) {
-				core.temp_var[0] = pextra;
+				core.temp_var[0] = (ptr)pextra;
 				if(core.summon_count[sumplayer] < get_summon_count_limit(sumplayer))
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
 				else
@@ -1076,7 +1076,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			returns.ivalue[0] = FALSE;
 			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
 			if(pextra) {
-				core.temp_var[0] = pextra;
+				core.temp_var[0] = (ptr)pextra;
 				if(core.summon_count[sumplayer] < get_summon_count_limit(sumplayer))
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
 				else
@@ -1341,7 +1341,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			else {
 				if(min == 0 && get_useable_count(setplayer, LOCATION_MZONE) > 0) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 90);
-					core.temp_var[0] = (void*)required;
+					core.temp_var[0] = required;
 					core.units.begin()->step = 9;
 				} else
 					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, required);
@@ -1386,7 +1386,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			returns.ivalue[0] = FALSE;
 			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
 			if(pextra) {
-				core.temp_var[0] = pextra;
+				core.temp_var[0] = (ptr)pextra;
 				if(core.summon_count[setplayer] < get_summon_count_limit(setplayer))
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
 				else

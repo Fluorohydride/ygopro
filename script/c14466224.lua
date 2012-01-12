@@ -54,7 +54,7 @@ function c14466224.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function c14466224.eqlimit(e,c)
-	return e:GetOwner()==c and not c:IsDisabled()
+	return e:GetOwner()==c
 end
 function c14466224.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -71,23 +71,29 @@ function c14466224.eqop(e,tp,eg,ep,ev,re,r,rp)
 			e:SetLabelObject(tc)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
+			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
 			e1:SetCode(EFFECT_EQUIP_LIMIT)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
 			e1:SetValue(c14466224.eqlimit)
 			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_EQUIP)
-			e2:SetCode(EFFECT_UPDATE_ATTACK)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			e2:SetValue(atk)
-			tc:RegisterEffect(e2)
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_EQUIP)
-			e3:SetCode(EFFECT_UPDATE_DEFENCE)
-			e3:SetReset(RESET_EVENT+0x1fe0000)
-			e3:SetValue(def)
-			tc:RegisterEffect(e3)
+			if atk>0 then
+				local e2=Effect.CreateEffect(c)
+				e2:SetType(EFFECT_TYPE_EQUIP)
+				e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
+				e2:SetCode(EFFECT_UPDATE_ATTACK)
+				e2:SetReset(RESET_EVENT+0x1fe0000)
+				e2:SetValue(atk)
+				tc:RegisterEffect(e2)
+			end
+			if def>0 then
+				local e3=Effect.CreateEffect(c)
+				e3:SetType(EFFECT_TYPE_EQUIP)
+				e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
+				e3:SetCode(EFFECT_UPDATE_DEFENCE)
+				e3:SetReset(RESET_EVENT+0x1fe0000)
+				e3:SetValue(def)
+				tc:RegisterEffect(e3)
+			end
 		else Duel.SendtoGrave(tc,REASON_EFFECT) end
 	end
 end

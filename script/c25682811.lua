@@ -14,7 +14,7 @@ function c25682811.initial_effect(c)
 	e1:SetTarget(c25682811.eqtg)
 	e1:SetOperation(c25682811.eqop)
 	c:RegisterEffect(e1)
-	--equip
+	--atkup
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
@@ -50,6 +50,7 @@ function c25682811.eqop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,tc,c,false)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c25682811.eqlimit)
@@ -58,7 +59,7 @@ function c25682811.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c25682811.eqlimit(e,c)
-	return e:GetOwner()==c and not c:IsDisabled()
+	return e:GetOwner()==c
 end
 function c25682811.atkval(e,c)
 	return c:GetEquipGroup():FilterCount(Card.IsSetCard,nil,0x29)*300

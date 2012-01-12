@@ -5,6 +5,8 @@
 #include "deck_manager.h"
 #include "replay.h"
 #include "materials.h"
+#include "duelclient.h"
+#include "netserver.h"
 
 #ifndef WIN32
 #include <sys/types.h>
@@ -487,6 +489,8 @@ void Game::MainLoop() {
 			timer->setTime(0);
 		}
 	}
+	DuelClient::StopClient(true);
+	NetServer::StopServer();
 	SaveConfig();
 	device->drop();
 }

@@ -21,13 +21,18 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_MODE: {
+				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wMainMenu, false, mainGame->wLanWindow);
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
-				mainGame->btnCreateHost->setEnabled(false);
-				mainGame->btnJoinHost->setEnabled(false);
-				mainGame->btnJoinCancel->setEnabled(false);
+				if(DuelClient::StartClient(0x7f000001, 7911, false)) {
+					mainGame->btnCreateHost->setEnabled(false);
+					mainGame->btnJoinHost->setEnabled(false);
+					mainGame->btnJoinCancel->setEnabled(false);
+				}
 				break;
 			}
 			case BUTTON_JOIN_CANCEL: {
@@ -52,6 +57,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CANCEL: {
+				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wCreateHost, false, mainGame->wLanWindow);
 				break;
 			}
@@ -216,6 +224,52 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_USER_EVENT: {
+		switch(event.UserEvent.UserData1) {
+		case UEVENT_EXIT: {
+			if(mainGame->guiFading) {
+				mainGame->guiFading->setVisible(false);
+				mainGame->guiNext = 0;
+			}
+			mainGame->ShowElement(mainGame->wMessage, 60);
+			if(event.UserEvent.UserData2 == 1)
+				mainGame->exit_window = mainGame->wLanWindow;
+			else if(event.UserEvent.UserData2 == 2)
+				;
+			else if(event.UserEvent.UserData2 == 3)
+				;
+			break;
+		}
+		case UEVENT_TOWINDOW: {
+			mainGame->exit_window = 0;
+			mainGame->wMessage->setVisible(false);
+			mainGame->wACMessage->setVisible(false);
+			mainGame->wQuery->setVisible(false);
+			mainGame->wOptions->setVisible(false);
+			mainGame->wPosSelect->setVisible(false);
+			mainGame->wCardSelect->setVisible(false);
+			mainGame->wANNumber->setVisible(false);
+			mainGame->wANCard->setVisible(false);
+			mainGame->wANAttribute->setVisible(false);
+			mainGame->wANRace->setVisible(false);
+			mainGame->wCmdMenu->setVisible(false);
+			mainGame->wReplaySave->setVisible(false);
+			mainGame->btnDP->setVisible(false);
+			mainGame->btnSP->setVisible(false);
+			mainGame->btnM1->setVisible(false);
+			mainGame->btnBP->setVisible(false);
+			mainGame->btnM2->setVisible(false);
+			mainGame->btnEP->setVisible(false);
+			mainGame->wCardImg->setVisible(false);
+			mainGame->wInfos->setVisible(false);
+			mainGame->stHintMsg->setVisible(false);
+			mainGame->stTip->setVisible(false);
+			mainGame->device->setEventReceiver(&mainGame->menuHandler);
+			mainGame->dField.Clear();
+			mainGame->ShowElement(mainGame->exit_window);
+			break;
+		}
+		break;
+		}
 		break;
 	}
 	}

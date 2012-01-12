@@ -1266,52 +1266,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		break;
 	}
 	case irr::EET_USER_EVENT: {
-		switch(event.UserEvent.UserData1) {
-		case UEVENT_EXIT: {
-			if(mainGame->guiFading) {
-				mainGame->guiFading->setVisible(false);
-				mainGame->guiNext = 0;
-			}
-			mainGame->ShowElement(mainGame->wMessage, 60);
-			if(event.UserEvent.UserData2 == 1)
-				mainGame->exit_window = mainGame->wLanWindow;
-			else if(event.UserEvent.UserData2 == 2)
-				;
-			else if(event.UserEvent.UserData2 == 3)
-				;
-			break;
-		}
-		case UEVENT_TOWINDOW: {
-			mainGame->exit_window = 0;
-			mainGame->wMessage->setVisible(false);
-			mainGame->wACMessage->setVisible(false);
-			mainGame->wQuery->setVisible(false);
-			mainGame->wOptions->setVisible(false);
-			mainGame->wPosSelect->setVisible(false);
-			mainGame->wCardSelect->setVisible(false);
-			mainGame->wANNumber->setVisible(false);
-			mainGame->wANCard->setVisible(false);
-			mainGame->wANAttribute->setVisible(false);
-			mainGame->wANRace->setVisible(false);
-			mainGame->wCmdMenu->setVisible(false);
-			mainGame->wReplaySave->setVisible(false);
-			mainGame->btnDP->setVisible(false);
-			mainGame->btnSP->setVisible(false);
-			mainGame->btnM1->setVisible(false);
-			mainGame->btnBP->setVisible(false);
-			mainGame->btnM2->setVisible(false);
-			mainGame->btnEP->setVisible(false);
-			mainGame->wCardImg->setVisible(false);
-			mainGame->wInfos->setVisible(false);
-			mainGame->stHintMsg->setVisible(false);
-			mainGame->stTip->setVisible(false);
-			mainGame->device->setEventReceiver(&mainGame->menuHandler);
-			mainGame->dField.Clear();
-			mainGame->ShowElement(mainGame->exit_window);
-			break;
-		}
 		break;
-		}
 	}
 	}
 	return false;

@@ -44,7 +44,7 @@ function c63519819.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function c63519819.eqlimit(e,c)
-	return e:GetOwner()==c and not c:IsDisabled()
+	return e:GetOwner()==c
 end
 function c63519819.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -53,31 +53,37 @@ function c63519819.eqop(e,tp,eg,ep,ev,re,r,rp)
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			local atk=tc:GetTextAttack()
 			local def=tc:GetTextDefence()
-			if atk<0 then atk=0 end
-			if def<0 then def=0 end
+			if c:IsFacedown() or atk<0 then atk=0 end
+			if c:IsFacedown() or def<0 then def=0 end
 			if not Duel.Equip(tp,tc,c,false) then return end
 			--Add Equip limit
 			tc:RegisterFlagEffect(63519819,RESET_EVENT+0x1fe0000,0,0)
 			e:SetLabelObject(tc)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
+			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
 			e1:SetCode(EFFECT_EQUIP_LIMIT)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
 			e1:SetValue(c63519819.eqlimit)
 			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_EQUIP)
-			e2:SetCode(EFFECT_SET_ATTACK)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			e2:SetValue(atk)
-			tc:RegisterEffect(e2)
-			local e3=Effect.CreateEffect(c)
-			e3:SetType(EFFECT_TYPE_EQUIP)
-			e3:SetCode(EFFECT_SET_DEFENCE)
-			e3:SetReset(RESET_EVENT+0x1fe0000)
-			e3:SetValue(def)
-			tc:RegisterEffect(e3)
+			if atk>0 then
+				local e2=Effect.CreateEffect(c)
+				e2:SetType(EFFECT_TYPE_EQUIP)
+				e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
+				e2:SetCode(EFFECT_SET_ATTACK)
+				e2:SetReset(RESET_EVENT+0x1fe0000)
+				e2:SetValue(atk)
+				tc:RegisterEffect(e2)
+			end
+			if def>0 then
+				local e3=Effect.CreateEffect(c)
+				e3:SetType(EFFECT_TYPE_EQUIP)
+				e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
+				e3:SetCode(EFFECT_SET_DEFENCE)
+				e3:SetReset(RESET_EVENT+0x1fe0000)
+				e3:SetValue(def)
+				tc:RegisterEffect(e3)
+			end
 			local e4=Effect.CreateEffect(c)
 			e4:SetType(EFFECT_TYPE_EQUIP)
 			e4:SetCode(EFFECT_DESTROY_SUBSTITUTE)

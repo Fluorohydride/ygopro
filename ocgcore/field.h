@@ -198,7 +198,7 @@ struct processor {
 	effect_vector delayed_ntp;
 	event_list delayed_tev;
 	event_list delayed_ntev;
-	void* temp_var[4];
+	ptr temp_var[4];
 	uint16 pre_field[5];
 	int32 chain_limit;
 	uint8 chain_limp;

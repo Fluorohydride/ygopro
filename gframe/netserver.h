@@ -3,60 +3,12 @@
 
 #include "config.h"
 #include "network.h"
-#include <event2/event.h>
-#include <event2/listener.h>
-#include <event2/bufferevent.h>
-#include <event2/buffer.h>
-#include <event2/thread.h>
 #include "data_manager.h"
 #include "deck_manager.h"
-#include <array>
 #include <set>
 #include <unordered_map>
 
 namespace ygo {
-
-class DuelMode;
-
-struct DuelPlayer {
-	unsigned short name[20];
-	DuelMode* game;
-	unsigned char type;
-	unsigned char state;
-	bufferevent* bev;
-	DuelPlayer() {
-		game = 0;
-		type = 0;
-		state = 0;
-		bev = 0;
-	}
-};
-
-class DuelMode {
-public:
-	DuelMode() {
-		for(int i = 0; i < 6; ++i) {
-			players[i] = 0;
-			ready[i] = false;
-		}
-		host_player = 0;
-		pduel = 0;
-	}
-	void Start();
-	void Process();
-	void End();
-
-public:
-	DuelPlayer* players[6];
-	bool ready[6];
-	Deck pdeck[6];
-	std::set<DuelPlayer*> observers;
-	DuelPlayer* host_player;
-	HostInfo host_info;
-	unsigned long pduel;
-	wchar_t name[20];
-	wchar_t pass[20];
-};
 
 class NetServer {
 private:
@@ -107,13 +59,5 @@ public:
 };
 
 }
-
-#define NETPLAYER_TYPE_PLAYER1		0
-#define NETPLAYER_TYPE_PLAYER2		1
-#define NETPLAYER_TYPE_PLAYER3		2
-#define NETPLAYER_TYPE_PLAYER4		3
-#define NETPLAYER_TYPE_PLAYER5		4
-#define NETPLAYER_TYPE_PLAYER6		5
-#define NETPLAYER_TYPE_OBSERVER		7
 
 #endif //NETSERVER_H

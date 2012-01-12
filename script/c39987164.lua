@@ -42,7 +42,7 @@ function c39987164.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function c39987164.eqlimit(e,c)
-	return e:GetOwner()==c and not c:IsDisabled()
+	return e:GetOwner()==c
 end
 function c39987164.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -54,7 +54,7 @@ function c39987164.eqop(e,tp,eg,ep,ev,re,r,rp)
 			tc:RegisterFlagEffect(39987164,RESET_EVENT+0x1fe0000,0,0)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
+			e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
 			e1:SetCode(EFFECT_EQUIP_LIMIT)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
 			e1:SetValue(c39987164.eqlimit)

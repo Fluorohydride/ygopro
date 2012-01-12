@@ -66,12 +66,14 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
 		bool create_game = (bool)ctx;
-		mainGame->HideElement(mainGame->wCreateHost);
-		mainGame->WaitFrameSignal(10);
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
 		if(create_game) {
+			mainGame->btnHostConfirm->setEnabled(true);
+			mainGame->btnHostCancel->setEnabled(true);
+			mainGame->HideElement(mainGame->wCreateHost);
+			mainGame->WaitFrameSignal(11);
 			CTOS_CreateGame cscg;
 			BufferIO::CopyWStr(mainGame->ebServerName->getText(), cscg.name, 20);
 			BufferIO::CopyWStr(mainGame->ebServerPass->getText(), cscg.pass, 20);
@@ -85,6 +87,8 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.no_shuffle_deck = mainGame->chkNoShuffleDeck->isChecked();
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
+			mainGame->HideElement(mainGame->wLanWindow);
+			mainGame->WaitFrameSignal(11);
 			CTOS_JoinGame csjg;
 			csjg.gameid = 0;
 			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
@@ -93,19 +97,19 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 		bufferevent_enable(bev, EV_READ);
 		connect_state = 2;
 	} else if (events & BEV_EVENT_ERROR) {
+		bufferevent_disable(bev, EV_READ);
 		if(!is_closing) {
 			if(connect_state == 1) {
 				mainGame->env->addMessageBox(L"", L"无法连接到主机。");
-				mainGame->btnCreateHost->setEnabled(true);
-				mainGame->btnJoinHost->setEnabled(true);
-				mainGame->btnJoinCancel->setEnabled(true);
 			} else if(connect_state == 2) {
-				mainGame->env->addMessageBox(L"", L"已断开连接。");
-				irr::SEvent sevt;
-				sevt.EventType = irr::EET_USER_EVENT;
-				sevt.UserEvent.UserData1 = UEVENT_EXIT;
-				sevt.UserEvent.UserData2 = 2;
-				mainGame->device->postEventFromUser(sevt);
+				if(!mainGame->dInfo.isStarted) {
+					mainGame->env->addMessageBox(L"", L"连接已断开。");
+					irr::SEvent sevt;
+					sevt.EventType = irr::EET_USER_EVENT;
+					sevt.UserEvent.UserData1 = UEVENT_EXIT;
+					sevt.UserEvent.UserData2 = 2;
+					mainGame->device->postEventFromUser(sevt);
+				}
 			}
 		}
 		event_base_loopexit(client_base, NULL);
@@ -153,7 +157,6 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->chkHostSingleReady[1]->setChecked(false);
 		if(selftype < 2)
 			mainGame->chkHostSingleReady[selftype]->setEnabled(true);
-		mainGame->WaitFrameSignal(10);
 		mainGame->ShowElement(mainGame->wHostSingle);
 		mainGame->WaitFrameSignal(10);
 		break;
@@ -169,6 +172,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
+		break;
+	}
+	case STOC_GAME_START: {
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {

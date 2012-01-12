@@ -42,6 +42,7 @@ function c54578613.eqop(e,tp,eg,ep,ev,re,r,rp)
 		if not Duel.Equip(tp,tc,c,false) then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c54578613.eqlimit)
@@ -49,7 +50,7 @@ function c54578613.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c54578613.eqlimit(e,c)
-	return e:GetOwner()==c and not c:IsDisabled()
+	return e:GetOwner()==c
 end
 function c54578613.costfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x29) and c:IsAbleToGraveAsCost()
