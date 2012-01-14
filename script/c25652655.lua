@@ -13,8 +13,7 @@ function c25652655.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c25652655.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c25652655.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end

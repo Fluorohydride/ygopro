@@ -13,8 +13,7 @@ function c5519829.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c5519829.con(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c5519829.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,500) end

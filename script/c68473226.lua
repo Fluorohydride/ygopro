@@ -28,9 +28,8 @@ function c68473226.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.SendtoGrave(g,REASON_DISCARD+REASON_COST)
 end
 function c68473226.regcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local rc=c:GetReasonCard()
-	return bit.band(c:GetReason(),0x18)==0x18 and rc:IsFaceup() and rc:IsLevelAbove(7)
+	local rc=e:GetHandler():GetReasonCard()
+	return r==REASON_SUMMON and rc:IsFaceup() and rc:IsLevelAbove(7)
 end
 function c68473226.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

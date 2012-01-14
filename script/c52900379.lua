@@ -54,8 +54,7 @@ function c52900379.clear(e,tp,eg,ep,ev,re,r,rp)
 	c52900379[1]=0
 end
 function c52900379.reccon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c52900379.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

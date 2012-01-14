@@ -13,8 +13,7 @@ function c40048324.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c40048324.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c40048324.filter(c)
 	return c:IsCode(80280737) and c:IsAbleToHand()

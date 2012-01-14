@@ -13,7 +13,7 @@ function c41431329.initial_effect(c)
 end
 function c41431329.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 		and c:GetReasonCard():IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c41431329.filter(c)

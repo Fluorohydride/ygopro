@@ -93,9 +93,9 @@ int NetServer::ServerThread(void* param) {
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 	auto bit = users.find(dp->bev);
 	if(bit != users.end()) {
-		users.erase(bit);
 		bufferevent_disable(dp->bev, EV_READ);
 		bufferevent_free(dp->bev);
+		users.erase(bit);
 	}
 }
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {

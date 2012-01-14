@@ -13,7 +13,7 @@ function c53116300.initial_effect(c)
 end
 function c53116300.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x1a)==0x1a and c:GetReasonCard():IsSetCard(0x100a)
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_SUMMON and c:GetReasonCard():IsSetCard(0x100a)
 end
 function c53116300.filter(c,e,tp)
 	return c:IsSetCard(0x100a) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

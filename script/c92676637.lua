@@ -23,8 +23,7 @@ function c92676637.slevel(e,c)
 	return 2*65536+lv
 end
 function c92676637.drcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c92676637.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -35,7 +35,7 @@ function c16825874.operation(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
 	Duel.SetSynchroMaterial(g)
 end
 function c16825874.ccon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_SYNCHRO)
+	return r==REASON_SYNCHRO
 end
 function c16825874.cop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

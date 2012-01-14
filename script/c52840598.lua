@@ -9,8 +9,7 @@ function c52840598.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c52840598.con(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c52840598.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

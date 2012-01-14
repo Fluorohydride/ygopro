@@ -12,8 +12,7 @@ function c26381750.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26381750.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 		and Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x39):GetClassCount(Card.GetCode)>=3
 end
 function c26381750.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -12,7 +12,7 @@ function c40348946.initial_effect(c)
 end
 function c40348946.con(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008 and c:GetReasonCard():IsRace(RACE_DRAGON)
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO and c:GetReasonCard():IsRace(RACE_DRAGON)
 end
 function c40348946.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

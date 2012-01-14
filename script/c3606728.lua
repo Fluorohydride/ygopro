@@ -44,8 +44,7 @@ function c3606728.ffilter(c)
 end
 function c3606728.efcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetReasonCard()
-	if ec:GetMaterial():IsExists(c3606728.ffilter,1,nil) then return false end
-	return bit.band(e:GetHandler():GetReason(),0x200008)==0x200008
+	return not ec:GetMaterial():IsExists(c3606728.ffilter,1,nil) and r==REASON_XYZ
 end
 function c3606728.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

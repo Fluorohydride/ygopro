@@ -13,8 +13,7 @@ function c37300735.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c37300735.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 end
 function c37300735.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

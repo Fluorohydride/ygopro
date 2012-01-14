@@ -28,7 +28,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
-				if(DuelClient::StartClient(0x7f000001, 7911, false)) {
+				if(DuelClient::StartClient(0xc0a80264, 7911, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
 					mainGame->btnJoinCancel->setEnabled(false);
@@ -48,7 +48,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HOST_CONFIRM: {
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
-				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
+				if(!DuelClient::StartClient(0xc0a80264, mainGame->gameConf.serverport)) {
 					NetServer::StopServer();
 					break;
 				}

@@ -14,7 +14,7 @@ function c96182448.initial_effect(c)
 end
 function c96182448.drcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and bit.band(c:GetReason(),0x80008)==0x80008 and c:GetReasonCard():IsCode(18013090)
+	return c:IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO and c:GetReasonCard():IsCode(18013090)
 end
 function c96182448.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
