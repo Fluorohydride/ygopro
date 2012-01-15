@@ -28,7 +28,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
-				if(DuelClient::StartClient(0xc0a80264, 7911, false)) {
+				char ip[20];
+				int i = 0;
+				wchar_t* pstr = (wchar_t *)mainGame->ebJoinIP->getText();
+				while(*pstr && i < 16)
+					ip[i++] = *pstr++;
+				ip[i] = 0;
+				unsigned int remote_addr = htonl(inet_addr(ip));
+				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
+				BufferIO::CopyWStr(mainGame->ebJoinIP->getText(), mainGame->gameConf.lastip, 20);
+				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
+				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
 					mainGame->btnJoinCancel->setEnabled(false);
@@ -46,9 +56,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
+				BufferIO::CopyWStr(mainGame->ebServerName->getText(), mainGame->gameConf.gamename, 20);
 				if(!NetServer::StartServer(mainGame->gameConf.serverport))
 					break;
-				if(!DuelClient::StartClient(0xc0a80264, mainGame->gameConf.serverport)) {
+				if(!DuelClient::StartClient(0x7f000001, mainGame->gameConf.serverport)) {
 					NetServer::StopServer();
 					break;
 				}
@@ -64,23 +75,34 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HS_DUELIST: {
+				DuelClient::SendPacketToServer(CTOS_HS_TODUELIST);
 				break;
 			}
 			case BUTTON_HS_OBSERVER: {
+				DuelClient::SendPacketToServer(CTOS_HS_TOOBSERVER);
 				break;
 			}
 			case BUTTON_HS_KICK: {
 				int id = caller - static_cast<IGUIElement*>(mainGame->btnHostSingleKick[0]);
+				CTOS_Kick csk;
 				if(id == 0)
-					DuelClient::SendPacketToServer(CTOS_HS_KICK1);
-				else
-					DuelClient::SendPacketToServer(CTOS_HS_KICK2);
+					csk.pos = 0;
+				else csk.pos = 1;
+				DuelClient::SendPacketToServer(CTOS_HS_KICK, csk);
 				break;
 			}
 			case BUTTON_HS_START: {
+				if(!mainGame->chkHostSingleReady[0]->isChecked()
+				        || !!mainGame->chkHostSingleReady[0]->isChecked())
+					break;
 				break;
 			}
 			case BUTTON_HS_CANCEL: {
+				DuelClient::StopClient();
+				mainGame->btnCreateHost->setEnabled(true);
+				mainGame->btnJoinHost->setEnabled(true);
+				mainGame->btnJoinCancel->setEnabled(true);
+				mainGame->HideElement(mainGame->wHostSingle, false, mainGame->wLanWindow);
 				break;
 			}
 			case BUTTON_DECK_EDIT: {
@@ -199,7 +221,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(!caller->isEnabled())
 					break;
 				mainGame->env->setFocus(mainGame->wHostSingle);
-				DuelClient::SendPacketToServer(CTOS_HS_READY);
+				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
+					if(mainGame->cbDeckSelect->getSelected() == -1 ||
+					        !deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))) {
+						static_cast<irr::gui::IGUICheckBox*>(caller)->setChecked(false);
+						break;
+					}
+					BufferIO::CopyWStr(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()),
+					                   mainGame->gameConf.lastdeck, 20);
+					char deckbuf[1024];
+					char* pdeck = deckbuf;
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
+					for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+						BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
+					for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+						BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
+					for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+						BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
+					DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+					DuelClient::SendPacketToServer(CTOS_HS_READY);
+				} else
+					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 				break;
 			}
 			}

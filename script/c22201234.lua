@@ -46,7 +46,7 @@ function c22201234.aop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c22201234.qcon(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return d:IsFaceup() and d:IsSetCard(0x38) and d:IsControler(tp)
+	return d:IsFaceup() and d:IsSetCard(0x38) and d:IsControler(tp) and not e:GetHandler():IsStatus(STATUS_CHAINING)
 end
 function c22201234.qcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,2) end

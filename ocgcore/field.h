@@ -218,6 +218,7 @@ struct processor {
 	card* attack_target;
 	card* sub_attack_target;
 	card* limit_tuner;
+	uint8 attack_cancelable;
 	int32 battle_damage[2];
 	int32 summon_count[2];
 	int32 spe_effect[2];

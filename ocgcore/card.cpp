@@ -310,8 +310,7 @@ int32 card::get_attack(uint8 swap) {
 			break;
 		case EFFECT_SET_ATTACK:
 			base = eset[i]->get_value(this);
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
-				up = 0;
+			up = 0;
 			break;
 		case EFFECT_SET_ATTACK_FINAL:
 			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
@@ -396,8 +395,7 @@ int32 card::get_defence(uint8 swap) {
 			break;
 		case EFFECT_SET_DEFENCE:
 			base = eset[i]->get_value(this);
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
-				up = 0;
+			up = 0;
 			break;
 		case EFFECT_SET_DEFENCE_FINAL:
 			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {

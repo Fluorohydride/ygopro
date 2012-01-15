@@ -1,5 +1,6 @@
 #include "config.h"
 #include "game.h"
+#include <event2/thread.h>
 
 int main() {
 #ifdef _WIN32
@@ -7,7 +8,9 @@ int main() {
 	WSADATA wsaData;
 	wVersionRequested = MAKEWORD(2, 2);
 	WSAStartup(wVersionRequested, &wsaData);
+	evthread_use_windows_threads();
 #else
+	evthread_use_pthreads();
 #endif //_WIN32
 	ygo::Game _game;
 	ygo::mainGame = &_game;

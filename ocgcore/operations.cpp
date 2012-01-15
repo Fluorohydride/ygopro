@@ -496,15 +496,13 @@ int32 field::pay_lp_cost(uint32 step, uint8 playerid, uint32 cost) {
 		e.reason_player = playerid;
 		core.select_options.clear();
 		core.select_effects.clear();
-		if(val < player[playerid].lp) {
+		if(val <= player[playerid].lp) {
 			core.select_options.push_back(11);
 			core.select_effects.push_back(0);
 		}
-		pair<effect_container::iterator, effect_container::iterator> pr;
-		pr = effects.continuous_effect.equal_range(EFFECT_LPCOST_REPLACE);
-		effect* peffect;
+		auto pr = effects.continuous_effect.equal_range(EFFECT_LPCOST_REPLACE);
 		for (; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
+			effect* peffect = pr.first->second;
 			if(peffect->is_activateable(peffect->get_handler_player(), e)) {
 				core.select_options.push_back(peffect->description);
 				core.select_effects.push_back(peffect);
@@ -2560,6 +2558,13 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 					target->reset(RESET_TOFIELD, RESET_EVENT);
 				if(target->current.location & LOCATION_ONFIELD)
 					target->reset(RESET_LEAVE, RESET_EVENT);
+			}
+		} else {
+			if(target->turnid != infos.turn_id) {
+				target->set_status(STATUS_SUMMON_TURN, FALSE);
+				target->set_status(STATUS_SET_TURN, FALSE);
+				target->set_status(STATUS_FORM_CHANGED, FALSE);
+				target->set_status(STATUS_ATTACKED, FALSE);
 			}
 		}
 		target->temp.sequence = seq;

@@ -17,19 +17,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
 			case BUTTON_CLEAR_DECK: {
-				deckManager.deckhost.main.clear();
-				deckManager.deckhost.extra.clear();
-				deckManager.deckhost.side.clear();
+				deckManager.current_deck.main.clear();
+				deckManager.current_deck.extra.clear();
+				deckManager.current_deck.side.clear();
 				break;
 			}
 			case BUTTON_SORT_DECK: {
-				std::sort(deckManager.deckhost.main.begin(), deckManager.deckhost.main.end(), ClientCard::deck_sort_lv);
-				std::sort(deckManager.deckhost.extra.begin(), deckManager.deckhost.extra.end(), ClientCard::deck_sort_lv);
-				std::sort(deckManager.deckhost.side.begin(), deckManager.deckhost.side.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.current_deck.extra.begin(), deckManager.current_deck.extra.end(), ClientCard::deck_sort_lv);
+				std::sort(deckManager.current_deck.side.begin(), deckManager.current_deck.side.end(), ClientCard::deck_sort_lv);
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
-				deckManager.SaveDeck(deckManager.deckhost, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
+				deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
 				mainGame->stACMessage->setText(L"保存成功");
 				mainGame->PopupElement(mainGame->wACMessage, 20);
 				break;
@@ -51,7 +51,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				deckManager.SaveDeck(deckManager.deckhost, dname);
+				deckManager.SaveDeck(deckManager.current_deck, dname);
 				mainGame->ebDeckname->setText(L"");
 				mainGame->stACMessage->setText(L"保存成功");
 				mainGame->PopupElement(mainGame->wACMessage, 20);
@@ -397,27 +397,27 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				int limit = 3;
 				if(filterList->count(limitcode))
 					limit = (*filterList)[limitcode];
-				for(int i = 0; i < deckManager.deckhost.main.size(); ++i)
-					if(deckManager.deckhost.main[i]->first == limitcode
-					        || deckManager.deckhost.main[i]->second.alias == limitcode)
+				for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+					if(deckManager.current_deck.main[i]->first == limitcode
+					        || deckManager.current_deck.main[i]->second.alias == limitcode)
 						limit--;
-				for(int i = 0; i < deckManager.deckhost.extra.size(); ++i)
-					if(deckManager.deckhost.extra[i]->first == limitcode
-					        || deckManager.deckhost.extra[i]->second.alias == limitcode)
+				for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+					if(deckManager.current_deck.extra[i]->first == limitcode
+					        || deckManager.current_deck.extra[i]->second.alias == limitcode)
 						limit--;
-				for(int i = 0; i < deckManager.deckhost.side.size(); ++i)
-					if(deckManager.deckhost.side[i]->first == limitcode
-					        || deckManager.deckhost.side[i]->second.alias == limitcode)
+				for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+					if(deckManager.current_deck.side[i]->first == limitcode
+					        || deckManager.current_deck.side[i]->second.alias == limitcode)
 						limit--;
 				if(limit <= 0)
 					break;
 			}
 			if(hovered_pos == 1)
-				deckManager.deckhost.main.erase(deckManager.deckhost.main.begin() + hovered_seq);
+				deckManager.current_deck.main.erase(deckManager.current_deck.main.begin() + hovered_seq);
 			else if(hovered_pos == 2)
-				deckManager.deckhost.extra.erase(deckManager.deckhost.extra.begin() + hovered_seq);
+				deckManager.current_deck.extra.erase(deckManager.current_deck.extra.begin() + hovered_seq);
 			else if(hovered_pos == 3)
-				deckManager.deckhost.side.erase(deckManager.deckhost.side.begin() + hovered_seq);
+				deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
 			is_draging = true;
 			break;
 		}
@@ -427,18 +427,18 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			is_draging = false;
 			if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)))
 				hovered_pos = 0;
-			if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.deckhost.main.size() < 60) {
-				if(hovered_seq < deckManager.deckhost.main.size())
-					deckManager.deckhost.main.insert(deckManager.deckhost.main.begin() + hovered_seq, draging_pointer);
-				else deckManager.deckhost.main.push_back(draging_pointer);
-			} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.deckhost.extra.size() < 15) {
-				if(hovered_seq < deckManager.deckhost.extra.size())
-					deckManager.deckhost.extra.insert(deckManager.deckhost.extra.begin() + hovered_seq, draging_pointer);
-				else deckManager.deckhost.extra.push_back(draging_pointer);
-			} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.deckhost.side.size() < 15) {
-				if(hovered_seq < deckManager.deckhost.side.size())
-					deckManager.deckhost.side.insert(deckManager.deckhost.side.begin() + hovered_seq, draging_pointer);
-				else deckManager.deckhost.side.push_back(draging_pointer);
+			if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 60) {
+				if(hovered_seq < deckManager.current_deck.main.size())
+					deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
+				else deckManager.current_deck.main.push_back(draging_pointer);
+			} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 15) {
+				if(hovered_seq < deckManager.current_deck.extra.size())
+					deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
+				else deckManager.current_deck.extra.push_back(draging_pointer);
+			} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 15) {
+				if(hovered_seq < deckManager.current_deck.side.size())
+					deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
+				else deckManager.current_deck.side.push_back(draging_pointer);
 			}
 			break;
 		}
@@ -451,34 +451,34 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				draging_pointer = dataManager.GetCodePointer(hovered_code);
 			if(hovered_pos == 1) {
 				if(!is_draging)
-					deckManager.deckhost.main.erase(deckManager.deckhost.main.begin() + hovered_seq);
-				else if(deckManager.deckhost.side.size() < 15) {
-					deckManager.deckhost.side.push_back(draging_pointer);
+					deckManager.current_deck.main.erase(deckManager.current_deck.main.begin() + hovered_seq);
+				else if(deckManager.current_deck.side.size() < 15) {
+					deckManager.current_deck.side.push_back(draging_pointer);
 					is_draging = false;
 				}
 			} else if(hovered_pos == 2) {
 				if(!is_draging)
-					deckManager.deckhost.extra.erase(deckManager.deckhost.extra.begin() + hovered_seq);
-				else if(deckManager.deckhost.side.size() < 15) {
-					deckManager.deckhost.side.push_back(draging_pointer);
+					deckManager.current_deck.extra.erase(deckManager.current_deck.extra.begin() + hovered_seq);
+				else if(deckManager.current_deck.side.size() < 15) {
+					deckManager.current_deck.side.push_back(draging_pointer);
 					is_draging = false;
 				}
 			} else if(hovered_pos == 3) {
 				if(!is_draging)
-					deckManager.deckhost.side.erase(deckManager.deckhost.side.begin() + hovered_seq);
+					deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
 				else {
-					if((draging_pointer->second.type & 0x802040) && deckManager.deckhost.extra.size() < 15) {
-						deckManager.deckhost.extra.push_back(draging_pointer);
+					if((draging_pointer->second.type & 0x802040) && deckManager.current_deck.extra.size() < 15) {
+						deckManager.current_deck.extra.push_back(draging_pointer);
 						is_draging = false;
-					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.deckhost.main.size() < 60) {
-						deckManager.deckhost.main.push_back(draging_pointer);
+					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60) {
+						deckManager.current_deck.main.push_back(draging_pointer);
 						is_draging = false;
 					}
 				}
 			} else {
 				if(is_draging) {
-					if(deckManager.deckhost.side.size() < 15) {
-						deckManager.deckhost.side.push_back(draging_pointer);
+					if(deckManager.current_deck.side.size() < 15) {
+						deckManager.current_deck.side.push_back(draging_pointer);
 						is_draging = false;
 					}
 				} else {
@@ -486,24 +486,24 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					int limit = 3;
 					if(filterList->count(limitcode))
 						limit = (*filterList)[limitcode];
-					for(int i = 0; i < deckManager.deckhost.main.size(); ++i)
-						if(deckManager.deckhost.main[i]->first == limitcode
-						        || deckManager.deckhost.main[i]->second.alias == limitcode)
+					for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+						if(deckManager.current_deck.main[i]->first == limitcode
+						        || deckManager.current_deck.main[i]->second.alias == limitcode)
 							limit--;
-					for(int i = 0; i < deckManager.deckhost.extra.size(); ++i)
-						if(deckManager.deckhost.extra[i]->first == limitcode
-						        || deckManager.deckhost.extra[i]->second.alias == limitcode)
+					for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+						if(deckManager.current_deck.extra[i]->first == limitcode
+						        || deckManager.current_deck.extra[i]->second.alias == limitcode)
 							limit--;
-					for(int i = 0; i < deckManager.deckhost.side.size(); ++i)
-						if(deckManager.deckhost.side[i]->first == limitcode
-						        || deckManager.deckhost.side[i]->second.alias == limitcode)
+					for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+						if(deckManager.current_deck.side[i]->first == limitcode
+						        || deckManager.current_deck.side[i]->second.alias == limitcode)
 							limit--;
 					if(limit <= 0)
 						break;
-					if((draging_pointer->second.type & 0x802040) && deckManager.deckhost.extra.size() < 15) {
-						deckManager.deckhost.extra.push_back(draging_pointer);
-					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.deckhost.main.size() < 60) {
-						deckManager.deckhost.main.push_back(draging_pointer);
+					if((draging_pointer->second.type & 0x802040) && deckManager.current_deck.extra.size() < 15) {
+						deckManager.current_deck.extra.push_back(draging_pointer);
+					} else if(!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 60) {
+						deckManager.current_deck.main.push_back(draging_pointer);
 					}
 				}
 			}
@@ -516,45 +516,45 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(x >= 314 && x <= 794 && y >= 164 && y <= 435) {
 				int lx = 10, px, py = (y - 164) / 68;
 				hovered_pos = 1;
-				if(deckManager.deckhost.main.size() > 40)
-					lx = (deckManager.deckhost.main.size() - 41) / 4 + 11;
+				if(deckManager.current_deck.main.size() > 40)
+					lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
 				if(x >= 750)
 					px = lx - 1;
 				else px = (x - 314) * (lx - 1) / 436;
-				if(py*lx + px >= deckManager.deckhost.main.size()) {
+				if(py*lx + px >= deckManager.current_deck.main.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
 					hovered_seq = py * lx + px;
-					hovered_code = deckManager.deckhost.main[hovered_seq]->first;
+					hovered_code = deckManager.current_deck.main[hovered_seq]->first;
 				}
 			} else if(x >= 314 && x <= 794 && y >= 466 && y <= 530) {
-				int lx = deckManager.deckhost.extra.size();
+				int lx = deckManager.current_deck.extra.size();
 				hovered_pos = 2;
 				if(lx < 10)
 					lx = 10;
 				if(x >= 750)
 					hovered_seq = lx - 1;
 				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= deckManager.deckhost.extra.size()) {
+				if(hovered_seq >= deckManager.current_deck.extra.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
-					hovered_code = deckManager.deckhost.extra[hovered_seq]->first;
+					hovered_code = deckManager.current_deck.extra[hovered_seq]->first;
 				}
 			} else if (x >= 314 && x <= 794 && y >= 564 && y <= 628) {
-				int lx = deckManager.deckhost.side.size();
+				int lx = deckManager.current_deck.side.size();
 				hovered_pos = 3;
 				if(lx < 10)
 					lx = 10;
 				if(x >= 750)
 					hovered_seq = lx - 1;
 				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= deckManager.deckhost.side.size()) {
+				if(hovered_seq >= deckManager.current_deck.side.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
-					hovered_code = deckManager.deckhost.side[hovered_seq]->first;
+					hovered_code = deckManager.current_deck.side[hovered_seq]->first;
 				}
 			} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
 				hovered_pos = 4;

@@ -11,11 +11,14 @@ function c64034255.initial_effect(c)
 	e1:SetOperation(c64034255.spop)
 	c:RegisterEffect(e1)
 end
+function c64034255.cfilter(c)
+	return c:IsFaceup() and c:IsAbleToHandAsCost()
+end
 function c64034255.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHandAsCost,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c64034255.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToHandAsCost,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c64034255.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	if g:GetFirst():IsAttribute(ATTRIBUTE_WIND) then e:SetLabel(1) else e:SetLabel(0) end
 	Duel.SendtoHand(g,nil,REASON_EFFECT)
 end

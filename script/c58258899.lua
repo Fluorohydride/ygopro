@@ -18,5 +18,5 @@ function c58258899.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x27)
 end
 function c58258899.val(e,c)
-	return Duel.GetMatchingGroupCount(c58258899.filter,tp,LOCATION_MZONE,0,nil)*300
+	return Duel.GetMatchingGroupCount(c58258899.filter,c:GetControler(),LOCATION_MZONE,0,nil)*300
 end

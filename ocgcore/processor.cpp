@@ -2378,6 +2378,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.to_m2 = FALSE;
 		if(must_attack.size())
 			core.to_ep = FALSE;
+		core.attack_cancelable = TRUE;
 		add_process(PROCESSOR_SELECT_BATTLECMD, 0, 0, 0, infos.turn_player, 0);
 		return FALSE;
 	}
@@ -2414,6 +2415,20 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker = core.attackable_cards[sel];
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, FALSE);
 			core.phase_action = TRUE;
+			effect_set eset;
+			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
+			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
+			for(int32 i = 0; i < eset.count; ++i) {
+				pduel->lua->add_param(core.attacker, PARAM_TYPE_CARD);
+				pduel->lua->add_param(infos.turn_player, PARAM_TYPE_INT);
+				if(!eset[i]->check_value_condition(2))
+					continue;
+				if(eset[i]->cost) {
+					core.attack_cancelable = FALSE;
+					core.sub_solving_event.push_back(nil_event);
+					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
+				}
+			}
 			return FALSE;
 		} else {
 			core.units.begin()->step = 29;
@@ -2459,7 +2474,7 @@ int32 field::process_battle_command(uint16 step) {
 			if(core.select_cards.size() == 1)
 				returns.bvalue[1] = 0;
 			else
-				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + 0x20000, 0x10001);
+				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			core.units.begin()->step = 5;
 			return FALSE;
 		}
@@ -2477,12 +2492,12 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.units.begin()->arg2) {
 			if(core.select_cards.size() == 1)
 				returns.bvalue[1] = 0;
-			else
-				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + 0x20000, 0x10001);
+			else 
+				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			core.units.begin()->step = 5;
 			return FALSE;
 		}
-		add_process(MSG_SELECT_CARD, 0, 0, 0, infos.turn_player + 0x20000, 0x10001);
+		add_process(MSG_SELECT_CARD, 0, 0, 0, infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 		core.units.begin()->step = 5;
 		return FALSE;
 	}
@@ -2492,7 +2507,7 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		} else {
 			if(core.select_cards.size())
-				add_process(MSG_SELECT_CARD, 0, 0, 0, infos.turn_player + 0x20000, 0x10001);
+				add_process(MSG_SELECT_CARD, 0, 0, 0, infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			else
 				core.units.begin()->step = -1;
 		}
@@ -2507,26 +2522,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target = 0;
 		else
 			core.attack_target = core.select_cards[returns.bvalue[1]];
-		//core.units.begin()->arg1 ---> is rollbacked
-		if(!core.units.begin()->arg1) {
-			//attack cost
-			effect_set eset;
-			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
-			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
-				pduel->lua->add_param(core.attacker, PARAM_TYPE_CARD);
-				pduel->lua->add_param(infos.turn_player, PARAM_TYPE_INT);
-				if(!eset[i]->check_value_condition(2))
-					continue;
-				if(eset[i]->cost) {
-					core.sub_solving_event.push_back(nil_event);
-					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
-				}
-			}
-		}
 		return FALSE;
 	}
 	case 7: {
+		core.attack_cancelable = TRUE;
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
 		core.attack_state[infos.turn_player] = TRUE;
@@ -3540,6 +3539,8 @@ int32 field::add_chain(uint16 step) {
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))
 			clit->flag |= CHAIN_DISABLE_EFFECT;
 		clit->chain_type = peffect->handler->get_type();
+		if(clit->chain_type == TYPE_MONSTER + TYPE_TRAP)
+			clit->chain_type = TYPE_MONSTER;
 		clit->chain_count = core.current_chain.size() + 1;
 		clit->target_cards = 0;
 		clit->target_player = PLAYER_NONE;

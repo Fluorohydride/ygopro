@@ -96,16 +96,16 @@ bool Game::Initialize() {
 	wCreateHost = env->addWindow(rect<s32>(320, 100, 700, 520), false, dataManager.GetSysString(1224));
 	wCreateHost->getCloseButton()->setVisible(false);
 	wCreateHost->setVisible(false);
-	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
-	cbRule = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
+	cbLFlist = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
+	for(int i = 0; i < deckManager._lfList.size(); ++i)
+		cbLFlist->addItem(deckManager._lfList[i].listName, deckManager._lfList[i].hash);
+	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
+	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
 	cbRule->addItem(dataManager.GetSysString(1240));
 	cbRule->addItem(dataManager.GetSysString(1241));
 	cbRule->addItem(dataManager.GetSysString(1242));
 	cbRule->addItem(dataManager.GetSysString(1243));
-	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
-	cbLFlist = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
-	for(int i = 0; i < deckManager._lfList.size(); ++i)
-		cbLFlist->addItem(deckManager._lfList[i].listName, deckManager._lfList[i].hash);
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));

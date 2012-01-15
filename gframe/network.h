@@ -12,16 +12,16 @@
 namespace ygo {
 
 struct HostInfo {
+	unsigned int lflist;
 	unsigned char rule;
 	unsigned char mode;
-	unsigned int lflist;
+	bool enable_priority;
 	bool no_check_deck;
 	bool no_shuffle_deck;
 	unsigned int start_lp;
 	unsigned char start_hand;
 	unsigned char draw_count;
 };
-
 struct HostPacket {
 	unsigned short identifier;
 	unsigned short version;
@@ -29,14 +29,8 @@ struct HostPacket {
 	unsigned short port;
 	HostInfo host;
 };
-
 struct HostRequest {
 	unsigned short identifier;
-};
-
-struct CTOS_Response {
-};
-struct CTOS_ChangeDeck {
 };
 struct CTOS_PlayerInfo {
 	unsigned short name[20];
@@ -50,8 +44,11 @@ struct CTOS_JoinGame {
 	unsigned int gameid;
 	unsigned short pass[20];
 };
-struct STOC_DeckError {
-	unsigned char reason;
+struct CTOS_Kick {
+	unsigned char pos;
+};
+struct STOC_ErrorMsg {
+	unsigned char msg;
 	unsigned int code;
 };
 struct STOC_CreateGame {
@@ -59,16 +56,12 @@ struct STOC_CreateGame {
 };
 struct STOC_JoinGame {
 	HostInfo info;
+};
+struct STOC_TypeChange {
 	unsigned char type;
 };
 struct STOC_ExitGame {
 	unsigned pos;
-};
-struct STOC_JoinFail {
-	//0 - common error
-	//1 - password incorrect
-	//2 - host denied
-	unsigned int reason;
 };
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
@@ -113,7 +106,7 @@ public:
 	virtual void LeaveGame(DuelPlayer* dp) = 0;
 	virtual void ToDuelist(DuelPlayer* dp) = 0;
 	virtual void ToObserver(DuelPlayer* dp) = 0;
-	virtual void PlayerReady(DuelPlayer* dp) = 0;
+	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) = 0;
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) = 0;
 	virtual void UpdateDeck(DuelPlayer* dp, void* pdata) = 0;
 	virtual void StartDuel(DuelPlayer* dp) = 0;
@@ -146,24 +139,24 @@ public:
 #define NETPLAYER_TYPE_OBSERVER		7
 
 #define CTOS_RESPONSE		0x1
-#define CTOS_CHANGEDECK		0x2
+#define CTOS_UPDATE_DECK	0x2
 #define CTOS_PLAYER_INFO	0x10
 #define CTOS_CREATE_GAME	0x11
 #define CTOS_JOIN_GAME		0x12
-#define CTOS_EXIT_GAME		0x13
+#define CTOS_LEAVE_GAME		0x13
 #define CTOS_HS_TODUELIST	0x20
 #define CTOS_HS_TOOBSERVER	0x21
 #define CTOS_HS_READY		0x22
-#define CTOS_HS_KICK1		0x23
-#define CTOS_HS_KICK2		0x24
+#define CTOS_HS_NOTREADY	0x23
+#define CTOS_HS_KICK		0x24
 #define CTOS_HS_START		0x25
 
 #define STOC_GAME_MSG		0x1
-#define STOC_DECK_ERROR		0x2
+#define STOC_ERROR_MSG		0x2
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
-#define STOC_EXIT_GAME		0x13
-#define STOC_JOIN_FAIL		0x14
+#define STOC_TYPE_CHANGE	0x13
+#define STOC_LEAVE_GAME		0x14
 #define STOC_GAME_START		0x15
 #define STOC_HS_PLAYER_ENTER	0x20
 #define STOC_HS_PLAYER_CHANGE	0x21
@@ -173,6 +166,9 @@ public:
 #define PLAYERCHANGE_NOTREADY	0x2
 #define PLAYERCHANGE_LEAVE		0x3
 #define PLAYERCHANGE_OBSERVE	0x4
+
+#define ERRMSG_JOINERROR	0x1
+#define ERRMSG_DECKERROR	0x2
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1

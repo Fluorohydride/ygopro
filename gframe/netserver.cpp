@@ -1,6 +1,5 @@
 #include "netserver.h"
 #include "single_duel.h"
-#include "match_duel.h"
 
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
@@ -17,11 +16,6 @@ bool NetServer::StartServer(unsigned short port) {
 	net_evbase = event_base_new();
 	if(!net_evbase)
 		return false;
-#ifdef _WIN32
-	evthread_use_windows_threads();
-#else
-	evthread_use_pthreads();
-#endif
 	sockaddr_in sin;
 	memset(&sin, 0, sizeof(sin));
 	sin.sin_family = AF_INET;
@@ -29,8 +23,11 @@ bool NetServer::StartServer(unsigned short port) {
 	sin.sin_port = htons(port);
 	listener = evconnlistener_new_bind(net_evbase, ServerAccept, NULL,
 	                                   LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (sockaddr*)&sin, sizeof(sin));
-	if(!listener)
+	if(!listener) {
+		event_base_free(net_evbase);
+		net_evbase = 0;
 		return false;
+	}
 	evconnlistener_set_error_cb(listener, ServerAcceptError);
 	Thread::NewThread(ServerThread, net_evbase);
 	return true;
@@ -84,10 +81,14 @@ int NetServer::ServerThread(void* param) {
 		bufferevent_disable(bit->first, EV_READ);
 		bufferevent_free(bit->first);
 	}
+	users.clear();
+	evconnlistener_free(listener);
 	event_base_free(net_evbase);
+	listener = 0;
 	net_evbase = 0;
 	if(duel_mode)
 		delete duel_mode;
+	duel_mode = 0;
 	return 0;
 }
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
@@ -106,26 +107,30 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	switch(pktType) {
 	case CTOS_RESPONSE:
 		break;
-	case CTOS_CHANGEDECK:
+	case CTOS_UPDATE_DECK: {
+		if(!dp->game || !duel_mode)
+			return;
+		duel_mode->UpdateDeck(dp, pdata);
 		break;
+	}
 	case CTOS_PLAYER_INFO: {
 		CTOS_PlayerInfo* pkt = (CTOS_PlayerInfo*)pdata;
 		BufferIO::CopyWStr(pkt->name, dp->name, 20);
 		break;
 	}
 	case CTOS_CREATE_GAME: {
-		if(dp->game || duel_mode || len < sizeof(CTOS_CreateGame))
+		if(dp->game || duel_mode)
 			return;
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
 		if(pkt->info.mode == MODE_SINGLE) {
 			duel_mode = new SingleDuel;
-		} else {
-			duel_mode = new MatchDuel;
+		} else if(pkt->info.mode == MODE_SINGLE) {
+			duel_mode = new SingleDuel;
 		}
 		if(pkt->info.rule > 3)
 			pkt->info.rule = 0;
 		if(pkt->info.mode > 1)
-			pkt->info.rule = 0;
+			pkt->info.mode = 0;
 		unsigned int hash = 0;
 		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {
 			if(pkt->info.lflist == lfit->hash) {
@@ -147,7 +152,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->JoinGame(dp, pdata, false);
 		break;
 	}
-	case CTOS_EXIT_GAME: {
+	case CTOS_LEAVE_GAME: {
 		if(!duel_mode)
 			break;
 		duel_mode->LeaveGame(dp);
@@ -165,17 +170,18 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->ToObserver(dp);
 		break;
 	}
-	case CTOS_HS_READY: {
+	case CTOS_HS_READY:
+	case CTOS_HS_NOTREADY: {
 		if(!duel_mode || duel_mode->pduel)
 			break;
-		duel_mode->PlayerReady(dp);
+		duel_mode->PlayerReady(dp, CTOS_HS_NOTREADY - pktType);
 		break;
 	}
-	case CTOS_HS_KICK1:
-	case CTOS_HS_KICK2: {
+	case CTOS_HS_KICK: {
 		if(!duel_mode || duel_mode->pduel)
 			break;
-		duel_mode->PlayerKick(dp, pktType - CTOS_HS_KICK1);
+		CTOS_Kick* pkt = (CTOS_Kick*)pdata;
+		duel_mode->PlayerKick(dp, pkt->pos);
 		break;
 	}
 	case CTOS_HS_START: {

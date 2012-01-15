@@ -12,7 +12,7 @@ function c11373345.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c11373345.cfilter(c)
-	return c:IsFaceup() and c:GetLevel()>=7
+	return c:IsFaceup() and c:IsLevelAbove(7)
 end
 function c11373345.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c11373345.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
@@ -28,7 +28,7 @@ function c11373345.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c11373345.filter(c)
-	return c:IsFaceup() and c:GetLevel()<=5 and c:IsDestructable()
+	return c:IsFaceup() and c:IsLevelBelow(5) and c:IsDestructable()
 end
 function c11373345.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c11373345.filter,tp,0,LOCATION_MZONE,1,c) end

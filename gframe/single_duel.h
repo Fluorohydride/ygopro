@@ -12,7 +12,7 @@ public:
 	virtual void LeaveGame(DuelPlayer* dp);
 	virtual void ToDuelist(DuelPlayer* dp);
 	virtual void ToObserver(DuelPlayer* dp);
-	virtual void PlayerReady(DuelPlayer* dp);
+	virtual void PlayerReady(DuelPlayer* dp, bool ready);
 	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos);
 	virtual void UpdateDeck(DuelPlayer* dp, void* pdata);
 	virtual void StartDuel(DuelPlayer* dp);
