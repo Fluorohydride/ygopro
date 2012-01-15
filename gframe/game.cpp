@@ -11,7 +11,6 @@
 #ifndef WIN32
 #include <sys/types.h>
 #include <dirent.h>
-#include "replay.h"
 #endif
 
 const unsigned short PRO_VERSION = 0x1020;

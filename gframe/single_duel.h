@@ -18,6 +18,17 @@ public:
 	virtual void StartDuel(DuelPlayer* dp);
 	virtual void Process();
 	virtual void EndDuel();
+	
+	void RefreshMzone(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshSzone(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshHand(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshGrave(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshExtra(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
+	
+	static int MessageHandler(long fduel, int type);
+protected:
+	unsigned char player_mapping[2];
 };
 
 }

@@ -232,4 +232,9 @@ const wchar_t* DataManager::FormatType(int type) {
 		*(p - 1) = 0;
 	return tpBuffer;
 }
+int DataManager::CardReader(int code, void* pData) {
+	dataManager.GetData(code, (CardData*)pData);
+	return 0;
+}
+
 }

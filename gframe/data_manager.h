@@ -40,6 +40,7 @@ public:
 
 	static wchar_t strBuffer[2048];
 	static const wchar_t* unknown_string;
+	static int CardReader(int, void*);
 	
 };
 

@@ -22,6 +22,7 @@ private:
 public:
 	static bool StartServer(unsigned short port);
 	static void StopServer();
+	static void StopListen();
 	static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
 	static void ServerAcceptError(evconnlistener *listener, void* ctx);
 	static void ServerEchoRead(bufferevent* bev, void* ctx);

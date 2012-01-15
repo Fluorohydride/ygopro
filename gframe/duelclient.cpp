@@ -243,6 +243,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_GAME_START: {
+		mainGame->gMutex.Lock();
+		mainGame->dField.Clear();
+		mainGame->dInfo.isStarted = true;
+		mainGame->gMutex.Unlock();
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {

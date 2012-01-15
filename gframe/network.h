@@ -112,7 +112,7 @@ public:
 	virtual void StartDuel(DuelPlayer* dp) = 0;
 	virtual void Process() = 0;
 	virtual void EndDuel() = 0;
-
+	
 public:
 	DuelPlayer* players[6];
 	bool ready[6];

@@ -37,6 +37,9 @@ void NetServer::StopServer() {
 		return;
 	event_base_loopexit(net_evbase, NULL);
 }
+void NetServer::StopListen() {
+	evconnlistener_disable(listener);
+}
 void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx) {
 	bufferevent* bev = bufferevent_socket_new(net_evbase, fd, BEV_OPT_CLOSE_ON_FREE);
 	DuelPlayer dp;
@@ -187,7 +190,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	case CTOS_HS_START: {
 		if(!duel_mode || duel_mode->pduel)
 			break;
-		evconnlistener_disable(listener);
+		duel_mode->StartDuel(dp);
 		break;
 	}
 	}

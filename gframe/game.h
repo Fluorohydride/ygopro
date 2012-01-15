@@ -2,12 +2,9 @@
 #define GAME_H
 
 #include "config.h"
-#include "client_card.h"
 #include "client_field.h"
 #include "deck_con.h"
 #include "menu_handler.h"
-#include <string>
-#include "../ocgcore/mtrandom.h"
 #include <unordered_map>
 
 namespace ygo {
@@ -80,19 +77,13 @@ public:
 	
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
-/*	bool RefreshMzone(int player, int flag = 0x181fff, int use_cache = 1);
-	bool RefreshSzone(int player, int flag = 0x181fff, int use_cache = 1);
-	bool RefreshHand(int player, int flag = 0x181fff, int use_cache = 1);
-	bool RefreshGrave(int player, int flag = 0x181fff, int use_cache = 1);
-	bool RefreshExtra(int player, int flag = 0x181fff, int use_cache = 1);
-	bool RefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
+	
+/*	
 	void ReplayRefresh(int flag = 0x181fff);
 	void ReplayRefreshHand(int player, int flag = 0x181fff);
 	void ReplayRefreshGrave(int player, int flag = 0x181fff);
 	void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
 
-	static int CardReader(int, void*);
-	static int MessageHandler(long, int);
 	static int EngineThread(void*);
 	static void Proceed(void*);
 	static void Analyze(void*, char*);
@@ -101,12 +92,8 @@ public:
 	static bool SolveMessage(void*, char*, int);
 	static int ReplayThread(void* pd);
 	static bool AnalyzeReplay(void*, char*);*/
-
 	//
-	char msgBuffer[0x1000];
-	char queryBuffer[0x1000];
-
-	mtrandom rnd;
+	
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;
