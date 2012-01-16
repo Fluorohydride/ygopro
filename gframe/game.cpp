@@ -204,6 +204,16 @@ bool Game::Initialize() {
 	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
 	chkAutoChain->setChecked(true);
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
+	//
+	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
+	wHand->getCloseButton()->setVisible(false);
+	wHand->setDraggable(false);
+	wHand->setDrawTitlebar(false);
+	wHand->setVisible(false);
+	for(int i = 0; i < 3; ++i) {
+		btnHand[i] = env->addButton(rect<s32>(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i, L"");
+		btnHand[i]->setImage(imageManager.tHand[i]);
+	}
 	//message (310)
 	wMessage = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(1216));
 	wMessage->getCloseButton()->setVisible(false);

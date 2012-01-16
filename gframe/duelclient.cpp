@@ -242,11 +242,23 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		}
 		break;
 	}
-	case STOC_GAME_START: {
+	case STOC_DUEL_START: {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = true;
+		mainGame->wCardImg->setVisible(true);
+		mainGame->wInfos->setVisible(true);
 		mainGame->gMutex.Unlock();
+		break;
+	}
+	case STOC_DUEL_END: {
+
+		break;
+	}
+	case STOC_REPLAY: {
+		mainGame->localAction.Reset();
+		mainGame->ShowElement(mainGame->wReplaySave);
+		mainGame->localAction.Wait();
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {

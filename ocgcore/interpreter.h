@@ -20,7 +20,7 @@ extern "C" {
 #endif
 }
 #include "common.h"
-#include <map>
+#include <unordered_map>
 #include <list>
 
 class card;
@@ -30,7 +30,7 @@ class duel;
 
 class interpreter {
 public:
-	typedef std::map<int32, lua_State*> coroutine_map;
+	typedef std::unordered_map<int32, lua_State*> coroutine_map;
 	typedef std::list<std::pair<void*, uint32> > param_list;
 	
 	duel* pduel;

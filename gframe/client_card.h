@@ -58,6 +58,7 @@ public:
 	bool is_showequip;
 	bool is_showtarget;
 	bool is_highlighting;
+	bool is_confirming;
 	u32 code;
 	u32 alias;
 	u32 type;

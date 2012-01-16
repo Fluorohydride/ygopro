@@ -1,7 +1,7 @@
 --インフェルニティ·デス·ドラゴン
 function c72896720.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,c72896720.synfilter,aux.NonTuner(c72896720.synfilter),1)
+	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),aux.NonTuner(nil),1)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -16,9 +16,6 @@ function c72896720.initial_effect(c)
 	e1:SetTarget(c72896720.destg)
 	e1:SetOperation(c72896720.desop)
 	c:RegisterEffect(e1)
-end
-function c72896720.synfilter(c)
-	return c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c72896720.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0

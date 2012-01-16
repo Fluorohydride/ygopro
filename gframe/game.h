@@ -218,6 +218,9 @@ public:
 	//replay
 	irr::gui::IGUIListBox* lstReplayList;
 	irr::gui::IGUIButton* btnLoadReplay;
+	//hand
+	irr::gui::IGUIWindow* wHand;
+	irr::gui::IGUIButton* btnHand[3];
 	//message
 	irr::gui::IGUIWindow* wMessage;
 	irr::gui::IGUIStaticText* stMessage;
@@ -362,6 +365,9 @@ extern Game* mainGame;
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202
+#define BUTTON_HAND1				205
+#define BUTTON_HAND2				206
+#define BUTTON_HAND3				207
 #define BUTTON_POS_AU				210
 #define BUTTON_POS_AD				211
 #define BUTTON_POS_DU				212

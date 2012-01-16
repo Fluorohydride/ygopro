@@ -595,9 +595,15 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Y = 4.0f;
 				t->Z = 0.5f + 0.001f * sequence;
 			}
-			r->X = -0.661f;
-			r->Y = 0.0f;
-			r->Z = 0.0f;
+			if(!pcard->is_confirming && !pcard->code) {
+				r->X = -0.661f;
+				r->Y = 0.0f;
+				r->Z = 0.0f;
+			} else {
+				r->X = -0.661f;
+				r->Y = 0;
+				r->Z = 0;
+			}
 		} else {
 			if (count <= 6)
 				t->X = 6.25f - (5.5f - 0.8f * count) / 2 - sequence * 0.8f;

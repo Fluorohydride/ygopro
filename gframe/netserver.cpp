@@ -108,12 +108,27 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	if(dp->state == 0xff || (dp->state && dp->state != pktType))
 		return;
 	switch(pktType) {
-	case CTOS_RESPONSE:
+	case CTOS_RESPONSE: {
 		break;
+	}
 	case CTOS_UPDATE_DECK: {
 		if(!dp->game || !duel_mode)
 			return;
 		duel_mode->UpdateDeck(dp, pdata);
+		break;
+	}
+	case CTOS_HAND_RESULT: {
+		if(!dp->game)
+			return;
+		CTOS_HandResult* pkt = (CTOS_HandResult*)pdata;
+		dp->game->HandResult(dp, pkt->res);
+		break;
+	}
+	case CTOS_TP_RESULT: {
+		if(!dp->game)
+			return;
+		CTOS_TPResult* pkt = (CTOS_TPResult*)pdata;
+		dp->game->TPResult(dp, pkt->res);
 		break;
 	}
 	case CTOS_PLAYER_INFO: {

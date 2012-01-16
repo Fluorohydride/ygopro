@@ -442,7 +442,7 @@ static const struct luaL_Reg duellib[] = {
 	{ NULL, NULL }
 };
 
-interpreter::interpreter(duel* pd) {
+interpreter::interpreter(duel* pd): coroutines(256) {
 	lua_state = luaL_newstate();
 	current_state = lua_state;
 	pduel = pd;

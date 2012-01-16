@@ -32,6 +32,12 @@ struct HostPacket {
 struct HostRequest {
 	unsigned short identifier;
 };
+struct CTOS_HandResult {
+	unsigned char res;
+};
+struct CTOS_TPResult {
+	unsigned char res;
+};
 struct CTOS_PlayerInfo {
 	unsigned short name[20];
 };
@@ -50,6 +56,10 @@ struct CTOS_Kick {
 struct STOC_ErrorMsg {
 	unsigned char msg;
 	unsigned int code;
+};
+struct STOC_HandResult {
+	unsigned char res1;
+	unsigned char res2;
 };
 struct STOC_CreateGame {
 	unsigned int gameid;
@@ -93,31 +103,23 @@ struct DuelPlayer {
 
 class DuelMode {
 public:
-	DuelMode() {
-		for(int i = 0; i < 6; ++i) {
-			players[i] = 0;
-			ready[i] = false;
-		}
-		host_player = 0;
-		pduel = 0;
-	}
+	DuelMode(): host_player(0), pduel(0) {}
 	virtual ~DuelMode() {}
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) = 0;
-	virtual void LeaveGame(DuelPlayer* dp) = 0;
-	virtual void ToDuelist(DuelPlayer* dp) = 0;
-	virtual void ToObserver(DuelPlayer* dp) = 0;
-	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) = 0;
-	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) = 0;
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata) = 0;
-	virtual void StartDuel(DuelPlayer* dp) = 0;
-	virtual void Process() = 0;
-	virtual void EndDuel() = 0;
-	
+	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {};
+	virtual void LeaveGame(DuelPlayer* dp) {};
+	virtual void ToDuelist(DuelPlayer* dp) {};
+	virtual void ToObserver(DuelPlayer* dp) {};
+	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {};
+	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {};
+	virtual void UpdateDeck(DuelPlayer* dp, void* pdata) {};
+	virtual void StartDuel(DuelPlayer* dp) {};
+	virtual void HandResult(DuelPlayer* dp, unsigned char res) {};
+	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {};
+	virtual void Process() {};
+	virtual int Analyze(char* msgbuffer, unsigned int len) {};
+	virtual void EndDuel() {};
+
 public:
-	DuelPlayer* players[6];
-	bool ready[6];
-	Deck pdeck[6];
-	std::set<DuelPlayer*> observers;
 	DuelPlayer* host_player;
 	HostInfo host_info;
 	unsigned long pduel;
@@ -140,6 +142,8 @@ public:
 
 #define CTOS_RESPONSE		0x1
 #define CTOS_UPDATE_DECK	0x2
+#define CTOS_HAND_RESULT	0x3
+#define CTOS_TP_RESULT		0x4
 #define CTOS_PLAYER_INFO	0x10
 #define CTOS_CREATE_GAME	0x11
 #define CTOS_JOIN_GAME		0x12
@@ -153,11 +157,17 @@ public:
 
 #define STOC_GAME_MSG		0x1
 #define STOC_ERROR_MSG		0x2
+#define STOC_SELECT_HAND	0x3
+#define STOC_SELECT_TP		0x4
+#define STOC_HAND_RESULT	0x5
+#define STOC_TP_RESULT		0x6
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
 #define STOC_TYPE_CHANGE	0x13
 #define STOC_LEAVE_GAME		0x14
-#define STOC_GAME_START		0x15
+#define STOC_DUEL_START		0x15
+#define STOC_DUEL_END		0x16
+#define STOC_REPLAY			0x17
 #define STOC_HS_PLAYER_ENTER	0x20
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22
