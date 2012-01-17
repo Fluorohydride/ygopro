@@ -454,7 +454,6 @@ void ClientField::ReplaySwap() {
 		(*cit)->is_moving = false;
 	}
 	mainGame->dInfo.is_first_turn = !mainGame->dInfo.is_first_turn;
-	std::swap(mainGame->dInfo.is_host_player[0], mainGame->dInfo.is_host_player[1]);
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	for(int i = 0; i < 16; ++i)
 		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);

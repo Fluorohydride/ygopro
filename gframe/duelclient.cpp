@@ -1,18 +1,23 @@
 #include "duelclient.h"
-#include client_card.h"
+#include "client_card.h"
+#include "materials.h"
+#include "../ocgcore/field.h"
+#include "../ocgcore/duel.h"
 #include "game.h"
 
 namespace ygo {
 
 unsigned DuelClient::connect_state = 0;
 unsigned char DuelClient::response_buf[64];
-bool DuelClient::is_responseB;
-unsigned char DuelClient::response_len;
+unsigned char DuelClient::response_len = 0;
 event_base* DuelClient::client_base = 0;
 bufferevent* DuelClient::client_bev = 0;
 char DuelClient::duel_client_read[0x2000];
 char DuelClient::duel_client_write[0x2000];
 bool DuelClient::is_closing = false;
+int DuelClient::select_hint = 0;
+wchar_t DuelClient::event_string[256];
+mtrandom DuelClient::rnd;
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
@@ -35,6 +40,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		return false;
 	}
 	connect_state = 1;
+	rnd.reset(time(0));
 	Thread::NewThread(ClientThread, 0);
 	return true;
 }
@@ -139,189 +145,190 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
-			ClientAnalyze(pdata, len - 1);
-			break;
-		}
+		ClientAnalyze(pdata, len - 1);
+		break;
+	}
 	case STOC_ERROR_MSG: {
-			STOC_ErrorMsg* pkt = (STOC_ErrorMsg*)pdata;
-			switch(pkt->msg) {
-			case ERRMSG_JOINERROR: {
-					mainGame->btnCreateHost->setEnabled(true);
-					mainGame->btnJoinHost->setEnabled(true);
-					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->gMutex.Lock();
-					if(pkt->code == 0)
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1403));
-					else if(pkt->code == 1)
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1404));
-					else if(pkt->code == 2)
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1405));
-					mainGame->gMutex.Unlock();
-					event_base_loopexit(client_base, NULL);
-					break;
-				}
-			case ERRMSG_DECKERROR: {
-					mainGame->gMutex.Lock();
-					if(pkt->code == 1)
-						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
-					else {
-						wchar_t msgbuf[64];
-						myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(pkt->code));
-						mainGame->env->addMessageBox(L"", msgbuf);
-					}
-					mainGame->gMutex.Unlock();
-					break;
-				}
-			}
+		STOC_ErrorMsg* pkt = (STOC_ErrorMsg*)pdata;
+		switch(pkt->msg) {
+		case ERRMSG_JOINERROR: {
+			mainGame->btnCreateHost->setEnabled(true);
+			mainGame->btnJoinHost->setEnabled(true);
+			mainGame->btnJoinCancel->setEnabled(true);
+			mainGame->gMutex.Lock();
+			if(pkt->code == 0)
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1403));
+			else if(pkt->code == 1)
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1404));
+			else if(pkt->code == 2)
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1405));
+			mainGame->gMutex.Unlock();
+			event_base_loopexit(client_base, NULL);
 			break;
 		}
+		case ERRMSG_DECKERROR: {
+			mainGame->gMutex.Lock();
+			if(pkt->code == 1)
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
+			else {
+				wchar_t msgbuf[64];
+				myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(pkt->code));
+				mainGame->env->addMessageBox(L"", msgbuf);
+			}
+			mainGame->gMutex.Unlock();
+			break;
+		}
+		}
+		break;
+	}
 	case STOC_SELECT_HAND: {
-			mainGame->ShowElement(mainGame->wHand);
-			break;
-		}
+		mainGame->ShowElement(mainGame->wHand);
+		break;
+	}
 	case STOC_SELECT_TP: {
-			break;
-		}
+		break;
+	}
 	case STOC_HAND_RESULT: {
-			break;
-		}
+		break;
+	}
 	case STOC_TP_RESULT: {
-			break;
-		}
+		break;
+	}
 	case STOC_JOIN_GAME: {
-			STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
-			std::wstring str;
-			wchar_t msgbuf[256];
-			myswprintf(msgbuf, L" % ls % ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
+		STOC_JoinGame* pkt = (STOC_JoinGame*)pdata;
+		std::wstring str;
+		wchar_t msgbuf[256];
+		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1226), deckManager.GetLFListName(pkt->info.lflist));
+		str.append(msgbuf);
+		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1225), dataManager.GetSysString(1240 + pkt->info.rule));
+		str.append(msgbuf);
+		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode));
+		str.append(msgbuf);
+		if(pkt->info.enable_priority) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1236));
 			str.append(msgbuf);
-			myswprintf(msgbuf, L" % ls % ls\n", dataManager.GetSysString(1225), dataManager.GetSysString(1240 + pkt->info.rule));
-			str.append(msgbuf);
-			myswprintf(msgbuf, L" % ls % ls\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode));
-			str.append(msgbuf);
-			if(pkt->info.enable_priority) {
-				myswprintf(msgbuf, L"* % ls\n", dataManager.GetSysString(1236));
-				str.append(msgbuf);
-			}
-			str.append(L" == == == == == \n");
-			myswprintf(msgbuf, L" % ls % d\n", dataManager.GetSysString(1231), pkt->info.start_lp);
-			str.append(msgbuf);
-			myswprintf(msgbuf, L" % ls % d\n", dataManager.GetSysString(1232), pkt->info.start_hand);
-			str.append(msgbuf);
-			myswprintf(msgbuf, L" % ls % d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
-			str.append(msgbuf);
-			if(pkt->info.no_check_deck) {
-				myswprintf(msgbuf, L"* % ls\n", dataManager.GetSysString(1229));
-				str.append(msgbuf);
-			}
-			if(pkt->info.no_shuffle_deck) {
-				myswprintf(msgbuf, L"* % ls\n", dataManager.GetSysString(1230));
-				str.append(msgbuf);
-			}
-			mainGame->gMutex.Lock();
-			mainGame->SetStaticText(mainGame->stHostSingleRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
-			mainGame->RefreshDeck(mainGame->cbDeckSelect);
-			mainGame->gMutex.Unlock();
-			if(mainGame->wCreateHost->isVisible())
-				mainGame->HideElement(mainGame->wCreateHost);
-			else if (mainGame->wLanWindow->isVisible())
-				mainGame->HideElement(mainGame->wLanWindow);
-			mainGame->WaitFrameSignal(10);
-			mainGame->ShowElement(mainGame->wHostSingle);
-			mainGame->WaitFrameSignal(10);
-			break;
 		}
+		str.append(L" == == == == == \n");
+		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1231), pkt->info.start_lp);
+		str.append(msgbuf);
+		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1232), pkt->info.start_hand);
+		str.append(msgbuf);
+		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1233), pkt->info.draw_count);
+		str.append(msgbuf);
+		if(pkt->info.no_check_deck) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1229));
+			str.append(msgbuf);
+		}
+		if(pkt->info.no_shuffle_deck) {
+			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1230));
+			str.append(msgbuf);
+		}
+		mainGame->gMutex.Lock();
+		mainGame->SetStaticText(mainGame->stHostSingleRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
+		mainGame->RefreshDeck(mainGame->cbDeckSelect);
+		mainGame->gMutex.Unlock();
+		if(mainGame->wCreateHost->isVisible())
+			mainGame->HideElement(mainGame->wCreateHost);
+		else if (mainGame->wLanWindow->isVisible())
+			mainGame->HideElement(mainGame->wLanWindow);
+		mainGame->WaitFrameSignal(10);
+		mainGame->ShowElement(mainGame->wHostSingle);
+		mainGame->WaitFrameSignal(10);
+		break;
+	}
 	case STOC_TYPE_CHANGE: {
-			STOC_TypeChange* pkt = (STOC_TypeChange*)pdata;
-			selftype = pkt->type & 0xf;
-			is_host = (pkt->type >> 4) & 0xf;
-			if(is_host) {
-				mainGame->btnHostSingleStart->setVisible(true);
-				mainGame->btnHostSingleKick[0]->setEnabled(true);
-				mainGame->btnHostSingleKick[1]->setEnabled(true);
-			} else {
-				mainGame->btnHostSingleStart->setVisible(false);
-				mainGame->btnHostSingleKick[0]->setEnabled(false);
-				mainGame->btnHostSingleKick[1]->setEnabled(false);
-			}
-			mainGame->chkHostSingleReady[0]->setEnabled(false);
-			mainGame->chkHostSingleReady[0]->setChecked(false);
-			mainGame->chkHostSingleReady[1]->setEnabled(false);
-			mainGame->chkHostSingleReady[1]->setChecked(false);
-			if(selftype < 2) {
-				mainGame->chkHostSingleReady[selftype]->setEnabled(true);
-				mainGame->btnHostSingleDuelist->setEnabled(false);
-				mainGame->btnHostSingleOB->setEnabled(true);
-			} else {
-				mainGame->btnHostSingleDuelist->setEnabled(true);
-				mainGame->btnHostSingleOB->setEnabled(false);
-			}
-			break;
+		STOC_TypeChange* pkt = (STOC_TypeChange*)pdata;
+		selftype = pkt->type & 0xf;
+		is_host = (pkt->type >> 4) & 0xf;
+		if(is_host) {
+			mainGame->btnHostSingleStart->setVisible(true);
+			mainGame->btnHostSingleKick[0]->setEnabled(true);
+			mainGame->btnHostSingleKick[1]->setEnabled(true);
+		} else {
+			mainGame->btnHostSingleStart->setVisible(false);
+			mainGame->btnHostSingleKick[0]->setEnabled(false);
+			mainGame->btnHostSingleKick[1]->setEnabled(false);
 		}
+		mainGame->chkHostSingleReady[0]->setEnabled(false);
+		mainGame->chkHostSingleReady[0]->setChecked(false);
+		mainGame->chkHostSingleReady[1]->setEnabled(false);
+		mainGame->chkHostSingleReady[1]->setChecked(false);
+		if(selftype < 2) {
+			mainGame->chkHostSingleReady[selftype]->setEnabled(true);
+			mainGame->btnHostSingleDuelist->setEnabled(false);
+			mainGame->btnHostSingleOB->setEnabled(true);
+		} else {
+			mainGame->btnHostSingleDuelist->setEnabled(true);
+			mainGame->btnHostSingleOB->setEnabled(false);
+		}
+		break;
+	}
 	case STOC_DUEL_START: {
-			mainGame->gMutex.Lock();
-			mainGame->dField.Clear();
-			mainGame->dInfo.isStarted = true;
-			mainGame->wCardImg->setVisible(true);
-			mainGame->wInfos->setVisible(true);
-			mainGame->device->setEventReceiver(&mainGame->dField);
-			mainGame->gMutex.Unlock();
-			break;
-		}
+		mainGame->gMutex.Lock();
+		mainGame->dField.Clear();
+		mainGame->dInfo.isStarted = true;
+		mainGame->wCardImg->setVisible(true);
+		mainGame->wInfos->setVisible(true);
+		mainGame->device->setEventReceiver(&mainGame->dField);
+		mainGame->gMutex.Unlock();
+		break;
+	}
 	case STOC_DUEL_END: {
 
-			break;
-		}
+		break;
+	}
 	case STOC_REPLAY: {
-			mainGame->localAction.Reset();
-			mainGame->ShowElement(mainGame->wReplaySave);
-			mainGame->localAction.Wait();
-			break;
-		}
+		mainGame->localAction.Reset();
+		mainGame->ShowElement(mainGame->wReplaySave);
+		mainGame->localAction.Wait();
+		break;
+	}
 	case STOC_HS_PLAYER_ENTER: {
-			STOC_HS_PlayerEnter* pkt = (STOC_HS_PlayerEnter*)pdata;
-			if(pkt->pos > 1)
-				break;
-			wchar_t name[20];
-			BufferIO::CopyWStr(pkt->name, name, 20);
-			mainGame->gMutex.Lock();
-			mainGame->stHostSingleDuelist[pkt->pos]->setText(name);
-			mainGame->gMutex.Unlock();
+		STOC_HS_PlayerEnter* pkt = (STOC_HS_PlayerEnter*)pdata;
+		if(pkt->pos > 1)
 			break;
-		}
+		wchar_t name[20];
+		BufferIO::CopyWStr(pkt->name, name, 20);
+		mainGame->gMutex.Lock();
+		mainGame->stHostSingleDuelist[pkt->pos]->setText(name);
+		mainGame->gMutex.Unlock();
+		break;
+	}
 	case STOC_HS_PLAYER_CHANGE: {
-			STOC_HS_PlayerChange* pkt = (STOC_HS_PlayerChange*)pdata;
-			unsigned char pos = (pkt->status >> 4) & 0xf;
-			unsigned char state = pkt->status & 0xf;
-			if(pos > 1)
-				break;
-			mainGame->gMutex.Lock();
-			if(state == PLAYERCHANGE_READY) {
-				mainGame->chkHostSingleReady[pos]->setChecked(true);
-			} else if(state == PLAYERCHANGE_NOTREADY) {
-				mainGame->chkHostSingleReady[pos]->setChecked(false);
-			} else if(state == PLAYERCHANGE_LEAVE) {
-				mainGame->stHostSingleDuelist[pos]->setText(L"");
-				mainGame->chkHostSingleReady[pos]->setChecked(false);
-			} else if(state == PLAYERCHANGE_OBSERVE) {
-				watching++;
-				wchar_t watchbuf[32];
-				myswprintf(watchbuf, L" % ls % d", dataManager.GetSysString(1253), watching);
-				mainGame->stHostSingleDuelist[pos]->setText(L"");
-				mainGame->chkHostSingleReady[pos]->setChecked(false);
-				mainGame->stHostSingleOB->setText(watchbuf);
-			}
-			mainGame->gMutex.Unlock();
+		STOC_HS_PlayerChange* pkt = (STOC_HS_PlayerChange*)pdata;
+		unsigned char pos = (pkt->status >> 4) & 0xf;
+		unsigned char state = pkt->status & 0xf;
+		if(pos > 1)
 			break;
+		mainGame->gMutex.Lock();
+		if(state == PLAYERCHANGE_READY) {
+			mainGame->chkHostSingleReady[pos]->setChecked(true);
+		} else if(state == PLAYERCHANGE_NOTREADY) {
+			mainGame->chkHostSingleReady[pos]->setChecked(false);
+		} else if(state == PLAYERCHANGE_LEAVE) {
+			mainGame->stHostSingleDuelist[pos]->setText(L"");
+			mainGame->chkHostSingleReady[pos]->setChecked(false);
+		} else if(state == PLAYERCHANGE_OBSERVE) {
+			watching++;
+			wchar_t watchbuf[32];
+			myswprintf(watchbuf, L"%ls%d", dataManager.GetSysString(1253), watching);
+			mainGame->stHostSingleDuelist[pos]->setText(L"");
+			mainGame->chkHostSingleReady[pos]->setChecked(false);
+			mainGame->stHostSingleOB->setText(watchbuf);
 		}
-	case STOC_HS_WATCH_CHANGE:
+		mainGame->gMutex.Unlock();
+		break;
+	}
+	case STOC_HS_WATCH_CHANGE: {
 		STOC_HS_WatchChange* pkt = (STOC_HS_WatchChange*)pdata;
 		watching = pkt->watch_count;
 		wchar_t watchbuf[32];
-		myswprintf(watchbuf, L" % ls % d", dataManager.GetSysString(1253), watching);
+		myswprintf(watchbuf, L"%ls%d", dataManager.GetSysString(1253), watching);
 		mainGame->gMutex.Lock();
 		mainGame->stHostSingleOB->setText(watchbuf);
 		mainGame->gMutex.Unlock();
 		break;
+	}
 	}
 }
 int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
@@ -339,783 +346,791 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	}
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
-			mainGame->stACMessage->setText(L"Error occurs.");
-			mainGame->PopupElement(mainGame->wACMessage, 100);
-			mainGame->WaitFrameSignal(120);
-			if(!mainGame->dField.is_replaying) {
-				pdInfo->isStarted = false;
-				mainGame->localResponse.Set();
-			}
-			return false;
+		mainGame->stACMessage->setText(L"Error occurs.");
+		mainGame->PopupElement(mainGame->wACMessage, 100);
+		mainGame->WaitFrameSignal(120);
+		if(!mainGame->dField.is_replaying) {
+			mainGame->dInfo.isStarted = false;
 		}
+		return false;
+	}
 	case MSG_HINT: {
-			int type = BufferIO::ReadInt8(pbuf);
-			int player = BufferIO::ReadInt8(pbuf);
-			int data = BufferIO::ReadInt32(pbuf);
-			switch (type) {
-			case HINT_EVENT: {
-					myswprintf(pdInfo->strEvent, L" % ls", dataManager.GetDesc(data));
-					break;
-				}
-			case HINT_MESSAGE: {
-					mainGame->stMessage->setText(dataManager.GetDesc(data));
-					mainGame->PopupElement(mainGame->wMessage);
-					mainGame->localAction.Reset();
-					mainGame->localAction.Wait();
-					break;
-				}
-			case HINT_SELECTMSG: {
-					mainGame->dInfo.selectHint = data;
-					break;
-				}
-			case HINT_OPSELECTED: {
-					myswprintf(textBuffer, L"对方选择了：[ % ls]", dataManager.GetDesc(data));
-					mainGame->lstLog->addItem(textBuffer);
-					mainGame->logParam.push_back(0);
-					mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
-					mainGame->PopupElement(mainGame->wACMessage, 20);
-					mainGame->WaitFrameSignal(40);
-					break;
-				}
-			case HINT_EFFECT: {
-					mainGame->showcardcode = data;
-					mainGame->showcarddif = 0;
-					mainGame->showcard = 1;
-					mainGame->WaitFrameSignal(30);
-					break;
-				}
-			case HINT_RACE: {
-					myswprintf(textBuffer, L"对方宣言了：[ % ls]", dataManager.FormatRace(data));
-					mainGame->lstLog->addItem(textBuffer);
-					mainGame->logParam.push_back(0);
-					mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
-					mainGame->PopupElement(mainGame->wACMessage, 20);
-					mainGame->WaitFrameSignal(40);
-					break;
-				}
-			case HINT_ATTRIB: {
-					myswprintf(textBuffer, L"对方宣言了：[ % ls]", dataManager.FormatAttribute(data));
-					mainGame->lstLog->addItem(textBuffer);
-					mainGame->logParam.push_back(0);
-					mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
-					mainGame->PopupElement(mainGame->wACMessage, 20);
-					mainGame->WaitFrameSignal(40);
-					break;
-				}
-			case HINT_CODE: {
-					myswprintf(textBuffer, L"对方宣言了：[ % ls]", dataManager.GetName(data));
-					mainGame->lstLog->addItem(textBuffer);
-					mainGame->logParam.push_back(data);
-					mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
-					mainGame->PopupElement(mainGame->wACMessage, 20);
-					mainGame->WaitFrameSignal(40);
-					break;
-				}
-			case HINT_NUMBER: {
-					myswprintf(textBuffer, L"对方选择了：[ % d]", data);
-					mainGame->lstLog->addItem(textBuffer);
-					mainGame->logParam.push_back(0);
-					mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
-					mainGame->PopupElement(mainGame->wACMessage, 20);
-					mainGame->WaitFrameSignal(40);
-					break;
-				}
-			case HINT_CARD: {
-					mainGame->showcardcode = data;
-					mainGame->showcarddif = 0;
-					mainGame->showcard = 1;
-					mainGame->WaitFrameSignal(30);
-					break;
-				}
-			}
+		int type = BufferIO::ReadInt8(pbuf);
+		int player = BufferIO::ReadInt8(pbuf);
+		int data = BufferIO::ReadInt32(pbuf);
+		switch (type) {
+		case HINT_EVENT: {
+			myswprintf(event_string, L"%ls", dataManager.GetDesc(data));
 			break;
 		}
-	case MSG_WIN: {
-			int player = BufferIO::ReadInt8(pbuf);
-			int type = BufferIO::ReadInt8(pbuf);
-			if(player == 2)
-				myswprintf(textBuffer, L"Draw Game.\n原因： % ls", dataManager.GetVictoryString(type));
-			else if(mainGame->LocalPlayer(player) == 0) {
-				if(!mainGame->dField.is_replaying) {
-					if(type == 1 || type == 2)
-						myswprintf(textBuffer, L"You Win！\n原因： % ls % ls", mainGame->LocalName(1), dataManager.GetVictoryString(type));
-					else myswprintf(textBuffer, L"You Win！\n原因： % ls", dataManager.GetVictoryString(type));
-				} else {
-					if(type == 1 || type == 2)
-						myswprintf(textBuffer, L" % ls Win！\n原因： % ls % ls", mainGame->LocalName(0), mainGame->LocalName(1), dataManager.GetVictoryString(type));
-					else myswprintf(textBuffer, L" % ls Win！\n原因： % ls", mainGame->LocalName(0), dataManager.GetVictoryString(type));
-				}
-			} else {
-				if(!mainGame->dField.is_replaying) {
-					if(type == 1 || type == 2)
-						myswprintf(textBuffer, L"You Lose！\n原因： % ls % ls", mainGame->LocalName(0), dataManager.GetVictoryString(type));
-					else myswprintf(textBuffer, L"You Lose！\n原因： % ls", dataManager.GetVictoryString(type));
-				} else {
-					if(type == 1 || type == 2)
-						myswprintf(textBuffer, L" % ls Win！\n原因： % ls % ls", mainGame->LocalName(1), mainGame->LocalName(0), dataManager.GetVictoryString(type));
-					else myswprintf(textBuffer, L" % ls Win！\n原因： % ls", mainGame->LocalName(1), dataManager.GetVictoryString(type));
-				}
-			}
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 100);
-			mainGame->WaitFrameSignal(120);
-			if(mainGame->dInfo.is_local_host)
-				mainGame->localResponse.Set();
-			break;
-		}
-	case MSG_DUEL_END: {
-			pdInfo->isStarted = false;
-			mainGame->localResponse.Set();
-			return false;
-		}
-	case MSG_REPLAY: {
-			pbuf -= 3;
-			int size = BufferIO::ReadInt16(pbuf);
-			pbuf++;
-			memcpy(&mainGame->lastReplay.pheader, pbuf, sizeof(ReplayHeader));
-			pbuf += sizeof(ReplayHeader);
-			memcpy(mainGame->lastReplay.comp_data, pbuf, size - sizeof(ReplayHeader) - 1);
-			mainGame->lastReplay.comp_size = size - sizeof(ReplayHeader) - 1;
-			mainGame->PopupElement(mainGame->wReplaySave);
+		case HINT_MESSAGE: {
+			mainGame->stMessage->setText(dataManager.GetDesc(data));
+			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->localAction.Reset();
 			mainGame->localAction.Wait();
 			break;
 		}
-	case MSG_WAITING: {
-			mainGame->waitFrame = 0;
-			mainGame->gMutex.Lock();
-			mainGame->stHintMsg->setText(L"等待对方行动中...");
-			mainGame->stHintMsg->setVisible(true);
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_START: {
-			mainGame->gMutex.Lock();
-			pdInfo->is_first_turn = BufferIO::ReadInt32(pbuf) ? false : true;
-			pdInfo->lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
-			pdInfo->lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
-			myswprintf(pdInfo->strLP[0], L" % d", pdInfo->lp[0]);
-			myswprintf(pdInfo->strLP[1], L" % d", pdInfo->lp[1]);
-			int deckc = BufferIO::ReadInt32(pbuf);
-			int extrac = BufferIO::ReadInt32(pbuf);
-			mainGame->dField.Initial(mainGame->LocalPlayer(0), deckc, extrac);
-			deckc = BufferIO::ReadInt32(pbuf);
-			extrac = BufferIO::ReadInt32(pbuf);
-			mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
-			pdInfo->turn = 0;
-			pdInfo->strTurn[0] = 0;
-			pdInfo->is_shuffling = false;
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_UPDATE_DATA: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int location = BufferIO::ReadInt8(pbuf);
-			mainGame->gMutex.Lock();
-			mainGame->dField.UpdateFieldCard(player, location, pbuf);
-			mainGame->gMutex.Unlock();
-			if (location == LOCATION_HAND && pdInfo->is_shuffling) {
-				pdInfo->is_shuffling = false;
-				for(int i = 0; i < mainGame->dField.hand[0].size(); ++i) {
-					mainGame->dField.hand[0][i]->is_hovered = false;
-					mainGame->dField.MoveCard(mainGame->dField.hand[0][i], 5);
-				}
-				mainGame->WaitFrameSignal(5);
-			}
-			return true;
-		}
-	case MSG_UPDATE_CARD: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int loc = BufferIO::ReadInt8(pbuf);
-			int seq = BufferIO::ReadInt8(pbuf);
-			mainGame->gMutex.Lock();
-			mainGame->dField.UpdateCard(player, loc, seq, pbuf);
-			mainGame->gMutex.Unlock();
+		case HINT_SELECTMSG: {
+			select_hint = data;
 			break;
 		}
-	case MSG_SELECT_BATTLECMD: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int code, desc, count, con, loc, seq, diratt;
-			ClientCard* pcard;
-			mainGame->dField.activatable_cards.clear();
-			mainGame->dField.activatable_descs.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc =  BufferIO::ReadInt8(pbuf);
-				seq =  BufferIO::ReadInt8(pbuf);
-				desc =  BufferIO::ReadInt32(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.activatable_cards.push_back(pcard);
-				mainGame->dField.activatable_descs.push_back(desc);
-				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if (pcard->location == LOCATION_GRAVE)
-					mainGame->dField.grave_act = true;
-				if (pcard->location == LOCATION_REMOVED)
-					mainGame->dField.remove_act = true;
-			}
-			mainGame->dField.attackable_cards.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				diratt = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.attackable_cards.push_back(pcard);
-				pcard->cmdFlag |= COMMAND_ATTACK;
-			}
-			mainGame->gMutex.Lock();
-			if(BufferIO::ReadInt8(pbuf)) {
-				mainGame->btnM2->setVisible(true);
-				mainGame->btnM2->setEnabled(true);
-				mainGame->btnM2->setPressed(false);
-			}
-			if(BufferIO::ReadInt8(pbuf)) {
-				mainGame->btnEP->setVisible(true);
-				mainGame->btnEP->setEnabled(true);
-				mainGame->btnEP->setPressed(false);
-			}
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearCommandFlag();
-			mainGame->btnM2->setVisible(false);
-			mainGame->btnEP->setVisible(false);
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_IDLECMD: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int code, desc, count, con, loc, seq;
-			ClientCard* pcard;
-			mainGame->dField.summonable_cards.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.summonable_cards.push_back(pcard);
-				pcard->cmdFlag |= COMMAND_SUMMON;
-			}
-			mainGame->dField.spsummonable_cards.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.spsummonable_cards.push_back(pcard);
-				pcard->cmdFlag |= COMMAND_SPSUMMON;
-				if (pcard->location == LOCATION_DECK) {
-					pcard->SetCode(code);
-					mainGame->dField.deck_act = true;
-				}
-				if (pcard->location == LOCATION_GRAVE)
-					mainGame->dField.grave_act = true;
-				if (pcard->location == LOCATION_REMOVED)
-					mainGame->dField.remove_act = true;
-				if (pcard->location == LOCATION_EXTRA)
-					mainGame->dField.extra_act = true;
-			}
-			mainGame->dField.reposable_cards.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.reposable_cards.push_back(pcard);
-				pcard->cmdFlag |= COMMAND_REPOS;
-			}
-			mainGame->dField.msetable_cards.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.msetable_cards.push_back(pcard);
-				pcard->cmdFlag |= COMMAND_MSET;
-			}
-			mainGame->dField.ssetable_cards.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.ssetable_cards.push_back(pcard);
-				pcard->cmdFlag |= COMMAND_SSET;
-			}
-			mainGame->dField.activatable_cards.clear();
-			mainGame->dField.activatable_descs.clear();
-			count = BufferIO::ReadInt8(pbuf);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				loc = BufferIO::ReadInt8(pbuf);
-				seq = BufferIO::ReadInt8(pbuf);
-				desc = BufferIO::ReadInt32(pbuf);
-				pcard = mainGame->dField.GetCard(con, loc, seq);
-				mainGame->dField.activatable_cards.push_back(pcard);
-				mainGame->dField.activatable_descs.push_back(desc);
-				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if (pcard->location == LOCATION_GRAVE)
-					mainGame->dField.grave_act = true;
-				if (pcard->location == LOCATION_REMOVED)
-					mainGame->dField.remove_act = true;
-			}
-			if(BufferIO::ReadInt8(pbuf)) {
-				mainGame->btnBP->setVisible(true);
-				mainGame->btnBP->setEnabled(true);
-				mainGame->btnBP->setPressed(false);
-			}
-			if(BufferIO::ReadInt8(pbuf)) {
-				mainGame->btnEP->setVisible(true);
-				mainGame->btnEP->setEnabled(true);
-				mainGame->btnEP->setPressed(false);
-			}
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearCommandFlag();
-			mainGame->btnBP->setVisible(false);
-			mainGame->btnEP->setVisible(false);
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_EFFECTYN: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int code = BufferIO::ReadInt32(pbuf);
-			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l = BufferIO::ReadInt8(pbuf);
-			int s = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
-			if (pcard->code != code)
-				pcard->SetCode(code);
-			BufferIO::ReadInt8(pbuf);
-			myswprintf(textBuffer, L"是否在[ % ls]发动[ % ls]的效果？", dataManager.FormatLocation(l), dataManager.GetName(code));
-			mainGame->gMutex.Lock();
-			mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
-			mainGame->PopupElement(mainGame->wQuery);
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_YESNO: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int desc = BufferIO::ReadInt32(pbuf);
-			mainGame->gMutex.Lock();
-			mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(desc));
-			mainGame->PopupElement(mainGame->wQuery);
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_OPTION: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_options.clear();
-			for (int i = 0; i < count; ++i)
-				mainGame->dField.select_options.push_back(BufferIO::ReadInt32(pbuf));
-			mainGame->gMutex.Lock();
-			mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont,
-			                        (wchar_t*)dataManager.GetDesc(mainGame->dField.select_options[0]));
-			mainGame->btnOptionp->setVisible(false);
-			if(count > 1)
-				mainGame->btnOptionn->setVisible(true);
-			else mainGame->btnOptionn->setVisible(false);
-			mainGame->dField.selected_option = 0;
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L" % ls", dataManager.GetDesc(mainGame->dInfo.selectHint));
-			else myswprintf(textBuffer, L"请选择一个选项：");
-			mainGame->dInfo.selectHint = 0;
-			mainGame->wOptions->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wOptions);
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_CARD: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.selectable_cards.clear();
-			mainGame->dField.selected_cards.clear();
-			int c, l, s, ss, code;
-			bool panelmode = false;
-			mainGame->dField.select_ready = false;
-			ClientCard* pcard;
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				ss = BufferIO::ReadInt8(pbuf);
-				if ((l & LOCATION_OVERLAY) > 0)
-					pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
-				else
-					pcard = mainGame->dField.GetCard(c, l, s);
-				if (code != 0 && pcard->code != code)
-					pcard->SetCode(code);
-				pcard->select_seq = i;
-				mainGame->dField.selectable_cards.push_back(pcard);
-				pcard->is_selectable = true;
-				pcard->is_selected = false;
-				if (l & 0xf1)
-					panelmode = true;
-			}
-			std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L" % ls( % d - % d)", dataManager.GetDesc(mainGame->dInfo.selectHint),
-				           mainGame->dField.select_min, mainGame->dField.select_max);
-			else myswprintf(textBuffer, L"请选择卡：( % d - % d)", mainGame->dField.select_min, mainGame->dField.select_max);
-			mainGame->dInfo.selectHint = 0;
-			if (panelmode) {
-				mainGame->gMutex.Lock();
-				mainGame->wCardSelect->setText(textBuffer);
-				mainGame->dField.ShowSelectCard();
-				mainGame->gMutex.Unlock();
-			} else {
-				mainGame->stHintMsg->setText(textBuffer);
-				mainGame->stHintMsg->setVisible(true);
-			}
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearSelect();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_CHAIN: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			int specount = BufferIO::ReadInt8(pbuf);
-			int hint0 = BufferIO::ReadInt32(pbuf);
-			int hint1 = BufferIO::ReadInt32(pbuf);
-			int c, l, s, code, desc;
-			ClientCard* pcard;
-			mainGame->dField.activatable_cards.clear();
-			mainGame->dField.activatable_descs.clear();
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				desc = BufferIO::ReadInt32(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				mainGame->dField.activatable_cards.push_back(pcard);
-				mainGame->dField.activatable_descs.push_back(desc);
-				pcard->is_selectable = true;
-				pcard->is_selected = false;
-				pcard->cmdFlag |= COMMAND_ACTIVATE;
-				if (pcard->location == LOCATION_GRAVE)
-					mainGame->dField.grave_act = true;
-				if (pcard->location == LOCATION_REMOVED)
-					mainGame->dField.remove_act = true;
-			}
-			if(mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain)) {
-				mainGame->dInfo.responseI = -1;
-				mainGame->SetResponseI();
-				mainGame->dField.ClearChainSelect();
-				if(mainGame->chkWaitChain->isChecked()) {
-					mainGame->WaitFrameSignal(mainGame->rnd.real() * 20 + 20);
-				}
-				mainGame->localResponse.Set();
-				return true;
-			}
-			mainGame->gMutex.Lock();
-			if(count == 0)
-				myswprintf(textBuffer, L"此时没有可以发动的效果\n是否要确认场上的情况？");
-			else
-				myswprintf(textBuffer, L" % ls\n是否进行连锁？", pdInfo->strEvent);
-			mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
-			mainGame->PopupElement(mainGame->wQuery);
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearChainSelect();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_PLACE:
-	case MSG_SELECT_DISFIELD: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
-			mainGame->dField.selected_field = 0;
-			if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
-				int filter;
-				if (mainGame->dField.selectable_field & 0x1f) {
-					mainGame->dInfo.responseB[0] = mainGame->dInfo.is_first_turn ? 0 : 1;
-					mainGame->dInfo.responseB[1] = 0x4;
-					filter = mainGame->dField.selectable_field & 0x1f;
-				} else if (mainGame->dField.selectable_field & 0x1f00) {
-					mainGame->dInfo.responseB[0] = mainGame->dInfo.is_first_turn ? 0 : 1;
-					mainGame->dInfo.responseB[1] = 0x8;
-					filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
-				} else if (mainGame->dField.selectable_field & 0x1f0000) {
-					mainGame->dInfo.responseB[0] = mainGame->dInfo.is_first_turn ? 1 : 0;
-					mainGame->dInfo.responseB[1] = 0x4;
-					filter = (mainGame->dField.selectable_field >> 16) & 0x1f;
-				} else {
-					mainGame->dInfo.responseB[0] = mainGame->dInfo.is_first_turn ? 1 : 0;
-					mainGame->dInfo.responseB[1] = 0x8;
-					filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
-				}
-				if(mainGame->chkRandomPos->isChecked()) {
-					mainGame->dInfo.responseB[2] = mainGame->rnd.real() * 5;
-					while(!(filter & (1 << mainGame->dInfo.responseB[2])))
-						mainGame->dInfo.responseB[2] = mainGame->rnd.real() * 5;
-				} else {
-					if (filter & 0x4) mainGame->dInfo.responseB[2] = 2;
-					else if (filter & 0x2) mainGame->dInfo.responseB[2] = 1;
-					else if (filter & 0x8) mainGame->dInfo.responseB[2] = 3;
-					else if (filter & 0x1) mainGame->dInfo.responseB[2] = 0;
-					else if (filter & 0x10) mainGame->dInfo.responseB[2] = 4;
-				}
-				mainGame->dField.selectable_field = 0;
-				mainGame->SetResponseB(3);
-				mainGame->localResponse.Set();
-				return true;
-			}
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_POSITION: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			int code = BufferIO::ReadInt32(pbuf);
-			int positions = BufferIO::ReadInt8(pbuf);
-			if (positions == 0x1 || positions == 0x2 || positions == 0x4 || positions == 0x8) {
-				mainGame->dInfo.responseI = positions;
-				mainGame->SetResponseI();
-				return true;
-			}
-			int count = 0, filter = 0x1, startpos;
-			while(filter != 0x10) {
-				if(positions & filter) count++;
-				filter <<= 1;
-			}
-			if(count == 4) startpos = 10;
-			else if(count == 3) startpos = 82;
-			else startpos = 155;
-			if(positions & 0x1) {
-				mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
-				mainGame->btnPSAU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
-				mainGame->btnPSAU->setVisible(true);
-				startpos += 145;
-			} else mainGame->btnPSAU->setVisible(false);
-			if(positions & 0x2) {
-				mainGame->btnPSAD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
-				mainGame->btnPSAD->setVisible(true);
-				startpos += 145;
-			} else mainGame->btnPSAD->setVisible(false);
-			if(positions & 0x4) {
-				mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
-				mainGame->btnPSDU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
-				mainGame->btnPSDU->setVisible(true);
-				startpos += 145;
-			} else mainGame->btnPSDU->setVisible(false);
-			if(positions & 0x8) {
-				mainGame->btnPSDD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
-				mainGame->btnPSDD->setVisible(true);
-				startpos += 145;
-			} else mainGame->btnPSDD->setVisible(false);
-			mainGame->PopupElement(mainGame->wPosSelect);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_TRIBUTE: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) ? true : false;
-			mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.selectable_cards.clear();
-			mainGame->dField.selected_cards.clear();
-			int c, l, s, t, code;
-			ClientCard* pcard;
-			mainGame->dField.select_ready = false;
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				t = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				if (code && pcard->code != code)
-					pcard->SetCode(code);
-				mainGame->dField.selectable_cards.push_back(pcard);
-				pcard->opParam = t;
-				pcard->select_seq = i;
-				pcard->is_selectable = true;
-			}
-			mainGame->stHintMsg->setText(L"请选择上级召唤用需要解放的怪兽：");
-			mainGame->stHintMsg->setVisible(false);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearSelect();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_COUNTER: {
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_counter_type = BufferIO::ReadInt16(pbuf);
-			mainGame->dField.select_counter_count = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.selectable_cards.clear();
-			int c, l, s, t, code;
-			ClientCard* pcard;
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				t = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				mainGame->dField.selectable_cards.push_back(pcard);
-				pcard->opParam = t;
-				pcard->select_seq = i;
-				pcard->is_selectable = true;
-				mainGame->dInfo.responseB[i] = 0;
-			}
-			myswprintf(textBuffer, L"请移除 % d个[ % ls]: ", mainGame->dField.select_counter_count, dataManager.GetCounterName(mainGame->dField.select_counter_type));
-			mainGame->gMutex.Lock();
-			mainGame->stHintMsg->setText(textBuffer);
-			mainGame->stHintMsg->setVisible(true);
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearSelect();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SELECT_SUM: {
-			mainGame->dField.select_mode = BufferIO::ReadInt8(pbuf);
-			int selecting_player = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.select_max = BufferIO::ReadInt32(pbuf);
-			mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.selectsum_all.clear();
-			mainGame->dField.selected_cards.clear();
-			mainGame->dField.selectsum_cards.clear();
-			int c, l, s, code;
-			bool panelmode = false;
-			ClientCard* pcard;
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				if (code != 0 && pcard->code != code)
-					pcard->SetCode(code);
-				pcard->opParam = BufferIO::ReadInt32(pbuf);
-				pcard->select_seq = i;
-				mainGame->dField.selectsum_all.push_back(pcard);
-				if ((l & 0xe) == 0)
-					panelmode = true;
-			}
-			std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
-			mainGame->dField.CheckSelectSum();
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L"
-				           % ls( % d)", dataManager.GetDesc(mainGame->dInfo.selectHint), mainGame->dField.select_max);
-			else myswprintf(textBuffer, L"请选择卡：( % d)", mainGame->dField.select_max);
-			mainGame->dInfo.selectHint = 0;
-			if (panelmode) {
-				mainGame->wCardSelect->setText(textBuffer);
-				mainGame->dField.ShowSelectCard();
-			} else {
-				mainGame->stHintMsg->setText(textBuffer);
-				mainGame->stHintMsg->setVisible(true);
-			}
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->dField.ClearSelect();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_SORT_CARD:
-	case MSG_SORT_CHAIN: {
-			int player = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->dField.selectable_cards.clear();
-			mainGame->dField.selected_cards.clear();
-			mainGame->dField.sort_list.clear();
-			int c, l, s, code;
-			ClientCard* pcard;
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				if (code != 0 && pcard->code != code)
-					pcard->SetCode(code);
-				mainGame->dField.selectable_cards.push_back(pcard);
-				pcard->select_seq = i;
-				mainGame->dField.sort_list.push_back(0);
-			}
-			if (mainGame->chkAutoChain->isChecked() && pdInfo->curMsg == MSG_SORT_CHAIN) {
-				mainGame->dInfo.responseI = -1;
-				mainGame->SetResponseI();
-				mainGame->localResponse.Set();
-				return true;
-			}
-			if(pdInfo->curMsg == MSG_SORT_CHAIN)
-				mainGame->wCardSelect->setText(L"请选择连锁顺序：");
-			else
-				mainGame->wCardSelect->setText(L"请选择排列顺序：");
-			mainGame->dField.select_min = 0;
-			mainGame->dField.select_max = count;
-			mainGame->dField.ShowSelectCard();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_CONFIRM_DECKTOP: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int count = BufferIO::ReadInt8(pbuf);
-			int code, c, l, s;
-			ClientCard* pcard;
-			myswprintf(textBuffer, L"翻开卡组上方 % d张卡：", count);
+		case HINT_OPSELECTED: {
+			myswprintf(textBuffer, L"对方选择了：[%ls]", dataManager.GetDesc(data));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(0);
-			mainGame->dField.selectable_cards.clear();
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
+			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
+			mainGame->PopupElement(mainGame->wACMessage, 20);
+			mainGame->WaitFrameSignal(40);
+			break;
+		}
+		case HINT_EFFECT: {
+			mainGame->showcardcode = data;
+			mainGame->showcarddif = 0;
+			mainGame->showcard = 1;
+			mainGame->WaitFrameSignal(30);
+			break;
+		}
+		case HINT_RACE: {
+			myswprintf(textBuffer, L"对方宣言了：[%ls]", dataManager.FormatRace(data));
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
+			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
+			mainGame->PopupElement(mainGame->wACMessage, 20);
+			mainGame->WaitFrameSignal(40);
+			break;
+		}
+		case HINT_ATTRIB: {
+			myswprintf(textBuffer, L"对方宣言了：[%ls]", dataManager.FormatAttribute(data));
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
+			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
+			mainGame->PopupElement(mainGame->wACMessage, 20);
+			mainGame->WaitFrameSignal(40);
+			break;
+		}
+		case HINT_CODE: {
+			myswprintf(textBuffer, L"对方宣言了：[%ls]", dataManager.GetName(data));
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(data);
+			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
+			mainGame->PopupElement(mainGame->wACMessage, 20);
+			mainGame->WaitFrameSignal(40);
+			break;
+		}
+		case HINT_NUMBER: {
+			myswprintf(textBuffer, L"对方选择了：[%d]", data);
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(0);
+			mainGame->SetStaticText(mainGame->stACMessage, 310, mainGame->textFont, textBuffer);
+			mainGame->PopupElement(mainGame->wACMessage, 20);
+			mainGame->WaitFrameSignal(40);
+			break;
+		}
+		case HINT_CARD: {
+			mainGame->showcardcode = data;
+			mainGame->showcarddif = 0;
+			mainGame->showcard = 1;
+			mainGame->WaitFrameSignal(30);
+			break;
+		}
+		}
+		break;
+	}
+	case MSG_WIN: {
+		int player = BufferIO::ReadInt8(pbuf);
+		int type = BufferIO::ReadInt8(pbuf);
+		if(player == 2)
+			myswprintf(textBuffer, L"Draw Game.\n原因：%ls", dataManager.GetVictoryString(type));
+		else if(mainGame->LocalPlayer(player) == 0) {
+			if(!mainGame->dField.is_replaying) {
+				if(type == 1 || type == 2)
+					myswprintf(textBuffer, L"You Win！\n原因：%ls%ls", mainGame->LocalName(1), dataManager.GetVictoryString(type));
+				else myswprintf(textBuffer, L"You Win！\n原因：%ls", dataManager.GetVictoryString(type));
+			} else {
+				if(type == 1 || type == 2)
+					myswprintf(textBuffer, L"%ls Win！\n原因：%ls%ls", mainGame->LocalName(0), mainGame->LocalName(1), dataManager.GetVictoryString(type));
+				else myswprintf(textBuffer, L"%ls Win！\n原因：%ls", mainGame->LocalName(0), dataManager.GetVictoryString(type));
+			}
+		} else {
+			if(!mainGame->dField.is_replaying) {
+				if(type == 1 || type == 2)
+					myswprintf(textBuffer, L"You Lose！\n原因：%ls%ls", mainGame->LocalName(0), dataManager.GetVictoryString(type));
+				else myswprintf(textBuffer, L"You Lose！\n原因：%ls", dataManager.GetVictoryString(type));
+			} else {
+				if(type == 1 || type == 2)
+					myswprintf(textBuffer, L"%ls Win！\n原因：%ls%ls", mainGame->LocalName(1), mainGame->LocalName(0), dataManager.GetVictoryString(type));
+				else myswprintf(textBuffer, L"%ls Win！\n原因：%ls", mainGame->LocalName(1), dataManager.GetVictoryString(type));
+			}
+		}
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 100);
+		mainGame->WaitFrameSignal(120);
+		break;
+	}
+	case MSG_WAITING: {
+		mainGame->waitFrame = 0;
+		mainGame->gMutex.Lock();
+		mainGame->stHintMsg->setText(L"等待对方行动中...");
+		mainGame->stHintMsg->setVisible(true);
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_START: {
+		mainGame->gMutex.Lock();
+		mainGame->dInfo.is_first_turn = BufferIO::ReadInt8(pbuf) ? false : true;
+		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
+		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
+		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
+		myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
+		int deckc = BufferIO::ReadInt16(pbuf);
+		int extrac = BufferIO::ReadInt16(pbuf);
+		mainGame->dField.Initial(mainGame->LocalPlayer(0), deckc, extrac);
+		deckc = BufferIO::ReadInt16(pbuf);
+		extrac = BufferIO::ReadInt16(pbuf);
+		mainGame->dField.Initial(mainGame->LocalPlayer(1), deckc, extrac);
+		mainGame->dInfo.turn = 0;
+		mainGame->dInfo.strTurn[0] = 0;
+		mainGame->dInfo.is_shuffling = false;
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_UPDATE_DATA: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int location = BufferIO::ReadInt8(pbuf);
+		mainGame->gMutex.Lock();
+		mainGame->dField.UpdateFieldCard(player, location, pbuf);
+		mainGame->gMutex.Unlock();
+		if (location == LOCATION_HAND && mainGame->dInfo.is_shuffling) {
+			mainGame->dInfo.is_shuffling = false;
+			for(int i = 0; i < mainGame->dField.hand[0].size(); ++i) {
+				mainGame->dField.hand[0][i]->is_hovered = false;
+				mainGame->dField.MoveCard(mainGame->dField.hand[0][i], 5);
+			}
+			mainGame->WaitFrameSignal(5);
+		}
+		return true;
+	}
+	case MSG_UPDATE_CARD: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int loc = BufferIO::ReadInt8(pbuf);
+		int seq = BufferIO::ReadInt8(pbuf);
+		mainGame->gMutex.Lock();
+		mainGame->dField.UpdateCard(player, loc, seq, pbuf);
+		mainGame->gMutex.Unlock();
+		break;
+	}
+	case MSG_SELECT_BATTLECMD: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int code, desc, count, con, loc, seq, diratt;
+		ClientCard* pcard;
+		mainGame->dField.activatable_cards.clear();
+		mainGame->dField.activatable_descs.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc =  BufferIO::ReadInt8(pbuf);
+			seq =  BufferIO::ReadInt8(pbuf);
+			desc =  BufferIO::ReadInt32(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.activatable_cards.push_back(pcard);
+			mainGame->dField.activatable_descs.push_back(desc);
+			pcard->cmdFlag |= COMMAND_ACTIVATE;
+			if (pcard->location == LOCATION_GRAVE)
+				mainGame->dField.grave_act = true;
+			if (pcard->location == LOCATION_REMOVED)
+				mainGame->dField.remove_act = true;
+		}
+		mainGame->dField.attackable_cards.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			diratt = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.attackable_cards.push_back(pcard);
+			pcard->cmdFlag |= COMMAND_ATTACK;
+		}
+		mainGame->gMutex.Lock();
+		if(BufferIO::ReadInt8(pbuf)) {
+			mainGame->btnM2->setVisible(true);
+			mainGame->btnM2->setEnabled(true);
+			mainGame->btnM2->setPressed(false);
+		}
+		if(BufferIO::ReadInt8(pbuf)) {
+			mainGame->btnEP->setVisible(true);
+			mainGame->btnEP->setEnabled(true);
+			mainGame->btnEP->setPressed(false);
+		}
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearCommandFlag();
+		mainGame->btnM2->setVisible(false);
+		mainGame->btnEP->setVisible(false);
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_IDLECMD: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int code, desc, count, con, loc, seq;
+		ClientCard* pcard;
+		mainGame->dField.summonable_cards.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.summonable_cards.push_back(pcard);
+			pcard->cmdFlag |= COMMAND_SUMMON;
+		}
+		mainGame->dField.spsummonable_cards.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.spsummonable_cards.push_back(pcard);
+			pcard->cmdFlag |= COMMAND_SPSUMMON;
+			if (pcard->location == LOCATION_DECK) {
+				pcard->SetCode(code);
+				mainGame->dField.deck_act = true;
+			}
+			if (pcard->location == LOCATION_GRAVE)
+				mainGame->dField.grave_act = true;
+			if (pcard->location == LOCATION_REMOVED)
+				mainGame->dField.remove_act = true;
+			if (pcard->location == LOCATION_EXTRA)
+				mainGame->dField.extra_act = true;
+		}
+		mainGame->dField.reposable_cards.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.reposable_cards.push_back(pcard);
+			pcard->cmdFlag |= COMMAND_REPOS;
+		}
+		mainGame->dField.msetable_cards.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.msetable_cards.push_back(pcard);
+			pcard->cmdFlag |= COMMAND_MSET;
+		}
+		mainGame->dField.ssetable_cards.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.ssetable_cards.push_back(pcard);
+			pcard->cmdFlag |= COMMAND_SSET;
+		}
+		mainGame->dField.activatable_cards.clear();
+		mainGame->dField.activatable_descs.clear();
+		count = BufferIO::ReadInt8(pbuf);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			con = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			loc = BufferIO::ReadInt8(pbuf);
+			seq = BufferIO::ReadInt8(pbuf);
+			desc = BufferIO::ReadInt32(pbuf);
+			pcard = mainGame->dField.GetCard(con, loc, seq);
+			mainGame->dField.activatable_cards.push_back(pcard);
+			mainGame->dField.activatable_descs.push_back(desc);
+			pcard->cmdFlag |= COMMAND_ACTIVATE;
+			if (pcard->location == LOCATION_GRAVE)
+				mainGame->dField.grave_act = true;
+			if (pcard->location == LOCATION_REMOVED)
+				mainGame->dField.remove_act = true;
+		}
+		if(BufferIO::ReadInt8(pbuf)) {
+			mainGame->btnBP->setVisible(true);
+			mainGame->btnBP->setEnabled(true);
+			mainGame->btnBP->setPressed(false);
+		}
+		if(BufferIO::ReadInt8(pbuf)) {
+			mainGame->btnEP->setVisible(true);
+			mainGame->btnEP->setEnabled(true);
+			mainGame->btnEP->setPressed(false);
+		}
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearCommandFlag();
+		mainGame->btnBP->setVisible(false);
+		mainGame->btnEP->setVisible(false);
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_EFFECTYN: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int code = BufferIO::ReadInt32(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l = BufferIO::ReadInt8(pbuf);
+		int s = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
+		if (pcard->code != code)
+			pcard->SetCode(code);
+		BufferIO::ReadInt8(pbuf);
+		myswprintf(textBuffer, L"是否在[%ls]发动[%ls]的效果？", dataManager.FormatLocation(l), dataManager.GetName(code));
+		mainGame->gMutex.Lock();
+		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
+		mainGame->PopupElement(mainGame->wQuery);
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_YESNO: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int desc = BufferIO::ReadInt32(pbuf);
+		mainGame->gMutex.Lock();
+		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(desc));
+		mainGame->PopupElement(mainGame->wQuery);
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_OPTION: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_options.clear();
+		for (int i = 0; i < count; ++i)
+			mainGame->dField.select_options.push_back(BufferIO::ReadInt32(pbuf));
+		mainGame->gMutex.Lock();
+		mainGame->SetStaticText(mainGame->stOptions, 310, mainGame->textFont,
+		                        (wchar_t*)dataManager.GetDesc(mainGame->dField.select_options[0]));
+		mainGame->btnOptionp->setVisible(false);
+		if(count > 1)
+			mainGame->btnOptionn->setVisible(true);
+		else mainGame->btnOptionn->setVisible(false);
+		mainGame->dField.selected_option = 0;
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+		else myswprintf(textBuffer, L"请选择一个选项：");
+		select_hint = 0;
+		mainGame->wOptions->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wOptions);
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_CARD: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.selectable_cards.clear();
+		mainGame->dField.selected_cards.clear();
+		int c, l, s, ss, code;
+		bool panelmode = false;
+		mainGame->dField.select_ready = false;
+		ClientCard* pcard;
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			ss = BufferIO::ReadInt8(pbuf);
+			if ((l & LOCATION_OVERLAY) > 0)
+				pcard = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+			else
 				pcard = mainGame->dField.GetCard(c, l, s);
-				if (code != 0)
-					pcard->SetCode(code);
-				myswprintf(textBuffer, L" % d [ % ls]", i, dataManager.GetName(code));
-				mainGame->lstLog->addItem(textBuffer);
-				mainGame->logParam.push_back(code);
+			if (code != 0 && pcard->code != code)
+				pcard->SetCode(code);
+			pcard->select_seq = i;
+			mainGame->dField.selectable_cards.push_back(pcard);
+			pcard->is_selectable = true;
+			pcard->is_selected = false;
+			if (l & 0xf1)
+				panelmode = true;
+		}
+		std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end(), ClientCard::client_card_sort);
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_hint),
+			           mainGame->dField.select_min, mainGame->dField.select_max);
+		else myswprintf(textBuffer, L"请选择卡：(%d-%d)", mainGame->dField.select_min, mainGame->dField.select_max);
+		select_hint = 0;
+		if (panelmode) {
+			mainGame->gMutex.Lock();
+			mainGame->wCardSelect->setText(textBuffer);
+			mainGame->dField.ShowSelectCard();
+			mainGame->gMutex.Unlock();
+		} else {
+			mainGame->stHintMsg->setText(textBuffer);
+			mainGame->stHintMsg->setVisible(true);
+		}
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearSelect();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_CHAIN: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		int specount = BufferIO::ReadInt8(pbuf);
+		int hint0 = BufferIO::ReadInt32(pbuf);
+		int hint1 = BufferIO::ReadInt32(pbuf);
+		int c, l, s, code, desc;
+		ClientCard* pcard;
+		mainGame->dField.activatable_cards.clear();
+		mainGame->dField.activatable_descs.clear();
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			desc = BufferIO::ReadInt32(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			mainGame->dField.activatable_cards.push_back(pcard);
+			mainGame->dField.activatable_descs.push_back(desc);
+			pcard->is_selectable = true;
+			pcard->is_selected = false;
+			pcard->cmdFlag |= COMMAND_ACTIVATE;
+			if (pcard->location == LOCATION_GRAVE)
+				mainGame->dField.grave_act = true;
+			if (pcard->location == LOCATION_REMOVED)
+				mainGame->dField.remove_act = true;
+		}
+		if(mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain)) {
+			SetResponseI(-1);
+			mainGame->dField.ClearChainSelect();
+			if(mainGame->chkWaitChain->isChecked()) {
+				mainGame->WaitFrameSignal(rnd.real() * 20 + 20);
+			}
+			DuelClient::SendResponse();
+			return true;
+		}
+		mainGame->gMutex.Lock();
+		if(count == 0)
+			myswprintf(textBuffer, L"此时没有可以发动的效果\n是否要确认场上的情况？");
+		else
+			myswprintf(textBuffer, L"%ls\n是否进行连锁？", event_string);
+		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+		mainGame->PopupElement(mainGame->wQuery);
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearChainSelect();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_PLACE:
+	case MSG_SELECT_DISFIELD: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
+		mainGame->dField.selected_field = 0;
+		unsigned char respbuf[64];
+		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
+			int filter;
+			if (mainGame->dField.selectable_field & 0x1f) {
+				respbuf[0] = mainGame->dInfo.is_first_turn ? 0 : 1;
+				respbuf[1] = 0x4;
+				filter = mainGame->dField.selectable_field & 0x1f;
+			} else if (mainGame->dField.selectable_field & 0x1f00) {
+				respbuf[0] = mainGame->dInfo.is_first_turn ? 0 : 1;
+				respbuf[1] = 0x8;
+				filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
+			} else if (mainGame->dField.selectable_field & 0x1f0000) {
+				respbuf[0] = mainGame->dInfo.is_first_turn ? 1 : 0;
+				respbuf[1] = 0x4;
+				filter = (mainGame->dField.selectable_field >> 16) & 0x1f;
+			} else {
+				respbuf[0] = mainGame->dInfo.is_first_turn ? 1 : 0;
+				respbuf[1] = 0x8;
+				filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
+			}
+			if(mainGame->chkRandomPos->isChecked()) {
+				respbuf[2] = rnd.real() * 5;
+				while(!(filter & (1 << respbuf[2])))
+					respbuf[2] = rnd.real() * 5;
+			} else {
+				if (filter & 0x4) respbuf[2] = 2;
+				else if (filter & 0x2) respbuf[2] = 1;
+				else if (filter & 0x8) respbuf[2] = 3;
+				else if (filter & 0x1) respbuf[2] = 0;
+				else if (filter & 0x10) respbuf[2] = 4;
+			}
+			mainGame->dField.selectable_field = 0;
+			SetResponseB(respbuf, 3);
+			DuelClient::SendResponse();
+			return true;
+		}
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_POSITION: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		int code = BufferIO::ReadInt32(pbuf);
+		int positions = BufferIO::ReadInt8(pbuf);
+		if (positions == 0x1 || positions == 0x2 || positions == 0x4 || positions == 0x8) {
+			SetResponseI(positions);
+			return true;
+		}
+		int count = 0, filter = 0x1, startpos;
+		while(filter != 0x10) {
+			if(positions & filter) count++;
+			filter <<= 1;
+		}
+		if(count == 4) startpos = 10;
+		else if(count == 3) startpos = 82;
+		else startpos = 155;
+		if(positions & 0x1) {
+			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSAU, code));
+			mainGame->btnPSAU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAU->setVisible(true);
+			startpos += 145;
+		} else mainGame->btnPSAU->setVisible(false);
+		if(positions & 0x2) {
+			mainGame->btnPSAD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSAD->setVisible(true);
+			startpos += 145;
+		} else mainGame->btnPSAD->setVisible(false);
+		if(positions & 0x4) {
+			mainGame->imageLoading.insert(std::make_pair(mainGame->btnPSDU, code));
+			mainGame->btnPSDU->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDU->setVisible(true);
+			startpos += 145;
+		} else mainGame->btnPSDU->setVisible(false);
+		if(positions & 0x8) {
+			mainGame->btnPSDD->setRelativePosition(rect<s32>(startpos, 45, startpos + 140, 185));
+			mainGame->btnPSDD->setVisible(true);
+			startpos += 145;
+		} else mainGame->btnPSDD->setVisible(false);
+		mainGame->PopupElement(mainGame->wPosSelect);
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_TRIBUTE: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_cancelable = BufferIO::ReadInt8(pbuf) ? true : false;
+		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.selectable_cards.clear();
+		mainGame->dField.selected_cards.clear();
+		int c, l, s, t, code;
+		ClientCard* pcard;
+		mainGame->dField.select_ready = false;
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			t = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			if (code && pcard->code != code)
+				pcard->SetCode(code);
+			mainGame->dField.selectable_cards.push_back(pcard);
+			pcard->opParam = t;
+			pcard->select_seq = i;
+			pcard->is_selectable = true;
+		}
+		mainGame->stHintMsg->setText(L"请选择上级召唤用需要解放的怪兽：");
+		mainGame->stHintMsg->setVisible(false);
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearSelect();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_COUNTER: {
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_counter_type = BufferIO::ReadInt16(pbuf);
+		mainGame->dField.select_counter_count = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.selectable_cards.clear();
+		int c, l, s, t, code;
+		ClientCard* pcard;
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			t = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			mainGame->dField.selectable_cards.push_back(pcard);
+			pcard->opParam = (t << 16) | t;
+			pcard->select_seq = i;
+			pcard->is_selectable = true;
+		}
+		myswprintf(textBuffer, L"请移除%d个[%ls]: ", mainGame->dField.select_counter_count, dataManager.GetCounterName(mainGame->dField.select_counter_type));
+		mainGame->gMutex.Lock();
+		mainGame->stHintMsg->setText(textBuffer);
+		mainGame->stHintMsg->setVisible(true);
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearSelect();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SELECT_SUM: {
+		mainGame->dField.select_mode = BufferIO::ReadInt8(pbuf);
+		int selecting_player = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_max = BufferIO::ReadInt32(pbuf);
+		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.selectsum_all.clear();
+		mainGame->dField.selected_cards.clear();
+		mainGame->dField.selectsum_cards.clear();
+		int c, l, s, code;
+		bool panelmode = false;
+		ClientCard* pcard;
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			if (code != 0 && pcard->code != code)
+				pcard->SetCode(code);
+			pcard->opParam = BufferIO::ReadInt32(pbuf);
+			pcard->select_seq = i;
+			mainGame->dField.selectsum_all.push_back(pcard);
+			if ((l & 0xe) == 0)
+				panelmode = true;
+		}
+		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
+		mainGame->dField.CheckSelectSum();
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_max);
+		else myswprintf(textBuffer, L"请选择卡：(%d)", mainGame->dField.select_max);
+		select_hint = 0;
+		if (panelmode) {
+			mainGame->wCardSelect->setText(textBuffer);
+			mainGame->dField.ShowSelectCard();
+		} else {
+			mainGame->stHintMsg->setText(textBuffer);
+			mainGame->stHintMsg->setVisible(true);
+		}
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->dField.ClearSelect();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_SORT_CARD:
+	case MSG_SORT_CHAIN: {
+		int player = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.selectable_cards.clear();
+		mainGame->dField.selected_cards.clear();
+		mainGame->dField.sort_list.clear();
+		int c, l, s, code;
+		ClientCard* pcard;
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			if (code != 0 && pcard->code != code)
+				pcard->SetCode(code);
+			mainGame->dField.selectable_cards.push_back(pcard);
+			pcard->select_seq = i;
+			mainGame->dField.sort_list.push_back(0);
+		}
+		if (mainGame->chkAutoChain->isChecked() && mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
+			SetResponseI(-1);
+			DuelClient::SendResponse();
+			return true;
+		}
+		if(mainGame->dInfo.curMsg == MSG_SORT_CHAIN)
+			mainGame->wCardSelect->setText(L"请选择连锁顺序：");
+		else
+			mainGame->wCardSelect->setText(L"请选择排列顺序：");
+		mainGame->dField.select_min = 0;
+		mainGame->dField.select_max = count;
+		mainGame->dField.ShowSelectCard();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_CONFIRM_DECKTOP: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		int code, c, l, s;
+		ClientCard* pcard;
+		myswprintf(textBuffer, L"翻开卡组上方%d张卡：", count);
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
+		mainGame->dField.selectable_cards.clear();
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			if (code != 0)
+				pcard->SetCode(code);
+			myswprintf(textBuffer, L"%d[%ls]", i, dataManager.GetName(code));
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(code);
+			float shift = -0.15f;
+			if (player == 1) shift = 0.15f;
+			pcard->dPos = irr::core::vector3df(shift, 0, 0);
+			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			pcard->is_moving = true;
+			pcard->aniFrame = 5;
+			mainGame->WaitFrameSignal(45);
+			mainGame->dField.MoveCard(pcard, 5);
+			mainGame->WaitFrameSignal(5);
+		}
+		return true;
+	}
+	case MSG_CONFIRM_CARDS: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		int code, c, l, s;
+		std::vector<ClientCard*> field_confirm;
+		ClientCard*  pcard;
+		myswprintf(textBuffer, L"确认%d张卡：", count);
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
+		for (int i = 0; i < count; ++i) {
+			code = BufferIO::ReadInt32(pbuf);
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			if (code != 0)
+				pcard->SetCode(code);
+			myswprintf(textBuffer, L"%d[%ls]", i, dataManager.GetName(code));
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(code);
+			if (l & 0x41) {
 				float shift = -0.15f;
-				if (player == 1) shift = 0.15f;
+				if ((c == 0 && l == 0x40) || (c == 1 && l == 0x1)) shift = 0.15f;
 				pcard->dPos = irr::core::vector3df(shift, 0, 0);
 				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
 				pcard->is_moving = true;
@@ -1123,1117 +1138,1084 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				mainGame->WaitFrameSignal(45);
 				mainGame->dField.MoveCard(pcard, 5);
 				mainGame->WaitFrameSignal(5);
-			}
-			return true;
+			} else
+				field_confirm.push_back(pcard);
 		}
-	case MSG_CONFIRM_CARDS: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int count = BufferIO::ReadInt8(pbuf);
-			int code, c, l, s;
-			std::vector<ClientCard*> field_confirm;
-			ClientCard*  pcard;
-			myswprintf(textBuffer, L"确认 % d张卡：", count);
-			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(0);
-			for (int i = 0; i < count; ++i) {
-				code = BufferIO::ReadInt32(pbuf);
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				if (code != 0)
-					pcard->SetCode(code);
-				myswprintf(textBuffer, L" % d [ % ls]", i, dataManager.GetName(code));
-				mainGame->lstLog->addItem(textBuffer);
-				mainGame->logParam.push_back(code);
-				if (l & 0x41) {
-					float shift = -0.15f;
-					if ((c == 0 && l == 0x40) || (c == 1 && l == 0x1)) shift = 0.15f;
-					pcard->dPos = irr::core::vector3df(shift, 0, 0);
+		if (field_confirm.size() > 0) {
+			for(int i = 0; i < field_confirm.size(); ++i) {
+				pcard = field_confirm[i];
+				c = pcard->controler;
+				l = pcard->location;
+				if (l == LOCATION_HAND) {
+					mainGame->dField.MoveCard(pcard, 5);
+				} else if (l == LOCATION_MZONE) {
+					if (pcard->position & POS_FACEUP)
+						continue;
+					pcard->dPos = irr::core::vector3df(0, 0, 0);
+					if (pcard->position == POS_FACEDOWN_ATTACK)
+						pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+					else
+						pcard->dRot = irr::core::vector3df(3.14159f / 5.0f, 0, 0);
+					pcard->is_moving = true;
+					pcard->aniFrame = 5;
+				} else if (l == LOCATION_SZONE) {
+					if (pcard->position & POS_FACEUP)
+						continue;
+					pcard->dPos = irr::core::vector3df(0, 0, 0);
 					pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
 					pcard->is_moving = true;
 					pcard->aniFrame = 5;
-					mainGame->WaitFrameSignal(45);
+				}
+			}
+			mainGame->WaitFrameSignal(45);
+			for(int i = 0; i < field_confirm.size(); ++i) {
+				if (pcard->location != LOCATION_HAND)
 					mainGame->dField.MoveCard(pcard, 5);
-					mainGame->WaitFrameSignal(5);
-				} else
-					field_confirm.push_back(pcard);
 			}
-			if (field_confirm.size() > 0) {
-				for(int i = 0; i < field_confirm.size(); ++i) {
-					pcard = field_confirm[i];
-					c = pcard->controler;
-					l = pcard->location;
-					if (l == LOCATION_HAND) {
-						mainGame->dField.MoveCard(pcard, 5);
-					} else if (l == LOCATION_MZONE) {
-						if (pcard->position & POS_FACEUP)
-							continue;
-						pcard->dPos = irr::core::vector3df(0, 0, 0);
-						if (pcard->position == POS_FACEDOWN_ATTACK)
-							pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-						else
-							pcard->dRot = irr::core::vector3df(3.14159f / 5.0f, 0, 0);
-						pcard->is_moving = true;
-						pcard->aniFrame = 5;
-					} else if (l == LOCATION_SZONE) {
-						if (pcard->position & POS_FACEUP)
-							continue;
-						pcard->dPos = irr::core::vector3df(0, 0, 0);
-						pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-						pcard->is_moving = true;
-						pcard->aniFrame = 5;
-					}
-				}
-				mainGame->WaitFrameSignal(45);
-				for(int i = 0; i < field_confirm.size(); ++i) {
-					if (pcard->location != LOCATION_HAND)
-						mainGame->dField.MoveCard(pcard, 5);
-				}
-				mainGame->WaitFrameSignal(5);
-			}
-			return true;
-		}
-	case MSG_SHUFFLE_DECK: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			std::vector<ClientCard*>::iterator cit;
-			for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
-				mainGame->dField.deck[player][i]->code = 0;
-			for (int i = 0; i < 5; ++i) {
-				for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-					(*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
-					(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-					(*cit)->is_moving = true;
-					(*cit)->aniFrame = 3;
-				}
-				mainGame->WaitFrameSignal(3);
-				for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
-					mainGame->dField.MoveCard(*cit, 3);
-				mainGame->WaitFrameSignal(3);
-			}
-			return true;
-		}
-	case MSG_SHUFFLE_HAND: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			std::vector<ClientCard*>::iterator cit;
 			mainGame->WaitFrameSignal(5);
-			if(player == 1) {
-				bool flip = false;
-				for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
-					if((*cit)->code) {
-						(*cit)->dPos = irr::core::vector3df(0, 0, 0);
-						(*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
-						(*cit)->is_moving = true;
-						(*cit)->is_hovered = false;
-						(*cit)->aniFrame = 5;
-						flip = true;
-					}
-				if(flip)
-					mainGame->WaitFrameSignal(5);
-			}
-			for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-				(*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
+		}
+		return true;
+	}
+	case MSG_SHUFFLE_DECK: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		std::vector<ClientCard*>::iterator cit;
+		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+			mainGame->dField.deck[player][i]->code = 0;
+		for (int i = 0; i < 5; ++i) {
+			for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+				(*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
 				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 				(*cit)->is_moving = true;
-				(*cit)->is_hovered = false;
-				(*cit)->aniFrame = 5;
+				(*cit)->aniFrame = 3;
 			}
-			mainGame->WaitFrameSignal(20);
+			mainGame->WaitFrameSignal(3);
+			for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
+				mainGame->dField.MoveCard(*cit, 3);
+			mainGame->WaitFrameSignal(3);
+		}
+		return true;
+	}
+	case MSG_SHUFFLE_HAND: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		std::vector<ClientCard*>::iterator cit;
+		mainGame->WaitFrameSignal(5);
+		if(player == 1) {
+			bool flip = false;
 			for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
-				(*cit)->SetCode(0);
-			if (player == 0)
-				mainGame->dInfo.is_shuffling = true;
-			else {
-				for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+				if((*cit)->code) {
+					(*cit)->dPos = irr::core::vector3df(0, 0, 0);
+					(*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
+					(*cit)->is_moving = true;
 					(*cit)->is_hovered = false;
-					mainGame->dField.MoveCard(*cit, 5);
+					(*cit)->aniFrame = 5;
+					flip = true;
 				}
+			if(flip)
 				mainGame->WaitFrameSignal(5);
-			}
-			return true;
 		}
+		for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+			(*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
+			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+			(*cit)->is_moving = true;
+			(*cit)->is_hovered = false;
+			(*cit)->aniFrame = 5;
+		}
+		mainGame->WaitFrameSignal(20);
+		for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
+			(*cit)->SetCode(0);
+		if (player == 0)
+			mainGame->dInfo.is_shuffling = true;
+		else {
+			for (cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+				(*cit)->is_hovered = false;
+				mainGame->dField.MoveCard(*cit, 5);
+			}
+			mainGame->WaitFrameSignal(5);
+		}
+		return true;
+	}
 	case MSG_REFRESH_DECK: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			return true;
-		}
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		return true;
+	}
 	case MSG_SWAP_GRAVE_DECK: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			std::vector<ClientCard*>::iterator cit;
-			mainGame->gMutex.Lock();
-			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
-			for (cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
-				(*cit)->location = LOCATION_GRAVE;
-				mainGame->dField.MoveCard(*cit, 10);
-			}
-			for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-				(*cit)->location = LOCATION_DECK;
-				mainGame->dField.MoveCard(*cit, 10);
-			}
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(10);
-			return true;
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		std::vector<ClientCard*>::iterator cit;
+		mainGame->gMutex.Lock();
+		mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
+		for (cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
+			(*cit)->location = LOCATION_GRAVE;
+			mainGame->dField.MoveCard(*cit, 10);
 		}
+		for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+			(*cit)->location = LOCATION_DECK;
+			mainGame->dField.MoveCard(*cit, 10);
+		}
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
 	case MSG_SHUFFLE_SET_CARD: {
-			std::vector<ClientCard*>::iterator cit;
-			int count = BufferIO::ReadInt8(pbuf);
-			ClientCard* mc[5];
-			ClientCard* swp;
-			int c, l, s, ps;
-			for (int i = 0; i < count; ++i) {
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				BufferIO::ReadInt8(pbuf);
-				mc[i] = mainGame->dField.mzone[c][s];
-				mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
-				mc[i]->dRot = irr::core::vector3df(0, 0, 0);
-				mc[i]->is_moving = true;
-				mc[i]->aniFrame = 10;
-			}
-			mainGame->WaitFrameSignal(20);
-			for (int i = 0; i < count; ++i) {
-				c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				BufferIO::ReadInt8(pbuf);
-				ps = mc[i]->sequence;
-				if (l > 0) {
-					swp = mainGame->dField.mzone[c][s];
-					mainGame->dField.mzone[c][ps] = swp;
-					mainGame->dField.mzone[c][s] = mc[i];
-					mc[i]->sequence = s;
-					swp->sequence = ps;
-				}
-			}
-			for (int i = 0; i < count; ++i) {
-				mainGame->dField.MoveCard(mc[i], 10);
-				for (cit = mc[i]->overlayed.begin(); cit != mc[i]->overlayed.end(); ++cit)
-					mainGame->dField.MoveCard(*cit, 10);
-			}
-			mainGame->WaitFrameSignal(10);
-			return true;
+		std::vector<ClientCard*>::iterator cit;
+		int count = BufferIO::ReadInt8(pbuf);
+		ClientCard* mc[5];
+		ClientCard* swp;
+		int c, l, s, ps;
+		for (int i = 0; i < count; ++i) {
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			BufferIO::ReadInt8(pbuf);
+			mc[i] = mainGame->dField.mzone[c][s];
+			mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
+			mc[i]->dRot = irr::core::vector3df(0, 0, 0);
+			mc[i]->is_moving = true;
+			mc[i]->aniFrame = 10;
 		}
+		mainGame->WaitFrameSignal(20);
+		for (int i = 0; i < count; ++i) {
+			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			l = BufferIO::ReadInt8(pbuf);
+			s = BufferIO::ReadInt8(pbuf);
+			BufferIO::ReadInt8(pbuf);
+			ps = mc[i]->sequence;
+			if (l > 0) {
+				swp = mainGame->dField.mzone[c][s];
+				mainGame->dField.mzone[c][ps] = swp;
+				mainGame->dField.mzone[c][s] = mc[i];
+				mc[i]->sequence = s;
+				swp->sequence = ps;
+			}
+		}
+		for (int i = 0; i < count; ++i) {
+			mainGame->dField.MoveCard(mc[i], 10);
+			for (cit = mc[i]->overlayed.begin(); cit != mc[i]->overlayed.end(); ++cit)
+				mainGame->dField.MoveCard(*cit, 10);
+		}
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
 	case MSG_NEW_TURN: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			mainGame->dInfo.turn++;
-			myswprintf(mainGame->dInfo.strTurn, L"Turn:
-			           % d", mainGame->dInfo.turn);
-			myswprintf(textBuffer, L" % ls的回合", mainGame->LocalName(player));
-			mainGame->gMutex.Lock();
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(40);
-			return true;
-		}
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		mainGame->dInfo.turn++;
+		myswprintf(mainGame->dInfo.strTurn, L"Turn:%d", mainGame->dInfo.turn);
+		myswprintf(textBuffer, L"%ls的回合", mainGame->LocalName(player));
+		mainGame->gMutex.Lock();
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(40);
+		return true;
+	}
 	case MSG_NEW_PHASE: {
-			int phase = (unsigned char)BufferIO::ReadInt8(pbuf);
-			mainGame->gMutex.Lock();
-			mainGame->btnDP->setVisible(false);
-			mainGame->btnSP->setVisible(false);
-			mainGame->btnM1->setVisible(false);
-			mainGame->btnBP->setVisible(false);
-			mainGame->btnM2->setVisible(false);
-			mainGame->btnEP->setVisible(false);
-			switch (phase) {
-			case PHASE_DRAW:
-				mainGame->btnDP->setVisible(true);
-				myswprintf(textBuffer, L"进入【抽卡阶段】");
-				break;
-			case PHASE_STANDBY:
-				mainGame->btnSP->setVisible(true);
-				myswprintf(textBuffer, L"进入【准备阶段】");
-				break;
-			case PHASE_MAIN1:
-				mainGame->btnM1->setVisible(true);
-				myswprintf(textBuffer, L"进入【主要阶段１】");
-				break;
-			case PHASE_BATTLE:
-				mainGame->btnBP->setVisible(true);
-				mainGame->btnBP->setPressed(true);
-				mainGame->btnBP->setEnabled(false);
-				myswprintf(textBuffer, L"进入【战斗阶段】");
-				break;
-			case PHASE_MAIN2:
-				mainGame->btnM2->setVisible(true);
-				mainGame->btnM2->setPressed(true);
-				mainGame->btnM2->setEnabled(false);
-				myswprintf(textBuffer, L"进入【主要阶段２】");
-				break;
-			case PHASE_END:
-				mainGame->btnEP->setVisible(true);
-				mainGame->btnEP->setPressed(true);
-				mainGame->btnEP->setEnabled(false);
-				myswprintf(textBuffer, L"进入【结束阶段】");
-				break;
-			}
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(40);
-			return true;
+		int phase = (unsigned char)BufferIO::ReadInt8(pbuf);
+		mainGame->gMutex.Lock();
+		mainGame->btnDP->setVisible(false);
+		mainGame->btnSP->setVisible(false);
+		mainGame->btnM1->setVisible(false);
+		mainGame->btnBP->setVisible(false);
+		mainGame->btnM2->setVisible(false);
+		mainGame->btnEP->setVisible(false);
+		switch (phase) {
+		case PHASE_DRAW:
+			mainGame->btnDP->setVisible(true);
+			myswprintf(textBuffer, L"进入【抽卡阶段】");
+			break;
+		case PHASE_STANDBY:
+			mainGame->btnSP->setVisible(true);
+			myswprintf(textBuffer, L"进入【准备阶段】");
+			break;
+		case PHASE_MAIN1:
+			mainGame->btnM1->setVisible(true);
+			myswprintf(textBuffer, L"进入【主要阶段１】");
+			break;
+		case PHASE_BATTLE:
+			mainGame->btnBP->setVisible(true);
+			mainGame->btnBP->setPressed(true);
+			mainGame->btnBP->setEnabled(false);
+			myswprintf(textBuffer, L"进入【战斗阶段】");
+			break;
+		case PHASE_MAIN2:
+			mainGame->btnM2->setVisible(true);
+			mainGame->btnM2->setPressed(true);
+			mainGame->btnM2->setEnabled(false);
+			myswprintf(textBuffer, L"进入【主要阶段２】");
+			break;
+		case PHASE_END:
+			mainGame->btnEP->setVisible(true);
+			mainGame->btnEP->setPressed(true);
+			mainGame->btnEP->setEnabled(false);
+			myswprintf(textBuffer, L"进入【结束阶段】");
+			break;
 		}
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(40);
+		return true;
+	}
 	case MSG_MOVE: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int pc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int pl = BufferIO::ReadUInt8(pbuf);
-			int ps = BufferIO::ReadInt8(pbuf);
-			int pp = BufferIO::ReadInt8(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadUInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int cp = BufferIO::ReadInt8(pbuf);
-			int reason = BufferIO::ReadInt32(pbuf);
-			if (pl == 0) {
-				ClientCard* pcard = new ClientCard();
-				pcard->position = cp;
+		int code = BufferIO::ReadInt32(pbuf);
+		int pc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int pl = BufferIO::ReadUInt8(pbuf);
+		int ps = BufferIO::ReadInt8(pbuf);
+		int pp = BufferIO::ReadInt8(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadUInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int cp = BufferIO::ReadInt8(pbuf);
+		int reason = BufferIO::ReadInt32(pbuf);
+		if (pl == 0) {
+			ClientCard* pcard = new ClientCard();
+			pcard->position = cp;
+			pcard->SetCode(code);
+			mainGame->gMutex.Lock();
+			mainGame->dField.AddCard(pcard, cc, cl, cs);
+			mainGame->gMutex.Unlock();
+			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+			pcard->mTransform.setTranslation(pcard->curPos);
+			pcard->mTransform.setRotationRadians(pcard->curRot);
+			pcard->curAlpha = 5;
+			mainGame->dField.FadeCard(pcard, 255, 20);
+			mainGame->WaitFrameSignal(20);
+		} else if (cl == 0) {
+			ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
+			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
-				mainGame->gMutex.Lock();
-				mainGame->dField.AddCard(pcard, cc, cl, cs);
-				mainGame->gMutex.Unlock();
-				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-				pcard->mTransform.setTranslation(pcard->curPos);
-				pcard->mTransform.setRotationRadians(pcard->curRot);
-				pcard->curAlpha = 5;
-				mainGame->dField.FadeCard(pcard, 255, 20);
-				mainGame->WaitFrameSignal(20);
-			} else if (cl == 0) {
+			pcard->ClearTarget();
+			mainGame->dField.FadeCard(pcard, 5, 20);
+			mainGame->WaitFrameSignal(20);
+			mainGame->gMutex.Lock();
+			mainGame->dField.RemoveCard(pc, pl, ps);
+			mainGame->gMutex.Unlock();
+			if(pcard == mainGame->dField.hovered_card)
+				mainGame->dField.hovered_card = 0;
+			delete pcard;
+		} else {
+			if (!(pl & 0x80) && !(cl & 0x80)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
 				if (code != 0 && pcard->code != code)
 					pcard->SetCode(code);
-				pcard->ClearTarget();
-				mainGame->dField.FadeCard(pcard, 5, 20);
-				mainGame->WaitFrameSignal(20);
+				if((pl & LOCATION_ONFIELD) && (cl != pl))
+					pcard->counters.clear();
+				if(cl != pl)
+					pcard->ClearTarget();
 				mainGame->gMutex.Lock();
 				mainGame->dField.RemoveCard(pc, pl, ps);
+				pcard->position = cp;
+				mainGame->dField.AddCard(pcard, cc, cl, cs);
 				mainGame->gMutex.Unlock();
-				if(pcard == mainGame->dField.hovered_card)
-					mainGame->dField.hovered_card = 0;
-				delete pcard;
-			} else {
-				if (!(pl & 0x80) && !(cl & 0x80)) {
-					ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
-					if (code != 0 && pcard->code != code)
-						pcard->SetCode(code);
-					if((pl & LOCATION_ONFIELD) && (cl != pl))
-						pcard->counters.clear();
-					if(cl != pl)
-						pcard->ClearTarget();
-					mainGame->gMutex.Lock();
-					mainGame->dField.RemoveCard(pc, pl, ps);
-					pcard->position = cp;
-					mainGame->dField.AddCard(pcard, cc, cl, cs);
-					mainGame->gMutex.Unlock();
-					if (pl == cl && pc == cc && (cl & 0x71)) {
-						pcard->dPos = irr::core::vector3df(-0.2f, 0, 0);
-						pcard->dRot = irr::core::vector3df(0, 0, 0);
-						if (pc == 1) pcard->dPos.X = 0.2f;
-						pcard->is_moving = true;
-						pcard->aniFrame = 5;
-						mainGame->WaitFrameSignal(5);
-						mainGame->dField.MoveCard(pcard, 5);
-						mainGame->WaitFrameSignal(5);
-					} else {
-						if (cl == 0x4 && pcard->overlayed.size() > 0) {
-							mainGame->gMutex.Lock();
-							for (int i = 0; i < pcard->overlayed.size(); ++i)
-								mainGame->dField.MoveCard(pcard->overlayed[i], 10);
-							mainGame->gMutex.Unlock();
-							mainGame->WaitFrameSignal(5);
-						}
-						if (cl == 0x2) {
-							mainGame->gMutex.Lock();
-							for (int i = 0; i < mainGame->dField.hand[cc].size(); ++i)
-								mainGame->dField.MoveCard(mainGame->dField.hand[cc][i], 10);
-							mainGame->gMutex.Unlock();
-						} else {
-							mainGame->gMutex.Lock();
-							mainGame->dField.MoveCard(pcard, 10);
-							if (pl == 0x2)
-								for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
-									mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
-							mainGame->gMutex.Unlock();
-						}
+				if (pl == cl && pc == cc && (cl & 0x71)) {
+					pcard->dPos = irr::core::vector3df(-0.2f, 0, 0);
+					pcard->dRot = irr::core::vector3df(0, 0, 0);
+					if (pc == 1) pcard->dPos.X = 0.2f;
+					pcard->is_moving = true;
+					pcard->aniFrame = 5;
+					mainGame->WaitFrameSignal(5);
+					mainGame->dField.MoveCard(pcard, 5);
+					mainGame->WaitFrameSignal(5);
+				} else {
+					if (cl == 0x4 && pcard->overlayed.size() > 0) {
+						mainGame->gMutex.Lock();
+						for (int i = 0; i < pcard->overlayed.size(); ++i)
+							mainGame->dField.MoveCard(pcard->overlayed[i], 10);
+						mainGame->gMutex.Unlock();
 						mainGame->WaitFrameSignal(5);
 					}
-				} else if (!(pl & 0x80)) {
-					ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
-					if (code != 0 && pcard->code != code)
-						pcard->SetCode(code);
-					if((pl & LOCATION_ONFIELD) && (cl != pl))
-						pcard->counters.clear();
-					if(cl != pl)
-						pcard->ClearTarget();
-					ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
-					mainGame->gMutex.Lock();
-					mainGame->dField.RemoveCard(pc, pl, ps);
-					olcard->overlayed.push_back(pcard);
-					mainGame->dField.overlay_cards.insert(pcard);
-					mainGame->gMutex.Unlock();
-					pcard->overlayTarget = olcard;
-					pcard->location = 0x80;
-					pcard->sequence = olcard->overlayed.size() - 1;
-					if (olcard->location == 0x4) {
+					if (cl == 0x2) {
+						mainGame->gMutex.Lock();
+						for (int i = 0; i < mainGame->dField.hand[cc].size(); ++i)
+							mainGame->dField.MoveCard(mainGame->dField.hand[cc][i], 10);
+						mainGame->gMutex.Unlock();
+					} else {
 						mainGame->gMutex.Lock();
 						mainGame->dField.MoveCard(pcard, 10);
 						if (pl == 0x2)
 							for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
 								mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
 						mainGame->gMutex.Unlock();
-						mainGame->WaitFrameSignal(5);
 					}
-				} else if (!(cl & 0x80)) {
-					ClientCard* olcard = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
-					ClientCard* pcard = olcard->overlayed[pp];
-					mainGame->gMutex.Lock();
-					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
-					pcard->overlayTarget = 0;
-					pcard->position = cp;
-					mainGame->dField.AddCard(pcard, cc, cl, cs);
-					mainGame->dField.overlay_cards.erase(pcard);
-					for (int i = 0; i < olcard->overlayed.size(); ++i) {
-						olcard->overlayed[i]->sequence = i;
-						mainGame->dField.MoveCard(olcard->overlayed[i], 2);
-					}
-					mainGame->gMutex.Unlock();
-					mainGame->WaitFrameSignal(5);
-					mainGame->gMutex.Lock();
-					mainGame->dField.MoveCard(pcard, 10);
-					mainGame->gMutex.Unlock();
-					mainGame->WaitFrameSignal(5);
-				} else {
-					ClientCard* olcard1 = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
-					ClientCard* pcard = olcard1->overlayed[pp];
-					ClientCard* olcard2 = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
-					mainGame->gMutex.Lock();
-					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
-					olcard2->overlayed.push_back(pcard);
-					pcard->sequence = olcard2->overlayed.size() - 1;
-					pcard->location = 0x80;
-					pcard->overlayTarget = olcard2;
-					for (int i = 0; i < olcard1->overlayed.size(); ++i) {
-						olcard1->overlayed[i]->sequence = i;
-						mainGame->dField.MoveCard(olcard1->overlayed[i], 2);
-					}
-					mainGame->dField.MoveCard(pcard, 10);
-					mainGame->gMutex.Unlock();
 					mainGame->WaitFrameSignal(5);
 				}
-			}
-			return true;
-		}
-	case MSG_POS_CHANGE: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int pp = BufferIO::ReadInt8(pbuf);
-			int cp = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
-			if((pp & POS_FACEUP) && (cp & POS_FACEDOWN)) {
-				pcard->counters.clear();
-				pcard->ClearTarget();
-			}
-			if (code != 0 && pcard->code != code)
-				pcard->SetCode(code);
-			pcard->position = cp;
-			myswprintf(pdInfo->strEvent, L"卡片改变了表示形式");
-			mainGame->dField.MoveCard(pcard, 10);
-			mainGame->WaitFrameSignal(10);
-			return true;
-		}
-	case MSG_SET: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int cp = BufferIO::ReadInt8(pbuf);
-			myswprintf(pdInfo->strEvent, L"放置了卡片");
-			return true;
-		}
-	case MSG_SWAP: {
-			int code1 = BufferIO::ReadInt32(pbuf);
-			int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l1 = BufferIO::ReadInt8(pbuf);
-			int s1 = BufferIO::ReadInt8(pbuf);
-			int p1 = BufferIO::ReadInt8(pbuf);
-			int code2 = BufferIO::ReadInt32(pbuf);
-			int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l2 = BufferIO::ReadInt8(pbuf);
-			int s2 = BufferIO::ReadInt8(pbuf);
-			int p2 = BufferIO::ReadInt8(pbuf);
-			myswprintf(pdInfo->strEvent, L"卡的控制权改变了");
-			ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-			ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-			mainGame->gMutex.Lock();
-			mainGame->dField.RemoveCard(c1, l1, s1);
-			mainGame->dField.RemoveCard(c2, l2, s2);
-			mainGame->dField.AddCard(pc1, c2, l2, s2);
-			mainGame->dField.AddCard(pc2, c1, l1, s1);
-			mainGame->dField.MoveCard(pc1, 10);
-			mainGame->dField.MoveCard(pc2, 10);
-			for (int i = 0; i < pc1->overlayed.size(); ++i)
-				mainGame->dField.MoveCard(pc1->overlayed[i], 10);
-			for (int i = 0; i < pc2->overlayed.size(); ++i)
-				mainGame->dField.MoveCard(pc2->overlayed[i], 10);
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(10);
-			return true;
-		}
-	case MSG_FIELD_DISABLED: {
-			int disabled = BufferIO::ReadInt32(pbuf);
-			if (!mainGame->dInfo.is_first_turn)
-				disabled = (disabled >> 16) | (disabled << 16);
-			mainGame->dField.disabled_field = disabled;
-			return true;
-		}
-	case MSG_SUMMONING: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int cp = BufferIO::ReadInt8(pbuf);
-			myswprintf(pdInfo->strEvent, L"[ % ls]召唤中...", dataManager.GetName(code));
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 0;
-			mainGame->showcard = 4;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			mainGame->WaitFrameSignal(10);
-			return true;
-		}
-	case MSG_SUMMONED: {
-			myswprintf(pdInfo->strEvent, L"怪兽召唤成功");
-			return true;
-		}
-	case MSG_SPSUMMONING: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int cp = BufferIO::ReadInt8(pbuf);
-			myswprintf(pdInfo->strEvent, L"[ % ls]特殊召唤中...", dataManager.GetName(code));
-			myswprintf(pdInfo->strEvent, L"[ % ls]召唤中...", dataManager.GetName(code));
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 1;
-			mainGame->showcard = 5;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			mainGame->WaitFrameSignal(10);
-			return true;
-		}
-	case MSG_SPSUMMONED: {
-			myswprintf(pdInfo->strEvent, L"怪兽特殊召唤成功");
-			return true;
-		}
-	case MSG_FLIPSUMMONING: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int cp = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
-			pcard->SetCode(code);
-			pcard->position = cp;
-			myswprintf(pdInfo->strEvent, L"[ % ls]反转召唤中...", dataManager.GetName(code));
-			mainGame->dField.MoveCard(pcard, 10);
-			mainGame->WaitFrameSignal(10);
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 0;
-			mainGame->showcard = 4;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			mainGame->WaitFrameSignal(10);
-			return true;
-		}
-	case MSG_FLIPSUMMONED: {
-			myswprintf(pdInfo->strEvent, L"怪兽反转召唤成功");
-			return true;
-		}
-	case MSG_CHAINING: {
-			int code = BufferIO::ReadInt32(pbuf);
-			int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int pcl = BufferIO::ReadInt8(pbuf);
-			int pcs = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cl = BufferIO::ReadInt8(pbuf);
-			int cs = BufferIO::ReadInt8(pbuf);
-			int desc = BufferIO::ReadInt32(pbuf);
-			int ct = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs);
-			mainGame->showcardcode = code;
-			mainGame->showcarddif = 0;
-			mainGame->showcard = 1;
-			pcard->is_highlighting = true;
-			mainGame->WaitFrameSignal(30);
-			pcard->is_highlighting = false;
-			mainGame->dField.current_chain.chain_card = pcard;
-			mainGame->dField.current_chain.code = code;
-			mainGame->dField.current_chain.desc = desc;
-			mainGame->dField.current_chain.controler = cc;
-			mainGame->dField.current_chain.location = cl;
-			mainGame->dField.current_chain.sequence = cs;
-			mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
-			mainGame->dField.current_chain.solved = false;
-			int chc = 0;
-			for(int i = 0; i < mainGame->dField.chains.size(); ++i) {
-				if (cl == 0x10 || cl == 0x20) {
-					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
-						chc++;
-				} else {
-					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
-						chc++;
-				}
-			}
-			if(cl == LOCATION_HAND)
-				mainGame->dField.current_chain.chain_pos.X += 0.35;
-			else
-				mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
-			return true;
-		}
-	case MSG_CHAINED: {
-			int ct = BufferIO::ReadInt8(pbuf);
-			myswprintf(mainGame->dInfo.strEvent, L"[ % ls]的效果发动", dataManager.GetName(mainGame->dField.current_chain.code));
-			mainGame->gMutex.Lock();
-			mainGame->dField.chains.push_back(mainGame->dField.current_chain);
-			mainGame->gMutex.Unlock();
-			if (ct > 1)
-				mainGame->WaitFrameSignal(20);
-			mainGame->dField.last_chain = true;
-			return true;
-		}
-	case MSG_CHAIN_SOLVING: {
-			int ct = BufferIO::ReadInt8(pbuf);
-			if (mainGame->dField.chains.size() > 1) {
-				if (mainGame->dField.last_chain)
-					mainGame->WaitFrameSignal(10);
-				for(int i = 0; i < 5; ++i) {
-					mainGame->dField.chains[ct - 1].solved = false;
-					mainGame->WaitFrameSignal(3);
-					mainGame->dField.chains[ct - 1].solved = true;
-					mainGame->WaitFrameSignal(3);
-				}
-			}
-			mainGame->dField.last_chain = false;
-			return true;
-		}
-	case MSG_CHAIN_SOLVED: {
-			int ct = BufferIO::ReadInt8(pbuf);
-			return true;
-		}
-	case MSG_CHAIN_END: {
-			mainGame->dField.chains.clear();
-			return true;
-		}
-	case MSG_CHAIN_INACTIVATED:
-	case MSG_CHAIN_DISABLED: {
-			int ct = BufferIO::ReadInt8(pbuf);
-			mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;
-			mainGame->showcarddif = 0;
-			mainGame->showcard = 3;
-			mainGame->WaitFrameSignal(30);
-			mainGame->showcard = 0;
-			return true;
-		}
-	case MSG_CARD_SELECTED: {
-			return true;
-		}
-	case MSG_RANDOM_SELECTED: {
-			int player = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcards[10];
-			for (int i = 0; i < count; ++i) {
-				int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				int l = BufferIO::ReadInt8(pbuf);
-				int s = BufferIO::ReadInt8(pbuf);
-				int ss = BufferIO::ReadInt8(pbuf);
-				if ((l & 0x80) > 0)
-					pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
-				else
-					pcards[i] = mainGame->dField.GetCard(c, l, s);
-				pcards[i]->is_highlighting = true;
-			}
-			mainGame->WaitFrameSignal(30);
-			for(int i = 0; i < count; ++i)
-				pcards[i]->is_highlighting = false;
-			return true;
-		}
-	case MSG_BECOME_TARGET: {
-			int count = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcard;
-			for (int i = 0; i < count; ++i) {
-				int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-				int l = BufferIO::ReadInt8(pbuf);
-				int s = BufferIO::ReadInt8(pbuf);
-				int ss = BufferIO::ReadInt8(pbuf);
-				pcard = mainGame->dField.GetCard(c, l, s);
-				pcard->is_highlighting = true;
-				if(pcard->location & LOCATION_ONFIELD) {
-					for (int j = 0; j < 3; ++j) {
-						mainGame->dField.FadeCard(pcard, 5, 5);
-						mainGame->WaitFrameSignal(5);
-						mainGame->dField.FadeCard(pcard, 255, 5);
-						mainGame->WaitFrameSignal(5);
-					}
-				} else
-					mainGame->WaitFrameSignal(30);
-				myswprintf(textBuffer, L"[ % ls]( % ls, % d)成为对象", dataManager.GetName(pcard->code), dataManager.FormatLocation(l), s);
-				mainGame->lstLog->addItem(textBuffer);
-				mainGame->logParam.push_back(pcard->code);
-				pcard->is_highlighting = false;
-			}
-			return true;
-		}
-	case MSG_DRAW: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int count = BufferIO::ReadInt8(pbuf);
-			ClientCard* pcard;
-			for (int i = 0; i < count; ++i) {
-				int code = BufferIO::ReadInt32(pbuf);
+			} else if (!(pl & 0x80)) {
+				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
+				if (code != 0 && pcard->code != code)
+					pcard->SetCode(code);
+				if((pl & LOCATION_ONFIELD) && (cl != pl))
+					pcard->counters.clear();
+				if(cl != pl)
+					pcard->ClearTarget();
+				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
 				mainGame->gMutex.Lock();
-				pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
-				pcard->SetCode(code);
-				mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
-				mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
-				for(int i = 0; i < mainGame->dField.hand[player].size(); ++i)
-					mainGame->dField.MoveCard(mainGame->dField.hand[player][i], 10);
+				mainGame->dField.RemoveCard(pc, pl, ps);
+				olcard->overlayed.push_back(pcard);
+				mainGame->dField.overlay_cards.insert(pcard);
+				mainGame->gMutex.Unlock();
+				pcard->overlayTarget = olcard;
+				pcard->location = 0x80;
+				pcard->sequence = olcard->overlayed.size() - 1;
+				if (olcard->location == 0x4) {
+					mainGame->gMutex.Lock();
+					mainGame->dField.MoveCard(pcard, 10);
+					if (pl == 0x2)
+						for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
+							mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
+					mainGame->gMutex.Unlock();
+					mainGame->WaitFrameSignal(5);
+				}
+			} else if (!(cl & 0x80)) {
+				ClientCard* olcard = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
+				ClientCard* pcard = olcard->overlayed[pp];
+				mainGame->gMutex.Lock();
+				olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
+				pcard->overlayTarget = 0;
+				pcard->position = cp;
+				mainGame->dField.AddCard(pcard, cc, cl, cs);
+				mainGame->dField.overlay_cards.erase(pcard);
+				for (int i = 0; i < olcard->overlayed.size(); ++i) {
+					olcard->overlayed[i]->sequence = i;
+					mainGame->dField.MoveCard(olcard->overlayed[i], 2);
+				}
+				mainGame->gMutex.Unlock();
+				mainGame->WaitFrameSignal(5);
+				mainGame->gMutex.Lock();
+				mainGame->dField.MoveCard(pcard, 10);
+				mainGame->gMutex.Unlock();
+				mainGame->WaitFrameSignal(5);
+			} else {
+				ClientCard* olcard1 = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
+				ClientCard* pcard = olcard1->overlayed[pp];
+				ClientCard* olcard2 = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
+				mainGame->gMutex.Lock();
+				olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
+				olcard2->overlayed.push_back(pcard);
+				pcard->sequence = olcard2->overlayed.size() - 1;
+				pcard->location = 0x80;
+				pcard->overlayTarget = olcard2;
+				for (int i = 0; i < olcard1->overlayed.size(); ++i) {
+					olcard1->overlayed[i]->sequence = i;
+					mainGame->dField.MoveCard(olcard1->overlayed[i], 2);
+				}
+				mainGame->dField.MoveCard(pcard, 10);
 				mainGame->gMutex.Unlock();
 				mainGame->WaitFrameSignal(5);
 			}
-			if (player == 0)
-				myswprintf(pdInfo->strEvent, L"我方抽了 % d张卡", count);
-			else myswprintf(pdInfo->strEvent, L"对手抽了 % d张卡", count);
-			return true;
 		}
-	case MSG_DAMAGE: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int val = BufferIO::ReadInt32(pbuf);
-			int final = mainGame->dInfo.lp[player] - val;
-			if (final < 0)
-				final = 0;
-			mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
-			if (player == 0)
-				myswprintf(pdInfo->strEvent, L"我方受到 % d伤害", val);
-			else
-				myswprintf(pdInfo->strEvent, L"对方受到 % d伤害", val);
-			mainGame->lpccolor = 0xffff0000;
-			mainGame->lpplayer = player;
-			myswprintf(textBuffer, L" - % d", val);
-			mainGame->lpcstring = textBuffer;
-			mainGame->WaitFrameSignal(30);
-			mainGame->lpframe = 10;
-			mainGame->WaitFrameSignal(10);
-			mainGame->lpcstring = 0;
-			mainGame->dInfo.lp[player] = final;
-			mainGame->gMutex.Lock();
-			myswprintf(mainGame->dInfo.strLP[player], L" % d", mainGame->dInfo.lp[player]);
-			mainGame->gMutex.Unlock();
-			return true;
+		return true;
+	}
+	case MSG_POS_CHANGE: {
+		int code = BufferIO::ReadInt32(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int pp = BufferIO::ReadInt8(pbuf);
+		int cp = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
+		if((pp & POS_FACEUP) && (cp & POS_FACEDOWN)) {
+			pcard->counters.clear();
+			pcard->ClearTarget();
 		}
-	case MSG_RECOVER: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int val = BufferIO::ReadInt32(pbuf);
-			int final = mainGame->dInfo.lp[player] + val;
-			mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
-			if (player == 0)
-				myswprintf(pdInfo->strEvent, L"我方回复 % dLP", val);
-			else
-				myswprintf(pdInfo->strEvent, L"对方回复 % dLP", val);
-			mainGame->lpccolor = 0xff00ff00;
-			mainGame->lpplayer = player;
-			myswprintf(textBuffer, L" + % d", val);
-			mainGame->lpcstring = textBuffer;
-			mainGame->WaitFrameSignal(30);
-			mainGame->lpframe = 10;
-			mainGame->WaitFrameSignal(10);
-			mainGame->lpcstring = 0;
-			mainGame->dInfo.lp[player] = final;
-			mainGame->gMutex.Lock();
-			myswprintf(mainGame->dInfo.strLP[player], L" % d", mainGame->dInfo.lp[player]);
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_EQUIP: {
-			int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l1 = BufferIO::ReadInt8(pbuf);
-			int s1 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l2 = BufferIO::ReadInt8(pbuf);
-			int s2 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-			ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-			mainGame->gMutex.Lock();
-			pc1->equipTarget = pc2;
-			pc2->equipped.insert(pc1);
-			if (mainGame->dField.hovered_card == pc1)
-				pc2->is_showequip = true;
-			else if (mainGame->dField.hovered_card == pc2)
-				pc1->is_showequip = true;
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_LPUPDATE: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int val = BufferIO::ReadInt32(pbuf);
-			mainGame->lpd = (val - mainGame->dInfo.lp[player]) / 10;
-			mainGame->lpplayer = player;
-			mainGame->lpframe = 10;
-			mainGame->WaitFrameSignal(10);
-			mainGame->dInfo.lp[player] = val;
-			mainGame->gMutex.Lock();
-			myswprintf(mainGame->dInfo.strLP[player], L" % d", mainGame->dInfo.lp[player]);
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_UNEQUIP: {
-			int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l1 = BufferIO::ReadInt8(pbuf);
-			int s1 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			ClientCard* pc = mainGame->dField.GetCard(c1, l1, s1);
-			mainGame->gMutex.Lock();
-			if (mainGame->dField.hovered_card == pc)
-				pc->equipTarget->is_showequip = false;
-			else if (mainGame->dField.hovered_card == pc->equipTarget)
-				pc->is_showequip = false;
-			pc->equipTarget->equipped.erase(pc);
-			pc->equipTarget = 0;
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_CARD_TARGET: {
-			int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l1 = BufferIO::ReadInt8(pbuf);
-			int s1 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l2 = BufferIO::ReadInt8(pbuf);
-			int s2 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-			ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-			mainGame->gMutex.Lock();
-			pc1->cardTarget.insert(pc2);
-			pc2->ownerTarget.insert(pc1);
-			if (mainGame->dField.hovered_card == pc1)
-				pc2->is_showtarget = true;
-			else if (mainGame->dField.hovered_card == pc2)
-				pc1->is_showtarget = true;
-			mainGame->gMutex.Unlock();
-			break;
-		}
-	case MSG_CANCEL_TARGET: {
-			int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l1 = BufferIO::ReadInt8(pbuf);
-			int s1 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l2 = BufferIO::ReadInt8(pbuf);
-			int s2 = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
-			ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-			mainGame->gMutex.Lock();
-			pc1->cardTarget.erase(pc2);
-			pc2->ownerTarget.erase(pc1);
-			if (mainGame->dField.hovered_card == pc1)
-				pc2->is_showtarget = false;
-			else if (mainGame->dField.hovered_card == pc2)
-				pc1->is_showtarget = false;
-			mainGame->gMutex.Unlock();
-			break;
-		}
-	case MSG_PAY_LPCOST: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int cost = BufferIO::ReadInt32(pbuf);
-			int final = mainGame->dInfo.lp[player] - cost;
-			if (final < 0)
-				final = 0;
-			mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
-			mainGame->lpccolor = 0xff0000ff;
-			mainGame->lpplayer = player;
-			myswprintf(textBuffer, L" - % d", cost);
-			mainGame->lpcstring = textBuffer;
-			mainGame->WaitFrameSignal(30);
-			mainGame->lpframe = 10;
-			mainGame->WaitFrameSignal(10);
-			mainGame->lpcstring = 0;
-			mainGame->dInfo.lp[player] = final;
-			mainGame->gMutex.Lock();
-			myswprintf(mainGame->dInfo.strLP[player], L" % d", mainGame->dInfo.lp[player]);
-			mainGame->gMutex.Unlock();
-			return true;
-		}
-	case MSG_ADD_COUNTER: {
-			int type = BufferIO::ReadInt16(pbuf);
-			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l = BufferIO::ReadInt8(pbuf);
-			int s = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			ClientCard* pc = mainGame->dField.GetCard(c, l, s);
-			if (pc->counters.count(type))
-				pc->counters[type] += count;
-			else pc->counters[type] = count;
-			myswprintf(textBuffer, L"[ % ls]放置了 % d个[ % ls]", dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
-			pc->is_highlighting = true;
-			mainGame->gMutex.Lock();
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(40);
-			pc->is_highlighting = false;
-			return true;
-		}
-	case MSG_REMOVE_COUNTER: {
-			int type = BufferIO::ReadInt16(pbuf);
-			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int l = BufferIO::ReadInt8(pbuf);
-			int s = BufferIO::ReadInt8(pbuf);
-			int count = BufferIO::ReadInt8(pbuf);
-			ClientCard* pc = mainGame->dField.GetCard(c, l, s);
-			pc->counters[type] -= count;
-			if (pc->counters[type] <= 0)
-				pc->counters.erase(type);
-			myswprintf(textBuffer, L"[ % ls]移除了 % d个[ % ls]", dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
-			pc->is_highlighting = true;
-			mainGame->gMutex.Lock();
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(40);
-			pc->is_highlighting = false;
-			return true;
-		}
-	case MSG_ATTACK: {
-			int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int la = BufferIO::ReadInt8(pbuf);
-			int sa = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			mainGame->dField.attacker = mainGame->dField.GetCard(ca, la, sa);
-			int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int ld = BufferIO::ReadInt8(pbuf);
-			int sd = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			float sy;
-			if (ld != 0) {
-				mainGame->dField.attack_target = mainGame->dField.GetCard(cd, ld, sd);
-				myswprintf(pdInfo->strEvent, L"[ % ls]攻击[ % ls]", dataManager.GetName(mainGame->dField.attacker->code),
-				           dataManager.GetName(mainGame->dField.attack_target->code));
-				float xa = mainGame->dField.attacker->curPos.X;
-				float ya = mainGame->dField.attacker->curPos.Y;
-				float xd = mainGame->dField.attack_target->curPos.X;
-				float yd = mainGame->dField.attack_target->curPos.Y;
-				sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-				mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
-				if (ca == 0)
-					mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
-				else
-					mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+		if (code != 0 && pcard->code != code)
+			pcard->SetCode(code);
+		pcard->position = cp;
+		myswprintf(event_string, L"卡片改变了表示形式");
+		mainGame->dField.MoveCard(pcard, 10);
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
+	case MSG_SET: {
+		int code = BufferIO::ReadInt32(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int cp = BufferIO::ReadInt8(pbuf);
+		myswprintf(event_string, L"放置了卡片");
+		return true;
+	}
+	case MSG_SWAP: {
+		int code1 = BufferIO::ReadInt32(pbuf);
+		int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l1 = BufferIO::ReadInt8(pbuf);
+		int s1 = BufferIO::ReadInt8(pbuf);
+		int p1 = BufferIO::ReadInt8(pbuf);
+		int code2 = BufferIO::ReadInt32(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l2 = BufferIO::ReadInt8(pbuf);
+		int s2 = BufferIO::ReadInt8(pbuf);
+		int p2 = BufferIO::ReadInt8(pbuf);
+		myswprintf(event_string, L"卡的控制权改变了");
+		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
+		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
+		mainGame->gMutex.Lock();
+		mainGame->dField.RemoveCard(c1, l1, s1);
+		mainGame->dField.RemoveCard(c2, l2, s2);
+		mainGame->dField.AddCard(pc1, c2, l2, s2);
+		mainGame->dField.AddCard(pc2, c1, l1, s1);
+		mainGame->dField.MoveCard(pc1, 10);
+		mainGame->dField.MoveCard(pc2, 10);
+		for (int i = 0; i < pc1->overlayed.size(); ++i)
+			mainGame->dField.MoveCard(pc1->overlayed[i], 10);
+		for (int i = 0; i < pc2->overlayed.size(); ++i)
+			mainGame->dField.MoveCard(pc2->overlayed[i], 10);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
+	case MSG_FIELD_DISABLED: {
+		int disabled = BufferIO::ReadInt32(pbuf);
+		if (!mainGame->dInfo.is_first_turn)
+			disabled = (disabled >> 16) | (disabled << 16);
+		mainGame->dField.disabled_field = disabled;
+		return true;
+	}
+	case MSG_SUMMONING: {
+		int code = BufferIO::ReadInt32(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int cp = BufferIO::ReadInt8(pbuf);
+		myswprintf(event_string, L"[%ls]召唤中...", dataManager.GetName(code));
+		mainGame->showcardcode = code;
+		mainGame->showcarddif = 0;
+		mainGame->showcard = 4;
+		mainGame->WaitFrameSignal(30);
+		mainGame->showcard = 0;
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
+	case MSG_SUMMONED: {
+		myswprintf(event_string, L"怪兽召唤成功");
+		return true;
+	}
+	case MSG_SPSUMMONING: {
+		int code = BufferIO::ReadInt32(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int cp = BufferIO::ReadInt8(pbuf);
+		myswprintf(event_string, L"[%ls]特殊召唤中...", dataManager.GetName(code));
+		mainGame->showcardcode = code;
+		mainGame->showcarddif = 1;
+		mainGame->showcard = 5;
+		mainGame->WaitFrameSignal(30);
+		mainGame->showcard = 0;
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
+	case MSG_SPSUMMONED: {
+		myswprintf(event_string, L"怪兽特殊召唤成功");
+		return true;
+	}
+	case MSG_FLIPSUMMONING: {
+		int code = BufferIO::ReadInt32(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int cp = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
+		pcard->SetCode(code);
+		pcard->position = cp;
+		myswprintf(event_string, L"[%ls]反转召唤中...", dataManager.GetName(code));
+		mainGame->dField.MoveCard(pcard, 10);
+		mainGame->WaitFrameSignal(10);
+		mainGame->showcardcode = code;
+		mainGame->showcarddif = 0;
+		mainGame->showcard = 4;
+		mainGame->WaitFrameSignal(30);
+		mainGame->showcard = 0;
+		mainGame->WaitFrameSignal(10);
+		return true;
+	}
+	case MSG_FLIPSUMMONED: {
+		myswprintf(event_string, L"怪兽反转召唤成功");
+		return true;
+	}
+	case MSG_CHAINING: {
+		int code = BufferIO::ReadInt32(pbuf);
+		int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int pcl = BufferIO::ReadInt8(pbuf);
+		int pcs = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cl = BufferIO::ReadInt8(pbuf);
+		int cs = BufferIO::ReadInt8(pbuf);
+		int desc = BufferIO::ReadInt32(pbuf);
+		int ct = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs);
+		mainGame->showcardcode = code;
+		mainGame->showcarddif = 0;
+		mainGame->showcard = 1;
+		pcard->is_highlighting = true;
+		mainGame->WaitFrameSignal(30);
+		pcard->is_highlighting = false;
+		mainGame->dField.current_chain.chain_card = pcard;
+		mainGame->dField.current_chain.code = code;
+		mainGame->dField.current_chain.desc = desc;
+		mainGame->dField.current_chain.controler = cc;
+		mainGame->dField.current_chain.location = cl;
+		mainGame->dField.current_chain.sequence = cs;
+		mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
+		mainGame->dField.current_chain.solved = false;
+		int chc = 0;
+		for(int i = 0; i < mainGame->dField.chains.size(); ++i) {
+			if (cl == 0x10 || cl == 0x20) {
+				if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
+					chc++;
 			} else {
-				myswprintf(pdInfo->strEvent, L"[ % ls]直接攻击", dataManager.GetName(mainGame->dField.attacker->code));
-				float xa = mainGame->dField.attacker->curPos.X;
-				float ya = mainGame->dField.attacker->curPos.Y;
-				float xd = 3.95f;
-				float yd = 3.5f;
-				if (ca == 0)
-					yd = -3.5f;
-				sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
-				mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
-				if (ca == 0)
-					mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
-				else
-					mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+				if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
+					chc++;
 			}
-			mainGame->matManager.GenArrow(sy);
-			mainGame->attack_sv = 0;
-			mainGame->is_attacking = true;
-			mainGame->WaitFrameSignal(40);
-			mainGame->is_attacking = false;
-			return true;
 		}
-	case MSG_BATTLE: {
-			int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int la = BufferIO::ReadInt8(pbuf);
-			int sa = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int va = BufferIO::ReadInt32(pbuf);
-			int da = BufferIO::ReadInt8(pbuf);
-			int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int ld = BufferIO::ReadInt8(pbuf);
-			int sd = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int vd = BufferIO::ReadInt32(pbuf);
-			int dd = BufferIO::ReadInt8(pbuf);
-			return true;
-		}
-	case MSG_ATTACK_DISABLED: {
-			myswprintf(pdInfo->strEvent, L"攻击被无效", dataManager.GetName(mainGame->dField.attacker->code));
-			return true;
-		}
-	case MSG_DAMAGE_STEP_START: {
-			return true;
-		}
-	case MSG_DAMAGE_STEP_END: {
-			return true;
-		}
-	case MSG_MISSED_EFFECT: {
-			BufferIO::ReadInt32(pbuf);
-			int code = BufferIO::ReadInt32(pbuf);
-			myswprintf(textBuffer, L"[ % ls]错过时点", dataManager.GetName(code));
-			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(code);
-			return true;
-		}
-	case MSG_TOSS_COIN: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int count = BufferIO::ReadInt8(pbuf);
-			textBuffer[0] = 0;
-			wcscat(textBuffer, L"投掷硬币结果：");
-			for (int i = 0; i < count; ++i) {
-				int res = BufferIO::ReadInt8(pbuf);
-				wcscat(textBuffer, res ? L"[正面]" : L"[反面]");
+		if(cl == LOCATION_HAND)
+			mainGame->dField.current_chain.chain_pos.X += 0.35;
+		else
+			mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
+		return true;
+	}
+	case MSG_CHAINED: {
+		int ct = BufferIO::ReadInt8(pbuf);
+		myswprintf(event_string, L"[%ls]的效果发动", dataManager.GetName(mainGame->dField.current_chain.code));
+		mainGame->gMutex.Lock();
+		mainGame->dField.chains.push_back(mainGame->dField.current_chain);
+		mainGame->gMutex.Unlock();
+		if (ct > 1)
+			mainGame->WaitFrameSignal(20);
+		mainGame->dField.last_chain = true;
+		return true;
+	}
+	case MSG_CHAIN_SOLVING: {
+		int ct = BufferIO::ReadInt8(pbuf);
+		if (mainGame->dField.chains.size() > 1) {
+			if (mainGame->dField.last_chain)
+				mainGame->WaitFrameSignal(10);
+			for(int i = 0; i < 5; ++i) {
+				mainGame->dField.chains[ct - 1].solved = false;
+				mainGame->WaitFrameSignal(3);
+				mainGame->dField.chains[ct - 1].solved = true;
+				mainGame->WaitFrameSignal(3);
 			}
-			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(0);
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->WaitFrameSignal(40);
-			return true;
 		}
-	case MSG_TOSS_DICE: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int count = BufferIO::ReadInt8(pbuf);
-			textBuffer[0] = 0;
-			wcscat(textBuffer, L"投掷骰子结果：");
-			wchar_t* p = &textBuffer[7];
-			for (int i = 0; i < count; ++i) {
-				int res = BufferIO::ReadInt8(pbuf);
-				*p++ = L'[';
-				*p++ = L'0' + res;
-				*p++ = L']';
-			}
-			*p = 0;
-			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(0);
-			mainGame->stACMessage->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wACMessage, 20);
-			mainGame->WaitFrameSignal(40);
-			return true;
-		}
-	case MSG_ANNOUNCE_RACE: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
-			int available = BufferIO::ReadInt32(pbuf);
-			for(int i = 0, filter = 0x1; i < 22; ++i, filter <<= 1) {
-				mainGame->chkRace[i]->setChecked(false);
-				if(filter & available)
-					mainGame->chkRace[i]->setVisible(true);
-				else mainGame->chkRace[i]->setVisible(false);
-			}
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L" % ls", dataManager.GetDesc(mainGame->dInfo.selectHint));
-			else myswprintf(textBuffer, L"请宣言种族");
-			mainGame->dInfo.selectHint = 0;
-			mainGame->wANRace->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wANRace);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_ANNOUNCE_ATTRIB: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
-			int available = BufferIO::ReadInt32(pbuf);
-			for(int i = 0, filter = 0x1; i < 7; ++i, filter <<= 1) {
-				mainGame->chkAttribute[i]->setChecked(false);
-				if(filter & available)
-					mainGame->chkAttribute[i]->setVisible(true);
-				else mainGame->chkAttribute[i]->setVisible(false);
-			}
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L" % ls", dataManager.GetDesc(mainGame->dInfo.selectHint));
-			else myswprintf(textBuffer, L"请宣言属性");
-			mainGame->dInfo.selectHint = 0;
-			mainGame->wANAttribute->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wANAttribute);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_ANNOUNCE_CARD: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			mainGame->ebANCard->setText(L"");
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L" % ls", dataManager.GetDesc(mainGame->dInfo.selectHint));
-			else myswprintf(textBuffer, L"请宣言卡名");
-			mainGame->dInfo.selectHint = 0;
-			mainGame->wANCard->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wANCard);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_ANNOUNCE_NUMBER: {
-			int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			int count = BufferIO::ReadInt8(pbuf);
-			mainGame->gMutex.Lock();
-			mainGame->cbANNumber->clear();
-			for (int i = 0; i < count; ++i) {
-				int value = BufferIO::ReadInt32(pbuf);
-				myswprintf(textBuffer, L" % d", value);
-				mainGame->cbANNumber->addItem(textBuffer, value);
-			}
-			mainGame->cbANNumber->setSelected(0);
-			if(mainGame->dInfo.selectHint)
-				myswprintf(textBuffer, L" % ls", dataManager.GetDesc(mainGame->dInfo.selectHint));
-			else myswprintf(textBuffer, L"请宣言数字");
-			mainGame->dInfo.selectHint = 0;
-			mainGame->wANNumber->setText(textBuffer);
-			mainGame->PopupElement(mainGame->wANNumber);
-			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
-			mainGame->localResponse.Set();
-			return true;
-		}
-	case MSG_COUNT_TURN: {
+		mainGame->dField.last_chain = false;
+		return true;
+	}
+	case MSG_CHAIN_SOLVED: {
+		int ct = BufferIO::ReadInt8(pbuf);
+		return true;
+	}
+	case MSG_CHAIN_END: {
+		mainGame->dField.chains.clear();
+		return true;
+	}
+	case MSG_CHAIN_INACTIVATED:
+	case MSG_CHAIN_DISABLED: {
+		int ct = BufferIO::ReadInt8(pbuf);
+		mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;
+		mainGame->showcarddif = 0;
+		mainGame->showcard = 3;
+		mainGame->WaitFrameSignal(30);
+		mainGame->showcard = 0;
+		return true;
+	}
+	case MSG_CARD_SELECTED: {
+		return true;
+	}
+	case MSG_RANDOM_SELECTED: {
+		int player = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcards[10];
+		for (int i = 0; i < count; ++i) {
 			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 			int l = BufferIO::ReadInt8(pbuf);
 			int s = BufferIO::ReadInt8(pbuf);
-			BufferIO::ReadInt8(pbuf);
-			int ct = BufferIO::ReadInt16(pbuf);
-			ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
-			pcard->turnCounter = ct;
-			if(ct == 0)
-				return true;
-			if(pcard->location & LOCATION_ONFIELD)
-				pcard->is_selectable = true;
-			mainGame->showcardcode = pcard->code;
-			mainGame->showcarddif = 0;
-			mainGame->showcardp = ct - 1;
-			mainGame->showcard = 6;
-			mainGame->WaitFrameSignal(30);
-			pcard->is_selectable = false;
-			mainGame->showcard = 0;
-			return true;
+			int ss = BufferIO::ReadInt8(pbuf);
+			if ((l & 0x80) > 0)
+				pcards[i] = mainGame->dField.GetCard(c, l & 0x7f, s)->overlayed[ss];
+			else
+				pcards[i] = mainGame->dField.GetCard(c, l, s);
+			pcards[i]->is_highlighting = true;
 		}
+		mainGame->WaitFrameSignal(30);
+		for(int i = 0; i < count; ++i)
+			pcards[i]->is_highlighting = false;
+		return true;
+	}
+	case MSG_BECOME_TARGET: {
+		int count = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcard;
+		for (int i = 0; i < count; ++i) {
+			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			int l = BufferIO::ReadInt8(pbuf);
+			int s = BufferIO::ReadInt8(pbuf);
+			int ss = BufferIO::ReadInt8(pbuf);
+			pcard = mainGame->dField.GetCard(c, l, s);
+			pcard->is_highlighting = true;
+			if(pcard->location & LOCATION_ONFIELD) {
+				for (int j = 0; j < 3; ++j) {
+					mainGame->dField.FadeCard(pcard, 5, 5);
+					mainGame->WaitFrameSignal(5);
+					mainGame->dField.FadeCard(pcard, 255, 5);
+					mainGame->WaitFrameSignal(5);
+				}
+			} else
+				mainGame->WaitFrameSignal(30);
+			myswprintf(textBuffer, L"[%ls](%ls,%d)成为对象", dataManager.GetName(pcard->code), dataManager.FormatLocation(l), s);
+			mainGame->lstLog->addItem(textBuffer);
+			mainGame->logParam.push_back(pcard->code);
+			pcard->is_highlighting = false;
+		}
+		return true;
+	}
+	case MSG_DRAW: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		ClientCard* pcard;
+		for (int i = 0; i < count; ++i) {
+			int code = BufferIO::ReadInt32(pbuf);
+			mainGame->gMutex.Lock();
+			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
+			pcard->SetCode(code);
+			mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
+			mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
+			for(int i = 0; i < mainGame->dField.hand[player].size(); ++i)
+				mainGame->dField.MoveCard(mainGame->dField.hand[player][i], 10);
+			mainGame->gMutex.Unlock();
+			mainGame->WaitFrameSignal(5);
+		}
+		if (player == 0)
+			myswprintf(event_string, L"我方抽了%d张卡", count);
+		else myswprintf(event_string, L"对手抽了%d张卡", count);
+		return true;
+	}
+	case MSG_DAMAGE: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int val = BufferIO::ReadInt32(pbuf);
+		int final = mainGame->dInfo.lp[player] - val;
+		if (final < 0)
+			final = 0;
+		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
+		if (player == 0)
+			myswprintf(event_string, L"我方受到%d伤害", val);
+		else
+			myswprintf(event_string, L"对方受到%d伤害", val);
+		mainGame->lpccolor = 0xffff0000;
+		mainGame->lpplayer = player;
+		myswprintf(textBuffer, L" - % d", val);
+		mainGame->lpcstring = textBuffer;
+		mainGame->WaitFrameSignal(30);
+		mainGame->lpframe = 10;
+		mainGame->WaitFrameSignal(10);
+		mainGame->lpcstring = 0;
+		mainGame->dInfo.lp[player] = final;
+		mainGame->gMutex.Lock();
+		myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_RECOVER: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int val = BufferIO::ReadInt32(pbuf);
+		int final = mainGame->dInfo.lp[player] + val;
+		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
+		if (player == 0)
+			myswprintf(event_string, L"我方回复%dLP", val);
+		else
+			myswprintf(event_string, L"对方回复%dLP", val);
+		mainGame->lpccolor = 0xff00ff00;
+		mainGame->lpplayer = player;
+		myswprintf(textBuffer, L" + % d", val);
+		mainGame->lpcstring = textBuffer;
+		mainGame->WaitFrameSignal(30);
+		mainGame->lpframe = 10;
+		mainGame->WaitFrameSignal(10);
+		mainGame->lpcstring = 0;
+		mainGame->dInfo.lp[player] = final;
+		mainGame->gMutex.Lock();
+		myswprintf(mainGame->dInfo.strLP[player], L" % d", mainGame->dInfo.lp[player]);
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_EQUIP: {
+		int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l1 = BufferIO::ReadInt8(pbuf);
+		int s1 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l2 = BufferIO::ReadInt8(pbuf);
+		int s2 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
+		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
+		mainGame->gMutex.Lock();
+		pc1->equipTarget = pc2;
+		pc2->equipped.insert(pc1);
+		if (mainGame->dField.hovered_card == pc1)
+			pc2->is_showequip = true;
+		else if (mainGame->dField.hovered_card == pc2)
+			pc1->is_showequip = true;
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_LPUPDATE: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int val = BufferIO::ReadInt32(pbuf);
+		mainGame->lpd = (val - mainGame->dInfo.lp[player]) / 10;
+		mainGame->lpplayer = player;
+		mainGame->lpframe = 10;
+		mainGame->WaitFrameSignal(10);
+		mainGame->dInfo.lp[player] = val;
+		mainGame->gMutex.Lock();
+		myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_UNEQUIP: {
+		int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l1 = BufferIO::ReadInt8(pbuf);
+		int s1 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		ClientCard* pc = mainGame->dField.GetCard(c1, l1, s1);
+		mainGame->gMutex.Lock();
+		if (mainGame->dField.hovered_card == pc)
+			pc->equipTarget->is_showequip = false;
+		else if (mainGame->dField.hovered_card == pc->equipTarget)
+			pc->is_showequip = false;
+		pc->equipTarget->equipped.erase(pc);
+		pc->equipTarget = 0;
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_CARD_TARGET: {
+		int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l1 = BufferIO::ReadInt8(pbuf);
+		int s1 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l2 = BufferIO::ReadInt8(pbuf);
+		int s2 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
+		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
+		mainGame->gMutex.Lock();
+		pc1->cardTarget.insert(pc2);
+		pc2->ownerTarget.insert(pc1);
+		if (mainGame->dField.hovered_card == pc1)
+			pc2->is_showtarget = true;
+		else if (mainGame->dField.hovered_card == pc2)
+			pc1->is_showtarget = true;
+		mainGame->gMutex.Unlock();
+		break;
+	}
+	case MSG_CANCEL_TARGET: {
+		int c1 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l1 = BufferIO::ReadInt8(pbuf);
+		int s1 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int c2 = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l2 = BufferIO::ReadInt8(pbuf);
+		int s2 = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
+		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
+		mainGame->gMutex.Lock();
+		pc1->cardTarget.erase(pc2);
+		pc2->ownerTarget.erase(pc1);
+		if (mainGame->dField.hovered_card == pc1)
+			pc2->is_showtarget = false;
+		else if (mainGame->dField.hovered_card == pc2)
+			pc1->is_showtarget = false;
+		mainGame->gMutex.Unlock();
+		break;
+	}
+	case MSG_PAY_LPCOST: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int cost = BufferIO::ReadInt32(pbuf);
+		int final = mainGame->dInfo.lp[player] - cost;
+		if (final < 0)
+			final = 0;
+		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
+		mainGame->lpccolor = 0xff0000ff;
+		mainGame->lpplayer = player;
+		myswprintf(textBuffer, L"-%d", cost);
+		mainGame->lpcstring = textBuffer;
+		mainGame->WaitFrameSignal(30);
+		mainGame->lpframe = 10;
+		mainGame->WaitFrameSignal(10);
+		mainGame->lpcstring = 0;
+		mainGame->dInfo.lp[player] = final;
+		mainGame->gMutex.Lock();
+		myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+		mainGame->gMutex.Unlock();
+		return true;
+	}
+	case MSG_ADD_COUNTER: {
+		int type = BufferIO::ReadInt16(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l = BufferIO::ReadInt8(pbuf);
+		int s = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		ClientCard* pc = mainGame->dField.GetCard(c, l, s);
+		if (pc->counters.count(type))
+			pc->counters[type] += count;
+		else pc->counters[type] = count;
+		myswprintf(textBuffer, L"[%ls]放置了%d个[%ls]", dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
+		pc->is_highlighting = true;
+		mainGame->gMutex.Lock();
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(40);
+		pc->is_highlighting = false;
+		return true;
+	}
+	case MSG_REMOVE_COUNTER: {
+		int type = BufferIO::ReadInt16(pbuf);
+		int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l = BufferIO::ReadInt8(pbuf);
+		int s = BufferIO::ReadInt8(pbuf);
+		int count = BufferIO::ReadInt8(pbuf);
+		ClientCard* pc = mainGame->dField.GetCard(c, l, s);
+		pc->counters[type] -= count;
+		if (pc->counters[type] <= 0)
+			pc->counters.erase(type);
+		myswprintf(textBuffer, L"[%ls]移除了%d个[%ls]", dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
+		pc->is_highlighting = true;
+		mainGame->gMutex.Lock();
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->gMutex.Unlock();
+		mainGame->WaitFrameSignal(40);
+		pc->is_highlighting = false;
+		return true;
+	}
+	case MSG_ATTACK: {
+		int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int la = BufferIO::ReadInt8(pbuf);
+		int sa = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		mainGame->dField.attacker = mainGame->dField.GetCard(ca, la, sa);
+		int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int ld = BufferIO::ReadInt8(pbuf);
+		int sd = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		float sy;
+		if (ld != 0) {
+			mainGame->dField.attack_target = mainGame->dField.GetCard(cd, ld, sd);
+			myswprintf(event_string, L"[%ls]攻击[%ls]", dataManager.GetName(mainGame->dField.attacker->code),
+			           dataManager.GetName(mainGame->dField.attack_target->code));
+			float xa = mainGame->dField.attacker->curPos.X;
+			float ya = mainGame->dField.attacker->curPos.Y;
+			float xd = mainGame->dField.attack_target->curPos.X;
+			float yd = mainGame->dField.attack_target->curPos.Y;
+			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
+			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			if (ca == 0)
+				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+			else
+				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+		} else {
+			myswprintf(event_string, L"[%ls]直接攻击", dataManager.GetName(mainGame->dField.attacker->code));
+			float xa = mainGame->dField.attacker->curPos.X;
+			float ya = mainGame->dField.attacker->curPos.Y;
+			float xd = 3.95f;
+			float yd = 3.5f;
+			if (ca == 0)
+				yd = -3.5f;
+			sy = (float)sqrt((xa - xd) * (xa - xd) + (ya - yd) * (ya - yd)) / 2;
+			mainGame->atk_t = vector3df((xa + xd) / 2, (ya + yd) / 2, 0);
+			if (ca == 0)
+				mainGame->atk_r = vector3df(0, 0, -atan((xd - xa) / (yd - ya)));
+			else
+				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
+		}
+		matManager.GenArrow(sy);
+		mainGame->attack_sv = 0;
+		mainGame->is_attacking = true;
+		mainGame->WaitFrameSignal(40);
+		mainGame->is_attacking = false;
+		return true;
+	}
+	case MSG_BATTLE: {
+		int ca = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int la = BufferIO::ReadInt8(pbuf);
+		int sa = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int va = BufferIO::ReadInt32(pbuf);
+		int da = BufferIO::ReadInt8(pbuf);
+		int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int ld = BufferIO::ReadInt8(pbuf);
+		int sd = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int vd = BufferIO::ReadInt32(pbuf);
+		int dd = BufferIO::ReadInt8(pbuf);
+		return true;
+	}
+	case MSG_ATTACK_DISABLED: {
+		myswprintf(event_string, L"攻击被无效", dataManager.GetName(mainGame->dField.attacker->code));
+		return true;
+	}
+	case MSG_DAMAGE_STEP_START: {
+		return true;
+	}
+	case MSG_DAMAGE_STEP_END: {
+		return true;
+	}
+	case MSG_MISSED_EFFECT: {
+		BufferIO::ReadInt32(pbuf);
+		int code = BufferIO::ReadInt32(pbuf);
+		myswprintf(textBuffer, L"[%ls]错过时点", dataManager.GetName(code));
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(code);
+		return true;
+	}
+	case MSG_TOSS_COIN: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		textBuffer[0] = 0;
+		wcscat(textBuffer, L"投掷硬币结果：");
+		for (int i = 0; i < count; ++i) {
+			int res = BufferIO::ReadInt8(pbuf);
+			wcscat(textBuffer, res ? L"[正面]" : L"[反面]");
+		}
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->WaitFrameSignal(40);
+		return true;
+	}
+	case MSG_TOSS_DICE: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		textBuffer[0] = 0;
+		wcscat(textBuffer, L"投掷骰子结果：");
+		wchar_t* p = &textBuffer[7];
+		for (int i = 0; i < count; ++i) {
+			int res = BufferIO::ReadInt8(pbuf);
+			*p++ = L'[';
+			*p++ = L'0' + res;
+			*p++ = L']';
+		}
+		*p = 0;
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
+		mainGame->stACMessage->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wACMessage, 20);
+		mainGame->WaitFrameSignal(40);
+		return true;
+	}
+	case MSG_ANNOUNCE_RACE: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
+		int available = BufferIO::ReadInt32(pbuf);
+		for(int i = 0, filter = 0x1; i < 22; ++i, filter <<= 1) {
+			mainGame->chkRace[i]->setChecked(false);
+			if(filter & available)
+				mainGame->chkRace[i]->setVisible(true);
+			else mainGame->chkRace[i]->setVisible(false);
+		}
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+		else myswprintf(textBuffer, L"请宣言种族");
+		select_hint = 0;
+		mainGame->wANRace->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wANRace);
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_ANNOUNCE_ATTRIB: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
+		int available = BufferIO::ReadInt32(pbuf);
+		for(int i = 0, filter = 0x1; i < 7; ++i, filter <<= 1) {
+			mainGame->chkAttribute[i]->setChecked(false);
+			if(filter & available)
+				mainGame->chkAttribute[i]->setVisible(true);
+			else mainGame->chkAttribute[i]->setVisible(false);
+		}
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+		else myswprintf(textBuffer, L"请宣言属性");
+		select_hint = 0;
+		mainGame->wANAttribute->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wANAttribute);
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_ANNOUNCE_CARD: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		mainGame->ebANCard->setText(L"");
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+		else myswprintf(textBuffer, L"请宣言卡名");
+		select_hint = 0;
+		mainGame->wANCard->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wANCard);
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_ANNOUNCE_NUMBER: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int count = BufferIO::ReadInt8(pbuf);
+		mainGame->gMutex.Lock();
+		mainGame->cbANNumber->clear();
+		for (int i = 0; i < count; ++i) {
+			int value = BufferIO::ReadInt32(pbuf);
+			myswprintf(textBuffer, L" % d", value);
+			mainGame->cbANNumber->addItem(textBuffer, value);
+		}
+		mainGame->cbANNumber->setSelected(0);
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls", dataManager.GetDesc(select_hint));
+		else myswprintf(textBuffer, L"请宣言数字");
+		select_hint = 0;
+		mainGame->wANNumber->setText(textBuffer);
+		mainGame->PopupElement(mainGame->wANNumber);
+		mainGame->gMutex.Unlock();
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		DuelClient::SendResponse();
+		return true;
+	}
+	case MSG_COUNT_TURN: {
+		int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int l = BufferIO::ReadInt8(pbuf);
+		int s = BufferIO::ReadInt8(pbuf);
+		BufferIO::ReadInt8(pbuf);
+		int ct = BufferIO::ReadInt16(pbuf);
+		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
+		pcard->turnCounter = ct;
+		if(ct == 0)
+			return true;
+		if(pcard->location & LOCATION_ONFIELD)
+			pcard->is_selectable = true;
+		mainGame->showcardcode = pcard->code;
+		mainGame->showcarddif = 0;
+		mainGame->showcardp = ct - 1;
+		mainGame->showcard = 6;
+		mainGame->WaitFrameSignal(30);
+		pcard->is_selectable = false;
+		mainGame->showcard = 0;
+		return true;
+	}
 	}
 	return true;
 }
 void DuelClient::SetResponseI(int respI) {
 	*((int*)response_buf) = respI;
-	is_responseB = false;
+	response_len = 4;
 }
 void DuelClient::SetResponseB(unsigned char* respB, unsigned char len) {
 	memcpy(response_buf, respB, len);
-	is_responseB = true;
 	response_len = len;
+}
+void DuelClient::SendResponse() {
+	SendBufferToServer(CTOS_RESPONSE, response_buf, response_len);
 }
 
 }
