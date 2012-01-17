@@ -3539,8 +3539,6 @@ int32 field::add_chain(uint16 step) {
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))
 			clit->flag |= CHAIN_DISABLE_EFFECT;
 		clit->chain_type = peffect->handler->get_type();
-		if(clit->chain_type == TYPE_MONSTER + TYPE_TRAP)
-			clit->chain_type = TYPE_MONSTER;
 		clit->chain_count = core.current_chain.size() + 1;
 		clit->target_cards = 0;
 		clit->target_player = PLAYER_NONE;

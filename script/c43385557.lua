@@ -20,9 +20,12 @@ end
 function c43385557.reccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
+function c43385557.filter(c)
+	return c:IsFaceup() and c:IsRace(RACE_PSYCHO)
+end
 function c43385557.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local ct=Duel.GetMatchingGroupCount(Card.IsRace,tp,LOCATION_MZONE,0,nil,RACE_PSYCHO)
+	local ct=Duel.GetMatchingGroupCount(c43385557.filter,tp,LOCATION_MZONE,0,nil)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ct*600)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,ct*600)

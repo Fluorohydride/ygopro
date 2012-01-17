@@ -18,7 +18,7 @@ function c74701381.initial_effect(c)
 end
 function c74701381.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,0)
+	Duel.Hint(HINT_SELECTMSG,tp,563)
 	local rc=Duel.AnnounceRace(tp,1,0xffffff)
 	e:GetLabelObject():SetLabel(rc)
 end

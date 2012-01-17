@@ -161,23 +161,28 @@ bool Game::Initialize() {
 	imgCard = env->addImage(rect<s32>(9, 9, 187, 262), wCardImg);
 	imgCard->setUseAlphaChannel(true);
 	//phase
-	btnDP = env->addButton(rect<s32>(475, 310, 525, 330), 0, -1, L"ＤＰ");
+	wPhase = env->addWindow(rect<s32>(475, 310, 850, 330), false, L"");
+	wPhase->setDraggable(false);
+	wPhase->getCloseButton()->setVisible(false);
+	wPhase->setDrawBackground(false);
+	wPhase->setVisible(false);
+	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"ＤＰ");
 	btnDP->setEnabled(false);
 	btnDP->setPressed(true);
 	btnDP->setVisible(false);
-	btnSP = env->addButton(rect<s32>(540, 310, 590, 330), 0, -1, L"ＳＰ");
+	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"ＳＰ");
 	btnSP->setEnabled(false);
 	btnSP->setPressed(true);
 	btnSP->setVisible(false);
-	btnM1 = env->addButton(rect<s32>(605, 310, 655, 330), 0, -1, L"Ｍ１");
+	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"Ｍ１");
 	btnM1->setEnabled(false);
 	btnM1->setPressed(true);
 	btnM1->setVisible(false);
-	btnBP = env->addButton(rect<s32>(670, 310, 720, 330), 0, BUTTON_BP, L"ＢＰ");
+	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"ＢＰ");
 	btnBP->setVisible(false);
-	btnM2 = env->addButton(rect<s32>(735, 310, 785, 330), 0, BUTTON_M2, L"Ｍ２");
+	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"Ｍ２");
 	btnM2->setVisible(false);
-	btnEP = env->addButton(rect<s32>(800, 310, 850, 330), 0, BUTTON_EP, L"ＥＰ");
+	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"ＥＰ");
 	btnEP->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);

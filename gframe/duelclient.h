@@ -24,6 +24,8 @@ private:
 	static char duel_client_read[0x2000];
 	static char duel_client_write[0x2000];
 	static bool is_closing;
+	static int select_hint;
+	static wchar_t event_string[128];
 public:
 	static bool StartClient(unsigned int ip, unsigned short port, bool create_game = true);
 	static void StopClient(bool is_exiting = false);
@@ -31,6 +33,7 @@ public:
 	static void ClientEvent(bufferevent *bev, short events, void *ctx);
 	static int ClientThread(void* param);
 	static void HandleSTOCPacketLan(char* data, unsigned int len);
+	static int ClientAnalyze(char* msg, unsigned int len);
 	static void SetResponseI(int respI);
 	static void SetResponseB(unsigned char* respB, unsigned char len);
 	static void SendPacketToServer(unsigned char proto) {

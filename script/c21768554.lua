@@ -26,7 +26,7 @@ function c21768554.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xc)
 end
 function c21768554.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c21768554.cfilter,tp,0,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(c21768554.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c21768554.filter(c)
 	return c:GetCounter(0xe)>0 and c:IsControlerCanBeChanged()

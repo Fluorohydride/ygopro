@@ -1265,9 +1265,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		break;
 	}
-	case irr::EET_USER_EVENT: {
-		break;
-	}
 	}
 	return false;
 }

@@ -13,7 +13,7 @@ function c53540729.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c53540729.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x58)
+	return c:IsFaceup() and c:IsSetCard(0x58) and c:IsLevelAbove(1)
 end
 function c53540729.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c24920410.filter(chkc) end

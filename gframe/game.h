@@ -24,28 +24,14 @@ struct Config {
 struct DuelInfo {
 	bool isStarted;
 	bool is_shuffling;
-	bool netError;
-	bool is_host_player[2];
 	bool is_first_turn;
-	bool is_local_host;
-	bool is_responsed;
-	int resPlayer;
 	int lp[2];
-	int engFlag;
-	int engLen;
-	int engType;
-	int msgLen;
-	int msgType;
 	int turn;
 	short curMsg;
-	short preMsg;
-	int selectHint;
 	wchar_t hostname[20];
 	wchar_t clientname[20];
-	wchar_t pass[20];
 	wchar_t strLP[2][16];
 	wchar_t strTurn[8];
-	wchar_t strEvent[64];
 };
 
 class Game {
@@ -279,6 +265,7 @@ public:
 	irr::gui::IGUIButton* btnAttack;
 	irr::gui::IGUIButton* btnShowList;
 	//phase button
+	irr::gui::IGUIWindow* wPhase;
 	irr::gui::IGUIButton* btnDP;
 	irr::gui::IGUIButton* btnSP;
 	irr::gui::IGUIButton* btnM1;
