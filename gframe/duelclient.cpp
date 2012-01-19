@@ -186,9 +186,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_SELECT_TP: {
+		mainGame->ShowElement(mainGame->wFTSelect);
 		break;
 	}
 	case STOC_HAND_RESULT: {
+		STOC_HandResult* pkt = (STOC_HandResult*)pdata;
+		mainGame->showcard = 100;
+		mainGame->showcardcode = pkt->res1 + (pkt->res2 << 16);
+		mainGame->showcarddif = 50;
+		mainGame->showcardp = 0;
+		mainGame->WaitFrameSignal(60);
 		break;
 	}
 	case STOC_TP_RESULT: {
@@ -208,7 +215,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			myswprintf(msgbuf, L"*%ls\n", dataManager.GetSysString(1236));
 			str.append(msgbuf);
 		}
-		str.append(L" == == == == == \n");
+		str.append(L"==========\n");
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1231), pkt->info.start_lp);
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1232), pkt->info.start_hand);
@@ -264,6 +271,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_DUEL_START: {
+		mainGame->HideElement(mainGame->wHostSingle);
+		mainGame->WaitFrameSignal(10);
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = true;

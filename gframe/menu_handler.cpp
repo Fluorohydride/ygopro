@@ -93,8 +93,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_HS_START: {
 				if(!mainGame->chkHostSingleReady[0]->isChecked()
-				        || !!mainGame->chkHostSingleReady[0]->isChecked())
+				        || !mainGame->chkHostSingleReady[0]->isChecked())
 					break;
+				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
 			case BUTTON_HS_CANCEL: {
@@ -103,6 +104,23 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostSingle, false, mainGame->wLanWindow);
+				break;
+			}
+			case BUTTON_HAND1:
+			case BUTTON_HAND2:
+			case BUTTON_HAND3: {
+				mainGame->HideElement(mainGame->wHand);
+				CTOS_HandResult cshr;
+				cshr.res = id - BUTTON_HAND1;
+				DuelClient::SendPacketToServer(CTOS_HAND_RESULT, cshr);
+				break;
+			}
+			case BUTTON_FIRST:
+			case BUTTON_SECOND: {
+				mainGame->HideElement(mainGame->wFTSelect);
+				CTOS_TPResult cstr;
+				cstr.res = BUTTON_SECOND - id;
+				DuelClient::SendPacketToServer(CTOS_TP_RESULT, cstr);
 				break;
 			}
 			case BUTTON_DECK_EDIT: {

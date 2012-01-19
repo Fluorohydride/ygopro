@@ -207,6 +207,10 @@ public:
 	//hand
 	irr::gui::IGUIWindow* wHand;
 	irr::gui::IGUIButton* btnHand[3];
+	//
+	irr::gui::IGUIWindow* wFTSelect;
+	irr::gui::IGUIButton* btnFirst;
+	irr::gui::IGUIButton* btnSecond;
 	//message
 	irr::gui::IGUIWindow* wMessage;
 	irr::gui::IGUIStaticText* stMessage;
@@ -355,6 +359,8 @@ extern Game* mainGame;
 #define BUTTON_HAND1				205
 #define BUTTON_HAND2				206
 #define BUTTON_HAND3				207
+#define BUTTON_FIRST				208
+#define BUTTON_SECOND				209
 #define BUTTON_POS_AU				210
 #define BUTTON_POS_AD				211
 #define BUTTON_POS_DU				212

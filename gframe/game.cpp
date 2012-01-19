@@ -219,6 +219,12 @@ bool Game::Initialize() {
 		btnHand[i] = env->addButton(rect<s32>(10 + 105 * i, 10, 105 + 105 * i, 144), wHand, BUTTON_HAND1 + i, L"");
 		btnHand[i]->setImage(imageManager.tHand[i]);
 	}
+	//
+	wFTSelect = env->addWindow(rect<s32>(550, 240, 780, 340), false, L"");
+	wFTSelect->getCloseButton()->setVisible(false);
+	wFTSelect->setVisible(false);
+	btnFirst = env->addButton(rect<s32>(10, 30, 220, 55), wFTSelect, BUTTON_FIRST, dataManager.GetSysString(100));
+	btnSecond = env->addButton(rect<s32>(10, 60, 220, 85), wFTSelect, BUTTON_SECOND, dataManager.GetSysString(101));
 	//message (310)
 	wMessage = env->addWindow(rect<s32>(490, 200, 840, 340), false, dataManager.GetSysString(1216));
 	wMessage->getCloseButton()->setVisible(false);

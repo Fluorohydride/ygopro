@@ -511,6 +511,17 @@ void Game::DrawSpec() {
 				showcarddif += 4;
 			break;
 		}
+		case 100: {
+			driver->draw2DImage(imageManager.tHand[showcardcode & 0x3], position2di(615, showcarddif));
+			driver->draw2DImage(imageManager.tHand[(showcardcode >> 16) & 0x3], position2di(615, 540 - showcarddif));
+			float dy = -0.333333f * showcardp + 10;
+			showcardp++;
+			if(showcardp < 30)
+				showcarddif += (int)dy;
+			if(showcardp > 60)
+				showcard = 0;
+			break;
+		}
 		}
 	}
 	if(is_attacking) {
