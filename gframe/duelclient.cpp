@@ -10,6 +10,9 @@ namespace ygo {
 unsigned DuelClient::connect_state = 0;
 unsigned char DuelClient::response_buf[64];
 unsigned char DuelClient::response_len = 0;
+unsigned int DuelClient::watching = 0;
+unsigned char DuelClient::selftype = 0;
+bool DuelClient::is_host = false;
 event_base* DuelClient::client_base = 0;
 bufferevent* DuelClient::client_bev = 0;
 char DuelClient::duel_client_read[0x2000];
@@ -139,9 +142,6 @@ int DuelClient::ClientThread(void* param) {
 }
 void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	char* pdata = data;
-	static unsigned int watching = 0;
-	static unsigned char selftype = 0;
-	static bool is_host = false;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
 	switch(pktType) {
 	case STOC_GAME_MSG: {
@@ -191,10 +191,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_HAND_RESULT: {
 		STOC_HandResult* pkt = (STOC_HandResult*)pdata;
-		mainGame->showcard = 100;
 		mainGame->showcardcode = pkt->res1 + (pkt->res2 << 16);
 		mainGame->showcarddif = 50;
 		mainGame->showcardp = 0;
+		mainGame->showcard = 100;
 		mainGame->WaitFrameSignal(60);
 		break;
 	}
@@ -272,13 +272,20 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_DUEL_START: {
 		mainGame->HideElement(mainGame->wHostSingle);
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = true;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
+		if(selftype != 1) {
+			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.hostname, 20);
+			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[1]->getText(), mainGame->dInfo.hostname, 20);
+		} else {
+			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[1]->getText(), mainGame->dInfo.hostname, 20);
+			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.hostname, 20);
+		}
 		mainGame->gMutex.Unlock();
 		break;
 	}

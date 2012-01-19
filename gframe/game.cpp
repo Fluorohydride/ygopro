@@ -733,5 +733,25 @@ void Game::ClearTextures() {
 	mainGame->btnCardSelect[4]->setImage();
 	imageManager.ClearTexture();
 }
+void Game::CloseDuelWindow() {
+	wACMessage->setVisible(false);
+	wANAttribute->setVisible(false);
+	wANCard->setVisible(false);
+	wANNumber->setVisible(false);
+	wANRace->setVisible(false);
+	wCardImg->setVisible(false);
+	wCardSelect->setVisible(false);
+	wCmdMenu->setVisible(false);
+	wFTSelect->setVisible(false);
+	wHand->setVisible(false);
+	wInfos->setVisible(false);
+	wMessage->setVisible(false);
+	wOptions->setVisible(false);
+	wPhase->setVisible(false);
+	wPosSelect->setVisible(false);
+	wQuery->setVisible(false);
+	wSelectOption->setVisible(false);
+	wSelectYesNo->setVisible(false);
+}
 
 }

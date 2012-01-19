@@ -60,6 +60,7 @@ public:
 	void SaveConfig();
 	void ShowCardInfo(int code);
 	void ClearTextures();
+	void CloseDuelWindow();
 	
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);

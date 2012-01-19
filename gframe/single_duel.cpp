@@ -254,10 +254,12 @@ void SingleDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 	if(hand_result[0] && hand_result[1]) {
 		STOC_HandResult schr;
 		schr.res1 = hand_result[0];
-		schr.res1 = hand_result[1];
+		schr.res2 = hand_result[1];
 		NetServer::SendPacketToPlayer(players[0], STOC_HAND_RESULT, schr);
+		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+			NetServer::ReSendToPlayer(*oit);
 		schr.res1 = hand_result[1];
-		schr.res1 = hand_result[0];
+		schr.res2 = hand_result[0];
 		NetServer::SendPacketToPlayer(players[1], STOC_HAND_RESULT, schr);
 		if(hand_result[0] == hand_result[1]) {
 			NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);

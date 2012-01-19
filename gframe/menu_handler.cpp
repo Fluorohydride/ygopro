@@ -106,23 +106,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wHostSingle, false, mainGame->wLanWindow);
 				break;
 			}
-			case BUTTON_HAND1:
-			case BUTTON_HAND2:
-			case BUTTON_HAND3: {
-				mainGame->HideElement(mainGame->wHand);
-				CTOS_HandResult cshr;
-				cshr.res = id - BUTTON_HAND1;
-				DuelClient::SendPacketToServer(CTOS_HAND_RESULT, cshr);
-				break;
-			}
-			case BUTTON_FIRST:
-			case BUTTON_SECOND: {
-				mainGame->HideElement(mainGame->wFTSelect);
-				CTOS_TPResult cstr;
-				cstr.res = BUTTON_SECOND - id;
-				DuelClient::SendPacketToServer(CTOS_TP_RESULT, cstr);
-				break;
-			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(mainGame->cbDBDecks->getSelected() != -1)

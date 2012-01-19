@@ -19,6 +19,9 @@ private:
 	static unsigned int connect_state;
 	static unsigned char response_buf[64];
 	static unsigned char response_len;
+	static unsigned int watching;
+	static unsigned char selftype;
+	static bool is_host;
 	static event_base* client_base;
 	static bufferevent* client_bev;
 	static char duel_client_read[0x2000];
