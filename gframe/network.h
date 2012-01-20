@@ -117,6 +117,7 @@ public:
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {};
 	virtual void Process() {};
 	virtual int Analyze(char* msgbuffer, unsigned int len) {};
+	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {};
 	virtual void EndDuel() {};
 
 public:

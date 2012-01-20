@@ -35,7 +35,7 @@ bool NetServer::StartServer(unsigned short port) {
 void NetServer::StopServer() {
 	if(!net_evbase)
 		return;
-	event_base_loopexit(net_evbase, NULL);
+	event_base_loopbreak(net_evbase);
 }
 void NetServer::StopListen() {
 	evconnlistener_disable(listener);
@@ -51,7 +51,7 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	bufferevent_enable(bev, EV_READ);
 }
 void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
-	event_base_loopexit(net_evbase, NULL);
+	event_base_loopbreak(net_evbase);
 }
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
@@ -109,10 +109,13 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
+		if(!dp->game || !duel_mode->pduel)
+			return;
+		duel_mode->GetResponse(dp, pdata, len > 64 ? 64 : len - 1);
 		break;
 	}
 	case CTOS_UPDATE_DECK: {
-		if(!dp->game || !duel_mode)
+		if(!dp->game)
 			return;
 		duel_mode->UpdateDeck(dp, pdata);
 		break;

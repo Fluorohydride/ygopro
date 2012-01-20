@@ -324,6 +324,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	set_player_info(pduel, 0, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	int opt = 0;
+	if(host_info.enable_priority)
+		opt |= DUEL_ENABLE_PRIORITY;
 	last_replay.WriteInt32(host_info.start_lp, false);
 	last_replay.WriteInt32(host_info.start_hand, false);
 	last_replay.WriteInt32(host_info.draw_count, false);
@@ -367,6 +369,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);
+	Process();
 }
 void SingleDuel::Process() {
 	char engineBuffer[0x1000];
@@ -430,19 +433,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			type = BufferIO::ReadInt8(pbuf);
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, offset, pbuf - offset);
-			last_replay.EndRecord();
-			char replaybuf[0x2000], *pbuf = replaybuf;
-			memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
-			pbuf += sizeof(ReplayHeader);
-			memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
-			NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
-			NetServer::ReSendToPlayer(players[1]);
-			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-				NetServer::ReSendToPlayer(*oit);
-			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-			NetServer::ReSendToPlayer(players[1]);
-			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-				NetServer::ReSendToPlayer(*oit);
+			EndDuel();
 			return 2;
 		}
 		case MSG_SELECT_BATTLECMD: {
@@ -1084,9 +1075,31 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 	}
 	return 0;
 }
+void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
+	byte resb[64];
+	memcpy(resb, pdata, len);
+	last_replay.WriteData(resb, len);
+	set_responseb(pduel, resb);
+	players[dp->type]->state = 0xff;
+	Process();
+}
 void SingleDuel::EndDuel() {
-	if(pduel)
-		end_duel(pduel);
+	if(!pduel)
+		return;
+	last_replay.EndRecord();
+	char replaybuf[0x2000], *pbuf = replaybuf;
+	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
+	pbuf += sizeof(ReplayHeader);
+	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
+	NetServer::SendBufferToPlayer(players[0], STOC_REPLAY, replaybuf, sizeof(ReplayHeader) + last_replay.comp_size);
+	NetServer::ReSendToPlayer(players[1]);
+	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+		NetServer::ReSendToPlayer(*oit);
+	NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+	NetServer::ReSendToPlayer(players[1]);
+	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+		NetServer::ReSendToPlayer(*oit);
+	end_duel(pduel);
 	pduel = 0;
 }
 void SingleDuel::WaitforResponse(int playerid) {

@@ -4,6 +4,7 @@
 #include "../ocgcore/field.h"
 #include "../ocgcore/duel.h"
 #include "game.h"
+#include "replay.h"
 
 namespace ygo {
 
@@ -54,7 +55,7 @@ void DuelClient::StopClient(bool is_exiting) {
 	if(!is_closing) {
 
 	}
-	event_base_loopexit(client_base, NULL);
+	event_base_loopbreak(client_base);
 }
 void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
@@ -125,11 +126,23 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					else mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
 					mainGame->gMutex.Unlock();
 				} else {
-
+					mainGame->gMutex.Lock();
+					mainGame->stMessage->setText(dataManager.GetSysString(1502));
+					mainGame->btnCreateHost->setEnabled(true);
+					mainGame->btnJoinHost->setEnabled(true);
+					mainGame->btnJoinCancel->setEnabled(true);
+					mainGame->gMutex.Unlock();
+					mainGame->PopupElement(mainGame->wMessage);
+					mainGame->localAction.Reset();
+					mainGame->localAction.Wait();
+					mainGame->CloseDuelWindow();
+					mainGame->dInfo.isStarted = false;
+					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->ShowElement(mainGame->wLanWindow);
 				}
 			}
 		}
-		event_base_loopexit(client_base, NULL);
+		event_base_loopexit(client_base, 0);
 	}
 }
 int DuelClient::ClientThread(void* param) {
@@ -157,25 +170,31 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnJoinCancel->setEnabled(true);
 			mainGame->gMutex.Lock();
 			if(pkt->code == 0)
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1403));
+				mainGame->wMessage->setText(dataManager.GetSysString(1403));
 			else if(pkt->code == 1)
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1404));
+				mainGame->wMessage->setText(dataManager.GetSysString(1404));
 			else if(pkt->code == 2)
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1405));
+				mainGame->wMessage->setText(dataManager.GetSysString(1405));
 			mainGame->gMutex.Unlock();
-			event_base_loopexit(client_base, NULL);
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->localAction.Reset();
+			mainGame->localAction.Wait();
+			event_base_loopbreak(client_base);
 			break;
 		}
 		case ERRMSG_DECKERROR: {
 			mainGame->gMutex.Lock();
 			if(pkt->code == 1)
-				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
+				mainGame->wMessage->setText(dataManager.GetSysString(1406));
 			else {
 				wchar_t msgbuf[64];
 				myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(pkt->code));
-				mainGame->env->addMessageBox(L"", msgbuf);
+				mainGame->wMessage->setText(msgbuf);
 			}
 			mainGame->gMutex.Unlock();
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->localAction.Reset();
+			mainGame->localAction.Wait();
 			break;
 		}
 		}
@@ -191,7 +210,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_HAND_RESULT: {
 		STOC_HandResult* pkt = (STOC_HandResult*)pdata;
-		mainGame->showcardcode = pkt->res1 + (pkt->res2 << 16);
+		mainGame->stHintMsg->setVisible(false);
+		mainGame->showcardcode = (pkt->res1 - 1) + ((pkt->res2 - 1) << 16);
 		mainGame->showcarddif = 50;
 		mainGame->showcardp = 0;
 		mainGame->showcard = 100;
@@ -278,25 +298,47 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.isStarted = true;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
+		mainGame->wPhase->setVisible(true);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(selftype != 1) {
 			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.hostname, 20);
-			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[1]->getText(), mainGame->dInfo.hostname, 20);
+			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[1]->getText(), mainGame->dInfo.clientname, 20);
 		} else {
 			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[1]->getText(), mainGame->dInfo.hostname, 20);
-			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.hostname, 20);
+			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.clientname, 20);
 		}
 		mainGame->gMutex.Unlock();
 		break;
 	}
 	case STOC_DUEL_END: {
-
+		mainGame->gMutex.Lock();
+		mainGame->stMessage->setText(dataManager.GetSysString(1500));
+		mainGame->gMutex.Unlock();
+		mainGame->PopupElement(mainGame->wMessage);
+		mainGame->localAction.Reset();
+		mainGame->localAction.Wait();
+		mainGame->CloseDuelWindow();
+		mainGame->ShowElement(mainGame->wLanWindow);
+		mainGame->dInfo.isStarted = false;
+		mainGame->device->setEventReceiver(&mainGame->menuHandler);
+		mainGame->ShowElement(mainGame->wLanWindow);
+		event_base_loopbreak(client_base);
 		break;
 	}
 	case STOC_REPLAY: {
+		mainGame->ebRSName->setText(L"");
+		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->localAction.Reset();
-		mainGame->ShowElement(mainGame->wReplaySave);
 		mainGame->localAction.Wait();
+		if(mainGame->actionParam) {
+			char* prep = pdata;
+			Replay new_replay;
+			memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
+			prep += sizeof(ReplayHeader);
+			memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
+			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
+			new_replay.SaveReplay(mainGame->ebRSName->getText());
+		}
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
@@ -380,7 +422,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case HINT_MESSAGE: {
+			mainGame->gMutex.Lock();
 			mainGame->stMessage->setText(dataManager.GetDesc(data));
+			mainGame->gMutex.Unlock();
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->localAction.Reset();
 			mainGame->localAction.Wait();

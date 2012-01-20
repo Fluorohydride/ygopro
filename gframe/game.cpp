@@ -161,10 +161,7 @@ bool Game::Initialize() {
 	imgCard = env->addImage(rect<s32>(9, 9, 187, 262), wCardImg);
 	imgCard->setUseAlphaChannel(true);
 	//phase
-	wPhase = env->addWindow(rect<s32>(475, 310, 850, 330), false, L"");
-	wPhase->setDraggable(false);
-	wPhase->getCloseButton()->setVisible(false);
-	wPhase->setDrawBackground(false);
+	wPhase = env->addStaticText(L"", rect<s32>(475, 310, 850, 330));
 	wPhase->setVisible(false);
 	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"ＤＰ");
 	btnDP->setEnabled(false);
@@ -750,8 +747,6 @@ void Game::CloseDuelWindow() {
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
-	wSelectOption->setVisible(false);
-	wSelectYesNo->setVisible(false);
 }
 
 }

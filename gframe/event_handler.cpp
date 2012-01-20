@@ -26,8 +26,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HAND2:
 			case BUTTON_HAND3: {
 				mainGame->HideElement(mainGame->wHand);
+				mainGame->stHintMsg->setText(L"");
+				mainGame->stHintMsg->setVisible(true);
 				CTOS_HandResult cshr;
-				cshr.res = id - BUTTON_HAND1;
+				cshr.res = id - BUTTON_HAND1 + 1;
 				DuelClient::SendPacketToServer(CTOS_HAND_RESULT, cshr);
 				break;
 			}

@@ -236,8 +236,6 @@ public:
 	irr::gui::CGUIImageButton* btnPSAD;
 	irr::gui::CGUIImageButton* btnPSDU;
 	irr::gui::CGUIImageButton* btnPSDD;
-	irr::gui::IGUIWindow* wSelectYesNo;
-	irr::gui::IGUIWindow* wSelectOption;
 	//card selection
 	irr::gui::IGUIWindow* wCardSelect;
 	irr::gui::CGUIImageButton* btnCardSelect[5];
@@ -270,7 +268,7 @@ public:
 	irr::gui::IGUIButton* btnAttack;
 	irr::gui::IGUIButton* btnShowList;
 	//phase button
-	irr::gui::IGUIWindow* wPhase;
+	irr::gui::IGUIStaticText* wPhase;
 	irr::gui::IGUIButton* btnDP;
 	irr::gui::IGUIButton* btnSP;
 	irr::gui::IGUIButton* btnM1;
