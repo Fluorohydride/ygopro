@@ -3,6 +3,7 @@
 #include "netserver.h"
 #include "duelclient.h"
 #include "deck_manager.h"
+#include "replay_mode.h"
 #include "game.h"
 
 namespace ygo {
@@ -106,6 +107,22 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wHostSingle, false, mainGame->wLanWindow);
 				break;
 			}
+			case BUTTON_REPLAY_MODE: {
+				mainGame->HideElement(mainGame->wMainMenu, false, mainGame->wReplay);
+				break;
+			}
+			case BUTTON_LOAD_REPLAY: {
+				if(mainGame->lstReplayList->getSelected() == -1)
+					break;
+				if(!replayMode.cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
+					break;
+				replayMode.StartReplay();
+				break;
+			}
+			case BUTTON_CANCEL_REPLAY: {
+				mainGame->HideElement(mainGame->wReplay, false, mainGame->wMainMenu);
+				break;
+			}
 			case BUTTON_DECK_EDIT: {
 				mainGame->RefreshDeck(mainGame->cbDBDecks);
 				if(mainGame->cbDBDecks->getSelected() != -1)
@@ -141,80 +158,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					mainGame->chkCategory[i]->setChecked(false);
 				break;
 			}
-			/*			case BUTTON_LAN_START_SERVER: {
-							if(mainGame->cbDeckSel->getSelected() == -1)
-								break;
-							if(!deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
-								mainGame->stModeStatus->setText(L"无效卡组");
-								break;
-							}
-							if(!mainGame->chkNoCheckDeck->isChecked()
-							        && !deckManager.CheckLFList(deckManager.deckhost, mainGame->cbLFlist->getSelected())) {
-								mainGame->stModeStatus->setText(L"无效卡组或者卡组不符合禁卡表规范");
-								break;
-							}
-							if(_wtoi(mainGame->ebStartLP->getText()) == 0)
-								mainGame->ebStartLP->setText(L"8000");
-							if(_wtoi(mainGame->ebStartHand->getText()) == 0)
-								mainGame->ebStartLP->setText(L"5");
-							if(_wtoi(mainGame->ebDrawCount->getText()) == 0)
-								mainGame->ebStartLP->setText(L"1");
-							if(mainGame->netManager.CreateHost(mainGame->cbIPList->getSelected())) {
-								mainGame->btnLanStartServer->setEnabled(false);
-								mainGame->btnLanCancelServer->setEnabled(true);
-								mainGame->btnLanConnect->setEnabled(false);
-								mainGame->btnRefreshList->setEnabled(false);
-								mainGame->btnLoadReplay->setEnabled(false);
-								mainGame->btnDeckEdit->setEnabled(false);
-								mainGame->stModeStatus->setText(L"等待连接...");
-							}
-							break;
-						}
-						case BUTTON_LAN_CANCEL_SERVER: {
-							mainGame->netManager.CancelHost();
-							mainGame->stModeStatus->setText(L"");
-							break;
-						}
-						case BUTTON_LAN_REFRESH: {
-							if(mainGame->netManager.RefreshHost(mainGame->cbIPList->getSelected())) {
-								mainGame->btnLanStartServer->setEnabled(false);
-								mainGame->btnLanConnect->setEnabled(false);
-								mainGame->btnRefreshList->setEnabled(false);
-								mainGame->btnLoadReplay->setEnabled(false);
-								mainGame->btnDeckEdit->setEnabled(false);
-							}
-							break;
-						}
-						case BUTTON_LAN_CONNECT: {
-							if(mainGame->cbDeckSel->getSelected() == -1)
-								break;
-							if(!deckManager.LoadDeck(mainGame->cbDeckSel->getItem(mainGame->cbDeckSel->getSelected()))) {
-								mainGame->stModeStatus->setText(L"无效卡组");
-								break;
-							}
-							if(mainGame->netManager.JoinHost()) {
-								mainGame->btnLanStartServer->setEnabled(false);
-								mainGame->btnLanConnect->setEnabled(false);
-								mainGame->btnRefreshList->setEnabled(false);
-								mainGame->btnLoadReplay->setEnabled(false);
-								mainGame->btnDeckEdit->setEnabled(false);
-								mainGame->stModeStatus->setText(L"连接中...");
-							}
-							break;
-						}
-						case BUTTON_LOAD_REPLAY: {
-							if(mainGame->lstReplayList->getSelected() == -1)
-								break;
-							if(!mainGame->lastReplay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected()))) {
-								mainGame->stModeStatus->setText(L"录像损坏或丢失，无法播放");
-								break;
-							}
-							mainGame->stModeStatus->setText(L"");
-							Thread::NewThread(Game::ReplayThread, &mainGame->dInfo);
-							break;
-						}
-						*/
 			}
+			break;
+		}
+		case irr::gui::EGET_LISTBOX_CHANGED: {
+			switch(id) {
+			case LISTBOX_REPLAY_LIST: {
+				break;
+			}
+			}
+			break;
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {

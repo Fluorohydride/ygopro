@@ -203,8 +203,11 @@ public:
 	irr::gui::IGUIButton* btnHostSingleStart;
 	irr::gui::IGUIButton* btnHostSingleCancel;
 	//replay
+	irr::gui::IGUIWindow* wReplay;
 	irr::gui::IGUIListBox* lstReplayList;
+	irr::gui::IGUIStaticText* stReplayInfo;
 	irr::gui::IGUIButton* btnLoadReplay;
+	irr::gui::IGUIButton* btnReplayCancel;
 	//hand
 	irr::gui::IGUIWindow* wHand;
 	irr::gui::IGUIButton* btnHand[3];
@@ -309,7 +312,7 @@ public:
 	irr::gui::IGUIButton* btnRSYes;
 	irr::gui::IGUIButton* btnRSNo;
 	//replay control
-	irr::gui::IGUIStaticText* wReplay;
+	irr::gui::IGUIStaticText* wReplayControl;
 	irr::gui::IGUIButton* btnReplayStart;
 	irr::gui::IGUIButton* btnReplayPause;
 	irr::gui::IGUIButton* btnReplayStep;
@@ -352,6 +355,9 @@ extern Game* mainGame;
 #define BUTTON_HS_CANCEL			123
 #define BUTTON_HS_KICK				124
 #define CHECKBOX_HS_READY			125
+#define LISTBOX_REPLAY_LIST			130
+#define BUTTON_LOAD_REPLAY			131
+#define BUTTON_CANCEL_REPLAY		132
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202

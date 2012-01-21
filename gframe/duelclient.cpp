@@ -320,6 +320,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->CloseDuelWindow();
 		mainGame->ShowElement(mainGame->wLanWindow);
 		mainGame->dInfo.isStarted = false;
+		mainGame->btnCreateHost->setEnabled(true);
+		mainGame->btnJoinHost->setEnabled(true);
+		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->ShowElement(mainGame->wLanWindow);
 		event_base_loopbreak(client_base);
