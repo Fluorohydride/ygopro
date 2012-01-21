@@ -1389,7 +1389,8 @@ int32 scriptlib::duel_get_decktop_group(lua_State *L) {
 */
 int32 scriptlib::duel_get_matching_group(lua_State *L) {
 	check_param_count(L, 5);
-	check_param(L, PARAM_TYPE_FUNCTION, 1);
+	if(!lua_isnil(L, 1))
+		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	uint32 extraargs = 0;
 	if(!lua_isnil(L, 5)) {
@@ -1413,7 +1414,8 @@ int32 scriptlib::duel_get_matching_group(lua_State *L) {
 */
 int32 scriptlib::duel_get_matching_count(lua_State *L) {
 	check_param_count(L, 5);
-	check_param(L, PARAM_TYPE_FUNCTION, 1);
+	if(!lua_isnil(L, 1))
+		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	uint32 extraargs = 0;
 	if(!lua_isnil(L, 5)) {
@@ -1438,7 +1440,8 @@ int32 scriptlib::duel_get_matching_count(lua_State *L) {
 */
 int32 scriptlib::duel_get_first_matching_card(lua_State *L) {
 	check_param_count(L, 5);
-	check_param(L, PARAM_TYPE_FUNCTION, 1);
+	if(!lua_isnil(L, 1))
+		check_param(L, PARAM_TYPE_FUNCTION, 1);
 	card* pexception = 0;
 	uint32 extraargs = 0;
 	if(!lua_isnil(L, 5)) {

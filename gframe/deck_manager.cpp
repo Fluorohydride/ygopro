@@ -152,6 +152,8 @@ bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 		pcount[deck.side[i]->first]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
+	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
+		return false;
 	for(int i = 0; i < ndeck.main.size(); ++i)
 		ncount[ndeck.main[i]->first]++;
 	for(int i = 0; i < ndeck.extra.size(); ++i)

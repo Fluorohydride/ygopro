@@ -284,6 +284,7 @@ void SingleDuel::HandResult(DuelPlayer* dp, unsigned char res) {
 void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(dp->state != CTOS_TP_RESULT)
 		return;
+	bool swapped = false;
 	if((tp && dp->type == 1) || (!tp && dp->type == 0)) {
 		DuelPlayer* p = players[0];
 		players[0] = players[1];
@@ -293,6 +294,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		Deck d = pdeck[0];
 		pdeck[0] = pdeck[1];
 		pdeck[1] = d;
+		swapped = true;
 	}
 	dp->state = CTOS_RESPONSE;
 	ReplayHeader rh;
@@ -362,10 +364,14 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x1));
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x40));
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 18);
-	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-		NetServer::ReSendToPlayer(*oit);
+	if(!swapped)
+		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+			NetServer::ReSendToPlayer(*oit);
 	startbuf[1] = 1;
 	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 18);
+	if(swapped)
+		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+			NetServer::ReSendToPlayer(*oit);
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);

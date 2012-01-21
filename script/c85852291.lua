@@ -18,8 +18,8 @@ function c85852291.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c85852291.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(p,c85852291.filter,p,LOCATION_HAND,0,1,63,nil)
+	Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
+	local g=Duel.SelectMatchingCard(p,Card.IsAbleToDeck,p,LOCATION_HAND,0,1,63,nil)
 	if g:GetCount()==0 then return end
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	Duel.ShuffleDeck(p)

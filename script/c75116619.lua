@@ -64,5 +64,5 @@ function c75116619.vfilter(c)
 end
 function c75116619.valcon(e)
 	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c49721904.vfilter,c:GetControler(),LOCATION_MZONE,0,2,c)
+	return Duel.IsExistingMatchingCard(c75116619.vfilter,c:GetControler(),LOCATION_MZONE,0,2,c)
 end

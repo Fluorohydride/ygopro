@@ -22,9 +22,8 @@ function c73752131.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c73752131.acop(e,tp,eg,ep,ev,re,r,rp)
-	local te=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
-	local c=te:GetHandler()
-	if te:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_SPELL) and c~=e:GetHandler() then
+	local c=re:GetHandler()
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_SPELL) then
 		e:GetHandler():AddCounter(0x3001,1)
 	end
 end
@@ -45,6 +44,5 @@ function c73752131.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c73752131.filter,tp,0x13,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		Duel.ShuffleDeck(tp)
 	end
 end

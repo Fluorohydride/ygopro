@@ -35,7 +35,7 @@ bool NetServer::StartServer(unsigned short port) {
 void NetServer::StopServer() {
 	if(!net_evbase)
 		return;
-	event_base_loopbreak(net_evbase);
+	event_base_loopexit(net_evbase, 0);
 }
 void NetServer::StopListen() {
 	evconnlistener_disable(listener);
@@ -51,7 +51,7 @@ void NetServer::ServerAccept(evconnlistener* listener, evutil_socket_t fd, socka
 	bufferevent_enable(bev, EV_READ);
 }
 void NetServer::ServerAcceptError(evconnlistener* listener, void* ctx) {
-	event_base_loopbreak(net_evbase);
+	event_base_loopexit(net_evbase, 0);
 }
 void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 	evbuffer* input = bufferevent_get_input(bev);
