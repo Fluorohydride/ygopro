@@ -263,7 +263,7 @@ void Game::DrawMisc() {
 		}
 	}
 	//lp bar
-	if((dInfo.turn % 2 && dInfo.is_first_turn) || (!(dInfo.turn % 2) && !dInfo.is_first_turn)) {
+	if((dInfo.turn % 2 && dInfo.isFirst) || (!(dInfo.turn % 2) && !dInfo.isFirst)) {
 		driver->draw2DRectangle(0xa0000000, recti(327, 8, 630, 51));
 		driver->draw2DRectangleOutline(recti(327, 8, 630, 51), 0xffff8080);
 	} else {

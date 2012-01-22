@@ -16,7 +16,6 @@ ClientCard::ClientCard() {
 	is_showtarget = false;
 	is_highlighting = false;
 	is_disabled = false;
-	is_confirming = false;
 	cmdFlag = 0;
 	code = 0;
 	type = 0;
@@ -37,7 +36,7 @@ ClientCard::ClientCard() {
 	equipTarget = 0;
 }
 void ClientCard::SetCode(int code) {
-	if(location == LOCATION_HAND && controler == 1 && this->code != code)
+	if(location == LOCATION_HAND && this->code != code)
 		mainGame->dField.MoveCard(this, 5);
 	this->code = code;
 }
@@ -48,7 +47,7 @@ void ClientCard::UpdateInfo(char* buf) {
 	int pdata;
 	if(flag & QUERY_CODE) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(location == LOCATION_HAND && controler == 1 && pdata != code)
+		if(location == LOCATION_HAND && pdata != code)
 			mainGame->dField.MoveCard(this, 5);
 		code = pdata;
 	}

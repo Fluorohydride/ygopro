@@ -369,12 +369,16 @@ void field::shuffle(uint8 playerid, uint8 location) {
 	}
 	if(location == LOCATION_HAND) {
 		pduel->write_buffer8(MSG_SHUFFLE_HAND);
+		pduel->write_buffer8(playerid);
+		pduel->write_buffer8(player[playerid].list_hand.size());
+		for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
+			pduel->write_buffer32((*cit)->data.code);
 		core.shuffle_hand_check[playerid] = FALSE;
 	} else {
 		pduel->write_buffer8(MSG_SHUFFLE_DECK);
+		pduel->write_buffer8(playerid);
 		core.shuffle_deck_check[playerid] = FALSE;
 	}
-	pduel->write_buffer8(playerid);
 }
 void field::reset_sequence(uint8 playerid, uint8 location) {
 	if(location & (LOCATION_ONFIELD))

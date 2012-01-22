@@ -4,7 +4,6 @@
 #include "config.h"
 #include "network.h"
 #include "Replay.h"
-#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
@@ -45,7 +44,6 @@ protected:
 	unsigned char last_response;
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
-	mtrandom rnd;
 };
 
 }

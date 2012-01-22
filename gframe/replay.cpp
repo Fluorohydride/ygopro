@@ -147,18 +147,13 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	return rheader.id == 0x31707279 && rheader.version >= 0x1020;
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
-	char resType = *pdata++;
 	if(pdata - replay_data >= replay_size)
 		return false;
-	if(resType == 1) {
-		*((int*)resp) = *((int*)pdata);
-		pdata += 4;
-	} else if(resType = 2) {
-		int len = *pdata++;
-		for(int i = 0; i < len; ++i)
-			resp[i] = *pdata++;
-	} else
+	int len = *pdata++;
+	if(len > 64)
 		return false;
+	memcpy(resp, pdata, len);
+	pdata += len;
 	return true;
 }
 void Replay::ReadData(void* data, unsigned int length) {

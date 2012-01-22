@@ -5,6 +5,7 @@
 #include "duelclient.h"
 #include "data_manager.h"
 #include "image_manager.h"
+#include "replay_mode.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {
@@ -42,46 +43,39 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_REPLAY_START: {
-				if(!mainGame->dField.is_replaying)
+				if(!mainGame->dInfo.isReplay)
 					break;
-				is_pausing = false;
-				is_paused = false;
 				mainGame->btnReplayStart->setVisible(false);
 				mainGame->btnReplayPause->setVisible(true);
 				mainGame->btnReplayStep->setVisible(false);
-				mainGame->localAction.Set();
+				ReplayMode::Pause(false, false);
 				break;
 			}
 			case BUTTON_REPLAY_PAUSE: {
-				if(!mainGame->dField.is_replaying)
+				if(!mainGame->dInfo.isReplay)
 					break;
-				is_pausing = true;
 				mainGame->btnReplayStart->setVisible(true);
 				mainGame->btnReplayPause->setVisible(false);
 				mainGame->btnReplayStep->setVisible(true);
+				ReplayMode::Pause(true, false);
 				break;
 			}
 			case BUTTON_REPLAY_STEP: {
-				if(!mainGame->dField.is_replaying)
+				if(!mainGame->dInfo.isReplay)
 					break;
-				is_paused = false;
-				mainGame->localAction.Set();
+				ReplayMode::Pause(false, true);
 				break;
 			}
 			case BUTTON_REPLAY_EXIT: {
-				if(!mainGame->dField.is_replaying)
+				if(!mainGame->dInfo.isReplay)
 					break;
-				mainGame->dField.is_replaying = false;
-				mainGame->localAction.Set();
+				ReplayMode::StopReplay();
 				break;
 			}
 			case BUTTON_REPLAY_SWAP: {
-				if(!mainGame->dField.is_replaying)
+				if(!mainGame->dInfo.isReplay)
 					break;
-				if(is_paused)
-					ReplaySwap();
-				else
-					is_swaping = true;
+				ReplayMode::SwapField();
 				break;
 			}
 			case BUTTON_REPLAY_SAVE: {
@@ -592,10 +586,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->HideElement(mainGame->wCardSelect, true);
 					}
 					break;
+				} else if(mainGame->dInfo.curMsg == MSG_CONFIRM_CARDS) {
+					mainGame->HideElement(mainGame->wCardSelect, true);
+					break;
 				} else {
 					mainGame->HideElement(mainGame->wCardSelect);
 					break;
 				}
+				break;
 			}
 			}
 			break;
@@ -755,7 +753,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_LEFT_UP: {
-			if(is_replaying)
+			if(mainGame->dInfo.isReplay)
 				break;
 			if(!mainGame->dInfo.isStarted)
 				break;
@@ -1028,7 +1026,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			break;
 		}
 		case irr::EMIE_RMOUSE_LEFT_UP: {
-			if(is_replaying)
+			if(mainGame->dInfo.isReplay)
 				break;
 			mainGame->wCmdMenu->setVisible(false);
 			if(mainGame->fadingFrame)

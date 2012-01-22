@@ -4,6 +4,7 @@
 #include "duelclient.h"
 #include "deck_manager.h"
 #include "replay_mode.h"
+#include "image_manager.h"
 #include "game.h"
 
 namespace ygo {
@@ -109,14 +110,33 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_REPLAY_MODE: {
 				mainGame->HideElement(mainGame->wMainMenu, false, mainGame->wReplay);
+				mainGame->RefreshReplay();
 				break;
 			}
 			case BUTTON_LOAD_REPLAY: {
 				if(mainGame->lstReplayList->getSelected() == -1)
 					break;
-				if(!replayMode.cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
+				if(!ReplayMode::cur_replay.OpenReplay(mainGame->lstReplayList->getListItem(mainGame->lstReplayList->getSelected())))
 					break;
-				replayMode.StartReplay();
+				mainGame->imgCard->setImage(imageManager.tCover);
+				mainGame->wCardImg->setVisible(true);
+				mainGame->wInfos->setVisible(true);
+				mainGame->wReplay->setVisible(true);
+				mainGame->stName->setText(L"");
+				mainGame->stInfo->setText(L"");
+				mainGame->stDataInfo->setText(L"");
+				mainGame->stText->setText(L"");
+				mainGame->wReplayControl->setVisible(true);
+				mainGame->btnReplayStart->setVisible(false);
+				mainGame->btnReplayPause->setVisible(true);
+				mainGame->btnReplayStep->setVisible(false);
+				mainGame->dField.panel = 0;
+				mainGame->dField.hovered_card = 0;
+				mainGame->dField.clicked_card = 0;
+				mainGame->dField.Clear();
+				mainGame->HideElement(mainGame->wReplay);
+				mainGame->device->setEventReceiver(&mainGame->dField);
+				ReplayMode::StartReplay();
 				break;
 			}
 			case BUTTON_CANCEL_REPLAY: {
@@ -135,7 +155,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->wFilter->setVisible(true);
 				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;;
 				mainGame->cbDBLFList->setSelected(0);
-				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 				mainGame->cbCardType->setSelected(0);
 				mainGame->cbCardType2->setSelected(0);
 				mainGame->cbAttribute->setSelected(0);
@@ -154,6 +173,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->deckBuilder.result_string[1] = 0;
 				mainGame->deckBuilder.results.clear();
 				mainGame->deckBuilder.is_draging = false;
+				mainGame->device->setEventReceiver(&mainGame->deckBuilder);
 				for(int i = 0; i < 32; ++i)
 					mainGame->chkCategory[i]->setChecked(false);
 				break;

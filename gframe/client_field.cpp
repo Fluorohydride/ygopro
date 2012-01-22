@@ -15,8 +15,6 @@ ClientField::ClientField() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
-	is_replaying = false;
-	is_paused = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
 			mzone[p].push_back(0);
@@ -453,7 +451,7 @@ void ClientField::ReplaySwap() {
 		(*cit)->mTransform.setRotationRadians((*cit)->curRot);
 		(*cit)->is_moving = false;
 	}
-	mainGame->dInfo.is_first_turn = !mainGame->dInfo.is_first_turn;
+	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
 	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
 	for(int i = 0; i < 16; ++i)
 		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);
@@ -594,13 +592,13 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->Y = 4.0f;
 				t->Z = 0.5f + 0.001f * sequence;
 			}
-			if(!pcard->is_confirming && !pcard->code) {
+			if(pcard->code) {
 				r->X = -0.661f;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
 			} else {
-				r->X = -0.661f;
-				r->Y = 0;
+				r->X = 0.661f;
+				r->Y = 3.1415926f;
 				r->Z = 0;
 			}
 		} else {

@@ -4,6 +4,7 @@
 #include "../ocgcore/card.h"
 #include "../ocgcore/duel.h"
 #include "../ocgcore/field.h"
+#include "../ocgcore/mtrandom.h"
 
 namespace ygo {
 
@@ -285,6 +286,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(dp->state != CTOS_TP_RESULT)
 		return;
 	bool swapped = false;
+	mtrandom rnd;
 	if((tp && dp->type == 1) || (!tp && dp->type == 0)) {
 		DuelPlayer* p = players[0];
 		players[0] = players[1];
@@ -300,6 +302,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
+	rh.flag = 0;
 	time_t seed = time(0);
 	rh.seed = seed;
 	last_replay.BeginRecord();
@@ -364,14 +367,13 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x1));
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x40));
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 18);
-	if(!swapped)
-		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-			NetServer::ReSendToPlayer(*oit);
 	startbuf[1] = 1;
 	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 18);
 	if(swapped)
-		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-			NetServer::ReSendToPlayer(*oit);
+		startbuf[1] = 0x10;
+	else startbuf[1] = 0x11;
+	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 18);
 	RefreshExtra(0);
 	RefreshExtra(1);
 	start_duel(pduel, opt);
@@ -587,12 +589,20 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 7;
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			if(pbuf[5] == LOCATION_HAND) {
+				pbuf += count * 7;
+				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+				NetServer::ReSendToPlayer(players[1 - player]);
+				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+					NetServer::ReSendToPlayer(*oit);
+			} else {
+				pbuf += count * 7;
+				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			}
 			break;
 		}
 		case MSG_SHUFFLE_DECK: {
-			pbuf++;
+			player = BufferIO::ReadInt8(pbuf);
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -601,8 +611,11 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		}
 		case MSG_SHUFFLE_HAND: {
 			player = BufferIO::ReadInt8(pbuf);
-			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
-			NetServer::ReSendToPlayer(players[1]);
+			count = BufferIO::ReadInt8(pbuf);
+			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
+			for(int i = 0; i < count; ++i)
+				BufferIO::WriteInt32(pbuf, 0);
+			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			RefreshHand(player, 0x181fff, 0);
@@ -1084,6 +1097,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 void SingleDuel::GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {
 	byte resb[64];
 	memcpy(resb, pdata, len);
+	last_replay.WriteInt8(len);
 	last_replay.WriteData(resb, len);
 	set_responseb(pduel, resb);
 	players[dp->type]->state = 0xff;
@@ -1111,6 +1125,8 @@ void SingleDuel::EndDuel() {
 void SingleDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
 	players[playerid]->state = CTOS_RESPONSE;
+	unsigned char msg = MSG_WAITING;
+	NetServer::SendPacketToPlayer(players[1-playerid], STOC_GAME_MSG, msg);
 }
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	char query_buffer[0x1000];

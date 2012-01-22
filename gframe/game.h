@@ -23,8 +23,10 @@ struct Config {
 
 struct DuelInfo {
 	bool isStarted;
+	bool isReplay;
+	bool isObserver;
+	bool isFirst;
 	bool is_shuffling;
-	bool is_first_turn;
 	int lp[2];
 	int turn;
 	short curMsg;
@@ -64,22 +66,6 @@ public:
 	
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
-	
-/*	
-	void ReplayRefresh(int flag = 0x181fff);
-	void ReplayRefreshHand(int player, int flag = 0x181fff);
-	void ReplayRefreshGrave(int player, int flag = 0x181fff);
-	void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
-
-	static int EngineThread(void*);
-	static void Proceed(void*);
-	static void Analyze(void*, char*);
-	static int RecvThread(void*);
-	static int GameThread(void*);
-	static bool SolveMessage(void*, char*, int);
-	static int ReplayThread(void* pd);
-	static bool AnalyzeReplay(void*, char*);*/
-	//
 	
 	Mutex gMutex;
 	Mutex gBuffer;

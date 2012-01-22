@@ -109,8 +109,8 @@ bool Game::Initialize() {
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
 	cbMatchMode->addItem(dataManager.GetSysString(1245));
-	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 120, 360, 140), wCreateHost, -1, dataManager.GetSysString(1236));
-	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
+	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 150, 360, 170), wCreateHost, -1, dataManager.GetSysString(1236));
+	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 180, 170, 200), wCreateHost, -1, dataManager.GetSysString(1229));
 	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1230));
 	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 210, 320, 230), false, false, wCreateHost);
@@ -408,11 +408,12 @@ bool Game::Initialize() {
 	wReplay = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1200));
 	wReplay->getCloseButton()->setVisible(false);
 	wReplay->setVisible(false);
-	lstReplayList = env->addListBox(rect<s32>(10, 30, 400, 350), wReplay, LISTBOX_REPLAY_LIST, true);
+	lstReplayList = env->addListBox(rect<s32>(10, 30, 350, 350), wReplay, LISTBOX_REPLAY_LIST, true);
 	lstReplayList->setItemHeight(18);
 	btnLoadReplay = env->addButton(rect<s32>(460, 355, 570, 380), wReplay, BUTTON_LOAD_REPLAY, dataManager.GetSysString(1348));
 	btnReplayCancel = env->addButton(rect<s32>(460, 385, 570, 410), wReplay, BUTTON_CANCEL_REPLAY, dataManager.GetSysString(1347));
-	stReplayInfo = env->addStaticText(L"", rect<s32>(410, 30, 570, 350), false, true, wReplay);
+	env->addStaticText(dataManager.GetSysString(1349), rect<s32>(360, 30, 570, 50), false, true, wReplay);
+	stReplayInfo = env->addStaticText(L"", rect<s32>(360, 60, 570, 350), false, true, wReplay);
 	//replay save
 	wReplaySave = env->addWindow(rect<s32>(510, 200, 820, 320), false, dataManager.GetSysString(1340));
 	wReplaySave->getCloseButton()->setVisible(false);
@@ -491,11 +492,11 @@ void Game::MainLoop() {
 		if(waitFrame >= 0) {
 			waitFrame++;
 			if(waitFrame % 90 == 0) {
-				stHintMsg->setText(dataManager.GetSysString(1350));
+				stHintMsg->setText(dataManager.GetSysString(1390));
 			} else if(waitFrame % 90 == 30) {
-				stHintMsg->setText(dataManager.GetSysString(1351));
+				stHintMsg->setText(dataManager.GetSysString(1391));
 			} else if(waitFrame % 90 == 60) {
-				stHintMsg->setText(dataManager.GetSysString(1352));
+				stHintMsg->setText(dataManager.GetSysString(1392));
 			}
 		}
 		driver->endScene();
@@ -756,6 +757,15 @@ void Game::CloseDuelWindow() {
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
+	wReplayControl->setVisible(false);
+	stHintMsg->setVisible(false);
+	ClearTextures();
+}
+int Game::LocalPlayer(int player) {
+	return dInfo.isFirst ? player : 1 - player;
+}
+const wchar_t* Game::LocalName(int local_player) {
+	return local_player == 0 ? dInfo.hostname : dInfo.clientname;
 }
 
 }

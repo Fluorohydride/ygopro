@@ -40,11 +40,6 @@ public:
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
 	
-	bool is_replaying;
-	bool is_pausing;
-	bool is_paused;
-	bool is_swaping;
-	
 	int selected_option;
 	ClientCard* attacker;
 	ClientCard* attack_target;
