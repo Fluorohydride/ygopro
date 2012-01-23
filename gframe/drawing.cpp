@@ -522,6 +522,68 @@ void Game::DrawSpec() {
 				showcard = 0;
 			break;
 		}
+		case 101: {
+			const wchar_t* lstr;
+			switch(showcardcode) {
+			case 1:
+				lstr = L"You Win!";
+				break;
+			case 2:
+				lstr = L"You Lose!";
+				break;
+			case 3:
+				lstr = L"Draw Game";
+				break;
+			case 4:
+				lstr = L"Draw Phase";
+				break;
+			case 5:
+				lstr = L"Standby Phase";
+				break;
+			case 6:
+				lstr = L"Main Phase 1";
+				break;
+			case 7:
+				lstr = L"Battle Phase";
+				break;
+			case 8:
+				lstr = L"Main Phase 2";
+				break;
+			case 9:
+				lstr = L"End Phase";
+				break;
+			case 10:
+				lstr = L"Next Players Turn";
+				break;
+			case 11:
+				lstr = L"Duel Start";
+				break;
+			case 12:
+				lstr = L"Duel1 Start";
+				break;
+			case 13:
+				lstr = L"Duel2 Start";
+				break;
+			case 14:
+				lstr = L"Duel3 Start";
+				break;
+			}
+			auto pos = lpcFont->getDimension(lstr);
+			if(showcardp < 10) {
+				int alpha = (showcardp * 25) << 24;
+				lpcFont->draw(lstr, recti(671 - pos.Width / 2 - (9 - showcardp) * 40, 271, 970, 350), alpha);
+				lpcFont->draw(lstr, recti(670 - pos.Width / 2 - (9 - showcardp) * 40, 270, 970, 350), alpha | 0xffffff);
+			} else if(showcardp < showcarddif) {
+				lpcFont->draw(lstr, recti(671 - pos.Width / 2, 271, 970, 350), 0xff000000);
+				lpcFont->draw(lstr, recti(670 - pos.Width / 2, 270, 970, 350), 0xffffffff);
+			} else if(showcardp < showcarddif + 10) {
+				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;
+				lpcFont->draw(lstr, recti(671 - pos.Width / 2 + (showcardp - showcarddif) * 40, 271, 970, 350), alpha);
+				lpcFont->draw(lstr, recti(670 - pos.Width / 2 + (showcardp - showcarddif) * 40, 270, 970, 350), alpha | 0xffffff);
+			}
+			showcardp++;
+			break;
+		}
 		}
 	}
 	if(is_attacking) {

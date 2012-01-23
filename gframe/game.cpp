@@ -108,7 +108,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
-	cbMatchMode->addItem(dataManager.GetSysString(1245));
+	//cbMatchMode->addItem(dataManager.GetSysString(1245));
 	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 150, 360, 170), wCreateHost, -1, dataManager.GetSysString(1236));
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 180, 170, 200), wCreateHost, -1, dataManager.GetSysString(1229));

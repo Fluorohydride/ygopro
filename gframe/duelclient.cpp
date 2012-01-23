@@ -505,31 +505,16 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_WIN: {
 		int player = BufferIO::ReadInt8(pbuf);
 		int type = BufferIO::ReadInt8(pbuf);
+		mainGame->showcarddif = 110;
+		mainGame->showcard = 101;
+		mainGame->showcardp = 0;
 		if(player == 2)
-			myswprintf(textBuffer, L"Draw Game.\n(%ls)", dataManager.GetVictoryString(type));
+			mainGame->showcardcode = 3;
 		else if(mainGame->LocalPlayer(player) == 0) {
-			if(!mainGame->dInfo.isReplay) {
-				if(type == 1 || type == 2)
-					myswprintf(textBuffer, L"You Win！\n(%ls%ls)", mainGame->LocalName(1), dataManager.GetVictoryString(type));
-				else myswprintf(textBuffer, L"You Win！\n(%ls)", dataManager.GetVictoryString(type));
-			} else {
-				if(type == 1 || type == 2)
-					myswprintf(textBuffer, L"%ls Win！\n(%ls%ls)", mainGame->LocalName(0), mainGame->LocalName(1), dataManager.GetVictoryString(type));
-				else myswprintf(textBuffer, L"%ls Win！\n(%ls)", mainGame->LocalName(0), dataManager.GetVictoryString(type));
-			}
+			mainGame->showcardcode = 1;
 		} else {
-			if(!mainGame->dInfo.isReplay) {
-				if(type == 1 || type == 2)
-					myswprintf(textBuffer, L"You Lose！\n(%ls%ls)", mainGame->LocalName(0), dataManager.GetVictoryString(type));
-				else myswprintf(textBuffer, L"You Lose！\n(%ls)", dataManager.GetVictoryString(type));
-			} else {
-				if(type == 1 || type == 2)
-					myswprintf(textBuffer, L"%ls Win！\n(%ls%ls)", mainGame->LocalName(1), mainGame->LocalName(0), dataManager.GetVictoryString(type));
-				else myswprintf(textBuffer, L"%ls Win！\n(%ls)", mainGame->LocalName(1), dataManager.GetVictoryString(type));
-			}
+			mainGame->showcardcode = 2;
 		}
-		mainGame->stACMessage->setText(textBuffer);
-		mainGame->PopupElement(mainGame->wACMessage, 100);
 		mainGame->WaitFrameSignal(120);
 		break;
 	}
@@ -542,6 +527,12 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		return true;
 	}
 	case MSG_START: {
+		mainGame->showcardcode = 11;
+		mainGame->showcarddif = 30;
+		mainGame->showcardp = 0;
+		mainGame->showcard = 101;
+		mainGame->WaitFrameSignal(40);
+		mainGame->showcard = 0;
 		mainGame->gMutex.Lock();
 		int playertype = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
@@ -1269,7 +1260,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->WaitFrameSignal(5);
-		if(player == 1) {
+		if(player == 1 && !mainGame->dInfo.isReplay) {
 			bool flip = false;
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 				if((*cit)->code) {
@@ -1290,7 +1281,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			(*cit)->is_hovered = false;
 			(*cit)->aniFrame = 5;
 		}
-		mainGame->WaitFrameSignal(20);
+		mainGame->WaitFrameSignal(10);
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 			(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
@@ -1365,12 +1356,12 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dInfo.turn++;
 		myswprintf(mainGame->dInfo.strTurn, L"Turn:%d", mainGame->dInfo.turn);
-		myswprintf(textBuffer, L"%ls的回合", mainGame->LocalName(player));
-		mainGame->gMutex.Lock();
-		mainGame->stACMessage->setText(textBuffer);
-		mainGame->PopupElement(mainGame->wACMessage, 20);
-		mainGame->gMutex.Unlock();
+		mainGame->showcardcode = 10;
+		mainGame->showcarddif = 30;
+		mainGame->showcardp = 0;
+		mainGame->showcard = 101;
 		mainGame->WaitFrameSignal(40);
+		mainGame->showcard = 0;
 		return true;
 	}
 	case MSG_NEW_PHASE: {
@@ -1382,42 +1373,44 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
+		mainGame->gMutex.Unlock();
+		mainGame->showcarddif = 30;
+		mainGame->showcardp = 0;
 		switch (phase) {
 		case PHASE_DRAW:
 			mainGame->btnDP->setVisible(true);
-			myswprintf(textBuffer, L"进入【抽卡阶段】");
+			mainGame->showcardcode = 4;
 			break;
 		case PHASE_STANDBY:
 			mainGame->btnSP->setVisible(true);
-			myswprintf(textBuffer, L"进入【准备阶段】");
+			mainGame->showcardcode = 5;
 			break;
 		case PHASE_MAIN1:
 			mainGame->btnM1->setVisible(true);
-			myswprintf(textBuffer, L"进入【主要阶段１】");
+			mainGame->showcardcode = 6;
 			break;
 		case PHASE_BATTLE:
 			mainGame->btnBP->setVisible(true);
 			mainGame->btnBP->setPressed(true);
 			mainGame->btnBP->setEnabled(false);
-			myswprintf(textBuffer, L"进入【战斗阶段】");
+			mainGame->showcardcode = 7;
 			break;
 		case PHASE_MAIN2:
 			mainGame->btnM2->setVisible(true);
 			mainGame->btnM2->setPressed(true);
 			mainGame->btnM2->setEnabled(false);
-			myswprintf(textBuffer, L"进入【主要阶段２】");
+			mainGame->showcardcode = 8;
 			break;
 		case PHASE_END:
 			mainGame->btnEP->setVisible(true);
 			mainGame->btnEP->setPressed(true);
 			mainGame->btnEP->setEnabled(false);
-			myswprintf(textBuffer, L"进入【结束阶段】");
+			mainGame->showcardcode = 9;
 			break;
 		}
-		mainGame->stACMessage->setText(textBuffer);
-		mainGame->PopupElement(mainGame->wACMessage, 20);
-		mainGame->gMutex.Unlock();
+		mainGame->showcard = 101;
 		mainGame->WaitFrameSignal(40);
+		mainGame->showcard = 0;
 		return true;
 	}
 	case MSG_MOVE: {
@@ -1466,6 +1459,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 					pcard->counters.clear();
 				if(cl != pl)
 					pcard->ClearTarget();
+				pcard->is_showequip = false;
+				pcard->is_showtarget = false;
 				mainGame->gMutex.Lock();
 				mainGame->dField.RemoveCard(pc, pl, ps);
 				pcard->position = cp;
@@ -1584,7 +1579,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		if (code != 0 && pcard->code != code)
 			pcard->SetCode(code);
 		pcard->position = cp;
-		myswprintf(event_string, L"卡片改变了表示形式");
+		myswprintf(event_string, dataManager.GetSysString(1600));
 		mainGame->dField.MoveCard(pcard, 10);
 		mainGame->WaitFrameSignal(10);
 		return true;
@@ -1595,7 +1590,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int cl = BufferIO::ReadInt8(pbuf);
 		int cs = BufferIO::ReadInt8(pbuf);
 		int cp = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, L"放置了卡片");
+		myswprintf(event_string, dataManager.GetSysString(1601));
 		return true;
 	}
 	case MSG_SWAP: {
@@ -1609,7 +1604,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int l2 = BufferIO::ReadInt8(pbuf);
 		int s2 = BufferIO::ReadInt8(pbuf);
 		int p2 = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, L"卡的控制权改变了");
+		myswprintf(event_string, dataManager.GetSysString(1602));
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
 		mainGame->gMutex.Lock();
@@ -1640,7 +1635,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int cl = BufferIO::ReadInt8(pbuf);
 		int cs = BufferIO::ReadInt8(pbuf);
 		int cp = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, L"[%ls]召唤中...", dataManager.GetName(code));
+		myswprintf(event_string, dataManager.GetSysString(1603), dataManager.GetName(code));
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 0;
 		mainGame->showcard = 4;
@@ -1650,7 +1645,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SUMMONED: {
-		myswprintf(event_string, L"怪兽召唤成功");
+		myswprintf(event_string, dataManager.GetSysString(1604));
 		return true;
 	}
 	case MSG_SPSUMMONING: {
@@ -1659,7 +1654,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int cl = BufferIO::ReadInt8(pbuf);
 		int cs = BufferIO::ReadInt8(pbuf);
 		int cp = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, L"[%ls]特殊召唤中...", dataManager.GetName(code));
+		myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 1;
 		mainGame->showcard = 5;
@@ -1669,7 +1664,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		return true;
 	}
 	case MSG_SPSUMMONED: {
-		myswprintf(event_string, L"怪兽特殊召唤成功");
+		myswprintf(event_string, dataManager.GetSysString(1606));
 		return true;
 	}
 	case MSG_FLIPSUMMONING: {
@@ -1681,7 +1676,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
 		pcard->SetCode(code);
 		pcard->position = cp;
-		myswprintf(event_string, L"[%ls]反转召唤中...", dataManager.GetName(code));
+		myswprintf(event_string, dataManager.GetSysString(1607), dataManager.GetName(code));
 		mainGame->dField.MoveCard(pcard, 10);
 		mainGame->WaitFrameSignal(10);
 		mainGame->showcardcode = code;
@@ -1693,7 +1688,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		return true;
 	}
 	case MSG_FLIPSUMMONED: {
-		myswprintf(event_string, L"怪兽反转召唤成功");
+		myswprintf(event_string, dataManager.GetSysString(1608));
 		return true;
 	}
 	case MSG_CHAINING: {
@@ -1740,7 +1735,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	}
 	case MSG_CHAINED: {
 		int ct = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, L"[%ls]的效果发动", dataManager.GetName(mainGame->dField.current_chain.code));
+		myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 		mainGame->gMutex.Lock();
 		mainGame->dField.chains.push_back(mainGame->dField.current_chain);
 		mainGame->gMutex.Unlock();
@@ -1824,7 +1819,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				}
 			} else
 				mainGame->WaitFrameSignal(30);
-			myswprintf(textBuffer, L"[%ls](%ls,%d)成为对象", dataManager.GetName(pcard->code), dataManager.FormatLocation(l), s);
+			myswprintf(textBuffer, dataManager.GetSysString(1610), dataManager.GetName(pcard->code), dataManager.FormatLocation(l), s);
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(pcard->code);
 			pcard->is_highlighting = false;
@@ -1848,8 +1843,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->WaitFrameSignal(5);
 		}
 		if (player == 0)
-			myswprintf(event_string, L"我方抽了%d张卡", count);
-		else myswprintf(event_string, L"对手抽了%d张卡", count);
+			myswprintf(event_string, dataManager.GetSysString(1611), count);
+		else myswprintf(event_string, dataManager.GetSysString(1612), count);
 		return true;
 	}
 	case MSG_DAMAGE: {
@@ -1860,9 +1855,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			final = 0;
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		if (player == 0)
-			myswprintf(event_string, L"我方受到%d伤害", val);
+			myswprintf(event_string, dataManager.GetSysString(1613), val);
 		else
-			myswprintf(event_string, L"对方受到%d伤害", val);
+			myswprintf(event_string, dataManager.GetSysString(1614), val);
 		mainGame->lpccolor = 0xffff0000;
 		mainGame->lpplayer = player;
 		myswprintf(textBuffer, L"-%d", val);
@@ -1883,9 +1878,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int final = mainGame->dInfo.lp[player] + val;
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		if (player == 0)
-			myswprintf(event_string, L"我方回复%dLP", val);
+			myswprintf(event_string, dataManager.GetSysString(1615), val);
 		else
-			myswprintf(event_string, L"对方回复%dLP", val);
+			myswprintf(event_string, dataManager.GetSysString(1616), val);
 		mainGame->lpccolor = 0xff00ff00;
 		mainGame->lpplayer = player;
 		myswprintf(textBuffer, L"+%d", val);
@@ -2023,7 +2018,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		if (pc->counters.count(type))
 			pc->counters[type] += count;
 		else pc->counters[type] = count;
-		myswprintf(textBuffer, L"[%ls]放置了%d个[%ls]", dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
+		myswprintf(textBuffer, dataManager.GetSysString(1617), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
 		pc->is_highlighting = true;
 		mainGame->gMutex.Lock();
 		mainGame->stACMessage->setText(textBuffer);
@@ -2043,7 +2038,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		pc->counters[type] -= count;
 		if (pc->counters[type] <= 0)
 			pc->counters.erase(type);
-		myswprintf(textBuffer, L"[%ls]移除了%d个[%ls]", dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
+		myswprintf(textBuffer, dataManager.GetSysString(1618), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
 		pc->is_highlighting = true;
 		mainGame->gMutex.Lock();
 		mainGame->stACMessage->setText(textBuffer);
@@ -2066,7 +2061,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		float sy;
 		if (ld != 0) {
 			mainGame->dField.attack_target = mainGame->dField.GetCard(cd, ld, sd);
-			myswprintf(event_string, L"[%ls]攻击[%ls]", dataManager.GetName(mainGame->dField.attacker->code),
+			myswprintf(event_string, dataManager.GetSysString(1619), dataManager.GetName(mainGame->dField.attacker->code),
 			           dataManager.GetName(mainGame->dField.attack_target->code));
 			float xa = mainGame->dField.attacker->curPos.X;
 			float ya = mainGame->dField.attacker->curPos.Y;
@@ -2079,7 +2074,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			else
 				mainGame->atk_r = vector3df(0, 0, 3.1415926 - atan((xd - xa) / (yd - ya)));
 		} else {
-			myswprintf(event_string, L"[%ls]直接攻击", dataManager.GetName(mainGame->dField.attacker->code));
+			myswprintf(event_string, dataManager.GetSysString(1620), dataManager.GetName(mainGame->dField.attacker->code));
 			float xa = mainGame->dField.attacker->curPos.X;
 			float ya = mainGame->dField.attacker->curPos.Y;
 			float xd = 3.95f;
@@ -2116,7 +2111,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		return true;
 	}
 	case MSG_ATTACK_DISABLED: {
-		myswprintf(event_string, L"攻击被无效", dataManager.GetName(mainGame->dField.attacker->code));
+		myswprintf(event_string, dataManager.GetSysString(1621), dataManager.GetName(mainGame->dField.attacker->code));
 		return true;
 	}
 	case MSG_DAMAGE_STEP_START: {
@@ -2128,7 +2123,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_MISSED_EFFECT: {
 		BufferIO::ReadInt32(pbuf);
 		int code = BufferIO::ReadInt32(pbuf);
-		myswprintf(textBuffer, L"[%ls]错过时点", dataManager.GetName(code));
+		myswprintf(textBuffer, dataManager.GetSysString(1622), dataManager.GetName(code));
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(code);
 		return true;
@@ -2136,12 +2131,15 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_TOSS_COIN: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
-		textBuffer[0] = 0;
-		wcscat(textBuffer, L"投掷硬币结果：");
+		wchar_t* pwbuf = textBuffer;
+		BufferIO::CopyWStrRef(dataManager.GetSysString(1623), pwbuf, 256);
 		for (int i = 0; i < count; ++i) {
 			int res = BufferIO::ReadInt8(pbuf);
-			wcscat(textBuffer, res ? L"[正面]" : L"[反面]");
+			*pwbuf++ = L'[';
+			BufferIO::CopyWStrRef(dataManager.GetSysString(res ? 60 : 61), pwbuf, 256);
+			*pwbuf++ = L']';
 		}
+		*pwbuf = 0;
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(0);
 		mainGame->stACMessage->setText(textBuffer);
@@ -2152,16 +2150,15 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_TOSS_DICE: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
-		textBuffer[0] = 0;
-		wcscat(textBuffer, L"投掷骰子结果：");
-		wchar_t* p = &textBuffer[7];
+		wchar_t* pwbuf = textBuffer;
+		BufferIO::CopyWStrRef(dataManager.GetSysString(1624), pwbuf, 256);
 		for (int i = 0; i < count; ++i) {
 			int res = BufferIO::ReadInt8(pbuf);
-			*p++ = L'[';
-			*p++ = L'0' + res;
-			*p++ = L']';
+			*pwbuf++ = L'[';
+			*pwbuf++ = L'0' + res;
+			*pwbuf++ = L']';
 		}
-		*p = 0;
+		*pwbuf = 0;
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(0);
 		mainGame->stACMessage->setText(textBuffer);

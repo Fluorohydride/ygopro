@@ -265,7 +265,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					}
 					}
-					mainGame->wCardSelect->setText(L"请选择要发动效果的卡：");
+					mainGame->wCardSelect->setText(dataManager.GetSysString(566));
 					list_command = COMMAND_ACTIVATE;
 					ShowSelectCard();
 				}
@@ -321,7 +321,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					}
 					list_command = COMMAND_SPSUMMON;
-					mainGame->wCardSelect->setText(L"请选择要特殊召唤的怪兽：");
+					mainGame->wCardSelect->setText(dataManager.GetSysString(509));
 					ShowSelectCard();
 				}
 				break;
@@ -386,28 +386,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
 					for(int i = 0; i < pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
-					myswprintf(formatBuffer, L"查看叠放卡：(%d)", pcard->overlayed.size());
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_GRAVE: {
 					for(int i = grave[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[command_controler][i]);
-					myswprintf(formatBuffer, L"查看墓地：(%d)", grave[command_controler].size());
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_REMOVED: {
 					for(int i = remove[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[command_controler][i]);
-					myswprintf(formatBuffer, L"查看除外：(%d)", remove[command_controler].size());
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_EXTRA: {
 					for(int i = extra[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[command_controler][i]);
-					myswprintf(formatBuffer, L"查看额外：(%d)", extra[command_controler].size());
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
@@ -966,7 +966,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					} else {
 						select_ready = true;
 						if(mainGame->dInfo.curMsg == MSG_SELECT_TRIBUTE) {
-							mainGame->stQMessage->setText(L"当前所选的卡已满足选择条件\n是否要继续选择？");
+							wchar_t wbuf[256], *pwbuf = wbuf;
+							BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
+							*pwbuf++ = L'\n';
+							BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
+							mainGame->stQMessage->setText(wbuf);
 							mainGame->PopupElement(mainGame->wQuery);
 						}
 					}
@@ -990,7 +994,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::SetResponseB(respbuf, selectable_cards.size());
 					mainGame->localAction.Set();
 				} else {
-					myswprintf(formatBuffer, L"请移除%d个[%ls]:", select_counter_count, dataManager.GetCounterName(select_counter_type));
+					myswprintf(formatBuffer, dataManager.GetSysString(204), select_counter_count, dataManager.GetCounterName(select_counter_type));
 					mainGame->stHintMsg->setText(formatBuffer);
 				}
 				break;
@@ -1015,7 +1019,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->localAction.Set();
 					} else {
 						select_ready = true;
-						mainGame->stQMessage->setText(L"当前所选的卡已选择条件\n是否要继续选择？");
+						wchar_t wbuf[256], *pwbuf = wbuf;
+						BufferIO::CopyWStrRef(dataManager.GetSysString(209), pwbuf, 256);
+						*pwbuf++ = L'\n';
+						BufferIO::CopyWStrRef(dataManager.GetSysString(210), pwbuf, 256);
+						mainGame->stQMessage->setText(wbuf);
 						mainGame->PopupElement(mainGame->wQuery);
 					}
 				} else
@@ -1206,7 +1214,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									}
 								}
 								if(mcard->turnCounter && (mcard->location & LOCATION_ONFIELD)) {
-									myswprintf(formatBuffer, L"\n回合计数：%d", mcard->turnCounter);
+									myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->turnCounter);
 									str.append(formatBuffer);
 								}
 							} else {
@@ -1223,7 +1231,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									}
 								}
 								if(mcard->turnCounter && (mcard->location & LOCATION_ONFIELD)) {
-									myswprintf(formatBuffer, L"\n回合计数：%d", mcard->turnCounter);
+									myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->turnCounter);
 									str.append(formatBuffer);
 								}
 							}

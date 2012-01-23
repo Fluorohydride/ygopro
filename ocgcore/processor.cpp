@@ -2571,6 +2571,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		}
 		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+			reset_phase(PHASE_DAMAGE);
 			if(core.attacker->fieldid == afid) {
 				if(!atk_disabled) {
 					if(core.attack_target)
