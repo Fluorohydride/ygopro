@@ -759,6 +759,8 @@ void Game::CloseDuelWindow() {
 	wQuery->setVisible(false);
 	wReplayControl->setVisible(false);
 	stHintMsg->setVisible(false);
+	lstLog->clear();
+	logParam.clear();
 	ClearTextures();
 }
 int Game::LocalPlayer(int player) {

@@ -512,18 +512,19 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 100: {
-			driver->draw2DImage(imageManager.tHand[(showcardcode >> 16) & 0x3], position2di(615, showcarddif));
-			driver->draw2DImage(imageManager.tHand[showcardcode & 0x3], position2di(615, 540 - showcarddif));
-			float dy = -0.333333f * showcardp + 10;
-			showcardp++;
-			if(showcardp < 30)
-				showcarddif += (int)dy;
-			if(showcardp > 60)
+			if(showcardp < 60) {
+				driver->draw2DImage(imageManager.tHand[(showcardcode >> 16) & 0x3], position2di(615, showcarddif));
+				driver->draw2DImage(imageManager.tHand[showcardcode & 0x3], position2di(615, 540 - showcarddif));
+				float dy = -0.333333f * showcardp + 10;
+				showcardp++;
+				if(showcardp < 30)
+					showcarddif += (int)dy;
+			} else
 				showcard = 0;
 			break;
 		}
 		case 101: {
-			const wchar_t* lstr;
+			const wchar_t* lstr = L"";
 			switch(showcardcode) {
 			case 1:
 				lstr = L"You Win!";

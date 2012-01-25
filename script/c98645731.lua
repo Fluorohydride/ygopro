@@ -38,8 +38,9 @@ function c98645731.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(p,3)
 	local g=Duel.GetDecktopGroup(p,3)
 	if g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(p,1,1,nil)
-		if sg:GetFirst():IsAbleToHand() then 
+		if sg:GetFirst():IsAbleToHand() then
 			Duel.SendtoHand(sg,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-p,sg)
 			Duel.ShuffleHand(p)

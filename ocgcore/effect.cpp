@@ -10,7 +10,6 @@
 #include "duel.h"
 #include "group.h"
 #include "interpreter.h"
-#include <iostream>
 
 bool effect_sort_id(const effect* e1, const effect* e2) {
 	return e1->id < e2->id;

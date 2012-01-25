@@ -1244,7 +1244,10 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	}
 	case 2: {
 		if(core.current_chain.size()) {
-			core.chain_limit = 0;
+			if(core.chain_limit) {
+				luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+				core.chain_limit = 0;
+			}
 			chain_array::iterator cait;
 			for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
@@ -1711,7 +1714,10 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 9: {
-		core.chain_limit = 0;
+		if(core.chain_limit) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+			core.chain_limit = 0;
+		}
 		if(core.current_chain.size()) {
 			chain_array::iterator cait;
 			for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
@@ -1719,7 +1725,10 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_new, 0);
 		} else {
 			core.used_event.splice(core.used_event.end(), core.point_event);
-			core.chain_limit_p = 0;
+			if(core.chain_limit_p) {
+				luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit_p);
+				core.chain_limit_p = 0;
+			}
 			reset_chain();
 		}
 		return TRUE;
@@ -2228,7 +2237,10 @@ int32 field::process_idle_command(uint16 step) {
 		return TRUE;
 	}
 	case 2: {
-		core.chain_limit = 0;
+		if(core.chain_limit) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+			core.chain_limit = 0;
+		}
 		chain_array::iterator cait;
 		for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 			cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
@@ -2279,10 +2291,12 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 10: {
 		//end announce
-		core.chain_limit = 0;
+		if(core.chain_limit) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+			core.chain_limit = 0;
+		}
 		if(core.current_chain.size()) {
-			chain_array::iterator cait;
-			for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
+			for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
 			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, FALSE, 0);
 			core.units.begin()->step = -1;
@@ -2346,31 +2360,33 @@ int32 field::process_battle_command(uint16 step) {
 		core.attackable_cards.clear();
 		card_vector first_attack;
 		card_vector must_attack;
-		for(uint32 i = 0; i < 5; ++i) {
-			pcard = player[infos.turn_player].list_mzone[i];
-			if(!pcard)
-				continue;
-			if(!pcard->is_capable_attack_announce(infos.turn_player))
-				continue;
-			core.select_cards.clear();
-			get_attack_target(pcard, &core.select_cards);
-			if(core.select_cards.size() == 0 && pcard->operation_param == 0)
-				continue;
-			core.attackable_cards.push_back(pcard);
-			if(pcard->is_affected_by_effect(EFFECT_FIRST_ATTACK)) {
-				if(first_attack.size()) {
-					first_attack.clear();
-					must_attack.clear();
-					core.attackable_cards.clear();
-					break;
-				} else {
-					core.attackable_cards.clear();
-					core.attackable_cards.push_back(pcard);
-					first_attack.push_back(pcard);
+		if(!is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_ATTACK_ANNOUNCE)) {
+			for(uint32 i = 0; i < 5; ++i) {
+				pcard = player[infos.turn_player].list_mzone[i];
+				if(!pcard)
+					continue;
+				if(!pcard->is_capable_attack_announce(infos.turn_player))
+					continue;
+				core.select_cards.clear();
+				get_attack_target(pcard, &core.select_cards);
+				if(core.select_cards.size() == 0 && pcard->operation_param == 0)
+					continue;
+				core.attackable_cards.push_back(pcard);
+				if(pcard->is_affected_by_effect(EFFECT_FIRST_ATTACK)) {
+					if(first_attack.size()) {
+						first_attack.clear();
+						must_attack.clear();
+						core.attackable_cards.clear();
+						break;
+					} else {
+						core.attackable_cards.clear();
+						core.attackable_cards.push_back(pcard);
+						first_attack.push_back(pcard);
+					}
 				}
+				if(pcard->is_affected_by_effect(EFFECT_MUST_ATTACK))
+					must_attack.push_back(pcard);
 			}
-			if(pcard->is_affected_by_effect(EFFECT_MUST_ATTACK))
-				must_attack.push_back(pcard);
 		}
 		core.to_m2 = TRUE;
 		core.to_ep = TRUE;
@@ -2440,9 +2456,11 @@ int32 field::process_battle_command(uint16 step) {
 		return TRUE;
 	}
 	case 2: {
-		core.chain_limit = 0;
-		chain_array::iterator cait;
-		for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
+		if(core.chain_limit) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+			core.chain_limit = 0;
+		}
+		for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 			cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
 		add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, FALSE, 0);
 		core.units.begin()->step = -1;
@@ -2492,7 +2510,7 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.units.begin()->arg2) {
 			if(core.select_cards.size() == 1)
 				returns.bvalue[1] = 0;
-			else 
+			else
 				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			core.units.begin()->step = 5;
 			return FALSE;
@@ -3536,7 +3554,10 @@ int32 field::add_chain(uint16 step) {
 		pduel->write_buffer32(peffect->description);
 		pduel->write_buffer8(core.current_chain.size() + 1);
 		break_effect();
-		core.chain_limit = 0;
+		if(core.chain_limit) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+			core.chain_limit = 0;
+		}
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))
 			clit->flag |= CHAIN_DISABLE_EFFECT;
 		clit->chain_type = peffect->handler->get_type();
@@ -3810,7 +3831,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		adjust_all();
 		core.current_chain.pop_back();
 		if(!core.current_chain.size()) {
-			core.chain_limit = 0;
+			if(core.chain_limit) {
+				luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+				core.chain_limit = 0;
+			}
 			return FALSE;
 		}
 		core.units.begin()->step = -1;
@@ -3830,7 +3854,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	case 12: {
 		core.used_event.splice(core.used_event.end(), core.point_event);
 		pduel->write_buffer8(MSG_CHAIN_END);
-		core.chain_limit_p = 0;
+		if(core.chain_limit_p) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit_p);
+			core.chain_limit_p = 0;
+		}
 		reset_chain();
 		if(core.summoning_card || core.spsummoning_card) {
 			core.subunits.push_back(core.reserved);

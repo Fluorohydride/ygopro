@@ -633,7 +633,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_LISTBOX_CHANGED: {
 			switch(id) {
-
+			case LISTBOX_LOG: {
+				int sel = mainGame->lstLog->getSelected();
+				if(sel != -1 && mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+					mainGame->ShowCardInfo(mainGame->logParam[sel]);
+				}
+				break;
+			}
 			}
 			break;
 		}

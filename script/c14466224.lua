@@ -23,17 +23,20 @@ function c14466224.initial_effect(c)
 	e2:SetOperation(c14466224.eqop)
 	c:RegisterEffect(e2)
 end
+function c14466224.gfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
+end
 function c14466224.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_MZONE,0,2,nil)
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c14466224.gfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
 function c14466224.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g1=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_MZONE,0,2,2,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,Card.IsAbleToRemoveAsCost,tp,LOCATION_GRAVE,0,1,1,nil)
+	local g2=Duel.SelectMatchingCard(tp,c14466224.gfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	g1:Merge(g2)
 	Duel.Remove(g1,POS_FACEUP,REASON_COST)
 end

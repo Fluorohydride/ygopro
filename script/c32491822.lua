@@ -34,6 +34,7 @@ function c32491822.initial_effect(c)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e4:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e4:SetCondition(c32491822.atcon)
 	e4:SetTarget(c32491822.atlimit)
 	e4:SetValue(1)
 	c:RegisterEffect(e4)
@@ -78,6 +79,9 @@ end
 function c32491822.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
+end
+function c32491822.atcon(e)
+	return e:GetHandler():IsDefence()
 end
 function c32491822.atlimit(e,c)
 	return c~=e:GetHandler()

@@ -172,31 +172,25 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnJoinCancel->setEnabled(true);
 			mainGame->gMutex.Lock();
 			if(pkt->code == 0)
-				mainGame->wMessage->setText(dataManager.GetSysString(1403));
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1403));
 			else if(pkt->code == 1)
-				mainGame->wMessage->setText(dataManager.GetSysString(1404));
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1404));
 			else if(pkt->code == 2)
-				mainGame->wMessage->setText(dataManager.GetSysString(1405));
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1405));
 			mainGame->gMutex.Unlock();
-			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
 			event_base_loopbreak(client_base);
 			break;
 		}
 		case ERRMSG_DECKERROR: {
 			mainGame->gMutex.Lock();
 			if(pkt->code == 1)
-				mainGame->wMessage->setText(dataManager.GetSysString(1406));
+				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
 			else {
 				wchar_t msgbuf[64];
 				myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(pkt->code));
-				mainGame->wMessage->setText(msgbuf);
+				mainGame->env->addMessageBox(L"", msgbuf);
 			}
 			mainGame->gMutex.Unlock();
-			mainGame->PopupElement(mainGame->wMessage);
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
 			break;
 		}
 		}
@@ -1231,7 +1225,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			mainGame->gMutex.Lock();
 			mainGame->dField.selectable_cards = panel_confirm;
-			mainGame->dField.ShowSelectCard();
+			mainGame->dField.ShowSelectCard(true);
 			mainGame->gMutex.Unlock();
 			mainGame->localAction.Reset();
 			mainGame->localAction.Wait();
