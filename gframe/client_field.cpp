@@ -771,14 +771,14 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		if (pcard->overlayTarget->controler == 0) {
 			t->X = 1.75f + 1.1f * oseq - 0.08f + 0.04f * sequence;
 			t->Y = 1.15f;
-			t->Z = 0.005f;
+			t->Z = 0.005f + pcard->sequence * 0.0001f;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 0.0f;
 		} else {
 			t->X = 6.15f - 1.1f * oseq + 0.08f - 0.04f * sequence;
 			t->Y = -1.15f;
-			t->Z = 0.005f;
+			t->Z = 0.005f + pcard->sequence * 0.0001f;
 			r->X = 0.0f;
 			r->Y = 0.0f;
 			r->Z = 3.1415926f;

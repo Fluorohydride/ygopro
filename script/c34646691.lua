@@ -23,7 +23,7 @@ function c34646691.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c34646691.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,eg,eg:GetCount(),0,0)
 end

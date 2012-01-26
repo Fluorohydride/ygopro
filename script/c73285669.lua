@@ -1,12 +1,12 @@
 --Gladiator Beast Essedarii
-function c73285660.initial_effect(c)
+function c73285669.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c73285660.splimit)
+	e1:SetValue(c73285669.splimit)
 	c:RegisterEffect(e1)
 	--special summon rule
 	local e2=Effect.CreateEffect(c)
@@ -14,27 +14,27 @@ function c73285660.initial_effect(c)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_EXTRA)
-	e2:SetCondition(c73285660.sprcon)
-	e2:SetOperation(c73285660.sprop)
+	e2:SetCondition(c73285669.sprcon)
+	e2:SetOperation(c73285669.sprop)
 	c:RegisterEffect(e2)
 end
-function c73285660.splimit(e,se,sp,st)
+function c73285669.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
-function c73285660.spfilter(c)
+function c73285669.spfilter(c)
 	local tpe=c:GetOriginalType()
 	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and
 		((bit.band(tpe,TYPE_FUSION)>0 and c:IsAbleToExtraAsCost()) or 
 		(bit.band(tpe,TYPE_FUSION)==0 and c:IsAbleToDeckAsCost()))
 end
-function c73285660.sprcon(e,c)
+function c73285669.sprcon(e,c)
 	if c==nil then return true end 
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(c73285660.spfilter,tp,LOCATION_MZONE,0,2,nil)
+	return Duel.IsExistingMatchingCard(c73285669.spfilter,tp,LOCATION_MZONE,0,2,nil)
 end
-function c73285660.sprop(e,tp,eg,ep,ev,re,r,rp,c)
+function c73285669.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c73285660.spfilter,tp,LOCATION_MZONE,0,2,2,nil)
+	local g=Duel.SelectMatchingCard(tp,c73285669.spfilter,tp,LOCATION_MZONE,0,2,2,nil)
 	local tc=g:GetFirst()
 	while tc do
 		if not tc:IsFaceup() then Duel.ConfirmCards(1-tp,tc) end

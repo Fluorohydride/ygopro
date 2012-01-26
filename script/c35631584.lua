@@ -19,7 +19,7 @@ function c35631584.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c35631584.gfilter(c,tp)
-	return c:IsSetCard(0x53) and c:IsType(TYPE_XYZ)
+	return c:IsSetCard(0x53) and c:IsType(TYPE_XYZ) and c:IsControler(tp)
 end
 function c35631584.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(35631584)==0 and eg:IsExists(c35631584.gfilter,1,nil,tp)

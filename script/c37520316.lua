@@ -28,7 +28,7 @@ function c37520316.activate(e,tp,eg,ep,ev,re,r,rp)
 			return
 		end
 		local e1=Effect.CreateEffect(c)
-		local reset=RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END
+		local reset=RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UNRELEASEABLE_SUM)
 		e1:SetReset(reset)

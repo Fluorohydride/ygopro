@@ -1174,19 +1174,20 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			myswprintf(textBuffer, L"%d[%ls]", i, dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
-			if (l & 0x40) {
-				float shift = -0.15f;
-				if (c == 0 && l == 0x40) shift = 0.15f;
-				pcard->dPos = irr::core::vector3df(shift, 0, 0);
-				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
-				pcard->is_moving = true;
-				pcard->aniFrame = 5;
-				mainGame->WaitFrameSignal(45);
-				mainGame->dField.MoveCard(pcard, 5);
-				mainGame->WaitFrameSignal(5);
-			} else if(l & 0x1)
-				panel_confirm.push_back(pcard);
-			else
+			if (l & 0x41) {
+				if(count <= 3) {
+					float shift = -0.15f;
+					if (c == 0 && l == 0x40) shift = 0.15f;
+					pcard->dPos = irr::core::vector3df(shift, 0, 0);
+					pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+					pcard->is_moving = true;
+					pcard->aniFrame = 5;
+					mainGame->WaitFrameSignal(45);
+					mainGame->dField.MoveCard(pcard, 5);
+					mainGame->WaitFrameSignal(5);
+				} else
+					panel_confirm.push_back(pcard);
+			} else
 				field_confirm.push_back(pcard);
 		}
 		if (field_confirm.size() > 0) {

@@ -3044,6 +3044,7 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 17: {
 		infos.phase = PHASE_DAMAGE;
+		core.hint_timing[infos.turn_player] = 0;
 		core.chain_attack = FALSE;
 		if(core.attack_target) {
 			core.attacker->battled_cards[core.attack_target->fieldid] = core.attack_target;

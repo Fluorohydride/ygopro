@@ -22,7 +22,7 @@ function c93830681.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
-function c93830681.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c93830681.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=Duel.GetAttacker()
 	if chkc then return chkc==tg end
 	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e) end
