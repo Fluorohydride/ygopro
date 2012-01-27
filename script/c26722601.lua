@@ -18,18 +18,10 @@ function c26722601.sumop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 		e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-		e1:SetCondition(c26722601.escon)
-		e1:SetValue(c26722601.esop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_EXTRA_SET_COUNT)
 		c:RegisterEffect(e2)
 	end
-end
-function c26722601.escon(e)
-	return Duel.GetFlagEffect(e:GetOwnerPlayer(),26722601)==0
-end
-function c26722601.esop(e,c)
-	Duel.RegisterFlagEffect(e:GetOwnerPlayer(),26722601,RESET_PHASE+PHASE_END,0,1)
 end

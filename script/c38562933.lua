@@ -12,17 +12,19 @@ function c38562933.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c38562933.descon(e,tp,eg,ep,ev,re,r,rp)
-	local d=Duel.GetAttackTarget()
 	local c=e:GetHandler()
-	return c==Duel.GetAttacker() and d and d:IsFaceup() and d:GetDefence()<=c:GetAttack()
+	local d=Duel.GetAttackTarget()
+	if d==c then d=Duel.GetAttacker() end
+	e:SetLabelObject(d)
+	return d and d:IsFaceup() and d:GetDefence()<=c:GetAttack()
 end
 function c38562933.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetAttackTarget(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetLabelObject(),1,0,0)
 end
 function c38562933.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local d=Duel.GetAttackTarget()
+	local d=e:GetLabelObject()
 	if c:IsFaceup() and c:IsRelateToEffect(e) and d:IsRelateToBattle() and d:GetDefence()<=c:GetAttack() then
 		Duel.Destroy(d,REASON_EFFECT)
 	end

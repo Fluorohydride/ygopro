@@ -24,17 +24,9 @@ function c13455953.sumop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e1:SetCondition(c13455953.escon)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x42))
-	e1:SetValue(c13455953.esop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	e:GetHandler():RegisterEffect(e1)
-end
-function c13455953.escon(e)
-	return Duel.GetFlagEffect(Duel.GetTurnPlayer(),13455953)==0
-end
-function c13455953.esop(e,c)
-	Duel.RegisterFlagEffect(c:GetControler(),13455953,RESET_PHASE+PHASE_END,0,1)
 end
 function c13455953.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

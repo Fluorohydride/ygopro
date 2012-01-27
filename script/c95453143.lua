@@ -6,7 +6,6 @@ function c95453143.initial_effect(c)
 	--copy
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(95453143,0))
-	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
@@ -25,8 +24,7 @@ function c95453143.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c95453143.filter(c)
-	local lv=c:GetLevel()
-	return lv>0 and lv<=6 and c:IsType(TYPE_EFFECT) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
+	return c:IsLevelBelow(6) and c:IsType(TYPE_EFFECT) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()
 end
 function c95453143.cost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(c95453143.filter,tp,LOCATION_GRAVE,0,1,nil) end

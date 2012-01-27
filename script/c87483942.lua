@@ -1,4 +1,4 @@
---スノーマンイーター
+--渋い忍者
 function c87483942.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -56,7 +56,7 @@ function c87483942.excon(e)
 	return Duel.IsExistingMatchingCard(c87483942.exfilter,c:GetControler(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function c87483942.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN) then return true end
+	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
 	return not Duel.IsExistingMatchingCard(c87483942.exfilter,tgp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function c87483942.descon(e)

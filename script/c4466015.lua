@@ -25,7 +25,7 @@ function c4466015.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local ct=tc:GetCounter(0x9)
 	if ct>0 then
-		tc:RemoveCounter(tp,0x9,ct,REASON_COST)
+		tc:RemoveCounter(tp,0x9,ct,REASON_EFFECT)
 		Duel.Damage(1-tp,ct*700,REASON_EFFECT)
 	end
 end

@@ -2105,7 +2105,7 @@ int32 scriptlib::duel_get_xyz_material(lua_State *L) {
 	card* scard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = scard->pduel;
 	group* pgroup = pduel->new_group();
-	pduel->game_field->get_exceed_material(scard, &pgroup->container);
+	pduel->game_field->get_xyz_material(scard, &pgroup->container);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }

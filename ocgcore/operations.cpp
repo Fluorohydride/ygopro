@@ -1027,12 +1027,12 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		core.temp_var[0] = 0;
 		if(!ignore_count) {
 			returns.ivalue[0] = FALSE;
-			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
+			effect* pextra = core.extra_summon[sumplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-				if(core.summon_count[sumplayer] < get_summon_count_limit(sumplayer))
-					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
-				else
+//				if(core.summon_count[sumplayer] < get_summon_count_limit(sumplayer))
+//					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
+//				else
 					returns.ivalue[0] = TRUE;
 			}
 		} else
@@ -1043,6 +1043,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		if(!returns.ivalue[0])
 			core.summon_count[sumplayer]++;
 		else if(core.temp_var[0]) {
+			core.extra_summon[sumplayer] = TRUE;
 			effect* pextra = (effect*)core.temp_var[0];
 			pextra->get_value(target);
 		}
@@ -1384,12 +1385,12 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 	case 5: {
 		if(!ignore_count) {
 			returns.ivalue[0] = FALSE;
-			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
+			effect* pextra = core.extra_summon[setplayer]? 0: target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-				if(core.summon_count[setplayer] < get_summon_count_limit(setplayer))
-					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
-				else
+//				if(core.summon_count[setplayer] < get_summon_count_limit(setplayer))
+//					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
+//				else
 					returns.ivalue[0] = TRUE;
 			}
 		} else
@@ -1400,13 +1401,12 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		if(!returns.ivalue[0])
 			core.summon_count[setplayer]++;
 		else if(core.temp_var[0]) {
+			core.extra_summon[setplayer] = TRUE;
 			effect* pextra = (effect*)core.temp_var[0];
 			pextra->get_value(target);
 		}
 		target->enable_field_effect(FALSE);
 		move_to_field(target, setplayer, setplayer, LOCATION_MZONE, POS_FACEDOWN_DEFENCE);
-		if(!ignore_count)
-			core.summon_count[setplayer]++;
 		return FALSE;
 	}
 	case 7: {

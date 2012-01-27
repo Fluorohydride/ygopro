@@ -221,6 +221,7 @@ struct processor {
 	uint8 attack_cancelable;
 	int32 battle_damage[2];
 	int32 summon_count[2];
+	uint8 extra_summon[2];
 	int32 spe_effect[2];
 	int32 duel_options;
 	uint32 copy_reset;
@@ -309,7 +310,7 @@ public:
 	int32 get_draw_count(uint8 playerid);
 	void get_ritual_material(uint8 playerid, card_set* material);
 	void ritual_release(card_set* material);
-	void get_exceed_material(card* scard, card_set* material);
+	void get_xyz_material(card* scard, card_set* material);
 	void get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset);
 	int32 get_overlay_count(uint8 self, uint8 s, uint8 o);
 	void update_disable_check_list(effect* peffect);

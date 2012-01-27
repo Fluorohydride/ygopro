@@ -976,7 +976,7 @@ void field::ritual_release(card_set* material) {
 	release(&rel, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player);
 	send_to(&rem, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player, PLAYER_NONE, LOCATION_REMOVED, 0, POS_FACEUP);
 }
-void field::get_exceed_material(card* scard, card_set* material) {
+void field::get_xyz_material(card* scard, card_set* material) {
 	card* pcard = 0;
 	int32 playerid = scard->current.controler;
 	for(int i = 0; i < 5; ++i) {

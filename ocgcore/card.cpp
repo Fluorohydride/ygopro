@@ -1404,7 +1404,7 @@ int32 card::is_summonable(effect* peffect) {
 int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffect) {
 	if(!is_summonable())
 		return FALSE;
-	if(!ignore_count && !is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT)
+	if(!ignore_count && (pduel->game_field->core.extra_summon[playerid] || !is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT))
 	        && pduel->game_field->core.summon_count[playerid] >= pduel->game_field->get_summon_count_limit(playerid))
 		return FALSE;
 	pduel->game_field->save_lp_cost();
@@ -1611,7 +1611,7 @@ int32 card::is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_MSET))
 		return FALSE;
-	if(!ignore_count && !is_affected_by_effect(EFFECT_EXTRA_SET_COUNT)
+	if(!ignore_count && (pduel->game_field->core.extra_summon[playerid] || !is_affected_by_effect(EFFECT_EXTRA_SET_COUNT))
 	        && pduel->game_field->core.summon_count[playerid] >= pduel->game_field->get_summon_count_limit(playerid))
 		return FALSE;
 	pduel->game_field->save_lp_cost();

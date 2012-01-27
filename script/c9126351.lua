@@ -73,19 +73,11 @@ function c9126351.exop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,0)
 	e1:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e1:SetCondition(c9126351.escon)
 	e1:SetTarget(c9126351.estg)
-	e1:SetValue(c9126351.esop)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	Duel.RegisterFlagEffect(tp,9126352,RESET_PHASE+PHASE_END,0,1)
 end
-function c9126351.escon(e)
-	return Duel.GetFlagEffect(e:GetOwnerPlayer(),9126351)==0
-end
 function c9126351.estg(e,c)
 	return c:IsSetCard(0x12) and c:GetCode()~=9126351
-end
-function c9126351.esop(e,c)
-	Duel.RegisterFlagEffect(c:GetControler(),9126351,RESET_PHASE+PHASE_END,0,1)
 end

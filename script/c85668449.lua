@@ -12,7 +12,6 @@ function c85668449.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_HAND+LOCATION_MZONE,LOCATION_HAND+LOCATION_MZONE)
 	e2:SetCode(EFFECT_EXTRA_SUMMON_COUNT)
-	e2:SetCondition(c85668449.escon)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_PSYCHO))
 	e2:SetValue(c85668449.esop)
 	c:RegisterEffect(e2)
@@ -38,11 +37,7 @@ function c85668449.initial_effect(c)
 	e5:SetLabelObject(e4)
 	c:RegisterEffect(e5)
 end
-function c85668449.escon(e)
-	return Duel.GetFlagEffect(Duel.GetTurnPlayer(),85668449)==0
-end
 function c85668449.esop(e,c)
-	Duel.RegisterFlagEffect(c:GetControler(),85668449,RESET_PHASE+PHASE_END,0,1)
 	e:GetHandler():AddCounter(0x3004,1)
 end
 function c85668449.lrcon(e,tp,eg,ep,ev,re,r,rp)

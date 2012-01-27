@@ -69,7 +69,7 @@ function c26082117.excon(e)
 	return Duel.IsExistingMatchingCard(c26082117.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
 end
 function c26082117.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN) then return true end
+	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
 	return not Duel.IsExistingMatchingCard(c26082117.exfilter,tgp,LOCATION_ONFIELD,0,1,nil)
 end
 function c26082117.descon(e)

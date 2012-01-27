@@ -3319,13 +3319,13 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.spsummoned_cards_pt[p].clear();
 			core.flipsummoned_cards_pt[p].clear();
 			core.attack_state[p] = 0;
+			core.summon_count[p] = 0;
+			core.extra_summon[p] = 0;
 		}
 		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
 			if(!((*rit)->flag & EFFECT_FLAG_NO_TURN_RESET))
 				(*rit)->recharge();
 		infos.turn_id++;
-		core.summon_count[0] = 0;
-		core.summon_count[1] = 0;
 		infos.turn_player = turn_player;
 		pduel->write_buffer8(MSG_NEW_TURN);
 		pduel->write_buffer8(turn_player);
