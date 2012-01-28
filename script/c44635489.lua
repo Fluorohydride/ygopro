@@ -32,14 +32,15 @@ function c44635489.spcon(e,c)
 		and	Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE,nil)>0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-function c44635489.filter(c)
-	return c:IsSetCard(0x53) and c:GetLevel()~=0
-		and ((c:IsLocation(LOCATION_MZONE) and c:IsFaceup()) or (c:IsLocation(LOCATION_GRAVE) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)))
+function c44635489.filter(c,clv)
+	local lv=c:GetLevel()
+	return c:IsSetCard(0x53) and lv~=0 and lv~=clv
+		and ((c:IsLocation(LOCATION_MZONE) and c:IsFaceup()) or c:IsLocation(LOCATION_GRAVE))
 end
 function c44635489.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and c44635489.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c44635489.filter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,e:GetHandler()) end
-	Duel.SelectTarget(tp,c44635489.filter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,e:GetHandler())
+	if chk==0 then return Duel.IsExistingTarget(c44635489.filter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,e:GetHandler(),e:GetHandler():GetLevel()) end
+	Duel.SelectTarget(tp,c44635489.filter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,e:GetHandler(),e:GetHandler():GetLevel())
 end
 function c44635489.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

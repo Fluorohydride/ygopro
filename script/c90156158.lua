@@ -22,7 +22,7 @@ function c90156158.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c90156158.filter(c)
-	return c:IsSetCard(0x53) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x53) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c90156158.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c90156158.filter(chkc) end

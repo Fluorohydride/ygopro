@@ -59,6 +59,7 @@ function c40101111.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rec=0
 	if c==a then rec=d:GetAttack()
 	else rec=a:GetAttack() end
+	if rec<0 then rec=0 end
 	Duel.SetTargetParam(rec)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec)
 end

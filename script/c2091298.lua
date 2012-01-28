@@ -1,7 +1,7 @@
 --セイクリッド・ビーハイブ
 function c2091298.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c26329679.xyzfilter,2)
+	aux.AddXyzProcedure(c,c2091298.xyzfilter,2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)

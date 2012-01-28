@@ -26,7 +26,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_HAND1:
 			case BUTTON_HAND2:
 			case BUTTON_HAND3: {
-				mainGame->HideElement(mainGame->wHand);
+				mainGame->wHand->setVisible(false);
 				mainGame->stHintMsg->setText(L"");
 				mainGame->stHintMsg->setVisible(true);
 				CTOS_HandResult cshr;

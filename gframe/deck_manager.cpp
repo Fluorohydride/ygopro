@@ -82,7 +82,7 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 		return 1;
 	for(int i = 0; i < deck.main.size(); ++i) {
 		code_pointer cit = deck.main[i];
-		if((!allow_ocg && (cit->second.ot & 0x1)) || (!allow_ocg && (cit->second.ot & 0x2)))
+		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
 			return cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
@@ -93,7 +93,7 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 	}
 	for(int i = 0; i < deck.extra.size(); ++i) {
 		code_pointer cit = deck.extra[i];
-		if((!allow_ocg && (cit->second.ot & 0x1)) || (!allow_ocg && (cit->second.ot & 0x2)))
+		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
 			return cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;
@@ -104,7 +104,7 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 	}
 	for(int i = 0; i < deck.side.size(); ++i) {
 		code_pointer cit = deck.side[i];
-		if((!allow_ocg && (cit->second.ot & 0x1)) || (!allow_ocg && (cit->second.ot & 0x2)))
+		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
 			return cit->first;
 		int code = cit->second.alias ? cit->second.alias : cit->first;
 		ccount[code]++;

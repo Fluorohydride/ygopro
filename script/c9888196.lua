@@ -102,7 +102,9 @@ function c9888196.hdop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(sg,REASON_EFFECT)
 		local tc=sg:GetFirst()
 		while tc do
-			atk=atk+tc:GetAttack()
+			local tatk=tc:GetAttack()
+			if tatk<0 then tatk=0 end
+			atk=atk+tatk
 			tc=sg:GetNext()
 		end
 		Duel.BreakEffect()

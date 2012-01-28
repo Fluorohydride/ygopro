@@ -197,7 +197,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_SELECT_HAND: {
-		mainGame->ShowElement(mainGame->wHand);
+		mainGame->wHand->setVisible(true);
 		break;
 	}
 	case STOC_SELECT_TP: {

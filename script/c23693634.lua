@@ -24,7 +24,7 @@ function c23693634.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c23693634.atkval(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,nil,RACE_WARRIOR)*100
+	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE,LOCATION_GRAVE,nil,RACE_WARRIOR)*100
 end
 function c23693634.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetLocation()==LOCATION_GRAVE
