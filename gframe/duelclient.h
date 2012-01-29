@@ -2,6 +2,7 @@
 #define DUELCLIENT_H
 
 #include "config.h"
+#include <vector>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -62,6 +63,15 @@ public:
 		memcpy(p, buffer, len);
 		bufferevent_write(client_bev, duel_client_write, len + 3);
 	}
+	
+protected:
+	static bool is_refreshing;
+	static event* resp_event;
+public:
+	static std::vector<HostInfo> hosts;
+	static void BeginRefreshHost();
+	static int RefreshThread(void* arg);
+	static void BroadcastReply(evutil_socket_t fd, short events, void* arg);
 };
 
 }

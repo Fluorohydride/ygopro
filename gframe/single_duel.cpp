@@ -112,6 +112,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 	if(dp == host_player) {
 		NetServer::StopServer();
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
+		observers.erase(dp);
 		if(!pduel) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
@@ -369,7 +370,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 18);
 	startbuf[1] = 1;
 	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 18);
-	if(swapped)
+	if(!swapped)
 		startbuf[1] = 0x10;
 	else startbuf[1] = 0x11;
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1126,7 +1127,7 @@ void SingleDuel::WaitforResponse(int playerid) {
 	last_response = playerid;
 	players[playerid]->state = CTOS_RESPONSE;
 	unsigned char msg = MSG_WAITING;
-	NetServer::SendPacketToPlayer(players[1-playerid], STOC_GAME_MSG, msg);
+	NetServer::SendPacketToPlayer(players[1 - playerid], STOC_GAME_MSG, msg);
 }
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	char query_buffer[0x1000];

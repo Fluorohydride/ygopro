@@ -12,7 +12,7 @@ function c4335427.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_CANNOT_DISABLE_SUMMON)
+	e2:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	c:RegisterEffect(e2)
 	--cannot special summon

@@ -155,6 +155,7 @@ public:
 	irr::gui::IGUIWindow* wLanWindow;
 	irr::gui::IGUIEditBox* ebNickName;
 	irr::gui::IGUIListBox* lstHostList;
+	irr::gui::IGUIButton* btnLanRefresh;
 	irr::gui::IGUIEditBox* ebJoinIP;
 	irr::gui::IGUIEditBox* ebJoinPort;
 	irr::gui::IGUIEditBox* ebJoinPass;
@@ -335,6 +336,7 @@ extern Game* mainGame;
 #define BUTTON_CREATE_HOST			113
 #define BUTTON_HOST_CONFIRM			114
 #define BUTTON_HOST_CANCEL			115
+#define BUTTON_LAN_REFRESH			116
 #define BUTTON_HS_DUELIST			120
 #define BUTTON_HS_OBSERVER			121
 #define BUTTON_HS_START				122

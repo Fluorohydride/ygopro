@@ -13,7 +13,9 @@ namespace ygo {
 class NetServer {
 private:
 	static std::unordered_map<bufferevent*, DuelPlayer> users;
+	static unsigned short server_port;
 	static event_base* net_evbase;
+	static event* broadcast_ev;
 	static evconnlistener* listener;
 	static DuelMode* duel_mode;
 	static char net_server_read[0x2000];
@@ -21,8 +23,11 @@ private:
 	static unsigned short last_sent;
 public:
 	static bool StartServer(unsigned short port);
+	static bool StartBroadcast();
 	static void StopServer();
+	static void StopBroadcast();
 	static void StopListen();
+	static void BroadcastEvent(evutil_socket_t fd, short events, void* arg);
 	static void ServerAccept(evconnlistener* listener, evutil_socket_t fd, sockaddr* address, int socklen, void* ctx);
 	static void ServerAcceptError(evconnlistener *listener, void* ctx);
 	static void ServerEchoRead(bufferevent* bev, void* ctx);

@@ -25,7 +25,6 @@ struct HostInfo {
 struct HostPacket {
 	unsigned short identifier;
 	unsigned short version;
-	unsigned int address;
 	unsigned short port;
 	HostInfo host;
 };

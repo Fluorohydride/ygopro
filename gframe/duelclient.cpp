@@ -23,6 +23,10 @@ int DuelClient::select_hint = 0;
 wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
 
+bool DuelClient::is_refreshing = false;
+std::vector<HostInfo> DuelClient::hosts;
+event* DuelClient::resp_event = 0;
+
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
 	if(connect_state)
 		return false;
@@ -254,7 +258,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->gMutex.Unlock();
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->ShowElement(mainGame->wHostSingle);
 		mainGame->WaitFrameSignal(10);
 		break;
@@ -2275,5 +2279,84 @@ void DuelClient::SetResponseB(unsigned char* respB, unsigned char len) {
 void DuelClient::SendResponse() {
 	SendBufferToServer(CTOS_RESPONSE, response_buf, response_len);
 }
-
+void DuelClient::BeginRefreshHost() {
+	if(is_refreshing)
+		return;
+	is_refreshing = true;
+	mainGame->gMutex.Lock();
+	mainGame->lstHostList->clear();
+	hosts.clear();
+	event_base* broadev = event_base_new();
+	char hname[256];
+	gethostname(hname, 256);
+	hostent* host = gethostbyname(hname);
+	if(!host)
+		return;
+	SOCKET reply = socket(AF_INET, SOCK_DGRAM, 0);
+	sockaddr_in reply_addr;
+	memset(&reply_addr, 0, sizeof(reply_addr));
+	reply_addr.sin_family = AF_INET;
+	reply_addr.sin_port = htons(7921);
+	reply_addr.sin_addr.s_addr = 0;
+	if(bind(reply, (sockaddr*)&reply_addr, sizeof(reply_addr)) == SOCKET_ERROR) {
+		closesocket(reply);
+		return;
+	}
+	timeval timeout = {5, 0};
+	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
+	event_add(resp_event, &timeout);
+	//send request
+	SOCKADDR_IN local;
+	local.sin_family = AF_INET;
+	local.sin_port = htons(7922);
+	SOCKADDR_IN sockTo;
+	sockTo.sin_addr.s_addr = htonl(INADDR_BROADCAST);
+	sockTo.sin_family = AF_INET;
+	sockTo.sin_port = htons(7920);
+	HostRequest hReq;
+	hReq.identifier = NETWORK_CLIENT_ID;
+	for(int i = 0; i < 8; ++i) {
+		if(host->h_addr_list[i] == 0)
+			break;
+		int local_addr = *(unsigned int*)host->h_addr_list[i];
+		local.sin_addr.s_addr = local_addr;
+		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+		if(sSend == INVALID_SOCKET)
+			break;
+		BOOL opt = TRUE;
+		setsockopt(sSend, SOL_SOCKET, SO_BROADCAST, (const char*)&opt, sizeof(BOOL));
+		if(bind(sSend, (sockaddr*)&local, sizeof(sockaddr)) == SOCKET_ERROR) {
+			closesocket(sSend);
+			break;
+		}
+		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
+		closesocket(sSend);
+	}
+	Thread::NewThread(RefreshThread, broadev);
+}
+int DuelClient::RefreshThread(void* arg) {
+	event_base* broadev = (event_base*)arg;
+	event_base_dispatch(broadev);
+	evutil_socket_t fd;
+	event_get_assignment(resp_event, 0, &fd, 0, 0, 0);
+	evutil_closesocket(fd);
+	event_free(resp_event);
+	event_base_free(broadev);
+	is_refreshing = false;
+}
+void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
+	if(events & EV_TIMEOUT) {
+		event_base_loopbreak((event_base*)arg);
+	} else if(events & EV_READ) {
+		sockaddr_in bc_addr;
+		int sz = sizeof(sockaddr_in);
+		char buf[256];
+		int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
+		HostPacket* pHP = (HostPacket*)buf;
+		if(pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION) {
+			mainGame->gMutex.Lock();
+			mainGame->gMutex.Unlock();
+		}
+	}
+}
 }

@@ -51,6 +51,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wMainMenu);
 				break;
 			}
+			case BUTTON_LAN_REFRESH: {
+				break;
+			}
 			case BUTTON_CREATE_HOST: {
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
@@ -154,7 +157,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wDeckEdit->setVisible(true);
 				mainGame->wFilter->setVisible(true);
-				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;;
+				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
 				mainGame->cbDBLFList->setSelected(0);
 				mainGame->cbCardType->setSelected(0);
 				mainGame->cbCardType2->setSelected(0);

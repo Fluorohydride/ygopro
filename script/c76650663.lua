@@ -14,10 +14,11 @@ function c76650663.condition(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	if a==c then a=Duel.GetAttackTarget() end
 	e:SetLabelObject(a)
-	return a and a:IsAttribute(ATTRIBUTE_LIGHT)
+	return a and a:IsAttribute(ATTRIBUTE_LIGHT) and a:IsRelateToBattle()
 end
 function c76650663.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
+	if tc:IsFacedown() or not tc:IsRelateToBattle() then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DISABLE)

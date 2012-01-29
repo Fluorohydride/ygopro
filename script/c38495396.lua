@@ -34,7 +34,7 @@ function c38495396.xyzcon(e,c)
 	if c==nil then return true end
 	if Duel.IsExistingMatchingCard(c38495396.ovfilter,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
 	local g=Duel.GetXyzMaterial(c)
-	return g:IsExists(c38495396.xyzfilter,3,nil)
+	return g:IsExists(c38495396.xyzfilter,2,nil)
 end
 function c38495396.xyzop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.GetXyzMaterial(c)
