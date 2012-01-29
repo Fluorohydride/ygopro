@@ -52,6 +52,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LAN_REFRESH: {
+				DuelClient::BeginRefreshHost();
 				break;
 			}
 			case BUTTON_CREATE_HOST: {
@@ -187,6 +188,19 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_LISTBOX_CHANGED: {
 			switch(id) {
+			case LISTBOX_LAN_HOST: {
+				int sel = mainGame->lstHostList->getSelected();
+				if(sel == -1)
+					break;
+				int addr = DuelClient::hosts[sel].ipaddr;
+				int port = DuelClient::hosts[sel].port;
+				wchar_t buf[20];
+				myswprintf(buf, L"%d.%d.%d.%d", addr & 0xff, (addr >> 8) & 0xff, (addr >> 16) & 0xff, (addr >> 24) & 0xff);
+				mainGame->ebJoinIP->setText(buf);
+				myswprintf(buf, L"%d", port);
+				mainGame->ebJoinPort->setText(buf);
+				break;
+			}
 			case LISTBOX_REPLAY_LIST: {
 				break;
 			}

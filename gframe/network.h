@@ -26,6 +26,8 @@ struct HostPacket {
 	unsigned short identifier;
 	unsigned short version;
 	unsigned short port;
+	unsigned int ipaddr;
+	unsigned short name[20];
 	HostInfo host;
 };
 struct HostRequest {

@@ -195,7 +195,7 @@ void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(is_ready) {
 		bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
 		bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
-		int res = deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
+		int res = host_info.no_check_deck ? true : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
 		if(res) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
@@ -311,17 +311,19 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rnd.reset(seed);
 	last_replay.WriteData(players[0], 40, false);
 	last_replay.WriteData(players[1], 40, false);
-	for(int i = 0; i < pdeck[0].main.size(); ++i) {
-		int swap = rnd.real() * pdeck[0].main.size();
-		auto tmp = pdeck[0].main[i];
-		pdeck[0].main[i] = pdeck[0].main[swap];
-		pdeck[0].main[swap] = tmp;
-	}
-	for(int i = 0; i < pdeck[1].main.size(); ++i) {
-		int swap = rnd.real() * pdeck[1].main.size();
-		auto tmp = pdeck[1].main[i];
-		pdeck[1].main[i] = pdeck[1].main[swap];
-		pdeck[1].main[swap] = tmp;
+	if(!host_info.no_shuffle_deck) {
+		for(int i = 0; i < pdeck[0].main.size(); ++i) {
+			int swap = rnd.real() * pdeck[0].main.size();
+			auto tmp = pdeck[0].main[i];
+			pdeck[0].main[i] = pdeck[0].main[swap];
+			pdeck[0].main[swap] = tmp;
+		}
+		for(int i = 0; i < pdeck[1].main.size(); ++i) {
+			int swap = rnd.real() * pdeck[1].main.size();
+			auto tmp = pdeck[1].main[i];
+			pdeck[1].main[i] = pdeck[1].main[swap];
+			pdeck[1].main[swap] = tmp;
+		}
 	}
 	set_card_reader((card_reader)DataManager::CardReader);
 	set_message_handler((message_handler)SingleDuel::MessageHandler);

@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include <vector>
+#include <set>
 #include <event2/event.h>
 #include <event2/listener.h>
 #include <event2/bufferevent.h>
@@ -67,8 +68,9 @@ public:
 protected:
 	static bool is_refreshing;
 	static event* resp_event;
+	static std::set<int> remotes;
 public:
-	static std::vector<HostInfo> hosts;
+	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();
 	static int RefreshThread(void* arg);
 	static void BroadcastReply(evutil_socket_t fd, short events, void* arg);

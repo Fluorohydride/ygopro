@@ -24,7 +24,8 @@ wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
 
 bool DuelClient::is_refreshing = false;
-std::vector<HostInfo> DuelClient::hosts;
+std::vector<HostPacket> DuelClient::hosts;
+std::set<int> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
@@ -2283,8 +2284,8 @@ void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;
 	is_refreshing = true;
-	mainGame->gMutex.Lock();
 	mainGame->lstHostList->clear();
+	remotes.clear();
 	hosts.clear();
 	event_base* broadev = event_base_new();
 	char hname[256];
@@ -2292,7 +2293,7 @@ void DuelClient::BeginRefreshHost() {
 	hostent* host = gethostbyname(hname);
 	if(!host)
 		return;
-	SOCKET reply = socket(AF_INET, SOCK_DGRAM, 0);
+	SOCKET reply = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	sockaddr_in reply_addr;
 	memset(&reply_addr, 0, sizeof(reply_addr));
 	reply_addr.sin_family = AF_INET;
@@ -2305,6 +2306,7 @@ void DuelClient::BeginRefreshHost() {
 	timeval timeout = {5, 0};
 	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
+	Thread::NewThread(RefreshThread, broadev);
 	//send request
 	SOCKADDR_IN local;
 	local.sin_family = AF_INET;
@@ -2332,7 +2334,6 @@ void DuelClient::BeginRefreshHost() {
 		sendto(sSend, (const char*)&hReq, sizeof(HostRequest), 0, (sockaddr*)&sockTo, sizeof(sockaddr));
 		closesocket(sSend);
 	}
-	Thread::NewThread(RefreshThread, broadev);
 }
 int DuelClient::RefreshThread(void* arg) {
 	event_base* broadev = (event_base*)arg;
@@ -2352,9 +2353,30 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 		int sz = sizeof(sockaddr_in);
 		char buf[256];
 		int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
+		int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
-		if(pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION) {
+		if(pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
 			mainGame->gMutex.Lock();
+			remotes.insert(ipaddr);
+			pHP->ipaddr = ipaddr;
+			hosts.push_back(*pHP);
+			std::wstring hoststr;
+			hoststr.append(L"[");
+			hoststr.append(deckManager.GetLFListName(pHP->host.lflist));
+			hoststr.append(L"][");
+			hoststr.append(dataManager.GetSysString(pHP->host.rule + 1240));
+			hoststr.append(L"][");
+			hoststr.append(dataManager.GetSysString(pHP->host.mode + 1244));
+			hoststr.append(L"][");
+			if(pHP->host.draw_count == 1 && pHP->host.start_hand == 5 && pHP->host.start_lp == 8000
+			        && !pHP->host.no_check_deck && !pHP->host.no_shuffle_deck && ! pHP->host.enable_priority)
+				hoststr.append(dataManager.GetSysString(1280));
+			else hoststr.append(dataManager.GetSysString(1281));
+			hoststr.append(L"]");
+			wchar_t gamename[20];
+			BufferIO::CopyWStr(pHP->name, gamename, 20);
+			hoststr.append(gamename);
+			mainGame->lstHostList->addItem(hoststr.c_str());
 			mainGame->gMutex.Unlock();
 		}
 	}
