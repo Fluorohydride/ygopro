@@ -765,6 +765,8 @@ void Game::CloseDuelWindow() {
 	btnSideOK->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
+	lstHostList->clear();
+	DuelClient::hosts.clear();
 	ClearTextures();
 }
 int Game::LocalPlayer(int player) {

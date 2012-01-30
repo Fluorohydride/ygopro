@@ -433,12 +433,29 @@ void SingleDuel::Process() {
 			for(int i = 0; i < duel_count; ++i)
 				winc[match_result[i]]++;
 			if(winc[0] == 2 || (winc[0] == 1 && winc[2] == 2)) {
+				NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+				NetServer::ReSendToPlayer(players[1]);
+				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+					NetServer::ReSendToPlayer(*oit);
+				NetServer::StopServer();
 			} else if(winc[1] == 2 || (winc[1] == 1 && winc[2] == 2)) {
+				NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+				NetServer::ReSendToPlayer(players[1]);
+				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+					NetServer::ReSendToPlayer(*oit);
+				NetServer::StopServer();
 			} else if(winc[2] == 3 || (winc[0] == 1 && winc[1] == 1 && winc[2] == 1)) {
+				NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+				NetServer::ReSendToPlayer(players[1]);
+				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+					NetServer::ReSendToPlayer(*oit);
+				NetServer::StopServer();
 			} else {
 				if(players[0] != pplayer[0]) {
 					players[0] = pplayer[0];
 					players[1] = pplayer[1];
+					players[0]->type = 0;
+					players[1]->type = 1;
 					Deck d = pdeck[0];
 					pdeck[0] = pdeck[1];
 					pdeck[1] = d;

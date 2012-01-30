@@ -336,6 +336,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = true;
+		mainGame->dInfo.lp[0] = 0;
+		mainGame->dInfo.lp[1] = 0;
+		mainGame->dInfo.strLP[0][0] = 0;
+		mainGame->dInfo.strLP[1][0] = 0;
+		mainGame->dInfo.turn = 0;
 		mainGame->is_building = false;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
