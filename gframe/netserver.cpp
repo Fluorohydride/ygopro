@@ -205,9 +205,9 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 			return;
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
 		if(pkt->info.mode == MODE_SINGLE) {
-			duel_mode = new SingleDuel;
-		} else if(pkt->info.mode == MODE_SINGLE) {
-			duel_mode = new SingleDuel;
+			duel_mode = new SingleDuel(false);
+		} else if(pkt->info.mode == MODE_MATCH) {
+			duel_mode = new SingleDuel(true);
 		}
 		if(pkt->info.rule > 3)
 			pkt->info.rule = 0;

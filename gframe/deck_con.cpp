@@ -4,6 +4,7 @@
 #include "deck_manager.h"
 #include "image_manager.h"
 #include "game.h"
+#include "duelclient.h"
 #include <algorithm>
 
 namespace ygo {
@@ -282,6 +283,25 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wCategories);
 				break;
 			}
+			case BUTTON_SIDE_OK: {
+				if(deckManager.current_deck.main.size() != pre_mainc || deckManager.current_deck.extra.size() != pre_extrac
+				        || deckManager.current_deck.side.size() != pre_sidec) {
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1410));
+					break;
+				}
+				char deckbuf[1024];
+				char* pdeck = deckbuf;
+				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
+				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
+				for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
+				for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
+				for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
+				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
+				break;
+			}
 			}
 			break;
 		}
@@ -425,25 +445,87 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			if(!is_draging)
 				break;
 			is_draging = false;
-			if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)))
-				hovered_pos = 0;
-			if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 60) {
-				if(hovered_seq < deckManager.current_deck.main.size())
-					deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
-				else deckManager.current_deck.main.push_back(draging_pointer);
-			} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 15) {
-				if(hovered_seq < deckManager.current_deck.extra.size())
-					deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
-				else deckManager.current_deck.extra.push_back(draging_pointer);
-			} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 15) {
-				if(hovered_seq < deckManager.current_deck.side.size())
-					deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
-				else deckManager.current_deck.side.push_back(draging_pointer);
+			if(!mainGame->is_siding) {
+				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)))
+					hovered_pos = 0;
+				if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 60) {
+					if(hovered_seq < deckManager.current_deck.main.size() && hovered_pos)
+						deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
+					else deckManager.current_deck.main.push_back(draging_pointer);
+				} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 15) {
+					if(hovered_seq < deckManager.current_deck.extra.size() && hovered_pos)
+						deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
+					else deckManager.current_deck.extra.push_back(draging_pointer);
+				} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 15) {
+					if(hovered_seq < deckManager.current_deck.side.size() && hovered_pos)
+						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
+					else deckManager.current_deck.side.push_back(draging_pointer);
+				}
+			} else {
+				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040))
+				        || hovered_pos == 4) {
+					if(click_pos == 1)
+						deckManager.current_deck.main.push_back(draging_pointer);
+					else if(click_pos == 2)
+						deckManager.current_deck.extra.push_back(draging_pointer);
+					else if(click_pos == 3)
+						deckManager.current_deck.side.push_back(draging_pointer);
+					break;
+				}
+				if(hovered_pos == 1) {
+					if(click_pos == 1) {
+						if(hovered_seq < deckManager.current_deck.main.size())
+							deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
+						else deckManager.current_deck.main.push_back(draging_pointer);
+					} else if(hovered_seq < deckManager.current_deck.main.size()) {
+						deckManager.current_deck.side.push_back(deckManager.current_deck.main[hovered_seq]);
+						deckManager.current_deck.main[hovered_seq] = draging_pointer;
+					} else
+						deckManager.current_deck.side.push_back(draging_pointer);
+				} else if(hovered_pos == 2) {
+					if(click_pos == 2) {
+						if(hovered_seq < deckManager.current_deck.main.size())
+							deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
+						else deckManager.current_deck.extra.push_back(draging_pointer);
+					} else if(hovered_seq < deckManager.current_deck.extra.size()) {
+						deckManager.current_deck.side.push_back(deckManager.current_deck.extra[hovered_seq]);
+						deckManager.current_deck.extra[hovered_seq] = draging_pointer;
+					} else
+						deckManager.current_deck.side.push_back(draging_pointer);
+				} else if(hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) {
+					if(click_pos == 3) {
+						if(hovered_seq < deckManager.current_deck.side.size())
+							deckManager.current_deck.extra.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
+						else deckManager.current_deck.side.push_back(draging_pointer);
+					} else if(hovered_seq < deckManager.current_deck.side.size()) {
+						auto swaping_pointer = deckManager.current_deck.side[hovered_seq];
+						if(click_pos == 1) {
+							if(swaping_pointer->second.type & 0x802040)
+								deckManager.current_deck.main.push_back(draging_pointer);
+							else {
+								deckManager.current_deck.main.push_back(swaping_pointer);
+								deckManager.current_deck.side[hovered_seq] = draging_pointer;
+							}
+						} else {
+							if(!(swaping_pointer->second.type & 0x802040))
+								deckManager.current_deck.extra.push_back(draging_pointer);
+							else {
+								deckManager.current_deck.extra.push_back(swaping_pointer);
+								deckManager.current_deck.side[hovered_seq] = draging_pointer;
+							}
+						}
+					} else {
+						if(click_pos == 1)
+							deckManager.current_deck.main.push_back(draging_pointer);
+						else
+							deckManager.current_deck.extra.push_back(draging_pointer);
+					}
+				}
 			}
 			break;
 		}
 		case irr::EMIE_RMOUSE_LEFT_UP: {
-			if(mainGame->wCategories->isVisible())
+			if(mainGame->wCategories->isVisible() || mainGame->is_siding)
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;

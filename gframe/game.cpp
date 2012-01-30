@@ -109,7 +109,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1227), rect<s32>(20, 90, 220, 110), false, false, wCreateHost);
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
-	//cbMatchMode->addItem(dataManager.GetSysString(1245));
+	cbMatchMode->addItem(dataManager.GetSysString(1245));
 	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 150, 360, 170), wCreateHost, -1, dataManager.GetSysString(1236));
 	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
 	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 180, 170, 200), wCreateHost, -1, dataManager.GetSysString(1229));
@@ -351,6 +351,8 @@ bool Game::Initialize() {
 	btnClearDeck = env->addButton(rect<s32>(225, 95, 290, 116), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
 	btnSortDeck = env->addButton(rect<s32>(155, 95, 220, 116), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
 	btnDBExit = env->addButton(rect<s32>(10, 95, 90, 116), wDeckEdit, BUTTON_DBEXIT, dataManager.GetSysString(1306));
+	btnSideOK = env->addButton(rect<s32>(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334));
+	btnSideOK->setVisible(false);
 	//filters
 	wFilter = env->addStaticText(L"", rect<s32>(610, 8, 1020, 130), true, false, 0, -1, true);
 	wFilter->setVisible(false);
@@ -760,6 +762,7 @@ void Game::CloseDuelWindow() {
 	wQuery->setVisible(false);
 	wReplayControl->setVisible(false);
 	stHintMsg->setVisible(false);
+	btnSideOK->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
 	ClearTextures();

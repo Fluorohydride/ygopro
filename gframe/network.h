@@ -163,6 +163,8 @@ public:
 #define STOC_SELECT_TP		0x4
 #define STOC_HAND_RESULT	0x5
 #define STOC_TP_RESULT		0x6
+#define STOC_CHANGE_SIDE	0x7
+#define STOC_WAITING_SIDE	0x8
 #define STOC_CREATE_GAME	0x11
 #define STOC_JOIN_GAME		0x12
 #define STOC_TYPE_CHANGE	0x13
@@ -181,6 +183,7 @@ public:
 
 #define ERRMSG_JOINERROR	0x1
 #define ERRMSG_DECKERROR	0x2
+#define ERRMSG_SIDEERROR	0x3
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1

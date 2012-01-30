@@ -154,10 +154,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					deckManager.LoadDeck(mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->is_building = true;
+				mainGame->is_siding = false;
 				mainGame->wInfos->setVisible(true);
 				mainGame->wCardImg->setVisible(true);
 				mainGame->wDeckEdit->setVisible(true);
 				mainGame->wFilter->setVisible(true);
+				mainGame->btnSideOK->setVisible(false);
 				mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
 				mainGame->cbDBLFList->setSelected(0);
 				mainGame->cbCardType->setSelected(0);

@@ -108,7 +108,8 @@ public:
 	bool ignore_chain;
 
 	bool is_building;
-
+	bool is_siding;
+	
 	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
@@ -274,6 +275,7 @@ public:
 	irr::gui::IGUIButton* btnSaveDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
 	irr::gui::IGUIButton* btnDBExit;
+	irr::gui::IGUIButton* btnSideOK;
 	irr::gui::IGUIEditBox* ebDeckname;
 	//filter
 	irr::gui::IGUIStaticText* wFilter;
@@ -395,6 +397,7 @@ extern Game* mainGame;
 #define BUTTON_SAVE_DECK_AS			305
 #define BUTTON_DBEXIT				306
 #define BUTTON_SORT_DECK			307
+#define BUTTON_SIDE_OK				308
 #define COMBOBOX_MAINTYPE			310
 #define BUTTON_EFFECT_FILTER		311
 #define BUTTON_START_FILTER			312

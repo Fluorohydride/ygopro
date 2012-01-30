@@ -33,6 +33,9 @@ public:
 	bool is_draging;
 	int dragx;
 	int dragy;
+	int pre_mainc;
+	int pre_extrac;
+	int pre_sidec;
 	code_pointer draging_pointer;
 	
 	std::unordered_map<int, int>* filterList;

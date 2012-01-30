@@ -9,7 +9,7 @@ namespace ygo {
 
 class SingleDuel: public DuelMode {
 public:
-	SingleDuel();
+	SingleDuel(bool is_match);
 	virtual ~SingleDuel();
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater);
 	virtual void LeaveGame(DuelPlayer* dp);
@@ -38,12 +38,17 @@ public:
 	
 protected:
 	DuelPlayer* players[2];
+	DuelPlayer* pplayer[2];
 	bool ready[2];
 	Deck pdeck[2];
 	unsigned char hand_result[2];
 	unsigned char last_response;
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
+	bool match_mode;
+	unsigned char duel_count;
+	unsigned char tp_player;
+	unsigned char match_result[3];
 };
 
 }

@@ -117,7 +117,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
 				mainGame->gMutex.Unlock();
 			} else if(connect_state == 2) {
-				if(!mainGame->dInfo.isStarted) {
+				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
@@ -132,18 +132,14 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->gMutex.Unlock();
 				} else {
 					mainGame->gMutex.Lock();
-					mainGame->stMessage->setText(dataManager.GetSysString(1502));
+					mainGame->env->addMessageBox(L"", dataManager.GetSysString(1502));
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->gMutex.Unlock();
-					mainGame->PopupElement(mainGame->wMessage);
-					mainGame->localAction.Reset();
-					mainGame->localAction.Wait();
-					mainGame->gMutex.Lock();
 					mainGame->CloseDuelWindow();
 					mainGame->gMutex.Unlock();
 					mainGame->dInfo.isStarted = false;
+					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->ShowElement(mainGame->wLanWindow);
 				}
@@ -198,6 +194,12 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.Unlock();
 			break;
 		}
+		case ERRMSG_SIDEERROR: {
+			mainGame->gMutex.Lock();
+			mainGame->env->addMessageBox(L"", dataManager.GetSysString(1408));
+			mainGame->gMutex.Unlock();
+			break;
+		}
 		}
 		break;
 	}
@@ -220,6 +222,35 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		break;
 	}
 	case STOC_TP_RESULT: {
+		break;
+	}
+	case STOC_CHANGE_SIDE: {
+		mainGame->gMutex.Lock();
+		mainGame->dInfo.isStarted = false;
+		mainGame->dField.Clear();
+		mainGame->is_building = true;
+		mainGame->is_siding = true;
+		mainGame->wPhase->setVisible(false);
+		mainGame->wDeckEdit->setVisible(false);
+		mainGame->wFilter->setVisible(false);
+		mainGame->btnSideOK->setVisible(true);
+		mainGame->deckBuilder.result_string[0] = L'0';
+		mainGame->deckBuilder.result_string[1] = 0;
+		mainGame->deckBuilder.results.clear();
+		mainGame->deckBuilder.is_draging = false;
+		mainGame->deckBuilder.pre_mainc = deckManager.current_deck.main.size();
+		mainGame->deckBuilder.pre_extrac = deckManager.current_deck.extra.size();
+		mainGame->deckBuilder.pre_sidec = deckManager.current_deck.side.size();
+		mainGame->device->setEventReceiver(&mainGame->deckBuilder);
+		mainGame->gMutex.Unlock();
+		break;
+	}
+	case STOC_WAITING_SIDE: {
+		mainGame->gMutex.Lock();
+		mainGame->dField.Clear();
+		mainGame->stHintMsg->setText(dataManager.GetSysString(1409));
+		mainGame->stHintMsg->setVisible(true);
+		mainGame->gMutex.Unlock();
 		break;
 	}
 	case STOC_JOIN_GAME: {
@@ -252,6 +283,14 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(msgbuf);
 		}
 		mainGame->gMutex.Lock();
+		mainGame->deckBuilder.filterList = 0;
+		for(auto lit = deckManager._lfList.begin(); lit != deckManager._lfList.end(); ++lit)
+			if(lit->hash == pkt->info.lflist)
+				mainGame->deckBuilder.filterList = lit->content;
+		if(mainGame->deckBuilder.filterList == 0)
+			mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
+		mainGame->stHostSingleDuelist[0]->setText(L"");
+		mainGame->stHostSingleDuelist[1]->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostSingleRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		if(mainGame->wCreateHost->isVisible())
@@ -297,9 +336,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->dField.Clear();
 		mainGame->dInfo.isStarted = true;
+		mainGame->is_building = false;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
 		mainGame->wPhase->setVisible(true);
+		mainGame->btnSideOK->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(selftype != 1) {
 			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.hostname, 20);
