@@ -462,70 +462,54 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					else deckManager.current_deck.side.push_back(draging_pointer);
 				}
 			} else {
-				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040))
-				        || hovered_pos == 4) {
-					if(click_pos == 1)
-						deckManager.current_deck.main.push_back(draging_pointer);
-					else if(click_pos == 2)
-						deckManager.current_deck.extra.push_back(draging_pointer);
-					else if(click_pos == 3)
-						deckManager.current_deck.side.push_back(draging_pointer);
-					break;
-				}
-				if(hovered_pos == 1) {
-					if(click_pos == 1) {
-						if(hovered_seq < deckManager.current_deck.main.size())
-							deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
-						else deckManager.current_deck.main.push_back(draging_pointer);
-					} else if(hovered_seq < deckManager.current_deck.main.size()) {
-						deckManager.current_deck.side.push_back(deckManager.current_deck.main[hovered_seq]);
-						deckManager.current_deck.main[hovered_seq] = draging_pointer;
-					} else
-						deckManager.current_deck.side.push_back(draging_pointer);
-				} else if(hovered_pos == 2) {
-					if(click_pos == 2) {
-						if(hovered_seq < deckManager.current_deck.main.size())
-							deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
-						else deckManager.current_deck.extra.push_back(draging_pointer);
-					} else if(hovered_seq < deckManager.current_deck.extra.size()) {
-						deckManager.current_deck.side.push_back(deckManager.current_deck.extra[hovered_seq]);
-						deckManager.current_deck.extra[hovered_seq] = draging_pointer;
-					} else
-						deckManager.current_deck.side.push_back(draging_pointer);
-				} else if(hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) {
-					if(click_pos == 3) {
-						if(hovered_seq < deckManager.current_deck.side.size())
-							deckManager.current_deck.extra.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
-						else deckManager.current_deck.side.push_back(draging_pointer);
-					} else if(hovered_seq < deckManager.current_deck.side.size()) {
-						auto swaping_pointer = deckManager.current_deck.side[hovered_seq];
-						if(click_pos == 1) {
-							if(swaping_pointer->second.type & 0x802040)
-								deckManager.current_deck.main.push_back(draging_pointer);
-							else {
-								deckManager.current_deck.main.push_back(swaping_pointer);
-								deckManager.current_deck.side[hovered_seq] = draging_pointer;
-							}
-						} else {
-							if(!(swaping_pointer->second.type & 0x802040))
-								deckManager.current_deck.extra.push_back(draging_pointer);
-							else {
-								deckManager.current_deck.extra.push_back(swaping_pointer);
-								deckManager.current_deck.side[hovered_seq] = draging_pointer;
-							}
-						}
-					} else {
-						if(click_pos == 1)
-							deckManager.current_deck.main.push_back(draging_pointer);
-						else
-							deckManager.current_deck.extra.push_back(draging_pointer);
-					}
+				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)) || hovered_pos == 4)
+					hovered_pos = 0;
+				if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 64) {
+					if(hovered_seq < deckManager.current_deck.main.size() && hovered_pos)
+						deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
+					else deckManager.current_deck.main.push_back(draging_pointer);
+				} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 20) {
+					if(hovered_seq < deckManager.current_deck.extra.size() && hovered_pos)
+						deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
+					else deckManager.current_deck.extra.push_back(draging_pointer);
+				} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 20) {
+					if(hovered_seq < deckManager.current_deck.side.size() && hovered_pos)
+						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
+					else deckManager.current_deck.side.push_back(draging_pointer);
 				}
 			}
 			break;
 		}
 		case irr::EMIE_RMOUSE_LEFT_UP: {
-			if(mainGame->wCategories->isVisible() || mainGame->is_siding)
+			if(mainGame->is_siding) {
+				if(is_draging)
+					break;
+				if(hovered_pos == 0 || hovered_seq == -1)
+					break;
+				draging_pointer = dataManager.GetCodePointer(hovered_code);
+				if(hovered_pos == 1) {
+					if(deckManager.current_deck.side.size() < 20) {
+						deckManager.current_deck.main.erase(deckManager.current_deck.main.begin() + hovered_seq);
+						deckManager.current_deck.side.push_back(draging_pointer);
+					}
+				} else if(hovered_pos == 2) {
+					if(deckManager.current_deck.side.size() < 20) {
+						deckManager.current_deck.extra.erase(deckManager.current_deck.extra.begin() + hovered_seq);
+						deckManager.current_deck.side.push_back(draging_pointer);
+					}
+				} else {
+					if((draging_pointer->second.type & 0x802040) && deckManager.current_deck.extra.size() < 20) {
+						deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
+						deckManager.current_deck.extra.push_back(draging_pointer);
+					}
+					if(!(draging_pointer->second.type & 0x802040) && deckManager.current_deck.main.size() < 64) {
+						deckManager.current_deck.side.erase(deckManager.current_deck.side.begin() + hovered_seq);
+						deckManager.current_deck.main.push_back(draging_pointer);
+					}
+				}
+				break;
+			}
+			if(mainGame->wCategories->isVisible())
 				break;
 			if(hovered_pos == 0 || hovered_seq == -1)
 				break;

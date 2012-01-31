@@ -1033,7 +1033,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 //				if(core.summon_count[sumplayer] < get_summon_count_limit(sumplayer))
 //					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
 //				else
-					returns.ivalue[0] = TRUE;
+				returns.ivalue[0] = TRUE;
 			}
 		} else
 			returns.ivalue[0] = TRUE;
@@ -1150,6 +1150,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		}
 		target->set_status(STATUS_SUMMONING, FALSE);
 		target->enable_field_effect(TRUE);
+		if(target->is_status(STATUS_DISABLED))
+			target->reset(RESET_DISABLE, RESET_EVENT);
 		target->set_status(STATUS_SUMMON_TURN, TRUE);
 		core.summoning_card = 0;
 		return FALSE;
@@ -1239,6 +1241,8 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 	case 3: {
 		target->set_status(STATUS_SUMMONING, FALSE);
 		target->enable_field_effect(TRUE);
+		if(target->is_status(STATUS_DISABLED))
+			target->reset(RESET_DISABLE, RESET_EVENT);
 		target->set_status(STATUS_SUMMON_TURN, TRUE);
 		return FALSE;
 	}
@@ -1385,13 +1389,13 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 	case 5: {
 		if(!ignore_count) {
 			returns.ivalue[0] = FALSE;
-			effect* pextra = core.extra_summon[setplayer]? 0: target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
+			effect* pextra = core.extra_summon[setplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
 //				if(core.summon_count[setplayer] < get_summon_count_limit(setplayer))
 //					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
 //				else
-					returns.ivalue[0] = TRUE;
+				returns.ivalue[0] = TRUE;
 			}
 		} else
 			returns.ivalue[0] = TRUE;
@@ -1628,6 +1632,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 				oeit->second = 0;
 		target->set_status(STATUS_SUMMONING, FALSE);
 		target->enable_field_effect(TRUE);
+		if(target->is_status(STATUS_DISABLED))
+			target->reset(RESET_DISABLE, RESET_EVENT);
 		target->set_status(STATUS_PROC_COMPLETE | STATUS_SUMMON_TURN, TRUE);
 		core.spsummoning_card = 0;
 		return FALSE;
@@ -2677,7 +2683,10 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					raise_single_event(*cvit, EVENT_CHANGE_POS, reason_effect, 0, reason_player, 0, 0);
 					pos_changed.insert(*cvit);
 				}
+				bool trapmonster = false;
 				if((opos & POS_FACEUP) && (npos & POS_FACEDOWN)) {
+					if((*cvit)->get_type()&TYPE_TRAPMONSTER)
+						trapmonster = true;
 					(*cvit)->reset(RESET_TURN_SET, RESET_EVENT);
 					(*cvit)->set_status(STATUS_SET_TURN, TRUE);
 					(*cvit)->enable_field_effect(FALSE);
@@ -2692,7 +2701,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 				}
 				if((npos & POS_FACEDOWN) && (*cvit)->equiping_target)
 					(*cvit)->unequip();
-				if((npos & POS_FACEDOWN) && ((*cvit)->get_type()&TYPE_TRAPMONSTER)) {
+				if(trapmonster) {
 					refresh_location_info_instant();
 					move_to_field(*cvit, (*cvit)->current.controler, (*cvit)->current.controler, LOCATION_SZONE, POS_FACEDOWN);
 				}

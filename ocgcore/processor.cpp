@@ -4120,15 +4120,6 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 1: {
 		//win check
-		if(core.win_player != 5) {
-			pduel->write_buffer8(MSG_WIN);
-			pduel->write_buffer8(core.win_player);
-			pduel->write_buffer8(core.win_reason);
-			core.win_player = 5;
-			core.win_reason = 0;
-			core.overdraw[0] = core.overdraw[1] = FALSE;
-			return FALSE;
-		}
 		uint32 winp = 5, rea = 1;
 		if((player[0].lp <= 0 && player[1].lp > 0)) {
 			winp = 1;
@@ -4158,6 +4149,16 @@ int32 field::adjust_step(uint16 step) {
 			pduel->write_buffer8(MSG_WIN);
 			pduel->write_buffer8(winp);
 			pduel->write_buffer8(rea);
+			core.overdraw[0] = core.overdraw[1] = FALSE;
+			core.win_player = 5;
+			core.win_reason = 0;
+		} else if(core.win_player != 5) {
+			pduel->write_buffer8(MSG_WIN);
+			pduel->write_buffer8(core.win_player);
+			pduel->write_buffer8(core.win_reason);
+			core.win_player = 5;
+			core.win_reason = 0;
+			core.overdraw[0] = core.overdraw[1] = FALSE;
 		}
 		return FALSE;
 	}

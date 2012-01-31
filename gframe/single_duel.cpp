@@ -198,7 +198,7 @@ void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	if(is_ready) {
 		bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
 		bool allow_tcg = host_info.rule == 1 || host_info.rule == 2;
-		int res = host_info.no_check_deck ? true : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
+		int res = host_info.no_check_deck ? false : deckManager.CheckLFList(pdeck[dp->type], host_info.lflist, allow_ocg, allow_tcg);
 		if(res) {
 			STOC_HS_PlayerChange scpc;
 			scpc.status = (dp->type << 4) | PLAYERCHANGE_NOTREADY;
