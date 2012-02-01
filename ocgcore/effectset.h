@@ -10,6 +10,7 @@
 
 #include <stdlib.h>
 #include <array>
+#include <vector>
 #include <algorithm>
 
 class effect;

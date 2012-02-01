@@ -22,7 +22,7 @@ solution "ygo"
         defines { "_CRT_SECURE_NO_WARNINGS" }
 
     configuration "not vs*"
-        buildoptions { "-Wall", "-fno-strict-aliasing", "-Wno-multichar" }
+        buildoptions { "-fno-strict-aliasing", "-Wno-multichar" }
     configuration {"not vs*", "windows"}
         buildoptions { "-static-libgcc" }
 

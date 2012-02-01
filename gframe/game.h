@@ -95,7 +95,6 @@ public:
 	int showcardp;
 	int is_attacking;
 	int attack_sv;
-	irr::gui::IGUIElement* exit_window;
 	irr::core::vector3df atk_r;
 	irr::core::vector3df atk_t;
 	float atkdy;

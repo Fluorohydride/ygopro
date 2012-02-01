@@ -106,19 +106,21 @@ class DuelMode {
 public:
 	DuelMode(): host_player(0), pduel(0) {}
 	virtual ~DuelMode() {}
-	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {};
-	virtual void LeaveGame(DuelPlayer* dp) {};
-	virtual void ToDuelist(DuelPlayer* dp) {};
-	virtual void ToObserver(DuelPlayer* dp) {};
-	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {};
-	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {};
-	virtual void UpdateDeck(DuelPlayer* dp, void* pdata) {};
-	virtual void StartDuel(DuelPlayer* dp) {};
-	virtual void HandResult(DuelPlayer* dp, unsigned char res) {};
-	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {};
-	virtual void Process() {};
-	virtual int Analyze(char* msgbuffer, unsigned int len) {};
-	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {};
+	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
+	virtual void LeaveGame(DuelPlayer* dp) {}
+	virtual void ToDuelist(DuelPlayer* dp) {}
+	virtual void ToObserver(DuelPlayer* dp) {}
+	virtual void PlayerReady(DuelPlayer* dp, bool is_ready) {}
+	virtual void PlayerKick(DuelPlayer* dp, unsigned char pos) {}
+	virtual void UpdateDeck(DuelPlayer* dp, void* pdata) {}
+	virtual void StartDuel(DuelPlayer* dp) {}
+	virtual void HandResult(DuelPlayer* dp, unsigned char res) {}
+	virtual void TPResult(DuelPlayer* dp, unsigned char tp) {}
+	virtual void Process() {}
+	virtual int Analyze(char* msgbuffer, unsigned int len) {
+		return 0;
+	}
+	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
 	virtual void EndDuel() {};
 
 public:

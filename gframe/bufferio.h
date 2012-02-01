@@ -63,13 +63,13 @@ public:
 				*str = *wsrc;
 				++str;
 			} else if(*wsrc < 0x800) {
-				str[0] = (*wsrc >> 6) & 0x1f | 0xc0;
-				str[1] = (*wsrc) & 0x3f | 0x80;
+				str[0] = ((*wsrc >> 6) & 0x1f) | 0xc0;
+				str[1] = ((*wsrc) & 0x3f) | 0x80;
 				str += 2;
 			} else {
-				str[0] = (*wsrc >> 12) & 0xf | 0xe0;
-				str[1] = (*wsrc >> 6) & 0x3f | 0x80;
-				str[2] = (*wsrc) & 0x3f | 0x80;
+				str[0] = ((*wsrc >> 12) & 0xf) | 0xe0;
+				str[1] = ((*wsrc >> 6) & 0x3f) | 0x80;
+				str[2] = ((*wsrc) & 0x3f) | 0x80;
 				str += 3;
 			}
 			wsrc++;

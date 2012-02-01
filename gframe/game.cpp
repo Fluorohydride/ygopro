@@ -40,7 +40,6 @@ bool Game::Initialize() {
 	always_chain = false;
 	ignore_chain = false;
 	is_building = false;
-	exit_window = 0;
 	memset(&dInfo, 0, sizeof(DuelInfo));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
@@ -98,7 +97,7 @@ bool Game::Initialize() {
 	wCreateHost->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1226), rect<s32>(20, 30, 220, 50), false, false, wCreateHost);
 	cbLFlist = env->addComboBox(rect<s32>(140, 25, 300, 50), wCreateHost);
-	for(int i = 0; i < deckManager._lfList.size(); ++i)
+	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
 		cbLFlist->addItem(deckManager._lfList[i].listName, deckManager._lfList[i].hash);
 	env->addStaticText(dataManager.GetSysString(1225), rect<s32>(20, 60, 220, 80), false, false, wCreateHost);
 	cbRule = env->addComboBox(rect<s32>(140, 55, 300, 80), wCreateHost);
@@ -342,7 +341,7 @@ bool Game::Initialize() {
 	cbDBLFList = env->addComboBox(rect<s32>(80, 5, 220, 30), wDeckEdit, COMBOBOX_DBLFLIST);
 	env->addStaticText(dataManager.GetSysString(1301), rect<s32>(10, 39, 100, 59), false, false, wDeckEdit);
 	cbDBDecks = env->addComboBox(rect<s32>(80, 35, 220, 60), wDeckEdit, COMBOBOX_DBDECKS);
-	for(int i = 0; i < deckManager._lfList.size(); ++i)
+	for(unsigned int i = 0; i < deckManager._lfList.size(); ++i)
 		cbDBLFList->addItem(deckManager._lfList[i].listName);
 	btnSaveDeck = env->addButton(rect<s32>(225, 35, 290, 60), wDeckEdit, BUTTON_SAVE_DECK, dataManager.GetSysString(1302));
 	ebDeckname = env->addEditBox(L"", rect<s32>(80, 65, 220, 90), true, wDeckEdit, -1);
@@ -460,7 +459,7 @@ void Game::MainLoop() {
 	irr::ITimer* timer = device->getTimer();
 	timer->setTime(0);
 	int fps = 0;
-	unsigned int cur_time = 0;
+	int cur_time = 0;
 	while(device->run()) {
 		linePattern = (linePattern << 1) | (linePattern >> 15);
 		atkframe += 0.1f;
@@ -486,11 +485,6 @@ void Game::MainLoop() {
 			signalFrame--;
 			if(!signalFrame)
 				frameSignal.Set();
-		}
-		if(exit_window && !fadingFrame) {
-			irr::SEvent sevt;
-			sevt.EventType = irr::EET_USER_EVENT;
-			sevt.UserEvent.UserData1 = UEVENT_TOWINDOW;
 		}
 		if(waitFrame >= 0) {
 			waitFrame++;
@@ -628,7 +622,6 @@ void Game::LoadConfig() {
 	char strbuf[32];
 	char valbuf[256];
 	wchar_t wstr[256];
-	int value;
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
 	gameConf.nickname[0] = 0;

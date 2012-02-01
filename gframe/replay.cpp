@@ -17,64 +17,104 @@ Replay::~Replay() {
 	delete comp_data;
 }
 void Replay::BeginRecord() {
+#ifdef _WIN32
+	if(is_recording)
+		CloseHandle(recording_fp);
+	recording_fp = CreateFile("./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+	if(recording_fp == INVALID_HANDLE_VALUE)
+		return;
+#else
 	if(is_recording)
 		fclose(fp);
 	fp = fopen("./replay/_LastReplay.yrp", "wb");
 	if(!fp)
 		return;
+#endif
 	pdata = replay_data;
 	is_recording = true;
 }
 void Replay::WriteHeader(ReplayHeader& header) {
 	pheader = header;
+#ifdef _WIN32
+	DWORD size;
+	WriteFile(recording_fp, &header, sizeof(header), &size, NULL);
+#else
 	fwrite(&header, sizeof(header), 1, fp);
 	fflush(fp);
+#endif
 }
 void Replay::WriteData(const void* data, unsigned int length, bool flush) {
 	if(!is_recording)
 		return;
-	fwrite(data, length, 1, fp);
 	memcpy(pdata, data, length);
 	pdata += length;
+#ifdef _WIN32
+	DWORD size;
+	WriteFile(recording_fp, data, length, &size, NULL);
+#else
+	fwrite(data, length, 1, fp);
 	if(flush)
 		fflush(fp);
+#endif
 }
 void Replay::WriteInt32(int data, bool flush) {
 	if(!is_recording)
 		return;
-	fwrite(&data, sizeof(int), 1, fp);
 	*((int*)(pdata)) = data;
 	pdata += 4;
+#ifdef _WIN32
+	DWORD size;
+	WriteFile(recording_fp, &data, sizeof(int), &size, NULL);
+#else
+	fwrite(&data, sizeof(int), 1, fp);
 	if(flush)
 		fflush(fp);
+#endif
 }
 void Replay::WriteInt16(short data, bool flush) {
 	if(!is_recording)
 		return;
-	fwrite(&data, sizeof(short), 1, fp);
 	*((short*)(pdata)) = data;
 	pdata += 2;
+#ifdef _WIN32
+	DWORD size;
+	WriteFile(recording_fp, &data, sizeof(short), &size, NULL);
+#else
+	fwrite(&data, sizeof(short), 1, fp);
 	if(flush)
 		fflush(fp);
+#endif
 }
 void Replay::WriteInt8(char data, bool flush) {
 	if(!is_recording)
 		return;
-	fwrite(&data, sizeof(char), 1, fp);
 	*pdata = data;
 	pdata++;
+#ifdef _WIN32
+	DWORD size;
+	WriteFile(recording_fp, &data, sizeof(char), &size, NULL);
+#else
+	fwrite(&data, sizeof(char), 1, fp);
 	if(flush)
 		fflush(fp);
+#endif
 }
 void Replay::Flush() {
 	if(!is_recording)
 		return;
+#ifdef _WIN32
+#else
 	fflush(fp);
+#endif
 }
 void Replay::EndRecord() {
 	if(!is_recording)
 		return;
+#ifdef _WIN32
+	CloseHandle(recording_fp);
+#else
 	fclose(fp);
+#endif
 	pheader.datasize = pdata - replay_data;
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;

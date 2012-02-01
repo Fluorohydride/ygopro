@@ -9,7 +9,7 @@ project "gframe"
     links { "ocgcore", "clzma", "irrlicht", "freetype", "sqlite3", "lua" , "event"}
 
     configuration "windows"
-        links { "opengl32", "wsock32", "winmm", "gdi32", "kernel32", "user32" }
+        links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
     configuration {"windows", "not vs*"}
         includedirs { "/mingw/include/irrlicht", "/mingw/include/freetype2" }
     configuration "not vs*"

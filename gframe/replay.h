@@ -42,6 +42,9 @@ public:
 
 	FILE* fp;
 	ReplayHeader pheader;
+#ifdef _WIN32
+	HANDLE recording_fp;
+#endif
 	unsigned char* replay_data;
 	unsigned char* comp_data;
 	unsigned char* pdata;
