@@ -1823,22 +1823,22 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 							core.spe_effect[priority]++;
 					}
 				}
-			}
-			pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
-			for(; pr.first != pr.second; ++pr.first) {
-				peffect = pr.first->second;
-				if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
-					newchain.flag = 0;
-					newchain.chain_id = infos.field_id++;
-					newchain.evt = nil_event;
-					newchain.triggering_controler = peffect->handler->current.controler;
-					newchain.triggering_effect = peffect;
-					newchain.triggering_location = peffect->handler->current.location;
-					newchain.triggering_sequence = peffect->handler->current.sequence;
-					newchain.triggering_player = priority;
-					core.select_chains.push_back(newchain);
-					if(check_hint_timing(peffect))
-						core.spe_effect[priority]++;
+				pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
+				for(; pr.first != pr.second; ++pr.first) {
+					peffect = pr.first->second;
+					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
+						newchain.flag = 0;
+						newchain.chain_id = infos.field_id++;
+						newchain.evt = nil_event;
+						newchain.triggering_controler = peffect->handler->current.controler;
+						newchain.triggering_effect = peffect;
+						newchain.triggering_location = peffect->handler->current.location;
+						newchain.triggering_sequence = peffect->handler->current.sequence;
+						newchain.triggering_player = priority;
+						core.select_chains.push_back(newchain);
+						if(check_hint_timing(peffect))
+							core.spe_effect[priority]++;
+					}
 				}
 			}
 			if(core.current_chain.size() || (core.hint_timing[0]&TIMING_ATTACK) || (core.hint_timing[1]&TIMING_ATTACK))

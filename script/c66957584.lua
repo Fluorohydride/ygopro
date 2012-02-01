@@ -32,8 +32,8 @@ function c66957584.disfilter(c)
 	return c:IsSetCard(0xb) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function c66957584.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(c66957584.disfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,0,0)
 end
 function c66957584.disop(e,tp,eg,ep,ev,re,r,rp)
@@ -45,6 +45,7 @@ function c66957584.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c66957584.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c66957584.filter(c,e,tp)

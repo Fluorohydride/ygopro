@@ -59,6 +59,7 @@ function c27970830.ctop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c27970830.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x3003,2,REASON_COST) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.RemoveCounter(tp,1,0,0x3003,2,REASON_COST)
 end
 function c27970830.filter1(c)
@@ -85,6 +86,7 @@ function c27970830.op1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c27970830.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x3003,4,REASON_COST) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.RemoveCounter(tp,1,0,0x3003,4,REASON_COST)
 end
 function c27970830.filter2(c)
@@ -105,6 +107,7 @@ function c27970830.op2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c27970830.cost3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x3003,6,REASON_COST) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.RemoveCounter(tp,1,0,0x3003,6,REASON_COST)
 end
 function c27970830.filter3(c,e,tp)

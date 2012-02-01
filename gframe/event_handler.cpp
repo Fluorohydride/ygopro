@@ -995,8 +995,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (select_counter_count == 0) {
 					unsigned char respbuf[64];
 					for(int i = 0; i < selectable_cards.size(); ++i)
-						respbuf[i] = (selectable_cards[i]->opParam >> 16) - (clicked_card->opParam & 0xffff);
+						respbuf[i] = (selectable_cards[i]->opParam >> 16) - (selectable_cards[i]->opParam & 0xffff);
 					mainGame->stHintMsg->setVisible(false);
+					ClearSelect();
 					DuelClient::SetResponseB(respbuf, selectable_cards.size());
 					mainGame->localAction.Set();
 				} else {

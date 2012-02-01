@@ -50,6 +50,7 @@ end
 function c9888196.destg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c9888196.filter1(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c9888196.filter1,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c9888196.filter1,tp,0,LOCATION_ONFIELD,1,1,nil)
 	e:GetHandler():RegisterFlagEffect(9888196,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
@@ -63,6 +64,8 @@ function c9888196.desop1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c9888196.descost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
@@ -81,6 +84,7 @@ function c9888196.desop2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c9888196.hdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	Duel.SendtoGrave(g,REASON_COST)
 end

@@ -1075,7 +1075,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			pcard = mainGame->dField.GetCard(c, l, s);
 			mainGame->dField.selectable_cards.push_back(pcard);
 			pcard->opParam = (t << 16) | t;
-			pcard->select_seq = i;
 			pcard->is_selectable = true;
 		}
 		myswprintf(textBuffer, dataManager.GetSysString(204), mainGame->dField.select_counter_count, dataManager.GetCounterName(mainGame->dField.select_counter_type));
@@ -1370,6 +1369,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			s = BufferIO::ReadInt8(pbuf);
 			BufferIO::ReadInt8(pbuf);
 			mc[i] = mainGame->dField.mzone[c][s];
+			mc[i]->SetCode(0);
 			mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
 			mc[i]->dRot = irr::core::vector3df(0, 0, 0);
 			mc[i]->is_moving = true;

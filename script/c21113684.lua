@@ -81,6 +81,7 @@ function c21113684.con(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21113684.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,0,0x3001,1,REASON_COST) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.RemoveCounter(tp,1,0,0x3001,1,REASON_COST)
 end
 function c21113684.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

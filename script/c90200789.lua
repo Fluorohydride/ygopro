@@ -17,23 +17,31 @@ function c90200789.initial_effect(c)
 	e2:SetOperation(c90200789.desop)
 	c:RegisterEffect(e2)
 end
-function c90200789.filter1(c)
-	return c:IsFaceup() and c:IsSetCard(0x2b) and c:GetLevel()>0
+function c90200789.filter1(c,tp,slv)
+	local lv1=c:GetOriginalLevel()
+	return c:IsFaceup() and c:IsSetCard(0x2b) and lv1>0
+		 and Duel.IsExistingTarget(c90200789.filter2,tp,0,LOCATION_MZONE,1,nil,lv1,slv)
 end
-function c90200789.filter2(c)
-	return c:IsFaceup() and c:GetLevel()>0
+function c90200789.filter2(c,lv1,slv)
+	local lv2=c:GetOriginalLevel()
+	return c:IsFaceup() and lv2>0 and lv1+lv2>=slv
 end
-function c90200789.spfilter(c,lv,e,tp)
-	return c:IsLevelBelow(lv) and c:IsRace(RACE_DRAGON+RACE_DINOSAUR+RACE_SEASERPENT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c90200789.spfilter(c,e,tp,lv)
+	return c:IsRace(RACE_DRAGON+RACE_DINOSAUR+RACE_SEASERPENT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and (not lv or c:IsLevelBelow(lv))
 end
 function c90200789.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(c90200789.filter1,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingTarget(c90200789.filter2,tp,0,LOCATION_MZONE,1,nil) end
+	local sg=Duel.GetMatchingGroup(c90200789.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
+	if chk==0 then
+		if sg:GetCount()==0 then return false end
+		local mlv=sg:GetMinGroup(Card.GetLevel):GetFirst():GetLevel()
+		return Duel.IsExistingTarget(c90200789.filter1,tp,LOCATION_MZONE,0,1,nil,tp,mlv)
+	end
+	local mlv=sg:GetMinGroup(Card.GetLevel):GetFirst():GetLevel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g1=Duel.SelectTarget(tp,c90200789.filter1,tp,LOCATION_MZONE,0,1,1,nil)
+	local g1=Duel.SelectTarget(tp,c90200789.filter1,tp,LOCATION_MZONE,0,1,1,nil,tp,mlv)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g2=Duel.SelectTarget(tp,c90200789.filter2,tp,0,LOCATION_MZONE,1,1,nil)
+	local g2=Duel.SelectTarget(tp,c90200789.filter2,tp,0,LOCATION_MZONE,1,1,nil,g1:GetFirst():GetOriginalLevel(),mlv)
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,2,0,0)
 end
@@ -52,7 +60,7 @@ function c90200789.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsLocation(LOCATION_GRAVE) then lv=lv+tc:GetLevel() end
 	if lv==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c90200789.spfilter,tp,LOCATION_DECK,0,1,1,nil,lv,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c90200789.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp,lv)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.BreakEffect()

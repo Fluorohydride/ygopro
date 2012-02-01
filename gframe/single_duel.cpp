@@ -333,8 +333,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.BeginRecord();
 	last_replay.WriteHeader(rh);
 	rnd.reset(seed);
-	last_replay.WriteData(players[0], 40, false);
-	last_replay.WriteData(players[1], 40, false);
+	last_replay.WriteData(players[0]->name, 40, false);
+	last_replay.WriteData(players[1]->name, 40, false);
 	if(!host_info.no_shuffle_deck) {
 		for(int i = 0; i < pdeck[0].main.size(); ++i) {
 			int swap = rnd.real() * pdeck[0].main.size();
