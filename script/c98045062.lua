@@ -29,9 +29,11 @@ function c98045062.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if e:GetLabel()==1 then cg=g:Filter(Card.IsAbleToChangeControler,nil)
 	else cg=g:Filter(Card.IsControlerCanBeChanged,nil) end
 	local sel=0
-	if cg:GetCount()==0 then sel=0
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(98045062,2))
-	elseif e:GetLabel()==1 and not Duel.CheckReleaseGroup(tp,nil,1,nil) then sel=0
+	Duel.Hint(HINT_SELECTMSG,tp,550)
+	if cg:GetCount()==0 then
+		sel=Duel.SelectOption(tp,aux.Stringid(98045062,0))
+	elseif e:GetLabel()==1 and not Duel.CheckReleaseGroup(tp,nil,1,nil) then
+		sel=Duel.SelectOption(tp,aux.Stringid(98045062,0))
 	else
 		sel=Duel.SelectOption(tp,aux.Stringid(98045062,0),aux.Stringid(98045062,1))
 		if sel==1 and e:GetLabel()==1 then

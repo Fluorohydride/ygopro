@@ -1220,12 +1220,12 @@ int32 scriptlib::duel_get_chain_info(lua_State *L) {
 			lua_pushinteger(L, ch->chain_id);
 			break;
 		case CHAININFO_TYPE:
-			if((ch->chain_type & 0x7) == (TYPE_TRAP | TYPE_MONSTER))
+			if((ch->triggering_effect->card_type & 0x7) == (TYPE_TRAP | TYPE_MONSTER))
 				lua_pushinteger(L, TYPE_MONSTER);
-			else lua_pushinteger(L, (ch->chain_type & 0x7));
+			else lua_pushinteger(L, (ch->triggering_effect->card_type & 0x7));
 			break;
 		case CHAININFO_EXTTYPE:
-			lua_pushinteger(L, ch->chain_type);
+			lua_pushinteger(L, ch->triggering_effect->card_type);
 			break;
 		default:
 			lua_pushnil(L);
@@ -1317,6 +1317,7 @@ int32 scriptlib::duel_disable_attack(lua_State *L) {
 		peffect->code = EFFECT_ATTACK_DISABLED;
 		peffect->type = EFFECT_TYPE_SINGLE;
 		attacker->add_effect(peffect);
+		attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		pduel->game_field->raise_event(attacker, EVENT_ATTACK_DISABLED, pduel->game_field->core.reason_effect,
 		                               0, pduel->game_field->core.reason_player, PLAYER_NONE, 0);
 		pduel->game_field->process_instant_event();

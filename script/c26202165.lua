@@ -12,7 +12,7 @@ function c26202165.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26202165.condition(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)>0
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c26202165.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

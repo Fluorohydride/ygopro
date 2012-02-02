@@ -122,9 +122,9 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->HideElement(mainGame->wHostSingle);
-					mainGame->WaitFrameSignal(10);
+					mainGame->WaitFrameSignal(11);
 					mainGame->ShowElement(mainGame->wLanWindow);
-					mainGame->WaitFrameSignal(10);
+					mainGame->WaitFrameSignal(11);
 					mainGame->gMutex.Lock();
 					if(events & BEV_EVENT_EOF)
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1401));
@@ -187,10 +187,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			if(pkt->code == 1)
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1406));
 			else {
-				wchar_t msgbuf[64];
+				wchar_t msgbuf[256];
 				myswprintf(msgbuf, dataManager.GetSysString(1407), dataManager.GetName(pkt->code));
 				mainGame->env->addMessageBox(L"", msgbuf);
 			}
+			mainGame->cbDeckSelect->setEnabled(true);
 			mainGame->gMutex.Unlock();
 			break;
 		}
@@ -293,6 +294,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stHostSingleDuelist[1]->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostSingleRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
+		mainGame->cbDeckSelect->setEnabled(true);
 		if(mainGame->wCreateHost->isVisible())
 			mainGame->HideElement(mainGame->wCreateHost);
 		else if (mainGame->wLanWindow->isVisible())
@@ -300,7 +302,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		mainGame->WaitFrameSignal(11);
 		mainGame->ShowElement(mainGame->wHostSingle);
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
@@ -451,7 +453,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->stHintMsg->setVisible(false);
 		if(mainGame->wCardSelect->isVisible()) {
 			mainGame->HideElement(mainGame->wCardSelect);
-			mainGame->WaitFrameSignal(10);
+			mainGame->WaitFrameSignal(11);
 		}
 	}
 	switch(mainGame->dInfo.curMsg) {
@@ -1326,7 +1328,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			(*cit)->is_hovered = false;
 			(*cit)->aniFrame = 5;
 		}
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 			(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
@@ -1354,7 +1356,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->dField.MoveCard(*cit, 10);
 		}
 		mainGame->gMutex.Unlock();
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_SHUFFLE_SET_CARD: {
@@ -1395,7 +1397,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			for (cit = mc[i]->overlayed.begin(); cit != mc[i]->overlayed.end(); ++cit)
 				mainGame->dField.MoveCard(*cit, 10);
 		}
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_NEW_TURN: {
@@ -1627,7 +1629,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		pcard->position = cp;
 		myswprintf(event_string, dataManager.GetSysString(1600));
 		mainGame->dField.MoveCard(pcard, 10);
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_SET: {
@@ -1665,7 +1667,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		for (int i = 0; i < pc2->overlayed.size(); ++i)
 			mainGame->dField.MoveCard(pc2->overlayed[i], 10);
 		mainGame->gMutex.Unlock();
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_FIELD_DISABLED: {
@@ -1687,7 +1689,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->showcard = 4;
 		mainGame->WaitFrameSignal(30);
 		mainGame->showcard = 0;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_SUMMONED: {
@@ -1706,7 +1708,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->showcard = 5;
 		mainGame->WaitFrameSignal(30);
 		mainGame->showcard = 0;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_SPSUMMONED: {
@@ -1724,13 +1726,13 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		pcard->position = cp;
 		myswprintf(event_string, dataManager.GetSysString(1607), dataManager.GetName(code));
 		mainGame->dField.MoveCard(pcard, 10);
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 0;
 		mainGame->showcard = 4;
 		mainGame->WaitFrameSignal(30);
 		mainGame->showcard = 0;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_FLIPSUMMONED: {
@@ -1794,7 +1796,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int ct = BufferIO::ReadInt8(pbuf);
 		if (mainGame->dField.chains.size() > 1) {
 			if (mainGame->dField.last_chain)
-				mainGame->WaitFrameSignal(10);
+				mainGame->WaitFrameSignal(11);
 			for(int i = 0; i < 5; ++i) {
 				mainGame->dField.chains[ct - 1].solved = false;
 				mainGame->WaitFrameSignal(3);
@@ -1910,7 +1912,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->lpcstring = textBuffer;
 		mainGame->WaitFrameSignal(30);
 		mainGame->lpframe = 10;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = 0;
 		mainGame->dInfo.lp[player] = final;
 		mainGame->gMutex.Lock();
@@ -1933,7 +1935,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->lpcstring = textBuffer;
 		mainGame->WaitFrameSignal(30);
 		mainGame->lpframe = 10;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = 0;
 		mainGame->dInfo.lp[player] = final;
 		mainGame->gMutex.Lock();
@@ -1968,7 +1970,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->lpd = (val - mainGame->dInfo.lp[player]) / 10;
 		mainGame->lpplayer = player;
 		mainGame->lpframe = 10;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->dInfo.lp[player] = val;
 		mainGame->gMutex.Lock();
 		myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
@@ -2046,7 +2048,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->lpcstring = textBuffer;
 		mainGame->WaitFrameSignal(30);
 		mainGame->lpframe = 10;
-		mainGame->WaitFrameSignal(10);
+		mainGame->WaitFrameSignal(11);
 		mainGame->lpcstring = 0;
 		mainGame->dInfo.lp[player] = final;
 		mainGame->gMutex.Lock();

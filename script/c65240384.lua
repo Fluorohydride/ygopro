@@ -22,7 +22,7 @@ function c65240384.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c65240384.negop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
+	if re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
 		local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 		local tc=g:GetFirst()
 		if g:GetCount()==1 and tc:IsCode(65240384) and tc:IsLocation(LOCATION_MZONE)

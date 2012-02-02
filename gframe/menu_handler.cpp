@@ -248,8 +248,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 					DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 					DuelClient::SendPacketToServer(CTOS_HS_READY);
-				} else
+					mainGame->cbDeckSelect->setEnabled(false);
+				} else {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
+					mainGame->cbDeckSelect->setEnabled(true);
+				}
 				break;
 			}
 			}

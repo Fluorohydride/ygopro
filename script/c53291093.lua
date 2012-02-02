@@ -24,7 +24,7 @@ end
 function c53291093.spfilter(c,e,tp)
 	return c:IsSetCard(0xc) and c:GetLevel()==4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c53291093.activate(e)
+function c53291093.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then

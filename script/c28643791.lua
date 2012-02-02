@@ -41,5 +41,5 @@ function c28643791.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c28643791.imfilter(e,re)
-	return re:GetOwner():IsType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

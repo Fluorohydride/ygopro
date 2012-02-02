@@ -15,8 +15,7 @@ function c59297550.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c59297550.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local rc=re:GetHandler()
-	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+	return re:IsActiveType(TYPE_MONSTER)
 		and re:GetHandler():IsSetCard(0x58) and re:GetHandler():GetCode()~=59297550
 end
 function c59297550.filter(c,e,tp)

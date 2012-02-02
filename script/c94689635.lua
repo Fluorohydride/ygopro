@@ -15,7 +15,7 @@ function c94689635.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c94689635.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_TRAP and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return ep~=tp and re:IsActiveType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 		and Duel.IsChainInactivatable(ev)
 end
 function c94689635.costfilter(c)

@@ -35,7 +35,7 @@ function c11224103.bdop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(11224103,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c11224103.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL)
+	return te:IsActiveType(TYPE_SPELL)
 end
 function c11224103.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(11224103)>0

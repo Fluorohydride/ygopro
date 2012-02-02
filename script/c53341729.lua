@@ -15,7 +15,7 @@ function c53341729.initial_effect(c)
 end
 function c53341729.disop(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and (loc==LOCATION_MZONE or loc==LOCATION_GRAVE)
+	if re:IsActiveType(TYPE_MONSTER) and (loc==LOCATION_MZONE or loc==LOCATION_GRAVE)
 		and re:GetHandler():IsAttribute(ATTRIBUTE_LIGHT) then
 		Duel.NegateEffect(ev)
 	end

@@ -31,7 +31,7 @@ c74388798.lvup={37267041}
 c74388798.lvdncount=1
 c74388798.lvdn={1995985}
 function c74388798.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL) and te:GetOwnerPlayer()~=e:GetHandler():GetControler()
+	return te:IsActiveType(TYPE_SPELL) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 function c74388798.damop(e,tp,eg,ep,ev,re,r,rp)
 	if ep~=tp and Duel.GetAttackTarget()==nil then

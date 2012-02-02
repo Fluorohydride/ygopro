@@ -22,5 +22,5 @@ c72443568.lvup={73665146}
 c72443568.lvdncount=1
 c72443568.lvdn={73665146}
 function c72443568.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL) and te:GetOwnerPlayer()~=e:GetHandler():GetControler()
+	return te:IsActiveType(TYPE_SPELL) and te:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end

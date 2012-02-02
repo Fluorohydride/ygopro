@@ -21,7 +21,7 @@ function c43932460.synfilter(c)
 	return c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c43932460.discon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
 end
 function c43932460.cfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToGraveAsCost()

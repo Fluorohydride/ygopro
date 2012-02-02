@@ -15,7 +15,7 @@ function c33950246.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c33950246.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and re:GetHandler():IsType(TYPE_FLIP) then
+	if re:IsActiveType(TYPE_FLIP) then
 		Duel.NegateActivation(ev)
 	end
 end

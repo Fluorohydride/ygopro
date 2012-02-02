@@ -14,7 +14,7 @@ function c71466592.initial_effect(c)
 end
 function c71466592.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and rp~=tp
-		and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+		and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
 end
 function c71466592.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end

@@ -318,7 +318,7 @@ int32 card::get_attack(uint8 swap) {
 				up = 0;
 				upc = 0;
 			} else
-				eset.add_item(eset[i]);
+				effects.add_item(eset[i]);
 			break;
 		}
 		if (!rev)

@@ -12,7 +12,7 @@ function c19252988.initial_effect(c)
 end
 function c19252988.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return ph>=0x08 and ph<=0x20 and tp~=ep and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_TRAP
+	return ph>=0x08 and ph<=0x20 and tp~=ep and re:IsActiveType(TYPE_TRAP)
 		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
 end
 function c19252988.target(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -59,7 +59,7 @@ function c49680980.ccost(e,tp)
 end
 function c49680980.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_TRAP and Duel.IsChainInactivatable(ev)
+		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and Duel.IsChainInactivatable(ev)
 end
 function c49680980.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end

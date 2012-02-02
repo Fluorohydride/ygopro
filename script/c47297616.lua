@@ -40,7 +40,7 @@ function c47297616.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c47297616.codisable(e,tp,eg,ep,ev,re,r,rp)
-	return (re:IsHasType(EFFECT_TYPE_ACTIVATE) or Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER)
+	return (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
 		and not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.IsChainInactivatable(ev)
 end
 function c47297616.tgdisable(e,tp,eg,ep,ev,re,r,rp,chk)

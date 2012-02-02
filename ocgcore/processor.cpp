@@ -581,7 +581,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_OPSELECTED);
-			pduel->write_buffer8(it->arg1);
+			pduel->write_buffer8(1 - it->arg1);
 			pduel->write_buffer32(core.select_options[returns.ivalue[0]]);
 			core.units.pop_front();
 		}
@@ -3561,7 +3561,9 @@ int32 field::add_chain(uint16 step) {
 		}
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))
 			clit->flag |= CHAIN_DISABLE_EFFECT;
-		clit->chain_type = peffect->handler->get_type();
+		clit->triggering_effect->card_type = peffect->handler->get_type();
+		if((clit->triggering_effect->card_type & 0x5) == 0x5)
+			clit->triggering_effect->card_type -= TYPE_TRAP;
 		clit->chain_count = core.current_chain.size() + 1;
 		clit->target_cards = 0;
 		clit->target_player = PLAYER_NONE;

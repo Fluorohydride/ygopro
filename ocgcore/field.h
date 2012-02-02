@@ -39,7 +39,6 @@ struct optarget {
 };
 struct chain {
 	typedef std::map<uint32, optarget > opmap;
-	uint32 chain_type;
 	uint16 chain_id;
 	uint8 chain_count;
 	uint8 triggering_player;

@@ -53,7 +53,7 @@ function c80925836.ccost(e,tp)
 end
 function c80925836.disop(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	if (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+	if (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) and re:IsActiveType(TYPE_MONSTER)
 		and re:GetHandler():IsAttribute(ATTRIBUTE_DARK+ATTRIBUTE_LIGHT) then
 		Duel.NegateEffect(ev)
 	end

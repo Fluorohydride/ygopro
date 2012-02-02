@@ -25,5 +25,5 @@ function c4638410.etarget(e,c)
 	return c:GetOwner()==e:GetHandlerPlayer()
 end
 function c4638410.efilter(e,te)
-	return e~=te and te:GetOwner():IsType(TYPE_TRAP)
+	return e~=te and te:IsActiveType(TYPE_TRAP)
 end

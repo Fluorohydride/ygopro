@@ -19,7 +19,7 @@ function c96012004.initial_effect(c)
 end
 function c96012004.coincon(e,tp,eg,ep,ev,re,r,rp)
 	local ex,eg,et,cp,ct=Duel.GetOperationInfo(ev,CATEGORY_COIN)
-	return ex and ct==1 and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+	return ex and ct==1 and re:IsActiveType(TYPE_MONSTER)
 end
 function c96012004.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

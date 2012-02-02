@@ -12,7 +12,7 @@ function c69632396.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c69632396.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
 end
 function c69632396.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,500) end

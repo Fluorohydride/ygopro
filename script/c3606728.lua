@@ -22,7 +22,7 @@ function c3606728.lvfilter(c,lv)
 	return c:IsFaceup() and c:IsCode(26082117) and c:GetLevel()~=lv
 end
 function c3606728.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(MZONE) and chkc:IsControler(tp) and c3606728.lvfilter(chkc,e:GetHandler():GetLevel()) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c3606728.lvfilter(chkc,e:GetHandler():GetLevel()) end
 	if chk==0 then return Duel.IsExistingTarget(c3606728.lvfilter,tp,LOCATION_MZONE,0,1,nil,e:GetHandler():GetLevel()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c3606728.lvfilter,tp,LOCATION_MZONE,0,1,1,nil,e:GetHandler():GetLevel())

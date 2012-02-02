@@ -9,5 +9,5 @@ function c86188410.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c86188410.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_TRAP)
+	return te:IsActiveType(TYPE_TRAP)
 end

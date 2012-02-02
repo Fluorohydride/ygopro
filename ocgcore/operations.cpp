@@ -1030,10 +1030,10 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			effect* pextra = core.extra_summon[sumplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-//				if(core.summon_count[sumplayer] < get_summon_count_limit(sumplayer))
-//					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
-//				else
-				returns.ivalue[0] = TRUE;
+				if(pextra->value)
+					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
+				else
+					returns.ivalue[0] = TRUE;
 			}
 		} else
 			returns.ivalue[0] = TRUE;
@@ -1392,10 +1392,10 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			effect* pextra = core.extra_summon[setplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-//				if(core.summon_count[setplayer] < get_summon_count_limit(setplayer))
-//					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
-//				else
-				returns.ivalue[0] = TRUE;
+				if(pextra->value)
+					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
+				else
+					returns.ivalue[0] = TRUE;
 			}
 		} else
 			returns.ivalue[0] = TRUE;

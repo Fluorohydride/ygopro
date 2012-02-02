@@ -64,7 +64,7 @@ function c95515060.distg(e,c)
 	return ec:GetEquipTarget() and c:GetCardTarget():IsContains(ec:GetEquipTarget())
 end
 function c95515060.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_SPELL then return end
+	if not re:IsActiveType(TYPE_SPELL) then return end
 	local ec=e:GetHandler()
 	if not ec:GetEquipTarget() or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)

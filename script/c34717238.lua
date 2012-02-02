@@ -11,7 +11,7 @@ function c34717238.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c34717238.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and re:GetCode()==EVENT_SUMMON_SUCCESS and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and re:GetCode()==EVENT_SUMMON_SUCCESS and Duel.IsChainInactivatable(ev)
 end
 function c34717238.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

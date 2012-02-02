@@ -36,7 +36,7 @@ function c42592719.imcon(e)
 	return e:GetHandler():GetFlagEffect(42592719)>0
 end
 function c42592719.imfilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL)
+	return te:IsActiveType(TYPE_SPELL)
 end
 function c42592719.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0

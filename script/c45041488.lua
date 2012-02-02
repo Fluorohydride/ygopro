@@ -58,7 +58,7 @@ function c45041488.ccost(e,tp)
 	end
 end
 function c45041488.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_MONSTER)
 		and Duel.IsChainInactivatable(ev)
 end
 function c45041488.cost(e,tp,eg,ep,ev,re,r,rp,chk)

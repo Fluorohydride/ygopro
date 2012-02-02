@@ -14,7 +14,7 @@ function c52228131.filter(c)
 	return c:IsSetCard(0x19) and c:IsAbleToDeck()
 end
 function c52228131.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_TRAP and Duel.IsChainInactivatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and Duel.IsChainInactivatable(ev)
 end
 function c52228131.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c52228131.filter,tp,LOCATION_HAND,0,1,nil) end
@@ -25,7 +25,7 @@ function c52228131.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c52228131.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c52228131.filter,p,LOCATION_HAND,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c52228131.filter,tp,LOCATION_HAND,0,1,1,nil)
 	if g:GetCount()==0 then return end
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	Duel.NegateActivation(ev)

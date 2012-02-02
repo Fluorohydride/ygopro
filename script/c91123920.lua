@@ -21,7 +21,7 @@ function c91123920.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c91123920.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL)
+	return te:IsActiveType(TYPE_SPELL)
 end
 function c91123920.val(e,c)
 	local ev,ep=Duel.GetEnvironment()

@@ -424,6 +424,29 @@ int32 scriptlib::effect_get_operation(lua_State *L) {
 	interpreter::function2value(L, peffect->operation);
 	return 1;
 }
+int32 scriptlib::effect_get_active_type(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	if(peffect->type & 0x7f0)
+		lua_pushinteger(L, peffect->card_type);
+	else
+		lua_pushinteger(L, peffect->owner->get_type());
+	return 1;
+}
+int32 scriptlib::effect_is_active_type(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	uint32 tpe = lua_tointeger(L, 2);
+	uint32 atype;
+	if(peffect->type & 0x7f0)
+		atype = peffect->card_type;
+	else
+		atype = peffect->owner->get_type();
+	lua_pushboolean(L, atype & tpe);
+	return 1;
+}
 int32 scriptlib::effect_is_has_property(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);

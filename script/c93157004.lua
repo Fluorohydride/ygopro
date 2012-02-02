@@ -165,7 +165,7 @@ function c93157004.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c93157004.discon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_MONSTER)
 		and Duel.IsChainInactivatable(ev)
 end
 function c93157004.discost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -176,17 +176,13 @@ end
 function c93157004.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
-	local loc=eg:GetFirst():GetLocation()
-	if eg:GetFirst():IsDestructable() and loc~=LOCATION_DECK then
-		eg:GetFirst():CreateEffectRelation(e)
+	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
-function c93157004.disop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c93157004.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	local ec=eg:GetFirst()
-	local loc=ec:GetLocation()
-	if ec:IsRelateToEffect(e) and loc~=LOCATION_DECK then
+	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

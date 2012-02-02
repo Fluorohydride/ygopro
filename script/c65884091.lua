@@ -35,5 +35,5 @@ function c65884091.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c65884091.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_EFFECT)
+	return te:IsActiveType(TYPE_EFFECT)
 end

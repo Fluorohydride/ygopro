@@ -76,7 +76,7 @@ function c24857466.chop2(e,tp,eg,ep,ev,re,r,rp)
 			e:SetLabelObject(de)
 			flag=0
 		end
-		local ty=Duel.GetChainInfo(ev,CHAININFO_TYPE)
+		local ty=re:GetActiveType()
 		if bit.band(ty,TYPE_SPELL)~=0 then flag=bit.bor(flag,0x1)
 		elseif bit.band(ty,TYPE_TRAP)~=0 then flag=bit.bor(flag,0x2)
 		else flag=bit.bor(flag,0x4) end

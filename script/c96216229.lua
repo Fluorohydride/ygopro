@@ -16,7 +16,7 @@ function c96216229.filter(c)
 end
 function c96216229.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c96216229.filter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.IsChainInactivatable(ev)
+		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
 end
 function c96216229.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

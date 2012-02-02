@@ -34,8 +34,8 @@ function c51452091.distarget(e,c)
 	return c~=e:GetHandler() and c:IsType(TYPE_TRAP)
 end
 function c51452091.disop(e,tp,eg,ep,ev,re,r,rp)
-	local te,tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_LOCATION)
-	if tl==LOCATION_SZONE and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_TRAP and te:GetHandler()~=e:GetHandler() then
+	local tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
+	if tl==LOCATION_SZONE and re:IsActiveType(TYPE_TRAP) and te:GetHandler()~=e:GetHandler() then
 		Duel.NegateEffect(ev)
 	end
 end

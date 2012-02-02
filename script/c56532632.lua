@@ -13,7 +13,7 @@ end
 function c56532632.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return ep~=tp and ph>=PHASE_BATTLE and ph<=PHASE_DAMAGE_CAL
-		and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.IsChainInactivatable(ev)
+		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
 end
 function c56532632.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

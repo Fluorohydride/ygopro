@@ -24,7 +24,7 @@ end
 c49441499.lvupcount=1
 c49441499.lvup={34088136}
 function c49441499.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL)
+	return te:IsActiveType(TYPE_SPELL)
 end
 function c49441499.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and not e:GetHandler():IsStatus(STATUS_SUMMON_TURN)

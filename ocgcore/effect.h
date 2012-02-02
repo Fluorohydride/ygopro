@@ -47,6 +47,7 @@ public:
 	uint32 category;
 	uint32 label;
 	uint32 hint_timing[2];
+	uint32 card_type;
 	void* label_object;
 	int32 condition;
 	int32 cost;

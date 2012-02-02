@@ -46,7 +46,7 @@ function c84749824.activate1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c84749824.condition2(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsChainInactivatable(ev) then return false end
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)~=TYPE_MONSTER and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
+	if not re:IsActiveType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	return re:IsHasCategory(CATEGORY_SPECIAL_SUMMON)
 end
 function c84749824.cost2(e,tp,eg,ep,ev,re,r,rp,chk)

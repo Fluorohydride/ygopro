@@ -12,7 +12,7 @@ function c65703851.initial_effect(c)
 end
 function c65703851.condition(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	return (loc==LOCATION_HAND or loc==LOCATION_GRAVE) and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER and Duel.IsChainInactivatable(ev)
+	return (loc==LOCATION_HAND or loc==LOCATION_GRAVE) and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
 end
 function c65703851.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return re:GetHandler():IsAbleToRemove() end

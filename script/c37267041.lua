@@ -32,8 +32,8 @@ function c37267041.distg(e,c)
 	return c:IsType(TYPE_SPELL)
 end
 function c37267041.disop(e,tp,eg,ep,ev,re,r,rp)
-	local te,tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_LOCATION)
-	if tl==LOCATION_SZONE and Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_SPELL then
+	local tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
+	if tl==LOCATION_SZONE and re:IsActiveType(TYPE_SPELL) then
 		Duel.NegateEffect(ev)
 	end
 end

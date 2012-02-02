@@ -58,7 +58,7 @@ function c93483212.imop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c93483212.imfilter(e,re)
-	return re:GetOwner():IsType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 function c93483212.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

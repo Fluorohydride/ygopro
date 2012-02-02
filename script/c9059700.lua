@@ -16,7 +16,7 @@ end
 function c9059700.condition(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp or not Duel.IsExistingMatchingCard(c9059700.cfilter,tp,LOCATION_MZONE,0,1,nil)
 		or Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)~=0 then return false end
-	return Duel.IsChainInactivatable(ev) and (Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER or re:IsHasType(EFFECT_TYPE_ACTIVATE))
+	return Duel.IsChainInactivatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
 end
 function c9059700.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

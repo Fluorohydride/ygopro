@@ -31,5 +31,5 @@ function c40991587.etarget(e,c)
 	return c:GetCode()~=40991587 and c:IsRace(RACE_ZOMBIE) and c:GetLevel()<=3
 end
 function c40991587.efilter(e,te)
-	return te:GetOwner():IsType(TYPE_SPELL+TYPE_TRAP)
+	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

@@ -33,7 +33,7 @@ function c3370104.distg(e,c)
 	return tc:IsControler(e:GetHandler():GetControler()) and tc:IsRace(RACE_MACHINE)
 end
 function c3370104.disop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetChainInfo(ev,CHAININFO_TYPE)==TYPE_MONSTER then return end
+	if re:IsActiveType(TYPE_MONSTER) then return end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()~=1 then return end

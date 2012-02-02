@@ -216,6 +216,8 @@ static const struct luaL_Reg effectlib[] = {
 	{ "GetCost", scriptlib::effect_get_cost },
 	{ "GetValue", scriptlib::effect_get_value },
 	{ "GetOperation", scriptlib::effect_get_operation },
+	{ "GetActiveType", scriptlib::effect_get_active_type },
+	{ "IsActiveType", scriptlib::effect_is_active_type },
 	{ "GetOwnerPlayer", scriptlib::effect_get_owner_player },
 	{ "GetHandlerPlayer", scriptlib::effect_get_handler_player },
 	{ "IsHasProperty", scriptlib::effect_is_has_property },
