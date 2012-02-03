@@ -213,14 +213,14 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 			pkt->info.rule = 0;
 		if(pkt->info.mode > 1)
 			pkt->info.mode = 0;
-		unsigned int hash = 0;
+		unsigned int hash = 1;
 		for(auto lfit = deckManager._lfList.begin(); lfit != deckManager._lfList.end(); ++lfit) {
 			if(pkt->info.lflist == lfit->hash) {
 				hash = pkt->info.lflist;
 				break;
 			}
 		}
-		if(!hash)
+		if(hash == 1)
 			pkt->info.lflist = deckManager._lfList[0].hash;
 		duel_mode->host_info = pkt->info;
 		BufferIO::CopyWStr(pkt->name, duel_mode->name, 20);

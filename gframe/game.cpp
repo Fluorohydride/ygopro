@@ -466,7 +466,7 @@ void Game::MainLoop() {
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
 		if(imageManager.tBackGround)
-			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getSize().Width, imageManager.tBackGround->getSize().Height));
+			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 		gMutex.Lock();
 		if(dInfo.isStarted) {
 			DrawBackGround();

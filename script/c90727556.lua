@@ -31,7 +31,7 @@ function c90727556.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c90727556.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.CheckPhaseActivity() and e:GetHandler():IsSetCard(0x100a)
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity() and e:GetHandler():IsSetCard(0x100a)
 		and not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_ONFIELD,0,1,nil,TYPE_SPELL+TYPE_TRAP) 
 end
 function c90727556.cost(e,tp,eg,ep,ev,re,r,rp,chk)

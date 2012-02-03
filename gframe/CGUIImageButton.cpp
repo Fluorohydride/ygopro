@@ -25,8 +25,8 @@ void Draw2DImageRotation(video::IVideoDriver* driver, video::ITexture* image, co
 	uvCorner[2] = irr::core::vector2df(sourceRect.UpperLeftCorner.X, sourceRect.LowerRightCorner.Y);
 	uvCorner[3] = irr::core::vector2df(sourceRect.LowerRightCorner.X, sourceRect.LowerRightCorner.Y);
 	for (int x = 0; x < 4; x++) {
-		float uvX = uvCorner[x].X / (float)image->getSize().Width;
-		float uvY = uvCorner[x].Y / (float)image->getSize().Height;
+		float uvX = uvCorner[x].X / (float)image->getOriginalSize().Width;
+		float uvY = uvCorner[x].Y / (float)image->getOriginalSize().Height;
 		uvCorner[x] = irr::core::vector2df(uvX, uvY);
 	}
 	irr::video::S3DVertex vertices[4];

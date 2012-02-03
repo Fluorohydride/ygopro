@@ -600,8 +600,8 @@ void Game::DrawSpec() {
 	}
 }
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
-	if(fadingFrame || win->isVisible())
-		return;
+	if(fadingFrame)
+		guiFading->setVisible(false);
 	fadingSize = win->getRelativePosition();
 	irr::core::position2di center = fadingSize.getCenter();
 	fadingDiff.X = fadingSize.getWidth() / 10;
@@ -628,8 +628,8 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	win->setVisible(true);
 }
 void Game::HideElement(irr::gui::IGUIElement * win, bool set_action, irr::gui::IGUIElement* next) {
-	if(fadingFrame || !win->isVisible())
-		return;
+	if(fadingFrame)
+		guiFading->setVisible(false);
 	fadingSize = win->getRelativePosition();
 	fadingDiff.X = fadingSize.getWidth() / 10;
 	fadingDiff.Y = (fadingSize.getHeight() - 4) / 10;

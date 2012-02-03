@@ -80,7 +80,7 @@ end
 function c29071332.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP_ATTACK)
 	end
 end
 function c29071332.damcon(e,tp,eg,ep,ev,re,r,rp)

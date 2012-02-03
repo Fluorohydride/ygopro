@@ -124,6 +124,7 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 	} else {
 		STOC_HS_PlayerChange scpc;
 		players[dp->type] = 0;
+		ready[dp->type] = false;
 		scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
 		if(players[0] && dp->type != 0)
 			NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_CHANGE, scpc);
@@ -134,7 +135,6 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		if(pduel)
 			NetServer::StopServer();
 		else {
-			ready[dp->type] = false;
 			NetServer::DisconnectPlayer(dp);
 		}
 	}

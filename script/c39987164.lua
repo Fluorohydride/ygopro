@@ -31,7 +31,7 @@ function c39987164.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c39987164.filter(c)
-	return c:IsFaceup() and c:IsAttack() and c:IsAbleToChangeControler()
+	return c:IsFaceup() and c:IsAttack() and c:IsType(TYPE_EFFECT) and c:IsAbleToChangeControler()
 end
 function c39987164.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c39987164.filter(chkc) end
