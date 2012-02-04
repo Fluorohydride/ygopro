@@ -14,10 +14,10 @@ function c41426869.filter(c,e,tp,m)
 	local result=false
 	if m:IsContains(c) then
 		m:RemoveCard(c)
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetOriginalLevel(),c)
+		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
 		m:AddCard(c)
 	else
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetOriginalLevel(),c)
+		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
 	end
 	return result
 end
@@ -38,7 +38,7 @@ function c41426869.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc=tg:GetFirst()
 		mg:RemoveCard(tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetOriginalLevel(),tc)
+		local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
 		tc:SetMaterial(mat)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()

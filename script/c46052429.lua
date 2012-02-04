@@ -11,7 +11,7 @@ function c46052429.initial_effect(c)
 end
 function c46052429.filter(c,e,tp,m)
 	return bit.band(c:GetType(),0x81)==0x81 and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false)
-		and m:CheckWithSumEqual(Card.GetRitualLevel,c:GetOriginalLevel(),1,c)
+		and m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,c)
 end
 function c46052429.matfilter(c)
 	return c:IsType(TYPE_NORMAL) and c:IsAbleToGrave()
@@ -32,7 +32,7 @@ function c46052429.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tg:GetCount()>0 then
 		local tc=tg:GetFirst()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetOriginalLevel(),1,tc)
+		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,tc)
 		tc:SetMaterial(mat)
 		Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
 		Duel.BreakEffect()

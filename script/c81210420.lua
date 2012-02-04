@@ -40,7 +40,10 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:Select(tp,2,2,nil)
 	if tc:IsFaceup() then
 		if tc:IsHasEffect(EFFECT_DEVINE_LIGHT) then Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
-		else Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE) end
+		else
+			Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
+			tc:ClearEffectRelation()
+		end
 	end
 	Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEDOWN_DEFENCE)
 	Duel.ConfirmCards(1-tp,sg)

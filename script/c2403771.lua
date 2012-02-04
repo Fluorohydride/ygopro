@@ -16,6 +16,8 @@ function c2403771.initial_effect(c)
 	--Destroy replace
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
 	e2:SetTarget(c2403771.desreptg)
 	e2:SetOperation(c2403771.desrepop)

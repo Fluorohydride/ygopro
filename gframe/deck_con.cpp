@@ -66,6 +66,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				mainGame->wInfos->setVisible(false);
 				mainGame->PopupElement(mainGame->wMainMenu);
 				mainGame->device->setEventReceiver(&mainGame->menuHandler);
+				mainGame->wACMessage->setVisible(false);
 				imageManager.ClearTexture();
 				mainGame->scrFilter->setVisible(false);
 				if(mainGame->cbDBDecks->getSelected() != -1) {

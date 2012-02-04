@@ -21,13 +21,23 @@ function c63465535.initial_effect(c)
 	e2:SetTarget(c63465535.eqtg)
 	e2:SetOperation(c63465535.eqop)
 	c:RegisterEffect(e2)
+	--Destroy replace
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EFFECT_DESTROY_REPLACE)
+	e3:SetTarget(c63465535.desreptg)
+	e3:SetOperation(c63465535.desrepop)
+	e3:SetLabelObject(e2)
+	c:RegisterEffect(e3)
 end
 function c63465535.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-	e1:SetTargetRange(1,1)
+	e1:SetTargetRange(0,1)
 	e1:SetValue(c63465535.aclimit)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
@@ -38,7 +48,7 @@ end
 function c63465535.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=e:GetLabelObject()
-	return ec==nil or ec:GetFlagEffect(63465535)==0
+	return ec==nil or not ec:IsHasCardTarget(c) or ec:GetFlagEffect(63465535)==0
 end
 function c63465535.filter(c)
 	return c:IsFaceup() and c:IsAbleToChangeControler()
@@ -70,16 +80,15 @@ function c63465535.eqop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
 			e1:SetValue(c63465535.eqlimit)
 			tc:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_EQUIP)
-			e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_OWNER_RELATE)
-			e2:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			e2:SetValue(c63465535.repval)
-			tc:RegisterEffect(e2)
 		else Duel.SendtoGrave(tc,REASON_EFFECT) end
 	end
 end
-function c63465535.repval(e,re,r,rp)
-	return bit.band(r,REASON_BATTLE)~=0
+function c63465535.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local c=e:GetHandler()
+	local ec=e:GetLabelObject():GetLabelObject()
+	if chk==0 then return c:IsReason(REASON_BATTLE) and ec and ec:IsHasCardTarget(c) and ec:GetFlagEffect(63465535)~=0 end
+	return Duel.SelectYesNo(tp,aux.Stringid(63465535,1))
+end
+function c63465535.desrepop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Destroy(e:GetLabelObject():GetLabelObject(),REASON_EFFECT+REASON_REPLACE)
 end

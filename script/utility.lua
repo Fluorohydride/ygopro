@@ -130,11 +130,11 @@ end
 function Auxiliary.SynFilter1(c,syncard,lv,f1,f2)
 	local clv=c:GetLevel()
 	if clv==0 or clv>=lv then return false end
-	return c:IsType(TYPE_TUNER) and c:IsCanBeSynchroMaterial(syncard) and f1(c)
+	return c:IsFaceup() and c:IsType(TYPE_TUNER) and c:IsCanBeSynchroMaterial(syncard) and f1(c)
 		and Duel.IsExistingMatchingCard(Auxiliary.SynFilter2,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,1,c,syncard,lv-clv,f2)
 end
 function Auxiliary.SynFilter2(c,syncard,lv,f2)
-	return c:IsCanBeSynchroMaterial(syncard) and c:GetLevel()==lv and f2(c)
+	return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard) and c:GetLevel()==lv and f2(c)
 end
 function Auxiliary.SynCondition2(f1,f2)
 	return	function(e,c,tuner)

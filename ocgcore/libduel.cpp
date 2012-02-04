@@ -72,8 +72,6 @@ int32 scriptlib::duel_register_effect(lua_State *L) {
 	if(playerid != 0 && playerid != 1)
 		return 0;
 	duel* pduel = peffect->pduel;
-	if(peffect->type & 0x5f5)
-		return 0;
 	pduel->game_field->add_effect(peffect, playerid);
 	return 0;
 }

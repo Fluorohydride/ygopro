@@ -56,6 +56,13 @@ int32 scriptlib::card_get_level(lua_State *L) {
 	lua_pushinteger(L, pcard->get_level());
 	return 1;
 }
+int32 scriptlib::card_get_rank(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->get_rank());
+	return 1;
+}
 int32 scriptlib::card_get_synchro_level(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 2);
@@ -794,6 +801,13 @@ int32 scriptlib::card_create_effect_relation(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 2);
 	pcard->create_relation(peffect);
+	return 0;
+}
+int32 scriptlib::card_clear_effect_relation(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	pcard->relate_effect.clear();
 	return 0;
 }
 int32 scriptlib::card_is_relate_to_effect(lua_State *L) {
