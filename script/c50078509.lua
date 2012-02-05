@@ -44,10 +44,10 @@ function c50078509.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_DISABLE)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCondition(c50078509.rcon)
-		tc:RegisterEffect(e1)
+		tc:RegisterEffect(e1,true)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_CANNOT_ATTACK)
-		tc:RegisterEffect(e2)
+		tc:RegisterEffect(e2,true)
 	end
 end
 function c50078509.rcon(e)

@@ -65,7 +65,7 @@ function c79965360.descon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c79965360.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetAttackTarget(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetAttackTarget(),1,0,0)
 end
 function c79965360.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttackTarget()

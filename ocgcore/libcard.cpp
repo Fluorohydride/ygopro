@@ -724,6 +724,15 @@ int32 scriptlib::card_is_has_effect(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
+int32 scriptlib::card_reset_effect(lua_State *L) {
+	check_param_count(L, 3);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	uint32 code = lua_tointeger(L, 2);
+	uint32 type = lua_tointeger(L, 3);
+	pcard->reset(code, type);
+	return 0;
+}
 int32 scriptlib::card_get_effect_count(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
