@@ -276,9 +276,14 @@ int32 scriptlib::duel_sets(lua_State *L) {
 	uint32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
+	uint32 toplayer = playerid;
+	if(lua_gettop(L) > 2)
+		toplayer = lua_tointeger(L, 3);
+	if(toplayer != 0 && toplayer != 1)
+		toplayer = playerid;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	duel * pduel = pcard->pduel;
-	pduel->game_field->add_process(PROCESSOR_SSET, 0, 0, (group*)pcard, playerid, 0);
+	pduel->game_field->add_process(PROCESSOR_SSET, 0, 0, (group*)pcard, playerid, toplayer);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_create_token(lua_State *L) {

@@ -41,13 +41,13 @@ function c49514333.repfilter(c)
 end
 function c49514333.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local count=eg:FilterCount(c49514333.repfilter,nil)
+		local count=eg:FilterCount(c49514333.repfilter,e:GetHandler())
 		return count>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>=count
 	end
 	if Duel.SelectYesNo(tp,aux.Stringid(49514333,0)) then
 		local container=e:GetLabelObject():GetLabelObject()
 		container:Clear()
-		local g=eg:Filter(c49514333.repfilter,nil)
+		local g=eg:Filter(c49514333.repfilter,e:GetHandler())
 		local tc=g:GetFirst()
 		while tc do
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)

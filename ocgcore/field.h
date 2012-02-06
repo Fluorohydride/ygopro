@@ -421,7 +421,7 @@ public:
 	int32 summon(uint16 step, uint8 sumplayer, card* target, effect* proc, uint8 ignore_count);
 	int32 flip_summon(uint16 step, uint8 sumplayer, card* target);
 	int32 mset(uint16 step, uint8 setplayer, card* ptarget, effect* proc, uint8 ignore_count);
-	int32 sset(uint16 step, uint8 setplayer, card* ptarget);
+	int32 sset(uint16 step, uint8 setplayer, uint8 toplayer, card* ptarget);
 	int32 special_summon_rule(uint16 step, uint8 sumplayer, card* target);
 	int32 special_summon_step(uint16 step, group* targets, card* target);
 	int32 special_summon(uint16 step, effect* reason_effect, uint8 reason_player, group* targets);

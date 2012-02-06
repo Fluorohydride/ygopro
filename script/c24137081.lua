@@ -1,5 +1,5 @@
---逆巻く炎の精霊
-function c90810762.initial_effect(c)
+--ドリル·バーニカル
+function c24137081.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -9,10 +9,10 @@ function c90810762.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_BATTLE_DAMAGE)
-	e2:SetOperation(c90810762.atkop)
+	e2:SetOperation(c24137081.atkop)
 	c:RegisterEffect(e2)
 end
-function c90810762.atkop(e,tp,eg,ep,ev,re,r,rp)
+function c24137081.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetAttackTarget()==nil then
 		local e1=Effect.CreateEffect(c)
