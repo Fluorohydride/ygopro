@@ -17,7 +17,7 @@ function c68073522.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c68073522.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(eg:GetCount()*500)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,tp,eg:GetCount()*500)

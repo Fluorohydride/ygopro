@@ -292,6 +292,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->deckBuilder.filterList = deckManager._lfList[0].content;
 		mainGame->stHostSingleDuelist[0]->setText(L"");
 		mainGame->stHostSingleDuelist[1]->setText(L"");
+		mainGame->stHostSingleOB->setText(L"");
 		mainGame->SetStaticText(mainGame->stHostSingleRule, 180, mainGame->guiFont, (wchar_t*)str.c_str());
 		mainGame->RefreshDeck(mainGame->cbDeckSelect);
 		mainGame->cbDeckSelect->setEnabled(true);
@@ -368,14 +369,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->localAction.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->CloseDuelWindow();
-		mainGame->gMutex.Unlock();
-		mainGame->ShowElement(mainGame->wLanWindow);
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
 		mainGame->btnJoinCancel->setEnabled(true);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->ShowElement(mainGame->wLanWindow);
+		mainGame->gMutex.Unlock();
 		event_base_loopbreak(client_base);
 		break;
 	}

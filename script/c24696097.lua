@@ -87,7 +87,9 @@ function c24696097.dacon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():GetControler()~=tp
 end
 function c24696097.datg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemove() end
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and e:GetHandler():IsCanBeEffectTarget(e)
+		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
+	Duel.SetTargetCard(e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
 end
 function c24696097.daop(e,tp,eg,ep,ev,re,r,rp,chk)
