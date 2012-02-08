@@ -27,7 +27,7 @@ function c41930553.rfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
 function c41930553.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCAITON_GRAVE) and chkc:IsControler(1-tp) and c41930553.rfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c41930553.rfilter(chkc) end
 	if chk==0 then return true end
 	if Duel.IsExistingMatchingCard(c41930553.cfilter,tp,LOCATION_HAND,0,1,nil)
 		and Duel.IsExistingTarget(c41930553.rfilter,tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(41930553,0)) then
@@ -39,7 +39,7 @@ function c41930553.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	else e:SetProperty(0) end
 end
 function c41930553.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCAITON_GRAVE) and chkc:IsControler(1-tp) and c41930553.rfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c41930553.rfilter(chkc) end
 	if chk==0 then return e:GetHandler():GetFlagEffect(41930553)==0
 		and Duel.IsExistingMatchingCard(c41930553.cfilter,tp,LOCATION_HAND,0,1,nil)
 		and Duel.IsExistingTarget(c41930553.rfilter,tp,0,LOCATION_GRAVE,1,nil) end

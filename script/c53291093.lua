@@ -15,7 +15,7 @@ function c53291093.filter(c)
 	return c:GetCounter(0xe)>0 and c:IsDestructable()
 end
 function c53291093.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCAITON_MZONE) and c53291093.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c53291093.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c53291093.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c53291093.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

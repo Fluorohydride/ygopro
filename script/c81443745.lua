@@ -25,7 +25,7 @@ function c81443745.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToGraveAsCost()
 end
 function c81443745.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCAITON_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return true end
 	if Duel.IsExistingMatchingCard(c81443745.cfilter,tp,LOCATION_HAND,0,1,nil)
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(81443745,1)) then
@@ -45,7 +45,7 @@ function c81443745.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(cg,POS_FACEUP,REASON_COST)
 end
 function c81443745.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCAITON_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return e:GetHandler():GetFlagEffect(81443745)==0
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,1,nil)
