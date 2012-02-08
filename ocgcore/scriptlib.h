@@ -265,7 +265,6 @@ public:
 	static int32 duel_get_turn_player(lua_State *L);
 	static int32 duel_get_turn_count(lua_State *L);
 	static int32 duel_get_draw_count(lua_State *L);
-	static int32 duel_debug_message(lua_State *L);
 	static int32 duel_register_effect(lua_State *L);
 	static int32 duel_register_flag_effect(lua_State *L);
 	static int32 duel_reset_flag_effect(lua_State *L);
@@ -445,6 +444,11 @@ public:
 	static int32 duel_venom_swamp_check(lua_State *L);
 	static int32 duel_swap_deck_and_grave(lua_State *L);
 	static int32 duel_majestic_copy(lua_State *L);
+	
+	//preload
+	static int32 debug_message(lua_State *L);
+	static int32 debug_add_card(lua_State *L);
+	static int32 debug_set_player_info(lua_State *L);
 };
 
 #endif /* SCRIPTLIB_H_ */

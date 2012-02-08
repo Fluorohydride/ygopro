@@ -11,7 +11,6 @@
 #include "card.h"
 #include "effect.h"
 #include "group.h"
-#include "ocgapi.h"
 
 int32 scriptlib::duel_get_lp(lua_State *L) {
 	check_param_count(L, 1);
@@ -54,15 +53,6 @@ int32 scriptlib::duel_get_draw_count(lua_State *L) {
 		return 0;
 	lua_pushinteger(L, pduel->game_field->get_draw_count(playerid));
 	return 1;
-}
-int32 scriptlib::duel_debug_message(lua_State *L) {
-	duel* pduel = interpreter::get_duel_info(L);
-	lua_getglobal(L, "tostring");
-	lua_pushvalue(L, -2);
-	lua_pcall(L, 1, 1, 0);
-	sprintf(pduel->strbuffer, "%s", lua_tostring(L, -1));
-	handle_message(pduel, 2);
-	return 0;
 }
 int32 scriptlib::duel_register_effect(lua_State *L) {
 	check_param_count(L, 2);

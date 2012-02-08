@@ -270,7 +270,6 @@ static const struct luaL_Reg duellib[] = {
 	{ "GetTurnPlayer", scriptlib::duel_get_turn_player },
 	{ "GetTurnCount", scriptlib::duel_get_turn_count },
 	{ "GetDrawCount", scriptlib::duel_get_draw_count },
-	{ "DebugMessage", scriptlib::duel_debug_message },
 	{ "RegisterEffect", scriptlib::duel_register_effect },
 	{ "RegisterFlagEffect", scriptlib::duel_register_flag_effect },
 	{ "GetFlagEffect", scriptlib::duel_get_flag_effect },
@@ -444,6 +443,13 @@ static const struct luaL_Reg duellib[] = {
 	{ "VenomSwampCheck", scriptlib::duel_venom_swamp_check },
 	{ "SwapDeckAndGrave", scriptlib::duel_swap_deck_and_grave },
 	{ "MajesticCopy", scriptlib::duel_majestic_copy },
+	{ NULL, NULL }
+};
+
+static const struct luaL_Reg debuglib[] = {
+	{ "Message", scriptlib::debug_message },
+	{ "AddCard", scriptlib::debug_add_card },
+	{ "SetPlayerInfo", scriptlib::debug_set_player_info },
 	{ NULL, NULL }
 };
 

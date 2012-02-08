@@ -48,6 +48,7 @@ struct CTOS_CreateGame {
 	unsigned short pass[20];
 };
 struct CTOS_JoinGame {
+	unsigned short version;
 	unsigned int gameid;
 	unsigned short pass[20];
 };
@@ -186,6 +187,7 @@ public:
 #define ERRMSG_JOINERROR	0x1
 #define ERRMSG_DECKERROR	0x2
 #define ERRMSG_SIDEERROR	0x3
+#define ERRMSG_VERERROR		0x4
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1

@@ -112,17 +112,19 @@ extern "C" DECL_DLLEXPORT int32 process(ptr pduel) {
 }
 extern "C" DECL_DLLEXPORT void new_card(ptr pduel, uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position) {
 	duel* ptduel = (duel*)pduel;
-	card* pcard = ptduel->new_card(code);
-	pcard->owner = owner;
-	ptduel->game_field->add_card(playerid, pcard, location, sequence);
-	pcard->current.position = position;
-	if(!(location & LOCATION_ONFIELD) || (position & POS_FACEUP)) {
-		pcard->enable_field_effect(TRUE);
-		ptduel->game_field->adjust_instant();
-	}
-	if(location & LOCATION_ONFIELD) {
-		if(location == LOCATION_MZONE)
-			pcard->set_status(STATUS_PROC_COMPLETE, TRUE);
+	if(ptduel->game_field->is_location_useable(playerid, location, sequence)) {
+		card* pcard = ptduel->new_card(code);
+		pcard->owner = owner;
+		ptduel->game_field->add_card(playerid, pcard, location, sequence);
+		pcard->current.position = position;
+		if(!(location & LOCATION_ONFIELD) || (position & POS_FACEUP)) {
+			pcard->enable_field_effect(TRUE);
+			ptduel->game_field->adjust_instant();
+		}
+		if(location & LOCATION_ONFIELD) {
+			if(location == LOCATION_MZONE)
+				pcard->set_status(STATUS_PROC_COMPLETE, TRUE);
+		}
 	}
 }
 extern "C" DECL_DLLEXPORT int32 query_card(ptr pduel, uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache) {
@@ -246,6 +248,6 @@ extern "C" DECL_DLLEXPORT void set_responsei(ptr pduel, int32 value) {
 extern "C" DECL_DLLEXPORT void set_responseb(ptr pduel, byte* buf) {
 	((duel*)pduel)->set_responseb(buf);
 }
-extern "C" DECL_DLLEXPORT void run_script(ptr pduel, byte* scriptbuf, int32 len) {
-
+extern "C" DECL_DLLEXPORT int32 preload_script(ptr pduel, char* script, int32 len) {
+	return ((duel*)pduel)->lua->load_script(script);
 }

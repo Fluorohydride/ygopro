@@ -455,8 +455,8 @@ void Game::DrawSpec() {
 	if(showcard) {
 		switch(showcard) {
 		case 1: {
-			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 200));
-			driver->draw2DImage(imageManager.tMask, recti(574, 200, 574 + (showcarddif > 177 ? 177 : showcarddif), 454),
+			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
+			driver->draw2DImage(imageManager.tMask, recti(574, 150, 574 + (showcarddif > 177 ? 177 : showcarddif), 404),
 			                    recti(254 - showcarddif, 0, 254 - (showcarddif > 177 ? showcarddif - 177 : 0), 254), 0, 0, true);
 			showcarddif += 15;
 			if(showcarddif >= 254) {
@@ -466,8 +466,8 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 2: {
-			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 200));
-			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 200, 761, 454), recti(0, 0, 177 - showcarddif, 254), 0, 0, true);
+			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
+			driver->draw2DImage(imageManager.tMask, recti(574 + showcarddif, 150, 761, 404), recti(0, 0, 177 - showcarddif, 254), 0, 0, true);
 			showcarddif += 15;
 			if(showcarddif >= 177) {
 				showcard = 0;
@@ -475,8 +475,8 @@ void Game::DrawSpec() {
 			break;
 		}
 		case 3: {
-			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 200));
-			driver->draw2DImage(imageManager.tNegated, recti(536 + showcarddif, 191 + showcarddif, 793 - showcarddif, 447 - showcarddif), recti(0, 0, 128, 128), 0, 0, true);
+			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
+			driver->draw2DImage(imageManager.tNegated, recti(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif), recti(0, 0, 128, 128), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += 4;
 			break;
@@ -486,7 +486,7 @@ void Game::DrawSpec() {
 			matManager.c2d[1] = (showcarddif << 24) | 0xffffff;
 			matManager.c2d[2] = (showcarddif << 24) | 0xffffff;
 			matManager.c2d[3] = (showcarddif << 24) | 0xffffff;
-			driver->draw2DImage(imageManager.GetTexture(showcardcode), recti(574, 200, 751, 454),
+			driver->draw2DImage(imageManager.GetTexture(showcardcode), recti(574, 154, 751, 404),
 			                    recti(0, 0, 177, 254), 0, matManager.c2d, true);
 			if(showcarddif < 255)
 				showcarddif += 17;
@@ -497,18 +497,36 @@ void Game::DrawSpec() {
 			matManager.c2d[1] = (showcarddif << 25) | 0xffffff;
 			matManager.c2d[2] = (showcarddif << 25) | 0xffffff;
 			matManager.c2d[3] = (showcarddif << 25) | 0xffffff;
-			driver->draw2DImage(imageManager.GetTexture(showcardcode), recti(662 - showcarddif * 0.69685f, 327 - showcarddif, 662 + showcarddif * 0.69685f, 327 + showcarddif),
+			driver->draw2DImage(imageManager.GetTexture(showcardcode), recti(662 - showcarddif * 0.69685f, 277 - showcarddif, 662 + showcarddif * 0.69685f, 277 + showcarddif),
 			                    recti(0, 0, 177, 254), 0, matManager.c2d, true);
 			if(showcarddif < 127)
 				showcarddif += 9;
 			break;
 		}
 		case 6: {
-			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 200));
+			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
 			driver->draw2DImage(imageManager.tNumber, recti(536 + showcarddif, 191 + showcarddif, 793 - showcarddif, 447 - showcarddif),
 			                    recti((showcardp % 5) * 32, (showcardp / 5) * 32, (showcardp % 5 + 1) * 32, (showcardp / 5 + 1) * 32), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += 4;
+			break;
+		}
+		case 7: {
+			core::position2d<s32> corner[4];
+			float y = sin(showcarddif * 3.1415926f / 180.0f) * 254;
+			corner[0] = core::position2d<s32>(574 - (254 - y) * 0.3f, 404 - y);
+			corner[1] = core::position2d<s32>(751 + (254 - y) * 0.3f, 404 - y);
+			corner[2] = core::position2d<s32>(574, 404);
+			corner[3] = core::position2d<s32>(751, 404);
+			irr::gui::Draw2DImageQuad(driver, imageManager.GetTexture(showcardcode), rect<s32>(0, 0, 177, 254), corner);
+			showcardp++;
+			showcarddif += 9;
+			if(showcarddif >= 90)
+				showcarddif = 90;
+			if(showcardp == 60) {
+				showcardp = 0;
+				showcarddif = 0;
+			}
 			break;
 		}
 		case 100: {

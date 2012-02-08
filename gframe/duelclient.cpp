@@ -50,8 +50,26 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	}
 	connect_state = 1;
 	rnd.reset(time(0));
+	if(!create_game) {
+		timeval timeout = {5, 0};
+		event* resp_event = event_new(client_base, 0, EV_TIMEOUT, ConnectTimeout, 0);
+		event_add(resp_event, &timeout);
+	}
 	Thread::NewThread(ClientThread, 0);
 	return true;
+}
+void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
+	if(connect_state == 2)
+		return;
+	if(!is_closing) {
+		mainGame->btnCreateHost->setEnabled(true);
+		mainGame->btnJoinHost->setEnabled(true);
+		mainGame->btnJoinCancel->setEnabled(true);
+		mainGame->gMutex.Lock();
+		mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
+		mainGame->gMutex.Unlock();
+	}
+	event_base_loopbreak(client_base);
 }
 void DuelClient::StopClient(bool is_exiting) {
 	if(connect_state != 2)
@@ -100,6 +118,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			SendPacketToServer(CTOS_CREATE_GAME, cscg);
 		} else {
 			CTOS_JoinGame csjg;
+			csjg.version = PRO_VERSION;
 			csjg.gameid = 0;
 			BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), csjg.pass, 20);
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
@@ -199,6 +218,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->env->addMessageBox(L"", dataManager.GetSysString(1408));
 			mainGame->gMutex.Unlock();
+			break;
+		}
+		case ERRMSG_VERERROR: {
+			mainGame->btnCreateHost->setEnabled(true);
+			mainGame->btnJoinHost->setEnabled(true);
+			mainGame->btnJoinCancel->setEnabled(true);
+			mainGame->gMutex.Lock();
+			wchar_t msgbuf[256];
+			myswprintf(msgbuf, dataManager.GetSysString(1411), pkt->code);
+			mainGame->env->addMessageBox(L"", msgbuf);
+			mainGame->gMutex.Unlock();
+			event_base_loopbreak(client_base);
 			break;
 		}
 		}
@@ -1686,7 +1717,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		myswprintf(event_string, dataManager.GetSysString(1603), dataManager.GetName(code));
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 0;
-		mainGame->showcard = 4;
+		mainGame->showcardp = 0;
+		mainGame->showcard = 7;
 		mainGame->WaitFrameSignal(30);
 		mainGame->showcard = 0;
 		mainGame->WaitFrameSignal(11);
@@ -1729,7 +1761,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->WaitFrameSignal(11);
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 0;
-		mainGame->showcard = 4;
+		mainGame->showcard = 7;
 		mainGame->WaitFrameSignal(30);
 		mainGame->showcard = 0;
 		mainGame->WaitFrameSignal(11);

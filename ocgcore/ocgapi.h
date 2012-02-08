@@ -48,7 +48,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_count(ptr pduel, uint8 playerid, uin
 extern "C" DECL_DLLEXPORT int32 query_field_card(ptr pduel, uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache);
 extern "C" DECL_DLLEXPORT void set_responsei(ptr pduel, int32 value);
 extern "C" DECL_DLLEXPORT void set_responseb(ptr pduel, byte* buf);
-extern "C" DECL_DLLEXPORT void run_script(ptr pduel, byte* scriptbuf, int32 len);
+extern "C" DECL_DLLEXPORT int32 preload_script(ptr pduel, char* script, int32 len);
 byte* default_script_reader(const char* script_name, int* len);
 uint32 default_card_reader(uint32 code, card_data* data);
 uint32 default_message_handler(void* pduel, uint32 msg_type);
