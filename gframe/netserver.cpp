@@ -56,6 +56,8 @@ bool NetServer::StartBroadcast() {
 void NetServer::StopServer() {
 	if(!net_evbase)
 		return;
+	if(duel_mode)
+		duel_mode->EndDuel();
 	event_base_loopexit(net_evbase, 0);
 }
 void NetServer::StopBroadcast() {
@@ -158,6 +160,7 @@ int NetServer::ServerThread(void* param) {
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 	auto bit = users.find(dp->bev);
 	if(bit != users.end()) {
+		bufferevent_flush(dp->bev, EV_WRITE, BEV_FLUSH);
 		bufferevent_disable(dp->bev, EV_READ);
 		bufferevent_free(dp->bev);
 		users.erase(bit);
@@ -166,7 +169,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	char* pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
-	if(dp->state == 0xff || (dp->state && dp->state != pktType))
+	if((pktType != CTOS_SURRENDER) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
@@ -239,6 +242,12 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		if(!duel_mode)
 			break;
 		duel_mode->LeaveGame(dp);
+		break;
+	}
+	case CTOS_SURRENDER: {
+		if(!duel_mode)
+			break;
+		duel_mode->Surrender(dp);
 		break;
 	}
 	case CTOS_HS_TODUELIST: {

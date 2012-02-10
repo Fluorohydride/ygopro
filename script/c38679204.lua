@@ -32,7 +32,7 @@ function c38679204.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c38679204.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return c:IsPreviousLocation(LOCATION_MZONE)
+	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 end
 function c38679204.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,500) end
@@ -59,7 +59,7 @@ function c38679204.descon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
 	local dt=nil
 	if ec==Duel.GetAttacker() then dt=Duel.GetAttackTarget()
-	elseif ec==Duel.GetAttackTarget() then di=Duel.GetAttacker() end
+	elseif ec==Duel.GetAttackTarget() then dt=Duel.GetAttacker() end
 	e:SetLabelObject(dt)
 	return dt and dt:IsRelateToBattle()
 end

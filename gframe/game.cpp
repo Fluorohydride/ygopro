@@ -433,6 +433,9 @@ bool Game::Initialize() {
 	btnReplayStep = env->addButton(rect<s32>(5, 55, 85, 75), wReplayControl, BUTTON_REPLAY_STEP, dataManager.GetSysString(1345));
 	btnReplaySwap = env->addButton(rect<s32>(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnReplayExit = env->addButton(rect<s32>(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
+	//
+	btnLeaveGame = env->addButton(rect<s32>(205, 200, 295, 273), 0, BUTTON_LEAVE_GAME, L"");
+	btnLeaveGame->setVisible(false);
 	device->setEventReceiver(&menuHandler);
 	LoadConfig();
 	env->getSkin()->setFont(guiFont);
@@ -756,6 +759,7 @@ void Game::CloseDuelWindow() {
 	wReplayControl->setVisible(false);
 	stHintMsg->setVisible(false);
 	btnSideOK->setVisible(false);
+	btnLeaveGame->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
 	lstHostList->clear();

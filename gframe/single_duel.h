@@ -22,10 +22,12 @@ public:
 	virtual void HandResult(DuelPlayer* dp, unsigned char res);
 	virtual void TPResult(DuelPlayer* dp, unsigned char tp);
 	virtual void Process();
+	virtual void Surrender(DuelPlayer* dp);
 	virtual int Analyze(char* msgbuffer, unsigned int len);
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
 	virtual void EndDuel();
 	
+	void DuelEndProc();
 	void WaitforResponse(int playerid);
 	void RefreshMzone(int player, int flag = 0x181fff, int use_cache = 1);
 	void RefreshSzone(int player, int flag = 0x181fff, int use_cache = 1);

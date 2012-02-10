@@ -306,6 +306,8 @@ public:
 	irr::gui::IGUIButton* btnReplayStep;
 	irr::gui::IGUIButton* btnReplayExit;
 	irr::gui::IGUIButton* btnReplaySwap;
+	//surrender/leave
+	irr::gui::IGUIButton* btnLeaveGame;
 
 };
 
@@ -386,6 +388,7 @@ extern Game* mainGame;
 #define BUTTON_BP					260
 #define BUTTON_M2					261
 #define BUTTON_EP					262
+#define BUTTON_LEAVE_GAME			263
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
 #define BUTTON_CATEGORY_OK			300

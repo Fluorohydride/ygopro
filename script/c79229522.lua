@@ -31,7 +31,7 @@ function c79229522.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function c79229522.spfilter1(c,tp)
-	return c:IsCode(70095154) and c:IsAbleToGraveAsCost() and c:IsCanBeFusionMaterial() and (c:IsControler(tp) or c:IsFaceup())
+	return c:IsCode(70095154) and c:IsAbleToGraveAsCost() and (c:IsControler(tp) or c:IsFaceup())
 		and Duel.IsExistingMatchingCard(c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,tp)
 end
 function c79229522.spfilter2(c,tp)

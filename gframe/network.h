@@ -121,6 +121,7 @@ public:
 	virtual int Analyze(char* msgbuffer, unsigned int len) {
 		return 0;
 	}
+	virtual void Surrender(DuelPlayer* dp) {}
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
 	virtual void EndDuel() {};
 
@@ -153,6 +154,7 @@ public:
 #define CTOS_CREATE_GAME	0x11
 #define CTOS_JOIN_GAME		0x12
 #define CTOS_LEAVE_GAME		0x13
+#define CTOS_SURRENDER		0x14
 #define CTOS_HS_TODUELIST	0x20
 #define CTOS_HS_TOOBSERVER	0x21
 #define CTOS_HS_READY		0x22

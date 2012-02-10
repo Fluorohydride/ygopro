@@ -26,6 +26,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			scem.msg = ERRMSG_JOINERROR;
 			scem.code = 0;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+			NetServer::DisconnectPlayer(dp);
 			return;
 		}
 		CTOS_JoinGame* pkt = (CTOS_JoinGame*)pdata;
@@ -34,6 +35,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			scem.msg = ERRMSG_VERERROR;
 			scem.code = PRO_VERSION;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
+			NetServer::DisconnectPlayer(dp);
 			return;
 		}
 		wchar_t jpass[20];
@@ -129,20 +131,33 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
-		STOC_HS_PlayerChange scpc;
-		players[dp->type] = 0;
-		ready[dp->type] = false;
-		scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
-		if(players[0] && dp->type != 0)
-			NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_CHANGE, scpc);
-		if(players[1] && dp->type != 1)
-			NetServer::SendPacketToPlayer(players[1], STOC_HS_PLAYER_CHANGE, scpc);
-		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
-			NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
-		if(pduel)
-			NetServer::StopServer();
-		else {
+		if(!pduel) {
+			STOC_HS_PlayerChange scpc;
+			players[dp->type] = 0;
+			ready[dp->type] = false;
+			scpc.status = (dp->type << 4) | PLAYERCHANGE_LEAVE;
+			if(players[0] && dp->type != 0)
+				NetServer::SendPacketToPlayer(players[0], STOC_HS_PLAYER_CHANGE, scpc);
+			if(players[1] && dp->type != 1)
+				NetServer::SendPacketToPlayer(players[1], STOC_HS_PLAYER_CHANGE, scpc);
+			for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+				NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 			NetServer::DisconnectPlayer(dp);
+		} else {
+			unsigned char wbuf[3];
+			wbuf[0] = MSG_WIN;
+			wbuf[1] = 1 - dp->type;
+			wbuf[2] = 0;
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, wbuf, 3);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			EndDuel();
+			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			NetServer::StopServer();
 		}
 	}
 }
@@ -428,56 +443,80 @@ void SingleDuel::Process() {
 			stop = Analyze(engineBuffer, engLen);
 		}
 	}
-	if(stop == 2) {
-		if(!match_mode) {
+	if(stop == 2)
+		DuelEndProc();
+}
+void SingleDuel::DuelEndProc() {
+	if(!match_mode) {
+		NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+		NetServer::ReSendToPlayer(players[1]);
+		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+			NetServer::ReSendToPlayer(*oit);
+		NetServer::StopServer();
+	} else {
+		int winc[3] = {0, 0, 0};
+		for(int i = 0; i < duel_count; ++i)
+			winc[match_result[i]]++;
+		if(winc[0] == 2 || (winc[0] == 1 && winc[2] == 2)) {
+			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			NetServer::StopServer();
+		} else if(winc[1] == 2 || (winc[1] == 1 && winc[2] == 2)) {
+			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			NetServer::StopServer();
+		} else if(winc[2] == 3 || (winc[0] == 1 && winc[1] == 1 && winc[2] == 1)) {
 			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			NetServer::StopServer();
 		} else {
-			int winc[3] = {0, 0, 0};
-			for(int i = 0; i < duel_count; ++i)
-				winc[match_result[i]]++;
-			if(winc[0] == 2 || (winc[0] == 1 && winc[2] == 2)) {
-				NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-				NetServer::ReSendToPlayer(players[1]);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-				NetServer::StopServer();
-			} else if(winc[1] == 2 || (winc[1] == 1 && winc[2] == 2)) {
-				NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-				NetServer::ReSendToPlayer(players[1]);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-				NetServer::StopServer();
-			} else if(winc[2] == 3 || (winc[0] == 1 && winc[1] == 1 && winc[2] == 1)) {
-				NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-				NetServer::ReSendToPlayer(players[1]);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-				NetServer::StopServer();
-			} else {
-				if(players[0] != pplayer[0]) {
-					players[0] = pplayer[0];
-					players[1] = pplayer[1];
-					players[0]->type = 0;
-					players[1]->type = 1;
-					Deck d = pdeck[0];
-					pdeck[0] = pdeck[1];
-					pdeck[1] = d;
-				}
-				ready[0] = false;
-				ready[1] = false;
-				players[0]->state = CTOS_UPDATE_DECK;
-				players[1]->state = CTOS_UPDATE_DECK;
-				NetServer::SendPacketToPlayer(players[0], STOC_CHANGE_SIDE);
-				NetServer::SendPacketToPlayer(players[1], STOC_CHANGE_SIDE);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::SendPacketToPlayer(*oit, STOC_WAITING_SIDE);
+			if(players[0] != pplayer[0]) {
+				players[0] = pplayer[0];
+				players[1] = pplayer[1];
+				players[0]->type = 0;
+				players[1]->type = 1;
+				Deck d = pdeck[0];
+				pdeck[0] = pdeck[1];
+				pdeck[1] = d;
 			}
+			ready[0] = false;
+			ready[1] = false;
+			players[0]->state = CTOS_UPDATE_DECK;
+			players[1]->state = CTOS_UPDATE_DECK;
+			NetServer::SendPacketToPlayer(players[0], STOC_CHANGE_SIDE);
+			NetServer::SendPacketToPlayer(players[1], STOC_CHANGE_SIDE);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::SendPacketToPlayer(*oit, STOC_WAITING_SIDE);
 		}
 	}
+}
+void SingleDuel::Surrender(DuelPlayer* dp) {
+	if(dp->type > 1 || !pduel)
+		return;
+	unsigned char wbuf[3];
+	uint32 player = dp->type;
+	wbuf[0] = MSG_WIN;
+	wbuf[1] = 1 - player;
+	wbuf[2] = 0;
+	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, wbuf, 3);
+	NetServer::ReSendToPlayer(players[1]);
+	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+		NetServer::ReSendToPlayer(*oit);
+	if(players[player] == pplayer[player]) {
+		match_result[duel_count++] = player;
+		tp_player = 1 - player;
+	} else {
+		match_result[duel_count++] = 1 - player;
+		tp_player = player;
+	}
+	EndDuel();
+	DuelEndProc();
 }
 int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 	char* offset, *pbufw, *pbuf = msgbuffer;

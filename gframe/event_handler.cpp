@@ -90,6 +90,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wReplaySave, true);
 				break;
 			}
+			case BUTTON_LEAVE_GAME: {
+				if(mainGame->dInfo.isObserver) {
+					DuelClient::StopClient();
+					mainGame->CloseDuelWindow();
+					mainGame->dInfo.isStarted = false;
+					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->ShowElement(mainGame->wLanWindow);
+				} else {
+					DuelClient::SendPacketToServer(CTOS_SURRENDER);
+					mainGame->localAction.Set();
+				}
+				break;
+			}
 			case BUTTON_MSG_OK: {
 				mainGame->HideElement(mainGame->wMessage, true);
 				break;
@@ -110,7 +123,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
-				mainGame->HideElement(mainGame->wQuery);
 				break;
 			}
 			case BUTTON_NO: {
@@ -138,7 +150,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				}
-				mainGame->HideElement(mainGame->wQuery);
 				break;
 			}
 			case BUTTON_POS_AU: {

@@ -266,6 +266,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->wFilter->setVisible(false);
 		mainGame->btnSideOK->setVisible(true);
+		if(!mainGame->dInfo.isObserver)
+			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->deckBuilder.result_string[0] = L'0';
 		mainGame->deckBuilder.result_string[1] = 0;
 		mainGame->deckBuilder.results.clear();
@@ -381,6 +383,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wPhase->setVisible(true);
 		mainGame->btnSideOK->setVisible(false);
 		mainGame->device->setEventReceiver(&mainGame->dField);
+		if(selftype > 1) {
+			mainGame->dInfo.isObserver = true;
+			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
+			mainGame->btnLeaveGame->setVisible(true);
+		}
 		if(selftype != 1) {
 			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[0]->getText(), mainGame->dInfo.hostname, 20);
 			BufferIO::CopyWStr(mainGame->stHostSingleDuelist[1]->getText(), mainGame->dInfo.clientname, 20);
@@ -615,6 +622,10 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int playertype = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
 		mainGame->dInfo.isObserver =  (playertype & 0xf0) ? true : false;
+		if(!mainGame->dInfo.isObserver) {
+			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
+			mainGame->btnLeaveGame->setVisible(true);
+		}
 		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
 		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
@@ -1221,7 +1232,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0)
 				pcard->SetCode(code);
-			myswprintf(textBuffer, L"%d[%ls]", i, dataManager.GetName(code));
+			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
 			float shift = -0.15f;
@@ -1254,7 +1265,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0)
 				pcard->SetCode(code);
-			myswprintf(textBuffer, L"%d[%ls]", i, dataManager.GetName(code));
+			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
 			if (l & 0x41) {
@@ -2384,7 +2395,7 @@ void DuelClient::BeginRefreshHost() {
 		return;
 	}
 	timeval timeout = {5, 0};
-	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
+	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
 	Thread::NewThread(RefreshThread, broadev);
 	//send request

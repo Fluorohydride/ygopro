@@ -20,13 +20,13 @@ function c46668237.initial_effect(c)
 	e2:SetOperation(c46668237.operation)
 	c:RegisterEffect(e2)
 end
-function c46668237.filter(c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_BEAST)
+function c46668237.filter(c,tp)
+	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_BEAST)
 end
 function c46668237.adjop(e,tp,eg,ep,ev,re,r,rp)
 	local pg=e:GetLabelObject()
 	if pg then pg:DeleteGroup() end
-	local dg=eg:Filter(c46668237.filter,nil)
+	local dg=eg:Filter(c46668237.filter,nil,tp)
 	e:SetLabelObject(dg)
 	dg:KeepAlive()
 end
