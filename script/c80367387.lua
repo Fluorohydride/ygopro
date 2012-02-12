@@ -51,7 +51,7 @@ function c80367387.ccost(e,tp)
 		Duel.ConfirmCards(1-tp,g)
 		Duel.ShuffleHand(tp)
 	else
-		Duel.Destroy(e:GetHandler(),REASON_RULE)
+		Duel.Destroy(e:GetHandler(),REASON_COST)
 	end
 end
 function c80367387.atcon(e,tp,eg,ep,ev,re,r,rp)

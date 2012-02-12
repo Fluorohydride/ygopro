@@ -30,8 +30,6 @@ bool Game::Initialize() {
 		return false;
 	linePattern = 0x0f0f;
 	waitFrame = 0;
-	fadingFrame = 0;
-	autoFadeoutFrame = 0;
 	signalFrame = 0;
 	showcard = 0;
 	is_attacking = false;
@@ -87,7 +85,6 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1222), rect<s32>(10, 390, 220, 410), false, false, wLanWindow);
 	ebJoinPass = env->addEditBox(L"", rect<s32>(110, 385, 250, 410), true, wLanWindow);
 	ebJoinPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	ebJoinPass->setPasswordBox(true);
 	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
 	btnCreateHost = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));

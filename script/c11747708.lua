@@ -14,7 +14,7 @@ end
 c11747708[0]=true
 c11747708[1]=true
 function c11747708.costfilter(c)
-	return c:IsRace(RACE_PLANT) and c:IsAbleToRemoveAsCost()
+	return c:IsRace(RACE_PLANT) and c:GetLevel()>0 and c:IsAbleToRemoveAsCost()
 end
 function c11747708.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c11747708.costfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end

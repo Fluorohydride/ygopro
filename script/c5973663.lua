@@ -8,7 +8,6 @@ function c5973663.initial_effect(c)
 	--add counter
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_DESTROY)
 	e2:SetOperation(c5973663.ctop)
@@ -48,7 +47,7 @@ function c5973663.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c5973663.ctfilter(c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsRace(RACE_PLANT)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsRace(RACE_PLANT)
 end
 function c5973663.ctop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(c5973663.ctfilter,1,nil) then

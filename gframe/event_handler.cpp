@@ -82,12 +82,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->ebRSName->getText()[0] == 0)
 					break;
 				mainGame->actionParam = 1;
-				mainGame->HideElement(mainGame->wReplaySave, true);
+				mainGame->HideElement(mainGame->wReplaySave);
+				mainGame->replaySignal.Set();
 				break;
 			}
 			case BUTTON_REPLAY_CANCEL: {
 				mainGame->actionParam = 0;
-				mainGame->HideElement(mainGame->wReplaySave, true);
+				mainGame->HideElement(mainGame->wReplaySave);
+				mainGame->replaySignal.Set();
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
@@ -96,6 +98,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->CloseDuelWindow();
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->btnCreateHost->setEnabled(true);
+					mainGame->btnJoinHost->setEnabled(true);
+					mainGame->btnJoinCancel->setEnabled(true);
 					mainGame->ShowElement(mainGame->wLanWindow);
 				} else {
 					DuelClient::SendPacketToServer(CTOS_SURRENDER);
@@ -119,6 +124,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_CARD:
 				case MSG_SELECT_TRIBUTE:
 				case MSG_SELECT_SUM: {
+					mainGame->HideElement(mainGame->wQuery);
+					break;
+				}
+				default: {
 					mainGame->HideElement(mainGame->wQuery);
 					break;
 				}
@@ -147,6 +156,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						respbuf[i + 1] = selected_cards[i]->select_seq;
 					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 					mainGame->HideElement(mainGame->wQuery, true);
+					break;
+				}
+				default: {
+					mainGame->HideElement(mainGame->wQuery);
 					break;
 				}
 				}
@@ -1058,7 +1071,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(mainGame->dInfo.isReplay)
 				break;
 			mainGame->wCmdMenu->setVisible(false);
-			if(mainGame->fadingFrame)
+			if(mainGame->fadingList.size())
 				break;
 			switch(mainGame->dInfo.curMsg) {
 			case MSG_WAITING: {

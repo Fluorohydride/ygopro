@@ -488,6 +488,8 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	lua_setglobal(lua_state, "Group");
 	luaL_newlib(lua_state, duellib);
 	lua_setglobal(lua_state, "Duel");
+	luaL_newlib(lua_state, debuglib);
+	lua_setglobal(lua_state, "Debug");
 	//extra scripts
 	load_script((char*) "constant.lua");
 	load_script((char*) "utility.lua");

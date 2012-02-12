@@ -384,70 +384,74 @@ void Game::DrawGUI() {
 			mit->first->setImage(imageManager.GetTexture(mit->second));
 		imageLoading.clear();
 	}
-	if(fadingFrame) {
-		if(isFadein) {
-			if(fadingFrame > 5) {
-				fadingUL.X -= fadingDiff.X;
-				fadingLR.X += fadingDiff.X;
-				fadingFrame--;
-				guiFading->setRelativePosition(irr::core::recti(fadingUL, fadingLR));
+	for(auto fit = fadingList.begin(); fit != fadingList.end();) {
+		auto fthis = fit++;
+		FadingUnit& fu = *fthis;
+		if(fu.fadingFrame) {
+			fu.guiFading->setVisible(true);
+			if(fu.isFadein) {
+				if(fu.fadingFrame > 5) {
+					fu.fadingUL.X -= fu.fadingDiff.X;
+					fu.fadingLR.X += fu.fadingDiff.X;
+					fu.fadingFrame--;
+					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
+				} else {
+					fu.fadingUL.Y -= fu.fadingDiff.Y;
+					fu.fadingLR.Y += fu.fadingDiff.Y;
+					fu.fadingFrame--;
+					if(!fu.fadingFrame) {
+						fu.guiFading->setRelativePosition(fu.fadingSize);
+						if(fu.guiFading == wPosSelect) {
+							btnPSAU->setDrawImage(true);
+							btnPSAD->setDrawImage(true);
+							btnPSDU->setDrawImage(true);
+							btnPSDD->setDrawImage(true);
+						}
+						if(fu.guiFading == wCardSelect) {
+							for(int i = 0; i < 5; ++i)
+								btnCardSelect[i]->setDrawImage(true);
+						}
+						env->setFocus(fu.guiFading);
+					} else
+						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
+				}
 			} else {
-				fadingUL.Y -= fadingDiff.Y;
-				fadingLR.Y += fadingDiff.Y;
-				fadingFrame--;
-				if(!fadingFrame) {
-					guiFading->setRelativePosition(fadingSize);
-					if(guiFading == wPosSelect) {
-						btnPSAU->setDrawImage(true);
-						btnPSAD->setDrawImage(true);
-						btnPSDU->setDrawImage(true);
-						btnPSDD->setDrawImage(true);
-					}
-					if(guiFading == wCardSelect) {
-						for(int i = 0; i < 5; ++i)
-							btnCardSelect[i]->setDrawImage(true);
-					}
-					env->setFocus(guiFading);
-				} else
-					guiFading->setRelativePosition(irr::core::recti(fadingUL, fadingLR));
+				if(fu.fadingFrame > 5) {
+					fu.fadingUL.Y += fu.fadingDiff.Y;
+					fu.fadingLR.Y -= fu.fadingDiff.Y;
+					fu.fadingFrame--;
+					fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
+				} else {
+					fu.fadingUL.X += fu.fadingDiff.X;
+					fu.fadingLR.X -= fu.fadingDiff.X;
+					fu.fadingFrame--;
+					if(!fu.fadingFrame) {
+						fu.guiFading->setVisible(false);
+						fu.guiFading->setRelativePosition(fu.fadingSize);
+						if(fu.guiFading == wPosSelect) {
+							btnPSAU->setDrawImage(true);
+							btnPSAD->setDrawImage(true);
+							btnPSDU->setDrawImage(true);
+							btnPSDD->setDrawImage(true);
+						}
+						if(fu.guiFading == wCardSelect) {
+							for(int i = 0; i < 5; ++i)
+								btnCardSelect[i]->setDrawImage(true);
+						}
+					} else
+						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
+				}
+				if(fu.signalAction && !fu.fadingFrame) {
+					localAction.Set();
+					fu.signalAction = false;
+				}
 			}
-		} else {
-			if(fadingFrame > 5) {
-				fadingUL.Y += fadingDiff.Y;
-				fadingLR.Y -= fadingDiff.Y;
-				fadingFrame--;
-				guiFading->setRelativePosition(irr::core::recti(fadingUL, fadingLR));
-			} else {
-				fadingUL.X += fadingDiff.X;
-				fadingLR.X -= fadingDiff.X;
-				fadingFrame--;
-				if(!fadingFrame) {
-					guiFading->setVisible(false);
-					guiFading->setRelativePosition(fadingSize);
-					if(guiFading == wPosSelect) {
-						btnPSAU->setDrawImage(true);
-						btnPSAD->setDrawImage(true);
-						btnPSDU->setDrawImage(true);
-						btnPSDD->setDrawImage(true);
-					}
-					if(guiFading == wCardSelect) {
-						for(int i = 0; i < 5; ++i)
-							btnCardSelect[i]->setDrawImage(true);
-					}
-					if(guiNext)
-						ShowElement(guiNext);
-				} else
-					guiFading->setRelativePosition(irr::core::recti(fadingUL, fadingLR));
-			}
-		}
-		if(signalAction && !fadingFrame) {
-			localAction.Set();
-			signalAction = false;
-		}
-	} else if(autoFadeoutFrame) {
-		autoFadeoutFrame--;
-		if(!autoFadeoutFrame)
-			HideElement(guiFading);
+		} else if(fu.autoFadeoutFrame) {
+			fu.autoFadeoutFrame--;
+			if(!fu.autoFadeoutFrame)
+				HideElement(fu.guiFading);
+		} else
+			fadingList.erase(fthis);
 	}
 	env->drawAll();
 }
@@ -618,20 +622,22 @@ void Game::DrawSpec() {
 	}
 }
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
-	if(fadingFrame)
-		guiFading->setVisible(false);
-	fadingSize = win->getRelativePosition();
-	irr::core::position2di center = fadingSize.getCenter();
-	fadingDiff.X = fadingSize.getWidth() / 10;
-	fadingDiff.Y = (fadingSize.getHeight() - 4) / 10;
-	fadingUL = center;
-	fadingLR = center;
-	fadingUL.Y -= 2;
-	fadingLR.Y += 2;
-	guiFading = win;
-	isFadein = true;
-	fadingFrame = 10;
-	autoFadeoutFrame = autoframe;
+	FadingUnit fu;
+	fu.fadingSize = win->getRelativePosition();
+	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
+		if(win == fit->guiFading)
+			fu.fadingSize = fit->fadingSize;
+	irr::core::position2di center = fu.fadingSize.getCenter();
+	fu.fadingDiff.X = fu.fadingSize.getWidth() / 10;
+	fu.fadingDiff.Y = (fu.fadingSize.getHeight() - 4) / 10;
+	fu.fadingUL = center;
+	fu.fadingLR = center;
+	fu.fadingUL.Y -= 2;
+	fu.fadingLR.Y += 2;
+	fu.guiFading = win;
+	fu.isFadein = true;
+	fu.fadingFrame = 10;
+	fu.autoFadeoutFrame = autoframe;
 	if(win == wPosSelect) {
 		btnPSAU->setDrawImage(false);
 		btnPSAD->setDrawImage(false);
@@ -643,22 +649,23 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 			btnCardSelect[i]->setDrawImage(false);
 	}
 	win->setRelativePosition(irr::core::recti(center.X, center.Y, 0, 0));
-	win->setVisible(true);
+	fadingList.push_back(fu);
 }
-void Game::HideElement(irr::gui::IGUIElement * win, bool set_action, irr::gui::IGUIElement* next) {
-	if(fadingFrame)
-		guiFading->setVisible(false);
-	fadingSize = win->getRelativePosition();
-	fadingDiff.X = fadingSize.getWidth() / 10;
-	fadingDiff.Y = (fadingSize.getHeight() - 4) / 10;
-	fadingUL = fadingSize.UpperLeftCorner;
-	fadingLR = fadingSize.LowerRightCorner;
-	guiFading = win;
-	isFadein = false;
-	fadingFrame = 10;
-	autoFadeoutFrame = 0;
-	signalAction = set_action;
-	guiNext = next;
+void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
+	FadingUnit fu;
+	fu.fadingSize = win->getRelativePosition();
+	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
+		if(win == fit->guiFading)
+			fu.fadingSize = fit->fadingSize;
+	fu.fadingDiff.X = fu.fadingSize.getWidth() / 10;
+	fu.fadingDiff.Y = (fu.fadingSize.getHeight() - 4) / 10;
+	fu.fadingUL = fu.fadingSize.UpperLeftCorner;
+	fu.fadingLR = fu.fadingSize.LowerRightCorner;
+	fu.guiFading = win;
+	fu.isFadein = false;
+	fu.fadingFrame = 10;
+	fu.autoFadeoutFrame = 0;
+	fu.signalAction = set_action;
 	if(win == wPosSelect) {
 		btnPSAU->setDrawImage(false);
 		btnPSAD->setDrawImage(false);
@@ -669,6 +676,7 @@ void Game::HideElement(irr::gui::IGUIElement * win, bool set_action, irr::gui::I
 		for(int i = 0; i < 5; ++i)
 			btnCardSelect[i]->setDrawImage(false);
 	}
+	fadingList.push_back(fu);
 }
 void Game::PopupElement(irr::gui::IGUIElement * element, int hideframe) {
 	element->getParent()->bringToFront(element);

@@ -19,7 +19,7 @@ function c60234913.initial_effect(c)
 	e2:SetOperation(c60234913.utop)
 	c:RegisterEffect(e2)
 end
-function c60234913.filter(c,e,tp,m)
+function c60234913.spfilter(c,e,tp,m)
 	if c:GetCode()~=61757117 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
 	local result=false
 	if m:IsContains(c) then
@@ -35,7 +35,7 @@ function c60234913.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
 		local mg=Duel.GetRitualMaterial(tp,nil)
-		return Duel.IsExistingMatchingCard(c60234913.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg)
+		return Duel.IsExistingMatchingCard(c60234913.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp,mg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
@@ -43,7 +43,7 @@ function c60234913.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
 	local mg=Duel.GetRitualMaterial(tp,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,c60234913.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
+	local tg=Duel.SelectMatchingCard(tp,c60234913.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
 	if tg:GetCount()>0 then
 		local tc=tg:GetFirst()
 		mg:RemoveCard(tc)
@@ -66,6 +66,7 @@ end
 function c60234913.uttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c60234913.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c60234913.filter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c60234913.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c60234913.utop(e,tp,eg,ep,ev,re,r,rp)

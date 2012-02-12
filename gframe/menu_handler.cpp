@@ -26,7 +26,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->HideElement(mainGame->wMainMenu, false, mainGame->wLanWindow);
+				mainGame->HideElement(mainGame->wMainMenu);
+				mainGame->ShowElement(mainGame->wLanWindow);
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
@@ -48,7 +49,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_CANCEL: {
-				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wMainMenu);
+				mainGame->HideElement(mainGame->wLanWindow);
+				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
 			}
 			case BUTTON_LAN_REFRESH: {
@@ -58,7 +60,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CREATE_HOST: {
 				mainGame->btnHostConfirm->setEnabled(true);
 				mainGame->btnHostCancel->setEnabled(true);
-				mainGame->HideElement(mainGame->wLanWindow, false, mainGame->wCreateHost);
+				mainGame->HideElement(mainGame->wLanWindow);
+				mainGame->ShowElement(mainGame->wCreateHost);
 				break;
 			}
 			case BUTTON_HOST_CONFIRM: {
@@ -77,7 +80,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->HideElement(mainGame->wCreateHost, false, mainGame->wLanWindow);
+				mainGame->HideElement(mainGame->wCreateHost);
+				mainGame->ShowElement(mainGame->wLanWindow);
 				break;
 			}
 			case BUTTON_HS_DUELIST: {
@@ -109,11 +113,13 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->HideElement(mainGame->wHostSingle, false, mainGame->wLanWindow);
+				mainGame->HideElement(mainGame->wHostSingle);
+				mainGame->ShowElement(mainGame->wLanWindow);
 				break;
 			}
 			case BUTTON_REPLAY_MODE: {
-				mainGame->HideElement(mainGame->wMainMenu, false, mainGame->wReplay);
+				mainGame->HideElement(mainGame->wMainMenu);
+				mainGame->ShowElement(mainGame->wReplay);
 				mainGame->RefreshReplay();
 				break;
 			}
@@ -145,7 +151,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CANCEL_REPLAY: {
-				mainGame->HideElement(mainGame->wReplay, false, mainGame->wMainMenu);
+				mainGame->HideElement(mainGame->wReplay);
+				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
 			}
 			case BUTTON_DECK_EDIT: {

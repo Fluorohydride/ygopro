@@ -509,11 +509,11 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
 	if(players[player] == pplayer[player]) {
-		match_result[duel_count++] = player;
-		tp_player = 1 - player;
-	} else {
 		match_result[duel_count++] = 1 - player;
 		tp_player = player;
+	} else {
+		match_result[duel_count++] = player;
+		tp_player = 1 - player;
 	}
 	EndDuel();
 	DuelEndProc();

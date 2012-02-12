@@ -6,6 +6,8 @@
 #include "deck_con.h"
 #include "menu_handler.h"
 #include <unordered_map>
+#include <vector>
+#include <list>
 
 namespace ygo {
 
@@ -36,6 +38,18 @@ struct DuelInfo {
 	wchar_t strTurn[8];
 };
 
+struct FadingUnit {
+	bool signalAction;
+	bool isFadein;
+	int fadingFrame;
+	int autoFadeoutFrame;
+	irr::gui::IGUIElement* guiFading;
+	irr::core::recti fadingSize;
+	irr::core::vector2di fadingUL;
+	irr::core::vector2di fadingLR;
+	irr::core::vector2di fadingDiff;
+};
+
 class Game {
 
 public:
@@ -53,7 +67,7 @@ public:
 	void DrawGUI();
 	void DrawSpec();
 	void ShowElement(irr::gui::IGUIElement* element, int autoframe = 0);
-	void HideElement(irr::gui::IGUIElement* element, bool set_action = false, irr::gui::IGUIElement* next = 0);
+	void HideElement(irr::gui::IGUIElement* element, bool set_action = false);
 	void PopupElement(irr::gui::IGUIElement* element, int hideframe = 0);
 	void WaitFrameSignal(int frame);
 	void DrawThumb(int code, position2di pos, std::unordered_map<int, int>* lflist);
@@ -71,24 +85,16 @@ public:
 	Mutex gBuffer;
 	Signal frameSignal;
 	Signal localAction;
+	Signal replaySignal;
 	Config gameConf;
 	DuelInfo dInfo;
-
+	
+	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	unsigned short linePattern;
 	int waitFrame;
 	int signalFrame;
-	bool isFadein;
-	bool signalAction;
 	int actionParam;
-	irr::gui::IGUIElement* guiFading;
-	irr::gui::IGUIElement* guiNext;
-	int fadingFrame;
-	irr::core::recti fadingSize;
-	irr::core::vector2di fadingUL;
-	irr::core::vector2di fadingLR;
-	irr::core::vector2di fadingDiff;
-	int autoFadeoutFrame;
 	int showcard;
 	int showcardcode;
 	int showcarddif;
