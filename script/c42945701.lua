@@ -15,7 +15,9 @@ function c42945701.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsAttribute,1,nil,ATTRIBUTE_FIRE) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsAttribute,1,1,nil,ATTRIBUTE_FIRE)
-	e:SetLabel(g:GetFirst():GetAttack())
+	local atk=g:GetFirst():GetTextAttack()
+	if atk<0 then atk=0 end
+	e:SetLabel(atk)
 	Duel.Release(g,REASON_COST)
 end
 function c42945701.target(e,tp,eg,ep,ev,re,r,rp,chk)
