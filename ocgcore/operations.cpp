@@ -2229,6 +2229,8 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				(*cit)->operation_param = ((*cit)->operation_param & 0xffff0000) + (redirect << 8) + (redirect >> 16);
 				dest = redirect;
 			}
+			if((*cit)->is_status(STATUS_BATTLE_DESTROYED) && !((*cit)->current.reason & REASON_DESTROY))
+				(*cit)->current.reason |= REASON_DESTROY | REASON_BATTLE;
 			if(((*cit)->current.location & LOCATION_ONFIELD) && !(*cit)->is_status(STATUS_SUMMON_DISABLED)) {
 				raise_single_event(*cit, EVENT_LEAVE_FIELD_P, (*cit)->current.reason_effect, (*cit)->current.reason, (*cit)->current.reason_player, 0, 0);
 				leave_p.insert(*cit);

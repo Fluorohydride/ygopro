@@ -1,5 +1,6 @@
 --アルカナフォースEX－THE LIGHT RULER
 function c5861892.initial_effect(c)
+	c:EnableReviveLimit()
 	--spsummon proc
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -60,6 +61,19 @@ function c5861892.arcanareg(c,coin)
 	e1:SetOperation(c5861892.thop)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
+	--
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(34568403,2))
+	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_F)
+	e2:SetCode(EVENT_CHAINING)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(c5861892.negcon)
+	e2:SetTarget(c5861892.negtg)
+	e2:SetOperation(c5861892.negop)
+	e2:SetReset(RESET_EVENT+0x1ff0000)
+	c:RegisterEffect(e2)
 	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
 end
 function c5861892.thcon(e,tp,eg,ep,ev,re,r,rp)
@@ -80,4 +94,36 @@ function c5861892.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end
+end
+function c5861892.negcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
+	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
+	if not g or not g:IsContains(c) then return false end
+	return c:GetFlagEffectLabel(36690018)==0 and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
+		and Duel.IsChainInactivatable(ev)
+end
+function c5861892.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	if re:GetHandler():IsRelateToEffect(re) and re:GetHandler():IsDestructable() then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	end
+end
+function c5861892.negop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsFaceup() or c:GetAttack()<1000 or not c:IsRelateToEffect(e) or Duel.GetCurrentChain()~=ev+1 then
+		return
+	end
+	Duel.NegateActivation(ev)
+	if re:GetHandler():IsRelateToEffect(re) then
+		Duel.Destroy(re:GetHandler(),REASON_EFFECT)
+	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
+	e1:SetReset(RESET_EVENT+0x1ff0000)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(-1000)
+	c:RegisterEffect(e1)
 end
