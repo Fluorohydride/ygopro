@@ -106,6 +106,8 @@ public:
 	static int32 card_register_flag_effect(lua_State *L);
 	static int32 card_get_flag_effect(lua_State *L);
 	static int32 card_reset_flag_effect(lua_State *L);
+	static int32 card_set_flag_effect_label(lua_State *L);
+	static int32 card_get_flag_effect_label(lua_State *L);
 	static int32 card_create_relation(lua_State *L);
 	static int32 card_release_relation(lua_State *L);
 	static int32 card_create_effect_relation(lua_State *L);

@@ -88,7 +88,7 @@ int32 effect::is_available() {
 				return FALSE;
 			if(owner == handler && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && handler->get_status(STATUS_DISABLED))
 				return FALSE;
-			if(handler->is_status(STATUS_BATTLE_DESTROYED))
+			if(handler->is_status(STATUS_BATTLE_DESTROYED) && !(flag & EFFECT_FLAG_AVAILABLE_BD))
 				return FALSE;
 			if(!(handler->get_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;

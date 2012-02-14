@@ -21,6 +21,7 @@ end
 function c36690018.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and c36690018.filter(tc) then
-		tc:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1)
+		local val=tc:GetFlagEffectLabel(36690018)
+		tc:SetFlagEffectLabel(36690018,1-val)
 	end
 end

@@ -1191,9 +1191,6 @@ int32 field::check_hint_timing(effect* peffect) {
 int32 field::process_phase_event(int16 step, int32 phase) {
 	switch(step) {
 	case 0: {
-		if(infos.phase == PHASE_STANDBY && is_player_affected_by_effect(infos.turn_id, EFFECT_SKIP_SP)) {
-			core.units.begin()->step = 14;
-		}
 		return FALSE;
 	}
 	case 1: {
@@ -1203,6 +1200,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		effect* peffect;
 		effect* solve_effect = 0;
 		nil_event.event_code = phase_event;
+		nil_event.event_player = infos.turn_player;
 		chain newchain;
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
@@ -1262,6 +1260,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.trigger_o_effect.equal_range(phase_event);
 		effect* peffect;
 		nil_event.event_code = phase_event;
+		nil_event.event_player = infos.turn_player;
 		chain newchain;
 		core.tpchain.clear();
 		core.ntpchain.clear();
@@ -1417,6 +1416,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		effect_vector::iterator eit;
 		effect* peffect;
 		nil_event.event_code = phase_event;
+		nil_event.event_player = infos.turn_player;
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
 			uint8 owner_player = peffect->get_handler_player();
@@ -3331,6 +3331,14 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		infos.turn_player = turn_player;
 		pduel->write_buffer8(MSG_NEW_TURN);
 		pduel->write_buffer8(turn_player);
+		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_TURN)) {
+			core.units.begin()->step = 17;
+			reset_phase(PHASE_DRAW);
+			reset_phase(PHASE_STANDBY);
+			reset_phase(PHASE_END);
+			adjust_all();
+			return FALSE;
+		}
 		infos.phase = PHASE_DRAW;
 		core.phase_action = FALSE;
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_DRAW, 0, 0, 0, turn_player, 0);
@@ -3502,6 +3510,15 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 18: {
+		raise_event((card*)0, EVENT_TURN_END, 0, 0, 0, turn_player, 0);
+		process_instant_event();
+		adjust_all();
+		return FALSE;
+	}
+	case 19: {
+		core.new_fchain.clear();
+		core.new_ochain.clear();
+		core.quick_f_chain.clear();
 		core.units.begin()->step = -1;
 		core.units.begin()->arg1 = 1 - core.units.begin()->arg1;
 		return FALSE;

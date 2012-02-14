@@ -751,6 +751,9 @@ int32 scriptlib::card_register_flag_effect(lua_State *L) {
 	int32 reset = lua_tointeger(L, 3);
 	int32 flag = lua_tointeger(L, 4);
 	int32 count = lua_tointeger(L, 5);
+	int32 lab = 0;
+	if(lua_gettop(L) >= 6)
+		lab = lua_tointeger(L, 6);
 	if(count == 0)
 		count = 1;
 	if(reset & (RESET_PHASE) && !(reset & (RESET_SELF_TURN | RESET_OPPO_TURN)))
@@ -764,6 +767,7 @@ int32 scriptlib::card_register_flag_effect(lua_State *L) {
 	peffect->reset_flag = reset;
 	peffect->flag = flag | EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_count |= count & 0xff;
+	peffect->label = lab;
 	pcard->add_effect(peffect);
 	interpreter::effect2value(L, peffect);
 	return 1;
@@ -783,6 +787,33 @@ int32 scriptlib::card_reset_flag_effect(lua_State *L) {
 	int32 code = (lua_tointeger(L, 2) & 0xfffffff) | 0x10000000;
 	pcard->reset(code, RESET_CODE);
 	return 0;
+}
+int32 scriptlib::card_set_flag_effect_label(lua_State *L) {
+	check_param_count(L, 3);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	int32 code = (lua_tointeger(L, 2) & 0xfffffff) | 0x10000000;
+	int lab = lua_tointeger(L, 3);
+	auto eit = pcard->single_effect.find(code);
+	if(eit == pcard->single_effect.end())
+		lua_pushboolean(L, FALSE);
+	else {
+		eit->second->label = lab;
+		lua_pushboolean(L, TRUE);
+	}
+	return 1;
+}
+int32 scriptlib::card_get_flag_effect_label(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	int32 code = (lua_tointeger(L, 2) & 0xfffffff) | 0x10000000;
+	auto eit = pcard->single_effect.find(code);
+	if(eit == pcard->single_effect.end())
+		lua_pushnil(L);
+	else
+		lua_pushinteger(L, eit->second->label);
+	return 1;
 }
 int32 scriptlib::card_create_relation(lua_State *L) {
 	check_param_count(L, 3);

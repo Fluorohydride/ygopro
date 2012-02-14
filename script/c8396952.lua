@@ -38,16 +38,13 @@ function c8396952.arcanareg(c,coin)
 	e1:SetOperation(c8396952.speop)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1)
-	if coin==0 then
-		c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1)
-	end
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
 end
 function c8396952.speop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not re:IsActiveType(TYPE_SPELL) or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return end
-	local ct=c:GetFlagEffect(36690018)
-	if ct%2==1 then
+	local val=c:GetFlagEffectLabel(36690018)
+	if val==1 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)

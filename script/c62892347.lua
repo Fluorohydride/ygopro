@@ -71,24 +71,21 @@ function c62892347.arcanareg(c,coin)
 	e3:SetTarget(c62892347.distg)
 	e3:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e3)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1)
-	if coin==0 then
-		c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1)
-	end
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
 end
 function c62892347.distg(e,c)
 	local ec=e:GetHandler()
 	if c==ec or c:GetCardTargetCount()==0 then return false end
-	local ct=ec:GetFlagEffect(36690018)
-	if ct%2==1 then
+	local val=ec:GetFlagEffectLabel(36690018)
+	if val==1 then
 		return c:GetControler()==ec:GetControler() and c:GetCardTarget():IsContains(ec)
 	else return c:GetControler()~=ec:GetControler() and c:GetCardTarget():IsContains(ec) end
 end
 function c62892347.disop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler()
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
-	local ct=ec:GetFlagEffect(36690018)
-	if (ct%2==1 and rp~=ec:GetControler()) or (ct%2==0 and rp==ec:GetControler()) then return end
+	local val=ec:GetFlagEffectLabel(36690018)
+	if (val==1 and rp~=ec:GetControler()) or (val==0 and rp==ec:GetControler()) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or not g:IsContains(ec) then return end
 	Duel.NegateEffect(ev)

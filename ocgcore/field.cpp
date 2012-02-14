@@ -319,12 +319,58 @@ void field::set_control(card* pcard, uint8 playerid, uint8 reset_phase, uint8 re
 }
 
 card* field::get_field_card(uint8 playerid, uint8 location, uint8 sequence) {
-	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
-		return 0;
-	if (location == LOCATION_MZONE)
-		return player[playerid].list_mzone[sequence];
-	else
-		return player[playerid].list_szone[sequence];
+	switch(location) {
+	case LOCATION_MZONE: {
+		if(sequence < 5)
+			return player[playerid].list_mzone[sequence];
+		else
+			return 0;
+		break;
+	}
+	case LOCATION_SZONE: {
+		if(sequence < 6)
+			return player[playerid].list_szone[sequence];
+		else
+			return 0;
+		break;
+	}
+	case LOCATION_DECK: {
+		if(sequence < player[playerid].list_main.size())
+			return player[playerid].list_main[sequence];
+		else
+			return 0;
+		break;
+	}
+	case LOCATION_HAND: {
+		if(sequence < player[playerid].list_hand.size())
+			return player[playerid].list_hand[sequence];
+		else
+			return 0;
+		break;
+	}
+	case LOCATION_GRAVE: {
+		if(sequence < player[playerid].list_grave.size())
+			return player[playerid].list_grave[sequence];
+		else
+			return 0;
+		break;
+	}
+	case LOCATION_REMOVED: {
+		if(sequence < player[playerid].list_remove.size())
+			return player[playerid].list_remove[sequence];
+		else
+			return 0;
+		break;
+	}
+	case LOCATION_EXTRA: {
+		if(sequence < player[playerid].list_extra.size())
+			return player[playerid].list_extra[sequence];
+		else
+			return 0;
+		break;
+	}
+	}
+	return 0;
 }
 int32 field::is_location_useable(uint8 playerid, uint8 location, uint8 sequence) {
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)

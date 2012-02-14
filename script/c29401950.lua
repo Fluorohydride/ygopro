@@ -36,23 +36,27 @@ function c29401950.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c29401950.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	if tc and tc:IsRelateToEffect(e) and c29401950.filter(tc,tp,ep) then
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:GetAttack()>=1500 then
 		Duel.Destroy(tc,REASON_EFFECT,LOCATION_REMOVED)
 	end
 end
-function c29401950.filter2(c,e,tp)
+function c29401950.filter2(c,tp)
 	return c:IsFaceup() and c:GetAttack()>=1500 and c:GetSummonPlayer()~=tp
-		and (not e or c:IsRelateToEffect(e)) and c:IsDestructable() and c:IsAbleToRemove()
+		and c:IsDestructable() and c:IsAbleToRemove()
 end
 function c29401950.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c29401950.filter2,1,nil,nil,tp) end
-	local g=eg:Filter(c29401950.filter,nil,nil,tp)
+	if chk==0 then return eg:IsExists(c29401950.filter2,1,nil,tp) end
+	local g=eg:Filter(c29401950.filter2,nil,tp)
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end
+function c29401950.filter3(c,e,tp)
+	return c:IsFaceup() and c:GetAttack()>=1500 and c:GetSummonPlayer()~=tp
+		and c:IsRelateToEffect(e) and c:IsDestructable()
+end
 function c29401950.activate2(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(c29401950.filter,nil,e,tp)
+	local g=eg:Filter(c29401950.filter3,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.Destroy(g,REASON_EFFECT,LOCATION_REMOVED)
 	end

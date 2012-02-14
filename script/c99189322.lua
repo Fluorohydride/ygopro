@@ -28,11 +28,9 @@ function c99189322.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(regc,POS_FACEUP,REASON_EFFECT)
 		local regfun=regc.arcanareg
 		if not regfun then return end
-		local ct=tc:GetFlagEffect(36690018)
+		local val=tc:GetFlagEffectLabel(36690018)
 		tc:ResetEffect(RESET_DISABLE,RESET_EVENT)
-		if ct%2==1 then
-			regfun(tc,1)
-		else regfun(tc,0) end
+		regfun(tc,val)
 		tc:RegisterFlagEffect(99189322,RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END,0,1)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -49,9 +47,7 @@ function c99189322.rec_effect(e,tp,eg,ep,ev,re,r,rp)
 	if tc:GetFlagEffect(99189322)==0 or tc:GetFlagEffect(36690018)==0 then return end
 	local regfun=tc.arcanareg
 	if not regfun then return end
-	local ct=tc:GetFlagEffect(36690018)
+	local val=tc:GetFlagEffectLabel(36690018)
 	tc:ResetEffect(RESET_DISABLE,RESET_EVENT)
-	if ct%2==1 then
-		regfun(tc,1)
-	else regfun(tc,0) end
+	regfun(tc,val)
 end

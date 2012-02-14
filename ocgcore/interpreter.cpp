@@ -104,6 +104,8 @@ static const struct luaL_Reg cardlib[] = {
 	{ "RegisterFlagEffect", scriptlib::card_register_flag_effect },
 	{ "GetFlagEffect", scriptlib::card_get_flag_effect },
 	{ "ResetFlagEffect", scriptlib::card_reset_flag_effect },
+	{ "SetFlagEffectLabel", scriptlib::card_set_flag_effect_label },
+	{ "GetFlagEffectLabel", scriptlib::card_get_flag_effect_label },
 	{ "CreateRelation", scriptlib::card_create_relation },
 	{ "ReleaseRelation", scriptlib::card_release_relation },
 	{ "CreateEffectRelation", scriptlib::card_create_effect_relation },
