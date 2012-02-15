@@ -392,7 +392,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			pauseable = false;
 			break;
 		}
-		case MSG_CHAIN_INACTIVATED: {
+		case MSG_CHAIN_NEGATED: {
 			pbuf++;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;

@@ -52,7 +52,7 @@ function c5183693.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
 end
-function c5183693.atkup(e,tp,eg,ep,ev,re,r,rp,chk)
+function c5183693.atkup(e,tp,eg,ep,ev,re,r,rp)
 	local eqc=e:GetHandler():GetEquipTarget()
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
@@ -72,7 +72,6 @@ function c5183693.atkup(e,tp,eg,ep,ev,re,r,rp,chk)
 		d:RegisterEffect(e1)
 	end
 end
-
 function c5183693.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeck() end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)

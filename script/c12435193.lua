@@ -49,7 +49,7 @@ function c12435193.ccost(e,tp)
 		Duel.ConfirmCards(1-tp,g)
 		Duel.ShuffleHand(tp)
 	else
-		Duel.Destroy(e:GetHandler(),REASON_COST)
+		Duel.Destroy(e:GetHandler(),REASON_RULE)
 	end
 end
 function c12435193.disspsum(e,c)

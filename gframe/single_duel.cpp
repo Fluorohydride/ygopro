@@ -983,7 +983,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshSzone(1);
 			break;
 		}
-		case MSG_CHAIN_INACTIVATED: {
+		case MSG_CHAIN_NEGATED: {
 			pbuf++;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);

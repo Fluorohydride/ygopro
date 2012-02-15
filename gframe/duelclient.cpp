@@ -1875,7 +1875,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->dField.chains.clear();
 		return true;
 	}
-	case MSG_CHAIN_INACTIVATED:
+	case MSG_CHAIN_NEGATED:
 	case MSG_CHAIN_DISABLED: {
 		int ct = BufferIO::ReadInt8(pbuf);
 		mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;

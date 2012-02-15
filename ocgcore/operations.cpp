@@ -27,7 +27,7 @@ int32 field::negate_chain(uint8 chaincount) {
 			pchain.triggering_effect->handler->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 			pchain.triggering_effect->handler->set_status(STATUS_ACTIVATE_DISABLED, TRUE);
 		}
-		pduel->write_buffer8(MSG_CHAIN_INACTIVATED);
+		pduel->write_buffer8(MSG_CHAIN_NEGATED);
 		pduel->write_buffer8(chaincount);
 		return TRUE;
 	}
@@ -1823,17 +1823,15 @@ int32 field::destroy(uint16 step, group * targets, card * target, uint8 battle) 
 	}
 	if(targets->container.find(target) == targets->container.end())
 		return TRUE;
-	if(!(target->current.reason & REASON_RULE)) {
-		returns.ivalue[0] = FALSE;
-		effect_set eset;
-		target->filter_single_continuous_effect(EFFECT_DESTROY_REPLACE, &eset);
-		if(!battle)
-			for (int32 i = 0; i < eset.count; ++i)
-				add_process(PROCESSOR_OPERATION_REPLACE, 0, eset[i], targets, (ptr)target, 1);
-		else
-			for (int32 i = 0; i < eset.count; ++i)
-				add_process(PROCESSOR_OPERATION_REPLACE, 10, eset[i], targets, (ptr)target, 1);
-	}
+	returns.ivalue[0] = FALSE;
+	effect_set eset;
+	target->filter_single_continuous_effect(EFFECT_DESTROY_REPLACE, &eset);
+	if(!battle)
+		for (int32 i = 0; i < eset.count; ++i)
+			add_process(PROCESSOR_OPERATION_REPLACE, 0, eset[i], targets, (ptr)target, 1);
+	else
+		for (int32 i = 0; i < eset.count; ++i)
+			add_process(PROCESSOR_OPERATION_REPLACE, 10, eset[i], targets, (ptr)target, 1);
 	return TRUE;
 }
 int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint32 reason, uint8 reason_player) {
@@ -1852,7 +1850,6 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 					(*rm)->current.reason_player = (*rm)->temp.reason_player;
 					(*rm)->set_status(STATUS_DESTROY_CONFIRMED, FALSE);
 					targets->container.erase(*rm);
-					continue;
 				}
 			}
 			(*rm)->filter_effect(EFFECT_DESTROY_SUBSTITUTE, &eset);
@@ -1890,8 +1887,6 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 				targets->container.insert(rep);
 			}
 		}
-		if(reason & REASON_RULE)
-			return FALSE;
 		auto pr = effects.continuous_effect.equal_range(EFFECT_DESTROY_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, targets, 0, 1);
@@ -1986,7 +1981,6 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 					(*rm)->current.reason_player = (*rm)->temp.reason_player;
 					(*rm)->set_status(STATUS_DESTROY_CONFIRMED, FALSE);
 					targets->container.erase(*rm);
-					continue;
 				}
 			}
 			(*rm)->filter_effect(EFFECT_DESTROY_SUBSTITUTE, &eset);
@@ -2229,7 +2223,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				(*cit)->operation_param = ((*cit)->operation_param & 0xffff0000) + (redirect << 8) + (redirect >> 16);
 				dest = redirect;
 			}
-			if((*cit)->is_status(STATUS_BATTLE_DESTROYED) && !((*cit)->current.reason & REASON_DESTROY))
+			if(((*cit)->current.location == LOCATION_MZONE) && (*cit)->is_status(STATUS_BATTLE_DESTROYED) && !((*cit)->current.reason & REASON_DESTROY))
 				(*cit)->current.reason |= REASON_DESTROY | REASON_BATTLE;
 			if(((*cit)->current.location & LOCATION_ONFIELD) && !(*cit)->is_status(STATUS_SUMMON_DISABLED)) {
 				raise_single_event(*cit, EVENT_LEAVE_FIELD_P, (*cit)->current.reason_effect, (*cit)->current.reason, (*cit)->current.reason_player, 0, 0);
@@ -2833,7 +2827,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 			uint32 is_destroy = arg2;
 			for (cit = targets->container.begin(); cit != targets->container.end();) {
 				rm = cit++;
-				if (!((*rm)->current.reason & REASON_RULE) && replace_effect->get_value(*rm)) {
+				if (replace_effect->get_value(*rm)) {
 					(*rm)->current.reason = (*rm)->temp.reason;
 					(*rm)->current.reason_effect = (*rm)->temp.reason_effect;
 					(*rm)->current.reason_player = (*rm)->temp.reason_player;
@@ -2949,7 +2943,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 			uint32 is_destroy = arg2;
 			for (cit = targets->container.begin(); cit != targets->container.end();) {
 				rm = cit++;
-				if (!((*rm)->current.reason & REASON_RULE) && replace_effect->get_value(*rm)) {
+				if (replace_effect->get_value(*rm)) {
 					(*rm)->current.reason = (*rm)->temp.reason;
 					(*rm)->current.reason_effect = (*rm)->temp.reason_effect;
 					(*rm)->current.reason_player = (*rm)->temp.reason_player;

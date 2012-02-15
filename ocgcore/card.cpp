@@ -882,7 +882,7 @@ void card::reset(uint32 id, uint32 reset_type) {
 			pr = field_effect.equal_range(EFFECT_DISABLE_FIELD);
 			for(; pr.first != pr.second; ++pr.first)
 				pr.first->second->value = 0;
-			set_status(STATUS_UNION + STATUS_BATTLE_DESTROYED, FALSE);
+			set_status(STATUS_UNION, FALSE);
 		}
 		if(id & 0x57e0000) {
 			counters.clear();
