@@ -66,7 +66,7 @@ end
 function c89493368.naop(e,tp,eg,ep,ev,re,r,rp)
 	tc=Duel.GetAttacker()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Duel.DisableAttack(tc)
+		Duel.NegateAttack(tc)
 	end
 end
 function c89493368.spcfilter(c,code)

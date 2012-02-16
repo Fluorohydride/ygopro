@@ -28,7 +28,7 @@ function c84013237.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c84013237.atkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end
 function c84013237.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

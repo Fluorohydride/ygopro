@@ -118,7 +118,7 @@ function c67030233.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
 		g:AddCard(m2)
 		local lv2=m2:GetLevel()
 		mg:RemoveCard(m2)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_MATERIAL)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 		local t3=mg:FilterSelect(tp,c67030233.synfilter3,1,1,nil,lv-lv1-lv2)
 		g:Merge(t3)
 	end

@@ -31,7 +31,7 @@ function c75326861.filter(c)
 	return c:GetEquipCount()>0
 end
 function c75326861.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c75326861.filter(cHKC) end
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c75326861.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c75326861.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPPO)
 	local g=Duel.SelectTarget(tp,c75326861.filter,tp,0,LOCATION_MZONE,1,1,nil)

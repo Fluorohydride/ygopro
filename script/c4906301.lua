@@ -22,7 +22,7 @@ function c4906301.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c4906301.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetAttacker() then Duel.DisableAttack()
+	if Duel.GetAttacker() then Duel.NegateAttack()
 	else
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -34,5 +34,5 @@ function c4906301.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c4906301.disop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

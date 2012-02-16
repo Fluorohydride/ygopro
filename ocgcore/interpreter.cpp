@@ -352,7 +352,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "IsDamageCalculated", scriptlib::duel_is_damage_calculated },
 	{ "GetAttacker", scriptlib::duel_get_attacker },
 	{ "GetAttackTarget", scriptlib::duel_get_attack_target },
-	{ "DisableAttack", scriptlib::duel_disable_attack },
+	{ "NegateAttack", scriptlib::duel_disable_attack },
 	{ "ChainAttack", scriptlib::duel_chain_attack },
 	{ "Readjust", scriptlib::duel_readjust },
 	{ "GetFieldGroup", scriptlib::duel_get_field_group },

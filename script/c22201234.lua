@@ -41,7 +41,7 @@ end
 function c22201234.aop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if e:GetLabel()==1 then
-		Duel.DisableAttack()
+		Duel.NegateAttack()
 	end
 end
 function c22201234.qcon(e,tp,eg,ep,ev,re,r,rp)
@@ -60,5 +60,5 @@ function c22201234.qtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c22201234.qop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

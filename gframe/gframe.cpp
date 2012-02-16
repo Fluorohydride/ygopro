@@ -2,7 +2,9 @@
 #include "game.h"
 #include <event2/thread.h>
 
-int main() {
+bool enable_log = false;
+
+int main(int argc, char* argv[]) {
 #ifdef _WIN32
 	WORD wVersionRequested;
 	WSADATA wsaData;
@@ -16,6 +18,8 @@ int main() {
 	ygo::mainGame = &_game;
 	if(!ygo::mainGame->Initialize())
 		return 0;
+	if(argc >= 2 && !strcmp(argv[1], "-debug"))
+		enable_log = true;
 	ygo::mainGame->MainLoop();
 #ifdef _WIN32
 	WSACleanup();

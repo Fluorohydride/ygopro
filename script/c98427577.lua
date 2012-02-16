@@ -20,7 +20,7 @@ function c98427577.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(tg)
 end
 function c98427577.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsCanTurnSet() then
 		Duel.BreakEffect()

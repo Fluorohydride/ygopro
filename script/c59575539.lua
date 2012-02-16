@@ -14,5 +14,5 @@ function c59575539.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,800)
 end
 function c59575539.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

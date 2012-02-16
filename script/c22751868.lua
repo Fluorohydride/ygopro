@@ -8,7 +8,7 @@ function c22751868.initial_effect(c)
 	--pos
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(22751868,0))
-	e2:SetCategory(CATEGIORY_POSITION)
+	e2:SetCategory(CATEGORY_POSITION)
 	e2:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_BE_BATTLE_TARGET)

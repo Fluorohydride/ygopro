@@ -97,7 +97,7 @@ function c24696097.daop(e,tp,eg,ep,ev,re,r,rp,chk)
 	if c:IsRelateToEffect(e) then
 		Duel.Remove(c,POS_FACEUP,REASON_EFFECT)
 	end
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 	c:RegisterFlagEffect(24696097,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,0,0)
 end
 function c24696097.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)

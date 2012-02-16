@@ -61,5 +61,6 @@ using namespace io;
 using namespace gui;
 
 extern const unsigned short PRO_VERSION;
+extern bool enable_log;
 
 #endif

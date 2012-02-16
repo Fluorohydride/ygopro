@@ -1698,7 +1698,8 @@ int32 card::is_destructable_by_effect(effect* peffect, uint8 playerid) {
 	for(int32 i = 0; i < eset.count; ++i) {
 		pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
-		if(eset[i]->check_value_condition(2))
+		pduel->lua->add_param(this, PARAM_TYPE_CARD);
+		if(eset[i]->check_value_condition(3))
 			return FALSE;
 	}
 	return TRUE;

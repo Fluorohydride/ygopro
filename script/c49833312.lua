@@ -22,7 +22,7 @@ function c49833312.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c49833312.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.DisableAttack() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+	if Duel.NegateAttack() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c49833312.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)

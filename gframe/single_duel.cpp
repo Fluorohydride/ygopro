@@ -1346,9 +1346,13 @@ void SingleDuel::RefreshSingle(int player, int location, int sequence, int flag)
 	}
 }
 int SingleDuel::MessageHandler(long fduel, int type) {
+	if(!enable_log)
+		return 0;
 	char msgbuf[1024];
 	get_log_message(fduel, (byte*)msgbuf);
 	FILE* fp = fopen("error.log", "at+");
+	if(!fp)
+		return 0;
 	msgbuf[1023] = 0;
 	fprintf(fp, "[Script error:] %s\n", msgbuf);
 	fclose(fp);

@@ -25,5 +25,5 @@ function c95472621.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c95472621.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,TYPE_MONSTER)
-	Duel.Remove(g,POS_FACEUP,EFFECT)
+	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 end

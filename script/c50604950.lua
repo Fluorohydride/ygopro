@@ -30,5 +30,5 @@ function c50604950.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,REASON_COST)
 end
 function c50604950.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

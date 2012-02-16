@@ -11,7 +11,7 @@ end
 function c49905576.drop(e,tp,eg,ep,ev,re,r,rp)
 	if not re:GetHandler():IsType(TYPE_COUNTER) then return end
 	Duel.BreakEffect()
-	Duel.Recover(tp,1000,REASON_EFFET)
+	Duel.Recover(tp,1000,REASON_EFFECT)
 	if Duel.GetEnvironment()~=56433456 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil)

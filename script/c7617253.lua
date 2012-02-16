@@ -37,7 +37,7 @@ end
 function c7617253.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetAttacker()
 	if not tg:IsRelateToEffect(e) or tg:IsStatus(STATUS_ATTACK_CANCELED)
-		or not Duel.DisableAttack() then return end
+		or not Duel.NegateAttack() then return end
 	local g=Duel.GetMatchingGroup(c7617253.filter,tp,LOCATION_DECK,0,nil)
 	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(7617253,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

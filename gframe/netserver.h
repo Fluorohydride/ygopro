@@ -21,6 +21,7 @@ private:
 	static char net_server_read[0x2000];
 	static char net_server_write[0x2000];
 	static unsigned short last_sent;
+	
 public:
 	static bool StartServer(unsigned short port);
 	static bool StartBroadcast();

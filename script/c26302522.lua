@@ -63,7 +63,7 @@ function c26302522.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetLabelObject()
 	if ec:IsRelateToEffect(e) and ec:IsFaceup() then
 		local atk=ec:GetAttack()
-		if Duel.Destroy(ec,REASON_EFFET)~=0 then
+		if Duel.Destroy(ec,REASON_EFFECT)~=0 then
 			Duel.Damage(1-tp,atk,REASON_EFFECT)
 		else Duel.Destroy(c,REASON_EFFECT) end
 	end

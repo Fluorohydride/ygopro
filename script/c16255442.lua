@@ -19,7 +19,7 @@ function c16255442.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	local sg=Duel.GetFieldGroup(tp,LOCATION_HAND,0,nil)
 	local tg=Duel.GetMatchingGroup(c16255442.filter,tp,LOCATION_GRAVE,0,nil)
-	Duel.SetOperationInfo(0,CATEGORY_HANDDES,sg,sg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,sg,sg:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,tg,sg:GetCount(),tp,LOCATION_GRAVE)
 end
 function c16255442.operation(e,tp,eg,ep,ev,re,r,rp)

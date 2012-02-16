@@ -17,5 +17,5 @@ function c94845226.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,c94845226.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function c94845226.op(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

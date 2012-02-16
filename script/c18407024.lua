@@ -21,7 +21,7 @@ end
 function c18407024.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0,nil)
 	if g:GetCount()==0 then return end
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSGDISCARD)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DISCARD)
 	local sg=g:Select(1-tp,1,1,nil)
 	Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)
 end

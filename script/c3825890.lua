@@ -21,6 +21,8 @@ function c3825890.initial_effect(c)
 	--Destroy replace
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_DESTROY_REPLACE)
 	e3:SetTarget(c3825890.desreptg)
 	c:RegisterEffect(e3)
@@ -45,7 +47,7 @@ function c3825890.atkval(e,c)
 end
 function c3825890.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsOnField() and c:IsFaceup()
+	if chk==0 then return not c:IsReason(REASON_REPLACE)
 		and Duel.IsExistingMatchingCard(c3825890.filter,tp,LOCATION_HAND,0,1,nil) end
 	if Duel.SelectYesNo(tp,aux.Stringid(3825890,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)

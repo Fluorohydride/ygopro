@@ -21,7 +21,7 @@ end
 function c7405310.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c7405310.filter,1-tp,LOCATION_EXTRA,0,nil,e:GetLabel())
 	if g:GetCount()~=0 then
-		Duel.Hint(HINT_SELECTMSG,1-tp,REMOVE)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
 		local rg=g:FilterSelect(1-tp,Card.IsAbleToRemove,1,1,nil)
 		if rg:GetCount()~=0 then
 			Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)

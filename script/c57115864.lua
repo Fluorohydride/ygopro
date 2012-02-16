@@ -23,7 +23,7 @@ function c57115864.filter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c57115864.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

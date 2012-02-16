@@ -42,6 +42,7 @@ function c78349103.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e5:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetCondition(c78349103.scon)
 	e5:SetTarget(c78349103.stg)
 	e5:SetOperation(c78349103.sop)
 	c:RegisterEffect(e5)
@@ -90,6 +91,9 @@ function c78349103.scon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c78349103.sfilter(c)
 	return c:IsType(TYPE_UNION) and c:IsAbleToHand()
+end
+function c78349103.scon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_DESTROY)
 end
 function c78349103.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c78349103.sfilter,tp,LOCATION_DECK,0,1,nil) end

@@ -11,7 +11,7 @@ function c33782437.initial_effect(c)
 end
 function c33782437.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsPlayerCanDraw(1-tp,1) end
-	Duel.SetOperationInfo(0,CHAININFO_DRAW,nil,0,PLAYER_ALL,1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)
 end
 function c33782437.activate(e,tp,eg,ep,ev,re,r,rp)
 	local d1=Duel.Draw(tp,1,REASON_EFFECT)

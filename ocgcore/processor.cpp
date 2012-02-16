@@ -4298,18 +4298,22 @@ int32 field::adjust_step(uint16 step) {
 		}
 		//self destroy
 		uint8 tp = infos.turn_player;
-		card* pcard;
+		effect* peffect;
 		core.destroy_set.clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
-				pcard = player[tp].list_mzone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))
+				card* pcard = player[tp].list_mzone[i];
+				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
 					core.destroy_set.insert(pcard);
+					pcard->current.reason_effect = peffect;
+				}
 			}
 			for(uint8 i = 0; i < 6; ++i) {
-				pcard = player[tp].list_szone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))
+				card* pcard = player[tp].list_szone[i];
+				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
 					core.destroy_set.insert(pcard);
+					pcard->current.reason_effect = peffect;
+				}
 			}
 			tp = 1 - tp;
 		}

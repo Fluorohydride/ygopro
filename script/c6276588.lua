@@ -16,7 +16,7 @@ function c6276588.initial_effect(c)
 	--pos change
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(6276588,0))
-	e3:SetCategory(CATEGIORY_POSITION)
+	e3:SetCategory(CATEGORY_POSITION)
 	e3:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
 	e3:SetCode(EVENT_BE_BATTLE_TARGET)
 	e3:SetOperation(c6276588.posop)

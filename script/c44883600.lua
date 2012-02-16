@@ -29,6 +29,6 @@ function c44883600.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c44883600.activate(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.DisableAttack()
+		Duel.NegateAttack()
 	end
 end

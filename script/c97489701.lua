@@ -142,7 +142,7 @@ function c97489701.natg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
 end
 function c97489701.naop(e,tp,eg,ep,ev,re,r,rp,chk)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Remove(c,POS_FACEUP,REASON_EFFECT)~=0 then
 		c:RegisterFlagEffect(97489701,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)

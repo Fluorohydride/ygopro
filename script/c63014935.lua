@@ -88,7 +88,7 @@ function c63014935.phcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c63014935.phtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(63014935)==0 end
-	e:GetHandler():RegisterFlagEffect(63014935,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,EFFECT_FLAG_PATH,1)
+	e:GetHandler():RegisterFlagEffect(63014935,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c63014935.phop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.CheckReleaseGroup(tp,aux.TRUE,1,e:GetHandler()) and Duel.SelectYesNo(tp,aux.Stringid(63014935,2)) then

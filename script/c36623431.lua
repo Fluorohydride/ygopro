@@ -49,7 +49,7 @@ function c36623431.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
 end
 function c36623431.costfilter(c)
-	return c:IsSetCard(0x1d) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x1d) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end
 function c36623431.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c36623431.costfilter,tp,LOCATION_HAND,0,1,nil) end

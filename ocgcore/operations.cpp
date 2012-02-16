@@ -184,7 +184,8 @@ void field::destroy(card_set* targets, effect* reason_effect, uint32 reason, uin
 		(*cit)->temp.reason_effect = (*cit)->current.reason_effect;
 		(*cit)->temp.reason_player = (*cit)->current.reason_player;
 		(*cit)->current.reason = reason;
-		(*cit)->current.reason_effect = reason_effect;
+		if(reason_effect)
+			(*cit)->current.reason_effect = reason_effect;
 		(*cit)->current.reason_player = reason_player;
 		p = playerid;
 		if(!(destination & (LOCATION_HAND + LOCATION_DECK + LOCATION_REMOVED)))
@@ -732,10 +733,14 @@ int32 field::remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 
 int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_player, card * pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count) {
 	switch(step) {
 	case 0: {
+		if(pcard->current.controler == playerid) {
+			returns.ivalue[0] = 1;
+			return TRUE;
+		}
 		returns.ivalue[0] = 0;
 		if(pcard->overlay_target)
 			return TRUE;
-		if(pcard->current.controler == PLAYER_NONE || pcard->current.controler == playerid)
+		if(pcard->current.controler == PLAYER_NONE)
 			return TRUE;
 		if(pcard->current.location != LOCATION_MZONE)
 			return TRUE;

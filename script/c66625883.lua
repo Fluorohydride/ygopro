@@ -16,7 +16,7 @@ function c66625883.initial_effect(c)
 	--to defence
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(66625883,0))
-	e3:SetCategory(CATEGIORY_POSITION)
+	e3:SetCategory(CATEGORY_POSITION)
 	e3:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
 	e3:SetCode(EVENT_BE_BATTLE_TARGET)
 	e3:SetCondition(c66625883.poscon)

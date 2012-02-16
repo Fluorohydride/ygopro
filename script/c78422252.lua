@@ -34,7 +34,7 @@ function c78422252.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(tg)
 end
 function c78422252.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end
 function c78422252.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()

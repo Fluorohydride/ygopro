@@ -21,5 +21,5 @@ function c42110434.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c42110434.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DiscardDeck(tp,1,REASON_EFFECT)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

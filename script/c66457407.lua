@@ -16,7 +16,7 @@ function c66457407.lvfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT)
 end
 function c66457407.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(MZONE) and c66457407.lvfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c66457407.lvfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c66457407.lvfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c66457407.lvfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

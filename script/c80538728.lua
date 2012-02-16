@@ -17,5 +17,5 @@ function c80538728.condition(e,tp,eg,ep,ev,re,r,rp)
 	return d and d:IsControler(tp) and d:IsFaceup() and d:IsSetCard(0x58)
 end
 function c80538728.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end

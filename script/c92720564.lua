@@ -27,5 +27,5 @@ function c92720564.cond(e,tp,eg,ep,ev,re,r,rp)
 	return not c:IsDisabled() and c:IsDefence() and d:IsFaceup() and d:IsSetCard(0x26)
 end
 function c92720564.opd(e,tp,eg,ep,ev,re,r,rp)
-	Duel.DisableAttack()
+	Duel.NegateAttack()
 end
