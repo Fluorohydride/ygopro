@@ -4356,7 +4356,7 @@ int32 field::adjust_step(uint16 step) {
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
 				pcard = player[tp].list_mzone[i];
-				if(!pcard)
+				if(!pcard || pcard->is_affected_by_effect(EFFECT_CANNOT_CHANGE_POS_E))
 					continue;
 				eset.clear();
 				pcard->filter_effect(EFFECT_SET_POSITION, &eset);

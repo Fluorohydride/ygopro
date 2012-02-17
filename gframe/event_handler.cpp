@@ -1044,7 +1044,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					selected_cards.push_back(clicked_card);
 				else break;
 				if (CheckSelectSum()) {
-					if(selectable_cards.size() == 0) {
+					if(selectsum_cards.size()==0 || selectable_cards.size() == 0) {
 						unsigned char respbuf[64];
 						respbuf[0] = selected_cards.size();
 						for (int i = 0; i < selected_cards.size(); ++i)

@@ -1964,7 +1964,7 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 		pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, sendtargets, 0, 0);
-		add_process(PROCESSOR_SENDTO, 1, 0, sendtargets, reason + REASON_DESTROY, reason_player);
+		add_process(PROCESSOR_SENDTO, 1, reason_effect, sendtargets, reason + REASON_DESTROY, reason_player);
 		return FALSE;
 	}
 	case 5: {
@@ -2125,7 +2125,7 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 		pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, sendtargets, 0, 0);
-		add_process(PROCESSOR_SENDTO, 1, 0, sendtargets, reason + REASON_RELEASE, reason_player);
+		add_process(PROCESSOR_SENDTO, 1, reason_effect, sendtargets, reason + REASON_RELEASE, reason_player);
 		return FALSE;
 	}
 	case 4: {
@@ -2650,7 +2650,8 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 			noflip = (*cvit)->operation_param >> 16;
 			if((*cvit)->is_status(STATUS_SUMMONING) || (*cvit)->overlay_target || !((*cvit)->current.location & LOCATION_ONFIELD)
 			        || !(*cvit)->is_affect_by_effect(reason_effect) || npos == opos
-			        || ((opos & POS_FACEUP) &&  (npos & POS_FACEDOWN) && !(*cvit)->is_capable_turn_set(reason_player))) {
+			        || ((opos & POS_FACEUP) &&  (npos & POS_FACEDOWN) && !(*cvit)->is_capable_turn_set(reason_player))
+			        || (reason_effect && (*cvit)->is_affected_by_effect(EFFECT_CANNOT_CHANGE_POS_E))) {
 				targets->container.erase((*cvit));
 			} else {
 				if(((*cvit)->data.type & TYPE_TOKEN) && (npos & POS_FACEDOWN))

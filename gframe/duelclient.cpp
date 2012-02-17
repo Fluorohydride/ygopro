@@ -636,10 +636,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int playertype = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
 		mainGame->dInfo.isObserver =  (playertype & 0xf0) ? true : false;
-		if(!mainGame->dInfo.isObserver) {
-			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
-			mainGame->btnLeaveGame->setVisible(true);
-		}
 		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
 		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
@@ -1189,7 +1185,10 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		}
 		mainGame->localAction.Reset();
 		mainGame->localAction.Wait();
-		mainGame->dField.ClearSelect();
+		for(int i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
+			mainGame->dField.selectsum_all[i]->is_selectable = false;
+			mainGame->dField.selectsum_all[i]->is_selected = false;
+		}
 		DuelClient::SendResponse();
 		return true;
 	}
@@ -1461,6 +1460,10 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_NEW_TURN: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dInfo.turn++;
+		if(mainGame->dInfo.turn == 5 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isObserver) {
+			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
+			mainGame->btnLeaveGame->setVisible(true);
+		}
 		myswprintf(mainGame->dInfo.strTurn, L"Turn:%d", mainGame->dInfo.turn);
 		mainGame->showcardcode = 10;
 		mainGame->showcarddif = 30;
