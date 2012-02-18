@@ -16,7 +16,7 @@ function c525110.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c525110.filter(c,e,tp)
-	return c:IsSetCard(0x5a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x5b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c525110.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -24,17 +24,13 @@ function c525110.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c525110.operation(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ct==0 then return end
-	local g=Duel.GetMatchingGroup(c525110.filter,tp,LOCATION_DECK,0,nil,e,tp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft==0 then return end
+	local g=Duel.SelectMatchingCard(tp,c525110.filter,tp,LOCATION_DECK,0,1,ft,nil,e,tp)
 	if g:GetCount()>0 then
 		local t1=g:GetFirst()
 		local t2=g:GetNext()
 		Duel.SpecialSummonStep(t1,0,tp,tp,false,false,POS_FACEUP)
-		if t2 and ct>1 and Duel.SelectYesNo(tp,aux.Stringid(525110,1)) then
-			Duel.SpecialSummonStep(t2,0,tp,tp,false,false,POS_FACEUP)
-		end
-		Duel.SpecialSummonComplete()
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
@@ -42,8 +38,11 @@ function c525110.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		t1:RegisterEffect(e1)
-		local e2=e1:Clone()
-		t2:RegisterEffect(e2)
+		if t2 then
+			Duel.SpecialSummonStep(t2,0,tp,tp,false,false,POS_FACEUP) end
+			local e2=e1:Clone()
+			t2:RegisterEffect(e2)
+		end
+		Duel.SpecialSummonComplete()
 	end
-	
 end

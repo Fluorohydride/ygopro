@@ -1,0 +1,8 @@
+--メタル·ドラゴン
+function c9293977.initial_effect(c)
+	--fusion material
+	c:EnableReviveLimit()
+	aux.AddFusionProcCode2(c,29172562,55444629,true,true)
+end
+c9293977.material_count=2
+c9293977.material={29172562,55444629}

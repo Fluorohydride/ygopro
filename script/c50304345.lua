@@ -22,6 +22,7 @@ function c50304345.spcon(e,c)
 		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
 end
 function c50304345.regop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local rc=e:GetHandler():GetReasonCard()
 	if r==REASON_SUMMON and rc:IsSetCard(0x8) then
 		local e1=Effect.CreateEffect(c)

@@ -45,7 +45,7 @@ function c90246973.rmfilter(c,lv)
 end
 function c90246973.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ec=e:GetHandler():GetEquipTarget()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c90246973.rmfilter(chkc,lv) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c90246973.rmfilter(chkc,ec:GetLevel()) end
 	if chk==0 then return Duel.IsExistingTarget(c90246973.rmfilter,tp,0,LOCATION_GRAVE,1,nil,ec:GetLevel()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c90246973.rmfilter,tp,0,LOCATION_GRAVE,1,1,nil,ec:GetLevel())
@@ -56,7 +56,7 @@ function c90246973.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	local ec=c:GetEquipTarget()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Remove(g,POS_FACEUP,REASON_EFFECT)~=0 then
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
