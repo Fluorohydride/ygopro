@@ -509,8 +509,8 @@ void Game::DrawSpec() {
 		}
 		case 6: {
 			driver->draw2DImage(imageManager.GetTexture(showcardcode), position2di(574, 150));
-			driver->draw2DImage(imageManager.tNumber, recti(536 + showcarddif, 191 + showcarddif, 793 - showcarddif, 447 - showcarddif),
-			                    recti((showcardp % 5) * 32, (showcardp / 5) * 32, (showcardp % 5 + 1) * 32, (showcardp / 5 + 1) * 32), 0, 0, true);
+			driver->draw2DImage(imageManager.tNumber, recti(536 + showcarddif, 141 + showcarddif, 793 - showcarddif, 397 - showcarddif),
+			                    recti((showcardp % 5) * 64, (showcardp / 5) * 64, (showcardp % 5 + 1) * 64, (showcardp / 5 + 1) * 64), 0, 0, true);
 			if(showcarddif < 64)
 				showcarddif += 4;
 			break;

@@ -364,6 +364,8 @@ public:
 	static int32 duel_get_release_group_count(lua_State *L);
 	static int32 duel_check_release_group(lua_State *L);
 	static int32 duel_select_release_group(lua_State *L);
+	static int32 duel_check_release_group_ex(lua_State *L);
+	static int32 duel_select_release_group_ex(lua_State *L);
 	static int32 duel_get_tribute_group(lua_State *L);
 	static int32 duel_get_tribute_count(lua_State *L);
 	static int32 duel_select_tribute(lua_State *L);

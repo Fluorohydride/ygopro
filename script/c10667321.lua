@@ -10,7 +10,7 @@ function c10667321.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c10667321.filter(c,e,tp)
-	return c:GetLevel()>=5 and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevelAbove(5) and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c10667321.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

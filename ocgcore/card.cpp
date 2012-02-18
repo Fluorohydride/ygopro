@@ -1742,6 +1742,8 @@ int32 card::is_releaseable_by_nonsummon(uint8 playerid) {
 		return FALSE;
 	if(current.location & (LOCATION_GRAVE + LOCATION_REMOVED))
 		return FALSE;
+	if((current.location == LOCATION_HAND) && (data.type & TYPE_SPELL + TYPE_TRAP))
+		return FALSE;
 	if(!pduel->game_field->is_player_can_release(playerid, this))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_UNRELEASEABLE_NONSUM))
