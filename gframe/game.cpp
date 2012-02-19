@@ -51,7 +51,7 @@ bool Game::Initialize() {
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, 14);
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, 12);
 	textFont = guiFont;
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"[---]");

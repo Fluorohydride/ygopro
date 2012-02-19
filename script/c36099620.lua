@@ -43,7 +43,8 @@ function c36099620.acop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c36099620.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetCounter(0x5)>=2 end
+	if chk==0 then return not e:GetHandler():IsReason(REASON_RULE)
+		and e:GetHandler():GetCounter(0x5)>=2 end
 	return true
 end
 function c36099620.desrepop(e,tp,eg,ep,ev,re,r,rp)

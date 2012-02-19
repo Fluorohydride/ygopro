@@ -29,7 +29,7 @@ function c48505422.spcon(e,c)
 		Duel.IsExistingMatchingCard(c48505422.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function c48505422.rlcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsOnField()
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c48505422.filter(c)
 	return c:IsSetCard(0x3d) and c:GetCode()~=48505422 and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

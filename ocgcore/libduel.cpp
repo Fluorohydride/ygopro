@@ -699,7 +699,7 @@ int32 scriptlib::duel_raise_single_event(lua_State *L) {
 	uint32 ep = lua_tointeger(L, 6);
 	uint32 ev = lua_tointeger(L, 7);
 	duel* pduel = pcard->pduel;
-	pduel->game_field->raise_single_event(pcard, code, peffect, r, rp, ep, ev);
+	pduel->game_field->raise_single_event(pcard, 0, code, peffect, r, rp, ep, ev);
 	pduel->game_field->process_single_event();
 	return lua_yield(L, 0);
 }

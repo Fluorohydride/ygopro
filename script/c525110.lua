@@ -39,7 +39,7 @@ function c525110.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		t1:RegisterEffect(e1)
 		if t2 then
-			Duel.SpecialSummonStep(t2,0,tp,tp,false,false,POS_FACEUP) end
+			Duel.SpecialSummonStep(t2,0,tp,tp,false,false,POS_FACEUP)
 			local e2=e1:Clone()
 			t2:RegisterEffect(e2)
 		end

@@ -13,7 +13,7 @@ function c88095331.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c88095331.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsOnField()
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c88095331.filter(c,e,tp)
 	return c:IsSetCard(0x604e) and c:IsCanBeSpecialSummoned(e,155,tp,false,false)

@@ -23,8 +23,9 @@ class group;
 class effect;
 
 struct tevent {
+	card* trigger_card;
 	uint32 event_code;
-	void* event_cards;
+	group* event_cards;
 	uint32 event_value;
 	uint8 event_player;
 	effect* reason_effect;
@@ -357,7 +358,7 @@ public:
 	int32 execute_target(uint16 step, effect* peffect, uint8 triggering_player);
 	void raise_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	void raise_event(card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
-	void raise_single_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value );
+	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value );
 	int32 check_event(uint32 code, tevent* pe = 0);
 	int32 check_hint_timing(effect* peffect);
 	int32 process_phase_event(int16 step, int32 phase_event);

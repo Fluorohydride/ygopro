@@ -52,6 +52,7 @@ function c95395761.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		if not Duel.Equip(tp,tc,c,true) then return end
 		local e1=Effect.CreateEffect(c)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
@@ -60,7 +61,7 @@ function c95395761.eqop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c95395761.eqlimit(e,c)
-	return e:GetOwner()==c and not c:IsDisabled()
+	return e:GetOwner()==c
 end
 function c95395761.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

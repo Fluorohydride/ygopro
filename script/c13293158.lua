@@ -16,14 +16,12 @@ function c13293158.initial_effect(c)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetOperation(c13293158.atkop)
 	c:RegisterEffect(e2)
-    --damage
+    --destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(13293158,0))
-	e3:SetCategory(CATEGORY_DAMAGE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
-	e3:SetCondition(c13293158.condition)
 	e3:SetTarget(c13293158.target)
 	e3:SetOperation(c13293158.activate)
 	c:RegisterEffect(e3)
@@ -45,9 +43,6 @@ function c13293158.atkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c13293158.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
-end
-function c13293158.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c13293158.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c13293158.filter(c)
 	return c:IsFacedown() and c:IsDestructable()
