@@ -934,7 +934,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 		for(int i = 0; i < player[playerid].list_hand.size(); ++i) {
 			pcard = player[playerid].list_hand[i];
 			if(pcard && pcard != exp && pcard->is_releaseable_by_nonsummon(playerid)
-				&& (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
+			        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 				if(release_list)
 					release_list->insert(pcard);
 				pcard->operation_param = 1;
@@ -1088,13 +1088,13 @@ void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
 	uint8 c = s;
 	card* pcard;
 	for(int p = 0; p < 2; ++p) {
-		if(!c)
-			continue;
-		for(int i = 0; i < 5; ++i) {
-			pcard = player[self].list_mzone[i];
-			if(pcard && !pcard->is_status(STATUS_SUMMONING) && pcard->xyz_materials.size())
-				for(auto clit = pcard->xyz_materials.begin(); clit != pcard->xyz_materials.end(); ++clit)
-					pset->insert(*clit);
+		if(c) {
+			for(int i = 0; i < 5; ++i) {
+				pcard = player[self].list_mzone[i];
+				if(pcard && !pcard->is_status(STATUS_SUMMONING) && pcard->xyz_materials.size())
+					for(auto clit = pcard->xyz_materials.begin(); clit != pcard->xyz_materials.end(); ++clit)
+						pset->insert(*clit);
+			}
 		}
 		self = 1 - self;
 		c = o;
@@ -1104,12 +1104,12 @@ int32 field::get_overlay_count(uint8 self, uint8 s, uint8 o) {
 	uint8 c = s;
 	uint32 count = 0;
 	for(int p = 0; p < 2; ++p) {
-		if(!c)
-			continue;
-		for(int i = 0; i < 5; ++i) {
-			card* pcard = player[self].list_mzone[i];
-			if(pcard && !pcard->is_status(STATUS_SUMMONING))
-				count += pcard->xyz_materials.size();
+		if(c) {
+			for(int i = 0; i < 5; ++i) {
+				card* pcard = player[self].list_mzone[i];
+				if(pcard && !pcard->is_status(STATUS_SUMMONING))
+					count += pcard->xyz_materials.size();
+			}
 		}
 		self = 1 - self;
 		c = o;

@@ -3844,7 +3844,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			for(cit = cait->target_cards->container.begin(); cit != cait->target_cards->container.end(); ++cit)
 				(*cit)->release_relation(cait->triggering_effect);
 		}
-		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE) && !pcard->equiping_target)
+		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
+		        && !pcard->equiping_target && (pcard->current.location == LOCATION_SZONE))
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE) && !pcard->is_status(STATUS_LEAVE_CONFIRMED)
 		        && pcard->is_has_relation(cait->triggering_effect) && player[1 - pcard->current.controler].list_szone[5]
