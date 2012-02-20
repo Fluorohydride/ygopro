@@ -4,7 +4,6 @@ function c70194827.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(70194827,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCode(EVENT_DAMAGE_STEP_END)
 	e1:SetCondition(c70194827.atcon)
@@ -13,7 +12,8 @@ function c70194827.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c70194827.atcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsChainAttackable() and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)~=0
+	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsChainAttackable()
+		and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)~=0
 end
 function c70194827.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end

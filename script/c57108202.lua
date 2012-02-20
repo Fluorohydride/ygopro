@@ -36,7 +36,7 @@ function c57108202.filtera(c,tp)
 		and Duel.IsExistingMatchingCard(c57108202.filter,tp,LOCATION_DECK,0,1,nil,lv)
 end
 function c57108202.tga(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c57108202.filtera1(chkc,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c57108202.filtera(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c57108202.filtera,tp,LOCATION_GRAVE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c57108202.filtera,tp,LOCATION_GRAVE,0,1,1,nil,tp)

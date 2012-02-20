@@ -187,8 +187,8 @@ function Auxiliary.ExOperation(f,ct)
 				local g=Duel.GetXyzMaterial(c)
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 				local mg=g:FilterSelect(tp,f,ct,ct,nil)
-				Duel.Overlay(c,mg)
 				c:SetMaterial(mg)
+				Duel.Overlay(c,mg)
 			end
 end
 function Auxiliary.FConditionCheckF(c,chkf)

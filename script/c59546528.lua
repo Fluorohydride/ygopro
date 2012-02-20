@@ -30,7 +30,7 @@ function c59546528.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(c59546528.cfilter2,tp,LOCATION_HAND,0,1,nil)
 		and Duel.IsExistingTarget(c59546528.filter,tp,0,LOCATION_SZONE,1,nil) end
 	local ht=Duel.GetMatchingGroupCount(c59546528.cfilter2,tp,LOCATION_HAND,0,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local eg=Duel.SelectTarget(tp,c59546528.filter,tp,0,LOCATION_SZONE,1,ht,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,eg,eg:GetCount(),0,0)
 end

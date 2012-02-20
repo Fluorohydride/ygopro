@@ -14,7 +14,7 @@ function c8275702.filter(c,e,sp)
 	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsCanBeSpecialSummoned(e,0,sp,true,false)
 end
 function c8275702.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_SZONE and chkc:GetControler()==tp and c34487429.filter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and c8275702.filter(chkc,e,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c8275702.filter,tp,LOCATION_SZONE,0,1,nil,e,tp)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

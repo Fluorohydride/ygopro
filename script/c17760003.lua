@@ -96,7 +96,7 @@ function c17760003.filter2(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c17760003.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c17760003.filter1(chkc) end
+	if chkc then return chkc:IsOnField() and c17760003.filter2(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c17760003.filter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c17760003.filter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)

@@ -44,7 +44,7 @@ function c50282757.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(1000)
-	Duel.SetOperationInfo(0,CATEGORY_LPDAMAGE,0,0,1-tp,1000)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,1000)
 end
 function c50282757.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) or e:GetHandler():IsFacedown() then return end

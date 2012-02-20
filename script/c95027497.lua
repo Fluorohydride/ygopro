@@ -40,7 +40,7 @@ function c95027497.op1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c95027497.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c95027497.filte2,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c95027497.filter2,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c95027497.op2(e,tp,eg,ep,ev,re,r,rp)

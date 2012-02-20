@@ -72,7 +72,7 @@ function c27383110.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local mat=tc:GetMaterial()
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and mat:IsContains(chkc) end
 	if chk==0 then return mat:IsExists(c27383110.thfilter,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=mat:FilterSelect(tp,c27383110.thfilter,1,1,nil)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
