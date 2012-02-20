@@ -33,14 +33,10 @@ function c95701283.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetCondition(c95701283.tgcon)
 	e1:SetTarget(c95701283.tgtg)
 	e1:SetOperation(c95701283.tgop)
 	e1:SetReset(RESET_EVENT+0xee0000)
 	c:RegisterEffect(e1)
-end
-function c95701283.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer()
 end
 function c95701283.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

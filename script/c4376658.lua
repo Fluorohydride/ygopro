@@ -15,7 +15,7 @@ function c4376658.spfilter1(c,tp)
 		and Duel.IsExistingMatchingCard(c4376658.spfilter2,tp,LOCATION_MZONE,0,1,c)
 end
 function c4376658.spfilter2(c)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGraveAsCost()
 end
 function c4376658.spcon(e,c)
 	if c==nil then return true end

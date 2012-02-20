@@ -38,7 +38,7 @@ function c3129635.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local d=Duel.GetAttackTarget()
 	if chk==0 then
 		if a:IsControler(tp) then return d and a~=e:GetHandler() and bit.band(a:GetOriginalType(),TYPE_TRAP)~=0
-		else return d and d~=e:Gethandler() and bit.band(d:GetOriginalType(),TYPE_TRAP)~=0 end
+		else return d and d~=e:GetHandler() and bit.band(d:GetOriginalType(),TYPE_TRAP)~=0 end
 	end
 	if a:IsControler(tp) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,d,1,0,0)

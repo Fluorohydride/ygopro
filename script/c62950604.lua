@@ -22,15 +22,12 @@ function c62950604.initial_effect(c)
 	c:RegisterEffect(e2)
 	e1:SetLabelObject(e2)
 end
-function c62950604.cfilter(c,e,tp)
-	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemove() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function c62950604.filter(c)
 	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemove()
 end
 function c62950604.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chk:IsControler(tp) and c62950604.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c62950604.cfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c62950604.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c62950604.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)

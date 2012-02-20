@@ -39,7 +39,7 @@ function c26533075.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c26533075.descon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_DESTROY)~=0 and rp~=tp and re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP)
+	return bit.band(r,REASON_DESTROY)~=0 and rp~=tp and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 		and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 		and e:GetHandler():IsPreviousPosition(POS_FACEDOWN)
 end

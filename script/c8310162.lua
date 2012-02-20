@@ -48,14 +48,14 @@ function c8310162.exfilter(c,fid)
 	return c:IsFaceup() and c:IsCode(8310162) and (fid==nil or c:GetFieldID()<fid)
 end
 function c8310162.excon(e)
-	return Duel.IsExistingMatchingCard(c8310162.exfilter,0,LOCATION_ONFILED,LOCATION_ONFILED,1,nil)
+	return Duel.IsExistingMatchingCard(c8310162.exfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function c8310162.descon(e)
 	local c=e:GetHandler()
 	local f1=Duel.GetFieldCard(0,LOCATION_SZONE,5)
 	local f2=Duel.GetFieldCard(1,LOCATION_SZONE,5)
 	return ((f1==nil or not f1:IsFaceup() or f1:GetCode()~=27564031) and (f2==nil or not f2:IsFaceup() or f2:GetCode()~=27564031))
-		or Duel.IsExistingMatchingCard(c8310162.exfilter,0,LOCATION_ONFILED,LOCATION_ONFILED,1,nil,c:GetFieldID())
+		or Duel.IsExistingMatchingCard(c8310162.exfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,c:GetFieldID())
 end
 function c8310162.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
