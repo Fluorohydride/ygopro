@@ -15,6 +15,7 @@ function c33423043.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,0)
 	local ac=Duel.AnnounceCard(tp)
 	e:SetLabel(ac)
+	e:GetHandler():SetHint(CHINT_CARD,ac)
 end
 function c33423043.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ac=e:GetLabel()

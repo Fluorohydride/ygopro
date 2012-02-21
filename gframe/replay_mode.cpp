@@ -546,8 +546,8 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			pbuf += 4 * count;
 			return ReadReplayResponse();
 		}
-		case MSG_COUNT_TURN: {
-			pbuf += 6;
+		case MSG_CARD_HINT: {
+			pbuf += 9;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}

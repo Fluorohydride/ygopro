@@ -181,6 +181,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "CancelToGrave", scriptlib::card_cancel_to_grave },
 	{ "GetTributeRequirement", scriptlib::card_get_tribute_requirement },
 	{ "GetBattleTarget", scriptlib::card_get_battle_target },
+	{ "SetHint", scriptlib::card_set_hint },
 	{ NULL, NULL }
 };
 

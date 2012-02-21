@@ -1249,8 +1249,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 										str.append(formatBuffer);
 									}
 								}
-								if(mcard->turnCounter && (mcard->location & LOCATION_ONFIELD)) {
-									myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->turnCounter);
+								if(mcard->cHint && mcard->chValue && (mcard->location & LOCATION_ONFIELD)) {
+									if(mcard->cHint == CHINT_TURN)
+										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->chValue);
+									else if(mcard->cHint == CHINT_CARD)
+										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(212), dataManager.GetName(mcard->chValue));
+									else if(mcard->cHint == CHINT_RACE)
+										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(213), dataManager.FormatRace(mcard->chValue));
+									else if(mcard->cHint == CHINT_ATTRIBUTE)
+										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(214), dataManager.FormatAttribute(mcard->chValue));
+									else if(mcard->cHint == CHINT_NUMBER)
+										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
 									str.append(formatBuffer);
 								}
 							} else {
@@ -1266,8 +1275,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 										str.append(formatBuffer);
 									}
 								}
-								if(mcard->turnCounter && (mcard->location & LOCATION_ONFIELD)) {
-									myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->turnCounter);
+								if(mcard->cHint && mcard->chValue && (mcard->location & LOCATION_ONFIELD)) {
+									if(mcard->cHint == CHINT_TURN)
+										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(211), mcard->chValue);
+									else if(mcard->cHint == CHINT_CARD)
+										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(212), dataManager.GetName(mcard->chValue));
+									else if(mcard->cHint == CHINT_RACE)
+										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(213), dataManager.FormatRace(mcard->chValue));
+									else if(mcard->cHint == CHINT_ATTRIBUTE)
+										myswprintf(formatBuffer, L"\n%ls%ls", dataManager.GetSysString(214), dataManager.FormatAttribute(mcard->chValue));
+									else if(mcard->cHint == CHINT_NUMBER)
+										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
 									str.append(formatBuffer);
 								}
 							}

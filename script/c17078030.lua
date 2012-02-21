@@ -30,6 +30,7 @@ function c17078030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local announce=Duel.AnnounceNumber(tp,unpack(t))
 	Duel.PayLPCost(tp,announce)
 	e:GetLabelObject():SetLabel(announce)
+	e:GetHandler():SetHint(CHINT_NUMBER,announce)
 end
 function c17078030.atktarget(e,c)
 	return c:GetAttack()<=e:GetLabel()

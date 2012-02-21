@@ -25,7 +25,7 @@ mtrandom DuelClient::rnd;
 
 bool DuelClient::is_refreshing = false;
 std::vector<HostPacket> DuelClient::hosts;
-std::set<int> DuelClient::remotes;
+std::set<unsigned int> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
 
 bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_game) {
@@ -1564,6 +1564,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
 				if (code != 0 && pcard->code != code)
 					pcard->SetCode(code);
+				pcard->cHint = 0;
+				pcard->chValue = 0;
 				if((pl & LOCATION_ONFIELD) && (cl != pl))
 					pcard->counters.clear();
 				if(cl != pl)
@@ -2366,25 +2368,29 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		DuelClient::SendResponse();
 		return true;
 	}
-	case MSG_COUNT_TURN: {
+	case MSG_CARD_HINT: {
 		int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int l = BufferIO::ReadInt8(pbuf);
 		int s = BufferIO::ReadInt8(pbuf);
 		BufferIO::ReadInt8(pbuf);
-		int ct = BufferIO::ReadInt16(pbuf);
+		int chtype = BufferIO::ReadInt8(pbuf);
+		int value = BufferIO::ReadInt32(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
-		pcard->turnCounter = ct;
-		if(ct == 0)
-			return true;
-		if(pcard->location & LOCATION_ONFIELD)
-			pcard->is_selectable = true;
-		mainGame->showcardcode = pcard->code;
-		mainGame->showcarddif = 0;
-		mainGame->showcardp = ct - 1;
-		mainGame->showcard = 6;
-		mainGame->WaitFrameSignal(30);
-		pcard->is_selectable = false;
-		mainGame->showcard = 0;
+		pcard->cHint = chtype;
+		pcard->chValue = value;
+		if(chtype == CHINT_TURN) {
+			if(value == 0)
+				return true;
+			if(pcard->location & LOCATION_ONFIELD)
+				pcard->is_highlighting = true;
+			mainGame->showcardcode = pcard->code;
+			mainGame->showcarddif = 0;
+			mainGame->showcardp = value - 1;
+			mainGame->showcard = 6;
+			mainGame->WaitFrameSignal(30);
+			pcard->is_highlighting = false;
+			mainGame->showcard = 0;
+		}
 		return true;
 	}
 	}
@@ -2425,7 +2431,7 @@ void DuelClient::BeginRefreshHost() {
 		return;
 	}
 	timeval timeout = {5, 0};
-	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ, BroadcastReply, broadev);
+	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
 	Thread::NewThread(RefreshThread, broadev);
 	//send request
@@ -2441,7 +2447,7 @@ void DuelClient::BeginRefreshHost() {
 	for(int i = 0; i < 8; ++i) {
 		if(host->h_addr_list[i] == 0)
 			break;
-		int local_addr = *(unsigned int*)host->h_addr_list[i];
+		unsigned int local_addr = *(unsigned int*)host->h_addr_list[i];
 		local.sin_addr.s_addr = local_addr;
 		SOCKET sSend = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 		if(sSend == INVALID_SOCKET)
@@ -2474,7 +2480,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 		int sz = sizeof(sockaddr_in);
 		char buf[256];
 		int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
-		int ipaddr = bc_addr.sin_addr.s_addr;
+		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
 		if(pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
 			mainGame->gMutex.Lock();

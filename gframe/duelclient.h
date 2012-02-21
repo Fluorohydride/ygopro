@@ -69,7 +69,7 @@ public:
 protected:
 	static bool is_refreshing;
 	static event* resp_event;
-	static std::set<int> remotes;
+	static std::set<unsigned int> remotes;
 public:
 	static std::vector<HostPacket> hosts;
 	static void BeginRefreshHost();

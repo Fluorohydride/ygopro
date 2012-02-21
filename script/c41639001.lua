@@ -8,9 +8,13 @@ function c41639001.initial_effect(c)
 	e1:SetCode(EVENT_BECOME_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c41639001.spcon)
 	e1:SetTarget(c41639001.sptg)
 	e1:SetOperation(c41639001.spop)
 	c:RegisterEffect(e1)
+end
+function c41639001.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsContains(e:GetHandler())
 end
 function c41639001.spfilter(c,e,tp)
 	return c:IsType(TYPE_NORMAL) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

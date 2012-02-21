@@ -623,6 +623,12 @@ public:
 #define HINT_CODE				8
 #define HINT_NUMBER				9
 #define HINT_CARD				10
+//
+#define CHINT_TURN				1
+#define CHINT_CARD				2
+#define CHINT_RACE				3
+#define CHINT_ATTRIBUTE			4
+#define CHINT_NUMBER			5
 //Messages
 #define MSG_RETRY				1
 #define MSG_HINT				2
@@ -703,5 +709,5 @@ public:
 #define MSG_ANNOUNCE_ATTRIB		141
 #define MSG_ANNOUNCE_CARD		142
 #define MSG_ANNOUNCE_NUMBER		143
-#define MSG_COUNT_TURN			160
+#define MSG_CARD_HINT			160
 #endif /* FIELD_H_ */

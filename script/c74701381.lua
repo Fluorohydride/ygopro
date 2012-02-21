@@ -21,6 +21,7 @@ function c74701381.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,563)
 	local rc=Duel.AnnounceRace(tp,1,0xffffff)
 	e:GetLabelObject():SetLabel(rc)
+	e:GetHandler():SetHint(CHINT_RACE,rc)
 end
 function c74701381.value(e,c)
 	return e:GetLabel()

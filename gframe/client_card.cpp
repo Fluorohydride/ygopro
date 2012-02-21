@@ -28,7 +28,8 @@ ClientCard::ClientCard() {
 	defence = 0;
 	base_attack = 0;
 	base_defence = 0;
-	turnCounter = 0;
+	cHint = 0;
+	chValue = 0;
 	atkstring[0] = 0;
 	defstring[0] = 0;
 	lvstring[0] = 0;

@@ -1685,3 +1685,18 @@ int32 scriptlib::card_get_battle_target(lua_State *L) {
 	else lua_pushnil(L);
 	return 1;
 }
+int32 scriptlib::card_set_hint(lua_State *L) {
+	check_param_count(L, 3);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	duel* pduel = pcard->pduel;
+	uint32 type = lua_tointeger(L, 2);
+	uint32 value = lua_tointeger(L, 3);
+	if(type > CHINT_NUMBER)
+		return 0;
+	pduel->write_buffer8(MSG_CARD_HINT);
+	pduel->write_buffer32(pcard->get_info_location());
+	pduel->write_buffer8(type);
+	pduel->write_buffer32(value);
+	return 0;
+}

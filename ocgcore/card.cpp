@@ -968,9 +968,10 @@ uint8 card::refresh_control_status() {
 }
 void card::count_turn(uint16 ct) {
 	turn_counter = ct;
-	pduel->write_buffer8(MSG_COUNT_TURN);
+	pduel->write_buffer8(MSG_CARD_HINT);
 	pduel->write_buffer32(get_info_location());
-	pduel->write_buffer16(ct);
+	pduel->write_buffer8(CHINT_TURN);
+	pduel->write_buffer32(ct);
 }
 void card::create_relation(card* target, uint32 reset) {
 	if (relations.find(target) != relations.end())
