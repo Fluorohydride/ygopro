@@ -1408,6 +1408,8 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 	if(!ignore_count && (pduel->game_field->core.extra_summon[playerid] || !is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT))
 	        && pduel->game_field->core.summon_count[playerid] >= pduel->game_field->get_summon_count_limit(playerid))
 		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
+		return FALSE;
 	pduel->game_field->save_lp_cost();
 	effect_set eset;
 	filter_effect(EFFECT_SUMMON_COST, &eset);
@@ -1499,6 +1501,8 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 		return FALSE;
 	if(!pduel->game_field->is_player_can_flipsummon(playerid, this))
 		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_FLIP_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_CHANGE_POSITION))
@@ -1526,6 +1530,8 @@ int32 card::is_special_summonable(uint8 playerid) {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	if(current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE))
 		return FALSE;
@@ -1610,6 +1616,8 @@ int32 card::is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect
 		return FALSE;
 	if(current.location != LOCATION_HAND)
 		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_MSET))
 		return FALSE;
 	if(!ignore_count && (pduel->game_field->core.extra_summon[playerid] || !is_affected_by_effect(EFFECT_EXTRA_SET_COUNT))
@@ -1644,6 +1652,8 @@ int32 card::is_setable_szone(uint8 playerid) {
 	if(!(data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(current.controler, LOCATION_SZONE) == 0)
 		return FALSE;
 	if(data.type & TYPE_MONSTER && !is_affected_by_effect(EFFECT_MONSTER_SSET))
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SSET))
 		return FALSE;
@@ -1868,6 +1878,8 @@ int32 card::is_capable_cost_to_extra(uint8 playerid) {
 int32 card::is_capable_attack() {
 	if(!is_position(POS_FACEUP_ATTACK) && !(is_position(POS_FACEUP_DEFENCE) && is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
 		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_ATTACK))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_ATTACK_DISABLED))
@@ -1903,6 +1915,8 @@ int32 card::is_capable_change_position(uint8 playerid) {
 	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_CHANGE_POSITION))
 		return FALSE;
@@ -1961,6 +1975,8 @@ int32 card::is_capable_be_effect_target(effect* peffect, uint8 playerid) {
 int32 card::is_can_be_fusion_material() {
 	if(!(get_type()&TYPE_MONSTER))
 		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_BE_FUSION_MATERIAL))
 		return FALSE;
 	return TRUE;
@@ -1971,6 +1987,8 @@ int32 card::is_can_be_synchro_material(card* scard) {
 	if(!(get_type()&TYPE_MONSTER))
 		return FALSE;
 	if(scard && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	effect_set eset;
 	filter_effect(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL, &eset);
@@ -1983,6 +2001,8 @@ int32 card::is_can_be_xyz_material(card* scard) {
 	if(data.type & (TYPE_XYZ | TYPE_TOKEN))
 		return FALSE;
 	if(!(get_type()&TYPE_MONSTER))
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	effect_set eset;
 	filter_effect(EFFECT_CANNOT_BE_XYZ_MATERIAL, &eset);

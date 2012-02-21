@@ -142,6 +142,8 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 						return FALSE;
 				}
 			}
+			if(handler->is_affected_by_effect(EFFECT_FORBIDDEN))
+				return FALSE;
 			if(handler->is_affected_by_effect(EFFECT_CANNOT_TRIGGER))
 				return FALSE;
 		} else if(!(type & EFFECT_TYPE_CONTINUOUS)) {
@@ -158,6 +160,8 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 				if(!((type & EFFECT_TYPE_IGNITION) || (type & EFFECT_TYPE_QUICK_O)) || !(flag & EFFECT_FLAG_BOTH_SIDE))
 					return FALSE;
 			}
+			if(handler->is_affected_by_effect(EFFECT_FORBIDDEN))
+				return FALSE;
 			if(handler->is_affected_by_effect(EFFECT_CANNOT_TRIGGER))
 				return FALSE;
 		} else {

@@ -302,6 +302,13 @@ int32 scriptlib::card_get_fieldid(lua_State *L) {
 	lua_pushinteger(L, pcard->fieldid);
 	return 1;
 }
+int32 scriptlib::card_get_fieldidr(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->fieldid_r);
+	return 1;
+}
 int32 scriptlib::card_is_code(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);

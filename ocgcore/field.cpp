@@ -132,6 +132,7 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 	}
 	pcard->apply_field_effect();
 	pcard->fieldid = infos.field_id++;
+	pcard->fieldid_r = pcard->fieldid;
 	pcard->turnid = infos.turn_id;
 	if (location == LOCATION_MZONE)
 		player[playerid].used_location |= 1 << sequence;

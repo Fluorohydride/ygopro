@@ -13,7 +13,7 @@ end
 function c15800838.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
-	Duel.Hint(HINT_SELECTMSG,tp,0)
+	Duel.Hint(HINT_SELECTMSG,tp,564)
 	local ac=Duel.AnnounceCard(tp)
 	e:SetLabel(ac)
 	e:GetHandler():SetHint(CHINT_CARD,ac)

@@ -94,6 +94,7 @@ public:
 	uint8 attacked_count;
 	uint16 cardid;
 	uint16 fieldid;
+	uint16 fieldid_r;
 	uint16 turnid;
 	uint16 turn_counter;
 	card* equiping_target;

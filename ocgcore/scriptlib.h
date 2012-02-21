@@ -58,6 +58,7 @@ public:
 	static int32 card_get_leave_field_dest(lua_State *L);
 	static int32 card_get_turnid(lua_State *L);
 	static int32 card_get_fieldid(lua_State *L);
+	static int32 card_get_fieldidr(lua_State *L);
 	static int32 card_is_code(lua_State *L);
 	static int32 card_is_type(lua_State *L);
 	static int32 card_is_race(lua_State *L);
