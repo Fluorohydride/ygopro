@@ -178,6 +178,12 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->GetResponse(dp, pdata, len > 64 ? 64 : len - 1);
 		break;
 	}
+	case CTOS_TIME_CONFIRM: {
+		if(!dp->game || !duel_mode->pduel)
+			return;
+		duel_mode->TimeConfirm(dp);
+		break;
+	}
 	case CTOS_UPDATE_DECK: {
 		if(!dp->game)
 			return;
@@ -212,6 +218,8 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		} else if(pkt->info.mode == MODE_MATCH) {
 			duel_mode = new SingleDuel(true);
 		}
+		timeval timeout = {1, 0};
+		duel_mode->etimer = event_new(net_evbase, 0, EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
 		if(pkt->info.rule > 3)
 			pkt->info.rule = 0;
 		if(pkt->info.mode > 1)

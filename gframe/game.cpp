@@ -514,7 +514,6 @@ void Game::MainLoop() {
 		}
 	}
 	DuelClient::StopClient(true);
-	NetServer::StopServer();
 	SaveConfig();
 	device->drop();
 }

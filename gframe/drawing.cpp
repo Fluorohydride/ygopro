@@ -2,6 +2,7 @@
 #include "materials.h"
 #include "image_manager.h"
 #include "deck_manager.h"
+#include "duelclient.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {
@@ -442,7 +443,7 @@ void Game::DrawGUI() {
 						fu.guiFading->setRelativePosition(irr::core::recti(fu.fadingUL, fu.fadingLR));
 				}
 				if(fu.signalAction && !fu.fadingFrame) {
-					localAction.Set();
+					DuelClient::SendResponse();
 					fu.signalAction = false;
 				}
 			}

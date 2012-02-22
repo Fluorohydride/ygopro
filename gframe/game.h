@@ -84,7 +84,7 @@ public:
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;
-	Signal localAction;
+	Signal actionSignal;
 	Signal replaySignal;
 	Config gameConf;
 	DuelInfo dInfo;

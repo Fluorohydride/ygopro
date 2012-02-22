@@ -401,8 +401,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->stMessage->setText(dataManager.GetSysString(1500));
 		mainGame->PopupElement(mainGame->wMessage);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
+		mainGame->actionSignal.Reset();
+		mainGame->actionSignal.Wait();
 		mainGame->gMutex.Lock();
 		mainGame->CloseDuelWindow();
 		mainGame->dInfo.isStarted = false;
@@ -521,8 +521,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->stMessage->setText(dataManager.GetDesc(data));
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
 			break;
 		}
 		case HINT_SELECTMSG: {
@@ -715,12 +715,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->btnEP->setPressed(false);
 		}
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		mainGame->dField.ClearCommandFlag();
-		mainGame->btnM2->setVisible(false);
-		mainGame->btnEP->setVisible(false);
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_IDLECMD: {
@@ -820,12 +814,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->btnEP->setEnabled(true);
 			mainGame->btnEP->setPressed(false);
 		}
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		mainGame->dField.ClearCommandFlag();
-		mainGame->btnBP->setVisible(false);
-		mainGame->btnEP->setVisible(false);
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_EFFECTYN: {
@@ -843,9 +831,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
 		mainGame->PopupElement(mainGame->wQuery);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_YESNO: {
@@ -855,9 +840,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(desc));
 		mainGame->PopupElement(mainGame->wQuery);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_OPTION: {
@@ -881,9 +863,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->wOptions->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wOptions);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_CARD: {
@@ -932,10 +911,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		mainGame->dField.ClearSelect();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_CHAIN: {
@@ -982,10 +957,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
 		mainGame->PopupElement(mainGame->wQuery);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		mainGame->dField.ClearChainSelect();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_PLACE:
@@ -1030,9 +1001,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			DuelClient::SendResponse();
 			return true;
 		}
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_POSITION: {
@@ -1076,9 +1044,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->PopupElement(mainGame->wPosSelect);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_TRIBUTE: {
@@ -1108,10 +1073,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		}
 		mainGame->stHintMsg->setText(dataManager.GetSysString(531));
 		mainGame->stHintMsg->setVisible(false);
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		mainGame->dField.ClearSelect();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_COUNTER: {
@@ -1138,10 +1099,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->stHintMsg->setText(textBuffer);
 		mainGame->stHintMsg->setVisible(true);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		mainGame->dField.ClearSelect();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SELECT_SUM: {
@@ -1183,13 +1140,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->stHintMsg->setText(textBuffer);
 			mainGame->stHintMsg->setVisible(true);
 		}
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		for(int i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
-			mainGame->dField.selectsum_all[i]->is_selectable = false;
-			mainGame->dField.selectsum_all[i]->is_selected = false;
-		}
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_SORT_CARD:
@@ -1225,9 +1175,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_CONFIRM_DECKTOP: {
@@ -1337,8 +1284,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->dField.selectable_cards = panel_confirm;
 			mainGame->dField.ShowSelectCard(true);
 			mainGame->gMutex.Unlock();
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
 		}
 		return true;
 	}
@@ -2301,9 +2248,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->wANRace->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANRace);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_ANNOUNCE_ATTRIB: {
@@ -2324,9 +2268,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->wANAttribute->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANAttribute);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_ANNOUNCE_CARD: {
@@ -2340,9 +2281,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->wANCard->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANCard);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_ANNOUNCE_NUMBER: {
@@ -2363,9 +2301,6 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->wANNumber->setText(textBuffer);
 		mainGame->PopupElement(mainGame->wANNumber);
 		mainGame->gMutex.Unlock();
-		mainGame->localAction.Reset();
-		mainGame->localAction.Wait();
-		DuelClient::SendResponse();
 		return true;
 	}
 	case MSG_CARD_HINT: {
@@ -2405,6 +2340,43 @@ void DuelClient::SetResponseB(unsigned char* respB, unsigned char len) {
 	response_len = len;
 }
 void DuelClient::SendResponse() {
+	switch(mainGame->dInfo.curMsg) {
+	case MSG_SELECT_BATTLECMD: {
+		mainGame->dField.ClearCommandFlag();
+		mainGame->btnM2->setVisible(false);
+		mainGame->btnEP->setVisible(false);
+		break;
+	}
+	case MSG_SELECT_IDLECMD: {
+		mainGame->dField.ClearCommandFlag();
+		mainGame->btnBP->setVisible(false);
+		mainGame->btnEP->setVisible(false);
+		break;
+	}
+	case MSG_SELECT_CARD: {
+		mainGame->dField.ClearSelect();
+		break;
+	}
+	case MSG_SELECT_CHAIN: {
+		mainGame->dField.ClearChainSelect();
+		break;
+	}
+	case MSG_SELECT_TRIBUTE: {
+		mainGame->dField.ClearSelect();
+		break;
+	}
+	case MSG_SELECT_COUNTER: {
+		mainGame->dField.ClearSelect();
+		break;
+	}
+	case MSG_SELECT_SUM: {
+		for(int i = 0; i < mainGame->dField.selectsum_all.size(); ++i) {
+			mainGame->dField.selectsum_all[i]->is_selectable = false;
+			mainGame->dField.selectsum_all[i]->is_selected = false;
+		}
+		break;
+	}
+	}
 	SendBufferToServer(CTOS_RESPONSE, response_buf, response_len);
 }
 void DuelClient::BeginRefreshHost() {

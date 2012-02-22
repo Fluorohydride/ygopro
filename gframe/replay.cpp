@@ -119,6 +119,7 @@ void Replay::EndRecord() {
 	pheader.flag |= REPLAY_COMPRESSED;
 	size_t propsize = 5;
 	comp_size = 0x1000;
+	printf("%x\n",comp_data);
 	LzmaCompress(comp_data, &comp_size, replay_data, pdata - replay_data, pheader.props, &propsize, 5, 1 << 24, 3, 0, 2, 32, 1);
 	is_recording = false;
 }

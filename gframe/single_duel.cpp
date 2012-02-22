@@ -1258,6 +1258,9 @@ void SingleDuel::WaitforResponse(int playerid) {
 	unsigned char msg = MSG_WAITING;
 	NetServer::SendPacketToPlayer(players[1 - playerid], STOC_GAME_MSG, msg);
 }
+void SingleDuel::TimeConfirm(DuelPlayer* dp) {
+	
+}
 void SingleDuel::RefreshMzone(int player, int flag, int use_cache) {
 	char query_buffer[0x1000];
 	char* qbuf = query_buffer;
@@ -1357,6 +1360,9 @@ int SingleDuel::MessageHandler(long fduel, int type) {
 	fprintf(fp, "[Script error:] %s\n", msgbuf);
 	fclose(fp);
 	return 0;
+}
+void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
+	SingleDuel* sd = static_cast<SingleDuel*>(arg);
 }
 
 }

@@ -25,6 +25,7 @@ public:
 	virtual void Surrender(DuelPlayer* dp);
 	virtual int Analyze(char* msgbuffer, unsigned int len);
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len);
+	virtual void TimeConfirm(DuelPlayer* dp);
 	virtual void EndDuel();
 	
 	void DuelEndProc();
@@ -37,6 +38,7 @@ public:
 	void RefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
 	
 	static int MessageHandler(long fduel, int type);
+	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
 	
 protected:
 	DuelPlayer* players[2];

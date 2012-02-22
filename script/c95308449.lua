@@ -32,6 +32,6 @@ function c95308449.checkop(e,tp,eg,ep,ev,re,r,rp)
 	ct=ct+1
 	c:SetTurnCounter(ct)
 	if ct==20 then
-		Duel.Win(tp,0x4)
+		Duel.Win(tp,0x11)
 	end
 end

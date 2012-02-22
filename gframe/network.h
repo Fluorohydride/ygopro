@@ -73,7 +73,11 @@ struct STOC_TypeChange {
 	unsigned char type;
 };
 struct STOC_ExitGame {
-	unsigned pos;
+	unsigned char pos;
+};
+struct STOC_TimeLimit {
+	unsigned char player;
+	unsigned short left_time;
 };
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
@@ -123,9 +127,11 @@ public:
 	}
 	virtual void Surrender(DuelPlayer* dp) {}
 	virtual void GetResponse(DuelPlayer* dp, void* pdata, unsigned int len) {}
+	virtual void TimeConfirm(DuelPlayer* dp) {}
 	virtual void EndDuel() {};
 
 public:
+	event* etimer;
 	DuelPlayer* host_player;
 	HostInfo host_info;
 	unsigned long pduel;
@@ -155,6 +161,7 @@ public:
 #define CTOS_JOIN_GAME		0x12
 #define CTOS_LEAVE_GAME		0x13
 #define CTOS_SURRENDER		0x14
+#define CTOS_TIME_CONFIRM	0x15
 #define CTOS_HS_TODUELIST	0x20
 #define CTOS_HS_TOOBSERVER	0x21
 #define CTOS_HS_READY		0x22
@@ -177,6 +184,7 @@ public:
 #define STOC_DUEL_START		0x15
 #define STOC_DUEL_END		0x16
 #define STOC_REPLAY			0x17
+#define STOC_TIME_LIMIT		0x18
 #define STOC_HS_PLAYER_ENTER	0x20
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22

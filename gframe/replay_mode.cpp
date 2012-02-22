@@ -25,7 +25,7 @@ void ReplayMode::StopReplay(bool is_exiting) {
 	is_continuing = false;
 	is_closing = is_exiting;
 	exit_pending = true;
-	mainGame->localAction.Set();
+	mainGame->actionSignal.Set();
 }
 void ReplayMode::SwapField() {
 	if(is_paused)
@@ -39,7 +39,7 @@ void ReplayMode::Pause(bool is_pause, bool is_step) {
 	else {
 		if(!is_step)
 			is_pausing = false;
-		mainGame->localAction.Set();
+		mainGame->actionSignal.Set();
 	}
 }
 bool ReplayMode::ReadReplayResponse() {
@@ -105,9 +105,9 @@ int ReplayMode::ReplayThread(void* param) {
 	end_duel(pduel);
 	if(!is_closing) {
 		mainGame->stMessage->setText(dataManager.GetSysString(1501));
-		mainGame->localAction.Reset();
+		mainGame->actionSignal.Reset();
 		mainGame->PopupElement(mainGame->wMessage);
-		mainGame->localAction.Wait();
+		mainGame->actionSignal.Wait();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
 		mainGame->CloseDuelWindow();
@@ -554,8 +554,8 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		if(pauseable && is_pausing) {
 			is_paused = true;
-			mainGame->localAction.Reset();
-			mainGame->localAction.Wait();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
 			is_paused = false;
 		}
 	}
