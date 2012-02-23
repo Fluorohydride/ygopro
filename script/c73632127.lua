@@ -1,4 +1,4 @@
---抹殺の聖刻印
+--ディメンション・スライド
 function c73632127.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -47,7 +47,7 @@ function c26211048.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e1:SetValue(c44505297.eqlimit)
+	e1:SetValue(c26211048.eqlimit)
 	tc:RegisterEffect(e1)
 	if tc:IsFaceup() then
 		local atk=tc:GetTextAttack()/2
@@ -68,6 +68,6 @@ function c26211048.eqop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 	end
 end
-function c44505297.eqlimit(e,c)
+function c26211048.eqlimit(e,c)
 	return e:GetOwner()==c
 end

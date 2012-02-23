@@ -12,7 +12,7 @@ function c37953640.initial_effect(c)
 end
 c37953640.tuner_filter=aux.FilterBoolFunction(Card.IsRace,RACE_FISH)
 function c37953640.synfilter(c,syncard,f)
-	return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard) and c:IsRace(RACE_FISH) and (f==nil or f(c))
+	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and c:IsRace(RACE_FISH) and (f==nil or f(c))
 end
 function c37953640.syntg(e,syncard,f,minc)
 	local c=e:GetHandler()
@@ -23,7 +23,8 @@ function c37953640.syntg(e,syncard,f,minc)
 	return res
 end
 function c37953640.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
-	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
+	local c=e:GetHandler()
+	local lv=syncard:GetLevel()-c:GetLevel()
 	local g=Duel.GetMatchingGroup(c37953640.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,syncard)
