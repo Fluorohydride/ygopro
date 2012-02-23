@@ -17,7 +17,7 @@ function c5037726.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,REASON_COST)
 end
 function c5037726.filter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c5037726.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and c5037726.filter(chkc,e,tp) end

@@ -21,6 +21,7 @@ struct HostInfo {
 	unsigned int start_lp;
 	unsigned char start_hand;
 	unsigned char draw_count;
+	unsigned short time_limit;
 };
 struct HostPacket {
 	unsigned short identifier;

@@ -142,6 +142,7 @@ int NetServer::ServerThread(void* param) {
 	}
 	users.clear();
 	evconnlistener_free(listener);
+	listener = 0;
 	if(broadcast_ev) {
 		evutil_socket_t fd;
 		event_get_assignment(broadcast_ev, 0, &fd, 0, 0, 0);
@@ -149,12 +150,13 @@ int NetServer::ServerThread(void* param) {
 		event_free(broadcast_ev);
 		broadcast_ev = 0;
 	}
-	event_base_free(net_evbase);
-	listener = 0;
-	net_evbase = 0;
-	if(duel_mode)
+	if(duel_mode) {
+		event_free(duel_mode->etimer);
 		delete duel_mode;
+	}
 	duel_mode = 0;
+	event_base_free(net_evbase);
+	net_evbase = 0;
 	return 0;
 }
 void NetServer::DisconnectPlayer(DuelPlayer* dp) {
@@ -215,11 +217,11 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		CTOS_CreateGame* pkt = (CTOS_CreateGame*)pdata;
 		if(pkt->info.mode == MODE_SINGLE) {
 			duel_mode = new SingleDuel(false);
+			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
 		} else if(pkt->info.mode == MODE_MATCH) {
 			duel_mode = new SingleDuel(true);
+			duel_mode->etimer = event_new(net_evbase, 0, EV_TIMEOUT | EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
 		}
-		timeval timeout = {1, 0};
-		duel_mode->etimer = event_new(net_evbase, 0, EV_PERSIST, SingleDuel::SingleTimer, duel_mode);
 		if(pkt->info.rule > 3)
 			pkt->info.rule = 0;
 		if(pkt->info.mode > 1)

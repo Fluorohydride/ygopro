@@ -111,6 +111,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			cscg.info.start_hand = _wtoi(mainGame->ebStartHand->getText());
 			cscg.info.start_lp = _wtoi(mainGame->ebStartLP->getText());
 			cscg.info.draw_count = _wtoi(mainGame->ebDrawCount->getText());
+			cscg.info.time_limit = _wtoi(mainGame->ebTimeLimit->getText());
 			cscg.info.lflist = mainGame->cbLFlist->getItemData(mainGame->cbLFlist->getSelected());
 			cscg.info.enable_priority = mainGame->chkEnablePriority->isChecked();
 			cscg.info.no_check_deck = mainGame->chkNoCheckDeck->isChecked();
@@ -297,6 +298,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		str.append(msgbuf);
 		myswprintf(msgbuf, L"%ls%ls\n", dataManager.GetSysString(1227), dataManager.GetSysString(1244 + pkt->info.mode));
 		str.append(msgbuf);
+		if(pkt->info.time_limit) {
+			myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1237), pkt->info.time_limit);
+			str.append(msgbuf);
+		}
 		str.append(L"==========\n");
 		myswprintf(msgbuf, L"%ls%d\n", dataManager.GetSysString(1231), pkt->info.start_lp);
 		str.append(msgbuf);
@@ -317,6 +322,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			str.append(msgbuf);
 		}
 		mainGame->gMutex.Lock();
+		mainGame->dInfo.time_limit = pkt->info.time_limit;
+		mainGame->dInfo.time_left[0] = 0;
+		mainGame->dInfo.time_left[1] = 0;
 		mainGame->deckBuilder.filterList = 0;
 		for(auto lit = deckManager._lfList.begin(); lit != deckManager._lfList.end(); ++lit)
 			if(lit->hash == pkt->info.lflist)
@@ -375,6 +383,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.strLP[0][0] = 0;
 		mainGame->dInfo.strLP[1][0] = 0;
 		mainGame->dInfo.turn = 0;
+		mainGame->dInfo.time_left[0] = 0;
+		mainGame->dInfo.time_left[1] = 0;
+		mainGame->dInfo.time_player = 2;
 		mainGame->is_building = false;
 		mainGame->wCardImg->setVisible(true);
 		mainGame->wInfos->setVisible(true);
@@ -431,6 +442,15 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
 			new_replay.SaveReplay(mainGame->ebRSName->getText());
 		}
+		break;
+	}
+	case STOC_TIME_LIMIT: {
+		STOC_TimeLimit* pkt = (STOC_TimeLimit*)pdata;
+		int lplayer = mainGame->LocalPlayer(pkt->player);
+		if(lplayer == 0)
+			DuelClient::SendPacketToServer(CTOS_TIME_CONFIRM);
+		mainGame->dInfo.time_player = lplayer;
+		mainGame->dInfo.time_left[lplayer] = pkt->left_time;
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
@@ -496,6 +516,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->WaitFrameSignal(11);
 		}
 	}
+	if(mainGame->dInfo.time_player == 1)
+		mainGame->dInfo.time_player = 2;
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		mainGame->gMutex.Lock();
@@ -605,16 +627,30 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int player = BufferIO::ReadInt8(pbuf);
 		int type = BufferIO::ReadInt8(pbuf);
 		mainGame->showcarddif = 110;
-		mainGame->showcard = 101;
 		mainGame->showcardp = 0;
+		mainGame->dInfo.vic_string = 0;
+		wchar_t vic_buf[256];
 		if(player == 2)
 			mainGame->showcardcode = 3;
 		else if(mainGame->LocalPlayer(player) == 0) {
 			mainGame->showcardcode = 1;
+			if(type < 0x10)
+				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
+			else
+				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
+			mainGame->dInfo.vic_string = vic_buf;
 		} else {
 			mainGame->showcardcode = 2;
+			if(type < 0x10)
+				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
+			else
+				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
+			mainGame->dInfo.vic_string = vic_buf;
 		}
+		mainGame->showcard = 101;
 		mainGame->WaitFrameSignal(120);
+		mainGame->dInfo.vic_string = 0;
+		mainGame->showcard = 0;
 		break;
 	}
 	case MSG_WAITING: {
@@ -2377,6 +2413,7 @@ void DuelClient::SendResponse() {
 		break;
 	}
 	}
+	mainGame->dInfo.time_player = 2;
 	SendBufferToServer(CTOS_RESPONSE, response_buf, response_len);
 }
 void DuelClient::BeginRefreshHost() {

@@ -294,6 +294,12 @@ void Game::DrawMisc() {
 			lpcFont->draw(lpcstring, recti(400, 162, 922, 210), lpccolor, true, false, 0);
 		}
 	}
+	if(!dInfo.isReplay && !dInfo.isObserver && dInfo.time_limit) {
+		driver->draw2DRectangle(recti(525, 34, 525 + dInfo.time_left[0] * 100 / dInfo.time_limit, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
+		driver->draw2DRectangleOutline(recti(525, 34, 625, 44), 0xffffffff);
+		driver->draw2DRectangle(recti(795 - dInfo.time_left[1] * 100 / dInfo.time_limit, 34, 795, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
+		driver->draw2DRectangleOutline(recti(695, 34, 795, 44), 0xffffffff);
+	}
 	numFont->draw(dInfo.strLP[0], recti(330, 11, 629, 30), 0xff000000, true, false, 0);
 	numFont->draw(dInfo.strLP[0], recti(330, 12, 631, 30), 0xffffff00, true, false, 0);
 	numFont->draw(dInfo.strLP[1], recti(691, 11, 990, 30), 0xff000000, true, false, 0);
@@ -600,6 +606,11 @@ void Game::DrawSpec() {
 			} else if(showcardp < showcarddif) {
 				lpcFont->draw(lstr, recti(671 - pos.Width / 2, 271, 970, 350), 0xff000000);
 				lpcFont->draw(lstr, recti(670 - pos.Width / 2, 270, 970, 350), 0xffffffff);
+				if(dInfo.vic_string && (showcardcode == 1 || showcardcode == 2)) {
+					driver->draw2DRectangle(0xa0000000, recti(540, 320, 800, 340));
+					guiFont->draw(dInfo.vic_string, recti(502, 321, 840, 340), 0xff000000, true, true);
+					guiFont->draw(dInfo.vic_string, recti(500, 320, 840, 340), 0xffffffff, true, true);
+				}
 			} else if(showcardp < showcarddif + 10) {
 				int alpha = ((showcarddif + 10 - showcardp) * 25) << 24;
 				lpcFont->draw(lstr, recti(671 - pos.Width / 2 + (showcardp - showcarddif) * 40, 271, 970, 350), alpha);

@@ -106,21 +106,25 @@ bool Game::Initialize() {
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
 	cbMatchMode->addItem(dataManager.GetSysString(1245));
-	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 150, 360, 170), wCreateHost, -1, dataManager.GetSysString(1236));
-	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
-	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 180, 170, 200), wCreateHost, -1, dataManager.GetSysString(1229));
-	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1230));
-	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 210, 320, 230), false, false, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1237), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
+	myswprintf(strbuf, L"%d", 180);
+	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
+	ebTimeLimit->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
+	env->addStaticText(dataManager.GetSysString(1228), rect<s32>(20, 150, 320, 170), false, false, wCreateHost);
+	chkEnablePriority = env->addCheckBox(false, rect<s32>(20, 180, 360, 200), wCreateHost, -1, dataManager.GetSysString(1236));
+	chkNoCheckDeck = env->addCheckBox(false, rect<s32>(20, 210, 170, 230), wCreateHost, -1, dataManager.GetSysString(1229));
+	chkNoShuffleDeck = env->addCheckBox(false, rect<s32>(180, 210, 360, 230), wCreateHost, -1, dataManager.GetSysString(1230));
+	env->addStaticText(dataManager.GetSysString(1231), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
 	myswprintf(strbuf, L"%d", 8000);
-	ebStartLP = env->addEditBox(strbuf, rect<s32>(140, 210, 220, 230), true, wCreateHost);
+	ebStartLP = env->addEditBox(strbuf, rect<s32>(140, 235, 220, 260), true, wCreateHost);
 	ebStartLP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(dataManager.GetSysString(1232), rect<s32>(20, 240, 320, 260), false, false, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1232), rect<s32>(20, 270, 320, 290), false, false, wCreateHost);
 	myswprintf(strbuf, L"%d", 5);
-	ebStartHand = env->addEditBox(strbuf, rect<s32>(140, 240, 220, 260), true, wCreateHost);
+	ebStartHand = env->addEditBox(strbuf, rect<s32>(140, 265, 220, 290), true, wCreateHost);
 	ebStartHand->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
-	env->addStaticText(dataManager.GetSysString(1233), rect<s32>(20, 270, 320, 290), false, false, wCreateHost);
+	env->addStaticText(dataManager.GetSysString(1233), rect<s32>(20, 300, 320, 320), false, false, wCreateHost);
 	myswprintf(strbuf, L"%d", 1);
-	ebDrawCount = env->addEditBox(strbuf, rect<s32>(140, 270, 220, 290), true, wCreateHost);
+	ebDrawCount = env->addEditBox(strbuf, rect<s32>(140, 295, 220, 320), true, wCreateHost);
 	ebDrawCount->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1234), rect<s32>(10, 360, 220, 380), false, false, wCreateHost);
 	ebServerName = env->addEditBox(gameConf.gamename, rect<s32>(110, 355, 250, 380), true, wCreateHost);
@@ -511,9 +515,17 @@ void Game::MainLoop() {
 			fps = 0;
 			cur_time -= 1000;
 			timer->setTime(0);
+			if(dInfo.time_player == 0 || dInfo.time_player == 1)
+				if(dInfo.time_left[dInfo.time_player])
+					dInfo.time_left[dInfo.time_player]--;
 		}
 	}
 	DuelClient::StopClient(true);
+#ifdef _WIN32
+	Sleep(500);
+#else
+	usleep(500000);
+#endif
 	SaveConfig();
 	device->drop();
 }

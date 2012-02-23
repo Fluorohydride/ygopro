@@ -22,12 +22,13 @@ function c85562745.con(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and bit.band(r,REASON_BATTLE)==0 and re:GetHandler():GetCode()~=85562745
 end
 function c85562745.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(300)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,300)
 end
 function c85562745.op(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
 end

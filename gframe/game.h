@@ -36,6 +36,10 @@ struct DuelInfo {
 	wchar_t clientname[20];
 	wchar_t strLP[2][16];
 	wchar_t strTurn[8];
+	wchar_t* vic_string;
+	unsigned char time_player;
+	unsigned short time_limit;
+	unsigned short time_left[2];
 };
 
 struct FadingUnit {
@@ -173,6 +177,7 @@ public:
 	irr::gui::IGUIComboBox* cbLFlist;
 	irr::gui::IGUIComboBox* cbMatchMode;
 	irr::gui::IGUIComboBox* cbRule;
+	irr::gui::IGUIEditBox* ebTimeLimit;
 	irr::gui::IGUIEditBox* ebStartLP;
 	irr::gui::IGUIEditBox* ebStartHand;
 	irr::gui::IGUIEditBox* ebDrawCount;

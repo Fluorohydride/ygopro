@@ -53,6 +53,8 @@ protected:
 	unsigned char duel_count;
 	unsigned char tp_player;
 	unsigned char match_result[3];
+	unsigned short time_limit[2];
+	unsigned short time_elapsed;
 };
 
 }
