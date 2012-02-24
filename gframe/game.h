@@ -14,6 +14,7 @@ namespace ygo {
 struct Config {
 	unsigned short antialias;
 	unsigned short serverport;
+	unsigned char textfontsize;
 	wchar_t lastip[20];
 	wchar_t lastport[10];
 	wchar_t nickname[20];

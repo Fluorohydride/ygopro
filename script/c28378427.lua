@@ -6,12 +6,17 @@ function c28378427.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c28378427.condition)
+	e1:SetCost(c28378427.cost)
 	e1:SetTarget(c28378427.target)
 	e1:SetOperation(c28378427.activate)
 	c:RegisterEffect(e1)
 end
 function c28378427.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
+end
+function c28378427.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c28378427.filter(c,e,tp,dam)
 	return c:IsAttackBelow(dam) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -18,10 +18,10 @@ function c30312361.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c30312361.filter(c)
-	return c:IsType(TYPE_EFFECT) and c:IsAbleToRemove()
+	return c:IsType(TYPE_EFFECT) and not c:IsHasEffect(EFFECT_FORBIDDEN) and c:IsAbleToRemove()
 end
 function c30312361.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and c30312361.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c30312361.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c30312361.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c30312361.filter,tp,LOCATION_GRAVE,0,1,1,nil)

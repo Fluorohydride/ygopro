@@ -48,12 +48,12 @@ function c81122844.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c81122844.tgfilter(c,e)
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP) and c:IsControler(tp)
-		and c:IsReason(REASON_DESTROY) and c:IsSetCard(0x58) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)
+function c81122844.tgfilter(c,e,tp)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP) and c:IsControler(tp)
+		and c:IsReason(REASON_DESTROY) and c:IsSetCard(0x58) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)
 end
 function c81122844.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c81122844.tgfilter,1,nil,e)
+	return eg:IsExists(c81122844.tgfilter,1,nil,e,tp)
 end
 function c81122844.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return eg:IsContains(chkc) and c81122844.tgfilter(chkc,e) end

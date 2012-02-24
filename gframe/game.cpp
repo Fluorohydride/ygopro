@@ -51,7 +51,7 @@ bool Game::Initialize() {
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
 	lpcFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 48);
-	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, 12);
+	guiFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.textfont, gameConf.textfontsize);
 	textFont = guiFont;
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"[---]");
@@ -635,6 +635,7 @@ void Game::LoadConfig() {
 	wchar_t wstr[256];
 	gameConf.antialias = 0;
 	gameConf.serverport = 7911;
+	gameConf.textfontsize = 12;
 	gameConf.nickname[0] = 0;
 	gameConf.gamename[0] = 0;
 	gameConf.lastdeck[0] = 0;
@@ -661,6 +662,7 @@ void Game::LoadConfig() {
 			BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
+			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &gameConf.textfontsize);
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
@@ -690,7 +692,7 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastdeck, linebuf);
 	fprintf(fp, "lastdeck = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.textfont, linebuf);
-	fprintf(fp, "textfont = %s\n", linebuf);
+	fprintf(fp, "textfont = %s %d\n", linebuf, gameConf.textfontsize);
 	BufferIO::EncodeUTF8(gameConf.numfont, linebuf);
 	fprintf(fp, "numfont = %s\n", linebuf);
 	fprintf(fp, "serverport = %d\n", gameConf.serverport);

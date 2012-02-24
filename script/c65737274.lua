@@ -41,7 +41,7 @@ function c65737274.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c65737274.cfilter(c,tp)
-	return c:IsRace(RACE_DRAGON) and Duel.IsExistingTarget(c65737274.lvfilter,tp,LOCATION_MZONE,0,1,nil)
+	return c:IsRace(RACE_DRAGON) and Duel.IsExistingTarget(c65737274.lvfilter,tp,LOCATION_MZONE,0,1,c)
 end
 function c65737274.lvfilter(c)
 	local lv=c:GetLevel()
