@@ -34,15 +34,7 @@ function c60953118.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c60953118.damop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
-	e1:SetValue(1)
-	Duel.RegisterEffect(e1,tp)
+	Duel.ChangeBattleDamage(ep,0)
 end
 function c60953118.cointg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

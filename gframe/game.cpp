@@ -750,6 +750,9 @@ void Game::ClearTextures() {
 	imageManager.ClearTexture();
 }
 void Game::CloseDuelWindow() {
+	for(auto wit = fadingList.begin(); wit != fadingList.end(); ++wit)
+		wit->guiFading->setRelativePosition(wit->fadingSize);
+	fadingList.clear();
 	wACMessage->setVisible(false);
 	wANAttribute->setVisible(false);
 	wANCard->setVisible(false);
@@ -766,7 +769,7 @@ void Game::CloseDuelWindow() {
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
-	wReplayControl->setVisible(false);
+	wReplay->setVisible(false);
 	stHintMsg->setVisible(false);
 	btnSideOK->setVisible(false);
 	btnLeaveGame->setVisible(false);

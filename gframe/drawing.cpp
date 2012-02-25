@@ -147,8 +147,7 @@ void Game::DrawCards() {
 		for(int i = 0; i < dField.extra[p].size(); ++i)
 			DrawCard(dField.extra[p][i]);
 	}
-	std::set<ClientCard*>::iterator cit;
-	for(cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
+	for(auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
 		DrawCard(*cit);
 }
 void Game::DrawCard(ClientCard* pcard) {
