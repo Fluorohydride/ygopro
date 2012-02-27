@@ -334,6 +334,12 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 		core.hint_timing[playerid] |= TIMING_DRAW + TIMING_TOHAND;
 		adjust_instant();
 		core.units.begin()->arg2 = (core.units.begin()->arg2 & 0xff000000) + drawed;
+		if(core.deck_reversed && player[playerid].list_main.size()) {
+			pduel->write_buffer8(MSG_DECK_TOP);
+			pduel->write_buffer8(playerid);
+			pduel->write_buffer8(drawed);
+			pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+		}
 		if(drawed > 0) {
 			pduel->write_buffer8(MSG_DRAW);
 			pduel->write_buffer8(playerid);
@@ -2421,6 +2427,12 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 				(*cit)->operation_param = redirect;
 				dest = redirect;
 			}
+		}
+		if(core.deck_reversed && player[playerid].list_main.size() > count) {
+			pduel->write_buffer8(MSG_DECK_TOP);
+			pduel->write_buffer8(playerid);
+			pduel->write_buffer8(count);
+			pduel->write_buffer32((*(player[playerid].list_main.rbegin() + count))->data.code);
 		}
 		return FALSE;
 	}

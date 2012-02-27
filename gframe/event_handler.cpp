@@ -1189,7 +1189,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mcard = *(remove[hovered_controler].rbegin());
 					if(mcard->position & POS_FACEDOWN)
 						mcard = 0;
-				} else mcard = 0;
+				} else if(hovered_location == LOCATION_DECK && deck[hovered_controler].size())
+					mcard = *(deck[hovered_controler].rbegin());
+				else mcard = 0;
 			}
 			if(hovered_location == LOCATION_HAND && (mainGame->dInfo.is_shuffling || mainGame->dInfo.curMsg == MSG_SHUFFLE_HAND))
 				mcard = 0;

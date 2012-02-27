@@ -1420,14 +1420,10 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		return true;
 	}
 	case MSG_DECK_TOP: {
-		int p0 = mainGame->LocalPlayer(0);
-		int p1 = mainGame->LocalPlayer(1);
-		int code0 = BufferIO::ReadInt32(pbuf);
-		int code1 = BufferIO::ReadInt32(pbuf);
-		if(code0)
-			mainGame->dField.GetCard(p0, LOCATION_DECK, mainGame->dField.deck[p0].size() - 1)->SetCode(code0);
-		if(code1)
-			mainGame->dField.GetCard(p1, LOCATION_DECK, mainGame->dField.deck[p1].size() - 1)->SetCode(code1);
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int seq = BufferIO::ReadInt8(pbuf);
+		int code = BufferIO::ReadInt32(pbuf);
+		mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq)->SetCode(code);
 		return true;
 	}
 	case MSG_SHUFFLE_SET_CARD: {

@@ -750,9 +750,10 @@ void Game::ClearTextures() {
 	imageManager.ClearTexture();
 }
 void Game::CloseDuelWindow() {
-	for(auto wit = fadingList.begin(); wit != fadingList.end(); ++wit)
-		wit->guiFading->setRelativePosition(wit->fadingSize);
-	fadingList.clear();
+	for(auto wit = fadingList.begin(); wit != fadingList.end(); ++wit) {
+		if(wit->isFadein)
+			wit->autoFadeoutFrame = 1;
+	}
 	wACMessage->setVisible(false);
 	wANAttribute->setVisible(false);
 	wANCard->setVisible(false);
