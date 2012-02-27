@@ -65,6 +65,7 @@ public:
 	bool extra_act;
 	ChainInfo current_chain;
 	bool last_chain;
+	bool deck_reversed;
 	
 	ClientField();
 	void Clear();

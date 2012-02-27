@@ -1,11 +1,12 @@
 #include "image_manager.h"
 
 namespace ygo {
-	
+
 ImageManager imageManager;
 
 bool ImageManager::Initial() {
 	tCover = driver->getTexture("textures/cover.jpg");
+	tUnknown = driver->getTexture("textures/unknown.jpg");
 	tAct = driver->getTexture("textures/act.png");
 	tAttack = driver->getTexture("textures/attack.png");
 	tChain = driver->getTexture("textures/chain.png");
@@ -49,7 +50,7 @@ void ImageManager::RemoveTexture(int code) {
 }
 irr::video::ITexture* ImageManager::GetTexture(int code) {
 	if(code == 0)
-		return 0;
+		return tUnknown;
 	auto tit = tMap.find(code);
 	if(tit == tMap.end()) {
 		char file[256];
@@ -58,7 +59,10 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 		tMap[code] = img;
 		return img;
 	}
-	return tit->second;
+	if(tit->second)
+		return tit->second;
+	else
+		return tUnknown;
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)

@@ -239,6 +239,7 @@ struct processor {
 	uint8 shuffle_check_disabled;
 	uint8 shuffle_hand_check[2];
 	uint8 shuffle_deck_check[2];
+	uint8 deck_reversed;
 	uint8 flip_delayed;
 	uint8 damage_calculated;
 	uint8 summon_state[2];
@@ -290,7 +291,8 @@ public:
 	void shuffle(uint8 playerid, uint8 location);
 	void reset_sequence(uint8 playerid, uint8 location);
 	void swap_deck_and_grave(uint8 playerid);
-
+	void reverse_deck(uint8 playerid);
+	
 	void add_effect(effect* peffect, uint8 owner_player = 2);
 	void remove_effect(effect* peffect);
 	void remove_oath_effect(effect* reason_effect);
@@ -660,6 +662,8 @@ public:
 #define MSG_REFRESH_DECK		34
 #define MSG_SWAP_GRAVE_DECK		35
 #define MSG_SHUFFLE_SET_CARD	36
+#define MSG_REVERSE_DECK		37
+#define MSG_DECK_TOP			38
 #define MSG_NEW_TURN			40
 #define MSG_NEW_PHASE			41
 #define MSG_MOVE				50

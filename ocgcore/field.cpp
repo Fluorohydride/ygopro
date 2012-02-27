@@ -47,6 +47,8 @@ field::field(duel* pduel) {
 			player[i].list_mzone.push_back(0);
 		for(int j = 0; j < 6; ++j)
 			player[i].list_szone.push_back(0);
+		core.shuffle_deck_check[i] = FALSE;
+		core.shuffle_hand_check[i] = FALSE;
 	}
 	for (int i = 0; i < 5; ++i)
 		core.pre_field[i] = 0;
@@ -68,6 +70,7 @@ field::field(duel* pduel) {
 	core.duel_options = 0;
 	core.attacker = 0;
 	core.attack_target = 0;
+	core.deck_reversed = FALSE;
 	nil_event.event_code = 0;
 	nil_event.event_cards = 0;
 	nil_event.event_player = PLAYER_NONE;
@@ -492,6 +495,16 @@ void field::swap_deck_and_grave(uint8 playerid) {
 	pduel->write_buffer8(MSG_SWAP_GRAVE_DECK);
 	pduel->write_buffer8(playerid);
 	shuffle(playerid, LOCATION_DECK);
+}
+void field::reverse_deck(uint8 playerid) {
+	int32 count = player[playerid].list_main.size();
+	if(count == 0)
+		return;
+	for(int i = 0; i < count / 2; ++i) {
+		card* tmp = player[playerid].list_main[i];
+		player[playerid].list_main[i] = player[playerid].list_main[count - 1 - i];
+		player[playerid].list_main[count - 1 - i] = tmp;
+	}
 }
 void field::add_effect(effect* peffect, uint8 owner_player) {
 	if (!peffect->handler) {
@@ -1374,6 +1387,8 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 		return FALSE;
 	if(is_player_affected_by_effect(playerid, EFFECT_CANNOT_DISCARD_DECK))
 		return FALSE;
+	if((count == 1) && core.deck_reversed)
+		return (*player[playerid].list_grave.rbegin())->is_capable_cost_to_grave(playerid);
 	effect_set eset;
 	filter_field_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
@@ -1383,7 +1398,7 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 	}
 	return TRUE;
 }
-int32 field::is_player_can_discard_hand(uint8 playerid, card* pcard, effect* peffect, uint32 reason) {
+int32 field::is_player_can_discard_hand(uint8 playerid, card * pcard, effect * peffect, uint32 reason) {
 	if(pcard->current.location != LOCATION_HAND)
 		return FALSE;
 	effect_set eset;
@@ -1416,7 +1431,7 @@ int32 field::is_player_can_summon(uint32 sumtype, uint8 playerid, card * pcard) 
 	}
 	return TRUE;
 }
-int32 field::is_player_can_mset(uint32 sumtype, uint8 playerid, card* pcard) {
+int32 field::is_player_can_mset(uint32 sumtype, uint8 playerid, card * pcard) {
 	effect_set eset;
 	sumtype |= SUMMON_TYPE_NORMAL;
 	filter_player_effect(playerid, EFFECT_CANNOT_MSET, &eset);
@@ -1432,7 +1447,7 @@ int32 field::is_player_can_mset(uint32 sumtype, uint8 playerid, card* pcard) {
 	}
 	return TRUE;
 }
-int32 field::is_player_can_sset(uint8 playerid, card* pcard) {
+int32 field::is_player_can_sset(uint8 playerid, card * pcard) {
 	effect_set eset;
 	filter_player_effect(playerid, EFFECT_CANNOT_SSET, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
@@ -1446,7 +1461,7 @@ int32 field::is_player_can_sset(uint8 playerid, card* pcard) {
 	}
 	return TRUE;
 }
-int32 field::is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card * pcard) {
+int32 field::is_player_can_spsummon(effect * peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card * pcard) {
 	effect_set eset;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if(sumpos & POS_FACEDOWN && is_player_affected_by_effect(playerid, EFFECT_DEVINE_LIGHT))
@@ -1521,7 +1536,7 @@ int32 field::is_player_can_remove_counter(uint8 playerid, card * pcard, uint8 s,
 	}
 	return FALSE;
 }
-int32 field::is_player_can_remove_overlay_card(uint8 playerid, card* pcard, uint8 s, uint8 o, uint16 min, uint32 reason) {
+int32 field::is_player_can_remove_overlay_card(uint8 playerid, card * pcard, uint8 s, uint8 o, uint16 min, uint32 reason) {
 	if((pcard && pcard->xyz_materials.size() >= min) || (!pcard && get_overlay_count(playerid, s, o) >= min))
 		return TRUE;
 	pair<effect_container::iterator, effect_container::iterator> pr;
@@ -1635,7 +1650,7 @@ int32 field::is_chain_disablable(uint8 chaincount) {
 	}
 	return TRUE;
 }
-int32 field::check_chain_target(uint8 chaincount, card* pcard) {
+int32 field::check_chain_target(uint8 chaincount, card * pcard) {
 	if(chaincount < 0 && chaincount > core.current_chain.size())
 		return FALSE;
 	chain* pchain;

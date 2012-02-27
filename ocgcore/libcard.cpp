@@ -1377,7 +1377,7 @@ int32 scriptlib::card_is_public(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(pcard->is_affected_by_effect(EFFECT_PUBLIC))
+	if(pcard->is_status(STATUS_IS_PUBLIC))
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);

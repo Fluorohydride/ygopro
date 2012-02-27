@@ -159,19 +159,16 @@ uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
 	}
 	if(query_flag & QUERY_OWNER)
 		*p++ = owner;
-	if(!use_cache) {
-		if(query_flag & QUERY_IS_DISABLED) *p++ = (status & STATUS_DISABLED) ? 1 : 0;
-		if(query_flag & QUERY_IS_PUBLIC) *p++ = is_affected_by_effect(EFFECT_PUBLIC) ? 1 : 0;
-	} else {
-		if((query_flag & QUERY_IS_DISABLED) && ((tdata = (status & STATUS_DISABLED) ? 1 : 0) != q_cache.is_disabled)) {
+	if(query_flag & QUERY_IS_DISABLED) {
+		tdata = (status & STATUS_DISABLED) ? 1 : 0;
+		if(!use_cache || (tdata != q_cache.is_disabled)) {
 			q_cache.is_disabled = tdata;
 			*p++ = tdata;
-		} else query_flag &= ~QUERY_IS_DISABLED;
-		if((query_flag & QUERY_IS_PUBLIC) && ((tdata = is_affected_by_effect(EFFECT_PUBLIC) ? 1 : 0) != q_cache.is_public)) {
-			q_cache.is_public = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_IS_PUBLIC;
+		} else
+			query_flag &= ~QUERY_IS_DISABLED;
 	}
+	if(query_flag & QUERY_IS_PUBLIC)
+		*p++ = (status & STATUS_IS_PUBLIC) ? 1 : 0;
 	*(uint32*)buf = (byte*)p - buf;
 	*(uint32*)(buf + 4) = query_flag;
 	return (byte*)p - buf;

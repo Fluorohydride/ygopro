@@ -4396,11 +4396,55 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 11: {
+		//shuffle check
+		for(int32 i = 0; i < player[0].list_hand.size(); ++i) {
+			card* pcard = player[0].list_hand[i];
+			int32 pub = pcard->is_affected_by_effect(EFFECT_PUBLIC) ? TRUE : FALSE;
+			if(!pub && (pcard->status & STATUS_IS_PUBLIC))
+				core.shuffle_hand_check[0] = TRUE;
+			pcard->set_status(STATUS_IS_PUBLIC, pub);
+		}
+		for(int32 i = 0; i < player[1].list_hand.size(); ++i) {
+			card* pcard = player[1].list_hand[i];
+			int32 pub = pcard->is_affected_by_effect(EFFECT_PUBLIC) ? TRUE : FALSE;
+			if(!pub && (pcard->status & STATUS_IS_PUBLIC))
+				core.shuffle_hand_check[1] = TRUE;
+			pcard->set_status(STATUS_IS_PUBLIC, pub);
+		}
+		if(core.shuffle_hand_check[infos.turn_player])
+			shuffle(infos.turn_player, LOCATION_HAND);
+		if(core.shuffle_hand_check[1 - infos.turn_player])
+			shuffle(1 - infos.turn_player, LOCATION_HAND);
+		return FALSE;
+	}
+	case 12: {
+		//reverse_deck
+		effect_set eset;
+		filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
+		uint8 rv = eset.count ? TRUE : FALSE;
+		if(core.deck_reversed ^ rv) {
+			reverse_deck(0);
+			reverse_deck(1);
+			pduel->write_buffer8(MSG_REVERSE_DECK);
+		}
+		core.deck_reversed = rv;
+		if(core.deck_reversed) {
+			pduel->write_buffer8(MSG_DECK_TOP);
+			if(player[0].list_main.size())
+				pduel->write_buffer32((*player[0].list_main.rbegin())->data.code);
+			else pduel->write_buffer32(0);
+			if(player[1].list_main.size())
+				pduel->write_buffer32((*player[1].list_main.rbegin())->data.code);
+			else pduel->write_buffer32(0);
+		}
+		return FALSE;
+	}
+	case 13: {
 		raise_event((card*)0, EVENT_ADJUST, 0, 0, PLAYER_NONE, PLAYER_NONE, 0);
 		process_instant_event();
 		return FALSE;
 	}
-	case 12: {
+	case 14: {
 		if(core.re_adjust || core.units.begin()->arg1) {
 			core.units.begin()->step = -1;
 			return FALSE;

@@ -772,6 +772,21 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshGrave(player);
 			break;
 		}
+		case MSG_REVERSE_DECK: {
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
+		case MSG_DECK_TOP: {
+			pbuf += 8;
+			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::ReSendToPlayer(players[1]);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
 		case MSG_SHUFFLE_SET_CARD: {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
@@ -788,6 +803,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshMzone(1);
 			RefreshSzone(0);
 			RefreshSzone(1);
+			RefreshHand(0);
+			RefreshHand(1);
 			pbuf++;
 			time_limit[0] = host_info.time_limit;
 			time_limit[1] = host_info.time_limit;
@@ -807,6 +824,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshMzone(1);
 			RefreshSzone(0);
 			RefreshSzone(1);
+			RefreshHand(0);
+			RefreshHand(1);
 			break;
 		}
 		case MSG_MOVE: {
@@ -954,6 +973,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshMzone(1);
 			RefreshSzone(0);
 			RefreshSzone(1);
+			RefreshHand(0);
+			RefreshHand(1);
 			break;
 		}
 		case MSG_CHAIN_SOLVING: {
@@ -974,6 +995,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshMzone(1);
 			RefreshSzone(0);
 			RefreshSzone(1);
+			RefreshHand(0);
+			RefreshHand(1);
 			break;
 		}
 		case MSG_CHAIN_END: {
@@ -985,6 +1008,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshMzone(1);
 			RefreshSzone(0);
 			RefreshSzone(1);
+			RefreshHand(0);
+			RefreshHand(1);
 			break;
 		}
 		case MSG_CHAIN_NEGATED: {
@@ -993,10 +1018,6 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			RefreshMzone(0);
-			RefreshMzone(1);
-			RefreshSzone(0);
-			RefreshSzone(1);
 			break;
 		}
 		case MSG_CHAIN_DISABLED: {
@@ -1332,8 +1353,20 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, MSG_UPDATE_DATA);
 	BufferIO::WriteInt8(qbuf, player);
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
-	int len = query_field_card(pduel, player, LOCATION_HAND, flag, (unsigned char*)qbuf, use_cache);
+	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
+	int qlen = 0, slen, qflag;
+	while(qlen < len) {
+		slen = BufferIO::ReadInt32(qbuf);
+		qflag = *(int*)qbuf;
+		if(!qbuf[slen - 8])
+			memset(qbuf, 0, slen - 4);
+		qbuf += slen - 4;
+		qlen += slen;
+	}
+	NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, query_buffer, len + 3);
+	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+		NetServer::ReSendToPlayer(*pit);
 }
 void SingleDuel::RefreshGrave(int player, int flag, int use_cache) {
 	char query_buffer[0x1000];

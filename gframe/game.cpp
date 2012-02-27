@@ -769,8 +769,8 @@ void Game::CloseDuelWindow() {
 	wPhase->setVisible(false);
 	wPosSelect->setVisible(false);
 	wQuery->setVisible(false);
-	wReplay->setVisible(false);
 	wReplayControl->setVisible(false);
+	wReplaySave->setVisible(false);
 	stHintMsg->setVisible(false);
 	btnSideOK->setVisible(false);
 	btnLeaveGame->setVisible(false);

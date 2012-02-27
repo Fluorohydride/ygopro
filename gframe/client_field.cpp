@@ -15,6 +15,7 @@ ClientField::ClientField() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
 			mzone[p].push_back(0);
@@ -23,40 +24,43 @@ ClientField::ClientField() {
 	}
 }
 void ClientField::Clear() {
-	std::vector<ClientCard*>::iterator cit;
 	for(int i = 0; i < 2; ++i) {
-		for(cit = deck[i].begin(); cit != deck[i].end(); ++cit)
+		for(auto cit = deck[i].begin(); cit != deck[i].end(); ++cit)
 			delete *cit;
 		deck[i].clear();
-		for(cit = hand[i].begin(); cit != hand[i].end(); ++cit)
+		for(auto cit = hand[i].begin(); cit != hand[i].end(); ++cit)
 			delete *cit;
 		hand[i].clear();
-		for(cit = mzone[i].begin(); cit != mzone[i].end(); ++cit) {
+		for(auto cit = mzone[i].begin(); cit != mzone[i].end(); ++cit) {
 			if(*cit)
 				delete *cit;
 			*cit = 0;
 		}
-		for(cit = szone[i].begin(); cit != szone[i].end(); ++cit) {
+		for(auto cit = szone[i].begin(); cit != szone[i].end(); ++cit) {
 			if(*cit)
 				delete *cit;
 			*cit = 0;
 		}
-		for(cit = grave[i].begin(); cit != grave[i].end(); ++cit)
+		for(auto cit = grave[i].begin(); cit != grave[i].end(); ++cit)
 			delete *cit;
 		grave[i].clear();
-		for(cit = remove[i].begin(); cit != remove[i].end(); ++cit)
+		for(auto cit = remove[i].begin(); cit != remove[i].end(); ++cit)
 			delete *cit;
 		remove[i].clear();
-		for(cit = extra[i].begin(); cit != extra[i].end(); ++cit)
+		for(auto cit = extra[i].begin(); cit != extra[i].end(); ++cit)
 			delete *cit;
 		extra[i].clear();
 	}
-	std::set<ClientCard*>::iterator sit;
-	for(sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
+	for(auto sit = overlay_cards.begin(); sit != overlay_cards.end(); ++sit)
 		delete *sit;
 	overlay_cards.clear();
 	chains.clear();
 	disabled_field = 0;
+	deck_act = false;
+	grave_act = false;
+	remove_act = false;
+	extra_act = false;
+	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
 	ClientCard* pcard;
@@ -564,16 +568,28 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			t->X = 7.3f;
 			t->Y = 3.0f;
 			t->Z = 0.01f + 0.01f * sequence;
-			r->X = 0.0f;
-			r->Y = 3.1415926f;
-			r->Z = 0.0f;
+			if(!deck_reversed) {
+				r->X = 0.0f;
+				r->Y = 3.1415926f;
+				r->Z = 0.0f;
+			} else {
+				r->X = 0.0f;
+				r->Y = 0.0f;
+				r->Z = 0.0f;
+			}
 		} else {
 			t->X = 0.6f;
 			t->Y = -3.0f;
 			t->Z = 0.01f + 0.01f * sequence;
-			r->X = 0.0f;
-			r->Y = 3.1415926f;
-			r->Z = 3.1415926f;
+			if(!deck_reversed) {
+				r->X = 0.0f;
+				r->Y = 3.1415926f;
+				r->Z = 3.1415926f;
+			} else {
+				r->X = 0.0f;
+				r->Y = 0.0f;
+				r->Z = 3.1415926f;
+			}
 		}
 		break;
 	}

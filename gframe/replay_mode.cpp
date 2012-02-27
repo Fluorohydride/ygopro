@@ -274,6 +274,15 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			ReplayRefreshGrave(player);
 			break;
 		}
+		case MSG_REVERSE_DECK: {
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
+		case MSG_DECK_TOP: {
+			pbuf += 8;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
 		case MSG_SHUFFLE_SET_CARD: {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;

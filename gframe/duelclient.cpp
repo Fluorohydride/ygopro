@@ -1327,6 +1327,13 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	}
 	case MSG_SHUFFLE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		bool rev = mainGame->dField.deck_reversed;
+		mainGame->dField.deck_reversed = false;
+		if(rev) {
+			for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+				mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
+			mainGame->WaitFrameSignal(10);
+		}
 		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
 			mainGame->dField.deck[player][i]->code = 0;
 		for (int i = 0; i < 5; ++i) {
@@ -1340,6 +1347,11 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
 				mainGame->dField.MoveCard(*cit, 3);
 			mainGame->WaitFrameSignal(3);
+		}
+		mainGame->dField.deck_reversed = rev;
+		if(rev) {
+			for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+				mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
 		}
 		return true;
 	}
@@ -1397,6 +1409,25 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		}
 		mainGame->gMutex.Unlock();
 		mainGame->WaitFrameSignal(11);
+		return true;
+	}
+	case MSG_REVERSE_DECK: {
+		mainGame->dField.deck_reversed = !mainGame->dField.deck_reversed;
+		for(int i = 0; i < mainGame->dField.deck[0].size(); ++i)
+			mainGame->dField.MoveCard(mainGame->dField.deck[0][i], 10);
+		for(int i = 0; i < mainGame->dField.deck[1].size(); ++i)
+			mainGame->dField.MoveCard(mainGame->dField.deck[1][i], 10);
+		return true;
+	}
+	case MSG_DECK_TOP: {
+		int p0 = mainGame->LocalPlayer(0);
+		int p1 = mainGame->LocalPlayer(1);
+		int code0 = BufferIO::ReadInt32(pbuf);
+		int code1 = BufferIO::ReadInt32(pbuf);
+		if(code0)
+			mainGame->dField.GetCard(p0, LOCATION_DECK, mainGame->dField.deck[p0].size() - 1)->SetCode(code0);
+		if(code1)
+			mainGame->dField.GetCard(p1, LOCATION_DECK, mainGame->dField.deck[p1].size() - 1)->SetCode(code1);
 		return true;
 	}
 	case MSG_SHUFFLE_SET_CARD: {

@@ -30,11 +30,11 @@ public:
 	
 	void DuelEndProc();
 	void WaitforResponse(int playerid);
-	void RefreshMzone(int player, int flag = 0x181fff, int use_cache = 1);
-	void RefreshSzone(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshMzone(int player, int flag = 0x81fff, int use_cache = 1);
+	void RefreshSzone(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshHand(int player, int flag = 0x181fff, int use_cache = 1);
-	void RefreshGrave(int player, int flag = 0x181fff, int use_cache = 1);
-	void RefreshExtra(int player, int flag = 0x181fff, int use_cache = 1);
+	void RefreshGrave(int player, int flag = 0x81fff, int use_cache = 1);
+	void RefreshExtra(int player, int flag = 0x81fff, int use_cache = 1);
 	void RefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
 	
 	static int MessageHandler(long fduel, int type);
