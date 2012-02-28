@@ -702,10 +702,14 @@ void Game::WaitFrameSignal(int frame) {
 	signalFrame = frame;
 	frameSignal.Wait();
 }
-void Game::DrawThumb(int code, position2di pos, std::unordered_map<int, int>* lflist) {
+void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist) {
+	int code = cp->first;
+	int lcode = cp->second.alias;
+	if(lcode == 0)
+		lcode = code;
 	driver->draw2DImage(imageManager.GetTextureThumb(code), pos);
-	if(lflist->count(code)) {
-		switch((*lflist)[code]) {
+	if(lflist->count(lcode)) {
+		switch((*lflist)[lcode]) {
 		case 0:
 			driver->draw2DImage(imageManager.tLim, recti(pos.X, pos.Y, pos.X + 20, pos.Y + 20), recti(0, 0, 64, 64), 0, 0, true);
 			break;
@@ -739,7 +743,7 @@ void Game::DrawDeckBd() {
 		dx = 436.0f / (lx - 1);
 	}
 	for(int i = 0; i < deckManager.current_deck.main.size(); ++i) {
-		DrawThumb(deckManager.current_deck.main[i]->first, position2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
+		DrawThumb(deckManager.current_deck.main[i], position2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
 		if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == i)
 			driver->draw2DRectangleOutline(recti(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
 	}
@@ -756,7 +760,7 @@ void Game::DrawDeckBd() {
 		dx = 436.0f / 9;
 	else dx = 436.0f / (deckManager.current_deck.extra.size() - 1);
 	for(int i = 0; i < deckManager.current_deck.extra.size(); ++i) {
-		DrawThumb(deckManager.current_deck.extra[i]->first, position2di(314 + i * dx, 466), deckBuilder.filterList);
+		DrawThumb(deckManager.current_deck.extra[i], position2di(314 + i * dx, 466), deckBuilder.filterList);
 		if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == i)
 			driver->draw2DRectangleOutline(recti(313 + i * dx, 465, 359 + i * dx, 531));
 	}
@@ -773,7 +777,7 @@ void Game::DrawDeckBd() {
 		dx = 436.0f / 9;
 	else dx = 436.0f / (deckManager.current_deck.side.size() - 1);
 	for(int i = 0; i < deckManager.current_deck.side.size(); ++i) {
-		DrawThumb(deckManager.current_deck.side[i]->first, position2di(314 + i * dx, 564), deckBuilder.filterList);
+		DrawThumb(deckManager.current_deck.side[i], position2di(314 + i * dx, 564), deckBuilder.filterList);
 		if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == i)
 			driver->draw2DRectangleOutline(recti(313 + i * dx, 563, 359 + i * dx, 629));
 	}
@@ -789,7 +793,7 @@ void Game::DrawDeckBd() {
 		code_pointer ptr = deckBuilder.results[i + mainGame->scrFilter->getPos()];
 		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == i)
 			driver->draw2DRectangle(0x80000000, recti(806, 164 + i * 66, 1019, 230 + i * 66));
-		DrawThumb(ptr->first, position2di(810, 165 + i * 66), deckBuilder.filterList);
+		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
 		if(ptr->second.type & TYPE_MONSTER) {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, recti(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
@@ -827,7 +831,7 @@ void Game::DrawDeckBd() {
 		}
 	}
 	if(deckBuilder.is_draging) {
-		DrawThumb(deckBuilder.draging_pointer->first, position2di(deckBuilder.dragx - 22, deckBuilder.dragy - 32), deckBuilder.filterList);
+		DrawThumb(deckBuilder.draging_pointer, position2di(deckBuilder.dragx - 22, deckBuilder.dragy - 32), deckBuilder.filterList);
 	}
 }
 }

@@ -32,25 +32,32 @@ function c99004752.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e2:SetDescription(aux.Stringid(99004752,0))
+		e2:SetCategory(CATEGORY_DAMAGE)
+		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 		e2:SetCode(EVENT_BATTLE_DESTROYED)
 		e2:SetCondition(c99004752.damcon)
+		e2:SetTarget(c99004752.damtg)
 		e2:SetOperation(c99004752.damop)
-		e2:SetReset(RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e2)
+		e2:SetReset(RESET_PHASE+PHASE_END)
+		e2:SetLabelObject(tc)
+		Duel.RegisterEffect(e2,tp)
+		tc:RegisterFlagEffect(99004752,RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function c99004752.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetPreviousControler()==c:GetControler()
+	local tc=eg:GetFirst()
+	return tc==e:GetLabelObject() and tc:GetFlagEffect(99004752)~=0
+end
+function c99004752.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local atk=eg:GetFirst():GetBaseAttack()
+	if atk<0 then atk=0 end
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetTargetParam(atk)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
 end
 function c99004752.damop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local atk=c:GetAttack()
-	if atk<0 then atk=0 end
-	if atk>0 then
-		Duel.Hint(HINT_CARD,tp,99004752)
-		Duel.Hint(HINT_CARD,1-tp,99004752)
-		Duel.Damage(tp,atk,REASON_EFFECT)
-	end
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
 end

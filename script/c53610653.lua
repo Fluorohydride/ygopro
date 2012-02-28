@@ -35,10 +35,10 @@ function c53610653.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c53610653.eqlimit(e,c)
-	return c:IsRace(RACE_SPELLCASTER)
+	return c:IsRace(RACE_SPELLCASTER) and not c:IsType(TYPE_XYZ)
 end
 function c53610653.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER)
+	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER) and not c:IsType(TYPE_XYZ)
 end
 function c53610653.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c53610653.filter(chkc) end

@@ -22,6 +22,7 @@ function c3900605.operation(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetOperatedGroup()
 	local ct1=dg:FilterCount(Card.IsControler,nil,tp)
 	local ct2=dg:GetCount()-ct1
+	Duel.BreakEffect()
 	if ct1~=0 then Duel.Draw(tp,ct1,REASON_EFFECT) end
 	if ct2~=0 then Duel.Draw(1-tp,ct2,REASON_EFFECT) end
 	--cannot set

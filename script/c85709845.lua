@@ -18,23 +18,31 @@ function c85709845.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsDefence() then
 		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
-		local a=Duel.GetAttacker()
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e1:SetDescription(aux.Stringid(85709845,0))
+		e1:SetCategory(CATEGORY_DAMAGE)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 		e1:SetCode(EVENT_BATTLE_DESTROYED)
+		e1:SetCondition(c85709845.damcon)
+		e1:SetTarget(c85709845.damtg)
 		e1:SetOperation(c85709845.damop)
-		e1:SetLabel(1-tp)
-		e1:SetReset(RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_DAMAGE)
-		a:RegisterEffect(e1)
+		e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
+		Duel.RegisterEffect(e1,tp)
 	end
 end
-function c85709845.damop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local atk=c:GetAttack()
+function c85709845.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	return tc==Duel.GetAttacker() and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE)
+end
+function c85709845.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local atk=eg:GetFirst():GetBaseAttack()
 	if atk<0 then atk=0 end
-	if atk>0 then
-		Duel.Hint(HINT_CARD,tp,99004752)
-		Duel.Hint(HINT_CARD,1-tp,99004752)
-		Duel.Damage(e:GetLabel(),atk,REASON_EFFECT)
-	end
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetTargetParam(atk)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
+end
+function c85709845.damop(e,tp,eg,ep,ev,re,r,rp)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
 end

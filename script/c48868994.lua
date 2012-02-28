@@ -47,6 +47,7 @@ function c48868994.opa(e,tp,eg,ep,ev,re,r,rp)
 end
 function c48868994.cond(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+		and not e:GetHandler():IsHasEffect(48868994)
 end
 function c48868994.filter(c)
 	return c:IsFaceup() and c:IsAttack() and c:IsAbleToChangeControler()
@@ -77,6 +78,11 @@ function c48868994.opd(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
 			e1:SetValue(c48868994.eqlimit)
 			tc:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_EQUIP)
+			e2:SetCode(48868994)
+			e2:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e2)
 		else Duel.SendtoGrave(tc,REASON_EFFECT) end
 	end
 end

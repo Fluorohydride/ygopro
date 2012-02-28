@@ -56,13 +56,13 @@ function c45986603.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(tp)
 		e2:SetReset(RESET_EVENT+0x1fc0000)
 		e2:SetCondition(c45986603.con)
-		tc:RegisterEffect(e2)
+		tc:RegisterEffect(e2,true)
 	end
 end
 function c45986603.con(e)
 	local c=e:GetOwner()
 	local h=e:GetHandler()
-	return not c:IsDisabled() and c:IsHasCardTarget(h)
+	return not c:IsDisabled() and c:IsHasCardTarget(h) and not c:IsImmuneToEffect(e)
 end
 function c45986603.reccon(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()

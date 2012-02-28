@@ -37,14 +37,19 @@ function c48582558.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetType(EFFECT_TYPE_FIELD)
 		e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 		e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-		e3:SetRange(LOCATION_MZONE)
 		e3:SetTargetRange(LOCATION_MZONE,0)
+		e3:SetCondition(c48582558.atkcon)
 		e3:SetTarget(c48582558.atktg)
 		e3:SetValue(1)
-		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e3)
+		e3:SetReset(RESET_PHASE+PHASE_END)
+		e3:SetLabelObject(tc)
+		e3:SetLabel(tc:GetRealFieldID())
+		Duel.RegisterEffect(e3,tp)
 	end
 end
+function c48582558.atkcon(e)
+	return e:GetLabelObject():GetRealFieldID()==e:GetLabel()
+end
 function c48582558.atktg(e,c)
-	return c~=e:GetHandler()
+	return c:GetRealFieldID()~=e:GetLabel()
 end

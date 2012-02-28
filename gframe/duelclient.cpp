@@ -2447,6 +2447,7 @@ void DuelClient::BeginRefreshHost() {
 	if(is_refreshing)
 		return;
 	is_refreshing = true;
+	mainGame->btnLanRefresh->setEnabled(false);
 	mainGame->lstHostList->clear();
 	remotes.clear();
 	hosts.clear();
@@ -2466,7 +2467,7 @@ void DuelClient::BeginRefreshHost() {
 		closesocket(reply);
 		return;
 	}
-	timeval timeout = {5, 0};
+	timeval timeout = {3, 0};
 	resp_event = event_new(broadev, reply, EV_TIMEOUT | EV_READ | EV_PERSIST, BroadcastReply, broadev);
 	event_add(resp_event, &timeout);
 	Thread::NewThread(RefreshThread, broadev);
@@ -2510,7 +2511,10 @@ int DuelClient::RefreshThread(void* arg) {
 }
 void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 	if(events & EV_TIMEOUT) {
+		evutil_closesocket(fd);
 		event_base_loopbreak((event_base*)arg);
+		if(!is_closing)
+			mainGame->btnLanRefresh->setEnabled(true);
 	} else if(events & EV_READ) {
 		sockaddr_in bc_addr;
 		int sz = sizeof(sockaddr_in);
@@ -2518,7 +2522,7 @@ void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 		int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
 		unsigned int ipaddr = bc_addr.sin_addr.s_addr;
 		HostPacket* pHP = (HostPacket*)buf;
-		if(pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
+		if(!is_closing && pHP->identifier == NETWORK_SERVER_ID && pHP->version == PRO_VERSION && remotes.find(ipaddr) == remotes.end() ) {
 			mainGame->gMutex.Lock();
 			remotes.insert(ipaddr);
 			pHP->ipaddr = ipaddr;
