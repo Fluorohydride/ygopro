@@ -624,8 +624,7 @@ int32 scriptlib::duel_confirm_cards(lua_State *L) {
 		pduel->write_buffer8(pcard->current.sequence);
 	} else {
 		pduel->write_buffer8(pgroup->container.size());
-		field::card_set::iterator cit;
-		for(cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 			pduel->write_buffer32((*cit)->data.code);
 			pduel->write_buffer8((*cit)->current.controler);
 			pduel->write_buffer8((*cit)->current.location);

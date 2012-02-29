@@ -302,6 +302,7 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 		card_set cset;
 		card_vector cv;
 		uint32 drawed = 0;
+		uint32 public_count = 0;
 		if(!(reason & REASON_RULE) && !is_player_can_draw(playerid)) {
 			returns.ivalue[0] = 0;
 			return TRUE;
@@ -328,6 +329,10 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			pcard->current.location = 0;
 			add_card(playerid, pcard, LOCATION_HAND, 0);
 			pcard->enable_field_effect(TRUE);
+			if(pcard->is_affected_by_effect(EFFECT_PUBLIC)) {
+				pcard->set_status(STATUS_IS_PUBLIC, TRUE);
+				public_count++;
+			}
 			cv.push_back(pcard);
 			cset.insert(pcard);
 		}
@@ -347,7 +352,19 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			for(uint32 i = 0; i < drawed; ++i)
 				pduel->write_buffer32(cv[i]->data.code);
 		}
-		if(cset.size()) {
+		if(core.deck_reversed && (drawed > 0) && (public_count < drawed)) {
+			pduel->write_buffer8(MSG_CONFIRM_CARDS);
+			pduel->write_buffer8(1 - playerid);
+			pduel->write_buffer8(cset.size());
+			for(auto cit = cset.begin(); cit != cset.end(); ++cit) {
+				pduel->write_buffer32((*cit)->data.code);
+				pduel->write_buffer8((*cit)->current.controler);
+				pduel->write_buffer8((*cit)->current.location);
+				pduel->write_buffer8((*cit)->current.sequence);
+			}
+			shuffle(playerid, LOCATION_HAND);
+		}
+		if(drawed) {
 			for(auto cit = cset.begin(); cit != cset.end(); ++cit)
 				raise_single_event((*cit), 0, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, 0);
 			process_single_event();
@@ -2242,6 +2259,31 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			cv.push_back(*cit);
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
+		if(core.deck_reversed) {
+			int32 d0 = player[0].list_main.size() - 1, s0 = d0;
+			int32 d1 = player[1].list_main.size() - 1, s1 = d1;
+			for( int i = 0; i < cv.size(); ++i) {
+				card* pcard = cv[i];
+				if(pcard->current.location != LOCATION_DECK)
+					continue;
+				if((pcard->current.controler == 0) && (pcard->current.sequence == s0))
+					s0--;
+				if((pcard->current.controler == 1) && (pcard->current.sequence == s1))
+					s1--;
+			}
+			if((s0 != d0) && (s0 > 0)) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(0);
+				pduel->write_buffer8(d0 - s0);
+				pduel->write_buffer32(player[0].list_main[s0]->data.code);
+			}
+			if((s1 != d1) && (s1 > 0)) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(1);
+				pduel->write_buffer8(d1 - s1);
+				pduel->write_buffer32(player[1].list_main[s1]->data.code);
+			}
+		}
 		for (auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
 			card* pcard = *cvit;
 			oloc = pcard->current.location;
@@ -2588,6 +2630,16 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		return FALSE;
 	}
 	case 2: {
+		if(core.deck_reversed && (target->current.location == LOCATION_DECK)) {
+			int32 curp = target->current.controler;
+			int32 curs = target->current.sequence;
+			if(curs > 0 && (curs == player[curp].list_main.size() - 1)) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(curp);
+				pduel->write_buffer8(1);
+				pduel->write_buffer32(player[curp].list_main[curs - 1]->data.code);
+			}
+		}
 		pduel->write_buffer8(MSG_MOVE);
 		pduel->write_buffer32(target->data.code);
 		if(target->overlay_target) {

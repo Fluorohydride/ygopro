@@ -1957,7 +1957,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			int code = BufferIO::ReadInt32(pbuf);
 			mainGame->gMutex.Lock();
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
-			pcard->SetCode(code);
+			if(code || !mainGame->dField.deck_reversed)
+				pcard->SetCode(code);
 			mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
 			mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
 			for(int i = 0; i < mainGame->dField.hand[player].size(); ++i)

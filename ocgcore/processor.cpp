@@ -4426,22 +4426,22 @@ int32 field::adjust_step(uint16 step) {
 			reverse_deck(0);
 			reverse_deck(1);
 			pduel->write_buffer8(MSG_REVERSE_DECK);
+			if(rv) {
+				if(player[0].list_main.size()) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(0);
+					pduel->write_buffer8(0);
+					pduel->write_buffer32((*player[0].list_main.rbegin())->data.code);
+				}
+				if(player[1].list_main.size()) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(1);
+					pduel->write_buffer8(0);
+					pduel->write_buffer32((*player[1].list_main.rbegin())->data.code);
+				}
+			}
 		}
 		core.deck_reversed = rv;
-		if(core.deck_reversed) {
-			if(player[0].list_main.size()) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(0);
-				pduel->write_buffer8(0);
-				pduel->write_buffer32((*player[0].list_main.rbegin())->data.code);
-			}
-			if(player[1].list_main.size()) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(1);
-				pduel->write_buffer8(0);
-				pduel->write_buffer32((*player[1].list_main.rbegin())->data.code);
-			}
-		}
 		return FALSE;
 	}
 	case 13: {

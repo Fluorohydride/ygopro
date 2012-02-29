@@ -428,6 +428,12 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(MSG_SHUFFLE_DECK);
 		pduel->write_buffer8(playerid);
 		core.shuffle_deck_check[playerid] = FALSE;
+		if(core.deck_reversed) {
+			pduel->write_buffer8(MSG_DECK_TOP);
+			pduel->write_buffer8(playerid);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+		}
 	}
 }
 void field::reset_sequence(uint8 playerid, uint8 location) {
@@ -502,6 +508,8 @@ void field::reverse_deck(uint8 playerid) {
 		return;
 	for(int i = 0; i < count / 2; ++i) {
 		card* tmp = player[playerid].list_main[i];
+		tmp->current.sequence = count - 1 - i;
+		player[playerid].list_main[count - 1 - i]->current.sequence = i;
 		player[playerid].list_main[i] = player[playerid].list_main[count - 1 - i];
 		player[playerid].list_main[count - 1 - i] = tmp;
 	}
@@ -714,11 +722,9 @@ void field::filter_affected_cards(effect* peffect, card_set* cset) {
 	}
 }
 void field::filter_player_effect(uint8 playerid, uint32 code, effect_set* eset, uint8 sort) {
-	effect* peffect;
-	pair<effect_container::iterator, effect_container::iterator> rg;
-	rg = effects.aura_effect.equal_range(code);
+	auto rg = effects.aura_effect.equal_range(code);
 	for (; rg.first != rg.second; ++rg.first) {
-		peffect = rg.first->second;
+		effect* peffect = rg.first->second;
 		if (peffect->is_target_player(playerid) && peffect->is_available())
 			eset->add_item(peffect);
 	}

@@ -6,6 +6,7 @@ function c10248192.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCost(c10248192.cost)
+	e1:SetTarget(c10248192.target)
 	e1:SetOperation(c10248192.activate)
 	c:RegisterEffect(e1)
 end
