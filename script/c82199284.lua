@@ -6,7 +6,6 @@ function c82199284.initial_effect(c)
 	e1:SetCode(EFFECT_ATTACK_COST)
 	e1:SetCost(c82199284.atcost)
 	e1:SetOperation(c82199284.atop)
-	e1:SetValue(1)
 	c:RegisterEffect(e1)
 end
 function c82199284.atcost(e,c,tp)

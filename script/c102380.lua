@@ -25,18 +25,18 @@ function c102380.initial_effect(c)
 	e2:SetTarget(c102380.damtg)
 	e2:SetOperation(c102380.damop)
 	c:RegisterEffect(e2)
-	--cannot normal summon
+	--spsummon cost
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_SPSUMMON_COST)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetOperation(c102380.op2)
+	e3:SetCost(c102380.spcost)
+	e3:SetOperation(c102380.spcop)
 	c:RegisterEffect(e3)
 end
 function c102380.spcon(e,c)
 	if c==nil then return true end
-	local p=c:GetControler()
-	return not Duel.CheckNormalSummonActivity(p) and Duel.IsExistingMatchingCard(Card.IsReleaseable,p,0,LOCATION_MZONE,2,nil)
+	return Duel.IsExistingMatchingCard(Card.IsReleaseable,c:GetControler(),0,LOCATION_MZONE,2,nil)
 end
 function c102380.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
@@ -53,17 +53,19 @@ end
 function c102380.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(e:GetHandler():GetControler(),1000,REASON_EFFECT)
 end
-function c102380.op2(e,tp,eg,ep,ev,re,r,rp)
+function c102380.spcost(e,c,tp)
+	return not Duel.CheckNormalSummonActivity(tp)
+end
+function c102380.spcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local sp=c:GetSummonPlayer()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetReset(RESET_PHASE+RESET_END)
 	e1:SetTargetRange(1,0)
-	Duel.RegisterEffect(e1,sp)
+	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone(e1)
 	e2:SetCode(EFFECT_CANNOT_MSET)
-	Duel.RegisterEffect(e2,sp)
+	Duel.RegisterEffect(e2,tp)
 end

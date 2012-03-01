@@ -13,7 +13,6 @@ function c79323590.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
 	e2:SetCost(c79323590.accost)
-	e2:SetValue(c79323590.acval)
 	e2:SetOperation(c79323590.acop)
 	c:RegisterEffect(e2)
 	--summon cost
@@ -23,7 +22,6 @@ function c79323590.initial_effect(c)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_HAND,LOCATION_HAND)
 	e3:SetCost(c79323590.ccost)
-	e3:SetValue(1)
 	e3:SetOperation(c79323590.acop)
 	c:RegisterEffect(e3)
 	local e4=e3:Clone()
@@ -38,13 +36,10 @@ function c79323590.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c79323590.accost(e,te,tp)
-	return Duel.CheckLPCost(tp,500)
+	return te:GetHandler():IsLocation(LOCATION_HAND) and Duel.CheckLPCost(tp,500)
 end
 function c79323590.ccost(e,c,tp)
 	return Duel.CheckLPCost(tp,500)
-end
-function c79323590.acval(e,te,tp)
-	return te:GetHandler():GetLocation()==LOCATION_HAND
 end
 function c79323590.acop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.PayLPCost(tp,500)

@@ -14,7 +14,6 @@ function c58054262.initial_effect(c)
 	e2:SetCode(EFFECT_ATTACK_COST)
 	e2:SetCost(c58054262.atcost)
 	e2:SetOperation(c58054262.atop)
-	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	--special summon
 	local e3=Effect.CreateEffect(c)

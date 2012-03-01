@@ -34,25 +34,23 @@ function c63014935.initial_effect(c)
 	e3:SetTarget(c63014935.phtg)
 	e3:SetOperation(c63014935.phop)
 	c:RegisterEffect(e3)
-	--cannot normal summon
+	--spsummon cost
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_SPSUMMON_COST)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetOperation(c63014935.op2)
+	e4:SetCost(c63014935.spcost)
+	e4:SetOperation(c63014935.spcop)
 	c:RegisterEffect(e4)
 end
 function c63014935.spcon(e,c)
 	if c==nil then return true end
-	local p=c:GetControler()
-	return not Duel.CheckNormalSummonActivity(p)
-		and Duel.IsExistingMatchingCard(Card.IsReleaseable,p,0,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(Card.IsReleaseable,c:GetControler(),0,LOCATION_MZONE,1,nil)
 end
 function c63014935.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local p=c:GetControler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(p,Card.IsReleaseable,p,0,LOCATION_MZONE,1,1,nil)
-	Duel.Release(g, REASON_COST)
+	local g=Duel.SelectMatchingCard(tp,Card.IsReleaseable,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.Release(g,REASON_COST)
 end
 function c63014935.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
@@ -70,19 +68,6 @@ function c63014935.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
-function c63014935.op2(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetReset(RESET_PHASE+RESET_END)
-	e1:SetTargetRange(1,0)
-	Duel.RegisterEffect(e1,ep)
-	local e2=e1:Clone(e1)
-	e2:SetCode(EFFECT_CANNOT_MSET)
-	Duel.RegisterEffect(e2,ep)
-end
 function c63014935.phcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
@@ -94,4 +79,20 @@ function c63014935.phop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.CheckReleaseGroup(tp,aux.TRUE,1,e:GetHandler()) and Duel.SelectYesNo(tp,aux.Stringid(63014935,2)) then
 		Duel.Release(Duel.SelectReleaseGroup(tp,aux.TRUE,1,1,e:GetHandler()),REASON_EFFECT)
 	else Duel.Damage(tp,1000,REASON_EFFECT) end
+end
+function c63014935.spcost(e,c,tp)
+	return not Duel.CheckNormalSummonActivity(tp)
+end
+function c63014935.spcop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetReset(RESET_PHASE+RESET_END)
+	e1:SetTargetRange(1,0)
+	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone(e1)
+	e2:SetCode(EFFECT_CANNOT_MSET)
+	Duel.RegisterEffect(e2,tp)
 end

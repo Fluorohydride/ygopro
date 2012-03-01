@@ -13,7 +13,6 @@ function c16762927.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(0,1)
 	e2:SetCost(c16762927.atcost)
-	e2:SetValue(1)
 	e2:SetOperation(c16762927.atop)
 	c:RegisterEffect(e2)
 	--accumulate

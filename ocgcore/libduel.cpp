@@ -581,8 +581,14 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 		return 0;
 	uint32 count = lua_tointeger(L, 2);
 	duel* pduel = interpreter::get_duel_info(L);
-	if(count > pduel->game_field->player[playerid].list_main.size())
+	if(count >= pduel->game_field->player[playerid].list_main.size())
 		count = pduel->game_field->player[playerid].list_main.size();
+	else if(pduel->game_field->core.deck_reversed) {
+		pduel->write_buffer8(MSG_DECK_TOP);
+		pduel->write_buffer8(playerid);
+		pduel->write_buffer8(count);
+		pduel->write_buffer32((*(pduel->game_field->player[playerid].list_main.rbegin() + count))->data.code);
+	}
 	auto cit = pduel->game_field->player[playerid].list_main.rbegin();
 	pduel->write_buffer8(MSG_CONFIRM_DECKTOP);
 	pduel->write_buffer8(playerid);

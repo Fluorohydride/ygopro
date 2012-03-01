@@ -2444,11 +2444,12 @@ int32 field::process_battle_command(uint16 step) {
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
 			for(int32 i = 0; i < eset.count; ++i) {
+				pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 				pduel->lua->add_param(core.attacker, PARAM_TYPE_CARD);
 				pduel->lua->add_param(infos.turn_player, PARAM_TYPE_INT);
-				if(!eset[i]->check_value_condition(2))
+				if(!pduel->lua->check_condition(eset[i]->cost, 3))
 					continue;
-				if(eset[i]->cost) {
+				if(eset[i]->operation) {
 					core.attack_cancelable = FALSE;
 					core.sub_solving_event.push_back(nil_event);
 					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
@@ -3246,8 +3247,7 @@ int32 field::process_battle_command(uint16 step) {
 		adjust_all();
 		if(core.chain_attack) {
 			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid != core.pre_field[0]
-			        || !core.attacker->is_capable_attack_announce(infos.turn_player)
-			        || core.attacker->announce_count > 1)
+			        || !core.attacker->is_capable_attack_announce(infos.turn_player))
 				return FALSE;
 			if(core.chain_attack_target) {
 				if(!core.chain_attack_target->is_capable_be_battle_target(core.attacker)
@@ -3263,11 +3263,12 @@ int32 field::process_battle_command(uint16 step) {
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
 			for(int32 i = 0; i < eset.count; ++i) {
+				pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 				pduel->lua->add_param(core.attacker, PARAM_TYPE_CARD);
 				pduel->lua->add_param(infos.turn_player, PARAM_TYPE_INT);
-				if(!eset[i]->check_value_condition(2))
+				if(!pduel->lua->check_condition(eset[i]->cost, 3))
 					continue;
-				if(eset[i]->cost) {
+				if(eset[i]->operation) {
 					core.sub_solving_event.push_back(nil_event);
 					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
 				}
@@ -3545,11 +3546,12 @@ int32 field::add_chain(uint16 step) {
 		effect_set eset;
 		filter_player_effect(clit->triggering_player, EFFECT_ACTIVATE_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit->triggering_effect, PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit->triggering_player, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(clit->evt);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, clit->triggering_player, 0);
 			}

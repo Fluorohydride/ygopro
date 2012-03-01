@@ -462,7 +462,8 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.side.push_back(draging_pointer);
 					is_draging = false;
-				}
+				} else if (hovered_pos == 4)
+					is_draging = false;
 			} else {
 				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)) || hovered_pos == 4)
 					hovered_pos = 0;

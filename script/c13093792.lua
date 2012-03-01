@@ -20,6 +20,7 @@ function c13093792.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()
 	if tc:GetType()==TYPE_SPELL then
+		Duel.DisableShuffleCheck()
 		Duel.SendtoGrave(g,REASON_EFFECT)
 		local ae=tc:GetActivateEffect()
 		if tc:GetLocation()==LOCATION_GRAVE and ae then

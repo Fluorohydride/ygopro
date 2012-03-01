@@ -13,7 +13,6 @@ function c82003859.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
 	e2:SetCost(c82003859.atcost)
-	e2:SetValue(1)
 	e2:SetOperation(c82003859.atop)
 	c:RegisterEffect(e2)
 end

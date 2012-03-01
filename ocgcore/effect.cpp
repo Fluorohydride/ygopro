@@ -205,10 +205,6 @@ int32 effect::is_action_check(uint8 playerid) {
 	eset.clear();
 	pduel->game_field->filter_player_effect(playerid, EFFECT_ACTIVATE_COST, &eset);
 	for(int i = 0; i < eset.count; ++i) {
-		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
-		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
-		if(!eset[i]->check_value_condition(2))
-			continue;
 		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);

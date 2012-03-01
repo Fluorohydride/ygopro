@@ -14,7 +14,6 @@ function c38318146.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(0,1)
 	e2:SetCost(c38318146.accost)
-	e2:SetValue(c38318146.acval)
 	e2:SetOperation(c38318146.acop)
 	c:RegisterEffect(e2)
 end
@@ -28,10 +27,8 @@ function c38318146.acfilter(c)
 end
 function c38318146.accost(e,te,tp)
 	c38318146[0]=false
-	return Duel.IsExistingMatchingCard(c38318146.acfilter,tp,LOCATION_DECK,0,1,nil)
-end
-function c38318146.acval(e,te,tp)
 	return te:GetHandler():IsType(TYPE_SPELL) and te:IsHasType(EFFECT_TYPE_ACTIVATE)
+		and Duel.IsExistingMatchingCard(c38318146.acfilter,tp,LOCATION_DECK,0,1,nil)
 end
 function c38318146.acop(e,tp,eg,ep,ev,re,r,rp)
 	if c38318146[0] then return end

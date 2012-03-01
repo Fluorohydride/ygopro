@@ -946,11 +946,12 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		effect_set eset;
 		target->filter_effect(EFFECT_SUMMON_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, sumplayer, 0);
 			}
@@ -1234,11 +1235,12 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		effect_set eset;
 		target->filter_effect(EFFECT_FLIPSUMMON_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, sumplayer, 0);
 			}
@@ -1314,11 +1316,12 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		effect_set eset;
 		target->filter_effect(EFFECT_MSET_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(setplayer, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, setplayer, 0);
 			}
@@ -1496,11 +1499,12 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 		effect_set eset;
 		target->filter_effect(EFFECT_SSET_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(setplayer, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, setplayer, 0);
 			}
@@ -1545,11 +1549,12 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		effect_set eset;
 		target->filter_effect(EFFECT_SPSUMMON_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, sumplayer, 0);
 			}
@@ -1743,11 +1748,12 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		eset.clear();
 		target->filter_effect(EFFECT_SPSUMMON_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
 			pduel->lua->add_param(target->summon_player, PARAM_TYPE_INT);
-			if(!eset[i]->check_value_condition(2))
+			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
-			if(eset[i]->cost) {
+			if(eset[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, target->summon_player, 0);
 			}
