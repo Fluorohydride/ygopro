@@ -396,7 +396,8 @@ int32 scriptlib::group_get_min_group(lua_State *L) {
 		}
 	}
 	interpreter::group2value(L, newgroup);
-	return 1;
+	lua_pushinteger(L, min);
+	return 2;
 }
 int32 scriptlib::group_get_max_group(lua_State *L) {
 	check_param_count(L, 2);
@@ -424,7 +425,8 @@ int32 scriptlib::group_get_max_group(lua_State *L) {
 		}
 	}
 	interpreter::group2value(L, newgroup);
-	return 1;
+	lua_pushinteger(L, max);
+	return 2;
 }
 int32 scriptlib::group_get_sum(lua_State *L) {
 	check_param_count(L, 2);

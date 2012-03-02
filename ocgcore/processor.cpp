@@ -2709,7 +2709,12 @@ int32 field::process_battle_command(uint16 step) {
 			adjust_all();
 			return FALSE;
 		}
-		add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, infos.turn_player, 30);
+		if(!core.attacker->is_affected_by_effect(EFFECT_MUST_ATTACK))
+			add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, infos.turn_player, 30);
+		else {
+			returns.ivalue[0] = TRUE;
+			core.attack_cancelable = FALSE;
+		}
 		return FALSE;
 	}
 	case 9: {

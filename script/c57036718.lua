@@ -23,12 +23,6 @@ end
 function c57036718.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(57036718)~=0
 end
-function c57036718.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsAttack() and c:IsRelateToBattle() then
-		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
-	end
-end
 function c57036718.filter(c)
 	return c:IsFaceup() and c:IsDestructable()
 end

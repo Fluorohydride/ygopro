@@ -85,10 +85,6 @@ function c78349103.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP_ATTACK)
 	end
 end
-function c78349103.scon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsReason(REASON_DESTROY) and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0
-end
 function c78349103.sfilter(c)
 	return c:IsType(TYPE_UNION) and c:IsAbleToHand()
 end

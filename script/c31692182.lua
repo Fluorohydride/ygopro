@@ -20,17 +20,14 @@ function c31692182.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(g,nil,0,REASON_COST)
 end
 function c31692182.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsSetCard(0x1d)
+	return c:IsType(TYPE_EFFECT) and not c:IsSetCard(0x1d)
 end
 function c31692182.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetTarget(c31692182.tgfilter)
+	e1:SetTarget(c31692182.filter)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 	Duel.RegisterEffect(e1,tp)
-end
-function c31692182.tgfilter(e,c)
-	return not c:IsSetCard(0x1d)
 end

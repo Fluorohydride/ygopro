@@ -9,10 +9,10 @@ function c32314730.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetOperation(c32314730.ccost)
 	c:RegisterEffect(e1)
-	--special summon
+	--salvage
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(32314730,0))
-	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)

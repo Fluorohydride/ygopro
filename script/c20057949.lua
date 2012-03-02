@@ -55,9 +55,6 @@ function c20057949.clear(e,tp,eg,ep,ev,re,r,rp)
 	c20057949[0]=false
 	c20057949[1]=false
 end
-function c20057949.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x31)
-end
 function c20057949.condition(e,tp,eg,ep,ev,re,r,rp)
 	return c20057949[tp]
 end

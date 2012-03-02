@@ -27,11 +27,14 @@ function c5037726.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c5037726.filter,tp,LOCATION_REMOVED,LOCATION_REMOVED,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
+function c5037726.cfilter(c)
+	return not c:IsPublic() and c:IsType(TYPE_TRAP)
+end
 function c5037726.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local dis=false
 	if Duel.IsChainDisablable(0) then
-		local g=Duel.GetMatchingGroup(Card.IsType,tp,0,LOCATION_HAND,nil,TYPE_TRAP)
+		local g=Duel.GetMatchingGroup(c5037726.cfilter,tp,0,LOCATION_HAND,nil)
 		if g:GetCount()>0 and Duel.SelectYesNo(1-tp,aux.Stringid(5037726,0)) then
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_CONFIRM)
 			local sg=g:Select(1-tp,1,1,nil)
