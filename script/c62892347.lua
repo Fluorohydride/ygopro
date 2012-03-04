@@ -71,7 +71,7 @@ function c62892347.arcanareg(c,coin)
 	e3:SetTarget(c62892347.distg)
 	e3:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e3)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c62892347.distg(e,c)
 	local ec=e:GetHandler()

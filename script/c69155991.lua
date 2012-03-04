@@ -3,8 +3,10 @@ function c69155991.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_CHAIN_SOLVED)
+	e1:SetCode(EVENT_CHAIN_SOLVING)
+	e1:SetCondition(c69155991.descon)
 	e1:SetOperation(c69155991.desop)
 	c:RegisterEffect(e1)
 	--to grave
@@ -19,8 +21,11 @@ function c69155991.initial_effect(c)
 	e2:SetOperation(c69155991.tgop)
 	c:RegisterEffect(e2)
 end
+function c69155991.descon(e,tp,eg,ep,ev,re,r,rp)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:GetHandler():IsType(TYPE_MONSTER)
+end
 function c69155991.desop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:GetHandler():IsType(TYPE_MONSTER) then
+	if e:GetHandler():IsLocation(LOCATION_MZONE) and e:GetHandler():IsFaceup() then
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 	end
 end

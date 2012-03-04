@@ -152,7 +152,7 @@ public:
 #define EFFECT_FLAG_EVENT_PLAYER	0x800000	//
 #define EFFECT_FLAG_OWNER_RELATE	0x1000000	//
 #define EFFECT_FLAG_AVAILABLE_BD	0x2000000	//
-
+#define EFFECT_FLAG_CLIENT_HINT		0x4000000	//
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//
 #define EFFECT_DISABLE					2	//

@@ -80,7 +80,7 @@ function c69831560.arcanareg(c,coin)
 	e4:SetOperation(c69831560.desop2)
 	e4:SetReset(RESET_EVENT+0x17f0000)
 	c:RegisterEffect(e4)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c69831560.macon(e)
 	return e:GetHandler():GetFlagEffectLabel(36690018)==1

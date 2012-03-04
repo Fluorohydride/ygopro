@@ -38,7 +38,7 @@ function c8396952.arcanareg(c,coin)
 	e1:SetOperation(c8396952.speop)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c8396952.speop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -631,6 +631,7 @@ public:
 #define CHINT_RACE				3
 #define CHINT_ATTRIBUTE			4
 #define CHINT_NUMBER			5
+#define CHINT_DESC				6
 //Messages
 #define MSG_RETRY				1
 #define MSG_HINT				2

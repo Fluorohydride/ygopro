@@ -759,8 +759,11 @@ int32 scriptlib::card_register_flag_effect(lua_State *L) {
 	int32 flag = lua_tointeger(L, 4);
 	int32 count = lua_tointeger(L, 5);
 	int32 lab = 0;
+	int32 desc = 0;
 	if(lua_gettop(L) >= 6)
 		lab = lua_tointeger(L, 6);
+	if(lua_gettop(L) >= 7)
+		desc = lua_tointeger(L, 7);
 	if(count == 0)
 		count = 1;
 	if(reset & (RESET_PHASE) && !(reset & (RESET_SELF_TURN | RESET_OPPO_TURN)))
@@ -775,6 +778,7 @@ int32 scriptlib::card_register_flag_effect(lua_State *L) {
 	peffect->flag = flag | EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_count |= count & 0xff;
 	peffect->label = lab;
+	peffect->description = desc;
 	pcard->add_effect(peffect);
 	interpreter::effect2value(L, peffect);
 	return 1;
@@ -1702,7 +1706,7 @@ int32 scriptlib::card_set_hint(lua_State *L) {
 	duel* pduel = pcard->pduel;
 	uint32 type = lua_tointeger(L, 2);
 	uint32 value = lua_tointeger(L, 3);
-	if(type > CHINT_NUMBER)
+	if(type > CHINT_DESC)
 		return 0;
 	pduel->write_buffer8(MSG_CARD_HINT);
 	pduel->write_buffer32(pcard->get_info_location());

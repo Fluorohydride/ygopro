@@ -52,7 +52,7 @@ function c97574404.arcanareg(c,coin)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_MSET)
 	c:RegisterEffect(e3)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c97574404.dtcon(e)
 	return e:GetHandler():GetFlagEffectLabel(36690018)==1

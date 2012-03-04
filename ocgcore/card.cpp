@@ -776,6 +776,12 @@ int32 card::add_effect(effect* peffect) {
 		pduel->game_field->effects.cheff.insert(peffect);
 	if(peffect->flag & EFFECT_FLAG_COUNT_LIMIT)
 		pduel->game_field->effects.rechargeable.insert(peffect);
+	if(peffect->flag & EFFECT_FLAG_CLIENT_HINT) {
+		pduel->write_buffer8(MSG_CARD_HINT);
+		pduel->write_buffer32(get_info_location());
+		pduel->write_buffer8(CHINT_DESC);
+		pduel->write_buffer32(peffect->description);
+	}
 	return peffect->id;
 }
 void card::remove_effect(effect* peffect) {
@@ -829,6 +835,12 @@ void card::remove_effect(effect* peffect, effect_container::iterator it) {
 			pduel->write_buffer8(cmit->second);
 			counters.erase(cmit);
 		}
+	}
+	if(peffect->flag & EFFECT_FLAG_CLIENT_HINT) {
+		pduel->write_buffer8(MSG_CARD_HINT);
+		pduel->write_buffer32(get_info_location());
+		pduel->write_buffer8(CHINT_DESC);
+		pduel->write_buffer32(0);
 	}
 	pduel->game_field->core.reseted_effects.insert(peffect);
 }

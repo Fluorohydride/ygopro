@@ -54,7 +54,7 @@ function c35781051.arcanareg(c,coin)
 	e2:SetOperation(c35781051.tgop)
 	e2:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e2)
-	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,0,1,coin)
+	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c35781051.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and e:GetHandler():GetFlagEffectLabel(36690018)==1
