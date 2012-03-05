@@ -1679,7 +1679,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 7: {
-		if(!(core.duel_options & DUEL_ENABLE_PRIORITY))
+		if(!(core.duel_options & DUEL_ENABLE_PRIORITY) || (infos.phase != PHASE_MAIN1 && infos.phase != PHASE_MAIN2))
 			return FALSE;
 		// Due to the new official rules, the priority of ignition effects when summon, special summon, flip summon is canceled
 		// Use DUEL_ENABLE_PRIORITY to enable this feature (TCG)
