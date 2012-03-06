@@ -31,6 +31,6 @@ function c43385557.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,ct*600)
 end
 function c43385557.recop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(Card.IsRace,tp,LOCATION_MZONE,0,nil,RACE_PSYCHO)
+	local ct=Duel.GetMatchingGroupCount(c43385557.filter,tp,LOCATION_MZONE,0,nil)
 	Duel.Recover(tp,ct*600,REASON_EFFECT)
 end

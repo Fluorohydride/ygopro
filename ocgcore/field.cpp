@@ -926,16 +926,14 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 	}
 	return count;
 }
-int32 field::is_player_affected_by_effect(uint8 playerid, uint32 code) {
-	effect* peffect;
-	pair<effect_container::iterator, effect_container::iterator> rg;
-	rg = effects.aura_effect.equal_range(code);
+effect* field::is_player_affected_by_effect(uint8 playerid, uint32 code) {
+	auto rg = effects.aura_effect.equal_range(code);
 	for (; rg.first != rg.second; ++rg.first) {
-		peffect = rg.first->second;
+		effect* peffect = rg.first->second;
 		if (peffect->is_target_player(playerid) && peffect->is_available())
-			return TRUE;
+			return peffect;
 	}
-	return FALSE;
+	return 0;
 }
 int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* ex_list, int32 use_con, int32 use_hand, int32 fun, int32 exarg, card* exp) {
 	card* pcard;

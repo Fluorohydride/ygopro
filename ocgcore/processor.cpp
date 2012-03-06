@@ -1205,6 +1205,11 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		return FALSE;
 	}
 	case 1: {
+		if((phase == PHASE_DRAW && is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_DP))
+		        || (phase == PHASE_STANDBY && is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_SP))) {
+			core.units.begin()->step = 14;
+			return FALSE;
+		}
 		int32 phase_event = EVENT_PHASE + phase;
 		pair<effect_container::iterator, effect_container::iterator> pr;
 		pr = effects.trigger_f_effect.equal_range(phase_event);
@@ -2345,11 +2350,16 @@ int32 field::process_battle_command(uint16 step) {
 		core.chain_attack_target = 0;
 		core.attacker = 0;
 		core.attack_target = 0;
-		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
 			core.units.begin()->step = 29;
 			core.units.begin()->arg1 = 2;
-			add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
-			adjust_all();
+			if(!peffect->value)
+				add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
+			else {
+				core.hint_timing[infos.turn_player] = 0;
+				reset_phase(PHASE_BATTLE);
+				adjust_all();
+			}
 			return FALSE;
 		}
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
@@ -2636,7 +2646,7 @@ int32 field::process_battle_command(uint16 step) {
 			reset_phase(PHASE_DAMAGE);
 			return FALSE;
 		}
-		if(core.sub_attack_target != (card*)0xffffffff) {
+		if(core.sub_attack_target != (card*)0xffffffff && (!core.sub_attack_target || core.sub_attack_target->current.location == LOCATION_MZONE)) {
 			core.attacker->announce_count++;
 			core.attacker->attacked_count++;
 			pduel->write_buffer8(MSG_ATTACK);

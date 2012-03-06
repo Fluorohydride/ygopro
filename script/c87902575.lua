@@ -52,6 +52,7 @@ function c87902575.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
 end
 function c87902575.rmop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=eg:GetFirst()
 	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY) then
 		tc:CreateRelation(e:GetHandler(),RESET_EVENT+0x1fe0000)
@@ -66,6 +67,7 @@ function c87902575.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return g:FilterCount(c87902575.retfilter,nil,e:GetHandler(),Duel.GetTurnPlayer())>0
 end
 function c87902575.retop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p=Duel.GetTurnPlayer()
 	local lg=e:GetLabelObject():GetLabelObject()
 	local g=lg:Filter(c87902575.retfilter,nil,e:GetHandler(),p)

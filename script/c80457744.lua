@@ -1,4 +1,4 @@
---ブースト·ウォリアー 推进战士
+--ブースト·ウォリアー
 function c80457744.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

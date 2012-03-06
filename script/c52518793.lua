@@ -23,15 +23,18 @@ function c52518793.initial_effect(c)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x19))
 	e3:SetValue(c52518793.atkval)
 	c:RegisterEffect(e3)
-	--Destroy replace
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_DESTROY_REPLACE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetTarget(c52518793.desreptg)
-	e4:SetOperation(c52518793.desrepop)
+	local e4=e3:Clone()
+	e4:SetCode(EFFECT_UPDATE_ATTACK)
 	c:RegisterEffect(e4)
+	--Destroy replace
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_DESTROY_REPLACE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_SZONE)
+	e5:SetTarget(c52518793.desreptg)
+	e5:SetOperation(c52518793.desrepop)
+	c:RegisterEffect(e5)
 end
 function c52518793.atkval(e,c)
 	return e:GetHandler():GetCounter(0x7)*100
@@ -46,7 +49,8 @@ function c52518793.acop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x7,1)
 end
 function c52518793.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_HAND,0,1,nil,52518793) end
+	if chk==0 then return not e:GetHandler():IsReason(REASON_RULE)
+		and Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_HAND,0,1,nil,52518793) end
 	return Duel.SelectYesNo(tp,aux.Stringid(52518793,1))
 end
 function c52518793.desrepop(e,tp,eg,ep,ev,re,r,rp)

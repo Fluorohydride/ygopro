@@ -11,20 +11,24 @@ function c4440873.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c4440873.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
+	return eg:IsExists(Card.IsControler,1,nil,1-tp)
 end
 function c4440873.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
+function c4440873.filter(c,e,tp)
+	return c:IsRelateToEffect(e) and c:IsControler(tp)
+end
 function c4440873.activate(e,tp,eg,ep,ev,re,r,rp)
-	local sg=eg:Filter(Card.IsRelateToEffect,nil,e)
+	local sg=eg:Filter(c4440873.filter,nil,e,1-tp)
 	if sg:GetCount()==0 then
 	elseif sg:GetCount()==1 then
 		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
 	else
-		local dg=sg:Select(ep,1,1,nil)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+		local dg=sg:Select(1-tp,1,1,nil)
 		Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
 	end
 end

@@ -54,9 +54,15 @@ end
 function c79875176.sdesop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
+function c79875176.dirfilter1(c)
+	return c:IsFaceup() and c:IsCode(15259703)
+end
+function c79875176.dirfilter2(c)
+	return c:IsFaceup() and c:IsType(TYPE_TOON)
+end
 function c79875176.dircon(e)
-	return Duel.IsExistingMatchingCard(Card.IsCode,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil,15259703)
-		and not Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil,TYPE_TOON)
+	return Duel.IsExistingMatchingCard(c79875176.dirfilter1,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+		and not Duel.IsExistingMatchingCard(c79875176.dirfilter2,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
 end
 function c79875176.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end

@@ -111,7 +111,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 		return FALSE;
 	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (reset_count & 0xf00) == 0)
 		return FALSE;
-	if (!(flag & EFFECT_FLAG_FIELD_ONLY)) {
+	if (!(flag & EFFECT_FLAG_FIELD_ONLY) && !neglect_cond) {
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
 				return FALSE;

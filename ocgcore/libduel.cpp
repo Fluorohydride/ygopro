@@ -999,10 +999,15 @@ int32 scriptlib::duel_replace_attacker(lua_State *L) {
 }
 int32 scriptlib::duel_change_attack_target(lua_State *L) {
 	check_param_count(L, 1);
-	check_param(L, PARAM_TYPE_CARD, 1);
-	card* target = *(card**) lua_touserdata(L, 1);
-	duel* pduel = target->pduel;
-	pduel->game_field->core.sub_attack_target = target;
+	if(lua_isnil(L, 1)) {
+		duel* pduel = interpreter::get_duel_info(L);
+		pduel->game_field->core.sub_attack_target = 0;
+	} else {
+		check_param(L, PARAM_TYPE_CARD, 1);
+		card* target = *(card**) lua_touserdata(L, 1);
+		duel* pduel = target->pduel;
+		pduel->game_field->core.sub_attack_target = target;
+	}
 	return 0;
 }
 int32 scriptlib::duel_replace_attack_target(lua_State *L) {
@@ -1258,6 +1263,7 @@ int32 scriptlib::duel_skip_phase(lua_State *L) {
 	uint32 phase = lua_tointeger(L, 2);
 	uint32 reset = lua_tointeger(L, 3);
 	uint32 count = lua_tointeger(L, 4);
+	uint32 value = lua_tointeger(L, 5);
 	if(count <= 0)
 		count = 1;
 	duel* pduel = interpreter::get_duel_info(L);
@@ -1284,6 +1290,7 @@ int32 scriptlib::duel_skip_phase(lua_State *L) {
 	peffect->s_range = 1;
 	peffect->o_range = 0;
 	peffect->reset_count |= count & 0xff;
+	peffect->value = value;
 	pduel->game_field->add_effect(peffect, playerid);
 	return 0;
 }
@@ -2463,7 +2470,7 @@ int32 scriptlib::duel_is_player_affected_by_effect(lua_State *L) {
 		return 1;
 	}
 	int32 code = lua_tointeger(L, 2);
-	lua_pushboolean(L, pduel->game_field->is_player_affected_by_effect(playerid, code));
+	lua_pushboolean(L, pduel->game_field->is_player_affected_by_effect(playerid, code) ? 1 : 0);
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_draw(lua_State * L) {

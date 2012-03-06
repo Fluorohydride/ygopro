@@ -10,19 +10,19 @@ function c47247413.initial_effect(c)
 	e1:SetOperation(c47247413.activate)
 	c:RegisterEffect(e1)
 end
+function c47247413.filter(c,e,tp)
+	return c:IsPreviousLocation(LOCATION_GRAVE) and c:IsControler(tp) and (not e or c:IsRelateToEffect(e))
+end
 function c47247413.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_GRAVE)
+	return eg:IsExists(c47247413.filter,1,nil,nil,1-tp)
 end
 function c47247413.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,eg,1,0,0)
 end
-function c47247413.filter(c,e)
-	return c:IsPreviousLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e)
-end
 function c47247413.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(c47247413.filter,nil,e)
+	local g=eg:Filter(c47247413.filter,nil,e,1-tp)
 	if g:GetCount()==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local rg=g:Select(1-tp,1,1,nil)
