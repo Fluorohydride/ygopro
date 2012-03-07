@@ -292,8 +292,8 @@ int32 card::get_attack(uint8 swap) {
 	int32 up = 0, upc = 0, final = -1, atk, rev = FALSE;
 	effect_set eset;
 	effect_set effects;
-	filter_effect(EFFECT_UPDATE_ATTACK, &eset);
-	filter_effect(EFFECT_SET_ATTACK, &eset);
+	filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
+	filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
 	filter_effect(EFFECT_SET_ATTACK_FINAL, &eset);
 	if (is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		rev = TRUE;
@@ -379,7 +379,7 @@ int32 card::get_defence(uint8 swap) {
 	effect_set effects;
 	filter_effect(EFFECT_UPDATE_DEFENCE, &eset, FALSE);
 	filter_effect(EFFECT_SET_DEFENCE, &eset, FALSE);
-	filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset, FALSE);
+	filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset);
 	if (is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		rev = TRUE;
 	for (int32 i = 0; i < eset.count; ++i) {
