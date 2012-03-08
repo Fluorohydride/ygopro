@@ -288,7 +288,7 @@ int32 scriptlib::card_get_leave_field_dest(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	lua_pushinteger(L, pcard->leave_field_redirect());
+	lua_pushinteger(L, pcard->leave_field_redirect(REASON_EFFECT));
 	return 1;
 }
 int32 scriptlib::card_get_turnid(lua_State *L) {

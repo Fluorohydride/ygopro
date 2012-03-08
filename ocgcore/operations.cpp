@@ -2232,14 +2232,14 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			dest = (pcard->operation_param >> 8) & 0xff;
 			redirect = 0;
 			if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED))
-				redirect = pcard->leave_field_redirect();
+				redirect = pcard->leave_field_redirect(pcard->current.reason);
 			if(redirect) {
 				pcard->current.reason &= ~REASON_TEMPORARY;
 				pcard->current.reason |= REASON_REDIRECT;
 				pcard->operation_param = (pcard->operation_param & 0xffff0000) + (redirect << 8) + (redirect >> 16);
 				dest = redirect;
 			}
-			redirect = pcard->destination_redirect(dest);
+			redirect = pcard->destination_redirect(dest, pcard->current.reason);
 			if(redirect && pcard->current.location != redirect) {
 				pcard->current.reason |= REASON_REDIRECT;
 				pcard->operation_param = (pcard->operation_param & 0xffff0000) + (redirect << 8) + (redirect >> 16);
@@ -2471,7 +2471,7 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 			(*cit)->current.reason_effect = core.reason_effect;
 			(*cit)->current.reason_player = core.reason_player;
 			(*cit)->current.reason = reason;
-			redirect = (*cit)->destination_redirect(dest);
+			redirect = (*cit)->destination_redirect(dest, reason);
 			if(redirect) {
 				(*cit)->operation_param = redirect;
 				dest = redirect;

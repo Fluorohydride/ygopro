@@ -111,7 +111,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 		return FALSE;
 	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (reset_count & 0xf00) == 0)
 		return FALSE;
-	if (!(flag & EFFECT_FLAG_FIELD_ONLY) && !neglect_cond) {
+	if (!(flag & EFFECT_FLAG_FIELD_ONLY)) {
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
 				return FALSE;
@@ -147,7 +147,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 			if(handler->is_affected_by_effect(EFFECT_CANNOT_TRIGGER))
 				return FALSE;
 		} else if(!(type & EFFECT_TYPE_CONTINUOUS)) {
-			if((handler->current.location & LOCATION_ONFIELD)
+			if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED))
 			        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
 			if(!(type & (EFFECT_TYPE_FLIP | EFFECT_TYPE_TRIGGER_F))) {
@@ -258,7 +258,7 @@ int32 effect::is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond, i
 	return TRUE;
 }
 int32 effect::is_condition_check(uint8 playerid, tevent& e) {
-	if((handler->current.location & LOCATION_ONFIELD) && (type & EFFECT_TYPE_FIELD)
+	if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED))
 	        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 		return FALSE;
 	if(!condition)

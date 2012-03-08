@@ -1012,14 +1012,15 @@ void card::release_relation(effect* peffect) {
 		return;
 	relate_effect.erase(peffect);
 }
-int32 card::leave_field_redirect() {
+int32 card::leave_field_redirect(uint32 reason) {
 	effect_set es;
 	uint8 redirect;
 	if(data.type & TYPE_TOKEN)
 		return 0;
 	filter_effect(EFFECT_LEAVE_FIELD_REDIRECT, &es);
 	for(int32 i = 0; i < es.count; ++i) {
-		redirect = es[i]->get_value(this);
+		pduel->lua->add_param(reason, PARAM_TYPE_INT);
+		redirect = es[i]->get_value(this, 1);
 		if(redirect & LOCATION_HAND && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
 			return LOCATION_HAND;
 		else if(redirect & LOCATION_DECK && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
@@ -1029,7 +1030,7 @@ int32 card::leave_field_redirect() {
 	}
 	return 0;
 }
-int32 card::destination_redirect(uint8 destination) {
+int32 card::destination_redirect(uint8 destination, uint32 reason) {
 	effect_set es;
 	uint8 redirect;
 	if(data.type & TYPE_TOKEN)
@@ -1046,7 +1047,8 @@ int32 card::destination_redirect(uint8 destination) {
 		filter_effect(EFFECT_REMOVE_REDIRECT, &es);
 	else return 0;
 	for(int32 i = 0; i < es.count; ++i) {
-		redirect = es[i]->get_value(this);
+		pduel->lua->add_param(reason, PARAM_TYPE_INT);
+		redirect = es[i]->get_value(this, 1);
 		if(redirect & LOCATION_HAND && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
 			return LOCATION_HAND;
 		if(redirect & LOCATION_DECK && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
@@ -1792,9 +1794,9 @@ int32 card::is_capable_cost_to_grave(uint8 playerid) {
 	if(!is_capable_send_to_grave(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect();
+		redirect = leave_field_redirect(REASON_COST);
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest);
+	redirect = destination_redirect(dest, REASON_COST);
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_GRAVE)
 		return FALSE;
@@ -1812,9 +1814,9 @@ int32 card::is_capable_cost_to_hand(uint8 playerid) {
 	if(!is_capable_send_to_hand(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect();
+		redirect = leave_field_redirect(REASON_COST);
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest);
+	redirect = destination_redirect(dest, REASON_COST);
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_HAND)
 		return FALSE;
@@ -1832,9 +1834,9 @@ int32 card::is_capable_cost_to_deck(uint8 playerid) {
 	if(!is_capable_send_to_deck(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect();
+		redirect = leave_field_redirect(REASON_COST);
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest);
+	redirect = destination_redirect(dest, REASON_COST);
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_DECK)
 		return FALSE;
@@ -1852,9 +1854,9 @@ int32 card::is_capable_cost_to_extra(uint8 playerid) {
 	if(!is_capable_send_to_deck(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect();
+		redirect = leave_field_redirect(REASON_COST);
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest);
+	redirect = destination_redirect(dest, REASON_COST);
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_DECK)
 		return FALSE;

@@ -166,8 +166,8 @@ public:
 	int32 is_has_relation(effect* peffect);
 	void release_relation(card* target);
 	void release_relation(effect* peffect);
-	int32 leave_field_redirect();
-	int32 destination_redirect(uint8 destination);
+	int32 leave_field_redirect(uint32 reason);
+	int32 destination_redirect(uint8 destination, uint32 reason);
 	int32 add_counter(uint16 countertype, uint16 count);
 	int32 remove_counter(uint16 countertype, uint16 count);
 	int32 is_can_add_counter(uint16 countertype, uint16 count);
