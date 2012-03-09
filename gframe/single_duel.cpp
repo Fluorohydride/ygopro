@@ -122,6 +122,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 }
 void SingleDuel::LeaveGame(DuelPlayer* dp) {
 	if(dp == host_player) {
+		EndDuel();
 		NetServer::StopServer();
 	} else if(dp->type == NETPLAYER_TYPE_OBSERVER) {
 		observers.erase(dp);

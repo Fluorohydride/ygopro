@@ -72,9 +72,10 @@ function c87902575.retop(e,tp,eg,ep,ev,re,r,rp)
 	local lg=e:GetLabelObject():GetLabelObject()
 	local g=lg:Filter(c87902575.retfilter,nil,e:GetHandler(),p)
 	lg:Sub(g)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local ft=Duel.GetLocationCount(p,LOCATION_MZONE)
 	if g:GetCount()>ft then
 		local sg=g
+		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(87902575,2))
 		g=g:Select(p,ft,ft,nil)
 		sg:Sub(g)
 		Duel.SendtoGrave(sg,REASON_EFFECT)

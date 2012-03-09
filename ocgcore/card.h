@@ -303,7 +303,7 @@ public:
 #define RACE_REPTILE		0x80000		//
 #define RACE_PSYCHO			0x100000	//
 #define RACE_DEVINE			0x200000	//
-#define RACE_RESERVE		0x400000	//
+#define RACE_CREATORGOD		0x400000	//
 //Reason
 #define REASON_DESTROY		0x1		//
 #define REASON_RELEASE		0x2		//

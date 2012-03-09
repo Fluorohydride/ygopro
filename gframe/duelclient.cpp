@@ -1,6 +1,7 @@
 #include "duelclient.h"
 #include "client_card.h"
 #include "materials.h"
+#include "image_manager.h"
 #include "../ocgcore/field.h"
 #include "../ocgcore/duel.h"
 #include "game.h"
@@ -391,6 +392,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wInfos->setVisible(true);
 		mainGame->wPhase->setVisible(true);
 		mainGame->btnSideOK->setVisible(false);
+		mainGame->btnDP->setVisible(false);
+		mainGame->btnSP->setVisible(false);
+		mainGame->btnM1->setVisible(false);
+		mainGame->btnBP->setVisible(false);
+		mainGame->btnM2->setVisible(false);
+		mainGame->btnEP->setVisible(false);
+		mainGame->imgCard->setImage(imageManager.tCover);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(selftype > 1) {
 			mainGame->dInfo.isObserver = true;
@@ -2298,7 +2306,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
 		int available = BufferIO::ReadInt32(pbuf);
-		for(int i = 0, filter = 0x1; i < 22; ++i, filter <<= 1) {
+		for(int i = 0, filter = 0x1; i < 23; ++i, filter <<= 1) {
 			mainGame->chkRace[i]->setChecked(false);
 			if(filter & available)
 				mainGame->chkRace[i]->setVisible(true);
