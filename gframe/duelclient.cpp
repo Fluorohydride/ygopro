@@ -441,14 +441,16 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		mainGame->replaySignal.Reset();
 		mainGame->replaySignal.Wait();
-		if(mainGame->actionParam) {
+		if(mainGame->actionParam || !is_host) {
 			char* prep = pdata;
 			Replay new_replay;
 			memcpy(&new_replay.pheader, prep, sizeof(ReplayHeader));
 			prep += sizeof(ReplayHeader);
 			memcpy(new_replay.comp_data, prep, len - sizeof(ReplayHeader) - 1);
 			new_replay.comp_size = len - sizeof(ReplayHeader) - 1;
-			new_replay.SaveReplay(mainGame->ebRSName->getText());
+			if(mainGame->actionParam)
+				new_replay.SaveReplay(mainGame->ebRSName->getText());
+			else new_replay.SaveReplay(L"_LastReplay");
 		}
 		break;
 	}
@@ -1232,19 +1234,22 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->dField.selectable_cards.clear();
 		for (int i = 0; i < count; ++i) {
 			code = BufferIO::ReadInt32(pbuf);
-			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-			l = BufferIO::ReadInt8(pbuf);
-			s = BufferIO::ReadInt8(pbuf);
-			pcard = mainGame->dField.GetCard(c, l, s);
+			pbuf += 3;
+			pcard = *(mainGame->dField.deck[player].rbegin() + i);
 			if (code != 0)
 				pcard->SetCode(code);
+		}
+		for (int i = 0; i < count; ++i) {
+			pcard = *(mainGame->dField.deck[player].rbegin() + i);
 			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
 			float shift = -0.15f;
 			if (player == 1) shift = 0.15f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);
-			pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			if(!mainGame->dField.deck_reversed)
+				pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+			else pcard->dRot = irr::core::vector3df(0, 0, 0);
 			pcard->is_moving = true;
 			pcard->aniFrame = 5;
 			mainGame->WaitFrameSignal(45);
@@ -1279,7 +1284,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 					float shift = -0.15f;
 					if (c == 0 && l == 0x40) shift = 0.15f;
 					pcard->dPos = irr::core::vector3df(shift, 0, 0);
-					pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
+					if((l == LOCATION_DECK) && mainGame->dField.deck_reversed)
+						pcard->dRot = irr::core::vector3df(0, 0, 0);
+					else pcard->dRot = irr::core::vector3df(0, 3.14159f / 5.0f, 0);
 					pcard->is_moving = true;
 					pcard->aniFrame = 5;
 					mainGame->WaitFrameSignal(45);
@@ -1596,9 +1603,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				mainGame->dField.AddCard(pcard, cc, cl, cs);
 				mainGame->gMutex.Unlock();
 				if (pl == cl && pc == cc && (cl & 0x71)) {
-					pcard->dPos = irr::core::vector3df(-0.2f, 0, 0);
+					pcard->dPos = irr::core::vector3df(-0.3f, 0, 0);
 					pcard->dRot = irr::core::vector3df(0, 0, 0);
-					if (pc == 1) pcard->dPos.X = 0.2f;
+					if (pc == 1) pcard->dPos.X = 0.3f;
 					pcard->is_moving = true;
 					pcard->aniFrame = 5;
 					mainGame->WaitFrameSignal(5);
@@ -1963,10 +1970,13 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
 			int code = BufferIO::ReadInt32(pbuf);
+			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
+			if(code)
+				pcard->SetCode(code);
+		}
+		for (int i = 0; i < count; ++i) {
 			mainGame->gMutex.Lock();
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
-			if(code || !mainGame->dField.deck_reversed)
-				pcard->SetCode(code);
 			mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
 			mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
 			for(int i = 0; i < mainGame->dField.hand[player].size(); ++i)

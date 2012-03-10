@@ -124,7 +124,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 	pcard->sequence = sequence;
 	switch(location) {
 	case LOCATION_DECK: {
-		if (sequence != 1 || deck[controler].size() == 0) {
+		if (sequence != 0 || deck[controler].size() == 0) {
 			deck[controler].push_back(pcard);
 			pcard->sequence = deck[controler].size() - 1;
 		} else {

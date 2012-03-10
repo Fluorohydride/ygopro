@@ -258,8 +258,7 @@ int32 effect::is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond, i
 	return TRUE;
 }
 int32 effect::is_condition_check(uint8 playerid, tevent& e) {
-	if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED))
-	        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+	if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (!handler->is_position(POS_FACEUP)))
 		return FALSE;
 	if(!condition)
 		return TRUE;

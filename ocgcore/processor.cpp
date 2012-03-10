@@ -947,8 +947,12 @@ int32 field::process() {
 					tc[count - i - 1]->current.sequence = player[target_player].list_main.size() - 1;
 				}
 			}
-			pduel->write_buffer8(MSG_REFRESH_DECK);
-			pduel->write_buffer8(target_player);
+			if(core.deck_reversed) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(target_player);
+				pduel->write_buffer8(0);
+				pduel->write_buffer32((*player[target_player].list_main.rbegin())->data.code);
+			}
 			core.units.pop_front();
 		}
 		return pduel->bufferlen;
