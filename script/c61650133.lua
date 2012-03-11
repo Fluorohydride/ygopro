@@ -55,7 +55,7 @@ function c61650133.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if rm2 then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
-		local g2=Duel.SelectMatchingCard(tp,Card.IsAbleToRemove,tp,LOCATION_HAND,0,1,1,nil)
+		local g2=Duel.SelectMatchingCard(1-tp,Card.IsAbleToRemove,1-tp,LOCATION_HAND,0,1,1,nil)
 		g:Merge(g2)
 	end
 	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)

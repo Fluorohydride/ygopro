@@ -14,9 +14,7 @@ function c74519184.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		local h1=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
 		if e:GetHandler():IsLocation(LOCATION_HAND) then h1=h1-1 end
 		local h2=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
-		local d1=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
-		local d2=Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)
-		return h1>1 and h2>1 and d1>1 and d2>1
+		return h1>1 and h2>1 and Duel.IsPlayerCanDraw(tp,2) and Duel.IsPlayerCanDraw(1-tp,2)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,2)
 end

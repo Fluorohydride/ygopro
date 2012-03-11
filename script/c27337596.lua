@@ -33,7 +33,8 @@ function c27337596.spfilter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c27337596.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+		and Duel.IsExistingMatchingCard(c27337596.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c27337596.spop(e,tp,eg,ep,ev,re,r,rp)
