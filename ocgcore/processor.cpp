@@ -1743,6 +1743,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
 			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_new, 0);
+			return FALSE;
 		} else {
 			core.used_event.splice(core.used_event.end(), core.point_event);
 			if(core.chain_limit_p) {
@@ -1750,9 +1751,13 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				core.chain_limit_p = 0;
 			}
 			reset_chain();
+			returns.ivalue[0] = FALSE;
+			return TRUE;
 		}
-		return TRUE;
 	}
+	case 10:
+		returns.ivalue[0] = TRUE;
+		return TRUE;
 	}
 	return TRUE;
 }
@@ -2612,7 +2617,8 @@ int32 field::process_battle_command(uint16 step) {
 			pduel->write_buffer8(MSG_ATTACK_DISABLED);
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		}
-		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+		effect* peffect;
+		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
 			reset_phase(PHASE_DAMAGE);
 			if(core.attacker->fieldid == afid) {
 				if(!atk_disabled) {
@@ -2626,8 +2632,13 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			core.units.begin()->step = 29;
 			core.units.begin()->arg1 = 2;
-			add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
-			adjust_all();
+			if(!peffect->value)
+				add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
+			else {
+				core.hint_timing[infos.turn_player] = 0;
+				reset_phase(PHASE_BATTLE);
+				adjust_all();
+			}
 			return FALSE;
 		}
 		if(atk_disabled || !core.attacker->is_capable_attack() || core.attacker->is_status(STATUS_ATTACK_CANCELED)
