@@ -1136,14 +1136,21 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 		core.phase_action = TRUE;
 		target->current.reason = REASON_SUMMON;
 		target->summon_player = sumplayer;
-		if(core.current_chain.size() > 1 || target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SUMMON)) {
+		if(core.current_chain.size() == 0) {
+			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SUMMON))
+				core.units.begin()->step = 14;
+			return FALSE;
+		} else if(core.current_chain.size() > 1) {
 			core.units.begin()->step = 14;
 			return FALSE;
-		} else if(core.current_chain.size() == 0) {
-			core.units.begin()->step = 9;
-			return FALSE;
+		} else {
+			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SUMMON))
+				core.units.begin()->step = 15;
+			else
+				core.units.begin()->step = 10;
+			core.reserved = core.units.front();
+			return TRUE;
 		}
-		core.reserved = core.units.front();
 		return TRUE;
 	}
 	case 10: {
@@ -1628,15 +1635,21 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		target->set_status(STATUS_SUMMONING, TRUE);
 		target->set_status(STATUS_SUMMON_DISABLED, FALSE);
 		core.spsummoning_card = target;
-		if(core.current_chain.size() > 1 || target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON)) {
+		if(core.current_chain.size() == 0) {
+			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON))
+				core.units.begin()->step = 14;
+			return FALSE;
+		} else if(core.current_chain.size() > 1) {
 			core.units.begin()->step = 14;
 			return FALSE;
-		} else if(core.current_chain.size() == 0) {
-			core.units.begin()->step = 9;
-			return FALSE;
+		} else {
+			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON))
+				core.units.begin()->step = 15;
+			else
+				core.units.begin()->step = 10;
+			core.reserved = core.units.front();
+			return TRUE;
 		}
-		core.reserved = core.units.front();
-		return TRUE;
 	}
 	case 10: {
 		pduel->write_buffer8(MSG_SPSUMMONING);

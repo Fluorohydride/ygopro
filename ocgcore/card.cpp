@@ -1607,7 +1607,7 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 int32 card::is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect) {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
-	if(is_status(STATUS_REVIVE_LIMIT))
+	if(status & (STATUS_REVIVE_LIMIT | STATUS_UNSUMMONABLE_CARD))
 		return FALSE;
 	if(current.location != LOCATION_HAND)
 		return FALSE;
