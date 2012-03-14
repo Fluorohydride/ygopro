@@ -1,59 +1,15 @@
 --破滅の儀式
 function c52913738.initial_effect(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c52913738.target)
-	e1:SetOperation(c52913738.activate)
-	c:RegisterEffect(e1)
+	aux.AddRitualProcGreater(c,aux.FilterBoolFunction(Card.IsCode,30646525))
 	--To Deck
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(52913738,0))
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCondition(c52913738.regcon)
-	e2:SetCost(c52913738.regcost)
-	e2:SetOperation(c52913738.regop)
-	c:RegisterEffect(e2)
-end
-function c52913738.filter(c,e,tp,m)
-	if c:GetCode()~=30646525 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
-	local result=false
-	if m:IsContains(c) then
-		m:RemoveCard(c)
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
-		m:AddCard(c)
-	else
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
-	end
-	return result
-end
-function c52913738.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
-		local mg=Duel.GetRitualMaterial(tp,nil)
-		return Duel.IsExistingMatchingCard(c52913738.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg)
-	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
-end
-function c52913738.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
-	local mg=Duel.GetRitualMaterial(tp,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,c52913738.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
-	if tg:GetCount()>0 then
-		local tc=tg:GetFirst()
-		mg:RemoveCard(tc)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
-		tc:SetMaterial(mat)
-		Duel.ReleaseRitualMaterial(mat)
-		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
-		tc:CompleteProcedure()
-	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(52913738,0))
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCondition(c52913738.regcon)
+	e1:SetCost(c52913738.regcost)
+	e1:SetOperation(c52913738.regop)
+	c:RegisterEffect(e1)
 end
 function c52913738.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1

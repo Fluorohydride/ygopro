@@ -1241,9 +1241,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		}
 		for (int i = 0; i < count; ++i) {
 			pcard = *(mainGame->dField.deck[player].rbegin() + i);
-			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(code));
+			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(pcard->code));
 			mainGame->lstLog->addItem(textBuffer);
-			mainGame->logParam.push_back(code);
+			mainGame->logParam.push_back(pcard->code);
 			float shift = -0.15f;
 			if (player == 1) shift = 0.15f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);

@@ -27,9 +27,13 @@ function c67169062.tgfilter(c,e)
 end
 function c67169062.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	if tg:IsExists(c67169062.tgfilter,1,nil,e) then return end
+	if not tg or tg:FilterCount(Card.IsRelateToEffect,nil,e)~=5 then return end
 	Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
-	Duel.ShuffleDeck(tp)
-	Duel.BreakEffect()
-	Duel.Draw(tp,2,REASON_EFFECT)
+	local g=Duel.GetOperatedGroup()
+	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
+	if ct==5 then
+		Duel.ShuffleDeck(tp)
+		Duel.BreakEffect()
+		Duel.Draw(tp,2,REASON_EFFECT)
+	end
 end

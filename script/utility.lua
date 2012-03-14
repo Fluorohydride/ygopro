@@ -694,3 +694,99 @@ function Auxiliary.FOperationFunRep(f,cc,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+function Auxiliary.AddRitualProcGreater(c,filter)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(Auxiliary.RPGTarget(filter))
+	e1:SetOperation(Auxiliary.RPGOperation(filter))
+	c:RegisterEffect(e1)
+end
+function Auxiliary.RPGFilter(c,filter,e,tp,m)
+	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	local result=false
+	if m:IsContains(c) then
+		m:RemoveCard(c)
+		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
+		m:AddCard(c)
+	else
+		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
+	end
+	return result
+end
+function Auxiliary.RPGTarget(filter)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then
+					local mg=Duel.GetRitualMaterial(tp)
+					return Duel.IsExistingMatchingCard(Auxiliary.RPGFilter,tp,LOCATION_HAND,0,1,nil,filter,e,tp,mg)
+				end
+				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+			end
+end
+function Auxiliary.RPGOperation(filter)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local mg=Duel.GetRitualMaterial(tp)
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+				local tg=Duel.SelectMatchingCard(tp,Auxiliary.RPGFilter,tp,LOCATION_HAND,0,1,1,nil,filter,e,tp,mg)
+				if tg:GetCount()>0 then
+					local tc=tg:GetFirst()
+					mg:RemoveCard(tc)
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+					local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
+					tc:SetMaterial(mat)
+					Duel.ReleaseRitualMaterial(mat)
+					Duel.BreakEffect()
+					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+					tc:CompleteProcedure()
+				end
+			end
+end
+function Auxiliary.AddRitualProcEqual(c,filter)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(Auxiliary.RPETarget(filter))
+	e1:SetOperation(Auxiliary.RPEOperation(filter))
+	c:RegisterEffect(e1)
+end
+function Auxiliary.RPEFilter(c,filter,e,tp,m)
+	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	local result=false
+	if m:IsContains(c) then
+		m:RemoveCard(c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,c)
+		m:AddCard(c)
+	else
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,c)
+	end
+	return result
+end
+function Auxiliary.RPETarget(filter)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then
+					local mg=Duel.GetRitualMaterial(tp)
+					return Duel.IsExistingMatchingCard(Auxiliary.RPEFilter,tp,LOCATION_HAND,0,1,nil,filter,e,tp,mg)
+				end
+				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+			end
+end
+function Auxiliary.RPEOperation(filter)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local mg=Duel.GetRitualMaterial(tp)
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+				local tg=Duel.SelectMatchingCard(tp,Auxiliary.RPEFilter,tp,LOCATION_HAND,0,1,1,nil,filter,e,tp,mg)
+				if tg:GetCount()>0 then
+					local tc=tg:GetFirst()
+					mg:RemoveCard(tc)
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+					local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,tc)
+					tc:SetMaterial(mat)
+					Duel.ReleaseRitualMaterial(mat)
+					Duel.BreakEffect()
+					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+					tc:CompleteProcedure()
+				end
+			end
+end

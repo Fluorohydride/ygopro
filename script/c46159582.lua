@@ -1,13 +1,6 @@
 --リチュアの儀水鏡
 function c46159582.initial_effect(c)
-	--Activate
-	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c46159582.target)
-	e1:SetOperation(c46159582.activate)
-	c:RegisterEffect(e1)
+	aux.AddRitualProcEqual(c,c46159582.ritual_filter)
 	--salvage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(46159582,0))
@@ -20,42 +13,8 @@ function c46159582.initial_effect(c)
 	e1:SetOperation(c46159582.op)
 	c:RegisterEffect(e1)
 end
-function c46159582.filter(c,e,tp,m)
-	if bit.band(c:GetType(),0x81)~=0x81 or not c:IsSetCard(0x3a) 
-		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
-	if m:IsContains(c) then
-		m:RemoveCard(c)
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,c)
-		m:AddCard(c)
-	else
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,c)
-	end
-	return result
-end
-function c46159582.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
-		local mg=Duel.GetRitualMaterial(tp,nil)
-		return Duel.IsExistingMatchingCard(c46159582.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg)
-	end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
-end
-function c46159582.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
-	local mg=Duel.GetRitualMaterial(tp,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local tg=Duel.SelectMatchingCard(tp,c46159582.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
-	if tg:GetCount()>0 then
-		local tc=tg:GetFirst()
-		mg:RemoveCard(tc)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,tc)
-		tc:SetMaterial(mat)
-		Duel.ReleaseRitualMaterial(mat)
-		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
-		tc:CompleteProcedure()
-	end
+function c46159582.ritual_filter(c)
+	return c:IsSetCard(0x3a) and bit.band(c:GetType(),0x81)==0x81
 end
 function c46159582.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToDeckAsCost() end

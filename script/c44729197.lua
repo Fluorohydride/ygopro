@@ -1,20 +1,18 @@
 --スチームロイド
 function c44729197.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_START)
-	e1:SetOperation(c44729197.operation)
-	c:RegisterEffect(e1)
-end
-function c44729197.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetAttackTarget()==nil then return end
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	if c==Duel.GetAttacker() then
-		e1:SetValue(500)
-	else e1:SetValue(-500) end
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
+	e1:SetCondition(c44729197.condtion)
+	e1:SetValue(c44729197.val)
 	c:RegisterEffect(e1)
+end
+function c44729197.condtion(e)
+	local ph=Duel.GetCurrentPhase()
+	return ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL
+end
+function c44729197.val(e,c)
+	if Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget()~=nil then return 500
+	elseif e:GetHandler()==Duel.GetAttackTarget() then return -500
+	else return 0 end
 end

@@ -35,15 +35,13 @@ function c27383110.filter(c,e,tp,m)
 end
 function c27383110.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
-		local mg=Duel.GetRitualMaterial(tp,nil)
+		local mg=Duel.GetRitualMaterial(tp)
 		return Duel.IsExistingMatchingCard(c27383110.filter,tp,LOCATION_HAND,0,1,nil,e,tp,mg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c27383110.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
-	local mg=Duel.GetRitualMaterial(tp,nil)
+	local mg=Duel.GetRitualMaterial(tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tg=Duel.SelectMatchingCard(tp,c27383110.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
 	if tg:GetCount()>0 then
