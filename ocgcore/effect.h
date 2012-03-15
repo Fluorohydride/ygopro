@@ -48,6 +48,8 @@ public:
 	uint32 label;
 	uint32 hint_timing[2];
 	uint32 card_type;
+	uint16 field_ref;
+	uint16 status;
 	void* label_object;
 	int32 condition;
 	int32 cost;
@@ -81,6 +83,9 @@ public:
 	uint8 get_owner_player();
 	uint8 get_handler_player();
 };
+
+//status
+#define EFFECT_STATUS_AVAILABLE	0x0001
 
 //========== Reset ==========
 #define RESET_DRAW			PHASE_DRAW

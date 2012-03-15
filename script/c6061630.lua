@@ -21,9 +21,7 @@ function c6061630.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c6061630.acop(e,tp,eg,ep,ev,re,r,rp)
-	local te=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
-	local c=te:GetHandler()
-	if te:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_SPELL) and c~=e:GetHandler() then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) then
 		e:GetHandler():AddCounter(0x3001,2)
 	end
 end

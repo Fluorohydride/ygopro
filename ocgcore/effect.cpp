@@ -36,6 +36,8 @@ effect::effect() {
 	label_object = 0;
 	hint_timing[0] = 0;
 	hint_timing[1] = 0;
+	field_ref = 0;
+	status = 0;
 	condition = 0;
 	cost = 0;
 	target = 0;
@@ -98,13 +100,17 @@ int32 effect::is_available() {
 				return FALSE;
 		}
 	}
-	if (condition) {
-		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
-		if(!pduel->lua->check_condition(condition, 1)) {
-			return FALSE;
-		}
-	}
-	return TRUE;
+	if (!condition)
+		return TRUE;
+	pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
+	int32 res = pduel->lua->check_condition(condition, 1);
+	if(res) {
+		if(!(status & EFFECT_STATUS_AVAILABLE))
+			id = pduel->game_field->infos.effect_id++;
+		status |= EFFECT_STATUS_AVAILABLE;
+	} else
+		status &= ~EFFECT_STATUS_AVAILABLE;
+	return res;
 }
 int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if(!(type & EFFECT_TYPE_ACTIONS))
@@ -205,6 +211,11 @@ int32 effect::is_action_check(uint8 playerid) {
 	eset.clear();
 	pduel->game_field->filter_player_effect(playerid, EFFECT_ACTIVATE_COST, &eset);
 	for(int i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		if(!pduel->lua->check_condition(eset[i]->target, 3))
+			continue;
 		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);

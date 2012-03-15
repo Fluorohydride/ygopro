@@ -1638,6 +1638,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		if(core.current_chain.size() == 0) {
 			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON))
 				core.units.begin()->step = 14;
+			else
+				core.units.begin()->step = 9;
 			return FALSE;
 		} else if(core.current_chain.size() > 1) {
 			core.units.begin()->step = 14;

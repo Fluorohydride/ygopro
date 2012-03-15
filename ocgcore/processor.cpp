@@ -3597,6 +3597,11 @@ int32 field::add_chain(uint16 step) {
 			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit->triggering_effect, PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit->triggering_player, PARAM_TYPE_INT);
+			if(!pduel->lua->check_condition(eset[i]->target, 3))
+				continue;
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
+			pduel->lua->add_param(clit->triggering_effect, PARAM_TYPE_EFFECT);
+			pduel->lua->add_param(clit->triggering_player, PARAM_TYPE_INT);
 			if(!pduel->lua->check_condition(eset[i]->cost, 3))
 				continue;
 			if(eset[i]->operation) {

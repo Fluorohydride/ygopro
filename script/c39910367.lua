@@ -36,15 +36,14 @@ function c39910367.initial_effect(c)
 	--Add counter2
 	local e6=Effect.CreateEffect(c)
 	e6:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e6:SetCode(EVENT_DESTROY)
+	e6:SetCode(EVENT_LEAVE_FIELD)
 	e6:SetRange(LOCATION_SZONE)
 	e6:SetOperation(c39910367.addop2)
 	c:RegisterEffect(e6)
 end
 function c39910367.op(e,tp,eg,ep,ev,re,r,rp)
-	local te=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
-	local c=te:GetHandler()
-	if te:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_SPELL) and c:GetSequence()~=5 then
+	local c=re:GetHandler()
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:GetSequence()~=5 then
 		e:GetHandler():AddCounter(0x3001,1)
 	end
 end
@@ -66,7 +65,9 @@ function c39910367.addop2(e,tp,eg,ep,ev,re,r,rp)
 	local count=0
 	local c=eg:GetFirst()
 	while c~=nil do
-		if not c:IsCode(39910367) then count=count+c:GetCounter(0x3001) end
+		if not c:IsCode(39910367) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY) then
+			count=count+c:GetCounter(0x3001)
+		end
 		c=eg:GetNext()
 	end
 	if count>0 then
