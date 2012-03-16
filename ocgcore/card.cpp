@@ -481,6 +481,8 @@ uint32 card::get_ritual_level(card* pcard) {
 uint32 card::get_attribute() {
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.attribute;
+	if((current.location == LOCATION_GRAVE) && (data.type & (TYPE_SPELL + TYPE_TRAP)))
+		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
 	effect_set effects;
@@ -503,6 +505,8 @@ uint32 card::get_attribute() {
 }
 uint32 card::get_race() {
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+		return data.race;
+	if((current.location == LOCATION_GRAVE) && (data.type & (TYPE_SPELL + TYPE_TRAP)))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;

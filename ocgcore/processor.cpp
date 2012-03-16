@@ -2588,7 +2588,7 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i])
-				core.pre_field[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid;
+				core.pre_field[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid_r;
 			else
 				core.pre_field[i] = 0;
 		}
@@ -2597,7 +2597,7 @@ int32 field::process_battle_command(uint16 step) {
 			raise_single_event(core.attacker, 0, EVENT_ATTACK_ANNOUNCE, 0, 0, 0, infos.turn_player, 0);
 			raise_event(core.attacker, EVENT_ATTACK_ANNOUNCE, 0, 0, 0, infos.turn_player, 0);
 		}
-		core.units.begin()->arg2 = (core.attacker->current.controler << 16) + core.attacker->fieldid;
+		core.units.begin()->arg2 = (core.attacker->current.controler << 16) + core.attacker->fieldid_r;
 		process_single_event();
 		process_instant_event();
 		core.hint_timing[infos.turn_player] = TIMING_ATTACK;
@@ -2637,10 +2637,10 @@ int32 field::process_battle_command(uint16 step) {
 		effect* peffect;
 		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
 			reset_phase(PHASE_DAMAGE);
-			if(core.attacker->fieldid == afid) {
+			if(core.attacker->fieldid_r == afid) {
 				if(!atk_disabled) {
 					if(core.attack_target)
-						core.attacker->attacked_cards[core.attack_target->fieldid] = core.attack_target;
+						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
 						core.attacker->attacked_cards[0] = 0;
 				}
@@ -2659,16 +2659,16 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		}
 		if(atk_disabled || !core.attacker->is_capable_attack() || core.attacker->is_status(STATUS_ATTACK_CANCELED)
-		        || core.attacker->current.controler != acon || core.attacker->fieldid != afid) {
-			if(core.attacker->fieldid == afid) {
+		        || core.attacker->current.controler != acon || core.attacker->fieldid_r != afid) {
+			if(core.attacker->fieldid_r == afid) {
 				if(core.attack_target)
-					core.attacker->announced_cards[core.attack_target->fieldid] = core.attack_target;
+					core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
 				else
 					core.attacker->announced_cards[0] = 0;
 				core.attacker->announce_count++;
 				if(!atk_disabled) {
 					if(core.attack_target)
-						core.attacker->attacked_cards[core.attack_target->fieldid] = core.attack_target;
+						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
 						core.attacker->attacked_cards[0] = 0;
 					core.attacker->attacked_count++;
@@ -2684,8 +2684,8 @@ int32 field::process_battle_command(uint16 step) {
 			pduel->write_buffer8(MSG_ATTACK);
 			pduel->write_buffer32(core.attacker->get_info_location());
 			if(core.sub_attack_target) {
-				core.attacker->announced_cards[core.sub_attack_target->fieldid] = core.sub_attack_target;
-				core.attacker->attacked_cards[core.sub_attack_target->fieldid] = core.sub_attack_target;
+				core.attacker->announced_cards[core.sub_attack_target->fieldid_r] = core.sub_attack_target;
+				core.attacker->attacked_cards[core.sub_attack_target->fieldid_r] = core.sub_attack_target;
 				pduel->write_buffer32(core.sub_attack_target->get_info_location());
 			} else {
 				core.attacker->announced_cards[0] = 0;
@@ -2703,7 +2703,7 @@ int32 field::process_battle_command(uint16 step) {
 				return FALSE;
 			}
 			uint8 seq = core.chain_attack_target->current.sequence;
-			if(core.pre_field[seq] != core.chain_attack_target->fieldid) {
+			if(core.pre_field[seq] != core.chain_attack_target->fieldid_r) {
 				core.units.begin()->step = -1;
 				reset_phase(PHASE_DAMAGE);
 				return FALSE;
@@ -2715,7 +2715,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.units.begin()->arg2 = get_attack_target(core.attacker, &core.select_cards, core.chain_attack);
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i]) {
-				if(!core.pre_field[i] || core.pre_field[i] != player[1 - infos.turn_player].list_mzone[i]->fieldid) {
+				if(!core.pre_field[i] || core.pre_field[i] != player[1 - infos.turn_player].list_mzone[i]->fieldid_r) {
 					rollback = true;
 					break;
 				}
@@ -2732,8 +2732,8 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->announce_count++;
 			core.attacker->attacked_count++;
 			if(core.attack_target) {
-				core.attacker->announced_cards[core.attack_target->fieldid] = core.attack_target;
-				core.attacker->attacked_cards[core.attack_target->fieldid] = core.attack_target;
+				core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
+				core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 			} else {
 				core.attacker->announced_cards[0] = 0;
 				core.attacker->attacked_cards[0] = 0;
@@ -2761,13 +2761,14 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 11: {
 		if(returns.ivalue[0]) {
+			core.attack_cancelable = FALSE;
 			core.units.begin()->arg1 = TRUE;
 			core.units.begin()->step = 3;
 			return FALSE;
 		}
 		core.attacker->announce_count++;
 		if(core.attack_target)
-			core.attacker->announced_cards[core.attack_target->fieldid] = core.attack_target;
+			core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
 		else
 			core.attacker->announced_cards[0] = 0;
 		core.units.begin()->step = -1;
@@ -2788,9 +2789,9 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker = core.sub_attacker;
 		if(core.sub_attack_target != (card*)0xffffffff)
 			core.attack_target = core.sub_attack_target;
-		core.pre_field[0] = core.attacker->fieldid;
+		core.pre_field[0] = core.attacker->fieldid_r;
 		if(core.attack_target)
-			core.pre_field[1] = core.attack_target->fieldid;
+			core.pre_field[1] = core.attack_target->fieldid_r;
 		else
 			core.pre_field[1] = 0;
 		raise_single_event(core.attacker, 0, EVENT_BATTLE_START, 0, 0, 0, 0, 0);
@@ -2807,8 +2808,8 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 21: {
-		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid != core.pre_field[0]
-		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid != core.pre_field[1]))) {
+		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.units.begin()->step = 30;
@@ -2844,7 +2845,7 @@ int32 field::process_battle_command(uint16 step) {
 		raise_single_event(core.attacker, 0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 0);
 		if(core.attack_target) {
 			if(core.attack_target->temp.position & POS_FACEDOWN)
-				core.pre_field[1] = core.attack_target->fieldid;
+				core.pre_field[1] = core.attack_target->fieldid_r;
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 1);
 		}
 		raise_event((card*)0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 0);
@@ -2874,15 +2875,15 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker = core.sub_attacker;
 			core.attack_target = core.sub_attack_target;
 			core.units.begin()->step = 20;
-			core.pre_field[0] = core.attacker->fieldid;
+			core.pre_field[0] = core.attacker->fieldid_r;
 			if(core.attack_target)
-				core.pre_field[1] = core.attack_target->fieldid;
+				core.pre_field[1] = core.attack_target->fieldid_r;
 			else
 				core.pre_field[1] = 0;
 			return FALSE;
 		}
-		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid != core.pre_field[0]
-		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid != core.pre_field[1]))) {
+		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.units.begin()->step = 30;
@@ -2911,8 +2912,8 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 25: {
-		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid != core.pre_field[0]
-		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid != core.pre_field[1]))) {
+		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
+		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.units.begin()->step = 30;
@@ -3105,8 +3106,8 @@ int32 field::process_battle_command(uint16 step) {
 		core.hint_timing[infos.turn_player] = 0;
 		core.chain_attack = FALSE;
 		if(core.attack_target) {
-			core.attacker->battled_cards[core.attack_target->fieldid] = core.attack_target;
-			core.attack_target->battled_cards[core.attacker->fieldid] = core.attacker;
+			core.attacker->battled_cards[core.attack_target->fieldid_r] = core.attack_target;
+			core.attack_target->battled_cards[core.attacker->fieldid_r] = core.attacker;
 		} else
 			core.attacker->battled_cards[0] = 0;
 		uint8 reason_player = core.temp_var[0];
@@ -3142,7 +3143,7 @@ int32 field::process_battle_command(uint16 step) {
 		effect* peffect;
 		uint32 dest, seq;
 		if(core.attacker->is_status(STATUS_BATTLE_DESTROYED)
-		        && core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid == core.pre_field[0]) {
+		        && core.attacker->current.location == LOCATION_MZONE && core.attacker->fieldid_r == core.pre_field[0]) {
 			des.insert(core.attacker);
 			core.attacker->temp.reason = core.attacker->current.reason;
 			core.attacker->temp.reason_card = core.attacker->current.reason_card;
@@ -3162,7 +3163,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->operation_param = (POS_FACEUP << 24) + (((uint32)core.attacker->owner) << 16) + (dest << 8) + seq;
 		}
 		if(core.attack_target && core.attack_target->is_status(STATUS_BATTLE_DESTROYED)
-		        && core.attack_target->current.location == LOCATION_MZONE && core.attack_target->fieldid == core.pre_field[1]) {
+		        && core.attack_target->current.location == LOCATION_MZONE && core.attack_target->fieldid_r == core.pre_field[1]) {
 			des.insert(core.attack_target);
 			core.attack_target->temp.reason = core.attack_target->current.reason;
 			core.attack_target->temp.reason_card = core.attack_target->current.reason_card;
@@ -3247,7 +3248,7 @@ int32 field::process_battle_command(uint16 step) {
 			card_set::iterator cit, rm;
 			for(cit = des->container.begin(); cit != des->container.end();) {
 				rm = cit++;
-				if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid != core.pre_field[0] && (*rm)->fieldid != core.pre_field[1]))
+				if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
 					des->container.erase(rm);
 			}
 			add_process(PROCESSOR_DESTROY, 2, 0, des, REASON_BATTLE, PLAYER_NONE);
@@ -3294,7 +3295,7 @@ int32 field::process_battle_command(uint16 step) {
 		reset_phase(PHASE_DAMAGE);
 		adjust_all();
 		if(core.chain_attack) {
-			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid != core.pre_field[0]
+			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid_r != core.pre_field[0]
 			        || !core.attacker->is_capable_attack_announce(infos.turn_player))
 				return FALSE;
 			if(core.chain_attack_target) {

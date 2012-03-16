@@ -17,14 +17,26 @@ function c14785765.costfilter(c)
 	return c:IsFaceup() and c:IsAbleToHandAsCost()
 end
 function c14785765.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c14785765[tp] and Duel.IsExistingMatchingCard(c14785765.costfilter,tp,LOCATION_ONFIELD,0,1,nil) end
+	if chk==0 then
+		if not c14785765[tp] then return false end
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+			return Duel.IsExistingMatchingCard(c14785765.costfilter,tp,LOCATION_MZONE,0,1,nil)
+		else
+			return Duel.IsExistingMatchingCard(c14785765.costfilter,tp,LOCATION_ONFIELD,0,1,nil)
+		end
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectMatchingCard(tp,c14785765.costfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
-	Duel.SendtoHand(g,nil,REASON_COST)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+		local g=Duel.SelectMatchingCard(tp,c14785765.costfilter,tp,LOCATION_MZONE,0,1,1,nil)
+		Duel.SendtoHand(g,nil,REASON_COST)
+	else
+		local g=Duel.SelectMatchingCard(tp,c14785765.costfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
+		Duel.SendtoHand(g,nil,REASON_COST)
+	end
 	c14785765[tp]=false
 end
 function c14785765.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,400)
 end
