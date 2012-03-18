@@ -28,19 +28,23 @@ function c36623431.condition1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c36623431.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCode(EFFECT_DRAW_COUNT)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+PHASE_DRAW)
-	e1:SetValue(0)
-	Duel.RegisterEffect(e1,tp)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
+	local dt=Duel.GetDrawCount(tp)
+	if dt~=0 then
+		e:SetLabel(1)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetCode(EFFECT_DRAW_COUNT)
+		e1:SetTargetRange(1,0)
+		e1:SetReset(RESET_PHASE+PHASE_DRAW)
+		e1:SetValue(0)
+		Duel.RegisterEffect(e1,tp)
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
+	else e:SetLabel(0) end
 end
 function c36623431.operation1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
+	if e:GetLabel()==1 and c:IsRelateToEffect(e) then
 		Duel.SendtoHand(c,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,c)
 	end

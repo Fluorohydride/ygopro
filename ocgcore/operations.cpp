@@ -185,7 +185,8 @@ void field::destroy(card_set* targets, effect* reason_effect, uint32 reason, uin
 		pcard->current.reason = reason;
 		if(reason_effect)
 			pcard->current.reason_effect = reason_effect;
-		pcard->current.reason_player = reason_player;
+		if(reason_player != 5)
+			pcard->current.reason_player = reason_player;
 		p = playerid;
 		if(!(destination & (LOCATION_HAND + LOCATION_DECK + LOCATION_REMOVED)))
 			destination = LOCATION_GRAVE;
@@ -299,7 +300,6 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 	switch(step) {
 	case 0: {
 		card* pcard;
-		card_set cset;
 		card_vector cv;
 		uint32 drawed = 0;
 		uint32 public_count = 0;
@@ -308,6 +308,8 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			return TRUE;
 		}
 		core.overdraw[playerid] = FALSE;
+		group* drawed_set = new group;
+		core.units.begin()->ptarget = drawed_set;
 		for(uint32 i = 0; i < count; ++i) {
 			if(player[playerid].list_main.size() == 0) {
 				core.overdraw[playerid] = TRUE;
@@ -334,53 +336,48 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 				public_count++;
 			}
 			cv.push_back(pcard);
-			cset.insert(pcard);
+			drawed_set->container.insert(pcard);
 		}
 		core.hint_timing[playerid] |= TIMING_DRAW + TIMING_TOHAND;
 		adjust_instant();
 		core.units.begin()->arg2 = (core.units.begin()->arg2 & 0xff000000) + drawed;
-		if(core.deck_reversed && player[playerid].list_main.size()) {
-			pduel->write_buffer8(MSG_DECK_TOP);
-			pduel->write_buffer8(playerid);
-			pduel->write_buffer8(drawed);
-			pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
-		}
-		if(drawed > 0) {
+		if(drawed) {
+			if(core.deck_reversed && player[playerid].list_main.size()) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(playerid);
+				pduel->write_buffer8(drawed);
+				pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+			}
 			pduel->write_buffer8(MSG_DRAW);
 			pduel->write_buffer8(playerid);
 			pduel->write_buffer8(drawed);
 			for(uint32 i = 0; i < drawed; ++i)
 				pduel->write_buffer32(cv[i]->data.code);
-		}
-		if(core.deck_reversed && (drawed > 0) && (public_count < drawed)) {
-			pduel->write_buffer8(MSG_CONFIRM_CARDS);
-			pduel->write_buffer8(1 - playerid);
-			pduel->write_buffer8(cset.size());
-			for(auto cit = cset.begin(); cit != cset.end(); ++cit) {
-				pduel->write_buffer32((*cit)->data.code);
-				pduel->write_buffer8((*cit)->current.controler);
-				pduel->write_buffer8((*cit)->current.location);
-				pduel->write_buffer8((*cit)->current.sequence);
+			if(core.deck_reversed && (public_count < drawed)) {
+				pduel->write_buffer8(MSG_CONFIRM_CARDS);
+				pduel->write_buffer8(1 - playerid);
+				pduel->write_buffer8(drawed_set->container.size());
+				for(auto cit = drawed_set->container.begin(); cit != drawed_set->container.end(); ++cit) {
+					pduel->write_buffer32((*cit)->data.code);
+					pduel->write_buffer8((*cit)->current.controler);
+					pduel->write_buffer8((*cit)->current.location);
+					pduel->write_buffer8((*cit)->current.sequence);
+				}
+				shuffle(playerid, LOCATION_HAND);
 			}
-			shuffle(playerid, LOCATION_HAND);
-		}
-		if(drawed) {
-			for(auto cit = cset.begin(); cit != cset.end(); ++cit)
+			for(auto cit = drawed_set->container.begin(); cit != drawed_set->container.end(); ++cit)
 				raise_single_event((*cit), 0, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, 0);
 			process_single_event();
-			raise_event(&cset, EVENT_DRAW, reason_effect, reason, reason_player, playerid, drawed);
-			raise_event(&cset, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, drawed);
+			raise_event(&drawed_set->container, EVENT_DRAW, reason_effect, reason, reason_player, playerid, drawed);
+			raise_event(&drawed_set->container, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, drawed);
 			process_instant_event();
 		}
 		return FALSE;
 	}
 	case 1: {
-		core.operated_set.clear();
-		auto clit = player[playerid].list_hand.rbegin();
-		for(uint32 i = 0; i < count; ++i) {
-			core.operated_set.insert(*clit);
-			clit++;
-		}
+		group* drawed_set = core.units.begin()->ptarget;
+		core.operated_set = drawed_set->container;
+		delete drawed_set;
 		returns.ivalue[0] = count;
 		return TRUE;
 	}

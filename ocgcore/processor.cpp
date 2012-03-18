@@ -2919,7 +2919,11 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->step = 30;
 			return FALSE;
 		}
+		raise_single_event(core.attacker, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
+		if(core.attack_target)
+			raise_single_event(core.attack_target, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 1);
 		raise_event((card*)0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
+		process_single_event();
 		process_instant_event();
 		core.new_ochain.clear();
 		core.new_fchain.clear();
@@ -3216,8 +3220,7 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
 		process_single_event();
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size())
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
 		core.units.begin()->arg1 = 1;
 		return FALSE;
 	}
@@ -4376,6 +4379,7 @@ int32 field::adjust_step(uint16 step) {
 				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
 					core.destroy_set.insert(pcard);
 					pcard->current.reason_effect = peffect;
+					pcard->current.reason_player = peffect->get_handler_player();
 				}
 			}
 			for(uint8 i = 0; i < 6; ++i) {
@@ -4383,14 +4387,13 @@ int32 field::adjust_step(uint16 step) {
 				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
 					core.destroy_set.insert(pcard);
 					pcard->current.reason_effect = peffect;
+					pcard->current.reason_player = peffect->get_handler_player();
 				}
 			}
 			tp = 1 - tp;
 		}
 		if(core.destroy_set.size()) {
-			destroy(&core.destroy_set, 0, REASON_EFFECT, PLAYER_NONE);
-			for(card_set::iterator cit = core.destroy_set.begin(); cit != core.destroy_set.end(); ++cit)
-				(*cit)->current.reason_player = (*cit)->current.controler;
+			destroy(&core.destroy_set, 0, REASON_EFFECT, 5);
 		} else {
 			returns.ivalue[0] = 0;
 		}

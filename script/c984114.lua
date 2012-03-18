@@ -18,7 +18,7 @@ function c984114.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c984114.filter(c)
-	return c:IsSetCard(0x16) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0x16) and c:GetCode()~=984114 and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c984114.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c984114.filter(chkc) end

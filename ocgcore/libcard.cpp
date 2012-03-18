@@ -24,9 +24,13 @@ int32 scriptlib::card_get_origin_code(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(pcard->data.alias)
-		lua_pushinteger(L, pcard->data.alias);
-	else
+	if(pcard->data.alias) {
+		int32 dif = pcard->data.code - pcard->data.alias;
+		if(dif > -10 && dif < 10)
+			lua_pushinteger(L, pcard->data.alias);
+		else
+			lua_pushinteger(L, pcard->data.code);
+	} else
 		lua_pushinteger(L, pcard->data.code);
 	return 1;
 }
@@ -893,7 +897,7 @@ int32 scriptlib::card_is_relate_to_battle(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = pcard->pduel;
-	if(pcard->fieldid == pduel->game_field->core.pre_field[0] || pcard->fieldid == pduel->game_field->core.pre_field[1])
+	if(pcard->fieldid_r == pduel->game_field->core.pre_field[0] || pcard->fieldid == pduel->game_field->core.pre_field[1])
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
