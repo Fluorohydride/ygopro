@@ -13,7 +13,7 @@ function c4206964.initial_effect(c)
 	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 	c:RegisterEffect(e2)
 end
-function c4206964.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c4206964.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=eg:GetFirst()
 	if chkc then return chkc==tc end
 	if chk==0 then return ep~=tp and tc:IsFaceup() and tc:GetAttack()>=1000 and tc:IsOnField()

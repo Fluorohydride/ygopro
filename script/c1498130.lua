@@ -16,7 +16,7 @@ function c1498130.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	if not g or g:GetCount()~=1 then return false end
 	local tg=g:GetFirst()
 	local c=e:GetHandler()
-	if tg==c or tg:GetControler()~=tp or tg:IsFacedown() or not tg:IsSetCard(0x3d) then return false end
+	if tg==c or tg:GetControler()~=tp or tg:IsFacedown() or or not tg:IsLocation(LOCATION_MZONE) or not tg:IsSetCard(0x3d) then return false end
 	local tf=re:GetTarget()
 	return tf(re,rp,nil,nil,nil,nil,nil,nil,0,c)
 end
