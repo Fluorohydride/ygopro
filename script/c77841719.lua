@@ -36,7 +36,8 @@ end
 function c77841719.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local tct=1
-	if Duel.GetTurnPlayer()~=tp then tct=2 end
+	if Duel.GetTurnPlayer()~=tp then tct=2
+	elseif Duel.GetCurrentPhase()==PHASE_END then tct=3 end
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and not Duel.GetControl(tc,tp,PHASE_END,tct) then
 		if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 			Duel.Destroy(tc,REASON_EFFECT)
