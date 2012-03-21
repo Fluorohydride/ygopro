@@ -27,8 +27,8 @@ end
 function c75498415.ntcon(e,c)
 	if c==nil then return true end
 	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0,nil)==0
-		and Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE,nil)>0
+		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
+		and Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)>0
 end
 function c75498415.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1

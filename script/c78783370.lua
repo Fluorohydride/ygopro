@@ -10,7 +10,7 @@ function c78783370.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c78783370.condition(e,tp,eg,ep,ev,re,r,rp)
-	if re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
+	if re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
 	if ex then return true end
 	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
@@ -29,6 +29,7 @@ function c78783370.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	e1:SetLabel(cid)
 	e1:SetValue(c78783370.refcon)
+	e1:SetReset(RESET_CHAIN)
 	Duel.RegisterEffect(e1,tp)
 end
 function c78783370.refcon(e,re,val,r,rp,rc)

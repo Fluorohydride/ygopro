@@ -47,7 +47,7 @@ function c96914272.lvop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)
-		if lv>clv then
+		if lv<clv then
 			if Duel.SelectOption(tp,aux.Stringid(96914272,1),aux.Stringid(96914272,2))==0 then
 				e1:SetValue(lv)
 			else e1:SetValue(-lv) end

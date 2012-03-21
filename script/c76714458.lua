@@ -24,6 +24,7 @@ function c76714458.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(1,0)
 	e1:SetLabel(cid)
 	e1:SetValue(c76714458.refcon)
+	e1:SetReset(RESET_CHAIN)
 	Duel.RegisterEffect(e1,tp)
 end
 function c76714458.refcon(e,re,val,r,rp,rc)

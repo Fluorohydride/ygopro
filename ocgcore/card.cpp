@@ -882,7 +882,7 @@ void card::reset(uint32 id, uint32 reset_type) {
 			if (rrm->second & 0xffff0000 & id)
 				relations.erase(rrm);
 		}
-		if(id & 0x7f0000)
+		if(id & 0x7c0000)
 			relate_effect.clear();
 		if(id & 0x1fc0000) {
 			announced_cards.clear();
