@@ -8,7 +8,7 @@ function c95451366.initial_effect(c)
 	e1:SetOperation(c95451366.activate)
 	c:RegisterEffect(e1)
 end
-function c95451366.taget(e,tp,eg,ep,ev,re,r,rp,chk)
+function c95451366.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,1,0x3001,1,REASON_EFFECT) end
 end
 function c95451366.filter(c)

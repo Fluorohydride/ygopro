@@ -33,7 +33,7 @@ function c36021814.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c36021814.costfilter(c)
 	local code=c:GetCode()
-	return code==32274490 or code==36021814 and c:IsAbleToRemoveAsCost()
+	return (code==32274490 or code==36021814) and c:IsAbleToRemoveAsCost()
 end
 function c36021814.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c36021814.costfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end

@@ -27,7 +27,7 @@ function c38318146.acfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToGraveAsCost()
 end
 function c38318146.actarget(e,te,tp)
-	te:GetHandler():IsType(TYPE_SPELL) and te:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return te:GetHandler():IsType(TYPE_SPELL) and te:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c38318146.accost(e,te,tp)
 	c38318146[0]=false
