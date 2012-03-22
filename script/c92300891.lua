@@ -22,12 +22,14 @@ function c92300891.initial_effect(c)
 	e3:SetCondition(c92300891.poscon)
 	e3:SetOperation(c92300891.posop)
 	c:RegisterEffect(e3)
-	--battle des rep
+	--battle indes
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_DESTROY_REPLACE)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e4:SetCountLimit(1)
-	e4:SetTarget(c92300891.reptg)
+	e4:SetValue(c92300891.valcon)
 	c:RegisterEffect(e4)
 end
 function c92300891.becon(e)
@@ -45,4 +47,7 @@ end
 function c92300891.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
 	return true
+end
+function c92300891.valcon(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
 end

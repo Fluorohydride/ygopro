@@ -12,18 +12,19 @@ function c45298492.initial_effect(c)
 	e1:SetTarget(c45298492.tg)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
-	--Revive
+	--battle indes
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetCountLimit(1)
-	e2:SetTarget(c45298492.reptg)
+	e2:SetValue(c45298492.valcon)
 	c:RegisterEffect(e2)
 end
 function c45298492.tg(e,c)
 	return c~=e:GetHandler() and c:IsRace(RACE_WARRIOR)
 end
-function c45298492.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	return true
+function c45298492.valcon(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
 end

@@ -23,15 +23,14 @@ function c61777313.tuner_filter(c)
 	return c:IsSetCard(0x42)
 end
 function c61777313.synfilter(c,syncard,f)
-	return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard) and c:IsSetCard(0x42) and (f==nil or f(c))
+	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and c:IsSetCard(0x42) and (f==nil or f(c))
 end
 function c61777313.syntg(e,syncard,f,minc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
 	local g=Duel.GetMatchingGroup(c61777313.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
-	local res=g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,syncard)
-	return res
+	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,syncard)
 end
 function c61777313.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()

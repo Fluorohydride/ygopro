@@ -26,10 +26,12 @@ end
 function c87319876.cop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_DESTROY_REPLACE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e1:SetCountLimit(1)
-	e1:SetTarget(c87319876.reptg)
+	e1:SetValue(c87319876.valcon)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	c:GetReasonCard():RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
@@ -40,10 +42,11 @@ function c87319876.cop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_EVENT+0x1fe0000)
 	c:GetReasonCard():RegisterEffect(e2)
 end
-function c87319876.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	e:GetHandler():RegisterFlagEffect(87319876,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE,0,1)
-	return true
+function c87319876.valcon(e,re,r,rp)
+	if bit.band(r,REASON_BATTLE)~=0 then
+		e:GetHandler():RegisterFlagEffect(87319876,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE,0,1)
+		return true
+	else return false end
 end
 function c87319876.adcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(87319876)~=0

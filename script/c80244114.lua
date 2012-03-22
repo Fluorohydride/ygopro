@@ -58,10 +58,12 @@ function c80244114.indop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DESTROY_REPLACE)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 		e1:SetCountLimit(1)
-		e1:SetTarget(c80244114.reptg)
+		e1:SetValue(c80244114.valcon)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(e:GetHandler())
@@ -72,10 +74,11 @@ function c80244114.indop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 	end
 end
-function c80244114.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	e:GetHandler():RegisterFlagEffect(80244114,RESET_PHASE+PHASE_DAMAGE,0,1)
-	return true
+function c80244114.valcon(e,re,r,rp)
+	if bit.band(r,REASON_BATTLE)~=0 then
+		e:GetHandler():RegisterFlagEffect(80244114,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE,0,1)
+		return true
+	else return false end
 end
 function c80244114.addown(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(80244114)==0 then return end

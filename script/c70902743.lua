@@ -19,6 +19,8 @@ function c70902743.initial_effect(c)
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
+	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetCondition(c70902743.condition2)
 	e2:SetTarget(c70902743.target2)
@@ -44,13 +46,12 @@ function c70902743.filter2(c)
 	return c:GetAttackedCount()==0 and c:IsDestructable()
 end
 function c70902743.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and e:GetHandler():GetFlagEffect(70902743)==0
+	return tp==Duel.GetTurnPlayer()
 end
 function c70902743.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c70902743.filter2,tp,LOCATION_MZONE,0,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	e:GetHandler():RegisterFlagEffect(70902743,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,EFFECT_FLAG_OATH,1)
 end
 function c70902743.operation2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c70902743.filter2,tp,LOCATION_MZONE,0,e:GetHandler())

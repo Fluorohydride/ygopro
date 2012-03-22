@@ -458,7 +458,7 @@ void effect::dec_count() {
 	reset_count -= 0x100;
 }
 void effect::recharge() {
-	if((type & EFFECT_TYPE_ACTIONS) && (flag & EFFECT_FLAG_COUNT_LIMIT)) {
+	if(flag & EFFECT_FLAG_COUNT_LIMIT) {
 		reset_count &= 0xf0ff;
 		reset_count |= (reset_count >> 4) & 0xf00;
 	}

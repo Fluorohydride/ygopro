@@ -1901,6 +1901,30 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 					continue;
 				}
 			}
+			pcard->filter_effect(EFFECT_INDESTRUCTABLE_COUNT, &eset);
+			if (eset.count) {
+				bool indes = false;
+				for (int32 i = 0; i < eset.count; ++i) {
+					if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) || (eset[i]->reset_count & 0xf00) == 0)
+						continue;
+					pduel->lua->add_param(pcard->current.reason_effect, PARAM_TYPE_EFFECT);
+					pduel->lua->add_param(pcard->current.reason, PARAM_TYPE_INT);
+					pduel->lua->add_param(pcard->current.reason_player, PARAM_TYPE_INT);
+					if(eset[i]->check_value_condition(3)) {
+						eset[i]->dec_count();
+						indes = true;
+					}
+				}
+				eset.clear();
+				if(indes) {
+					pcard->current.reason = pcard->temp.reason;
+					pcard->current.reason_effect = pcard->temp.reason_effect;
+					pcard->current.reason_player = pcard->temp.reason_player;
+					pcard->set_status(STATUS_DESTROY_CONFIRMED, FALSE);
+					targets->container.erase(pcard);
+					continue;
+				}
+			}
 			pcard->filter_effect(EFFECT_DESTROY_SUBSTITUTE, &eset);
 			if (eset.count) {
 				bool sub = false;
@@ -2020,6 +2044,30 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 			card* pcard = *rm;
 			if (!(pcard->current.reason & REASON_RULE)) {
 				if (!pcard->is_destructable()) {
+					pcard->current.reason = pcard->temp.reason;
+					pcard->current.reason_effect = pcard->temp.reason_effect;
+					pcard->current.reason_player = pcard->temp.reason_player;
+					pcard->set_status(STATUS_DESTROY_CONFIRMED, FALSE);
+					targets->container.erase(pcard);
+					continue;
+				}
+			}
+			pcard->filter_effect(EFFECT_INDESTRUCTABLE_COUNT, &eset);
+			if (eset.count) {
+				bool indes = false;
+				for (int32 i = 0; i < eset.count; ++i) {
+					if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) || (eset[i]->reset_count & 0xf00) == 0)
+						continue;
+					pduel->lua->add_param(pcard->current.reason_effect, PARAM_TYPE_EFFECT);
+					pduel->lua->add_param(pcard->current.reason, PARAM_TYPE_INT);
+					pduel->lua->add_param(pcard->current.reason_player, PARAM_TYPE_INT);
+					if(eset[i]->check_value_condition(3)) {
+						eset[i]->dec_count();
+						indes = true;
+					}
+				}
+				eset.clear();
+				if(indes) {
 					pcard->current.reason = pcard->temp.reason;
 					pcard->current.reason_effect = pcard->temp.reason_effect;
 					pcard->current.reason_player = pcard->temp.reason_player;
@@ -2310,8 +2358,6 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			dest = (pcard->operation_param >> 8) & 0xff;
 			seq = (pcard->operation_param) & 0xff;
 			pcard->enable_field_effect(FALSE);
-			if(pcard->equiping_target)
-				pcard->unequip();
 			if(pcard->data.type & TYPE_TOKEN) {
 				pduel->write_buffer8(MSG_MOVE);
 				pduel->write_buffer32(pcard->data.code);
@@ -2399,6 +2445,8 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			card* pcard = *cit;
 			nloc = pcard->current.location;
+			if(pcard->equiping_target)
+				pcard->unequip();
 			if(pcard->equiping_cards.size()) {
 				for(auto csit = pcard->equiping_cards.begin(); csit != pcard->equiping_cards.end();) {
 					auto rm = csit++;

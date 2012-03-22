@@ -43,7 +43,7 @@ function c78794994.operation(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=sg:GetFirst()
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
-		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)==0 then return end
+		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 		Duel.Equip(tp,c,tc)
 		--Add Equip limit
 		local e1=Effect.CreateEffect(tc)

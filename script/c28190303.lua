@@ -8,12 +8,14 @@ function c28190303.initial_effect(c)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c28190303.spcon)
 	c:RegisterEffect(e1)
-	--
+	--battle indes
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetCountLimit(1)
-	e2:SetTarget(c28190303.reptg)
+	e2:SetValue(c28190303.valcon)
 	c:RegisterEffect(e2)
 end
 function c28190303.spcon(e,c)
@@ -24,7 +26,6 @@ function c28190303.spcon(e,c)
 	local tc=g:GetFirst()
 	return g:GetCount()==1 and tc:IsSetCard(0x33) and tc:GetCode()~=28190303
 end
-function c28190303.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	return true
+function c28190303.valcon(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
 end

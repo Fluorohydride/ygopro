@@ -563,13 +563,12 @@ void card::equip(card *target) {
 void card::unequip() {
 	if (!equiping_target)
 		return;
-	effect_container::iterator it;
-	for (it = equip_effect.begin(); it != equip_effect.end(); ++it) {
+	for (auto it = equip_effect.begin(); it != equip_effect.end(); ++it) {
 		if (it->second->is_disable_related())
 			pduel->game_field->add_to_disable_check_list(equiping_target);
 	}
-	pduel->write_buffer8(MSG_UNEQUIP);
-	pduel->write_buffer32(get_info_location());
+//	pduel->write_buffer8(MSG_UNEQUIP);
+//	pduel->write_buffer32(get_info_location());
 	equiping_target->equiping_cards.erase(this);
 	pre_equip_target = equiping_target;
 	equiping_target = 0;
@@ -952,10 +951,8 @@ void card::reset(uint32 id, uint32 reset_type) {
 	}
 }
 void card::reset_effect_count() {
-	effect_indexer::iterator i;
-	effect* peffect;
-	for (i = indexer.begin(); i != indexer.end(); ++i) {
-		peffect = i->first;
+	for (auto i = indexer.begin(); i != indexer.end(); ++i) {
+		effect* peffect = i->first;
 		if (peffect->flag & EFFECT_FLAG_COUNT_LIMIT)
 			peffect->recharge();
 	}

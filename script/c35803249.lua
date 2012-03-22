@@ -74,7 +74,7 @@ function c35803249.spfilter(c)
 end
 function c35803249.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(tp,c35803249.spfilter,1,nil)
+	return Duel.CheckReleaseGroup(c:GetControler(),c35803249.spfilter,1,nil)
 end
 function c35803249.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(tp,c35803249.spfilter,1,1,nil)

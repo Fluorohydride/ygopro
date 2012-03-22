@@ -8,12 +8,14 @@ function c82693042.initial_effect(c)
 	e1:SetCode(EFFECT_ADD_ATTRIBUTE)
 	e1:SetValue(ATTRIBUTE_LIGHT)
 	c:RegisterEffect(e1)
-	--battle des rep
+	--battle indes
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_DESTROY_REPLACE)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e2:SetCountLimit(1)
-	e2:SetTarget(c82693042.reptg)
+	e2:SetValue(c82693042.valcon)
 	c:RegisterEffect(e2)
 	--search
 	local e3=Effect.CreateEffect(c)
@@ -26,9 +28,8 @@ function c82693042.initial_effect(c)
 	e3:SetOperation(c82693042.thop)
 	c:RegisterEffect(e3)
 end
-function c82693042.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	return true
+function c82693042.valcon(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
 end
 function c82693042.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE

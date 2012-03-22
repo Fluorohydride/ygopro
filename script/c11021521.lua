@@ -1,6 +1,5 @@
 --ネコマネキング
 function c11021521.initial_effect(c)
-	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
 	--end turn
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(11021521,0))

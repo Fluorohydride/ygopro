@@ -42,7 +42,7 @@ function c78422252.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return a==Duel.GetAttacker() and bit.band(d:GetBattlePosition(),POS_DEFENCE)~=0
 end
 function c78422252.filter(c,e,tp)
-	return c:IsSetCard(0x100d) and c:GetLevel()<=4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x100d) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c78422252.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c78422252.filter(chkc,e,tp) end

@@ -1,14 +1,15 @@
 --ダーク·リゾネーター
 function c97021916.initial_effect(c)
-	--battle des rep
+	--battle indes
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_DESTROY_REPLACE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e1:SetCountLimit(1)
-	e1:SetTarget(c97021916.reptg)
+	e1:SetValue(c97021916.valcon)
 	c:RegisterEffect(e1)
 end
-function c97021916.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	return true
+function c97021916.valcon(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
 end

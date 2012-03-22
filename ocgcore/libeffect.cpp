@@ -121,8 +121,6 @@ int32 scriptlib::effect_set_count_limit(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
-	if(!(peffect->type & EFFECT_TYPE_ACTIONS))
-		return 0;
 	int32 v = lua_tointeger(L, 2);
 	if(v == 0)
 		v = 1;
@@ -183,7 +181,7 @@ int32 scriptlib::effect_set_label_object(lua_State *L) {
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
 	if(lua_isnil(L, 2)) {
-		peffect->label = 0;
+		peffect->label_object = 0;
 		return 0;
 	}
 	if(!lua_isuserdata(L, 2))
