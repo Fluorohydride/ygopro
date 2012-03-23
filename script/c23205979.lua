@@ -73,6 +73,7 @@ function c23205979.desop2(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated() then
 			e:GetLabelObject():SetLabel(1)
 		else
+			Debug.Message(c:IsDisabled())
 			if not c:IsDisabled() then Duel.Destroy(c,REASON_EFFECT) end
 		end
 	end

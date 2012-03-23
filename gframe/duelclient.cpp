@@ -963,10 +963,12 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int selecting_player = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		int specount = BufferIO::ReadInt8(pbuf);
+		int forced = BufferIO::ReadInt8(pbuf);
 		int hint0 = BufferIO::ReadInt32(pbuf);
 		int hint1 = BufferIO::ReadInt32(pbuf);
 		int c, l, s, code, desc;
 		ClientCard* pcard;
+		mainGame->dField.chain_forced = (forced != 0);
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
 		for (int i = 0; i < count; ++i) {
@@ -995,13 +997,23 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			DuelClient::SendResponse();
 			return true;
 		}
+		if(mainGame->chkAutoChain->isChecked() && forced) {
+			SetResponseI(0);
+			mainGame->dField.ClearChainSelect();
+			DuelClient::SendResponse();
+			return true;
+		}
 		mainGame->gMutex.Lock();
-		if(count == 0)
-			myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
-		else
-			myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
-		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
-		mainGame->PopupElement(mainGame->wQuery);
+		mainGame->stHintMsg->setText(dataManager.GetSysString(550));
+		mainGame->stHintMsg->setVisible(true);
+		if(!forced) {
+			if(count == 0)
+				myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
+			else
+				myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
+			mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+			mainGame->PopupElement(mainGame->wQuery);
+		}
 		mainGame->gMutex.Unlock();
 		return true;
 	}

@@ -111,7 +111,7 @@ int32 field::process() {
 		}
 	}
 	case PROCESSOR_SELECT_CHAIN: {
-		if (select_chain(it->step, it->arg1, it->arg2)) {
+		if (select_chain(it->step, it->arg1, (it->arg2 & 0xffff), it->arg2 >> 16)) {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
@@ -1206,94 +1206,40 @@ int32 field::check_hint_timing(effect* peffect) {
 int32 field::process_phase_event(int16 step, int32 phase) {
 	switch(step) {
 	case 0: {
-		return FALSE;
-	}
-	case 1: {
 		if((phase == PHASE_DRAW && is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_DP))
 		        || (phase == PHASE_STANDBY && is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_SP))) {
 			core.units.begin()->step = 14;
 			return FALSE;
 		}
 		int32 phase_event = EVENT_PHASE + phase;
+		effect* peffect;
+		nil_event.event_code = phase_event;
+		nil_event.event_player = infos.turn_player;
+		int32 check_player = infos.turn_player;
+		chain newchain;
+		core.select_chains.clear();
+		int32 tf_count = 0, to_count = 0, fc_count = 0;
 		auto pr = effects.trigger_f_effect.equal_range(phase_event);
-		effect* peffect;
-		effect* solve_effect = 0;
-		nil_event.event_code = phase_event;
-		nil_event.event_player = infos.turn_player;
-		chain newchain;
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if(solve_effect && peffect->get_handler_player() != infos.turn_player)
+			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
-			if(!peffect->is_activateable(peffect->get_handler_player(), nil_event))
-				continue;
-			solve_effect = peffect;
-			if(peffect->get_handler_player() == infos.turn_player)
-				break;
+			peffect->id = infos.effect_id++;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			tf_count++;
 		}
-		if(solve_effect) {
-			newchain.flag = 0;
-			newchain.chain_id = infos.field_id++;
-			newchain.evt = nil_event;
-			newchain.triggering_effect = solve_effect;
-			if(solve_effect->flag & EFFECT_FLAG_FIELD_ONLY) {
-				newchain.triggering_controler = solve_effect->get_handler_player();
-				newchain.triggering_location = 0;
-				newchain.triggering_sequence = 0;
-				newchain.triggering_player = solve_effect->get_handler_player();
-			} else {
-				newchain.triggering_controler = solve_effect->handler->current.controler;
-				newchain.triggering_location = solve_effect->handler->current.location;
-				newchain.triggering_sequence = solve_effect->handler->current.sequence;
-				newchain.triggering_player = solve_effect->handler->current.controler;
-			}
-			core.new_chains.push_back(newchain);
-			solve_effect->handler->set_status(STATUS_CHAINING, TRUE);
-			core.select_chains.clear();
-			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
-			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
-			infos.priorities[0] = 0;
-			infos.priorities[1] = 0;
-			return FALSE;
-		}
-		core.units.begin()->step = 2;
-		return FALSE;
-	}
-	case 2: {
-		if(core.current_chain.size()) {
-			if(core.chain_limit) {
-				luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
-				core.chain_limit = 0;
-			}
-			chain_array::iterator cait;
-			for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
-				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
-			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, FALSE, 0);
-		}
-		core.units.begin()->step = 0;
-		return FALSE;
-	}
-	case 3: {
-		int32 phase_event = EVENT_PHASE + phase;
-		auto pr = effects.trigger_o_effect.equal_range(phase_event);
-		effect* peffect;
-		nil_event.event_code = phase_event;
-		nil_event.event_player = infos.turn_player;
-		chain newchain;
-		core.tpchain.clear();
-		core.ntpchain.clear();
+		core.spe_effect[check_player] = 0;
+		pr = effects.trigger_o_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if(!peffect->is_activateable(peffect->get_handler_player(), nil_event))
+			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
 			newchain.triggering_effect = peffect;
-			if(peffect->get_handler_player() == infos.turn_player)
-				core.tpchain.push_back(newchain);
-			else
-				core.ntpchain.push_back(newchain);
+			core.select_chains.push_back(newchain);
+			to_count++;
+			core.spe_effect[check_player]++;
 		}
-		core.spe_effect[infos.turn_player] = core.tpchain.size();
-		core.spe_effect[1 - infos.turn_player] = core.ntpchain.size();
 		if(phase == PHASE_DRAW)
 			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
 		else if(phase == PHASE_STANDBY)
@@ -1304,42 +1250,39 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if(!peffect->is_chainable(peffect->get_handler_player()) || !peffect->is_activateable(peffect->get_handler_player(), nil_event))
+			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			newchain.triggering_effect = peffect;
-			if(peffect->get_handler_player() == infos.turn_player) {
-				if(check_hint_timing(peffect))
-					core.spe_effect[infos.turn_player]++;
-				core.tpchain.push_back(newchain);
-			} else {
-				if(check_hint_timing(peffect))
-					core.spe_effect[1 - infos.turn_player]++;
-				core.ntpchain.push_back(newchain);
-			}
+			if(check_hint_timing(peffect))
+				core.spe_effect[check_player]++;
+			core.select_chains.push_back(newchain);
+			fc_count++;
 		}
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if(!peffect->is_chainable(peffect->get_handler_player()) || !peffect->is_activateable(peffect->get_handler_player(), nil_event))
+			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			newchain.triggering_effect = peffect;
-			if(peffect->get_handler_player() == infos.turn_player) {
-				core.tpchain.push_back(newchain);
-				if(check_hint_timing(peffect))
-					core.spe_effect[infos.turn_player]++;
-			} else {
-				core.ntpchain.push_back(newchain);
-				if(check_hint_timing(peffect))
-					core.spe_effect[1 - infos.turn_player]++;
-			}
+			if(check_hint_timing(peffect))
+				core.spe_effect[check_player]++;
+			core.select_chains.push_back(newchain);
+			fc_count++;
 		}
-		core.select_chains.clear();
-		if(core.tpchain.size()) {
-			for(auto clit = core.tpchain.begin(); clit != core.tpchain.end(); ++clit)
-				core.select_chains.push_back(*clit);
+		if(core.select_chains.size() == 0) {
+			core.units.begin()->step = 3;
+			return FALSE;
+		} else if(tf_count == 1 && to_count == 0 && fc_count == 0) {
+			returns.ivalue[0] = 0;
+			core.units.begin()->step = 1;
+			return FALSE;
+		} else if(tf_count == 0 && to_count == 1 && fc_count == 0) {
+			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)core.select_chains[0].triggering_effect->handler, check_player, 0);
+			return FALSE;
+		} else {
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(infos.turn_player);
+			pduel->write_buffer8(check_player);
 			if(infos.phase == PHASE_DRAW)
 				pduel->write_buffer32(20);
 			else if(infos.phase == PHASE_STANDBY)
@@ -1348,16 +1291,22 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 				pduel->write_buffer32(25);
 			else
 				pduel->write_buffer32(26);
-			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, infos.turn_player, core.spe_effect[infos.turn_player]);
+			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count ? 0x10000 : 0));
+			core.units.begin()->step = 1;
 			return FALSE;
 		}
-		core.units.begin()->step = 4;
 		return FALSE;
 	}
-	case 4: {
+	case 1: {
+		returns.ivalue[0]--;
+		return FALSE;
+	}
+	case 2: {
 		chain newchain;
-		if(returns.ivalue[0] == -1)
+		if(returns.ivalue[0] == -1) {
+			core.units.begin()->step = 3;
 			return FALSE;
+		}
 		newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
 		newchain.flag = 0;
@@ -1375,17 +1324,92 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
 		infos.priorities[0] = 0;
 		infos.priorities[1] = 0;
-		core.units.begin()->step = 1;
 		return FALSE;
 	}
-	case 5: {
+	case 3: {
+		if(core.chain_limit) {
+			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
+			core.chain_limit = 0;
+		}
+		for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
+			cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
+		add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, FALSE, 0);
+		core.units.begin()->step = -1;
+		return FALSE;
+	}
+	case 4: {
+		int32 phase_event = EVENT_PHASE + phase;
+		effect* peffect;
+		nil_event.event_code = phase_event;
+		nil_event.event_player = infos.turn_player;
+		int32 check_player = 1 - infos.turn_player;
+		chain newchain;
 		core.select_chains.clear();
-		if(core.ntpchain.size()) {
-			for(chain_list::iterator clit = core.ntpchain.begin(); clit != core.ntpchain.end(); ++clit)
-				core.select_chains.push_back(*clit);
+		int32 tf_count = 0, to_count = 0, fc_count = 0;
+		auto pr = effects.trigger_f_effect.equal_range(phase_event);
+		for(; pr.first != pr.second; ++pr.first) {
+			peffect = pr.first->second;
+			if(!peffect->is_activateable(check_player, nil_event))
+				continue;
+			peffect->id = infos.effect_id++;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			tf_count++;
+		}
+		core.spe_effect[check_player] = 0;
+		pr = effects.trigger_o_effect.equal_range(phase_event);
+		for(; pr.first != pr.second; ++pr.first) {
+			peffect = pr.first->second;
+			if(!peffect->is_activateable(check_player, nil_event))
+				continue;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			to_count++;
+			core.spe_effect[check_player]++;
+		}
+		if(phase == PHASE_DRAW)
+			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
+		else if(phase == PHASE_STANDBY)
+			core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
+		else if(phase == PHASE_BATTLE)
+			core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
+		else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
+		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+		for(; pr.first != pr.second; ++pr.first) {
+			peffect = pr.first->second;
+			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+				continue;
+			newchain.triggering_effect = peffect;
+			if(check_hint_timing(peffect))
+				core.spe_effect[check_player]++;
+			core.select_chains.push_back(newchain);
+			fc_count++;
+		}
+		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
+		for(; pr.first != pr.second; ++pr.first) {
+			peffect = pr.first->second;
+			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+				continue;
+			newchain.triggering_effect = peffect;
+			if(check_hint_timing(peffect))
+				core.spe_effect[check_player]++;
+			core.select_chains.push_back(newchain);
+			fc_count++;
+		}
+		if(core.select_chains.size() == 0) {
+			core.units.begin()->step = 6;
+			return FALSE;
+		} else if(tf_count == 1 && to_count == 0 && fc_count == 0) {
+			returns.ivalue[0] = 0;
+			core.units.begin()->step = 5;
+			return FALSE;
+		} else if(tf_count == 0 && to_count == 1 && fc_count == 0) {
+			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)core.select_chains[0].triggering_effect->handler, check_player, 0);
+			return FALSE;
+		} else {
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(1 - infos.turn_player);
+			pduel->write_buffer8(check_player);
 			if(infos.phase == PHASE_DRAW)
 				pduel->write_buffer32(20);
 			else if(infos.phase == PHASE_STANDBY)
@@ -1394,16 +1418,22 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 				pduel->write_buffer32(25);
 			else
 				pduel->write_buffer32(26);
-			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, 1 - infos.turn_player, core.spe_effect[1 - infos.turn_player]);
+			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count ? 0x10000 : 0));
+			core.units.begin()->step = 5;
 			return FALSE;
 		}
-		core.units.begin()->step = 6;
+		return FALSE;
+	}
+	case 5: {
+		returns.ivalue[0]--;
 		return FALSE;
 	}
 	case 6: {
 		chain newchain;
-		if(returns.ivalue[0] == -1)
+		if(returns.ivalue[0] == -1) {
+			core.units.begin()->step = 6;
 			return FALSE;
+		}
 		newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
 		newchain.flag = 0;
@@ -1421,17 +1451,15 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, infos.turn_player);
 		infos.priorities[0] = 0;
 		infos.priorities[1] = 0;
-		core.units.begin()->step = 1;
+		core.units.begin()->step = 2;
 		return FALSE;
 	}
 	case 7: {
 		core.hint_timing[infos.turn_player] = 0;
 		int32 phase_event = EVENT_PHASE + phase;
-		pair<effect_container::iterator, effect_container::iterator> pr;
-		pr = effects.continuous_effect.equal_range(phase_event);
+		auto pr = effects.continuous_effect.equal_range(phase_event);
 		effect_vector tp;
 		effect_vector ntp;
-		effect_vector::iterator eit;
 		effect* peffect;
 		nil_event.event_code = phase_event;
 		nil_event.event_player = infos.turn_player;
@@ -1445,11 +1473,11 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 					ntp.push_back(peffect);
 			}
 		}
-		for(eit = tp.begin(); eit != tp.end(); ++eit) {
+		for(auto eit = tp.begin(); eit != tp.end(); ++eit) {
 			core.sub_solving_event.push_back(nil_event);
 			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, (*eit), 0, (*eit)->get_handler_player(), 0);
 		}
-		for(eit = ntp.begin(); eit != ntp.end(); ++eit) {
+		for(auto eit = ntp.begin(); eit != ntp.end(); ++eit) {
 			core.sub_solving_event.push_back(nil_event);
 			add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, (*eit), 0, (*eit)->get_handler_player(), 0);
 		}
@@ -1741,8 +1769,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			core.chain_limit = 0;
 		}
 		if(core.current_chain.size()) {
-			chain_array::iterator cait;
-			for(cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
+			for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
 			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_new, 0);
 		} else {
@@ -2560,6 +2587,14 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 6: {
 		if(returns.ivalue[0] == -1) {
+			//roolback
+			if(core.units.begin()->arg1) {
+				core.attacker->announce_count++;
+				if(core.attack_target)
+					core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
+				else
+					core.attacker->announced_cards[0] = 0;
+			}
 			core.units.begin()->step = -1;
 			return FALSE;
 		}
@@ -2761,7 +2796,6 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 11: {
 		if(returns.ivalue[0]) {
-			core.attack_cancelable = FALSE;
 			core.units.begin()->arg1 = TRUE;
 			core.units.begin()->step = 3;
 			return FALSE;
@@ -3893,6 +3927,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		pduel->write_buffer8(MSG_CHAIN_SOLVED);
 		pduel->write_buffer8(cait->chain_count);
 		raise_event((card*)0, EVENT_CHAIN_SOLVED, cait->triggering_effect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
+		adjust_instant();
 		process_instant_event();
 		core.units.begin()->step = 9;
 		return FALSE;

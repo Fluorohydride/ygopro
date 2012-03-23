@@ -265,13 +265,14 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 		return TRUE;
 	}
 }
-int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count) {
+int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 forced) {
 	if(step == 0) {
 		returns.ivalue[0] = -1;
 		pduel->write_buffer8(MSG_SELECT_CHAIN);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(core.select_chains.size());
 		pduel->write_buffer8(spe_count);
+		pduel->write_buffer8(forced);
 		pduel->write_buffer32(pduel->game_field->core.hint_timing[playerid]);
 		pduel->write_buffer32(pduel->game_field->core.hint_timing[1 - playerid]);
 		std::sort(core.select_chains.begin(), core.select_chains.end(), chain::chain_operation_sort);
@@ -286,7 +287,7 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count) {
 		}
 		return FALSE;
 	} else {
-		if(returns.ivalue[0] > 0 && returns.ivalue[0] >= (int32)core.select_chains.size()) {
+		if((returns.ivalue[0] < 0 && forced) || returns.ivalue[0] >= (int32)core.select_chains.size()) {
 			pduel->write_buffer8(MSG_RETRY);
 			return FALSE;
 		}

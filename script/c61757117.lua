@@ -24,7 +24,7 @@ end
 function c61757117.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_RITUAL
 end
-function c61757117.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c61757117.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsFaceup() end
 	if chk==0 then return true end
 	local c=e:GetHandler()
@@ -36,6 +36,7 @@ function c61757117.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=g:GetFirst()
 	local c=e:GetHandler()
+	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	while tc do
 		if tc:IsFaceup() and tc:IsRelateToEffect(e) then c:SetCardTarget(tc) end
 		tc=g:GetNext()

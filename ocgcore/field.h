@@ -451,7 +451,7 @@ public:
 	int32 select_yes_no(uint16 step, uint8 playerid, uint32 description);
 	int32 select_option(uint16 step, uint8 playerid);
 	int32 select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 min, uint8 max);
-	int32 select_chain(uint16 step, uint8 playerid, uint8 spe_count);
+	int32 select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 forced);
 	int32 select_place(uint16 step, uint8 playerid, uint32 flag, uint8 count);
 	int32 select_position(uint16 step, uint8 playerid, uint32 code, uint8 positions);
 	int32 select_tribute(uint16 step, uint8 playerid, uint8 cancelable, uint8 min, uint8 max);

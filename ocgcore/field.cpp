@@ -16,7 +16,7 @@
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 
 bool chain::chain_operation_sort(chain c1, chain c2) {
-	return c1.triggering_effect->id < c2.triggering_effect->id;
+	return c1.triggering_effect->id > c2.triggering_effect->id;
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
@@ -392,13 +392,21 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint32* list) {
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return 0;
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
-	if (location == LOCATION_MZONE)
+	effect_set eset;
+	if (location == LOCATION_MZONE) {
 		flag = (flag & 0x1f);
-	else
+		filter_player_effect(playerid, EFFECT_MAX_MZONE, &eset);
+	} else {
 		flag = (flag & 0x1f00) >> 8;
+		filter_player_effect(playerid, EFFECT_MAX_SZONE, &eset);
+	}
 	if(list)
 		*list = flag;
-	return 5 - field_used_count[flag];
+	int32 max = 5;
+	if(eset.count)
+		max = eset.get_last()->get_value();
+	int32 ret = max - field_used_count[flag];
+	return ret > 0 ? ret : 0;
 }
 void field::shuffle(uint8 playerid, uint8 location) {
 	if(!(location & (LOCATION_HAND + LOCATION_DECK)))

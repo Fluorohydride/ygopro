@@ -1154,6 +1154,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case MSG_SELECT_CHAIN: {
+				if(chain_forced)
+					break;
 				if(mainGame->wCardSelect->isVisible()) {
 					mainGame->HideElement(mainGame->wCardSelect);
 					break;

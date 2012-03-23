@@ -26,5 +26,5 @@ function c58601383.ffilter(c)
 	return c:IsType(TYPE_SYNCHRO) and not c:IsType(TYPE_EFFECT)
 end
 function c58601383.efilter(e,re)
-	return re:GetOwner():IsType(TYPE_EFFECT)
+	return re:IsActiveType(TYPE_EFFECT)
 end

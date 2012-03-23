@@ -19,13 +19,16 @@ function c8903700.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c8903700.operation(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
-	--cannot special summon
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetAbsoluteRange(rp,0,1)
-	rc:RegisterEffect(e1)
+	if rc:GetFlagEffect(8903700)==0 then
+		--cannot special summon
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetAbsoluteRange(rp,0,1)
+		rc:RegisterEffect(e1)
+		rc:RegisterFlagEffect(8903700,RESET_EVENT+0x1fe0000,0,1)
+	end
 end

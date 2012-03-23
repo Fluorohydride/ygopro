@@ -63,6 +63,7 @@ public:
 	bool remove_act;
 	bool deck_act;
 	bool extra_act;
+	bool chain_forced;
 	ChainInfo current_chain;
 	bool last_chain;
 	bool deck_reversed;
