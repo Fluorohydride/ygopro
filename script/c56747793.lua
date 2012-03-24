@@ -22,6 +22,7 @@ function c56747793.initial_effect(c)
 	c:RegisterEffect(e3)
 	--Equip limit
 	local e4=Effect.CreateEffect(c)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_EQUIP_LIMIT)
 	e4:SetValue(1)

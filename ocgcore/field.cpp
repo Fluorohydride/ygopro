@@ -411,15 +411,24 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint32* list) {
 void field::shuffle(uint8 playerid, uint8 location) {
 	if(!(location & (LOCATION_HAND + LOCATION_DECK)))
 		return;
-	card* t;
 	card_vector& svector = (location == LOCATION_HAND) ? player[playerid].list_hand : player[playerid].list_main;
 	if(svector.size() == 0)
 		return;
+	if(location == LOCATION_HAND) {
+		bool shuffle = false;
+		for(auto cit = svector.begin(); cit != svector.end(); ++cit)
+			if(!(*cit)->is_status(STATUS_IS_PUBLIC))
+				shuffle = true;
+		if(!shuffle) {
+			core.shuffle_hand_check[playerid] = FALSE;
+			return;
+		}
+	}
 	if(svector.size() > 1) {
 		uint32 i = 0, s = svector.size(), r;
 		for(i = 0; i < s - 1; ++i) {
 			r = pduel->get_next_integer(i, s - 1);
-			t = svector[i];
+			card* t = svector[i];
 			svector[i] = svector[r];
 			svector[r] = t;
 		}
@@ -429,7 +438,7 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(MSG_SHUFFLE_HAND);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(player[playerid].list_hand.size());
-		for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
+		for(auto cit = svector.begin(); cit != svector.end(); ++cit)
 			pduel->write_buffer32((*cit)->data.code);
 		core.shuffle_hand_check[playerid] = FALSE;
 	} else {
@@ -440,7 +449,7 @@ void field::shuffle(uint8 playerid, uint8 location) {
 			pduel->write_buffer8(MSG_DECK_TOP);
 			pduel->write_buffer8(playerid);
 			pduel->write_buffer8(0);
-			pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+			pduel->write_buffer32((*svector.rbegin())->data.code);
 		}
 	}
 }

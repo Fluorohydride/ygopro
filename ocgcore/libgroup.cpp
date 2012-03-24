@@ -261,8 +261,7 @@ int32 scriptlib::group_is_exists(lua_State *L) {
 	uint32 extraargs = lua_gettop(L) - 4;
 	uint32 fcount = 0;
 	uint32 result = FALSE;
-	group::card_set::iterator it;
-	for (it = pgroup->container.begin(); it != pgroup->container.end(); ++it) {
+	for (auto it = pgroup->container.begin(); it != pgroup->container.end(); ++it) {
 		if((*it) != pcard && pduel->lua->check_matching(*it, 2, extraargs)) {
 			fcount++;
 			if(fcount >= count) {
@@ -285,9 +284,8 @@ int32 scriptlib::group_check_with_sum_equal(lua_State *L) {
 	if(min == 0)
 		min = 1;
 	int32 extraargs = lua_gettop(L) - 4;
-	field::card_set::iterator cit;
 	field::card_vector cv;
-	for(cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 		(*cit)->operation_param = pduel->lua->get_operation_value(*cit, 2, extraargs);
 		cv.push_back(*cit);
 	}
