@@ -533,12 +533,23 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	switch(mainGame->dInfo.curMsg) {
 	case MSG_RETRY: {
 		mainGame->gMutex.Lock();
-		mainGame->stACMessage->setText(L"Error occurs.");
-		mainGame->PopupElement(mainGame->wACMessage, 100);
+		mainGame->stMessage->setText(L"Error occurs.");
+		mainGame->PopupElement(mainGame->wMessage);
 		mainGame->gMutex.Unlock();
-		mainGame->WaitFrameSignal(120);
-		if(!mainGame->dInfo.isReplay)
-			mainGame->dInfo.isStarted = false;
+		mainGame->actionSignal.Reset();
+		mainGame->actionSignal.Wait();
+		mainGame->gMutex.Lock();
+		mainGame->CloseDuelWindow();
+		mainGame->dInfo.isStarted = false;
+		mainGame->btnCreateHost->setEnabled(true);
+		mainGame->btnJoinHost->setEnabled(true);
+		mainGame->btnJoinCancel->setEnabled(true);
+		mainGame->device->setEventReceiver(&mainGame->menuHandler);
+		mainGame->ShowElement(mainGame->wLanWindow);
+		mainGame->gMutex.Unlock();
+		event_base_loopbreak(client_base);
+		if(exit_on_return)
+			mainGame->device->closeDevice();
 		return false;
 	}
 	case MSG_HINT: {
@@ -990,7 +1001,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			if (pcard->location == LOCATION_REMOVED)
 				mainGame->dField.remove_act = true;
 		}
-		if(mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain)) {
+		if(!forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain))) {
 			SetResponseI(-1);
 			mainGame->dField.ClearChainSelect();
 			if(mainGame->chkWaitChain->isChecked()) {
