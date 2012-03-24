@@ -115,6 +115,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostSingle);
 				mainGame->ShowElement(mainGame->wLanWindow);
+				if(exit_on_return)
+					mainGame->device->closeDevice();
 				break;
 			}
 			case BUTTON_REPLAY_MODE: {

@@ -432,6 +432,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->ShowElement(mainGame->wLanWindow);
 		mainGame->gMutex.Unlock();
 		event_base_loopbreak(client_base);
+		if(exit_on_return)
+			mainGame->device->closeDevice();
 		break;
 	}
 	case STOC_REPLAY: {
