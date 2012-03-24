@@ -83,7 +83,7 @@ bool Game::Initialize() {
 	ebJoinPort = env->addEditBox(gameConf.lastport, rect<s32>(260, 355, 320, 380), true, wLanWindow);
 	ebJoinPort->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1222), rect<s32>(10, 390, 220, 410), false, false, wLanWindow);
-	ebJoinPass = env->addEditBox(L"", rect<s32>(110, 385, 250, 410), true, wLanWindow);
+	ebJoinPass = env->addEditBox(gameConf.roompass, rect<s32>(110, 385, 250, 410), true, wLanWindow);
 	ebJoinPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
@@ -643,6 +643,7 @@ void Game::LoadConfig() {
 	gameConf.textfont[0] = 0;
 	gameConf.lastip[0] = 0;
 	gameConf.lastport[0] = 0;
+	gameConf.roompass[0] = 0;
 	fseek(fp, 0, SEEK_END);
 	size_t fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
@@ -675,6 +676,9 @@ void Game::LoadConfig() {
 		} else if(!strcmp(strbuf, "lastport")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.lastport, 20);
+		} else if(!strcmp(strbuf, "roompass")) {
+			BufferIO::DecodeUTF8(valbuf, wstr);
+			BufferIO::CopyWStr(wstr, gameConf.roompass, 20);
 		}
 	}
 	fclose(fp);

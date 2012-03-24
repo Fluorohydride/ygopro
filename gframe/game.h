@@ -22,6 +22,7 @@ struct Config {
 	wchar_t lastdeck[64];
 	wchar_t textfont[256];
 	wchar_t numfont[256];
+	wchar_t roompass[20];
 };
 
 struct DuelInfo {
@@ -82,10 +83,10 @@ public:
 	void ShowCardInfo(int code);
 	void ClearTextures();
 	void CloseDuelWindow();
-	
+
 	int LocalPlayer(int player);
 	const wchar_t* LocalName(int local_player);
-	
+
 	Mutex gMutex;
 	Mutex gBuffer;
 	Signal frameSignal;
@@ -93,7 +94,7 @@ public:
 	Signal replaySignal;
 	Config gameConf;
 	DuelInfo dInfo;
-	
+
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
 	unsigned short linePattern;
@@ -119,7 +120,7 @@ public:
 
 	bool is_building;
 	bool is_siding;
-	
+
 	ClientField dField;
 	DeckBuilder deckBuilder;
 	MenuHandler menuHandler;
