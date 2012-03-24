@@ -36,7 +36,7 @@ public:
 	std::set<group*> groups;
 	std::set<group*> sgroups;
 	std::set<effect*> effects;
-
+	std::set<effect*> uncopy;
 	duel();
 	~duel();
 

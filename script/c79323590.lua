@@ -22,6 +22,7 @@ function c79323590.initial_effect(c)
 	e3:SetCode(EFFECT_SUMMON_COST)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_HAND,LOCATION_HAND)
+	e3:SetCondition(c79323590.costcon)
 	e3:SetCost(c79323590.costchk)
 	e3:SetOperation(c79323590.costop)
 	c:RegisterEffect(e3)
@@ -47,8 +48,11 @@ end
 function c79323590.actarget(e,te,tp)
 	return te:GetHandler():IsLocation(LOCATION_HAND)
 end
-function c79323590.costchk(e,te_or_c,tp)
+function c79323590.costcon(e)
 	c79323590[0]=false
+	return true
+end
+function c79323590.costchk(e,te_or_c,tp)
 	return Duel.CheckLPCost(tp,500)
 end
 function c79323590.costop(e,tp,eg,ep,ev,re,r,rp)

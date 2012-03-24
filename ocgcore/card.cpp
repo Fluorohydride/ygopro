@@ -707,7 +707,7 @@ void card::enable_field_effect(int32 enabled) {
 int32 card::add_effect(effect* peffect) {
 	effect_container::iterator it, rm;
 	if (get_status(STATUS_COPYING_EFFECT) && (peffect->flag & EFFECT_FLAG_UNCOPYABLE)) {
-		pduel->delete_effect(peffect);
+		pduel->uncopy.insert(peffect);
 		return 0;
 	}
 	if (indexer.find(peffect) != indexer.end())
@@ -863,6 +863,9 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	set_status(STATUS_COPYING_EFFECT, FALSE);
 	pduel->game_field->core.copy_reset = cr;
 	pduel->game_field->core.copy_reset_count = crc;
+	for(auto eit = pduel->uncopy.begin(); eit != pduel->uncopy.end(); ++eit)
+		pduel->delete_effect(*eit);
+	pduel->uncopy.clear();
 	return pduel->game_field->infos.copy_id - 1;
 }
 void card::reset(uint32 id, uint32 reset_type) {
