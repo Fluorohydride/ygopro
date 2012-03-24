@@ -46,12 +46,13 @@ function c20686759.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c20686759.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ec=c:GetPreviousEquipTarget()
+	local ec=c:GetEquipTarget()
 	return c:IsReason(REASON_LOST_TARGET) and ec and ec:IsReason(REASON_DESTROY)
 end
 function c20686759.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local dam=e:GetHandler():GetPreviousEquipTarget():GetBaseAttack()
+	if dam<0 then dam=0 end
 	e:SetLabel(dam)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,dam)
 end

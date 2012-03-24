@@ -22,7 +22,7 @@ function c53610653.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetValue(c53610653.eqlimit)
 	c:RegisterEffect(e3)
-	--draw
+	--spsummon
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(53610653,0))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)

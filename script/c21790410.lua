@@ -59,8 +59,7 @@ function c21790410.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c21790410.cfilter(c,ec,tp)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp)
-		and c:IsHasCardTarget(ec) and c:GetPreviousEquipTarget()==ec
+	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp) and c:GetEquipTarget()==ec
 end
 function c21790410.shcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c21790410.cfilter,1,nil,e:GetHandler(),tp)

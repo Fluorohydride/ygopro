@@ -63,8 +63,7 @@ function c43366227.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c43366227.cfilter(c,ec,tp)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp)
-		and c:IsHasCardTarget(ec) and c:GetPreviousEquipTarget()==ec
+	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp) and c:GetEquipTarget()==ec
 end
 function c43366227.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c43366227.cfilter,1,nil,e:GetHandler(),tp)
