@@ -1618,8 +1618,13 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				pcard->chValue = 0;
 				if((pl & LOCATION_ONFIELD) && (cl != pl))
 					pcard->counters.clear();
-				if(cl != pl)
+				if(cl != pl) {
 					pcard->ClearTarget();
+					if(pcard->equipTarget) {
+						pcard->equipTarget->equipped.erase(pcard);
+						pcard->equipTarget = 0;
+					}
+				}
 				pcard->is_showequip = false;
 				pcard->is_showtarget = false;
 				mainGame->gMutex.Lock();
