@@ -711,6 +711,7 @@ void Game::ShowCardInfo(int code) {
 	wchar_t formatBuffer[256];
 	dataManager.GetData(code, &cd);
 	imgCard->setImage(imageManager.GetTexture(code));
+	imgCard->setScaleImage(true); //I don't know weather check size or not will be faster; if Irrlicht don't check size internal and cause slow, check size like Game::DrawThumb()
 	if(cd.alias != 0 && (cd.alias - code < 10 || code - cd.alias < 10))
 		myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(cd.alias), cd.alias);
 	else myswprintf(formatBuffer, L"%ls[%08d]", dataManager.GetName(code), code);
