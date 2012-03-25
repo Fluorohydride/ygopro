@@ -35,6 +35,7 @@ int main(int argc, char* argv[]) {
             if(!strcmp(argv[1], "-j")){
                 event.GUIEvent.Caller = ygo::mainGame->btnLanMode;
                 ygo::mainGame->device->postEventFromUser(event);
+                //TODO: wait for wLanWindow show. if network connection faster than wLanWindow, wLanWindow will still show on duel scene.
                 event.GUIEvent.Caller = ygo::mainGame->btnJoinHost;
                 ygo::mainGame->device->postEventFromUser(event);
             }else if(!strcmp(argv[1], "-d")){
@@ -45,6 +46,7 @@ int main(int argc, char* argv[]) {
                 ygo::mainGame->device->postEventFromUser(event);
                 ygo::mainGame->lstReplayList->setSelected(0);
                 event.GUIEvent.Caller = ygo::mainGame->btnLoadReplay;
+                ygo::mainGame->device->postEventFromUser(event);
             }
         }
 	ygo::mainGame->MainLoop();

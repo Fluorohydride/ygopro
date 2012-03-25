@@ -703,11 +703,21 @@ void Game::WaitFrameSignal(int frame) {
 	frameSignal.Wait();
 }
 void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, int>* lflist) {
+    const int width = 44; //standard pic size, maybe it should be defined in game.h
+    const int height = 64;
 	int code = cp->first;
 	int lcode = cp->second.alias;
 	if(lcode == 0)
 		lcode = code;
-	driver->draw2DImage(imageManager.GetTextureThumb(code), pos);
+    irr::video::ITexture* img = imageManager.GetTextureThumb(code);
+    if(img == NULL)
+        return; //NULL->getSize() will cause a crash
+    dimension2d<u32> size = img->getSize();
+    if(size.Width == width and size.Height == height)
+        driver->draw2DImage(img, pos);
+    else
+        driver->draw2DImage(img, rect<s32>(pos.X, pos.Y,pos.X+width,pos.Y+height), rect<s32>(0,0,size.Width,size.Height));
+
 	if(lflist->count(lcode)) {
 		switch((*lflist)[lcode]) {
 		case 0:
