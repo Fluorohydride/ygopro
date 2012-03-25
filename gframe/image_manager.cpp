@@ -42,7 +42,7 @@ void ImageManager::ClearTexture() {
 }
 void ImageManager::RemoveTexture(int code) {
 	auto tit = tMap.find(code);
-	if(tit != tMap.end()) {
+	if(tit != tMap.end() and tThumb.find(code)->second != tit->second) { //if member of tThumb point to this; don't remove
 		if(tit->second)
 			driver->removeTexture(tit->second);
 		tMap.erase(tit);
@@ -54,8 +54,14 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 	auto tit = tMap.find(code);
 	if(tit == tMap.end()) {
 		char file[256];
-		sprintf(file, "pics/%d.jpg", code);
+		sprintf(file, "pics/%d.jpg", code); //suggest that define the path in game.h
 		irr::video::ITexture* img = driver->getTexture(file);
+		if(img == NULL){
+		    sprintf(file, "pics/thumbnail/%d.jpg", code);
+		    img = driver->getTexture(file);
+            if(img)
+		        tThumb[code] = img;
+		}
 		tMap[code] = img;
 		return img;
 	}
@@ -66,15 +72,24 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 }
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
-		return 0;
+		return tUnknown;
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		char file[32];
 		sprintf(file, "pics/thumbnail/%d.jpg", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		if(img == NULL){
+		    sprintf(file, "pics/%d.jpg", code);
+		    img = driver->getTexture(file);
+		    if(img)
+		        tMap[code] = img;
+		}
 		tThumb[code] = img;
 		return img;
 	}
-	return tit->second;
+    if(tit->second)
+		return tit->second;
+	else
+		return tUnknown;
 }
 }
