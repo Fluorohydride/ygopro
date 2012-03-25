@@ -897,7 +897,7 @@ int32 scriptlib::card_is_relate_to_battle(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = pcard->pduel;
-	if(pcard->fieldid_r == pduel->game_field->core.pre_field[0] || pcard->fieldid == pduel->game_field->core.pre_field[1])
+	if(pcard->fieldid_r == pduel->game_field->core.pre_field[0] || pcard->fieldid_r == pduel->game_field->core.pre_field[1])
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);

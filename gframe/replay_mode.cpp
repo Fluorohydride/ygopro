@@ -135,7 +135,12 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
-			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			mainGame->gMutex.Lock();
+			mainGame->stMessage->setText(L"Error occurs.");
+			mainGame->PopupElement(mainGame->wMessage);
+			mainGame->gMutex.Unlock();
+			mainGame->actionSignal.Reset();
+			mainGame->actionSignal.Wait();
 			return false;
 		}
 		case MSG_HINT: {

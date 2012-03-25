@@ -1996,8 +1996,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		for (int i = 0; i < count; ++i) {
 			int code = BufferIO::ReadInt32(pbuf);
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
-			if(code)
-				pcard->SetCode(code);
+			pcard->SetCode(code);
 		}
 		for (int i = 0; i < count; ++i) {
 			mainGame->gMutex.Lock();

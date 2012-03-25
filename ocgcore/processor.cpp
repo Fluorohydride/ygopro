@@ -2804,7 +2804,6 @@ int32 field::process_battle_command(uint16 step) {
 		reset_phase(PHASE_DAMAGE);
 		adjust_instant();
 		adjust_all();
-		core.units.begin()->step = 19;
 		return FALSE;
 	}
 	case 20: {
