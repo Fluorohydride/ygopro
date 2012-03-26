@@ -62,7 +62,8 @@ function c18096222.eqlimit(e,c)
 	return c:GetControler()==e:GetOwnerPlayer() and c:IsType(TYPE_DUAL)
 end
 function c18096222.dacon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():GetEquipTarget()~=nil
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_DESTROY)
+		and e:GetHandler():GetEquipTarget()~=nil
 end
 function c18096222.dafilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_DUAL) and not c:IsDualState()

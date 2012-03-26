@@ -1235,6 +1235,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
+			peffect->id = infos.effect_id++;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			to_count++;
@@ -1252,6 +1253,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
+			peffect->id = infos.effect_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -1263,6 +1265,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
+			peffect->id = infos.effect_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -1362,6 +1365,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
+			peffect->id = infos.effect_id++;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			to_count++;
@@ -1379,6 +1383,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
+			peffect->id = infos.effect_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -1390,6 +1395,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
+			peffect->id = infos.effect_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
