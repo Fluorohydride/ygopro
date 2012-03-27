@@ -9,15 +9,14 @@ function c49389523.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetCode(EVENT_DESTROY)
+	e1:SetCode(EVENT_DESTROYED)
 	e1:SetCondition(c49389523.spcon)
 	e1:SetTarget(c49389523.sptg)
 	e1:SetOperation(c49389523.spop)
 	c:RegisterEffect(e1)
 end
 function c49389523.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetOwner()==c:GetControler() and rp~=tp
+	return rp~=tp and e:GetHandler():GetPreviousControler()==tp
 end
 function c49389523.filter(c,e,tp)
 	local code=c:GetCode()

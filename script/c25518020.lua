@@ -17,6 +17,7 @@ function c25518020.initial_effect(c)
 	--add counter
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_DESTROY)
 	e3:SetCondition(c25518020.ctcon)

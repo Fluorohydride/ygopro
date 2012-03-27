@@ -14,5 +14,5 @@ function c38033123.val(e,c)
 end
 function c38033123.filter(c)
 	local code=c:GetCode()
-	return code==46986414 or code==40737112
+	return code==46986414 or code==30208479
 end

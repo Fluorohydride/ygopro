@@ -368,6 +368,7 @@ extern Game* mainGame;
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
+#define EDITBOX_CHAT				140
 #define BUTTON_MSG_OK				200
 #define BUTTON_YES					201
 #define BUTTON_NO					202

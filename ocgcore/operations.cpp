@@ -2410,7 +2410,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 	}
 	case 5: {
 		uint8 nloc;
-		card_set tohand, todeck, tograve, remove, released;
+		card_set tohand, todeck, tograve, remove, released, destroyed;
 		card_set equipings, overlays;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			card* pcard = *cit;
@@ -2451,6 +2451,10 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				released.insert(pcard);
 				raise_single_event(pcard, 0, EVENT_RELEASE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 			}
+			if(pcard->current.reason & REASON_DESTROY) {
+				destroyed.insert(pcard);
+				raise_single_event(pcard, 0, EVENT_DESTROYED, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+			}
 			if(pcard->xyz_materials.size()) {
 				for(auto clit = pcard->xyz_materials.begin(); clit != pcard->xyz_materials.end(); ++clit)
 					overlays.insert(*clit);
@@ -2466,6 +2470,8 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			raise_event(&remove, EVENT_REMOVE, reason_effect, reason, reason_player, 0, 0);
 		if(released.size())
 			raise_event(&released, EVENT_RELEASE, reason_effect, reason, reason_player, 0, 0);
+		if(destroyed.size())
+			raise_event(&released, EVENT_DESTROYED, reason_effect, reason, reason_player, 0, 0);
 		process_single_event();
 		process_instant_event();
 		if(equipings.size())

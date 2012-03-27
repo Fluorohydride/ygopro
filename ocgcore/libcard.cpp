@@ -1433,7 +1433,9 @@ int32 scriptlib::card_add_counter(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 countertype = lua_tointeger(L, 2);
 	uint32 count = lua_tointeger(L, 3);
-	lua_pushboolean(L, pcard->add_counter(countertype, count));
+	if(pcard->is_affect_by_effect(pcard->pduel->game_field->core.reason_effect))
+		lua_pushboolean(L, pcard->add_counter(countertype, count));
+	else lua_pushboolean(L, 0);
 	return 1;
 }
 int32 scriptlib::card_remove_counter(lua_State *L) {

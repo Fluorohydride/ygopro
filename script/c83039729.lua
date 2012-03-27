@@ -14,7 +14,7 @@ function c83039729.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCondition(c83039729.thcon)
 	e2:SetTarget(c83039729.thtg)
 	e2:SetOperation(c83039729.thop)
@@ -51,7 +51,7 @@ function c83039729.spcon(e,c)
 end
 function c83039729.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:GetOwner()==c:GetControler() and bit.band(r,REASON_EFFECT)>0 and rp~=tp and rp~=PLAYER_NONE
+	return not c:IsReason(REASON_BATTLE) and rp==1-tp and c:GetPreviousControler()==tp
 end
 function c83039729.filter(c)
 	return c:IsSetCard(0x3d) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

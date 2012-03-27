@@ -24,24 +24,17 @@ function c69243953.initial_effect(c)
 	c:RegisterEffect(e3)
 	--tohand
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_DESTROY)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetOperation(c69243953.checkeq)
+	e4:SetDescription(aux.Stringid(69243953,0))
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e4:SetCategory(CATEGORY_TOHAND)
+	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCondition(c69243953.retcon)
+	e4:SetTarget(c69243953.rettg)
+	e4:SetOperation(c69243953.retop)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCategory(CATEGORY_TOHAND)
-	e5:SetDescription(aux.Stringid(69243953,0))
-	e5:SetCode(EVENT_TO_GRAVE)
-	e5:SetCondition(c69243953.retcon)
-	e5:SetTarget(c69243953.rettg)
-	e5:SetOperation(c69243953.retop)
-	e5:SetLabelObject(e4)
-	c:RegisterEffect(e5)
 end
 function c69243953.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:IsFaceup() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
@@ -61,7 +54,7 @@ function c69243953.checkeq(e,tp,eg,ep,ev,re,r,rp)
 end
 function c69243953.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_SZONE) and c:IsReason(REASON_DESTROY) and e:GetLabelObject():GetLabel()==1
+	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_DESTROY) and c:GetEquipTarget()~=nil
 end
 function c69243953.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end

@@ -38,7 +38,7 @@ function c61257789.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetCode(EVENT_DESTROY)
+	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetCondition(c61257789.spcon)
 	e4:SetTarget(c61257789.sptg)
 	e4:SetOperation(c61257789.spop)
@@ -77,7 +77,7 @@ function c61257789.sumop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c61257789.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsOnField()
+	return e:GetHandler():IsReason(REASON_DESTROY)
 end
 function c61257789.spfilter(c,e,tp)
 	return c:IsCode(44508094) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

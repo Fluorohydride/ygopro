@@ -47,7 +47,7 @@ function c131182.initial_effect(c)
 	e7:SetCategory(CATEGORY_DESTROY)
 	e7:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e7:SetCode(EVENT_DESTROY)
+	e7:SetCode(EVENT_DESTROYED)
 	e7:SetCondition(c131182.descon)
 	e7:SetTarget(c131182.destg)
 	e7:SetOperation(c131182.desop)
@@ -82,7 +82,7 @@ function c131182.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c131182.descon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_EFFECT) and re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP)
+	return not bit.band(r,REASON_BATTLE) and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 function c131182.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDestructable() end

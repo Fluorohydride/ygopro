@@ -61,7 +61,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 			img = driver->getTexture(file);
 		}
 		if(img == NULL) {
-			tMap[code] = tUnknown;
+			tMap[code] = NULL;
 			return tUnknown;
 		} else {
 			tMap[code] = img;
@@ -86,7 +86,7 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 			img = driver->getTexture(file);
 		}
 		if(img == NULL) {
-			tThumb[code] = tUnknown;
+			tThumb[code] = NULL;
 			return tUnknown;
 		} else {
 			tThumb[code] = img;

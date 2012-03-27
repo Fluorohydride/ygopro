@@ -36,5 +36,6 @@ function c35059553.value(e)
 end
 function c35059553.condition(e)
 	local tp=e:GetHandlerPlayer()
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<=Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
+	local ct=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)
+	return ct~=0 and ct<=Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
 end

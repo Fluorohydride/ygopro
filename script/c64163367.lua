@@ -16,7 +16,7 @@ function c64163367.initial_effect(c)
 	e2:SetDescription(aux.Stringid(64163367,0))
 	e2:SetCategory(CATEGORY_COUNTER)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_LEAVE_FIELD)
 	e2:SetCondition(c64163367.ctcon2)
 	e2:SetOperation(c64163367.ctop2)
 	c:RegisterEffect(e2)
@@ -27,7 +27,7 @@ end
 function c64163367.ctcon2(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetHandler():GetCounter(0xe)
 	e:SetLabel(ct)
-	return ct>0
+	return e:GetHandler():IsReason(REASON_DESTROY) and ct>0
 end
 function c64163367.ctop2(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()

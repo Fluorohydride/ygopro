@@ -35,7 +35,7 @@ function c79229522.spfilter1(c,tp)
 		and Duel.IsExistingMatchingCard(c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,tp)
 end
 function c79229522.spfilter2(c,tp)
-	return c:IsRace(RACE_MACHINE) and c:IsCanBeFusionMaterial() and (c:IsControler(tp) or c:IsFaceup())
+	return c:IsRace(RACE_MACHINE) and c:IsAbleToGraveAsCost() and c:IsCanBeFusionMaterial() and (c:IsControler(tp) or c:IsFaceup())
 end
 function c79229522.sprcon(e,c)
 	if c==nil then return true end 

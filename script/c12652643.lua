@@ -27,20 +27,10 @@ function c12652643.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetCode(EVENT_DESTROY)
-	e4:SetCondition(c12652643.spcon)
+	e4:SetCode(EVENT_DESTROYED)
 	e4:SetTarget(c12652643.sptg)
 	e4:SetOperation(c12652643.spop)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(12652643,0))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e5:SetCode(EVENT_BATTLE_DESTROYED)
-	e5:SetTarget(c12652643.sptg)
-	e5:SetOperation(c12652643.spop)
-	c:RegisterEffect(e5)
 end
 c12652643.material_count=1
 c12652643.material={83104731}
@@ -62,9 +52,6 @@ function c12652643.aclimit(e,re,tp)
 end
 function c12652643.spfilter(c,e,tp)
 	return c:IsCode(83104731) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
-end
-function c12652643.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_EFFECT)
 end
 function c12652643.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c12652643.spfilter(chkc,e,tp) end

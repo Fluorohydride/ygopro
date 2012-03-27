@@ -11,9 +11,6 @@ function c25262697.initial_effect(c)
 	e1:SetOperation(c25262697.posop)
 	c:RegisterEffect(e1)
 end
-function c25262697.costfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x2e)
-end
 function c25262697.poscon(e,tp,eg,ep,ev,re,r,rp,chk)
 	return Duel.GetEnvironment()==47355498
 end

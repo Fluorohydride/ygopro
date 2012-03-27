@@ -8,15 +8,14 @@ function c13995824.initial_effect(c)
 	e1:SetDescription(aux.Stringid(13995824,0))
 	e1:SetCategory(CATEGORY_DECKDES)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_DESTROY)
+	e1:SetCode(EVENT_DESTROYED)
 	e1:SetCondition(c13995824.ddcon)
 	e1:SetTarget(c13995824.ddtg)
 	e1:SetOperation(c13995824.ddop)
 	c:RegisterEffect(e1)
 end
 function c13995824.ddcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetOwner()==c:GetControler() and rp~=tp
+	return rp~=tp and e:GetHandler():GetPreviousControler()==tp
 end
 function c13995824.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

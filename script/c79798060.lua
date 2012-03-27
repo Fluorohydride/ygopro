@@ -38,7 +38,7 @@ function c79798060.initial_effect(c)
 	e7:SetDescription(aux.Stringid(79798060,0))
 	e7:SetCategory(CATEGORY_DESTROY)
 	e7:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e7:SetCode(EVENT_DESTROY)
+	e7:SetCode(EVENT_DESTROYED)
 	e7:SetCondition(c79798060.descon)
 	e7:SetTarget(c79798060.destg)
 	e7:SetOperation(c79798060.desop)
@@ -64,7 +64,7 @@ function c79798060.sdcon(e)
 end
 function c79798060.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return (not c:IsOnField() or c:IsFaceup()) and (not re or re:GetHandler()~=c)
+	return not c:IsReason(REASON_BATTLE) and re and re:GetHandler()~=c
 end
 function c79798060.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

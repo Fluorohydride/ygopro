@@ -207,6 +207,9 @@ bool Game::Initialize() {
 	chkAutoChain = env->addCheckBox(false, rect<s32>(20, 80, 280, 105), tabSystem, -1, dataManager.GetSysString(1276));
 	chkAutoChain->setChecked(true);
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
+	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
+	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
+	chkIgnore2->setChecked(true);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -434,6 +437,13 @@ bool Game::Initialize() {
 	btnReplayStep = env->addButton(rect<s32>(5, 55, 85, 75), wReplayControl, BUTTON_REPLAY_STEP, dataManager.GetSysString(1345));
 	btnReplaySwap = env->addButton(rect<s32>(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnReplayExit = env->addButton(rect<s32>(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
+	//chat
+	wChat = env->addWindow(rect<s32>(305, 615, 1020, 640), false, L"");
+	wChat->getCloseButton()->setVisible(false);
+	wChat->setDraggable(false);
+//	wChat->setDrawBackground(false);
+	wChat->setDrawTitlebar(false);
+	ebChatInput = env->addEditBox(L"", rect<s32>(3, 2, 710, 22), true, wChat, EDITBOX_CHAT);
 	//
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");
 	btnLeaveGame->setVisible(false);
@@ -780,6 +790,7 @@ void Game::CloseDuelWindow() {
 	stHintMsg->setVisible(false);
 	btnSideOK->setVisible(false);
 	btnLeaveGame->setVisible(false);
+	wChat->setVisible(false);
 	lstLog->clear();
 	logParam.clear();
 	lstHostList->clear();

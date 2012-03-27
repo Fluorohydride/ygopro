@@ -25,7 +25,7 @@ function c78082039.initial_effect(c)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_DESTROY)
+	e4:SetCode(EVENT_DESTROYED)
 	e4:SetOperation(c78082039.desop)
 	c:RegisterEffect(e4)
 end

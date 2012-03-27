@@ -419,7 +419,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		irr::gui::IGUIElement* ele = dev->getGUIEnvironment()->getFocus();
 		if(!ele)
 			break;
-		irr::core::position2di pos = ele->getAbsolutePosition().getCenter();
+		irr::core::position2di pos = ele->getAbsolutePosition().UpperLeftCorner;
 		CANDIDATEFORM cd;
 		cd.dwIndex = 0;
 		cd.dwStyle = CFS_CANDIDATEPOS;

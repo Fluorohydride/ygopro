@@ -16,15 +16,10 @@ function c39823987.initial_effect(c)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DESTROY)
+	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCondition(c39823987.regcon)
 	e2:SetOperation(c39823987.regop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_BATTLE_DESTROYED)
-	e3:SetOperation(c39823987.regop)
-	c:RegisterEffect(e3)
 end
 function c39823987.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
@@ -46,7 +41,7 @@ function c39823987.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c39823987.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsOnField() and e:GetHandler():IsReason(REASON_EFFECT)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c39823987.regop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

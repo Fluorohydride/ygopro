@@ -31,7 +31,7 @@ function c38898779.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e4:SetCode(EVENT_DESTROY)
+	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetCondition(c38898779.spcon)
 	e4:SetTarget(c38898779.sptg)
 	e4:SetOperation(c38898779.spop)
@@ -55,7 +55,7 @@ function c38898779.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsRace,e:GetHandler():GetControler(),LOCATION_GRAVE,0,nil,RACE_WARRIOR)*-100
 end
 function c38898779.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsOnField()
+	return e:GetHandler():IsReason(REASON_DESTROY)
 end
 function c38898779.spfilter(c,e,tp)
 	return c:IsCode(23693634) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
