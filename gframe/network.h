@@ -81,7 +81,7 @@ struct STOC_TimeLimit {
 	unsigned short left_time;
 };
 struct STOC_Chat {
-	unsigned char player;
+	unsigned short player;
 	unsigned short msg[256];
 };
 struct STOC_HS_PlayerEnter {

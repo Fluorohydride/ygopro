@@ -772,7 +772,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->AddChatMsg((wchar_t*)input, 0);
 					else mainGame->AddChatMsg((wchar_t*)input, 2);
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
-					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, len * sizeof(short));
+					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");
 				}
 				break;

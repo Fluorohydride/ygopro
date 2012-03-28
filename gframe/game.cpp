@@ -441,8 +441,8 @@ bool Game::Initialize() {
 	wChat = env->addWindow(rect<s32>(305, 615, 1020, 640), false, L"");
 	wChat->getCloseButton()->setVisible(false);
 	wChat->setDraggable(false);
-//	wChat->setDrawBackground(false);
 	wChat->setDrawTitlebar(false);
+	wChat->setVisible(false);
 	ebChatInput = env->addEditBox(L"", rect<s32>(3, 2, 710, 22), true, wChat, EDITBOX_CHAT);
 	//
 	btnLeaveGame = env->addButton(rect<s32>(205, 5, 295, 80), 0, BUTTON_LEAVE_GAME, L"");

@@ -398,6 +398,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
+		mainGame->wChat->setVisible(true);
 		mainGame->imgCard->setImage(imageManager.tCover);
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(selftype > 1) {
@@ -472,6 +473,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			if(mainGame->chkIgnore1->isChecked())
 				break;
 			BufferIO::CopyWStr(pkt->msg, msg, 256);
+			msg[(len - 3) / 2] = 0;
 			mainGame->gMutex.Lock();
 			mainGame->AddChatMsg(msg, mainGame->LocalPlayer(pkt->player));
 			mainGame->gMutex.Unlock();
@@ -479,6 +481,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			if(mainGame->chkIgnore2->isChecked())
 				break;
 			BufferIO::CopyWStr(pkt->msg, msg, 256);
+			msg[(len - 3) / 2] = 0;
 			mainGame->gMutex.Lock();
 			mainGame->AddChatMsg(msg, 2);
 			mainGame->gMutex.Unlock();
@@ -2021,7 +2024,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		for (int i = 0; i < count; ++i) {
 			int code = BufferIO::ReadInt32(pbuf);
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
-			pcard->SetCode(code);
+			if(!mainGame->dField.deck_reversed || code)
+				pcard->SetCode(code);
 		}
 		for (int i = 0; i < count; ++i) {
 			mainGame->gMutex.Lock();

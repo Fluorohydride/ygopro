@@ -171,7 +171,7 @@ void NetServer::DisconnectPlayer(DuelPlayer* dp) {
 void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	char* pdata = data;
 	unsigned char pktType = BufferIO::ReadUInt8(pdata);
-	if((pktType != CTOS_SURRENDER) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
+	if((pktType != CTOS_SURRENDER) && (pktType != CTOS_CHAT) && (dp->state == 0xff || (dp->state && dp->state != pktType)))
 		return;
 	switch(pktType) {
 	case CTOS_RESPONSE: {
@@ -189,7 +189,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	case CTOS_CHAT: {
 		if(!dp->game)
 			return;
-		duel_mode->Chat(dp, data, len);
+		duel_mode->Chat(dp, pdata, len - 1);
 		break;
 	}
 	case CTOS_UPDATE_DECK: {
