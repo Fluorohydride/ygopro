@@ -465,6 +465,26 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->dInfo.time_left[lplayer] = pkt->left_time;
 		break;
 	}
+	case STOC_CHAT: {
+		STOC_Chat* pkt = (STOC_Chat*)pdata;
+		wchar_t msg[256];
+		if(pkt->player < 2) {
+			if(mainGame->chkIgnore1->isChecked())
+				break;
+			BufferIO::CopyWStr(pkt->msg, msg, 256);
+			mainGame->gMutex.Lock();
+			mainGame->AddChatMsg(msg, mainGame->LocalPlayer(pkt->player));
+			mainGame->gMutex.Unlock();
+		} else {
+			if(mainGame->chkIgnore2->isChecked())
+				break;
+			BufferIO::CopyWStr(pkt->msg, msg, 256);
+			mainGame->gMutex.Lock();
+			mainGame->AddChatMsg(msg, 2);
+			mainGame->gMutex.Unlock();
+		}
+		break;
+	}
 	case STOC_HS_PLAYER_ENTER: {
 		STOC_HS_PlayerEnter* pkt = (STOC_HS_PlayerEnter*)pdata;
 		if(pkt->pos > 1)

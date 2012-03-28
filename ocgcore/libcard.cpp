@@ -921,7 +921,8 @@ int32 scriptlib::card_enable_revive_limit(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	pcard->set_status(STATUS_REVIVE_LIMIT, TRUE);
+	if(!pcard->is_status(STATUS_COPYING_EFFECT))
+		pcard->set_status(STATUS_REVIVE_LIMIT, TRUE);
 	return 0;
 }
 int32 scriptlib::card_complete_procedure(lua_State *L) {

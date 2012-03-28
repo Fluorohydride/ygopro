@@ -464,7 +464,7 @@ void Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.81f, 0.44f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-	mProjection.buildCameraLookAtMatrixLH(vector3df(3.95f, 7.0f, 9.0f), vector3df(3.95f, 0, 0), vector3df(0, 0, 1));
+	mProjection.buildCameraLookAtMatrixLH(vector3df(3.95f, 8.0f, 7.8f), vector3df(3.95f, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	irr::scene::ILightSceneNode* light = smgr->addLightSceneNode(0, vector3df(0, 0, 100));
 	light->getLightData().AmbientColor = SColorf(1.0f, 1.0f, 1.0f);
@@ -751,6 +751,21 @@ void Game::ShowCardInfo(int code) {
 		stText->setRelativePosition(irr::core::position2di(15, 60));
 	}
 	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
+}
+void Game::AddChatMsg(wchar_t* msg, int player) {
+	for(int i = 4; i > 0; --i) {
+		chatMsg[i] = chatMsg[i - 1];
+		chatTiming[i] = chatTiming[i - 1];
+	}
+	chatMsg[0].clear();
+	chatTiming[0] = 600;
+	if(player == 0)
+		chatMsg[0].append(dInfo.hostname);
+	else if(player == 1)
+		chatMsg[0].append(dInfo.clientname);
+	else chatMsg[0].append(L"[***]");
+	chatMsg[0].append(L": ");
+	chatMsg[0].append(msg);
 }
 void Game::ClearTextures() {
 	matManager.mCard.setTexture(0, 0);

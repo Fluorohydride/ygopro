@@ -80,6 +80,10 @@ struct STOC_TimeLimit {
 	unsigned char player;
 	unsigned short left_time;
 };
+struct STOC_Chat {
+	unsigned char player;
+	unsigned short msg[256];
+};
 struct STOC_HS_PlayerEnter {
 	unsigned short name[20];
 	unsigned char pos;
@@ -112,6 +116,7 @@ class DuelMode {
 public:
 	DuelMode(): host_player(0), pduel(0) {}
 	virtual ~DuelMode() {}
+	virtual void Chat(DuelPlayer* dp, void* pdata, int len) {}
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {}
 	virtual void LeaveGame(DuelPlayer* dp) {}
 	virtual void ToDuelist(DuelPlayer* dp) {}
@@ -163,6 +168,7 @@ public:
 #define CTOS_LEAVE_GAME		0x13
 #define CTOS_SURRENDER		0x14
 #define CTOS_TIME_CONFIRM	0x15
+#define CTOS_CHAT			0x16
 #define CTOS_HS_TODUELIST	0x20
 #define CTOS_HS_TOOBSERVER	0x21
 #define CTOS_HS_READY		0x22
@@ -186,6 +192,7 @@ public:
 #define STOC_DUEL_END		0x16
 #define STOC_REPLAY			0x17
 #define STOC_TIME_LIMIT		0x18
+#define STOC_CHAT			0x19
 #define STOC_HS_PLAYER_ENTER	0x20
 #define STOC_HS_PLAYER_CHANGE	0x21
 #define STOC_HS_WATCH_CHANGE	0x22

@@ -11,6 +11,7 @@ class SingleDuel: public DuelMode {
 public:
 	SingleDuel(bool is_match);
 	virtual ~SingleDuel();
+	virtual void Chat(DuelPlayer* dp, void* pdata, int len);
 	virtual void JoinGame(DuelPlayer* dp, void* pdata, bool is_creater);
 	virtual void LeaveGame(DuelPlayer* dp);
 	virtual void ToDuelist(DuelPlayer* dp);

@@ -19,6 +19,24 @@ SingleDuel::SingleDuel(bool is_match) {
 }
 SingleDuel::~SingleDuel() {
 }
+void SingleDuel::Chat(DuelPlayer* dp, void* pdata, int len) {
+	STOC_Chat scc;
+	scc.player = dp->type;
+	unsigned short* msg = (unsigned short*)pdata;
+	int msglen = BufferIO::CopyWStr(msg, scc.msg, 256);
+	if(dp->type < 2) {
+		NetServer::SendBufferToPlayer(players[0], STOC_CHAT, &scc, 1 + msglen * 2);
+		NetServer::SendBufferToPlayer(players[1], STOC_CHAT, &scc, 1 + msglen * 2);
+		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+			if((*pit) != dp)
+				NetServer::ReSendToPlayer(*pit);
+	} else {
+		NetServer::SendBufferToPlayer(players[1 - dp->type], STOC_CHAT, &scc, 1 + msglen * 2);
+		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+			NetServer::ReSendToPlayer(*pit);
+	}
+
+}
 void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 	if(!is_creater) {
 		if(dp->game && dp->type != 0xff) {

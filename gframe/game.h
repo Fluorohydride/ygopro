@@ -81,6 +81,7 @@ public:
 	void LoadConfig();
 	void SaveConfig();
 	void ShowCardInfo(int code);
+	void AddChatMsg(wchar_t* msg, int player);
 	void ClearTextures();
 	void CloseDuelWindow();
 
@@ -97,6 +98,8 @@ public:
 
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
+	std::wstring chatMsg[5];
+	int chatTiming[5];
 	unsigned short linePattern;
 	int waitFrame;
 	int signalFrame;

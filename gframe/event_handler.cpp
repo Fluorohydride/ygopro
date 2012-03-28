@@ -762,6 +762,21 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case EDITBOX_CHAT: {
+				if(mainGame->dInfo.isReplay)
+					break;
+				const wchar_t* input = mainGame->ebChatInput->getText();
+				if(input[0]) {
+					unsigned short msgbuf[256];
+					if(!mainGame->dInfo.isObserver)
+						mainGame->AddChatMsg((wchar_t*)input, 0);
+					else mainGame->AddChatMsg((wchar_t*)input, 2);
+					int len = BufferIO::CopyWStr(input, msgbuf, 256);
+					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, len * sizeof(short));
+					mainGame->ebChatInput->setText(L"");
+				}
+				break;
+			}
 			}
 			break;
 		}
@@ -1357,21 +1372,21 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(433, 528, 883, 618);
-	irr::core::recti ofRect(513, 117, 807, 175);
+	irr::core::recti sfRect(416, 504, 900, 600);
+	irr::core::recti ofRect(516, 135, 805, 191);
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 433 + 77 * (6 - hc) / 2;
+			int left = 416 + 82 * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
-				int seq = (x - left) / 77;
+				int seq = (x - left) / 82;
 				if(seq >= hc) seq = hc - 1;
-				if(x - left - 77 * seq < 68) {
+				if(x - left - 82 * seq < 71) {
 					hovered_controler = 0;
 					hovered_location = LOCATION_HAND;
 					hovered_sequence = seq;
@@ -1380,23 +1395,23 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 0;
 			hovered_location = LOCATION_HAND;
-			if(x >= 817)
+			if(x >= 829)
 				hovered_sequence = hc - 1;
 			else
-				hovered_sequence = (x - 433) * (hc - 1) / 384;
+				hovered_sequence = (x - 416) * (hc - 1) / 413;
 		}
 	} else if(ofRect.isPointInside(pos)) {
 		int hc = hand[1].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 513 + 50 * (6 - hc) / 2;
+			int left = 516 + 49 * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
-				int seq = (x - left) / 50;
+				int seq = (x - left) / 49;
 				if(seq >= hc) seq = hc - 1;
-				if(x - left - 50 * seq < 45) {
+				if(x - left - 49 * seq < 42) {
 					hovered_controler = 1;
 					hovered_location = LOCATION_HAND;
 					hovered_sequence = hc - 1 - seq;
@@ -1405,18 +1420,18 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 1;
 			hovered_location = LOCATION_HAND;
-			if(x >= 763)
+			if(x >= 756)
 				hovered_sequence = 0;
 			else
-				hovered_sequence = hc - 1 - (x - 513) * (hc - 1) / 250;
+				hovered_sequence = hc - 1 - (x - 516) * (hc - 1) / 247;
 		}
 	} else {
 		double screenx = x / 1024.0 * 1.25 - 0.81;
 		double screeny = y / 640.0 * 0.84 - 0.42;
-		double angle = 0.66104316885 - atan(screeny);	//0.66104316885 = arctan(7.0/9.0)
+		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
 		double vlen = sqrt(1.0 + screeny * screeny);
-		double boardx = 3.95 + 9.0 * screenx / vlen / cos(angle);
-		double boardy = 7.0 - 9.0 * tan(angle);
+		double boardx = 3.95 + 7.8 * screenx / vlen / cos(angle);
+		double boardy = 8.0 - 7.8 * tan(angle);
 		hovered_location = 0;
 		if(boardx >= 0.2 && boardx <= 1.0) {
 			if(boardy >= 2.4 && boardy <= 3.6) {

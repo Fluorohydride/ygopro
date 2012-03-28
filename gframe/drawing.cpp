@@ -315,72 +315,79 @@ void Game::DrawMisc() {
 	for(int i = 0; i < 5; ++i) {
 		ClientCard* pcard = dField.mzone[0][i];
 		if(pcard) {
-			int m = 491 + i * 86;
-			adFont->draw(L"/", recti(m - 4, 403, m + 4, 423), 0xff000000, true, false, 0);
-			adFont->draw(L"/", recti(m - 3, 404, m + 5, 424), 0xffffffff, true, false, 0);
+			int m = 483 + i * 90;
+			adFont->draw(L"/", recti(m - 4, 396, m + 4, 416), 0xff000000, true, false, 0);
+			adFont->draw(L"/", recti(m - 3, 397, m + 5, 417), 0xffffffff, true, false, 0);
 			int w = adFont->getDimension(pcard->atkstring).Width;
-			adFont->draw(pcard->atkstring, recti(m - 5 - w, 403, m - 5, 423), 0xff000000, false, false, 0);
-			adFont->draw(pcard->atkstring, recti(m - 4 - w, 404, m - 4, 424),
+			adFont->draw(pcard->atkstring, recti(m - 5 - w, 396, m - 5, 416), 0xff000000, false, false, 0);
+			adFont->draw(pcard->atkstring, recti(m - 4 - w, 397, m - 4, 417),
 			             pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff , false, false, 0);
 			w = adFont->getDimension(pcard->defstring).Width;
-			adFont->draw(pcard->defstring, recti(m + 4, 403, m + 4 + w, 423), 0xff000000, false, false, 0);
-			adFont->draw(pcard->defstring, recti(m + 5, 404, m + 5 + w, 424),
+			adFont->draw(pcard->defstring, recti(m + 4, 396, m + 4 + w, 416), 0xff000000, false, false, 0);
+			adFont->draw(pcard->defstring, recti(m + 5, 397, m + 5 + w, 417),
 			             pcard->defence > pcard->base_defence ? 0xffffff00 : pcard->defence < pcard->base_defence ? 0xffff2090 : 0xffffffff , false, false, 0);
-			adFont->draw(pcard->lvstring, recti(468 + i * 83, 347, 500 + i * 83, 367), 0xff000000, false, false, 0);
-			adFont->draw(pcard->lvstring, recti(469 + i * 83, 348, 501 + i * 83, 368),
+			adFont->draw(pcard->lvstring, recti(463 + i * 85, 346, 495 + i * 85, 366), 0xff000000, false, false, 0);
+			adFont->draw(pcard->lvstring, recti(464 + i * 85, 347, 496 + i * 85, 367),
 			             (pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 		}
 	}
 	for(int i = 0; i < 5; ++i) {
 		ClientCard* pcard = dField.mzone[1][i];
 		if(pcard && (pcard->position & POS_FACEUP)) {
-			int m = 808 - i * 72;
-			adFont->draw(L"/", recti(m - 4, 235, m + 4, 255), 0xff000000, true, false, 0);
-			adFont->draw(L"/", recti(m - 3, 236, m + 5, 256), 0xffffffff, true, false, 0);
+			int m = 810 - i * 73;
+			adFont->draw(L"/", recti(m - 4, 245, m + 4, 265), 0xff000000, true, false, 0);
+			adFont->draw(L"/", recti(m - 3, 246, m + 5, 266), 0xffffffff, true, false, 0);
 			int w = adFont->getDimension(pcard->atkstring).Width;
-			adFont->draw(pcard->atkstring, recti(m - 5 - w, 235, m - 5, 255), 0xff000000, false, false, 0);
-			adFont->draw(pcard->atkstring, recti(m - 4 - w, 236, m - 4, 256),
+			adFont->draw(pcard->atkstring, recti(m - 5 - w, 245, m - 5, 265), 0xff000000, false, false, 0);
+			adFont->draw(pcard->atkstring, recti(m - 4 - w, 246, m - 4, 266),
 			             pcard->attack > pcard->base_attack ? 0xffffff00 : pcard->attack < pcard->base_attack ? 0xffff2090 : 0xffffffff , false, false, 0);
 			w = adFont->getDimension(pcard->defstring).Width;
-			adFont->draw(pcard->defstring, recti(m + 4, 235, m + 4 + w, 255), 0xff000000, false, false, 0);
-			adFont->draw(pcard->defstring, recti(m + 5, 236, m + 5 + w, 256),
+			adFont->draw(pcard->defstring, recti(m + 4, 245, m + 4 + w, 265), 0xff000000, false, false, 0);
+			adFont->draw(pcard->defstring, recti(m + 5, 246, m + 5 + w, 266),
 			             pcard->defence > pcard->base_defence ? 0xffffff00 : pcard->defence < pcard->base_defence ? 0xffff2090 : 0xffffffff , false, false, 0);
-			adFont->draw(pcard->lvstring, recti(789 - i * 76, 280, 820 - i * 76, 300), 0xff000000, false, false, 0);
-			adFont->draw(pcard->lvstring, recti(789 - i * 76, 281, 820 - i * 76, 301),
+			adFont->draw(pcard->lvstring, recti(789 - i * 76, 282, 820 - i * 76, 302), 0xff000000, false, false, 0);
+			adFont->draw(pcard->lvstring, recti(789 - i * 76, 283, 820 - i * 76, 303),
 			             (pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 		}
 	}
 	if(dField.extra[0].size()) {
-		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(337, 540, 397, 560), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(337, 541, 399, 561), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(305, 532, 381, 552), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(305, 533, 383, 553), 0xffffff00, true, false, 0);
 	}
 	if(dField.deck[0].size()) {
-		numFont->draw(dataManager.GetNumString(dField.deck[0].size()), recti(934, 540, 994, 560), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.deck[0].size()), recti(934, 541, 996, 561), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.deck[0].size()), recti(942, 532, 1021, 552), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.deck[0].size()), recti(943, 533, 1023, 553), 0xffffff00, true, false, 0);
 	}
 	if(dField.grave[0].size()) {
-		numFont->draw(dataManager.GetNumString(dField.grave[0].size()), recti(910, 442, 970, 462), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.grave[0].size()), recti(910, 443, 972, 463), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.grave[0].size()), recti(917, 436, 984, 456), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.grave[0].size()), recti(917, 437, 986, 457), 0xffffff00, true, false, 0);
 	}
 	if(dField.remove[0].size()) {
-		numFont->draw(dataManager.GetNumString(dField.remove[0].size()), recti(888, 359, 948, 359), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.remove[0].size()), recti(888, 360, 950, 360), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.remove[0].size()), recti(895, 360, 957, 380), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.remove[0].size()), recti(895, 361, 959, 381), 0xffffff00, true, false, 0);
 	}
 	if(dField.extra[1].size()) {
-		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(848, 194, 908, 214), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(848, 195, 910, 215), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(848, 212, 908, 232), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.extra[1].size()), recti(848, 213, 910, 233), 0xffffff00, true, false, 0);
 	}
 	if(dField.deck[1].size()) {
-		numFont->draw(dataManager.GetNumString(dField.deck[1].size()), recti(421, 194, 481, 214), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.deck[1].size()), recti(421, 195, 483, 215), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.deck[1].size()), recti(421, 212, 481, 232), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.deck[1].size()), recti(421, 213, 483, 233), 0xffffff00, true, false, 0);
 	}
 	if(dField.grave[1].size()) {
-		numFont->draw(dataManager.GetNumString(dField.grave[1].size()), recti(408, 250, 469, 270), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.grave[1].size()), recti(408, 251, 471, 271), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.grave[1].size()), recti(408, 261, 462, 281), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.grave[1].size()), recti(408, 262, 464, 282), 0xffffff00, true, false, 0);
 	}
 	if(dField.remove[1].size()) {
-		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(392, 315, 453, 335), 0xff000000, true, false, 0);
-		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(392, 316, 455, 336), 0xffffff00, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(386, 320, 443, 340), 0xff000000, true, false, 0);
+		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(386, 321, 445, 341), 0xffffff00, true, false, 0);
+	}
+	for(int i = 0; i < 5; ++i) {
+		if(chatTiming[i]) {
+			chatTiming[i]--;
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i, 1021, 616 - 20 * i), 0xffffffff, false, false);
+		}
 	}
 }
 void Game::DrawGUI() {

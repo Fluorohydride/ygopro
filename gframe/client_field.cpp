@@ -602,18 +602,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			else
 				t->X = 1.9f + sequence * 4.0f / (count - 1);
 			if (pcard->is_hovered) {
-				t->Y = 3.82f;
-				t->Z = 0.64f + 0.001f * sequence;
+				t->Y = 3.84f;
+				t->Z = 0.656f + 0.001f * sequence;
 			} else {
 				t->Y = 4.0f;
 				t->Z = 0.5f + 0.001f * sequence;
 			}
 			if(pcard->code) {
-				r->X = -0.661f;
+				r->X = -0.798056f;
 				r->Y = 0.0f;
 				r->Z = 0.0f;
 			} else {
-				r->X = 0.661f;
+				r->X = 0.798056f;
 				r->Y = 3.1415926f;
 				r->Z = 0;
 			}
@@ -623,18 +623,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			else
 				t->X = 5.9f - sequence * 4.0f / (count - 1);
 			if (pcard->is_hovered) {
-				t->Y = -3.58f;
-				t->Z = 0.64f - 0.001f * sequence;
+				t->Y = -3.56f;
+				t->Z = 0.656f - 0.001f * sequence;
 			} else {
 				t->Y = -3.4f;
 				t->Z = 0.5f - 0.001f * sequence;
 			}
 			if (pcard->code == 0) {
-				r->X = 0.661f;
+				r->X = 0.798056f;
 				r->Y = 3.1415926f;
 				r->Z = 0;
 			} else {
-				r->X = -0.661f;
+				r->X = -0.798056f;
 				r->Y = 0;
 				r->Z = 0;
 			}

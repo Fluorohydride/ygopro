@@ -186,6 +186,12 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 		duel_mode->TimeConfirm(dp);
 		break;
 	}
+	case CTOS_CHAT: {
+		if(!dp->game)
+			return;
+		duel_mode->Chat(dp, data, len);
+		break;
+	}
 	case CTOS_UPDATE_DECK: {
 		if(!dp->game)
 			return;
