@@ -34,7 +34,7 @@ function c14943837.tuner_filter(c)
 	return c:GetLevel()~=4
 end
 function c14943837.synfilter(c,syncard,f)
-	return c:IsFaceup() and c:IsCanBeSynchroMaterial(syncard) and c:GetLevel()~=4 and (f==nil or f(c))
+	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and c:GetLevel()~=4 and (f==nil or f(c))
 end
 function c14943837.syntg(e,syncard,f,minc)
 	local c=e:GetHandler()

@@ -29,23 +29,18 @@ function c70780151.initial_effect(c)
 end
 function c70780151.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	local des=d
-	if c==d then des=a end
-	return c:IsRelateToBattle() and des:GetLocation() and des:IsType(TYPE_MONSTER)
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c70780151.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	local m=0
-	if a==e:GetHandler() then m=d:GetAttack()
-	else m=a:GetAttack() end
-	if m<0 then m=0 end
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	local dam=bc:GetAttack()
+	if dam<0 then dam=0 end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(m)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,m)
+	Duel.SetTargetParam(dam)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,dam)
 end
 function c70780151.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

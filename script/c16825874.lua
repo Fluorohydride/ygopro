@@ -20,7 +20,7 @@ function c16825874.initial_effect(c)
 end
 c16825874.tuner_filter=aux.FALSE
 function c16825874.filter(c,syncard,f,lv)
-	return c:IsCanBeSynchroMaterial(syncard) and (f==nil or f(c)) and c:GetLevel()==lv
+	return c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and (f==nil or f(c)) and c:GetLevel()==lv
 end
 function c16825874.target(e,syncard,f,minc)
 	if minc>1 then return false end

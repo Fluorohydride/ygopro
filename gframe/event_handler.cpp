@@ -1281,7 +1281,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									else if(mcard->cHint == CHINT_NUMBER)
 										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
 									else if(mcard->cHint == CHINT_DESC)
-										myswprintf(formatBuffer, L"\n%ls", dataManager.GetSysString(mcard->chValue));
+										myswprintf(formatBuffer, L"\n%ls", dataManager.GetDesc(mcard->chValue));
 									str.append(formatBuffer);
 								}
 							} else {
@@ -1309,7 +1309,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 									else if(mcard->cHint == CHINT_NUMBER)
 										myswprintf(formatBuffer, L"\n%ls%d", dataManager.GetSysString(215), mcard->chValue);
 									else if(mcard->cHint == CHINT_DESC)
-										myswprintf(formatBuffer, L"\n%ls", dataManager.GetSysString(mcard->chValue));
+										myswprintf(formatBuffer, L"\n%ls", dataManager.GetDesc(mcard->chValue));
 									str.append(formatBuffer);
 								}
 							}

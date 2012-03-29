@@ -2656,6 +2656,8 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 				if(target->current.location & LOCATION_ONFIELD)
 					target->reset(RESET_LEAVE, RESET_EVENT);
 			}
+			if(!(location & LOCATION_ONFIELD))
+				target->relate_effect.clear();
 		} else {
 			if(target->turnid != infos.turn_id) {
 				target->set_status(STATUS_SUMMON_TURN, FALSE);

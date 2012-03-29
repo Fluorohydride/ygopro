@@ -13,12 +13,10 @@ function c79109599.initial_effect(c)
 	--fusion substitute
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetRange(0x1e)
 	e2:SetCode(EFFECT_FUSION_SUBSTITUTE)
-	e2:SetCondition(c79109599.subcon)
 	c:RegisterEffect(e2)
-end
-function c79109599.subcon(e)
-	return e:GetHandler():IsLocation(0x1e)
 end
 function c79109599.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

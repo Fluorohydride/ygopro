@@ -18,8 +18,9 @@ function c72714392.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c72714392.filter(c,e,tp)
-	return c:IsSetCard(0x33) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
-		and Duel.IsExistingMatchingCard(c72714392.exfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetLevel()+1,e,tp)
+	local lv=c:GetLevel()
+	return lv>0 and c:IsSetCard(0x33) and not c:IsType(TYPE_TUNER) and c:IsAbleToRemove()
+		and Duel.IsExistingMatchingCard(c72714392.exfilter,tp,LOCATION_EXTRA,0,1,nil,lv+1,e,tp)
 end
 function c72714392.exfilter(c,lv,e,tp)
 	return c:IsSetCard(0x33) and c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
