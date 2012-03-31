@@ -231,8 +231,8 @@ int32 field::process() {
 			core.units.begin()->step++;
 		return pduel->bufferlen;
 	}
-	case PROCESSOR_DAMAGE_PHASE: {
-		if(process_damage_phase(it->step))
+	case PROCESSOR_DAMAGE_STEP: {
+		if(process_damage_step(it->step))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -3126,17 +3126,23 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		process_single_event();
 		process_instant_event();
-		pduel->write_buffer8(MSG_HINT);
-		pduel->write_buffer8(HINT_EVENT);
-		pduel->write_buffer8(0);
-		pduel->write_buffer32(43);
-		pduel->write_buffer8(MSG_HINT);
-		pduel->write_buffer8(HINT_EVENT);
-		pduel->write_buffer8(1);
-		pduel->write_buffer32(43);
-		core.hint_timing[infos.turn_player] = TIMING_DAMAGE_CAL;
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+		if(!core.effect_damage_step) {
+			pduel->write_buffer8(MSG_HINT);
+			pduel->write_buffer8(HINT_EVENT);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32(43);
+			pduel->write_buffer8(MSG_HINT);
+			pduel->write_buffer8(HINT_EVENT);
+			pduel->write_buffer8(1);
+			pduel->write_buffer32(43);
+			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_CAL;
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+		} else {
+			break_effect();
+		}
 		core.damage_calculated = TRUE;
+		if(core.effect_damage_step && core.current_chain.size() <= 1)
+			return TRUE;
 		return FALSE;
 	}
 	case 27: {
@@ -3239,8 +3245,7 @@ int32 field::process_battle_command(uint16 step) {
 		group* des = core.units.begin()->ptarget;
 		if(!des || !des->container.size())
 			return FALSE;
-		card_set::iterator cit;
-		for(cit = des->container.begin(); cit != des->container.end(); ++cit) {
+		for(auto cit = des->container.begin(); cit != des->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_BATTLE_DESTROYED, TRUE);
 			(*cit)->filter_disable_related_cards();
 		}
@@ -3254,8 +3259,12 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
 		process_single_event();
 		process_instant_event();
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
-		core.units.begin()->arg1 = 1;
+		if(!core.effect_damage_step || core.current_chain.size() <= 1) {
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
+			core.units.begin()->arg1 = 1;
+		} else {
+			break_effect();
+		}
 		return FALSE;
 	}
 	case 31: {
@@ -3271,8 +3280,12 @@ int32 field::process_battle_command(uint16 step) {
 			process_single_event();
 			process_instant_event();
 		}
-		if(core.flip_chain.size() || core.new_fchain.size() || core.new_ochain.size())
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+		if(!core.effect_damage_step || core.current_chain.size() <= 1) {
+			if(core.flip_chain.size() || core.new_fchain.size() || core.new_ochain.size())
+				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+		} else {
+			break_effect();
+		}
 		return FALSE;
 	}
 	case 32: {
@@ -3321,8 +3334,12 @@ int32 field::process_battle_command(uint16 step) {
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(core.attack_target)
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
-		core.units.begin()->step = 38;
+		if(!core.effect_damage_step || core.current_chain.size() <= 1) {
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+			core.units.begin()->step = 38;
+		} else {
+			break_effect();
+		}
 		return FALSE;
 	}
 	case 39: {
@@ -3331,6 +3348,8 @@ int32 field::process_battle_command(uint16 step) {
 		pduel->write_buffer8(MSG_DAMAGE_STEP_END);
 		reset_phase(PHASE_DAMAGE);
 		adjust_all();
+		if(core.effect_damage_step)
+			return TRUE;
 		if(core.chain_attack) {
 			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid_r != core.pre_field[0]
 			        || !core.attacker->is_capable_attack_announce(infos.turn_player))
@@ -3365,7 +3384,60 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	return TRUE;
 }
-int32 field::process_damage_phase(uint16 step) {
+int32 field::process_damage_step(uint16 step) {
+	switch(step) {
+	case 0: {
+		core.effect_damage_step = 1;
+		card* tmp = core.attacker;
+		core.attacker = (card*)core.units.begin()->peffect;
+		core.units.begin()->peffect = (effect*)tmp;
+		tmp = core.attack_target;
+		core.attack_target = (card*)core.units.begin()->ptarget;
+		core.units.begin()->ptarget = (group*)tmp;
+		core.units.begin()->arg1 = infos.phase;
+		pduel->write_buffer8(MSG_ATTACK);
+		pduel->write_buffer32(core.attacker->get_info_location());
+		pduel->write_buffer32(core.attack_target->get_info_location());
+		infos.phase = PHASE_DAMAGE;
+		pduel->write_buffer8(MSG_DAMAGE_STEP_START);
+		core.pre_field[0] = core.attacker->fieldid_r;
+		if(core.attack_target)
+			core.pre_field[1] = core.attack_target->fieldid_r;
+		else
+			core.pre_field[1] = 0;
+		infos.phase = PHASE_DAMAGE_CAL;
+		raise_single_event(core.attacker, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
+		if(core.attack_target)
+			raise_single_event(core.attack_target, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 1);
+		raise_event((card*)0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
+		process_single_event();
+		process_instant_event();
+		add_process(PROCESSOR_BATTLE_COMMAND, 26, 0, 0, 0, 0);
+		if(core.current_chain.size() > 1) {
+			core.units.begin()->step = 1;
+			return FALSE;
+		} else {
+			core.units.begin()->step = 1;
+			core.reserved = core.units.front();
+			return TRUE;
+		}
+	}
+	case 1: {
+		core.effect_damage_step = 2;
+		add_process(PROCESSOR_BATTLE_COMMAND, 27, 0, 0, 0, 0);
+		return FALSE;
+	}
+	case 2: {
+		core.attacker = (card*)core.units.begin()->peffect;
+		core.attack_target = (card*)core.units.begin()->ptarget;
+		core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		if(core.attack_target)
+			core.attack_target->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		core.effect_damage_step = 0;
+		infos.phase = core.units.begin()->arg1;
+		return TRUE;
+	}
+	}
 	return TRUE;
 }
 int32 field::process_turn(uint16 step, uint8 turn_player) {
@@ -3975,7 +4047,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			core.chain_limit_p = 0;
 		}
 		reset_chain();
-		if(core.summoning_card || core.spsummoning_card)
+		if(core.summoning_card || core.spsummoning_card || core.effect_damage_step == 1)
 			core.subunits.push_back(core.reserved);
 		return FALSE;
 	}

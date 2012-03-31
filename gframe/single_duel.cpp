@@ -546,7 +546,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		unsigned char engType = BufferIO::ReadUInt8(pbuf);
 		switch (engType) {
 		case MSG_RETRY: {
-			WaitforResponse(player);
+			WaitforResponse(last_response);
 			NetServer::SendBufferToPlayer(players[last_response], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}

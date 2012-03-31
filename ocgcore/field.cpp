@@ -71,6 +71,7 @@ field::field(duel* pduel) {
 	core.attacker = 0;
 	core.attack_target = 0;
 	core.deck_reversed = FALSE;
+	core.effect_damage_step = FALSE;
 	nil_event.event_code = 0;
 	nil_event.event_cards = 0;
 	nil_event.event_player = PLAYER_NONE;

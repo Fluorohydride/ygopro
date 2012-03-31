@@ -588,18 +588,16 @@ void card::xyz_overlay(card_set* materials) {
 		return;
 	card_set des;
 	if(materials->size() == 1) {
+		(*materials->begin())->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
 		xyz_add(*materials->begin(), &des);
-		(*materials->begin())->reset(RESET_EVENT, RESET_OVERLAY);
 	} else {
 		field::card_vector cv;
-		field::card_vector::iterator cvit;
-		card_set::iterator cit;
-		for(cit = materials->begin(); cit != materials->end(); ++cit)
+		for(auto cit = materials->begin(); cit != materials->end(); ++cit)
 			cv.push_back(*cit);
 		std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		for(cvit = cv.begin(); cvit != cv.end(); ++cvit) {
+		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
+			(*cvit)->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
 			xyz_add(*cvit, &des);
-			(*cvit)->reset(RESET_EVENT, RESET_OVERLAY);
 		}
 	}
 	if(des.size())
@@ -611,7 +609,6 @@ void card::xyz_add(card* mat, card_set* des) {
 	pduel->write_buffer8(MSG_MOVE);
 	pduel->write_buffer32(mat->data.code);
 	mat->enable_field_effect(false);
-	mat->reset(RESET_LEAVE, RESET_EVENT);
 	if(mat->overlay_target) {
 		pduel->write_buffer8(mat->overlay_target->current.controler);
 		pduel->write_buffer8(mat->overlay_target->current.location | LOCATION_OVERLAY);

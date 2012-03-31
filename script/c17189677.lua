@@ -18,8 +18,8 @@ function c17189677.tgfilter(c)
 	return c:IsRace(RACE_REPTILE) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function c17189677.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c17189677.tgfilter,tp,LOCATION_DECK,0,2,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,2,tp,LOCATION_DECK)
+	if chk==0 then return Duel.IsExistingMatchingCard(c17189677.tgfilter,tp,LOCATION_DECK,0,4,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,4,tp,LOCATION_DECK)
 end
 function c17189677.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c17189677.tgfilter,tp,LOCATION_DECK,0,nil)

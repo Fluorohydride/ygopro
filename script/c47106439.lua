@@ -20,7 +20,7 @@ end
 function c47106439.rlevel(e,c)
 	local lv=e:GetHandler():GetLevel()
 	if c:IsAttribute(ATTRIBUTE_WATER) then
-		local clv=c:GetOriginalLevel()
+		local clv=c:GetLevel()
 		return lv*65536+clv
 	else return lv end
 end

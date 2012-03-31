@@ -1691,10 +1691,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
 				if (code != 0 && pcard->code != code)
 					pcard->SetCode(code);
-				if((pl & LOCATION_ONFIELD) && (cl != pl))
-					pcard->counters.clear();
-				if(cl != pl)
-					pcard->ClearTarget();
+				pcard->counters.clear();
+				pcard->ClearTarget();
 				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
 				mainGame->gMutex.Lock();
 				mainGame->dField.RemoveCard(pc, pl, ps);
@@ -2446,6 +2444,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int chtype = BufferIO::ReadInt8(pbuf);
 		int value = BufferIO::ReadInt32(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
+		if(!pcard)
+			return true;
 		pcard->cHint = chtype;
 		pcard->chValue = value;
 		if(chtype == CHINT_TURN) {

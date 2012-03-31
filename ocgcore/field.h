@@ -219,6 +219,7 @@ struct processor {
 	card* sub_attack_target;
 	card* limit_tuner;
 	uint8 attack_cancelable;
+	uint8 effect_damage_step;
 	int32 battle_damage[2];
 	int32 summon_count[2];
 	uint8 extra_summon[2];
@@ -370,7 +371,7 @@ public:
 	int32 process_single_event();
 	int32 process_idle_command(uint16 step);
 	int32 process_battle_command(uint16 step);
-	int32 process_damage_phase(uint16 step);
+	int32 process_damage_step(uint16 step);
 	int32 process_turn(uint16 step, uint8 turn_player);
 
 	int32 add_chain(uint16 step);
@@ -540,7 +541,7 @@ public:
 #define PROCESSOR_IDLE_COMMAND		32
 #define PROCESSOR_PHASE_EVENT		33
 #define PROCESSOR_BATTLE_COMMAND	34
-#define PROCESSOR_DAMAGE_PHASE		35
+#define PROCESSOR_DAMAGE_STEP		35
 #define PROCESSOR_ADD_CHAIN			40
 #define PROCESSOR_SOLVE_CHAIN		42
 #define PROCESSOR_SOLVE_CONTINUOUS	43
