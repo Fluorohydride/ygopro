@@ -64,7 +64,7 @@ function c81866673.spfilter(c,e,tp)
 	return c:IsLocation(LOCATION_HAND) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c81866673.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and eg:IsExists(c81866673.spfilter,1,nil,e,tp) end
 	if eg:GetCount()==1 then
 		Duel.ConfirmCards(1-tp,eg)

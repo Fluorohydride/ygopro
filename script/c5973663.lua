@@ -11,6 +11,7 @@ function c5973663.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_DESTROY)
+	e2:SetCondition(c5973663.ctcon)
 	e2:SetOperation(c5973663.ctop)
 	c:RegisterEffect(e2)
 	--atkup defup
@@ -50,10 +51,11 @@ end
 function c5973663.ctfilter(c)
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsRace(RACE_PLANT)
 end
+function c5973663.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c5973663.ctfilter,1,nil)
+end
 function c5973663.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(c5973663.ctfilter,1,nil) then
-		e:GetHandler():AddCounter(0x18,1)
-	end
+	e:GetHandler():AddCounter(0x18,1)
 end
 function c5973663.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,0x18,1,REASON_COST) end

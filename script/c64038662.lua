@@ -54,8 +54,8 @@ function c64038662.eftg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		else return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and c64038662.filter2(chkc,e,tp) end
 	end
 	if chk==0 then return true end
-	local b1=Duel.IsExistingMatchingCard(c64038662.filter1,tp,LOCATION_MZONE,0,2,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)~=0
-	local b2=Duel.IsExistingMatchingCard(c64038662.filter2,tp,LOCATION_SZONE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	local b1=Duel.IsExistingMatchingCard(c64038662.filter1,tp,LOCATION_MZONE,0,2,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+	local b2=Duel.IsExistingMatchingCard(c64038662.filter2,tp,LOCATION_SZONE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	if (not b1 and not b2) or not Duel.SelectYesNo(tp,aux.Stringid(64038662,1)) then
 		e:SetProperty(0)
 		e:SetCategory(0)
@@ -69,8 +69,8 @@ function c64038662.eftg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		if e:GetLabel()==0 or e:GetLabel()==1 then return false
 		else return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and c64038662.filter2(chkc,e,tp) end
 	end
-	local b1=Duel.IsExistingMatchingCard(c64038662.filter1,tp,LOCATION_MZONE,0,2,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)~=0
-	local b2=Duel.IsExistingMatchingCard(c64038662.filter2,tp,LOCATION_SZONE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	local b1=Duel.IsExistingMatchingCard(c64038662.filter1,tp,LOCATION_MZONE,0,2,nil) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+	local b2=Duel.IsExistingMatchingCard(c64038662.filter2,tp,LOCATION_SZONE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	if chk==0 then return e:GetHandler():GetFlagEffect(64038662)==0 and (b1 or b2) end
 	c64038662.select(e,tp,b1,b2)
 end

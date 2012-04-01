@@ -41,7 +41,7 @@ function c8487449.initial_effect(c)
 end
 function c8487449.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)~=0
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and not Duel.IsExistingMatchingCard(c8487449.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
 end
 function c8487449.regcon(e,tp,eg,ep,ev,re,r,rp)

@@ -23,7 +23,7 @@ function c81336148.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return d and Duel.GetTurnPlayer()==tp and (d:IsRelateToBattle() or not d:IsReason(REASON_BATTLE))
 end
 function c81336148.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.ShuffleHand(tp)

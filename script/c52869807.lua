@@ -19,7 +19,7 @@ end
 function c52869807.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
-		Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
+		Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD,0)==0
 end
 function c52869807.atkup(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()

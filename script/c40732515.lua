@@ -39,7 +39,7 @@ function c40732515.spcon(e,c)
 	if c==nil then return true end
 	local fd=Duel.GetFieldCard(c:GetControler(),LOCATION_SZONE,5)
 	return fd and fd:IsCode(39910367) and fd:IsCanRemoveCounter(c:GetControler(),0x3001,6,REASON_COST)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c40732515.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local fd=Duel.GetFieldCard(tp,LOCATION_SZONE,5)

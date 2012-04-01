@@ -63,7 +63,7 @@ function c53610653.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c53610653.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ec=e:GetHandler():GetPreviousEquipTarget()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and ec:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetTargetCard(ec)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,ec,1,0,0)

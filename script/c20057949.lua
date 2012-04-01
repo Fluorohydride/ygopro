@@ -76,7 +76,7 @@ function c20057949.spcon1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnCount()~=e:GetLabel() and Duel.GetTurnPlayer()==tp
 end
 function c20057949.spop1(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c20057949.filter,tp,LOCATION_HAND,0,1,nil,e,tp)
 		and Duel.SelectYesNo(tp,aux.Stringid(20057949,0)) then
 		local e1=Effect.CreateEffect(e:GetHandler())

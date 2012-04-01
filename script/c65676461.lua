@@ -27,7 +27,7 @@ function c65676461.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c65676461.attg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.GetAttackTarget():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK,1-tp) end
 	Duel.GetAttackTarget():CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,Duel.GetAttackTarget(),1,0,0)

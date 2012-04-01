@@ -25,7 +25,7 @@ function c33550694.filter2(c,e,tp,m,chkf)
 end
 function c33550694.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 and PLAYER_NONE or tp
+		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
 		local mg1=Duel.GetMatchingGroup(c33550694.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
 		local res=Duel.IsExistingMatchingCard(c33550694.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,chkf)
 		if not res then
@@ -41,7 +41,7 @@ function c33550694.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c33550694.operation(e,tp,eg,ep,ev,re,r,rp)
-	local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 and PLAYER_NONE or tp
+	local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local mg1=Duel.GetMatchingGroup(c33550694.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
 	local sg1=Duel.GetMatchingGroup(c33550694.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,chkf)

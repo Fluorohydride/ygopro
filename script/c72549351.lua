@@ -19,7 +19,7 @@ function c72549351.spfilter(c,e,tp)
 end
 function c72549351.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if e:GetLabel()==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+		if e:GetLabel()==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and Duel.IsExistingMatchingCard(c72549351.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 		e:SetLabel(0)
 		return Duel.CheckReleaseGroup(tp,Card.IsRace,2,nil,RACE_DRAGON)

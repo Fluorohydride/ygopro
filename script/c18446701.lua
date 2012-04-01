@@ -29,14 +29,12 @@ function c18446701.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:CancelToGrave()
 		--draw
 		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EFFECT_DESTROY_REPLACE)
-		e1:SetCondition(c18446701.repcon)
-		e1:SetTarget(aux.TRUE)
+		e1:SetType(EFFECT_TYPE_EQUIP)
+		e1:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 		e1:SetCountLimit(2)
-		e1:SetLabelObject(c)
+		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1)
+		c:RegisterEffect(e1)
 		--Equip limit
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -46,9 +44,6 @@ function c18446701.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
 	end
-end
-function c18446701.repcon(e)
-	return not e:GetLabelObject():IsDisabled() and e:GetLabelObject():IsHasCardTarget(e:GetHandler())
 end
 function c18446701.eqlimit(e,c)
 	return c:GetControler()==e:GetOwnerPlayer() and c:IsRace(RACE_SPELLCASTER)

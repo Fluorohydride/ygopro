@@ -11,7 +11,7 @@ function c68396778.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c68396778.filter(c)
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)~=0
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 end
 function c68396778.spfilter(c,e,tp)
@@ -30,7 +30,7 @@ function c68396778.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoGrave(tc,REASON_EFFECT)
-		if tc:IsLocation(LOCATION_GRAVE) and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 then
+		if tc:IsLocation(LOCATION_GRAVE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local g=Duel.SelectMatchingCard(tp,c68396778.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 			if g:GetCount() then

@@ -38,7 +38,7 @@ function c3283679.spfilter(c,e,tp)
 	return c:IsSetCard(0x304e) and c:IsCanBeSpecialSummoned(e,156,tp,false,false)
 end
 function c3283679.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c3283679.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end

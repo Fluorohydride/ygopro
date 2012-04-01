@@ -22,7 +22,7 @@ function c12079734.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		if e:GetLabel()==0 then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c12079734.filter1(chkc,c)
 		else return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c12079734.filter2(chkc) end
 	end
-	local b1=Duel.GetLocationCount(tp,LOCATION_SZONE)~=0 and c:GetUnionCount()==0
+	local b1=Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and c:GetUnionCount()==0
 		and Duel.IsExistingTarget(c12079734.filter1,tp,LOCATION_GRAVE,0,1,nil,c)
 	local b2=Duel.IsExistingTarget(c12079734.filter2,tp,LOCATION_MZONE,0,1,nil) and Duel.IsPlayerCanDraw(tp,1)
 	if chk==0 then return b1 or b2 end
@@ -49,7 +49,7 @@ function c12079734.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then
 		local c=e:GetHandler()
 		if c:IsRelateToEffect(e) and c:IsFaceup() and c:GetUnionCount()==0
-			and Duel.GetLocationCount(tp,LOCATION_SZONE)~=0 and tc:IsRelateToEffect(e) then
+			and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 and tc:IsRelateToEffect(e) then
 			Duel.Equip(tp,tc,c,false)
 			tc:SetStatus(STATUS_UNION,true)
 		end

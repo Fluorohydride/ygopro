@@ -16,7 +16,7 @@ function c66499018.condition(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c66499018.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	local dt=Duel.GetDrawCount(tp)
 	if dt~=0 then

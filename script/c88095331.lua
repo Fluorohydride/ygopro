@@ -19,7 +19,7 @@ function c88095331.filter(c,e,tp)
 	return c:IsSetCard(0x604e) and c:IsCanBeSpecialSummoned(e,155,tp,false,false)
 end
 function c88095331.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c88095331.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end

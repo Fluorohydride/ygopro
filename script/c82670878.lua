@@ -59,7 +59,7 @@ function c82670878.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c82670878.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.ConfirmCards(1-tp,c)
 	Duel.ShuffleHand(tp)

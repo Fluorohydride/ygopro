@@ -58,7 +58,7 @@ function c39823987.spcon1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnCount()~=e:GetLabel()
 end
 function c39823987.spop1(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c39823987.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 		and Duel.SelectYesNo(tp,aux.Stringid(39823987,1)) then
 		local e1=Effect.CreateEffect(e:GetHandler())

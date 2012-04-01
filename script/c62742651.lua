@@ -39,7 +39,7 @@ function c62742651.spfilter(c,e,tp,atk)
 end
 function c62742651.damop(e,tp,eg,ep,ev,re,r,rp)
 	local dam=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
-	if Duel.Damage(tp,dam,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 then
+	if Duel.Damage(tp,dam,REASON_EFFECT)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		local g=Duel.GetMatchingGroup(c62742651.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp,dam)
 		if g:GetCount()~=0 and Duel.SelectYesNo(tp,aux.Stringid(62742651,2)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

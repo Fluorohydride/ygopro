@@ -63,7 +63,7 @@ function c97452817.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and e:GetHandler():GetFlagEffectLabel(36690018)==1
 end
 function c97452817.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,97452818,0,0x4011,0,0,1,RACE_FAIRY,ATTRIBUTE_LIGHT) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)

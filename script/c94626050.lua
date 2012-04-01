@@ -21,7 +21,7 @@ function c94626050.spfilter(c,e,tp)
 	return c:IsLevelBelow(3) and c:IsRace(RACE_FISH+RACE_SEASERPENT+RACE_AQUA) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c94626050.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)~=0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c94626050.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end

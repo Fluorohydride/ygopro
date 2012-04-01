@@ -29,7 +29,7 @@ function c29999161.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_HAND) then
 		Duel.ShuffleHand(tc:GetControler())
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local g=Duel.SelectMatchingCard(tp,c29999161.spfilter,tp,LOCATION_HAND,0,1,1,nil,tc:GetLevel(),e,tp)
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)

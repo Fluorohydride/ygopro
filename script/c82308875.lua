@@ -38,7 +38,7 @@ function c82308875.operation(e,tp,eg,ep,ev,re,r,rp)
 	if d1+d2==7 then
 		local b1=Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)>1
 		local spg=Duel.GetMatchingGroup(c82308875.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,LOCATION_GRAVE,nil,e,tp)
-		local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)~=0 and spg:GetCount()>0
+		local b2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and spg:GetCount()>0
 		local b3=Duel.IsPlayerCanDraw(tp,3)
 		if not b1 and not b2 and not b3 then return end
 		local op=0
