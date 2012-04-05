@@ -44,7 +44,7 @@ function c41234315.spfilter(c,e,tp)
 	return c:IsCode(89493368) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c41234315.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c41234315.spfilter,tp,0x12,0,1,1,nil,e,tp)
 	if g:GetCount()~=0 then

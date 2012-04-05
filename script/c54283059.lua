@@ -34,14 +34,14 @@ function c54283059.filter2(c,e,tp,m)
 end
 function c54283059.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		local mg=Duel.GetMatchingGroup(c54283059.filter1,tp,LOCATION_REMOVED,0,nil,e)
 		return Duel.IsExistingMatchingCard(c54283059.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c54283059.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local mg=Duel.GetMatchingGroup(c54283059.filter1,tp,LOCATION_REMOVED,0,nil,e)
 	local sg=Duel.GetMatchingGroup(c54283059.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg)
 	if sg:GetCount()>0 then

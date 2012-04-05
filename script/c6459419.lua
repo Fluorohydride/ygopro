@@ -24,7 +24,7 @@ function c6459419.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c6459419.dfilter,tp,LOCATION_MZONE,0,nil)
 	local ct=Duel.Destroy(g,REASON_EFFECT)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ct==0 or ft==0 then return end
+	if ct==0 or ft<=0 then return end
 	if ft>ct then ft=ct end
 	local sg=Duel.GetMatchingGroup(c6459419.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
 	if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(6459419,0)) then

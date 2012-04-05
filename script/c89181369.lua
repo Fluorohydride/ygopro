@@ -26,7 +26,7 @@ function c89181369.rmfilter(c)
 end
 function c89181369.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		local rg=Duel.GetMatchingGroup(c89181369.rmfilter,tp,LOCATION_GRAVE,0,nil)
 		return Duel.IsExistingTarget(c89181369.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,rg)
 	end
@@ -37,7 +37,7 @@ function c89181369.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c89181369.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)==0
+	if not tc:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	local rg=Duel.GetMatchingGroup(c89181369.rmfilter,tp,LOCATION_GRAVE,0,nil)
 	rg:RemoveCard(tc)

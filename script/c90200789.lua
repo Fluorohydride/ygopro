@@ -52,7 +52,7 @@ function c90200789.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
 	if tg:GetCount()==0 then return end
 	Duel.SendtoGrave(tg,REASON_EFFECT)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=tg:GetFirst()
 	local lv=0
 	if tc:IsLocation(LOCATION_GRAVE) then lv=lv+tc:GetLevel() end

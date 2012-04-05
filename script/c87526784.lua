@@ -26,7 +26,7 @@ function c87526784.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c87526784.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if not Duel.IsExistingMatchingCard(c87526784.cfilter,tp,LOCATION_MZONE,0,1,nil) then return end
 	local tc=Duel.GetFirstMatchingCard(c87526784.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
 	if tc then

@@ -42,7 +42,7 @@ end
 function c92719314.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c92719314.tgfilter(chkc,e,tp) end
 	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
 			return Duel.IsExistingMatchingCard(c92719314.costfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
@@ -61,7 +61,7 @@ function c92719314.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c92719314.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)

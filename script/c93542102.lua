@@ -42,7 +42,7 @@ function c93542102.opa(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
 	local dc=Duel.TossDice(tp,1)
 	Duel.ConfirmDecktop(tp,dc)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local g=Duel.GetDecktopGroup(tp,dc)
 	local sg=g:FilterSelect(tp,c93542102.filter,1,1,nil,e,tp)
 	Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEUP)

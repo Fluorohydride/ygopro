@@ -26,7 +26,7 @@ function c40703222.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c40703222.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 or not Duel.IsPlayerCanSpecialSummonMonster(tp,40703223,0,0x4011,300,200,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
+	if ft<=0 or not Duel.IsPlayerCanSpecialSummonMonster(tp,40703223,0,0x4011,300,200,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
 	for i=1,ft do
 		local token=Duel.CreateToken(tp,40703223)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_DEFENCE)

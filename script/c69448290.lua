@@ -22,7 +22,7 @@ end
 function c69448290.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
 		Duel.SendtoGrave(c,REASON_EFFECT)
 		return
 	end

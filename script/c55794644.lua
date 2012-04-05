@@ -28,13 +28,13 @@ end
 function c55794644.hspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
 		return Duel.IsExistingMatchingCard(c55794644.spfilter,tp,LOCATION_MZONE,0,1,nil)
 	else return Duel.IsExistingMatchingCard(c55794644.spfilter,tp,0x16,0,1,nil) end
 end
 function c55794644.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
 		local g=Duel.SelectMatchingCard(tp,c55794644.spfilter,tp,LOCATION_MZONE,0,1,1,nil)
 		Duel.Remove(g,POS_FACEUP,REASON_COST)
 	else

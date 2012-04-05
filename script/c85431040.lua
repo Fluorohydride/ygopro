@@ -25,7 +25,7 @@ end
 function c85431040.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,300,REASON_EFFECT)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	if ft>2 then ft=2 end
 	local g=Duel.GetMatchingGroup(c85431040.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if g:GetCount()==0 then return end

@@ -19,7 +19,7 @@ function c74845897.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c74845897.op(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c74845897.filter,tp,LOCATION_GRAVE,0,ft,ft,nil,e,tp)
 	if g:GetCount()>0 then

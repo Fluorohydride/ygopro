@@ -39,7 +39,7 @@ end
 function c50766506.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	local c=e:GetHandler()
 	local slv=e:GetLabel()
 	local sg=Duel.GetMatchingGroup(c50766506.spfilter2,tp,LOCATION_DECK,0,nil,e,tp)
@@ -54,7 +54,7 @@ function c50766506.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:SetCardTarget(tc)
 		sg:Remove(Card.IsLevelAbove,nil,slv+1)
 		ft=ft-1
-	until ft==0 or sg:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(50766506,0))
+	until ft<=0 or sg:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(50766506,0))
 	Duel.SpecialSummonComplete()
 end
 function c50766506.desop(e,tp,eg,ep,ev,re,r,rp)

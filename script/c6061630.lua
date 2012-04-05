@@ -56,7 +56,7 @@ function c6061630.sfilter(c,lv,e,tp)
 		and c:GetLevel()==lv
 end
 function c6061630.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local lv=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c6061630.sfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil,lv,e,tp)

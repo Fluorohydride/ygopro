@@ -43,7 +43,7 @@ function c31828916.filter(c,atk,att,e,tp)
 end
 function c31828916.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		local dg=eg:Filter(c31828916.cfilter,nil,e:GetLabelObject():GetLabelObject(),e,tp)
 		if dg:GetCount()==1 then
 			e:SetLabel(1)
@@ -65,7 +65,7 @@ function c31828916.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c31828916.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if e:GetLabel()==1 then
 		local tc=e:GetLabelObject()
 		if not tc:IsRelateToEffect(e) then return end

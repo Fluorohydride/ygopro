@@ -17,7 +17,7 @@ function c5220687.filter(c,e,tp)
 	return c:IsLevelBelow(3) and c:IsRace(RACE_BEAST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
 end
 function c5220687.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local g=Duel.GetMatchingGroup(c5220687.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(5220687,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

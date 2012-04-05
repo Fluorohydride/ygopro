@@ -48,7 +48,7 @@ function c60312997.damval(e,re,val,r,rp,rc)
 	else return val end
 end
 function c60312997.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=e:GetLabelObject()
 	if tc:IsLocation(LOCATION_GRAVE) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)

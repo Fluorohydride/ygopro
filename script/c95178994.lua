@@ -25,7 +25,7 @@ end
 function c95178994.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	Duel.Damage(1-tp,500,REASON_EFFECT)
-	if ft==0 then return end
+	if ft<=0 then return end
 	local g=Duel.GetMatchingGroup(c95178994.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(95178994,1)) then
 		Duel.BreakEffect()

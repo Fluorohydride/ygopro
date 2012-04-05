@@ -36,14 +36,14 @@ function c12958919.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)
 	if ft>ct then ft=ct end
-	if ft==0 then return end
+	if ft<=0 then return end
 	if not Duel.IsPlayerCanSpecialSummonMonster(tp,12958920,0x49,0x4011,500,500,4,RACE_FIEND,ATTRIBUTE_DARK) then return end
 	local ctn=true
 	while ft>0 and ctn do
 		local token=Duel.CreateToken(tp,12958920)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		ft=ft-1
-		if ft==0 or not Duel.SelectYesNo(tp,aux.Stringid(12958919,2)) then ctn=false end
+		if ft<=0 or not Duel.SelectYesNo(tp,aux.Stringid(12958919,2)) then ctn=false end
 	end
 	Duel.SpecialSummonComplete()
 end

@@ -2552,6 +2552,11 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		}
 		if(core.attacker->operation_param) {
+			if(core.select_cards.size() == 0) {
+				returns.ivalue[0] = -2;
+				core.units.begin()->step = 5;
+				return FALSE;
+			}
 			for(int32 i = 0; i < 5; ++i) {
 				if(player[1 - infos.turn_player].list_mzone[i]) {
 					add_process(MSG_SELECT_YESNO, 0, 0, 0, infos.turn_player, 31);
@@ -3395,6 +3400,10 @@ int32 field::process_damage_step(uint16 step) {
 		core.attack_target = (card*)core.units.begin()->ptarget;
 		core.units.begin()->ptarget = (group*)tmp;
 		core.units.begin()->arg1 = infos.phase;
+		if(core.attacker->current.location != LOCATION_MZONE || core.attack_target->current.location != LOCATION_MZONE) {
+			core.units.begin()->step = 1;
+			return FALSE;
+		}
 		pduel->write_buffer8(MSG_ATTACK);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		pduel->write_buffer32(core.attack_target->get_info_location());

@@ -23,7 +23,7 @@ function c77847678.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c77847678.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	if ft>2 then ft=2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c77847678.filter,tp,LOCATION_HAND,0,1,ft,nil,e,tp)

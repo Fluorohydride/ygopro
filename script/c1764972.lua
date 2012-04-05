@@ -47,7 +47,7 @@ function c1764972.sfilter(c,e,tp)
 end
 function c1764972.spop1(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c1764972.sfilter,nil,e,tp)
 	if g:GetCount()==0 or g:GetCount()>ft then return false end
 	local c=e:GetHandler()

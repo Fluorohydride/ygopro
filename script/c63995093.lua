@@ -26,7 +26,7 @@ function c63995093.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c63995093.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	if ft>2 then ft=2 end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=g:GetFirst()

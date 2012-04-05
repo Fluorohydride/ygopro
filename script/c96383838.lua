@@ -27,7 +27,7 @@ end
 function c96383838.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	local sg=g:Filter(c96383838.rfilter,nil,e,tp)
 	if sg:GetCount()==0 then return end
 	if sg:GetCount()>ft then sg=sg:Select(tp,ft,ft,nil) end

@@ -31,8 +31,11 @@ end
 function c39512984.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
+function c39512984.atkfilter(c)
+	return c:IsSetCard(0x47) and c:IsType(TYPE_MONSTER)
+end
 function c39512984.atkup(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x47)*100
+	return Duel.GetMatchingGroupCount(c39512984.atkfilter,c:GetControler(),LOCATION_GRAVE,0,nil)*100
 end
 function c39512984.filter(c)
 	return c:IsLevelBelow(7) and c:IsSetCard(0x1047) and c:IsType(TYPE_FUSION) and c:IsAbleToRemoveAsCost()

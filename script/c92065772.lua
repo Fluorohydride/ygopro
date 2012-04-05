@@ -9,7 +9,7 @@ function c92065772.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c92065772.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		and Duel.GetLocationCount(1-tp,LOCATION_MZONE) then return end
 	--disable field
 	local e1=Effect.CreateEffect(e:GetHandler())

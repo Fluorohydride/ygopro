@@ -46,7 +46,7 @@ function c176392.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function c176392.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if not Duel.IsPlayerCanSpecialSummonMonster(tp,176393,0x1d,0x4011,1800,1800,4,RACE_ROCK,ATTRIBUTE_EARTH) then return end
 	local token=Duel.CreateToken(tp,176393)
 	Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)

@@ -21,7 +21,7 @@ end
 function c28190303.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return false end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
 	local tc=g:GetFirst()
 	return g:GetCount()==1 and tc:IsSetCard(0x33) and tc:GetCode()~=28190303

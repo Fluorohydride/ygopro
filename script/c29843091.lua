@@ -31,14 +31,14 @@ function c29843091.activate(e,tp,eg,ep,ev,re,r,rp)
 			token:RegisterEffect(e1,true)
 			local e2=Effect.CreateEffect(e:GetHandler())
 			e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-			e2:SetCode(EVENT_DESTROYED)
+			e2:SetCode(EVENT_DESTROY)
 			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e2:SetOperation(c29843091.tokendes)
+			e2:SetOperation(c29843091.damop)
 			token:RegisterEffect(e2,true)
 		end
 	end
 	Duel.SpecialSummonComplete()
 end
-function c29843091.tokendes(e,tp,eg,ep,ev,re,r,rp)
+function c29843091.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(tp,300,REASON_EFFECT)
 end

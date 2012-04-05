@@ -56,7 +56,7 @@ function c35514096.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Destroy(tc,REASON_EFFECT)
 		end
 	elseif e:GetLabel()==3 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 			or not Duel.IsPlayerCanSpecialSummonMonster(tp,35514097,0,0x4011,1200,1200,4,RACE_MACHINE,ATTRIBUTE_LIGHT) then return end
 		local token=Duel.CreateToken(tp,35514097)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)

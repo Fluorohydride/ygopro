@@ -36,7 +36,7 @@ end
 function c56252810.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,nil)
 	Duel.Destroy(dg,REASON_EFFECT)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
 	if tc:IsRelateToEffect(e) then

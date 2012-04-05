@@ -68,7 +68,7 @@ end
 function c24221808.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:FilterSelect(tp,c24221808.spfilter,ft,ft,nil,e:GetHandler(),e,tp)
 	Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)

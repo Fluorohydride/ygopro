@@ -38,7 +38,7 @@ function c90500169.activate(e,tp,eg,ep,ev,re,r,rp)
 	local rc=Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
 	if tc:GetLocation()==LOCATION_DECK then Duel.ShuffleDeck(tc:GetControler()) end
 	if rc==0 then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local class=_G["c"..code]
 	if class==nil or class.lvdncount==nil then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

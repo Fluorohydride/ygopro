@@ -20,7 +20,7 @@ function c11136371.pltg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c11136371.plop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_GRAVE,0,ft,ft,nil,0x34)
 	if g:GetCount()>0 then

@@ -82,7 +82,7 @@ function c77565204.proc(e,tp,eg,ep,ev,re,r,rp)
 		local code=e:GetLabel()
 		local tc=Duel.GetFirstMatchingCard(c77565204.procfilter,tp,LOCATION_EXTRA,0,nil,code,e,tp)
 		if not tc then return end
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
 			Duel.SendtoGrave(tc,REASON_EFFECT)
 			tc:CompleteProcedure()
 		else

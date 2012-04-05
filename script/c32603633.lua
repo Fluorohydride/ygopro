@@ -27,7 +27,7 @@ end
 function c32603633.op(e,tp,eg,ep,ev,re,r,rp)
 	local count=0
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	local g=Duel.GetMatchingGroup(c32603633.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
 	while g:GetCount()>0 and ft>0 do
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

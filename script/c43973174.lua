@@ -25,7 +25,7 @@ function c43973174.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c43973174.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if ft<=0 then return end
 	if ft>2 then ft=2 end
 	if not Duel.IsExistingMatchingCard(c43973174.cfilter,tp,LOCATION_MZONE,0,1,nil) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

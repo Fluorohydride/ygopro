@@ -67,7 +67,7 @@ function c44330098.sumtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,EFFECT_SPSUM_EFFECT_ACTIVATED,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c44330098.sumop2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	local val=e:GetLabelObject():GetLabel()
 	if not Duel.IsPlayerCanSpecialSummonMonster(tp,44330099,0,0x4011,0,0,7,RACE_FAIRY,ATTRIBUTE_LIGHT) then return end
