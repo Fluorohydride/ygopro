@@ -20,24 +20,24 @@ function c80163754.filter(c,atk)
 end
 function c80163754.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local g=Duel.GetMatchingGroup(c80163754.filter,tp,0,LOCATION_MZONE,nil)
+		local g=Duel.GetMatchingGroup(c80163754.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 		if g:GetCount()==0 then return false end
-		local mg=g:GetMinGroup(Card.GetDefence)
+		local mg,mdef=g:GetMinGroup(Card.GetDefence)
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c80163754.cfilter,1,nil,g:GetFirst():GetDefence())
+		return Duel.CheckReleaseGroup(tp,c80163754.cfilter,1,nil,mdef)
 	end
-	local g=Duel.GetMatchingGroup(c80163754.filter,tp,0,LOCATION_MZONE,nil)
-	local mg=g:GetMinGroup(Card.GetDefence)
-	local rg=Duel.SelectReleaseGroup(tp,c80163754.cfilter,1,1,nil,g:GetFirst():GetDefence())
+	local g=Duel.GetMatchingGroup(c80163754.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local mg,mdef=g:GetMinGroup(Card.GetDefence)
+	local rg=Duel.SelectReleaseGroup(tp,c80163754.cfilter,1,1,nil,mdef)
 	e:SetLabel(rg:GetFirst():GetAttack())
 	Duel.Release(rg,REASON_COST)
 end
 function c80163754.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetLabel()==0 end
-	local dg=Duel.GetMatchingGroup(c80163754.filter,tp,0,LOCATION_MZONE,nil,e:GetLabel())
+	local dg=Duel.GetMatchingGroup(c80163754.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetLabel())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,dg:GetCount(),0,0)
 end
 function c80163754.activate(e,tp,eg,ep,ev,re,r,rp)
-	local dg=Duel.GetMatchingGroup(c80163754.filter,tp,0,LOCATION_MZONE,nil,e:GetLabel())
+	local dg=Duel.GetMatchingGroup(c80163754.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetLabel())
 	Duel.Destroy(dg,REASON_EFFECT)
 end
