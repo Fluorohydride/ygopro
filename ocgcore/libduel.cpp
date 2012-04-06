@@ -2506,14 +2506,15 @@ int32 scriptlib::duel_is_player_can_draw(lua_State * L) {
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_discard_deck(lua_State * L) {
-	check_param_count(L, 1);
+	check_param_count(L, 2);
 	int32 playerid = lua_tointeger(L, 1);
+	int32 count = lua_tointeger(L, 2);
 	if(playerid != 0 && playerid != 1) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushboolean(L, pduel->game_field->is_player_can_discard_deck(playerid));
+	lua_pushboolean(L, pduel->game_field->is_player_can_discard_deck(playerid, count));
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_discard_deck_as_cost(lua_State * L) {

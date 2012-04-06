@@ -53,7 +53,7 @@ function c2403771.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		local res=g:IsExists(c2403771.repfilter,1,nil)
 		return not c:IsReason(REASON_REPLACE) and res
 	end
-	if Duel.SelectYesNo(tp,aux.Stringid(2403771,0)) then
+	if Duel.SelectYesNo(tp,aux.Stringid(2403771,1)) then
 		local g=c:GetEquipGroup()
 		local sg=g:FilterSelect(tp,c2403771.repfilter,1,1,nil)
 		Duel.SetTargetCard(sg)

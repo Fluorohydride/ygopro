@@ -36,6 +36,7 @@ function c39823987.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetReasonCard()
 	if not tc:IsRelateToBattle() then return end
 	local atk=tc:GetAttack()/2
+	if atk<0 then atk=0 end
 	if Duel.Destroy(tc,REASON_EFFECT)~=0 then
 		Duel.Damage(1-tp,atk,REASON_EFFECT)
 	end

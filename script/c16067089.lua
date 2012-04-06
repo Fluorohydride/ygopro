@@ -4,14 +4,15 @@ function c16067089.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_DESTROY)
+	e1:SetCode(EVENT_DESTROYED)
 	e1:SetCondition(c16067089.condition)
 	e1:SetTarget(c16067089.target)
 	e1:SetOperation(c16067089.activate)
 	c:RegisterEffect(e1)
 end
 function c16067089.cfilter(c,tp)
-	return c:IsCode(72677437) and c:IsControler(tp) and c:IsOnField() and c:IsFaceup()
+	return c:IsCode(72677437) and c:GetPreviousControler()==tp
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP_ATTACK)
 end
 function c16067089.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c16067089.cfilter,1,nil,tp)

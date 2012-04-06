@@ -8,10 +8,14 @@ function c41613948.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c41613948.condition)
 	e1:SetCost(c41613948.cost)
 	e1:SetTarget(c41613948.target)
 	e1:SetOperation(c41613948.operation)
 	c:RegisterEffect(e1)
+end
+function c41613948.condition(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK)
 end
 function c41613948.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.CheckAttackActivity(tp) end
@@ -24,7 +28,7 @@ function c41613948.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c41613948.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_MZONE,1,1,nil)

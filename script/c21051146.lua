@@ -25,16 +25,16 @@ function c21051146.acop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():AddCounter(0x3001,1)
 	end
 end
-function c21051146.filter(c,cc)
+function c21051146.filter(c,cc,tp)
 	local ct=math.ceil(c:GetAttack()/700)
 	if ct==0 then ct=1 end
 	return c:IsFaceup() and c:IsDestructable() and cc:IsCanRemoveCounter(tp,0x3001,ct,REASON_COST)
 end
 function c21051146.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c21051146.filter(chkc,e:GetHandler()) end
-	if chk==0 then return Duel.IsExistingTarget(c21051146.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetHandler()) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c21051146.filter(chkc,e:GetHandler(),tp) end
+	if chk==0 then return Duel.IsExistingTarget(c21051146.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetHandler(),tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c21051146.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e:GetHandler())
+	local g=Duel.SelectTarget(tp,c21051146.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e:GetHandler(),tp)
 	local ct=math.ceil(g:GetFirst():GetAttack()/700)
 	if ct==0 then ct=1 end
 	e:GetHandler():RemoveCounter(tp,0x3001,ct,REASON_COST)

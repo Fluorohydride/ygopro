@@ -2478,7 +2478,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		if(released.size())
 			raise_event(&released, EVENT_RELEASE, reason_effect, reason, reason_player, 0, 0);
 		if(destroyed.size())
-			raise_event(&released, EVENT_DESTROYED, reason_effect, reason, reason_player, 0, 0);
+			raise_event(&destroyed, EVENT_DESTROYED, reason_effect, reason, reason_player, 0, 0);
 		process_single_event();
 		process_instant_event();
 		if(equipings.size())

@@ -6,7 +6,7 @@ function c2584136.initial_effect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
-	e1:SetOperation(c2584136.eqcon)
+	e1:SetCondition(c2584136.eqcon)
 	e1:SetOperation(c2584136.eqop)
 	c:RegisterEffect(e1)
 end

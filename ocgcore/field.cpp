@@ -1401,7 +1401,9 @@ int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int
 int32 field::is_player_can_draw(uint8 playerid) {
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DRAW);
 }
-int32 field::is_player_can_discard_deck(uint8 playerid) {
+int32 field::is_player_can_discard_deck(uint8 playerid, int32 count) {
+	if(player[playerid].list_main.size() < (uint32)count)
+		return FALSE;
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DISCARD_DECK);
 }
 int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {

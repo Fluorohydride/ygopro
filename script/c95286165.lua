@@ -31,7 +31,7 @@ function c95286165.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mg=tc:GetMaterial()
 	local sumable=true
 	local sumtype=tc:GetSummonType()
-	if Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)==0 and bit.band(sumtype,SUMMON_TYPE_FUSION)~=SUMMON_TYPE_FUSION or mg:GetCount()==0
+	if Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)==0 or bit.band(sumtype,SUMMON_TYPE_FUSION)~=SUMMON_TYPE_FUSION or mg:GetCount()==0
 		or mg:GetCount()>Duel.GetLocationCount(tp,LOCATION_MZONE)
 		or mg:IsExists(c95286165.mgfilter,1,nil,e,tp,tc) then
 		sumable=false

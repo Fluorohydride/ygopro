@@ -13,16 +13,17 @@ function c59042331.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c59042331.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetAttackTarget()
-	return tc:IsControler(tp) or Duel.GetAttackTarget()~=nil
+	local tc=Duel.GetAttacker()
+	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
+	e:SetLabelObject(tc)
+	return tc and tc:IsControler(tp)
 end
-function c59042331.atkcost(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c59042331.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c59042331.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetAttackTarget()
-	if not tc or not tc:IsControler(tp) then tc=Duel.GetAttacker() end
+	local tc=e:GetLabelObject()
 	if tc:IsRelateToBattle() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
