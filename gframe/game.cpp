@@ -759,12 +759,21 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	}
 	chatMsg[0].clear();
 	chatTiming[0] = 600;
-	if(player == 0)
+	switch(player){
+	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
-	else if(player == 1)
+		chatMsg[0].append(L": ");
+		break;
+	case 1: //from client
 		chatMsg[0].append(dInfo.clientname);
-	else chatMsg[0].append(L"[***]");
-	chatMsg[0].append(L": ");
+		chatMsg[0].append(L": ");
+		break;
+	case 8: //system custom message, no prefix.
+		break;
+	default: //from watcher or unknown
+		chatMsg[0].append(L"[***]: ");
+	}
+
 	chatMsg[0].append(msg);
 }
 void Game::ClearTextures() {
