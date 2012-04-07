@@ -29,7 +29,7 @@ function c18060565.eqfilter(c)
 	return c:IsSetCard(0x29) and c:IsRace(RACE_DRAGON) and c:GetLevel()<=3
 end
 function c18060565.eqop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)

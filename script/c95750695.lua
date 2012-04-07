@@ -40,7 +40,7 @@ function c95750695.filter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_DUAL)
 end
 function c95750695.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c95750695.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c95750695.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c95750695.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c95750695.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
@@ -63,7 +63,7 @@ end
 function c95750695.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c95750695.spfilter(chkc) end
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c95750695.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
 end

@@ -16,7 +16,7 @@ end
 function c80549379.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsFaceup() and c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_DESTROY) end
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0
 		or not Duel.IsExistingMatchingCard(c80549379.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) then return false end
 	return Duel.SelectEffectYesNo(tp,c)
 end

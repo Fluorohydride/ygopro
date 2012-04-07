@@ -23,7 +23,7 @@ end
 function c95600067.reptarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_DESTROY) end
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return false end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
 	return Duel.SelectEffectYesNo(tp,c)
 end
 function c95600067.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)

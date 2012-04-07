@@ -22,8 +22,7 @@ function c95084054.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c95084054.filter(c)
-	local lv=c:GetLevel()
-	return lv>0 and lv<=4 and c:IsFaceup() and c:IsRace(RACE_THUNDER)
+	return c:IsFaceup() and c:IsLevelBelow(4) and c:IsRace(RACE_THUNDER)
 end
 function c95084054.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c95084054.filter,1,nil)

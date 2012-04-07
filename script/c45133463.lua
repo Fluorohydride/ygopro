@@ -12,7 +12,7 @@ function c45133463.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c45133463.cfiltetr(c,tp)
-	return c:IsPreviousLocation(LOCATION_GRAVE) and c:GetPreviousControler(tp)
+	return c:IsPreviousLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp
 end
 function c45133463.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c45133463.cfiltetr,1,nil,tp)

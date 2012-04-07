@@ -15,5 +15,8 @@ function c79409334.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
 end
 function c79409334.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangePosition(e:GetHandler(), POS_FACEUP_DEFENCE)
+	local c=e:GetHandler()
+	if c:IsRelateToEffect(e) and c:IsPosition(POS_FACEUP_ATTACK) then
+		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
+	end
 end

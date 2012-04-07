@@ -41,7 +41,7 @@ end
 function c44505297.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 or c:IsFacedown()
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsFacedown()
 		or not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end
 	Duel.Equip(tp,tc,c,false)
 	local e1=Effect.CreateEffect(c)

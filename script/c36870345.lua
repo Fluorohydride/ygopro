@@ -39,7 +39,7 @@ function c36870345.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) or c:IsControler(1-tp) 
-		or Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
+		or Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.BreakEffect()
 	if not Duel.Equip(tp,c,tc,false) then return end
 	local e1=Effect.CreateEffect(c)

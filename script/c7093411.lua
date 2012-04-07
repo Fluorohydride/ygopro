@@ -36,7 +36,7 @@ end
 function c7093411.reptarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_DESTROY) end
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return false end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
 	return Duel.SelectEffectYesNo(tp,c)
 end
 function c7093411.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -59,7 +59,7 @@ function c7093411.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end
 end
 function c7093411.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,1,nil,0x34)
 	if g:GetCount()>0 then

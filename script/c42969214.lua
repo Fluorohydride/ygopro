@@ -11,9 +11,6 @@ function c42969214.initial_effect(c)
 	e1:SetOperation(c42969214.operation)
 	c:RegisterEffect(e1)
 end
-function c42969214.cfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
-end
 function c42969214.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
