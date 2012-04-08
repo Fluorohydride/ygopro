@@ -20,7 +20,7 @@ function c19353570.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c19353570.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst():GetLevel()==3
+	return rp==tp and eg:GetFirst():GetLevel()==3
 end
 function c19353570.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

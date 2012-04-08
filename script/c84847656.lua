@@ -11,7 +11,7 @@ function c84847656.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c84847656.dfilter(c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_PSYCHO)
+	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_PSYCHO) and not c:IsReason(REASON_REPLACE)
 end
 function c84847656.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not eg:IsContains(e:GetHandler())
@@ -22,7 +22,7 @@ function c84847656.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	else return false end
 end
 function c84847656.value(e,c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_PSYCHO)
+	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsRace(RACE_PSYCHO) and not c:IsReason(REASON_REPLACE)
 end
 function c84847656.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT+REASON_REPLACE)
