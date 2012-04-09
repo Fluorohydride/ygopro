@@ -77,6 +77,7 @@ end
 function c97489701.syncon(e,c,tuner)
 	if c==nil then return true end
 	local tp=c:GetControler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<-2 then return false end
 	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local lv=c:GetLevel()

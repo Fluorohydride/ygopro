@@ -32,14 +32,17 @@ function c38495396.ovfilter(c)
 end
 function c38495396.xyzcon(e,c)
 	if c==nil then return true end
-	if Duel.IsExistingMatchingCard(c38495396.ovfilter,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
+	local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
+	if ft<=-2 then return false end
+	if ft>-1 and Duel.IsExistingMatchingCard(c38495396.ovfilter,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
 	local g=Duel.GetXyzMaterial(c)
 	return g:IsExists(c38495396.xyzfilter,2,nil)
 end
 function c38495396.xyzop(e,tp,eg,ep,ev,re,r,rp,c)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local g=Duel.GetXyzMaterial(c)
-	local b1=g:IsExists(c38495396.xyzfilter,2,nil)
-	local b2=Duel.IsExistingMatchingCard(c38495396.ovfilter,tp,LOCATION_MZONE,0,1,nil)
+	local b1=ft>-2 and g:IsExists(c38495396.xyzfilter,2,nil)
+	local b2=ft>-1 and Duel.IsExistingMatchingCard(c38495396.ovfilter,tp,LOCATION_MZONE,0,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	if (b1 and b2 and Duel.SelectYesNo(tp,aux.Stringid(38495396,1))) or ((not b1) and b2) then
 		local mg=Duel.SelectMatchingCard(tp,c38495396.ovfilter,tp,LOCATION_MZONE,0,1,1,nil)

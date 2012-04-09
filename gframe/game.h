@@ -293,6 +293,7 @@ public:
 	irr::gui::IGUIComboBox* cbDBDecks;
 	irr::gui::IGUIButton* btnClearDeck;
 	irr::gui::IGUIButton* btnSortDeck;
+	irr::gui::IGUIButton* btnShuffleDeck;
 	irr::gui::IGUIButton* btnSaveDeck;
 	irr::gui::IGUIButton* btnSaveDeckAs;
 	irr::gui::IGUIButton* btnDBExit;
@@ -423,6 +424,7 @@ extern Game* mainGame;
 #define BUTTON_DBEXIT				306
 #define BUTTON_SORT_DECK			307
 #define BUTTON_SIDE_OK				308
+#define BUTTON_SHUFFLE_DECK			309
 #define COMBOBOX_MAINTYPE			310
 #define BUTTON_EFFECT_FILTER		311
 #define BUTTON_START_FILTER			312

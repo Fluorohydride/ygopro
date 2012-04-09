@@ -274,27 +274,30 @@ int32 scriptlib::group_is_exists(lua_State *L) {
 	return 1;
 }
 int32 scriptlib::group_check_with_sum_equal(lua_State *L) {
-	check_param_count(L, 4);
+	check_param_count(L, 5);
 	check_param(L, PARAM_TYPE_GROUP, 1);
 	check_param(L, PARAM_TYPE_FUNCTION, 2);
 	group* pgroup = *(group**) lua_touserdata(L, 1);
 	duel* pduel = pgroup->pduel;
 	int32 acc = lua_tointeger(L, 3);
 	int32 min = lua_tointeger(L, 4);
-	if(min == 0)
+	int32 max = lua_tointeger(L, 5);
+	if(min <= 0)
 		min = 1;
-	int32 extraargs = lua_gettop(L) - 4;
+	if(max < min)
+		max = min;
+	int32 extraargs = lua_gettop(L) - 5;
 	field::card_vector cv;
 	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 		(*cit)->operation_param = pduel->lua->get_operation_value(*cit, 2, extraargs);
 		cv.push_back(*cit);
 	}
-	lua_pushboolean(L, pduel->game_field->check_with_sum_limit(&cv, acc, 0, 1, min));
+	lua_pushboolean(L, pduel->game_field->check_with_sum_limit(&cv, acc, 0, 1, min, max));
 	return 1;
 }
 int32 scriptlib::group_select_with_sum_equal(lua_State *L) {
 	check_action_permission(L);
-	check_param_count(L, 5);
+	check_param_count(L, 6);
 	check_param(L, PARAM_TYPE_GROUP, 1);
 	check_param(L, PARAM_TYPE_FUNCTION, 3);
 	group* pgroup = *(group**) lua_touserdata(L, 1);
@@ -304,18 +307,20 @@ int32 scriptlib::group_select_with_sum_equal(lua_State *L) {
 		return 0;
 	int32 acc = lua_tointeger(L, 4);
 	int32 min = lua_tointeger(L, 5);
-	if(min == 0)
+	int32 max = lua_tointeger(L, 6);
+	if(min <= 0)
 		min = 1;
-	int32 extraargs = lua_gettop(L) - 5;
-	field::card_set::iterator cit;
+	if(max < min)
+		max = min;
+	int32 extraargs = lua_gettop(L) - 6;
 	pduel->game_field->core.select_cards.clear();
-	for(cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 		(*cit)->operation_param = pduel->lua->get_operation_value(*cit, 3, extraargs);
 		pduel->game_field->core.select_cards.push_back(*cit);
 	}
-	if(!pduel->game_field->check_with_sum_limit(&pduel->game_field->core.select_cards, acc, 0, 1, min))
+	if(!pduel->game_field->check_with_sum_limit(&pduel->game_field->core.select_cards, acc, 0, 1, min, max))
 		return 0;
-	pduel->game_field->add_process(PROCESSOR_SELECT_SUM_S, 0, 0, 0, acc, playerid + (min << 16));
+	pduel->game_field->add_process(PROCESSOR_SELECT_SUM_S, 0, 0, 0, acc, playerid + (min << 16) + (max << 24));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::group_check_with_sum_greater(lua_State *L) {

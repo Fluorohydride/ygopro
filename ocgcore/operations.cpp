@@ -764,9 +764,9 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 			return TRUE;
 		if(pcard->current.location != LOCATION_MZONE)
 			return TRUE;
-		if(get_useable_count(playerid, LOCATION_MZONE) == 0)
+		if(get_useable_count(playerid, LOCATION_MZONE, playerid, LOCATION_REASON_CONTROL) == 0)
 			return TRUE;
-		if(pcard->data.type & TYPE_TRAPMONSTER && get_useable_count(playerid, LOCATION_SZONE) == 0)
+		if(pcard->data.type & TYPE_TRAPMONSTER && get_useable_count(playerid, LOCATION_SZONE, playerid, LOCATION_REASON_CONTROL) == 0)
 			return TRUE;
 		if(!pcard->is_capable_change_control())
 			return TRUE;
@@ -875,7 +875,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card* equip_card, card* targ
 				change_position(equip_card, 0, equip_player, POS_FACEUP, 0);
 			return FALSE;
 		}
-		if(get_useable_count(equip_player, LOCATION_SZONE) == 0)
+		if(get_useable_count(equip_player, LOCATION_SZONE, equip_player, LOCATION_REASON_TOFIELD) == 0)
 			return TRUE;
 		equip_card->enable_field_effect(FALSE);
 		move_to_field(equip_card, equip_player, equip_player, LOCATION_SZONE, (up || equip_card->is_position(POS_FACEUP)) ? POS_FACEUP : POS_FACEDOWN);
@@ -1003,12 +1003,19 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 			if(rcount == 0)
 				returns.bvalue[0] = 0;
 			else {
-				if(min == 0 && get_useable_count(sumplayer, LOCATION_MZONE) > 0 ) {
+				int32 fcount = get_useable_count(sumplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD);
+				if(min == 0 && (fcount > 0)) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 90);
 					core.temp_var[0] = required;
+					core.temp_var[1] = fcount;
 					core.units.begin()->step = 19;
-				} else
+				} else {
+					if(min < -fcount + 1) {
+						min = -fcount + 1;
+						required = min + (max >> 16);
+					}
 					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, required);
+				}
 			}
 		}
 		return FALSE;
@@ -1216,8 +1223,15 @@ int32 field::summon(uint16 step, uint8 sumplayer, card* target, effect* proc, ui
 	case 20: {
 		if(returns.ivalue[0])
 			returns.bvalue[0] = 0;
-		else
-			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, (ptr)(core.temp_var[0]) + 1);
+		else {
+			int32 min = 1;
+			int32 max = core.temp_var[0] >> 16;
+			if(min < -core.temp_var[1] + 1) {
+				min = -core.temp_var[1] + 1;
+			}
+			core.temp_var[0] = min + (max >> 16);
+			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, core.temp_var[0]);
+		}
 		core.units.begin()->step = 2;
 		return false;
 	}
@@ -1371,12 +1385,19 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			if(rcount == 0)
 				returns.bvalue[0] = 0;
 			else {
-				if(min == 0 && get_useable_count(setplayer, LOCATION_MZONE) > 0) {
+				int32 fcount = get_useable_count(setplayer, LOCATION_MZONE, setplayer, LOCATION_REASON_TOFIELD);
+				if(min == 0 && fcount > 0) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 90);
 					core.temp_var[0] = required;
+					core.temp_var[1] = fcount;
 					core.units.begin()->step = 9;
-				} else
+				} else {
+					if(min < -fcount + 1) {
+						min = -fcount + 1;
+						required = min + (max >> 16);
+					}
 					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, required);
+				}
 			}
 		}
 		return FALSE;
@@ -1466,8 +1487,15 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 	case 10: {
 		if(returns.ivalue[0])
 			returns.bvalue[0] = 0;
-		else
-			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, (ptr)(core.temp_var[0]) + 1);
+		else {
+			int32 min = 1;
+			int32 max = core.temp_var[0] >> 16;
+			if(min < -core.temp_var[1] + 1) {
+				min = -core.temp_var[1] + 1;
+			}
+			core.temp_var[0] = min + (max >> 16);
+			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, core.temp_var[0]);
+		}
 		core.units.begin()->step = 2;
 		return false;
 	}
@@ -1477,7 +1505,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 	switch(step) {
 	case 0: {
-		if(!(target->data.type & TYPE_FIELD) && get_useable_count(toplayer, LOCATION_SZONE) == 0)
+		if(!(target->data.type & TYPE_FIELD) && get_useable_count(toplayer, LOCATION_SZONE, setplayer, LOCATION_REASON_TOFIELD) == 0)
 			return TRUE;
 		if(target->data.type & TYPE_MONSTER && !target->is_affected_by_effect(EFFECT_MONSTER_SSET))
 			return TRUE;
@@ -1710,7 +1738,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!result || (target->current.location == LOCATION_MZONE)
 		        || !is_player_can_spsummon(core.reason_effect, target->summon_type, positions, target->summon_player, playerid, target)
 		        || target->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON)
-		        || get_useable_count(playerid, LOCATION_MZONE) == 0
+		        || get_useable_count(playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD) == 0
 		        || (!nocheck && !(target->data.type & TYPE_MONSTER)))
 			result = FALSE;
 		if(result && !nocheck) {
@@ -2624,7 +2652,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			return TRUE;
 		if(!(location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))) {
 			uint32 flag;
-			uint32 ct = get_useable_count(playerid, location, &flag);
+			uint32 ct = get_useable_count(playerid, location, move_player, LOCATION_REASON_TOFIELD, &flag);
 			if(ret && (ct == 0 || !(target->data.type & TYPE_MONSTER))) {
 				send_to(target, core.reason_effect, REASON_EFFECT, core.reason_player, PLAYER_NONE, LOCATION_GRAVE, 0, 0);
 				return TRUE;
@@ -3098,7 +3126,7 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 	}
 	return TRUE;
 }
-int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min) {
+int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max) {
 	switch(step) {
 	case 0: {
 		core.select_cards.clear();
@@ -3116,7 +3144,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 						pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 						pduel->lua->add_param(-1, PARAM_TYPE_INDEX);
 						pduel->lua->add_param(min, PARAM_TYPE_INT);
-						if(pduel->lua->check_condition(peffect->target, 4))
+						pduel->lua->add_param(max, PARAM_TYPE_INT);
+						if(pduel->lua->check_condition(peffect->target, 5))
 							core.select_cards.push_back(tuner);
 					} else {
 						card_vector nsyn;
@@ -3137,7 +3166,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 						int32 lv = pcard->get_level();
 						if(lv == l1)
 							continue;
-						if(check_with_sum_limit(&nsyn, lv - l1, 0, 1, min))
+						if(check_with_sum_limit(&nsyn, lv - l1, 0, 1, min, max))
 							core.select_cards.push_back(tuner);
 					}
 				}
@@ -3163,6 +3192,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 			pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 			pduel->lua->add_param(-1, PARAM_TYPE_INDEX);
 			pduel->lua->add_param(min, PARAM_TYPE_INT);
+			pduel->lua->add_param(max, PARAM_TYPE_INT);
 			core.sub_solving_event.push_back(nil_event);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, peffect, 0, playerid, 0);
 		} else {
@@ -3185,7 +3215,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 			pduel->write_buffer8(HINT_SELECTMSG);
 			pduel->write_buffer8(playerid);
 			pduel->write_buffer32(512);
-			add_process(PROCESSOR_SELECT_SUM, 0, 0, 0, lv - l1, playerid + (min << 16));
+			add_process(PROCESSOR_SELECT_SUM, 0, 0, 0, lv - l1, playerid + (min << 16) + (max << 24));
 			core.units.begin()->step = 2;
 		}
 		return FALSE;
@@ -3216,7 +3246,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 int32 field::select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max) {
 	switch(step) {
 	case 0: {
-		if(core.release_cards_ex.size() == 0 || (check_field && get_useable_count(playerid, LOCATION_MZONE) == 0)) {
+		if(core.release_cards_ex.size() == 0 || (check_field && get_useable_count(playerid, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD) == 0)) {
 			core.select_cards.clear();
 			for(auto cit = core.release_cards.begin(); cit != core.release_cards.end(); ++cit)
 				core.select_cards.push_back(*cit);
@@ -3283,7 +3313,7 @@ int32 field::select_release_cards(int16 step, uint8 playerid, uint8 check_field,
 int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max) {
 	switch(step) {
 	case 0: {
-		if(core.release_cards_ex.size() == 0 || (get_useable_count(playerid, LOCATION_MZONE) == 0 && min < 2)) {
+		if(core.release_cards_ex.size() == 0 || (get_useable_count(playerid, LOCATION_MZONE, playerid, LOCATION_REASON_TOFIELD) == 0 && min < 2)) {
 			core.select_cards.clear();
 			for(auto cit = core.release_cards.begin(); cit != core.release_cards.end(); ++cit)
 				core.select_cards.push_back(*cit);

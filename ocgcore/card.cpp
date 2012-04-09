@@ -1237,10 +1237,11 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 	if(!pduel->game_field->is_player_can_summon(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
 	uint32 rcount = get_summon_tribute_count();
-	uint32 min = rcount & 0xffff, max = (rcount >> 16) & 0xffff;
+	int32 min = rcount & 0xffff, max = (rcount >> 16) & 0xffff;
 	if(min > 0 && !pduel->game_field->is_player_can_summon(SUMMON_TYPE_ADVANCE, playerid, this))
 		return FALSE;
-	if(pduel->game_field->get_useable_count(current.controler, LOCATION_MZONE) == 0 && max == 0)
+	int32 fcount = pduel->game_field->get_useable_count(current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_TOFIELD);
+	if(max <= -fcount)
 		return FALSE;
 	if(min == 0)
 		return TRUE;
@@ -1271,10 +1272,11 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 	if(!pduel->game_field->is_player_can_mset(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
 	uint32 rcount = get_set_tribute_count();
-	uint32 min = rcount & 0xffff, max = (rcount >> 16) & 0xffff;
+	int32 min = rcount & 0xffff, max = (rcount >> 16) & 0xffff;
 	if(min > 0 && !pduel->game_field->is_player_can_mset(SUMMON_TYPE_ADVANCE, playerid, this))
 		return FALSE;
-	if(pduel->game_field->get_useable_count(current.controler, LOCATION_MZONE) == 0 && max == 0)
+	int32 fcount = pduel->game_field->get_useable_count(current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_TOFIELD);
+	if(max <= -fcount)
 		return FALSE;
 	if(min == 0)
 		return TRUE;
@@ -1642,7 +1644,7 @@ int32 card::is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect
 	return TRUE;
 }
 int32 card::is_setable_szone(uint8 playerid) {
-	if(!(data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(current.controler, LOCATION_SZONE) == 0)
+	if(!(data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_TOFIELD) == 0)
 		return FALSE;
 	if(data.type & TYPE_MONSTER && !is_affected_by_effect(EFFECT_MONSTER_SSET))
 		return FALSE;
@@ -1930,9 +1932,9 @@ int32 card::is_control_can_be_changed() {
 		return FALSE;
 	if(current.location != LOCATION_MZONE)
 		return FALSE;
-	if(pduel->game_field->get_useable_count(1 - current.controler, LOCATION_MZONE) == 0)
+	if(pduel->game_field->get_useable_count(1 - current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_CONTROL) == 0)
 		return FALSE;
-	if(data.type & TYPE_TRAPMONSTER && pduel->game_field->get_useable_count(1 - current.controler, LOCATION_MZONE))
+	if((data.type & TYPE_TRAPMONSTER) && pduel->game_field->get_useable_count(1 - current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_CONTROL))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_CHANGE_CONTROL))
 		return FALSE;

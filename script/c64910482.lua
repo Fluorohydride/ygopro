@@ -22,7 +22,7 @@ end
 function c64910482.synfilter2(c,syncard,f)
 	return c:IsSetCard(0x27) and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and (f==nil or f(c))
 end
-function c64910482.syntg(e,syncard,f,minc)
+function c64910482.syntg(e,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
@@ -31,9 +31,9 @@ function c64910482.syntg(e,syncard,f,minc)
 		local exg=Duel.GetMatchingGroup(c64910482.synfilter2,syncard:GetControler(),LOCATION_HAND,0,c,syncard,f)
 		g:Merge(exg)
 	end
-	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,syncard)
+	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,maxc,syncard)
 end
-function c64910482.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
+function c64910482.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
 	local g=Duel.GetMatchingGroup(c64910482.synfilter1,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
 	if syncard:IsSetCard(0x27) then
@@ -41,7 +41,7 @@ function c64910482.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
 		g:Merge(exg)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,syncard)
+	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,maxc,syncard)
 	Duel.SetSynchroMaterial(sg)
 end
 function c64910482.regop(e,tp,eg,ep,ev,re,r,rp)

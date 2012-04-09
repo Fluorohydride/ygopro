@@ -29,6 +29,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				std::sort(deckManager.current_deck.side.begin(), deckManager.current_deck.side.end(), ClientCard::deck_sort_lv);
 				break;
 			}
+			case BUTTON_SHUFFLE_DECK: {
+				std::random_shuffle(deckManager.current_deck.main.begin(), deckManager.current_deck.main.end());
+				break;
+			}
 			case BUTTON_SAVE_DECK: {
 				deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
 				mainGame->stACMessage->setText(dataManager.GetSysString(1335));

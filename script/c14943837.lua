@@ -36,18 +36,17 @@ end
 function c14943837.synfilter(c,syncard,f)
 	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and c:GetLevel()~=4 and (f==nil or f(c))
 end
-function c14943837.syntg(e,syncard,f,minc)
+function c14943837.syntg(e,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
 	local g=Duel.GetMatchingGroup(c14943837.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
-	local res=g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,syncard)
-	return res
+	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,maxc,syncard)
 end
-function c14943837.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
+function c14943837.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
 	local g=Duel.GetMatchingGroup(c14943837.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
-	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,syncard)
+	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,maxc,syncard)
 	Duel.SetSynchroMaterial(sg)
 end
 function c14943837.filter2(c,e,sp)

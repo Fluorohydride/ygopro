@@ -456,7 +456,7 @@ int32 select_sum_check1(int32* oparam, int32 size, int32 index, int32 count, int
 	return (acc > o1 && select_sum_check1(oparam, size, index + 1, count + 1, acc - o1, min))
 	       || (o2 > 0 && acc > o2 && select_sum_check1(oparam, size, index + 1, count + 1, acc - o2, min));
 }
-int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 min) {
+int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 min, int32 max) {
 	if(step == 0) {
 		returns.bvalue[0] = 0;
 		if(core.select_cards.empty())
@@ -466,9 +466,12 @@ int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 
 			pduel->write_buffer8(0);
 		else
 			pduel->write_buffer8(1);
+		if(max < min)
+			max = min;
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer32(acc & 0xffff);
 		pduel->write_buffer8(min);
+		pduel->write_buffer8(max);
 		pduel->write_buffer8(core.select_cards.size());
 		card* pcard;
 		std::sort(core.select_cards.begin(), core.select_cards.end(), card::card_operation_sort);
@@ -486,7 +489,7 @@ int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 
 		memset(c, 0, 64);
 		if(min) {
 			int32 oparam[16];
-			if(returns.bvalue[0] < min) {
+			if(returns.bvalue[0] < min || returns.bvalue[0] > max) {
 				pduel->write_buffer8(MSG_RETRY);
 				return FALSE;
 			}

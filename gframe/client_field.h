@@ -48,6 +48,7 @@ public:
 	int selected_field;
 	int select_min;
 	int select_max;
+	int select_sumval;
 	int select_cancelable;
 	int select_mode;
 	bool select_ready;

@@ -14,10 +14,10 @@ function c89181369.spfilter(c,e,tp,rg)
 	if not c:IsType(TYPE_SYNCHRO) or not c:IsRace(RACE_DRAGON) or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) then return false end
 	if rg:IsContains(c) then
 		rg:RemoveCard(c)
-		result=rg:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),1)
+		result=rg:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),1,99)
 		rg:AddCard(c)
 	else
-		result=rg:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),1)
+		result=rg:CheckWithSumEqual(Card.GetLevel,c:GetLevel(),1,99)
 	end
 	return result
 end
@@ -41,8 +41,8 @@ function c89181369.activate(e,tp,eg,ep,ev,re,r,rp)
 		or not tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	local rg=Duel.GetMatchingGroup(c89181369.rmfilter,tp,LOCATION_GRAVE,0,nil)
 	rg:RemoveCard(tc)
-	if rg:CheckWithSumEqual(Card.GetLevel,tc:GetLevel(),1) then
-		local rm=rg:SelectWithSumEqual(tp,Card.GetLevel,tc:GetLevel(),1)
+	if rg:CheckWithSumEqual(Card.GetLevel,tc:GetLevel(),1,99) then
+		local rm=rg:SelectWithSumEqual(tp,Card.GetLevel,tc:GetLevel(),1,99)
 		Duel.Remove(rm,POS_FACEUP,REASON_EFFECT)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end

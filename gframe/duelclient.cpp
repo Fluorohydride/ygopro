@@ -1206,8 +1206,9 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_SELECT_SUM: {
 		mainGame->dField.select_mode = BufferIO::ReadInt8(pbuf);
 		int selecting_player = BufferIO::ReadInt8(pbuf);
-		mainGame->dField.select_max = BufferIO::ReadInt32(pbuf);
+		mainGame->dField.select_sumval = BufferIO::ReadInt32(pbuf);
 		mainGame->dField.select_min = BufferIO::ReadInt8(pbuf);
+		mainGame->dField.select_max = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->dField.selectsum_all.clear();
 		mainGame->dField.selected_cards.clear();
@@ -1232,8 +1233,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		std::sort(mainGame->dField.selectsum_all.begin(), mainGame->dField.selectsum_all.end(), ClientCard::client_card_sort);
 		mainGame->dField.CheckSelectSum();
 		if(select_hint)
-			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_max);
-		else myswprintf(textBuffer, L"%ls(%d)", dataManager.GetSysString(560), mainGame->dField.select_max);
+			myswprintf(textBuffer, L"%ls(%d)", dataManager.GetDesc(select_hint), mainGame->dField.select_sumval);
+		else myswprintf(textBuffer, L"%ls(%d)", dataManager.GetSysString(560), mainGame->dField.select_sumval);
 		select_hint = 0;
 		if (panelmode) {
 			mainGame->wCardSelect->setText(textBuffer);

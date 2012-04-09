@@ -288,7 +288,7 @@ public:
 	void set_control(card* pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count);
 	card* get_field_card(uint8 playerid, uint8 location, uint8 sequence);
 	int32 is_location_useable(uint8 playerid, uint8 location, uint8 sequence);
-	int32 get_useable_count(uint8 playerid, uint8 location, uint32* list = 0);
+	int32 get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, uint32 reason, uint32* list = 0);
 	void shuffle(uint8 playerid, uint8 location);
 	void reset_sequence(uint8 playerid, uint8 location);
 	void swap_deck_and_grave(uint8 playerid);
@@ -329,9 +329,9 @@ public:
 	uint32 get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype);
 	int32 effect_replace_check(uint32 code, tevent& e);
 	int32 get_attack_target(card* pcard, card_vector* v, uint8 chain_attack = FALSE);
-	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min);
-	int32 check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min);
-	int32 check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int32 count, int32 min);
+	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max);
+	int32 check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max);
+	int32 check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int32 count, int32 min, int32 max);
 
 	int32 is_player_can_draw(uint8 playerid);
 	int32 is_player_can_discard_deck(uint8 playerid, int32 count);
@@ -440,7 +440,7 @@ public:
 	int32 move_to_field(uint16 step, card* target, uint32 enable, uint32 ret);
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, ptr arg, ptr replace_type);
-	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min);
+	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max);
 	int32 select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max);
 	int32 select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max);
 	int32 toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count);
@@ -457,7 +457,7 @@ public:
 	int32 select_position(uint16 step, uint8 playerid, uint32 code, uint8 positions);
 	int32 select_tribute(uint16 step, uint8 playerid, uint8 cancelable, uint8 min, uint8 max);
 	int32 select_counter(uint16 step, uint8 playerid, uint16 countertype, uint16 count);
-	int32 select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 min);
+	int32 select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 min, int max);
 	int32 sort_card(int16 step, uint8 playerid, uint8 is_chain);
 	int32 announce_race(int16 step, uint8 playerid, int32 count, int32 available);
 	int32 announce_attribute(int16 step, uint8 playerid, int32 count, int32 available);
@@ -465,6 +465,9 @@ public:
 	int32 announce_number(int16 step, uint8 playerid);
 };
 
+//Location Use Reason
+#define LOCATION_REASON_TOFIELD	0x1
+#define LOCATION_REASON_CONTROL	0x2
 //Chain Info
 #define CHAIN_DISABLE_ACTIVATE	0x01
 #define CHAIN_DISABLE_EFFECT	0x02

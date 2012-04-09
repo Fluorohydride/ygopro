@@ -46,18 +46,18 @@ c93369354.tuner_filter=aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER)
 function c93369354.synfilter(c,syncard,f)
 	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and c:IsAttribute(ATTRIBUTE_WATER) and (f==nil or f(c))
 end
-function c93369354.syntg(e,syncard,f,minc)
+function c93369354.syntg(e,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
 	local g=Duel.GetMatchingGroup(c93369354.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
-	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,syncard)
+	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,maxc,syncard)
 end
-function c93369354.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
+function c93369354.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	local g=Duel.GetMatchingGroup(c93369354.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,syncard)
+	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,maxc,syncard)
 	Duel.SetSynchroMaterial(sg)
 end

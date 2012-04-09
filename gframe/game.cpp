@@ -351,8 +351,9 @@ bool Game::Initialize() {
 	ebDeckname = env->addEditBox(L"", rect<s32>(80, 65, 220, 90), true, wDeckEdit, -1);
 	ebDeckname->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnSaveDeckAs = env->addButton(rect<s32>(225, 65, 290, 90), wDeckEdit, BUTTON_SAVE_DECK_AS, dataManager.GetSysString(1303));
-	btnClearDeck = env->addButton(rect<s32>(225, 95, 290, 116), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
-	btnSortDeck = env->addButton(rect<s32>(155, 95, 220, 116), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
+	btnClearDeck = env->addButton(rect<s32>(240, 95, 290, 116), wDeckEdit, BUTTON_CLEAR_DECK, dataManager.GetSysString(1304));
+	btnSortDeck = env->addButton(rect<s32>(185, 95, 235, 116), wDeckEdit, BUTTON_SORT_DECK, dataManager.GetSysString(1305));
+	btnShuffleDeck = env->addButton(rect<s32>(130, 95, 180, 116), wDeckEdit, BUTTON_SHUFFLE_DECK, dataManager.GetSysString(1307));
 	btnDBExit = env->addButton(rect<s32>(10, 95, 90, 116), wDeckEdit, BUTTON_DBEXIT, dataManager.GetSysString(1306));
 	btnSideOK = env->addButton(rect<s32>(510, 40, 820, 80), 0, BUTTON_SIDE_OK, dataManager.GetSysString(1334));
 	btnSideOK->setVisible(false);

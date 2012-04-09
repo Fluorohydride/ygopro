@@ -230,7 +230,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_SUM: {
 			pbuf++;
 			player = BufferIO::ReadInt8(pbuf);
-			pbuf += 5;
+			pbuf += 6;
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 11;
 			return ReadReplayResponse();

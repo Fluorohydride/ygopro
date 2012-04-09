@@ -19,13 +19,12 @@ function c27174286.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c27174286.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
-		and Duel.IsExistingMatchingCard(c27174286.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp)
-	end
+		and Duel.IsExistingMatchingCard(c27174286.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_REMOVED)
 end
 function c27174286.op(e,tp,eg,ep,ev,re,r,rp)
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft1==0 then return end
+	if ft1<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c27174286.filter,tp,LOCATION_REMOVED,0,ft1,ft1,nil,e,tp)
 	if g:GetCount()>0 then

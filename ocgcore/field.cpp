@@ -380,8 +380,6 @@ card* field::get_field_card(uint8 playerid, uint8 location, uint8 sequence) {
 int32 field::is_location_useable(uint8 playerid, uint8 location, uint8 sequence) {
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return TRUE;
-	if (!(location == LOCATION_SZONE && sequence == 5) && get_useable_count(playerid, location) == 0)
-		return FALSE;
 	int32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	if (location == LOCATION_MZONE && flag & (1 << sequence))
 		return FALSE;
@@ -389,25 +387,33 @@ int32 field::is_location_useable(uint8 playerid, uint8 location, uint8 sequence)
 		return FALSE;
 	return TRUE;
 }
-int32 field::get_useable_count(uint8 playerid, uint8 location, uint32* list) {
+int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, uint32 reason, uint32* list) {
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return 0;
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
 	effect_set eset;
 	if (location == LOCATION_MZONE) {
 		flag = (flag & 0x1f);
-		filter_player_effect(playerid, EFFECT_MAX_MZONE, &eset);
+		if(uplayer < 2)
+			filter_player_effect(playerid, EFFECT_MAX_MZONE, &eset);
 	} else {
 		flag = (flag & 0x1f00) >> 8;
-		filter_player_effect(playerid, EFFECT_MAX_SZONE, &eset);
+		if(uplayer < 2)
+			filter_player_effect(playerid, EFFECT_MAX_SZONE, &eset);
 	}
 	if(list)
 		*list = flag;
-	int32 max = 5;
-	if(eset.count)
-		max = eset.get_last()->get_value();
-	int32 ret = max - field_used_count[flag];
-	return ret > 0 ? ret : 0;
+	if(eset.count) {
+		int32 max = 5;
+		pduel->lua->add_param(uplayer, PARAM_TYPE_INT);
+		pduel->lua->add_param(reason, PARAM_TYPE_INT);
+		max = eset.get_last()->get_value(2);
+		int32 block = 5 - field_used_count[flag];
+		int32 limit = max - field_used_count[player[playerid].used_location];
+		return block < limit ? block : limit;
+	} else {
+		return 5 - field_used_count[flag];
+	}
 }
 void field::shuffle(uint8 playerid, uint8 location) {
 	if(!(location & (LOCATION_HAND + LOCATION_DECK)))
@@ -1338,18 +1344,18 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack) 
 		pcard->operation_param = 1;
 	return must_be_attack.size() ? TRUE : FALSE;
 }
-int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min) {
+int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max) {
 	card* tuner;
 	for(uint8 p = 0; p < 2; ++p) {
 		for(int32 i = 0; i < 5; ++i) {
 			tuner = player[p].list_mzone[i];
-			if(check_tuner_material(pcard, tuner, findex1, findex2, min))
+			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max))
 				return TRUE;
 		}
 	}
 	return FALSE;
 }
-int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min) {
+int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max) {
 	effect* peffect;
 	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && pduel->lua->check_matching(tuner, findex1, 0)
 	        && tuner->is_can_be_synchro_material(pcard)) {
@@ -1360,7 +1366,8 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 			pduel->lua->add_param(findex2, PARAM_TYPE_INDEX);
 			pduel->lua->add_param(min, PARAM_TYPE_INT);
-			if(pduel->lua->check_condition(peffect->target, 4))
+			pduel->lua->add_param(max, PARAM_TYPE_INT);
+			if(pduel->lua->check_condition(peffect->target, 5))
 				return TRUE;
 		} else {
 			card_vector nsyn;
@@ -1381,22 +1388,22 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			int32 lv = pcard->get_level();
 			if(lv == l1)
 				return FALSE;
-			if(check_with_sum_limit(&nsyn, lv - l1, 0, 1, min))
+			if(check_with_sum_limit(&nsyn, lv - l1, 0, 1, min, max))
 				return TRUE;
 		}
 	}
 	return FALSE;
 }
-int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int32 count, int32 min) {
+int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int32 count, int32 min, int32 max) {
 	if((uint32)index >= mats->size())
 		return FALSE;
 	int32 op1 = mats->at(index)->operation_param & 0xffff;
 	int32 op2 = (mats->at(index)->operation_param >> 16) & 0xffff;
-	if((op1 == acc || op2 == acc) && count >= min)
+	if((op1 == acc || op2 == acc) && count >= min && count <= max)
 		return TRUE;
-	return (acc > op1 && check_with_sum_limit(mats, acc - op1, index + 1, count + 1, min))
-	       || (op2 && acc > op2 && check_with_sum_limit(mats, acc - op2, index + 1, count + 1, min))
-	       || check_with_sum_limit(mats, acc, index + 1, count, min);
+	return (acc > op1 && check_with_sum_limit(mats, acc - op1, index + 1, count + 1, min, max))
+	       || (op2 && acc > op2 && check_with_sum_limit(mats, acc - op2, index + 1, count + 1, min, max))
+	       || check_with_sum_limit(mats, acc, index + 1, count, min, max);
 }
 int32 field::is_player_can_draw(uint8 playerid) {
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DRAW);

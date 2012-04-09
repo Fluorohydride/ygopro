@@ -14,27 +14,16 @@ c73417207.tuner_filter=aux.FALSE
 function c73417207.filter(c,syncard,f)
 	return c:IsSetCard(0x42) and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and (f==nil or f(c))
 end
-function c73417207.lvtest1(c,lv,g)
-	local lv1=c:GetLevel()
-	return lv1<lv and g:IsExists(c73417207.lvtest2,1,c,lv-lv1)
-end
-function c73417207.lvtest2(c,lv2)
-	return c:GetLevel()==lv2
-end
-function c73417207.target(e,syncard,f,minc)
-	if minc>2 then return false end
+function c73417207.target(e,syncard,f,minc,maxc)
+	if minc>2 or maxc<2 then then return false end
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
 	if lv<=0 then return false end
 	local g=Duel.GetMatchingGroup(c73417207.filter,syncard:GetControler(),LOCATION_HAND,0,nil,syncard,f)
-	return g:GetCount()>=2 and g:IsExists(c73417207.lvtest1,1,nil,lv,g)
+	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,2,2,syncard)
 end
-function c73417207.operation(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
+function c73417207.operation(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
-	local g=Duel.GetMatchingGroup(c73417207.filter,tp,LOCATION_HAND,0,nil,syncard,f)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-	local g1=g:FilterSelect(tp,c73417207.lvtest1,1,1,nil,lv,g)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-	local g2=g:FilterSelect(tp,c73417207.lvtest2,1,1,g1:GetFirst(),lv-g1:GetFirst():GetLevel())
-	g1:Merge(g2)
-	Duel.SetSynchroMaterial(g1)
+	local g=Duel.GetMatchingGroup(c73417207.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
+	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,2,2,syncard)
+	Duel.SetSynchroMaterial(sg)
 end

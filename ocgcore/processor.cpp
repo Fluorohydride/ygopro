@@ -165,7 +165,7 @@ int32 field::process() {
 		}
 	}
 	case PROCESSOR_SELECT_SUM: {
-		if (select_with_sum_limit(it->step, it->arg2 & 0xffff, it->arg1, it->arg2 >> 16)) {
+		if (select_with_sum_limit(it->step, it->arg2 & 0xffff, it->arg1, (it->arg2 >> 16) & 0xff, (it->arg2 >> 24) & 0xff)) {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
@@ -721,7 +721,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_SYNCHRO: {
-		if (select_synchro_material(it->step, it->arg1, (card*)it->ptarget, it->arg2))
+		if (select_synchro_material(it->step, it->arg1, (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -4223,7 +4223,7 @@ int32 field::refresh_location_info(uint16 step) {
 		int32 val = peffect->get_value();
 		int32 count1 = (val & 0xffff) - field_used_count[(val >> 16) & 0x1f];
 		uint32 flag = 0;
-		int32 count2 = get_useable_count(p, loc, &flag);
+		int32 count2 = get_useable_count(p, loc, PLAYER_NONE, 0, &flag);
 		if(count1 > count2)
 			count1 = count2;
 		core.units.begin()->arg1 = count1;
@@ -4270,7 +4270,7 @@ int32 field::refresh_location_info(uint16 step) {
 		int32 val = peffect->get_value();
 		int32 count1 = (val & 0xffff) - field_used_count[(val >> 16) & 0x1f];
 		uint32 flag = 0;
-		int32 count2 = get_useable_count(p, loc, &flag);
+		int32 count2 = get_useable_count(p, loc, PLAYER_NONE, 0, &flag);
 		if(count1 > count2)
 			count1 = count2;
 		core.units.begin()->arg1 = count1;
@@ -4431,7 +4431,7 @@ int32 field::adjust_step(uint16 step) {
 			for(cit = core.adjust_list.begin(); cit != core.adjust_list.end(); ++cit) {
 				tp = (*cit)->current.controler;
 				if(((tp == 0 && swap[0] == 0) || (tp == 1 && swap[1] == 0)) &&
-				        (!((*cit)->get_type()&TYPE_TRAPMONSTER) || get_useable_count(1 - tp, LOCATION_SZONE) > 0)) {
+				        (!((*cit)->get_type()&TYPE_TRAPMONSTER) || get_useable_count(1 - tp, LOCATION_SZONE, 1 - tp, LOCATION_REASON_CONTROL) > 0)) {
 					swap[tp] = *cit;
 					it[tp] = cit;
 					if(swap[0] && swap[1]) {
