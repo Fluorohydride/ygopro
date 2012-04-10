@@ -28,7 +28,8 @@ function c5861892.initial_effect(c)
 end
 function c5861892.spcon(e,c)
 	if c==nil then return true end
-	return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,c:GetControler(),LOCATION_MZONE,0,3,nil)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3
+		and Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,c:GetControler(),LOCATION_MZONE,0,3,nil)
 end
 function c5861892.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

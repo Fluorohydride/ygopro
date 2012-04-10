@@ -25,7 +25,8 @@ function c70861343.filter(c,lv,e,tp)
 	return c:IsLevelBelow(lv) and c:IsRace(RACE_BEAST+RACE_WINDBEAST+RACE_INSECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c70861343.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c70861343.cfilter,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.CheckReleaseGroup(tp,c70861343.cfilter,1,nil,e,tp) end
 	local rg=Duel.SelectReleaseGroup(tp,c70861343.cfilter,1,1,nil,e,tp)
 	e:SetLabel(rg:GetFirst():GetLevel()+3)
 	Duel.Release(rg,REASON_COST)

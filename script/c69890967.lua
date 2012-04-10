@@ -41,7 +41,8 @@ function c69890967.initial_effect(c)
 end
 function c69890967.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsRace,3,nil,RACE_FIEND)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3
+		and Duel.CheckReleaseGroup(c:GetControler(),Card.IsRace,3,nil,RACE_FIEND)
 end
 function c69890967.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsRace,3,3,nil,RACE_FIEND)

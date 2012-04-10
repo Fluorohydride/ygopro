@@ -16,7 +16,7 @@ function c35059553.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 LOCATION_REASON_TOFIELD=1
-function c35059553.value(e,rp,r)
+function c35059553.value(e,fp,rp,r)
 	if rp==e:GetHandlerPlayer() or r~=LOCATION_REASON_TOFIELD then return 5 end
 	local limit=Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)
 	return limit>0 and limit or 5

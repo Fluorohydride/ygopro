@@ -64,7 +64,8 @@ function c2067935.filter(c,e,tp)
 	return not c:IsCode(2067935) and c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,112,tp,false,false)
 end
 function c2067935.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c2067935.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(c2067935.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c2067935.spop(e,tp,eg,ep,ev,re,r,rp)

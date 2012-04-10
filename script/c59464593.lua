@@ -34,7 +34,8 @@ c59464593.lvdncount=3
 c59464593.lvdn={73879377,46384672,980973}
 function c59464593.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,73879377)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+		and Duel.CheckReleaseGroup(c:GetControler(),Card.IsCode,1,nil,73879377)
 end
 function c59464593.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsCode,1,1,nil,73879377)

@@ -56,7 +56,8 @@ end
 function c72258771.otcon(e,c)
 	if c==nil then return true end
 	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and g:IsExists(Card.IsSetCard,1,nil,0x1d)
+	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+		and g:IsExists(Card.IsSetCard,1,nil,0x1d)
 end
 function c72258771.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.GetTributeGroup(c)

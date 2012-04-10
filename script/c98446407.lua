@@ -23,7 +23,8 @@ function c98446407.filter(c,e,tp)
 	return c:GetCode()==61441708 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c98446407.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c98446407.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2
+		and Duel.IsExistingMatchingCard(c98446407.filter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
 function c98446407.spop(e,tp,eg,ep,ev,re,r,rp)

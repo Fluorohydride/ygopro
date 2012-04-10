@@ -73,7 +73,7 @@ function c89493368.spcfilter(c,code)
 	return c:IsCode(code) and c:IsAbleToGraveAsCost()
 end
 function c89493368.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost()
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and e:GetHandler():IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(c89493368.spcfilter,tp,LOCATION_ONFIELD,0,1,nil,15175429)
 		and Duel.IsExistingMatchingCard(c89493368.spcfilter,tp,LOCATION_ONFIELD,0,1,nil,52286175) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

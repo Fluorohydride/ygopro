@@ -29,7 +29,6 @@ function c25924653.initial_effect(c)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetOperation(c25924653.leave)
 	c:RegisterEffect(e3)
-	e1:SetLabelObject(e3)
 end
 function c25924653.spgcon(e,tp,eg,ep,ev,re,r,rp)
 	local st=e:GetHandler():GetSummonType()
@@ -39,9 +38,9 @@ function c25924653.spgfilter(c,e,tp)
 	return c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,104,tp,false,false)
 end
 function c25924653.spgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and c25924653.spgfilter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c25924653.spgfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c25924653.spgfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(c25924653.spgfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c25924653.spgfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
@@ -52,26 +51,34 @@ function c25924653.spgop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,104,tp,tp,false,false,POS_FACEUP)>0
 		and c:IsFaceup() and c:IsRelateToEffect(e) then
 		c:SetCardTarget(tc)
-		e:GetLabelObject():SetLabelObject(tc)
-		c:CreateRelation(tc,RESET_EVENT+0x1fe0000)
-		tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
+		tc:RegisterFlagEffect(25924653,RESET_EVENT+0x13e0000,0,1)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x13e0000)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCondition(c25924653.discon)
 		tc:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e2:SetCode(EVENT_CHAIN_SOLVING)
+		e2:SetRange(LOCATION_MZONE)
+		e2:SetOperation(c25924653.disop)
+		c:RegisterEffect(e2)
 	end
 end
 function c25924653.discon(e)
-	local o=e:GetOwner()
-	local c=e:GetHandler()
-	return not o:IsDisabled() and o:IsRelateToCard(c)
+	return e:GetOwner():IsHasCardTarget(e:GetHandler())
+end
+function c25924653.disop(e,tp,eg,ep,ev,re,r,rp)
+	if re:GetHandler():GetFlagEffect(25924653)~=0 then
+		Duel.NegateEffect(ev)
+	end
 end
 function c25924653.leave(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=e:GetLabelObject()
-	if tc and tc:IsRelateToCard(c) then
+	local tc=c:GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_MZONE) then
 		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 	end
 end
@@ -87,7 +94,8 @@ function c25924653.filter(c,e,tp)
 	return not c:IsCode(25924653) and c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,104,tp,false,false)
 end
 function c25924653.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c25924653.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(c25924653.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c25924653.spop(e,tp,eg,ep,ev,re,r,rp)

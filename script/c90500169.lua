@@ -25,7 +25,8 @@ function c90500169.spfilter(c,class,e,tp)
 end
 function c90500169.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c90500169.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c90500169.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingTarget(c90500169.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,c90500169.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)

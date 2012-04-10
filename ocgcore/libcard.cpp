@@ -1466,6 +1466,7 @@ int32 scriptlib::card_enable_counter_permit(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 countertype = lua_tointeger(L, 2);
 	effect* peffect = pcard->pduel->new_effect();
+	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
 	peffect->code = EFFECT_COUNTER_PERMIT | countertype;
 	peffect->flag = EFFECT_FLAG_SINGLE_RANGE;
@@ -1482,6 +1483,7 @@ int32 scriptlib::card_set_counter_limit(lua_State *L) {
 	int32 countertype = lua_tointeger(L, 2);
 	int32 limit = lua_tointeger(L, 3);
 	effect* peffect = pcard->pduel->new_effect();
+	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
 	peffect->code = EFFECT_COUNTER_LIMIT | countertype;
 	peffect->value = limit;

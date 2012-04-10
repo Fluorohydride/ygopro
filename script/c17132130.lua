@@ -32,7 +32,7 @@ function c17132130.spcon(e,c)
 	local g=Duel.GetReleaseGroup(c:GetControler())
 	local d=g:FilterCount(Card.IsSetCard,nil,0xc008)
 	local ct=g:GetCount()
-	return d>0 and ct>2
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3 and d>0 and ct>2
 end
 function c17132130.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.GetReleaseGroup(c:GetControler())

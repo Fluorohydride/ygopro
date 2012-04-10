@@ -19,7 +19,8 @@ function c20638610.spfilter(c,e,tp)
 end
 function c20638610.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c20638610.rmfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c20638610.rmfilter,tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingTarget(c20638610.rmfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(c20638610.spfilter,tp,LOCATION_GRAVE+LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c20638610.rmfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)

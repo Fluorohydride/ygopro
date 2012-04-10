@@ -35,7 +35,8 @@ function c50893987.scfilter(c)
 	return c:IsSetCard(0x19) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c50893987.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(c50893987.scfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingTarget(c50893987.scfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c50893987.scop(e,tp,eg,ep,ev,re,r,rp)

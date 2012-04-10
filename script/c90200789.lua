@@ -35,7 +35,8 @@ function c90200789.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
 		if sg:GetCount()==0 then return false end
 		local mlv=sg:GetMinGroup(Card.GetLevel):GetFirst():GetLevel()
-		return Duel.IsExistingTarget(c90200789.filter1,tp,LOCATION_MZONE,0,1,nil,tp,mlv)
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+			and Duel.IsExistingTarget(c90200789.filter1,tp,LOCATION_MZONE,0,1,nil,tp,mlv)
 	end
 	local mlv=sg:GetMinGroup(Card.GetLevel):GetFirst():GetLevel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

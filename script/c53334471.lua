@@ -9,6 +9,7 @@ function c53334471.initial_effect(c)
 	--adjust
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCode(EVENT_ADJUST)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c53334471.adjustop)
@@ -16,6 +17,7 @@ function c53334471.initial_effect(c)
 	--adjust
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetOperation(c53334471.adjustop2)
@@ -75,17 +77,23 @@ function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if g1:GetCount()==0 then c53334471[tp]=0
 	else
-		if c53334471[tp]==0 then c53334471[tp]=Duel.AnnounceAttribute(tp,1,c53334471.getattribute(g1)) end
+		if c53334471[tp]==0 then
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(53334471,0))
+			c53334471[tp]=Duel.AnnounceAttribute(tp,1,c53334471.getattribute(g1))
+		end
 		g1:Remove(c53334471.rmfilter,nil,c53334471[tp])
 	end
 	if g2:GetCount()==0 then c53334471[1-tp]=0
 	else
-		if c53334471[1-tp]==0 then c53334471[1-tp]=Duel.AnnounceAttribute(1-tp,1,c53334471.getattribute(g2)) end
+		if c53334471[1-tp]==0 then
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(53334471,0))
+			c53334471[1-tp]=Duel.AnnounceAttribute(1-tp,1,c53334471.getattribute(g2))
+		end
 		g2:Remove(c53334471.rmfilter,nil,c53334471[1-tp])
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then
-		Duel.SendtoGrave(g1,REASON_EFFECT+REASON_RULE)
+		Duel.SendtoGrave(g1,REASON_EFFECT)
 		Duel.Readjust()
 	end
 end

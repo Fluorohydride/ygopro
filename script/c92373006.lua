@@ -42,7 +42,8 @@ function c92373006.spfilter(c,e,tp)
 end
 function c92373006.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:GetControler()==tp and c92373006.tgfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c92373006.tgfilter,tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2
+		and Duel.IsExistingTarget(c92373006.tgfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(c92373006.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	Duel.SelectTarget(tp,c92373006.tgfilter,tp,LOCATION_MZONE,0,1,1,nil)

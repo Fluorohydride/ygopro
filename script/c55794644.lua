@@ -28,7 +28,9 @@ end
 function c55794644.hspcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft<=-1 then return false end
+	if ft<=0 then
 		return Duel.IsExistingMatchingCard(c55794644.spfilter,tp,LOCATION_MZONE,0,1,nil)
 	else return Duel.IsExistingMatchingCard(c55794644.spfilter,tp,0x16,0,1,nil) end
 end

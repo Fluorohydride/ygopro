@@ -42,7 +42,7 @@ function c94092230.tlimit(e,c)
 end
 function c94092230.ttcon(e,c)
 	if c==nil then return true end
-	return Duel.GetTributeCount(c)>=3
+	return Duel.GetTributeCount(c)>=3 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3
 end
 function c94092230.ttop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectTribute(tp,c,3,3)

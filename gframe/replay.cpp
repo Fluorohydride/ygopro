@@ -139,7 +139,7 @@ void Replay::SaveReplay(const wchar_t* name) {
 	fclose(fp);
 }
 bool Replay::OpenReplay(const wchar_t* name) {
-	wchar_t fname[64];
+	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
 #ifdef WIN32
 	fp = _wfopen(fname, L"rb");
@@ -170,7 +170,7 @@ bool Replay::OpenReplay(const wchar_t* name) {
 	return true;
 }
 bool Replay::CheckReplay(const wchar_t* name) {
-	wchar_t fname[64];
+	wchar_t fname[256];
 	myswprintf(fname, L"./replay/%ls", name);
 #ifdef WIN32
 	FILE* rfp = _wfopen(fname, L"rb");

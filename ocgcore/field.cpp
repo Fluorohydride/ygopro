@@ -391,13 +391,16 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, ui
 	if (location != LOCATION_MZONE && location != LOCATION_SZONE)
 		return 0;
 	uint32 flag = player[playerid].disabled_location | player[playerid].used_location;
+	uint32 used_flag = player[playerid].used_location;
 	effect_set eset;
 	if (location == LOCATION_MZONE) {
 		flag = (flag & 0x1f);
+		used_flag = (used_flag & 0x1f);
 		if(uplayer < 2)
 			filter_player_effect(playerid, EFFECT_MAX_MZONE, &eset);
 	} else {
 		flag = (flag & 0x1f00) >> 8;
+		used_flag = (used_flag & 0x1f00) >> 8;
 		if(uplayer < 2)
 			filter_player_effect(playerid, EFFECT_MAX_SZONE, &eset);
 	}
@@ -405,11 +408,12 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, ui
 		*list = flag;
 	if(eset.count) {
 		int32 max = 5;
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		pduel->lua->add_param(uplayer, PARAM_TYPE_INT);
 		pduel->lua->add_param(reason, PARAM_TYPE_INT);
-		max = eset.get_last()->get_value(2);
+		max = eset.get_last()->get_value(3);
 		int32 block = 5 - field_used_count[flag];
-		int32 limit = max - field_used_count[player[playerid].used_location];
+		int32 limit = max - field_used_count[used_flag];
 		return block < limit ? block : limit;
 	} else {
 		return 5 - field_used_count[flag];

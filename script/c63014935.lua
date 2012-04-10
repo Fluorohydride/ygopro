@@ -45,7 +45,8 @@ function c63014935.initial_effect(c)
 end
 function c63014935.spcon(e,c)
 	if c==nil then return true end
-	return Duel.IsExistingMatchingCard(Card.IsReleaseable,c:GetControler(),0,LOCATION_MZONE,1,nil)
+	return Duel.GetLocationCount(1-c:GetControler(),LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(Card.IsReleaseable,c:GetControler(),0,LOCATION_MZONE,1,nil)
 end
 function c63014935.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)

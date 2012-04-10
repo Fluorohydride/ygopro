@@ -33,7 +33,8 @@ function c31516413.initial_effect(c)
 end
 function c31516413.hspcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsSetCard,1,nil,0x69)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+		and Duel.CheckReleaseGroup(c:GetControler(),Card.IsSetCard,1,nil,0x69)
 end
 function c31516413.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsSetCard,1,1,nil,0x69)

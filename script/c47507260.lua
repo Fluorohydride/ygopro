@@ -59,7 +59,8 @@ function c47507260.spfilter(c,e,tp)
 	return c:IsCode(74591968) and c:IsCanBeSpecialSummoned(e,0,tp,true,true)
 end
 function c47507260.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c47507260.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(c47507260.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function c47507260.spop(e,tp,eg,ep,ev,re,r,rp)

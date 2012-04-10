@@ -9,6 +9,7 @@ function c90846359.initial_effect(c)
 	--adjust
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCode(EVENT_ADJUST)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c90846359.adjustop)
@@ -16,6 +17,7 @@ function c90846359.initial_effect(c)
 	--adjust
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EVENT_LEAVE_FIELD)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetOperation(c90846359.adjustop2)
@@ -91,7 +93,7 @@ function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then
-		Duel.SendtoGrave(g1,REASON_EFFECT+REASON_RULE)
+		Duel.SendtoGrave(g1,REASON_EFFECT)
 		Duel.Readjust()
 	end
 end

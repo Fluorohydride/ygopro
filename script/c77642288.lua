@@ -25,12 +25,12 @@ function c77642288.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function c77642288.spop(e,tp,eg,ep,ev,re,r,rp)
-	local zc=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if zc==0 then return end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft==0 then return end
 	if not Duel.IsExistingMatchingCard(c77642288.filter,tp,LOCATION_DECK,0,2,nil,e,tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c77642288.filter,tp,LOCATION_DECK,0,2,2,nil,e,tp)
-	if zc==1 then
+	if ft==1 then
 		local sg=g:Select(tp,1,1,nil)
 		local sc=sg:GetFirst()
 		g:RemoveCard(sc)

@@ -19,7 +19,7 @@ function c43434803.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return Duel.IsExistingTarget(c43434803.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and Duel.IsExistingTarget(c43434803.filter,1-tp,LOCATION_GRAVE,0,1,nil,e,1-tp)
-			and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+			and Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp)>0
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectTarget(tp,c43434803.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)

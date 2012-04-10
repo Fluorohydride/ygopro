@@ -67,8 +67,8 @@ function c91842653.spcon(e,c)
 	local lv=c:GetLevel()
 	local tp=c:GetControler()
 	if lv<5 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	elseif lv<7 then return Duel.CheckReleaseGroup(tp,nil,1,nil)
-	else return Duel.CheckReleaseGroup(tp,nil,2,nil) end
+	elseif lv<7 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.CheckReleaseGroup(tp,nil,1,nil)
+	else return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and Duel.CheckReleaseGroup(tp,nil,2,nil) end
 end
 function c91842653.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local lv=c:GetLevel()

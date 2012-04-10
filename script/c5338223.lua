@@ -21,10 +21,10 @@ function c5338223.spfilter(c,e,tp)
 end
 function c5338223.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local chkf=(e:GetLabel()==1)
+		local chkf=(e:GetLabel()==1) and 0 or -1
 		e:SetLabel(0)
 		return Duel.IsExistingMatchingCard(c5338223.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
-			and (chkf or Duel.GetLocationCount(tp,LOCATION_MZONE)>0)
+			and Duel.GetLocationCount(tp,LOCATION_MZONE)>chkf
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 	e:SetLabel(0)
