@@ -2811,8 +2811,6 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					pcard->fieldid = infos.field_id++;
 					if(pcard->current.location == LOCATION_MZONE) {
 						raise_single_event(pcard, 0, EVENT_FLIP, reason_effect, 0, reason_player, 0, noflip);
-						if(infos.phase == PHASE_BATTLE && pcard->current.controler != infos.turn_player)
-							core.pre_field[pcard->current.sequence] = pcard->fieldid;
 					}
 					if(enable)
 						pcard->enable_field_effect(TRUE);
