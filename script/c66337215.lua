@@ -18,7 +18,7 @@ function c66337215.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c66337215.filter(c)
-	return c:GetLevel()>=7 and c:IsAbleToHand()
+	return c:IsLevelAbove(7) and c:IsAbleToHand()
 end
 function c66337215.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and chkc:GetControler()==tp and c66337215.filter(chkc) end
