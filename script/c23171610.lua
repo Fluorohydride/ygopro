@@ -13,8 +13,7 @@ function c23171610.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c23171610.condition(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetCurrentPhase()==PHASE_DAMAGE and Duel.IsDamageCalculated() then return false end
-	return true
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated() 
 end
 function c23171610.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)

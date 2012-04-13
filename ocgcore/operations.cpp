@@ -1534,6 +1534,17 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 	case 2: {
 		core.phase_action = TRUE;
 		target->set_status(STATUS_SET_TURN, TRUE);
+		if(target->data.type & TYPE_MONSTER) {
+			effect* peffect = target->is_affected_by_effect(EFFECT_MONSTER_SSET);
+			int32 type_val = peffect->get_value();
+			peffect = pduel->new_effect();
+			peffect->owner = target;
+			peffect->type = EFFECT_TYPE_SINGLE;
+			peffect->code = EFFECT_CHANGE_TYPE;
+			peffect->reset_flag = RESET_EVENT + 0x1fe0000;
+			peffect->value = type_val;
+			target->add_effect(peffect);
+		}
 		pduel->write_buffer8(MSG_SET);
 		pduel->write_buffer32(target->data.code);
 		pduel->write_buffer8(target->current.controler);

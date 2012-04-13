@@ -2,7 +2,7 @@
 function c65422840.initial_effect(c)
 	--Draw
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(66526672,0))
+	e1:SetDescription(aux.Stringid(65422840,0))
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
@@ -13,7 +13,7 @@ function c65422840.initial_effect(c)
 	c:RegisterEffect(e1)
 	--todeck
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(66526672,1))
+	e2:SetDescription(aux.Stringid(65422840,1))
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCategory(CATEGORY_TODECK)
 	e2:SetRange(LOCATION_MZONE)
@@ -27,6 +27,7 @@ function c65422840.cfilter(c)
 end
 function c65422840.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c65422840.cfilter,tp,LOCATION_GRAVE,0,2,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c65422840.cfilter,tp,LOCATION_GRAVE,0,2,2,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
@@ -49,6 +50,7 @@ function c65422840.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c65422840.filter(chkc) end
 	if chk==0 then return e:GetHandler():GetFlagEffect(65422840)==0
 		and Duel.IsExistingTarget(c65422840.filter,tp,LOCATION_REMOVED,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c65422840.filter,tp,LOCATION_REMOVED,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
