@@ -14,10 +14,10 @@ function c19159413.filter(c)
 	return c:IsFacedown() or c:IsType(TYPE_SPELL)
 end
 function c19159413.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c19159413.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c19159413.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and c19159413.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c19159413.filter,tp,LOCATION_SZONE,LOCATION_SZONE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c19159413.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	local g=Duel.SelectTarget(tp,c19159413.filter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
 	if g:GetFirst():IsFaceup() then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end

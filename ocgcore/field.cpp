@@ -629,14 +629,11 @@ void field::remove_oath_effect(effect* reason_effect) {
 	}
 }
 void field::reset_effect(uint32 id, uint32 reset_type) {
-	effect_indexer::iterator it, rm;
-	effect_container::iterator pit;
-	effect* peffect;
 	int32 result;
-	for (it = effects.indexer.begin(); it != effects.indexer.end(); ++it) {
-		rm = it++;
-		peffect = rm->first;
-		pit = rm->second;
+	for (auto it = effects.indexer.begin(); it != effects.indexer.end(); ++it) {
+		auto rm = it++;
+		auto peffect = rm->first;
+		auto pit = rm->second;
 		if (!(peffect->flag & EFFECT_FLAG_FIELD_ONLY))
 			continue;
 		result = peffect->reset(id, reset_type);
@@ -667,9 +664,8 @@ void field::reset_effect(uint32 id, uint32 reset_type) {
 	}
 }
 void field::reset_phase(uint32 phase) {
-	field_effect::effect_collection::iterator eit, rm;
-	for(eit = effects.pheff.begin(); eit != effects.pheff.end();) {
-		rm = eit++;
+	for(auto eit = effects.pheff.begin(); eit != effects.pheff.end();) {
+		auto rm = eit++;
 		if((*rm)->reset(phase, RESET_PHASE)) {
 			if((*rm)->flag & EFFECT_FLAG_FIELD_ONLY)
 				remove_effect((*rm));
@@ -679,9 +675,8 @@ void field::reset_phase(uint32 phase) {
 	}
 }
 void field::reset_chain() {
-	field_effect::effect_collection::iterator eit, rm;
-	for(eit = effects.cheff.begin(); eit != effects.cheff.end();) {
-		rm = eit++;
+	for(auto eit = effects.cheff.begin(); eit != effects.cheff.end();) {
+		auto rm = eit++;
 		if((*rm)->flag & EFFECT_FLAG_FIELD_ONLY)
 			remove_effect((*rm));
 		else
@@ -690,8 +685,7 @@ void field::reset_chain() {
 }
 void field::filter_field_effect(uint32 code, effect_set* eset, uint8 sort) {
 	effect* peffect;
-	pair<effect_container::iterator, effect_container::iterator> rg;
-	rg = effects.aura_effect.equal_range(code);
+	auto rg = effects.aura_effect.equal_range(code);
 	for (; rg.first != rg.second; ++rg.first) {
 		peffect = rg.first->second;
 		if (peffect->is_available())

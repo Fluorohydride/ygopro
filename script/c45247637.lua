@@ -34,7 +34,7 @@ function c45247637.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c45247637.costfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c45247637.costfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c45247637.filter(c)
 	return c:IsFaceup() and c:IsControlerCanBeChanged()

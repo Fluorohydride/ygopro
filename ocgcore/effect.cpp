@@ -395,7 +395,7 @@ int32 effect::is_chainable(uint8 tp) {
 	if((type & EFFECT_TYPE_ACTIVATE) && sp <= 1)
 		return FALSE;
 	if(pduel->game_field->core.current_chain.size()) {
-		if(get_speed() < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
+		if(sp < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
 			return FALSE;
 	}
 	if(pduel->game_field->core.chain_limit) {

@@ -139,7 +139,7 @@ int32 scriptlib::effect_set_reset(lua_State *L) {
 	if(v & (RESET_PHASE) && !(v & (RESET_SELF_TURN | RESET_OPPO_TURN)))
 		v |= (RESET_SELF_TURN | RESET_OPPO_TURN);
 	peffect->reset_flag = v;
-	peffect->reset_count |= c & 0xff;
+	peffect->reset_count = (peffect->reset_count & 0xff00) | (c & 0xff);
 	return 0;
 }
 int32 scriptlib::effect_set_type(lua_State *L) {
