@@ -27,9 +27,9 @@ function c86585274.cffilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsPublic()
 end
 function c86585274.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c40213117.cffilter,tp,LOCATION_HAND,0,3,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c86585274.cffilter,tp,LOCATION_HAND,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,c40213117.cffilter,tp,LOCATION_HAND,0,3,3,nil)
+	local g=Duel.SelectMatchingCard(tp,c86585274.cffilter,tp,LOCATION_HAND,0,3,3,nil)
 	g:AddCard(e:GetHandler())
 	Duel.ConfirmCards(1-tp,g)
 	Duel.ShuffleHand(tp)

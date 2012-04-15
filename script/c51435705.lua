@@ -23,7 +23,7 @@ function c51435705.shcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(e:GetHandler(),REASON_DISCARD+REASON_COST)
 end
 function c51435705.filter(c)
-	return c:IsSetCard(0x70) and c:GetCode()~=51435705 and c:IsAbleToHand()
+	return c:IsSetCard(0x70) and c:GetCode()~=51435705 and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c51435705.shtg(e,tp,eg,ep,ev,re,r,rp,chk)

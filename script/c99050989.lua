@@ -8,10 +8,10 @@ function c99050989.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c99050989.filter(c)
-	return c:IsAttackBelow(1600) or c:IsFacedown()
+	return c:GetAttack()<1600 or c:IsFacedown()
 end
 function c99050989.dircon(e)
 	local tp=e:GetHandlerPlayer()
-	return Duel.GetFieldGroupCount(tp,LOCATION_SZONE)==0 
+	return Duel.GetFieldGroupCount(tp,0,LOCATION_SZONE)==0 
 		and not Duel.IsExistingMatchingCard(c99050989.filter,tp,0,LOCATION_MZONE,1,nil)
 end
