@@ -29,6 +29,7 @@ function c74641045.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_BATTLED)
+	e4:SetCondition(c74641045.descon)
 	e4:SetTarget(c74641045.destg)
 	e4:SetOperation(c74641045.desop)
 	c:RegisterEffect(e4)
@@ -47,6 +48,9 @@ function c74641045.retop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c74641045.atkcon(e)
 	return not Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,TYPE_MONSTER)
+end
+function c74641045.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetAttackTarget()~=nil
 end
 function c74641045.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsDestructable() end

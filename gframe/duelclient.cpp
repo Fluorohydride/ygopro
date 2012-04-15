@@ -1382,7 +1382,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			}
 			mainGame->WaitFrameSignal(45);
 			for(int i = 0; i < field_confirm.size(); ++i) {
-				mainGame->dField.MoveCard(pcard, 5);
+				mainGame->dField.MoveCard(field_confirm[i], 5);
 			}
 			mainGame->WaitFrameSignal(5);
 		}

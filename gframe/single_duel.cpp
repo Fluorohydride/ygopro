@@ -400,6 +400,8 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	int opt = 0;
 	if(host_info.enable_priority)
 		opt |= DUEL_ENABLE_PRIORITY;
+	if(host_info.no_shuffle_deck)
+		opt |= DUEL_PSEUDO_SHUFFLE;
 	last_replay.WriteInt32(host_info.start_lp, false);
 	last_replay.WriteInt32(host_info.start_hand, false);
 	last_replay.WriteInt32(host_info.draw_count, false);

@@ -1364,6 +1364,11 @@ int32 scriptlib::duel_readjust(lua_State *L) {
 	pduel->game_field->core.re_adjust = TRUE;
 	return 0;
 }
+int32 scriptlib::duel_adjust_instantly(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->adjust_instant();
+	return 0;
+}
 /**
  * \brief Duel.GetFieldGroup
  * \param playerid, location1, location2

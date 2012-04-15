@@ -13,7 +13,7 @@ function c1371589.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c1371589.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
+	return ep~=tp and Duel.GetAttackTarget()~=nil
 end
 function c1371589.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

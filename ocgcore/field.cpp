@@ -435,15 +435,17 @@ void field::shuffle(uint8 playerid, uint8 location) {
 			return;
 		}
 	}
-	if(svector.size() > 1) {
-		uint32 i = 0, s = svector.size(), r;
-		for(i = 0; i < s - 1; ++i) {
-			r = pduel->get_next_integer(i, s - 1);
-			card* t = svector[i];
-			svector[i] = svector[r];
-			svector[r] = t;
+	if(location == LOCATION_HAND || !(core.duel_options & DUEL_PSEUDO_SHUFFLE)) {
+		if(svector.size() > 1) {
+			uint32 i = 0, s = svector.size(), r;
+			for(i = 0; i < s - 1; ++i) {
+				r = pduel->get_next_integer(i, s - 1);
+				card* t = svector[i];
+				svector[i] = svector[r];
+				svector[r] = t;
+			}
+			reset_sequence(playerid, location);
 		}
-		reset_sequence(playerid, location);
 	}
 	if(location == LOCATION_HAND) {
 		pduel->write_buffer8(MSG_SHUFFLE_HAND);

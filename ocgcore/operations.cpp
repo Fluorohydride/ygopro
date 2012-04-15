@@ -2338,6 +2338,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 	case 4: {
 		card_set leave, discard;
 		uint8 oloc, playerid, dest, seq;
+		bool show_decktop[2] = {false, false};
 		card_vector cv;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit)
 			cv.push_back(*cit);
@@ -2429,6 +2430,8 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pduel->write_buffer8(pcard->current.sequence);
 			pduel->write_buffer8(pcard->current.position);
 			pduel->write_buffer32(pcard->current.reason);
+			if(core.deck_reversed && pcard->current.location == LOCATION_DECK)
+				show_decktop[pcard->current.controler] = true;
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
 			if(pcard->status & (STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED)) {
 				pcard->set_status(STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED, FALSE);
@@ -2442,6 +2445,18 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				raise_single_event(pcard, 0, EVENT_DISCARD, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 				discard.insert(pcard);
 			}
+		}
+		if(show_decktop[0]) {
+			pduel->write_buffer8(MSG_DECK_TOP);
+			pduel->write_buffer8(0);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32((*player[0].list_main.rbegin())->data.code);
+		}
+		if(show_decktop[1]) {
+			pduel->write_buffer8(MSG_DECK_TOP);
+			pduel->write_buffer8(1);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32((*player[1].list_main.rbegin())->data.code);
 		}
 		adjust_instant();
 		process_single_event();

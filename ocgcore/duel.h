@@ -74,5 +74,6 @@ public:
 #define DUEL_ATTACK_FIRST_TURN	0x02
 #define DUEL_NO_CHAIN_HINT		0x04
 #define DUEL_ENABLE_PRIORITY	0x08
+#define DUEL_PSEUDO_SHUFFLE		0x10
 
 #endif /* DUEL_H_ */

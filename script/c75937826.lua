@@ -15,7 +15,7 @@ function c75937826.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	--destroy
+	--remove counter
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(75937826,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
@@ -44,7 +44,7 @@ function c75937826.initial_effect(c)
 end
 function c75937826.addct(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,0,0x1f)
+	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,3,0,0x1f)
 end
 function c75937826.addc(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
