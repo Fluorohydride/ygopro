@@ -36,7 +36,7 @@ function c24082387.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.SelectMatchingCard(tp,c24082387.filter1,tp,LOCATION_DECK,0,1,1,nil,e,tp,cg,minc)
 	e:SetLabel(rg:GetFirst():GetLevel())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local sg=cg:SelectWithSumEqual(tp,Card.GetLevel,e:GetLabel(),1)
+	local sg=cg:SelectWithSumEqual(tp,Card.GetLevel,e:GetLabel(),minc,99)
 	Duel.SendtoGrave(sg,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end

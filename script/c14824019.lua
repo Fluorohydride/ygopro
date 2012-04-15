@@ -14,7 +14,7 @@ function c14824019.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c14824019.filter(c)
-	return c:IsSetCard(0x106e) and c:IsAbleToHand()
+	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function c14824019.shtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

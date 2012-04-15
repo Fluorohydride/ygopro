@@ -26,17 +26,17 @@ function c92394653.initial_effect(c)
 	e3:SetOperation(c92394653.mtop)
 	c:RegisterEffect(e3)
 end
-function c92394653.filter(c)
+function c92394653.filter(c,tp)
 	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 		and c:IsControler(tp) and c:IsType(TYPE_SPIRIT)
 end
 function c92394653.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c92394653.filter,1,nil)
+	return eg:IsExists(c92394653.filter,1,nil,tp)
 end
 function c92394653.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end 
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end

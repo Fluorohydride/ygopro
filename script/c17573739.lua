@@ -47,9 +47,10 @@ function c17573739.spfilter2(c,att)
 end
 function c17573739.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and not Duel.IsExistingMatchingCard(c17573739.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
-		and	Duel.IsExistingMatchingCard(c17573739.spfilter1,c:GetControler(),0,LOCATION_MZONE,1,nil,tp)
+	local tp=c:GetControler()
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and not Duel.IsExistingMatchingCard(c17573739.exfilter,tp,LOCATION_ONFIELD,0,1,nil)
+		and	Duel.IsExistingMatchingCard(c17573739.spfilter1,tp,0,LOCATION_MZONE,1,nil,tp)
 end
 function c17573739.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsFaceup() end

@@ -61,3 +61,6 @@ end
 function c41230939.eqlimit(e,c)
 	return e:GetOwner()==c
 end
+function c41230939.repval(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
+end

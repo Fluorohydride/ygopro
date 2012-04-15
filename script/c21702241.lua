@@ -53,5 +53,5 @@ function c21702241.damop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local ec=c:GetEquipTarget()
-	Duel.Damage(ec:GetControler(),ec:GetBaseAttack(),REASON_DAMAGE)
+	Duel.Damage(ec:GetControler(),ec:GetBaseAttack(),REASON_EFFECT)
 end

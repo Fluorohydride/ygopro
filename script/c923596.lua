@@ -9,11 +9,12 @@ function c923596.initial_effect(c)
 	e1:SetTarget(c923596.target)
 	e1:SetOperation(c923596.operation)
 	c:RegisterEffect(e1)
-	--damage
+	--tohand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(923596,1))
 	e2:SetCategory(CATEGORY_SEARCH+CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_FLIP)
 	e2:SetTarget(c923596.shtg)
 	e2:SetOperation(c923596.shop)
@@ -35,7 +36,7 @@ function c923596.filter(c)
 	return c:IsSetCard(0x72) and c:GetCode()~=923596 and c:IsAbleToHand()
 end
 function c923596.shtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(c923596.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c923596.shop(e,tp,eg,ep,ev,re,r,rp)

@@ -22,7 +22,7 @@ function c13821299.spfilter(c)
 end
 function c13821299.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c13821299.spfilter,c:GetControler(),0,LOCATION_ONFIELD,1,nil)
 end
 function c13821299.spop(e,tp,eg,ep,ev,re,r,rp,c)

@@ -36,7 +36,7 @@ end
 function c87608852.checkop1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsLevelAbove(5) and (not tc:IsRace(RACE_SPELLCASTER) or not tc:IsAttribute(0x30)) then
+		if tc:IsLevelAbove(5) then
 			c87608852[tc:GetSummonPlayer()]=false
 		end
 		tc=eg:GetNext()
@@ -67,7 +67,7 @@ function c87608852.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c87608852.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsLevelAbove(5) and (not c:IsRace(RACE_SPELLCASTER) or not c:IsAttribute(0x30))
+	return c:IsLevelAbove(5)
 end
 function c87608852.spfilter(c,e,tp)
 	return c:IsLevelAbove(5) and c:IsRace(RACE_SPELLCASTER) and c:IsAttribute(0x30)

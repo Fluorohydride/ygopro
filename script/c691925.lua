@@ -15,8 +15,8 @@ function c691925.costfilter(c)
 	return c:IsSetCard(0x38) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
 end
 function c691925.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c691925.costfilter,tp,LOCATION_HAND,0,1,nil,0x38) end
-	Duel.DiscardHand(tp,c691925.costfilter,1,1,REASON_COST+REASON_DISCARD,nil,0x38)
+	if chk==0 then return Duel.IsExistingMatchingCard(c691925.costfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,c691925.costfilter,1,1,REASON_COST+REASON_DISCARD,nil)
 end
 function c691925.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,4) end

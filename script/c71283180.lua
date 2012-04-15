@@ -14,7 +14,7 @@ function c71283180.filter(c,e)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)
 end
 function c71283180.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c71283180.filter(chkc) end
+	if chkc then return chkc:IsOnField() and c71283180.filter(chkc,e) end
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c71283180.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e)
 	if g:GetCount()<2 then

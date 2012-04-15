@@ -60,9 +60,9 @@ end
 function c25343017.filter(c)
 	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemove()
 end
-function c25343017.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c25343017.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chk:IsControler(tp) and c25343017.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c25343017.cfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c25343017.cfilter,tp,LOCATION_GRAVE,0,1,nil,e,PLAYER_NONE) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c25343017.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
@@ -72,7 +72,7 @@ function c25343017.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
 		tc:RegisterFlagEffect(25343017,RESET_EVENT+0x1fe0000,0,0)
-		e:GetLabelObject(25343017):SetLabel(1)
+		e:GetLabelObject():SetLabel(1)
 		if c:GetFlagEffect(25343017)==0 then
 			c:RegisterFlagEffect(25343017,RESET_EVENT+0x1680000,0,0)
 			e:GetLabelObject():GetLabelObject():Clear()

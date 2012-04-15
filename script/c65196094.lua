@@ -76,7 +76,7 @@ function c65196094.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local lv=cg:GetFirst():GetLevel()
 	Duel.SendtoDeck(cg,nil,0,REASON_COST)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg=spg:SelectWithSumEqual(tp,Card.GetLevel,lv,1)
+	local sg=spg:SelectWithSumEqual(tp,Card.GetLevel,lv,1,ft+1)
 	Duel.SetTargetCard(sg)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg,sg:GetCount(),0,0)
 end

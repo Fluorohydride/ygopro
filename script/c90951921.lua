@@ -59,7 +59,7 @@ function c90951921.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x70) and c:IsAbleToRemove()
 end
 function c90951921.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(GRAVE) and chkc:IsControler(tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) end
 	if chk==0 then
 		if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<3
 			or not Duel.IsExistingTarget(c90951921.filter,tp,LOCATION_GRAVE,0,1,nil) then return false end
@@ -73,7 +73,7 @@ function c90951921.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c90951921.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEP,REASON_EFFECT)~=0 then
+	if tc:IsRelateToEffect(e) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
 		Duel.BreakEffect()
 		local g=Duel.GetDecktopGroup(tp,2)
 		Duel.ConfirmCards(tp,g)

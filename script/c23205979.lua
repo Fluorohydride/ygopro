@@ -52,7 +52,7 @@ function c23205979.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,0,0,1-tp,1)
 end
 function c23205979.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0,nil)
+	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0)
 	if g:GetCount()==0 then return end
 	local sg=g:RandomSelect(1-tp,1)
 	Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)
@@ -73,7 +73,7 @@ function c23205979.desop2(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated() then
 			e:GetLabelObject():SetLabel(1)
 		else
-			Debug.Message(c:IsDisabled())
+			if c:IsHasEffect(EFFECT_DISABLE) then return end
 			if not c:IsDisabled() then Duel.Destroy(c,REASON_EFFECT) end
 		end
 	end
@@ -82,6 +82,7 @@ function c23205979.desop3(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local des=e:GetLabelObject():GetLabel()
 	e:GetLabelObject():SetLabel(0)
+	if c:IsHasEffect(EFFECT_DISABLE) then return end
 	if des==1 and not c:IsDisabled() then
 		Duel.Destroy(c,REASON_EFFECT)
 	end

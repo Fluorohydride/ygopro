@@ -19,7 +19,7 @@ end
 function c50491121.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x6f)
 end
-function c50491121.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c50491121.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c50491121.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c50491121.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

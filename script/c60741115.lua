@@ -2,7 +2,7 @@
 function c60741115.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(61864793,0))
+	e1:SetDescription(aux.Stringid(60741115,0))
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_GRAVE)

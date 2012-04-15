@@ -15,7 +15,7 @@ function c56514812.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,0,0,ep,1)
 end
 function c56514812.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0,nil)
+	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0)
 	if g:GetCount()==0 then return end
 	local sg=g:RandomSelect(ep,1)
 	Duel.SendtoGrave(sg,REASON_DISCARD+REASON_EFFECT)

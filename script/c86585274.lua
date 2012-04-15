@@ -24,7 +24,7 @@ function c86585274.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c86585274.cffilter(c)
-	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsPublic()
+	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and not c:IsPublic()
 end
 function c86585274.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c86585274.cffilter,tp,LOCATION_HAND,0,3,nil) end
