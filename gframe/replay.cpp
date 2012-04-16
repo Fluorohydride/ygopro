@@ -20,7 +20,7 @@ void Replay::BeginRecord() {
 #ifdef _WIN32
 	if(is_recording)
 		CloseHandle(recording_fp);
-	recording_fp = CreateFile("./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
 	if(recording_fp == INVALID_HANDLE_VALUE)
 		return;
 #else

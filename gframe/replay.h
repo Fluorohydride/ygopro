@@ -2,7 +2,7 @@
 #define REPLAY_H
 
 #include "config.h"
-#include <sys/time.h>
+#include <time.h>
 
 namespace ygo {
 

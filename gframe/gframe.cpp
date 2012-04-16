@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 	 * -j: join host (host info from system.conf)
 	 * -d: deck edit
 	 * -r: replay */
-		else if(!strcmp(argv[1], "-j") or !strcmp(argv[1], "-d") or !strcmp(argv[1], "-r")) {
+		else if(!strcmp(argv[1], "-j") || !strcmp(argv[1], "-d") || !strcmp(argv[1], "-r")) {
 			exit_on_return = true;
 			irr::SEvent event;
 			event.EventType = irr::EET_GUI_EVENT;

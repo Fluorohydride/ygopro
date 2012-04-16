@@ -174,6 +174,7 @@ int DuelClient::ClientThread(void* param) {
 	client_bev = 0;
 	client_base = 0;
 	connect_state = 0;
+	return 0;
 }
 void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	char* pdata = data;
@@ -2589,6 +2590,7 @@ int DuelClient::RefreshThread(void* arg) {
 	event_free(resp_event);
 	event_base_free(broadev);
 	is_refreshing = false;
+	return 0;
 }
 void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
 	if(events & EV_TIMEOUT) {

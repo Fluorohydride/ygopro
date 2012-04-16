@@ -5,25 +5,9 @@
 
 #define _IRR_STATIC_LIB_
 
-#include <irrlicht.h>
-#include <GL/gl.h>
-#include <GL/glu.h>
-#include "CGUITTFont.h"
-#include "CGUIImageButton.h"
-#include <iostream>
-#include <stdio.h>
-#include <stdlib.h>
-#include <memory.h>
-#include <sys/time.h>
-#include "bufferio.h"
-#include "mymutex.h"
-#include "mysignal.h"
-#include "mythread.h"
-#include "../ocgcore/ocgapi.h"
-#include "../ocgcore/card.h"
-
 #ifdef _WIN32
 
+#include <WinSock2.h>
 #include <windows.h>
 #define myswprintf swprintf
 
@@ -52,6 +36,23 @@ inline int _wtoi(const wchar_t * s) {
 	return (int)wcstol(s, &endptr, 10);
 }
 #endif
+
+#include <irrlicht.h>
+#include <GL/gl.h>
+#include <GL/glu.h>
+#include "CGUITTFont.h"
+#include "CGUIImageButton.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <memory.h>
+#include <time.h>
+#include "bufferio.h"
+#include "mymutex.h"
+#include "mysignal.h"
+#include "mythread.h"
+#include "../ocgcore/ocgapi.h"
+#include "../ocgcore/card.h"
 
 using namespace irr;
 using namespace core;
