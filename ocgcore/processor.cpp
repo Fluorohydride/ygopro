@@ -3248,11 +3248,11 @@ int32 field::process_battle_command(uint16 step) {
 	case 29: {
 		core.selfdes_disabled = FALSE;
 		group* des = core.units.begin()->ptarget;
-		if(!des || !des->container.size())
-			return FALSE;
-		for(auto cit = des->container.begin(); cit != des->container.end(); ++cit) {
-			(*cit)->set_status(STATUS_BATTLE_DESTROYED, TRUE);
-			(*cit)->filter_disable_related_cards();
+		if(des && des->container.size()) {
+			for(auto cit = des->container.begin(); cit != des->container.end(); ++cit) {
+				(*cit)->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+				(*cit)->filter_disable_related_cards();
+			}
 		}
 		adjust_all();
 		return FALSE;
@@ -3922,28 +3922,30 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 1: {
+		effect* peffect = cait->triggering_effect;
 		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_inactivatable(cait->chain_count)) {
-			remove_oath_effect(cait->triggering_effect);
-			if((cait->triggering_effect->flag & EFFECT_FLAG_COUNT_LIMIT) && (cait->triggering_effect->flag & EFFECT_FLAG_REPEAT))
-				cait->triggering_effect->reset_count += 0x100;
-			raise_event((card*)0, EVENT_CHAIN_INACTIVATED, cait->triggering_effect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
+			remove_oath_effect(peffect);
+			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->flag & EFFECT_FLAG_REPEAT))
+				peffect->reset_count += 0x100;
+			raise_event((card*)0, EVENT_CHAIN_INACTIVATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
 			return FALSE;
 		}
 		oath_effects::iterator oeit;
 		for(oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
-			if(oeit->second == cait->triggering_effect)
+			if(oeit->second == peffect)
 				oeit->second = 0;
 		break_effect();
 		core.chain_solving = TRUE;
 		if(cait->opinfos.count(0x200))
 			core.spsummon_state[cait->triggering_player] = TRUE;
-		if((cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE) && cait->triggering_effect->handler->is_has_relation(cait->triggering_effect)) {
-			cait->triggering_effect->handler->enable_field_effect(TRUE);
+		if((peffect->type & EFFECT_TYPE_ACTIVATE) && peffect->handler->is_has_relation(peffect)) {
+			peffect->handler->set_status(STATUS_ACTIVATED, TRUE);
+			peffect->handler->enable_field_effect(TRUE);
 			adjust_instant();
 		}
-		raise_event((card*)0, EVENT_CHAIN_SOLVING, cait->triggering_effect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
+		raise_event((card*)0, EVENT_CHAIN_SOLVING, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 		process_instant_event();
 		return FALSE;
 	}
@@ -3972,8 +3974,6 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	}
 	case 3: {
 		effect* peffect = cait->triggering_effect;
-		if((peffect->type & EFFECT_TYPE_ACTIVATE) && (peffect->handler->current.location == LOCATION_SZONE))
-			peffect->handler->set_status(STATUS_ACTIVATED, TRUE);
 		peffect->operation = (ptr)core.units.begin()->peffect;
 		if(core.special_summoning.size())
 			special_summon_complete(peffect, cait->triggering_player);

@@ -20,13 +20,16 @@ end
 function c28553439.filter(c,e,tp)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+function c28553439.rfilter(c)
+	return not c:IsImmuneToEffect(e)
+end
 function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c28553439.rfilter,1,nil,e)
 		and Duel.IsExistingMatchingCard(c28553439.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c28553439.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	local g=Duel.SelectReleaseGroup(tp,c28553439.rfilter,1,1,nil,e)
 	if g:GetCount()==0 or Duel.Release(g,REASON_EFFECT)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectMatchingCard(tp,c28553439.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)

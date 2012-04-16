@@ -40,13 +40,13 @@ function c54306223.acop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
-		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) then
+		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) and not tc:IsCode(72677437) then
 			tc:AddCounter(0x9,1)
 		end
 	end
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(1-tp,LOCATION_MZONE,i)
-		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) then
+		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) and not tc:IsCode(72677437) then
 			tc:AddCounter(0x9,1)
 		end
 	end
