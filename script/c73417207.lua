@@ -15,7 +15,7 @@ function c73417207.filter(c,syncard,f)
 	return c:IsSetCard(0x42) and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard) and (f==nil or f(c))
 end
 function c73417207.target(e,syncard,f,minc,maxc)
-	if minc>2 or maxc<2 then then return false end
+	if minc>2 or maxc<2 then return false end
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
 	if lv<=0 then return false end
 	local g=Duel.GetMatchingGroup(c73417207.filter,syncard:GetControler(),LOCATION_HAND,0,nil,syncard,f)

@@ -16,14 +16,10 @@ function c48216773.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c48216773.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g1=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_MZONE,0,nil)
-	local g2=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,nil)
-	if g1:GetCount()>0 and g2:GetCount()>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local dg1=g1:Select(tp,1,1,nil)
-		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
-		local dg2=g2:Select(1-tp,1,1,nil)
-		dg1:Merge(dg2)
-		Duel.SendtoDeck(dg1,nil,2,REASON_EFFECT)
-	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local dg1=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_MZONE,0,1,1nil)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
+	local dg1=Duel.SelectMatchingCard(1-tp,Card.IsAbleToDeck,1-tp,LOCATION_MZONE,0,1,1nil)
+	dg1:Merge(dg2)
+	Duel.SendtoDeck(dg1,nil,2,REASON_EFFECT)
 end

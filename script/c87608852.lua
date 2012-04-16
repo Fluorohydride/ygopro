@@ -64,10 +64,11 @@ function c87608852.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(c87608852.splimit)
+	e1:SetLabelObject(e)
 	Duel.RegisterEffect(e1,tp)
 end
 function c87608852.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsLevelAbove(5)
+	return e:GetLabelObject()~=se and c:IsLevelAbove(5)
 end
 function c87608852.spfilter(c,e,tp)
 	return c:IsLevelAbove(5) and c:IsRace(RACE_SPELLCASTER) and c:IsAttribute(0x30)

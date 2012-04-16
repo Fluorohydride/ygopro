@@ -49,8 +49,7 @@ end
 function c51405049.regop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then return end
 	local tc=eg:GetFirst()
-	if tc:GetCode()==e:GetLabel() and tc:GetFlagEffect(51405049)==0 then
-		tc:RegisterFlagEffect(51405049,RESET_CHAIN,0,0)
+	if tc:GetCode()==e:GetLabel() then
 		e:SetLabel(0)
 	end
 end

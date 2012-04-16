@@ -226,7 +226,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->btnJoinCancel->setEnabled(true);
 			mainGame->gMutex.Lock();
 			wchar_t msgbuf[256];
-			myswprintf(msgbuf, dataManager.GetSysString(1411), pkt->code);
+			myswprintf(msgbuf, dataManager.GetSysString(1411), pkt->code >> 12, (pkt->code >> 4) & 0xff, pkt->code & 0xf);
 			mainGame->env->addMessageBox(L"", msgbuf);
 			mainGame->gMutex.Unlock();
 			event_base_loopbreak(client_base);
@@ -477,8 +477,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->AddChatMsg(msg, mainGame->LocalPlayer(pkt->player));
 			mainGame->gMutex.Unlock();
-        } else if(pkt->player == 8){ //system custom message.
-           if(mainGame->chkIgnore1->isChecked())
+		} else if(pkt->player == 8) { //system custom message.
+			if(mainGame->chkIgnore1->isChecked())
 				break;
 			BufferIO::CopyWStr(pkt->msg, msg, 256);
 			msg[(len - 3) / 2] = 0;
