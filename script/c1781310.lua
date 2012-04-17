@@ -57,7 +57,7 @@ function c1781310.activate(e,tp,eg,ep,ev,re,r,rp)
 		off=off+1
 	end
 	if off==1 then return end
-	local op=Duel.SelectOption(tp,unpack(ops))
+	local op=Duel.SelectOption(tp,table.unpack(ops))
 	if opval[op]==1 then
 		local g=Duel.GetMatchingGroup(c1781310.dfilter1,tp,0,LOCATION_MZONE,nil)
 		Duel.Destroy(g,REASON_EFFECT)

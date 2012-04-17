@@ -42,40 +42,27 @@ function c31828916.filter(c,atk,att,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c31828916.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
-		local dg=eg:Filter(c31828916.cfilter,nil,e:GetLabelObject():GetLabelObject(),e,tp)
-		if dg:GetCount()==1 then
-			e:SetLabel(1)
-			e:SetLabelObject(dg:GetFirst())
-			return true
-		elseif dg:GetCount()==2 then
-			e:SetLabel(2)
-			return true
-		end
-		return false
-	end
-	if e:GetLabel()==2 then
-		eg:GetFirst():CreateEffectRelation(e)
-		eg:GetNext():CreateEffectRelation(e)
-	else
-		e:GetLabelObject():CreateEffectRelation(e)
-	end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and eg:IsExists(c31828916.cfilter,1,nil,e:GetLabelObject():GetLabelObject(),e,tp) end
+	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+end
+function c31828916.cfilter2(c,e,tp)
+	return c:IsRace(RACE_MACHINE) and c:IsControler(tp) and c:IsRelateToEffect(e)
+		and Duel.IsExistingMatchingCard(c31828916.filter,tp,LOCATION_DECK,0,1,nil,c:GetAttack(),c:GetAttribute(),e,tp)
 end
 function c31828916.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if e:GetLabel()==1 then
-		local tc=e:GetLabelObject()
-		if not tc:IsRelateToEffect(e) then return end
+	local sg=eg:Filter(c31828916.cfilter2,nil,e,tp)
+	if sg:GetCount()==1 then
+		local tc=sg:GetFirst()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c31828916.filter,tp,LOCATION_DECK,0,1,1,nil,tc:GetAttack(),tc:GetAttribute(),e,tp)
 		if g:GetCount()>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	else
-		local sg=eg:Filter(Card.IsRelateToEffect,nil,e)
 		local tc=sg:GetFirst()
 		if not tc then return end
 		local atk=tc:GetAttack()

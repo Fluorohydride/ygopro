@@ -44,7 +44,7 @@ function c84389640.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 		t[i]=i*100
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(84389640,1))
-	local pay=Duel.AnnounceNumber(tp,unpack(t))
+	local pay=Duel.AnnounceNumber(tp,table.unpack(t))
 	Duel.PayLPCost(tp,pay)
 	e:SetLabel(-pay)
 	e:GetHandler():RegisterFlagEffect(84389640,RESET_PHASE+RESET_DAMAGE_CAL,0,1)

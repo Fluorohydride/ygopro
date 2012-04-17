@@ -18,12 +18,12 @@ function c3280747.activate(e,tp,eg,ep,ev,re,r,rp)
 	local i=1
 	local p=1
 	for i=1,6 do t[i]=i end
-	local a1=Duel.AnnounceNumber(tp,unpack(t))
+	local a1=Duel.AnnounceNumber(tp,table.unpack(t))
 	for i=1,6 do 
 		if a1~=i then t[p]=i p=p+1 end
 	end
 	t[p]=nil
-	local a2=Duel.AnnounceNumber(tp,unpack(t))
+	local a2=Duel.AnnounceNumber(tp,table.unpack(t))
 	local dc=Duel.TossDice(1-tp,1)
 	if dc==a1 or dc==a2 then Duel.Draw(tp,dc,REASON_EFFECT)
 	else Duel.DiscardDeck(tp,dc,REASON_EFFECT) end

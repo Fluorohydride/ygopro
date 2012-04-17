@@ -12,7 +12,7 @@ function c67445676.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c67445676.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:GetHandler():IsCode(21051977)
+	return e:GetHandler():IsReason(REASON_EFFECT) and re and re:GetHandler():IsCode(21051977)
 end
 function c67445676.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

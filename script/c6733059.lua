@@ -45,7 +45,7 @@ function c6733059.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		lvt[pc]=nil
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(6733059,2))
-		local lv=Duel.AnnounceNumber(tp,unpack(lvt))
+		local lv=Duel.AnnounceNumber(tp,table.unpack(lvt))
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local rg=cg:Select(tp,lv,lv,nil)
 		Duel.Remove(rg,POS_FACEUP,REASON_COST)
@@ -75,7 +75,7 @@ function c6733059.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	lvt[pc]=nil
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(6733059,2))
-	local lv=Duel.AnnounceNumber(tp,unpack(lvt))
+	local lv=Duel.AnnounceNumber(tp,table.unpack(lvt))
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local rg=cg:Select(tp,lv,lv,nil)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)

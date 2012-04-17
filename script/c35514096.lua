@@ -27,7 +27,7 @@ function c35514096.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		if t1 then m[ct]=aux.Stringid(35514096,1) n[ct]=1 ct=ct+1 end
 		if t2 then m[ct]=aux.Stringid(35514096,2) n[ct]=2 ct=ct+1 end
 		if t3 then m[ct]=aux.Stringid(35514096,3) n[ct]=3 ct=ct+1 end
-		local sp=Duel.SelectOption(tp,unpack(m))
+		local sp=Duel.SelectOption(tp,table.unpack(m))
 		op=n[sp+1]
 	end
 	e:SetLabel(op)

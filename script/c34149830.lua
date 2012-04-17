@@ -23,7 +23,7 @@ function c34149830.condition(e,tp,eg,ep,ev,re,r,rp)
 		tc=Duel.GetAttackTarget()
 		bc=Duel.GetAttacker()
 	end
-	return tc and not tc:IsHasEffect(EFFECT_INDESTRUCTABLE_BATTLE)
+	return tc and bc and not tc:IsHasEffect(EFFECT_INDESTRUCTABLE_BATTLE)
 		and ((tc:IsDefence() and tc:GetDefence()<bc:GetAttack()) or (tc:IsAttack() and tc:GetAttack()<=bc:GetAttack()))
 end
 function c34149830.spfilter(c,e,tp)

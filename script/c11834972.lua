@@ -24,7 +24,7 @@ function c11834972.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local t={}
 	for i=1,ct do t[i]=i end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(11834972,1))
-	local ac=Duel.AnnounceNumber(tp,unpack(t))
+	local ac=Duel.AnnounceNumber(tp,table.unpack(t))
 	Duel.DiscardDeck(tp,ac,REASON_COST)
 	local g=Duel.GetOperatedGroup()
 	e:SetLabel(g:FilterCount(Card.IsSetCard,nil,0x39)*200)

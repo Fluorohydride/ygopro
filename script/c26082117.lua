@@ -48,7 +48,7 @@ function c26082117.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	t[p]=nil
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(26082117,1))
-	e:SetLabel(Duel.AnnounceNumber(tp,unpack(t)))
+	e:SetLabel(Duel.AnnounceNumber(tp,table.unpack(t)))
 end
 function c26082117.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
