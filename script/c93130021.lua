@@ -9,7 +9,7 @@ function c93130021.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c93130021.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_SPELL) and c:IsDestrutable()
+	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_SPELL) and c:IsDestructable()
 end
 function c93130021.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c93130021.filter(chkc) end

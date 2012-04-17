@@ -12,7 +12,7 @@ function c62271284.initial_effect(c)
 end
 function c62271284.condition(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
-	return tp~=Duel.GetTurnPlayer() and at:IsFaceup() and at:IsType(TYPE_NORMAL)
+	return tp~=Duel.GetTurnPlayer() and at and at:IsFaceup() and at:IsType(TYPE_NORMAL)
 end
 function c62271284.filter(c)
 	return not (c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsAttack()) and c:IsDestructable()

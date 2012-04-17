@@ -15,7 +15,7 @@ end
 function c85682655.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetAttacker()
 	if tc==e:GetHandler() then tc=Duel.GetAttackTarget() end
-	if chk==0 then return not tc:IsStatus(STATUS_BATTLE_DESTROYED) and tc:IsDestructable() end
+	if chk==0 then return tc and not tc:IsStatus(STATUS_BATTLE_DESTROYED) and tc:IsDestructable() end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 end
 function c85682655.operation(e,tp,eg,ep,ev,re,r,rp)
