@@ -12,6 +12,7 @@
 namespace ygo {
 
 struct Config {
+	bool use_d3d;
 	unsigned short antialias;
 	unsigned short serverport;
 	unsigned char textfontsize;
@@ -100,6 +101,7 @@ public:
 	std::vector<int> logParam;
 	std::wstring chatMsg[5];
 	int chatTiming[5];
+	int chatType[5];
 	unsigned short linePattern;
 	int waitFrame;
 	int signalFrame;

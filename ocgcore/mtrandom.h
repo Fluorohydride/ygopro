@@ -65,7 +65,7 @@ public:
 		return y;
 	}
 	double real() {
-		return (double) rand() / -1UL;
+		return (double) rand() / 0xffffffffUL;
 	}
 	double res53() {
 		unsigned int a = rand() >> 5, b = rand() >> 6;

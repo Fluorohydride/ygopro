@@ -9,9 +9,14 @@
 
 #include <WinSock2.h>
 #include <windows.h>
-#define myswprintf swprintf
 
+#ifdef _MSC_VER
+#define myswprintf _swprintf
 #else
+#define myswprintf swprintf
+#endif
+
+#else //_WIN32
 
 #include <errno.h>
 #include <netinet/in.h>

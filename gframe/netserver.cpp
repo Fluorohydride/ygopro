@@ -52,6 +52,7 @@ bool NetServer::StartBroadcast() {
 	}
 	broadcast_ev = event_new(net_evbase, udp, EV_READ | EV_PERSIST, BroadcastEvent, NULL);
 	event_add(broadcast_ev, NULL);
+	return true;
 }
 void NetServer::StopServer() {
 	if(!net_evbase)

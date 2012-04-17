@@ -39,7 +39,7 @@ struct CardString {
 };
 typedef std::unordered_map<unsigned int, CardDataC>::iterator code_pointer;
 
-struct ClientCard {
+class ClientCard {
 public:
 	irr::video::ITexture* curTexture;
 	irr::core::matrix4 mTransform;

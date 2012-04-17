@@ -60,8 +60,8 @@ public:
 	int32 call_card_function(card *pcard, char *f, uint32 param_count, uint32 ret_count);
 	int32 call_code_function(uint32 code, char *f, uint32 param_count, uint32 ret_count);
 	int32 check_condition(int32 f, uint32 param_count);
-	int32 check_matching(card* pcard, int32 findex, uint32 extraargs);
-	int32 get_operation_value(card* pcard, int32 findex, uint32 extraargs);
+	int32 check_matching(card* pcard, int32 findex, int32 extraargs);
+	int32 get_operation_value(card* pcard, int32 findex, int32 extraargs);
 	int32 get_function_value(int32 f, uint32 param_count);
 	int32 call_coroutine(int32 f, uint32 param_count, uint32* yield_value, uint16 step);
 

@@ -1,5 +1,6 @@
 #include "single_duel.h"
 #include "netserver.h"
+#include "game.h"
 #include "../ocgcore/ocgapi.h"
 #include "../ocgcore/card.h"
 #include "../ocgcore/duel.h"
@@ -1430,13 +1431,10 @@ int SingleDuel::MessageHandler(long fduel, int type) {
 	if(!enable_log)
 		return 0;
 	char msgbuf[1024];
+	wchar_t wbuf[1024];
 	get_log_message(fduel, (byte*)msgbuf);
-	FILE* fp = fopen("error.log", "at+");
-	if(!fp)
-		return 0;
-	msgbuf[1023] = 0;
-	fprintf(fp, "[Script error:] %s\n", msgbuf);
-	fclose(fp);
+	BufferIO::DecodeUTF8(msgbuf, wbuf);
+	mainGame->AddChatMsg(wbuf, 9);
 	return 0;
 }
 void SingleDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {

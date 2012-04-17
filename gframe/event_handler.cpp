@@ -1261,11 +1261,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 								myswprintf(formatBuffer, L"\n%ls/%ls", mcard->atkstring, mcard->defstring);
 								str.append(formatBuffer);
-								myswprintf(formatBuffer, L"\n★%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
+								myswprintf(formatBuffer, L"\n\x2605%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-										myswprintf(formatBuffer, L"\n[%ls]：%d", dataManager.GetCounterName(ctit->first), ctit->second);
+										myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
 										str.append(formatBuffer);
 									}
 								}
@@ -1293,7 +1293,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
-										myswprintf(formatBuffer, L"\n[%ls]：%d", dataManager.GetCounterName(ctit->first), ctit->second);
+										myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
 										str.append(formatBuffer);
 									}
 								}
@@ -1337,7 +1337,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			break;
-		}
+									}
 		case irr::EMIE_MOUSE_WHEEL: {
 			break;
 		}

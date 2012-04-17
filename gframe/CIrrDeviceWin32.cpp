@@ -429,22 +429,23 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 		break;
 	}
 	case WM_IME_CHAR: {
-		setlocale(LC_ALL, "");
+/*		setlocale(LC_ALL, "");*/
 		event.EventType = irr::EET_KEY_INPUT_EVENT;
 		event.KeyInput.PressedDown = true;
 		dev = getDeviceFromHWnd(hWnd);
-		unsigned char mbc[3];
-		wchar_t wc[2];
-		if(wParam > 255) {
-			mbc[0] = wParam >> 8;
-			mbc[1] = wParam & 0xff;
-			mbc[2] = 0;
-		} else {
-			mbc[0] = wParam;
-			mbc[1] = mbc[2] = 0;
-		}
-		mbstowcs(wc, (char *)&mbc, MB_CUR_MAX );
-		event.KeyInput.Char = wc[0];
+//		unsigned char mbc[3];
+//		wchar_t wc[2];
+// 		if(wParam > 255) {
+// 			mbc[0] = wParam >> 8;
+// 			mbc[1] = wParam & 0xff;
+// 			mbc[2] = 0;
+// 		} else {
+// 			mbc[0] = wParam;
+// 			mbc[1] = mbc[2] = 0;
+// 		}
+// 		mbstowcs(wc, (char *)&mbc, MB_CUR_MAX );
+//		event.KeyInput.Char = wc[0];
+		event.KeyInput.Char = wParam;
 		event.KeyInput.Key = irr::KEY_ACCEPT;
 		event.KeyInput.Shift = 0;
 		event.KeyInput.Control = 0;

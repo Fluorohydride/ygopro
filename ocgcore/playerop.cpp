@@ -417,7 +417,7 @@ int32 field::select_counter(uint16 step, uint8 playerid, uint16 countertype, uin
 		pduel->write_buffer8(MSG_SELECT_COUNTER);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer16(countertype);
-		pduel->write_buffer8(count);
+		pduel->write_buffer8((uint8)count);
 		pduel->write_buffer8(core.select_cards.size());
 		card* pcard;
 		std::sort(core.select_cards.begin(), core.select_cards.end(), card::card_operation_sort);
@@ -510,7 +510,7 @@ int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 
 			return TRUE;
 		} else {
 			uint8 m = core.select_cards.size(), v = 0;
-			int32 op, o1, o2, sum = 0, mx = 0, mn;
+			int32 op, o1, o2, sum = 0, mx = 0, mn = 0x7fffffff;
 			int16 ms[16];
 			for(int32 i = 0; i < returns.bvalue[0]; ++i) {
 				v = returns.bvalue[i + 1];

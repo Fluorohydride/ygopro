@@ -220,7 +220,8 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					break;
 				wchar_t infobuf[256];
 				std::wstring repinfo;
-				tm* st = localtime((time_t*)(&ReplayMode::cur_replay.pheader.seed));
+				time_t curtime = ReplayMode::cur_replay.pheader.seed;
+				tm* st = localtime(&curtime);
 				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
 				repinfo.append(infobuf);
 				myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]));

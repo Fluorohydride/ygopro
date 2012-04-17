@@ -816,7 +816,7 @@ int32 interpreter::check_condition(int32 f, uint32 param_count) {
 		pduel->release_script_group();
 	return OPERATION_FAIL;
 }
-int32 interpreter::check_matching(card* pcard, int32 findex, uint32 extraargs) {
+int32 interpreter::check_matching(card* pcard, int32 findex, int32 extraargs) {
 	int32 result;
 	if(!findex || lua_isnil(current_state, findex))
 		return TRUE;
@@ -844,7 +844,7 @@ int32 interpreter::check_matching(card* pcard, int32 findex, uint32 extraargs) {
 		pduel->release_script_group();
 	return result;
 }
-int32 interpreter::get_operation_value(card* pcard, int32 findex, uint32 extraargs) {
+int32 interpreter::get_operation_value(card* pcard, int32 findex, int32 extraargs) {
 	int32 result;
 	if(!findex || lua_isnil(current_state, findex))
 		return 0;

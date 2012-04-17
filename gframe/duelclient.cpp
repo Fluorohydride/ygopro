@@ -1284,7 +1284,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_CONFIRM_DECKTOP: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
-		int code, c, l, s;
+		int code;
 		ClientCard* pcard;
 		myswprintf(textBuffer, dataManager.GetSysString(207), count);
 		mainGame->lstLog->addItem(textBuffer);

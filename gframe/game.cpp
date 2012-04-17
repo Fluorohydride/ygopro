@@ -23,7 +23,10 @@ bool Game::Initialize() {
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
-	params.DriverType = irr::video::EDT_OPENGL;
+	if(gameConf.use_d3d)
+		params.DriverType = irr::video::EDT_DIRECT3D9;
+	else
+		params.DriverType = irr::video::EDT_OPENGL;
 	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
 	device = irr::createDeviceEx(params);
 	if(!device)
@@ -39,6 +42,7 @@ bool Game::Initialize() {
 	ignore_chain = false;
 	is_building = false;
 	memset(&dInfo, 0, sizeof(DuelInfo));
+	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
@@ -164,23 +168,23 @@ bool Game::Initialize() {
 	//phase
 	wPhase = env->addStaticText(L"", rect<s32>(475, 310, 850, 330));
 	wPhase->setVisible(false);
-	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"ＤＰ");
+	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"\xff24\xff30");
 	btnDP->setEnabled(false);
 	btnDP->setPressed(true);
 	btnDP->setVisible(false);
-	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"ＳＰ");
+	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"\xff33\xff30");
 	btnSP->setEnabled(false);
 	btnSP->setPressed(true);
 	btnSP->setVisible(false);
-	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"Ｍ１");
+	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"\xff2d\xff11");
 	btnM1->setEnabled(false);
 	btnM1->setPressed(true);
 	btnM1->setVisible(false);
-	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"ＢＰ");
+	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
 	btnBP->setVisible(false);
-	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"Ｍ２");
+	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
 	btnM2->setVisible(false);
-	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"ＥＰ");
+	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
@@ -538,7 +542,7 @@ void Game::MainLoop() {
 	usleep(500000);
 #endif
 	SaveConfig();
-	device->drop();
+//	device->drop();
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
@@ -663,6 +667,10 @@ void Game::LoadConfig() {
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
+		} else if(!strcmp(strbuf, "use_d3d")) {
+			gameConf.use_d3d = atoi(valbuf);
+		} else if(!strcmp(strbuf, "errorlog")) {
+			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "nickname")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.nickname, 20);
@@ -698,7 +706,9 @@ void Game::SaveConfig() {
 	FILE* fp = fopen("system.conf", "w");
 	fprintf(fp, "#config file\n#nickname & gamename should be less than 20 characters\n");
 	char linebuf[256];
+	fprintf(fp, "use_d3d = %d\n", gameConf.use_d3d ? 1 : 0);
 	fprintf(fp, "antialias = %d\n", gameConf.antialias);
+	fprintf(fp, "errorlog = %d\n", enable_log ? 1 : 0);
 	BufferIO::CopyWStr(ebNickName->getText(), gameConf.nickname, 20);
 	BufferIO::EncodeUTF8(gameConf.nickname, linebuf);
 	fprintf(fp, "nickname = %s\n", linebuf);
@@ -757,9 +767,11 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 4; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
+		chatType[i] = chatType[i - 1];
 	}
 	chatMsg[0].clear();
 	chatTiming[0] = 600;
+	chatType[0] = player;
 	switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
@@ -770,6 +782,10 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
+		chatMsg[0].append(L"[System]: ");
+		break;
+	case 9: //error message
+		chatMsg[0].append(L"[Script error:] ");
 		break;
 	default: //from watcher or unknown
 		chatMsg[0].append(L"[***]: ");

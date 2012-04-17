@@ -35,6 +35,8 @@ public:
 	static void ReplayRefreshHand(int player, int flag = 0x181fff);
 	static void ReplayRefreshGrave(int player, int flag = 0x181fff);
 	static void ReplayRefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
+
+	static int MessageHandler(long fduel, int type);
 };
 
 }

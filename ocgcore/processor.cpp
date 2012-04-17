@@ -1824,7 +1824,13 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 	case 1: {
 		if(core.tpchain.size() == 0 && core.ntpchain.size() == 0) {
 			chain newchain;
-			for(evit = core.point_event.begin(); evit != core.instant_event.end();) {
+			evit = core.point_event.begin();
+			bool pev = true;
+			if(evit == core.point_event.end()) {
+				evit = core.instant_event.begin();
+				pev = false;
+			}
+			while(pev || (evit != core.instant_event.end())) {
 				pr = effects.activate_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
@@ -1855,9 +1861,11 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						core.select_chains.push_back(newchain);
 					}
 				}
-				++evit;
-				if(evit == core.point_event.end())
+				evit++;
+				if(pev && evit == core.point_event.end()) {
 					evit = core.instant_event.begin();
+					pev = false;
+				}
 			}
 			core.spe_effect[priority] = core.select_chains.size();
 			if(!special) {

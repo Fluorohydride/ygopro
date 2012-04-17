@@ -8,21 +8,29 @@
 namespace ygo {
 
 void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv) {
-	float origin[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-	glLineWidth(width);
-	glLineStipple(1, linePattern);
-	if(strip)
-		glEnable(GL_LINE_STIPPLE);
-	glDisable(GL_TEXTURE_2D);
-	glMaterialfv(GL_FRONT, GL_AMBIENT, cv);
-	glBegin(GL_LINE_LOOP);
-	glVertex3fv((float*)&vec[0].Pos);
-	glVertex3fv((float*)&vec[1].Pos);
-	glVertex3fv((float*)&vec[3].Pos);
-	glVertex3fv((float*)&vec[2].Pos);
-	glEnd();
-	glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
-	glDisable(GL_LINE_STIPPLE);
+	if(!gameConf.use_d3d) {
+		float origin[4] = {1.0f, 1.0f, 1.0f, 1.0f};
+		glLineWidth(width);
+		glLineStipple(1, linePattern);
+		if(strip)
+			glEnable(GL_LINE_STIPPLE);
+		glDisable(GL_TEXTURE_2D);
+		glMaterialfv(GL_FRONT, GL_AMBIENT, cv);
+		glBegin(GL_LINE_LOOP);
+		glVertex3fv((float*)&vec[0].Pos);
+		glVertex3fv((float*)&vec[1].Pos);
+		glVertex3fv((float*)&vec[3].Pos);
+		glVertex3fv((float*)&vec[2].Pos);
+		glEnd();
+		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
+		glDisable(GL_LINE_STIPPLE);
+	} else {
+		int indexlist[4] = {0, 1, 3, 2};
+		driver->draw3DLine(vec[0].Pos,vec[1].Pos);
+		driver->draw3DLine(vec[1].Pos,vec[3].Pos);
+		driver->draw3DLine(vec[3].Pos,vec[2].Pos);
+		driver->draw3DLine(vec[2].Pos,vec[0].Pos);
+	}
 }
 void Game::DrawBackGround() {
 	static int selFieldAlpha = 255;
@@ -383,10 +391,13 @@ void Game::DrawMisc() {
 		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(386, 321, 445, 341), 0xffffff00, true, false, 0);
 	}
 	for(int i = 0; i < 5; ++i) {
+		static unsigned int chatColor[10] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040};
 		if(chatTiming[i]) {
 			chatTiming[i]--;
+			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
+			driver->draw2DRectangle(recti(305, 596 - 20 * i, 307 + w, 616 - 20 * i), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
 			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
-			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i, 1021, 616 - 20 * i), 0xffffffff, false, false);
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i, 1021, 616 - 20 * i), chatColor[chatType[i]], false, false);
 		}
 	}
 }
@@ -812,7 +823,7 @@ void Game::DrawDeckBd() {
 			myswprintf(textBuffer, L"%ls", dataManager.GetName(ptr->first));
 			textFont->draw(textBuffer, recti(859, 164 + i * 66, 955, 185 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 165 + i * 66, 955, 185 + i * 66), 0xffffffff, false, false);
-			myswprintf(textBuffer, L"%ls/%ls ★%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), ptr->second.level);
+			myswprintf(textBuffer, L"%ls/%ls \x2605%d", dataManager.FormatAttribute(ptr->second.attribute), dataManager.FormatRace(ptr->second.race), ptr->second.level);
 			textFont->draw(textBuffer, recti(859, 186 + i * 66, 955, 207 + i * 66), 0xff000000, false, false);
 			textFont->draw(textBuffer, recti(860, 187 + i * 66, 955, 207 + i * 66), 0xffffffff, false, false);
 			if(ptr->second.attack < 0 && ptr->second.defence < 0)

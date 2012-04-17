@@ -58,7 +58,7 @@ int ReplayMode::ReplayThread(void* param) {
 	cur_replay.ReadData(mainGame->dInfo.hostname, 40);
 	cur_replay.ReadData(mainGame->dInfo.clientname, 40);
 	set_card_reader((card_reader)DataManager::CardReader);
-	//set_message_handler((message_handler)DuelClient::MessageHandler);
+	set_message_handler((message_handler)MessageHandler);
 	pduel = create_duel(rnd.rand());
 	int start_lp = cur_replay.ReadInt32();
 	int start_hand = cur_replay.ReadInt32();
@@ -119,7 +119,7 @@ int ReplayMode::ReplayThread(void* param) {
 }
 bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 	char* offset, *pbufw, *pbuf = msg;
-	int player, count, type;
+	int player, count;
 	bool pauseable;
 	while (pbuf - msg < len) {
 		if(is_closing)
@@ -604,6 +604,16 @@ void ReplayMode::ReplayRefreshSingle(int player, int location, int sequence, int
 	unsigned char queryBuffer[0x1000];
 	int len = query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
+}
+int ReplayMode::MessageHandler(long fduel, int type) {
+	if(!enable_log)
+		return 0;
+	char msgbuf[1024];
+	wchar_t wbuf[1024];
+	get_log_message(fduel, (byte*)msgbuf);
+	BufferIO::DecodeUTF8(msgbuf, wbuf);
+	mainGame->AddChatMsg(wbuf, 9);
+	return 0;
 }
 
 }
