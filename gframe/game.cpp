@@ -471,16 +471,17 @@ void Game::MainLoop() {
 	camera->setProjectionMatrix(mProjection);
 	mProjection.buildCameraLookAtMatrixLH(vector3df(3.95f, 8.0f, 7.8f), vector3df(3.95f, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
-	irr::scene::ILightSceneNode* light = smgr->addLightSceneNode(0, vector3df(0, 0, 100));
-	light->getLightData().AmbientColor = SColorf(1.0f, 1.0f, 1.0f);
-	light->getLightData().DiffuseColor = SColorf(0.0f, 0.0f, 0.0f);
+	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
 	irr::ITimer* timer = device->getTimer();
 	timer->setTime(0);
 	int fps = 0;
 	int cur_time = 0;
 	while(device->run()) {
-		linePattern = (linePattern << 1) | (linePattern >> 15);
+		if(gameConf.use_d3d)
+			linePattern = (linePattern + 1) % 30;
+		else
+			linePattern = (linePattern << 1) | (linePattern >> 15);
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));

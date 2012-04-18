@@ -15,7 +15,7 @@ end
 function c86778566.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) end
 	if chk==0 then return true end
-	local op=0
+	local opt=0
 	if Duel.IsExistingTarget(nil,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) then
 		opt=Duel.SelectOption(tp,aux.Stringid(86778566,0),aux.Stringid(86778566,1))
 	else opt=Duel.SelectOption(tp,aux.Stringid(86778566,1))+1 end

@@ -33,7 +33,7 @@ function c96561011.rfilter(c)
 end
 function c96561011.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATINO_MZONE)>-1
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(c:GetControler(),c96561011.rfilter,1,nil)
 end
 function c96561011.spop(e,tp,eg,ep,ev,re,r,rp,c)

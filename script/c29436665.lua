@@ -33,7 +33,7 @@ function c29436665.rfilter(c)
 end
 function c29436665.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATINO_MZONE)>-1
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(c:GetControler(),c29436665.rfilter,1,nil)
 end
 function c29436665.spop(e,tp,eg,ep,ev,re,r,rp,c)
@@ -41,7 +41,7 @@ function c29436665.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_COST)
 end
 function c29436665.dmgcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return re:GetActiveType()==TYPE_SPELL and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c29436665.dmgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,1000,REASON_EFFECT)

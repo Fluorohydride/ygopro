@@ -66,7 +66,7 @@ end
 function c22790789.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetCounter(0x1f)==0
 end
-function c22790789.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c22790789.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end

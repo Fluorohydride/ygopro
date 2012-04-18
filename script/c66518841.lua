@@ -13,6 +13,7 @@ end
 function c66518841.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
+	if not tc then return false end
 	local bc=tc:GetBattleTarget()
 	if tc and bc then
 		local dif=bc:GetAttack()-tc:GetAttack()

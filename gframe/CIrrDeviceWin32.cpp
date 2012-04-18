@@ -853,6 +853,7 @@ video::IVideoModeList* CIrrDeviceWin32::getVideoModeList() {
 }
 typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, PDWORD);
 // Needed for old windows apis
+#ifndef PRODUCT_ULTIMATE
 #define PRODUCT_ULTIMATE                            0x00000001
 #define PRODUCT_HOME_BASIC                          0x00000002
 #define PRODUCT_HOME_PREMIUM                        0x00000003
@@ -873,6 +874,7 @@ typedef BOOL (WINAPI *PGPI)(DWORD, DWORD, DWORD, DWORD, PDWORD);
 #define PRODUCT_PROFESSIONAL_E                      0x00000045
 #define PRODUCT_ENTERPRISE_E                        0x00000046
 #define PRODUCT_ULTIMATE_E                          0x00000047
+#endif
 void CIrrDeviceWin32::getWindowsVersion(core::stringc& out) {
 	OSVERSIONINFOEX osvi;
 	PGPI pGPI;

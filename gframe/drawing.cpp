@@ -25,11 +25,25 @@ void Game::DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, 
 		glMaterialfv(GL_FRONT, GL_AMBIENT, origin);
 		glDisable(GL_LINE_STIPPLE);
 	} else {
-		int indexlist[4] = {0, 1, 3, 2};
-		driver->draw3DLine(vec[0].Pos,vec[1].Pos);
-		driver->draw3DLine(vec[1].Pos,vec[3].Pos);
-		driver->draw3DLine(vec[3].Pos,vec[2].Pos);
-		driver->draw3DLine(vec[2].Pos,vec[0].Pos);
+		driver->setMaterial(matManager.mOutLine);
+		if(strip) {
+			if(linePattern < 15) {
+				driver->draw3DLine(vec[0].Pos, vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePattern + 1) / 15.0);
+				driver->draw3DLine(vec[1].Pos, vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePattern + 1) / 15.0);
+				driver->draw3DLine(vec[3].Pos, vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePattern + 1) / 15.0);
+				driver->draw3DLine(vec[2].Pos, vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePattern + 1) / 15.0);
+			} else {
+				driver->draw3DLine(vec[0].Pos + (vec[1].Pos - vec[0].Pos) * (linePattern - 14) / 15.0, vec[1].Pos);
+				driver->draw3DLine(vec[1].Pos + (vec[3].Pos - vec[1].Pos) * (linePattern - 14) / 15.0, vec[3].Pos);
+				driver->draw3DLine(vec[3].Pos + (vec[2].Pos - vec[3].Pos) * (linePattern - 14) / 15.0, vec[2].Pos);
+				driver->draw3DLine(vec[2].Pos + (vec[0].Pos - vec[2].Pos) * (linePattern - 14) / 15.0, vec[0].Pos);
+			}
+		} else {
+			driver->draw3DLine(vec[0].Pos, vec[1].Pos);
+			driver->draw3DLine(vec[1].Pos, vec[3].Pos);
+			driver->draw3DLine(vec[3].Pos, vec[2].Pos);
+			driver->draw3DLine(vec[2].Pos, vec[0].Pos);
+		}
 	}
 }
 void Game::DrawBackGround() {

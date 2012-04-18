@@ -20,7 +20,7 @@ end
 function c28553439.filter(c,e,tp)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c28553439.rfilter(c)
+function c28553439.rfilter(c,e)
 	return not c:IsImmuneToEffect(e)
 end
 function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk)

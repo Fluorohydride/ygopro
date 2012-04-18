@@ -349,6 +349,8 @@ Materials::Materials() {
 	mSelField.DiffuseColor = 0xff000000;
 	mSelField.MaterialType = irr::video::EMT_ONETEXTURE_BLEND;
 	mSelField.MaterialTypeParam = pack_texureBlendFunc(EBF_SRC_ALPHA, EBF_ONE_MINUS_SRC_ALPHA, EMFN_MODULATE_1X, EAS_VERTEX_COLOR);
+	mOutLine.ColorMaterial = irr::video::ECM_AMBIENT;
+	mOutLine.DiffuseColor = 0xff000000;
 	mOutLine.Thickness = 2;
 	mTRTexture = mTexture;
 	mTRTexture.AmbientColor = 0xffffff00;
