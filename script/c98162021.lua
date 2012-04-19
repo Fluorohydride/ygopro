@@ -51,7 +51,9 @@ function c98162021.addct2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,Card.IsCanAddCounter,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler(),0x3003,1)
 end
 function c98162021.addc2(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RemoveCounter(tp,0x3003,1,REASON_EFFECT)
+	local c=e:GetHandler()
+	if c:GetCounter(0x21)==0 then return end
+	c:RemoveCounter(tp,0x3003,1,REASON_EFFECT)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		tc:AddCounter(0x3003,1)

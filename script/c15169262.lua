@@ -11,7 +11,7 @@ function c15169262.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c15169262.condition(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)~=0
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c15169262.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x39)

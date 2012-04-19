@@ -2481,9 +2481,10 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pcard->unequip();
 			if(pcard->equiping_cards.size()) {
 				for(auto csit = pcard->equiping_cards.begin(); csit != pcard->equiping_cards.end();) {
-					auto rm = csit++;
-					equipings.insert(*rm);
-					(*rm)->unequip();
+					card* equipc = *(csit++);
+					equipc->unequip();
+					if(equipc->current.location == LOCATION_SZONE)
+						equipings.insert(equipc);
 				}
 			}
 			if(pcard->data.type & TYPE_TOKEN)

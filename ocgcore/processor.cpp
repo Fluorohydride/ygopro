@@ -2650,7 +2650,7 @@ int32 field::process_battle_command(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		core.hint_timing[infos.turn_player] = TIMING_ATTACK;
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 8: {
@@ -2664,7 +2664,7 @@ int32 field::process_battle_command(uint16 step) {
 		pduel->write_buffer32(24);
 		core.hint_timing[0] = TIMING_BATTLE_PHASE;
 		core.hint_timing[1] = TIMING_BATTLE_PHASE;
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 9: {

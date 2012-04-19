@@ -85,12 +85,14 @@ function c50418970.damop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c50418970.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
+		and Duel.GetDrawCount(tp)>0
 end
 function c50418970.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
 	local dt=Duel.GetDrawCount(tp)
 	if dt~=0 then
-		e:SetLabel(1)
+		_replace_count=0
+		_replace_max=dt
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
@@ -99,12 +101,13 @@ function c50418970.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 		e1:SetReset(RESET_PHASE+PHASE_DRAW)
 		e1:SetValue(0)
 		Duel.RegisterEffect(e1,tp)
-		Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
-	else e:SetLabel(0) end
+	end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
 end
 function c50418970.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if e:GetLabel()==1 and c:IsRelateToEffect(e) then
+	_replace_count=_replace_count+1
+	if _replace_count<=_replace_max and c:IsRelateToEffect(e) then
 		Duel.SendtoHand(c,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,c)
 	end

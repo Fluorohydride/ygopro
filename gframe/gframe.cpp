@@ -21,10 +21,10 @@ int main(int argc, char* argv[]) {
 		return 0;
 
 	if(argc >= 2) {
-	/*command line args:
-	 * -j: join host (host info from system.conf)
-	 * -d: deck edit
-	 * -r: replay */
+		/*command line args:
+		 * -j: join host (host info from system.conf)
+		 * -d: deck edit
+		 * -r: replay */
 		if(!strcmp(argv[1], "-j") || !strcmp(argv[1], "-d") || !strcmp(argv[1], "-r")) {
 			exit_on_return = true;
 			irr::SEvent event;

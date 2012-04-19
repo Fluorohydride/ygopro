@@ -34,8 +34,9 @@ function c84962466.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		return Duel.GetCurrentPhase()~=PHASE_DAMAGE or Duel.IsExistingMatchingCard(c84962466.cfilter,tp,LOCATION_MZONE,0,1,nil)
 	end
 	if Duel.GetCurrentPhase()==PHASE_DAMAGE or 
-		Duel.IsExistingMatchingCard(c84962466.cfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(84962466,0)) then
+		(Duel.IsExistingMatchingCard(c84962466.cfilter,tp,LOCATION_MZONE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(84962466,0))) then
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local rg=Duel.SelectMatchingCard(tp,c84962466.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
 		e:SetLabel(rg:GetFirst():GetBaseAttack())
 		Duel.Remove(rg,POS_FACEUP,REASON_COST)

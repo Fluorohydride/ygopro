@@ -15,7 +15,7 @@ function c76039636.initial_effect(c)
 	e2:SetCategory(CATEGORY_DECKDES)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_DAMAGE)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCondition(c76039636.condition)
 	e2:SetTarget(c76039636.target)
 	e2:SetOperation(c76039636.operation)
@@ -36,7 +36,7 @@ function c76039636.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c76039636.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler()
+	return ep~=tp
 end
 function c76039636.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
