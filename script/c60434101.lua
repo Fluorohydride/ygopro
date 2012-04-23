@@ -22,7 +22,7 @@ end
 function c60434101.filter(c,atk)
 	return c:IsFaceup() and c:IsDestructable() and c:GetDefence()<=atk
 end
-function c60434101.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c60434101.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c60434101.filter(chkc,c:GetAttack()) end
 	if chk==0 then return Duel.IsExistingMatchingCard(c60434101.filter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack()) end

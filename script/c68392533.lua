@@ -29,7 +29,7 @@ end
 function c68392533.eqlimit(e,c)
 	return c:IsRace(RACE_PSYCHO)
 end
-function c68392533.filter(c,tp)
+function c68392533.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PSYCHO)
 end
 function c68392533.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

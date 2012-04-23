@@ -22,7 +22,7 @@ function c92901944.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c92901944.cfilter(c,tp)
-	return c:IsSetCard(0x24) and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp
+	return c:IsSetCard(0x24) and c:GetCode()~=92901944 and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp
 		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c92901944.spcon(e,tp,eg,ep,ev,re,r,rp)

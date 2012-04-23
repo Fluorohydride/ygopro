@@ -43,7 +43,7 @@ function c27564031.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c27564031.operation(e,tp,eg,ep,ev,re,r,rp)
 	_replace_count=_replace_count+1
-	if _replace_count>replace_max or not e:GetHandler():IsRelateToEffect(e) then return end
+	if _replace_count>_replace_max or not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_DECK,0,nil,0x23)
 	if g:GetCount()>=3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

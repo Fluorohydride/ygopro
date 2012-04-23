@@ -1,16 +1,22 @@
 --イモータル·ルーラー
 function c32485518.initial_effect(c)
-	--salvage
+	--cannot special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(32485518,0))
-	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(c32485518.cost)
-	e1:SetTarget(c32485518.target)
-	e1:SetOperation(c32485518.operation)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e1)
+	--salvage
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(32485518,0))
+	e2:SetCategory(CATEGORY_TOHAND)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCost(c32485518.cost)
+	e2:SetTarget(c32485518.target)
+	e2:SetOperation(c32485518.operation)
+	c:RegisterEffect(e2)
 end
 function c32485518.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end
@@ -29,7 +35,7 @@ end
 function c32485518.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFECT)
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end
 end

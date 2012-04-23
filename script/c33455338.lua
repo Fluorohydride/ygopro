@@ -3,7 +3,7 @@ function c33455338.initial_effect(c)
 	--atk up
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(33455338,0))
-	e1:SetCategory(CATEGORY_COUNTER)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)

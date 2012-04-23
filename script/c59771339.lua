@@ -29,7 +29,7 @@ function c59771339.tfilter(c)
 	return code==63977008 or code==20932152
 end
 function c59771339.cfilter(c)
-	return c:IsSetCard(0x43) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x43) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 end
 function c59771339.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c59771339.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
