@@ -50,12 +50,12 @@ function c79491903.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c79491903.postg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetTurnPlayer()==tp and e:GetHandler():IsDefence() end
+	if chk==0 then return Duel.GetTurnPlayer()==tp and e:GetHandler():IsDefencePos() end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
 end
 function c79491903.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsRelateToEffect(e) and c:IsDefence() then
+	if c:IsFaceup() and c:IsRelateToEffect(e) and c:IsDefencePos() then
 		Duel.ChangePosition(c,0,0,POS_FACEUP_ATTACK,0)
 	end
 end

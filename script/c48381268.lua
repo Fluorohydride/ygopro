@@ -21,10 +21,10 @@ function c48381268.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c48381268.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c48381268.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end
 function c48381268.tgd(e,c)
 	return c:IsSetCard(0x26) and c~=e:GetHandler()

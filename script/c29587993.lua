@@ -15,7 +15,7 @@ function c29587993.initial_effect(c)
 end
 function c29587993.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and not c:IsStatus(STATUS_CHAINING) and Duel.IsChainInactivatable(ev)
+	return not c:IsStatus(STATUS_BATTLE_DESTROYED) and not c:IsStatus(STATUS_CHAINING) and Duel.IsChainNegatable(ev)
 end
 function c29587993.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x37) and c:IsAbleToHand()

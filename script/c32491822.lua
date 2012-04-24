@@ -81,7 +81,7 @@ function c32491822.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c32491822.atcon(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end
 function c32491822.atlimit(e,c)
 	return c~=e:GetHandler()

@@ -43,7 +43,7 @@ function c93724592.becon(e)
 	return e:GetHandler():IsAttackable()
 end
 function c93724592.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c93724592.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -12,7 +12,7 @@ function c93396832.initial_effect(c)
 end
 function c93396832.condition(e,tp,eg,ep,ev,re,r,rp)
 	return (re:IsActiveType(TYPE_MONSTER) or (re:IsActiveType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE)))
-		and re:IsHasCategory(CATEGORY_DISABLE_SUMMON) and Duel.IsChainInactivatable(ev)
+		and re:IsHasCategory(CATEGORY_DISABLE_SUMMON) and Duel.IsChainNegatable(ev)
 end
 function c93396832.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

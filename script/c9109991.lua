@@ -21,7 +21,7 @@ function c9109991.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and r==REASON_BATTLE and Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget()==nil
 end
 function c9109991.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetControler()~=tp and chkc:IsLocation(LOCATION_MZONE) and chkc:IsAttack() end
+	if chkc then return chkc:GetControler()~=tp and chkc:IsLocation(LOCATION_MZONE) and chkc:IsAttackPos() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATTACK)
 	local g=Duel.SelectTarget(tp,Card.IsAttack,tp,0,LOCATION_MZONE,1,1,nil)
@@ -31,7 +31,7 @@ function c9109991.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c9109991.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsAttack() then
+	if tc and tc:IsRelateToEffect(e) and tc:IsAttackPos() then
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE)
 	end
 end

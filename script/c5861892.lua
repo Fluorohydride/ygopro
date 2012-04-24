@@ -102,7 +102,7 @@ function c5861892.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or not g:IsContains(c) then return false end
 	return c:GetFlagEffectLabel(36690018)==0 and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
-		and Duel.IsChainInactivatable(ev)
+		and Duel.IsChainNegatable(ev)
 end
 function c5861892.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

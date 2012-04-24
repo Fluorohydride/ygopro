@@ -104,7 +104,7 @@ function Auxiliary.SynCondition(f1,f2,minc,maxc)
 				local ct=-ft
 				if minc<ct then minc=ct end
 				if maxc<minc then return false end
-				if tuner then return Duel.CheckTunerMaterial(c,tuner,f1,f2,maxc,maxc) end
+				if tuner then return Duel.CheckTunerMaterial(c,tuner,f1,f2,minc,maxc) end
 				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc)
 			end
 end

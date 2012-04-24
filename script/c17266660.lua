@@ -15,7 +15,7 @@ function c17266660.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c17266660.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
+	return ep~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c17266660.costfilter(c)
 	return c:IsRace(RACE_FAIRY) and c:IsAbleToGraveAsCost()

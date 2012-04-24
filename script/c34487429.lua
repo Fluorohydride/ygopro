@@ -66,7 +66,7 @@ function c34487429.desrepcon(e)
 	return Duel.IsExistingMatchingCard(c34487429.filter1,e:GetHandler():GetControler(),LOCATION_SZONE,0,1,nil)
 end
 function c34487429.discon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_SZONE,0,3,nil,0x34)
 end
 function c34487429.filter2(c)

@@ -12,7 +12,7 @@ function c60718396.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c60718396.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c60718396.cfilter(c)
 	return c:GetDefence()==200 and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToRemoveAsCost()

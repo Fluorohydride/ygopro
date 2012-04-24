@@ -22,7 +22,7 @@ function c80885324.initial_effect(c)
 end
 function c80885324.descon(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefence()
+	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefencePos()
 end
 function c80885324.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -40,7 +40,7 @@ function c80885324.poscon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c80885324.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsAttack() then
+	if c:IsAttackPos() then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 	end
 	local e1=Effect.CreateEffect(c)

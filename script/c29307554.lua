@@ -28,7 +28,7 @@ end
 function c29307554.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsDefence() then
+		if tc:IsDefencePos() then
 			c29307554[1-tc:GetControler()]=true
 		end
 		tc=eg:GetNext()

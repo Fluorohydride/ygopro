@@ -23,10 +23,10 @@ function c91107093.initial_effect(c)
 end
 function c91107093.infilter(e,c)
 	local lv=c:GetLevel()
-	return lv>0 and lv<=3 and c:IsDefence() and c:IsRace(RACE_THUNDER)
+	return lv>0 and lv<=3 and c:IsDefencePos() and c:IsRace(RACE_THUNDER)
 end
 function c91107093.filter(c)
-	return c:IsFaceup() and c:IsAttack()
+	return c:IsFaceup() and c:IsAttackPos()
 end
 function c91107093.descon(e)
 	return Duel.IsExistingMatchingCard(c91107093.filter,e:GetHandler():GetControler(),LOCATION_MZONE,0,1,nil)

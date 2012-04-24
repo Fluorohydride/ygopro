@@ -33,7 +33,7 @@ function c92408984.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if not pe:GetHandler():IsType(TYPE_TRAP) then return false end
 	local tg=Duel.GetChainInfo(ct-1,CHAININFO_TARGET_CARDS)
 	if not tg or not tg:IsExists(c92408984.cfilter,1,nil) then return false end
-	if not Duel.IsChainInactivatable(ct-1) then return false end
+	if not Duel.IsChainNegatable(ct-1) then return false end
 	if not Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) then return end
 	if Duel.SelectYesNo(tp,aux.Stringid(92408984,1)) then
 		Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
@@ -68,7 +68,7 @@ function c92408984.condition2(e,tp,eg,ep,ev,re,r,rp)
 	if not re:GetHandler():IsType(TYPE_TRAP) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not tg or not tg:IsExists(c92408984.cfilter,1,nil) then return false end
-	return Duel.IsChainInactivatable(ev)
+	return Duel.IsChainNegatable(ev)
 end
 function c92408984.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end

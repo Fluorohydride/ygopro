@@ -18,7 +18,7 @@ function c90576781.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c90576781.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c90576781.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocaion(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDefence() end
+	if chkc then return chkc:IsLocaion(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDefencePos() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsDefence,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DEFENCE)
 	local g=Duel.SelectTarget(tp,Card.IsDefence,tp,0,LOCATION_MZONE,1,1,nil)
@@ -26,7 +26,7 @@ function c90576781.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c90576781.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsDefence() and tc:IsRelateToEffect(e) and Duel.ChangePosition(tc,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)~=0 then
+	if tc:IsDefencePos() and tc:IsRelateToEffect(e) and Duel.ChangePosition(tc,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)

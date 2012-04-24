@@ -44,7 +44,7 @@ function c31764700.batop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c31764700.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAttack() and Duel.GetAttackTarget()~=0 end
+	if chk==0 then return e:GetHandler():IsAttackPos() and Duel.GetAttackTarget()~=0 end
 	local tc=e:GetLabelObject():GetLabelObject()
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,e:GetLabelObject():GetLabel())
 	if tc:IsDestructable() then

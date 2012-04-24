@@ -29,7 +29,7 @@ end
 function c39648965.piercecon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return d and a:IsControler(tp) and a~=e:GetHandler() and d:IsDefence() and a:IsSetCard(0x13)
+	return d and a:IsControler(tp) and a~=e:GetHandler() and d:IsDefencePos() and a:IsSetCard(0x13)
 end
 function c39648965.piercetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

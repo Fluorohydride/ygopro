@@ -12,7 +12,7 @@ function c33977496.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c33977496.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttackTarget()==e:GetHandler() and e:GetHandler():IsDefence()
+	return Duel.GetAttackTarget()==e:GetHandler() and e:GetHandler():IsDefencePos()
 		and Duel.GetAttacker():GetAttack()<e:GetHandler():GetDefence()
 end
 function c33977496.target(e,tp,eg,ep,ev,re,r,rp,chk)

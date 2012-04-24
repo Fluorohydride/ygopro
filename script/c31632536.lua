@@ -25,7 +25,7 @@ end
 function c31632536.caop1(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if e:GetHandler()==a and d and d:IsDefence() then e:SetLabel(1)
+	if e:GetHandler()==a and d and d:IsDefencePos() then e:SetLabel(1)
 	else e:SetLabel(0) end
 end
 function c31632536.caop2(e,tp,eg,ep,ev,re,r,rp)

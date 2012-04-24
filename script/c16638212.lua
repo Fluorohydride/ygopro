@@ -29,14 +29,10 @@ function c16638212.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
-	e1:SetReset(RESET_EVENT+0xff0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
-	e1:SetCondition(c16638212.retcon)
+	e1:SetReset(RESET_EVENT+0xff0000+RESET_PHASE+PHASE_STANDBY)
 	e1:SetOperation(c16638212.retop)
 	e1:SetLabelObject(g:GetFirst())
 	c:RegisterEffect(e1)
-end
-function c16638212.retcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
 end
 function c16638212.retop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabelObject():GetFlagEffect(16638212)~=0 then

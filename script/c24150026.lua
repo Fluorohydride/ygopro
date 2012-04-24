@@ -36,7 +36,7 @@ function c24150026.becon(e)
 	return e:GetHandler():IsAttackable()
 end
 function c24150026.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c24150026.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -49,7 +49,7 @@ function c24150026.bpcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c24150026.bpop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsAttack() then
+	if c:IsAttackPos() then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 	end
 end

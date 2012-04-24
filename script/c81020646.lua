@@ -18,7 +18,7 @@ function c81020646.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c81020646.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 		and Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0
 end
 function c81020646.distg(e,tp,eg,ep,ev,re,r,rp,chk)

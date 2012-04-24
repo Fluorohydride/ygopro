@@ -770,7 +770,9 @@ int32 scriptlib::duel_damage(lua_State *L) {
 	uint32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	uint32 amount = lua_tointeger(L, 2);
+	int32 amount = lua_tointeger(L, 2);
+	if(amount < 0)
+		amount = 0;
 	uint32 reason = lua_tointeger(L, 3);
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->game_field->damage(pduel->game_field->core.reason_effect, reason, pduel->game_field->core.reason_player, 0, playerid, amount);
@@ -783,7 +785,9 @@ int32 scriptlib::duel_recover(lua_State *L) {
 	uint32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	uint32 amount = lua_tointeger(L, 2);
+	int32 amount = lua_tointeger(L, 2);
+	if(amount < 0)
+		amount = 0;
 	uint32 reason = lua_tointeger(L, 3);
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->game_field->recover(pduel->game_field->core.reason_effect, reason, pduel->game_field->core.reason_player, playerid, amount);
@@ -2679,11 +2683,11 @@ int32 scriptlib::duel_is_player_can_send_to_deck(lua_State * L) {
 	lua_pushboolean(L, pduel->game_field->is_player_can_send_to_deck(playerid, pcard));
 	return 1;
 }
-int32 scriptlib::duel_is_chain_inactivatable(lua_State * L) {
+int32 scriptlib::duel_is_chain_negatable(lua_State * L) {
 	check_param_count(L, 1);
 	int32 chaincount = lua_tointeger(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushboolean(L, pduel->game_field->is_chain_inactivatable(chaincount));
+	lua_pushboolean(L, pduel->game_field->is_chain_negatable(chaincount));
 	return 1;
 }
 int32 scriptlib::duel_is_chain_disablable(lua_State * L) {

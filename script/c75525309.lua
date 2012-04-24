@@ -16,7 +16,7 @@ function c75525309.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
 	local ct=g:GetCount()
 	local tg=g:GetFirst()
-	return ct==1 and tg:IsFaceup() and tg:IsAttack() and tg:IsSetCard(0x3d)
+	return ct==1 and tg:IsFaceup() and tg:IsAttackPos() and tg:IsSetCard(0x3d)
 end
 function c75525309.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetControler()~=tp and chkc:IsOnField() and chkc:IsAbleToHand() end

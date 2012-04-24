@@ -21,7 +21,7 @@ function c78700060.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c78700060.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c78700060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end

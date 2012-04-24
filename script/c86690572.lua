@@ -22,7 +22,7 @@ function c86690572.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c86690572.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c86690572.cfilter(c)
 	return c:IsSetCard(0x39) and c:IsAbleToGraveAsCost()

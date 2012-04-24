@@ -12,25 +12,17 @@ function c75833426.initial_effect(c)
 end
 function c75833426.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_MONSTER)
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c75833426.cfilter(c)
 	return c:IsFaceup() and c:IsCode(74641045)
 end
-function c75833426.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsDestructable() end
+function c75833426.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,eg,1,0,0)
 	end
-	if Duel.IsExistingMatchingCard(c75833426.cfilter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,re:GetHandler())
-		and Duel.SelectYesNo(tp,aux.Stringid(75833426,0)) then
-		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,re:GetHandler())
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	else e:SetProperty(0) end
 end
 function c75833426.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ec=re:GetHandler()
@@ -39,8 +31,10 @@ function c75833426.activate(e,tp,eg,ep,ev,re,r,rp)
 		ec:CancelToGrave()
 		Duel.SendtoHand(ec,nil,REASON_EFFECT)
 	end
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
+	if Duel.IsExistingMatchingCard(c75833426.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil)
+		and Duel.SelectYesNo(tp,aux.Stringid(75833426,0)) then
+		local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil)
+		Duel.Destroy(g,REASON_EFFECT)
 	end
 end

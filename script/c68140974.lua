@@ -119,7 +119,7 @@ function c68140974.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c68140974.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
-	return ep~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return ep~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c68140974.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

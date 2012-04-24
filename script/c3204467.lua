@@ -23,7 +23,7 @@ function c3204467.defval(e,c)
 end
 function c3204467.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsDefence() and c==Duel.GetAttackTarget() then
+	if c:IsDefencePos() and c==Duel.GetAttackTarget() then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(3204467,0))
 		e1:SetCategory(CATEGORY_DESTROY)

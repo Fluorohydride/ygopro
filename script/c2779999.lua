@@ -15,7 +15,7 @@ function c2779999.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tc:IsControler(tp) and tc:IsFaceup() and tc:IsRace(RACE_PLANT)
 end
 function c2779999.filter(c)
-	return c:IsAttack() and c:IsDestructable()
+	return c:IsAttackPos() and c:IsDestructable()
 end
 function c2779999.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c2779999.filter,tp,0,LOCATION_MZONE,1,nil) end

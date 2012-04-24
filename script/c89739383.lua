@@ -12,7 +12,7 @@ function c89739383.initial_effect(c)
 end
 function c89739383.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,89739383)==0 end
-	Duel.RegisterFlagEffect(tp,89739383,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,89739383,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c89739383.filter(c)
 	return c:IsSetCard(0x106e) and c:GetCode()~=89739383 and c:IsAbleToHand()

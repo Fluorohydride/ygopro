@@ -65,7 +65,7 @@ function c74530899.ntcon(e,c)
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c74530899.damcon(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c74530899.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0

@@ -27,7 +27,7 @@ function c29981921.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c29981921.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c29981921.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

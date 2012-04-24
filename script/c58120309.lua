@@ -14,7 +14,7 @@ function c58120309.filter(c,p)
 	return c:GetControler()==p and c:IsOnField()
 end
 function c58120309.condition(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsChainInactivatable(ev) then return false end
+	if not Duel.IsChainNegatable(ev) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
 	return ex and tg~=nil and tc+tg:FilterCount(c58120309.filter,nil,tp)-tg:GetCount()>1
 end

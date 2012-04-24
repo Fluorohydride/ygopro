@@ -23,7 +23,7 @@ function c45037489.tfilter(c)
 end
 function c45037489.discon(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp or tp~=Duel.GetTurnPlayer() then return false end
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c45037489.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

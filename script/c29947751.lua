@@ -29,7 +29,7 @@ function c29947751.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c29947751.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 		and Duel.IsExistingMatchingCard(Card.IsFaceup,e:GetHandler():GetControler(),0,LOCATION_MZONE,1,nil)
 end
 function c29947751.filter(c,atk)
@@ -44,7 +44,7 @@ function c29947751.vala(e,c)
 	return c==e:GetHandler()
 end
 function c29947751.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end
 function c29947751.atlimit(e,c)
 	return c~=e:GetHandler()

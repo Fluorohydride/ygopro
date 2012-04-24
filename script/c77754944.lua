@@ -14,7 +14,7 @@ function c77754944.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp)
 end
 function c77754944.filter(c)
-	return c:IsFaceup() and c:IsAttack() and c:IsDestructable()
+	return c:IsFaceup() and c:IsAttackPos() and c:IsDestructable()
 end
 function c77754944.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c77754944.filter,tp,0,LOCATION_MZONE,1,nil) end

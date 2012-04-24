@@ -15,7 +15,7 @@ function c62271284.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer() and at and at:IsFaceup() and at:IsType(TYPE_NORMAL)
 end
 function c62271284.filter(c)
-	return not (c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsAttack()) and c:IsDestructable()
+	return not (c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsAttackPos()) and c:IsDestructable()
 end
 function c62271284.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c62271284.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end

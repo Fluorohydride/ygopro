@@ -12,7 +12,7 @@ function c14258627.initial_effect(c)
 	--atk/def down
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DAMAGE_CALCULATE)
+	e2:SetCode(EVENT_DAMAGE_CALCULATING)
 	e2:SetCondition(c14258627.adcon)
 	e2:SetOperation(c14258627.addown)
 	c:RegisterEffect(e2)

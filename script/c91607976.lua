@@ -33,13 +33,13 @@ function c91607976.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c91607976.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c91607976.vala(e,c)
 	return c:GetCounter(0x8)*500
 end
 function c91607976.cond1(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 end
 function c91607976.opd1(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
@@ -47,7 +47,7 @@ function c91607976.opd1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c91607976.cond2(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 end
 function c91607976.costd2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end

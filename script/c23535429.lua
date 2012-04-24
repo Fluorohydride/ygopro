@@ -18,7 +18,7 @@ function c23535429.condition(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()
 	if (phase~=PHASE_DAMAGE and phase~=PHASE_DAMAGE_CAL) or Duel.IsDamageCalculated() then return false end
 	local d=Duel.GetAttackTarget()
-	return d and d:IsControler(tp) and d:IsDefence()
+	return d and d:IsControler(tp) and d:IsDefencePos()
 end
 function c23535429.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end

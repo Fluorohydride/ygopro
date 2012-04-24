@@ -43,7 +43,7 @@ function c52628687.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
-	Duel.RegisterFlagEffect(tp,52628687,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,52628687,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c52628687.eqlimit(e,c)
 	return e:GetOwner()==c

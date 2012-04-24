@@ -21,7 +21,7 @@ function c31053337.initial_effect(c)
 	--indes
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_DAMAGE_CALCULATE)
+	e3:SetCode(EVENT_DAMAGE_CALCULATING)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetOperation(c31053337.indes)
 	c:RegisterEffect(e3)

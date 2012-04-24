@@ -167,7 +167,7 @@ function c93157004.eqlimit(e,c)
 end
 function c93157004.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsActiveType(TYPE_MONSTER)
-		and Duel.IsChainInactivatable(ev)
+		and Duel.IsChainNegatable(ev)
 end
 function c93157004.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetEquipGroup():IsExists(Card.IsAbleToGraveAsCost,1,nil) end

@@ -18,7 +18,7 @@ function c97896503.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c97896503.op(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	if d~=nil and d:IsRelateToBattle() and d:IsDefence() then
+	if d~=nil and d:IsRelateToBattle() and d:IsDefencePos() then
 		Duel.Destroy(d,REASON_EFFECT)
 	end
 end

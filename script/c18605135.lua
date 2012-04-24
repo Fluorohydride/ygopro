@@ -28,7 +28,7 @@ function c18605135.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetEnvironment()==22702055
 end
 function c18605135.abdcon(e)
-	return Duel.GetAttackTarget()==nil or Duel.GetAttackTarget():IsAttack() or Duel.GetAttacker():GetAttack()>Duel.GetAttackTarget():GetDefence()
+	return Duel.GetAttackTarget()==nil or Duel.GetAttackTarget():IsAttackPos() or Duel.GetAttacker():GetAttack()>Duel.GetAttackTarget():GetDefence()
 end
 function c18605135.sdcon(e)
 	return Duel.GetEnvironment()~=22702055

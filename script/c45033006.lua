@@ -12,7 +12,7 @@ function c45033006.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c45033006.filter(c)
-	return c:IsFacedown() and c:IsDefence() and c:IsControlerCanBeChanged()
+	return c:IsFacedown() and c:IsDefencePos() and c:IsControlerCanBeChanged()
 end
 function c45033006.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c45033006.filter(chkc) end
@@ -23,7 +23,7 @@ function c45033006.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c45033006.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFacedown() and tc:IsDefence() and not Duel.GetControl(tc,tp,PHASE_END,1) then
+	if tc:IsRelateToEffect(e) and tc:IsFacedown() and tc:IsDefencePos() and not Duel.GetControl(tc,tp,PHASE_END,1) then
 		if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 			Duel.Destroy(tc,REASON_EFFECT)
 		end

@@ -23,12 +23,12 @@ function c41090784.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c41090784.potg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return e:GetHandler():IsAttack() end
+	if chk==0 then return e:GetHandler():IsAttackPos() end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
 end
 function c41090784.poop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsAttack() and c:IsRelateToEffect(e) then
+	if c:IsFaceup() and c:IsAttackPos() and c:IsRelateToEffect(e) then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 	end
 end

@@ -14,7 +14,7 @@ function c93889755.initial_effect(c)
 end
 function c93889755.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return bit.band(c:GetPreviousPosition(),POS_DEFENCE)~=0 and c:IsFaceup() and c:IsAttack()
+	return bit.band(c:GetPreviousPosition(),POS_DEFENCE)~=0 and c:IsFaceup() and c:IsAttackPos()
 end
 function c93889755.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsAbleToHand() end

@@ -18,7 +18,7 @@ function c3648368.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
 end
 function c3648368.filter(c)
-	return c:IsFacedown() and c:IsDefence()
+	return c:IsFacedown() and c:IsDefencePos()
 end
 function c3648368.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c3648368.filter(chkc) end

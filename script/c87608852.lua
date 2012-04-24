@@ -14,8 +14,8 @@ function c87608852.initial_effect(c)
 		c87608852.global_check=true
 		c87608852[0]=true
 		c87608852[1]=true
-		c87608852[2]=false
-		c87608852[3]=false
+		c87608852[2]=0
+		c87608852[3]=0
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -28,9 +28,14 @@ function c87608852.initial_effect(c)
 		Duel.RegisterEffect(ge2,0)
 		local ge3=Effect.CreateEffect(c)
 		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge3:SetOperation(c87608852.clear)
+		ge3:SetCode(EVENT_CHAIN_NEGATED)
+		ge3:SetOperation(c87608852.checkop3)
 		Duel.RegisterEffect(ge3,0)
+		local ge4=Effect.CreateEffect(c)
+		ge4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge4:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+		ge4:SetOperation(c87608852.clear)
+		Duel.RegisterEffect(ge4,0)
 	end
 end
 function c87608852.checkop1(e,tp,eg,ep,ev,re,r,rp)
@@ -44,17 +49,22 @@ function c87608852.checkop1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c87608852.checkop2(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
-		c87608852[rp+2]=true
+		c87608852[rp+2]=c87608852[rp+2]+1
+	end
+end
+function c87608852.checkop3(e,tp,eg,ep,ev,re,r,rp)
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
+		c87608852[rp+2]=c87608852[rp+2]-1
 	end
 end
 function c87608852.clear(e,tp,eg,ep,ev,re,r,rp)
 	c87608852[0]=true
 	c87608852[1]=true
-	c87608852[2]=false
-	c87608852[3]=false
+	c87608852[2]=0
+	c87608852[3]=0
 end
 function c87608852.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c87608852[tp] and c87608852[tp+2] and e:GetHandler():IsReleaseable() end
+	if chk==0 then return c87608852[tp] and c87608852[tp+2]>0 and e:GetHandler():IsReleaseable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())

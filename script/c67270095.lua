@@ -26,13 +26,13 @@ end
 function c67270095.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local d=Duel.GetAttackTarget()
 	if chkc then return chkc==d end
-	if chk==0 then return d and d:IsAttack() and d:IsCanBeEffectTarget(e) end
+	if chk==0 then return d and d:IsAttackPos() and d:IsCanBeEffectTarget(e) end
 	Duel.SetTargetCard(d)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,d,1,0,0)
 end
 function c67270095.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsAttack() then
+	if tc and tc:IsRelateToEffect(e) and tc:IsAttackPos() then
 		Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
 	end
 end

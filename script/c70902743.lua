@@ -28,10 +28,10 @@ function c70902743.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c70902743.condition1(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget() and not Duel.GetAttackTarget():IsAttack()
+	return Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget() and not Duel.GetAttackTarget():IsAttackPos()
 end
 function c70902743.filter1(c)
-	return not c:IsAttack() and c:IsDestructable()
+	return not c:IsAttackPos() and c:IsDestructable()
 end
 function c70902743.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

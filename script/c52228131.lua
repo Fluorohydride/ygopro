@@ -14,7 +14,7 @@ function c52228131.filter(c)
 	return c:IsSetCard(0x19) and c:IsAbleToDeck()
 end
 function c52228131.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and Duel.IsChainInactivatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and Duel.IsChainNegatable(ev)
 end
 function c52228131.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c52228131.filter,tp,LOCATION_HAND,0,1,nil) end

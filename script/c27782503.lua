@@ -25,7 +25,7 @@ function c27782503.cfilter(c)
 end
 function c27782503.descon(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefence()
+	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefencePos()
 		and Duel.IsExistingMatchingCard(c27782503.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c27782503.destg(e,tp,eg,ep,ev,re,r,rp,chk)

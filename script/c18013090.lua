@@ -12,7 +12,7 @@ function c18013090.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DAMAGE_CALCULATE)
+	e2:SetCode(EVENT_DAMAGE_CALCULATING)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c18013090.atcon2)
@@ -59,7 +59,7 @@ function c18013090.cacon(e,tp,eg,ep,ev,re,r,rp)
 	return a==e:GetHandler() and d and d:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c18013090.filter(c)
-	return c:IsFaceup() and c:IsDefence() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+	return c:IsFaceup() and c:IsDefencePos() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c18013090.catg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c18013090.filter(chkc) end

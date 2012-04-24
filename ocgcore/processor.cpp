@@ -3931,11 +3931,11 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	}
 	case 1: {
 		effect* peffect = cait->triggering_effect;
-		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_inactivatable(cait->chain_count)) {
+		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_negatable(cait->chain_count)) {
 			remove_oath_effect(peffect);
 			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->flag & EFFECT_FLAG_REPEAT))
 				peffect->reset_count += 0x100;
-			raise_event((card*)0, EVENT_CHAIN_INACTIVATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
+			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
 			return FALSE;

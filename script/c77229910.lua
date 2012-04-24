@@ -15,7 +15,7 @@ function c77229910.dfilter(c,p)
 	return c:GetControler()==p and c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsSetCard(0x26)
 end
 function c77229910.condition(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsChainInactivatable(ev) or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
+	if not Duel.IsChainNegatable(ev) or not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
 	return ex and tg~=nil and tc+tg:FilterCount(c77229910.dfilter,nil,tp)-tg:GetCount()>0
 end

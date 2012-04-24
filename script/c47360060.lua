@@ -12,7 +12,7 @@ function c47360060.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c47360060.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsChainInactivatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
+	return Duel.IsChainNegatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
 end
 function c47360060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x69) end

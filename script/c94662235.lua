@@ -51,7 +51,7 @@ function c94662235.activate1(e,tp,eg,ep,ev,re,r,rp)
 	ec:RegisterEffect(e1)
 end
 function c94662235.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev) and c94662235.check(tp)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev) and c94662235.check(tp)
 end
 function c94662235.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:GetFirst():IsAbleToRemove() end

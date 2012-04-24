@@ -23,5 +23,5 @@ function c76913983.atkcon(e)
 	if ph~=PHASE_DAMAGE and ph~=PHASE_DAMAGE_CAL then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return e:GetHandler()==a and d and d:IsDefence()
+	return e:GetHandler()==a and d and d:IsDefencePos()
 end

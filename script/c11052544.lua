@@ -13,7 +13,7 @@ function c11052544.filter(c)
 	return c:IsFaceup() and c:IsDestructable()
 end
 function c11052544.cfilter(c)
-	return c:IsFaceup() and c:IsAttack() and c:IsSetCard(0x100d)
+	return c:IsFaceup() and c:IsAttackPos() and c:IsSetCard(0x100d)
 end
 function c11052544.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

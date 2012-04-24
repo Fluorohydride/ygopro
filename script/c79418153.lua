@@ -15,7 +15,7 @@ end
 function c79418153.piercecon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return d and a:IsControler(tp) and d:IsDefence()
+	return d and a:IsControler(tp) and d:IsDefencePos()
 end
 function c79418153.piercetg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

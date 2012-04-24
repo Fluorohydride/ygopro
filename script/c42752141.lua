@@ -21,7 +21,7 @@ function c42752141.xyzfilter(c)
 	return c:GetLevel()==4 and c:IsRace(RACE_DINOSAUR)
 end
 function c42752141.condition(e,tp,eg,ep,ev,re,r,rp,chk)
-	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c42752141.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

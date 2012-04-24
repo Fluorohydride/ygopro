@@ -11,7 +11,7 @@ function c42309337.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c42309337.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:GetHandler():IsType(TYPE_COUNTER) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:GetHandler():IsType(TYPE_COUNTER) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c42309337.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

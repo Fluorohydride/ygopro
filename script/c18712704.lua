@@ -34,7 +34,7 @@ function c18712704.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ex,dg=Duel.GetOperationInfo(0,CATEGORY_DESTROY)
 	local sc=sg:GetFirst()
 	local dc=dg:GetFirst()
-	if dc:IsRelateToEffect(e) and dc:IsAttack() then
+	if dc:IsRelateToEffect(e) and dc:IsAttackPos() then
 		Duel.Destroy(dg,REASON_EFFECT)
 		if sc:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 			and sc:IsCanBeSpecialSummoned(e,0,tp,false,false) then

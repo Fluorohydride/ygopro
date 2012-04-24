@@ -17,7 +17,7 @@ function c65240384.initial_effect(c)
 end
 function c65240384.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c==Duel.GetAttackTarget() and c:IsDefence() and c:IsRelateToBattle() then
+	if c==Duel.GetAttackTarget() and c:IsDefencePos() and c:IsRelateToBattle() then
 		Duel.ChangePosition(c,POS_FACEUP_ATTACK)
 	end
 end
@@ -26,7 +26,7 @@ function c65240384.negop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 		local tc=g:GetFirst()
 		if g:GetCount()==1 and tc:IsCode(65240384) and tc:IsLocation(LOCATION_MZONE)
-			and tc:IsFacedown() and tc:IsDefence() then
+			and tc:IsFacedown() and tc:IsDefencePos() then
 			Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
 			Duel.NegateActivation(ev)
 		end

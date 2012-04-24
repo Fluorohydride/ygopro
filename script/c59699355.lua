@@ -11,7 +11,7 @@ function c59699355.initial_effect(c)
 end
 function c59699355.condition(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return d and d:IsDefence() and d:IsSetCard(0x24)
+	return d and d:IsDefencePos() and d:IsSetCard(0x24)
 end
 function c59699355.activate(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()

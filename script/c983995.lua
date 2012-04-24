@@ -22,7 +22,7 @@ function c983995.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c983995.condition(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp or not Duel.IsChainInactivatable(ev) then return false end
+	if rp==tp or not Duel.IsChainNegatable(ev) then return false end
 	if re:IsHasCategory(CATEGORY_NEGATE)
 		and Duel.GetChainInfo(ev-1,CHAININFO_TRIGGERING_EFFECT):IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_TOHAND)

@@ -12,7 +12,7 @@ function c81601517.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c81601517.condition(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return rp~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c81601517.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_DUAL) and c:IsCanTurnSet()

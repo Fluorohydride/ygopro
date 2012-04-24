@@ -17,7 +17,7 @@ function c45215453.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c45215453.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and e:GetHandler():IsDefence()
+	return Duel.GetTurnPlayer()==tp and e:GetHandler():IsDefencePos()
 end
 function c45215453.filter(c)
 	return c:IsType(TYPE_EQUIP) and c:IsAbleToHand()
@@ -28,7 +28,7 @@ function c45215453.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c45215453.thop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFacedown() or c:IsAttack() or not c:IsRelateToEffect(e) then return end
+	if c:IsFacedown() or c:IsAttackPos() or not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c45215453.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then

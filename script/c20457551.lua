@@ -19,7 +19,7 @@ function c20457551.initial_effect(c)
 	--atk down
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_DAMAGE_CALCULATE)
+	e3:SetCode(EVENT_DAMAGE_CALCULATING)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetOperation(c20457551.atkdown)
 	c:RegisterEffect(e3)

@@ -25,13 +25,13 @@ function c77797992.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c77797992.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c77797992.targeta(e,c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsRace(RACE_WINDBEAST+RACE_PLANT+RACE_INSECT)
 end
 function c77797992.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end
 function c77797992.targetd(e,c)
 	return c:IsPosition(POS_FACEUP_DEFENCE) and c:IsRace(RACE_WINDBEAST+RACE_PLANT+RACE_INSECT)

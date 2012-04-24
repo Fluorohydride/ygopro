@@ -50,7 +50,7 @@ function c73580471.poscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c73580471.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDefence() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDefencePos() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsDefence,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DEFENCE)
 	local g=Duel.SelectTarget(tp,Card.IsDefence,tp,0,LOCATION_MZONE,1,1,nil)
@@ -58,7 +58,7 @@ function c73580471.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c73580471.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc or tc:IsAttack() or not tc:IsRelateToEffect(e) then return end
+	if not tc or tc:IsAttackPos() or not tc:IsRelateToEffect(e) then return end
 	if Duel.ChangePosition(tc,POS_FACEUP_ATTACK)==0 then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)

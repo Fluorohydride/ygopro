@@ -16,7 +16,7 @@ function c7478431.initial_effect(c)
 end
 function c7478431.discon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and re:IsActiveType(TYPE_MONSTER)
-		and Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)~=LOCATION_DECK and Duel.IsChainInactivatable(ev)
+		and Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)~=LOCATION_DECK and Duel.IsChainNegatable(ev)
 end
 function c7478431.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -36,7 +36,7 @@ function c47507260.bdop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c47507260.descon(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefence()
+	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefencePos()
 end
 function c47507260.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

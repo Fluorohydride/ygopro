@@ -27,7 +27,7 @@ function c48868994.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c48868994.cona(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttack()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttackPos()
 end
 function c48868994.costa(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetEquipGroup():IsExists(Card.IsAbleToGraveAsCost,1,nil) end
@@ -46,11 +46,11 @@ function c48868994.opa(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c48868994.cond(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 		and not e:GetHandler():IsHasEffect(48868994)
 end
 function c48868994.filter(c)
-	return c:IsFaceup() and c:IsAttack() and c:IsAbleToChangeControler()
+	return c:IsFaceup() and c:IsAttackPos() and c:IsAbleToChangeControler()
 end
 function c48868994.tgd(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c48868994.filter(chkc) end
@@ -66,7 +66,7 @@ end
 function c48868994.opd(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttack() then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttackPos() then
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			if not Duel.Equip(tp,tc,c,false) then return end
 			--Add Equip limit

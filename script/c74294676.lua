@@ -37,7 +37,7 @@ function c74294676.xyzfilter(c)
 	return c:GetLevel()==4 and c:IsRace(RACE_DINOSAUR)
 end
 function c74294676.condition1(e,tp,eg,ep,ev,re,r,rp,chk)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c74294676.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end

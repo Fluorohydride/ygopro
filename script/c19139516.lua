@@ -31,7 +31,7 @@ function c19139516.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c19139516.regop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsDefence() and e:GetHandler():IsFaceup() then
+	if e:GetHandler():IsDefencePos() and e:GetHandler():IsFaceup() then
 		e:GetHandler():RegisterFlagEffect(19139516,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,1)
 	end
 end

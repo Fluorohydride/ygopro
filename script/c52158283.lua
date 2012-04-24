@@ -28,14 +28,18 @@ function c52158283.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c52158283.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsAttack() then
-		local opt=0
-		if tc:IsCanTurnSet() then 
-			opt=Duel.SelectOption(tp,aux.Stringid(52158283,1),aux.Stringid(52158283,2))
+	if tc:IsRelateToEffect(e) then
+		if tc:IsAttackPos() then
+			local opt=0
+			if tc:IsCanTurnSet() then 
+				opt=Duel.SelectOption(tp,aux.Stringid(52158283,1),aux.Stringid(52158283,2))
+			else
+				opt=Duel.SelectOption(tp,aux.Stringid(52158283,1))
+			end
+			if opt==0 then Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
+			else Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE) end
 		else
-			opt=Duel.SelectOption(tp,aux.Stringid(52158283,1))
+			Duel.ChangePosition(tc,0,0,POS_FACEDOWN_DEFENCE,POS_FACEUP_DEFENCE)
 		end
-		if opt==0 then Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
-		else Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE) end
 	end
 end

@@ -15,7 +15,7 @@ function c69279219.cfilter(c)
 	return c:IsOnField() and c:IsType(TYPE_MONSTER)
 end
 function c69279219.condition(e,tp,eg,ep,ev,re,r,rp)
-	if tp==ep or not Duel.IsChainInactivatable(ev) then return false end
+	if tp==ep or not Duel.IsChainNegatable(ev) then return false end
 	if not re:IsActiveType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
 	return ex and tg~=nil and tc+tg:FilterCount(c69279219.cfilter,nil)-tg:GetCount()>0

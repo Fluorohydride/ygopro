@@ -40,7 +40,7 @@ function c66625883.becon(e)
 	return e:GetHandler():IsAttackable()
 end
 function c66625883.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c66625883.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

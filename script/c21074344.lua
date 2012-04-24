@@ -16,7 +16,7 @@ function c21074344.initial_effect(c)
 end
 function c21074344.discon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
-		and Duel.IsChainInactivatable(ev)
+		and Duel.IsChainNegatable(ev)
 end
 function c21074344.costfilter(c)
 	return c:IsRace(RACE_FAIRY) and c:IsAbleToGraveAsCost()

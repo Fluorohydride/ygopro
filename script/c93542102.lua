@@ -23,10 +23,10 @@ function c93542102.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c93542102.cona(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttack()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttackPos()
 end
 function c93542102.cond(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 end
 function c93542102.cfilter(c)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x26) and c:IsType(TYPE_MONSTER)

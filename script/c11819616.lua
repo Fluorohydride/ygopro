@@ -18,7 +18,7 @@ function c11819616.discon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg:IsExists(Card.IsOnField,1,nil) and Duel.IsChainInactivatable(ev)
+	return tg:IsExists(Card.IsOnField,1,nil) and Duel.IsChainNegatable(ev)
 end
 function c11819616.costfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT)

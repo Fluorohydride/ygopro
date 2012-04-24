@@ -12,7 +12,7 @@ function c79178930.initial_effect(c)
 end
 function c79178930.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc:IsFaceup() and tc:IsDefence() and tc:IsSetCard(0x11)
+	return tc:IsFaceup() and tc:IsDefencePos() and tc:IsSetCard(0x11)
 end
 function c79178930.filter(c)
 	return c:IsFaceup() and c:IsDestructable()

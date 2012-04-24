@@ -16,10 +16,10 @@ function c84592800.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c84592800.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c84592800.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end
 function c84592800.val(e,c)
 	return c:GetEquipCount()*800

@@ -21,7 +21,7 @@ c60482781.lvdncount=2
 c60482781.lvdn={47507260,74591968}
 function c60482781.descon(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefence()
+	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefencePos()
 end
 function c60482781.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

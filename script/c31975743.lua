@@ -21,7 +21,7 @@ function c31975743.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c31975743.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c31975743.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()

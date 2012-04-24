@@ -23,7 +23,7 @@ function c28284902.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c28284902.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x26) and c:IsAttack()
+	return c:IsFaceup() and c:IsSetCard(0x26) and c:IsAttackPos()
 end
 function c28284902.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c28284902.cfilter,1,nil) end
@@ -31,7 +31,7 @@ function c28284902.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,eg,eg:GetCount(),0,0)
 end
 function c28284902.filter(c,e)
-	return c:IsFaceup() and c:IsSetCard(0x26) and c:IsAttack() and c:IsRelateToEffect(e)
+	return c:IsFaceup() and c:IsSetCard(0x26) and c:IsAttackPos() and c:IsRelateToEffect(e)
 end
 function c28284902.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

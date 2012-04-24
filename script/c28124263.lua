@@ -30,7 +30,7 @@ function c28124263.initial_effect(c)
 end
 function c28124263.check(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsDisabled() and c:IsAttack() then e:SetLabel(1)
+	if not c:IsDisabled() and c:IsAttackPos() then e:SetLabel(1)
 	else e:SetLabel(0) end
 end
 function c28124263.cona(e,tp,eg,ep,ev,re,r,rp)
@@ -52,5 +52,5 @@ function c28124263.opa(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 end
 function c28124263.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end

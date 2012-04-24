@@ -29,7 +29,7 @@ function c56286179.drcon(e,tp,eg,ep,ev,re,r,rp)
 	if r~=REASON_BATTLE or ep==tp then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return d and d:IsDefence() and a:GetControler()==tp and a:IsRace(RACE_WARRIOR)
+	return d and d:IsDefencePos() and a:GetControler()==tp and a:IsRace(RACE_WARRIOR)
 end
 function c56286179.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end

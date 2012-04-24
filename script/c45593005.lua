@@ -21,10 +21,10 @@ function c45593005.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c45593005.cfilter(c)
-	return c:IsFaceup() and c:IsAttack()
+	return c:IsFaceup() and c:IsAttackPos()
 end
 function c45593005.cona(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttack()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttackPos()
 		and Duel.GetMatchingGroupCount(c45593005.cfilter,tp,LOCATION_MZONE,0,e:GetHandler())==2
 		and not Duel.IsExistingMatchingCard(Card.IsDefence,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
@@ -63,5 +63,5 @@ function c45593005.opa(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c45593005.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end

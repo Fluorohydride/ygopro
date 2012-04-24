@@ -15,7 +15,7 @@ function c16940215.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c16940215.discon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c16940215.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

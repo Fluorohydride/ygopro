@@ -11,12 +11,12 @@ function c85709845.initial_effect(c)
 end
 function c85709845.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local d=Duel.GetAttackTarget()
-	if chk==0 then return d:IsDefence() and d:IsControler(tp) end
+	if chk==0 then return d:IsDefencePos() and d:IsControler(tp) end
 	Duel.SetTargetCard(d)
 end
 function c85709845.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsDefence() then
+	if tc:IsRelateToEffect(e) and tc:IsDefencePos() then
 		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(85709845,0))

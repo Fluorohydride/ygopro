@@ -46,7 +46,7 @@ function c2250266.initial_effect(c)
 end
 function c2250266.check(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsDisabled() and c:IsAttack() then e:SetLabel(1)
+	if not c:IsDisabled() and c:IsAttackPos() then e:SetLabel(1)
 	else e:SetLabel(0) end
 end
 function c2250266.cona(e,tp,eg,ep,ev,re,r,rp)
@@ -64,16 +64,16 @@ function c2250266.opa(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2250266.cona2(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c2250266.atlimit(e,c)
 	return c~=e:GetHandler()
 end
 function c2250266.cond(e)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 end
 function c2250266.filter(c)
-	return c:IsFaceup() and c:IsAttack()
+	return c:IsFaceup() and c:IsAttackPos()
 end
 function c2250266.tgd2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c2250266.filter(chkc) end
@@ -85,7 +85,7 @@ end
 function c2250266.opd2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
-	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttack()
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttackPos()
 		and Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)~=0 and c:IsRelateToBattle() then
 		Duel.ChangePosition(e:GetHandler(),POS_FACEUP_ATTACK,0,POS_FACEUP_ATTACK,0)
 	end

@@ -17,7 +17,7 @@ function c5562461.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	if not re:IsActiveType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg and tg:IsExists(c5562461.cfilter,1,nil) and Duel.IsChainInactivatable(ev)
+	return tg and tg:IsExists(c5562461.cfilter,1,nil) and Duel.IsChainNegatable(ev)
 end
 function c5562461.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

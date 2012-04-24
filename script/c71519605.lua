@@ -23,7 +23,7 @@ function c71519605.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c71519605.atcon(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c71519605.atlimit(e,c)
 	return c:IsFacedown() or c:GetCode()~=71519605

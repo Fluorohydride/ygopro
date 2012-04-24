@@ -16,5 +16,5 @@ function c81380218.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c81380218.filter(e,c)
-	return c:IsDefence()
+	return c:IsDefencePos()
 end

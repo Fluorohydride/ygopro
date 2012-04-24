@@ -14,7 +14,7 @@ function c29934351.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x21)
 end
 function c29934351.condition(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+	return rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 		and Duel.IsExistingMatchingCard(c29934351.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c29934351.target(e,tp,eg,ep,ev,re,r,rp,chk)

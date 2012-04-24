@@ -7,7 +7,7 @@ function c60946968.initial_effect(c)
 	--atk def
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DAMAGE_CALCULATE)
+	e2:SetCode(EVENT_DAMAGE_CALCULATING)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c60946968.adval)
 	c:RegisterEffect(e2)

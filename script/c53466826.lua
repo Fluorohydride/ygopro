@@ -13,7 +13,7 @@ function c53466826.initial_effect(c)
 end
 function c53466826.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,53466826)==0 end
-	Duel.RegisterFlagEffect(tp,53466826,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,53466826,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c53466826.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x6f)

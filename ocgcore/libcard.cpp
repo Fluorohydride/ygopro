@@ -1214,7 +1214,7 @@ int32 scriptlib::card_is_faceup(lua_State *L) {
 	lua_pushboolean(L, pcard->is_position(POS_FACEUP));
 	return 1;
 }
-int32 scriptlib::card_is_attack(lua_State *L) {
+int32 scriptlib::card_is_attack_pos(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
@@ -1228,7 +1228,7 @@ int32 scriptlib::card_is_facedown(lua_State *L) {
 	lua_pushboolean(L, pcard->is_position(POS_FACEDOWN));
 	return 1;
 }
-int32 scriptlib::card_is_defence(lua_State *L) {
+int32 scriptlib::card_is_defence_pos(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);

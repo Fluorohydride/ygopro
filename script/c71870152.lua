@@ -52,7 +52,7 @@ function c71870152.lvop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c71870152.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsFaceup() and c:IsAttack() and c:GetSummonType()==SUMMON_TYPE_SPECIAL+0x8
+	return c:IsFaceup() and c:IsAttackPos() and c:GetSummonType()==SUMMON_TYPE_SPECIAL+0x8
 end
 function c71870152.filter(c)
 	return c:IsFaceup() and c:IsDestructable()

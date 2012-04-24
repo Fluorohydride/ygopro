@@ -13,12 +13,12 @@ end
 function c4041838.targ(e,tp,eg,ep,ev,re,r,rp,chk)
 	local d=Duel.GetAttackTarget()
 	if chk ==0 then	return Duel.GetAttacker()==e:GetHandler()
-		and d~=nil and d:IsFaceup() and d:IsDefence() and d:IsDestructable() end
+		and d~=nil and d:IsFaceup() and d:IsDefencePos() and d:IsDestructable() end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,d,1,0,0)
 end
 function c4041838.op(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	if d~=nil and d:IsRelateToBattle() and d:IsDefence() then
+	if d~=nil and d:IsRelateToBattle() and d:IsDefencePos() then
 		Duel.Destroy(d,REASON_EFFECT)
 	end
 end

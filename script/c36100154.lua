@@ -8,7 +8,7 @@ function c36100154.initial_effect(c)
 	--atk up
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DAMAGE_CALCULATE)
+	e2:SetCode(EVENT_DAMAGE_CALCULATING)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c36100154.atkup)
 	c:RegisterEffect(e2)

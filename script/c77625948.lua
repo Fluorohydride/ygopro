@@ -18,7 +18,7 @@ function c77625948.initial_effect(c)
 	--
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_DAMAGE_CALCULATE)
+	e3:SetCode(EVENT_DAMAGE_CALCULATING)
 	e3:SetCondition(c77625948.atkcon)
 	e3:SetOperation(c77625948.atkop)
 	c:RegisterEffect(e3)

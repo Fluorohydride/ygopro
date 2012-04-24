@@ -129,7 +129,7 @@ function c67030233.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker()
 end
 function c67030233.desfilter(c)
-	return c:IsDefence() and c:IsDestructable()
+	return c:IsDefencePos() and c:IsDestructable()
 end
 function c67030233.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

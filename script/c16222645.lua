@@ -13,7 +13,7 @@ function c16222645.initial_effect(c)
 end
 function c16222645.descon(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefence()
+	return e:GetHandler()==Duel.GetAttacker() and d and d:IsFacedown() and d:IsDefencePos()
 end
 function c16222645.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -27,7 +27,7 @@ function c35011819.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetCurrentChain()
 	local te=Duel.GetChainInfo(ct-1,CHAININFO_TRIGGERING_EFFECT)
 	local tc=te:GetHandler()
-	if te:GetCode()==EVENT_SUMMON_SUCCESS and te:IsActiveType(TYPE_MONSTER) and Duel.IsChainInactivatable(ct-1)
+	if te:GetCode()==EVENT_SUMMON_SUCCESS and te:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ct-1)
 		and Duel.IsPlayerCanDraw(tc:GetControler(),1) and Duel.SelectYesNo(tp,aux.Stringid(35011819,1)) then
 		e:SetLabel(1)
 		Duel.SetOperationInfo(0,CATEGORY_NEGATE,tc,1,0,0)
@@ -46,7 +46,7 @@ function c35011819.activate1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c35011819.condition2(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and re:GetCode()==EVENT_SUMMON_SUCCESS and Duel.IsChainInactivatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and re:GetCode()==EVENT_SUMMON_SUCCESS and Duel.IsChainNegatable(ev)
 end
 function c35011819.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(rp,1) end

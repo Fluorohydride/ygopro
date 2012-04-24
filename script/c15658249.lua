@@ -12,7 +12,7 @@ function c15658249.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c15658249.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsDefence() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsDefencePos() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
 	local g=Duel.SelectTarget(tp,Card.IsDefence,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
@@ -20,7 +20,7 @@ function c15658249.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c15658249.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsDefence() and tc:IsRelateToEffect(e) then
+	if tc and tc:IsDefencePos() and tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(tc,0,0,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
 end

@@ -11,7 +11,7 @@ function c79409334.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c79409334.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAttack() end
+	if chk==0 then return e:GetHandler():IsAttackPos() end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
 end
 function c79409334.operation(e,tp,eg,ep,ev,re,r,rp)

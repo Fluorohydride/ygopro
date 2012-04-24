@@ -27,7 +27,7 @@ c48229808.lvdncount=2
 c48229808.lvdn={75830094,11224103}
 function c48229808.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
-		and re:IsActiveType(TYPE_SPELL) and Duel.IsChainInactivatable(ev)
+		and re:IsActiveType(TYPE_SPELL) and Duel.IsChainNegatable(ev)
 end
 function c48229808.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

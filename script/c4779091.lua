@@ -54,7 +54,7 @@ function c4779091.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c4779091.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAttack() end
+	if chk==0 then return e:GetHandler():IsAttackPos() end
 	Duel.SetTargetPlayer(1-tp)
 	local atk=Duel.GetAttacker():GetAttack()
 	Duel.SetTargetParam(atk)

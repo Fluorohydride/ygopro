@@ -31,7 +31,7 @@ function c39987164.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c39987164.filter(c)
-	return c:IsFaceup() and c:IsAttack() and c:IsType(TYPE_EFFECT) and c:IsAbleToChangeControler()
+	return c:IsFaceup() and c:IsAttackPos() and c:IsType(TYPE_EFFECT) and c:IsAbleToChangeControler()
 end
 function c39987164.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c39987164.filter(chkc) end
@@ -47,7 +47,7 @@ end
 function c39987164.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsAttack() and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsAttackPos() and tc:IsRelateToEffect(e) then
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			if not Duel.Equip(tp,tc,c,false) then return end
 			--Add Equip limit

@@ -143,9 +143,9 @@ public:
 	static int32 card_is_attackable(lua_State *L);
 	static int32 card_is_chain_attackable(lua_State *L);
 	static int32 card_is_faceup(lua_State *L);
-	static int32 card_is_attack(lua_State *L);
+	static int32 card_is_attack_pos(lua_State *L);
 	static int32 card_is_facedown(lua_State *L);
-	static int32 card_is_defence(lua_State *L);
+	static int32 card_is_defence_pos(lua_State *L);
 	static int32 card_is_position(lua_State *L);
 	static int32 card_is_pre_position(lua_State *L);
 	static int32 card_is_controler(lua_State *L);
@@ -433,7 +433,7 @@ public:
 	static int32 duel_is_player_can_send_to_hand(lua_State *L);
 	static int32 duel_is_player_can_send_to_grave(lua_State *L);
 	static int32 duel_is_player_can_send_to_deck(lua_State *L);
-	static int32 duel_is_chain_inactivatable(lua_State *L);
+	static int32 duel_is_chain_negatable(lua_State *L);
 	static int32 duel_is_chain_disablable(lua_State *L);
 	static int32 duel_check_chain_target(lua_State *L);
 	static int32 duel_check_chain_uniqueness(lua_State *L);

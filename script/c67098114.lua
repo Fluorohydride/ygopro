@@ -51,7 +51,7 @@ function c67098114.tfilter(c)
 end
 function c67098114.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and ep~=tp and bit.band(Duel.GetCurrentPhase(),0x38)~=0
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainInactivatable(ev)
+		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c67098114.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

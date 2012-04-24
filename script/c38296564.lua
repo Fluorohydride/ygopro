@@ -24,7 +24,7 @@ function c38296564.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c38296564.filter(c)
-	return c:IsFaceup() and c:IsAttack()
+	return c:IsFaceup() and c:IsAttackPos()
 end
 function c38296564.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c38296564.filter(chkc) end

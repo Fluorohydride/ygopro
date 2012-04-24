@@ -27,14 +27,14 @@ function c76865611.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c76865611.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c76865611.refval(e,re,val,r,rp,rc)
 	return rp~=e:GetHandlerPlayer() and bit.band(r,REASON_EFFECT)~=0
 end
 function c76865611.check(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsDisabled() and c:IsDefence() then e:SetLabel(1)
+	if not c:IsDisabled() and c:IsDefencePos() then e:SetLabel(1)
 	else e:SetLabel(0) end
 end
 function c76865611.cond(e,tp,eg,ep,ev,re,r,rp)

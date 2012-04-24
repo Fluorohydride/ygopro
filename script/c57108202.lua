@@ -28,7 +28,7 @@ function c57108202.filter(c,lv)
 	return c:IsSetCard(0x26) and c:GetLevel()==lv and c:IsAbleToHand()
 end
 function c57108202.cona(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttack()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttackPos()
 end
 function c57108202.filtera(c,tp)
 	local lv=c:GetLevel()
@@ -55,7 +55,7 @@ function c57108202.opa(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c57108202.cond(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefence()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 end
 function c57108202.filterd(c,tp)
 	local lv=c:GetLevel()

@@ -11,7 +11,7 @@ function c24291651.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c24291651.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c24291651.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

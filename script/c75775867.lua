@@ -22,7 +22,7 @@ function c75775867.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c75775867.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttack()
+	return not e:GetHandler():IsDisabled() and e:GetHandler():IsAttackPos()
 end
 function c75775867.cfilter(c)
 	return c:GetCode()~=75775867 and c:IsSetCard(0x26)
@@ -50,7 +50,7 @@ function c75775867.repfilter(c)
 end
 function c75775867.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsOnField() and c:IsFaceup() and c:IsDefence()
+	if chk==0 then return not c:IsReason(REASON_REPLACE) and c:IsOnField() and c:IsFaceup() and c:IsDefencePos()
 		and Duel.IsExistingMatchingCard(c75775867.repfilter,tp,LOCATION_MZONE,0,1,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(75775867,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)

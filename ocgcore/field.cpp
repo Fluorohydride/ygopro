@@ -1643,7 +1643,7 @@ int32 field::is_player_can_remove(uint8 playerid, card * pcard) {
 	}
 	return TRUE;
 }
-int32 field::is_chain_inactivatable(uint8 chaincount) {
+int32 field::is_chain_negatable(uint8 chaincount) {
 	effect_set eset;
 	if(chaincount < 0 && chaincount > core.current_chain.size())
 		return FALSE;

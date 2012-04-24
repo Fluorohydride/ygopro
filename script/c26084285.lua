@@ -15,7 +15,7 @@ function c26084285.initial_effect(c)
 end
 function c26084285.condition(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp or (not re:IsHasType(EFFECT_TYPE_ACTIVATE) and not re:IsActiveType(TYPE_MONSTER))
-		or (not Duel.IsChainInactivatable(ev)) then return false end
+		or (not Duel.IsChainNegatable(ev)) then return false end
 	local ex,tg,tc,p=Duel.GetOperationInfo(ev,CATEGORY_HANDES)
 	return ex and (p==ep or p==PLAYER_ALL)
 end

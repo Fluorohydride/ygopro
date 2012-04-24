@@ -18,8 +18,8 @@ function c55119278.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c55119278.cona(e)
-	return e:GetHandler():IsAttack()
+	return e:GetHandler():IsAttackPos()
 end
 function c55119278.cond(e)
-	return e:GetHandler():IsDefence()
+	return e:GetHandler():IsDefencePos()
 end

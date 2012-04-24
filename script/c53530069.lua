@@ -15,7 +15,7 @@ function c53530069.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c53530069.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and e:GetHandler():IsAttack()
+	return tp==Duel.GetTurnPlayer() and e:GetHandler():IsAttackPos()
 end
 function c53530069.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

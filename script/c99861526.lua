@@ -33,7 +33,7 @@ function c99861526.rdop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c99861526.poscon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsRelateToBattle() and c:IsAttack()
+	return c:IsRelateToBattle() and c:IsAttackPos()
 end
 function c99861526.posop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then

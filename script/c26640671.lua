@@ -63,7 +63,7 @@ function c26640671.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c26640671.pfilter(c)
-	return c:GetFlagEffect(26640671)~=0 and c:IsAttack()
+	return c:GetFlagEffect(26640671)~=0 and c:IsAttackPos()
 end
 function c26640671.posop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c26640671.pfilter,tp,0,LOCATION_MZONE,nil)

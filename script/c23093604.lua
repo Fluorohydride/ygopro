@@ -21,7 +21,7 @@ function c23093604.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c23093604.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsFaceup() and e:GetHandler():IsDefence() and Duel.GetTurnPlayer()~=tp
+	return e:GetHandler():IsFaceup() and e:GetHandler():IsDefencePos() and Duel.GetTurnPlayer()~=tp
 end
 function c23093604.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

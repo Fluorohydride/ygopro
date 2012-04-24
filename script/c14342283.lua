@@ -26,5 +26,5 @@ function c14342283.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c14342283.tg(e,c)
-	return c:IsType(TYPE_TOKEN) and c:IsAttack()
+	return c:IsType(TYPE_TOKEN) and c:IsAttackPos()
 end

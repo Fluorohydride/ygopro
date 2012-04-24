@@ -28,7 +28,7 @@ function c34646691.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,eg,eg:GetCount(),0,0)
 end
 function c34646691.filter(c,e)
-	return c:IsFaceup() and c:IsAttack() and c:IsRelateToEffect(e)
+	return c:IsFaceup() and c:IsAttackPos() and c:IsRelateToEffect(e)
 end
 function c34646691.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
