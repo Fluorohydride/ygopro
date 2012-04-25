@@ -3772,8 +3772,10 @@ int32 field::add_chain(uint16 step) {
 		clit->disable_player = PLAYER_NONE;
 		clit->replace_op = 0;
 		core.current_chain.push_back(*clit);
-		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY))
+		if(!(peffect->type & (EFFECT_TYPE_TRIGGER_O | EFFECT_TYPE_TRIGGER_F | EFFECT_TYPE_FLIP))
+		        && !(peffect->flag & EFFECT_FLAG_FIELD_ONLY)) {
 			peffect->handler->create_relation(peffect);
+		}
 		if(peffect->cost) {
 			core.sub_solving_event.push_back(clit->evt);
 			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit->triggering_player, 0);
