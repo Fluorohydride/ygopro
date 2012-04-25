@@ -28,8 +28,9 @@ function c20855340.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c20855340.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,153,tp,tp,false,false,POS_FACEUP)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.SpecialSummon(tc,153,tp,tp,false,false,POS_FACEUP)
 		local rf=tc.evolreg
 		if rf then rf(tc) end
 	end

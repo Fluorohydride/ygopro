@@ -87,7 +87,7 @@ function c39823987.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c39823987.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
 	end
 end

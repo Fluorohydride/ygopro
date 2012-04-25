@@ -15,7 +15,7 @@ end
 function c33883834.con(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return (a:GetControler()==tp and a:IsSetCard(0x3d)) or (d and d:GetControler()==tp and d:IsSetCard(0x3d))
+	return d and ((a:GetControler()==tp and a:IsSetCard(0x3d)) or (d:GetControler()==tp and d:IsSetCard(0x3d)))
 		and Duel.GetFlagEffect(tp,33883834)==0
 end
 function c33883834.cost(e,tp,eg,ep,ev,re,r,rp,chk)

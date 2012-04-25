@@ -62,7 +62,7 @@ function c5556499.hdop(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp then return end
 	if not re:IsActiveType(TYPE_EFFECT) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	if g:IsContains(e:GetHandler()) then
+	if g and g:IsContains(e:GetHandler()) then
 		local hg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 		if hg:GetCount()==0 then return end
 		Duel.ConfirmCards(tp,hg)
