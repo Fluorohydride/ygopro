@@ -29,7 +29,8 @@ function c80280737.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c80280737.filter1,1,nil,e,tp)
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+			and Duel.CheckReleaseGroup(tp,c80280737.filter1,1,nil,e,tp)
 	end
 	local rg=Duel.SelectReleaseGroup(tp,c80280737.filter1,1,1,nil,e,tp)
 	e:SetLabel(rg:GetFirst():GetCode())

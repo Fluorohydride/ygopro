@@ -20,14 +20,9 @@ function c20057949.initial_effect(c)
 		Duel.RegisterEffect(ge1,0)
 		local ge2=Effect.CreateEffect(c)
 		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_BATTLE_DESTROYED)
-		ge2:SetOperation(c20057949.checkop2)
+		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+		ge2:SetOperation(c20057949.clear)
 		Duel.RegisterEffect(ge2,0)
-		local ge3=Effect.CreateEffect(c)
-		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge3:SetOperation(c20057949.clear)
-		Duel.RegisterEffect(ge3,0)
 	end
 end
 function c20057949.checkop1(e,tp,eg,ep,ev,re,r,rp)
@@ -37,16 +32,6 @@ function c20057949.checkop1(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.GetCurrentPhase()==PHASE_DAMAGE then pos=tc:GetBattlePosition() end
 		if tc:IsLocation(LOCATION_MZONE) and tc:IsSetCard(0x31) and bit.band(pos,POS_FACEUP)~=0 then
 			c20057949[tc:GetControler()]=true
-		end
-		tc=eg:GetNext()
-	end
-end
-function c20057949.checkop2(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		local pos=tc:GetBattlePosition()
-		if tc:IsSetCard(0x31) and bit.band(pos,POS_FACEUP)~=0 then
-			c20057949[tc:GetPreviousControler()]=true
 		end
 		tc=eg:GetNext()
 	end

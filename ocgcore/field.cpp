@@ -551,6 +551,7 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 		peffect->effect_owner = owner_player;
 		peffect->id = infos.effect_id++;
 	}
+	peffect->card_type = peffect->owner->data.type;
 	effect_container::iterator it;
 	if (!(peffect->type & EFFECT_TYPE_ACTIONS))
 		it = effects.aura_effect.insert(make_pair(peffect->code, peffect));

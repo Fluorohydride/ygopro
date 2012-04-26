@@ -741,6 +741,7 @@ int32 card::add_effect(effect* peffect) {
 	} else
 		return 0;
 	peffect->id = pduel->game_field->infos.effect_id++;
+	peffect->card_type = data.type;
 	if(get_status(STATUS_INITIALIZING))
 		peffect->flag |= EFFECT_FLAG_INITIAL;
 	if (get_status(STATUS_COPYING_EFFECT)) {

@@ -3772,8 +3772,8 @@ int32 field::add_chain(uint16 step) {
 		clit->disable_player = PLAYER_NONE;
 		clit->replace_op = 0;
 		core.current_chain.push_back(*clit);
-		if(!(peffect->type & (EFFECT_TYPE_TRIGGER_O | EFFECT_TYPE_TRIGGER_F | EFFECT_TYPE_FLIP))
-		        && !(peffect->flag & EFFECT_FLAG_FIELD_ONLY)) {
+		//triggered events which are not caused by RaiseEvent create relation with the handler
+		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (!(peffect->type & 0x2a0) || (peffect->code & EVENT_PHASE) == EVENT_PHASE)) {
 			peffect->handler->create_relation(peffect);
 		}
 		if(peffect->cost) {

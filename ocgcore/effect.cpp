@@ -21,6 +21,7 @@ effect::effect() {
 	handler = 0;
 	description = 0;
 	effect_owner = PLAYER_NONE;
+	card_type = 0;
 	id = 0;
 	code = 0;
 	type = 0;
