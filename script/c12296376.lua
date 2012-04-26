@@ -16,12 +16,11 @@ function c12296376.initial_effect(c)
 end
 function c12296376.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local t=Duel.GetAttackTarget()
-	if t==c then t=GetAttacker() end
-	if not t then return end
+	local bc=c:GetBattleTarget()
+	if not bc then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	t:RegisterEffect(e1)
+	bc:RegisterEffect(e1)
 end

@@ -42,6 +42,7 @@ end
 function c79106360.sp(e,tp,ct)
 	local g=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 	local dt=g:GetCount()
+	if dt==0 then return false end
 	local dlist={}
 	tc=g:GetFirst()
 	while tc do

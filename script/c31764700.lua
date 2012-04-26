@@ -36,25 +36,24 @@ function c31764700.initial_effect(c)
 end
 function c31764700.batop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if c==tc then tc=Duel.GetAttackTarget() end
-	if tc then
-		e:SetLabel(tc:GetAttack())
-		e:SetLabelObject(tc)
+	local bc=c:GetBattleTarget()
+	if bc then
+		e:SetLabel(bc:GetAttack())
+		e:SetLabelObject(bc)
 	end
 end
 function c31764700.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAttackPos() and Duel.GetAttackTarget()~=0 end
-	local tc=e:GetLabelObject():GetLabelObject()
+	local bc=e:GetHandler():GetBattleTarget()
+	if chk==0 then return bc and e:GetHandler():IsAttackPos() end
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,e:GetLabelObject():GetLabel())
-	if tc:IsDestructable() then
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
+	if bc:IsDestructable() then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,bc,1,0,0)
 	end
 end
 function c31764700.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,e:GetLabelObject():GetLabel(),REASON_EFFECT)
-	local tc=e:GetLabelObject():GetLabelObject()
-	if tc:IsRelateToBattle() then
-		Duel.Destroy(tc,REASON_EFFECT)
+	local bc=e:GetHandler():GetBattleTarget()
+	if bc:IsRelateToBattle() then
+		Duel.Destroy(bc,REASON_EFFECT)
 	end
 end

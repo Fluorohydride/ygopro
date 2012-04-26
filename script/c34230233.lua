@@ -50,12 +50,14 @@ function c34230233.desop(e,tp,eg,ep,ev,re,r,rp)
 	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and rp~=tp then
 		Duel.BreakEffect()
 		local hg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
-		local cg=hg:RandomSelect(tp,1)
-		local cc=cg:GetFirst()
-		Duel.ConfirmCards(tp,cc)
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0
-			and cc:IsCanBeSpecialSummoned(e,0,tp,false,false) and Duel.SelectYesNo(tp,aux.Stringid(34230233,1)) then
-			Duel.SpecialSummon(cc,0,tp,tp,false,false,POS_FACEUP)
-		else Duel.ShuffleHand(1-tp) end
+		if hg:GetCount()>0 then
+			local cg=hg:RandomSelect(tp,1)
+			local cc=cg:GetFirst()
+			Duel.ConfirmCards(tp,cc)
+			if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and cc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+				and Duel.SelectYesNo(tp,aux.Stringid(34230233,1)) then
+				Duel.SpecialSummon(cc,0,tp,tp,false,false,POS_FACEUP)
+			else Duel.ShuffleHand(1-tp) end
+		end
 	end
 end

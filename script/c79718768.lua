@@ -32,7 +32,7 @@ end
 function c79718768.desop1(e,tp,eg,ep,ev,re,r,rp)
 	if rp==tp or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET)
 		or not eg:IsExists(Card.IsLocation,1,nil,LOCATION_GRAVE) then
-		e:SetLabelObjct(0)
+		e:SetLabelObject(nil)
 	else e:SetLabelObject(re) end
 end
 function c79718768.desop2(e,tp,eg,ep,ev,re,r,rp)

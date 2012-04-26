@@ -18,7 +18,7 @@ function c73507661.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c73507661.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c) end
 	local sg=Duel.GetMatchingGroup(c73507661.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,c)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,g:GetCount()*300)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,sg:GetCount()*300)
 end
 function c73507661.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(c73507661.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())

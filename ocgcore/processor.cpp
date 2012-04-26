@@ -798,14 +798,15 @@ int32 field::process() {
 		uint32 count = it->arg2, i = 0, p = 0;
 		field::card_set::iterator cit;
 		group* pgroup = it->ptarget;
+		group* newgroup = pduel->new_group();
 		if(count > pgroup->container.size())
 			count = pgroup->container.size();
 		if(count == 0) {
+			pduel->lua->add_param(newgroup, PARAM_TYPE_GROUP);
 			core.units.pop_front();
 			return pduel->bufferlen;
 		}
 		duel* pduel = pgroup->pduel;
-		group* newgroup = pduel->new_group();
 		if(count == pgroup->container.size())
 			newgroup->container = pgroup->container;
 		else {

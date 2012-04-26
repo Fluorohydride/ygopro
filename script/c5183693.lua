@@ -57,7 +57,7 @@ function c5183693.atkup(e,tp,eg,ep,ev,re,r,rp)
 	local eqc=e:GetHandler():GetEquipTarget()
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if a~=eqc and d~=eqc then return end
+	if not d or (a~=eqc and d~=eqc) then return end
 	local la=a:GetLevel()
 	local ld=d:GetLevel()
 	if (a==eqc and ld<=la) or (d==eqc and la<=ld) then return end

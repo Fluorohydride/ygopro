@@ -24,6 +24,7 @@ end
 function c65240384.negop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
 		local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
+		if not g then return end
 		local tc=g:GetFirst()
 		if g:GetCount()==1 and tc:IsCode(65240384) and tc:IsLocation(LOCATION_MZONE)
 			and tc:IsFacedown() and tc:IsDefencePos() then
