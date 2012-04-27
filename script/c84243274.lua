@@ -1,6 +1,8 @@
 --VWXYZ－ドラゴン·カタパルトキャノン
 function c84243274.initial_effect(c)
+	--fusion material
 	c:EnableReviveLimit()
+	aux.AddFusionProcCode2(c,58859575,91998119,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

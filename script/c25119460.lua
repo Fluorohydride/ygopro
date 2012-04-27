@@ -1,6 +1,8 @@
 --YZ－キャタピラー·ドラゴン
 function c25119460.initial_effect(c)
+	--fusion material
 	c:EnableReviveLimit()
+	aux.AddFusionProcCode2(c,65622692,64500000,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

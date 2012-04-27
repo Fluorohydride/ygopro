@@ -931,15 +931,18 @@ void card::reset(uint32 id, uint32 reset_type) {
 			}
 		}
 		if(id & RESET_TURN_SET) {
-			pr = single_effect.equal_range(EFFECT_SET_CONTROL);
-			for(; pr.first != pr.second; ++pr.first) {
-				peffect = pr.first->second;
-				if(peffect->condition) {
-					luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, peffect->condition);
-					peffect->value = current.controler;
-					peffect->flag &= ~EFFECT_FLAG_FUNC_VALUE;
-					peffect->condition = 0;
-				}
+			effect* peffect = check_equip_control_effect();
+			if(peffect) {
+				effect* new_effect = pduel->new_effect();
+				new_effect->id = peffect->id;
+				new_effect->owner = this;
+				new_effect->handler = this;
+				new_effect->type = EFFECT_TYPE_SINGLE;
+				new_effect->code = EFFECT_SET_CONTROL;
+				new_effect->value = current.controler;
+				new_effect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+				new_effect->reset_flag = RESET_EVENT | 0xec0000;
+				this->add_effect(new_effect);
 			}
 		}
 	}
@@ -1358,6 +1361,18 @@ effect* card::is_affected_by_effect(int32 code, card* target) {
 			return peffect;
 	}
 	return 0;
+}
+effect* card::check_equip_control_effect() {
+	effect* ret_effect = 0;
+	for (auto cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
+		auto rg = (*cit)->equip_effect.equal_range(EFFECT_SET_CONTROL);
+		for (; rg.first != rg.second; ++rg.first) {
+			effect* peffect = rg.first->second;
+			if(!ret_effect || peffect->id > ret_effect->id)
+				ret_effect = peffect;
+		}
+	}
+	return ret_effect;
 }
 int32 card::fusion_check(group* fusion_m, card* cg, int32 chkf) {
 	auto ecit = single_effect.find(EFFECT_FUSION_MATERIAL);

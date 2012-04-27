@@ -444,6 +444,13 @@ int32 field::process() {
 			core.units.begin()->step++;
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_CONTROL_ADJUST: {
+		if (control_adjust(it->step)) {
+			core.units.pop_front();
+		} else
+			core.units.begin()->step++;
+		return pduel->bufferlen;
+	}
 	case PROCESSOR_PAY_LPCOST: {
 		if (pay_lp_cost(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
@@ -4416,8 +4423,8 @@ int32 field::adjust_step(uint16 step) {
 		//1-4 control
 		card* pcard;
 		uint8 cur, ref, tp = infos.turn_player;
-		card_list::iterator cit;
-		core.adjust_list.clear();
+		core.control_adjust_set[0].clear();
+		core.control_adjust_set[1].clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
 				pcard = player[tp].list_mzone[i];
@@ -4425,60 +4432,26 @@ int32 field::adjust_step(uint16 step) {
 				cur = pcard->current.controler;
 				ref = pcard->refresh_control_status();
 				if(cur != ref && pcard->is_capable_change_control()) {
-					core.adjust_list.push_back(pcard);
+					core.control_adjust_set[p].insert(pcard);
 					pcard->operation_param = ref;
 				}
 			}
 			tp = 1 - tp;
 		}
-		if(core.adjust_list.size())
+		if(core.control_adjust_set[0].size() || core.control_adjust_set[1].size()) {
 			core.units.begin()->arg1 = TRUE;
-		card* swap[2];
-		card_list::iterator it[2];
-		bool swaped;
-		swap[0] = swap[1] = 0;
-		do {
-			swaped = false;
-			for(cit = core.adjust_list.begin(); cit != core.adjust_list.end(); ++cit) {
-				tp = (*cit)->current.controler;
-				if(((tp == 0 && swap[0] == 0) || (tp == 1 && swap[1] == 0)) &&
-				        (!((*cit)->get_type()&TYPE_TRAPMONSTER) || get_useable_count(1 - tp, LOCATION_SZONE, 1 - tp, LOCATION_REASON_CONTROL) > 0)) {
-					swap[tp] = *cit;
-					it[tp] = cit;
-					if(swap[0] && swap[1]) {
-						swap_control(0, PLAYER_NONE, swap[0], swap[1], 0, 0);
-						core.adjust_list.erase(it[0]);
-						core.adjust_list.erase(it[1]);
-						swap[0] = 0;
-						swap[1] = 0;
-						swaped = true;
-						break;
-					}
-				}
-			}
-		} while(swaped);
-		core.adjust_set.clear();
+			add_process(PROCESSOR_CONTROL_ADJUST, 0, 0, 0, 0, 0);
+		}
+		core.units.begin()->step = 7;
 		return FALSE;
 	}
 	case 5: {
-		if(!core.adjust_list.size()) {
-			core.units.begin()->step = 6;
-			return FALSE;
-		}
-		card_list::iterator cit = core.adjust_list.begin();
-		get_control(0, PLAYER_NONE, *cit, 1 - (*cit)->current.controler, 0, 0);
 		return FALSE;
 	}
 	case 6: {
-		if(!returns.ivalue[0])
-			core.adjust_set.insert(core.adjust_list.front());
-		core.adjust_list.pop_front();
-		core.units.begin()->step = 4;
 		return FALSE;
 	}
 	case 7: {
-		if(core.adjust_set.size())
-			send_to(&core.adjust_set, 0, REASON_RULE, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
 		return FALSE;
 	}
 	case 8: {
@@ -4541,7 +4514,7 @@ int32 field::adjust_step(uint16 step) {
 		//position
 		uint32 tp = infos.turn_player, pos;
 		card* pcard;
-		core.adjust_set.clear();
+		card_set pos_adjust;
 		effect_set eset;
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
@@ -4553,7 +4526,7 @@ int32 field::adjust_step(uint16 step) {
 				if(eset.count) {
 					pos = eset.get_last()->get_value();
 					if((pos & 0xff) != pcard->current.position) {
-						core.adjust_set.insert(pcard);
+						pos_adjust.insert(pcard);
 						pcard->operation_param = pos;
 						if(pcard->is_status(STATUS_JUST_POS))
 							pcard->set_status(STATUS_CONTINUOUS_POS, TRUE);
@@ -4566,10 +4539,10 @@ int32 field::adjust_step(uint16 step) {
 			}
 			tp = 1 - tp;
 		}
-		if(core.adjust_set.size()) {
+		if(pos_adjust.size()) {
 			core.units.begin()->arg1 = TRUE;
 			group* ng = pduel->new_group();
-			ng->container = core.adjust_set;
+			ng->container = pos_adjust;
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_CHANGEPOS, 0, 0, ng, PLAYER_NONE, TRUE);
 		}

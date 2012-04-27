@@ -1,5 +1,8 @@
 --剣闘獣ゲオルディアス
 function c90957527.initial_effect(c)
+	--fusion material
+	c:EnableReviveLimit()
+	aux.AddFusionProcCodeFun(c,79580323,aux.FilterBoolFunction(Card.IsSetCard,0x19),1,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -39,7 +42,6 @@ function c90957527.initial_effect(c)
 	e4:SetTarget(c90957527.sptg)
 	e4:SetOperation(c90957527.spop)
 	c:RegisterEffect(e4)
-	c:EnableReviveLimit()
 end
 c90957527.material_count=1
 c90957527.material={79580323}
