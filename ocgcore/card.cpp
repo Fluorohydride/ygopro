@@ -975,6 +975,8 @@ int32 card::refresh_disable_status() {
 }
 uint8 card::refresh_control_status() {
 	uint8 final = owner;
+	if(pduel->game_field->core.remove_brainwashing)
+		return final;
 	effect_set eset;
 	filter_effect(EFFECT_SET_CONTROL, &eset);
 	if(eset.count)

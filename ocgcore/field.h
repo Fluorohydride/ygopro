@@ -240,6 +240,7 @@ struct processor {
 	uint8 shuffle_hand_check[2];
 	uint8 shuffle_deck_check[2];
 	uint8 deck_reversed;
+	uint8 remove_brainwashing;
 	uint8 flip_delayed;
 	uint8 damage_calculated;
 	uint8 summon_state[2];

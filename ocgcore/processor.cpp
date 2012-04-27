@@ -1597,18 +1597,19 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	case 2: {
 		//forced trigger
 		for (auto clit = core.new_fchain_s.begin(); clit != core.new_fchain_s.end(); ++clit) {
-			if(!(clit->triggering_effect->flag & EFFECT_FLAG_EVENT_PLAYER)) {
-				if(clit->triggering_effect->handler->current.reason & REASON_TEMPORARY)
-					clit->triggering_player = clit->triggering_effect->handler->previous.controler;
-				else
-					clit->triggering_player = clit->triggering_effect->handler->current.controler;
+			effect* peffect = clit->triggering_effect;
+			if(!(peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && peffect->handler->is_has_relation(peffect)) {
+				clit->triggering_player = peffect->handler->current.controler;
+				clit->triggering_controler = peffect->handler->current.controler;
+				clit->triggering_location = peffect->handler->current.location;
+				clit->triggering_sequence = peffect->handler->current.sequence;
 			}
-			if(clit->triggering_effect->is_chainable(clit->triggering_player) && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
+			if(peffect->is_chainable(clit->triggering_player) && peffect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
 				if(clit->triggering_player == infos.turn_player)
 					core.tpchain.push_back(*clit);
 				else
 					core.ntpchain.push_back(*clit);
-				clit->triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+				peffect->handler->set_status(STATUS_CHAINING, TRUE);
 			}
 		}
 		if(core.tpchain.size() > 1)
@@ -1632,11 +1633,12 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			return FALSE;
 		}
 		for (auto clit = core.new_ochain_s.begin(); clit != core.new_ochain_s.end(); ++clit) {
-			if(!(clit->triggering_effect->flag & EFFECT_FLAG_EVENT_PLAYER)) {
-				if(clit->triggering_effect->handler->current.reason & REASON_TEMPORARY)
-					clit->triggering_player = clit->triggering_effect->handler->previous.controler;
-				else
-					clit->triggering_player = clit->triggering_effect->handler->current.controler;
+			effect* peffect = clit->triggering_effect;
+			if(!(peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && peffect->handler->is_has_relation(peffect)) {
+				clit->triggering_player = peffect->handler->current.controler;
+				clit->triggering_controler = peffect->handler->current.controler;
+				clit->triggering_location = peffect->handler->current.location;
+				clit->triggering_sequence = peffect->handler->current.sequence;
 			}
 			if(clit->triggering_player == infos.turn_player)
 				core.tpchain.push_back(*clit);
@@ -4332,7 +4334,6 @@ int32 field::adjust_step(uint16 step) {
 	//win, isable, control, self_des, equip, position, trap_monster
 	switch(step) {
 	case 0: {
-		core.units.begin()->arg1 = FALSE;
 		core.re_adjust = FALSE;
 		return FALSE;
 	}
@@ -4412,7 +4413,7 @@ int32 field::adjust_step(uint16 step) {
 					pcard->reset(RESET_TURN_SET, RESET_EVENT);
 					refresh_location_info_instant();
 					move_to_field(pcard, tp, tp, LOCATION_SZONE, pcard->current.position);
-					core.units.begin()->arg1 = TRUE;
+					core.re_adjust = TRUE;
 				}
 			}
 			tp = 1 - tp;
@@ -4439,7 +4440,7 @@ int32 field::adjust_step(uint16 step) {
 			tp = 1 - tp;
 		}
 		if(core.control_adjust_set[0].size() || core.control_adjust_set[1].size()) {
-			core.units.begin()->arg1 = TRUE;
+			core.re_adjust = TRUE;
 			add_process(PROCESSOR_CONTROL_ADJUST, 0, 0, 0, 0, 0);
 		}
 		core.units.begin()->step = 7;
@@ -4491,7 +4492,7 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 9: {
 		if(returns.ivalue[0] > 0)
-			core.units.begin()->arg1 = TRUE;
+			core.re_adjust = TRUE;
 		//equip check
 		uint8 tp = infos.turn_player;
 		card* pcard;
@@ -4505,7 +4506,7 @@ int32 field::adjust_step(uint16 step) {
 			tp = 1 - tp;
 		}
 		if(core.destroy_set.size()) {
-			core.units.begin()->arg1 = TRUE;
+			core.re_adjust = TRUE;
 			destroy(&core.destroy_set, 0, REASON_RULE, PLAYER_NONE);
 		}
 		return FALSE;
@@ -4540,7 +4541,7 @@ int32 field::adjust_step(uint16 step) {
 			tp = 1 - tp;
 		}
 		if(pos_adjust.size()) {
-			core.units.begin()->arg1 = TRUE;
+			core.re_adjust = TRUE;
 			group* ng = pduel->new_group();
 			ng->container = pos_adjust;
 			ng->is_readonly = TRUE;
@@ -4571,15 +4572,15 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 12: {
-		//reverse_deck
+		//reverse_deck && remove brainwashing
 		effect_set eset;
 		filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
-		uint8 rv = eset.count ? TRUE : FALSE;
-		if(core.deck_reversed ^ rv) {
+		uint8 res = eset.count ? TRUE : FALSE;
+		if(core.deck_reversed ^ res) {
 			reverse_deck(0);
 			reverse_deck(1);
 			pduel->write_buffer8(MSG_REVERSE_DECK);
-			if(rv) {
+			if(res) {
 				if(player[0].list_main.size()) {
 					pduel->write_buffer8(MSG_DECK_TOP);
 					pduel->write_buffer8(0);
@@ -4594,7 +4595,23 @@ int32 field::adjust_step(uint16 step) {
 				}
 			}
 		}
-		core.deck_reversed = rv;
+		core.deck_reversed = res;
+		filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
+		res = eset.count ? TRUE : FALSE;
+		if(res && !core.remove_brainwashing) {
+			for(int i = 0; i < 5; ++i) {
+				card* pcard = player[0].list_mzone[i];
+				if(pcard)
+					pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
+			}
+			for(int i = 0; i < 5; ++i) {
+				card* pcard = player[1].list_mzone[i];
+				if(pcard)
+					pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
+			}
+			core.re_adjust = TRUE;
+		}
+		core.remove_brainwashing = res;
 		return FALSE;
 	}
 	case 13: {
@@ -4603,7 +4620,7 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 14: {
-		if(core.re_adjust || core.units.begin()->arg1) {
+		if(core.re_adjust) {
 			core.units.begin()->step = -1;
 			return FALSE;
 		}

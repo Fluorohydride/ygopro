@@ -71,6 +71,7 @@ field::field(duel* pduel) {
 	core.attacker = 0;
 	core.attack_target = 0;
 	core.deck_reversed = FALSE;
+	core.remove_brainwashing = FALSE;
 	core.effect_damage_step = FALSE;
 	nil_event.event_code = 0;
 	nil_event.event_cards = 0;
@@ -300,7 +301,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	add_card(playerid, pcard, location, sequence);
 }
 void field::set_control(card* pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count) {
-	if(pcard->refresh_control_status() == playerid)
+	if(core.remove_brainwashing || pcard->refresh_control_status() == playerid)
 		return;
 	effect* peffect = pduel->new_effect();
 	if(core.reason_effect)
