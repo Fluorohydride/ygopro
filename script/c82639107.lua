@@ -5,9 +5,13 @@ function c82639107.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c82639107.condition)
 	e1:SetTarget(c82639107.target)
 	e1:SetOperation(c82639107.activate)
 	c:RegisterEffect(e1)
+end
+function c82639107.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c82639107.filter(c)
 	return c:IsSetCard(0x1f) and c:IsAbleToGrave()

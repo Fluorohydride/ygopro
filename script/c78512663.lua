@@ -112,10 +112,10 @@ function c78512663.atkval(e,c)
 	return Duel.GetFieldGroupCount(0,LOCATION_ONFIELD,LOCATION_ONFIELD)*400
 end
 function c78512663.retcon1(e,tp,eg,ep,ev,re,r,rp,chk)
-	return not Duel.IsPlayerAffectedByEffect(tp,42015635)
+	return not e:GetHandler():IsHasEffect(42015635)
 end
 function c78512663.retcon2(e,tp,eg,ep,ev,re,r,rp,chk)
-	return Duel.IsPlayerAffectedByEffect(tp,42015635)
+	return e:GetHandler():IsHasEffect(42015635)
 end
 function c78512663.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtra() end

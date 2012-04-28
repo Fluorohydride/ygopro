@@ -18,7 +18,7 @@ function c40044918.ctfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x8)
 end
 function c40044918.schfilter(c)
-	return c:IsSetCard(0x8) and c:IsAbleToHand()
+	return c:IsSetCard(0x8) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c40044918.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()

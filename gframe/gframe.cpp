@@ -2,7 +2,7 @@
 #include "game.h"
 #include <event2/thread.h>
 
-bool enable_log = false;
+int enable_log = 0;
 bool exit_on_return = false;
 
 int main(int argc, char* argv[]) {

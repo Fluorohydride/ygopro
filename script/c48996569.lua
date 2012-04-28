@@ -98,10 +98,10 @@ function c48996569.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
 function c48996569.retcon1(e,tp,eg,ep,ev,re,r,rp,chk)
-	return not Duel.IsPlayerAffectedByEffect(tp,42015635)
+	return not e:GetHandler():IsHasEffect(42015635)
 end
 function c48996569.retcon2(e,tp,eg,ep,ev,re,r,rp,chk)
-	return Duel.IsPlayerAffectedByEffect(tp,42015635)
+	return e:GetHandler():IsHasEffect(42015635)
 end
 function c48996569.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtra() end

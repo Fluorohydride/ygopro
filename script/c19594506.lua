@@ -26,7 +26,7 @@ end
 function c19594506.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstMatchingCard(c19594506.filter,tp,LOCATION_DECK,0,nil)
 	if tc then
-		Duel.SendtoHand(tg,nil,REASON_EFFECT)
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end
 end
