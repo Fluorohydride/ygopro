@@ -13,12 +13,12 @@ function c4081825.spfilter(c,e,tp)
 	return c:IsSetCard(0x13) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c4081825.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDefence,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDefencePos,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c4081825.spfilter,tp,0x11,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c4081825.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsDefence,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(Card.IsDefencePos,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if g:GetCount()==0 then return end
 	Duel.ChangePosition(g,POS_FACEUP_ATTACK)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE,0)==0 then return end

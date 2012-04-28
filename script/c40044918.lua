@@ -49,11 +49,11 @@ function c40044918.op(e,tp,eg,ep,ev,re,r,rp)
 	local sel=e:GetLabel()
 	if sel==1 then
 		local ct=Duel.GetMatchingGroupCount(c40044918.ctfilter,tp,LOCATION_MZONE,0,c)
-		if ct==0 then return end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectMatchingCard(tp,c40044918.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
-		if g:GetCount()>0 then
-			Duel.Destroy(g,REASON_EFFECT)
+		local g=Duel.GetMatchingGroup(c40044918.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+		if ct>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(40044918,3)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+			local dg=g:Select(tp,1,ct,nil)
+			Duel.Destroy(dg,REASON_EFFECT)
 		end
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

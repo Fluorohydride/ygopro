@@ -43,7 +43,7 @@ function c86197239.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<sg:GetCount() then return end
-	if sg:GetCount() then
+	if sg:GetCount()>0 then
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

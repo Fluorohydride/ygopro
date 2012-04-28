@@ -32,7 +32,7 @@ function c61968753.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g2=Duel.SelectTarget(tp,c61968753.filter2,tp,0,LOCATION_MZONE,1,1,nil)
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g1,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL,nil,1,tp,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c61968753.pfilter(c,e)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsRelateToEffect(e)

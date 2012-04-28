@@ -10,8 +10,7 @@ function c35563539.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c35563539.condition(e,tp,eg,ep,ev,re,r,rp)
-	local te=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
-	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:IsHasProperty(EFFECT_FLAG_PLAYER_TARGET)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and re:IsHasProperty(EFFECT_FLAG_PLAYER_TARGET)
 end
 function c35563539.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

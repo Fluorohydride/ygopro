@@ -30,6 +30,7 @@ function c65282484.initial_effect(c)
 	--destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(65282484,1))
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCondition(c65282484.descon)

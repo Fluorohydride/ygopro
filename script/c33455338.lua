@@ -14,7 +14,7 @@ function c33455338.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c33455338.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel:GetTurnPlayer()~=tp
+	return Duel.GetTurnPlayer()~=tp
 end
 function c33455338.filter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()

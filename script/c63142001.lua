@@ -18,11 +18,11 @@ function c63142001.filter(c)
 end
 function c63142001.atkval(e,c)
 	local g=Duel.GetMatchingGroup(c63142001.filter,c:GetControler(),LOCATION_MZONE,0,nil)
-	if g:IsExists(Card.IsDefence,1,nil) then return 0 end
+	if g:IsExists(Card.IsDefencePos,1,nil) then return 0 end
 	return g:GetCount()*1000
 end
 function c63142001.defval(e,c)
 	local g=Duel.GetMatchingGroup(c63142001.filter,c:GetControler(),LOCATION_MZONE,0,nil)
-	if g:IsExists(Card.IsAttack,1,nil) then return 0 end
+	if g:IsExists(Card.IsAttackPos,1,nil) then return 0 end
 	return g:GetCount()*1000
 end

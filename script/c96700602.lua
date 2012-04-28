@@ -22,7 +22,7 @@ function c96700602.cfilter(c,lv)
 	return c:IsLevelBelow(lv) and c:IsType(TYPE_SYNCHRO) and c:IsStatus(STATUS_PROC_COMPLETE)
 end
 function c96700602.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAttack,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAttackPos,tp,0,LOCATION_MZONE,1,nil) end
 	local tc=eg:GetFirst()
 	if tc:IsLocation(LOCATION_MZONE) then
 		Duel.SetTargetCard(tc)
@@ -31,7 +31,7 @@ function c96700602.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c96700602.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local g=Duel.GetMatchingGroup(Card.IsAttack,tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(Card.IsAttackPos,tp,0,LOCATION_MZONE,nil)
 	if Duel.ChangePosition(g,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE,0,0)~=0 then
 		if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 			Duel.Damage(1-tp,tc:GetDefence(),REASON_EFFECT)

@@ -22,11 +22,11 @@ function c1804528.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 	local g2=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
 	local opt=0
-	if g1:GetCount() and g2:GetCount() then
+	if g1:GetCount()>0 and g2:GetCount()>0 then
 		opt=Duel.SelectOption(tp,aux.Stringid(1804528,1),aux.Stringid(1804528,2))
-	elseif g1:GetCount() then
+	elseif g1:GetCount()>0 then
 		opt=Duel.SelectOption(tp,aux.Stringid(1804528,1))
-	elseif g2:GetCount() then
+	elseif g2:GetCount()>0 then
 		opt=Duel.SelectOption(tp,aux.Stringid(1804528,2))+1
 	else return end
 	if opt==0 then

@@ -12,7 +12,7 @@ function c32065885.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c32065885.ctlcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and bit.band(r,REASON_BATTLE) and Duel.GetAttackTarget()==nil and Duel.GetAttacker():IsControler(1-tp)
+	return ep==tp and bit.band(r,REASON_BATTLE)~=0 and Duel.GetAttackTarget()==nil and Duel.GetAttacker():IsControler(1-tp)
 end
 function c32065885.ctltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,nil) end

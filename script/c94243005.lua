@@ -15,6 +15,7 @@ function c94243005.initial_effect(c)
 	--special summon
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetDescription(aux.Stringid(94243005,0))
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetCountLimit(1)

@@ -74,7 +74,7 @@ function c60953118.rdcon2(e)
 	return e:GetHandler():GetFlagEffectLabel(36690018)==0
 end
 function c60953118.rdval(e,re,val,r,rp,rc)
-	if bit.band(r,REASON_BATTLE) then
+	if bit.band(r,REASON_BATTLE)~=0 then
 		return val/2
 	else
 		return val

@@ -57,6 +57,6 @@ function c56641453.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c56641453.damval(e,re,val,r,rp,rc)
-	if bit.band(r,REASON_EFFECT) then return 0
+	if bit.band(r,REASON_EFFECT)~=0 then return 0
 	else return val end
 end

@@ -19,6 +19,6 @@ function c74270067.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c74270067.damval(e,re,val,r,rp,rc)
-	if bit.band(r,REASON_EFFECT) then return 0
+	if bit.band(r,REASON_EFFECT)~=0 then return 0
 	else return val end
 end

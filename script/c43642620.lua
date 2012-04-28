@@ -20,7 +20,7 @@ function c43642620.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c43642620.sdcon(e)
-	return not Duel.IsExistingMatchingCard(Card.IsRace,0,LOCATION_GRAVE,0,1,nil,RACE_ZOMBIE)
+	return not Duel.IsExistingMatchingCard(Card.IsRace,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,RACE_ZOMBIE)
 end
 function c43642620.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

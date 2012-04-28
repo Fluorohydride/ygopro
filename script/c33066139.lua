@@ -18,7 +18,7 @@ function c33066139.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c33066139.filter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
-	if g:GetCOunt()>0 and g:GetFirst():IsFaceup() then
+	if g:GetCount()>0 and g:GetFirst():IsFaceup() then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end
 end

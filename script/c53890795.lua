@@ -10,5 +10,5 @@ end
 function c53890795.dircon(e)
 	local tp=e:GetHandler():GetControler()
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_SZONE)==0
-		and not Duel.IsExistingMatchingCard(Card.IsAttack,tp,0,LOCATION_MZONE,1,nil)
+		and not Duel.IsExistingMatchingCard(Card.IsAttackPos,tp,0,LOCATION_MZONE,1,nil)
 end

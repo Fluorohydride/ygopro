@@ -11,8 +11,8 @@ function c20450925.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c20450925.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+	if chk==0 then return e:GetHandler():IsDiscardable() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 end
 function c20450925.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -25,6 +25,6 @@ function c20450925.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c20450925.damval(e,re,val,r,rp,rc)
-	if bit.band(r,REASON_EFFECT) then return 0
+	if bit.band(r,REASON_EFFECT)~=0 then return 0
 	else return val end
 end

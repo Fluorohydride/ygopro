@@ -8,5 +8,5 @@ function c20939559.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c20939559.con(e)
-	return not Duel.IsExistingMatchingCard(Card.IsAttack,e:GetHandler():GetControler(),0,LOCATION_MZONE,1,nil)
+	return not Duel.IsExistingMatchingCard(Card.IsAttackPos,e:GetHandler():GetControler(),0,LOCATION_MZONE,1,nil)
 end

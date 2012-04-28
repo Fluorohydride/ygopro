@@ -10,7 +10,7 @@ function c27191436.initial_effect(c)
 	e1:SetOperation(c27191436.activate)
 	c:RegisterEffect(e1)
 end
-function c27191436.filter(c)
+function c27191436.cfilter(c)
 	return c:IsFaceup() and c:IsCode(58932615)
 end
 function c27191436.condition(e,tp,eg,ep,ev,re,r,rp)

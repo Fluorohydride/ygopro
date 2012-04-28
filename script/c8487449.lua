@@ -77,7 +77,7 @@ function c8487449.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local sp=c:GetSummonPlayer()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c8487449.filter,sp,0,LOCATION_MZONE,1,1,e:GetHandler())
-	if g:GetCount() then
+	if g:GetCount()>0 then
 		g:AddCard(e:GetHandler())
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,2,0,0)
 	end
