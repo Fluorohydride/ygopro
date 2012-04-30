@@ -875,6 +875,7 @@ int32 field::control_adjust(uint16 step) {
 					core.control_adjust_set[0].clear();
 					core.units.begin()->step = 4;
 				} else {
+					core.temp_var[0] = 0;
 					uint32 count = core.control_adjust_set[0].size() - core.control_adjust_set[1].size() - b1;
 					core.select_cards.clear();
 					for(auto cit = core.control_adjust_set[0].begin(); cit != core.control_adjust_set[0].end(); ++cit)
@@ -893,6 +894,7 @@ int32 field::control_adjust(uint16 step) {
 					core.control_adjust_set[1].clear();
 					core.units.begin()->step = 4;
 				} else {
+					core.temp_var[0] = 1;
 					uint32 count = core.control_adjust_set[1].size() - core.control_adjust_set[0].size() - b0;
 					core.select_cards.clear();
 					for(auto cit = core.control_adjust_set[1].begin(); cit != core.control_adjust_set[1].end(); ++cit)
@@ -901,7 +903,7 @@ int32 field::control_adjust(uint16 step) {
 					pduel->write_buffer8(HINT_SELECTMSG);
 					pduel->write_buffer8(infos.turn_player);
 					pduel->write_buffer32(504);
-					add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, 1, count + (count << 16));
+					add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, 0, count + (count << 16));
 				}
 			}
 		} else

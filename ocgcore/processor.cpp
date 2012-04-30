@@ -4423,12 +4423,12 @@ int32 field::adjust_step(uint16 step) {
 	case 4: {
 		//1-4 control
 		card* pcard;
-		uint8 cur, ref, tp = infos.turn_player;
+		uint8 cur, ref;
 		core.control_adjust_set[0].clear();
 		core.control_adjust_set[1].clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
-				pcard = player[tp].list_mzone[i];
+				pcard = player[p].list_mzone[i];
 				if(!pcard) continue;
 				cur = pcard->current.controler;
 				ref = pcard->refresh_control_status();
@@ -4437,7 +4437,6 @@ int32 field::adjust_step(uint16 step) {
 					pcard->operation_param = ref;
 				}
 			}
-			tp = 1 - tp;
 		}
 		if(core.control_adjust_set[0].size() || core.control_adjust_set[1].size()) {
 			core.re_adjust = TRUE;

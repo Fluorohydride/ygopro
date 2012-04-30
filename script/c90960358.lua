@@ -64,9 +64,9 @@ function c90960358.cfilter(c)
 end
 function c90960358.spcon(e,c)
 	if c==nil then return true end
+	local tp=c:GetControler()
 	if not Duel.IsExistingMatchingCard(c90960358.cfilter,tp,LOCATION_ONFIELD,0,1,nil) then return false end
 	local lv=c:GetLevel()
-	local tp=c:GetControler()
 	if lv<5 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	elseif lv<7 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.CheckReleaseGroup(tp,nil,1,nil)
 	else return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and Duel.CheckReleaseGroup(tp,nil,2,nil) end

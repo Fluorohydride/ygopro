@@ -47,7 +47,6 @@ function c74854609.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_CONTROL)
 		e2:SetValue(tp)
 		e2:SetReset(RESET_EVENT+0x1fc0000)
-		e2:SetLabelObject(ec)
-		c:RegisterEffect(e2)
+		ec:RegisterEffect(e2)
 	end
 end
