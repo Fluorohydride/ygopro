@@ -10,7 +10,6 @@ function c6021033.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCondition(c6021033.spcon)
 	e1:SetTarget(c6021033.sptg)
 	e1:SetOperation(c6021033.spop)
 	c:RegisterEffect(e1)
@@ -21,9 +20,6 @@ function c6021033.initial_effect(c)
 	e2:SetOperation(c6021033.desop)
 	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
-end
-function c6021033.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function c6021033.filter(c,e,tp)
 	return c:IsRace(RACE_ZOMBIE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
