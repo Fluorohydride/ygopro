@@ -13,7 +13,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1270;
+const unsigned short PRO_VERSION = 0x1271;
 
 namespace ygo {
 
@@ -789,7 +789,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L"[Script error:] ");
 		break;
 	default: //from watcher or unknown
-		chatMsg[0].append(L"[***]: ");
+		chatMsg[0].append(L"[---]: ");
 	}
 
 	chatMsg[0].append(msg);

@@ -24,12 +24,17 @@ function c18605135.initial_effect(c)
 	e3:SetCondition(c18605135.sdcon)
 	c:RegisterEffect(e3)
 end
+function c18605135.filter(c)
+	return c:IsFaceup() and c:IsCode(22702055)
+end
 function c18605135.actcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetEnvironment()==22702055
+	return Duel.IsExistingMatchingCard(c18605135.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+		or Duel.GetEnvironment()==22702055
 end
 function c18605135.abdcon(e)
 	return Duel.GetAttackTarget()==nil or Duel.GetAttackTarget():IsAttackPos() or Duel.GetAttacker():GetAttack()>Duel.GetAttackTarget():GetDefence()
 end
 function c18605135.sdcon(e)
-	return Duel.GetEnvironment()~=22702055
+	return Duel.IsExistingMatchingCard(c18605135.filter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+		or Duel.GetEnvironment()==22702055
 end
