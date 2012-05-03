@@ -75,5 +75,5 @@ public:
 #define DUEL_NO_CHAIN_HINT		0x04
 #define DUEL_ENABLE_PRIORITY	0x08
 #define DUEL_PSEUDO_SHUFFLE		0x10
-
+#define DUEL_TAG_MODE			0x20
 #endif /* DUEL_H_ */

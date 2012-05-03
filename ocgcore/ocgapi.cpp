@@ -127,6 +127,20 @@ extern "C" DECL_DLLEXPORT void new_card(ptr pduel, uint32 code, uint8 owner, uin
 		}
 	}
 }
+extern "C" DECL_DLLEXPORT void new_tag_card(ptr pduel, uint32 code, uint8 owner, uint8 location) {
+	duel* ptduel = (duel*)pduel;
+	if(owner > 1 || !(location & 0x41))
+		return;
+	card* pcard = ptduel->new_card(code);
+	switch(location) {
+	case LOCATION_DECK:
+		ptduel->game_field->player[owner].tag_list_main.push_back(pcard);
+		break;
+	case LOCATION_EXTRA:
+		ptduel->game_field->player[owner].tag_list_extra.push_back(pcard);
+		break;
+	}
+}
 extern "C" DECL_DLLEXPORT int32 query_card(ptr pduel, uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache) {
 	if(playerid != 0 && playerid != 1)
 		return 0;

@@ -545,6 +545,47 @@ void field::reverse_deck(uint8 playerid) {
 		player[playerid].list_main[count - 1 - i] = tmp;
 	}
 }
+void field::tag_swap(uint8 playerid) {
+	card_vector::iterator clit;
+	//main
+	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
+		(*clit)->enable_field_effect(false);
+		(*clit)->cancel_field_effect();
+	}
+	card_vector cl = player[playerid].list_grave;
+	player[playerid].list_main = player[playerid].tag_list_main;
+	player[playerid].list_main = cl;
+	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
+		(*clit)->apply_field_effect();
+		(*clit)->enable_field_effect(true);
+	}
+	//hand
+	for(clit = player[playerid].list_hand.begin(); clit != player[playerid].list_hand.end(); ++clit) {
+		(*clit)->enable_field_effect(false);
+		(*clit)->cancel_field_effect();
+	}
+	cl = player[playerid].list_grave;
+	player[playerid].list_hand = player[playerid].tag_list_hand;
+	player[playerid].list_hand = cl;
+	for(clit = player[playerid].list_hand.begin(); clit != player[playerid].list_hand.end(); ++clit) {
+		(*clit)->apply_field_effect();
+		(*clit)->enable_field_effect(true);
+	}
+	//extra
+	for(clit = player[playerid].list_extra.begin(); clit != player[playerid].list_extra.end(); ++clit) {
+		(*clit)->enable_field_effect(false);
+		(*clit)->cancel_field_effect();
+	}
+	cl = player[playerid].list_grave;
+	player[playerid].list_extra = player[playerid].tag_list_extra;
+	player[playerid].list_extra = cl;
+	for(clit = player[playerid].list_extra.begin(); clit != player[playerid].list_extra.end(); ++clit) {
+		(*clit)->apply_field_effect();
+		(*clit)->enable_field_effect(true);
+	}
+	pduel->write_buffer8(MSG_TAG_SWAP);
+	pduel->write_buffer8(playerid);
+}
 void field::add_effect(effect* peffect, uint8 owner_player) {
 	if (!peffect->handler) {
 		peffect->flag |= EFFECT_FLAG_FIELD_ONLY;

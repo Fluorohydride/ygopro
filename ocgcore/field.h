@@ -73,6 +73,9 @@ struct player_info {
 	card_vector list_hand;
 	card_vector list_remove;
 	card_vector list_extra;
+	card_vector tag_list_main;
+	card_vector tag_list_hand;
+	card_vector tag_list_extra;
 };
 struct field_effect {
 	typedef std::multimap<uint32, effect*> effect_container;
@@ -293,6 +296,7 @@ public:
 	void reset_sequence(uint8 playerid, uint8 location);
 	void swap_deck_and_grave(uint8 playerid);
 	void reverse_deck(uint8 playerid);
+	void tag_swap(uint8 playerid);
 	
 	void add_effect(effect* peffect, uint8 owner_player = 2);
 	void remove_effect(effect* peffect);
@@ -721,4 +725,5 @@ public:
 #define MSG_ANNOUNCE_CARD		142
 #define MSG_ANNOUNCE_NUMBER		143
 #define MSG_CARD_HINT			160
+#define MSG_TAG_SWAP			161
 #endif /* FIELD_H_ */
