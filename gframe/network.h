@@ -95,6 +95,17 @@ struct STOC_HS_PlayerChange {
 struct STOC_HS_WatchChange {
 	unsigned short watch_count;
 };
+struct STOC_HT_PlayerEnter {
+	unsigned short name[20];
+	unsigned char pos;
+};
+struct STOC_HT_PlayerChange {
+	//pos<<4 | state
+	unsigned char status;
+};
+struct STOC_HT_WatchChange {
+	unsigned short watch_count;
+};
 
 class DuelMode;
 
@@ -175,11 +186,12 @@ public:
 #define CTOS_HS_NOTREADY	0x23
 #define CTOS_HS_KICK		0x24
 #define CTOS_HS_START		0x25
-#define CTOS_HT_CHANGEPOS	0x30
-#define CTOS_HT_READY		0x31
-#define CTOS_HT_NOTREADY	0x32
-#define CTOS_HT_KICK		0x33
-#define CTOS_HT_START		0x34
+#define CTOS_HT_TODUELIST	0x30
+#define CTOS_HT_TOOBSERVER	0x31
+#define CTOS_HT_READY		0x32
+#define CTOS_HT_NOTREADY	0x33
+#define CTOS_HT_KICK		0x34
+#define CTOS_HT_START		0x35
 
 #define STOC_GAME_MSG		0x1
 #define STOC_ERROR_MSG		0x2
@@ -203,6 +215,7 @@ public:
 #define STOC_HS_WATCH_CHANGE	0x22
 #define STOC_HT_PLAYER_ENTER	0x30
 #define STOC_HT_PLAYER_CHANGE	0x31
+#define STOC_HT_WATCH_CHANGE	0x32
 
 #define PLAYERCHANGE_READY		0x1
 #define PLAYERCHANGE_NOTREADY	0x2
@@ -216,4 +229,5 @@ public:
 
 #define MODE_SINGLE		0x0
 #define MODE_MATCH		0x1
+#define MODE_TAG		0x2
 #endif //NETWORK_H

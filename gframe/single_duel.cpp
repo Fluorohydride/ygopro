@@ -225,6 +225,7 @@ void SingleDuel::ToObserver(DuelPlayer* dp) {
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 	players[dp->type] = 0;
+	ready[dp->type] = false;
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
 	STOC_TypeChange sctc;
