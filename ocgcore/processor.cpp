@@ -4595,6 +4595,7 @@ int32 field::adjust_step(uint16 step) {
 			}
 		}
 		core.deck_reversed = res;
+		eset.clear();
 		filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
 		res = eset.count ? TRUE : FALSE;
 		if(res && !core.remove_brainwashing) {

@@ -30,7 +30,7 @@ function c17955766.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc=tg:GetFirst()
 		if tc then
 			local atk=tc:GetAttack()
-			if atk>0 and Duel.IsExistingMatchingCard(c17955766.filter,tp,LOCATION_MZONE,0,1,nil,atk) then
+			if atk>=0 and Duel.IsExistingMatchingCard(c17955766.filter,tp,LOCATION_MZONE,0,1,nil,atk) then
 				Duel.Destroy(tc,REASON_EFFECT)
 				Duel.Damage(1-tp,500,REASON_EFFECT)
 			else
