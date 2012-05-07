@@ -178,6 +178,22 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 		sctc.type = (dp == host_player ? 0x10 : 0) | dp->type;
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 	} else {
+		uint8 dptype = (dp->type + 1) % 4;
+		while(players[dptype])
+			dptype = (dp->type + 1) % 4;
+		STOC_HT_PlayerChange scpc;
+		scpc.status = (dp->type << 4) | dptype;
+		for(int i = 0; i < 4; ++i)
+			if(players[i])
+				NetServer::SendPacketToPlayer(players[i], STOC_HT_PLAYER_CHANGE, scpc);
+		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+			NetServer::SendPacketToPlayer(*pit, STOC_HT_PLAYER_CHANGE, scpc);
+		STOC_TypeChange sctc;
+		sctc.type = (dp == host_player ? 0x10 : 0) | dp->type;
+		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
+		players[dptype] = dp;
+		players[dp->type] = 0;
+		dp->type = dptype;
 	}
 
 }
@@ -186,10 +202,9 @@ void TagDuel::ToObserver(DuelPlayer* dp) {
 		return;
 	STOC_HT_PlayerChange scpc;
 	scpc.status = (dp->type << 4) | PLAYERCHANGE_OBSERVE;
-	if(players[0])
-		NetServer::SendPacketToPlayer(players[0], STOC_HT_PLAYER_CHANGE, scpc);
-	if(players[1])
-		NetServer::SendPacketToPlayer(players[1], STOC_HT_PLAYER_CHANGE, scpc);
+	for(int i = 0; i < 4; ++i)
+		if(players[i])
+			NetServer::SendPacketToPlayer(players[i], STOC_HT_PLAYER_CHANGE, scpc);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HT_PLAYER_CHANGE, scpc);
 	players[dp->type] = 0;
@@ -200,9 +215,7 @@ void TagDuel::ToObserver(DuelPlayer* dp) {
 	NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 }
 void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
-	if(dp->type > 3)
-		return;
-	if(ready[dp->type] == is_ready)
+	if(dp->type > 3 || ready[dp->type] == is_ready)
 		return;
 	if(is_ready) {
 		bool allow_ocg = host_info.rule == 0 || host_info.rule == 2;
@@ -222,8 +235,9 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 	ready[dp->type] = is_ready;
 	STOC_HT_PlayerChange scpc;
 	scpc.status = (dp->type << 4) | (is_ready ? PLAYERCHANGE_READY : PLAYERCHANGE_NOTREADY);
-	if(players[1 - dp->type])
-		NetServer::SendPacketToPlayer(players[1 - dp->type], STOC_HT_PLAYER_CHANGE, scpc);
+	for(int i = 0; i < 4; ++i)
+		if(players[i] && players[i] != dp)
+			NetServer::SendPacketToPlayer(players[i], STOC_HT_PLAYER_CHANGE, scpc);
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HT_PLAYER_CHANGE, scpc);
 }
@@ -243,55 +257,58 @@ void TagDuel::UpdateDeck(DuelPlayer* dp, void* pdata) {
 void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(dp != host_player)
 		return;
-	if(!ready[0] || !ready[1])
+	if(!ready[0] || !ready[1] || !ready[2] || !ready[3])
 		return;
 	NetServer::StopListen();
-	NetServer::SendPacketToPlayer(players[0], STOC_DUEL_START);
-	NetServer::ReSendToPlayer(players[1]);
+	for(int i = 0; i < 4; ++i)
+		NetServer::SendPacketToPlayer(players[i], STOC_DUEL_START);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit) {
 		(*oit)->state = CTOS_LEAVE_GAME;
 		NetServer::ReSendToPlayer(*oit);
 	}
 	NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
-	NetServer::ReSendToPlayer(players[1]);
+	NetServer::ReSendToPlayer(players[2]);
 	hand_result[0] = 0;
 	hand_result[1] = 0;
 	players[0]->state = CTOS_HAND_RESULT;
-	players[1]->state = CTOS_HAND_RESULT;
+	players[2]->state = CTOS_HAND_RESULT;
 }
 void TagDuel::HandResult(DuelPlayer* dp, unsigned char res) {
-	if(res > 3)
+	if(res > 3 || dp->state != CTOS_HAND_RESULT)
 		return;
-	if(dp->state != CTOS_HAND_RESULT)
-		return;
-	hand_result[dp->type] = res;
+	if(dp->type == 0)
+		hand_result[0] = res;
+	else
+		hand_result[1] = res;
 	if(hand_result[0] && hand_result[1]) {
 		STOC_HandResult schr;
 		schr.res1 = hand_result[0];
 		schr.res2 = hand_result[1];
 		NetServer::SendPacketToPlayer(players[0], STOC_HAND_RESULT, schr);
+		NetServer::ReSendToPlayer(players[1]);
 		for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 			NetServer::ReSendToPlayer(*oit);
 		schr.res1 = hand_result[1];
 		schr.res2 = hand_result[0];
-		NetServer::SendPacketToPlayer(players[1], STOC_HAND_RESULT, schr);
+		NetServer::SendPacketToPlayer(players[2], STOC_HAND_RESULT, schr);
+		NetServer::ReSendToPlayer(players[3]);
 		if(hand_result[0] == hand_result[1]) {
 			NetServer::SendPacketToPlayer(players[0], STOC_SELECT_HAND);
-			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
 			hand_result[0] = 0;
 			hand_result[1] = 0;
 			players[0]->state = CTOS_HAND_RESULT;
-			players[1]->state = CTOS_HAND_RESULT;
+			players[2]->state = CTOS_HAND_RESULT;
 		} else if((hand_result[0] == 1 && hand_result[1] == 2)
 		          || (hand_result[0] == 2 && hand_result[1] == 3)
 		          || (hand_result[0] == 3 && hand_result[1] == 1)) {
-			NetServer::SendPacketToPlayer(players[1], CTOS_TP_RESULT);
+			NetServer::SendPacketToPlayer(players[2], CTOS_TP_RESULT);
 			tp_player = 1;
 			players[0]->state = 0xff;
-			players[1]->state = CTOS_TP_RESULT;
+			players[2]->state = CTOS_TP_RESULT;
 		} else {
 			NetServer::SendPacketToPlayer(players[0], CTOS_TP_RESULT);
-			players[1]->state = 0xff;
+			players[2]->state = 0xff;
 			players[0]->state = CTOS_TP_RESULT;
 			tp_player = 0;
 		}
@@ -304,15 +321,17 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	mtrandom rnd;
 	pplayer[0] = players[0];
 	pplayer[1] = players[1];
-	if((tp && dp->type == 1) || (!tp && dp->type == 0)) {
-		DuelPlayer* p = players[0];
-		players[0] = players[1];
-		players[1] = p;
+	pplayer[2] = players[2];
+	pplayer[3] = players[3];
+	if((tp && dp->type == 2) || (!tp && dp->type == 0)) {
+		std::swap(players[0], players[2]);
+		std::swap(players[1], players[3]);
 		players[0]->type = 0;
 		players[1]->type = 1;
-		Deck d = pdeck[0];
-		pdeck[0] = pdeck[1];
-		pdeck[1] = d;
+		players[2]->type = 2;
+		players[3]->type = 3;
+		std::swap(pdeck[0], pdeck[2]);
+		std::swap(pdeck[1], pdeck[3]);
 		swapped = true;
 	}
 	dp->state = CTOS_RESPONSE;
@@ -354,11 +373,13 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		opt |= DUEL_ENABLE_PRIORITY;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
+	opt |= DUEL_TAG_MODE;
 	last_replay.WriteInt32(host_info.start_lp, false);
 	last_replay.WriteInt32(host_info.start_hand, false);
 	last_replay.WriteInt32(host_info.draw_count, false);
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
+	//
 	last_replay.WriteInt32(pdeck[0].main.size(), false);
 	for(int i = pdeck[0].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, 0);
@@ -369,15 +390,38 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, 0);
 		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
 	}
+	//
 	last_replay.WriteInt32(pdeck[1].main.size(), false);
 	for(int i = pdeck[1].main.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[1].main[i]->first, 1, 1, LOCATION_DECK, 0, 0);
+		new_tag_card(pduel, pdeck[1].main[i]->first, 0, LOCATION_DECK);
 		last_replay.WriteInt32(pdeck[1].main[i]->first, false);
 	}
 	last_replay.WriteInt32(pdeck[1].extra.size(), false);
 	for(int i = pdeck[1].extra.size() - 1; i >= 0; --i) {
-		new_card(pduel, pdeck[1].extra[i]->first, 1, 1, LOCATION_EXTRA, 0, 0);
+		new_tag_card(pduel, pdeck[1].extra[i]->first, 0, LOCATION_EXTRA);
 		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
+	}
+	//
+	last_replay.WriteInt32(pdeck[2].main.size(), false);
+	for(int i = pdeck[2].main.size() - 1; i >= 0; --i) {
+		new_card(pduel, pdeck[2].main[i]->first, 1, 1, LOCATION_DECK, 0, 0);
+		last_replay.WriteInt32(pdeck[2].main[i]->first, false);
+	}
+	last_replay.WriteInt32(pdeck[2].extra.size(), false);
+	for(int i = pdeck[2].extra.size() - 1; i >= 0; --i) {
+		new_card(pduel, pdeck[2].extra[i]->first, 1, 1, LOCATION_EXTRA, 0, 0);
+		last_replay.WriteInt32(pdeck[2].extra[i]->first, false);
+	}
+	//
+	last_replay.WriteInt32(pdeck[3].main.size(), false);
+	for(int i = pdeck[3].main.size() - 1; i >= 0; --i) {
+		new_tag_card(pduel, pdeck[3].main[i]->first, 0, LOCATION_DECK);
+		last_replay.WriteInt32(pdeck[3].main[i]->first, false);
+	}
+	last_replay.WriteInt32(pdeck[3].extra.size(), false);
+	for(int i = pdeck[3].extra.size() - 1; i >= 0; --i) {
+		new_tag_card(pduel, pdeck[3].extra[i]->first, 0, LOCATION_EXTRA);
+		last_replay.WriteInt32(pdeck[3].extra[i]->first, false);
 	}
 	last_replay.Flush();
 	char startbuf[32], *pbuf = startbuf;
@@ -390,15 +434,15 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x1));
 	BufferIO::WriteInt16(pbuf, query_field_count(pduel, 1, 0x40));
 	NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, startbuf, 18);
+	NetServer::ReSendToPlayer(players[1]);
 	startbuf[1] = 1;
-	NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, startbuf, 18);
+	NetServer::SendBufferToPlayer(players[2], STOC_GAME_MSG, startbuf, 18);
+	NetServer::ReSendToPlayer(players[3]);
 	if(!swapped)
 		startbuf[1] = 0x10;
 	else startbuf[1] = 0x11;
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 18);
-	RefreshExtra(0);
-	RefreshExtra(1);
 	start_duel(pduel, opt);
 	Process();
 }
@@ -423,6 +467,8 @@ void TagDuel::Process() {
 void TagDuel::DuelEndProc() {
 	NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
 	NetServer::ReSendToPlayer(players[1]);
+	NetServer::ReSendToPlayer(players[2]);
+	NetServer::ReSendToPlayer(players[3]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::ReSendToPlayer(*oit);
 	NetServer::StopServer();
@@ -439,7 +485,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		switch (engType) {
 		case MSG_RETRY: {
 			WaitforResponse(last_response);
-			NetServer::SendBufferToPlayer(players[last_response], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[last_response], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_HINT: {
@@ -453,14 +499,16 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			case 4:
 			case 5:
 			case 10: {
-				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+				NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 				break;
 			}
 			case 6:
 			case 7:
 			case 8:
 			case 9: {
-				NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
+				for(int i = 0; i < 4; ++i)
+					if(players[i] != cur_player[player])
+						NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, offset, pbuf - offset);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 					NetServer::ReSendToPlayer(*oit);
 				break;
@@ -473,6 +521,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			type = BufferIO::ReadInt8(pbuf);
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			EndDuel();
@@ -491,7 +541,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshHand(0);
 			RefreshHand(1);
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_IDLECMD: {
@@ -515,21 +565,21 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshHand(0);
 			RefreshHand(1);
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_EFFECTYN: {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 8;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_YESNO: {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 4;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_OPTION: {
@@ -537,7 +587,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 4;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_CARD:
@@ -556,7 +606,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 				if (c != player) BufferIO::WriteInt32(pbufw, 0);
 			}
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_CHAIN: {
@@ -564,7 +614,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += 10 + count * 11;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_PLACE:
@@ -572,14 +622,14 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_POSITION: {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 5;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_COUNTER: {
@@ -588,7 +638,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 8;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SELECT_SUM: {
@@ -598,7 +648,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 11;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_SORT_CARD:
@@ -607,7 +657,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			WaitforResponse(player);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
 		}
 		case MSG_CONFIRM_DECKTOP: {
@@ -616,6 +666,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf += count * 7;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			break;
@@ -625,13 +677,15 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			if(pbuf[5] == LOCATION_HAND) {
 				pbuf += count * 7;
-				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
-				NetServer::ReSendToPlayer(players[1 - player]);
+				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+				NetServer::ReSendToPlayer(players[1]);
+				NetServer::ReSendToPlayer(players[2]);
+				NetServer::ReSendToPlayer(players[3]);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 					NetServer::ReSendToPlayer(*oit);
 			} else {
 				pbuf += count * 7;
-				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
+				NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
 			}
 			break;
 		}
@@ -639,6 +693,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			break;
@@ -646,10 +702,12 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_SHUFFLE_HAND: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, (pbuf - offset) + count * 4);
 			for(int i = 0; i < count; ++i)
 				BufferIO::WriteInt32(pbuf, 0);
-			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
+			for(int i = 0; i < 4; ++i)
+				if(players[i] != cur_player[player])
+					NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			RefreshHand(player, 0x181fff, 0);
@@ -659,6 +717,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf++;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			break;
@@ -667,6 +727,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			RefreshGrave(player);
@@ -675,6 +737,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_REVERSE_DECK: {
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			break;
@@ -683,6 +747,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf += 6;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			break;
@@ -692,6 +758,8 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf += count * 8;
 			NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
 			NetServer::ReSendToPlayer(players[1]);
+			NetServer::ReSendToPlayer(players[2]);
+			NetServer::ReSendToPlayer(players[3]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			RefreshMzone(0, 0x181fff, 0);

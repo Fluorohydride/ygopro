@@ -2124,7 +2124,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_LPUPDATE: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int val = BufferIO::ReadInt32(pbuf);
-		mainGame->lpd = (val - mainGame->dInfo.lp[player]) / 10;
+		mainGame->lpd = (mainGame->dInfo.lp[player] - val) / 10;
 		mainGame->lpplayer = player;
 		mainGame->lpframe = 10;
 		mainGame->WaitFrameSignal(11);

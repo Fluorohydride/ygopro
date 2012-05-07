@@ -44,6 +44,7 @@ public:
 protected:
 	DuelPlayer* players[4];
 	DuelPlayer* pplayer[4];
+	DuelPlayer* cur_player[2];
 	std::set<DuelPlayer*> observers;
 	bool ready[4];
 	Deck pdeck[4];
