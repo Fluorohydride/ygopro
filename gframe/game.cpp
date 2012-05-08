@@ -139,26 +139,24 @@ bool Game::Initialize() {
 	btnHostConfirm = env->addButton(rect<s32>(260, 355, 370, 380), wCreateHost, BUTTON_HOST_CONFIRM, dataManager.GetSysString(1211));
 	btnHostCancel = env->addButton(rect<s32>(260, 385, 370, 410), wCreateHost, BUTTON_HOST_CANCEL, dataManager.GetSysString(1212));
 	//host(single)
-	wHostSingle = env->addWindow(rect<s32>(270, 120, 750, 420), false, dataManager.GetSysString(1250));
-	wHostSingle->getCloseButton()->setVisible(false);
-	wHostSingle->setVisible(false);
-	btnHostSingleDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostSingle, BUTTON_HS_DUELIST, dataManager.GetSysString(1251));
-	stHostSingleDuelist[0] = env->addStaticText(L"", rect<s32>(40, 65, 240, 85), true, false, wHostSingle);
-	btnHostSingleKick[0] = env->addButton(rect<s32>(10, 65, 30, 85), wHostSingle, BUTTON_HS_KICK, L"X");
-	chkHostSingleReady[0] = env->addCheckBox(false, rect<s32>(250, 65, 270, 85), wHostSingle, CHECKBOX_HS_READY, L"");
-	chkHostSingleReady[0]->setEnabled(false);
-	stHostSingleDuelist[1] = env->addStaticText(L"", rect<s32>(40, 90, 240, 110), true, false, wHostSingle);
-	btnHostSingleKick[1] = env->addButton(rect<s32>(10, 90, 30, 110), wHostSingle, BUTTON_HS_KICK, L"X");
-	chkHostSingleReady[1] = env->addCheckBox(false, rect<s32>(250, 90, 270, 110), wHostSingle, CHECKBOX_HS_READY, L"");
-	chkHostSingleReady[1]->setEnabled(false);
-	btnHostSingleOB = env->addButton(rect<s32>(10, 120, 110, 145), wHostSingle, BUTTON_HS_OBSERVER, dataManager.GetSysString(1252));
+	wHostPrepare = env->addWindow(rect<s32>(270, 120, 750, 440), false, dataManager.GetSysString(1250));
+	wHostPrepare->getCloseButton()->setVisible(false);
+	wHostPrepare->setVisible(false);
+	btnHostPrepDuelist = env->addButton(rect<s32>(10, 30, 110, 55), wHostPrepare, BUTTON_HP_DUELIST, dataManager.GetSysString(1251));
+	for(int i = 0; i < 4; ++i) {
+		stHostPrepDuelist[i] = env->addStaticText(L"", rect<s32>(40, 65 + i * 25, 240, 85 + i * 25), true, false, wHostPrepare);
+		btnHostPrepKick[i] = env->addButton(rect<s32>(10, 65 + i * 25, 30, 85 + i * 25), wHostPrepare, BUTTON_HP_KICK, L"X");
+		chkHostPrepReady[i] = env->addCheckBox(false, rect<s32>(250, 65 + i * 25, 270, 85 + i * 25), wHostPrepare, CHECKBOX_HP_READY, L"");
+		chkHostPrepReady[i]->setEnabled(false);
+	}
+	btnHostPrepOB = env->addButton(rect<s32>(10, 170, 110, 195), wHostPrepare, BUTTON_HP_OBSERVER, dataManager.GetSysString(1252));
 	myswprintf(dataManager.strBuffer, L"%ls%d", dataManager.GetSysString(1253), 0);
-	stHostSingleOB = env->addStaticText(dataManager.strBuffer, rect<s32>(10, 150, 270, 170), false, false, wHostSingle);
-	stHostSingleRule = env->addStaticText(L"", rect<s32>(280, 30, 460, 230), false, true, wHostSingle);
-	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 185, 110, 205), false, false, wHostSingle);
-	cbDeckSelect = env->addComboBox(rect<s32>(120, 180, 270, 205), wHostSingle);
-	btnHostSingleStart = env->addButton(rect<s32>(230, 260, 340, 285), wHostSingle, BUTTON_HS_START, dataManager.GetSysString(1215));
-	btnHostSingleCancel = env->addButton(rect<s32>(350, 260, 460, 285), wHostSingle, BUTTON_HS_CANCEL, dataManager.GetSysString(1212));
+	stHostPrepOB = env->addStaticText(dataManager.strBuffer, rect<s32>(10, 200, 270, 220), false, false, wHostPrepare);
+	stHostPrepRule = env->addStaticText(L"", rect<s32>(280, 30, 460, 230), false, true, wHostPrepare);
+	env->addStaticText(dataManager.GetSysString(1254), rect<s32>(10, 235, 110, 255), false, false, wHostPrepare);
+	cbDeckSelect = env->addComboBox(rect<s32>(120, 230, 270, 255), wHostPrepare);
+	btnHostPrepStart = env->addButton(rect<s32>(230, 280, 340, 305), wHostPrepare, BUTTON_HP_START, dataManager.GetSysString(1215));
+	btnHostPrepCancel = env->addButton(rect<s32>(350, 280, 460, 305), wHostPrepare, BUTTON_HP_CANCEL, dataManager.GetSysString(1212));
 	//img
 	wCardImg = env->addStaticText(L"", rect<s32>(1, 1, 199, 273), true, false, 0, -1, true);
 	wCardImg->setBackgroundColor(0xc0c0c0c0);
@@ -780,6 +778,14 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		break;
 	case 1: //from client
 		chatMsg[0].append(dInfo.clientname);
+		chatMsg[0].append(L": ");
+		break;
+	case 2: //host tag
+		chatMsg[0].append(dInfo.hostname_tag);
+		chatMsg[0].append(L": ");
+		break;
+	case 3: //client tag
+		chatMsg[0].append(dInfo.clientname_tag);
 		chatMsg[0].append(L": ");
 		break;
 	case 8: //system custom message, no prefix.
