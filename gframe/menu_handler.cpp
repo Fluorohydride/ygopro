@@ -84,16 +84,16 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->ShowElement(mainGame->wLanWindow);
 				break;
 			}
-			case BUTTON_HS_DUELIST: {
+			case BUTTON_HP_DUELIST: {
 				DuelClient::SendPacketToServer(CTOS_HS_TODUELIST);
 				break;
 			}
-			case BUTTON_HS_OBSERVER: {
+			case BUTTON_HP_OBSERVER: {
 				DuelClient::SendPacketToServer(CTOS_HS_TOOBSERVER);
 				break;
 			}
-			case BUTTON_HS_KICK: {
-				int id = caller - static_cast<IGUIElement*>(mainGame->btnHostSingleKick[0]);
+			case BUTTON_HP_KICK: {
+				int id = caller - static_cast<IGUIElement*>(mainGame->btnHostPrepKick[0]);
 				CTOS_Kick csk;
 				if(id == 0)
 					csk.pos = 0;
@@ -101,19 +101,19 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				DuelClient::SendPacketToServer(CTOS_HS_KICK, csk);
 				break;
 			}
-			case BUTTON_HS_START: {
-				if(!mainGame->chkHostSingleReady[0]->isChecked()
-				        || !mainGame->chkHostSingleReady[0]->isChecked())
+			case BUTTON_HP_START: {
+				if(!mainGame->chkHostPrepReady[0]->isChecked()
+				        || !mainGame->chkHostPrepReady[1]->isChecked())
 					break;
 				DuelClient::SendPacketToServer(CTOS_HS_START);
 				break;
 			}
-			case BUTTON_HS_CANCEL: {
+			case BUTTON_HP_CANCEL: {
 				DuelClient::StopClient();
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
-				mainGame->HideElement(mainGame->wHostSingle);
+				mainGame->HideElement(mainGame->wHostPrepare);
 				mainGame->ShowElement(mainGame->wLanWindow);
 				if(exit_on_return)
 					mainGame->device->closeDevice();
@@ -234,10 +234,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 		}
 		case irr::gui::EGET_CHECKBOX_CHANGED: {
 			switch(id) {
-			case CHECKBOX_HS_READY: {
+			case CHECKBOX_HP_READY: {
 				if(!caller->isEnabled())
 					break;
-				mainGame->env->setFocus(mainGame->wHostSingle);
+				mainGame->env->setFocus(mainGame->wHostPrepare);
 				if(static_cast<irr::gui::IGUICheckBox*>(caller)->isChecked()) {
 					if(mainGame->cbDeckSelect->getSelected() == -1 ||
 					        !deckManager.LoadDeck(mainGame->cbDeckSelect->getItem(mainGame->cbDeckSelect->getSelected()))) {

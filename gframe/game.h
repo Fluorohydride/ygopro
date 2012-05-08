@@ -32,11 +32,15 @@ struct DuelInfo {
 	bool isObserver;
 	bool isFirst;
 	bool is_shuffling;
+	bool is_tag;
+	bool tag_player[2];
 	int lp[2];
 	int turn;
 	short curMsg;
 	wchar_t hostname[20];
 	wchar_t clientname[20];
+	wchar_t hostname_tag[20];
+	wchar_t clientname_tag[20];
 	wchar_t strLP[2][16];
 	wchar_t strTurn[8];
 	wchar_t* vic_string;
@@ -195,18 +199,18 @@ public:
 	irr::gui::IGUICheckBox* chkNoShuffleDeck;
 	irr::gui::IGUIButton* btnHostConfirm;
 	irr::gui::IGUIButton* btnHostCancel;
-	//host(single)
-	irr::gui::IGUIWindow* wHostSingle;
-	irr::gui::IGUIButton* btnHostSingleDuelist;
-	irr::gui::IGUIButton* btnHostSingleOB;
-	irr::gui::IGUIStaticText* stHostSingleDuelist[2];
-	irr::gui::IGUICheckBox* chkHostSingleReady[2];
-	irr::gui::IGUIButton* btnHostSingleKick[2];
+	//host panel
+	irr::gui::IGUIWindow* wHostPrepare;
+	irr::gui::IGUIButton* btnHostPrepDuelist;
+	irr::gui::IGUIButton* btnHostPrepOB;
+	irr::gui::IGUIStaticText* stHostPrepDuelist[4];
+	irr::gui::IGUICheckBox* chkHostPrepReady[4];
+	irr::gui::IGUIButton* btnHostPrepKick[4];
 	irr::gui::IGUIComboBox* cbDeckSelect;
-	irr::gui::IGUIStaticText* stHostSingleRule;
-	irr::gui::IGUIStaticText* stHostSingleOB;
-	irr::gui::IGUIButton* btnHostSingleStart;
-	irr::gui::IGUIButton* btnHostSingleCancel;
+	irr::gui::IGUIStaticText* stHostPrepRule;
+	irr::gui::IGUIStaticText* stHostPrepOB;
+	irr::gui::IGUIButton* btnHostPrepStart;
+	irr::gui::IGUIButton* btnHostPrepCancel;
 	//replay
 	irr::gui::IGUIWindow* wReplay;
 	irr::gui::IGUIListBox* lstReplayList;
@@ -365,12 +369,12 @@ extern Game* mainGame;
 #define BUTTON_HOST_CONFIRM			114
 #define BUTTON_HOST_CANCEL			115
 #define BUTTON_LAN_REFRESH			116
-#define BUTTON_HS_DUELIST			120
-#define BUTTON_HS_OBSERVER			121
-#define BUTTON_HS_START				122
-#define BUTTON_HS_CANCEL			123
-#define BUTTON_HS_KICK				124
-#define CHECKBOX_HS_READY			125
+#define BUTTON_HP_DUELIST			120
+#define BUTTON_HP_OBSERVER			121
+#define BUTTON_HP_START				122
+#define BUTTON_HP_CANCEL			123
+#define BUTTON_HP_KICK				124
+#define CHECKBOX_HP_READY			125
 #define LISTBOX_REPLAY_LIST			130
 #define BUTTON_LOAD_REPLAY			131
 #define BUTTON_CANCEL_REPLAY		132
