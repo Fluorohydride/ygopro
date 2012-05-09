@@ -585,6 +585,15 @@ void field::tag_swap(uint8 playerid) {
 	}
 	pduel->write_buffer8(MSG_TAG_SWAP);
 	pduel->write_buffer8(playerid);
+	pduel->write_buffer8(player[playerid].list_main.size());
+	pduel->write_buffer8(player[playerid].list_extra.size());
+	pduel->write_buffer8(player[playerid].list_hand.size());
+	if(core.deck_reversed)
+		pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+	else
+		pduel->write_buffer32(0);
+	for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
+		pduel->write_buffer32((*cit)->data.code | ((*cit)->is_status(STATUS_IS_PUBLIC) ? 0x80000000 : 0));
 }
 void field::add_effect(effect* peffect, uint8 owner_player) {
 	if (!peffect->handler) {

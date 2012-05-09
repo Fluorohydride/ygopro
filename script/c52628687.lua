@@ -52,22 +52,23 @@ function c52628687.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e)
-		and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)~=0 then
+		and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+		--levelup
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_EQUIP)
+		e1:SetCode(EFFECT_UPDATE_LEVEL)
+		e1:SetValue(e:GetLabel())
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(e1)
+		Duel.SpecialSummonComplete()
 		Duel.Equip(tp,c,tc)
 		--Add Equip limit
-		local e1=Effect.CreateEffect(tc)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(c52628687.eqlimit)
-		c:RegisterEffect(e1)
-		--levelup
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_EQUIP)
-		e2:SetCode(EFFECT_UPDATE_LEVEL)
-		e2:SetValue(e:GetLabel())
+		local e2=Effect.CreateEffect(tc)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_EQUIP_LIMIT)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetValue(c52628687.eqlimit)
 		c:RegisterEffect(e2)
 	end
 end

@@ -1081,8 +1081,12 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbufw = pbuf;
 			pbuf += count * 4;
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
-			for (int i = 0; i < count; ++i)
-				BufferIO::WriteInt32(pbufw, 0);
+			for (int i = 0; i < count; ++i) {
+				if(!(pbufw[i] & 0x80000000))
+					BufferIO::WriteInt32(pbufw, 0);
+				else
+					pbufw += 4;
+			}
 			NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
@@ -1437,7 +1441,7 @@ int SingleDuel::MessageHandler(long fduel, int type) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msgbuf, wbuf);
 		mainGame->AddChatMsg(wbuf, 9);
-	} else if(enable_log == 2){
+	} else if(enable_log == 2) {
 		FILE* fp = fopen("error.log", "at");
 		if(!fp)
 			return 0;

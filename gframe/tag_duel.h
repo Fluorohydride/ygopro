@@ -39,7 +39,7 @@ public:
 	void RefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
 	
 	static int MessageHandler(long fduel, int type);
-	static void SingleTimer(evutil_socket_t fd, short events, void* arg);
+	static void TagTimer(evutil_socket_t fd, short events, void* arg);
 	
 protected:
 	DuelPlayer* players[4];

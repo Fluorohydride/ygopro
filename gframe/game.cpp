@@ -110,6 +110,7 @@ bool Game::Initialize() {
 	cbMatchMode = env->addComboBox(rect<s32>(140, 85, 300, 110), wCreateHost);
 	cbMatchMode->addItem(dataManager.GetSysString(1244));
 	cbMatchMode->addItem(dataManager.GetSysString(1245));
+	cbMatchMode->addItem(dataManager.GetSysString(1246));
 	env->addStaticText(dataManager.GetSysString(1237), rect<s32>(20, 120, 320, 140), false, false, wCreateHost);
 	myswprintf(strbuf, L"%d", 180);
 	ebTimeLimit = env->addEditBox(strbuf, rect<s32>(140, 115, 220, 140), true, wCreateHost);
