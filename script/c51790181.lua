@@ -13,14 +13,6 @@ function c51790181.initial_effect(c)
 end
 function c51790181.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,51790181)==0 end
-	--oath effects
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTargetRange(1,0)
-	Duel.RegisterEffect(e1,tp)
 	Duel.RegisterFlagEffect(tp,51790181,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c51790181.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

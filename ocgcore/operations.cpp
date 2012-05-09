@@ -352,7 +352,7 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			pduel->write_buffer8(playerid);
 			pduel->write_buffer8(drawed);
 			for(uint32 i = 0; i < drawed; ++i)
-				pduel->write_buffer32(cv[i]->data.code);
+				pduel->write_buffer32(cv[i]->data.code | (cv[i]->is_status(STATUS_IS_PUBLIC) ? 0x80000000 : 0));
 			if(core.deck_reversed && (public_count < drawed)) {
 				pduel->write_buffer8(MSG_CONFIRM_CARDS);
 				pduel->write_buffer8(1 - playerid);

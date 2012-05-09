@@ -191,13 +191,12 @@ void TagDuel::ToDuelist(DuelPlayer* dp) {
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 		STOC_TypeChange sctc;
-		sctc.type = (dp == host_player ? 0x10 : 0) | dp->type;
+		sctc.type = (dp == host_player ? 0x10 : 0) | dptype;
 		NetServer::SendPacketToPlayer(dp, STOC_TYPE_CHANGE, sctc);
 		players[dptype] = dp;
 		players[dp->type] = 0;
 		dp->type = dptype;
 	}
-
 }
 void TagDuel::ToObserver(DuelPlayer* dp) {
 	if(dp->type > 3)
@@ -448,6 +447,8 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	else startbuf[1] = 0x11;
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 		NetServer::SendBufferToPlayer(*oit, STOC_GAME_MSG, startbuf, 18);
+	RefreshExtra(0);
+	RefreshExtra(1);
 	start_duel(pduel, opt);
 	Process();
 }
@@ -1090,8 +1091,12 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbufw = pbuf;
 			pbuf += count * 4;
 			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
-			for (int i = 0; i < count; ++i)
-				BufferIO::WriteInt32(pbufw, 0);
+			for (int i = 0; i < count; ++i) {
+				if(!(pbufw[i] & 0x80000000))
+					BufferIO::WriteInt32(pbufw, 0);
+				else
+					pbufw += 4;
+			}
 			for(int i = 0; i < 4; ++i)
 				if(players[i] != cur_player[player])
 					NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, offset, pbuf - offset);
@@ -1318,6 +1323,28 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 				NetServer::ReSendToPlayer(*oit);
 			break;
 		}
+		case MSG_TAG_SWAP: {
+			player = BufferIO::ReadInt8(pbuf);
+			int mcount = BufferIO::ReadInt8(pbuf);
+			int ecount = BufferIO::ReadInt8(pbuf);
+			int hcount = BufferIO::ReadInt8(pbuf);
+			pbufw = pbuf + 4;
+			pbuf += hcount * 4 + 4;
+			NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, offset, pbuf - offset);
+			for (int i = 0; i < hcount; ++i) {
+				if(!(pbufw[i] & 0x80000000))
+					BufferIO::WriteInt32(pbufw, 0);
+				else
+					pbufw += 4;
+			}
+			for(int i = 0; i < 4; ++i)
+				if(players[i] != cur_player[player])
+					NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, offset, pbuf - offset);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
+			RefreshExtra(player);
+			break;
+		}
 		}
 	}
 	return 0;
@@ -1510,7 +1537,7 @@ int TagDuel::MessageHandler(long fduel, int type) {
 	}
 	return 0;
 }
-void TagDuel::SingleTimer(evutil_socket_t fd, short events, void* arg) {
+void TagDuel::TagTimer(evutil_socket_t fd, short events, void* arg) {
 	TagDuel* sd = static_cast<TagDuel*>(arg);
 	sd->time_elapsed++;
 	if(sd->time_elapsed >= sd->time_limit[sd->last_response]) {

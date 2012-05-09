@@ -1,6 +1,7 @@
 #include "replay_mode.h"
 #include "duelclient.h"
 #include "game.h"
+#include "../ocgcore/duel.h"
 #include "../ocgcore/field.h"
 #include "../ocgcore/mtrandom.h"
 
@@ -72,20 +73,49 @@ int ReplayMode::ReplayThread(void* param) {
 	myswprintf(mainGame->dInfo.strLP[1], L"%d", mainGame->dInfo.lp[1]);
 	mainGame->dInfo.turn = 0;
 	mainGame->dInfo.strTurn[0] = 0;
-	int main = cur_replay.ReadInt32();
-	for(int i = 0; i < main; ++i)
-		new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, 0);
-	int extra = cur_replay.ReadInt32();
-	for(int i = 0; i < extra; ++i)
-		new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, 0);
-	mainGame->dField.Initial(0, main, extra);
-	main = cur_replay.ReadInt32();
-	for(int i = 0; i < main; ++i)
-		new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, 0);
-	extra = cur_replay.ReadInt32();
-	for(int i = 0; i < extra; ++i)
-		new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, 0);
-	mainGame->dField.Initial(1, main, extra);
+	if(!(opt & DUEL_TAG_MODE)) {
+		int main = cur_replay.ReadInt32();
+		for(int i = 0; i < main; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, 0);
+		int extra = cur_replay.ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, 0);
+		mainGame->dField.Initial(0, main, extra);
+		main = cur_replay.ReadInt32();
+		for(int i = 0; i < main; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, 0);
+		extra = cur_replay.ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, 0);
+		mainGame->dField.Initial(1, main, extra);
+	} else {
+		int main = cur_replay.ReadInt32();
+		for(int i = 0; i < main; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_DECK, 0, 0);
+		int extra = cur_replay.ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 0, 0, LOCATION_EXTRA, 0, 0);
+		mainGame->dField.Initial(0, main, extra);
+		main = cur_replay.ReadInt32();
+		for(int i = 0; i < main; ++i)
+			new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_DECK);
+		extra = cur_replay.ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			new_tag_card(pduel, cur_replay.ReadInt32(), 0, LOCATION_EXTRA);
+		main = cur_replay.ReadInt32();
+		for(int i = 0; i < main; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_DECK, 0, 0);
+		extra = cur_replay.ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			new_card(pduel, cur_replay.ReadInt32(), 1, 1, LOCATION_EXTRA, 0, 0);
+		mainGame->dField.Initial(1, main, extra);
+		main = cur_replay.ReadInt32();
+		for(int i = 0; i < main; ++i)
+			new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_DECK);
+		extra = cur_replay.ReadInt32();
+		for(int i = 0; i < extra; ++i)
+			new_tag_card(pduel, cur_replay.ReadInt32(), 1, LOCATION_EXTRA);
+	}
 	start_duel(pduel, opt);
 	mainGame->dInfo.isStarted = true;
 	mainGame->dInfo.isReplay = true;
@@ -565,6 +595,11 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
+		case MSG_TAG_SWAP: {
+			pbuf += pbuf[4] * 4 + 8;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
+			break;
+		}
 		}
 		if(pauseable && is_pausing) {
 			is_paused = true;
@@ -614,7 +649,7 @@ int ReplayMode::MessageHandler(long fduel, int type) {
 		wchar_t wbuf[1024];
 		BufferIO::DecodeUTF8(msgbuf, wbuf);
 		mainGame->AddChatMsg(wbuf, 9);
-	} else if(enable_log == 2){
+	} else if(enable_log == 2) {
 		FILE* fp = fopen("error.log", "at");
 		if(!fp)
 			return 0;

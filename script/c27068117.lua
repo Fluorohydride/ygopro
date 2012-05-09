@@ -14,7 +14,8 @@ function c27068117.filter(c)
 end
 function c27068117.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c27068117.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c27068117.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return not e:GetHandler():IsLocation(LOCATION_GRAVE)
+		and Duel.IsExistingTarget(c27068117.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c27068117.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end

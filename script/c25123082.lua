@@ -26,7 +26,7 @@ function c25123082.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c25123082.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsImmuneToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -38,7 +38,7 @@ function c25123082.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 		e2:SetCode(EVENT_BATTLE_DESTROYING)
-		e2:SetLabelObject(tc)
+		e2:SetLabel(tc:GetFieldID())
 		e2:SetCondition(c25123082.shcon)
 		e2:SetTarget(c25123082.shtg)
 		e2:SetOperation(c25123082.shop)
@@ -47,7 +47,7 @@ function c25123082.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c25123082.shcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetLabelObject())
+	return eg:GetFirst():GetFieldID()==e:GetLabel()
 end
 function c25123082.shfilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()

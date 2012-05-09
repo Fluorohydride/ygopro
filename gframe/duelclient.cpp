@@ -600,7 +600,11 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(pos > 3)
 			break;
 		mainGame->gMutex.Lock();
-		if(state == PLAYERCHANGE_READY) {
+		if(state < 8) {
+			mainGame->stHostPrepDuelist[state]->setText(mainGame->stHostPrepDuelist[pos]->getText());
+			mainGame->stHostPrepDuelist[pos]->setText(L"");
+			mainGame->chkHostPrepReady[pos]->setChecked(false);
+		} else if(state == PLAYERCHANGE_READY) {
 			mainGame->chkHostPrepReady[pos]->setChecked(true);
 		} else if(state == PLAYERCHANGE_NOTREADY) {
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
@@ -2563,6 +2567,109 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			mainGame->showcard = 0;
 		}
 		return true;
+	}
+	case MSG_TAG_SWAP: {
+		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		int mcount = BufferIO::ReadInt8(pbuf);
+		int ecount = BufferIO::ReadInt8(pbuf);
+		int hcount = BufferIO::ReadInt8(pbuf);
+		int topcode = BufferIO::ReadInt32(pbuf);
+		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+			mainGame->dField.deck[player][i]->code = 0;
+		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+			if(player == 0) (*cit)->dPos.Y = 1.0f;
+			else (*cit)->dPos.Y = -1.0f;
+			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+			(*cit)->is_moving = true;
+			(*cit)->aniFrame = 5;
+		}
+		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+			if(player == 0) (*cit)->dPos.Y = 1.0f;
+			else (*cit)->dPos.Y = -1.0f;
+			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+			(*cit)->is_moving = true;
+			(*cit)->aniFrame = 5;
+		}
+		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+			if(player == 0) (*cit)->dPos.Y = 1.0f;
+			else (*cit)->dPos.Y = -1.0f;
+			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+			(*cit)->is_moving = true;
+			(*cit)->aniFrame = 5;
+		}
+		mainGame->WaitFrameSignal(5);
+		//
+		mainGame->gMutex.Lock();
+		if(mainGame->dField.deck[player].size() > mcount) {
+			for(int i = 0; i < mainGame->dField.deck[player].size() - mcount; ++i) {
+				ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
+				mainGame->dField.deck[player].pop_back();
+				delete ccard;
+			}
+		} else {
+			for(int i = 0; i < mcount - mainGame->dField.deck[player].size(); ++i) {
+				ClientCard* ccard = new ClientCard();
+				ccard->controler = player;
+				ccard->location = LOCATION_DECK;
+				ccard->sequence = mainGame->dField.deck[player].size() - 1;
+				mainGame->dField.deck[player].push_back(ccard);
+			}
+		}
+		if(mainGame->dField.hand[player].size() > mcount) {
+			for(int i = 0; i < mainGame->dField.hand[player].size() - mcount; ++i) {
+				ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
+				mainGame->dField.hand[player].pop_back();
+				delete ccard;
+			}
+		} else {
+			for(int i = 0; i < mcount - mainGame->dField.hand[player].size(); ++i) {
+				ClientCard* ccard = new ClientCard();
+				ccard->controler = player;
+				ccard->location = LOCATION_HAND;
+				ccard->sequence = mainGame->dField.hand[player].size() - 1;
+				mainGame->dField.hand[player].push_back(ccard);
+			}
+		}
+		if(mainGame->dField.extra[player].size() > mcount) {
+			for(int i = 0; i < mainGame->dField.extra[player].size() - mcount; ++i) {
+				ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
+				mainGame->dField.extra[player].pop_back();
+				delete ccard;
+			}
+		} else {
+			for(int i = 0; i < mcount - mainGame->dField.extra[player].size(); ++i) {
+				ClientCard* ccard = new ClientCard();
+				ccard->controler = player;
+				ccard->location = LOCATION_EXTRA;
+				ccard->sequence = mainGame->dField.extra[player].size() - 1;
+				mainGame->dField.extra[player].push_back(ccard);
+			}
+		}
+		mainGame->gMutex.Unlock();
+		//
+		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+			ClientCard* pcard = *cit;
+			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+			if(player == 0) pcard->curPos.Y += 5.0f;
+			else pcard->curPos.Y -= 5.0f;
+			mainGame->dField.MoveCard(*cit, 5);
+		}
+		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+			ClientCard* pcard = *cit;
+			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+			if(player == 0) pcard->curPos.Y += 5.0f;
+			else pcard->curPos.Y -= 5.0f;
+			mainGame->dField.MoveCard(*cit, 5);
+		}
+		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+			ClientCard* pcard = *cit;
+			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+			if(player == 0) pcard->curPos.Y += 5.0f;
+			else pcard->curPos.Y -= 5.0f;
+			mainGame->dField.MoveCard(*cit, 5);
+		}
+		mainGame->WaitFrameSignal(5);
+		break;
 	}
 	}
 	return true;
