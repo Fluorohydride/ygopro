@@ -32,7 +32,7 @@ function c93542102.cfilter(c)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x26) and c:IsType(TYPE_MONSTER)
 end
 function c93542102.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 		and Duel.IsExistingMatchingCard(c93542102.cfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c93542102.filter(c,e,tp)

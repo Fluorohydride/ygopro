@@ -552,9 +552,7 @@ void field::tag_swap(uint8 playerid) {
 		(*clit)->enable_field_effect(false);
 		(*clit)->cancel_field_effect();
 	}
-	card_vector cl = player[playerid].list_grave;
-	player[playerid].list_main = player[playerid].tag_list_main;
-	player[playerid].list_main = cl;
+	std::swap(player[playerid].list_main, player[playerid].tag_list_main);
 	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
 		(*clit)->apply_field_effect();
 		(*clit)->enable_field_effect(true);
@@ -564,9 +562,7 @@ void field::tag_swap(uint8 playerid) {
 		(*clit)->enable_field_effect(false);
 		(*clit)->cancel_field_effect();
 	}
-	cl = player[playerid].list_grave;
-	player[playerid].list_hand = player[playerid].tag_list_hand;
-	player[playerid].list_hand = cl;
+	std::swap(player[playerid].list_hand, player[playerid].tag_list_hand);
 	for(clit = player[playerid].list_hand.begin(); clit != player[playerid].list_hand.end(); ++clit) {
 		(*clit)->apply_field_effect();
 		(*clit)->enable_field_effect(true);
@@ -576,9 +572,7 @@ void field::tag_swap(uint8 playerid) {
 		(*clit)->enable_field_effect(false);
 		(*clit)->cancel_field_effect();
 	}
-	cl = player[playerid].list_grave;
-	player[playerid].list_extra = player[playerid].tag_list_extra;
-	player[playerid].list_extra = cl;
+	std::swap(player[playerid].list_extra, player[playerid].tag_list_extra);
 	for(clit = player[playerid].list_extra.begin(); clit != player[playerid].list_extra.end(); ++clit) {
 		(*clit)->apply_field_effect();
 		(*clit)->enable_field_effect(true);
@@ -588,7 +582,7 @@ void field::tag_swap(uint8 playerid) {
 	pduel->write_buffer8(player[playerid].list_main.size());
 	pduel->write_buffer8(player[playerid].list_extra.size());
 	pduel->write_buffer8(player[playerid].list_hand.size());
-	if(core.deck_reversed)
+	if(core.deck_reversed && player[playerid].list_main.size())
 		pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
 	else
 		pduel->write_buffer32(0);

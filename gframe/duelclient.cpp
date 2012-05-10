@@ -2574,25 +2574,23 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int ecount = BufferIO::ReadInt8(pbuf);
 		int hcount = BufferIO::ReadInt8(pbuf);
 		int topcode = BufferIO::ReadInt32(pbuf);
-		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
-			mainGame->dField.deck[player][i]->code = 0;
 		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-			if(player == 0) (*cit)->dPos.Y = 1.0f;
-			else (*cit)->dPos.Y = -1.0f;
+			if(player == 0) (*cit)->dPos.Y = 0.4f;
+			else (*cit)->dPos.Y = -0.4f;
 			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 			(*cit)->is_moving = true;
 			(*cit)->aniFrame = 5;
 		}
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-			if(player == 0) (*cit)->dPos.Y = 1.0f;
-			else (*cit)->dPos.Y = -1.0f;
+			if(player == 0) (*cit)->dPos.Y = 0.4f;
+			else (*cit)->dPos.Y = -0.4f;
 			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 			(*cit)->is_moving = true;
 			(*cit)->aniFrame = 5;
 		}
 		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
-			if(player == 0) (*cit)->dPos.Y = 1.0f;
-			else (*cit)->dPos.Y = -1.0f;
+			if(player == 0) (*cit)->dPos.Y = 0.4f;
+			else (*cit)->dPos.Y = -0.4f;
 			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 			(*cit)->is_moving = true;
 			(*cit)->aniFrame = 5;
@@ -2615,14 +2613,14 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				mainGame->dField.deck[player].push_back(ccard);
 			}
 		}
-		if(mainGame->dField.hand[player].size() > mcount) {
-			for(int i = 0; i < mainGame->dField.hand[player].size() - mcount; ++i) {
+		if(mainGame->dField.hand[player].size() > hcount) {
+			for(int i = 0; i < mainGame->dField.hand[player].size() - hcount; ++i) {
 				ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
 				mainGame->dField.hand[player].pop_back();
 				delete ccard;
 			}
 		} else {
-			for(int i = 0; i < mcount - mainGame->dField.hand[player].size(); ++i) {
+			for(int i = 0; i < hcount - mainGame->dField.hand[player].size(); ++i) {
 				ClientCard* ccard = new ClientCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_HAND;
@@ -2630,14 +2628,14 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 				mainGame->dField.hand[player].push_back(ccard);
 			}
 		}
-		if(mainGame->dField.extra[player].size() > mcount) {
-			for(int i = 0; i < mainGame->dField.extra[player].size() - mcount; ++i) {
+		if(mainGame->dField.extra[player].size() > ecount) {
+			for(int i = 0; i < mainGame->dField.extra[player].size() - ecount; ++i) {
 				ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
 				mainGame->dField.extra[player].pop_back();
 				delete ccard;
 			}
 		} else {
-			for(int i = 0; i < mcount - mainGame->dField.extra[player].size(); ++i) {
+			for(int i = 0; i < ecount - mainGame->dField.extra[player].size(); ++i) {
 				ClientCard* ccard = new ClientCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_EXTRA;
@@ -2650,22 +2648,25 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
 			ClientCard* pcard = *cit;
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y += 5.0f;
-			else pcard->curPos.Y -= 5.0f;
+			if(player == 0) pcard->curPos.Y += 2.0f;
+			else pcard->curPos.Y -= 2.0f;
 			mainGame->dField.MoveCard(*cit, 5);
 		}
+		if(mainGame->dField.deck[player].size())
+			(*mainGame->dField.deck[player].rbegin())->code = topcode;
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 			ClientCard* pcard = *cit;
+			pcard->code = BufferIO::ReadInt32(pbuf);
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y += 5.0f;
-			else pcard->curPos.Y -= 5.0f;
+			if(player == 0) pcard->curPos.Y +=2.0f;
+			else pcard->curPos.Y -= 2.0f;
 			mainGame->dField.MoveCard(*cit, 5);
 		}
 		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 			ClientCard* pcard = *cit;
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y += 5.0f;
-			else pcard->curPos.Y -= 5.0f;
+			if(player == 0) pcard->curPos.Y += 2.0f;
+			else pcard->curPos.Y -= 2.0f;
 			mainGame->dField.MoveCard(*cit, 5);
 		}
 		mainGame->WaitFrameSignal(5);

@@ -380,15 +380,11 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	if(!host_info.no_shuffle_deck) {
 		for(int i = 0; i < pdeck[0].main.size(); ++i) {
 			int swap = rnd.real() * pdeck[0].main.size();
-			auto tmp = pdeck[0].main[i];
-			pdeck[0].main[i] = pdeck[0].main[swap];
-			pdeck[0].main[swap] = tmp;
+			std::swap(pdeck[0].main[i], pdeck[0].main[swap]);
 		}
 		for(int i = 0; i < pdeck[1].main.size(); ++i) {
 			int swap = rnd.real() * pdeck[1].main.size();
-			auto tmp = pdeck[1].main[i];
-			pdeck[1].main[i] = pdeck[1].main[swap];
-			pdeck[1].main[swap] = tmp;
+			std::swap(pdeck[1].main[i], pdeck[1].main[swap]);
 		}
 	}
 	time_limit[0] = host_info.time_limit;
@@ -1082,7 +1078,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbuf += count * 4;
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			for (int i = 0; i < count; ++i) {
-				if(!(pbufw[i] & 0x80000000))
+				if(!(pbufw[3] & 0x80))
 					BufferIO::WriteInt32(pbufw, 0);
 				else
 					pbufw += 4;
