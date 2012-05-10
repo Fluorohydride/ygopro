@@ -326,7 +326,6 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		}
 		case MSG_NEW_TURN: {
 			pbuf++;
-			ReplayRefresh();
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
