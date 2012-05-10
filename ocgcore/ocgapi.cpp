@@ -77,6 +77,24 @@ extern "C" DECL_DLLEXPORT void start_duel(ptr pduel, int options) {
 		pd->game_field->draw(0, REASON_RULE, PLAYER_NONE, 0, pd->game_field->player[0].start_count);
 	if(pd->game_field->player[1].start_count > 0)
 		pd->game_field->draw(0, REASON_RULE, PLAYER_NONE, 1, pd->game_field->player[1].start_count);
+	if(options & DUEL_TAG_MODE) {
+		for(int i = 0; i < pd->game_field->player[0].start_count && pd->game_field->player[0].tag_list_main.size(); ++i) {
+			card* pcard = *pd->game_field->player[0].tag_list_main.rbegin();
+			pd->game_field->player[0].tag_list_main.pop_back();
+			pd->game_field->player[0].tag_list_hand.push_back(pcard);
+			pcard->current.controler = 0;
+			pcard->current.location = LOCATION_HAND;
+			pcard->current.sequence = pd->game_field->player[0].tag_list_hand.size() - 1;
+		}
+		for(int i = 0; i < pd->game_field->player[1].start_count && pd->game_field->player[1].tag_list_main.size(); ++i) {
+			card* pcard = *pd->game_field->player[1].tag_list_main.rbegin();
+			pd->game_field->player[1].tag_list_main.pop_back();
+			pd->game_field->player[1].tag_list_hand.push_back(pcard);
+			pcard->current.controler = 1;
+			pcard->current.location = LOCATION_HAND;
+			pcard->current.sequence = pd->game_field->player[1].tag_list_hand.size() - 1;
+		}
+	}
 	pd->game_field->add_process(PROCESSOR_TURN, 0, 0, 0, 0, 0);
 }
 extern "C" DECL_DLLEXPORT void end_duel(ptr pduel) {
@@ -135,9 +153,15 @@ extern "C" DECL_DLLEXPORT void new_tag_card(ptr pduel, uint32 code, uint8 owner,
 	switch(location) {
 	case LOCATION_DECK:
 		ptduel->game_field->player[owner].tag_list_main.push_back(pcard);
+		pcard->current.controler = owner;
+		pcard->current.location = LOCATION_DECK;
+		pcard->current.sequence = ptduel->game_field->player[owner].tag_list_main.size() - 1;
 		break;
 	case LOCATION_EXTRA:
 		ptduel->game_field->player[owner].tag_list_extra.push_back(pcard);
+		pcard->current.controler = owner;
+		pcard->current.location = LOCATION_EXTRA;
+		pcard->current.sequence = ptduel->game_field->player[owner].tag_list_extra.size() - 1;
 		break;
 	}
 }

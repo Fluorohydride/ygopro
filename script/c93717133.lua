@@ -24,10 +24,10 @@ function c93717133.initial_effect(c)
 end
 function c93717133.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsAttackPosAbove,2,nil,2000)
+	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsAttackAbove,2,nil,2000)
 end
 function c93717133.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsAttackPosAbove,2,2,nil,2000)
+	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsAttackAbove,2,2,nil,2000)
 	Duel.Release(g,REASON_COST)
 end
 function c93717133.rmcon(e,tp,eg,ep,ev,re,r,rp)

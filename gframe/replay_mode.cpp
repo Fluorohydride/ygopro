@@ -596,7 +596,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_TAG_SWAP: {
-			pbuf += pbuf[4] * 4 + 8;
+			pbuf += pbuf[3] * 4 + 8;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}

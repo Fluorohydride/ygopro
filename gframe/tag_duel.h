@@ -51,7 +51,7 @@ protected:
 	unsigned char hand_result[2];
 	unsigned char last_response;
 	Replay last_replay;
-	unsigned char tp_player;
+	unsigned char turn_count;
 	unsigned short time_limit[2];
 	unsigned short time_elapsed;
 };

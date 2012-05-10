@@ -55,7 +55,7 @@ function c32391631.recop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
 function c32391631.becon(e)
-	return Duel.IsExistingMatchingCard(Card.IsAttackPosable,Duel.GetTurnPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(Card.IsAttackable,Duel.GetTurnPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function c32391631.desfilter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:GetAttackedCount()==0 and c:IsDestructable()
