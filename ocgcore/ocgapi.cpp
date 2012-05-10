@@ -153,12 +153,14 @@ extern "C" DECL_DLLEXPORT void new_tag_card(ptr pduel, uint32 code, uint8 owner,
 	switch(location) {
 	case LOCATION_DECK:
 		ptduel->game_field->player[owner].tag_list_main.push_back(pcard);
+		pcard->owner = owner;
 		pcard->current.controler = owner;
 		pcard->current.location = LOCATION_DECK;
 		pcard->current.sequence = ptduel->game_field->player[owner].tag_list_main.size() - 1;
 		break;
 	case LOCATION_EXTRA:
 		ptduel->game_field->player[owner].tag_list_extra.push_back(pcard);
+		pcard->owner = owner;
 		pcard->current.controler = owner;
 		pcard->current.location = LOCATION_EXTRA;
 		pcard->current.sequence = ptduel->game_field->player[owner].tag_list_extra.size() - 1;
