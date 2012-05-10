@@ -32,7 +32,6 @@ function c57421866.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function c57421866.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or tc:GetLevel()<2 then return end
 	local c=e:GetHandler()

@@ -1729,6 +1729,8 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
 			pcard->ClearTarget();
+			for(auto eqit = pcard->equipped.begin(); eqit != pcard->equipped.end(); ++eqit)
+				(*eqit)->equipTarget = 0;
 			mainGame->dField.FadeCard(pcard, 5, 20);
 			mainGame->WaitFrameSignal(20);
 			mainGame->gMutex.Lock();
