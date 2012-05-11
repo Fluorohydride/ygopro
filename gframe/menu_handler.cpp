@@ -224,7 +224,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
 				repinfo.append(infobuf);
-				myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]));
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
+					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]),
+					           (wchar_t*)(&ReplayMode::cur_replay.replay_data[80]), (wchar_t*)(&ReplayMode::cur_replay.replay_data[120]));
+				else
+					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]));
 				repinfo.append(infobuf);
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
 				break;

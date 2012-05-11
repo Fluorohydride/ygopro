@@ -48,7 +48,12 @@ function c13093792.spelltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return not ftg or ftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
-	ftg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if ae:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	else e:SetProperty(0) end
+	if ftg then
+		ftg(e,tp,eg,ep,ev,re,r,rp,chk)
+	end
 end
 function c13093792.spellop(e,tp,eg,ep,ev,re,r,rp)
 	local ae=e:GetHandler():GetActivateEffect()

@@ -93,7 +93,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
-				if(mainGame->dInfo.isObserver) {
+				if(mainGame->dInfo.player_type == 7) {
 					DuelClient::StopClient();
 					mainGame->CloseDuelWindow();
 					mainGame->dInfo.isStarted = false;
@@ -471,6 +471,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			case BUTTON_CARD_2:
 			case BUTTON_CARD_3:
 			case BUTTON_CARD_4: {
+				if(mainGame->dInfo.isReplay)
+					break;
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_IDLECMD:
 				case MSG_SELECT_BATTLECMD:
@@ -602,6 +604,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_CARD_SEL_OK: {
+				if(mainGame->dInfo.isReplay) {
+					mainGame->HideElement(mainGame->wCardSelect);
+					break;
+				}
 				if(mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
 					if(select_ready) {
 						unsigned char respbuf[64];
@@ -768,9 +774,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
 					unsigned short msgbuf[256];
-					if(!mainGame->dInfo.isObserver)
-						mainGame->AddChatMsg((wchar_t*)input, 0);
-					else mainGame->AddChatMsg((wchar_t*)input, 2);
+					if(mainGame->dInfo.player_type < 7) {
+						if(mainGame->dInfo.is_tag && (mainGame->dInfo.player_type % 2))
+							mainGame->AddChatMsg((wchar_t*)input, 2);
+						else
+							mainGame->AddChatMsg((wchar_t*)input, 0);
+					} else mainGame->AddChatMsg((wchar_t*)input, 10);
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");
@@ -804,8 +813,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	case irr::EET_MOUSE_INPUT_EVENT: {
 		switch(event.MouseInput.Event) {
 		case irr::EMIE_LMOUSE_LEFT_UP: {
-			if(mainGame->dInfo.isReplay)
-				break;
 			if(!mainGame->dInfo.isStarted)
 				break;
 			s32 x = event.MouseInput.X;
@@ -819,6 +826,52 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			if(panel && panel->isVisible())
 				break;
 			GetHoverField(x, y);
+			if(mainGame->dInfo.isReplay) {
+				if(mainGame->wCardSelect->isVisible())
+					break;
+				selectable_cards.clear();
+				switch(hovered_location) {
+				case LOCATION_DECK: {
+					for(int i = deck[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(deck[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1000), deck[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				case LOCATION_MZONE: {
+					ClientCard* pcard = deck[hovered_controler][hovered_sequence];
+					for(int i = 0; i < pcard->overlayed.size(); ++i)
+						selectable_cards.push_back(pcard->overlayed[i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				case LOCATION_GRAVE: {
+					for(int i = grave[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(grave[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				case LOCATION_REMOVED: {
+					for(int i = remove[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(remove[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				case LOCATION_EXTRA: {
+					for(int i = extra[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(extra[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				}
+				if(selectable_cards.size())
+					ShowSelectCard(true);
+				break;
+			}
 			if(hovered_location & 0xe)
 				clicked_card = GetCard(hovered_controler, hovered_location, hovered_sequence);
 			else clicked_card = 0;
@@ -1337,7 +1390,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 			}
 			break;
-									}
+		}
 		case irr::EMIE_MOUSE_WHEEL: {
 			break;
 		}
