@@ -209,6 +209,7 @@ void TagDuel::ToObserver(DuelPlayer* dp) {
 	for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 	players[dp->type] = 0;
+	ready[dp->type] = false;
 	dp->type = NETPLAYER_TYPE_OBSERVER;
 	observers.insert(dp);
 	STOC_TypeChange sctc;
@@ -340,7 +341,7 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	ReplayHeader rh;
 	rh.id = 0x31707279;
 	rh.version = PRO_VERSION;
-	rh.flag = 0;
+	rh.flag = REPLAY_TAG;
 	time_t seed = time(0);
 	rh.seed = seed;
 	last_replay.BeginRecord();
@@ -348,6 +349,8 @@ void TagDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	rnd.reset(seed);
 	last_replay.WriteData(players[0]->name, 40, false);
 	last_replay.WriteData(players[1]->name, 40, false);
+	last_replay.WriteData(players[2]->name, 40, false);
+	last_replay.WriteData(players[3]->name, 40, false);
 	if(!host_info.no_shuffle_deck) {
 		for(int i = 0; i < pdeck[0].main.size(); ++i) {
 			int swap = rnd.real() * pdeck[0].main.size();
@@ -798,12 +801,6 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 				}
 			}
 			turn_count++;
-			RefreshMzone(0);
-			RefreshMzone(1);
-			RefreshSzone(0);
-			RefreshSzone(1);
-			RefreshHand(0);
-			RefreshHand(1);
 			break;
 		}
 		case MSG_NEW_PHASE: {
@@ -1347,6 +1344,12 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
 			RefreshExtra(player);
+			RefreshMzone(0, 0x81fff, 0);
+			RefreshMzone(1, 0x81fff, 0);
+			RefreshSzone(0, 0x81fff, 0);
+			RefreshSzone(1, 0x81fff, 0);
+			RefreshHand(0, 0x181fff, 0);
+			RefreshHand(1, 0x181fff, 0);
 			break;
 		}
 		}

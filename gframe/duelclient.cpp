@@ -269,7 +269,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->wDeckEdit->setVisible(false);
 		mainGame->wFilter->setVisible(false);
 		mainGame->btnSideOK->setVisible(true);
-		if(!mainGame->dInfo.isObserver)
+		if(mainGame->dInfo.player_type < 7)
 			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->deckBuilder.result_string[0] = L'0';
 		mainGame->deckBuilder.result_string[1] = 0;
@@ -330,17 +330,15 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->chkHostPrepReady[3]->setVisible(true);
 			mainGame->stHostPrepDuelist[2]->setVisible(true);
 			mainGame->stHostPrepDuelist[3]->setVisible(true);
-			mainGame->btnHostPrepKick[2]->setVisible(true);
-			mainGame->btnHostPrepKick[3]->setVisible(true);
 		} else {
 			mainGame->dInfo.is_tag = false;
 			mainGame->chkHostPrepReady[2]->setVisible(false);
 			mainGame->chkHostPrepReady[3]->setVisible(false);
 			mainGame->stHostPrepDuelist[2]->setVisible(false);
 			mainGame->stHostPrepDuelist[3]->setVisible(false);
-			mainGame->btnHostPrepKick[2]->setVisible(false);
-			mainGame->btnHostPrepKick[3]->setVisible(false);
 		}
+		for(int i = 0; i < 4; ++i)
+			mainGame->chkHostPrepReady[i]->setChecked(false);
 		mainGame->dInfo.time_limit = pkt->info.time_limit;
 		mainGame->dInfo.time_left[0] = 0;
 		mainGame->dInfo.time_left[1] = 0;
@@ -368,17 +366,19 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_TYPE_CHANGE: {
 		STOC_TypeChange* pkt = (STOC_TypeChange*)pdata;
-		selftype = pkt->type & 0xf;
-		is_host = (pkt->type >> 4) & 0xf;
 		if(!mainGame->dInfo.is_tag) {
+			selftype = pkt->type & 0xf;
+			is_host = (pkt->type >> 4) & 0xf;
+			mainGame->btnHostPrepKick[2]->setVisible(true);
+			mainGame->btnHostPrepKick[3]->setVisible(true);
 			if(is_host) {
 				mainGame->btnHostPrepStart->setVisible(true);
-				mainGame->btnHostPrepKick[0]->setEnabled(true);
-				mainGame->btnHostPrepKick[1]->setEnabled(true);
+				mainGame->btnHostPrepKick[0]->setVisible(true);
+				mainGame->btnHostPrepKick[1]->setVisible(true);
 			} else {
 				mainGame->btnHostPrepStart->setVisible(false);
-				mainGame->btnHostPrepKick[0]->setEnabled(false);
-				mainGame->btnHostPrepKick[1]->setEnabled(false);
+				mainGame->btnHostPrepKick[0]->setVisible(false);
+				mainGame->btnHostPrepKick[1]->setVisible(false);
 			}
 			mainGame->chkHostPrepReady[0]->setEnabled(false);
 			mainGame->chkHostPrepReady[0]->setChecked(false);
@@ -393,19 +393,21 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnHostPrepOB->setEnabled(false);
 			}
 		} else {
+			if(selftype < 4) {
+				mainGame->chkHostPrepReady[selftype]->setEnabled(false);
+				mainGame->chkHostPrepReady[selftype]->setChecked(false);
+			}
+			selftype = pkt->type & 0xf;
+			is_host = (pkt->type >> 4) & 0xf;
 			mainGame->btnHostPrepDuelist->setEnabled(true);
 			if(is_host) {
 				mainGame->btnHostPrepStart->setVisible(true);
 				for(int i = 0; i < 4; ++i)
-					mainGame->btnHostPrepKick[i]->setEnabled(true);
+					mainGame->btnHostPrepKick[i]->setVisible(true);
 			} else {
 				mainGame->btnHostPrepStart->setVisible(false);
 				for(int i = 0; i < 4; ++i)
-					mainGame->btnHostPrepKick[i]->setEnabled(false);
-			}
-			for(int i = 0; i < 4; ++i) {
-				mainGame->chkHostPrepReady[i]->setEnabled(false);
-				mainGame->chkHostPrepReady[i]->setChecked(false);
+					mainGame->btnHostPrepKick[i]->setVisible(false);
 			}
 			if(selftype < 4) {
 				mainGame->chkHostPrepReady[selftype]->setEnabled(true);
@@ -414,6 +416,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->btnHostPrepOB->setEnabled(false);
 			}
 		}
+		mainGame->dInfo.player_type = selftype;
 		break;
 	}
 	case STOC_DUEL_START: {
@@ -446,7 +449,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->device->setEventReceiver(&mainGame->dField);
 		if(!mainGame->dInfo.is_tag) {
 			if(selftype > 1) {
-				mainGame->dInfo.isObserver = true;
+				mainGame->dInfo.player_type = 7;
 				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
 				mainGame->btnLeaveGame->setVisible(true);
 			}
@@ -459,7 +462,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			}
 		} else {
 			if(selftype > 3) {
-				mainGame->dInfo.isObserver = true;
+				mainGame->dInfo.player_type = 7;
 				mainGame->btnLeaveGame->setText(dataManager.GetSysString(1350));
 				mainGame->btnLeaveGame->setVisible(true);
 			}
@@ -639,7 +642,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	wchar_t textBuffer[256];
 	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 	mainGame->wCmdMenu->setVisible(false);
-	if(mainGame->dInfo.curMsg != MSG_WAITING && mainGame->dInfo.curMsg != MSG_CARD_SELECTED) {
+	if(!mainGame->dInfo.isReplay && mainGame->dInfo.curMsg != MSG_WAITING && mainGame->dInfo.curMsg != MSG_CARD_SELECTED) {
 		mainGame->waitFrame = -1;
 		mainGame->stHintMsg->setVisible(false);
 		if(mainGame->wCardSelect->isVisible()) {
@@ -815,7 +818,14 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		int playertype = BufferIO::ReadInt8(pbuf);
 		mainGame->dInfo.isFirst =  (playertype & 0xf) ? false : true;
-		mainGame->dInfo.isObserver =  (playertype & 0xf0) ? true : false;
+		if(playertype & 0xf0)
+			mainGame->dInfo.player_type = 7;
+		if(mainGame->dInfo.is_tag) {
+			if(mainGame->dInfo.isFirst)
+				mainGame->dInfo.tag_player[1] = true;
+			else
+				mainGame->dInfo.tag_player[0] = true;
+		}
 		mainGame->dInfo.lp[mainGame->LocalPlayer(0)] = BufferIO::ReadInt32(pbuf);
 		mainGame->dInfo.lp[mainGame->LocalPlayer(1)] = BufferIO::ReadInt32(pbuf);
 		myswprintf(mainGame->dInfo.strLP[0], L"%d", mainGame->dInfo.lp[0]);
@@ -1632,7 +1642,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 	case MSG_NEW_TURN: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dInfo.turn++;
-		if(!mainGame->dInfo.is_tag && mainGame->dInfo.turn == 5 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isObserver) {
+		if(!mainGame->dInfo.is_tag && mainGame->dInfo.turn == 5 && !mainGame->dInfo.isReplay && mainGame->dInfo.player_type < 7) {
 			mainGame->btnLeaveGame->setText(dataManager.GetSysString(1351));
 			mainGame->btnLeaveGame->setVisible(true);
 		}
@@ -2578,21 +2588,21 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		int topcode = BufferIO::ReadInt32(pbuf);
 		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
 			if(player == 0) (*cit)->dPos.Y = 0.4f;
-			else (*cit)->dPos.Y = -0.4f;
+			else (*cit)->dPos.Y = -0.6f;
 			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 			(*cit)->is_moving = true;
 			(*cit)->aniFrame = 5;
 		}
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
 			if(player == 0) (*cit)->dPos.Y = 0.4f;
-			else (*cit)->dPos.Y = -0.4f;
+			else (*cit)->dPos.Y = -0.6f;
 			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 			(*cit)->is_moving = true;
 			(*cit)->aniFrame = 5;
 		}
 		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 			if(player == 0) (*cit)->dPos.Y = 0.4f;
-			else (*cit)->dPos.Y = -0.4f;
+			else (*cit)->dPos.Y = -0.6f;
 			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
 			(*cit)->is_moving = true;
 			(*cit)->aniFrame = 5;
@@ -2601,47 +2611,47 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		//
 		mainGame->gMutex.Lock();
 		if(mainGame->dField.deck[player].size() > mcount) {
-			for(int i = 0; i < mainGame->dField.deck[player].size() - mcount; ++i) {
+			while(mainGame->dField.deck[player].size() > mcount) {
 				ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
 				mainGame->dField.deck[player].pop_back();
 				delete ccard;
 			}
 		} else {
-			for(int i = 0; i < mcount - mainGame->dField.deck[player].size(); ++i) {
+			while(mainGame->dField.deck[player].size() < mcount) {
 				ClientCard* ccard = new ClientCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_DECK;
-				ccard->sequence = mainGame->dField.deck[player].size() - 1;
+				ccard->sequence = mainGame->dField.deck[player].size();
 				mainGame->dField.deck[player].push_back(ccard);
 			}
 		}
 		if(mainGame->dField.hand[player].size() > hcount) {
-			for(int i = 0; i < mainGame->dField.hand[player].size() - hcount; ++i) {
+			while(mainGame->dField.hand[player].size() > hcount) {
 				ClientCard* ccard = *mainGame->dField.hand[player].rbegin();
 				mainGame->dField.hand[player].pop_back();
 				delete ccard;
 			}
 		} else {
-			for(int i = 0; i < hcount - mainGame->dField.hand[player].size(); ++i) {
+			while(mainGame->dField.hand[player].size() < hcount) {
 				ClientCard* ccard = new ClientCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_HAND;
-				ccard->sequence = mainGame->dField.hand[player].size() - 1;
+				ccard->sequence = mainGame->dField.hand[player].size();
 				mainGame->dField.hand[player].push_back(ccard);
 			}
 		}
 		if(mainGame->dField.extra[player].size() > ecount) {
-			for(int i = 0; i < mainGame->dField.extra[player].size() - ecount; ++i) {
+			while(mainGame->dField.extra[player].size() > ecount) {
 				ClientCard* ccard = *mainGame->dField.extra[player].rbegin();
 				mainGame->dField.extra[player].pop_back();
 				delete ccard;
 			}
 		} else {
-			for(int i = 0; i < ecount - mainGame->dField.extra[player].size(); ++i) {
+			while(mainGame->dField.extra[player].size() < ecount) {
 				ClientCard* ccard = new ClientCard();
 				ccard->controler = player;
 				ccard->location = LOCATION_EXTRA;
-				ccard->sequence = mainGame->dField.extra[player].size() - 1;
+				ccard->sequence = mainGame->dField.extra[player].size();
 				mainGame->dField.extra[player].push_back(ccard);
 			}
 		}
@@ -2651,7 +2661,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			ClientCard* pcard = *cit;
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 			if(player == 0) pcard->curPos.Y += 2.0f;
-			else pcard->curPos.Y -= 2.0f;
+			else pcard->curPos.Y -= 3.0f;
 			mainGame->dField.MoveCard(*cit, 5);
 		}
 		if(mainGame->dField.deck[player].size())
@@ -2660,15 +2670,15 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 			ClientCard* pcard = *cit;
 			pcard->code = BufferIO::ReadInt32(pbuf);
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y +=2.0f;
-			else pcard->curPos.Y -= 2.0f;
+			if(player == 0) pcard->curPos.Y += 2.0f;
+			else pcard->curPos.Y -= 3.0f;
 			mainGame->dField.MoveCard(*cit, 5);
 		}
 		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 			ClientCard* pcard = *cit;
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 			if(player == 0) pcard->curPos.Y += 2.0f;
-			else pcard->curPos.Y -= 2.0f;
+			else pcard->curPos.Y -= 3.0f;
 			mainGame->dField.MoveCard(*cit, 5);
 		}
 		mainGame->WaitFrameSignal(5);

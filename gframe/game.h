@@ -29,7 +29,6 @@ struct Config {
 struct DuelInfo {
 	bool isStarted;
 	bool isReplay;
-	bool isObserver;
 	bool isFirst;
 	bool is_shuffling;
 	bool is_tag;
@@ -44,6 +43,7 @@ struct DuelInfo {
 	wchar_t strLP[2][16];
 	wchar_t strTurn[8];
 	wchar_t* vic_string;
+	unsigned char player_type;
 	unsigned char time_player;
 	unsigned short time_limit;
 	unsigned short time_left[2];

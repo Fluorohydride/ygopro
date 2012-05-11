@@ -315,7 +315,7 @@ void Game::DrawMisc() {
 			lpcFont->draw(lpcstring, recti(400, 162, 922, 210), lpccolor, true, false, 0);
 		}
 	}
-	if(!dInfo.isReplay && !dInfo.isObserver && dInfo.time_limit) {
+	if(!dInfo.isReplay && dInfo.player_type < 7 && dInfo.time_limit) {
 		driver->draw2DRectangle(recti(525, 34, 525 + dInfo.time_left[0] * 100 / dInfo.time_limit, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
 		driver->draw2DRectangleOutline(recti(525, 34, 625, 44), 0xffffffff);
 		driver->draw2DRectangle(recti(795 - dInfo.time_left[1] * 100 / dInfo.time_limit, 34, 795, 44), 0xa0e0e0e0, 0xa0e0e0e0, 0xa0c0c0c0, 0xa0c0c0c0);
@@ -343,7 +343,7 @@ void Game::DrawMisc() {
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn), recti(635, 5, 687, 40), 0x8000ffff, true, false, 0);
 	for(int i = 0; i < 5; ++i) {
 		ClientCard* pcard = dField.mzone[0][i];
-		if(pcard) {
+		if(pcard && pcard->code != 0) {
 			int m = 483 + i * 90;
 			adFont->draw(L"/", recti(m - 4, 396, m + 4, 416), 0xff000000, true, false, 0);
 			adFont->draw(L"/", recti(m - 3, 397, m + 5, 417), 0xffffffff, true, false, 0);
