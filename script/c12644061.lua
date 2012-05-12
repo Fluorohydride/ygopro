@@ -67,5 +67,6 @@ function c12644061.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c12644061.damop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.ChangeBattleDamage(tp,0)
 end

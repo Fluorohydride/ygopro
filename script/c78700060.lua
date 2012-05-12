@@ -21,7 +21,7 @@ function c78700060.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c78700060.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
+	return re:IsActiveType(TYPE_MONSTER)
 end
 function c78700060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleaseable() end
@@ -37,8 +37,7 @@ end
 function c78700060.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetCurrentChain()~=ev+1 then return	end
-	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(re) then
+	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

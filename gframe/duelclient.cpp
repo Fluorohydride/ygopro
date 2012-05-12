@@ -369,8 +369,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		if(!mainGame->dInfo.is_tag) {
 			selftype = pkt->type & 0xf;
 			is_host = (pkt->type >> 4) & 0xf;
-			mainGame->btnHostPrepKick[2]->setVisible(true);
-			mainGame->btnHostPrepKick[3]->setVisible(true);
+			mainGame->btnHostPrepKick[2]->setVisible(false);
+			mainGame->btnHostPrepKick[3]->setVisible(false);
 			if(is_host) {
 				mainGame->btnHostPrepStart->setVisible(true);
 				mainGame->btnHostPrepKick[0]->setVisible(true);
@@ -2676,6 +2676,7 @@ int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
 		}
 		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
 			ClientCard* pcard = *cit;
+			pcard->code = 0;
 			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 			if(player == 0) pcard->curPos.Y += 2.0f;
 			else pcard->curPos.Y -= 3.0f;

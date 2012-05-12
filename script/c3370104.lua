@@ -29,8 +29,8 @@ function c3370104.initial_effect(c)
 end
 function c3370104.distg(e,c)
 	if c:GetCardTargetCount()~=1 then return false end
-	local tc=c:GetCardTarget():GetFirst()
-	return tc:IsControler(e:GetHandler():GetControler()) and tc:IsRace(RACE_MACHINE)
+	local tc=c:GetFirstCardTarget()
+	return tc:IsControler(e:GetHandlerPlayer()) and tc:IsRace(RACE_MACHINE)
 end
 function c3370104.disop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsActiveType(TYPE_MONSTER) then return end

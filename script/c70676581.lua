@@ -25,7 +25,7 @@ function c70676581.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_SELF_DESTROY)
-	e4:SetRange(LOCATION_SZONE)
+	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_SZONE,LOCATION_SZONE)
 	e4:SetTarget(c70676581.distg)
 	c:RegisterEffect(e4)
@@ -42,19 +42,18 @@ function c70676581.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c70676581.distg(e,c)
-	if c:GetCardTargetCount()==0 then return false end
-	local tc=c:GetCardTarget():GetFirst()
-	return tc:IsControler(e:GetHandlerPlayer()) and tc:IsAttribute(ATTRIBUTE_DARK)
+	if c:GetCardTargetCount()==0 or not c:IsType(TYPE_SPELL) then return false end
+	return c:GetCardTarget():IsExists(c70676581.disfilter,1,nil,e:GetHandlerPlayer())
 end
 function c70676581.disfilter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsAttribute(ATTRIBUTE_DARK)
+	return c:IsControler(tp) and c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c70676581.disop(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsActiveType(TYPE_SPELL) then return end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()==0 then return end
-	if g:IsExists(c70676581.disfilter,1,nil) then
+	if g:IsExists(c70676581.disfilter,1,nil,tp) then
 		Duel.NegateEffect(ev)
 		if re:GetHandler():IsRelateToEffect(re) then
 			Duel.Destroy(re:GetHandler(),REASON_EFFECT)

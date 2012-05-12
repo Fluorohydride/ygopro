@@ -2687,14 +2687,14 @@ int32 scriptlib::duel_is_chain_negatable(lua_State * L) {
 	check_param_count(L, 1);
 	int32 chaincount = lua_tointeger(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushboolean(L, pduel->game_field->is_chain_negatable(chaincount));
+	lua_pushboolean(L, pduel->game_field->is_chain_negatable(chaincount, TRUE));
 	return 1;
 }
 int32 scriptlib::duel_is_chain_disablable(lua_State * L) {
 	check_param_count(L, 1);
 	int32 chaincount = lua_tointeger(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushboolean(L, pduel->game_field->is_chain_disablable(chaincount));
+	lua_pushboolean(L, pduel->game_field->is_chain_disablable(chaincount, TRUE));
 	return 1;
 }
 int32 scriptlib::duel_check_chain_target(lua_State *L) {

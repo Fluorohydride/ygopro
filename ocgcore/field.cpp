@@ -1689,7 +1689,7 @@ int32 field::is_player_can_remove(uint8 playerid, card * pcard) {
 	}
 	return TRUE;
 }
-int32 field::is_chain_negatable(uint8 chaincount) {
+int32 field::is_chain_negatable(uint8 chaincount, uint8 naga_check) {
 	effect_set eset;
 	if(chaincount < 0 && chaincount > core.current_chain.size())
 		return FALSE;
@@ -1698,6 +1698,8 @@ int32 field::is_chain_negatable(uint8 chaincount) {
 		peffect = core.current_chain.back().triggering_effect;
 	else
 		peffect = core.current_chain[chaincount - 1].triggering_effect;
+	if(naga_check && peffect->flag & EFFECT_FLAG_NAGA)
+		return FALSE;
 	if(peffect->flag & EFFECT_FLAG_CANNOT_DISABLE)
 		return FALSE;
 	filter_field_effect(EFFECT_CANNOT_INACTIVATE, &eset);
@@ -1708,7 +1710,7 @@ int32 field::is_chain_negatable(uint8 chaincount) {
 	}
 	return TRUE;
 }
-int32 field::is_chain_disablable(uint8 chaincount) {
+int32 field::is_chain_disablable(uint8 chaincount, uint8 naga_check) {
 	effect_set eset;
 	if(chaincount < 0 && chaincount > core.current_chain.size())
 		return FALSE;
@@ -1717,6 +1719,8 @@ int32 field::is_chain_disablable(uint8 chaincount) {
 		peffect = core.current_chain.back().triggering_effect;
 	else
 		peffect = core.current_chain[chaincount - 1].triggering_effect;
+	if(naga_check && peffect->flag & EFFECT_FLAG_NAGA)
+		return FALSE;
 	if(peffect->flag & EFFECT_FLAG_CANNOT_DISABLE)
 		return FALSE;
 	filter_field_effect(EFFECT_CANNOT_DISEFFECT, &eset);

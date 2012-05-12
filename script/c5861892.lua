@@ -102,7 +102,6 @@ function c5861892.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or not g:IsContains(c) then return false end
 	return c:GetFlagEffectLabel(36690018)==0 and (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
-		and Duel.IsChainNegatable(ev)
 end
 function c5861892.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -116,15 +115,16 @@ function c5861892.negop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsFaceup() or c:GetAttack()<1000 or not c:IsRelateToEffect(e) or Duel.GetCurrentChain()~=ev+1 then
 		return
 	end
-	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(re:GetHandler(),REASON_EFFECT)
+	if Duel.NegateActivation(ev) then
+		if re:GetHandler():IsRelateToEffect(re) then
+			Duel.Destroy(re:GetHandler(),REASON_EFFECT)
+		end
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
+		e1:SetReset(RESET_EVENT+0x1ff0000)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(-1000)
+		c:RegisterEffect(e1)
 	end
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
-	e1:SetReset(RESET_EVENT+0x1ff0000)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(-1000)
-	c:RegisterEffect(e1)
 end
