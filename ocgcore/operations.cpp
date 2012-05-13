@@ -1550,7 +1550,6 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		} else
 			target->summon_type = SUMMON_TYPE_NORMAL;
 		target->summon_player = setplayer;
-		break_effect();
 		target->current.reason_effect = 0;
 		target->current.reason_player = setplayer;
 		core.units.begin()->step = 4;
@@ -1567,6 +1566,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 	}
 	case 5: {
 		core.temp_var[0] = 0;
+		break_effect();
 		if(!ignore_count) {
 			returns.ivalue[0] = FALSE;
 			effect* pextra = core.extra_summon[setplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
