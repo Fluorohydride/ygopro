@@ -631,8 +631,8 @@ void card::xyz_add(card* mat, card_set* des) {
 	xyz_materials.push_back(mat);
 	for(auto cit = mat->equiping_cards.begin(); cit != mat->equiping_cards.end();) {
 		auto rm = cit++;
-		(*rm)->unequip();
 		des->insert(*rm);
+		(*rm)->unequip();
 	}
 	mat->overlay_target = this;
 	mat->current.controler = PLAYER_NONE;

@@ -17,9 +17,9 @@ function c48216773.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c48216773.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local dg1=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_MZONE,0,1,1nil)
+	local dg1=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
-	local dg2=Duel.SelectMatchingCard(1-tp,Card.IsAbleToDeck,1-tp,LOCATION_MZONE,0,1,1nil)
+	local dg2=Duel.SelectMatchingCard(1-tp,Card.IsAbleToDeck,1-tp,LOCATION_MZONE,0,1,1,nil)
 	dg1:Merge(dg2)
 	Duel.SendtoDeck(dg1,nil,2,REASON_EFFECT)
 end
