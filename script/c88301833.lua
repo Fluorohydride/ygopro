@@ -20,16 +20,16 @@ end
 function c88301833.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetCount()==1 and eg:GetFirst():GetSummonType()==SUMMON_TYPE_RITUAL
 end
-function c88301833.thfilter(c)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsAbleToHand()
+function c88301833.thfilter(c,tp)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp) and c:IsAbleToHand()
 end
 function c88301833.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=eg:GetFirst()
-	local mat=tc:GetMaterial()
+	local mat=tc:GetMaterial()i
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and mat:IsContains(chkc) end
-	if chk==0 then return mat:IsExists(c88301833.thfilter,1,nil) end
+	if chk==0 then return mat:IsExists(c88301833.thfilter,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=mat:FilterSelect(tp,c88301833.thfilter,1,1,nil)
+	local g=mat:FilterSelect(tp,c88301833.thfilter,1,1,nil,tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
