@@ -60,6 +60,8 @@ int32 scriptlib::effect_reset(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	if(peffect->owner == 0)
+		return 0;
 	if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
 		peffect->pduel->game_field->remove_effect(peffect);
 	else
@@ -476,5 +478,13 @@ int32 scriptlib::effect_is_has_type(lua_State *L) {
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
+	return 1;
+}
+int32 scriptlib::effect_is_activatable(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	uint32 playerid = lua_tointeger(L, 2);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	lua_pushboolean(L, peffect->is_activateable(playerid, peffect->pduel->game_field->nil_event));
 	return 1;
 }

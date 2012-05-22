@@ -1450,15 +1450,31 @@ int32 scriptlib::card_remove_counter(lua_State *L) {
 	uint32 countertype = lua_tointeger(L, 3);
 	uint32 count = lua_tointeger(L, 4);
 	uint32 reason = lua_tointeger(L, 5);
-	pcard->pduel->game_field->remove_counter(reason, pcard, rplayer, 0, 0, countertype, count);
-	return lua_yield(L, 0);
+	if(countertype == 0) {
+		for(auto cmit = pcard->counters.begin(); cmit != pcard->counters.end(); ++cmit) {
+			pcard->pduel->write_buffer8(MSG_REMOVE_COUNTER);
+			pcard->pduel->write_buffer16(cmit->first);
+			pcard->pduel->write_buffer8(pcard->current.controler);
+			pcard->pduel->write_buffer8(pcard->current.location);
+			pcard->pduel->write_buffer8(pcard->current.sequence);
+			pcard->pduel->write_buffer8(cmit->second);
+		}
+		pcard->counters.clear();
+		return 0;
+	} else {
+		pcard->pduel->game_field->remove_counter(reason, pcard, rplayer, 0, 0, countertype, count);
+		return lua_yield(L, 0);
+	}
 }
 int32 scriptlib::card_get_counter(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 countertype = lua_tointeger(L, 2);
-	lua_pushinteger(L, pcard->get_counter(countertype));
+	if(countertype == 0)
+		lua_pushinteger(L, pcard->counters.size());
+	else
+		lua_pushinteger(L, pcard->get_counter(countertype));
 	return 1;
 }
 int32 scriptlib::card_enable_counter_permit(lua_State *L) {

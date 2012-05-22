@@ -229,6 +229,7 @@ public:
 	static int32 effect_is_has_property(lua_State *L);
 	static int32 effect_is_has_category(lua_State *L);
 	static int32 effect_is_has_type(lua_State *L);
+	static int32 effect_is_activatable(lua_State *L);
 
 	//Group functions
 	static int32 group_new(lua_State *L);

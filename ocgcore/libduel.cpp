@@ -1157,7 +1157,7 @@ int32 scriptlib::duel_get_location_count(lua_State *L) {
 	if(lua_gettop(L) > 2)
 		uplayer = lua_tointeger(L, 3);
 	if(lua_gettop(L) > 3)
-		uplayer = lua_tointeger(L, 4);
+		reason = lua_tointeger(L, 4);
 	lua_pushinteger(L, pduel->game_field->get_useable_count(playerid, location, uplayer, reason));
 	return 1;
 }

@@ -130,8 +130,6 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 				if((code < 1134 || code > 1136) && pduel->game_field->infos.phase == PHASE_DAMAGE_CAL && !(flag & EFFECT_FLAG_DAMAGE_CAL))
 					return FALSE;
 			}
-			if(handler->current.location != LOCATION_SZONE && handler->current.location != LOCATION_HAND)
-				return FALSE;
 			if(handler->current.location == LOCATION_HAND) {
 				if((handler->data.type & TYPE_TRAP) && !handler->is_affected_by_effect(EFFECT_TRAP_ACT_IN_HAND))
 					return FALSE;
@@ -139,7 +137,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 					return FALSE;
 				if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(handler->current.controler, LOCATION_SZONE, handler->current.controler, LOCATION_REASON_TOFIELD) <= 0)
 					return FALSE;
-			} else {
+			} else if(handler->current.location == LOCATION_SZONE) {
 				if(handler->is_position(POS_FACEUP))
 					return FALSE;
 				if(handler->get_status(STATUS_SET_TURN)) {

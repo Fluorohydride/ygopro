@@ -1548,9 +1548,14 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		return FALSE;
 	}
 	case 16: {
-		core.new_fchain.clear();
-		core.new_ochain.clear();
+		if(core.new_fchain.size() || core.new_ochain.size()) {
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+			core.units.begin()->step = 0;
+			return FALSE;
+		}
 		core.quick_f_chain.clear();
+		core.instant_event.clear();
+		core.point_event.clear();
 		return TRUE;
 	}
 	}

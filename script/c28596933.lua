@@ -10,7 +10,7 @@ function c28596933.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c28596933.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:GetLevel()>=5 and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:IsLevelAbove(5) and c:IsAbleToHand()
 end
 function c28596933.dfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
@@ -26,8 +26,7 @@ function c28596933.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c28596933.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 then
 		local sg=Duel.GetMatchingGroup(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 		Duel.Destroy(sg,REASON_EFFECT)
 	end

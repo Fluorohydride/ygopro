@@ -788,9 +788,9 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 		return FALSE;
 	}
 	case 2: {
-		raise_single_event(pcard, 0, EVENT_CONTROL_CHANGED, reason_effect, 0, reason_player, playerid, 0);
+		raise_single_event(pcard, 0, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, playerid, 0);
 		process_single_event();
-		raise_event(pcard, EVENT_CONTROL_CHANGED, reason_effect, 0, reason_player, playerid, 0);
+		raise_event(pcard, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, playerid, 0);
 		process_instant_event();
 		return FALSE;
 	}
@@ -845,13 +845,13 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 		pduel->write_buffer8(pcard1->current.location);
 		pduel->write_buffer8(pcard1->current.sequence);
 		pduel->write_buffer8(pcard1->current.position);
-		raise_single_event(pcard1, 0, EVENT_CONTROL_CHANGED, reason_effect, 0, reason_player, pcard1->current.controler, 0);
-		raise_single_event(pcard2, 0, EVENT_CONTROL_CHANGED, reason_effect, 0, reason_player, pcard2->current.controler, 0);
+		raise_single_event(pcard1, 0, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, pcard1->current.controler, 0);
+		raise_single_event(pcard2, 0, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, pcard2->current.controler, 0);
 		process_single_event();
 		card_set cset;
 		cset.insert(pcard1);
 		cset.insert(pcard2);
-		raise_event(&cset, EVENT_CONTROL_CHANGED, reason_effect, 0, reason_player, 0, 0);
+		raise_event(&cset, EVENT_CONTROL_CHANGED, reason_effect, REASON_EFFECT, reason_player, 0, 0);
 		process_instant_event();
 		return FALSE;
 	}

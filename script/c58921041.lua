@@ -9,16 +9,15 @@ function c58921041.initial_effect(c)
 	--cannot activate
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_TRIGGER)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(LOCATION_HAND+LOCATION_SZONE, LOCATION_HAND+LOCATION_SZONE)
-	e2:SetTarget(c58921041.targets)
+	e2:SetTargetRange(0,1)
+	e2:SetValue(c58921041.aclimit)
 	c:RegisterEffect(e2)
 end
-function c58921041.targets(e,c)
-	if not c:IsType(TYPE_SPELL) then return false end
-	if c:IsLocation(LOCATION_HAND) then return true end
-	if c:IsFaceup() then return false end
-	return Duel.GetTurnCount()-c:GetTurnID()<2
+function c58921041.aclimit(e,re,tp)
+	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) or not re:IsActiveType(TYPE_SPELL) then return false end
+	local c=re:GetHandler()
+	return not c:IsLocation(LOCATION_SZONE) or Duel.GetTurnCount()-c:GetTurnID()<2
 end
