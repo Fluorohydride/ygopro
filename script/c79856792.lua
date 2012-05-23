@@ -8,14 +8,12 @@ function c79856792.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c79856792.spcon)
-	e1:SetOperation(c79856792.spop)
 	c:RegisterEffect(e1)
 	--cannot special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e2:SetValue(aux.FALSE)
 	c:RegisterEffect(e2)
 	--atkup
 	local e3=Effect.CreateEffect(c)
@@ -41,6 +39,13 @@ function c79856792.initial_effect(c)
 	e4:SetTarget(c79856792.tdtg)
 	e4:SetOperation(c79856792.tdop)
 	c:RegisterEffect(e4)
+	--
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetOperation(c79856792.spop)
+	c:RegisterEffect(e5)
 end
 function c79856792.spfilter(c)
 	return c:IsSetCard(0x34) and (not c:IsOnField() or c:IsFaceup())
@@ -52,8 +57,8 @@ function c79856792.spcon(e,c)
 	local ct=g:GetClassCount(Card.GetCode)
 	return ct>6
 end
-function c79856792.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	c:RegisterFlagEffect(79856792,RESET_EVENT+0xfc0000+RESET_PHASE+PHASE_END,0,1)
+function c79856792.spop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(79856792,RESET_EVENT+0xfc0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c79856792.atcon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(79856792)~=0 then return false end

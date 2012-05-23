@@ -8,5 +8,5 @@ function c92084010.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c92084010.condition(e,c)
-	return c:IsAttribute(ATTRIBUTE_DARK)
+	return c:IsAttribute(ATTRIBUTE_WATER)
 end

@@ -15,9 +15,9 @@ function c45662855.initial_effect(c)
 	e1:SetOperation(c45662855.operation)
 	c:RegisterEffect(e1)
 end
-function c45662855.costfilter(c)
+function c45662855.costfilter(c,tp)
 	return c:IsSetCard(0x47) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
-		and Duel.IsExistingTarget(c45662855.tgfilter,tp,LOCATION_GRAVE,0,1,c,e,tp)
+		and Duel.IsExistingTarget(c45662855.tgfilter,tp,LOCATION_GRAVE,0,1,c)
 end
 function c45662855.tgfilter(c)
 	return c:IsSetCard(0x1047) and c:IsAbleToHand()
@@ -31,14 +31,14 @@ function c45662855.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
-			return Duel.IsExistingMatchingCard(c45662855.costfilter,tp,LOCATION_GRAVE,0,1,nil)
+			return Duel.IsExistingMatchingCard(c45662855.costfilter,tp,LOCATION_GRAVE,0,1,nil,tp)
 		else
 			return Duel.IsExistingTarget(c45662855.tgfilter,tp,LOCATION_GRAVE,0,1,nil)
 		end
 	end
 	if e:GetLabel()==1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-		local cg=Duel.SelectMatchingCard(tp,c45662855.costfilter,tp,LOCATION_GRAVE,0,1,1,nil)
+		local cg=Duel.SelectMatchingCard(tp,c45662855.costfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp)
 		Duel.Remove(cg,POS_FACEUP,REASON_COST)
 		e:SetLabel(0)
 	end
