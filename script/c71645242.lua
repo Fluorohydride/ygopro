@@ -6,6 +6,8 @@ function c71645242.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	--token
+	local g=Group.CreateGroup()
+	g:KeepAlive()
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(71645242,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
@@ -15,9 +17,11 @@ function c71645242.initial_effect(c)
 	e2:SetCondition(c71645242.spcon)
 	e2:SetTarget(c71645242.sptg)
 	e2:SetOperation(c71645242.spop)
+	e2:SetLabelObject(g)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetLabelObject(g)
 	c:RegisterEffect(e3)
 	--special summon
 	local e4=Effect.CreateEffect(c)
@@ -31,17 +35,21 @@ function c71645242.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c71645242.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst():GetSummonType()~=SUMMON_TYPE_SPECIAL+0x20
+	if eg:GetFirst():GetSummonType()~=SUMMON_TYPE_SPECIAL+0x20 then
+		e:GetLabelObject():Clear()
+		e:GetLabelObject():Merge(eg)
+		return true
+	else return false end
 end
 function c71645242.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) end
-	Duel.SetTargetCard(eg)
+	Duel.SetTargetCard(e:GetLabelObject())
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function c71645242.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=eg:Filter(Card.IsRelateToEffect,nil,e)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local tc=g:GetFirst()
 	if not tc then return end
 	local s0=false

@@ -10,6 +10,12 @@ function c51987571.initial_effect(c)
 	e1:SetTarget(c51987571.target)
 	e1:SetOperation(c51987571.operation)
 	c:RegisterEffect(e1)
+	--
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e2:SetValue(1)
+	c:RegisterEffect(e2)
 end
 function c51987571.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsLocation(LOCATION_GRAVE)

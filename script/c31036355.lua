@@ -10,10 +10,8 @@ function c31036355.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c31036355.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		return Duel.IsExistingMatchingCard(Card.IsAbleToChangeControler,tp,LOCATION_MZONE,0,1,nil)
-			and Duel.IsExistingMatchingCard(Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,1,nil)
-	end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToChangeControler,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(Card.IsAbleToChangeControler,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,0,0,0)
 end
 function c31036355.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -27,7 +25,7 @@ function c31036355.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g2=Duel.SelectMatchingCard(1-tp,Card.IsAbleToChangeControler,1-tp,LOCATION_MZONE,0,1,1,nil)
 	local c1=g1:GetFirst()
 	local c2=g2:GetFirst()
-	if Duel.SwapControl(c1,c2,RESET_PHASE+PHASE_END,0) then
+	if Duel.SwapControl(c1,c2,0,0) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)

@@ -10,18 +10,20 @@ function c69042950.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c69042950.mfilter(c,clv)
-	local lv=c:GetLevel()
-	return lv>0 and c:IsFaceup() and (not clv or lv==clv)
+	return c:IsFaceup() and c:GetLevel()==clv
+end
+function c69042950.mfilter2(c)
+	return c:IsFaceup() and c:IsLevelBelow(4)
 end
 function c69042950.spfilter(c,e,tp)
 	local lv=c:GetLevel()
-	return lv<=4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsExistingMatchingCard(c69042950.mfilter,tp,LOCATION_MZONE,0,1,nil)
+	return lv>0 and lv<=4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and Duel.IsExistingMatchingCard(c69042950.mfilter,tp,LOCATION_MZONE,0,1,nil,lv)
 end
 function c69042950.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c69042950.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
-		and Duel.IsExistingMatchingCard(c69042950.mfilter,tp,0,LOCATION_MZONE,1,nil) end
+		and Duel.IsExistingMatchingCard(c69042950.mfilter2,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c69042950.activate(e,tp,eg,ep,ev,re,r,rp)

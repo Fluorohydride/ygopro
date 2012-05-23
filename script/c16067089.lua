@@ -12,7 +12,7 @@ function c16067089.initial_effect(c)
 end
 function c16067089.cfilter(c,tp)
 	return c:IsCode(72677437) and c:GetPreviousControler()==tp
-		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP_ATTACK)
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c16067089.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c16067089.cfilter,1,nil,tp)

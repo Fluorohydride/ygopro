@@ -2416,6 +2416,9 @@ int32 field::process_battle_command(uint16 step) {
 		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
 			core.units.begin()->step = 39;
 			core.units.begin()->arg1 = 2;
+			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
+				core.units.begin()->arg2 = 1;
+			else core.units.begin()->arg2 = 0;
 			if(!peffect->value)
 				add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
 			else {
@@ -2527,6 +2530,9 @@ int32 field::process_battle_command(uint16 step) {
 		} else {
 			core.units.begin()->step = 39;
 			core.units.begin()->arg1 = ctype;
+			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
+				core.units.begin()->arg2 = 1;
+			else core.units.begin()->arg2 = 0;
 			add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
 			adjust_all();
 			return FALSE;
@@ -3407,6 +3413,7 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 40: {
 		returns.ivalue[0] = core.units.begin()->arg1;
+		returns.ivalue[1] = core.units.begin()->arg2;
 		return TRUE;
 	}
 	}
@@ -3657,6 +3664,23 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 12: {
+		if(core.units.begin()->arg2 == 0 && returns.ivalue[1]) {
+			core.units.begin()->arg2 = 1;
+			core.units.begin()->step = 8;
+			for(uint8 p = 0; p < 2; ++p) {
+				for(uint8 i = 0; i < 5; ++i) {
+					card* pcard = player[p].list_mzone[i];
+					if(!pcard)
+						continue;
+					pcard->announce_count = 0;
+					pcard->attacked_count = 0;
+					pcard->announced_cards.clear();
+					pcard->attacked_cards.clear();
+					pcard->battled_cards.clear();
+				}
+			}
+			return FALSE;
+		}
 		if(returns.ivalue[0] == 3) { // End Phase
 			core.units.begin()->step = 14;
 			return FALSE;

@@ -10,6 +10,7 @@ function c99342953.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_DESTROY)
+	e2:SetCondition(c99342953.ctcon)
 	e2:SetOperation(c99342953.ctop)
 	c:RegisterEffect(e2)
 	--special summon
@@ -27,11 +28,13 @@ function c99342953.initial_effect(c)
 end
 function c99342953.ctfilter(c)
 	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsSetCard(0xc)
+		and (not c:IsReason(REASON_BATTLE) or bit.band(c:GetBattlePosition(),POS_FACEUP)~=0)
+end
+function c99342953.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c99342953.ctfilter,1,nil)
 end
 function c99342953.ctop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(c99342953.ctfilter,1,nil) then
-		e:GetHandler():AddCounter(0xe,1)
-	end
+	e:GetHandler():AddCounter(0xe,1)
 end
 function c99342953.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,1,0xe,2,REASON_COST) end
