@@ -975,6 +975,14 @@ int32 field::process() {
 		}
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_MOVETOFIELD_S: {
+		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2)) {
+			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
+			core.units.pop_front();
+		} else
+			core.units.begin()->step++;
+		return pduel->bufferlen;
+	}
 	}
 	return pduel->bufferlen;
 }
@@ -2706,6 +2714,11 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		effect* peffect;
 		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+			core.units.begin()->step = 39;
+			core.units.begin()->arg1 = 2;
+			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
+				core.units.begin()->arg2 = 1;
+			else core.units.begin()->arg2 = 0;
 			reset_phase(PHASE_DAMAGE);
 			if(core.attacker->fieldid_r == afid) {
 				if(!atk_disabled) {
@@ -2717,8 +2730,6 @@ int32 field::process_battle_command(uint16 step) {
 				core.attacker->attacked_count++;
 				core.attacker->announce_count++;
 			}
-			core.units.begin()->step = 39;
-			core.units.begin()->arg1 = 2;
 			if(!peffect->value)
 				add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
 			else {
@@ -2880,6 +2891,7 @@ int32 field::process_battle_command(uint16 step) {
 		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
+			core.selfdes_disabled = FALSE;
 			core.units.begin()->step = 30;
 			return FALSE;
 		}
@@ -2954,6 +2966,7 @@ int32 field::process_battle_command(uint16 step) {
 		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
+			core.selfdes_disabled = FALSE;
 			core.units.begin()->step = 30;
 			return FALSE;
 		}
@@ -2984,6 +2997,7 @@ int32 field::process_battle_command(uint16 step) {
 		        || (core.attack_target && (core.attack_target->current.location != LOCATION_MZONE || core.attack_target->fieldid_r != core.pre_field[1]))) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
+			core.selfdes_disabled = FALSE;
 			core.units.begin()->step = 30;
 			return FALSE;
 		}

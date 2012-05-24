@@ -2807,14 +2807,16 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 	uint32 positions = (target->operation_param) & 0xff;
 	switch(step) {
 	case 0: {
-		if(ret && !(target->current.reason & REASON_TEMPORARY))
+		returns.ivalue[0] = FALSE;
+		if(ret && (!(target->current.reason & REASON_TEMPORARY) || (target->current.reason_effect->owner != core.reason_effect->owner)))
 			return TRUE;
 		if(!(location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))) {
 			uint32 flag;
 			uint32 ct = get_useable_count(playerid, location, move_player, LOCATION_REASON_TOFIELD, &flag);
 			if(ret && (ct <= 0 || !(target->data.type & TYPE_MONSTER))) {
+				core.units.begin()->step = 3;
 				send_to(target, core.reason_effect, REASON_EFFECT, core.reason_player, PLAYER_NONE, LOCATION_GRAVE, 0, 0);
-				return TRUE;
+				return FALSE;
 			}
 			if(!ct)
 				return TRUE;
@@ -2921,6 +2923,14 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		if(enable || ret)
 			target->enable_field_effect(TRUE);
 		adjust_instant();
+		return FALSE;
+	}
+	case 3: {
+		returns.ivalue[0] = TRUE;
+		return TRUE;
+	}
+	case 4: {
+		returns.ivalue[0] = FALSE;
 		return TRUE;
 	}
 	}

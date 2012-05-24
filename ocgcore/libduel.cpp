@@ -511,6 +511,7 @@ int32 scriptlib::duel_move_to_field(lua_State *L) {
 	pcard->enable_field_effect(FALSE);
 	pduel->game_field->adjust_instant();
 	pduel->game_field->move_to_field(pcard, move_player, playerid, destination, positions, enable);
+	pduel->game_field->core.subunits.begin()->type = PROCESSOR_MOVETOFIELD_S;
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_return_to_field(lua_State *L) {
@@ -528,6 +529,7 @@ int32 scriptlib::duel_return_to_field(lua_State *L) {
 	pduel->game_field->adjust_instant();
 	pduel->game_field->move_to_field(pcard, pcard->previous.controler, pcard->previous.controler,
 	                                 pcard->previous.location, pos, TRUE, TRUE);
+	pduel->game_field->core.subunits.begin()->type = PROCESSOR_MOVETOFIELD_S;
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_move_sequence(lua_State *L) {

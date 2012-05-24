@@ -43,7 +43,7 @@ end
 function c85668449.lrcon(e,tp,eg,ep,ev,re,r,rp)
 	if tp~=ep then return false end
 	local lp=Duel.GetLP(ep)
-	if lp<ev then return false end
+	if lp<=ev then return false end
 	local rc=re:GetHandler()
 	return rc:IsRace(RACE_PSYCHO)
 end

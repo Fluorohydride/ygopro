@@ -27,14 +27,11 @@ function c78663366.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetOperation(c78663366.retop)
 		Duel.RegisterEffect(e1,tp)
-		c:RegisterFlagEffect(78663366,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,1)
 	end
 end
 function c78663366.retop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetFlagEffect(78663366)==0 then return end
-	Duel.ReturnToField(tc)
-	if tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() then
+	if Duel.ReturnToField(tc) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)

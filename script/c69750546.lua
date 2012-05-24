@@ -23,10 +23,7 @@ function c69750546.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c69750546.condition(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsReason(REASON_RETURN) then return false end
-	if not re then return true end
-	local code=re:GetHandler():GetCode()
-	return code~=69537999 and code~=21420702
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c69750546.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -1,5 +1,6 @@
 --ネジマキシキガミ
 function c45458027.initial_effect(c)
+	c:EnableReviveLimit()
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -22,9 +23,10 @@ function c45458027.initial_effect(c)
 end
 function c45458027.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,1,nil,RACE_MACHINE)
-		and not Duel.IsExistingMatchingCard(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,1,nil,0xffffffff-RACE_MACHINE)
+	local tp=c:GetControler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
+	return g:GetCount()>0 and g:FilterCount(Card.IsRace,nil,0xffffffff-RACE_MACHINE)==0
 end
 function c45458027.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsLocation(LOCATION_MZONE) end
