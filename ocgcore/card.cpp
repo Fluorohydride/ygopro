@@ -233,7 +233,7 @@ int32 card::is_set_card(uint32 set_code) {
 	return FALSE;
 }
 uint32 card::get_type() {
-	if(!(current.location & 0x1c))
+	if(!(current.location & 0x1e))
 		return data.type;
 	if (temp.type != 0xffffffff)
 		return temp.type;

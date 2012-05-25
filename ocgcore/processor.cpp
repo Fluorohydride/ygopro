@@ -4291,6 +4291,10 @@ int32 field::refresh_location_info(uint16 step) {
 		int32 count2 = get_useable_count(p, loc, PLAYER_NONE, 0, &flag);
 		if(count1 > count2)
 			count1 = count2;
+		if(count1 == 0) {
+			core.units.begin()->step = 4;
+			return FALSE;
+		}
 		core.units.begin()->arg1 = count1;
 		if(loc == LOCATION_SZONE)
 			flag = ((flag << 8) & 0xff00) | 0xffff00ff;
@@ -4313,7 +4317,7 @@ int32 field::refresh_location_info(uint16 step) {
 			player[peffect->get_handler_player()].disabled_location |= selflag;
 		else
 			player[peffect->get_handler_player()].disabled_location |= selflag << 8;
-		peffect->value = ((int32)peffect->value & 0xffff) | (selflag << 16);
+		peffect->value = ((int32)peffect->value) | (selflag << 16);
 		core.units.begin()->step = 2;
 		return FALSE;
 	}
@@ -4338,6 +4342,10 @@ int32 field::refresh_location_info(uint16 step) {
 		int32 count2 = get_useable_count(p, loc, PLAYER_NONE, 0, &flag);
 		if(count1 > count2)
 			count1 = count2;
+		if(count1 == 0) {
+			core.units.begin()->step = 6;
+			return FALSE;
+		}
 		core.units.begin()->arg1 = count1;
 		if(loc == LOCATION_SZONE)
 			flag = ((flag << 8) & 0xff00) | 0xffff00ff;
@@ -4360,7 +4368,7 @@ int32 field::refresh_location_info(uint16 step) {
 			player[peffect->get_handler_player()].disabled_location |= selflag;
 		else
 			player[peffect->get_handler_player()].disabled_location |= selflag << 8;
-		peffect->value = ((int32)peffect->value & 0xffff) | (selflag << 16);
+		peffect->value = ((int32)peffect->value) | (selflag << 16);
 		core.units.begin()->step = 4;
 		return FALSE;
 	}

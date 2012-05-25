@@ -8,7 +8,7 @@ function c93542102.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c93542102.cona)
-	e1:SetTarget(c93542102.tg)
+	e1:SetTarget(c93542102.tga)
 	e1:SetOperation(c93542102.opa)
 	c:RegisterEffect(e1)
 	--confirm
@@ -18,7 +18,7 @@ function c93542102.initial_effect(c)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c93542102.cond)
-	e2:SetTarget(c93542102.tg)
+	e2:SetTarget(c93542102.tgd)
 	e2:SetOperation(c93542102.opd)
 	c:RegisterEffect(e2)
 end
@@ -31,9 +31,14 @@ end
 function c93542102.cfilter(c)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x26) and c:IsType(TYPE_MONSTER)
 end
-function c93542102.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c93542102.tga(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 		and Duel.IsExistingMatchingCard(c93542102.cfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
+end
+function c93542102.tgd(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	Duel.SetOperationInfo(0,CATEGORY_DICE,nil,0,tp,1)
 end
 function c93542102.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x26) and c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)

@@ -296,6 +296,8 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 fo
 }
 int32 field::select_place(uint16 step, uint8 playerid, uint32 flag, uint8 count) {
 	if(step == 0) {
+		if(count == 0)
+			return TRUE;
 		if(core.units.begin()->type == PROCESSOR_SELECT_PLACE)
 			pduel->write_buffer8(MSG_SELECT_PLACE);
 		else
