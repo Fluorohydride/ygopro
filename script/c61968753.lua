@@ -42,7 +42,7 @@ function c61968753.posop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()==2 then
 		Duel.ChangePosition(g,POS_FACEUP_DEFENCE)
 		local tc=e:GetLabelObject()
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and not tc:IsImmuneToEffect(e) and tc:IsReleaseable() then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and not tc:IsImmuneToEffect(e) and tc:IsReleasable() then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg=Duel.SelectMatchingCard(tp,c61968753.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 			Duel.Release(tc,REASON_EFFECT)

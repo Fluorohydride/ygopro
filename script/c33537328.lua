@@ -63,9 +63,9 @@ end
 function c33537328.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsReason(REASON_BATTLE) and c:GetBattlePosition()~=POS_FACEUP_DEFENCE
-		and Duel.CheckReleaseGroup(tp,nil,1,c) end
+		and Duel.CheckReleaseGroup(tp,Card.IsReleasableByEffect,1,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(33537328,0)) then
-		local g=Duel.SelectReleaseGroup(tp,nil,1,1,c)
+		local g=Duel.SelectReleaseGroup(tp,Card.IsReleasableByEffect,1,1,c)
 		Duel.Release(g,REASON_EFFECT)
 		Duel.SetLP(1-tp,Duel.GetLP(1-tp)/2)
 		return true

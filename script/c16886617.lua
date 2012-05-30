@@ -43,7 +43,7 @@ function c16886617.exfilter(c,fid)
 	return c:IsFaceup() and c:GetCode()==16886617 and (fid==nil or c:GetFieldID()<fid)
 end
 function c16886617.rfilter(c)
-	return c:IsFaceup() and c:GetAttack()==0 and c:IsReleaseable()
+	return c:IsFaceup() and c:GetAttack()==0 and c:IsReleasable()
 end
 function c16886617.spcon(e,c)
 	if c==nil then return not Duel.IsExistingMatchingCard(c16886617.exfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end

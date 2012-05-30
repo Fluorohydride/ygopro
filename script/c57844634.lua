@@ -13,7 +13,7 @@ function c57844634.initial_effect(c)
 	--
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_UNRELEASEABLE_SUM)
+	e2:SetCode(EFFECT_UNRELEASABLE_SUM)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(1)

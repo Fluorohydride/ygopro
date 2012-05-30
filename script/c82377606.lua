@@ -13,7 +13,7 @@ function c82377606.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c82377606.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c82377606.filter(c)

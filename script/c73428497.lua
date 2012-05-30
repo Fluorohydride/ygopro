@@ -26,7 +26,7 @@ function c73428497.atkval(e,c)
 	return Duel.GetMatchingGroupCount(c73428497.atkfilter,c:GetControler(),LOCATION_MZONE,0,nil)*200
 end
 function c73428497.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c73428497.filter(c,e,tp)

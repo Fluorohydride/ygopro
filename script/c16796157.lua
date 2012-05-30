@@ -12,7 +12,7 @@ function c16796157.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c16796157.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c16796157.filter(c)

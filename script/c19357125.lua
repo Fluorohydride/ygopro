@@ -30,7 +30,7 @@ function c19357125.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsDisabled() and Duel.IsExistingMatchingCard(Card.IsAttribute,tp,LOCATION_GRAVE,0,5,nil,ATTRIBUTE_DARK)
 end
 function c19357125.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c19357125.filter(c)

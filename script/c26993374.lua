@@ -21,7 +21,7 @@ function c26993374.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return t:GetLocation()==LOCATION_GRAVE and t:IsType(TYPE_MONSTER)
 end
 function c26993374.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c26993374.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)

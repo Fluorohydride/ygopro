@@ -13,7 +13,7 @@ function c98446407.initial_effect(c)
 end
 function c98446407.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReleaseable() and Duel.CheckReleaseGroup(tp,nil,1,c) end
+	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroup(tp,nil,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 	local rg=Duel.SelectReleaseGroup(tp,nil,1,1,c)
 	rg:AddCard(c)

@@ -27,7 +27,7 @@ function c46363422.acop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c46363422.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetCounter(0x3001)==3 and e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():GetCounter(0x3001)==3 and e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c46363422.filter(c,e,tp)

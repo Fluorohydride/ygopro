@@ -75,7 +75,7 @@ function c72709014.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c72709014.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ec=e:GetHandler():GetEquipTarget()
-	if chk==0 then return ec:IsReleaseable() end
+	if chk==0 then return ec:IsReleasable() end
 	e:SetLabel(ec:GetCode())
 	Duel.Release(ec,REASON_COST)
 end

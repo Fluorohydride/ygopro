@@ -38,7 +38,7 @@ function c19605133.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c19605133.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c19605133.filter(c)

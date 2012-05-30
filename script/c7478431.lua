@@ -20,7 +20,7 @@ function c7478431.discon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c7478431.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReleaseable() and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,c,0x2a) end
+	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,c,0x2a) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,c,0x2a)
 	g:AddCard(c)
 	Duel.Release(g,REASON_COST)

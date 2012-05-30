@@ -1740,7 +1740,7 @@ int32 card::is_removeable_as_cost(uint8 playerid) {
 		return FALSE;
 	return TRUE;
 }
-int32 card::is_releaseable_by_summon(uint8 playerid, card *pcard) {
+int32 card::is_releasable_by_summon(uint8 playerid, card *pcard) {
 	if(is_status(STATUS_SUMMONING))
 		return FALSE;
 	if(overlay_target)
@@ -1749,13 +1749,13 @@ int32 card::is_releaseable_by_summon(uint8 playerid, card *pcard) {
 		return FALSE;
 	if(!pduel->game_field->is_player_can_release(playerid, this))
 		return FALSE;
-	if(is_affected_by_effect(EFFECT_UNRELEASEABLE_SUM, pcard))
+	if(is_affected_by_effect(EFFECT_UNRELEASABLE_SUM, pcard))
 		return FALSE;
 	if(pcard->is_affected_by_effect(EFFECT_TRIBUTE_LIMIT, this))
 		return FALSE;
 	return TRUE;
 }
-int32 card::is_releaseable_by_nonsummon(uint8 playerid) {
+int32 card::is_releasable_by_nonsummon(uint8 playerid) {
 	if(is_status(STATUS_SUMMONING))
 		return FALSE;
 	if(overlay_target)
@@ -1766,8 +1766,22 @@ int32 card::is_releaseable_by_nonsummon(uint8 playerid) {
 		return FALSE;
 	if(!pduel->game_field->is_player_can_release(playerid, this))
 		return FALSE;
-	if(is_affected_by_effect(EFFECT_UNRELEASEABLE_NONSUM))
+	if(is_affected_by_effect(EFFECT_UNRELEASABLE_NONSUM))
 		return FALSE;
+	return TRUE;
+}
+int32 card::is_releasable_by_effect(uint8 playerid, effect* peffect) {
+	if(!peffect)
+		return TRUE;
+	effect_set eset;
+	filter_effect(EFFECT_UNRELEASABLE_EFFECT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		pduel->lua->add_param(this, PARAM_TYPE_CARD);
+		if(eset[i]->check_value_condition(3))
+			return FALSE;
+	}
 	return TRUE;
 }
 int32 card::is_capable_send_to_grave(uint8 playerid) {

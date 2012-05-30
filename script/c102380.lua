@@ -37,11 +37,11 @@ end
 function c102380.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-2
-		and Duel.IsExistingMatchingCard(Card.IsReleaseable,c:GetControler(),0,LOCATION_MZONE,2,nil)
+		and Duel.IsExistingMatchingCard(Card.IsReleasable,c:GetControler(),0,LOCATION_MZONE,2,nil)
 end
 function c102380.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsReleaseable,tp,0,LOCATION_MZONE,2,2,nil)
+	local g=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,0,LOCATION_MZONE,2,2,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c102380.damcon(e,tp,eg,ep,ev,re,r,rp)

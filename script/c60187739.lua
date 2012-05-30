@@ -51,7 +51,7 @@ function c60187739.filter(c)
 	return c:IsFaceup() and c:GetBattledGroupCount()~=0
 end
 function c60187739.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c60187739.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

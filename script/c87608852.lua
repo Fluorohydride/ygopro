@@ -64,7 +64,7 @@ function c87608852.clear(e,tp,eg,ep,ev,re,r,rp)
 	c87608852[3]=0
 end
 function c87608852.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c87608852[tp] and c87608852[tp+2]>0 and e:GetHandler():IsReleaseable() end
+	if chk==0 then return c87608852[tp] and c87608852[tp+2]>0 and e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())

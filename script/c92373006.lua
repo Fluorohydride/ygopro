@@ -31,7 +31,7 @@ function c92373006.sprcon(e,c)
 end
 function c92373006.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReleaseable() end
+	if chk==0 then return c:IsReleasable() end
 	Duel.Release(c,REASON_COST)
 end
 function c92373006.tgfilter(c)

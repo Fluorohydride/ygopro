@@ -20,7 +20,7 @@ function c95231062.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c95231062.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c95231062.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c95231062.desfilter(c)

@@ -42,10 +42,10 @@ function c32907538.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCondition(c32907538.rcon)
 		tc:RegisterEffect(e1,true)
 		local e2=e1:Clone()
-		e2:SetCode(EFFECT_UNRELEASEABLE_SUM)
+		e2:SetCode(EFFECT_UNRELEASABLE_SUM)
 		tc:RegisterEffect(e2,true)
 		local e3=e1:Clone()
-		e3:SetCode(EFFECT_UNRELEASEABLE_NONSUM)
+		e3:SetCode(EFFECT_UNRELEASABLE_NONSUM)
 		tc:RegisterEffect(e3,true)
 	end
 end

@@ -50,7 +50,7 @@ function c91607976.cond2(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsDisabled() and e:GetHandler():IsDefencePos()
 end
 function c91607976.costd2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	e:SetLabel(e:GetHandler():GetCounter(0x8)*1000)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end

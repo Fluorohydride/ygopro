@@ -1148,12 +1148,24 @@ int32 scriptlib::card_is_able_to_remove_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
-int32 scriptlib::card_is_releaseable(lua_State *L) {
+int32 scriptlib::card_is_releasable(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 p = pcard->pduel->game_field->core.reason_player;
-	if(pcard->is_releaseable_by_nonsummon(p))
+	if(pcard->is_releasable_by_nonsummon(p))
+		lua_pushboolean(L, 1);
+	else
+		lua_pushboolean(L, 0);
+	return 1;
+}
+int32 scriptlib::card_is_releasable_by_effect(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	uint32 p = pcard->pduel->game_field->core.reason_player;
+	effect* re = pcard->pduel->game_field->core.reason_effect;
+	if(pcard->is_releasable_by_effect(p, re))
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);

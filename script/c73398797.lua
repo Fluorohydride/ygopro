@@ -62,7 +62,7 @@ function c73398797.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c73398797.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c73398797[tp] and e:GetHandler():IsReleaseable()end
+	if chk==0 then return c73398797[tp] and e:GetHandler():IsReleasable()end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)

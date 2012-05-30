@@ -2288,9 +2288,9 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 			auto rm = cit++;
 			card* pcard = *rm;
 			if (pcard->is_status(STATUS_SUMMONING)
-			        || ((reason & REASON_SUMMON) && !pcard->is_releaseable_by_summon(reason_player, pcard->current.reason_card))
+			        || ((reason & REASON_SUMMON) && !pcard->is_releasable_by_summon(reason_player, pcard->current.reason_card))
 			        || (!(pcard->current.reason & (REASON_RULE | REASON_SUMMON | REASON_COST))
-			            && (!pcard->is_affect_by_effect(pcard->current.reason_effect) || !pcard->is_releaseable_by_nonsummon(reason_player)))) {
+			            && (!pcard->is_affect_by_effect(pcard->current.reason_effect) || !pcard->is_releasable_by_nonsummon(reason_player)))) {
 				pcard->current.reason = pcard->temp.reason;
 				pcard->current.reason_effect = pcard->temp.reason_effect;
 				pcard->current.reason_player = pcard->temp.reason_player;
@@ -2847,10 +2847,14 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			seq = 5;
 		if(!ret) {
 			if(location != target->current.location) {
+				uint32 resetflag = 0;
 				if(location & LOCATION_ONFIELD)
-					target->reset(RESET_TOFIELD, RESET_EVENT);
+					resetflag |= RESET_TOFIELD;
 				if(target->current.location & LOCATION_ONFIELD)
-					target->reset(RESET_LEAVE, RESET_EVENT);
+					resetflag |= RESET_LEAVE;
+				if((location & LOCATION_ONFIELD) && (target->current.location & LOCATION_ONFIELD))
+					resetflag |= RESET_MSCHANGE;
+				target->reset(resetflag, RESET_EVENT);
 			}
 			if(!(target->current.location & LOCATION_ONFIELD))
 				target->relate_effect.clear();

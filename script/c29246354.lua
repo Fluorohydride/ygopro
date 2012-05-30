@@ -16,7 +16,7 @@ function c29246354.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetEnvironment()==42015635
 end
 function c29246354.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c29246354.spfilter(c,e,tp)

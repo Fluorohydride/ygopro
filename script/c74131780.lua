@@ -13,7 +13,7 @@ function c74131780.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c74131780.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c74131780.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

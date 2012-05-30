@@ -43,7 +43,7 @@ function c50088247.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:GetLevel()>=5
 end
 function c50088247.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c50088247.filter(c,e,tp)

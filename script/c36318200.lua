@@ -17,7 +17,7 @@ function c36318200.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return g:GetCount()>0 and not g:IsExists(Card.IsRace,1,nil,0xffffffff-RACE_BEAST)
 end
 function c36318200.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c36318200.filter(c,e,tp)

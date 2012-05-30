@@ -44,7 +44,7 @@ function c92001300.addc(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x300b,1)
 end
 function c92001300.sumcon(e,c)
-	if c==nil then return e:GetHandler():IsReleaseable() end
+	if c==nil then return e:GetHandler():IsReleasable() end
 	local mi,ma=c:GetTributeRequirement()
 	return ma>0 and e:GetHandler():GetCounter(0x300b)>=mi and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end

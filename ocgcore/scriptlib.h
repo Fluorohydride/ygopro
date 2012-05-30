@@ -138,7 +138,8 @@ public:
 	static int32 card_is_able_to_deck_as_cost(lua_State *L);
 	static int32 card_is_able_to_extra_as_cost(lua_State *L);
 	static int32 card_is_able_to_remove_as_cost(lua_State *L);
-	static int32 card_is_releaseable(lua_State *L);
+	static int32 card_is_releasable(lua_State *L);
+	static int32 card_is_releasable_by_effect(lua_State *L);
 	static int32 card_is_discardable(lua_State *L);
 	static int32 card_is_attackable(lua_State *L);
 	static int32 card_is_chain_attackable(lua_State *L);

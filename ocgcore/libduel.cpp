@@ -1944,7 +1944,7 @@ int32 scriptlib::duel_get_ritual_material(lua_State *L) {
 		return 0;
 	duel* pduel = interpreter::get_duel_info(L);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->get_ritual_material(playerid, &pgroup->container);
+	pduel->game_field->get_ritual_material(playerid, pduel->game_field->core.reason_effect, &pgroup->container);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }

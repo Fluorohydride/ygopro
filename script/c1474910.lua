@@ -14,7 +14,7 @@ function c1474910.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_INSECT) and not c:IsCode(1474910)
 end
 function c1474910.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleaseable() and Duel.CheckReleaseGroup(tp,c1474910.cfilter,1,nil) end
+	if chk==0 then return e:GetHandler():IsReleasable() and Duel.CheckReleaseGroup(tp,c1474910.cfilter,1,nil) end
 	local g=Duel.SelectReleaseGroup(tp,c1474910.cfilter,1,1,nil)
 	g:AddCard(e:GetHandler())
 	Duel.Release(g,REASON_COST)

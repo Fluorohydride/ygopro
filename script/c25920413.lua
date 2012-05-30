@@ -29,7 +29,7 @@ function c25920413.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c25920413.spfilter(c)
-	return c:IsLevelBelow(3) and c:IsFaceup() and c:IsReleaseable()
+	return c:IsLevelBelow(3) and c:IsFaceup() and c:IsReleasable()
 end
 function c25920413.spcon(e,c)
 	if c==nil then return true end

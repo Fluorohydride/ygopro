@@ -313,7 +313,7 @@ void field::set_control(card* pcard, uint8 playerid, uint8 reset_phase, uint8 re
 	peffect->code = EFFECT_SET_CONTROL;
 	peffect->value = playerid;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
-	peffect->reset_flag = RESET_EVENT | 0xec0000;
+	peffect->reset_flag = RESET_EVENT | 0xc6c0000;
 	if(reset_count) {
 		peffect->reset_flag |= RESET_PHASE | reset_phase;
 		if(!(peffect->reset_flag & (RESET_SELF_TURN | RESET_OPPO_TURN)))
@@ -1010,7 +1010,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	uint32 rcount = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
-		if(pcard && pcard != exp && pcard->is_releaseable_by_nonsummon(playerid)
+		if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 		        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 			if(release_list)
 				release_list->insert(pcard);
@@ -1021,7 +1021,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	if(use_hand) {
 		for(int i = 0; i < player[playerid].list_hand.size(); ++i) {
 			pcard = player[playerid].list_hand[i];
-			if(pcard && pcard != exp && pcard->is_releaseable_by_nonsummon(playerid)
+			if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 			        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 				if(release_list)
 					release_list->insert(pcard);
@@ -1033,7 +1033,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard != exp && (pcard->is_position(POS_FACEUP) || !use_con) && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)
-		        && pcard->is_releaseable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
+		        && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 			if(ex_list)
 				ex_list->insert(pcard);
 			pcard->operation_param = 1;
@@ -1046,7 +1046,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 	card* pcard;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
-		if(pcard && pcard != exp && pcard->is_releaseable_by_nonsummon(playerid)
+		if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 		        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 			count--;
 			if(count == 0)
@@ -1056,7 +1056,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 	if(use_hand) {
 		for(int i = 0; i < player[playerid].list_hand.size(); ++i) {
 			pcard = player[playerid].list_hand[i];
-			if(pcard && pcard != exp && pcard->is_releaseable_by_nonsummon(playerid)
+			if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 			        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 				count--;
 				if(count == 0)
@@ -1067,7 +1067,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard != exp && (!use_con || pcard->is_position(POS_FACEUP)) && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)
-		        && pcard->is_releaseable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
+		        && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
 			count--;
 			if(count == 0)
 				return TRUE;
@@ -1081,7 +1081,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	uint32 rcount = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[p].list_mzone[i];
-		if(pcard && pcard->is_releaseable_by_summon(p, target)) {
+		if(pcard && pcard->is_releasable_by_summon(p, target)) {
 			if(release_list)
 				release_list->insert(pcard);
 			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
@@ -1093,7 +1093,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - p].list_mzone[i];
-		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_summon(p, target)) {
+		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releasable_by_summon(p, target)) {
 			if(ex_list)
 				ex_list->insert(pcard);
 			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
@@ -1124,22 +1124,23 @@ int32 field::get_draw_count(uint8 playerid) {
 		count = eset.get_last()->get_value();
 	return count;
 }
-void field::get_ritual_material(uint8 playerid, card_set* material) {
+void field::get_ritual_material(uint8 playerid, effect* peffect, card_set* material) {
 	card* pcard;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
 		if(pcard && pcard->get_level() && pcard->is_affect_by_effect(core.reason_effect)
-		        && pcard->is_releaseable_by_nonsummon(playerid))
+		        && pcard->is_releasable_by_nonsummon(playerid) && pcard->is_releasable_by_effect(playerid, peffect))
 			material->insert(pcard);
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard->get_level() && pcard->is_affect_by_effect(core.reason_effect)
-		        && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releaseable_by_nonsummon(playerid))
+		        && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)
+		        && pcard->is_releasable_by_nonsummon(playerid) && pcard->is_releasable_by_effect(playerid, peffect))
 			material->insert(pcard);
 	}
 	for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
-		if(((*cit)->data.type & TYPE_MONSTER) && (*cit)->is_releaseable_by_nonsummon(playerid))
+		if(((*cit)->data.type & TYPE_MONSTER) && (*cit)->is_releasable_by_nonsummon(playerid))
 			material->insert((*cit));
 	for(auto cit = player[playerid].list_grave.begin(); cit != player[playerid].list_grave.end(); ++cit)
 		if(((*cit)->data.type & TYPE_MONSTER) && (*cit)->is_affected_by_effect(EFFECT_EXTRA_RITUAL_MATERIAL) && (*cit)->is_removeable(playerid))
