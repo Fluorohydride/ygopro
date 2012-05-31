@@ -861,11 +861,13 @@ int32 scriptlib::card_create_effect_relation(lua_State *L) {
 	pcard->create_relation(peffect);
 	return 0;
 }
-int32 scriptlib::card_clear_effect_relation(lua_State *L) {
-	check_param_count(L, 1);
+int32 scriptlib::card_release_effect_relation(lua_State *L) {
+	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
+	check_param(L, PARAM_TYPE_EFFECT, 2);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	pcard->relate_effect.clear();
+	effect* peffect = *(effect**) lua_touserdata(L, 2);
+	pcard->relate_effect.erase(peffect);
 	return 0;
 }
 int32 scriptlib::card_is_relate_to_effect(lua_State *L) {
@@ -1717,7 +1719,15 @@ int32 scriptlib::card_cancel_to_grave(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
+	bool cancel = true;
+	if(lua_gettop(L) > 1)
+		cancel = lua_toboolean(L, 2);
+	if(cancel)
+		pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
+	else {
+		pcard->pduel->game_field->core.leave_confirmed.insert(pcard);
+		pcard->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
+	}
 	return 0;
 }
 int32 scriptlib::card_get_tribute_requirement(lua_State *L) {

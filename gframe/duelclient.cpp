@@ -361,6 +361,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		else if (mainGame->wLanWindow->isVisible())
 			mainGame->HideElement(mainGame->wLanWindow);
 		mainGame->ShowElement(mainGame->wHostPrepare);
+		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
 		break;
 	}
@@ -542,18 +543,23 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			BufferIO::CopyWStr(pkt->msg, msg, 256);
 			msg[(len - 3) / 2] = 0;
 			mainGame->gMutex.Lock();
-			if(!mainGame->dInfo.is_tag)
-				mainGame->AddChatMsg(msg, mainGame->LocalPlayer(pkt->player));
-			else {
-				if(mainGame->dInfo.isFirst) {
+			if(!mainGame->dInfo.is_tag) {
+				if(mainGame->dInfo.isStarted)
+					mainGame->AddChatMsg(msg, mainGame->LocalPlayer(pkt->player));
+				else
+					mainGame->AddChatMsg(msg, pkt->player);
+			} else {
+				if(mainGame->dInfo.isFirst || !mainGame->dInfo.isStarted) {
 					if(pkt->player == 0)
 						mainGame->AddChatMsg(msg, 0);
 					else if(pkt->player == 1)
 						mainGame->AddChatMsg(msg, 2);
 					else if(pkt->player == 2)
 						mainGame->AddChatMsg(msg, 1);
-					else
+					else if(pkt->player == 3)
 						mainGame->AddChatMsg(msg, 3);
+					else
+						mainGame->AddChatMsg(msg, 10);
 				} else {
 					if(pkt->player == 0)
 						mainGame->AddChatMsg(msg, 1);
@@ -561,8 +567,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 						mainGame->AddChatMsg(msg, 3);
 					else if(pkt->player == 2)
 						mainGame->AddChatMsg(msg, 0);
-					else
+					else if(pkt->player == 3)
 						mainGame->AddChatMsg(msg, 2);
+					else
+						mainGame->AddChatMsg(msg, 10);
 				}
 			}
 			mainGame->gMutex.Unlock();
@@ -591,6 +599,21 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			break;
 		wchar_t name[20];
 		BufferIO::CopyWStr(pkt->name, name, 20);
+		if(mainGame->dInfo.is_tag) {
+			if(pkt->pos == 0)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.hostname, 20);
+			else if(pkt->pos == 1)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.hostname_tag, 20);
+			else if(pkt->pos == 2)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.clientname, 20);
+			else if(pkt->pos == 3)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.clientname_tag, 20);
+		} else {
+			if(pkt->pos == 0)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.hostname, 20);
+			else if(pkt->pos == 1)
+				BufferIO::CopyWStr(pkt->name, mainGame->dInfo.clientname, 20);
+		}
 		mainGame->gMutex.Lock();
 		mainGame->stHostPrepDuelist[pkt->pos]->setText(name);
 		mainGame->gMutex.Unlock();
@@ -604,9 +627,18 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			break;
 		mainGame->gMutex.Lock();
 		if(state < 8) {
-			mainGame->stHostPrepDuelist[state]->setText(mainGame->stHostPrepDuelist[pos]->getText());
+			wchar_t* prename = (wchar_t*)mainGame->stHostPrepDuelist[pos]->getText();
+			mainGame->stHostPrepDuelist[state]->setText(prename);
 			mainGame->stHostPrepDuelist[pos]->setText(L"");
 			mainGame->chkHostPrepReady[pos]->setChecked(false);
+			if(pos == 0)
+				BufferIO::CopyWStr(prename, mainGame->dInfo.hostname, 20);
+			else if(pos == 1)
+				BufferIO::CopyWStr(prename, mainGame->dInfo.hostname_tag, 20);
+			else if(pos == 2)
+				BufferIO::CopyWStr(prename, mainGame->dInfo.clientname, 20);
+			else if(pos == 3)
+				BufferIO::CopyWStr(prename, mainGame->dInfo.clientname_tag, 20);
 		} else if(state == PLAYERCHANGE_READY) {
 			mainGame->chkHostPrepReady[pos]->setChecked(true);
 		} else if(state == PLAYERCHANGE_NOTREADY) {
@@ -637,7 +669,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	}
 }
-int DuelClient::ClientAnalyze(char* msg, unsigned int len) {
+int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	char* pbuf = msg;
 	wchar_t textBuffer[256];
 	mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
@@ -2692,7 +2724,7 @@ void DuelClient::SetResponseI(int respI) {
 	*((int*)response_buf) = respI;
 	response_len = 4;
 }
-void DuelClient::SetResponseB(unsigned char* respB, unsigned char len) {
+void DuelClient::SetResponseB(unsigned char * respB, unsigned char len) {
 	memcpy(response_buf, respB, len);
 	response_len = len;
 }
@@ -2793,7 +2825,7 @@ void DuelClient::BeginRefreshHost() {
 		closesocket(sSend);
 	}
 }
-int DuelClient::RefreshThread(void* arg) {
+int DuelClient::RefreshThread(void * arg) {
 	event_base* broadev = (event_base*)arg;
 	event_base_dispatch(broadev);
 	evutil_socket_t fd;
@@ -2804,7 +2836,7 @@ int DuelClient::RefreshThread(void* arg) {
 	is_refreshing = false;
 	return 0;
 }
-void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void* arg) {
+void DuelClient::BroadcastReply(evutil_socket_t fd, short events, void * arg) {
 	if(events & EV_TIMEOUT) {
 		evutil_closesocket(fd);
 		event_base_loopbreak((event_base*)arg);

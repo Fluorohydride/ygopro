@@ -774,12 +774,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				const wchar_t* input = mainGame->ebChatInput->getText();
 				if(input[0]) {
 					unsigned short msgbuf[256];
-					if(mainGame->dInfo.player_type < 7) {
-						if(mainGame->dInfo.is_tag && (mainGame->dInfo.player_type % 2))
-							mainGame->AddChatMsg((wchar_t*)input, 2);
-						else
-							mainGame->AddChatMsg((wchar_t*)input, 0);
-					} else mainGame->AddChatMsg((wchar_t*)input, 10);
+					if(mainGame->dInfo.isStarted) {
+						if(mainGame->dInfo.player_type < 7) {
+							if(mainGame->dInfo.is_tag && (mainGame->dInfo.player_type % 2))
+								mainGame->AddChatMsg((wchar_t*)input, 2);
+							else
+								mainGame->AddChatMsg((wchar_t*)input, 0);
+						} else
+							mainGame->AddChatMsg((wchar_t*)input, 10);
+					} else
+						mainGame->AddChatMsg((wchar_t*)input, 7);
 					int len = BufferIO::CopyWStr(input, msgbuf, 256);
 					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
 					mainGame->ebChatInput->setText(L"");

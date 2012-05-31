@@ -112,7 +112,7 @@ public:
 	static int32 card_create_relation(lua_State *L);
 	static int32 card_release_relation(lua_State *L);
 	static int32 card_create_effect_relation(lua_State *L);
-	static int32 card_clear_effect_relation(lua_State *L);
+	static int32 card_release_effect_relation(lua_State *L);
 	static int32 card_is_relate_to_effect(lua_State *L);
 	static int32 card_is_relate_to_card(lua_State *L);
 	static int32 card_is_relate_to_battle(lua_State *L);

@@ -776,7 +776,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatType[i] = chatType[i - 1];
 	}
 	chatMsg[0].clear();
-	chatTiming[0] = 600;
+	chatTiming[0] = 1200;
 	chatType[0] = player;
 	switch(player) {
 	case 0: //from host
@@ -795,6 +795,10 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(dInfo.clientname_tag);
 		chatMsg[0].append(L": ");
 		break;
+	case 7: //local name
+		chatMsg[0].append(mainGame->ebNickName->getText());
+		chatMsg[0].append(L": ");
+		break;
 	case 8: //system custom message, no prefix.
 		chatMsg[0].append(L"[System]: ");
 		break;
@@ -804,7 +808,6 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	default: //from watcher or unknown
 		chatMsg[0].append(L"[---]: ");
 	}
-
 	chatMsg[0].append(msg);
 }
 void Game::ClearTextures() {

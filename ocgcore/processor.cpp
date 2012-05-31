@@ -4126,8 +4126,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 13: {
+		raise_event((card*)0, EVENT_CHAIN_END, 0, 0, 0, 0, 0);
 		if(!skip_new) {
-			raise_event((card*)0, EVENT_CHAIN_END, 0, 0, 0, 0, 0);
 			process_instant_event();
 			core.hint_timing[0] |= TIMING_CHAIN_END;
 			core.hint_timing[1] |= TIMING_CHAIN_END;

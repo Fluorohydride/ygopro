@@ -113,6 +113,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->HideElement(mainGame->wHostPrepare);
 				mainGame->ShowElement(mainGame->wLanWindow);
+				mainGame->wChat->setVisible(false);
 				if(exit_on_return)
 					mainGame->device->closeDevice();
 				break;
@@ -264,6 +265,33 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				} else {
 					DuelClient::SendPacketToServer(CTOS_HS_NOTREADY);
 					mainGame->cbDeckSelect->setEnabled(true);
+				}
+				break;
+			}
+			}
+			break;
+		}
+		case irr::gui::EGET_EDITBOX_ENTER: {
+			switch(id) {
+			case EDITBOX_CHAT: {
+				if(mainGame->dInfo.isReplay)
+					break;
+				const wchar_t* input = mainGame->ebChatInput->getText();
+				if(input[0]) {
+					unsigned short msgbuf[256];
+					if(mainGame->dInfo.isStarted) {
+						if(mainGame->dInfo.player_type < 7) {
+							if(mainGame->dInfo.is_tag && (mainGame->dInfo.player_type % 2))
+								mainGame->AddChatMsg((wchar_t*)input, 2);
+							else
+								mainGame->AddChatMsg((wchar_t*)input, 0);
+						} else
+							mainGame->AddChatMsg((wchar_t*)input, 10);
+					} else
+						mainGame->AddChatMsg((wchar_t*)input, 7);
+					int len = BufferIO::CopyWStr(input, msgbuf, 256);
+					DuelClient::SendBufferToServer(CTOS_CHAT, msgbuf, (len + 1) * sizeof(short));
+					mainGame->ebChatInput->setText(L"");
 				}
 				break;
 			}

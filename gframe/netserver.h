@@ -21,7 +21,7 @@ private:
 	static char net_server_read[0x2000];
 	static char net_server_write[0x2000];
 	static unsigned short last_sent;
-	
+
 public:
 	static bool StartServer(unsigned short port);
 	static bool StartBroadcast();
@@ -41,6 +41,8 @@ public:
 		BufferIO::WriteInt16(p, 1);
 		BufferIO::WriteInt8(p, proto);
 		last_sent = 3;
+		if(!dp)
+			return;
 		bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	template<typename ST>
@@ -50,7 +52,8 @@ public:
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, &st, sizeof(ST));
 		last_sent = sizeof(ST) + 3;
-		bufferevent_write(dp->bev, net_server_write, last_sent);
+		if(dp)
+			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	static void SendBufferToPlayer(DuelPlayer* dp, unsigned char proto, void* buffer, size_t len) {
 		char* p = net_server_write;
@@ -58,10 +61,12 @@ public:
 		BufferIO::WriteInt8(p, proto);
 		memcpy(p, buffer, len);
 		last_sent = len + 3;
-		bufferevent_write(dp->bev, net_server_write, last_sent);
+		if(dp)
+			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 	static void ReSendToPlayer(DuelPlayer* dp) {
-		bufferevent_write(dp->bev, net_server_write, last_sent);
+		if(dp)
+			bufferevent_write(dp->bev, net_server_write, last_sent);
 	}
 };
 

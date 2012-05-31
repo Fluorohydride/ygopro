@@ -411,16 +411,6 @@ void Game::DrawMisc() {
 		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(386, 320, 443, 340), 0xff000000, true, false, 0);
 		numFont->draw(dataManager.GetNumString(dField.remove[1].size()), recti(386, 321, 445, 341), 0xffffff00, true, false, 0);
 	}
-	for(int i = 0; i < 5; ++i) {
-		static unsigned int chatColor[10] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040};
-		if(chatTiming[i]) {
-			chatTiming[i]--;
-			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
-			driver->draw2DRectangle(recti(305, 596 - 20 * i, 307 + w, 616 - 20 * i), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
-			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
-			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i, 1021, 616 - 20 * i), chatColor[chatType[i]], false, false);
-		}
-	}
 }
 void Game::DrawGUI() {
 	if(imageLoading.size()) {
@@ -669,6 +659,16 @@ void Game::DrawSpec() {
 		attack_sv += 4;
 		if (attack_sv > 28)
 			attack_sv = 0;
+	}
+	for(int i = 0; i < 5; ++i) {
+		static unsigned int chatColor[10] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040};
+		if(chatTiming[i]) {
+			chatTiming[i]--;
+			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
+			driver->draw2DRectangle(recti(305, 596 - 20 * i, 307 + w, 616 - 20 * i), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i, 1021, 616 - 20 * i), chatColor[chatType[i]], false, false);
+		}
 	}
 }
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
