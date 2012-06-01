@@ -23,7 +23,8 @@ function c44790889.ntcon(e,c)
 		and Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_ONFIELD,nil)>0
 end
 function c44790889.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_ONFIELD,0,1,nil,TYPE_SPELL+TYPE_TRAP)
+	return Duel.GetAttackTarget()~=nil
+		and not Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_ONFIELD,0,1,nil,TYPE_SPELL+TYPE_TRAP)
 end
 function c44790889.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

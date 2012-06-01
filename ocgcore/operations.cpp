@@ -1039,6 +1039,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 		cset.insert(equip_card);
 		raise_single_event(target, &cset, EVENT_EQUIP, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
 		raise_event(&cset, EVENT_EQUIP, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
+		core.hint_timing[target->current.controler] |= TIMING_EQUIP;
 		process_single_event();
 		process_instant_event();
 		return FALSE;

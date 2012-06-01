@@ -54,6 +54,7 @@ function c30353551.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,c30353551[tp],tp,LOCATION_DECK)
 end
 function c30353551.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c30353551.filter,tp,LOCATION_DECK,0,c30353551[tp],c30353551[tp],nil,e,tp)
 	if g:GetCount()==0 then return end
