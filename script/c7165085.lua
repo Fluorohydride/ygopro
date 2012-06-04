@@ -44,8 +44,8 @@ function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
 				Duel.ChangePosition(tc,POS_FACEUP)
 				tc:CancelToGrave(false)
 				tc:CreateEffectRelation(te)
-				cost(te,tep,eg,ep,ev,re,r,rp,1)
-				target(te,tep,eg,ep,ev,re,r,rp,1)
+				if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+				if target then target(te,tep,eg,ep,ev,re,r,rp,1) end
 				local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 				local tg=g:GetFirst()
 				while tg do

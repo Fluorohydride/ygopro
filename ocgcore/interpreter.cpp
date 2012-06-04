@@ -111,6 +111,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "ReleaseRelation", scriptlib::card_release_relation },
 	{ "CreateEffectRelation", scriptlib::card_create_effect_relation },
 	{ "ReleaseEffectRelation", scriptlib::card_release_effect_relation },
+	{ "ClearEffectRelation", scriptlib::card_clear_effect_relation },
 	{ "IsRelateToEffect", scriptlib::card_is_relate_to_effect },
 	{ "IsRelateToCard", scriptlib::card_is_relate_to_card },
 	{ "IsRelateToBattle", scriptlib::card_is_relate_to_battle },

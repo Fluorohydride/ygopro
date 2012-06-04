@@ -870,6 +870,13 @@ int32 scriptlib::card_release_effect_relation(lua_State *L) {
 	pcard->relate_effect.erase(peffect);
 	return 0;
 }
+int32 scriptlib::card_clear_effect_relation(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	pcard->relate_effect.clear();
+	return 0;
+}
 int32 scriptlib::card_is_relate_to_effect(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);

@@ -61,6 +61,7 @@ int ReplayMode::ReplayThread(void* param) {
 		cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+		mainGame->dInfo.is_tag = true;
 	} else {
 		cur_replay.ReadData(mainGame->dInfo.hostname, 40);
 		cur_replay.ReadData(mainGame->dInfo.clientname, 40);

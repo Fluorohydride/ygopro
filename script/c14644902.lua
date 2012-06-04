@@ -21,7 +21,7 @@ function c14644902.filter(c,e,tp)
 end
 function c14644902.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local rg=Duel.SelectReleaseGroup(tp,c14644902.rfilter,1,1,nil,e)
+	local rg=Duel.SelectReleaseGroup(tp,c14644902.rfilter,1,1,e:GetHandler(),e)
 	if Duel.Release(rg,REASON_EFFECT)>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=Duel.SelectMatchingCard(tp,c14644902.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)

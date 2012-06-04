@@ -1793,6 +1793,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				if(cl != pl) {
 					pcard->ClearTarget();
 					if(pcard->equipTarget) {
+						pcard->equipTarget->is_showequip = false;
 						pcard->equipTarget->equipped.erase(pcard);
 						pcard->equipTarget = 0;
 					}

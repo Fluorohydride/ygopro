@@ -444,6 +444,10 @@ int32 field::damage(uint16 step, effect* reason_effect, uint32 reason, uint8 rea
 		pduel->write_buffer32(val);
 		core.units.begin()->arg2 = (core.units.begin()->arg2 & 0xff000000) + (val & 0xffffff);
 		raise_event(reason_card, EVENT_DAMAGE, reason_effect, reason, reason_player, playerid, val);
+		if(reason == REASON_BATTLE && reason_card) {
+			raise_single_event(reason_card, 0, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, val);
+			raise_event(reason_card, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, val);
+		}
 		process_instant_event();
 		return FALSE;
 	}

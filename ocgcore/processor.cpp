@@ -3210,16 +3210,10 @@ int32 field::process_battle_command(uint16 step) {
 			reason_card = core.attack_target;
 		effect* damchange = core.units.begin()->peffect;
 		if(!damchange) {
-			if(core.battle_damage[0]) {
+			if(core.battle_damage[0])
 				damage(0, REASON_BATTLE, reason_player, reason_card, 0, core.battle_damage[0]);
-				raise_single_event(reason_card, 0, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, 0, core.battle_damage[0]);
-				raise_event(reason_card, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, 0, core.battle_damage[0]);
-			}
-			if(core.battle_damage[1]) {
+			if(core.battle_damage[1])
 				damage(0, REASON_BATTLE, reason_player, reason_card, 1, core.battle_damage[1]);
-				raise_single_event(reason_card, 0, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, 1, core.battle_damage[1]);
-				raise_event(reason_card, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, 1, core.battle_damage[1]);
-			}
 		} else {
 			if(core.battle_damage[0])
 				damage(damchange, REASON_EFFECT, reason_player, reason_card, 0, core.battle_damage[0]);

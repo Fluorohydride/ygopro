@@ -23,7 +23,7 @@ function c15574615.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c15574615.spfilter(c,code)
-	return c:IsFaceup() and c:IsCode(code) and c:IsAbleToGraveAsCost()
+	return (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsCode(code) and c:IsAbleToGraveAsCost()
 end
 function c15574615.spcon(e,c)
 	if c==nil then return true end

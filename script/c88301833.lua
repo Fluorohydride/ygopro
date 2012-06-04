@@ -11,6 +11,7 @@ function c88301833.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCountLimit(1)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCondition(c88301833.thcon)
 	e2:SetTarget(c88301833.thtg)
@@ -25,7 +26,7 @@ function c88301833.thfilter(c,tp)
 end
 function c88301833.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=eg:GetFirst()
-	local mat=tc:GetMaterial()i
+	local mat=tc:GetMaterial()
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and mat:IsContains(chkc) end
 	if chk==0 then return mat:IsExists(c88301833.thfilter,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)

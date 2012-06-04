@@ -108,10 +108,16 @@ void ClientCard::UpdateInfo(char* buf) {
 		is_public = BufferIO::ReadInt32(buf);
 }
 void ClientCard::ClearTarget() {
-	for(auto cit = cardTarget.begin(); cit != cardTarget.end(); ++cit)
+	for(auto cit = cardTarget.begin(); cit != cardTarget.end(); ++cit) {
+		if(is_showtarget)
+			(*cit)->is_showtarget = false;
 		(*cit)->ownerTarget.erase(this);
-	for(auto cit = ownerTarget.begin(); cit != ownerTarget.end(); ++cit)
+	}
+	for(auto cit = ownerTarget.begin(); cit != ownerTarget.end(); ++cit) {
+		if(is_showtarget)
+			(*cit)->is_showtarget = false;
 		(*cit)->cardTarget.erase(this);
+	}
 	cardTarget.clear();
 	ownerTarget.clear();
 }
