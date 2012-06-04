@@ -146,17 +146,21 @@ int ReplayMode::ReplayThread(void* param) {
 	}
 	end_duel(pduel);
 	if(!is_closing) {
-		mainGame->stMessage->setText(dataManager.GetSysString(1501));
 		mainGame->actionSignal.Reset();
+		mainGame->gMutex.Lock();
+		mainGame->stMessage->setText(dataManager.GetSysString(1501));
 		if(mainGame->wCardSelect->isVisible())
 			mainGame->HideElement(mainGame->wCardSelect);
 		mainGame->PopupElement(mainGame->wMessage);
+		mainGame->gMutex.Unlock();
 		mainGame->actionSignal.Wait();
+		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
 		mainGame->CloseDuelWindow();
 		mainGame->ClearTextures();
 		mainGame->ShowElement(mainGame->wReplay);
+		mainGame->gMutex.Unlock();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 	}
 	return 0;
