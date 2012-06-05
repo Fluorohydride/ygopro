@@ -510,6 +510,9 @@ function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
 					tc=eg:GetNext()
 				end
 				if chkf~=PLAYER_NONE then
+					if sg2:GetCount()==cc then
+						sg1:Sub(sg2)
+					end
 					local g1=nil
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					if fs then g1=sg1:Select(tp,1,1,nil)
@@ -533,11 +536,13 @@ function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
 					end
 					Duel.SetFusionMaterial(g1)
 				else
+					if sg2:GetCount()==cc then
+						sg1:Sub(sg2)
+					end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg1:Select(tp,1,1,nil)
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g2=sg2:Select(tp,cc,cc,g1:GetFirst())
-					g1:Merge(g2)
+					g1:Merge(sg2:Select(tp,cc,cc,g1:GetFirst()))
 					Duel.SetFusionMaterial(g1)
 				end
 			end

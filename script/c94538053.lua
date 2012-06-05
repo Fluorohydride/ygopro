@@ -40,5 +40,9 @@ function c94538053.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_BASE_DEFENCE)
 		e2:SetValue(c:GetBaseDefence()/2)
 		c:RegisterEffect(e2)
+		local e3=e1:Clone()
+		e3:SetCode(EFFECT_CHANGE_LEVEL)
+		e3:SetValue(2)
+		c:RegisterEffect(e3)
 	end
 end
