@@ -70,6 +70,7 @@ public:
 	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, wchar_t* text);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
+	void RefreshSingleplay();
 	void DrawSelectionLine(irr::video::S3DVertex* vec, bool strip, int width, float* cv);
 	void DrawBackGround();
 	void DrawCards();
@@ -217,6 +218,12 @@ public:
 	irr::gui::IGUIStaticText* stReplayInfo;
 	irr::gui::IGUIButton* btnLoadReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
+	//single play
+	irr::gui::IGUIWindow* wSinglePlay;
+	irr::gui::IGUIListBox* lstSinglePlayList;
+	irr::gui::IGUIStaticText* stSinglePlayInfo;
+	irr::gui::IGUIButton* btnLoadSinglePlay;
+	irr::gui::IGUIButton* btnSinglePlayCancel;
 	//hand
 	irr::gui::IGUIWindow* wHand;
 	irr::gui::IGUIButton* btnHand[3];
@@ -357,7 +364,7 @@ extern Game* mainGame;
 #define COMMAND_LIST		0x0080
 
 #define BUTTON_LAN_MODE				100
-#define BUTTON_SERVER_MODE			101
+#define BUTTON_SINGLE_MODE			101
 #define BUTTON_REPLAY_MODE			102
 #define BUTTON_TEST_MODE			103
 #define BUTTON_DECK_EDIT			104
@@ -444,4 +451,7 @@ extern Game* mainGame;
 #define BUTTON_REPLAY_SWAP			324
 #define BUTTON_REPLAY_SAVE			330
 #define BUTTON_REPLAY_CANCEL		331
+#define LISTBOX_SINGLEPLAY_LIST		350
+#define BUTTON_LOAD_SINGLEPLAY		351
+#define BUTTON_CANCEL_SINGLEPLAY	352
 #endif // GAME_H

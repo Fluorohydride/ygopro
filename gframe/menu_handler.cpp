@@ -124,6 +124,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->RefreshReplay();
 				break;
 			}
+			case BUTTON_SINGLE_MODE: {
+				mainGame->HideElement(mainGame->wMainMenu);
+				mainGame->ShowElement(mainGame->wSinglePlay);
+				mainGame->RefreshSingleplay();
+				break;
+			}
 			case BUTTON_LOAD_REPLAY: {
 				if(mainGame->lstReplayList->getSelected() == -1)
 					break;
@@ -153,6 +159,14 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_CANCEL_REPLAY: {
 				mainGame->HideElement(mainGame->wReplay);
+				mainGame->ShowElement(mainGame->wMainMenu);
+				break;
+			}
+			case BUTTON_LOAD_SINGLEPLAY: {
+				break;
+			}
+			case BUTTON_CANCEL_SINGLEPLAY: {
+				mainGame->HideElement(mainGame->wSinglePlay);
 				mainGame->ShowElement(mainGame->wMainMenu);
 				break;
 			}

@@ -2181,7 +2181,13 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 	case 5: {
 		core.operated_set.clear();
 		core.operated_set = targets->container;
-		returns.ivalue[0] = targets->container.size();
+		for(auto cit = core.operated_set.begin(); cit != core.operated_set.end();) {
+			if((*cit)->current.reason & REASON_REPLACE)
+				core.operated_set.erase(cit++);
+			else
+				cit++;
+		}
+		returns.ivalue[0] = core.operated_set.size();
 		pduel->delete_group(targets);
 		return TRUE;
 	}
@@ -2483,7 +2489,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		if(core.deck_reversed) {
 			int32 d0 = player[0].list_main.size() - 1, s0 = d0;
 			int32 d1 = player[1].list_main.size() - 1, s1 = d1;
-			for( int i = 0; i < cv.size(); ++i) {
+			for(int i = 0; i < cv.size(); ++i) {
 				card* pcard = cv[i];
 				if(pcard->current.location != LOCATION_DECK)
 					continue;

@@ -25,7 +25,7 @@ function c82003859.initial_effect(c)
 	e3:SetTargetRange(1,1)
 	c:RegisterEffect(e3)
 end
-function c82003859.stcon(e)
+function c82003859.atcon(e)
 	c82003859[0]=false
 	return true
 end
