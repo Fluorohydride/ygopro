@@ -78,7 +78,7 @@ void NetServer::StopListen() {
 }
 void NetServer::BroadcastEvent(evutil_socket_t fd, short events, void* arg) {
 	sockaddr_in bc_addr;
-	int sz = sizeof(sockaddr_in);
+	socklen_t sz = sizeof(sockaddr_in);
 	char buf[256];
 	int ret = recvfrom(fd, buf, 256, 0, (sockaddr*)&bc_addr, &sz);
 	if(ret == -1)
