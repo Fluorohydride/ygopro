@@ -16,6 +16,8 @@
 #define myswprintf swprintf
 #endif
 
+#define socklen_t int
+
 #else //_WIN32
 
 #include <errno.h>
@@ -24,6 +26,7 @@
 #include <sys/ioctl.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include <unistd.h>
 
 #define SD_BOTH 2
 #define SOCKET int

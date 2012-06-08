@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "network.h"
-#include "Replay.h"
+#include "replay.h"
 
 namespace ygo {
 

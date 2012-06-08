@@ -176,7 +176,7 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	FILE* fp = _wfopen(deck, L"r");
 #else
 	char deckfn[256];
-	DataManager::EncodeUTF8(deck, deckfn);
+	BufferIO::EncodeUTF8(deck, deckfn);
 	FILE* fp = fopen(deckfn, "r");
 #endif
 	if(!fp)
@@ -213,7 +213,7 @@ void DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	FILE* fp = _wfopen(file, L"w");
 #else
 	char filefn[256];
-	DataManager::EncodeUTF8(file, filefn);
+	BufferIO::EncodeUTF8(file, filefn);
 	FILE* fp = fopen(filefn, "w");
 #endif
 	if(!fp)

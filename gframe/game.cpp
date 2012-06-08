@@ -651,8 +651,8 @@ void Game::RefreshReplay() {
 			continue;
 		wchar_t wname[256];
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
-		if(lastReplay.CheckReplay(dirp->d_name));
-		lstReplayList->addItem(wname);
+		if(Replay::CheckReplay(wname))
+			lstReplayList->addItem(wname);
 	}
 #endif
 }
