@@ -26,7 +26,7 @@ function c10925955.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if sel==1 then
 		ac=Duel.SelectOption(tp,aux.Stringid(10925955,0))
 	elseif sel==2 then
-		ac=Duel.SelectOption(tp,aux.Stringid(10925955,1))
+		ac=Duel.SelectOption(tp,aux.Stringid(10925955,1))+1
 	elseif Duel.IsExistingMatchingCard(c10925955.cfilter,tp,LOCATION_MZONE,0,1,nil,true) then
 		ac=Duel.SelectOption(tp,aux.Stringid(10925955,0),aux.Stringid(10925955,1),aux.Stringid(10925955,2))
 	else

@@ -717,6 +717,8 @@ int32 scriptlib::card_register_effect(lua_State *L) {
 	effect* peffect = *(effect**) lua_touserdata(L, 2);
 	int32 forced = lua_toboolean(L, 3);
 	duel* pduel = pcard->pduel;
+	if(peffect->owner == pduel->game_field->temp_card)
+		return 0;
 	if(!forced && pduel->game_field->core.reason_effect && !pcard->is_affect_by_effect(pduel->game_field->core.reason_effect))
 		return 0;
 	int32 id;

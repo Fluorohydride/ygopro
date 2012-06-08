@@ -66,3 +66,7 @@ int32 scriptlib::debug_set_player_info(lua_State *L) {
 	pd->game_field->player[playerid].draw_count = drawcount;
 	return 0;
 }
+int32 scriptlib::debug_reload_field_begin(lua_State *L) {
+}
+int32 scriptlib::debug_reload_field_end(lua_State *L) {
+}

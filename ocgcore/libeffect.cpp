@@ -22,6 +22,14 @@ int32 scriptlib::effect_new(lua_State *L) {
 	interpreter::effect2value(L, peffect);
 	return 1;
 }
+int32 scriptlib::effect_newex(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	effect* peffect = pduel->new_effect();
+	peffect->effect_owner = 0;
+	peffect->owner = pduel->game_field->temp_card;
+	interpreter::effect2value(L, peffect);
+	return 1;
+}
 int32 scriptlib::effect_clone(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_EFFECT, 1);

@@ -657,6 +657,31 @@ void Game::RefreshReplay() {
 #endif
 }
 void Game::RefreshSingleplay() {
+	lstSinglePlayList->clear();
+#ifdef _WIN32
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./single/*.lua", &fdataw);
+	if(fh == INVALID_HANDLE_VALUE)
+		return;
+	do {
+		if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY))
+			lstSinglePlayList->addItem(fdataw.cFileName);
+	} while(FindNextFileW(fh, &fdataw));
+	FindClose(fh);
+#else
+	DIR * dir;
+	struct dirent * dirp;
+	if((dir = opendir("./single/")) == NULL)
+		return;
+	while((dirp = readdir(dir)) != NULL) {
+		size_t len = strlen(dirp->d_name);
+		if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".lua") != 0)
+			continue;
+		wchar_t wname[256];
+		BufferIO::DecodeUTF8(dirp->d_name, wname);
+		lstSinglePlayList->addItem(wname);
+	}
+#endif
 }
 void Game::LoadConfig() {
 	FILE* fp = fopen("system.conf", "r");

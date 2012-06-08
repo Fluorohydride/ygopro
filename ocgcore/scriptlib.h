@@ -189,6 +189,7 @@ public:
 	static int32 card_set_hint(lua_State *L);
 	//Effect functions
 	static int32 effect_new(lua_State *L);
+	static int32 effect_newex(lua_State *L);
 	static int32 effect_clone(lua_State *L);
 	static int32 effect_reset(lua_State *L);
 	static int32 effect_set_description(lua_State *L);
@@ -460,6 +461,8 @@ public:
 	static int32 debug_message(lua_State *L);
 	static int32 debug_add_card(lua_State *L);
 	static int32 debug_set_player_info(lua_State *L);
+	static int32 debug_reload_field_begin(lua_State *L);
+	static int32 debug_reload_field_end(lua_State *L);
 };
 
 #endif /* SCRIPTLIB_H_ */

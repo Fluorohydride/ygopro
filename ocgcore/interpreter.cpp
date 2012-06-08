@@ -190,6 +190,7 @@ static const struct luaL_Reg cardlib[] = {
 
 static const struct luaL_Reg effectlib[] = {
 	{ "CreateEffect", scriptlib::effect_new },
+	{ "GlobalEffect", scriptlib::effect_newex },
 	{ "Clone", scriptlib::effect_clone },
 	{ "Reset", scriptlib::effect_reset },
 	{ "SetDescription", scriptlib::effect_set_description },
@@ -461,6 +462,8 @@ static const struct luaL_Reg debuglib[] = {
 	{ "Message", scriptlib::debug_message },
 	{ "AddCard", scriptlib::debug_add_card },
 	{ "SetPlayerInfo", scriptlib::debug_set_player_info },
+	{ "ReloadFieldBegin", scriptlib::debug_reload_field_begin },
+	{ "ReloadFieldEnd", scriptlib::debug_reload_field_end },
 	{ NULL, NULL }
 };
 
