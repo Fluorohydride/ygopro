@@ -93,7 +93,12 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_HP_KICK: {
-				int id = caller - static_cast<IGUIElement*>(mainGame->btnHostPrepKick[0]);
+				int id = 0;
+				while(id < 4) {
+					if(mainGame->btnHostPrepKick[id] == caller)
+						break;
+					id++;
+				}
 				CTOS_Kick csk;
 				csk.pos = id;
 				DuelClient::SendPacketToServer(CTOS_HS_KICK, csk);

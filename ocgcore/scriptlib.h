@@ -461,6 +461,7 @@ public:
 	static int32 debug_message(lua_State *L);
 	static int32 debug_add_card(lua_State *L);
 	static int32 debug_set_player_info(lua_State *L);
+	static int32 debug_set_duel_info(lua_State *L);
 	static int32 debug_reload_field_begin(lua_State *L);
 	static int32 debug_reload_field_end(lua_State *L);
 };

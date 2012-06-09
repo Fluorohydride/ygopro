@@ -48,6 +48,15 @@ int32 scriptlib::debug_add_card(lua_State *L) {
 			pcard->set_status(STATUS_PROC_COMPLETE, TRUE);
 		interpreter::card2value(L, pcard);
 		return 1;
+	} else if(location == LOCATION_MZONE) {
+		card* pcard = pduel->new_card(code);
+		pcard->owner = owner;
+		card* fcard = pduel->game_field->get_field_card(playerid, location, sequence);
+		fcard->xyz_materials.push_back(pcard);
+		pcard->overlay_target = fcard;
+		pcard->current.controler = PLAYER_NONE;
+		pcard->current.location = LOCATION_OVERLAY;
+		pcard->current.sequence = fcard->xyz_materials.size() - 1;
 	}
 	return 0;
 }
@@ -64,6 +73,13 @@ int32 scriptlib::debug_set_player_info(lua_State *L) {
 	pd->game_field->player[playerid].lp = lp;
 	pd->game_field->player[playerid].start_count = startcount;
 	pd->game_field->player[playerid].draw_count = drawcount;
+	return 0;
+}
+int32 scriptlib::debug_set_duel_info(lua_State *L) {
+	check_param_count(L, 1);
+	duel* pduel = interpreter::get_duel_info(L);
+	uint32 flag = lua_tointeger(L, 1);
+	pduel->game_field->core.duel_options = flag;
 	return 0;
 }
 int32 scriptlib::debug_reload_field_begin(lua_State *L) {

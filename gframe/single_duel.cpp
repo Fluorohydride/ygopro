@@ -261,7 +261,7 @@ void SingleDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 }
 void SingleDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
-	if(dp != host_player || dp == players[pos] || !players[pos])
+	if(pos > 1 || dp != host_player || dp == players[pos] || !players[pos])
 		return;
 	LeaveGame(players[pos]);
 }

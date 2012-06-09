@@ -49,6 +49,7 @@ end
 function c45812361.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.Draw(tp,2,REASON_EFFECT)
 	if ct==0 then return end
+	Duel.BreakEffect()
 	Duel.SkipPhase(tp,PHASE_MAIN1,RESET_PHASE+PHASE_END,1)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)

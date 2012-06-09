@@ -160,6 +160,10 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 }
 int32 field::select_effect_yes_no(uint16 step, uint8 playerid, card* pcard) {
 	if(step == 0) {
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			returns.ivalue[0] = 1;
+			return TRUE;
+		}
 		pduel->write_buffer8(MSG_SELECT_EFFECTYN);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer32(pcard->data.code);
@@ -176,6 +180,10 @@ int32 field::select_effect_yes_no(uint16 step, uint8 playerid, card* pcard) {
 }
 int32 field::select_yes_no(uint16 step, uint8 playerid, uint32 description) {
 	if(step == 0) {
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			returns.ivalue[0] = 1;
+			return TRUE;
+		}
 		pduel->write_buffer8(MSG_SELECT_YESNO);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer32(description);
@@ -194,6 +202,10 @@ int32 field::select_option(uint16 step, uint8 playerid) {
 		returns.ivalue[0] = -1;
 		if(core.select_options.size() == 0)
 			return TRUE;
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			returns.ivalue[0] = 0;
+			return TRUE;
+		}
 		pduel->write_buffer8(MSG_SELECT_OPTION);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(core.select_options.size());
@@ -219,6 +231,12 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 			max = core.select_cards.size();
 		if(min > max)
 			min = max;
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			returns.bvalue[0] = min;
+			for(uint8 i = 0; i < min; ++i)
+				returns.bvalue[i + 1] = i + 1;
+			return TRUE;
+		}
 		core.units.begin()->arg2 = ((uint32)min) + (((uint32)max) << 16);
 		pduel->write_buffer8(MSG_SELECT_CARD);
 		pduel->write_buffer8(playerid);
@@ -268,6 +286,13 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 forced) {
 	if(step == 0) {
 		returns.ivalue[0] = -1;
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			if(core.select_chains.size() == 0)
+				returns.ivalue[0] = -1;
+			else
+				returns.ivalue[0] = 0;
+			return TRUE;
+		}
 		pduel->write_buffer8(MSG_SELECT_CHAIN);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(core.select_chains.size());
@@ -298,6 +323,26 @@ int32 field::select_place(uint16 step, uint8 playerid, uint32 flag, uint8 count)
 	if(step == 0) {
 		if(count == 0)
 			return TRUE;
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			returns.bvalue[0] = 1;
+			flag = ~flag;
+			if(flag & 0x1f) {
+				returns.bvalue[1] = LOCATION_MZONE;
+				if(flag & 0x4) returns.bvalue[2] = 2;
+				else if(flag & 0x2) returns.bvalue[2] = 1;
+				else if(flag & 0x8) returns.bvalue[2] = 3;
+				else if(flag & 0x1) returns.bvalue[2] = 0;
+				else returns.bvalue[2] = 4;
+			} else {
+				returns.bvalue[1] = LOCATION_SZONE;
+				if(flag & 0x400) returns.bvalue[2] = 2;
+				else if(flag & 0x200) returns.bvalue[2] = 1;
+				else if(flag & 0x800) returns.bvalue[2] = 3;
+				else if(flag & 0x100) returns.bvalue[2] = 0;
+				else returns.bvalue[2] = 4;
+			}
+			return true;
+		}
 		if(core.units.begin()->type == PROCESSOR_SELECT_PLACE)
 			pduel->write_buffer8(MSG_SELECT_PLACE);
 		else
@@ -313,8 +358,8 @@ int32 field::select_place(uint16 step, uint8 playerid, uint32 flag, uint8 count)
 			p = returns.bvalue[pt];
 			l = returns.bvalue[pt + 1];
 			s = returns.bvalue[pt + 2];
-			if((p != 0 && p != 1) || (l != LOCATION_MZONE && l != LOCATION_SZONE) || s >= 5
-			        || ((1 << s) & (flag >> ((p == playerid ? 0 : 16) + (l == LOCATION_MZONE ? 0 : 8))))) {
+			if((p != 0 && p != 1) || ((l != LOCATION_MZONE) && (l != LOCATION_SZONE)) || s >= 5
+			        || ((1 << s) & (flag >> (((p == playerid) ? 0 : 16) + ((l == LOCATION_MZONE) ? 0 : 8))))) {
 				pduel->write_buffer8(MSG_RETRY);
 				return FALSE;
 			}
@@ -541,6 +586,10 @@ int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 
 int32 field::sort_card(int16 step, uint8 playerid, uint8 is_chain) {
 	if(step == 0) {
 		returns.bvalue[0] = 0;
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			returns.ivalue[0] = -1;
+			return TRUE;
+		}
 		if(core.select_cards.empty())
 			return TRUE;
 		if(is_chain)

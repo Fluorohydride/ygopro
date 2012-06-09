@@ -244,7 +244,7 @@ void TagDuel::PlayerReady(DuelPlayer* dp, bool is_ready) {
 		NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 }
 void TagDuel::PlayerKick(DuelPlayer* dp, unsigned char pos) {
-	if(dp != host_player || dp == players[pos] || !players[pos])
+	if(pos > 3 || dp != host_player || dp == players[pos] || !players[pos])
 		return;
 	LeaveGame(players[pos]);
 }

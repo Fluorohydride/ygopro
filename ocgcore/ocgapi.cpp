@@ -72,7 +72,7 @@ extern "C" DECL_DLLEXPORT ptr create_duel(uint32 seed) {
 }
 extern "C" DECL_DLLEXPORT void start_duel(ptr pduel, int options) {
 	duel* pd = (duel*)pduel;
-	pd->game_field->core.duel_options = options;
+	pd->game_field->core.duel_options |= options;
 	if(pd->game_field->player[0].start_count > 0)
 		pd->game_field->draw(0, REASON_RULE, PLAYER_NONE, 0, pd->game_field->player[0].start_count);
 	if(pd->game_field->player[1].start_count > 0)

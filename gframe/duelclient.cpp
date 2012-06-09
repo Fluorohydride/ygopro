@@ -145,6 +145,7 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->gMutex.Lock();
 					mainGame->HideElement(mainGame->wHostPrepare);
 					mainGame->ShowElement(mainGame->wLanWindow);
+					mainGame->wChat->setVisible(false);
 					if(events & BEV_EVENT_EOF)
 						mainGame->env->addMessageBox(L"", dataManager.GetSysString(1401));
 					else mainGame->env->addMessageBox(L"", dataManager.GetSysString(1402));
