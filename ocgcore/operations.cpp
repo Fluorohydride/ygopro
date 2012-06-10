@@ -100,10 +100,10 @@ void field::change_target_param(uint8 chaincount, int32 param) {
 	core.current_chain[chaincount - 1].target_param = param;
 }
 void field::remove_counter(uint32 reason, card* pcard, uint32 rplayer, uint32 s, uint32 o, uint32 countertype, uint32 count) {
-	add_process(PROCESSOR_REMOVE_COUNTER, 0, (effect*) reason, (group*)pcard, (rplayer << 16) + (s << 8) + o, countertype + (count << 16));
+	add_process(PROCESSOR_REMOVE_COUNTER, 0, (effect*)(size_t) reason, (group*)pcard, (rplayer << 16) + (s << 8) + o, countertype + (count << 16));
 }
 void field::remove_overlay_card(uint32 reason, card* pcard, uint32 rplayer, uint32 s, uint32 o, uint16 min, uint16 max) {
-	add_process(PROCESSOR_REMOVEOL_S, 0, (effect*) reason, (group*)pcard, (rplayer << 16) + (s << 8) + o, (max << 16) + min);
+	add_process(PROCESSOR_REMOVEOL_S, 0, (effect*)(size_t) reason, (group*)pcard, (rplayer << 16) + (s << 8) + o, (max << 16) + min);
 }
 void field::get_control(effect* reason_effect, uint32 reason_player, card* pcard, uint32 playerid, uint32 reset_phase, uint32 reset_count) {
 	add_process(PROCESSOR_GET_CONTROL, 0, reason_effect, (group*)pcard, 0, (reason_player << 24) + (playerid << 16) + (reset_phase << 8) + reset_count);

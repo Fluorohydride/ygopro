@@ -910,7 +910,7 @@ int32 scriptlib::duel_discard_hand(lua_State *L) {
 		lua_pushinteger(L, 0);
 		return 1;
 	}
-	pduel->game_field->add_process(PROCESSOR_DISCARD_HAND_S, 0, 0, (group*)reason, playerid, min + (max << 16));
+	pduel->game_field->add_process(PROCESSOR_DISCARD_HAND_S, 0, 0, (group*)(size_t)reason, playerid, min + (max << 16));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_disable_shuffle_check(lua_State *L) {
@@ -2716,7 +2716,7 @@ int32 scriptlib::duel_check_chain_uniqueness(lua_State *L) {
 	card::effect_relation er;
 	field::chain_array::iterator cait;
 	for(cait = pduel->game_field->core.current_chain.begin(); cait != pduel->game_field->core.current_chain.end(); ++cait)
-		er.insert((effect*)(cait->triggering_effect->handler->get_code()));
+		er.insert((effect*)(size_t)(cait->triggering_effect->handler->get_code()));
 	if(er.size() == pduel->game_field->core.current_chain.size())
 		lua_pushboolean(L, 1);
 	else

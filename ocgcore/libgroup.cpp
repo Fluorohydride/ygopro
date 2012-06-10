@@ -456,7 +456,7 @@ int32 scriptlib::group_get_class_count(lua_State *L) {
 	card::effect_relation er;
 	field::card_set::iterator cit = pgroup->container.begin();
 	for(; cit != pgroup->container.end(); ++cit) {
-		er.insert((effect*)pduel->lua->get_operation_value(*cit, 2, extraargs));
+		er.insert((effect*)(size_t)pduel->lua->get_operation_value(*cit, 2, extraargs));
 	}
 	lua_pushinteger(L, er.size());
 	return 1;

@@ -4026,7 +4026,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				return FALSE;
 			}
 		}
-		core.units.begin()->peffect = (effect*)cait->triggering_effect->operation;
+		core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 		if(cait->replace_op)
 			cait->triggering_effect->operation = cait->replace_op;
 		if(cait->triggering_effect->operation) {
