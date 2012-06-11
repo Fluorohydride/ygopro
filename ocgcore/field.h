@@ -284,7 +284,8 @@ public:
 	static int32 field_used_count[32];
 	field(duel* pduel);
 	~field();
-
+	void reload_field_info();
+	
 	void add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence);
 	void remove_card(card* pcard);
 	void move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence);
@@ -728,4 +729,5 @@ public:
 #define MSG_ANNOUNCE_NUMBER		143
 #define MSG_CARD_HINT			160
 #define MSG_TAG_SWAP			161
+#define MSG_RELOAD_FIELD		162
 #endif /* FIELD_H_ */

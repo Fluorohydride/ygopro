@@ -282,6 +282,37 @@ extern "C" DECL_DLLEXPORT int32 query_field_card(ptr pduel, uint8 playerid, uint
 	}
 	return ct;
 }
+extern "C" DECL_DLLEXPORT int32 query_field_info(ptr pduel, byte* buf) {
+	duel* ptduel = (duel*)pduel;
+	*buf++ = MSG_RELOAD_FIELD;
+	card* pcard;
+	for(int playerid = 0; playerid < 2; ++playerid) {
+		for(uint32 i = 0; i < 5; ++i) {
+			pcard = ptduel->game_field->player[playerid].list_mzone[i];
+			if(pcard) {
+				*buf++ = 1;
+				*buf++ = pcard->current.position;
+				*buf++ = pcard->xyz_materials.size();
+			} else {
+				*buf++ = 0;
+			}
+		}
+		for(uint32 i = 0; i < 6; ++i) {
+			pcard = ptduel->game_field->player[playerid].list_szone[i];
+			if(pcard) {
+				*buf++ = 1;
+				*buf++ = pcard->current.position;
+			} else {
+				*buf++ = 0;
+			}
+		}
+		*buf++ = ptduel->game_field->player[playerid].list_main.size();
+		*buf++ = ptduel->game_field->player[playerid].list_hand.size();
+		*buf++ = ptduel->game_field->player[playerid].list_grave.size();
+		*buf++ = ptduel->game_field->player[playerid].list_remove.size();
+		*buf++ = ptduel->game_field->player[playerid].list_extra.size();
+	}
+}
 extern "C" DECL_DLLEXPORT void set_responsei(ptr pduel, int32 value) {
 	((duel*)pduel)->set_responsei(value);
 }

@@ -262,6 +262,7 @@ void TagDuel::StartDuel(DuelPlayer* dp) {
 	if(!ready[0] || !ready[1] || !ready[2] || !ready[3])
 		return;
 	NetServer::StopListen();
+	//NetServer::StopBroadcast();
 	for(int i = 0; i < 4; ++i)
 		NetServer::SendPacketToPlayer(players[i], STOC_DUEL_START);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit) {

@@ -4,6 +4,7 @@
 #include "duelclient.h"
 #include "deck_manager.h"
 #include "replay_mode.h"
+#include "single_mode.h"
 #include "image_manager.h"
 #include "game.h"
 
@@ -168,6 +169,9 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LOAD_SINGLEPLAY: {
+				if(mainGame->lstSinglePlayList->getSelected() == -1)
+					break;
+				SingleMode::StartPlay();
 				break;
 			}
 			case BUTTON_CANCEL_SINGLEPLAY: {
@@ -300,7 +304,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					unsigned short msgbuf[256];
 					if(mainGame->dInfo.isStarted) {
 						if(mainGame->dInfo.player_type < 7) {
-							if(mainGame->dInfo.is_tag && (mainGame->dInfo.player_type % 2))
+							if(mainGame->dInfo.isTag && (mainGame->dInfo.player_type % 2))
 								mainGame->AddChatMsg((wchar_t*)input, 2);
 							else
 								mainGame->AddChatMsg((wchar_t*)input, 0);

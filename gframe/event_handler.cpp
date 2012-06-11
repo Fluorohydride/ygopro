@@ -776,7 +776,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					unsigned short msgbuf[256];
 					if(mainGame->dInfo.isStarted) {
 						if(mainGame->dInfo.player_type < 7) {
-							if(mainGame->dInfo.is_tag && (mainGame->dInfo.player_type % 2))
+							if(mainGame->dInfo.isTag && (mainGame->dInfo.player_type % 2))
 								mainGame->AddChatMsg((wchar_t*)input, 2);
 							else
 								mainGame->AddChatMsg((wchar_t*)input, 0);

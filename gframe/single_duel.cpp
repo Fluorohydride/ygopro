@@ -296,6 +296,7 @@ void SingleDuel::StartDuel(DuelPlayer* dp) {
 	if(!ready[0] || !ready[1])
 		return;
 	NetServer::StopListen();
+	//NetServer::StopBroadcast();
 	NetServer::SendPacketToPlayer(players[0], STOC_DUEL_START);
 	NetServer::ReSendToPlayer(players[1]);
 	for(auto oit = observers.begin(); oit != observers.end(); ++oit) {

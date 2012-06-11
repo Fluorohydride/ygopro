@@ -84,6 +84,37 @@ field::field(duel* pduel) {
 field::~field() {
 
 }
+void field::reload_field_info() {
+	pduel->write_buffer8(MSG_RELOAD_FIELD);
+	card* pcard;
+	for(int playerid = 0; playerid < 2; ++playerid) {
+		for(uint32 i = 0; i < 5; ++i) {
+			pcard = player[playerid].list_mzone[i];
+			if(pcard) {
+				pduel->write_buffer8(1);
+				pduel->write_buffer8(pcard->current.position);
+				pduel->write_buffer8(pcard->xyz_materials.size());
+			} else {
+				pduel->write_buffer8(0);
+			}
+		}
+		for(uint32 i = 0; i < 6; ++i) {
+			pcard = player[playerid].list_szone[i];
+			if(pcard) {
+				pduel->write_buffer8(1);
+				pduel->write_buffer8(pcard->current.position);
+			} else {
+				pduel->write_buffer8(0);
+			}
+		}
+		pduel->write_buffer8(player[playerid].list_main.size());
+		pduel->write_buffer8(player[playerid].list_hand.size());
+		pduel->write_buffer8(player[playerid].list_grave.size());
+		pduel->write_buffer8(player[playerid].list_remove.size());
+		pduel->write_buffer8(player[playerid].list_extra.size());
+	}
+}
+
 void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence) {
 	if (pcard->current.location != 0)
 		return;

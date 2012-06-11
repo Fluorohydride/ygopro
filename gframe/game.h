@@ -30,8 +30,9 @@ struct DuelInfo {
 	bool isStarted;
 	bool isReplay;
 	bool isFirst;
+	bool isTag;
+	bool isSingleMode;
 	bool is_shuffling;
-	bool is_tag;
 	bool tag_player[2];
 	int lp[2];
 	int turn;
@@ -99,6 +100,7 @@ public:
 	Signal frameSignal;
 	Signal actionSignal;
 	Signal replaySignal;
+	Signal singleSignal;
 	Config gameConf;
 	DuelInfo dInfo;
 

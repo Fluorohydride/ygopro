@@ -11,12 +11,12 @@ namespace ygo {
 class SingleMode {
 private:
 	static long pduel;
+	static bool is_closing;
 	static wchar_t event_string[256];
 	
 public:
 	static bool StartPlay();
-	static void StopReplay(bool is_exiting = false);
-	static bool ReadReplayResponse();
+	static void StopPlay(bool is_exiting = false);
 	static int SinglePlayThread(void* param);
 	static bool SinglePlayAnalyze(char* msg, unsigned int len);
 	

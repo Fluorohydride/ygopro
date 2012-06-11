@@ -31,6 +31,21 @@ duel::~duel() {
 	delete lua;
 	delete game_field;
 }
+void duel::clear() {
+	for(std::set<card*>::iterator cit = cards.begin(); cit != cards.end(); ++cit)
+		delete *cit;
+	for(std::set<group*>::iterator git = groups.begin(); git != groups.end(); ++git)
+		delete *git;
+	for(std::set<effect*>::iterator eit = effects.begin(); eit != effects.end(); ++eit)
+		delete *eit;
+	delete lua;
+	delete game_field;
+	lua = new interpreter(this);
+	game_field = new field(this);
+	game_field->temp_card = new_card(0);
+	bufferlen = 0;
+	bufferp = buffer;
+}
 card* duel::new_card(uint32 code) {
 	card* pcard = new card();
 	cards.insert(pcard);

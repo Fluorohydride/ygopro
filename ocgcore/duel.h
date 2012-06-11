@@ -39,7 +39,8 @@ public:
 	std::set<effect*> uncopy;
 	duel();
 	~duel();
-
+	void clear();
+	
 	card* new_card(uint32 code);
 	group* new_group(card* pcard = 0);
 	effect* new_effect();

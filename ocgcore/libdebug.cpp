@@ -83,6 +83,11 @@ int32 scriptlib::debug_set_duel_info(lua_State *L) {
 	return 0;
 }
 int32 scriptlib::debug_reload_field_begin(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->clear();
 }
 int32 scriptlib::debug_reload_field_end(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->reload_field_info();
+	return 0;
 }
