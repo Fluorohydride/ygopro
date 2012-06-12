@@ -730,4 +730,6 @@ public:
 #define MSG_CARD_HINT			160
 #define MSG_TAG_SWAP			161
 #define MSG_RELOAD_FIELD		162
+#define MSG_AI_NAME				163
+#define MSG_SHOW_HINT			164
 #endif /* FIELD_H_ */

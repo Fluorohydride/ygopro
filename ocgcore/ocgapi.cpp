@@ -40,10 +40,8 @@ uint32 handle_message(void* pduel, uint32 msg_type) {
 	return mhandler(pduel, msg_type);
 }
 byte* default_script_reader(const char* script_name, int* slen) {
-	char fullname[50];
-	sprintf(fullname, "./script/%s", script_name);
 	FILE *fp;
-	fp = fopen(fullname, "rb");
+	fp = fopen(script_name, "rb");
 	if (!fp)
 		return 0;
 	fseek(fp, 0, SEEK_END);
@@ -73,6 +71,10 @@ extern "C" DECL_DLLEXPORT ptr create_duel(uint32 seed) {
 extern "C" DECL_DLLEXPORT void start_duel(ptr pduel, int options) {
 	duel* pd = (duel*)pduel;
 	pd->game_field->core.duel_options |= options;
+	pd->game_field->core.shuffle_hand_check[0] = FALSE;
+	pd->game_field->core.shuffle_hand_check[1] = FALSE;
+	pd->game_field->core.shuffle_deck_check[0] = FALSE;
+	pd->game_field->core.shuffle_deck_check[1] = FALSE;
 	if(pd->game_field->player[0].start_count > 0)
 		pd->game_field->draw(0, REASON_RULE, PLAYER_NONE, 0, pd->game_field->player[0].start_count);
 	if(pd->game_field->player[1].start_count > 0)
@@ -287,6 +289,8 @@ extern "C" DECL_DLLEXPORT int32 query_field_info(ptr pduel, byte* buf) {
 	*buf++ = MSG_RELOAD_FIELD;
 	card* pcard;
 	for(int playerid = 0; playerid < 2; ++playerid) {
+		*((int*)(buf)) = ptduel->game_field->player[playerid].lp;
+		buf += 4;
 		for(uint32 i = 0; i < 5; ++i) {
 			pcard = ptduel->game_field->player[playerid].list_mzone[i];
 			if(pcard) {

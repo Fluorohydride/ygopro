@@ -234,7 +234,7 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
 			returns.bvalue[0] = min;
 			for(uint8 i = 0; i < min; ++i)
-				returns.bvalue[i + 1] = i + 1;
+				returns.bvalue[i + 1] = i;
 			return TRUE;
 		}
 		core.units.begin()->arg2 = ((uint32)min) + (((uint32)max) << 16);
@@ -289,8 +289,16 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 fo
 		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
 			if(core.select_chains.size() == 0)
 				returns.ivalue[0] = -1;
-			else
-				returns.ivalue[0] = 0;
+			else {
+				bool act = true;
+				for(auto chit = core.current_chain.begin(); chit != core.current_chain.end(); ++chit)
+					if(chit->triggering_player == 1)
+						act = false;
+				if(act)
+					returns.ivalue[0] = 0;
+				else
+					returns.ivalue[0] = -1;
+			}
 			return TRUE;
 		}
 		pduel->write_buffer8(MSG_SELECT_CHAIN);

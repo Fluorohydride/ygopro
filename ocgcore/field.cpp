@@ -88,6 +88,7 @@ void field::reload_field_info() {
 	pduel->write_buffer8(MSG_RELOAD_FIELD);
 	card* pcard;
 	for(int playerid = 0; playerid < 2; ++playerid) {
+		pduel->write_buffer32(player[playerid].lp);
 		for(uint32 i = 0; i < 5; ++i) {
 			pcard = player[playerid].list_mzone[i];
 			if(pcard) {

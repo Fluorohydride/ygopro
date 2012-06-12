@@ -17,6 +17,7 @@ private:
 public:
 	static bool StartPlay();
 	static void StopPlay(bool is_exiting = false);
+	static void SetResponse(unsigned char* resp);
 	static int SinglePlayThread(void* param);
 	static bool SinglePlayAnalyze(char* msg, unsigned int len);
 	
@@ -26,6 +27,7 @@ public:
 	static void SinglePlayRefreshDeck(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshExtra(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshSingle(int player, int location, int sequence, int flag = 0x181fff);
+	static void SinglePlayReload();
 
 	static int MessageHandler(long fduel, int type);
 };

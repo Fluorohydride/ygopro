@@ -1,4 +1,5 @@
 #include "client_card.h"
+#include "client_field.h"
 #include "game.h"
 
 namespace ygo {
@@ -102,6 +103,43 @@ void ClientCard::UpdateInfo(char* buf) {
 		base_defence = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_REASON)
 		reason = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_EQUIP_CARD) {
+		int c = BufferIO::ReadInt8(buf);
+		int l = BufferIO::ReadInt8(buf);
+		int s = BufferIO::ReadInt8(buf);
+		BufferIO::ReadInt8(buf);
+		ClientCard* ecard = mainGame->dField.GetCard(c, l, s);
+		equipTarget = ecard;
+		ecard->equipped.insert(this);
+	}
+	if(flag & QUERY_TARGET_CARD) {
+		int count = BufferIO::ReadInt8(buf);
+		for(int i = 0; i < count; ++i) {
+			int c = BufferIO::ReadInt8(buf);
+			int l = BufferIO::ReadInt8(buf);
+			int s = BufferIO::ReadInt8(buf);
+			BufferIO::ReadInt8(buf);
+			ClientCard* tcard = mainGame->dField.GetCard(c, l, s);
+			cardTarget.insert(tcard);
+			tcard->ownerTarget.insert(this);
+		}
+	}
+	if(flag & QUERY_OVERLAY_CARD) {
+		int count = BufferIO::ReadInt8(buf);
+		for(int i = 0; i < count; ++i) {
+			overlayed[i]->SetCode(BufferIO::ReadInt32(buf));
+		}
+	}
+	if(flag & QUERY_COUNTERS) {
+		int count = BufferIO::ReadInt8(buf);
+		for(int i = 0; i < count; ++i) {
+			int ctype = BufferIO::ReadInt16(buf);
+			int ccount = BufferIO::ReadInt16(buf);
+			counters[ctype] = ccount;
+		}
+	}
+	if(flag & QUERY_OWNER)
+		owner = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_IS_DISABLED)
 		is_disabled = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_IS_PUBLIC)

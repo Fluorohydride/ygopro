@@ -464,6 +464,8 @@ static const struct luaL_Reg debuglib[] = {
 	{ "SetPlayerInfo", scriptlib::debug_set_player_info },
 	{ "ReloadFieldBegin", scriptlib::debug_reload_field_begin },
 	{ "ReloadFieldEnd", scriptlib::debug_reload_field_end },
+	{ "SetAIName", scriptlib::debug_set_ai_name },
+	{ "ShowHint", scriptlib::debug_show_hint },
 	{ NULL, NULL }
 };
 
@@ -505,8 +507,8 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	luaL_newlib(lua_state, debuglib);
 	lua_setglobal(lua_state, "Debug");
 	//extra scripts
-	load_script((char*) "constant.lua");
-	load_script((char*) "utility.lua");
+	load_script((char*) "./script/constant.lua");
+	load_script((char*) "./script/utility.lua");
 }
 interpreter::~interpreter() {
 	lua_close(lua_state);
@@ -617,7 +619,7 @@ int32 interpreter::load_card_script(uint32 code) {
 		lua_pushvalue(current_state, -2);
 		lua_rawset(current_state, -3);
 		//load extra scripts
-		sprintf(script_name, "c%d.lua", code);
+		sprintf(script_name, "./script/c%d.lua", code);
 		if (!load_script(script_name)) {
 			return OPERATION_FAIL;
 		}

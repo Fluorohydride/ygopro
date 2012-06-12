@@ -558,7 +558,7 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 	}
 	}
 }
-void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r) {
+void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {
 	int controler = pcard->controler;
 	int sequence = pcard->sequence;
 	int location = pcard->location;
@@ -801,6 +801,10 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 		}
 		break;
 	}
+	}
+	if(setTrans) {
+		pcard->mTransform.setTranslation(*t);
+		pcard->mTransform.setRotationRadians(*r);
 	}
 }
 void ClientField::MoveCard(ClientCard * pcard, int frame) {

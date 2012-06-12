@@ -93,6 +93,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_LEAVE_GAME: {
+				if(mainGame->dInfo.isSingleMode) {
+					break;
+				}
 				if(mainGame->dInfo.player_type == 7) {
 					DuelClient::StopClient();
 					mainGame->CloseDuelWindow();

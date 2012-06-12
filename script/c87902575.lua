@@ -11,9 +11,10 @@ function c87902575.initial_effect(c)
 	e1:SetLabelObject(ng)
 	--remove
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetDescription(aux.Stringid(87902575,0))
+	e2:SetCategory(CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetTarget(c87902575.rmtg)
@@ -46,9 +47,11 @@ function c87902575.clear(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	e:GetLabelObject():Clear()
 end
-function c87902575.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	eg:GetFirst():CreateEffectRelation(e)
+function c87902575.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
+	if chk==0 then return eg:GetFirst():IsOnField()
+		and eg:GetFirst():IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(eg:GetFirst())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,eg,1,0,0)
 end
 function c87902575.rmop(e,tp,eg,ep,ev,re,r,rp)

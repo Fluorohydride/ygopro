@@ -38,13 +38,12 @@ void duel::clear() {
 		delete *git;
 	for(std::set<effect*>::iterator eit = effects.begin(); eit != effects.end(); ++eit)
 		delete *eit;
-	delete lua;
 	delete game_field;
-	lua = new interpreter(this);
+	cards.clear();
+	groups.clear();
+	effects.clear();
 	game_field = new field(this);
 	game_field->temp_card = new_card(0);
-	bufferlen = 0;
-	bufferp = buffer;
 }
 card* duel::new_card(uint32 code) {
 	card* pcard = new card();

@@ -138,8 +138,12 @@ uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
 	}
 	if(query_flag & QUERY_REASON_CARD)
 		*p++ = current.reason_card ? current.reason_card->get_info_location() : 0;
-	if(query_flag & QUERY_EQUIP_CARD)
-		*p++ = equiping_target ? equiping_target->get_info_location() : 0;
+	if(query_flag & QUERY_EQUIP_CARD) {
+		if(equiping_target)
+			*p++ = equiping_target->get_info_location();
+		else
+			query_flag &= ~QUERY_EQUIP_CARD;
+	}
 	if(query_flag & QUERY_TARGET_CARD) {
 		*p++ = effect_target_cards.size();
 		card_set::iterator cit;

@@ -84,7 +84,7 @@ public:
 	void ReplaySwap();
 	
 	void GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t);
-	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r);
+	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);
 	void MoveCard(ClientCard* pcard, int frame);
 	void FadeCard(ClientCard* pcard, int alpha, int frame);
 	bool CheckSelectSum();

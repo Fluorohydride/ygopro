@@ -67,27 +67,56 @@ int32 scriptlib::debug_set_player_info(lua_State *L) {
 	uint32 lp = lua_tointeger(L, 2);
 	uint32 startcount = lua_tointeger(L, 3);
 	uint32 drawcount = lua_tointeger(L, 4);
-	duel* pd = (duel*)pduel;
 	if(playerid != 0 && playerid != 1)
 		return 0;
-	pd->game_field->player[playerid].lp = lp;
-	pd->game_field->player[playerid].start_count = startcount;
-	pd->game_field->player[playerid].draw_count = drawcount;
-	return 0;
-}
-int32 scriptlib::debug_set_duel_info(lua_State *L) {
-	check_param_count(L, 1);
-	duel* pduel = interpreter::get_duel_info(L);
-	uint32 flag = lua_tointeger(L, 1);
-	pduel->game_field->core.duel_options = flag;
+	pduel->game_field->player[playerid].lp = lp;
+	pduel->game_field->player[playerid].start_count = startcount;
+	pduel->game_field->player[playerid].draw_count = drawcount;
 	return 0;
 }
 int32 scriptlib::debug_reload_field_begin(lua_State *L) {
+	check_param_count(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
+	uint32 flag = lua_tointeger(L, 1);
 	pduel->clear();
+	pduel->game_field->core.duel_options = flag;
 }
 int32 scriptlib::debug_reload_field_end(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->core.shuffle_hand_check[0] = FALSE;
+	pduel->game_field->core.shuffle_hand_check[1] = FALSE;
+	pduel->game_field->core.shuffle_deck_check[0] = FALSE;
+	pduel->game_field->core.shuffle_deck_check[1] = FALSE;
 	pduel->game_field->reload_field_info();
 	return 0;
+}
+int32 scriptlib::debug_set_ai_name(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_STRING, 1);
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->write_buffer8(MSG_AI_NAME);
+	const char* pstr = lua_tostring(L, 1);
+	int len = strlen(pstr);
+	if(len > 100)
+		len = 100;
+	pduel->write_buffer16(len);
+	memcpy(pduel->bufferp, pstr, len);
+	pduel->bufferp += len;
+	pduel->bufferlen += len;
+	pduel->write_buffer8(0);
+}
+int32 scriptlib::debug_show_hint(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_STRING, 1);
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->write_buffer8(MSG_SHOW_HINT);
+	const char* pstr = lua_tostring(L, 1);
+	int len = strlen(pstr);
+	if(len > 1024)
+		len = 1024;
+	pduel->write_buffer16(len);
+	memcpy(pduel->bufferp, pstr, len);
+	pduel->bufferp += len;
+	pduel->bufferlen += len;
+	pduel->write_buffer8(0);
 }
