@@ -411,6 +411,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				selectable_cards.clear();
 				switch(command_location) {
+				case LOCATION_DECK: {
+					for(int i = deck[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(deck[command_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1000), deck[command_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
 					for(int i = 0; i < pcard->overlayed.size(); ++i)
@@ -924,8 +931,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				switch(hovered_location) {
 				case LOCATION_DECK: {
 					int command_flag = 0;
+					if(deck[hovered_controler].size() == 0)
+						break;
 					for(int i = 0; i < deck[hovered_controler].size(); ++i)
 						command_flag |= deck[hovered_controler][i]->cmdFlag;
+					if(mainGame->dInfo.isSingleMode)
+						command_flag |= COMMAND_LIST;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;

@@ -316,6 +316,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_info(ptr pduel, byte* buf) {
 		*buf++ = ptduel->game_field->player[playerid].list_remove.size();
 		*buf++ = ptduel->game_field->player[playerid].list_extra.size();
 	}
+	return 0;
 }
 extern "C" DECL_DLLEXPORT void set_responsei(ptr pduel, int32 value) {
 	((duel*)pduel)->set_responsei(value);

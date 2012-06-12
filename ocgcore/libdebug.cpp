@@ -80,6 +80,7 @@ int32 scriptlib::debug_reload_field_begin(lua_State *L) {
 	uint32 flag = lua_tointeger(L, 1);
 	pduel->clear();
 	pduel->game_field->core.duel_options = flag;
+	return 0;
 }
 int32 scriptlib::debug_reload_field_end(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
@@ -104,6 +105,7 @@ int32 scriptlib::debug_set_ai_name(lua_State *L) {
 	pduel->bufferp += len;
 	pduel->bufferlen += len;
 	pduel->write_buffer8(0);
+	return 0;
 }
 int32 scriptlib::debug_show_hint(lua_State *L) {
 	check_param_count(L, 1);
@@ -119,4 +121,5 @@ int32 scriptlib::debug_show_hint(lua_State *L) {
 	pduel->bufferp += len;
 	pduel->bufferlen += len;
 	pduel->write_buffer8(0);
+	return 0;
 }

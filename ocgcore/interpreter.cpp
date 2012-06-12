@@ -603,7 +603,7 @@ int32 interpreter::load_script(char* script_name) {
 }
 int32 interpreter::load_card_script(uint32 code) {
 	char class_name[20];
-	char script_name[20];
+	char script_name[64];
 	sprintf(class_name, "c%d", code);
 	lua_getglobal(current_state, class_name);
 	//if script is not loaded, create and load it
