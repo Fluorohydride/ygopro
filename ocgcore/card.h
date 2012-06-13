@@ -141,7 +141,7 @@ public:
 	int32 get_status(uint32 status);
 	int32 is_status(uint32 status);
 
-	void equip(card *target);
+	void equip(card *target, uint32 send_msg = TRUE);
 	void unequip();
 	int32 get_union_count();
 	void xyz_overlay(card_set* materials);

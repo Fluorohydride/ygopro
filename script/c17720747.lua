@@ -5,7 +5,6 @@ function c17720747.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
 	c:RegisterEffect(e1)
 	--Draw
 	local e2=Effect.CreateEffect(c)
@@ -19,7 +18,7 @@ function c17720747.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c17720747.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<=1
+	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)<=1
 end
 function c17720747.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

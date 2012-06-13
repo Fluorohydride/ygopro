@@ -57,6 +57,8 @@ int32 scriptlib::debug_add_card(lua_State *L) {
 		pcard->current.controler = PLAYER_NONE;
 		pcard->current.location = LOCATION_OVERLAY;
 		pcard->current.sequence = fcard->xyz_materials.size() - 1;
+		interpreter::card2value(L, pcard);
+		return 1;
 	}
 	return 0;
 }
@@ -72,6 +74,33 @@ int32 scriptlib::debug_set_player_info(lua_State *L) {
 	pduel->game_field->player[playerid].lp = lp;
 	pduel->game_field->player[playerid].start_count = startcount;
 	pduel->game_field->player[playerid].draw_count = drawcount;
+	return 0;
+}
+int32 scriptlib::debug_pre_equip(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	check_param(L, PARAM_TYPE_CARD, 2);
+	card* equip_card = *(card**) lua_touserdata(L, 1);
+	card* target = *(card**) lua_touserdata(L, 2);
+	if((equip_card->current.location != LOCATION_SZONE)
+	        || (target->current.location != LOCATION_MZONE)
+	        || (target->current.position & POS_FACEDOWN))
+		lua_pushboolean(L, 0);
+	else {
+		equip_card->equip(target, FALSE);
+		equip_card->effect_target_cards.insert(target);
+		target->effect_target_owner.insert(equip_card);
+		lua_pushboolean(L, 1);
+	}
+	return 1;
+}
+int32 scriptlib::debug_pre_set_target(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	check_param(L, PARAM_TYPE_CARD, 2);
+	card* t_card = *(card**) lua_touserdata(L, 1);
+	card* target = *(card**) lua_touserdata(L, 2);
+	t_card->add_card_target(target);
 	return 0;
 }
 int32 scriptlib::debug_reload_field_begin(lua_State *L) {

@@ -11,6 +11,9 @@ function c98437424.initial_effect(c)
 	e1:SetTarget(c98437424.sptg)
 	e1:SetOperation(c98437424.spop)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_MSET)
+	c:RegisterEffect(e2)
 end
 function c98437424.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp

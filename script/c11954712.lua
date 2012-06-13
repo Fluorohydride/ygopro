@@ -11,20 +11,24 @@ function c11954712.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_PIERCE)
 	c:RegisterEffect(e2)
+	--remove
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(11954712,0))
+	e3:SetCategory(CATEGORY_REMOVE)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EVENT_PHASE+PHASE_BATTLE)
+	e3:SetCountLimit(1)
+	e3:SetCondition(c11954712.rmcon)
+	e3:SetTarget(c11954712.rmtg)
+	e3:SetOperation(c11954712.rmop)
+	c:RegisterEffect(e3)
 end
 function c11954712.regop(e,tp,eg,ep,ev,re,r,rp)
-	--remove
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(11954712,0))
-	e1:SetCategory(CATEGORY_REMOVE)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e1:SetCountLimit(1)
-	e1:SetTarget(c11954712.rmtg)
-	e1:SetOperation(c11954712.rmop)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
-	e:GetHandler():RegisterEffect(e1)
+	e:GetHandler():RegisterFlagEffect(11954712,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE,0,1)
+end
+function c11954712.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFlagEffect(11954712)~=0
 end
 function c11954712.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

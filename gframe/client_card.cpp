@@ -113,7 +113,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		ecard->equipped.insert(this);
 	}
 	if(flag & QUERY_TARGET_CARD) {
-		int count = BufferIO::ReadInt8(buf);
+		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
 			int c = BufferIO::ReadInt8(buf);
 			int l = BufferIO::ReadInt8(buf);
@@ -125,13 +125,13 @@ void ClientCard::UpdateInfo(char* buf) {
 		}
 	}
 	if(flag & QUERY_OVERLAY_CARD) {
-		int count = BufferIO::ReadInt8(buf);
+		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
 			overlayed[i]->SetCode(BufferIO::ReadInt32(buf));
 		}
 	}
 	if(flag & QUERY_COUNTERS) {
-		int count = BufferIO::ReadInt8(buf);
+		int count = BufferIO::ReadInt32(buf);
 		for(int i = 0; i < count; ++i) {
 			int ctype = BufferIO::ReadInt16(buf);
 			int ccount = BufferIO::ReadInt16(buf);

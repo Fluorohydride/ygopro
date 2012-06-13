@@ -549,19 +549,20 @@ int32 card::is_status(uint32 status) {
 		return TRUE;
 	return FALSE;
 }
-void card::equip(card *target) {
+void card::equip(card *target, uint32 send_msg) {
 	if (equiping_target)
 		return;
 	target->equiping_cards.insert(this);
 	equiping_target = target;
-	effect_container::iterator it;
-	for (it = equip_effect.begin(); it != equip_effect.end(); ++it) {
+	for (auto it = equip_effect.begin(); it != equip_effect.end(); ++it) {
 		if (it->second->is_disable_related())
 			pduel->game_field->add_to_disable_check_list(equiping_target);
 	}
-	pduel->write_buffer8(MSG_EQUIP);
-	pduel->write_buffer32(get_info_location());
-	pduel->write_buffer32(target->get_info_location());
+	if(send_msg) {
+		pduel->write_buffer8(MSG_EQUIP);
+		pduel->write_buffer32(get_info_location());
+		pduel->write_buffer32(target->get_info_location());
+	}
 	return;
 }
 void card::unequip() {
@@ -571,8 +572,6 @@ void card::unequip() {
 		if (it->second->is_disable_related())
 			pduel->game_field->add_to_disable_check_list(equiping_target);
 	}
-//	pduel->write_buffer8(MSG_UNEQUIP);
-//	pduel->write_buffer32(get_info_location());
 	equiping_target->equiping_cards.erase(this);
 	pre_equip_target = equiping_target;
 	equiping_target = 0;
