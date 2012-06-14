@@ -23,7 +23,7 @@ end
 function c32441317.mgfilter(c,e,tp,sync)
 	return not c:IsControler(tp) or not c:IsLocation(LOCATION_GRAVE)
 		or bit.band(c:GetReason(),0x80008)~=0x80008 or c:GetReasonCard()~=sync
-		or not c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c32441317.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

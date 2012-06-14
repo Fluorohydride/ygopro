@@ -21,7 +21,7 @@ end
 function c29455728.mgfilter(c,e,tp,fusc)
 	return not c:IsControler(tp) or not c:IsLocation(LOCATION_GRAVE)
 		or bit.band(c:GetReason(),0x40008)~=0x40008 or c:GetReasonCard()~=fusc
-		or not c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c29455728.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=e:GetHandler():GetMaterial()

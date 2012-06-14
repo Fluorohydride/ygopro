@@ -7,6 +7,7 @@ function c23440062.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_END_PHASE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCost(c23440062.cost)
 	e1:SetTarget(c23440062.target)
 	e1:SetOperation(c23440062.operation)
 	c:RegisterEffect(e1)
@@ -24,6 +25,10 @@ function c23440062.initial_effect(c)
 	e3:SetCondition(c23440062.descon2)
 	e3:SetOperation(c23440062.desop2)
 	c:RegisterEffect(e3)
+end
+function c23440062.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,800) end
+	Duel.PayLPCost(tp,800)
 end
 function c23440062.filter(c,e,tp)
 	return c:IsType(TYPE_SYNCHRO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
