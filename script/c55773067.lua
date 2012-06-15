@@ -16,7 +16,7 @@ end
 function c55773067.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetCard(eg)
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function c55773067.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=eg:Filter(Card.IsRelateToEffect,nil,e)

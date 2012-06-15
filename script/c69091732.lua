@@ -17,11 +17,12 @@ function c69091732.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c69091732.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetPlayer(1-tp)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function c69091732.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	local g=Duel.GetFieldGroup(p,0,LOCATION_HAND)
+	local g=Duel.GetFieldGroup(p,LOCATION_HAND,0)
 	local dg=g:RandomSelect(tp,1)
 	Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
 end
