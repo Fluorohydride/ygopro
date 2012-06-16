@@ -12,7 +12,7 @@ function c80678380.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c80678380.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
+	return ep~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c80678380.cfilter(c)
 	return c:IsSetCard(0x50) and not c:IsPublic()

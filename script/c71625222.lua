@@ -24,10 +24,11 @@ function c71625222.desop(e,tp,eg,ep,ev,re,r,rp)
 	if coin~=res then
 		local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
 		Duel.Destroy(g,REASON_EFFECT)
+		Duel.RaiseEvent(e:GetHandler(),71625222,e,0,0,tp,0)
 	else
 		local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,nil)
-		Duel.Destroy(g,REASON_EFFECT)
 		local sum=g:GetSum(Card.GetAttack)
+		Duel.Destroy(g,REASON_EFFECT)
 		Duel.Damage(tp,sum/2,REASON_EFFECT)
 	end
 end
