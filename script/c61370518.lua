@@ -32,7 +32,7 @@ function c61370518.disop(e,tp,eg,ep,ev,re,r,rp)
 	if not tg or not tg:IsContains(e:GetHandler()) or not Duel.IsChainDisablable(ev) then return false end
 	local rc=re:GetHandler()
 	local dc=Duel.TossDice(tp,1)
-	if dc==1 and dc==3 and dc==6 then
+	if dc==1 or dc==3 or dc==6 then
 		Duel.NegateEffect(ev)
 		if rc:IsRelateToEffect(re) then
 			Duel.Destroy(rc,REASON_EFFECT)

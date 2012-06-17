@@ -103,6 +103,15 @@ int32 scriptlib::debug_pre_set_target(lua_State *L) {
 	t_card->add_card_target(target);
 	return 0;
 }
+int32 scriptlib::debug_pre_add_counter(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	uint32 ctype = lua_tointeger(L, 2);
+	uint32 ccount = lua_tointeger(L, 3);
+	pcard->counters[ctype] += ccount;
+	return 0;
+}
 int32 scriptlib::debug_reload_field_begin(lua_State *L) {
 	check_param_count(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);

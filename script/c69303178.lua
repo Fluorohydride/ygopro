@@ -26,7 +26,7 @@ function c69303178.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetTarget(c69303178.tgtg)
 	e1:SetOperation(c69303178.tgop)
-	e1:SetReset(RESET_EVENT+0xee0000)
+	e1:SetReset(RESET_EVENT+0xc6e0000)
 	c:RegisterEffect(e1)
 end
 function c69303178.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)

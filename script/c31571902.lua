@@ -27,7 +27,7 @@ function c31571902.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetCondition(c31571902.tgcon)
 	e1:SetTarget(c31571902.tgtg)
 	e1:SetOperation(c31571902.tgop)
-	e1:SetReset(RESET_EVENT+0xee0000)
+	e1:SetReset(RESET_EVENT+0xc6e0000)
 	c:RegisterEffect(e1)
 end
 function c31571902.filter(c)

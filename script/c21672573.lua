@@ -17,10 +17,11 @@ function c21672573.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c21672573.tdcon1(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst()~=e:GetHandler() and bit.band(eg:GetFirst():GetSummonType(),SUMMON_TYPE_ADVANCE)~=0
+	return eg:GetFirst()~=e:GetHandler() and ep==tp
+		and bit.band(eg:GetFirst():GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
 end
 function c21672573.tdcon2(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst():GetMaterialCount()~=0
+	return eg:GetFirst():GetMaterialCount()~=0 and ep==tp
 end
 function c21672573.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

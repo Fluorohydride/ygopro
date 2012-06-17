@@ -464,6 +464,7 @@ static const struct luaL_Reg debuglib[] = {
 	{ "SetPlayerInfo", scriptlib::debug_set_player_info },
 	{ "PreEquip", scriptlib::debug_pre_equip },
 	{ "PreSetTarget", scriptlib::debug_pre_set_target },
+	{ "PreAddCounter", scriptlib::debug_pre_add_counter },
 	{ "ReloadFieldBegin", scriptlib::debug_reload_field_begin },
 	{ "ReloadFieldEnd", scriptlib::debug_reload_field_end },
 	{ "SetAIName", scriptlib::debug_set_ai_name },
