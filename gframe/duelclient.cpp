@@ -1397,7 +1397,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (code != 0 && pcard->code != code)
 				pcard->SetCode(code);
 			mainGame->dField.selectable_cards.push_back(pcard);
-			pcard->select_seq = i;
 			mainGame->dField.sort_list.push_back(0);
 		}
 		if (mainGame->chkAutoChain->isChecked() && mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {

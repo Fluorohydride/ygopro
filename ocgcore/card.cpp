@@ -789,8 +789,7 @@ int32 card::add_effect(effect* peffect) {
 	return peffect->id;
 }
 void card::remove_effect(effect* peffect) {
-	effect_indexer::iterator it;
-	it = indexer.find(peffect);
+	auto it = indexer.find(peffect);
 	if (it == indexer.end())
 		return;
 	remove_effect(peffect, it->second);
@@ -815,7 +814,7 @@ void card::remove_effect(effect* peffect, effect_container::iterator it) {
 		else
 			check_target = 0;
 	}
-	if (current.controler != PLAYER_NONE && !get_status(STATUS_DISABLED) && check_target) {
+	if ((current.controler != PLAYER_NONE) && !get_status(STATUS_DISABLED) && check_target) {
 		if (peffect->is_disable_related())
 			pduel->game_field->add_to_disable_check_list(check_target);
 	}
@@ -829,7 +828,7 @@ void card::remove_effect(effect* peffect, effect_container::iterator it) {
 	if(peffect->flag & EFFECT_FLAG_COUNT_LIMIT)
 		pduel->game_field->effects.rechargeable.erase(peffect);
 	if(((peffect->code & 0xf0000) == EFFECT_COUNTER_PERMIT) && (peffect->type & EFFECT_TYPE_SINGLE)) {
-		counter_map::iterator cmit = counters.find(peffect->code & 0xffff);
+		auto cmit = counters.find(peffect->code & 0xffff);
 		if(cmit != counters.end()) {
 			pduel->write_buffer8(MSG_REMOVE_COUNTER);
 			pduel->write_buffer16(cmit->first);
@@ -870,18 +869,12 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	return pduel->game_field->infos.copy_id - 1;
 }
 void card::reset(uint32 id, uint32 reset_type) {
-	effect_indexer::iterator i, rm;
-	effect_container::iterator it;
-	std::pair<effect_container::iterator, effect_container::iterator> pr;
-	relation_map::iterator rit, rrm;
-	effect_relation::iterator erit, rrit;
-	card_set::iterator cit;
 	effect* peffect;
 	if (reset_type != RESET_EVENT && reset_type != RESET_PHASE && reset_type != RESET_CODE && reset_type != RESET_COPY)
 		return;
 	if (reset_type == RESET_EVENT) {
-		for (rit = relations.begin(); rit != relations.end();) {
-			rrm = rit++;
+		for (auto rit = relations.begin(); rit != relations.end();) {
+			auto rrm = rit++;
 			if (rrm->second & 0xffff0000 & id)
 				relations.erase(rrm);
 		}
@@ -896,22 +889,30 @@ void card::reset(uint32 id, uint32 reset_type) {
 		if(id & 0x1fe0000) {
 			battled_cards.clear();
 			reset_effect_count();
-			pr = field_effect.equal_range(EFFECT_DISABLE_FIELD);
+			auto pr = field_effect.equal_range(EFFECT_DISABLE_FIELD);
 			for(; pr.first != pr.second; ++pr.first)
 				pr.first->second->value = 0;
 			set_status(STATUS_UNION, FALSE);
 		}
 		if(id & 0x57e0000) {
 			counters.clear();
-			for(cit = effect_target_owner.begin(); cit != effect_target_owner.end(); ++cit)
+			for(auto cit = effect_target_owner.begin(); cit != effect_target_owner.end(); ++cit)
 				(*cit)->effect_target_cards.erase(this);
-			for(cit = effect_target_cards.begin(); cit != effect_target_cards.end(); ++cit)
-				(*cit)->effect_target_owner.erase(this);
+			for(auto cit = effect_target_cards.begin(); cit != effect_target_cards.end(); ++cit) {
+				card* pcard = *cit;
+				pcard->effect_target_owner.erase(this);
+				for(auto it = pcard->single_effect.begin(); it != pcard->single_effect.end();) {
+					auto rm = it++;
+					peffect = rm->second;
+					if((peffect->owner == this) && (peffect->flag & EFFECT_FLAG_OWNER_RELATE))
+						pcard->remove_effect(peffect, rm);
+				}
+			}
 			effect_target_owner.clear();
 			effect_target_cards.clear();
 		}
 		if(id & 0x3fe0000) {
-			pr = field_effect.equal_range(EFFECT_USE_EXTRA_MZONE);
+			auto pr = field_effect.equal_range(EFFECT_USE_EXTRA_MZONE);
 			for(; pr.first != pr.second; ++pr.first)
 				pr.first->second->value = pr.first->second->value & 0xffff;
 			pr = field_effect.equal_range(EFFECT_USE_EXTRA_SZONE);
@@ -919,9 +920,8 @@ void card::reset(uint32 id, uint32 reset_type) {
 				pr.first->second->value = pr.first->second->value & 0xffff;
 		}
 		if(id & RESET_DISABLE) {
-			counter_map::iterator cmit, rm;
-			for(cmit = counters.begin(); cmit != counters.end();) {
-				rm = cmit++;
+			for(auto cmit = counters.begin(); cmit != counters.end();) {
+				auto rm = cmit++;
 				if(rm->first & COUNTER_NEED_ENABLE) {
 					pduel->write_buffer8(MSG_REMOVE_COUNTER);
 					pduel->write_buffer16(rm->first);
@@ -949,10 +949,10 @@ void card::reset(uint32 id, uint32 reset_type) {
 			}
 		}
 	}
-	for (i = indexer.begin(); i != indexer.end();) {
-		rm = i++;
+	for (auto i = indexer.begin(); i != indexer.end();) {
+		auto rm = i++;
 		peffect = rm->first;
-		it = rm->second;
+		auto it = rm->second;
 		if (peffect->reset(id, reset_type))
 			remove_effect(peffect, it);
 	}
@@ -1025,25 +1025,25 @@ void card::release_relation(effect* peffect) {
 }
 int32 card::leave_field_redirect(uint32 reason) {
 	effect_set es;
-	uint8 redirect;
+	uint32 redirect;
 	if(data.type & TYPE_TOKEN)
 		return 0;
 	filter_effect(EFFECT_LEAVE_FIELD_REDIRECT, &es);
 	for(int32 i = 0; i < es.count; ++i) {
 		pduel->lua->add_param(reason, PARAM_TYPE_INT);
 		redirect = es[i]->get_value(this, 1);
-		if(redirect & LOCATION_HAND && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
-			return LOCATION_HAND;
-		else if(redirect & LOCATION_DECK && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
-			return LOCATION_DECK;
-		else if(redirect & LOCATION_REMOVED && !is_affected_by_effect(EFFECT_CANNOT_REMOVE) && pduel->game_field->is_player_can_remove(current.controler, this))
-			return LOCATION_REMOVED;
+		if((redirect & LOCATION_HAND) && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
+			return redirect;
+		else if((redirect & LOCATION_DECK) && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
+			return redirect;
+		else if((redirect & LOCATION_REMOVED) && !is_affected_by_effect(EFFECT_CANNOT_REMOVE) && pduel->game_field->is_player_can_remove(current.controler, this))
+			return redirect;
 	}
 	return 0;
 }
 int32 card::destination_redirect(uint8 destination, uint32 reason) {
 	effect_set es;
-	uint8 redirect;
+	uint32 redirect;
 	if(data.type & TYPE_TOKEN)
 		return 0;
 	if(data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ ) && destination == LOCATION_HAND )
@@ -1060,12 +1060,12 @@ int32 card::destination_redirect(uint8 destination, uint32 reason) {
 	for(int32 i = 0; i < es.count; ++i) {
 		pduel->lua->add_param(reason, PARAM_TYPE_INT);
 		redirect = es[i]->get_value(this, 1);
-		if(redirect & LOCATION_HAND && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
-			return LOCATION_HAND;
-		if(redirect & LOCATION_DECK && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
-			return LOCATION_DECK;
-		if(redirect & LOCATION_REMOVED && !is_affected_by_effect(EFFECT_CANNOT_REMOVE) && pduel->game_field->is_player_can_remove(current.controler, this))
-			return LOCATION_REMOVED;
+		if((redirect & LOCATION_HAND) && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
+			return redirect;
+		if((redirect & LOCATION_DECK) && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
+			return redirect;
+		if((redirect & LOCATION_REMOVED) && !is_affected_by_effect(EFFECT_CANNOT_REMOVE) && pduel->game_field->is_player_can_remove(current.controler, this))
+			return redirect;
 	}
 	return 0;
 }
@@ -1833,9 +1833,9 @@ int32 card::is_capable_cost_to_grave(uint8 playerid) {
 	if(!is_capable_send_to_grave(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect(REASON_COST);
+		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest, REASON_COST);
+	redirect = destination_redirect(dest, REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_GRAVE)
 		return FALSE;
@@ -1853,9 +1853,9 @@ int32 card::is_capable_cost_to_hand(uint8 playerid) {
 	if(!is_capable_send_to_hand(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect(REASON_COST);
+		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest, REASON_COST);
+	redirect = destination_redirect(dest, REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_HAND)
 		return FALSE;
@@ -1873,9 +1873,9 @@ int32 card::is_capable_cost_to_deck(uint8 playerid) {
 	if(!is_capable_send_to_deck(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect(REASON_COST);
+		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest, REASON_COST);
+	redirect = destination_redirect(dest, REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_DECK)
 		return FALSE;
@@ -1893,9 +1893,9 @@ int32 card::is_capable_cost_to_extra(uint8 playerid) {
 	if(!is_capable_send_to_deck(playerid))
 		return FALSE;
 	if(current.location & LOCATION_ONFIELD)
-		redirect = leave_field_redirect(REASON_COST);
+		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
-	redirect = destination_redirect(dest, REASON_COST);
+	redirect = destination_redirect(dest, REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
 	if(dest != LOCATION_DECK)
 		return FALSE;

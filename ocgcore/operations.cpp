@@ -2439,25 +2439,32 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 3: {
-		uint32 redirect, dest;
+		uint32 redirect, dest, redirect_seq;
 		card_set leave_p, destroying;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			card* pcard = *cit;
 			dest = (pcard->operation_param >> 8) & 0xff;
 			redirect = 0;
-			if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED))
+			redirect_seq = 0;
+			if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED)) {
 				redirect = pcard->leave_field_redirect(pcard->current.reason);
+				redirect_seq = redirect >> 16;
+				redirect &= 0xffff;
+			}
 			if(redirect) {
 				pcard->current.reason &= ~REASON_TEMPORARY;
 				pcard->current.reason |= REASON_REDIRECT;
-				pcard->operation_param = (pcard->operation_param & 0xffff0000) + (redirect << 8) + (redirect >> 16);
+				pcard->operation_param = (pcard->operation_param & 0xffff0000) | (redirect << 8) | redirect_seq;
 				dest = redirect;
 			}
 			redirect = pcard->destination_redirect(dest, pcard->current.reason);
-			if(redirect && pcard->current.location != redirect) {
+			if(redirect) {
+				redirect_seq = redirect >> 16;
+				redirect &= 0xffff;
+			}
+			if(redirect && (pcard->current.location != redirect)) {
 				pcard->current.reason |= REASON_REDIRECT;
-				pcard->operation_param = (pcard->operation_param & 0xffff0000) + (redirect << 8) + (redirect >> 16);
-				dest = redirect;
+				pcard->operation_param = (pcard->operation_param & 0xffff0000) | (redirect << 8) | redirect_seq;
 			}
 			if((pcard->current.location == LOCATION_MZONE) && pcard->is_status(STATUS_BATTLE_DESTROYED) && !(pcard->current.reason & REASON_DESTROY)) {
 				pcard->current.reason |= REASON_DESTROY | REASON_BATTLE;
@@ -2712,7 +2719,7 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 			(*cit)->current.reason_effect = core.reason_effect;
 			(*cit)->current.reason_player = core.reason_player;
 			(*cit)->current.reason = reason;
-			redirect = (*cit)->destination_redirect(dest, reason);
+			redirect = (*cit)->destination_redirect(dest, reason) & 0xffff;
 			if(redirect) {
 				(*cit)->operation_param = redirect;
 				dest = redirect;

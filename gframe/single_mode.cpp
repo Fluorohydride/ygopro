@@ -9,6 +9,7 @@ namespace ygo {
 
 long SingleMode::pduel = 0;
 bool SingleMode::is_closing = false;
+bool SingleMode::is_continuing = false;
 wchar_t SingleMode::event_string[256];
 
 bool SingleMode::StartPlay() {
@@ -17,7 +18,9 @@ bool SingleMode::StartPlay() {
 }
 void SingleMode::StopPlay(bool is_exiting) {
 	is_closing = is_exiting;
+	is_continuing = false;
 	mainGame->actionSignal.Set();
+	mainGame->singleSignal.Set();
 }
 void SingleMode::SetResponse(unsigned char* resp) {
 	if(!pduel)
@@ -73,7 +76,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	start_duel(pduel, 0);
 	char engineBuffer[0x1000];
 	is_closing = false;
-	bool is_continuing = true;
+	is_continuing = true;
 	int len = 0, flag = 0;
 	while (is_continuing) {
 		int result = process(pduel);
@@ -101,7 +104,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 	char* offset, *pbufw, *pbuf = msg;
 	int player, count;
 	while (pbuf - msg < len) {
-		if(is_closing)
+		if(is_closing || !is_continuing)
 			return false;
 		offset = pbuf;
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
@@ -694,7 +697,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		}
 		}
 	}
-	return true;
+	return is_continuing;
 }
 void SingleMode::SinglePlayRefresh(int flag) {
 	unsigned char queryBuffer[0x1000];

@@ -7,6 +7,7 @@
 #include "materials.h"
 #include "duelclient.h"
 #include "netserver.h"
+#include "single_mode.h"
 
 #ifndef WIN32
 #include <sys/types.h>
@@ -552,6 +553,8 @@ void Game::MainLoop() {
 		}
 	}
 	DuelClient::StopClient(true);
+	if(mainGame->dInfo.isSingleMode)
+		SingleMode::StopPlay(true);
 #ifdef _WIN32
 	Sleep(500);
 #else

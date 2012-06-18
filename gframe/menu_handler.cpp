@@ -171,6 +171,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_LOAD_SINGLEPLAY: {
 				if(mainGame->lstSinglePlayList->getSelected() == -1)
 					break;
+				mainGame->singleSignal.SetNoWait(false);
 				SingleMode::StartPlay();
 				break;
 			}

@@ -44,9 +44,7 @@ end
 function c73199638.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then return end
-	local sg=g:Filter(c73199638.rfilter,nil,e,tp)
-	if sg:GetCount()==0 then return end
-	if sg:GetCount()>ft then sg=sg:Select(tp,ft,ft,nil) end
-	Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+	if ft<=2 then return end
+	if g:FilterCount(c73199638.rfilter,nil,e,tp)~=3 then return end
+	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 end

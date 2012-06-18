@@ -9,6 +9,7 @@ class Signal {
 public:
 	Signal() {
 		_event = CreateEvent(0, FALSE, FALSE, 0);
+		_nowait = false;
 	}
 	~Signal() {
 		CloseHandle(_event);
@@ -20,10 +21,16 @@ public:
 		ResetEvent(_event);
 	}
 	void Wait() {
+		if(_nowait)
+			return;
 		WaitForSingleObject(_event, INFINITE);
+	}
+	void SetNoWait(bool nowait) {
+		_nowait = nowait;
 	}
 private:
 	HANDLE _event;
+	bool _nowait;
 };
 
 #else // _WIN32
@@ -35,6 +42,7 @@ class Signal {
 public:
 	Signal() {
 		_state = false;
+		_nowait = false;
 		pthread_mutex_init(&_mutex, NULL);
 		pthread_cond_init(&_cond, NULL);
 	}
@@ -61,7 +69,7 @@ public:
 		pthread_mutex_unlock(&_mutex);
 	}
 	void Wait() {
-		if(pthread_mutex_lock(&_mutex))
+		if(_nowait || pthread_mutex_lock(&_mutex))
 			return;
 		while(!_state)
 		{
@@ -75,10 +83,14 @@ public:
 		_state = false;
 		pthread_mutex_unlock(&_mutex);
 	}
+	void SetNoWait(bool nowait) {
+		_nowait = nowait;
+	}
 private:
 	pthread_mutex_t _mutex;
 	pthread_cond_t _cond;
 	bool _state;
+	bool _nowait;
 };
 
 #endif // _WIN32

@@ -6,6 +6,7 @@
 #include "data_manager.h"
 #include "image_manager.h"
 #include "replay_mode.h"
+#include "single_mode.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {
@@ -94,6 +95,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case BUTTON_LEAVE_GAME: {
 				if(mainGame->dInfo.isSingleMode) {
+					mainGame->singleSignal.SetNoWait(true);
+					SingleMode::StopPlay(false);
 					break;
 				}
 				if(mainGame->dInfo.player_type == 7) {
@@ -579,11 +582,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SORT_CHAIN:
 				case MSG_SORT_CARD: {
 					int offset = mainGame->scrCardList->getPos() / 10;
-					command_card = selectable_cards[id - BUTTON_CARD_0 + offset];
-					if(sort_list[command_card->select_seq]) {
+					int sel_seq = id - BUTTON_CARD_0 + offset;
+					if(sort_list[sel_seq]) {
 						select_min--;
-						int sel = sort_list[command_card->select_seq];
-						sort_list[command_card->select_seq] = 0;
+						int sel = sort_list[sel_seq];
+						sort_list[sel_seq] = 0;
 						for(int i = 0; i < select_max; ++i)
 							if(sort_list[i] > sel)
 								sort_list[i]--;
@@ -597,7 +600,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						}
 					} else {
 						select_min++;
-						sort_list[command_card->select_seq] = select_min;
+						sort_list[sel_seq] = select_min;
 						myswprintf(formatBuffer, L"%d", select_min);
 						mainGame->stCardPos[id - BUTTON_CARD_0]->setText(formatBuffer);
 						if(select_min == select_max) {
@@ -1251,6 +1254,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->HideElement(mainGame->wQuery, true);
 				} else {
 					mainGame->PopupElement(mainGame->wQuery);
+				}
+				break;
+			}
+			case MSG_SORT_CHAIN:
+			case MSG_SORT_CARD: {
+				if(mainGame->wCardSelect->isVisible()) {
+					DuelClient::SetResponseI(-1);
+					mainGame->HideElement(mainGame->wCardSelect, true);
 				}
 				break;
 			}
