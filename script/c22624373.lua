@@ -21,7 +21,7 @@ function c22624373.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c22624373.discon)
-	e2:SetCost(c22624373.discost)
+	e2:SetTarget(c22624373.distg)
 	e2:SetOperation(c22624373.disop)
 	c:RegisterEffect(e2)
 end
@@ -55,7 +55,7 @@ end
 function c22624373.discon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
 end
-function c22624373.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c22624373.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end

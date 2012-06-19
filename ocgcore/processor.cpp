@@ -2652,6 +2652,7 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 7: {
+		core.chain_attack = 0;
 		core.attack_cancelable = TRUE;
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
@@ -3783,9 +3784,12 @@ int32 field::add_chain(uint16 step) {
 			break_effect();
 			if (peffect->handler->current.location == LOCATION_HAND) {
 				peffect->handler->enable_field_effect(FALSE);
+				peffect->handler->set_status(STATUS_ACT_FROM_HAND, TRUE);
 				move_to_field(peffect->handler, peffect->handler->current.controler, peffect->handler->current.controler, LOCATION_SZONE, POS_FACEUP);
-			} else
+			} else {
+				peffect->handler->set_status(STATUS_ACT_FROM_HAND, FALSE);
 				change_position(peffect->handler, 0, peffect->handler->current.controler, POS_FACEUP, 0);
+			}
 		}
 		if(peffect->handler->current.location & 0x30)
 			move_card(peffect->handler->current.controler, peffect->handler, peffect->handler->current.location, 0);
