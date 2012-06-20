@@ -2026,8 +2026,6 @@ int32 scriptlib::duel_set_target_player(lua_State *L) {
 	check_action_permission(L);
 	check_param_count(L, 1);
 	uint32 playerid = lua_tointeger(L, 1);
-	if(playerid != 0 && playerid != 1)
-		return 0;
 	duel* pduel = interpreter::get_duel_info(L);
 	if(pduel->game_field->core.continuous_chain.size()) {
 		pduel->game_field->core.continuous_chain.rbegin()->target_player = playerid;

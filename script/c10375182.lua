@@ -20,5 +20,5 @@ function c10375182.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c10375182.ccon(e)
-	return Duel.GetFieldGroupCount(e:GetHandler():GetControler(),LOCATION_MZONE,0)>1
+	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)>1
 end

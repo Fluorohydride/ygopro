@@ -1,5 +1,6 @@
 --サイレント·マジシャン LV8
 function c72443568.initial_effect(c)
+	c:EnableReviveLimit()
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -15,7 +16,6 @@ function c72443568.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(c72443568.efilter)
 	c:RegisterEffect(e2)
-	c:EnableReviveLimit()
 end
 c72443568.lvupcount=1
 c72443568.lvup={73665146}

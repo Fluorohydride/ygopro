@@ -30,7 +30,7 @@ function c38296564.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c38296564.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c38296564.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUPATTACK)
-	local g=Duel.SelectTarget(tp,c38296564.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c38296564.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c38296564.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -39,7 +39,7 @@ function c38296564.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:SetCardTarget(tc)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_OWNER_RELATE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
@@ -61,11 +61,10 @@ function c38296564.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c38296564.rcon(e)
-	return e:GetOwner():IsHasCardTarget(e:GetHandler()) and not e:GetOwner():IsDisabled()
+	return e:GetOwner():IsHasCardTarget(e:GetHandler())
 end
 function c38296564.acon(e)
 	return e:GetOwner():IsHasCardTarget(e:GetHandler()) and e:GetHandlerPlayer()==e:GetLabel()
-		and not e:GetOwner():IsDisabled()
 end
 function c38296564.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
