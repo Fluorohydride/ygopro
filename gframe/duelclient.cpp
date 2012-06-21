@@ -2444,14 +2444,38 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int la = BufferIO::ReadInt8(pbuf);
 		int sa = BufferIO::ReadInt8(pbuf);
 		BufferIO::ReadInt8(pbuf);
-		int va = BufferIO::ReadInt32(pbuf);
+		int aatk = BufferIO::ReadInt32(pbuf);
+		int adef = BufferIO::ReadInt32(pbuf);
 		int da = BufferIO::ReadInt8(pbuf);
 		int cd = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int ld = BufferIO::ReadInt8(pbuf);
 		int sd = BufferIO::ReadInt8(pbuf);
 		BufferIO::ReadInt8(pbuf);
-		int vd = BufferIO::ReadInt32(pbuf);
+		int datk = BufferIO::ReadInt32(pbuf);
+		int ddef = BufferIO::ReadInt32(pbuf);
 		int dd = BufferIO::ReadInt8(pbuf);
+		mainGame->gMutex.Lock();
+		ClientCard* pcard = mainGame->dField.GetCard(ca, la, sa);
+		if(aatk != pcard->attack) {
+			pcard->attack = aatk;
+			myswprintf(pcard->atkstring, L"%d", aatk);
+		}
+		if(adef != pcard->defence) {
+			pcard->defence = adef;
+			myswprintf(pcard->defstring, L"%d", adef);
+		}
+		if(ld) {
+			pcard = mainGame->dField.GetCard(cd, ld, sd);
+			if(datk != pcard->attack) {
+				pcard->attack = datk;
+				myswprintf(pcard->atkstring, L"%d", datk);
+			}
+			if(ddef != pcard->defence) {
+				pcard->defence = ddef;
+				myswprintf(pcard->defstring, L"%d", ddef);
+			}
+		}
+		mainGame->gMutex.Unlock();
 		return true;
 	}
 	case MSG_ATTACK_DISABLED: {

@@ -12,7 +12,7 @@ function c21843307.initial_effect(c)
 end
 function c21843307.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()
-	return ec:IsLevelBelow(4) and ec:IsRace(RACE_WARRIOR)
+	return ep==tp and ec:IsLevelBelow(4) and ec:IsRace(RACE_WARRIOR)
 end
 function c21843307.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ec=eg:GetFirst()

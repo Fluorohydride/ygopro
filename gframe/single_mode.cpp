@@ -509,7 +509,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_BATTLE: {
-			pbuf += 18;
+			pbuf += 26;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}

@@ -1339,7 +1339,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		newchain.triggering_controler = peffect->handler->current.controler;
 		newchain.triggering_location = peffect->handler->current.location;
 		newchain.triggering_sequence = peffect->handler->current.sequence;
-		newchain.triggering_player = peffect->handler->current.controler;
+		newchain.triggering_player = infos.turn_player;
 		core.new_chains.push_back(newchain);
 		newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
 		core.select_chains.clear();
@@ -1469,7 +1469,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		newchain.triggering_controler = peffect->handler->current.controler;
 		newchain.triggering_location = peffect->handler->current.location;
 		newchain.triggering_sequence = peffect->handler->current.sequence;
-		newchain.triggering_player = peffect->handler->current.controler;
+		newchain.triggering_player = 1 - infos.turn_player;
 		core.new_chains.push_back(newchain);
 		newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
 		core.select_chains.clear();
@@ -1615,7 +1615,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		//forced trigger
 		for (auto clit = core.new_fchain_s.begin(); clit != core.new_fchain_s.end(); ++clit) {
 			effect* peffect = clit->triggering_effect;
-			if(!(peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && peffect->handler->is_has_relation(peffect)) {
+			if(!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect)) {
 				clit->triggering_player = peffect->handler->current.controler;
 				clit->triggering_controler = peffect->handler->current.controler;
 				clit->triggering_location = peffect->handler->current.location;
@@ -1651,7 +1651,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		}
 		for (auto clit = core.new_ochain_s.begin(); clit != core.new_ochain_s.end(); ++clit) {
 			effect* peffect = clit->triggering_effect;
-			if(!(peffect->flag & EFFECT_FLAG_EVENT_PLAYER) && peffect->handler->is_has_relation(peffect)) {
+			if(!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect)) {
 				clit->triggering_player = peffect->handler->current.controler;
 				clit->triggering_controler = peffect->handler->current.controler;
 				clit->triggering_location = peffect->handler->current.location;
@@ -3017,7 +3017,8 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 26: {
-		uint32 a = core.attacker->get_attack(), d;
+		uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
+		uint32 da = 0, dd = 0, a = aa, d;
 		uint8 pa = core.attacker->current.controler, pd;
 		uint8 damp = 0;
 		effect* damchange = 0;
@@ -3025,10 +3026,12 @@ int32 field::process_battle_command(uint16 step) {
 		card* reason_card = 0;
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(core.attack_target) {
+			da = core.attack_target->get_attack();
+			dd = core.attack_target->get_defence();
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			pd = core.attack_target->current.controler;
 			if(core.attack_target->is_position(POS_ATTACK)) {
-				d = core.attack_target->get_attack();
+				d = da;
 				if(a > d) {
 					damchange = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
 					if(damchange) {
@@ -3076,7 +3079,7 @@ int32 field::process_battle_command(uint16 step) {
 					}
 				}
 			} else {
-				d = core.attack_target->get_defence();
+				d = dd;
 				if(a > d) {
 					effect_set eset;
 					uint8 dp[2];
@@ -3144,13 +3147,16 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		pduel->write_buffer8(MSG_BATTLE);
 		pduel->write_buffer32(core.attacker->get_info_location());
-		pduel->write_buffer32(a);
+		pduel->write_buffer32(aa);
+		pduel->write_buffer32(ad);
 		pduel->write_buffer8(core.attacker->is_status(STATUS_BATTLE_DESTROYED) ? 1 : 0);
 		if(core.attack_target) {
 			pduel->write_buffer32(core.attack_target->get_info_location());
-			pduel->write_buffer32(d);
+			pduel->write_buffer32(da);
+			pduel->write_buffer32(dd);
 			pduel->write_buffer8(core.attack_target->is_status(STATUS_BATTLE_DESTROYED) ? 1 : 0);
 		} else {
+			pduel->write_buffer32(0);
 			pduel->write_buffer32(0);
 			pduel->write_buffer32(0);
 			pduel->write_buffer8(0);

@@ -1365,7 +1365,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			if(min < -core.temp_var[1] + 1) {
 				min = -core.temp_var[1] + 1;
 			}
-			core.temp_var[0] = min + (max >> 16);
+			core.temp_var[0] = min + (max << 16);
 			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, core.temp_var[0]);
 		}
 		core.units.begin()->step = 2;
@@ -1530,7 +1530,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 				} else {
 					if(min < -fcount + 1) {
 						min = -fcount + 1;
-						required = min + (max >> 16);
+						required = min + (max << 16);
 					}
 					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, required);
 				}

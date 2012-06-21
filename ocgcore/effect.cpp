@@ -161,10 +161,8 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 				if((code < 1134 || code > 1136) && pduel->game_field->infos.phase == PHASE_DAMAGE_CAL && !(flag & EFFECT_FLAG_DAMAGE_CAL))
 					return FALSE;
 			}
-			if((type & EFFECT_TYPE_FIELD) && handler->current.controler != playerid) {
-				if(!((type & EFFECT_TYPE_IGNITION) || (type & EFFECT_TYPE_QUICK_O)) || !(flag & EFFECT_FLAG_BOTH_SIDE))
-					return FALSE;
-			}
+			if((type & EFFECT_TYPE_FIELD) && (handler->current.controler != playerid) && !(flag & EFFECT_FLAG_BOTH_SIDE))
+				return FALSE;
 			if(handler->is_affected_by_effect(EFFECT_FORBIDDEN))
 				return FALSE;
 			if(handler->is_affected_by_effect(EFFECT_CANNOT_TRIGGER))
