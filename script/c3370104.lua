@@ -28,12 +28,12 @@ function c3370104.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c3370104.distg(e,c)
-	if c:GetCardTargetCount()~=1 then return false end
+	if not e:GetHandler():IsAttackPos() or c:GetCardTargetCount()~=1 then return false end
 	local tc=c:GetFirstCardTarget()
 	return tc:IsControler(e:GetHandlerPlayer()) and tc:IsRace(RACE_MACHINE)
 end
 function c3370104.disop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsActiveType(TYPE_MONSTER) then return end
+	if not e:GetHandler():IsAttackPos() or re:IsActiveType(TYPE_MONSTER) then return end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()~=1 then return end

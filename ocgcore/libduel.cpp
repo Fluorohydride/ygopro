@@ -1367,11 +1367,23 @@ int32 scriptlib::duel_chain_attack(lua_State *L) {
 }
 int32 scriptlib::duel_readjust(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
+	card* adjcard = pduel->game_field->core.reason_effect->handler;
+	pduel->game_field->core.readjust_map[adjcard]++;
+	if(pduel->game_field->core.readjust_map[adjcard] > 3) {
+		pduel->game_field->send_to(adjcard, 0, REASON_RULE, pduel->game_field->core.reason_player, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
+		pduel->game_field->core.subunits.begin()->type = PROCESSOR_SENDTO_S;
+		return lua_yield(L, 0);
+	}
 	pduel->game_field->core.re_adjust = TRUE;
 	return 0;
 }
 int32 scriptlib::duel_adjust_instantly(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
+	if(lua_gettop(L) > 0) {
+		check_param(L, PARAM_TYPE_CARD, 1);
+		card* pcard = *(card**) lua_touserdata(L, 1);
+		pcard->filter_disable_related_cards();
+	}
 	pduel->game_field->adjust_instant();
 	return 0;
 }

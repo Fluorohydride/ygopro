@@ -15,6 +15,7 @@
 #include <map>
 #include <list>
 #include <array>
+#include <unordered_map>
 
 class card;
 struct card_data;
@@ -200,6 +201,7 @@ struct processor {
 	effect_vector delayed_ntp;
 	event_list delayed_tev;
 	event_list delayed_ntev;
+	std::unordered_map<card*, uint32> readjust_map;
 	ptr temp_var[4];
 	uint16 pre_field[5];
 	int32 chain_limit;

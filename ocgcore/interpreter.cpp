@@ -267,6 +267,7 @@ static const struct luaL_Reg grouplib[] = {
 	{ "Remove", scriptlib::group_remove },
 	{ "Merge", scriptlib::group_merge },
 	{ "Sub", scriptlib::group_sub },
+	{ "Equal", scriptlib::group_equal },
 	{ "IsContains", scriptlib::group_is_contains },
 	{ "SearchCard", scriptlib::group_search_card },
 	{ NULL, NULL }

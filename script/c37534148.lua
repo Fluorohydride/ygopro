@@ -18,10 +18,8 @@ function c37534148.initial_effect(c)
 	c:RegisterEffect(e2)
 	--special summon
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(37534148,0))
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCode(EVENT_BATTLE_DESTROYED)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCondition(c37534148.regcon)
 	e3:SetOperation(c37534148.regop)
 	c:RegisterEffect(e3)
@@ -47,14 +45,15 @@ function c37534148.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c37534148.regcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	e:SetLabelObject(tc)
-	return e:GetHandler():GetPreviousEquipTarget()==tc and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE)
+	local c=e:GetHandler()
+	local ec=c:GetPreviousEquipTarget()
+	return c:IsReason(REASON_LOST_TARGET) and ec:IsReason(REASON_BATTLE) and ec:IsLocation(LOCATION_GRAVE)
 end
 function c37534148.regop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(37534148,1))
+	local c=e:GetHandler()
+	local ec=c:GetPreviousEquipTarget()
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(37534148,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
@@ -62,18 +61,21 @@ function c37534148.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCountLimit(1)
 	e1:SetTarget(c37534148.sptg)
 	e1:SetOperation(c37534148.spop)
-	e1:SetLabelObject(tc)
+	e1:SetLabelObject(ec)
 	e1:SetReset(RESET_EVENT+0x16c0000+RESET_PHASE+PHASE_END)
 	e:GetHandler():RegisterEffect(e1)
-	tc:RegisterFlagEffect(37534148,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	ec:RegisterFlagEffect(37534148,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c37534148.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetLabelObject():GetFlagEffect(37534148)~=0 end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetLabelObject(),1,0,0)
+	local ec=e:GetHandler():GetPreviousEquipTarget()
+	if chk==0 then return ec:GetFlagEffect(37534148)~=0 end
+	Duel.SetTargetCard(ec)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,ec,1,0,0)
 end
 function c37534148.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if e:GetLabelObject():GetFlagEffect(37534148)~=0 then
-		Duel.SpecialSummon(e:GetLabelObject(),0,tp,tp,false,false,POS_FACEUP)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

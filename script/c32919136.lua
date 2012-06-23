@@ -78,7 +78,7 @@ end
 function c32919136.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Recover(p,d,REASON_EFFECT)
+	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c32919136.desfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x45)

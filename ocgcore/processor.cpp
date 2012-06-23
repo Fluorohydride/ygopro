@@ -4167,6 +4167,7 @@ void field::adjust_instant() {
 	adjust_disable_check_list();
 }
 void field::adjust_all() {
+	core.readjust_map.clear();
 	add_process(PROCESSOR_ADJUST, 0, 0, 0, 0, 0);
 }
 void field::refresh_location_info_instant() {

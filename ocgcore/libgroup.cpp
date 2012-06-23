@@ -512,6 +512,27 @@ int32 scriptlib::group_sub(lua_State *L) {
 	}
 	return 0;
 }
+int32 scriptlib::group_equal(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_GROUP, 1);
+	check_param(L, PARAM_TYPE_GROUP, 2);
+	group* pgroup = *(group**) lua_touserdata(L, 1);
+	group* sgroup = *(group**) lua_touserdata(L, 2);
+	if(pgroup->container.size() != sgroup->container.size()) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	auto pit = pgroup->container.begin();
+	auto sit = sgroup->container.begin();
+	for (; pit != pgroup->container.end(); ++pit, ++sit) {
+		if((*pit) != (*sit)) {
+			lua_pushboolean(L, 0);
+			return 1;
+		}
+	}
+	lua_pushboolean(L, 1);
+	return 1;
+}
 int32 scriptlib::group_is_contains(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_GROUP, 1);

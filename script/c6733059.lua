@@ -80,14 +80,14 @@ function c6733059.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=cg:Select(tp,lv,lv,nil)
 	Duel.Remove(rg,POS_FACEUP,REASON_COST)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,1,0,0)
-	e:SetLabel(lv)
+	Duel.SetTargetParam(lv)
 end
 function c6733059.dfilter(c,lv)
 	return c:IsFaceup() and c:GetLevel()==lv and c:IsDestructable()
 end
 function c6733059.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local lv=e:GetLabel()
+	local lv=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
 	if lv==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,c6733059.dfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,lv)

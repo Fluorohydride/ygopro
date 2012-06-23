@@ -85,7 +85,7 @@ int32 effect::is_available() {
 	}
 	if (type & EFFECT_TYPE_FIELD) {
 		if (!(flag & EFFECT_FLAG_FIELD_ONLY)) {
-			if(handler->current.controler == PLAYER_NONE)
+			if(handler->is_position(POS_FACEDOWN) || handler->current.controler == PLAYER_NONE)
 				return FALSE;
 			if((flag & EFFECT_FLAG_OWNER_RELATE) && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && owner->is_status(STATUS_DISABLED))
 				return FALSE;
