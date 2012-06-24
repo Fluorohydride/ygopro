@@ -1,5 +1,6 @@
 --サイバー·バリア·ドラゴン
 function c68774379.initial_effect(c)
+	c:EnableReviveLimit()
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
