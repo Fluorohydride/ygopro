@@ -61,31 +61,20 @@ function c31053337.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c31053337.indes(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if c==a and d then
+	local bc=c:GetBattleTarget()
+	if bc then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 		e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
 		e1:SetValue(1)
-		d:RegisterEffect(e1)
-	elseif c==d then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
-		e1:SetValue(1)
-		d:RegisterEffect(e1)
+		bc:RegisterEffect(e1)
 	end
 end
 function c31053337.operation2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if c==a and d and d:IsRelateToBattle() then
-		Duel.SendtoHand(d,nil,REASON_EFFECT)
-	elseif c==d and a:IsRelateToBattle() then
-		Duel.SendtoHand(a,nil,REASON_EFFECT)
+	local bc=c:GetBattleTarget()
+	if bc and bc:IsRelateToBattle() then
+		Duel.SendtoHand(bc,nil,REASON_EFFECT)
 	end
 end

@@ -2652,7 +2652,6 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 7: {
-		core.chain_attack = 0;
 		core.attack_cancelable = TRUE;
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
