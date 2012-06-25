@@ -688,7 +688,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			memcpy(msgbuf, begin, len + 1);
 			BufferIO::DecodeUTF8(msgbuf, msg);
 			mainGame->gMutex.Lock();
-			mainGame->stMessage->setText(msg);
+			mainGame->SetStaticText(mainGame->stMessage, 310, mainGame->textFont, msg);
 			mainGame->PopupElement(mainGame->wMessage);
 			mainGame->gMutex.Unlock();
 			mainGame->actionSignal.Reset();
