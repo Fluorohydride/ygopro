@@ -10,7 +10,7 @@ function c26412047.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26412047.filter(c)
-	return c:IsFaceup() and c:IsDestructable()
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsDestructable()
 end
 function c26412047.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c26412047.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end

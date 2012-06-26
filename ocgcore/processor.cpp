@@ -2863,6 +2863,7 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 20: {
 		infos.phase = PHASE_DAMAGE;
+		core.chain_attack = FALSE;
 		pduel->write_buffer8(MSG_DAMAGE_STEP_START);
 		core.units.begin()->arg1 = FALSE;
 		core.damage_calculated = FALSE;
