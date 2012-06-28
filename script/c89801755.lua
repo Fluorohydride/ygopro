@@ -31,7 +31,7 @@ end
 function c89801755.activate(e,tp,eg,ep,ev,re,r,rp)
 	local att=e:GetLabel()
 	local p,rc=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TO_GRAVE)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(p,c89801755.filter,p,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,rc,att)
 	if g:GetCount()>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)

@@ -119,14 +119,14 @@ function c4545683.eqop(e,tp,eg,ep,ev,re,r,rp)
 		else Duel.SendtoGrave(tc,REASON_EFFECT) end
 	end
 end
-function c4545683.spfilter(c,e,tp)
-	return c:GetFlagEffect(4545683)~=0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c4545683.spfilter(c,e,tp,ec)
+	return c:GetFlagEffect(4545683)~=0 and c:GetEquipTarget()==ec and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c4545683.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(c4545683.spfilter,tp,LOCATION_SZONE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(c4545683.spfilter,tp,LOCATION_SZONE,0,1,nil,e,tp,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,c4545683.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,c4545683.spfilter,tp,LOCATION_SZONE,0,1,1,nil,e,tp,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c4545683.spop2(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -22,11 +22,11 @@ function c98792570.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.IsExistingMatchingCard(c98792570.filter,tp,LOCATION_MZONE,0,1,nil,e,tp)
+		return Duel.IsExistingMatchingCard(c98792570.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp)
 	end
 	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c98792570.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c98792570.cfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SendtoGrave(g,REASON_COST)
 	Duel.SetTargetParam(g:GetFirst():GetTextAttack())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

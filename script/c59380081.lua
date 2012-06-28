@@ -5,7 +5,7 @@ function c59380081.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e1:SetTargetRange(0,LOCATION_MZONE)
 	e1:SetTarget(c59380081.target)
 	c:RegisterEffect(e1)
 end

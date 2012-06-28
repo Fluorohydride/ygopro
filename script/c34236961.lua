@@ -9,7 +9,7 @@ function c34236961.initial_effect(c)
 	e1:SetOperation(c34236961.activate)
 	c:RegisterEffect(e1)
 end
-function c34236961.condition(e,tp,eg,ep,ev,re,r,rp,chk)
+function c34236961.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local h1=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
 		if e:GetHandler():IsLocation(LOCATION_HAND) then h1=h1-1 end

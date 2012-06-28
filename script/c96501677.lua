@@ -25,20 +25,7 @@ function c96501677.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_BEAST)
 end
 function c96501677.ccon(e)
-	return Duel.IsExistingMatchingCard(c96501677.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,e:GetHandler())
-end
-function c96501677.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and eg:GetFirst()~=e:GetHandler() and eg:GetFirst():IsRace(RACE_ROCK)
-end
-function c96501677.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(300)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,300)
-end
-function c96501677.damop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Damage(p,d,REASON_EFFECT)
+	return Duel.IsExistingMatchingCard(c96501677.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c96501677.deftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsFaceup() and chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) end

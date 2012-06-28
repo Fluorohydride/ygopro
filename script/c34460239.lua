@@ -30,7 +30,7 @@ function c34460239.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		local hc=Duel.GetFirstMatchingCard(c34460239.filter2,tp,LOCATION_DECK,0,nil,tc:GetCode())
 		if hc then
-			Duel.SendtoHand(hc,nil,REAOSN_EFFECT)
+			Duel.SendtoHand(hc,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,hc)
 		end
 	end

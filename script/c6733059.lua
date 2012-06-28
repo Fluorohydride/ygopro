@@ -50,7 +50,7 @@ function c6733059.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 		local rg=cg:Select(tp,lv,lv,nil)
 		Duel.Remove(rg,POS_FACEUP,REASON_COST)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,1,0,0)
-		e:SetLabel(lv)
+		Duel.SetTargetParam(lv)
 	end
 end
 function c6733059.cost2(e,tp,eg,ep,ev,re,r,rp,chk)

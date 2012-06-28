@@ -27,7 +27,7 @@ function c72053645.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTargetRange(1,0)
 		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_BATTLE then
 			e1:SetLabel(Duel.GetTurnCount())
-			e1:SetCondition(c19763315.bpcon)
+			e1:SetCondition(c72053645.bpcon)
 			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,2)
 		else
 			e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_SELF_TURN,1)

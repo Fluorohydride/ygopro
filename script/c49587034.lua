@@ -29,7 +29,7 @@ function c49587034.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,4)
 		e1:SetOperation(c49587034.tohand)
-		if cp~=e:GetHandlerPlayer() and ph~=DRAW_PHASE
+		if cp~=e:GetHandlerPlayer() and ph~=PHASE_DRAW
 			then e1:SetLabel(2)
 			else e1:SetLabel(1)
 		end

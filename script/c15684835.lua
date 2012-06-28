@@ -14,7 +14,7 @@ function c15684835.filter(c,tp)
 	return c:IsFaceup() and c:IsControler(1-tp)
 end
 function c15684835.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:Contains(chkc) end
+	if chkc then return eg:IsContains(chkc) end
 	if chk==0 then return eg:IsExists(c15684835.filter,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local g=eg:FilterSelect(tp,c15684835.filter,1,1,nil,tp)

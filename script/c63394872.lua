@@ -16,16 +16,16 @@ function c63394872.initial_effect(c)
 	e2:SetOperation(c63394872.seqop)
 	c:RegisterEffect(e2)
 end
-function c63394872.filter(c)
+function c63394872.filter(c,tp)
 	local seq=c:GetSequence()
 	return (seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1))
 		or (seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1))
 end
 function c63394872.seqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c63394872.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c63394872.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c63394872.filter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c63394872.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(63394872,1))
-	Duel.SelectTarget(tp,c63394872.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c63394872.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 end
 function c63394872.seqop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

@@ -42,8 +42,5 @@ function c10352095.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c10352095.value(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsFaceup,e:GetHandler():GetControler(),LOCATION_MZONE,0,nil)*800
-end
-function c10352095.value(e,c)
 	return e:GetLabel()
 end

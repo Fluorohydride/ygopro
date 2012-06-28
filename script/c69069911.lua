@@ -15,7 +15,7 @@ function c69069911.initial_effect(c)
 end
 function c69069911.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local bc=tc:GetBattleTarget()
+	local bc=c:GetBattleTarget()
 	return bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE) and bc:IsType(TYPE_MONSTER) and c:IsChainAttackable()
 end
 function c69069911.atcost(e,tp,eg,ep,ev,re,r,rp,chk)

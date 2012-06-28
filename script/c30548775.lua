@@ -29,7 +29,7 @@ function c30548775.spfilter(c,eg)
 	return c:IsReason(REASON_FUSION) and eg:IsContains(c:GetReasonCard())
 end
 function c30548775.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocaion(LOCATION_GRAVE) and c30548775.spfilter(chkc,eg) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c30548775.spfilter(chkc,eg) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c30548775.spfilter,tp,LOCATION_GRAVE,0,1,nil,eg) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

@@ -24,7 +24,7 @@ function c39648965.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x13)
 end
 function c39648965.val(e,c)
-	return Duel.GetMatchingGroupCount(c39648965.atkfilter,c:GetControler(),LOCATION_MZONE,0,c)*100
+	return Duel.GetMatchingGroupCount(c39648965.atkfilter,0,LOCATION_MZONE,LOCATION_MZONE,c)*100
 end
 function c39648965.piercecon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()

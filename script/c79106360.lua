@@ -44,7 +44,7 @@ function c79106360.sp(e,tp,ct)
 	local dt=g:GetCount()
 	if dt==0 then return false end
 	local dlist={}
-	tc=g:GetFirst()
+	local tc=g:GetFirst()
 	while tc do
 		if tc:IsType(TYPE_MONSTER) then dlist[tc:GetSequence()]=tc end
 		tc=g:GetNext()
@@ -53,7 +53,7 @@ function c79106360.sp(e,tp,ct)
 	local a=0
 	local last=nil
 	g=Group.CreateGroup()
-	while a<ct and i>0 do
+	while a<ct and i>=0 do
 		tc=dlist[i]
 		if tc then
 			g:AddCard(tc)

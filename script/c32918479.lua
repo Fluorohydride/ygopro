@@ -61,13 +61,3 @@ function c32918479.tgop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(c,REASON_EFFECT)
 	end
 end
-function c32918479.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler(),1,0,0)
-end
-function c32918479.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		Duel.SendtoGrave(c,REASON_EFFECT)
-	end
-end

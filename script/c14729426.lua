@@ -30,7 +30,7 @@ function c14729426.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=e:GetLabelObject()
 	if a:IsControler(1-tp) and a:GetRealFieldID()==e:GetLabel() then
 		Duel.SetTargetCard(a)
-		Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_CONTROL,a,1,0,0)
 	end
 end
 function c14729426.ctop(e,tp,eg,ep,ev,re,r,rp)

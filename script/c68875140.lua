@@ -25,7 +25,7 @@ function c68875140.filter(c)
 	return c:GetSequence()~=5 and c:IsAbleToHand()
 end
 function c68875140.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocatoin(LOCATION_SZONE) and chkc:IsControler(1-tp) and c68875140.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and c68875140.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c68875140.filter,tp,0,LOCATION_SZONE,1,1,nil)

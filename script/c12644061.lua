@@ -24,7 +24,7 @@ function c12644061.initial_effect(c)
 	c:RegisterEffect(e3)
 	--
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(74823665,0))
+	e4:SetDescription(aux.Stringid(12644061,0))
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e4:SetRange(LOCATION_SZONE)

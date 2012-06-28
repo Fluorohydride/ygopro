@@ -78,9 +78,9 @@ function c64599569.dircon(e)
 	return e:GetHandler():GetAttackAnnouncedCount()>0
 end
 function c64599569.atkcon(e)
-	return e:GetHandler():GetAttackedCount()~=e:GetHandler():GetAttackedGroupCount()
+	return e:GetHandler():IsDirectAttacked()
 end
 function c64599569.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,0,e:GetHandler())
+	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_ONFIELD,0,e:GetHandler())
 	Duel.SendtoGrave(g,REASON_EFFECT)
 end

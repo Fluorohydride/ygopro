@@ -26,7 +26,7 @@ end
 function c39978267.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then
 		if e:GetLabel()==1 then return chkc:IsLocation(LOCATION_SZONE) and c39978267.desfilter(chkc)
-		else return chkc:IsLocation(LOCATION_SZONE) and c39978267.eqfilter(chkc) end
+		else return chkc:IsLocation(LOCATION_SZONE) and c39978267.eqfilter(chkc,e:GetHandler()) end
 	end
 	if chk==0 then return true end
 	local sel=0
@@ -57,7 +57,7 @@ function c39978267.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if sel==1 then
 		if tc and tc:IsRelateToEffect(e) then
-			Duel.Destroy(c,REASON_EFFECT)
+			Duel.Destroy(tc,REASON_EFFECT)
 		end
 	else
 		local c=e:GetHandler()
