@@ -687,15 +687,15 @@ void card::enable_field_effect(int32 enabled) {
 		effect_container::iterator it;
 		for (it = single_effect.begin(); it != single_effect.end(); ++it) {
 			if ((it->second->flag & EFFECT_FLAG_SINGLE_RANGE) && (current.location & it->second->range))
-				it->second->id = pduel->game_field->infos.effect_id++;
+				it->second->id = pduel->game_field->infos.field_id++;
 		}
 		for (it = field_effect.begin(); it != field_effect.end(); ++it) {
 			if (current.location & it->second->range)
-				it->second->id = pduel->game_field->infos.effect_id++;
+				it->second->id = pduel->game_field->infos.field_id++;
 		}
 		if(current.location == LOCATION_SZONE) {
 			for (it = equip_effect.begin(); it != equip_effect.end(); ++it)
-				it->second->id = pduel->game_field->infos.effect_id++;
+				it->second->id = pduel->game_field->infos.field_id++;
 		}
 	} else
 		set_status(STATUS_EFFECT_ENABLED, FALSE);
@@ -743,7 +743,7 @@ int32 card::add_effect(effect* peffect) {
 			check_target = 0;
 	} else
 		return 0;
-	peffect->id = pduel->game_field->infos.effect_id++;
+	peffect->id = pduel->game_field->infos.field_id++;
 	peffect->card_type = data.type;
 	if(get_status(STATUS_INITIALIZING))
 		peffect->flag |= EFFECT_FLAG_INITIAL;

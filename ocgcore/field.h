@@ -102,10 +102,9 @@ struct field_effect {
 	std::set<card*, card_sort> disable_check_set;
 };
 struct field_info {
-	int16 effect_id;
+	int32 field_id;
 	int16 copy_id;
 	int16 turn_id;
-	int16 field_id;
 	int16 card_id;
 	uint8 phase;
 	uint8 turn_player;

@@ -76,6 +76,13 @@ int32 scriptlib::effect_reset(lua_State *L) {
 		peffect->handler->remove_effect(peffect);
 	return 0;
 }
+int32 scriptlib::effect_get_field_id(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	lua_pushinteger(L, peffect->id);
+	return 1;
+}
 int32 scriptlib::effect_set_description(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);

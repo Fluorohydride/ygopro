@@ -100,6 +100,7 @@ public:
 	static int32 card_get_owner_target(lua_State *L);
 	static int32 card_get_owner_target_count(lua_State *L);
 	static int32 card_get_activate_effect(lua_State *L);
+	static int32 card_check_activate_effect(lua_State *L);
 	static int32 card_register_effect(lua_State *L);
 	static int32 card_is_has_effect(lua_State *L);
 	static int32 card_reset_effect(lua_State *L);
@@ -192,6 +193,7 @@ public:
 	static int32 effect_newex(lua_State *L);
 	static int32 effect_clone(lua_State *L);
 	static int32 effect_reset(lua_State *L);
+	static int32 effect_get_field_id(lua_State *L);
 	static int32 effect_set_description(lua_State *L);
 	static int32 effect_set_code(lua_State *L);
 	static int32 effect_set_range(lua_State *L);

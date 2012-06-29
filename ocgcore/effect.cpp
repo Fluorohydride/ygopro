@@ -107,7 +107,7 @@ int32 effect::is_available() {
 	int32 res = pduel->lua->check_condition(condition, 1);
 	if(res) {
 		if(!(status & EFFECT_STATUS_AVAILABLE))
-			id = pduel->game_field->infos.effect_id++;
+			id = pduel->game_field->infos.field_id++;
 		status |= EFFECT_STATUS_AVAILABLE;
 	} else
 		status &= ~EFFECT_STATUS_AVAILABLE;

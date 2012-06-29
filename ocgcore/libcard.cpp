@@ -397,6 +397,8 @@ int32 scriptlib::card_set_status(lua_State *L) {
 	check_param_count(L, 3);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(pcard->status & STATUS_COPYING_EFFECT)
+		return 0;
 	uint32 tstatus = lua_tointeger(L, 2);
 	int32 enable = lua_toboolean(L, 3);
 	pcard->set_status(tstatus, enable);
@@ -699,15 +701,23 @@ int32 scriptlib::card_get_activate_effect(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	card::effect_container::iterator eit;
 	int32 count = 0;
-	for(eit = pcard->field_effect.begin(); eit != pcard->field_effect.end(); ++eit) {
+	for(auto eit = pcard->field_effect.begin(); eit != pcard->field_effect.end(); ++eit) {
 		if(eit->second->type & EFFECT_TYPE_ACTIVATE) {
 			interpreter::effect2value(L, eit->second);
 			count++;
 		}
 	}
 	return count;
+}
+int32 scriptlib::card_check_activate_effect(lua_State *L) {
+	check_param_count(L, 3);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	int32 neglect_con = lua_toboolean(L, 2);
+	int32 neglect_cost = lua_toboolean(L, 3);
+	duel* pduel = pcard->pduel;
+	return 1;
 }
 int32 scriptlib::card_register_effect(lua_State *L) {
 	check_param_count(L, 2);
@@ -1223,7 +1233,7 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	card* attacker = pduel->game_field->core.attacker;
 	if(pduel->game_field->core.effect_damage_step
 	        || attacker->is_status(STATUS_BATTLE_DESTROYED)
-	        || attacker->fieldid != pduel->game_field->core.pre_field[0]
+	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
 	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
 	        || attacker->announce_count >= ac) {
 		lua_pushboolean(L, 0);

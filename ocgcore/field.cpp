@@ -20,7 +20,6 @@ bool chain::chain_operation_sort(chain c1, chain c2) {
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
-	infos.effect_id = 1;
 	infos.copy_id = 1;
 	infos.turn_player = 0;
 	infos.turn_id = 0;
@@ -626,7 +625,7 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 		peffect->flag |= EFFECT_FLAG_FIELD_ONLY;
 		peffect->handler = peffect->owner;
 		peffect->effect_owner = owner_player;
-		peffect->id = infos.effect_id++;
+		peffect->id = infos.field_id++;
 	}
 	peffect->card_type = peffect->owner->data.type;
 	effect_container::iterator it;
@@ -1381,7 +1380,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack) 
 				pv = &player[1 - p].list_mzone;
 			for(cit = pv->begin(); cit != pv->end(); ++cit) {
 				atarget = *cit;
-				if(!atarget || pcard->announced_cards.count(atarget->fieldid))
+				if(!atarget || pcard->announced_cards.count(atarget->fieldid_r))
 					continue;
 				if(atarget->is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET))
 					continue;

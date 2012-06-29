@@ -19,7 +19,7 @@ function c31692182.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,c31692182.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoDeck(g,nil,0,REASON_COST)
 end
-function c31692182.filter(c)
+function c31692182.filter(e,c)
 	return c:IsType(TYPE_EFFECT) and not c:IsSetCard(0x1d)
 end
 function c31692182.operation(e,tp,eg,ep,ev,re,r,rp)

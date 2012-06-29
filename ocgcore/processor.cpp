@@ -1244,7 +1244,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			tf_count++;
@@ -1255,7 +1255,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			to_count++;
@@ -1273,7 +1273,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -1285,7 +1285,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -1374,7 +1374,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			tf_count++;
@@ -1385,7 +1385,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			to_count++;
@@ -1403,7 +1403,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -1415,7 +1415,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			peffect = pr.first->second;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
-			peffect->id = infos.effect_id++;
+			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
 			if(check_hint_timing(peffect))
 				core.spe_effect[check_player]++;
@@ -2763,15 +2763,22 @@ int32 field::process_battle_command(uint16 step) {
 			reset_phase(PHASE_DAMAGE);
 			return FALSE;
 		}
-		if(core.sub_attack_target != (card*)0xffffffff && (!core.sub_attack_target || core.sub_attack_target->current.location == LOCATION_MZONE)) {
+		if((core.sub_attacker && core.sub_attacker->is_position(POS_FACEUP) && core.sub_attacker->current.location == LOCATION_MZONE)
+		        || ((core.sub_attack_target != (card*)0xffffffff) && (!core.sub_attack_target || core.sub_attack_target->current.location == LOCATION_MZONE))) {
+			if(core.sub_attacker)
+				core.attacker = core.sub_attacker;
+			if(core.sub_attack_target != (card*)0xffffffff)
+				core.attack_target = core.sub_attack_target;
+			core.sub_attacker = 0;
+			core.sub_attack_target = (card*)0xffffffff;
 			core.attacker->announce_count++;
 			core.attacker->attacked_count++;
 			pduel->write_buffer8(MSG_ATTACK);
 			pduel->write_buffer32(core.attacker->get_info_location());
-			if(core.sub_attack_target) {
-				core.attacker->announced_cards[core.sub_attack_target->fieldid_r] = core.sub_attack_target;
-				core.attacker->attacked_cards[core.sub_attack_target->fieldid_r] = core.sub_attack_target;
-				pduel->write_buffer32(core.sub_attack_target->get_info_location());
+			if(core.attack_target) {
+				core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
+				core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
+				pduel->write_buffer32(core.attack_target->get_info_location());
 			} else {
 				core.attacker->announced_cards[0] = 0;
 				core.attacker->attacked_cards[0] = 0;

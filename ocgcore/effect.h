@@ -36,7 +36,7 @@ public:
 	uint32 description;
 	uint32 code;
 	uint32 flag;
-	uint16 id;
+	uint32 id;
 	uint16 type;
 	uint16 copy_id;
 	uint16 range;
