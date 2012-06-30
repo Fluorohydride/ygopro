@@ -711,13 +711,34 @@ int32 scriptlib::card_get_activate_effect(lua_State *L) {
 	return count;
 }
 int32 scriptlib::card_check_activate_effect(lua_State *L) {
-	check_param_count(L, 3);
+	check_param_count(L, 4);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 neglect_con = lua_toboolean(L, 2);
 	int32 neglect_cost = lua_toboolean(L, 3);
+	int32 copy_info = lua_toboolean(L, 4);
 	duel* pduel = pcard->pduel;
-	return 1;
+	tevent pe;
+	for(auto eit = pcard->field_effect.begin(); eit != pcard->field_effect.end(); ++eit) {
+		effect* peffect = eit->second;
+		if((peffect->type & EFFECT_TYPE_ACTIVATE)
+		        && pduel->game_field->check_event_c(peffect, pduel->game_field->core.reason_player, neglect_con, neglect_cost, copy_info, &pe)) {
+			if(!copy_info || (peffect->code == EVENT_FREE_CHAIN)) {
+				interpreter::effect2value(L, peffect);
+				return 1;
+			} else {
+				interpreter::effect2value(L, peffect);
+				interpreter::group2value(L, pe.event_cards);
+				lua_pushinteger(L, pe.event_player);
+				lua_pushinteger(L, pe.event_value);
+				interpreter::effect2value(L, pe.reason_effect);
+				lua_pushinteger(L, pe.reason);
+				lua_pushinteger(L, pe.reason_player);
+				return 7;
+			}
+		}
+	}
+	return 0;
 }
 int32 scriptlib::card_register_effect(lua_State *L) {
 	check_param_count(L, 2);

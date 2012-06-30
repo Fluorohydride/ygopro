@@ -4,9 +4,8 @@ function c63665875.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(63665875,0))
 	e1:SetCategory(CATEGORY_DECKDES)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c63665875.ddcon)
 	e1:SetTarget(c63665875.ddtg)
 	e1:SetOperation(c63665875.ddop)
@@ -23,7 +22,7 @@ function c63665875.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c63665875.ddcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and (Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler())
+	return ep~=tp
 end
 function c63665875.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -8,48 +8,25 @@ function c58242947.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1e1)
 	e1:SetCost(c58242947.cost)
-	e1:SetTarget(c58242947.tg)
-	e1:SetOperation(c58242947.op)
+	e1:SetTarget(c58242947.target)
+	e1:SetOperation(c58242947.operation)
 	c:RegisterEffect(e1)
 end
-function c58242947.check_effect(ce,e,tp,eg,ep,ev,re,r,rp)
-	local ecode=ce:GetCode()
-	if ecode~=EVENT_FREE_CHAIN and not Duel.CheckEvent(ecode) then return false end
-	local con=ce:GetCondition()
-	if con and not con(e,tp,eg,ep,ev,re,r,rp) then return false end
-	local tg=ce:GetTarget()
-	if tg and not tg(e,tp,eg,ep,ev,re,r,rp,0) then return false end
-	return true
-end
-function c58242947.filter(c,e,tp,eg,ep,ev,re,r,rp)
-	if c:GetType()~=0x4 or not c:IsAbleToRemoveAsCost() then return false end
-	local e1,e2,e3,e4,e5=c:GetActivateEffect()
-	if e1 and c58242947.check_effect(e1,e,tp,eg,ep,ev,re,r,rp) then return true
-	elseif e2 and c58242947.check_effect(e2,e,tp,eg,ep,ev,re,r,rp) then return true
-	elseif e3 and c58242947.check_effect(e3,e,tp,eg,ep,ev,re,r,rp) then return true
-	elseif e4 and c58242947.check_effect(e4,e,tp,eg,ep,ev,re,r,rp) then return true
-	elseif e5 and c58242947.check_effect(e5,e,tp,eg,ep,ev,re,r,rp) then return true
-	end
-	return false
+function c58242947.filter(c)
+	return c:GetType()==0x4 and c:IsAbleToRemoveAsCost() and c:CheckActivateEffect(false,true,false)~=nil
 end
 function c58242947.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return c:IsAbleToRemoveAsCost()
-		and Duel.IsExistingMatchingCard(c58242947.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp,eg,ep,ev,re,r,rp)
-	end
+		and Duel.IsExistingMatchingCard(c58242947.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(58242947,1))
-	local g=Duel.SelectMatchingCard(tp,c58242947.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,eg,ep,ev,re,r,rp)
-	local e1,e2,e3,e4,e5=g:GetFirst():GetActivateEffect()
-	if e1 and c58242947.check_effect(e1,e,tp,eg,ep,ev,re,r,rp) then e:SetLabelObject(e1)
-	elseif e2 and c58242947.check_effect(e2,e,tp,eg,ep,ev,re,r,rp) then e:SetLabelObject(e2)
-	elseif e3 and c58242947.check_effect(e3,e,tp,eg,ep,ev,re,r,rp) then e:SetLabelObject(e3)
-	elseif e4 and c58242947.check_effect(e4,e,tp,eg,ep,ev,re,r,rp) then e:SetLabelObject(e4)
-	elseif e5 and c58242947.check_effect(e5,e,tp,eg,ep,ev,re,r,rp) then e:SetLabelObject(e5)
-	end
+	local g=Duel.SelectMatchingCard(tp,c58242947.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local te=g:GetFirst():CheckActivateEffect(false,true,true)
+	e:SetLabelObject(te)
 	g:AddCard(c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
-function c58242947.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c58242947.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local te=e:GetLabelObject()
 	if chkc then
 		local tg=te:GetTarget()
@@ -57,12 +34,12 @@ function c58242947.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 	if chk==0 then return true end
 	if not te then return end
-	local tg=te:GetTarget()
 	e:SetCategory(te:GetCategory())
 	e:SetProperty(te:GetProperty())
+	local tg=te:GetTarget()
 	if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
 end
-function c58242947.op(e,tp,eg,ep,ev,re,r,rp)
+function c58242947.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()
 	if not te then return end
 	local op=te:GetOperation()

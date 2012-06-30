@@ -1199,18 +1199,45 @@ void field::raise_single_event(card* trigger_card, card_set* event_cards, uint32
 	core.single_event.push_back(new_event);
 }
 int32 field::check_event(uint32 code, tevent * pe) {
-	event_list::iterator eit;
-	for(eit = core.point_event.begin(); eit != core.point_event.end(); ++eit) {
+	for(auto eit = core.point_event.begin(); eit != core.point_event.end(); ++eit) {
 		if(eit->event_code == code) {
 			if(pe)
 				*pe = *eit;
 			return TRUE;
 		}
 	}
-	for(eit = core.instant_event.begin(); eit != core.instant_event.end(); ++eit) {
+	for(auto eit = core.instant_event.begin(); eit != core.instant_event.end(); ++eit) {
 		if(eit->event_code == code) {
 			if(pe)
 				*pe = *eit;
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
+int32 field::check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, int32 neglect_cost, int32 copy_info, tevent* pe) {
+	if(peffect->code == EVENT_FREE_CHAIN) {
+		return peffect->is_activate_ready(playerid, nil_event, neglect_con, neglect_cost, FALSE);
+	}
+	for(auto eit = core.point_event.begin(); eit != core.point_event.end(); ++eit) {
+		if(eit->event_code == peffect->code &&
+		        peffect->is_activate_ready(playerid, *eit, neglect_con, neglect_cost, FALSE)) {
+			if(pe)
+				*pe = *eit;
+			if(copy_info && !pduel->lua->no_action && core.current_chain.size()) {
+				core.current_chain.rbegin()->evt = *eit;
+			}
+			return TRUE;
+		}
+	}
+	for(auto eit = core.instant_event.begin(); eit != core.instant_event.end(); ++eit) {
+		if(eit->event_code == peffect->code &&
+		        peffect->is_activate_ready(playerid, *eit, neglect_con, neglect_cost, FALSE)) {
+			if(pe)
+				*pe = *eit;
+			if(copy_info && !pduel->lua->no_action && core.current_chain.size()) {
+				core.current_chain.rbegin()->evt = *eit;
+			}
 			return TRUE;
 		}
 	}
