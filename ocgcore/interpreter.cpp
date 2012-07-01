@@ -686,7 +686,7 @@ void interpreter::push_param(lua_State* L) {
 		}
 		case PARAM_TYPE_INDEX: {
 			int32 index = (int32)(ptr)it->first;
-			if(index > 0)
+			if (lua_isnil(L, index))
 				lua_pushvalue(L, index);
 			else lua_pushnil(L);
 			break;
