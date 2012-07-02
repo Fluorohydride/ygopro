@@ -645,9 +645,9 @@ void interpreter::add_param(ptr param, int32 type, bool front) {
 		params.push_back(make_pair((void*)param, type));
 }
 void interpreter::push_param(lua_State* L) {
-	param_list::iterator it;
 	uint32 type;
-	for (it = params.begin(); it != params.end(); ++it) {
+	int32 pushed = 0;
+	for (auto it = params.begin(); it != params.end(); ++it) {
 		type = it->second;
 		switch(type) {
 		case PARAM_TYPE_INT:
@@ -688,10 +688,14 @@ void interpreter::push_param(lua_State* L) {
 			int32 index = (int32)(ptr)it->first;
 			if(index > 0)
 				lua_pushvalue(L, index);
-			else lua_pushnil(L);
+			else {
+				lua_pushnil(L);
+//				lua_pushvalue(L, index - pushed);
+			}
 			break;
 		}
 		}
+		pushed++;
 	}
 	params.clear();
 }

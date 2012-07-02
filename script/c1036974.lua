@@ -30,6 +30,6 @@ end
 function c1036974.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		Duel.Damage(1-tp,tc:GetAttack()/2,REASON_EFFECT)
+		Duel.Damage(1-tp,tc:GetBaseAttack()/2,REASON_EFFECT)
 	end
 end
