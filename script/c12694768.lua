@@ -19,6 +19,6 @@ function c12694768.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,500)
 end
 function c12694768.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Recover(tp,500,REASON_EFFECT)
-	Duel.Recover(1-tp,500,REASON_EFFECT)
+	Duel.Damage(tp,500,REASON_EFFECT)
+	Duel.Damage(1-tp,500,REASON_EFFECT)
 end

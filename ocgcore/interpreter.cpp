@@ -644,7 +644,7 @@ void interpreter::add_param(ptr param, int32 type, bool front) {
 	else
 		params.push_back(make_pair((void*)param, type));
 }
-void interpreter::push_param(lua_State* L) {
+void interpreter::push_param(lua_State* L, bool is_coroutine) {
 	uint32 type;
 	int32 pushed = 0;
 	for (auto it = params.begin(); it != params.end(); ++it) {
@@ -688,9 +688,15 @@ void interpreter::push_param(lua_State* L) {
 			int32 index = (int32)(ptr)it->first;
 			if(index > 0)
 				lua_pushvalue(L, index);
-			else {
-				lua_pushnil(L);
-//				lua_pushvalue(L, index - pushed);
+			else if(is_coroutine) {
+				//copy value from current_state to new stack
+				lua_pushvalue(current_state, index);
+				int32 ref = luaL_ref(current_state, LUA_REGISTRYINDEX);
+				lua_rawgeti(L, LUA_REGISTRYINDEX, ref);
+				luaL_unref(current_state, LUA_REGISTRYINDEX, ref);
+			} else {
+				//the calling function is pushed before the params, so the actual index is: index - pushed -1
+				lua_pushvalue(L, index - pushed - 1);
 			}
 			break;
 		}
@@ -956,8 +962,8 @@ int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_va
 			return OPERATION_FAIL;
 		}
 	}
+	push_param(rthread, true);
 	current_state = rthread;
-	push_param(rthread);
 	int32 result = lua_resume(rthread, 0, param_count);
 	if (result == 0) {
 		coroutines.erase(f);
