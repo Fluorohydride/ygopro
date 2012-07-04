@@ -28,7 +28,8 @@ function c69488544.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c69488544.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return aux.IsDualState(e) and rp~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+		and aux.IsDualState(e) and rp~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c69488544.filter(c,e,tp)
 	return c:IsType(TYPE_DUAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -20,7 +20,8 @@ function c92661479.initial_effect(c)
 end
 function c92661479.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	return ep~=tp and loc==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
+		and loc==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev)
 end
 function c92661479.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

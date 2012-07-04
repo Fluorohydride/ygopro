@@ -50,8 +50,8 @@ function c67098114.tfilter(c)
 	return c:IsSetCard(0xa042) or c:IsCode(61777313)
 end
 function c67098114.discon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and ep~=tp and bit.band(Duel.GetCurrentPhase(),0x38)~=0
-		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.GetTurnPlayer()==tp
+		and ep~=tp and bit.band(Duel.GetCurrentPhase(),0x38)~=0 and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c67098114.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

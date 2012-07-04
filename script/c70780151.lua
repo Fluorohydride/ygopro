@@ -47,6 +47,7 @@ function c70780151.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Recover(p,d,REASON_EFFECT)
 end
 function c70780151.discon(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not tg or tg:GetCount()~=1 or not tg:GetFirst():IsRace(RACE_PSYCHO) then return false end

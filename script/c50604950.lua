@@ -20,7 +20,7 @@ end
 function c50604950.atkval(e,c)
 	local ph=Duel.GetCurrentPhase()
 	if ph~=PHASE_DAMAGE and ph~=PHASE_DAMAGE_CAL then return 0 end
-	if c==Duel.GetAttacker() then return 300 end
+	if c==Duel.GetAttacker() and Duel.GetAttackTarget() then return 300 end
 	if c==Duel.GetAttackTarget() then return -500 end
 	return 0
 end

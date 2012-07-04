@@ -40,6 +40,7 @@ function c6137095.activate(e,tp,eg,ep,ev,re,r,rp)
 			if rc:IsCanTurnSet() then
 				rc:CancelToGrave()
 				Duel.ChangePosition(rc,POS_FACEDOWN)
+				rc:SetStatus(STATUS_SET_TURN,false)
 				Duel.RaiseEvent(rc,EVENT_SSET,e,REASON_EFFECT,tp,tp,0)
 			end
 		end

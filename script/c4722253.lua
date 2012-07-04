@@ -41,7 +41,7 @@ function c4722253.cfilter(c)
 	return c:IsFaceup() and not c:IsRace(RACE_WARRIOR)
 end
 function c4722253.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 		and not Duel.IsExistingMatchingCard(c4722253.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c4722253.cfilter2(c)
