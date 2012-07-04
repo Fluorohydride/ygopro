@@ -686,7 +686,7 @@ void interpreter::push_param(lua_State* L, bool is_coroutine) {
 		}
 		case PARAM_TYPE_INDEX: {
 			int32 index = (int32)(ptr)it->first;
-			if(index > 0)
+			if (lua_isnil(L, index))
 				lua_pushvalue(L, index);
 			else if(is_coroutine) {
 				//copy value from current_state to new stack
