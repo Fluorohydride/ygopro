@@ -1667,6 +1667,15 @@ int32 card::is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect
 int32 card::is_setable_szone(uint8 playerid) {
 	if(!(data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_TOFIELD) <= 0)
 		return FALSE;
+	if(data.type & TYPE_FIELD) {
+		int32 fcount = 0;
+		if(pduel->game_field->get_field_card(current.controler, LOCATION_SZONE, 5))
+			fcount++;
+		effect_set eset;
+		pduel->game_field->filter_player_effect(current.controler, EFFECT_MAX_SZONE, &eset);
+		if(eset.count && pduel->game_field->get_useable_count(current.controler, LOCATION_SZONE, current.controler, LOCATION_REASON_TOFIELD) <= -fcount)
+			return FALSE;
+	}
 	if(data.type & TYPE_MONSTER && !is_affected_by_effect(EFFECT_MONSTER_SSET))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))

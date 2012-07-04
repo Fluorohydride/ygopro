@@ -1645,6 +1645,15 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 	case 0: {
 		if(!(target->data.type & TYPE_FIELD) && get_useable_count(toplayer, LOCATION_SZONE, setplayer, LOCATION_REASON_TOFIELD) <= 0)
 			return TRUE;
+		if(target->data.type & TYPE_FIELD) {
+			int32 fcount = 0;
+			if(get_field_card(toplayer, LOCATION_SZONE, 5))
+				fcount++;
+			effect_set eset;
+			pduel->game_field->filter_player_effect(toplayer, EFFECT_MAX_SZONE, &eset);
+			if(eset.count && get_useable_count(toplayer, LOCATION_SZONE, setplayer, LOCATION_REASON_TOFIELD) <= -fcount)
+				return FALSE;
+		}
 		if(target->data.type & TYPE_MONSTER && !target->is_affected_by_effect(EFFECT_MONSTER_SSET))
 			return TRUE;
 		if(target->current.location == LOCATION_SZONE)
