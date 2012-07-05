@@ -72,6 +72,7 @@ field::field(duel* pduel) {
 	core.deck_reversed = FALSE;
 	core.remove_brainwashing = FALSE;
 	core.effect_damage_step = FALSE;
+	core.shuffle_check_disabled = FALSE;
 	nil_event.event_code = 0;
 	nil_event.event_cards = 0;
 	nil_event.event_player = PLAYER_NONE;

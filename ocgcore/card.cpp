@@ -1030,8 +1030,7 @@ int32 card::leave_field_redirect(uint32 reason) {
 		return 0;
 	filter_effect(EFFECT_LEAVE_FIELD_REDIRECT, &es);
 	for(int32 i = 0; i < es.count; ++i) {
-		pduel->lua->add_param(reason, PARAM_TYPE_INT);
-		redirect = es[i]->get_value(this, 1);
+		redirect = es[i]->get_value(this, 0);
 		if((redirect & LOCATION_HAND) && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
 			return redirect;
 		else if((redirect & LOCATION_DECK) && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))
@@ -1058,8 +1057,7 @@ int32 card::destination_redirect(uint8 destination, uint32 reason) {
 		filter_effect(EFFECT_REMOVE_REDIRECT, &es);
 	else return 0;
 	for(int32 i = 0; i < es.count; ++i) {
-		pduel->lua->add_param(reason, PARAM_TYPE_INT);
-		redirect = es[i]->get_value(this, 1);
+		redirect = es[i]->get_value(this, 0);
 		if((redirect & LOCATION_HAND) && !is_affected_by_effect(EFFECT_CANNOT_TO_HAND) && pduel->game_field->is_player_can_send_to_hand(current.controler, this))
 			return redirect;
 		if((redirect & LOCATION_DECK) && !is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && pduel->game_field->is_player_can_send_to_deck(current.controler, this))

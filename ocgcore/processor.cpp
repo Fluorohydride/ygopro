@@ -4724,6 +4724,14 @@ int32 field::adjust_step(uint16 step) {
 			core.units.begin()->step = -1;
 			return FALSE;
 		}
+		if(core.shuffle_hand_check[0])
+			shuffle(0, LOCATION_HAND);
+		if(core.shuffle_hand_check[1])
+			shuffle(1, LOCATION_HAND);
+		if(core.shuffle_deck_check[0])
+			shuffle(0, LOCATION_DECK);
+		if(core.shuffle_deck_check[1])
+			shuffle(1, LOCATION_DECK);
 		return TRUE;
 	}
 	}
