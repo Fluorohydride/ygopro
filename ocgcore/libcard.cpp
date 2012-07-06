@@ -1798,6 +1798,20 @@ int32 scriptlib::card_get_battle_target(lua_State *L) {
 	else lua_pushnil(L);
 	return 1;
 }
+int32 scriptlib::card_get_attackable_target(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	duel* pduel = pcard->pduel;
+	field::card_vector targets;
+	pduel->game_field->get_attack_target(pcard, &targets);
+	group* newgroup = pduel->new_group();
+	for(auto cit = targets.begin(); cit != targets.end(); ++cit)
+		newgroup->container.insert(*cit);
+	interpreter::group2value(L, newgroup);
+	lua_pushboolean(L, pcard->operation_param);
+	return 2;
+}
 int32 scriptlib::card_set_hint(lua_State *L) {
 	check_param_count(L, 3);
 	check_param(L, PARAM_TYPE_CARD, 1);
