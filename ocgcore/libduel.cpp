@@ -809,9 +809,33 @@ int32 scriptlib::duel_equip(lua_State *L) {
 	uint32 up = TRUE;
 	if(lua_gettop(L) > 3)
 		up = lua_toboolean(L, 4);
+	uint32 step = FALSE;
+	if(lua_gettop(L) > 4)
+		step = lua_toboolean(L, 5);
 	duel* pduel = target->pduel;
-	pduel->game_field->equip(playerid, equip_card, target, up);
+	pduel->game_field->equip(playerid, equip_card, target, up, step);
 	pduel->game_field->core.subunits.begin()->type = PROCESSOR_EQUIP_S;
+	return lua_yield(L, 0);
+}
+int32 scriptlib::duel_equip_complete(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	field::card_set etargets;
+	for(auto cit = pduel->game_field->core.equiping_cards.begin(); cit != pduel->game_field->core.equiping_cards.end(); ++cit) {
+		card* equip_card = *cit;
+		if(equip_card->is_position(POS_FACEUP))
+			equip_card->enable_field_effect(TRUE);
+		etargets.insert(equip_card->equiping_target);
+	}
+	pduel->game_field->adjust_instant();
+	for(auto cit = etargets.begin(); cit != etargets.end(); ++cit)
+		pduel->game_field->raise_single_event(*cit, &pduel->game_field->core.equiping_cards, EVENT_EQUIP,
+		                                      pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, PLAYER_NONE, 0);
+	pduel->game_field->raise_event(&pduel->game_field->core.equiping_cards, EVENT_EQUIP,
+	                               pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, PLAYER_NONE, 0);
+	pduel->game_field->core.hint_timing[0] |= TIMING_EQUIP;
+	pduel->game_field->core.hint_timing[1] |= TIMING_EQUIP;
+	pduel->game_field->process_single_event();
+	pduel->game_field->process_instant_event();
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_get_control(lua_State *L) {

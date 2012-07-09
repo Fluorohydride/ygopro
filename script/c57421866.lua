@@ -33,7 +33,7 @@ function c57421866.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c57421866.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or tc:GetLevel()<2 then return end
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:GetLevel()<2 then return end
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

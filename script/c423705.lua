@@ -10,14 +10,16 @@ function c423705.initial_effect(c)
 	e1:SetOperation(c423705.desop)
 	c:RegisterEffect(e1)
 end
+function c423705.filter(c,ec)
+	return c:GetEquipTarget()==ec
+end
 function c423705.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	eg:GetFirst():CreateEffectRelation(e)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	if chk==0 then return eg:IsExists(c423705.filter,1,nil,e:GetHandler()) end
+	local dg=eg:Filter(c423705.filter,nil,e:GetHandler())
+	Duel.SetTargetCard(dg)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,dg:GetCount(),0,0)
 end
 function c423705.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	if tc:IsRelateToEffect(e) then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
+	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	Duel.Destroy(tg,REASON_EFFECT)
 end

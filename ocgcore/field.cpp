@@ -1367,8 +1367,7 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack) 
 	}
 	if((peffect = pcard->is_affected_by_effect(EFFECT_ATTACK_ALL))) {
 		if(pcard->announced_cards.size()) {
-			card::attacker_map::iterator ait;
-			for(ait = pcard->announced_cards.begin(); ait != pcard->announced_cards.end(); ++ait) {
+			for(auto ait = pcard->announced_cards.begin(); ait != pcard->announced_cards.end(); ++ait) {
 				if(ait->first == 0)
 					continue;
 				pduel->lua->add_param(ait->second, PARAM_TYPE_CARD);

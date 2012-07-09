@@ -111,8 +111,8 @@ void field::get_control(effect* reason_effect, uint32 reason_player, card* pcard
 void field::swap_control(effect* reason_effect, uint32 reason_player, card* pcard1, card* pcard2, uint32 reset_phase, uint32 reset_count) {
 	add_process(PROCESSOR_SWAP_CONTROL, 0, reason_effect, (group*)pcard1, (ptr)pcard2, (reason_player << 24) + (reset_phase << 8) + reset_count);
 }
-void field::equip(uint32 equip_player, card* equip_card, card* target, uint32 up) {
-	add_process(PROCESSOR_EQUIP, 0, 0, (group*)target, (ptr)equip_card, equip_player + (up << 16));
+void field::equip(uint32 equip_player, card* equip_card, card* target, uint32 up, uint32 is_step) {
+	add_process(PROCESSOR_EQUIP, 0, 0, (group*)target, (ptr)equip_card, equip_player + (up << 16) + (is_step << 24));
 }
 void field::draw(effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 count) {
 	add_process(PROCESSOR_DRAW, 0, reason_effect, 0, reason, (reason_player << 28) + (playerid << 24) + (count & 0xffffff));
@@ -993,7 +993,7 @@ int32 field::control_adjust(uint16 step) {
 	}
 	return TRUE;
 }
-int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * target, uint32 up) {
+int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * target, uint32 up, uint32 is_step) {
 	switch(step) {
 	case 0: {
 		returns.ivalue[0] = FALSE;
@@ -1034,19 +1034,25 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 			peffect->reset_flag = RESET_EVENT + 0x1fe0000;
 			equip_card->add_effect(peffect);
 		}
-		if(equip_card->is_position(POS_FACEUP))
-			equip_card->enable_field_effect(TRUE);
 		equip_card->effect_target_cards.insert(target);
 		target->effect_target_owner.insert(equip_card);
-		adjust_instant();
-		card_set cset;
-		cset.insert(equip_card);
-		raise_single_event(target, &cset, EVENT_EQUIP, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
-		raise_event(&cset, EVENT_EQUIP, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
-		core.hint_timing[target->current.controler] |= TIMING_EQUIP;
-		process_single_event();
-		process_instant_event();
-		return FALSE;
+		if(!is_step) {
+			if(equip_card->is_position(POS_FACEUP))
+				equip_card->enable_field_effect(TRUE);
+			adjust_instant();
+			card_set cset;
+			cset.insert(equip_card);
+			raise_single_event(target, &cset, EVENT_EQUIP, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
+			raise_event(&cset, EVENT_EQUIP, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
+			core.hint_timing[target->current.controler] |= TIMING_EQUIP;
+			process_single_event();
+			process_instant_event();
+			return FALSE;
+		} else {
+			core.equiping_cards.insert(equip_card);
+			returns.ivalue[0] = TRUE;
+			return TRUE;
+		}
 	}
 	case 2: {
 		returns.ivalue[0] = TRUE;

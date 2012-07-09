@@ -178,6 +178,7 @@ struct processor {
 	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
 	card_set special_summoning;
+	card_set equiping_cards;
 	card_set control_adjust_set[2];
 	card_set release_cards;
 	card_set release_cards_ex;
@@ -403,7 +404,7 @@ public:
 	void remove_overlay_card(uint32 reason, card* pcard, uint32 rplayer, uint32 s, uint32 o, uint16 min, uint16 max);
 	void get_control(effect* reason_effect, uint32 reason_player, card* pcard, uint32 playerid, uint32 reset_phase, uint32 reset_count);
 	void swap_control(effect* reason_effect, uint32 reason_player, card* pcard1, card* pcard2, uint32 reset_phase, uint32 reset_count);
-	void equip(uint32 equip_player, card* equip_card, card* target, uint32 up);
+	void equip(uint32 equip_player, card* equip_card, card* target, uint32 up, uint32 is_step);
 	void draw(effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 count);
 	void damage(effect* reason_effect, uint32 reason, uint32 reason_player, card* pcard, uint32 playerid, uint32 amount);
 	void recover(effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 amount);
@@ -427,7 +428,7 @@ public:
 	int32 get_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count);
 	int32 swap_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard1, card* pcard2, uint8 reset_phase, uint8 reset_count);
 	int32 control_adjust(uint16 step);
-	int32 equip(uint16 step, uint8 equip_player, card* equip_card, card* target, uint32 up);
+	int32 equip(uint16 step, uint8 equip_player, card* equip_card, card* target, uint32 up, uint32 is_step);
 	int32 draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 playerid, uint32 count);
 	int32 damage(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, card* pcard, uint8 playerid, uint32 amount);
 	int32 recover(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 playerid, uint32 amount);

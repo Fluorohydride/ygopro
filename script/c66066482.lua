@@ -66,8 +66,11 @@ end
 function c66066482.eqlimit(e,c)
 	return e:GetOwner()==c and not c:IsDisabled()
 end
+function c66066482.eqfilter(c,ec)
+	return c:IsFaceup() and c:GetEquipTarget()==ec and c:IsSetCard(0x56)
+end
 function c66066482.cfcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst():IsSetCard(0x56)
+	return eg:IsExists(c66066482.eqfilter,1,nil,e:GetHandler())
 end
 function c66066482.cftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_ONFIELD,1,nil) end

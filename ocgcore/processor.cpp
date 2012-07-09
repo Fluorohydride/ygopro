@@ -424,7 +424,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EQUIP: {
-		if (equip(it->step, it->arg2 & 0xffff, (card*)it->arg1, (card*)it->ptarget, (it->arg2 >> 16)))
+		if (equip(it->step, it->arg2 & 0xffff, (card*)it->arg1, (card*)it->ptarget, (it->arg2 >> 16) & 0xff, (it->arg2 >> 24) & 0xff))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -4087,7 +4087,9 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		effect* peffect = cait->triggering_effect;
 		peffect->operation = (ptr)core.units.begin()->peffect;
 		if(core.special_summoning.size())
-			special_summon_complete(peffect, cait->triggering_player);
+			core.special_summoning.clear();
+		if(core.equiping_cards.size())
+			core.equiping_cards.clear();
 		return FALSE;
 	}
 	case 4: {
