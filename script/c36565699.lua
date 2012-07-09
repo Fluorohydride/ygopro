@@ -22,6 +22,7 @@ function c36565699.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(1-tp,3)
 	local g=Duel.GetDecktopGroup(1-tp,3)
 	if g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local sg=g:FilterSelect(tp,Card.IsAbleToRemove,1,1,nil)
 		Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
 		Duel.ShuffleDeck(1-tp)

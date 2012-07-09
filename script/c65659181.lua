@@ -40,6 +40,7 @@ function c65659181.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		Duel.SpecialSummonComplete()
 	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local fg=sg:Select(tp,ft,ft,nil)
 		local tc=fg:GetFirst()
 		while tc do

@@ -69,9 +69,9 @@ function c3429238.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c3429238.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_HAND,0,1,1,nil)
 	if g:GetCount()>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
 		if c:IsRelateToEffect(e) and Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)~=0 then
 			e:GetHandler():RegisterFlagEffect(3429238,RESET_EVENT+0x1fe0000,0,1)

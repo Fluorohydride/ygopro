@@ -55,6 +55,7 @@ function c80033124.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleHand(tp)
 	end
 	Duel.SendtoDeck(g1,nil,2,REASON_EFFECT)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectMatchingCard(tp,c80033124.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	Duel.SpecialSummon(sg,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 	sg:GetFirst():CompleteProcedure()

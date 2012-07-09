@@ -32,6 +32,7 @@ function c1802450.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		local cg=Duel.SelectReleaseGroup(tp,c1802450.cfilter,1,1,nil)
 		Duel.Release(cg,REASON_COST)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,2,nil)
 		Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 		e:GetHandler():RegisterFlagEffect(1802450,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
@@ -46,6 +47,7 @@ function c1802450.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return e:GetHandler():GetFlagEffect(1802450)==0
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 	e:GetHandler():RegisterFlagEffect(1802450,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)

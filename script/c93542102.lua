@@ -49,6 +49,7 @@ function c93542102.opa(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(tp,dc)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local g=Duel.GetDecktopGroup(tp,dc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:FilterSelect(tp,c93542102.filter,1,1,nil,e,tp)
 	Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEUP)
 	Duel.ShuffleDeck(tp)

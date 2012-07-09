@@ -34,8 +34,8 @@ function c41858121.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.BreakEffect()
 	local op=0
 	local b1=Duel.IsPlayerCanDraw(tp,1)
-	Duel.Hint(HINT_SELECTMSG,tp,0)
 	local b2=Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,0)
 	if b1 and b2 then op=Duel.SelectOption(tp,aux.Stringid(41858121,0),aux.Stringid(41858121,1))
 	elseif b1 then op=Duel.SelectOption(tp,aux.Stringid(41858121,0))
 	elseif b2 then Duel.SelectOption(tp,aux.Stringid(41858121,1)) op=1
@@ -43,6 +43,7 @@ function c41858121.activate(e,tp,eg,ep,ev,re,r,rp)
 	if op==0 then
 		Duel.Draw(tp,1,REASON_EFFECT)
 	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local dg=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil)
 		Duel.Destroy(dg,REASON_EFFECT)
 	end

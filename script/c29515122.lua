@@ -31,6 +31,7 @@ function c29515122.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetOperatedGroup()
 	local ct=g:FilterCount(c29515122.cfilter,nil)
 	if ct==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,ct,nil)
 	Duel.Destroy(dg,REASON_EFFECT)
 end

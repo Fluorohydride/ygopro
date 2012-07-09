@@ -82,6 +82,7 @@ function c24104865.spop(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(c24104865.sfilter,nil,e,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	if sg:GetCount()>ft then sg=sg:Select(tp,ft,ft,nil) end
 	local tc=sg:GetFirst()
 	local c=e:GetHandler()

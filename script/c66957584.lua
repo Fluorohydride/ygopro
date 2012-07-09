@@ -37,6 +37,7 @@ function c66957584.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,0,0)
 end
 function c66957584.disop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c66957584.disfilter,tp,LOCATION_HAND,0,1,1,nil)
 	if g:GetCount()>0 then Duel.SendtoGrave(g,REASON_EFFECT) end
 end
@@ -71,6 +72,7 @@ function c66957584.spop(e,tp,eg,ep,ev,re,r,rp)
 	if ft>=g:GetCount() then
 		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg2=sg:Select(tp,ft,ft,nil)
 		Duel.SpecialSummon(sg2,0,tp,tp,false,false,POS_FACEUP)
 	end
