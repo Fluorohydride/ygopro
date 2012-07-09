@@ -33,6 +33,7 @@ function c81443745.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local cg=Duel.SelectMatchingCard(tp,c81443745.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 		Duel.SendtoGrave(cg,REASON_COST)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 		e:GetHandler():RegisterFlagEffect(81443745,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
@@ -48,6 +49,7 @@ function c81443745.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return e:GetHandler():GetFlagEffect(81443745)==0
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 	e:GetHandler():RegisterFlagEffect(81443745,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)

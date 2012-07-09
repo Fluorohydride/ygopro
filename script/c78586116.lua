@@ -59,8 +59,8 @@ end
 function c78586116.attg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local eq=e:GetHandler():GetEquipTarget()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and chkc~=eq end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	if chk==0 then return eq and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,eq) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,eq)
 end
 function c78586116.atop(e,tp,eg,ep,ev,re,r,rp)

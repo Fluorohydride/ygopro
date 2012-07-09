@@ -62,6 +62,7 @@ function c32710364.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	if gc<=ct then
 		Duel.SpecialSummon(g,0,tp,tp,true,false,POS_FACEUP)
 	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,ct,ct,nil)
 		Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEUP)
 	end

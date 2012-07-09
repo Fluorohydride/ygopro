@@ -53,6 +53,7 @@ end
 function c52684508.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c52684508.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c52684508.filter,tp,LOCATION_MZONE,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,c52684508.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c52684508.activate(e,tp,eg,ep,ev,re,r,rp)

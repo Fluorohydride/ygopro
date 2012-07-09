@@ -26,6 +26,7 @@ function c66729231.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetOperatedGroup():GetFirst()
 	Duel.ConfirmCards(1-tp,tc)
 	if tc:IsSetCard(0x3a) and tc:IsType(TYPE_MONSTER) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local dg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		Duel.SendtoDeck(dg,nil,2,REASON_EFFECT)
 	end

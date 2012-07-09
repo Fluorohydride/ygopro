@@ -26,6 +26,7 @@ function c99267150.fscondition(e,g,gc)
 	return g:IsExists(Card.IsRace,5,nil,RACE_DRAGON)
 end
 function c99267150.fsoperation(e,tp,eg,ep,ev,re,r,rp,gc)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 	if gc then Duel.SetFusionMaterial(eg:FilterSelect(tp,Card.IsRace,4,4,gc,RACE_DRAGON))
 	else Duel.SetFusionMaterial(eg:FilterSelect(tp,Card.IsRace,5,5,nil,RACE_DRAGON)) end
 end

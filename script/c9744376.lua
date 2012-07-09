@@ -21,6 +21,7 @@ function c9744376.activate(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetMatchingGroupCount(Card.IsCode,p,LOCATION_GRAVE,0,nil,9744376)+1
 	Duel.Draw(p,d,REASON_EFFECT)
 	Duel.BreakEffect()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(p,aux.TRUE,p,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoDeck(g,nil,1,REASON_EFFECT)
 end
