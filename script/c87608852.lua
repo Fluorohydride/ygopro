@@ -28,14 +28,9 @@ function c87608852.initial_effect(c)
 		Duel.RegisterEffect(ge2,0)
 		local ge3=Effect.CreateEffect(c)
 		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_CHAIN_NEGATED)
-		ge3:SetOperation(c87608852.checkop3)
+		ge3:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+		ge3:SetOperation(c87608852.clear)
 		Duel.RegisterEffect(ge3,0)
-		local ge4=Effect.CreateEffect(c)
-		ge4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge4:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge4:SetOperation(c87608852.clear)
-		Duel.RegisterEffect(ge4,0)
 	end
 end
 function c87608852.checkop1(e,tp,eg,ep,ev,re,r,rp)
@@ -50,11 +45,6 @@ end
 function c87608852.checkop2(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
 		c87608852[rp+2]=c87608852[rp+2]+1
-	end
-end
-function c87608852.checkop3(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
-		c87608852[rp+2]=c87608852[rp+2]-1
 	end
 end
 function c87608852.clear(e,tp,eg,ep,ev,re,r,rp)

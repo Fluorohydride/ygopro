@@ -8,6 +8,7 @@ function c71209500.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1c0+TIMING_DRAW_PHASE)
 	e1:SetCost(c71209500.efcost)
+	e1:SetTarget(c71209500.eftg)
 	e1:SetOperation(c71209500.efop)
 	c:RegisterEffect(e1)
 end
@@ -17,6 +18,9 @@ function c71209500.efcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c71209500.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x4)
+end
+function c71209500.eftg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c71209500.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 end
 function c71209500.efop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

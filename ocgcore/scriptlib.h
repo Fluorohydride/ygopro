@@ -344,8 +344,9 @@ public:
 	static int32 duel_change_target_param(lua_State *L);
 	static int32 duel_break_effect(lua_State *L);
 	static int32 duel_change_effect(lua_State *L);
-	static int32 duel_disable_activate(lua_State *L);
-	static int32 duel_disable_effect(lua_State *L);
+	static int32 duel_negate_activate(lua_State *L);
+	static int32 duel_negate_effect(lua_State *L);
+	static int32 duel_negate_related_chain(lua_State *L);
 	static int32 duel_disable_summon(lua_State *L);
 	static int32 duel_increase_summon_count(lua_State *L);
 	static int32 duel_check_summon_count(lua_State *L);

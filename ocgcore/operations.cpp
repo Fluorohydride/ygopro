@@ -54,6 +54,21 @@ int32 field::disable_chain(uint8 chaincount) {
 	}
 	return FALSE;
 }
+int32 field::negate_related_chain(card* pcard) {
+	for(int32 i = 0; i < core.current_chain.size(); ++i) {
+		chain& pchain = core.current_chain[i];
+		if(pchain.triggering_effect->handler == pcard && !(pchain.flag & CHAIN_DISABLE_EFFECT) && is_chain_disablable(pchain.chain_count)
+		        && pchain.triggering_effect->handler->is_affect_by_effect(core.reason_effect)) {
+			pchain.flag |= CHAIN_DISABLE_EFFECT | CHAIN_NEGATED;
+			pchain.disable_reason = core.reason_effect;
+			pchain.disable_player = core.reason_player;
+			pduel->write_buffer8(MSG_CHAIN_DISABLED);
+			pduel->write_buffer8(i);
+			return TRUE;
+		}
+	}
+	return FALSE;
+}
 void field::change_chain_effect(uint8 chaincount, int32 rep_op) {
 	if(core.current_chain.size() == 0)
 		return;
@@ -213,8 +228,7 @@ void field::destroy(card* target, effect* reason_effect, uint32 reason, uint32 r
 	destroy(&tset, reason_effect, reason, reason_player, playerid, destination, sequence);
 }
 void field::release(card_set* targets, effect* reason_effect, uint32 reason, uint32 reason_player) {
-	card_set::iterator cit;
-	for(cit = targets->begin(); cit != targets->end(); ++cit) {
+	for(auto cit = targets->begin(); cit != targets->end(); ++cit) {
 		card* pcard = *cit;
 		pcard->temp.reason = pcard->current.reason;
 		pcard->temp.reason_effect = pcard->current.reason_effect;
@@ -235,11 +249,10 @@ void field::release(card* target, effect* reason_effect, uint32 reason, uint32 r
 	release(&tset, reason_effect, reason, reason_player);
 }
 void field::send_to(card_set* targets, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position) {
-	card_set::iterator cit;
 	if(!(destination & (LOCATION_HAND + LOCATION_DECK + LOCATION_GRAVE + LOCATION_REMOVED)))
 		return;
 	uint32 p, pos;
-	for(cit = targets->begin(); cit != targets->end(); ++cit) {
+	for(auto cit = targets->begin(); cit != targets->end(); ++cit) {
 		card* pcard = *cit;
 		pcard->temp.reason = pcard->current.reason;
 		pcard->temp.reason_effect = pcard->current.reason_effect;
@@ -279,8 +292,7 @@ void field::change_position(card_set* targets, effect* reason_effect, uint32 rea
 	group* ng = pduel->new_group();
 	ng->container = *targets;
 	ng->is_readonly = TRUE;
-	card_set::iterator cit;
-	for(cit = targets->begin(); cit != targets->end(); ++cit) {
+	for(auto cit = targets->begin(); cit != targets->end(); ++cit) {
 		card* pcard = *cit;
 		if(pcard->current.position == POS_FACEUP_ATTACK) pcard->operation_param = au;
 		else if(pcard->current.position == POS_FACEDOWN_DEFENCE) pcard->operation_param = dd;

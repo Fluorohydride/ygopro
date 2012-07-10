@@ -396,6 +396,7 @@ public:
 	//operations
 	int32 negate_chain(uint8 chaincount);
 	int32 disable_chain(uint8 chaincount);
+	int32 negate_related_chain(card* pcard);
 	void change_chain_effect(uint8 chaincount, int32 replace_op);
 	void change_target(uint8 chaincount, group* targets);
 	void change_target_player(uint8 chaincount, uint8 playerid);

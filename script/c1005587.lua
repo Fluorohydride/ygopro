@@ -36,18 +36,7 @@ function c1005587.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_DISABLE)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	tc:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
-	e2:SetOperation(c1005587.disop)
-	e2:SetLabelObject(tc)
-	e2:SetReset(RESET_CHAIN)
-	Duel.RegisterEffect(e2,tp)
 	Duel.AdjustInstantly()
+	Duel.NegateRelatedChain(tc)
 	Duel.Destroy(tc,REASON_EFFECT)
-end
-function c1005587.disop(e,tp,eg,ep,ev,re,r,rp)
-	if re:GetHandler()==e:GetLabelObject() then
-		Duel.NegateEffect(ev)
-	end
 end

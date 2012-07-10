@@ -1120,18 +1120,26 @@ int32 scriptlib::duel_change_effect(lua_State *L) {
 	pduel->game_field->change_chain_effect(count, pf);
 	return 0;
 }
-int32 scriptlib::duel_disable_activate(lua_State *L) {
+int32 scriptlib::duel_negate_activate(lua_State *L) {
 	check_param_count(L, 1);
 	uint32 c = lua_tointeger(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	lua_pushboolean(L, pduel->game_field->negate_chain(c));
 	return 1;
 }
-int32 scriptlib::duel_disable_effect(lua_State *L) {
+int32 scriptlib::duel_negate_effect(lua_State *L) {
 	check_param_count(L, 1);
 	uint32 c = lua_tointeger(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	lua_pushboolean(L, pduel->game_field->disable_chain(c));
+	return 1;
+}
+int32 scriptlib::duel_negate_related_chain(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**)lua_touserdata(L, 1);
+	duel* pduel = pcard->pduel;
+	lua_pushboolean(L, pduel->game_field->negate_related_chain(pcard));
 	return 1;
 }
 int32 scriptlib::duel_disable_summon(lua_State *L) {

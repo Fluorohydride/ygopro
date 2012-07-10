@@ -42,9 +42,9 @@ function c4545854.adup(c,oc)
 end
 function c4545854.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsReason(REASON_RULE)
-		and Duel.CheckRemoveOverlayCard(tp,1,1,1,REASON_EFFECT) end
+		and Duel.CheckRemoveOverlayCard(tp,1,0,1,REASON_EFFECT) end
 	if Duel.SelectYesNo(tp,aux.Stringid(4545854,0)) then
-		Duel.RemoveOverlayCard(tp,1,1,1,1,REASON_EFFECT)
+		Duel.RemoveOverlayCard(tp,1,0,1,1,REASON_EFFECT)
 		return true
 	else return false end
 end
