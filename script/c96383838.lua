@@ -30,6 +30,7 @@ function c96383838.activate(e,tp,eg,ep,ev,re,r,rp)
 	if ft<=0 then return end
 	local sg=g:Filter(c96383838.rfilter,nil,e,tp)
 	if sg:GetCount()==0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	if sg:GetCount()>ft then sg=sg:Select(tp,ft,ft,nil) end
 	Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 end

@@ -22,6 +22,7 @@ function c86361354.dfilter(c,rc)
 end
 function c86361354.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c86361354.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c86361354.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	e:SetLabel(g:GetFirst():GetRace())
 	Duel.Remove(g,POS_FACEUP,REASON_COST)

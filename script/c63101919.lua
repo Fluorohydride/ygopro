@@ -51,6 +51,7 @@ function c63101919.addc1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c63101919.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,63,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 	e:SetLabel(g:GetCount())

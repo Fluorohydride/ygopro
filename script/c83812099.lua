@@ -40,6 +40,7 @@ function c83812099.eqtg1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c83812099.eqop1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local g=Duel.SelectMatchingCard(tp,c83812099.filter1,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,c)
 	local eqc=g:GetFirst()
 	if eqc and c:IsRelateToEffect(e) and c:IsFaceup() then

@@ -53,6 +53,7 @@ function c82308875.operation(e,tp,eg,ep,ev,re,r,rp)
 			local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 			Duel.SendtoGrave(g,REASON_EFFECT)
 		elseif op==1 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg=spg:Select(tp,1,1,nil)
 			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		else
