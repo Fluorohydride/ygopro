@@ -63,7 +63,7 @@ int32 field::negate_related_chain(card* pcard) {
 			pchain.disable_reason = core.reason_effect;
 			pchain.disable_player = core.reason_player;
 			pduel->write_buffer8(MSG_CHAIN_DISABLED);
-			pduel->write_buffer8(i);
+			pduel->write_buffer8(i + 1);
 			return TRUE;
 		}
 	}
