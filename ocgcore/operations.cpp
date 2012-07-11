@@ -567,6 +567,8 @@ int32 field::pay_lp_cost(uint32 step, uint8 playerid, uint32 cost) {
 			pduel->write_buffer8(MSG_PAY_LPCOST);
 			pduel->write_buffer8(playerid);
 			pduel->write_buffer32(cost);
+			raise_event((card*)0, EVENT_PAY_LPCOST, core.reason_effect, 0, playerid, playerid, cost);
+			process_instant_event();
 			return TRUE;
 		}
 		tevent e;
@@ -1357,8 +1359,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		if(target->material_cards.size()) {
 			for(auto mit = target->material_cards.begin(); mit != target->material_cards.end(); ++mit)
 				raise_single_event(*mit, 0, EVENT_BE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
+			raise_event(&target->material_cards, EVENT_BE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
 		}
-		raise_event(&target->material_cards, EVENT_BE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
 		process_single_event();
 		process_instant_event();
 		return false;
@@ -2706,9 +2708,9 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		process_single_event();
 		process_instant_event();
 		if(equipings.size())
-			destroy(&equipings, 0, REASON_LOST_TARGET, PLAYER_NONE);
+			destroy(&equipings, 0, REASON_RULE + REASON_LOST_TARGET, PLAYER_NONE);
 		if(overlays.size())
-			send_to(&overlays, 0, REASON_LOST_TARGET, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
+			send_to(&overlays, 0, REASON_RULE + REASON_LOST_TARGET, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
 		adjust_instant();
 		return FALSE;
 	}

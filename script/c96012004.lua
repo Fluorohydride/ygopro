@@ -43,7 +43,6 @@ function c96012004.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return re==e:GetLabelObject() and res==e:GetLabel()
 end
 function c96012004.drop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,tp,96012004)
-	Duel.Hint(HINT_CARD,1-tp,96012004)
+	Duel.Hint(HINT_CARD,0,96012004)
 	Duel.Draw(tp,1,REASON_EFFECT)
 end

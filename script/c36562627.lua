@@ -20,8 +20,7 @@ end
 function c36562627.coinop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,36562627)~=0 then return end
 	if Duel.SelectYesNo(tp,aux.Stringid(36562627,0)) then
-		Duel.Hint(HINT_CARD,tp,36562627)
-		Duel.Hint(HINT_CARD,1-tp,36562627)
+		Duel.Hint(HINT_CARD,0,36562627)
 		Duel.RegisterFlagEffect(tp,36562627,RESET_PHASE+PHASE_END,0,1)
 		Duel.TossCoin(tp,ev)
 	end

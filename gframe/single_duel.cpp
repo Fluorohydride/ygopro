@@ -560,8 +560,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			case 2:
 			case 3:
 			case 4:
-			case 5:
-			case 10: {
+			case 5: {
 				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 				break;
 			}
@@ -570,6 +569,13 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			case 8:
 			case 9: {
 				NetServer::SendBufferToPlayer(players[1 - player], STOC_GAME_MSG, offset, pbuf - offset);
+				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+					NetServer::ReSendToPlayer(*oit);
+				break;
+			}
+			case 10: {
+				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+				NetServer::SendBufferToPlayer(players[1], STOC_GAME_MSG, offset, pbuf - offset);
 				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 					NetServer::ReSendToPlayer(*oit);
 				break;

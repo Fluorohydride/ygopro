@@ -14,11 +14,12 @@ function c1498130.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()~=1 then return false end
-	local tg=g:GetFirst()
+	local tc=g:GetFirst()
 	local c=e:GetHandler()
-	if tg==c or tg:GetControler()~=tp or tg:IsFacedown() or not tg:IsLocation(LOCATION_MZONE) or not tg:IsSetCard(0x3d) then return false end
+	if tc==c or tc:GetControler()~=tp or tc:IsFacedown() or not tc:IsLocation(LOCATION_MZONE) or not tc:IsSetCard(0x3d) then return false end
 	local tf=re:GetTarget()
-	return tf(re,rp,nil,nil,nil,nil,nil,nil,0,c)
+	local res,ceg,cep,cev,cre,cr,crp=Duel.CheckEvent(re:GetCode(),true)
+	return tf(re,rp,ceg,cep,cev,cre,cr,crp,0,c)
 end
 function c1498130.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

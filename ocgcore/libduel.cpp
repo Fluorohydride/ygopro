@@ -662,8 +662,26 @@ int32 scriptlib::duel_check_event(lua_State *L) {
 	check_param_count(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 ev = lua_tointeger(L, 1);
-	lua_pushboolean(L, pduel->game_field->check_event(ev));
-	return 1;
+	int32 get_info = lua_toboolean(L, 2);
+	if(!get_info) {
+		lua_pushboolean(L, pduel->game_field->check_event(ev));
+		return 1;
+	} else {
+		tevent pe;
+		if(pduel->game_field->check_event(ev, &pe)) {
+			lua_pushboolean(L, 1);
+			interpreter::group2value(L, pe.event_cards);
+			lua_pushinteger(L, pe.event_player);
+			lua_pushinteger(L, pe.event_value);
+			interpreter::effect2value(L, pe.reason_effect);
+			lua_pushinteger(L, pe.reason);
+			lua_pushinteger(L, pe.reason_player);
+			return 7;
+		} else {
+			lua_pushboolean(L, 0);
+			return 1;
+		}
+	}
 }
 int32 scriptlib::duel_raise_event(lua_State *L) {
 	check_action_permission(L);
