@@ -17,7 +17,7 @@ function c49600724.filter1(c,g)
 	return g:IsExists(Card.IsAttribute,1,c,c:GetAttribute())
 end
 function c49600724.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return c:IsLocation(LOCATION_GRAVE) and c49600724.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c49600724.filter(chkc) end
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(c49600724.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil,e)
 		return g:IsExists(c49600724.filter1,1,nil,g)

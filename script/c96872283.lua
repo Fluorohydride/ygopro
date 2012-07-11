@@ -22,7 +22,7 @@ function c96872283.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,c96872283.costfilter,tp,LOCATION_SZONE,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function c96872283.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c96872283.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsDestructable() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)

@@ -84,7 +84,7 @@ function c44505297.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g2=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_ONFIELD,1,1,nil)
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,2,0,0)
 end
 function c44505297.tgfilter(c,e)
 	return c:IsFaceup() and c:IsRelateToEffect(e)

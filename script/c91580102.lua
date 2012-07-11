@@ -38,7 +38,7 @@ function c91580102.initial_effect(c)
 	e5:SetOperation(c91580102.atkop)
 	c:RegisterEffect(e5)
 end
-function c91580102.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c91580102.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
@@ -54,7 +54,7 @@ end
 function c91580102.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_DESTROY)
 end
-function c91580102.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c91580102.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

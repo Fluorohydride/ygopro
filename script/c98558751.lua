@@ -45,7 +45,7 @@ function c98558751.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c98558751.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return c:IsOnField() and c98558751.filter(chkc) end
+	if chkc then return chkc:IsOnField() and c98558751.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c98558751.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)

@@ -1,7 +1,7 @@
 --コアキメイル·アイス
 function c54520292.initial_effect(c)
 	--cost
-	e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EVENT_PHASE+PHASE_END)

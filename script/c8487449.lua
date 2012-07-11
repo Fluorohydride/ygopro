@@ -71,7 +71,7 @@ function c8487449.filter(c)
 	return c:IsFaceup() and c:IsAbleToHand()
 end
 function c8487449.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return Duel.IsLocation(LOCATION_MZONE) and c8487449.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c8487449.filter(chkc) end
 	if chk==0 then return true end
 	local c=e:GetHandler()
 	local sp=c:GetSummonPlayer()

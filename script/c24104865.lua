@@ -1,7 +1,7 @@
 --エーリアン·マザー
 function c24104865.initial_effect(c)
 	--check
-	e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EVENT_BATTLE_END)
@@ -11,7 +11,7 @@ function c24104865.initial_effect(c)
 	e1:SetLabelObject(g)
 	g:KeepAlive()
 	--special summon
-	e2=Effect.CreateEffect(c)
+	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
@@ -32,7 +32,7 @@ function c24104865.initial_effect(c)
 	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 	--destroy
-	e4=Effect.CreateEffect(c)
+	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e4:SetCode(EVENT_LEAVE_FIELD)
 	e4:SetOperation(c24104865.desop)

@@ -26,7 +26,7 @@ function c76641981.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g1=Duel.SelectTarget(tp,c76641981.filter1,tp,LOCATION_MZONE,0,1,1,nil)
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g1,2,0,0)
 end
 function c76641981.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

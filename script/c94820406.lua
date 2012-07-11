@@ -26,7 +26,7 @@ function c94820406.target(e,tp,eg,ep,ev,re,r,rp,chk)
 			if ce~=nil then
 				local fgroup=ce:GetTarget()
 				local mg2=fgroup(ce,e,tp)
-				res=Duel.IsExistingMatchingCard(c24094653.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,chkf)
+				res=Duel.IsExistingMatchingCard(c94820406.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,chkf)
 			end
 		end
 		return res

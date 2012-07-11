@@ -43,7 +43,7 @@ function c56535497.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.SelectTarget(tp,c56535497.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,rg:GetFirst())
 		e:GetHandler():RegisterFlagEffect(56535497,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	else 
-		e:SetLabalObject(nil)
+		e:SetLabelObject(nil)
 		e:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	end
 end

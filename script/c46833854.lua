@@ -28,7 +28,7 @@ end
 function c46833854.filter(c)
 	return c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
-function c46833854.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c46833854.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c46833854.filter(chkc) end
 	if chk==0 then return Duel.IsExistingMatchingCard(c46833854.filter,tp,0,LOCATION_ONFIELD,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
