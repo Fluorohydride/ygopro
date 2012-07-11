@@ -22,7 +22,7 @@ function c39507162.atkcon(e)
 	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_HAND,0)<=1
 end
 function c39507162.discon(e)
-	return not Duel.IsExistingMatchingCard(nil,tp,LOCATION_MZONE,0,1,e:GetHandler())
+	return not Duel.IsExistingMatchingCard(nil,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c39507162.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

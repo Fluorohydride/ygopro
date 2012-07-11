@@ -72,7 +72,7 @@ end
 function c15187079.filter(c)
 	return c:IsFaceup() and c:IsAbleToChangeControler()
 end
-function c15187079.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c15187079.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c15187079.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c15187079.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)

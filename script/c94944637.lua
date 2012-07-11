@@ -19,7 +19,7 @@ function c94944637.initial_effect(c)
 	e2:SetOperation(c94944637.desop)
 	c:RegisterEffect(e2)
 end
-function c94944637.filter(c,e,sp)
+function c94944637.filter(c,e,tp)
 	return c:IsRace(RACE_FIEND) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c94944637.target(e,tp,eg,ep,ev,re,r,rp,chk)

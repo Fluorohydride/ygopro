@@ -31,7 +31,7 @@ function c51670553.filter(c)
 	return c:GetEquipCount()~=0 and c:GetEquipGroup():IsExists(Card.IsSetCard,1,nil,0x60)
 end
 function c51670553.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return c:IsLocation(LOCATION_MZONE) and c51670553.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c51670553.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c51670553.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	e:GetHandler():SetTurnCounter(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

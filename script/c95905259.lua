@@ -15,7 +15,7 @@ function c95905259.filter(c)
 	return c:GetSequence()~=5 and c:IsFacedown()
 end
 function c95905259.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(SZONE) and c95905259.filter(chkc) end
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_SZONE) and c95905259.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(95905259,1))
 	Duel.SelectTarget(tp,c95905259.filter,tp,0,LOCATION_SZONE,1,1,nil)

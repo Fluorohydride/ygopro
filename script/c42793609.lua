@@ -10,7 +10,7 @@ function c42793609.initial_effect(c)
 	e1:SetOperation(c42793609.operation)
 	c:RegisterEffect(e1)
 end
-function c42793609.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c42793609.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end

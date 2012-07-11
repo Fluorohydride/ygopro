@@ -37,7 +37,7 @@ function c93130021.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	elseif op==2 then
 		e:SetProperty(0)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 		Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	else
 		e:SetProperty(0)

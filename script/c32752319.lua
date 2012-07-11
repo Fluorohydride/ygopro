@@ -7,14 +7,14 @@ function c32752319.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetOperation(c32752319.atkcon)
+	e1:SetCondition(c32752319.atkcon)
 	e1:SetOperation(c32752319.atkop)
 	c:RegisterEffect(e1)
 end
 c32752319.material_count=1
 c32752319.material={7602840}
 function c32752319.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetSumonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c32752319.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

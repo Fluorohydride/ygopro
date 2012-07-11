@@ -46,7 +46,7 @@ function c58551308.spop(e,tp,eg,ep,ev,re,r,rp)
 		local spos=0
 		if tc:IsCanBeSpecialSummoned(e,0,sp,false,false) then spos=spos+POS_FACEUP_ATTACK end
 		if tc:IsCanBeSpecialSummoned(e,0,sp,false,false,POS_FACEDOWN) then spos=spos+POS_FACEDOWN_DEFENCE end
-		if pos~=0 then Duel.SpecialSummonStep(tc,0,sp,sp,false,false,spos) end
+		if spos~=0 then Duel.SpecialSummonStep(tc,0,sp,sp,false,false,spos) end
 	end
 	tc=sg:GetNext()
 	if tc and Duel.GetLocationCount(tc:GetControler(),LOCATION_MZONE)>0 then
@@ -54,7 +54,7 @@ function c58551308.spop(e,tp,eg,ep,ev,re,r,rp)
 		local spos=0
 		if tc:IsCanBeSpecialSummoned(e,0,sp,false,false) then spos=spos+POS_FACEUP_ATTACK end
 		if tc:IsCanBeSpecialSummoned(e,0,sp,false,false,POS_FACEDOWN) then spos=spos+POS_FACEDOWN_DEFENCE end
-		if pos~=0 then Duel.SpecialSummonStep(tc,0,sp,sp,false,false,spos) end
+		if spos~=0 then Duel.SpecialSummonStep(tc,0,sp,sp,false,false,spos) end
 	end
 	Duel.SpecialSummonComplete()
 end

@@ -64,7 +64,7 @@ function c89493368.natg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(tg)
 end
 function c89493368.naop(e,tp,eg,ep,ev,re,r,rp)
-	tc=Duel.GetAttacker()
+	local tc=Duel.GetAttacker()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.NegateAttack(tc)
 	end

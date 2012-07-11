@@ -29,7 +29,7 @@ function c15471265.filter(c)
 	return c:IsFaceup() and c:IsCode(57116033)
 end
 function c15471265.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:isLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c15471265.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c15471265.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c15471265.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	local g=Duel.SelectTarget(tp,c15471265.filter,tp,LOCATION_MZONE,0,1,1,nil)
