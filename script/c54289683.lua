@@ -41,7 +41,7 @@ function c54289683.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	elseif op==2 then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 		Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 	else
 		e:SetCategory(CATEGORY_ATKCHANGE)

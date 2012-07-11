@@ -26,15 +26,15 @@ function c52558805.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function c52558805.filter(c)
+function c52558805.filter(c,tp)
 	return c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
 end
 function c52558805.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c52558805.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c52558805.filter(chkc,tp) end
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
-		and Duel.IsExistingTarget(c52558805.filter,tp,0,LOCATION_MZONE,1,nil) end
+		and Duel.IsExistingTarget(c52558805.filter,tp,0,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c52558805.filter,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c52558805.filter,tp,0,LOCATION_MZONE,1,1,nil,tp)
 end
 function c52558805.atkfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(0x6d)

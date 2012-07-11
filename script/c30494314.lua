@@ -15,7 +15,7 @@ function c30494314.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_GRAVE) and re:GetHandler():IsRace(RACE_ZOMBIE)
 end
 function c30494314.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and not c:IsType(XYZ)
+	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and not c:IsType(TYPE_XYZ)
 end
 function c30494314.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,1,1,REASON_EFFECT)

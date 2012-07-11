@@ -13,7 +13,7 @@ function c53257892.initial_effect(c)
 	e1:SetOperation(c53257892.operation)
 	c:RegisterEffect(e1)
 end
-function c53257892.filter(c,e,sp)
+function c53257892.filter(c,e,tp)
 	return c:IsRace(RACE_INSECT+RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c53257892.target(e,tp,eg,ep,ev,re,r,rp,chk)

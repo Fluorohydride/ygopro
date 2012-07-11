@@ -14,7 +14,7 @@ end
 function c5914184.actop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		ct=math.floor(ev/1000)
+		local ct=math.floor(ev/1000)
 		c:AddCounter(0x1a,ct)
 		--damage
 		local e1=Effect.CreateEffect(c)

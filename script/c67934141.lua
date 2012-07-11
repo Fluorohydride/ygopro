@@ -24,7 +24,7 @@ function c67934141.filter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE)
 end
 function c67934141.val(e,c)
-	return Duel.GetMatchingGroupCount(c67934141.filter,tp,LOCATION_MZONE,LOCATION_MZONE,c)*1000
+	return Duel.GetMatchingGroupCount(c67934141.filter,c:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c)*1000
 end
 function c67934141.costfilter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGraveAsCost()

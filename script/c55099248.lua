@@ -19,7 +19,7 @@ function c55099248.filter(c,e,tp)
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsCanBeEffectTarget(e) and c:GetSummonPlayer()~=tp
 end
 function c55099248.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:Contains(chkc) and c55099248.filter(chkc,e,tp) end
+	if chkc then return eg:IsContains(chkc) and c55099248.filter(chkc,e,tp) end
 	if chk==0 then return e:GetHandler():GetFlagEffect(55099248)==0 and eg:IsExists(c55099248.filter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=eg:FilterSelect(tp,c55099248.filter,1,1,nil,e,tp)

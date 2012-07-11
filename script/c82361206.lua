@@ -18,7 +18,7 @@ function c82361206.initial_effect(c)
 	c:RegisterEffect(e2)
 	--remove
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(83584898,0))
+	e3:SetDescription(aux.Stringid(82361206,0))
 	e3:SetCategory(CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
@@ -46,7 +46,7 @@ function c82361206.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler():GetEquipTarget()
 end
 function c82361206.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IcLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,2,nil)

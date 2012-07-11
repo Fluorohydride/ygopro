@@ -62,7 +62,7 @@ function c41181774.sdcon(e)
 	return ((f1==nil or not f1:IsFaceup()) and (f2==nil or not f2:IsFaceup()))
 		or Duel.IsExistingMatchingCard(c41181774.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c:GetFieldID())
 end
-function c41181774.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c41181774.hdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsAbleToDeck() end
 	if chk==0 then return true end
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
@@ -78,7 +78,7 @@ function c41181774.hdop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
 	if ct==0 then return end
 	local dg=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,ct)
-	local dt=Duel.SendtoGrave(dg,REASON_EFFECT_REASON_DISCARD)
+	local dt=Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
 	local c=e:GetHandler()
 	if dt~=0 and c:IsRelateToEffect(e) and c:IsFaceup() then
 		local e1=Effect.CreateEffect(c)

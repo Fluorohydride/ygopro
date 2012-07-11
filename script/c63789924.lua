@@ -27,7 +27,7 @@ function c63789924.initial_effect(c)
 	e3:SetOperation(c63789924.disop)
 	c:RegisterEffect(e3)
 end
-function c63789924.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c63789924.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
