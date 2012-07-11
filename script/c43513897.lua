@@ -16,7 +16,7 @@ function c43513897.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x53)
 end
 function c43513897.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c26329679.filter,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(c43513897.filter,tp,LOCATION_MZONE,0,nil)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(e:GetHandler())

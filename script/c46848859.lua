@@ -17,7 +17,7 @@ end
 function c46848859.cfilter(c)
 	return c:IsOnField() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
-function c46848859.tgfilter(c,yp)
+function c46848859.tgfilter(c,tp)
 	return c:IsOnField() and c:IsControler(tp) and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c46848859.condition(e,tp,eg,ep,ev,re,r,rp)

@@ -40,6 +40,6 @@ function c49633574.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c49633574.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,flse,false,POS_FACEUP)
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

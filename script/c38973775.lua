@@ -21,7 +21,7 @@ end
 function c38973775.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,38973775)==0
 		and Duel.IsExistingMatchingCard(c38973775.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 	Duel.RegisterFlagEffect(tp,38973775,RESET_PHASE+PHASE_END,0,1)
 end
 function c38973775.operation(e,tp,eg,ep,ev,re,r,rp)

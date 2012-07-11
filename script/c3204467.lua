@@ -19,7 +19,7 @@ function c3204467.vfilter(c)
 	return c:IsSetCard(0x3e) and c:IsRace(RACE_REPTILE)
 end
 function c3204467.defval(e,c)
-	return Duel.GetMatchingGroupCount(c3204467.vfilter,tp,LOCATION_GRAVE,0,nil)*100
+	return Duel.GetMatchingGroupCount(c3204467.vfilter,c:GetControler(),LOCATION_GRAVE,0,nil)*100
 end
 function c3204467.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

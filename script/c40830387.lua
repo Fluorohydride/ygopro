@@ -51,7 +51,7 @@ function c40830387.descon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
 	local dt=nil
 	if ec==Duel.GetAttacker() then dt=Duel.GetAttackTarget()
-	elseif ec==Duel.GetAttackTarget() then di=Duel.GetAttacker() end
+	elseif ec==Duel.GetAttackTarget() then dt=Duel.GetAttacker() end
 	e:SetLabelObject(dt)
 	return dt and dt:IsRelateToBattle()
 end

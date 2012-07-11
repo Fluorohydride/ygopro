@@ -14,8 +14,8 @@ function c46291010.filter(c,lv)
 	return c:IsRace(RACE_PSYCHO) and c:GetLevel()~=lv and c:IsAbleToRemove()
 end
 function c46291010.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c46291010.cfilter,tp,LOCATION_DECK,0,1,nil,e:GetHandler():GetLevel()) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
+	if chk==0 then return Duel.IsExistingMatchingCard(c46291010.filter,tp,LOCATION_DECK,0,1,nil,e:GetHandler():GetLevel()) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 end
 function c46291010.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

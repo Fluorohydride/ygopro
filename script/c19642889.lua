@@ -1,7 +1,7 @@
 --コアキメイル·パワーハンド
 function c19642889.initial_effect(c)
 	--cost
-	e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
@@ -10,12 +10,12 @@ function c19642889.initial_effect(c)
 	e1:SetOperation(c19642889.ccost)
 	c:RegisterEffect(e1)
 	--negate
-	e2=Effect.CreateEffect(c)
+	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetOperation(c19642889.negop1)
 	c:RegisterEffect(e2)
-	e3=Effect.CreateEffect(c)
+	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_BE_BATTLE_TARGET)
 	e3:SetOperation(c19642889.negop2)

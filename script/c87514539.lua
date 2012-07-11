@@ -19,7 +19,7 @@ end
 function c87514539.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE+RACE_FIEND) and c:IsControlerCanBeChanged()
 end
-function c87514539.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c87514539.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c87514539.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c87514539.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)

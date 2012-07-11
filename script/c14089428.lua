@@ -11,7 +11,7 @@ function c14089428.initial_effect(c)
 end
 function c14089428.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToBattle() end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
 end
 function c14089428.operation(e,tp,eg,ep,ev,re,r,rp)

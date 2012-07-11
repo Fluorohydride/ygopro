@@ -19,7 +19,7 @@ function c70595331.initial_effect(c)
 	e2:SetOperation(c70595331.desop)
 	c:RegisterEffect(e2)
 end
-function c70595331.filter(c,e,sp)
+function c70595331.filter(c,e,tp)
 	return c:IsRace(RACE_ZOMBIE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c70595331.target(e,tp,eg,ep,ev,re,r,rp,chk)
