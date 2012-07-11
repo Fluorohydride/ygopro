@@ -283,7 +283,7 @@ public:
 	return_value returns;
 	tevent nil_event;
 
-	static int32 field_used_count[32];
+	static int32 field_used_count[64];
 	field(duel* pduel);
 	~field();
 	void reload_field_info();

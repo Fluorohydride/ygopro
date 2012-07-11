@@ -137,6 +137,15 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 					return FALSE;
 				if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(handler->current.controler, LOCATION_SZONE, handler->current.controler, LOCATION_REASON_TOFIELD) <= 0)
 					return FALSE;
+				if(handler->data.type & TYPE_FIELD) {
+					int32 fcount = 0;
+					if(pduel->game_field->get_field_card(handler->current.controler, LOCATION_SZONE, 5))
+						fcount++;
+					effect_set eset;
+					pduel->game_field->filter_player_effect(handler->current.controler, EFFECT_MAX_SZONE, &eset);
+					if(eset.count && pduel->game_field->get_useable_count(handler->current.controler, LOCATION_SZONE, handler->current.controler, LOCATION_REASON_TOFIELD) <= -fcount)
+						return FALSE;
+				}
 			} else if(handler->current.location == LOCATION_SZONE) {
 				if(handler->is_position(POS_FACEUP))
 					return FALSE;

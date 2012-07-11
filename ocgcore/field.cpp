@@ -13,7 +13,7 @@
 #include "interpreter.h"
 #include <iostream>
 
-int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
+int32 field::field_used_count[64] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5, 2, 3, 3, 4, 3, 4, 4, 5, 3, 4, 4, 5, 4, 5, 5, 6};
 
 bool chain::chain_operation_sort(chain c1, chain c2) {
 	return c1.triggering_effect->id < c2.triggering_effect->id;
@@ -432,13 +432,13 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, ui
 		if(uplayer < 2)
 			filter_player_effect(playerid, EFFECT_MAX_MZONE, &eset);
 	} else {
-		flag = (flag & 0x1f00) >> 8;
-		used_flag = (used_flag & 0x1f00) >> 8;
+		flag = (flag & 0x3f00) >> 8;
+		used_flag = (used_flag & 0x3f00) >> 8;
 		if(uplayer < 2)
 			filter_player_effect(playerid, EFFECT_MAX_SZONE, &eset);
 	}
 	if(list)
-		*list = flag;
+		*list = flag & 0x1f;
 	if(eset.count) {
 		int32 max = 5;
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
@@ -449,7 +449,7 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, ui
 		int32 limit = max - field_used_count[used_flag];
 		return block < limit ? block : limit;
 	} else {
-		return 5 - field_used_count[flag];
+		return 5 - field_used_count[flag & 0x1f];
 	}
 }
 void field::shuffle(uint8 playerid, uint8 location) {
