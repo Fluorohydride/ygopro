@@ -3060,6 +3060,7 @@ int32 field::process_battle_command(uint16 step) {
 		effect* damchange = 0;
 		core.battle_damage[0] = core.battle_damage[1] = 0;
 		card* reason_card = 0;
+		uint8 bd[2] = {FALSE};
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(core.attack_target) {
 			da = core.attack_target->get_attack();
@@ -3088,7 +3089,7 @@ int32 field::process_battle_command(uint16 step) {
 						reason_card = core.attacker;
 					}
 					if(core.attack_target->is_destructable_by_battle(core.attacker))
-						core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+						bd[1] = TRUE;
 				} else if (a < d) {
 					damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
 					if(damchange) {
@@ -3107,13 +3108,13 @@ int32 field::process_battle_command(uint16 step) {
 						reason_card = core.attack_target;
 					}
 					if(core.attacker->is_destructable_by_battle(core.attack_target))
-						core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+						bd[0] = TRUE;
 				} else {
 					if(a != 0) {
 						if(core.attack_target->is_destructable_by_battle(core.attacker))
-							core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+							bd[1] = TRUE;
 						if(core.attacker->is_destructable_by_battle(core.attack_target))
-							core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+							bd[0] = TRUE;
 					}
 				}
 			} else {
@@ -3148,7 +3149,7 @@ int32 field::process_battle_command(uint16 step) {
 						reason_card = core.attacker;
 					}
 					if(core.attack_target->is_destructable_by_battle(core.attacker))
-						core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+						bd[1] = TRUE;
 				} else if (a < d) {
 					damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
 					if(damchange) {
@@ -3183,16 +3184,20 @@ int32 field::process_battle_command(uint16 step) {
 				reason_card = core.attacker;
 			}
 		}
+		if(bd[0])
+			core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		if(bd[1])
+			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
 		pduel->write_buffer8(MSG_BATTLE);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		pduel->write_buffer32(aa);
 		pduel->write_buffer32(ad);
-		pduel->write_buffer8(core.attacker->is_status(STATUS_BATTLE_DESTROYED) ? 1 : 0);
+		pduel->write_buffer8(bd[0]);
 		if(core.attack_target) {
 			pduel->write_buffer32(core.attack_target->get_info_location());
 			pduel->write_buffer32(da);
 			pduel->write_buffer32(dd);
-			pduel->write_buffer8(core.attack_target->is_status(STATUS_BATTLE_DESTROYED) ? 1 : 0);
+			pduel->write_buffer8(bd[1]);
 		} else {
 			pduel->write_buffer32(0);
 			pduel->write_buffer32(0);

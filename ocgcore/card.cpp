@@ -604,7 +604,7 @@ void card::xyz_overlay(card_set* materials) {
 		}
 	}
 	if(des.size())
-		pduel->game_field->destroy(&des, 0, REASON_LOST_TARGET, PLAYER_NONE);
+		pduel->game_field->destroy(&des, 0, REASON_LOST_TARGET + REASON_RULE, PLAYER_NONE);
 }
 void card::xyz_add(card* mat, card_set* des) {
 	if(mat->overlay_target == this)
