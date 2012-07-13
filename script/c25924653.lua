@@ -63,6 +63,7 @@ function c25924653.spgop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_CHAIN_SOLVING)
 		e2:SetRange(LOCATION_MZONE)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
 		e2:SetOperation(c25924653.disop)
 		c:RegisterEffect(e2)
 	end
