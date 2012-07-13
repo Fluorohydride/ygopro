@@ -5,7 +5,7 @@ function c39180960.initial_effect(c)
 	e1:SetDescription(aux.Stringid(39180960,0))
 	e1:SetCategory(CATEGORY_HANDES)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
-	e1:SetOperation(c39180960.target)
+	e1:SetTarget(c39180960.target)
 	e1:SetOperation(c39180960.operation)
 	c:RegisterEffect(e1)
 	--destroyed
