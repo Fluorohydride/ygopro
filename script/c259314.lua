@@ -36,6 +36,7 @@ function c259314.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_EQUIP)
 		e1:SetCode(EFFECT_UPDATE_DEFENCE)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(1000)
 		c:RegisterEffect(e1)
 		--Equip limit

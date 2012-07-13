@@ -92,6 +92,7 @@ function c95090813.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetType(EFFECT_TYPE_EQUIP)
 		e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
+		e3:SetReset(RESET_EVENT+0x1fe0000)
 		e3:SetValue(c95090813.subval)
 		tc:RegisterEffect(e3)
 	end
