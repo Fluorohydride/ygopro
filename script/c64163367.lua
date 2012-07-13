@@ -22,7 +22,7 @@ function c64163367.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c64163367.ctop1(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():AddCounter(0xe,ev)
+	e:GetHandler():AddCounter(0xe,1)
 end
 function c64163367.ctcon2(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetHandler():GetCounter(0xe)
