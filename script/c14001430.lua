@@ -44,7 +44,7 @@ function c14001430.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c14001430.repfilter(c,tp)
-	return c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE) and c:GetDestination()==LOCATION_DECK
+	return c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE) and c:GetDestination()==LOCATION_DECK and c:IsType(TYPE_MONSTER)
 end
 function c14001430.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return bit.band(r,REASON_EFFECT)~=0 and re:IsActiveType(TYPE_MONSTER)

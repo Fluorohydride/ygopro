@@ -1411,7 +1411,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.select_min = 0;
 		mainGame->dField.select_max = count;
 		mainGame->dField.ShowSelectCard();
-		return true;
+		return false;
 	}
 	case MSG_CONFIRM_DECKTOP: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));

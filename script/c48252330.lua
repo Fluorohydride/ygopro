@@ -26,7 +26,7 @@ function c48252330.retcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c48252330.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOKEN,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
 function c48252330.retop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then

@@ -419,6 +419,8 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_CHAIN_END: {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			SinglePlayRefresh();
+			SinglePlayRefreshDeck(0);
+			SinglePlayRefreshDeck(1);
 			break;
 		}
 		case MSG_CHAIN_NEGATED: {

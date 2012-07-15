@@ -222,6 +222,7 @@ struct processor {
 	card* attack_target;
 	card* sub_attack_target;
 	card* limit_tuner;
+	group* limit_xyz;
 	uint8 attack_cancelable;
 	uint8 effect_damage_step;
 	int32 battle_damage[2];
