@@ -47,7 +47,7 @@ function c79229522.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(79205581,0))
 	local g1=Duel.SelectMatchingCard(tp,c79229522.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(79205581,1))
-	local g2=Duel.SelectMatchingCard(tp,c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,10,g1:GetFirst())
+	local g2=Duel.SelectMatchingCard(tp,c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,10,g1:GetFirst(),tp)
 	g1:Merge(g2)
 	Duel.SendtoGrave(g1,REASON_COST)
 	--spsummon condition

@@ -16,7 +16,7 @@ function c12423762.initial_effect(c)
 	e2:SetDescription(aux.Stringid(12423762,1))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BE_BATTLE_TARGET)
-	e2:SetTarget(c12423762.indcost)
+	e2:SetCost(c12423762.indcost)
 	e2:SetOperation(c12423762.indop)
 	c:RegisterEffect(e2)
 end

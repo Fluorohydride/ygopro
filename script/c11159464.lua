@@ -9,7 +9,7 @@ function c11159464.initial_effect(c)
 	c:RegisterEffect(e1)
 	--discard
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(56074358,0))
+	e2:SetDescription(aux.Stringid(11159464,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c11159464.tgcon)

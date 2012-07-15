@@ -12,7 +12,7 @@ function c83555666.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c83555666.filter(c)
-	return c:IsDestructable()
+	return c:IsFaceup() and c:IsDestructable()
 end
 function c83555666.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c83555666.filter(chkc) end
@@ -24,7 +24,7 @@ function c83555666.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c83555666.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local atk=tc:GetAttack()
 		if Duel.Destroy(tc,REASON_EFFECT)>0 then
 			Duel.Damage(1-tp,atk,REASON_EFFECT)

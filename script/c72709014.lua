@@ -80,7 +80,7 @@ function c72709014.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(ec,REASON_COST)
 end
 function c72709014.spfilter(c,e,tp,code)
-	return (code==81383947 and c:IsCode(75917088)) or (code==46128076 and c:IsCode(2316186))
+	return ((code==81383947 and c:IsCode(75917088)) or (code==46128076 and c:IsCode(2316186)))
 		and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c72709014.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

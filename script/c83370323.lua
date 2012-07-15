@@ -24,7 +24,7 @@ function c83370323.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetOperation(c83370323.atkop)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+0x1fe0000)
 	sync:RegisterEffect(e1)
 end
 function c83370323.atkop(e,tp,eg,ep,ev,re,r,rp)

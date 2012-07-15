@@ -22,5 +22,5 @@ end
 function c78613627.operation(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	if not a:IsRelateToBattle() then return end
-	Duel.Destroy(a,nil,0,REASON_EFFECT)
+	Duel.Destroy(a,REASON_EFFECT)
 end

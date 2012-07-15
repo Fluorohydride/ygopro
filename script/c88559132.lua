@@ -18,6 +18,7 @@ function c88559132.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsRace,1,1,nil,RACE_WARRIOR)
 	Duel.Release(g,REASON_COST)
 	local atk=g:GetFirst():GetBaseAttack()
+	if atk<0 then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)

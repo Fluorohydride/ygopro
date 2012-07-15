@@ -5,7 +5,7 @@ function c31000575.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c31000575.target)
+	e1:SetTarget(c31000575.target)
 	e1:SetOperation(c31000575.operation)
 	c:RegisterEffect(e1)
 end

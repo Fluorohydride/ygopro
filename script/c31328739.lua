@@ -18,13 +18,12 @@ function c31328739.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c31328739.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 and Duel.IsPlayerCanDraw(1-tp,3) end
-	local ht=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
 	Duel.SetTargetPlayer(1-tp)
 end
 function c31328739.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local g=Duel.GetFieldGroup(p,LOCATION_HAND,0)
-	if Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)==0 then return end
+	if g:GetCount()==0 then return end
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	Duel.ShuffleDeck(p)
 	Duel.BreakEffect()

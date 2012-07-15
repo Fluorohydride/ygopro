@@ -12,7 +12,7 @@ function c97922283.initial_effect(c)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCondition(c97922283.condition)
-	e2:SetCost(c97922283.target)
+	e2:SetTarget(c97922283.target)
 	e2:SetOperation(c97922283.operation)
 	c:RegisterEffect(e2)
 end

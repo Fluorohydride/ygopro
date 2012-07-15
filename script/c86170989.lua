@@ -17,7 +17,7 @@ function c86170989.filter2(c,e,tp)
 end
 function c86170989.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
-		if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c86170989.filter2(chkc) end
+		if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c86170989.filter2(chkc,e,tp) end
 		return e:GetHandler():IsRelateToBattle()
 	end
 	local op=0
@@ -61,7 +61,7 @@ function c86170989.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local g=Duel.SelectMatchingCard(tp,c86170989.filter1,tp,LOCATION_DECK,0,1,1,nil)
 		if g:GetCount()>0 then
-			Duel.SendtoGrave(g,nil,REASON_EFFECT)
+			Duel.SendtoGrave(g,REASON_EFFECT)
 		end
 	end
 end

@@ -20,7 +20,7 @@ end
 function c81336148.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return d and Duel.GetTurnPlayer()==tp and (d:IsRelateToBattle() or not d:IsReason(REASON_BATTLE))
+	return d and Duel.GetTurnPlayer()==tp and a:IsRace(RACE_WARRIOR) and (d:IsRelateToBattle() or not d:IsReason(REASON_BATTLE))
 end
 function c81336148.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

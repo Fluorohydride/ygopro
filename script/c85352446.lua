@@ -13,7 +13,7 @@ function c85352446.initial_effect(c)
 end
 function c85352446.filter(c)
 	local lv=c:GetLevel()
-	return lv>0 and lv<=5 and c:IsFaceup() and Duel.IsExistingMatchingCard(c85352446.filter2,0,LOCATION_MZONE,LOCATION_MZONE,1,c)
+	return lv>0 and lv<=5 and c:IsFaceup() and Duel.IsExistingMatchingCard(c85352446.filter2,0,LOCATION_MZONE,LOCATION_MZONE,1,c,lv)
 end
 function c85352446.filter2(c,lv)
 	local clv=c:GetLevel()

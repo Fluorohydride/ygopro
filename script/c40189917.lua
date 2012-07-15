@@ -32,7 +32,7 @@ end
 function c40189917.sumcon(e,c)
 	if c==nil then return true end
 	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and g:IsExists(Card.IsSetCard,1,nil,0x2c)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1 and g:IsExists(Card.IsSetCard,1,nil,0x2c)
 end
 function c40189917.sumop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.GetTributeGroup(c)
