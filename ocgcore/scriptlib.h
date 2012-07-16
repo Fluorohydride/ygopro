@@ -128,6 +128,7 @@ public:
 	static int32 card_is_ssetable(lua_State *L);
 	static int32 card_is_special_summonable(lua_State *L);
 	static int32 card_is_synchro_summonable(lua_State *L);
+	static int32 card_is_xyz_summonable(lua_State *L);
 	static int32 card_is_can_be_summoned(lua_State *L);
 	static int32 card_is_can_be_special_summoned(lua_State *L);
 	static int32 card_is_able_to_hand(lua_State *L);
@@ -287,6 +288,7 @@ public:
 	static int32 duel_summon(lua_State *L);
 	static int32 duel_special_summon_rule(lua_State *L);
 	static int32 duel_synchro_summon(lua_State *L);
+	static int32 duel_xyz_summon(lua_State *L);
 	static int32 duel_setm(lua_State *L);
 	static int32 duel_sets(lua_State *L);
 	static int32 duel_create_token(lua_State *L);

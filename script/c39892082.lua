@@ -29,16 +29,16 @@ function c39892082.addccon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c39892082.addct(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,0,0x28)
+	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,0,0x29)
 end
 function c39892082.addc(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
-		e:GetHandler():AddCounter(0x28,1)
+		e:GetHandler():AddCounter(0x29,1)
 	end
 end
 function c39892082.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=c:GetCounter(0x28)
+	local ct=c:GetCounter(0x29)
 	e:SetLabel(ct)
 	return ct>0 and c:IsReason(REASON_DESTROY)
 end

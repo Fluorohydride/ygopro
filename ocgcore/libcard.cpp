@@ -1049,6 +1049,22 @@ int32 scriptlib::card_is_synchro_summonable(lua_State *L) {
 	lua_pushboolean(L, pcard->is_special_summonable(p));
 	return 1;
 }
+int32 scriptlib::card_is_xyz_summonable(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(!(pcard->data.type & TYPE_XYZ))
+		return 0;
+	group* materials = 0;
+	if(!lua_isnil(L, 2)) {
+		check_param(L, PARAM_TYPE_GROUP, 2);
+		materials = *(group**) lua_touserdata(L, 2);
+	}
+	uint32 p = pcard->pduel->game_field->core.reason_player;
+	pcard->pduel->game_field->core.limit_xyz = materials;
+	lua_pushboolean(L, pcard->is_special_summonable(p));
+	return 1;
+}
 int32 scriptlib::card_is_can_be_summoned(lua_State *L) {
 	check_param_count(L, 3);
 	check_param(L, PARAM_TYPE_CARD, 1);

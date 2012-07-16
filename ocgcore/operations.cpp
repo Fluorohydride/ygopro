@@ -1743,8 +1743,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		effect_set eset;
 		target->material_cards.clear();
 		card* tuner = core.limit_tuner;
+		group* materials = core.limit_xyz;
 		target->filter_spsummon_procedure(sumplayer, &eset);
 		core.limit_tuner = tuner;
+		core.limit_xyz = materials;
 		if(!eset.count)
 			return TRUE;
 		core.select_effects.clear();
@@ -1768,6 +1770,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			if(core.limit_tuner) {
 				pduel->lua->add_param(core.limit_tuner, PARAM_TYPE_CARD);
 				core.limit_tuner = 0;
+			}
+			if(core.limit_xyz) {
+				pduel->lua->add_param(core.limit_xyz, PARAM_TYPE_GROUP);
+				core.limit_xyz = 0;
 			}
 			core.sub_solving_event.push_back(nil_event);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, peffect, 0, sumplayer, 0);
