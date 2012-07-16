@@ -25,16 +25,18 @@ function c69954399.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetCode(EVENT_PHASE_START+PHASE_STANDBY)
+	e4:SetCode(EVENT_PHASE+PHASE_END)
+	e4:SetCountLimit(1)
 	e4:SetRange(LOCATION_SZONE)
-	e4:SetOperation(c69954399.turncount)
+	e4:SetCondition(c69954399.turncon)
+	e4:SetOperation(c69954399.turnop)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(69954399,0))
 	e5:SetCategory(CATEGORY_DESTROY)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e5:SetProperty(EFFECT_FLAG_REPEAT)
-	e5:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e5:SetCode(EVENT_PHASE+PHASE_END)
 	e5:SetCountLimit(1)
 	e5:SetRange(LOCATION_SZONE)
 	e5:SetCondition(c69954399.descon)
@@ -62,17 +64,17 @@ function c69954399.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,e:GetHandler(),tc)
+		e:GetHandler():SetTurnCounter(0)
 	end
 end
-function c69954399.turncount(e,tp,eg,ep,ev,re,r,rp)
+function c69954399.turncon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
-	if ec:GetControler()~=Duel.GetTurnPlayer() then return end
+	return ec:GetControler()==Duel.GetTurnPlayer()
+end
+function c69954399.turnop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if ec:GetFlagEffect(69954399)~=0 then c:SetTurnCounter(2)
-	else
-		ec:RegisterFlagEffect(69954399,RESET_EVENT+0x3fe0000,0,0)
-		c:SetTurnCounter(1)
-	end
+	local ct=c:GetTurnCounter()
+	c:SetTurnCounter(ct+1)
 end
 function c69954399.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetTurnCounter()==2
