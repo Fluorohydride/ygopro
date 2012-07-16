@@ -4,6 +4,7 @@ function c20529766.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCondition(c20529766.condition)
 	e1:SetOperation(c20529766.operation)
 	c:RegisterEffect(e1)
 	--tribute check

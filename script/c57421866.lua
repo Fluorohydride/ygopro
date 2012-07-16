@@ -23,7 +23,7 @@ function c57421866.filter(c)
 	return c:IsFaceup() and c:GetLevel()>=5
 end
 function c57421866.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:GetLevel()>=5 end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c57421866.filter(chkc) end
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingTarget(c57421866.filter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end

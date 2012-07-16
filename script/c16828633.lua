@@ -6,7 +6,7 @@ function c16828633.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(c16828633.condition)
+	e1:SetCondition(c16828633.condition)
 	e1:SetOperation(c16828633.operation)
 	c:RegisterEffect(e1)
 end

@@ -17,16 +17,17 @@ end
 function c89235196.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c89235196.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c89235196.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	Duel.SendtoGrave(g,REASON_COST)
 	Duel.ShuffleHand(tp)
 end
 function c89235196.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
-function c89235196.spop(e,tp,eg,ep,ev,re,r,rp,c)
+function c89235196.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if not c:IsRelateToEffect(e) or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end

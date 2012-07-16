@@ -17,7 +17,7 @@ function c18158397.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c18158397.cfilter(c,tp)
-	return c:IsControler(tp) and c:GetPreviousControler(tp)
+	return c:IsControler(tp) and c:GetPreviousControler()==tp
 end
 function c18158397.condition(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,0x41)==0x41 and re and re:GetHandler():IsSetCard(0x18)

@@ -13,7 +13,7 @@ end
 function c98336111.condtion(e)
 	local ph=Duel.GetCurrentPhase()
 	return (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and Duel.GetAttackTarget()~=nil
-		and (Duel.GetAttacker()==e:GetHandler()) or (Duel.GetAttackTarget()==e:GetHandler())
+		and (Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler())
 end
 function c98336111.target(e,c)
 	return c==e:GetHandler():GetBattleTarget() and c:IsType(TYPE_FUSION)

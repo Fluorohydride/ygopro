@@ -56,10 +56,10 @@ function c81122844.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c81122844.tgfilter,1,nil,e,tp)
 end
 function c81122844.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:IsContains(chkc) and c81122844.tgfilter(chkc,e) end
+	if chkc then return eg:IsContains(chkc) and c81122844.tgfilter(chkc,e,tp) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=eg:FilterSelect(tp,c81122844.tgfilter,1,1,nil,e)
+	local g=eg:FilterSelect(tp,c81122844.tgfilter,1,1,nil,e,tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end

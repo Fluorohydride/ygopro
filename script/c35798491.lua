@@ -26,7 +26,7 @@ function c35798491.mtop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c35798491.filter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and c:IsFaceup() and c:IsSetCard()
+	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp) and c:IsFaceup() and c:IsSetCard(0x45)
 end
 function c35798491.disop(e,tp,eg,ep,ev,re,r,rp)
 	if ep==tp then return end

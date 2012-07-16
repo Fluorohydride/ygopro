@@ -11,6 +11,6 @@ function c45439263.initial_effect(c)
 end
 function c45439263.spcon(e,c)
 	if c==nil then return true end
-	if Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)==0 then return false end
+	if Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)<=0 then return false end
 	return Duel.GetMatchingGroup(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x39):GetClassCount(Card.GetCode)>=3
 end

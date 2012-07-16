@@ -46,12 +46,12 @@ function c47436247.filter(c,ct,e,tp)
 		and c:IsType(TYPE_EFFECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c47436247.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,0)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c47436247.filter,tp,LOCATION_DECK,0,1,nil,e:GetHandler():GetCounter(0x3003),e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c47436247.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE,0)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local ct=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c47436247.filter,tp,LOCATION_DECK,0,1,1,nil,ct,e,tp)

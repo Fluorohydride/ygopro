@@ -20,10 +20,10 @@ function c79205581.initial_effect(c)
 end
 function c79205581.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	if Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
+	if Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 		and Duel.GetCurrentPhase()==PHASE_BATTLE and Duel.SelectYesNo(tp,aux.Stringid(79205581,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
+		local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
 		Duel.SendtoGrave(g,REASON_COST)
 		e:SetLabel(1)
 	else e:SetLabel(0) end
@@ -38,9 +38,9 @@ function c79205581.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_BATTLE
 end
 function c79205581.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
+	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c79205581.operation2(e,tp,eg,ep,ev,re,r,rp)

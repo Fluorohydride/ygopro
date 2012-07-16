@@ -7,6 +7,7 @@ function c65810489.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetCondition(c65810489.spcon)
+	e1:SetTarget(c65810489.sptg)
 	e1:SetOperation(c65810489.spop)
 	c:RegisterEffect(e1)
 end

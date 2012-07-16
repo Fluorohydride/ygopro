@@ -7,7 +7,7 @@ function c44792253.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_REMOVE)
 	e1:SetCondition(c44792253.descon)
-	e1:SetCost(c44792253.destg)
+	e1:SetTarget(c44792253.destg)
 	e1:SetOperation(c44792253.desop)
 	c:RegisterEffect(e1)
 end

@@ -20,7 +20,7 @@ function c46384403.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c46384403.filter(c,e,tp)
-	return c:IsCode(46384403) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
+	return c:IsCode(46384403) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c46384403.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)

@@ -39,10 +39,10 @@ function c64047146.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c64047146.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c64047146.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c64047146.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,c64047146.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c64047146.operation(e,tp,eg,ep,ev,re,r,rp)

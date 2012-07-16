@@ -25,7 +25,7 @@ function c38742075.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c38742075.cfilter(c,tp)
-	return c:IsFaceup() and c:IsRace(RACE_WARRIOR) and c:IsControler(tp)
+	return c:IsFaceup() and c:IsRace(RACE_WARRIOR) and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
 end
 function c38742075.distg(e,c)
 	return c:GetCardTargetCount()>0 and c:IsType(TYPE_SPELL)
