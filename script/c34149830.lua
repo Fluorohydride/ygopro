@@ -12,7 +12,7 @@ function c34149830.initial_effect(c)
 	e2:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCondition(c34149830.condition)
-	e2:SetCost(c34149830.target)
+	e2:SetTarget(c34149830.target)
 	e2:SetOperation(c34149830.operation)
 	c:RegisterEffect(e2)
 end

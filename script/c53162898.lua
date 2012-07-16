@@ -8,7 +8,7 @@ function c53162898.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_DAMAGE_STEP_END)
 	e1:SetCondition(c53162898.condition)
-	e1:SetCost(c53162898.target)
+	e1:SetTarget(c53162898.target)
 	e1:SetOperation(c53162898.operation)
 	c:RegisterEffect(e1)
 end

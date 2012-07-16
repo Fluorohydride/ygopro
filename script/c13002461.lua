@@ -26,10 +26,10 @@ function c13002461.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER) and c:IsLevelAbove(1)
 end
 function c13002461.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c13002461.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c13002461.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c13002461.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c13002461.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c13002461.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c13002461.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c13002461.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -1,5 +1,6 @@
 --バックアップ·ウォリアー
 function c95637655.initial_effect(c)
+	c:EnableReviveLimit()
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

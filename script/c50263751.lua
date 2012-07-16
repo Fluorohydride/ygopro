@@ -15,6 +15,7 @@ function c50263751.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(c50263751.condition)
 	e2:SetOperation(c50263751.operation)
 	c:RegisterEffect(e2)
 end

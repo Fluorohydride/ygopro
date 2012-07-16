@@ -11,7 +11,7 @@ function c88958576.initial_effect(c)
 end
 function c88958576.spcon(e,c)
 	if c==nil then return true end
-	if Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)==0 then return false end
+	if Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)<=0 then return false end
 	local g=Duel.GetMatchingGroup(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x39)
 	local ct=g:GetClassCount(Card.GetCode)
 	return ct>=3

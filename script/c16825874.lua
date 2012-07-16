@@ -14,7 +14,7 @@ function c16825874.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_BE_MATERIAL)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetTarget(c16825874.ccon)
+	e2:SetCondition(c16825874.ccon)
 	e2:SetOperation(c16825874.cop)
 	c:RegisterEffect(e2)
 end

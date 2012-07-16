@@ -21,5 +21,5 @@ end
 function c13945283.operation(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	if not a:IsRelateToBattle() then return end
-	Duel.SendtoHand(a,nil,0,REASON_EFFECT)
+	Duel.SendtoHand(a,nil,REASON_EFFECT)
 end

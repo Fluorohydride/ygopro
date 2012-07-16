@@ -5,7 +5,7 @@ function c60534585.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetCondition(c60534585.condition)
-	e1:SetCost(c60534585.target)
+	e1:SetTarget(c60534585.target)
 	e1:SetOperation(c60534585.operation)
 	c:RegisterEffect(e1)
 end

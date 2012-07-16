@@ -7,11 +7,11 @@ function c92933195.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetCost(c92933195.handcon)
+	e1:SetCondition(c92933195.handcon)
 	e1:SetOperation(c92933195.handop)
 	c:RegisterEffect(e1)
 end
-function c92933195.handcon(e,tp,eg,ep,ev,re,r,rp,chk)
+function c92933195.handcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>=5 and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>=5
 end
 function c92933195.handop(e,tp,eg,ep,ev,re,r,rp)

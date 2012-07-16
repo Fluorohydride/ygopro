@@ -48,7 +48,7 @@ function c65079854.eqlimit(e,c)
 	return c:IsCode(73580471) or c:IsRace(RACE_PLANT)
 end
 function c65079854.filter(c,tp)
-	return c:IsFaceup() and c:IsCode(73580471) or c:IsRace(RACE_PLANT)
+	return c:IsFaceup() and (c:IsCode(73580471) or c:IsRace(RACE_PLANT))
 end
 function c65079854.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c65079854.filter(chkc) end

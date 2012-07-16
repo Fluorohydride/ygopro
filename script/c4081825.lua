@@ -21,7 +21,7 @@ function c4081825.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsDefencePos,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if g:GetCount()==0 then return end
 	Duel.ChangePosition(g,POS_FACEUP_ATTACK)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE,0)==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=Duel.SelectMatchingCard(tp,c4081825.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
 	local tc=sg:GetFirst()

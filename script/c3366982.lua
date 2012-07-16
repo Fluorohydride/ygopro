@@ -12,6 +12,9 @@ function c3366982.initial_effect(c)
 end
 c3366982.material_count=2
 c3366982.material={88819587,64428736}
+function c3366982.filter(c)
+	return c:IsFaceup() and c:IsAttribute(0xf8)
+end
 function c3366982.dircon(e)
-	return not Duel.IsExistingMatchingCard(c3366982.filter,e:GetHandler():GetControler(),0,LOCATION_MZONE,1,nil)
+	return not Duel.IsExistingMatchingCard(c3366982.filter,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
 end
