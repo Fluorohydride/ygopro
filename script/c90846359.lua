@@ -14,14 +14,6 @@ function c90846359.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c90846359.adjustop)
 	c:RegisterEffect(e2)
-	--adjust
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetCode(EVENT_LEAVE_FIELD)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetOperation(c90846359.adjustop2)
-	c:RegisterEffect(e3)
 	--cannot summon,spsummon,flipsummon
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
@@ -77,17 +69,19 @@ function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if g1:GetCount()==0 then c90846359[tp]=0
 	else
-		if c90846359[tp]==0 then
+		c90846359[tp]=c90846359.getrace(g1)
+		if bit.band(c90846359[tp],c90846359[tp]-1)~=0 then
 			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(90846359,0))
-			c90846359[tp]=Duel.AnnounceRace(tp,1,c90846359.getrace(g1))
+			c90846359[tp]=Duel.AnnounceRace(tp,1,c90846359[tp])
 		end
 		g1:Remove(c90846359.rmfilter,nil,c90846359[tp])
 	end
 	if g2:GetCount()==0 then c90846359[1-tp]=0
 	else
-		if c90846359[1-tp]==0 then
-			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(90846359,0))
-			c90846359[1-tp]=Duel.AnnounceRace(1-tp,1,c90846359.getrace(g2))
+		c90846359[1-tp]=c90846359.getrace(g2)
+		if bit.band(c90846359[1-tp],c90846359[1-tp]-1)~=0 then
+			Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(90846359,0))
+			c90846359[1-tp]=Duel.AnnounceRace(1-tp,1,c90846359[1-tp])
 		end
 		g2:Remove(c90846359.rmfilter,nil,c90846359[1-tp])
 	end
@@ -96,11 +90,4 @@ function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g1,REASON_EFFECT)
 		Duel.Readjust()
 	end
-end
-function c90846359.op2filter(c)
-	return c:IsFaceup() and c:GetRace()>0
-end
-function c90846359.adjustop2(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsExistingMatchingCard(c90846359.op2filter,tp,LOCATION_MZONE,0,1,nil) then c90846359[tp]=0 end
-	if not Duel.IsExistingMatchingCard(c90846359.op2filter,tp,0,LOCATION_MZONE,1,nil) then c90846359[1-tp]=0 end
 end

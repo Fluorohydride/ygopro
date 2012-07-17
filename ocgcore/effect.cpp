@@ -180,6 +180,9 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 			if((handler == owner) && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && handler->is_status(STATUS_DISABLED))
 				return FALSE;
 		}
+	} else {
+		if((get_owner_player() != playerid) && !(flag & EFFECT_FLAG_BOTH_SIDE))
+			return FALSE;
 	}
 	pduel->game_field->save_lp_cost();
 	effect* oreason = pduel->game_field->core.reason_effect;
