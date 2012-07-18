@@ -3,6 +3,8 @@ function c2333365.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_SELF_DESTROY)
 	e1:SetCondition(c2333365.descon)
 	c:RegisterEffect(e1)

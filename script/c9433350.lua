@@ -36,6 +36,8 @@ function c9433350.initial_effect(c)
 	--selfdes
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
+	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e7:SetRange(LOCATION_MZONE)
 	e7:SetCode(EFFECT_SELF_DESTROY)
 	e7:SetCondition(c9433350.descon)
 	c:RegisterEffect(e7)

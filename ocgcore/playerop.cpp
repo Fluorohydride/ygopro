@@ -387,6 +387,17 @@ int32 field::select_position(uint16 step, uint8 playerid, uint32 code, uint8 pos
 			returns.ivalue[0] = positions;
 			return TRUE;
 		}
+		if((playerid == 1) && (core.duel_options & DUEL_SIMPLE_AI)) {
+			if(positions & 0x4)
+				returns.ivalue[0] = 0x4;
+			else if(positions & 0x1)
+				returns.ivalue[0] = 0x1;
+			else if(positions & 0x8)
+				returns.ivalue[0] = 0x8;
+			else
+				returns.ivalue[0] = 0x2;
+			return TRUE;
+		}
 		pduel->write_buffer8(MSG_SELECT_POSITION);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer32(code);

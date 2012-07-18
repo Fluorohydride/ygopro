@@ -1470,7 +1470,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
 			if (l & 0x41) {
-				if(count <= 3) {
+				if(count == 1) {
 					float shift = -0.15f;
 					if (c == 0 && l == 0x40) shift = 0.15f;
 					pcard->dPos = irr::core::vector3df(shift, 0, 0);
@@ -1482,8 +1482,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					mainGame->WaitFrameSignal(45);
 					mainGame->dField.MoveCard(pcard, 5);
 					mainGame->WaitFrameSignal(5);
-				} else
-					panel_confirm.push_back(pcard);
+				} else {
+					if(!mainGame->dInfo.isReplay)
+						panel_confirm.push_back(pcard);
+				}
 			} else
 				field_confirm.push_back(pcard);
 		}
@@ -1523,6 +1525,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			std::sort(panel_confirm.begin(), panel_confirm.end(), ClientCard::client_card_sort);
 			mainGame->gMutex.Lock();
 			mainGame->dField.selectable_cards = panel_confirm;
+			myswprintf(textBuffer, dataManager.GetSysString(208), panel_confirm.size());
+			mainGame->wCardSelect->setText(textBuffer);
 			mainGame->dField.ShowSelectCard(true);
 			mainGame->gMutex.Unlock();
 			mainGame->actionSignal.Reset();
@@ -1564,7 +1568,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
 		mainGame->WaitFrameSignal(5);
-		if(player == 1 && !mainGame->dInfo.isReplay) {
+		if(player == 1 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
 			bool flip = false;
 			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 				if((*cit)->code) {

@@ -2,7 +2,7 @@
 #include <stdio.h>
 
 namespace ygo {
-	
+
 const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[2048];
 DataManager dataManager;
@@ -233,7 +233,8 @@ const wchar_t* DataManager::FormatType(int type) {
 	return tpBuffer;
 }
 int DataManager::CardReader(int code, void* pData) {
-	dataManager.GetData(code, (CardData*)pData);
+	if(!dataManager.GetData(code, (CardData*)pData))
+		memset(pData, 0, sizeof(CardData));
 	return 0;
 }
 

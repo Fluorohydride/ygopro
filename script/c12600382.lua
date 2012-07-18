@@ -1,5 +1,6 @@
 --エクゾディア·ネクロス
 function c12600382.initial_effect(c)
+	c:EnableReviveLimit()
 	--cannot destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -36,10 +37,11 @@ function c12600382.initial_effect(c)
 	--selfdes
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetRange(LOCATION_MZONE)
 	e5:SetCode(EFFECT_SELF_DESTROY)
 	e5:SetCondition(c12600382.descondition)
 	c:RegisterEffect(e5)
-	c:EnableReviveLimit()
 end
 function c12600382.efdes(e,re)
 	return not re:GetHandler():IsType(TYPE_MONSTER)

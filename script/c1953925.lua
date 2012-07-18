@@ -37,7 +37,7 @@ function c1953925.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c1953925.distg(e,c)
-	if not c:IsType(TYPE_TRAP) and c:GetCardTargetCount()==0 then return false end
+	if not c:IsType(TYPE_TRAP) or c:GetCardTargetCount()==0 then return false end
 	return c:GetCardTarget():IsContains(e:GetHandler())
 end
 function c1953925.disop(e,tp,eg,ep,ev,re,r,rp)

@@ -18,6 +18,8 @@ function c48357738.initial_effect(c)
 	--des
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EFFECT_SELF_DESTROY)
 	e3:SetCondition(c48357738.descon)
 	c:RegisterEffect(e3)

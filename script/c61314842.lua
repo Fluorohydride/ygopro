@@ -14,12 +14,14 @@ function c61314842.filter(c,e,tp)
 	return c:IsSetCard(0x76) and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c61314842.xyzfilter(c,mg)
+	if c.xyz_count~=2 then return false end
 	return c:IsXyzSummonable(mg)
 end
 function c61314842.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local mg=Duel.GetMatchingGroup(c61314842.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and mg:GetCount()>1 end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and mg:GetCount()>1
+		and Duel.IsExistingMatchingCard(c61314842.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,mg) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=mg:Select(tp,2,2,nil)
 	Duel.SetTargetCard(g)

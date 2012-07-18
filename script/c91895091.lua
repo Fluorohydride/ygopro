@@ -3,7 +3,7 @@ function c91895091.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,c91895091.xyzfilter,2)
 	c:EnableReviveLimit()
-	--addown
+	--actlimit
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(91895091,0))
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -34,10 +34,10 @@ function c91895091.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c91895091.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsFacedown() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and chkc:IsFacedown() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,0,LOCATION_SZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(91895091,2))
-	Duel.SelectTarget(tp,Card.IsFacedown,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil)
+	Duel.SelectTarget(tp,Card.IsFacedown,tp,0,LOCATION_SZONE,1,1,nil)
 end
 function c91895091.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

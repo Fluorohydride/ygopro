@@ -14,7 +14,8 @@ function c72926163.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetOperation(c72926163.sucop)
+	e3:SetCondition(c72926163.atkcon)
+	e3:SetOperation(c72926163.atkop)
 	c:RegisterEffect(e3)
 	--multiatk
 	local e4=Effect.CreateEffect(c)
@@ -33,7 +34,10 @@ c72926163.material={89943723}
 function c72926163.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
-function c72926163.sucop(e,tp,eg,ep,ev,re,r,rp)
+function c72926163.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+function c72926163.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=c:GetMaterial()
 	local tc=g:GetFirst()

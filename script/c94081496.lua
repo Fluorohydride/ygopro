@@ -21,7 +21,7 @@ function c94081496.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=eg:GetFirst()
 	if chkc then return chkc==tc end
 	if chk==0 then return eg:GetCount()==1 and tc:IsFaceup() and tc:IsType(TYPE_SYNCHRO) and tc:IsOnField()
-		and tc:IsCanBeEffectTarget(e) and tc:IsDestructable() end
+		and tc:IsControler(1-tp) and tc:IsCanBeEffectTarget(e) and tc:IsDestructable() end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 end

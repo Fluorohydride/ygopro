@@ -22,6 +22,8 @@ function c85684223.initial_effect(c)
 	--self des
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_SELF_DESTROY)
 	e3:SetCondition(c85684223.sdcon)
 	c:RegisterEffect(e3)

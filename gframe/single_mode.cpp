@@ -277,6 +277,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
+			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_SHUFFLE_DECK: {

@@ -158,6 +158,12 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.AddXyzProcedure(c,f,ct,alterf,desc)
+	if c.xyz_filter==nil then
+		local code=c:GetOriginalCode()
+		local mt=_G["c" .. code]
+		mt.xyz_filter=f
+		mt.xyz_count=ct
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
