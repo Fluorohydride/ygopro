@@ -4,6 +4,7 @@ function c80921533.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetValue(SUMMON_TYPE_NORMAL)
 	c:RegisterEffect(e1)
 	--summon
 	local e2=Effect.CreateEffect(c)
@@ -69,7 +70,7 @@ function c80921533.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		local s1=tc:IsSummonable(false,se)
 		local s2=tc:IsMSetable(false,se)
-		if (s1 and s2 and Duel.SelectOption(tp,aux.Stringid(80921533,1),aux.Stringid(80921533,2))==0) or not s2 then
+		if (s1 and s2 and Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)==POS_FACEUP_ATTACK) or not s2 then
 			Duel.Summon(tp,tc,false,se)
 		else
 			Duel.MSet(tp,tc,false,se)

@@ -57,7 +57,7 @@ function c39712330.activate1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
 		if tc:IsSummonable(true,nil) and (not tc:IsMSetable(true,nil) 
-			or Duel.SelectOption(tp,aux.Stringid(39712330,2),aux.Stringid(39712330,3))==0) then
+			or Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)==POS_FACEUP_ATTACK) then
 			Duel.Summon(tp,tc,true,nil)
 		else Duel.MSet(tp,tc,true,nil) end
 	end
@@ -92,7 +92,7 @@ function c39712330.activate2(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		local s1=tc:IsSummonable(true,nil)
 		local s2=tc:IsMSetable(true,nil)
-		if (s1 and s2 and Duel.SelectOption(tp,aux.Stringid(39712330,2),aux.Stringid(39712330,3))==0) or not s2 then
+		if (s1 and s2 and Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)==POS_FACEUP_ATTACK) or not s2 then
 			Duel.Summon(tp,tc,true,nil)
 		else
 			Duel.MSet(tp,tc,true,nil)

@@ -2409,7 +2409,7 @@ int32 scriptlib::duel_select_position(lua_State * L) {
 	card* pcard = *(card**) lua_touserdata(L, 2);
 	uint32 positions = lua_tointeger(L, 3);
 	duel* pduel = interpreter::get_duel_info(L);
-	pduel->game_field->add_process(PROCESSOR_SELECT_POSITION_S, 0, 0, 0, playerid + (positions << 16), (ptr)pcard);
+	pduel->game_field->add_process(PROCESSOR_SELECT_POSITION_S, 0, 0, 0, playerid + (positions << 16), pcard->data.code);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_select_disable_field(lua_State * L) {

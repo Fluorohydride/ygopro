@@ -1476,7 +1476,8 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 		}
 		effect_set proc;
 		int32 res = filter_summon_procedure(playerid, &proc, ignore_count);
-		if((peffect && res < 0) || (!peffect && (!res || res == -2) && !proc.count)) {
+		if((peffect && res < 0) || (!peffect && (!res || res == -2) && !proc.count)
+		        || (peffect && (proc.count == 0) && !pduel->game_field->is_player_can_summon(peffect->get_value(), playerid, this))) {
 			pduel->game_field->restore_lp_cost();
 			return FALSE;
 		}
