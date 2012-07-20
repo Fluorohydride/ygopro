@@ -30,7 +30,7 @@ function c74329404.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c74329404.ctfilter(c,tp)
-	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousControler()==tp
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousControler()==tp and c:IsSetCard(0xc008)
 end
 function c74329404.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c74329404.ctfilter,1,nil,tp)
@@ -40,10 +40,10 @@ function c74329404.ctop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c74329404.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
-	return Duel.GetTurnPlayer()==tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2) --and e:GetHandler():GetCounter(0x1c)>=2
+	return Duel.GetTurnPlayer()==tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function c74329404.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() and e:GetHandler():GetCounter(0x1c)>=2 end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c74329404.filter1(c,e,tp)
@@ -56,7 +56,7 @@ end
 function c74329404.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c74329404.filter1,1,nil,nil,tp) end
 	Duel.SetTargetCard(eg)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
 function c74329404.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c74329404.filter1,nil,e,tp)

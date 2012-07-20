@@ -13,7 +13,7 @@ function c51554871.initial_effect(c)
 end
 function c51554871.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c51554871.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x39)

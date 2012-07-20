@@ -39,7 +39,7 @@ function c39712330.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.SelectYesNo(tp,aux.Stringid(39712330,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local g=Duel.SelectMatchingCard(tp,c39712330.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+		Duel.Remove(g,POS_FACEUP,REASON_COST)
 		e:SetLabel(1)
 	end
 end
@@ -71,7 +71,7 @@ function c39712330.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c39712330.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c39712330.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c39712330.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

@@ -69,7 +69,7 @@ end
 function c15187079.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,e:GetHandler()) end
 	local g=Duel.SelectReleaseGroup(tp,nil,1,1,e:GetHandler())
-	Duel.Release(g,REASON_EFFECT)
+	Duel.Release(g,REASON_COST)
 end
 function c15187079.filter(c)
 	return c:IsFaceup() and c:IsAbleToChangeControler()
