@@ -2,7 +2,7 @@
 function c68815401.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1c0)
@@ -34,6 +34,8 @@ function c68815401.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dg2=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	dg1:Merge(dg2)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg1,dg1:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function c68815401.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dg1=Duel.GetMatchingGroup(c68815401.filter1,tp,LOCATION_SZONE,0,nil)
@@ -42,7 +44,7 @@ function c68815401.activate(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.Destroy(dg2,REASON_EFFECT)>0
 			and Duel.IsPlayerCanSpecialSummonMonster(tp,68815402,0,0x4011,1000,1000,3,RACE_PYRO,ATTRIBUTE_FIRE) then
 			local token=Duel.CreateToken(tp,68815402)
-			Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 		end
 	end
 end

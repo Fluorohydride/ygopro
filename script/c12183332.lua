@@ -23,7 +23,7 @@ function c12183332.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local opt=Duel.SelectOption(tp,aux.Stringid(12183332,1),aux.Stringid(12183332,2))
 	if opt==0 then 
-		Duel.ShuffleDeck(1-tp)
+		Duel.ShuffleDeck(tp)
 	else
 		Duel.ShuffleDeck(1-tp)
 	end

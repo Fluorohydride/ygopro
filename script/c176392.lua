@@ -30,7 +30,7 @@ end
 function c176392.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c176392.rfilter,1,nil,e:GetHandler()) end
 	if Duel.SelectYesNo(tp,aux.Stringid(176392,0)) then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+		Duel.Destroy(e:GetHandler(),REASON_EFFECT+REASON_REPLACE)
 		return true
 	else return false end
 end

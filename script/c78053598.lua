@@ -17,7 +17,7 @@ end
 function c78053598.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,564)
 	local code=Duel.AnnounceCard(tp)
-	Duel.Hint(HINT_SELECTMSG,1-tp,ATOHAND)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(1-tp,c78053598.filter,1-tp,LOCATION_DECK,0,1,1,nil,code)
 	local tc=g:GetFirst()
 	if tc then

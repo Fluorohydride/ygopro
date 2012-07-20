@@ -23,7 +23,7 @@ function c191749.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc3=Duel.GetFirstMatchingCard(c191749.cfilter,tp,LOCATION_GRAVE,0,nil,37318031)
 	local tc4=Duel.GetFirstMatchingCard(c191749.cfilter,tp,LOCATION_GRAVE,0,nil,63703130)
 	local g=Group.FromCards(tc1,tc2,tc3,tc4)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c191749.filter(c,e,tp)
 	return c:IsSetCard(0x3008) and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

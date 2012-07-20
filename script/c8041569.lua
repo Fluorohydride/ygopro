@@ -17,7 +17,7 @@ function c8041569.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x39):GetClassCount(Card.GetCode)>=3
 end
 function c8041569.cfilter(c)
-	return c:IsSetCard(0x39) and c:IsAbleToRemove()
+	return c:IsSetCard(0x39) and c:IsAbleToRemoveAsCost()
 end
 function c8041569.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()
@@ -25,7 +25,7 @@ function c8041569.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c8041569.cfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
 	g:AddCard(e:GetHandler())
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c8041569.filter(c)
 	return c:IsFacedown() and c:IsDestructable()
