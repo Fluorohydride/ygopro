@@ -127,6 +127,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			case BUTTON_REPLAY_MODE: {
 				mainGame->HideElement(mainGame->wMainMenu);
 				mainGame->ShowElement(mainGame->wReplay);
+				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->RefreshReplay();
 				break;
 			}
@@ -160,7 +161,10 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				ReplayMode::StartReplay(0);
+				unsigned int start_turn = _wtoi(mainGame->ebRepStartTurn->getText());
+				if(start_turn == 1)
+					start_turn = 0;
+				ReplayMode::StartReplay(start_turn);
 				break;
 			}
 			case BUTTON_CANCEL_REPLAY: {
@@ -253,6 +257,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				else
 					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]));
 				repinfo.append(infobuf);
+				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
 				break;
 			}

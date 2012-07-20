@@ -192,8 +192,10 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
-			if(mainGame->dInfo.isReplaySkiping)
+			if(mainGame->dInfo.isReplaySkiping) {
+				mainGame->dField.RefreshAllCards();
 				mainGame->gMutex.Unlock();
+			}
 			mainGame->gMutex.Lock();
 			mainGame->stMessage->setText(L"Error occurs.");
 			mainGame->PopupElement(mainGame->wMessage);
@@ -208,6 +210,10 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_WIN: {
+			if(mainGame->dInfo.isReplaySkiping) {
+				mainGame->dField.RefreshAllCards();
+				mainGame->gMutex.Unlock();
+			}
 			pbuf += 2;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			return false;

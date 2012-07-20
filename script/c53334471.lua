@@ -5,6 +5,7 @@ function c53334471.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
+	e1:SetTarget(c53334471.acttg)
 	c:RegisterEffect(e1)
 	--adjust
 	local e2=Effect.CreateEffect(c)
@@ -42,6 +43,11 @@ function c53334471.initial_effect(c)
 end
 c53334471[0]=0
 c53334471[1]=0
+function c53334471.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	c53334471[0]=0
+	c53334471[1]=0
+end
 function c53334471.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
 	local at=c53334471[sump]
@@ -69,21 +75,27 @@ function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if g1:GetCount()==0 then c53334471[tp]=0
 	else
-		c53334471[tp]=c53334471.getattribute(g1)
-		if bit.band(c53334471[tp],c53334471[tp]-1)~=0 then
-			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(53334471,0))
-			c53334471[tp]=Duel.AnnounceAttribute(tp,1,c53334471[tp])
+		local att=c53334471.getattribute(g1)
+		if bit.band(att,att-1)~=0 then
+			if c53334471[tp]==0 or bit.band(c53334471[tp],att)==0 then
+				Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(53334471,0))
+				att=Duel.AnnounceAttribute(tp,1,att)
+			else att=c53334471[tp] end
 		end
-		g1:Remove(c53334471.rmfilter,nil,c53334471[tp])
+		g1:Remove(c53334471.rmfilter,nil,att)
+		c53334471[tp]=att
 	end
 	if g2:GetCount()==0 then c53334471[1-tp]=0
 	else
-		c53334471[1-tp]=c53334471.getattribute(g2)
-		if bit.band(c53334471[1-tp],c53334471[1-tp]-1)~=0 then
-			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(53334471,0))
-			c53334471[1-tp]=Duel.AnnounceAttribute(1-tp,1,c53334471[1-tp])
+		local att=c53334471.getattribute(g2)
+		if bit.band(att,att-1)~=0 then
+			if c53334471[1-tp]==0 or bit.band(c53334471[1-tp],att)==0 then
+				Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(53334471,0))
+				att=Duel.AnnounceAttribute(1-tp,1,att)
+			else att=c53334471[1-tp] end
 		end
-		g2:Remove(c53334471.rmfilter,nil,c53334471[1-tp])
+		g2:Remove(c53334471.rmfilter,nil,att)
+		c53334471[1-tp]=att
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then

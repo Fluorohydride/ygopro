@@ -24,14 +24,14 @@ function c62437430.filter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToRemove() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c62437430.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c62437430.filter,tp,0x13,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,0x13)
+	if chk==0 then return Duel.IsExistingMatchingCard(c62437430.filter,tp,0x16,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,0x16)
 end
 function c62437430.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local tc=Duel.SelectMatchingCard(tp,c62437430.filter,tp,0x13,0,1,1,nil):GetFirst()
+	local tc=Duel.SelectMatchingCard(tp,c62437430.filter,tp,0x16,0,1,1,nil):GetFirst()
 	if tc then
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
 		tc:RegisterFlagEffect(62437430,RESET_EVENT+0x1fe0000,0,0)

@@ -814,8 +814,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardp = 0;
 		mainGame->dInfo.vic_string = 0;
 		wchar_t vic_buf[256];
-		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-			mainGame->gMutex.Unlock();
 		if(player == 2)
 			mainGame->showcardcode = 3;
 		else if(mainGame->LocalPlayer(player) == 0) {
@@ -1501,8 +1499,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					if(!mainGame->dInfo.isReplay)
 						panel_confirm.push_back(pcard);
 				}
-			} else
-				field_confirm.push_back(pcard);
+			} else {
+				if(!mainGame->dInfo.isReplay || (l & LOCATION_ONFIELD))
+					field_confirm.push_back(pcard);
+			}
 		}
 		if (field_confirm.size() > 0) {
 			for(int i = 0; i < field_confirm.size(); ++i) {

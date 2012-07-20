@@ -5,6 +5,7 @@ function c90846359.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_DRAW_PHASE)
+	e1:SetTarget(c90846359.acttg)
 	c:RegisterEffect(e1)
 	--adjust
 	local e2=Effect.CreateEffect(c)
@@ -42,6 +43,11 @@ function c90846359.initial_effect(c)
 end
 c90846359[0]=0
 c90846359[1]=0
+function c90846359.acttg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	c90846359[0]=0
+	c90846359[1]=0
+end
 function c90846359.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	if sumpos and bit.band(sumpos,POS_FACEDOWN)>0 then return false end
 	local rc=c90846359[sump]
@@ -69,21 +75,27 @@ function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if g1:GetCount()==0 then c90846359[tp]=0
 	else
-		c90846359[tp]=c90846359.getrace(g1)
-		if bit.band(c90846359[tp],c90846359[tp]-1)~=0 then
-			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(90846359,0))
-			c90846359[tp]=Duel.AnnounceRace(tp,1,c90846359[tp])
+		local rac=c90846359.getrace(g1)
+		if bit.band(rac,rac-1)~=0 then
+			if c90846359[tp]==0 or bit.band(c90846359[tp],rac)==0 then
+				Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(90846359,0))
+				rac=Duel.AnnounceRace(tp,1,rac)
+			else rac=c90846359[tp] end
 		end
-		g1:Remove(c90846359.rmfilter,nil,c90846359[tp])
+		g1:Remove(c90846359.rmfilter,nil,rac)
+		c90846359[tp]=rac
 	end
 	if g2:GetCount()==0 then c90846359[1-tp]=0
 	else
-		c90846359[1-tp]=c90846359.getrace(g2)
-		if bit.band(c90846359[1-tp],c90846359[1-tp]-1)~=0 then
-			Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(90846359,0))
-			c90846359[1-tp]=Duel.AnnounceRace(1-tp,1,c90846359[1-tp])
+		local rac=c90846359.getrace(g2)
+		if bit.band(rac,rac-1)~=0 then
+			if c90846359[1-tp]==0 or bit.band(c90846359[1-tp],rac)==0 then
+				Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(90846359,0))
+				rac=Duel.AnnounceRace(1-tp,1,rac)
+			else rac=c90846359[1-tp] end
 		end
-		g2:Remove(c90846359.rmfilter,nil,c90846359[1-tp])
+		g2:Remove(c90846359.rmfilter,nil,rac)
+		c90846359[1-tp]=rac
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then

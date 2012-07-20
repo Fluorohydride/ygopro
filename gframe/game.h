@@ -221,6 +221,7 @@ public:
 	irr::gui::IGUIStaticText* stReplayInfo;
 	irr::gui::IGUIButton* btnLoadReplay;
 	irr::gui::IGUIButton* btnReplayCancel;
+	irr::gui::IGUIEditBox* ebRepStartTurn;
 	//single play
 	irr::gui::IGUIWindow* wSinglePlay;
 	irr::gui::IGUIListBox* lstSinglePlayList;
