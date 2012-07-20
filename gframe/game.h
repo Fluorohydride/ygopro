@@ -29,6 +29,7 @@ struct Config {
 struct DuelInfo {
 	bool isStarted;
 	bool isReplay;
+	bool isReplaySkiping;
 	bool isFirst;
 	bool isTag;
 	bool isSingleMode;

@@ -3,7 +3,7 @@ function c96704018.initial_effect(c)
 	--lv change
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(96704018,0))
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetOperation(c96704018.operation)
 	c:RegisterEffect(e1)

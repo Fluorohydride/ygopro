@@ -160,7 +160,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				mainGame->dField.Clear();
 				mainGame->HideElement(mainGame->wReplay);
 				mainGame->device->setEventReceiver(&mainGame->dField);
-				ReplayMode::StartReplay();
+				ReplayMode::StartReplay(0);
 				break;
 			}
 			case BUTTON_CANCEL_REPLAY: {

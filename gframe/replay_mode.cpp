@@ -15,9 +15,11 @@ bool ReplayMode::is_pausing = false;
 bool ReplayMode::is_paused = false;
 bool ReplayMode::is_swaping = false;
 bool ReplayMode::exit_pending = false;
+int ReplayMode::skip_turn = 0;
 wchar_t ReplayMode::event_string[256];
 
-bool ReplayMode::StartReplay() {
+bool ReplayMode::StartReplay(int skipturn) {
+	skip_turn = skipturn;
 	Thread::NewThread(ReplayThread, 0);
 	return true;
 }
@@ -134,6 +136,13 @@ int ReplayMode::ReplayThread(void* param) {
 	char engineBuffer[0x1000];
 	is_continuing = true;
 	exit_pending = false;
+	if(skip_turn < 0)
+		skip_turn = 0;
+	if(skip_turn) {
+		mainGame->dInfo.isReplaySkiping = true;
+		mainGame->gMutex.Lock();
+	} else
+		mainGame->dInfo.isReplaySkiping = false;
 	int len = 0, flag = 0;
 	while (is_continuing && !exit_pending) {
 		int result = process(pduel);
@@ -183,6 +192,8 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		mainGame->dInfo.curMsg = BufferIO::ReadUInt8(pbuf);
 		switch (mainGame->dInfo.curMsg) {
 		case MSG_RETRY: {
+			if(mainGame->dInfo.isReplaySkiping)
+				mainGame->gMutex.Unlock();
 			mainGame->gMutex.Lock();
 			mainGame->stMessage->setText(L"Error occurs.");
 			mainGame->PopupElement(mainGame->wMessage);
@@ -344,6 +355,14 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_NEW_TURN: {
+			if(skip_turn) {
+				skip_turn--;
+				if(skip_turn == 0) {
+					mainGame->dInfo.isReplaySkiping = false;
+					mainGame->dField.RefreshAllCards();
+					mainGame->gMutex.Unlock();
+				}
+			}
 			player = BufferIO::ReadInt8(pbuf);
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -365,7 +384,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			int cp = pbuf[11];
 			pbuf += 16;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
-			if(pl != cl || pc != cc)
+			if(cl && !(cl & 0x80) && (pl != cl || pc != cc))
 				ReplayRefreshSingle(cc, cl, cs);
 			break;
 		}

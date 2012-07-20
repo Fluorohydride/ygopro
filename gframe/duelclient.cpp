@@ -7,6 +7,7 @@
 #include "../ocgcore/duel.h"
 #include "game.h"
 #include "replay.h"
+#include "replay_mode.h"
 
 namespace ygo {
 
@@ -714,6 +715,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int type = BufferIO::ReadInt8(pbuf);
 		int player = BufferIO::ReadInt8(pbuf);
 		int data = BufferIO::ReadInt32(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		switch (type) {
 		case HINT_EVENT: {
 			myswprintf(event_string, L"%ls", dataManager.GetDesc(data));
@@ -811,6 +814,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->showcardp = 0;
 		mainGame->dInfo.vic_string = 0;
 		wchar_t vic_buf[256];
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			mainGame->gMutex.Unlock();
 		if(player == 2)
 			mainGame->showcardcode = 3;
 		else if(mainGame->LocalPlayer(player) == 0) {
@@ -1418,9 +1423,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int count = BufferIO::ReadInt8(pbuf);
 		int code;
 		ClientCard* pcard;
-		myswprintf(textBuffer, dataManager.GetSysString(207), count);
-		mainGame->lstLog->addItem(textBuffer);
-		mainGame->logParam.push_back(0);
 		mainGame->dField.selectable_cards.clear();
 		for (int i = 0; i < count; ++i) {
 			code = BufferIO::ReadInt32(pbuf);
@@ -1429,11 +1431,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (code != 0)
 				pcard->SetCode(code);
 		}
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
+		myswprintf(textBuffer, dataManager.GetSysString(207), count);
+		mainGame->lstLog->addItem(textBuffer);
+		mainGame->logParam.push_back(0);
 		for (int i = 0; i < count; ++i) {
 			pcard = *(mainGame->dField.deck[player].rbegin() + i);
+			mainGame->gMutex.Lock();
 			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(pcard->code));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(pcard->code);
+			mainGame->gMutex.Unlock();
 			float shift = -0.15f;
 			if (player == 1) shift = 0.15f;
 			pcard->dPos = irr::core::vector3df(shift, 0, 0);
@@ -1455,6 +1464,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		std::vector<ClientCard*> field_confirm;
 		std::vector<ClientCard*> panel_confirm;
 		ClientCard* pcard;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pbuf += count * 7;
+			return true;
+		}
 		myswprintf(textBuffer, dataManager.GetSysString(208), count);
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(0);
@@ -1466,9 +1479,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard = mainGame->dField.GetCard(c, l, s);
 			if (code != 0)
 				pcard->SetCode(code);
+			mainGame->gMutex.Lock();
 			myswprintf(textBuffer, L"*[%ls]", dataManager.GetName(code));
 			mainGame->lstLog->addItem(textBuffer);
 			mainGame->logParam.push_back(code);
+			mainGame->gMutex.Unlock();
 			if (l & 0x41) {
 				if(count == 1) {
 					float shift = -0.15f;
@@ -1537,66 +1552,74 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SHUFFLE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		bool rev = mainGame->dField.deck_reversed;
-		mainGame->dField.deck_reversed = false;
-		if(rev) {
-			for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
-				mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
-			mainGame->WaitFrameSignal(10);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->dField.deck_reversed = false;
+			if(rev) {
+				for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+					mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
+				mainGame->WaitFrameSignal(10);
+			}
 		}
 		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
 			mainGame->dField.deck[player][i]->code = 0;
-		for (int i = 0; i < 5; ++i) {
-			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-				(*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
-				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-				(*cit)->is_moving = true;
-				(*cit)->aniFrame = 3;
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for (int i = 0; i < 5; ++i) {
+				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+					(*cit)->dPos = irr::core::vector3df(rand() * 0.4f / RAND_MAX - 0.2f, 0, 0);
+					(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+					(*cit)->is_moving = true;
+					(*cit)->aniFrame = 3;
+				}
+				mainGame->WaitFrameSignal(3);
+				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
+					mainGame->dField.MoveCard(*cit, 3);
+				mainGame->WaitFrameSignal(3);
 			}
-			mainGame->WaitFrameSignal(3);
-			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
-				mainGame->dField.MoveCard(*cit, 3);
-			mainGame->WaitFrameSignal(3);
-		}
-		mainGame->dField.deck_reversed = rev;
-		if(rev) {
-			for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
-				mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
+			mainGame->dField.deck_reversed = rev;
+			if(rev) {
+				for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+					mainGame->dField.MoveCard(mainGame->dField.deck[player][i], 10);
+			}
 		}
 		return true;
 	}
 	case MSG_SHUFFLE_HAND: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int count = BufferIO::ReadInt8(pbuf);
-		mainGame->WaitFrameSignal(5);
-		if(player == 1 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
-			bool flip = false;
-			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
-				if((*cit)->code) {
-					(*cit)->dPos = irr::core::vector3df(0, 0, 0);
-					(*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
-					(*cit)->is_moving = true;
-					(*cit)->is_hovered = false;
-					(*cit)->aniFrame = 5;
-					flip = true;
-				}
-			if(flip)
-				mainGame->WaitFrameSignal(5);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->WaitFrameSignal(5);
+			if(player == 1 && !mainGame->dInfo.isReplay && !mainGame->dInfo.isSingleMode) {
+				bool flip = false;
+				for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
+					if((*cit)->code) {
+						(*cit)->dPos = irr::core::vector3df(0, 0, 0);
+						(*cit)->dRot = irr::core::vector3df(1.322f / 5, 3.1415926f / 5, 0);
+						(*cit)->is_moving = true;
+						(*cit)->is_hovered = false;
+						(*cit)->aniFrame = 5;
+						flip = true;
+					}
+				if(flip)
+					mainGame->WaitFrameSignal(5);
+			}
+			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+				(*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
+				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+				(*cit)->is_moving = true;
+				(*cit)->is_hovered = false;
+				(*cit)->aniFrame = 5;
+			}
+			mainGame->WaitFrameSignal(11);
 		}
-		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-			(*cit)->dPos = irr::core::vector3df((3.9f - (*cit)->curPos.X) / 5, 0, 0);
-			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-			(*cit)->is_moving = true;
-			(*cit)->is_hovered = false;
-			(*cit)->aniFrame = 5;
-		}
-		mainGame->WaitFrameSignal(11);
 		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit)
 			(*cit)->SetCode(BufferIO::ReadInt32(pbuf));
-		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-			(*cit)->is_hovered = false;
-			mainGame->dField.MoveCard(*cit, 5);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+				(*cit)->is_hovered = false;
+				mainGame->dField.MoveCard(*cit, 5);
+			}
+			mainGame->WaitFrameSignal(5);
 		}
-		mainGame->WaitFrameSignal(5);
 		return true;
 	}
 	case MSG_REFRESH_DECK: {
@@ -1605,27 +1628,36 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SWAP_GRAVE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
-		std::vector<ClientCard*>::iterator cit;
-		mainGame->gMutex.Lock();
-		mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
-		for (cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
-			(*cit)->location = LOCATION_GRAVE;
-			mainGame->dField.MoveCard(*cit, 10);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
+			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
+				(*cit)->location = LOCATION_GRAVE;
+			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
+				(*cit)->location = LOCATION_DECK;
+		} else {
+			mainGame->gMutex.Lock();
+			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
+			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit) {
+				(*cit)->location = LOCATION_GRAVE;
+				mainGame->dField.MoveCard(*cit, 10);
+			}
+			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+				(*cit)->location = LOCATION_DECK;
+				mainGame->dField.MoveCard(*cit, 10);
+			}
+			mainGame->gMutex.Unlock();
+			mainGame->WaitFrameSignal(11);
 		}
-		for (cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-			(*cit)->location = LOCATION_DECK;
-			mainGame->dField.MoveCard(*cit, 10);
-		}
-		mainGame->gMutex.Unlock();
-		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_REVERSE_DECK: {
 		mainGame->dField.deck_reversed = !mainGame->dField.deck_reversed;
-		for(int i = 0; i < mainGame->dField.deck[0].size(); ++i)
-			mainGame->dField.MoveCard(mainGame->dField.deck[0][i], 10);
-		for(int i = 0; i < mainGame->dField.deck[1].size(); ++i)
-			mainGame->dField.MoveCard(mainGame->dField.deck[1][i], 10);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for(int i = 0; i < mainGame->dField.deck[0].size(); ++i)
+				mainGame->dField.MoveCard(mainGame->dField.deck[0][i], 10);
+			for(int i = 0; i < mainGame->dField.deck[1].size(); ++i)
+				mainGame->dField.MoveCard(mainGame->dField.deck[1][i], 10);
+		}
 		return true;
 	}
 	case MSG_DECK_TOP: {
@@ -1648,12 +1680,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			BufferIO::ReadInt8(pbuf);
 			mc[i] = mainGame->dField.mzone[c][s];
 			mc[i]->SetCode(0);
-			mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
-			mc[i]->dRot = irr::core::vector3df(0, 0, 0);
-			mc[i]->is_moving = true;
-			mc[i]->aniFrame = 10;
+			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+				mc[i]->dPos = irr::core::vector3df((3.95f - mc[i]->curPos.X) / 10, 0, 0.05f);
+				mc[i]->dRot = irr::core::vector3df(0, 0, 0);
+				mc[i]->is_moving = true;
+				mc[i]->aniFrame = 10;
+			}
 		}
-		mainGame->WaitFrameSignal(20);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+			mainGame->WaitFrameSignal(20);
 		for (int i = 0; i < count; ++i) {
 			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 			l = BufferIO::ReadInt8(pbuf);
@@ -1668,12 +1703,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				swp->sequence = ps;
 			}
 		}
-		for (int i = 0; i < count; ++i) {
-			mainGame->dField.MoveCard(mc[i], 10);
-			for (cit = mc[i]->overlayed.begin(); cit != mc[i]->overlayed.end(); ++cit)
-				mainGame->dField.MoveCard(*cit, 10);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for (int i = 0; i < count; ++i) {
+				mainGame->dField.MoveCard(mc[i], 10);
+				for (cit = mc[i]->overlayed.begin(); cit != mc[i]->overlayed.end(); ++cit)
+					mainGame->dField.MoveCard(*cit, 10);
+			}
+			mainGame->WaitFrameSignal(11);
 		}
-		mainGame->WaitFrameSignal(11);
 		return true;
 	}
 	case MSG_NEW_TURN: {
@@ -1689,25 +1726,25 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			else
 				mainGame->dInfo.tag_player[1] = !mainGame->dInfo.tag_player[1];
 		}
-		myswprintf(mainGame->dInfo.strTurn, L"Turn:%d", mainGame->dInfo.turn);
-		mainGame->showcardcode = 10;
-		mainGame->showcarddif = 30;
-		mainGame->showcardp = 0;
-		mainGame->showcard = 101;
-		mainGame->WaitFrameSignal(40);
-		mainGame->showcard = 0;
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			myswprintf(mainGame->dInfo.strTurn, L"Turn:%d", mainGame->dInfo.turn);
+			mainGame->showcardcode = 10;
+			mainGame->showcarddif = 30;
+			mainGame->showcardp = 0;
+			mainGame->showcard = 101;
+			mainGame->WaitFrameSignal(40);
+			mainGame->showcard = 0;
+		}
 		return true;
 	}
 	case MSG_NEW_PHASE: {
 		int phase = (unsigned char)BufferIO::ReadInt8(pbuf);
-		mainGame->gMutex.Lock();
 		mainGame->btnDP->setVisible(false);
 		mainGame->btnSP->setVisible(false);
 		mainGame->btnM1->setVisible(false);
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
-		mainGame->gMutex.Unlock();
 		mainGame->showcarddif = 30;
 		mainGame->showcardp = 0;
 		switch (phase) {
@@ -1742,9 +1779,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->showcardcode = 9;
 			break;
 		}
-		mainGame->showcard = 101;
-		mainGame->WaitFrameSignal(40);
-		mainGame->showcard = 0;
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->showcard = 101;
+			mainGame->WaitFrameSignal(40);
+			mainGame->showcard = 0;
+		}
 		return true;
 	}
 	case MSG_MOVE: {
@@ -1762,15 +1801,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			ClientCard* pcard = new ClientCard();
 			pcard->position = cp;
 			pcard->SetCode(code);
-			mainGame->gMutex.Lock();
-			mainGame->dField.AddCard(pcard, cc, cl, cs);
-			mainGame->gMutex.Unlock();
-			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			pcard->mTransform.setTranslation(pcard->curPos);
-			pcard->mTransform.setRotationRadians(pcard->curRot);
-			pcard->curAlpha = 5;
-			mainGame->dField.FadeCard(pcard, 255, 20);
-			mainGame->WaitFrameSignal(20);
+			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+				mainGame->gMutex.Lock();
+				mainGame->dField.AddCard(pcard, cc, cl, cs);
+				mainGame->gMutex.Unlock();
+				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				pcard->mTransform.setTranslation(pcard->curPos);
+				pcard->mTransform.setRotationRadians(pcard->curRot);
+				pcard->curAlpha = 5;
+				mainGame->dField.FadeCard(pcard, 255, 20);
+				mainGame->WaitFrameSignal(20);
+			} else
+				mainGame->dField.AddCard(pcard, cc, cl, cs);
 		} else if (cl == 0) {
 			ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
 			if (code != 0 && pcard->code != code)
@@ -1778,13 +1820,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->ClearTarget();
 			for(auto eqit = pcard->equipped.begin(); eqit != pcard->equipped.end(); ++eqit)
 				(*eqit)->equipTarget = 0;
-			mainGame->dField.FadeCard(pcard, 5, 20);
-			mainGame->WaitFrameSignal(20);
-			mainGame->gMutex.Lock();
-			mainGame->dField.RemoveCard(pc, pl, ps);
-			mainGame->gMutex.Unlock();
-			if(pcard == mainGame->dField.hovered_card)
-				mainGame->dField.hovered_card = 0;
+			if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+				mainGame->dField.FadeCard(pcard, 5, 20);
+				mainGame->WaitFrameSignal(20);
+				mainGame->gMutex.Lock();
+				mainGame->dField.RemoveCard(pc, pl, ps);
+				mainGame->gMutex.Unlock();
+				if(pcard == mainGame->dField.hovered_card)
+					mainGame->dField.hovered_card = 0;
+			}
 			delete pcard;
 		} else {
 			if (!(pl & 0x80) && !(cl & 0x80)) {
@@ -1805,42 +1849,48 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				}
 				pcard->is_showequip = false;
 				pcard->is_showtarget = false;
-				mainGame->gMutex.Lock();
-				mainGame->dField.RemoveCard(pc, pl, ps);
-				pcard->position = cp;
-				mainGame->dField.AddCard(pcard, cc, cl, cs);
-				mainGame->gMutex.Unlock();
-				if (pl == cl && pc == cc && (cl & 0x71)) {
-					pcard->dPos = irr::core::vector3df(-0.3f, 0, 0);
-					pcard->dRot = irr::core::vector3df(0, 0, 0);
-					if (pc == 1) pcard->dPos.X = 0.3f;
-					pcard->is_moving = true;
-					pcard->aniFrame = 5;
-					mainGame->WaitFrameSignal(5);
-					mainGame->dField.MoveCard(pcard, 5);
-					mainGame->WaitFrameSignal(5);
+				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+					mainGame->dField.RemoveCard(pc, pl, ps);
+					pcard->position = cp;
+					mainGame->dField.AddCard(pcard, cc, cl, cs);
 				} else {
-					if (cl == 0x4 && pcard->overlayed.size() > 0) {
-						mainGame->gMutex.Lock();
-						for (int i = 0; i < pcard->overlayed.size(); ++i)
-							mainGame->dField.MoveCard(pcard->overlayed[i], 10);
-						mainGame->gMutex.Unlock();
+					mainGame->gMutex.Lock();
+					mainGame->dField.RemoveCard(pc, pl, ps);
+					pcard->position = cp;
+					mainGame->dField.AddCard(pcard, cc, cl, cs);
+					mainGame->gMutex.Unlock();
+					if (pl == cl && pc == cc && (cl & 0x71)) {
+						pcard->dPos = irr::core::vector3df(-0.3f, 0, 0);
+						pcard->dRot = irr::core::vector3df(0, 0, 0);
+						if (pc == 1) pcard->dPos.X = 0.3f;
+						pcard->is_moving = true;
+						pcard->aniFrame = 5;
+						mainGame->WaitFrameSignal(5);
+						mainGame->dField.MoveCard(pcard, 5);
+						mainGame->WaitFrameSignal(5);
+					} else {
+						if (cl == 0x4 && pcard->overlayed.size() > 0) {
+							mainGame->gMutex.Lock();
+							for (int i = 0; i < pcard->overlayed.size(); ++i)
+								mainGame->dField.MoveCard(pcard->overlayed[i], 10);
+							mainGame->gMutex.Unlock();
+							mainGame->WaitFrameSignal(5);
+						}
+						if (cl == 0x2) {
+							mainGame->gMutex.Lock();
+							for (int i = 0; i < mainGame->dField.hand[cc].size(); ++i)
+								mainGame->dField.MoveCard(mainGame->dField.hand[cc][i], 10);
+							mainGame->gMutex.Unlock();
+						} else {
+							mainGame->gMutex.Lock();
+							mainGame->dField.MoveCard(pcard, 10);
+							if (pl == 0x2)
+								for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
+									mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
+							mainGame->gMutex.Unlock();
+						}
 						mainGame->WaitFrameSignal(5);
 					}
-					if (cl == 0x2) {
-						mainGame->gMutex.Lock();
-						for (int i = 0; i < mainGame->dField.hand[cc].size(); ++i)
-							mainGame->dField.MoveCard(mainGame->dField.hand[cc][i], 10);
-						mainGame->gMutex.Unlock();
-					} else {
-						mainGame->gMutex.Lock();
-						mainGame->dField.MoveCard(pcard, 10);
-						if (pl == 0x2)
-							for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
-								mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
-						mainGame->gMutex.Unlock();
-					}
-					mainGame->WaitFrameSignal(5);
 				}
 			} else if (!(pl & 0x80)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
@@ -1849,59 +1899,89 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				pcard->counters.clear();
 				pcard->ClearTarget();
 				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
-				mainGame->gMutex.Lock();
-				mainGame->dField.RemoveCard(pc, pl, ps);
-				olcard->overlayed.push_back(pcard);
-				mainGame->dField.overlay_cards.insert(pcard);
-				mainGame->gMutex.Unlock();
-				pcard->overlayTarget = olcard;
-				pcard->location = 0x80;
-				pcard->sequence = olcard->overlayed.size() - 1;
-				if (olcard->location == 0x4) {
+				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+					mainGame->dField.RemoveCard(pc, pl, ps);
+					olcard->overlayed.push_back(pcard);
+					mainGame->dField.overlay_cards.insert(pcard);
+					pcard->overlayTarget = olcard;
+					pcard->location = 0x80;
+					pcard->sequence = olcard->overlayed.size() - 1;
+				} else {
 					mainGame->gMutex.Lock();
-					mainGame->dField.MoveCard(pcard, 10);
-					if (pl == 0x2)
-						for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
-							mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
+					mainGame->dField.RemoveCard(pc, pl, ps);
+					olcard->overlayed.push_back(pcard);
+					mainGame->dField.overlay_cards.insert(pcard);
 					mainGame->gMutex.Unlock();
-					mainGame->WaitFrameSignal(5);
+					pcard->overlayTarget = olcard;
+					pcard->location = 0x80;
+					pcard->sequence = olcard->overlayed.size() - 1;
+					if (olcard->location == 0x4) {
+						mainGame->gMutex.Lock();
+						mainGame->dField.MoveCard(pcard, 10);
+						if (pl == 0x2)
+							for (int i = 0; i < mainGame->dField.hand[pc].size(); ++i)
+								mainGame->dField.MoveCard(mainGame->dField.hand[pc][i], 10);
+						mainGame->gMutex.Unlock();
+						mainGame->WaitFrameSignal(5);
+					}
 				}
 			} else if (!(cl & 0x80)) {
 				ClientCard* olcard = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
 				ClientCard* pcard = olcard->overlayed[pp];
-				mainGame->gMutex.Lock();
-				olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
-				pcard->overlayTarget = 0;
-				pcard->position = cp;
-				mainGame->dField.AddCard(pcard, cc, cl, cs);
-				mainGame->dField.overlay_cards.erase(pcard);
-				for (int i = 0; i < olcard->overlayed.size(); ++i) {
-					olcard->overlayed[i]->sequence = i;
-					mainGame->dField.MoveCard(olcard->overlayed[i], 2);
+				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
+					pcard->overlayTarget = 0;
+					pcard->position = cp;
+					mainGame->dField.AddCard(pcard, cc, cl, cs);
+					mainGame->dField.overlay_cards.erase(pcard);
+					for (int i = 0; i < olcard->overlayed.size(); ++i)
+						olcard->overlayed[i]->sequence = i;
+				} else {
+					mainGame->gMutex.Lock();
+					olcard->overlayed.erase(olcard->overlayed.begin() + pcard->sequence);
+					pcard->overlayTarget = 0;
+					pcard->position = cp;
+					mainGame->dField.AddCard(pcard, cc, cl, cs);
+					mainGame->dField.overlay_cards.erase(pcard);
+					for (int i = 0; i < olcard->overlayed.size(); ++i) {
+						olcard->overlayed[i]->sequence = i;
+						mainGame->dField.MoveCard(olcard->overlayed[i], 2);
+					}
+					mainGame->gMutex.Unlock();
+					mainGame->WaitFrameSignal(5);
+					mainGame->gMutex.Lock();
+					mainGame->dField.MoveCard(pcard, 10);
+					mainGame->gMutex.Unlock();
+					mainGame->WaitFrameSignal(5);
 				}
-				mainGame->gMutex.Unlock();
-				mainGame->WaitFrameSignal(5);
-				mainGame->gMutex.Lock();
-				mainGame->dField.MoveCard(pcard, 10);
-				mainGame->gMutex.Unlock();
-				mainGame->WaitFrameSignal(5);
 			} else {
 				ClientCard* olcard1 = mainGame->dField.GetCard(pc, pl & 0x7f, ps);
 				ClientCard* pcard = olcard1->overlayed[pp];
 				ClientCard* olcard2 = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
-				mainGame->gMutex.Lock();
-				olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
-				olcard2->overlayed.push_back(pcard);
-				pcard->sequence = olcard2->overlayed.size() - 1;
-				pcard->location = 0x80;
-				pcard->overlayTarget = olcard2;
-				for (int i = 0; i < olcard1->overlayed.size(); ++i) {
-					olcard1->overlayed[i]->sequence = i;
-					mainGame->dField.MoveCard(olcard1->overlayed[i], 2);
+				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
+					olcard2->overlayed.push_back(pcard);
+					pcard->sequence = olcard2->overlayed.size() - 1;
+					pcard->location = 0x80;
+					pcard->overlayTarget = olcard2;
+					for (int i = 0; i < olcard1->overlayed.size(); ++i) {
+						olcard1->overlayed[i]->sequence = i;
+					}
+				} else {
+					mainGame->gMutex.Lock();
+					olcard1->overlayed.erase(olcard1->overlayed.begin() + pcard->sequence);
+					olcard2->overlayed.push_back(pcard);
+					pcard->sequence = olcard2->overlayed.size() - 1;
+					pcard->location = 0x80;
+					pcard->overlayTarget = olcard2;
+					for (int i = 0; i < olcard1->overlayed.size(); ++i) {
+						olcard1->overlayed[i]->sequence = i;
+						mainGame->dField.MoveCard(olcard1->overlayed[i], 2);
+					}
+					mainGame->dField.MoveCard(pcard, 10);
+					mainGame->gMutex.Unlock();
+					mainGame->WaitFrameSignal(5);
 				}
-				mainGame->dField.MoveCard(pcard, 10);
-				mainGame->gMutex.Unlock();
-				mainGame->WaitFrameSignal(5);
 			}
 		}
 		return true;
@@ -1921,9 +2001,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (code != 0 && pcard->code != code)
 			pcard->SetCode(code);
 		pcard->position = cp;
-		myswprintf(event_string, dataManager.GetSysString(1600));
-		mainGame->dField.MoveCard(pcard, 10);
-		mainGame->WaitFrameSignal(11);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			myswprintf(event_string, dataManager.GetSysString(1600));
+			mainGame->dField.MoveCard(pcard, 10);
+			mainGame->WaitFrameSignal(11);
+		}
 		return true;
 	}
 	case MSG_SET: {
@@ -1949,19 +2031,26 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		myswprintf(event_string, dataManager.GetSysString(1602));
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-		mainGame->gMutex.Lock();
-		mainGame->dField.RemoveCard(c1, l1, s1);
-		mainGame->dField.RemoveCard(c2, l2, s2);
-		mainGame->dField.AddCard(pc1, c2, l2, s2);
-		mainGame->dField.AddCard(pc2, c1, l1, s1);
-		mainGame->dField.MoveCard(pc1, 10);
-		mainGame->dField.MoveCard(pc2, 10);
-		for (int i = 0; i < pc1->overlayed.size(); ++i)
-			mainGame->dField.MoveCard(pc1->overlayed[i], 10);
-		for (int i = 0; i < pc2->overlayed.size(); ++i)
-			mainGame->dField.MoveCard(pc2->overlayed[i], 10);
-		mainGame->gMutex.Unlock();
-		mainGame->WaitFrameSignal(11);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->gMutex.Lock();
+			mainGame->dField.RemoveCard(c1, l1, s1);
+			mainGame->dField.RemoveCard(c2, l2, s2);
+			mainGame->dField.AddCard(pc1, c2, l2, s2);
+			mainGame->dField.AddCard(pc2, c1, l1, s1);
+			mainGame->dField.MoveCard(pc1, 10);
+			mainGame->dField.MoveCard(pc2, 10);
+			for (int i = 0; i < pc1->overlayed.size(); ++i)
+				mainGame->dField.MoveCard(pc1->overlayed[i], 10);
+			for (int i = 0; i < pc2->overlayed.size(); ++i)
+				mainGame->dField.MoveCard(pc2->overlayed[i], 10);
+			mainGame->gMutex.Unlock();
+			mainGame->WaitFrameSignal(11);
+		} else {
+			mainGame->dField.RemoveCard(c1, l1, s1);
+			mainGame->dField.RemoveCard(c2, l2, s2);
+			mainGame->dField.AddCard(pc1, c2, l2, s2);
+			mainGame->dField.AddCard(pc2, c1, l1, s1);
+		}
 		return true;
 	}
 	case MSG_FIELD_DISABLED: {
@@ -1977,14 +2066,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int cl = BufferIO::ReadInt8(pbuf);
 		int cs = BufferIO::ReadInt8(pbuf);
 		int cp = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, dataManager.GetSysString(1603), dataManager.GetName(code));
-		mainGame->showcardcode = code;
-		mainGame->showcarddif = 0;
-		mainGame->showcardp = 0;
-		mainGame->showcard = 7;
-		mainGame->WaitFrameSignal(30);
-		mainGame->showcard = 0;
-		mainGame->WaitFrameSignal(11);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			myswprintf(event_string, dataManager.GetSysString(1603), dataManager.GetName(code));
+			mainGame->showcardcode = code;
+			mainGame->showcarddif = 0;
+			mainGame->showcardp = 0;
+			mainGame->showcard = 7;
+			mainGame->WaitFrameSignal(30);
+			mainGame->showcard = 0;
+			mainGame->WaitFrameSignal(11);
+		}
 		return true;
 	}
 	case MSG_SUMMONED: {
@@ -1997,13 +2088,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int cl = BufferIO::ReadInt8(pbuf);
 		int cs = BufferIO::ReadInt8(pbuf);
 		int cp = BufferIO::ReadInt8(pbuf);
-		myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
-		mainGame->showcardcode = code;
-		mainGame->showcarddif = 1;
-		mainGame->showcard = 5;
-		mainGame->WaitFrameSignal(30);
-		mainGame->showcard = 0;
-		mainGame->WaitFrameSignal(11);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			myswprintf(event_string, dataManager.GetSysString(1605), dataManager.GetName(code));
+			mainGame->showcardcode = code;
+			mainGame->showcarddif = 1;
+			mainGame->showcard = 5;
+			mainGame->WaitFrameSignal(30);
+			mainGame->showcard = 0;
+			mainGame->WaitFrameSignal(11);
+		}
 		return true;
 	}
 	case MSG_SPSUMMONED: {
@@ -2019,16 +2112,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ClientCard* pcard = mainGame->dField.GetCard(cc, cl, cs);
 		pcard->SetCode(code);
 		pcard->position = cp;
-		myswprintf(event_string, dataManager.GetSysString(1607), dataManager.GetName(code));
-		mainGame->dField.MoveCard(pcard, 10);
-		mainGame->WaitFrameSignal(11);
-		mainGame->showcardcode = code;
-		mainGame->showcarddif = 0;
-		mainGame->showcardp = 0;
-		mainGame->showcard = 7;
-		mainGame->WaitFrameSignal(30);
-		mainGame->showcard = 0;
-		mainGame->WaitFrameSignal(11);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			myswprintf(event_string, dataManager.GetSysString(1607), dataManager.GetName(code));
+			mainGame->dField.MoveCard(pcard, 10);
+			mainGame->WaitFrameSignal(11);
+			mainGame->showcardcode = code;
+			mainGame->showcarddif = 0;
+			mainGame->showcardp = 0;
+			mainGame->showcard = 7;
+			mainGame->WaitFrameSignal(30);
+			mainGame->showcard = 0;
+			mainGame->WaitFrameSignal(11);
+		}
 		return true;
 	}
 	case MSG_FLIPSUMMONED: {
@@ -2040,13 +2135,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int pcl = BufferIO::ReadInt8(pbuf);
 		int pcs = BufferIO::ReadInt8(pbuf);
-		BufferIO::ReadInt8(pbuf);
+		int subs = BufferIO::ReadInt8(pbuf);
 		int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int cl = BufferIO::ReadInt8(pbuf);
 		int cs = BufferIO::ReadInt8(pbuf);
 		int desc = BufferIO::ReadInt32(pbuf);
 		int ct = BufferIO::ReadInt8(pbuf);
-		ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
+		ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 0;
 		mainGame->showcard = 1;
@@ -2079,6 +2176,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_CHAINED: {
 		int ct = BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
 		mainGame->gMutex.Lock();
 		mainGame->dField.chains.push_back(mainGame->dField.current_chain);
@@ -2090,6 +2189,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_CHAIN_SOLVING: {
 		int ct = BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		if (mainGame->dField.chains.size() > 1) {
 			if (mainGame->dField.last_chain)
 				mainGame->WaitFrameSignal(11);
@@ -2114,11 +2215,13 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_CHAIN_NEGATED:
 	case MSG_CHAIN_DISABLED: {
 		int ct = BufferIO::ReadInt8(pbuf);
-		mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;
-		mainGame->showcarddif = 0;
-		mainGame->showcard = 3;
-		mainGame->WaitFrameSignal(30);
-		mainGame->showcard = 0;
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			mainGame->showcardcode = mainGame->dField.chains[ct - 1].code;
+			mainGame->showcarddif = 0;
+			mainGame->showcard = 3;
+			mainGame->WaitFrameSignal(30);
+			mainGame->showcard = 0;
+		}
 		return true;
 	}
 	case MSG_CARD_SELECTED: {
@@ -2127,6 +2230,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_RANDOM_SELECTED: {
 		int player = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pbuf += count * 4;
+			return true;
+		}
 		ClientCard* pcards[10];
 		for (int i = 0; i < count; ++i) {
 			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
@@ -2146,6 +2253,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_BECOME_TARGET: {
 		int count = BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pbuf += count * 4;
+			return true;
+		}
 		ClientCard* pcard;
 		for (int i = 0; i < count; ++i) {
 			int c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
@@ -2180,15 +2291,23 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if(!mainGame->dField.deck_reversed || code)
 				pcard->SetCode(code);
 		}
-		for (int i = 0; i < count; ++i) {
-			mainGame->gMutex.Lock();
-			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
-			mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
-			mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
-			for(int i = 0; i < mainGame->dField.hand[player].size(); ++i)
-				mainGame->dField.MoveCard(mainGame->dField.hand[player][i], 10);
-			mainGame->gMutex.Unlock();
-			mainGame->WaitFrameSignal(5);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			for (int i = 0; i < count; ++i) {
+				pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
+				mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
+				mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
+			}
+		} else {
+			for (int i = 0; i < count; ++i) {
+				mainGame->gMutex.Lock();
+				pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1);
+				mainGame->dField.deck[player].erase(mainGame->dField.deck[player].end() - 1);
+				mainGame->dField.AddCard(pcard, player, LOCATION_HAND, 0);
+				for(int i = 0; i < mainGame->dField.hand[player].size(); ++i)
+					mainGame->dField.MoveCard(mainGame->dField.hand[player][i], 10);
+				mainGame->gMutex.Unlock();
+				mainGame->WaitFrameSignal(5);
+			}
 		}
 		if (player == 0)
 			myswprintf(event_string, dataManager.GetSysString(1611), count);
@@ -2201,6 +2320,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int final = mainGame->dInfo.lp[player] - val;
 		if (final < 0)
 			final = 0;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			mainGame->dInfo.lp[player] = final;
+			myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+			return true;
+		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		if (player == 0)
 			myswprintf(event_string, dataManager.GetSysString(1613), val);
@@ -2224,6 +2348,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int val = BufferIO::ReadInt32(pbuf);
 		int final = mainGame->dInfo.lp[player] + val;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			mainGame->dInfo.lp[player] = final;
+			myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+			return true;
+		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		if (player == 0)
 			myswprintf(event_string, dataManager.GetSysString(1615), val);
@@ -2254,19 +2383,29 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		BufferIO::ReadInt8(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-		mainGame->gMutex.Lock();
-		pc1->equipTarget = pc2;
-		pc2->equipped.insert(pc1);
-		if (mainGame->dField.hovered_card == pc1)
-			pc2->is_showequip = true;
-		else if (mainGame->dField.hovered_card == pc2)
-			pc1->is_showequip = true;
-		mainGame->gMutex.Unlock();
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pc1->equipTarget = pc2;
+			pc2->equipped.insert(pc1);
+		} else {
+			mainGame->gMutex.Lock();
+			pc1->equipTarget = pc2;
+			pc2->equipped.insert(pc1);
+			if (mainGame->dField.hovered_card == pc1)
+				pc2->is_showequip = true;
+			else if (mainGame->dField.hovered_card == pc2)
+				pc1->is_showequip = true;
+			mainGame->gMutex.Unlock();
+		}
 		return true;
 	}
 	case MSG_LPUPDATE: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int val = BufferIO::ReadInt32(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			mainGame->dInfo.lp[player] = val;
+			myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+			return true;
+		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - val) / 10;
 		mainGame->lpplayer = player;
 		mainGame->lpframe = 10;
@@ -2283,14 +2422,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int s1 = BufferIO::ReadInt8(pbuf);
 		BufferIO::ReadInt8(pbuf);
 		ClientCard* pc = mainGame->dField.GetCard(c1, l1, s1);
-		mainGame->gMutex.Lock();
-		if (mainGame->dField.hovered_card == pc)
-			pc->equipTarget->is_showequip = false;
-		else if (mainGame->dField.hovered_card == pc->equipTarget)
-			pc->is_showequip = false;
-		pc->equipTarget->equipped.erase(pc);
-		pc->equipTarget = 0;
-		mainGame->gMutex.Unlock();
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pc->equipTarget->equipped.erase(pc);
+			pc->equipTarget = 0;
+		} else {
+			mainGame->gMutex.Lock();
+			if (mainGame->dField.hovered_card == pc)
+				pc->equipTarget->is_showequip = false;
+			else if (mainGame->dField.hovered_card == pc->equipTarget)
+				pc->is_showequip = false;
+			pc->equipTarget->equipped.erase(pc);
+			pc->equipTarget = 0;
+			mainGame->gMutex.Unlock();
+		}
 		return true;
 	}
 	case MSG_CARD_TARGET: {
@@ -2304,14 +2448,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		BufferIO::ReadInt8(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-		mainGame->gMutex.Lock();
-		pc1->cardTarget.insert(pc2);
-		pc2->ownerTarget.insert(pc1);
-		if (mainGame->dField.hovered_card == pc1)
-			pc2->is_showtarget = true;
-		else if (mainGame->dField.hovered_card == pc2)
-			pc1->is_showtarget = true;
-		mainGame->gMutex.Unlock();
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pc1->cardTarget.insert(pc2);
+			pc2->ownerTarget.insert(pc1);
+		} else {
+			mainGame->gMutex.Lock();
+			pc1->cardTarget.insert(pc2);
+			pc2->ownerTarget.insert(pc1);
+			if (mainGame->dField.hovered_card == pc1)
+				pc2->is_showtarget = true;
+			else if (mainGame->dField.hovered_card == pc2)
+				pc1->is_showtarget = true;
+			mainGame->gMutex.Unlock();
+		}
 		break;
 	}
 	case MSG_CANCEL_TARGET: {
@@ -2325,14 +2474,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		BufferIO::ReadInt8(pbuf);
 		ClientCard* pc1 = mainGame->dField.GetCard(c1, l1, s1);
 		ClientCard* pc2 = mainGame->dField.GetCard(c2, l2, s2);
-		mainGame->gMutex.Lock();
-		pc1->cardTarget.erase(pc2);
-		pc2->ownerTarget.erase(pc1);
-		if (mainGame->dField.hovered_card == pc1)
-			pc2->is_showtarget = false;
-		else if (mainGame->dField.hovered_card == pc2)
-			pc1->is_showtarget = false;
-		mainGame->gMutex.Unlock();
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			pc1->cardTarget.erase(pc2);
+			pc2->ownerTarget.erase(pc1);
+		} else {
+			mainGame->gMutex.Lock();
+			pc1->cardTarget.erase(pc2);
+			pc2->ownerTarget.erase(pc1);
+			if (mainGame->dField.hovered_card == pc1)
+				pc2->is_showtarget = false;
+			else if (mainGame->dField.hovered_card == pc2)
+				pc1->is_showtarget = false;
+			mainGame->gMutex.Unlock();
+		}
 		break;
 	}
 	case MSG_PAY_LPCOST: {
@@ -2341,6 +2495,11 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int final = mainGame->dInfo.lp[player] - cost;
 		if (final < 0)
 			final = 0;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
+			mainGame->dInfo.lp[player] = final;
+			myswprintf(mainGame->dInfo.strLP[player], L"%d", mainGame->dInfo.lp[player]);
+			return true;
+		}
 		mainGame->lpd = (mainGame->dInfo.lp[player] - final) / 10;
 		mainGame->lpccolor = 0xff0000ff;
 		mainGame->lpplayer = player;
@@ -2366,6 +2525,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (pc->counters.count(type))
 			pc->counters[type] += count;
 		else pc->counters[type] = count;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		myswprintf(textBuffer, dataManager.GetSysString(1617), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
 		pc->is_highlighting = true;
 		mainGame->gMutex.Lock();
@@ -2386,6 +2547,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		pc->counters[type] -= count;
 		if (pc->counters[type] <= 0)
 			pc->counters.erase(type);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		myswprintf(textBuffer, dataManager.GetSysString(1618), dataManager.GetName(pc->code), count, dataManager.GetCounterName(type));
 		pc->is_highlighting = true;
 		mainGame->gMutex.Lock();
@@ -2406,6 +2569,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int ld = BufferIO::ReadInt8(pbuf);
 		int sd = BufferIO::ReadInt8(pbuf);
 		BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		float sy;
 		if (ld != 0) {
 			mainGame->dField.attack_target = mainGame->dField.GetCard(cd, ld, sd);
@@ -2458,6 +2623,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int datk = BufferIO::ReadInt32(pbuf);
 		int ddef = BufferIO::ReadInt32(pbuf);
 		int dd = BufferIO::ReadInt8(pbuf);
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		mainGame->gMutex.Lock();
 		ClientCard* pcard = mainGame->dField.GetCard(ca, la, sa);
 		if(aatk != pcard->attack) {
@@ -2512,6 +2679,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			*pwbuf++ = L']';
 		}
 		*pwbuf = 0;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		mainGame->gMutex.Lock();
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(0);
@@ -2533,6 +2702,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			*pwbuf++ = L']';
 		}
 		*pwbuf = 0;
+		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+			return true;
 		mainGame->gMutex.Lock();
 		mainGame->lstLog->addItem(textBuffer);
 		mainGame->logParam.push_back(0);
@@ -2630,6 +2801,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(chtype == CHINT_TURN) {
 			if(value == 0)
 				return true;
+			if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+				return true;
 			if(pcard->location & LOCATION_ONFIELD)
 				pcard->is_highlighting = true;
 			mainGame->showcardcode = pcard->code;
@@ -2648,30 +2821,33 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int ecount = BufferIO::ReadInt8(pbuf);
 		int hcount = BufferIO::ReadInt8(pbuf);
 		int topcode = BufferIO::ReadInt32(pbuf);
-		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-			if(player == 0) (*cit)->dPos.Y = 0.4f;
-			else (*cit)->dPos.Y = -0.6f;
-			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-			(*cit)->is_moving = true;
-			(*cit)->aniFrame = 5;
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+				if(player == 0) (*cit)->dPos.Y = 0.4f;
+				else (*cit)->dPos.Y = -0.6f;
+				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+				(*cit)->is_moving = true;
+				(*cit)->aniFrame = 5;
+			}
+			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+				if(player == 0) (*cit)->dPos.Y = 0.4f;
+				else (*cit)->dPos.Y = -0.6f;
+				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+				(*cit)->is_moving = true;
+				(*cit)->aniFrame = 5;
+			}
+			for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+				if(player == 0) (*cit)->dPos.Y = 0.4f;
+				else (*cit)->dPos.Y = -0.6f;
+				(*cit)->dRot = irr::core::vector3df(0, 0, 0);
+				(*cit)->is_moving = true;
+				(*cit)->aniFrame = 5;
+			}
+			mainGame->WaitFrameSignal(5);
 		}
-		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-			if(player == 0) (*cit)->dPos.Y = 0.4f;
-			else (*cit)->dPos.Y = -0.6f;
-			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-			(*cit)->is_moving = true;
-			(*cit)->aniFrame = 5;
-		}
-		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
-			if(player == 0) (*cit)->dPos.Y = 0.4f;
-			else (*cit)->dPos.Y = -0.6f;
-			(*cit)->dRot = irr::core::vector3df(0, 0, 0);
-			(*cit)->is_moving = true;
-			(*cit)->aniFrame = 5;
-		}
-		mainGame->WaitFrameSignal(5);
 		//
-		mainGame->gMutex.Lock();
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+			mainGame->gMutex.Lock();
 		if(mainGame->dField.deck[player].size() > mcount) {
 			while(mainGame->dField.deck[player].size() > mcount) {
 				ClientCard* ccard = *mainGame->dField.deck[player].rbegin();
@@ -2717,34 +2893,37 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.extra[player].push_back(ccard);
 			}
 		}
-		mainGame->gMutex.Unlock();
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping)
+			mainGame->gMutex.Unlock();
 		//
-		for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-			ClientCard* pcard = *cit;
-			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y += 2.0f;
-			else pcard->curPos.Y -= 3.0f;
-			mainGame->dField.MoveCard(*cit, 5);
+		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
+			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
+				ClientCard* pcard = *cit;
+				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				if(player == 0) pcard->curPos.Y += 2.0f;
+				else pcard->curPos.Y -= 3.0f;
+				mainGame->dField.MoveCard(*cit, 5);
+			}
+			if(mainGame->dField.deck[player].size())
+				(*mainGame->dField.deck[player].rbegin())->code = topcode;
+			for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
+				ClientCard* pcard = *cit;
+				pcard->code = BufferIO::ReadInt32(pbuf);
+				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				if(player == 0) pcard->curPos.Y += 2.0f;
+				else pcard->curPos.Y -= 3.0f;
+				mainGame->dField.MoveCard(*cit, 5);
+			}
+			for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
+				ClientCard* pcard = *cit;
+				pcard->code = 0;
+				mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
+				if(player == 0) pcard->curPos.Y += 2.0f;
+				else pcard->curPos.Y -= 3.0f;
+				mainGame->dField.MoveCard(*cit, 5);
+			}
+			mainGame->WaitFrameSignal(5);
 		}
-		if(mainGame->dField.deck[player].size())
-			(*mainGame->dField.deck[player].rbegin())->code = topcode;
-		for (auto cit = mainGame->dField.hand[player].begin(); cit != mainGame->dField.hand[player].end(); ++cit) {
-			ClientCard* pcard = *cit;
-			pcard->code = BufferIO::ReadInt32(pbuf);
-			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y += 2.0f;
-			else pcard->curPos.Y -= 3.0f;
-			mainGame->dField.MoveCard(*cit, 5);
-		}
-		for (auto cit = mainGame->dField.extra[player].begin(); cit != mainGame->dField.extra[player].end(); ++cit) {
-			ClientCard* pcard = *cit;
-			pcard->code = 0;
-			mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
-			if(player == 0) pcard->curPos.Y += 2.0f;
-			else pcard->curPos.Y -= 3.0f;
-			mainGame->dField.MoveCard(*cit, 5);
-		}
-		mainGame->WaitFrameSignal(5);
 		break;
 	}
 	case MSG_RELOAD_FIELD: {

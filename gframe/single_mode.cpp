@@ -341,7 +341,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			int cp = pbuf[11];
 			pbuf += 16;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
-			if(pl != cl || pc != cc)
+			if(cl && !(cl & 0x80) && (pl != cl || pc != cc))
 				SinglePlayRefreshSingle(cc, cl, cs);
 			break;
 		}

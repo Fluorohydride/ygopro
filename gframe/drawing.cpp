@@ -53,14 +53,19 @@ void Game::DrawBackGround() {
 	im.setTranslation(vector3df(0, 0, -0.01));
 	driver->setTransform(irr::video::ETS_WORLD, im);
 	//dark shade
-	matManager.mSelField.AmbientColor = 0xff000000;
-	matManager.mSelField.DiffuseColor = 0xa0000000;
-	driver->setMaterial(matManager.mSelField);
-	for(int i = 0; i < 120; i += 4)
-		driver->drawVertexPrimitiveList(&matManager.vFields[i], 4, matManager.iRectangle, 2);
+//	matManager.mSelField.AmbientColor = 0xff000000;
+//	matManager.mSelField.DiffuseColor = 0xa0000000;
+//	driver->setMaterial(matManager.mSelField);
+//	for(int i = 0; i < 120; i += 4)
+//		driver->drawVertexPrimitiveList(&matManager.vFields[i], 4, matManager.iRectangle, 2);
+//	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
+//	driver->setMaterial(matManager.mBackLine);
+//	driver->drawVertexPrimitiveList(matManager.vBackLine, 76, matManager.iBackLine, 58, irr::video::EVT_STANDARD, irr::scene::EPT_LINES);
+	//draw field
 	driver->setTransform(irr::video::ETS_WORLD, irr::core::IdentityMatrix);
-	driver->setMaterial(matManager.mBackLine);
-	driver->drawVertexPrimitiveList(matManager.vBackLine, 76, matManager.iBackLine, 58, irr::video::EVT_STANDARD, irr::scene::EPT_LINES);
+	matManager.mTexture.setTexture(0, imageManager.tField);
+	driver->setMaterial(matManager.mTexture);
+	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
 	//select field
 	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD) {
 		float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};

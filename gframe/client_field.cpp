@@ -87,8 +87,10 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->mTransform.setRotationRadians(pcard->curRot);
 	}
 }
-ClientCard* ClientField::GetCard(int controler, int location, int sequence) {
+ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
+	bool is_xyz = (location & 0x80);
+	location &= 0x7f;
 	switch(location) {
 	case LOCATION_DECK:
 		lst = &deck[controler];
@@ -114,9 +116,19 @@ ClientCard* ClientField::GetCard(int controler, int location, int sequence) {
 	}
 	if(!lst)
 		return 0;
-	if(sequence >= lst->size())
-		return 0;
-	return (*lst)[sequence];
+	if(is_xyz) {
+		if(sequence >= lst->size())
+			return 0;
+		ClientCard* scard = (*lst)[sequence];
+		if(scard && scard->overlayed.size() > sub_seq)
+			return scard->overlayed[sub_seq];
+		else
+			return 0;
+	} else {
+		if(sequence >= lst->size())
+			return 0;
+		return (*lst)[sequence];
+	}
 }
 void ClientField::AddCard(ClientCard* pcard, int controler, int location, int sequence) {
 	pcard->controler = controler;
@@ -393,6 +405,20 @@ void ClientField::ReplaySwap() {
 	std::swap(grave[0], grave[1]);
 	std::swap(remove[0], remove[1]);
 	std::swap(extra[0], extra[1]);
+	RefreshAllCards();
+	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
+	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
+	for(int i = 0; i < 16; ++i)
+		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);
+	for(int i = 0; i < 20; ++i)
+		std::swap(mainGame->dInfo.hostname[i], mainGame->dInfo.clientname[i]);
+	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
+		chit->controler = 1 - chit->controler;
+		GetChainLocation(chit->controler, chit->location, chit->sequence, &chit->chain_pos);
+	}
+	disabled_field = (disabled_field >> 16) | (disabled_field << 16);
+}
+void ClientField::RefreshAllCards() {
 	for(int p = 0; p < 2; ++p) {
 		for(auto cit = deck[p].begin(); cit != deck[p].end(); ++cit) {
 			(*cit)->controler = 1 - (*cit)->controler;
@@ -455,17 +481,6 @@ void ClientField::ReplaySwap() {
 		(*cit)->mTransform.setRotationRadians((*cit)->curRot);
 		(*cit)->is_moving = false;
 	}
-	mainGame->dInfo.isFirst = !mainGame->dInfo.isFirst;
-	std::swap(mainGame->dInfo.lp[0], mainGame->dInfo.lp[1]);
-	for(int i = 0; i < 16; ++i)
-		std::swap(mainGame->dInfo.strLP[0][i], mainGame->dInfo.strLP[1][i]);
-	for(int i = 0; i < 20; ++i)
-		std::swap(mainGame->dInfo.hostname[i], mainGame->dInfo.clientname[i]);
-	for(auto chit = chains.begin(); chit != chains.end(); ++chit) {
-		chit->controler = 1 - chit->controler;
-		GetChainLocation(chit->controler, chit->location, chit->sequence, &chit->chain_pos);
-	}
-	disabled_field = (disabled_field >> 16) | (disabled_field << 16);
 }
 void ClientField::GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t) {
 	t->X = 0;

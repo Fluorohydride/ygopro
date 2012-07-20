@@ -72,7 +72,7 @@ public:
 	ClientField();
 	void Clear();
 	void Initial(int player, int deckc, int extrac);
-	ClientCard* GetCard(int controler, int location, int sequence);
+	ClientCard* GetCard(int controler, int location, int sequence, int sub_seq = 0);
 	void AddCard(ClientCard* pcard, int controler, int location, int sequence);
 	ClientCard* RemoveCard(int controler, int location, int sequence);
 	void UpdateCard(int controler, int location, int sequence, char* data);
@@ -82,6 +82,7 @@ public:
 	void ClearChainSelect();
 	void ShowSelectCard(bool buttonok = false);
 	void ReplaySwap();
+	void RefreshAllCards();
 	
 	void GetChainLocation(int controler, int location, int sequence, irr::core::vector3df* t);
 	void GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans = false);

@@ -18,12 +18,13 @@ private:
 	static bool is_paused;
 	static bool is_swaping;
 	static bool exit_pending;
+	static int skip_turn;
 	static wchar_t event_string[256];
 public:
 	static Replay cur_replay;
 	
 public:
-	static bool StartReplay();
+	static bool StartReplay(int skipturn);
 	static void StopReplay(bool is_exiting = false);
 	static void SwapField();
 	static void Pause(bool is_pause, bool is_step);

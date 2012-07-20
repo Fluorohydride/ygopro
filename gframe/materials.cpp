@@ -37,6 +37,10 @@ Materials::Materials() {
 	vActivate[1] = S3DVertex(vector3df(0.5, -0.5, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
 	vActivate[2] = S3DVertex(vector3df(-0.5, 0.5, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
 	vActivate[3] = S3DVertex(vector3df(0.5, 0.5, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
+	vField[0] = S3DVertex(vector3df(0.0, -4.0, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));
+	vField[1] = S3DVertex(vector3df(8.0, -4.0, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 0));
+	vField[2] = S3DVertex(vector3df(0.0, 4.0, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 1));
+	vField[3] = S3DVertex(vector3df(8.0, 4.0, 0), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(1, 1));
 	//background grids
 	for (int i = 0; i < 6; ++i) {
 		vBackLine[i * 6 + 0] = S3DVertex(vector3df(1.2f + i * 1.1f, 0.5f, -0.01f), vector3df(0, 0, 1), SColor(255, 255, 255, 255), vector2df(0, 0));

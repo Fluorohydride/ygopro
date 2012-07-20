@@ -878,15 +878,15 @@ void card::reset(uint32 id, uint32 reset_type) {
 			if (rrm->second & 0xffff0000 & id)
 				relations.erase(rrm);
 		}
-		if(id & 0x7c0000)
+		if(id & 0x47c0000)
 			relate_effect.clear();
-		if(id & 0x1fc0000) {
+		if(id & 0x5fc0000) {
 			announced_cards.clear();
 			attacked_cards.clear();
 			announce_count = 0;
 			attacked_count = 0;
 		}
-		if(id & 0x1fe0000) {
+		if(id & 0x5fe0000) {
 			battled_cards.clear();
 			reset_effect_count();
 			auto pr = field_effect.equal_range(EFFECT_DISABLE_FIELD);
