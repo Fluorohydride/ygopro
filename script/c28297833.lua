@@ -3,7 +3,7 @@ function c28297833.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(28297833,0))
-	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_ATKCHANGE)
+	e1:SetCategory(CATEGORY_TODECK+CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetTarget(c28297833.tdtg)
@@ -21,7 +21,7 @@ function c28297833.initial_effect(c)
 end
 function c28297833.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,PLAYER_ALL,LOCATION_REMOVED)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,PLAYER_ALL,LOCATION_REMOVED)
 end
 function c28297833.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

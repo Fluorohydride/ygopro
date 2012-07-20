@@ -19,7 +19,7 @@ function c18816758.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c18816758.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,c18816758.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.SendtoHand(g,nil,REASON_EFFECT)
+	Duel.SendtoHand(g,nil,REASON_COST)
 end
 function c18816758.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsDestructable() end

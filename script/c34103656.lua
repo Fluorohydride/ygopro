@@ -38,14 +38,14 @@ function c34103656.lvop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_SZONE)
 		e1:SetTargetRange(LOCATION_MZONE,0)
 		e1:SetTarget(c34103656.lvtg)
-		e1:SetValue(c35220244.lvval)
+		e1:SetValue(c34103656.lvval)
 		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
 	end
 end
-function c35220244.cfilter(c)
+function c34103656.cfilter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER)
 end
-function c35220244.lvval(e,c)
-	return Duel.GetMatchingGroupCount(c35220244.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)
+function c34103656.lvval(e,c)
+	return Duel.GetMatchingGroupCount(c34103656.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,nil)
 end

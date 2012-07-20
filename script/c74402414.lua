@@ -56,8 +56,8 @@ function c74402414.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(c74402414.filter,tp,LOCATION_DECK,0,nil)
 	if g:GetCount()<5 then return end
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
-	local rg=g:Select(1-tp,5,5,nil)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	local rg=g:Select(tp,5,5,nil)
 	Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
 	local tc=rg:GetFirst()
 	while tc do
@@ -82,11 +82,11 @@ end
 function c74402414.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return e:GetLabelObject():IsContains(chkc) and c74402414.thfilter(chkc) end
 	if chk==0 then return e:GetLabelObject():IsExists(c74402414.thfilter,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=e:GetLabelObject():FilterSelect(tp,c74402414.thfilter,1,1,nil)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
+	local g=e:GetLabelObject():FilterSelect(1-tp,c74402414.thfilter,1,1,nil)
 	e:GetLabelObject():Sub(g)
 	Duel.SetTargetCard(g)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,5,tp,LOCATION_DECK)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_REMOVED)
 end
 function c74402414.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

@@ -30,6 +30,7 @@ function c62473983.initial_effect(c)
 	c:RegisterEffect(e5)
 	--summon success
 	local e6=Effect.CreateEffect(c)
+	e6:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e6:SetCode(EVENT_SUMMON_SUCCESS)
 	e6:SetCondition(c62473983.spcon)

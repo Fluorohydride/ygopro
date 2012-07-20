@@ -30,7 +30,7 @@ function c76442347.filter(c,e,tp)
 		or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN))
 end
 function c76442347.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c76442347.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c76442347.filter(chkc,e,tp) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c76442347.filter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp)

@@ -43,7 +43,7 @@ function c72677437.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c72677437.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c72677437.cfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c72677437.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

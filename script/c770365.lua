@@ -26,7 +26,7 @@ function c770365.xyzfilter(c)
 	return c:GetLevel()==5 and c:IsRace(RACE_SPELLCASTER)
 end
 function c770365.atkval(e,c)
-	return Duel.GetOverlayCount(tp,1,0)*300
+	return Duel.GetOverlayCount(c:GetControler(),1,0)*300
 end
 function c770365.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -36,7 +36,7 @@ function c770365.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5 end
 end
 function c770365.filter(c)
-	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
+	return c:IsSetCard(0x106e)
 end
 function c770365.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ShuffleDeck(tp)
@@ -44,7 +44,7 @@ function c770365.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,5)
 	local ct=g:FilterCount(c770365.filter,nil)
 	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	if ct>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(770365,1)) then
+	if ct>0 and sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(770365,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local dg=sg:Select(tp,1,ct,nil)
 		Duel.Destroy(dg,REASON_EFFECT)
