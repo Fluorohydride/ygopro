@@ -25,7 +25,7 @@ function c58471134.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,58471134,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c58471134.filter(c)
-	return c:IsLevelBelow(3) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToHand()
+	return c:GetLevel()==3 and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToHand()
 end
 function c58471134.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c58471134.filter,tp,LOCATION_DECK,0,1,nil) end
