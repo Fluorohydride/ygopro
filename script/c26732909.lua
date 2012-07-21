@@ -70,7 +70,7 @@ function c26732909.thop(e,tp,eg,ep,ev,re,r,rp)
 		local sg1=g1:Select(tp,1,1,nil)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg2=g2:Select(tp,1,1,nil)
-		g1:Merge(g2)
+		sg1:Merge(sg2)
 		Duel.SendtoHand(sg1,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg1)
 	end
