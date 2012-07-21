@@ -4,6 +4,7 @@ function c41482598.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(c41482598.clear)
 	c:RegisterEffect(e1)
 	--draw
 	local e2=Effect.CreateEffect(c)
@@ -46,9 +47,12 @@ function c41482598.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,0)
 end
 function c41482598.drop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local ht=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
-	Duel.Draw(tp,4-ht,REASON_EFFECT)
-	e:GetLabelObject():SetLabel(4-ht)
+	if ht<4 then
+		Duel.Draw(tp,4-ht,REASON_EFFECT)
+		e:GetLabelObject():SetLabel(4-ht)
+	else e:GetLabelObject():SetLabel(0) end
 end
 function c41482598.dccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and e:GetLabelObject():GetLabel()~=0
@@ -61,6 +65,7 @@ function c41482598.dctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,e:GetLabel())
 end
 function c41482598.dcop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	local sg=g:RandomSelect(tp,e:GetLabel())
 	Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
