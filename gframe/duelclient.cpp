@@ -1828,7 +1828,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->gMutex.Unlock();
 				if(pcard == mainGame->dField.hovered_card)
 					mainGame->dField.hovered_card = 0;
-			}
+			} else
+				mainGame->dField.RemoveCard(pc, pl, ps);
 			delete pcard;
 		} else {
 			if (!(pl & 0x80) && !(cl & 0x80)) {

@@ -2008,9 +2008,9 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			if(!((*cit)->current.position & POS_FACEDOWN))
 				raise_single_event(*cit, 0, EVENT_SPSUMMON_SUCCESS, (*cit)->current.reason_effect, 0, (*cit)->current.reason_player, (*cit)->summon_player, 0);
-			int32 summontype = (*cit)->summon_type & 0x3000000;
+			int32 summontype = (*cit)->summon_type & 0xff000000;
 			if(summontype && (*cit)->material_cards.size()) {
-				int32 matreason = (summontype & SUMMON_TYPE_FUSION) ? REASON_FUSION : (summontype & SUMMON_TYPE_RITUAL) ? REASON_RITUAL : 0;
+				int32 matreason = (summontype == SUMMON_TYPE_FUSION) ? REASON_FUSION : (summontype == SUMMON_TYPE_RITUAL) ? REASON_RITUAL : 0;
 				for(auto mit = (*cit)->material_cards.begin(); mit != (*cit)->material_cards.end(); ++mit)
 					raise_single_event(*mit, 0, EVENT_BE_MATERIAL, core.reason_effect, matreason, core.reason_player, (*cit)->summon_player, 0);
 				raise_event(&((*cit)->material_cards), EVENT_BE_MATERIAL, core.reason_effect, matreason, core.reason_player, (*cit)->summon_player, 0);
