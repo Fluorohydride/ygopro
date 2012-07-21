@@ -16,14 +16,14 @@ function c69257165.ctffilter(c,lv)
 end
 function c69257165.ctfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsDiscardable()
-		and Duel.IsExistingMatchingCard(c69257165.ctffilter,tp,0,LOCATION_MZONE,1,nil,c:GetLevel())
+		and Duel.IsExistingTarget(c69257165.ctffilter,tp,0,LOCATION_MZONE,1,nil,c:GetLevel())
 end
 function c69257165.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
 	return true
 end
 function c69257165.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c69257165.ctffilter(e,e:GetLabel()) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c69257165.ctffilter(chkc,e:GetLabel()) end
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
@@ -33,7 +33,7 @@ function c69257165.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local sg=Duel.SelectMatchingCard(tp,c69257165.ctfilter,tp,LOCATION_HAND,0,1,1,nil,tp)
 	local lv=sg:GetFirst():GetLevel()
 	e:SetLabel(lv)
-	Duel.SendtoGrave(sg,REASON_COST)
+	Duel.SendtoGrave(sg,REASON_COST+REASON_DISCARD)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c69257165.ctffilter,tp,0,LOCATION_MZONE,1,1,nil,lv)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)

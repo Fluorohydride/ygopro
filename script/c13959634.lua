@@ -40,8 +40,9 @@ function c13959634.filter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c13959634.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetFlagEffect(tp,13959634)==0 end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,2)
+	Duel.RegisterFlagEffect(tp,13959634,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c13959634.hdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,2)
