@@ -8,9 +8,14 @@ function c51281878.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetCountLimit(1)
+	e1:SetTarget(c51281878.cost)
 	e1:SetTarget(c51281878.target)
 	e1:SetOperation(c51281878.operation)
 	c:RegisterEffect(e1)
+end
+function c51281878.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,51281878)==0 end
+	Duel.RegisterFlagEffect(tp,51281878,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c51281878.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
