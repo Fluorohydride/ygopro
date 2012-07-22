@@ -11,7 +11,7 @@ function c56514812.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c56514812.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAIINING) end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,0,0,ep,1)
 end
 function c56514812.operation(e,tp,eg,ep,ev,re,r,rp)

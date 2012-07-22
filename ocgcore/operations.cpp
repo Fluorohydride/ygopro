@@ -1400,6 +1400,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 	case 1: {
 		target->previous.position = target->current.position;
 		target->current.position = POS_FACEUP_ATTACK;
+		target->fieldid = infos.field_id++;
 		core.phase_action = TRUE;
 		core.flipsummon_state[sumplayer] = TRUE;
 		core.flipsummoned_cards_pt[sumplayer].insert(target);
