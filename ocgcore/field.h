@@ -397,7 +397,6 @@ public:
 	//operations
 	int32 negate_chain(uint8 chaincount);
 	int32 disable_chain(uint8 chaincount);
-	int32 negate_related_chain(card* pcard);
 	void change_chain_effect(uint8 chaincount, int32 replace_op);
 	void change_target(uint8 chaincount, group* targets);
 	void change_target_player(uint8 chaincount, uint8 playerid);
@@ -482,7 +481,6 @@ public:
 //Chain Info
 #define CHAIN_DISABLE_ACTIVATE	0x01
 #define CHAIN_DISABLE_EFFECT	0x02
-#define CHAIN_NEGATED			0x04
 #define CHAININFO_CHAIN_COUNT			0x01
 #define CHAININFO_TRIGGERING_EFFECT		0x02
 #define CHAININFO_TRIGGERING_PLAYER		0x04

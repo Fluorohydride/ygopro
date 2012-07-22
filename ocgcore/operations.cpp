@@ -20,7 +20,7 @@ int32 field::negate_chain(uint8 chaincount) {
 	chain& pchain = core.current_chain[chaincount - 1];
 	if(!(pchain.flag & CHAIN_DISABLE_ACTIVATE) && is_chain_negatable(pchain.chain_count)
 	        && pchain.triggering_effect->handler->is_affect_by_effect(core.reason_effect) ) {
-		pchain.flag |= CHAIN_DISABLE_ACTIVATE | CHAIN_NEGATED;
+		pchain.flag |= CHAIN_DISABLE_ACTIVATE;
 		pchain.disable_reason = core.reason_effect;
 		pchain.disable_player = core.reason_player;
 		if((pchain.triggering_effect->type & EFFECT_TYPE_ACTIVATE) && (pchain.triggering_effect->handler->current.location == LOCATION_SZONE)) {
@@ -43,7 +43,7 @@ int32 field::disable_chain(uint8 chaincount) {
 	chain& pchain = core.current_chain[chaincount - 1];
 	if(!(pchain.flag & CHAIN_DISABLE_EFFECT) && is_chain_disablable(pchain.chain_count)
 	        && pchain.triggering_effect->handler->is_affect_by_effect(core.reason_effect)) {
-		core.current_chain[chaincount - 1].flag |= CHAIN_DISABLE_EFFECT | CHAIN_NEGATED;
+		core.current_chain[chaincount - 1].flag |= CHAIN_DISABLE_EFFECT;
 		core.current_chain[chaincount - 1].disable_reason = core.reason_effect;
 		core.current_chain[chaincount - 1].disable_player = core.reason_player;
 		pduel->write_buffer8(MSG_CHAIN_DISABLED);
@@ -51,21 +51,6 @@ int32 field::disable_chain(uint8 chaincount) {
 		if(pchain.triggering_effect->flag & EFFECT_FLAG_NAGA)
 			return FALSE;
 		return TRUE;
-	}
-	return FALSE;
-}
-int32 field::negate_related_chain(card* pcard) {
-	for(int32 i = 0; i < core.current_chain.size(); ++i) {
-		chain& pchain = core.current_chain[i];
-		if(pchain.triggering_effect->handler == pcard && !(pchain.flag & CHAIN_DISABLE_EFFECT) && is_chain_disablable(pchain.chain_count)
-		        && pchain.triggering_effect->handler->is_affect_by_effect(core.reason_effect)) {
-			pchain.flag |= CHAIN_DISABLE_EFFECT | CHAIN_NEGATED;
-			pchain.disable_reason = core.reason_effect;
-			pchain.disable_player = core.reason_player;
-			pduel->write_buffer8(MSG_CHAIN_DISABLED);
-			pduel->write_buffer8(i + 1);
-			return TRUE;
-		}
 	}
 	return FALSE;
 }

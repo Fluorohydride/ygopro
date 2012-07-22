@@ -9,9 +9,9 @@ function c1992816.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
 	e1:SetHintTiming(0,TIMING_BATTLE_PHASE)
 	e1:SetCondition(c1992816.atkcon)
+	e1:SetCost(c1992816.atkcost)
 	e1:SetOperation(c1992816.atkop)
 	c:RegisterEffect(e1)
 	--material
@@ -37,6 +37,10 @@ function c1992816.initial_effect(c)
 end
 function c1992816.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttackTarget() and e:GetHandler():GetOverlayCount()~=0
+end
+function c1992816.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(1992816)==0 end
+	e:GetHandler():RegisterFlagEffect(1992816,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE,0,1)
 end
 function c1992816.atkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateAttack()

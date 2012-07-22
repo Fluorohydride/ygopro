@@ -1173,12 +1173,20 @@ int32 scriptlib::duel_negate_effect(lua_State *L) {
 	return 1;
 }
 int32 scriptlib::duel_negate_related_chain(lua_State *L) {
-	check_param_count(L, 1);
+	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**)lua_touserdata(L, 1);
-	duel* pduel = pcard->pduel;
-	lua_pushboolean(L, pduel->game_field->negate_related_chain(pcard));
-	return 1;
+	uint32 reset_flag = lua_tointeger(L, 2);
+	duel * pduel = pcard->pduel;
+	if(pduel->game_field->core.current_chain.size() < 2)
+		return FALSE;
+	effect* negeff = pduel->new_effect();
+	negeff->owner = pduel->game_field->core.reason_effect->handler;
+	negeff->type = EFFECT_TYPE_SINGLE;
+	negeff->code = EFFECT_DISABLE_CHAIN;
+	negeff->reset_flag = RESET_CHAIN | RESET_EVENT | reset_flag;
+	pcard->add_effect(negeff);
+	return 0;
 }
 int32 scriptlib::duel_disable_summon(lua_State *L) {
 	check_param_count(L, 1);

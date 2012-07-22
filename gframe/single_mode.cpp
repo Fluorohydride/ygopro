@@ -119,8 +119,11 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			return false;
 		}
 		case MSG_HINT: {
-			pbuf += 6;
-			//DuelClient::ClientAnalyze(offset, pbuf - offset);
+			int type = BufferIO::ReadInt8(pbuf);
+			int player = BufferIO::ReadInt8(pbuf);
+			int data = BufferIO::ReadInt32(pbuf);
+			if(player == 0)
+				DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
 		case MSG_WIN: {

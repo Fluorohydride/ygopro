@@ -1648,8 +1648,30 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				clit->triggering_location = peffect->handler->current.location;
 				clit->triggering_sequence = peffect->handler->current.sequence;
 			}
-			if(peffect->is_chainable(clit->triggering_player) && peffect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
-				if(clit->triggering_player == infos.turn_player)
+			uint8 tp = clit->triggering_player;
+			bool act = true;
+			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)) {
+				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+					if(tp == infos.turn_player) {
+						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
+							if(tpit->triggering_effect->handler->data.code == peffect->handler->data.code) {
+								act = false;
+								break;
+							}
+						}
+					} else {
+						for(auto ntpit = core.ntpchain.begin(); ntpit != core.ntpchain.end(); ++ntpit) {
+							if(ntpit->triggering_effect->handler->data.code == peffect->handler->data.code) {
+								act = false;
+								break;
+							}
+						}
+					}
+				}
+			} else
+				act = false;
+			if(act) {
+				if(tp == infos.turn_player)
 					core.tpchain.push_back(*clit);
 				else
 					core.ntpchain.push_back(*clit);
@@ -3865,8 +3887,15 @@ int32 field::add_chain(uint16 step) {
 			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
 			core.chain_limit = 0;
 		}
-		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))
-			clit->flag |= CHAIN_DISABLE_EFFECT;
+		effect* deffect;
+		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (deffect = peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))) {
+			effect* negeff = pduel->new_effect();
+			negeff->owner = deffect->owner;
+			negeff->type = EFFECT_TYPE_SINGLE;
+			negeff->code = EFFECT_DISABLE_CHAIN;
+			negeff->reset_flag = RESET_CHAIN | RESET_EVENT | deffect->get_value();
+			peffect->handler->add_effect(negeff);
+		}
 		clit->triggering_effect->card_type = peffect->handler->get_type();
 		if((clit->triggering_effect->card_type & 0x5) == 0x5)
 			clit->triggering_effect->card_type -= TYPE_TRAP;
@@ -4068,8 +4097,9 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	case 2: {
 		card* pcard = cait->triggering_effect->handler;
 		if(is_chain_disablable(cait->chain_count)) {
-			if((cait->flag & CHAIN_DISABLE_EFFECT) || (pcard->is_status(STATUS_DISABLED) && pcard->is_has_relation(cait->triggering_effect))) {
-				if(!(cait->flag & CHAIN_NEGATED)) {
+			if((cait->flag & CHAIN_DISABLE_EFFECT) || pcard->is_affected_by_effect(EFFECT_DISABLE_CHAIN)
+			        || (pcard->is_status(STATUS_DISABLED) && pcard->is_has_relation(cait->triggering_effect))) {
+				if(!(cait->flag & CHAIN_DISABLE_EFFECT)) {
 					pduel->write_buffer8(MSG_CHAIN_DISABLED);
 					pduel->write_buffer8(cait->chain_count);
 				}

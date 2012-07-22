@@ -37,6 +37,6 @@ function c1005587.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	tc:RegisterEffect(e1)
 	Duel.AdjustInstantly()
-	Duel.NegateRelatedChain(tc)
+	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 	Duel.Destroy(tc,REASON_EFFECT)
 end

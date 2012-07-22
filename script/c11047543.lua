@@ -12,12 +12,12 @@ function c11047543.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c11047543.filter1(c,e,tp)
-	return c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_TUNER)
+	return c:IsFaceup() and c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_TUNER)
 		and Duel.IsExistingTarget(c11047543.filter2,tp,LOCATION_REMOVED,0,1,nil,e,tp,c:GetLevel())
 end
 function c11047543.filter2(c,e,tp,lv)
 	local clv=c:GetLevel()
-	return clv>0 and c:IsRace(RACE_PSYCHO) and not c:IsType(TYPE_TUNER)
+	return clv>0 and c:IsFaceup() and c:IsRace(RACE_PSYCHO) and not c:IsType(TYPE_TUNER)
 		and Duel.IsExistingMatchingCard(c11047543.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,lv+clv)
 end
 function c11047543.spfilter(c,e,tp,lv)
