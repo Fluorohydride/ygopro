@@ -33,8 +33,8 @@ function c19041767.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()
 end
 function c19041767.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,500)
-	else Duel.PayLPCost(tp,500)	end
+	if chk==0 then return Duel.CheckLPCost(tp,500) end
+	Duel.PayLPCost(tp,500)
 end
 function c19041767.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c19041767.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
@@ -48,7 +48,7 @@ function c19041767.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		local s1=tc:IsSummonable(true,nil)
 		local s2=tc:IsMSetable(true,nil)
-		if (s1 and s2 and Duel.SelectOption(tp,aux.Stringid(19041767,1),aux.Stringid(19041767,2))==0) or not s2 then
+		if (s1 and s2 and Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)==POS_FACEUP_ATTACK) or not s2 then
 			Duel.Summon(tp,tc,true,nil)
 		else
 			Duel.MSet(tp,tc,true,nil)

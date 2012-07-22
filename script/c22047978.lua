@@ -28,10 +28,10 @@ function c22047978.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsAttackable() and not tc:IsStatus(STATUS_ATTACK_CANCELED) then
 		local g=Duel.GetMatchingGroup(c22047978.cfilter,1-tp,LOCATION_HAND,0,nil)
-		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(22047978,0)) then
+		if g:GetCount()>0 and Duel.SelectYesNo(1-tp,aux.Stringid(22047978,0)) then
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_CONFIRM)
 			local cg=g:Select(1-tp,1,1,nil)
-			Duel.ConfirmCards(tp,g)
+			Duel.ConfirmCards(tp,cg)
 			Duel.ShuffleHand(1-tp)
 			return
 		end

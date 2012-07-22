@@ -25,6 +25,7 @@ function c1248895.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if eg:GetCount()==1 then
 		Duel.SetTargetCard(eg)
 	else
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 		local g=eg:FilterSelect(tp,c1248895.filter,1,1,nil,e)
 		Duel.SetTargetCard(g)
 	end
