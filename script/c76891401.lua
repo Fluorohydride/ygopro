@@ -18,7 +18,7 @@ function c76891401.synfilter(c)
 	return c:GetLevel()==3
 end
 function c76891401.filter(c)
-	if c:GetLevel()~=3 then return false end
+	if not c:IsLevelBelow(3) then return false end
 	local loc=c:GetPreviousLocation()
 	if not (bit.band(loc,LOCATION_ONFIELD)>0) then return false end
 	local pos=c:GetPreviousPosition()

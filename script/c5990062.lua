@@ -12,10 +12,14 @@ function c5990062.cfilter(c)
 	return not c:IsAbleToGraveAsCost()
 end
 function c5990062.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetFieldGroup(tp,LOCATION_ONFIELD+LOCATION_HAND,0)
-	g:RemoveCard(e:GetHandler())
-	if chk==0 then return g:GetCount()>0 and not g:IsExists(c5990062.cfilter,1,nil) end
-	Duel.SendtoGrave(g,REASON_COST)
+	local g1=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,0)
+	local g2=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+	g1:RemoveCard(e:GetHandler())
+	g2:RemoveCard(e:GetHandler())
+	if chk==0 then return g1:GetCount()>0 and not g1:IsExists(c5990062.cfilter,1,nil)
+		and g2:GetCount()>0 and not g2:IsExists(c5990062.cfilter,1,nil) end
+	g1:Merge(g2)
+	Duel.SendtoGrave(g1,REASON_COST)
 end
 function c5990062.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,1)

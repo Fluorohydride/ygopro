@@ -692,6 +692,8 @@ int32 field::process() {
 						pduel->write_buffer32(core.select_cards[returns.bvalue[i + 1]]->get_info_location());
 					}
 				}
+				for(auto cit = pret->container.begin(); cit != pret->container.end(); ++cit)
+					(*cit)->create_relation(peffect);
 				pduel->lua->add_param(pret, PARAM_TYPE_GROUP);
 			}
 			core.units.pop_front();
@@ -3933,8 +3935,6 @@ int32 field::add_chain(uint16 step) {
 		effect* peffect = clit->triggering_effect;
 		card_set::iterator cit;
 		if(clit->target_cards && clit->target_cards->container.size()) {
-			for(cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
-				(*cit)->create_relation(clit->triggering_effect);
 			if(clit->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
 				for(cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
 					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, 0, clit->chain_count);

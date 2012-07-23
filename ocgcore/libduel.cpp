@@ -1912,7 +1912,7 @@ int32 scriptlib::duel_select_target(lua_State *L) {
 	group* pgroup = pduel->new_group();
 	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, (uint8)self, location1, location2, pgroup, pexception, extraargs, 0, 0, TRUE);
-	for(field::card_set::iterator cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
+	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
 		pduel->game_field->core.select_cards.push_back(*cit);
 	pduel->game_field->add_process(PROCESSOR_SELECT_TARGET, 0, 0, 0, playerid, min + (max << 16));
 	return lua_yield(L, 0);
@@ -2078,12 +2078,15 @@ int32 scriptlib::duel_set_target_card(lua_State *L) {
 			pduel->game_field->core.current_chain.rbegin()->target_cards->is_readonly = TRUE;
 		}
 		group* targets = pduel->game_field->core.current_chain.rbegin()->target_cards;
-		if(pcard)
+		if(pcard) {
 			targets->container.insert(pcard);
-		else
+			pcard->create_relation(peffect);
+		} else {
 			targets->container.insert(pgroup->container.begin(), pgroup->container.end());
+			for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
+				(*cit)->create_relation(peffect);
+		}
 		if(peffect->flag & EFFECT_FLAG_CARD_TARGET) {
-			group::card_set::iterator cit;
 			if(pcard) {
 				if(pcard->current.location & 0x30)
 					pduel->game_field->move_card(pcard->current.controler, pcard, pcard->current.location, 0);
@@ -2091,7 +2094,7 @@ int32 scriptlib::duel_set_target_card(lua_State *L) {
 				pduel->write_buffer8(1);
 				pduel->write_buffer32(pcard->get_info_location());
 			} else {
-				for(cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+				for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 					if((*cit)->current.location & 0x30)
 						pduel->game_field->move_card((*cit)->current.controler, (*cit), (*cit)->current.location, 0);
 					pduel->write_buffer8(MSG_BECOME_TARGET);
