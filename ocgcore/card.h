@@ -92,6 +92,7 @@ public:
 	uint32 operation_param;
 	uint8 announce_count;
 	uint8 attacked_count;
+	uint8 attack_all_target;
 	uint16 cardid;
 	uint32 fieldid;
 	uint32 fieldid_r;
@@ -188,7 +189,7 @@ public:
 	effect* check_equip_control_effect();
 	int32 fusion_check(group* fusion_m, card* cg, int32 chkf);
 	void fusion_select(uint8 playerid, group* fusion_m, card* cg, int32 chkf);
-
+	
 	int32 is_equipable(card* pcard);
 	int32 is_summonable();
 	int32 is_summonable(effect* peffect);

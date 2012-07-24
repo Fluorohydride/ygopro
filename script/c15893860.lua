@@ -11,6 +11,7 @@ function c15893860.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	c:RegisterEffect(e2)
 	local e3=e1:Clone()
 	e3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
@@ -34,6 +35,7 @@ function c15893860.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc:AddCounter(0x15,1)
 	end
 	if ct>=3 and Duel.SelectYesNo(tp,aux.Stringid(15893860,2)) then
+		Duel.BreakEffect()
 		local dg=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil)
 		Duel.Destroy(dg,REASON_EFFECT)
 	end

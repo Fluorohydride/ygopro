@@ -885,6 +885,7 @@ void card::reset(uint32 id, uint32 reset_type) {
 			attacked_cards.clear();
 			announce_count = 0;
 			attacked_count = 0;
+			attack_all_target = TRUE;
 		}
 		if(id & 0x5fe0000) {
 			battled_cards.clear();

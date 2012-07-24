@@ -2784,6 +2784,7 @@ int32 field::process_battle_command(uint16 step) {
 				}
 				core.attacker->attacked_count++;
 				core.attacker->announce_count++;
+				attack_all_target_check();
 			}
 			if(!peffect->value)
 				add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_BATTLE, 0);
@@ -2802,6 +2803,7 @@ int32 field::process_battle_command(uint16 step) {
 				else
 					core.attacker->announced_cards[0] = 0;
 				core.attacker->announce_count++;
+				attack_all_target_check();
 				if(!atk_disabled) {
 					if(core.attack_target)
 						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
@@ -2824,6 +2826,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.sub_attack_target = (card*)0xffffffff;
 			core.attacker->announce_count++;
 			core.attacker->attacked_count++;
+			attack_all_target_check();
 			pduel->write_buffer8(MSG_ATTACK);
 			pduel->write_buffer32(core.attacker->get_info_location());
 			if(core.attack_target) {
@@ -2840,6 +2843,7 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		if(core.chain_attack && core.chain_attack_target) {
 			core.attacker->announce_count++;
+			attack_all_target_check();
 			if(!(core.chain_attack_target->current.location & LOCATION_MZONE)) {
 				core.units.begin()->step = -1;
 				reset_phase(PHASE_DAMAGE);
@@ -2874,6 +2878,7 @@ int32 field::process_battle_command(uint16 step) {
 		if(!rollback) {
 			core.attacker->announce_count++;
 			core.attacker->attacked_count++;
+			attack_all_target_check();
 			if(core.attack_target) {
 				core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
 				core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
@@ -2888,6 +2893,7 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		if(!core.select_cards.size() && !core.attacker->operation_param) {
 			core.attacker->announce_count++;
+			attack_all_target_check();
 			core.units.begin()->step = -1;
 			reset_phase(PHASE_DAMAGE);
 			adjust_instant();
@@ -2913,6 +2919,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
 		else
 			core.attacker->announced_cards[0] = 0;
+		attack_all_target_check();
 		core.units.begin()->step = -1;
 		reset_phase(PHASE_DAMAGE);
 		adjust_instant();
@@ -3593,6 +3600,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 				pcard->announced_cards.clear();
 				pcard->attacked_cards.clear();
 				pcard->battled_cards.clear();
+				pcard->attack_all_target = TRUE;
 			}
 			for(uint8 i = 0; i < 6; ++i) {
 				pcard = player[p].list_szone[i];

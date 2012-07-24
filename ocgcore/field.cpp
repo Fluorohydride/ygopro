@@ -1366,15 +1366,8 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack) 
 		if(atarget && atarget->is_affected_by_effect(EFFECT_MUST_BE_ATTACKED))
 			must_be_attack.push_back(atarget);
 	}
-	if((peffect = pcard->is_affected_by_effect(EFFECT_ATTACK_ALL))) {
+	if(pcard->attack_all_target && (peffect = pcard->is_affected_by_effect(EFFECT_ATTACK_ALL))) {
 		if(pcard->announced_cards.size()) {
-			for(auto ait = pcard->announced_cards.begin(); ait != pcard->announced_cards.end(); ++ait) {
-				if(ait->first == 0)
-					continue;
-				pduel->lua->add_param(ait->second, PARAM_TYPE_CARD);
-				if(!peffect->check_value_condition(1))
-					return 0;
-			}
 			if(must_be_attack.size())
 				pv = &must_be_attack;
 			else
@@ -1422,6 +1415,20 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack) 
 	if((mcount == 0 || pcard->is_affected_by_effect(EFFECT_DIRECT_ATTACK)) && !pcard->is_affected_by_effect(EFFECT_CANNOT_DIRECT_ATTACK))
 		pcard->operation_param = 1;
 	return must_be_attack.size() ? TRUE : FALSE;
+}
+void field::attack_all_target_check() {
+	if(!core.attacker)
+		return;
+	if(!core.attack_target) {
+		core.attacker->attack_all_target = FALSE;
+		return;
+	}
+	effect* peffect = core.attacker->is_affected_by_effect(EFFECT_ATTACK_ALL);
+	if(!peffect)
+		return;
+	pduel->lua->add_param(core.attack_target, PARAM_TYPE_CARD);
+	if(!peffect->check_value_condition(1))
+		core.attacker->attack_all_target = FALSE;
 }
 int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max) {
 	card* tuner;
