@@ -57,8 +57,10 @@ void ClientCard::UpdateInfo(char* buf) {
 		} else
 			code = pdata;
 	}
-	if(flag & QUERY_POSITION)
+	if(flag & QUERY_POSITION) {
 		pdata = BufferIO::ReadInt32(buf);
+		position = (pdata >> 24) & 0xff;
+	}
 	if(flag & QUERY_ALIAS)
 		alias = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_TYPE)

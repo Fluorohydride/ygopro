@@ -242,7 +242,6 @@ function Auxiliary.XyzOperation2(f,minc,alterf,desc)
 							Duel.Overlay(c,mg2)
 						end
 						Duel.Overlay(c,mg)
-						mg:Merge(mg2)
 						c:SetMaterial(mg)
 					else
 						local mg=g:FilterSelect(tp,f,minc,minc,nil)

@@ -504,6 +504,11 @@ int32 field::pay_lp_cost(uint32 step, uint8 playerid, uint32 cost) {
 	case 0: {
 		effect_set eset;
 		int32 val = cost;
+		if(cost == 0) {
+			raise_event((card*)0, EVENT_PAY_LPCOST, core.reason_effect, 0, playerid, playerid, cost);
+			process_instant_event();
+			return TRUE;
+		}
 		filter_player_effect(playerid, EFFECT_LPCOST_CHANGE, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
 			pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
@@ -2843,7 +2848,8 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			return TRUE;
 		if(!(location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))) {
 			uint32 flag;
-			uint32 ct = get_useable_count(playerid, location, move_player, LOCATION_REASON_TOFIELD, &flag);
+			uint32 lreason = (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
+			uint32 ct = get_useable_count(playerid, location, move_player, lreason, &flag);
 			if(ret && (ct <= 0 || !(target->data.type & TYPE_MONSTER))) {
 				core.units.begin()->step = 3;
 				send_to(target, core.reason_effect, REASON_EFFECT, core.reason_player, PLAYER_NONE, LOCATION_GRAVE, 0, 0);

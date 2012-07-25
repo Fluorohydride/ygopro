@@ -928,8 +928,6 @@ int32 scriptlib::duel_pay_lp_cost(lua_State *L) {
 	if(playerid != 0 && playerid != 1)
 		return 0;
 	uint32 cost = lua_tointeger(L, 2);
-	if(cost == 0)
-		return 0;
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->game_field->add_process(PROCESSOR_PAY_LPCOST, 0, 0, 0, playerid, cost);
 	return lua_yield(L, 0);

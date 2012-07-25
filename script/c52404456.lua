@@ -24,6 +24,7 @@ function c52404456.initial_effect(c)
 end
 function c52404456.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():GetReasonPlayer()~=tp
+		and e:GetHandler():GetPreviousControler()==tp
 end
 function c52404456.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

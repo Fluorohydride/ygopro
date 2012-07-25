@@ -11,10 +11,10 @@ function c45141844.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c45141844.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:GetControler()~=tp and chkc:IsDestructable() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDestructable() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,1,nil,tp)
+	local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c45141844.operation(e,tp,eg,ep,ev,re,r,rp)

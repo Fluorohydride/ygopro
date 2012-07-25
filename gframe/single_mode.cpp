@@ -614,18 +614,15 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 						ClientCard* ccard = new ClientCard;
 						mainGame->dField.AddCard(ccard, p, LOCATION_MZONE, seq);
 						ccard->position = BufferIO::ReadInt8(pbuf);
-						mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 						val = BufferIO::ReadInt8(pbuf);
 						if(val) {
 							for(int xyz = 0; xyz < val; ++xyz) {
 								ClientCard* xcard = new ClientCard;
 								ccard->overlayed.push_back(xcard);
 								mainGame->dField.overlay_cards.insert(xcard);
-								mainGame->gMutex.Unlock();
 								xcard->overlayTarget = ccard;
 								xcard->location = 0x80;
 								xcard->sequence = ccard->overlayed.size() - 1;
-								mainGame->dField.GetCardLocation(xcard, &xcard->curPos, &xcard->curRot, true);
 							}
 						}
 					}
@@ -636,42 +633,37 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 						ClientCard* ccard = new ClientCard;
 						mainGame->dField.AddCard(ccard, p, LOCATION_SZONE, seq);
 						ccard->position = BufferIO::ReadInt8(pbuf);
-						mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 					}
 				}
 				val = BufferIO::ReadInt8(pbuf);
 				for(int seq = 0; seq < val; ++seq) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_DECK, seq);
-					mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 				}
 				val = BufferIO::ReadInt8(pbuf);
 				for(int seq = 0; seq < val; ++seq) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_HAND, seq);
-					mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 				}
 				val = BufferIO::ReadInt8(pbuf);
 				for(int seq = 0; seq < val; ++seq) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_GRAVE, seq);
-					mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 				}
 				val = BufferIO::ReadInt8(pbuf);
 				for(int seq = 0; seq < val; ++seq) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_REMOVED, seq);
-					mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 				}
 				val = BufferIO::ReadInt8(pbuf);
 				for(int seq = 0; seq < val; ++seq) {
 					ClientCard* ccard = new ClientCard;
 					mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
-					mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 				}
 			}
-			mainGame->gMutex.Unlock();
 			SinglePlayReload();
+			mainGame->dField.RefreshAllCards();
+			mainGame->gMutex.Unlock();
 			break;
 		}
 		case MSG_AI_NAME: {

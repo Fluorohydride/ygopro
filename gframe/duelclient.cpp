@@ -1551,6 +1551,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	}
 	case MSG_SHUFFLE_DECK: {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+		if(mainGame->dField.deck[player].size() < 2)
+			return true;
 		bool rev = mainGame->dField.deck_reversed;
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			mainGame->dField.deck_reversed = false;

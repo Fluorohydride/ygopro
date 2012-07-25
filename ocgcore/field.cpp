@@ -1288,6 +1288,8 @@ void field::adjust_disable_check_list() {
 int32 field::check_lp_cost(uint8 playerid, uint32 lp) {
 	effect_set eset;
 	int32 val = lp;
+	if(lp == 0)
+		return TRUE;
 	filter_player_effect(playerid, EFFECT_LPCOST_CHANGE, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
 		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);

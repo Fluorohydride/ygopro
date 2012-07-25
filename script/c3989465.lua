@@ -21,6 +21,7 @@ function c3989465.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	local c=e:GetHandler()
 	return (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and (c==Duel.GetAttacker() or c==Duel.GetAttackTarget())
+		and not Duel.IsDamageCalculated()
 end
 function c3989465.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(3989465)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
