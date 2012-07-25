@@ -51,7 +51,7 @@ function c22842214.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsFacedown() or not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<g:GetCount() then return end
 	local tc=g:GetFirst()
 	while tc do
-		Duel.Equip(tp,tc,c,false)
+		Duel.Equip(tp,tc,c,false,true)
 		tc:RegisterFlagEffect(22842214,RESET_EVENT+0x1fe0000,0,0)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -62,6 +62,7 @@ function c22842214.eqop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
+	Duel.EquipComplete()
 end
 function c22842214.eqfilter(c,ec)
 	return c:GetFlagEffect(22842214)~=0 and c:IsHasCardTarget(ec)

@@ -20,6 +20,13 @@ function c23516703.initial_effect(c)
 	local e4=e2:Clone()
 	e4:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
 	c:RegisterEffect(e4)
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetRange(LOCATION_SZONE)
+	e5:SetCode(23516703)
+	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e5:SetTargetRange(1,1)
+	c:RegisterEffect(e5)
 	if not c23516703.global_check then
 		c23516703.global_check=true
 		c23516703[0]=0
