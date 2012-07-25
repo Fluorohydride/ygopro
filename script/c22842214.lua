@@ -31,7 +31,7 @@ function c22842214.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c22842214.filter(c)
-	return c:IsRace(RACE_FISH+RACE_AQUA+RACE_SEASERPENT)
+	return c:IsFaceup() and c:IsRace(RACE_FISH+RACE_AQUA+RACE_SEASERPENT)
 end
 function c22842214.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c22842214.filter(chkc) end
@@ -70,6 +70,7 @@ function c22842214.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingMatchingCard(c22842214.eqfilter,tp,LOCATION_SZONE,0,1,nil,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(22842214,1)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
 		local tc=Duel.SelectMatchingCard(tp,c22842214.eqfilter,tp,LOCATION_SZONE,0,1,1,nil,c):GetFirst()
 		e:SetLabelObject(tc)
 		return true

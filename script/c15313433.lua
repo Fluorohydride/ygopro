@@ -17,11 +17,11 @@ function c15313433.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
 end
 function c15313433.filter(c,e,tp)
-	return c:IsSetCard(0xb) and c:GetPreviousControler()==tp
+	return c:IsSetCard(0xb) and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp
 		and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c15313433.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:IsContains(chkc) end
+	if chkc then return eg:IsContains(chkc) and c15313433.filter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and eg:IsExists(c15313433.filter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=eg:FilterSelect(tp,c15313433.filter,1,1,nil,e,tp)
@@ -30,8 +30,7 @@ function c15313433.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,1,1-tp,1000)
 end
 function c15313433.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end

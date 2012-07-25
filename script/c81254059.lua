@@ -52,8 +52,8 @@ function c81254059.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(sg:GetFirst():GetLevel())
 	Duel.Release(sg,REASON_COST)
 end
-function c81254059.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return true end
+function c81254059.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c81254059.spop(e,tp,eg,ep,ev,re,r,rp)

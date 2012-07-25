@@ -15,13 +15,16 @@ end
 function c10925955.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c10925955.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
+function c10925955.filter(c)
+	return c:IsFacedown() and c:GetSequence()~=5
+end
 function c10925955.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1
 		or Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1
-		or Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_SZONE,1,nil) end
+		or Duel.IsExistingMatchingCard(c10925955.filter,tp,0,LOCATION_SZONE,1,nil) end
 	local sel=0
 	local ac=0
-	if Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_SZONE,1,nil) then sel=sel+1 end
+	if Duel.IsExistingMatchingCard(c10925955.filter,tp,0,LOCATION_SZONE,1,nil) then sel=sel+1 end
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1 or Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1 then sel=sel+2 end
 	if sel==1 then
 		ac=Duel.SelectOption(tp,aux.Stringid(10925955,0))
@@ -37,7 +40,7 @@ end
 function c10925955.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ac=e:GetLabel()
 	if ac==0 or ac==2 then
-		local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,0,LOCATION_SZONE,nil)
+		local g=Duel.GetMatchingGroup(c10925955.filter,tp,0,LOCATION_SZONE,nil)
 		Duel.ConfirmCards(tp,g)
 	end
 	if ac==1 or ac==2 then

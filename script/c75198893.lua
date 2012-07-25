@@ -13,7 +13,7 @@ function c75198893.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c75198893.filter(c)
-	return c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_XYZ) and not c:IsHasEffect(EFFECT_FORBIDDEN)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_XYZ) and not c:IsHasEffect(EFFECT_FORBIDDEN)
 end
 function c75198893.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(1-tp) and c75198893.filter(chkc) end

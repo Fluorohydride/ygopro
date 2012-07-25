@@ -33,7 +33,7 @@ function c31828916.check(e,tp,eg,ep,ev,re,r,rp)
 	dg:KeepAlive()
 end
 function c31828916.cfilter(c,cg,e,tp)
-	return c:IsRace(RACE_MACHINE) and c:IsControler(tp) and cg:IsContains(c)
+	return c:IsRace(RACE_MACHINE) and c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE) and cg:IsContains(c)
 		and Duel.IsExistingMatchingCard(c31828916.filter,tp,LOCATION_DECK,0,1,nil,c:GetAttack(),c:GetAttribute(),e,tp)
 end
 function c31828916.filter(c,atk,att,e,tp)

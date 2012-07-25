@@ -25,18 +25,21 @@ function c64379430.initial_effect(c)
 	e3:SetOperation(c64379430.retop)
 	c:RegisterEffect(e3)
 end
+function c64379430.filter(c)
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK)
+end
 function c64379430.value(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsAttribute,0,LOCATION_REMOVED,LOCATION_REMOVED,nil,ATTRIBUTE_DARK)*300
+	return Duel.GetMatchingGroupCount(c64379430.filter,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)*300
 end
 function c64379430.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_DESTROY)
 end
 function c64379430.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsAttribute,0,LOCATION_REMOVED,LOCATION_REMOVED,nil,ATTRIBUTE_DARK)
+	local g=Duel.GetMatchingGroup(c64379430.filter,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,g:GetCount(),0,0)
 end
 function c64379430.retop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsAttribute,0,LOCATION_REMOVED,LOCATION_REMOVED,nil,ATTRIBUTE_DARK)
+	local g=Duel.GetMatchingGroup(c64379430.filter,0,LOCATION_REMOVED,LOCATION_REMOVED,nil)
 	Duel.SendtoGrave(g,REASON_EFFECT+REASON_RETURN)
 end

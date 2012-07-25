@@ -18,7 +18,7 @@ function c23327298.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c23327298.cfilter,1,nil,tp)
 end
 function c23327298.filter(c)
-	return c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function c23327298.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c23327298.filter(chkc) end

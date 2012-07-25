@@ -36,6 +36,7 @@ function c15893860.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if ct>=3 and Duel.SelectYesNo(tp,aux.Stringid(15893860,2)) then
 		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local dg=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil)
 		Duel.Destroy(dg,REASON_EFFECT)
 	end

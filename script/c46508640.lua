@@ -10,7 +10,7 @@ function c46508640.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c46508640.cfilter(c)
-	return c:IsFaceup() and c:GetType()==TYPE_SPELL+TYPE_CONTINUOUS and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:GetType()==TYPE_SPELL+TYPE_CONTINUOUS and c:GetSequence()~=5
 end
 function c46508640.atkval(e,c)
 	return Duel.GetMatchingGroupCount(c46508640.cfilter,c:GetControler(),LOCATION_SZONE,0,nil)*300
