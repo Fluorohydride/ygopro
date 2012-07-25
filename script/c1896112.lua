@@ -21,7 +21,7 @@ function c1896112.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(g,nil,0,REASON_COST)
 end
 function c1896112.filter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c1896112.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

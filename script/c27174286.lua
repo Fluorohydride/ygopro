@@ -11,7 +11,7 @@ function c27174286.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c27174286.filter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c27174286.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

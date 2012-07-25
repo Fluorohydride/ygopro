@@ -16,7 +16,7 @@ function c61592395.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,61592395,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c61592395.filter(c)
-	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:GetCode()~=61592395 and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:GetCode()~=61592395 and c:IsAbleToHand()
 end
 function c61592395.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c61592395.filter(chkc) end

@@ -31,7 +31,7 @@ end
 function c18060565.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local eq=Duel.SelectMatchingCard(tp,c18060565.eqfilter,tp,LOCATION_DECK,0,1,1,nil)
 	local eqc=eq:GetFirst()

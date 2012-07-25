@@ -18,7 +18,7 @@ function c98147766.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,1000)
 end
 function c98147766.filter(c)
-	return c:IsRace(RACE_PSYCHO) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsRace(RACE_PSYCHO) and c:IsAbleToHand()
 end
 function c98147766.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and c98147766.filter(chkc) end

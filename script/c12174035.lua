@@ -31,7 +31,7 @@ end
 function c12174035.eqlimit(e,c)
 	return c:IsLevelBelow(3) and c:IsAttribute(ATTRIBUTE_WATER)
 end
-function c12174035.filter(c,tp)
+function c12174035.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(3) and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c12174035.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

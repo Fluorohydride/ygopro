@@ -35,19 +35,19 @@ function c49514333.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetLabelObject(e)
 	c:RegisterEffect(e1)
 end
-function c49514333.repfilter(c)
+function c49514333.repfilter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_DESTROY)
-		and bit.band(c:GetOriginalType(),TYPE_TRAP)~=0 and c:IsCanTurnSet()
+		and c:GetReasonPlayer()~=tp and c:GetOwner()==tp and bit.band(c:GetOriginalType(),TYPE_TRAP)~=0 and c:IsCanTurnSet()
 end
 function c49514333.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local count=eg:FilterCount(c49514333.repfilter,e:GetHandler())
+		local count=eg:FilterCount(c49514333.repfilter,e:GetHandler(),tp)
 		return count>0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>=count
 	end
 	if Duel.SelectYesNo(tp,aux.Stringid(49514333,0)) then
 		local container=e:GetLabelObject():GetLabelObject()
 		container:Clear()
-		local g=eg:Filter(c49514333.repfilter,e:GetHandler())
+		local g=eg:Filter(c49514333.repfilter,e:GetHandler(),tp)
 		local tc=g:GetFirst()
 		while tc do
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)

@@ -5,8 +5,8 @@ function c3072808.initial_effect(c)
 	e1:SetDescription(aux.Stringid(3072808,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_DAMAGE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetCondition(c3072808.condition)
 	e1:SetTarget(c3072808.target)
@@ -16,25 +16,26 @@ end
 c3072808[0]=true
 c3072808[1]=true
 function c3072808.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and bit.band(r,REASON_BATTLE)~=0 and ev>=2000 and Duel.GetAttackTarget()==nil and c3072808[tp]
+	return ep==tp and ev>=2000 and Duel.GetAttackTarget()==nil and c3072808[tp]
 end
 function c3072808.filter(c,e,tp)
 	return c:IsLevelBelow(3) and c:IsSetCard(0x33) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c3072808.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c3072808.filter(chkc,e,tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,0)>1
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and Duel.IsExistingTarget(c3072808.filter,tp,LOCATION_GRAVE,0,1,e:GetHandler(),e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c3072808.filter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler(),e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	g:AddCard(e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,0,0)
 	c3072808[tp]=false
 end
 function c3072808.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE,0)<2 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	if not c:IsRelateToEffect(e) or not c:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	if not tc:IsRelateToEffect(e) or not tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	local e1=Effect.CreateEffect(c)

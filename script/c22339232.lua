@@ -37,7 +37,7 @@ function c22339232.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c22339232.tgfilter(c)
 	local code=c:GetCode()
-	return code==32274490 or code==22339232
+	return c:IsFaceup() and (code==32274490 or code==22339232)
 end
 function c22339232.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c22339232.tgfilter(chkc) end
@@ -54,7 +54,7 @@ function c22339232.tgop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c22339232.spfilter(c,e,tp)
 	local code=c:GetCode()
-	return (code==36021814 or code==40991587) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and (code==36021814 or code==40991587) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c22339232.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c22339232.spfilter(chkc,e,tp) end

@@ -43,13 +43,13 @@ function c41077745.descon(e,tp,eg,ep,ev,re,r,rp,chk)
 	return ep~=tp and Duel.GetAttackTarget()==nil
 end
 function c41077745.filter(c)
-	return c:IsFacedown() and c:GetSequence()~=5 and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
+	return c:IsFacedown() and c:GetSequence()~=5 and c:IsDestructable()
 end
 function c41077745.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c41077745.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c41077745.filter,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and c41077745.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c41077745.filter,tp,0,LOCATION_SZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c41077745.filter,tp,0,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,c41077745.filter,tp,0,LOCATION_SZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c41077745.desop(e,tp,eg,ep,ev,re,r,rp)

@@ -11,11 +11,11 @@ function c6343408.initial_effect(c)
 	e1:SetOperation(c6343408.activate)
 	c:RegisterEffect(e1)
 end
-function c6343408.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_REMOVED,0,5,nil,TYPE_MONSTER)
-end
 function c6343408.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
+end
+function c6343408.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c6343408.filter,tp,LOCATION_REMOVED,0,5,nil)
 end
 function c6343408.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and c6343408.filter(chkc) end

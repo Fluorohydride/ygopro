@@ -26,7 +26,7 @@ function c84653834.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(c84653834.filter,tp,LOCATION_MZONE,0,nil)
 	local c=e:GetHandler()
 	local tc=sg:GetFirst()
-	local atk=Duel.GetMatchingGroupCount(Card.IsRace,tp,LOCATION_REMOVED,0,nil,RACE_PSYCHO)*300
+	local atk=Duel.GetMatchingGroupCount(c84653834.filter,tp,LOCATION_REMOVED,0,nil)*300
 	while tc do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

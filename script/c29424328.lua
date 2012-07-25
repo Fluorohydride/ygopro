@@ -33,24 +33,6 @@ end
 function c29424328.tlimit(e,c)
 	return not c:IsAttribute(ATTRIBUTE_DARK)
 end
-function c29424328.filter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP)
-end
-function c29424328.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,0)
-end
-function c29424328.damop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local c1=Duel.GetMatchingGroupCount(c29424328.filter,tp,LOCATION_ONFIELD,0,nil)
-	if c1<2 then
-		Duel.Damage(tp,1000-c1*500,REASON_EFFECT)
-	end
-	local c2=Duel.GetMatchingGroupCount(c29424328.filter,1-tp,LOCATION_ONFIELD,0,nil)
-	if c2<2 then
-		Duel.Damage(1-tp,1000-c2*500,REASON_EFFECT)
-	end
-end
 function c29424328.cfcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)>0
 end
