@@ -40,7 +40,7 @@ end
 function c16550875.eqlimit(e,c)
 	return c:IsSetCard(0x56)
 end
-function c16550875.filter(c,tp)
+function c16550875.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x56)
 end
 function c16550875.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

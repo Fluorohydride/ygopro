@@ -1734,7 +1734,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			if(tp == infos.turn_player) {
 				for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
 					if(!(clit->triggering_effect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-						if(tpit->triggering_location == LOCATION_HAND) {
+						if(clit->triggering_location == LOCATION_HAND) {
 							if(tpit->triggering_location == LOCATION_HAND || tpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
 								act = false;
 								break;
@@ -1755,7 +1755,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			} else {
 				for(auto ntpit = core.ntpchain.begin(); ntpit != core.ntpchain.end(); ++ntpit) {
 					if(!(clit->triggering_effect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-						if(ntpit->triggering_location == LOCATION_HAND) {
+						if(clit->triggering_location == LOCATION_HAND) {
 							if(ntpit->triggering_location == LOCATION_HAND || ntpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
 								act = false;
 								break;

@@ -27,7 +27,7 @@ function c43586926.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c43586926.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return c43586926[tp] end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 	c43586926[tp]=false
 end

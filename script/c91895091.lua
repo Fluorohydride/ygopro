@@ -33,11 +33,14 @@ function c91895091.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
+function c91895091.filter(c)
+	return c:IsFacedown() and c:GetSequence()~=5
+end
 function c91895091.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and chkc:IsFacedown() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,0,LOCATION_SZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and c91895091.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c91895091.filter,tp,0,LOCATION_SZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(91895091,2))
-	Duel.SelectTarget(tp,Card.IsFacedown,tp,0,LOCATION_SZONE,1,1,nil)
+	Duel.SelectTarget(tp,c91895091.filter,tp,0,LOCATION_SZONE,1,1,nil)
 end
 function c91895091.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

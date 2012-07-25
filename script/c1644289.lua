@@ -41,7 +41,7 @@ function c1644289.tglimit(e,re)
 	local rc=re:GetOwner()
 	return e:GetHandler():GetControler()~=rc:GetControler() and rc:IsType(TYPE_TRAP+TYPE_MONSTER)
 end
-function c1644289.filter(c,tp)
+function c1644289.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x30)
 end
 function c1644289.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

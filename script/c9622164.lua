@@ -21,13 +21,15 @@ function c9622164.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
+function c9622164.filter(c,e,tp)
+	return c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function c9622164.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_REMOVED and chkc:GetControler()==tp
-		and chkc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c9622164.filter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(Card.IsCanBeSpecialSummoned,tp,LOCATION_REMOVED,0,1,nil,e,0,tp,false,false) end
+		and Duel.IsExistingTarget(c9622164.filter,tp,LOCATION_REMOVED,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,Card.IsCanBeSpecialSummoned,tp,LOCATION_REMOVED,0,1,1,nil,e,0,tp,false,false)
+	local g=Duel.SelectTarget(tp,c9622164.filter,tp,LOCATION_REMOVED,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end

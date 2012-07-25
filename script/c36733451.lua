@@ -50,7 +50,7 @@ function c36733451.thcon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetHandler():GetPreviousControler()==tp
 end
 function c36733451.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c36733451.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and c36733451.filter(chkc) end

@@ -9,9 +9,12 @@ function c11136371.initial_effect(c)
 	e1:SetOperation(c11136371.plop)
 	c:RegisterEffect(e1)
 end
+function c11136371.plfilter(c)
+	return c:GetSequence()~=5 and c:IsAbleToGraveAsCost()
+end
 function c11136371.plcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_SZONE,0,1,e:GetHandler()) end
-	local g=Duel.GetMatchingGroup(Card.IsAbleToGraveAsCost,tp,LOCATION_SZONE,0,e:GetHandler())
+	if chk==0 then return Duel.IsExistingMatchingCard(c11136371.plfilter,tp,LOCATION_SZONE,0,1,e:GetHandler()) end
+	local g=Duel.GetMatchingGroup(c11136371.plfilter,tp,LOCATION_SZONE,0,e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c11136371.pltg(e,tp,eg,ep,ev,re,r,rp,chk)

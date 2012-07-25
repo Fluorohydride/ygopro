@@ -19,15 +19,18 @@ function c5014629.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
+function c5014629.filter(c)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
+end
 function c5014629.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_REMOVED,0,1,nil,TYPE_MONSTER) end
-	local ct=Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_REMOVED,0,nil,TYPE_MONSTER)
+	if chk==0 then return Duel.IsExistingMatchingCard(c5014629.filter,tp,LOCATION_REMOVED,0,1,nil) end
+	local ct=Duel.GetMatchingGroupCount(c5014629.filter,tp,LOCATION_REMOVED,0,nil)
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(ct*100)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*100)
 end
 function c5014629.damop(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_REMOVED,0,nil,TYPE_MONSTER)
+	local ct=Duel.GetMatchingGroupCount(c5014629.filter,tp,LOCATION_REMOVED,0,nil)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	Duel.Damage(p,ct*100,REASON_EFFECT)
 end

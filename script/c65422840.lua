@@ -44,7 +44,7 @@ function c65422840.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c65422840.filter(c)
-	return c:IsRace(RACE_ZOMBIE) and c:IsAbleToDeck()
+	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and c:IsAbleToDeck()
 end
 function c65422840.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c65422840.filter(chkc) end

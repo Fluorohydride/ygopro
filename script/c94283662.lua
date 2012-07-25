@@ -48,7 +48,7 @@ function c94283662.thcon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetHandler():GetPreviousControler()==tp
 end
 function c94283662.filter(c)
-	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
 end
 function c94283662.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and c94283662.filter(chkc) end
