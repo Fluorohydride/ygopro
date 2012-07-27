@@ -43,6 +43,10 @@ function c51858306.operation(e,tp,eg,ep,ev,re,r,rp)
 		e:SetLabelObject(tc)
 		e:GetHandler():RegisterFlagEffect(51858306,RESET_EVENT+0x1e60000,0,1)
 		tc:RegisterFlagEffect(51858306,RESET_EVENT+0x1fe0000,0,1)
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ShuffleDeck(tp)
 	end
 end
 function c51858306.thcon(e,tp,eg,ep,ev,re,r,rp)
