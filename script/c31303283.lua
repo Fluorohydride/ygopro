@@ -19,8 +19,8 @@ function c31303283.initial_effect(c)
 	e2:SetOperation(c31303283.atkop)
 	c:RegisterEffect(e2)
 end
-function c31303283.tgvalue(e,tp)
-	return tp~=e:GetHandlerPlayer()
+function c31303283.tgvalue(e,re,rp)
+	return rp~=e:GetHandlerPlayer()
 end
 function c31303283.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsAttribute,1,e:GetHandler(),ATTRIBUTE_FIRE) end

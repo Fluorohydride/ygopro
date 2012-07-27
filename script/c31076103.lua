@@ -56,13 +56,13 @@ function c31076103.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	if not Duel.IsExistingMatchingCard(c31076103.cfilter1,tp,LOCATION_SZONE,0,1,nil,4081094) then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(31076103,2))
-		local g=Duel.SelectMatchingCard(tp,c31076103.cfilter1,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,4081094)
+		local g=Duel.SelectMatchingCard(tp,Card.IsCode,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,4081094)
 		if g:GetCount()>0 then
 			Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
 	elseif not Duel.IsExistingMatchingCard(c31076103.cfilter1,tp,LOCATION_SZONE,0,1,nil,78697395) then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(31076103,2))
-		local g=Duel.SelectMatchingCard(tp,c31076103.cfilter1,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,78697395)
+		local g=Duel.SelectMatchingCard(tp,Card.IsCode,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,78697395)
 		if g:GetCount()>0 then
 			Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
