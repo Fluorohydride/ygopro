@@ -33,5 +33,5 @@ function c41090784.poop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c41090784.indval(e,re,rp)
-	return re:GetOwner():IsType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

@@ -54,7 +54,7 @@ function c33981008.drop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c33981008.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_DESTROY) and rp==1-tp
+	return e:GetHandler():IsReason(REASON_DESTROY) and not e:GetHandler():IsReason(REASON_RULE) and rp==1-tp
 end
 function c33981008.ctfilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)

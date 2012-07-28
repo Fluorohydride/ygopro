@@ -4172,12 +4172,11 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE) && !pcard->is_status(STATUS_LEAVE_CONFIRMED)
 		        && pcard->is_has_relation(cait->triggering_effect) && player[1 - pcard->current.controler].list_szone[5]
 		        && player[1 - pcard->current.controler].list_szone[5]->is_position(POS_FACEUP))
-			destroy(player[1 - pcard->current.controler].list_szone[5], 0, REASON_RULE, 0);
+			destroy(player[1 - pcard->current.controler].list_szone[5], 0, REASON_RULE, 1 - pcard->current.controler);
 		pcard->release_relation(cait->triggering_effect);
 		if(cait->target_cards)
 			pduel->delete_group(cait->target_cards);
-		chain::opmap::iterator oit;
-		for(oit = cait->opinfos.begin(); oit != cait->opinfos.end(); ++oit) {
+		for(auto oit = cait->opinfos.begin(); oit != cait->opinfos.end(); ++oit) {
 			if(oit->second.op_cards)
 				pduel->delete_group(oit->second.op_cards);
 		}

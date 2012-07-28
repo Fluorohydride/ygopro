@@ -2872,7 +2872,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		} else {
 			card* pcard;
 			if((pcard = get_field_card(playerid, LOCATION_SZONE, 5))) {
-				destroy(pcard, 0, REASON_RULE, PLAYER_NONE);
+				destroy(pcard, 0, REASON_RULE, pcard->current.controler);
 				adjust_all();
 			}
 		}
