@@ -23,6 +23,7 @@ function c95920682.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function c95920682.activate(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLP(1-tp)==8000 then return end
 	Duel.SetLP(1-tp,8000)
 	Duel.Draw(tp,2,REASON_EFFECT)
 end

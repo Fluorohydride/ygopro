@@ -23,9 +23,9 @@ function c34707034.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,3,0,0)
 end
 function c34707034.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<3 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()<3 then return end
+	if g:GetCount()==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<g:GetCount() then return end
 	local c=e:GetHandler()
 	local tc=g:GetFirst()
 	while tc do

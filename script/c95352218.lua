@@ -8,8 +8,7 @@ function c95352218.initial_effect(c)
 	c:RegisterEffect(e1)
 	--adjust
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(95352218,0))
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetRange(LOCATION_SZONE)
@@ -34,7 +33,6 @@ function c95352218.filter2(c,lv)
 	return c:IsFaceup() and c:GetLevel()~=lv
 end
 function c95352218.adjustop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local turnp=Duel.GetTurnPlayer()
 	local g=Duel.GetMatchingGroup(c95352218.filter1,turnp,LOCATION_MZONE,0,nil)
 	if g:GetCount()<2 then return end

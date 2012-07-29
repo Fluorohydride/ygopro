@@ -53,6 +53,10 @@ function c60470713.operation(e,tp,eg,ep,ev,re,r,rp)
 		if g:GetCount()>0 then
 			Duel.SendtoHand(g,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,g)
+		else
+			local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+			Duel.ConfirmCards(1-tp,cg)
+			Duel.ShuffleDeck(tp)
 		end
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -66,6 +70,10 @@ function c60470713.operation(e,tp,eg,ep,ev,re,r,rp)
 				Duel.SendtoHand(tc,nil,REASON_EFFECT)
 				Duel.ConfirmCards(1-tp,tc)
 			end
+		else
+			local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+			Duel.ConfirmCards(1-tp,cg)
+			Duel.ShuffleDeck(tp)
 		end
 	end
 end

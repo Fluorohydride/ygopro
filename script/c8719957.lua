@@ -24,14 +24,10 @@ function c8719957.initial_effect(c)
 	c:RegisterEffect(e3)
 	--negate
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(8719957,0))
-	e4:SetCategory(CATEGORY_DISABLE)
-	e4:SetType(EFFECT_TYPE_QUICK_F)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
-	e4:SetCode(EVENT_CHAINING)
+	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetCode(EVENT_CHAIN_SOLVING)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCondition(c8719957.negcon)
-	e4:SetTarget(c8719957.negtg)
 	e4:SetOperation(c8719957.negop)
 	c:RegisterEffect(e4)
 end
@@ -58,13 +54,7 @@ function c8719957.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)==LOCATION_MZONE
 		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev) 
 end
-function c8719957.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,e:GetHandler(),1,0,0)
-end
 function c8719957.negop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.NegateEffect(ev)
 	Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
 end

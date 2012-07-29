@@ -54,13 +54,14 @@ function c35220244.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c35220244.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
+	local ec=c:GetEquipTarget()
+	if ec and c:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_EQUIP)
+		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(400)
-		e1:SetReset(RESET_EVENT+0x1ff0000)
-		c:RegisterEffect(e1)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		ec:RegisterEffect(e1)
 	end
 end
 function c35220244.discon(e,tp,eg,ep,ev,re,r,rp)
