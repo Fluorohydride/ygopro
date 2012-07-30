@@ -24,6 +24,7 @@ function c34029630.initial_effect(c)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c34029630.condition)
 	e3:SetTarget(c34029630.target2)
 	e3:SetOperation(c34029630.operation)
 	c:RegisterEffect(e3)
@@ -46,7 +47,7 @@ function c34029630.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	local c=e:GetHandler()
 	c:AddCounter(0x3001,3)
-	if c:IsCanRemoveCounter(tp,0x3001,1,REASON_EFFECT)
+	if Duel.GetTurnPlayer()==tp and c:IsCanRemoveCounter(tp,0x3001,1,REASON_EFFECT)
 		and Duel.IsExistingTarget(c34029630.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
 		and Duel.SelectYesNo(tp,aux.Stringid(34029630,0)) then
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -65,6 +66,9 @@ function c34029630.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RemoveCounter(tp,0x3001,1,REASON_EFFECT)
 		tc:AddCounter(0x3001,1)
 	end
+end
+function c34029630.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
 end
 function c34029630.filter(c)
 	return c:IsFaceup() and c:IsCanAddCounter(0x3001,1)
