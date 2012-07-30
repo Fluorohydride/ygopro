@@ -26,7 +26,7 @@ function c131182.initial_effect(c)
 	c:RegisterEffect(e4)
 	--spsummon
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_BATTLE_DESTROYED)
 	e5:SetOperation(c131182.battleop)
 	c:RegisterEffect(e5)

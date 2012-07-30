@@ -24,5 +24,6 @@ function c76972801.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	Duel.RegisterEffect(e2,tp)
 end
