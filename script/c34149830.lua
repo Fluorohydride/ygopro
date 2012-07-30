@@ -27,7 +27,7 @@ function c34149830.condition(e,tp,eg,ep,ev,re,r,rp)
 		and ((tc:IsDefencePos() and tc:GetDefence()<bc:GetAttack()) or (tc:IsAttackPos() and tc:GetAttack()<=bc:GetAttack()))
 end
 function c34149830.spfilter(c,e,tp)
-	return c:GetLevel()==4 and c:IsRace(RACE_WARRIOR) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevelBelow(4) and c:IsRace(RACE_WARRIOR) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c34149830.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING)

@@ -21,7 +21,7 @@ function c59509952.initial_effect(c)
 	--redirect
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT)
+	e3:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 	e3:SetCondition(c59509952.recon)
 	e3:SetValue(LOCATION_DECK)
 	c:RegisterEffect(e3)
@@ -45,7 +45,7 @@ function c59509952.spcon(e,c)
 end
 function c59509952.recon(e)
 	local c=e:GetHandler()
-	return c:IsOnField() and c:IsFaceup()
+	return c:IsFaceup() and c:GetDestination()==LOCATION_GRAVE
 end
 function c59509952.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1

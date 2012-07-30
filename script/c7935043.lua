@@ -26,5 +26,5 @@ function c7935043.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c7935043.tg(e,c)
-	return c:GetLevel()<=3 and c:IsAttribute(ATTRIBUTE_WATER)
+	return c:IsLevelBelow(3) and c:IsAttribute(ATTRIBUTE_WATER)
 end
