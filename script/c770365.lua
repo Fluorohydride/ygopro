@@ -44,7 +44,7 @@ function c770365.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,5)
 	local ct=g:FilterCount(c770365.filter,nil)
 	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	if ct>0 and sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(770365,1)) then
+	if ct>0 and sg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local dg=sg:Select(tp,1,ct,nil)
 		Duel.Destroy(dg,REASON_EFFECT)

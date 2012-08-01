@@ -22,6 +22,7 @@ function c62437430.initial_effect(c)
 end
 function c62437430.filter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToRemove() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+		and (not c:IsLocation(LOCATION_MZONE) or c:IsFaceup())
 end
 function c62437430.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c62437430.filter,tp,0x16,0,1,nil) end
