@@ -23,7 +23,7 @@ function c86016245.drcon(e,tp,eg,ep,ev,re,r,rp)
 	local bc=tc:GetBattleTarget()
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0 and eg:GetCount()==1
 		and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE)
-		and bc:IsRelateToBattle() and bc:IsType(TYPE_NORMAL) and bc:IsLevelBelow(2)
+		and bc:IsRelateToBattle() and bc:IsLevelBelow(2)
 end
 function c86016245.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
