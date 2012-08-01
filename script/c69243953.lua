@@ -58,6 +58,7 @@ function c69243953.retcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c69243953.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
+	e:GetHandler():CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
 end
 function c69243953.retop(e,tp,eg,ep,ev,re,r,rp)

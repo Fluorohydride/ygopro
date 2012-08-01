@@ -18,7 +18,8 @@ end
 function c94770493.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:GetFlagEffect(94770493)==0 then
+		tc:RegisterFlagEffect(94770493,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
