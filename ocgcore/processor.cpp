@@ -957,7 +957,7 @@ int32 field::process() {
 					tc[count - i - 1]->current.sequence = player[target_player].list_main.size() - 1;
 				}
 			}
-			if(core.deck_reversed) {
+			if(count > 0 && core.deck_reversed) {
 				pduel->write_buffer8(MSG_DECK_TOP);
 				pduel->write_buffer8(target_player);
 				pduel->write_buffer8(0);
