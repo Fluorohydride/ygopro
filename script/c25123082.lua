@@ -48,8 +48,8 @@ function c25123082.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c25123082.shcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	return tc==e:GetLabelObject() and tc:GetFlagEffect(25123082)~=0
+	local tc=e:GetLabelObject()
+	return eg:IsContains(tc) and tc:GetFlagEffect(25123082)~=0
 end
 function c25123082.shfilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
