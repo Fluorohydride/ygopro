@@ -19,7 +19,9 @@ function c22047978.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc==tg end
 	if chk==0 then return tg:IsOnField() and tg:IsDestructable() and tg:IsCanBeEffectTarget(e) end
 	Duel.SetTargetCard(tg)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,1,0,0)
+	if Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)==0 then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,tg,1,0,0)
+	end
 end
 function c22047978.cfilter(c)
 	return c:IsType(TYPE_MONSTER) and not c:IsPublic()

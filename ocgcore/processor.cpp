@@ -2954,6 +2954,7 @@ int32 field::process_battle_command(uint16 step) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 			core.units.begin()->arg1 = TRUE;
 		}
+		core.temp_var[2] = 0;
 		return FALSE;
 	}
 	case 21: {
@@ -2992,11 +2993,12 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 22: {
-		raise_single_event(core.attacker, 0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 0);
+		int32 r = core.temp_var[2] == 0? 0 : REASON_REPLACE;
+		raise_single_event(core.attacker, 0, EVENT_BATTLE_CONFIRM, 0, r, 0, 0, 0);
 		if(core.attack_target) {
 			if(core.attack_target->temp.position & POS_FACEDOWN)
 				core.pre_field[1] = core.attack_target->fieldid_r;
-			raise_single_event(core.attack_target, 0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 1);
+			raise_single_event(core.attack_target, 0, EVENT_BATTLE_CONFIRM, 0, r, 0, 0, 1);
 		}
 		raise_event((card*)0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 0);
 		process_single_event();
@@ -3022,14 +3024,17 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 23: {
 		if((core.sub_attack_target != (card*)0xffffffff) || core.sub_attacker) {
-			core.attacker = core.sub_attacker;
-			core.attack_target = core.sub_attack_target;
+			if(core.sub_attacker)
+				core.attacker = core.sub_attacker;
+			if(core.sub_attack_target != (card*)0xffffffff)
+				core.attack_target = core.sub_attack_target;
 			core.units.begin()->step = 20;
 			core.pre_field[0] = core.attacker->fieldid_r;
 			if(core.attack_target)
 				core.pre_field[1] = core.attack_target->fieldid_r;
 			else
 				core.pre_field[1] = 0;
+			core.temp_var[2] = 1;
 			return FALSE;
 		}
 		if(core.attacker->current.location != LOCATION_MZONE || core.attacker->fieldid_r != core.pre_field[0]
