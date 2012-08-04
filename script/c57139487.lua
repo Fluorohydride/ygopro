@@ -25,7 +25,7 @@ function c57139487.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end
 function c57139487.efilter(c,e)
-	return c:IsFaceup() and c:IsRelateToEffect(e)
+	return c:IsFaceup() and c:IsAttackBelow(1000) and c:IsRelateToEffect(e)
 end
 function c57139487.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

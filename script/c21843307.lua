@@ -29,12 +29,13 @@ function c21843307.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,ec:GetCode(),0,0x11,0,0,ec:GetLevel(),RACE_WARRIOR,ATTRIBUTE_LIGHT) then return end
 	c:AddTrapMonsterAttribute(true,ATTRIBUTE_LIGHT,RACE_WARRIOR,ec:GetLevel(),0,0)
-	Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
-	c:TrapMonsterBlock()
+	Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CHANGE_CODE)
 	e1:SetValue(ec:GetCode())
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e1)
+	Duel.SpecialSummonComplete()
+	c:TrapMonsterBlock()
 end

@@ -23,7 +23,8 @@ function c73417207.target(e,syncard,f,minc,maxc)
 end
 function c73417207.operation(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
-	local g=Duel.GetMatchingGroup(c73417207.synfilter,syncard:GetControler(),LOCATION_HAND,0,c,syncard,f)
+	local g=Duel.GetMatchingGroup(c73417207.filter,syncard:GetControler(),LOCATION_HAND,0,c,syncard,f)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,2,2,syncard)
 	Duel.SetSynchroMaterial(sg)
 end

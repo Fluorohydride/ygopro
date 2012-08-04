@@ -21,7 +21,7 @@ function c26931058.filter3(c,e,tp)
 end
 function c26931058.eftg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	local b1=Duel.IsExistingMatchingCard(c26931058.filter1,tp,LOCATION_MZONE,0,2,nil,tp) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+	local b1=Duel.IsExistingMatchingCard(c26931058.filter1,tp,LOCATION_MZONE,0,1,nil,tp) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 	local b2=Duel.IsExistingMatchingCard(c26931058.filter3,tp,LOCATION_SZONE,0,1,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	if chk==0 then return b1 or b2 end
 	local op=0
