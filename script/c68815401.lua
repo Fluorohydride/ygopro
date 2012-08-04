@@ -43,6 +43,7 @@ function c68815401.activate(e,tp,eg,ep,ev,re,r,rp)
 		local dg2=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 		if Duel.Destroy(dg2,REASON_EFFECT)>0
 			and Duel.IsPlayerCanSpecialSummonMonster(tp,68815402,0,0x4011,1000,1000,3,RACE_PYRO,ATTRIBUTE_FIRE) then
+			Duel.BreakEffect()
 			local token=Duel.CreateToken(tp,68815402)
 			Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 		end

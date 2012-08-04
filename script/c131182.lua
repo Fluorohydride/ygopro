@@ -82,7 +82,7 @@ function c131182.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c131182.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not bit.band(r,REASON_BATTLE) and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return bit.band(r,REASON_EFFECT)~=0 and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 function c131182.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDestructable() end
