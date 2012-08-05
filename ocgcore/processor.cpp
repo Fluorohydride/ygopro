@@ -1542,7 +1542,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	}
 	case 8: {
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		core.units.begin()->step = 0;
+		core.units.begin()->step = -1;
 		return FALSE;
 	}
 	case 9: {
@@ -1579,7 +1579,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	}
 	case 11: {
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		core.units.begin()->step = 0;
+		core.units.begin()->step = -1;
 		return FALSE;
 	}
 	case 15: {
@@ -1591,7 +1591,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	case 16: {
 		if(core.new_fchain.size() || core.new_ochain.size()) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->step = 0;
+			core.units.begin()->step = -1;
 			return FALSE;
 		}
 		core.quick_f_chain.clear();
