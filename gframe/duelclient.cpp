@@ -1562,8 +1562,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->WaitFrameSignal(10);
 			}
 		}
-		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i)
+		for (int i = 0; i < mainGame->dField.deck[player].size(); ++i) {
 			mainGame->dField.deck[player][i]->code = 0;
+			mainGame->dField.deck[player][i]->is_reversed = false;
+		}
 		if(!mainGame->dInfo.isReplay || !mainGame->dInfo.isReplaySkiping) {
 			for (int i = 0; i < 5; ++i) {
 				for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
@@ -1666,7 +1668,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int player = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		int seq = BufferIO::ReadInt8(pbuf);
 		int code = BufferIO::ReadInt32(pbuf);
-		mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq)->SetCode(code);
+		ClientCard* pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq);
+		pcard->is_reversed = (code & 0x80000000) != 0;
+		pcard->SetCode(code & 0x7fffff);
+		mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
 		return true;
 	}
 	case MSG_SHUFFLE_SET_CARD: {

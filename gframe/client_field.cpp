@@ -148,6 +148,7 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 			deck[controler][0] = pcard;
 			pcard->sequence = 0;
 		}
+		pcard->is_reversed = false;
 		break;
 	}
 	case LOCATION_HAND: {
@@ -636,7 +637,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			t->X = 7.3f;
 			t->Y = 3.0f;
 			t->Z = 0.01f + 0.01f * sequence;
-			if(!deck_reversed) {
+			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
 				r->Y = 3.1415926f;
 				r->Z = 0.0f;
@@ -649,7 +650,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			t->X = 0.6f;
 			t->Y = -3.0f;
 			t->Z = 0.01f + 0.01f * sequence;
-			if(!deck_reversed) {
+			if(deck_reversed == pcard->is_reversed) {
 				r->X = 0.0f;
 				r->Y = 3.1415926f;
 				r->Z = 3.1415926f;

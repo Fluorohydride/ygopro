@@ -2518,29 +2518,39 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			cv.push_back(*cit);
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		if(core.deck_reversed) {
-			int32 d0 = player[0].list_main.size() - 1, s0 = d0;
-			int32 d1 = player[1].list_main.size() - 1, s1 = d1;
-			for(uint32 i = 0; i < cv.size(); ++i) {
-				card* pcard = cv[i];
-				if(pcard->current.location != LOCATION_DECK)
-					continue;
-				if((pcard->current.controler == 0) && (pcard->current.sequence == s0))
-					s0--;
-				if((pcard->current.controler == 1) && (pcard->current.sequence == s1))
-					s1--;
-			}
-			if((s0 != d0) && (s0 > 0)) {
+		int32 d0 = player[0].list_main.size() - 1, s0 = d0;
+		int32 d1 = player[1].list_main.size() - 1, s1 = d1;
+		for(uint32 i = 0; i < cv.size(); ++i) {
+			card* pcard = cv[i];
+			if(pcard->current.location != LOCATION_DECK)
+				continue;
+			if((pcard->current.controler == 0) && (pcard->current.sequence == s0))
+				s0--;
+			if((pcard->current.controler == 1) && (pcard->current.sequence == s1))
+				s1--;
+		}
+		if((s0 != d0) && (s0 > 0)) {
+			card* ptop = player[0].list_main[s0];
+			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 				pduel->write_buffer8(MSG_DECK_TOP);
 				pduel->write_buffer8(0);
 				pduel->write_buffer8(d0 - s0);
-				pduel->write_buffer32(player[0].list_main[s0]->data.code);
+				if(ptop->current.position != POS_FACEUP_DEFENCE)
+					pduel->write_buffer32(ptop->data.code);
+				else
+					pduel->write_buffer32(ptop->data.code | 0x80000000);
 			}
-			if((s1 != d1) && (s1 > 0)) {
+		}
+		if((s1 != d1) && (s1 > 0)) {
+			card* ptop = player[0].list_main[s0];
+			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 				pduel->write_buffer8(MSG_DECK_TOP);
 				pduel->write_buffer8(1);
 				pduel->write_buffer8(d1 - s1);
-				pduel->write_buffer32(player[1].list_main[s1]->data.code);
+				if(ptop->current.position != POS_FACEUP_DEFENCE)
+					pduel->write_buffer32(ptop->data.code);
+				else
+					pduel->write_buffer32(ptop->data.code | 0x80000000);
 			}
 		}
 		for (auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
@@ -2933,14 +2943,20 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		return FALSE;
 	}
 	case 2: {
-		if(core.deck_reversed && (target->current.location == LOCATION_DECK)) {
+		if(target->current.location == LOCATION_DECK) {
 			uint32 curp = target->current.controler;
 			uint32 curs = target->current.sequence;
 			if(curs > 0 && (curs == player[curp].list_main.size() - 1)) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(curp);
-				pduel->write_buffer8(1);
-				pduel->write_buffer32(player[curp].list_main[curs - 1]->data.code);
+				card* ptop = player[curp].list_main[curs - 1];
+				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(curp);
+					pduel->write_buffer8(1);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
+				}
 			}
 		}
 		pduel->write_buffer8(MSG_MOVE);

@@ -139,16 +139,18 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		if (sequence == 0) {		//deck top
 			player[playerid].list_main.push_back(pcard);
 			pcard->current.sequence = player[playerid].list_main.size() - 1;
+			pcard->current.position = POS_FACEUP_ATTACK;
 		} else if (sequence == 1) {		//deck button
 			player[playerid].list_main.insert(player[playerid].list_main.begin(), pcard);
 			reset_sequence(playerid, LOCATION_DECK);
+			pcard->current.position = POS_FACEDOWN;
 		} else {		//deck top & shuffle
 			player[playerid].list_main.push_back(pcard);
 			pcard->current.sequence = player[playerid].list_main.size() - 1;
 			if(!core.shuffle_check_disabled)
 				core.shuffle_deck_check[playerid] = TRUE;
+			pcard->current.position = POS_FACEDOWN;
 		}
-		pcard->current.position = POS_FACEDOWN;
 		break;
 	case LOCATION_HAND:
 		player[playerid].list_hand.push_back(pcard);
@@ -455,7 +457,7 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, ui
 	}
 }
 void field::shuffle(uint8 playerid, uint8 location) {
-	if(!(location & (LOCATION_HAND + LOCATION_DECK)))
+	if(!(location & (LOCATION_HAND | LOCATION_DECK)))
 		return;
 	card_vector& svector = (location == LOCATION_HAND) ? player[playerid].list_hand : player[playerid].list_main;
 	if(svector.size() == 0)
@@ -469,6 +471,9 @@ void field::shuffle(uint8 playerid, uint8 location) {
 			core.shuffle_hand_check[playerid] = FALSE;
 			return;
 		}
+	} else {
+		for(auto cit = svector.begin(); cit != svector.end(); ++cit)
+			(*cit)->current.position = POS_FACEDOWN;
 	}
 	if(location == LOCATION_HAND || !(core.duel_options & DUEL_PSEUDO_SHUFFLE)) {
 		if(svector.size() > 1) {

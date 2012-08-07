@@ -17,6 +17,7 @@ ClientCard::ClientCard() {
 	is_showtarget = false;
 	is_highlighting = false;
 	is_disabled = false;
+	is_reversed = false;
 	cmdFlag = 0;
 	code = 0;
 	type = 0;
