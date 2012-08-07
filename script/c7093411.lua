@@ -51,9 +51,6 @@ function c7093411.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)
 	c:RegisterEffect(e1)
 	Duel.RaiseEvent(c,47408488,e,0,tp,0,0)
 end
-function c7093411.filter(c)
-	return c:IsSetCard(0x34)
-end
 function c7093411.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK+LOCATION_GRAVE+LOCATION_HAND,0,1,nil,0x34)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0 end

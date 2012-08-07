@@ -14,7 +14,7 @@ end
 function c50957346.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
-function c50957346.filter(c,e,tp)
+function c50957346.filter(c)
 	return (c:IsFacedown() or c:IsAttribute(0xff-ATTRIBUTE_EARTH)) and c:IsDestructable()
 end
 function c50957346.target(e,tp,eg,ep,ev,re,r,rp,chk)

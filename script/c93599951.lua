@@ -13,9 +13,6 @@ end
 function c93599951.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer() and Duel.GetAttackTarget()
 end
-function c93599951.filter(c,e)
-	return c:IsCanBeEffectTarget(e)
-end
 function c93599951.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local a=Duel.GetAttacker()

@@ -41,10 +41,6 @@ function c77859858.initial_effect(c)
 	e6:SetOperation(c77859858.costop)
 	c:RegisterEffect(e6)
 end
-function c77859858.recop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Recover(p,d,REASON_EFFECT)
-end
 function c77859858.leave(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetPreviousControler()==tp and c:IsStatus(STATUS_ACTIVATED) then

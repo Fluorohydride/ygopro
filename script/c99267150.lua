@@ -20,16 +20,6 @@ end
 function c99267150.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
-function c99267150.fscondition(e,g,gc)
-	if g==nil then return false end
-	if gc then return gc:IsRace(RACE_DRAGON) and g:IsExists(Card.IsRace,4,gc,RACE_DRAGON) end
-	return g:IsExists(Card.IsRace,5,nil,RACE_DRAGON)
-end
-function c99267150.fsoperation(e,tp,eg,ep,ev,re,r,rp,gc)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-	if gc then Duel.SetFusionMaterial(eg:FilterSelect(tp,Card.IsRace,4,4,gc,RACE_DRAGON))
-	else Duel.SetFusionMaterial(eg:FilterSelect(tp,Card.IsRace,5,5,nil,RACE_DRAGON)) end
-end
 function c99267150.batfilter(e,c)
 	return c:IsAttribute(0x2f)
 end

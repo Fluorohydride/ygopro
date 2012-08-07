@@ -15,11 +15,11 @@ function c30461781.filter(c)
 end
 function c30461781.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	local d = 1
+	local d=1
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>1
-		and Duel.IsExistingMatchingCard(c30461781.filter,tp,0,LOCATION_MZONE,1,nil,TYPE_SPIRIT)
-		and Duel.SelectOption(tp,aux.Stringid(30461781,0),aux.Stringid(30461781,1)) == 1 then
-		d = 2
+		and Duel.IsExistingMatchingCard(c30461781.filter,tp,0,LOCATION_MZONE,1,nil)
+		and Duel.SelectOption(tp,aux.Stringid(30461781,0),aux.Stringid(30461781,1))==1 then
+		d=2
 	end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(d)

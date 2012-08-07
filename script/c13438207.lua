@@ -11,9 +11,6 @@ function c13438207.initial_effect(c)
 	e1:SetOperation(c13438207.activate)
 	c:RegisterEffect(e1)
 end
-function c13438207.filter(c,p)
-	return c:GetControler()==p and c:IsOnField()
-end
 function c13438207.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	local bc=tc:GetBattleTarget()

@@ -9,10 +9,7 @@ function c13532663.initial_effect(c)
 	e1:SetOperation(c13532663.operation)
 	c:RegisterEffect(e1)
 end
-function c13532663.filter(c)
-	return c:IsType(TYPE_SPELL) and c:IsAbleToHand()
-end
-function c13532663.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c13532663.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,nil,0,0,0)
 end

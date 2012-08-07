@@ -6,6 +6,7 @@ function c8074847.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_TO_HAND)
 	e1:SetCondition(c8074847.condition)
+	e1:SetTarget(c8074847.target)
 	e1:SetOperation(c8074847.operation)
 	c:RegisterEffect(e1)
 end

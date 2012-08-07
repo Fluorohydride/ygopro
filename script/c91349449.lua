@@ -53,7 +53,7 @@ function c91349449.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.IsExistingTarget(c91349449.filter1,tp,LOCATION_REMOVED,0,1,nil)
 		and Duel.IsExistingTarget(c91349449.filter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g1=Duel.SelectTarget(tp,c91349449.filter1,tp,LOCATION_REMOVED,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g1,1,0,0)
 	e:SetLabelObject(g1:GetFirst())

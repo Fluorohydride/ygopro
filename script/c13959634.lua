@@ -36,9 +36,6 @@ function c13959634.spcon(e,c)
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
 		Duel.GetMatchingGroupCount(Card.IsAttribute,c:GetControler(),LOCATION_GRAVE,0,nil,ATTRIBUTE_WATER)==5
 end
-function c13959634.filter(c,e,tp)
-	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function c13959634.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,13959634)==0 end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,2)

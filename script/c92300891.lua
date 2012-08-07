@@ -44,10 +44,6 @@ function c92300891.posop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 	end
 end
-function c92300891.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReason(REASON_BATTLE) end
-	return true
-end
 function c92300891.valcon(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
 end

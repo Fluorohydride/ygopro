@@ -10,7 +10,7 @@ function c89899996.initial_effect(c)
 	e1:SetOperation(c89899996.operation)
 	c:RegisterEffect(e1)
 end
-function c89899996.cfilter(c,tp)
+function c89899996.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xc008)
 end
 function c89899996.condition(e,tp,eg,ep,ev,re,r,rp)

@@ -22,7 +22,7 @@ function c7243511.cfilter(c)
 end
 function c7243511.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c7243511.cfilter,tp,LOCATION_HAND,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local cg=Duel.SelectMatchingCard(tp,c7243511.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(cg,REASON_COST)
 end
