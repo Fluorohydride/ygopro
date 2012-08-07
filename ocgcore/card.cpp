@@ -91,27 +91,27 @@ uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
 		if(query_flag & QUERY_BASE_DEFENCE) q_cache.base_defence = *p++ = get_base_defence();
 		if(query_flag & QUERY_REASON) q_cache.reason = *p++ = current.reason;
 	} else {
-		if((query_flag & QUERY_ALIAS) && ((tdata = get_code()) != q_cache.alias)) {
+		if((query_flag & QUERY_ALIAS) && ((uint32)(tdata = get_code()) != q_cache.alias)) {
 			q_cache.alias = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_ALIAS;
-		if((query_flag & QUERY_TYPE) && ((tdata = get_type()) != q_cache.type)) {
+		if((query_flag & QUERY_TYPE) && ((uint32)(tdata = get_type()) != q_cache.type)) {
 			q_cache.type = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_TYPE;
-		if((query_flag & QUERY_LEVEL) && ((tdata = get_level()) != q_cache.level)) {
+		if((query_flag & QUERY_LEVEL) && ((uint32)(tdata = get_level()) != q_cache.level)) {
 			q_cache.level = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_LEVEL;
-		if((query_flag & QUERY_RANK) && ((tdata = get_rank()) != q_cache.rank)) {
+		if((query_flag & QUERY_RANK) && ((uint32)(tdata = get_rank()) != q_cache.rank)) {
 			q_cache.rank = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_RANK;
-		if((query_flag & QUERY_ATTRIBUTE) && ((tdata = get_attribute()) != q_cache.attribute)) {
+		if((query_flag & QUERY_ATTRIBUTE) && ((uint32)(tdata = get_attribute()) != q_cache.attribute)) {
 			q_cache.attribute = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_ATTRIBUTE;
-		if((query_flag & QUERY_RACE) && ((tdata = get_race()) != q_cache.race)) {
+		if((query_flag & QUERY_RACE) && ((uint32)(tdata = get_race()) != q_cache.race)) {
 			q_cache.race = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_RACE;
@@ -131,7 +131,7 @@ uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
 			q_cache.base_defence = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_BASE_DEFENCE;
-		if((query_flag & QUERY_REASON) && ((tdata = current.reason) != q_cache.reason)) {
+		if((query_flag & QUERY_REASON) && ((uint32)(tdata = current.reason) != q_cache.reason)) {
 			q_cache.reason = tdata;
 			*p++ = tdata;
 		} else query_flag &= ~QUERY_REASON;
@@ -1253,7 +1253,7 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 		return FALSE;
 	if(min == 0)
 		return TRUE;
-	uint32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
+	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
 	if(m >= min)
 		return TRUE;
 	return FALSE;
@@ -1288,7 +1288,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 		return FALSE;
 	if(min == 0)
 		return TRUE;
-	uint32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
+	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
 	if(m >= min)
 		return TRUE;
 	return FALSE;
@@ -1771,7 +1771,7 @@ int32 card::is_releasable_by_nonsummon(uint8 playerid) {
 		return FALSE;
 	if(current.location & (LOCATION_GRAVE + LOCATION_REMOVED))
 		return FALSE;
-	if((current.location == LOCATION_HAND) && (data.type & TYPE_SPELL + TYPE_TRAP))
+	if((current.location == LOCATION_HAND) && (data.type & (TYPE_SPELL | TYPE_TRAP)))
 		return FALSE;
 	if(!pduel->game_field->is_player_can_release(playerid, this))
 		return FALSE;

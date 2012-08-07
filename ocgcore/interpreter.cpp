@@ -853,7 +853,7 @@ int32 interpreter::check_matching(card* pcard, int32 findex, int32 extraargs) {
 	call_depth++;
 	lua_pushvalue(current_state, findex);
 	interpreter::card2value(current_state, pcard);
-	for(uint32 i = 0; i < extraargs; ++i)
+	for(int32 i = 0; i < extraargs; ++i)
 		lua_pushvalue(current_state, (int32)(-extraargs - 2));
 	if (lua_pcall(current_state, 1 + extraargs, 1, 0)) {
 		sprintf(pduel->strbuffer, lua_tostring(current_state, -1));
@@ -881,7 +881,7 @@ int32 interpreter::get_operation_value(card* pcard, int32 findex, int32 extraarg
 	call_depth++;
 	lua_pushvalue(current_state, findex);
 	interpreter::card2value(current_state, pcard);
-	for(uint32 i = 0; i < extraargs; ++i)
+	for(int32 i = 0; i < extraargs; ++i)
 		lua_pushvalue(current_state, (int32)(-extraargs - 2));
 	if (lua_pcall(current_state, 1 + extraargs, 1, 0)) {
 		sprintf(pduel->strbuffer, lua_tostring(current_state, -1));

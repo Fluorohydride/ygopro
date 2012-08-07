@@ -957,11 +957,17 @@ int32 field::process() {
 					tc[count - i - 1]->current.sequence = player[target_player].list_main.size() - 1;
 				}
 			}
-			if(count > 0 && core.deck_reversed) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(target_player);
-				pduel->write_buffer8(0);
-				pduel->write_buffer32((*player[target_player].list_main.rbegin())->data.code);
+			if(count > 0) {
+				card* ptop = *player[target_player].list_main.rbegin();
+				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(target_player);
+					pduel->write_buffer8(0);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
+				}
 			}
 			core.units.pop_front();
 		}
@@ -2476,7 +2482,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.chain_attack_target = 0;
 		core.attacker = 0;
 		core.attack_target = 0;
-		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
 			core.units.begin()->step = 39;
 			core.units.begin()->arg1 = 2;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
@@ -2768,7 +2774,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		}
 		effect* peffect;
-		if(peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
 			core.units.begin()->step = 39;
 			core.units.begin()->arg1 = 2;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
@@ -2993,7 +2999,7 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 22: {
-		int32 r = core.temp_var[2] == 0? 0 : REASON_REPLACE;
+		int32 r = core.temp_var[2] == 0 ? 0 : REASON_REPLACE;
 		raise_single_event(core.attacker, 0, EVENT_BATTLE_CONFIRM, 0, r, 0, 0, 0);
 		if(core.attack_target) {
 			if(core.attack_target->temp.position & POS_FACEDOWN)
@@ -4317,7 +4323,7 @@ int32 field::refresh_location_info(uint16 step) {
 			player[p].disabled_location |= (value >> 16) & 0x1f;
 			if(field_used_count[(value >> 16) & 0x1f] == 0)
 				core.extraz_effects_e.add_item(eset[i]);
-			else if(field_used_count[(value >> 16) & 0x1f] < (value & 0xffff))
+			else if((uint32)field_used_count[(value >> 16) & 0x1f] < (value & 0xffff))
 				core.extraz_effects.add_item(eset[i]);
 		}
 		eset.clear();
@@ -4328,7 +4334,7 @@ int32 field::refresh_location_info(uint16 step) {
 			player[p].disabled_location |= (value >> 8) & 0x1f00;
 			if(field_used_count[(value >> 16) & 0x1f] == 0)
 				core.extraz_effects_e.add_item(eset[i]);
-			else if(field_used_count[(value >> 16) & 0x1f] < (value & 0xffff))
+			else if((uint32)field_used_count[(value >> 16) & 0x1f] < (value & 0xffff))
 				core.extraz_effects.add_item(eset[i]);
 		}
 		return FALSE;
@@ -4699,14 +4705,14 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 11: {
 		//shuffle check
-		for(int32 i = 0; i < player[0].list_hand.size(); ++i) {
+		for(uint32 i = 0; i < player[0].list_hand.size(); ++i) {
 			card* pcard = player[0].list_hand[i];
 			int32 pub = pcard->is_affected_by_effect(EFFECT_PUBLIC) ? TRUE : FALSE;
 			if(!pub && (pcard->status & STATUS_IS_PUBLIC))
 				core.shuffle_hand_check[0] = TRUE;
 			pcard->set_status(STATUS_IS_PUBLIC, pub);
 		}
-		for(int32 i = 0; i < player[1].list_hand.size(); ++i) {
+		for(uint32 i = 0; i < player[1].list_hand.size(); ++i) {
 			card* pcard = player[1].list_hand[i];
 			int32 pub = pcard->is_affected_by_effect(EFFECT_PUBLIC) ? TRUE : FALSE;
 			if(!pub && (pcard->status & STATUS_IS_PUBLIC))
@@ -4730,16 +4736,24 @@ int32 field::adjust_step(uint16 step) {
 			pduel->write_buffer8(MSG_REVERSE_DECK);
 			if(res) {
 				if(player[0].list_main.size()) {
+					card* ptop = *player[0].list_main.rbegin();
 					pduel->write_buffer8(MSG_DECK_TOP);
 					pduel->write_buffer8(0);
 					pduel->write_buffer8(0);
-					pduel->write_buffer32((*player[0].list_main.rbegin())->data.code);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
 				}
 				if(player[1].list_main.size()) {
+					card* ptop = *player[1].list_main.rbegin();
 					pduel->write_buffer8(MSG_DECK_TOP);
 					pduel->write_buffer8(1);
 					pduel->write_buffer8(0);
-					pduel->write_buffer32((*player[1].list_main.rbegin())->data.code);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
 				}
 			}
 		}

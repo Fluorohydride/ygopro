@@ -148,6 +148,7 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 			if(!core.shuffle_check_disabled)
 				core.shuffle_deck_check[playerid] = TRUE;
 		}
+		pcard->current.position = POS_FACEDOWN;
 		break;
 	case LOCATION_HAND:
 		player[playerid].list_hand.push_back(pcard);
@@ -492,11 +493,15 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(MSG_SHUFFLE_DECK);
 		pduel->write_buffer8(playerid);
 		core.shuffle_deck_check[playerid] = FALSE;
-		if(core.deck_reversed) {
+		card* ptop = *svector.rbegin();
+		if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 			pduel->write_buffer8(MSG_DECK_TOP);
 			pduel->write_buffer8(playerid);
 			pduel->write_buffer8(0);
-			pduel->write_buffer32((*svector.rbegin())->data.code);
+			if(ptop->current.position != POS_FACEUP_DEFENCE)
+				pduel->write_buffer32(ptop->data.code);
+			else
+				pduel->write_buffer32(ptop->data.code | 0x80000000);
 		}
 	}
 }
@@ -1041,7 +1046,7 @@ effect* field::is_player_affected_by_effect(uint8 playerid, uint32 code) {
 int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* ex_list, int32 use_con, int32 use_hand, int32 fun, int32 exarg, card* exp) {
 	card* pcard;
 	uint32 rcount = 0;
-	for(int i = 0; i < 5; ++i) {
+	for(uint32 i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
 		if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 		        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
@@ -1052,7 +1057,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 		}
 	}
 	if(use_hand) {
-		for(int i = 0; i < player[playerid].list_hand.size(); ++i) {
+		for(uint32 i = 0; i < player[playerid].list_hand.size(); ++i) {
 			pcard = player[playerid].list_hand[i];
 			if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 			        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
@@ -1063,7 +1068,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 			}
 		}
 	}
-	for(int i = 0; i < 5; ++i) {
+	for(uint32 i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard != exp && (pcard->is_position(POS_FACEUP) || !use_con) && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)
 		        && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
@@ -1077,7 +1082,7 @@ int32 field::get_release_list(uint8 playerid, card_set* release_list, card_set* 
 }
 int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int32 use_hand, int32 fun, int32 exarg, card* exp) {
 	card* pcard;
-	for(int i = 0; i < 5; ++i) {
+	for(uint32 i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
 		if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 		        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
@@ -1087,7 +1092,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 		}
 	}
 	if(use_hand) {
-		for(int i = 0; i < player[playerid].list_hand.size(); ++i) {
+		for(uint32 i = 0; i < player[playerid].list_hand.size(); ++i) {
 			pcard = player[playerid].list_hand[i];
 			if(pcard && pcard != exp && pcard->is_releasable_by_nonsummon(playerid)
 			        && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
@@ -1097,7 +1102,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 			}
 		}
 	}
-	for(int i = 0; i < 5; ++i) {
+	for(uint32 i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard != exp && (!use_con || pcard->is_position(POS_FACEUP)) && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)
 		        && pcard->is_releasable_by_nonsummon(playerid) && (!use_con || pduel->lua->check_matching(pcard, fun, exarg))) {
