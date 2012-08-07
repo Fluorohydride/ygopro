@@ -42,7 +42,7 @@ end
 function c59385322.eqlimit(e,c)
 	return c:IsSetCard(0x1d)
 end
-function c59385322.filter(c,tp)
+function c59385322.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1d)
 end
 function c59385322.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

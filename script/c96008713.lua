@@ -14,12 +14,12 @@ end
 function c96008713.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)>0
 end
-function c96008713.filter(c,e,tp)
+function c96008713.filter(c)
 	return c:IsFaceup() and c:IsControlerCanBeChanged()
 end
 function c96008713.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local atr=Duel.GetAttacker()
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c96008713.filter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c96008713.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c96008713.filter,tp,0,LOCATION_MZONE,1,atr) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c96008713.filter,tp,0,LOCATION_MZONE,1,1,atr)

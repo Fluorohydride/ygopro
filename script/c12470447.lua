@@ -27,7 +27,7 @@ function c12470447.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_ST_AVAILABLE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetReset(RESET_PHASE+PHASE_END)

@@ -15,8 +15,8 @@ function c57728570.costfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAttackBelow(1000)
 end
 function c57728570.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c57728570.costfilter,1,nil,ATTRIBUTE_DARK) end
-	local g=Duel.SelectReleaseGroup(tp,c57728570.costfilter,1,1,nil,ATTRIBUTE_DARK)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c57728570.costfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,c57728570.costfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c57728570.tgfilter(c)

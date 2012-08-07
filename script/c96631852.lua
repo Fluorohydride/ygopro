@@ -17,10 +17,6 @@ function c96631852.initial_effect(c)
 	e2:SetOperation(c96631852.desop)
 	c:RegisterEffect(e2)
 end
-function c96631852.filter(c)
-	local code=c:GetCode()
-	return c:IsFaceup() and (code==8508055 or code==3810071 or code==49814180)
-end
 function c96631852.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end

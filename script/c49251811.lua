@@ -9,7 +9,7 @@ function c49251811.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c49251811.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasTyp(EFFECT_TYPE_ACTIVATE) and re:GetActiveType()==TYPE_CONTINUOUS+TYPE_SPELL
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetActiveType()==TYPE_CONTINUOUS+TYPE_SPELL
 end
 function c49251811.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

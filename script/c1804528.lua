@@ -15,9 +15,6 @@ function c1804528.descon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 		and e:GetHandler():IsPreviousPosition(POS_FACEDOWN)
 end
-function c1804528.desfilter(c)
-	return c:IsFaceup() and c:IsDestructable()
-end
 function c1804528.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 	local g2=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)

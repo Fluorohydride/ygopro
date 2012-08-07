@@ -14,7 +14,7 @@ function c61831093.filter(c,e)
 	return c:IsFacedown() and c:IsDestructable() and c:IsCanBeEffectTarget(e)
 end
 function c61831093.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_SZONE and c61831093.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and c61831093.filter(chkc,e) end
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c61831093.filter,tp,LOCATION_SZONE,LOCATION_SZONE,nil,e)
 	if g:GetCount()<2 then

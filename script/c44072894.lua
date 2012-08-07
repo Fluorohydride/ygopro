@@ -14,7 +14,7 @@ function c44072894.filter(c,e)
 	return c:IsReason(REASON_FUSION) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)
 end
 function c44072894.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c44072894.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c44072894.filter(chkc,e) end
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c44072894.filter,tp,LOCATION_GRAVE,0,nil,e)
 	if g:GetCount()>=2 then

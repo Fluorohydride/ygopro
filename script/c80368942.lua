@@ -9,9 +9,6 @@ function c80368942.initial_effect(c)
 	e1:SetOperation(c80368942.activate)
 	c:RegisterEffect(e1)
 end
-function c80368942.filter(c,e,tp)
-	return c:IsLevelBelow(4) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function c80368942.gfilter(c)
 	return c:IsSetCard(0x1f) and c:IsType(TYPE_MONSTER)
 end

@@ -47,9 +47,9 @@ end
 function c4694209.addct2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsFaceup() end
 	if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,0x21,1,REASON_EFFECT)
-		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,e:GetHandler(),0x21,1) end
+		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(98162021,1))
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler(),0x21,1)
+	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
 end
 function c4694209.addc2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

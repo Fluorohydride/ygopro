@@ -15,7 +15,7 @@ function c55013285.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c55013285.filter(c,e,tp)
-	return c:IsCode(55013285) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENCE)
+	return c:IsCode(55013285) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c55013285.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

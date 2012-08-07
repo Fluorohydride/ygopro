@@ -14,7 +14,7 @@ function c32298781.filter(c)
 	return c:IsFaceup() and bit.band(tpe,TYPE_NORMAL)~=0 and bit.band(tpe,TYPE_TOKEN)==0 and c:GetLevel()==1
 end
 function c32298781.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c32298781.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c32298781.filter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function c32298781.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c32298781.filter,tp,LOCATION_MZONE,0,nil)

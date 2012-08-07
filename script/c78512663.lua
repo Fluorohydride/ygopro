@@ -92,7 +92,7 @@ function c78512663.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Group.CreateGroup()
 	local tc=nil
 	for i=1,3 do
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		if ft<=0 then
 			tc=g1:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
 		else

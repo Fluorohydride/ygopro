@@ -9,9 +9,6 @@ function c90887783.initial_effect(c)
 	e1:SetOperation(c90887783.operation)
 	c:RegisterEffect(e1)
 end
-function c90887783.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsLocation(LOCATION_GRAVE)
-end
 function c90887783.filter1(c,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsAbleToDeck() and not c:IsPublic()
 		and Duel.IsExistingMatchingCard(c90887783.filter2,tp,LOCATION_DECK,0,1,nil,c:GetLevel())

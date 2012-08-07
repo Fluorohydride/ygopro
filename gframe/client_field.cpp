@@ -952,7 +952,7 @@ bool ClientField::CheckSelectSum() {
 		for(sit = selable.begin(); sit != selable.end(); ++sit) {
 			op1 = (*sit)->opParam & 0xffff;
 			op2 = (*sit)->opParam >> 16;
-			m = (op2 > 0 && op1 > op2) ? op2 : op1;
+			m = op1;
 			sums = sumc;
 			sums += m;
 			ms = mm;
@@ -961,8 +961,23 @@ bool ClientField::CheckSelectSum() {
 			if (sums >= select_sumval) {
 				if (sums - ms < select_sumval)
 					selectsum_cards.insert(*sit);
-				else
-					continue;
+			} else {
+				std::set<ClientCard*> left(selable);
+				left.erase(*sit);
+				if (check_min(left, left.begin(), select_sumval - sums, select_sumval - sums + ms - 1))
+					selectsum_cards.insert(*sit);
+			}
+			if (op2 == 0)
+				continue;
+			m = op2;
+			sums = sumc;
+			sums += m;
+			ms = mm;
+			if (ms == -1 || m < ms)
+				ms = m;
+			if (sums >= select_sumval) {
+				if (sums - ms < select_sumval)
+					selectsum_cards.insert(*sit);
 			} else {
 				std::set<ClientCard*> left(selable);
 				left.erase(*sit);

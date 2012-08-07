@@ -30,9 +30,6 @@ function c74730899.spcon(e,c)
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c74730899.spfilter,tp,LOCATION_MZONE,0,2,nil)
 end
-function c74730899.costfilter(c)
-	return c:IsRace(RACE_THUNDER) and c:IsAbleToRemoveAsCost()
-end
 function c74730899.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0x28) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,e:GetHandler(),0x28)

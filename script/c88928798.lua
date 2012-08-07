@@ -10,9 +10,6 @@ function c88928798.initial_effect(c)
 	e1:SetOperation(c88928798.activate)
 	c:RegisterEffect(e1)
 end
-function c88928798.filter(c,p)
-	return c:GetControler()==p and c:IsOnField()
-end
 function c88928798.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) or not Duel.IsChainNegatable(ev) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)

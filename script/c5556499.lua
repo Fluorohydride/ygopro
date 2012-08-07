@@ -29,7 +29,7 @@ function c5556499.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c5556499.spfilter(c,ec)
-	return c:IsRace(RACE_MACHINE) and (c~=ec or c:IsAbleToGraveAsCost())
+	return c:IsRace(RACE_MACHINE) and (c~=ec or c:IsDiscardable())
 end
 function c5556499.spcon(e,c)
 	if c==nil then return true end
@@ -40,7 +40,7 @@ function c5556499.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.GetMatchingGroup(c5556499.spfilter,c:GetControler(),LOCATION_HAND,0,nil,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local sg=g:SelectWithSumGreater(tp,Card.GetLevel,8)
-	Duel.SendtoGrave(sg,REASON_COST)
+	Duel.SendtoGrave(sg,REASON_COST+REASON_DISCARD)
 end
 function c5556499.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)

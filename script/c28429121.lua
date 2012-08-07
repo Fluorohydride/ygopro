@@ -23,7 +23,7 @@ end
 function c28429121.mfilter1(c,e)
 	return c:IsFaceup() and c:GetLevel()>0 and not c:IsImmuneToEffect(e) and c:IsReleasable()
 end
-function c28429121.mfilter2(c,e)
+function c28429121.mfilter2(c)
 	return c:IsHasEffect(EFFECT_EXTRA_RITUAL_MATERIAL) and c:IsAbleToRemove()
 end
 function c28429121.get_material(e,tp)

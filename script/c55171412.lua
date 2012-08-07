@@ -82,7 +82,7 @@ function c55171412.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Group.CreateGroup()
 	local tc=nil
 	for i=1,2 do
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		if ft<=0 then
 			tc=g1:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
 		else
@@ -115,9 +115,6 @@ end
 function c55171412.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
-end
-function c55171412.filter(c)
-	return c:IsFacedown() and c:IsDestructable()
 end
 function c55171412.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end

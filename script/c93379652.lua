@@ -40,9 +40,9 @@ function c93379652.filter(c)
 end
 function c93379652.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c93379652.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c93379652.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c93379652.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c93379652.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,e,tp)
+	local g=Duel.SelectTarget(tp,c93379652.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c93379652.operation(e,tp,eg,ep,ev,re,r,rp)

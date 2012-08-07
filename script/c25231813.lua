@@ -33,7 +33,7 @@ end
 function c25231813.eqlimit(e,c)
 	return c:IsLevelAbove(8) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO)
 end
-function c25231813.filter(c,tp)
+function c25231813.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(8) and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO)
 end
 function c25231813.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

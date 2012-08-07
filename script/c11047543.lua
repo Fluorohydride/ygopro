@@ -32,7 +32,7 @@ function c11047543.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g2=Duel.SelectTarget(tp,c11047543.filter2,tp,LOCATION_REMOVED,0,1,1,nil,e,tp,g1:GetFirst():GetLevel())
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c11047543.operation(e,tp,eg,ep,ev,re,r,rp)

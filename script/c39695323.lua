@@ -24,7 +24,7 @@ function c39695323.filter(c,e,tp)
 	return c:IsSetCard(0x59) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c39695323.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c39695323.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c39695323.filter(chkc,e,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c39695323.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

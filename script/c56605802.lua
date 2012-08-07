@@ -17,7 +17,7 @@ function c56605802.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c56605802.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,c56605802.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
+	local g=Duel.SelectTarget(tp,c56605802.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end
 function c56605802.operation(e,tp,eg,ep,ev,re,r,rp)
