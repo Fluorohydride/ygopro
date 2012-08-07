@@ -34,7 +34,6 @@ function c97342942.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	local rg=Duel.SelectReleaseGroup(tp,c97342942.rfilter,1,1,e:GetHandler(),e)
 	if Duel.Release(rg,REASON_EFFECT)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local atk=rg:GetFirst():GetBaseAttack()/2
 		Duel.Damage(1-tp,atk,REASON_EFFECT)
 	end

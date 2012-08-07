@@ -14,9 +14,6 @@ function c68057622.initial_effect(c)
 	e2:SetOperation(c68057622.desop)
 	c:RegisterEffect(e2)
 end
-function c68057622.filter(c)
-	return c:IsCode(68057622) and c:IsAbleToHand()
-end
 function c68057622.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()

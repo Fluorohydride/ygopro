@@ -36,11 +36,11 @@ end
 function c55046718.eqlimit(e,c)
 	return c:IsSetCard(0x30)
 end
-function c55046718.filter(c,tp)
+function c55046718.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x30)
 end
 function c55046718.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c55046718.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c55046718.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c55046718.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c55046718.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

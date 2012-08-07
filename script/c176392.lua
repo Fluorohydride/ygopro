@@ -24,11 +24,11 @@ end
 function c176392.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_END
 end
-function c176392.rfilter(c,rc)
-	return c~=rc and c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x1d)
+function c176392.rfilter(c)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x1d)
 end
 function c176392.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c176392.rfilter,1,nil,e:GetHandler()) end
+	if chk==0 then return eg:IsExists(c176392.rfilter,1,e:GetHandler()) end
 	if Duel.SelectYesNo(tp,aux.Stringid(176392,0)) then
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT+REASON_REPLACE)
 		return true

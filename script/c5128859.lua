@@ -84,9 +84,6 @@ function c5128859.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
-function c5128859.filter(c)
-	return c:IsFacedown() and c:IsDestructable()
-end
 function c5128859.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,1-tp,LOCATION_HAND)

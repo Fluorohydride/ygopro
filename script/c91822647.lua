@@ -14,7 +14,7 @@ end
 function c91822647.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
-function c91822647.filter1(c,e)
+function c91822647.filter1(c)
 	return c:IsSetCard(0x10) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function c91822647.filter2(c,e,tp)

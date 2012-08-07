@@ -32,7 +32,7 @@ end
 function c63851864.eqlimit(e,c)
 	return c:IsRace(RACE_MACHINE)
 end
-function c63851864.filter(c,tp)
+function c63851864.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
 end
 function c63851864.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

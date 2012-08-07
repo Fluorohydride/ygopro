@@ -21,7 +21,7 @@ end
 function c35429292.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c35429292.filter(chkc) end
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(1-tp,c35429292.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end

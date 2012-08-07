@@ -15,7 +15,7 @@ function c73079365.filter(c,tp)
 		and bit.band(c:GetReason(),0x41)==0x41
 end
 function c73079365.condition(e,tp,eg,ep,ev,re,r,rp)
-	return rp==1-rp and eg:IsExists(c73079365.filter,1,nil,tp,rp)
+	return rp==1-tp and eg:IsExists(c73079365.filter,1,nil,tp)
 end
 function c73079365.desfilter(c)
 	return c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)

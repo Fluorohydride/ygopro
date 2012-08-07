@@ -71,7 +71,7 @@ end
 function c18096222.datg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c18096222.dafilter(chkc) end
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c18096222.dafilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c18096222.daop(e,tp,eg,ep,ev,re,r,rp)

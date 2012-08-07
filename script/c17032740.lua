@@ -86,7 +86,7 @@ function c17032740.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Group.CreateGroup()
 	local tc=nil
 	for i=1,3 do
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		if ft<=0 then
 			tc=g1:FilterSelect(tp,Card.IsLocation,1,1,nil,LOCATION_MZONE):GetFirst()
 		else
@@ -125,9 +125,6 @@ end
 function c17032740.cointg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,3)
-end
-function c17032740.desfilter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c17032740.coinop(e,tp,eg,ep,ev,re,r,rp)
 	local c1,c2,c3=Duel.TossCoin(tp,3)

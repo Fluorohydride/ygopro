@@ -45,9 +45,6 @@ function c51085303.adop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e2)
 	end
 end
-function c51085303.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x3008)
-end
 function c51085303.attg(e,c)
 	return c:IsFacedown() or not c:IsCode(51085303)
 end

@@ -22,7 +22,7 @@ function c62379337.filter(c)
 	return c:IsDefenceBelow(1500) and c:IsRace(RACE_PLANT) and c:IsAbleToHand()
 end
 function c62379337.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c62379337.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)

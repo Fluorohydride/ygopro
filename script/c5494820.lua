@@ -34,8 +34,8 @@ end
 function c5494820.filter(c)
 	return c:IsFaceup() and c:IsCode(10992251)
 end
-function c5494820.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and chkc:IsCode(10992251) end
+function c5494820.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c5494820.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c5494820.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c5494820.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

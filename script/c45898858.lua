@@ -10,9 +10,6 @@ function c45898858.initial_effect(c)
 	e1:SetOperation(c45898858.activate)
 	c:RegisterEffect(e1)
 end
-function c45898858.costfilter(c)
-	return c:IsAbleToGraveAsCost() and c:IsType(TYPE_MONSTER)
-end
 function c45898858.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsCode,2,nil,22587018)
 		and Duel.CheckReleaseGroup(tp,Card.IsCode,1,nil,58071123) end

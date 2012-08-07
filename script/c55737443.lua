@@ -38,12 +38,6 @@ function c55737443.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x5c)
 	Duel.Release(g,REASON_COST)
 end
-function c55737443.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
-end
-function c55737443.value(e,c)
-	return Duel.GetMatchingGroupCount(c55737443.filter,c:GetControler(),LOCATION_REMOVED,LOCATION_REMOVED,nil)*200
-end
 function c55737443.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	return tc~=e:GetHandler() and tc:IsAttribute(ATTRIBUTE_EARTH)

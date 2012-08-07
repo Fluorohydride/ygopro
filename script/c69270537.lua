@@ -13,10 +13,6 @@ end
 function c69270537.tdfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x9) and c:IsType(TYPE_FUSION) and c:IsAbleToExtra()
 end
-function c69270537.filter2(c,e,tp,m,chkf)
-	return c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
-		and c:CheckFusionMaterial(m,nil,chkf)
-end
 function c69270537.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c69270537.tdfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c69270537.tdfilter,tp,LOCATION_MZONE,0,1,nil) end

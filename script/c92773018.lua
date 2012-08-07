@@ -29,7 +29,7 @@ function c92773018.cfilter(c)
 end
 function c92773018.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c92773018.cfilter,tp,LOCATION_MZONE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c92773018.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
@@ -43,7 +43,7 @@ function c92773018.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.SelectYesNo(tp,aux.Stringid(92773018,1)) then
 		e:SetCategory(CATEGORY_DESTROY)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local g=Duel.SelectMatchingCard(tp,c92773018.cfilter,tp,LOCATION_MZONE,0,1,1,nil)
 		Duel.SendtoGrave(g,REASON_COST)
 		Duel.SetTargetCard(tg)

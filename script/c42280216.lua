@@ -29,7 +29,7 @@ end
 function c42280216.shcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_DESTROY)
 end
-function c42280216.filter(c,e,tp)
+function c42280216.filter(c)
 	local code=c:GetCode()
 	return (code==78275321 or code==78552773) and c:IsAbleToHand()
 end

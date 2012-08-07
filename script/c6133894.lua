@@ -39,9 +39,6 @@ function c6133894.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),c6133894.rfilter,1,1,nil,66073051)
 	Duel.Release(g,REASON_COST)
 end
-function c6133894.cfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
-end
 function c6133894.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)

@@ -36,7 +36,7 @@ function c49681811.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c49681811.distg(e,c)
-	if c:GetCardTargetCount()==0 then return false end
+	if not c:IsType(TYPE_SPELL) or c:GetCardTargetCount()==0 then return false end
 	return c:GetCardTarget():IsContains(e:GetHandler())
 end
 function c49681811.disop(e,tp,eg,ep,ev,re,r,rp)
