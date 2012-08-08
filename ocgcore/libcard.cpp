@@ -1843,3 +1843,18 @@ int32 scriptlib::card_set_hint(lua_State *L) {
 	pduel->write_buffer32(value);
 	return 0;
 }
+int32 scriptlib::card_reverse_in_deck(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(pcard->current.location != LOCATION_DECK)
+		return 0;
+	pcard->current.position = POS_FACEUP_DEFENCE;
+	duel* pduel = pcard->pduel;
+	if(pcard->current.sequence == pduel->game_field->player[pcard->current.controler].list_main.size() - 1) {
+		pduel->write_buffer8(MSG_DECK_TOP);
+		pduel->write_buffer8(pcard->current.controler);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(pcard->data.code | 0x80000000);
+	}
+}

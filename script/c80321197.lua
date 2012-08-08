@@ -14,10 +14,9 @@ function c80321197.initial_effect(c)
 end
 function c80321197.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local t=Duel.GetAttackTarget()
-	if ev==1 then t=Duel.GetAttacker() end
+	local bc=c:GetBattleTarget()
 	if not c:IsRelateToBattle() or c:IsFacedown() then return false end
-	return t:IsLocation(LOCATION_GRAVE) and t:IsType(TYPE_MONSTER)
+	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c80321197.spop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -25,10 +24,14 @@ function c80321197.spop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetTargetRange(0,1)
-	e1:SetLabel(Duel.GetTurnCount())
 	e1:SetCondition(c80321197.sumcon)
 	e1:SetTarget(c80321197.sumlimit)
-	e1:SetReset(RESET_PHASE+PHASE_END,2)
+	e1:SetLabel(Duel.GetTurnCount())
+	if Duel.GetTurnPlayer()==tp then
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	else
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
+	end
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_SUMMON)

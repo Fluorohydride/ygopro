@@ -1,4 +1,4 @@
---破壊輪
+--破壊輪(JP)
 function c83555666.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

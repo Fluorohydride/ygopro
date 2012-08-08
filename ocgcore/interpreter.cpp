@@ -188,6 +188,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetBattleTarget", scriptlib::card_get_battle_target },
 	{ "GetAttackableTarget", scriptlib::card_get_attackable_target },
 	{ "SetHint", scriptlib::card_set_hint },
+	{ "ReverseInDeck", scriptlib::card_reverse_in_deck },
 	{ NULL, NULL }
 };
 
@@ -278,6 +279,7 @@ static const struct luaL_Reg grouplib[] = {
 };
 
 static const struct luaL_Reg duellib[] = {
+	{ "EnableGlobalFlag", scriptlib::duel_enable_global_flag },
 	{ "GetLP", scriptlib::duel_get_lp },
 	{ "SetLP", scriptlib::duel_set_lp },
 	{ "GetTurnPlayer", scriptlib::duel_get_turn_player },

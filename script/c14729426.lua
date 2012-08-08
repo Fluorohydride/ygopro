@@ -9,7 +9,7 @@ function c14729426.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c14729426.operation(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler()==Duel.GetAttackTarget() then
+	if e:GetHandler()==Duel.GetAttackTarget() and e:GetHandler():IsAttackPos() then
 		local a=Duel.GetAttacker()
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetDescription(aux.Stringid(14729426,0))

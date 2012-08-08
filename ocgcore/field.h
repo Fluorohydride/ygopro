@@ -203,6 +203,7 @@ struct processor {
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
 	ptr temp_var[4];
+	uint32 global_flag;
 	uint16 pre_field[5];
 	int32 chain_limit;
 	uint8 chain_limp;
@@ -523,6 +524,10 @@ public:
 #define TIMING_TOGRAVE				0x800000
 #define TIMING_BATTLE_PHASE			0x1000000
 #define TIMING_EQUIP				0x2000000
+
+#define GLOBALFLAG_DECK_REVERSE_CHECK	0x1
+#define GLOBALFLAG_BRAINWASHING_CHECK	0x2
+
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

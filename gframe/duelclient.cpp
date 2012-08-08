@@ -1669,9 +1669,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		int seq = BufferIO::ReadInt8(pbuf);
 		int code = BufferIO::ReadInt32(pbuf);
 		ClientCard* pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - seq);
-		pcard->is_reversed = (code & 0x80000000) != 0;
-		pcard->SetCode(code & 0x7fffff);
-		mainGame->dField.GetCardLocation(pcard, &pcard->curPos, &pcard->curRot, true);
+		pcard->SetCode(code & 0x7fffffff);
+		bool rev = (code & 0x80000000) != 0;
+		if(pcard->is_reversed != rev) {
+			pcard->is_reversed = rev;
+			mainGame->dField.MoveCard(pcard, 5);
+		}
 		return true;
 	}
 	case MSG_SHUFFLE_SET_CARD: {

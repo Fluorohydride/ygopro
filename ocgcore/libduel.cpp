@@ -12,6 +12,13 @@
 #include "effect.h"
 #include "group.h"
 
+int32 scriptlib::duel_enable_global_flag(lua_State *L) {
+	check_param_count(L, 1);
+	int32 flag = lua_tointeger(L, 1);
+	duel* pduel = interpreter::get_duel_info(L);
+	pduel->game_field->core.global_flag |= flag;
+}
+
 int32 scriptlib::duel_get_lp(lua_State *L) {
 	check_param_count(L, 1);
 	int32 p = lua_tointeger(L, 1);
@@ -604,15 +611,17 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 	if(count >= pduel->game_field->player[playerid].list_main.size())
 		count = pduel->game_field->player[playerid].list_main.size();
 	else if(pduel->game_field->player[playerid].list_main.size() > count) {
-		card* pcard = *(pduel->game_field->player[playerid].list_main.rbegin() + count);
-		if(pduel->game_field->core.deck_reversed) {
-			pduel->write_buffer8(MSG_DECK_TOP);
-			pduel->write_buffer8(playerid);
-			pduel->write_buffer8(count);
-			if(pcard->current.position != POS_FACEUP_DEFENCE)
-				pduel->write_buffer32(pcard->data.code);
-			else
-				pduel->write_buffer32(pcard->data.code | 0x80000000);
+		if(pduel->game_field->core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			card* pcard = *(pduel->game_field->player[playerid].list_main.rbegin() + count);
+			if(pduel->game_field->core.deck_reversed) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(playerid);
+				pduel->write_buffer8(count);
+				if(pcard->current.position != POS_FACEUP_DEFENCE)
+					pduel->write_buffer32(pcard->data.code);
+				else
+					pduel->write_buffer32(pcard->data.code | 0x80000000);
+			}
 		}
 	}
 	auto cit = pduel->game_field->player[playerid].list_main.rbegin();

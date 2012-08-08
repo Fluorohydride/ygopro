@@ -74,6 +74,7 @@ field::field(duel* pduel) {
 	core.remove_brainwashing = FALSE;
 	core.effect_damage_step = FALSE;
 	core.shuffle_check_disabled = FALSE;
+	core.global_flag = 0;
 	nil_event.event_code = 0;
 	nil_event.event_cards = 0;
 	nil_event.event_player = PLAYER_NONE;
@@ -471,9 +472,6 @@ void field::shuffle(uint8 playerid, uint8 location) {
 			core.shuffle_hand_check[playerid] = FALSE;
 			return;
 		}
-	} else {
-		for(auto cit = svector.begin(); cit != svector.end(); ++cit)
-			(*cit)->current.position = POS_FACEDOWN;
 	}
 	if(location == LOCATION_HAND || !(core.duel_options & DUEL_PSEUDO_SHUFFLE)) {
 		if(svector.size() > 1) {
@@ -499,14 +497,16 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(playerid);
 		core.shuffle_deck_check[playerid] = FALSE;
 		card* ptop = *svector.rbegin();
-		if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-			pduel->write_buffer8(MSG_DECK_TOP);
-			pduel->write_buffer8(playerid);
-			pduel->write_buffer8(0);
-			if(ptop->current.position != POS_FACEUP_DEFENCE)
-				pduel->write_buffer32(ptop->data.code);
-			else
-				pduel->write_buffer32(ptop->data.code | 0x80000000);
+		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(playerid);
+				pduel->write_buffer8(0);
+				if(ptop->current.position != POS_FACEUP_DEFENCE)
+					pduel->write_buffer32(ptop->data.code);
+				else
+					pduel->write_buffer32(ptop->data.code | 0x80000000);
+			}
 		}
 	}
 }

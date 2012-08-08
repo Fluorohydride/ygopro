@@ -957,16 +957,18 @@ int32 field::process() {
 					tc[count - i - 1]->current.sequence = player[target_player].list_main.size() - 1;
 				}
 			}
-			if(count > 0) {
-				card* ptop = *player[target_player].list_main.rbegin();
-				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-					pduel->write_buffer8(MSG_DECK_TOP);
-					pduel->write_buffer8(target_player);
-					pduel->write_buffer8(0);
-					if(ptop->current.position != POS_FACEUP_DEFENCE)
-						pduel->write_buffer32(ptop->data.code);
-					else
-						pduel->write_buffer32(ptop->data.code | 0x80000000);
+			if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+				if(count > 0) {
+					card* ptop = *player[target_player].list_main.rbegin();
+					if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+						pduel->write_buffer8(MSG_DECK_TOP);
+						pduel->write_buffer8(target_player);
+						pduel->write_buffer8(0);
+						if(ptop->current.position != POS_FACEUP_DEFENCE)
+							pduel->write_buffer32(ptop->data.code);
+						else
+							pduel->write_buffer32(ptop->data.code | 0x80000000);
+					}
 				}
 			}
 			core.units.pop_front();
@@ -4728,53 +4730,58 @@ int32 field::adjust_step(uint16 step) {
 	case 12: {
 		//reverse_deck && remove brainwashing
 		effect_set eset;
-		filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
-		uint8 res = eset.count ? TRUE : FALSE;
-		if(core.deck_reversed ^ res) {
-			reverse_deck(0);
-			reverse_deck(1);
-			pduel->write_buffer8(MSG_REVERSE_DECK);
-			if(res) {
-				if(player[0].list_main.size()) {
-					card* ptop = *player[0].list_main.rbegin();
-					pduel->write_buffer8(MSG_DECK_TOP);
-					pduel->write_buffer8(0);
-					pduel->write_buffer8(0);
-					if(ptop->current.position != POS_FACEUP_DEFENCE)
-						pduel->write_buffer32(ptop->data.code);
-					else
-						pduel->write_buffer32(ptop->data.code | 0x80000000);
+		uint32 res = 0;
+		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
+			res = eset.count ? TRUE : FALSE;
+			if(core.deck_reversed ^ res) {
+				reverse_deck(0);
+				reverse_deck(1);
+				pduel->write_buffer8(MSG_REVERSE_DECK);
+				if(res) {
+					if(player[0].list_main.size()) {
+						card* ptop = *player[0].list_main.rbegin();
+						pduel->write_buffer8(MSG_DECK_TOP);
+						pduel->write_buffer8(0);
+						pduel->write_buffer8(0);
+						if(ptop->current.position != POS_FACEUP_DEFENCE)
+							pduel->write_buffer32(ptop->data.code);
+						else
+							pduel->write_buffer32(ptop->data.code | 0x80000000);
+					}
+					if(player[1].list_main.size()) {
+						card* ptop = *player[1].list_main.rbegin();
+						pduel->write_buffer8(MSG_DECK_TOP);
+						pduel->write_buffer8(1);
+						pduel->write_buffer8(0);
+						if(ptop->current.position != POS_FACEUP_DEFENCE)
+							pduel->write_buffer32(ptop->data.code);
+						else
+							pduel->write_buffer32(ptop->data.code | 0x80000000);
+					}
 				}
-				if(player[1].list_main.size()) {
-					card* ptop = *player[1].list_main.rbegin();
-					pduel->write_buffer8(MSG_DECK_TOP);
-					pduel->write_buffer8(1);
-					pduel->write_buffer8(0);
-					if(ptop->current.position != POS_FACEUP_DEFENCE)
-						pduel->write_buffer32(ptop->data.code);
-					else
-						pduel->write_buffer32(ptop->data.code | 0x80000000);
+			}
+			core.deck_reversed = res;
+			eset.clear();
+		}
+		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
+			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
+			res = eset.count ? TRUE : FALSE;
+			if(res && !core.remove_brainwashing) {
+				for(int i = 0; i < 5; ++i) {
+					card* pcard = player[0].list_mzone[i];
+					if(pcard)
+						pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
 				}
+				for(int i = 0; i < 5; ++i) {
+					card* pcard = player[1].list_mzone[i];
+					if(pcard)
+						pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
+				}
+				core.re_adjust = TRUE;
 			}
+			core.remove_brainwashing = res;
 		}
-		core.deck_reversed = res;
-		eset.clear();
-		filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
-		res = eset.count ? TRUE : FALSE;
-		if(res && !core.remove_brainwashing) {
-			for(int i = 0; i < 5; ++i) {
-				card* pcard = player[0].list_mzone[i];
-				if(pcard)
-					pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-			}
-			for(int i = 0; i < 5; ++i) {
-				card* pcard = player[1].list_mzone[i];
-				if(pcard)
-					pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-			}
-			core.re_adjust = TRUE;
-		}
-		core.remove_brainwashing = res;
 		return FALSE;
 	}
 	case 13: {

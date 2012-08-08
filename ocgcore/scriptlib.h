@@ -190,6 +190,7 @@ public:
 	static int32 card_get_battle_target(lua_State *L);
 	static int32 card_get_attackable_target(lua_State *L);
 	static int32 card_set_hint(lua_State *L);
+	static int32 card_reverse_in_deck(lua_State *L);
 	//Effect functions
 	static int32 effect_new(lua_State *L);
 	static int32 effect_newex(lua_State *L);
@@ -273,6 +274,7 @@ public:
 	static int32 group_search_card(lua_State *L);
 
 	//Duel functions
+	static int32 duel_enable_global_flag(lua_State *L);
 	static int32 duel_get_lp(lua_State *L);
 	static int32 duel_set_lp(lua_State *L);
 	static int32 duel_get_turn_player(lua_State *L);

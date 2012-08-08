@@ -339,21 +339,24 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			}
 			cv.push_back(pcard);
 			drawed_set->container.insert(pcard);
+			pcard->reset(RESET_TOHAND, RESET_EVENT);
 		}
 		core.hint_timing[playerid] |= TIMING_DRAW + TIMING_TOHAND;
 		adjust_instant();
 		core.units.begin()->arg2 = (core.units.begin()->arg2 & 0xff000000) + drawed;
 		if(drawed) {
-			if(player[playerid].list_main.size()) {
-				card* ptop = *player[playerid].list_main.rbegin();
-				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-					pduel->write_buffer8(MSG_DECK_TOP);
-					pduel->write_buffer8(playerid);
-					pduel->write_buffer8(drawed);
-					if(ptop->current.position != POS_FACEUP_DEFENCE)
-						pduel->write_buffer32(ptop->data.code);
-					else
-						pduel->write_buffer32(ptop->data.code | 0x80000000);
+			if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+				if(player[playerid].list_main.size()) {
+					card* ptop = *player[playerid].list_main.rbegin();
+					if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+						pduel->write_buffer8(MSG_DECK_TOP);
+						pduel->write_buffer8(playerid);
+						pduel->write_buffer8(drawed);
+						if(ptop->current.position != POS_FACEUP_DEFENCE)
+							pduel->write_buffer32(ptop->data.code);
+						else
+							pduel->write_buffer32(ptop->data.code | 0x80000000);
+					}
 				}
 			}
 			pduel->write_buffer8(MSG_DRAW);
@@ -2518,39 +2521,41 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			cv.push_back(*cit);
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		int32 d0 = player[0].list_main.size() - 1, s0 = d0;
-		int32 d1 = player[1].list_main.size() - 1, s1 = d1;
-		for(uint32 i = 0; i < cv.size(); ++i) {
-			card* pcard = cv[i];
-			if(pcard->current.location != LOCATION_DECK)
-				continue;
-			if((pcard->current.controler == 0) && (pcard->current.sequence == s0))
-				s0--;
-			if((pcard->current.controler == 1) && (pcard->current.sequence == s1))
-				s1--;
-		}
-		if((s0 != d0) && (s0 > 0)) {
-			card* ptop = player[0].list_main[s0];
-			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(0);
-				pduel->write_buffer8(d0 - s0);
-				if(ptop->current.position != POS_FACEUP_DEFENCE)
-					pduel->write_buffer32(ptop->data.code);
-				else
-					pduel->write_buffer32(ptop->data.code | 0x80000000);
+		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			int32 d0 = player[0].list_main.size() - 1, s0 = d0;
+			int32 d1 = player[1].list_main.size() - 1, s1 = d1;
+			for(uint32 i = 0; i < cv.size(); ++i) {
+				card* pcard = cv[i];
+				if(pcard->current.location != LOCATION_DECK)
+					continue;
+				if((pcard->current.controler == 0) && (pcard->current.sequence == s0))
+					s0--;
+				if((pcard->current.controler == 1) && (pcard->current.sequence == s1))
+					s1--;
 			}
-		}
-		if((s1 != d1) && (s1 > 0)) {
-			card* ptop = player[0].list_main[s0];
-			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(1);
-				pduel->write_buffer8(d1 - s1);
-				if(ptop->current.position != POS_FACEUP_DEFENCE)
-					pduel->write_buffer32(ptop->data.code);
-				else
-					pduel->write_buffer32(ptop->data.code | 0x80000000);
+			if((s0 != d0) && (s0 > 0)) {
+				card* ptop = player[0].list_main[s0];
+				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(0);
+					pduel->write_buffer8(d0 - s0);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
+				}
+			}
+			if((s1 != d1) && (s1 > 0)) {
+				card* ptop = player[0].list_main[s0];
+				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(1);
+					pduel->write_buffer8(d1 - s1);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
+				}
 			}
 		}
 		for (auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
@@ -2630,25 +2635,27 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				discard.insert(pcard);
 			}
 		}
-		if(show_decktop[0]) {
-			card* ptop = *player[0].list_main.rbegin();
-			pduel->write_buffer8(MSG_DECK_TOP);
-			pduel->write_buffer8(0);
-			pduel->write_buffer8(0);
-			if(ptop->current.position != POS_FACEUP_DEFENCE)
-				pduel->write_buffer32(ptop->data.code);
-			else
-				pduel->write_buffer32(ptop->data.code | 0x80000000);
-		}
-		if(show_decktop[1]) {
-			card* ptop = *player[1].list_main.rbegin();
-			pduel->write_buffer8(MSG_DECK_TOP);
-			pduel->write_buffer8(1);
-			pduel->write_buffer8(0);
-			if(ptop->current.position != POS_FACEUP_DEFENCE)
-				pduel->write_buffer32(ptop->data.code);
-			else
-				pduel->write_buffer32(ptop->data.code | 0x80000000);
+		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			if(show_decktop[0]) {
+				card* ptop = *player[0].list_main.rbegin();
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(0);
+				pduel->write_buffer8(0);
+				if(ptop->current.position != POS_FACEUP_DEFENCE)
+					pduel->write_buffer32(ptop->data.code);
+				else
+					pduel->write_buffer32(ptop->data.code | 0x80000000);
+			}
+			if(show_decktop[1]) {
+				card* ptop = *player[1].list_main.rbegin();
+				pduel->write_buffer8(MSG_DECK_TOP);
+				pduel->write_buffer8(1);
+				pduel->write_buffer8(0);
+				if(ptop->current.position != POS_FACEUP_DEFENCE)
+					pduel->write_buffer32(ptop->data.code);
+				else
+					pduel->write_buffer32(ptop->data.code | 0x80000000);
+			}
 		}
 		adjust_instant();
 		process_single_event();
@@ -2768,16 +2775,18 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 				dest = redirect;
 			}
 		}
-		if(player[playerid].list_main.size() > count) {
-			card* ptop = *(player[playerid].list_main.rbegin() + count);
-			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-				pduel->write_buffer8(MSG_DECK_TOP);
-				pduel->write_buffer8(playerid);
-				pduel->write_buffer8(count);
-				if(ptop->current.position != POS_FACEUP_DEFENCE)
-					pduel->write_buffer32(ptop->data.code);
-				else
-					pduel->write_buffer32(ptop->data.code | 0x80000000);
+		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			if(player[playerid].list_main.size() > count) {
+				card* ptop = *(player[playerid].list_main.rbegin() + count);
+				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+					pduel->write_buffer8(MSG_DECK_TOP);
+					pduel->write_buffer8(playerid);
+					pduel->write_buffer8(count);
+					if(ptop->current.position != POS_FACEUP_DEFENCE)
+						pduel->write_buffer32(ptop->data.code);
+					else
+						pduel->write_buffer32(ptop->data.code | 0x80000000);
+				}
 			}
 		}
 		return FALSE;
@@ -2943,19 +2952,21 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		return FALSE;
 	}
 	case 2: {
-		if(target->current.location == LOCATION_DECK) {
-			uint32 curp = target->current.controler;
-			uint32 curs = target->current.sequence;
-			if(curs > 0 && (curs == player[curp].list_main.size() - 1)) {
-				card* ptop = player[curp].list_main[curs - 1];
-				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
-					pduel->write_buffer8(MSG_DECK_TOP);
-					pduel->write_buffer8(curp);
-					pduel->write_buffer8(1);
-					if(ptop->current.position != POS_FACEUP_DEFENCE)
-						pduel->write_buffer32(ptop->data.code);
-					else
-						pduel->write_buffer32(ptop->data.code | 0x80000000);
+		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			if(target->current.location == LOCATION_DECK) {
+				uint32 curp = target->current.controler;
+				uint32 curs = target->current.sequence;
+				if(curs > 0 && (curs == player[curp].list_main.size() - 1)) {
+					card* ptop = player[curp].list_main[curs - 1];
+					if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
+						pduel->write_buffer8(MSG_DECK_TOP);
+						pduel->write_buffer8(curp);
+						pduel->write_buffer8(1);
+						if(ptop->current.position != POS_FACEUP_DEFENCE)
+							pduel->write_buffer32(ptop->data.code);
+						else
+							pduel->write_buffer32(ptop->data.code | 0x80000000);
+					}
 				}
 			}
 		}
