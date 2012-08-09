@@ -2386,6 +2386,18 @@ int32 scriptlib::duel_hint(lua_State * L) {
 	pduel->write_buffer32(desc);
 	return 0;
 }
+int32 scriptlib::duel_hint_selection(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_GROUP, 1);
+	group* pgroup = *(group**) lua_touserdata(L, 1);
+	duel* pduel = pgroup->pduel;
+	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+		pduel->write_buffer8(MSG_BECOME_TARGET);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32((*cit)->get_info_location());
+	}
+	return 0;
+}
 int32 scriptlib::duel_select_effect_yesno(lua_State * L) {
 	check_action_permission(L);
 	check_param_count(L, 2);

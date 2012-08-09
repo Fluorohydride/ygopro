@@ -40,6 +40,7 @@ function c28553439.activate(e,tp,eg,ep,ev,re,r,rp)
 	if dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(28553439,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local des=dg:Select(tp,1,1,nil)
+		Duel.HintSelection(des)
 		Duel.BreakEffect()
 		Duel.Destroy(des,REASON_EFFECT)
 	end

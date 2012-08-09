@@ -34,5 +34,6 @@ function c45586855.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	if rg:GetCount()<ct then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local sg=rg:Select(tp,ct,ct,nil)
+	Duel.HintSelection(sg)
 	Duel.SendtoHand(sg,nil,REASON_EFFECT)
 end

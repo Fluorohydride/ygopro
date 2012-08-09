@@ -30,6 +30,7 @@ function c52971673.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local sg=dg:Select(tp,1,dt,nil)
+		Duel.HintSelection(sg)
 		Duel.Destroy(sg,REASON_EFFECT)
 	end
 end

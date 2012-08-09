@@ -42,6 +42,7 @@ function c37164373.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ct>0 and dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(37164373,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local rg=dg:Select(tp,1,ct,nil)
+		Duel.HintSelection(rg)
 		Duel.SendtoDeck(rg,nil,2,REASON_EFFECT)
 	end
 end

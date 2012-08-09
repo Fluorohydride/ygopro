@@ -33,5 +33,6 @@ end
 function c74860293.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
+	Duel.HintSelection(sg)
 	Duel.Destroy(sg,REASON_EFFECT)
 end

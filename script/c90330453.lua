@@ -1,4 +1,4 @@
---魔女狩り
+--魔女狩り(JP)
 function c90330453.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

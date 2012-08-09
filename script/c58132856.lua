@@ -66,5 +66,6 @@ function c58132856.desop(e,tp,eg,ep,ev,re,r,rp)
 	if ct==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectMatchingCard(tp,c58132856.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,ct,ct,nil)
+	Duel.HintSelection(g)
 	Duel.Destroy(g,REASON_EFFECT)
 end

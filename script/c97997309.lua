@@ -69,6 +69,7 @@ function c97997309.activate1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,c97997309.filter1,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
 	if g:GetCount()>0 then
+		Duel.HintSelection(g)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
 end
@@ -85,6 +86,7 @@ function c97997309.activate2(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c97997309.filter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
+		Duel.HintSelection(g)
 		if tc:IsPosition(POS_FACEUP_ATTACK) then
 			Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
 		else
@@ -105,6 +107,7 @@ function c97997309.activate3(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c97997309.filter3,tp,0,LOCATION_ONFIELD,1,1,nil)
 	if g:GetCount()>0 then
+		Duel.HintSelection(g)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end

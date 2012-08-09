@@ -53,6 +53,7 @@ function c40044918.op(e,tp,eg,ep,ev,re,r,rp)
 		if ct>0 and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(40044918,3)) then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 			local dg=g:Select(tp,1,ct,nil)
+			Duel.HintSelection(dg)
 			Duel.Destroy(dg,REASON_EFFECT)
 		end
 	else

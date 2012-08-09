@@ -31,5 +31,6 @@ function c16191953.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ct>g:GetCount() then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=g:Select(tp,ct,ct,nil)
+	Duel.HintSelection(dg)
 	Duel.Destroy(dg,REASON_EFFECT)
 end

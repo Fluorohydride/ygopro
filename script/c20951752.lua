@@ -79,5 +79,6 @@ function c20951752.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=g:Select(tp,1,e:GetLabel(),nil)
+	Duel.HintSelection(dg)
 	Duel.Destroy(dg,REASON_EFFECT)
 end

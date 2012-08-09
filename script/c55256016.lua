@@ -43,6 +43,7 @@ function c55256016.operation(e,tp,eg,ep,ev,re,r,rp)
 	if dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(55256016,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local des=dg:Select(tp,1,1,nil)
+		Duel.HintSelection(des)
 		local atk=des:GetFirst():GetAttack()
 		Duel.BreakEffect()
 		if Duel.Destroy(des,REASON_EFFECT)>0 then

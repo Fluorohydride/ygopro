@@ -32,6 +32,7 @@ function c13210191.activate(e,tp,eg,ep,ev,re,r,rp)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local g3=g2:Select(tp,ct1,ct1,nil)
+		Duel.HintSelection(g3)
 		Duel.Destroy(g3,REASON_EFFECT)
 	end
 end

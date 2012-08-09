@@ -47,6 +47,7 @@ function c770365.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ct>0 and sg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local dg=sg:Select(tp,1,ct,nil)
+		Duel.HintSelection(dg)
 		Duel.Destroy(dg,REASON_EFFECT)
 	end
 	Duel.SortDecktop(tp,tp,5)

@@ -32,17 +32,20 @@ function c57319935.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,1000)
 end
 function c57319935.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsRankBelow,tp,LOCATION_EXTRA,0,1,nil,e:GetLabel())
-		and Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)>0 end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsRankBelow,tp,LOCATION_EXTRA,0,1,nil,e:GetLabel()) end
 end
 function c57319935.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(57319935,0))
 	local tc1=Duel.SelectMatchingCard(tp,Card.IsRankBelow,tp,LOCATION_EXTRA,0,1,1,nil,e:GetLabel()):GetFirst()
 	Duel.Hint(HINT_SELECTMSG,1-tp,aux.Stringid(57319935,0))
 	local tc2=Duel.SelectMatchingCard(1-tp,Card.IsRankBelow,1-tp,LOCATION_EXTRA,0,1,1,nil,e:GetLabel()):GetFirst()
-	if tc1 and tc2 then
+	if tc1 then
 		Duel.ConfirmCards(1-tp,tc1)
+	end
+	if tc2 then
 		Duel.ConfirmCards(tp,tc2)
+	end
+	if tc1 and tc2 then
 		local atk1=tc1:GetAttack()
 		local atk2=tc2:GetAttack()
 		if atk1>atk2 then
