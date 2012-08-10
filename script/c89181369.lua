@@ -24,7 +24,8 @@ end
 function c89181369.rmfilter(c)
 	return c:GetLevel()>0 and c:IsAbleToRemove()
 end
-function c89181369.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c89181369.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		local rg=Duel.GetMatchingGroup(c89181369.rmfilter,tp,LOCATION_GRAVE,0,nil)

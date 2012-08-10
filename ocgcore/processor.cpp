@@ -3399,7 +3399,7 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
 		process_single_event();
 		process_instant_event();
-		if(!core.effect_damage_step || core.current_chain.size() <= 1) {
+		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
 			core.units.begin()->arg1 = 1;
 		} else {
@@ -3420,7 +3420,7 @@ int32 field::process_battle_command(uint16 step) {
 			process_single_event();
 			process_instant_event();
 		}
-		if(!core.effect_damage_step || core.current_chain.size() <= 1) {
+		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
 			if(core.flip_chain.size() || core.new_fchain.size() || core.new_ochain.size())
 				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		} else {
@@ -3474,7 +3474,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(core.attack_target)
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		if(!core.effect_damage_step || core.current_chain.size() <= 1) {
+		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 			core.units.begin()->step = 38;
 		} else {
@@ -3537,7 +3537,7 @@ int32 field::process_damage_step(uint16 step) {
 		core.units.begin()->ptarget = (group*)tmp;
 		core.units.begin()->arg1 = infos.phase;
 		if(core.attacker->current.location != LOCATION_MZONE || core.attack_target->current.location != LOCATION_MZONE) {
-			core.units.begin()->step = 1;
+			core.units.begin()->step = 2;
 			return FALSE;
 		}
 		pduel->write_buffer8(MSG_ATTACK);
@@ -3550,6 +3550,13 @@ int32 field::process_damage_step(uint16 step) {
 			core.pre_field[1] = core.attack_target->fieldid_r;
 		else
 			core.pre_field[1] = 0;
+		if(core.attack_target->is_position(POS_FACEDOWN)) {
+			change_position(core.attack_target, 0, PLAYER_NONE, core.attack_target->current.position >> 1, 0, TRUE);
+			adjust_all();
+		}
+		return FALSE;
+	}
+	case 1: {
 		infos.phase = PHASE_DAMAGE_CAL;
 		raise_single_event(core.attacker, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
 		if(core.attack_target)
@@ -3558,24 +3565,27 @@ int32 field::process_damage_step(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		add_process(PROCESSOR_BATTLE_COMMAND, 26, 0, 0, 0, 0);
-		if(core.current_chain.size() > 1) {
-			core.units.begin()->step = 1;
+		if(core.current_chain.size() > 1 || core.units.begin()->arg2) {	//skip timing
+			core.units.begin()->step = 2;
+			core.effect_damage_step = 3;
+			add_process(PROCESSOR_BATTLE_COMMAND, 27, 0, 0, 0, 0);
 			return FALSE;
 		} else {
-			core.units.begin()->step = 1;
+			core.units.begin()->step = 2;
 			core.reserved = core.units.front();
 			return TRUE;
 		}
 	}
-	case 1: {
+	case 2: {
 		core.effect_damage_step = 2;
 		add_process(PROCESSOR_BATTLE_COMMAND, 27, 0, 0, 0, 0);
 		return FALSE;
 	}
-	case 2: {
+	case 3: {
 		core.attacker = (card*)core.units.begin()->peffect;
 		core.attack_target = (card*)core.units.begin()->ptarget;
-		core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		if(core.attacker)
+			core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		if(core.attack_target)
 			core.attack_target->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		core.effect_damage_step = 0;
@@ -4175,8 +4185,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	case 10: {
 		card* pcard = cait->triggering_effect->handler;
 		if(cait->target_cards && cait->target_cards->container.size()) {
-			card_set::iterator cit;
-			for(cit = cait->target_cards->container.begin(); cit != cait->target_cards->container.end(); ++cit)
+			for(auto cit = cait->target_cards->container.begin(); cit != cait->target_cards->container.end(); ++cit)
 				(*cit)->release_relation(cait->triggering_effect);
 		}
 		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
@@ -4206,9 +4215,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 11: {
-		card_set::iterator cit, rm;
-		for(cit = core.leave_confirmed.begin(); cit != core.leave_confirmed.end();) {
-			rm = cit++;
+		for(auto cit = core.leave_confirmed.begin(); cit != core.leave_confirmed.end();) {
+			auto rm = cit++;
 			if(!(*rm)->is_status(STATUS_LEAVE_CONFIRMED))
 				core.leave_confirmed.erase(rm);
 		}

@@ -66,6 +66,7 @@ void Game::DrawBackGround() {
 	matManager.mTexture.setTexture(0, imageManager.tField);
 	driver->setMaterial(matManager.mTexture);
 	driver->drawVertexPrimitiveList(matManager.vField, 4, matManager.iRectangle, 2);
+	driver->setMaterial(matManager.mBackLine);
 	//select field
 	if(dInfo.curMsg == MSG_SELECT_PLACE || dInfo.curMsg == MSG_SELECT_DISFIELD) {
 		float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
