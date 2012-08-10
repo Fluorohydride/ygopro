@@ -26,7 +26,7 @@ function c87798440.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
 	e3:SetCondition(c87798440.uncon)
-	e3:SetValue(1)
+	e3:SetValue(c87798440.repval)
 	c:RegisterEffect(e3)
 	--draw
 	local e4=Effect.CreateEffect(c)
@@ -50,6 +50,9 @@ function c87798440.initial_effect(c)
 end
 function c87798440.uncon(e)
 	return e:GetHandler():IsStatus(STATUS_UNION)
+end
+function c87798440.repval(e,re,r,rp)
+	return bit.band(r,REASON_BATTLE)~=0
 end
 function c87798440.eqlimit(e,c)
 	return c:IsRace(RACE_WARRIOR)

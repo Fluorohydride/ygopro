@@ -1,4 +1,4 @@
---�˩`�ɥ롤�ܩ`��
+--ニードル·ボール
 function c94230224.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
