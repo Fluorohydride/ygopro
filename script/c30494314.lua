@@ -17,7 +17,8 @@ end
 function c30494314.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and not c:IsType(TYPE_XYZ)
 end
-function c30494314.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c30494314.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c30494314.filter(chkc) end
 	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,1,1,REASON_EFFECT)
 		and Duel.IsExistingTarget(c30494314.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

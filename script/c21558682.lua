@@ -27,7 +27,8 @@ end
 function c21558682.filter(c)
 	return c:IsFaceup() and c:IsCode(31709826)
 end
-function c21558682.atktg1(e,tp,eg,ep,ev,re,r,rp,chk)
+function c21558682.atktg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c21558682.filter(chkc) end
 	if chk==0 then return true end
 	e:SetProperty(0)
 	if Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and tp~=Duel.GetTurnPlayer() then
@@ -39,7 +40,8 @@ function c21558682.atktg1(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 	end
 end
-function c21558682.atktg2(e,tp,eg,ep,ev,re,r,rp,chk)
+function c21558682.atktg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c21558682.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c21558682.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c21558682.filter,tp,LOCATION_MZONE,0,1,1,nil)

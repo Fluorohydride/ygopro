@@ -14,7 +14,7 @@ function c61844784.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPELL)
 end
 function c61844784.addct(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:Location(LOCATION_SZONE) and chkc:IsControler(tp) and c61844784.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and c61844784.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c61844784.filter,tp,LOCATION_SZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(61844784,0))
 	Duel.SelectTarget(tp,c61844784.filter,tp,LOCATION_SZONE,0,1,1,e:GetHandler())

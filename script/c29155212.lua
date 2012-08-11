@@ -25,7 +25,7 @@ function c29155212.filter(c)
 	return c:IsFaceup() and c:IsCode(62121)
 end
 function c29155212.adval(e,c)
-	if Duel.IsExistingMatchingCard(c29155212.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) then
+	if Duel.IsExistingMatchingCard(c29155212.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) then
 		return 100+c:GetFlagEffect(29155212)*100
 	else
 		return c:GetFlagEffect(29155212)*100

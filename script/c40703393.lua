@@ -18,10 +18,10 @@ end
 function c40703393.rmfilter(c)
 	return c:GetLevel()>0 and c:IsAbleToRemove()
 end
-function c40703393.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c40703393.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then ft=-ft+1 end
+	if ft<=0 then ft=-ft+1 else ft=1 end
 	if chk==0 then
 		local rg=Duel.GetMatchingGroup(c40703393.rmfilter,tp,LOCATION_MZONE,0,nil)
 		return Duel.IsExistingTarget(c40703393.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp,ft,rg)
@@ -29,16 +29,17 @@ function c40703393.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.GetMatchingGroup(c40703393.rmfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c40703393.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp,ft,rg)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c40703393.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then ft=-ft+1 end
+	if ft<=0 then ft=-ft+1 else ft=1 end
 	if not tc:IsRelateToEffect(e) or not tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	local rg=Duel.GetMatchingGroup(c40703393.rmfilter,tp,LOCATION_MZONE,0,nil)
 	local lv=tc:GetLevel()
 	if rg:CheckWithSumEqual(Card.GetLevel,lv,ft,99) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local rm=rg:SelectWithSumEqual(tp,Card.GetLevel,lv,ft,99)
 		Duel.Remove(rm,POS_FACEUP,REASON_EFFECT)
 		Duel.BreakEffect()
