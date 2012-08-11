@@ -1857,4 +1857,5 @@ int32 scriptlib::card_reverse_in_deck(lua_State *L) {
 		pduel->write_buffer8(0);
 		pduel->write_buffer32(pcard->data.code | 0x80000000);
 	}
+	return 0;
 }

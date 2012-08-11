@@ -17,6 +17,7 @@ int32 scriptlib::duel_enable_global_flag(lua_State *L) {
 	int32 flag = lua_tointeger(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->game_field->core.global_flag |= flag;
+	return 0;
 }
 
 int32 scriptlib::duel_get_lp(lua_State *L) {
