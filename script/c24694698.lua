@@ -39,7 +39,8 @@ end
 function c24694698.filter(c)
 	return c:IsSetCard(0x2a) and c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
-function c24694698.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c24694698.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c24694698.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c24694698.filter,tp,LOCATION_GRAVE,0,2,nil) and Duel.IsPlayerCanDraw(tp,1) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c24694698.filter,tp,LOCATION_GRAVE,0,2,2,nil)

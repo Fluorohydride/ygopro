@@ -16,11 +16,11 @@ function c21296383.spfilter(c,e,tp)
 		and c:IsCanBeEffectTarget(e)
 end
 function c21296383.cfilter(c,lv)
-	return c:IsFaceup() and c:IsAbleToRemove() and c:IsLevelAbove(lv)
+	return c:IsFaceup() and c:IsAbleToRemoveAsCost() and c:IsLevelAbove(lv)
 end
 function c21296383.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local sg=Duel.GetMatchingGroup(c21296383.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	if chkc==0 then return sg:IsContains(chkc) and chkc:IsLevelBelow(e:GetLabel()) end
+	if chkc then return sg:IsContains(chkc) and chkc:IsLevelBelow(e:GetLabel()) end
 	if sg:GetCount()==0 then return false end
 	local sg,mlv=sg:GetMinGroup(Card.GetLevel)
 	local elv=e:GetHandler():GetLevel()

@@ -23,12 +23,14 @@ function c25435080.cost(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabel(1)
 	return true
 end
-function c25435080.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c25435080.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c25435080.tfilter(chkc) end
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
 		return Duel.IsExistingMatchingCard(c25435080.cfilter,tp,LOCATION_MZONE,0,1,nil,tp)
 	end
+	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 	local rg=Duel.SelectMatchingCard(tp,c25435080.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	e:SetLabel(rg:GetFirst():GetAttack())

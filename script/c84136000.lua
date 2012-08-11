@@ -20,7 +20,8 @@ end
 function c84136000.spfilter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c84136000.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c84136000.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return false end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c84136000.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)

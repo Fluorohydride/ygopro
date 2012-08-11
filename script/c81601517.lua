@@ -17,7 +17,8 @@ end
 function c81601517.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_DUAL) and c:IsCanTurnSet()
 end
-function c81601517.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c81601517.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c81601517.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c81601517.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c81601517.filter,tp,LOCATION_MZONE,0,1,1,nil)
