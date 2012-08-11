@@ -36,7 +36,7 @@ function c94215860.filter(c)
 end
 function c94215860.srettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c94215860.filter(chkc) end
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(c94215860.filter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c94215860.filter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
