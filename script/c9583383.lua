@@ -30,12 +30,12 @@ function c9583383.atkcon(e)
 	return not Duel.IsExistingMatchingCard(c9583383.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c9583383.rfilter(c,tp)
-	local lv=c:GEtLevel()
+	local lv=c:GetLevel()
 	return lv>0 and c:IsAbleToRemoveAsCost()
 		and Duel.IsExistingMatchingCard(c9583383.tfilter,tp,LOCATION_MZONE,0,1,nil,lv)
 end
 function c9583383.tfilter(c,clv)
-	local lv=c:GEtLevel()
+	local lv=c:GetLevel()
 	return lv>0 and lv~=clv and c:IsFaceup() and c:IsSetCard(0x54)
 end
 function c9583383.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -19,7 +19,8 @@ function c63442604.cfilter(c,tp)
 	return c:IsFaceup() and c:GetLevel()>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,63442605,0,0x11,c:GetAttack(),c:GetDefence(),c:GetLevel(),c:GetRace(),c:GetAttribute())
 end
-function c63442604.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c63442604.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c63442604.cfilter(chkc,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 
 		Duel.IsExistingTarget(c63442604.cfilter,tp,0,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

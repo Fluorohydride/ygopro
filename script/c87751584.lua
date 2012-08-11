@@ -28,6 +28,6 @@ function c87751584.desop(e,tp,eg,ep,ev,re,r,rp)
 	if ct==0 or ct>g:GetCount() then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=g:Select(tp,ct,ct,nil)
-	Duel.HintSelection(sg)
+	Duel.HintSelection(dg)
 	Duel.Destroy(dg,REASON_EFFECT)
 end

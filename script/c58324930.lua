@@ -18,7 +18,8 @@ end
 function c58324930.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
-function c58324930.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c58324930.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c58324930.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c58324930.filter,tp,0,LOCATION_GRAVE,1,1,nil)

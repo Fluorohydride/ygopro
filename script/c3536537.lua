@@ -26,7 +26,8 @@ end
 function c3536537.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(5) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 and c:IsDestructable()
 end
-function c3536537.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c3536537.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c3536537.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c3536537.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

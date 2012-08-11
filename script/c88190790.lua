@@ -39,9 +39,11 @@ function c88190790.condition(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabelObject(tc)
 	return g:GetCount()==1 and tc:IsFaceup() and tc:IsRace(RACE_WARRIOR)
 end
-function c88190790.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetLabelObject() end
-	Duel.SetTargetCard(e:GetLabelObject())
+function c88190790.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local tc=e:GetLabelObject()
+	if chkc then return chkc==tc end
+	if chk==0 then return tc and tc:IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(tc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c88190790.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -54,9 +56,9 @@ end
 function c88190790.macon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end
-function c88190790.macost(e,tp,eg,ep,ev,re,r,rp,chkc)
+function c88190790.macost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chkc==0 then return c:IsAbleToGraveAsCost() end
+	if chk==0 then return c:IsAbleToGraveAsCost() end
 	Duel.SetTargetCard(c:GetEquipTarget())
 	Duel.SendtoGrave(c,REASON_COST)
 end
