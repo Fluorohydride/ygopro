@@ -1,4 +1,4 @@
---ハーピィの羽根帚
+--ハーピィの羽根帚(JP)
 function c18144506.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

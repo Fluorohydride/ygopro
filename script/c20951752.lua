@@ -49,7 +49,7 @@ function c20951752.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabel()==1
 end
 function c20951752.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_FAIRY) end
 	local g=Duel.GetReleaseGroup(tp)
 	local rg=g:Filter(Card.IsRace,nil,RACE_FAIRY)
 	Duel.Release(rg,REASON_COST)
