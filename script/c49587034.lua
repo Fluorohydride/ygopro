@@ -28,19 +28,27 @@ function c49587034.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetCountLimit(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,4)
-		e1:SetOperation(c49587034.tohand)
+		e1:SetCondition(c49587034.thcon)
+		e1:SetOperation(c49587034.thop)
 		if cp~=e:GetHandlerPlayer() and ph~=PHASE_DRAW
 			then e1:SetLabel(2)
 			else e1:SetLabel(1)
 		end
 		card:RegisterEffect(e1)
+		e:GetHandler():RegisterFlagEffect(1082946,RESET_PHASE+PHASE_END+RESET_OPPO_TURN,0,3)
+		c49587034[e:GetHandler()]=e1
 	end
 end
-function c49587034.tohand(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
+function c49587034.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
+function c49587034.thop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
-	e:GetHandler():SetTurnCounter(ct)
+	e:GetOwner():SetTurnCounter(ct)
 	if ct==4 then
 		Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
-	else e:SetLabel(ct+1) end
+		e:GetOwner():ResetFlagEffect(1082946)
+	else
+		e:SetLabel(ct+1)
+	end
 end

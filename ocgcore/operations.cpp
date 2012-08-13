@@ -106,10 +106,10 @@ void field::remove_overlay_card(uint32 reason, card* pcard, uint32 rplayer, uint
 	add_process(PROCESSOR_REMOVEOL_S, 0, (effect*)(size_t) reason, (group*)pcard, (rplayer << 16) + (s << 8) + o, (max << 16) + min);
 }
 void field::get_control(effect* reason_effect, uint32 reason_player, card* pcard, uint32 playerid, uint32 reset_phase, uint32 reset_count) {
-	add_process(PROCESSOR_GET_CONTROL, 0, reason_effect, (group*)pcard, 0, (reason_player << 24) + (playerid << 16) + (reset_phase << 8) + reset_count);
+	add_process(PROCESSOR_GET_CONTROL, 0, reason_effect, (group*)pcard, 0, (reason_player << 28) + (playerid << 24) + (reset_phase << 8) + reset_count);
 }
 void field::swap_control(effect* reason_effect, uint32 reason_player, card* pcard1, card* pcard2, uint32 reset_phase, uint32 reset_count) {
-	add_process(PROCESSOR_SWAP_CONTROL, 0, reason_effect, (group*)pcard1, (ptr)pcard2, (reason_player << 24) + (reset_phase << 8) + reset_count);
+	add_process(PROCESSOR_SWAP_CONTROL, 0, reason_effect, (group*)pcard1, (ptr)pcard2, (reason_player << 28) + (reset_phase << 8) + reset_count);
 }
 void field::equip(uint32 equip_player, card* equip_card, card* target, uint32 up, uint32 is_step) {
 	add_process(PROCESSOR_EQUIP, 0, 0, (group*)target, (ptr)equip_card, equip_player + (up << 16) + (is_step << 24));
@@ -772,7 +772,7 @@ int32 field::remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 
 	}
 	return TRUE;
 }
-int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_player, card * pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count) {
+int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_player, card * pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count) {
 	switch(step) {
 	case 0: {
 		if(pcard->current.controler == playerid) {
@@ -819,7 +819,7 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 	}
 	return TRUE;
 }
-int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_player, card * pcard1, card * pcard2, uint8 reset_phase, uint8 reset_count) {
+int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_player, card * pcard1, card * pcard2, uint16 reset_phase, uint8 reset_count) {
 	switch(step) {
 	case 0: {
 		uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;

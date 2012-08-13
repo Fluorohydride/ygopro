@@ -25,6 +25,8 @@ function c95308449.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetOperation(c95308449.checkop)
 	e1:SetCountLimit(1)
 	Duel.RegisterEffect(e1,tp)
+	c:RegisterFlagEffect(1082946,RESET_PHASE+PHASE_END,0,20)
+	c95308449[c]=e1
 end
 function c95308449.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -33,5 +35,6 @@ function c95308449.checkop(e,tp,eg,ep,ev,re,r,rp)
 	c:SetTurnCounter(ct)
 	if ct==20 then
 		Duel.Win(tp,0x11)
+		c:ResetFlagEffect(1082946)
 	end
 end

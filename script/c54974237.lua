@@ -49,6 +49,17 @@ function c54974237.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetLabel(ty)
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
 	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetCountLimit(1)
+	e2:SetCondition(c54974237.turncon)
+	e2:SetOperation(c54974237.turnop)
+	e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
+	Duel.RegisterEffect(e2,tp)
+	e2:SetLabelObject(e1)
+	e:GetHandler():RegisterFlagEffect(1082946,RESET_PHASE+PHASE_END+RESET_OPPO_TURN,0,3)
+	c54974237[e:GetHandler()]=e2
 end
 function c54974237.desop(e,tp,eg,ep,ev,re,r,rp)
 	if ep==e:GetOwnerPlayer() then return end
@@ -58,4 +69,17 @@ function c54974237.desop(e,tp,eg,ep,ev,re,r,rp)
 	local dg=hg:Filter(Card.IsType,nil,e:GetLabel())
 	Duel.Destroy(dg,REASON_EFFECT)
 	Duel.ShuffleHand(ep)
+end
+function c54974237.turncon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
+end
+function c54974237.turnop(e,tp,eg,ep,ev,re,r,rp)
+	local ct=e:GetLabel()
+	ct=ct+1
+	e:SetLabel(ct)
+	e:GetHandler():SetTurnCounter(ct)
+	if ct==3 then
+		e:GetLabelObject():Reset()
+		e:GetOwner():ResetFlagEffect(1082946)
+	end
 end

@@ -431,14 +431,14 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_GET_CONTROL: {
-		if (get_control(it->step, it->peffect, (it->arg2 >> 24) & 0xff, (card*)it->ptarget, (it->arg2 >> 16) & 0xff, (it->arg2 >> 8) & 0xff, it->arg2 & 0xff)) {
+		if (get_control(it->step, it->peffect, (it->arg2 >> 28) & 0xf, (card*)it->ptarget, (it->arg2 >> 24) & 0xf, (it->arg2 >> 8) & 0x3ff, it->arg2 & 0xff)) {
 			core.units.pop_front();
 		} else
 			core.units.begin()->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SWAP_CONTROL: {
-		if (swap_control(it->step, it->peffect, (it->arg2 >> 24) & 0xff, (card*)it->ptarget, (card*)it->arg1, (it->arg2 >> 8) & 0xff, it->arg2 & 0xff)) {
+		if (swap_control(it->step, it->peffect, (it->arg2 >> 28) & 0xf, (card*)it->ptarget, (card*)it->arg1, (it->arg2 >> 8) & 0x3ff, it->arg2 & 0xff)) {
 			core.units.pop_front();
 		} else
 			core.units.begin()->step++;

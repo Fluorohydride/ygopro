@@ -901,7 +901,7 @@ int32 scriptlib::duel_get_control(lua_State *L) {
 	uint32 reset_phase = 0;
 	uint32 reset_count = 0;
 	if(lua_gettop(L) > 2) {
-		reset_phase = lua_tointeger(L, 3) & 0xff;
+		reset_phase = lua_tointeger(L, 3) & 0x3ff;
 		reset_count = lua_tointeger(L, 4) & 0xff;
 	}
 	duel* pduel = target->pduel;
@@ -919,8 +919,8 @@ int32 scriptlib::duel_swap_control(lua_State *L) {
 	uint32 reset_phase = 0;
 	uint32 reset_count = 0;
 	if(lua_gettop(L) > 2) {
-		reset_phase = lua_tointeger(L, 3);
-		reset_count = lua_tointeger(L, 4);
+		reset_phase = lua_tointeger(L, 3) & 0x3ff;
+		reset_count = lua_tointeger(L, 4) & 0xff;
 	}
 	duel* pduel = pcard1->pduel;
 	pduel->game_field->swap_control(pduel->game_field->core.reason_effect, pduel->game_field->core.reason_player, pcard1, pcard2, reset_phase, reset_count);

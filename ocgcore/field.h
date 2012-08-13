@@ -293,7 +293,7 @@ public:
 	void add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence);
 	void remove_card(card* pcard);
 	void move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence);
-	void set_control(card* pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count);
+	void set_control(card* pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count);
 	card* get_field_card(uint8 playerid, uint8 location, uint8 sequence);
 	int32 is_location_useable(uint8 playerid, uint8 location, uint8 sequence);
 	int32 get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, uint32 reason, uint32* list = 0);
@@ -428,8 +428,8 @@ public:
 
 	int32 remove_counter(uint16 step, uint32 reason, card* pcard, uint8 rplayer, uint8 s, uint8 o, uint16 countertype, uint16 count);
 	int32 remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 rplayer, uint8 s, uint8 o, uint16 min, uint16 max);
-	int32 get_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard, uint8 playerid, uint8 reset_phase, uint8 reset_count);
-	int32 swap_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard1, card* pcard2, uint8 reset_phase, uint8 reset_count);
+	int32 get_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count);
+	int32 swap_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard1, card* pcard2, uint16 reset_phase, uint8 reset_count);
 	int32 control_adjust(uint16 step);
 	int32 equip(uint16 step, uint8 equip_player, card* equip_card, card* target, uint32 up, uint32 is_step);
 	int32 draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 playerid, uint32 count);

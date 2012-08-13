@@ -23,14 +23,17 @@ function c13599884.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetCondition(c13599884.descon)
 		e1:SetOperation(c13599884.desop)
 		e1:SetLabel(0)
 		e1:SetOwnerPlayer(tp)
 		tc:RegisterEffect(e1)
 	end
 end
+function c13599884.descon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetOwnerPlayer()~=Duel.GetTurnPlayer()
+end
 function c13599884.desop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetOwnerPlayer()==Duel.GetTurnPlayer() then return end
 	local ct=e:GetLabel()
 	ct=ct+1
 	e:SetLabel(ct)

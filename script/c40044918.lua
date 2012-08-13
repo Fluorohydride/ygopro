@@ -40,8 +40,6 @@ function c40044918.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	e:SetLabel(sel)
 	if sel==1 then
-		local g=Duel.GetMatchingGroup(c40044918.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,c)
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	else Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK) end
 end
 function c40044918.op(e,tp,eg,ep,ev,re,r,rp)

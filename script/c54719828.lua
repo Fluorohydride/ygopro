@@ -39,11 +39,11 @@ function c54719828.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c54719828.aclimit1(e,re,tp)
-	return re:GetHandler():IsType(TYPE_MONSTER)
+	return re:IsActiveType(TYPE_MONSTER)
 end
 function c54719828.aclimit2(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_SPELL)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL)
 end
 function c54719828.aclimit3(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_TRAP)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP)
 end
