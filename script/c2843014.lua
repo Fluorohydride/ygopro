@@ -16,7 +16,7 @@ function c2843014.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c2843014.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function c2843014.filter1(c)
 	return c:IsRace(RACE_FISH) and c:IsAbleToGrave()

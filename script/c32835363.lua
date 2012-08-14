@@ -48,7 +48,7 @@ end
 function c32835363.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetParam(800)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,ep,800)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,ep,800)
 end
 function c32835363.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

@@ -24,7 +24,7 @@ function c61032879.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,1-tp,500)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,500)
 end
 function c61032879.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then

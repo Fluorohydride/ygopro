@@ -30,7 +30,6 @@ function c25435080.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e:SetLabel(0)
 		return Duel.IsExistingMatchingCard(c25435080.cfilter,tp,LOCATION_MZONE,0,1,nil,tp)
 	end
-	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 	local rg=Duel.SelectMatchingCard(tp,c25435080.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	e:SetLabel(rg:GetFirst():GetAttack())

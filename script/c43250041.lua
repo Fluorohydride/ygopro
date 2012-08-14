@@ -20,7 +20,7 @@ function c43250041.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e) end
 	Duel.SetTargetCard(tg)
 	local rec=tg:GetAttack()
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,rec)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec)
 end
 function c43250041.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

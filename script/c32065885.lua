@@ -4,15 +4,14 @@ function c32065885.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_CONTROL)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c32065885.ctlcon)
 	e1:SetTarget(c32065885.ctltg)
 	e1:SetOperation(c32065885.ctlop)
 	c:RegisterEffect(e1)
 end
 function c32065885.ctlcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and bit.band(r,REASON_BATTLE)~=0 and Duel.GetAttackTarget()==nil and Duel.GetAttacker():IsControler(1-tp)
+	return ep==tp and Duel.GetAttackTarget()==nil and Duel.GetAttacker():IsControler(1-tp)
 end
 function c32065885.ctltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsControlerCanBeChanged,tp,0,LOCATION_MZONE,1,nil) end
