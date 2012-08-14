@@ -1,4 +1,4 @@
---サンダーエンド·ドラゴン
+--No.91 サンダー·スパーク·ドラゴン
 function c84417082.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,4),3)
@@ -31,15 +31,18 @@ function c84417082.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	e:GetHandler():RemoveOverlayCard(tp,3,3,REASON_COST)
 end
+function c84417082.filter1(c)
+	return c:IsFaceup() and c:IsDestructable()
+end
 function c84417082.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(84417082)==0
-		and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+		and Duel.IsExistingMatchingCard(c84417082.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
 	e:GetHandler():RegisterFlagEffect(84417082,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
+	local g=Duel.GetMatchingGroup(c84417082.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c84417082.operation1(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
+	local g=Duel.GetMatchingGroup(c84417082.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	Duel.Destroy(g,REASON_EFFECT)
 end
 function c84417082.cost2(e,tp,eg,ep,ev,re,r,rp,chk)

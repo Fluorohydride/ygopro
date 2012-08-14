@@ -4232,7 +4232,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			core.chain_limit_p = 0;
 		}
 		reset_chain();
-		if(core.summoning_card || core.spsummoning_card || core.effect_damage_step == 1)
+		if(core.summoning_card || core.effect_damage_step == 1)
 			core.subunits.push_back(core.reserved);
 		return FALSE;
 	}

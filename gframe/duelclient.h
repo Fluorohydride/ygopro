@@ -68,6 +68,7 @@ public:
 	
 protected:
 	static bool is_refreshing;
+	static int match_kill;
 	static event* resp_event;
 	static std::set<unsigned int> remotes;
 public:

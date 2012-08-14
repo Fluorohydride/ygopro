@@ -216,7 +216,6 @@ struct processor {
 	effect* reason_effect;
 	uint8 reason_player;
 	card* summoning_card;
-	card* spsummoning_card;
 	uint8 summon_depth;
 	card* attacker;
 	card* sub_attacker;
@@ -741,4 +740,6 @@ public:
 #define MSG_RELOAD_FIELD		162
 #define MSG_AI_NAME				163
 #define MSG_SHOW_HINT			164
+#define MSG_MATCH_KILL			170
+#define MSG_CUSTOM_MSG			180
 #endif /* FIELD_H_ */

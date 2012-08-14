@@ -601,6 +601,10 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			SinglePlayRefreshExtra(player);
 			break;
 		}
+		case MSG_MATCH_KILL: {
+			pbuf += 4;
+			break;
+		}
 		case MSG_RELOAD_FIELD: {
 			mainGame->gMutex.Lock();
 			mainGame->dField.Clear();

@@ -52,7 +52,6 @@ field::field(duel* pduel) {
 	for (int i = 0; i < 5; ++i)
 		core.pre_field[i] = 0;
 	core.summoning_card = 0;
-	core.spsummoning_card = 0;
 	core.summon_depth = 0;
 	core.chain_limit = 0;
 	core.chain_limit_p = 0;

@@ -1353,6 +1353,10 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 			RefreshHand(1, 0x181fff, 0);
 			break;
 		}
+		case MSG_MATCH_KILL: {
+			pbuf += 4;
+			break;
+		}
 		}
 	}
 	return 0;

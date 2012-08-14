@@ -12,6 +12,7 @@ function c3643300.initial_effect(c)
 	--atk
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetCode(EFFECT_IGNORE_BATTLE_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c3643300.econ)

@@ -51,6 +51,7 @@ protected:
 	std::set<DuelPlayer*> observers;
 	Replay last_replay;
 	bool match_mode;
+	int match_kill;
 	unsigned char duel_count;
 	unsigned char tp_player;
 	unsigned char match_result[3];

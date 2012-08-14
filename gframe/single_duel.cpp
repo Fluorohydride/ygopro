@@ -11,6 +11,7 @@ namespace ygo {
 
 SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
+	match_kill = 0;
 	for(int i = 0; i < 2; ++i) {
 		players[i] = 0;
 		ready[i] = false;
@@ -478,19 +479,10 @@ void SingleDuel::DuelEndProc() {
 		int winc[3] = {0, 0, 0};
 		for(int i = 0; i < duel_count; ++i)
 			winc[match_result[i]]++;
-		if(winc[0] == 2 || (winc[0] == 1 && winc[2] == 2)) {
-			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-			NetServer::ReSendToPlayer(players[1]);
-			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-				NetServer::ReSendToPlayer(*oit);
-			NetServer::StopServer();
-		} else if(winc[1] == 2 || (winc[1] == 1 && winc[2] == 2)) {
-			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-			NetServer::ReSendToPlayer(players[1]);
-			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-				NetServer::ReSendToPlayer(*oit);
-			NetServer::StopServer();
-		} else if(winc[2] == 3 || (winc[0] == 1 && winc[1] == 1 && winc[2] == 1)) {
+		if(match_kill
+		        || (winc[0] == 2 || (winc[0] == 1 && winc[2] == 2))
+		        || (winc[1] == 2 || (winc[1] == 1 && winc[2] == 2))
+		        || (winc[2] == 3 || (winc[0] == 1 && winc[1] == 1 && winc[2] == 1)) ) {
 			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
@@ -1276,6 +1268,17 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			NetServer::ReSendToPlayer(players[1]);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
+			break;
+		}
+		case MSG_MATCH_KILL: {
+			int code = BufferIO::ReadInt32(pbuf);
+			if(match_mode) {
+				match_kill = code;
+				NetServer::SendBufferToPlayer(players[0], STOC_GAME_MSG, offset, pbuf - offset);
+				NetServer::ReSendToPlayer(players[1]);
+				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+					NetServer::ReSendToPlayer(*oit);
+			}
 			break;
 		}
 		}

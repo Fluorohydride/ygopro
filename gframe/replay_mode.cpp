@@ -638,6 +638,10 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
 		}
+		case MSG_MATCH_KILL: {
+			pbuf += 4;
+			break;
+		}
 		case MSG_TAG_SWAP: {
 			player = pbuf[0];
 			pbuf += pbuf[3] * 4 + 8;

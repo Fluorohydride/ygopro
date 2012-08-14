@@ -452,6 +452,10 @@ int32 field::damage(uint16 step, effect* reason_effect, uint32 reason, uint8 rea
 		core.units.begin()->arg2 = (core.units.begin()->arg2 & 0xff000000) + (val & 0xffffff);
 		raise_event(reason_card, EVENT_DAMAGE, reason_effect, reason, reason_player, playerid, val);
 		if(reason == REASON_BATTLE && reason_card) {
+			if((player[playerid].lp <= 0) && (core.attack_target == 0) && reason_card->is_affected_by_effect(EFFECT_MATCH_KILL)) {
+				pduel->write_buffer8(MSG_MATCH_KILL);
+				pduel->write_buffer32(reason_card->data.code);
+			}
 			raise_single_event(reason_card, 0, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, val);
 			raise_event(reason_card, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, val);
 		}
@@ -1236,6 +1240,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			effect* pextra = (effect*)core.temp_var[0];
 			pextra->get_value(target);
 		}
+		target->set_status(STATUS_FLIP_SUMMONED, FALSE);
 		target->enable_field_effect(FALSE);
 		if(is_player_affected_by_effect(sumplayer, EFFECT_DEVINE_LIGHT))
 			move_to_field(target, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
@@ -1442,6 +1447,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 	case 3: {
 		target->set_status(STATUS_SUMMONING, FALSE);
 		target->enable_field_effect(TRUE);
+		target->set_status(STATUS_FLIP_SUMMONED, TRUE);
 		if(target->is_status(STATUS_DISABLED))
 			target->reset(RESET_DISABLE, RESET_EVENT);
 		target->set_status(STATUS_SUMMON_TURN, TRUE);
@@ -1810,8 +1816,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		core.phase_action = TRUE;
 		target->current.reason_effect = core.units.begin()->peffect;
 		target->set_status(STATUS_SUMMONING, TRUE);
-		target->set_status(STATUS_SUMMON_DISABLED, FALSE);
-		core.spsummoning_card = target;
+		target->set_status(STATUS_SUMMON_DISABLED | STATUS_FLIP_SUMMONED, FALSE);
+		core.summoning_card = target;
 		pduel->write_buffer8(MSG_SPSUMMONING);
 		pduel->write_buffer32(target->data.code);
 		pduel->write_buffer8(target->current.controler);
@@ -1840,7 +1846,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		return FALSE;
 	}
 	case 10: {
-		core.spsummoning_card = 0;
+		core.summoning_card = 0;
 		raise_event(target, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
@@ -1865,7 +1871,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		if(target->is_status(STATUS_DISABLED))
 			target->reset(RESET_DISABLE, RESET_EVENT);
 		target->set_status(STATUS_PROC_COMPLETE | STATUS_SUMMON_TURN, TRUE);
-		core.spsummoning_card = 0;
+		core.summoning_card = 0;
 		return FALSE;
 	}
 	case 16: {
@@ -1953,6 +1959,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!targets)
 			core.special_summoning.insert(target);
 		target->enable_field_effect(FALSE);
+		target->set_status(STATUS_FLIP_SUMMONED, FALSE);
 		core.spsummoned_cards_pt[target->summon_player].insert(target);
 		core.spsummon_state[target->summon_player] = TRUE;
 		core.hint_timing[target->summon_player] |= TIMING_SPSUMMON;
@@ -3084,6 +3091,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 						trapmonster = true;
 					pcard->reset(RESET_TURN_SET, RESET_EVENT);
 					pcard->set_status(STATUS_SET_TURN, TRUE);
+					pcard->set_status(STATUS_FLIP_SUMMONED, FALSE);
 					pcard->enable_field_effect(FALSE);
 				}
 				if((npos & POS_FACEDOWN) && pcard->equiping_cards.size()) {

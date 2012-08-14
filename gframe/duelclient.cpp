@@ -27,6 +27,7 @@ wchar_t DuelClient::event_string[256];
 mtrandom DuelClient::rnd;
 
 bool DuelClient::is_refreshing = false;
+int DuelClient::match_kill = 0;
 std::vector<HostPacket> DuelClient::hosts;
 std::set<unsigned int> DuelClient::remotes;
 event* DuelClient::resp_event = 0;
@@ -485,6 +486,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->dInfo.tag_player[1] = false;
 		}
 		mainGame->gMutex.Unlock();
+		match_kill = 0;
 		break;
 	}
 	case STOC_DUEL_END: {
@@ -818,14 +820,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->showcardcode = 3;
 		else if(mainGame->LocalPlayer(player) == 0) {
 			mainGame->showcardcode = 1;
-			if(type < 0x10)
+			if(match_kill)
+				myswprintf(vic_buf, dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
+			else if(type < 0x10)
 				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.clientname, dataManager.GetVictoryString(type));
 			else
 				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
 			mainGame->dInfo.vic_string = vic_buf;
 		} else {
 			mainGame->showcardcode = 2;
-			if(type < 0x10)
+			if(match_kill)
+				myswprintf(vic_buf, dataManager.GetVictoryString(0x20), dataManager.GetName(match_kill));
+			else if(type < 0x10)
 				myswprintf(vic_buf, L"[%ls] %ls", mainGame->dInfo.hostname, dataManager.GetVictoryString(type));
 			else
 				myswprintf(vic_buf, L"%ls", dataManager.GetVictoryString(type));
@@ -2824,6 +2830,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_highlighting = false;
 			mainGame->showcard = 0;
 		}
+		return true;
+	}
+	case MSG_MATCH_KILL: {
+		match_kill = BufferIO::ReadInt32(pbuf);
 		return true;
 	}
 	case MSG_TAG_SWAP: {
