@@ -16,7 +16,7 @@ function c85519211.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c85519211.filter,tp,LOCATION_MZONE,0,1,nil) end
 	local g=Duel.GetMatchingGroup(c85519211.filter,tp,LOCATION_MZONE,0,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,1-tp,g:GetCount()*1000)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,g:GetCount()*1000)
 end
 function c85519211.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c85519211.filter,tp,LOCATION_MZONE,0,nil)

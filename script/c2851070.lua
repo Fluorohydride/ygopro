@@ -39,8 +39,8 @@ function c2851070.damop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2851070.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk ==0 then	return e:GetHandler():GetFlagEffect(2851070)~=0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),0,0,0)
+	if chk==0 then return e:GetHandler():GetFlagEffect(2851070)~=0 end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
 function c2851070.desop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then

@@ -55,7 +55,6 @@ function c53828396.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	ec:CreateEffectRelation(e)
 	e:SetLabelObject(ec)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,ec,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ec:GetAttack())
 end
 function c53828396.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

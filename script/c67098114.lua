@@ -37,7 +37,7 @@ function c67098114.initial_effect(c)
 	--salvage
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(67098114,2))
-	e4:SetCategory(CATEGORY_DAMAGE)
+	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -105,15 +105,15 @@ function c67098114.thfilter(c)
 	return c:IsType(TYPE_TRAP) and c:IsAbleToHand()
 end
 function c67098114.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c67098114.thfilter(chkc) end
-	if chk==0 then return true end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c67098114.thfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c67098114.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c67098114.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c67098114.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	end

@@ -13,7 +13,7 @@ function c81218874.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c81218874.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.CheckLPCost(tp,500) end
 	Duel.PayLPCost(tp,500)
 end
 function c81218874.filter(c,e,tp)
