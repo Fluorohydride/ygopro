@@ -81,7 +81,7 @@ function c3891471.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetPlayer(tp)
 	local lv=e:GetHandler():GetFlagEffectLabel(3891471)
 	Duel.SetTargetParam(lv*400)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,lv*400)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,lv*400)
 end
 function c3891471.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

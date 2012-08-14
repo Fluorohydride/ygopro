@@ -16,7 +16,8 @@ function c81913510.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c81913510.filter1(c,e,tp)
 	local code=c:GetCode()
-	return Duel.IsExistingMatchingCard(c81913510.filter2,tp,LOCATION_EXTRA,0,1,nil,code,e,tp)
+	return c:IsFaceup() and c:IsSetCard(0x1f) and c:IsAbleToGraveAsCost()
+		and Duel.IsExistingMatchingCard(c81913510.filter2,tp,LOCATION_EXTRA,0,1,nil,code,e,tp)
 end
 function c81913510.filter2(c,code,e,tp)
 	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)

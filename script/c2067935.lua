@@ -32,24 +32,26 @@ function c2067935.rmfilter(c)
 	return c:IsSetCard(0x19) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
 function c2067935.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and chkc:GetControler()==tp and c2067935.rmfilter(chkc) end
-	if chk==0 then return true end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c2067935.rmfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c2067935.rmfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c2067935.rmfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function c2067935.rmop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local code=tc:GetOriginalCode()
 		Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)
-		local e1=Effect.CreateEffect(e:GetHandler())
+		if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EFFECT_CHANGE_CODE)
 		e1:SetValue(code)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		e:GetHandler():RegisterEffect(e1)
+		c:RegisterEffect(e1)
 	end
 end
 function c2067935.spcon(e,tp,eg,ep,ev,re,r,rp)

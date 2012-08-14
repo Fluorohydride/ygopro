@@ -36,7 +36,7 @@ function c76218643.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(800)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,800)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,800)
 end
 function c76218643.recop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

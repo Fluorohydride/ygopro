@@ -61,7 +61,7 @@ function c19578592.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local p=e:GetHandler():GetEquipTarget():GetControler()
 	Duel.SetTargetPlayer(p)
 	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,p,500)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,p,500)
 end
 function c19578592.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

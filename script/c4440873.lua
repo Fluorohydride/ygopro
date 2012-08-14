@@ -16,7 +16,7 @@ end
 function c4440873.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetCard(eg)
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function c4440873.filter(c,e,tp)
 	return c:IsRelateToEffect(e) and c:IsControler(tp)
@@ -27,7 +27,7 @@ function c4440873.activate(e,tp,eg,ep,ev,re,r,rp)
 	elseif sg:GetCount()==1 then
 		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
 	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DISCARD)
 		local dg=sg:Select(1-tp,1,1,nil)
 		Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
 	end

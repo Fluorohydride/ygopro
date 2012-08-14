@@ -54,7 +54,7 @@ function c71315423.eqlimit(e,c)
 end
 function c71315423.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,e:GetHandler():GetEquipTarget():GetControler(),400)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,e:GetHandler():GetEquipTarget():GetControler(),400)
 end
 function c71315423.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(e:GetHandler():GetEquipTarget():GetControler(),400,REASON_EFFECT)
