@@ -80,7 +80,7 @@ function c76080032.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c76080032.discon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
-	return ec and (ec==Duel.GetAttacker() or ec==Duel.GetAttackTarget()) and ec:GetBattleTarget():IsFaceup()
+	return ec and (ec==Duel.GetAttacker() or ec==Duel.GetAttackTarget()) and ec:GetBattleTarget()
 end
 function c76080032.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetEquipTarget():GetBattleTarget()
