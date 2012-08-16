@@ -55,6 +55,7 @@ field::field(duel* pduel) {
 	core.summon_depth = 0;
 	core.chain_limit = 0;
 	core.chain_limit_p = 0;
+	core.chain_solving = FALSE;
 	core.win_player = 5;
 	core.win_reason = 0;
 	core.reason_effect = 0;

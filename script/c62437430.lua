@@ -48,7 +48,7 @@ function c62437430.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetLabelObject():GetFlagEffect(62437430)~=0
 		and e:GetLabelObject():GetReasonEffect():GetHandler()==e:GetHandler() end
 	Duel.SetTargetCard(e:GetLabelObject())
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetLabelObject(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetLabelObject(),1,0,0)
 end
 function c62437430.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

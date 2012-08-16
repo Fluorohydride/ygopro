@@ -19,10 +19,10 @@ function c58859575.initial_effect(c)
 	e2:SetCondition(c58859575.spcon)
 	e2:SetOperation(c58859575.spop)
 	c:RegisterEffect(e2)
-	--destroy
+	--pos
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(58859575,0))
-	e3:SetCategory(CATEGORY_DESTROY)
+	e3:SetCategory(CATEGORY_POSITION)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)

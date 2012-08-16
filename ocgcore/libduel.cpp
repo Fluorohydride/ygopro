@@ -2716,7 +2716,7 @@ int32 scriptlib::duel_is_player_can_flipsummon(lua_State * L) {
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_spsummon_monster(lua_State * L) {
-	check_param_count(L, 8);
+	check_param_count(L, 9);
 	int32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1) {
 		lua_pushboolean(L, 0);
