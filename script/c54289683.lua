@@ -22,7 +22,7 @@ function c54289683.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=cg:GetFirst()
 	local t1=Duel.IsExistingTarget(c54289683.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
 	local t2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,0,0,c:GetAttack(),c:GetDefence(),c:GetLevel(),c:GetRace(),c:GetAttribute())
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,93130022,0,0x4011,c:GetAttack(),c:GetDefence(),c:GetLevel(),c:GetRace(),c:GetAttribute())
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(93130021,0))
 	if t1 and t2 then
 		op=Duel.SelectOption(tp,aux.Stringid(93130021,1),aux.Stringid(93130021,2),aux.Stringid(93130021,3))

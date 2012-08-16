@@ -20,7 +20,7 @@ end
 function c86871614.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ec=eg:GetFirst()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 
-		Duel.IsPlayerCanSpecialSummonMonster(tp,86871615,0,0x11,ec:GetBaseAttack(),ec:GetBaseDefence(),
+		Duel.IsPlayerCanSpecialSummonMonster(tp,86871615,0,0x4011,ec:GetBaseAttack(),ec:GetBaseDefence(),
 			ec:GetOriginalLevel(),ec:GetOriginalRace(),ec:GetOriginalAttribute()) end
 	ec:CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
@@ -30,7 +30,7 @@ function c86871614.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()
 	if not ec:IsRelateToEffect(e) or ec:IsFacedown() then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,86871615,0,0x11,ec:GetBaseAttack(),ec:GetBaseDefence(),
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,86871615,0,0x4011,ec:GetBaseAttack(),ec:GetBaseDefence(),
 			ec:GetOriginalLevel(),ec:GetOriginalRace(),ec:GetOriginalAttribute()) then return end
 	ec:RegisterFlagEffect(86871614,RESET_EVENT+0x17a0000,0,0)
 	local token=Duel.CreateToken(tp,86871615)

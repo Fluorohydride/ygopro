@@ -12,7 +12,7 @@ function c83121692.initial_effect(c)
 	c:RegisterEffect(e1)
 	--set target
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(61757117,0))
+	e1:SetDescription(aux.Stringid(83121692,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
