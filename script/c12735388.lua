@@ -40,7 +40,7 @@ function c12735388.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c12735388.discon1(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
-	return ec and (ec==Duel.GetAttacker() or ec==Duel.GetAttackTarget())
+	return ec and (ec==Duel.GetAttacker() or ec==Duel.GetAttackTarget()) and ec:GetBattleTarget()
 end
 function c12735388.disop1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

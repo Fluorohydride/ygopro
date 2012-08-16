@@ -8,10 +8,10 @@ function c45023678.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetOperation(c45023678.chop)
 	c:RegisterEffect(e1)
-	--special summon
+	--destroy
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(45023678,0))
-	e2:SetCategory(CATEGORY_DRAW)
+	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_CHAIN_END)

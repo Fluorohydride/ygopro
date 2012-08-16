@@ -56,13 +56,13 @@ function c35268887.val(e,re,dam,r,rp,rc)
 	else return dam end
 end
 function c35268887.tokentg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c35268887[tp]~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE,0)>=c35268887[tp]
+	if chk==0 then return c35268887[tp]~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=c35268887[tp]
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,35268888,0,0x4011,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,c35268887[tp],0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,c35268887[tp],0,0)
 end
 function c35268887.tokenop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE,0)<c35268887[tp]
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<c35268887[tp]
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,35268888,0,0x4011,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
 	for i=1,c35268887[tp] do
 		local token=Duel.CreateToken(tp,35268888)

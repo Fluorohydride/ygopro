@@ -21,7 +21,7 @@ function c27450400.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
 	if ft>ct then ft=ct end
 	if ft<=0 then return end
-	if not Duel.IsPlayerCanSpecialSummonMonster(tp,27450401,0,0x4011,0,0,4,RACE_MACHINE,ATTRIBUTE_EARTH) then return end
+	if not Duel.IsPlayerCanSpecialSummonMonster(tp,27450401,0,0x4011,0,0,1,RACE_MACHINE,ATTRIBUTE_EARTH) then return end
 	local ctn=true
 	while ft>0 and ctn do
 		local token=Duel.CreateToken(tp,27450401)
