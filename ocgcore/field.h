@@ -237,6 +237,7 @@ struct processor {
 	uint8 to_bp;
 	uint8 to_m2;
 	uint8 to_ep;
+	uint8 skip_m2;
 	uint8 chain_attack;
 	card* chain_attack_target;
 	uint8 selfdes_disabled;

@@ -2272,6 +2272,11 @@ int32 field::process_idle_command(uint16 step) {
 			}
 			return FALSE;
 		}
+		if((infos.phase == PHASE_MAIN2) && core.skip_m2) {
+			core.skip_m2 = FALSE;
+			returns.ivalue[0] = 7;
+			return FALSE;
+		}
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
@@ -3798,9 +3803,9 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			}
 			return FALSE;
 		}
+		core.skip_m2 = FALSE;
 		if(returns.ivalue[0] == 3) { // End Phase
-			core.units.begin()->step = 14;
-			return FALSE;
+			core.skip_m2 = TRUE;
 		}
 		//Main2
 		infos.phase = PHASE_MAIN2;
