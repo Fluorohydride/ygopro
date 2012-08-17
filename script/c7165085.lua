@@ -41,7 +41,9 @@ function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
 				e:SetProperty(te:GetProperty())
 				Duel.Hint(HINT_CARD,0,tc:GetOriginalCode())
 				Duel.ChangePosition(tc,POS_FACEUP)
-				tc:CancelToGrave(false)
+				if tc:GetType()==TYPE_TYPE then
+					tc:CancelToGrave(false)
+				end
 				tc:CreateEffectRelation(te)
 				if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
 				if target then target(te,tep,eg,ep,ev,re,r,rp,1) end

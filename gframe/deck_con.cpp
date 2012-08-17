@@ -182,104 +182,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				FilterCards();
 				break;
 			}
-			case BUTTON_RESULT_FILTER: {
-				filter_type = mainGame->cbCardType->getSelected();
-				filter_type2 = mainGame->cbCardType2->getItemData(mainGame->cbCardType2->getSelected());
-				filter_lm = mainGame->cbLimit->getSelected();
-				if(filter_type > 1) {
-					FilterCardsFromResult();
-					break;
-				}
-				filter_attrib = mainGame->cbAttribute->getItemData(mainGame->cbAttribute->getSelected());
-				filter_race = mainGame->cbRace->getItemData(mainGame->cbRace->getSelected());
-				const wchar_t* pstr = mainGame->ebAttack->getText();
-				if(*pstr == 0) filter_atktype = 0;
-				else {
-					if(*pstr == L'=') {
-						filter_atktype = 1;
-						filter_atk = BufferIO::GetVal(pstr + 1);
-					} else if(*pstr >= L'0' && *pstr <= L'9') {
-						filter_atktype = 1;
-						filter_atk = BufferIO::GetVal(pstr);
-					} else if(*pstr == L'>') {
-						if(*(pstr + 1) == L'=') {
-							filter_atktype = 2;
-							filter_atk = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_atktype = 3;
-							filter_atk = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'<') {
-						if(*(pstr + 1) == L'=') {
-							filter_atktype = 4;
-							filter_atk = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_atktype = 5;
-							filter_atk = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'?') {
-						filter_atktype = 6;
-					} else filter_atktype = 0;
-				}
-				pstr = mainGame->ebDefence->getText();
-				if(*pstr == 0) filter_deftype = 0;
-				else {
-					if(*pstr == L'=') {
-						filter_deftype = 1;
-						filter_def = BufferIO::GetVal(pstr + 1);
-					} else if(*pstr >= L'0' && *pstr <= L'9') {
-						filter_deftype = 1;
-						filter_def = BufferIO::GetVal(pstr);
-					} else if(*pstr == L'>') {
-						if(*(pstr + 1) == L'=') {
-							filter_deftype = 2;
-							filter_def = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_deftype = 3;
-							filter_def = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'<') {
-						if(*(pstr + 1) == L'=') {
-							filter_deftype = 4;
-							filter_def = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_deftype = 5;
-							filter_def = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'?') {
-						filter_deftype = 6;
-					} else filter_deftype = 0;
-				}
-				pstr = mainGame->ebStar->getText();
-				if(*pstr == 0) filter_lvtype = 0;
-				else {
-					if(*pstr == L'=') {
-						filter_lvtype = 1;
-						filter_lv = BufferIO::GetVal(pstr + 1);
-					} else if(*pstr >= L'0' && *pstr <= L'9') {
-						filter_lvtype = 1;
-						filter_lv = BufferIO::GetVal(pstr);
-					} else if(*pstr == L'>') {
-						if(*(pstr + 1) == L'=') {
-							filter_lvtype = 2;
-							filter_lv = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_lvtype = 3;
-							filter_lv = BufferIO::GetVal(pstr + 1);
-						}
-					} else if(*pstr == L'<') {
-						if(*(pstr + 1) == L'=') {
-							filter_lvtype = 4;
-							filter_lv = BufferIO::GetVal(pstr + 2);
-						} else {
-							filter_lvtype = 5;
-							filter_lv = BufferIO::GetVal(pstr + 1);
-						}
-					} else filter_lvtype = 0;
-				}
-				FilterCardsFromResult();
-				break;
-			}
 			case BUTTON_CATEGORY_OK: {
 				filter_effect = 0;
 				long long filter = 0x1;
@@ -771,7 +673,11 @@ void DeckBuilder::FilterCards() {
 		if(filter_effect && !(data.category & filter_effect))
 			continue;
 		if(filter_lm) {
-			if(!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1)
+			if(filter_lm <= 3 && (!filterList->count(ptr->first) || (*filterList)[ptr->first] != filter_lm - 1))
+				continue;
+			if(filter_lm == 4 && data.ot != 1)
+				continue;
+			if(filter_lm == 5 && data.ot != 2)
 				continue;
 		}
 		if(pstr) {
@@ -800,101 +706,5 @@ void DeckBuilder::FilterCards() {
 	for(int i = 0; i < 32; ++i)
 		mainGame->chkCategory[i]->setChecked(false);
 }
-void DeckBuilder::FilterCardsFromResult() {
-	int offset = 0;
-	const wchar_t* pstr = mainGame->ebCardName->getText();
-	int trycode = BufferIO::GetVal(pstr);
-	if(dataManager.GetData(trycode, 0)) {
-		results.clear();
-		auto ptr = dataManager.GetCodePointer(trycode);
-		results.push_back(ptr);
-		mainGame->scrFilter->setVisible(false);
-		mainGame->scrFilter->setPos(0);
-		myswprintf(result_string, L"%d", results.size());
-		return;
-	}
-	if(pstr[0] == 0)
-		pstr = 0;
-	for(int i = 0; i < results.size(); ++i) {
-		CardDataC& data = results[i]->second;
-		if(data.type & TYPE_TOKEN)
-			continue;
-		switch(filter_type) {
-		case 1: {
-			int type2 = data.type & 0xe03ef1;
-			if(!(data.type & TYPE_MONSTER) || (filter_type2 == 0x21 && type2 != 0x21) || (data.type & filter_type2) != filter_type2)
-				continue;
-			if(filter_race && data.race != filter_race)
-				continue;
-			if(filter_attrib && data.attribute != filter_attrib)
-				continue;
-			if(filter_atktype) {
-				if((filter_atktype == 1 && data.attack != filter_atk) || (filter_atktype == 2 && data.attack < filter_atk)
-				        || (filter_atktype == 3 && data.attack <= filter_atk) || (filter_atktype == 4 && (data.attack > filter_atk || data.attack < 0))
-				        || (filter_atktype == 5 && (data.attack >= filter_atk || data.attack < 0)) || (filter_atktype == 6 && data.attack != -2))
-					continue;
-			}
-			if(filter_deftype) {
-				if((filter_deftype == 1 && data.defence != filter_def) || (filter_deftype == 2 && data.defence < filter_def)
-				        || (filter_deftype == 3 && data.defence <= filter_def) || (filter_deftype == 4 && (data.defence > filter_def || data.defence < 0))
-				        || (filter_deftype == 5 && (data.defence >= filter_def || data.defence < 0)) || (filter_deftype == 6 && data.defence != -2))
-					continue;
-			}
-			if(filter_lvtype) {
-				if((filter_lvtype == 1 && data.level != filter_lv) || (filter_lvtype == 2 && data.level < filter_lv)
-				        || (filter_lvtype == 3 && data.level <= filter_lv) || (filter_lvtype == 4 && data.level > filter_lv)
-				        || (filter_lvtype == 5 && data.level >= filter_lv))
-					continue;
-			}
-			break;
-		}
-		case 2: {
-			if(!(data.type & TYPE_SPELL))
-				continue;
-			if(filter_type2 && data.type != filter_type2)
-				continue;
-			break;
-		}
-		case 3: {
-			if(!(data.type & TYPE_TRAP))
-				continue;
-			if(filter_type2 && data.type != filter_type2)
-				continue;
-			break;
-		}
-		}
-		if(filter_lm) {
-			if(!filterList->count(results[i]->first) || (*filterList)[results[i]->first] != filter_lm - 1)
-				continue;
-		}
-		if(filter_effect && !(data.category & filter_effect))
-			continue;
-		if(pstr) {
-			CardString& text = dataManager._strings[data.code];
-			if(wcsstr(text.name, pstr) == 0 && wcsstr(text.text, pstr) == 0)
-				continue;
-		}
-		results[offset] = results[i];
-		offset++;
-	}
-	results.resize(offset);
-	myswprintf(result_string, L"%d", results.size());
-	if(results.size() > 7) {
-		mainGame->scrFilter->setVisible(true);
-		mainGame->scrFilter->setMax(results.size() - 7);
-		mainGame->scrFilter->setPos(0);
-	} else {
-		mainGame->scrFilter->setVisible(false);
-		mainGame->scrFilter->setPos(0);
-	}
-	mainGame->cbAttribute->setSelected(0);
-	mainGame->cbRace->setSelected(0);
-	mainGame->cbLimit->setSelected(0);
-	mainGame->ebAttack->setText(L"");
-	mainGame->ebDefence->setText(L"");
-	mainGame->ebStar->setText(L"");
-	filter_effect = 0;
-	for(int i = 0; i < 32; ++i)
-		mainGame->chkCategory[i]->setChecked(false);
-}
+
 }

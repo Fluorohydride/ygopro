@@ -2553,7 +2553,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				}
 			}
 			if((s1 != d1) && (s1 > 0)) {
-				card* ptop = player[0].list_main[s0];
+				card* ptop = player[1].list_main[s0];
 				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 					pduel->write_buffer8(MSG_DECK_TOP);
 					pduel->write_buffer8(1);

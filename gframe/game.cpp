@@ -64,14 +64,14 @@ bool Game::Initialize() {
 	//main menu
 	wchar_t strbuf[256];
 	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X)", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
-	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 450), false, strbuf);
+	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, strbuf);
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
 	btnServerMode = env->addButton(rect<s32>(10, 65, 270, 95), wMainMenu, BUTTON_SINGLE_MODE, dataManager.GetSysString(1201));
 	btnReplayMode = env->addButton(rect<s32>(10, 100, 270, 130), wMainMenu, BUTTON_REPLAY_MODE, dataManager.GetSysString(1202));
-	btnTestMode = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203));
-	btnDeckEdit = env->addButton(rect<s32>(10, 170, 270, 200), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204));
-	btnModeExit = env->addButton(rect<s32>(10, 205, 270, 235), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210));
+//	btnTestMode = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_TEST_MODE, dataManager.GetSysString(1203));
+	btnDeckEdit = env->addButton(rect<s32>(10, 135, 270, 165), wMainMenu, BUTTON_DECK_EDIT, dataManager.GetSysString(1204));
+	btnModeExit = env->addButton(rect<s32>(10, 170, 270, 200), wMainMenu, BUTTON_MODE_EXIT, dataManager.GetSysString(1210));
 	//lan mode
 	wLanWindow = env->addWindow(rect<s32>(220, 100, 800, 520), false, dataManager.GetSysString(1200));
 	wLanWindow->getCloseButton()->setVisible(false);
@@ -384,6 +384,8 @@ bool Game::Initialize() {
 	cbLimit->addItem(dataManager.GetSysString(1316));
 	cbLimit->addItem(dataManager.GetSysString(1317));
 	cbLimit->addItem(dataManager.GetSysString(1318));
+	cbLimit->addItem(dataManager.GetSysString(1240));
+	cbLimit->addItem(dataManager.GetSysString(1241));
 	env->addStaticText(dataManager.GetSysString(1319), rect<s32>(10, 28, 70, 48), false, false, wFilter);
 	cbAttribute = env->addComboBox(rect<s32>(60, 26, 190, 46), wFilter, -1);
 	cbAttribute->addItem(dataManager.GetSysString(1310), 0);
@@ -407,8 +409,7 @@ bool Game::Initialize() {
 	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, SCROLL_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
-	btnStartFilter = env->addButton(rect<s32>(165, 96, 270, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
-	btnResultFilter = env->addButton(rect<s32>(285, 96, 390, 118), wFilter, BUTTON_RESULT_FILTER, dataManager.GetSysString(1328));
+	btnStartFilter = env->addButton(rect<s32>(210, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
 	wCategories = env->addWindow(rect<s32>(630, 60, 1000, 270), false, dataManager.strBuffer);
 	wCategories->getCloseButton()->setVisible(false);
 	wCategories->setDrawTitlebar(false);

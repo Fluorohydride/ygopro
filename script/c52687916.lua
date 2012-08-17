@@ -29,11 +29,13 @@ function c52687916.remop(e,tp,eg,ep,ev,re,r,rp)
 	if g1:GetCount()>0 and ((g2:GetCount()==0 and g3:GetCount()==0) or Duel.SelectYesNo(tp,aux.Stringid(52687916,1))) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local sg1=g1:Select(tp,1,1,nil)
+		Duel.HintSelection(sg1)
 		sg:Merge(sg1)
 	end
 	if g2:GetCount()>0 and ((sg:GetCount()==0 and g3:GetCount()==0) or Duel.SelectYesNo(tp,aux.Stringid(52687916,2))) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local sg2=g2:Select(tp,1,1,nil)
+		Duel.HintSelection(sg2)
 		sg:Merge(sg2)
 	end
 	if g3:GetCount()>0 and (sg:GetCount()==0 or Duel.SelectYesNo(tp,aux.Stringid(52687916,3))) then

@@ -330,7 +330,6 @@ public:
 	irr::gui::IGUIEditBox* ebCardName;
 	irr::gui::IGUIButton* btnEffectFilter;
 	irr::gui::IGUIButton* btnStartFilter;
-	irr::gui::IGUIButton* btnResultFilter;
 	irr::gui::IGUIWindow* wCategories;
 	irr::gui::IGUICheckBox* chkCategory[32];
 	irr::gui::IGUIButton* btnCategoryOK;
@@ -445,7 +444,6 @@ extern Game* mainGame;
 #define COMBOBOX_MAINTYPE			310
 #define BUTTON_EFFECT_FILTER		311
 #define BUTTON_START_FILTER			312
-#define BUTTON_RESULT_FILTER		313
 #define SCROLL_FILTER				314
 #define SCROLL_KEYWORD				315
 #define BUTTON_REPLAY_START			320

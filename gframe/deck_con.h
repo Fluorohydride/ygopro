@@ -12,7 +12,6 @@ class DeckBuilder: public irr::IEventReceiver {
 public:
 	virtual bool OnEvent(const irr::SEvent& event);
 	void FilterCards();
-	void FilterCardsFromResult();
 	
 	long long filter_effect;
 	int filter_type;

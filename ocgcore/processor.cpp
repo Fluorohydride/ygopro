@@ -682,7 +682,7 @@ int32 field::process() {
 					tg->container.insert(core.select_cards[returns.bvalue[i + 1]]);
 					pret->container.insert(core.select_cards[returns.bvalue[i + 1]]);
 				}
-				if(returns.bvalue[0] > 0 && peffect->flag & EFFECT_FLAG_CARD_TARGET) {
+				if((returns.bvalue[0] > 0) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					for(int32 i = 0; i < returns.bvalue[0]; ++i) {
 						card* pcard = core.select_cards[returns.bvalue[i + 1]];
 						if(pcard->current.location & 0x30)
