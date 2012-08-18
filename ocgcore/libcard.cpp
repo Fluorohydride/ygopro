@@ -332,7 +332,7 @@ int32 scriptlib::card_is_type(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 ttype = lua_tointeger(L, 2);
-	if(pcard->get_type()&ttype)
+	if(pcard->get_type() & ttype)
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
@@ -343,7 +343,7 @@ int32 scriptlib::card_is_race(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 trace = lua_tointeger(L, 2);
-	if(pcard->get_race()&trace)
+	if(pcard->get_race() & trace)
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
@@ -354,7 +354,7 @@ int32 scriptlib::card_is_attribute(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 tattrib = lua_tointeger(L, 2);
-	if(pcard->get_attribute()&tattrib)
+	if(pcard->get_attribute() & tattrib)
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
