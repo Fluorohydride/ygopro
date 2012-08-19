@@ -39,7 +39,7 @@ function c37164373.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_HAND+LOCATION_EXTRA)
 	local dg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_ONFIELD,nil)
-	if ct>0 and dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(37164373,1)) then
+	if ct>0 and dg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local rg=dg:Select(tp,1,ct,nil)
 		Duel.HintSelection(rg)

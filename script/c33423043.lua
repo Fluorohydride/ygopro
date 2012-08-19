@@ -11,7 +11,7 @@ function c33423043.initial_effect(c)
 end
 function c33423043.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0
-		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_HAND,0,1,nil) end
+		and Duel.IsExistingMatchingCard(nil,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,564)
 	local ac=Duel.AnnounceCard(tp)
 	e:SetLabel(ac)
