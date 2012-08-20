@@ -3016,6 +3016,46 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.GetCardLocation(ccard, &ccard->curPos, &ccard->curRot, true);
 			}
 		}
+		val = BufferIO::ReadInt8(pbuf); //chains
+		for(int i = 0; i < val; ++i) {
+			int code = BufferIO::ReadInt32(pbuf);
+			int pcc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			int pcl = BufferIO::ReadInt8(pbuf);
+			int pcs = BufferIO::ReadInt8(pbuf);
+			int subs = BufferIO::ReadInt8(pbuf);
+			int cc = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
+			int cl = BufferIO::ReadInt8(pbuf);
+			int cs = BufferIO::ReadInt8(pbuf);
+			int desc = BufferIO::ReadInt32(pbuf);
+			ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
+			mainGame->dField.current_chain.chain_card = pcard;
+			mainGame->dField.current_chain.code = code;
+			mainGame->dField.current_chain.desc = desc;
+			mainGame->dField.current_chain.controler = cc;
+			mainGame->dField.current_chain.location = cl;
+			mainGame->dField.current_chain.sequence = cs;
+			mainGame->dField.GetChainLocation(cc, cl, cs, &mainGame->dField.current_chain.chain_pos);
+			mainGame->dField.current_chain.solved = false;
+			int chc = 0;
+			for(int i = 0; i < mainGame->dField.chains.size(); ++i) {
+				if (cl == 0x10 || cl == 0x20) {
+					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl)
+						chc++;
+				} else {
+					if (mainGame->dField.chains[i].controler == cc && mainGame->dField.chains[i].location == cl && mainGame->dField.chains[i].sequence == cs)
+						chc++;
+				}
+			}
+			if(cl == LOCATION_HAND)
+				mainGame->dField.current_chain.chain_pos.X += 0.35;
+			else
+				mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
+			mainGame->dField.chains.push_back(mainGame->dField.current_chain);
+		}
+		if(val) {
+			myswprintf(event_string, dataManager.GetSysString(1609), dataManager.GetName(mainGame->dField.current_chain.code));
+			mainGame->dField.last_chain = true;
+		}
 		mainGame->gMutex.Unlock();
 		break;
 	}

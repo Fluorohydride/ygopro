@@ -316,6 +316,19 @@ extern "C" DECL_DLLEXPORT int32 query_field_info(ptr pduel, byte* buf) {
 		*buf++ = ptduel->game_field->player[playerid].list_remove.size();
 		*buf++ = ptduel->game_field->player[playerid].list_extra.size();
 	}
+	*buf++ = ptduel->game_field->core.current_chain.size();
+	for(auto chit = ptduel->game_field->core.current_chain.begin(); chit != ptduel->game_field->core.current_chain.end(); ++chit) {
+		effect* peffect = chit->triggering_effect;
+		*((int*)(buf)) = peffect->handler->data.code;
+		buf += 4;
+		*((int*)(buf)) = peffect->handler->get_info_location();
+		buf += 4;
+		*buf++ = chit->triggering_controler;
+		*buf++ = chit->triggering_location;
+		*buf++ = chit->triggering_sequence;
+		*((int*)(buf)) = peffect->description;
+		buf += 4;
+	}
 	return 0;
 }
 extern "C" DECL_DLLEXPORT void set_responsei(ptr pduel, int32 value) {

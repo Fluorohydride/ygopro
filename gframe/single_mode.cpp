@@ -665,6 +665,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 					mainGame->dField.AddCard(ccard, p, LOCATION_EXTRA, seq);
 				}
 			}
+			BufferIO::ReadInt8(pbuf); //chain count, always 0
 			SinglePlayReload();
 			mainGame->dField.RefreshAllCards();
 			mainGame->gMutex.Unlock();

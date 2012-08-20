@@ -116,6 +116,16 @@ void field::reload_field_info() {
 		pduel->write_buffer8(player[playerid].list_remove.size());
 		pduel->write_buffer8(player[playerid].list_extra.size());
 	}
+	pduel->write_buffer8(core.current_chain.size());
+	for(auto chit = core.current_chain.begin(); chit != core.current_chain.end(); ++chit) {
+		effect* peffect = chit->triggering_effect;
+		pduel->write_buffer32(peffect->handler->data.code);
+		pduel->write_buffer32(peffect->handler->get_info_location());
+		pduel->write_buffer8(chit->triggering_controler);
+		pduel->write_buffer8(chit->triggering_location);
+		pduel->write_buffer8(chit->triggering_sequence);
+		pduel->write_buffer32(peffect->description);
+	}
 }
 
 void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence) {

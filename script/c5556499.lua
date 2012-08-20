@@ -28,20 +28,20 @@ function c5556499.initial_effect(c)
 	e3:SetOperation(c5556499.hdop)
 	c:RegisterEffect(e3)
 end
-function c5556499.spfilter(c,ec)
-	return c:IsRace(RACE_MACHINE) and (c~=ec or c:IsDiscardable())
+function c5556499.spfilter(c)
+	return c:IsRace(RACE_MACHINE) and c:IsDiscardable()
 end
 function c5556499.spcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetMatchingGroup(c5556499.spfilter,c:GetControler(),LOCATION_HAND,0,nil,c)
-	if c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT) then
+	local g=Duel.GetMatchingGroup(c5556499.spfilter,c:GetControler(),LOCATION_HAND,0,nil)
+	if not c:IsAbleToGraveAsCost() then
 		g:RemoveCard(c)
 	end
 	return g:CheckWithSumGreater(Card.GetLevel,8)
 end
 function c5556499.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetMatchingGroup(c5556499.spfilter,c:GetControler(),LOCATION_HAND,0,nil,c)
-	if c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT) then
+	local g=Duel.GetMatchingGroup(c5556499.spfilter,c:GetControler(),LOCATION_HAND,0,nil)
+	if not c:IsAbleToGraveAsCost() then
 		g:RemoveCard(c)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
