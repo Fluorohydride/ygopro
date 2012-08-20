@@ -26,7 +26,7 @@ function c49460512.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c49460512.cfilter,1,nil,tp)
 end
 function c49460512.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE,0)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.ShuffleHand(tp)

@@ -36,7 +36,7 @@ function c33981008.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and Duel.IsExistingMatchingCard(c33981008.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
 end
 function c33981008.filter(c)
-	return c:IsSetCard(0x106e) and c:GetCode()~=33981008 and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
+	return c:IsSetCard(0x106e) and c:GetCode()~=33981008 and c:IsType(TYPE_SPELL) and c:IsAbleToDeck()
 end
 function c33981008.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) and Duel.IsExistingMatchingCard(c33981008.filter,tp,LOCATION_GRAVE,0,1,nil) end

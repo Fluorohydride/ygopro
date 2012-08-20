@@ -14,7 +14,6 @@ function c4335645.initial_effect(c)
 end
 function c4335645.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
-		and e:GetHandler():GetReasonCard():IsRelateToBattle()
 end
 function c4335645.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsDestructable() end

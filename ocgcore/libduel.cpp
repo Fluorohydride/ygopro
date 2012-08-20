@@ -2966,7 +2966,7 @@ int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 				up += eset[i]->get_value(pcard);
 			else
 				upc += eset[i]->get_value(pcard);
-			if(pcard->temp.attack)
+			if(pcard->temp.attack > 0)
 				peffect = eset[i];
 			break;
 		}

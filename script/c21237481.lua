@@ -30,6 +30,7 @@ function c21237481.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SelectYesNo(tp,aux.Stringid(21237481,1)) then
 		e:SetCategory(CATEGORY_DAMAGE)
 		e:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 		local cg=Duel.SelectMatchingCard(tp,c21237481.costfilter,tp,LOCATION_HAND,0,1,60,nil)
 		Duel.SendtoGrave(cg,REASON_COST+REASON_DISCARD)
 		local dam=cg:GetCount()*500
@@ -45,6 +46,7 @@ function c21237481.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c21237481.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c21237481.costfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local cg=Duel.SelectMatchingCard(tp,c21237481.costfilter,tp,LOCATION_HAND,0,1,60,nil)
 	Duel.SendtoGrave(cg,REASON_COST+REASON_DISCARD)
 	e:SetLabel(cg:GetCount())
