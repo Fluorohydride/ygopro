@@ -41,7 +41,7 @@ function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
 				e:SetProperty(te:GetProperty())
 				Duel.Hint(HINT_CARD,0,tc:GetOriginalCode())
 				Duel.ChangePosition(tc,POS_FACEUP)
-				if tc:GetType()==TYPE_TYPE then
+				if tc:GetType()==TYPE_TRAP then
 					tc:CancelToGrave(false)
 				end
 				tc:CreateEffectRelation(te)

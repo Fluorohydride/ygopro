@@ -41,7 +41,6 @@ end
 function c91819979.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
 	local dt=Duel.GetDrawCount(tp)
-	local dt=Duel.GetDrawCount(tp)
 	if dt~=0 then
 		_replace_count=0
 		_replace_max=dt

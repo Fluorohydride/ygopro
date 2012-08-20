@@ -11,6 +11,9 @@ function c35073065.initial_effect(c)
 	e1:SetTarget(c35073065.sptg)
 	e1:SetOperation(c35073065.spop)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EVENT_MSET)
+	c:RegisterEffect(e2)
 end
 function c35073065.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()
@@ -18,7 +21,7 @@ function c35073065.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c35073065.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.ShuffleHand(tp)
 	Duel.SetTargetCard(eg)
@@ -27,7 +30,7 @@ end
 function c35073065.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=eg:GetFirst()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummonStep(c,0,tp,tp,true,false,POS_FACEUP) then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
 		if ec:IsRelateToEffect(e) and ec:IsFaceup() then
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)

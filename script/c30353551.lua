@@ -58,7 +58,7 @@ function c30353551.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c30353551.filter,tp,LOCATION_DECK,0,c30353551[tp],c30353551[tp],nil,e,tp)
 	if g:GetCount()==0 then return end
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE,0)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	elseif ft>=g:GetCount() then

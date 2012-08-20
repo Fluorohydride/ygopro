@@ -62,7 +62,7 @@ function c73398797.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c73398797.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c73398797[tp] and e:GetHandler():IsReleasable()end
+	if chk==0 then return c73398797[tp] and e:GetHandler():IsReleasable() end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
@@ -77,8 +77,8 @@ function c73398797.spfilter(c,e,tp)
 	return c:IsCode(89631139) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c73398797.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c73398797.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
-	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(c73398797.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function c73398797.spop(e,tp,eg,ep,ev,re,r,rp)
