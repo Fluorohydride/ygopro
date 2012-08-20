@@ -849,7 +849,7 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 		set_control(pcard1, p2, reset_phase, reset_count);
 		set_control(pcard2, p1, reset_phase, reset_count);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);
-		pcard1->reset(RESET_CONTROL, RESET_EVENT);
+		pcard2->reset(RESET_CONTROL, RESET_EVENT);
 		pcard1->filter_disable_related_cards();
 		pcard2->filter_disable_related_cards();
 		adjust_instant();
@@ -962,7 +962,7 @@ int32 field::control_adjust(uint16 step) {
 			add_card(p2, pcard1, l2, s2);
 			add_card(p1, pcard2, l1, s1);
 			pcard1->reset(RESET_CONTROL, RESET_EVENT);
-			pcard1->reset(RESET_CONTROL, RESET_EVENT);
+			pcard2->reset(RESET_CONTROL, RESET_EVENT);
 			pduel->write_buffer8(MSG_SWAP);
 			pduel->write_buffer32(pcard1->data.code);
 			pduel->write_buffer8(pcard2->current.controler);
@@ -2553,7 +2553,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				}
 			}
 			if((s1 != d1) && (s1 > 0)) {
-				card* ptop = player[1].list_main[s0];
+				card* ptop = player[1].list_main[s1];
 				if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 					pduel->write_buffer8(MSG_DECK_TOP);
 					pduel->write_buffer8(1);
