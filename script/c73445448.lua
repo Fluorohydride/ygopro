@@ -37,7 +37,7 @@ function c73445448.filter(c)
 	return c:IsFaceup() and not c:IsDisabled() and not c:IsType(TYPE_NORMAL)
 end
 function c73445448.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c73445448.filter(chkc) end
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c73445448.filter(chkc) end
 	if chk==0 then return e:GetHandler():IsAttackPos()
 		and Duel.IsExistingTarget(c73445448.filter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

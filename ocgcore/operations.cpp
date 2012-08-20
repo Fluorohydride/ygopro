@@ -2891,19 +2891,23 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 	switch(step) {
 	case 0: {
 		returns.ivalue[0] = FALSE;
-		if(ret && (!(target->current.reason & REASON_TEMPORARY) || (target->current.reason_effect->owner != core.reason_effect->owner)))
+		if((ret == 1) && (!(target->current.reason & REASON_TEMPORARY) || (target->current.reason_effect->owner != core.reason_effect->owner)))
 			return TRUE;
 		if(!(location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))) {
 			uint32 flag;
 			uint32 lreason = (target->current.location == LOCATION_MZONE) ? LOCATION_REASON_CONTROL : LOCATION_REASON_TOFIELD;
 			uint32 ct = get_useable_count(playerid, location, move_player, lreason, &flag);
-			if(ret && (ct <= 0 || !(target->data.type & TYPE_MONSTER))) {
+			if((ret == 1) && (ct <= 0 || !(target->data.type & TYPE_MONSTER))) {
 				core.units.begin()->step = 3;
 				send_to(target, core.reason_effect, REASON_EFFECT, core.reason_player, PLAYER_NONE, LOCATION_GRAVE, 0, 0);
 				return FALSE;
 			}
 			if(!ct)
 				return TRUE;
+			if(ret && is_location_useable(playerid, location, target->previous.sequence)) {
+				returns.bvalue[2] = target->previous.sequence;
+				return FALSE;
+			}
 			if(move_player == playerid) {
 				if(location == LOCATION_SZONE)
 					flag = ((flag << 8) & 0xff00) | 0xffff00ff;
@@ -2929,7 +2933,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		uint32 seq = returns.bvalue[2];
 		if(location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL))
 			seq = 5;
-		if(!ret) {
+		if(ret != 1) {
 			if(location != target->current.location) {
 				uint32 resetflag = 0;
 				if(location & LOCATION_ONFIELD)
@@ -3016,7 +3020,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		}
 		if((target->previous.location == LOCATION_SZONE) && target->equiping_target)
 			target->unequip();
-		if(enable || ret)
+		if(enable || ((ret == 1) && target->is_position(POS_FACEUP)))
 			target->enable_field_effect(TRUE);
 		adjust_instant();
 		return FALSE;
@@ -3087,7 +3091,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 				}
 				bool trapmonster = false;
 				if((opos & POS_FACEUP) && (npos & POS_FACEDOWN)) {
-					if(pcard->get_type()&TYPE_TRAPMONSTER)
+					if(pcard->get_type() & TYPE_TRAPMONSTER)
 						trapmonster = true;
 					pcard->reset(RESET_TURN_SET, RESET_EVENT);
 					pcard->set_status(STATUS_SET_TURN, TRUE);
@@ -3105,7 +3109,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					pcard->unequip();
 				if(trapmonster) {
 					refresh_location_info_instant();
-					move_to_field(pcard, pcard->current.controler, pcard->current.controler, LOCATION_SZONE, POS_FACEDOWN);
+					move_to_field(pcard, pcard->current.controler, pcard->current.controler, LOCATION_SZONE, POS_FACEDOWN, FALSE, 2);
 				}
 			}
 		}
