@@ -5,9 +5,14 @@ function c30190809.initial_effect(c)
 	e1:SetDescription(aux.Stringid(30190809,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCost(c30190809.cost)
 	e1:SetCondition(c30190809.condition)
 	e1:SetOperation(c30190809.operation)
 	c:RegisterEffect(e1)
+end
+function c30190809.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.CheckLPCost(tp,800)
+	else Duel.PayLPCost(tp,800)	end
 end
 function c30190809.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 and e:GetHandler():GetEffectCount(EFFECT_DIRECT_ATTACK)==0
