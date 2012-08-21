@@ -16,7 +16,7 @@ function c23701465.cfilter(c)
 	return c:IsFaceup() and (code==72989439 or code==82301904)
 end
 function c23701465.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c23701465.cfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	return Duel.IsExistingMatchingCard(c23701465.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c23701465.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_REMOVED) and chkc:IsAbleToHand()end
