@@ -8,11 +8,12 @@ function c9628664.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetOperation(c9628664.chop)
 	c:RegisterEffect(e1)
-	--special summon
+	--draw
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(9628664,0))
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_CHAIN_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c9628664.drcon)
@@ -27,7 +28,7 @@ function c9628664.chop(e,tp,eg,ep,ev,re,r,rp)
 		e:SetLabel(0)
 	elseif not Duel.CheckChainUniqueness() then
 		e:SetLabel(2)
-	elseif re:IsHasType(EFFECT_TYPE_ACTIVATE) and e:GetLabel()~=2 then
+	elseif ct>=3 and e:GetLabel()~=2 then
 		e:SetLabel(1)
 	end
 end

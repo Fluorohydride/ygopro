@@ -30,7 +30,7 @@ end
 function c3370104.distg(e,c)
 	if not e:GetHandler():IsAttackPos() or c:GetCardTargetCount()~=1 then return false end
 	local tc=c:GetFirstCardTarget()
-	return tc:IsControler(e:GetHandlerPlayer()) and tc:IsRace(RACE_MACHINE)
+	return tc:IsControler(e:GetHandlerPlayer()) and tc:IsFaceup() and tc:IsRace(RACE_MACHINE)
 end
 function c3370104.disop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsAttackPos() or re:IsActiveType(TYPE_MONSTER) then return end
@@ -38,7 +38,7 @@ function c3370104.disop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()~=1 then return end
 	local tc=g:GetFirst()
-	if tc:IsControler(tp) and tc:IsRace(RACE_MACHINE) then
+	if tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() and tc:IsRace(RACE_MACHINE) then
 		Duel.NegateEffect(ev)
 	end
 end

@@ -11,7 +11,7 @@ function c76263644.initial_effect(c)
 	e2:SetDescription(aux.Stringid(76263644,0))
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c76263644.descon)
+	e2:SetCost(c76263644.descost)
 	e2:SetTarget(c76263644.destg)
 	e2:SetOperation(c76263644.desop)
 	c:RegisterEffect(e2)
@@ -30,8 +30,15 @@ function c76263644.initial_effect(c)
 end
 c76263644.material_count=2
 c76263644.material={83965310,17132130}
-function c76263644.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+function c76263644.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1 end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_BP)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetTargetRange(1,0)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	Duel.RegisterEffect(e1,tp)
 end
 function c76263644.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDestructable() end
@@ -43,13 +50,6 @@ function c76263644.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if d:IsFaceup() then atk=d:GetAttack() end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_BP)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
 end
 function c76263644.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

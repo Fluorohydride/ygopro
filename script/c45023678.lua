@@ -28,7 +28,7 @@ function c45023678.chop(e,tp,eg,ep,ev,re,r,rp)
 		e:SetLabel(0)
 	elseif not Duel.CheckChainUniqueness() then
 		e:SetLabel(2)
-	elseif re:IsHasType(EFFECT_TYPE_ACTIVATE) and e:GetLabel()~=2 then
+	elseif ct>=3 and e:GetLabel()~=2 then
 		e:SetLabel(1)
 	end
 end
