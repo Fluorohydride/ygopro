@@ -14,13 +14,15 @@ function c77910045.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c77910045.filter(c,tp)
-	return c:IsPreviousLocation(LOCATION_MZONE) and c:GetControler()==tp and c:IsType(TYPE_MONSTER)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsControler(tp) and c:IsType(TYPE_MONSTER)
 end
 function c77910045.operation(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(c77910045.filter,1,nil,tp) then
-		Duel.Damage(tp,500,REASON_EFFECT)
+	local ct=eg:FilterCount(c77910045.filter,nil,tp)
+	if ct>0 then
+		Duel.Damage(tp,500*ct,REASON_EFFECT)
 	end
-	if eg:IsExists(c77910045.filter,1,nil,1-tp) then
-		Duel.Damage(1-tp,500,REASON_EFFECT)
+	ct=eg:FilterCount(c77910045.filter,nil,1-tp)
+	if ct>0 then
+		Duel.Damage(1-tp,500*ct,REASON_EFFECT)
 	end
 end

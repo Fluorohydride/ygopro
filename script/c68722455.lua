@@ -18,9 +18,9 @@ end
 function c68722455.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c68722455.costfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	local rt=Duel.GetTargetCount(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local cg=Duel.SelectMatchingCard(tp,c68722455.costfilter,tp,LOCATION_HAND,0,1,rt,nil)
-	Duel.SendtoGrave(cg,REASON_COST+REASON_DISCARD)
+	Duel.SendtoGrave(cg,REASON_COST)
 	e:SetLabel(cg:GetCount())
 end
 function c68722455.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

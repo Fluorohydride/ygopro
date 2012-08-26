@@ -11,7 +11,7 @@ function c39284521.initial_effect(c)
 	e1:SetOperation(c39284521.spop)
 	c:RegisterEffect(e1)
 end
-function c39284521.spfilter(c,ec)
+function c39284521.spfilter(c)
 	return c:IsRace(RACE_MACHINE) and c:IsAbleToGraveAsCost()
 end
 function c39284521.spcon(e,c)

@@ -21,7 +21,7 @@ end
 function c71395725.chop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetCurrentChain()==1 then
 		e:SetLabel(0)
-	elseif re:IsHasType(EFFECT_TYPE_ACTIVATE) then
+	else
 		e:SetLabel(1)
 	end
 end

@@ -16,7 +16,7 @@ function c99594764.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetCount()==1 and eg:GetFirst()==e:GetHandler():GetEquipTarget()
 end
 function c99594764.filter(c,race,att)
-	return c:IsRace(race) and c:IsAttribute(att) and c:GetLevel()<=4
+	return c:IsRace(race) and c:IsAttribute(att) and c:GetLevel()<=4 and c:IsAbleToHand()
 end
 function c99594764.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local eqc=e:GetHandler():GetEquipTarget()

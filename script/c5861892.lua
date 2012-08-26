@@ -52,7 +52,7 @@ end
 function c5861892.arcanareg(c,coin)
 	--coin effect
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(34568403,1))
+	e1:SetDescription(aux.Stringid(5861892,1))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -64,7 +64,7 @@ function c5861892.arcanareg(c,coin)
 	c:RegisterEffect(e1)
 	--
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(34568403,2))
+	e2:SetDescription(aux.Stringid(5861892,2))
 	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_F)
 	e2:SetCode(EVENT_CHAINING)
