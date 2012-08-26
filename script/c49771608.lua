@@ -13,21 +13,15 @@ function c49771608.initial_effect(c)
 end
 function c49771608.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	return not c:IsStatus(STATUS_BATTLE_DESTROYED) 
-		and ((c==a and d:GetLocation()==LOCATION_GRAVE) or (c==d and a:GetLocation()==LOCATION_GRAVE))
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c49771608.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	local m=0
-	if a==e:GetHandler() then m=d:GetLevel()*300
-	else m=a:GetLevel()*300 end
+	local rec=e:GetHandler():GetBattleTarget():GetLevel()*300
 	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(m)
-	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,m)
+	Duel.SetTargetParam(rec)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec)
 end
 function c49771608.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

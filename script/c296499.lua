@@ -37,8 +37,8 @@ function c296499.atktarget(e,c)
 end
 function c296499.mtop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetTurnPlayer()~=tp then return end
-	if Duel.CheckReleaseGroup(tp,Card.IsReleasableByCost,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(296499,0)) then
-		local g=Duel.SelectReleaseGroup(tp,Card.IsReleasableByCost,1,1,nil)
+	if Duel.CheckReleaseGroup(tp,Card.IsReleasable,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(296499,0)) then
+		local g=Duel.SelectReleaseGroup(tp,Card.IsReleasable,1,1,nil)
 		Duel.Release(g,REASON_COST)
 	else
 		Duel.Destroy(e:GetHandler(),REASON_RULE)

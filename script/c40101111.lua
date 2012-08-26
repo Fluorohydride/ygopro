@@ -45,21 +45,14 @@ function c40101111.ffilter(c)
 end
 function c40101111.recon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	return (c==a and d:IsLocation(LOCATION_GRAVE) and d:IsType(TYPE_MONSTER))
-		or (c==d and a:IsLocation(LOCATION_GRAVE) and a:IsType(TYPE_MONSTER))
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c40101111.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsRelateToBattle() end
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	Duel.SetTargetPlayer(tp)
-	local rec=0
-	if c==a then rec=d:GetAttack()
-	else rec=a:GetAttack() end
+	if chk==0 then return true end
+	local rec=e:GetHandler():GetBattleTarget():GetAttack()
 	if rec<0 then rec=0 end
+	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(rec)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec)
 end
