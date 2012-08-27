@@ -16,10 +16,8 @@ function c86170989.filter2(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c86170989.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then
-		if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c86170989.filter2(chkc,e,tp) end
-		return e:GetHandler():IsRelateToBattle()
-	end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c86170989.filter2(chkc,e,tp) end
+	if chk==0 then return true end
 	local op=0
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(86170989,0))
 	local t1=Duel.IsExistingMatchingCard(c86170989.filter1,tp,LOCATION_DECK,0,1,nil)

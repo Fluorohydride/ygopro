@@ -13,7 +13,7 @@ function c35514096.filter(c)
 end
 function c35514096.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c35514096.filter(chkc) end
-	if chk==0 then return e:GetHandler():IsRelateToBattle() end
+	if chk==0 then return true end
 	local c=e:GetHandler()
 	local t1=c:IsChainAttackable()
 	local t2=Duel.IsExistingTarget(c35514096.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
