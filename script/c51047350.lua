@@ -1,5 +1,6 @@
---¥«©`¥É¡¤¥Ö¥ì¥¤¥«©`
+--ã‚«ãƒ¼ãƒ‰Â·ãƒ–ãƒ¬ã‚¤ã‚«ãƒ¼
 function c51047350.initial_effect(c)
+	c:EnableReviveLimit()
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

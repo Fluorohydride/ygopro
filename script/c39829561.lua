@@ -17,8 +17,9 @@ function c39829561.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_TO_GRAVE_REDIRECT)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCondition(c39829561.recon)
-	e2:SetValue(c39829561.reval)
+	e2:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e2)
 end
 function c39829561.filter(c)
@@ -37,15 +38,7 @@ function c39829561.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c39829561.recon(e)
-	return e:GetHandler():IsLocation(LOCATION_DECK+LOCATION_HAND+LOCATION_ONFIELD)
-end
-function c39829561.reval(e,c,r)
-	if e:GetHandler():IsOnField() then
-		if bit.band(r,REASON_BATTLE)~=0 then return LOCATION_REMOVED
-		else return LOCATION_GRAVE end
-	else
-		if bit.band(r,REASON_EFFECT)~=0 then return LOCATION_REMOVED
-		else return LOCATION_GRAVE end
-	end
-		
+	local c=e:GetHandler()
+	return (c:IsLocation(LOCATION_MZONE) and c:IsReason(REASON_BATTLE))
+		or (c:IsLocation(LOCATION_DECK+LOCATION_HAND) and c:IsReason(REASON_EFFECT))
 end

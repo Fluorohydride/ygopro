@@ -2467,15 +2467,32 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pduel->delete_group(targets);
 			return TRUE;
 		}
+		card_set leave_p, destroying;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
-			(*cit)->enable_field_effect(FALSE);
+			card* pcard = *cit;
+			if((pcard->current.location == LOCATION_MZONE) && pcard->is_status(STATUS_BATTLE_DESTROYED) && !(pcard->current.reason & (REASON_DESTROY | REASON_EFFECT))) {
+				pcard->current.reason |= REASON_DESTROY | REASON_BATTLE;
+				raise_single_event(pcard, 0, EVENT_DESTROY, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+				destroying.insert(pcard);
+			}
+			if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED)) {
+				raise_single_event(pcard, 0, EVENT_LEAVE_FIELD_P, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+				leave_p.insert(pcard);
+			}
 		}
-		adjust_instant();
+		if(leave_p.size())
+			raise_event(&leave_p, EVENT_LEAVE_FIELD_P, reason_effect, reason, reason_player, 0, 0);
+		if(destroying.size())
+			raise_event(&destroying, EVENT_DESTROY, reason_effect, reason, reason_player, 0, 0);
+		process_single_event();
+		process_instant_event();
 		return FALSE;
 	}
 	case 3: {
 		uint32 redirect, dest, redirect_seq;
-		card_set leave_p, destroying;
+		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit)
+			(*cit)->enable_field_effect(FALSE);
+		adjust_instant();
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			card* pcard = *cit;
 			dest = (pcard->operation_param >> 8) & 0xff;
@@ -2501,22 +2518,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pcard->current.reason |= REASON_REDIRECT;
 				pcard->operation_param = (pcard->operation_param & 0xffff0000) | (redirect << 8) | redirect_seq;
 			}
-			if((pcard->current.location == LOCATION_MZONE) && pcard->is_status(STATUS_BATTLE_DESTROYED) && !(pcard->current.reason & (REASON_DESTROY | REASON_EFFECT))) {
-				pcard->current.reason |= REASON_DESTROY | REASON_BATTLE;
-				raise_single_event(pcard, 0, EVENT_DESTROY, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-				destroying.insert(pcard);
-			}
-			if((pcard->current.location & LOCATION_ONFIELD) && !pcard->is_status(STATUS_SUMMON_DISABLED)) {
-				raise_single_event(pcard, 0, EVENT_LEAVE_FIELD_P, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-				leave_p.insert(pcard);
-			}
 		}
-		if(leave_p.size())
-			raise_event(&leave_p, EVENT_LEAVE_FIELD_P, reason_effect, reason, reason_player, 0, 0);
-		if(destroying.size())
-			raise_event(&destroying, EVENT_DESTROY, reason_effect, reason, reason_player, 0, 0);
-		process_single_event();
-		process_instant_event();
 		return FALSE;
 	}
 	case 4: {
