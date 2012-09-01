@@ -26,9 +26,9 @@ function c67959180.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
 		e1:SetReset(RESET_EVENT+0x1ff0000)
 		if opt==coin then
-			e1:SetValue(c:GetAttack()/2)
+			e1:SetValue(c:GetBaseAttack()/2)
 		else
-			e1:SetValue(c:GetAttack()*2)
+			e1:SetValue(c:GetBaseAttack()*2)
 		end
 		c:RegisterEffect(e1)
 	end

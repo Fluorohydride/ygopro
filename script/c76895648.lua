@@ -39,7 +39,7 @@ function c76895648.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(1-tp,1,REASON_EFFECT)
 	elseif dice==5 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,1,nil)
+		local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,0,LOCATION_MZONE,1,1,nil)
 		Duel.Destroy(g,REASON_EFFECT)
 	else
 		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
