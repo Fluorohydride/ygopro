@@ -7,6 +7,7 @@ function c26732909.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c26732909.thcon)
 	e1:SetCost(c26732909.thcost)
 	e1:SetTarget(c26732909.thtg)
 	e1:SetOperation(c26732909.thop)
@@ -45,6 +46,9 @@ end
 function c26732909.clear(e,tp,eg,ep,ev,re,r,rp)
 	c26732909[0]=0
 	c26732909[1]=0
+end
+function c26732909.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
 end
 function c26732909.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return c26732909[tp]>0 and Duel.GetFlagEffect(tp,26732909)==0 and e:GetHandler():IsAbleToRemoveAsCost() end

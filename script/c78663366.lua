@@ -22,12 +22,21 @@ function c78663366.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetReset(RESET_PHASE+PHASE_STANDBY)
+		if Duel.GetCurrentPhase()==PHASE_STANDBY then
+			e1:SetLabel(Duel.GetTurnCount())
+			e1:SetCondition(c78663366.retcon)
+			e1:SetReset(RESET_PHASE+PHASE_STANDBY,2)
+		else
+			e1:SetReset(RESET_PHASE+PHASE_STANDBY)
+		end
 		e1:SetLabelObject(c)
 		e1:SetCountLimit(1)
 		e1:SetOperation(c78663366.retop)
 		Duel.RegisterEffect(e1,tp)
 	end
+end
+function c78663366.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()~=e:GetLabel()
 end
 function c78663366.retop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()

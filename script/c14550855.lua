@@ -12,10 +12,10 @@ end
 function c14550855.filter(c)
 	return c:IsSetCard(0xb) and c:IsAbleToGrave()
 end
-function c14550855.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c14550855.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0
 		and Duel.IsExistingMatchingCard(c14550855.filter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function c14550855.activate(e,tp,eg,ep,ev,re,r,rp)
