@@ -61,7 +61,8 @@ end
 function c95515060.distg(e,c)
 	local ec=e:GetHandler()
 	if c==ec or c:GetCardTargetCount()==0 then return false end
-	return ec:GetEquipTarget() and c:GetCardTarget():IsContains(ec:GetEquipTarget())
+	local eq=ec:GetEquipTarget()
+	return eq and c:GetCardTarget():IsContains(eq) and c:IsType(TYPE_SPELL)
 end
 function c95515060.disop(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsActiveType(TYPE_SPELL) then return end

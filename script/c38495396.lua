@@ -49,7 +49,6 @@ function c38495396.xyzop(e,tp,eg,ep,ev,re,r,rp,c)
 		local mg2=mg:GetFirst():GetOverlayGroup()
 		Duel.Overlay(c,mg2)
 		Duel.Overlay(c,mg)
-		mg:Merge(mg2)
 		c:SetMaterial(mg)
 		c:RegisterFlagEffect(38495396,RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END,0,1)
 	else
