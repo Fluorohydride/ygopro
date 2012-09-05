@@ -5,6 +5,7 @@
  *      Author: Argon
  */
 
+#include <string.h>
 #include "scriptlib.h"
 #include "duel.h"
 #include "field.h"
