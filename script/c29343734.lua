@@ -23,9 +23,9 @@ function c29343734.initial_effect(c)
 	e4:SetDescription(aux.Stringid(29343734,0))
 	e4:SetCategory(CATEGORY_TODECK)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e4:SetCondition(c29343734.retcon)
+	e4:SetTarget(c29343734.rettg)
 	e4:SetOperation(c29343734.retop)
 	c:RegisterEffect(e4)
 	--atk
@@ -45,8 +45,13 @@ end
 function c29343734.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
+function c29343734.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
+end
 function c29343734.retop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(aux.TRUE,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
+	local g=Duel.GetMatchingGroup(nil,tp,LOCATION_REMOVED,LOCATION_REMOVED,nil)
 	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 end
 function c29343734.atkfilter(c,att)

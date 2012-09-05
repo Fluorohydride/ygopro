@@ -30,6 +30,7 @@ function c54704216.initial_effect(c)
 	e3:SetCondition(c54704216.descon)
 	e3:SetOperation(c54704216.desop)
 	c:RegisterEffect(e3)
+	e1:SetLabelObject(e3)
 end
 function c54704216.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
@@ -40,14 +41,15 @@ end
 function c54704216.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
 		c:SetCardTarget(tc)
+		c:CreateRelation(tc,RESET_EVENT+0x1fe0000)
+		e:GetLabelObject():SetLabelObject(tc)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_OWNER_RELATE)
-		e1:SetRange(LOCATION_MZONE)
+		e1:SetProperty(EFFECT_FLAG_OWNER_RELATE)
 		e1:SetCode(EFFECT_CANNOT_ATTACK)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+0x1fc0000)
 		e1:SetCondition(c54704216.rcon)
 		tc:RegisterEffect(e1,true)
 		local e2=e1:Clone()
@@ -56,16 +58,16 @@ function c54704216.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c54704216.rcon(e)
-	return e:GetOwner():IsHasCardTarget(e:GetHandler())
+	return e:GetOwner():IsRelateToCard(e:GetHandler())
 end
 function c54704216.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsStatus(STATUS_DESTROY_CONFIRMED) then return false end
-	local tc=c:GetFirstCardTarget()
-	return tc and eg:IsContains(tc)
+	local tc=e:GetLabelObject()
+	return tc and eg:IsContains(tc) and c:IsRelateToCard(tc)
 end
 function c54704216.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(), REASON_EFFECT)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 function c54704216.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()

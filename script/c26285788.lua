@@ -72,9 +72,9 @@ function c26285788.effectop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	else
 		local g=Duel.GetMatchingGroup(c26285788.filter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
-		if g:GetCount()>2 then
+		if g:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-			local tg=g:Select(tp,3,3,nil)
+			local tg=g:Select(tp,1,3,nil)
 			Duel.Destroy(tg,REASON_EFFECT)
 		end
 	end

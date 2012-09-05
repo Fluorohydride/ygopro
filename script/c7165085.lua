@@ -20,8 +20,15 @@ function c7165085.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c7165085.filter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,e:GetHandler())
 end
 function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or tc:IsFaceup() then return end
+	if not tc:IsRelateToEffect(e) or tc:IsFaceup() then
+		if c:IsRelateToEffect(e) then
+			c:CancelToGrave()
+			Duel.SendtoDeck(c,nil,2,REASON_EFFECT)
+		end
+		return
+	end
 	Duel.ConfirmCards(tp,tc)
 	if tc:IsType(TYPE_TRAP) then
 		local te=tc:GetActivateEffect()
@@ -65,7 +72,6 @@ function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
 			end
 		end
 	end
-	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		c:CancelToGrave()
 		Duel.SendtoDeck(c,nil,2,REASON_EFFECT)

@@ -26,10 +26,12 @@ function c74923978.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c74923978.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,eg:GetCount())
+	local ct=eg:FilterCount(c74923978.cfilter,nil,tp)
+	e:SetLabel(ct)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,ct)
 end
 function c74923978.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local ct=eg:GetCount()
+	local ct=e:GetLabel()
 	Duel.DiscardHand(1-tp,nil,ct,ct,REASON_EFFECT+REASON_DISCARD)
 end

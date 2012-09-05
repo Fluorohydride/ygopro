@@ -42,7 +42,7 @@ end
 function c95096437.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,1-tp,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,2)
 end
 function c95096437.hdop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)

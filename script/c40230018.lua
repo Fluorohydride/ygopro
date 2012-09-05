@@ -6,6 +6,7 @@ function c40230018.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c40230018.condition)
 	e1:SetCost(c40230018.cost)
 	e1:SetTarget(c40230018.target)
 	e1:SetOperation(c40230018.operation)
@@ -34,6 +35,12 @@ end
 function c40230018.clear(e,tp,eg,ep,ev,re,r,rp)
 	c40230018[0]=true
 	c40230018[1]=true
+end
+function c40230018.cfilter(c)
+	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
+end
+function c40230018.condition(e,tp,eg,ep,ev,re,r,rp)
+	return not Duel.IsExistingMatchingCard(c40230018.cfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
 function c40230018.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,40230018)==0 and c40230018[tp] end

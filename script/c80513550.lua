@@ -15,6 +15,7 @@ function c80513550.initial_effect(c)
 	e2:SetCategory(CATEGORY_HANDES+CATEGORY_DRAW)
 	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCondition(c80513550.hdcon)
 	e2:SetTarget(c80513550.hdtg)
 	e2:SetOperation(c80513550.hdop)
 	c:RegisterEffect(e2)
@@ -39,9 +40,12 @@ function c80513550.hspcon(e,c)
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c80513550.hspfilter,c:GetControler(),LOCATION_SZONE,0,3,nil)
 end
+function c80513550.hdcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler()==Duel.GetAttacker()
+end
 function c80513550.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,0,1-tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c80513550.hdop(e,tp,eg,ep,ev,re,r,rp)

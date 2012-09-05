@@ -56,7 +56,7 @@ function c49681811.condition(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.GetDrawCount(tp)>0
 end
 function c49681811.filter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_WARRIOR) and c:IsAbleToHand()
+	return c:IsLevelBelow(4) and c:IsRace(RACE_WARRIOR) and c:IsAbleToHand()
 end
 function c49681811.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c49681811.filter,tp,LOCATION_DECK,0,1,nil) end

@@ -1087,7 +1087,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		if(target->current.location == LOCATION_MZONE) {
 			if(target->is_position(POS_FACEDOWN))
 				return TRUE;
-			if(!ignore_count && core.summon_count[sumplayer] >= get_summon_count_limit(sumplayer))
+			if(!ignore_count && (core.extra_summon[sumplayer] || !target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT))
+			        && (core.summon_count[sumplayer] >= get_summon_count_limit(sumplayer)))
 				return TRUE;
 			if(!target->is_affected_by_effect(EFFECT_DUAL_SUMMONABLE))
 				return TRUE;
