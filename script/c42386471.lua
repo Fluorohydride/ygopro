@@ -64,10 +64,10 @@ function c42386471.dircon(e)
 end
 function c42386471.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 end
 function c42386471.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0,nil)
+	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0)
 	if g:GetCount()==0 then return end
 	local sg=g:RandomSelect(1-tp,1)
 	Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)

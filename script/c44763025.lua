@@ -25,7 +25,7 @@ function c44763025.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(p,0,LOCATION_HAND)
 	if g:GetCount()>0 then
 		local sg=g:RandomSelect(p,1)
-		Duel.SendtoGrave(sg,REASON_EFFECT)
+		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_DISCARD)
 		g:RemoveCard(sg:GetFirst())
 		if g:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,1-p,HINTMSG_DISCARD)

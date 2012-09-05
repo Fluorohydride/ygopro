@@ -35,15 +35,15 @@ function c3897065.initial_effect(c)
 end
 c3897065.material_count=4
 c3897065.material={61538782,98049038,71218746,984114}
-function c3897065.eqfilter(c)
-	return c:IsFaceup() and not c:IsRace(RACE_MACHINE) and c:IsAbleToChangeControler()
+function c3897065.eqfilter(c,tp)
+	return c:IsFaceup() and not c:IsRace(RACE_MACHINE) and (c:IsControler(tp) or c:IsAbleToChangeControler())
 end
 function c3897065.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c3897065.eqfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c3897065.eqfilter(chkc,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(c3897065.eqfilter,tp,0,LOCATION_MZONE,1,e:GetHandler()) end
+		and Duel.IsExistingTarget(c3897065.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler(),tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectTarget(tp,c3897065.eqfilter,tp,0,LOCATION_MZONE,1,1,e:GetHandler())
+	local g=Duel.SelectTarget(tp,c3897065.eqfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler(),tp)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function c3897065.eqlimit(e,c)
