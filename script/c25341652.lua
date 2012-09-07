@@ -46,7 +46,7 @@ function c25341652.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c25341652.repfilter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x6d) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
+	return c:IsOnField() and c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x6d) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
 end
 function c25341652.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c25341652.repfilter,1,nil,tp) end

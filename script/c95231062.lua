@@ -17,7 +17,7 @@ function c95231062.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_FISH+RACE_AQUA+RACE_SEASERPENT)
 end
 function c95231062.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c95231062.cfilter,tp,LOCATION_MZONE,0,1,e:GetHandler())
+	return Duel.IsExistingMatchingCard(c95231062.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function c95231062.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
