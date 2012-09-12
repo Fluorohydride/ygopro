@@ -4,7 +4,7 @@ function c61132951.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(61132951,0))
 	e1:SetCategory(CATEGORY_DESTROY)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_CONFIRM)
 	e1:SetTarget(c61132951.destg)
 	e1:SetOperation(c61132951.desop)
@@ -12,7 +12,7 @@ function c61132951.initial_effect(c)
 end
 function c61132951.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local d=Duel.GetAttackTarget()
-	if chk ==0 then	return Duel.GetAttacker()==e:GetHandler()
+	if chk==0 then return Duel.GetAttacker()==e:GetHandler()
 		and d and d:IsDefencePos() and d:IsDestructable() end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,d,1,0,0)
 end

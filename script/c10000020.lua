@@ -98,7 +98,7 @@ function c10000020.adval(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)*1000
 end
 function c10000020.atkfilter(c,e,tp)
-	return c:GetSummonPlayer()==tp and c:IsPosition(POS_FACEUP_ATTACK) and (not e or c:IsRelateToEffect(e))
+	return c:IsControler(tp) and c:IsPosition(POS_FACEUP_ATTACK) and (not e or c:IsRelateToEffect(e))
 end
 function c10000020.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c10000020.atkfilter,1,nil,nil,1-tp)
