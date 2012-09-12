@@ -3425,7 +3425,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 							for(int32 j = 0; j < 5; ++j) {
 								pm = player[np].list_mzone[j];
 								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, -1, 0)
-								        && pm->is_can_be_synchro_material(pcard)) {
+								        && pm->is_can_be_synchro_material(pcard, tuner)) {
 									nsyn.push_back(pm);
 									pm->operation_param = pm->get_synchro_level(pcard);
 								}
@@ -3472,7 +3472,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 				for(int32 i = 0; i < 5; ++i) {
 					card* pm = player[np].list_mzone[i];
 					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, -1, 0)
-					        && pm->is_can_be_synchro_material(pcard)) {
+					        && pm->is_can_be_synchro_material(pcard, tuner)) {
 						core.select_cards.push_back(pm);
 						pm->operation_param = pm->get_synchro_level(pcard);
 					}

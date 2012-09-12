@@ -1484,7 +1484,7 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 				for(int32 i = 0; i < 5; ++i) {
 					pm = player[p].list_mzone[i];
 					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, findex2, 0)
-					        && pm->is_can_be_synchro_material(pcard)) {
+					        && pm->is_can_be_synchro_material(pcard, tuner)) {
 						nsyn.push_back(pm);
 						pm->operation_param = pm->get_synchro_level(pcard);
 					}

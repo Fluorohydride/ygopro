@@ -16,7 +16,8 @@ function c74064212.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
-	e2:SetValue(c74064212.atkval)
+	e2:SetCondition(c74064212.atkcon)
+	e2:SetValue(1000)
 	c:RegisterEffect(e2)
 	--equip limit
 	local e3=Effect.CreateEffect(c)
@@ -48,12 +49,9 @@ function c74064212.eqop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,c,tc)
 	end
 end
-function c74064212.atkval(e,c)
+function c74064212.atkcon(e)
 	local ph=Duel.GetCurrentPhase()
-	if (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and (c==Duel.GetAttacker() or c==Duel.GetAttackTarget()) then
-		return 1000
-	end
-	return 0
+	return ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL
 end
 function c74064212.eqlimit(e,c)
 	return c:GetControler()==e:GetHandler():GetControler()

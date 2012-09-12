@@ -79,7 +79,7 @@ end
 function c25924653.leave(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=c:GetFirstCardTarget()
-	if tc and tc:IsLocation(LOCATION_MZONE) then
+	if tc and tc:IsLocation(LOCATION_MZONE) and tc:GetFlagEffect(25924654)~=0 then
 		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 	end
 end

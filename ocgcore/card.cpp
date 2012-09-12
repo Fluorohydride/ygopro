@@ -2009,7 +2009,7 @@ int32 card::is_can_be_fusion_material() {
 		return FALSE;
 	return TRUE;
 }
-int32 card::is_can_be_synchro_material(card* scard) {
+int32 card::is_can_be_synchro_material(card* scard, card* tuner) {
 	if(data.type & TYPE_XYZ)
 		return FALSE;
 	if(!(get_type()&TYPE_MONSTER))
@@ -2018,6 +2018,11 @@ int32 card::is_can_be_synchro_material(card* scard) {
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
+	//special fix for scrap chimera, not perfect yet
+	if(tuner && (pduel->game_field->core.global_flag & GLOBALFLAG_SCRAP_CHIMERA)) {
+		if(is_affected_by_effect(EFFECT_SCRAP_CHIMERA, tuner))
+			return false;
+	}
 	effect_set eset;
 	filter_effect(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL, &eset);
 	for(int32 i = 0; i < eset.count; ++i)

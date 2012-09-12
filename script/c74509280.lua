@@ -11,18 +11,20 @@ function c74509280.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 c74509280.tuner_filter=aux.FALSE
-function c74509280.filter(c,syncard,f,lv)
-	return c:IsSetCard(0x23) and c:IsCanBeSynchroMaterial(syncard) and (f==nil or f(c)) and c:GetLevel()==lv
+function c74509280.synfilter(c,syncard,tuner,f,lv)
+	return c:IsSetCard(0x23) and c:IsCanBeSynchroMaterial(syncard,tuner) and (f==nil or f(c)) and c:GetLevel()==lv
 end
 function c74509280.target(e,syncard,f,minc)
+	local c=e:GetHandler()
 	if minc>1 then return false end
-	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
+	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
-	return Duel.IsExistingMatchingCard(c74509280.filter,syncard:GetControler(),LOCATION_HAND,0,1,nil,syncard,f,lv)
+	return Duel.IsExistingMatchingCard(c74509280.filter,syncard:GetControler(),LOCATION_HAND,0,1,nil,syncard,c,f,lv)
 end
 function c74509280.operation(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc)
-	local lv=syncard:GetLevel()-e:GetHandler():GetLevel()
+	local c=e:GetHandler()
+	local lv=syncard:GetLevel()-c:GetLevel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-	local g=Duel.SelectMatchingCard(tp,c74509280.filter,tp,LOCATION_HAND,0,1,1,nil,syncard,f,lv)
+	local g=Duel.SelectMatchingCard(tp,c74509280.filter,tp,LOCATION_HAND,0,1,1,nil,syncard,c,f,lv)
 	Duel.SetSynchroMaterial(g)
 end

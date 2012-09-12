@@ -1624,11 +1624,16 @@ int32 scriptlib::card_is_can_be_synchro_material(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* scard = 0;
-	if(!lua_isnil(L, 2)) {
+	card* tuner = 0;
+	if(lua_gettop(L) >= 2) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		scard = *(card**) lua_touserdata(L, 2);
 	}
-	lua_pushboolean(L, pcard->is_can_be_synchro_material(scard));
+	if(lua_gettop(L) >= 3) {
+		check_param(L, PARAM_TYPE_CARD, 3);
+		tuner = *(card**) lua_touserdata(L, 3);
+	}
+	lua_pushboolean(L, pcard->is_can_be_synchro_material(scard, tuner));
 	return 1;
 }
 int32 scriptlib::card_is_can_be_xyz_material(lua_State *L) {
@@ -1636,7 +1641,7 @@ int32 scriptlib::card_is_can_be_xyz_material(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* scard = 0;
-	if(!lua_isnil(L, 2)) {
+	if(lua_gettop(L) >= 2) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		scard = *(card**) lua_touserdata(L, 2);
 	}

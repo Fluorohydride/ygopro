@@ -14,7 +14,7 @@ function c36318200.initial_effect(c)
 end
 function c36318200.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
-	return g:GetCount()>0 and not g:IsExists(Card.IsRace,1,nil,0xffffffff-RACE_BEAST)
+	return g:GetCount()>0 and not g:IsExists(Card.IsRace,1,nil,0xfffffff-RACE_BEAST)
 end
 function c36318200.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

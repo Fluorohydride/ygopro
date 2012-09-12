@@ -11,21 +11,21 @@ function c56897896.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 c56897896.tuner_filter=aux.FALSE
-function c56897896.synfilter(c,syncard,f)
-	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard)
+function c56897896.synfilter(c,syncard,tuner,f)
+	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard,tuner)
 		and c:IsLevelBelow(4) and c:IsRace(RACE_WARRIOR+RACE_MACHINE) and (f==nil or f(c))
 end
 function c56897896.syntg(e,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
-	local g=Duel.GetMatchingGroup(c56897896.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
+	local g=Duel.GetMatchingGroup(c56897896.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,c,f)
 	return lv>=minc and lv<=maxc and g:GetCount()>=lv
 end
 function c56897896.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
-	local g=Duel.GetMatchingGroup(c56897896.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,f)
+	local g=Duel.GetMatchingGroup(c56897896.synfilter,syncard:GetControler(),LOCATION_MZONE,LOCATION_MZONE,c,syncard,c,f)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 	local sg=g:Select(tp,lv,lv,nil)
 	Duel.SetSynchroMaterial(sg)
