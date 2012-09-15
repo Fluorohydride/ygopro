@@ -27,7 +27,7 @@ end
 function c35950025.ntcon(e,c)
 	if c==nil then return true end
 	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c35950025.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c35950025.cfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function c35950025.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_NORMAL+1
