@@ -51,9 +51,9 @@ function c35950025.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(-1000)
 		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	end
-	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
+		local tc=Duel.GetFirstTarget()
+		if tc and tc:IsRelateToEffect(e) then
+			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
+		end
 	end
 end
