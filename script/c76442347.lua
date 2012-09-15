@@ -19,7 +19,7 @@ function c76442347.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c76442347.flipop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(76442347,RESET_EVENT+0x17a0000,0,0)
+	e:GetHandler():RegisterFlagEffect(76442347,RESET_EVENT+0x57a0000,0,0)
 end
 function c76442347.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(76442347)~=0

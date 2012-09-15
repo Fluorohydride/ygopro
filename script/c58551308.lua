@@ -19,7 +19,7 @@ end
 function c58551308.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) then
-		c:RegisterFlagEffect(58551308,RESET_EVENT+0x17a0000,0,0)
+		c:RegisterFlagEffect(58551308,RESET_EVENT+0x57a0000,0,0)
 	end
 end
 function c58551308.filter(c,e,tp)

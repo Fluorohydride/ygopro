@@ -20,7 +20,7 @@ function c84926738.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Recover(tp,3000,REASON_EFFECT)
 	if c:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) then
-		c:RegisterFlagEffect(84926738,RESET_EVENT+0x17a0000,0,0)
+		c:RegisterFlagEffect(84926738,RESET_EVENT+0x57a0000,0,0)
 	end
 end
 function c84926738.lptg(e,tp,eg,ep,ev,re,r,rp,chk)
