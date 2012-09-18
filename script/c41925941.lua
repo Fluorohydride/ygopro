@@ -27,12 +27,12 @@ function c41925941.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c41925941.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local bc=e:GetLabelObject()
-	if chk==0 then return Duel.GetLP(tp)>100 and bc:IsAttackAbove(100) and bc:IsDefenceAbove(100) end
+	if chk==0 then return Duel.GetLP(tp)>100 and (bc:IsAttackAbove(100) or bc:IsDefenceAbove(100)) end
 	local maxc=Duel.GetLP(tp)
-	local atk=bc:GetAttack()
+	local maxpay=bc:GetAttack()
 	local def=bc:GetDefence()
-	if atk<maxc then maxc=atk end
-	if def<maxc then maxc=def end
+	if maxpay<def then maxpay=def end
+	if maxpay<maxc then maxc=maxpay end
 	if maxc>5000 then maxc=5000 end
 	local t={}
 	for i=1,maxc/100 do

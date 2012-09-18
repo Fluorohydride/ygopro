@@ -3,7 +3,7 @@ function c62107612.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(62107612,0))
-	e1:SetType(EFFECT_TYPE_QUICK_O)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_REMOVE)
 	e1:SetRange(LOCATION_HAND)
@@ -14,7 +14,7 @@ function c62107612.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c62107612.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:GetDescription()==aux.Stringid(93717133,0)
+	return bit.band(r,REASON_EFFECT)~=0 and re:GetHandler():GetCode()==93717133
 end
 function c62107612.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,62107612)==0 and e:GetHandler():IsAbleToGraveAsCost() end

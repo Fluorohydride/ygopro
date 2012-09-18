@@ -16,7 +16,7 @@ function c64187086.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c64187086.filter1(c)
-	return c:IsSetCard(0x21) and c:IsAbleToHand()
+	return c:IsSetCard(0x21) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c64187086.filter2(c)
 	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()
