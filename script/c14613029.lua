@@ -19,7 +19,7 @@ function c14613029.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c14613029.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsDestructable() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsDestructable,tp,0,LOCATION_ONFIELD,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_OPPO)
 	local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,0,LOCATION_ONFIELD,2,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
