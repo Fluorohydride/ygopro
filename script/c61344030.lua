@@ -67,8 +67,9 @@ function c61344030.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c61344030.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():GetPreviousControler()==tp
-		and e:GetHandler():GetReasonPlayer()==1-tp
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY)
+		and c:GetPreviousControler()==tp and c:GetReasonPlayer()==1-tp
 end
 function c61344030.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
