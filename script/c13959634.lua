@@ -46,19 +46,20 @@ function c13959634.hdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
 end
 function c13959634.leaveop(e,tp,eg,ep,ev,re,r,rp)
+	local effp=e:GetHandler():GetPreviousControler()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SKIP_BP)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
-	if Duel.GetTurnPlayer()==tp then
+	if Duel.GetTurnPlayer()==effp then
 		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetCondition(c13959634.skipcon)
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
 	else
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
 	end
-	Duel.RegisterEffect(e1,tp)
+	Duel.RegisterEffect(e1,effp)
 end
 function c13959634.skipcon(e)
 	return Duel.GetTurnCount()~=e:GetLabel()

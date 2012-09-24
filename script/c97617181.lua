@@ -73,7 +73,7 @@ end
 function c97617181.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=c:GetFirstCardTarget()
-	if tc and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() then
+	if tc and tc:IsLocation(LOCATION_MZONE) and tc:IsFaceup() and not c:IsLocation(LOCATION_DECK) then
 		e:SetLabelObject(tc)
 		tc:CreateEffectRelation(e)
 		return true
