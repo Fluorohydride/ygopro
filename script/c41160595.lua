@@ -13,7 +13,7 @@ function c41160595.initial_effect(c)
 end
 function c41160595.setcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return bit.band(r,0x41)==0x41 and rp~=tp and c:GetPreviousControler()==tp
+	return bit.band(r,0x41)==0x41 and rp~=tp and re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and c:GetPreviousControler()==tp
 		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEDOWN)
 end
 function c41160595.filter(c)

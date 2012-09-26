@@ -37,8 +37,8 @@ function c29424328.cfcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(1-tp,LOCATION_DECK,0)>0
 end
 function c29424328.cfop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ConfirmDecktop(1-tp,1)
 	local g=Duel.GetDecktopGroup(1-tp,1)
+	Duel.ConfirmCards(tp,g)
 	local tc=g:GetFirst()
 	local opt=Duel.SelectOption(tp,aux.Stringid(29424328,1),aux.Stringid(29424328,2))
 	if opt==1 then

@@ -11,7 +11,7 @@ function c96383838.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c96383838.filter(c,e,tp)
-	return c:IsType(TYPE_NORMAL) and c:GetLevel()<=2 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsType(TYPE_NORMAL) and c:IsLevelBelow(2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c96383838.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c96383838.filter(chkc,e,tp) end
