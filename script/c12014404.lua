@@ -27,8 +27,10 @@ function c12014404.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c12014404.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	if c:IsAttackPos() then
+	if not c:IsRelateToEffect(e) then return end
+	if c:IsDefencePos() then
+		Duel.Damage(1-tp,800,REASON_EFFECT)
+	elseif c:IsPosition(POS_FACEUP_ATTACK) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_BATTLE_START)
@@ -36,8 +38,6 @@ function c12014404.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(c12014404.atkop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	else
-		Duel.Damage(1-tp,800,REASON_EFFECT)
 	end
 end
 function c12014404.atkop(e,tp,eg,ep,ev,re,r,rp)
