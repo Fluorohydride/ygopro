@@ -25,9 +25,9 @@ function c67959180.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
 		if opt==coin then
-			e1:SetValue(c:GetBaseAttack()/2)
+			e1:SetValue(c:GetAttack()/2)
 		else
-			e1:SetValue(c:GetBaseAttack()*2)
+			e1:SetValue(c:GetAttack()*2)
 		end
 		c:RegisterEffect(e1)
 	end

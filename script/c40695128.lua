@@ -80,8 +80,8 @@ function c40695128.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
 end
 function c40695128.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
+	Duel.ConfirmCards(tp,g)
 	local tc=g:GetFirst()
 	local opt=Duel.SelectOption(tp,aux.Stringid(40695128,2),aux.Stringid(40695128,3))
 	if opt==1 then

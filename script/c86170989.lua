@@ -9,10 +9,10 @@ function c86170989.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c86170989.filter1(c)
-	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetAttack()<=1200 and c:IsAbleToGrave()
+	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAttackBelow(1200) and c:IsAbleToGrave()
 end
 function c86170989.filter2(c,e,tp)
-	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetAttack()<=1200
+	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAttackBelow(1200)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c86170989.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

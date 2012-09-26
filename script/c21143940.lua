@@ -28,9 +28,10 @@ end
 function c21143940.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
+	local att=tc:GetAttribute()
 	if Duel.SendtoGrave(tc,REASON_EFFECT)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg=Duel.SelectMatchingCard(tp,c21143940.tfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetAttribute(),e,tp)
+	local sg=Duel.SelectMatchingCard(tp,c21143940.tfilter,tp,LOCATION_EXTRA,0,1,1,nil,att,e,tp)
 	if sg:GetCount()>0 then
 		Duel.BreakEffect()
 		Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEUP)

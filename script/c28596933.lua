@@ -16,17 +16,17 @@ function c28596933.dfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c28596933.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(c28596933.filter,tp,LOCATION_MZONE,0,1,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c28596933.filter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,c28596933.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	local sg=Duel.GetMatchingGroup(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_MZONE)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
 end
 function c28596933.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 then
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	local g=Duel.SelectMatchingCard(tp,c28596933.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc and Duel.SendtoHand(tc,nil,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_HAND) then
 		local sg=Duel.GetMatchingGroup(c28596933.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
 		Duel.Destroy(sg,REASON_EFFECT)
 	end

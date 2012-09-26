@@ -13,8 +13,8 @@ function c76614003.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c76614003.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
-	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
+	Duel.ConfirmCards(tp,g)
 	local tc=g:GetFirst()
 	local opt=Duel.SelectOption(tp,aux.Stringid(76614003,1),aux.Stringid(76614003,2))
 	if opt==1 then

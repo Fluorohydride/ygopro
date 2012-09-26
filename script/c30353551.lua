@@ -35,10 +35,10 @@ end
 function c30353551.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if a:IsStatus(STATUS_BATTLE_DESTROYED) and a:IsType(TYPE_NORMAL) and a:GetLevel()<=2 then
+	if a:IsStatus(STATUS_BATTLE_DESTROYED) and a:IsType(TYPE_NORMAL) and a:IsLevelBelow(2) then
 		c30353551[a:GetControler()]=c30353551[a:GetControler()]+1
 	end
-	if d and d:IsStatus(STATUS_BATTLE_DESTROYED) and d:IsType(TYPE_NORMAL) and d:GetLevel()<=2 then
+	if d and d:IsStatus(STATUS_BATTLE_DESTROYED) and d:IsType(TYPE_NORMAL) and d:IsLevelBelow(2) then
 		c30353551[d:GetControler()]=c30353551[d:GetControler()]+1
 	end
 end
@@ -47,7 +47,7 @@ function c30353551.clear(e,tp,eg,ep,ev,re,r,rp)
 	c30353551[1]=0
 end
 function c30353551.filter(c,e,tp)
-	return c:IsType(TYPE_NORMAL) and c:GetLevel()<=2 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsType(TYPE_NORMAL) and c:IsLevelBelow(2) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c30353551.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return c30353551[tp]~=0 end

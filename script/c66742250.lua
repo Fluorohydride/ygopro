@@ -11,11 +11,11 @@ function c66742250.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c66742250.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsType(TYPE_EFFECT)
 end
 function c66742250.postg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c66742250.filter,Duel.GetTurnPlayer(),LOCATION_MZONE,LOCATION_MZONE,1,nil) end
-	local g=Duel.GetMatchingGroup(c66742250.filter,Duel.GetTurnPlayer(),LOCATION_MZONE,LOCATION_MZONE,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c66742250.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	local g=Duel.GetMatchingGroup(c66742250.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
 end
 function c66742250.posop(e,tp,eg,ep,ev,re,r,rp)
