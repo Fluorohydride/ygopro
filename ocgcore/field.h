@@ -439,6 +439,7 @@ public:
 	int32 flip_summon(uint16 step, uint8 sumplayer, card* target);
 	int32 mset(uint16 step, uint8 setplayer, card* ptarget, effect* proc, uint8 ignore_count);
 	int32 sset(uint16 step, uint8 setplayer, uint8 toplayer, card* ptarget);
+	int32 sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget);
 	int32 special_summon_rule(uint16 step, uint8 sumplayer, card* target);
 	int32 special_summon_step(uint16 step, group* targets, card* target);
 	int32 special_summon(uint16 step, effect* reason_effect, uint8 reason_player, group* targets);
@@ -584,6 +585,7 @@ public:
 #define PROCESSOR_MSET				64
 #define PROCESSOR_SSET				65
 #define PROCESSOR_SPSUMMON_STEP		66
+#define PROCESSOR_SSET_G			67
 #define PROCESSOR_DRAW				70
 #define PROCESSOR_DAMAGE			71
 #define PROCESSOR_RECOVER			72

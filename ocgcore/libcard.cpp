@@ -1270,6 +1270,7 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	card* attacker = pduel->game_field->core.attacker;
 	if(pduel->game_field->core.effect_damage_step
 	        || attacker->is_status(STATUS_BATTLE_DESTROYED)
+			|| attacker->current.controler != pduel->game_field->infos.turn_player
 	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
 	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
 	        || attacker->announce_count >= ac) {

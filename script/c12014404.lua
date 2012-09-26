@@ -33,6 +33,7 @@ function c12014404.operation(e,tp,eg,ep,ev,re,r,rp)
 	elseif c:IsPosition(POS_FACEUP_ATTACK) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EVENT_BATTLE_START)
 		e1:SetCountLimit(1)
 		e1:SetOperation(c12014404.atkop)

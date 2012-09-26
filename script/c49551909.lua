@@ -82,5 +82,5 @@ function c49551909.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return ec and ep==tp and (Duel.GetAttacker()==ec or Duel.GetAttackTarget()==ec)
 end
 function c49551909.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(1-tp,ev)
+	Duel.ChangeBattleDamage(1-tp,ev,false)
 end

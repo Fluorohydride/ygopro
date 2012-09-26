@@ -800,6 +800,7 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 			return TRUE;
 		pcard->filter_disable_related_cards();
 		move_to_field(pcard, playerid, playerid, LOCATION_MZONE, pcard->current.position);
+		pcard->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		return FALSE;
 	}
 	case 1: {
@@ -852,6 +853,8 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 		pcard2->reset(RESET_CONTROL, RESET_EVENT);
 		pcard1->filter_disable_related_cards();
 		pcard2->filter_disable_related_cards();
+		pcard1->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		pcard2->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		adjust_instant();
 		return FALSE;
 	}
@@ -1724,6 +1727,78 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 			core.hint_timing[setplayer] |= TIMING_SSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
+	}
+	}
+	return TRUE;
+}
+int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget) {
+	switch(step) {
+	case 0: {
+		card_set* set_cards = new card_set;
+		core.operated_set.clear();
+		for(auto cit = ptarget->container.begin(); cit != ptarget->container.end(); ++cit) {
+			card* target = *cit;
+			if((!(target->data.type & TYPE_FIELD) && get_useable_count(toplayer, LOCATION_SZONE, setplayer, LOCATION_REASON_TOFIELD) <= 0)
+			        || (target->data.type & TYPE_MONSTER && !target->is_affected_by_effect(EFFECT_MONSTER_SSET))
+			        || (target->current.location == LOCATION_SZONE)
+			        || (!is_player_can_sset(setplayer, target))
+			        || (target->is_affected_by_effect(EFFECT_CANNOT_SSET))) {
+				continue;
+			}
+			set_cards->insert(target);
+		}
+		if(set_cards->empty()) {
+			delete set_cards;
+			returns.ivalue[0] = 0;
+			return TRUE;
+		}
+		core.phase_action = TRUE;
+		core.units.begin()->ptarget = (group*)set_cards;
+		return FALSE;
+	}
+	case 1: {
+		card_set* set_cards = (card_set*)ptarget;
+		card* target = *set_cards->begin();
+		target->enable_field_effect(FALSE);
+		move_to_field(target, setplayer, toplayer, LOCATION_SZONE, POS_FACEDOWN, FALSE);
+		return FALSE;
+	}
+	case 2: {
+		card_set* set_cards = (card_set*)ptarget;
+		card* target = *set_cards->begin();
+		target->set_status(STATUS_SET_TURN, TRUE);
+		if(target->data.type & TYPE_MONSTER) {
+			effect* peffect = target->is_affected_by_effect(EFFECT_MONSTER_SSET);
+			int32 type_val = peffect->get_value();
+			peffect = pduel->new_effect();
+			peffect->owner = target;
+			peffect->type = EFFECT_TYPE_SINGLE;
+			peffect->code = EFFECT_CHANGE_TYPE;
+			peffect->reset_flag = RESET_EVENT + 0x1fe0000;
+			peffect->value = type_val;
+			target->add_effect(peffect);
+		}
+		pduel->write_buffer8(MSG_SET);
+		pduel->write_buffer32(target->data.code);
+		pduel->write_buffer8(target->current.controler);
+		pduel->write_buffer8(target->current.location);
+		pduel->write_buffer8(target->current.sequence);
+		pduel->write_buffer8(target->current.position);
+		core.operated_set.insert(target);
+		set_cards->erase(target);
+		if(!set_cards->empty())
+			core.units.begin()->step = 0;
+		else
+			delete set_cards;
+		return FALSE;
+	}
+	case 3: {
+		returns.ivalue[0] = core.operated_set.size();
+		adjust_instant();
+		raise_event(&core.operated_set, EVENT_SSET, 0, 0, setplayer, setplayer, 0);
+		process_instant_event();
+		adjust_all();
+		return TRUE;
 	}
 	}
 	return TRUE;

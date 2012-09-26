@@ -288,7 +288,6 @@ int32 scriptlib::duel_setm(lua_State *L) {
 int32 scriptlib::duel_sets(lua_State *L) {
 	check_action_permission(L);
 	check_param_count(L, 2);
-	check_param(L, PARAM_TYPE_CARD, 2);
 	uint32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1)
 		return 0;
@@ -297,9 +296,21 @@ int32 scriptlib::duel_sets(lua_State *L) {
 		toplayer = lua_tointeger(L, 3);
 	if(toplayer != 0 && toplayer != 1)
 		toplayer = playerid;
-	card* pcard = *(card**)lua_touserdata(L, 2);
-	duel * pduel = pcard->pduel;
-	pduel->game_field->add_process(PROCESSOR_SSET, 0, 0, (group*)pcard, playerid, toplayer);
+	card* pcard = 0;
+	group* pgroup = 0;
+	duel* pduel = 0;
+	if(check_param(L, PARAM_TYPE_CARD, 2, TRUE)) {
+		pcard = *(card**) lua_touserdata(L, 2);
+		pduel = pcard->pduel;
+	} else if(check_param(L, PARAM_TYPE_GROUP, 2, TRUE)) {
+		pgroup = *(group**) lua_touserdata(L, 2);
+		pduel = pgroup->pduel;
+	} else
+		luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 2);
+	if(pcard)
+		pduel->game_field->add_process(PROCESSOR_SSET, 0, 0, (group*)pcard, playerid, toplayer);
+	else
+		pduel->game_field->add_process(PROCESSOR_SSET_G, 0, 0, pgroup, playerid, toplayer);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_create_token(lua_State *L) {
@@ -1127,6 +1138,11 @@ int32 scriptlib::duel_change_battle_damage(lua_State *L) {
 	int32 playerid = lua_tointeger(L, 1);
 	int32 dam = lua_tointeger(L, 2);
 	if(playerid != 0 && playerid != 1)
+		return 0;
+	int32 check = TRUE;
+	if(lua_gettop(L) >= 3)
+		check = lua_toboolean(L, 3);
+	if(check && dam == 0)
 		return 0;
 	pduel->game_field->core.battle_damage[playerid] = dam;
 	return 0;

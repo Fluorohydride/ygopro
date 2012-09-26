@@ -30,7 +30,7 @@ function c74311226.thfilter(c)
 	return not c:IsCode(74311226) and c:IsRace(RACE_SEASERPENT) and c:IsAbleToHand()
 end
 function c74311226.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return not e:GetHandler():IsLocation(LOCATION_HAND+LOCATION_DECK) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c74311226.thop(e,tp,eg,ep,ev,re,r,rp,c)

@@ -31,7 +31,7 @@ function c40473581.dcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and (c==Duel.GetAttacker() or c==Duel.GetAttackTarget())
 end
 function c40473581.dop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,Duel.GetBattleDamage(ep)/2)
+	Duel.ChangeBattleDamage(ep,ev/2)
 end
 function c40473581.retreg(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

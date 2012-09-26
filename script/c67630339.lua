@@ -50,7 +50,7 @@ function c67630339.clear(e,tp,eg,ep,ev,re,r,rp)
 end
 function c67630339.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and Duel.GetAttackTarget()==nil and c67630339[tp]==2
-		and c67630339[2]:GetFlagEffect(67630339)~=0
+		and c67630339[2]:GetFlagEffect(67630339)~=0 and Duel.GetAttacker()~=c67630339[2]
 end
 function c67630339.operation(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()

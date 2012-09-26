@@ -395,6 +395,14 @@ int32 field::process() {
 			core.units.begin()->step++;
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_SSET_G: {
+		if (sset_g(it->step, it->arg1, it->arg2, it->ptarget)) {
+			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
+			core.units.pop_front();
+		} else
+			core.units.begin()->step++;
+		return pduel->bufferlen;
+	}
 	case PROCESSOR_DRAW	: {
 		if (draw(it->step, it->peffect, it->arg1, (it->arg2 >> 28) & 0xf, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
@@ -3497,7 +3505,7 @@ int32 field::process_battle_command(uint16 step) {
 			return TRUE;
 		if(core.chain_attack) {
 			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid_r != core.pre_field[0]
-			        || !core.attacker->is_capable_attack_announce(infos.turn_player))
+			        || (core.attacker->current.controler != infos.turn_player) || !core.attacker->is_capable_attack_announce(infos.turn_player))
 				return FALSE;
 			if(core.chain_attack_target) {
 				if(!core.chain_attack_target->is_capable_be_battle_target(core.attacker)

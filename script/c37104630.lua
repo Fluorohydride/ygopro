@@ -32,7 +32,7 @@ function c37104630.desfilter(c)
 end
 function c37104630.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c37104630.desfilter(chkc) end
-	if chk==0 then return true end
+	if chk==0 then return not e:GetHandler():IsLocation(LOCATION_HAND+LOCATION_DECK) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c37104630.desfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)

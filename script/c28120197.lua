@@ -18,5 +18,5 @@ function c28120197.dcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetFirst():IsDefencePos() and eg:GetFirst():IsRace(RACE_ROCK)
 end
 function c28120197.dop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,Duel.GetBattleDamage(ep)*2)
+	Duel.ChangeBattleDamage(ep,ev*2)
 end

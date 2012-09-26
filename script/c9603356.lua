@@ -50,5 +50,5 @@ function c9603356.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and e:GetHandler()==Duel.GetAttacker()
 end
 function c9603356.rdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,Duel.GetBattleDamage(ep)/2)
+	Duel.ChangeBattleDamage(ep,ev/2)
 end
