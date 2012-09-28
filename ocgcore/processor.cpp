@@ -1634,7 +1634,8 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.ntpchain.clear();
 		for (auto clit = core.flip_chain.begin(); clit != core.flip_chain.end(); ++clit) {
 			if(clit->triggering_effect->is_chainable(clit->triggering_player)
-			        && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
+			        && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)
+			        && ((clit->triggering_location & 0x3) || !(clit->triggering_effect->handler->current.location & 0x3))) {
 				if(clit->triggering_player == infos.turn_player)
 					core.tpchain.push_back(*clit);
 				else
@@ -1668,7 +1669,8 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			}
 			uint8 tp = clit->triggering_player;
 			bool act = true;
-			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)) {
+			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
+			        && ((clit->triggering_location & 0x3) || !(peffect->handler->current.location & 0x3))) {
 				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 					if(tp == infos.turn_player) {
 						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
@@ -1746,7 +1748,8 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		auto clit = core.new_ochain_s.begin();
 		uint8 tp = clit->triggering_player;
 		bool act = true;
-		if(clit->triggering_effect->is_chainable(tp) && clit->triggering_effect->is_activateable(tp, clit->evt, TRUE)) {
+		if(clit->triggering_effect->is_chainable(tp) && clit->triggering_effect->is_activateable(tp, clit->evt, TRUE)
+		        && ((clit->triggering_location & 0x3) || !(clit->triggering_effect->handler->current.location & 0x3))) {
 			if(tp == infos.turn_player) {
 				for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
 					if(!(clit->triggering_effect->flag & EFFECT_FLAG_MULTIACT_HAND)) {

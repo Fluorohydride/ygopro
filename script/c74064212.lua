@@ -51,7 +51,8 @@ function c74064212.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c74064212.atkcon(e)
 	local ph=Duel.GetCurrentPhase()
-	return ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL
+	local ec=e:GetHandler():GetEquipTarget()
+	return ec and (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and ec:IsRelateToBattle()
 end
 function c74064212.eqlimit(e,c)
 	return c:GetControler()==e:GetHandler():GetControler()

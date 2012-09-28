@@ -1621,7 +1621,7 @@ int32 scriptlib::card_is_can_be_fusion_material(lua_State *L) {
 	return 1;
 }
 int32 scriptlib::card_is_can_be_synchro_material(lua_State *L) {
-	check_param_count(L, 2);
+	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* scard = 0;
