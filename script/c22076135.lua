@@ -16,7 +16,7 @@ function c22076135.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c22076135.cfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsDiscardable()
+	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
 end
 function c22076135.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,22076135)==0

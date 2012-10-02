@@ -67,9 +67,13 @@ function c3657444.operation2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.BreakEffect()
 	Duel.Draw(tp,2,REASON_EFFECT)
 end
+function c3657444.filter3(c)
+	return c:IsAbleToDeck() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+end
 function c3657444.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemove()
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,LOCATION_HAND,0,1,nil) end
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,LOCATION_HAND,0,1,nil)
+		and Duel.IsExistingMatchingCard(c3657444.filter3,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,0,LOCATION_GRAVE)
@@ -84,7 +88,7 @@ function c3657444.operation3(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(hg,POS_FACEUP,REASON_EFFECT)
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-		local gg=Duel.SelectMatchingCard(tp,Card.IsAbleToDeck,tp,LOCATION_GRAVE,0,1,1,nil)
+		local gg=Duel.SelectMatchingCard(tp,c3657444.filter3,tp,LOCATION_GRAVE,0,1,1,nil)
 		if gg:GetCount()>0 then
 			Duel.SendtoDeck(gg,nil,0,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,gg)

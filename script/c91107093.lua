@@ -18,18 +18,17 @@ function c91107093.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e3:SetRange(LOCATION_MZONE)
+	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EFFECT_SELF_DESTROY)
 	e3:SetCondition(c91107093.descon)
 	c:RegisterEffect(e3)
 end
 function c91107093.infilter(e,c)
-	local lv=c:GetLevel()
-	return lv>0 and lv<=3 and c:IsDefencePos() and c:IsRace(RACE_THUNDER)
+	return c:IsDefencePos() and c:IsLevelBelow(3) and c:IsRace(RACE_THUNDER)
 end
 function c91107093.filter(c)
 	return c:IsFaceup() and c:IsAttackPos()
 end
 function c91107093.descon(e)
-	return Duel.IsExistingMatchingCard(c91107093.filter,e:GetHandler():GetControler(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c91107093.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
