@@ -68,7 +68,7 @@ function c4694209.addc2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c4694209.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetCounter(0x21)>0 end
+	if chk==0 then return not e:GetHandler():IsReason(REASON_RULE) and e:GetHandler():GetCounter(0x21)>0 end
 	return true
 end
 function c4694209.repop(e,tp,eg,ep,ev,re,r,rp,chk)

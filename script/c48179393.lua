@@ -33,7 +33,7 @@ function c48179393.initial_effect(c)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
 	e4:SetCountLimit(1)
-	e4:SetValue(1)
+	e4:SetValue(c48179393.valcon)
 	c:RegisterEffect(e4)
 	--
 	local e5=Effect.CreateEffect(c)
@@ -67,6 +67,9 @@ function c48179393.actop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c48179393.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	return c:IsLocation(LOCATION_EXTRA)
+end
+function c48179393.valcon(e,re,r,rp)
+	return bit.band(r,REASON_EFFECT)~=0
 end
 function c48179393.atkcon(e)
 	return Duel.IsExistingMatchingCard(Card.IsPosition,e:GetHandlerPlayer(),LOCATION_MZONE,0,2,nil,POS_FACEUP_ATTACK)

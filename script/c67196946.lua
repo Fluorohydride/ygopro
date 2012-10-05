@@ -43,8 +43,11 @@ function c67196946.op(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(67196946,1))
 		local sg=g:Select(tp,1,1,nil)
 		local tc=sg:GetFirst()
+		if tc:IsLocation(LOCATION_MZONE) then
+			Duel.HintSelection(sg)
+		end
 		Duel.ConfirmCards(1-tp,sg)
-		if tc:GetLocation()==LOCATION_HAND then Duel.ShuffleHand(tp) end
+		if tc:IsLocation(LOCATION_HAND) then Duel.ShuffleHand(tp) end
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_LEVEL)

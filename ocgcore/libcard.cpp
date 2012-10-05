@@ -750,8 +750,10 @@ int32 scriptlib::card_register_effect(lua_State *L) {
 	duel* pduel = pcard->pduel;
 	if(peffect->owner == pduel->game_field->temp_card)
 		return 0;
-	if(!forced && pduel->game_field->core.reason_effect && !pcard->is_affect_by_effect(pduel->game_field->core.reason_effect))
+	if(!forced && pduel->game_field->core.reason_effect && !pcard->is_affect_by_effect(pduel->game_field->core.reason_effect)) {
+		pduel->game_field->core.reseted_effects.insert(peffect);
 		return 0;
+	}
 	int32 id;
 	if (peffect->handler)
 		id = -1;
