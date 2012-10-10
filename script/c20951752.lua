@@ -51,11 +51,11 @@ function c20951752.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabel()==1
 end
 function c20951752.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_FAIRY) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
 	local g=Duel.GetReleaseGroup(tp)
-	local rg=g:Filter(Card.IsRace,nil,RACE_FAIRY)
-	Duel.Release(rg,REASON_COST)
-	e:GetLabelObject():SetLabel(rg:GetCount())
+	local ct=g:FilterCount(Card.IsRace,nil,RACE_FAIRY)
+	Duel.Release(g,REASON_COST)
+	e:GetLabelObject():SetLabel(ct)
 end
 function c20951752.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
@@ -73,7 +73,7 @@ function c20951752.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
 end
 function c20951752.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) and e:GetLabel()>0 end
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end

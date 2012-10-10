@@ -110,7 +110,7 @@ c33900648[0]=0
 c33900648[1]=0
 function c33900648.raccheck(p)
 	local rac=0
-	for i=1,5 do
+	for i=0,4 do
 		local tc=Duel.GetFieldCard(p,LOCATION_MZONE,i)
 		if tc and tc:IsFaceup() then
 			rac=bit.bor(rac,tc:GetAttribute())
