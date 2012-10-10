@@ -17,10 +17,10 @@ function c12247206.condition(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()~=1 then return end
 	local tc=g:GetFirst()
 	e:SetLabelObject(tc)
-	return tc:GetAttack()<=1500 and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
+	return tc:IsAttackBelow(1500) and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
 end
 function c12247206.filter(c,code,e,tp)
-	return c:GetCode()==code and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:GetCode()==code and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c12247206.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetLabelObject()
