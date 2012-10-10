@@ -42,7 +42,7 @@ function c61650133.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local rm2=false
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsLocation(LOCATION_ONFIELD) and tc:IsFaceup() then
+		if tc:IsOnField() then
 			if tc:IsControler(tp) then rm1=true else rm2=true end
 		end
 		tc=eg:GetNext()
