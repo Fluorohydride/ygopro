@@ -15,7 +15,7 @@ function c3149764.cfilter(c)
 end
 function c3149764.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
-	if not re:IsActiveType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
+	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return tg and tg:GetCount()==1 and c3149764.cfilter(tg:GetFirst()) and Duel.IsChainNegatable(ev)
 end

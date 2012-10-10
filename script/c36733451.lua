@@ -26,7 +26,7 @@ function c36733451.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local g=Duel.GetDecktopGroup(tp,1)
 		local tc=g:GetFirst()
-		return tc:IsAbleToRemove()
+		return tc and tc:IsAbleToRemove()
 	end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 end

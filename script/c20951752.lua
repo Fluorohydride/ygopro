@@ -44,7 +44,7 @@ function c20951752.chop1(e,tp,eg,ep,ev,re,r,rp)
 	e:GetLabelObject():SetLabel(0)
 end
 function c20951752.chop2(e,tp,eg,ep,ev,re,r,rp)
-	if not re:IsActiveType(TYPE_COUNTER) then return end
+	if rp~=tp or not re:IsActiveType(TYPE_COUNTER) then return end
 	e:GetLabelObject():SetLabel(1)
 end
 function c20951752.sumcon(e,tp,eg,ep,ev,re,r,rp)
