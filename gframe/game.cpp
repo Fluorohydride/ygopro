@@ -14,13 +14,14 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x12e0;
+const unsigned short PRO_VERSION = 0x12e1;
 
 namespace ygo {
 
 Game* mainGame;
 
 bool Game::Initialize() {
+	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
 	params.AntiAlias = gameConf.antialias;
