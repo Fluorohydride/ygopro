@@ -1,4 +1,4 @@
---Vampire Dragon
+--ヴァンパイア，ドラゴン
 function c36352429.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

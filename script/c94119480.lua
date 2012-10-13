@@ -1,4 +1,4 @@
---Adreus, Keeper of Armageddon
+--ΩK—…§Œ ÿ◊o’ﬂ•¢•…•Ï•¶•π
 function c94119480.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,5),2)

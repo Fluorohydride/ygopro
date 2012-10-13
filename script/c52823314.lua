@@ -1,4 +1,4 @@
---Tour Bus From the Underworld
+--Ä§½ç°k¬FÊÀÐÐ¤­¥Ð¥¹
 function c52823314.initial_effect(c)
 	--to deck
 	local e1=Effect.CreateEffect(c)

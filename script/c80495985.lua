@@ -1,4 +1,4 @@
---Photon Sabre Tiger
+--¥Õ¥©¥È¥ó¡¤¥µ©`¥Ù¥ë¥¿¥¤¥¬©`
 function c80495985.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

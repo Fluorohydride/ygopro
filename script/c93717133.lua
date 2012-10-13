@@ -16,6 +16,7 @@ function c93717133.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetHintTiming(TIMING_BATTLE_PHASE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c93717133.rmcon)
 	e2:SetTarget(c93717133.rmtg)
@@ -37,8 +38,8 @@ function c93717133.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if chk==0 then return (a==e:GetHandler() and d and d:IsCanBeEffectTarget(e) and a:IsAbleToRemove() and d:IsAbleToRemove())
-		or (d==e:GetHandler() and a:IsCanBeEffectTarget(e) and a:IsAbleToRemove() and d:IsAbleToRemove()) end
+	if chk==0 then return (a==e:GetHandler() and d and d:IsOnField() and d:IsCanBeEffectTarget(e) and a:IsAbleToRemove() and d:IsAbleToRemove())
+		or (d==e:GetHandler() and a:IsOnField() and a:IsCanBeEffectTarget(e) and a:IsAbleToRemove() and d:IsAbleToRemove()) end
 	if a==e:GetHandler() then Duel.SetTargetCard(d)
 	else Duel.SetTargetCard(a) end
 	local g=Group.FromCards(a,d)

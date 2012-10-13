@@ -1,4 +1,4 @@
---Inzektor Hopper
+--¼×³æ×°™C ¥Û¥Ã¥Ñ©`
 function c52601736.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---Smashing Horn
+--½ÇµÑ³Z¤­
 function c93396832.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

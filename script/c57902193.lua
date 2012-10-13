@@ -1,9 +1,8 @@
---Painful Return
+--ø‡úi§Œ‹û…˙
 function c57902193.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1)
@@ -14,15 +13,15 @@ end
 function c57902193.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
-function c57902193.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c57902193.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c57902193.filter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
-	Duel.SelectTarget(1-tp,c57902193.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+function c57902193.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c57902193.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 end
 function c57902193.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_ATOHAND)
+	local g=Duel.SelectMatchingCard(1-tp,c57902193.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local tc=g:GetFirst()
+	if tc then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
@@ -35,5 +34,7 @@ function c57902193.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function c57902193.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,e:GetHandler())
+	if e:GetHandler():IsLocation(LOCATION_HAND) then
+		Duel.ConfirmCards(1-tp,e:GetHandler())
+	end
 end

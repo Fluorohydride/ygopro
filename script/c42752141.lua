@@ -1,4 +1,4 @@
---Evolzar Dolkka
+--¥¨¥ô¥©¥ë¥«¥¤¥¶©`¡¤¥É¥ë¥«
 function c42752141.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,c42752141.xyzfilter,2)

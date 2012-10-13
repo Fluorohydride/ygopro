@@ -1,4 +1,4 @@
---Photon Trident
+--フォトン，トライデント
 function c51589188.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

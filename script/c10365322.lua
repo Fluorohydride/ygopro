@@ -28,16 +28,20 @@ function c10365322.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,0)
 end
 function c10365322.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
-	local dam=tc:IsRelateToEffect(e) and c:IsRelateToEffect(e)
-	local dg=Group.FromCards(c,tc)
-	Duel.Destroy(dg,REASON_EFFECT)
-	if dam and tc:IsLocation(LOCATION_GRAVE) and c:IsLocation(LOCATION_GRAVE) then
-		Duel.BreakEffect()
-		local d=tc:GetAttack()
-		if d<0 then d=0 end
-		Duel.Damage(1-tp,d,REASON_EFFECT)
+	if not tc:IsRelateToEffect(e) and not c:IsRelateToEffect(e) then return end
+	if not tc:IsRelateToEffect(e) then
+		Duel.Destroy(c,REASON_EFFECT)
+	elseif not c:IsRelateToEffect(e) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	else
+		local dg=Group.FromCards(c,tc)
+		if Duel.Destroy(dg,REASON_EFFECT)==2 and tc:IsLocation(LOCATION_GRAVE) and c:IsLocation(LOCATION_GRAVE) then
+			Duel.BreakEffect()
+			local d=tc:GetAttack()
+			if d<0 then d=0 end
+			Duel.Damage(1-tp,d,REASON_EFFECT)
+		end
 	end
 end

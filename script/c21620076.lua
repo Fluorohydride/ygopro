@@ -1,4 +1,4 @@
---Pain Painter
+--¥Ú¥¤¥ó¥Ú¥¤¥ó¥¿©`
 function c21620076.initial_effect(c)
 	--alias
 	local e1=Effect.CreateEffect(c)
@@ -33,7 +33,7 @@ function c21620076.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local tc=g:GetFirst()
 	while tc do
-		if c21620076.lvfilter(tc) then
+		if tc:IsFaceup() then
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_CHANGE_LEVEL)

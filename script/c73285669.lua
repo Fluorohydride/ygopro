@@ -1,4 +1,4 @@
---Gladiator Beast Essedarii
+--„‡êLª•¥¨¥»¥À¥ê
 function c73285669.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
