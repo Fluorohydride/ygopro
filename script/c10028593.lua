@@ -1,4 +1,4 @@
---Reborn Tengu
+--İ†hÌì¹·
 function c10028593.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

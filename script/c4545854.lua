@@ -1,4 +1,4 @@
---Xyz Territory
+--¥¨¥¯¥·©`¥º¡¤¥Æ¥ê¥È¥ê©`
 function c4545854.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

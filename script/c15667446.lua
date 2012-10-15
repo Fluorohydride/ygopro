@@ -1,4 +1,4 @@
---Latinum, Exarch of Dark World
+--°µü\½ç¤ÎêLÉñ ¥é¥Á¥Ê
 function c15667446.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

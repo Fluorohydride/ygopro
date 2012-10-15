@@ -1,4 +1,4 @@
---Evolsaur Pelta
+--¥¨¥ô¥©¥ë¥À©`¡¤¥Ú¥ë¥¿
 function c16480084.initial_effect(c)
 end
 function c16480084.evolreg(c)

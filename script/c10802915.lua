@@ -1,4 +1,4 @@
---Tour Guide From the Underworld
+--Ä§½ç°k¬FÊÀÐÐ¤­¥Ç¥¹¥¬¥¤¥É
 function c10802915.initial_effect(c)
 	--spsummon
 	local e2=Effect.CreateEffect(c)

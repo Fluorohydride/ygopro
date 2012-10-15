@@ -1,4 +1,4 @@
---Evo-Instant
+--Í»È»ßM»¯
 function c24362891.initial_effect(c)
 	--Special Summon
 	local e1=Effect.CreateEffect(c)

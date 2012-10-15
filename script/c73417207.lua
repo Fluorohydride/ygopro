@@ -1,4 +1,4 @@
---Mara of the Nordic Alfar
+--˜OÐÇë‘¥¹¥ô¥¡¥ë¥È¥¢©`¥ë¥ô
 function c73417207.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)

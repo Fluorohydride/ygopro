@@ -1,4 +1,4 @@
---Ninjitsu Art of Duplication
+--»Ã∑® ∑÷…Ì§Œ–g
 function c50766506.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

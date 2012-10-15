@@ -1,4 +1,4 @@
---Inzektor Axe - Zektahawk
+--¼×³æ×°™C¤ÎÄ§¸« ¥¼¥¯¥È¥Û©`¥¯
 function c87973893.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

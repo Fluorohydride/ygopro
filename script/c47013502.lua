@@ -1,4 +1,4 @@
---Dodger Dragon
+--アボイド，ドラゴン
 function c47013502.initial_effect(c)
 	--summon
 	local e1=Effect.CreateEffect(c)

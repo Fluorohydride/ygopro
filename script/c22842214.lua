@@ -1,4 +1,4 @@
---Sea Lancer
+--¥·©`¡¤¥é¥ó¥µ©`
 function c22842214.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

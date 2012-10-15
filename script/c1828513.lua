@@ -1,4 +1,4 @@
---Shadow of the Six Samurai - Shien
+--ÁùÎäĞ\¤ÎÓ°£­×ÏÑ×
 function c1828513.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,c1828513.xyzfilter,2)
