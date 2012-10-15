@@ -1142,7 +1142,7 @@ int32 scriptlib::duel_change_battle_damage(lua_State *L) {
 	int32 check = TRUE;
 	if(lua_gettop(L) >= 3)
 		check = lua_toboolean(L, 3);
-	if(check && dam == 0)
+	if(check && pduel->game_field->core.battle_damage[playerid] == 0)
 		return 0;
 	pduel->game_field->core.battle_damage[playerid] = dam;
 	return 0;
