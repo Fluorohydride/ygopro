@@ -12,7 +12,7 @@ function c5498296.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c5498296.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c5498296.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

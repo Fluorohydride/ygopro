@@ -10,7 +10,7 @@ function c47121070.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c47121070.filter(c,tp)
-	return c:IsSetCard(0x34) and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp
+	return c:IsSetCard(0x34) and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp and c:IsReason(REASON_BATTLE)
 end
 function c47121070.tfcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c47121070.filter,1,nil,tp)

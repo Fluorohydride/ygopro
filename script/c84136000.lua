@@ -12,7 +12,7 @@ function c84136000.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c84136000.cfilter(c,tp)
-	return c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp
+	return c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp and c:IsReason(REASON_BATTLE)
 end
 function c84136000.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c84136000.cfilter,1,nil,tp)

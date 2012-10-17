@@ -17,7 +17,7 @@ function c15313433.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
 end
 function c15313433.filter(c,e,tp)
-	return c:IsSetCard(0xb) and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp
+	return c:IsSetCard(0xb) and c:IsLocation(LOCATION_GRAVE) and c:GetPreviousControler()==tp and c:IsReason(REASON_BATTLE)
 		and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c15313433.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

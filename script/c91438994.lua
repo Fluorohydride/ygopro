@@ -40,7 +40,7 @@ function c91438994.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c91438994.filter1(c,tp)
-	return c:GetPreviousControler()==tp and c:GetPreviousLocation()==LOCATION_MZONE
+	return c:GetPreviousControler()==tp and c:GetPreviousLocation()==LOCATION_MZONE and c:IsReason(REASON_BATTLE)
 end
 function c91438994.addc1(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(c91438994.filter1,1,nil,tp) then

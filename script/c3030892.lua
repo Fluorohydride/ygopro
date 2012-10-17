@@ -12,7 +12,7 @@ function c3030892.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c3030892.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c3030892.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -14,7 +14,7 @@ function c74130411.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c74130411.cfilter(c,tp)
-	return c:GetPreviousControler()==tp and c:IsLocation(LOCATION_GRAVE) and c:IsRace(RACE_MACHINE)
+	return c:GetPreviousControler()==tp and c:IsLocation(LOCATION_GRAVE) and c:IsRace(RACE_MACHINE) and c:IsReason(REASON_BATTLE)
 end
 function c74130411.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c74130411.cfilter,1,nil,tp)

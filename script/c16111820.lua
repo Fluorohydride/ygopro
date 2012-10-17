@@ -13,7 +13,7 @@ function c16111820.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c16111820.filter(c,tp)
-	return c:GetPreviousControler()==tp and c:GetControler()==tp and c:IsLocation(LOCATION_GRAVE) and c:IsPreviousPosition(POS_DEFENCE)
+	return c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_DEFENCE) and c:IsReason(REASON_BATTLE) and c:IsLocation(LOCATION_GRAVE) 
 		and c:IsSetCard(0x22) and c:GetCode()~=16111820
 end
 function c16111820.condition(e,tp,eg,ep,ev,re,r,rp)

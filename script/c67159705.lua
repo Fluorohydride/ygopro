@@ -26,7 +26,6 @@ function c67159705.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
 	e3:SetCondition(c67159705.uncon)
-	e3:SetValue(c67159705.repval)
 	c:RegisterEffect(e3)
 	--eqlimit
 	local e4=Effect.CreateEffect(c)

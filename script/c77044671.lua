@@ -12,7 +12,7 @@ function c77044671.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c77044671.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c77044671.filter(c,e,tp)
 	return c:IsDefenceBelow(2000) and c:IsRace(RACE_ZOMBIE)

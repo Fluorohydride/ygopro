@@ -12,7 +12,7 @@ function c79544790.initial_effect(c)
 end
 function c79544790.filter(c,e,tp)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsCanBeEffectTarget(e)
-		and c:GetPreviousControler()==tp and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:GetPreviousControler()==tp and c:IsReason(REASON_BATTLE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c79544790.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return eg:IsContains(chkc) and c79544790.filter(chkc,e,tp) end

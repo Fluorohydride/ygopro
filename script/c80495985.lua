@@ -40,5 +40,5 @@ function c80495985.atfilter(c)
 	return c:IsFaceup() and c:IsCode(80495985)
 end
 function c80495985.atcon(e)
-	return not Duel.IsExistingMatchingCard(c80495985.atfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
+	return not Duel.IsExistingMatchingCard(c80495985.atfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,e:GetHandler())
 end

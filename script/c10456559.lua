@@ -13,7 +13,7 @@ function c10456559.initial_effect(c)
 end
 function c10456559.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and tp==c:GetPreviousControler()
+	return c:IsLocation(LOCATION_GRAVE) and tp==c:GetPreviousControler() and c:IsReason(REASON_BATTLE)
 end
 function c10456559.filter(c)
 	return c:IsCode(10456559) and c:IsAbleToHand()

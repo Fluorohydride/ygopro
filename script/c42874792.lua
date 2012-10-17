@@ -28,15 +28,22 @@ function c42874792.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
-		e1:SetLabelObject(tc)
+		e1:SetRange(LOCATION_REMOVED)
 		e1:SetCountLimit(1)
+		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then
+			e1:SetLabel(Duel.GetTurnCount())
+			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
+		else
+			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
+		end
+		e1:SetCondition(c42874792.retcon)
 		e1:SetOperation(c42874792.retop)
-		Duel.RegisterEffect(e1,tp)
+		tc:RegisterEffect(e1)
 	end
 end
+function c42874792.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel()
+end
 function c42874792.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.ReturnToField(e:GetLabelObject())
-	end
+	Duel.ReturnToField(e:GetHandler())
 end

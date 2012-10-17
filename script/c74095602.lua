@@ -13,7 +13,8 @@ function c74095602.initial_effect(c)
 end
 function c74095602.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()
-	return tc:GetPreviousControler()==tp and tc:IsType(TYPE_FUSION) and tc:IsLocation(LOCATION_GRAVE) and tc:IsSetCard(0x3008)
+	return tc:GetPreviousControler()==tp and tc:IsType(TYPE_FUSION) and tc:IsSetCard(0x3008)
+		and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE) 
 end
 function c74095602.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -55,7 +55,9 @@ function c52601736.eqlimit(e,c)
 	return e:GetOwner()==c and not c:IsDisabled()
 end
 function c52601736.dacon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	local tc=e:GetHandler():GetEquipTarget()
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and tc:IsAttackable() and tc:GetEffectCount(EFFECT_DIRECT_ATTACK)==0
 end
 function c52601736.ftarget(e,c)
 	return e:GetLabel()~=c:GetFieldID()
@@ -63,8 +65,7 @@ end
 function c52601736.dacost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	local tc=e:GetHandler():GetEquipTarget()
-	e:SetLabelObject(tc)
-	tc:CreateEffectRelation(e)
+	Duel.SetTargetCard(tc)
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -77,7 +78,7 @@ function c52601736.dacost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c52601736.daop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
+	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
