@@ -30,7 +30,7 @@ function c56339050.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			e:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 			e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 			Duel.SetTargetCard(tc)
-			local dam=tc:GetAttack()
+			local dam=tc:GetAttack()/2
 			Duel.SetTargetParam(dam)
 			Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 			Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
@@ -44,7 +44,7 @@ end
 function c56339050.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttackable() then
-		local atk=tc:GetAttack()
+		local atk=tc:GetAttack()/2
 		if Duel.Destroy(tc,REASON_EFFECT)~=0 then
 			Duel.Damage(1-tp,atk,REASON_EFFECT)
 		end
@@ -63,7 +63,7 @@ function c56339050.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return e:GetHandler():GetFlagEffect(56339050)==0
 		and tc:IsOnField() and tc:IsCanBeEffectTarget(e) and tc:IsDestructable() end
 	Duel.SetTargetCard(tc)
-	local dam=tc:GetAttack()
+	local dam=tc:GetAttack()/2
 	Duel.SetTargetParam(dam)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)

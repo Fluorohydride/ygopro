@@ -29,12 +29,12 @@ function c54974237.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ty=TYPE_SPELL
 	if ac==1 then ty=TYPE_TRAP end
 	e:SetLabel(ty)
-	local g=Duel.GetMatchingGroup(c54974237.tgfilter,tp,0,LOCATION_SZONE,nil,ty)
+	local g=Duel.GetMatchingGroup(c54974237.tgfilter,tp,0,LOCATION_ONFIELD,nil,ty)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c54974237.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ty=e:GetLabel()
-	local conf=Duel.GetFieldGroup(tp,0,LOCATION_SZONE+LOCATION_HAND)
+	local conf=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD+LOCATION_HAND)
 	if conf:GetCount()>0 then
 		Duel.ConfirmCards(tp,conf)
 		local dg=conf:Filter(Card.IsType,nil,ty)

@@ -5,7 +5,6 @@ function c31615285.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
 	c:RegisterEffect(e1)
 	--disable spsummon
 	local e2=Effect.CreateEffect(c)
@@ -21,5 +20,5 @@ function c31615285.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_PLANT)
 end
 function c31615285.dscon(e)
-	return Duel.IsExistingMatchingCard(c31615285.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
+	return Duel.IsExistingMatchingCard(c31615285.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
