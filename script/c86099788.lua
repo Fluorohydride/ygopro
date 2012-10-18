@@ -27,8 +27,6 @@ function c86099788.initial_effect(c)
 	e4:SetCode(EFFECT_CANNOT_SUMMON)
 	c:RegisterEffect(e4)
 end
-c86099788.material_count=2
-c86099788.material={71466592,88472456}
 function c86099788.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,e:GetHandler())

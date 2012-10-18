@@ -39,8 +39,6 @@ function c86346643.initial_effect(c)
 	e4:SetOperation(c86346643.tdop3)
 	c:RegisterEffect(e4)
 end
-c86346643.material_count=1
-c86346643.material={89943723}
 function c86346643.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

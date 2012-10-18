@@ -54,8 +54,6 @@ function c85684223.initial_effect(c)
 	e7:SetCode(EFFECT_DIRECT_ATTACK)
 	c:RegisterEffect(e7)
 end
-c85684223.material_count=2
-c85684223.material={23205979,59290628}
 function c85684223.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and Duel.GetAttackTarget()==nil
 end

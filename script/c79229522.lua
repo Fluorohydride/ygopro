@@ -25,8 +25,6 @@ function c79229522.initial_effect(c)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
 end
-c79229522.material_count=1
-c79229522.material={70095154}
 function c79229522.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end

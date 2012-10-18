@@ -12,8 +12,6 @@ function c9910360.initial_effect(c)
 	e2:SetValue(c9910360.atkval)
 	c:RegisterEffect(e2)
 end
-c9910360.material_count=1
-c9910360.material={84451804}
 function c9910360.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsCode,c:GetControler(),LOCATION_GRAVE,0,nil,12538374)*500
 end

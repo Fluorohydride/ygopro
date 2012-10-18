@@ -256,6 +256,12 @@ function Auxiliary.FConditionCheckF(c,chkf)
 	return c:IsOnField() and c:IsControler(chkf)
 end
 function Auxiliary.AddFusionProcCode2(c,code1,code2,sub,insf)
+	if c.material_count==nil then
+		local code=c:GetOriginalCode()
+		local mt=_G["c" .. code]
+		mt.material_count=2
+		mt.material={code1,code2}
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -322,6 +328,12 @@ function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 			end
 end
 function Auxiliary.AddFusionProcCode3(c,code1,code2,code3,sub,insf)
+	if c.material_count==nil then
+		local code=c:GetOriginalCode()
+		local mt=_G["c" .. code]
+		mt.material_count=3
+		mt.material={code1,code2,code2}
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -411,6 +423,12 @@ function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
 			end
 end
 function Auxiliary.AddFusionProcCode4(c,code1,code2,code3,code4,sub,insf)
+	if c.material_count==nil then
+		local code=c:GetOriginalCode()
+		local mt=_G["c" .. code]
+		mt.material_count=4
+		mt.material={code1,code2,code3,code4}
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -513,6 +531,12 @@ function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
 			end
 end
 function Auxiliary.AddFusionProcCodeFun(c,code,f,cc,sub,insf)
+	if c.material_count==nil then
+		local code=c:GetOriginalCode()
+		local mt=_G["c" .. code]
+		mt.material_count=1
+		mt.material={code}
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -662,6 +686,12 @@ function Auxiliary.FOperationFun2(f1,f2,insf)
 			end
 end
 function Auxiliary.AddFusionProcCodeRep(c,code,cc,sub,insf)
+	if c.material_count==nil then
+		local code=c:GetOriginalCode()
+		local mt=_G["c" .. code]
+		mt.material_count=1
+		mt.material={code}
+	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

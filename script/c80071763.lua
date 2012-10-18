@@ -24,8 +24,6 @@ function c80071763.initial_effect(c)
 	e2:SetOperation(c80071763.disop2)
 	c:RegisterEffect(e2)
 end
-c80071763.material_count=2
-c80071763.material={52860176,38742075}
 function c80071763.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end

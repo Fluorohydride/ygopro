@@ -49,8 +49,6 @@ function c17032740.initial_effect(c)
 	e5:SetOperation(c17032740.coinop)
 	c:RegisterEffect(e5)
 end
-c17032740.material_count=3
-c17032740.material={89943723,43237273,17732278}
 function c17032740.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end

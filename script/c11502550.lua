@@ -46,8 +46,6 @@ function c11502550.initial_effect(c)
 	e5:SetValue(c11502550.atkval)
 	c:RegisterEffect(e5)
 end
-c11502550.material_count=2
-c11502550.material={89943723,54959865}
 function c11502550.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end

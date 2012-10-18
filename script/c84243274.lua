@@ -41,8 +41,6 @@ function c84243274.initial_effect(c)
 	e4:SetOperation(c84243274.posop)
 	c:RegisterEffect(e4)
 end
-c84243274.material_count=2
-c84243274.material={58859575,91998119}
 function c84243274.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end

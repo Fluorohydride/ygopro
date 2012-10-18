@@ -14,8 +14,6 @@ function c4796100.initial_effect(c)
 	e1:SetOperation(c4796100.spop)
 	c:RegisterEffect(e1)
 end
-c4796100.material_count=2
-c4796100.material={5818798,77207191}
 function c4796100.spfilter(c,e,tp)
 	local code=c:GetCode()
 	return (code==5818798 or code==77207191) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -31,8 +31,6 @@ function c13108445.initial_effect(c)
 	e4:SetOperation(c13108445.posop)
 	c:RegisterEffect(e4)
 end
-c13108445.material_count=1
-c13108445.material={27126980}
 function c13108445.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

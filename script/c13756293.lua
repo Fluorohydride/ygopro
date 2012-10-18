@@ -23,8 +23,6 @@ function c13756293.initial_effect(c)
 	e2:SetOperation(c13756293.spop)
 	c:RegisterEffect(e2)
 end
-c13756293.material_count=2
-c13756293.material={17985575,62113340}
 function c13756293.etarget(e,c)
 	return c:IsRace(RACE_DRAGON)
 end

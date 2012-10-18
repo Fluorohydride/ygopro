@@ -22,8 +22,6 @@ function c21947653.initial_effect(c)
 	e2:SetOperation(c21947653.operation)
 	c:RegisterEffect(e2)
 end
-c21947653.material_count=2
-c21947653.material={20721928,84327329}
 function c21947653.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_FUSION+0x10
 end

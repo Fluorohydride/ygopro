@@ -20,8 +20,6 @@ function c58601383.initial_effect(c)
 	e3:SetValue(c58601383.efilter)
 	c:RegisterEffect(e3)
 end
-c58601383.material_count=1
-c58601383.material={97204936}
 function c58601383.ffilter(c)
 	return c:IsType(TYPE_SYNCHRO) and not c:IsType(TYPE_EFFECT)
 end

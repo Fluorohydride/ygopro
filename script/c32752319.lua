@@ -11,8 +11,6 @@ function c32752319.initial_effect(c)
 	e1:SetOperation(c32752319.atkop)
 	c:RegisterEffect(e1)
 end
-c32752319.material_count=1
-c32752319.material={7602840}
 function c32752319.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

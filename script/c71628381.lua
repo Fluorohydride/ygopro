@@ -15,8 +15,6 @@ function c71628381.initial_effect(c)
 	e1:SetOperation(c71628381.spop)
 	c:RegisterEffect(e1)
 end
-c71628381.material_count=2
-c71628381.material={25247218,58843503}
 function c71628381.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0
 end

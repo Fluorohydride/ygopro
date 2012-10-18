@@ -57,8 +57,6 @@ function c49352945.initial_effect(c)
 	e6:SetOperation(c49352945.tdop)
 	c:RegisterEffect(e6)
 end
-c49352945.material_count=3
-c49352945.material={89943723,17955766,54959865}
 function c49352945.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end

@@ -17,8 +17,6 @@ function c99916754.initial_effect(c)
 	e2:SetOperation(c99916754.disop)
 	c:RegisterEffect(e2)
 end
-c99916754.material_count=2
-c99916754.material={33198837,2956282}
 function c99916754.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)

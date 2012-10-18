@@ -19,8 +19,6 @@ function c66235877.initial_effect(c)
 	e2:SetOperation(c66235877.disop)
 	c:RegisterEffect(e2)
 end
-c66235877.material_count=2
-c66235877.material={93220472,16475472}
 function c66235877.distg(e,c)
 	return c:IsType(TYPE_FLIP)
 end

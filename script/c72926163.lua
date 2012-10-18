@@ -29,8 +29,6 @@ function c72926163.initial_effect(c)
 	e4:SetCode(EFFECT_NO_BATTLE_DAMAGE)
 	c:RegisterEffect(e4)
 end
-c72926163.material_count=1
-c72926163.material={89943723}
 function c72926163.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

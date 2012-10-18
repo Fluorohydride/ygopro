@@ -28,8 +28,6 @@ function c63519819.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	c:RegisterEffect(e4)
 end
-c63519819.material_count=2
-c63519819.material={64631466,27125110}
 function c63519819.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=e:GetLabelObject()

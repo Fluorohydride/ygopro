@@ -9,5 +9,3 @@ function c36256625.initial_effect(c)
 	e1:SetCode(EFFECT_PIERCE)
 	c:RegisterEffect(e1)
 end
-c36256625.material_count=3
-c36256625.material={44729197,71218746,99861526}

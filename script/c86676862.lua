@@ -34,8 +34,6 @@ function c86676862.initial_effect(c)
 	e5:SetRange(LOCATION_MZONE)
 	c:RegisterEffect(e5)
 end
-c86676862.material_count=1
-c86676862.material={58554959}
 function c86676862.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_FUSION+0x10
 end

@@ -42,8 +42,6 @@ function c48156348.initial_effect(c)
 	e4:SetOperation(c48156348.spop)
 	c:RegisterEffect(e4)
 end
-c48156348.material_count=1
-c48156348.material={41470137}
 function c48156348.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end

@@ -33,8 +33,6 @@ function c3897065.initial_effect(c)
 	e4:SetOperation(c3897065.atkop)
 	c:RegisterEffect(e4)
 end
-c3897065.material_count=4
-c3897065.material={61538782,98049038,71218746,984114}
 function c3897065.eqfilter(c,tp)
 	return c:IsFaceup() and not c:IsRace(RACE_MACHINE) and (c:IsControler(tp) or c:IsAbleToChangeControler())
 end

@@ -32,8 +32,6 @@ function c50282757.initial_effect(c)
 	e3:SetValue(c50282757.indesval)
 	c:RegisterEffect(e3)
 end
-c50282757.material_count=2
-c50282757.material={84327329,58932615}
 function c50282757.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_FUSION+0x10
 end

@@ -15,8 +15,6 @@ function c7243511.initial_effect(c)
 	e1:SetOperation(c7243511.operation)
 	c:RegisterEffect(e1)
 end
-c7243511.material_count=2
-c7243511.material={87685879,71759912}
 function c7243511.cfilter(c)
 	return c:IsRace(RACE_BEAST) and c:IsAbleToGraveAsCost()
 end

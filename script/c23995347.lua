@@ -4,5 +4,3 @@ function c23995347.initial_effect(c)
 	c:EnableReviveLimit()
 	aux.AddFusionProcCodeRep(c,89631139,3,true,true)
 end
-c23995347.material_count=1
-c23995347.material={89631139}

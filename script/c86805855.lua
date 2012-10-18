@@ -15,8 +15,6 @@ function c86805855.initial_effect(c)
 	e1:SetOperation(c86805855.rmop)
 	c:RegisterEffect(e1)
 end
-c86805855.material_count=2
-c86805855.material={11321183,47415292}
 function c86805855.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp
 end

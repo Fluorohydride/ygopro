@@ -10,8 +10,6 @@ function c3366982.initial_effect(c)
 	e2:SetCondition(c3366982.dircon)
 	c:RegisterEffect(e2)
 end
-c3366982.material_count=2
-c3366982.material={88819587,64428736}
 function c3366982.filter(c)
 	return c:IsFaceup() and c:IsAttribute(0xf8)
 end

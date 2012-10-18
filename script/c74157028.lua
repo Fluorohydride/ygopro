@@ -10,5 +10,3 @@ function c74157028.initial_effect(c)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 end
-c74157028.material_count=1
-c74157028.material={70095154}

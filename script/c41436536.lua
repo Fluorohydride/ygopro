@@ -17,8 +17,6 @@ function c41436536.initial_effect(c)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 end
-c41436536.material_count=2
-c41436536.material={21844576,58932615}
 function c41436536.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

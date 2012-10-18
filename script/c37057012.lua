@@ -11,8 +11,6 @@ function c37057012.initial_effect(c)
 	e1:SetOperation(c37057012.atkop)
 	c:RegisterEffect(e1)
 end
-c37057012.material_count=1
-c37057012.material={64268668}
 function c37057012.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil
 end

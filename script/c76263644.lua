@@ -28,8 +28,6 @@ function c76263644.initial_effect(c)
 	e3:SetOperation(c76263644.spop)
 	c:RegisterEffect(e3)
 end
-c76263644.material_count=2
-c76263644.material={83965310,17132130}
 function c76263644.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1 end
 	local e1=Effect.CreateEffect(e:GetHandler())

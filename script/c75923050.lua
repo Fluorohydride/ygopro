@@ -25,8 +25,6 @@ function c75923050.initial_effect(c)
 	e2:SetOperation(c75923050.spop)
 	c:RegisterEffect(e2)
 end
-c75923050.material_count=2
-c75923050.material={92421852,38916461}
 function c75923050.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattleTarget()==nil
 end
