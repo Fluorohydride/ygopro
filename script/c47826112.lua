@@ -26,9 +26,6 @@ function c47826112.cfilter(c)
 end
 function c47826112.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c47826112.cfilter,3,nil) end
-	if e:GetHandler():IsLocation(LOCATION_HAND) then
-		Duel.ConfirmCards(1-tp,e:GetHandler())
-	end
 	local g=Duel.SelectReleaseGroup(tp,c47826112.cfilter,3,3,nil)
 	Duel.Release(g,REASON_COST)
 end

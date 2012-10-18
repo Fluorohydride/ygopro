@@ -18,8 +18,6 @@ function c54161401.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c54161401.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.DiscardDeck(tp,1,REASON_COST)
 end
 function c54161401.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

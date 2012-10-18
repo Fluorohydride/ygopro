@@ -25,8 +25,6 @@ function c55277252.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_HAND,0,1,e:GetHandler(),0x35)
 		and e:GetHandler():IsCanBeSpecialSummoned(e,1,tp,false,false)
 	end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c55277252.op(e,tp,eg,ep,ev,re,r,rp)

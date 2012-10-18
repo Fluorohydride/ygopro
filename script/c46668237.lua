@@ -45,10 +45,6 @@ function c46668237.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c46668237.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
-	if e:GetHandler():IsLocation(LOCATION_HAND) then
-		Duel.ConfirmCards(1-tp,e:GetHandler())
-		Duel.ShuffleHand(tp)
-	end
 	Duel.PayLPCost(tp,1000)
 end
 function c46668237.target(e,tp,eg,ep,ev,re,r,rp,chk)

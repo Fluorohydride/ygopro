@@ -106,7 +106,7 @@ public:
 	ClientCard* clicked_card;
 	ClientCard* command_card;
 	int list_command;
-	wchar_t formatBuffer[256];
+	wchar_t formatBuffer[2048];
 
 	virtual bool OnEvent(const irr::SEvent& event);
 	void GetHoverField(int x, int y);

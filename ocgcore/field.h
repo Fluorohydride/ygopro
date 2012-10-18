@@ -484,6 +484,7 @@ public:
 //Chain Info
 #define CHAIN_DISABLE_ACTIVATE	0x01
 #define CHAIN_DISABLE_EFFECT	0x02
+#define CHAIN_HAND_EFFECT		0x04
 #define CHAININFO_CHAIN_COUNT			0x01
 #define CHAININFO_TRIGGERING_EFFECT		0x02
 #define CHAININFO_TRIGGERING_PLAYER		0x04
@@ -656,7 +657,8 @@ public:
 #define CHINT_RACE				3
 #define CHINT_ATTRIBUTE			4
 #define CHINT_NUMBER			5
-#define CHINT_DESC				6
+#define CHINT_DESC_ADD			6
+#define CHINT_DESC_REMOVE		7
 //Messages
 #define MSG_RETRY				1
 #define MSG_HINT				2

@@ -1891,7 +1891,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 							for (int i = 0; i < pcard->overlayed.size(); ++i)
 								mainGame->dField.MoveCard(pcard->overlayed[i], 10);
 							mainGame->gMutex.Unlock();
-							mainGame->WaitFrameSignal(5);
+							mainGame->WaitFrameSignal(10);
 						}
 						if (cl == 0x2) {
 							mainGame->gMutex.Lock();
@@ -2161,6 +2161,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
 			return true;
 		ClientCard* pcard = mainGame->dField.GetCard(pcc, pcl, pcs, subs);
+		if(pcard->code != code) {
+			pcard->code = code;
+			mainGame->dField.MoveCard(pcard, 10);
+		}
 		mainGame->showcardcode = code;
 		mainGame->showcarddif = 0;
 		mainGame->showcard = 1;
@@ -2813,22 +2817,30 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		ClientCard* pcard = mainGame->dField.GetCard(c, l, s);
 		if(!pcard)
 			return true;
-		pcard->cHint = chtype;
-		pcard->chValue = value;
-		if(chtype == CHINT_TURN) {
-			if(value == 0)
-				return true;
-			if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
-				return true;
-			if(pcard->location & LOCATION_ONFIELD)
-				pcard->is_highlighting = true;
-			mainGame->showcardcode = pcard->code;
-			mainGame->showcarddif = 0;
-			mainGame->showcardp = value - 1;
-			mainGame->showcard = 6;
-			mainGame->WaitFrameSignal(30);
-			pcard->is_highlighting = false;
-			mainGame->showcard = 0;
+		if(chtype == CHINT_DESC_ADD) {
+			pcard->desc_hints[value]++;
+		} else if(chtype == CHINT_DESC_REMOVE) {
+			pcard->desc_hints[value]--;
+			if(pcard->desc_hints[value] == 0)
+				pcard->desc_hints.erase(value);
+		} else {
+			pcard->cHint = chtype;
+			pcard->chValue = value;
+			if(chtype == CHINT_TURN) {
+				if(value == 0)
+					return true;
+				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping)
+					return true;
+				if(pcard->location & LOCATION_ONFIELD)
+					pcard->is_highlighting = true;
+				mainGame->showcardcode = pcard->code;
+				mainGame->showcarddif = 0;
+				mainGame->showcardp = value - 1;
+				mainGame->showcard = 6;
+				mainGame->WaitFrameSignal(30);
+				pcard->is_highlighting = false;
+				mainGame->showcard = 0;
+			}
 		}
 		return true;
 	}

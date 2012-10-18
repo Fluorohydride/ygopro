@@ -49,8 +49,6 @@ end
 function c60417395.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c60417395.cfilter1,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingMatchingCard(c60417395.cfilter2,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g1=Duel.SelectMatchingCard(tp,c60417395.cfilter1,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)

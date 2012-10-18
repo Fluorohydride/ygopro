@@ -42,8 +42,6 @@ function c38109772.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		local ct=e:GetLabelObject():FilterCount(Card.IsLocation,nil,LOCATION_MZONE)
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-ct and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
 	end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,eg,1,0,0)
 end
 function c38109772.operation(e,tp,eg,ep,ev,re,r,rp)

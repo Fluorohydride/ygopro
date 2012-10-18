@@ -59,8 +59,6 @@ function c20951752.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c20951752.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c20951752.sumop(e,tp,eg,ep,ev,re,r,rp)

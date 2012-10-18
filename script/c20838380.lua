@@ -23,7 +23,7 @@ function c20838380.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c20838380.cfilter(c,tp)
-	return c:IsControler(tp) and c:IsRace(RACE_FISH+RACE_SEASERPENT+RACE_AQUA)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_FISH+RACE_SEASERPENT+RACE_AQUA)
 end
 function c20838380.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c20838380.cfilter,1,nil,tp)
@@ -31,8 +31,6 @@ end
 function c20838380.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c20838380.spop(e,tp,eg,ep,ev,re,r,rp)

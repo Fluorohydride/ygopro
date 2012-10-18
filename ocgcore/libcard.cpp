@@ -1843,7 +1843,7 @@ int32 scriptlib::card_set_hint(lua_State *L) {
 	duel* pduel = pcard->pduel;
 	uint32 type = lua_tointeger(L, 2);
 	uint32 value = lua_tointeger(L, 3);
-	if(type > CHINT_DESC)
+	if(type >= CHINT_DESC_ADD)
 		return 0;
 	pduel->write_buffer8(MSG_CARD_HINT);
 	pduel->write_buffer32(pcard->get_info_location());

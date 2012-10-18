@@ -3918,14 +3918,15 @@ int32 field::add_chain(uint16 step) {
 	case 1: {
 		chain_list::iterator clit = core.new_chains.begin();
 		effect* peffect = clit->triggering_effect;
+		card* phandler = peffect->handler;
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
-			clit->triggering_controler = peffect->handler->current.controler;
-			clit->triggering_location = peffect->handler->current.location;
-			clit->triggering_sequence = peffect->handler->current.sequence;
+			clit->triggering_controler = phandler->current.controler;
+			clit->triggering_location = phandler->current.location;
+			clit->triggering_sequence = phandler->current.sequence;
 		}
 		pduel->write_buffer8(MSG_CHAINING);
-		pduel->write_buffer32(peffect->handler->data.code);
-		pduel->write_buffer32(peffect->handler->get_info_location());
+		pduel->write_buffer32(phandler->data.code);
+		pduel->write_buffer32(phandler->get_info_location());
 		pduel->write_buffer8(clit->triggering_controler);
 		pduel->write_buffer8(clit->triggering_location);
 		pduel->write_buffer8(clit->triggering_sequence);
@@ -3937,13 +3938,13 @@ int32 field::add_chain(uint16 step) {
 			core.chain_limit = 0;
 		}
 		effect* deffect;
-		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (deffect = peffect->handler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))) {
+		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (deffect = phandler->is_affected_by_effect(EFFECT_DISABLE_EFFECT))) {
 			effect* negeff = pduel->new_effect();
 			negeff->owner = deffect->owner;
 			negeff->type = EFFECT_TYPE_SINGLE;
 			negeff->code = EFFECT_DISABLE_CHAIN;
 			negeff->reset_flag = RESET_CHAIN | RESET_EVENT | deffect->get_value();
-			peffect->handler->add_effect(negeff);
+			phandler->add_effect(negeff);
 		}
 		clit->triggering_effect->card_type = peffect->handler->get_type();
 		if((clit->triggering_effect->card_type & 0x5) == 0x5)
@@ -3955,8 +3956,10 @@ int32 field::add_chain(uint16 step) {
 		clit->disable_reason = 0;
 		clit->disable_player = PLAYER_NONE;
 		clit->replace_op = 0;
+		if((phandler->current.location == LOCATION_HAND))
+			clit->flag |= CHAIN_HAND_EFFECT;
 		core.current_chain.push_back(*clit);
-		//triggered events which are not caused by RaiseEvent create relation with the handler
+		// triggered events which are not caused by RaiseEvent create relation with the handler
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (!(peffect->type & 0x2a0) || (peffect->code & EVENT_PHASE) == EVENT_PHASE)) {
 			peffect->handler->create_relation(peffect);
 		}
@@ -3980,10 +3983,9 @@ int32 field::add_chain(uint16 step) {
 		break_effect();
 		chain_array::iterator clit = --(core.current_chain.end());
 		effect* peffect = clit->triggering_effect;
-		card_set::iterator cit;
 		if(clit->target_cards && clit->target_cards->container.size()) {
 			if(clit->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
-				for(cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
+				for(auto cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
 					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, 0, clit->chain_count);
 				process_single_event();
 				if(clit->target_cards->container.size())
@@ -4013,13 +4015,12 @@ int32 field::add_chain(uint16 step) {
 int32 field::sort_chain(uint16 step, uint8 tp) {
 	switch(step) {
 	case 0: {
-		chain_list::iterator clit;
 		core.select_cards.clear();
 		if(tp)
-			for(clit = core.tpchain.begin(); clit != core.tpchain.end(); ++clit)
+			for(auto clit = core.tpchain.begin(); clit != core.tpchain.end(); ++clit)
 				core.select_cards.push_back(clit->triggering_effect->handler);
 		else
-			for(clit = core.ntpchain.begin(); clit != core.ntpchain.end(); ++clit)
+			for(auto clit = core.ntpchain.begin(); clit != core.ntpchain.end(); ++clit)
 				core.select_cards.push_back(clit->triggering_effect->handler);
 		add_process(PROCESSOR_SORT_CARD, 0, 0, 0, tp ? infos.turn_player : (1 - infos.turn_player), 1);
 		return FALSE;
@@ -4124,8 +4125,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			core.units.begin()->step = 9;
 			return FALSE;
 		}
-		oath_effects::iterator oeit;
-		for(oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
+		for(auto oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
 			if(oeit->second == peffect)
 				oeit->second = 0;
 		break_effect();
@@ -4200,6 +4200,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	}
 	case 10: {
 		card* pcard = cait->triggering_effect->handler;
+		if((cait->flag & CHAIN_HAND_EFFECT) && !pcard->is_status(STATUS_IS_PUBLIC) && (pcard->current.location == LOCATION_HAND))
+			shuffle(pcard->current.controler, LOCATION_HAND);
 		if(cait->target_cards && cait->target_cards->container.size()) {
 			for(auto cit = cait->target_cards->container.begin(); cit != cait->target_cards->container.end(); ++cit)
 				(*cit)->release_relation(cait->triggering_effect);
