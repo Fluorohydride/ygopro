@@ -43,7 +43,7 @@ function c70902743.operation1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(g,REASON_EFFECT)
 end
 function c70902743.filter2(c)
-	return c:GetAttackedCount()==0 and c:IsDestructable()
+	return c:GetAttackAnnouncedCount()==0 and c:IsDestructable()
 end
 function c70902743.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
