@@ -159,7 +159,7 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 end
 function Auxiliary.AddXyzProcedure(c,f,ct,alterf,desc,maxct)
 	if c.xyz_filter==nil then
-		local code=c:GetOriginalCode()
+		local code=c:GetOriginalCode(true)
 		local mt=_G["c" .. code]
 		mt.xyz_filter=f
 		mt.xyz_count=ct
@@ -257,7 +257,7 @@ function Auxiliary.FConditionCheckF(c,chkf)
 end
 function Auxiliary.AddFusionProcCode2(c,code1,code2,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode()
+		local code=c:GetOriginalCode(true)
 		local mt=_G["c" .. code]
 		mt.material_count=2
 		mt.material={code1,code2}
@@ -329,7 +329,7 @@ function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 end
 function Auxiliary.AddFusionProcCode3(c,code1,code2,code3,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode()
+		local code=c:GetOriginalCode(true)
 		local mt=_G["c" .. code]
 		mt.material_count=3
 		mt.material={code1,code2,code2}
@@ -424,7 +424,7 @@ function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
 end
 function Auxiliary.AddFusionProcCode4(c,code1,code2,code3,code4,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode()
+		local code=c:GetOriginalCode(true)
 		local mt=_G["c" .. code]
 		mt.material_count=4
 		mt.material={code1,code2,code3,code4}
@@ -532,7 +532,7 @@ function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
 end
 function Auxiliary.AddFusionProcCodeFun(c,code,f,cc,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode()
+		local code=c:GetOriginalCode(true)
 		local mt=_G["c" .. code]
 		mt.material_count=1
 		mt.material={code}
@@ -687,7 +687,7 @@ function Auxiliary.FOperationFun2(f1,f2,insf)
 end
 function Auxiliary.AddFusionProcCodeRep(c,code,cc,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode()
+		local code=c:GetOriginalCode(true)
 		local mt=_G["c" .. code]
 		mt.material_count=1
 		mt.material={code}
