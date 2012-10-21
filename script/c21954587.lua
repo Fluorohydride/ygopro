@@ -36,9 +36,7 @@ function c21954587.cfilter(c)
 end
 function c21954587.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c21954587.cfilter,tp,LOCATION_HAND,0,2,e:GetHandler()) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.DiscardHand(tp,c21954587.cfilter,2,2,REASON_COST+REASON_DISCARD,e:GetHandler())
-	Duel.ShuffleHand(tp)
 end
 function c21954587.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

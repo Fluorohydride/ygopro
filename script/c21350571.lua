@@ -63,7 +63,7 @@ function c21350571.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c21350571.eqlimit(e,c)
-	return c:GetControler()==e:GetOwnerPlayer() and c:IsRace(RACE_BEAST+RACE_BEASTWARRIOR)
+	return c:IsRace(RACE_BEAST+RACE_BEASTWARRIOR)
 end
 function c21350571.drfilter(c,rc)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:GetReasonCard()==rc

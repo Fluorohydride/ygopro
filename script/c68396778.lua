@@ -31,6 +31,7 @@ function c68396778.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoGrave(tc,REASON_EFFECT)
 		if tc:IsLocation(LOCATION_GRAVE) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local g=Duel.SelectMatchingCard(tp,c68396778.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 			if g:GetCount()>0 then
