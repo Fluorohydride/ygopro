@@ -1,4 +1,4 @@
---死者への供物(JP)
+--死者への供物
 function c19230407.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

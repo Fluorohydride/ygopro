@@ -1,4 +1,4 @@
---治療の神 ディアン·ケト(JP)
+--治療の神 ディアン·ケト
 function c84257639.initial_effect(c)
 	--recover
 	local e1=Effect.CreateEffect(c)

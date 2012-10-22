@@ -535,7 +535,10 @@ int32 interpreter::register_card(card *pcard) {
 	//some userdata may be created in script like token so use current_state
 	lua_rawgeti(current_state, LUA_REGISTRYINDEX, pcard->ref_handle);
 	//load script
-	load_card_script(pcard->data.code);
+	if(pcard->data.alias && (pcard->data.alias < pcard->data.code + 10) && (pcard->data.code < pcard->data.alias + 10))
+		load_card_script(pcard->data.alias);
+	else
+		load_card_script(pcard->data.code);
 	//set metatable of pointer to base script
 	lua_setmetatable(current_state, -2);
 	lua_pop(current_state, 1);

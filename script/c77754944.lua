@@ -1,4 +1,4 @@
---万能地雷グレイモヤ(JP)
+--万能地雷グレイモヤ
 function c77754944.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

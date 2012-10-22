@@ -1,4 +1,4 @@
---血の代償(JP)
+--血の代償
 function c80604091.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

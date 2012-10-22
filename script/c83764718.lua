@@ -1,4 +1,4 @@
---死者蘇生(JP)
+--死者蘇生
 function c83764718.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
