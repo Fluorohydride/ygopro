@@ -16,11 +16,9 @@ function c89235196.cfilter(c)
 end
 function c89235196.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c89235196.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c89235196.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
 	Duel.SendtoGrave(g,REASON_COST)
-	Duel.ShuffleHand(tp)
 end
 function c89235196.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

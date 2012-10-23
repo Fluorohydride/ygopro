@@ -40,8 +40,6 @@ function c38107923.costfilter(c)
 end
 function c38107923.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c38107923.costfilter,tp,LOCATION_GRAVE,0,2,nil) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c38107923.costfilter,tp,LOCATION_GRAVE,0,2,2,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)

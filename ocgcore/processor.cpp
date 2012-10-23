@@ -2844,8 +2844,16 @@ int32 field::process_battle_command(uint16 step) {
 		        || ((core.sub_attack_target != (card*)0xffffffff) && (!core.sub_attack_target || core.sub_attack_target->current.location == LOCATION_MZONE))) {
 			if(core.sub_attacker)
 				core.attacker = core.sub_attacker;
-			if(core.sub_attack_target != (card*)0xffffffff)
+			if(core.sub_attack_target != (card*)0xffffffff) {
 				core.attack_target = core.sub_attack_target;
+				if(core.attack_target) {
+					raise_single_event(core.attack_target, 0, EVENT_BE_BATTLE_TARGET, 0, REASON_REPLACE, 0, 1 - infos.turn_player, 0);
+					raise_event(core.attack_target, EVENT_BE_BATTLE_TARGET, 0, REASON_REPLACE, 0, 1 - infos.turn_player, 0);
+					process_single_event();
+					process_instant_event();
+					add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+				}
+			}
 			core.sub_attacker = 0;
 			core.sub_attack_target = (card*)0xffffffff;
 			core.attacker->announce_count++;

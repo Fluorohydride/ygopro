@@ -44,9 +44,8 @@ end
 function c87997872.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	if e:GetHandler():IsLocation(LOCATION_HAND) then
-		Duel.ShuffleHand(tp)
+	if e:GetHandler():IsLocation(LOCATION_DECK) then
+		Duel.ConfirmCards(1-tp,e:GetHandler())
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end

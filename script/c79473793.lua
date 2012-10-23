@@ -45,7 +45,7 @@ end
 function c79473793.cbcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bt=eg:GetFirst()
-	return c~=bt and bt:IsFaceup() and bt:GetControler()==c:GetControler()
+	return r~=REASON_REPLACE and c~=bt and bt:IsFaceup() and bt:GetControler()==c:GetControler()
 end
 function c79473793.cfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGraveAsCost()

@@ -33,7 +33,7 @@ function c90011152.atcon(e)
 	return Duel.IsExistingMatchingCard(c90011152.cfilter,e:GetHandler():GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function c90011152.costfilter(c)
-	return c:IsSetCard(0xf) and c:IsAbleToGrave()
+	return c:IsSetCard(0xf) and c:IsAbleToGraveAsCost()
 end
 function c90011152.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c90011152.costfilter,tp,LOCATION_HAND,0,1,nil) end
