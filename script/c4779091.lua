@@ -87,10 +87,6 @@ end
 function c4779091.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c4779091.filter,tp,0x13,0,1,nil,e,tp) end
-	if e:GetHandler():IsLocation(LOCATION_HAND) then
-		Duel.ConfirmCards(1-tp,e:GetHandler())
-		Duel.ShuffleHand(tp)
-	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,0x13)
 end
 function c4779091.spop(e,tp,eg,ep,ev,re,r,rp)

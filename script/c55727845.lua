@@ -10,31 +10,19 @@ function c55727845.initial_effect(c)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(c55727845.atkcost)
-	e1:SetTarget(c55727845.atktg1)
+	e1:SetTarget(c55727845.atktg)
 	e1:SetOperation(c55727845.atkop)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(55727845,0))
-	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCode(EVENT_BE_BATTLE_TARGET)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCost(c55727845.atkcost)
-	e2:SetTarget(c55727845.atktg2)
-	e2:SetOperation(c55727845.atkop)
-	c:RegisterEffect(e2)
 end
 function c55727845.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function c55727845.atktg1(e,tp,eg,ep,ev,re,r,rp,chk)
+function c55727845.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local at=Duel.GetAttackTarget()
-	if chk==0 then return at and at:IsFaceup() and Duel.GetAttacker()==e:GetHandler() and not e:GetHandler():IsStatus(STATUS_CHAINING) end
+	if chk==0 then return ((at and at:IsFaceup() and Duel.GetAttacker()==e:GetHandler()) or at==e:GetHandler())
+		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	Duel.SetTargetCard(at)
-end
-function c55727845.atktg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetAttackTarget()==e:GetHandler() and not e:GetHandler():IsStatus(STATUS_CHAINING) end
-	Duel.SetTargetCard(Duel.GetAttacker())
 end
 function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

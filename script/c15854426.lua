@@ -29,7 +29,8 @@ end
 function c15854426.check(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsControler(tp) and tc:IsFaceup() and tc:IsAttribute(ATTRIBUTE_WIND) and tc:GetDestination()==LOCATION_HAND then
+		if tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE)
+			and tc:IsFaceup() and tc:IsAttribute(ATTRIBUTE_WIND) and tc:GetDestination()==LOCATION_HAND then
 			tc:RegisterFlagEffect(15854426,RESET_EVENT+0x15e0000,0,1)
 		end
 		tc=eg:GetNext()

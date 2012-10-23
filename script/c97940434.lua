@@ -29,8 +29,6 @@ function c97940434.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c97940434.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.ConfirmCards(1-tp,e:GetHandler())
-	Duel.ShuffleHand(tp)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,e:GetHandler())
 end
 function c97940434.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

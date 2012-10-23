@@ -159,7 +159,7 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 end
 function Auxiliary.AddXyzProcedure(c,f,ct,alterf,desc,maxct)
 	if c.xyz_filter==nil then
-		local code=c:GetOriginalCode(true)
+		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.xyz_filter=f
 		mt.xyz_count=ct
@@ -257,7 +257,7 @@ function Auxiliary.FConditionCheckF(c,chkf)
 end
 function Auxiliary.AddFusionProcCode2(c,code1,code2,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode(true)
+		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.material_count=2
 		mt.material={code1,code2}
@@ -329,10 +329,10 @@ function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 end
 function Auxiliary.AddFusionProcCode3(c,code1,code2,code3,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode(true)
+		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.material_count=3
-		mt.material={code1,code2,code2}
+		mt.material={code1,code2,code3}
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -424,7 +424,7 @@ function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
 end
 function Auxiliary.AddFusionProcCode4(c,code1,code2,code3,code4,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode(true)
+		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.material_count=4
 		mt.material={code1,code2,code3,code4}
@@ -530,19 +530,19 @@ function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
-function Auxiliary.AddFusionProcCodeFun(c,code,f,cc,sub,insf)
+function Auxiliary.AddFusionProcCodeFun(c,code1,f,cc,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode(true)
+		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.material_count=1
-		mt.material={code}
+		mt.material={code1}
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_FUSION_MATERIAL)
-	e1:SetCondition(Auxiliary.FConditionCodeFun(code,f,cc,sub,insf))
-	e1:SetOperation(Auxiliary.FOperationCodeFun(code,f,cc,sub,insf))
+	e1:SetCondition(Auxiliary.FConditionCodeFun(code1,f,cc,sub,insf))
+	e1:SetOperation(Auxiliary.FOperationCodeFun(code1,f,cc,sub,insf))
 	c:RegisterEffect(e1)
 end
 function Auxiliary.FConditionFilterCF(c,g2,cc)
@@ -685,19 +685,19 @@ function Auxiliary.FOperationFun2(f1,f2,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
-function Auxiliary.AddFusionProcCodeRep(c,code,cc,sub,insf)
+function Auxiliary.AddFusionProcCodeRep(c,code1,cc,sub,insf)
 	if c.material_count==nil then
-		local code=c:GetOriginalCode(true)
+		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
 		mt.material_count=1
-		mt.material={code}
+		mt.material={code1}
 	end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_FUSION_MATERIAL)
-	e1:SetCondition(Auxiliary.FConditionCodeRep(code,cc,sub,insf))
-	e1:SetOperation(Auxiliary.FOperationCodeRep(code,cc,sub,insf))
+	e1:SetCondition(Auxiliary.FConditionCodeRep(code1,cc,sub,insf))
+	e1:SetOperation(Auxiliary.FOperationCodeRep(code1,cc,sub,insf))
 	c:RegisterEffect(e1)
 end
 function Auxiliary.FConditionFilterCR(c,code,sub)

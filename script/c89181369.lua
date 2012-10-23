@@ -43,6 +43,7 @@ function c89181369.activate(e,tp,eg,ep,ev,re,r,rp)
 	local rg=Duel.GetMatchingGroup(c89181369.rmfilter,tp,LOCATION_GRAVE,0,nil)
 	rg:RemoveCard(tc)
 	if rg:CheckWithSumEqual(Card.GetLevel,tc:GetLevel(),1,99) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local rm=rg:SelectWithSumEqual(tp,Card.GetLevel,tc:GetLevel(),1,99)
 		Duel.Remove(rm,POS_FACEUP,REASON_EFFECT)
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
