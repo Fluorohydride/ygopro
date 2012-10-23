@@ -26,6 +26,7 @@ function c31828916.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c31828916.check(e,tp,eg,ep,ev,re,r,rp)
+	if r~=REASON_BATTLE then return end
 	local pg=e:GetLabelObject()
 	if pg then pg:DeleteGroup() end
 	local dg=eg:Filter(Card.IsRace,nil,RACE_MACHINE)
@@ -33,7 +34,7 @@ function c31828916.check(e,tp,eg,ep,ev,re,r,rp)
 	dg:KeepAlive()
 end
 function c31828916.cfilter(c,cg,e,tp)
-	return c:IsRace(RACE_MACHINE) and c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE) and cg:IsContains(c)
+	return c:IsRace(RACE_MACHINE) and c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and cg:IsContains(c)
 		and Duel.IsExistingMatchingCard(c31828916.filter,tp,LOCATION_DECK,0,1,nil,c:GetAttack(),c:GetAttribute(),e,tp)
 end
 function c31828916.filter(c,atk,att,e,tp)
