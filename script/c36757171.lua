@@ -28,7 +28,8 @@ function c36757171.filter(c)
 end
 function c36757171.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c36757171.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c36757171.filter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c36757171.filter,tp,0,LOCATION_MZONE,1,nil)
+		and Duel.IsExistingMatchingCard(c36757171.dfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c36757171.filter,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)

@@ -35,10 +35,13 @@ function c90616316.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)
 	end
 end
+function c90616316.cfilter(c)
+	return c:IsSetCard(0x35) and not c:IsPublic()
+end
 function c90616316.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_HAND,0,1,nil,0x35) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c90616316.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_HAND,0,1,1,nil,0x35)
+	local g=Duel.SelectMatchingCard(tp,c90616316.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.ConfirmCards(1-tp,g)
 	Duel.ShuffleHand(tp)
 end

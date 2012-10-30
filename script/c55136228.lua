@@ -45,13 +45,16 @@ function c55136228.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
+function c55136228.cfilter(c)
+	return c:IsSetCard(0x19) and c:IsAbleToDeckAsCost()
+end
 function c55136228.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_GRAVE,0,2,e:GetHandler(),0x19) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c55136228.cfilter,tp,LOCATION_GRAVE,0,2,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_GRAVE,0,2,2,e:GetHandler(),0x19)
+	local g=Duel.SelectMatchingCard(tp,c55136228.cfilter,tp,LOCATION_GRAVE,0,2,2,e:GetHandler())
 	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
-function c55136228.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c55136228.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
 end
