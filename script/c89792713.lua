@@ -28,7 +28,7 @@ function c89792713.checkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c89792713.filter(c)
-	return c:IsFaceup() and c:GetFlagEffect(89792713)~=0
+	return c:IsFaceup() and c:GetFlagEffect(89792713)~=0 and c:IsDestructable()
 end
 function c89792713.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c89792713.filter(chkc) end
