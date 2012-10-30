@@ -17,7 +17,7 @@ function c42328171.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK)
 end
 function c42328171.filter(c)
-	return c:IsSetCard(0x58) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x58) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c42328171.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c42328171.filter(chkc) end

@@ -15,7 +15,7 @@ function c36280194.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_GRAVE,0,5,nil,TYPE_MONSTER)
 end
 function c36280194.filter(c)
-	return c:IsAttackBelow(1500) and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_EFFECT)
+	return c:IsAttackBelow(1500) and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_EFFECT) and c:IsAbleToHand()
 end
 function c36280194.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c36280194.filter(chkc) end

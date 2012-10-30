@@ -16,11 +16,14 @@ end
 function c46833854.con(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)-Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>=2
 end
+function c46833854.cfilter(c)
+	return c:IsSetCard(0x35) and not c:IsPublic()
+end
 function c46833854.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable()
-		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_HAND,0,1,nil,0x35) end
+		and Duel.IsExistingMatchingCard(c46833854.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_HAND,0,1,1,nil,0x35)
+	local g=Duel.SelectMatchingCard(tp,c46833854.cfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
 	Duel.ConfirmCards(1-tp,g)
 	Duel.Release(e:GetHandler(),REASON_COST)
 	Duel.ShuffleHand(tp)
@@ -30,7 +33,7 @@ function c46833854.filter(c)
 end
 function c46833854.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c46833854.filter(chkc) end
-	if chk==0 then return Duel.IsExistingMatchingCard(c46833854.filter,tp,0,LOCATION_ONFIELD,2,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c46833854.filter,tp,0,LOCATION_ONFIELD,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c46833854.filter,tp,0,LOCATION_ONFIELD,2,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)

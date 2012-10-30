@@ -1,6 +1,8 @@
 --キメラテック·フォートレス·ドラゴン
 function c79229522.initial_effect(c)
+	--fusion material
 	c:EnableReviveLimit()
+	aux.AddFusionProcCodeFun(c,70095154,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),1,true,true)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

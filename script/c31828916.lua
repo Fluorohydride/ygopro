@@ -26,7 +26,7 @@ function c31828916.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c31828916.check(e,tp,eg,ep,ev,re,r,rp)
-	if r~=REASON_BATTLE then return end
+	if bit.band(r,REASON_BATTLE)==0 then return end
 	local pg=e:GetLabelObject()
 	if pg then pg:DeleteGroup() end
 	local dg=eg:Filter(Card.IsRace,nil,RACE_MACHINE)

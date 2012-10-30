@@ -31,8 +31,8 @@ function c59546528.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingTarget(c59546528.filter,tp,0,LOCATION_SZONE,1,nil) end
 	local ht=Duel.GetMatchingGroupCount(c59546528.cfilter2,tp,LOCATION_HAND,0,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local eg=Duel.SelectTarget(tp,c59546528.filter,tp,0,LOCATION_SZONE,1,ht,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,eg,eg:GetCount(),0,0)
+	local g=Duel.SelectTarget(tp,c59546528.filter,tp,0,LOCATION_SZONE,1,ht,nil)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
 function c59546528.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

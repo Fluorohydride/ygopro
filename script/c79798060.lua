@@ -66,7 +66,7 @@ function c79798060.sdcon(e)
 end
 function c79798060.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return not c:IsReason(REASON_BATTLE) and re and re:GetHandler()~=c
+	return not c:IsReason(REASON_BATTLE) and re and re:GetOwner()~=c
 end
 function c79798060.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
