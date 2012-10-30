@@ -71,7 +71,7 @@ function c98777036.ctffilter(c,lv)
 end
 function c98777036.ctfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
-		and Duel.IsExistingMatchingCard(c98777036.ctffilter,tp,0,LOCATION_MZONE,1,nil,c:GetLevel())
+		and Duel.IsExistingTarget(c98777036.ctffilter,tp,0,LOCATION_MZONE,1,nil,c:GetLevel())
 end
 function c98777036.ctcos(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c98777036.ctfilter,tp,LOCATION_HAND,0,1,nil,tp) end
@@ -99,7 +99,7 @@ function c98777036.lvfilter(c)
 	return c:GetLevel()>0
 end
 function c98777036.lvtar(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and chkc:IsType(TYPE_MONSTER) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and chkc:IsType(TYPE_MONSTER) end
 	if chk==0 then return Duel.IsExistingTarget(c98777036.lvfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c98777036.lvfilter,tp,LOCATION_GRAVE,0,1,1,nil)
