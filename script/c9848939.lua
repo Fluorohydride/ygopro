@@ -39,7 +39,7 @@ function c9848939.filter(c)
 	return c:IsType(TYPE_DUAL) and c:IsAbleToHand()
 end
 function c9848939.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(c9848939.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c9848939.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c9848939.operation(e,tp,eg,ep,ev,re,r,rp)

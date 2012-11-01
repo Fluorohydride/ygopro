@@ -18,14 +18,14 @@ function c70284332.initial_effect(c)
 	e2:SetOperation(c70284332.desop)
 	c:RegisterEffect(e2)
 end
-function c70284332.filter(c,tp)
-	return c:IsFaceup() and c:IsControler(tp) and c:IsType(TYPE_SYNCHRO) and c:IsControlerCanBeChanged()
+function c70284332.filter(c,e,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsType(TYPE_SYNCHRO) and c:IsCanBeEffectTarget(e) and c:IsControlerCanBeChanged()
 end
 function c70284332.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:IsContains(chkc) and c70284332.filter(chkc,1-tp) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and eg:IsExists(c70284332.filter,1,nil,1-tp) end
+	if chkc then return eg:IsContains(chkc) and c70284332.filter(chkc,e,1-tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and eg:IsExists(c70284332.filter,1,nil,e,1-tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-	local g=eg:FilterSelect(tp,c70284332.filter,1,1,nil,1-tp)
+	local g=eg:FilterSelect(tp,c70284332.filter,1,1,nil,e,1-tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
 end

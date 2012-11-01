@@ -27,18 +27,17 @@ function c93108433.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g2=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g1,g1:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,g2,g2:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,g2:GetCount())
 end
 function c93108433.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g1=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local g2=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-	local tc=g1:GetFirst()
-	if tc:IsRelateToEffect(e) then 
-		if g2:GetCount()==0 then return end
-		Duel.SendtoDeck(g1,nil,2,REASON_EFFECT)
-		Duel.SendtoDeck(g2,nil,2,REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+	local ct=g:GetCount()
+	if ct>0 and tc:IsRelateToEffect(e) then
+		g:AddCard(tc)
+		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 		Duel.ShuffleDeck(tp)
 		Duel.BreakEffect()
-		Duel.Draw(tp,g2:GetCount(),REASON_EFFECT)
+		Duel.Draw(tp,ct,REASON_EFFECT)
 	 end 
 end

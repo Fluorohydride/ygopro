@@ -121,6 +121,7 @@ function c4545683.spfilter(c,e,tp,ec)
 	return c:GetFlagEffect(4545683)~=0 and c:GetEquipTarget()==ec and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c4545683.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(tp) and c4545683.spfilter(chkc,e,tp,e:GetHandler()) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c4545683.spfilter,tp,LOCATION_SZONE,0,1,nil,e,tp,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

@@ -11,7 +11,7 @@ function c70391588.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c70391588.filter(c,e,tp)
-	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
+	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsCanBeEffectTarget(e)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,70391589,0,0x4011,0,0,c:GetLevel(),RACE_SPELLCASTER,ATTRIBUTE_DARK)
 end
 function c70391588.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

@@ -20,10 +20,10 @@ function c72204747.filter2(c,lv,e,sp)
 end
 function c72204747.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c72204747.filter1(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingMatchingCard(c72204747.filter1,tp,LOCATION_GRAVE,0,1,nil,e,tp)
+	if chk==0 then return Duel.IsExistingTarget(c72204747.filter1,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(72204747,0))
-	local sg=Duel.SelectTarget(tp,c72204747.filter1,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.SelectTarget(tp,c72204747.filter1,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c72204747.activate(e,tp,eg,ep,ev,re,r,rp)
