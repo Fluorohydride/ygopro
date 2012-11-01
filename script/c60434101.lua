@@ -25,7 +25,7 @@ end
 function c60434101.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c60434101.filter(chkc,c:GetAttack()) end
-	if chk==0 then return Duel.IsExistingMatchingCard(c60434101.filter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack()) end
+	if chk==0 then return Duel.IsExistingTarget(c60434101.filter,tp,0,LOCATION_MZONE,1,nil,c:GetAttack()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c60434101.filter,tp,0,LOCATION_MZONE,1,1,nil,c:GetAttack())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)

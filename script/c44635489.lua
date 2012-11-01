@@ -40,6 +40,7 @@ end
 function c44635489.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and c44635489.filter(chkc,e:GetHandler():GetLevel()) end
 	if chk==0 then return Duel.IsExistingTarget(c44635489.filter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,e:GetHandler(),e:GetHandler():GetLevel()) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c44635489.filter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,1,e:GetHandler(),e:GetHandler():GetLevel())
 end
 function c44635489.lvop(e,tp,eg,ep,ev,re,r,rp)

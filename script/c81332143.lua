@@ -10,6 +10,7 @@ end
 function c81332143.activate(e,tp,eg,ep,ev,re,r,rp)
 	local opt=0
 	if Duel.IsExistingMatchingCard(Card.IsCode,tp,LOCATION_HAND,0,1,nil,14731897) and Duel.SelectYesNo(tp,aux.Stringid(81332143,2)) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 		local g=Duel.SelectMatchingCard(tp,Card.IsCode,tp,LOCATION_HAND,0,1,1,nil,14731897)
 		Duel.ConfirmCards(1-tp,g)
 		Duel.ShuffleHand(tp)

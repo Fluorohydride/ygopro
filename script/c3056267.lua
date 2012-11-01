@@ -21,10 +21,12 @@ end
 function c3056267.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-	local mon=Duel.SelectTarget(tp,c3056267.swapfilter,tp,0,LOCATION_MZONE,1,1,nil)
-	mon:AddCard(e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_CONTROL,mon,2,0,0)
+	if Duel.IsExistingTarget(c3056267.swapfilter,tp,0,LOCATION_MZONE,1,nil) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
+		local mon=Duel.SelectTarget(tp,c3056267.swapfilter,tp,0,LOCATION_MZONE,1,1,nil)
+		mon:AddCard(e:GetHandler())
+		Duel.SetOperationInfo(0,CATEGORY_CONTROL,mon,2,0,0)
+	end
 end
 function c3056267.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

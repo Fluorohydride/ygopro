@@ -13,16 +13,16 @@ function c43573231.initial_effect(c)
 	e1:SetOperation(c43573231.adop)
 	c:RegisterEffect(e1)
 end
-function c43573231.cfilter(c,tp)
+function c43573231.cfilter(c,e,tp)
 	local np=c:GetPosition()
 	local pp=c:GetPreviousPosition()
-	return c:IsControler(tp) and ((pp==0x1 and np==0x4) or (pp==0x4 and np==0x1) or (pp==0x8 and np==0x1))
+	return c:IsControler(tp) and ((pp==0x1 and np==0x4) or (pp==0x4 and np==0x1) or (pp==0x8 and np==0x1)) and c:IsCanBeEffectTarget(e)
 end
 function c43573231.adtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:IsContains(chkc) and c43573231.cfilter(chkc,1-tp) end
-	if chk==0 then return eg:IsExists(c43573231.cfilter,1,nil,1-tp) end
+	if chkc then return eg:IsContains(chkc) and c43573231.cfilter(chkc,e,1-tp) end
+	if chk==0 then return eg:IsExists(c43573231.cfilter,1,nil,e,1-tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=eg:FilterSelect(tp,c43573231.cfilter,1,1,nil,1-tp)
+	local g=eg:FilterSelect(tp,c43573231.cfilter,1,1,nil,e,1-tp)
 	Duel.SetTargetCard(g)
 end
 function c43573231.adop(e,tp,eg,ep,ev,re,r,rp)

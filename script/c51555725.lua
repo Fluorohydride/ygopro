@@ -14,6 +14,7 @@ function c51555725.initial_effect(c)
 	e2:SetDescription(aux.Stringid(51555725,0))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCondition(c51555725.condition)
 	e2:SetTarget(c51555725.target)
@@ -31,7 +32,8 @@ end
 function c51555725.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x24) and c:IsDestructable()
 end
-function c51555725.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c51555725.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c51555725.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c51555725.filter,tp,LOCATION_MZONE,0,1,1,nil)
