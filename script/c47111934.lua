@@ -61,7 +61,7 @@ function c47111934.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c47111934.filter,tp,0,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
 function c47111934.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

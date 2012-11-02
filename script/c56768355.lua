@@ -39,9 +39,10 @@ function c56768355.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
 end
 function c56768355.eqop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.Equip(tp,tc,e:GetHandler())
+	if tc:IsRelateToEffect(e) and c:IsFaceup() and c:IsRelateToEffect(e) then
+		Duel.Equip(tp,tc,c)
 	end
 end
 function c56768355.indcon(e)

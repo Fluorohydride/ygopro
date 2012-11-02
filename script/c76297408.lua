@@ -34,6 +34,7 @@ function c76297408.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingTarget(c76297408.rfilter,tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(76297408,1)) then
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+		Duel.PayLPCost(tp,500)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local g1=Duel.SelectTarget(tp,c76297408.rfilter,tp,0,LOCATION_GRAVE,1,1,nil)
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)

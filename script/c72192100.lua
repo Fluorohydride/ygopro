@@ -56,15 +56,15 @@ function c72192100.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c72192100.filter(c,e,tp)
 	return c:IsCode(35975813) and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_ONFIELD)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c72192100.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return eg:IsContains(chkc) end
+	if chkc then return eg:IsContains(chkc) and c72192100.filter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and eg:IsExists(c72192100.filter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=eg:FilterSelect(tp,c72192100.filter,1,1,nil,e,tp)
-	Duel.SetTargetCard(g:GetFirst())
+	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c72192100.spop(e,tp,eg,ep,ev,re,r,rp)

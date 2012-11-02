@@ -26,9 +26,9 @@ function c41777.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c41777.filter(chkc,e,tp) end
 	if chk==0 then
 		if e:GetLabel()==1 then
-			local res=Duel.IsExistingTarget(c41777.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 			e:SetLabel(0)
-			return res
+			return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+				and Duel.IsExistingTarget(c41777.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 		else
 			return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 				and Duel.IsExistingTarget(c41777.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
