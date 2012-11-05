@@ -148,10 +148,16 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 		if(!pduel) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
+			if(players[0])
+				NetServer::SendPacketToPlayer(players[0], STOC_HS_WATCH_CHANGE, scwc);
+			if(players[1])
+				NetServer::SendPacketToPlayer(players[1], STOC_HS_WATCH_CHANGE, scwc);
+			for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+				NetServer::SendPacketToPlayer(*pit, STOC_HS_WATCH_CHANGE, scwc);
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
-		if(!pduel) {
+		if(!pduel && duel_count == 0) {
 			STOC_HS_PlayerChange scpc;
 			players[dp->type] = 0;
 			ready[dp->type] = false;
@@ -164,6 +170,12 @@ void SingleDuel::LeaveGame(DuelPlayer* dp) {
 				NetServer::SendPacketToPlayer(*pit, STOC_HS_PLAYER_CHANGE, scpc);
 			NetServer::DisconnectPlayer(dp);
 		} else {
+			if(!pduel) {
+				if(!ready[0])
+					NetServer::SendPacketToPlayer(players[0], STOC_DUEL_START);
+				if(!ready[1])
+					NetServer::SendPacketToPlayer(players[1], STOC_DUEL_START);
+			}
 			unsigned char wbuf[3];
 			wbuf[0] = MSG_WIN;
 			wbuf[1] = 1 - dp->type;
@@ -530,6 +542,7 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 	}
 	EndDuel();
 	DuelEndProc();
+	event_del(etimer);
 }
 int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 	char* offset, *pbufw, *pbuf = msgbuffer;
