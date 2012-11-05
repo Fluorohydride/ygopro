@@ -89,7 +89,7 @@ void TagDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 		scwc.watch_count = observers.size();
 		for(int i = 0; i < 4; ++i)
 			if(players[i])
-				NetServer::SendPacketToPlayer(players[1], STOC_HS_WATCH_CHANGE, scwc);
+				NetServer::SendPacketToPlayer(players[i], STOC_HS_WATCH_CHANGE, scwc);
 		for(auto pit = observers.begin(); pit != observers.end(); ++pit)
 			NetServer::SendPacketToPlayer(*pit, STOC_HS_WATCH_CHANGE, scwc);
 	}
@@ -122,6 +122,11 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 		if(!pduel) {
 			STOC_HS_WatchChange scwc;
 			scwc.watch_count = observers.size();
+			for(int i = 0; i < 4; ++i)
+				if(players[i])
+					NetServer::SendPacketToPlayer(players[i], STOC_HS_WATCH_CHANGE, scwc);
+			for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+				NetServer::SendPacketToPlayer(*pit, STOC_HS_WATCH_CHANGE, scwc);
 		}
 		NetServer::DisconnectPlayer(dp);
 	} else {
