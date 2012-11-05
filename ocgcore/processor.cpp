@@ -2090,6 +2090,8 @@ int32 field::process_instant_event() {
 			if(!peffect->is_condition_check(peffect->handler->current.controler, *elit))
 				continue;
 			peffect->handler->create_relation(peffect);
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.flag = 0;
 			newchain.chain_id = infos.field_id++;
 			newchain.evt = *elit;
@@ -2108,6 +2110,8 @@ int32 field::process_instant_event() {
 			if(!peffect->is_condition_check(peffect->handler->current.controler, *elit))
 				continue;
 			peffect->handler->create_relation(peffect);
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.flag = 0;
 			newchain.chain_id = infos.field_id++;
 			newchain.evt = *elit;
@@ -2126,6 +2130,8 @@ int32 field::process_instant_event() {
 			peffect = pr.first->second;
 			if(peffect->is_activateable(peffect->handler->current.controler, *elit)) {
 				peffect->handler->create_relation(peffect);
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
 				newchain.flag = 0;
 				newchain.chain_id = infos.field_id++;
 				newchain.evt = *elit;
@@ -2201,6 +2207,8 @@ int32 field::process_single_event() {
 				if(!peffect->is_condition_check(peffect->handler->current.controler, e))
 					continue;
 				peffect->handler->create_relation(peffect);
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
 				chain newchain;
 				newchain.flag = 0;
 				newchain.chain_id = infos.field_id++;

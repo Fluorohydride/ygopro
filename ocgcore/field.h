@@ -25,12 +25,12 @@ class effect;
 
 struct tevent {
 	card* trigger_card;
-	uint32 event_code;
 	group* event_cards;
-	uint32 event_value;
-	uint8 event_player;
 	effect* reason_effect;
+	uint32 event_code;
+	uint32 event_value;
 	uint32 reason;
+	uint8 event_player;
 	uint8 reason_player;
 };
 struct optarget {
