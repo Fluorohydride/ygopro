@@ -37,6 +37,7 @@ function c56768355.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local g=Duel.SelectTarget(tp,c56768355.filter,tp,LOCATION_GRAVE,0,1,1,nil,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,1,0,0)
 end
 function c56768355.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
