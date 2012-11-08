@@ -25,7 +25,7 @@ int main(int argc, char* argv[]) {
 		 * -j: join host (host info from system.conf)
 		 * -d: deck edit
 		 * -r: replay */
-		if(!strcmp(argv[1], "-j") || !strcmp(argv[1], "-d") || !strcmp(argv[1], "-r")) {
+		if(!strcmp(argv[1], "-j") || !strcmp(argv[1], "-d") || !strcmp(argv[1], "-r") || !strcmp(argv[1],"-s")) {
 			exit_on_return = true;
 			irr::SEvent event;
 			event.EventType = irr::EET_GUI_EVENT;
@@ -45,6 +45,12 @@ int main(int argc, char* argv[]) {
 				ygo::mainGame->lstReplayList->setSelected(0);
 				event.GUIEvent.Caller = ygo::mainGame->btnLoadReplay;
 				ygo::mainGame->device->postEventFromUser(event);
+			}else if(!strcmp(argv[1],"-s")){
+			event.GUIEvent.Caller = ygo::mainGame->btnServerMode;
+			ygo::mainGame->device->postEventFromUser(event);
+			ygo::mainGame->lstSinglePlayList->setSelected(0);
+            event.GUIEvent.Caller = ygo::mainGame->btnLoadSinglePlay;
+            ygo::mainGame->device->postEventFromUser(event);
 			}
 		}
 	}
