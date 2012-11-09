@@ -1,7 +1,7 @@
 --ヴェルズ·ナイトメア
 function c359563.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c359563.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),4),2)
 	c:EnableReviveLimit()
 	--pos
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c359563.initial_effect(c)
 	e1:SetTarget(c359563.target)
 	e1:SetOperation(c359563.operation)
 	c:RegisterEffect(e1)
-end
-function c359563.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsAttribute(ATTRIBUTE_DARK)
 end
 function c359563.filter(c,e,tp)
 	return c:IsFaceup() and c:IsControler(1-tp) and (not e or c:IsRelateToEffect(e))

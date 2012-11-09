@@ -1,7 +1,7 @@
 --No.22 不乱健
 function c73445448.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c73445448.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),8),2)
 	c:EnableReviveLimit()
 	--spsummon limit
 	local e1=Effect.CreateEffect(c)
@@ -23,9 +23,6 @@ function c73445448.initial_effect(c)
 	e2:SetTarget(c73445448.target)
 	e2:SetOperation(c73445448.operation)
 	c:RegisterEffect(e2)
-end
-function c73445448.xyzfilter(c)
-	return c:IsAttribute(ATTRIBUTE_DARK) and c:GetLevel()==8
 end
 function c73445448.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)

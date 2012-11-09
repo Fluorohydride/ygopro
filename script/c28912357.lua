@@ -1,7 +1,7 @@
 --ギアギガント X
 function c28912357.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c28912357.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),4),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -25,9 +25,6 @@ function c28912357.initial_effect(c)
 	e2:SetTarget(c28912357.sptg)
 	e2:SetOperation(c28912357.spop)
 	c:RegisterEffect(e2)
-end
-function c28912357.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_MACHINE)
 end
 function c28912357.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

@@ -1,7 +1,7 @@
 --¥¨¥ô¥©¥ë¥«¥¤¥¶©`¡¤¥É¥ë¥«
 function c42752141.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c42752141.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4),2)
 	c:EnableReviveLimit()
 	--negate activate
 	local e1=Effect.CreateEffect(c)
@@ -16,9 +16,6 @@ function c42752141.initial_effect(c)
 	e1:SetTarget(c42752141.target)
 	e1:SetOperation(c42752141.operation)
 	c:RegisterEffect(e1)
-end
-function c42752141.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_DINOSAUR)
 end
 function c42752141.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)

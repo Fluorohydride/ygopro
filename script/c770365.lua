@@ -1,7 +1,7 @@
 --魔導皇聖 トリス
 function c770365.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c770365.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),5),2)
 	c:EnableReviveLimit()
 	--atklimit
 	local e1=Effect.CreateEffect(c)
@@ -21,9 +21,6 @@ function c770365.initial_effect(c)
 	e2:SetTarget(c770365.target)
 	e2:SetOperation(c770365.operation)
 	c:RegisterEffect(e2)
-end
-function c770365.xyzfilter(c)
-	return c:GetLevel()==5 and c:IsRace(RACE_SPELLCASTER)
 end
 function c770365.atkval(e,c)
 	return Duel.GetOverlayCount(c:GetControler(),1,0)*300

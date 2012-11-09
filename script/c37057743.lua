@@ -1,7 +1,7 @@
 --炎星皇－チョウライオ
 function c37057743.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c37057743.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),3),2)
 	c:EnableReviveLimit()
 	--salvage
 	local e1=Effect.CreateEffect(c)
@@ -15,9 +15,6 @@ function c37057743.initial_effect(c)
 	e1:SetTarget(c37057743.thtg)
 	e1:SetOperation(c37057743.thop)
 	c:RegisterEffect(e1)
-end
-function c37057743.xyzfilter(c)
-	return c:IsAttribute(ATTRIBUTE_FIRE) and c:GetLevel()==3
 end
 function c37057743.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

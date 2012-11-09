@@ -1,7 +1,7 @@
 --ヴェルズ・オピオン
 function c91279700.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c91279700.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0xa),4),2)
 	c:EnableReviveLimit()
 	--disable spsummon
 	local e1=Effect.CreateEffect(c)
@@ -23,9 +23,6 @@ function c91279700.initial_effect(c)
 	e2:SetTarget(c91279700.target)
 	e2:SetOperation(c91279700.operation)
 	c:RegisterEffect(e2)
-end
-function c91279700.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsSetCard(0xa)
 end
 function c91279700.dscon(e)
 	return e:GetHandler():GetOverlayCount()~=0

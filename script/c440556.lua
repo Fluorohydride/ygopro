@@ -1,7 +1,7 @@
 --バハムート·シャーク
 function c440556.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c440556.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),4),2)
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c440556.initial_effect(c)
 	e1:SetTarget(c440556.sptg)
 	e1:SetOperation(c440556.spop)
 	c:RegisterEffect(e1)
-end
-function c440556.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c440556.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

@@ -1,7 +1,7 @@
 --魔導法皇 ハイロン
 function c92918648.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c92918648.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),7),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c92918648.initial_effect(c)
 	e1:SetTarget(c92918648.target)
 	e1:SetOperation(c92918648.operation)
 	c:RegisterEffect(e1)
-end
-function c92918648.xyzfilter(c)
-	return c:GetLevel()==7 and c:IsRace(RACE_SPELLCASTER)
 end
 function c92918648.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

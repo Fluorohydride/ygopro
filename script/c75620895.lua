@@ -1,7 +1,7 @@
 --隻眼のスキル・ゲイナー
 function c75620895.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,4),3)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)

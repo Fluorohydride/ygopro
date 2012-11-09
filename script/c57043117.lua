@@ -1,7 +1,7 @@
 --Giant Soldier of Steel
 function c57043117.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c57043117.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_ROCK),3),2)
 	c:EnableReviveLimit()
 	--immune
 	local e1=Effect.CreateEffect(c)
@@ -24,9 +24,6 @@ function c57043117.initial_effect(c)
 	e2:SetCost(c57043117.cost)
 	e2:SetOperation(c57043117.operation)
 	c:RegisterEffect(e2)
-end
-function c57043117.xyzfilter(c)
-	return c:GetLevel()==3 and c:IsRace(RACE_ROCK)
 end
 function c57043117.efilter(e,te)
 	return te:IsActiveType(TYPE_MONSTER)

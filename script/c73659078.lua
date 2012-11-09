@@ -1,7 +1,7 @@
 --スノーダスト・ジャイアント
 function c73659078.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c73659078.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),4),2)
 	c:EnableReviveLimit()
 	--counter
 	local e1=Effect.CreateEffect(c)
@@ -21,9 +21,6 @@ function c73659078.initial_effect(c)
 	e2:SetTarget(c73659078.atktg)
 	e2:SetValue(c73659078.atkval)
 	c:RegisterEffect(e2)
-end
-function c73659078.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c73659078.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and not c:IsPublic()

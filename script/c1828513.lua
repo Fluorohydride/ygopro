@@ -1,7 +1,7 @@
 --ÁùÎäÐ\¤ÎÓ°£­×ÏÑ×
 function c1828513.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c1828513.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x3d),4),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -17,9 +17,6 @@ function c1828513.initial_effect(c)
 	e1:SetTarget(c1828513.target)
 	e1:SetOperation(c1828513.operation)
 	c:RegisterEffect(e1)
-end
-function c1828513.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsSetCard(0x3d)
 end
 function c1828513.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

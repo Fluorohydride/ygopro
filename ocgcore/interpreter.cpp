@@ -26,6 +26,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetSynchroLevel", scriptlib::card_get_synchro_level },
 	{ "GetRitualLevel", scriptlib::card_get_ritual_level },
 	{ "GetOriginalLevel", scriptlib::card_get_origin_level },
+	{ "IsXyzLevel", scriptlib::card_is_xyz_level },
 	{ "GetAttribute", scriptlib::card_get_attribute },
 	{ "GetOriginalAttribute", scriptlib::card_get_origin_attribute },
 	{ "GetRace", scriptlib::card_get_race },

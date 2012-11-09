@@ -1,7 +1,7 @@
 --H－C エクスカリバー
 function c60645181.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c60645181.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -13,9 +13,6 @@ function c60645181.initial_effect(c)
 	e1:SetCost(c60645181.cost)
 	e1:SetOperation(c60645181.operation)
 	c:RegisterEffect(e1)
-end
-function c60645181.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_WARRIOR)
 end
 function c60645181.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end

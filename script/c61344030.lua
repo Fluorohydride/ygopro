@@ -1,7 +1,7 @@
 --輝光子パラディオス
 function c61344030.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c61344030.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),4),2)
 	c:EnableReviveLimit()
 	--negate
 	local e1=Effect.CreateEffect(c)
@@ -25,9 +25,6 @@ function c61344030.initial_effect(c)
 	e2:SetTarget(c61344030.drtg)
 	e2:SetOperation(c61344030.drop)
 	c:RegisterEffect(e2)
-end
-function c61344030.xyzfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetLevel()==4
 end
 function c61344030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end

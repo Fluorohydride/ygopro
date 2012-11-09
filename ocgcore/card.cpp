@@ -482,6 +482,18 @@ uint32 card::get_ritual_level(card* pcard) {
 		lev = get_level();
 	return lev;
 }
+uint32 card::is_xyz_level(card* pcard, uint32 lv) {
+	if(data.type & TYPE_XYZ)
+		return FALSE;
+	uint32 lev;
+	effect_set eset;
+	filter_effect(EFFECT_XYZ_LEVEL, &eset);
+	if(eset.count)
+		lev = eset[0]->get_value(pcard);
+	else
+		lev = get_level();
+	return ((lev & 0xffff) == lv) || ((lev >> 16) == lv);
+}
 uint32 card::get_attribute() {
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.attribute;

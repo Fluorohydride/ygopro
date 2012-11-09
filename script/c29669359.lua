@@ -1,7 +1,7 @@
 --No.61 ヴォルカザウルス
 function c29669359.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,5),2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --No.6 先史遺産アトランタル
 function c9161357.initial_effect(c)
 	--synchro summon
-	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,6),2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)

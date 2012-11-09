@@ -1,7 +1,7 @@
 --マジマジ☆マジシャンギャル
 function c10000030.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c10000030.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),6),2)
 	c:EnableReviveLimit()
 	--effect
 	local e1=Effect.CreateEffect(c)
@@ -25,9 +25,6 @@ function c10000030.initial_effect(c)
 	e2:SetTarget(c10000030.target2)
 	e2:SetOperation(c10000030.operation2)
 	c:RegisterEffect(e2)
-end
-function c10000030.xyzfilter(c)
-	return c:GetLevel()==6 and c:IsRace(RACE_SPELLCASTER)
 end
 function c10000030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(10000030)==0
