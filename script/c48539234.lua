@@ -20,5 +20,6 @@ function c48539234.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and Duel.GetCurrentPhase()~=PHASE_DRAW
 end
 function c48539234.operation(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,48539234)
 	Duel.Draw(tp,2,REASON_EFFECT)
 end

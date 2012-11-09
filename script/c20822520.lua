@@ -40,7 +40,7 @@ function c20822520.cfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsSetCard(0x106e)
 end
 function c20822520.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c20822520.cfilter,tp,LOCATION_GRAVE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c20822520.cfilter,tp,LOCATION_GRAVE,0,5,nil)
 end
 function c20822520.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,20822520)==0 and c20822520[tp] end
@@ -68,7 +68,7 @@ function c20822520.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,LOCATION_DECK)
 end
 function c20822520.filter(c)
-	return c:IsType(TYPE_SPELL) and c:IsSetCard(0x106e) and c:IsAbleToHand()
+	return c:IsType(TYPE_SPELL) and c:IsSetCard(0x106e)
 end
 function c20822520.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
@@ -76,12 +76,14 @@ function c20822520.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(p,2)
 	if g:GetCount()>0 then
 		local sg=g:Filter(c20822520.filter,nil)
-		if sg:GetFirst():IsAbleToHand() then
-			Duel.SendtoHand(sg,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-p,sg)
-			Duel.ShuffleHand(p)
-		else
-			Duel.SendtoGrave(sg,REASON_EFFECT)
+		if sg:GetCount()>0 then
+			if sg:GetFirst():IsAbleToHand() then
+				Duel.SendtoHand(sg,nil,REASON_EFFECT)
+				Duel.ConfirmCards(1-p,sg)
+				Duel.ShuffleHand(p)
+			else
+				Duel.SendtoGrave(sg,REASON_EFFECT)
+			end
 		end
 		Duel.ShuffleDeck(p)
 	end

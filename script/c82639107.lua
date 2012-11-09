@@ -33,6 +33,7 @@ function c82639107.activate(e,tp,eg,ep,ev,re,r,rp)
 		sg1:Merge(sg2)
 		Duel.SendtoGrave(sg1,REASON_EFFECT)
 		Duel.ShuffleDeck(tp)
+		Duel.BreakEffect()
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end
 end
