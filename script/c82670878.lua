@@ -5,7 +5,7 @@ function c82670878.initial_effect(c)
 	e1:SetDescription(aux.Stringid(82670878,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetCode(82670878)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c82670878.condition)
 	e1:SetTarget(c82670878.target)
@@ -41,6 +41,8 @@ function c82670878.check(e,tp,eg,ep,ev,re,r,rp)
 			c82670878[3]=Duel.GetAttacker():GetAttack()
 			c82670878[4]=Duel.GetAttacker():GetDefence()
 			Duel.GetAttacker():RegisterFlagEffect(82670878,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		elseif c82670878[1-tc:GetControler()]==2 then
+			Duel.RaiseEvent(tc,82670878,e,0,0,0,0)
 		end
 	end
 end

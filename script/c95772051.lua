@@ -42,7 +42,7 @@ function c95772051.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c95772051.spfilter(c)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_NORMAL) and c:IsAbleToRemoveAsCost()
+	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_NORMAL) and c:IsAbleToGraveAsCost()
 end
 function c95772051.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c95772051.spfilter,tp,LOCATION_MZONE,0,1,nil) end

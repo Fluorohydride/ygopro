@@ -12,7 +12,7 @@ function c82263578.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c82263578.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_INFIELD,1,e:GetHandler())
+	return not Duel.IsExistingMatchingCard(nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
 end
 function c82263578.filter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER+ATTRIBUTE_WIND) and c:IsAbleToHand()

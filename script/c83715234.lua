@@ -19,13 +19,13 @@ function c83715234.initial_effect(c)
 	e2:SetOperation(c83715234.desop)
 	c:RegisterEffect(e2)
 end
-function c83715234.cfilter(c)
+function c83715234.cfilter(c,tp)
 	local np=c:GetPosition()
 	local pp=c:GetPreviousPosition()
-	return c:IsRace(RACE_ROCK) and not c:IsStatus(STATUS_CONTINUOUS_POS) and ((np<3 and pp>3) or (pp<3 and np>3))
+	return c:IsControler(tp) and c:IsRace(RACE_ROCK) and not c:IsStatus(STATUS_CONTINUOUS_POS) and ((np<3 and pp>3) or (pp<3 and np>3))
 end
 function c83715234.descon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c83715234.cfilter,1,nil)
+	return eg:IsExists(c83715234.cfilter,1,nil,tp)
 end
 function c83715234.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
