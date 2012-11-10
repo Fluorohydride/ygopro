@@ -8,7 +8,6 @@ function c12533811.initial_effect(c)
 	e1:SetDescription(aux.Stringid(12533811,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c12533811.condition)
 	e1:SetCost(c12533811.cost)
@@ -24,7 +23,7 @@ function c12533811.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c12533811.filter(c)
-	return c:IsFaceup() and c:GetLevel()==1
+	return c:IsFaceup() and c:GetLevel()==1 and c:GetEffectCount(EFFECT_DIRECT_ATTACK)==0
 end
 function c12533811.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c12533811.filter(chkc) end

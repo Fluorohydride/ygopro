@@ -22,7 +22,7 @@ function c55727845.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local at=Duel.GetAttackTarget()
 	if chk==0 then return ((at and at:IsFaceup() and Duel.GetAttacker()==e:GetHandler()) or at==e:GetHandler())
 		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
-	Duel.SetTargetCard(at)
+	Duel.SetTargetCard(e:GetHandler():GetBattleTarget())
 end
 function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
