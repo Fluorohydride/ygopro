@@ -1,7 +1,7 @@
 --エヴォルカイザー・ソルデ
 function c18511599.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c18511599.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),6),2)
 	c:EnableReviveLimit()
 	--indes
 	local e1=Effect.CreateEffect(c)
@@ -26,9 +26,6 @@ function c18511599.initial_effect(c)
 end
 function c18511599.indcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayCount()~=0
-end
-function c18511599.xyzfilter(c)
-	return c:GetLevel()==6 and c:IsRace(RACE_DINOSAUR)
 end
 function c18511599.filter(c,e,tp)
 	return c:IsControler(1-tp) and (not e or c:IsRelateToEffect(e))

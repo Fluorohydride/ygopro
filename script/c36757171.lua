@@ -1,7 +1,7 @@
 --ヴェルズ·バハムート
 function c36757171.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c36757171.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0xa),4),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -15,9 +15,6 @@ function c36757171.initial_effect(c)
 	e1:SetTarget(c36757171.target)
 	e1:SetOperation(c36757171.operation)
 	c:RegisterEffect(e1)
-end
-function c36757171.xyzfilter(c)
-	return c:IsSetCard(0xa) and c:GetLevel()==4
 end
 function c36757171.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

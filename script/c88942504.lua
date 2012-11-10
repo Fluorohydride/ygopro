@@ -1,7 +1,7 @@
 --管魔人メロメロメロディ
 function c88942504.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,3),2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(88942504,0))

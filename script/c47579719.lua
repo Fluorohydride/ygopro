@@ -1,7 +1,7 @@
 --セイクリッド·ヒアデス
 function c47579719.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c47579719.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),3),2)
 	c:EnableReviveLimit()
 	--pos change
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c47579719.initial_effect(c)
 	e1:SetTarget(c47579719.target)
 	e1:SetOperation(c47579719.operation)
 	c:RegisterEffect(e1)
-end
-function c47579719.xyzfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetLevel()==3
 end
 function c47579719.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

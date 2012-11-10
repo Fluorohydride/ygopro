@@ -1,7 +1,7 @@
 --セイクリッド・オメガ
 function c26329679.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c26329679.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),4),2)
 	c:EnableReviveLimit()
 	--immune
 	local e1=Effect.CreateEffect(c)
@@ -13,9 +13,6 @@ function c26329679.initial_effect(c)
 	e1:SetCost(c26329679.cost)
 	e1:SetOperation(c26329679.operation)
 	c:RegisterEffect(e1)
-end
-function c26329679.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsAttribute(ATTRIBUTE_LIGHT)
 end
 function c26329679.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

@@ -22,7 +22,7 @@ function c40343749.condition(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c40343749.filter(c,e,tp)
-	return c:IsCode(40343749) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x80) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP,1-tp)
 end
 function c40343749.target(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -2,7 +2,7 @@
 function c49221191.initial_effect(c)
 	--xyz summon
 	c:EnableReviveLimit()
-	aux.AddXyzProcedure(c,c49221191.xyzfilter,4,c49221191.ovfilter,aux.Stringid(49221191,0))
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),4),4,c49221191.ovfilter,aux.Stringid(49221191,0))
 	--atk/def
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(49221191,1))
@@ -17,9 +17,6 @@ function c49221191.initial_effect(c)
 	e1:SetTarget(c49221191.target)
 	e1:SetOperation(c49221191.operation)
 	c:RegisterEffect(e1)
-end
-function c49221191.xyzfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WATER) and c:GetLevel()==4
 end
 function c49221191.ovfilter(c)
 	return c:IsFaceup() and c:IsCode(65676461)

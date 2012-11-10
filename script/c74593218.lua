@@ -1,7 +1,7 @@
 --H－C クサナギ
 function c74593218.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c74593218.xyzfilter,3)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4),3)
 	c:EnableReviveLimit()
 	--negate
 	local e1=Effect.CreateEffect(c)
@@ -17,9 +17,6 @@ function c74593218.initial_effect(c)
 	e1:SetTarget(c74593218.negtg)
 	e1:SetOperation(c74593218.negop)
 	c:RegisterEffect(e1)
-end
-function c74593218.xyzfilter(c)
-	return c:IsRace(RACE_WARRIOR) and c:GetLevel()==4
 end
 function c74593218.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)

@@ -1,7 +1,7 @@
 --サンダーエンド·ドラゴン
 function c698785.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c698785.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsType,TYPE_NORMAL),8),2)
 	c:EnableReviveLimit()
 	--negate activate
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c698785.initial_effect(c)
 	e1:SetTarget(c698785.target)
 	e1:SetOperation(c698785.operation)
 	c:RegisterEffect(e1)
-end
-function c698785.xyzfilter(c)
-	return c:GetLevel()==8 and c:IsType(TYPE_NORMAL)
 end
 function c698785.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

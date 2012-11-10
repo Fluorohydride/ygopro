@@ -1,7 +1,7 @@
 --甲虫装機 エクサスタッグ
 function c26211048.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c26211048.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_INSECT),5),2)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -15,9 +15,6 @@ function c26211048.initial_effect(c)
 	e1:SetTarget(c26211048.eqtg)
 	e1:SetOperation(c26211048.eqop)
 	c:RegisterEffect(e1)
-end
-function c26211048.xyzfilter(c)
-	return c:IsRace(RACE_INSECT) and c:GetLevel()==5
 end
 function c26211048.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

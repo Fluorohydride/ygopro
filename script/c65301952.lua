@@ -1,7 +1,7 @@
 --アルケミック・マジシャン
 function c65301952.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c65301952.xyzfilter,3)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),4),3)
 	c:EnableReviveLimit()
 	--atkup
 	local e1=Effect.CreateEffect(c)
@@ -23,9 +23,6 @@ function c65301952.initial_effect(c)
 	e2:SetTarget(c65301952.settg)
 	e2:SetOperation(c65301952.setop)
 	c:RegisterEffect(e2)
-end
-function c65301952.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_SPELLCASTER)
 end
 function c65301952.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsType,c:GetControler(),LOCATION_GRAVE,0,nil,TYPE_SPELL)*200

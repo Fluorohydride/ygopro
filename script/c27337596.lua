@@ -1,7 +1,7 @@
 --聖刻龍王－アトゥムス
 function c27337596.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c27337596.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),6),2)
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c27337596.initial_effect(c)
 	e1:SetTarget(c27337596.sptg)
 	e1:SetOperation(c27337596.spop)
 	c:RegisterEffect(e1)
-end
-function c27337596.xyzfilter(c)
-	return c:IsRace(RACE_DRAGON) and c:GetLevel()==6
 end
 function c27337596.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetAttackAnnouncedCount()==0

@@ -1,7 +1,7 @@
 --水精鱗－ガイオアビス
 function c74371660.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c74371660.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),7),2)
 	c:EnableReviveLimit()
 	--atklimit
 	local e1=Effect.CreateEffect(c)
@@ -24,9 +24,6 @@ function c74371660.initial_effect(c)
 	e2:SetTarget(c74371660.target)
 	e2:SetOperation(c74371660.operation)
 	c:RegisterEffect(e2)
-end
-function c74371660.xyzfilter(c)
-	return c:GetLevel()==7 and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c74371660.dscon(e)
 	return e:GetHandler():GetOverlayCount()~=0

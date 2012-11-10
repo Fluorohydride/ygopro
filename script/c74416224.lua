@@ -1,7 +1,7 @@
 --ブラック·レイ·ランサー
 function c74416224.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c74416224.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),3),2)
 	c:EnableReviveLimit()
 	--disable
 	local e1=Effect.CreateEffect(c)
@@ -15,9 +15,6 @@ function c74416224.initial_effect(c)
 	e1:SetTarget(c74416224.target)
 	e1:SetOperation(c74416224.operation)
 	c:RegisterEffect(e1)
-end
-function c74416224.xyzfilter(c)
-	return c:GetLevel()==3 and c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c74416224.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

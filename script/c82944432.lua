@@ -1,7 +1,7 @@
 --機甲忍者ブレード·ハート
 function c82944432.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c82944432.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4),2)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(82944432,0))
@@ -13,9 +13,6 @@ function c82944432.initial_effect(c)
 	e1:SetTarget(c82944432.target)
 	e1:SetOperation(c82944432.operation)
 	c:RegisterEffect(e1)
-end
-function c82944432.xyzfilter(c)
-	return c:IsRace(RACE_WARRIOR) and c:GetLevel()==4
 end
 function c82944432.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

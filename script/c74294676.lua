@@ -1,7 +1,7 @@
 --エヴォルカイザー·ラギア
 function c74294676.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c74294676.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4),2)
 	c:EnableReviveLimit()
 	--negate activate
 	local e1=Effect.CreateEffect(c)
@@ -32,9 +32,6 @@ function c74294676.initial_effect(c)
 	e3:SetDescription(aux.Stringid(74294676,2))
 	e3:SetCode(EVENT_SPSUMMON)
 	c:RegisterEffect(e3)
-end
-function c74294676.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_DINOSAUR)
 end
 function c74294676.condition1(e,tp,eg,ep,ev,re,r,rp,chk)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)

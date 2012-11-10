@@ -28,7 +28,6 @@ function c99365553.initial_effect(c)
 	e3:SetTarget(c99365553.sptg3)
 	e3:SetOperation(c99365553.spop3)
 	c:RegisterEffect(e3)
-	
 end
 function c99365553.spfilter1(c,att)
 	return c:IsAttribute(att) and c:IsAbleToRemoveAsCost()

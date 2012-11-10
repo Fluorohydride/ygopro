@@ -1,7 +1,7 @@
 --H－C ガーンデーヴァ
 function c48009503.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c48009503.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4),2)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -15,9 +15,6 @@ function c48009503.initial_effect(c)
 	e1:SetTarget(c48009503.target)
 	e1:SetOperation(c48009503.operation)
 	c:RegisterEffect(e1)
-end
-function c48009503.xyzfilter(c)
-	return c:GetLevel()==4 and c:IsRace(RACE_WARRIOR)
 end
 function c48009503.filter(c,e,tp)
 	return c:IsFaceup() and c:IsControler(1-tp) and c:IsLevelBelow(4) and (not e or c:IsRelateToEffect(e))

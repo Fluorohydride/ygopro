@@ -1,7 +1,7 @@
 --イビリチュア·メロウガイスト
 function c76372778.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,4),2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
 	--to deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76372778,0))

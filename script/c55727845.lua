@@ -1,7 +1,7 @@
 --No.96 ブラック·ミスト
 function c55727845.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.FilterEqualFunction(Card.GetLevel,2),3)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,2),3)
 	c:EnableReviveLimit()
 	--atk u/d
 	local e1=Effect.CreateEffect(c)
@@ -22,7 +22,7 @@ function c55727845.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local at=Duel.GetAttackTarget()
 	if chk==0 then return ((at and at:IsFaceup() and Duel.GetAttacker()==e:GetHandler()) or at==e:GetHandler())
 		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
-	Duel.SetTargetCard(at)
+	Duel.SetTargetCard(e:GetHandler():GetBattleTarget())
 end
 function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

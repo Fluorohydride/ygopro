@@ -1,7 +1,7 @@
 --No.8 紋章王ゲノム・ヘリター
 function c47387961.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,c47387961.xyzfilter,2)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x76),4),2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)
@@ -14,9 +14,6 @@ function c47387961.initial_effect(c)
 	e1:SetTarget(c47387961.target)
 	e1:SetOperation(c47387961.operation)
 	c:RegisterEffect(e1)
-end
-function c47387961.xyzfilter(c)
-	return c:IsSetCard(0x76) and c:GetLevel()==4
 end
 function c47387961.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
