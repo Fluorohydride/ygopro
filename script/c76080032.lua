@@ -94,7 +94,7 @@ function c76080032.disop(e,tp,eg,ep,ev,re,r,rp)
 	tc:RegisterEffect(e2)
 end
 function c76080032.eqlimit(e,c)
-	return c:IsCode(56840427) and c:GetControler()==e:GetHandlerPlayer()
+	return c:IsCode(56840427)
 end
 function c76080032.exfilter(c,fid)
 	return c:IsFaceup() and c:GetCode()==76080032 and (fid==nil or c:GetFieldID()<fid)
