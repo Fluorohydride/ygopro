@@ -94,7 +94,7 @@ function c87008374.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c87008374.eqlimit(e,c)
-	return c:IsCode(56840427) and c:GetControler()==e:GetHandlerPlayer()
+	return c:IsCode(56840427)
 end
 function c87008374.exfilter(c,fid)
 	return c:IsFaceup() and c:GetCode()==87008374 and (fid==nil or c:GetFieldID()<fid)

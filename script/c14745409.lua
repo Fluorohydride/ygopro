@@ -21,7 +21,7 @@ function c14745409.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_EQUIP_LIMIT)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetValue(1)
+	e3:SetValue(c14745409.eqlimit)
 	c:RegisterEffect(e3)
 	--atkdown
 	local e4=Effect.CreateEffect(c)
@@ -45,17 +45,23 @@ function c14745409.initial_effect(c)
 	e5:SetOperation(c14745409.operation)
 	c:RegisterEffect(e5)
 end
+function c14745409.eqlimit(e,c)
+	return c:IsRace(RACE_WARRIOR)
+end
 function c14745409.cfilter(c)
 	return c:IsFaceup() and c:IsCode(14745409)
+end
+function c14745409.eqfilter1(c)
+	return c:IsFaceup() and c:IsRace(RACE_WARRIOR)
 end
 function c14745409.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(c14745409.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c14745409.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c14745409.eqfilter1(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c14745409.eqfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c14745409.eqfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c14745409.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -94,13 +100,13 @@ function c14745409.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,14745409)==0 end
 	Duel.RegisterFlagEffect(tp,14745409,RESET_PHASE+PHASE_END,0,1)
 end
-function c14745409.eqfilter(c)
+function c14745409.eqfilter2(c)
 	return c:IsFaceup() and c:IsSetCard(0x107a) and c:IsRace(RACE_WARRIOR)
 end
 function c14745409.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c14745409.eqfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c14745409.eqfilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c14745409.eqfilter2(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c14745409.eqfilter2,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,c14745409.eqfilter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c14745409.eqfilter2,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
