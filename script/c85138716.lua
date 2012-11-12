@@ -24,7 +24,7 @@ function c85138716.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,85138716,RESET_PHASE+PHASE_END,0,1)
 end
 function c85138716.filter(c,e,tp)
-	return c:IsType(TYPE_NORMAL) and c:GetLevel()<=4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsType(TYPE_NORMAL) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c85138716.filter2(c,g)
 	return g:IsExists(Card.IsCode,1,c,c:GetCode())

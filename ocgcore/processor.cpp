@@ -3473,7 +3473,7 @@ int32 field::process_battle_command(uint16 step) {
 				if((*rm)->current.location != LOCATION_MZONE || ((*rm)->fieldid_r != core.pre_field[0] && (*rm)->fieldid_r != core.pre_field[1]))
 					des->container.erase(rm);
 			}
-			add_process(PROCESSOR_DESTROY, 2, 0, des, REASON_BATTLE, PLAYER_NONE);
+			add_process(PROCESSOR_DESTROY, 3, 0, des, REASON_BATTLE, PLAYER_NONE);
 		}
 		return FALSE;
 	}

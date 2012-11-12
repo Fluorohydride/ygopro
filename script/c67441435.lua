@@ -14,7 +14,7 @@ c67441435[0]=true
 c67441435[1]=true
 function c67441435.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c67441435[tp] and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
+	if chk==0 then return c67441435[tp] and Duel.IsPlayerCanDiscardDeck(tp,1)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,1)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
