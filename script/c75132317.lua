@@ -26,11 +26,11 @@ function c75132317.initial_effect(c)
 	e2:SetOperation(c75132317.drop)
 	c:RegisterEffect(e2)
 end
-function c75132317.tgfilter(c)
-	return c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+function c75132317.tgfilter(c,tp)
+	return c:IsControler(tp) and c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c75132317.setcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c75132317.tgfilter,1,nil)
+	return eg:IsExists(c75132317.tgfilter,1,nil,tp)
 end
 function c75132317.filter(c)
 	return c:IsSetCard(0x7c) and c:IsType(TYPE_TRAP) and c:IsSSetable()

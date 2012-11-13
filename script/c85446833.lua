@@ -12,10 +12,10 @@ function c85446833.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(c21831848.target)
+	e1:SetTarget(c85446833.target)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 end
-function c21831848.target(e,c)
+function c85446833.target(e,c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:GetAttack()==0
 end

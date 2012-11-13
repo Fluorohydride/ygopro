@@ -25,7 +25,7 @@ end
 function c43138260.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and Duel.CheckRemoveOverlayCard(tp,1,0,2,REASON_COST)
+		and Duel.CheckRemoveOverlayCard(c:GetControler(),1,0,2,REASON_COST)
 end
 function c43138260.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.RemoveOverlayCard(tp,1,0,2,2,REASON_COST)

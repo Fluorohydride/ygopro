@@ -28,5 +28,6 @@ end
 function c691925.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
+	Duel.BreakEffect()
 	Duel.DiscardDeck(tp,2,REASON_EFFECT)
 end

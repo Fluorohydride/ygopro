@@ -22,8 +22,7 @@ function c2333365.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x42)
 end
 function c2333365.descon(e)
-	local c=e:GetHandler()
-	return not Duel.IsExistingMatchingCard(c2333365.filter,c:GetControler(),LOCATION_MZONE,0,1,c)
+	return not Duel.IsExistingMatchingCard(c2333365.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function c2333365.tg(e,c)
 	return c:GetCode()~=2333365 and c:IsSetCard(0x42)

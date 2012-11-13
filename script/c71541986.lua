@@ -14,7 +14,7 @@ function c71541986.initial_effect(c)
 end
 function c71541986.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousPosition(POS_FACEDOWN)
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEDOWN)
 end
 function c71541986.spfilter(c,e,tp)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:GetLevel()==8 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
