@@ -73,7 +73,7 @@ function c71071546.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c71071546.filter(c)
-	return (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and c:IsAbleToHand()
+	return (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c71071546.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c71071546.filter(chkc) end

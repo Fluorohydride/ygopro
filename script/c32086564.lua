@@ -32,7 +32,7 @@ function c32086564.check(c,tp)
 end
 function c32086564.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetAttackTarget()~=nil
-		and c32086564.check(Duel.GetAttacker(),tp) or c32086564.check(Duel.GetAttackTarget(),tp) end
+		and (c32086564.check(Duel.GetAttacker(),tp) or c32086564.check(Duel.GetAttackTarget(),tp)) end
 	if c32086564.check(Duel.GetAttacker(),tp) then
 		Duel.SetTargetCard(Duel.GetAttackTarget())
 	else

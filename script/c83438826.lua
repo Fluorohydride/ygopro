@@ -54,7 +54,7 @@ function c83438826.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(c83438826.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c83438826.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c83438826.eqfilter1 end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c83438826.eqfilter1(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c83438826.eqfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c83438826.eqfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
