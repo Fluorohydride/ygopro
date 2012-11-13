@@ -1,7 +1,21 @@
 --エヴォルダー·ケラト
 function c80651316.initial_effect(c)
+	--atkup
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCondition(c80651316.atkcon)
+	e1:SetOperation(c80651316.atkop)
+	c:RegisterEffect(e1)
 end
-function c80651316.evolreg(c)
+function c80651316.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local st=e:GetHandler():GetSummonType()
+	return st>=(SUMMON_TYPE_SPECIAL+150) and st<(SUMMON_TYPE_SPECIAL+180)
+end
+function c80651316.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	--atkup
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -17,7 +31,7 @@ function c80651316.evolreg(c)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
 	e2:SetTarget(c80651316.schtg)
 	e2:SetOperation(c80651316.schop)
-	e2:SetReset(RESET_EVENT+0x1ff0000)
+	e2:SetReset(RESET_EVENT+0x1620000)
 	c:RegisterEffect(e2)
 end
 function c80651316.sfilter(c)

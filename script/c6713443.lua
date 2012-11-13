@@ -27,7 +27,7 @@ function c6713443.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(c6713443.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE)
 end
-function c2521011.sfilter(c)
+function c6713443.sfilter(c)
 	return c:IsSetCard(0x7c) and c:GetCode()~=6713443 and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()
 end
 function c6713443.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -36,17 +36,17 @@ function c6713443.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c6713443.filter,tp,LOCATION_GRAVE,0,ft,ft,nil,e,tp)
 	if g:GetCount()==0 then return end
-	ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	if ct>0 then
 		local ft2=Duel.GetLocationCount(tp,LOCATION_SZONE)
 		if ft2>ct then ft2=ct end
 		if ft2<=0 then return end
-		local sg=Duel.GetMatchingGroup(c2521011.sfilter,tp,LOCATION_DECK,0,nil)
+		local sg=Duel.GetMatchingGroup(c6713443.sfilter,tp,LOCATION_DECK,0,nil)
 		if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(6713443,0)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 			local setg=sg:Select(tp,1,ft2,nil)
-			Duel.SSet(tp,sg)
+			Duel.SSet(tp,setg)
 		end
 	end
 end

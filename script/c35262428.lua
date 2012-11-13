@@ -48,7 +48,7 @@ function c35262428.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		e3:SetValue(1)
 		tc:RegisterEffect(e3,true)
-		local e4=Effect.CreateEffect(e:GetHandler())
+		local e4=Effect.CreateEffect(c)
 		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e4:SetRange(LOCATION_MZONE)
@@ -56,12 +56,14 @@ function c35262428.activate(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetOperation(c35262428.ctlop)
 		e4:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		e4:SetCountLimit(1)
+		e4:SetLabel(1-tp)
 		tc:RegisterEffect(e4,true)
 	end
 end
 function c35262428.ctlop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler()
-	if not Duel.GetControl(tc,1-tp) and not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
+	local p=e:GetLabel()
+	if tc:GetControler()~=p and not Duel.GetControl(tc,p) and not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

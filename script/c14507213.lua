@@ -11,7 +11,7 @@ function c14507213.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c14507213.filter(c)
-	return c:IsFaceup() and c:IsCanBeSynchroMaterial(nil)
+	return c:IsFaceup() and c:IsCanBeSynchroMaterial()
 end
 function c14507213.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end
