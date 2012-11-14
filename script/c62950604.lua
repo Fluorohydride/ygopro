@@ -52,7 +52,7 @@ function c62950604.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c62950604.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetLabelObject()
-	if chk==0 then return tc:GetFlagEffect(62950604)~=0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return tc:GetFlagEffect(62950604)~=0 end
 	tc:CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,tc,1,0,0)
 end

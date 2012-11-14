@@ -11,6 +11,7 @@ function c58242947.initial_effect(c)
 	e1:SetTarget(c58242947.target)
 	e1:SetOperation(c58242947.operation)
 	c:RegisterEffect(e1)
+	c58242947[0]=nil
 end
 function c58242947.filter(c)
 	return c:GetType()==0x4 and c:IsAbleToRemoveAsCost() and c:CheckActivateEffect(false,true,false)~=nil
@@ -22,12 +23,12 @@ function c58242947.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(58242947,1))
 	local g=Duel.SelectMatchingCard(tp,c58242947.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	local te=g:GetFirst():CheckActivateEffect(false,true,true)
-	e:SetLabelObject(te)
+	c58242947[0]=te
 	g:AddCard(c)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c58242947.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local te=e:GetLabelObject()
+	local te=c58242947[0]
 	if chkc then
 		local tg=te:GetTarget()
 		return tg(e,tp,eg,ep,ev,re,r,rp,0,true)
@@ -40,7 +41,7 @@ function c58242947.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
 end
 function c58242947.operation(e,tp,eg,ep,ev,re,r,rp)
-	local te=e:GetLabelObject()
+	local te=c58242947[0]
 	if not te then return end
 	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
