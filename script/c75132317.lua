@@ -36,7 +36,7 @@ function c75132317.filter(c)
 	return c:IsSetCard(0x7c) and c:IsType(TYPE_TRAP) and c:IsSSetable()
 end
 function c75132317.settg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING)
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingMatchingCard(c75132317.filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c75132317.setop(e,tp,eg,ep,ev,re,r,rp)

@@ -24,7 +24,7 @@ end
 function c60470713.cfilter(c,tp)
 	return c:IsControler(tp) and c:GetPreviousControler()==tp
 		and (c:IsPreviousLocation(LOCATION_GRAVE) or (c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)))
-		and c:IsSetCard(0x71)
+		and c:IsSetCard(0x71) and not c:IsLocation(LOCATION_EXTRA)
 end
 function c60470713.condition(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0 and eg:IsExists(c60470713.cfilter,1,nil,tp)

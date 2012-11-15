@@ -21,24 +21,28 @@ end
 function c14772491.spfilter(c,e,tp)
 	return c:IsSetCard(0x1f) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+function c14772491.filter(c)
+	return c:IsFaceup() and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
 function c14772491.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c14772491.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c14772491.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		and Duel.IsExistingMatchingCard(c14772491.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c14772491.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c14772491.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
+	local cp=tc:GetControler()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+		if Duel.GetLocationCount(cp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c14772491.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 		if g:GetCount()==0 then return end
 		local sc=g:GetFirst()
-		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(sc,0,tp,cp,false,false,POS_FACEUP)
 		c:SetCardTarget(tc)
 		c:SetCardTarget(sc)
 		e:GetLabelObject():SetLabelObject(sc)
