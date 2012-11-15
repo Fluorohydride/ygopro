@@ -38,8 +38,8 @@ function c37781520.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
 end
 function c37781520.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c37781520.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,c37781520.cfilter,1,1,REASON_COST+REASON_DISCARD,e:GetHandler())
+	if chk==0 then return Duel.IsExistingMatchingCard(c37781520.cfilter,tp,LOCATION_HAND,0,3,e:GetHandler()) end
+	Duel.DiscardHand(tp,c37781520.cfilter,3,3,REASON_COST+REASON_DISCARD,e:GetHandler())
 end
 function c37781520.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

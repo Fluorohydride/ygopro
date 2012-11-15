@@ -5,7 +5,6 @@ function c2356994.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
 	c:RegisterEffect(e1)
 	--summon,flip
 	local e2=Effect.CreateEffect(c)
@@ -34,14 +33,13 @@ function c2356994.skipop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SKIP_BP)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(0,1)
 	if Duel.GetTurnPlayer()~=tp then
 		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetCondition(c2356994.bpcon)
-		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_OPPO_TURN,2)
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
 	else
-		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_OPPO_TURN,1)
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	end
 	Duel.RegisterEffect(e1,tp)
 end

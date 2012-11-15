@@ -38,7 +38,7 @@ function c57836546.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()~=2 or Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local tc=g:GetFirst()
 	while tc do
-		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+		if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
 			tc:RegisterFlagEffect(57836546,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 		end
 		tc=g:GetNext()
