@@ -15,7 +15,7 @@ function c59170782.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(59170782,0))
-	e2:SetType(EFFECT_TYPE_QUICK_O)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c59170782.tgcon2)
@@ -59,8 +59,12 @@ function c59170782.tgop1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c59170782.tgcon2(e,tp,eg,ep,ev,re,r,rp)
 	if tp==Duel.GetTurnPlayer() then return false end
-	local ag=eg:GetFirst():GetAttackableTarget()
-	return ag:IsContains(e:GetHandler())
+	local at=Duel.GetAttackTarget()
+	if at and at:IsFaceup() and at:IsSetCard(0x74) then
+		local ag=eg:GetFirst():GetAttackableTarget()
+		return ag:IsContains(e:GetHandler())
+	end
+	return false
 end
 function c59170782.tgop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

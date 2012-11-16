@@ -36,5 +36,5 @@ function c19870120.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	return c:IsLocation(LOCATION_EXTRA)
 end
 function c19870120.target(e,c)
-	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)~=0
+	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
 end

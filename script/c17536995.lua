@@ -11,7 +11,7 @@ function c17536995.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c17536995.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker()~=tp
+	return Duel.GetAttacker():IsControler(1-tp)
 end
 function c17536995.filter(c,e,tp)
 	return c:IsSetCard(0x76) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
