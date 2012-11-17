@@ -7,7 +7,7 @@ const wchar_t* DataManager::unknown_string = L"???";
 wchar_t DataManager::strBuffer[2048];
 DataManager dataManager;
 
-bool DataManager::LoadDates(const char* file) {
+bool DataManager::LoadDB(const char* file) {
 	sqlite3* pDB;
 	if(sqlite3_open(file, &pDB) != SQLITE_OK)
 		return Error(pDB);
@@ -15,8 +15,6 @@ bool DataManager::LoadDates(const char* file) {
 	const char* sql = "select * from datas,texts where datas.id=texts.id";
 	if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 		return Error(pDB);
-	for(int i = 0; i < 2048; ++i)
-		_sysStrings[i] = 0;
 	CardDataC cd;
 	CardString cs;
 	for(int i = 0; i < 16; ++i) cs.desc[i] = 0;
@@ -63,9 +61,14 @@ bool DataManager::LoadDates(const char* file) {
 	} while(step != SQLITE_DONE);
 	sqlite3_finalize(pStmt);
 	sqlite3_close(pDB);
-	FILE* fp = fopen("strings.conf", "r");
+	return true;
+}
+bool DataManager::LoadStrings(const char* file) {
+	FILE* fp = fopen(file, "r");
 	if(!fp)
 		return false;
+	for(int i = 0; i < 2048; ++i)
+		_sysStrings[i] = 0;
 	char linebuf[256];
 	char strbuf[256];
 	int value;

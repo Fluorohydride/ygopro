@@ -57,8 +57,9 @@ function c23998625.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	else return false end
 end
 function c23998625.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_EFFECT) and e:GetHandler():GetOverlayCount()==0
-		and e:GetHandler():IsLocation(LOCATION_GRAVE)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT) and c:GetOverlayCount()==0
+		and c:IsLocation(LOCATION_GRAVE)
 end
 function c23998625.spfilter(c,e,tp)
 	return c:IsCode(97403510) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)

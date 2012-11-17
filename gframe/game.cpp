@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x12e1;
+const unsigned short PRO_VERSION = 0x12f0;
 
 namespace ygo {
 
@@ -51,7 +51,9 @@ bool Game::Initialize() {
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial())
 		return false;
-	if(!dataManager.LoadDates("cards.cdb"))
+	if(!dataManager.LoadDB("cards.cdb"))
+		return false;
+	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);

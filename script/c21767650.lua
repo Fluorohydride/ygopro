@@ -24,7 +24,7 @@ function c21767650.lvtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c21767650.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local opt=e:GetLabel()
-	local g=Duel.GetMatchingGroup(c21767650.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(c21767650.filter,tp,LOCATION_MZONE,0,nil)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(e:GetHandler())

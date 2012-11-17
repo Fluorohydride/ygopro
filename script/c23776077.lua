@@ -76,5 +76,5 @@ function c23776077.tgvalue(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
 end
 function c23776077.indcon(e)
-	return e:GetHandler():GetOverlayCount()>=5
+	return e:GetHandler():GetOverlayCount()==5
 end

@@ -20,7 +20,7 @@ function c31863912.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c31863912.cfilter(c,sp)
-	return c:IsFaceup() and c:GetSummonPlayer()==sp and c:GetLevel()>0 and c:IsAbleToHand()
+	return c:IsFaceup() and c:GetSummonPlayer()==sp
 end
 function c31863912.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
