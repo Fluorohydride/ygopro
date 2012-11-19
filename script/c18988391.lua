@@ -12,7 +12,7 @@ end
 function c18988391.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,18988391)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,18988391,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,18988391,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c18988391.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

@@ -26,7 +26,7 @@ function c56981417.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,c56981417.cffilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())
 	Duel.ConfirmCards(1-tp,g)
 	Duel.ShuffleHand(tp)
-	Duel.RegisterFlagEffect(tp,56981417,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,56981417,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c56981417.filter(c)
 	return c:IsSetCard(0x106e) and c:GetCode()~=56981417 and c:GetType()==TYPE_SPELL and c:CheckActivateEffect(true,true,false)~=nil

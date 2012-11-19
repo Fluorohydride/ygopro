@@ -53,6 +53,7 @@ function c9560338.effop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 	if ct>=4 then
+		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g=Duel.SelectMatchingCard(tp,c9560338.filter1,tp,LOCATION_DECK,0,1,1,nil)
 		if g:GetCount()>0 then 
@@ -61,6 +62,7 @@ function c9560338.effop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	if ct>=5 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c9560338.filter2,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		if g:GetCount()>0 then 

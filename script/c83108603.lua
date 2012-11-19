@@ -45,6 +45,10 @@ function c83108603.matop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 		local g=Duel.SelectMatchingCard(tp,c83108603.matfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,tc)
 		if g:GetCount()>0 then
+			local mg=g:GetFirst():GetOverlayGroup()
+			if mg:GetCount()>0 then
+				Duel.SendtoGrave(mg,REASON_RULE)
+			end
 			Duel.Overlay(tc,g)
 		end
 	end

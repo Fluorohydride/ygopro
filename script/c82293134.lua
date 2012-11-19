@@ -19,6 +19,7 @@ function c82293134.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetCondition(c82293134.thcon)
 	e2:SetCost(c82293134.thcost)
 	e2:SetTarget(c82293134.thtg)
 	e2:SetOperation(c82293134.thop)
@@ -37,6 +38,9 @@ function c82293134.desop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.Destroy(c,REASON_EFFECT)
 	end
+end
+function c82293134.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c82293134.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,82293134)==0 end

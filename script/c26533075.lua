@@ -44,7 +44,7 @@ function c26533075.descon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetHandler():IsPreviousPosition(POS_FACEDOWN)
 end
 function c26533075.desfilter(c)
-	return c:IsFaceup() and c:IsDestructable()
+	return c:IsDestructable()
 end
 function c26533075.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c26533075.desfilter(chkc) end

@@ -18,6 +18,7 @@ function c22653490.initial_effect(c)
 	e2:SetDescription(aux.Stringid(22653490,1))
 	e2:SetCategory(CATEGORY_TODECK)
 	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCost(c22653490.tdcost2)
@@ -51,16 +52,16 @@ end
 function c22653490.tdfilter2(c)
 	return c:IsFaceup() and c:IsAbleToDeck()
 end
-function c22653490.tdtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c22653490.tdfilter2,tp,0,LOCATION_ONFIELD,1,nil) end
-	local g=Duel.GetMatchingGroup(c22653490.tdfilter2,tp,0,LOCATION_ONFIELD,nil)
+function c22653490.tdtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c22653490.tdfilter2(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c22653490.tdfilter2,tp,0,LOCATION_ONFIELD,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g=Duel.SelectTarget(tp,c22653490.tdfilter2,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
 function c22653490.tdop2(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c22653490.tdfilter2,tp,0,LOCATION_ONFIELD,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.HintSelection(g)
-		Duel.SendtoDeck(g,nil,0,REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+		Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)
 	end
 end
