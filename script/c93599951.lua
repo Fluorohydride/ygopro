@@ -28,6 +28,6 @@ function c93599951.activate(e,tp,eg,ep,ev,re,r,rp)
 		if tc:IsDefencePos() then
 			Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
 		end
-		Duel.ChangeAttacker(tc)
+		Duel.ReplaceAttacker(tc)
 	end
 end

@@ -2552,21 +2552,13 @@ int32 field::process_battle_command(uint16 step) {
 				if(core.select_cards.size() == 0 && pcard->operation_param == 0)
 					continue;
 				core.attackable_cards.push_back(pcard);
-				if(pcard->is_affected_by_effect(EFFECT_FIRST_ATTACK)) {
-					if(first_attack.size()) {
-						first_attack.clear();
-						must_attack.clear();
-						core.attackable_cards.clear();
-						break;
-					} else {
-						core.attackable_cards.clear();
-						core.attackable_cards.push_back(pcard);
-						first_attack.push_back(pcard);
-					}
-				}
+				if(pcard->is_affected_by_effect(EFFECT_FIRST_ATTACK))
+					first_attack.push_back(pcard);
 				if(pcard->is_affected_by_effect(EFFECT_MUST_ATTACK))
 					must_attack.push_back(pcard);
 			}
+			if(first_attack.size())
+				core.attackable_cards = first_attack;
 		}
 		core.to_m2 = TRUE;
 		core.to_ep = TRUE;
