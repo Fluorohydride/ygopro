@@ -39,7 +39,7 @@ function c90020065.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c90020065.desop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,nil)
-	local dam=g:GetSum(Card.GetAttack)
+	local dam=g:GetSum(Card.GetAttack)/2
 	Duel.Destroy(g,REASON_EFFECT)
 	Duel.Damage(1-tp,dam,REASON_EFFECT)
 end

@@ -6,6 +6,7 @@ function c38369349.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c38369349.splimit)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
@@ -57,6 +58,9 @@ function c38369349.initial_effect(c)
 	e8:SetCost(c38369349.atcost)
 	e8:SetOperation(c38369349.atop)
 	c:RegisterEffect(e8)
+end
+function c38369349.splimit(e,se,sp,st,spos,tgp)
+	return Duel.IsExistingMatchingCard(c38369349.cfilter,tgp,LOCATION_ONFIELD,0,1,nil)
 end
 function c38369349.cfilter(c)
 	return c:IsFaceup() and c:IsCode(15259703)

@@ -40,7 +40,7 @@ function c66818682.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c66818682.spfilter(c,e,tp)
-	return c:IsCode(39823987) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsCode(39823987) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c66818682.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c66818682.spfilter(chkc,e,tp) end
@@ -53,6 +53,6 @@ end
 function c66818682.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
