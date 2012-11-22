@@ -31,8 +31,8 @@ function c56105047.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)==1 then
-		Duel.BreakEffect()
 		if c:IsPosition(POS_FACEUP_ATTACK) and c:IsRelateToEffect(e) then
+			Duel.BreakEffect()
 			Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 		end
 	end

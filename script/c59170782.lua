@@ -10,7 +10,7 @@ function c59170782.initial_effect(c)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c59170782.tgcon1)
-	e1:SetCost(c59170782.tgcost)
+--	e1:SetCost(c59170782.tgcost)
 	e1:SetOperation(c59170782.tgop1)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
@@ -51,10 +51,14 @@ function c59170782.tgcon1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c59170782.tgop1(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		local g=Group.CreateGroup()
-		g:AddCard(c)
-		Duel.ChangeTargetCard(ev,g)
+	if c:IsRelateToEffect(e) then
+		local tf=re:GetTarget()
+		local res,ceg,cep,cev,cre,cr,crp=Duel.CheckEvent(re:GetCode(),true)
+		if tf(re,rp,ceg,cep,cev,cre,cr,crp,0,c) then
+			local g=Group.CreateGroup()
+			g:AddCard(c)
+			Duel.ChangeTargetCard(ev,g)
+		end
 	end
 end
 function c59170782.tgcon2(e,tp,eg,ep,ev,re,r,rp)
