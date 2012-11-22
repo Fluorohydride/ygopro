@@ -20,7 +20,8 @@ function c12469386.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c12469386.filter,1,nil,tp)
 end
 function c12469386.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c12469386.spop(e,tp,eg,ep,ev,re,r,rp)

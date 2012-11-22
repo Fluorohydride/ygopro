@@ -1,4 +1,4 @@
---ADチェンジャー
+--先史遺産コロッサル·ヘッド
 function c52158283.initial_effect(c)
 	--adchange
 	local e1=Effect.CreateEffect(c)
@@ -17,7 +17,7 @@ function c52158283.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c52158283.filter(c)
-	return c:IsPosition(POS_ATTACK) and c:IsLevelAbove(3)
+	return c:IsAttackPos() and c:IsLevelAbove(3)
 end
 function c52158283.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c52158283.filter(chkc) end
@@ -30,14 +30,13 @@ function c52158283.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		if tc:IsAttackPos() then
-			local opt=0
+			local pos=0
 			if tc:IsCanTurnSet() then 
-				opt=Duel.SelectOption(tp,aux.Stringid(52158283,1),aux.Stringid(52158283,2))
+				pos=Duel.SelectPosition(tp,tc,POS_DEFENCE)
 			else
-				opt=Duel.SelectOption(tp,aux.Stringid(52158283,1))
+				pos=Duel.SelectPosition(tp,tc,POS_FACEUP_DEFENCE)
 			end
-			if opt==0 then Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
-			else Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE) end
+			Duel.ChangePosition(tc,pos)
 		else
 			Duel.ChangePosition(tc,0,0,POS_FACEDOWN_DEFENCE,POS_FACEUP_DEFENCE)
 		end
