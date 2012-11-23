@@ -13,15 +13,18 @@ end
 function c55465441.filter(c,e,tp)
 	return c:GetLevel()>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_DEFENCE,1-tp)
 end
+function c55465441.filter2(c)
+	return c:IsFaceup() and not c:IsType(TYPE_XYZ)
+end
 function c55465441.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingTarget(c55465441.filter2,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(c55465441.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectTarget(tp,c55465441.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g2=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,nil)
+	local g2=Duel.SelectTarget(tp,c55465441.filter2,tp,LOCATION_MZONE,0,1,1,nil)
 	e:SetLabelObject(g2:GetFirst())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,1,0,0)
 end
