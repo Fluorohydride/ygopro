@@ -1185,6 +1185,32 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		return FALSE;
 	}
 	case 3: {
+		int32 min = 0;
+		int32 level = target->get_level();
+		if(level < 5)
+			min = 0;
+		else if(level < 7)
+			min = 1;
+		else
+			min = 2;
+		min -= returns.bvalue[0];
+		effect_set eset;
+		target->filter_effect(EFFECT_DECREASE_TRIBUTE, &eset);
+		for(int32 i = 0; i < eset.count; ++i) {
+			if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
+				int32 dec = eset[i]->get_value(target);
+				min -= dec & 0xffff;
+			}
+		}
+		for(int32 i = 0; i < eset.count; ++i) {
+			if(min <= 0)
+				break;
+			if((eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) && (eset[i]->reset_count & 0xf00) > 0) {
+				int32 dec = eset[i]->get_value(target);
+				min -= dec & 0xffff;
+				eset[i]->dec_count();
+			}
+		}
 		if(returns.bvalue[0]) {
 			card_set tributes;
 			for(int32 i = 0; i < returns.bvalue[0]; ++i) {
