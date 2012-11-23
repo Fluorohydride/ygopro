@@ -1509,8 +1509,10 @@ int32 card::get_summon_tribute_count() {
 		min = max = 2;
 	effect_set eset;
 	filter_effect(EFFECT_DECREASE_TRIBUTE, &eset);
-	if(eset.count) {
-		int32 dec = eset.get_last()->get_value(this);
+	for(int32 i = 0; i < eset.count; ++i) {
+		if((eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) && (eset[i]->reset_count & 0xf00) == 0)
+			continue;
+		int32 dec = eset[i]->get_value(this);
 		min -= dec & 0xffff;
 		max -= dec >> 16;
 	}
