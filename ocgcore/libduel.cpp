@@ -1386,8 +1386,9 @@ int32 scriptlib::duel_get_first_target(lua_State *L) {
 	else return 0;
 	if(!ch->target_cards || ch->target_cards->container.size() == 0)
 		return 0;
-	interpreter::card2value(L, *ch->target_cards->container.begin());
-	return 1;
+	for(auto iter = ch->target_cards->container.begin(); iter != ch->target_cards->container.end(); ++iter)
+		interpreter::card2value(L, *iter);
+	return ch->target_cards->container.size();
 }
 int32 scriptlib::duel_get_current_phase(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
