@@ -13,8 +13,9 @@ function c52158283.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c52158283.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return Duel.GetFlagEffect(tp,52158283)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
+	Duel.RegisterFlagEffect(tp,52158283,RESET_PHASE+PHASE_END,0,1)
 end
 function c52158283.filter(c)
 	return c:IsAttackPos() and c:IsLevelAbove(3)
