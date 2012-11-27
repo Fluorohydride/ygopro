@@ -47,6 +47,21 @@ function c97403510.initial_effect(c)
 	e5:SetCondition(c97403510.atkcon)
 	e5:SetOperation(c97403510.atkop)
 	c:RegisterEffect(e5)
+	if not c97403510.global_check then
+		c97403510.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SSET)
+		ge1:SetOperation(c97403510.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end
+end
+function c97403510.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	while tc do
+		tc:RegisterFlagEffect(97403510,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		tc=eg:GetNext()
+	end
 end
 function c97403510.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
@@ -56,7 +71,7 @@ function c97403510.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c97403510.filter(c,turn)
-	return c:GetTurnID()==turn and c:IsAbleToRemove()
+	return (c:IsLocation(LOCATION_MZONE) or c:GetFlagEffect(97403510)~=0) and c:GetTurnID()==turn and c:IsAbleToRemove()
 end
 function c97403510.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c97403510.filter,tp,0,LOCATION_ONFIELD,1,nil,Duel.GetTurnCount()) end
