@@ -201,7 +201,7 @@ public:
 	int32 is_special_summonable(uint8 playerid);
 	int32 is_can_be_special_summoned(effect* reason_effect, uint32 sumtype, uint8 sumpos, uint8 sumplayer, uint8 toplayer, uint8 nocheck, uint8 nolimit);
 	int32 is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect);
-	int32 is_setable_szone(uint8 playerid);
+	int32 is_setable_szone(uint8 playerid, uint8 ignore_fd = 0);
 	int32 is_affect_by_effect(effect* peffect);
 	int32 is_destructable();
 	int32 is_destructable_by_battle(card* pcard);

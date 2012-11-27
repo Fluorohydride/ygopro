@@ -1034,7 +1034,10 @@ int32 scriptlib::card_is_ssetable(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 p = pcard->pduel->game_field->core.reason_player;
-	lua_pushboolean(L, pcard->is_setable_szone(p));
+	uint32 ign = FALSE;
+	if(lua_gettop(L) >= 2)
+		ign = lua_toboolean(L, 2);
+	lua_pushboolean(L, pcard->is_setable_szone(p, ign));
 	return 1;
 }
 int32 scriptlib::card_is_special_summonable(lua_State *L) {

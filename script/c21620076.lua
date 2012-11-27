@@ -20,7 +20,8 @@ function c21620076.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c21620076.lvfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and c:GetLevel()~=2
+	local lv=c:GetLevel()
+	return c:IsFaceup() and c:IsRace(RACE_ZOMBIE) and lv>0 and lv~=2
 end
 function c21620076.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c21620076.lvfilter(chkc) end
