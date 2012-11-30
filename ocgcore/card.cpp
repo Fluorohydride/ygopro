@@ -1500,6 +1500,7 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 }
 int32 card::get_summon_tribute_count() {
 	int32 min = 0, max = 0;
+	int32 minul = 0, maxul = 0;
 	int32 level = get_level();
 	if(level < 5)
 		return 0;
@@ -1510,12 +1511,19 @@ int32 card::get_summon_tribute_count() {
 	effect_set eset;
 	filter_effect(EFFECT_DECREASE_TRIBUTE, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
-		if((eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) && (eset[i]->reset_count & 0xf00) == 0)
-			continue;
 		int32 dec = eset[i]->get_value(this);
-		min -= dec & 0xffff;
-		max -= dec >> 16;
+		if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
+			if(minul < (dec & 0xffff))
+				minul = dec & 0xffff;
+			if(maxul < (dec >> 16))
+				maxul = dec >> 16;
+		} else if((eset[i]->reset_count & 0xf00) > 0) {
+			min -= dec & 0xffff;
+			max -= dec >> 16;
+		}
 	}
+	min -= minul;
+	max -= maxul;
 	if(min < 0) min = 0;
 	if(max < min) max = min;
 	return min + (max << 16);

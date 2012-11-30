@@ -25,8 +25,8 @@ function c39537362.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and tp~=Duel.GetTurnPlayer()
 		and Duel.SelectYesNo(tp,aux.Stringid(39537362,1)) then 
 		e:SetLabel(1)
+		Duel.SetTargetCard(Duel.GetAttacker())
 	else e:SetLabel(0) end
-	Duel.SetTargetCard(Duel.GetAttacker())
 end
 function c39537362.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()

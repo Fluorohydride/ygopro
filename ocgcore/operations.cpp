@@ -1197,12 +1197,15 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		if(min > 0) {
 			effect_set eset;
 			target->filter_effect(EFFECT_DECREASE_TRIBUTE, &eset);
+			int32 minul = 0;
 			for(int32 i = 0; i < eset.count; ++i) {
 				if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
 					int32 dec = eset[i]->get_value(target);
-					min -= dec & 0xffff;
+					if(minul < (dec & 0xffff))
+						minul = dec & 0xffff;
 				}
 			}
+			min -= minul;
 			for(int32 i = 0; i < eset.count && min > 0; ++i) {
 				if((eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) && (eset[i]->reset_count & 0xf00) > 0 && eset[i]->target) {
 					int32 dec = eset[i]->get_value(target);

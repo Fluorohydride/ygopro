@@ -5,6 +5,7 @@ function c96704018.initial_effect(c)
 	e1:SetDescription(aux.Stringid(96704018,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetTarget(c96704018.target)
 	e1:SetOperation(c96704018.operation)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
@@ -17,6 +18,9 @@ function c96704018.initial_effect(c)
 end
 function c96704018.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(5)
+end
+function c96704018.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c96704018.filter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function c96704018.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c96704018.filter,tp,LOCATION_MZONE,0,nil)

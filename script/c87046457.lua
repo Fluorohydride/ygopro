@@ -54,11 +54,11 @@ function c87046457.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(c,REASON_EFFECT)
 	end
 end
-function c87046457.filter(c,e)
-	return c:IsFaceup() and c:IsRace(RACE_PLANT) and c:IsPreviousLocation(LOCATION_GRAVE) and (not e or c:IsRelateToEffect(e))
+function c87046457.filter(c,e,tp)
+	return c:IsFaceup() and c:IsRace(RACE_PLANT) and c:IsControler(tp) and c:IsPreviousLocation(LOCATION_GRAVE) and (not e or c:IsRelateToEffect(e))
 end
 function c87046457.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c87046457.filter,1,nil) end
+	if chk==0 then return eg:IsExists(c87046457.filter,1,nil,nil,tp) end
 	Duel.SetTargetCard(eg)
 end
 function c87046457.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -69,7 +69,7 @@ function c87046457.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterFlagEffect(87046457,RESET_EVENT+0x1ff0000,0,1)
 		atkg:Clear()
 	end
-	local g=eg:Filter(c87046457.filter,nil,e)
+	local g=eg:Filter(c87046457.filter,nil,e,tp)
 	local tc=g:GetFirst()
 	while tc do
 		tc:RegisterFlagEffect(87046457,RESET_EVENT+0x1fe0000,0,1)

@@ -32,7 +32,7 @@ function c83438826.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(83438826,1))
 	e5:SetCategory(CATEGORY_EQUIP)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CHAIN_UNIQUE)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_TO_GRAVE)
 	e5:SetCondition(c83438826.eqcon)
@@ -43,6 +43,7 @@ function c83438826.initial_effect(c)
 end
 function c83438826.eqlimit(e,c)
 	return c:IsRace(RACE_WARRIOR)
+		and not Duel.IsExistingMatchingCard(c83438826.cfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,e:GetHandler())
 end
 function c83438826.cfilter(c)
 	return c:IsFaceup() and c:IsCode(83438826)
@@ -113,7 +114,8 @@ function c83438826.eqfilter2(c)
 end
 function c83438826.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c83438826.eqfilter2(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c83438826.eqfilter2,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and Duel.IsExistingTarget(c83438826.eqfilter2,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c83438826.eqfilter2,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
