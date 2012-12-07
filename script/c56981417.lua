@@ -17,7 +17,7 @@ function c56981417.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c56981417.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c56981417.cffilter(c)
-	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and not c:IsPublic()
+	return c:IsSetCard(0x106e) and not c:IsPublic()
 end
 function c56981417.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,56981417)==0
