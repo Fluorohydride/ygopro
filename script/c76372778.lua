@@ -2,6 +2,7 @@
 function c76372778.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	c:EnableReviveLimit()
 	--to deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76372778,0))
