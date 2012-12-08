@@ -1287,6 +1287,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		auto pr = effects.trigger_f_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1298,6 +1300,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.trigger_o_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1328,6 +1332,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1417,6 +1423,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		auto pr = effects.trigger_f_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1428,6 +1436,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.trigger_o_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1446,6 +1456,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1458,6 +1470,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -2128,10 +2142,10 @@ int32 field::process_instant_event() {
 		pr = effects.quick_f_effect.equal_range(elit->event_code);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			if(peffect->is_activateable(peffect->handler->current.controler, *elit)) {
 				peffect->handler->create_relation(peffect);
-				peffect->s_range = peffect->handler->current.location;
-				peffect->o_range = peffect->handler->current.sequence;
 				newchain.flag = 0;
 				newchain.chain_id = infos.field_id++;
 				newchain.evt = *elit;

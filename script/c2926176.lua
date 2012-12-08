@@ -11,7 +11,7 @@ function c2926176.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c2926176.cfilter(c)
-	return c:IsOnField() and (c:IsType(TYPE_SPELL) or c:IsType(TYPE_TRAP))
+	return c:IsOnField() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c2926176.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) or not Duel.IsChainNegatable(ev) then return false end

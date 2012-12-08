@@ -49,5 +49,5 @@ end
 function c15894048.facon(e)
 	local tp=e:GetHandlerPlayer()
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0
-		and (c15894048[tp]~=2 or e:GetHandler():GetFlagEffect(15894048)~=0)
+		and c15894048[tp]==e:GetHandler():GetFlagEffect(15894048)
 end
