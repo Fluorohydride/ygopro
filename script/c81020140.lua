@@ -23,6 +23,8 @@ function c81020140.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(81020140,1))
 	local g=Duel.SelectMatchingCard(tp,c81020140.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
+		Duel.ShuffleDeck(tp)
 		Duel.MoveSequence(g:GetFirst(),0)
+		Duel.ConfirmDecktop(tp,1)
 	end
 end
