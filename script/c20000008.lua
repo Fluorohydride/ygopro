@@ -55,7 +55,7 @@ function c20000008.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c20000008.filter(c)
-	return c:IsSetCard(0x7c) and c:IsType(TYPE_TRAP) and c:IsSSetable(true)
+	return c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable(true)
 end
 function c20000008.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>-1
