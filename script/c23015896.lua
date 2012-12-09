@@ -40,7 +40,7 @@ end
 function c23015896.spreg(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if bit.band(r,0x41)==0x41 then
-		c:RegisterFlagEffect(23015896,RESET_EVENT+0x1fe0000,0,1)
+		c:RegisterFlagEffect(23015896,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,1)
 	end
 end
 function c23015896.spcon(e,tp,eg,ep,ev,re,r,rp)

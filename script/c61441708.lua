@@ -30,7 +30,7 @@ end
 function c61441708.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if bit.band(r,0x41)~=0x41 or c:IsPreviousLocation(LOCATION_SZONE) then return end
-	c:RegisterFlagEffect(61441708,RESET_EVENT+0x1fe0000,0,1)
+	c:RegisterFlagEffect(61441708,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
 end
 function c61441708.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

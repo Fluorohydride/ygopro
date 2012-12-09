@@ -57,7 +57,7 @@ end
 function c62953041.spreg(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if bit.band(r,0x41)==0x41 and c:IsPreviousPosition(POS_FACEUP) then
-		c:RegisterFlagEffect(62953041,RESET_EVENT+0x1fe0000,0,1)
+		c:RegisterFlagEffect(62953041,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
 	end
 end
 function c62953041.spcon(e,tp,eg,ep,ev,re,r,rp)
