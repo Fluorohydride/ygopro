@@ -1527,7 +1527,7 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 	if(is_player_affected_by_effect(playerid, EFFECT_CANNOT_DISCARD_DECK))
 		return FALSE;
 	if((count == 1) && core.deck_reversed)
-		return (*player[playerid].list_grave.rbegin())->is_capable_cost_to_grave(playerid);
+		return (*player[playerid].list_main.rbegin())->is_capable_cost_to_grave(playerid);
 	effect_set eset;
 	filter_field_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {

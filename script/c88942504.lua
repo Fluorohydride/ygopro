@@ -2,6 +2,7 @@
 function c88942504.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(88942504,0))

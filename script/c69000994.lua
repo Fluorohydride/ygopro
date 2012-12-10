@@ -27,6 +27,7 @@ function c69000994.initial_effect(c)
 	e3:SetCondition(c69000994.thcon)
 	e3:SetTarget(c69000994.thtg)
 	e3:SetOperation(c69000994.thop)
+	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 end
 function c69000994.cfilter(c,tp)
@@ -50,22 +51,25 @@ function c69000994.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c69000994.threg(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if bit.band(r,0x41)==0x41 then
-		c:RegisterFlagEffect(69000994,RESET_EVENT+0x1fe0000,0,1)
+	if bit.band(r,0x41)~=0x41 then return end
+	if Duel.GetCurrentPhase()==PHASE_STANDBY then
+		e:SetLabel(Duel.GetTurnCount())
+		c:RegisterFlagEffect(69000994,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,2)
+	else
+		e:SetLabel(0)
+		c:RegisterFlagEffect(69000994,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,1)
 	end
 end
 function c69000994.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetTurnID()~=Duel.GetTurnCount() and c:GetFlagEffect(69000994)>0
+	return e:GetLabelObject():GetLabel()~=Duel.GetTurnCount() and e:GetHandler():GetFlagEffect(69000994)>0
 end
-function c69000994.thfilter(c,e,tp)
+function c69000994.thfilter(c)
 	return c:IsSetCard(0x81) and c:GetCode()~=69000994 and c:IsAbleToHand()
 end
 function c69000994.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local c=e:GetHandler()
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,c,1,0,0)
-	c:ResetFlagEffect(69000994)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	e:GetHandler():ResetFlagEffect(69000994)
 end
 function c69000994.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

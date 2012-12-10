@@ -74,7 +74,7 @@ function c3429238.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
 		if c:IsRelateToEffect(e) and Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)~=0 then
-			e:GetHandler():RegisterFlagEffect(3429238,RESET_EVENT+0x1fe0000,0,1)
+			e:GetHandler():RegisterFlagEffect(3429238,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
 		end
 	end
 end
