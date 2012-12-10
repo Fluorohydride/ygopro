@@ -172,7 +172,7 @@ end
 function c33900648.hdop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	if bit.band(c33900648[Duel.GetTurnPlayer()],ATTRIBUTE_WATER)==0 then return end
-	Duel.DiscardHand(Duel.GetTurnPlayer(),nil,1,1,REASON_EFFECT)
+	Duel.DiscardHand(Duel.GetTurnPlayer(),nil,1,1,REASON_EFFECT+REASON_DISCARD)
 end
 function c33900648.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(c33900648[Duel.GetTurnPlayer()],ATTRIBUTE_FIRE)~=0

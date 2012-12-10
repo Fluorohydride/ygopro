@@ -3155,6 +3155,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 	case 0: {
 		card_set::iterator cit;
 		card_set equipings;
+		card_set flips;
 		card_set pos_changed;
 		uint8 npos, opos, noflip;
 		card_vector cv;
@@ -3193,6 +3194,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					pcard->fieldid = infos.field_id++;
 					if(pcard->current.location == LOCATION_MZONE) {
 						raise_single_event(pcard, 0, EVENT_FLIP, reason_effect, 0, reason_player, 0, noflip);
+						flips.insert(pcard);
 					}
 					if(enable)
 						pcard->enable_field_effect(TRUE);
@@ -3229,6 +3231,8 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 		}
 		adjust_instant();
 		process_single_event();
+		if(flips.size())
+			raise_event(&flips, EVENT_FLIP, reason_effect, 0, reason_player, 0, 0);
 		if(pos_changed.size())
 			raise_event(&pos_changed, EVENT_CHANGE_POS, reason_effect, 0, reason_player, 0, 0);
 		process_instant_event();

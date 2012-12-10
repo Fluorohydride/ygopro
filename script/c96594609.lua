@@ -46,7 +46,7 @@ end
 function c96594609.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_DESTROY)
 end
-function c96594609.tgfilter(c,e,tp)
+function c96594609.tgfilter(c)
 	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToGrave()
 end
 function c96594609.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)

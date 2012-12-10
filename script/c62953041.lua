@@ -23,6 +23,7 @@ function c62953041.initial_effect(c)
 	e2:SetCondition(c62953041.spcon)
 	e2:SetTarget(c62953041.sptg)
 	e2:SetOperation(c62953041.spop)
+	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--only 1 can exists
 	local e3=Effect.CreateEffect(c)
@@ -56,13 +57,18 @@ function c62953041.hspcon(e,c)
 end
 function c62953041.spreg(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if bit.band(r,0x41)==0x41 and c:IsPreviousPosition(POS_FACEUP) then
-		c:RegisterFlagEffect(62953041,RESET_EVENT+0x1fe0000,0,1)
+	if bit.band(r,0x41)~=0x41 or not c:IsPreviousPosition(POS_FACEUP) then return end
+	if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then
+		e:SetLabel(Duel.GetTurnCount())
+		c:RegisterFlagEffect(61441708,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,2)
+	else
+		e:SetLabel(0)
+		c:RegisterFlagEffect(61441708,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
 	end
 end
 function c62953041.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:GetTurnID()~=Duel.GetTurnCount() and tp==Duel.GetTurnPlayer() and c:GetFlagEffect(62953041)>0
+	return e:GetLabelObject():GetLabel()~=Duel.GetTurnCount() and tp==Duel.GetTurnPlayer() and c:GetFlagEffect(62953041)>0
 end
 function c62953041.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
