@@ -30,20 +30,25 @@ function c42874792.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetRange(LOCATION_REMOVED)
 		e1:SetCountLimit(1)
-		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then
-			e1:SetLabel(Duel.GetTurnCount())
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
+		if Duel.GetTurnPlayer()==tp then
+			if Duel.GetCurrentPhase()==PHASE_DRAW then
+				e1:SetLabel(Duel.GetTurnCount())
+			else
+				e1:SetLabel(Duel.GetTurnCount()+2)
+			end
 		else
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
+			e1:SetLabel(Duel.GetTurnCount()+1)
 		end
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCondition(c42874792.retcon)
 		e1:SetOperation(c42874792.retop)
 		tc:RegisterEffect(e1)
 	end
 end
 function c42874792.retcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel()
+	return Duel.GetTurnCount()==e:GetLabel()
 end
 function c42874792.retop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ReturnToField(e:GetHandler())
+	e:Reset()
 end

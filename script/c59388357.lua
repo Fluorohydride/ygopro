@@ -37,7 +37,7 @@ end
 function c59388357.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc1,tc2=Duel.GetFirstTarget()
 	if tc1~=e:GetLabelObject() then tc1,tc2=tc2,tc1 end
-	if tc1:IsRelateToEffect(e) and Duel.Destroy(tc1,REASON_EFFECT)>0 and tc2:IsRelateToEffect(e) then
+	if tc1:IsControler(tp) and tc1:IsRelateToEffect(e) and Duel.Destroy(tc1,REASON_EFFECT)>0 and tc2:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc2,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

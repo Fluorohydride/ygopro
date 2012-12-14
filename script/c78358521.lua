@@ -57,9 +57,9 @@ function c78358521.thop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
-		if c:IsRelateToEffect(e) and c:IsFaceup() then
-			c:RegisterFlagEffect(78358521,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-		end
+	end
+	if c:IsRelateToEffect(e) and c:IsFaceup() then
+		c:RegisterFlagEffect(78358521,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function c78358521.sumcon(e,tp,eg,ep,ev,re,r,rp)
@@ -81,17 +81,30 @@ function c78358521.sumop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c78358521.decop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsReason(REASON_RETURN) or Duel.GetFlagEffect(tp,78358522)~=0 then return end
-	local e1=Effect.CreateEffect(e:GetHandler())
+	local c=e:GetHandler()
+	if c:IsReason(REASON_RETURN) or Duel.GetFlagEffect(tp,78358522)~=0 then return end
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DECREASE_TRIBUTE)
 	e1:SetTargetRange(LOCATION_HAND,LOCATION_HAND)
 	e1:SetTarget(c78358521.rfilter)
+	e1:SetCondition(c78358521.econ)
 	e1:SetCountLimit(1)
 	e1:SetValue(0x1)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(0x10000000+78358523)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetRange(LOCATION_GRAVE)
+	e2:SetTargetRange(1,0)
+	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e2)
 	Duel.RegisterFlagEffect(tp,78358522,RESET_PHASE+PHASE_END,0,1)
+end
+function c78358521.econ(e)
+	return Duel.GetFlagEffect(tp,78358523)~=0
 end
 function c78358521.rfilter(e,c)
 	return c:IsSetCard(0x53)
