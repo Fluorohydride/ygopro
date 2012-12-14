@@ -65,10 +65,11 @@ function c41181774.sdcon(e)
 		or Duel.IsExistingMatchingCard(c41181774.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c:GetFieldID())
 end
 function c41181774.hdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsAbleToDeck() end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc:IsAbleToDeck() end
 	if chk==0 then return true end
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
 	if ct==0 then return end
+	if ct>3 then ct=3 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,0,1,ct,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
@@ -76,8 +77,9 @@ end
 function c41181774.hdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if not g then return end
-	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
-	local ct=g:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
+	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
+	Duel.SendtoDeck(sg,nil,2,REASON_EFFECT)
+	local ct=sg:FilterCount(Card.IsLocation,nil,LOCATION_DECK+LOCATION_EXTRA)
 	if ct==0 then return end
 	local dg=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,ct)
 	local dt=Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
@@ -89,7 +91,7 @@ function c41181774.hdop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(dt*1000)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetReset(RESET_EVENT+0x1ff0000)
 		c:RegisterEffect(e1)
 	end
 end
