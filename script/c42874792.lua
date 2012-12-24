@@ -2,6 +2,7 @@
 function c42874792.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(42874792,0))
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET+EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_QUICK_O)

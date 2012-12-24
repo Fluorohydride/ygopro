@@ -45,8 +45,8 @@ end
 function c71983925.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c71983925.filter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c71983925.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c71983925.filter,tp,LOCATION_MZONE,0,1,nil)
+function c71983925.descon(e)
+	return not Duel.IsExistingMatchingCard(c71983925.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function c71983925.distg(e,c)
 	return c:IsType(TYPE_SPELL)
