@@ -2677,7 +2677,7 @@ int32 field::process_battle_command(uint16 step) {
 			if(core.select_cards.size() == 1)
 				returns.bvalue[1] = 0;
 			else
-				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
+				add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			core.units.begin()->step = 5;
 			return FALSE;
 		}
@@ -2689,7 +2689,7 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			for(int32 i = 0; i < 5; ++i) {
 				if(player[1 - infos.turn_player].list_mzone[i]) {
-					add_process(MSG_SELECT_YESNO, 0, 0, 0, infos.turn_player, 31);
+					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, infos.turn_player, 31);
 					return FALSE;
 				}
 			}
@@ -2701,11 +2701,19 @@ int32 field::process_battle_command(uint16 step) {
 			if(core.select_cards.size() == 1)
 				returns.bvalue[1] = 0;
 			else
-				add_process(MSG_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
+				add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, 1 - infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			core.units.begin()->step = 5;
 			return FALSE;
 		}
-		add_process(MSG_SELECT_CARD, 0, 0, 0, infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
+		if(core.select_cards.size() == 0) {
+			if(!core.attack_cancelable) {
+				core.attacker->announce_count++;
+				core.attacker->announced_cards[0] = 0;
+			}
+			core.units.begin()->step = -1;
+			return FALSE;
+		}
+		add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 		core.units.begin()->step = 5;
 		return FALSE;
 	}
@@ -2715,7 +2723,7 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		} else {
 			if(core.select_cards.size())
-				add_process(MSG_SELECT_CARD, 0, 0, 0, infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
+				add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, infos.turn_player + (core.attack_cancelable ? 0x20000 : 0), 0x10001);
 			else
 				core.units.begin()->step = -1;
 		}
