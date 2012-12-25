@@ -83,7 +83,7 @@ function c31111109.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c31111109.filter(c)
-	return (c:IsSetCard(0x9) or c:IsSetCard(0x1f) or c:IsSetCard(0x8))
+	return (c:IsSetCard(0x9) or c:IsSetCard(0x1f) or c:IsSetCard(0x8)) and c:IsType(TYPE_MONSTER)
 		and not c:IsHasEffect(EFFECT_FORBIDDEN) and c:IsAbleToRemove()
 end
 function c31111109.copytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
