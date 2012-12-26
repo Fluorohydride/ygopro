@@ -13,8 +13,8 @@ function c56286179.initial_effect(c)
 	e2:SetDescription(aux.Stringid(56286179,0))
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_DAMAGE)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c56286179.drcon)
@@ -26,13 +26,13 @@ function c56286179.ptg(e,c)
 	return c:IsRace(RACE_WARRIOR)
 end
 function c56286179.drcon(e,tp,eg,ep,ev,re,r,rp)
-	if r~=REASON_BATTLE or ep==tp then return false end
+	if ep==tp then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	return d and d:IsDefencePos() and a:GetControler()==tp and a:IsRace(RACE_WARRIOR)
+	return d and d:IsDefencePos() and a:IsControler(tp) and a:IsRace(RACE_WARRIOR)
 end
 function c56286179.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

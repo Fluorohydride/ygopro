@@ -42,25 +42,15 @@ function c27770341.addcount(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c27770341.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(7)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(0xff)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
-	e1:SetTarget(c27770341.drtarget)
 	e1:SetOperation(c27770341.droperation)
-	c:RegisterEffect(e1)
-end
-function c27770341.drtarget(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(c27770341[tp])
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,c27770341[tp])
+	Duel.RegisterEffect(e1,tp)
 end
 function c27770341.droperation(e,tp,eg,ep,ev,re,r,rp)
-	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	Duel.Draw(p,c27770341[tp],REASON_EFFECT)
+	Duel.Hint(HINT_CARD,0,27770341)
+	Duel.Draw(tp,c27770341[tp],REASON_EFFECT)
 end
