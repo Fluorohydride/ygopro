@@ -32,6 +32,7 @@ function c97489701.initial_effect(c)
 	e4:SetDescription(aux.Stringid(97489701,0))
 	e4:SetCategory(CATEGORY_REMOVE)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCondition(c97489701.nacon)
@@ -136,7 +137,8 @@ end
 function c97489701.nacon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():GetControler()~=tp
 end
-function c97489701.natg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c97489701.natg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc==Duel.GetAttacker() end
 	if chk==0 then return e:GetHandler():IsAbleToRemove() and Duel.GetAttacker():IsCanBeEffectTarget(e)
 		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	Duel.SetTargetCard(Duel.GetAttacker())
