@@ -38,7 +38,7 @@ function c35762283.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c35762283.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

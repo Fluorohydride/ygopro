@@ -25,7 +25,7 @@ function c97396380.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c97396380.filter,tp,0,LOCATION_MZONE,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-		Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,0,1-tp,500)
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
 	end
 end
 function c97396380.operation(e,tp,eg,ep,ev,re,r,rp)

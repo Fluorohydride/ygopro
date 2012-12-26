@@ -16,8 +16,9 @@ function c4179255.initial_effect(c)
 	e1:SetTarget(c4179255.drtg)
 	e1:SetOperation(c4179255.drop)
 	c:RegisterEffect(e1)
-	--equip change
+	--destroy
 	local e2=Effect.CreateEffect(c)
+	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetDescription(aux.Stringid(4179255,1))
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -67,7 +68,7 @@ end
 function c4179255.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsPosition(POS_FACEUP_ATTACK) and c4179255.check then
+	if tc:IsRelateToEffect(e) and tc:IsPosition(POS_FACEUP_ATTACK) and c4179255.check() then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
