@@ -44,7 +44,9 @@ function c98012938.hfilter(c,e)
 end
 function c98012938.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c98012938.hfilter,nil,e)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	if not g then return end
+	g=g:Filter(c98012938.hfilter,nil,e)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		local tc=g:GetFirst()
