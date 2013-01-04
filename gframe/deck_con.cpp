@@ -34,9 +34,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_SAVE_DECK: {
-				deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()));
-				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
-				mainGame->PopupElement(mainGame->wACMessage, 20);
+				if(deckManager.SaveDeck(deckManager.current_deck, mainGame->cbDBDecks->getItem(mainGame->cbDBDecks->getSelected()))) {
+					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
+					mainGame->PopupElement(mainGame->wACMessage, 20);
+				}
 				break;
 			}
 			case BUTTON_SAVE_DECK_AS: {
@@ -56,9 +57,10 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 					mainGame->cbDBDecks->addItem(dname);
 					mainGame->cbDBDecks->setSelected(mainGame->cbDBDecks->getItemCount() - 1);
 				}
-				deckManager.SaveDeck(deckManager.current_deck, dname);
-				mainGame->stACMessage->setText(dataManager.GetSysString(1335));
-				mainGame->PopupElement(mainGame->wACMessage, 20);
+				if(deckManager.SaveDeck(deckManager.current_deck, dname)) {
+					mainGame->stACMessage->setText(dataManager.GetSysString(1335));
+					mainGame->PopupElement(mainGame->wACMessage, 20);
+				}
 				break;
 			}
 			case BUTTON_DBEXIT: {

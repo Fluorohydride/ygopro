@@ -1032,7 +1032,7 @@ void card::release_relation(card* target) {
 	relations.erase(target);
 }
 void card::release_relation(effect* peffect) {
-	if (relate_effect.find(peffect) != relate_effect.end())
+	if (relate_effect.find(peffect) == relate_effect.end())
 		return;
 	relate_effect.erase(peffect);
 }
