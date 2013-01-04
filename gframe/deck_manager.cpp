@@ -206,7 +206,7 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 	LoadDeck(current_deck, cardlist, mainc, sidec);
 	return true;
 }
-void DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
+bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	wchar_t file[64];
 	myswprintf(file, L"./deck/%ls.ydk", name);
 #ifdef WIN32
@@ -217,7 +217,7 @@ void DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	FILE* fp = fopen(filefn, "w");
 #endif
 	if(!fp)
-		return;
+		return false;
 	fprintf(fp, "#created by ...\n#main\n");
 	for(int i = 0; i < deck.main.size(); ++i)
 		fprintf(fp, "%d\n", deck.main[i]->first);
@@ -228,5 +228,6 @@ void DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	for(int i = 0; i < deck.side.size(); ++i)
 		fprintf(fp, "%d\n", deck.side[i]->first);
 	fclose(fp);
+	return true;
 }
 }

@@ -49,10 +49,13 @@ function c102380.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c102380.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
+	Duel.SetTargetPlayer(tp)
+	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,tp,1000)
 end
 function c102380.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(e:GetHandler():GetControler(),1000,REASON_EFFECT)
+	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
+	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c102380.spcost(e,c,tp)
 	return not Duel.CheckNormalSummonActivity(tp)

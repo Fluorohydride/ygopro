@@ -735,12 +735,14 @@ void Game::LoadConfig() {
 			BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
-			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &gameConf.textfontsize);
+			int textfontsize;
+			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
+			gameConf.textfontsize = textfontsize;
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
-		} else if(!strcmp(strbuf, "servport")) {
+		} else if(!strcmp(strbuf, "serverport")) {
 			gameConf.serverport = atoi(valbuf);
 		} else if(!strcmp(strbuf, "lastip")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
@@ -783,7 +785,8 @@ void Game::SaveConfig() {
 void Game::ShowCardInfo(int code) {
 	CardData cd;
 	wchar_t formatBuffer[256];
-	dataManager.GetData(code, &cd);
+	if(!dataManager.GetData(code, &cd))
+		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code));
 	imgCard->setScaleImage(true);
 	if(cd.alias != 0 && (cd.alias - code < 10 || code - cd.alias < 10))

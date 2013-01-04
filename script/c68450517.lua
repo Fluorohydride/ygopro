@@ -23,7 +23,7 @@ function c68450517.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RegisterEffect(e1)
 end
 function c68450517.filter(c,att)
-	return c:IsFaceup() and c:IsAttribute(att) and c:IsDestructable()
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAttribute(att) and c:IsDestructable()
 end
 function c68450517.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp)
@@ -34,8 +34,9 @@ function c68450517.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c68450517.desop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttribute(e:GetHandler():GetAttribute()) then
+	if c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and c68450517.filter(tc,c:GetAttribute()) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

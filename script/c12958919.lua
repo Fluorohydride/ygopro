@@ -22,9 +22,35 @@ function c12958919.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c12958919.damcon)
+	e2:SetCost(c12958919.damcost)
 	e2:SetTarget(c12958919.damtg)
 	e2:SetOperation(c12958919.damop)
 	c:RegisterEffect(e2)
+	if not c12958919.global_check then
+		c12958919.global_check=true
+		c12958919[0]=true
+		c12958919[1]=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
+		ge1:SetOperation(c12958919.checkop)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+		ge2:SetOperation(c12958919.clear)
+		Duel.RegisterEffect(ge2,0)
+	end
+end
+function c12958919.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	if tc:IsSetCard(0x49) then
+		c12958919[tc:GetControler()]=false
+	end
+end
+function c12958919.clear(e,tp,eg,ep,ev,re,r,rp)
+	c12958919[0]=true
+	c12958919[1]=true
 end
 function c12958919.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -50,6 +76,17 @@ end
 function c12958919.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
 end
+function c12958919.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return c12958919[tp] end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e1:SetProperty(EFFECT_FLAG_OATH)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x49))
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetReset(RESET_PHASE+RESET_END)
+	Duel.RegisterEffect(e1,tp)
+end
 function c12958919.damfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x49)
 end
@@ -57,14 +94,7 @@ function c12958919.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local ct=Duel.GetMatchingGroupCount(c12958919.damfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.SetTargetPlayer(1-tp)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,ct*300)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_ATTACK)
-	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x49))
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*300)
 end
 function c12958919.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
