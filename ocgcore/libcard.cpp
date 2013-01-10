@@ -912,7 +912,7 @@ int32 scriptlib::card_release_effect_relation(lua_State *L) {
 	check_param(L, PARAM_TYPE_EFFECT, 2);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 2);
-	pcard->relate_effect.erase(peffect);
+	pcard->release_relation(peffect);
 	return 0;
 }
 int32 scriptlib::card_clear_effect_relation(lua_State *L) {
