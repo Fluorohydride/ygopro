@@ -2855,10 +2855,10 @@ int32 scriptlib::duel_check_chain_uniqueness(lua_State *L) {
 		lua_pushboolean(L, 1);
 		return 1;
 	}
-	card::effect_relation er;
+	std::set<uint32> er;
 	field::chain_array::iterator cait;
 	for(cait = pduel->game_field->core.current_chain.begin(); cait != pduel->game_field->core.current_chain.end(); ++cait)
-		er.insert((effect*)(size_t)(cait->triggering_effect->handler->get_code()));
+		er.insert(cait->triggering_effect->handler->get_code());
 	if(er.size() == pduel->game_field->core.current_chain.size())
 		lua_pushboolean(L, 1);
 	else

@@ -73,7 +73,7 @@ public:
 	typedef std::multimap<uint32, effect*> effect_container;
 	typedef std::set<card*, card_sort> card_set;
 	typedef std::map<effect*, effect_container::iterator> effect_indexer;
-	typedef std::set<effect*> effect_relation;
+	typedef std::map<effect*, uint32> effect_relation;
 	typedef std::map<card*, uint32> relation_map;
 	typedef std::map<uint16, uint16> counter_map;
 	typedef std::map<uint16, card*> attacker_map;
