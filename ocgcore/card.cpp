@@ -1012,9 +1012,11 @@ void card::create_relation(card* target, uint32 reset) {
 	relations[target] = reset;
 }
 void card::create_relation(effect* peffect) {
-	if (relate_effect.find(peffect) != relate_effect.end())
-		return;
-	relate_effect.insert(peffect);
+	auto it = relate_effect.find(peffect);
+	if (it != relate_effect.end())
+		++it->second;
+	else
+		relate_effect[peffect] = 1;
 }
 int32 card::is_has_relation(card* target) {
 	if (relations.find(target) != relations.end())
@@ -1032,9 +1034,9 @@ void card::release_relation(card* target) {
 	relations.erase(target);
 }
 void card::release_relation(effect* peffect) {
-	if (relate_effect.find(peffect) == relate_effect.end())
-		return;
-	relate_effect.erase(peffect);
+	auto it = relate_effect.find(peffect);
+	if (it != relate_effect.end() && --it->second == 0)
+		relate_effect.erase(it);
 }
 int32 card::leave_field_redirect(uint32 reason) {
 	effect_set es;
