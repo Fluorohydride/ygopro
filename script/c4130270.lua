@@ -8,4 +8,11 @@ function c4130270.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_CANNOT_TO_HAND)
+	e2:SetTarget(c4130270.etarget)
+	c:RegisterEffect(e2)
+end
+function c4130270.etarget(e,c)
+	return c:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)
 end

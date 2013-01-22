@@ -15,9 +15,7 @@ function c29228529.costfilter(c)
 end
 function c29228529.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c29228529.costfilter,tp,LOCATION_HAND,0,2,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c29228529.costfilter,tp,LOCATION_HAND,0,2,2,nil)
-	Duel.SendtoGrave(g,REASON_COST)
+	Duel.DiscardHand(tp,c29228529.costfilter,2,2,REASON_COST)
 end
 function c29228529.filter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToHand()
