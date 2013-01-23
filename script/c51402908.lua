@@ -18,8 +18,6 @@ function c51402908.initial_effect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetCondition(c51402908.spcon)
 	e3:SetCost(c51402908.spcost)
@@ -48,6 +46,7 @@ function c51402908.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	e:GetHandler():ResetFlagEffect(51402908)
 end
 function c51402908.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -44,7 +44,7 @@ function c9156135.addc(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c9156135.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsLocation(LOCATION_DECK)
+	return not e:GetHandler():IsLocation(LOCATION_DECK) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c9156135.spfilter(c,e,tp)
 	return c:IsLevelBelow(2) and c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)

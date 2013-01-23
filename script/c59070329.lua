@@ -10,8 +10,8 @@ function c59070329.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c59070329.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,1,1,REASON_COST) end
-	Duel.RemoveOverlayCard(tp,1,1,1,1,REASON_COST)
+	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,0,1,REASON_COST) end
+	Duel.RemoveOverlayCard(tp,1,0,1,1,REASON_COST)
 end
 function c59070329.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c59070329.filter,tp,LOCATION_MZONE,0,1,nil) end
