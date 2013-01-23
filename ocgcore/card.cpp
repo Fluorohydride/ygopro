@@ -670,20 +670,18 @@ void card::xyz_remove(card* mat) {
 		(*clit)->current.sequence = clit - xyz_materials.begin();
 }
 void card::apply_field_effect() {
-	effect_container::iterator it;
 	if (current.controler == PLAYER_NONE)
 		return;
-	for (it = field_effect.begin(); it != field_effect.end(); ++it) {
+	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
 		if (current.location & it->second->range) {
 			pduel->game_field->add_effect(it->second);
 		}
 	}
 }
 void card::cancel_field_effect() {
-	effect_container::iterator it;
 	if (current.controler == PLAYER_NONE)
 		return;
-	for (it = field_effect.begin(); it != field_effect.end(); ++it) {
+	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
 		if (current.location & it->second->range)
 			pduel->game_field->remove_effect(it->second);
 	}
