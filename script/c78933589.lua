@@ -1,10 +1,10 @@
 --原初のスープ
 function c78933589.initial_effect(c)
+	c:SetUniqueOnField(1,0,78933589)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(c78933589.condition)
 	c:RegisterEffect(e1)
 	--draw
 	local e2=Effect.CreateEffect(c)
@@ -16,12 +16,6 @@ function c78933589.initial_effect(c)
 	e2:SetTarget(c78933589.target)
 	e2:SetOperation(c78933589.activate)
 	c:RegisterEffect(e2)
-end
-function c78933589.afilter(c)
-	return c:IsFaceup() and c:GetCode()==78933589
-end
-function c78933589.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c78933589.afilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c78933589.filter(c)
 	return c:IsSetCard(0x604e) and c:IsAbleToDeck()

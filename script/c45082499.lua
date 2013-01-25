@@ -1,5 +1,6 @@
 --ZW－雷神猛虎剣
 function c45082499.initial_effect(c)
+	c:SetUniqueOnField(1,0,45082499)
 	--equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(45082499,0))
@@ -27,29 +28,9 @@ function c45082499.initial_effect(c)
 	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
 	e3:SetValue(c45082499.repval)
 	c:RegisterEffect(e3)
-	--only 1 can exists
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_CANNOT_SUMMON)
-	e4:SetCondition(c45082499.excon)
-	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	c:RegisterEffect(e5)
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e6:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e6:SetValue(c45082499.splimit)
-	c:RegisterEffect(e6)
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_SELF_DESTROY)
-	e7:SetCondition(c45082499.descon)
-	c:RegisterEffect(e7)
 end
 function c45082499.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c45082499.exfilter,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
+	return e:GetHandler():CheckUniqueOnField(tp)
 end
 function c45082499.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7f)
@@ -65,7 +46,7 @@ function c45082499.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:GetControler()~=tp or tc:IsFacedown() or not tc:IsRelateToEffect(e) then
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:GetControler()~=tp or tc:IsFacedown() or not tc:IsRelateToEffect(e) or not c:CheckUniqueOnField(tp) then
 		Duel.SendtoGrave(c,REASON_EFFECT)
 		return
 	end
@@ -93,19 +74,3 @@ end
 function c45082499.repval(e,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0
 end
-function c45082499.exfilter(c,fid)
-	return c:IsFaceup() and c:GetCode()==45082499 and (fid==nil or c:GetFieldID()<fid)
-end
-function c45082499.excon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c45082499.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
-end
-function c45082499.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
-	return not Duel.IsExistingMatchingCard(c45082499.exfilter,tgp,LOCATION_ONFIELD,0,1,nil)
-end
-function c45082499.descon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c45082499.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil,c:GetFieldID())
-end
-

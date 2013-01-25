@@ -1880,3 +1880,29 @@ int32 scriptlib::card_reverse_in_deck(lua_State *L) {
 	}
 	return 0;
 }
+int32 scriptlib::card_set_unique_onfield(lua_State *L) {
+	check_param_count(L, 4);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	pcard->unique_pos[0] = lua_tointeger(L, 2);
+	pcard->unique_pos[1] = lua_tointeger(L, 3);
+	pcard->unique_code = lua_tointeger(L, 4);
+	effect* peffect = pcard->pduel->new_effect();
+	peffect->owner = pcard;
+	peffect->type = EFFECT_TYPE_SINGLE;
+	peffect->code = EFFECT_UNIQUE_CHECK;
+	peffect->flag = EFFECT_FLAG_COPY_INHERIT;
+	pcard->add_effect(peffect);
+	pcard->unique_effect = peffect;
+	if(pcard->current.location & LOCATION_ONFIELD)
+		pcard->pduel->game_field->add_unique_card(pcard);
+	return 0;
+}
+int32 scriptlib::card_check_unique_onfield(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	uint32 check_player = lua_tointeger(L, 2);
+	lua_pushboolean(L, pcard->pduel->game_field->check_unique_onfield(pcard, check_player) ? 0 : 1);
+	return 1;
+}

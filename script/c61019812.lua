@@ -1,5 +1,6 @@
 --レッド·ダストン
 function c61019812.initial_effect(c)
+	c:SetUniqueOnField(1,0,61019812)
 	--cannot release
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -30,26 +31,6 @@ function c61019812.initial_effect(c)
 	e6:SetTarget(c61019812.dmtg)
 	e6:SetOperation(c61019812.dmop)
 	c:RegisterEffect(e6)
-	--
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_CANNOT_SUMMON)
-	e7:SetCondition(c61019812.excon)
-	c:RegisterEffect(e7)
-	local e8=e7:Clone()
-	e8:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	c:RegisterEffect(e8)
-	local e9=Effect.CreateEffect(c)
-	e9:SetType(EFFECT_TYPE_SINGLE)
-	e9:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e9:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e9:SetValue(c61019812.splimit)
-	c:RegisterEffect(e9)
-	local e10=Effect.CreateEffect(c)
-	e10:SetType(EFFECT_TYPE_SINGLE)
-	e10:SetCode(EFFECT_SELF_DESTROY)
-	e10:SetCondition(c61019812.descon)
-	c:RegisterEffect(e10)
 end
 function c61019812.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -65,19 +46,4 @@ end
 function c61019812.dmop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
-end
-function c61019812.exfilter(c,fid)
-	return c:IsFaceup() and c:GetCode()==61019812 and (fid==nil or c:GetFieldID()<fid)
-end
-function c61019812.excon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c61019812.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
-end
-function c61019812.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
-	return not Duel.IsExistingMatchingCard(c61019812.exfilter,tgp,LOCATION_ONFIELD,0,1,nil)
-end
-function c61019812.descon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c61019812.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil,c:GetFieldID())
 end

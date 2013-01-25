@@ -59,6 +59,8 @@ card::card() {
 	memset(&current, 0, sizeof(card_state));
 	memset(&previous, 0, sizeof(card_state));
 	memset(&temp, 0xff, sizeof(card_state));
+	unique_pos[0] = unique_pos[1] = 0;
+	unique_code = 0;
 	current.controler = PLAYER_NONE;
 }
 card::~card() {
@@ -677,6 +679,8 @@ void card::apply_field_effect() {
 			pduel->game_field->add_effect(it->second);
 		}
 	}
+	if(unique_code && (current.location & LOCATION_ONFIELD))
+		pduel->game_field->add_unique_card(this);
 }
 void card::cancel_field_effect() {
 	if (current.controler == PLAYER_NONE)
@@ -685,6 +689,8 @@ void card::cancel_field_effect() {
 		if (current.location & it->second->range)
 			pduel->game_field->remove_effect(it->second);
 	}
+	if(unique_code && current.location & LOCATION_ONFIELD)
+		pduel->game_field->remove_unique_card(this);
 }
 void card::enable_field_effect(int32 enabled) {
 	if (current.location == 0)
@@ -854,6 +860,11 @@ void card::remove_effect(effect* peffect, effect_container::iterator it) {
 		pduel->write_buffer32(get_info_location());
 		pduel->write_buffer8(CHINT_DESC_REMOVE);
 		pduel->write_buffer32(peffect->description);
+	}
+	if(peffect->code == EFFECT_UNIQUE_CHECK) {
+		pduel->game_field->remove_unique_card(this);
+		unique_pos[0] = unique_pos[1] = 0;
+		unique_code = 0;
 	}
 	pduel->game_field->core.reseted_effects.insert(peffect);
 }
@@ -1456,6 +1467,8 @@ int32 card::is_summonable(effect* peffect) {
 int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffect) {
 	if(!is_summonable())
 		return FALSE;
+	if(pduel->game_field->check_unique_onfield(this, playerid))
+		return FALSE;
 	if(!ignore_count && (pduel->game_field->core.extra_summon[playerid] || !is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT))
 	        && pduel->game_field->core.summon_count[playerid] >= pduel->game_field->get_summon_count_limit(playerid))
 		return FALSE;
@@ -1557,6 +1570,8 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 		return FALSE;
 	if(!(current.position & POS_FACEDOWN))
 		return FALSE;
+	if(pduel->game_field->check_unique_onfield(this, playerid))
+		return FALSE;
 	if(!pduel->game_field->is_player_can_flipsummon(playerid, this))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
@@ -1582,6 +1597,8 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 }
 int32 card::is_special_summonable(uint8 playerid) {
 	if(!(data.type & TYPE_MONSTER))
+		return FALSE;
+	if(pduel->game_field->check_unique_onfield(this, playerid))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
@@ -1617,6 +1634,8 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 		if((!nolimit && (current.location & 0x38)) || (!nocheck && (current.location & 0x3)))
 			return FALSE;
 	}
+	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))
+		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if((sumplayer == 0 || sumplayer == 1) && !pduel->game_field->is_player_can_spsummon(reason_effect, sumtype, sumpos, sumplayer, toplayer, this))
 		return FALSE;

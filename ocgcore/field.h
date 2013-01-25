@@ -16,6 +16,7 @@
 #include <list>
 #include <array>
 #include <unordered_map>
+#include <unordered_set>
 
 class card;
 struct card_data;
@@ -202,6 +203,7 @@ struct processor {
 	event_list delayed_tev;
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
+	std::unordered_set<card*> unique_cards[2];
 	ptr temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[5];
@@ -329,7 +331,10 @@ public:
 	void update_disable_check_list(effect* peffect);
 	void add_to_disable_check_list(card* pcard);
 	void adjust_disable_check_list();
-
+	void add_unique_card(card* pcard);
+	void remove_unique_card(card* pcard);
+	effect* check_unique_onfield(card* pcard, uint8 controler);
+	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();
 	void restore_lp_cost();

@@ -98,6 +98,10 @@ public:
 	uint32 fieldid_r;
 	uint16 turnid;
 	uint16 turn_counter;
+	uint8 unique_pos[2];
+	uint16 unique_uid;
+	uint32 unique_code;
+	effect* unique_effect;
 	card* equiping_target;
 	card* pre_equip_target;
 	card* overlay_target;

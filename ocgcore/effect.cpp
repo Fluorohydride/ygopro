@@ -122,6 +122,8 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
 				return FALSE;
+			if(pduel->game_field->check_unique_onfield(handler, playerid))
+				return FALSE;
 			if(handler->data.type & TYPE_MONSTER)
 				return FALSE;
 			if(!(handler->data.type & TYPE_COUNTER)) {

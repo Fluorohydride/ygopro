@@ -1305,6 +1305,35 @@ void field::adjust_disable_check_list() {
 	} while(effects.disable_check_list.size());
 }
 
+void field::add_unique_card(card* pcard) {
+	uint8 con = pcard->current.controler;
+	if(pcard->unique_pos[0])
+		core.unique_cards[con].insert(pcard);
+	if(pcard->unique_pos[1])
+		core.unique_cards[1 - con].insert(pcard);
+	pcard->unique_uid = infos.copy_id++;
+}
+
+void field::remove_unique_card(card* pcard) {
+	uint8 con = pcard->current.controler;
+	if(pcard->unique_pos[0])
+		core.unique_cards[con].erase(pcard);
+	if(pcard->unique_pos[1])
+		core.unique_cards[1 - con].erase(pcard);
+}
+
+effect* field::check_unique_onfield(card* pcard, uint8 controler) {
+	if(!pcard->unique_code)
+		return 0;
+	for(auto iter = core.unique_cards[controler].begin(); iter != core.unique_cards[controler].end(); ++iter) {
+		card* ucard = *iter;
+		if((ucard != pcard) && ucard->is_position(POS_FACEUP) && ucard->unique_code == pcard->unique_code
+			&& (!(pcard->current.location & LOCATION_ONFIELD) || pcard->is_position(POS_FACEDOWN) || (ucard->unique_uid < pcard->unique_uid)))
+			return pcard->unique_effect;
+	}
+	return 0;
+}
+	
 int32 field::check_lp_cost(uint8 playerid, uint32 lp) {
 	effect_set eset;
 	int32 val = lp;

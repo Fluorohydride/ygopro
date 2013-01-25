@@ -190,6 +190,8 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetAttackableTarget", scriptlib::card_get_attackable_target },
 	{ "SetHint", scriptlib::card_set_hint },
 	{ "ReverseInDeck", scriptlib::card_reverse_in_deck },
+	{ "SetUniqueOnField", scriptlib::card_set_unique_onfield },
+	{ "CheckUniqueOnField", scriptlib::card_check_unique_onfield },
 	{ NULL, NULL }
 };
 

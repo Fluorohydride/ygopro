@@ -4679,7 +4679,8 @@ int32 field::adjust_step(uint16 step) {
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
 				card* pcard = player[tp].list_mzone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
+				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
+				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
 					core.destroy_set.insert(pcard);
 					pcard->current.reason_effect = peffect;
 					pcard->current.reason_player = peffect->get_handler_player();
@@ -4687,7 +4688,8 @@ int32 field::adjust_step(uint16 step) {
 			}
 			for(uint8 i = 0; i < 6; ++i) {
 				card* pcard = player[tp].list_szone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
+				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
+				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
 					core.destroy_set.insert(pcard);
 					pcard->current.reason_effect = peffect;
 					pcard->current.reason_player = peffect->get_handler_player();

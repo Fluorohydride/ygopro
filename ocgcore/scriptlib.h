@@ -192,6 +192,9 @@ public:
 	static int32 card_get_attackable_target(lua_State *L);
 	static int32 card_set_hint(lua_State *L);
 	static int32 card_reverse_in_deck(lua_State *L);
+	static int32 card_set_unique_onfield(lua_State *L);
+	static int32 card_check_unique_onfield(lua_State *L);
+	
 	//Effect functions
 	static int32 effect_new(lua_State *L);
 	static int32 effect_newex(lua_State *L);

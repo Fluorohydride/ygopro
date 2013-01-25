@@ -1100,6 +1100,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			if(!is_player_can_summon(SUMMON_TYPE_DUAL, sumplayer, target))
 				return TRUE;
 		}
+		if(check_unique_onfield(target, sumplayer))
+			return TRUE;
 		if(target->is_affected_by_effect(EFFECT_CANNOT_SUMMON))
 			return TRUE;
 		core.summon_depth++;
@@ -1446,6 +1448,8 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		if(target->current.location != LOCATION_MZONE)
 			return TRUE;
 		if(!(target->current.position & POS_FACEDOWN))
+			return TRUE;
+		if(check_unique_onfield(target, sumplayer))
 			return TRUE;
 		effect_set eset;
 		target->filter_effect(EFFECT_FLIPSUMMON_COST, &eset);
@@ -1844,6 +1848,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 	case 0: {
 		if(!(target->data.type & TYPE_MONSTER))
 			return FALSE;
+		if(check_unique_onfield(target, sumplayer))
+			return TRUE;
 		if(target->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 			return FALSE;
 		if(target->current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && !target->is_status(STATUS_REVIVE_LIMIT) && target->is_affected_by_effect(EFFECT_REVIVE_LIMIT))
@@ -2030,6 +2036,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 				result = FALSE;
 		}
 		if(!result || (target->current.location == LOCATION_MZONE)
+				|| check_unique_onfield(target, playerid)
 		        || !is_player_can_spsummon(core.reason_effect, target->summon_type, positions, target->summon_player, playerid, target)
 		        || target->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON)
 		        || get_useable_count(playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD) <= 0
