@@ -1474,11 +1474,15 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(target->current.location);
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
-		target->set_status(STATUS_SUMMONING, TRUE);
-		target->set_status(STATUS_SUMMON_DISABLED, FALSE);
-		raise_event(target, EVENT_FLIP_SUMMON, 0, 0, sumplayer, sumplayer, 0);
-		process_instant_event();
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
+		if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_FLIP_SUMMON))
+			core.units.begin()->step = 2;
+		else {
+			target->set_status(STATUS_SUMMONING, TRUE);
+			target->set_status(STATUS_SUMMON_DISABLED, FALSE);
+			raise_event(target, EVENT_FLIP_SUMMON, 0, 0, sumplayer, sumplayer, 0);
+			process_instant_event();
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
+		}
 		return FALSE;
 	}
 	case 2: {
@@ -1933,8 +1937,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			set_control(target, targetplayer, 0, 0);
 		core.phase_action = TRUE;
 		target->current.reason_effect = core.units.begin()->peffect;
-		target->set_status(STATUS_SUMMONING, TRUE);
-		target->set_status(STATUS_SUMMON_DISABLED | STATUS_FLIP_SUMMONED, FALSE);
 		core.summoning_card = target;
 		pduel->write_buffer8(MSG_SPSUMMONING);
 		pduel->write_buffer32(target->data.code);
@@ -1965,6 +1967,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 	}
 	case 10: {
 		core.summoning_card = 0;
+		target->set_status(STATUS_SUMMONING, TRUE);
+		target->set_status(STATUS_SUMMON_DISABLED | STATUS_FLIP_SUMMONED, FALSE);
 		raise_event(target, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
