@@ -22,8 +22,8 @@ end
 function c59546528.cfilter2(c)
 	return c:IsSetCard(0x2f) and c:IsType(TYPE_MONSTER) and not c:IsPublic()
 end
-function c59546528.filter(c)
-	return c:IsFacedown() and c:IsAbleToHand()
+function c59546528.filter(c,e)
+	return c:IsFacedown() and c:IsAbleToHand() and (not e or c:IsRelateToEffect(e))
 end
 function c59546528.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and c59546528.filter(chkc) end
@@ -42,7 +42,7 @@ function c59546528.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg=hg:Select(tp,g:GetCount(),g:GetCount(),nil)
 	Duel.ConfirmCards(1-tp,cg)
 	Duel.ShuffleHand(tp)
-	local rg=g:Filter(Card.IsRelateToEffect,nil,e)
+	local rg=g:Filter(c59546528.filter,nil,e)
 	if rg:GetCount()>0 then
 		Duel.SendtoHand(rg,nil,REASON_EFFECT)
 	end
