@@ -15,8 +15,9 @@ function c57115864.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c57115864.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=Duel.GetAttacker()
-	if chkc then return chkc==tg and Duel.IsExistingMatchingCard(c57115864.filter,tp,LOCATION_MZONE,0,1,nil) end
-	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e) end
+	if chkc then return chkc==tg end
+	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e)
+		and Duel.IsExistingMatchingCard(c57115864.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetTargetCard(tg)
 end
 function c57115864.filter(c)

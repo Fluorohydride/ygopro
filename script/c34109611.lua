@@ -20,7 +20,7 @@ function c34109611.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x10)
 end
 function c34109611.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c34109611.filter,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(c34109611.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(e:GetHandler())

@@ -23,6 +23,7 @@ function c11501629.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetCondition(c11501629.damcon)
 	e2:SetCost(c11501629.damcost)
 	e2:SetTarget(c11501629.damtg)
 	e2:SetOperation(c11501629.damop)
@@ -38,6 +39,9 @@ function c11501629.ctcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c11501629.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x2d,e:GetLabel())
+end
+function c11501629.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_STANDBY
 end
 function c11501629.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end

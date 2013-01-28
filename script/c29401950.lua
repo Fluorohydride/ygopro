@@ -53,7 +53,7 @@ function c29401950.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c29401950.filter3(c,e,tp)
 	return c:IsFaceup() and c:GetAttack()>=1500 and c:GetSummonPlayer()~=tp
-		and c:IsRelateToEffect(e) and c:IsDestructable()
+		and c:IsRelateToEffect(e) and c:IsLocation(LOCATION_MZONE) and c:IsDestructable()
 end
 function c29401950.activate2(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c29401950.filter3,nil,e,tp)
