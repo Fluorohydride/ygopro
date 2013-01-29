@@ -25,7 +25,7 @@ function c40937767.ccon(e)
 	return Duel.IsExistingMatchingCard(Card.IsPosition,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,POS_FACEDOWN_DEFENCE)
 end
 function c40937767.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and eg:GetFirst()~=e:GetHandler() and eg:GetFirst():IsRace(RACE_ROCK)
+	return ep==tp and eg:GetFirst()~=e:GetHandler()
 end
 function c40937767.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
