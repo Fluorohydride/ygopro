@@ -1,0 +1,21 @@
+Preparation:
+1. Get/Build 3rd party libraries as below (or you can install certain
+  packages in some OS):
+    freetype: http://www.freetype.org
+    irrlicht: http://irrlicht.sourceforge.net
+    libevent: http://www.libevent.org
+    lua:      http://www.lua.org
+    sqlite3:  http://www.sqlite.org
+  Note: In order to support input method with unicode characters on windows,
+  please patch irrlicht using files in folder 'patches', and compile it in
+  unicode mode as static lib.
+2. Get/Build premake4 from:
+  http://industriousone.com/premake
+
+Compiling on visual studio:
+  Type 'premake4 vs2010'(or older versions of visual studio) in command line
+to generate project files under folder 'build'.
+
+Compiling on msys/mingw or POSIX systems:
+  Type 'premake4 gmake' in terminal to generate makefiles under folder 'build'
+and then type 'make -Cbuild' to bring it on.
