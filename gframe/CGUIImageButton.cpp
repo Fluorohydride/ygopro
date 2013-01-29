@@ -135,5 +135,21 @@ void CGUIImageButton::setImageScale(core::vector2df s) {
 	imageScale = s;
 }
 
+IGUIFont* CGUIImageButton::getOverrideFont( void ) const
+{
+	IGUISkin* skin = Environment->getSkin();
+	if (!skin)
+		return NULL;
+	return skin->getFont();
+}
+
+IGUIFont* CGUIImageButton::getActiveFont() const
+{
+	IGUISkin* skin = Environment->getSkin();
+	if (!skin)
+		return NULL;
+	return skin->getFont();
+}
+
 }
 }
