@@ -52,7 +52,7 @@ function c27863269.indcon(e)
 end
 function c27863269.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
-	return at and at:IsRelateToBattle() and at:IsFaceup()
+	return at and at:IsRelateToBattle() and at:IsFaceup() and Duel.GetAttacker()==e:GetHandler():GetEquipTarget()
 end
 function c27863269.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
