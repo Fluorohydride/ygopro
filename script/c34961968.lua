@@ -38,5 +38,8 @@ function c34961968.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 		tc:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+		tc:RegisterEffect(e2)
 	end
 end
