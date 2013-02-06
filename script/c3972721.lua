@@ -13,35 +13,31 @@ function c3972721.initial_effect(c)
 	c:RegisterEffect(e1)
 	if not c3972721.global_check then
 		c3972721.global_check=true
-		c3972721[0]=false
-		c3972721[1]=false
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_DESTROYED)
 		ge1:SetOperation(c3972721.checkop)
 		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c3972721.clear)
-		Duel.RegisterEffect(ge2,0)
 	end
 end
 function c3972721.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	if tc:IsType(TYPE_SYNCHRO) and tc:IsPreviousLocation(LOCATION_MZONE)
-		and ((tc:IsReason(REASON_BATTLE) and bit.band(tc:GetBattlePosition(),POS_FACEUP)~=0)
-		or (not tc:IsReason(REASON_BATTLE) and tc:IsPreviousPosition(POS_FACEUP)))
-		and tc:GetPreviousControler()~=tc:GetReasonPlayer() then
-		c3972721[tc:GetReasonPlayer()]=true
+	local p1=false
+	local p2=false
+	while tc do
+		if tc:IsType(TYPE_SYNCHRO) and tc:IsPreviousLocation(LOCATION_MZONE)
+			and ((tc:IsReason(REASON_BATTLE) and bit.band(tc:GetBattlePosition(),POS_FACEUP)~=0)
+			or (not tc:IsReason(REASON_BATTLE) and tc:IsPreviousPosition(POS_FACEUP)))
+			and tc:GetPreviousControler()~=tc:GetReasonPlayer() then
+			if tc:GetReasonPlayer()==0 then p1=true else p2=true end
+		end
+		tc=eg:GetNext()
 	end
-end
-function c3972721.clear(e,tp,eg,ep,ev,re,r,rp)
-	c3972721[0]=false
-	c3972721[1]=false
+	if p1 then Duel.RegisterFlagEffect(0,3972721,RESET_PHASE+PHASE_END,0,1) end
+	if p2 then Duel.RegisterFlagEffect(1,3972721,RESET_PHASE+PHASE_END,0,1) end
 end
 function c3972721.condition(e,tp,eg,ep,ev,re,r,rp)
-	return c3972721[tp]
+	return Duel.GetFlagEffect(tp,3972721)~=0
 end
 function c3972721.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end

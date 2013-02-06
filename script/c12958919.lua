@@ -28,29 +28,18 @@ function c12958919.initial_effect(c)
 	c:RegisterEffect(e2)
 	if not c12958919.global_check then
 		c12958919.global_check=true
-		c12958919[0]=true
-		c12958919[1]=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
 		ge1:SetOperation(c12958919.checkop)
 		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c12958919.clear)
-		Duel.RegisterEffect(ge2,0)
 	end
 end
 function c12958919.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	if tc:IsSetCard(0x49) then
-		c12958919[tc:GetControler()]=false
+		Duel.RegisterFlagEffect(tc:GetControler(),12958919,RESET_PHASE+PHASE_END,0,1)
 	end
-end
-function c12958919.clear(e,tp,eg,ep,ev,re,r,rp)
-	c12958919[0]=true
-	c12958919[1]=true
 end
 function c12958919.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -77,7 +66,7 @@ function c12958919.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
 end
 function c12958919.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c12958919[tp] end
+	if chk==0 then return Duel.GetFlagEffect(tp,12958920)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
