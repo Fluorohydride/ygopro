@@ -36,7 +36,7 @@ end
 function c68450517.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and c68450517.filter(tc,c:GetAttribute()) then
+	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and c68450517.filter(tc,c:GetAttribute()) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
