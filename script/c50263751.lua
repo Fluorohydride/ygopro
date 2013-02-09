@@ -26,14 +26,25 @@ function c50263751.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsRelateToBattle() and e:GetHandler():IsFaceup()
 end
 function c50263751.operation(e,tp,eg,ep,ev,re,r,rp)
-	local bc=e:GetHandler():GetBattleTarget()
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
 	local lv=bc:GetLevel()
 	if lv>0 then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_LEVEL)
-		e1:SetValue(lv)
-		e1:SetReset(RESET_EVENT+0x1ff0000)
-		e:GetHandler():RegisterEffect(e1)
+		if c:GetFlagEffect(50263751)==0 then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_LEVEL)
+			e1:SetValue(lv)
+			e1:SetReset(RESET_EVENT+0x1ff0000)
+			c:RegisterEffect(e1)
+			c:RegisterFlagEffect(50263751,RESET_EVENT+0x1ff0000,0,0)
+			e:SetLabelObject(e1)
+			e:SetLabel(lv)
+		else
+			local pe=e:GetLabelObject()
+			local ct=e:GetLabel()+lv
+			e:SetLabel(ct)
+			pe:SetValue(ct)
+		end
 	end
 end

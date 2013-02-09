@@ -12,8 +12,6 @@ function c43140791.initial_effect(c)
 	c:RegisterEffect(e1)
 	if not c43140791.global_check then
 		c43140791.global_check=true
-		c43140791[0]=true
-		c43140791[1]=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -24,26 +22,21 @@ function c43140791.initial_effect(c)
 		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
 		ge2:SetOperation(c43140791.checkop)
 		Duel.RegisterEffect(ge2,0)
-		local ge3=Effect.CreateEffect(c)
-		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge3:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge3:SetOperation(c43140791.clear)
-		Duel.RegisterEffect(ge3,0)
 	end
 end
 function c43140791.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
+	local p1=false
+	local p2=false
 	while tc do
 		local lv=tc:GetLevel()
 		if lv==3 or lv==4 then
-			c43140791[tc:GetSummonPlayer()]=false
+			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
 		end
 		tc=eg:GetNext()
 	end
-end
-function c43140791.clear(e,tp,eg,ep,ev,re,r,rp)
-	c43140791[0]=true
-	c43140791[1]=true
+	if p1 then Duel.RegisterFlagEffect(0,43140791,RESET_PHASE+PHASE_END,0,1) end
+	if p2 then Duel.RegisterFlagEffect(1,43140791,RESET_PHASE+PHASE_END,0,1) end
 end
 function c43140791.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_INSECT)
@@ -52,7 +45,7 @@ function c43140791.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c43140791.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c43140791.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c43140791[tp] end
+	if chk==0 then return Duel.GetFlagEffect(tp,43140791)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
