@@ -33,7 +33,7 @@ function c32750510.initial_effect(c)
 end
 function c32750510.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-2
 		and Duel.CheckReleaseGroup(c:GetControler(),Card.IsAttribute,2,nil,ATTRIBUTE_WATER)
 end
 function c32750510.spop(e,tp,eg,ep,ev,re,r,rp,c)
