@@ -32,12 +32,16 @@ function c54974237.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(c54974237.tgfilter,tp,0,LOCATION_ONFIELD,nil,ty)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
+function c54974237.cffilter(c)
+	return c:IsLocation(LOCATION_HAND) or (c:IsFacedown() and c:IsType(TYPE_SPELL+TYPE_TRAP))
+end
 function c54974237.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ty=e:GetLabel()
-	local conf=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD+LOCATION_HAND)
-	if conf:GetCount()>0 then
-		Duel.ConfirmCards(tp,conf)
-		local dg=conf:Filter(Card.IsType,nil,ty)
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_ONFIELD+LOCATION_HAND)
+	if g:GetCount()>0 then
+		local cg=g:Filter(c54974237.cffilter,nil)
+		Duel.ConfirmCards(tp,cg)
+		local dg=g:Filter(Card.IsType,nil,ty)
 		Duel.Destroy(dg,REASON_EFFECT)
 		Duel.ShuffleHand(1-tp)
 	end

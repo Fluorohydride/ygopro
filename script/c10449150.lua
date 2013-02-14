@@ -39,7 +39,7 @@ end
 function c10449150.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Remove(c,POS_FACEUP,REASON_EFFECT)~=0 then
-		c:RegisterFlagEffect(10449150,RESET_EVENT+0x1fe0000,0,1)
+		c:RegisterFlagEffect(10449150,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
 	end
 end
 function c10449150.spcon(e,tp,eg,ep,ev,re,r,rp)
