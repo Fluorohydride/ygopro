@@ -18,6 +18,7 @@ function c49398568.cfilter(c)
 end
 function c49398568.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+	hg:RemoveCard(e:GetHandler())
 	if chk==0 then return hg:GetCount()>0 and hg:FilterCount(c49398568.cfilter,nil)==hg:GetCount() end
 	Duel.SendtoGrave(hg,REASON_COST)
 end

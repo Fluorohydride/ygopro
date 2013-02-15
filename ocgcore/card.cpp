@@ -349,7 +349,7 @@ int32 card::get_attack(uint8 swap) {
 int32 card::get_base_defence(uint8 swap) {
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
-	if (temp.base_attack != -1)
+	if (temp.base_defence != -1)
 		return temp.base_defence;
 	if(!swap && is_affected_by_effect(EFFECT_SWAP_BASE_AD))
 		return get_base_attack(TRUE);
@@ -1274,6 +1274,8 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 	int32 fcount = pduel->game_field->get_useable_count(current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_TOFIELD);
 	if(max <= -fcount)
 		return FALSE;
+	if(min < -fcount + 1)
+		min = -fcount + 1;
 	if(min == 0)
 		return TRUE;
 	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
@@ -1309,6 +1311,8 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 	int32 fcount = pduel->game_field->get_useable_count(current.controler, LOCATION_MZONE, current.controler, LOCATION_REASON_TOFIELD);
 	if(max <= -fcount)
 		return FALSE;
+	if(min < -fcount + 1)
+		min = -fcount + 1;
 	if(min == 0)
 		return TRUE;
 	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
@@ -1879,6 +1883,7 @@ int32 card::is_capable_cost_to_grave(uint8 playerid) {
 		return FALSE;
 	if(!is_capable_send_to_grave(playerid))
 		return FALSE;
+	operation_param = dest << 8;
 	if(current.location & LOCATION_ONFIELD)
 		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
@@ -1899,6 +1904,7 @@ int32 card::is_capable_cost_to_hand(uint8 playerid) {
 		return FALSE;
 	if(!is_capable_send_to_hand(playerid))
 		return FALSE;
+	operation_param = dest << 8;
 	if(current.location & LOCATION_ONFIELD)
 		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
@@ -1919,6 +1925,7 @@ int32 card::is_capable_cost_to_deck(uint8 playerid) {
 		return FALSE;
 	if(!is_capable_send_to_deck(playerid))
 		return FALSE;
+	operation_param = dest << 8;
 	if(current.location & LOCATION_ONFIELD)
 		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
@@ -1939,6 +1946,7 @@ int32 card::is_capable_cost_to_extra(uint8 playerid) {
 		return FALSE;
 	if(!is_capable_send_to_deck(playerid))
 		return FALSE;
+	operation_param = dest << 8;
 	if(current.location & LOCATION_ONFIELD)
 		redirect = leave_field_redirect(REASON_COST) & 0xffff;
 	if(redirect) dest = redirect;
