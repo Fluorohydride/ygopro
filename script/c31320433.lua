@@ -19,6 +19,7 @@ function c31320433.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c31320433.dacon)
+	e2:SetCost(c31320433.dacost)
 	e2:SetTarget(c31320433.datg)
 	e2:SetOperation(c31320433.daop)
 	c:RegisterEffect(e2)
@@ -38,6 +39,10 @@ function c31320433.matop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c31320433.dacon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 and Duel.GetTurnCount()~=1
+end
+function c31320433.dacost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c31320433.filter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER)

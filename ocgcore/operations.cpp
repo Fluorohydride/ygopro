@@ -2645,7 +2645,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 4: {
-		card_set leave, discard;
+		card_set leave, discard, detach;
 		uint8 oloc, playerid, dest, seq;
 		bool show_decktop[2] = {false, false};
 		card_vector cv;
@@ -2737,6 +2737,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pduel->write_buffer8(pcard->overlay_target->current.location | LOCATION_OVERLAY);
 				pduel->write_buffer8(pcard->overlay_target->current.sequence);
 				pduel->write_buffer8(pcard->current.sequence);
+				detach.insert(pcard->overlay_target);
 				pcard->overlay_target->xyz_remove(pcard);
 			} else {
 				pduel->write_buffer8(pcard->current.controler);
@@ -2791,6 +2792,10 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		adjust_instant();
 		process_single_event();
+		if(detach.size()) {
+			for(auto iter = detach.begin(); iter != detach.end(); ++iter)
+				raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
+		}
 		if(leave.size()) {
 			raise_event(&leave, EVENT_LEAVE_FIELD, reason_effect, reason, reason_player, 0, 0);
 			process_instant_event();
