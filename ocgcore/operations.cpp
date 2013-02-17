@@ -2790,12 +2790,12 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 					pduel->write_buffer32(ptop->data.code | 0x80000000);
 			}
 		}
-		adjust_instant();
-		process_single_event();
 		if(detach.size()) {
 			for(auto iter = detach.begin(); iter != detach.end(); ++iter)
 				raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
 		}
+		adjust_instant();
+		process_single_event();
 		if(leave.size()) {
 			raise_event(&leave, EVENT_LEAVE_FIELD, reason_effect, reason, reason_player, 0, 0);
 			process_instant_event();
