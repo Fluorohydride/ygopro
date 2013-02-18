@@ -55,9 +55,9 @@ end
 function c22110647.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=1 then return end
 	if Duel.IsPlayerCanSpecialSummonMonster(tp,31533705,0x101b,0x4011,0,0,3,RACE_MACHINE,ATTRIBUTE_WIND) then
-		local token1=Duel.CreateToken(tp,22110648)
+		local token1=Duel.CreateToken(tp,31533705)
 		Duel.SpecialSummonStep(token1,0,tp,tp,false,false,POS_FACEUP)
-		local token2=Duel.CreateToken(tp,22110648)
+		local token2=Duel.CreateToken(tp,31533705)
 		Duel.SpecialSummonStep(token2,0,tp,tp,false,false,POS_FACEUP)
 		Duel.SpecialSummonComplete()
 	end
@@ -78,7 +78,7 @@ function c22110647.filter(c)
 end
 function c22110647.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c22110647.filter(chkc) end
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,LOCAITON_ONFIELD)>1
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)>1
 		and Duel.IsExistingTarget(c22110647.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c22110647.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)

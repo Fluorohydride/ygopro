@@ -20,6 +20,8 @@ function c85909450.initial_effect(c)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
+	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e3:SetValue(c85909450.tgvalue)
 	c:RegisterEffect(e3)
 	--remove material
