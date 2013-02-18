@@ -48,6 +48,7 @@ function c19337371.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCountLimit(1)
 	e1:SetTarget(c19337371.thtg)
 	e1:SetOperation(c19337371.thop)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function c19337371.thfilter(c)

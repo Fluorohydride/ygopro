@@ -39,11 +39,13 @@ function c86848580.disop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 		tc=g:GetNext()
 	end
-	local atk=Duel.GetMatchingGroupCount(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)*300
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetValue(atk)
-	e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_STANDBY,2)
-	c:RegisterEffect(e1)
+	local atk=Duel.GetMatchingGroupCount(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())*300
+	if atk>0 then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetValue(atk)
+		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_STANDBY,2)
+		c:RegisterEffect(e1)
+	end
 end
