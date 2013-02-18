@@ -13,16 +13,16 @@ function c71098407.initial_effect(c)
 end
 function c71098407.condition(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
-		and re:GetHandler():IsOnField() and re:GetHandler():IsFaceup()
+		and re:GetHandler():IsOnField() and re:GetHandler():IsPosition(POS_FACEUP_ATTACK)
 end
 function c71098407.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return re:GetHandler():IsCanTurnSet() end
+	if chk==0 then return true end
 	Duel.SetTargetCard(re:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 end
 function c71098407.activate(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	if Duel.NegateEffect(ev) and rc:IsRelateToEffect(e) and rc:IsFaceup() and rc:IsCanTurnSet() then
-		Duel.ChangePosition(rc,POS_FACEDOWN_DEFENCE)
+	if Duel.NegateEffect(ev) and rc:IsRelateToEffect(e) then
+		Duel.ChangePosition(rc,POS_FACEUP_DEFENCE)
 	end
 end

@@ -45,6 +45,7 @@ function c4417407.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c4417407.lvval(e,c)
+	local tp=e:GetHandlerPlayer()
 	local lv=0
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
@@ -63,7 +64,7 @@ end
 function c4417407.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if Duel.IsPlayerCanSpecialSummonMonster(tp,31533705,0x101b,0x4011,0,0,3,RACE_MACHINE,ATTRIBUTE_WIND) then
-		local token=Duel.CreateToken(tp,4417408)
+		local token=Duel.CreateToken(tp,31533705)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

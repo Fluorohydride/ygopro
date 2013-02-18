@@ -21,7 +21,7 @@ function c27632240.cfilter(c)
 	return c:IsPreviousLocation(LOCATION_MZONE)
 end
 function c27632240.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c27632240.cfilter,1,nil,tp)
+	return eg:IsExists(c27632240.cfilter,1,nil)
 end
 function c27632240.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,27632240)==0 end

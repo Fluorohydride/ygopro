@@ -12,15 +12,13 @@ function c9861795.initial_effect(c)
 	e1:SetOperation(c9861795.operation)
 	c:RegisterEffect(e1)
 end
-c9861795[0]=true
-c9861795[1]=true
 function c9861795.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c9861795.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c9861795[tp] and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetFlagEffect(tp,9861795)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	c9861795[tp]=false
+	Duel.RegisterFlagEffect(tp,9861795,0,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c9861795.operation(e,tp,eg,ep,ev,re,r,rp)
