@@ -78,7 +78,7 @@ function c22110647.filter(c)
 end
 function c22110647.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c22110647.filter(chkc) end
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,LOCAITON_ONFIELD)>1
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)>1
 		and Duel.IsExistingTarget(c22110647.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c22110647.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
