@@ -31,7 +31,7 @@ function c28577986.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and Duel.IsExistingTarget(c28577986.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,c28577986.cfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_TO_GRAVE,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c28577986.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -48,7 +48,7 @@ function c28577986.operation(e,tp,eg,ep,ev,re,r,rp)
 		local tc=sg:Select(tp,1,1,nil):GetFirst()
 		sg:RemoveCard(tc)
 		slv=slv-tc:GetLevel()
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 		sg:Remove(Card.IsLevelAbove,nil,slv+1)
 		ft=ft-1
 	until ft<=0 or sg:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(28577986,1))

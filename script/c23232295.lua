@@ -24,7 +24,7 @@ function c23232295.repfilter(c,tp)
 	return c:IsOnField() and c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x84)
 end
 function c23232295.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:GetCount()==1 and c23232295.repfilter(eg:GetFirst()) end
+	if chk==0 then return eg:GetCount()==1 and c23232295.repfilter(eg:GetFirst(),tp) end
 	if e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT) and Duel.SelectYesNo(tp,aux.Stringid(23232295,0)) then
 		e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 		return true
