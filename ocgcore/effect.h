@@ -162,6 +162,7 @@ public:
 #define EFFECT_FLAG_CHAIN_UNIQUE	0x8000000	//
 #define EFFECT_FLAG_NAGA			0x10000000	//
 #define EFFECT_FLAG_COF				0x20000000	//
+#define EFFECT_FLAG_CVAL_CHECK		0x40000000	//
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//
 #define EFFECT_DISABLE					2	//

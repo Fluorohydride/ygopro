@@ -28,12 +28,13 @@ function c96381979.initial_effect(c)
 	e3:SetDescription(aux.Stringid(96381979,2))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CHAIN_UNIQUE)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CVAL_CHECK)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetCondition(c96381979.spcon)
 	e3:SetCost(c96381979.spcost)
 	e3:SetTarget(c96381979.sptg)
 	e3:SetOperation(c96381979.spop)
+	e3:SetValue(c96381979.valcheck)
 	c:RegisterEffect(e3)
 end
 function c96381979.setcon(e,tp,eg,ep,ev,re,r,rp)
@@ -89,7 +90,14 @@ function c96381979.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGraveAsCost()
 end
 function c96381979.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c96381979.cfilter,tp,LOCATION_ONFIELD,0,3,nil) end
+	if chk==0 then
+		if Duel.GetFlagEffect(tp,96381979)==0 then
+			Duel.RegisterFlagEffect(tp,96381979,RESET_CHAIN,0,1)
+			c96381979[0]=Duel.GetMatchingGroupCount(c96381979.cfilter,tp,LOCATION_ONFIELD,0,nil)
+			c96381979[1]=0
+		end
+		return c96381979[0]-c96381979[1]>=3
+	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c96381979.cfilter,tp,LOCATION_ONFIELD,0,3,3,nil)
 	Duel.SendtoGrave(g,REASON_COST)
@@ -123,4 +131,7 @@ function c96381979.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonStep(tc2,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
 		Duel.SpecialSummonComplete()
 	end
+end
+function c96381979.valcheck(e)
+	c96381979[1]=c96381979[1]+3
 end

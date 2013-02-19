@@ -2791,8 +2791,10 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			}
 		}
 		if(detach.size()) {
-			for(auto iter = detach.begin(); iter != detach.end(); ++iter)
-				raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
+			for(auto iter = detach.begin(); iter != detach.end(); ++iter) {
+				if((*iter)->current.location & LOCATION_MZONE)
+					raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
+			}
 		}
 		adjust_instant();
 		process_single_event();

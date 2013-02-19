@@ -17,6 +17,7 @@ function c23232295.initial_effect(c)
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_DETACH_MATERIAL)
+	e2:SetTarget(c23232295.atktg)
 	e2:SetOperation(c23232295.atkop)
 	c:RegisterEffect(e2)
 end
@@ -29,6 +30,9 @@ function c23232295.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 		return true
 	else return false end
+end
+function c23232295.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 end
 function c23232295.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -2,6 +2,7 @@
 function c46448938.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCost(c46448938.cost)
@@ -29,11 +30,10 @@ function c46448938.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(46448938,0))
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetCountLimit(1)
-	e3:SetTarget(c46448938.efftg)
+	e3:SetCondition(c46448938.effcon)
 	e3:SetOperation(c46448938.effop)
 	e3:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e3,tp)
@@ -52,9 +52,8 @@ function c46448938.regop2(e,tp,eg,ep,ev,re,r,rp)
 	if ct==0 then ct=1 end
 	e:GetLabelObject():SetLabel(ct-1)
 end
-function c46448938.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetLabel()>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+function c46448938.effcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetLabel()>0
 end
 function c46448938.sfilter(c)
 	return c:IsSetCard(0x106e) and c:GetCode()~=46448938 and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
@@ -63,6 +62,7 @@ function c46448938.spfilter(c,lv,e,tp)
 	return c:IsLevelBelow(lv) and c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c46448938.effop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,46448938)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c46448938.sfilter,tp,LOCATION_DECK,0,1,e:GetLabel(),nil)
 	if g:GetCount()>0 then
