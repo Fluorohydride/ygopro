@@ -35,7 +35,7 @@ function c86848580.disop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_STANDBY+PHASE_STANDBY,2)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,2)
 		tc:RegisterEffect(e2)
 		tc=g:GetNext()
 	end
