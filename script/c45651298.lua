@@ -22,5 +22,5 @@ function c45651298.spcon(e,c)
 		and Duel.IsExistingMatchingCard(c45651298.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c45651298.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	Duel.RegisterFlagEffect(tp,45651298,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,45651298,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
