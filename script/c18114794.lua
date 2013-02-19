@@ -10,6 +10,7 @@ function c18114794.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(18114794)
+	e2:SetCondition(c18114794.condition)
 	e2:SetOperation(c18114794.operation)
 	c:RegisterEffect(e2)
 	if not c18114794.global_check then
@@ -49,6 +50,9 @@ function c18114794.checkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc=eg:GetNext()
 	end
+end
+function c18114794.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c18114794.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

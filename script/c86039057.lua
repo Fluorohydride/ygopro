@@ -12,17 +12,15 @@ function c86039057.initial_effect(c)
 	e1:SetOperation(c86039057.operation)
 	c:RegisterEffect(e1)
 end
-c86039057[0]=true
-c86039057[1]=true
 function c86039057.condition(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttacker()
 	return at:GetControler()~=tp and Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0
 end
 function c86039057.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c86039057[tp] and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetFlagEffect(tp,86039057)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	c86039057[tp]=false
+	Duel.RegisterFlagEffect(tp,86039057,0,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function c86039057.operation(e,tp,eg,ep,ev,re,r,rp)

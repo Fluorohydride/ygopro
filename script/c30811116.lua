@@ -44,6 +44,7 @@ function c30811116.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c30811116.lvval(e,c)
+	local tp=c:GetControler()
 	local lv=0
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)

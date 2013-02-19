@@ -27,7 +27,7 @@ function c23454876.initial_effect(c)
 	e2:SetOperation(c23454876.damop)
 	c:RegisterEffect(e2)
 end
-function c23454876.drcon(e,tp,eg,ep,ev,re,r,rp,chk)
+function c23454876.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c23454876.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -36,7 +36,7 @@ function c23454876.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
-function c23454876.drop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c23454876.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
@@ -55,7 +55,7 @@ function c23454876.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(dam)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,dam)
 end
-function c23454876.damop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c23454876.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local dam=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)*400
 	Duel.Damage(p,dam,REASON_EFFECT)
