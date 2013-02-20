@@ -82,10 +82,11 @@ function c89399912.retop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c89399912.dfilter(c)
-	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsDiscardable()
+	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
 end
 function c89399912.shcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,89399912)==0 and e:GetHandler():IsDiscardable()
+	if chk==0 then return Duel.GetFlagEffect(tp,89399912)==0
+		and e:GetHandler():IsDiscardable() and e:GetHandler():IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(c89399912.dfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,c89399912.dfilter,tp,LOCATION_HAND,0,1,1,e:GetHandler())

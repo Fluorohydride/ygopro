@@ -11,9 +11,6 @@ function c54813225.initial_effect(c)
 	e1:SetOperation(c54813225.spop)
 	c:RegisterEffect(e1)
 end
-function c54813225.cfilter(c)
-	return c:IsFaceup() and c:IsAbleToHandAsCost()
-end
 function c54813225.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local ct=-ft+1

@@ -16,12 +16,13 @@ function c27415516.costfilter(c)
 end
 function c27415516.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsDiscardable() and 
-		Duel.IsExistingMatchingCard(c27415516.costfilter,tp,LOCATION_HAND,0,1,c) end
+	if chk==0 then return Duel.GetFlagEffect(tp,27415516)==0 and c:IsDiscardable()
+		and Duel.IsExistingMatchingCard(c27415516.costfilter,tp,LOCATION_HAND,0,1,c) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DISCARD)
 	local g=Duel.SelectMatchingCard(tp,c27415516.costfilter,tp,LOCATION_HAND,0,1,1,c)
 	g:AddCard(c)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
+	Duel.RegisterFlagEffect(tp,27415516,RESET_PHASE+PHASE_END,0,1)
 end
 function c27415516.spfilter(c,e,tp)
 	return c:IsCode(26400609) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -34,7 +35,12 @@ end
 function c27415516.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local tc=Duel.GetFirstMatchingCard(c27415516.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
-	if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	if tc and Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_ATTACK)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		Duel.SpecialSummonComplete()
 	end
 end
