@@ -42,7 +42,7 @@ function c47754278.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetFlagEffect(tp,47754278)==0 then
 			Duel.RegisterFlagEffect(tp,47754278,RESET_CHAIN,0,1)
-			c47754278[0]=Duel.GetReleaseGroup():GetCount()
+			c47754278[0]=Duel.GetReleaseGroupCount(tp)
 			c47754278[1]=0
 		end
 		return c47754278[0]-c47754278[1]>=1
