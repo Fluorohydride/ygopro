@@ -441,16 +441,23 @@ uint32 card::get_level() {
 	effect_set effects;
 	int32 level = data.level;
 	temp.level = data.level;
+	int32 up = 0, upc = 0;
 	filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
 	filter_effect(EFFECT_CHANGE_LEVEL, &effects);
 	for (int32 i = 0; i < effects.count; ++i) {
-		if (effects[i]->code == EFFECT_UPDATE_LEVEL)
-			level += effects[i]->get_value(this);
-		else
+		if (effects[i]->code == EFFECT_UPDATE_LEVEL) {
+			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
+				up += effects[i]->get_value(this);
+			else
+				upc += effects[i]->get_value(this);
+		} else {
 			level = effects[i]->get_value(this);
+			up = 0;
+		}
 		temp.level = level;
 	}
-	if(level < 1 && (get_type()&TYPE_MONSTER))
+	level += up + upc;
+	if(level < 1 && (get_type() & TYPE_MONSTER))
 		level = 1;
 	temp.level = 0xffffffff;
 	return level;

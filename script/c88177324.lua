@@ -32,10 +32,10 @@ function c88177324.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c88177324.filter1(c)
-	return c:IsType(TYPE_EFFECT)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
 end
 function c88177324.filter2(c)
-	return c:GetAttack()~=c:GetBaseAttack() or c:GetDefence()~=c:GetBaseDefence()
+	return c:IsFaceup() and (c:GetAttack()~=c:GetBaseAttack() or c:GetDefence()~=c:GetBaseDefence())
 end
 function c88177324.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return
