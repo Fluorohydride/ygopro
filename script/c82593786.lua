@@ -13,7 +13,7 @@ function c82593786.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c82593786.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker()~=nil
+	return Duel.GetAttackTarget()~=nil
 end
 function c82593786.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,82593786)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
