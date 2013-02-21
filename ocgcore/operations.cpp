@@ -1417,8 +1417,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		process_single_event();
 		raise_event(target, EVENT_SUMMON_SUCCESS, proc, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[sumplayer] |= TIMING_SUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
@@ -1690,8 +1690,8 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		adjust_instant();
 		raise_event(target, EVENT_MSET, proc, 0, setplayer, setplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[setplayer] |= TIMING_MSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
@@ -1766,8 +1766,8 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 		adjust_instant();
 		raise_event(target, EVENT_SSET, 0, 0, setplayer, setplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[setplayer] |= TIMING_SSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
@@ -1841,7 +1841,11 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 		adjust_instant();
 		raise_event(&core.operated_set, EVENT_SSET, 0, 0, setplayer, setplayer, 0);
 		process_instant_event();
-		adjust_all();
+		if(core.current_chain.size() == 0) {
+			adjust_all();
+			core.hint_timing[setplayer] |= TIMING_SSET;
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+		}
 		return TRUE;
 	}
 	}
@@ -2015,8 +2019,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		process_single_event();
 		raise_event(target, EVENT_SPSUMMON_SUCCESS, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[sumplayer] |= TIMING_SPSUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}

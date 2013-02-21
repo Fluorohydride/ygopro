@@ -40,7 +40,7 @@ end
 function c68815132.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 then
+	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND+LOCATION_EXTRA) then
 		if Duel.IsExistingMatchingCard(c68815132.sumfilter,tp,LOCATION_HAND,0,1,nil)
 			and Duel.SelectYesNo(tp,aux.Stringid(68815132,1)) then
 			Duel.BreakEffect()

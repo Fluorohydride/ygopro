@@ -8,20 +8,27 @@ function c27632240.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_TO_HAND)
-	e1:SetCondition(c27632240.tgcon)
+	e1:SetCondition(c27632240.tgcon1)
 	e1:SetCost(c27632240.tgcost)
 	e1:SetTarget(c27632240.tgtg)
 	e1:SetOperation(c27632240.tgop)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_TO_DECK)
+	e2:SetCondition(c27632240.tgcon2)
 	c:RegisterEffect(e2)
 end
-function c27632240.cfilter(c)
+function c27632240.cfilter1(c)
 	return c:IsPreviousLocation(LOCATION_MZONE)
 end
-function c27632240.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c27632240.cfilter,1,nil)
+function c27632240.tgcon1(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c27632240.cfilter1,1,nil)
+end
+function c27632240.cfilter2(c)
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsLocation(LOCATION_DECK)
+end
+function c27632240.tgcon2(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c27632240.cfilter2,1,nil)
 end
 function c27632240.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,27632240)==0 end
