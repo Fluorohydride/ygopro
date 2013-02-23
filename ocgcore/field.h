@@ -175,6 +175,7 @@ struct processor {
 	chain_list new_fchain_b;
 	chain_list new_ochain_b;
 	chain_list flip_chain_b;
+	chain_list new_ochain_h;
 	chain_list new_chains;
 	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
