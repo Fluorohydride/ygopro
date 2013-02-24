@@ -9,6 +9,7 @@ project "ygopro"
     links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3", "lua" , "event"}
 
     configuration "windows"
+        files "ygopro.rc"
         includedirs { "../irrlicht/include", "../freetype/include", "../event/include", "../sqlite3" }
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
     configuration {"windows", "not vs*"}
