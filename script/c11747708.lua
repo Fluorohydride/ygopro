@@ -11,8 +11,6 @@ function c11747708.initial_effect(c)
 	e1:SetOperation(c11747708.operation)
 	c:RegisterEffect(e1)
 end
-c11747708[0]=true
-c11747708[1]=true
 function c11747708.costfilter(c)
 	return c:IsRace(RACE_PLANT) and c:GetLevel()>0 and c:IsAbleToRemoveAsCost()
 end
@@ -25,10 +23,10 @@ function c11747708.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c11747708.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c11747708[tp] and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetFlagEffect(tp,11747708)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
-	c11747708[tp]=false
+	Duel.RegisterFlagEffect(tp,11747708,0,0,0)
 end
 function c11747708.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

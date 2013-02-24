@@ -25,8 +25,8 @@ function c50766506.spfilter(c,lv,e,tp)
 	return c:IsLevelBelow(lv) and c:IsSetCard(0x2b) and
 		(c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP_ATTACK) or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN_DEFENCE))
 end
-function c50766506.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,c50766506.cfilter,1,nil,e,tp) end
+function c50766506.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.CheckReleaseGroup(tp,c50766506.cfilter,1,nil,e,tp) end
 	local rg=Duel.SelectReleaseGroup(tp,c50766506.cfilter,1,1,nil,e,tp)
 	e:SetLabel(rg:GetFirst():GetLevel())
 	Duel.Release(rg,REASON_COST)

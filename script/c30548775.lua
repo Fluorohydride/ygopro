@@ -25,15 +25,15 @@ end
 function c30548775.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	return eg:IsExists(c30548775.filter,1,nil)
 end
-function c30548775.spfilter(c,eg)
-	return c:IsReason(REASON_FUSION) and eg:IsContains(c:GetReasonCard())
+function c30548775.spfilter(c,eg,e,tp)
+	return c:IsReason(REASON_FUSION) and eg:IsContains(c:GetReasonCard()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c30548775.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c30548775.spfilter(chkc,eg) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c30548775.spfilter(chkc,eg,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(c30548775.spfilter,tp,LOCATION_GRAVE,0,1,nil,eg) end
+		and Duel.IsExistingTarget(c30548775.spfilter,tp,LOCATION_GRAVE,0,1,nil,eg,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectTarget(tp,c30548775.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,eg)
+	local g=Duel.SelectTarget(tp,c30548775.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,eg,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c30548775.operation(e,tp,eg,ep,ev,re,r,rp)

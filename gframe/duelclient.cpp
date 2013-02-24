@@ -1511,6 +1511,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 		}
 		if (field_confirm.size() > 0) {
+			mainGame->WaitFrameSignal(5);
 			for(int i = 0; i < field_confirm.size(); ++i) {
 				pcard = field_confirm[i];
 				c = pcard->controler;
@@ -1536,7 +1537,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->aniFrame = 5;
 				}
 			}
-			mainGame->WaitFrameSignal(45);
+			mainGame->WaitFrameSignal(90);
 			for(int i = 0; i < field_confirm.size(); ++i) {
 				mainGame->dField.MoveCard(field_confirm[i], 5);
 			}

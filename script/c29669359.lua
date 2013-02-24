@@ -3,7 +3,7 @@ function c29669359.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),2)
 	c:EnableReviveLimit()
-	--attack up
+	--destroy&damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e1:SetDescription(aux.Stringid(29669359,0))

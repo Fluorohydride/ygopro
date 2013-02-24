@@ -73,9 +73,9 @@ end
 function c24857466.hspcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local label=c:GetFlagEffectLabel(24857466)
-	if label~=nil then
-		c:ResetFlagEffect(24857466)
+	if label~=nil and label~=0 then
 		e:SetLabel(label)
+		c:SetFlagEffectLabel(24857466,0)
 		return true
 	else return false end
 end

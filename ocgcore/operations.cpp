@@ -1178,7 +1178,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 				} else {
 					if(min < -fcount + 1) {
 						min = -fcount + 1;
-						required = min + (max >> 16);
+						required = min + (max << 16);
 					}
 					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, required);
 				}
@@ -1417,8 +1417,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		process_single_event();
 		raise_event(target, EVENT_SUMMON_SUCCESS, proc, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[sumplayer] |= TIMING_SUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
@@ -1690,8 +1690,8 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		adjust_instant();
 		raise_event(target, EVENT_MSET, proc, 0, setplayer, setplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[setplayer] |= TIMING_MSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
@@ -1706,7 +1706,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			if(min < -core.temp_var[1] + 1) {
 				min = -core.temp_var[1] + 1;
 			}
-			core.temp_var[0] = min + (max >> 16);
+			core.temp_var[0] = min + (max << 16);
 			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, core.temp_var[0]);
 		}
 		core.units.begin()->step = 2;
@@ -1766,8 +1766,8 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 		adjust_instant();
 		raise_event(target, EVENT_SSET, 0, 0, setplayer, setplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[setplayer] |= TIMING_SSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
@@ -1841,7 +1841,11 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 		adjust_instant();
 		raise_event(&core.operated_set, EVENT_SSET, 0, 0, setplayer, setplayer, 0);
 		process_instant_event();
-		adjust_all();
+		if(core.current_chain.size() == 0) {
+			adjust_all();
+			core.hint_timing[setplayer] |= TIMING_SSET;
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+		}
 		return TRUE;
 	}
 	}
@@ -2015,8 +2019,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		process_single_event();
 		raise_event(target, EVENT_SPSUMMON_SUCCESS, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
-		adjust_all();
 		if(core.current_chain.size() == 0) {
+			adjust_all();
 			core.hint_timing[sumplayer] |= TIMING_SPSUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
@@ -2645,7 +2649,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 4: {
-		card_set leave, discard;
+		card_set leave, discard, detach;
 		uint8 oloc, playerid, dest, seq;
 		bool show_decktop[2] = {false, false};
 		card_vector cv;
@@ -2737,6 +2741,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pduel->write_buffer8(pcard->overlay_target->current.location | LOCATION_OVERLAY);
 				pduel->write_buffer8(pcard->overlay_target->current.sequence);
 				pduel->write_buffer8(pcard->current.sequence);
+				detach.insert(pcard->overlay_target);
 				pcard->overlay_target->xyz_remove(pcard);
 			} else {
 				pduel->write_buffer8(pcard->current.controler);
@@ -2787,6 +2792,12 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 					pduel->write_buffer32(ptop->data.code);
 				else
 					pduel->write_buffer32(ptop->data.code | 0x80000000);
+			}
+		}
+		if(detach.size()) {
+			for(auto iter = detach.begin(); iter != detach.end(); ++iter) {
+				if((*iter)->current.location & LOCATION_MZONE)
+					raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
 			}
 		}
 		adjust_instant();

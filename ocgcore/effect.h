@@ -162,6 +162,7 @@ public:
 #define EFFECT_FLAG_CHAIN_UNIQUE	0x8000000	//
 #define EFFECT_FLAG_NAGA			0x10000000	//
 #define EFFECT_FLAG_COF				0x20000000	//
+#define EFFECT_FLAG_CVAL_CHECK		0x40000000	//
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//
 #define EFFECT_DISABLE					2	//
@@ -406,6 +407,7 @@ public:
 #define EVENT_TOSS_DICE_NEGATE		1153
 #define EVENT_LEVEL_UP				1200
 #define EVENT_PAY_LPCOST			1201
+#define EVENT_DETACH_MATERIAL		1202
 #define EVENT_TURN_END				1210
 #define EVENT_PHASE					0x1000
 #define EVENT_PHASE_START			0x2000

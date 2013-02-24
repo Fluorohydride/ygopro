@@ -1822,6 +1822,9 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				core.tpchain.push_back(*clit);
 			else
 				core.ntpchain.push_back(*clit);
+			if(clit->triggering_effect->flag & EFFECT_FLAG_CVAL_CHECK) {
+				clit->triggering_effect->get_value();
+			}
 		}
 		core.new_ochain_s.pop_front();
 		core.units.begin()->step = 4;
