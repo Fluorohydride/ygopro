@@ -24,7 +24,7 @@ function c83272895.efop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_CHANGE_TYPE)
 		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetReset(RESET_EVENT+0x1ff0000)
 		rc:RegisterEffect(e2)
 	end
 end

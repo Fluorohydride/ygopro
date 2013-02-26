@@ -33,7 +33,7 @@ function c923596.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c923596.filter(c)
-	return c:IsSetCard(0x72) and c:GetCode()~=923596 and c:IsAbleToHand()
+	return c:IsSetCard(0x72) and c:GetCode()~=923596 and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c923596.shtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c923596.filter,tp,LOCATION_DECK,0,1,nil) end

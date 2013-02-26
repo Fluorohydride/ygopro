@@ -17,9 +17,9 @@ function c89399912.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_REPEAT)
-	e2:SetCountLimit(1)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetCondition(c89399912.retcon)
+	e2:SetCost(c89399912.retcost)
 	e2:SetTarget(c89399912.rettg)
 	e2:SetOperation(c89399912.retop)
 	c:RegisterEffect(e2)
@@ -70,6 +70,10 @@ end
 function c89399912.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 		and bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+end
+function c89399912.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,89399912)==0 end
+	Duel.RegisterFlagEffect(tp,89399912,RESET_PHASE+PHASE_END,0,1)
 end
 function c89399912.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

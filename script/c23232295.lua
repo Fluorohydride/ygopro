@@ -9,7 +9,7 @@ function c23232295.initial_effect(c)
 	e1:SetCode(EFFECT_DESTROY_REPLACE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTarget(c23232295.reptg)
-	e1:SetValue(1)
+	e1:SetValue(c23232295.repval)
 	c:RegisterEffect(e1)
 	--attack up
 	local e2=Effect.CreateEffect(c)
@@ -25,11 +25,22 @@ function c23232295.repfilter(c,tp)
 	return c:IsOnField() and c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x84)
 end
 function c23232295.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:GetCount()==1 and c23232295.repfilter(eg:GetFirst(),tp) end
-	if e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT) and Duel.SelectYesNo(tp,aux.Stringid(23232295,0)) then
+	if chk==0 then return eg:IsExists(c23232295.repfilter,1,nil,tp) end
+	if e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT) and Duel.SelectYesNo(tp,aux.Stringid(23232295,1)) then
 		e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
+		local g=eg:Filter(c23232295.repfilter,nil,tp)
+		if g:GetCount()==1 then
+			e:SetLabelObject(g:GetFirst())
+		else
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
+			local cg=g:Select(g,1,1,nil)
+			e:SetLabelObject(cg:GetFirst())
+		end
 		return true
 	else return false end
+end
+function c23232295.repval(e,c)
+	return c==e:GetLabelObject()
 end
 function c23232295.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
