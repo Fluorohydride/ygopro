@@ -1733,7 +1733,10 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		}
 		for (auto clit = core.new_ochain_s.begin(); clit != core.new_ochain_s.end(); ++clit) {
 			effect* peffect = clit->triggering_effect;
-			if(!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect)) {
+			if((!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect))
+			        || ((peffect->range & LOCATION_HAND) && peffect->handler->current.location == LOCATION_HAND)) {
+				if(!peffect->handler->is_has_relation(peffect))
+					peffect->handler->create_relation(peffect);
 				clit->triggering_player = peffect->handler->current.controler;
 				clit->triggering_controler = peffect->handler->current.controler;
 				clit->triggering_location = peffect->handler->current.location;
@@ -1747,6 +1750,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.new_ochain_s.clear();
 		core.new_ochain_s.splice(core.new_ochain_s.end(), core.tpchain);
 		core.new_ochain_s.splice(core.new_ochain_s.end(), core.ntpchain);
+		core.new_ochain_h.clear();
 		return FALSE;
 	}
 	case 5: {
@@ -1759,57 +1763,38 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			return FALSE;
 		}
 		auto clit = core.new_ochain_s.begin();
+		effect* peffect = clit->triggering_effect;
 		uint8 tp = clit->triggering_player;
 		bool act = true;
-		if(clit->triggering_effect->is_chainable(tp) && clit->triggering_effect->is_activateable(tp, clit->evt, TRUE)
-		        && ((clit->triggering_effect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
-		            || !(clit->triggering_effect->handler->current.location & 0x3) || clit->triggering_effect->handler->is_status(STATUS_IS_PUBLIC))) {
-			if(tp == infos.turn_player) {
-				for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
-					if(!(clit->triggering_effect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-						if(clit->triggering_location == LOCATION_HAND) {
-							if(tpit->triggering_location == LOCATION_HAND || tpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
+		if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
+		        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
+		            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
+			if((peffect->range & LOCATION_HAND) && clit->triggering_location == LOCATION_HAND) {
+				core.new_ochain_h.push_back(*clit);
+				act = false;
+			} else if(!(peffect->type & EFFECT_TYPE_FIELD) || (clit->triggering_location & peffect->range)) {
+				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+					if(tp == infos.turn_player) {
+						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
+							if(tpit->triggering_effect->handler->data.code == peffect->handler->data.code) {
 								act = false;
 								break;
 							}
-						} else {
-							if(tpit->triggering_location == LOCATION_HAND && tpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
+						}
+					} else {
+						for(auto ntpit = core.ntpchain.begin(); ntpit != core.ntpchain.end(); ++ntpit) {
+							if(ntpit->triggering_effect->handler->data.code == peffect->handler->data.code) {
 								act = false;
 								break;
 							}
 						}
 					}
-					if(act && (clit->triggering_effect->flag & EFFECT_FLAG_CHAIN_UNIQUE)
-					        && tpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
-						act = false;
-						break;
-					}
 				}
-			} else {
-				for(auto ntpit = core.ntpchain.begin(); ntpit != core.ntpchain.end(); ++ntpit) {
-					if(!(clit->triggering_effect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-						if(clit->triggering_location == LOCATION_HAND) {
-							if(ntpit->triggering_location == LOCATION_HAND || ntpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
-								act = false;
-								break;
-							}
-						} else {
-							if(ntpit->triggering_location == LOCATION_HAND && ntpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
-								act = false;
-								break;
-							}
-						}
-					}
-					if(act && (clit->triggering_effect->flag & EFFECT_FLAG_CHAIN_UNIQUE)
-					        && ntpit->triggering_effect->handler->data.code == clit->triggering_effect->handler->data.code) {
-						act = false;
-						break;
-					}
-				}
-			}
+			} else
+				act = false;
 		} else act = false;
 		if(act)
-			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)clit->triggering_effect->handler, tp, 0);
+			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)peffect->handler, tp, 0);
 		else returns.ivalue[0] = FALSE;
 		return FALSE;
 	}
@@ -1884,6 +1869,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 10: {
+		core.new_ochain_h.clear();
 		if(core.chain_limit) {
 			luaL_unref(pduel->lua->lua_state, LUA_REGISTRYINDEX, core.chain_limit);
 			core.chain_limit = 0;
@@ -1907,11 +1893,9 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	return TRUE;
 }
 int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
-	effect_container::iterator eit;
 	pair<effect_container::iterator, effect_container::iterator> pr;
 	event_list::iterator evit;
 	effect* peffect;
-	chain newchain;
 	switch(step) {
 	case 0: {
 		core.tpchain.clear();
@@ -1980,6 +1964,30 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 					evit = core.instant_event.begin();
 					pev = false;
 				}
+			}
+			for(auto clit = core.new_ochain_h.begin(); clit != core.new_ochain_h.end(); ++clit) {
+				effect* peffect = clit->triggering_effect;
+				bool act = true;
+				if(clit->triggering_player == priority && !peffect->handler->is_status(STATUS_CHAINING)
+				        && peffect->is_chainable(priority) && peffect->is_activateable(priority, clit->evt, TRUE)) {
+					for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
+						if(cait->triggering_player == priority) {
+							if(!(peffect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
+								if(cait->triggering_location == LOCATION_HAND || cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
+									act = false;
+									break;
+								}
+							}
+							if((peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) && (cait->triggering_effect->handler->data.code == peffect->handler->data.code)) {
+								act = false;
+								break;
+							}
+						}
+					}
+				} else
+					act = false;
+				if(act)
+					core.select_chains.push_back(*clit);
 			}
 			core.spe_effect[priority] = core.select_chains.size();
 			if(!special) {
