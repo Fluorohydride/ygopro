@@ -38,8 +38,11 @@ solution "ygo"
 
     configuration { "Release", "not vs*" }
         flags "Symbols"
-	defines "NDEBUG"
+        defines "NDEBUG"
         buildoptions "-march=native"
+
+    configuration { "Debug", "vs*" }
+        defines { "_ITERATOR_DEBUG_LEVEL=0" }
 
     configuration "Release"
         flags { "OptimizeSpeed" }

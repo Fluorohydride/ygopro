@@ -8,8 +8,6 @@ project "ygopro"
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3", "lua" , "event"}
 
-    configuration { "vs*", "Debug" }
-        defines { "_ITERATOR_DEBUG_LEVEL=0" }
     configuration "windows"
         files "ygopro.rc"
         includedirs { "../irrlicht/include", "../freetype/include", "../event/include", "../sqlite3" }
