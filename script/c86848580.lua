@@ -20,7 +20,7 @@ function c86848580.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c86848580.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
+	return c:IsFaceup() and not c:IsType(TYPE_NORMAL)
 end
 function c86848580.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c86848580.filter,tp,0,LOCATION_ONFIELD,1,nil) end

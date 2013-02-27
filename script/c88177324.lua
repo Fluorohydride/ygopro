@@ -32,10 +32,13 @@ function c88177324.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c88177324.filter1(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsDisabled()
 end
 function c88177324.filter2(c)
 	return c:IsFaceup() and (c:GetAttack()~=c:GetBaseAttack() or c:GetDefence()~=c:GetBaseDefence())
+end
+function c88177324.filter3(c)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
 end
 function c88177324.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return
@@ -45,7 +48,7 @@ function c88177324.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c88177324.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(c88177324.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,c)
+	local g=Duel.GetMatchingGroup(c88177324.filter3,tp,LOCATION_MZONE,LOCATION_MZONE,c)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)

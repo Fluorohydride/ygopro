@@ -682,9 +682,8 @@ void card::apply_field_effect() {
 	if (current.controler == PLAYER_NONE)
 		return;
 	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
-		if (current.location & it->second->range) {
+		if ((current.location & it->second->range) || ((it->second->range & LOCATION_HAND) && (it->second->type & EFFECT_TYPE_TRIGGER_O)))
 			pduel->game_field->add_effect(it->second);
-		}
 	}
 	if(unique_code && (current.location & LOCATION_ONFIELD))
 		pduel->game_field->add_unique_card(this);
@@ -693,7 +692,7 @@ void card::cancel_field_effect() {
 	if (current.controler == PLAYER_NONE)
 		return;
 	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
-		if (current.location & it->second->range)
+		if ((current.location & it->second->range) || ((it->second->range & LOCATION_HAND) && (it->second->type & EFFECT_TYPE_TRIGGER_O)))
 			pduel->game_field->remove_effect(it->second);
 	}
 	if(unique_code && current.location & LOCATION_ONFIELD)
