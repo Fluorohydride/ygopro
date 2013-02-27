@@ -9,12 +9,17 @@ solution "ygo"
         defines { "WIN32", "_WIN32" }
 
     configuration "bsd"
+        defines { "LUA_USE_POSIX" }
         includedirs { "/usr/local/include" }
         libdirs { "/usr/local/lib" }
 
     configuration "macosx"
+        defines { "LUA_USE_MACOSX" }
         includedirs { "/opt/local/include" }
         libdirs { "/opt/local/lib" }
+
+    configuration "linux"
+        defines { "LUA_USE_LINUX" }
 
     configuration "vs*"
         flags "EnableSSE2"
@@ -42,3 +47,10 @@ solution "ygo"
 
     include "ocgcore"
     include "gframe"
+    if os.is("windows") then
+    include "event"
+    include "freetype"
+    include "irrlicht"
+    include "lua"
+    include "sqlite3"
+    end

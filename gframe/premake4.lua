@@ -1,6 +1,6 @@
 include "lzma"
 
-project "gframe"
+project "ygopro"
     kind "WindowedApp"
 
     files { "**.cpp", "**.cc", "**.c", "**.h" }
@@ -8,7 +8,11 @@ project "gframe"
     includedirs { "../ocgcore" }
     links { "ocgcore", "clzma", "Irrlicht", "freetype", "sqlite3", "lua" , "event"}
 
+    configuration { "vs*", "Debug" }
+        defines { "_ITERATOR_DEBUG_LEVEL=0" }
     configuration "windows"
+        files "ygopro.rc"
+        includedirs { "../irrlicht/include", "../freetype/include", "../event/include", "../sqlite3" }
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
     configuration {"windows", "not vs*"}
         includedirs { "/mingw/include/irrlicht", "/mingw/include/freetype2" }
@@ -16,5 +20,5 @@ project "gframe"
         buildoptions { "-std=gnu++0x", "-fno-rtti" }
     configuration "not windows"
         includedirs { "/usr/include/lua", "/usr/include/lua5.2", "/usr/include/lua/5.2", "/usr/include/irrlicht", "/usr/include/freetype2" }
-	excludes { "COSOperator.*" }
+        excludes { "COSOperator.*" }
         links { "event_pthreads", "GL", "dl", "pthread" }
