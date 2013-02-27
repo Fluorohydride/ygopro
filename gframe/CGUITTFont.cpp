@@ -822,7 +822,7 @@ video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
 	video::ITexture* tex = page->texture;
 
 	// Acquire a read-only lock of the corresponding page texture.
-	void* ptr = tex->lock(true);
+	void* ptr = tex->lock(video::ETLM_READ_ONLY);
 
 	video::ECOLOR_FORMAT format = tex->getColorFormat();
 	core::dimension2du tex_size = tex->getOriginalSize();
