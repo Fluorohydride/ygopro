@@ -18,12 +18,8 @@ function c72710085.initial_effect(c)
 	e2:SetOperation(c72710085.tgop)
 	c:RegisterEffect(e2)
 end
-function c72710085.cfilter(c)
-	return not c:IsType(TYPE_TOKEN)
-end
 function c72710085.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(c72710085.cfilter,nil)
-	return g:GetCount()==1 and g:GetFirst():IsPreviousLocation(LOCATION_GRAVE) and g:GetFirst():IsControler(tp)
+	return eg:GetCount()==1 and eg:GetFirst():IsPreviousLocation(LOCATION_GRAVE) and eg:GetFirst():IsControler(tp)
 end
 function c72710085.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,72710085)==0 end
