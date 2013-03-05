@@ -25,7 +25,8 @@ function c31766317.rfilter(c)
 end
 function c31766317.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dc=eg:GetFirst()
-	if chk==0 then return eg:GetCount()==1 and dc~=e:GetHandler() and dc:IsFaceup() and dc:IsRace(RACE_FIEND) and dc:IsAttribute(ATTRIBUTE_DARK)
+	if chk==0 then return eg:GetCount()==1 and dc~=e:GetHandler() and dc:IsFaceup() and dc:IsLocation(LOCATION_MZONE)
+		and dc:IsRace(RACE_FIEND) and dc:IsAttribute(ATTRIBUTE_DARK)
 		and Duel.IsExistingMatchingCard(c31766317.rfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	if Duel.SelectYesNo(tp,aux.Stringid(31766317,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)

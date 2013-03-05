@@ -58,6 +58,7 @@ function c4694209.addc2(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		tc:AddCounter(0x21,1)
+		if tc:GetFlagEffect(4694209)~=0 then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EFFECT_DESTROY_REPLACE)
@@ -65,6 +66,7 @@ function c4694209.addc2(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetOperation(c4694209.repop)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
+		tc:RegisterFlagEffect(4694209,RESET_EVENT+0x1fe0000,0,0)
 	end
 end
 function c4694209.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
