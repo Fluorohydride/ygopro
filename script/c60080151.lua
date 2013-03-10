@@ -27,8 +27,7 @@ function c60080151.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local dam=tc:GetAttack()
-		Duel.Damage(tp,dam,REASON_EFFECT)
-		if Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 then
+		if Duel.Damage(tp,dam,REASON_EFFECT)>0 and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetDescription(aux.Stringid(60080151,0))
 			e1:SetCategory(CATEGORY_SPECIAL_SUMMON)

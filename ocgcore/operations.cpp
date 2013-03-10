@@ -2721,6 +2721,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pcard->fieldid = infos.field_id++;
 				pcard->reset(RESET_LEAVE, RESET_EVENT);
 				remove_card(pcard);
+				leave.insert(pcard);
 				continue;
 			}
 			if(dest == LOCATION_GRAVE) {
@@ -2829,22 +2830,23 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 						equipings.insert(equipc);
 				}
 			}
-			if(pcard->data.type & TYPE_TOKEN)
-				continue;
-			pcard->enable_field_effect(TRUE);
-			if(nloc == LOCATION_HAND) {
-				tohand.insert(pcard);
-				pcard->reset(RESET_TOHAND, RESET_EVENT);
-				raise_single_event(*cit, 0, EVENT_TO_HAND, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-			} else if(nloc == LOCATION_DECK || nloc == LOCATION_EXTRA) {
-				todeck.insert(pcard);
-				pcard->reset(RESET_TODECK, RESET_EVENT);
-				raise_single_event(*cit, 0, EVENT_TO_DECK, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-			} else if(nloc == LOCATION_GRAVE) {
-				tograve.insert(pcard);
-				pcard->reset(RESET_TOGRAVE, RESET_EVENT);
-				raise_single_event(*cit, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-			} else if(nloc == LOCATION_REMOVED) {
+			if(!(pcard->data.type & TYPE_TOKEN)) {
+				pcard->enable_field_effect(TRUE);
+				if(nloc == LOCATION_HAND) {
+					tohand.insert(pcard);
+					pcard->reset(RESET_TOHAND, RESET_EVENT);
+					raise_single_event(*cit, 0, EVENT_TO_HAND, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+				} else if(nloc == LOCATION_DECK || nloc == LOCATION_EXTRA) {
+					todeck.insert(pcard);
+					pcard->reset(RESET_TODECK, RESET_EVENT);
+					raise_single_event(*cit, 0, EVENT_TO_DECK, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+				} else if(nloc == LOCATION_GRAVE) {
+					tograve.insert(pcard);
+					pcard->reset(RESET_TOGRAVE, RESET_EVENT);
+					raise_single_event(*cit, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+				}
+			}
+			if(nloc == LOCATION_REMOVED || ((pcard->data.type & TYPE_TOKEN) && ((pcard->operation_param >> 8) & 0xff) == LOCATION_REMOVED)) {
 				remove.insert(pcard);
 				if(pcard->current.reason & REASON_TEMPORARY)
 					pcard->reset(RESET_TEMP_REMOVE, RESET_EVENT);

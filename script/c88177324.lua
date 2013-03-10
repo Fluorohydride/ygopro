@@ -103,6 +103,6 @@ function c88177324.regop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_EXTRA_ATTACK)
 	e2:SetValue(1)
-	e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_BATTLE)
+	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
 	c:RegisterEffect(e2)
 end

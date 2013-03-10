@@ -46,14 +46,13 @@ function c25341652.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c25341652.repfilter(c,tp)
-	return c:IsOnField() and c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x6d) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x6d) and c:CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
 end
 function c25341652.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c25341652.repfilter,1,nil,tp) end
 	if Duel.SelectYesNo(tp,aux.Stringid(25341652,1)) then
 		local g=eg:Filter(c25341652.repfilter,nil,tp)
-		g:KeepAlive()
-		e:SetLabelObject(g)
+		Duel.SetTargetCard(g)
 		return true
 	else return false end
 end
@@ -61,7 +60,7 @@ function c25341652.repval(e,c)
 	return c25341652.repfilter(c,e:GetHandlerPlayer())
 end
 function c25341652.repop(e,tp,eg,ep,ev,re,r,rp)
-	local g=e:GetLabelObject()
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc=g:GetFirst()
 	while tc do
 		tc:RemoveOverlayCard(tp,1,1,REASON_EFFECT)

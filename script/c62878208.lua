@@ -16,16 +16,17 @@ function c62878208.eqcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c62878208.filter1(c,e,tp)
 	local ec=c:GetEquipTarget()
-	return ec and ec:IsPosition(POS_FACEUP_ATTACK) and Duel.IsExistingTarget(c62878208.filter2,tp,0,LOCATION_MZONE,1,nil,c)
+	return ec and ec:IsControler(tp) and ec:IsPosition(POS_FACEUP_ATTACK)
+		and Duel.IsExistingTarget(c62878208.filter2,tp,0,LOCATION_MZONE,1,nil,c)
 end
 function c62878208.filter2(c,ec)
 	return c:IsPosition(POS_FACEUP_ATTACK) and ec:CheckEquipTarget(c)
 end
 function c62878208.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(c62878208.filter1,tp,LOCATION_SZONE,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c62878208.filter1,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(62878208,2))
-	local g1=Duel.SelectTarget(tp,c62878208.filter1,tp,LOCATION_SZONE,0,1,1,nil,e,tp)
+	local g1=Duel.SelectTarget(tp,c62878208.filter1,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,e,tp)
 	e:SetLabelObject(g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUPATTACK)
 	local g2=Duel.SelectTarget(tp,c62878208.filter2,tp,0,LOCATION_MZONE,1,1,nil,g1:GetFirst())
