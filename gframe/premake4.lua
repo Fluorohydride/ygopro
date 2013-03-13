@@ -10,6 +10,7 @@ project "ygopro"
 
     configuration "windows"
         files "ygopro.rc"
+        excludes "CGUIButton.cpp"
         includedirs { "../irrlicht/include", "../freetype/include", "../event/include", "../sqlite3" }
         links { "opengl32", "ws2_32", "winmm", "gdi32", "kernel32", "user32", "imm32" }
     configuration {"windows", "not vs*"}
