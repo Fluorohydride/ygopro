@@ -39,7 +39,7 @@ ClientCard::ClientCard() {
 	equipTarget = 0;
 }
 void ClientCard::SetCode(int code) {
-	if((location == LOCATION_HAND) && (this->code != code)) {
+	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
 		this->code = code;
 		mainGame->dField.MoveCard(this, 5);
 	} else
@@ -52,7 +52,7 @@ void ClientCard::UpdateInfo(char* buf) {
 	int pdata;
 	if(flag & QUERY_CODE) {
 		pdata = BufferIO::ReadInt32(buf);
-		if((location == LOCATION_HAND) && (pdata != code)) {
+		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
 			code = pdata;
 			mainGame->dField.MoveCard(this, 5);
 		} else
@@ -68,14 +68,14 @@ void ClientCard::UpdateInfo(char* buf) {
 		type = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LEVEL) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && level != pdata) {
+		if(pdata && level != (unsigned int)pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
 	}
 	if(flag & QUERY_RANK) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && rank != pdata) {
+		if(pdata && rank != (unsigned int)pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
 		}

@@ -119,7 +119,7 @@ void NetServer::ServerEchoRead(bufferevent *bev, void *ctx) {
 		if(len < 2)
 			return;
 		evbuffer_copyout(input, &packet_len, 2);
-		if(len < packet_len + 2)
+		if(len < (size_t)packet_len + 2)
 			return;
 		evbuffer_remove(input, net_server_read, packet_len + 2);
 		if(packet_len)

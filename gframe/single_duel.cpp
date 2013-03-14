@@ -392,11 +392,11 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteData(players[0]->name, 40, false);
 	last_replay.WriteData(players[1]->name, 40, false);
 	if(!host_info.no_shuffle_deck) {
-		for(int i = 0; i < pdeck[0].main.size(); ++i) {
+		for(size_t i = 0; i < pdeck[0].main.size(); ++i) {
 			int swap = rnd.real() * pdeck[0].main.size();
 			std::swap(pdeck[0].main[i], pdeck[0].main[swap]);
 		}
-		for(int i = 0; i < pdeck[1].main.size(); ++i) {
+		for(size_t i = 0; i < pdeck[1].main.size(); ++i) {
 			int swap = rnd.real() * pdeck[1].main.size();
 			std::swap(pdeck[1].main[i], pdeck[1].main[swap]);
 		}
@@ -420,22 +420,22 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteInt32(opt, false);
 	last_replay.Flush();
 	last_replay.WriteInt32(pdeck[0].main.size(), false);
-	for(int i = pdeck[0].main.size() - 1; i >= 0; --i) {
+	for(size_t i = pdeck[0].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].main[i]->first, 0, 0, LOCATION_DECK, 0, 0);
 		last_replay.WriteInt32(pdeck[0].main[i]->first, false);
 	}
 	last_replay.WriteInt32(pdeck[0].extra.size(), false);
-	for(int i = pdeck[0].extra.size() - 1; i >= 0; --i) {
+	for(size_t i = pdeck[0].extra.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[0].extra[i]->first, 0, 0, LOCATION_EXTRA, 0, 0);
 		last_replay.WriteInt32(pdeck[0].extra[i]->first, false);
 	}
 	last_replay.WriteInt32(pdeck[1].main.size(), false);
-	for(int i = pdeck[1].main.size() - 1; i >= 0; --i) {
+	for(size_t i = pdeck[1].main.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[1].main[i]->first, 1, 1, LOCATION_DECK, 0, 0);
 		last_replay.WriteInt32(pdeck[1].main[i]->first, false);
 	}
 	last_replay.WriteInt32(pdeck[1].extra.size(), false);
-	for(int i = pdeck[1].extra.size() - 1; i >= 0; --i) {
+	for(size_t i = pdeck[1].extra.size() - 1; i >= 0; --i) {
 		new_card(pduel, pdeck[1].extra[i]->first, 1, 1, LOCATION_EXTRA, 0, 0);
 		last_replay.WriteInt32(pdeck[1].extra[i]->first, false);
 	}
@@ -675,14 +675,14 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			player = BufferIO::ReadInt8(pbuf);
 			pbuf += 3;
 			count = BufferIO::ReadInt8(pbuf);
-			int c, l, s, ss, code;
+			int c/*, l, s, ss, code*/;
 			for (int i = 0; i < count; ++i) {
 				pbufw = pbuf;
-				code = BufferIO::ReadInt32(pbuf);
+				/*code = */BufferIO::ReadInt32(pbuf);
 				c = BufferIO::ReadInt8(pbuf);
-				l = BufferIO::ReadInt8(pbuf);
-				s = BufferIO::ReadInt8(pbuf);
-				ss = BufferIO::ReadInt8(pbuf);
+				/*l = */BufferIO::ReadInt8(pbuf);
+				/*s = */BufferIO::ReadInt8(pbuf);
+				/*ss = */BufferIO::ReadInt8(pbuf);
 				if (c != player) BufferIO::WriteInt32(pbufw, 0);
 			}
 			WaitforResponse(player);
@@ -862,8 +862,8 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			pbufw = pbuf;
 			int pc = pbuf[4];
 			int pl = pbuf[5];
-			int ps = pbuf[6];
-			int pp = pbuf[7];
+			/*int ps = pbuf[6];*/
+			/*int pp = pbuf[7];*/
 			int cc = pbuf[8];
 			int cl = pbuf[9];
 			int cs = pbuf[10];
@@ -1400,10 +1400,10 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_HAND);
 	int len = query_field_card(pduel, player, LOCATION_HAND, flag | QUERY_IS_PUBLIC, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	int qlen = 0, slen, qflag;
+	int qlen = 0, slen;
 	while(qlen < len) {
 		slen = BufferIO::ReadInt32(qbuf);
-		qflag = *(int*)qbuf;
+		/*int qflag = *(int*)qbuf;*/
 		if(!qbuf[slen - 8])
 			memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
