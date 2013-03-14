@@ -547,7 +547,7 @@ void SingleDuel::Surrender(DuelPlayer* dp) {
 int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 	char* offset, *pbufw, *pbuf = msgbuffer;
 	int player, count, type;
-	while (pbuf - msgbuffer < len) {
+	while (pbuf - msgbuffer < (int)len) {
 		offset = pbuf;
 		unsigned char engType = BufferIO::ReadUInt8(pbuf);
 		switch (engType) {

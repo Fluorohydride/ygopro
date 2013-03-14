@@ -1,6 +1,10 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4244)
+#endif
+
 class BufferIO {
 public:
 	inline static int ReadInt32(char*& p) {

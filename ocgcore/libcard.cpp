@@ -1805,7 +1805,7 @@ int32 scriptlib::card_cancel_to_grave(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	bool cancel = true;
 	if(lua_gettop(L) > 1)
-		cancel = lua_toboolean(L, 2);
+		cancel = lua_toboolean(L, 2) != 0;
 	if(cancel)
 		pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
 	else {

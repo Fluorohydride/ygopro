@@ -985,7 +985,7 @@ void luaC_freeallobjects (lua_State *L) {
 
 static l_mem atomic (lua_State *L) {
   global_State *g = G(L);
-  l_mem work = -g->GCmemtrav;  /* start counting work */
+  l_mem work = -(l_mem)g->GCmemtrav;  /* start counting work */
   GCObject *origweak, *origall;
   lua_assert(!iswhite(obj2gco(g->mainthread)));
   markobject(g, L);  /* mark running thread */

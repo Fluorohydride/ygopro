@@ -287,7 +287,7 @@ void NetServer::HandleCTOSPacket(DuelPlayer* dp, char* data, unsigned int len) {
 	case CTOS_HS_NOTREADY: {
 		if(!duel_mode || duel_mode->pduel)
 			break;
-		duel_mode->PlayerReady(dp, CTOS_HS_NOTREADY - pktType);
+		duel_mode->PlayerReady(dp, (CTOS_HS_NOTREADY - pktType) != 0);
 		break;
 	}
 	case CTOS_HS_KICK: {

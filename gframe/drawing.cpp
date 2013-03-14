@@ -50,7 +50,7 @@ void Game::DrawBackGround() {
 	static int selFieldAlpha = 255;
 	static int selFieldDAlpha = -10;
 	matrix4 im = irr::core::IdentityMatrix;
-	im.setTranslation(vector3df(0, 0, -0.01));
+	im.setTranslation(vector3df(0, 0, -0.01f));
 	driver->setTransform(irr::video::ETS_WORLD, im);
 	//dark shade
 //	matManager.mSelField.AmbientColor = 0xff000000;
@@ -243,7 +243,7 @@ void Game::DrawCard(ClientCard* pcard) {
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
 	irr::core::matrix4 im, ic, it;
-	act_rot.Z += 0.02;
+	act_rot.Z += 0.02f;
 	im.setRotationRadians(act_rot);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);

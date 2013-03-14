@@ -89,7 +89,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
-	bool is_xyz = (location & 0x80);
+	bool is_xyz = (location & 0x80) != 0;
 	location &= 0x7f;
 	switch(location) {
 	case LOCATION_DECK:

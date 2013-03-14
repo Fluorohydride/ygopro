@@ -20,7 +20,7 @@ public:
 		LeaveCriticalSection(&_mutex);
 	}
 	bool TryLock() {
-		return TryEnterCriticalSection(&_mutex);
+		return TryEnterCriticalSection(&_mutex) == TRUE;
 	}
 private:
 	CRITICAL_SECTION _mutex;

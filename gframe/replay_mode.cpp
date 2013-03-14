@@ -178,7 +178,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 	char* offset, *pbuf = msg;
 	int player, count;
 	bool pauseable;
-	while (pbuf - msg < len) {
+	while (pbuf - msg < (int)len) {
 		if(is_closing)
 			return false;
 		if(is_swaping) {

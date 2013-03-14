@@ -102,7 +102,7 @@ void DuelClient::ClientRead(bufferevent* bev, void* ctx) {
 }
 void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 	if (events & BEV_EVENT_CONNECTED) {
-		bool create_game = (bool)ctx;
+		bool create_game = (size_t)ctx != 0;
 		CTOS_PlayerInfo cspi;
 		BufferIO::CopyWStr(mainGame->ebNickName->getText(), cspi.name, 20);
 		SendPacketToServer(CTOS_PLAYER_INFO, cspi);
@@ -373,7 +373,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		STOC_TypeChange* pkt = (STOC_TypeChange*)pdata;
 		if(!mainGame->dInfo.isTag) {
 			selftype = pkt->type & 0xf;
-			is_host = (pkt->type >> 4) & 0xf;
+			is_host = ((pkt->type >> 4) & 0xf) != 0;
 			mainGame->btnHostPrepKick[2]->setVisible(false);
 			mainGame->btnHostPrepKick[3]->setVisible(false);
 			if(is_host) {
@@ -403,7 +403,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 				mainGame->chkHostPrepReady[selftype]->setChecked(false);
 			}
 			selftype = pkt->type & 0xf;
-			is_host = (pkt->type >> 4) & 0xf;
+			is_host = ((pkt->type >> 4) & 0xf) != 0;
 			mainGame->btnHostPrepDuelist->setEnabled(true);
 			if(is_host) {
 				mainGame->btnHostPrepStart->setVisible(true);
@@ -2195,7 +2195,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			}
 		}
 		if(cl == LOCATION_HAND)
-			mainGame->dField.current_chain.chain_pos.X += 0.35;
+			mainGame->dField.current_chain.chain_pos.X += 0.35f;
 		else
 			mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
 		return true;
@@ -3064,7 +3064,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				}
 			}
 			if(cl == LOCATION_HAND)
-				mainGame->dField.current_chain.chain_pos.X += 0.35;
+				mainGame->dField.current_chain.chain_pos.X += 0.35f;
 			else
 				mainGame->dField.current_chain.chain_pos.Y += chc * 0.25f;
 			mainGame->dField.chains.push_back(mainGame->dField.current_chain);

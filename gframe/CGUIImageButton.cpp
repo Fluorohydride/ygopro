@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#pragma warning(disable: 4244)
+#endif
+
 #include "CGUIImageButton.h"
 
 namespace irr {
