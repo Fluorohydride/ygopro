@@ -40,7 +40,7 @@ public:
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
 	
-	int selected_option;
+	size_t selected_option;
 	ClientCard* attacker;
 	ClientCard* attack_target;
 	int disabled_field;
@@ -98,10 +98,10 @@ public:
 	std::vector<int> ancard;
 	int hovered_controler;
 	int hovered_location;
-	int hovered_sequence;
+	size_t hovered_sequence;
 	int command_controler;
 	int command_location;
-	int command_sequence;
+	size_t command_sequence;
 	ClientCard* hovered_card;
 	ClientCard* clicked_card;
 	ClientCard* command_card;

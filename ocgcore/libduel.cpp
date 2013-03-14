@@ -741,7 +741,7 @@ int32 scriptlib::duel_raise_event(lua_State *L) {
 		pgroup = *(group**) lua_touserdata(L, 1);
 		pduel = pgroup->pduel;
 	} else
-		luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
+		return luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
 	check_param(L, PARAM_TYPE_EFFECT, 3);
 	uint32 code = lua_tointeger(L, 2);
 	effect* peffect = *(effect**) lua_touserdata(L, 3);

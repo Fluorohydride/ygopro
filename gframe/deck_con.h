@@ -14,16 +14,16 @@ public:
 	void FilterCards();
 	
 	long long filter_effect;
-	int filter_type;
-	int filter_type2;
-	int filter_attrib;
-	int filter_race;
-	int filter_atktype;
+	unsigned int filter_type;
+	unsigned int filter_type2;
+	unsigned int filter_attrib;
+	unsigned int filter_race;
+	unsigned int filter_atktype;
 	int filter_atk;
-	int filter_deftype;
+	unsigned int filter_deftype;
 	int filter_def;
-	int filter_lvtype;
-	int filter_lv;
+	unsigned int filter_lvtype;
+	unsigned int filter_lv;
 	int filter_lm;
 	int hovered_code;
 	int hovered_pos;
@@ -32,9 +32,9 @@ public:
 	bool is_draging;
 	int dragx;
 	int dragy;
-	int pre_mainc;
-	int pre_extrac;
-	int pre_sidec;
+	size_t pre_mainc;
+	size_t pre_extrac;
+	size_t pre_sidec;
 	code_pointer draging_pointer;
 	
 	std::unordered_map<int, int>* filterList;

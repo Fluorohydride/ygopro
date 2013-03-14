@@ -15,7 +15,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
-		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -282,11 +281,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					char* pdeck = deckbuf;
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
-					for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
-					for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
-					for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 					DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 					DuelClient::SendPacketToServer(CTOS_HS_READY);
@@ -327,7 +326,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		break;
+		default: break;
 		}
 		break;
 	}
@@ -342,9 +341,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			mainGame->device->minimizeWindow();
 			break;
 		}
+		default: break;
 		}
 		break;
 	}
+	default: break;
 	}
 	return false;
 }

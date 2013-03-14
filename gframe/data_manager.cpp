@@ -73,7 +73,7 @@ bool DataManager::LoadStrings(const char* file) {
 	char strbuf[256];
 	int value;
 	fseek(fp, 0, SEEK_END);
-	size_t fsize = ftell(fp);
+	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	fgets(linebuf, 256, fp);
 	while(ftell(fp) < fsize) {
