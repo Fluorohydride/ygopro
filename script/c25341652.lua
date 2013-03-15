@@ -66,5 +66,4 @@ function c25341652.repop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 		tc=g:GetNext()
 	end
-	g:DeleteGroup()
 end

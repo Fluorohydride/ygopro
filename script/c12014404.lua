@@ -35,7 +35,6 @@ function c12014404.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EVENT_BATTLE_START)
-		e1:SetCountLimit(1)
 		e1:SetOperation(c12014404.atkop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
@@ -45,6 +44,7 @@ function c12014404.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	if bc then
+		if c:GetFlagEffect(12014404)~=0 then return end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -59,5 +59,6 @@ function c12014404.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(-500)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 		bc:RegisterEffect(e2)
+		c:RegisterFlagEffect(12014404,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE,0,1)
 	end
 end

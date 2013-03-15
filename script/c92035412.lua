@@ -17,11 +17,11 @@ function c92035412.initial_effect(c)
 	e2:SetOperation(c92035412.spop)
 	c:RegisterEffect(e2)
 end
-function c92035412.cfilter(c)
-	return c:IsSetCard(0x30) and c:IsType(TYPE_EQUIP) and c:IsFaceup()
+function c92035412.cfilter(c,tp)
+	return c:IsSetCard(0x30) and c:IsType(TYPE_EQUIP) and c:IsFaceup() and c:IsControler(tp)
 end
 function c92035412.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local ct=eg:FilterCount(c92035412.cfilter,nil)
+	local ct=eg:FilterCount(c92035412.cfilter,nil,tp)
 	e:SetLabel(ct)
 	return ct>0
 end
