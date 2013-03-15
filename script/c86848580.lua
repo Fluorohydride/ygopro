@@ -19,14 +19,17 @@ function c86848580.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
-function c86848580.filter(c)
-	return c:IsFaceup() and not c:IsType(TYPE_NORMAL)
+function c86848580.filter1(c)
+	return c:IsFaceup() and not c:IsDisabled() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT))
+end
+function c86848580.filter2(c)
+	return c:IsFaceup() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT))
 end
 function c86848580.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c86848580.filter,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c86848580.filter1,tp,0,LOCATION_ONFIELD,1,nil) end
 end
 function c86848580.disop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c86848580.filter,tp,0,LOCATION_ONFIELD,nil)
+	local g=Duel.GetMatchingGroup(c86848580.filter2,tp,0,LOCATION_ONFIELD,nil)
 	local tc=g:GetFirst()
 	local c=e:GetHandler()
 	while tc do
