@@ -58,7 +58,8 @@ function c303660.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c303660.etarget(e,c)
-	return c:IsType(TYPE_TRAP) and c:GetControler()==e:GetHandler():GetEquipTarget():GetControler()
+	local ec=e:GetHandler():GetEquipTarget()
+	return c:IsType(TYPE_TRAP) and ec and c:GetControler()==ec:GetControler()
 end
 function c303660.efilter(e,re)
 	return re:GetHandler()==e:GetHandler():GetEquipTarget()

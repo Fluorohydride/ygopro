@@ -14,6 +14,7 @@ function c25290459.costfilter(c,e,tp)
 	if not c:IsSetCard(0x41) or not c:IsAbleToGraveAsCost() then return false end
 	local code=c:GetCode()
 	local class=_G["c"..code]
+	if class==nil or class.lvupcount==nil then return false end
 	return Duel.IsExistingMatchingCard(c25290459.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,nil,class,e,tp)
 end
 function c25290459.spfilter(c,class,e,tp)

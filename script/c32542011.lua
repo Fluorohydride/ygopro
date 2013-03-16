@@ -71,6 +71,8 @@ function c32542011.activate(e,tp,eg,ep,ev,re,r,rp)
 		if g:GetCount()>0 then
 			Duel.HintSelection(g)
 			Duel.Destroy(g,REASON_EFFECT)
+			Duel.BreakEffect()
+			Duel.DiscardHand(tp,nil,1,1,REASON_DISCARD+REASON_EFFECT)
 		end
 	end
 end
