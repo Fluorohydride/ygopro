@@ -16,6 +16,7 @@ function c86827882.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c86827882.filter(c)
+	if c==Duel.GetAttacker() and Duel.GetAttackTarget()==nil then return false end
 	return c:IsFaceup() and (c:IsSetCard(0x42) or c:IsSetCard(0x4b))
 end
 function c86827882.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

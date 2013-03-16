@@ -52,7 +52,7 @@ function c59593925.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c59593925.sdesop(e,tp,eg,ep,ev,re,r,rp)
-	if tp==Duel.GetTurnPlayer() then return end
+	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

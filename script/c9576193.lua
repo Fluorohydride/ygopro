@@ -39,8 +39,8 @@ function c9576193.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Draw(tp,1,REASON_EFFECT)==0 then return end
 	local dr=Duel.GetOperatedGroup():GetFirst()
 	Duel.ConfirmCards(1-tp,dr)
+	Duel.BreakEffect()
 	if dr:GetLevel()==tc1:GetLevel() then
-		Duel.BreakEffect()
 		if Duel.SpecialSummon(dr,0,tp,tp,false,false,POS_FACEUP)==0 then
 			Duel.ShuffleHand(tp)
 		end

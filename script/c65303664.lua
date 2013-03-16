@@ -24,6 +24,7 @@ function c65303664.filter(c,tp)
 	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_BEAST)
 end
 function c65303664.adjop(e,tp,eg,ep,ev,re,r,rp)
+	if bit.band(r,REASON_BATTLE)==0 then return end
 	local pg=e:GetLabelObject()
 	if pg then pg:DeleteGroup() end
 	local dg=eg:Filter(c65303664.filter,nil,tp)
@@ -31,7 +32,7 @@ function c65303664.adjop(e,tp,eg,ep,ev,re,r,rp)
 	dg:KeepAlive()
 end
 function c65303664.cfilter(c,dg)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and dg:IsContains(c)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and c:IsReason(REASON_BATTLE) and dg:IsContains(c)
 end
 function c65303664.condition(e,tp,eg,ep,ev,re,r,rp)
 	local de=e:GetLabelObject()

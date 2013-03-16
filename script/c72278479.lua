@@ -27,7 +27,7 @@ function c72278479.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c72278479.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:GetAttack()>0 then
 		Duel.Recover(tp,tc:GetAttack(),REASON_EFFECT)
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
