@@ -21,27 +21,24 @@ function c46668237.initial_effect(c)
 	e2:SetOperation(c46668237.operation)
 	c:RegisterEffect(e2)
 end
-function c46668237.filter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_BEAST)
+function c46668237.filter(c)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsRace(RACE_BEAST)
 end
 function c46668237.adjop(e,tp,eg,ep,ev,re,r,rp)
-	local pg=e:GetLabelObject()
-	if pg then pg:DeleteGroup() end
-	local dg=eg:Filter(c46668237.filter,nil,tp)
-	e:SetLabelObject(dg)
-	dg:KeepAlive()
+	local g=eg:Filter(c46668237.filter,nil)
+	local tc=g:GetFirst()
+	while tc do
+		if tc:GetFlagEffect(46668237)==0 then
+			tc:RegisterFlagEffect(46668237,RESET_EVENT+0x17a0000+RESET_PHASE+PHASE_END,0,1)
+		end
+		tc=g:GetNext()
+	end
 end
-function c46668237.cfilter(c,dg)
-	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and dg:IsContains(c)
+function c46668237.cfilter(c,tp)
+	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and c:GetPreviousControler()==tp and c:GetFlagEffect(46668237)~=0
 end
 function c46668237.condition(e,tp,eg,ep,ev,re,r,rp)
-	local de=e:GetLabelObject()
-	local dg=de:GetLabelObject()
-	if not dg then return false end
-	local res=eg:IsExists(c46668237.cfilter,1,nil,dg)
-	dg:DeleteGroup()
-	de:SetLabelObject(nil)
-	return res
+	return eg:IsExists(c46668237.cfilter,1,nil,tp)
 end
 function c46668237.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end

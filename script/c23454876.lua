@@ -45,9 +45,8 @@ function c23454876.damcon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,51960178)
 end
 function c23454876.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,23454876)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,23454876,RESET_PHASE+PHASE_END,0,1)
 end
 function c23454876.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
