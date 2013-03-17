@@ -3,7 +3,6 @@ function c30608985.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(30608985,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
 	e1:SetTarget(c30608985.target)
@@ -19,9 +18,12 @@ function c30608985.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c30608985.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
 		and Duel.SelectYesNo(tp,aux.Stringid(30608985,1)) then
+		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectTarget(tp,c30608985.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
+	else
+		e:SetCategory(0)
 	end
 end
 function c30608985.operation(e,tp,eg,ep,ev,re,r,rp)
