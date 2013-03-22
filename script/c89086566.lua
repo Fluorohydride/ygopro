@@ -12,7 +12,7 @@ function c89086566.initial_effect(c)
 end
 function c89086566.cfilter(c)
 	local code=c:GetCode()
-	return (code==40640057 or code==40703223) and c:IsDestructable()
+	return (code==40640057 or code==40703223) and c:IsDestructable() and c:IsFaceup()
 end
 function c89086566.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c89086566.cfilter,tp,LOCATION_MZONE,0,1,nil) end
