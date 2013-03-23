@@ -18,7 +18,7 @@ function c19337371.initial_effect(c)
 end
 function c19337371.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,19337371)==0 end
-	Duel.RegisterFlagEffect(tp,19337371,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,19337371,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c19337371.filter(c)
 	return c:IsCode(90219263) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
@@ -37,7 +37,7 @@ function c19337371.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c19337371.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_HAND+LOCATION_ONFIELD) and Duel.GetFlagEffect(tp,19337371)==0
+	return e:GetHandler():IsPreviousLocation(LOCATION_HAND+LOCATION_ONFIELD)
 end
 function c19337371.regop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -57,7 +57,7 @@ function c19337371.thfilter(c)
 end
 function c19337371.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,19337371)==0 end
-	Duel.RegisterFlagEffect(tp,19337371,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,19337371,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c19337371.thop(e,tp,eg,ep,ev,re,r,rp)
