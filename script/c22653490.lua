@@ -41,7 +41,7 @@ function c22653490.tdtg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c22653490.tdop1(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFacedown() and tc:IsRelateToEffect(e) then
+	if tc and tc:IsRelateToEffect(e) then
 		Duel.SendtoDeck(tc,nil,1,REASON_EFFECT)
 	end
 end
