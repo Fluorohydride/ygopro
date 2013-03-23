@@ -564,7 +564,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					else if(pkt->player == 3)
 						mainGame->AddChatMsg(msg, 3);
 					else
-						mainGame->AddChatMsg(msg, 10);
+						mainGame->AddChatMsg(msg, 9);
 				} else {
 					if(pkt->player == 0)
 						mainGame->AddChatMsg(msg, 1);
@@ -575,7 +575,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					else if(pkt->player == 3)
 						mainGame->AddChatMsg(msg, 2);
 					else
-						mainGame->AddChatMsg(msg, 10);
+						mainGame->AddChatMsg(msg, 9);
 				}
 			}
 			mainGame->gMutex.Unlock();
@@ -593,7 +593,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			BufferIO::CopyWStr(pkt->msg, msg, 256);
 			msg[(len - 3) / 2] = 0;
 			mainGame->gMutex.Lock();
-			mainGame->AddChatMsg(msg, 10);
+			mainGame->AddChatMsg(msg, 9);
 			mainGame->gMutex.Unlock();
 		}
 		break;
