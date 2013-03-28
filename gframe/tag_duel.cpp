@@ -143,11 +143,7 @@ void TagDuel::LeaveGame(DuelPlayer* dp) {
 			NetServer::DisconnectPlayer(dp);
 		} else {
 			EndDuel();
-			NetServer::SendPacketToPlayer(players[0], STOC_DUEL_END);
-			NetServer::ReSendToPlayer(players[1]);
-			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-				NetServer::ReSendToPlayer(*oit);
-			NetServer::StopServer();
+			DuelEndProc();
 		}
 	}
 }
