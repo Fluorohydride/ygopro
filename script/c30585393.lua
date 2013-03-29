@@ -10,12 +10,13 @@ function c30585393.initial_effect(c)
 	e1:SetOperation(c30585393.activate)
 	c:RegisterEffect(e1)
 end
-function c30585393.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c30585393.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=eg:GetFirst()
+	if chkc then return chkc==tc end
 	if chk==0 then return eg:GetCount()==1 and tc:GetPreviousControler()==tp
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and tc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and tc:IsReason(REASON_EFFECT)
-		and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		and tc:IsCanBeEffectTarget(e) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetTargetCard(tc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,tc,1,0,0)
 end
