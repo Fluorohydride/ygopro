@@ -59,14 +59,15 @@ function c85602018.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetLabelObject():GetLabel()==1 and Duel.GetCurrentChain()==0
 end
 function c85602018.spop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetLabelObject():GetLabel()~=1 then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c85602018.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
 		and Duel.SelectYesNo(tp,aux.Stringid(85602018,0)) then
+		e:GetLabelObject():SetLabel(2)
 		Duel.Hint(HINT_CARD,0,85602018)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local g=Duel.SelectMatchingCard(tp,c85602018.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		e:GetLabelObject():SetLabel(2)
 	else
 		e:GetLabelObject():SetLabel(0)
 	end

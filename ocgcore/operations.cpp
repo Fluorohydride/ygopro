@@ -1200,19 +1200,32 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			effect_set eset;
 			target->filter_effect(EFFECT_DECREASE_TRIBUTE, &eset);
 			int32 minul = 0;
+			effect* pdec = 0;
 			for(int32 i = 0; i < eset.count; ++i) {
 				if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
 					int32 dec = eset[i]->get_value(target);
-					if(minul < (dec & 0xffff))
+					if(minul < (dec & 0xffff)) {
 						minul = dec & 0xffff;
+						pdec = eset[i];
+					}
 				}
 			}
-			min -= minul;
+			if(pdec) {
+				min -= minul;
+				pduel->write_buffer8(MSG_HINT);
+				pduel->write_buffer8(HINT_CARD);
+				pduel->write_buffer8(0);
+				pduel->write_buffer32(pdec->handler->data.code);
+			}
 			for(int32 i = 0; i < eset.count && min > 0; ++i) {
 				if((eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT) && (eset[i]->reset_count & 0xf00) > 0 && eset[i]->target) {
 					int32 dec = eset[i]->get_value(target);
 					min -= dec & 0xffff;
 					eset[i]->dec_count();
+					pduel->write_buffer8(MSG_HINT);
+					pduel->write_buffer8(HINT_CARD);
+					pduel->write_buffer8(0);
+					pduel->write_buffer32(eset[i]->handler->data.code);
 				}
 			}
 			for(int32 i = 0; i < eset.count && min > 0; ++i) {
@@ -1220,6 +1233,10 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 					int32 dec = eset[i]->get_value(target);
 					min -= dec & 0xffff;
 					eset[i]->dec_count();
+					pduel->write_buffer8(MSG_HINT);
+					pduel->write_buffer8(HINT_CARD);
+					pduel->write_buffer8(0);
+					pduel->write_buffer32(eset[i]->handler->data.code);
 				}
 			}
 		}
@@ -1281,6 +1298,10 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			core.extra_summon[sumplayer] = TRUE;
 			effect* pextra = (effect*)core.temp_var[0];
 			pextra->get_value(target);
+			pduel->write_buffer8(MSG_HINT);
+			pduel->write_buffer8(HINT_CARD);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32(pextra->handler->data.code);
 		}
 		target->set_status(STATUS_FLIP_SUMMONED, FALSE);
 		target->enable_field_effect(FALSE);
@@ -1329,6 +1350,10 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			core.extra_summon[sumplayer] = TRUE;
 			effect* pextra = (effect*)core.temp_var[0];
 			pextra->get_value(target);
+			pduel->write_buffer8(MSG_HINT);
+			pduel->write_buffer8(HINT_CARD);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32(pextra->handler->data.code);
 		}
 		core.summoning_card = target;
 		return FALSE;
@@ -1669,6 +1694,10 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			core.extra_summon[setplayer] = TRUE;
 			effect* pextra = (effect*)core.temp_var[0];
 			pextra->get_value(target);
+			pduel->write_buffer8(MSG_HINT);
+			pduel->write_buffer8(HINT_CARD);
+			pduel->write_buffer8(0);
+			pduel->write_buffer32(pextra->handler->data.code);
 		}
 		target->enable_field_effect(FALSE);
 		move_to_field(target, setplayer, setplayer, LOCATION_MZONE, POS_FACEDOWN_DEFENCE);

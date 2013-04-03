@@ -12,15 +12,14 @@ function c53714009.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(53714009,0))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_DAMAGE)
-	e2:SetRange(LOCATION_MZONE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCondition(c53714009.atkcon)
 	e2:SetOperation(c53714009.atkop)
 	c:RegisterEffect(e2)
 end
 function c53714009.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler()
+	return ep~=tp
 end
 function c53714009.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
