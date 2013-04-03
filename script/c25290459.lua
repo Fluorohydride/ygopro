@@ -11,7 +11,7 @@ function c25290459.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c25290459.costfilter(c,e,tp)
-	if not c:IsSetCard(0x41) or not c:IsAbleToGraveAsCost() then return false end
+	if not c:IsSetCard(0x41) or not c:IsAbleToGraveAsCost() or not c:IsFaceup() then return false end
 	local code=c:GetCode()
 	local class=_G["c"..code]
 	if class==nil or class.lvupcount==nil then return false end

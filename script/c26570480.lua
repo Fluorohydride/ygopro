@@ -39,7 +39,7 @@ end
 function c26570480.cfilter(c,tp)
 	local np=c:GetPosition()
 	local pp=c:GetPreviousPosition()
-	return ((np==POS_FACEUP_DEFENCE and pp==POS_FACEUP_ATTACK) or (pp==POS_FACEUP_DEFENCE and np==POS_FACEUP_ATTACK))
+	return ((np==POS_FACEUP_DEFENCE and pp==POS_FACEUP_ATTACK) or (bit.band(pp,POS_DEFENCE)~=0 and np==POS_FACEUP_ATTACK))
 		and c:IsControler(tp) and c:IsSetCard(0x71)
 end
 function c26570480.poscon(e,tp,eg,ep,ev,re,r,rp)
