@@ -28,7 +28,13 @@ function c967928.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
 		e1:SetCode(EFFECT_SKIP_DP)
-		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN)
+		if Duel.GetTurnPlayer()==p and Duel.GetCurrentPhase()==PHASE_DRAW then
+			e1:SetReset(RESET_PHASE+PHASE_DRAW+RESET_SELF_TURN,2)
+			e1:SetLabel(Duel.GetTurnCount())
+			e1:SetCondition(c967928.skipcon)
+		else
+			e1:SetReset(RESET_PHASE+PHASE_DRAW+RESET_SELF_TURN)
+		end
 		Duel.RegisterEffect(e1,p)
 	else
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -41,6 +47,9 @@ function c967928.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e1,p)
 	end
 end
+function c967928.skipcon(e)
+	return Duel.GetTurnCount()~=e:GetLabel()
+end
 function c967928.aclimit(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
