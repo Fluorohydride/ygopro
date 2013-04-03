@@ -40,7 +40,7 @@ function c85909450.effcon(e)
 	return e:GetHandler():GetOverlayCount()>0
 end
 function c85909450.target(e,c)
-	return c:IsSetCard(0x64)
+	return c:IsSetCard(0x64) and c:IsType(TYPE_MONSTER)
 end
 function c85909450.tgvalue(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
