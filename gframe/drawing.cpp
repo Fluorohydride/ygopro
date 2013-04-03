@@ -667,7 +667,7 @@ void Game::DrawSpec() {
 			attack_sv = 0;
 	}
 	for(int i = 0; i < 5; ++i) {
-		static unsigned int chatColor[10] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040};
+		static unsigned int chatColor[11] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040};
 		if(chatTiming[i]) {
 			chatTiming[i]--;
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
