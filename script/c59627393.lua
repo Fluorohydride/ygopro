@@ -35,8 +35,8 @@ end
 function c59627393.operation(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	if a:IsFacedown() or not a:IsRelateToEffect(e) or at:IsFacedown() or not at:IsRelateToEffect(e) then return end
 	if at:IsControler(tp) then a,at=at,a end
+	if a:IsFacedown() or not a:IsRelateToEffect(e) or not at:IsRelateToEffect(e) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -49,14 +49,16 @@ function c59627393.operation(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetValue(1)
 	e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	a:RegisterEffect(e2,true)
-	local e3=Effect.CreateEffect(e:GetHandler())
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_DISABLE)
-	e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-	at:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(e:GetHandler())
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_DISABLE_EFFECT)
-	e4:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-	at:RegisterEffect(e4)
+	if at:IsType(TYPE_EFFECT) then
+		local e3=Effect.CreateEffect(e:GetHandler())
+		e3:SetType(EFFECT_TYPE_SINGLE)
+		e3:SetCode(EFFECT_DISABLE)
+		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		at:RegisterEffect(e3)
+		local e4=Effect.CreateEffect(e:GetHandler())
+		e4:SetType(EFFECT_TYPE_SINGLE)
+		e4:SetCode(EFFECT_DISABLE_EFFECT)
+		e4:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		at:RegisterEffect(e4)
+	end
 end

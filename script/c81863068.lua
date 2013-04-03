@@ -23,5 +23,5 @@ function c81863068.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-p,g)
 	local dg=g:Filter(Card.IsType,nil,TYPE_SPELL)
 	Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
-	Duel.ShuffleHand(1-p)
+	Duel.ShuffleHand(p)
 end

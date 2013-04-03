@@ -30,7 +30,7 @@ function c8483333.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function c8483333.spfilter(c,e,tp,rc)
-	return c:IsReason(REASON_SUMMON) and c:GetReasonCard()==rc and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_SUMMON) and c:GetReasonCard()==rc and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c8483333.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
