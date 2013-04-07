@@ -12,11 +12,14 @@ function c57568840.initial_effect(c)
 	e1:SetOperation(c57568840.lvop)
 	c:RegisterEffect(e1)
 end
+function c57568840.filter(c)
+	return c:IsFaceup() and not c:IsType(TYPE_XYZ)
+end
 function c57568840.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c57568840.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c57568840.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,c57568840.filter,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
 end
 function c57568840.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

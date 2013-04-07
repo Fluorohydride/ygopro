@@ -52,4 +52,5 @@ function c7634581.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
 	end
+	e:GetHandler():CompleteProcedure()
 end
