@@ -48,8 +48,7 @@ function c66970002.tdop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c66970002.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled()
-		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
+	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
 end
 function c66970002.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

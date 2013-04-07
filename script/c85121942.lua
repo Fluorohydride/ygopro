@@ -48,8 +48,7 @@ function c85121942.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c85121942.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled()
-		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,59627393)
+	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,59627393)
 end
 function c85121942.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
