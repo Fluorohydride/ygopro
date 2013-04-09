@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 		 * -r: replay */
 		if(argv[i][0] == '-' && argv[i][1] == 'e') {
 			ygo::dataManager.LoadDB(&argv[i][2]);
-		} else if(!strcmp(argv[i], "-j") || !strcmp(argv[i], "-d") || !strcmp(argv[i], "-r")) {
+		} else if(!strcmp(argv[i], "-j") || !strcmp(argv[i], "-d") || !strcmp(argv[i], "-r") || !strcmp(argv[i], "-s")) {
 			exit_on_return = true;
 			irr::SEvent event;
 			event.EventType = irr::EET_GUI_EVENT;
@@ -48,7 +48,14 @@ int main(int argc, char* argv[]) {
 				ygo::mainGame->lstReplayList->setSelected(0);
 				event.GUIEvent.Caller = ygo::mainGame->btnLoadReplay;
 				ygo::mainGame->device->postEventFromUser(event);
+			} else if(!strcmp(argv[i], "-s")) {
+				event.GUIEvent.Caller = ygo::mainGame->btnServerMode;
+				ygo::mainGame->device->postEventFromUser(event);
+				ygo::mainGame->lstSinglePlayList->setSelected(0);
+				event.GUIEvent.Caller = ygo::mainGame->btnLoadSinglePlay;
+				ygo::mainGame->device->postEventFromUser(event);
 			}
+
 		}
 	}
 	ygo::mainGame->MainLoop();
