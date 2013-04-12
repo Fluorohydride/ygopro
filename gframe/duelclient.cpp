@@ -52,7 +52,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 		client_base = 0;
 		return false;
 	}
-	connect_state = 1;
+	connect_state = 0x1;
 	rnd.reset(time(0));
 	if(!create_game) {
 		timeval timeout = {5, 0};
@@ -63,7 +63,7 @@ bool DuelClient::StartClient(unsigned int ip, unsigned short port, bool create_g
 	return true;
 }
 void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
-	if(connect_state == 2)
+	if(connect_state == 0x7)
 		return;
 	if(!is_closing) {
 		mainGame->btnCreateHost->setEnabled(true);
@@ -76,7 +76,7 @@ void DuelClient::ConnectTimeout(evutil_socket_t fd, short events, void* arg) {
 	event_base_loopbreak(client_base);
 }
 void DuelClient::StopClient(bool is_exiting) {
-	if(connect_state != 2)
+	if(connect_state != 0x7)
 		return;
 	is_closing = is_exiting;
 	if(!is_closing) {
@@ -129,18 +129,18 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 			SendPacketToServer(CTOS_JOIN_GAME, csjg);
 		}
 		bufferevent_enable(bev, EV_READ);
-		connect_state = 2;
+		connect_state |= 0x2;
 	} else if (events & (BEV_EVENT_EOF | BEV_EVENT_ERROR)) {
 		bufferevent_disable(bev, EV_READ);
 		if(!is_closing) {
-			if(connect_state == 1) {
+			if(connect_state == 0x1) {
 				mainGame->btnCreateHost->setEnabled(true);
 				mainGame->btnJoinHost->setEnabled(true);
 				mainGame->btnJoinCancel->setEnabled(true);
 				mainGame->gMutex.Lock();
 				mainGame->env->addMessageBox(L"", dataManager.GetSysString(1400));
 				mainGame->gMutex.Unlock();
-			} else if(connect_state == 2) {
+			} else if(connect_state == 0x7) {
 				if(!mainGame->dInfo.isStarted && !mainGame->is_building) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
@@ -367,6 +367,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->ShowElement(mainGame->wHostPrepare);
 		mainGame->wChat->setVisible(true);
 		mainGame->gMutex.Unlock();
+		connect_state |= 0x4;
 		break;
 	}
 	case STOC_TYPE_CHANGE: {
