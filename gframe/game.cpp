@@ -584,7 +584,7 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 }
 void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, wchar_t* text) {
 	int pbuffer = 0;
-	int _width = 0, w = 0;
+	unsigned int _width = 0, w = 0;
 	for(int i = 0; text[i] != 0 && i < 1023; ++i) {
 		w = font->getCharDimension(text[i]).Width;
 		if(text[i] == L'\n')
@@ -631,7 +631,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 		cbDeck->addItem(wname);
 	}
 #endif
-	for(int i = 0; i < cbDeck->getItemCount(); ++i) {
+	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
 			cbDeck->setSelected(i);
 			break;
@@ -714,7 +714,7 @@ void Game::LoadConfig() {
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
 	fseek(fp, 0, SEEK_END);
-	size_t fsize = ftell(fp);
+	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	while(ftell(fp) < fsize) {
 		fgets(linebuf, 250, fp);
@@ -722,7 +722,7 @@ void Game::LoadConfig() {
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
-			gameConf.use_d3d = atoi(valbuf);
+			gameConf.use_d3d = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "nickname")) {
@@ -798,7 +798,7 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		formatBuffer[0] = L'[';
-		for(int i = 1; i <= cd.level; ++i)
+		for(unsigned int i = 1; i <= cd.level; ++i)
 			formatBuffer[i] = 0x2605;
 		formatBuffer[cd.level + 1] = L']';
 		formatBuffer[cd.level + 2] = L' ';

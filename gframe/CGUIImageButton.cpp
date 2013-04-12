@@ -1,3 +1,7 @@
+#ifdef _MSC_VER
+#pragma warning(disable: 4244)
+#endif
+
 #include "CGUIImageButton.h"
 
 namespace irr {
@@ -133,6 +137,22 @@ void CGUIImageButton::setImageRotation(f32 r) {
 }
 void CGUIImageButton::setImageScale(core::vector2df s) {
 	imageScale = s;
+}
+
+IGUIFont* CGUIImageButton::getOverrideFont( void ) const
+{
+	IGUISkin* skin = Environment->getSkin();
+	if (!skin)
+		return NULL;
+	return skin->getFont();
+}
+
+IGUIFont* CGUIImageButton::getActiveFont() const
+{
+	IGUISkin* skin = Environment->getSkin();
+	if (!skin)
+		return NULL;
+	return skin->getFont();
 }
 
 }

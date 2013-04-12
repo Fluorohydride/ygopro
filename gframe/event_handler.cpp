@@ -15,7 +15,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
-		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -160,7 +159,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				case MSG_SELECT_SUM: {
 					unsigned char respbuf[64];
 					respbuf[0] = selected_cards.size();
-					for (int i = 0; i < selected_cards.size(); ++i)
+					for (size_t i = 0; i < selected_cards.size(); ++i)
 						respbuf[i + 1] = selected_cards[i]->select_seq;
 					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 					mainGame->HideElement(mainGame->wQuery, true);
@@ -246,7 +245,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(!list_command) {
 					int index = -1;
 					select_options.clear();
-					for (int i = 0; i < activatable_cards.size(); ++i) {
+					for (size_t i = 0; i < activatable_cards.size(); ++i) {
 						if (activatable_cards[i] == clicked_card) {
 							select_options.push_back(activatable_descs[i]);
 							if (index == -1) index = i;
@@ -273,25 +272,25 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					selectable_cards.clear();
 					switch(command_location) {
 					case LOCATION_DECK: {
-						for(int i = 0; i < deck[command_controler].size(); ++i)
+						for(size_t i = 0; i < deck[command_controler].size(); ++i)
 							if(deck[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(deck[command_controler][i]);
 						break;
 					}
 					case LOCATION_GRAVE: {
-						for(int i = 0; i < grave[command_controler].size(); ++i)
+						for(size_t i = 0; i < grave[command_controler].size(); ++i)
 							if(grave[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(grave[command_controler][i]);
 						break;
 					}
 					case LOCATION_REMOVED: {
-						for(int i = 0; i < remove[command_controler].size(); ++i)
+						for(size_t i = 0; i < remove[command_controler].size(); ++i)
 							if(remove[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(remove[command_controler][i]);
 						break;
 					}
 					case LOCATION_EXTRA: {
-						for(int i = 0; i < extra[command_controler].size(); ++i)
+						for(size_t i = 0; i < extra[command_controler].size(); ++i)
 							if(extra[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(extra[command_controler][i]);
 						break;
@@ -307,7 +306,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!clicked_card)
 					break;
-				for(int i = 0; i < summonable_cards.size(); ++i) {
+				for(size_t i = 0; i < summonable_cards.size(); ++i) {
 					if(summonable_cards[i] == clicked_card) {
 						ClearCommandFlag();
 						DuelClient::SetResponseI(i << 16);
@@ -322,7 +321,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(!list_command) {
 					if(!clicked_card)
 						break;
-					for(int i = 0; i < spsummonable_cards.size(); ++i) {
+					for(size_t i = 0; i < spsummonable_cards.size(); ++i) {
 						if(spsummonable_cards[i] == clicked_card) {
 							ClearCommandFlag();
 							DuelClient::SetResponseI((i << 16) + 1);
@@ -334,19 +333,19 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					selectable_cards.clear();
 					switch(command_location) {
 					case LOCATION_DECK: {
-						for(int i = 0; i < deck[command_controler].size(); ++i)
+						for(size_t i = 0; i < deck[command_controler].size(); ++i)
 							if(deck[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
 								selectable_cards.push_back(deck[command_controler][i]);
 						break;
 					}
 					case LOCATION_GRAVE: {
-						for(int i = 0; i < grave[command_controler].size(); ++i)
+						for(size_t i = 0; i < grave[command_controler].size(); ++i)
 							if(grave[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
 								selectable_cards.push_back(grave[command_controler][i]);
 						break;
 					}
 					case LOCATION_EXTRA: {
-						for(int i = 0; i < extra[command_controler].size(); ++i)
+						for(size_t i = 0; i < extra[command_controler].size(); ++i)
 							if(extra[command_controler][i]->cmdFlag & COMMAND_SPSUMMON)
 								selectable_cards.push_back(extra[command_controler][i]);
 						break;
@@ -362,7 +361,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!clicked_card)
 					break;
-				for(int i = 0; i < msetable_cards.size(); ++i) {
+				for(size_t i = 0; i < msetable_cards.size(); ++i) {
 					if(msetable_cards[i] == clicked_card) {
 						DuelClient::SetResponseI((i << 16) + 3);
 						DuelClient::SendResponse();
@@ -375,7 +374,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!clicked_card)
 					break;
-				for(int i = 0; i < ssetable_cards.size(); ++i) {
+				for(size_t i = 0; i < ssetable_cards.size(); ++i) {
 					if(ssetable_cards[i] == clicked_card) {
 						DuelClient::SetResponseI((i << 16) + 4);
 						DuelClient::SendResponse();
@@ -388,7 +387,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!clicked_card)
 					break;
-				for(int i = 0; i < reposable_cards.size(); ++i) {
+				for(size_t i = 0; i < reposable_cards.size(); ++i) {
 					if(reposable_cards[i] == clicked_card) {
 						DuelClient::SetResponseI((i << 16) + 2);
 						DuelClient::SendResponse();
@@ -401,7 +400,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!clicked_card)
 					break;
-				for(int i = 0; i < attackable_cards.size(); ++i) {
+				for(size_t i = 0; i < attackable_cards.size(); ++i) {
 					if(attackable_cards[i] == clicked_card) {
 						DuelClient::SetResponseI((i << 16) + 1);
 						DuelClient::SendResponse();
@@ -415,7 +414,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(command_location) {
 				case LOCATION_DECK: {
-					for(int i = deck[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = deck[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[command_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1000), deck[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
@@ -423,28 +422,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
-					for(int i = 0; i < pcard->overlayed.size(); ++i)
+					for(size_t i = 0; i < pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_GRAVE: {
-					for(int i = grave[command_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = grave[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[command_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_REMOVED: {
-					for(int i = remove[command_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = remove[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[command_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_EXTRA: {
-					for(int i = extra[command_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = extra[command_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[command_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[command_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
@@ -504,7 +503,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						int index = -1;
 						command_card = selectable_cards[id - BUTTON_CARD_0 + mainGame->scrCardList->getPos() / 10];
 						select_options.clear();
-						for (int i = 0; i < activatable_cards.size(); ++i) {
+						for (size_t i = 0; i < activatable_cards.size(); ++i) {
 							if (activatable_cards[i] == command_card) {
 								select_options.push_back(activatable_descs[i]);
 								if (index == -1) index = i;
@@ -550,7 +549,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (sel >= select_max) {
 						unsigned char respbuf[64];
 						respbuf[0] = selected_cards.size();
-						for (int i = 0; i < selected_cards.size(); ++i)
+						for (size_t i = 0; i < selected_cards.size(); ++i)
 							respbuf[i + 1] = selected_cards[i]->select_seq;
 						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 						mainGame->HideElement(mainGame->wCardSelect, true);
@@ -569,7 +568,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if (CheckSelectSum()) {
 						unsigned char respbuf[64];
 						respbuf[0] = selected_cards.size();
-						for (int i = 0; i < selected_cards.size(); ++i)
+						for (size_t i = 0; i < selected_cards.size(); ++i)
 							respbuf[i + 1] = selected_cards[i]->select_seq;
 						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 						mainGame->HideElement(mainGame->wCardSelect, true);
@@ -625,7 +624,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(select_ready) {
 						unsigned char respbuf[64];
 						respbuf[0] = selected_cards.size();
-						for (int i = 0; i < selected_cards.size(); ++i)
+						for (size_t i = 0; i < selected_cards.size(); ++i)
 							respbuf[i + 1] = selected_cards[i]->select_seq;
 						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 						mainGame->HideElement(mainGame->wCardSelect, true);
@@ -681,7 +680,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case LISTBOX_LOG: {
 				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
 					mainGame->ShowCardInfo(mainGame->logParam[sel]);
 				}
 				break;
@@ -693,7 +692,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			switch(id) {
 			case LISTBOX_LOG: {
 				int sel = mainGame->lstLog->getSelected();
-				if(sel != -1 && mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
+				if(sel != -1 && (int)mainGame->logParam.size() >= sel && mainGame->logParam[sel]) {
 					mainGame->wInfos->setActiveTab(0);
 				}
 				break;
@@ -857,28 +856,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = deck[hovered_controler][hovered_sequence];
-					for(int i = 0; i < pcard->overlayed.size(); ++i)
+					for(size_t i = 0; i < pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_GRAVE: {
-					for(int i = grave[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_REMOVED: {
-					for(int i = remove[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = remove[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_EXTRA: {
-					for(int i = extra[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(size_t i = extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
@@ -912,14 +911,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_REMOVED: {
-					int command_flag = 0;
 					if(remove[hovered_controler].size() == 0)
 						break;
 					ShowMenu(COMMAND_LIST, x, y);
 					break;
 				}
 				case LOCATION_EXTRA: {
-					int command_flag = 0;
 					if(extra[hovered_controler].size() == 0 || hovered_controler != 0)
 						break;
 					ShowMenu(COMMAND_LIST, x, y);
@@ -936,7 +933,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					int command_flag = 0;
 					if(deck[hovered_controler].size() == 0)
 						break;
-					for(int i = 0; i < deck[hovered_controler].size(); ++i)
+					for(size_t i = 0; i < deck[hovered_controler].size(); ++i)
 						command_flag |= deck[hovered_controler][i]->cmdFlag;
 					if(mainGame->dInfo.isSingleMode)
 						command_flag |= COMMAND_LIST;
@@ -960,7 +957,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					int command_flag = 0;
 					if(grave[hovered_controler].size() == 0)
 						break;
-					for(int i = 0; i < grave[hovered_controler].size(); ++i)
+					for(size_t i = 0; i < grave[hovered_controler].size(); ++i)
 						command_flag |= grave[hovered_controler][i]->cmdFlag;
 					command_flag |= COMMAND_LIST;
 					list_command = 1;
@@ -971,7 +968,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					int command_flag = 0;
 					if(remove[hovered_controler].size() == 0)
 						break;
-					for(int i = 0; i < remove[hovered_controler].size(); ++i)
+					for(size_t i = 0; i < remove[hovered_controler].size(); ++i)
 						command_flag |= remove[hovered_controler][i]->cmdFlag;
 					command_flag |= COMMAND_LIST;
 					list_command = 1;
@@ -982,7 +979,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					int command_flag = 0;
 					if(extra[hovered_controler].size() == 0)
 						break;
-					for(int i = 0; i < extra[hovered_controler].size(); ++i)
+					for(size_t i = 0; i < extra[hovered_controler].size(); ++i)
 						command_flag |= extra[hovered_controler][i]->cmdFlag;
 					if(hovered_controler == 0)
 						command_flag |= COMMAND_LIST;
@@ -1070,13 +1067,13 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if (mainGame->dInfo.curMsg == MSG_SELECT_CARD) {
 					max = selected_cards.size();
 				} else {
-					for(int i = 0; i < selected_cards.size(); ++i)
+					for(size_t i = 0; i < selected_cards.size(); ++i)
 						max += selected_cards[i]->opParam;
 				}
 				if (min >= select_max) {
 					unsigned char respbuf[64];
 					respbuf[0] = selected_cards.size();
-					for (int i = 0; i < selected_cards.size(); ++i)
+					for (size_t i = 0; i < selected_cards.size(); ++i)
 						respbuf[i + 1] = selected_cards[i]->select_seq;
 					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 					DuelClient::SendResponse();
@@ -1084,7 +1081,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(selected_cards.size() == selectable_cards.size()) {
 						unsigned char respbuf[64];
 						respbuf[0] = selected_cards.size();
-						for (int i = 0; i < selected_cards.size(); ++i)
+						for (size_t i = 0; i < selected_cards.size(); ++i)
 							respbuf[i + 1] = selected_cards[i]->select_seq;
 						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 						DuelClient::SendResponse();
@@ -1113,7 +1110,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				select_counter_count--;
 				if (select_counter_count == 0) {
 					unsigned char respbuf[64];
-					for(int i = 0; i < selectable_cards.size(); ++i)
+					for(size_t i = 0; i < selectable_cards.size(); ++i)
 						respbuf[i] = (selectable_cards[i]->opParam >> 16) - (selectable_cards[i]->opParam & 0xffff);
 					mainGame->stHintMsg->setVisible(false);
 					ClearSelect();
@@ -1139,7 +1136,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(selectsum_cards.size() == 0 || selectable_cards.size() == 0) {
 						unsigned char respbuf[64];
 						respbuf[0] = selected_cards.size();
-						for (int i = 0; i < selected_cards.size(); ++i)
+						for (size_t i = 0; i < selected_cards.size(); ++i)
 							respbuf[i + 1] = selected_cards[i]->select_seq;
 						DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 						DuelClient::SendResponse();
@@ -1210,7 +1207,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wQuery->isVisible()) {
 					unsigned char respbuf[64];
 					respbuf[0] = selected_cards.size();
-					for (int i = 0; i < selected_cards.size(); ++i)
+					for (size_t i = 0; i < selected_cards.size(); ++i)
 						respbuf[i + 1] = selected_cards[i]->select_seq;
 					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 					mainGame->HideElement(mainGame->wQuery, true);
@@ -1219,7 +1216,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(select_ready) {
 					unsigned char respbuf[64];
 					respbuf[0] = selected_cards.size();
-					for (int i = 0; i < selected_cards.size(); ++i)
+					for (size_t i = 0; i < selected_cards.size(); ++i)
 						respbuf[i + 1] = selected_cards[i]->select_seq;
 					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 					if(mainGame->wCardSelect->isVisible())
@@ -1234,7 +1231,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				if(mainGame->wQuery->isVisible()) {
 					unsigned char respbuf[64];
 					respbuf[0] = selected_cards.size();
-					for (int i = 0; i < selected_cards.size(); ++i)
+					for (size_t i = 0; i < selected_cards.size(); ++i)
 						respbuf[i + 1] = selected_cards[i]->select_seq;
 					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
 					mainGame->HideElement(mainGame->wQuery, true);
@@ -1451,9 +1448,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			mainGame->device->minimizeWindow();
 			break;
 		}
+		default: break;
 		}
 		break;
 	}
+	default: break;
 	}
 	return false;
 }
