@@ -20,13 +20,13 @@ function c66712593.filter(c,att)
 	return c:IsFaceup() and c:IsAttribute(att)
 end
 function c66712593.ctlcon(e)
-	return Duel.IsExistingMatchingCard(c66712593.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,ATTRIBUTE_WATER)
+	return Duel.IsExistingMatchingCard(c66712593.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,ATTRIBUTE_WATER)
 end
 function c66712593.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
-		and Duel.IsExistingMatchingCard(c66712593.filter,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_EARTH)
+		and Duel.IsExistingMatchingCard(c66712593.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,ATTRIBUTE_EARTH)
 end
 function c66712593.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
