@@ -12,5 +12,3 @@ if (WIN32)
 endif ()
 
 add_library (irrlicht STATIC ${AUTO_FILES_RESULT})
-
-include (MSVCMultipleProcessCompile)

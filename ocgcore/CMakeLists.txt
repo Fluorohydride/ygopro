@@ -10,5 +10,3 @@ else ()
 endif ()
 
 add_library (ocgcore STATIC ${AUTO_FILES_RESULT})
-
-include (MSVCMultipleProcessCompile)

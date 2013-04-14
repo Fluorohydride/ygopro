@@ -27,9 +27,7 @@ else ()
     include_directories (${FREETYPE_INCLUDE_DIRS} ${LUA_INCLUDE_DIR}
                          ${LIBEVENT_INCLUDE_DIR} ${IRRLICHT_INCLUDE_DIR}
                          ${SQLITE3_INCLUDE_DIR} ${OPENGL_INCLUDE_DIR})
-    if (NOT WIN32)
-        target_link_libraries (ygopro pthread dl ${X11_LIBRARIES} ${X11_Xxf86vm_LIB})
-    endif ()
+    target_link_libraries (ygopro ${CMAKE_THREAD_LIBS_INIT} ${DL_LIBRARIES})
 endif ()
 if (WIN32)
     target_link_libraries (ygopro ws2_32 winmm gdi32 kernel32 user32 imm32)
@@ -37,5 +35,3 @@ endif ()
 
 create_target_launcher(ygopro WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
 create_default_target_launcher(ygopro WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-
-include (MSVCMultipleProcessCompile)

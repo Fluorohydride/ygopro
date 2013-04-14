@@ -15,12 +15,10 @@ if (MSVC)
     list (APPEND SRC_FILES1 win32select.c evthread_win32.c buffer_iocp.c event_iocp.c
                            bufferevent_async.c)
     include_directories ( "compat" )
-    source_group(src FILES ${SRC_FILES1} ${INC_FILES1})
-    source_group(src\\include\\event2 FILES ${INC_FILES2})
 endif ()
+source_group(src FILES ${SRC_FILES1} ${INC_FILES1})
+source_group(src\\include\\event2 FILES ${INC_FILES2})
 
 include_directories ( "include" "." )
 
 add_library (event STATIC ${SRC_FILES1} ${INC_FILES1} ${INC_FILES2})
-
-include (MSVCMultipleProcessCompile)
