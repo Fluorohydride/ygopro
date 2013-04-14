@@ -26,5 +26,5 @@ function c11760174.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c11760174.aclimit(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

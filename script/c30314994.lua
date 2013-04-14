@@ -22,13 +22,13 @@ function c30314994.filter(c,att)
 	return c:IsFaceup() and c:IsAttribute(att)
 end
 function c30314994.atkcon(e)
-	return Duel.IsExistingMatchingCard(c30314994.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil,ATTRIBUTE_FIRE)
+	return Duel.IsExistingMatchingCard(c30314994.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,ATTRIBUTE_FIRE)
 end
 function c30314994.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:IsChainAttackable()
-		and not c:IsDisabled() and Duel.IsExistingMatchingCard(c30314994.filter,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_WIND)
+		and not c:IsDisabled() and Duel.IsExistingMatchingCard(c30314994.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,ATTRIBUTE_WIND)
 end
 function c30314994.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChainAttack()

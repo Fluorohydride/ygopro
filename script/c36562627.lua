@@ -15,7 +15,7 @@ function c36562627.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c36562627.coincon(e,tp,eg,ep,ev,re,r,rp)
-	return rp==tp and Duel.GetFlagEffect(tp,36562627)==0
+	return ep==tp and Duel.GetFlagEffect(tp,36562627)==0
 end
 function c36562627.coinop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,36562627)~=0 then return end

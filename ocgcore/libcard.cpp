@@ -1718,15 +1718,13 @@ int32 scriptlib::card_is_can_be_battle_target(lua_State *L) {
 int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	check_param_count(L, 7);
 	check_param(L, PARAM_TYPE_CARD, 1);
-	int32 is_effect = lua_toboolean(L, 2);
+	int32 extra_type = lua_tointeger(L, 2);
 	int32 attribute = lua_tointeger(L, 3);
 	int32 race = lua_tointeger(L, 4);
 	int32 level = lua_tointeger(L, 5);
 	int32 atk = lua_tointeger(L, 6);
 	int32 def = lua_tointeger(L, 7);
 	int32 is_tuner = FALSE;
-	if(lua_gettop(L) >= 8)
-		is_tuner = lua_toboolean(L, 8);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = pcard->pduel;
 	//type
@@ -1736,7 +1734,7 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	peffect->code = EFFECT_ADD_TYPE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_flag = RESET_EVENT + 0x47e0000;
-	peffect->value = TYPE_MONSTER | TYPE_TRAPMONSTER | (is_effect ? TYPE_EFFECT : TYPE_NORMAL) | (is_tuner ? TYPE_TUNER : 0);
+	peffect->value = TYPE_MONSTER | TYPE_TRAPMONSTER | extra_type;
 	pcard->add_effect(peffect);
 	//attribute
 	peffect = pduel->new_effect();
