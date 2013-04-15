@@ -671,9 +671,10 @@ void Game::DrawSpec() {
 		if(chatTiming[i]) {
 			chatTiming[i]--;
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
-			driver->draw2DRectangle(recti(305, 596 - 20 * i, 307 + w, 616 - 20 * i), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
-			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
-			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i, 1021, 616 - 20 * i), chatColor[chatType[i]], false, false);
+			const int  p = 40; //portatilino
+			driver->draw2DRectangle(recti(305, 596 - 20 * i-p, 307 + w, 616 - 20 * i-p), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i-p, 1020, 615 - 20 * i-p), 0xff000000, false, false);
+			textFont->draw(chatMsg[i].c_str(), rect<s32>(306, 596 - 20 * i-p, 1021, 616 - 20 * i-p), chatColor[chatType[i]], false, false);
 		}
 	}
 }

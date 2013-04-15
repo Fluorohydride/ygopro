@@ -29,7 +29,8 @@ bool Game::Initialize() {
 		params.DriverType = irr::video::EDT_DIRECT3D9;
 	else
 		params.DriverType = irr::video::EDT_OPENGL;
-	params.WindowSize = irr::core::dimension2d<u32>(1024, 640);
+	params.WindowSize = irr::core::dimension2d<u32>(1024, 600);
+	params.Fullscreen = true;
 	device = irr::createDeviceEx(params);
 	if(!device)
 		return false;
@@ -47,7 +48,9 @@ bool Game::Initialize() {
 	memset(chatTiming, 0, sizeof(chatTiming));
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
-	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, true);
+	//driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_SPEED, true);
+
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial())
 		return false;
@@ -63,7 +66,7 @@ bool Game::Initialize() {
 	textFont = guiFont;
 	smgr = device->getSceneManager();
 	device->setWindowCaption(L"[---]");
-	device->setResizable(false);
+	device->setResizable(true);
 	//main menu
 	wchar_t strbuf[256];
 	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X)", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
@@ -222,7 +225,7 @@ bool Game::Initialize() {
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(true);
+	chkIgnore2->setChecked(false);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -466,7 +469,7 @@ bool Game::Initialize() {
 	btnReplaySwap = env->addButton(rect<s32>(5, 80, 85, 100), wReplayControl, BUTTON_REPLAY_SWAP, dataManager.GetSysString(1346));
 	btnReplayExit = env->addButton(rect<s32>(5, 105, 85, 125), wReplayControl, BUTTON_REPLAY_EXIT, dataManager.GetSysString(1347));
 	//chat
-	wChat = env->addWindow(rect<s32>(305, 615, 1020, 640), false, L"");
+	wChat = env->addWindow(rect<s32>(305, 575, 1020, 600), false, L"");
 	wChat->getCloseButton()->setVisible(false);
 	wChat->setDraggable(false);
 	wChat->setDrawTitlebar(false);
@@ -492,7 +495,7 @@ void Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.81f, 0.44f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-	
+
 	mProjection.buildCameraLookAtMatrixLH(vector3df(3.95f, 8.0f, 7.8f), vector3df(3.95f, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
@@ -509,9 +512,11 @@ void Game::MainLoop() {
 		atkframe += 0.1f;
 		atkdy = (float)sin(atkframe);
 		driver->beginScene(true, true, SColor(0, 0, 0, 0));
-		if(imageManager.tBackGround)
+		if(0&&imageManager.tBackGround)
 			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
+
 		gMutex.Lock();
+
 		if(dInfo.isStarted) {
 			DrawBackGround();
 			DrawCards();

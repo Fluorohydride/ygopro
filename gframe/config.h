@@ -13,7 +13,9 @@
 #ifdef _MSC_VER
 #define myswprintf _swprintf
 #else
-#define myswprintf swprintf
+//#include <wchar.h>
+//#define myswprintf swprintf
+#error che casso?
 #endif
 
 #define socklen_t int
@@ -37,6 +39,7 @@
 #define SOCKADDR sockaddr
 #define SOCKET_ERRNO() (errno)
 
+#include <wchar.h>
 #include <wchar.h>
 #define myswprintf(buf, fmt, ...) swprintf(buf, 4096, fmt, ##__VA_ARGS__)
 inline int _wtoi(const wchar_t * s) {

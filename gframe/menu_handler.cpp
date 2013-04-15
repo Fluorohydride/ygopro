@@ -45,7 +45,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
-					mainGame->btnJoinCancel->setEnabled(false);
+					//mainGame->btnJoinCancel->setEnabled(false);
 				}
 				break;
 			}
