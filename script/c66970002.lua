@@ -8,7 +8,7 @@ function c66970002.initial_effect(c)
 	e1:SetDescription(aux.Stringid(66970002,0))
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_DESTROYED)
 	e1:SetCondition(c66970002.tdcon)
 	e1:SetTarget(c66970002.tdtg)
@@ -48,8 +48,7 @@ function c66970002.tdop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c66970002.descon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsDisabled()
-		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
+	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
 end
 function c66970002.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

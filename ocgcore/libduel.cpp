@@ -741,7 +741,7 @@ int32 scriptlib::duel_raise_event(lua_State *L) {
 		pgroup = *(group**) lua_touserdata(L, 1);
 		pduel = pgroup->pduel;
 	} else
-		luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
+		return luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
 	check_param(L, PARAM_TYPE_EFFECT, 3);
 	uint32 code = lua_tointeger(L, 2);
 	effect* peffect = *(effect**) lua_touserdata(L, 3);
@@ -1455,7 +1455,7 @@ int32 scriptlib::duel_disable_attack(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	card* attacker = pduel->game_field->core.attacker;
 	if(!attacker
-	        || (attacker->fieldid_r != pduel->game_field->core.pre_field[0] && attacker->fieldid_r != pduel->game_field->core.pre_field[1])
+	        || (pduel->game_field->infos.phase == PHASE_DAMAGE && attacker->fieldid_r != pduel->game_field->core.pre_field[0] && attacker->fieldid_r != pduel->game_field->core.pre_field[1])
 	        || (attacker->current.position & POS_FACEDOWN)
 	        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
 	        || !attacker->is_affect_by_effect(pduel->game_field->core.reason_effect))

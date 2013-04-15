@@ -13,7 +13,6 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 	switch(event.EventType) {
 	case irr::EET_GUI_EVENT: {
 		s32 id = event.GUIEvent.Caller->getID();
-		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -45,7 +44,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(*dname == 0)
 					break;
 				int sel = -1;
-				for(int i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
+				for(size_t i = 0; i < mainGame->cbDBDecks->getItemCount(); ++i) {
 					if(!wcscmp(dname, mainGame->cbDBDecks->getItem(i))) {
 						sel = i;
 						break;
@@ -203,11 +202,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				char* pdeck = deckbuf;
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 				BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
-				for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
-				for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+				for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
-				for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 				DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 				break;
@@ -308,6 +307,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			}
 		}
+		default: break;
 		}
 		break;
 	}
@@ -322,20 +322,20 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			dragx = event.MouseInput.X;
 			dragy = event.MouseInput.Y;
 			draging_pointer = dataManager.GetCodePointer(hovered_code);
-			int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
+			unsigned int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
 			if(hovered_pos == 4) {
 				int limit = 3;
 				if(filterList->count(limitcode))
 					limit = (*filterList)[limitcode];
-				for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+				for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
 					if(deckManager.current_deck.main[i]->first == limitcode
 					        || deckManager.current_deck.main[i]->second.alias == limitcode)
 						limit--;
-				for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+				for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
 					if(deckManager.current_deck.extra[i]->first == limitcode
 					        || deckManager.current_deck.extra[i]->second.alias == limitcode)
 						limit--;
-				for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+				for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 					if(deckManager.current_deck.side[i]->first == limitcode
 					        || deckManager.current_deck.side[i]->second.alias == limitcode)
 						limit--;
@@ -358,17 +358,23 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)))
 					hovered_pos = 0;
 				if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 60) {
-					if(hovered_seq < deckManager.current_deck.main.size() && hovered_pos)
+					if(hovered_seq == -1)
+						deckManager.current_deck.main.push_back(draging_pointer);
+					else if(hovered_seq < (int)deckManager.current_deck.main.size() && hovered_pos)
 						deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.main.push_back(draging_pointer);
 					is_draging = false;
 				} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 15) {
-					if(hovered_seq < deckManager.current_deck.extra.size() && hovered_pos)
+					if(hovered_seq == -1)
+						deckManager.current_deck.extra.push_back(draging_pointer);
+					else if(hovered_seq < (int)deckManager.current_deck.extra.size() && hovered_pos)
 						deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.extra.push_back(draging_pointer);
 					is_draging = false;
 				} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 15) {
-					if(hovered_seq < deckManager.current_deck.side.size() && hovered_pos)
+					if(hovered_seq == -1)
+						deckManager.current_deck.side.push_back(draging_pointer);
+					else if(hovered_seq < (int)deckManager.current_deck.side.size() && hovered_pos)
 						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.side.push_back(draging_pointer);
 					is_draging = false;
@@ -378,17 +384,23 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if((hovered_pos == 1 && (draging_pointer->second.type & 0x802040)) || (hovered_pos == 2 && !(draging_pointer->second.type & 0x802040)) || hovered_pos == 4)
 					hovered_pos = 0;
 				if((hovered_pos == 1 || (hovered_pos == 0 && click_pos == 1)) && deckManager.current_deck.main.size() < 65) {
-					if(hovered_seq < deckManager.current_deck.main.size() && hovered_pos)
+					if(hovered_seq == -1)
+						deckManager.current_deck.main.push_back(draging_pointer);
+					else if(hovered_seq < (int)deckManager.current_deck.main.size() && hovered_pos)
 						deckManager.current_deck.main.insert(deckManager.current_deck.main.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.main.push_back(draging_pointer);
 					is_draging = false;
 				} else if((hovered_pos == 2 || (hovered_pos == 0 && click_pos == 2)) && deckManager.current_deck.extra.size() < 20) {
-					if(hovered_seq < deckManager.current_deck.extra.size() && hovered_pos)
+					if(hovered_seq == -1)
+						deckManager.current_deck.extra.push_back(draging_pointer);
+					else if(hovered_seq < (int)deckManager.current_deck.extra.size() && hovered_pos)
 						deckManager.current_deck.extra.insert(deckManager.current_deck.extra.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.extra.push_back(draging_pointer);
 					is_draging = false;
 				} else if((hovered_pos == 3 || (hovered_pos == 0 && click_pos == 3)) && deckManager.current_deck.side.size() < 20) {
-					if(hovered_seq < deckManager.current_deck.side.size() && hovered_pos)
+					if(hovered_seq == -1)
+						deckManager.current_deck.side.push_back(draging_pointer);
+					else if(hovered_seq < (int)deckManager.current_deck.side.size() && hovered_pos)
 						deckManager.current_deck.side.insert(deckManager.current_deck.side.begin() + hovered_seq, draging_pointer);
 					else deckManager.current_deck.side.push_back(draging_pointer);
 					is_draging = false;
@@ -473,19 +485,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 						is_draging = false;
 					}
 				} else {
-					int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
+					unsigned int limitcode = draging_pointer->second.alias ? draging_pointer->second.alias : draging_pointer->first;
 					int limit = 3;
 					if(filterList->count(limitcode))
 						limit = (*filterList)[limitcode];
-					for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
 						if(deckManager.current_deck.main[i]->first == limitcode
 						        || deckManager.current_deck.main[i]->second.alias == limitcode)
 							limit--;
-					for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
 						if(deckManager.current_deck.extra[i]->first == limitcode
 						        || deckManager.current_deck.extra[i]->second.alias == limitcode)
 							limit--;
-					for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 						if(deckManager.current_deck.side[i]->first == limitcode
 						        || deckManager.current_deck.side[i]->second.alias == limitcode)
 							limit--;
@@ -512,7 +524,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(x >= 750)
 					px = lx - 1;
 				else px = (x - 314) * (lx - 1) / 436;
-				if(py*lx + px >= deckManager.current_deck.main.size()) {
+				if(py*lx + px >= (int)deckManager.current_deck.main.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
@@ -527,7 +539,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(x >= 750)
 					hovered_seq = lx - 1;
 				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= deckManager.current_deck.extra.size()) {
+				if(hovered_seq >= (int)deckManager.current_deck.extra.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
@@ -541,7 +553,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 				if(x >= 750)
 					hovered_seq = lx - 1;
 				else hovered_seq = (x - 314) * (lx - 1) / 436;
-				if(hovered_seq >= deckManager.current_deck.side.size()) {
+				if(hovered_seq >= (int)deckManager.current_deck.side.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
@@ -550,7 +562,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			} else if(x >= 810 && x <= 995 && y >= 165 && y <= 626) {
 				hovered_pos = 4;
 				hovered_seq = (y - 165) / 66;
-				if(mainGame->scrFilter->getPos() + hovered_seq >= results.size()) {
+				if(mainGame->scrFilter->getPos() + hovered_seq >= (int)results.size()) {
 					hovered_seq = -1;
 					hovered_code = 0;
 				} else {
@@ -588,6 +600,7 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			mainGame->device->postEventFromUser(e);
 			break;
 		}
+		default: break;
 		}
 		break;
 	}
@@ -602,9 +615,11 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			mainGame->device->minimizeWindow();
 			break;
 		}
+		default: break;
 		}
 		break;
 	}
+	default: break;
 	}
 	return false;
 }

@@ -187,7 +187,7 @@ bool Replay::CheckReplay(const wchar_t* name) {
 	return rheader.id == 0x31707279 && rheader.version >= 0x12d0;
 }
 bool Replay::ReadNextResponse(unsigned char resp[64]) {
-	if(pdata - replay_data >= replay_size)
+	if(pdata - replay_data >= (int)replay_size)
 		return false;
 	int len = *pdata++;
 	if(len > 64)

@@ -8,13 +8,13 @@ namespace ygo {
 DeckManager deckManager;
 
 void DeckManager::LoadLFList() {
-	LFList* cur;
+	LFList* cur = NULL;
 	FILE* fp = fopen("lflist.conf", "r");
 	char linebuf[256];
 	wchar_t strBuffer[256];
 	if(fp) {
 		fseek(fp, 0, SEEK_END);
-		size_t fsize = ftell(fp);
+		int fsize = ftell(fp);
 		fseek(fp, 0, SEEK_SET);
 		fgets(linebuf, 256, fp);
 		while(ftell(fp) < fsize) {
@@ -46,6 +46,7 @@ void DeckManager::LoadLFList() {
 			while(linebuf[p] != ' ' && linebuf[p] != '\t' && linebuf[p] != 0) p++;
 			linebuf[p] = 0;
 			count = atoi(&linebuf[sa]);
+			if(cur == NULL) continue;
 			(*cur->content)[code] = count;
 			cur->hash = cur->hash ^ ((code << 18) | (code >> 14)) ^ ((code << (27 + count)) | (code >> (5 - count)));
 		}
@@ -58,9 +59,8 @@ void DeckManager::LoadLFList() {
 	_lfList.push_back(nolimit);
 }
 wchar_t* DeckManager::GetLFListName(int lfhash) {
-	std::unordered_map<int, int>* list = 0;
-	for(int i = 0; i < _lfList.size(); ++i) {
-		if(_lfList[i].hash == lfhash) {
+	for(size_t i = 0; i < _lfList.size(); ++i) {
+		if(_lfList[i].hash == (unsigned int)lfhash) {
 			return _lfList[i].listName;
 		}
 	}
@@ -69,18 +69,18 @@ wchar_t* DeckManager::GetLFListName(int lfhash) {
 int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_tcg) {
 	std::unordered_map<int, int> ccount;
 	std::unordered_map<int, int>* list = 0;
-	for(int i = 0; i < _lfList.size(); ++i) {
-		if(_lfList[i].hash == lfhash) {
+	for(size_t i = 0; i < _lfList.size(); ++i) {
+		if(_lfList[i].hash == (unsigned int)lfhash) {
 			list = _lfList[i].content;
 			break;
 		}
 	}
 	if(!list)
 		return 0;
-	int dc = 0, dec = 0;
+	int dc = 0;
 	if(deck.main.size() < 40 || deck.main.size() > 60 || deck.extra.size() > 15 || deck.side.size() > 15)
 		return 1;
-	for(int i = 0; i < deck.main.size(); ++i) {
+	for(size_t i = 0; i < deck.main.size(); ++i) {
 		code_pointer cit = deck.main[i];
 		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
 			return cit->first;
@@ -91,7 +91,7 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 		if(dc > 3 || (it != list->end() && dc > it->second))
 			return cit->first;
 	}
-	for(int i = 0; i < deck.extra.size(); ++i) {
+	for(size_t i = 0; i < deck.extra.size(); ++i) {
 		code_pointer cit = deck.extra[i];
 		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
 			return cit->first;
@@ -102,7 +102,7 @@ int DeckManager::CheckLFList(Deck& deck, int lfhash, bool allow_ocg, bool allow_
 		if(dc > 3 || (it != list->end() && dc > it->second))
 			return cit->first;
 	}
-	for(int i = 0; i < deck.side.size(); ++i) {
+	for(size_t i = 0; i < deck.side.size(); ++i) {
 		code_pointer cit = deck.side[i];
 		if((!allow_ocg && (cit->second.ot == 0x1)) || (!allow_tcg && (cit->second.ot == 0x2)))
 			return cit->first;
@@ -144,21 +144,21 @@ void DeckManager::LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec) {
 bool DeckManager::LoadSide(Deck& deck, int* dbuf, int mainc, int sidec) {
 	std::unordered_map<int, int> pcount;
 	std::unordered_map<int, int> ncount;
-	for(int i = 0; i < deck.main.size(); ++i)
+	for(size_t i = 0; i < deck.main.size(); ++i)
 		pcount[deck.main[i]->first]++;
-	for(int i = 0; i < deck.extra.size(); ++i)
+	for(size_t i = 0; i < deck.extra.size(); ++i)
 		pcount[deck.extra[i]->first]++;
-	for(int i = 0; i < deck.side.size(); ++i)
+	for(size_t i = 0; i < deck.side.size(); ++i)
 		pcount[deck.side[i]->first]++;
 	Deck ndeck;
 	LoadDeck(ndeck, dbuf, mainc, sidec);
 	if(ndeck.main.size() != deck.main.size() || ndeck.extra.size() != deck.extra.size())
 		return false;
-	for(int i = 0; i < ndeck.main.size(); ++i)
+	for(size_t i = 0; i < ndeck.main.size(); ++i)
 		ncount[ndeck.main[i]->first]++;
-	for(int i = 0; i < ndeck.extra.size(); ++i)
+	for(size_t i = 0; i < ndeck.extra.size(); ++i)
 		ncount[ndeck.extra[i]->first]++;
-	for(int i = 0; i < ndeck.side.size(); ++i)
+	for(size_t i = 0; i < ndeck.side.size(); ++i)
 		ncount[ndeck.side[i]->first]++;
 	for(auto cdit = ncount.begin(); cdit != ncount.end(); ++cdit)
 		if(cdit->second != pcount[cdit->first])
@@ -183,7 +183,7 @@ bool DeckManager::LoadDeck(const wchar_t* file) {
 		return false;
 	char linebuf[256];
 	fseek(fp, 0, SEEK_END);
-	size_t fsize = ftell(fp);
+	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	fgets(linebuf, 256, fp);
 	while(ftell(fp) < fsize && ct < 128) {
@@ -219,13 +219,13 @@ bool DeckManager::SaveDeck(Deck& deck, const wchar_t* name) {
 	if(!fp)
 		return false;
 	fprintf(fp, "#created by ...\n#main\n");
-	for(int i = 0; i < deck.main.size(); ++i)
+	for(size_t i = 0; i < deck.main.size(); ++i)
 		fprintf(fp, "%d\n", deck.main[i]->first);
 	fprintf(fp, "#extra\n");
-	for(int i = 0; i < deck.extra.size(); ++i)
+	for(size_t i = 0; i < deck.extra.size(); ++i)
 		fprintf(fp, "%d\n", deck.extra[i]->first);
 	fprintf(fp, "!side\n");
-	for(int i = 0; i < deck.side.size(); ++i)
+	for(size_t i = 0; i < deck.side.size(); ++i)
 		fprintf(fp, "%d\n", deck.side[i]->first);
 	fclose(fp);
 	return true;

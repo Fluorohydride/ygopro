@@ -50,7 +50,7 @@ void Game::DrawBackGround() {
 	static int selFieldAlpha = 255;
 	static int selFieldDAlpha = -10;
 	matrix4 im = irr::core::IdentityMatrix;
-	im.setTranslation(vector3df(0, 0, -0.01));
+	im.setTranslation(vector3df(0, 0, -0.01f));
 	driver->setTransform(irr::video::ETS_WORLD, im);
 	//dark shade
 //	matManager.mSelField.AmbientColor = 0xff000000;
@@ -93,7 +93,7 @@ void Game::DrawBackGround() {
 	}
 	//disabled field
 	{
-		float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};
+		/*float cv[4] = {0.0f, 0.0f, 1.0f, 1.0f};*/
 		int filter = 0x1;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if ((dField.disabled_field & filter) > 0) {
@@ -164,15 +164,15 @@ void Game::DrawCards() {
 		for(int i = 0; i < 6; ++i)
 			if(dField.szone[p][i])
 				DrawCard(dField.szone[p][i]);
-		for(int i = 0; i < dField.deck[p].size(); ++i)
+		for(size_t i = 0; i < dField.deck[p].size(); ++i)
 			DrawCard(dField.deck[p][i]);
-		for(int i = 0; i < dField.hand[p].size(); ++i)
+		for(size_t i = 0; i < dField.hand[p].size(); ++i)
 			DrawCard(dField.hand[p][i]);
-		for(int i = 0; i < dField.grave[p].size(); ++i)
+		for(size_t i = 0; i < dField.grave[p].size(); ++i)
 			DrawCard(dField.grave[p][i]);
-		for(int i = 0; i < dField.remove[p].size(); ++i)
+		for(size_t i = 0; i < dField.remove[p].size(); ++i)
 			DrawCard(dField.remove[p][i]);
-		for(int i = 0; i < dField.extra[p].size(); ++i)
+		for(size_t i = 0; i < dField.extra[p].size(); ++i)
 			DrawCard(dField.extra[p][i]);
 	}
 	for(auto cit = dField.overlay_cards.begin(); cit != dField.overlay_cards.end(); ++cit)
@@ -243,7 +243,7 @@ void Game::DrawCard(ClientCard* pcard) {
 void Game::DrawMisc() {
 	static irr::core::vector3df act_rot(0, 0, 0);
 	irr::core::matrix4 im, ic, it;
-	act_rot.Z += 0.02;
+	act_rot.Z += 0.02f;
 	im.setRotationRadians(act_rot);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
@@ -268,7 +268,7 @@ void Game::DrawMisc() {
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
 	if(dField.chains.size() > 1) {
-		for(int i = 0; i < dField.chains.size(); ++i) {
+		for(size_t i = 0; i < dField.chains.size(); ++i) {
 			if(dField.chains[i].solved)
 				break;
 			matManager.mTRTexture.setTexture(0, imageManager.tChain);
@@ -695,6 +695,7 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	fu.isFadein = true;
 	fu.fadingFrame = 10;
 	fu.autoFadeoutFrame = autoframe;
+	fu.signalAction = 0;
 	if(win == wPosSelect) {
 		btnPSAU->setDrawImage(false);
 		btnPSAD->setDrawImage(false);
@@ -795,9 +796,9 @@ void Game::DrawDeckBd() {
 		lx = (deckManager.current_deck.main.size() - 41) / 4 + 11;
 		dx = 436.0f / (lx - 1);
 	}
-	for(int i = 0; i < deckManager.current_deck.main.size(); ++i) {
+	for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i) {
 		DrawThumb(deckManager.current_deck.main[i], position2di(314 + (i % lx) * dx, 164 + (i / lx) * 68), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == i)
+		if(deckBuilder.hovered_pos == 1 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangleOutline(recti(313 + (i % lx) * dx, 163 + (i / lx) * 68, 359 + (i % lx) * dx, 228 + (i / lx) * 68));
 	}
 	//extra deck
@@ -812,9 +813,9 @@ void Game::DrawDeckBd() {
 	if(deckManager.current_deck.extra.size() <= 10)
 		dx = 436.0f / 9;
 	else dx = 436.0f / (deckManager.current_deck.extra.size() - 1);
-	for(int i = 0; i < deckManager.current_deck.extra.size(); ++i) {
+	for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i) {
 		DrawThumb(deckManager.current_deck.extra[i], position2di(314 + i * dx, 466), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == i)
+		if(deckBuilder.hovered_pos == 2 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangleOutline(recti(313 + i * dx, 465, 359 + i * dx, 531));
 	}
 	//side deck
@@ -829,9 +830,9 @@ void Game::DrawDeckBd() {
 	if(deckManager.current_deck.side.size() <= 10)
 		dx = 436.0f / 9;
 	else dx = 436.0f / (deckManager.current_deck.side.size() - 1);
-	for(int i = 0; i < deckManager.current_deck.side.size(); ++i) {
+	for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i) {
 		DrawThumb(deckManager.current_deck.side[i], position2di(314 + i * dx, 564), deckBuilder.filterList);
-		if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == i)
+		if(deckBuilder.hovered_pos == 3 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangleOutline(recti(313 + i * dx, 563, 359 + i * dx, 629));
 	}
 	driver->draw2DRectangle(recti(805, 137, 915, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
@@ -842,9 +843,9 @@ void Game::DrawDeckBd() {
 	numFont->draw(deckBuilder.result_string, recti(875, 137, 935, 157), 0xffffffff, false, true);
 	driver->draw2DRectangle(recti(805, 160, 1020, 630), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(recti(804, 159, 1020, 630));
-	for(int i = 0; i < 7 && i + mainGame->scrFilter->getPos() < deckBuilder.results.size(); ++i) {
+	for(size_t i = 0; i < 7 && i + mainGame->scrFilter->getPos() < deckBuilder.results.size(); ++i) {
 		code_pointer ptr = deckBuilder.results[i + mainGame->scrFilter->getPos()];
-		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == i)
+		if(deckBuilder.hovered_pos == 4 && deckBuilder.hovered_seq == (int)i)
 			driver->draw2DRectangle(0x80000000, recti(806, 164 + i * 66, 1019, 230 + i * 66));
 		DrawThumb(ptr, position2di(810, 165 + i * 66), deckBuilder.filterList);
 		if(ptr->second.type & TYPE_MONSTER) {

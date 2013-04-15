@@ -4,6 +4,7 @@ function c62784717.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_STANDBY_PHASE)
 	c:RegisterEffect(e1)
 	--coin
 	local e2=Effect.CreateEffect(c)

@@ -89,7 +89,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 }
 ClientCard* ClientField::GetCard(int controler, int location, int sequence, int sub_seq) {
 	std::vector<ClientCard*>* lst = 0;
-	bool is_xyz = (location & 0x80);
+	bool is_xyz = (location & 0x80) != 0;
 	location &= 0x7f;
 	switch(location) {
 	case LOCATION_DECK:
@@ -117,15 +117,15 @@ ClientCard* ClientField::GetCard(int controler, int location, int sequence, int 
 	if(!lst)
 		return 0;
 	if(is_xyz) {
-		if(sequence >= lst->size())
+		if(sequence >= (int)lst->size())
 			return 0;
 		ClientCard* scard = (*lst)[sequence];
-		if(scard && scard->overlayed.size() > sub_seq)
+		if(scard && (int)scard->overlayed.size() > sub_seq)
 			return scard->overlayed[sub_seq];
 		else
 			return 0;
 	} else {
-		if(sequence >= lst->size())
+		if(sequence >= (int)lst->size())
 			return 0;
 		return (*lst)[sequence];
 	}
@@ -186,7 +186,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	switch (location) {
 	case LOCATION_DECK: {
 		pcard = deck[controler][sequence];
-		for (int i = sequence; i < deck[controler].size() - 1; ++i) {
+		for (size_t i = sequence; i < deck[controler].size() - 1; ++i) {
 			deck[controler][i] = deck[controler][i + 1];
 			deck[controler][i]->sequence--;
 			deck[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
@@ -197,7 +197,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_HAND: {
 		pcard = hand[controler][sequence];
-		for (int i = sequence; i < hand[controler].size() - 1; ++i) {
+		for (size_t i = sequence; i < hand[controler].size() - 1; ++i) {
 			hand[controler][i] = hand[controler][i + 1];
 			hand[controler][i]->sequence--;
 		}
@@ -216,7 +216,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_GRAVE: {
 		pcard = grave[controler][sequence];
-		for (int i = sequence; i < grave[controler].size() - 1; ++i) {
+		for (size_t i = sequence; i < grave[controler].size() - 1; ++i) {
 			grave[controler][i] = grave[controler][i + 1];
 			grave[controler][i]->sequence--;
 			grave[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
@@ -227,7 +227,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_REMOVED: {
 		pcard = remove[controler][sequence];
-		for (int i = sequence; i < remove[controler].size() - 1; ++i) {
+		for (size_t i = sequence; i < remove[controler].size() - 1; ++i) {
 			remove[controler][i] = remove[controler][i + 1];
 			remove[controler][i]->sequence--;
 			remove[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
@@ -238,7 +238,7 @@ ClientCard* ClientField::RemoveCard(int controler, int location, int sequence) {
 	}
 	case LOCATION_EXTRA: {
 		pcard = extra[controler][sequence];
-		for (int i = sequence; i < extra[controler].size() - 1; ++i) {
+		for (size_t i = sequence; i < extra[controler].size() - 1; ++i) {
 			extra[controler][i] = extra[controler][i + 1];
 			extra[controler][i]->sequence--;
 			extra[controler][i]->curPos -= irr::core::vector3df(0, 0, 0.01f);
@@ -333,7 +333,7 @@ void ClientField::ClearChainSelect() {
 void ClientField::ShowSelectCard(bool buttonok) {
 	if(selectable_cards.size() <= 5) {
 		int startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
-		for(int i = 0; i < selectable_cards.size(); ++i) {
+		for(size_t i = 0; i < selectable_cards.size(); ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
 			else
@@ -914,12 +914,12 @@ void ClientField::FadeCard(ClientCard * pcard, int alpha, int frame) {
 bool ClientField::CheckSelectSum() {
 	std::set<ClientCard*> selable;
 	std::set<ClientCard*>::iterator sit;
-	for(int i = 0; i < selectsum_all.size(); ++i) {
+	for(size_t i = 0; i < selectsum_all.size(); ++i) {
 		selectsum_all[i]->is_selectable = false;
 		selectsum_all[i]->is_selected = false;
 		selable.insert(selectsum_all[i]);
 	}
-	for(int i = 0; i < selected_cards.size(); ++i) {
+	for(size_t i = 0; i < selected_cards.size(); ++i) {
 		selected_cards[i]->is_selectable = true;
 		selected_cards[i]->is_selected = true;
 		selable.erase(selected_cards[i]);
@@ -937,7 +937,7 @@ bool ClientField::CheckSelectSum() {
 	} else {
 		int op1, op2, mm = -1, ms, m, max = 0, sumc = 0, sums;
 		ret = false;
-		for (int i = 0; i < selected_cards.size(); ++i) {
+		for (size_t i = 0; i < selected_cards.size(); ++i) {
 			op1 = selected_cards[i]->opParam & 0xffff;
 			op2 = selected_cards[i]->opParam >> 16;
 			m = (op2 > 0 && op1 > op2) ? op2 : op1;
@@ -1003,11 +1003,11 @@ bool ClientField::check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::
 	if (m >= min && m <= max)
 		return true;
 	index++;
-	return (min > m && check_min(left, index, min - m, max - m)
-	        || (check_min(left, index, min, max)));
+	return (min > m && check_min(left, index, min - m, max - m))
+	        || check_min(left, index, min, max);
 }
 bool ClientField::check_sel_sum_s(std::set<ClientCard*>& left, int index, int acc) {
-	if (index == selected_cards.size()) {
+	if (index == (int)selected_cards.size()) {
 		if (acc == 0)
 			return true;
 		check_sel_sum_t(left, acc);
