@@ -36,7 +36,7 @@ function c29146185.checkop(e,tp,eg,ep,ev,re,r,rp)
 	c29146185[1]=Duel.GetFlagEffect(1,29146185)
 	local tc=eg:GetFirst()
 	while tc do
-		sump=tc:GetSummonPlayer()
+		local sump=tc:GetSummonPlayer()
 		if c29146185[sump]==0 then
 			if tc:GetCode()==29146185 and Duel.GetFlagEffect(sump,29146186)==0 then
 				tc:RegisterFlagEffect(29146185,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
@@ -69,7 +69,7 @@ function c29146185.filter(c)
 end
 function c29146185.rettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c29146185.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c29146185.filter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c29146185.filter,tp,LOCATION_GRAVE,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c29146185.filter,tp,LOCATION_GRAVE,0,2,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
@@ -88,10 +88,16 @@ function c29146185.cffilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and not c:IsPublic()
 end
 function c29146185.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c29146185.cffilter,tp,LOCATION_HAND,0,2,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,c29146185.cffilter,tp,LOCATION_HAND,0,2,2,nil)
-	Duel.ConfirmCards(1-tp,g)
+	local g=Duel.GetMatchingGroup(c29146185.cffilter,tp,LOCATION_HAND,0,nil)
+	if chk==0 then return g:GetClassCount(Card.GetCode)>=4 end
+	local cg=Group.CreateGroup()
+	for i=1,4 do
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+		local sg=g:Select(tp,1,1,nil)
+		g:Remove(Card.IsCode,nil,sg:GetFirst():GetCode())
+		cg:Merge(sg)
+	end
+	Duel.ConfirmCards(1-tp,cg)
 	Duel.ShuffleHand(tp)
 end
 function c29146185.destg(e,tp,eg,ep,ev,re,r,rp,chk)
