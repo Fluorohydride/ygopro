@@ -6,7 +6,7 @@ function c2061963.initial_effect(c)
 	--negate activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(2061963,0))
-	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DAMAGE)
+	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DAMAGE)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_MZONE)
@@ -31,7 +31,7 @@ end
 function c2061963.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ph=Duel.GetCurrentPhase()
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
-		and (ph>PHASE_MAIN1 and ph<PHASE_MAIN2) and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev)
+		and (ph>PHASE_MAIN1 and ph<PHASE_MAIN2) and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c2061963.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -39,11 +39,11 @@ function c2061963.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c2061963.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
 end
 function c2061963.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateEffect(ev) then
+	if Duel.NegateActivation(ev) then
 		Duel.Damage(1-tp,800,REASON_EFFECT)
 	end
 end

@@ -16,7 +16,7 @@ function c49456901.initial_effect(c)
 	--negate activate
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(49456901,1))
-	e2:SetCategory(CATEGORY_DISABLE+CATEGORY_HANDES)
+	e2:SetCategory(CATEGORY_NEGATE+CATEGORY_HANDES)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_MZONE)
@@ -47,7 +47,7 @@ end
 function c49456901.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp
-		and loc==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainDisablable(ev)
+		and loc==LOCATION_MZONE and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,2061963)
 end
 function c49456901.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -56,10 +56,10 @@ function c49456901.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c49456901.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
 function c49456901.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateEffect(ev) and Duel.SelectYesNo(tp,aux.Stringid(49456901,2)) then
+	if Duel.NegateActivation(ev) and Duel.SelectYesNo(tp,aux.Stringid(49456901,2)) then
 		local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0):RandomSelect(1-tp,1)
 		if g:GetCount()>0 then
 			Duel.SendtoGrave(g,REASON_DISCARD+REASON_EFFECT)

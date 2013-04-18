@@ -21,8 +21,8 @@ function c82361206.initial_effect(c)
 	e3:SetDescription(aux.Stringid(82361206,0))
 	e3:SetCategory(CATEGORY_REMOVE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCode(EVENT_DAMAGE)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCode(EVENT_BATTLE_DAMAGE)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCondition(c82361206.rmcon)
 	e3:SetTarget(c82361206.rmtg)
@@ -43,13 +43,16 @@ function c82361206.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c82361206.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler():GetEquipTarget()
+	return ep~=tp and eg:GetFirst()==e:GetHandler():GetEquipTarget()
+end
+function c82361206.filter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
 function c82361206.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c82361206.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c82361206.filter,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,2,nil)
+	local g=Duel.SelectTarget(tp,c82361206.filter,tp,0,LOCATION_GRAVE,1,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end
 function c82361206.rmop(e,tp,eg,ep,ev,re,r,rp)
