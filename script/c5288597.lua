@@ -12,8 +12,9 @@ function c5288597.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c5288597.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,5288597)==0 end
+	Duel.RegisterFlagEffect(tp,5288597,RESET_PHASE+PHASE_END,0,1)
 	e:SetLabel(100)
-	return true
 end
 function c5288597.cfilter(c,e,tp)
 	local lv=c:GetLevel()
@@ -30,6 +31,7 @@ function c5288597.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 			and Duel.IsExistingMatchingCard(c5288597.cfilter,tp,LOCATION_MZONE,0,1,nil,e,tp)
 	end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c5288597.cfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
 	c5288597[0]=tc:GetLevel()

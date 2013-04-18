@@ -25,7 +25,7 @@ function c66540884.thfilter(c)
 	return c:IsSetCard(0x45) and c:GetCode()~=66540884 and c:IsAbleToHand()
 end
 function c66540884.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(c66540884.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c66540884.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c66540884.thop(e,tp,eg,ep,ev,re,r,rp)
