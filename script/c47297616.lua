@@ -53,7 +53,7 @@ function c47297616.tgdisable(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c47297616.opdisable(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsFaceup() or c:GetDefence()<500 or c:GetAttack()< 500 or not c:IsRelateToEffect(e) or Duel.GetCurrentChain()~=ev+1 then
+	if not c:IsFaceup() or c:GetDefence()<500 or c:GetAttack()< 500 or not c:IsRelateToEffect(e) or Duel.GetCurrentChain()~=ev+1 or c:IsStatus(STATUS_BATTLE_DESTROYED) then
 		return
 	end
 	if Duel.NegateActivation(ev) then
