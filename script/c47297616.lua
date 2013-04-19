@@ -41,7 +41,7 @@ function c47297616.initial_effect(c)
 end
 function c47297616.codisable(e,tp,eg,ep,ev,re,r,rp)
 	return (re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:IsActiveType(TYPE_MONSTER))
-		and not e:GetHandler():IsStatus(STATUS_CHAINING)
+		and not e:GetHandler():IsStatus(STATUS_CHAINING) and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c47297616.tgdisable(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
