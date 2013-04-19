@@ -13,6 +13,9 @@ function c80032567.initial_effect(c)
 	e1:SetValue(c80032567.val)
 	c:RegisterEffect(e1)
 end
+function c80032567.filter(c)
+	return c:IsSetCard(0x22) and c:IsType(TYPE_MONSTER)
+end
 function c80032567.val(e,c)
-	return Duel.GetMatchingGroupCount(Card.IsSetCard,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil,0x22)*200
+	return Duel.GetMatchingGroupCount(c80032567.filter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil)*200
 end

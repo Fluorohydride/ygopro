@@ -40,7 +40,7 @@ function c16366810.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c16366810.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
 end
 function c16366810.rettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local prec=e:GetHandler():GetPreviousControler()

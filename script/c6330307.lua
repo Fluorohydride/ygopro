@@ -54,7 +54,7 @@ function c6330307.eqop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c6330307.eqlimit(e,c)
-	return c:IsSetCard(0x7f) and c:IsSetCard(0x7f) and c:IsSetCard(0x1048)
+	return c:IsSetCard(0x7f) and c:IsSetCard(0x1048)
 end
 function c6330307.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
