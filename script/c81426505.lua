@@ -14,7 +14,7 @@ function c81426505.confilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3d)
 end
 function c81426505.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c81426505.confilter,tp,LOCATION_ONFIELD,0,3,nil)
+	return Duel.IsExistingMatchingCard(c81426505.confilter,tp,LOCATION_MZONE,0,3,nil)
 end
 function c81426505.filter1(c)
 	return c:IsFaceup() and c:IsDestructable()
