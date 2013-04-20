@@ -11,7 +11,11 @@ if (MSVC)
 else ()
     AutoFiles("." "src" "\\.(cpp|c|h)$")
 endif ()
-add_executable (ygopro ${AUTO_FILES_RESULT})
+
+if (MSVC)
+    SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
+    add_executable (ygopro WIN32 ${AUTO_FILES_RESULT})
+endif ()
 
 include_directories ( "../ocgcore" )
 
