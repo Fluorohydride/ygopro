@@ -28,9 +28,6 @@ function c29616929.checkop(e,tp,eg,ep,ev,re,r,rp)
 		tc=eg:GetNext()
 	end
 end
-function c29616929.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x19)
-end
 function c29616929.condition(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_LOCATION)
 	return ep~=tp and loc==LOCATION_MZONE and re:GetHandler():GetFlagEffect(29616929)>0 and Duel.IsChainNegatable(ev)

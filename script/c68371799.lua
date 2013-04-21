@@ -17,7 +17,7 @@ function c68371799.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetTarget(c68371799.descon)
+	e2:SetCondition(c68371799.descon)
 	e2:SetTarget(c68371799.destg)
 	e2:SetOperation(c68371799.desop)
 	c:RegisterEffect(e2)
@@ -41,10 +41,16 @@ function c68371799.spcon(e,c)
 	local tp=c:GetControler()
 	return Duel.GetFlagEffect(tp,68371799)==0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c68371799.filter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c68371799.filter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c68371799.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.RegisterFlagEffect(tp,68371799,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_ATTACK)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_OATH)
+	e1:SetReset(RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e1)
 end
 function c68371799.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
