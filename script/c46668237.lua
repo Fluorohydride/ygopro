@@ -38,7 +38,7 @@ function c46668237.cfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and c:GetPreviousControler()==tp and c:GetFlagEffect(46668237)~=0
 end
 function c46668237.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c46668237.cfilter,1,nil,tp)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c46668237.cfilter,1,nil,tp)
 end
 function c46668237.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end

@@ -1,4 +1,4 @@
---幻獣機ウォーブラン
+--幻獣機ブルーインパラス
 function c67489919.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)
@@ -72,13 +72,13 @@ function c67489919.syntg(e,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
 	if lv<=0 then return false end
-	local g=Duel.GetMatchingGroup(c67489919.synfilter,syncard:GetControler(),LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE+LOCATION_HAND,c,syncard,c,f)
+	local g=Duel.GetMatchingGroup(c67489919.synfilter,syncard:GetControler(),LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,c,syncard,c,f)
 	return g:CheckWithSumEqual(Card.GetSynchroLevel,lv,minc,maxc,syncard)
 end
 function c67489919.synop(e,tp,eg,ep,ev,re,r,rp,syncard,f,minc,maxc)
 	local c=e:GetHandler()
 	local lv=syncard:GetLevel()-c:GetLevel()
-	local g=Duel.GetMatchingGroup(c67489919.synfilter,syncard:GetControler(),LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE+LOCATION_HAND,c,syncard,c,f)
+	local g=Duel.GetMatchingGroup(c67489919.synfilter,syncard:GetControler(),LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,c,syncard,c,f)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 	local sg=g:SelectWithSumEqual(tp,Card.GetSynchroLevel,lv,minc,maxc,syncard)
 	Duel.SetSynchroMaterial(sg)
