@@ -59,11 +59,10 @@ function c49456901.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
 end
 function c49456901.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateActivation(ev) and Duel.SelectYesNo(tp,aux.Stringid(49456901,2)) then
+	if Duel.NegateActivation(ev) and Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)>0
+		and Duel.SelectYesNo(tp,aux.Stringid(49456901,2)) then
 		local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0):RandomSelect(1-tp,1)
-		if g:GetCount()>0 then
-			Duel.SendtoGrave(g,REASON_DISCARD+REASON_EFFECT)
-		end
+		Duel.SendtoGrave(g,REASON_DISCARD+REASON_EFFECT)
 		Duel.SetLP(1-tp,Duel.GetLP(1-tp)/2)
 	end
 end
