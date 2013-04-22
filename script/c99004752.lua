@@ -47,7 +47,7 @@ function c99004752.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function c99004752.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc==e:GetLabelObject() and tc:GetFlagEffect(99004752)~=0
+	return tc==e:GetLabelObject() and tc:GetFlagEffect(99004752)~=0 and tc:GetOwner()==1-tp
 end
 function c99004752.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
