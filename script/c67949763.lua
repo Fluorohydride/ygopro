@@ -15,13 +15,14 @@ function c67949763.filter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,c:GetAttack(),0,1,RACE_FIEND,ATTRIBUTE_DARK)
 end
-function c67949763.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c67949763.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c67949763.filter(chkc,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>2
 		and Duel.IsExistingTarget(c67949763.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c67949763.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)
-	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,4,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,4,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,3,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,3,0,0)
 end
 function c67949763.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

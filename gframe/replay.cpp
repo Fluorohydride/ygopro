@@ -13,8 +13,8 @@ Replay::Replay() {
 	comp_data = new unsigned char[0x2000];
 }
 Replay::~Replay() {
-	delete replay_data;
-	delete comp_data;
+	delete[] replay_data;
+	delete[] comp_data;
 }
 void Replay::BeginRecord() {
 #ifdef _WIN32
