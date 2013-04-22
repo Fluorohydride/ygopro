@@ -82,7 +82,7 @@ function c94973028.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,REASON_COST)
 end
 function c94973028.desfilter(c)
-	return c:IsDestructable() and c:IsAbleToRemove()
+	return c:IsDestructable()
 end
 function c94973028.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c94973028.desfilter(chkc) end

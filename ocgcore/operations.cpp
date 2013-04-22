@@ -1407,6 +1407,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		}
 		if(proc)
 			remove_oath_effect(proc);
+		if(target->current.location == LOCATION_MZONE)
+			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		adjust_instant();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		return TRUE;
@@ -1511,9 +1513,10 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		return FALSE;
 	}
 	case 2: {
-		if(target->is_status(STATUS_SUMMONING)) {
+		if(target->is_status(STATUS_SUMMONING))
 			return FALSE;
-		}
+		if(target->current.location == LOCATION_MZONE)
+			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		return TRUE;
 	}
@@ -2013,6 +2016,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			return FALSE;
 		}
 		remove_oath_effect(core.units.begin()->peffect);
+		if(target->current.location == LOCATION_MZONE)
+			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		adjust_instant();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		return TRUE;

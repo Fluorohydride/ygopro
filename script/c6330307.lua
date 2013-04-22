@@ -63,7 +63,7 @@ function c6330307.atkcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c6330307.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
-	if at:IsRelateToBattle() then
+	if at:IsRelateToBattle() and not at:IsImmuneToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
