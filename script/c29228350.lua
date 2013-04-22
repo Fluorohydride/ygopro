@@ -13,7 +13,7 @@ function c29228350.initial_effect(c)
 end
 function c29228350.filter(c)
 	local ec=c:GetEquipTarget()
-	return ec and c:IsCode(48568032) and ec:IsCode(12079734)
+	return ec and c:IsCode(48568432) and ec:IsCode(12079734)
 end
 function c29228350.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and c29228350.filter(chkc) end
