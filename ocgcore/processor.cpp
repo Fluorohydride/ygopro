@@ -4626,6 +4626,7 @@ int32 field::adjust_step(uint16 step) {
 		}
 		adjust_disable_check_list();
 		add_process(PROCESSOR_REFRESH_LOC, 0, 0, 0, 0, 0);
+		return FALSE;
 	}
 	case 3: {
 		//trap monster
