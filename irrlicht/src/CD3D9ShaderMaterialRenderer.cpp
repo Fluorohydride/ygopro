@@ -329,7 +329,7 @@ HRESULT CD3D9ShaderMaterialRenderer::stubD3DXAssembleShader(LPCSTR pSrcData,
 			strDllName += (int)D3DX_SDK_VERSION;
 			strDllName += ".dll";
 
-			HMODULE hMod = LoadLibrary(strDllName.c_str());
+			HMODULE hMod = LoadLibraryA(strDllName.c_str());
 			if (hMod)
 				 pFn = (AssembleShaderFunction)GetProcAddress(hMod, "D3DXAssembleShader");
 
@@ -389,7 +389,7 @@ HRESULT CD3D9ShaderMaterialRenderer::stubD3DXAssembleShaderFromFile(LPCSTR pSrcF
 			strDllName += (int)D3DX_SDK_VERSION;
 			strDllName += ".dll";
 
-			HMODULE hMod = LoadLibrary(strDllName.c_str());
+			HMODULE hMod = LoadLibraryA(strDllName.c_str());
 			if (hMod)
 				 pFn = (AssembleShaderFromFileFunction)GetProcAddress(hMod, "D3DXAssembleShaderFromFileA");
 
@@ -450,7 +450,7 @@ HRESULT CD3D9ShaderMaterialRenderer::stubD3DXCompileShader(LPCSTR pSrcData, UINT
 			strDllName += (int)D3DX_SDK_VERSION;
 			strDllName += ".dll";
 
-			HMODULE hMod = LoadLibrary(strDllName.c_str());
+			HMODULE hMod = LoadLibraryA(strDllName.c_str());
 			if (hMod)
 				 pFn = (D3DXCompileShaderFunction)GetProcAddress(hMod, "D3DXCompileShader");
 
@@ -510,7 +510,7 @@ HRESULT CD3D9ShaderMaterialRenderer::stubD3DXCompileShaderFromFile(LPCSTR pSrcFi
 			strDllName += (int)D3DX_SDK_VERSION;
 			strDllName += ".dll";
 
-			HMODULE hMod = LoadLibrary(strDllName.c_str());
+			HMODULE hMod = LoadLibraryA(strDllName.c_str());
 			if (hMod)
 				 pFn = (D3DXCompileShaderFromFileFunction)GetProcAddress(hMod, "D3DXCompileShaderFromFileA");
 

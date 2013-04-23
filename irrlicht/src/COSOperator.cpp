@@ -54,9 +54,6 @@ const core::stringc& COSOperator::getOperatingSystemVersion() const
 //! copies text to the clipboard
 void COSOperator::copyToClipboard(const c8* text) const
 {
-	if (strlen(text)==0)
-		return;
-
 // Windows version
 #if defined(_IRR_XBOX_PLATFORM_)
 #elif defined(_IRR_WINDOWS_API_)
@@ -65,6 +62,20 @@ void COSOperator::copyToClipboard(const c8* text) const
 
 	EmptyClipboard();
 
+	HGLOBAL clipbuffer;
+
+#if defined(_UNICODE)
+	wchar_t * utext = (wchar_t *)text;
+	wchar_t * buffer;
+
+	clipbuffer = GlobalAlloc(GMEM_DDESHARE, sizeof(wchar_t) * (wcslen(utext)+1));
+	buffer = (wchar_t*)GlobalLock(clipbuffer);
+
+	wcscpy(buffer, utext);
+
+	GlobalUnlock(clipbuffer);
+	SetClipboardData(CF_UNICODETEXT, clipbuffer);
+#else
 	HGLOBAL clipbuffer;
 	char * buffer;
 
@@ -75,6 +86,8 @@ void COSOperator::copyToClipboard(const c8* text) const
 
 	GlobalUnlock(clipbuffer);
 	SetClipboardData(CF_TEXT, clipbuffer);
+#endif
+
 	CloseClipboard();
 
 // MacOSX version
@@ -103,7 +116,11 @@ const c8* COSOperator::getTextFromClipboard() const
 
 	char * buffer = 0;
 
+#ifdef _UNICODE
+	HANDLE hData = GetClipboardData( CF_UNICODETEXT );
+#else
 	HANDLE hData = GetClipboardData( CF_TEXT );
+#endif
 	buffer = (char*)GlobalLock( hData );
 	GlobalUnlock( hData );
 	CloseClipboard();
