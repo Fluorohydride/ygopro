@@ -697,7 +697,7 @@ void card::cancel_field_effect() {
 		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE)))
 			pduel->game_field->remove_effect(it->second);
 	}
-	if(unique_code && current.location & LOCATION_ONFIELD)
+	if(unique_code && (current.location & LOCATION_ONFIELD))
 		pduel->game_field->remove_unique_card(this);
 }
 void card::enable_field_effect(int32 enabled) {

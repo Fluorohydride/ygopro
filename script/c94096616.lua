@@ -7,10 +7,14 @@ function c94096616.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCondition(c94096616.condition)
 	e1:SetCost(c94096616.cost)
 	e1:SetTarget(c94096616.target)
 	e1:SetOperation(c94096616.operation)
 	c:RegisterEffect(e1)
+end
+function c94096616.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c94096616.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
@@ -21,7 +25,7 @@ function c94096616.filter(c)
 end
 function c94096616.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c94096616.filter(chkc) end
-	if chk==0 then return Duel.GetTurnCount()~=1 and Duel.IsExistingTarget(c94096616.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c94096616.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c94096616.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end

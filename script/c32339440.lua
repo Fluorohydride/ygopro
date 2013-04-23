@@ -18,7 +18,7 @@ function c32339440.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function c32339440.filter(c)
-	return c:IsSetCard(0x88) and c:IsAbleToHand()
+	return c:IsSetCard(0x88) and c:IsType(TYPE_MONSTER) and sc:IsAbleToHand()
 end
 function c32339440.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c32339440.filter,tp,LOCATION_DECK,0,1,nil) end

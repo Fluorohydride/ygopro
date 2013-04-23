@@ -39,7 +39,7 @@ function c21044178.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e1:SetTargetRange(0,1)
 	e1:SetValue(c21044178.aclimit)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function c21044178.aclimit(e,re,tp)

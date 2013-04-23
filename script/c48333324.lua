@@ -48,6 +48,9 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g=Duel.GetMatchingGroup(c48333324.negfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,sc)
 	tc=g:GetFirst()
+	if tc then
+		Duel.BreakEffect()
+	end
 	while tc do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

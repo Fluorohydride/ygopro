@@ -799,11 +799,15 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 		if(!pcard->is_affect_by_effect(reason_effect))
 			return TRUE;
 		pcard->filter_disable_related_cards();
+		if(pcard->unique_code)
+			pduel->game_field->remove_unique_card(pcard);
 		move_to_field(pcard, playerid, playerid, LOCATION_MZONE, pcard->current.position);
 		pcard->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		return FALSE;
 	}
 	case 1: {
+		if(pcard->unique_code)
+			pduel->game_field->add_unique_card(pcard);
 		set_control(pcard, playerid, reset_phase, reset_count);
 		pcard->reset(RESET_CONTROL, RESET_EVENT);
 		pcard->filter_disable_related_cards();
@@ -843,10 +847,18 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 			return TRUE;
 		pcard1->filter_disable_related_cards();
 		pcard2->filter_disable_related_cards();
+		if(pcard1->unique_code)
+			pduel->game_field->remove_unique_card(pcard1);
+		if(pcard2->unique_code)
+			pduel->game_field->remove_unique_card(pcard2);
 		remove_card(pcard1);
 		remove_card(pcard2);
 		add_card(p2, pcard1, l2, s2);
 		add_card(p1, pcard2, l1, s1);
+		if(pcard1->unique_code)
+			pduel->game_field->add_unique_card(pcard1);
+		if(pcard2->unique_code)
+			pduel->game_field->add_unique_card(pcard2);
 		set_control(pcard1, p2, reset_phase, reset_count);
 		set_control(pcard2, p1, reset_phase, reset_count);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);
@@ -1407,6 +1419,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		}
 		if(proc)
 			remove_oath_effect(proc);
+		if(target->current.location == LOCATION_MZONE)
+			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		adjust_instant();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		return TRUE;
@@ -1511,9 +1525,10 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		return FALSE;
 	}
 	case 2: {
-		if(target->is_status(STATUS_SUMMONING)) {
+		if(target->is_status(STATUS_SUMMONING))
 			return FALSE;
-		}
+		if(target->current.location == LOCATION_MZONE)
+			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		return TRUE;
 	}
@@ -2013,6 +2028,8 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			return FALSE;
 		}
 		remove_oath_effect(core.units.begin()->peffect);
+		if(target->current.location == LOCATION_MZONE)
+			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		adjust_instant();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		return TRUE;
