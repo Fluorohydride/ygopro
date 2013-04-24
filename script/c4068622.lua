@@ -32,7 +32,7 @@ function c4068622.spfilter1(c)
 	return c:IsFaceup() and c:IsSetCard(0x33) and c:IsType(TYPE_TUNER) and c:IsAbleToRemove()
 end
 function c4068622.spfilter2(c)
-	return c:IsFaceup() and c:IsSetCard(0x33) and not c:IsType(TYPE_TUNER) and c:IsAbleToRemove()
+	return c:IsFaceup() and not c:IsType(TYPE_TUNER) and c:IsAbleToRemove()
 end
 function c4068622.spcon(e,c)
 	if c==nil then return true end
