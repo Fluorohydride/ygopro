@@ -59,7 +59,7 @@ end
 function c6330307.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return a==e:GetHandler():GetEquipTarget() and at:IsRelateToBattle() and at:GetAttack()>0 and a:IsChainAttackable()
+	return at and a==e:GetHandler():GetEquipTarget() and at:IsRelateToBattle() and at:GetAttack()>0 and a:IsChainAttackable()
 end
 function c6330307.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()

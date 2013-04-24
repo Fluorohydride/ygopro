@@ -422,7 +422,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
-					for(size_t i = 0; i < pcard->overlayed.size(); ++i)
+					for(int32 i = 0; i < pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
@@ -848,7 +848,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				selectable_cards.clear();
 				switch(hovered_location) {
 				case LOCATION_DECK: {
-					for(int i = deck[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32 i = (int32)deck[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(deck[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1000), deck[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
@@ -856,28 +856,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = deck[hovered_controler][hovered_sequence];
-					for(size_t i = 0; i < pcard->overlayed.size(); ++i)
+					for(int32 i = 0; i < pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_GRAVE: {
-					for(size_t i = grave[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(grave[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_REMOVED: {
-					for(size_t i = remove[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32 i = (int32)remove[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(remove[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1005), remove[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
 				case LOCATION_EXTRA: {
-					for(size_t i = extra[hovered_controler].size() - 1; i >= 0 ; --i)
+					for(int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
