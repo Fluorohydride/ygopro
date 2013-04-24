@@ -22,10 +22,10 @@
 #if defined(_IRR_COMPILE_WITH_JOYSTICK_EVENTS_)
 #ifdef _IRR_COMPILE_WITH_DIRECTINPUT_JOYSTICK_
 #define DIRECTINPUT_VERSION 0x0800
+#define INITGUID
 #include <dinput.h>
 #ifdef _MSC_VER
 #pragma comment(lib, "dinput8.lib")
-#pragma comment(lib, "dxguid.lib")
 #endif
 #else
 #ifdef _MSC_VER
