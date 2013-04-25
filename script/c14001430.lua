@@ -28,6 +28,11 @@ function c14001430.initial_effect(c)
 	e4:SetTarget(c14001430.reptg)
 	e4:SetValue(c14001430.repval)
 	c:RegisterEffect(e4)
+	--immune to necro valley
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_NECRO_VALLEY_IM)
+	c:RegisterEffect(e5)
 end
 function c14001430.tdfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x71) and c:IsAbleToDeck()
