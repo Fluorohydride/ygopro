@@ -53,4 +53,12 @@ private:
 
 #endif // _WIN32
 
+class ScopedLock {
+public:
+	inline ScopedLock(Mutex& m): mutex(m) { mutex.Lock(); }
+	inline ~ScopedLock() { mutex.Unlock(); }
+private:
+	Mutex& mutex;
+};
+
 #endif // MUTEX_H

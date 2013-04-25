@@ -30,6 +30,7 @@ void ImageManager::SetDevice(irr::IrrlichtDevice* dev) {
 	driver = dev->getVideoDriver();
 }
 void ImageManager::ClearTexture() {
+	ScopedLock lk(mutex);
 	for(auto tit = tMap.begin(); tit != tMap.end(); ++tit) {
 		if(tit->second)
 			driver->removeTexture(tit->second);
@@ -42,6 +43,7 @@ void ImageManager::ClearTexture() {
 	tThumb.clear();
 }
 void ImageManager::RemoveTexture(int code) {
+	ScopedLock lk(mutex);
 	auto tit = tMap.find(code);
 	if(tit != tMap.end()) {
 		if(tit->second)
@@ -52,6 +54,7 @@ void ImageManager::RemoveTexture(int code) {
 irr::video::ITexture* ImageManager::GetTexture(int code) {
 	if(code == 0)
 		return tUnknown;
+	ScopedLock lk(mutex);
 	auto tit = tMap.find(code);
 	if(tit == tMap.end()) {
 		char file[256];
@@ -73,6 +76,7 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 	if(code == 0)
 		return tUnknown;
+	ScopedLock lk(mutex);
 	auto tit = tThumb.find(code);
 	if(tit == tThumb.end()) {
 		char file[256];
