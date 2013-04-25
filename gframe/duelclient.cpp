@@ -2316,7 +2316,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			unsigned int code = (unsigned int)BufferIO::ReadInt32(pbuf);
 			pcard = mainGame->dField.GetCard(player, LOCATION_DECK, mainGame->dField.deck[player].size() - 1 - i);
 			if(!mainGame->dField.deck_reversed || code)
-				pcard->SetCode(code);
+				pcard->SetCode(code & 0x7fffffff);
 		}
 		if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 			for (int i = 0; i < count; ++i) {

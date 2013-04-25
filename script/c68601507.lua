@@ -13,8 +13,9 @@ function c68601507.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c68601507.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=Duel.GetAttacker()
-	if c:IsControler(1-tp) then c=Duel.GetAttackTarget() end
+	local c=Duel.GetAttackTarget()
+	if not c then return false end
+	if c:IsControler(1-tp) then c=Duel.GetAttacker() end
 	e:SetLabelObject(c)
 	return c and c:IsSetCard(0x88) and c:IsRace(RACE_BEASTWARRIOR) and c:IsRelateToBattle()
 end

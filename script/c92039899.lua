@@ -14,7 +14,7 @@ function c92039899.initial_effect(c)
 end
 function c92039899.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY)
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_EFFECT) and c:IsReason(REASON_DESTROY)
 end
 function c92039899.spfilter(c,e,tp)
 	return c:IsSetCard(0x45) and c:GetCode()~=92039899 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
