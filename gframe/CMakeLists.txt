@@ -15,9 +15,9 @@ endif ()
 if (MSVC)
     SET(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /ENTRY:mainCRTStartup")
     add_executable (ygopro WIN32 ${AUTO_FILES_RESULT})
+else ()
+    add_executable (ygopro ${AUTO_FILES_RESULT})
 endif ()
-
-include_directories ( "../ocgcore" )
 
 target_link_libraries (ygopro ocgcore)
 
