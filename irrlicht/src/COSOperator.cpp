@@ -76,7 +76,6 @@ void COSOperator::copyToClipboard(const c8* text) const
 	GlobalUnlock(clipbuffer);
 	SetClipboardData(CF_UNICODETEXT, clipbuffer);
 #else
-	HGLOBAL clipbuffer;
 	char * buffer;
 
 	clipbuffer = GlobalAlloc(GMEM_DDESHARE, strlen(text)+1);
