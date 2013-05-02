@@ -21,7 +21,7 @@ function c22754505.cfilter(c)
 	return c:IsFaceup() and c:IsCode(25247218)
 end
 function c22754505.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c22754505.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c22754505.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c22754505.filter(c,e,tp)
 	return c:IsCode(58843503) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

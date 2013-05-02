@@ -21,7 +21,6 @@ function c21702241.initial_effect(c)
 	e3:SetDescription(aux.Stringid(21702241,0))
 	e3:SetCategory(CATEGORY_DAMAGE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_CONTROL_CHANGED)
 	e3:SetCondition(c21702241.damcon)
@@ -31,8 +30,7 @@ function c21702241.initial_effect(c)
 end
 function c21702241.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING)
-		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
@@ -47,7 +45,7 @@ function c21702241.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsContains(e:GetHandler():GetEquipTarget())
 end
 function c21702241.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	local ec=e:GetHandler():GetEquipTarget()
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,ec:GetControler(),ec:GetBaseAttack())
 end

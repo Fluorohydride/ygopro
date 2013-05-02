@@ -14,7 +14,7 @@ function c68191243.cfilter(c)
 	return c:IsFaceup() and c:IsCode(76922029)
 end
 function c68191243.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c68191243.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c68191243.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c68191243.filter(c,e,tp)
 	return c:IsSetCard(0x1a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

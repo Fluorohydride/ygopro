@@ -123,6 +123,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
+					if(highlighting_card)
+						highlighting_card->is_highlighting = false;
+					highlighting_card = 0;
 					DuelClient::SetResponseI(1);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
@@ -145,6 +148,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				switch(mainGame->dInfo.curMsg) {
 				case MSG_SELECT_YESNO:
 				case MSG_SELECT_EFFECTYN: {
+					if(highlighting_card)
+						highlighting_card->is_highlighting = false;
+					highlighting_card = 0;
 					DuelClient::SetResponseI(0);
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
@@ -1189,6 +1195,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case MSG_SELECT_YESNO:
 			case MSG_SELECT_EFFECTYN: {
+				if(highlighting_card)
+					highlighting_card->is_highlighting = false;
+				highlighting_card = 0;
 				DuelClient::SetResponseI(0);
 				mainGame->HideElement(mainGame->wQuery, true);
 				break;

@@ -22,12 +22,12 @@ function c74094021.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c74094021.spfilter(c)
-	return c:IsFaceup() and c:GetCode()==48505422
+	return c:IsFaceup() and c:IsCode(48505422)
 end
 function c74094021.spcon(e,c)
 	if c==nil then return true end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
-		Duel.IsExistingMatchingCard(c74094021.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
+		Duel.IsExistingMatchingCard(c74094021.spfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
 end
 function c74094021.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0x3d) end
