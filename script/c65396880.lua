@@ -16,9 +16,9 @@ end
 function c65396880.condition(e,tp,eg,ep,ev,re,r,rp)
 	local ph=Duel.GetCurrentPhase()
 	return Duel.GetTurnPlayer()==tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
-		and Duel.IsExistingMatchingCard(c65396880.cfilter,tp,LOCATION_MZONE,0,1,nil,58538870)
-		and Duel.IsExistingMatchingCard(c65396880.cfilter,tp,LOCATION_MZONE,0,1,nil,12143771)
-		and Duel.IsExistingMatchingCard(c65396880.cfilter,tp,LOCATION_MZONE,0,1,nil,85936485)
+		and Duel.IsExistingMatchingCard(c65396880.cfilter,tp,LOCATION_ONFIELD,0,1,nil,58538870)
+		and Duel.IsExistingMatchingCard(c65396880.cfilter,tp,LOCATION_ONFIELD,0,1,nil,12143771)
+		and Duel.IsExistingMatchingCard(c65396880.cfilter,tp,LOCATION_ONFIELD,0,1,nil,85936485)
 end
 function c65396880.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil)

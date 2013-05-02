@@ -12,21 +12,47 @@ function c93211810.initial_effect(c)
 	e1:SetTarget(c93211810.target)
 	e1:SetOperation(c93211810.activate)
 	c:RegisterEffect(e1)
+	if not c93211810.global_check then
+		c93211810.global_check=true
+		c93211810[0]=0
+		c93211810[1]=0
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
+		ge1:SetOperation(c93211810.checkop)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
+		ge2:SetOperation(c93211810.clear)
+		Duel.RegisterEffect(ge2,0)
+	end
+end
+function c93211810.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	if tc:GetFlagEffect(93211810)==0 then
+		c93211810[ep]=c93211810[ep]+1
+		tc:RegisterFlagEffect(93211810,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	end
+end
+function c93211810.clear(e,tp,eg,ep,ev,re,r,rp)
+	c93211810[0]=0
+	c93211810[1]=0
 end
 function c93211810.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
 end
 function c93211810.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckAttackActivity(tp) end
+	if chk==0 then return c93211810[tp]<2 end
 end
-function c93211810.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x101b)
+function c93211810.filter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0x101b) and (c93211810[tp]==0 or c:GetFlagEffect(93211810)~=0)
 end
 function c93211810.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c93211810.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c93211810.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c93211810.filter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c93211810.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c93211810.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,c93211810.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,tp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)

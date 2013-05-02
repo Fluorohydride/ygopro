@@ -20,14 +20,20 @@ function c72575145.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_EQUIP_LIMIT)
-	e4:SetValue(1)
+	e4:SetValue(c72575145.eqlimit)
 	c:RegisterEffect(e4)
 end
+function c72575145.eqlimit(e,c)
+	return c:GetLevel()>0
+end
+function c72575145.filter(c)
+	return c:IsFaceup() and c:GetLevel()>0
+end
 function c72575145.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c72575145.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c72575145.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c72575145.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c72575145.operation(e,tp,eg,ep,ev,re,r,rp)

@@ -16,14 +16,15 @@ function c86827882.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c86827882.filter(c)
-	if c==Duel.GetAttacker() and Duel.GetAttackTarget()==nil then return false end
 	return c:IsFaceup() and (c:IsSetCard(0x42) or c:IsSetCard(0x4b))
 end
 function c86827882.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c86827882.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c86827882.filter,tp,LOCATION_MZONE,0,1,nil) end
+	local exc=nil
+	if Duel.GetCurrentPhase()==PHASE_DAMAGE and Duel.GetAttackTarget()==nil then exc=Duel.GetAttacker() end
+	if chk==0 then return Duel.IsExistingTarget(c86827882.filter,tp,LOCATION_MZONE,0,1,exc) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	Duel.SelectTarget(tp,c86827882.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c86827882.filter,tp,LOCATION_MZONE,0,1,1,exc)
 end
 function c86827882.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

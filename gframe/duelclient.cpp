@@ -1060,6 +1060,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		if (pcard->code != code)
 			pcard->SetCode(code);
 		BufferIO::ReadInt8(pbuf);
+		pcard->is_highlighting = true;
+		mainGame->dField.highlighting_card = pcard;
 		myswprintf(textBuffer, dataManager.GetSysString(200), dataManager.FormatLocation(l), dataManager.GetName(code));
 		mainGame->gMutex.Lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, textBuffer);
@@ -1070,6 +1072,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 	case MSG_SELECT_YESNO: {
 		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
 		int desc = BufferIO::ReadInt32(pbuf);
+		mainGame->dField.highlighting_card = 0;
 		mainGame->gMutex.Lock();
 		mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)dataManager.GetDesc(desc));
 		mainGame->PopupElement(mainGame->wQuery);

@@ -18,7 +18,7 @@ function c5288597.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c5288597.cfilter(c,e,tp)
 	local lv=c:GetOriginalLevel()
-	return lv>0 and c:IsAbleToGraveAsCost()
+	return lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(c5288597.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,c:GetOriginalRace(),c:GetOriginalAttribute(),e,tp)
 end
 function c5288597.spfilter(c,lv,rc,att,e,tp)
@@ -35,16 +35,17 @@ function c5288597.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c5288597.cfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
-	c5288597[0]=tc:GetOriginalLevel()
-	c5288597[1]=tc:GetOriginalRace()
-	c5288597[2]=tc:GetOriginalAttribute()
 	Duel.SendtoGrave(tc,REASON_COST)
+	e:SetLabelObject(tc)
+	tc:RegisterFlagEffect(5288597,RESET_EVENT+0x1fe0000+RESET_CHAIN,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
 function c5288597.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local tc=e:GetLabelObject()
+	if tc:GetFlagEffect(5288597)==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c5288597.spfilter,tp,LOCATION_DECK,0,1,1,nil,c5288597[0]+1,c5288597[1],c5288597[2],e,tp)
+	local g=Duel.SelectMatchingCard(tp,c5288597.spfilter,tp,LOCATION_DECK,0,1,1,nil,tc:GetLevel()+1,tc:GetRace(),tc:GetAttribute(),e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
