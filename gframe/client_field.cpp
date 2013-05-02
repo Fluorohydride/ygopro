@@ -11,6 +11,7 @@ ClientField::ClientField() {
 	panel = 0;
 	hovered_card = 0;
 	clicked_card = 0;
+	highlighting_card = 0;
 	deck_act = false;
 	grave_act = false;
 	remove_act = false;
@@ -725,7 +726,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->X = 0.0f;
 				r->Z = 0.0f;
 				if (pcard->position & POS_FACEDOWN)
-					r->X = 3.1415926f;
+					r->Y = 3.1415926f;
 				else r->Y = 0.0f;
 			}
 		} else {
@@ -737,7 +738,7 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				r->Z = 3.1415926f / 2.0f;
 				if (pcard->position & POS_FACEDOWN)
 					r->Y = 3.1415926f + 0.001f;
-				else r->Y = 0;
+				else r->Y = 0.0f;
 			} else {
 				r->X = 0.0f;
 				r->Z = 3.1415926f;
