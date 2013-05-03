@@ -43,5 +43,5 @@ function c89856523.atkfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c89856523.atkval(e,c)
-	return Duel.GetMatchingGroupCount(c89856523.atkfilter,e:GetHandler(),LOCATION_ONFIELD,0,nil)*-100
+	return Duel.GetMatchingGroupCount(c89856523.atkfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,nil)*-100
 end

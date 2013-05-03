@@ -14,19 +14,15 @@ function c1127737.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCondition(c1127737.damcon1)
 	e2:SetTarget(c1127737.damtg1)
-	e2:SetOperation(c1127737.damop)
+	e2:SetOperation(c1127737.damop1)
 	c:RegisterEffect(e2)
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(1127737,0))
-	e2:SetCategory(CATEGORY_DAMAGE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCondition(c1127737.damcon2)
-	e2:SetTarget(c1127737.damtg2)
-	e2:SetOperation(c1127737.damop)
+	e2:SetOperation(c1127737.damop2)
 	c:RegisterEffect(e2)
 end
 function c1127737.damcon1(e,tp,eg,ep,ev,re,r,rp)
@@ -38,23 +34,22 @@ function c1127737.damtg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetParam(500)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,500)
 end
-function c1127737.cfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-end
-function c1127737.damcon2(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c1127737.cfilter,Duel.GetTurnPlayer(),LOCATION_MZONE,0,1,nil)
-end
-function c1127737.damtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetTargetPlayer(Duel.GetTurnPlayer())
-	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,Duel.GetTurnPlayer(),500)
-end
-function c1127737.damop(e,tp,eg,ep,ev,re,r,rp)
+function c1127737.damop1(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 		if not Duel.IsPlayerAffectedByEffect(p,37511832) then
 			Duel.Damage(p,d,REASON_EFFECT)
 		end
 	end
+end
+function c1127737.cfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ)
+end
+function c1127737.damcon2(e,tp,eg,ep,ev,re,r,rp)
+	local turnp=Duel.GetTurnPlayer()
+	return not Duel.IsPlayerAffectedByEffect(turnp,37511832) and Duel.IsExistingMatchingCard(c1127737.cfilter,turnp,LOCATION_MZONE,0,1,nil)
+end
+function c1127737.damop2(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,36562627)
+	Duel.Damage(p,d,REASON_EFFECT)
 end

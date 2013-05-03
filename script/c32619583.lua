@@ -12,6 +12,7 @@ function c32619583.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c32619583.spcon(e,tp,eg,ep,ev,re,r,rp)
+	e:SetLabel(e:GetHandler():GetPreviousControler())
 	return e:GetHandler():IsPreviousLocation(LOCATION_HAND) and bit.band(r,0x4040)==0x4040
 end
 function c32619583.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -20,7 +21,7 @@ function c32619583.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c32619583.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)>0
-		and rp~=tp and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>1 then
+		and rp~=tp and tp==e:GetLabel() and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>1 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
 		local g=Duel.SelectMatchingCard(1-tp,aux.TRUE,tp,0,LOCATION_HAND,2,2,nil)

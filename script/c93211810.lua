@@ -14,7 +14,8 @@ function c93211810.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c93211810.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+	local ph=Duel.GetCurrentPhase()
+	return Duel.GetTurnPlayer()==tp and ph<PHASE_MAIN2 and (ph~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
 end
 function c93211810.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.CheckAttackActivity(tp) end

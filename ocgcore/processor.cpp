@@ -2079,6 +2079,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			else {
 				core.hint_timing[0] = 0;
 				core.hint_timing[1] = 0;
+				core.delayed_quick.clear();
 			}
 		}
 		core.select_chains.clear();

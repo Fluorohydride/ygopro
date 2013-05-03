@@ -82,11 +82,11 @@ function c94973028.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,REASON_COST)
 end
 function c94973028.desfilter(c)
-	return c:IsDestructable()
+	return c:IsDestructable() and c:IsAbleToRemove()
 end
 function c94973028.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c94973028.desfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c94973028.desfilter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c94973028.desfilter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c94973028.desfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)

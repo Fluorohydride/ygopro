@@ -38,7 +38,7 @@ function c63883999.filter(c,e,tp)
 		and Duel.IsExistingMatchingCard(c63883999.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK,0,1,nil,lv,e,tp)
 end
 function c63883999.rfilter(c)
-	return c:IsRace(RACE_FIEND) and c:IsAbleToRemove()
+	return c:IsFaceup() and c:IsRace(RACE_FIEND) and c:IsAbleToRemove()
 end
 function c63883999.spfilter(c,lv,e,tp)
 	return c:IsSetCard(0x45) and c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -16,7 +16,7 @@ function c15240238.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c15240238.filter(c)
-	return c:IsFaceup()
+	return c:IsFaceup() and c:GetAttack()>0
 end
 function c15240238.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c15240238.filter(chkc) end
