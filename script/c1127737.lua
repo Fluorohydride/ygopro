@@ -32,7 +32,7 @@ function c1127737.damtg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(eg:GetFirst():GetSummonPlayer())
 	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,500)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,eg:GetFirst():GetSummonPlayer(),500)
 end
 function c1127737.damop1(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
@@ -46,10 +46,12 @@ function c1127737.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c1127737.damcon2(e,tp,eg,ep,ev,re,r,rp)
-	local turnp=Duel.GetTurnPlayer()
-	return not Duel.IsPlayerAffectedByEffect(turnp,37511832) and Duel.IsExistingMatchingCard(c1127737.cfilter,turnp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c1127737.cfilter,Duel.GetTurnPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function c1127737.damop2(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,36562627)
-	Duel.Damage(p,d,REASON_EFFECT)
+	local p=Duel.GetTurnPlayer()
+	if not Duel.IsPlayerAffectedByEffect(p,37511832) then
+		Duel.Hint(HINT_CARD,0,1127737)
+		Duel.Damage(p,500,REASON_EFFECT)
+	end
 end

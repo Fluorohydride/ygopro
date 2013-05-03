@@ -17,6 +17,6 @@ end
 function c33655493.tg(e,c)
 	return c:IsFaceup() and c:GetCode()~=33655493
 end
-function c33655493.tglimit(e,re)
-	return not re:GetHandler():IsType(TYPE_MONSTER)
+function c33655493.tglimit(e,re,rp)
+	return rp~=e:GetHandlerPlayer() and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

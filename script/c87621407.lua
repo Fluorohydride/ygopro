@@ -10,11 +10,11 @@ function c87621407.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c87621407.filter(c)
-	return c:IsFaceup() and c:GetCode()==8715625
+	return c:IsFaceup() and c:IsCode(8715625)
 end
 function c87621407.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local ct=Duel.GetMatchingGroupCount(c87621407.filter,tp,LOCATION_MZONE,0,nil)
+	local ct=Duel.GetMatchingGroupCount(c87621407.filter,tp,LOCATION_ONFIELD,0,nil)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ct+1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct+1)

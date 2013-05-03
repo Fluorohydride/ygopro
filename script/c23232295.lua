@@ -33,7 +33,7 @@ function c23232295.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 			e:SetLabelObject(g:GetFirst())
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
-			local cg=g:Select(g,1,1,nil)
+			local cg=g:Select(tp,1,1,nil)
 			e:SetLabelObject(cg:GetFirst())
 		end
 		return true
