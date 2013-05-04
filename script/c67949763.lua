@@ -26,10 +26,22 @@ function c67949763.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c67949763.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local atk=tc:GetAttack()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>2
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>2
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,atk,0,1,RACE_FIEND,ATTRIBUTE_DARK) then
 		local rfid=tc:GetRealFieldID()
+		local atk=0
+		local cr=false
+		if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+			local de=Effect.CreateEffect(e:GetHandler())
+			de:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+			de:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+			de:SetCode(EVENT_LEAVE_FIELD)
+			de:SetOperation(c67949763.desop)
+			de:SetLabel(rfid)
+			tc:RegisterEffect(de,true)
+			atk=tc:GetAttack()
+			cr=true
+		end
 		for i=1,3 do
 			local token=Duel.CreateToken(tp,67949764)
 			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
@@ -46,30 +58,18 @@ function c67949763.activate(e,tp,eg,ep,ev,re,r,rp)
 			token:RegisterEffect(e2,true)
 			local e3=Effect.CreateEffect(e:GetHandler())
 			e3:SetType(EFFECT_TYPE_SINGLE)
-			e3:SetCode(EFFECT_SET_ATTACK_FINAL)
-			e3:SetValue(c67949763.atkval)
+			e3:SetCode(EFFECT_SET_ATTACK)
+			e3:SetValue(atk)
 			e3:SetLabelObject(tc)
 			e3:SetReset(RESET_EVENT+0x1fe0000)
 			token:RegisterEffect(e3,true)
-			token:RegisterFlagEffect(67949764,RESET_EVENT+0x1fe0000,0,0,rfid)
-			tc:CreateRelation(token,RESET_EVENT+0x1fc0000)
+			if cr then
+				token:RegisterFlagEffect(67949764,RESET_EVENT+0x1fe0000,0,0,rfid)
+				tc:CreateRelation(token,RESET_EVENT+0x1fc0000)
+			end
 		end
 		Duel.SpecialSummonComplete()
-		local de=Effect.CreateEffect(e:GetHandler())
-		de:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		de:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		de:SetCode(EVENT_LEAVE_FIELD)
-		de:SetOperation(c67949763.desop)
-		de:SetLabel(rfid)
-		tc:RegisterEffect(de,true)
 	end
-end
-function c67949763.atkval(e,c)
-	local rc=e:GetLabelObject()
-	if rc:IsRelateToCard(c) then
-		e:SetLabel(rc:GetAttack())
-	end
-	return e:GetLabel()
 end
 function c67949763.desfilter(c,rfid)
 	return c:GetFlagEffectLabel(67949764)==rfid

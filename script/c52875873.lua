@@ -13,29 +13,18 @@ function c52875873.initial_effect(c)
 	c:RegisterEffect(e1)
 	if not c52875873.global_check then
 		c52875873.global_check=true
-		c52875873[0]=true
-		c52875873[1]=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
 		ge1:SetOperation(c52875873.checkop)
 		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c52875873.clear)
-		Duel.RegisterEffect(ge2,0)
 	end
 end
 function c52875873.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	if tc:IsCode(70095154) then
-		c52875873[tc:GetControler()]=false
+		Duel.RegisterFlagEffect(tc:GetControler(),52875873,RESET_PHASE+PHASE_END,0,1)
 	end
-end
-function c52875873.clear(e,tp,eg,ep,ev,re,r,rp)
-	c52875873[0]=true
-	c52875873[1]=true
 end
 function c52875873.cfilter(c)
 	return c:IsFaceup() and c:IsCode(70095154)
@@ -44,7 +33,7 @@ function c52875873.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c52875873.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c52875873.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c52875873[tp] end
+	if chk==0 then return Duel.GetFlagEffect(tp,52875873)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)

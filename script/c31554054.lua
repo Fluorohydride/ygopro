@@ -31,7 +31,7 @@ end
 function c31554054.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local at=Duel.GetAttackTarget()
-	if at:IsRelateToEffect(e) and Duel.SendtoDeck(at,nil,2,REASON_EFFECT)>0 then
+	if at:IsRelateToEffect(e) and at:IsFaceup() and Duel.SendtoDeck(at,nil,2,REASON_EFFECT)>0 then
 		Duel.BreakEffect()
 		local tc=Duel.GetFirstTarget()
 		if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 and c:IsRelateToEffect(e) then

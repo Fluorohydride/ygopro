@@ -12,10 +12,10 @@ function c63391643.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c63391643.cfilter(c)
-	return c:IsFaceup() and c:GetCode()==46986414
+	return c:IsFaceup() and c:IsCode(46986414)
 end
 function c63391643.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c63391643.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c63391643.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c63391643.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsDestructable() end

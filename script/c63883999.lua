@@ -33,12 +33,12 @@ function c63883999.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c63883999.filter(c,e,tp)
 	local lv=c:GetLevel()
-	return lv>0 and c:IsSetCard(0x45)
+	return lv>0 and c:IsFaceup() and c:IsSetCard(0x45)
 		and Duel.IsExistingMatchingCard(c63883999.rfilter,tp,LOCATION_MZONE,0,1,c)
 		and Duel.IsExistingMatchingCard(c63883999.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK,0,1,nil,lv,e,tp)
 end
 function c63883999.rfilter(c)
-	return c:IsRace(RACE_FIEND) and c:IsAbleToRemove()
+	return c:IsFaceup() and c:IsRace(RACE_FIEND) and c:IsAbleToRemove()
 end
 function c63883999.spfilter(c,lv,e,tp)
 	return c:IsSetCard(0x45) and c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

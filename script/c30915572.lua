@@ -6,9 +6,13 @@ function c30915572.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE+CATEGORY_DECKDES)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCost(c30915572.spcost)
 	e1:SetTarget(c30915572.sptarget)
 	e1:SetOperation(c30915572.spoperation)
 	c:RegisterEffect(e1)
+end
+function c30915572.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not e:GetHandler():IsPublic() end
 end
 function c30915572.sptarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1)
