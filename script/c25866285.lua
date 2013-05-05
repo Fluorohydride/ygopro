@@ -16,7 +16,7 @@ function c25866285.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ec:IsFaceup() and ec:IsControler(tp) and ec:IsSetCard(0x2a)
 end
 function c25866285.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToGrave() end
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c25866285.operation(e,tp,eg,ep,ev,re,r,rp)

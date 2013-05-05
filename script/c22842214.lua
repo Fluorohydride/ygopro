@@ -69,10 +69,10 @@ function c22842214.eqfilter(c,ec)
 end
 function c22842214.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingMatchingCard(c22842214.eqfilter,tp,LOCATION_SZONE,0,1,nil,c) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c22842214.eqfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(22842214,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
-		local tc=Duel.SelectMatchingCard(tp,c22842214.eqfilter,tp,LOCATION_SZONE,0,1,1,nil,c):GetFirst()
+		local tc=Duel.SelectMatchingCard(tp,c22842214.eqfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,c):GetFirst()
 		e:SetLabelObject(tc)
 		return true
 	else return false end
@@ -81,5 +81,5 @@ function c22842214.desrepop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetLabelObject(),REASON_EFFECT+REASON_REPLACE)
 end
 function c22842214.atcon(e)
-	return Duel.IsExistingMatchingCard(c22842214.eqfilter,e:GetHandlerPlayer(),LOCATION_SZONE,0,1,nil,e:GetHandler())
+	return Duel.IsExistingMatchingCard(c22842214.eqfilter,e:GetHandlerPlayer(),LOCATION_SZONE,LOCATION_SZONE,1,nil,e:GetHandler())
 end

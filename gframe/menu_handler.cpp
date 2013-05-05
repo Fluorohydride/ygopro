@@ -250,11 +250,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
 				repinfo.append(infobuf);
+				wchar_t namebuf[4][20];
+				BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[0], namebuf[0], 20);
+				BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[40], namebuf[1], 20);
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
+					BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[80], namebuf[2], 20);
+					BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[120], namebuf[3], 20);
+				}
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]),
-					           (wchar_t*)(&ReplayMode::cur_replay.replay_data[80]), (wchar_t*)(&ReplayMode::cur_replay.replay_data[120]));
+					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
 				else
-					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]));
+					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());

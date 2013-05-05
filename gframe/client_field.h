@@ -105,6 +105,7 @@ public:
 	ClientCard* hovered_card;
 	ClientCard* clicked_card;
 	ClientCard* command_card;
+	ClientCard* highlighting_card;
 	int list_command;
 	wchar_t formatBuffer[2048];
 

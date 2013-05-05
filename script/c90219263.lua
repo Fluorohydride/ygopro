@@ -14,7 +14,7 @@ function c90219263.cfilter(c)
 	return c:IsFaceup() and c:IsCode(76812113)
 end
 function c90219263.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c90219263.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	return Duel.IsExistingMatchingCard(c90219263.cfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function c90219263.filter(c,e,tp)
 	local code=c:GetCode()

@@ -15,7 +15,7 @@ function c86821010.cfilter(c)
 	return c:IsFaceup() and c:IsCode(2403771)
 end
 function c86821010.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c86821010.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c86821010.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c86821010.filter(c)
 	return c:IsType(TYPE_EQUIP) and c:IsAbleToDeck()
