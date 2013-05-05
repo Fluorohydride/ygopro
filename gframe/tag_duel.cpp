@@ -1382,7 +1382,7 @@ void TagDuel::EndDuel() {
 	if(!pduel)
 		return;
 	last_replay.EndRecord();
-	char replaybuf[0x2000], *pbuf = replaybuf;
+	char replaybuf[0x20000], *pbuf = replaybuf;
 	memcpy(pbuf, &last_replay.pheader, sizeof(ReplayHeader));
 	pbuf += sizeof(ReplayHeader);
 	memcpy(pbuf, last_replay.comp_data, last_replay.comp_size);
