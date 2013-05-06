@@ -25,6 +25,11 @@ public:
 			return;
 		WaitForSingleObject(_event, INFINITE);
 	}
+	bool Wait(long milli) {
+		if(_nowait)
+			return false;
+		return WaitForSingleObject(_event, milli + 1) != WAIT_TIMEOUT;
+	}
 	void SetNoWait(bool nowait) {
 		_nowait = nowait;
 	}
@@ -82,6 +87,38 @@ public:
 		}
 		_state = false;
 		pthread_mutex_unlock(&_mutex);
+	}
+
+	bool Wait(long milliseconds)
+	{
+		if (_nowait || pthread_mutex_lock(&_mutex) != 0)
+			return false;
+
+		int rc = 0;
+		struct timespec abstime;
+
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		abstime.tv_sec  = tv.tv_sec + milliseconds / 1000;
+		abstime.tv_nsec = tv.tv_usec*1000 + (milliseconds % 1000)*1000000;
+		if (abstime.tv_nsec >= 1000000000)
+		{
+			abstime.tv_nsec -= 1000000000;
+			abstime.tv_sec++;
+		}
+
+		while (!_state) 
+		{
+			if ((rc = pthread_cond_timedwait(&_cond, &_mutex, &abstime)))
+			{
+				if (rc == ETIMEDOUT) break;
+				pthread_mutex_unlock(&_mutex);
+				return false;
+			}
+		}
+		_state = false;
+		pthread_mutex_unlock(&_mutex);
+		return rc == 0;
 	}
 	void SetNoWait(bool nowait) {
 		_nowait = nowait;
