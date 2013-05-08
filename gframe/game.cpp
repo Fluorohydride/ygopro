@@ -484,6 +484,8 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
+	engineSound = irrklang::createIrrKlangDevice();
+	engineMusic = irrklang::createIrrKlangDevice();
 	return true;
 }
 void Game::MainLoop() {
@@ -501,6 +503,7 @@ void Game::MainLoop() {
 	timer->setTime(0);
 	int fps = 0;
 	int cur_time = 0;
+	engineMusic->play2D("./sound/menu.mp3", true);
 	while(device->run()) {
 		if(gameConf.use_d3d)
 			linePattern = (linePattern + 1) % 30;
@@ -513,6 +516,12 @@ void Game::MainLoop() {
 			driver->draw2DImage(imageManager.tBackGround, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
 		gMutex.Lock();
 		if(dInfo.isStarted) {
+			if(imageManager.tBackGround2)
+				driver->draw2DImage(imageManager.tBackGround2, recti(0, 0, 1024, 640), recti(0, 0, imageManager.tBackGround->getOriginalSize().Width, imageManager.tBackGround->getOriginalSize().Height));
+			if(!engineMusic->isCurrentlyPlaying("./sound/song.mp3")){
+				engineMusic->stopAllSounds();
+				engineMusic->play2D("./sound/song.mp3", true);
+			}
 			DrawBackGround();
 			DrawCards();
 			DrawMisc();
@@ -521,6 +530,16 @@ void Game::MainLoop() {
 			driver->clearZBuffer();
 		} else if(is_building) {
 			DrawDeckBd();
+			if(!engineMusic->isCurrentlyPlaying("./sound/deck.mp3")){
+				engineMusic->stopAllSounds();
+				engineMusic->play2D("./sound/deck.mp3", true);
+			}
+		}
+		else {
+			if(!engineMusic->isCurrentlyPlaying("./sound/menu.mp3")){
+				engineMusic->stopAllSounds();
+				engineMusic->play2D("./sound/menu.mp3", true);
+			}
 		}
 		DrawGUI();
 		DrawSpec();
@@ -570,6 +589,7 @@ void Game::MainLoop() {
 #endif
 	SaveConfig();
 //	device->drop();
+	engineMusic->drop();
 }
 void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar) {
 	for(int i = 0; i < 16; ++i)
