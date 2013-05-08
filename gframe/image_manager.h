@@ -35,6 +35,7 @@ public:
 	irr::video::ITexture* tLim;
 	irr::video::ITexture* tHand[3];
 	irr::video::ITexture* tBackGround;
+	irr::video::ITexture* tBackGround2;
 	irr::video::ITexture* tField;
 };
 
