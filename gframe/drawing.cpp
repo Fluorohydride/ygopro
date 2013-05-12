@@ -672,7 +672,7 @@ void Game::DrawSpec() {
 	if(hideChat)
 	{
 	    showChat=false;
-	    hideChatTimer = 15;
+	    hideChatTimer = 10;
 	}
 	else if (hideChatTimer > 0)
 	{
