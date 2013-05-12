@@ -666,10 +666,24 @@ void Game::DrawSpec() {
 		if (attack_sv > 28)
 			attack_sv = 0;
 	}
+
+
+	bool showChat=true;
+	if(hideChat)
+	{
+	    showChat=false;
+	    hideChatTimer = 15;
+	}
+	else if (hideChatTimer > 0)
+	{
+	    showChat= false;
+	    hideChatTimer--;
+	}
 	for(int i = 0; i < 5; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
 						   0xffff4040,0xff40ff40,0xff4040ff,0xff40ffff,0xffff40ff,0xffffff40,0xffffffff,0xff808080,0xff404040};
-
+        if(!showChat && i >2)
+            continue;
 
 		if(chatTiming[i]) {
 			chatTiming[i]--;

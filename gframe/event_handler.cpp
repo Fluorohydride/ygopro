@@ -1305,6 +1305,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(hovered_card->location == LOCATION_HAND && !mainGame->dInfo.is_shuffling && mainGame->dInfo.curMsg != MSG_SHUFFLE_HAND) {
 						hovered_card->is_hovered = false;
 						MoveCard(hovered_card, 5);
+						if(hovered_controler== 0)
+                            mainGame->hideChat=false;
 					}
 					if(hovered_card->equipTarget)
 						hovered_card->equipTarget->is_showequip = false;
@@ -1324,6 +1326,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(hovered_location == LOCATION_HAND) {
 						mcard->is_hovered = true;
 						MoveCard(mcard, 5);
+						if(hovered_controler== 0)
+                            mainGame->hideChat=true;
 					}
 					if(mcard->equipTarget)
 						mcard->equipTarget->is_showequip = true;
