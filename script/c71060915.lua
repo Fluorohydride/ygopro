@@ -14,7 +14,7 @@ function c71060915.filter(c)
 	return c:IsFaceup() and c:IsCode(21844576)
 end
 function c71060915.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c71060915.filter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c71060915.filter,tp,LOCATION_ONFIELD,0,1,nil)
 		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c71060915.target(e,tp,eg,ep,ev,re,r,rp,chk)

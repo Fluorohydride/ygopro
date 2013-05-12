@@ -141,6 +141,7 @@ struct processor {
 	typedef std::vector<chain> chain_array;
 	typedef std::list<processor_unit> processor_list;
 	typedef std::set<card*, card_sort> card_set;
+	typedef std::set<effect*> effect_collection;
 
 	processor_list units;
 	processor_list subunits;
@@ -177,6 +178,9 @@ struct processor {
 	chain_list flip_chain_b;
 	chain_list new_ochain_h;
 	chain_list new_chains;
+	effect_collection delayed_quick_tmp;
+	effect_collection delayed_quick_break;
+	effect_collection delayed_quick;
 	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
 	card_set special_summoning;
@@ -535,7 +539,8 @@ public:
 
 #define GLOBALFLAG_DECK_REVERSE_CHECK	0x1
 #define GLOBALFLAG_BRAINWASHING_CHECK	0x2
-#define GLOBALFLAG_SCRAP_CHIMERA		0x3
+#define GLOBALFLAG_SCRAP_CHIMERA		0x4
+#define GLOBALFLAG_DELAYED_QUICKEFFECT	0x8
 
 //
 #define PROCESSOR_NONE		0

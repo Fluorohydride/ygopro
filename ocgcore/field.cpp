@@ -1327,7 +1327,7 @@ effect* field::check_unique_onfield(card* pcard, uint8 controler) {
 		return 0;
 	for(auto iter = core.unique_cards[controler].begin(); iter != core.unique_cards[controler].end(); ++iter) {
 		card* ucard = *iter;
-		if((ucard != pcard) && ucard->is_position(POS_FACEUP) && ucard->unique_code == pcard->unique_code
+		if((ucard != pcard) && ucard->get_status(STATUS_EFFECT_ENABLED) && (ucard->unique_code == pcard->unique_code)
 			&& (!(pcard->current.location & LOCATION_ONFIELD) || pcard->is_position(POS_FACEDOWN) || (ucard->unique_uid < pcard->unique_uid)))
 			return pcard->unique_effect;
 	}
@@ -1782,7 +1782,7 @@ int32 field::is_player_can_remove(uint8 playerid, card * pcard) {
 }
 int32 field::is_chain_negatable(uint8 chaincount, uint8 naga_check) {
 	effect_set eset;
-	if(chaincount < 0 && chaincount > core.current_chain.size())
+	if(chaincount < 0 || chaincount > core.current_chain.size())
 		return FALSE;
 	effect* peffect;
 	if(chaincount == 0)
@@ -1803,7 +1803,7 @@ int32 field::is_chain_negatable(uint8 chaincount, uint8 naga_check) {
 }
 int32 field::is_chain_disablable(uint8 chaincount, uint8 naga_check) {
 	effect_set eset;
-	if(chaincount < 0 && chaincount > core.current_chain.size())
+	if(chaincount < 0 || chaincount > core.current_chain.size())
 		return FALSE;
 	effect* peffect;
 	if(chaincount == 0)
@@ -1823,7 +1823,7 @@ int32 field::is_chain_disablable(uint8 chaincount, uint8 naga_check) {
 	return TRUE;
 }
 int32 field::check_chain_target(uint8 chaincount, card * pcard) {
-	if(chaincount < 0 && chaincount > core.current_chain.size())
+	if(chaincount < 0 || chaincount > core.current_chain.size())
 		return FALSE;
 	chain* pchain;
 	if(chaincount == 0)

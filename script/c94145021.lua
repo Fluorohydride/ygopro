@@ -1,5 +1,6 @@
 --ドロール＆ロックバード
 function c94145021.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_DELAYED_QUICKEFFECT)
 	--disable
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(94145021,0))

@@ -17,7 +17,7 @@ function c78845026.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c78845026.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c78845026.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c78845026.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c78845026.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c78845026.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -25,7 +25,7 @@ function c78845026.activate(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_ADD_TYPE)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(TYPE_TUNER)
 		tc:RegisterEffect(e1)
 	end

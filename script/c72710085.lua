@@ -19,7 +19,8 @@ function c72710085.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c72710085.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetCount()==1 and eg:GetFirst():IsPreviousLocation(LOCATION_GRAVE) and eg:GetFirst():IsControler(tp)
+	local tc=eg:GetFirst()
+	return eg:GetCount()==1 and tc:IsPreviousLocation(LOCATION_GRAVE) and tc:IsControler(tp) and tc:IsType(TYPE_MONSTER)
 end
 function c72710085.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,72710085)==0 end
