@@ -222,7 +222,7 @@ bool Game::Initialize() {
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(true);
+	chkIgnore2->setChecked(false);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -829,7 +829,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200;
 	chatType[0] = player;
-	switch(player) {
+	if (player<11 || player > 19) switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
 		chatMsg[0].append(L": ");
