@@ -107,12 +107,12 @@ public:
 
 	std::list<FadingUnit> fadingList;
 	std::vector<int> logParam;
-	std::wstring chatMsg[5];
+	std::wstring chatMsg[8];
 
 	int hideChatTimer;
 	bool hideChat;
-	int chatTiming[5];
-	int chatType[5];
+	int chatTiming[8];
+	int chatType[8];
 	unsigned short linePattern;
 	int waitFrame;
 	int signalFrame;

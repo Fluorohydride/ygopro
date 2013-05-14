@@ -823,7 +823,7 @@ void Game::ShowCardInfo(int code) {
 	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
-	for(int i = 4; i > 0; --i) {
+	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];

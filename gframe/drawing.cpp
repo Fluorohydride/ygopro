@@ -679,7 +679,9 @@ void Game::DrawSpec() {
 	    showChat= false;
 	    hideChatTimer--;
 	}
-	for(int i = 0; i < 5; ++i) {
+	int maxChatLines = mainGame->dInfo.isStarted?5:8;
+
+	for(int i = 0; i < maxChatLines ; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
 						   0xffff4040,0xff40ff40,0xff4040ff,0xff40ffff,0xffff40ff,0xffffff40,0xffffffff,0xff808080,0xff404040};
         if(!showChat && i >2)
