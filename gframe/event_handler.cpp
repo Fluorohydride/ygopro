@@ -1305,6 +1305,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(hovered_card->location == LOCATION_HAND && !mainGame->dInfo.is_shuffling && mainGame->dInfo.curMsg != MSG_SHUFFLE_HAND) {
 						hovered_card->is_hovered = false;
 						MoveCard(hovered_card, 5);
+						if(hovered_controler== 0)
+                            mainGame->hideChat=false;
 					}
 					if(hovered_card->equipTarget)
 						hovered_card->equipTarget->is_showequip = false;
@@ -1324,6 +1326,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(hovered_location == LOCATION_HAND) {
 						mcard->is_hovered = true;
 						MoveCard(mcard, 5);
+						if(hovered_controler== 0)
+                            mainGame->hideChat=true;
 					}
 					if(mcard->equipTarget)
 						mcard->equipTarget->is_showequip = true;
@@ -1466,7 +1470,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(416, 504, 900, 600);
+	irr::core::recti sfRect(416, 440, 900, 520);
+
 	irr::core::recti ofRect(516, 135, 805, 191);
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
@@ -1521,7 +1526,7 @@ void ClientField::GetHoverField(int x, int y) {
 		}
 	} else {
 		double screenx = x / 1024.0 * 1.25 - 0.81;
-		double screeny = y / 640.0 * 0.84 - 0.42;
+		double screeny = y / 600.0 * 0.84 - 0.42;
 		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
 		double vlen = sqrt(1.0 + screeny * screeny);
 		double boardx = 3.95 + 7.8 * screenx / vlen / cos(angle);
