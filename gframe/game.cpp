@@ -487,6 +487,8 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
+	hideChat=false;
+	hideChatTimer=0;
 	return true;
 }
 void Game::MainLoop() {
@@ -826,7 +828,7 @@ void Game::ShowCardInfo(int code) {
 	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
-	for(int i = 4; i > 0; --i) {
+	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];
@@ -834,7 +836,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200;
 	chatType[0] = player;
-	switch(player) {
+	if (player<11 || player > 19) switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
 		chatMsg[0].append(L": ");
