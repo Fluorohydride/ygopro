@@ -4,7 +4,7 @@ function c8323633.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetTarget(c8323633.target)
+	e1:SetOperation(c8323633.target)
 	c:RegisterEffect(e1)
 end
 function c8323633.target(e,tp,eg,ep,ev,re,r,rp,chk)
