@@ -222,7 +222,7 @@ bool Game::Initialize() {
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(true);
+	chkIgnore2->setChecked(false);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -484,6 +484,8 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
+	hideChat=false;
+	hideChatTimer=0;
 	return true;
 }
 void Game::MainLoop() {
@@ -492,7 +494,7 @@ void Game::MainLoop() {
 	irr::core::matrix4 mProjection;
 	BuildProjectionMatrix(mProjection, -0.81f, 0.44f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-	
+
 	mProjection.buildCameraLookAtMatrixLH(vector3df(3.95f, 8.0f, 7.8f), vector3df(3.95f, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
@@ -823,7 +825,7 @@ void Game::ShowCardInfo(int code) {
 	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
-	for(int i = 4; i > 0; --i) {
+	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];
@@ -831,7 +833,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200;
 	chatType[0] = player;
-	switch(player) {
+	if (player<11 || player > 19) switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
 		chatMsg[0].append(L": ");

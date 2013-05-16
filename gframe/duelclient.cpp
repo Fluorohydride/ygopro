@@ -592,6 +592,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->AddChatMsg(msg, 8);
 			mainGame->gMutex.Unlock();
+		} else if(pkt->player >= 11 && pkt->player<=19) { //system custom message.
+                        BufferIO::CopyWStr(pkt->msg, msg, 256);
+                        msg[(len - 3) / 2] = 0;
+                        mainGame->gMutex.Lock();
+                        mainGame->AddChatMsg(msg, pkt->player);
+                        mainGame->gMutex.Unlock();
+
 		} else {
 			if(mainGame->chkIgnore2->isChecked())
 				break;
