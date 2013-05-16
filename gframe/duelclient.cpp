@@ -159,9 +159,11 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
+					mainGame->gMutex.Unlock();
 					mainGame->closeDoneSignal.Reset();
 					mainGame->closeSignal.Set();
 					mainGame->closeDoneSignal.Wait();
+					mainGame->gMutex.Lock();
 					mainGame->dInfo.isStarted = false;
 					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
@@ -499,10 +501,10 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
-		mainGame->gMutex.Lock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
+		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
@@ -592,6 +594,13 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 			mainGame->gMutex.Lock();
 			mainGame->AddChatMsg(msg, 8);
 			mainGame->gMutex.Unlock();
+		} else if(pkt->player >= 11 && pkt->player<=19) { //system custom message.
+                        BufferIO::CopyWStr(pkt->msg, msg, 256);
+                        msg[(len - 3) / 2] = 0;
+                        mainGame->gMutex.Lock();
+                        mainGame->AddChatMsg(msg, pkt->player);
+                        mainGame->gMutex.Unlock();
+
 		} else {
 			if(mainGame->chkIgnore2->isChecked())
 				break;
@@ -704,10 +713,10 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Unlock();
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
-		mainGame->gMutex.Lock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
+		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
