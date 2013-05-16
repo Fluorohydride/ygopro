@@ -666,10 +666,31 @@ void Game::DrawSpec() {
 		if (attack_sv > 28)
 			attack_sv = 0;
 	}
-	for(int i = 0; i < 5; ++i) {
-		static unsigned int chatColor[11] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040};
+
+
+	bool showChat=true;
+	if(hideChat)
+	{
+	    showChat=false;
+	    hideChatTimer = 10;
+	}
+	else if (hideChatTimer > 0)
+	{
+	    showChat= false;
+	    hideChatTimer--;
+	}
+	int maxChatLines = mainGame->dInfo.isStarted?5:8;
+
+	for(int i = 0; i < maxChatLines ; ++i) {
+		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
+						   0xffff4040,0xff40ff40,0xff4040ff,0xff40ffff,0xffff40ff,0xffffff40,0xffffffff,0xff808080,0xff404040};
+
 		if(chatTiming[i]) {
 			chatTiming[i]--;
+
+			if(!showChat && i >2)
+                continue;
+
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
 			driver->draw2DRectangle(recti(305, 596 - 20 * i, 307 + w, 616 - 20 * i), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
 			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
