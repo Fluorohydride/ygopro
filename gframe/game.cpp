@@ -543,6 +543,8 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
+		if(closeSignal.Wait(0))
+			CloseDuelWindow();
 		fps++;
 		cur_time = timer->getTime();
 		if(cur_time < fps * 17 - 20)
@@ -907,6 +909,7 @@ void Game::CloseDuelWindow() {
 	lstHostList->clear();
 	DuelClient::hosts.clear();
 	ClearTextures();
+	closeDoneSignal.Set();
 }
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;

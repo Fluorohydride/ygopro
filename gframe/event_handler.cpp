@@ -100,7 +100,6 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				if(mainGame->dInfo.player_type == 7) {
 					DuelClient::StopClient();
-					mainGame->CloseDuelWindow();
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
 					mainGame->btnCreateHost->setEnabled(true);

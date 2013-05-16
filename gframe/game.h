@@ -102,6 +102,8 @@ public:
 	Signal actionSignal;
 	Signal replaySignal;
 	Signal singleSignal;
+	Signal closeSignal;
+	Signal closeDoneSignal;
 	Config gameConf;
 	DuelInfo dInfo;
 

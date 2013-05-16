@@ -159,7 +159,9 @@ void DuelClient::ClientEvent(bufferevent *bev, short events, void *ctx) {
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
-					mainGame->CloseDuelWindow();
+					mainGame->closeDoneSignal.Reset();
+					mainGame->closeSignal.Set();
+					mainGame->closeDoneSignal.Wait();
 					mainGame->dInfo.isStarted = false;
 					mainGame->is_building = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
@@ -498,7 +500,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
 		mainGame->gMutex.Lock();
-		mainGame->CloseDuelWindow();
+		mainGame->closeDoneSignal.Reset();
+		mainGame->closeSignal.Set();
+		mainGame->closeDoneSignal.Wait();
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
@@ -708,7 +712,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->actionSignal.Reset();
 		mainGame->actionSignal.Wait();
 		mainGame->gMutex.Lock();
-		mainGame->CloseDuelWindow();
+		mainGame->closeDoneSignal.Reset();
+		mainGame->closeSignal.Set();
+		mainGame->closeDoneSignal.Wait();
 		mainGame->dInfo.isStarted = false;
 		mainGame->btnCreateHost->setEnabled(true);
 		mainGame->btnJoinHost->setEnabled(true);
