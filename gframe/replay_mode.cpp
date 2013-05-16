@@ -166,13 +166,14 @@ int ReplayMode::ReplayThread(void* param) {
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isReplay = false;
+		mainGame->gMutex.Unlock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
+		mainGame->gMutex.Lock();
 		mainGame->ShowElement(mainGame->wReplay);
-		mainGame->gMutex.Unlock();
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
-		mainGame->closeSignal.Set();
+		mainGame->gMutex.Unlock();
 	}
 	return 0;
 }

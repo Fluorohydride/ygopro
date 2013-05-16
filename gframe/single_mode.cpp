@@ -92,9 +92,11 @@ int SingleMode::SinglePlayThread(void* param) {
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
+		mainGame->gMutex.Unlock();
 		mainGame->closeDoneSignal.Reset();
 		mainGame->closeSignal.Set();
 		mainGame->closeDoneSignal.Wait();
+		mainGame->gMutex.Lock();
 		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
 		mainGame->gMutex.Unlock();
