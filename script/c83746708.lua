@@ -41,6 +41,12 @@ function c83746708.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
 end
+
+function c83746708.filter(c)
+	return c:IsType(TYPE_SPELL) or c:IsType(TYPE_TRAP)
+end
+
 function c83746708.value(e,c)
-	return Duel.GetFieldGroupCount(e:GetHandler():GetControler(),LOCATION_SZONE,0)*500
+	local g=Duel.GetMatchingGroup(c83746708.filter,tp,LOCATION_ONFIELD,0,nil)
+	return g:GetCount()*500
 end
