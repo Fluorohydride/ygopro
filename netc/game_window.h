@@ -21,7 +21,7 @@ namespace ygopro
 		GameWindow();
 		~GameWindow();
 		void Initialise();
-		void MainLoop();
+		void MainLoop(int x, int y);
 		void Close();
 
 		virtual void LoadTexture(const std::string& name);

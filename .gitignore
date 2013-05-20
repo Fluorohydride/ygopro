@@ -1,0 +1,14 @@
+/Debug/
+/Release/
+/bin/
+/dep/
+*.exe
+*.ilk
+*.sdf
+*.opensdf
+*.suo
+*.sdf
+*.sln
+*.vcxproj
+*.filters
+*.user

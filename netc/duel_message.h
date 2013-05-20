@@ -32,9 +32,9 @@ namespace ygopro
 		}
 
 		virtual void CheckMessage() {
-			msg_mutex.lock();
 			if(msg_queue.empty())
 				return;
+			msg_mutex.lock();
 			DuelMessageData dmd = msg_queue.front();
 			msg_queue.pop();
 			msg_mutex.unlock();

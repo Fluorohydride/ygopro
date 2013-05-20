@@ -19,18 +19,13 @@ class ClientConnection: public PacketStream {
 protected:
 	TcpServer* server;
 	bufferevent* bev;
-	unsigned int address;
 	void* object;
+	unsigned int address;
 
 public:
-	ClientConnection() {
-		object = nullptr;
-		address = 0;
-	}
+	ClientConnection(): server(nullptr), bev(nullptr), object(nullptr), address(0) {}
 
-	virtual ~ClientConnection() {
-
-	}
+	virtual ~ClientConnection() {}
 
 	// connection event
 	virtual void Connected() {}

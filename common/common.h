@@ -51,13 +51,4 @@
 
 extern unsigned int proto_version;
 
-#define PRIVILEGE_WATCH				0x1
-#define PRIVILEGE_DUEL				0x2
-#define PRIVILEGE_MATCHING			0x4
-#define PRIVILEGE_AVATAR			0x8
-#define PRIVILEGE_SLEEVE			0x10
-#define PRIVILEGE_KICK_PLAYER		0x10000
-#define PRIVILEGE_BAN_PLAYER		0x20000
-#define PRIVILEGE_GIVE_PRIVILEGE	0x40000
-
 #endif //_COMMON_H_

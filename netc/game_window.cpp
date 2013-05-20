@@ -29,26 +29,27 @@ namespace ygopro
 		mGUI->initialise("MyGUI_Core.xml");
 	}
 
-	void GameWindow::MainLoop() {
-		glWindow = glfwCreateWindow(1024, 640, GLFW_WINDOWED, "YGOPRO", 0);
-		glfwMakeContextCurrent(glWindow);
+	void GameWindow::MainLoop(int x, int y) {
 #ifdef _WIN32
 		int cx = GetSystemMetrics(SM_CXSCREEN);
 		int cy = GetSystemMetrics(SM_CYSCREEN);
-		glfwSetWindowPos(glWindow, (cx - 1024) / 2, (cy - 640) / 2);
+		glfwWindowHint(GLFW_POSITION_X, (cx - x) / 2);
+		glfwWindowHint(GLFW_POSITION_Y, (cy - y) / 2);
 #endif
+		glWindow = glfwCreateWindow(x, y, GLFW_WINDOWED, "YGOPRO", 0);
+		glfwMakeContextCurrent(glWindow);
 
 		mPlatform->getRenderManagerPtr()->setViewSize(1024, 640);
 		MyGUI::PointerManager::getInstancePtr()->setVisible(false);
 
-		glfwSetCursorPosCallback(mousePosFunc);
-		glfwSetMouseButtonCallback(mouseButtonFunc);
-		glfwSetScrollCallback(mouseWheelFunc);
+		glfwSetCursorPosCallback(glWindow, mousePosFunc);
+		glfwSetMouseButtonCallback(glWindow, mouseButtonFunc);
+		glfwSetScrollCallback(glWindow, mouseWheelFunc);
 
 		FpsInitialise();
 		FpsSet(60);
 
-		while(exiting && !glfwGetWindowParam(glWindow, GLFW_CLOSE_REQUESTED)) {
+		while(!exiting && !glfwGetWindowParam(glWindow, GLFW_CLOSE_REQUESTED)) {
 			FpsNextFrame();
 			CheckMessage();
 			glfwPollEvents();

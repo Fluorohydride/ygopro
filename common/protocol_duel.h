@@ -15,5 +15,7 @@
 //	repeated response
 #define DUELCS_RESPONSE 0x2
 
+// 
+#define DUELCS_CHECKTIME 0x3
 
 #endif

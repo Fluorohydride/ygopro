@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MyGUI type="Resource" version="1.1">
+	<Resource type="ResourceTrueTypeFont" name="wqy-microhei.15">
+		<Property key="Source" value="wqy-microhei.ttf"/>
+		<Property key="Size" value="10"/>
+		<Codes>
+			<Code range="32 126"/>
+			<Code range="1025 1105"/>
+			<Code range="8470"/>
+			<Code hide="1026 1039"/>
+			<Code hide="1104"/>
+		</Codes>
+	</Resource>
+</MyGUI>
