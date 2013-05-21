@@ -1,4 +1,4 @@
---Mermail Abyssmander
+--水精鱗－アビスマンダー
 function c21767650.initial_effect(c)
 	--lvup
 	local e1=Effect.CreateEffect(c)

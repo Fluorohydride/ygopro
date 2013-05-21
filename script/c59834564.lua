@@ -1,4 +1,4 @@
---Bonfire Colossus
+--嚇灼の魔神
 function c59834564.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

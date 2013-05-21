@@ -1,4 +1,4 @@
---Hieratic Seal of the Dragon King
+--龍王の聖刻印
 function c64514622.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--special summon

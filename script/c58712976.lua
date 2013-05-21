@@ -1,4 +1,4 @@
---Infernal Flame Vixen
+--ヘルフレイムゴースト
 function c58712976.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_PYRO),4),2)

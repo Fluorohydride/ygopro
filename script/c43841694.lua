@@ -1,4 +1,4 @@
---エクシーズ·リボーン
+--魔導書の奇跡
 function c43841694.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -22,7 +22,7 @@ function c43841694.filter2(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
 end
 function c43841694.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c43841694.filter(chkc,e,tp) end
+	if chkc then return false end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c43841694.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) 
 		and Duel.IsExistingTarget(c43841694.filter2,tp,LOCATION_REMOVED,0,1,nil) end
@@ -36,8 +36,9 @@ function c43841694.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c43841694.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg=g:Filter(Card.IsType,nil,TYPE_SPELL):Filter(Card.IsRelateToEffect,nil,e)
+	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
 	local tc=e:GetLabelObject()
+	sg:RemoveCard(tc)
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		Duel.BreakEffect()
 		if sg:GetCount()>0 then 

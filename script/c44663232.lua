@@ -1,6 +1,6 @@
 --異怪の妖精 エルフォビア
 function c44663232.initial_effect(c)
-	--xyz limit
+	--activate limit
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(44663232,0))
 	e2:SetType(EFFECT_TYPE_IGNITION)
@@ -32,7 +32,6 @@ function c44663232.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(c44663232.val)
 	Duel.RegisterEffect(e1,tp)
 end
-
 function c44663232.val(e,re,tp)
-	return re:IsActiveType(TYPE_MONSTER) and  re:GetHandler():GetLevel()>e:GetLabel()
+	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsLevelAbove(e:GetLabel())
 end

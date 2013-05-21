@@ -1,4 +1,4 @@
---Mermail Abyssteus
+--水精鱗－ディニクアビス
 function c22446869.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

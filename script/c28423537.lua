@@ -51,24 +51,16 @@ function c28423537.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e2)
 	--
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(28423537,2))
-	e3:SetCategory(CATEGORY_DESTROY)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetTarget(c28423537.tgtg)
 	e3:SetOperation(c28423537.tgop)
 	e3:SetReset(RESET_EVENT+0xc6e0000)
 	c:RegisterEffect(e3)
 end
 function c28423537.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsRace(RACE_FIEND)
-end
-function c28423537.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 end
 function c28423537.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
