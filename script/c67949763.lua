@@ -26,12 +26,16 @@ function c67949763.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c67949763.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>2
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,atk,0,1,RACE_FIEND,ATTRIBUTE_DARK) then
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>2 then
 		local rfid=tc:GetRealFieldID()
 		local atk=0
 		local cr=false
 		if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+			atk=tc:GetAttack()
+			cr=true
+		end
+		if not Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,atk,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
+		if cr then
 			local de=Effect.CreateEffect(e:GetHandler())
 			de:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 			de:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
@@ -39,8 +43,6 @@ function c67949763.activate(e,tp,eg,ep,ev,re,r,rp)
 			de:SetOperation(c67949763.desop)
 			de:SetLabel(rfid)
 			tc:RegisterEffect(de,true)
-			atk=tc:GetAttack()
-			cr=true
 		end
 		for i=1,3 do
 			local token=Duel.CreateToken(tp,67949764)

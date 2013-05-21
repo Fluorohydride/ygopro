@@ -2,9 +2,8 @@
 function c29616929.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
+	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetCondition(c29616929.condition)
 	e1:SetTarget(c29616929.target)
@@ -30,17 +29,17 @@ function c29616929.checkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c29616929.condition(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(0,CHAININFO_TRIGGERING_LOCATION)
-	return ep~=tp and loc==LOCATION_MZONE and re:GetHandler():GetFlagEffect(29616929)>0 and Duel.IsChainNegatable(ev)
+	return ep~=tp and loc==LOCATION_MZONE and re:GetHandler():GetFlagEffect(29616929)>0 and Duel.IsChainDisablable(ev)
 end
 function c29616929.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_NEGATE,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE,eg,1,0,0)
 	if re:GetHandler():IsDestructable() and re:GetHandler():IsRelateToEffect(re) then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
 	end
 end
 function c29616929.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateActivation(ev)
+	Duel.NegateEffect(ev)
 	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end

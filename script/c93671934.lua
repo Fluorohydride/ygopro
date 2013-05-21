@@ -22,7 +22,7 @@ function c93671934.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c93671934.recop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Recover(tp,1000,REASON_EFFECT)
+	Duel.Recover(eg:GetFirst():GetControler(),1000,REASON_EFFECT)
 end
 function c93671934.filter(c)
 	return c:GetEquipTarget()~=nil or c:IsReason(REASON_LOST_TARGET)
@@ -31,5 +31,11 @@ function c93671934.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c93671934.filter,1,nil)
 end
 function c93671934.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(tp,1000,REASON_EFFECT)
+	local g=eg:Filter(c93671934.filter,nil)
+	if g:IsExists(Card.IsControler,1,nil,tp) then
+		Duel.Damage(tp,1000,REASON_EFFECT)
+	end
+	if g:IsExists(Card.IsControler,1,nil,1-tp) then
+		Duel.Damage(1-tp,1000,REASON_EFFECT)
+	end
 end

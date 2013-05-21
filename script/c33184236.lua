@@ -14,7 +14,7 @@ end
 function c33184236.cfilter(c,tp)
 	local np=c:GetPosition()
 	local pp=c:GetPreviousPosition()
-	return c:IsControler(tp) and c:IsSetCard(0x11) and ((pp==0x1 and np==0x4) or (pp==0x4 and np==0x1) or (pp==0x8 and np==0x1))
+	return c:IsControler(tp) and c:IsSetCard(0x11) and ((pp==0x1 and np==0x4) or (pp==0x4 and np==0x1))
 end
 function c33184236.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c33184236.cfilter,1,nil,tp)
