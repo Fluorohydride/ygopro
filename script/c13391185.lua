@@ -9,10 +9,10 @@ function c13391185.initial_effect(c)
 	e1:SetCondition(c13391185.eqcon1)
 	e1:SetValue(TYPE_NORMAL+TYPE_MONSTER)
 	c:RegisterEffect(e1)
-	--spsummon
+	--tohand
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(13391185,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
@@ -31,7 +31,7 @@ function c13391185.eqcon2(e)
 	return eg and eg:IsExists(Card.IsSetCard,1,nil,0x207a)
 end
 function c13391185.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return c13391185.eqcon2(e) and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==1
+	return c13391185.eqcon2(e)
 end
 function c13391185.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,13391185)==0 end
@@ -43,12 +43,12 @@ end
 function c13391185.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c13391185.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c13391185.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c13391185.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c13391185.desfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x207a) and c:IsType(TYPE_EQUIP)
+	return c:IsFaceup() and c:IsSetCard(0x207a) and c:IsType(TYPE_EQUIP) and c:IsDestructable()
 end
 function c13391185.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

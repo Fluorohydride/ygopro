@@ -65,8 +65,8 @@ function c7452945.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP) and c:IsReason(REASON_DESTROY) and c:CheckUniqueOnField(tp)
 end
 function c7452945.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,c7452945)==0 end
-	Duel.RegisterFlagEffect(tp,c7452945,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return Duel.GetFlagEffect(tp,7452945)==0 end
+	Duel.RegisterFlagEffect(tp,7452945,RESET_PHASE+PHASE_END,0,1)
 end
 function c7452945.eqfilter2(c)
 	return c:IsFaceup() and c:IsSetCard(0x107a) and c:IsRace(RACE_WARRIOR)

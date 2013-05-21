@@ -63,10 +63,7 @@ function c28423537.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsRace(RACE_FIEND)
 end
 function c28423537.tgop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		Duel.Destroy(c,REASON_EFFECT)
-	end
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 function c28423537.rfilter(c)
 	return c:IsSetCard(0x45) and c:IsAbleToRemoveAsCost()

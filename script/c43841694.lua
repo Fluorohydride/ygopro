@@ -31,7 +31,6 @@ function c43841694.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	e:SetLabelObject(g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g2=Duel.SelectTarget(tp,c43841694.filter2,tp,LOCATION_REMOVED,0,1,2,nil)
-	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,1,0,0)
 end
 function c43841694.activate(e,tp,eg,ep,ev,re,r,rp)
