@@ -10,7 +10,7 @@ function c49785720.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c49785720.filter(c)
-	return c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsFaceup() and c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c49785720.spcon(e,c)
 	if c==nil then return true end
