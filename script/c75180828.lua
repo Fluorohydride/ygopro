@@ -60,7 +60,7 @@ end
 function c75180828.desfilter(c)
 	return c:IsDestructable()
 end
-function c75180828.destg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c75180828.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c75180828.desfilter(chkc) end
 	if chk==0 then return true end
 	local ct=Duel.GetMatchingGroupCount(c75180828.descount,tp,LOCATION_GRAVE,0,nil)

@@ -4,14 +4,14 @@ function c8323633.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetOperation(c8323633.target)
+	e1:SetOperation(c8323633.operation)
 	c:RegisterEffect(e1)
 end
-function c8323633.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+function c8323633.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,564)
 	local ac=Duel.AnnounceCard(tp)
-	local c=e:GetHandler()
 	c:SetHint(CHINT_CARD,ac)
 	--remove
 	local e1=Effect.CreateEffect(c)

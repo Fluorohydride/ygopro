@@ -50,8 +50,8 @@ function c28201945.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c28201945.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp,ft)
 	local tc=g:GetFirst()
 	if tc then
-		if ft>0 and tc:IsAbleToHand() and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
-			and Duel.SelectYesNo(tp,aux.Stringid(28201945,1)) then
+		if ft>0 and tc:IsCanBeSpecialSummoned(e,0,tp,false,false)
+			and (not tc:IsAbleToHand() or Duel.SelectYesNo(tp,aux.Stringid(28201945,1))) then
 			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 		else
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
