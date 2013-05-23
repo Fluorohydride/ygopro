@@ -1,4 +1,4 @@
---Advance Zone
+--アドバンス・ゾーン
 function c76224717.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

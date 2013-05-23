@@ -1,4 +1,4 @@
---Noble Arms - Gallatin
+--聖剣ガラティーン
 function c14745409.initial_effect(c)
 	c:SetUniqueOnField(1,0,14745409)
 	--Activate

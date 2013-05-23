@@ -1,4 +1,4 @@
---Imairuka
+--イマイルカ
 function c41952656.initial_effect(c)
 	--draw
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---Ninjitsu Art of Shadow Sealing
+--忍法 影縫いの術
 function c13629812.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -13,8 +13,10 @@ function c13629812.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Destroy
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e2:SetDescription(aux.Stringid(13629812,0))
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetCondition(c13629812.retcon)
 	e2:SetOperation(c13629812.retop)
 	c:RegisterEffect(e2)
 end
@@ -58,9 +60,9 @@ end
 function c13629812.disop(e,tp)
 	return bit.lshift(0x1,e:GetLabel())
 end
+function c13629812.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetFirstCardTarget()~=nil
+end
 function c13629812.retop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler():GetFirstCardTarget()
-	if tc then
-		Duel.ReturnToField(tc)
-	end
+	Duel.ReturnToField(e:GetHandler():GetFirstCardTarget())
 end

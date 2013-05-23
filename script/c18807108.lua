@@ -45,7 +45,7 @@ function c18807108.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c18807108.rcon(e)
-	return e:GetOwner():IsRelateToCard(e:GetHandler())
+	return not e:GetHandler():IsImmuneToEffect(e) and e:GetOwner():IsRelateToCard(e:GetHandler())
 end
 function c18807108.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

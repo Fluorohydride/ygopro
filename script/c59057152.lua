@@ -1,4 +1,4 @@
---Noble Knight Medraut
+--聖騎士モルドレッド
 function c59057152.initial_effect(c)
 	--Attribute Dark
 	local e1=Effect.CreateEffect(c)

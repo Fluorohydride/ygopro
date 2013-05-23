@@ -1,4 +1,4 @@
---Artorigus, King of the Noble Knights
+--聖騎士王アルトリウス
 function c21223277.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x107a),4),2)

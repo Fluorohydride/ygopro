@@ -18,10 +18,10 @@ function c40390147.spfilter(c,e,tp)
 	return c:IsCode(93717133) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c40390147.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local b1=Duel.IsExistingMatchingCard(c40390147.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp)
-	local b2=Duel.IsExistingMatchingCard(c40390147.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
+	local b1=Duel.IsExistingMatchingCard(c40390147.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
+	local b2=Duel.IsExistingMatchingCard(c40390147.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) and e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and ((b1 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)) or (b2 and e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST))) end
+		and (b1 or b2) end
 	if b1 and b2 then
 		local opt=Duel.SelectOption(tp,aux.Stringid(40390147,1),aux.Stringid(40390147,2))
 		e:SetLabel(opt)

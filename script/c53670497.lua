@@ -1,4 +1,4 @@
---Hieratic Seal From the Ashes
+--復活の聖刻印
 function c53670497.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -23,7 +23,8 @@ function c58185394.sdfilter(c)
 	return c:IsFaceup() and c:IsCode(99171160)
 end
 function c58185394.sdcon(e)
-	return not Duel.IsExistingMatchingCard(c58185394.sdfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
+	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+		and not Duel.IsExistingMatchingCard(c58185394.sdfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
 function c58185394.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

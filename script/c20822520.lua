@@ -1,4 +1,4 @@
---Spellbook Library of the Heliosphere
+--魔導書庫ソレイン
 function c20822520.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -13,28 +13,17 @@ function c20822520.initial_effect(c)
 	c:RegisterEffect(e1)
 	if not c20822520.global_check then
 		c20822520.global_check=true
-		c20822520[0]=true
-		c20822520[1]=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_CHAINING)
 		ge1:SetOperation(c20822520.checkop)
 		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c20822520.clear)
-		Duel.RegisterEffect(ge2,0)
 	end
 end
 function c20822520.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and not re:GetHandler():IsSetCard(0x106e) then
-		c20822520[rp]=false
+		Duel.RegisterFlagEffect(rp,20822521,RESET_PHASE+PHASE_END,0,1)
 	end
-end
-function c20822520.clear(e,tp,eg,ep,ev,re,r,rp)
-	c20822520[0]=true
-	c20822520[1]=true
 end
 function c20822520.cfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsSetCard(0x106e)
@@ -43,7 +32,7 @@ function c20822520.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c20822520.cfilter,tp,LOCATION_GRAVE,0,5,nil)
 end
 function c20822520.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,20822520)==0 and c20822520[tp] end
+	if chk==0 then return Duel.GetFlagEffect(tp,20822520)==0 and Duel.GetFlagEffect(tp,20822521)==0 end
 	--oath effects
 	Duel.RegisterFlagEffect(tp,20822520,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 	local e1=Effect.CreateEffect(e:GetHandler())
