@@ -50,6 +50,7 @@ function c93751476.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c93751476.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
+	and e:GetHandler():GetReasonCard():IsSetCard(0x79)
 end
 function c93751476.filter(c)
 	return c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL) and c:IsSSetable()
