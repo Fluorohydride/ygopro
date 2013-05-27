@@ -1,5 +1,4 @@
 #include "player.h"
-#include "duel_base.h"
 #include "../common/tcpserver.h"
 
 namespace ygopro

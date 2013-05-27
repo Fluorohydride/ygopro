@@ -7,8 +7,6 @@
 
 namespace ygopro {
 
-	PlayerServer playerServer;
-
 	// packet format: 
 	// |  packet_size |      response_seed     |              packet               |
 	// |              |                        |   proto(8bit)   |       data      |

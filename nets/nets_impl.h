@@ -2,7 +2,6 @@
 #define _NETS_IMPL_H_
 
 #include "../common/tcpserver.h"
-#include "timer_object.h"
 
 namespace ygopro {
 
@@ -33,16 +32,9 @@ namespace ygopro {
 		virtual ClientConnection* NewConnection() {
 			return new PlayerConnection();
 		}
-
-		void RegisterTimerEvent(TimerObject* timer, short flag = EV_TIMEOUT) {
-			timer->TimerEnd();
-			event* event_ptr = event_new(loop_base, 0, flag, TimerObject::TimerCallback, timer);
-			timer->SetEventPtr(event_ptr);
-		}
 		
 	};
 
-	extern PlayerServer playerServer;
 }
 
 #endif

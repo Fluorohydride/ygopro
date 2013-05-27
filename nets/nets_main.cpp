@@ -26,7 +26,8 @@ int main(int argc, char* argv[])
 	ygopro::clanMgr.LoadClans();
 	ygopro::playerMgr.LoadPlayers();
 	ygopro::ticketMgr.LoadTicketInfos();
-	ygopro::playerServer.Run(8848);
+	ygopro::PlayerServer playerServer;
+	playerServer.Run(8848);
 
 #ifdef _WIN32
 	WSACleanup();
