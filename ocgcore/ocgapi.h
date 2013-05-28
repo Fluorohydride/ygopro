@@ -9,7 +9,7 @@
 #define OCGAPI_H_
 
 #include "common.h"
-#ifdef WIN32
+#ifdef _WIN32
 #include <windows.h>
 #define DECL_DLLEXPORT __declspec(dllexport)
 #else

@@ -71,6 +71,38 @@ public:
 
 };
 
+class ClientConnectionSeed: public ClientConnection {
+
+protected:
+	unsigned int response_seed;
+
+public:
+	ClientConnectionSeed(): response_seed(0) {}
+	// packet format: 
+	// |  packet_size |      response_seed     |              packet               |
+	// |              |                        |   proto(8bit)   |       data      |
+	// |    16 bits   |         32 bits        |          packet_size bits         |
+	// packet_size must less then 1024
+	virtual void ClientConnectionSeed::HandleData(bufferevent* bev) {
+		evbuffer* input = bufferevent_get_input(bev);
+		size_t len = evbuffer_get_length(input);
+		unsigned short packet_len = 0;
+		while(len >= 6) {
+			evbuffer_copyout(input, &packet_len, 2);
+			if(len < (size_t)(packet_len + 6))
+				return;
+			unsigned char buffer[2048];
+			evbuffer_remove(input, buffer, packet_len + 6);
+			unsigned int resp_seed = *(unsigned int*)&buffer[2];
+			if(packet_len && (resp_seed == response_seed)) {
+				HandlePacket(buffer[6], &buffer[7], packet_len - 1);
+				response_seed = (resp_seed * 0x1fd45cc2 + 0xdee89c3a) ^ 0xe7262ca9;
+			}
+			len -= packet_len + 6;
+		}
+	}
+};
+
 class TcpServer {
 
 protected:
