@@ -20,6 +20,7 @@ duel::duel() {
 	game_field->temp_card = new_card(0);
 	bufferlen = 0;
 	bufferp = buffer;
+	adapter = &defaultAdapter;
 }
 duel::~duel() {
 	for(std::set<card*>::iterator cit = cards.begin(); cit != cards.end(); ++cit)
@@ -49,7 +50,7 @@ card* duel::new_card(uint32 code) {
 	card* pcard = new card();
 	cards.insert(pcard);
 	if(code)
-		::read_card(code, &(pcard->data));
+		adapter->ReadCard(code, &(pcard->data));
 	pcard->data.code = code;
 	pcard->pduel = this;
 	lua->register_card(pcard);

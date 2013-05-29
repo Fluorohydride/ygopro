@@ -214,7 +214,7 @@ uint32 card::get_code() {
 			code = data.alias;
 	} else {
 		card_data dat;
-		read_card(code, &dat);
+		pduel->adapter->ReadCard(code, &dat);
 		if (dat.alias)
 			code = dat.alias;
 	}
@@ -227,7 +227,7 @@ int32 card::is_set_card(uint32 set_code) {
 		setcode = data.setcode;
 	} else {
 		card_data dat;
-		::read_card(code, &dat);
+		pduel->adapter->ReadCard(code, &dat);
 		setcode = dat.setcode;
 	}
 	uint32 settype = set_code & 0xfff;
@@ -878,7 +878,7 @@ void card::remove_effect(effect* peffect, effect_container::iterator it) {
 }
 int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	card_data cdata;
-	read_card(code, &cdata);
+	pduel->adapter->ReadCard(code, &cdata);
 	if(cdata.type & TYPE_NORMAL)
 		return -1;
 	set_status(STATUS_COPYING_EFFECT, TRUE);
