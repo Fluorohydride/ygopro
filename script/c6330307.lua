@@ -28,7 +28,7 @@ function c6330307.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c6330307.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x7f) and c:IsSetCard(0x1048)
+	return c:IsFaceup() and c:IsSetCard(0x3048)
 end
 function c6330307.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c6330307.filter(chkc) end
@@ -54,7 +54,7 @@ function c6330307.eqop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c6330307.eqlimit(e,c)
-	return c:IsSetCard(0x7f) and c:IsSetCard(0x1048)
+	return c:IsSetCard(0x3048)
 end
 function c6330307.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
