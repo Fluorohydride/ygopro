@@ -1,4 +1,4 @@
---Ω~åù≤ªø…«÷ÓI”Ú
+--Áµ∂ÂØæ‰∏çÂèØ‰æµÈ†òÂüü
 function c76848240.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,10 +11,10 @@ function c76848240.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c76848240.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()==tp  
+	return Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()==tp
 end
 function c76848240.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c76848240.operation(e,tp,eg,ep,ev,re,r,rp)
