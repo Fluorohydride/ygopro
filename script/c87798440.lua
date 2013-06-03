@@ -28,7 +28,7 @@ function c87798440.initial_effect(c)
 	e3:SetCondition(c87798440.uncon)
 	e3:SetValue(c87798440.repval)
 	c:RegisterEffect(e3)
-	--draw
+	--destroy
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(87798440,2))
 	e4:SetCategory(CATEGORY_DESTROY)
@@ -93,7 +93,7 @@ function c87798440.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c87798440.descon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and e:GetHandler():GetEquipTarget()==eg:GetFirst()
+	return ep~=tp and e:GetHandler():GetEquipTarget()==eg:GetFirst() and c87798440.uncon(e)
 end
 function c87798440.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsDestructable() end
