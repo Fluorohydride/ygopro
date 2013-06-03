@@ -19,25 +19,20 @@ function c88071625.initial_effect(c)
 	c:RegisterEffect(e2)
 	--atk
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_MATERIAL_CHECK)
-	e3:SetValue(c88071625.valcheck)
+	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_SUMMON_SUCCESS)
+	e3:SetOperation(c88071625.atkop)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_SUMMON_SUCCESS)
-	e4:SetOperation(c88071625.atkop)
-	c:RegisterEffect(e4)
 	--copy
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(88071625,1))
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e5:SetCode(EVENT_SUMMON_SUCCESS)
-	e5:SetCondition(c88071625.copycon)
-	e5:SetTarget(c88071625.copytg)
-	e5:SetOperation(c88071625.copyop)
-	c:RegisterEffect(e5)
+	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(88071625,1))
+	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e4:SetCode(EVENT_SUMMON_SUCCESS)
+	e4:SetCondition(c88071625.copycon)
+	e4:SetTarget(c88071625.copytg)
+	e4:SetOperation(c88071625.copyop)
+	c:RegisterEffect(e4)
 end
 function c88071625.otcon(e,c)
 	if c==nil then return true end
@@ -48,25 +43,33 @@ function c88071625.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:SetMaterial(sg)
 	Duel.Release(sg, REASON_SUMMON+REASON_MATERIAL)
 end
-function c88071625.valcheck(e,c)
-	local g=c:GetMaterial()
-	c88071625.atk=g:GetSum(Card.GetBaseAttack)
-	c88071625.def=g:GetSum(Card.GetBaseDefence)
-end
 function c88071625.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetMaterialCount()==0 then return end
 	local e1=Effect.CreateEffect(c)
+	local mg=c:GetMaterial()
+	local tc=mg:GetFirst()
+	local atk=0
+	local def=0
+	while tc do
+		local catk=tc:GetTextAttack()
+		local cdef=tc:GetTextDefence()
+		if catk<0 then catk=0 end
+		if cdef<0 then cdef=0 end
+		atk=atk+catk
+		def=def+cdef
+		tc=mg:GetNext()
+	end
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c88071625.atk)
+	e1:SetValue(atk)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_DEFENCE)
-	e2:SetValue(c88071625.def)
+	e2:SetValue(def)
 	c:RegisterEffect(e2)
 end
 function c88071625.copycon(e,tp,eg,ep,ev,re,r,rp)
