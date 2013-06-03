@@ -48,11 +48,11 @@ function c66762372.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c66762372.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x79) and c:IsPreviousLocation(LOCATION_EXTRA)
+function c66762372.cfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0x79) and c:IsPreviousLocation(LOCATION_EXTRA) and c:GetPreviousControler()==tp
 end
 function c66762372.setcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c66762372.cfilter,1,nil)
+	return eg:IsExists(c66762372.cfilter,1,nil,tp)
 end
 function c66762372.filter(c)
 	return c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL) and c:IsSSetable()

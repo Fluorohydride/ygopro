@@ -7,10 +7,14 @@ function c96682430.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCondition(c96682430.condition)
 	e1:SetCost(c96682430.cost)
 	e1:SetTarget(c96682430.target)
 	e1:SetOperation(c96682430.operation)
 	c:RegisterEffect(e1)
+end
+function c96682430.condition(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c96682430.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,96682430)==0 end

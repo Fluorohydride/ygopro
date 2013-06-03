@@ -1,4 +1,4 @@
---ÍõŒm¤ÎÖØË°
+--çŽ‹å®®ã®é‡ç¨Ž
 function c86742443.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -11,10 +11,10 @@ function c86742443.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c86742443.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()~=tp  
+	return Duel.GetCurrentPhase()==PHASE_STANDBY and Duel.GetTurnPlayer()~=tp
 end
 function c86742443.target(e,tp,eg,ep,ev,re,r,rp,chk)
-    if chk==0 then return Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)>0 end
+	if chk==0 then return Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)>0 end
 end
 function c86742443.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)==0 then return end
@@ -27,6 +27,7 @@ function c86742443.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c86742443.damcon)
 	e1:SetOperation(c86742443.damop)
 	e1:SetLabel(0)
 	e1:SetReset(RESET_PHASE+PHASE_END,2)
@@ -48,6 +49,9 @@ function c86742443.operation(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetLabel(code)
 	e3:SetReset(RESET_PHASE+PHASE_END,2)
 	Duel.RegisterEffect(e3,tp)
+end
+function c86742443.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
 end
 function c86742443.damop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then

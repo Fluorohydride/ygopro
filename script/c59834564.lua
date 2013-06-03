@@ -30,11 +30,15 @@ end
 function c59834564.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c59834564.filter(chkc) end
 	if chk==0 then return true end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c59834564.filter,tp,LOCATION_MZONE,0,2,2,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+	if Duel.IsExistingTarget(c59834564.filter,tp,LOCATION_MZONE,0,2,nil) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local g=Duel.SelectTarget(tp,c59834564.filter,tp,LOCATION_MZONE,0,2,2,nil)
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
+	end
 end
 function c59834564.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	Duel.Destroy(g,REASON_EFFECT)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	if not g then return end
+	local dg=g:Filter(Card.IsRelateToEffect,nil,e)
+	Duel.Destroy(dg,REASON_EFFECT)
 end

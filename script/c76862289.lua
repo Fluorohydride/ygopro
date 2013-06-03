@@ -71,7 +71,10 @@ end
 function c76862289.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	local ht=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
+	if ht<5 then
+		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,5-ht)
+	end
 end
 function c76862289.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)

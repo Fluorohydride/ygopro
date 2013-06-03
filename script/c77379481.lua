@@ -18,11 +18,15 @@ end
 function c77379481.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
+	local ht=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
+	if ht<7 then
+		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,7-ht)
+	end
 end
 function c77379481.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	if Duel.GetFieldGroupCount(p,LOCATION_HAND,0)<7 then
-		Duel.Draw(p,7-Duel.GetFieldGroupCount(p,LOCATION_HAND,0),REASON_EFFECT)
+	local ht=Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
+	if ht<7 then
+		Duel.Draw(p,7-ht,REASON_EFFECT)
 	end
 end
