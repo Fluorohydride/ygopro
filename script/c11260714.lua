@@ -19,8 +19,9 @@ function c11260714.filter(c,e,sp)
 	return c:IsRace(RACE_FAIRY) and c:GetCode()~=11260714 and c:IsCanBeSpecialSummoned(e,0,sp,false,false)
 end
 function c11260714.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_GRAVE and chkc:GetControler()==tp and c11260714.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c11260714.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c11260714.filter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(c11260714.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c11260714.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)

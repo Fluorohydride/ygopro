@@ -60,14 +60,18 @@ end
 function c58712976.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c58712976.filter(chkc) end
 	if chk==0 then return true end
+	if Duel.IsExistingTarget(c58712976.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,3,nil) then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
+		local g=Duel.SelectTarget(tp,c58712976.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,3,3,nil)
+		Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,3,0,0)
+	end
 	e:GetHandler():ResetFlagEffect(58712976)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=Duel.SelectTarget(tp,c58712976.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,3,3,nil)
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end
 function c58712976.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()>0 then
-		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	if not g then return end
+	local rg=g:Filter(Card.IsRelateToEffect,nil,e)
+	if rg:GetCount()>0 then
+		Duel.Remove(rg,POS_FACEUP,REASON_EFFECT)
 	end
 end

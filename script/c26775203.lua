@@ -30,8 +30,6 @@ function c26775203.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 	end
-	Duel.ConfirmCards(1-tp,c)
-	Duel.ShuffleHand(tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,c,1,0,0)
 end
 function c26775203.operation(e,tp,eg,ep,ev,re,r,rp)

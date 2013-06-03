@@ -24,7 +24,7 @@ function c18511599.initial_effect(c)
 	e2:SetOperation(c18511599.operation)
 	c:RegisterEffect(e2)
 end
-function c18511599.indcon(e,tp,eg,ep,ev,re,r,rp)
+function c18511599.indcon(e)
 	return e:GetHandler():GetOverlayCount()~=0
 end
 function c18511599.filter(c,e,tp)
