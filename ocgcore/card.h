@@ -51,8 +51,7 @@ struct query_cache {
 	int32 base_attack;
 	int32 base_defence;
 	uint32 reason;
-	int32 is_public;
-	int32 is_disabled;
+	uint32 status;
 };
 
 class card {

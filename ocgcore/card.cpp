@@ -75,6 +75,7 @@ card::~card() {
 	relate_effect.clear();
 }
 uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
+	
 	int32* p = (int32*)buf;
 	int32 tdata = 0;
 	p += 2;
@@ -165,16 +166,13 @@ uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
 	}
 	if(query_flag & QUERY_OWNER)
 		*p++ = owner;
-	if(query_flag & QUERY_IS_DISABLED) {
-		tdata = (status & STATUS_DISABLED) ? 1 : 0;
-		if(!use_cache || (tdata != q_cache.is_disabled)) {
-			q_cache.is_disabled = tdata;
+	if(query_flag & QUERY_STATUS) {
+		tdata = status & (STATUS_DISABLED |  STATUS_IS_PUBLIC | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT);
+		if(!use_cache || (tdata != q_cache.status)) {
+			q_cache.status = tdata;
 			*p++ = tdata;
-		} else
-			query_flag &= ~QUERY_IS_DISABLED;
+		}
 	}
-	if(query_flag & QUERY_IS_PUBLIC)
-		*p++ = (status & STATUS_IS_PUBLIC) ? 1 : 0;
 	*(uint32*)buf = (byte*)p - buf;
 	*(uint32*)(buf + 4) = query_flag;
 	return (byte*)p - buf;

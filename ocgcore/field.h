@@ -199,6 +199,7 @@ struct processor {
 	card_set normalsummoned_cards_pt[2];
 	card_set spsummoned_cards_pt[2];
 	card_set flipsummoned_cards_pt[2];
+	card_set update_single_card;
 	effect_set_v disfield_effects;
 	effect_set_v extraz_effects;
 	effect_set_v extraz_effects_e;
@@ -256,6 +257,7 @@ struct processor {
 	uint8 deck_reversed;
 	uint8 remove_brainwashing;
 	uint8 flip_delayed;
+	uint8 update_field;
 	uint8 damage_calculated;
 	uint8 summon_state[2];
 	uint8 normalsummon_state[2];

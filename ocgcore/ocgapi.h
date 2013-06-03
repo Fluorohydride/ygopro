@@ -43,13 +43,11 @@ public:
 	int32 process();
 	void new_card(uint32 code, uint8 owner, uint8 playerid, uint8 location, uint8 sequence, uint8 position);
 	void new_tag_card(uint32 code, uint8 owner, uint8 location);
-	int32 query_card(uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache);
-	int32 query_field_count(uint8 playerid, uint8 location);
-	int32 query_field_card(uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache);
 	int32 query_field_info(byte* buf);
 	void set_responsei(int32 value);
 	void set_responseb(byte* buf);
 	int32 preload_script(char* script, int32 len);
+	void set_adapter(ygoAdapter*);
 };
 
 #endif /* OCGAPI_H_ */

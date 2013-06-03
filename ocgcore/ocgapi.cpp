@@ -137,118 +137,6 @@ void duelAdapter::new_tag_card(uint32 code, uint8 owner, uint8 location) {
 		break;
 	}
 }
-int32 duelAdapter::query_card(uint8 playerid, uint8 location, uint8 sequence, int32 query_flag, byte* buf, int32 use_cache) {
-	if(playerid != 0 && playerid != 1)
-		return 0;
-	card* pcard = 0;
-	location &= 0x7f;
-	if(location & LOCATION_ONFIELD)
-		pcard = pduel->game_field->get_field_card(playerid, location, sequence);
-	else {
-		field::card_vector* lst = 0;
-		if(location == LOCATION_HAND )
-			lst = &pduel->game_field->player[playerid].list_hand;
-		else if(location == LOCATION_GRAVE )
-			lst = &pduel->game_field->player[playerid].list_grave;
-		else if(location == LOCATION_REMOVED )
-			lst = &pduel->game_field->player[playerid].list_remove;
-		else if(location == LOCATION_EXTRA )
-			lst = &pduel->game_field->player[playerid].list_extra;
-		else if(location == LOCATION_DECK )
-			lst = &pduel->game_field->player[playerid].list_main;
-		if(!lst || sequence > lst->size())
-			pcard = 0;
-		else {
-			auto cit = lst->begin();
-			for(uint32 i = 0; i < sequence; ++i, ++cit);
-			pcard = *cit;
-		}
-	}
-	if(pcard)
-		return pcard->get_infos(buf, query_flag, use_cache);
-	else {
-		*((int32*)buf) = 4;
-		return 4;
-	}
-}
-int32 duelAdapter::query_field_count( uint8 playerid, uint8 location) {
-	if(playerid != 0 && playerid != 1)
-		return 0;
-	if(location == LOCATION_HAND)
-		return pduel->game_field->player[playerid].list_hand.size();
-	if(location == LOCATION_GRAVE)
-		return pduel->game_field->player[playerid].list_grave.size();
-	if(location == LOCATION_REMOVED)
-		return pduel->game_field->player[playerid].list_remove.size();
-	if(location == LOCATION_EXTRA)
-		return pduel->game_field->player[playerid].list_extra.size();
-	if(location == LOCATION_DECK)
-		return pduel->game_field->player[playerid].list_main.size();
-	if(location == LOCATION_MZONE) {
-		uint32 count = 0;
-		for(uint32 i = 0; i < 5; ++i)
-			if(pduel->game_field->player[playerid].list_mzone[i]) count++;
-		return count;
-	}
-	if(location == LOCATION_SZONE) {
-		uint32 count = 0;
-		for(uint32 i = 0; i < 6; ++i)
-			if(pduel->game_field->player[playerid].list_szone[i]) count++;
-		return count;
-	}
-	return 0;
-}
-int32 duelAdapter::query_field_card( uint8 playerid, uint8 location, int32 query_flag, byte* buf, int32 use_cache) {
-	if(playerid != 0 && playerid != 1)
-		return 0;
-	card* pcard;
-	uint32 ct = 0, clen;
-	byte* p = buf;
-	if(location == LOCATION_MZONE) {
-		for(uint32 i = 0; i < 5; ++i) {
-			pcard = pduel->game_field->player[playerid].list_mzone[i];
-			if(pcard) {
-				ct += clen = pcard->get_infos(p, query_flag, use_cache);
-				p += clen;
-			} else {
-				*((int32*)p) = 4;
-				ct += 4;
-				p += 4;
-			}
-		}
-	} else if(location == LOCATION_SZONE) {
-		for(uint32 i = 0; i < 6; ++i) {
-			pcard = pduel->game_field->player[playerid].list_szone[i];
-			if(pcard) {
-				ct += clen = pcard->get_infos(p, query_flag, use_cache);
-				p += clen;
-			} else {
-				*((int32*)p) = 4;
-				ct += 4;
-				p += 4;
-			}
-
-		}
-	} else {
-		field::card_vector* lst = nullptr;
-		field::card_vector::iterator cit;
-		if(location == LOCATION_HAND )
-			lst = &pduel->game_field->player[playerid].list_hand;
-		else if(location == LOCATION_GRAVE )
-			lst = &pduel->game_field->player[playerid].list_grave;
-		else if(location == LOCATION_REMOVED )
-			lst = &pduel->game_field->player[playerid].list_remove;
-		else if(location == LOCATION_EXTRA )
-			lst = &pduel->game_field->player[playerid].list_extra;
-		else if(location == LOCATION_DECK )
-			lst = &pduel->game_field->player[playerid].list_main;
-		for(cit = lst->begin(); cit != lst->end(); ++cit) {
-			ct += clen = (*cit)->get_infos(p, query_flag, use_cache);
-			p += clen;
-		}
-	}
-	return ct;
-}
 int32 duelAdapter::query_field_info( byte* buf) {
 	*buf++ = MSG_RELOAD_FIELD;
 	card* pcard;
@@ -294,4 +182,8 @@ int32 duelAdapter::query_field_info( byte* buf) {
 		buf += 4;
 	}
 	return 0;
+}
+
+void duelAdapter::set_adapter(ygoAdapter* adapter) {
+	pduel->adapter = adapter;
 }

@@ -4914,6 +4914,12 @@ int32 field::adjust_step(uint16 step) {
 			shuffle(0, LOCATION_DECK);
 		if(core.shuffle_deck_check[1])
 			shuffle(1, LOCATION_DECK);
+		if(core.update_single_card.size()) {
+
+		}
+		if(core.update_field) {
+
+		}
 		return TRUE;
 	}
 	}

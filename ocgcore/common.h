@@ -199,8 +199,8 @@ struct card_data {
 #define COUNTER_NEED_PERMIT		0x1000
 #define COUNTER_NEED_ENABLE		0x2000
 //Query list
-#define QUERY_CODE			0x1
-#define QUERY_POSITION		0x2
+#define QUERY_POSITION		0x1
+#define QUERY_CODE			0x2
 #define QUERY_ALIAS			0x4
 #define QUERY_TYPE			0x8
 #define QUERY_LEVEL			0x10
@@ -218,8 +218,7 @@ struct card_data {
 #define QUERY_OVERLAY_CARD	0x10000
 #define QUERY_COUNTERS		0x20000
 #define QUERY_OWNER			0x40000
-#define QUERY_IS_DISABLED	0x80000
-#define QUERY_IS_PUBLIC		0x100000
+#define QUERY_STATUS		0x80000
 
 //Messages
 #define MSG_RETRY				1
