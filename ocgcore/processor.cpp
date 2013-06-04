@@ -4915,10 +4915,20 @@ int32 field::adjust_step(uint16 step) {
 		if(core.shuffle_deck_check[1])
 			shuffle(1, LOCATION_DECK);
 		if(core.update_single_card.size()) {
-
+			for(auto& cit : core.update_single_card)
+				cit->update_infos(0x3fff);
+			core.update_single_card.clear();
 		}
 		if(core.update_field) {
-
+			for(uint32 p = 0; p < 2; ++p) {
+				for(auto& cit : player[p].list_mzone)
+					if(cit)
+						cit->update_infos(0x3fff);
+				for(auto& cit : player[p].list_szone)
+					if(cit)
+						cit->update_infos(0x3807);
+			}
+			core.update_field = FALSE;
 		}
 		return TRUE;
 	}

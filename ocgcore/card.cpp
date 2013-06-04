@@ -74,108 +74,198 @@ card::~card() {
 	equip_effect.clear();
 	relate_effect.clear();
 }
-uint32 card::get_infos(byte* buf, int32 query_flag, int32 use_cache) {
-	
-	int32* p = (int32*)buf;
-	int32 tdata = 0;
-	p += 2;
-	if(query_flag & QUERY_CODE) *p++ = data.code;
-	if(query_flag & QUERY_POSITION) *p++ = get_info_location();
-	if(!use_cache) {
-		if(query_flag & QUERY_ALIAS) q_cache.code = *p++ = get_code();
-		if(query_flag & QUERY_TYPE) q_cache.type = *p++ = get_type();
-		if(query_flag & QUERY_LEVEL) q_cache.level = *p++ = get_level();
-		if(query_flag & QUERY_RANK) q_cache.rank = *p++ = get_rank();
-		if(query_flag & QUERY_ATTRIBUTE) q_cache.attribute = *p++ = get_attribute();
-		if(query_flag & QUERY_RACE) q_cache.race = *p++ = get_race();
-		if(query_flag & QUERY_ATTACK) q_cache.attack = *p++ = get_attack();
-		if(query_flag & QUERY_DEFENCE) q_cache.defence = *p++ = get_defence();
-		if(query_flag & QUERY_BASE_ATTACK) q_cache.base_attack = *p++ = get_base_attack();
-		if(query_flag & QUERY_BASE_DEFENCE) q_cache.base_defence = *p++ = get_base_defence();
-		if(query_flag & QUERY_REASON) q_cache.reason = *p++ = current.reason;
-	} else {
-		if((query_flag & QUERY_ALIAS) && ((uint32)(tdata = get_code()) != q_cache.alias)) {
+void card::update_infos(int32 query_flag) {
+	pduel->write_buffer8(MSG_UPDATE_CARD);
+	pduel->write_buffer32(get_info_location());
+	uint32* pflag = (uint32*)pduel->bufferp;
+	pduel->write_buffer32(0);
+	query_flag &= 0x3fff;
+	uint32 tdata;
+	if(query_flag & QUERY_CODE) {
+		if((tdata = data.code) != q_cache.code) {
+			q_cache.code = tdata;
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_CODE;
+	} 
+	if(query_flag & QUERY_ALIAS) {
+		if((tdata = get_code()) != q_cache.alias) {
 			q_cache.alias = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_ALIAS;
-		if((query_flag & QUERY_TYPE) && ((uint32)(tdata = get_type()) != q_cache.type)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_ALIAS;
+	}
+	if(query_flag & QUERY_TYPE) {
+		if((tdata = get_type()) != q_cache.type) {
 			q_cache.type = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_TYPE;
-		if((query_flag & QUERY_LEVEL) && ((uint32)(tdata = get_level()) != q_cache.level)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_TYPE;
+	}
+	if(query_flag & QUERY_LEVEL) {
+		if((tdata = get_level()) != q_cache.level) {
 			q_cache.level = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_LEVEL;
-		if((query_flag & QUERY_RANK) && ((uint32)(tdata = get_rank()) != q_cache.rank)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_LEVEL;
+	} 
+	if(query_flag & QUERY_RANK) {
+		if((tdata = get_rank()) != q_cache.rank) {
 			q_cache.rank = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_RANK;
-		if((query_flag & QUERY_ATTRIBUTE) && ((uint32)(tdata = get_attribute()) != q_cache.attribute)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_RANK;
+	}
+	if(query_flag & QUERY_ATTRIBUTE) {
+		if((tdata = get_attribute()) != q_cache.attribute) {
 			q_cache.attribute = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_ATTRIBUTE;
-		if((query_flag & QUERY_RACE) && ((uint32)(tdata = get_race()) != q_cache.race)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_ATTRIBUTE;
+	}
+	if(query_flag & QUERY_RACE) {
+		if((tdata = get_race()) != q_cache.race) {
 			q_cache.race = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_RACE;
-		if((query_flag & QUERY_ATTACK) && ((tdata = get_attack()) != q_cache.attack)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_RACE;
+	}
+	if(query_flag & QUERY_ATTACK) {
+		if((int32)(tdata = get_attack()) != q_cache.attack) {
 			q_cache.attack = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_ATTACK;
-		if((query_flag & QUERY_DEFENCE) && ((tdata = get_defence()) != q_cache.defence)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_ATTACK;
+	}
+	if(query_flag & QUERY_DEFENCE) {
+		if((int32)(tdata = get_defence()) != q_cache.defence) {
 			q_cache.defence = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_DEFENCE;
-		if((query_flag & QUERY_BASE_ATTACK) && ((tdata = get_base_attack()) != q_cache.base_attack)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_DEFENCE;
+	}
+	if(query_flag & QUERY_BASE_ATTACK) {
+		if((int32)(tdata = get_base_attack()) != q_cache.base_attack) {
 			q_cache.base_attack = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_BASE_ATTACK;
-		if((query_flag & QUERY_BASE_DEFENCE) && ((tdata = get_base_defence()) != q_cache.base_defence)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_BASE_ATTACK;
+	}
+	if(query_flag & QUERY_BASE_DEFENCE) {
+		if((int32)(tdata = get_base_defence()) != q_cache.base_defence) {
 			q_cache.base_defence = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_BASE_DEFENCE;
-		if((query_flag & QUERY_REASON) && ((uint32)(tdata = current.reason) != q_cache.reason)) {
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_BASE_DEFENCE;
+	}
+	if(query_flag & QUERY_REASON) {
+		if((tdata = current.reason) != q_cache.reason) {
 			q_cache.reason = tdata;
-			*p++ = tdata;
-		} else query_flag &= ~QUERY_REASON;
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_REASON;
+	}
+	if(query_flag & QUERY_OWNER) {
+		if(q_cache.owner != owner) {
+			q_cache.owner = owner;
+			pduel->write_buffer32(owner);
+		} else
+			query_flag &= ~QUERY_OWNER;
+	}
+	if(query_flag & QUERY_STATUS) {
+		tdata = status & (STATUS_DISABLED |  STATUS_IS_PUBLIC | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT | STATUS_UNION);
+		if(tdata != q_cache.status) {
+			q_cache.status = tdata;
+			pduel->write_buffer32(tdata);
+		} else
+			query_flag &= ~QUERY_STATUS;
+	}
+	if(query_flag)
+		*pflag = query_flag;
+	else
+		pduel->rollback_buffer(9);
+}
+void card::update_infos_nocache(int32 query_flag) {
+	pduel->write_buffer8(MSG_UPDATE_CARD);
+	pduel->write_buffer32(get_info_location());
+	pduel->write_buffer32(query_flag);
+	if(query_flag & QUERY_CODE) {
+		q_cache.code = data.code;
+		pduel->write_buffer32(q_cache.code);
+	}
+	if(query_flag & QUERY_ALIAS) {
+		q_cache.alias = get_code();
+		pduel->write_buffer32(q_cache.alias);
+	}
+	if(query_flag & QUERY_TYPE) {
+		q_cache.type = get_type();
+		pduel->write_buffer32(q_cache.type);
+	}
+	if(query_flag & QUERY_LEVEL) {
+		q_cache.level = get_level();
+		pduel->write_buffer32(q_cache.level);
+	}
+	if(query_flag & QUERY_RANK) {
+		q_cache.rank = get_rank();
+		pduel->write_buffer32(q_cache.rank);
+	}
+	if(query_flag & QUERY_ATTRIBUTE) {
+		q_cache.attribute = get_attribute();
+		pduel->write_buffer32(q_cache.attribute);
+	}
+	if(query_flag & QUERY_RACE) {
+		q_cache.race = get_race();
+		pduel->write_buffer32(q_cache.race);
+	}
+	if(query_flag & QUERY_ATTACK) {
+		q_cache.attack = get_attack();
+		pduel->write_buffer32(q_cache.attack);
+	}
+	if(query_flag & QUERY_DEFENCE) {
+		q_cache.defence = get_defence();
+		pduel->write_buffer32(q_cache.defence);
+	}
+	if(query_flag & QUERY_BASE_ATTACK) {
+		q_cache.base_attack = get_base_attack();
+		pduel->write_buffer32(q_cache.base_attack);
+	}
+	if(query_flag & QUERY_BASE_DEFENCE) {
+		q_cache.base_defence = get_base_defence();
+		pduel->write_buffer32(q_cache.base_defence);
+	}
+	if(query_flag & QUERY_REASON) {
+		q_cache.reason = current.reason;
+		pduel->write_buffer32(q_cache.reason);
+	}
+	if(query_flag & QUERY_OWNER) {
+		q_cache.owner = owner;
+		pduel->write_buffer32(q_cache.owner);
+	}
+	if(query_flag & QUERY_STATUS) {
+		q_cache.status = status & (STATUS_DISABLED |  STATUS_IS_PUBLIC | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT | STATUS_UNION);
+		pduel->write_buffer32(q_cache.status);
 	}
 	if(query_flag & QUERY_REASON_CARD)
-		*p++ = current.reason_card ? current.reason_card->get_info_location() : 0;
-	if(query_flag & QUERY_EQUIP_CARD) {
-		if(equiping_target)
-			*p++ = equiping_target->get_info_location();
-		else
-			query_flag &= ~QUERY_EQUIP_CARD;
-	}
+		pduel->write_buffer32(current.reason_card ? current.reason_card->get_info_location() : 0);
+	if(query_flag & QUERY_EQUIP_CARD)
+		pduel->write_buffer32(equiping_target ? equiping_target->get_info_location() : 0);
+	else
+		query_flag &= ~QUERY_EQUIP_CARD;
 	if(query_flag & QUERY_TARGET_CARD) {
-		*p++ = effect_target_cards.size();
-		card_set::iterator cit;
-		for(cit = effect_target_cards.begin(); cit != effect_target_cards.end(); ++cit)
-			*p++ = (*cit)->get_info_location();
+		pduel->write_buffer32(effect_target_cards.size());
+		for(auto& cit : effect_target_cards)
+			pduel->write_buffer32(cit->get_info_location());
 	}
 	if(query_flag & QUERY_OVERLAY_CARD) {
-		*p++ = xyz_materials.size();
-		for(auto clit = xyz_materials.begin(); clit != xyz_materials.end(); ++clit)
-			*p++ = (*clit)->data.code;
+		pduel->write_buffer32(xyz_materials.size());
+		for(auto& cit : xyz_materials)
+			pduel->write_buffer32(cit->data.code);
 	}
 	if(query_flag & QUERY_COUNTERS) {
-		*p++ = counters.size();
-		counter_map::iterator cmit;
-		for(cmit = counters.begin(); cmit != counters.end(); ++cmit)
-			*p++ = cmit->first + (cmit->second << 16);
+		pduel->write_buffer32(counters.size());
+		for(auto& ctit : counters)
+			pduel->write_buffer32(ctit.first + (ctit.second << 16));
 	}
-	if(query_flag & QUERY_OWNER)
-		*p++ = owner;
-	if(query_flag & QUERY_STATUS) {
-		tdata = status & (STATUS_DISABLED |  STATUS_IS_PUBLIC | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT);
-		if(!use_cache || (tdata != q_cache.status)) {
-			q_cache.status = tdata;
-			*p++ = tdata;
-		}
-	}
-	*(uint32*)buf = (byte*)p - buf;
-	*(uint32*)(buf + 4) = query_flag;
-	return (byte*)p - buf;
 }
 uint32 card::get_info_location() {
 	if(overlay_target) {

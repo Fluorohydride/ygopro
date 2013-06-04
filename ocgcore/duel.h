@@ -56,6 +56,7 @@ public:
 	void write_buffer32(uint32 value);
 	void write_buffer16(uint16 value);
 	void write_buffer8(uint8 value);
+	void rollback_buffer(uint32 len);
 	void clear_buffer();
 	void set_responsei(uint32 resp);
 	void set_responseb(byte* resp);

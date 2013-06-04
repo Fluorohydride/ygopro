@@ -120,6 +120,15 @@ void duel::write_buffer8(uint8 value) {
 	bufferp += 1;
 	bufferlen += 1;
 }
+void duel::rollback_buffer(uint32 len) {
+	if(bufferlen >= len) {
+		bufferlen -= len;
+		bufferp -= len;
+	} else {
+		bufferlen = 0;
+		bufferp = buffer;
+	}
+}
 void duel::clear_buffer() {
 	bufferlen = 0;
 	bufferp = buffer;

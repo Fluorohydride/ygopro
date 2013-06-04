@@ -51,6 +51,7 @@ struct query_cache {
 	int32 base_attack;
 	int32 base_defence;
 	uint32 reason;
+	uint32 owner;
 	uint32 status;
 };
 
@@ -113,7 +114,8 @@ public:
 	~card();
 	static bool card_operation_sort(card* c1, card* c2);
 
-	uint32 get_infos(byte* buf, int32 query_flag, int32 use_cache = TRUE);
+	void update_infos(int32 query_flag);
+	void update_infos_nocache(int32 query_flag);
 	uint32 get_info_location();
 	uint32 get_code();
 	int32 is_set_card(uint32 set_code);
