@@ -500,9 +500,11 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(MSG_SHUFFLE_HAND);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(player[playerid].list_hand.size());
-		for(auto cit = svector.begin(); cit != svector.end(); ++cit)
-			pduel->write_buffer32((*cit)->data.code);
+		for(auto& cit : svector)
+			pduel->write_buffer32(cit->data.code);
 		core.shuffle_hand_check[playerid] = FALSE;
+		for(auto& cit : player[playerid].list_hand)
+			cit->update_infos_nocache(0x3ffe);
 	} else {
 		pduel->write_buffer8(MSG_SHUFFLE_DECK);
 		pduel->write_buffer8(playerid);
@@ -524,63 +526,61 @@ void field::shuffle(uint8 playerid, uint8 location) {
 void field::reset_sequence(uint8 playerid, uint8 location) {
 	if(location & (LOCATION_ONFIELD))
 		return;
-	card_vector::iterator cit;
 	uint32 i = 0;
 	switch(location) {
 	case LOCATION_DECK:
-		for(cit = player[playerid].list_main.begin(), i = 0; cit != player[playerid].list_main.end(); ++cit, ++i)
-			(*cit)->current.sequence = i;
+		for(auto& cit : player[playerid].list_main)
+			cit->current.sequence = i++;
 		break;
 	case LOCATION_HAND:
-		for(cit = player[playerid].list_hand.begin(), i = 0; cit != player[playerid].list_hand.end(); ++cit, ++i)
-			(*cit)->current.sequence = i;
+		for(auto cit : player[playerid].list_hand)
+			cit->current.sequence = i++;
 		break;
 	case LOCATION_EXTRA:
-		for(cit = player[playerid].list_extra.begin(), i = 0; cit != player[playerid].list_extra.end(); ++cit, ++i)
-			(*cit)->current.sequence = i;
+		for(auto& cit : player[playerid].list_extra)
+			cit->current.sequence = i++;
 		break;
 	case LOCATION_GRAVE:
-		for(cit = player[playerid].list_grave.begin(), i = 0; cit != player[playerid].list_grave.end(); ++cit, ++i)
-			(*cit)->current.sequence = i;
+		for(auto& cit : player[playerid].list_grave)
+			cit->current.sequence = i;
 		break;
 	case LOCATION_REMOVED:
-		for(cit = player[playerid].list_remove.begin(), i = 0; cit != player[playerid].list_remove.end(); ++cit, ++i)
-			(*cit)->current.sequence = i;
+		for(auto& cit : player[playerid].list_remove)
+			cit->current.sequence = i;
 		break;
 	}
 }
 void field::swap_deck_and_grave(uint8 playerid) {
-	card_vector::iterator clit;
-	for(clit = player[playerid].list_grave.begin(); clit != player[playerid].list_grave.end(); ++clit) {
-		(*clit)->previous.location = LOCATION_GRAVE;
-		(*clit)->previous.sequence = (*clit)->current.sequence;
-		(*clit)->enable_field_effect(false);
-		(*clit)->cancel_field_effect();
+	for(auto& clit : player[playerid].list_grave) {
+		clit->previous.location = LOCATION_GRAVE;
+		clit->previous.sequence = clit->current.sequence;
+		clit->enable_field_effect(false);
+		clit->cancel_field_effect();
 	}
-	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
-		(*clit)->previous.location = LOCATION_DECK;
-		(*clit)->previous.sequence = (*clit)->current.sequence;
-		(*clit)->enable_field_effect(false);
-		(*clit)->cancel_field_effect();
+	for(auto& clit : player[playerid].list_main) {
+		clit->previous.location = LOCATION_DECK;
+		clit->previous.sequence = clit->current.sequence;
+		clit->enable_field_effect(false);
+		clit->cancel_field_effect();
 	}
 	card_vector cl = player[playerid].list_grave;
 	player[playerid].list_grave = player[playerid].list_main;
 	player[playerid].list_main = cl;
-	for(clit = player[playerid].list_grave.begin(); clit != player[playerid].list_grave.end(); ++clit) {
-		(*clit)->current.location = LOCATION_GRAVE;
-		(*clit)->current.reason = REASON_EFFECT;
-		(*clit)->current.reason_effect = core.reason_effect;
-		(*clit)->current.reason_player = core.reason_player;
-		(*clit)->apply_field_effect();
-		(*clit)->enable_field_effect(true);
+	for(auto& clit : player[playerid].list_grave) {
+		clit->current.location = LOCATION_GRAVE;
+		clit->current.reason = REASON_EFFECT;
+		clit->current.reason_effect = core.reason_effect;
+		clit->current.reason_player = core.reason_player;
+		clit->apply_field_effect();
+		clit->enable_field_effect(true);
 	}
-	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
-		(*clit)->current.location = LOCATION_DECK;
-		(*clit)->current.reason = REASON_EFFECT;
-		(*clit)->current.reason_effect = core.reason_effect;
-		(*clit)->current.reason_player = core.reason_player;
-		(*clit)->apply_field_effect();
-		(*clit)->enable_field_effect(true);
+	for(auto& clit : player[playerid].list_main) {
+		clit->current.location = LOCATION_DECK;
+		clit->current.reason = REASON_EFFECT;
+		clit->current.reason_effect = core.reason_effect;
+		clit->current.reason_player = core.reason_player;
+		clit->apply_field_effect();
+		clit->enable_field_effect(true);
 	}
 	reset_sequence(playerid, LOCATION_GRAVE);
 	pduel->write_buffer8(MSG_SWAP_GRAVE_DECK);
@@ -600,36 +600,35 @@ void field::reverse_deck(uint8 playerid) {
 	}
 }
 void field::tag_swap(uint8 playerid) {
-	card_vector::iterator clit;
 	//main
-	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
-		(*clit)->enable_field_effect(false);
-		(*clit)->cancel_field_effect();
+	for(auto& clit : player[playerid].list_main) {
+		clit->enable_field_effect(false);
+		clit->cancel_field_effect();
 	}
 	std::swap(player[playerid].list_main, player[playerid].tag_list_main);
-	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
-		(*clit)->apply_field_effect();
-		(*clit)->enable_field_effect(true);
+	for(auto clit : player[playerid].list_main) {
+		clit->apply_field_effect();
+		clit->enable_field_effect(true);
 	}
 	//hand
-	for(clit = player[playerid].list_hand.begin(); clit != player[playerid].list_hand.end(); ++clit) {
-		(*clit)->enable_field_effect(false);
-		(*clit)->cancel_field_effect();
+	for(auto& clit : player[playerid].list_hand) {
+		clit->enable_field_effect(false);
+		clit->cancel_field_effect();
 	}
 	std::swap(player[playerid].list_hand, player[playerid].tag_list_hand);
-	for(clit = player[playerid].list_hand.begin(); clit != player[playerid].list_hand.end(); ++clit) {
-		(*clit)->apply_field_effect();
-		(*clit)->enable_field_effect(true);
+	for(auto& clit : player[playerid].list_hand) {
+		clit->apply_field_effect();
+		clit->enable_field_effect(true);
 	}
 	//extra
-	for(clit = player[playerid].list_extra.begin(); clit != player[playerid].list_extra.end(); ++clit) {
-		(*clit)->enable_field_effect(false);
-		(*clit)->cancel_field_effect();
+	for(auto& clit : player[playerid].list_extra) {
+		clit->enable_field_effect(false);
+		clit->cancel_field_effect();
 	}
 	std::swap(player[playerid].list_extra, player[playerid].tag_list_extra);
-	for(clit = player[playerid].list_extra.begin(); clit != player[playerid].list_extra.end(); ++clit) {
-		(*clit)->apply_field_effect();
-		(*clit)->enable_field_effect(true);
+	for(auto& clit : player[playerid].list_extra) {
+		clit->apply_field_effect();
+		clit->enable_field_effect(true);
 	}
 	pduel->write_buffer8(MSG_TAG_SWAP);
 	pduel->write_buffer8(playerid);
@@ -640,8 +639,10 @@ void field::tag_swap(uint8 playerid) {
 		pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
 	else
 		pduel->write_buffer32(0);
-	for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
-		pduel->write_buffer32((*cit)->data.code | ((*cit)->is_status(STATUS_IS_PUBLIC) ? 0x80000000 : 0));
+	for(auto cit : player[playerid].list_hand)
+		pduel->write_buffer32(cit->data.code | (cit->is_status(STATUS_IS_PUBLIC) ? 0x80000000 : 0));
+	for(auto& cit : player[playerid].list_hand)
+		cit->update_infos_nocache(0x3ffe);
 }
 void field::add_effect(effect* peffect, uint8 owner_player) {
 	if (!peffect->handler) {

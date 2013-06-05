@@ -2803,6 +2803,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pduel->write_buffer8(pcard->current.sequence);
 			pduel->write_buffer8(pcard->current.position);
 			pduel->write_buffer32(pcard->current.reason);
+			core.update_single_card.insert(pcard);
 			if((core.deck_reversed && pcard->current.location == LOCATION_DECK) || (pcard->current.position == POS_FACEUP_DEFENCE))
 				show_decktop[pcard->current.controler] = true;
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
@@ -3187,6 +3188,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
 		pduel->write_buffer32(target->current.reason);
+		core.update_field = TRUE;
 		if((target->current.location != LOCATION_MZONE)) {
 			if(target->equiping_cards.size()) {
 				destroy(&target->equiping_cards, 0, REASON_LOST_TARGET + REASON_RULE, PLAYER_NONE);
@@ -3299,6 +3301,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 				}
 			}
 		}
+		core.update_field = TRUE;
 		adjust_instant();
 		process_single_event();
 		if(flips.size())
