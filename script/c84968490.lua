@@ -18,5 +18,5 @@ function c84968490.distarget(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c84968490.disop(e,tp,eg,ep,ev,re,r,rp)
 	local p,val=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.DiscardDeck(tp,val,REASON_EFFECT)
+	Duel.DiscardDeck(p,val,REASON_EFFECT)
 end
