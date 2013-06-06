@@ -4083,6 +4083,7 @@ int32 field::add_chain(uint16 step) {
 		if(core.new_chains.size())
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 		adjust_all();
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -4300,6 +4301,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				pduel->delete_group(oit->second.op_cards);
 		}
 		adjust_all();
+		core.update_field = TRUE;
 		core.current_chain.pop_back();
 		if(!core.current_chain.size()) {
 			if(core.chain_limit) {

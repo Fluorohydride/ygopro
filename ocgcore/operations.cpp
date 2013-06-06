@@ -340,6 +340,7 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			cv.push_back(pcard);
 			drawed_set->container.insert(pcard);
 			pcard->reset(RESET_TOHAND, RESET_EVENT);
+			pcard->update_infos_nocache(0x3fff);
 		}
 		core.hint_timing[playerid] |= TIMING_DRAW + TIMING_TOHAND;
 		adjust_instant();
@@ -390,6 +391,7 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 		core.operated_set = drawed_set->container;
 		delete drawed_set;
 		returns.ivalue[0] = count;
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -1421,8 +1423,9 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			remove_oath_effect(proc);
 		if(target->current.location == LOCATION_MZONE)
 			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
-		adjust_instant();
+		adjust_all();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	case 15: {
@@ -1461,6 +1464,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			core.hint_timing[sumplayer] |= TIMING_SUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	case 20: {
@@ -1529,7 +1533,9 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 			return FALSE;
 		if(target->current.location == LOCATION_MZONE)
 			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
+		adjust_all();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	case 3: {
@@ -1557,6 +1563,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 			core.hint_timing[sumplayer] |= TIMING_FLIPSUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -1739,6 +1746,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			core.hint_timing[setplayer] |= TIMING_MSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	case 10: {
@@ -1815,6 +1823,7 @@ int32 field::sset(uint16 step, uint8 setplayer, uint8 toplayer, card * target) {
 			core.hint_timing[setplayer] |= TIMING_SSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
+		core.update_field = TRUE;
 	}
 	}
 	return TRUE;
@@ -1890,6 +1899,7 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 			core.hint_timing[setplayer] |= TIMING_SSET;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -2030,8 +2040,9 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		remove_oath_effect(core.units.begin()->peffect);
 		if(target->current.location == LOCATION_MZONE)
 			send_to(target, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
-		adjust_instant();
+		adjust_all();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	case 15: {
@@ -2058,7 +2069,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		raise_event(&target->material_cards, EVENT_BE_MATERIAL, proc, matreason, sumplayer, sumplayer, 0);
 		process_single_event();
 		process_instant_event();
-		return false;
+		return FALSE;
 	}
 	case 17: {
 		raise_single_event(target, 0, EVENT_SPSUMMON_SUCCESS, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
@@ -2070,6 +2081,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			core.hint_timing[sumplayer] |= TIMING_SPSUMMON;
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -2939,6 +2951,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		core.operated_set.clear();
 		core.operated_set = targets->container;
 		returns.ivalue[0] = targets->container.size();
+		core.update_field = TRUE;
 		pduel->delete_group(targets);
 		return TRUE;
 	}
@@ -3030,6 +3043,7 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 			pduel->write_buffer8(pcard->current.sequence);
 			pduel->write_buffer8(pcard->current.position);
 			pduel->write_buffer32(pcard->current.reason);
+			core.update_single_card.insert(pcard);
 			if(dest == LOCATION_HAND) {
 				tohand.insert(pcard);
 				raise_single_event(pcard, 0, EVENT_TO_HAND, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
@@ -3063,6 +3077,7 @@ int32 field::discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reaso
 		core.operated_set = core.discarded_set;
 		returns.ivalue[0] = core.discarded_set.size();
 		core.discarded_set.clear();
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -3188,6 +3203,12 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
 		pduel->write_buffer32(target->current.reason);
+		if(target->previous.location & (LOCATION_DECK | LOCATION_HAND | LOCATION_EXTRA)) {
+			if(target->current.location == LOCATION_MZONE)
+				target->update_infos_nocache(0x3fff);
+			else
+				target->update_infos_nocache(0x3807);
+		}
 		core.update_field = TRUE;
 		if((target->current.location != LOCATION_MZONE)) {
 			if(target->equiping_cards.size()) {
@@ -3265,9 +3286,11 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 				if((opos & POS_FACEDOWN) && (npos & POS_FACEUP)) {
 					pcard->fieldid = infos.field_id++;
 					if(pcard->current.location == LOCATION_MZONE) {
+							pcard->update_infos_nocache(0x3fff);
 						raise_single_event(pcard, 0, EVENT_FLIP, reason_effect, 0, reason_player, 0, noflip);
 						flips.insert(pcard);
-					}
+					} else
+						pcard->update_infos_nocache(0x3807);
 					if(enable)
 						pcard->enable_field_effect(TRUE);
 					else
