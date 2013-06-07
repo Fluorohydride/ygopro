@@ -61,6 +61,7 @@ function c21223277.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if ft<g:GetCount() then return end
 	local c=e:GetHandler()
+	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local tc=g:GetFirst()
 	while tc do
 		Duel.Equip(tp,tc,c,true,true)

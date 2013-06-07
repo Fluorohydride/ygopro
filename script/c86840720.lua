@@ -23,7 +23,7 @@ function c86840720.filter(c,e,tp)
 end
 function c86840720.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return eg:IsContains(chkc) and c86840720.filter(chkc,e,tp) end
-	if chk==0 then return eg:IsExists(c86840720.filter,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and eg:IsExists(c86840720.filter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=eg:FilterSelect(tp,c86840720.filter,1,1,nil,e,tp)
 	Duel.SetTargetCard(g)
