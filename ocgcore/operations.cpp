@@ -377,6 +377,7 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 				}
 				shuffle(playerid, LOCATION_HAND);
 			}
+			core.update_field = TRUE;
 			for(auto cit = drawed_set->container.begin(); cit != drawed_set->container.end(); ++cit)
 				raise_single_event((*cit), 0, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, 0);
 			process_single_event();
@@ -462,6 +463,7 @@ int32 field::damage(uint16 step, effect* reason_effect, uint32 reason, uint8 rea
 			raise_event(reason_card, EVENT_BATTLE_DAMAGE, 0, 0, reason_player, playerid, val);
 		}
 		process_instant_event();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 1: {
@@ -502,6 +504,7 @@ int32 field::recover(uint16 step, effect* reason_effect, uint32 reason, uint8 re
 		pduel->write_buffer32(amount);
 		raise_event((card*)0, EVENT_RECOVER, reason_effect, reason, reason_player, playerid, amount);
 		process_instant_event();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 1: {
@@ -586,6 +589,7 @@ int32 field::pay_lp_cost(uint32 step, uint8 playerid, uint32 cost) {
 		e.reason_player = playerid;
 		core.sub_solving_event.push_back(e);
 		add_process(PROCESSOR_SOLVE_CONTINUOUS, 0, peffect, 0, playerid, 0);
+		core.update_field = TRUE;
 		return TRUE;
 	}
 	}
@@ -687,6 +691,7 @@ int32 field::remove_counter(uint16 step, uint32 reason, card* pcard, uint8 rplay
 		return FALSE;
 	}
 	case 4: {
+		core.update_field = TRUE;
 		returns.ivalue[0] = 1;
 		return TRUE;
 	}
@@ -824,6 +829,7 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 		return FALSE;
 	}
 	case 3: {
+		core.update_field = TRUE;
 		returns.ivalue[0] = 1;
 		return TRUE;
 	}
@@ -895,6 +901,7 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 		return FALSE;
 	}
 	case 2: {
+		core.update_field = TRUE;
 		returns.ivalue[0] = 1;
 		return TRUE;
 	}
@@ -1090,6 +1097,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 		}
 	}
 	case 2: {
+		core.update_field = TRUE;
 		returns.ivalue[0] = TRUE;
 		return TRUE;
 	}

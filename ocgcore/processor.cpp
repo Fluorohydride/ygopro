@@ -2580,6 +2580,7 @@ int32 field::process_battle_command(uint16 step) {
 				core.hint_timing[infos.turn_player] = 0;
 				reset_phase(PHASE_BATTLE);
 				adjust_all();
+				core.update_field = TRUE;
 			}
 			return FALSE;
 		}
@@ -3757,6 +3758,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_DRAW, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 1: {
@@ -3794,6 +3796,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_STANDBY, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 4: {
@@ -3822,6 +3825,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_MAIN1, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 7: {
@@ -3858,6 +3862,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_BATTLE, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 10: {
@@ -3900,6 +3905,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_MAIN2, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 13: {
@@ -3925,6 +3931,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_END, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 16: {
@@ -3943,6 +3950,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		raise_event((card*)0, EVENT_TURN_END, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
+		core.update_field = TRUE;
 		return FALSE;
 	}
 	case 19: {
