@@ -39,6 +39,7 @@ function c40044918.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 		sel=Duel.SelectOption(tp,aux.Stringid(40044918,1),aux.Stringid(40044918,2))+1
 	end
 	e:SetLabel(sel)
+	Duel.Hint(HINT_OPSELECTED,1-tp,aux.Stringid(40044918,sel))
 	if sel==1 then
 	else Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK) end
 end
