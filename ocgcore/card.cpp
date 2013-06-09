@@ -173,7 +173,7 @@ void card::update_infos(int32 query_flag) {
 			query_flag &= ~QUERY_OWNER;
 	}
 	if(query_flag & QUERY_STATUS) {
-		tdata = status & (STATUS_DISABLED |  STATUS_IS_PUBLIC | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT | STATUS_UNION);
+		tdata = status & (STATUS_DISABLED | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT | STATUS_UNION);
 		if(tdata != q_cache.status) {
 			q_cache.status = tdata;
 			pduel->write_buffer32(tdata);
@@ -242,7 +242,7 @@ void card::update_infos_nocache(int32 query_flag) {
 		pduel->write_buffer32(q_cache.owner);
 	}
 	if(query_flag & QUERY_STATUS) {
-		q_cache.status = status & (STATUS_DISABLED |  STATUS_IS_PUBLIC | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT | STATUS_UNION);
+		q_cache.status = status & (STATUS_DISABLED | STATUS_PROC_COMPLETE | STATUS_REVIVE_LIMIT | STATUS_UNION);
 		pduel->write_buffer32(q_cache.status);
 	}
 	if(query_flag & QUERY_REASON_CARD)
