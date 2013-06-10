@@ -27,7 +27,7 @@ function c6614221.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=mg:GetFirst()
 	local atk=0
 	while tc do
-		local catk=tc:GetBaseAttack()
+		local catk=tc:GetTextAttack()
 		if catk<0 then catk=0 end
 		atk=atk+catk
 		tc=mg:GetNext()
