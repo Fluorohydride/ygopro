@@ -625,7 +625,7 @@ int32 scriptlib::card_get_attack_announced_count(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	lua_pushinteger(L, pcard->announce_count);
+	lua_pushinteger(L, pcard->announce_count - pcard->attack_negated_count);
 	return 1;
 }
 int32 scriptlib::card_is_direct_attacked(lua_State *L) {

@@ -914,6 +914,7 @@ void card::reset(uint32 id, uint32 reset_type) {
 			attacked_cards.clear();
 			announce_count = 0;
 			attacked_count = 0;
+			attack_negated_count = 0;
 			attack_all_target = TRUE;
 		}
 		if(id & 0x5fe0000) {
@@ -1972,6 +1973,8 @@ int32 card::is_capable_attack() {
 	if(is_affected_by_effect(EFFECT_CANNOT_ATTACK))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_ATTACK_DISABLED))
+		return FALSE;
+	if(pduel->game_field->is_player_affected_by_effect(pduel->game_field->infos.turn_player, EFFECT_SKIP_BP))
 		return FALSE;
 	return TRUE;
 }
