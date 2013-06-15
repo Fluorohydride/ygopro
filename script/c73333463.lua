@@ -1,4 +1,4 @@
---ライトロード·エンジェル ケルビム
+--アーマロイドガイデンゴー
 function c73333463.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)
