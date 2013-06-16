@@ -17,11 +17,11 @@ function c88071625.initial_effect(c)
 	e2:SetOperation(c88071625.otop)
 	e2:SetValue(SUMMON_TYPE_ADVANCE)
 	c:RegisterEffect(e2)
-	--atk
+	--tribute check
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_SUMMON_SUCCESS)
-	e3:SetOperation(c88071625.atkop)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_MATERIAL_CHECK)
+	e3:SetValue(c88071625.valcheck)
 	c:RegisterEffect(e3)
 	--copy
 	local e4=Effect.CreateEffect(c)
@@ -43,30 +43,28 @@ function c88071625.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:SetMaterial(sg)
 	Duel.Release(sg, REASON_SUMMON+REASON_MATERIAL)
 end
-function c88071625.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:GetMaterialCount()==0 then return end
-	local e1=Effect.CreateEffect(c)
-	local mg=c:GetMaterial()
-	local tc=mg:GetFirst()
+function c6614221.valcheck(e,c)
+	local g=c:GetMaterial()
+	local tc=g:GetFirst()
 	local atk=0
 	local def=0
 	while tc do
 		local catk=tc:GetTextAttack()
 		local cdef=tc:GetTextDefence()
-		if catk<0 then catk=0 end
-		if cdef<0 then cdef=0 end
-		atk=atk+catk
-		def=def+cdef
-		tc=mg:GetNext()
+		atk=atk+(catk>=0 and catk or 0)
+		def=def+(cdef>=0 and cdef or 0)
+		tc=g:GetNext()
 	end
+	--atk continuous effect
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetValue(atk)
-	e1:SetReset(RESET_EVENT+0x1ff0000)
+	e1:SetReset(RESET_EVENT+0xff0000)
 	c:RegisterEffect(e1)
+	--def continuous effect
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_DEFENCE)
 	e2:SetValue(def)
