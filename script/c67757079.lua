@@ -1,6 +1,6 @@
 --キング·オブ·ビースト
 function c67757079.initial_effect(c)
-	c:SetUniqueOnField(1,0,67757079)
+	c:SetUniqueOnField(1,1,67757079)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(67757079,0))

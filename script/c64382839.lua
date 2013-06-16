@@ -22,8 +22,8 @@ function c64382839.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c64382839.cfilter(c,tp)
-	return c:GetPreviousControler()==1-tp and (c:IsPreviousLocation(LOCATION_MZONE) or
-		(c:IsPreviousLocation(LOCATION_SZONE) and c:IsType(TYPE_MONSTER)))
+	return c:GetPreviousControler()==1-tp and c:IsPreviousLocation(LOCATION_ONFIELD)
+		and c:IsType(TYPE_MONSTER) and not c:IsType(TYPE_TOKEN)
 end
 function c64382839.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c64382839.cfilter,1,nil,tp)

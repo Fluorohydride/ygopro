@@ -43,7 +43,7 @@ function c88071625.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:SetMaterial(sg)
 	Duel.Release(sg, REASON_SUMMON+REASON_MATERIAL)
 end
-function c6614221.valcheck(e,c)
+function c88071625.valcheck(e,c)
 	local g=c:GetMaterial()
 	local tc=g:GetFirst()
 	local atk=0

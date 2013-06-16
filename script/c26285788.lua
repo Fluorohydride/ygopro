@@ -49,7 +49,7 @@ function c26285788.filter2(c)
 	return c:IsFaceup() and c:IsDestructable()
 end
 function c26285788.effectop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_CARD,0,26285789)
+	Duel.Hint(HINT_CARD,0,26285788)
 	local ct=Duel.GetFlagEffect(tp,26285789)
 	if ct==1 then
 		Duel.Draw(tp,1,REASON_EFFECT)
