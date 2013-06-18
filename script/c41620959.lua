@@ -5,9 +5,14 @@ function c41620959.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCost(c41620959.cost)
 	e1:SetTarget(c41620959.target)
 	e1:SetOperation(c41620959.activate)
 	c:RegisterEffect(e1)
+end
+function c41620959.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,41620959)==0 end
+	Duel.RegisterFlagEffect(tp,41620959,RESET_PHASE+PHASE_END,0,1)
 end
 function c41620959.tgfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsAbleToGrave()

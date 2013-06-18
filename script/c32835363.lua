@@ -29,7 +29,7 @@ function c32835363.regcon(e,tp,eg,ep,ev,re,r,rp)
 	local d2=false
 	local tc=eg:GetFirst()
 	while tc do
-		if tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsType(TYPE_MONSTER) and bit.band(tc:GetReason(),0x41)==0x41 then
+		if tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsType(TYPE_MONSTER) and tc:IsReason(REASON_EFFECT) then
 			if tc:GetControler()==0 then d1=true
 			else d2=true end
 		end
