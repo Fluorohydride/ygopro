@@ -61,8 +61,18 @@ function c13629812.disop(e,tp)
 	return bit.lshift(0x1,e:GetLabel())
 end
 function c13629812.retcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFirstCardTarget()~=nil
+	local c=e:GetHandler()
+	local tc=c:GetFirstCardTarget()
+	if tc and tc:IsLocation(LOCATION_REMOVED) and tc:IsFaceup() and c:IsLocation(LOCATION_GRAVE) then
+		e:SetLabelObject(tc)
+		tc:CreateEffectRelation(e)
+		return true
+	else return false end
 end
 function c13629812.retop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ReturnToField(e:GetHandler():GetFirstCardTarget())
+	local c=e:GetHandler()
+	local tc=e:GetLabelObject()
+	if tc:IsRelateToEffect(e) then
+		Duel.ReturnToField(tc)
+	end
 end
