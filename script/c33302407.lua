@@ -22,7 +22,7 @@ function c33302407.discon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and not Duel.CheckAttackActivity(tp)
 end
 function c33302407.filter(c)
-	return c:IsSetCard(0x25) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0x25)
 end
 function c33302407.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(c33302407.filter,tp,LOCATION_MZONE,0,nil)

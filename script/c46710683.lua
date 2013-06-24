@@ -10,8 +10,7 @@ function c46710683.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c46710683.condition(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_DESTROY)>0
-		and bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)>0
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_DESTROY)
 end
 function c46710683.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -22,11 +21,11 @@ function c46710683.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(c46710683.damval)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	c46710683.available=true
+	Duel.RegisterFlagEffect(tp,46710683,RESET_PHASE+PHASE_END,0,1)
 end
-c46710683.available=false
 function c46710683.damval(e,re,val,r,rp,rc)
-	if not c46710683.available or bit.band(r,REASON_BATTLE)==0 then return val end
-	c46710683.available=false
+	local tp=e:GetHandlerPlayer()
+	if Duel.GetFlagEffect(tp,46710683)==0 or bit.band(r,REASON_BATTLE)==0 then return val end
+	Duel.ResetFlagEffect(tp,46710683)
 	return 0
 end

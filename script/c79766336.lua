@@ -18,7 +18,7 @@ function c79766336.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
 end
-function c79766336.filter(c,e,tp,eg,ep,ev,re,r,rp)
+function c79766336.filter(c)
 	return c:GetType()==0x4 and not c:IsCode(79766336) and c:IsAbleToRemove() and c:CheckActivateEffect(false,true,false)~=nil
 end
 function c79766336.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

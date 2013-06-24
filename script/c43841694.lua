@@ -19,7 +19,7 @@ function c43841694.filter(c,e,tp)
 	return c:IsType(TYPE_XYZ) and c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c43841694.filter2(c)
-	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
+	return c:IsFaceup() and c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
 end
 function c43841694.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
