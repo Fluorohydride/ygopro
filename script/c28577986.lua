@@ -1,4 +1,4 @@
---Ë®¾«÷[£­¥ª©`¥±¥¢¥Ó¥¹
+--æ°´ç²¾é±—ï¼ã‚ªãƒ¼ã‚±ã‚¢ãƒ“ã‚¹
 function c28577986.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -18,12 +18,12 @@ function c28577986.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c28577986.cfilter(c,e,tp)
 	local lv=c:GetLevel()
-	return lv>0 and c:IsSetCard(0x74)
+	return lv>0 and c:IsFaceup() and c:IsSetCard(0x74)
 		and Duel.IsExistingMatchingCard(c28577986.spfilter,tp,LOCATION_DECK,0,1,nil,lv,e,tp)
 end
 function c28577986.spfilter(c,lv,e,tp)
 	if lv>4 then lv=4 end
-	return c:IsLevelBelow(lv) and c:IsSetCard(0x74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsLevelBelow(lv) and c:IsSetCard(0x74) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c28577986.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c28577986.cfilter(chkc,e,tp) end

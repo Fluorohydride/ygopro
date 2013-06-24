@@ -14,7 +14,7 @@ function c83500096.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c83500096.cfilter(c)
-	return c:IsSetCard(0x2) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x2) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToGraveAsCost()
 end
 function c83500096.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c83500096.cfilter,tp,LOCATION_MZONE,0,1,nil) end
