@@ -20,7 +20,7 @@ namespace ygopro
 	public:
 		GameWindow();
 		~GameWindow();
-		void Initialise();
+		void Initialise(int x, int y);
 		void MainLoop(int x, int y);
 		void Close();
 

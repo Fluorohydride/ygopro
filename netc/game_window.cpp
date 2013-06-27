@@ -20,35 +20,35 @@ namespace ygopro
 		delete mPlatform;
 	}
 
-	void GameWindow::Initialise() {
+	void GameWindow::Initialise(int x, int y) {
 		glfwInit();
+// #ifdef _WIN32
+// 		int cx = GetSystemMetrics(SM_CXSCREEN);
+// 		int cy = GetSystemMetrics(SM_CYSCREEN);
+// 		glfwWindowHint(GLFW_POSITION_X, (cx - x) / 2);
+// 		glfwWindowHint(GLFW_POSITION_Y, (cy - y) / 2);
+// #endif
+		glfwWindowHint(GLFW_VISIBLE, 0);
+		glWindow = glfwCreateWindow(x, y, GLFW_WINDOWED, "YGOPRO", 0);
+		glfwMakeContextCurrent(glWindow);
+		// callbacks
+		glfwSetCursorPosCallback(glWindow, mousePosFunc);
+		glfwSetMouseButtonCallback(glWindow, mouseButtonFunc);
+		glfwSetScrollCallback(glWindow, mouseWheelFunc);
+
 		mPlatform = new MyGUI::OpenGLPlatform();
 		mPlatform->initialise(&imageLoader);
 		mPlatform->getDataManagerPtr()->addResourceLocation("./skin", false);
 		mGUI = new MyGUI::Gui();
 		mGUI->initialise("MyGUI_Core.xml");
+		mPlatform->getRenderManagerPtr()->setViewSize(x, y);
+		MyGUI::PointerManager::getInstancePtr()->setVisible(false);
+		FpsSet(60);
 	}
 
 	void GameWindow::MainLoop(int x, int y) {
-#ifdef _WIN32
-		int cx = GetSystemMetrics(SM_CXSCREEN);
-		int cy = GetSystemMetrics(SM_CYSCREEN);
-		glfwWindowHint(GLFW_POSITION_X, (cx - x) / 2);
-		glfwWindowHint(GLFW_POSITION_Y, (cy - y) / 2);
-#endif
-		glWindow = glfwCreateWindow(x, y, GLFW_WINDOWED, "YGOPRO", 0);
-		glfwMakeContextCurrent(glWindow);
-
-		mPlatform->getRenderManagerPtr()->setViewSize(1024, 640);
-		MyGUI::PointerManager::getInstancePtr()->setVisible(false);
-
-		glfwSetCursorPosCallback(glWindow, mousePosFunc);
-		glfwSetMouseButtonCallback(glWindow, mouseButtonFunc);
-		glfwSetScrollCallback(glWindow, mouseWheelFunc);
-
+		glfwShowWindow(glWindow);
 		FpsInitialise();
-		FpsSet(60);
-
 		while(!exiting && !glfwGetWindowParam(glWindow, GLFW_CLOSE_REQUESTED)) {
 			FpsNextFrame();
 			CheckMessage();
@@ -57,7 +57,9 @@ namespace ygopro
 			mPlatform->getRenderManagerPtr()->drawOneFrame();
 			glfwSwapBuffers(glWindow);
 		}
-		glfwTerminate();
+		glfwHideWindow(glWindow);
+
+//		glfwTerminate();
 	}
 
 	void GameWindow::Close() {

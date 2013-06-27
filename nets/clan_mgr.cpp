@@ -15,7 +15,7 @@ namespace ygopro
 	}
 
 	void ClanMgr::LoadClans() {
-		MongoQuery mq = MongoExecutor(dbAdapter)("$query")()("$orderby", "_id", 1) << "ygo.clan";
+		MongoQuery mq = MongoExecutor(dbAdapter).orderby("_id", 1).queryFrom("ygo.clan");
 		while(mq++) {
 			Clan* new_clan = new Clan;
 			mq("_id", new_clan->uid)
@@ -44,7 +44,7 @@ namespace ygopro
 		std::string namekey = new_clan->name;
 		std::transform(namekey.begin(), namekey.end(), namekey.begin(), toupper);
 		clanKey[namekey] = new_clan;
-		MongoExecutor(dbAdapter, true)("_id", new_clan->uid)("creator", new_clan->creator)("name", name)("create_time", new_clan->create_time) + "ygo.clan";
+		new_clan->DBNewObject("creator", new_clan->creator, "name", name, "create_time", new_clan->create_time);
 		return new_clan;
 	}
 

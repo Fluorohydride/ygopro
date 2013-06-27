@@ -21,7 +21,7 @@ namespace ygopro
 	}
 
 	void PlayerMgr::LoadPlayers() {
-		MongoQuery mq = MongoExecutor(dbAdapter)("$query")()("$orderby", "_id", 1) << "ygo.player";
+		MongoQuery mq = MongoExecutor(dbAdapter).orderby("_id", 1).queryFrom("ygo.player");
 		max_uid = 0;
 		while(mq++) {
 			Player* new_player = new Player;
@@ -62,7 +62,7 @@ namespace ygopro
 	}
 
 	void PlayerMgr::LoadFriendships() {
-		MongoQuery mq = MongoExecutor(dbAdapter)("$query")()("$orderby", "player1", 1) << "ygo.friend";
+		MongoQuery mq = MongoExecutor(dbAdapter).orderby("player1", 1).queryFrom("ygo.friend");
 		int player1, player2, current = 0, relation = 0;
 		Player* pcurrent = nullptr;
 		while(mq++) {
@@ -107,7 +107,7 @@ namespace ygopro
 		new_player->name = name;
 		new_player->password = pass;
 		new_player->reg_time = (int)time(0);
-		MongoExecutor(dbAdapter, true)("_id", max_uid)("name", name)("password", pass)("reg_time", new_player->reg_time) + "ygo.player";
+		new_player->DBNewObject("name", name, "password", pass, "reg_time", new_player->reg_time);
 		uidPlayerMap[new_player->uid] = new_player;
 		namePlayerMap[namekey] = new_player;
 		return new_player;
@@ -120,7 +120,7 @@ namespace ygopro
 		if(iter == namePlayerMap.end())
 			return;
 		Player* player = iter->second;
-		MongoExecutor(dbAdapter)("_id", player->uid) - "ygo.player";
+		player->DBDeleteObject();
 		uidPlayerMap.erase(player->uid);
 		namePlayerMap.erase(namekey);
 		delete player;
@@ -129,7 +129,7 @@ namespace ygopro
 	void PlayerMgr::RemovePlayer(int uid) {
 		Player* player = FindPlayer(uid);
 		if(player) {
-			MongoExecutor(dbAdapter)("_id", player->uid) - "ygo.player";
+			player->DBDeleteObject();
 			uidPlayerMap.erase(player->uid);
 			namePlayerMap.erase(player->name);
 			delete player;

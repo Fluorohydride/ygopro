@@ -48,13 +48,13 @@ namespace ygopro
 		if(iter == friends.end()) {
 			friends[player] = RELATION_FRIEND;
 			PacketWriter(STOC_FRIEND_NEW) << player->uid << player->name << RELATION_FRIEND >> this;
-			MongoExecutor(dbAdapter, true)("player1", this->uid)("player2", player->uid)("relation", RELATION_FRIEND) + "ygo.friend";
+			MongoExecutor(dbAdapter).values("player1", this->uid, "player2", player->uid, "relation", RELATION_FRIEND).insertTo("ygo.friend");
 		} else {
 			if(iter->second == RELATION_FRIEND)
 				return;
 			iter->second = RELATION_FRIEND;
 			PacketWriter(STOC_FRIEND_ALTER) << player->uid << RELATION_FRIEND >> this;
-			MongoExecutor(dbAdapter)("player1", this->uid)("player2", player->uid).Op()("relation", RELATION_FRIEND) >> "ygo.friend";
+			MongoExecutor(dbAdapter).condition("player1", this->uid, "player2", player->uid).operation("$set", "relation", RELATION_FRIEND).updateTo("ygo.friend");
 		}
 		if(IsOnline())
 			player->followers.insert(this);
@@ -62,7 +62,7 @@ namespace ygopro
 		if(iter2 == player->friends.end()) {
 			player->friends[this] = RELATION_PENDING;
 			PacketWriter(STOC_FRIEND_NEW) << this->uid << this->name << RELATION_PENDING >> player;
-			MongoExecutor(dbAdapter, true)("player1", player->uid)("player2", this->uid)("relation", RELATION_PENDING) + "ygo.friend";
+			MongoExecutor(dbAdapter).values("player1", player->uid, "player2", this->uid, "relation", RELATION_PENDING).insertTo("ygo.friend");
 		}
 	}
 
@@ -72,7 +72,7 @@ namespace ygopro
 			return;
 		friends.erase(player);
 		PacketWriter(STOC_FRIEND_ALTER) << player->uid << RELATION_NONE >> this;
-		MongoExecutor(dbAdapter)("player1", this->uid)("player2", player->uid) - "ygo.friend";
+		MongoExecutor(dbAdapter).condition("player1", this->uid, "player2", player->uid).deleteFrom("ygo.friend");
 	}
 
 	bool Player::IsFriend(Player* player) {

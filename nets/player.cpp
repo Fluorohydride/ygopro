@@ -82,14 +82,14 @@ namespace ygopro
 		case CTOS_FTREASON_AVATAR:
 			{
 				avatar = resource_id;
-				SetField("avatar", avatar);
+				DBSetField("avatar", avatar);
 				PacketWriter(STOC_PLAYER_INFO_CHANGE) << PIC_AVATAR << avatar >> connection;
 				break;
 			}
 		case CTOS_FTREASON_SLEEVE:
 			{
 				sleeve = resource_id;
-				SetField("sleeve", sleeve);
+				DBSetField("sleeve", sleeve);
 				PacketWriter(STOC_PLAYER_INFO_CHANGE) << PIC_SLEEVE << sleeve >> connection;
 				break;
 			}

@@ -8,7 +8,7 @@ namespace ygopro
 	TicketMgr ticketMgr;
 
 	void TicketMgr::LoadTicketInfos() {
-		MongoQuery mq = MongoExecutor(dbAdapter)("$query")()("$orderby", "duel_uid", 1) << "ygo.ticket";
+		MongoQuery mq = MongoExecutor(dbAdapter).orderby("duel_uid", 1).queryFrom("ygo.ticket");
 		unsigned int duel_uid = 0, current = 0, playerid = 0;
 		TicketInfo* pticket = nullptr;
 		while(mq++) {
@@ -40,7 +40,7 @@ namespace ygopro
 
 	void TicketMgr::RemoveTicket(unsigned int duel_uid) {
 		ticket_pool.erase(duel_uid);
-		MongoExecutor(dbAdapter)("duel_uid", duel_uid) - "ygo.ticket";
+		MongoExecutor(dbAdapter).condition("duel_uid", duel_uid).deleteFrom("ygo.ticket");
 	}
 
 	bool TicketMgr::CheckTicket(unsigned int duel_uid, Player* player) {
@@ -57,7 +57,7 @@ namespace ygopro
 		if(iter->second->player_paid.find(player->uid) != iter->second->player_paid.end())
 			return;
 		iter->second->player_paid.insert(player->uid);
-		MongoExecutor(dbAdapter, true)("duel_uid", duel_uid)("playerid", player->uid) + "ygo.ticket";
+		MongoExecutor(dbAdapter).values("duel_uid", duel_uid, "playerid", player->uid).insertTo("ygo.ticket");
 	}
 
 }
