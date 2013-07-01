@@ -70,6 +70,5 @@ function c59057152.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=Duel.SelectMatchingCard(tp,c59057152.desfilter,tp,LOCATION_SZONE,0,1,1,nil)
-	Duel.BreakEffect()
 	Duel.Destroy(dg,REASON_EFFECT)
 end

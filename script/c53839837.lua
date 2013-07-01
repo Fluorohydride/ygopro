@@ -15,6 +15,7 @@ function c53839837.initial_effect(c)
 	e2:SetCondition(c53839837.spcon)
 	e2:SetTarget(c53839837.sptg)
 	e2:SetOperation(c53839837.spop)
+	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--to grave
 	local e3=Effect.CreateEffect(c)
@@ -22,6 +23,7 @@ function c53839837.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
+	e3:SetCondition(c53839837.tgcon)
 	e3:SetTarget(c53839837.tgtg)
 	e3:SetOperation(c53839837.tgop)
 	c:RegisterEffect(e3)
@@ -52,6 +54,9 @@ function c53839837.spop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) then
 		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
+end
+function c53839837.tgcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
 end
 function c53839837.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
