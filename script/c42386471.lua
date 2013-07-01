@@ -32,6 +32,7 @@ function c42386471.initial_effect(c)
 	e6:SetCategory(CATEGORY_HANDES)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e6:SetCode(EVENT_BATTLE_DAMAGE)
+	e6:SetCondition(c42386471.condition)
 	e6:SetTarget(c42386471.target)
 	e6:SetOperation(c42386471.operation)
 	c:RegisterEffect(e6)
@@ -61,6 +62,9 @@ end
 function c42386471.dircon(e)
 	return Duel.IsExistingMatchingCard(c42386471.dirfilter1,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 		and not Duel.IsExistingMatchingCard(c42386471.dirfilter2,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
+end
+function c42386471.condition(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
 end
 function c42386471.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -48,14 +48,14 @@ function c56948373.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c56948373.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler():GetEquipTarget()
-	return c and Duel.GetTurnPlayer()==c:GetControler()
+	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetEquipTarget()~=nil
 end
 function c56948373.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetTargetPlayer(Duel.GetTurnPlayer())
+	local p=e:GetHandler():GetEquipTarget():GetControler()
+	Duel.SetTargetPlayer(p)
 	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,Duel.GetTurnPlayer(),500)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,p,500)
 end
 function c56948373.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

@@ -44,17 +44,17 @@ function c2403771.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2403771.repfilter(c)
-	return c:IsType(TYPE_SPELL) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
+	return c:IsType(TYPE_SPELL) and c:IsLocation(LOCATION_SZONE) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
 end
 function c2403771.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then
 		local g=c:GetEquipGroup()
-		local res=g:IsExists(c2403771.repfilter,1,nil)
-		return not c:IsReason(REASON_REPLACE) and res
+		return not c:IsReason(REASON_REPLACE) and g:IsExists(c2403771.repfilter,1,nil)
 	end
 	if Duel.SelectYesNo(tp,aux.Stringid(2403771,1)) then
 		local g=c:GetEquipGroup()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local sg=g:FilterSelect(tp,c2403771.repfilter,1,1,nil)
 		Duel.SetTargetCard(sg)
 		return true
