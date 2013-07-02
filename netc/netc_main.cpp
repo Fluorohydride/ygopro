@@ -5,7 +5,7 @@
 int main(int argc, char* argv[]) {
 
 	ygopro::mainGame.Initialise(1280, 720);
-	ygopro::mainGame.MainLoop(1280, 720);
+	ygopro::mainGame.ShowWindow(100, 100);
 
 	return 0;
 };

@@ -13,6 +13,8 @@ namespace ygopro
 		PanelBase(const std::string& layoutname);
 		virtual ~PanelBase();
 
+		void setSize(int w, int h);
+		void setPosition(int x, int y);
 		void fadeShow(float speed = 5.0);
 		void fadeDestroy(float speed = 5.0);
 

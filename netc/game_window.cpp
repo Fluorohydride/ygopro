@@ -10,26 +10,35 @@ namespace ygopro
 	GameWindow mainGame;
 
 	GameWindow::GameWindow(): exiting(false), mGUI(nullptr), mPlatform(nullptr), ConfigMgr("config.conf") {
-		
+		glfwInit();
 	}
 
 	GameWindow::~GameWindow() {
-		mGUI->shutdown();
-		mPlatform->shutdown();
-		delete mGUI;
-		delete mPlatform;
+		if(mGUI) {
+			mGUI->shutdown();
+			delete mGUI;
+		}
+		if(mPlatform) {
+			mPlatform->shutdown();
+			delete mPlatform;
+		}
+		glfwTerminate();
 	}
 
-	void GameWindow::Initialise(int x, int y) {
-		glfwInit();
-// #ifdef _WIN32
-// 		int cx = GetSystemMetrics(SM_CXSCREEN);
-// 		int cy = GetSystemMetrics(SM_CYSCREEN);
-// 		glfwWindowHint(GLFW_POSITION_X, (cx - x) / 2);
-// 		glfwWindowHint(GLFW_POSITION_Y, (cy - y) / 2);
-// #endif
+	void GameWindow::Initialise(int sx, int sy) {
+		if(mPlatform) {
+			mGUI->shutdown();
+			delete mGUI;
+		}
+		if(mGUI) {
+			mPlatform->shutdown();
+			delete mPlatform;
+		}
+		if(glWindow)
+			glfwDestroyWindow(glWindow);
 		glfwWindowHint(GLFW_VISIBLE, 0);
-		glWindow = glfwCreateWindow(x, y, GLFW_WINDOWED, "YGOPRO", 0);
+		glfwWindowHint(GLFW_RESIZABLE, 0);
+		glWindow = glfwCreateWindow(sx, sy, "YGOPRO", 0, 0);
 		glfwMakeContextCurrent(glWindow);
 		// callbacks
 		glfwSetCursorPosCallback(glWindow, mousePosFunc);
@@ -39,17 +48,20 @@ namespace ygopro
 		mPlatform = new MyGUI::OpenGLPlatform();
 		mPlatform->initialise(&imageLoader);
 		mPlatform->getDataManagerPtr()->addResourceLocation("./skin", false);
+		
 		mGUI = new MyGUI::Gui();
 		mGUI->initialise("MyGUI_Core.xml");
-		mPlatform->getRenderManagerPtr()->setViewSize(x, y);
 		MyGUI::PointerManager::getInstancePtr()->setVisible(false);
+		mPlatform->getRenderManagerPtr()->setViewSize(sx, sy);
 		FpsSet(60);
 	}
 
-	void GameWindow::MainLoop(int x, int y) {
+	void GameWindow::ShowWindow(int x, int y) {
+		glfwSetWindowPos(glWindow, x, y);
 		glfwShowWindow(glWindow);
 		FpsInitialise();
-		while(!exiting && !glfwGetWindowParam(glWindow, GLFW_CLOSE_REQUESTED)) {
+		(new PanelSysMsg(PANEL_SYSMSG_DEFAULT))->fadeShow();
+		while(!exiting && !glfwWindowShouldClose(glWindow)) {
 			FpsNextFrame();
 			CheckMessage();
 			glfwPollEvents();
@@ -58,8 +70,6 @@ namespace ygopro
 			glfwSwapBuffers(glWindow);
 		}
 		glfwHideWindow(glWindow);
-
-//		glfwTerminate();
 	}
 
 	void GameWindow::Close() {
@@ -69,11 +79,10 @@ namespace ygopro
 	void GameWindow::LoadTexture(const std::string& name) {
 		auto iter = custom_textures.find(name);
 		if(iter == custom_textures.end()) {
-			CustomTextureInfo cti;
+			CustomTextureInfo& cti = custom_textures[name];
 			cti.ptexture = mPlatform->getRenderManagerPtr()->createTexture(name);
 			cti.ptexture->loadFromFile(name);
 			cti.ref_count = 1;
-			custom_textures[name] = cti;
 		} else {
 			iter->second.ref_count++;
 		}
@@ -94,20 +103,20 @@ namespace ygopro
 
 	}
 
-	void GameWindow::mousePosFunc(GLFWwindow win, int x, int y) {
-		MyGUI::InputManager::getInstancePtr()->injectMouseMove(x, y, 0);
+	void GameWindow::mousePosFunc(GLFWwindow* win, double x, double y) {
+		MyGUI::InputManager::getInstancePtr()->injectMouseMove((int)x, (int)y, 0);
 	}
 
-	void GameWindow::mouseButtonFunc(GLFWwindow win, int button, int state) {
-		int xpos, ypos;
+	void GameWindow::mouseButtonFunc(GLFWwindow* win, int button, int state, int modkey) {
+		double xpos, ypos;
 		glfwGetCursorPos(win, &xpos, &ypos);
 		if(state == GLFW_PRESS)
-			MyGUI::InputManager::getInstancePtr()->injectMousePress(xpos, ypos, (MyGUI::MouseButton::Enum)button);
+			MyGUI::InputManager::getInstancePtr()->injectMousePress((int)xpos, (int)ypos, (MyGUI::MouseButton::Enum)button);
 		else
-			MyGUI::InputManager::getInstancePtr()->injectMouseRelease(xpos, ypos, (MyGUI::MouseButton::Enum)button);
+			MyGUI::InputManager::getInstancePtr()->injectMouseRelease((int)xpos, (int)ypos, (MyGUI::MouseButton::Enum)button);
 	}
 
-	void GameWindow::mouseWheelFunc(GLFWwindow win, double button, double state) {
+	void GameWindow::mouseWheelFunc(GLFWwindow* win, double button, double state) {
 
 	}
 
