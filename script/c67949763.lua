@@ -13,7 +13,7 @@ function c67949763.initial_effect(c)
 end
 function c67949763.filter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-		and Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,c:GetAttack(),0,1,RACE_FIEND,ATTRIBUTE_DARK)
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,-2,0,1,RACE_FIEND,ATTRIBUTE_DARK)
 end
 function c67949763.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c67949763.filter(chkc,tp) end
@@ -34,7 +34,7 @@ function c67949763.activate(e,tp,eg,ep,ev,re,r,rp)
 			atk=tc:GetAttack()
 			cr=true
 		end
-		if not Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,atk,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
+		if not Duel.IsPlayerCanSpecialSummonMonster(tp,67949764,0x87,0x4011,-2,0,1,RACE_FIEND,ATTRIBUTE_DARK) then return end
 		if cr then
 			local de=Effect.CreateEffect(e:GetHandler())
 			de:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
