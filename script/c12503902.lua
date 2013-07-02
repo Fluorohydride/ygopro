@@ -7,6 +7,7 @@ function c12503902.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_DAMAGE_STEP)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCondition(c12503902.condition)
 	e1:SetTarget(c12503902.target)
 	e1:SetOperation(c12503902.operation)
 	c:RegisterEffect(e1)
@@ -25,6 +26,9 @@ function c12503902.descon2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c12503902.desop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+end
+function c12503902.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c12503902.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)

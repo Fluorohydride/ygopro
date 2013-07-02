@@ -6,9 +6,13 @@ function c68167124.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
+	e1:SetCondition(c68167124.condition)
 	e1:SetTarget(c68167124.target)
 	e1:SetOperation(c68167124.operation)
 	c:RegisterEffect(e1)
+end
+function c68167124.condition(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
 end
 function c68167124.filter(c)
 	return c:IsFaceup() and c:GetSequence()~=5
