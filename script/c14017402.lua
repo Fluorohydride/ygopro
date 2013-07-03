@@ -38,7 +38,7 @@ function c14017402.splimit(e,se,sp,st)
 	return true
 end
 function c14017402.refcon(e,re,val,r,rp,rc)
-	return bit.band(r,REASON_EFFECT)~=0 and rp~=e:GetHandler():GetControler()
+	return bit.band(r,REASON_EFFECT)~=0 and rp~=e:GetHandler():GetControler()  and e:GetHandler():IsAttackPos()
 end
 function c14017402.ffilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO)
