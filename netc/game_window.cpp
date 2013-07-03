@@ -1,123 +1,49 @@
 #include "game_window.h"
-#include "image_loader.h"
-#include "panels.h"
-
-Random globalRandom;
+#include "wx/wx.h"
+#include "wx/glcanvas.h"
+#include "wx/ribbon/bar.h"
+#include "wx/ribbon/buttonbar.h"
+#include "wx/ribbon/gallery.h"
+#include "wx/ribbon/toolbar.h"
+#include "duel_canvas.h"
 
 namespace ygopro
 {
 
-	GameWindow mainGame;
+	GameFrame* mainFrame = nullptr;
+	Random globalRandom;
 
-	GameWindow::GameWindow(): exiting(false), mGUI(nullptr), mPlatform(nullptr), ConfigMgr("config.conf") {
-		glfwInit();
-	}
+	BEGIN_EVENT_TABLE(GameFrame, wxFrame)
+	END_EVENT_TABLE()
 
-	GameWindow::~GameWindow() {
-		if(mGUI) {
-			mGUI->shutdown();
-			delete mGUI;
-		}
-		if(mPlatform) {
-			mPlatform->shutdown();
-			delete mPlatform;
-		}
-		glfwTerminate();
-	}
+	GameFrame::GameFrame(int sx, int sy): wxFrame(nullptr, wxID_ANY, "YGOpro", wxDefaultPosition, wxSize(sx, sy)) {
+		wxRibbonBar* m_ribbon = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRIBBON_BAR_DEFAULT_STYLE | wxRIBBON_BAR_SHOW_PANEL_EXT_BUTTONS);
+		wxRibbonPage* ribbon_page = new wxRibbonPage(m_ribbon, wxID_ANY, wxT("Menu"));
 
-	void GameWindow::Initialise(int sx, int sy) {
-		if(mPlatform) {
-			mGUI->shutdown();
-			delete mGUI;
-		}
-		if(mGUI) {
-			mPlatform->shutdown();
-			delete mPlatform;
-		}
-		if(glWindow)
-			glfwDestroyWindow(glWindow);
-		glfwWindowHint(GLFW_VISIBLE, 0);
-		glfwWindowHint(GLFW_RESIZABLE, 0);
-		glWindow = glfwCreateWindow(sx, sy, "YGOPRO", 0, 0);
-		glfwMakeContextCurrent(glWindow);
-		// callbacks
-		glfwSetCursorPosCallback(glWindow, mousePosFunc);
-		glfwSetMouseButtonCallback(glWindow, mouseButtonFunc);
-		glfwSetScrollCallback(glWindow, mouseWheelFunc);
-
-		mPlatform = new MyGUI::OpenGLPlatform();
-		mPlatform->initialise(&imageLoader);
-		mPlatform->getDataManagerPtr()->addResourceLocation("./skin", false);
+		wxRibbonPanel *config_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Config"), wxBitmap(32, 32));
+		wxRibbonButtonBar *config_bar = new wxRibbonButtonBar(config_panel);
+		config_bar->AddButton(wxID_ANY, wxT("Edit Config"), wxBitmap(32, 32), "This is a tooltip\na tooltip");
+		config_bar->AddButton(wxID_ANY, wxT("Edit Show"), wxBitmap(32, 32), wxEmptyString);
+		wxRibbonPanel *replay_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
+		wxRibbonButtonBar *replay_bar = new wxRibbonButtonBar(replay_panel);
+		replay_bar->AddButton(wxID_ANY, wxT("Start"), wxBitmap(32, 32), wxBitmap(16, 16));
+		m_ribbon->Realize();
+		int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
+		wxDuelCanvas* glcanvas = new wxDuelCanvas(this, wxID_ANY, wx_gl_attribs);
+		wxSizer *s = new wxBoxSizer(wxVERTICAL);
+		s->Add(m_ribbon, 0, wxEXPAND);
+		s->Add(glcanvas, 1, wxEXPAND);
+		SetSizer(s);
 		
-		mGUI = new MyGUI::Gui();
-		mGUI->initialise("MyGUI_Core.xml");
-		MyGUI::PointerManager::getInstancePtr()->setVisible(false);
-		mPlatform->getRenderManagerPtr()->setViewSize(sx, sy);
-		FpsSet(60);
 	}
 
-	void GameWindow::ShowWindow(int x, int y) {
-		glfwSetWindowPos(glWindow, x, y);
-		glfwShowWindow(glWindow);
-		FpsInitialise();
-		(new PanelSysMsg(PANEL_SYSMSG_DEFAULT))->fadeShow();
-		while(!exiting && !glfwWindowShouldClose(glWindow)) {
-			FpsNextFrame();
-			CheckMessage();
-			glfwPollEvents();
-			glClear(GL_COLOR_BUFFER_BIT);
-			mPlatform->getRenderManagerPtr()->drawOneFrame();
-			glfwSwapBuffers(glWindow);
-		}
-		glfwHideWindow(glWindow);
+	GameFrame::~GameFrame() {
 	}
 
-	void GameWindow::Close() {
-		exiting = true;
-	}
-
-	void GameWindow::LoadTexture(const std::string& name) {
-		auto iter = custom_textures.find(name);
-		if(iter == custom_textures.end()) {
-			CustomTextureInfo& cti = custom_textures[name];
-			cti.ptexture = mPlatform->getRenderManagerPtr()->createTexture(name);
-			cti.ptexture->loadFromFile(name);
-			cti.ref_count = 1;
-		} else {
-			iter->second.ref_count++;
-		}
-	}
-
-	void GameWindow::DestroyTexture(const std::string& name) {
-		auto iter = custom_textures.find(name);
-		if(iter != custom_textures.end()) {
-			iter->second.ref_count--;
-			if(iter->second.ref_count == 0) {
-				mPlatform->getRenderManagerPtr()->destroyTexture(iter->second.ptexture);
-				custom_textures.erase(iter);
-			}
-		}
-	}
-
-	void GameWindow::HandleMessage(unsigned int msg, unsigned int size, void* data) {
+	void GameFrame::HandleMessage(unsigned int msg, unsigned int size, void* data) {
 
 	}
 
-	void GameWindow::mousePosFunc(GLFWwindow* win, double x, double y) {
-		MyGUI::InputManager::getInstancePtr()->injectMouseMove((int)x, (int)y, 0);
-	}
-
-	void GameWindow::mouseButtonFunc(GLFWwindow* win, int button, int state, int modkey) {
-		double xpos, ypos;
-		glfwGetCursorPos(win, &xpos, &ypos);
-		if(state == GLFW_PRESS)
-			MyGUI::InputManager::getInstancePtr()->injectMousePress((int)xpos, (int)ypos, (MyGUI::MouseButton::Enum)button);
-		else
-			MyGUI::InputManager::getInstancePtr()->injectMouseRelease((int)xpos, (int)ypos, (MyGUI::MouseButton::Enum)button);
-	}
-
-	void GameWindow::mouseWheelFunc(GLFWwindow* win, double button, double state) {
-
-	}
+	
 
 }

@@ -1,5 +1,5 @@
-#ifndef _CONFIG_MGR_H
-#define _CONFIG_MGR_H
+#ifndef _CONFIG_MGR_H_
+#define _CONFIG_MGR_H_
 
 #include <string>
 #include <unordered_map>
@@ -67,14 +67,18 @@ namespace ygopro
 		}
 
 		virtual ~ConfigMgr() {
-			if(config_file.length()) {
+			Flush();
+		}
+
+		void Flush() {
+			if(config_file.length() && (config_int.size() + config_str.size() > 0)) {
 				FILE* fp = fopen(config_file.c_str(), "w+");
 				if(fp) {
 					fprintf(fp, "#configures\n");
-					for(auto iter = config_int.begin(); iter != config_int.end(); ++iter)
-						fprintf(fp, "\"%s\" = %d\n", iter->first.c_str(), iter->second);
-					for(auto iter = config_str.begin(); iter != config_str.end(); ++iter)
-						fprintf(fp, "\"%s\" = \"%s\"\n", iter->first.c_str(), iter->second.c_str());
+					for(auto& iter : config_int)
+						fprintf(fp, "\"%s\" = %d\n", iter.first.c_str(), iter.second);
+					for(auto& iter : config_str)
+						fprintf(fp, "\"%s\" = \"%s\"\n", iter.first.c_str(), iter.second.c_str());
 					fclose(fp);
 				}
 			}
@@ -107,6 +111,16 @@ namespace ygopro
 
 		void SaveConfig(const std::string& name, std::string& val) {
 			config_str[name] = val;
+		}
+
+		void foreachInt(void (f)(const std::string&, const int&)) {
+			for(auto& iter : config_int)
+				f(iter.first, iter.second);
+		}
+
+		void foreachString(void (f)(const std::string&, const std::string&)) {
+			for(auto& iter : config_str)
+				f(iter.first, iter.second);
 		}
 
 	};

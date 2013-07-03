@@ -89,6 +89,24 @@ public:
 		return result;
 	}
 
+	void GetHash(unsigned int out[5]) {
+		memset(&tblock[pos], 0, 64 - pos);
+		tblock[pos] = 0x80;
+		if(pos >= 56){
+			BlockTransform();
+			memset(tblock, 0, 64);
+		}
+		length <<= 3;
+		length = LEFT_MOST64(length);
+		memcpy(&tblock[56], &length, 8);
+		BlockTransform();
+		out[0] = LEFT_MOST(digest[0]);
+		out[1] = LEFT_MOST(digest[1]);
+		out[2] = LEFT_MOST(digest[2]);
+		out[3] = LEFT_MOST(digest[3]);
+		out[4] = LEFT_MOST(digest[4]);
+	}
+
 private:
 
 	void BlockTransform()

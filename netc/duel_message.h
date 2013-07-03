@@ -1,7 +1,7 @@
 #ifndef _DUEL_MESSAGE_H_
 #define _DUEL_MESSAGE_H_
 
-#include <queue>
+#include <list>
 #include <mutex>
 
 namespace ygopro
@@ -17,9 +17,14 @@ namespace ygopro
 
 	private:
 		std::mutex msg_mutex;
-		std::queue<DuelMessageData> msg_queue;
+		std::list<DuelMessageData> msg_queue;
 
 	public:
+		virtual ~DuelMessage() {
+			for(auto& iter : msg_queue)
+				delete[] iter.data;
+		}
+
 		virtual void PushMessage(unsigned int msg, unsigned int size, void* data) {
 			msg_mutex.lock();
 			DuelMessageData dmd;
@@ -27,7 +32,7 @@ namespace ygopro
 			dmd.size = size;
 			dmd.data = new unsigned char[size];
 			memcpy(dmd.data, data, size);
-			msg_queue.push(dmd);
+			msg_queue.push_back(dmd);
 			msg_mutex.unlock();
 		}
 
@@ -36,7 +41,7 @@ namespace ygopro
 				return;
 			msg_mutex.lock();
 			DuelMessageData dmd = msg_queue.front();
-			msg_queue.pop();
+			msg_queue.pop_front();
 			msg_mutex.unlock();
 			HandleMessage(dmd.msg, dmd.size, dmd.data);
 			delete[] dmd.data;

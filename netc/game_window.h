@@ -1,13 +1,10 @@
-#ifndef _GAME_H_
-#define _GAME_H_
+#ifndef _GAME_WINDOW_H_
+#define _GAME_WINDOW_H_
 
 #include "../common/common.h"
-#include "GL/glfw3.h"
-#include "MyGUI.h"
-#include "MyGUI_OpenGLPlatform.h"
 #include "frame_controler.h"
 #include "config_mgr.h"
-#include "custom_texture_mgr.h"
+#include "wx/frame.h"
 #include <vector>
 #include <queue>
 
@@ -16,30 +13,20 @@
 namespace ygopro
 {
 
-	class GameWindow : public DuelMessage, public FrameControler, public ConfigMgr, public CustomTextureMgr {
+	class GameFrame : public wxFrame, public DuelMessage, public FrameControler, public ConfigMgr
+	{
 	public:
-		GameWindow();
-		~GameWindow();
-		void Initialise(int sx, int sy);
-		void ShowWindow(int x, int y);
-		void Close();
+		GameFrame(int sx, int sy);
+		~GameFrame();
 
-		virtual void LoadTexture(const std::string& name);
-		virtual void DestroyTexture(const std::string& name);
 		virtual void HandleMessage(unsigned int msg, unsigned int size, void* data);
 
-		static void mousePosFunc(GLFWwindow* win, double x, double y);
-		static void mouseButtonFunc(GLFWwindow* win, int button, int state, int modkey);
-		static void mouseWheelFunc(GLFWwindow* win, double x, double y);
-
-	private:
-		bool exiting;
-		MyGUI::Gui* mGUI;
-		MyGUI::OpenGLPlatform* mPlatform;
-		GLFWwindow* glWindow;
+	protected:
+		DECLARE_EVENT_TABLE()
 	};
 
-	extern GameWindow mainGame;
+	extern GameFrame* mainFrame;
+	extern Random globalRandom;
 
 }
 

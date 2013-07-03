@@ -1,11 +1,24 @@
 #include "../common/common.h"
 #include "../common/hash.h"
 #include "game_window.h"
+#include "wx/app.h"
 
-int main(int argc, char* argv[]) {
+namespace ygopro {
 
-	ygopro::mainGame.Initialise(1280, 720);
-	ygopro::mainGame.ShowWindow(100, 100);
+	class ygoApp : public wxApp
+	{
+	public:
+		bool OnInit() {
+			if(!wxApp::OnInit())
+				return false;
 
-	return 0;
-};
+			mainFrame = new GameFrame(960, 720);
+			mainFrame->Show();
+			return true;
+		}
+	};
+
+	DECLARE_APP(ygoApp)
+	IMPLEMENT_APP(ygoApp)
+
+}
