@@ -3,11 +3,11 @@
 
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
+#include "frame_controler.h"
 
 namespace ygopro
 {
-	class wxDuelCanvas : public wxGLCanvas
-	{
+	class wxDuelCanvas : public wxGLCanvas, public FrameControler {
 
 	private:
 		wxGLContext* glcontext;
@@ -16,8 +16,7 @@ namespace ygopro
 		wxDuelCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxDuelCanvas();
 
-		void prepare3DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bottomrigth_y);
-		void prepare2DViewport(int topleft_x, int topleft_y, int bottomrigth_x, int bottomrigth_y);
+		void drawScene();
 
 		// events
 		void eventResized(wxSizeEvent& evt);

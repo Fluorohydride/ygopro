@@ -2,7 +2,6 @@
 #define _GAME_WINDOW_H_
 
 #include "../common/common.h"
-#include "frame_controler.h"
 #include "config_mgr.h"
 #include "wx/frame.h"
 #include <vector>
@@ -13,7 +12,7 @@
 namespace ygopro
 {
 
-	class GameFrame : public wxFrame, public DuelMessage, public FrameControler, public ConfigMgr
+	class GameFrame : public wxFrame, public DuelMessage, public ConfigMgr
 	{
 	public:
 		GameFrame(int sx, int sy);

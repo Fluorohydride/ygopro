@@ -15,24 +15,21 @@ namespace ygopro
 	END_EVENT_TABLE()
 
 	wxDuelCanvas::wxDuelCanvas(wxFrame* parent, int id, int* args):
-		wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE)
-	{
+		wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
 		glcontext = new wxGLContext(this);
 		SetBackgroundStyle(wxBG_STYLE_CUSTOM);
 	}
 
-	wxDuelCanvas::~wxDuelCanvas()
-	{
+	wxDuelCanvas::~wxDuelCanvas() {
 		delete glcontext;
 	}
 
-	void wxDuelCanvas::eventResized(wxSizeEvent& evt)
-	{
+	void wxDuelCanvas::eventResized(wxSizeEvent& evt) {
 		Refresh();
+		
 	}
 
-	void wxDuelCanvas::eventRender(wxPaintEvent& evt)
-	{
+	void wxDuelCanvas::eventRender(wxPaintEvent& evt) {
 		if(!IsShown())
 			return;
 
