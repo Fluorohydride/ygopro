@@ -1,68 +1,58 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
-#include "wx/image.h"
 #include "GL/glew.h"
+#include "wx/image.h"
+#include <vector>
+#include <unordered_map>
 
 namespace ygopro
 {
 	struct ImageInfo {
 		wxImage image;
-		int texture_id;
-		int imagex;
-		int imagey;
-		int texturex;
-		int texturey;
-
-		ImageInfo(): texture_id(0) {
-
-		}
-
-		~ImageInfo() {
-			if(texture_id)
-				;
-		}
-
-		wxImage& getBitmap() {
-			return image;
-		}
-
-		int getTexture() {
-			if(texture_id)
-				return texture_id;
-
-			image.Rescale(256, 256);
-  
-			glGenTextures(1, &texture_id);
-
-			// Setup the new texture
-			glBindTexture(GL_TEXTURE_2D, texture_id);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-			// Load the data into the texture buffer
-			glTexImage2D(GL_TEXTURE_2D, 0, image.HasAlpha() ? 4 : 3, m_resolution, m_resolution, 0, m_img.HasAlpha() ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, image.GetData());
-
-			return texture_id;
-		}
-
-		void load(const std::string& file) {
-			if(!wxFileExists(path))
-				return;
-			image.LoadFile(file);
-			imagex = image.GetWidth();
-			imagey = image.GetHeight();
-		}
-
+		unsigned int texture_id;
+		unsigned int imagex;
+		unsigned int imagey;
+		float lx;
+		float ly;
+		float rx;
+		float ry;
 	};
 
 	class ImageMgr {
+
 	public:
-		ImageInfo* getBitmap(unsigned int id);
-		ImageInfo* getBitmap(const std::string& name);
+		ImageMgr();
+		~ImageMgr();
+		ImageInfo* getCardImage(unsigned int id);
+		void loadTextures();
+		inline unsigned int texlen(unsigned int len) {
+			len = len - 1;
+			len = len | (len >> 1);
+			len = len | (len >> 2);
+			len = len | (len >> 4);
+			len = len | (len >> 8);
+			len = len | (len >> 16);
+			return len + 1;
+		}
+		ImageInfo* load(const std::string& file);
+		ImageInfo* loadCard(const std::string& file, unsigned int index);
+		void genCardMap();
 
+		unsigned int card_index;
+		unsigned int card_texture;
+		ImageInfo* unknown_card;
+		ImageInfo* sleeve;
+		ImageInfo* negate;
+		ImageInfo* background;
+		ImageInfo* field;
 
+	private:
+		std::unordered_map<unsigned int, ImageInfo*> card_images;
+		std::vector<unsigned int> texture_loaded;
 	};
+
+	extern ImageMgr imageMgr;
 
 }
 

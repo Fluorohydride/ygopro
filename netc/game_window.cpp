@@ -27,6 +27,9 @@ namespace ygopro
 		wxRibbonPanel *replay_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
 		wxRibbonButtonBar *replay_bar = new wxRibbonButtonBar(replay_panel);
 		replay_bar->AddButton(wxID_ANY, wxT("Start"), wxBitmap(32, 32), wxBitmap(16, 16));
+		wxRibbonPanel *tool_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
+		wxRibbonButtonBar *tool_bar = new wxRibbonButtonBar(tool_panel);
+		tool_bar->AddButton(wxID_ANY, wxT("Screenshot"), wxBitmap(32, 32), wxBitmap(16, 16));
 		m_ribbon->Realize();
 		int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
 		wxDuelCanvas* glcanvas = new wxDuelCanvas(this, wxID_ANY, wx_gl_attribs);
