@@ -41,7 +41,7 @@ function c80513550.hspcon(e,c)
 		and Duel.IsExistingMatchingCard(c80513550.hspfilter,c:GetControler(),LOCATION_SZONE,0,3,nil)
 end
 function c80513550.hdcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler()==Duel.GetAttacker()
+	return ep~=tp and e:GetHandler()==Duel.GetAttacker()
 end
 function c80513550.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

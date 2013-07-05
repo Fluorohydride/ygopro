@@ -125,7 +125,8 @@ int32 scriptlib::duel_reset_flag_effect(lua_State *L) {
 	effect* peffect;
 	pr = pduel->game_field->effects.aura_effect.equal_range(code);
 	for(; pr.first != pr.second; ) {
-		peffect = pr.first->second;
+		auto rm = pr.first++;
+		peffect = rm->second;
 		if(peffect->code == code)
 			pduel->game_field->remove_effect(peffect);
 	}

@@ -12,7 +12,7 @@ function c41620959.initial_effect(c)
 end
 function c41620959.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,41620959)==0 end
-	Duel.RegisterFlagEffect(tp,41620959,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,41620959,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c41620959.tgfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsAbleToGrave()

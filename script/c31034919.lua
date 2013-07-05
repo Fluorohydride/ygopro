@@ -20,10 +20,7 @@ function c31034919.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function c31034919.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGrave,tp,LOCATION_HAND,0,2,2,nil)
-	if g:GetCount()==2 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
-		Duel.Draw(tp,2,REASON_EFFECT)
-	end
+	if Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)<2 then return end
+	Duel.DiscardHand(tp,nil,2,2,REASON_EFFECT)
+	Duel.Draw(tp,2,REASON_EFFECT)
 end

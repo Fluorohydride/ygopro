@@ -26,7 +26,7 @@ function c12275533.initial_effect(c)
 		local ge3=ge1:Clone()
 		ge3:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
 		Duel.RegisterEffect(ge3,0)
-	end	
+	end
 end
 function c12275533.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
@@ -39,7 +39,7 @@ function c12275533.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFlagEffect(1-tp,12275533)>=3
 end
 function c12275533.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end

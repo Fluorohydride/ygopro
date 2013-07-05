@@ -731,7 +731,7 @@ void field::remove_oath_effect(effect* reason_effect) {
 }
 void field::reset_effect(uint32 id, uint32 reset_type) {
 	int32 result;
-	for (auto it = effects.indexer.begin(); it != effects.indexer.end(); ++it) {
+	for (auto it = effects.indexer.begin(); it != effects.indexer.end();) {
 		auto rm = it++;
 		auto peffect = rm->first;
 		auto pit = rm->second;
