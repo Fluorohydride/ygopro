@@ -24,8 +24,9 @@ namespace ygopro
 	public:
 		ImageMgr();
 		~ImageMgr();
-		ImageInfo* getCardImage(unsigned int id);
 		void loadTextures();
+		ImageInfo* getCardImage(unsigned int id);
+		ImageInfo* reloadCardImage(unsigned int id);
 		inline unsigned int texlen(unsigned int len) {
 			len = len - 1;
 			len = len | (len >> 1);
@@ -36,7 +37,7 @@ namespace ygopro
 			return len + 1;
 		}
 		ImageInfo* load(const std::string& file);
-		ImageInfo* loadCard(const std::string& file, unsigned int index);
+		ImageInfo* loadCard(const std::string& file);
 		void genCardMap();
 
 		unsigned int card_index;
@@ -45,7 +46,7 @@ namespace ygopro
 		ImageInfo* sleeve;
 		ImageInfo* negate;
 		ImageInfo* background;
-		ImageInfo* field;
+		ImageInfo* field_img;
 
 	private:
 		std::unordered_map<unsigned int, ImageInfo*> card_images;

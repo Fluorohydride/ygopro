@@ -12,7 +12,7 @@
 namespace ygopro
 {
 
-	class GameFrame : public wxFrame, public DuelMessage, public ConfigMgr
+	class GameFrame : public wxFrame, public DuelMessage
 	{
 	public:
 		GameFrame(int sx, int sy);
@@ -26,6 +26,7 @@ namespace ygopro
 
 	extern GameFrame* mainFrame;
 	extern Random globalRandom;
+	extern ConfigMgr commonCfg;
 
 }
 

@@ -25,17 +25,16 @@ namespace ygopro
 	}
 
 	void wxDuelCanvas::eventResized(wxSizeEvent& evt) {
+		glViewport(0, 0, evt.GetSize().GetWidth(), evt.GetSize().GetHeight());
 		Refresh();
-		
 	}
 
 	void wxDuelCanvas::eventRender(wxPaintEvent& evt) {
 		if(!IsShown())
 			return;
-
 		wxGLCanvas::SetCurrent(*glcontext);
 		wxPaintDC(this);
-
+		drawScene();
 		SwapBuffers();
 	}
 

@@ -12,6 +12,7 @@ namespace ygopro
 
 	GameFrame* mainFrame = nullptr;
 	Random globalRandom;
+	ConfigMgr commonCfg("config.conf");
 
 	BEGIN_EVENT_TABLE(GameFrame, wxFrame)
 	END_EVENT_TABLE()
@@ -22,12 +23,16 @@ namespace ygopro
 
 		wxRibbonPanel *config_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Config"), wxBitmap(32, 32));
 		wxRibbonButtonBar *config_bar = new wxRibbonButtonBar(config_panel);
-		config_bar->AddButton(wxID_ANY, wxT("Edit Config"), wxBitmap(32, 32), "This is a tooltip\na tooltip");
-		config_bar->AddButton(wxID_ANY, wxT("Edit Show"), wxBitmap(32, 32), wxEmptyString);
+		config_bar->AddButton(wxID_ANY, wxT("Edit Config"), wxBitmap(32, 32));
+		config_bar->AddButton(wxID_ANY, wxT("Edit Show"), wxBitmap(32, 32));
+		config_bar->AddButton(wxID_ANY, wxT("Edit Timing"), wxBitmap(32, 32));
 		wxRibbonPanel *replay_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
 		wxRibbonButtonBar *replay_bar = new wxRibbonButtonBar(replay_panel);
-		replay_bar->AddButton(wxID_ANY, wxT("Start"), wxBitmap(32, 32), wxBitmap(16, 16));
-		wxRibbonPanel *tool_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
+		replay_bar->AddButton(wxID_ANY, wxT("Play"), wxBitmap(32, 32), wxBitmap(16, 16));
+		replay_bar->AddButton(wxID_ANY, wxT("Next Step"), wxBitmap(32, 32), wxBitmap(16, 16));
+		replay_bar->AddButton(wxID_ANY, wxT("Pause"), wxBitmap(32, 32), wxBitmap(16, 16));
+		replay_bar->AddButton(wxID_ANY, wxT("Resume"), wxBitmap(32, 32), wxBitmap(16, 16));
+		wxRibbonPanel *tool_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Tools"), wxBitmap(32, 32));
 		wxRibbonButtonBar *tool_bar = new wxRibbonButtonBar(tool_panel);
 		tool_bar->AddButton(wxID_ANY, wxT("Screenshot"), wxBitmap(32, 32), wxBitmap(16, 16));
 		m_ribbon->Realize();
