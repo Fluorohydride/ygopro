@@ -1,116 +1,152 @@
 #include "image_mgr.h"
+#include <tuple>
 
 namespace ygopro
 {
 
 	ImageMgr imageMgr;
 
-	ImageMgr::ImageMgr(): card_index(0), card_texture(0), unknown_card(nullptr) {
+	ImageMgr::ImageMgr(): texture_all(0), texture_card(0), texture_bg(0), card_index(0) {
 
 	}
 
 	ImageMgr::~ImageMgr() {
-
+		for(auto iter : card_images)
+			delete iter.second;
 	}
 
-	void ImageMgr::loadTextures() {
-		genCardMap();
-		unknown_card = loadCard("./textures/unknown.jpg");
-		sleeve = loadCard("./textures/sleeve.jpg");
-		field_img = load("./textures/sleeve.jpg");
+	void ImageMgr::InitTextures() {
+		glGenTextures(1, &texture_card);
+		glBindTexture(GL_TEXTURE_2D, texture_card);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 	}
 
-	ImageInfo* ImageMgr::getCardImage(unsigned int id) {
-		auto iter = card_images.find(id);
-		if(iter == card_images.end()) {
-			char file[32];
-			sprintf(file, "./image/%d.jpg");
-			return loadCard("file");
+	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
+		auto iter = card_textures.find(id);
+		if(iter == card_textures.end()) {
+			wxString file = wxString::Format("./image/%d.jpg", id);
+			TextureInfo& ti = card_textures[id];
+			if(!wxFileExists(file)) {
+				ti = card_unknown;
+				return ti;
+			} else {
+				wxImage* img = new wxImage;
+				img->LoadFile(file);
+				ti = LoadCard(*img);
+				card_images[id] = img;
+				return ti;
+			}
 		}
 		return iter->second;
 	}
 
-	ImageInfo* ImageMgr::reloadCardImage(unsigned int id) {
-		auto iter = card_images.find(id);
-		if(iter == card_images.end())
-			return nullptr;
-		ImageInfo* ii = iter->second;
-		char file[32];
-		sprintf(file, "./image/%d.jpg");
-		if(card_index >= 256 || !wxFileExists(file)) {
-			ii->lx = unknown_card->lx;
-			ii->ly = unknown_card->ly;
-			ii->rx = unknown_card->rx;
-			ii->ry = unknown_card->ry;
-			return ii;
+	TextureInfo& ImageMgr::ReloadCardTexture(unsigned int id) {
+		wxString file = wxString::Format("./image/%d.jpg", id);
+		TextureInfo& ti = card_textures[id];
+		if(!wxFileExists(file)) {
+			ti = card_unknown;
+			return ti;
+		} else {
+			if(card_images.find(id) == card_images.end()) {
+				wxImage* img = new wxImage;
+				img->LoadFile(file);
+				ti = LoadCard(*img);
+				card_images[id] = img;
+			} else {
+				wxImage* img = card_images[id];
+				img->LoadFile(file);
+				ti = LoadCard(*img);
+			}
 		}
-		ii->texture_id = 0;
-		ii->image.LoadFile(file);
-		ii->imagex = ii->image.GetWidth();
-		ii->imagey = ii->image.GetHeight();
-		unsigned int indexx = (card_index % 16);
-		unsigned int indexy = card_index / 16;
-		glTexSubImage2D(GL_TEXTURE_2D, 0, indexx * 256, indexy * 256, ii->imagex, ii->imagey, GL_RGB, GL_UNSIGNED_BYTE, ii->image.GetData());
-		ii->lx = 1.0f / 16.0f * indexx;
-		ii->ly = 1.0f / 16.0f * indexy;
-		ii->rx = ii->lx + ii->imagex / 256.0f;
-		ii->ry = ii->ly + ii->imagey / 256.0f;
-		card_index++;
-		return ii;
+		return ti;
 	}
 
-	ImageInfo* ImageMgr::load(const std::string& file) {
-		if(!wxFileExists(file))
-			return nullptr;
-		ImageInfo* ii = new ImageInfo;
-		ii->image.LoadFile(file);
-		ii->imagex = ii->image.GetWidth();
-		ii->imagey = ii->image.GetHeight();
-		glGenTextures(1, &ii->texture_id);
-		texture_loaded.push_back(ii->texture_id);
-		glBindTexture(GL_TEXTURE_2D, ii->texture_id);
+	unsigned int ImageMgr::LoadTexture(const wxImage& img) {
+		unsigned int tid;
+		glGenTextures(1, &tid);
+		glBindTexture(GL_TEXTURE_2D, tid);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		unsigned int tx = texlen(ii->imagex);
-		unsigned int ty = texlen(ii->imagey);
-		glTexImage2D(GL_TEXTURE_2D, 0, ii->image.HasAlpha() ? GL_RGBA : GL_RGB, tx, ty, 0, ii->image.HasAlpha() ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, nullptr);
-		glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, ii->imagex, ii->imagey, ii->image.HasAlpha() ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, ii->image.GetData());
-		ii->rx = (float)ii->imagex / tx;
-		ii->ry = (float)ii->imagey / ty;
-		return ii;
-	}
-
-	ImageInfo* ImageMgr::loadCard(const std::string& file) {
-		ImageInfo* ii = new ImageInfo;
-		if(card_index >= 256 || !wxFileExists(file)) {
-			ii->lx = unknown_card->lx;
-			ii->ly = unknown_card->ly;
-			ii->rx = unknown_card->rx;
-			ii->ry = unknown_card->ry;
-			return ii;
+		unsigned int tx = texlen(img.GetWidth());
+		unsigned int ty = texlen(img.GetHeight());
+		unsigned char* px = new unsigned char[tx * ty * 4];
+		unsigned char* pxdata = img.GetData();
+		unsigned char* apdata = img.GetAlpha();
+		memset(px, 0, sizeof(unsigned char) * tx * ty * 4);
+		for(unsigned int y = 0; y < tx; ++y) {
+			for(unsigned int x = 0; x < tx; ++x) {
+				px[(x + y * tx) * 4 + 0] = pxdata[(x + y * tx) * 3 + 0];
+				px[(x + y * tx) * 4 + 1] = pxdata[(x + y * tx) * 3 + 1];
+				px[(x + y * tx) * 4 + 2] = pxdata[(x + y * tx) * 3 + 2];
+				if(apdata)
+					px[(x + y * tx) * 4 + 3] = apdata[(x + y * tx) * 3];
+			}
 		}
-		ii->texture_id = 0;
-		ii->image.LoadFile(file);
-		ii->imagex = ii->image.GetWidth();
-		ii->imagey = ii->image.GetHeight();
-		unsigned int indexx = (card_index % 16);
-		unsigned int indexy = card_index / 16;
-		glTexSubImage2D(GL_TEXTURE_2D, 0, indexx * 256, indexy * 256, ii->imagex, ii->imagey, GL_RGB, GL_UNSIGNED_BYTE, ii->image.GetData());
-		ii->lx = 1.0f / 16.0f * indexx;
-		ii->ly = 1.0f / 16.0f * indexy;
-		ii->rx = ii->lx + ii->imagex / 4096.0f;
-		ii->ry = ii->ly + ii->imagey / 4096.0f;
-		card_index++;
-		return ii;
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tx, ty, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
+		delete px;
+		return tid;
 	}
 
-	void ImageMgr::genCardMap() {
-		glGenTextures(1, &card_texture);
-		texture_loaded.push_back(card_texture);
-		glBindTexture(GL_TEXTURE_2D, card_texture);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 4096, 4096, 0, GL_RGB, GL_UNSIGNED_BYTE, nullptr);
+	TextureInfo ImageMgr::LoadCard(const wxImage& img) {
+		if(card_index >= 256)
+			return card_unknown;
+		TextureInfo ti;
+		unsigned int indexx = (card_index % 23);
+		unsigned int indexy = card_index / 23;
+		unsigned int imagex = img.GetWidth();
+		unsigned int imagey = img.GetHeight();
+		unsigned char * pxdata = img.GetData();
+		unsigned char * px = new unsigned char[imagex * imagey * 4];
+		memset(px, 0, sizeof(unsigned char) * imagex * imagey * 4);
+		for(unsigned int y = 0; y < imagey; y++) {
+			for(unsigned int x = 0; x < imagex; ++x) {
+				px[(x + y * imagex) * 4 + 0] = pxdata[(x + y * imagex) * 3 + 0];
+				px[(x + y * imagex) * 4 + 1] = pxdata[(x + y * imagex) * 3 + 1];
+				px[(x + y * imagex) * 4 + 2] = pxdata[(x + y * imagex) * 3 + 2];
+			}
+		}
+		glTexSubImage2D(GL_TEXTURE_2D, 0, indexx * 178, indexy * 256, imagex, imagey, GL_RGBA, GL_UNSIGNED_BYTE, px);
+		delete[] px;
+		ti.lx = 178.0f / 4096.0f * indexx;
+		ti.ly = 1.0f / 16.0f * indexy;
+		ti.rx = ti.lx + imagex / 4096.0f;
+		ti.ry = ti.ly + imagey / 2048.0f;
+		card_index++;
+		return ti;
+	}
+
+	void ImageMgr::LoadConfig(const wxString& name) {
+		wxXmlDocument doc;
+		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
+			return;
+		wxXmlNode* root = doc.GetRoot();
+		wxString texture_file = root->GetAttribute("all");
+		if(wxFileExists(texture_file))
+			image_texture.LoadFile(texture_file);
+		wxXmlNode* child = root->GetChildren();
+		std::unordered_map<std::string, std::tuple<long, long, long, long>> infos;
+		while (child) {
+			if (child->GetName() == wxT("texture")) {
+				std::string name = child->GetAttribute("name").ToStdString();
+				wxString sx = child->GetAttribute("x");
+				wxString sy = child->GetAttribute("y");
+				wxString sw = child->GetAttribute("w");
+				wxString sh = child->GetAttribute("h");
+				long x, y, w, h;
+				sx.ToLong(&x);
+				sy.ToLong(&y);
+				sw.ToLong(&w);
+				sh.ToLong(&h);
+				infos[name] = std::make_tuple(x, y, w, h);
+			}
+			child = child->GetNext();
+		}
+	}
+
+	void ImageMgr::SaveConfig(const wxString& name) {
+	
 	}
 
 }

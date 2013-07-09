@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Common>
+  <setting name="test" value="hello world" type="string"/>
+</Common>

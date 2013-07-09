@@ -3,30 +3,25 @@
 
 #include "GL/glew.h"
 #include "wx/image.h"
+#include "xml_config.h"
 #include <vector>
 #include <unordered_map>
 
 namespace ygopro
 {
-	struct ImageInfo {
-		wxImage image;
-		unsigned int texture_id;
-		unsigned int imagex;
-		unsigned int imagey;
+	struct TextureInfo {
 		float lx;
 		float ly;
 		float rx;
 		float ry;
 	};
 
-	class ImageMgr {
+	class ImageMgr : XMLConfig {
 
 	public:
 		ImageMgr();
 		~ImageMgr();
-		void loadTextures();
-		ImageInfo* getCardImage(unsigned int id);
-		ImageInfo* reloadCardImage(unsigned int id);
+
 		inline unsigned int texlen(unsigned int len) {
 			len = len - 1;
 			len = len | (len >> 1);
@@ -36,21 +31,34 @@ namespace ygopro
 			len = len | (len >> 16);
 			return len + 1;
 		}
-		ImageInfo* load(const std::string& file);
-		ImageInfo* loadCard(const std::string& file);
-		void genCardMap();
+
+		void InitTextures();
+		TextureInfo& GetCardTexture(unsigned int id);
+		TextureInfo& ReloadCardTexture(unsigned int id);
+		unsigned int LoadTexture(const wxImage& img);
+		TextureInfo LoadCard(const wxImage& img);
+
+		virtual void LoadConfig(const wxString& name);
+		virtual void SaveConfig(const wxString& name);
+
+		wxImage image_texture;
+		wxImage image_unknown;
+		wxImage image_sleeve;
+		wxImage image_bg;
+		unsigned int texture_all;
+		unsigned int texture_card;
+		unsigned int texture_bg;
 
 		unsigned int card_index;
-		unsigned int card_texture;
-		ImageInfo* unknown_card;
-		ImageInfo* sleeve;
-		ImageInfo* negate;
-		ImageInfo* background;
-		ImageInfo* field_img;
+
+		TextureInfo card_unknown;
+		TextureInfo card_sleeve;
+		TextureInfo txtrure_negate;
+		TextureInfo texture_field;
 
 	private:
-		std::unordered_map<unsigned int, ImageInfo*> card_images;
-		std::vector<unsigned int> texture_loaded;
+		std::unordered_map<unsigned int, TextureInfo> card_textures;
+		std::unordered_map<unsigned int, wxImage*> card_images;
 	};
 
 	extern ImageMgr imageMgr;

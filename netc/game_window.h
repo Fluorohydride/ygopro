@@ -2,11 +2,11 @@
 #define _GAME_WINDOW_H_
 
 #include "../common/common.h"
-#include "config_mgr.h"
 #include "wx/frame.h"
 #include <vector>
 #include <queue>
 
+#include "xml_config.h"
 #include "duel_message.h"
 
 namespace ygopro
@@ -26,7 +26,7 @@ namespace ygopro
 
 	extern GameFrame* mainFrame;
 	extern Random globalRandom;
-	extern ConfigMgr commonCfg;
+	extern CommonConfig commonCfg;
 
 }
 
