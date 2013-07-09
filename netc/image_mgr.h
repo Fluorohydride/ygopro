@@ -37,13 +37,16 @@ namespace ygopro
 		TextureInfo& ReloadCardTexture(unsigned int id);
 		unsigned int LoadTexture(const wxImage& img);
 		TextureInfo LoadCard(const wxImage& img);
-
-		virtual void LoadConfig(const wxString& name);
-		virtual void SaveConfig(const wxString& name);
+		
+		void LoadSleeve(const wxString& file);
+		void LoadBackground(const wxString& file);
+		virtual void LoadConfig(const wxString& file);
+		virtual void SaveConfig(const wxString& file);
 
 		wxImage image_texture;
 		wxImage image_unknown;
-		wxImage image_sleeve;
+		wxImage image_sleeve1;
+		wxImage image_sleeve2;
 		wxImage image_bg;
 		unsigned int texture_all;
 		unsigned int texture_card;

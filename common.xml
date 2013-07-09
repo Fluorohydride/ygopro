@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
-  <setting name="test" value="hello world" type="string"/>
+  <setting name="default_unknown" value="./textures/unknown.jpg" type="string"/>
+  <setting name="default_sleeve" value="./textures/sleeve.jpg" type="string"/>
+  <setting name="default_bg" value="./textures/bg.jpg" type="string"/>
 </Common>

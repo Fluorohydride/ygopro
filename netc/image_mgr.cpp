@@ -90,7 +90,7 @@ namespace ygopro
 	}
 
 	TextureInfo ImageMgr::LoadCard(const wxImage& img) {
-		if(card_index >= 256)
+		if(card_index >= 184)
 			return card_unknown;
 		TextureInfo ti;
 		unsigned int indexx = (card_index % 23);
@@ -117,14 +117,32 @@ namespace ygopro
 		return ti;
 	}
 
+	void ImageMgr::LoadSleeve(const wxString& file) {
+
+	}
+
+	void ImageMgr::LoadBackground(const wxString& file) {
+	}
+
 	void ImageMgr::LoadConfig(const wxString& name) {
 		wxXmlDocument doc;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return;
 		wxXmlNode* root = doc.GetRoot();
 		wxString texture_file = root->GetAttribute("all");
+		wxString sleeve_file = root->GetAttribute("sleeve");
+		wxString unknown_file = root->GetAttribute("unknown");
+		wxString bg_file = root->GetAttribute("background");
 		if(wxFileExists(texture_file))
 			image_texture.LoadFile(texture_file);
+		if(wxFileExists(sleeve_file)) {
+			image_sleeve1.LoadFile(texture_file);
+			image_sleeve2.LoadFile(texture_file);
+		}
+		if(wxFileExists(unknown_file))
+			image_unknown.LoadFile(unknown_file);
+		if(wxFileExists(bg_file))
+			image_bg.LoadFile(bg_file);
 		wxXmlNode* child = root->GetChildren();
 		std::unordered_map<std::string, std::tuple<long, long, long, long>> infos;
 		while (child) {

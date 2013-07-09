@@ -4657,7 +4657,6 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 3: {
 		//trap monster
-		card* pcard;
 		uint8 tp = infos.turn_player;
 		for(uint8 p = 0; p < 2; ++p) {
 			for(auto& pcard : player[tp].list_mzone) {
@@ -4676,7 +4675,6 @@ int32 field::adjust_step(uint16 step) {
 	}
 	case 4: {
 		//1-4 control
-		card* pcard;
 		uint8 cur, ref;
 		core.control_adjust_set[0].clear();
 		core.control_adjust_set[1].clear();
@@ -4748,7 +4746,6 @@ int32 field::adjust_step(uint16 step) {
 			core.re_adjust = TRUE;
 		//equip check
 		uint8 tp = infos.turn_player;
-		card* pcard;
 		core.destroy_set.clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(auto& pcard : player[tp].list_szone) {
@@ -4766,7 +4763,6 @@ int32 field::adjust_step(uint16 step) {
 	case 10: {
 		//position
 		uint32 tp = infos.turn_player, pos;
-		card* pcard;
 		card_set pos_adjust;
 		effect_set eset;
 		for(uint8 p = 0; p < 2; ++p) {

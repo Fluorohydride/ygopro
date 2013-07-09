@@ -34,7 +34,7 @@ namespace ygopro {
 						player->connection = this;
 						player->last_login_ip = address;
 						player->last_login_time = time(0);
-						player->SetField("last_login_ip", player->last_login_ip, "last_login_time", player->last_login_time);
+						player->DBSetField("last_login_ip", player->last_login_ip, "last_login_time", player->last_login_time);
 						player->Login();
 					}
 					break;

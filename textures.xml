@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Texture all="./textures/textures.png">
+<Texture all="./textures/textures.png" sleeve="./textures/sleeve.jpg" unknown="./textures/unknown.jpg" background="./textures/bg.jpg">
   <texture name="field" x="0" y="0" w="512" h="512"/>
   <texture name="number" x="512" y="0" w="320" h="250"/>
   <texture name="activate" x="896" y="0" w="128" h="128"/>

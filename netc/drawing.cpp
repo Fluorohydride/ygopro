@@ -26,13 +26,13 @@ namespace ygopro
 		GLfloat b[] = {0.0, 0.0, 1.0, 1.0};
 		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
-//  	glBindTexture(GL_TEXTURE_2D, imageMgr.card_texture);
-// 		glBegin(GL_QUADS);
-// 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.sleeve->lx, imageMgr.sleeve->ly);glVertex3f(0.0f, 0.0f, 0.0f);
-// 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.sleeve->lx, imageMgr.sleeve->ry);glVertex3f(0.0f, 1.0f, 0.0f);
-// 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.sleeve->rx, imageMgr.sleeve->ry);glVertex3f(1.0f, 1.0f, 0.0f);
-// 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.sleeve->rx, imageMgr.sleeve->ly);glVertex3f(1.0f, 0.0f, 0.0f);
-// 		glEnd();
+		glBindTexture(GL_TEXTURE_2D, imageMgr.texture_card);
+ 		glBegin(GL_QUADS);
+			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.card_sleeve.lx, imageMgr.card_sleeve.ly);glVertex3f(0.0f, 0.0f, 0.0f);
+ 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.card_sleeve.lx, imageMgr.card_sleeve.ry);glVertex3f(0.0f, 1.0f, 0.0f);
+ 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.card_sleeve.rx, imageMgr.card_sleeve.ry);glVertex3f(1.0f, 1.0f, 0.0f);
+ 			glNormal3f(0.0f, 1.0f, 0.0f);glTexCoord2f(imageMgr.card_sleeve.rx, imageMgr.card_sleeve.ly);glVertex3f(1.0f, 0.0f, 0.0f);
+ 		glEnd();
 		glFlush();
 	}
 

@@ -1,6 +1,7 @@
 #include "../common/common.h"
 #include "../common/hash.h"
 #include "game_window.h"
+#include "image_mgr.h"
 #include "wx/app.h"
 #include "wx/image.h"
 
@@ -13,6 +14,8 @@ namespace ygopro {
 				return false;
 
 			wxInitAllImageHandlers();
+			commonCfg.LoadConfig("common.xml");
+			imageMgr.LoadConfig("textures.xml");
 
 			mainFrame = new GameFrame(960, 720);
 			mainFrame->Show();

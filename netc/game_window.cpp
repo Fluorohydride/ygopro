@@ -42,12 +42,10 @@ namespace ygopro
 		s->Add(m_ribbon, 0, wxEXPAND);
 		s->Add(glcanvas, 1, wxEXPAND);
 		SetSizer(s);
-		
-		commonCfg.LoadConfig("common.xml");
 	}
 
 	GameFrame::~GameFrame() {
-		commonCfg.SaveConfig("common.xml");
+
 	}
 
 	void GameFrame::HandleMessage(unsigned int msg, unsigned int size, void* data) {

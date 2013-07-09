@@ -175,11 +175,32 @@ namespace ygopro
 			}
 			return *this;
 		}
-		void foreach(void (f)(const char*, int)) {
+		inline void foreach(void (f)(const char*, const int)) {
 			bson_iterator iter[1];
 			bson_iterator_init(iter, data);
 			while(bson_iterator_next(iter)) {
 				f(bson_iterator_key(iter), bson_iterator_int(iter));
+			}
+		}
+		inline void foreach(void (f)(const char*, const long)) {
+			bson_iterator iter[1];
+			bson_iterator_init(iter, data);
+			while(bson_iterator_next(iter)) {
+				f(bson_iterator_key(iter), bson_iterator_long(iter));
+			}
+		}
+		inline void foreach(void (f)(const char*, const float)) {
+			bson_iterator iter[1];
+			bson_iterator_init(iter, data);
+			while(bson_iterator_next(iter)) {
+				f(bson_iterator_key(iter), bson_iterator_double(iter));
+			}
+		}
+		inline void foreach(void (f)(const char*, const char*)) {
+			bson_iterator iter[1];
+			bson_iterator_init(iter, data);
+			while(bson_iterator_next(iter)) {
+				f(bson_iterator_key(iter), bson_iterator_string(iter));
 			}
 		}
 
