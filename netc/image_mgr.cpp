@@ -6,7 +6,7 @@ namespace ygopro
 
 	ImageMgr imageMgr;
 
-	ImageMgr::ImageMgr(): texture_all(0), texture_card(0), texture_bg(0), card_index(0) {
+	ImageMgr::ImageMgr(): textureid_all(0), textureid_card(0), textureid_bg(0), card_index(0) {
 
 	}
 
@@ -16,11 +16,21 @@ namespace ygopro
 	}
 
 	void ImageMgr::InitTextures() {
-		glGenTextures(1, &texture_card);
-		glBindTexture(GL_TEXTURE_2D, texture_card);
+		glGenTextures(1, &textureid_card);
+		glBindTexture(GL_TEXTURE_2D, textureid_card);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
+		if(image_unknown.IsOk())
+			card_unknown = LoadCard(image_unknown);
+		if(image_sleeve1.IsOk())
+			card_sleeve1 = LoadCard(image_sleeve1);
+		if(image_sleeve2.IsOk())
+			card_sleeve2 = LoadCard(image_sleeve2);
+		if(image_texture.IsOk())
+			textureid_all = LoadTexture(image_texture);
+		if(image_bg.IsOk())
+			textureid_bg = LoadTexture(image_bg);
 	}
 
 	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
@@ -69,19 +79,21 @@ namespace ygopro
 		glBindTexture(GL_TEXTURE_2D, tid);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		unsigned int imagex = img.GetWidth();
+		unsigned int imagey = img.GetHeight();
 		unsigned int tx = texlen(img.GetWidth());
 		unsigned int ty = texlen(img.GetHeight());
 		unsigned char* px = new unsigned char[tx * ty * 4];
 		unsigned char* pxdata = img.GetData();
-		unsigned char* apdata = img.GetAlpha();
+		unsigned char* apdata = img.GetAlpha();	
 		memset(px, 0, sizeof(unsigned char) * tx * ty * 4);
-		for(unsigned int y = 0; y < tx; ++y) {
-			for(unsigned int x = 0; x < tx; ++x) {
-				px[(x + y * tx) * 4 + 0] = pxdata[(x + y * tx) * 3 + 0];
-				px[(x + y * tx) * 4 + 1] = pxdata[(x + y * tx) * 3 + 1];
-				px[(x + y * tx) * 4 + 2] = pxdata[(x + y * tx) * 3 + 2];
+		for(unsigned int y = 0; y < imagey; ++y) {
+			for(unsigned int x = 0; x < imagex; ++x) {
+				px[(x + y * tx) * 4 + 0] = pxdata[(x + y * imagex) * 3 + 0];
+				px[(x + y * tx) * 4 + 1] = pxdata[(x + y * imagex) * 3 + 1];
+				px[(x + y * tx) * 4 + 2] = pxdata[(x + y * imagex) * 3 + 2];
 				if(apdata)
-					px[(x + y * tx) * 4 + 3] = apdata[(x + y * tx) * 3];
+					px[(x + y * tx) * 4 + 3] = apdata[x + y * imagex];
 			}
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tx, ty, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
@@ -117,11 +129,10 @@ namespace ygopro
 		return ti;
 	}
 
-	void ImageMgr::LoadSleeve(const wxString& file) {
-
-	}
-
-	void ImageMgr::LoadBackground(const wxString& file) {
+	void ImageMgr::LoadSingleImage(wxImage& img, const wxString& file) {
+		if(!wxFileExists(file))
+			return;
+		img.LoadFile(file);
 	}
 
 	void ImageMgr::LoadConfig(const wxString& name) {
@@ -136,13 +147,18 @@ namespace ygopro
 		if(wxFileExists(texture_file))
 			image_texture.LoadFile(texture_file);
 		if(wxFileExists(sleeve_file)) {
-			image_sleeve1.LoadFile(texture_file);
-			image_sleeve2.LoadFile(texture_file);
+			image_sleeve1.LoadFile(sleeve_file);
+			image_sleeve2.LoadFile(sleeve_file);
 		}
 		if(wxFileExists(unknown_file))
 			image_unknown.LoadFile(unknown_file);
-		if(wxFileExists(bg_file))
+		if(wxFileExists(bg_file)) {
 			image_bg.LoadFile(bg_file);
+			background.lx = 0;
+			background.ly = 0;
+			background.rx = (float)image_bg.GetWidth() / texlen(image_bg.GetWidth());
+			background.ry = (float)image_bg.GetHeight() / texlen(image_bg.GetHeight());
+		}
 		wxXmlNode* child = root->GetChildren();
 		std::unordered_map<std::string, std::tuple<long, long, long, long>> infos;
 		while (child) {
@@ -161,6 +177,35 @@ namespace ygopro
 			}
 			child = child->GetNext();
 		}
+		float all_width = texlen(image_texture.GetWidth());
+		float all_height = texlen(image_texture.GetHeight());
+		
+#define MAP_TEXTURE_INFO(a,b) {\
+			std::tuple<long, long, long, long>& element = infos[b];\
+			a.lx = std::get<0>(element) / all_width;\
+			a.ly = std::get<1>(element) / all_width;\
+			a.rx = a.lx + std::get<2>(element) / all_width;\
+			a.ry = a.ly + std::get<3>(element) / all_height;\
+		}
+
+		MAP_TEXTURE_INFO(texture_field, "field")
+		MAP_TEXTURE_INFO(texture_number, "number")
+		MAP_TEXTURE_INFO(texture_activate, "activate")
+		MAP_TEXTURE_INFO(texture_chain, "chain")
+		MAP_TEXTURE_INFO(texture_mask, "mask")
+		MAP_TEXTURE_INFO(texture_negated, "negated")
+		MAP_TEXTURE_INFO(texture_limit0, "limit0")
+		MAP_TEXTURE_INFO(texture_limit1, "limit1")
+		MAP_TEXTURE_INFO(texture_limit2, "limit2")
+		MAP_TEXTURE_INFO(texture_lpframe, "lpframe")
+		MAP_TEXTURE_INFO(texture_lpbar, "lpbar")
+		MAP_TEXTURE_INFO(texture_equip, "equip")
+		MAP_TEXTURE_INFO(texture_target, "target")
+		MAP_TEXTURE_INFO(texture_scissors, "scissors")
+		MAP_TEXTURE_INFO(texture_rock, "rock")
+		MAP_TEXTURE_INFO(texture_paper, "paper")
+#undef MAP_TEXTURE_INFO
+
 	}
 
 	void ImageMgr::SaveConfig(const wxString& name) {

@@ -7,7 +7,6 @@
   <texture name="mask" x="512" y="256" w="254" h="254"/>
   <texture name="negated" x="768" y="256" w="128" h="128"/>
   <texture name="attack" x="896" y="256" w="128" h="128"/>
-  <texture name="attack" x="896" y="256" w="128" h="128"/>
   <texture name="limit0" x="768" y="384" w="64" h="64"/>
   <texture name="limit1" x="832" y="384" w="64" h="64"/>
   <texture name="limit2" x="896" y="384" w="64" h="64"/>
