@@ -55,6 +55,24 @@ namespace ygopro
 			glNormal3f(0.0f, 0.0f, 1.0f);glTexCoord2f(imageMgr.texture_field.lx, imageMgr.texture_field.ry);glVertex3f(0.0f, 4.0f, 0.0f);
 		}
 		glEnd();
+
+		// other 2d stuff
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glDisable(GL_DEPTH_TEST);
+		glDisable(GL_LIGHTING);
+		float avawidth = 256.0f / glwidth;
+		float avaheight = 256.0f / glheight;
+		glBegin(GL_QUADS);
+		{
+			glTexCoord2f(imageMgr.texture_attack.lx, imageMgr.texture_attack.ly);glVertex2f(-1.0f, 1.0f);
+			glTexCoord2f(imageMgr.texture_attack.rx, imageMgr.texture_attack.ly);glVertex2f(-1.0f + avawidth, 1.0f);
+			glTexCoord2f(imageMgr.texture_attack.rx, imageMgr.texture_attack.ry);glVertex2f(-1.0f + avawidth, 1.0f - avaheight);
+			glTexCoord2f(imageMgr.texture_attack.lx, imageMgr.texture_attack.ry);glVertex2f(-1.0f, 1.0f - avaheight);
+		}
+		glEnd();
 		glFlush();
 	}
 

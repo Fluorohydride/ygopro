@@ -183,13 +183,14 @@ namespace ygopro
 #define MAP_TEXTURE_INFO(a,b) {\
 			std::tuple<long, long, long, long>& element = infos[b];\
 			a.lx = std::get<0>(element) / all_width;\
-			a.ly = std::get<1>(element) / all_width;\
+			a.ly = std::get<1>(element) / all_height;\
 			a.rx = a.lx + std::get<2>(element) / all_width;\
 			a.ry = a.ly + std::get<3>(element) / all_height;\
 		}
 
 		MAP_TEXTURE_INFO(texture_field, "field")
 		MAP_TEXTURE_INFO(texture_number, "number")
+		MAP_TEXTURE_INFO(texture_attack, "attack")
 		MAP_TEXTURE_INFO(texture_activate, "activate")
 		MAP_TEXTURE_INFO(texture_chain, "chain")
 		MAP_TEXTURE_INFO(texture_mask, "mask")

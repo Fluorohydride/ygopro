@@ -25,7 +25,9 @@ namespace ygopro
 	}
 
 	void wxDuelCanvas::eventResized(wxSizeEvent& evt) {
-		glViewport(0, 0, evt.GetSize().GetWidth(), evt.GetSize().GetHeight());
+		glwidth = evt.GetSize().GetWidth();
+		glheight = evt.GetSize().GetHeight();
+		glViewport(0, 0, glwidth, glheight);
 		Refresh();
 	}
 

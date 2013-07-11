@@ -11,6 +11,8 @@ namespace ygopro
 
 	private:
 		wxGLContext* glcontext;
+		unsigned int glwidth;
+		unsigned int glheight;
 
 	public:
 		wxDuelCanvas(wxFrame* parent, int id, int* args);

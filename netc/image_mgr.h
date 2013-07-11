@@ -60,6 +60,7 @@ namespace ygopro
 		TextureInfo card_sleeve2;
 		TextureInfo texture_field;
 		TextureInfo texture_number;
+		TextureInfo texture_attack;
 		TextureInfo texture_activate;
 		TextureInfo texture_chain;
 		TextureInfo texture_mask;
