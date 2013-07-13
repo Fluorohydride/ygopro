@@ -54,7 +54,7 @@ function c74530899.initial_effect(c)
 	e7:SetCondition(c74530899.tdcon)
 	e7:SetTarget(c74530899.tdtg)
 	e7:SetOperation(c74530899.tdop)
-	Duel.RegisterEffect(e7,0)
+	c:RegisterEffect(e7)
 end
 function c74530899.ntcon(e,c)
 	if c==nil then return true end
