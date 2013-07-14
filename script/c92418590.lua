@@ -19,7 +19,7 @@ function c92418590.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c92418590.cfilter(c)
-	return c:IsSetCard(0x83) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x83) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
 end
 function c92418590.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,92418590)==0

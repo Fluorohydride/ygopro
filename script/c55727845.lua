@@ -41,7 +41,7 @@ function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetValue(atk)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetReset(RESET_EVENT+0x1ff0000)
 		c:RegisterEffect(e2)
 	end
 end
