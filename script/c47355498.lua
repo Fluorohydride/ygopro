@@ -79,6 +79,9 @@ function c47355498.discheck(ev,category,re,im0,im1,targets)
 	local ex,tg,ct,p,v=Duel.GetOperationInfo(ev,category)
 	if not ex then return false end
 	if tg and tg:GetCount()>0 then
+		if targets:GetCount()==1 then
+			return targets:GetFirst()~=re:GetHandler()
+		end
 		if targets then
 			return tg:IsExists(c47355498.disfilter1,1,nil,im0,im1,targets)
 		else
