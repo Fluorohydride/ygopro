@@ -42,13 +42,12 @@ function c18114794.checkop(e,tp,eg,ep,ev,re,r,rp)
 		c18114794[2]=Duel.GetTurnCount()
 	end
 	local tc=eg:GetFirst()
-	while tc do
+	if tc then
 		local sp=tc:GetSummonPlayer()
 		c18114794[sp]=c18114794[sp]+1
 		if c18114794[sp]==3 and sp==turnp then
 			Duel.RaiseEvent(e:GetHandler(),18114794,e,0,0,0,0)
 		end
-		tc=eg:GetNext()
 	end
 end
 function c18114794.condition(e,tp,eg,ep,ev,re,r,rp)
