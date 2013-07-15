@@ -176,6 +176,62 @@ int32 scriptlib::card_get_text_defence(lua_State *L) {
 	lua_pushinteger(L, pcard->data.defence);
 	return 1;
 }
+int32 scriptlib:: card_get_previous_code_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.code);
+	return 1;
+}
+int32 scriptlib::card_get_previous_type_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.type);
+	return 1;
+}
+int32 scriptlib::card_get_previous_level_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.level);
+	return 1;
+}
+int32 scriptlib::card_get_previous_rank_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.rank);
+	return 1;
+}
+int32 scriptlib::card_get_previous_attribute_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.attribute);
+	return 1;
+}
+int32 scriptlib::card_get_previous_race_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.race);
+	return 1;
+}
+int32 scriptlib::card_get_previous_attack_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.attack);
+	return 1;
+}
+int32 scriptlib::card_get_previous_defence_onfield(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->previous.defence);
+	return 1;
+}
 int32 scriptlib::card_get_owner(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
@@ -1906,4 +1962,22 @@ int32 scriptlib::card_check_unique_onfield(lua_State *L) {
 	uint32 check_player = lua_tointeger(L, 2);
 	lua_pushboolean(L, pcard->pduel->game_field->check_unique_onfield(pcard, check_player) ? 0 : 1);
 	return 1;
+}
+int32 scriptlib::card_reset_negate_effect(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	int32 count = lua_gettop(L) - 1;
+	for(int32 i = 0; i < count; ++i)
+		pcard->reset(lua_tointeger(L, i + 2), RESET_CARD);
+	return 0;
+}
+int32 scriptlib::card_assume_prop(lua_State *L) {
+	check_param_count(L, 3);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	pcard->assume_type = lua_tointeger(L, 2);
+	pcard->assume_value = lua_tointeger(L, 3);
+	pcard->pduel->assumes.insert(pcard);
+	return 0;
 }

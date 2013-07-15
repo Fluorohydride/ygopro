@@ -427,7 +427,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = mzone[command_controler][command_sequence];
-					for(int32 i = 0; i < pcard->overlayed.size(); ++i)
+					for(int32 i = 0; i < (int32)pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);
@@ -861,7 +861,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_MZONE: {
 					ClientCard* pcard = deck[hovered_controler][hovered_sequence];
-					for(int32 i = 0; i < pcard->overlayed.size(); ++i)
+					for(int32 i = 0; i < (int32)pcard->overlayed.size(); ++i)
 						selectable_cards.push_back(pcard->overlayed[i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1007), pcard->overlayed.size());
 					mainGame->wCardSelect->setText(formatBuffer);

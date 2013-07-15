@@ -34,6 +34,7 @@ struct card_state {
 	uint32 code;
 	uint32 type;
 	uint32 level;
+	uint32 rank;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -102,6 +103,8 @@ public:
 	uint8 unique_pos[2];
 	uint16 unique_uid;
 	uint32 unique_code;
+	uint8 assume_type;
+	uint32 assume_value;
 	effect* unique_effect;
 	card* equiping_target;
 	card* pre_equip_target;
@@ -404,4 +407,12 @@ public:
 #define QUERY_IS_DISABLED	0x80000
 #define QUERY_IS_PUBLIC		0x100000
 
+#define ASSUME_CODE			1
+#define ASSUME_TYPE			2
+#define ASSUME_LEVEL		3
+#define ASSUME_RANK			4
+#define ASSUME_ATTRIBUTE	5
+#define ASSUME_RACE			6
+#define ASSUME_ATTACK		7
+#define ASSUME_DEFENCE		8
 #endif /* CARD_H_ */

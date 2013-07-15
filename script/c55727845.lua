@@ -37,11 +37,11 @@ function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetValue(atk)
-		e2:SetReset(RESET_EVENT+0x1ff0000)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
 	end
 end

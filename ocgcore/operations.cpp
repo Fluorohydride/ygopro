@@ -2652,6 +2652,29 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				raise_single_event(pcard, 0, EVENT_LEAVE_FIELD_P, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 				leave_p.insert(pcard);
 			}
+			if((pcard->current.location & LOCATION_ONFIELD)) {
+				if(pcard->current.position & POS_FACEUP) {
+					pcard->previous.code = pcard->get_code();
+					pcard->previous.type = pcard->get_type();
+					if(pcard->current.location & LOCATION_MZONE) {
+						pcard->previous.level = pcard->get_level();
+						pcard->previous.rank = pcard->get_rank();
+						pcard->previous.attribute = pcard->get_attribute();
+						pcard->previous.race = pcard->get_race();
+						pcard->previous.attack = pcard->get_attack();
+						pcard->previous.defence = pcard->get_defence();
+					}
+				} else {
+					pcard->previous.code = pcard->data.code;
+					pcard->previous.type = pcard->data.type;
+					pcard->previous.level = pcard->data.level;
+					pcard->previous.rank = pcard->data.level;
+					pcard->previous.attribute = pcard->data.attribute;
+					pcard->previous.race = pcard->data.race;
+					pcard->previous.attack = pcard->data.attack;
+					pcard->previous.defence = pcard->data.defence;
+				}
+			}
 		}
 		if(leave_p.size())
 			raise_event(&leave_p, EVENT_LEAVE_FIELD_P, reason_effect, reason, reason_player, 0, 0);

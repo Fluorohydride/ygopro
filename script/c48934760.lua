@@ -36,6 +36,9 @@ function c48934760.activate(e,tp,eg,ep,ev,re,r,rp)
 		else
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
+		local te=tc:GetActivateEffect()
+		local cost=te:GetCost()
+		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
 		Duel.RaiseEvent(tc,EVENT_CHAIN_SOLVED,tc:GetActivateEffect(),0,tp,tp,Duel.GetCurrentChain())
 	end
 end
