@@ -1497,7 +1497,7 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 	effect* passume = tuner->is_affected_by_effect(EFFECT_SYNCHRO_ASSUME);
 	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
 		if(passume)
-			passume->get_value(tuner);
+			passume->
 		if(!pduel->lua->check_matching(tuner, findex1, 0))
 			return FALSE;
 		if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
