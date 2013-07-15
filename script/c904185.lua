@@ -30,7 +30,7 @@ function c904185.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<e:GetLabel() then return end
 	if Duel.IsPlayerCanSpecialSummonMonster(tp,31533705,0x101b,0x4011,0,0,3,RACE_MACHINE,ATTRIBUTE_WIND) then
 		for i=1,e:GetLabel() do
-			local token=Duel.CreateToken(tp,904186)
+			local token=Duel.CreateToken(tp,31533705)
 			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		end
 		Duel.SpecialSummonComplete()

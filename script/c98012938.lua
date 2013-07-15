@@ -1,4 +1,4 @@
---ª•Éñ¥ô¥¡¥ë¥«¥ó
+--ç£ç¥ãƒ´ã‚¡ãƒ«ã‚«ãƒ³
 function c98012938.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
