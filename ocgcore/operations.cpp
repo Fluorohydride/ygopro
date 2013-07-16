@@ -3613,9 +3613,14 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 		effect* peffect;
 		for(uint8 p = 0; p < 2; ++p) {
 			for(int32 i = 0; i < 5; ++i) {
+				pduel->restore_assumes();
 				tuner = player[p].list_mzone[i];
-				if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && pduel->lua->check_matching(tuner, -2, 0)
-				        && tuner->is_can_be_synchro_material(pcard)) {
+				if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
+					effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
+					if(pcheck)
+						pcheck->get_value(tuner);
+					if(!pduel->lua->check_matching(tuner, -2, 0))
+						continue;
 					if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
 						if(!peffect->target)
 							continue;
@@ -3632,8 +3637,11 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 						for(uint8 np = 0; np < 2; ++np) {
 							for(int32 j = 0; j < 5; ++j) {
 								pm = player[np].list_mzone[j];
-								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, -1, 0)
-								        && pm->is_can_be_synchro_material(pcard, tuner)) {
+								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+									if(pcheck)
+										pcheck->get_value(pm);
+									if(!pduel->lua->check_matching(pm, -1, 0))
+										continue;
 									nsyn.push_back(pm);
 									pm->operation_param = pm->get_synchro_level(pcard);
 								}
@@ -3651,6 +3659,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 				}
 			}
 		}
+		pduel->restore_assumes();
 		if(core.select_cards.size() == 0)
 			return TRUE;
 		pduel->write_buffer8(MSG_HINT);
@@ -3662,6 +3671,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 	}
 	case 1: {
 		card* tuner = core.select_cards[returns.bvalue[1]];
+		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 		core.units.begin()->ptarget = (group*)tuner;
 		effect* peffect;
 		if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
@@ -3679,8 +3689,11 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 			for(uint8 np = 0; np < 2; ++np) {
 				for(int32 i = 0; i < 5; ++i) {
 					card* pm = player[np].list_mzone[i];
-					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, -1, 0)
-					        && pm->is_can_be_synchro_material(pcard, tuner)) {
+					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+						if(pcheck)
+							pcheck->get_value(pm);
+						if(!pduel->lua->check_matching(pm, -1, 0))
+							continue;
 						core.select_cards.push_back(pm);
 						pm->operation_param = pm->get_synchro_level(pcard);
 					}
@@ -3697,6 +3710,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 			add_process(PROCESSOR_SELECT_SUM, 0, 0, 0, lv - l1, playerid + (min << 16) + (max << 24));
 			core.units.begin()->step = 2;
 		}
+		pduel->restore_assumes();
 		return FALSE;
 	}
 	case 2: {
