@@ -24,6 +24,8 @@ function c74841885.chkfilter(c,rac,att)
 	return c:IsRace(rac) and c:IsAttribute(att)
 end
 function c74841885.valcheck(e,c)
+	if e:GetLabel()~=1 then return end
+	e:SetLabel(0)
 	local g=c:GetMaterial()
 	local lbl=0
 	if g:IsExists(c74841885.chkfilter,1,nil,RACE_FAIRY,ATTRIBUTE_LIGHT) then
@@ -32,7 +34,7 @@ function c74841885.valcheck(e,c)
 	if g:IsExists(c74841885.chkfilter,1,nil,RACE_FIEND,ATTRIBUTE_DARK) then
 		lbl=lbl+TYPE_TRAP
 	end
-	if e:GetLabel()==1 and lbl~=0 then
+	if lbl~=0 then
 		--disable
 		local e1=Effect.CreateEffect(c)
 		if lbl==TYPE_SPELL then
