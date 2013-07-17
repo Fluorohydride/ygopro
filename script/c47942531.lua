@@ -21,6 +21,7 @@ function c47942531.valcheck(e,c)
 	if atk<0 then atk=0 end
 	--atk continuous effect
 	if e:GetLabel()==1 then
+		e:SetLabel(0)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK)
@@ -28,7 +29,7 @@ function c47942531.valcheck(e,c)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetValue(atk)
 		e1:SetReset(RESET_EVENT+0xff0000)
-		c:RegisterEffect(e1)	
+		c:RegisterEffect(e1)
 	end
 end
 function c47942531.facechk(e,tp,eg,ep,ev,re,r,rp)

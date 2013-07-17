@@ -1,4 +1,4 @@
---ゴーストリックの雪女
+--ゴーストリック・キョンシー
 function c80885284.initial_effect(c)
 	--summon limit
 	local e1=Effect.CreateEffect(c)
@@ -20,7 +20,7 @@ function c80885284.initial_effect(c)
 	e3:SetDescription(aux.Stringid(80885284,1))
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
+	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCode(EVENT_FLIP)
 	e3:SetCost(c80885284.thcost)
 	e3:SetTarget(c80885284.thtg)

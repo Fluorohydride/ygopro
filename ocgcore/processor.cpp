@@ -2870,7 +2870,6 @@ int32 field::process_battle_command(uint16 step) {
 			atk_disabled = true;
 			pduel->write_buffer8(MSG_ATTACK_DISABLED);
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
-			core.attacker->attack_negated_count++;
 		}
 		effect* peffect;
 		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
