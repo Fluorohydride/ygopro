@@ -1780,7 +1780,6 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	int32 level = lua_tointeger(L, 5);
 	int32 atk = lua_tointeger(L, 6);
 	int32 def = lua_tointeger(L, 7);
-	int32 is_tuner = FALSE;
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = pcard->pduel;
 	//type
