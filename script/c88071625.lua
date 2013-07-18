@@ -66,6 +66,7 @@ function c88071625.valcheck(e,c)
 		tc=g:GetNext()
 	end
 	if e:GetLabel()==1 then
+		e:SetLabel(0)
 		--atk continuous effect
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

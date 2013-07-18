@@ -38,6 +38,7 @@ function c6614221.valcheck(e,c)
 		tc=g:GetNext()
 	end
 	if e:GetLabel()==1 then
+		e:SetLabel(0)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK)
