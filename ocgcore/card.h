@@ -93,7 +93,6 @@ public:
 	uint32 operation_param;
 	uint8 announce_count;
 	uint8 attacked_count;
-	uint8 attack_negated_count;
 	uint8 attack_all_target;
 	uint16 cardid;
 	uint32 fieldid;

@@ -490,7 +490,7 @@ uint32 card::get_rank() {
 	filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
 	filter_effect(EFFECT_CHANGE_RANK, &effects);
 	for (int32 i = 0; i < effects.count; ++i) {
-		if (effects[i]->code == EFFECT_UPDATE_LEVEL) {
+		if (effects[i]->code == EFFECT_UPDATE_RANK) {
 			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up += effects[i]->get_value(this);
 			else
@@ -958,7 +958,6 @@ void card::reset(uint32 id, uint32 reset_type) {
 			attacked_cards.clear();
 			announce_count = 0;
 			attacked_count = 0;
-			attack_negated_count = 0;
 			attack_all_target = TRUE;
 		}
 		if(id & 0x5fe0000) {

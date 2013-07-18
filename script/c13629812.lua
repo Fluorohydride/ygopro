@@ -11,7 +11,7 @@ function c13629812.initial_effect(c)
 	e1:SetTarget(c13629812.target)
 	e1:SetOperation(c13629812.operation)
 	c:RegisterEffect(e1)
-	--Destroy
+	--return
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(13629812,0))
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
@@ -63,7 +63,7 @@ end
 function c13629812.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=c:GetFirstCardTarget()
-	if tc and tc:IsLocation(LOCATION_REMOVED) and tc:IsFaceup() and c:IsLocation(LOCATION_GRAVE) then
+	if tc and tc:IsLocation(LOCATION_REMOVED) and tc:IsFaceup() and not c:IsLocation(LOCATION_DECK) then
 		e:SetLabelObject(tc)
 		tc:CreateEffectRelation(e)
 		return true
