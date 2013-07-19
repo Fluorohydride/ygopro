@@ -24,7 +24,7 @@ end
 function c28553439.rfilter(c,e)
 	return c:IsReleasableByEffect()
 end
-function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c28553439.rfilter(chkc,e) end
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c28553439.rfilter,1,nil,e)
 		and Duel.IsExistingMatchingCard(c28553439.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
@@ -33,7 +33,6 @@ function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c28553439.activate(e,tp,eg,ep,ev,re,r,rp)
-	--local g=Duel.SelectReleaseGroup(tp,c28553439.rfilter,1,1,nil,e)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		if Duel.Release(tc,REASON_EFFECT)==0 then return end
