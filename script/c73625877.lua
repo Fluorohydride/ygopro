@@ -37,13 +37,20 @@ function c73625877.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetCountLimit(1)
 		e1:SetLabelObject(tc)
+		e1:SetCondition(c73625877.retcon)
 		e1:SetOperation(c73625877.retop)
-		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
+		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_DRAW then
+			e:GetLabel(0)
+		else
+			e:GetLabel(Duel.GetTurnCount())
+		end
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function c73625877.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel()
+end
 function c73625877.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.ReturnToField(e:GetLabelObject())
-	end
+	Duel.ReturnToField(e:GetLabelObject())
+	e:Reset()
 end
