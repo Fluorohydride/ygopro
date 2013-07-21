@@ -16,16 +16,16 @@ function c63422098.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCondition(c63422098.regcon)
 	e2:SetOperation(c63422098.regop)
 	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 end
-function c63422098.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
-end
 function c63422098.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=c:GetMaterialCount()
-	e:GetLabelObject():SetValue(ct*300-300)
+	if c:GetSummonType()==SUMMON_TYPE_SYNCHRO then
+		local ct=c:GetMaterialCount()
+		e:GetLabelObject():SetValue(ct*200-200)
+	else
+		e:GetLabelObject():SetValue(0)
+	end
 end

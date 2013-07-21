@@ -20,7 +20,8 @@ function c56427559.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c56427559.lvfilter(c,lv)
-	return c:IsFaceup() and c:IsSetCard(0x83) and c:GetLevel()~=lv
+	local clv=c:GetLevel()
+	return c:IsFaceup() and c:IsSetCard(0x83) and clv>0 and clv~=lv
 end
 function c56427559.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c56427559.lvfilter(chkc,e:GetHandler():GetLevel()) end

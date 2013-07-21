@@ -51,7 +51,7 @@ function c43378076.sretcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c43378076.filter(c)
-	return c:IsFaceup() and c:IsAbleToHand()
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAbleToHand()
 end
 function c43378076.srettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c43378076.filter(chkc) end

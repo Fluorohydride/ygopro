@@ -30,7 +30,7 @@ function c20032555.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c20032555.effop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then
-		Duel.Damage(1-tp,800,RASON_EFFECT)
+		Duel.Damage(1-tp,800,REASON_EFFECT)
 	else
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
