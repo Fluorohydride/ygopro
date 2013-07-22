@@ -17,7 +17,7 @@ function c55204071.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetTarget(c55204071.spcon2)
+	e2:SetCondition(c55204071.spcon2)
 	e2:SetTarget(c55204071.sptg2)
 	e2:SetOperation(c55204071.spop2)
 	c:RegisterEffect(e2)
@@ -27,13 +27,13 @@ function c55204071.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetOperation(c55204071.spop3)
-	c:RegisterEffect(e2)
+	c:RegisterEffect(e3)
 end
 function c55204071.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c55204071.spcon(e,c)
-	if c==nil then return Duel.GetFlagEffect(tp,55204071)==0 end
+	if c==nil then return Duel.GetFlagEffect(c:GetControler(),55204071)==0 end
 	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(c:GetControler(),c55204071.cfilter,1,nil)
 end

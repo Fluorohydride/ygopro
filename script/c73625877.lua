@@ -40,9 +40,9 @@ function c73625877.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCondition(c73625877.retcon)
 		e1:SetOperation(c73625877.retop)
 		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_DRAW then
-			e:GetLabel(0)
+			e1:SetLabel(0)
 		else
-			e:GetLabel(Duel.GetTurnCount())
+			e1:SetLabel(Duel.GetTurnCount())
 		end
 		Duel.RegisterEffect(e1,tp)
 	end
