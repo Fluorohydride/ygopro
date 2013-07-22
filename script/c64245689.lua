@@ -27,6 +27,7 @@ function c64245689.initial_effect(c)
 end
 function c64245689.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(64245689)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	e:GetHandler():RegisterFlagEffect(64245689,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end

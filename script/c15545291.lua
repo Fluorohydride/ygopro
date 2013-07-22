@@ -21,12 +21,6 @@ function c15545291.initial_effect(c)
 	e2:SetTarget(c15545291.destg)
 	e2:SetOperation(c15545291.desop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_MATERIAL_CHECK)
-	e3:SetValue(c15545291.valcheck)
-	e3:SetLabelObject(e2)
-	c:RegisterEffect(e3)
 end
 function c15545291.otfilter(c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
@@ -56,8 +50,12 @@ function c15545291.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c15545291.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	if e:GetLabel()==1 then
+	local mg=e:GetHandler():GetMaterial()
+	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_EARTH) then
+		e:SetLabel(1)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	else
+		e:SetLabel(0)
 	end
 end
 function c15545291.dfilter(c,e)

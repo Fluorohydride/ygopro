@@ -47,6 +47,7 @@ end
 function c98850929.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,98850929)==0 end
 	Duel.RegisterFlagEffect(tp,98850929,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c98850929.filter1(c)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
