@@ -3,7 +3,7 @@ function c64245689.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),3),2)
 	c:EnableReviveLimit()
-	--spsummon
+	--to grave
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(64245689,0))
 	e1:SetCategory(CATEGORY_TOGRAVE)
@@ -13,7 +13,7 @@ function c64245689.initial_effect(c)
 	e1:SetTarget(c64245689.tgtg)
 	e1:SetOperation(c64245689.tgop)
 	c:RegisterEffect(e1)
-	--control
+	--spsummon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(64245689,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -49,7 +49,8 @@ function c64245689.spfilter(c,e,tp)
 end
 function c64245689.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c64245689.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c64245689.ctfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(c64245689.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c64245689.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)

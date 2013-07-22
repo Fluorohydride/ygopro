@@ -51,13 +51,10 @@ function c6691855.operation(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetCode(EFFECT_EQUIP_LIMIT)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e3:SetValue(c6691855.eqlimit)
+		e3:SetValue(1)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e3)
 	end
-end
-function c6691855.eqlimit(e,c)
-	return c:GetControler()==e:GetOwnerPlayer()
 end
 function c6691855.defcon(e)
 	local eq=e:GetHandler():GetEquipTarget()

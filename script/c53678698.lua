@@ -43,8 +43,7 @@ function c53678698.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c53678698.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and Duel.IsPlayerCanDraw(tp,1) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c53678698.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -54,7 +53,7 @@ function c53678698.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c53678698.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetFlagEffect(53678698)>0
+	return e:GetHandler():GetFlagEffect(53678698)>0
 end
 function c53678698.filter(c)
 	return c:IsSetCard(0x88) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
