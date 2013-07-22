@@ -12,7 +12,6 @@ function c38296564.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetOperation(c38296564.desop)
 	c:RegisterEffect(e2)
 	--Destroy2

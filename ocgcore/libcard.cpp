@@ -1333,11 +1333,14 @@ int32 scriptlib::card_is_attackable(lua_State *L) {
 int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
+	int32 monsteronly = FALSE;
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	duel* pduel = pcard->pduel;
 	int32 ac = 2;
 	if(lua_gettop(L) > 1)
 		ac = lua_tointeger(L, 2);
+	if(lua_gettop(L) > 2)
+		monsteronly = lua_toboolean(L, 3);
 	card* attacker = pduel->game_field->core.attacker;
 	if(pduel->game_field->core.effect_damage_step
 	        || attacker->is_status(STATUS_BATTLE_DESTROYED)
@@ -1350,7 +1353,7 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	}
 	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->get_attack_target(attacker, &pduel->game_field->core.select_cards, TRUE);
-	if(pduel->game_field->core.select_cards.size() == 0 && attacker->operation_param == 0)
+	if(pduel->game_field->core.select_cards.size() == 0 && (monsteronly || attacker->operation_param == 0))
 		lua_pushboolean(L, 0);
 	else
 		lua_pushboolean(L, 1);

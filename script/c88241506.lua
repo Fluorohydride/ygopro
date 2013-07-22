@@ -36,8 +36,7 @@ function c88241506.natg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c88241506.naop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.NegateAttack()
-	if c:IsRelateToEffect(e) then
+	if Duel.NegateAttack() and c:IsRelateToEffect(e) then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE,POS_FACEUP_DEFENCE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		local g=Duel.GetMatchingGroup(c88241506.spfilter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp)

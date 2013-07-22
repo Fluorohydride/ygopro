@@ -39,17 +39,17 @@ function c53090623.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c53090623.rdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetOverlayCount(tp,1,0)>0 end
+	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,0,1,REASON_COST) end
 	Duel.RemoveOverlayCard(tp,1,0,1,1,REASON_COST)
 end
 function c53090623.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:GetRank()>1
 end
 function c53090623.rdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c53090623.filter(chkc,e,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c53090623.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c53090623.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c53090623.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,c53090623.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c53090623.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end
 function c53090623.rdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
