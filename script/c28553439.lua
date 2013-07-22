@@ -4,6 +4,7 @@ function c28553439.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1c0)
 	e1:SetCondition(c28553439.condition)
@@ -21,27 +22,32 @@ function c28553439.filter(c,e,tp)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c28553439.rfilter(c,e)
-	return c:IsReleasableByEffect() and not c:IsImmuneToEffect(e)
+	return c:IsReleasableByEffect()
 end
-function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c28553439.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c28553439.rfilter(chkc,e) end
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c28553439.rfilter,1,nil,e)
 		and Duel.IsExistingMatchingCard(c28553439.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+	Duel.SelectTarget(tp,c28553439.rfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c28553439.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.SelectReleaseGroup(tp,c28553439.rfilter,1,1,nil,e)
-	if g:GetCount()==0 or Duel.Release(g,REASON_EFFECT)==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local sg=Duel.SelectMatchingCard(tp,c28553439.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
-	if sg:GetCount()==0 then return end
-	Duel.BreakEffect()
-	Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-	local dg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	if dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(28553439,0)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-		local des=dg:Select(tp,1,1,nil)
-		Duel.HintSelection(des)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+		if Duel.Release(tc,REASON_EFFECT)==0 then return end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=Duel.SelectMatchingCard(tp,c28553439.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+		if sg:GetCount()==0 then return end
 		Duel.BreakEffect()
-		Duel.Destroy(des,REASON_EFFECT)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+		local dg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+		if dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(28553439,0)) then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+			local des=dg:Select(tp,1,1,nil)
+			Duel.HintSelection(des)
+			Duel.BreakEffect()
+			Duel.Destroy(des,REASON_EFFECT)
+		end
 	end
 end
