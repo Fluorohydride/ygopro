@@ -2864,7 +2864,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 					pduel->write_buffer32(ptop->data.code | 0x80000000);
 			}
 		}
-		if(detach.size()) {
+		if((core.global_flag & GLOBALFLAG_DETACH_EVENT) && detach.size()) {
 			for(auto iter = detach.begin(); iter != detach.end(); ++iter) {
 				if((*iter)->current.location & LOCATION_MZONE)
 					raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
@@ -2872,14 +2872,13 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		adjust_instant();
 		process_single_event();
-		if(leave.size()) {
+		if(leave.size())
 			raise_event(&leave, EVENT_LEAVE_FIELD, reason_effect, reason, reason_player, 0, 0);
-			process_instant_event();
-		}
-		if(discard.size()) {
+		if(discard.size())
 			raise_event(&discard, EVENT_DISCARD, reason_effect, reason, reason_player, 0, 0);
-			process_instant_event();
-		}
+		if((core.global_flag & GLOBALFLAG_DETACH_EVENT) && detach.size())
+			raise_event(&detach, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
+		process_instant_event();
 		return FALSE;
 	}
 	case 5: {
