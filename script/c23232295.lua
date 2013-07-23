@@ -1,5 +1,6 @@
 --BK 拘束蛮兵リードブロー
 function c23232295.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_DETACH_EVENT)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x84),4),2)
 	c:EnableReviveLimit()
