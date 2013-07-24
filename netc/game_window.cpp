@@ -18,28 +18,28 @@ namespace ygopro
 	END_EVENT_TABLE()
 
 	GameFrame::GameFrame(int sx, int sy): wxFrame(nullptr, wxID_ANY, "YGOpro", wxDefaultPosition, wxSize(sx, sy)) {
-		wxRibbonBar* m_ribbon = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRIBBON_BAR_DEFAULT_STYLE | wxRIBBON_BAR_SHOW_PANEL_EXT_BUTTONS);
-		wxRibbonPage* ribbon_page = new wxRibbonPage(m_ribbon, wxID_ANY, wxT("Menu"));
-
-		wxRibbonPanel *config_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Config"), wxBitmap(32, 32));
-		wxRibbonButtonBar *config_bar = new wxRibbonButtonBar(config_panel);
-		config_bar->AddButton(wxID_ANY, wxT("System Setting"), wxBitmap(64, 32));
-		config_bar->AddButton(wxID_ANY, wxT("Declear Setting"), wxBitmap(64, 32));
-		config_bar->AddButton(wxID_ANY, wxT("Hint Setting"), wxBitmap(64, 32));
-		wxRibbonPanel *replay_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
-		wxRibbonButtonBar *replay_bar = new wxRibbonButtonBar(replay_panel);
-		replay_bar->AddButton(wxID_ANY, wxT("Play"), wxBitmap(48, 48), wxBitmap(16, 16));
-		replay_bar->AddButton(wxID_ANY, wxT("Next Step"), wxBitmap(48, 48), wxBitmap(16, 16));
-		replay_bar->AddButton(wxID_ANY, wxT("Pause"), wxBitmap(48, 48), wxBitmap(16, 16));
-		replay_bar->AddButton(wxID_ANY, wxT("Resume"), wxBitmap(48, 48), wxBitmap(16, 16));
-		wxRibbonPanel *tool_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Tools"), wxBitmap(32, 32));
-		wxRibbonButtonBar *tool_bar = new wxRibbonButtonBar(tool_panel);
-		tool_bar->AddButton(wxID_ANY, wxT("Screenshot"), wxBitmap(48, 48), wxBitmap(16, 16));
-		m_ribbon->Realize();
+// 		wxRibbonBar* m_ribbon = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRIBBON_BAR_DEFAULT_STYLE | wxRIBBON_BAR_SHOW_PANEL_EXT_BUTTONS);
+// 		wxRibbonPage* ribbon_page = new wxRibbonPage(m_ribbon, wxID_ANY, wxT("Menu"));
+// 
+// 		wxRibbonPanel *config_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Config"), wxBitmap(32, 32));
+// 		wxRibbonButtonBar *config_bar = new wxRibbonButtonBar(config_panel);
+// 		config_bar->AddButton(wxID_ANY, wxT("System Setting"), wxBitmap(64, 32));
+// 		config_bar->AddButton(wxID_ANY, wxT("Declear Setting"), wxBitmap(64, 32));
+// 		config_bar->AddButton(wxID_ANY, wxT("Hint Setting"), wxBitmap(64, 32));
+// 		wxRibbonPanel *replay_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Replay"), wxBitmap(32, 32));
+// 		wxRibbonButtonBar *replay_bar = new wxRibbonButtonBar(replay_panel);
+// 		replay_bar->AddButton(wxID_ANY, wxT("Play"), wxBitmap(48, 48), wxBitmap(16, 16));
+// 		replay_bar->AddButton(wxID_ANY, wxT("Next Step"), wxBitmap(48, 48), wxBitmap(16, 16));
+// 		replay_bar->AddButton(wxID_ANY, wxT("Pause"), wxBitmap(48, 48), wxBitmap(16, 16));
+// 		replay_bar->AddButton(wxID_ANY, wxT("Resume"), wxBitmap(48, 48), wxBitmap(16, 16));
+// 		wxRibbonPanel *tool_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Tools"), wxBitmap(32, 32));
+// 		wxRibbonButtonBar *tool_bar = new wxRibbonButtonBar(tool_panel);
+// 		tool_bar->AddButton(wxID_ANY, wxT("Screenshot"), wxBitmap(48, 48), wxBitmap(16, 16));
+// 		m_ribbon->Realize();
 		int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
-		wxDuelCanvas* glcanvas = new wxDuelCanvas(this, wxID_ANY, wx_gl_attribs);
+ 		wxDuelCanvas* glcanvas = new wxDuelCanvas(this, wxID_ANY, wx_gl_attribs);
 		wxSizer *s = new wxBoxSizer(wxVERTICAL);
-		s->Add(m_ribbon, 0, wxEXPAND);
+//		s->Add(m_ribbon, 0, wxEXPAND);
 		s->Add(glcanvas, 1, wxEXPAND);
 		SetSizer(s);
 	}

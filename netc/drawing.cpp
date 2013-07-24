@@ -33,26 +33,23 @@ namespace ygopro
  		glEnd();
 		// field
 		glShadeModel(GL_SMOOTH);
-		glEnable(GL_LIGHTING);
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
 		gluPerspective(45, 1.5f, 0.1f, 100);
-		gluLookAt(3.95f, 8.0f, 7.8f, 3.95f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f);
+		gluLookAt(3.95f, 8.0f, 7.8f, 3.95f, 0.8f, 0.0f, 0.0f, 0.0f, 1.0f);
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
-		GLfloat ambient[] = {1.0, 1.0, 1.0, 1.0};
-		glLightModelfv(GL_LIGHT_MODEL_AMBIENT, ambient);
 
-		glMaterialfv(GL_FRONT, GL_AMBIENT, ambient);
 		glBindTexture(GL_TEXTURE_2D, imageMgr.textureid_all);
 		glBegin(GL_QUADS);
 		{
-			glNormal3f(0.0f, 0.0f, 1.0f);glTexCoord2f(imageMgr.texture_field.lx, imageMgr.texture_field.ly);glVertex3f(0.0f, -4.0f, 0.0f);
-			glNormal3f(0.0f, 0.0f, 1.0f);glTexCoord2f(imageMgr.texture_field.rx, imageMgr.texture_field.ly);glVertex3f(8.0f, -4.0f, 0.0f);
-			glNormal3f(0.0f, 0.0f, 1.0f);glTexCoord2f(imageMgr.texture_field.rx, imageMgr.texture_field.ry);glVertex3f(8.0f, 4.0f, 0.0f);
-			glNormal3f(0.0f, 0.0f, 1.0f);glTexCoord2f(imageMgr.texture_field.lx, imageMgr.texture_field.ry);glVertex3f(0.0f, 4.0f, 0.0f);
+			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+			glTexCoord2f(imageMgr.texture_field.lx, imageMgr.texture_field.ly);glVertex3f(0.0f, -4.0f, 0.0f);
+			glTexCoord2f(imageMgr.texture_field.rx, imageMgr.texture_field.ly);glVertex3f(8.0f, -4.0f, 0.0f);
+			glTexCoord2f(imageMgr.texture_field.rx, imageMgr.texture_field.ry);glVertex3f(8.0f, 4.0f, 0.0f);
+			glTexCoord2f(imageMgr.texture_field.lx, imageMgr.texture_field.ry);glVertex3f(0.0f, 4.0f, 0.0f);
 		}
 		glEnd();
 
@@ -62,11 +59,11 @@ namespace ygopro
 		glMatrixMode(GL_MODELVIEW);
 		glLoadIdentity();
 		glDisable(GL_DEPTH_TEST);
-		glDisable(GL_LIGHTING);
 		float avawidth = 256.0f / glwidth;
 		float avaheight = 256.0f / glheight;
 		glBegin(GL_QUADS);
 		{
+			glColor4f(1.0f, 1.0f, 1.0f, 0.5f);
 			glTexCoord2f(imageMgr.texture_attack.lx, imageMgr.texture_attack.ly);glVertex2f(-1.0f, 1.0f);
 			glTexCoord2f(imageMgr.texture_attack.rx, imageMgr.texture_attack.ly);glVertex2f(-1.0f + avawidth, 1.0f);
 			glTexCoord2f(imageMgr.texture_attack.rx, imageMgr.texture_attack.ry);glVertex2f(-1.0f + avawidth, 1.0f - avaheight);
