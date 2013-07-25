@@ -1,4 +1,4 @@
---�ե��ȥ󡤥ȥ饤�ǥ��
+--フォトン・トライデント
 function c51589188.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -53,7 +53,7 @@ function c51589188.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c51589188.descon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst()==e:GetLabelObject()
+	return ep~=tp and eg:GetFirst()==e:GetLabelObject()
 end
 function c51589188.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()

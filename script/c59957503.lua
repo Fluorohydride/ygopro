@@ -20,12 +20,14 @@ function c59957503.initial_effect(c)
 	end
 end
 function c59957503.checkop(e,tp,eg,ep,ev,re,r,rp)
-	c59957503[0]=re
+	local cid=Duel.GetCurrentChain()
+	if cid>0 then
+		c59957503[0]=Duel.GetChainInfo(cid,CHAININFO_CHAIN_ID)
+	end
 end
 function c59957503.condition(e,tp,eg,ep,ev,re,r,rp)
-	local acte=c59957503[0]
-	c59957503[0]=nil
-	return re==acte and rp~=tp and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
+	return rp~=tp and Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)==c59957503[0]
+		and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
 end
 function c59957503.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

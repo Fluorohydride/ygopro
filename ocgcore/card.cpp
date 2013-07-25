@@ -61,6 +61,8 @@ card::card() {
 	memset(&temp, 0xff, sizeof(card_state));
 	unique_pos[0] = unique_pos[1] = 0;
 	unique_code = 0;
+	assume_type = 0;
+	assume_value = 0;
 	current.controler = PLAYER_NONE;
 }
 card::~card() {
@@ -195,6 +197,8 @@ uint32 card::get_info_location() {
 	}
 }
 uint32 card::get_code() {
+	if(assume_type == ASSUME_CODE)
+		return assume_value;
 	if(!(current.location & 0x1c)) {
 		if(data.alias)
 			return data.alias;
@@ -239,6 +243,8 @@ int32 card::is_set_card(uint32 set_code) {
 	return FALSE;
 }
 uint32 card::get_type() {
+	if(assume_type == ASSUME_TYPE)
+		return assume_value;
 	if(!(current.location & 0x1e))
 		return data.type;
 	if (temp.type != 0xffffffff)
@@ -286,6 +292,8 @@ int32 card::get_base_attack(uint8 swap) {
 	return batk;
 }
 int32 card::get_attack(uint8 swap) {
+	if(assume_type == ASSUME_ATTACK)
+		return assume_value;
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
 	if (temp.attack != -1)
@@ -371,6 +379,8 @@ int32 card::get_base_defence(uint8 swap) {
 	return bdef;
 }
 int32 card::get_defence(uint8 swap) {
+	if(assume_type == ASSUME_DEFENCE)
+		return assume_value;
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
 	if (temp.defence != -1)
@@ -434,6 +444,8 @@ int32 card::get_defence(uint8 swap) {
 uint32 card::get_level() {
 	if(data.type & TYPE_XYZ)
 		return 0;
+	if(assume_type == ASSUME_LEVEL)
+		return assume_value;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_HAND)))
 		return data.level;
 	if (temp.level != 0xffffffff)
@@ -465,7 +477,35 @@ uint32 card::get_level() {
 uint32 card::get_rank() {
 	if(!(data.type & TYPE_XYZ))
 		return 0;
-	return data.level;
+	if(assume_type == ASSUME_RANK)
+		return assume_value;
+	if(!(current.location & LOCATION_MZONE))
+		return data.level;
+	if (temp.level != 0xffffffff)
+		return temp.level;
+	effect_set effects;
+	int32 rank = data.level;
+	temp.level = data.level;
+	int32 up = 0, upc = 0;
+	filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
+	filter_effect(EFFECT_CHANGE_RANK, &effects);
+	for (int32 i = 0; i < effects.count; ++i) {
+		if (effects[i]->code == EFFECT_UPDATE_RANK) {
+			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
+				up += effects[i]->get_value(this);
+			else
+				upc += effects[i]->get_value(this);
+		} else {
+			rank = effects[i]->get_value(this);
+			up = 0;
+		}
+		temp.level = rank;
+	}
+	rank += up + upc;
+	if(rank < 1 && (get_type() & TYPE_MONSTER))
+		rank = 1;
+	temp.level = 0xffffffff;
+	return rank;
 }
 uint32 card::get_synchro_level(card* pcard) {
 	if(data.type & TYPE_XYZ)
@@ -504,6 +544,8 @@ uint32 card::is_xyz_level(card* pcard, uint32 lv) {
 	return ((lev & 0xffff) == lv) || ((lev >> 16) == lv);
 }
 uint32 card::get_attribute() {
+	if(assume_type == ASSUME_ATTRIBUTE)
+		return assume_value;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.attribute;
 	if((current.location == LOCATION_GRAVE) && (data.type & (TYPE_SPELL + TYPE_TRAP)))
@@ -529,6 +571,8 @@ uint32 card::get_attribute() {
 	return attribute;
 }
 uint32 card::get_race() {
+	if(assume_type == ASSUME_RACE)
+		return assume_value;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.race;
 	if((current.location == LOCATION_GRAVE) && (data.type & (TYPE_SPELL + TYPE_TRAP)))
@@ -899,7 +943,7 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 }
 void card::reset(uint32 id, uint32 reset_type) {
 	effect* peffect;
-	if (reset_type != RESET_EVENT && reset_type != RESET_PHASE && reset_type != RESET_CODE && reset_type != RESET_COPY)
+	if (reset_type != RESET_EVENT && reset_type != RESET_PHASE && reset_type != RESET_CODE && reset_type != RESET_COPY && reset_type != RESET_CARD)
 		return;
 	if (reset_type == RESET_EVENT) {
 		for (auto rit = relations.begin(); rit != relations.end();) {
@@ -914,7 +958,6 @@ void card::reset(uint32 id, uint32 reset_type) {
 			attacked_cards.clear();
 			announce_count = 0;
 			attacked_count = 0;
-			attack_negated_count = 0;
 			attack_all_target = TRUE;
 		}
 		if(id & 0x5fe0000) {

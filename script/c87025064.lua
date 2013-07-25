@@ -13,7 +13,7 @@ function c87025064.initial_effect(c)
 end
 function c87025064.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,87025064)==0 end
-	Duel.RegisterFlagEffect(tp,87025064,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,87025064,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c87025064.filter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -15,20 +15,14 @@ function c58712976.initial_effect(c)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DESTROY)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetOperation(c58712976.desop)
+	e2:SetDescription(aux.Stringid(58712976,1))
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_DESTROYED)
+	e2:SetCondition(c58712976.rmcon)
+	e2:SetTarget(c58712976.rmtg)
+	e2:SetOperation(c58712976.rmop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(58712976,1))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e3:SetCode(EVENT_DESTROYED)
-	e3:SetCondition(c58712976.rmcon)
-	e3:SetTarget(c58712976.rmtg)
-	e3:SetOperation(c58712976.rmop)
-	c:RegisterEffect(e3)
 end
 function c58712976.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -46,13 +40,8 @@ function c58712976.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-function c58712976.desop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():GetAttack()>=2500 then
-		e:GetHandler():RegisterFlagEffect(58712976,RESET_PHASE+PHASE_END,0,1)
-	end
-end
 function c58712976.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(58712976)~=0
+	return e:GetHandler():GetPreviousAttackOnField()>=2500
 end
 function c58712976.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
@@ -65,7 +54,6 @@ function c58712976.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		local g=Duel.SelectTarget(tp,c58712976.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,3,3,nil)
 		Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,3,0,0)
 	end
-	e:GetHandler():ResetFlagEffect(58712976)
 end
 function c58712976.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

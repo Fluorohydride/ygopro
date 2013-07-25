@@ -101,6 +101,7 @@ public:
 #define RESET_PHASE			0x0400
 #define RESET_CHAIN			0x0800
 #define RESET_EVENT			0x1000
+#define RESET_CARD			0x2000
 #define RESET_CODE			0x4000
 #define RESET_COPY			0x8000
 
@@ -273,6 +274,8 @@ public:
 #define EFFECT_CHANGE_ATTRIBUTE			127	//
 #define EFFECT_UPDATE_LEVEL				130	//
 #define EFFECT_CHANGE_LEVEL				131	//
+#define EFFECT_UPDATE_RANK				132 //
+#define EFFECT_CHANGE_RANK				133 //
 #define EFFECT_SET_POSITION				140 //
 #define EFFECT_SELF_DESTROY				141 //
 #define EFFECT_DOUBLE_TRIBUTE			150
@@ -347,6 +350,7 @@ public:
 #define EFFECT_BP_TWICE					296
 #define EFFECT_UNIQUE_CHECK				297
 #define EFFECT_MATCH_KILL				300
+#define EFFECT_SYNCHRO_CHECK			310
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001
