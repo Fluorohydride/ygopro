@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Layout>
+  <layout name="avatar_frame0" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar_frame1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar0" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_frame0" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_frame1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp0" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_txt0" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_txt1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="turn_frame" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="turn_box" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_frame" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_dp" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_sp" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_m1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_bp" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_m2" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_ep" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_menu" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_surrender" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_confirm" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+</Layout>

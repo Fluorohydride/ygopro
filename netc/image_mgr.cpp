@@ -77,8 +77,8 @@ namespace ygopro
 		unsigned int tid;
 		glGenTextures(1, &tid);
 		glBindTexture(GL_TEXTURE_2D, tid);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 		unsigned int imagex = img.GetWidth();
 		unsigned int imagey = img.GetHeight();
 		unsigned int tx = texlen(img.GetWidth());

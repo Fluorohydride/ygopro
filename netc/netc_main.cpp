@@ -17,7 +17,7 @@ namespace ygopro {
 			commonCfg.LoadConfig("common.xml");
 			imageMgr.LoadConfig("textures.xml");
 
-			mainFrame = new GameFrame(1140, 800);
+			mainFrame = new GameFrame(1280, 800);
 			mainFrame->Center();
 			mainFrame->Show();
 			return true;
