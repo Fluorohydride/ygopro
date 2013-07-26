@@ -32,7 +32,7 @@ function c20686759.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x26)
 end
 function c20686759.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c20686759.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c20686759.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c20686759.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c20686759.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
@@ -46,7 +46,7 @@ function c20686759.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c20686759.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ec=c:GetEquipTarget()
+	local ec=c:GetPreviousEquipTarget()
 	return c:IsReason(REASON_LOST_TARGET) and ec and ec:IsReason(REASON_DESTROY)
 end
 function c20686759.damtg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -1,4 +1,4 @@
---Mystical Fairy Elfuria
+--神秘の妖精 エルフィリア
 function c85239662.initial_effect(c)
 	--xyz limit
 	local e2=Effect.CreateEffect(c)

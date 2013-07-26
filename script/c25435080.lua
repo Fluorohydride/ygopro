@@ -7,11 +7,15 @@ function c25435080.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP)
+	e1:SetCondition(c25435080.condition)
 	e1:SetCost(c25435080.cost)
 	e1:SetTarget(c25435080.target)
 	e1:SetOperation(c25435080.activate)
 	e1:SetLabel(0)
 	c:RegisterEffect(e1)
+end
+function c25435080.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c25435080.cfilter(c,tp)
 	return c:IsSetCard(0x33) and Duel.IsExistingTarget(c25435080.tfilter,tp,LOCATION_MZONE,0,1,c)
@@ -28,10 +32,9 @@ function c25435080.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
-		return Duel.IsExistingMatchingCard(c25435080.cfilter,tp,LOCATION_MZONE,0,1,nil,tp)
+		return Duel.CheckReleaseGroup(tp,c25435080.cfilter,1,nil,tp)
 	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local rg=Duel.SelectMatchingCard(tp,c25435080.cfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)
+	local rg=Duel.SelectReleaseGroup(tp,c25435080.cfilter,1,1,nil,tp)
 	e:SetLabel(rg:GetFirst():GetAttack())
 	Duel.Release(rg,REASON_COST)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

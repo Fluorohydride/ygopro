@@ -381,7 +381,7 @@ public:
 	int32 execute_target(uint16 step, effect* peffect, uint8 triggering_player);
 	void raise_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	void raise_event(card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
-	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value );
+	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	int32 check_event(uint32 code, tevent* pe = 0);
 	int32 check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, int32 neglect_cost, int32 copy_info, tevent* pe = 0);
 	int32 check_hint_timing(effect* peffect);
@@ -541,7 +541,7 @@ public:
 #define GLOBALFLAG_BRAINWASHING_CHECK	0x2
 #define GLOBALFLAG_SCRAP_CHIMERA		0x4
 #define GLOBALFLAG_DELAYED_QUICKEFFECT	0x8
-
+#define GLOBALFLAG_DETACH_EVENT			0x10
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

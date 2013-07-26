@@ -15,6 +15,7 @@ function c53839837.initial_effect(c)
 	e2:SetCondition(c53839837.spcon)
 	e2:SetTarget(c53839837.sptg)
 	e2:SetOperation(c53839837.spop)
+	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 	--to grave
 	local e3=Effect.CreateEffect(c)
@@ -22,6 +23,7 @@ function c53839837.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_BATTLE_DAMAGE)
+	e3:SetCondition(c53839837.tgcon)
 	e3:SetTarget(c53839837.tgtg)
 	e3:SetOperation(c53839837.tgop)
 	c:RegisterEffect(e3)
@@ -29,11 +31,17 @@ end
 function c53839837.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if bit.band(r,0x41)~=0x41 or rp==tp or c:GetPreviousControler()~=tp then return end
-	c:RegisterFlagEffect(53839837,RESET_EVENT+0x1fe0000,0,0)
+	if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then
+		e:SetLabel(Duel.GetTurnCount())
+		c:RegisterFlagEffect(53839837,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,2)
+	else
+		e:SetLabel(0)
+		c:RegisterFlagEffect(53839837,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
+	end
 end
 function c53839837.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:GetTurnID()~=Duel.GetTurnCount() and tp==Duel.GetTurnPlayer() and c:GetFlagEffect(53839837)>0
+	return e:GetLabelObject():GetLabel()~=Duel.GetTurnCount() and tp==Duel.GetTurnPlayer() and c:GetFlagEffect(53839837)>0
 end
 function c53839837.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -44,8 +52,11 @@ end
 function c53839837.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,1,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
+end
+function c53839837.tgcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
 end
 function c53839837.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

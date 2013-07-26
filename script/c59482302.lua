@@ -16,10 +16,13 @@ function c59482302.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 		and e:GetHandler():GetReasonCard():IsAttribute(ATTRIBUTE_LIGHT)
 end
+function c59482302.filter(c,e)
+	return c:IsDestructable() and c:IsCanBeEffectTarget(e)
+end
 function c59482302.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsDestructable() end
+	if chkc then return chkc:IsOnField() and c59482302.filter(chkc,e) end
 	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
+	local g=Duel.GetMatchingGroup(c59482302.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil,e)
 	if g:GetCount()>1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local sg=g:Select(tp,2,2,nil)

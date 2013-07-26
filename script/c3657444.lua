@@ -32,7 +32,7 @@ function c3657444.initial_effect(c)
 end
 function c3657444.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,0)
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c3657444.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
@@ -52,15 +52,13 @@ function c3657444.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c3657444.filter2,tp,LOCATION_MZONE,0,1,1,e:GetHandler())
-	local sg=g:Clone()
-	sg:AddCard(e:GetHandler())
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,sg,2,0,0)
+	g:AddCard(e:GetHandler())
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
 end
 function c3657444.operation2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	if tc:IsFacedown() or not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end
 	local sg=Group.FromCards(c,tc)
 	Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
@@ -76,7 +74,7 @@ function c3657444.target3(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.IsExistingMatchingCard(c3657444.filter3,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,2,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,0,LOCATION_GRAVE)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,tp,LOCATION_GRAVE)
 end
 function c3657444.operation3(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

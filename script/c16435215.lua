@@ -35,6 +35,7 @@ function c16435215.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(sg1,REASON_EFFECT+REASON_DISCARD)
 	Duel.ShuffleHand(tp)
 	Duel.ShuffleHand(1-tp)
+	Duel.BreakEffect()
 	Duel.Draw(tp,1,REASON_EFFECT)
 	Duel.Draw(1-tp,1,REASON_EFFECT)
 end

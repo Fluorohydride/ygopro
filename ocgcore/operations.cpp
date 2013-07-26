@@ -2652,6 +2652,29 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				raise_single_event(pcard, 0, EVENT_LEAVE_FIELD_P, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 				leave_p.insert(pcard);
 			}
+			if((pcard->current.location & LOCATION_ONFIELD)) {
+				if(pcard->current.position & POS_FACEUP) {
+					pcard->previous.code = pcard->get_code();
+					pcard->previous.type = pcard->get_type();
+					if(pcard->current.location & LOCATION_MZONE) {
+						pcard->previous.level = pcard->get_level();
+						pcard->previous.rank = pcard->get_rank();
+						pcard->previous.attribute = pcard->get_attribute();
+						pcard->previous.race = pcard->get_race();
+						pcard->previous.attack = pcard->get_attack();
+						pcard->previous.defence = pcard->get_defence();
+					}
+				} else {
+					pcard->previous.code = pcard->data.code;
+					pcard->previous.type = pcard->data.type;
+					pcard->previous.level = pcard->data.level;
+					pcard->previous.rank = pcard->data.level;
+					pcard->previous.attribute = pcard->data.attribute;
+					pcard->previous.race = pcard->data.race;
+					pcard->previous.attack = pcard->data.attack;
+					pcard->previous.defence = pcard->data.defence;
+				}
+			}
 		}
 		if(leave_p.size())
 			raise_event(&leave_p, EVENT_LEAVE_FIELD_P, reason_effect, reason, reason_player, 0, 0);
@@ -2841,7 +2864,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 					pduel->write_buffer32(ptop->data.code | 0x80000000);
 			}
 		}
-		if(detach.size()) {
+		if((core.global_flag & GLOBALFLAG_DETACH_EVENT) && detach.size()) {
 			for(auto iter = detach.begin(); iter != detach.end(); ++iter) {
 				if((*iter)->current.location & LOCATION_MZONE)
 					raise_single_event(*iter, 0, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
@@ -2849,14 +2872,13 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		}
 		adjust_instant();
 		process_single_event();
-		if(leave.size()) {
+		if(leave.size())
 			raise_event(&leave, EVENT_LEAVE_FIELD, reason_effect, reason, reason_player, 0, 0);
-			process_instant_event();
-		}
-		if(discard.size()) {
+		if(discard.size())
 			raise_event(&discard, EVENT_DISCARD, reason_effect, reason, reason_player, 0, 0);
-			process_instant_event();
-		}
+		if((core.global_flag & GLOBALFLAG_DETACH_EVENT) && detach.size())
+			raise_event(&detach, EVENT_DETACH_MATERIAL, reason_effect, reason, reason_player, 0, 0);
+		process_instant_event();
 		return FALSE;
 	}
 	case 5: {
@@ -3590,9 +3612,14 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 		effect* peffect;
 		for(uint8 p = 0; p < 2; ++p) {
 			for(int32 i = 0; i < 5; ++i) {
+				pduel->restore_assumes();
 				tuner = player[p].list_mzone[i];
-				if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && pduel->lua->check_matching(tuner, -2, 0)
-				        && tuner->is_can_be_synchro_material(pcard)) {
+				if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
+					effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
+					if(pcheck)
+						pcheck->get_value(tuner);
+					if(!pduel->lua->check_matching(tuner, -2, 0))
+						continue;
 					if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
 						if(!peffect->target)
 							continue;
@@ -3609,8 +3636,11 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 						for(uint8 np = 0; np < 2; ++np) {
 							for(int32 j = 0; j < 5; ++j) {
 								pm = player[np].list_mzone[j];
-								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, -1, 0)
-								        && pm->is_can_be_synchro_material(pcard, tuner)) {
+								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+									if(pcheck)
+										pcheck->get_value(pm);
+									if(!pduel->lua->check_matching(pm, -1, 0))
+										continue;
 									nsyn.push_back(pm);
 									pm->operation_param = pm->get_synchro_level(pcard);
 								}
@@ -3628,6 +3658,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 				}
 			}
 		}
+		pduel->restore_assumes();
 		if(core.select_cards.size() == 0)
 			return TRUE;
 		pduel->write_buffer8(MSG_HINT);
@@ -3639,6 +3670,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 	}
 	case 1: {
 		card* tuner = core.select_cards[returns.bvalue[1]];
+		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 		core.units.begin()->ptarget = (group*)tuner;
 		effect* peffect;
 		if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
@@ -3656,8 +3688,11 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 			for(uint8 np = 0; np < 2; ++np) {
 				for(int32 i = 0; i < 5; ++i) {
 					card* pm = player[np].list_mzone[i];
-					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pduel->lua->check_matching(pm, -1, 0)
-					        && pm->is_can_be_synchro_material(pcard, tuner)) {
+					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+						if(pcheck)
+							pcheck->get_value(pm);
+						if(!pduel->lua->check_matching(pm, -1, 0))
+							continue;
 						core.select_cards.push_back(pm);
 						pm->operation_param = pm->get_synchro_level(pcard);
 					}
@@ -3674,6 +3709,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 			add_process(PROCESSOR_SELECT_SUM, 0, 0, 0, lv - l1, playerid + (min << 16) + (max << 24));
 			core.units.begin()->step = 2;
 		}
+		pduel->restore_assumes();
 		return FALSE;
 	}
 	case 2: {

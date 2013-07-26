@@ -16,7 +16,7 @@ end
 function c1539051.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(c1539051.gfilter,tp,LOCATION_MZONE,0,nil)
-		local ct=g:GetClassCount(Card.GetOriginalCode)
+		local ct=g:GetClassCount(Card.GetCode)
 		e:SetLabel(ct)
 		return ct>0 and Duel.IsPlayerCanDraw(tp,ct)
 	end
@@ -27,6 +27,6 @@ end
 function c1539051.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local g=Duel.GetMatchingGroup(c1539051.gfilter,tp,LOCATION_MZONE,0,nil)
-	local ct=g:GetClassCount(Card.GetOriginalCode)
+	local ct=g:GetClassCount(Card.GetCode)
 	Duel.Draw(p,ct,REASON_EFFECT)
 end

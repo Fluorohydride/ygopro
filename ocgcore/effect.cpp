@@ -421,7 +421,7 @@ int32 effect::is_chainable(uint8 tp) {
 }
 int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 	switch (reset_type) {
-	case RESET_EVENT:
+	case RESET_EVENT: {
 		if(!(reset_flag & RESET_EVENT))
 			return FALSE;
 		if(owner != handler)
@@ -430,6 +430,11 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 			return TRUE;
 		return FALSE;
 		break;
+	}
+	case RESET_CARD: {
+		return owner && (owner->data.code == reset_level);
+		break;
+	}
 	case RESET_PHASE: {
 		if(!(reset_flag & RESET_PHASE))
 			return FALSE;
@@ -442,16 +447,14 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 		return FALSE;
 		break;
 	}
-	case RESET_CODE:
-		if(code == reset_level && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS))
-			return TRUE;
-		return FALSE;
+	case RESET_CODE: {
+		return (code == reset_level) && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS);
 		break;
-	case RESET_COPY:
-		if(copy_id == reset_level)
-			return TRUE;
-		return FALSE;
+	}
+	case RESET_COPY: {
+		return copy_id == reset_level;
 		break;
+	}
 	}
 	return FALSE;
 }

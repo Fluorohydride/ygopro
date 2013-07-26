@@ -26,6 +26,35 @@ function c70902743.initial_effect(c)
 	e2:SetTarget(c70902743.target2)
 	e2:SetOperation(c70902743.operation2)
 	c:RegisterEffect(e2)
+	if not c70902743.global_check then
+		c70902743.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
+		ge1:SetOperation(c70902743.check)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_ATTACK_DISABLED)
+		ge2:SetOperation(c70902743.check2)
+		Duel.RegisterEffect(ge2,0)
+	end
+end
+function c70902743.check(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	local ct=tc:GetFlagEffectLabel(70902743)
+	if ct then
+		tc:SetFlagEffectLabel(70902743,ct+1)
+	else
+		tc:RegisterFlagEffect(70902743,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,1)
+	end
+end
+function c70902743.check2(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	local ct=tc:GetFlagEffectLabel(70902743)
+	if ct then
+		tc:SetFlagEffectLabel(70902743,ct-1)
+	end
 end
 function c70902743.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget() and not Duel.GetAttackTarget():IsAttackPos()
@@ -43,7 +72,8 @@ function c70902743.operation1(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(g,REASON_EFFECT)
 end
 function c70902743.filter2(c)
-	return c:GetAttackAnnouncedCount()==0 and c:IsDestructable()
+	local ct=c:GetFlagEffectLabel(70902743)
+	return (not ct or ct==0) and c:IsDestructable()
 end
 function c70902743.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()

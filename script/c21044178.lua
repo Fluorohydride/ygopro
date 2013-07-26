@@ -1,4 +1,4 @@
---Abyss Dweller
+--深淵に潜む者
 function c21044178.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)

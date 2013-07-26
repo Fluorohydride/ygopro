@@ -1,4 +1,4 @@
---Hazy Flame Mantikor
+--陽炎獣 メコレオス
 function c96051150.initial_effect(c)
 	--cannot be target
 	local e1=Effect.CreateEffect(c)

@@ -19,7 +19,7 @@ function c83986578.cfilter(c)
 	return c:IsFaceup() and c:IsAttackBelow(1400)
 end
 function c83986578.condition(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c83986578.cfilter,1,nil)
+	return eg:IsExists(c83986578.cfilter,1,nil) and not eg:IsContains(e:GetHandler())
 end
 function c83986578.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

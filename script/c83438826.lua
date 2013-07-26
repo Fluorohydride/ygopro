@@ -1,4 +1,4 @@
---Noble Arms - Arfeudutyr
+--聖剣アロンダイト
 function c83438826.initial_effect(c)
 	c:SetUniqueOnField(1,0,83438826)
 	--Activate

@@ -1,4 +1,4 @@
---Ignoble Knight of Black Laundsallyn
+--魔聖騎士ランスロット
 function c95772051.initial_effect(c)
 	c:SetUniqueOnField(1,0,95772051)
 	--special summon

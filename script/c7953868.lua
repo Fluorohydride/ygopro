@@ -36,7 +36,7 @@ function c7953868.poop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c7953868.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetOverlayCount(tp,1,0)>0 end
+	if chk==0 then return Duel.CheckRemoveOverlayCard(tp,1,0,1,REASON_COST) end
 	Duel.RemoveOverlayCard(tp,1,0,1,1,REASON_COST)
 end
 function c7953868.filter(c,e,tp)
