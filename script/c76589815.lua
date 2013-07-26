@@ -64,9 +64,9 @@ function c76589815.cffilter(c)
 end
 function c76589815.cfop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
-	if g:GetCount()>0 then
-		Duel.ConfirmCards(tp,g)
-		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
+	if g:GetCount()==0 then return end
+	Duel.ConfirmCards(tp,g)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
 		local sg=g:Filter(c76589815.cffilter,nil)
 		if sg:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
@@ -75,4 +75,5 @@ function c76589815.cfop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-tp,setg)
 		end
 	end
+	Duel.ShuffleHand(1-tp)
 end

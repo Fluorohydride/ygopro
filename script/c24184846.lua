@@ -14,7 +14,7 @@ function c24184846.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c24184846.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemove() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c24184846.filter(c)
