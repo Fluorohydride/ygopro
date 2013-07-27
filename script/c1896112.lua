@@ -44,7 +44,7 @@ function c1896112.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g1=g:Filter(Card.IsControler,nil,tp)
 	local g2=g:Filter(Card.IsControler,nil,1-tp)
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft1>g1:GetCount() then
+	if ft1>=g1:GetCount() then
 		local tc=g1:GetFirst()
 		while tc do
 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
@@ -52,7 +52,7 @@ function c1896112.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
-	if ft2>g2:GetCount() then
+	if ft2>=g2:GetCount() then
 		local tc=g2:GetFirst()
 		while tc do
 			Duel.SpecialSummonStep(tc,0,1-tp,1-tp,false,false,POS_FACEUP)
