@@ -75,7 +75,7 @@ function c37364101.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c37364101.atkval(e,c)
-	return Duel.GetOverlayCount(e:GetHandlerPlayer(),1,1)*600
+	return Duel.GetOverlayCount(e:GetHandlerPlayer(),1,0)*600
 end
 function c37364101.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetFirst()==e:GetHandler():GetEquipTarget() and ep~=tp and eg:GetFirst():GetBattleTarget()~=nil

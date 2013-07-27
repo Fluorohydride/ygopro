@@ -33,8 +33,9 @@ function c55204071.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c55204071.spcon(e,c)
-	if c==nil then return Duel.GetFlagEffect(c:GetControler(),55204071)==0 end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+	if c==nil then return true end
+	return Duel.GetFlagEffect(c:GetControler(),55204071)==0
+		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(c:GetControler(),c55204071.cfilter,1,nil)
 end
 function c55204071.spop(e,tp,eg,ep,ev,re,r,rp,c)
