@@ -12,7 +12,6 @@ function c54762426.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c54762426.condition(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_TOHAND)
 	return ex and tg~=nil and tg:IsContains(e:GetHandler())
 end

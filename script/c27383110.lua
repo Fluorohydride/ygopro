@@ -62,16 +62,16 @@ function c27383110.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsAbleToRemove() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
-function c27383110.thfilter(c)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsAbleToHand()
+function c27383110.thfilter(c,e,tp)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)
 end
 function c27383110.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=e:GetLabelObject():GetLabelObject()
 	local mat=tc:GetMaterial()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and mat:IsContains(chkc) end
-	if chk==0 then return mat:IsExists(c27383110.thfilter,1,nil) end
+	if chkc then return mat:IsContains(chkc) and c27383110.thfilter(chkc,e,tp) end
+	if chk==0 then return mat:IsExists(c27383110.thfilter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=mat:FilterSelect(tp,c27383110.thfilter,1,1,nil)
+	local g=mat:FilterSelect(tp,c27383110.thfilter,1,1,nil,e,tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end

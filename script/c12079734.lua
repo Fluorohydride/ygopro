@@ -14,7 +14,7 @@ function c12079734.filter1(c,ec)
 	return c:IsType(TYPE_UNION) and c:CheckEquipTarget(ec)
 end
 function c12079734.filter2(c)
-	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT)
+	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToDeck()
 end
 function c12079734.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()

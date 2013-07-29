@@ -6,11 +6,11 @@ function c84968490.initial_effect(c)
 	e1:SetCategory(CATEGORY_DECKDES)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetCost(c84968490.discost)
+	e1:SetTarget(c84968490.distarget)
 	e1:SetOperation(c84968490.disop)
 	c:RegisterEffect(e1)
 end
-function c84968490.discost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c84968490.distarget(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,5) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(5)

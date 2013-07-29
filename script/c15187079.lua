@@ -1,20 +1,7 @@
 --地縛神 Uru
 function c15187079.initial_effect(c)
-	--only 1 can exists
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_SUMMON)
-	e1:SetCondition(c15187079.excon)
-	c:RegisterEffect(e1)
-	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c15187079.splimit)
-	c:RegisterEffect(e3)
+	c:SetUniqueOnField(1,1,10000000)
+	--
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
@@ -48,23 +35,12 @@ function c15187079.initial_effect(c)
 	e7:SetOperation(c15187079.ctop)
 	c:RegisterEffect(e7)
 end
-function c15187079.exfilter(c,fid)
-	return c:IsFaceup() and c:IsSetCard(0x21) and (fid==nil or c:GetFieldID()<fid)
-end
-function c15187079.excon(e)
-	return Duel.IsExistingMatchingCard(c15187079.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
-end
-function c15187079.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
-	return not Duel.IsExistingMatchingCard(c15187079.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
-end
 function c15187079.sdcon(e)
 	local c=e:GetHandler()
-	if c:IsStatus(STATUS_BATTLE_DESTROYED) or c:IsHasEffect(67987302) then return false end
+	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	local f1=Duel.GetFieldCard(0,LOCATION_SZONE,5)
 	local f2=Duel.GetFieldCard(1,LOCATION_SZONE,5)
 	return ((f1==nil or not f1:IsFaceup()) and (f2==nil or not f2:IsFaceup()))
-		or Duel.IsExistingMatchingCard(c15187079.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c:GetFieldID())
 end
 function c15187079.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,e:GetHandler()) end

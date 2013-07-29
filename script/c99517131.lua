@@ -18,7 +18,7 @@ function c99517131.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rec=Duel.GetMatchingGroupCount(c99517131.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)*400
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(rec)
-	if rec>0 then Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,1-tp,rec) end
+	if rec>0 then Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,rec) end
 end
 function c99517131.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,LOCATION_MZONE,LOCATION_MZONE,nil)

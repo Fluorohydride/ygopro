@@ -34,6 +34,7 @@ struct card_state {
 	uint32 code;
 	uint32 type;
 	uint32 level;
+	uint32 rank;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -73,7 +74,7 @@ public:
 	typedef std::multimap<uint32, effect*> effect_container;
 	typedef std::set<card*, card_sort> card_set;
 	typedef std::map<effect*, effect_container::iterator> effect_indexer;
-	typedef std::set<effect*> effect_relation;
+	typedef std::map<effect*, uint32> effect_relation;
 	typedef std::map<card*, uint32> relation_map;
 	typedef std::map<uint16, uint16> counter_map;
 	typedef std::map<uint16, card*> attacker_map;
@@ -98,6 +99,12 @@ public:
 	uint32 fieldid_r;
 	uint16 turnid;
 	uint16 turn_counter;
+	uint8 unique_pos[2];
+	uint16 unique_uid;
+	uint32 unique_code;
+	uint8 assume_type;
+	uint32 assume_value;
+	effect* unique_effect;
 	card* equiping_target;
 	card* pre_equip_target;
 	card* overlay_target;
@@ -399,4 +406,12 @@ public:
 #define QUERY_IS_DISABLED	0x80000
 #define QUERY_IS_PUBLIC		0x100000
 
+#define ASSUME_CODE			1
+#define ASSUME_TYPE			2
+#define ASSUME_LEVEL		3
+#define ASSUME_RANK			4
+#define ASSUME_ATTRIBUTE	5
+#define ASSUME_RACE			6
+#define ASSUME_ATTACK		7
+#define ASSUME_DEFENCE		8
 #endif /* CARD_H_ */

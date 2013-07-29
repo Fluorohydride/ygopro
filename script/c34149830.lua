@@ -24,7 +24,7 @@ function c34149830.condition(e,tp,eg,ep,ev,re,r,rp)
 		bc=Duel.GetAttacker()
 	end
 	return tc and bc and not tc:IsHasEffect(EFFECT_INDESTRUCTABLE_BATTLE)
-		and ((tc:IsDefencePos() and tc:GetDefence()<bc:GetAttack()) or (tc:IsAttackPos() and tc:GetAttack()<=bc:GetAttack()))
+		and tc:IsPosition(POS_FACEUP_ATTACK) and tc:GetAttack()<=bc:GetAttack()
 end
 function c34149830.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_WARRIOR) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

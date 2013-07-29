@@ -37,6 +37,7 @@ function c770365.filter(c)
 end
 function c770365.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ShuffleDeck(tp)
+	Duel.BreakEffect()
 	Duel.ConfirmDecktop(tp,5)
 	local g=Duel.GetDecktopGroup(tp,5)
 	local ct=g:FilterCount(c770365.filter,nil)
@@ -46,6 +47,7 @@ function c770365.operation(e,tp,eg,ep,ev,re,r,rp)
 		local dg=sg:Select(tp,1,ct,nil)
 		Duel.HintSelection(dg)
 		Duel.Destroy(dg,REASON_EFFECT)
+		Duel.BreakEffect()
 	end
 	Duel.SortDecktop(tp,tp,5)
 end

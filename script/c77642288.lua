@@ -25,25 +25,15 @@ function c77642288.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function c77642288.spop(e,tp,eg,ep,ev,re,r,rp)
-	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft==0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	if not Duel.IsExistingMatchingCard(c77642288.filter,tp,LOCATION_DECK,0,2,nil,e,tp) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c77642288.filter,tp,LOCATION_DECK,0,2,2,nil,e,tp)
-	if ft==1 then
-		local sg=g:Select(tp,1,1,nil)
-		local sc=sg:GetFirst()
-		g:RemoveCard(sc)
-		Duel.SpecialSummon(sc,106,tp,tp,false,false,POS_FACEUP)
-		sc:RegisterFlagEffect(sc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-		Duel.Destroy(g,REASON_EFFECT)
-	else
-		local tc=g:GetFirst()
-		while tc do
-			Duel.SpecialSummonStep(tc,106,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-			tc=g:GetNext()
-		end
-		Duel.SpecialSummonComplete()
+	local tc=g:GetFirst()
+	while tc do
+		Duel.SpecialSummonStep(tc,106,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
+		tc=g:GetNext()
 	end
+	Duel.SpecialSummonComplete()
 end

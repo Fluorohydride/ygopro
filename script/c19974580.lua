@@ -17,9 +17,8 @@ function c19974580.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(19974580,1))
 	e2:SetCategory(CATEGORY_DECKDES)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_DAMAGE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCondition(c19974580.ddcon)
 	e2:SetTarget(c19974580.ddtg)
 	e2:SetOperation(c19974580.ddop)
@@ -47,7 +46,7 @@ function c19974580.atop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c19974580.ddcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler()
+	return ep~=tp
 end
 function c19974580.ddtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

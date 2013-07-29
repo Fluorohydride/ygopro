@@ -1,5 +1,6 @@
 --超魔神イド
 function c35984222.initial_effect(c)
+	c:SetUniqueOnField(1,0,35984222)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -34,26 +35,6 @@ function c35984222.initial_effect(c)
 	local e5=e3:Clone()
 	e5:SetCode(EFFECT_CANNOT_MSET)
 	c:RegisterEffect(e5)
-	--only 1 can exists
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetCode(EFFECT_CANNOT_SUMMON)
-	e6:SetCondition(c35984222.excon)
-	c:RegisterEffect(e6)
-	local e7=e6:Clone()
-	e7:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	c:RegisterEffect(e7)
-	local e8=Effect.CreateEffect(c)
-	e8:SetType(EFFECT_TYPE_SINGLE)
-	e8:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e8:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e8:SetValue(c35984222.splimit)
-	c:RegisterEffect(e8)
-	local e9=Effect.CreateEffect(c)
-	e9:SetType(EFFECT_TYPE_SINGLE)
-	e9:SetCode(EFFECT_SELF_DESTROY)
-	e9:SetCondition(c35984222.descon)
-	c:RegisterEffect(e9)
 end
 function c35984222.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -76,19 +57,4 @@ function c35984222.spop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,0,c)
 		Duel.Destroy(g,REASON_EFFECT)
 	end
-end
-function c35984222.exfilter(c,fid)
-	return c:IsFaceup() and c:GetCode()==35984222 and (fid==nil or c:GetFieldID()<fid)
-end
-function c35984222.excon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c35984222.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil)
-end
-function c35984222.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
-	return not Duel.IsExistingMatchingCard(c35984222.exfilter,tgp,LOCATION_ONFIELD,0,1,nil)
-end
-function c35984222.descon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c35984222.exfilter,c:GetControler(),LOCATION_ONFIELD,0,1,nil,c:GetFieldID())
 end

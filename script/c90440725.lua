@@ -24,7 +24,7 @@ function c90440725.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
 		or not Duel.IsPlayerCanSpecialSummonMonster(tp,90440725,0,0x21,-2,-2,4,RACE_MACHINE,ATTRIBUTE_EARTH) then return end
-	c:AddTrapMonsterAttribute(true,ATTRIBUTE_EARTH,RACE_MACHINE,4,-2,-2)
+	c:AddTrapMonsterAttribute(TYPE_EFFECT,ATTRIBUTE_EARTH,RACE_MACHINE,4,-2,-2)
 	Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
 	c:TrapMonsterBlock()
 	--cannot attack

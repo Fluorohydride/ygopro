@@ -20,7 +20,7 @@ function c98380593.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		e:SetLabel(1)
 		Duel.SetTargetParam(1000)
-		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,2000)
+		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,1000)
 	end
 end
 function c98380593.recop(e,tp,eg,ep,ev,re,r,rp)

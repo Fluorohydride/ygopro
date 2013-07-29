@@ -1,18 +1,17 @@
 --E·HERO ボルテック
 function c9327502.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c9327502.condition)
 	e1:SetTarget(c9327502.target)
 	e1:SetOperation(c9327502.operation)
 	c:RegisterEffect(e1)
 end
 function c9327502.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler()
+	return ep~=tp
 end
 function c9327502.filter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x3008) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

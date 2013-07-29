@@ -21,7 +21,7 @@ function c43932460.synfilter(c)
 	return c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c43932460.discon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+	return e~=re and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c43932460.cfilter(c)

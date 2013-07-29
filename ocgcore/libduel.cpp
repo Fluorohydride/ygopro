@@ -125,7 +125,8 @@ int32 scriptlib::duel_reset_flag_effect(lua_State *L) {
 	effect* peffect;
 	pr = pduel->game_field->effects.aura_effect.equal_range(code);
 	for(; pr.first != pr.second; ) {
-		peffect = pr.first->second;
+		auto rm = pr.first++;
+		peffect = rm->second;
 		if(peffect->code == code)
 			pduel->game_field->remove_effect(peffect);
 	}
@@ -741,7 +742,7 @@ int32 scriptlib::duel_raise_event(lua_State *L) {
 		pgroup = *(group**) lua_touserdata(L, 1);
 		pduel = pgroup->pduel;
 	} else
-		luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
+		return luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
 	check_param(L, PARAM_TYPE_EFFECT, 3);
 	uint32 code = lua_tointeger(L, 2);
 	effect* peffect = *(effect**) lua_touserdata(L, 3);
@@ -1454,7 +1455,10 @@ int32 scriptlib::duel_get_attack_target(lua_State *L) {
 int32 scriptlib::duel_disable_attack(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	card* attacker = pduel->game_field->core.attacker;
-	if(!attacker || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
+	if(!attacker
+	        || (pduel->game_field->infos.phase == PHASE_DAMAGE && attacker->fieldid_r != pduel->game_field->core.pre_field[0] && attacker->fieldid_r != pduel->game_field->core.pre_field[1])
+	        || (attacker->current.position & POS_FACEDOWN)
+	        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
 	        || !attacker->is_affect_by_effect(pduel->game_field->core.reason_effect))
 		lua_pushboolean(L, 0);
 	else {
@@ -2632,7 +2636,7 @@ int32 scriptlib::duel_set_dice_result(lua_State * L) {
 	int32 res;
 	for(int32 i = 0; i < 5; ++i) {
 		res = lua_tointeger(L, i + 1);
-		if(res < 1 && res > 6)
+		if(res < 1 || res > 6)
 			res = 1;
 		pduel->game_field->core.dice_result[i] = res;
 	}
@@ -2855,10 +2859,10 @@ int32 scriptlib::duel_check_chain_uniqueness(lua_State *L) {
 		lua_pushboolean(L, 1);
 		return 1;
 	}
-	card::effect_relation er;
+	std::set<uint32> er;
 	field::chain_array::iterator cait;
 	for(cait = pduel->game_field->core.current_chain.begin(); cait != pduel->game_field->core.current_chain.end(); ++cait)
-		er.insert((effect*)(size_t)(cait->triggering_effect->handler->get_code()));
+		er.insert(cait->triggering_effect->handler->get_code());
 	if(er.size() == pduel->game_field->core.current_chain.size())
 		lua_pushboolean(L, 1);
 	else

@@ -83,15 +83,16 @@ function c74530899.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,ct*300,REASON_EFFECT)
 end
 function c74530899.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
+	return Duel.GetTurnPlayer()==e:GetHandler():GetControler()
 end
 function c74530899.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
+	e:GetHandler():CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
 function c74530899.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsRelateToEffect(e) then
 		Duel.SendtoDeck(c,nil,2,REASON_EFFECT)
 	end
 end

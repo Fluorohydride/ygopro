@@ -26,7 +26,8 @@ function c46411259.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
-		return Duel.CheckReleaseGroup(tp,c46411259.filter1,1,nil,e,tp)
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+			and Duel.CheckReleaseGroup(tp,c46411259.filter1,1,nil,e,tp)
 	end
 	local rg=Duel.SelectReleaseGroup(tp,c46411259.filter1,1,1,nil,e,tp)
 	e:SetLabel(rg:GetFirst():GetLevel())

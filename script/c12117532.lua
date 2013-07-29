@@ -31,7 +31,7 @@ function c12117532.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c12117532.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
+	return c:IsFaceup()
 end
 function c12117532.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c12117532.filter(chkc) end
@@ -54,7 +54,7 @@ function c12117532.descon(e,tp,eg,ep,ev,re,r,rp)
 	return tc and eg:IsContains(tc) and tc:IsReason(REASON_DESTROY)
 end
 function c12117532.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(), REASON_EFFECT)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 function c12117532.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetFirstCardTarget()~=nil
@@ -69,7 +69,7 @@ function c12117532.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_OWNER_RELATE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(-300)
+		e1:SetValue(-500)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCondition(c12117532.rcon)
 		tc:RegisterEffect(e1,true)

@@ -453,10 +453,10 @@ int32 scriptlib::group_get_class_count(lua_State *L) {
 	group* pgroup = *(group**) lua_touserdata(L, 1);
 	duel* pduel = pgroup->pduel;
 	int32 extraargs = lua_gettop(L) - 2;
-	card::effect_relation er;
+	std::set<uint32> er;
 	field::card_set::iterator cit = pgroup->container.begin();
 	for(; cit != pgroup->container.end(); ++cit) {
-		er.insert((effect*)(size_t)pduel->lua->get_operation_value(*cit, 2, extraargs));
+		er.insert(pduel->lua->get_operation_value(*cit, 2, extraargs));
 	}
 	lua_pushinteger(L, er.size());
 	return 1;

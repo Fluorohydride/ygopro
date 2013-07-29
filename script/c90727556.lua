@@ -26,6 +26,8 @@ function c90727556.initial_effect(c)
 	--cannot be synchro material
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
 	e4:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
 	e4:SetValue(1)
 	c:RegisterEffect(e4)

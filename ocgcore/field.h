@@ -16,6 +16,7 @@
 #include <list>
 #include <array>
 #include <unordered_map>
+#include <unordered_set>
 
 class card;
 struct card_data;
@@ -140,6 +141,7 @@ struct processor {
 	typedef std::vector<chain> chain_array;
 	typedef std::list<processor_unit> processor_list;
 	typedef std::set<card*, card_sort> card_set;
+	typedef std::set<effect*> effect_collection;
 
 	processor_list units;
 	processor_list subunits;
@@ -174,7 +176,11 @@ struct processor {
 	chain_list new_fchain_b;
 	chain_list new_ochain_b;
 	chain_list flip_chain_b;
+	chain_list new_ochain_h;
 	chain_list new_chains;
+	effect_collection delayed_quick_tmp;
+	effect_collection delayed_quick_break;
+	effect_collection delayed_quick;
 	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
 	card_set special_summoning;
@@ -202,6 +208,7 @@ struct processor {
 	event_list delayed_tev;
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
+	std::unordered_set<card*> unique_cards[2];
 	ptr temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[5];
@@ -329,7 +336,10 @@ public:
 	void update_disable_check_list(effect* peffect);
 	void add_to_disable_check_list(card* pcard);
 	void adjust_disable_check_list();
-
+	void add_unique_card(card* pcard);
+	void remove_unique_card(card* pcard);
+	effect* check_unique_onfield(card* pcard, uint8 controler);
+	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();
 	void restore_lp_cost();
@@ -371,7 +381,7 @@ public:
 	int32 execute_target(uint16 step, effect* peffect, uint8 triggering_player);
 	void raise_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	void raise_event(card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
-	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value );
+	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	int32 check_event(uint32 code, tevent* pe = 0);
 	int32 check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, int32 neglect_cost, int32 copy_info, tevent* pe = 0);
 	int32 check_hint_timing(effect* peffect);
@@ -529,8 +539,9 @@ public:
 
 #define GLOBALFLAG_DECK_REVERSE_CHECK	0x1
 #define GLOBALFLAG_BRAINWASHING_CHECK	0x2
-#define GLOBALFLAG_SCRAP_CHIMERA		0x3
-
+#define GLOBALFLAG_SCRAP_CHIMERA		0x4
+#define GLOBALFLAG_DELAYED_QUICKEFFECT	0x8
+#define GLOBALFLAG_DETACH_EVENT			0x10
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

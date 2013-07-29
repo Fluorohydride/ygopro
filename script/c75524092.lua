@@ -55,10 +55,9 @@ function c75524092.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	return true
 end
 function c75524092.desrepop(e,tp,eg,ep,ev,re,r,rp)
+	local exc=e:GetHandler():GetEquipTarget():GetBattleTarget()
 	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local exc=Duel.GetAttacker()
-	if exc:IsControler(tp) then exc=Duel.GetAttackTarget() end
 	local g=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,exc)
 	if Duel.Destroy(g,REASON_EFFECT)>0 and Duel.Damage(1-tp,600,REASON_EFFECT)~=0 then
 		if Duel.GetLocationCount(1-tp,LOCATION_MZONE,tp)>0

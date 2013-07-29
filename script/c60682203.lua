@@ -31,5 +31,5 @@ function c60682203.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function c60682203.aclimit(e,re,tp)
-	return re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

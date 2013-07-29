@@ -33,7 +33,9 @@ function c5556499.spfilter(c)
 end
 function c5556499.spcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetMatchingGroup(c5556499.spfilter,c:GetControler(),LOCATION_HAND,0,nil)
+	local tp=c:GetControler()
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
+	local g=Duel.GetMatchingGroup(c5556499.spfilter,tp,LOCATION_HAND,0,nil)
 	if not c:IsAbleToGraveAsCost() then
 		g:RemoveCard(c)
 	end

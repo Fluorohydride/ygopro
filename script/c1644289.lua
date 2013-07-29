@@ -37,9 +37,8 @@ end
 function c1644289.eqlimit(e,c)
 	return c:IsSetCard(0x30)
 end
-function c1644289.tglimit(e,re)
-	local rc=re:GetOwner()
-	return e:GetHandler():GetControler()~=rc:GetControler() and rc:IsType(TYPE_TRAP+TYPE_MONSTER)
+function c1644289.tglimit(e,re,rp)
+	return rp~=e:GetHandlerPlayer() and re:IsActiveType(TYPE_TRAP+TYPE_MONSTER)
 end
 function c1644289.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x30)

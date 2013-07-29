@@ -104,6 +104,11 @@ void duel::release_script_group() {
 	}
 	sgroups.clear();
 }
+void duel::restore_assumes() {
+	for(auto pcard : assumes)
+		pcard->assume_type = 0;
+	assumes.clear();
+}
 void duel::write_buffer32(uint32 value) {
 	*((uint32*)bufferp) = value;
 	bufferp += 4;

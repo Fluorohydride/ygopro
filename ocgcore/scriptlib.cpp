@@ -18,7 +18,7 @@ int32 scriptlib::check_param(lua_State* L, int32 param_type, int32 index, int32 
 		}
 		if(retfalse)
 			return FALSE;
-		luaL_error(L, "Parameter %d should be \"Card\".", index, result);
+		luaL_error(L, "Parameter %d should be \"Card\".", index);
 		break;
 	case PARAM_TYPE_GROUP:
 		if (lua_isuserdata(L, index)) {

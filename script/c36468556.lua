@@ -10,11 +10,14 @@ function c36468556.initial_effect(c)
 	e1:SetOperation(c36468556.activate)
 	c:RegisterEffect(e1)
 end
+function c36468556.tgfilter(c)
+	return (c:IsFaceup() and c:IsType(TYPE_EFFECT)) or c:IsFacedown()
+end
 function c36468556.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
 end
 function c36468556.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(aux.TRUE,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c36468556.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	local dam=Duel.GetMatchingGroupCount(c36468556.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)*500
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(dam)

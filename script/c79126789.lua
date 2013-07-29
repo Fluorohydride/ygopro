@@ -13,12 +13,13 @@ function c79126789.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c79126789.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and bit.band(r,0x4040)==0x4040
+	e:SetLabel(e:GetHandler():GetPreviousControler())
+	return e:GetHandler():IsPreviousLocation(LOCATION_HAND) and bit.band(r,0x4040)==0x4040
 end
 function c79126789.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
-	if tp==rp then
+	if tp==rp or tp~=e:GetLabel() then
 		Duel.SetTargetParam(1)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 	else

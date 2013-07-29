@@ -11,12 +11,13 @@ function c60228941.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c60228941.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetPreviousLocation()==LOCATION_HAND and bit.band(r,0x4040)==0x4040
+	e:SetLabel(e:GetHandler():GetPreviousControler())
+	return e:GetHandler():IsPreviousLocation(LOCATION_HAND) and bit.band(r,0x4040)==0x4040
 end
 function c60228941.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	if tp~=rp and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if tp~=rp and tp==e:GetLabel() and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c60228941.filter2,tp,0,LOCATION_GRAVE,1,nil,e,tp)
 		and Duel.SelectYesNo(tp,aux.Stringid(60228941,1)) then
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)

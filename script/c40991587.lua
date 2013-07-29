@@ -28,7 +28,7 @@ function c40991587.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c40991587.etarget(e,c)
-	return c:GetCode()~=40991587 and c:IsRace(RACE_ZOMBIE) and c:GetLevel()<=3
+	return c:GetCode()~=40991587 and c:IsRace(RACE_ZOMBIE) and c:IsLevelBelow(3)
 end
 function c40991587.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)

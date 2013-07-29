@@ -4,6 +4,7 @@ function c62107981.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DIRECT_ATTACK)
+	e1:SetCondition(c62107981.atcon)
 	c:RegisterEffect(e1)
 	--atk/def
 	local e2=Effect.CreateEffect(c)

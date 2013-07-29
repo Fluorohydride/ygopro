@@ -21,10 +21,11 @@ function c1281505.initial_effect(c)
 	c:RegisterEffect(e2)
 	--destroy sub
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetType(EFFECT_TYPE_EQUIP+EFFECT_TYPE_CONTINUOUS)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetCode(EFFECT_DESTROY_SUBSTITUTE)
-	e3:SetValue(1)
+	e3:SetCode(EFFECT_DESTROY_REPLACE)
+	e3:SetTarget(c1281505.reptg)
+	e3:SetOperation(c1281505.repop)
 	c:RegisterEffect(e3)
 end
 function c1281505.eqcon(e,tp,eg,ep,ev,re,r,rp)
@@ -51,4 +52,11 @@ function c1281505.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c1281505.eqlimit(e,c)
 	return c:GetControler()==e:GetHandler():GetControler()
+end
+function c1281505.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	return Duel.SelectYesNo(tp,aux.Stringid(1281505,1))
+end
+function c1281505.repop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT+REASON_REPLACE)
 end

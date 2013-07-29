@@ -1,12 +1,13 @@
 --レプティレス·ヴァースキ
 function c16886617.initial_effect(c)
 	c:EnableReviveLimit()
+	c:SetUniqueOnField(1,1,16886617)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
+	e1:SetValue(0)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
@@ -17,18 +18,6 @@ function c16886617.initial_effect(c)
 	e2:SetCondition(c16886617.spcon)
 	e2:SetOperation(c16886617.spop)
 	c:RegisterEffect(e2)
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	e3:SetCondition(c16886617.excon)
-	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e4:SetRange(LOCATION_MZONE)
-	e4:SetCode(EFFECT_SELF_DESTROY)
-	e4:SetCondition(c16886617.sdcon)
-	c:RegisterEffect(e4)
 	--destroy
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(16886617,0))
@@ -41,27 +30,34 @@ function c16886617.initial_effect(c)
 	e5:SetOperation(c16886617.desop)
 	c:RegisterEffect(e5)
 end
-function c16886617.exfilter(c,fid)
-	return c:IsFaceup() and c:GetCode()==16886617 and (fid==nil or c:GetFieldID()<fid)
-end
 function c16886617.rfilter(c)
 	return c:IsFaceup() and c:GetAttack()==0 and c:IsReleasable()
 end
 function c16886617.spcon(e,c)
-	if c==nil then return not Duel.IsExistingMatchingCard(c16886617.exfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	return Duel.IsExistingMatchingCard(c16886617.rfilter,0,LOCATION_MZONE,LOCATION_MZONE,2,nil)
+	if c==nil then return true end
+	local tp=c:GetControler()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local ct=-ft+1
+	if ct>2 then return false end
+	if ct>0 and not Duel.IsExistingMatchingCard(c16886617.rfilter,tp,LOCATION_MZONE,0,ct,nil) then return false end
+	return Duel.IsExistingMatchingCard(c16886617.rfilter,tp,LOCATION_MZONE,LOCATION_MZONE,2,nil)
 end
 function c16886617.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g=Duel.SelectMatchingCard(tp,c16886617.rfilter,0,LOCATION_MZONE,LOCATION_MZONE,2,2,nil)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local ct=-ft+1
+	if ct<0 then ct=0 end
+	local g=Group.CreateGroup()
+	if ct>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+		local sg=Duel.SelectMatchingCard(tp,c16886617.rfilter,tp,LOCATION_MZONE,0,ct,ct,nil)
+		g:Merge(sg)
+	end
+	if ct<2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+		local sg=Duel.SelectMatchingCard(tp,c16886617.rfilter,tp,LOCATION_MZONE,LOCATION_MZONE,2-ct,2-ct,g:GetFirst())
+		g:Merge(sg)
+	end
 	Duel.Release(g,REASON_COST)
-end
-function c16886617.excon(e)
-	return Duel.IsExistingMatchingCard(c16886617.exfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-end
-function c16886617.sdcon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c16886617.exfilter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c,c:GetFieldID())
 end
 function c16886617.desfilter(c)
 	return c:IsFaceup() and c:IsDestructable()

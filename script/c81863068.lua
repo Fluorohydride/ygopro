@@ -14,7 +14,7 @@ function c81863068.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(3)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,3)
 end
 function c81863068.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
@@ -23,5 +23,5 @@ function c81863068.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmCards(1-p,g)
 	local dg=g:Filter(Card.IsType,nil,TYPE_SPELL)
 	Duel.SendtoGrave(dg,REASON_EFFECT+REASON_DISCARD)
-	Duel.ShuffleHand(1-p)
+	Duel.ShuffleHand(p)
 end

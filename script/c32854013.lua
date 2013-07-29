@@ -31,7 +31,7 @@ function c32854013.activate(e)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local tc2=g:GetFirst()
 	if tc2==tc1 then tc2=g:GetNext() end
-	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.Destroy(tc1,REASON_EFFECT)~=0 then
+	if tc1:IsRelateToEffect(e) and tc1:IsFaceup() and Duel.Destroy(tc1,REASON_EFFECT)~=0 and tc2:IsRelateToEffect(e) then
 		Duel.SendtoDeck(tc2,nil,2,REASON_EFFECT)
 	end
 end

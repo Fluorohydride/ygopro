@@ -122,6 +122,8 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
 				return FALSE;
+			if(pduel->game_field->check_unique_onfield(handler, playerid))
+				return FALSE;
 			if(handler->data.type & TYPE_MONSTER)
 				return FALSE;
 			if(!(handler->data.type & TYPE_COUNTER)) {
@@ -269,7 +271,7 @@ int32 effect::is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond, i
 	return TRUE;
 }
 int32 effect::is_condition_check(uint8 playerid, tevent& e) {
-	if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (!handler->is_position(POS_FACEUP)))
+	if(!(type & EFFECT_TYPE_ACTIVATE) && (handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (!handler->is_position(POS_FACEUP)))
 		return FALSE;
 	if(!condition)
 		return TRUE;
@@ -395,7 +397,10 @@ int32 effect::is_chainable(uint8 tp) {
 	if((type & EFFECT_TYPE_ACTIVATE) && (sp <= 1) && !(flag & EFFECT_FLAG_COF))
 		return FALSE;
 	if(pduel->game_field->core.current_chain.size()) {
-		if(sp < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
+		if(!(flag & EFFECT_FLAG_FIELD_ONLY) && (type & EFFECT_TYPE_TRIGGER_O) && (handler->current.location == LOCATION_HAND)) {
+			if(pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed() > 2)
+				return FALSE;
+		} else if(sp < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
 			return FALSE;
 	}
 	if(pduel->game_field->core.chain_limit) {
@@ -416,7 +421,7 @@ int32 effect::is_chainable(uint8 tp) {
 }
 int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 	switch (reset_type) {
-	case RESET_EVENT:
+	case RESET_EVENT: {
 		if(!(reset_flag & RESET_EVENT))
 			return FALSE;
 		if(owner != handler)
@@ -425,6 +430,11 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 			return TRUE;
 		return FALSE;
 		break;
+	}
+	case RESET_CARD: {
+		return owner && (owner->data.code == reset_level);
+		break;
+	}
 	case RESET_PHASE: {
 		if(!(reset_flag & RESET_PHASE))
 			return FALSE;
@@ -437,16 +447,14 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 		return FALSE;
 		break;
 	}
-	case RESET_CODE:
-		if(code == reset_level && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS))
-			return TRUE;
-		return FALSE;
+	case RESET_CODE: {
+		return (code == reset_level) && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS);
 		break;
-	case RESET_COPY:
-		if(copy_id == reset_level)
-			return TRUE;
-		return FALSE;
+	}
+	case RESET_COPY: {
+		return copy_id == reset_level;
 		break;
+	}
 	}
 	return FALSE;
 }

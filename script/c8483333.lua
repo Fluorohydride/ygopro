@@ -30,7 +30,7 @@ function c8483333.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function c8483333.spfilter(c,e,tp,rc)
-	return c:IsReason(REASON_SUMMON) and c:GetReasonCard()==rc and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_SUMMON) and c:GetReasonCard()==rc and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c8483333.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -40,14 +40,33 @@ end
 function c8483333.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
-	local g=e:GetHandler():GetMaterial():Filter(c8483333.spfilter,nil,e,tp,e:GetHandler())
+	local c=e:GetHandler()
+	local g=c:GetMaterial():Filter(c8483333.spfilter,nil,e,tp,c)
 	if g:GetCount()>0 then
-		if g:GetCount()<=ft then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-		else
+		if g:GetCount()>ft then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-			local sg=g:Select(tp,ft,ft,nil)
-			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
+			g=g:Select(tp,ft,ft,nil)
 		end
+		local tc=g:GetFirst()
+		while tc do
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+			e1:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE)
+			e2:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e2)
+			local e3=Effect.CreateEffect(c)
+			e3:SetType(EFFECT_TYPE_SINGLE)
+			e3:SetCode(EFFECT_DISABLE_EFFECT)
+			e3:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e3)
+			tc=g:GetNext()
+		end
+		Duel.SpecialSummonComplete()
 	end
 end

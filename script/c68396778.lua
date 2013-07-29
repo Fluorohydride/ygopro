@@ -11,15 +11,15 @@ function c68396778.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c68396778.filter(c)
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
-		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 end
 function c68396778.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c68396778.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c68396778.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c68396778.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(c68396778.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		and Duel.IsExistingMatchingCard(c68396778.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,c68396778.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

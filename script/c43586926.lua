@@ -7,11 +7,9 @@ function c43586926.initial_effect(c)
 	e1:SetOperation(c43586926.regop)
 	c:RegisterEffect(e1)
 end
-c43586926[0]=true
-c43586926[1]=true
 function c43586926.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c43586926[tp] and c:IsReason(REASON_DESTROY) and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0 then
+	if Duel.GetFlagEffect(tp,43586926)==0 and c:IsReason(REASON_DESTROY) and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0 then
 		--spsummon
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(43586926,0))
@@ -27,9 +25,9 @@ function c43586926.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c43586926.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c43586926[tp] end
+	if chk==0 then return Duel.GetFlagEffect(tp,43586926)==0 end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	c43586926[tp]=false
+	Duel.RegisterFlagEffect(tp,43586926,0,0,0)
 end
 function c43586926.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

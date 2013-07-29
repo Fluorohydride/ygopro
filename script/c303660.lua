@@ -22,7 +22,7 @@ function c303660.initial_effect(c)
 	e3:SetCode(EFFECT_IMMUNE_EFFECT)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(LOCATION_ONFIELD,0)
+	e3:SetTargetRange(LOCATION_ONFIELD,LOCATION_ONFIELD)
 	e3:SetTarget(c303660.etarget)
 	e3:SetValue(c303660.efilter)
 	c:RegisterEffect(e3)
@@ -58,7 +58,8 @@ function c303660.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c303660.etarget(e,c)
-	return c:IsType(TYPE_TRAP)
+	local ec=e:GetHandler():GetEquipTarget()
+	return c:IsType(TYPE_TRAP) and ec and c:GetControler()==ec:GetControler()
 end
 function c303660.efilter(e,re)
 	return re:GetHandler()==e:GetHandler():GetEquipTarget()

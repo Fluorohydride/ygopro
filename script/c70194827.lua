@@ -12,7 +12,7 @@ function c70194827.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c70194827.atcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsChainAttackable()
+	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsChainAttackable(2,true)
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)~=0
 end
 function c70194827.atcost(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -12,6 +12,5 @@ function c8594079.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x22)
 end
 function c8594079.indcon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c8594079.filter,c:GetControler(),LOCATION_MZONE,0,1,c)
+	return Duel.IsExistingMatchingCard(c8594079.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end

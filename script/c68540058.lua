@@ -26,10 +26,10 @@ function c68540058.filter(c)
 	return c:IsFaceup()
 end
 function c68540058.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c68540058.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c68540058.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c68540058.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c68540058.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectTarget(tp,c68540058.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,c68540058.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c68540058.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -54,13 +54,10 @@ function c68540058.operation(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetCode(EFFECT_EQUIP_LIMIT)
 		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e3:SetValue(c68540058.eqlimit)
+		e3:SetValue(1)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e3)
 	end
-end
-function c68540058.eqlimit(e,c)
-	return c:GetControler()==e:GetOwnerPlayer()
 end
 function c68540058.atkup(e,tp,eg,ep,ev,re,r,rp)
 	local eqc=e:GetHandler():GetEquipTarget()

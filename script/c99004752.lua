@@ -46,12 +46,13 @@ function c99004752.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c99004752.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	return tc==e:GetLabelObject() and tc:GetFlagEffect(99004752)~=0
+	local tc=e:GetLabelObject()
+	return eg:IsContains(tc) and tc:GetFlagEffect(99004752)~=0 and tc:GetOwner()==1-tp
+		and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE)
 end
 function c99004752.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local atk=eg:GetFirst():GetBaseAttack()
+	local atk=e:GetLabelObject():GetBaseAttack()
 	if atk<0 then atk=0 end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(atk)

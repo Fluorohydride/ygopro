@@ -73,7 +73,7 @@ bool DataManager::LoadStrings(const char* file) {
 	char strbuf[256];
 	int value;
 	fseek(fp, 0, SEEK_END);
-	size_t fsize = ftell(fp);
+	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	fgets(linebuf, 256, fp);
 	while(ftell(fp) < fsize) {
@@ -205,6 +205,8 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 	}
 	if(p != attBuffer)
 		*(p - 1) = 0;
+	else
+		return unknown_string;
 	return attBuffer;
 }
 const wchar_t* DataManager::FormatRace(int race) {
@@ -219,6 +221,8 @@ const wchar_t* DataManager::FormatRace(int race) {
 	}
 	if(p != racBuffer)
 		*(p - 1) = 0;
+	else
+		return unknown_string;
 	return racBuffer;
 }
 const wchar_t* DataManager::FormatType(int type) {
@@ -233,6 +237,8 @@ const wchar_t* DataManager::FormatType(int type) {
 	}
 	if(p != tpBuffer)
 		*(p - 1) = 0;
+	else
+		return unknown_string;
 	return tpBuffer;
 }
 int DataManager::CardReader(int code, void* pData) {

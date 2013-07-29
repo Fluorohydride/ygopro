@@ -1,10 +1,10 @@
 --フィールドバリア
 function c7153114.initial_effect(c)
+	c:SetUniqueOnField(1,0,7153114)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCondition(c7153114.condition)
 	c:RegisterEffect(e1)
 	--indestructable
 	local e2=Effect.CreateEffect(c)
@@ -32,12 +32,6 @@ function c7153114.initial_effect(c)
 	e4:SetTargetRange(1,1)
 	e4:SetTarget(c7153114.sfilter)
 	c:RegisterEffect(e4)
-end
-function c7153114.afilter(c)
-	return c:IsFaceup() and c:GetCode()==7153114
-end
-function c7153114.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c7153114.afilter,tp,LOCATION_SZONE,0,1,nil)
 end
 function c7153114.infilter(e,c)
 	return c:IsType(TYPE_FIELD)

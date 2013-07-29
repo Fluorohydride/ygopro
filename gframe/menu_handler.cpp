@@ -15,7 +15,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 	case irr::EET_GUI_EVENT: {
 		irr::gui::IGUIElement* caller = event.GUIEvent.Caller;
 		s32 id = caller->getID();
-		irr::gui::IGUIEnvironment* env = mainGame->device->getGUIEnvironment();
 		switch(event.GUIEvent.EventType) {
 		case irr::gui::EGET_BUTTON_CLICKED: {
 			switch(id) {
@@ -38,7 +37,28 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				while(*pstr && i < 16)
 					ip[i++] = *pstr++;
 				ip[i] = 0;
-				unsigned int remote_addr = htonl(inet_addr(ip));
+
+                struct addrinfo hints, *servinfo;
+                 memset(&hints, 0, sizeof(struct addrinfo));
+                hints.ai_family = AF_INET;    /* Allow IPv4 or IPv6 */
+                hints.ai_socktype = SOCK_STREAM; /* Datagram socket */
+                hints.ai_flags = AI_PASSIVE;    /* For wildcard IP address */
+                hints.ai_protocol = 0;          /* Any protocol */
+                hints.ai_canonname = NULL;
+                hints.ai_addr = NULL;
+                hints.ai_next = NULL;
+                int status;
+                char hostname[100];
+                BufferIO::CopyWStr((wchar_t *)mainGame->ebJoinIP->getText(),hostname,100);
+                if ((status = getaddrinfo(hostname, NULL, &hints, &servinfo)) == -1) {
+                    //fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+                    //error handling
+                }
+                else
+                {
+                    inet_ntop(AF_INET, &(((struct sockaddr_in *)servinfo->ai_addr)->sin_addr), ip, 20);
+                }
+                unsigned int remote_addr = htonl(inet_addr(ip));
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
 				BufferIO::CopyWStr(mainGame->ebJoinIP->getText(), mainGame->gameConf.lastip, 20);
 				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
@@ -251,11 +271,17 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				tm* st = localtime(&curtime);
 				myswprintf(infobuf, L"%d/%d/%d %02d:%02d:%02d\n", st->tm_year + 1900, st->tm_mon + 1, st->tm_mday, st->tm_hour, st->tm_min, st->tm_sec);
 				repinfo.append(infobuf);
+				wchar_t namebuf[4][20];
+				BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[0], namebuf[0], 20);
+				BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[40], namebuf[1], 20);
+				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG) {
+					BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[80], namebuf[2], 20);
+					BufferIO::CopyWStr((unsigned short*)&ReplayMode::cur_replay.replay_data[120], namebuf[3], 20);
+				}
 				if(ReplayMode::cur_replay.pheader.flag & REPLAY_TAG)
-					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]),
-					           (wchar_t*)(&ReplayMode::cur_replay.replay_data[80]), (wchar_t*)(&ReplayMode::cur_replay.replay_data[120]));
+					myswprintf(infobuf, L"%ls\n%ls\n===VS===\n%ls\n%ls\n", namebuf[0], namebuf[1], namebuf[2], namebuf[3]);
 				else
-					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", (wchar_t*)ReplayMode::cur_replay.replay_data, (wchar_t*)(&ReplayMode::cur_replay.replay_data[40]));
+					myswprintf(infobuf, L"%ls\n===VS===\n%ls\n", namebuf[0], namebuf[1]);
 				repinfo.append(infobuf);
 				mainGame->ebRepStartTurn->setText(L"1");
 				mainGame->SetStaticText(mainGame->stReplayInfo, 180, mainGame->guiFont, (wchar_t*)repinfo.c_str());
@@ -282,11 +308,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 					char* pdeck = deckbuf;
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.main.size() + deckManager.current_deck.extra.size());
 					BufferIO::WriteInt32(pdeck, deckManager.current_deck.side.size());
-					for(int i = 0; i < deckManager.current_deck.main.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.main.size(); ++i)
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.main[i]->first);
-					for(int i = 0; i < deckManager.current_deck.extra.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.extra.size(); ++i)
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.extra[i]->first);
-					for(int i = 0; i < deckManager.current_deck.side.size(); ++i)
+					for(size_t i = 0; i < deckManager.current_deck.side.size(); ++i)
 						BufferIO::WriteInt32(pdeck, deckManager.current_deck.side[i]->first);
 					DuelClient::SendBufferToServer(CTOS_UPDATE_DECK, deckbuf, pdeck - deckbuf);
 					DuelClient::SendPacketToServer(CTOS_HS_READY);
@@ -327,7 +353,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
-		break;
+		default: break;
 		}
 		break;
 	}
@@ -342,9 +368,11 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 			mainGame->device->minimizeWindow();
 			break;
 		}
+		default: break;
 		}
 		break;
 	}
+	default: break;
 	}
 	return false;
 }

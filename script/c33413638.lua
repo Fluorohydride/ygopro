@@ -6,12 +6,16 @@ function c33413638.initial_effect(c)
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCondition(c33413638.tdcon)
 	e1:SetTarget(c33413638.tdtg)
 	e1:SetOperation(c33413638.tdop)
 	c:RegisterEffect(e1)
 end
+function c33413638.tdcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
+end
 function c33413638.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToDeck() end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
 function c33413638.tdop(e,tp,eg,ep,ev,re,r,rp)

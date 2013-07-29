@@ -5,7 +5,8 @@ function c27769400.initial_effect(c)
 	e1:SetDescription(aux.Stringid(27769400,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetCode(27769400)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c27769400.spcon)
 	e1:SetTarget(c27769400.sptg)
@@ -26,25 +27,33 @@ function c27769400.initial_effect(c)
 		c27769400[0]=Group.CreateGroup()
 		c27769400[0]:KeepAlive()
 		c27769400[1]=0
-		c27769400[2]=false
 		local ge1=Effect.GlobalEffect()
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_PHASE_START+PHASE_BATTLE)
 		ge1:SetOperation(c27769400.checkop1)
 		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.GlobalEffect()
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_BATTLE_DESTROYED)
+		ge2:SetOperation(c27769400.checkop2)
+		Duel.RegisterEffect(ge2,0)
 	end
 end
 function c27769400.checkop1(e,tp,eg,ep,ev,re,r,rp)
 	c27769400[0]:Clear()
 	c27769400[0]:Merge(Duel.GetFieldGroup(Duel.GetTurnPlayer(),0,LOCATION_MZONE))
 	c27769400[1]=c27769400[0]:GetCount()
-	c27769400[2]=false
 end
-function c27769400.spcon(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp or c27769400[1]<2 or c27769400[0]:GetCount()==0 then return false end
+function c27769400.checkop2(e,tp,eg,ep,ev,re,r,rp)
+	if c27769400[1]<2 or c27769400[0]:GetCount()==0 then return end
 	local g=eg:Filter(Card.IsLocation,nil,LOCATION_GRAVE)
 	c27769400[0]:Sub(g)
-	return c27769400[0]:GetCount()==0
+	if c27769400[0]:GetCount()==0 then
+		Duel.RaiseEvent(e:GetHandler(),27769400,e,0,0,0,0)
+	end
+end
+function c27769400.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
 end
 function c27769400.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

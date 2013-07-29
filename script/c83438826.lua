@@ -1,12 +1,12 @@
---Noble Arms - Arfeudutyr
+--聖剣アロンダイト
 function c83438826.initial_effect(c)
+	c:SetUniqueOnField(1,0,83438826)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCondition(c83438826.condition)
 	e1:SetTarget(c83438826.target)
 	e1:SetOperation(c83438826.operation)
 	c:RegisterEffect(e1)
@@ -43,16 +43,9 @@ function c83438826.initial_effect(c)
 end
 function c83438826.eqlimit(e,c)
 	return c:IsRace(RACE_WARRIOR)
-		and not Duel.IsExistingMatchingCard(c83438826.cfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,e:GetHandler())
-end
-function c83438826.cfilter(c)
-	return c:IsFaceup() and c:IsCode(83438826)
 end
 function c83438826.eqfilter1(c)
 	return c:IsFaceup() and c:IsRace(RACE_WARRIOR)
-end
-function c83438826.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c83438826.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c83438826.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c83438826.eqfilter1(chkc) end
@@ -62,9 +55,10 @@ function c83438826.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c83438826.operation(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Duel.Equip(tp,e:GetHandler(),tc)
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() and c:CheckUniqueOnField(tp) then
+		Duel.Equip(tp,c,tc)
 	end
 end
 function c83438826.desfilter(c)
@@ -98,7 +92,7 @@ function c83438826.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c83438826.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP) and c:IsReason(REASON_DESTROY)
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP) and c:IsReason(REASON_DESTROY) and c:CheckUniqueOnField(tp)
 end
 function c83438826.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,83438826)==0 end

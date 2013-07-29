@@ -43,6 +43,7 @@ function c8062132.initial_effect(c)
 	e6:SetCategory(CATEGORY_COUNTER)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e6:SetCode(EVENT_BATTLE_DAMAGE)
+	e6:SetCondition(c8062132.ctcon)
 	e6:SetOperation(c8062132.ctop)
 	c:RegisterEffect(e6)
 end
@@ -70,6 +71,9 @@ function c8062132.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,true,POS_FACEUP)
 	end
+end
+function c8062132.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	return ep~=tp
 end
 function c8062132.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -44,7 +44,8 @@ function c41482598.drcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c41482598.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,0)
+	local ht=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
+	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,4-ht)
 end
 function c41482598.drop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

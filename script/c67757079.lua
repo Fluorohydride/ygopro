@@ -1,5 +1,6 @@
 --キング·オブ·ビースト
 function c67757079.initial_effect(c)
+	c:SetUniqueOnField(1,1,67757079)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(67757079,0))
@@ -11,26 +12,6 @@ function c67757079.initial_effect(c)
 	e1:SetTarget(c67757079.sptg)
 	e1:SetOperation(c67757079.spop)
 	c:RegisterEffect(e1)
-	--only 1 can exists
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_CANNOT_SUMMON)
-	e2:SetCondition(c67757079.excon)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e4:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e4:SetValue(c67757079.splimit)
-	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_SELF_DESTROY)
-	e5:SetCondition(c67757079.descon)
-	c:RegisterEffect(e5)
 end
 function c67757079.cfilter(c)
 	return c:IsFaceup() and c:GetCode()==94878265
@@ -49,19 +30,4 @@ function c67757079.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c67757079.exfilter(c,fid)
-	return c:IsFaceup() and c:GetCode()==67757079 and (fid==nil or c:GetFieldID()<fid)
-end
-function c67757079.excon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c67757079.exfilter,c:GetControler(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-end
-function c67757079.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
-	return not Duel.IsExistingMatchingCard(c67757079.exfilter,tgp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-end
-function c67757079.descon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c67757079.exfilter,c:GetControler(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,c:GetFieldID())
 end
