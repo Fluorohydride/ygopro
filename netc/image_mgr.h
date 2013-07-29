@@ -3,7 +3,7 @@
 
 #include "GL/glew.h"
 #include "wx/image.h"
-#include "xml_config.h"
+#include "wx/xml/xml.h"
 #include <vector>
 #include <unordered_map>
 
@@ -17,7 +17,19 @@ namespace ygopro
 		float ry;
 	};
 
-	class ImageMgr : XMLConfig {
+	struct LayoutInfo {
+		bool show;
+		float x1;
+		float y1;
+		float x2;
+		float y2;
+		float x3;
+		float y3;
+		float x4;
+		float y4;
+	};
+
+	class ImageMgr {
 
 	public:
 		ImageMgr();
@@ -40,8 +52,8 @@ namespace ygopro
 		TextureInfo LoadCard(const wxImage& img);
 		
 		void LoadSingleImage(wxImage& img, const wxString& file);
-		virtual void LoadConfig(const wxString& file);
-		virtual void SaveConfig(const wxString& file);
+		void LoadImageConfig(const wxString& file);
+		void LoadLayoutConfig(const wxString& file);
 
 		wxImage image_texture;
 		wxImage image_unknown;

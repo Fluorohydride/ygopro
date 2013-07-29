@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Texture all="./textures/textures.png" sleeve="./textures/sleeve.jpg" unknown="./textures/unknown.jpg" background="./textures/bg.jpg">
-  <texture name="field" x="0" y="0" w="256" h="256"/>
-  <texture name="number" x="256" y="0" w="256" h="256"/>
-  <texture name="negated" x="0" y="256" w="128" h="128"/>
-  <texture name="attack" x="128" y="256" w="128" h="128"/>
-  <texture name="activate" x="0" y="384" w="128" h="128"/>
-  <texture name="chain" x="128" y="384" w="128" h="128"/>
-  <texture name="mask" x="256" y="256" w="128" h="128"/>
-  <texture name="fscissors" x="390" y="256" w="89" h="128"/>
-  <texture name="frock" x="256" y="384" w="89" h="128"/>
-  <texture name="fpaper" x="350" y="384" w="89" h="128"/>
-  <texture name="equip" x="450" y="390" w="34" h="34"/>
-  <texture name="target" x="450" y="430" w="34" h="34"/>
-  <texture name="limit0" x="512" y="0" w="64" h="64"/>
-  <texture name="limit1" x="576" y="0" w="64" h="64"/>
-  <texture name="limit2" x="640" y="0" w="64" h="64"/>
-  <texture name="lpframe" x="768" y="450" w="200" h="20"/>
-  <texture name="lpbar" x="970" y="450" w="16" h="16"/>
+  <texture id="1" name="field" x="0" y="0" w="256" h="256"/>
+  <texture id="2" name="number" x="256" y="0" w="256" h="256"/>
+  <texture id="3" name="negated" x="0" y="256" w="128" h="128"/>
+  <texture id="4" name="attack" x="128" y="256" w="128" h="128"/>
+  <texture id="5" name="activate" x="0" y="384" w="128" h="128"/>
+  <texture id="6" name="chain" x="128" y="384" w="128" h="128"/>
+  <texture id="7" name="mask" x="256" y="256" w="128" h="128"/>
+  <texture id="8" name="fscissors" x="390" y="256" w="89" h="128"/>
+  <texture id="9" name="frock" x="256" y="384" w="89" h="128"/>
+  <texture id="10" name="fpaper" x="350" y="384" w="89" h="128"/>
+  <texture id="11" name="equip" x="450" y="390" w="34" h="34"/>
+  <texture id="12" name="target" x="450" y="430" w="34" h="34"/>
+  <texture id="13" name="limit0" x="512" y="0" w="64" h="64"/>
+  <texture id="14" name="limit1" x="576" y="0" w="64" h="64"/>
+  <texture id="15" name="limit2" x="640" y="0" w="64" h="64"/>
+  <texture id="16" name="lpframe" x="768" y="0" w="256" h="64"/>
+  <texture id="17" name="lpbar" x="768" y="64" w="256" h="64"/>
 </Texture>

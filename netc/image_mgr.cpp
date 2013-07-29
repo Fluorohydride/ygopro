@@ -135,7 +135,7 @@ namespace ygopro
 		img.LoadFile(file);
 	}
 
-	void ImageMgr::LoadConfig(const wxString& name) {
+	void ImageMgr::LoadImageConfig(const wxString& name) {
 		wxXmlDocument doc;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return;
@@ -209,8 +209,8 @@ namespace ygopro
 
 	}
 
-	void ImageMgr::SaveConfig(const wxString& name) {
-	
+	void ImageMgr::LoadLayoutConfig(const wxString& name) {
+
 	}
 
 }

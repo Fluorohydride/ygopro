@@ -6,11 +6,6 @@
 
 namespace ygopro
 {
-	class XMLConfig {
-	public:
-		virtual void LoadConfig(const wxString& name) = 0;
-		virtual void SaveConfig(const wxString& name) = 0;
-	};
 
 	class CommonConfig : public XMLConfig {
 
@@ -35,8 +30,8 @@ namespace ygopro
 			return config_map[name];
 		}
 
-		virtual void LoadConfig(const wxString& name);
-		virtual void SaveConfig(const wxString& name);
+		void LoadConfig(const wxString& name);
+		void SaveConfig(const wxString& name);
 
 	private:
 		std::unordered_map<std::string, _ValueStruct> config_map;
