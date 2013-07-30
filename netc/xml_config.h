@@ -7,7 +7,7 @@
 namespace ygopro
 {
 
-	class CommonConfig : public XMLConfig {
+	class CommonConfig {
 
 		struct _ValueStruct {
 			bool is_string;

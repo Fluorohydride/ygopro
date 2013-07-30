@@ -15,7 +15,7 @@ namespace ygopro {
 
 			wxInitAllImageHandlers();
 			commonCfg.LoadConfig("common.xml");
-			imageMgr.LoadConfig("textures.xml");
+			imageMgr.LoadImageConfig("textures.xml");
 
 			mainFrame = new GameFrame(1280, 800);
 			mainFrame->Center();

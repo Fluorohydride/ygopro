@@ -160,7 +160,9 @@ namespace ygopro
 			background.ry = (float)image_bg.GetHeight() / texlen(image_bg.GetHeight());
 		}
 		wxXmlNode* child = root->GetChildren();
-		std::unordered_map<std::string, std::tuple<long, long, long, long>> infos;
+		float all_width = texlen(image_texture.GetWidth());
+		float all_height = texlen(image_texture.GetHeight());
+		std::unordered_map<std::string, int> infos;
 		while (child) {
 			if (child->GetName() == wxT("texture")) {
 				std::string name = child->GetAttribute("name").ToStdString();
@@ -168,44 +170,39 @@ namespace ygopro
 				wxString sy = child->GetAttribute("y");
 				wxString sw = child->GetAttribute("w");
 				wxString sh = child->GetAttribute("h");
-				long x, y, w, h;
+				wxString sid = child->GetAttribute("id");
+				long x, y, w, h, id;
+				sid.ToLong(&id);
+				TextureInfo& ti = textures[id];
 				sx.ToLong(&x);
 				sy.ToLong(&y);
 				sw.ToLong(&w);
 				sh.ToLong(&h);
-				infos[name] = std::make_tuple(x, y, w, h);
+				ti.lx = x / all_width;
+				ti.ly = y / all_height;
+				ti.rx = ti.lx + w / all_width;
+				ti.ry = ti.ly + h / all_height;
+				infos[name] = id;
 			}
 			child = child->GetNext();
 		}
-		float all_width = texlen(image_texture.GetWidth());
-		float all_height = texlen(image_texture.GetHeight());
 		
-#define MAP_TEXTURE_INFO(a,b) {\
-			std::tuple<long, long, long, long>& element = infos[b];\
-			a.lx = std::get<0>(element) / all_width;\
-			a.ly = std::get<1>(element) / all_height;\
-			a.rx = a.lx + std::get<2>(element) / all_width;\
-			a.ry = a.ly + std::get<3>(element) / all_height;\
-		}
-
-		MAP_TEXTURE_INFO(texture_field, "field")
-		MAP_TEXTURE_INFO(texture_number, "number")
-		MAP_TEXTURE_INFO(texture_attack, "attack")
-		MAP_TEXTURE_INFO(texture_activate, "activate")
-		MAP_TEXTURE_INFO(texture_chain, "chain")
-		MAP_TEXTURE_INFO(texture_mask, "mask")
-		MAP_TEXTURE_INFO(texture_negated, "negated")
-		MAP_TEXTURE_INFO(texture_limit0, "limit0")
-		MAP_TEXTURE_INFO(texture_limit1, "limit1")
-		MAP_TEXTURE_INFO(texture_limit2, "limit2")
-		MAP_TEXTURE_INFO(texture_lpframe, "lpframe")
-		MAP_TEXTURE_INFO(texture_lpbar, "lpbar")
-		MAP_TEXTURE_INFO(texture_equip, "equip")
-		MAP_TEXTURE_INFO(texture_target, "target")
-		MAP_TEXTURE_INFO(texture_scissors, "scissors")
-		MAP_TEXTURE_INFO(texture_rock, "rock")
-		MAP_TEXTURE_INFO(texture_paper, "paper")
-#undef MAP_TEXTURE_INFO
+		system_texture[TEXINDEX_FIELD] = infos["field"];
+		system_texture[TEXINDEX_ATTACK] = infos["attack"];
+		system_texture[TEXINDEX_ACTIVATE] = infos["activate"];
+		system_texture[TEXINDEX_CHAIN] = infos["chain"];
+		system_texture[TEXINDEX_MASK] = infos["mask"];
+		system_texture[TEXINDEX_NEGATED] = infos["negated"];
+		system_texture[TEXINDEX_LIMIT0] = infos["limit0"];
+		system_texture[TEXINDEX_LIMIT1] = infos["limit1"];
+		system_texture[TEXINDEX_LIMIT2] = infos["limit2"];
+		system_texture[TEXINDEX_LPFRAME] = infos["lpframe"];
+		system_texture[TEXINDEX_LPBAR] = infos["lpbar"];
+		system_texture[TEXINDEX_EQUIP] = infos["equip"];
+		system_texture[TEXINDEX_TARGET] = infos["target"];
+		system_texture[TEXINDEX_SCISSORS] = infos["scissors"];
+		system_texture[TEXINDEX_ROCK] = infos["rock"];
+		system_texture[TEXINDEX_PAPER] = infos["paper"];
 
 	}
 

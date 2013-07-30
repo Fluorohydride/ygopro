@@ -7,6 +7,24 @@
 #include <vector>
 #include <unordered_map>
 
+#define TEXINDEX_FIELD		0
+#define TEXINDEX_ATTACK		1
+#define TEXINDEX_ACTIVATE	2
+#define TEXINDEX_CHAIN		3
+#define TEXINDEX_MASK		4
+#define TEXINDEX_NEGATED	5
+#define TEXINDEX_LIMIT0		6
+#define TEXINDEX_LIMIT1		7
+#define TEXINDEX_LIMIT2		8
+#define TEXINDEX_LPFRAME	9
+#define TEXINDEX_LPBAR		10
+#define TEXINDEX_EQUIP		11
+#define TEXINDEX_TARGET		12
+#define TEXINDEX_SCISSORS	13
+#define TEXINDEX_ROCK		14
+#define TEXINDEX_PAPER		15
+#define TEXINDEX_NUMBERS	16
+
 namespace ygopro
 {
 	struct TextureInfo {
@@ -27,6 +45,7 @@ namespace ygopro
 		float y3;
 		float x4;
 		float y4;
+		
 	};
 
 	class ImageMgr {
@@ -70,24 +89,9 @@ namespace ygopro
 		TextureInfo card_unknown;
 		TextureInfo card_sleeve1;
 		TextureInfo card_sleeve2;
-		TextureInfo texture_field;
-		TextureInfo texture_number;
-		TextureInfo texture_attack;
-		TextureInfo texture_activate;
-		TextureInfo texture_chain;
-		TextureInfo texture_mask;
-		TextureInfo texture_negated;
-		TextureInfo texture_limit0;
-		TextureInfo texture_limit1;
-		TextureInfo texture_limit2;
-		TextureInfo texture_lpframe;
-		TextureInfo texture_lpbar;
-		TextureInfo texture_equip;
-		TextureInfo texture_target;
-		TextureInfo texture_scissors;
-		TextureInfo texture_rock;
-		TextureInfo texture_paper;
 
+		unsigned int system_texture[32];
+		TextureInfo textures[64];
 	private:
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
 		std::unordered_map<unsigned int, wxImage*> card_images;
