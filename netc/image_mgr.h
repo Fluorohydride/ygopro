@@ -4,6 +4,7 @@
 #include "GL/glew.h"
 #include "wx/image.h"
 #include "wx/xml/xml.h"
+#include <array>
 #include <vector>
 #include <unordered_map>
 
@@ -23,7 +24,12 @@
 #define TEXINDEX_SCISSORS	13
 #define TEXINDEX_ROCK		14
 #define TEXINDEX_PAPER		15
-#define TEXINDEX_NUMBERS	16
+
+#define LAYOUT_STATIC	0
+#define LAYOUT_LP		1
+#define LAYOUT_TEXT		2
+#define LAYOUT_PHASE	3
+#define LAYOUT_BUTTON	4
 
 namespace ygopro
 {
@@ -36,7 +42,8 @@ namespace ygopro
 	};
 
 	struct LayoutInfo {
-		bool show;
+		int style;
+		int click;
 		float x1;
 		float y1;
 		float x2;
@@ -45,7 +52,7 @@ namespace ygopro
 		float y3;
 		float x4;
 		float y4;
-		
+		TextureInfo* ptex;
 	};
 
 	class ImageMgr {
@@ -82,19 +89,21 @@ namespace ygopro
 		unsigned int textureid_all;
 		unsigned int textureid_card;
 		unsigned int textureid_bg;
-
 		unsigned int card_index;
-
 		TextureInfo background;
 		TextureInfo card_unknown;
 		TextureInfo card_sleeve1;
 		TextureInfo card_sleeve2;
+		std::array<TextureInfo*, 16> system_texture;
+		std::vector<TextureInfo> textures;
+		std::vector<TextureInfo> text_texture;
+		std::vector<LayoutInfo> layouts;
+		std::vector<LayoutInfo> clickable;
 
-		unsigned int system_texture[32];
-		TextureInfo textures[64];
 	private:
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
 		std::unordered_map<unsigned int, wxImage*> card_images;
+		std::unordered_map<std::string, TextureInfo*> texture_infos;
 	};
 
 	extern ImageMgr imageMgr;

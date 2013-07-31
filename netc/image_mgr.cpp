@@ -7,7 +7,8 @@ namespace ygopro
 	ImageMgr imageMgr;
 
 	ImageMgr::ImageMgr(): textureid_all(0), textureid_card(0), textureid_bg(0), card_index(0) {
-
+		for(int i = 0; i < 16; ++i)
+			system_texture[i] = nullptr;
 	}
 
 	ImageMgr::~ImageMgr() {
@@ -162,7 +163,6 @@ namespace ygopro
 		wxXmlNode* child = root->GetChildren();
 		float all_width = texlen(image_texture.GetWidth());
 		float all_height = texlen(image_texture.GetHeight());
-		std::unordered_map<std::string, int> infos;
 		while (child) {
 			if (child->GetName() == wxT("texture")) {
 				std::string name = child->GetAttribute("name").ToStdString();
@@ -171,9 +171,8 @@ namespace ygopro
 				wxString sw = child->GetAttribute("w");
 				wxString sh = child->GetAttribute("h");
 				wxString sid = child->GetAttribute("id");
-				long x, y, w, h, id;
-				sid.ToLong(&id);
-				TextureInfo& ti = textures[id];
+				long x, y, w, h;
+				TextureInfo ti;
 				sx.ToLong(&x);
 				sy.ToLong(&y);
 				sw.ToLong(&w);
@@ -182,28 +181,39 @@ namespace ygopro
 				ti.ly = y / all_height;
 				ti.rx = ti.lx + w / all_width;
 				ti.ry = ti.ly + h / all_height;
-				infos[name] = id;
+				textures.push_back(ti);
+				texture_infos[name] = &textures[textures.size() - 1];
 			}
 			child = child->GetNext();
 		}
 		
-		system_texture[TEXINDEX_FIELD] = infos["field"];
-		system_texture[TEXINDEX_ATTACK] = infos["attack"];
-		system_texture[TEXINDEX_ACTIVATE] = infos["activate"];
-		system_texture[TEXINDEX_CHAIN] = infos["chain"];
-		system_texture[TEXINDEX_MASK] = infos["mask"];
-		system_texture[TEXINDEX_NEGATED] = infos["negated"];
-		system_texture[TEXINDEX_LIMIT0] = infos["limit0"];
-		system_texture[TEXINDEX_LIMIT1] = infos["limit1"];
-		system_texture[TEXINDEX_LIMIT2] = infos["limit2"];
-		system_texture[TEXINDEX_LPFRAME] = infos["lpframe"];
-		system_texture[TEXINDEX_LPBAR] = infos["lpbar"];
-		system_texture[TEXINDEX_EQUIP] = infos["equip"];
-		system_texture[TEXINDEX_TARGET] = infos["target"];
-		system_texture[TEXINDEX_SCISSORS] = infos["scissors"];
-		system_texture[TEXINDEX_ROCK] = infos["rock"];
-		system_texture[TEXINDEX_PAPER] = infos["paper"];
-
+		system_texture[TEXINDEX_FIELD] = texture_infos["field"];
+		system_texture[TEXINDEX_ATTACK] = texture_infos["attack"];
+		system_texture[TEXINDEX_ACTIVATE] = texture_infos["activate"];
+		system_texture[TEXINDEX_CHAIN] = texture_infos["chain"];
+		system_texture[TEXINDEX_MASK] = texture_infos["mask"];
+		system_texture[TEXINDEX_NEGATED] = texture_infos["negated"];
+		system_texture[TEXINDEX_LIMIT0] = texture_infos["limit0"];
+		system_texture[TEXINDEX_LIMIT1] = texture_infos["limit1"];
+		system_texture[TEXINDEX_LIMIT2] = texture_infos["limit2"];
+		system_texture[TEXINDEX_LPFRAME] = texture_infos["lpframe"];
+		system_texture[TEXINDEX_LPBAR] = texture_infos["lpbar"];
+		system_texture[TEXINDEX_EQUIP] = texture_infos["equip"];
+		system_texture[TEXINDEX_TARGET] = texture_infos["target"];
+		system_texture[TEXINDEX_SCISSORS] = texture_infos["scissors"];
+		system_texture[TEXINDEX_ROCK] = texture_infos["rock"];
+		system_texture[TEXINDEX_PAPER] = texture_infos["paper"];
+		TextureInfo& ti = *texture_infos["number"];
+		float w = (ti.rx - ti.lx) / 4;
+		float h = (ti.ry - ti.ly) / 4;
+		for(int i = 0; i < 16; ++i) {
+			TextureInfo nti;
+			nti.lx = ti.lx + (i % 4) * w;
+			nti.ly = ti.ly + (i / 4) * h;
+			nti.rx = nti.lx + w;
+			nti.ry = nti.ly + h;
+			text_texture.push_back(nti);
+		}
 	}
 
 	void ImageMgr::LoadLayoutConfig(const wxString& name) {
