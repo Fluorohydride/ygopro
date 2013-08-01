@@ -161,8 +161,8 @@ namespace ygopro
 			background.ry = (float)image_bg.GetHeight() / texlen(image_bg.GetHeight());
 		}
 		wxXmlNode* child = root->GetChildren();
-		float all_width = texlen(image_texture.GetWidth());
-		float all_height = texlen(image_texture.GetHeight());
+		double all_width = texlen(image_texture.GetWidth());
+		double all_height = texlen(image_texture.GetHeight());
 		while (child) {
 			if (child->GetName() == wxT("texture")) {
 				std::string name = child->GetAttribute("name").ToStdString();
@@ -217,7 +217,27 @@ namespace ygopro
 	}
 
 	void ImageMgr::LoadLayoutConfig(const wxString& name) {
-
+		wxXmlDocument doc;
+		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
+			return;
+		wxXmlNode* root = doc.GetRoot();
+		wxXmlNode* child = root->GetChildren();
+		while (child) {
+			if (child->GetName() == wxT("layout")) {
+				LayoutInfo li;
+				std::string name = child->GetAttribute("name").ToStdString();
+				wxString style = child->GetAttribute("style");
+				wxString click = child->GetAttribute("click");
+				std::string texture = child->GetAttribute("texture").ToStdString();
+				child->GetAttribute("x1").ToDouble(&li.x1);
+				child->GetAttribute("x2").ToDouble(&li.x2);
+				child->GetAttribute("x3").ToDouble(&li.x3);
+				child->GetAttribute("x4").ToDouble(&li.x4);
+				textures.push_back(ti);
+				texture_infos[name] = &textures[textures.size() - 1];
+			}
+			child = child->GetNext();
+		}
 	}
 
 }

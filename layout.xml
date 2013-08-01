@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Layout>
-  <layout name="avatar_frame0" style="static" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="avatar_frame1" style="static" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="avatar0" style="static" click="avatar0" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="avatar1" style="static" click="avatar1" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp0" style="lp" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp1" style="lp" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp_txt0" style="text" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp_txt1" style="text" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="turn_frame" style="static" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="turn_box" style="text" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_frame" style="static" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_dp" style="phase" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_sp" style="phase" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_m1" style="phase" click="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_bp" style="phase" click="bp" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_m2" style="phase" click="m2" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_ep" style="phase" click="ep" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="button_menu" style="button" click="menu" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="button_surrender" style="button" click="surrender" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="button_confirm" style="button" click="confirm" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar_frame0" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar_frame1" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar0" style="static" click="avatar0" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar1" style="static" click="avatar1" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp0" style="lp" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp1" style="lp" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_txt0" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_txt1" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="turn_frame" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="turn_box" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_frame" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_dp" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_sp" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_m1" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_bp" style="phase" click="bp" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_m2" style="phase" click="m2" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_ep" style="phase" click="ep" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_menu" style="button" click="menu" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_surrender" style="button" click="surrender" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_confirm" style="button" click="confirm" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
 </Layout>

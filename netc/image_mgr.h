@@ -34,24 +34,24 @@
 namespace ygopro
 {
 	struct TextureInfo {
-		TextureInfo() : lx(0.0f), ly(0.0f), rx(0.0f), ry(0.0f) {}
-		float lx;
-		float ly;
-		float rx;
-		float ry;
+		TextureInfo() : lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
+		double lx;
+		double ly;
+		double rx;
+		double ry;
 	};
 
 	struct LayoutInfo {
 		int style;
 		int click;
-		float x1;
-		float y1;
-		float x2;
-		float y2;
-		float x3;
-		float y3;
-		float x4;
-		float y4;
+		double x1;
+		double y1;
+		double x2;
+		double y2;
+		double x3;
+		double y3;
+		double x4;
+		double y4;
 		TextureInfo* ptex;
 	};
 
