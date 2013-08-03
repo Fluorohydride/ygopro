@@ -18,17 +18,6 @@ function c42155488.initial_effect(c)
 	e2:SetTarget(c42155488.dectg)
 	e2:SetOperation(c42155488.decop)
 	c:RegisterEffect(e2)
-	if not c42155488.globalcheck then
-		c42155488.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c42155488.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=ge1:Clone()
-		ge2:SetCode(EVENT_SUMMON_SUCCESS)
-		Duel.RegisterEffect(ge2,0)
-	end
 end
 function c42155488.ntcon(e,c)
 	if c==nil then return true end
@@ -50,15 +39,10 @@ function c42155488.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e2)
 end
 function c42155488.dectg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,42155488)==0 
-	   or c42155488[tp]~=0
+	if chk==0 then return true
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,563)
-	if Duel.GetFlagEffect(tp,42155488)==0 then
-		local rc=Duel.AnnounceRace(tp,1,0xffffff)
-	else 
-		local rc=Duel.AnnounceRace(tp,1,c42155488[tp])
-	end
+	local rc=Duel.AnnounceRace(tp,1,0xffffff)
 	e:SetLabel(rc)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
