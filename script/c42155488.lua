@@ -78,19 +78,3 @@ end
 function c42155488.syncheck(e,c)
 	c:AssumeProperty(ASSUME_RACE,e:GetLabel())
 end
-
-function c42155488.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		local sump=tc:GetSummonPlayer()
-		local race=tc:GetRace()
-		if Duel.GetFlagEffect(sump,42155488)==0 then
-		    c42155488[sump]=race
-			Duel.RegisterFlagEffect(sump,42155488,RESET_PHASE+PHASE_END,0,1)
-	    else if c42155488[sump]~= race then
-			c42155488[sump]=0
-			end
-		end
-		tc=eg:GetNext()
-	end
-end
