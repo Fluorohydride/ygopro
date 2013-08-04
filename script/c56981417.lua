@@ -32,24 +32,28 @@ function c56981417.filter(c)
 	return c:IsSetCard(0x106e) and c:GetCode()~=56981417 and c:GetType()==TYPE_SPELL and c:CheckActivateEffect(true,true,false)~=nil
 end
 function c56981417.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c56981417.filter(chkc) end
+	if chkc then
+		local te=e:GetLabelObject()
+		local tg=te:GetTarget()
+		return tg and tg(e,tp,eg,ep,ev,re,r,rp,0,chkc)
+	end
 	if chk==0 then return Duel.IsExistingTarget(c56981417.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e:SetCategory(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,c56981417.filter,tp,LOCATION_GRAVE,0,1,1,nil)
-end
-function c56981417.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) or tc:CheckActivateEffect(true,true,false)==nil then return end
-	local tpe=tc:GetType()
-	local te=tc:GetActivateEffect()
+	local g=Duel.SelectTarget(tp,c56981417.filter,tp,LOCATION_GRAVE,0,1,1,nil)
+	local te=g:GetFirst():CheckActivateEffect(true,true,false)
+	e:SetLabelObject(te)
+	Duel.ClearTargetCard()
+	g:GetFirst():CreateEffectRelation(e)
 	local tg=te:GetTarget()
-	local op=te:GetOperation()
 	e:SetCategory(te:GetCategory())
 	e:SetProperty(te:GetProperty())
-	Duel.ClearTargetCard()
 	if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
-	Duel.BreakEffect()
+end
+function c56981417.operation(e,tp,eg,ep,ev,re,r,rp)
+	local te=e:GetLabelObject()
+	if not te:GetHandler():IsRelateToEffect(e) then return end
+	local op=te:GetOperation()
 	if op then op(e,tp,eg,ep,ev,re,r,rp) end
 end

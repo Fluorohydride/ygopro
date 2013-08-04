@@ -4,7 +4,7 @@ function c35307484.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(35307484,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
@@ -17,11 +17,11 @@ function c35307484.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
 end
-function c35307484.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x8b) and c:GetCode()~=35307484
+function c35307484.cfilter(c,tp)
+	return c:IsFaceup() and c:IsControler(tp) and c:IsSetCard(0x8b) and c:GetCode()~=35307484
 end
 function c35307484.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c35307484.cfilter,1,nil)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c35307484.cfilter,1,nil,tp)
 end
 function c35307484.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,35307484)==0 end
