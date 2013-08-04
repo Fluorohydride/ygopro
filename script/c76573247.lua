@@ -39,8 +39,8 @@ function c76573247.seqop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.MoveSequence(e:GetHandler(),nseq)
 	end
 end
-function c76573247.dircon(e,tp)
+function c76573247.dircon(e)
+	local p=1-e:GetHandlerPlayer()
 	local seq=4-e:GetHandler():GetSequence()
-	return Duel.GetFieldCard(e:GetOwnerPlayer(),LOCATION_MZONE,seq)==nil
-		and Duel.GetFieldCard(e:GetOwnerPlayer(),LOCATION_SZONE,seq)==nil
+	return Duel.GetFieldCard(p,LOCATION_MZONE,seq)==nil and Duel.GetFieldCard(p,LOCATION_SZONE,seq)==nil
 end
