@@ -233,8 +233,47 @@ namespace ygopro
 				child->GetAttribute("x2").ToDouble(&li.x2);
 				child->GetAttribute("x3").ToDouble(&li.x3);
 				child->GetAttribute("x4").ToDouble(&li.x4);
-				textures.push_back(ti);
-				texture_infos[name] = &textures[textures.size() - 1];
+				child->GetAttribute("y1").ToDouble(&li.y1);
+				child->GetAttribute("y2").ToDouble(&li.y2);
+				child->GetAttribute("y3").ToDouble(&li.y3);
+				child->GetAttribute("y4").ToDouble(&li.y4);
+				if(style == "static")
+					li.style = LAYOUT_STATIC;
+				else if(style == "lp")
+					li.style = LAYOUT_LP;
+				else if(style == "text")
+					li.style = LAYOUT_TEXT;
+				else if(style == "phase")
+					li.style = LAYOUT_PHASE;
+				else
+					li.style = LAYOUT_BUTTON;
+				if(click == "")
+					li.click = CLICK_NONE;
+				else if(click == "avatar0")
+					li.click = CLICK_AVATAR0;
+				else if(click == "avatar1")
+					li.click = CLICK_AVATAR1;
+				else if(click == "bp")
+					li.click = CLICK_BP;
+				else if(click == "m2")
+					li.click = CLICK_M2;
+				else if(click == "ep")
+					li.click = CLICK_EP;
+				else if(click == "menu")
+					li.click = CLICK_MENU;
+				else if(click == "surrender")
+					li.click = CLICK_SURRENDER;
+				else if(click == "confirm")
+					li.click = CLICK_CONFIRM;
+				else
+					li.click = CLICK_NONE;
+				if(texture == "")
+					li.ptex = nullptr;
+				else
+					li.ptex = texture_infos[texture];
+				layouts.push_back(li);
+				if(li.click)
+					clickable.push_back(li);
 			}
 			child = child->GetNext();
 		}

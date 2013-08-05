@@ -31,6 +31,16 @@
 #define LAYOUT_PHASE	3
 #define LAYOUT_BUTTON	4
 
+#define CLICK_NONE		0
+#define CLICK_AVATAR0	1
+#define CLICK_AVATAR1	2
+#define CLICK_BP		3
+#define CLICK_M2		4
+#define CLICK_EP		5
+#define CLICK_MENU		6
+#define CLICK_SURRENDER	7
+#define CLICK_CONFIRM	8
+
 namespace ygopro
 {
 	struct TextureInfo {
