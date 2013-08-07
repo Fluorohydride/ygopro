@@ -1454,25 +1454,8 @@ int32 scriptlib::duel_get_attack_target(lua_State *L) {
 }
 int32 scriptlib::duel_disable_attack(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	card* attacker = pduel->game_field->core.attacker;
-	if(!attacker
-	        || (pduel->game_field->infos.phase == PHASE_DAMAGE && attacker->fieldid_r != pduel->game_field->core.pre_field[0] && attacker->fieldid_r != pduel->game_field->core.pre_field[1])
-	        || (attacker->current.position & POS_FACEDOWN)
-	        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
-	        || !attacker->is_affect_by_effect(pduel->game_field->core.reason_effect))
-		lua_pushboolean(L, 0);
-	else {
-		effect* peffect = pduel->new_effect();
-		peffect->code = EFFECT_ATTACK_DISABLED;
-		peffect->type = EFFECT_TYPE_SINGLE;
-		attacker->add_effect(peffect);
-		attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
-		pduel->game_field->raise_event(attacker, EVENT_ATTACK_DISABLED, pduel->game_field->core.reason_effect,
-		                               0, pduel->game_field->core.reason_player, PLAYER_NONE, 0);
-		pduel->game_field->process_instant_event();
-		lua_pushboolean(L, 1);
-	}
-	return 1;
+	pduel->game_field->add_process(PROCESSOR_ATTACK_DISABLE, 0, 0, 0, 0, 0);
+	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_chain_attack(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);

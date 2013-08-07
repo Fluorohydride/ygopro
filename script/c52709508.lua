@@ -118,5 +118,6 @@ function c52709508.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end

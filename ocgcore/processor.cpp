@@ -474,6 +474,34 @@ int32 field::process() {
 			core.units.begin()->step++;
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_ATTACK_DISABLE: {
+		if(it->step == 0) {
+			card* attacker = core.attacker;
+			if(!attacker
+			        || (infos.phase == PHASE_DAMAGE && attacker->fieldid_r != core.pre_field[0] && attacker->fieldid_r != core.pre_field[1])
+			        || (attacker->current.position & POS_FACEDOWN)
+			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
+			        || !attacker->is_affect_by_effect(core.reason_effect)) {
+				returns.ivalue[0] = 0;
+				pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
+				core.units.pop_front();
+			} else {
+				effect* peffect = pduel->new_effect();
+				peffect->code = EFFECT_ATTACK_DISABLED;
+				peffect->type = EFFECT_TYPE_SINGLE;
+				attacker->add_effect(peffect);
+				attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+				raise_event(attacker, EVENT_ATTACK_DISABLED, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
+				process_instant_event();
+				core.units.begin()->step++;
+			}
+		} else {
+			returns.ivalue[0] = 1;
+			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
+			core.units.pop_front();
+		}
+		return pduel->bufferlen;
+	}
 	case PROCESSOR_DESTROY_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DESTROY, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
@@ -1947,7 +1975,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						newchain.triggering_sequence = peffect->handler->current.sequence;
 						newchain.triggering_player = priority;
 						core.select_chains.push_back(newchain);
-						core.delayed_quick_tmp.erase(peffect);
+						core.delayed_quick_tmp.erase(make_pair(peffect, *evit));
 					}
 				}
 				pr = effects.quick_o_effect.equal_range(evit->event_code);
@@ -1963,7 +1991,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						newchain.triggering_sequence = peffect->handler->current.sequence;
 						newchain.triggering_player = priority;
 						core.select_chains.push_back(newchain);
-						core.delayed_quick_tmp.erase(peffect);
+						core.delayed_quick_tmp.erase(make_pair(peffect, *evit));
 					}
 				}
 				evit++;
@@ -1998,11 +2026,12 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			}
 			if(core.global_flag & GLOBALFLAG_DELAYED_QUICKEFFECT) {
 				for(auto eit = core.delayed_quick.begin(); eit != core.delayed_quick.end(); ++eit) {
-					peffect = *eit;
-					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event, TRUE, FALSE, FALSE)) {
+					peffect = eit->first;
+					tevent evt = eit->second;
+					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, evt, TRUE, FALSE, FALSE)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
-						newchain.evt = nil_event;
+						newchain.evt = evt;
 						newchain.triggering_controler = peffect->handler->current.controler;
 						newchain.triggering_effect = peffect;
 						newchain.triggering_location = peffect->handler->current.location;
@@ -2069,7 +2098,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		if(core.select_chains.size() && returns.ivalue[0] != -1) {
 			chain newchain = core.select_chains[returns.ivalue[0]];
 			core.new_chains.push_back(newchain);
-			core.delayed_quick.erase(newchain.triggering_effect);
+			core.delayed_quick.erase(make_pair(newchain.triggering_effect, newchain.evt));
 			newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - priority);
@@ -2200,13 +2229,13 @@ int32 field::process_instant_event() {
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
 			if((peffect->flag & EFFECT_FLAG_DELAY) && peffect->is_condition_check(peffect->handler->current.controler, *elit))
-				core.delayed_quick_tmp.insert(peffect);
+				core.delayed_quick_tmp.insert(make_pair(peffect, *elit));
 		}
 		pr = effects.quick_o_effect.equal_range(elit->event_code);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
 			if((peffect->flag & EFFECT_FLAG_DELAY) && peffect->is_condition_check(peffect->handler->current.controler, *elit))
-				core.delayed_quick_tmp.insert(peffect);
+				core.delayed_quick_tmp.insert(make_pair(peffect, *elit));
 		}
 	}
 	for(eit = tp.begin(), evit = tev.begin(); eit != tp.end(); ++eit, ++evit) {
