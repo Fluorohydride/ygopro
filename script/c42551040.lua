@@ -38,14 +38,14 @@ function c42551040.posop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		if tc:IsPosition(POS_FACEUP_ATTACK) then
 			Duel.ChangePosition(tc,POS_FACEUP_DEFENCE)
-		end
-		if tc:GetDefence()>0 then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_SET_DEFENCE_FINAL)
-			e1:SetValue(0)
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e1)
+			if tc:GetDefence()>0 then
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_SET_DEFENCE_FINAL)
+				e1:SetValue(0)
+				e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+				tc:RegisterEffect(e1)
+			end
 		end
 	end
 end
