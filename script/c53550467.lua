@@ -19,7 +19,7 @@ function c53550467.initial_effect(c)
 	e2:SetCondition(c53550467.con)
 	e2:SetTarget(c53550467.tg)
 	e2:SetValue(c53550467.efval)
-	c:RegisterEffect(e1)
+	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(53550467,0))
@@ -40,7 +40,7 @@ function c53550467.con(e)
 	return Duel.IsExistingMatchingCard(c53550467.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c53550467.tg(e,c)
-	return c~=e:GetHandler() and c:IsFaceup() and c:IsAttackBelow(1800)
+	return c~=e:GetHandler() and c:IsAttackBelow(1800)
 end
 function c53550467.efval(e,re,tp)
 	return e:GetHandlerPlayer()~=tp
@@ -65,6 +65,6 @@ end
 function c53550467.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Duel.Destroy(tg,REASON_EFFECT)
+		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end

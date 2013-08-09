@@ -656,16 +656,21 @@ void card::xyz_overlay(card_set* materials) {
 		return;
 	card_set des;
 	if(materials->size() == 1) {
-		(*materials->begin())->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
-		xyz_add(*materials->begin(), &des);
+		card* pcard = *materials->begin();
+		pcard->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
+		if(pcard->unique_code)
+			pduel->game_field->remove_unique_card(pcard);
+		xyz_add(pcard, &des);
 	} else {
 		field::card_vector cv;
-		for(auto cit = materials->begin(); cit != materials->end(); ++cit)
-			cv.push_back(*cit);
+		for(auto cit : *materials)
+			cv.push_back(cit);
 		std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
-			(*cvit)->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
-			xyz_add(*cvit, &des);
+		for(auto pcard : cv) {
+			pcard->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
+			if(pcard->unique_code)
+				pduel->game_field->remove_unique_card(pcard);
+			xyz_add(pcard, &des);
 		}
 	}
 	if(des.size())
