@@ -42,11 +42,12 @@ end
 function c847915.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c847915.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
-function c847915.dfilter(c)
+function c847915.dfilter(c,tp)
 	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsSetCard(0x48)
+	and c:GetPreviousControler()==tp
 end
 function c847915.descon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c847915.dfilter,1,nil)
+	return eg:IsExists(c847915.dfilter,1,nil,tp)
 end
 function c847915.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
