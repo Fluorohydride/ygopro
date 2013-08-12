@@ -1,4 +1,4 @@
---素早いマンタ
+--スノー・ドラゴン
 function c3070049.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
