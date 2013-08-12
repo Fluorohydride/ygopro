@@ -34,4 +34,5 @@ function c77334267.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if g:IsRelateToEffect(e) then
 	Duel.Destroy(g,REASON_EFFECT)
+	end
 end
