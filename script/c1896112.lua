@@ -34,7 +34,7 @@ function c1896112.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g1=Duel.SelectTarget(tp,c1896112.filter,tp,LOCATION_REMOVED,0,1,ft1,nil,e,tp)
 	local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	if ft2>2 then ft2=2 end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
 	local g2=Duel.SelectTarget(1-tp,c1896112.filter,1-tp,LOCATION_REMOVED,0,1,ft2,nil,e,1-tp)
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,g1:GetCount(),0,0)
@@ -44,7 +44,7 @@ function c1896112.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g1=g:Filter(Card.IsControler,nil,tp)
 	local g2=g:Filter(Card.IsControler,nil,1-tp)
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft1>g1:GetCount() then
+	if ft1>=g1:GetCount() then
 		local tc=g1:GetFirst()
 		while tc do
 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
@@ -52,7 +52,7 @@ function c1896112.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
-	if ft2>g2:GetCount() then
+	if ft2>=g2:GetCount() then
 		local tc=g2:GetFirst()
 		while tc do
 			Duel.SpecialSummonStep(tc,0,1-tp,1-tp,false,false,POS_FACEUP)

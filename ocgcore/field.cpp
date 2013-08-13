@@ -12,6 +12,7 @@
 #include "effect.h"
 #include "interpreter.h"
 #include <iostream>
+#include <cstring>
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 

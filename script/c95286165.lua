@@ -14,7 +14,7 @@ function c95286165.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsAbleToExtra()
 end
 function c95286165.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c95286165.filter(chk) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c95286165.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c95286165.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c95286165.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
