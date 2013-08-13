@@ -12,13 +12,9 @@ end
 function c78783370.condition(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
 	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
-	if ex then return true end
+	if ex and (cp==tp or cp==PLAYER_ALL) then return true end
 	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
-	if not ex then return false end
-	if cp~=PLAYER_ALL then return Duel.IsPlayerAffectedByEffect(cp,EFFECT_REVERSE_RECOVER)
-	else return Duel.IsPlayerAffectedByEffect(0,EFFECT_REVERSE_RECOVER)
-		or Duel.IsPlayerAffectedByEffect(1,EFFECT_REVERSE_RECOVER)
-	end
+	return ex and (cp==tp or cp==PLAYER_ALL) and Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_RECOVER)
 end
 function c78783370.operation(e,tp,eg,ep,ev,re,r,rp)
 	local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
