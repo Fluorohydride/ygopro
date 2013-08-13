@@ -8,6 +8,7 @@
 #ifndef FIELD_H_
 #define FIELD_H_
 
+#include "memory.h"
 #include "common.h"
 #include "effectset.h"
 #include <vector>

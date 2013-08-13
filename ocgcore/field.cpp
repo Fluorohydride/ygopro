@@ -19,7 +19,7 @@ bool chain::chain_operation_sort(chain c1, chain c2) {
 	return c1.triggering_effect->id < c2.triggering_effect->id;
 }
 bool tevent::operator< (const tevent& v) const {
-	return std::memcmp(this, &v, sizeof(tevent)) < 0;
+	return memcmp(this, &v, sizeof(tevent)) < 0;
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
