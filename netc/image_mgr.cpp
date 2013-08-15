@@ -165,18 +165,13 @@ namespace ygopro
 		double all_height = texlen(image_texture.GetHeight());
 		while (child) {
 			if (child->GetName() == wxT("texture")) {
-				std::string name = child->GetAttribute("name").ToStdString();
-				wxString sx = child->GetAttribute("x");
-				wxString sy = child->GetAttribute("y");
-				wxString sw = child->GetAttribute("w");
-				wxString sh = child->GetAttribute("h");
-				wxString sid = child->GetAttribute("id");
 				long x, y, w, h;
 				TextureInfo ti;
-				sx.ToLong(&x);
-				sy.ToLong(&y);
-				sw.ToLong(&w);
-				sh.ToLong(&h);
+				std::string name = child->GetAttribute("name").ToStdString();
+				child->GetAttribute("x").ToLong(&x);
+				child->GetAttribute("y").ToLong(&y);
+				child->GetAttribute("w").ToLong(&w);
+				child->GetAttribute("h").ToLong(&h);
 				ti.lx = x / all_width;
 				ti.ly = y / all_height;
 				ti.rx = ti.lx + w / all_width;
