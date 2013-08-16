@@ -9,6 +9,17 @@
 
 namespace ygo {
 
+extern unsigned int lflist;
+extern unsigned char rule;
+extern unsigned char mode;
+extern bool enable_priority;
+extern bool no_check_deck;
+extern bool no_shuffle_deck;
+extern unsigned int start_lp;
+extern unsigned char start_hand;
+extern unsigned char draw_count;
+bool runasserver = true;
+
 SingleDuel::SingleDuel(bool is_match) {
 	match_mode = is_match;
 	match_kill = 0;
@@ -57,6 +68,31 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			NetServer::DisconnectPlayer(dp);
 			return;
 		}
+		
+		if (runasserver){
+			host_info.start_hand=5;
+			host_info.start_lp=8000;
+			host_info.draw_count=1;
+			host_info.mode=1;
+			host_info.no_check_deck=false;
+			host_info.no_shuffle_deck=false;
+			host_info.enable_priority=false;
+			host_info.rule=0;
+			host_info.time_limit=180;
+
+			if (ygo::start_hand !=0 ){
+		        host_info.start_hand=ygo::start_hand;
+		        host_info.start_lp=ygo::start_lp;
+		        host_info.draw_count=ygo::draw_count;
+		        host_info.mode=ygo::mode;
+		        host_info.no_check_deck=ygo::no_check_deck;
+		        host_info.no_shuffle_deck=ygo::no_shuffle_deck;
+		        host_info.enable_priority=ygo::enable_priority;
+		        host_info.rule=ygo::rule;
+		        host_info.time_limit=180;
+			}
+		}else
+		{
 		wchar_t jpass[20];
 		BufferIO::CopyWStr(pkt->pass, jpass, 20);
 		if(wcscmp(jpass, pass)) {
@@ -65,6 +101,7 @@ void SingleDuel::JoinGame(DuelPlayer* dp, void* pdata, bool is_creater) {
 			scem.code = 1;
 			NetServer::SendPacketToPlayer(dp, STOC_ERROR_MSG, scem);
 			return;
+		}
 		}
 	}
 	dp->game = this;

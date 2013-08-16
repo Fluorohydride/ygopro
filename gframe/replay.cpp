@@ -3,8 +3,11 @@
 #include "../ocgcore/card.h"
 #include <algorithm>
 #include "lzma/LzmaLib.h"
+#include   <sstream>
 
 namespace ygo {
+
+extern unsigned short aServerPort;
 
 Replay::Replay() {
 	is_recording = false;
@@ -16,11 +19,42 @@ Replay::~Replay() {
 	delete[] replay_data;
 	delete[] comp_data;
 }
+
+
+std::wstring SA2W(std::string& strA)
+{
+    setlocale(LC_ALL, "chs");
+
+    const char* _Source = strA.c_str();
+    size_t _Dsize = strA.size() + 1;
+    wchar_t *_Dest = new wchar_t[_Dsize];
+    wmemset(_Dest, 0, _Dsize);
+    mbstowcs(_Dest,_Source,_Dsize);
+    std::wstring result = _Dest;
+    delete []_Dest;
+
+    setlocale(LC_ALL, "C");
+
+    return result;
+
+}
+
+
+
 void Replay::BeginRecord() {
 #ifdef _WIN32
-	if(is_recording)
+if(is_recording)
 		CloseHandle(recording_fp);
-	recording_fp = CreateFileW(L"./replay/_LastReplay.yrp", GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
+    std::stringstream ss;
+    ss<<ygo::aServerPort;
+    std::string ssss;
+    ssss=ss.str();
+
+    std::wstring comPrefix = L"./replay/";
+
+    std::wstring comID =comPrefix+ SA2W(ssss)+L"Replay.yrp" ;
+
+	recording_fp = CreateFileW(comID.c_str(), GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, FILE_FLAG_WRITE_THROUGH, NULL);
 	if(recording_fp == INVALID_HANDLE_VALUE)
 		return;
 #else

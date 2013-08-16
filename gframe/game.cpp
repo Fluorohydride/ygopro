@@ -20,6 +20,27 @@ namespace ygo {
 
 Game* mainGame;
 
+unsigned short aServerPort;
+unsigned int lflist;
+unsigned char rule;
+unsigned char mode;
+bool enable_priority;
+bool no_check_deck;
+bool no_shuffle_deck;
+unsigned int start_lp;
+unsigned char start_hand;
+unsigned char draw_count;
+
+void Game::MainServerLoop(int bDuel_mode) {
+	deckManager.LoadLFList();
+    dataManager.LoadDB("cards.cdb");
+    NetServer::StartServer(aServerPort);
+    NetServer::Initduel(bDuel_mode);
+	while(NetServer::net_evbase) {
+        Sleep(200);
+    }
+}
+
 bool Game::Initialize() {
 	srand(time(0));
 	LoadConfig();
