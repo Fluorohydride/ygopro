@@ -12,6 +12,7 @@
 #ifndef WIN32
 #include <sys/types.h>
 #include <dirent.h>
+#include <unistd.h>
 #endif
 
 const unsigned short PRO_VERSION = 0x1320;
@@ -37,7 +38,11 @@ void Game::MainServerLoop(int bDuel_mode) {
     NetServer::StartServer(aServerPort);
     NetServer::Initduel(bDuel_mode);
 	while(NetServer::net_evbase) {
+#ifdef WIN32
         Sleep(200);
+#else
+	usleep(200000);
+#endif
     }
 }
 
