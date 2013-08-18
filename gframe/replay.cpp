@@ -60,7 +60,9 @@ if(is_recording)
 #else
 	if(is_recording)
 		fclose(fp);
-	fp = fopen("./replay/_LastReplay.yrp", "wb");
+	char path[20];
+	sprintf(path, "./replay/%u.yrp", ygo::aServerPort);
+	fp = fopen(path, "wb");
 	if(!fp)
 		return;
 #endif
