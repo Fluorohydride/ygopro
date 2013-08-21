@@ -1,7 +1,9 @@
 #include "../common/common.h"
 #include "../common/hash.h"
-#include "game_window.h"
+#include "game_frame.h"
+#include "editor_frame.h"
 #include "image_mgr.h"
+#include "card_data.h"
 #include "wx/app.h"
 #include "wx/image.h"
 
@@ -16,6 +18,9 @@ namespace ygopro {
 			wxInitAllImageHandlers();
 			commonCfg.LoadConfig("common.xml");
 			imageMgr.LoadImageConfig("textures.xml");
+
+//			if(dataMgr.LoadDatas("cards.cdb"))
+//				return true;
 
 			mainFrame = new GameFrame(1280, 800);
 			mainFrame->Center();

@@ -6,9 +6,15 @@ namespace ygopro
 
 	ImageMgr imageMgr;
 
-	ImageMgr::ImageMgr(): textureid_all(0), textureid_card(0), textureid_bg(0), card_index(0) {
+	ImageMgr::ImageMgr(): textureid_all(0), textureid_card(0), textureid_bg(0) {
 		for(int i = 0; i < 16; ++i)
 			system_texture[i] = nullptr;
+		for(int i = 0; i < 184; ++i) {
+			texture_pool[i].count = 0;
+			texture_pool[i].next = i + 1;
+		}
+		pool_start = 0;
+		pool_end = 183;
 	}
 
 	ImageMgr::~ImageMgr() {
@@ -55,6 +61,7 @@ namespace ygopro
 
 	TextureInfo& ImageMgr::ReloadCardTexture(unsigned int id) {
 		wxString file = wxString::Format("./image/%d.jpg", id);
+		UnloadCardTexture(id);
 		TextureInfo& ti = card_textures[id];
 		if(!wxFileExists(file)) {
 			ti = card_unknown;
@@ -72,6 +79,21 @@ namespace ygopro
 			}
 		}
 		return ti;
+	}
+
+	void ImageMgr::UnloadCardTexture(unsigned int id) {
+		auto iter = card_textures.find(id);
+		if(iter == card_textures.end())
+			return;
+		unsigned index = iter->second.index;
+		card_textures.erase(iter);
+		if(index < 3)
+			return;
+		texture_pool[index].count--;
+		if(texture_pool[index].count == 0) {
+			texture_pool[pool_end].next = index;
+			pool_end = index;
+		}
 	}
 
 	unsigned int ImageMgr::LoadTexture(const wxImage& img) {
@@ -103,11 +125,11 @@ namespace ygopro
 	}
 
 	TextureInfo ImageMgr::LoadCard(const wxImage& img) {
-		if(card_index >= 184)
+		if(pool_start == pool_end)
 			return card_unknown;
 		TextureInfo ti;
-		unsigned int indexx = (card_index % 23);
-		unsigned int indexy = card_index / 23;
+		unsigned int indexx = (pool_start % 23);
+		unsigned int indexy = pool_start / 23;
 		unsigned int imagex = img.GetWidth();
 		unsigned int imagey = img.GetHeight();
 		unsigned char * pxdata = img.GetData();
@@ -122,11 +144,13 @@ namespace ygopro
 		}
 		glTexSubImage2D(GL_TEXTURE_2D, 0, indexx * 178, indexy * 256, imagex, imagey, GL_RGBA, GL_UNSIGNED_BYTE, px);
 		delete[] px;
+		ti.index = pool_start;
 		ti.lx = 178.0f / 4096.0f * indexx;
 		ti.ly = 1.0f / 16.0f * indexy;
 		ti.rx = ti.lx + imagex / 4096.0f;
 		ti.ry = ti.ly + imagey / 2048.0f;
-		card_index++;
+		texture_pool[pool_start].count = 1;
+		pool_start = texture_pool[pool_start].next;
 		return ti;
 	}
 
@@ -198,6 +222,10 @@ namespace ygopro
 		system_texture[TEXINDEX_SCISSORS] = texture_infos["scissors"];
 		system_texture[TEXINDEX_ROCK] = texture_infos["rock"];
 		system_texture[TEXINDEX_PAPER] = texture_infos["paper"];
+		system_texture[TEXINDEX_SOCG] = texture_infos["symbol_ocg"];
+		system_texture[TEXINDEX_STCG] = texture_infos["symbol_tcg"];
+		system_texture[TEXINDEX_SCTM] = texture_infos["symbol_ctm"];
+		system_texture[TEXINDEX_STST] = texture_infos["symbol_tst"];
 		TextureInfo& ti = *texture_infos["number"];
 		float w = (ti.rx - ti.lx) / 4;
 		float h = (ti.ry - ti.ly) / 4;

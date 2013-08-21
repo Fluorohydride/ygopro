@@ -15,6 +15,10 @@
   <texture name="limit0" x="512" y="0" w="64" h="64"/>
   <texture name="limit1" x="576" y="0" w="64" h="64"/>
   <texture name="limit2" x="640" y="0" w="64" h="64"/>
+  <texture name="symbol_ocg" x="512" y="64" w="128" h="64"/>
+  <texture name="symbol_tcg" x="640" y="64" w="128" h="64"/>
+  <texture name="symbol_ctm" x="512" y="128" w="128" h="64"/>
+  <texture name="symbol_tst" x="640" y="128" w="128" h="64"/>
   <texture name="lpframe" x="768" y="0" w="256" h="64"/>
   <texture name="lpbar" x="768" y="64" w="256" h="64"/>
 </Texture>

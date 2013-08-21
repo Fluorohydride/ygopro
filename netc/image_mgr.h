@@ -24,6 +24,10 @@
 #define TEXINDEX_SCISSORS	13
 #define TEXINDEX_ROCK		14
 #define TEXINDEX_PAPER		15
+#define TEXINDEX_SOCG		16
+#define TEXINDEX_STCG		17
+#define TEXINDEX_SCTM		18
+#define TEXINDEX_STST		19
 
 #define LAYOUT_STATIC	0
 #define LAYOUT_LP		1
@@ -44,7 +48,8 @@
 namespace ygopro
 {
 	struct TextureInfo {
-		TextureInfo() : lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
+		TextureInfo() : index(0), lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
+		unsigned int index;
 		double lx;
 		double ly;
 		double rx;
@@ -63,6 +68,11 @@ namespace ygopro
 		double x4;
 		double y4;
 		TextureInfo* ptex;
+	};
+
+	struct BlockInfo {
+		unsigned int count;
+		unsigned int next;
 	};
 
 	class ImageMgr {
@@ -84,6 +94,7 @@ namespace ygopro
 		void InitTextures();
 		TextureInfo& GetCardTexture(unsigned int id);
 		TextureInfo& ReloadCardTexture(unsigned int id);
+		void UnloadCardTexture(unsigned int id);
 		unsigned int LoadTexture(const wxImage& img);
 		TextureInfo LoadCard(const wxImage& img);
 		
@@ -99,12 +110,11 @@ namespace ygopro
 		unsigned int textureid_all;
 		unsigned int textureid_card;
 		unsigned int textureid_bg;
-		unsigned int card_index;
 		TextureInfo background;
 		TextureInfo card_unknown;
 		TextureInfo card_sleeve1;
 		TextureInfo card_sleeve2;
-		std::array<TextureInfo*, 16> system_texture;
+		std::array<TextureInfo*, 32> system_texture;
 		std::vector<TextureInfo> textures;
 		std::vector<TextureInfo> text_texture;
 		std::vector<LayoutInfo> layouts;
@@ -114,6 +124,9 @@ namespace ygopro
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
 		std::unordered_map<unsigned int, wxImage*> card_images;
 		std::unordered_map<std::string, TextureInfo*> texture_infos;
+		std::array<BlockInfo, 184> texture_pool;
+		unsigned int pool_start;
+		unsigned int pool_end;
 	};
 
 	extern ImageMgr imageMgr;

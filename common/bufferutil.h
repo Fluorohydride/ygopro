@@ -1,5 +1,5 @@
-#ifndef BUFFERUTIL_H
-#define BUFFERUTIL_H
+#ifndef _BUFFERUTIL_H_
+#define _BUFFERUTIL_H_
 
 class BufferUtil {
 public:
