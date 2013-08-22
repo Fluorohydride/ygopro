@@ -36,6 +36,8 @@ function c10591919.opa(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c10591919.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+	local tc=g:GetFirst()
+	if not tc then return end
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -44,7 +46,7 @@ function c10591919.opa(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetOperation(c10591919.desop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
-	g:GetFirst():RegisterEffect(e1)
+	tc:RegisterEffect(e1)
 end
 function c10591919.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)

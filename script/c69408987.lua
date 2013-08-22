@@ -21,10 +21,15 @@ end
 function c69408987.posop(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	if Duel.ChangePosition(a,POS_FACEUP_DEFENCE)~=0 then
+		e:GetHandler():CreateRelation(a,RESET_EVENT+0x1fe0000)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,3)
+		e1:SetCondition(c69408987.poscon2)
 		a:RegisterEffect(e1)
 	end
+end
+function c69408987.poscon2(e)
+	return e:GetOwner():IsRelateToCard(e:GetHandler())
 end

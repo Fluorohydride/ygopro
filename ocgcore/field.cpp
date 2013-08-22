@@ -1320,6 +1320,8 @@ void field::add_unique_card(card* pcard) {
 
 void field::remove_unique_card(card* pcard) {
 	uint8 con = pcard->current.controler;
+	if(con == PLAYER_NONE)
+		return;
 	if(pcard->unique_pos[0])
 		core.unique_cards[con].erase(pcard);
 	if(pcard->unique_pos[1])
