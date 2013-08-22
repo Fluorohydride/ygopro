@@ -22,9 +22,9 @@ namespace ygopro {
 //			if(dataMgr.LoadDatas("cards.cdb"))
 //				return true;
 
-			mainFrame = new GameFrame(1280, 800);
-			mainFrame->Center();
-			mainFrame->Show();
+			editorFrame = new EditorFrame(1000, 750);
+			editorFrame->Center();
+			editorFrame->Show();
 			return true;
 		}
 	};

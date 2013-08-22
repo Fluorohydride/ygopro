@@ -1,4 +1,6 @@
 #include "editor_frame.h"
+#include "editor_canvas.h"
+#include "image_mgr.h"
 
 namespace ygopro
 {
@@ -10,8 +12,8 @@ namespace ygopro
 	END_EVENT_TABLE()
 
 	EditorFrame::EditorFrame(int sx, int sy): wxFrame(nullptr, wxID_ANY, "YGOpro Deck Editor", wxDefaultPosition, wxSize(sx, sy)) {
-		wxRibbonBar* m_ribbon = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRIBBON_BAR_DEFAULT_STYLE | wxRIBBON_BAR_SHOW_PANEL_EXT_BUTTONS);
-		wxRibbonPage* ribbon_page = new wxRibbonPage(m_ribbon, wxID_ANY, wxT("Menu"));
+		wxRibbonBar* m_ribbon = new wxRibbonBar(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxRIBBON_BAR_DEFAULT_STYLE);
+		wxRibbonPage* ribbon_page = new wxRibbonPage(m_ribbon, wxID_ANY, wxT("Deck Editor"));
 
 		wxRibbonPanel *deck_panel = new wxRibbonPanel(ribbon_page, wxID_ANY, wxT("Deck"));
 		wxRibbonButtonBar *deck_bar = new wxRibbonButtonBar(deck_panel);
@@ -35,6 +37,13 @@ namespace ygopro
 		s1->Add(s2, 1, wxEXPAND);
 		wxSizer* sl = new wxBoxSizer(wxVERTICAL);
 		s2->Add(sl, 0, wxEXPAND);
+		wxStaticBitmap* bmpCardImage = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
+		wxTextCtrl* textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_MULTILINE | wxTE_READONLY |	wxTE_LEFT | wxTE_BESTWRAP | wxBORDER_NONE);
+		sl->Add(bmpCardImage, 0, wxALIGN_CENTER_HORIZONTAL, 5);
+		sl->Add(textCtrl, 1, wxEXPAND, 5);
+		int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
+		wxEditorCanvas* glcanvas = new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
+		s2->Add(glcanvas, 1, wxEXPAND);
 		SetSizer(s1);
 	}
 

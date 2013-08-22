@@ -21,7 +21,7 @@ namespace ygopro
 			void operator = (const std::string& val) { svalue = val; is_string = true; }
 			void operator = (const wxString& val) { svalue = val.ToStdString(); is_string = true; }
 			operator const int&() { return ivalue; }
-			operator std::string&() { return svalue; }
+			operator const std::string&() { return svalue; }
 		};
 
 	public:
