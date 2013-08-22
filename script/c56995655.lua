@@ -27,6 +27,7 @@ function c56995655.op(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) then return end
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,1,nil)
 	local tc=g:GetFirst()
+	if not tc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CARDTYPE)
 	local op=Duel.SelectOption(tp,70,71,72)
 	Duel.ConfirmCards(tp,tc)
