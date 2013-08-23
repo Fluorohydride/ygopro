@@ -59,7 +59,7 @@ function c40607210.tgfilter(c,ty)
 end
 function c40607210.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=nil
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
 	if e:GetLabel()==0 then g=Duel.SelectMatchingCard(1-tp,c40607210.tgfilter,1-tp,LOCATION_DECK,0,1,1,nil,TYPE_MONSTER)
 	elseif e:GetLabel()==1 then g=Duel.SelectMatchingCard(1-tp,c40607210.tgfilter,1-tp,LOCATION_DECK,0,1,1,nil,TYPE_SPELL)
 	else g=Duel.SelectMatchingCard(1-tp,c40607210.tgfilter,1-tp,LOCATION_DECK,0,1,1,nil,TYPE_TRAP) end
