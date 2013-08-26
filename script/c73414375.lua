@@ -26,7 +26,9 @@ function c73414375.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if Duel.IsExistingTarget(c73414375.filter,1-tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(1-tp,aux.Stringid(73414375,1)) then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
 		local rg=Duel.SelectTarget(1-tp,c73414375.filter,1-tp,0,LOCATION_GRAVE,1,3,nil)
-		g:Merge(rg)
+		if rg then 
+			g:Merge(rg)
+		end
 	end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end
