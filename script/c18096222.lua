@@ -31,7 +31,7 @@ function c18096222.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c18096222.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c18096222.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g=Duel.SelectTarget(tp,c18096222.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c18096222.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c18096222.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -62,8 +62,12 @@ function c18096222.eqlimit(e,c)
 	return c:GetControler()==e:GetOwnerPlayer() and c:IsType(TYPE_DUAL)
 end
 function c18096222.dacon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_DESTROY)
-		and e:GetHandler():GetEquipTarget()~=nil
+	local c=e:GetHandler()
+	local ec=c:GetEquipTarget()
+	if c:IsReason(REASON_LOST_TARGET) then
+		ec=c:GetPreviousEquipTarget()
+	end
+	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_DESTROY) and ec~=nil
 end
 function c18096222.dafilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_DUAL) and not c:IsDualState()

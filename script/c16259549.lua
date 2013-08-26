@@ -86,6 +86,7 @@ function c16259549.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if not g then return end
 	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
+	if tg:GetCount()~=2 then return end
 	Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then

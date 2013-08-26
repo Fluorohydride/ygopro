@@ -30,6 +30,8 @@ function c45898858.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c45898858.filter,tp,LOCATION_HAND+LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SpecialSummon(g,0,tp,tp,true,true,POS_FACEUP)
-	g:GetFirst():CompleteProcedure()
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,true,true,POS_FACEUP)
+		g:GetFirst():CompleteProcedure()
+	end
 end

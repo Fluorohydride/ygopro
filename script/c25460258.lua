@@ -55,7 +55,7 @@ function c25460258.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g1,REASON_COST)
 end
 function c25460258.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chk:IsLocation(LOCATION_GRAVE) and chkc:IsAbleToRemove() end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)

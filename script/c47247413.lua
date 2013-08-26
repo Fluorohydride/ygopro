@@ -24,7 +24,7 @@ end
 function c47247413.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c47247413.filter,nil,e,1-tp)
 	if g:GetCount()==0 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
 	local rg=g:Select(1-tp,1,1,nil)
 	Duel.ConfirmCards(tp,rg)
 	Duel.SendtoDeck(rg,nil,2,REASON_EFFECT)
