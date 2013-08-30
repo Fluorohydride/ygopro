@@ -43,6 +43,8 @@ function c440556.spop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	elseif cp~=tp then
 		local cg=Duel.GetFieldGroup(cp,LOCATION_EXTRA,0)
+		if cg and cg:GetCount()>0 then
 		Duel.ConfirmCards(cg,tp)
+		end
 	end
 end

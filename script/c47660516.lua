@@ -41,12 +41,13 @@ function c47660516.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
-	end
-	if Duel.GetOverlayCount(tp,0,1)~=0 then
-		Duel.BreakEffect()
-		local g1=Duel.GetOverlayGroup(tp,0,1)
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(47660516,0))
-		local mg2=g1:Select(tp,1,1,nil)
-		Duel.Overlay(sc,mg2)
+
+		if Duel.GetOverlayCount(tp,0,1)~=0 then
+			Duel.BreakEffect()
+			local g1=Duel.GetOverlayGroup(tp,0,1)
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(47660516,0))
+			local mg2=g1:Select(tp,1,1,nil)
+			Duel.Overlay(sc,mg2)
+		end
 	end
 end
