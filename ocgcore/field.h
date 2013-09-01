@@ -8,6 +8,7 @@
 #ifndef FIELD_H_
 #define FIELD_H_
 
+#include "memory.h"
 #include "common.h"
 #include "effectset.h"
 #include <vector>
@@ -33,6 +34,7 @@ struct tevent {
 	uint32 reason;
 	uint8 event_player;
 	uint8 reason_player;
+	bool operator< (const tevent& v) const;
 };
 struct optarget {
 	group* op_cards;
@@ -142,6 +144,7 @@ struct processor {
 	typedef std::list<processor_unit> processor_list;
 	typedef std::set<card*, card_sort> card_set;
 	typedef std::set<effect*> effect_collection;
+	typedef std::set<std::pair<effect*, tevent> > delayed_effect_collection;
 
 	processor_list units;
 	processor_list subunits;
@@ -178,9 +181,9 @@ struct processor {
 	chain_list flip_chain_b;
 	chain_list new_ochain_h;
 	chain_list new_chains;
-	effect_collection delayed_quick_tmp;
-	effect_collection delayed_quick_break;
-	effect_collection delayed_quick;
+	delayed_effect_collection delayed_quick_tmp;
+	delayed_effect_collection delayed_quick_break;
+	delayed_effect_collection delayed_quick;
 	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
 	card_set special_summoning;
@@ -607,6 +610,7 @@ public:
 #define PROCESSOR_CONTROL_ADJUST	76
 #define PROCESSOR_PAY_LPCOST		80
 #define PROCESSOR_REMOVE_COUNTER	81
+#define PROCESSOR_ATTACK_DISABLE	82
 
 #define PROCESSOR_DESTROY_S			100
 #define PROCESSOR_RELEASE_S			101

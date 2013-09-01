@@ -77,7 +77,7 @@ function c15335853.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c15335853.atfilter(c)
-	return not c:IsSetCard(0x101b)
+	return not c:IsSetCard(0x101b) and c:IsType(TYPE_MONSTER)
 end
 function c15335853.atcon(e)
 	return Duel.IsExistingMatchingCard(c15335853.atfilter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil)

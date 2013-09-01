@@ -31,12 +31,12 @@ function c85709845.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c85709845.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	return tc==Duel.GetAttacker() and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE)
+	local tc=Duel.GetAttacker()
+	return eg:IsContains(tc) and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE)
 end
 function c85709845.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local atk=eg:GetFirst():GetBaseAttack()
+	local atk=Duel.GetAttacker():GetBaseAttack()
 	if atk<0 then atk=0 end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(atk)

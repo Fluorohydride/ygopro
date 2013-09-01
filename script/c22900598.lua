@@ -32,7 +32,7 @@ function c22900598.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstMatchingCard(c22900598.filter,tp,LOCATION_DECK,0,nil,tp)
 	if tc then
 		if Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)~=nil
-			and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5):IsFaceup() then
+			and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5):IsStatus(STATUS_ACTIVATED) then
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 			Duel.Destroy(Duel.GetFieldCard(1-tp,LOCATION_SZONE,5),REASON_RULE)
 		else

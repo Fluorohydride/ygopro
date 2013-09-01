@@ -22,7 +22,10 @@ function c27655513.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,2,tp,LOCATION_DECK)
 end
 function c27655513.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c27655513.filter,tp,LOCATION_DECK,0,2,2,nil)
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	local g=Duel.GetMatchingGroup(c27655513.filter,tp,LOCATION_DECK,0,nil)
+	if g:GetCount()>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local sg=g:Select(tp,2,2,nil)
+		Duel.SendtoGrave(sg,REASON_EFFECT)
+	end
 end

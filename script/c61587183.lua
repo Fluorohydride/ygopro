@@ -2,18 +2,16 @@
 function c61587183.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(61587183,0))
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCategory(CATEGORY_TOHAND)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c61587183.condition)
 	e1:SetTarget(c61587183.target)
 	e1:SetOperation(c61587183.operation)
 	c:RegisterEffect(e1)
 end
 function c61587183.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler()
+	return ep~=tp
 end
 function c61587183.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToHand() end
@@ -36,8 +34,8 @@ function c61587183.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-		e:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
-	else e:SetProperty(EFFECT_FLAG_DAMAGE_STEP) end
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	else e:SetProperty(0) end
 end
 function c61587183.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then

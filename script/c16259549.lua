@@ -72,7 +72,7 @@ function c16259549.filter(c,e)
 	return c:GetLevel()==3 and c:IsCanBeEffectTarget(e) and c:IsAbleToDeck()
 end
 function c16259549.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c16259549.filter(chkc) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c16259549.filter(chkc,e) end
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c16259549.filter,tp,LOCATION_GRAVE,0,nil,e)
 	if g:GetCount()>=2 then
@@ -86,6 +86,7 @@ function c16259549.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	if not g then return end
 	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
+	if tg:GetCount()~=2 then return end
 	Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
