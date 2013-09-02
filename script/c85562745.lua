@@ -19,7 +19,7 @@ function c85562745.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c85562745.con(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and bit.band(r,REASON_BATTLE)==0 and re:GetHandler():GetCode()~=85562745
+	return ep~=tp and bit.band(r,REASON_BATTLE)==0 and re and re:GetHandler():GetCode()~=85562745
 end
 function c85562745.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
