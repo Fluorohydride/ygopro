@@ -86,9 +86,10 @@ function c83438826.desop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(-500)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	eq:RegisterEffect(e1)
-	
-	Duel.Destroy(tc,REASON_EFFECT)
+
+	if eq:RegisterEffect(e1) then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end
 function c83438826.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

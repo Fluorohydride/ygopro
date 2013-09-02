@@ -42,7 +42,7 @@ function c73578229.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local ag=g:GetMaxGroup(Card.GetAttack)
 	local preg=e:GetLabelObject()
-	if ag:Equal(preg) then return end
+	if ag and ag:Equal(preg) then return end
 	preg:Clear()
 	preg:Merge(ag)
 	Duel.AdjustInstantly(e:GetHandler())

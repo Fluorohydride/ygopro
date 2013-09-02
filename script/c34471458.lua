@@ -53,7 +53,7 @@ end
 function c34471458.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_EFFECT) and not c:IsLocation(LOCATION_DECK)
-		and c:IsPreviousPosition(POS_FACEUP)
+		and (c:IsPreviousPosition(POS_FACEUP) or c:IsLocation(LOCATION_HAND))
 end
 function c34471458.spfilter(c,e,tp)
 	return c:IsSetCard(0x31) and c:IsCanBeSpecialSummoned(e,0x8,tp,false,false)

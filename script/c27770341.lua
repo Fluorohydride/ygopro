@@ -25,7 +25,7 @@ function c27770341.initial_effect(c)
 		local e4=Effect.CreateEffect(c)
 		e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 		e4:SetCode(EVENT_DISCARD)
-		e4:SetOperation(c27770341.addcount)
+		e4:SetOperation(c27770341.addcount1)
 		Duel.RegisterEffect(e4,0)
 	end
 end
@@ -37,7 +37,15 @@ function c27770341.addcount(e,tp,eg,ep,ev,re,r,rp)
 	local c=eg:GetFirst()
 	while c~=nil do
 		local p=c:GetControler()
-		if c:IsRace(RACE_DRAGON) then c27770341[p]=c27770341[p]+1 end
+		if c:GetPreviousRaceOnField()==RACE_DRAGON then c27770341[p]=c27770341[p]+1 end
+		c=eg:GetNext()
+	end
+end
+function c27770341.addcount1(e,tp,eg,ep,ev,re,r,rp)
+	local c=eg:GetFirst()
+	while c~=nil do
+		local p=c:GetControler()
+		if c:GetOriginalRace()==RACE_DRAGON then c27770341[p]=c27770341[p]+1 end
 		c=eg:GetNext()
 	end
 end

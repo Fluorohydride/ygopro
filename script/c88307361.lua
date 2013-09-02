@@ -71,7 +71,7 @@ function c88307361.discon(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg:IsContains(c) and Duel.IsChainNegatable(ev)
+	return tg and tg:IsContains(c) and Duel.IsChainNegatable(ev)
 end
 function c88307361.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,e:GetHandler(),RACE_FISH) end
