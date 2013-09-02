@@ -1,7 +1,10 @@
 /bin/
+/lib/
 /dep/
 /build/
 /_cache/
 /_res/
 *.exe
 *.log
+*.DS_Store
+
