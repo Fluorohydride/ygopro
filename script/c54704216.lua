@@ -56,13 +56,6 @@ function c54704216.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 		tc:RegisterEffect(e2,true)
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-		e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-		e3:SetReset(RESET_EVENT+0x1fc0000)
-		e3:SetCondition(c54704216.rcon)
-		tc:RegisterEffect(e3)
 	end
 end
 function c54704216.rcon(e)
