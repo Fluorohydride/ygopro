@@ -32,17 +32,29 @@ function c30834988.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,eg,eg:GetCount(),0,0)
 end
 function c30834988.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local g=eg:Filter(Card.IsRelateToEffect,nil,e)
 	Duel.ChangePosition(g,POS_FACEUP_ATTACK)
 	local tc=g:GetFirst()
 	while tc do
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_MUST_ATTACK)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
+	end
+	
+	if 	Duel.GetFlagEffect(tp,30834988)==0 then	
+		Duel.RegisterFlagEffect(tp,30834988,RESET_PHASE+PHASE_END,0,1)
+		e:SetLabel(0)
+	else
+		local count=e:GetLabel()
+		e:SetLabel(count+1)
+		if count>49 then
+			Duel.SendtoGrave(c,REASON_RULE)
+		end
 	end
 end
 function c30834988.epfilter(c)
