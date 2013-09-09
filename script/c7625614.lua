@@ -15,6 +15,7 @@ function c7625614.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCondition(c7625614.atkcon)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(c7625614.atktg)
 	e2:SetValue(1)
@@ -39,6 +40,9 @@ function c7625614.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
+end
+function c7625614.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetEquipTarget():GetControler()==tp
 end
 function c7625614.atktg(e,c)
 	return c~=e:GetHandler():GetEquipTarget()
