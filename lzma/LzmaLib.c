@@ -8,8 +8,8 @@ Public domain */
 #include "Alloc.h"
 #include "LzmaLib.h"
 
-static void *SzAlloc(void *p, size_t size) { p = p; return MyAlloc(size); }
-static void SzFree(void *p, void *address) { p = p; MyFree(address); }
+static void *SzAlloc(void *p, size_t size) { /*p = p;*/ return MyAlloc(size); }
+static void SzFree(void *p, void *address) { /*p = p;*/ MyFree(address); }
 static ISzAlloc g_Alloc = { SzAlloc, SzFree };
 
 MY_STDAPI LzmaCompress(unsigned char *dest, size_t  *destLen, const unsigned char *src, size_t  srcLen,

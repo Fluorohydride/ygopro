@@ -14,7 +14,7 @@ namespace ygopro
 			int ivalue;
 			std::string svalue;
 
-			_ValueStruct(): ivalue(0), is_string(false) {}
+			_ValueStruct(): is_string(false), ivalue(0) {}
 			
 			void operator = (int val) { ivalue = val; is_string = false; }
 			void operator = (const char* val) { svalue = val; is_string = true; }

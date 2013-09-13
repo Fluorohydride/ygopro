@@ -10,7 +10,7 @@ namespace ygopro
 	struct DuelMessageData {
 		unsigned int msg;
 		unsigned int size;
-		void* data;
+		unsigned char* data;
 	};
 
 	class DuelMessage {
