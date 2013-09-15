@@ -34,7 +34,6 @@ function c72302403.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(sg,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK,POS_FACEUP_DEFENCE,POS_FACEUP_DEFENCE)
 	end
 	local c=e:GetHandler()
-	
 	c:CancelToGrave()
 	--cannot attack
 	local e2=Effect.CreateEffect(c)
@@ -42,11 +41,13 @@ function c72302403.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(0,LOCATION_MZONE)
+	e2:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e2)
 	--remain field
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_REMAIN_FIELD)
+	e3:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e3)
 end
 function c72302403.descon(e,tp,eg,ep,ev,re,r,rp)
