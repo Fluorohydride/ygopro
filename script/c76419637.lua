@@ -39,7 +39,7 @@ function c76419637.dctg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c76419637.dcop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT)
+	Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
 end
 function c76419637.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,40424929)

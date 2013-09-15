@@ -41,8 +41,9 @@ function c7625614.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
 end
-function c7625614.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetEquipTarget():GetControler()==tp
+function c7625614.atkcon(e)
+	local ec=e:GetHandler():GetEquipTarget()
+	return ec and ec:GetControler()==e:GetHandlerPlayer()
 end
 function c7625614.atktg(e,c)
 	return c~=e:GetHandler():GetEquipTarget()

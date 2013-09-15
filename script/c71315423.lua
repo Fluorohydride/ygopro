@@ -59,6 +59,6 @@ end
 function c71315423.damop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=e:GetHandler():GetEquipTarget()
 	if tg then
-	Duel.Damage(tg:GetControler(),400,REASON_EFFECT)
+		Duel.Damage(tg:GetControler(),400,REASON_EFFECT)
 	end
 end

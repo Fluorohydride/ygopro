@@ -22,7 +22,8 @@ function c18517177.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x1d)
 end
 function c18517177.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
+	return Duel.GetTurnPlayer()==tp
+		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)
 		and Duel.IsExistingMatchingCard(c18517177.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c18517177.destg(e,tp,eg,ep,ev,re,r,rp,chk)
