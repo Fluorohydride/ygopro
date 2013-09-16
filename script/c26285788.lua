@@ -19,8 +19,10 @@ end
 function c26285788.addcount(e,tp,eg,ep,ev,re,r,rp)
 	local c=eg:GetFirst()
 	while c~=nil do
-		local p=c:GetPreviousControler()
-		Duel.RegisterFlagEffect(p,26285789,RESET_PHASE+PHASE_END,0,1)
+		if not c:IsType(TYPE_TOKEN) then
+			local p=c:GetReasonPlayer()
+			Duel.RegisterFlagEffect(p,26285789,RESET_PHASE+PHASE_END,0,1)
+		end
 		c=eg:GetNext()
 	end
 end

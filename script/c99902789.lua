@@ -14,9 +14,7 @@ function c99902789.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c99902789.discon(e,tp,eg,ep,ev,re,r,rp)
-	local a=Duel.GetAttacker()
-	local at=Duel.GetAttackTarget()
-	return Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and at and (a and a:IsControler(tp) or at:IsControler(tp))
+	return Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and Duel.GetAttacker():IsControler(tp) and Duel.GetAttackTarget()~=nil
 		and ep~=tp and re:GetActiveType()==TYPE_TRAP and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c99902789.discost(e,tp,eg,ep,ev,re,r,rp,chk)
