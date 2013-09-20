@@ -1,7 +1,7 @@
 #include "netserver.h"
 #include "single_duel.h"
 #include "tag_duel.h"
-
+#include <stdio.h>
 namespace ygo {
 std::unordered_map<bufferevent*, DuelPlayer> NetServer::users;
 unsigned short NetServer::server_port = 0;
@@ -57,19 +57,25 @@ void NetServer::Initduel(int bDuel_mode)
 
 
 bool NetServer::StartServer(unsigned short port) {
+	
 	if(net_evbase)
 		return false;
 	net_evbase = event_base_new();
 	if(!net_evbase)
 		return false;
-	sockaddr_in sin;
+	int fd=0,addr_len=sizeof(sockaddr_in);
+	sockaddr_in sin,addr_info;
 	memset(&sin, 0, sizeof(sin));
 	server_port = port;
 	sin.sin_family = AF_INET;
 	sin.sin_addr.s_addr = htonl(INADDR_ANY);
 	sin.sin_port = htons(port);
-	listener = evconnlistener_new_bind(net_evbase, ServerAccept, NULL,
-	                                   LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, (sockaddr*)&sin, sizeof(sin));
+	fd= socket(AF_INET,SOCK_STREAM,0);
+	bind(fd,sin,sizeof(sockaddr_in));
+	getsockname(fd,addr_info,&addr_len);
+	printf("%d\n",ntohs(addr_info.sin_port));
+	listener = evconnlistener_new(net_evbase, ServerAccept, NULL,
+	                                   LEV_OPT_CLOSE_ON_FREE | LEV_OPT_REUSEABLE, -1, fd);
 	if(!listener) {
 		event_base_free(net_evbase);
 		net_evbase = 0;

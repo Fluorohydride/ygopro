@@ -7,7 +7,10 @@
 #include "deck_manager.h"
 #include <set>
 #include <unordered_map>
-
+#include <sys/socket.h>
+#include <netinet/ip.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 namespace ygo {
 
 class NetServer {
