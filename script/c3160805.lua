@@ -22,18 +22,18 @@ function c3160805.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c3160805.tgfilter1(c,tp)
-	return c:IsType(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_LIGHT)
+	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_LIGHT)
 		and Duel.IsExistingMatchingCard(c3160805.thfilter1,tp,LOCATION_DECK,0,1,nil,c:GetLevel())
 end
 function c3160805.thfilter1(c,lv)
-	return c:GetLevel()==lv and c:IsType(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
+	return c:GetLevel()==lv and c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToHand()
 end
 function c3160805.tgfilter2(c,tp)
-	return c:IsType(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_DARK)
+	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_DARK)
 		and Duel.IsExistingMatchingCard(c3160805.thfilter2,tp,LOCATION_DECK,0,1,nil,c:GetLevel())
 end
 function c3160805.thfilter2(c,lv)
-	return c:GetLevel()==lv and c:IsType(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToHand()
+	return c:GetLevel()==lv and c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToHand()
 end
 function c3160805.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
