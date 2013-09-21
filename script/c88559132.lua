@@ -24,6 +24,6 @@ function c88559132.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(atk)
-	e1:SetReset(RESET_EVENT+0xfe0000)
+	e1:SetReset(RESET_EVENT+0xff0000)
 	c:RegisterEffect(e1)
 end
