@@ -51,7 +51,10 @@ function c50766506.operation(e,tp,eg,ep,ev,re,r,rp)
 		local tc=sg:Select(tp,1,1,nil):GetFirst()
 		sg:RemoveCard(tc)
 		slv=slv-tc:GetLevel()
-		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)
+		local spos=0
+		if tc:IsCanBeSpecialSummoned(e,0,tp,false,false) then spos=spos+POS_FACEUP_ATTACK end
+		if tc:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN) then spos=spos+POS_FACEDOWN_DEFENCE end
+		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,spos)
 		if tc:IsFacedown() then cg:AddCard(tc) end
 		c:SetCardTarget(tc)
 		sg:Remove(Card.IsLevelAbove,nil,slv+1)
