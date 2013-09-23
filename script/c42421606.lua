@@ -36,7 +36,7 @@ function c42421606.efop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(tp,1,REASON_EFFECT)
 	elseif dc==3 then
 		if Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 then
-			Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT)
+			Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
 		end
 	elseif dc==4 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)

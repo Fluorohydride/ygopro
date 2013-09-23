@@ -53,7 +53,8 @@ function c56981417.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c56981417.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=e:GetLabelObject()
-	if not te:GetHandler():IsRelateToEffect(e) then return end
-	local op=te:GetOperation()
-	if op then op(e,tp,eg,ep,ev,re,r,rp) end
+	if te and te:GetHandler():IsRelateToEffect(e) then  
+		local op=te:GetOperation()
+		if op then op(e,tp,eg,ep,ev,re,r,rp) end
+	end
 end

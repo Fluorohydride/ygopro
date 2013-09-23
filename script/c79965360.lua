@@ -18,9 +18,9 @@ function c79965360.initial_effect(c)
 	c:RegisterEffect(e2)
 	--destroy rep
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_EQUIP)
-	e3:SetCode(EFFECT_DESTROY_REPLACE)
-	e3:SetTarget(c79965360.reptg)
+	e3:SetType(EFFECT_TYPE_EQUIP)
+	e3:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
+	e3:SetValue(c79965360.valcon)
 	e3:SetCountLimit(1)
 	c:RegisterEffect(e3)
 	--destroy
@@ -54,11 +54,8 @@ function c79965360.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
 end
-function c79965360.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	local tc=c:GetEquipTarget()
-	if chk==0 then return tc:IsReason(REASON_BATTLE) end
-	return true
+function c79965360.valcon(e,re,r,rp)
+	return r==REASON_BATTLE
 end
 function c79965360.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetEquipTarget()==Duel.GetAttacker() and Duel.GetAttackTarget()

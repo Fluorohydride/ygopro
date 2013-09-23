@@ -87,7 +87,7 @@ function c69954399.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c69954399.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()
-	if ec:IsRelateToEffect(e) and Duel.Destroy(ec,REASON_EFFECT)~=0 then
+	if ec and ec:IsRelateToEffect(e) and Duel.Destroy(ec,REASON_EFFECT)~=0 then
 		Duel.RaiseSingleEvent(e:GetHandler(),69954400,e,0,0,0,0)
 	end
 end

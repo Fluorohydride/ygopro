@@ -20,7 +20,7 @@ function c22359980.initial_effect(c)
 	--atkchange
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_SET_ATTACK)
+	e3:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(0,LOCATION_MZONE)
 	e3:SetTarget(c22359980.atktg)

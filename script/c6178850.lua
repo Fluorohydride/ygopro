@@ -47,8 +47,10 @@ function c6178850.value(e,c)
 	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),0,LOCATION_MZONE)*300
 end
 function c6178850.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_DESTROY_CONFIRMED)
-		and e:GetHandler():GetEquipTarget():IsReason(REASON_BATTLE) end
+	local c=e:GetHandler()
+	local tg=c:GetEquipTarget()
+	if chk==0 then return c and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
+		and tg and tg:IsReason(REASON_BATTLE) end
 	return Duel.SelectYesNo(tp,aux.Stringid(6178850,0))
 end
 function c6178850.desop(e,tp,eg,ep,ev,re,r,rp)

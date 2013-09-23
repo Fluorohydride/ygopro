@@ -5,7 +5,12 @@ function c5851097.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1c1)
+	e1:SetOperation(c5851097.activate)
 	c:RegisterEffect(e1)
+end
+function c5851097.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	--disable spsummon
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
@@ -13,6 +18,7 @@ function c5851097.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
+	e2:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
@@ -23,11 +29,11 @@ function c5851097.initial_effect(c)
 	e3:SetCondition(c5851097.descon)
 	e3:SetTarget(c5851097.destg)
 	e3:SetOperation(c5851097.desop)
+	e3:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e3)
 end
 function c5851097.filter(c,tp)
-	local pl=c:GetPreviousLocation()
-	return bit.band(pl,0xd)~=0 and c:IsLocation(LOCATION_GRAVE) and c:GetControler()==tp
+	return c:IsPreviousLocation(LOCATION_DECK+LOCATION_ONFIELD) and c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp)
 end
 function c5851097.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c5851097.filter,1,nil,tp)

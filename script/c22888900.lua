@@ -22,7 +22,11 @@ function c22888900.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetTarget(c22888900.tg)
 	e1:SetCode(EFFECT_DISABLE)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	if Duel.GetTurnPlayer()~=tp then
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
+	else
+		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	end
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_ATTACK)
@@ -34,7 +38,11 @@ function c22888900.operation(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetTargetRange(1,1)
 	e3:SetTarget(c22888900.splimit)
-	e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	if Duel.GetTurnPlayer()~=tp then
+		e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
+	else
+		e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	end
 	Duel.RegisterEffect(e3,tp)
 end
 function c22888900.tg(e,c)

@@ -34,6 +34,7 @@ function c54306223.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c54306223.atkval(e,c)
+	if  c:IsCode(72677437) then return 0 end
 	return c:GetCounter(0x9)*-500
 end
 function c54306223.acop(e,tp,eg,ep,ev,re,r,rp)
