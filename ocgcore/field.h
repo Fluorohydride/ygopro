@@ -363,6 +363,7 @@ public:
 	int32 is_player_can_summon(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_mset(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_sset(uint8 playerid, card* pcard);
+	int32 is_player_can_spsummon(uint8 playerid);
 	int32 is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card* pcard);
 	int32 is_player_can_flipsummon(uint8 playerid, card* pcard);
 	int32 is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);

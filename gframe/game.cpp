@@ -545,6 +545,8 @@ void Game::MainLoop() {
 		driver->endScene();
 		if(closeSignal.Wait(0))
 			CloseDuelWindow();
+		if(!device->isWindowActive())
+			ignore_chain = false;
 		fps++;
 		cur_time = timer->getTime();
 		if(cur_time < fps * 17 - 20)

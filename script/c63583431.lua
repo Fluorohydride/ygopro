@@ -31,8 +31,8 @@ end
 function c63583431.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x59)
 end
-function c63583431.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c63583431.cfilter,tp,LOCATION_MZONE,0,2,nil)
+function c63583431.damcon(e)
+	return Duel.IsExistingMatchingCard(c63583431.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,2,nil)
 end
 function c63583431.damval(e,re,val,r,rp,rc)
 	if bit.band(r,REASON_EFFECT)~=0 then return 0 end

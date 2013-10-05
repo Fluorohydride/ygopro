@@ -25,7 +25,7 @@ function c27770341.initial_effect(c)
 		local e4=Effect.CreateEffect(c)
 		e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 		e4:SetCode(EVENT_DISCARD)
-		e4:SetOperation(c27770341.addcount1)
+		e4:SetOperation(c27770341.addcount)
 		Duel.RegisterEffect(e4,0)
 	end
 end
@@ -34,19 +34,15 @@ function c27770341.resetcount(e,tp,eg,ep,ev,re,r,rp)
 	c27770341[1]=0
 end
 function c27770341.addcount(e,tp,eg,ep,ev,re,r,rp)
-	local c=eg:GetFirst()
-	while c~=nil do
-		local p=c:GetControler()
-		if c:GetPreviousRaceOnField()==RACE_DRAGON then c27770341[p]=c27770341[p]+1 end
-		c=eg:GetNext()
-	end
-end
-function c27770341.addcount1(e,tp,eg,ep,ev,re,r,rp)
-	local c=eg:GetFirst()
-	while c~=nil do
-		local p=c:GetControler()
-		if c:GetOriginalRace()==RACE_DRAGON then c27770341[p]=c27770341[p]+1 end
-		c=eg:GetNext()
+	local tc=eg:GetFirst()
+	while tc do
+		local p=tc:GetReasonPlayer()
+		local pl=tc:GetPreviousLocation()
+		if (pl==LOCATION_MZONE and tc:GetPreviousRaceOnField()==RACE_DRAGON)
+			or (pl==LOCATION_HAND and tc:GetOriginalRace()==RACE_DRAGON) then
+			c27770341[p]=c27770341[p]+1
+		end
+		tc=eg:GetNext()
 	end
 end
 function c27770341.activate(e,tp,eg,ep,ev,re,r,rp)

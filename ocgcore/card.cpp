@@ -224,6 +224,18 @@ uint32 card::get_code() {
 	}
 	return code;
 }
+uint32 card::get_another_code() {
+	effect_set eset;
+	filter_effect(EFFECT_ADD_CODE, &eset);
+	if(!eset.count)
+		return 0;
+	uint32 otcode = eset.get_last()->get_value(this);
+	if(get_code() != otcode)
+		return otcode;
+	if(data.alias == otcode)
+		return data.code;
+	return 0;
+}
 int32 card::is_set_card(uint32 set_code) {
 	uint32 code = get_code();
 	uint32 setcode;

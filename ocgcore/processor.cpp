@@ -2887,6 +2887,8 @@ int32 field::process_battle_command(uint16 step) {
 	case 9: {
 		if(returns.ivalue[0])
 			core.units.begin()->step = 7;
+		else
+			adjust_all();
 		return FALSE;
 	}
 	case 10: {
@@ -2947,6 +2949,7 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			core.units.begin()->step = -1;
 			reset_phase(PHASE_DAMAGE);
+			adjust_all();
 			return FALSE;
 		}
 		if((core.sub_attacker && core.sub_attacker->is_position(POS_FACEUP) && core.sub_attacker->current.location == LOCATION_MZONE)

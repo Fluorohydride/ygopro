@@ -20,7 +20,7 @@ end
 function c5818294.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g and g:IsExists(c5818294.tfilter,1,nil,tp)
+	return g and g:IsExists(c5818294.tfilter,1,nil,tp) and Duel.IsChainDisablable(ev)
 end
 function c5818294.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
