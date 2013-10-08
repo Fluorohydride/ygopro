@@ -86,14 +86,7 @@ namespace ygopro
 		if(iter == card_textures.end())
 			return;
 		unsigned index = iter->second.index;
-		card_textures.erase(iter);
-		if(index < 3)
-			return;
-		texture_pool[index].count--;
-		if(texture_pool[index].count == 0) {
-			texture_pool[pool_end].next = index;
-			pool_end = index;
-		}
+		glDeleteTextures(1, &index);
 	}
 
 	unsigned int ImageMgr::LoadTexture(const wxImage& img) {

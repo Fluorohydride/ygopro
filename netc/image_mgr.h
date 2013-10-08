@@ -17,17 +17,24 @@
 #define TEXINDEX_LIMIT0		6
 #define TEXINDEX_LIMIT1		7
 #define TEXINDEX_LIMIT2		8
-#define TEXINDEX_LPFRAME	9
-#define TEXINDEX_LPBAR		10
-#define TEXINDEX_EQUIP		11
-#define TEXINDEX_TARGET		12
-#define TEXINDEX_SCISSORS	13
-#define TEXINDEX_ROCK		14
-#define TEXINDEX_PAPER		15
-#define TEXINDEX_SOCG		16
-#define TEXINDEX_STCG		17
-#define TEXINDEX_SCTM		18
-#define TEXINDEX_STST		19
+#define TEXINDEX_EQUIP		9
+#define TEXINDEX_TARGET		10
+#define TEXINDEX_SCISSORS	11
+#define TEXINDEX_ROCK		12
+#define TEXINDEX_PAPER		13
+#define TEXINDEX_SOCG		14
+#define TEXINDEX_STCG		15
+#define TEXINDEX_SCTM		16
+#define TEXINDEX_STST		17
+#define TEXINDEX_BUILDBG    18
+#define TEXINDEX_SLEEVE1    19
+#define TEXINDEX_AVATAR1    20
+#define TEXINDEX_LPFRAME1	21
+#define TEXINDEX_LPBAR1		22
+#define TEXINDEX_SLEEVE2    23
+#define TEXINDEX_AVATAR2    24
+#define TEXINDEX_LPFRAME2	25
+#define TEXINDEX_LPBAR2		26
 
 #define LAYOUT_STATIC	0
 #define LAYOUT_LP		1
@@ -56,6 +63,12 @@ namespace ygopro
 		double ry;
 	};
 
+    struct CardImageInfo {
+        unsigned int ref_count;
+        wxImage* card_image;
+        TextureInfo texture;
+    };
+    
 	struct LayoutInfo {
 		int style;
 		int click;
@@ -68,11 +81,6 @@ namespace ygopro
 		double x4;
 		double y4;
 		TextureInfo* ptex;
-	};
-
-	struct BlockInfo {
-		unsigned int count;
-		unsigned int next;
 	};
 
 	class ImageMgr {
@@ -102,14 +110,8 @@ namespace ygopro
 		void LoadImageConfig(const wxString& file);
 		void LoadLayoutConfig(const wxString& file);
 
-		wxImage image_texture;
-		wxImage image_unknown;
-		wxImage image_sleeve1;
-		wxImage image_sleeve2;
-		wxImage image_bg;
-		unsigned int textureid_all;
-		unsigned int textureid_card;
-		unsigned int textureid_bg;
+        std::vector<wxImage*> image_texture;
+        std::vector<unsigned int> textures_id;
 		TextureInfo background;
 		TextureInfo card_unknown;
 		TextureInfo card_sleeve1;
@@ -124,9 +126,6 @@ namespace ygopro
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
 		std::unordered_map<unsigned int, wxImage*> card_images;
 		std::unordered_map<std::string, TextureInfo*> texture_infos;
-		std::array<BlockInfo, 184> texture_pool;
-		unsigned int pool_start;
-		unsigned int pool_end;
 	};
 
 	extern ImageMgr imageMgr;

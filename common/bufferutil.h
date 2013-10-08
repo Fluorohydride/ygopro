@@ -55,7 +55,7 @@ public:
 			wsrc++;
 		}
 		*str = 0;
-		return str - pstr;
+		return (int)(str - pstr);
 	}
 	static int DecodeUTF8(const char * src, wchar_t * wstr) {
 		char* p = (char*)src;
@@ -78,7 +78,7 @@ public:
 			wp++;
 		}
 		*wp = 0;
-		return wp - wstr;
+		return (int)(wp - wstr);
 	}
 
 private:
