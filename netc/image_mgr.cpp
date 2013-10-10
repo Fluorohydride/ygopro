@@ -6,15 +6,9 @@ namespace ygopro
 
 	ImageMgr imageMgr;
 
-	ImageMgr::ImageMgr(): textureid_all(0), textureid_card(0), textureid_bg(0) {
-		for(int i = 0; i < 16; ++i)
+	ImageMgr::ImageMgr() {
+		for(int i = 0; i < 32; ++i)
 			system_texture[i] = nullptr;
-		for(int i = 0; i < 184; ++i) {
-			texture_pool[i].count = 0;
-			texture_pool[i].next = i + 1;
-		}
-		pool_start = 0;
-		pool_end = 183;
 	}
 
 	ImageMgr::~ImageMgr() {
@@ -23,21 +17,7 @@ namespace ygopro
 	}
 
 	void ImageMgr::InitTextures() {
-		glGenTextures(1, &textureid_card);
-		glBindTexture(GL_TEXTURE_2D, textureid_card);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 4096, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
-		if(image_unknown.IsOk())
-			card_unknown = LoadCard(image_unknown);
-		if(image_sleeve1.IsOk())
-			card_sleeve1 = LoadCard(image_sleeve1);
-		if(image_sleeve2.IsOk())
-			card_sleeve2 = LoadCard(image_sleeve2);
-		if(image_texture.IsOk())
-			textureid_all = LoadTexture(image_texture);
-		if(image_bg.IsOk())
-			textureid_bg = LoadTexture(image_bg);
+		
 	}
 
 	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
@@ -118,73 +98,42 @@ namespace ygopro
 	}
 
 	TextureInfo ImageMgr::LoadCard(const wxImage& img) {
-		if(pool_start == pool_end)
-			return card_unknown;
+
 		TextureInfo ti;
-		unsigned int indexx = (pool_start % 23);
-		unsigned int indexy = pool_start / 23;
-		unsigned int imagex = img.GetWidth();
-		unsigned int imagey = img.GetHeight();
-		unsigned char * pxdata = img.GetData();
-		unsigned char * px = new unsigned char[imagex * imagey * 4];
-		memset(px, 0, sizeof(unsigned char) * imagex * imagey * 4);
-		for(unsigned int y = 0; y < imagey; y++) {
-			for(unsigned int x = 0; x < imagex; ++x) {
-				px[(x + y * imagex) * 4 + 0] = pxdata[(x + y * imagex) * 3 + 0];
-				px[(x + y * imagex) * 4 + 1] = pxdata[(x + y * imagex) * 3 + 1];
-				px[(x + y * imagex) * 4 + 2] = pxdata[(x + y * imagex) * 3 + 2];
-			}
-		}
-		glTexSubImage2D(GL_TEXTURE_2D, 0, indexx * 178, indexy * 256, imagex, imagey, GL_RGBA, GL_UNSIGNED_BYTE, px);
-		delete[] px;
-		ti.index = pool_start;
-		ti.lx = 178.0f / 4096.0f * indexx;
-		ti.ly = 1.0f / 16.0f * indexy;
-		ti.rx = ti.lx + imagex / 4096.0f;
-		ti.ry = ti.ly + imagey / 2048.0f;
-		texture_pool[pool_start].count = 1;
-		pool_start = texture_pool[pool_start].next;
+		ti.index = LoadTexture(img);
+		ti.lx = 0.0f;
+		ti.ly = 0.0f;
+		ti.rx = img.GetWidth();
+		ti.ry = img.GetHeight();
+
 		return ti;
 	}
 
-	void ImageMgr::LoadSingleImage(wxImage& img, const wxString& file) {
-		if(!wxFileExists(file))
-			return;
-		img.LoadFile(file);
+	void ImageMgr::LoadSingleImage(unsigned int index, const wxString& file) {
+
 	}
 
 	void ImageMgr::LoadImageConfig(const wxString& name) {
 		wxXmlDocument doc;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return;
-		wxXmlNode* root = doc.GetRoot();
-		wxString texture_file = root->GetAttribute("all");
-		wxString sleeve_file = root->GetAttribute("sleeve");
-		wxString unknown_file = root->GetAttribute("unknown");
-		wxString bg_file = root->GetAttribute("background");
-		if(wxFileExists(texture_file))
-			image_texture.LoadFile(texture_file);
-		if(wxFileExists(sleeve_file)) {
-			image_sleeve1.LoadFile(sleeve_file);
-			image_sleeve2.LoadFile(sleeve_file);
-		}
-		if(wxFileExists(unknown_file))
-			image_unknown.LoadFile(unknown_file);
-		if(wxFileExists(bg_file)) {
-			image_bg.LoadFile(bg_file);
-			background.lx = 0;
-			background.ly = 0;
-			background.rx = (float)image_bg.GetWidth() / texlen(image_bg.GetWidth());
-			background.ry = (float)image_bg.GetHeight() / texlen(image_bg.GetHeight());
-		}
 		wxXmlNode* child = root->GetChildren();
-		double all_width = texlen(image_texture.GetWidth());
-		double all_height = texlen(image_texture.GetHeight());
 		while (child) {
-			if (child->GetName() == wxT("texture")) {
-				long x, y, w, h;
+            if (child->GetName() == wxT("image")) {
+                SrcImageInfo sii;
+                long id;
+                child->GetAttribute("id").ToLong(&id);
+                wxString path = child->GetAttribute("path");
+                if(wxFileExists(path)) {
+                    auto& src = src_images[id];
+                    src.img.LoadFile(path);
+                    LoadTexture(src.img);
+                }
+            } else if (child->GetName() == wxT("texture")) {
+				long x, y, w, h, srcid;
 				TextureInfo ti;
 				std::string name = child->GetAttribute("name").ToStdString();
+                child->GetAttribute("x").ToLong(&srcid);
 				child->GetAttribute("x").ToLong(&x);
 				child->GetAttribute("y").ToLong(&y);
 				child->GetAttribute("w").ToLong(&w);

@@ -28,12 +28,12 @@
 #define TEXINDEX_STST		17
 #define TEXINDEX_BUILDBG    18
 #define TEXINDEX_SLEEVE1    19
-#define TEXINDEX_AVATAR1    20
-#define TEXINDEX_LPFRAME1	21
-#define TEXINDEX_LPBAR1		22
-#define TEXINDEX_SLEEVE2    23
-#define TEXINDEX_AVATAR2    24
-#define TEXINDEX_LPFRAME2	25
+#define TEXINDEX_SLEEVE2    20
+#define TEXINDEX_AVATAR1    21
+#define TEXINDEX_AVATAR2    22
+#define TEXINDEX_LPFRAME1	23
+#define TEXINDEX_LPFRAME2	24
+#define TEXINDEX_LPBAR1		25
 #define TEXINDEX_LPBAR2		26
 
 #define LAYOUT_STATIC	0
@@ -54,6 +54,14 @@
 
 namespace ygopro
 {
+    
+    struct SrcImageInfo {
+        wxImage img;
+        unsigned int t_index;
+        unsigned int t_width;
+        unsigned int t_height;
+    };
+    
 	struct TextureInfo {
 		TextureInfo() : index(0), lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
 		unsigned int index;
@@ -65,8 +73,8 @@ namespace ygopro
 
     struct CardImageInfo {
         unsigned int ref_count;
-        wxImage* card_image;
-        TextureInfo texture;
+        SrcImageInfo* image_info;
+        TextureInfo* texture;
     };
     
 	struct LayoutInfo {
@@ -106,16 +114,12 @@ namespace ygopro
 		unsigned int LoadTexture(const wxImage& img);
 		TextureInfo LoadCard(const wxImage& img);
 		
-		void LoadSingleImage(wxImage& img, const wxString& file);
+		void LoadSingleImage(unsigned int index, const wxString& file);
 		void LoadImageConfig(const wxString& file);
 		void LoadLayoutConfig(const wxString& file);
 
-        std::vector<wxImage*> image_texture;
         std::vector<unsigned int> textures_id;
-		TextureInfo background;
-		TextureInfo card_unknown;
-		TextureInfo card_sleeve1;
-		TextureInfo card_sleeve2;
+
 		std::array<TextureInfo*, 32> system_texture;
 		std::vector<TextureInfo> textures;
 		std::vector<TextureInfo> text_texture;
@@ -123,8 +127,9 @@ namespace ygopro
 		std::vector<LayoutInfo> clickable;
 
 	private:
+        std::unordered_map<unsigned int, SrcImageInfo> src_images;
+        std::unordered_map<unsigned int, SrcImageInfo> card_images;
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
-		std::unordered_map<unsigned int, wxImage*> card_images;
 		std::unordered_map<std::string, TextureInfo*> texture_infos;
 	};
 

@@ -47,7 +47,7 @@ public:
 		Append(data, size);
 	}
 
-	Hash32_SHA1& Append(const void* data, unsigned int size) {
+	Hash32_SHA1& Append(const void* data, size_t size) {
 		unsigned int lcpy;
 		unsigned int pbuf = 0;
 		unsigned char* buffer = (unsigned char*)data;

@@ -11,16 +11,16 @@ namespace ygopro
 
 		struct _ValueStruct {
 			bool is_string;
-			int ivalue;
+			long ivalue;
 			std::string svalue;
 
 			_ValueStruct(): is_string(false), ivalue(0) {}
 			
-			void operator = (int val) { ivalue = val; is_string = false; }
+			void operator = (long val) { ivalue = val; is_string = false; }
 			void operator = (const char* val) { svalue = val; is_string = true; }
 			void operator = (const std::string& val) { svalue = val; is_string = true; }
 			void operator = (const wxString& val) { svalue = val.ToStdString(); is_string = true; }
-			operator const int&() { return ivalue; }
+			operator const long&() { return ivalue; }
 			operator const std::string&() { return svalue; }
 		};
 
