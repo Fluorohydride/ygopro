@@ -23,6 +23,26 @@
   <texture src="1" name="symbol_tcg" x="640" y="64" w="128" h="64"/>
   <texture src="1" name="symbol_ctm" x="512" y="128" w="128" h="64"/>
   <texture src="1" name="symbol_tst" x="640" y="128" w="128" h="64"/>
-  <texture src="1" name="lpframe" x="768" y="0" w="256" h="64"/>
-  <texture src="1" name="lpbar" x="768" y="64" w="256" h="64"/>
+  <texture src="1" name="lpframe1" x="768" y="0" w="256" h="64"/>
+  <texture src="1" name="lpbar1" x="768" y="64" w="256" h="64"/>
+  <layout name="avatar_frame0" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar_frame1" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar0" style="static" click="avatar0" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="avatar1" style="static" click="avatar1" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp0" style="lp" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp1" style="lp" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_txt0" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="lp_txt1" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="turn_frame" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="turn_box" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_frame" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_dp" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_sp" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_m1" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_bp" style="phase" click="bp" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_m2" style="phase" click="m2" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="phase_ep" style="phase" click="ep" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_menu" style="button" click="menu" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_surrender" style="button" click="surrender" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <layout name="button_confirm" style="button" click="confirm" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
 </Texture>

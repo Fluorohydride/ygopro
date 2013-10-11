@@ -120,7 +120,7 @@ namespace ygopro
         img_info.t_height = ty;
 	}
 
-	void ImageMgr::LoadSingleImage(unsigned int index, const wxString& file) {
+	void ImageMgr::LoadSingleImage(const std::string& name, const wxString& file) {
 
 	}
 
@@ -158,6 +158,37 @@ namespace ygopro
 				ti.ly = y / (double)iter->second.t_height;
 				ti.rx = ti.lx + w / (double)iter->second.t_width;;
 				ti.ry = ti.ly + h / (double)iter->second.t_height;;
+			} else if(child->GetName() == wxT("layout")) {
+				LayoutInfo li;
+				std::string name = child->GetAttribute("name").ToStdString();
+				wxString style = child->GetAttribute("style");
+				li.click = child->GetAttribute("click");
+				std::string texture = child->GetAttribute("texture").ToStdString();
+				child->GetAttribute("x1").ToDouble(&li.x1);
+				child->GetAttribute("x2").ToDouble(&li.x2);
+				child->GetAttribute("x3").ToDouble(&li.x3);
+				child->GetAttribute("x4").ToDouble(&li.x4);
+				child->GetAttribute("y1").ToDouble(&li.y1);
+				child->GetAttribute("y2").ToDouble(&li.y2);
+				child->GetAttribute("y3").ToDouble(&li.y3);
+				child->GetAttribute("y4").ToDouble(&li.y4);
+				if(style == "button")
+					li.style = LAYOUT_BUTTON;
+				else if(style == "lp")
+					li.style = LAYOUT_LP;
+				else if(style == "text")
+					li.style = LAYOUT_TEXT;
+				else if(style == "phase")
+					li.style = LAYOUT_PHASE;
+				else
+					li.style = LAYOUT_STATIC;
+				if(texture == "")
+					li.ptex = nullptr;
+				else
+					li.ptex = &textures[texture];
+				layouts.push_back(li);
+				if(li.click != "")
+					clickable.push_back(li);
 			}
 			child = child->GetNext();
 		}
@@ -172,69 +203,6 @@ namespace ygopro
 			nti.rx = nti.lx + w;
 			nti.ry = nti.ly + h;
 			text_texture.push_back(nti);
-		}
-	}
-
-	void ImageMgr::LoadLayoutConfig(const wxString& name) {
-		wxXmlDocument doc;
-		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return;
-		wxXmlNode* root = doc.GetRoot();
-		wxXmlNode* child = root->GetChildren();
-		while (child) {
-			if (child->GetName() == wxT("layout")) {
-				LayoutInfo li;
-				std::string name = child->GetAttribute("name").ToStdString();
-				wxString style = child->GetAttribute("style");
-				wxString click = child->GetAttribute("click");
-				std::string texture = child->GetAttribute("texture").ToStdString();
-				child->GetAttribute("x1").ToDouble(&li.x1);
-				child->GetAttribute("x2").ToDouble(&li.x2);
-				child->GetAttribute("x3").ToDouble(&li.x3);
-				child->GetAttribute("x4").ToDouble(&li.x4);
-				child->GetAttribute("y1").ToDouble(&li.y1);
-				child->GetAttribute("y2").ToDouble(&li.y2);
-				child->GetAttribute("y3").ToDouble(&li.y3);
-				child->GetAttribute("y4").ToDouble(&li.y4);
-				if(style == "static")
-					li.style = LAYOUT_STATIC;
-				else if(style == "lp")
-					li.style = LAYOUT_LP;
-				else if(style == "text")
-					li.style = LAYOUT_TEXT;
-				else if(style == "phase")
-					li.style = LAYOUT_PHASE;
-				else
-					li.style = LAYOUT_BUTTON;
-				if(click == "")
-					li.click = CLICK_NONE;
-				else if(click == "avatar0")
-					li.click = CLICK_AVATAR0;
-				else if(click == "avatar1")
-					li.click = CLICK_AVATAR1;
-				else if(click == "bp")
-					li.click = CLICK_BP;
-				else if(click == "m2")
-					li.click = CLICK_M2;
-				else if(click == "ep")
-					li.click = CLICK_EP;
-				else if(click == "menu")
-					li.click = CLICK_MENU;
-				else if(click == "surrender")
-					li.click = CLICK_SURRENDER;
-				else if(click == "confirm")
-					li.click = CLICK_CONFIRM;
-				else
-					li.click = CLICK_NONE;
-				if(texture == "")
-					li.ptex = nullptr;
-				else
-					li.ptex = texture_infos[texture];
-				layouts.push_back(li);
-				if(li.click)
-					clickable.push_back(li);
-			}
-			child = child->GetNext();
 		}
 	}
 

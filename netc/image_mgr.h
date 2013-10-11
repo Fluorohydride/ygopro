@@ -45,16 +45,6 @@
 #define LAYOUT_PHASE	3
 #define LAYOUT_BUTTON	4
 
-#define CLICK_NONE		0
-#define CLICK_AVATAR0	1
-#define CLICK_AVATAR1	2
-#define CLICK_BP		3
-#define CLICK_M2		4
-#define CLICK_EP		5
-#define CLICK_MENU		6
-#define CLICK_SURRENDER	7
-#define CLICK_CONFIRM	8
-
 namespace ygopro
 {
     
@@ -77,7 +67,6 @@ namespace ygopro
     
 	struct LayoutInfo {
 		int style;
-		int click;
 		double x1;
 		double y1;
 		double x2;
@@ -86,6 +75,7 @@ namespace ygopro
 		double y3;
 		double x4;
 		double y4;
+		wxString click;
 		TextureInfo* ptex;
 	};
 
@@ -112,19 +102,16 @@ namespace ygopro
 		void UnloadAllCardTexture();
 		void LoadTexture(SrcImageInfo& img);
 		
-		void LoadSingleImage(unsigned int index, const wxString& file);
+		void LoadSingleImage(const std::string& name, const wxString& file);
 		void LoadImageConfig(const wxString& file);
-		void LoadLayoutConfig(const wxString& file);
 		
-		std::vector<LayoutInfo> layouts;
-		std::vector<LayoutInfo> clickable;
-
-	private:
         std::unordered_map<std::string, SrcImageInfo> src_images;
         std::unordered_map<unsigned int, SrcImageInfo> card_images;
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
 		std::unordered_map<std::string, TextureInfo> textures;
         std::vector<TextureInfo> text_texture;
+		std::vector<LayoutInfo> layouts;
+		std::vector<LayoutInfo> clickable;
 	};
 
 	extern ImageMgr imageMgr;
