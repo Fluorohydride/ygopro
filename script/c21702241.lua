@@ -47,6 +47,7 @@ end
 function c21702241.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	local ec=e:GetHandler():GetEquipTarget()
+	if not ec then return false end
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,ec:GetControler(),ec:GetBaseAttack())
 end
 function c21702241.damop(e,tp,eg,ep,ev,re,r,rp)

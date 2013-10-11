@@ -37,6 +37,7 @@ function c56321639.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c56321639.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	if not re then return false end
 	local c=re:GetHandler()
 	return e:GetHandler()~=re:GetHandler() and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:IsSetCard(0x106e)
 end
