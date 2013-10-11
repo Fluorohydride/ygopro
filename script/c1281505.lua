@@ -12,13 +12,6 @@ function c1281505.initial_effect(c)
 	e1:SetTarget(c1281505.eqtg)
 	e1:SetOperation(c1281505.eqop)
 	c:RegisterEffect(e1)
-	--equip limit
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_EQUIP_LIMIT)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetValue(c1281505.eqlimit)
-	c:RegisterEffect(e2)
 	--destroy sub
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_EQUIP+EFFECT_TYPE_CONTINUOUS)
@@ -48,10 +41,18 @@ function c1281505.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)
+		--equip limit
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetValue(c1281505.eqlimit)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(e1)
 	end
 end
 function c1281505.eqlimit(e,c)
-	return c:GetControler()==e:GetHandler():GetControler()
+	return c:GetControler()==e:GetHandlerPlayer() or e:GetHandler():GetEquipTarget()==c
 end
 function c1281505.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
