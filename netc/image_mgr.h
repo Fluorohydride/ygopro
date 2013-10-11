@@ -26,15 +26,18 @@
 #define TEXINDEX_STCG		15
 #define TEXINDEX_SCTM		16
 #define TEXINDEX_STST		17
-#define TEXINDEX_BUILDBG    18
-#define TEXINDEX_SLEEVE1    19
-#define TEXINDEX_SLEEVE2    20
-#define TEXINDEX_AVATAR1    21
-#define TEXINDEX_AVATAR2    22
-#define TEXINDEX_LPFRAME1	23
-#define TEXINDEX_LPFRAME2	24
-#define TEXINDEX_LPBAR1		25
-#define TEXINDEX_LPBAR2		26
+#define TEXINDEX_DUELBG     18
+#define TEXINDEX_BUILDBG    19
+#define TEXINDEX_UNKNOWN    20
+#define TEXINDEX_SLEEVE1    21
+#define TEXINDEX_SLEEVE2    22
+#define TEXINDEX_AVATAR1    23
+#define TEXINDEX_AVATAR2    24
+#define TEXINDEX_LPFRAME1	25
+#define TEXINDEX_LPFRAME2	26
+#define TEXINDEX_LPBAR1		27
+#define TEXINDEX_LPBAR2		28
+
 
 #define LAYOUT_STATIC	0
 #define LAYOUT_LP		1
@@ -56,6 +59,7 @@ namespace ygopro
 {
     
     struct SrcImageInfo {
+        SrcImageInfo() : t_index(0), t_width(0), t_height(0) {}
         wxImage img;
         unsigned int t_index;
         unsigned int t_width;
@@ -70,12 +74,6 @@ namespace ygopro
 		double rx;
 		double ry;
 	};
-
-    struct CardImageInfo {
-        unsigned int ref_count;
-        SrcImageInfo* image_info;
-        TextureInfo* texture;
-    };
     
 	struct LayoutInfo {
 		int style;
@@ -110,27 +108,23 @@ namespace ygopro
 		void InitTextures();
 		TextureInfo& GetCardTexture(unsigned int id);
 		TextureInfo& ReloadCardTexture(unsigned int id);
-		void UnloadCardTexture(unsigned int id);
-		unsigned int LoadTexture(const wxImage& img);
-		TextureInfo LoadCard(const wxImage& img);
+        void UnloadCardTexture(unsigned int id);
+		void UnloadAllCardTexture();
+		void LoadTexture(SrcImageInfo& img);
 		
 		void LoadSingleImage(unsigned int index, const wxString& file);
 		void LoadImageConfig(const wxString& file);
 		void LoadLayoutConfig(const wxString& file);
-
-        std::vector<unsigned int> textures_id;
-
-		std::array<TextureInfo*, 32> system_texture;
-		std::vector<TextureInfo> textures;
-		std::vector<TextureInfo> text_texture;
+		
 		std::vector<LayoutInfo> layouts;
 		std::vector<LayoutInfo> clickable;
 
 	private:
-        std::unordered_map<unsigned int, SrcImageInfo> src_images;
+        std::unordered_map<std::string, SrcImageInfo> src_images;
         std::unordered_map<unsigned int, SrcImageInfo> card_images;
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
-		std::unordered_map<std::string, TextureInfo*> texture_infos;
+		std::unordered_map<std::string, TextureInfo> textures;
+        std::vector<TextureInfo> text_texture;
 	};
 
 	extern ImageMgr imageMgr;

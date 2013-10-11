@@ -7,13 +7,11 @@ namespace ygopro
 	ImageMgr imageMgr;
 
 	ImageMgr::ImageMgr() {
-		for(int i = 0; i < 32; ++i)
-			system_texture[i] = nullptr;
+		
 	}
 
 	ImageMgr::~ImageMgr() {
-		for(auto iter : card_images)
-			delete iter.second;
+		
 	}
 
 	void ImageMgr::InitTextures() {
@@ -24,52 +22,75 @@ namespace ygopro
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
 			wxString file = wxString::Format("./image/%d.jpg", id);
-			TextureInfo& ti = card_textures[id];
+			auto& ti = iter->second;
 			if(!wxFileExists(file)) {
-				ti = card_unknown;
-				return ti;
+				ti = textures["unknown"];
 			} else {
-				wxImage* img = new wxImage;
-				img->LoadFile(file);
-				ti = LoadCard(*img);
-				card_images[id] = img;
-				return ti;
+                auto& card_image = card_images[id];
+                if(card_image.img.LoadFile(file)) {
+                    LoadTexture(card_image);
+                    ti.index = card_image.t_index;
+                    ti.lx = 0;
+                    ti.ly = 0;
+                    ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
+                    ti.ry = (double)card_image.img.GetHeight() / (double)card_image.t_height;
+                } else {
+                    card_images.erase(id);
+                    ti = textures["unknown"];
+                }
 			}
 		}
 		return iter->second;
 	}
 
 	TextureInfo& ImageMgr::ReloadCardTexture(unsigned int id) {
-		wxString file = wxString::Format("./image/%d.jpg", id);
-		UnloadCardTexture(id);
-		TextureInfo& ti = card_textures[id];
-		if(!wxFileExists(file)) {
-			ti = card_unknown;
-			return ti;
-		} else {
-			if(card_images.find(id) == card_images.end()) {
-				wxImage* img = new wxImage;
-				img->LoadFile(file);
-				ti = LoadCard(*img);
-				card_images[id] = img;
-			} else {
-				wxImage* img = card_images[id];
-				img->LoadFile(file);
-				ti = LoadCard(*img);
-			}
-		}
-		return ti;
+        auto& ti = card_textures[id];
+        auto iter = card_images.find(id);
+        if(iter != card_images.end() && iter->second.t_index)
+            glDeleteTextures(1, &iter->second.t_index);
+        card_images.erase(id);
+        wxString file = wxString::Format("./image/%d.jpg", id);
+        if(!wxFileExists(file)) {
+            ti = textures["unknown"];
+        } else {
+            auto& card_image = card_images[id];
+            if(card_image.img.LoadFile(file)) {
+                LoadTexture(card_image);
+                ti.index = card_image.t_index;
+                ti.lx = 0;
+                ti.ly = 0;
+                ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
+                ti.ry = (double)card_image.img.GetHeight() / (double)card_image.t_height;
+            } else {
+                card_images.erase(id);
+                ti = textures["unknown"];
+            }
+        }
+        return ti;
 	}
 
-	void ImageMgr::UnloadCardTexture(unsigned int id) {
-		auto iter = card_textures.find(id);
-		if(iter == card_textures.end())
-			return;
-		unsigned index = iter->second.index;
-		glDeleteTextures(1, &index);
+    void ImageMgr::UnloadCardTexture(unsigned int id) {
+        card_textures.erase(id);
+        auto iter = card_images.find(id);
+        if(iter == card_images.end())
+           return;
+        if(iter->second.t_index)
+           glDeleteTextures(1, &iter->second.t_index);
+        card_images.erase(id);
+    }
+    
+	void ImageMgr::UnloadAllCardTexture() {
+        for(auto& card_image : card_images)
+        {
+            unsigned int index = card_image.second.t_index;
+            if(index)
+                glDeleteTextures(1, &index);
+        }
+        card_images.clear();
 	}
 
-	unsigned int ImageMgr::LoadTexture(const wxImage& img) {
+	void ImageMgr::LoadTexture(SrcImageInfo& img_info) {
+        wxImage& img = img_info.img;
 		unsigned int tid;
 		glGenTextures(1, &tid);
 		glBindTexture(GL_TEXTURE_2D, tid);
@@ -94,19 +115,9 @@ namespace ygopro
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tx, ty, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
 		delete px;
-		return tid;
-	}
-
-	TextureInfo ImageMgr::LoadCard(const wxImage& img) {
-
-		TextureInfo ti;
-		ti.index = LoadTexture(img);
-		ti.lx = 0.0f;
-		ti.ly = 0.0f;
-		ti.rx = img.GetWidth();
-		ti.ry = img.GetHeight();
-
-		return ti;
+        img_info.t_index = tid;
+        img_info.t_width = tx;
+        img_info.t_height = ty;
 	}
 
 	void ImageMgr::LoadSingleImage(unsigned int index, const wxString& file) {
@@ -117,58 +128,41 @@ namespace ygopro
 		wxXmlDocument doc;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return;
+        wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* child = root->GetChildren();
 		while (child) {
             if (child->GetName() == wxT("image")) {
-                SrcImageInfo sii;
-                long id;
-                child->GetAttribute("id").ToLong(&id);
+                std::string name = child->GetAttribute("id").ToStdString();
                 wxString path = child->GetAttribute("path");
                 if(wxFileExists(path)) {
-                    auto& src = src_images[id];
-                    src.img.LoadFile(path);
-                    LoadTexture(src.img);
+                    auto& src = src_images[name];
+                    if(src.img.LoadFile(path))
+                        LoadTexture(src);
+                    else
+                        src_images.erase(name);
                 }
             } else if (child->GetName() == wxT("texture")) {
-				long x, y, w, h, srcid;
-				TextureInfo ti;
+				long x, y, w, h;
+                std::string src = child->GetAttribute("src").ToStdString();
 				std::string name = child->GetAttribute("name").ToStdString();
-                child->GetAttribute("x").ToLong(&srcid);
 				child->GetAttribute("x").ToLong(&x);
 				child->GetAttribute("y").ToLong(&y);
 				child->GetAttribute("w").ToLong(&w);
 				child->GetAttribute("h").ToLong(&h);
-				ti.lx = x / all_width;
-				ti.ly = y / all_height;
-				ti.rx = ti.lx + w / all_width;
-				ti.ry = ti.ly + h / all_height;
-				textures.push_back(ti);
-				texture_infos[name] = &textures[textures.size() - 1];
+                auto iter = src_images.find(src);
+                if(iter == src_images.end())
+                    continue;
+                TextureInfo& ti = textures[name];
+                ti.index = iter->second.t_index;
+				ti.lx = x / (double)iter->second.t_width;
+				ti.ly = y / (double)iter->second.t_height;
+				ti.rx = ti.lx + w / (double)iter->second.t_width;;
+				ti.ry = ti.ly + h / (double)iter->second.t_height;;
 			}
 			child = child->GetNext();
 		}
 		
-		system_texture[TEXINDEX_FIELD] = texture_infos["field"];
-		system_texture[TEXINDEX_ATTACK] = texture_infos["attack"];
-		system_texture[TEXINDEX_ACTIVATE] = texture_infos["activate"];
-		system_texture[TEXINDEX_CHAIN] = texture_infos["chain"];
-		system_texture[TEXINDEX_MASK] = texture_infos["mask"];
-		system_texture[TEXINDEX_NEGATED] = texture_infos["negated"];
-		system_texture[TEXINDEX_LIMIT0] = texture_infos["limit0"];
-		system_texture[TEXINDEX_LIMIT1] = texture_infos["limit1"];
-		system_texture[TEXINDEX_LIMIT2] = texture_infos["limit2"];
-		system_texture[TEXINDEX_LPFRAME] = texture_infos["lpframe"];
-		system_texture[TEXINDEX_LPBAR] = texture_infos["lpbar"];
-		system_texture[TEXINDEX_EQUIP] = texture_infos["equip"];
-		system_texture[TEXINDEX_TARGET] = texture_infos["target"];
-		system_texture[TEXINDEX_SCISSORS] = texture_infos["scissors"];
-		system_texture[TEXINDEX_ROCK] = texture_infos["rock"];
-		system_texture[TEXINDEX_PAPER] = texture_infos["paper"];
-		system_texture[TEXINDEX_SOCG] = texture_infos["symbol_ocg"];
-		system_texture[TEXINDEX_STCG] = texture_infos["symbol_tcg"];
-		system_texture[TEXINDEX_SCTM] = texture_infos["symbol_ctm"];
-		system_texture[TEXINDEX_STST] = texture_infos["symbol_tst"];
-		TextureInfo& ti = *texture_infos["number"];
+		TextureInfo& ti = textures["number"];
 		float w = (ti.rx - ti.lx) / 4;
 		float h = (ti.ry - ti.ly) / 4;
 		for(int i = 0; i < 16; ++i) {
