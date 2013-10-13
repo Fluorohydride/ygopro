@@ -1,3 +1,4 @@
+#include "image_mgr.h"
 #include "duel_canvas.h"
 
 namespace ygopro
@@ -14,10 +15,12 @@ namespace ygopro
 		EVT_KEY_UP(wxDuelCanvas::eventKeyReleased)
 	END_EVENT_TABLE()
 
-	wxDuelCanvas::wxDuelCanvas(wxFrame* parent, int id, int* args):
-		wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
+	wxDuelCanvas::wxDuelCanvas(wxFrame* parent, int id, int* args): wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
 		glcontext = new wxGLContext(this);
 		SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+        t_duelbg = &imageMgr.textures["duelng"];
+        t_field = &imageMgr.textures["field"];
+        t_avatar1 = &imageMgr.textures["avatar1"];
 	}
 
 	wxDuelCanvas::~wxDuelCanvas() {

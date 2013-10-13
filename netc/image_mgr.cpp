@@ -14,10 +14,6 @@ namespace ygopro
 		
 	}
 
-	void ImageMgr::InitTextures() {
-		
-	}
-
 	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
@@ -121,18 +117,33 @@ namespace ygopro
 	}
 
 	void ImageMgr::LoadSingleImage(const std::string& name, const wxString& file) {
-
+        if(!wxFileExists(file))
+            return;
+        auto& image = src_images[name];
+        if(image.img.LoadFile(file))
+        {
+            LoadTexture(image);
+            auto& ti = textures[name];
+            ti.index = image.t_index;
+            ti.lx = 0;
+            ti.ly = 0;
+            ti.rx = image.img.GetWidth() / (double)image.t_width;
+            ti.ry = image.img.GetHeight() / (double)image.t_height;
+        } else
+            src_images.erase(name);
 	}
 
 	void ImageMgr::LoadImageConfig(const wxString& name) {
 		wxXmlDocument doc;
+        if(!wxFileExists(name))
+            return;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return;
         wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* child = root->GetChildren();
 		while (child) {
             if (child->GetName() == wxT("image")) {
-                std::string name = child->GetAttribute("id").ToStdString();
+                std::string name = child->GetAttribute("name").ToStdString();
                 wxString path = child->GetAttribute("path");
                 if(wxFileExists(path)) {
                     auto& src = src_images[name];
@@ -150,14 +161,14 @@ namespace ygopro
 				child->GetAttribute("w").ToLong(&w);
 				child->GetAttribute("h").ToLong(&h);
                 auto iter = src_images.find(src);
-                if(iter == src_images.end())
-                    continue;
-                TextureInfo& ti = textures[name];
-                ti.index = iter->second.t_index;
-				ti.lx = x / (double)iter->second.t_width;
-				ti.ly = y / (double)iter->second.t_height;
-				ti.rx = ti.lx + w / (double)iter->second.t_width;;
-				ti.ry = ti.ly + h / (double)iter->second.t_height;;
+                if(iter != src_images.end()) {
+                    TextureInfo& ti = textures[name];
+                    ti.index = iter->second.t_index;
+                    ti.lx = x / (double)iter->second.t_width;
+                    ti.ly = y / (double)iter->second.t_height;
+                    ti.rx = ti.lx + w / (double)iter->second.t_width;
+                    ti.ry = ti.ly + h / (double)iter->second.t_height;
+                }
 			} else if(child->GetName() == wxT("layout")) {
 				LayoutInfo li;
 				std::string name = child->GetAttribute("name").ToStdString();

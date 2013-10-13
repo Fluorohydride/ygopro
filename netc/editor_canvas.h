@@ -6,13 +6,17 @@
 
 namespace ygopro
 {
+    
+    struct TextureInfo;
+    
 	class wxEditorCanvas : public wxGLCanvas {
 
 	private:
 		wxGLContext* glcontext;
 		unsigned int glwidth;
 		unsigned int glheight;
-
+        TextureInfo* t_buildbg;
+        
 	public:
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxEditorCanvas();

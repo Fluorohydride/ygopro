@@ -1,43 +1,12 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
-#include "GL/glew.h"
+#include <GL/glew.h>
 #include "wx/image.h"
 #include "wx/xml/xml.h"
 #include <array>
 #include <vector>
 #include <unordered_map>
-
-#define TEXINDEX_FIELD		0
-#define TEXINDEX_ATTACK		1
-#define TEXINDEX_ACTIVATE	2
-#define TEXINDEX_CHAIN		3
-#define TEXINDEX_MASK		4
-#define TEXINDEX_NEGATED	5
-#define TEXINDEX_LIMIT0		6
-#define TEXINDEX_LIMIT1		7
-#define TEXINDEX_LIMIT2		8
-#define TEXINDEX_EQUIP		9
-#define TEXINDEX_TARGET		10
-#define TEXINDEX_SCISSORS	11
-#define TEXINDEX_ROCK		12
-#define TEXINDEX_PAPER		13
-#define TEXINDEX_SOCG		14
-#define TEXINDEX_STCG		15
-#define TEXINDEX_SCTM		16
-#define TEXINDEX_STST		17
-#define TEXINDEX_DUELBG     18
-#define TEXINDEX_BUILDBG    19
-#define TEXINDEX_UNKNOWN    20
-#define TEXINDEX_SLEEVE1    21
-#define TEXINDEX_SLEEVE2    22
-#define TEXINDEX_AVATAR1    23
-#define TEXINDEX_AVATAR2    24
-#define TEXINDEX_LPFRAME1	25
-#define TEXINDEX_LPFRAME2	26
-#define TEXINDEX_LPBAR1		27
-#define TEXINDEX_LPBAR2		28
-
 
 #define LAYOUT_STATIC	0
 #define LAYOUT_LP		1
@@ -49,7 +18,6 @@ namespace ygopro
 {
     
     struct SrcImageInfo {
-        SrcImageInfo() : t_index(0), t_width(0), t_height(0) {}
         wxImage img;
         unsigned int t_index;
         unsigned int t_width;
@@ -57,7 +25,6 @@ namespace ygopro
     };
     
 	struct TextureInfo {
-		TextureInfo() : index(0), lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
 		unsigned int index;
 		double lx;
 		double ly;

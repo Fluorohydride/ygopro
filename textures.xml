@@ -24,7 +24,16 @@
   <texture src="1" name="symbol_ctm" x="512" y="128" w="128" h="64"/>
   <texture src="1" name="symbol_tst" x="640" y="128" w="128" h="64"/>
   <texture src="1" name="lpframe1" x="768" y="0" w="256" h="64"/>
+  <texture src="1" name="lpframe2" x="768" y="0" w="256" h="64"/>
   <texture src="1" name="lpbar1" x="768" y="64" w="256" h="64"/>
+  <texture src="1" name="lpbar2" x="768" y="64" w="256" h="64"/>
+  <texture src="1" name="avatar1" x="128" y="256" w="128" h="128"/>
+  <texture src="1" name="avatar2" x="128" y="256" w="128" h="128"/>
+  <texture src="2" name="sleeve1" x="0" y="0" w="177" h="254"/>
+  <texture src="2" name="sleeve2" x="0" y="0" w="177" h="254"/>
+  <texture src="3" name="unknown" x="0" y="0" w="177" h="254"/>
+  <texture src="4" name="duelbg" x="0" y="0" w="1024" h="640"/>
+  <texture src="4" name="buildbg" x="0" y="0" w="1024" h="640"/>
   <layout name="avatar_frame0" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
   <layout name="avatar_frame1" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
   <layout name="avatar0" style="static" click="avatar0" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>

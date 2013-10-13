@@ -1,6 +1,5 @@
-#include "GL/glew.h"
-#include "editor_canvas.h"
 #include "image_mgr.h"
+#include "editor_canvas.h"
 
 namespace ygopro
 {
@@ -14,10 +13,10 @@ namespace ygopro
 		EVT_LEAVE_WINDOW(wxEditorCanvas::eventMouseLeftWindow)
 	END_EVENT_TABLE()
 
-	wxEditorCanvas::wxEditorCanvas(wxFrame* parent, int id, int* args):
-		wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
-			glcontext = new wxGLContext(this);
-			SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+	wxEditorCanvas::wxEditorCanvas(wxFrame* parent, int id, int* args): wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
+        glcontext = new wxGLContext(this);
+        SetBackgroundStyle(wxBG_STYLE_CUSTOM);
+        t_buildbg = &imageMgr.textures["buildbg"];
 	}
 
 	wxEditorCanvas::~wxEditorCanvas() {
@@ -61,11 +60,6 @@ namespace ygopro
 	}
 
 	void wxEditorCanvas::drawScene() {
-		static bool first_time = true;
-		if(first_time) {
-			imageMgr.InitTextures();
-			first_time = false;
-		}
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -80,13 +74,13 @@ namespace ygopro
 		glDisable(GL_LIGHTING);
 		glDisable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, imageMgr.textureid_bg);
+		glBindTexture(GL_TEXTURE_2D, t_buildbg->index);
 		glBegin(GL_QUADS);
 		{
-			glTexCoord2f(imageMgr.background.lx, imageMgr.background.ly);glVertex2f(-1.0f, 1.0f);
-			glTexCoord2f(imageMgr.background.lx, imageMgr.background.ry);glVertex2f(-1.0f, -1.0f);
-			glTexCoord2f(imageMgr.background.rx, imageMgr.background.ry);glVertex2f(1.0f, -1.0f);
-			glTexCoord2f(imageMgr.background.rx, imageMgr.background.ly);glVertex2f(1.0f, 1.0f);
+			glTexCoord2f(t_buildbg->lx, t_buildbg->ly);glVertex2f(-1.0f, 1.0f);
+			glTexCoord2f(t_buildbg->lx, t_buildbg->ry);glVertex2f(-1.0f, -1.0f);
+			glTexCoord2f(t_buildbg->rx, t_buildbg->ry);glVertex2f(1.0f, -1.0f);
+			glTexCoord2f(t_buildbg->rx, t_buildbg->ly);glVertex2f(1.0f, 1.0f);
 		}
 		glEnd();
 

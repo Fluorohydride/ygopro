@@ -41,7 +41,7 @@ namespace ygopro
 				element->AddAttribute("type", "string");
 			} else {
 				char buf[32];
-				sprintf(buf, "%d", iter.second.ivalue);
+				sprintf(buf, "%ld", iter.second.ivalue);
 				element->AddAttribute("name", iter.first);
 				element->AddAttribute("value", buf);
 				element->AddAttribute("type", "integer");

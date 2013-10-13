@@ -27,13 +27,15 @@ namespace ygopro {
 
 			wxInitAllImageHandlers();
 			commonCfg.LoadConfig("common.xml");
-			imageMgr.LoadImageConfig("textures.xml");
 
 //			if(dataMgr.LoadDatas("cards.cdb"))
 //				return true;
 
 			editorFrame = new EditorFrame(1000, 750);
 			editorFrame->Center();
+            
+            imageMgr.LoadImageConfig("textures.xml");
+            
 			editorFrame->Show();
 			return true;
 		}

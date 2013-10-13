@@ -7,13 +7,19 @@
 
 namespace ygopro
 {
+    
+    struct TextureInfo;
+    
 	class wxDuelCanvas : public wxGLCanvas, public FrameControler {
 
 	private:
 		wxGLContext* glcontext;
 		unsigned int glwidth;
 		unsigned int glheight;
-
+        TextureInfo* t_duelbg;
+        TextureInfo* t_field;
+        TextureInfo* t_avatar1;
+        
 	public:
 		wxDuelCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxDuelCanvas();

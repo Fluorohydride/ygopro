@@ -6,11 +6,6 @@ namespace ygopro
 {
 
 	void wxDuelCanvas::drawScene() {
-		static bool first_time = true;
-		if(first_time) {
-			imageMgr.InitTextures();
-			first_time = false;
-		}
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -25,13 +20,13 @@ namespace ygopro
  		glDisable(GL_LIGHTING);
 		glDisable(GL_BLEND);
  		glEnable(GL_TEXTURE_2D);
- 		glBindTexture(GL_TEXTURE_2D, imageMgr.textureid_bg);
+ 		glBindTexture(GL_TEXTURE_2D, t_duelbg->index);
  		glBegin(GL_QUADS);
 		{
- 			glTexCoord2f(imageMgr.background.lx, imageMgr.background.ly);glVertex2f(-1.0f, 1.0f);
-			glTexCoord2f(imageMgr.background.lx, imageMgr.background.ry);glVertex2f(-1.0f, -1.0f);
- 			glTexCoord2f(imageMgr.background.rx, imageMgr.background.ry);glVertex2f(1.0f, -1.0f);
- 			glTexCoord2f(imageMgr.background.rx, imageMgr.background.ly);glVertex2f(1.0f, 1.0f);
+ 			glTexCoord2f(t_duelbg->lx, t_duelbg->ly);glVertex2f(-1.0f, 1.0f);
+			glTexCoord2f(t_duelbg->lx, t_duelbg->ry);glVertex2f(-1.0f, -1.0f);
+ 			glTexCoord2f(t_duelbg->rx, t_duelbg->ry);glVertex2f(1.0f, -1.0f);
+ 			glTexCoord2f(t_duelbg->rx, t_duelbg->ly);glVertex2f(1.0f, 1.0f);
 		}
  		glEnd();
 
@@ -45,14 +40,14 @@ namespace ygopro
 		glLoadIdentity();
 
 		//draw field
-		glBindTexture(GL_TEXTURE_2D, imageMgr.textureid_all);
+		glBindTexture(GL_TEXTURE_2D, t_field->index);
 		glBegin(GL_QUADS);
 		{
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			glTexCoord2f(imageMgr.textures[0].lx, imageMgr.textures[0].ly);glVertex3f(0.0f, -4.0f, 0.0f);
-			glTexCoord2f(imageMgr.textures[0].lx, imageMgr.textures[0].ry);glVertex3f(0.0f, 4.0f, 0.0f);
-			glTexCoord2f(imageMgr.textures[0].rx, imageMgr.textures[0].ry);glVertex3f(8.0f, 4.0f, 0.0f);
-			glTexCoord2f(imageMgr.textures[0].rx, imageMgr.textures[0].ly);glVertex3f(8.0f, -4.0f, 0.0f);
+			glTexCoord2f(t_field->lx, t_field->ly);glVertex3f(0.0f, -4.0f, 0.0f);
+			glTexCoord2f(t_field->lx, t_field->ry);glVertex3f(0.0f, 4.0f, 0.0f);
+			glTexCoord2f(t_field->rx, t_field->ry);glVertex3f(8.0f, 4.0f, 0.0f);
+			glTexCoord2f(t_field->rx, t_field->ly);glVertex3f(8.0f, -4.0f, 0.0f);
 		}
 		glEnd();
 
@@ -65,31 +60,19 @@ namespace ygopro
 		float avawidth = 300.0f / glwidth;
 		float avaheight = 400.0f / glheight;
 
+        glBindTexture(GL_TEXTURE_2D, t_field->index);
 		glBegin(GL_QUADS);
 		{
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-			glTexCoord2f(imageMgr.textures[3].lx, imageMgr.textures[3].ly);glVertex2f(-1.0f, -1.0f + avaheight);
-			glTexCoord2f(imageMgr.textures[3].rx, imageMgr.textures[3].ly);glVertex2f(-1.0f + avawidth, -1.0f + avaheight);
-			glTexCoord2f(imageMgr.textures[3].rx, imageMgr.textures[3].ry);glVertex2f(-1.0f + avawidth, -1.0f);
-			glTexCoord2f(imageMgr.textures[3].lx, imageMgr.textures[3].ry);glVertex2f(-1.0f, -1.0f);
-			glColor4f(0.5f, 0.5f, 0.5f, 0.8f);
-			glTexCoord2f(imageMgr.textures[16].lx, imageMgr.textures[16].ly);glVertex2f(-0.70f, -0.8f);
-			glTexCoord2f(imageMgr.textures[16].rx, imageMgr.textures[16].ly);glVertex2f(0.35f, -0.8f);
-			glTexCoord2f(imageMgr.textures[16].rx, imageMgr.textures[16].ry);glVertex2f(0.35f, -1.0f);
-			glTexCoord2f(imageMgr.textures[16].lx, imageMgr.textures[16].ry);glVertex2f(-0.70f, -1.0f);
-			glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-			glTexCoord2f(imageMgr.textures[16].lx, imageMgr.textures[16].ly);glVertex2f(-0.70f, -0.8f);
-			glTexCoord2f(imageMgr.textures[16].lx + (imageMgr.textures[16].rx - imageMgr.textures[16].lx) * 0.8095238f, imageMgr.textures[16].ly);glVertex2f(0.15f, -0.8f);
-			glTexCoord2f(imageMgr.textures[16].lx + (imageMgr.textures[16].rx - imageMgr.textures[16].lx) * 0.8095238f, imageMgr.textures[16].ry);glVertex2f(0.15f, -1.0f);
-			glTexCoord2f(imageMgr.textures[16].lx, imageMgr.textures[16].ry);glVertex2f(-0.70f, -1.0f);
-			glColor4f(1.0f, 1.0f, 1.0f, 0.8f);
-			glTexCoord2f(imageMgr.textures[15].lx, imageMgr.textures[15].ly);glVertex2f(-0.70f, -0.8f);
-			glTexCoord2f(imageMgr.textures[15].rx, imageMgr.textures[15].ly);glVertex2f(0.35f, -0.8f);
-			glTexCoord2f(imageMgr.textures[15].rx, imageMgr.textures[15].ry);glVertex2f(0.35f, -1.0f);
-			glTexCoord2f(imageMgr.textures[15].lx, imageMgr.textures[15].ry);glVertex2f(-0.70f, -1.0f);
+			glTexCoord2f(t_avatar1->lx, t_avatar1->ly);glVertex2f(-1.0f, -1.0f + avaheight);
+			glTexCoord2f(t_avatar1->rx, t_avatar1->ly);glVertex2f(-1.0f + avawidth, -1.0f + avaheight);
+			glTexCoord2f(t_avatar1->rx, t_avatar1->ry);glVertex2f(-1.0f + avawidth, -1.0f);
+			glTexCoord2f(t_avatar1->lx, t_avatar1->ry);glVertex2f(-1.0f, -1.0f);
 		}
 		glEnd();
-
+        
+        glBindTexture(GL_TEXTURE_2D, 0);
+        
 		glFlush();
 	}
 
