@@ -56,12 +56,12 @@ function c20457551.atkdown(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetAttacker()~=eqc and Duel.GetAttackTarget()~=eqc then return end
 	local tc=eqc:GetBattleTarget()
 	if tc then
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
-	e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
-	e1:SetValue(-eqc:GetLevel()*100)
-	tc:RegisterEffect(e1)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_UPDATE_ATTACK)
+		e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
+		e1:SetValue(-eqc:GetLevel()*100)
+		tc:RegisterEffect(e1)
 	end
 end
 function c20457551.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)

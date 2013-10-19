@@ -77,16 +77,12 @@ function c83438826.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	local eq=c:GetEquipTarget()
-	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or tc:IsFaceup() or  
-	not eq:IsAttackAbove(500)
-	then return end
-	
+	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or tc:IsFaceup() or not eq:IsAttackAbove(500) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(-500)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-
 	if eq:RegisterEffect(e1) then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end

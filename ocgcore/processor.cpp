@@ -1976,6 +1976,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						newchain.triggering_player = priority;
 						core.select_chains.push_back(newchain);
 						core.delayed_quick_tmp.erase(make_pair(peffect, *evit));
+						core.delayed_quick_break.erase(make_pair(peffect, *evit));
 					}
 				}
 				pr = effects.quick_o_effect.equal_range(evit->event_code);
@@ -1992,6 +1993,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						newchain.triggering_player = priority;
 						core.select_chains.push_back(newchain);
 						core.delayed_quick_tmp.erase(make_pair(peffect, *evit));
+						core.delayed_quick_break.erase(make_pair(peffect, *evit));
 					}
 				}
 				evit++;

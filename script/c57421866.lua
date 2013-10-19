@@ -40,7 +40,7 @@ function c57421866.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_UPDATE_LEVEL)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(-1)
-	tc:RegisterEffect(e1)
-	if not c:IsRelateToEffect(e) then return end
-	Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if tc:RegisterEffect(e1) and c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	end
 end
