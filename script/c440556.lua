@@ -30,9 +30,8 @@ end
 function c440556.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	local cp=c:GetControler()
-	Duel.Hint(HINT_SELECTMSG,cp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(cp,c440556.filter,cp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,c440556.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		local e1=Effect.CreateEffect(e:GetHandler())
@@ -41,10 +40,10 @@ function c440556.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	elseif cp~=tp then
-		local cg=Duel.GetFieldGroup(cp,LOCATION_EXTRA,0)
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
 		if cg and cg:GetCount()>0 then
-			Duel.ConfirmCards(tp,cg)
+			Duel.ConfirmCards(1-tp,cg)
 		end
 	end
 end
