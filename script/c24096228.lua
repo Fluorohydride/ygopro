@@ -45,7 +45,7 @@ function c24096228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if not tc or not tc:IsRelateToEffect(e) then return end
 	local tpe=tc:GetType()
 	local te=tc:GetActivateEffect()
 	local tg=te:GetTarget()

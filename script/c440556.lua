@@ -44,7 +44,7 @@ function c440556.spop(e,tp,eg,ep,ev,re,r,rp)
 	elseif cp~=tp then
 		local cg=Duel.GetFieldGroup(cp,LOCATION_EXTRA,0)
 		if cg and cg:GetCount()>0 then
-			Duel.ConfirmCards(cg,tp)
+			Duel.ConfirmCards(tp,cg)
 		end
 	end
 end
