@@ -53,8 +53,10 @@ field::field(duel* pduel) {
 		core.shuffle_deck_check[i] = FALSE;
 		core.shuffle_hand_check[i] = FALSE;
 	}
+	core.pre_field[0] = 0;
+	core.pre_field[1] = 0;
 	for (int i = 0; i < 5; ++i)
-		core.pre_field[i] = 0;
+		core.opp_mzone[i] = 0;
 	core.summoning_card = 0;
 	core.summon_depth = 0;
 	core.chain_limit = 0;

@@ -607,6 +607,13 @@ int32 scriptlib::card_get_overlay_count(lua_State *L) {
 	lua_pushinteger(L, pcard->xyz_materials.size());
 	return 1;
 }
+int32 scriptlib::card_get_overlay_target(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	interpreter::card2value(L, pcard->overlay_target);
+	return 1;
+}
 int32 scriptlib::card_check_remove_overlay_card(lua_State *L) {
 	check_param_count(L, 4);
 	check_param(L, PARAM_TYPE_CARD, 1);

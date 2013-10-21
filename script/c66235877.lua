@@ -18,6 +18,13 @@ function c66235877.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetOperation(c66235877.disop)
 	c:RegisterEffect(e2)
+	--
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(66235877)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	c:RegisterEffect(e3)
 end
 function c66235877.distg(e,c)
 	return c:IsType(TYPE_FLIP)

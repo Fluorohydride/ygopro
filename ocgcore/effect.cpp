@@ -155,7 +155,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 				return FALSE;
 		} else if(!(type & EFFECT_TYPE_CONTINUOUS)) {
 			if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED))
-			        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+			        && !(code & EVENT_FLIP) && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
 			if(!(type & (EFFECT_TYPE_FLIP | EFFECT_TYPE_TRIGGER_F))) {
 				if((code < 1132 || code > 1149) && pduel->game_field->infos.phase == PHASE_DAMAGE && !(flag & EFFECT_FLAG_DAMAGE_STEP))

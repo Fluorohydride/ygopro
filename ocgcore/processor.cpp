@@ -478,7 +478,7 @@ int32 field::process() {
 		if(it->step == 0) {
 			card* attacker = core.attacker;
 			if(!attacker
-			        || (infos.phase == PHASE_DAMAGE && attacker->fieldid_r != core.pre_field[0] && attacker->fieldid_r != core.pre_field[1])
+			        || (attacker->fieldid_r != core.pre_field[0])
 			        || (attacker->current.position & POS_FACEDOWN)
 			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
@@ -2831,6 +2831,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target = 0;
 		else
 			core.attack_target = core.select_cards[returns.bvalue[1]];
+		if(core.attack_target)
+			core.pre_field[1] = core.attack_target->fieldid_r;
+		else
+			core.pre_field[1] = 0;
 		return FALSE;
 	}
 	case 7: {
@@ -2852,9 +2856,9 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i])
-				core.pre_field[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid_r;
+				core.opp_mzone[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid_r;
 			else
-				core.pre_field[i] = 0;
+				core.opp_mzone[i] = 0;
 		}
 		//core.units.begin()->arg1 ---> is rollbacked
 		if(!core.units.begin()->arg1) {
@@ -2996,7 +3000,7 @@ int32 field::process_battle_command(uint16 step) {
 				return FALSE;
 			}
 			uint8 seq = core.chain_attack_target->current.sequence;
-			if(core.pre_field[seq] != core.chain_attack_target->fieldid_r) {
+			if(core.opp_mzone[seq] != core.chain_attack_target->fieldid_r) {
 				core.units.begin()->step = -1;
 				reset_phase(PHASE_DAMAGE);
 				return FALSE;
@@ -3008,12 +3012,12 @@ int32 field::process_battle_command(uint16 step) {
 		core.units.begin()->arg2 = get_attack_target(core.attacker, &core.select_cards, core.chain_attack);
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i]) {
-				if(!core.pre_field[i] || core.pre_field[i] != player[1 - infos.turn_player].list_mzone[i]->fieldid_r) {
+				if(!core.opp_mzone[i] || core.opp_mzone[i] != player[1 - infos.turn_player].list_mzone[i]->fieldid_r) {
 					rollback = true;
 					break;
 				}
 			} else {
-				if(core.pre_field[i]) {
+				if(core.opp_mzone[i]) {
 					rollback = true;
 					break;
 				}
@@ -4407,10 +4411,14 @@ int32 field::break_effect() {
 	core.hint_timing[1] = 0;
 	for (auto chit = core.new_ochain.begin(); chit != core.new_ochain.end();) {
 		auto rm = chit++;
-		if (!(rm->triggering_effect->flag & EFFECT_FLAG_DELAY)) {
-			pduel->write_buffer8(MSG_MISSED_EFFECT);
-			pduel->write_buffer32(rm->triggering_effect->handler->get_info_location());
-			pduel->write_buffer32(rm->triggering_effect->handler->data.code);
+		effect* peffect = rm->triggering_effect;
+		if (!(peffect->flag & EFFECT_FLAG_DELAY)) {
+			if ((peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+			        || !(peffect->type & EFFECT_TYPE_FIELD) || (peffect->range & rm->triggering_location)) {
+				pduel->write_buffer8(MSG_MISSED_EFFECT);
+				pduel->write_buffer32(peffect->handler->get_info_location());
+				pduel->write_buffer32(peffect->handler->data.code);
+			}
 			core.new_ochain.erase(rm);
 		}
 	}

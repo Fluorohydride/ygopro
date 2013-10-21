@@ -39,7 +39,7 @@ function c36076683.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 		e2:SetCondition(c36076683.rdcon)
 		e2:SetOperation(c36076683.rdop)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e2)
 	end
 end

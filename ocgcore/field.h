@@ -214,7 +214,8 @@ struct processor {
 	std::unordered_set<card*> unique_cards[2];
 	ptr temp_var[4];
 	uint32 global_flag;
-	uint16 pre_field[5];
+	uint16 pre_field[2];
+	uint16 opp_mzone[5];
 	int32 chain_limit;
 	uint8 chain_limp;
 	int32 chain_limit_p;
