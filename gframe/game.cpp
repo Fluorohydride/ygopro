@@ -37,6 +37,7 @@ void Game::MainServerLoop(int bDuel_mode) {
     dataManager.LoadDB("cards.cdb");
     aServerPort = NetServer::StartServer(aServerPort);
     printf("%u\n", aServerPort);
+    fflush(stdout);
     NetServer::Initduel(bDuel_mode);
 	while(NetServer::net_evbase) {
 #ifdef WIN32
