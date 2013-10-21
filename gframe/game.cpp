@@ -35,7 +35,7 @@ unsigned char draw_count;
 void Game::MainServerLoop(int bDuel_mode) {
 	deckManager.LoadLFList();
     dataManager.LoadDB("cards.cdb");
-    NetServer::StartServer(aServerPort);
+    aServerPort = NetServer::StartServer(aServerPort);
     printf("%u\n", aServerPort);
     NetServer::Initduel(bDuel_mode);
 	while(NetServer::net_evbase) {
