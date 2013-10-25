@@ -649,7 +649,7 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 		pduel->write_buffer8((*cit)->current.sequence);
 		cset.insert(*cit);
 	}
-	pduel->game_field->raise_event(&cset, EVENT_CONFIRM, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
+	pduel->game_field->raise_event(&cset, EVENT_CONFIRM_DECKTOP, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
 	pduel->game_field->process_instant_event();
 	return lua_yield(L, 0);
 }
@@ -689,9 +689,9 @@ int32 scriptlib::duel_confirm_cards(lua_State *L) {
 		}
 	}
 	if(pcard)
-		pduel->game_field->raise_event(pcard, EVENT_CONFIRM, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
+		pduel->game_field->raise_event(pcard, EVENT_CONFIRM_CARDS, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
 	else
-		pduel->game_field->raise_event(&pgroup->container, EVENT_CONFIRM, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
+		pduel->game_field->raise_event(&pgroup->container, EVENT_CONFIRM_CARDS, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
 	pduel->game_field->process_instant_event();
 	return lua_yield(L, 0);
 }
