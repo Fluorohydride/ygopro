@@ -26,7 +26,8 @@ function c24094653.target(e,tp,eg,ep,ev,re,r,rp,chk)
 			if ce~=nil then
 				local fgroup=ce:GetTarget()
 				local mg2=fgroup(ce,e,tp)
-				res=Duel.IsExistingMatchingCard(c24094653.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,chkf)
+				local filter=ce:GetCost()
+				res=Duel.IsExistingMatchingCard(filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,chkf))
 			end
 		end
 		return res
@@ -42,8 +43,9 @@ function c24094653.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ce=Duel.GetChainMaterial(tp)
 	if ce~=nil then
 		local fgroup=ce:GetTarget()
+		local filter=ce:GetCost()
 		mg2=fgroup(ce,e,tp)
-		sg2=Duel.GetMatchingGroup(c24094653.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,chkf)
+		sg2=Duel.GetMatchingGroup(filter,tp,LOCATION_EXTRA,0,nil,e,tp,mg2,chkf)
 	end
 	if sg1:GetCount()>0 or (sg2~=nil and sg2:GetCount()>0) then
 		local sg=sg1:Clone()
