@@ -3,12 +3,9 @@
 
 #include <gl/glew.h>
 #include "wx/wx.h"
+#include "wx/aui/aui.h"
 #include "wx/frame.h"
 #include "wx/glcanvas.h"
-#include "wx/ribbon/bar.h"
-#include "wx/ribbon/buttonbar.h"
-#include "wx/ribbon/gallery.h"
-#include "wx/ribbon/toolbar.h"
 
 namespace ygopro
 {
@@ -18,17 +15,29 @@ namespace ygopro
 
 		enum
 		{
-			ID_RIBBON_BANLIST = wxID_HIGHEST + 1,
+			ID_DECK_LOAD = wxID_HIGHEST + 1,
+            ID_DECK_SAVE,
+            ID_DECK_SAVEAS,
+            ID_TOOL_CLEAR,
+            ID_TOOL_SORT,
+            ID_TOOL_SHUFFLE,
+            ID_TOOL_SCREENSHOT,
+            ID_TOOL_SEARCH,
+            
+            ID_MENUEND,
+            ID_BANLISTSTART = wxID_HIGHEST + 100,
 		};
 
 	public:
 		EditorFrame(int sx, int sy);
 		~EditorFrame();
 
-	void OnBanListDropdown(wxRibbonButtonBarEvent& evt);
+        void OnDeckLoad(wxCommandEvent& evt);
+        void OnDeckSave(wxCommandEvent& evt);
+        void OnDeckSaveAs(wxCommandEvent& evt);
 
-	protected:
-		DECLARE_EVENT_TABLE()
+    private:
+        wxAuiManager m_auiManager;
 	};
 
 	extern EditorFrame* editorFrame;

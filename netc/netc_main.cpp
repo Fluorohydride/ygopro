@@ -31,7 +31,7 @@ namespace ygopro {
 //			if(dataMgr.LoadDatas("cards.cdb"))
 //				return true;
 
-			editorFrame = new EditorFrame(1000, 750);
+			editorFrame = new EditorFrame(1200, 720);
 			editorFrame->Center();
             
             imageMgr.LoadImageConfig("textures.xml");

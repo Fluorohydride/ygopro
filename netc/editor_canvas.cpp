@@ -17,6 +17,7 @@ namespace ygopro
         glcontext = new wxGLContext(this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         t_buildbg = &imageMgr.textures["buildbg"];
+        wxGLCanvas::SetCurrent(*glcontext);
 	}
 
 	wxEditorCanvas::~wxEditorCanvas() {
