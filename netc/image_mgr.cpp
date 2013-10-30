@@ -25,7 +25,7 @@ namespace ygopro
                 auto& card_image = card_images[id];
                 if(card_image.img.LoadFile(file)) {
                     LoadTexture(card_image);
-                    ti.index = card_image.t_index;
+                    ti.src = &card_image;
                     ti.lx = 0;
                     ti.ly = 0;
                     ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
@@ -52,7 +52,7 @@ namespace ygopro
             auto& card_image = card_images[id];
             if(card_image.img.LoadFile(file)) {
                 LoadTexture(card_image);
-                ti.index = card_image.t_index;
+                ti.src = &card_image;
                 ti.lx = 0;
                 ti.ly = 0;
                 ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
@@ -116,15 +116,30 @@ namespace ygopro
         img_info.t_height = ty;
 	}
 
+    void ImageMgr::InitTextures(bool force) {
+        static bool first_time = true;
+        if(!first_time && !force)
+            return;
+        first_time = false;
+        for(auto& src : src_images) {
+            if(src.second.t_index)
+                glDeleteTextures(1, &src.second.t_index);
+            LoadTexture(src.second);
+        }
+    }
+    
 	void ImageMgr::LoadSingleImage(const std::string& name, const wxString& file) {
         if(!wxFileExists(file))
             return;
         auto& image = src_images[name];
         if(image.img.LoadFile(file))
         {
-            LoadTexture(image);
+            single_images[name] = file;
+            image.t_index = 0;
+            image.t_width = texlen(image.img.GetWidth());
+            image.t_height = texlen(image.img.GetWidth());
             auto& ti = textures[name];
-            ti.index = image.t_index;
+            ti.src = &image;
             ti.lx = 0;
             ti.ly = 0;
             ti.rx = image.img.GetWidth() / (double)image.t_width;
@@ -148,8 +163,11 @@ namespace ygopro
                 if(wxFileExists(path)) {
                     auto& src = src_images[name];
                     if(src.img.LoadFile(path))
-                        LoadTexture(src);
-                    else
+                    {
+                        src.t_index = 0;
+                        src.t_width = texlen(src.img.GetWidth());
+                        src.t_height = texlen(src.img.GetWidth());
+                    } else
                         src_images.erase(name);
                 }
             } else if (child->GetName() == wxT("texture")) {
@@ -163,7 +181,7 @@ namespace ygopro
                 auto iter = src_images.find(src);
                 if(iter != src_images.end()) {
                     TextureInfo& ti = textures[name];
-                    ti.index = iter->second.t_index;
+                    ti.src = &iter->second;
                     ti.lx = x / (double)iter->second.t_width;
                     ti.ly = y / (double)iter->second.t_height;
                     ti.rx = ti.lx + w / (double)iter->second.t_width;
@@ -209,6 +227,7 @@ namespace ygopro
 		float h = (ti.ry - ti.ly) / 4;
 		for(int i = 0; i < 16; ++i) {
 			TextureInfo nti;
+            nti.src = ti.src;
 			nti.lx = ti.lx + (i % 4) * w;
 			nti.ly = ti.ly + (i / 4) * h;
 			nti.rx = nti.lx + w;

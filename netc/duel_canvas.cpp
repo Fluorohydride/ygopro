@@ -39,6 +39,7 @@ namespace ygopro
 			return;
 		wxGLCanvas::SetCurrent(*glcontext);
 		wxPaintDC(this);
+        imageMgr.InitTextures();
 		drawScene();
 		SwapBuffers();
 	}

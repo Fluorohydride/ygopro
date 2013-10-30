@@ -25,11 +25,15 @@ namespace ygopro
     };
     
 	struct TextureInfo {
-		unsigned int index;
+        TextureInfo(): src(nullptr), lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
+		SrcImageInfo* src;
 		double lx;
 		double ly;
 		double rx;
 		double ry;
+        inline unsigned int tex() {
+            return src ? src->t_index : 0;
+        }
 	};
     
 	struct LayoutInfo {
@@ -62,13 +66,13 @@ namespace ygopro
 			return len + 1;
 		}
 
-		void InitTextures();
 		TextureInfo& GetCardTexture(unsigned int id);
 		TextureInfo& ReloadCardTexture(unsigned int id);
         void UnloadCardTexture(unsigned int id);
 		void UnloadAllCardTexture();
 		void LoadTexture(SrcImageInfo& img);
-		
+		void InitTextures(bool force = false);
+        
 		void LoadSingleImage(const std::string& name, const wxString& file);
 		void LoadImageConfig(const wxString& file);
 		
@@ -76,6 +80,7 @@ namespace ygopro
         std::unordered_map<unsigned int, SrcImageInfo> card_images;
 		std::unordered_map<unsigned int, TextureInfo> card_textures;
 		std::unordered_map<std::string, TextureInfo> textures;
+        std::unordered_map<std::string, wxString> single_images;
         std::vector<TextureInfo> text_texture;
 		std::vector<LayoutInfo> layouts;
 		std::vector<LayoutInfo> clickable;

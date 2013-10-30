@@ -20,7 +20,7 @@ namespace ygopro
  		glDisable(GL_LIGHTING);
 		glDisable(GL_BLEND);
  		glEnable(GL_TEXTURE_2D);
- 		glBindTexture(GL_TEXTURE_2D, t_duelbg->index);
+ 		glBindTexture(GL_TEXTURE_2D, t_duelbg->tex());
  		glBegin(GL_QUADS);
 		{
  			glTexCoord2f(t_duelbg->lx, t_duelbg->ly);glVertex2f(-1.0f, 1.0f);
@@ -40,7 +40,7 @@ namespace ygopro
 		glLoadIdentity();
 
 		//draw field
-		glBindTexture(GL_TEXTURE_2D, t_field->index);
+		glBindTexture(GL_TEXTURE_2D, t_field->tex());
 		glBegin(GL_QUADS);
 		{
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
@@ -60,7 +60,7 @@ namespace ygopro
 		float avawidth = 300.0f / glwidth;
 		float avaheight = 400.0f / glheight;
 
-        glBindTexture(GL_TEXTURE_2D, t_field->index);
+        glBindTexture(GL_TEXTURE_2D, t_field->tex());
 		glBegin(GL_QUADS);
 		{
 			glColor4f(1.0f, 1.0f, 1.0f, 1.0f);

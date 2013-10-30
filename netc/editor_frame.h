@@ -35,9 +35,12 @@ namespace ygopro
         void OnDeckLoad(wxCommandEvent& evt);
         void OnDeckSave(wxCommandEvent& evt);
         void OnDeckSaveAs(wxCommandEvent& evt);
-
+        
+        DECLARE_EVENT_TABLE()
+        
     private:
         wxAuiManager m_auiManager;
+        wxString current_file;
 	};
 
 	extern EditorFrame* editorFrame;

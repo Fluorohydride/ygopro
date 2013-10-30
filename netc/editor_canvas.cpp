@@ -17,7 +17,7 @@ namespace ygopro
         glcontext = new wxGLContext(this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         t_buildbg = &imageMgr.textures["buildbg"];
-        wxGLCanvas::SetCurrent(*glcontext);
+        current_deck = nullptr;
 	}
 
 	wxEditorCanvas::~wxEditorCanvas() {
@@ -36,6 +36,7 @@ namespace ygopro
 			return;
 		wxGLCanvas::SetCurrent(*glcontext);
 		wxPaintDC(this);
+        imageMgr.InitTextures();
 		drawScene();
 		SwapBuffers();
 	}
@@ -75,7 +76,7 @@ namespace ygopro
 		glDisable(GL_LIGHTING);
 		glDisable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
-		glBindTexture(GL_TEXTURE_2D, t_buildbg->index);
+		glBindTexture(GL_TEXTURE_2D, t_buildbg->tex());
 		glBegin(GL_QUADS);
 		{
 			glTexCoord2f(t_buildbg->lx, t_buildbg->ly);glVertex2f(-1.0f, 1.0f);

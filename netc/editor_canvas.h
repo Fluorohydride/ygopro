@@ -8,6 +8,7 @@ namespace ygopro
 {
     
     struct TextureInfo;
+    struct DeckData;
     
 	class wxEditorCanvas : public wxGLCanvas {
 
@@ -16,6 +17,7 @@ namespace ygopro
 		unsigned int glwidth;
 		unsigned int glheight;
         TextureInfo* t_buildbg;
+        DeckData* current_deck;
         
 	public:
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
