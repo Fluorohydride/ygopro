@@ -19,7 +19,7 @@ function c70630741.initial_effect(c)
 end
 function c70630741.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE)
+	return not c:IsLocation(LOCATION_DECK) and c:IsReason(REASON_BATTLE)
 end
 function c70630741.filter(c,tp)
 	return c:IsFaceup() and c:GetOwner()==tp and c:IsControlerCanBeChanged()

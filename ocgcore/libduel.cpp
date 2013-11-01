@@ -637,6 +637,7 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 			}
 		}
 	}
+	field::card_set cset;
 	auto cit = pduel->game_field->player[playerid].list_main.rbegin();
 	pduel->write_buffer8(MSG_CONFIRM_DECKTOP);
 	pduel->write_buffer8(playerid);
@@ -646,8 +647,10 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 		pduel->write_buffer8((*cit)->current.controler);
 		pduel->write_buffer8((*cit)->current.location);
 		pduel->write_buffer8((*cit)->current.sequence);
+		cset.insert(*cit);
 	}
-	pduel->game_field->add_process(PROCESSOR_WAIT, 0, 0, 0, 0, 0);
+	pduel->game_field->raise_event(&cset, EVENT_CONFIRM_DECKTOP, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
+	pduel->game_field->process_instant_event();
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_confirm_cards(lua_State *L) {
@@ -685,7 +688,11 @@ int32 scriptlib::duel_confirm_cards(lua_State *L) {
 			pduel->write_buffer8((*cit)->current.sequence);
 		}
 	}
-	pduel->game_field->add_process(PROCESSOR_WAIT, 0, 0, 0, 0, 0);
+	if(pcard)
+		pduel->game_field->raise_event(pcard, EVENT_CONFIRM_CARDS, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
+	else
+		pduel->game_field->raise_event(&pgroup->container, EVENT_CONFIRM_CARDS, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
+	pduel->game_field->process_instant_event();
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_sort_decktop(lua_State *L) {
@@ -1454,25 +1461,8 @@ int32 scriptlib::duel_get_attack_target(lua_State *L) {
 }
 int32 scriptlib::duel_disable_attack(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	card* attacker = pduel->game_field->core.attacker;
-	if(!attacker
-	        || (pduel->game_field->infos.phase == PHASE_DAMAGE && attacker->fieldid_r != pduel->game_field->core.pre_field[0] && attacker->fieldid_r != pduel->game_field->core.pre_field[1])
-	        || (attacker->current.position & POS_FACEDOWN)
-	        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
-	        || !attacker->is_affect_by_effect(pduel->game_field->core.reason_effect))
-		lua_pushboolean(L, 0);
-	else {
-		effect* peffect = pduel->new_effect();
-		peffect->code = EFFECT_ATTACK_DISABLED;
-		peffect->type = EFFECT_TYPE_SINGLE;
-		attacker->add_effect(peffect);
-		attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
-		pduel->game_field->raise_event(attacker, EVENT_ATTACK_DISABLED, pduel->game_field->core.reason_effect,
-		                               0, pduel->game_field->core.reason_player, PLAYER_NONE, 0);
-		pduel->game_field->process_instant_event();
-		lua_pushboolean(L, 1);
-	}
-	return 1;
+	pduel->game_field->add_process(PROCESSOR_ATTACK_DISABLE, 0, 0, 0, 0, 0);
+	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_chain_attack(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
@@ -2711,19 +2701,24 @@ int32 scriptlib::duel_is_player_can_summon(lua_State * L) {
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_spsummon(lua_State * L) {
-	check_param_count(L, 4);
+	check_param_count(L, 1);
 	int32 playerid = lua_tointeger(L, 1);
-	int32 sumtype = lua_tointeger(L, 2);
-	int32 sumpos = lua_tointeger(L, 3);
-	int32 toplayer = lua_tointeger(L, 4);
-	check_param(L, PARAM_TYPE_CARD, 5);
-	card* pcard = *(card**) lua_touserdata(L, 5);
 	if(playerid != 0 && playerid != 1) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushboolean(L, pduel->game_field->is_player_can_spsummon(pduel->game_field->core.reason_effect, sumtype, sumpos, playerid, toplayer, pcard));
+	if(lua_gettop(L) == 1)
+		lua_pushboolean(L, pduel->game_field->is_player_can_spsummon(playerid));
+	else {
+		check_param_count(L, 5);
+		check_param(L, PARAM_TYPE_CARD, 5);
+		int32 sumtype = lua_tointeger(L, 2);
+		int32 sumpos = lua_tointeger(L, 3);
+		int32 toplayer = lua_tointeger(L, 4);
+		card* pcard = *(card**) lua_touserdata(L, 5);
+		lua_pushboolean(L, pduel->game_field->is_player_can_spsummon(pduel->game_field->core.reason_effect, sumtype, sumpos, playerid, toplayer, pcard));
+	}
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_flipsummon(lua_State * L) {

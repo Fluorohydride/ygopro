@@ -13,7 +13,8 @@ function c50457953.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c50457953.lvfilter(c,lv)
-	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER) and c:IsRace(RACE_DRAGON)
+	local clv=c:GetLevel()
+	return c:IsFaceup() and clv>0 and clv~=lv and c:IsAttribute(ATTRIBUTE_WATER) and c:IsRace(RACE_DRAGON)
 end
 function c50457953.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c50457953.lvfilter(chkc,e:GetHandler():GetLevel()) end

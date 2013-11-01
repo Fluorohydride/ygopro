@@ -50,8 +50,7 @@ end
 function c35514096.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabel()==2 then
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		local tc=g:GetFirst()
+		local tc=Duel.GetFirstTarget()
 		if tc:IsRelateToEffect(e) then
 			Duel.Destroy(tc,REASON_EFFECT)
 		end

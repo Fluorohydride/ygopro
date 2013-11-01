@@ -26,7 +26,7 @@ function c51549976.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c51549976.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
-	if Duel.Destroy(g,REASON_EFFECT)==0 then return end
+	Duel.Destroy(g,REASON_EFFECT)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)

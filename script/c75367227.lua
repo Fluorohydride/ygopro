@@ -31,6 +31,7 @@ function c75367227.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCondition(c75367227.thcon)
 	e3:SetTarget(c75367227.thtg)
 	e3:SetOperation(c75367227.thop)
 	c:RegisterEffect(e3)
@@ -55,9 +56,12 @@ function c75367227.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c75367227.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and tc:IsFacedown() then
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
+end
+function c75367227.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c75367227.filter(c)
 	return c:IsSetCard(0x8d) and c:IsAbleToHand()
@@ -73,5 +77,6 @@ function c75367227.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end

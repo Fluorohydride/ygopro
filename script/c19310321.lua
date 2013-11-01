@@ -37,7 +37,6 @@ function c19310321.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,tc,e)
-	local oc=g:GetFirst()
 	if g:GetCount()>0 then
 		Duel.Overlay(tc,g)
 	end

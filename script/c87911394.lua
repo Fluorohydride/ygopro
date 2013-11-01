@@ -33,7 +33,6 @@ end
 function c87911394.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
-
 function c87911394.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
 	return at and at:IsFaceup() and e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
@@ -50,7 +49,6 @@ function c87911394.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local atk=tc:GetAttack()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -62,6 +60,8 @@ function c87911394.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetValue(RESET_TURN_SET)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
+		Duel.AdjustInstantly(tc)
+		local atk=tc:GetAttack()
 		if c:IsFaceup() and c:IsRelateToEffect(e) then
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)

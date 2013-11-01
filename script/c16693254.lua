@@ -21,7 +21,9 @@ function c16693254.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(16693254,1))
 	local g=Duel.SelectMatchingCard(tp,c16693254.filter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
-	Duel.ShuffleDeck(tp)
-	Duel.MoveSequence(tc,0)
-	Duel.ConfirmDecktop(tp,1)
+	if tc then
+		Duel.ShuffleDeck(tp)
+		Duel.MoveSequence(tc,0)
+		Duel.ConfirmDecktop(tp,1)
+	end
 end

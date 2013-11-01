@@ -43,7 +43,7 @@ function c89516305.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	e:GetHandler():RegisterFlagEffect(89516305,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
-function c89516305.sttg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c89516305.sttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_SZONE) and chkc:IsFacedown() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,0,LOCATION_SZONE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEDOWN)
@@ -76,7 +76,7 @@ function c89516305.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c89516305.setfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
 	local g=Duel.SelectTarget(tp,c89516305.setfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_CHANGE_POSITION,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
 end
 function c89516305.setop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

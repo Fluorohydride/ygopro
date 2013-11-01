@@ -23,7 +23,7 @@ function c2137678.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x13)
 end
 function c2137678.val(e,c)
-	return Duel.GetMatchingGroupCount(c2137678.atkfilter,c:GetControler(),LOCATION_MZONE,0,c)*100
+	return Duel.GetMatchingGroupCount(c2137678.atkfilter,0,LOCATION_MZONE,LOCATION_MZONE,c)*100
 end
 function c2137678.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsLocation(LOCATION_MZONE) end

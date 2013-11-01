@@ -39,7 +39,7 @@ function c76419637.dctg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c76419637.dcop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT)
+	Duel.DiscardHand(1-tp,nil,1,1,REASON_EFFECT+REASON_DISCARD)
 end
 function c76419637.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,40424929)
@@ -51,12 +51,12 @@ function c76419637.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c76419637.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
+	local ct=Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*300)
 end
 function c76419637.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
-	local ct=Duel.GetFieldGroupCount(p,LOCATION_ONFIELD,0)
+	local ct=Duel.GetFieldGroupCount(p,LOCATION_ONFIELD,LOCATION_ONFIELD)
 	Duel.Damage(p,ct*300,REASON_EFFECT)
 end

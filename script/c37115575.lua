@@ -45,6 +45,13 @@ function c37115575.initial_effect(c)
 	e7:SetCode(EFFECT_SELF_DESTROY)
 	e7:SetCondition(c37115575.descon)
 	c:RegisterEffect(e7)
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_FIELD)
+	e8:SetCode(EFFECT_SELF_DESTROY)
+	e8:SetRange(LOCATION_MZONE)
+	e8:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e8:SetTarget(c37115575.destarget)
+	c:RegisterEffect(e8)
 	--spson
 	local e8=Effect.CreateEffect(c)
 	e8:SetType(EFFECT_TYPE_SINGLE)
@@ -65,8 +72,8 @@ end
 function c37115575.sumlimit(e,c)
 	return c:IsSetCard(0x23)
 end
-function c37115575.exfilter(c,fid)
-	return c:IsFaceup() and c:IsSetCard(0x23) and (fid==nil or c:GetFieldID()<fid)
+function c37115575.exfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x23)
 end
 function c37115575.excon(e)
 	return Duel.IsExistingMatchingCard(c37115575.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
@@ -95,11 +102,12 @@ function c37115575.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c37115575.descon(e)
-	local c=e:GetHandler()
 	local f1=Duel.GetFieldCard(0,LOCATION_SZONE,5)
 	local f2=Duel.GetFieldCard(1,LOCATION_SZONE,5)
-	return ((f1==nil or not f1:IsFaceup()) and (f2==nil or not f2:IsFaceup()))
-		or Duel.IsExistingMatchingCard(c37115575.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c:GetFieldID())
+	return (f1==nil or f1:IsFacedown()) and (f2==nil or f2:IsFacedown())
+end
+function c37115575.destarget(e,c)
+	return c:IsSetCard(0x23) and c:GetFieldID()>e:GetHandler():GetFieldID()
 end
 function c37115575.defilter(c)
 	return c:IsFaceup() and c:IsDestructable()

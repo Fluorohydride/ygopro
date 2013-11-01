@@ -30,11 +30,8 @@ function c77334267.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c77334267.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,2,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
 end
-function c77334267.dfilter(c,e)
-	return c:IsFacedown() and c:IsRelateToEffect(e)
-end
 function c77334267.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local dg=g:Filter(c77334267.dfilter,nil,e)
+	local dg=g:Filter(Card.IsRelateToEffect,nil,e)
 	Duel.Destroy(dg,REASON_EFFECT)
 end

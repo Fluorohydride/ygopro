@@ -1,7 +1,7 @@
 --フォーミュラ·シンクロン
 function c50091196.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	aux.AddSynchroProcedure2(c,nil,aux.NonTuner(nil))
 	c:EnableReviveLimit()
 	--synchro summon success
 	local e1=Effect.CreateEffect(c)

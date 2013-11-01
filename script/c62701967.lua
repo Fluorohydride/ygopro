@@ -13,17 +13,16 @@ function c62701967.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(62701967,0))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetCode(EVENT_BATTLE_DESTROYED)
-	e2:SetRange(LOCATION_MZONE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e2:SetCode(EVENT_BATTLE_DESTROYING)
 	e2:SetLabel(300)
 	e2:SetCondition(c62701967.atkcon)
 	e2:SetOperation(c62701967.operation)
 	c:RegisterEffect(e2)
 end
 function c62701967.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_DINOSAUR) end
-	local sg=Duel.SelectReleaseGroup(tp,Card.IsRace,1,1,nil,RACE_DINOSAUR)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,e:GetHandler(),RACE_DINOSAUR) end
+	local sg=Duel.SelectReleaseGroup(tp,Card.IsRace,1,1,e:GetHandler(),RACE_DINOSAUR)
 	Duel.Release(sg,REASON_COST)
 end
 function c62701967.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -38,7 +37,8 @@ function c62701967.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c62701967.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	return eg:GetCount()==1 and tc:GetReasonCard()==e:GetHandler()
-		and tc:IsLocation(LOCATION_GRAVE) and tc:IsReason(REASON_BATTLE) 
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:IsFaceup() and c:IsRelateToBattle()
+		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE) and bc:IsType(TYPE_MONSTER)
 end

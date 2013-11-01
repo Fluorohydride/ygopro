@@ -69,7 +69,7 @@ function c21954587.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c21954587.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c21954587.rfilter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAttribute(ATTRIBUTE_WATER)

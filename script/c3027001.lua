@@ -13,7 +13,7 @@ function c3027001.cfilter(c,tp)
 	return c:IsType(TYPE_TRAP) and c:IsControler(tp)
 end
 function c3027001.condition(e,tp,eg,ep,ev,re,r,rp)
-	if rp==tp then return end
+	if rp==tp then return false end
 	local ex,tg,tc=Duel.GetOperationInfo(ev,CATEGORY_DESTROY)
 	return ex and tg~=nil and tg:GetCount()==tc and tg:IsExists(c3027001.cfilter,1,e:GetHandler(),tp)
 end

@@ -46,7 +46,9 @@ function c34086406.operation2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(34086406,3))
 	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK,0,1,1,nil,TYPE_MONSTER)
 	local tc=g:GetFirst()
-	Duel.ShuffleDeck(tp)
-	Duel.MoveSequence(tc,0)
-	Duel.ConfirmDecktop(tp,1)
+	if tc then
+		Duel.ShuffleDeck(tp)
+		Duel.MoveSequence(tc,0)
+		Duel.ConfirmDecktop(tp,1)
+	end
 end

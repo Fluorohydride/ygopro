@@ -44,7 +44,7 @@ function c20374351.discon(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg:IsContains(c) and Duel.IsChainNegatable(ev)
+	return tg and tg:IsContains(c) and Duel.IsChainNegatable(ev)
 end
 function c20374351.cfilter(c)
 	return c:IsSetCard(0x39) and c:IsAbleToRemoveAsCost()

@@ -11,13 +11,13 @@ function c14618326.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c14618326.filter(c)
-	return c:IsFacedown() or c:IsType(TYPE_TRAP)
+	return c:IsType(TYPE_TRAP) or (c:IsFacedown() and c:IsLocation(LOCATION_SZONE) and c:GetSequence()~=5)
 end
 function c14618326.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_SZONE) and c14618326.filter(chkc) end
+	if chkc then return chkc:IsOnField() and c14618326.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c14618326.filter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,c14618326.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	if g:GetCount()>0 and g:GetFirst():IsFaceup() then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end

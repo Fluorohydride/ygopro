@@ -33,8 +33,9 @@ function c55204071.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c55204071.spcon(e,c)
-	if c==nil then return Duel.GetFlagEffect(c:GetControler(),55204071)==0 end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+	if c==nil then return true end
+	return Duel.GetFlagEffect(c:GetControler(),55204071)==0
+		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(c:GetControler(),c55204071.cfilter,1,nil)
 end
 function c55204071.spop(e,tp,eg,ep,ev,re,r,rp,c)
@@ -46,7 +47,7 @@ function c55204071.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
 end
 function c55204071.spfilter(c,e,tp)
-	return c:IsSetCard(0x83) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsCode(55204071) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c55204071.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

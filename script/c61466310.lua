@@ -53,12 +53,15 @@ function c61466310.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	elseif t1 then e:SetLabel(Duel.SelectOption(tp,aux.Stringid(61466310,1)))
 	else e:SetLabel(Duel.SelectOption(tp,aux.Stringid(61466310,2))+1) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	eg:GetFirst():CreateEffectRelation(e)
 end
 function c61466310.thop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local ec=eg:GetFirst()
+	if ec:IsFacedown() or not ec:IsRelateToEffect(e) then return end
 	local atk=e:GetLabel()==0 and 2400 or 2800
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c61466310.filter2,tp,LOCATION_DECK,0,1,1,nil,atk,eg:GetFirst():GetCode())
+	local g=Duel.SelectMatchingCard(tp,c61466310.filter2,tp,LOCATION_DECK,0,1,1,nil,atk,ec:GetCode())
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

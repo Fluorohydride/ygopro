@@ -21,7 +21,7 @@ function c88190790.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_EQUIP_LIMIT)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetValue(1)
+	e3:SetValue(c88190790.eqlimit)
 	c:RegisterEffect(e3)
 	--multi attack
 	local e4=Effect.CreateEffect(c)
@@ -32,6 +32,12 @@ function c88190790.initial_effect(c)
 	e4:SetCost(c88190790.macost)
 	e4:SetOperation(c88190790.maop)
 	c:RegisterEffect(e4)
+end
+function c88190790.eqlimit(e,c)
+	if e:GetHandler():GetEquipTarget()==c then return true end
+	local g=Duel.GetFieldGroup(e:GetHandlerPlayer(),LOCATION_MZONE,0)
+	local tc=g:GetFirst()
+	return g:GetCount()==1 and tc==c and tc:IsRace(RACE_WARRIOR)
 end
 function c88190790.condition(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)

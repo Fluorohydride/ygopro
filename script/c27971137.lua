@@ -2,8 +2,7 @@
 function c27971137.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(27971137,0))
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetOperation(c27971137.atkop)
 	c:RegisterEffect(e1)
@@ -22,14 +21,12 @@ function c27971137.initial_effect(c)
 end
 function c27971137.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsRelateToEffect(e) then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(500)
-		e1:SetReset(RESET_EVENT+0x1ff0000)
-		c:RegisterEffect(e1)
-	end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(500)
+	e1:SetReset(RESET_EVENT+0x1ff0000)
+	c:RegisterEffect(e1)
 end
 function c27971137.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_DESTROY)

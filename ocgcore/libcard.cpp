@@ -18,6 +18,11 @@ int32 scriptlib::card_get_code(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->get_code());
+	uint32 otcode = pcard->get_another_code();
+	if(otcode) {
+		lua_pushinteger(L, otcode);
+		return 2;
+	}
 	return 1;
 }
 int32 scriptlib::card_get_origin_code(lua_State *L) {
@@ -387,7 +392,7 @@ int32 scriptlib::card_is_code(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 tcode = lua_tointeger(L, 2);
-	if(pcard->get_code() == tcode)
+	if(pcard->get_code() == tcode || pcard->get_another_code() == tcode)
 		lua_pushboolean(L, 1);
 	else
 		lua_pushboolean(L, 0);
@@ -600,6 +605,13 @@ int32 scriptlib::card_get_overlay_count(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->xyz_materials.size());
+	return 1;
+}
+int32 scriptlib::card_get_overlay_target(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	interpreter::card2value(L, pcard->overlay_target);
 	return 1;
 }
 int32 scriptlib::card_check_remove_overlay_card(lua_State *L) {

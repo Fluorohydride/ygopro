@@ -20,7 +20,7 @@ function c40424929.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,40424929,RESET_PHASE+PHASE_END,0,1)
 end
 function c40424929.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
 	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,ct*200)

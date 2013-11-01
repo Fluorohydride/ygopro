@@ -224,6 +224,18 @@ uint32 card::get_code() {
 	}
 	return code;
 }
+uint32 card::get_another_code() {
+	effect_set eset;
+	filter_effect(EFFECT_ADD_CODE, &eset);
+	if(!eset.count)
+		return 0;
+	uint32 otcode = eset.get_last()->get_value(this);
+	if(get_code() != otcode)
+		return otcode;
+	if(data.alias == otcode)
+		return data.code;
+	return 0;
+}
 int32 card::is_set_card(uint32 set_code) {
 	uint32 code = get_code();
 	uint32 setcode;
@@ -656,16 +668,21 @@ void card::xyz_overlay(card_set* materials) {
 		return;
 	card_set des;
 	if(materials->size() == 1) {
-		(*materials->begin())->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
-		xyz_add(*materials->begin(), &des);
+		card* pcard = *materials->begin();
+		pcard->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
+		if(pcard->unique_code)
+			pduel->game_field->remove_unique_card(pcard);
+		xyz_add(pcard, &des);
 	} else {
 		field::card_vector cv;
-		for(auto cit = materials->begin(); cit != materials->end(); ++cit)
-			cv.push_back(*cit);
+		for(auto cit : *materials)
+			cv.push_back(cit);
 		std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
-			(*cvit)->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
-			xyz_add(*cvit, &des);
+		for(auto pcard : cv) {
+			pcard->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
+			if(pcard->unique_code)
+				pduel->game_field->remove_unique_card(pcard);
+			xyz_add(pcard, &des);
 		}
 	}
 	if(des.size())

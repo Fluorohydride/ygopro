@@ -12,11 +12,15 @@
 #include "effect.h"
 #include "interpreter.h"
 #include <iostream>
+#include <cstring>
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 
 bool chain::chain_operation_sort(chain c1, chain c2) {
 	return c1.triggering_effect->id < c2.triggering_effect->id;
+}
+bool tevent::operator< (const tevent& v) const {
+	return memcmp(this, &v, sizeof(tevent)) < 0;
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
@@ -49,8 +53,10 @@ field::field(duel* pduel) {
 		core.shuffle_deck_check[i] = FALSE;
 		core.shuffle_hand_check[i] = FALSE;
 	}
+	core.pre_field[0] = 0;
+	core.pre_field[1] = 0;
 	for (int i = 0; i < 5; ++i)
-		core.pre_field[i] = 0;
+		core.opp_mzone[i] = 0;
 	core.summoning_card = 0;
 	core.summon_depth = 0;
 	core.chain_limit = 0;
@@ -1316,6 +1322,8 @@ void field::add_unique_card(card* pcard) {
 
 void field::remove_unique_card(card* pcard) {
 	uint8 con = pcard->current.controler;
+	if(con == PLAYER_NONE)
+		return;
 	if(pcard->unique_pos[0])
 		core.unique_cards[con].erase(pcard);
 	if(pcard->unique_pos[1])
@@ -1578,6 +1586,9 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 	effect_set eset;
 	filter_field_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
+		uint32 redirect = eset[i]->get_value();
+		if((redirect & LOCATION_REMOVED) && player[playerid].list_main.back()->is_affected_by_effect(EFFECT_CANNOT_REMOVE))
+			continue;
 		uint8 p = eset[i]->get_handler_player();
 		if((eset[i]->flag & EFFECT_FLAG_IGNORE_RANGE) || (p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
 			return FALSE;
@@ -1643,6 +1654,15 @@ int32 field::is_player_can_sset(uint8 playerid, card * pcard) {
 		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		if (pduel->lua->check_condition(eset[i]->target, 3))
+			return FALSE;
+	}
+	return TRUE;
+}
+int32 field::is_player_can_spsummon(uint8 playerid) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_CANNOT_SPECIAL_SUMMON, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		if(!eset[i]->target)
 			return FALSE;
 	}
 	return TRUE;
