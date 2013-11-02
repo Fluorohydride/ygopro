@@ -18,6 +18,8 @@ function c58775978.initial_effect(c)
 	--remain field
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EFFECT_REMAIN_FIELD)
 	c:RegisterEffect(e3)
 end

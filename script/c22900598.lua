@@ -31,10 +31,10 @@ end
 function c22900598.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstMatchingCard(c22900598.filter,tp,LOCATION_DECK,0,nil,tp)
 	if tc then
-		if Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)~=nil
-			and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5):IsStatus(STATUS_ACTIVATED) then
+		local fc=Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)
+		if fc and fc:IsStatus(STATUS_ACTIVATED) then
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-			Duel.Destroy(Duel.GetFieldCard(1-tp,LOCATION_SZONE,5),REASON_RULE)
+			Duel.Destroy(fc,REASON_RULE)
 		else
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
@@ -42,6 +42,7 @@ function c22900598.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tep=tc:GetControler()
 		local cost=te:GetCost()
 		if cost then cost(te,tep,eg,ep,ev,re,r,rp,1) end
+		tc:SetStatus(STATUS_ACTIVATED,true)
 		Duel.RaiseEvent(tc,EVENT_CHAIN_SOLVED,tc:GetActivateEffect(),0,tp,tp,Duel.GetCurrentChain())
 		local sg=Duel.GetMatchingGroup(c22900598.spfilter,tp,LOCATION_GRAVE,0,nil,e,tp)
 		if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(22900598,0)) then
