@@ -35,7 +35,6 @@ function c24096228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 	e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e:SetCategory(0)
-	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
 		Duel.SelectTarget(tp,c24096228.filter1,tp,0,LOCATION_GRAVE,1,1,nil)
@@ -54,7 +53,7 @@ function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 	e:SetCategory(te:GetCategory())
 	e:SetProperty(te:GetProperty())
 	Duel.ClearTargetCard()
-	if bit.band(tpe,TYPE_EQUIP+TYPE_CONTINUOUS)~=0 then
+	if bit.band(tpe,TYPE_EQUIP+TYPE_CONTINUOUS)~=0 or tc:IsHasEffect(EFFECT_REMAIN_FIELD) then
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		tc:CreateEffectRelation(te)

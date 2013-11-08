@@ -55,5 +55,6 @@ function c82301904.sgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(g,REASON_EFFECT)
 	local og=Duel.GetOperatedGroup()
 	local ct=og:FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
+	Duel.BreakEffect()
 	Duel.Damage(1-tp,ct*300,REASON_EFFECT)
 end

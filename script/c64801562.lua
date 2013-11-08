@@ -24,6 +24,7 @@ function c64801562.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_EQUIP_LIMIT)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetValue(1)
 	c:RegisterEffect(e4)
 	--selfdes

@@ -19,11 +19,14 @@ function c98643358.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,g:GetCount()*500)
 end
+function c98643358.ctfilter(c)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsAttribute(ATTRIBUTE_WATER)
+end
 function c98643358.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c98643358.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if Duel.Destroy(g,REASON_EFFECT)~=0 then
 		Duel.BreakEffect()
-		local ct=Duel.GetOperatedGroup():FilterCount(Card.IsLocation,nil,LOCATION_GRAVE)
+		local ct=Duel.GetOperatedGroup():FilterCount(c98643358.ctfilter,nil)
 		Duel.Damage(1-tp,ct*500,REASON_EFFECT)
 	end
 end

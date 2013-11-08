@@ -11,7 +11,7 @@ function c10069180.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c10069180.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetActiveType()==TYPE_SPELL+TYPE_CONTINUOUS and Duel.IsChainNegatable(ev)
+	return rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetActiveType()==TYPE_SPELL+TYPE_CONTINUOUS and Duel.IsChainNegatable(ev)
 end
 function c10069180.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

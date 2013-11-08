@@ -30,6 +30,7 @@ function c39980304.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCost(c39980304.chain_filter)
 	e1:SetTarget(c39980304.chain_target)
 	e1:SetOperation(c39980304.chain_operation)
+	e1:SetValue(aux.TRUE)
 	Duel.RegisterEffect(e1,tp)
 end
 function c39980304.chain_filter(c,e,tp,m,chkf)
