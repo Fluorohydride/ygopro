@@ -512,8 +512,8 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(MSG_SHUFFLE_DECK);
 		pduel->write_buffer8(playerid);
 		core.shuffle_deck_check[playerid] = FALSE;
-		card* ptop = *svector.rbegin();
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			card* ptop = svector.back();
 			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 				pduel->write_buffer8(MSG_DECK_TOP);
 				pduel->write_buffer8(playerid);
@@ -642,7 +642,7 @@ void field::tag_swap(uint8 playerid) {
 	pduel->write_buffer8(player[playerid].list_extra.size());
 	pduel->write_buffer8(player[playerid].list_hand.size());
 	if(core.deck_reversed && player[playerid].list_main.size())
-		pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+		pduel->write_buffer32(player[playerid].list_main.back()->data.code);
 	else
 		pduel->write_buffer32(0);
 	for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
@@ -1022,32 +1022,27 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 		}
 		if(location & LOCATION_HAND) {
 			if(pgroup)
-				for(auto cit = player[self].list_hand.begin(); cit != player[self].list_hand.end(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_hand.begin(), player[self].list_hand.end());
 			count += player[self].list_hand.size();
 		}
 		if(location & LOCATION_DECK) {
 			if(pgroup)
-				for(auto cit = player[self].list_main.rbegin(); cit != player[self].list_main.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_main.rbegin(), player[self].list_main.rend());
 			count += player[self].list_main.size();
 		}
 		if(location & LOCATION_EXTRA) {
 			if(pgroup)
-				for(auto cit = player[self].list_extra.rbegin(); cit != player[self].list_extra.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_extra.rbegin(), player[self].list_extra.rend());
 			count += player[self].list_extra.size();
 		}
 		if(location & LOCATION_GRAVE) {
 			if(pgroup)
-				for(auto cit = player[self].list_grave.rbegin(); cit != player[self].list_grave.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_grave.rbegin(), player[self].list_grave.rend());
 			count += player[self].list_grave.size();
 		}
 		if(location & LOCATION_REMOVED) {
 			if(pgroup)
-				for(auto cit = player[self].list_remove.rbegin(); cit != player[self].list_remove.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_remove.rbegin(), player[self].list_remove.rend());
 			count += player[self].list_remove.size();
 		}
 		location = location2;
@@ -1240,8 +1235,7 @@ void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
 			for(int i = 0; i < 5; ++i) {
 				pcard = player[self].list_mzone[i];
 				if(pcard && !pcard->is_status(STATUS_SUMMONING) && pcard->xyz_materials.size())
-					for(auto clit = pcard->xyz_materials.begin(); clit != pcard->xyz_materials.end(); ++clit)
-						pset->insert(*clit);
+					pset->insert(pcard->xyz_materials.begin(), pcard->xyz_materials.end());
 			}
 		}
 		self = 1 - self;
@@ -1403,7 +1397,7 @@ uint32 field::get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype
 	}
 	return count;
 }
-int32 field::effect_replace_check(uint32 code, tevent& e) {
+int32 field::effect_replace_check(uint32 code, const tevent& e) {
 	auto pr = effects.continuous_effect.equal_range(code);
 	for (; pr.first != pr.second; ++pr.first) {
 		effect* peffect = pr.first->second;
@@ -1582,7 +1576,7 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 	if(is_player_affected_by_effect(playerid, EFFECT_CANNOT_DISCARD_DECK))
 		return FALSE;
 	if((count == 1) && core.deck_reversed)
-		return (*player[playerid].list_main.rbegin())->is_capable_cost_to_grave(playerid);
+		return player[playerid].list_main.back()->is_capable_cost_to_grave(playerid);
 	effect_set eset;
 	filter_field_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
