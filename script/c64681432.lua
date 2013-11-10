@@ -5,7 +5,6 @@ function c64681432.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
 	c:RegisterEffect(e1)
 	--summon,flip
 	local e2=Effect.CreateEffect(c)
@@ -30,7 +29,7 @@ function c64681432.initial_effect(c)
 end
 function c64681432.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c64681432.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
