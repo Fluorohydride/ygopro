@@ -22,7 +22,7 @@ function c17078030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local t={}
 	local f=math.floor((lp-1)/1000)
 	local l=1
-	while l<=f and l<=10 do
+	while l<=f and l<=20 do
 		t[l]=l*1000
 		l=l+1
 	end
