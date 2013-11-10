@@ -525,9 +525,7 @@ int32 scriptlib::card_get_material(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	group* pgroup = pcard->pduel->new_group();
-	card::card_set::iterator cit;
-	for(cit = pcard->material_cards.begin(); cit != pcard->material_cards.end(); ++cit)
-		pgroup->container.insert(*cit);
+	pgroup->container.insert(pcard->material_cards.begin(), pcard->material_cards.end());
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -543,9 +541,7 @@ int32 scriptlib::card_get_equip_group(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	group* pgroup = pcard->pduel->new_group();
-	card::card_set::iterator cit;
-	for(cit = pcard->equiping_cards.begin(); cit != pcard->equiping_cards.end(); ++cit)
-		pgroup->container.insert(*cit);
+	pgroup->container.insert(pcard->equiping_cards.begin(), pcard->equiping_cards.end());
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -595,8 +591,7 @@ int32 scriptlib::card_get_overlay_group(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	group* pgroup = pcard->pduel->new_group();
-	for(auto cit = pcard->xyz_materials.begin(); cit != pcard->xyz_materials.end(); ++cit)
-		pgroup->container.insert(*cit);
+	pgroup->container.insert(pcard->xyz_materials.begin(), pcard->xyz_materials.end());
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -1914,8 +1909,7 @@ int32 scriptlib::card_get_attackable_target(lua_State *L) {
 	field::card_vector targets;
 	pduel->game_field->get_attack_target(pcard, &targets);
 	group* newgroup = pduel->new_group();
-	for(auto cit = targets.begin(); cit != targets.end(); ++cit)
-		newgroup->container.insert(*cit);
+	newgroup->container.insert(targets.begin(), targets.end());
 	interpreter::group2value(L, newgroup);
 	lua_pushboolean(L, pcard->operation_param);
 	return 2;
