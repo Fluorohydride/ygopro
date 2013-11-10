@@ -12,14 +12,14 @@ function c1834107.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_DAMAGE)
+	e2:SetCode(EVENT_BATTLE_DAMAGE)
 	e2:SetCondition(c1834107.reccon)
 	e2:SetTarget(c1834107.rectg)
 	e2:SetOperation(c1834107.recop)
 	c:RegisterEffect(e2)
 end
 function c1834107.reccon(e,tp,eg,ep,ev,re,r,rp)
-	if ep==tp or r~=REASON_BATTLE then return false end
+	if ep==tp then return false end
 	local rc=eg:GetFirst()
 	return rc:IsControler(tp) and rc:IsRace(RACE_THUNDER)
 end

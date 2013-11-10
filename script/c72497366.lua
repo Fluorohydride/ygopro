@@ -33,7 +33,7 @@ function c72497366.nttg(e,c)
 	return c:IsLevelAbove(5) and c:IsRace(RACE_FIEND)
 end
 function c72497366.ntop(e,tp,eg,ep,ev,re,r,rp,c)
-	e:GetHandler():RegisterFlagEffect(72497366,RESET_PHASE+PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(72497366,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c72497366.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()

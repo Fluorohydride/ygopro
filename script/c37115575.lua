@@ -87,8 +87,7 @@ function c37115575.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c37115575.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local lp=Duel.GetLP(tp)
-	Duel.PayLPCost(tp,lp/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c37115575.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
