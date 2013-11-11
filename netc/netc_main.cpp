@@ -28,8 +28,8 @@ namespace ygopro {
 			wxInitAllImageHandlers();
 			commonCfg.LoadConfig("common.xml");
 
-//			if(dataMgr.LoadDatas("cards.cdb"))
-//				return true;
+			if(dataMgr.LoadDatas("cards.cdb"))
+				return true;
 
 			editorFrame = new EditorFrame(1200, 720);
 			editorFrame->Center();

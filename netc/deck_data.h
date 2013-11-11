@@ -9,14 +9,6 @@ namespace ygopro
 {
 	struct CardData;
 
-	struct BanListData {
-		wxString name;
-		unsigned int hash;
-		std::map<unsigned int, unsigned int> counts;
-        
-        unsigned int get_hash();
-	};
-
 	struct DeckData {
 		std::vector<CardData*> main_deck;
 		std::vector<CardData*> extra_deck;
@@ -25,9 +17,19 @@ namespace ygopro
         void sort();
         void shuffle();
         wxString get_deck_string();
-        void load_from_string();
+        void load_from_string(const wxString& deck);
 	};
 
+    struct BanListData {
+        unsigned int hash;
+		wxString name;
+		std::map<unsigned int, unsigned int> counts;
+        
+        BanListData(): hash(0) {}
+        unsigned int get_hash();
+        unsigned int check_deck(DeckData& deck, unsigned int pool_flag);
+	};
+    
 	class DeckMgr {
 	public:
 		void LoadBanLists(const wxString& file);

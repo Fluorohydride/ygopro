@@ -2,6 +2,7 @@
 #include "editor_canvas.h"
 #include "image_mgr.h"
 #include <wx/wfstream.h>
+#include <wx/richtext/richtextctrl.h>
 
 namespace ygopro
 {
@@ -34,24 +35,22 @@ namespace ygopro
         SetMenuBar(menu_bar);
 
         wxStaticBitmap* bmpCardImage = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
-		wxTextCtrl* textCtrl = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-                                              wxTE_MULTILINE |	wxTE_LEFT | wxTE_BESTWRAP);
+		wxRichTextCtrl* textCtrl = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
+                                              wxTE_MULTILINE |	wxTE_LEFT | wxTE_BESTWRAP | wxTE_READONLY);
         int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
         wxEditorCanvas* glcanvas = new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
         
-#ifdef _WIN32
-        m_auiManager.AddPane(bmpCardImage, wxAuiPaneInfo().Name(wxT("Image")).Caption(wxT("Card Image")).Left()
-                             .CloseButton(false).Movable(false).Floatable(false));
-        m_auiManager.AddPane(textCtrl, wxAuiPaneInfo().Name(wxT("Text")).Caption(wxT("Card Information")).Left()
-                             .CloseButton(false).Movable(false).Floatable(false));
+        wxPanel* infoPanel = new wxPanel(this, 0, 0, 200, 600);
+        wxBoxSizer *sz=new wxBoxSizer(wxVERTICAL);
+        sz->wxSizer::AddSpacer(5);
+        sz->Add(bmpCardImage, 0, wxALIGN_CENTER_HORIZONTAL);
+        sz->wxSizer::AddSpacer(5);
+        sz->Add(textCtrl, 1, wxEXPAND | wxALL);
+        infoPanel->SetSizer(sz);
+        
+        m_auiManager.AddPane(infoPanel, wxAuiPaneInfo().Name(wxT("Text")).Caption(wxT("Card Information")).Left()
+                             .CloseButton(false).Movable(false).Floatable(false).CaptionVisible(false));
         m_auiManager.AddPane(glcanvas, wxAuiPaneInfo().CenterPane());
-#else
-        m_auiManager.AddPane(textCtrl, wxAuiPaneInfo().Name(wxT("Text")).Caption(wxT("Card Information")).Left()
-                             .CloseButton(false).Movable(false).Floatable(false));
-        m_auiManager.AddPane(bmpCardImage, wxAuiPaneInfo().Name(wxT("Image")).Caption(wxT("Card Image")).Left()
-                             .CloseButton(false).Movable(false).Floatable(false));
-        m_auiManager.AddPane(glcanvas, wxAuiPaneInfo().CenterPane());
-#endif
         m_auiManager.Update();
         editorFrame = this;
 	}

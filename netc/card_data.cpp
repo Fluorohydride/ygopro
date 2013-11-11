@@ -42,6 +42,11 @@ namespace ygopro
 				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), unicode_buffer);
 				unicode_buffer[len] = 0;
 				cd.texts = unicode_buffer;
+                for(unsigned int i = 0; i < 16; ++i) {
+                    len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 14 + i), unicode_buffer);
+                    unicode_buffer[len] = 0;
+                    cd.desc[i] = unicode_buffer;
+                }
 			}
 		} while(step != SQLITE_DONE);
 		sqlite3_finalize(pStmt);
