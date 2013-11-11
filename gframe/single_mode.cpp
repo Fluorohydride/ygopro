@@ -63,6 +63,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
 	mainGame->stText->setText(L"");
+	mainGame->scrCardText->setVisible(false);
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.panel = 0;
 	mainGame->dField.hovered_card = 0;

@@ -214,9 +214,19 @@ bool DeckBuilder::OnEvent(const irr::SEvent& event) {
 			}
 			break;
 		}
+		case irr::gui::EGET_SCROLL_BAR_CHANGED: {
+			switch(id) {
+			case SCROLL_CARDTEXT: {
+				u32 pos = mainGame->scrCardText->getPos();
+				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
+				break;
+			}
+			break;
+			}
+		}
 		case irr::gui::EGET_EDITBOX_ENTER: {
 			switch(id) {
-			case SCROLL_KEYWORD: {
+			case EDITBOX_KEYWORD: {
 				irr::SEvent me;
 				me.EventType = irr::EET_GUI_EVENT;
 				me.GUIEvent.EventType = irr::gui::EGET_BUTTON_CLICKED;
@@ -639,8 +649,8 @@ void DeckBuilder::FilterCards() {
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
-		CardDataC& data = ptr->second;
-		CardString& text = strpointer->second;
+		const CardDataC& data = ptr->second;
+		const CardString& text = strpointer->second;
 		if(data.type & TYPE_TOKEN)
 			continue;
 		switch(filter_type) {

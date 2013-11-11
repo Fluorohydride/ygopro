@@ -548,68 +548,43 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_CHAT: {
 		STOC_Chat* pkt = (STOC_Chat*)pdata;
-		wchar_t msg[256];
-		if(pkt->player < 4) {
+		int player = pkt->player;
+		if(player < 4) {
 			if(mainGame->chkIgnore1->isChecked())
 				break;
-			BufferIO::CopyWStr(pkt->msg, msg, 256);
-			msg[(len - 3) / 2] = 0;
-			mainGame->gMutex.Lock();
 			if(!mainGame->dInfo.isTag) {
 				if(mainGame->dInfo.isStarted)
-					mainGame->AddChatMsg(msg, mainGame->LocalPlayer(pkt->player));
-				else
-					mainGame->AddChatMsg(msg, pkt->player);
+					player = mainGame->LocalPlayer(player);
 			} else {
-				if(mainGame->dInfo.isFirst || !mainGame->dInfo.isStarted) {
-					if(pkt->player == 0)
-						mainGame->AddChatMsg(msg, 0);
-					else if(pkt->player == 1)
-						mainGame->AddChatMsg(msg, 2);
-					else if(pkt->player == 2)
-						mainGame->AddChatMsg(msg, 1);
-					else if(pkt->player == 3)
-						mainGame->AddChatMsg(msg, 3);
-					else
-						mainGame->AddChatMsg(msg, 10);
-				} else {
-					if(pkt->player == 0)
-						mainGame->AddChatMsg(msg, 1);
-					else if(pkt->player == 1)
-						mainGame->AddChatMsg(msg, 3);
-					else if(pkt->player == 2)
-						mainGame->AddChatMsg(msg, 0);
-					else if(pkt->player == 3)
-						mainGame->AddChatMsg(msg, 2);
-					else
-						mainGame->AddChatMsg(msg, 10);
-				}
+				if(mainGame->dInfo.isStarted && !mainGame->dInfo.isFirst)
+					player ^= 2;
+				if(player == 0)
+					player = 0;
+				else if(player == 1)
+					player = 2;
+				else if(player == 2)
+					player = 1;
+				else if(player == 3)
+					player = 3;
+				else
+					player = 10;
 			}
-			mainGame->gMutex.Unlock();
-		} else if(pkt->player == 8) { //system custom message.
-			if(mainGame->chkIgnore1->isChecked())
-				break;
-			BufferIO::CopyWStr(pkt->msg, msg, 256);
-			msg[(len - 3) / 2] = 0;
-			mainGame->gMutex.Lock();
-			mainGame->AddChatMsg(msg, 8);
-			mainGame->gMutex.Unlock();
-		} else if(pkt->player >= 11 && pkt->player<=19) { //system custom message.
-                        BufferIO::CopyWStr(pkt->msg, msg, 256);
-                        msg[(len - 3) / 2] = 0;
-                        mainGame->gMutex.Lock();
-                        mainGame->AddChatMsg(msg, pkt->player);
-                        mainGame->gMutex.Unlock();
-
 		} else {
-			if(mainGame->chkIgnore2->isChecked())
-				break;
-			BufferIO::CopyWStr(pkt->msg, msg, 256);
-			msg[(len - 3) / 2] = 0;
-			mainGame->gMutex.Lock();
-			mainGame->AddChatMsg(msg, 10);
-			mainGame->gMutex.Unlock();
+			if(player == 8) { //system custom message.
+				if(mainGame->chkIgnore1->isChecked())
+					break;
+			} else if(player < 11 || player > 19) {
+				if(mainGame->chkIgnore2->isChecked())
+					break;
+				player = 10;
+			}
 		}
+		wchar_t msg[256];
+		BufferIO::CopyWStr(pkt->msg, msg, 256);
+		msg[(len - 3) / 2] = 0;
+		mainGame->gMutex.Lock();
+		mainGame->AddChatMsg(msg, player);
+		mainGame->gMutex.Unlock();
 		break;
 	}
 	case STOC_HS_PLAYER_ENTER: {
