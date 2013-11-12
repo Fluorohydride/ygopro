@@ -12,7 +12,7 @@ namespace ygopro
 	struct DeckData {
 		std::vector<CardData*> main_deck;
 		std::vector<CardData*> extra_deck;
-		std::vector<CardData*> side_dack;
+		std::vector<CardData*> side_deck;
         
         void sort();
         void shuffle();

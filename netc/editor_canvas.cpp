@@ -1,5 +1,8 @@
 #include "image_mgr.h"
 #include "editor_canvas.h"
+#include "card_data.h"
+#include "deck_data.h"
+#include "image_mgr.h"
 
 namespace ygopro
 {
@@ -17,7 +20,6 @@ namespace ygopro
         glcontext = new wxGLContext(this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         t_buildbg = &imageMgr.textures["buildbg"];
-        current_deck = nullptr;
 	}
 
 	wxEditorCanvas::~wxEditorCanvas() {
@@ -61,6 +63,27 @@ namespace ygopro
 
 	}
 
+    void wxEditorCanvas::setDeck(DeckData* deck) {
+        for(auto pcard : deck->main_deck) {
+            EditorCardData cd;
+            cd.cd = pcard;
+            cd.ti = &imageMgr.GetCardTexture(cd.cd->code);
+            main_deck.push_back(cd);
+        }
+        for(auto pcard : deck->extra_deck) {
+            EditorCardData cd;
+            cd.cd = pcard;
+            cd.ti = &imageMgr.GetCardTexture(cd.cd->code);
+            extra_deck.push_back(cd);
+        }
+        for(auto pcard : deck->side_deck) {
+            EditorCardData cd;
+            cd.cd = pcard;
+            cd.ti = &imageMgr.GetCardTexture(cd.cd->code);
+            side_deck.push_back(cd);
+        }
+    }
+    
 	void wxEditorCanvas::drawScene() {
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -85,7 +108,6 @@ namespace ygopro
 			glTexCoord2f(t_buildbg->rx, t_buildbg->ly);glVertex2f(1.0f, 1.0f);
 		}
 		glEnd();
-
 		glFlush();
 	}
 

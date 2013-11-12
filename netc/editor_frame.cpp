@@ -40,7 +40,7 @@ namespace ygopro
         int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
         wxEditorCanvas* glcanvas = new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
         
-        wxPanel* infoPanel = new wxPanel(this, 0, 0, 200, 600);
+        wxPanel* infoPanel = new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(200, 600));
         wxBoxSizer *sz=new wxBoxSizer(wxVERTICAL);
         sz->wxSizer::AddSpacer(5);
         sz->Add(bmpCardImage, 0, wxALIGN_CENTER_HORIZONTAL);
