@@ -6,7 +6,7 @@ function c58139128.initial_effect(c)
 	e1:SetCode(EFFECT_UPDATE_DEFENCE)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c58139128.atkval)
+	e1:SetValue(c58139128.defval)
 	c:RegisterEffect(e1)
 	--disable
 	local e2=Effect.CreateEffect(c)
@@ -39,7 +39,7 @@ end
 function c58139128.filter(c)
 	return c:IsSetCard(0x2e) and c:IsType(TYPE_MONSTER)
 end
-function c58139128.atkval(e,c)
+function c58139128.defval(e,c)
 	return Duel.GetMatchingGroupCount(c58139128.filter,c:GetControler(),LOCATION_GRAVE,0,nil)*200
 end
 function c58139128.disop(e,tp,eg,ep,ev,re,r,rp)
