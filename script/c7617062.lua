@@ -57,6 +57,7 @@ function c7617062.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetLabelObject():IsRelateToBattle() end
 end
 function c7617062.posop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=e:GetLabelObject()
 	if tc:IsRelateToBattle() and tc:IsFaceup() then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)

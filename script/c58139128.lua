@@ -34,7 +34,7 @@ function c58139128.initial_effect(c)
 	e4:SetCondition(c58139128.econ)
 	e4:SetTarget(c58139128.etarget)
 	e4:SetValue(c58139128.efilter2)
-	c:RegisterEffect(e4,true)
+	c:RegisterEffect(e4)
 end
 function c58139128.filter(c)
 	return c:IsSetCard(0x2e) and c:IsType(TYPE_MONSTER)
