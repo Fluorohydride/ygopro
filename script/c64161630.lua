@@ -20,44 +20,41 @@ function c64161630.filter(c,rk,rc,e,tp)
 		and c:GetRank()==rk and c:IsRace(rc) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c64161630.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	e:SetLabel(1)
+	e:SetLabel(100)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c64161630.cfilter,1,nil,e,tp) end
 	local g=Duel.SelectReleaseGroup(tp,c64161630.cfilter,1,1,nil,e,tp)
+	e:SetLabel(g:GetFirst():GetRank())
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetLabel(g:GetFirst():GetRace())
+	Duel.RegisterEffect(e1,tp)
+	e:SetLabelObject(e1)
 	Duel.Release(g,REASON_COST)
-	e:SetLabelObject(g:GetFirst())
 end
 function c64161630.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		if e:GetLabel()~=1 then return false end
+		if e:GetLabel()~=100 then return false end
 		e:SetLabel(0)
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 	end
-	e:SetLabel(0)
 end
 function c64161630.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetDescription(aux.Stringid(64161630,0))
-	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
-	e1:SetTarget(c64161630.sptg)
 	e1:SetOperation(c64161630.spop)
-	e1:SetLabelObject(tc)
 	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetLabel(e:GetLabel())
+	e1:SetLabelObject(e:GetLabelObject())
 	Duel.RegisterEffect(e1,tp)
-	tc:CreateEffectRelation(e1)
-end
-function c64161630.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
 function c64161630.spop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,64161630)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local tc=e:GetLabelObject()
-	if not tc:IsRelateToEffect(e) then return end
+	local rk=e:GetLabel()
+	local rc=e:GetLabelObject():GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c64161630.filter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRace()-1,tc:GetRace(),e,tp)
+	local g=Duel.SelectMatchingCard(tp,c64161630.filter,tp,LOCATION_EXTRA,0,1,1,nil,rk-1,rc,e,tp)
 	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 end

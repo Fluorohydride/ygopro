@@ -25,7 +25,7 @@ end
 function c86062400.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and rp~=tp
+	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE)
 		and bc:IsFaceup() and bc:IsRelateToBattle() and bc:IsType(TYPE_XYZ)
 end
 function c86062400.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)

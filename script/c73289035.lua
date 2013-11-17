@@ -44,8 +44,10 @@ function c73289035.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c73289035.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-	Duel.SendtoGrave(g,REASON_EFFECT)
-	Duel.Draw(tp,2,REASON_EFFECT)
+	if g:GetCount()>0 then
+		Duel.SendtoGrave(g,REASON_EFFECT)
+		Duel.Draw(tp,2,REASON_EFFECT)
+	end
 end
 function c73289035.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetHandler():GetOverlayCount()

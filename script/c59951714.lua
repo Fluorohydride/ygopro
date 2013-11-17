@@ -8,9 +8,8 @@ function c59951714.initial_effect(c)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetRange(LOCATION_GRAVE)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_BE_MATERIAL)
 	e2:SetOperation(c59951714.spr)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -48,7 +47,7 @@ function c59951714.checkop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c59951714.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsReason(REASON_SUMMON) and c:GetReasonCard()==eg:GetFirst() then
+	if r==REASON_SUMMON then
 		c:RegisterFlagEffect(59951714,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1)
 	end
 end

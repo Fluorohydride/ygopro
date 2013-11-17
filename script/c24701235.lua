@@ -89,15 +89,15 @@ function c24701235.cfilter(c)
 end
 function c24701235.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)
-		and Duel.IsExistingMatchingCard(c24701235.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c24701235.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingMatchingCard(c24701235.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
 function c24701235.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsExistingMatchingCard(c24701235.cfilter,tp,LOCATION_MZONE,0,1,nil) then return end
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end

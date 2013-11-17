@@ -39,7 +39,7 @@ function c43366227.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c43366227.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(800)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)

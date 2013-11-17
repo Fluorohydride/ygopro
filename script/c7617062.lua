@@ -41,25 +41,13 @@ function c7617062.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	if tc:IsRelateToBattle() and tc:IsFaceup() and tc:IsCanTurnSet() then
 		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(7617062,0))
-		e1:SetCategory(CATEGORY_POSITION)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_DAMAGE_STEP_END)
-		e1:SetRange(LOCATION_SZONE)
-		e1:SetTarget(c7617062.postg)
 		e1:SetOperation(c7617062.posop)
-		e1:SetLabelObject(tc)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
-		c:RegisterEffect(e1)
+		tc:RegisterEffect(e1)
 	end
-end
-function c7617062.postg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetLabelObject():IsRelateToBattle() end
 end
 function c7617062.posop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=e:GetLabelObject()
-	if tc:IsRelateToBattle() and tc:IsFaceup() then
-		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
-	end
+	Duel.ChangePosition(e:GetHandler(),POS_FACEDOWN_DEFENCE)
 end
