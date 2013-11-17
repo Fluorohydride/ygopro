@@ -46,7 +46,7 @@ function c50474354.aclimit(e,re,tp)
 	return not re:GetHandler():IsSetCard(0x88)
 end
 function c50474354.filter(c)
-	return c:IsSetCard(0x88) and c:IsAbleToHand()
+	return c:IsSetCard(0x88) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c50474354.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c50474354.filter,tp,LOCATION_DECK,0,1,nil) end

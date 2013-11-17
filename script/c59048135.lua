@@ -43,8 +43,8 @@ function c59048135.checkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc=eg:GetNext()
 	end
-	if p1 then Duel.RegisterFlagEffect(0,64319467,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,64319467,RESET_PHASE+PHASE_END,0,1) end
+	if p1 then Duel.RegisterFlagEffect(0,59048135,RESET_PHASE+PHASE_END,0,1) end
+	if p2 then Duel.RegisterFlagEffect(1,59048135,RESET_PHASE+PHASE_END,0,1) end
 end
 function c59048135.etarget(e,c)
 	return c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_XYZ)

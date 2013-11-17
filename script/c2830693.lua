@@ -37,9 +37,9 @@ function c2830693.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(at)
 end
 function c2830693.eqop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
-	local tc=c:GetBattleTarget()
+	local c=e:GetHandler()
+	local tc=Duel.GetAttacker()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToBattle() then
 		Duel.Equip(tp,c,tc,true)
 		--Add Equip limit

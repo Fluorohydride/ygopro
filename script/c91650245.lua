@@ -35,14 +35,10 @@ function c91650245.activate(e,tp,eg,ep,ev,re,r,rp)
 		if sc then
 			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetDescription(aux.Stringid(91650245,2))
-			e1:SetCategory(CATEGORY_TOGRAVE)
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 			e1:SetRange(LOCATION_MZONE)
-			e1:SetProperty(EFFECT_FLAG_REPEAT)
 			e1:SetCountLimit(1)
 			e1:SetCode(EVENT_PHASE+PHASE_END)
-			e1:SetTarget(c91650245.tdtg)
 			e1:SetOperation(c91650245.tdop)
 			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
 			sc:RegisterEffect(e1)
@@ -57,18 +53,12 @@ function c91650245.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function c91650245.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
-end
 function c91650245.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		if c:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)
-			or Duel.SelectOption(tp,aux.Stringid(91650245,0),aux.Stringid(91650245,1))==0 then
-			Duel.SendtoDeck(c,nil,0,REASON_EFFECT)
-		else
-			Duel.SendtoDeck(c,nil,1,REASON_EFFECT)
-		end
+	if c:IsType(TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)
+		or Duel.SelectOption(tp,aux.Stringid(91650245,0),aux.Stringid(91650245,1))==0 then
+		Duel.SendtoDeck(c,nil,0,REASON_EFFECT)
+	else
+		Duel.SendtoDeck(c,nil,1,REASON_EFFECT)
 	end
 end

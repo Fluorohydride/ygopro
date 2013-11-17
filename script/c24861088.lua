@@ -6,6 +6,7 @@ function c24861088.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCost(c24861088.cost)
 	e1:SetTarget(c24861088.target)
 	e1:SetOperation(c24861088.operation)
 	c:RegisterEffect(e1)
@@ -33,6 +34,10 @@ function c24861088.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if not re:GetHandler():IsSetCard(0x70) then
 		Duel.RegisterFlagEffect(rp,24861088,RESET_PHASE+PHASE_END,0,1)
 	end
+end
+function c24861088.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,24861088)==0 end
+	Duel.RegisterFlagEffect(tp,24861088,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c24861088.filter(c)
 	return c:IsSetCard(0x70) and not c:IsCode(24861088) and c:IsAbleToHand()
