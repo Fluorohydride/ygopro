@@ -26,5 +26,6 @@ function c37168514.lvop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(3)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
+		tc=g:GetNext()
 	end
 end
