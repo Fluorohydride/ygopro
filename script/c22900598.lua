@@ -2,6 +2,7 @@
 function c22900598.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCondition(c22900598.condition)
@@ -31,10 +32,10 @@ end
 function c22900598.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstMatchingCard(c22900598.filter,tp,LOCATION_DECK,0,nil,tp)
 	if tc then
-		if Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)~=nil
-			and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5):IsStatus(STATUS_ACTIVATED) then
+		local fc=Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)
+		if fc and fc:IsFaceup() then
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-			Duel.Destroy(Duel.GetFieldCard(1-tp,LOCATION_SZONE,5),REASON_RULE)
+			Duel.Destroy(fc,REASON_RULE)
 		else
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end

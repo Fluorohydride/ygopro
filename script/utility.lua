@@ -49,7 +49,7 @@ end
 function Auxiliary.BeginPuzzle(effect)
 	local e1=Effect.GlobalEffect()
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCode(EVENT_TURN_END)
 	e1:SetCountLimit(1)
 	e1:SetOperation(Auxiliary.PuzzleOp)
 	Duel.RegisterEffect(e1,0)

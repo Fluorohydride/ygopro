@@ -16,7 +16,7 @@ function c8949584.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c8949584.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c8949584.filter(c,e,tp)
 	return c:IsSetCard(0x3008) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

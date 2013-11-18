@@ -10,7 +10,8 @@ function c4896788.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c4896788.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsCode(55144522)
+	return e:GetHandler():IsAttackPos()
+		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsCode(55144522)
 end
 function c4896788.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeTargetParam(ev,3)

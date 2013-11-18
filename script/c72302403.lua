@@ -8,6 +8,18 @@ function c72302403.initial_effect(c)
 	e1:SetTarget(c72302403.target)
 	e1:SetOperation(c72302403.activate)
 	c:RegisterEffect(e1)
+	--cannot attack
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD)
+	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(0,LOCATION_MZONE)
+	c:RegisterEffect(e2)
+	--remain field
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_REMAIN_FIELD)
+	c:RegisterEffect(e3)
 end
 function c72302403.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -33,22 +45,6 @@ function c72302403.activate(e,tp,eg,ep,ev,re,r,rp)
 	if sg:GetCount()>0 then
 		Duel.ChangePosition(sg,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK,POS_FACEUP_DEFENCE,POS_FACEUP_DEFENCE)
 	end
-	local c=e:GetHandler()
-	c:CancelToGrave()
-	--cannot attack
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(0,LOCATION_MZONE)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
-	c:RegisterEffect(e2)
-	--remain field
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_REMAIN_FIELD)
-	e3:SetReset(RESET_EVENT+0x1fe0000)
-	c:RegisterEffect(e3)
 end
 function c72302403.descon(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=Duel.GetTurnPlayer()

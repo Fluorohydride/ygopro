@@ -726,6 +726,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
+			case SCROLL_CARDTEXT: {
+				u32 pos = mainGame->scrCardText->getPos();
+				mainGame->SetStaticText(mainGame->stText, mainGame->stText->getRelativePosition().getWidth()-25, mainGame->textFont, mainGame->showingtext, pos);
+				break;
+			}
 			break;
 			}
 		}
@@ -822,6 +827,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->stInfo->setText(L"");
 					mainGame->stDataInfo->setText(L"");
 					mainGame->stText->setText(L"");
+					mainGame->scrCardText->setVisible(false);
 				}
 			}
 			break;
@@ -1304,8 +1310,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(hovered_card->location == LOCATION_HAND && !mainGame->dInfo.is_shuffling && mainGame->dInfo.curMsg != MSG_SHUFFLE_HAND) {
 						hovered_card->is_hovered = false;
 						MoveCard(hovered_card, 5);
-						if(hovered_controler== 0)
-                            mainGame->hideChat=false;
+						if(hovered_controler == 0)
+							mainGame->hideChat = false;
 					}
 					if(hovered_card->equipTarget)
 						hovered_card->equipTarget->is_showequip = false;
@@ -1325,8 +1331,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					if(hovered_location == LOCATION_HAND) {
 						mcard->is_hovered = true;
 						MoveCard(mcard, 5);
-						if(hovered_controler== 0)
-                            mainGame->hideChat=true;
+						if(hovered_controler == 0)
+							mainGame->hideChat = true;
 					}
 					if(mcard->equipTarget)
 						mcard->equipTarget->is_showequip = true;
@@ -1346,7 +1352,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							if(mcard->type & TYPE_MONSTER) {
 								myswprintf(formatBuffer, L"%ls", dataManager.GetName(mcard->code));
 								str.append(formatBuffer);
-								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
+								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)
+								        && wcscmp(dataManager.GetName(mcard->code), dataManager.GetName(mcard->alias))) {
 									myswprintf(formatBuffer, L"\n(%ls)", dataManager.GetName(mcard->alias));
 									str.append(formatBuffer);
 								}
@@ -1420,6 +1427,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						mainGame->stInfo->setText(L"");
 						mainGame->stDataInfo->setText(L"");
 						mainGame->stText->setText(L"");
+						mainGame->scrCardText->setVisible(false);
 					}
 				} else {
 					mainGame->stTip->setVisible(false);
