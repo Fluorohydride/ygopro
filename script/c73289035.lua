@@ -16,12 +16,6 @@ function c73289035.initial_effect(c)
 	e1:SetOperation(c73289035.operation)
 	c:RegisterEffect(e1)
 	--spsummon
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetCode(EVENT_LEAVE_FIELD_P)
-	e2:SetOperation(c73289035.checkop)
-	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
@@ -30,7 +24,6 @@ function c73289035.initial_effect(c)
 	e3:SetCondition(c73289035.spcon)
 	e3:SetTarget(c73289035.sptg)
 	e3:SetOperation(c73289035.spop)
-	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 end
 function c73289035.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -49,12 +42,10 @@ function c73289035.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end
 end
-function c73289035.checkop(e,tp,eg,ep,ev,re,r,rp)
+function c73289035.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetHandler():GetOverlayCount()
 	e:SetLabel(ct)
-end
-function c73289035.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and bit.band(r,REASON_EFFECT)~=0
+	return rp~=tp and bit.band(r,REASON_EFFECT)~=0 and ct>0
 		and e:GetHandler():IsPreviousPosition(POS_FACEUP) and not e:GetHandler():IsLocation(LOCATION_DECK)
 end
 function c73289035.spfilter(c,e,tp)
@@ -62,9 +53,9 @@ function c73289035.spfilter(c,e,tp)
 end
 function c73289035.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c73289035.spfilter(chkc,e,tp) end
-	local ct=e:GetLabelObject():GetLabel()
-	if chk==0 then return ct>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c73289035.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
+	local ct=e:GetLabel()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ct>ft then ct=ft end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
