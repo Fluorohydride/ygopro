@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
-  <setting name="default_unknown" value="./textures/unknown.jpg" type="string"/>
-  <setting name="default_sleeve" value="./textures/sleeve.jpg" type="string"/>
-  <setting name="default_bg" value="./textures/bg.jpg" type="string"/>
+  <setting name="image_path" value="./image" type="string">
+  <setting name="image_size_x" value="177" type="integer"/>
+  <setting name="image_size_y" value="254" type="integer"/>
+  <setting name="tex_size_x" value="256" type="integer"/>
+  <setting name="tex_size_y" value="256" type="integer"/>
+  <setting name="image_count_x" value="1" type="integer"/>
+  <setting name="image_count_y" value="1" type="integer"/>
 </Common>

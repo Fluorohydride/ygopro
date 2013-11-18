@@ -42,9 +42,9 @@ namespace ygopro
         
         wxPanel* infoPanel = new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(200, 600));
         wxBoxSizer *sz=new wxBoxSizer(wxVERTICAL);
-        sz->wxSizer::AddSpacer(5);
+        sz->AddSpacer(5);
         sz->Add(bmpCardImage, 0, wxALIGN_CENTER_HORIZONTAL);
-        sz->wxSizer::AddSpacer(5);
+        sz->AddSpacer(5);
         sz->Add(textCtrl, 1, wxEXPAND | wxALL);
         infoPanel->SetSizer(sz);
         
@@ -52,6 +52,7 @@ namespace ygopro
                              .CloseButton(false).Movable(false).Floatable(false).CaptionVisible(false));
         m_auiManager.AddPane(glcanvas, wxAuiPaneInfo().CenterPane());
         m_auiManager.Update();
+        
         editorFrame = this;
 	}
 

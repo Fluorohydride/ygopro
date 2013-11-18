@@ -107,6 +107,25 @@ namespace ygopro
 			glTexCoord2f(t_buildbg->rx, t_buildbg->ry);glVertex2f(1.0f, -1.0f);
 			glTexCoord2f(t_buildbg->rx, t_buildbg->ly);glVertex2f(1.0f, 1.0f);
 		}
+        size_t main_size = main_deck.size();
+        size_t line_size = 10;
+        float sx = -0.8f, sy = 0.9f;
+        float dx = 1.64f / (line_size - 1);
+        float dy = 0.24f;
+        if(main_size > 40)
+            line_size = 10 + (main_size - 40) / 4;
+        for(size_t i = 0; i < main_size; ++i) {
+            auto& ecd = main_deck[i];
+            size_t lx = i % line_size;
+            size_t ly = i / line_size;
+            glBegin(GL_QUADS);
+            {
+                glTexCoord2f(ecd.ti->lx, ecd.ti->ly);glVertex2f(sx + lx * dx, sy - ly * dy);
+                glTexCoord2f(ecd.ti->lx, ecd.ti->ry);glVertex2f(sx + lx * dx, sy - ly * dy - dy);
+                glTexCoord2f(ecd.ti->rx, ecd.ti->ry);glVertex2f(sx + lx * dx + dx, sy - ly * dy - dy);
+                glTexCoord2f(ecd.ti->rx, ecd.ti->ly);glVertex2f(sx + lx * dx + dx, sy - ly * dy);
+            }
+        }
 		glEnd();
 		glFlush();
 	}
