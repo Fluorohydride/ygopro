@@ -16,7 +16,7 @@ function c61656650.efcon(e,tp,eg,ep,ev,re,r,rp)
 	if not g or g:GetCount()~=1 then return false end
 	local tc=g:GetFirst()
 	local ex,dg=Duel.GetOperationInfo(0,CATEGORY_DESTROY)
-	return tc:IsControler(tp) and dg and dg:GetCount()==1 and dg:GetFirst()==tc
+	return tc:IsControler(tp) and dg and dg:GetCount()==1 and dg:GetFirst()==tc and tc:IsType(TYPE_MONSTER)
 end
 function c61656650.filter(c,re,rp,tf)
 	return tf(re,rp,nil,nil,nil,nil,nil,nil,0,c)
