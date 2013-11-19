@@ -13,7 +13,7 @@ function c91650245.filter(c,e,tp)
 	return c:IsAbleToDeck() and Duel.IsExistingMatchingCard(c91650245.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,c,e,tp)
 end
 function c91650245.spfilter(c,e,tp)
-	return c:IsSetCard(0x90) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x90) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c91650245.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

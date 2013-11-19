@@ -39,9 +39,9 @@ end
 function c19041767.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c19041767.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
+	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c19041767.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SUMMON)
 	local g=Duel.SelectMatchingCard(tp,c19041767.filter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	local tc=g:GetFirst()
