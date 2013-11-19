@@ -21,7 +21,9 @@ end
 function c19028307.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	local n=0
+	if Duel.IsExistingMatchingCard(c19028307.spfilter,tp,LOCATION_MZONE,0,1,c,RACE_BEASTWARRIOR+RACE_MACHINE) then n=-1 end
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>n
 		and Duel.IsExistingMatchingCard(c19028307.spfilter,tp,0x16,0,1,c,RACE_BEASTWARRIOR)
 		and Duel.IsExistingMatchingCard(c19028307.spfilter,tp,0x16,0,1,c,RACE_MACHINE)
 end
