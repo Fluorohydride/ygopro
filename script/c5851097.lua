@@ -3,9 +3,10 @@ function c5851097.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1c1)
-	e1:SetCost(c5851097.activate)
+	e1:SetOperation(c5851097.activate)
 	c:RegisterEffect(e1)
 	--disable spsummon
 	local e2=Effect.CreateEffect(c)
@@ -15,10 +16,10 @@ function c5851097.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
 	c:RegisterEffect(e2)
-	
 end
-function c5851097.activate(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk then return true end
+function c5851097.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	--destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(5851097,0))
