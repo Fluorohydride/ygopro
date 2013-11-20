@@ -79,5 +79,5 @@ function c65384188.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c65384188.effcon(e)
-	return e:GetHandler():GetFlagEffect(65384188)~=0 and e:GetLabelObject():ResetFlagEffect(65384188)~=0
+	return e:GetHandler():GetFlagEffect(65384188)~=0 and e:GetLabelObject():GetFlagEffect(65384188)~=0
 end
