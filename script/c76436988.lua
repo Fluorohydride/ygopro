@@ -17,6 +17,7 @@ function c76436988.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c76436988.damcon)
 	e2:SetTarget(c76436988.damtg)
 	e2:SetOperation(c76436988.damop)
 	c:RegisterEffect(e2)
@@ -26,6 +27,9 @@ function c76436988.spcon(e,c)
 	return Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
 		and Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)>0
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+end
+function c76436988.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==Duel.GetTurnPlayer()
 end
 function c76436988.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
