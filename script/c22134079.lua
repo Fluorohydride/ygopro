@@ -47,7 +47,7 @@ function c22134079.tdop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c22134079.flipop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(22134079,RESET_EVENT+0x17a0000,0,0)
+	e:GetHandler():RegisterFlagEffect(22134079,RESET_EVENT+0x57a0000,0,0)
 end
 function c22134079.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(22134079)~=0

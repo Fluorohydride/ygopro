@@ -326,17 +326,18 @@ int32 card::get_attack(uint8 swap) {
 	for (int32 i = 0; i < eset.count; ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_ATTACK:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
+			if (eset[i]->type & EFFECT_TYPE_SINGLE)
 				up += eset[i]->get_value(this);
 			else
 				upc += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_ATTACK:
 			base = eset[i]->get_value(this);
-			up = 0;
+			if (!(eset[i]->type & EFFECT_TYPE_SINGLE))
+				up = 0;
 			break;
 		case EFFECT_SET_ATTACK_FINAL:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+			if (eset[i]->type & EFFECT_TYPE_SINGLE) {
 				base = eset[i]->get_value(this);
 				up = 0;
 				upc = 0;
@@ -348,10 +349,20 @@ int32 card::get_attack(uint8 swap) {
 			temp.attack = base + up + upc;
 		else
 			temp.attack = base - up - upc;
+		for (int32 i = 0; i < effects.count; ++i) {
+			if (effects[i]->flag & EFFECT_FLAG_REPEAT) {
+				base = effects[i]->get_value(this);
+				up = 0;
+				upc = 0;
+				temp.attack = base;
+			}
+		}
 	}
 	for (int32 i = 0; i < effects.count; ++i) {
-		final = effects[i]->get_value(this);
-		temp.attack = final;
+		if (!(effects[i]->flag & EFFECT_FLAG_REPEAT)) {
+			final = effects[i]->get_value(this);
+			temp.attack = final;
+		}
 	}
 	if (final == -1) {
 		if (!rev)
@@ -413,17 +424,18 @@ int32 card::get_defence(uint8 swap) {
 	for (int32 i = 0; i < eset.count; ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_DEFENCE:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
+			if (eset[i]->type & EFFECT_TYPE_SINGLE)
 				up += eset[i]->get_value(this);
 			else
 				upc += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_DEFENCE:
 			base = eset[i]->get_value(this);
-			up = 0;
+			if (!(eset[i]->type & EFFECT_TYPE_SINGLE))
+				up = 0;
 			break;
 		case EFFECT_SET_DEFENCE_FINAL:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+			if (eset[i]->type & EFFECT_TYPE_SINGLE) {
 				base = eset[i]->get_value(this);
 				up = 0;
 				upc = 0;
@@ -435,10 +447,20 @@ int32 card::get_defence(uint8 swap) {
 			temp.defence = base + up + upc;
 		else
 			temp.defence = base - up - upc;
+		for (int32 i = 0; i < effects.count; ++i) {
+			if (effects[i]->flag & EFFECT_FLAG_REPEAT) {
+				base = effects[i]->get_value(this);
+				up = 0;
+				upc = 0;
+				temp.defence = base;
+			}
+		}
 	}
 	for (int32 i = 0; i < effects.count; ++i) {
-		final = effects[i]->get_value(this);
-		temp.defence = final;
+		if (!(effects[i]->flag & EFFECT_FLAG_REPEAT)) {
+			final = effects[i]->get_value(this);
+			temp.defence = final;
+		}
 	}
 	if (final == -1) {
 		if (!rev)
@@ -799,8 +821,7 @@ int32 card::add_effect(effect* peffect) {
 		return 0;
 	card* check_target = this;
 	if (peffect->type & EFFECT_TYPE_SINGLE) {
-		if((peffect->code == EFFECT_SET_ATTACK || peffect->code == EFFECT_SET_ATTACK_FINAL)
-		        && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+		if(peffect->code == EFFECT_SET_ATTACK && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
 			for(it = single_effect.begin(); it != single_effect.end();) {
 				rm = it++;
 				if((rm->second->code == EFFECT_SET_ATTACK || rm->second->code == EFFECT_SET_ATTACK_FINAL)
@@ -808,12 +829,27 @@ int32 card::add_effect(effect* peffect) {
 					remove_effect(rm->second);
 			}
 		}
-		if((peffect->code == EFFECT_SET_DEFENCE || peffect->code == EFFECT_SET_DEFENCE_FINAL)
-		        && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+		if(peffect->code == EFFECT_SET_ATTACK_FINAL && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+			for(it = single_effect.begin(); it != single_effect.end();) {
+				rm = it++;
+				if((rm->second->code == EFFECT_UPDATE_ATTACK || rm->second->code == EFFECT_SET_ATTACK
+				        || rm->second->code == EFFECT_SET_ATTACK_FINAL) && !(rm->second->flag & EFFECT_FLAG_SINGLE_RANGE))
+					remove_effect(rm->second);
+			}
+		}
+		if(peffect->code == EFFECT_SET_DEFENCE && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
 			for(it = single_effect.begin(); it != single_effect.end();) {
 				rm = it++;
 				if((rm->second->code == EFFECT_SET_DEFENCE || rm->second->code == EFFECT_SET_DEFENCE_FINAL)
 				        && !(rm->second->flag & EFFECT_FLAG_SINGLE_RANGE))
+					remove_effect(rm->second);
+			}
+		}
+		if(peffect->code == EFFECT_SET_DEFENCE_FINAL && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+			for(it = single_effect.begin(); it != single_effect.end();) {
+				rm = it++;
+				if((rm->second->code == EFFECT_UPDATE_DEFENCE || rm->second->code == EFFECT_SET_DEFENCE
+				        || rm->second->code == EFFECT_SET_DEFENCE_FINAL) && !(rm->second->flag & EFFECT_FLAG_SINGLE_RANGE))
 					remove_effect(rm->second);
 			}
 		}
