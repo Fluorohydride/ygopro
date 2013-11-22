@@ -34,20 +34,19 @@ function c54306223.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c54306223.atkval(e,c)
-	if  c:IsCode(72677437) then return 0 end
 	return c:GetCounter(0x9)*-500
 end
 function c54306223.acop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
-		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) and not tc:IsCode(72677437) then
+		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) then
 			tc:AddCounter(0x9,1)
 		end
 	end
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(1-tp,LOCATION_MZONE,i)
-		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) and not tc:IsCode(72677437) then
+		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) then
 			tc:AddCounter(0x9,1)
 		end
 	end

@@ -5,6 +5,7 @@ function c20858318.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCondition(c20858318.con)
+	e1:SetTarget(c20858318.tg)
 	e1:SetOperation(c20858318.op)
 	c:RegisterEffect(e1)
 end
@@ -18,11 +19,13 @@ function c20858318.con(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsExistingMatchingCard(c20858318.cfilter,tp,LOCATION_MZONE,0,1,nil,48768179)
 		and Duel.IsExistingMatchingCard(c20858318.cfilter,tp,LOCATION_MZONE,0,1,nil,74153887)
 end
-function c20858318.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1a)
+function c20858318.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	Duel.SetTargetCard(g)
 end
 function c20858318.op(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c20858318.filter,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local tc=g:GetFirst()
 	while tc do
 		tc:RegisterFlagEffect(20858318,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
@@ -41,7 +44,7 @@ function c20858318.op(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCondition(c20858318.rdcon)
 	e2:SetOperation(c20858318.rdop)
 	e2:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e2,tp)	
+	Duel.RegisterEffect(e2,tp)
 end
 function c20858318.affected(e,c)
 	return c:GetFlagEffect(20858318)~=0

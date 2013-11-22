@@ -45,8 +45,7 @@ function c30834988.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
-	
-	if 	Duel.GetFlagEffect(tp,30834988)==0 then	
+	if Duel.GetFlagEffect(tp,30834988)==0 then
 		Duel.RegisterFlagEffect(tp,30834988,RESET_PHASE+PHASE_END,0,1)
 		e:SetLabel(0)
 	else

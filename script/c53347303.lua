@@ -54,7 +54,7 @@ function c53347303.discon(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local loc,tg=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TARGET_CARDS)
-	if not tg:IsContains(c) then return false end
+	if not tg or not tg:IsContains(c) then return false end
 	if (not Duel.IsChainNegatable(ev)) or loc==LOCATION_DECK then return false end
 	return true
 end

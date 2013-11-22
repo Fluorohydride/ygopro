@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1320;
+const unsigned short PRO_VERSION = 0x1321;
 
 namespace ygo {
 
@@ -66,7 +66,7 @@ bool Game::Initialize() {
 	device->setResizable(false);
 	//main menu
 	wchar_t strbuf[256];
-	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X)", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
+	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, strbuf);
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
@@ -206,7 +206,11 @@ bool Game::Initialize() {
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stDataInfo = env->addStaticText(L"", rect<s32>(15, 60, 296, 83), false, true, tabInfo, -1, false);
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
-	stText = env->addStaticText(L"", rect<s32>(15, 83, 296, 324), false, true, tabInfo, -1, false);
+	stText = env->addStaticText(L"", rect<s32>(15, 83, 287, 324), false, true, tabInfo, -1, false);
+	scrCardText = env->addScrollBar(false, rect<s32>(267, 83, 287, 324), tabInfo, SCROLL_CARDTEXT);
+	scrCardText->setLargeStep(1);
+	scrCardText->setSmallStep(1);
+	scrCardText->setVisible(false);
 	//log
 	irr::gui::IGUITab* tabLog =  wInfos->addTab(dataManager.GetSysString(1271));
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
@@ -409,7 +413,7 @@ bool Game::Initialize() {
 	ebStar = env->addEditBox(L"", rect<s32>(60, 72, 140, 92), true, wFilter);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 74, 280, 94), false, false, wFilter);
-	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, SCROLL_KEYWORD);
+	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(210, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
@@ -484,8 +488,8 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
-	hideChat=false;
-	hideChatTimer=0;
+	hideChat = false;
+	hideChatTimer = 0;
 	return true;
 }
 void Game::MainLoop() {
@@ -545,6 +549,8 @@ void Game::MainLoop() {
 		driver->endScene();
 		if(closeSignal.Wait(0))
 			CloseDuelWindow();
+		if(!device->isWindowActive())
+			ignore_chain = false;
 		fps++;
 		cur_time = timer->getTime();
 		if(cur_time < fps * 17 - 20)
@@ -586,16 +592,38 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
-void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, wchar_t* text) {
+void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
+	SetStaticText(pControl, cWidth, font, text);
+	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
+		scrCardText->setVisible(false);
+		return;
+	}
+	SetStaticText(pControl, cWidth-25, font, text);
+	u32 fontheight = font->getDimension(L"A").Height + font->getKerningHeight();
+	u32 step = (font->getDimension(dataManager.strBuffer).Height - cHeight) / fontheight + 1;
+	scrCardText->setVisible(true);
+	scrCardText->setMin(0);
+	scrCardText->setMax(step);
+	scrCardText->setPos(0);
+}
+void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0;
-	unsigned int _width = 0, w = 0;
+	u32 _width = 0, _height = 0;
 	for(int i = 0; text[i] != 0 && i < 1023; ++i) {
-		w = font->getCharDimension(text[i]).Width;
-		if(text[i] == L'\n')
-			_width = 0;
-		else if(_width > 0 && _width + w > cWidth) {
+		u32 w = font->getCharDimension(text[i]).Width;
+		if(text[i] == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
 			_width = 0;
+			_height++;
+			if(_height == pos)
+				pbuffer = 0;
+			continue;
+		} else if(_width > 0 && _width + w > cWidth) {
+			dataManager.strBuffer[pbuffer++] = L'\n';
+			_width = 0;
+			_height++;
+			if(_height == pos)
+				pbuffer = 0;
 		}
 		_width += w;
 		dataManager.strBuffer[pbuffer++] = text[i];
@@ -815,14 +843,18 @@ void Game::ShowCardInfo(int code) {
 		else
 			myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
 		stDataInfo->setText(formatBuffer);
-		stText->setRelativePosition(irr::core::position2di(15, 83));
+		stText->setRelativePosition(rect<s32>(15, 83, 287, 324));
+		scrCardText->setRelativePosition(rect<s32>(267, 83, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stText->setRelativePosition(irr::core::position2di(15, 60));
+		stText->setRelativePosition(rect<s32>(15, 60, 287, 324));
+		scrCardText->setRelativePosition(rect<s32>(267, 60, 287, 324));
 	}
-	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
+	showingtext = dataManager.GetText(code);
+	const auto& tsize = stText->getRelativePosition();
+	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
 	for(int i = 7; i > 0; --i) {
@@ -833,7 +865,7 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 	chatMsg[0].clear();
 	chatTiming[0] = 1200;
 	chatType[0] = player;
-	if (player<11 || player > 19) switch(player) {
+	switch(player) {
 	case 0: //from host
 		chatMsg[0].append(dInfo.hostname);
 		chatMsg[0].append(L": ");
@@ -861,7 +893,8 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L"[Script error:] ");
 		break;
 	default: //from watcher or unknown
-		chatMsg[0].append(L"[---]: ");
+		if(player < 11 || player > 19)
+			chatMsg[0].append(L"[---]: ");
 	}
 	chatMsg[0].append(msg);
 }

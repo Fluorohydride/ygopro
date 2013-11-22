@@ -40,18 +40,25 @@ function c73578229.efilter(e,te)
 end
 function c73578229.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	local ag=g:GetMaxGroup(Card.GetAttack)
 	local preg=e:GetLabelObject()
-	if ag and ag:Equal(preg) then return end
-	preg:Clear()
-	preg:Merge(ag)
+	if g:GetCount()>0 then
+		local ag=g:GetMaxGroup(Card.GetAttack)
+		if ag:Equal(preg) then return end
+		preg:Clear()
+		preg:Merge(ag)
+	else
+		if preg:GetCount()==0 then return end
+		preg:Clear()
+	end
 	Duel.AdjustInstantly(e:GetHandler())
 	Duel.Readjust()
 end
 function c73578229.desop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_ACTIVATED) then
 		local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-		local ag=g:GetMaxGroup(Card.GetAttack)
-		Duel.Destroy(ag,REASON_EFFECT)
+		if g:GetCount()>0 then
+			local ag=g:GetMaxGroup(Card.GetAttack)
+			Duel.Destroy(ag,REASON_EFFECT)
+		end
 	end
 end

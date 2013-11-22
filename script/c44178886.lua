@@ -16,6 +16,7 @@ function c44178886.initial_effect(c)
 	e2:SetDescription(aux.Stringid(44178886,1))
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetCondition(c44178886.discon)
 	e2:SetTarget(c44178886.distg)
 	e2:SetOperation(c44178886.disop)
@@ -36,8 +37,7 @@ function c44178886.discon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
 end
 function c44178886.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return  e:GetHandler():GetFlagEffect(44178886)==0 end
-	e:GetHandler():RegisterFlagEffect(44178886,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end
 function c44178886.disop(e,tp,eg,ep,ev,re,r,rp)

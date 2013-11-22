@@ -17,7 +17,7 @@ function c36376145.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c36376145.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,36376145)==0 end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 	Duel.RegisterFlagEffect(tp,36376145,RESET_PHASE+PHASE_END,0,1)
 end
 function c36376145.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

@@ -47,6 +47,7 @@ end
 function c93900406.ctltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsControlerCanBeChanged() end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,e:GetHandler(),1,0,0)
+	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c93900406.ctlop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

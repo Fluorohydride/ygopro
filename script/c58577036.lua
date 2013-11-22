@@ -4,16 +4,20 @@ function c58577036.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c58577036.condition)
 	e1:SetTarget(c58577036.target)
 	e1:SetOperation(c58577036.operation)
 	c:RegisterEffect(e1)
 end
-function c58577036.filter(c,e,tp)
-	return c:IsSummonableCard() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c58577036.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsPlayerCanSpecialSummon(tp)
+end
+function c58577036.filter(c)
+	return c:IsSummonableCard()
 end
 function c58577036.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c58577036.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(c58577036.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_DECK)
 end
 function c58577036.operation(e,tp,eg,ep,ev,re,r,rp)

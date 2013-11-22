@@ -36,13 +36,11 @@ function c93717133.rmcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c93717133.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if chk==0 then return (a==e:GetHandler() and d and d:IsOnField() and d:IsCanBeEffectTarget(e) and a:IsAbleToRemove() and d:IsAbleToRemove())
-		or (d==e:GetHandler() and a:IsOnField() and a:IsCanBeEffectTarget(e) and a:IsAbleToRemove() and d:IsAbleToRemove()) end
-	if a==e:GetHandler() then Duel.SetTargetCard(d)
-	else Duel.SetTargetCard(a) end
-	local g=Group.FromCards(a,d)
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	if chk==0 then return bc and bc:IsOnField() and bc:IsCanBeEffectTarget(e) and c:IsAbleToRemove() and bc:IsAbleToRemove() end
+	Duel.SetTargetCard(bc)
+	local g=Group.FromCards(c,bc)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,2,0,0)
 end
 function c93717133.rmop(e,tp,eg,ep,ev,re,r,rp)
@@ -52,37 +50,43 @@ function c93717133.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.FromCards(c,tc)
 	local mcount=0
 	if tc:IsFaceup() then mcount=tc:GetOverlayCount() end
-	Duel.Remove(g,0,REASON_EFFECT+REASON_TEMPORARY)
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetRange(LOCATION_REMOVED)
-	e1:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
-	e1:SetLabelObject(c)
-	e1:SetLabel(mcount)
-	e1:SetCountLimit(1)
-	e1:SetOperation(c93717133.retop)
-	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetRange(LOCATION_REMOVED)
-	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
-	e2:SetLabelObject(tc)
-	e2:SetLabel(0)
-	e2:SetCountLimit(1)
-	e2:SetOperation(c93717133.retop)
-	tc:RegisterEffect(e2)
+	if Duel.Remove(g,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
+		local og=Duel.GetOperatedGroup()
+		if not og:IsContains(tc) then mcount=0 end
+		local oc=og:GetFirst()
+		while oc do
+			oc:RegisterFlagEffect(93717133,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+			oc=og:GetNext()
+		end
+		og:KeepAlive()
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_BATTLE)
+		e1:SetReset(RESET_PHASE+PHASE_BATTLE)
+		e1:SetLabel(mcount)
+		e1:SetCountLimit(1)
+		e1:SetLabelObject(og)
+		e1:SetOperation(c93717133.retop)
+		Duel.RegisterEffect(e1,tp)
+	end
+end
+function c93717133.retfilter(c)
+	return c:GetFlagEffect(93717133)~=0
 end
 function c93717133.retop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetLabelObject()
-	Duel.ReturnToField(c)
-	if c:IsOnField() and c:IsFaceup() and e:GetLabel()~=0 then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(e:GetLabel()*500)
-		c:RegisterEffect(e1)
+	local g=e:GetLabelObject()
+	local sg=g:Filter(c93717133.retfilter,nil)
+	g:DeleteGroup()
+	local tc=sg:GetFirst()
+	while tc do
+		if Duel.ReturnToField(tc) and tc==e:GetOwner() and tc:IsFaceup() and e:GetLabel()~=0 then
+			local e1=Effect.CreateEffect(e:GetOwner())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_UPDATE_ATTACK)
+			e1:SetReset(RESET_EVENT+0x1ff0000)
+			e1:SetValue(e:GetLabel()*500)
+			e:GetOwner():RegisterEffect(e1)
+		end
+		tc=sg:GetNext()
 	end
 end

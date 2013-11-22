@@ -3,7 +3,7 @@ function c25132288.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_LIGHT),1)
 	c:EnableReviveLimit()
-	--send to grave
+	--addown
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(25132288,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
@@ -17,13 +17,9 @@ function c25132288.initial_effect(c)
 end
 function c25132288.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if not d or (c~=a and c~=d) then return false end
-	local tc=a
-	if tc==c then tc=d end
+	local tc=c:GetBattleTarget()
 	e:SetLabelObject(tc)
-	return tc:IsFaceup() and c:GetAttack()>=500 and c:GetDefence()>=500 and tc:GetAttack()>0 and tc:GetDefence()>0
+	return tc and c:GetAttack()>=500 and c:GetDefence()>=500 and tc:IsFaceup() and (tc:GetAttack()>0 or tc:GetDefence()>0)
 end
 function c25132288.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
