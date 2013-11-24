@@ -21,22 +21,6 @@ function c99429730.initial_effect(c)
 	e2:SetTarget(c99429730.tdtg)
 	e2:SetOperation(c99429730.tdop)
 	c:RegisterEffect(e2)
-	if not c99429730.global_check then
-		c99429730.global_check=true
-		c99429730[0]=Group.CreateGroup()
-		c99429730[0]:KeepAlive()
-		c99429730[1]=0
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CONFIRM_DECKTOP)
-		ge1:SetOperation(c99429730.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c99429730.checkop(e,tp,eg,ep,ev,re,r,rp)
-	c99429730[0]:Clear()
-	c99429730[0]:Merge(eg)
-	c99429730[1]=re
 end
 function c99429730.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -54,7 +38,7 @@ function c99429730.operation(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:Filter(Card.IsRace,nil,RACE_PLANT)
 	if sg:GetCount()>0 then
 		Duel.DisableShuffleCheck()
-		Duel.SendtoGrave(sg,REASON_EFFECT)
+		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_REVEAL)
 	end
 	ac=ac-sg:GetCount()
 	if ac>0 then
@@ -66,8 +50,9 @@ function c99429730.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c99429730.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and e:GetHandler():IsPreviousLocation(LOCATION_DECK)
-		and c99429730[0]:IsContains(e:GetHandler()) and c99429730[1]==re
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) and
+		(c:IsReason(REASON_REVEAL) or c:IsPreviousPosition(POS_FACEUP) or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
 end
 function c99429730.filter(c)
 	return c:IsRace(RACE_PLANT) and c:IsAbleToDeck()
