@@ -10,6 +10,8 @@
 namespace ygopro
 {
 
+    class wxEditorCanvas;
+    
 	class EditorFrame : public wxFrame
 	{
 
@@ -41,6 +43,8 @@ namespace ygopro
     private:
         wxAuiManager m_auiManager;
         wxString current_file;
+        wxEditorCanvas* editor_canvas;
+        
 	};
 
 	extern EditorFrame* editorFrame;

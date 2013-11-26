@@ -7,17 +7,22 @@
 
 namespace ygopro
 {
-	struct CardData;
 
+    struct CardData;
+    
 	struct DeckData {
-		std::vector<CardData*> main_deck;
-		std::vector<CardData*> extra_deck;
-		std::vector<CardData*> side_deck;
+		std::vector<std::pair<CardData*, void*> > main_deck;
+		std::vector<std::pair<CardData*, void*> > extra_deck;
+		std::vector<std::pair<CardData*, void*> > side_deck;
         
         void sort();
         void shuffle();
-        wxString get_deck_string();
-        void load_from_string(const wxString& deck);
+        bool load_from_file(const wxString& file);
+        void save_to_file(const wxString& file);
+        bool load_from_string(const wxString& deck);
+        wxString save_to_string();
+        
+        bool deck_sort(const std::pair<CardData*, void*>& c1, const std::pair<CardData*, void*>& c2);
 	};
 
     struct BanListData {

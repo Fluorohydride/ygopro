@@ -1,5 +1,5 @@
 #include "image_mgr.h"
-#include <tuple>
+#include "game_frame.h"
 
 namespace ygopro
 {
@@ -17,7 +17,7 @@ namespace ygopro
 	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-			wxString file = wxString::Format("./image/%d.jpg", id);
+			wxString file = wxString::Format("%s%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
 			auto& ti = iter->second;
 			if(!wxFileExists(file)) {
 				ti = textures["unknown"];
@@ -45,7 +45,7 @@ namespace ygopro
         if(iter != card_images.end() && iter->second.t_index)
             glDeleteTextures(1, &iter->second.t_index);
         card_images.erase(id);
-        wxString file = wxString::Format("./image/%d.jpg", id);
+        wxString file = wxString::Format("%s%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
         if(!wxFileExists(file)) {
             ti = textures["unknown"];
         } else {

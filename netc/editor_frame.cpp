@@ -1,7 +1,6 @@
 #include "editor_frame.h"
 #include "editor_canvas.h"
 #include "image_mgr.h"
-#include <wx/wfstream.h>
 #include <wx/richtext/richtextctrl.h>
 
 namespace ygopro
@@ -38,7 +37,7 @@ namespace ygopro
 		wxRichTextCtrl* textCtrl = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
                                               wxTE_MULTILINE |	wxTE_LEFT | wxTE_BESTWRAP | wxTE_READONLY);
         int wx_gl_attribs[] = {WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0};
-        wxEditorCanvas* glcanvas = new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
+        editor_canvas= new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
         
         wxPanel* infoPanel = new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(200, 600));
         wxBoxSizer *sz=new wxBoxSizer(wxVERTICAL);
@@ -50,7 +49,7 @@ namespace ygopro
         
         m_auiManager.AddPane(infoPanel, wxAuiPaneInfo().Name(wxT("Text")).Caption(wxT("Card Information")).Left()
                              .CloseButton(false).Movable(false).Floatable(false).CaptionVisible(false));
-        m_auiManager.AddPane(glcanvas, wxAuiPaneInfo().CenterPane());
+        m_auiManager.AddPane(editor_canvas, wxAuiPaneInfo().CenterPane());
         m_auiManager.Update();
         
         editorFrame = this;
@@ -64,11 +63,12 @@ namespace ygopro
         wxFileDialog fd(this, wxT("Choose"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
         if(fd.ShowModal() != wxID_OK)
             return;
-        wxFileInputStream deck_file(fd.GetPath());
-        if(!deck_file.IsOk())
+        if(editor_canvas->loadDeck(fd.GetPath())) {
+            current_file = fd.GetPath();
+            SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+        } else {
             wxMessageDialog(this, wxT("Cannot load deck file."));
-        current_file = fd.GetPath();
-        SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+        }
 	}
     
     void EditorFrame::OnDeckSave(wxCommandEvent& evt) {

@@ -63,25 +63,22 @@ namespace ygopro
 
 	}
 
-    void wxEditorCanvas::setDeck(DeckData* deck) {
-        for(auto pcard : deck->main_deck) {
-            EditorCardData cd;
-            cd.cd = pcard;
-            cd.ti = &imageMgr.GetCardTexture(cd.cd->code);
-            main_deck.push_back(cd);
+    bool wxEditorCanvas::loadDeck(const wxString& file) {
+        if(!current_deck.load_from_file(file))
+            return false;
+        for(auto ecard : current_deck.main_deck) {
+            if(ecard.first)
+                ecard.second = &imageMgr.GetCardTexture(ecard.first->code);
         }
-        for(auto pcard : deck->extra_deck) {
-            EditorCardData cd;
-            cd.cd = pcard;
-            cd.ti = &imageMgr.GetCardTexture(cd.cd->code);
-            extra_deck.push_back(cd);
+        for(auto ecard : current_deck.extra_deck) {
+            if(ecard.first)
+                ecard.second = &imageMgr.GetCardTexture(ecard.first->code);
         }
-        for(auto pcard : deck->side_deck) {
-            EditorCardData cd;
-            cd.cd = pcard;
-            cd.ti = &imageMgr.GetCardTexture(cd.cd->code);
-            side_deck.push_back(cd);
+        for(auto ecard : current_deck.side_deck) {
+            if(ecard.first)
+                ecard.second = &imageMgr.GetCardTexture(ecard.first->code);
         }
+        return true;
     }
     
 	void wxEditorCanvas::drawScene() {
@@ -107,7 +104,7 @@ namespace ygopro
 			glTexCoord2f(t_buildbg->rx, t_buildbg->ry);glVertex2f(1.0f, -1.0f);
 			glTexCoord2f(t_buildbg->rx, t_buildbg->ly);glVertex2f(1.0f, 1.0f);
 		}
-        size_t main_size = main_deck.size();
+        size_t main_size = current_deck.main_deck.size();
         size_t line_size = 10;
         float sx = -0.8f, sy = 0.9f;
         float dx = 1.64f / (line_size - 1);
@@ -115,15 +112,15 @@ namespace ygopro
         if(main_size > 40)
             line_size = 10 + (main_size - 40) / 4;
         for(size_t i = 0; i < main_size; ++i) {
-            auto& ecd = main_deck[i];
+            auto ti = static_cast<TextureInfo*>(current_deck.main_deck[i].second);
             size_t lx = i % line_size;
             size_t ly = i / line_size;
             glBegin(GL_QUADS);
             {
-                glTexCoord2f(ecd.ti->lx, ecd.ti->ly);glVertex2f(sx + lx * dx, sy - ly * dy);
-                glTexCoord2f(ecd.ti->lx, ecd.ti->ry);glVertex2f(sx + lx * dx, sy - ly * dy - dy);
-                glTexCoord2f(ecd.ti->rx, ecd.ti->ry);glVertex2f(sx + lx * dx + dx, sy - ly * dy - dy);
-                glTexCoord2f(ecd.ti->rx, ecd.ti->ly);glVertex2f(sx + lx * dx + dx, sy - ly * dy);
+                glTexCoord2f(ti->lx, ti->ly);glVertex2f(sx + lx * dx, sy - ly * dy);
+                glTexCoord2f(ti->lx, ti->ry);glVertex2f(sx + lx * dx, sy - ly * dy - dy);
+                glTexCoord2f(ti->rx, ti->ry);glVertex2f(sx + lx * dx + dx, sy - ly * dy - dy);
+                glTexCoord2f(ti->rx, ti->ly);glVertex2f(sx + lx * dx + dx, sy - ly * dy);
             }
         }
 		glEnd();
