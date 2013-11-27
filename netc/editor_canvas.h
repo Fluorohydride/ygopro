@@ -24,7 +24,8 @@ namespace ygopro
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxEditorCanvas();
 
-        bool loadDeck(const wxString& file);
+        DeckData& getDeck() { return current_deck; }
+
 		void drawScene();
 
 		// events

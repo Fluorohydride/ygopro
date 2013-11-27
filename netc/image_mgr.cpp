@@ -17,8 +17,8 @@ namespace ygopro
 	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-			wxString file = wxString::Format("%s%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
-			auto& ti = iter->second;
+			wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
+			auto& ti = card_textures[id];
 			if(!wxFileExists(file)) {
 				ti = textures["unknown"];
 			} else {
@@ -35,6 +35,7 @@ namespace ygopro
                     ti = textures["unknown"];
                 }
 			}
+            return ti;
 		}
 		return iter->second;
 	}
@@ -45,7 +46,7 @@ namespace ygopro
         if(iter != card_images.end() && iter->second.t_index)
             glDeleteTextures(1, &iter->second.t_index);
         card_images.erase(id);
-        wxString file = wxString::Format("%s%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
+        wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
         if(!wxFileExists(file)) {
             ti = textures["unknown"];
         } else {
@@ -110,7 +111,8 @@ namespace ygopro
 			}
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tx, ty, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
-		delete px;
+        glBindTexture(GL_TEXTURE_2D, 0);
+		delete[] px;
         img_info.t_index = tid;
         img_info.t_width = tx;
         img_info.t_height = ty;

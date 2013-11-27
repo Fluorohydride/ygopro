@@ -44,7 +44,6 @@ namespace ygopro
         wxAuiManager m_auiManager;
         wxString current_file;
         wxEditorCanvas* editor_canvas;
-        
 	};
 
 	extern EditorFrame* editorFrame;

@@ -63,20 +63,29 @@ namespace ygopro
         wxFileDialog fd(this, wxT("Choose"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
         if(fd.ShowModal() != wxID_OK)
             return;
-        if(editor_canvas->loadDeck(fd.GetPath())) {
+        if(editor_canvas->getDeck().LoadFromFile(fd.GetPath())) {
             current_file = fd.GetPath();
             SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+            editor_canvas->Refresh();
         } else {
             wxMessageDialog(this, wxT("Cannot load deck file."));
         }
 	}
     
     void EditorFrame::OnDeckSave(wxCommandEvent& evt) {
+        if(current_file.IsEmpty())
+            OnDeckSaveAs(evt);
+        else
+            editor_canvas->getDeck().SaveToFile(current_file);
     }
     
     void EditorFrame::OnDeckSaveAs(wxCommandEvent& evt) {
         wxFileDialog fd(this, wxT("Choose"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
-        fd.ShowModal();
+        if(fd.ShowModal() != wxID_OK)
+            return;
+        editor_canvas->getDeck().SaveToFile(fd.GetPath());
+        current_file = fd.GetPath();
+        SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
     }
     
 }
