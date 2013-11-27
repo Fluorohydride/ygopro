@@ -4,7 +4,6 @@ function c81210420.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_POSITION+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_BATTLE_START+TIMING_BATTLE_END)
 	e1:SetCondition(c81210420.condition)
@@ -16,7 +15,7 @@ function c81210420.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()==PHASE_BATTLE
 end
 function c81210420.filter(c)
-	return not c:IsType(TYPE_TOKEN)
+	return c:IsFacedown() or c:IsCanTurnSet()
 end
 function c81210420.spfilter(c,e,tp)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsCanBeSpecialSummoned(e,0,tp,true,false,POS_FACEDOWN)
@@ -34,7 +33,7 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()<2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local tc=Duel.SelectMatchingCard(tp,c81210420.filter,tp,LOCATION_MZONE,0,1,1,nil):GetFirst()
-	if not tc then return end
+	if not tc or tc:IsImmuneToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:Select(tp,2,2,nil)
 	if tc:IsFaceup() then

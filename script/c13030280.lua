@@ -28,7 +28,10 @@ function c13030280.valcon(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
 end
 function c13030280.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsRelateToBattle() and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,77631175)
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,77631175)
+		and c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c13030280.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

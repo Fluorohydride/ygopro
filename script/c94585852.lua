@@ -32,6 +32,7 @@ function c94585852.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c94585852.repcon(e,tp,eg,ep,ev,re,r,rp)
+	if not re then return false end
 	local rc=re:GetHandler()
 	return Duel.GetCurrentPhase()==PHASE_STANDBY and rc:IsSetCard(0x45) and rc:IsType(TYPE_MONSTER)
 end

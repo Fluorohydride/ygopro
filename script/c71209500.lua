@@ -30,7 +30,7 @@ function c71209500.efop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-		e1:SetValue(1)
+		e1:SetValue(c71209500.efilter)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
@@ -41,4 +41,7 @@ function c71209500.efop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 		tc=g:GetNext()
 	end
+end
+function c71209500.efilter(e,re)
+	return re:GetHandler():IsType(TYPE_MONSTER)
 end

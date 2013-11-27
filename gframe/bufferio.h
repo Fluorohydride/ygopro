@@ -82,7 +82,7 @@ public:
 		return str - pstr;
 	}
 	static int DecodeUTF8(const char * src, wchar_t * wstr) {
-		char* p = (char*)src;
+		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
 			if((*p & 0x80) == 0) {

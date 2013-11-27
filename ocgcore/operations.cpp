@@ -733,7 +733,7 @@ int32 field::remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 
 			tevent e;
 			e.event_cards = 0;
 			e.event_player = rplayer;
-			e.event_value = min + (max << 16);;
+			e.event_value = min + (max << 16);
 			e.reason = reason;
 			e.reason_effect = core.reason_effect;
 			e.reason_player = rplayer;
@@ -990,10 +990,8 @@ int32 field::control_adjust(uint16 step) {
 			pduel->write_buffer8(pcard1->current.sequence);
 			pduel->write_buffer8(pcard1->current.position);
 		}
-		while(cit1 != core.control_adjust_set[0].end())
-			core.operated_set.insert(*cit1++);
-		while(cit2 != core.control_adjust_set[1].end())
-			core.operated_set.insert(*cit2++);
+		core.operated_set.insert(cit1, core.control_adjust_set[0].end());
+		core.operated_set.insert(cit2, core.control_adjust_set[1].end());
 		return FALSE;
 	}
 	case 3: {
@@ -1004,11 +1002,11 @@ int32 field::control_adjust(uint16 step) {
 		core.operated_set.erase(cit);
 		pcard->reset(RESET_CONTROL, RESET_EVENT);
 		move_to_field(pcard, 1 - pcard->current.controler, 1 - pcard->current.controler, LOCATION_MZONE, pcard->current.position);
+		core.units.begin()->step = 2;
 		return FALSE;
 	}
 	case 4: {
-		for(auto cit = core.control_adjust_set[1].begin(); cit != core.control_adjust_set[1].end(); ++cit)
-			core.control_adjust_set[0].insert(*cit);
+		core.control_adjust_set[0].insert(core.control_adjust_set[1].begin(), core.control_adjust_set[1].end());
 		for(auto cit = core.control_adjust_set[0].begin(); cit != core.control_adjust_set[0].end(); ++cit) {
 			(*cit)->filter_disable_related_cards();
 			raise_single_event((*cit), 0, EVENT_CONTROL_CHANGED, 0, REASON_RULE, 0, 0, 0);
@@ -2160,9 +2158,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_player, group * targets) {
 	switch(step) {
 	case 0: {
-		card_vector cv;
-		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit)
-			cv.push_back(*cit);
+		card_vector cv(targets->container.begin(), targets->container.end());
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
 		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit)
@@ -2340,9 +2336,7 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 			pduel->delete_group(targets);
 			return TRUE;
 		}
-		card_vector cv;
-		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit)
-			cv.push_back(*cit);
+		card_vector cv(targets->container.begin(), targets->container.end());
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
 		for (auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
@@ -2502,7 +2496,7 @@ int32 field::release(uint16 step, group * targets, card * target) {
 int32 field::release(uint16 step, group * targets, effect * reason_effect, uint32 reason, uint8 reason_player) {
 	switch (step) {
 	case 0: {
-		card_set extra;
+		//card_set extra;
 		for (auto cit = targets->container.begin(); cit != targets->container.end();) {
 			auto rm = cit++;
 			card* pcard = *rm;
@@ -2537,9 +2531,7 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 			pduel->delete_group(targets);
 			return TRUE;
 		}
-		card_vector cv;
-		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit)
-			cv.push_back(*cit);
+		card_vector cv(targets->container.begin(), targets->container.end());
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
 		for (auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
@@ -2721,9 +2713,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		card_set leave, discard, detach;
 		uint8 oloc, playerid, dest, seq;
 		bool show_decktop[2] = {false, false};
-		card_vector cv;
-		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit)
-			cv.push_back(*cit);
+		card_vector cv(targets->container.begin(), targets->container.end());
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
@@ -3219,8 +3209,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			}
 			if(target->xyz_materials.size()) {
 				card_set overlays;
-				for(auto clit = target->xyz_materials.begin(); clit != target->xyz_materials.end(); ++clit)
-					overlays.insert(*clit);
+				overlays.insert(target->xyz_materials.begin(), target->xyz_materials.end());
 				send_to(&overlays, 0, REASON_LOST_TARGET + REASON_RULE, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
 			}
 		}
@@ -3245,18 +3234,14 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 int32 field::change_position(uint16 step, group * targets, effect * reason_effect, uint8 reason_player, uint32 enable) {
 	switch(step) {
 	case 0: {
-		card_set::iterator cit;
 		card_set equipings;
 		card_set flips;
 		card_set pos_changed;
 		uint8 npos, opos, noflip;
-		card_vector cv;
-		card_vector::iterator cvit;
-		for(cit = targets->container.begin(); cit != targets->container.end(); ++cit)
-			cv.push_back(*cit);
+		card_vector cv(targets->container.begin(), targets->container.end());
 		if(cv.size() > 1)
 			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		for(cvit = cv.begin(); cvit != cv.end(); ++cvit) {
+		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
 			card* pcard = *cvit;
 			npos = pcard->operation_param & 0xff;
 			opos = pcard->current.position;

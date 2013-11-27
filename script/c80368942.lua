@@ -18,7 +18,7 @@ end
 function c80368942.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(c80368942.gfilter,tp,LOCATION_GRAVE,0,nil)
-		local ct=g:GetClassCount(Card.GetOriginalCode)
+		local ct=c80368942.count_unique_code(g)
 		e:SetLabel(ct)
 		return ct>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>=ct
 			and Duel.IsExistingMatchingCard(c80368942.spfilter,tp,LOCATION_DECK,0,ct,nil,e,tp)
@@ -27,11 +27,26 @@ function c80368942.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c80368942.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c80368942.gfilter,tp,LOCATION_GRAVE,0,nil)
-	local ct=g:GetClassCount(Card.GetOriginalCode)
+	local ct=c80368942.count_unique_code(g)
 	if ct==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)<ct then return end
 	local sg=Duel.GetMatchingGroup(c80368942.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
 	if sg:GetCount()<ct then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local spg=sg:Select(tp,ct,ct,nil)
 	Duel.SpecialSummon(spg,0,tp,tp,false,false,POS_FACEUP)
+end
+function c80368942.count_unique_code(g)
+	local check={}
+	local count=0
+	local tc=g:GetFirst()
+	while tc do
+		for i,code in ipairs({tc:GetCode()}) do
+			if not check[code] then
+				check[code]=true
+				count=count+1
+			end
+		end
+		tc=g:GetNext()
+	end
+	return count
 end

@@ -24,7 +24,7 @@ function c92933195.handop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local ht2=Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)
 	if ht2>=5 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
 		local sg=Duel.SelectMatchingCard(1-tp,aux.TRUE,1-tp,LOCATION_HAND,0,ht2-4,ht2-4,nil)
 		g:Merge(sg)
 	end

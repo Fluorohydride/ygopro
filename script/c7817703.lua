@@ -19,6 +19,7 @@ function c7817703.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_EQUIP_LIMIT)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetValue(c7817703.eqlimit)
 	c:RegisterEffect(e3)
 end
@@ -29,7 +30,7 @@ function c7817703.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x26) and c:GetLevel()==3
 end
 function c7817703.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c7817703.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c7817703.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c7817703.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c7817703.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

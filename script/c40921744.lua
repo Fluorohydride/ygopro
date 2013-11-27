@@ -3,7 +3,7 @@ function c40921744.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(40921744,0))
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_CANNOT_DISABLE)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SUMMON_PROC)
 	e1:SetCondition(c40921744.sumcon)

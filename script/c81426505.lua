@@ -26,7 +26,11 @@ function c81426505.filter3(c)
 	return c:IsFacedown() and c:IsDestructable()
 end
 function c81426505.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return 
+		Duel.IsExistingMatchingCard(c81426505.filter1,tp,0,LOCATION_MZONE,1,nil) or
+		Duel.IsExistingMatchingCard(c81426505.filter2,tp,0,LOCATION_ONFIELD,1,nil) or
+		Duel.IsExistingMatchingCard(c81426505.filter3,tp,0,LOCATION_SZONE,1,nil)
+	end
 	local t={}
 	local p=1
 	if Duel.IsExistingMatchingCard(c81426505.filter1,tp,0,LOCATION_MZONE,1,nil) then t[p]=aux.Stringid(81426505,0) p=p+1 end

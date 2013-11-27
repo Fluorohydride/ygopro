@@ -36,6 +36,7 @@ function c78004197.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)>0 and e:GetLabel()==1 then
 		Duel.BreakEffect()
 		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+		if not g then return end
 		local sg=g:Filter(Card.IsRelateToEffect,nil,e)
 		Duel.Destroy(sg,REASON_EFFECT)
 	end

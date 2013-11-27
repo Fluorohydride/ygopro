@@ -41,6 +41,13 @@ function c36521459.initial_effect(c)
 	e7:SetCode(EFFECT_SELF_DESTROY)
 	e7:SetCondition(c36521459.descon)
 	c:RegisterEffect(e7)
+	local e8=Effect.CreateEffect(c)
+	e8:SetType(EFFECT_TYPE_FIELD)
+	e8:SetCode(EFFECT_SELF_DESTROY)
+	e8:SetRange(LOCATION_MZONE)
+	e8:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
+	e8:SetTarget(c36521459.destarget)
+	c:RegisterEffect(e8)
 	--cannot announce
 	local e8=Effect.CreateEffect(c)
 	e8:SetType(EFFECT_TYPE_FIELD)
@@ -72,8 +79,8 @@ end
 function c36521459.indes(e,c)
 	return c:IsFaceup() and c:GetSequence()==5
 end
-function c36521459.exfilter(c,fid)
-	return c:IsFaceup() and c:IsSetCard(0x23) and (fid==nil or c:GetFieldID()<fid)
+function c36521459.exfilter(c)
+	return c:IsFaceup() and c:IsSetCard(0x23)
 end
 function c36521459.excon(e)
 	return Duel.IsExistingMatchingCard(c36521459.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
@@ -92,11 +99,12 @@ function c36521459.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Remove(tc,POS_FACEUP,REASON_COST)
 end
 function c36521459.descon(e)
-	local c=e:GetHandler()
 	local f1=Duel.GetFieldCard(0,LOCATION_SZONE,5)
 	local f2=Duel.GetFieldCard(1,LOCATION_SZONE,5)
-	return ((f1==nil or not f1:IsFaceup()) and (f2==nil or not f2:IsFaceup()))
-		or Duel.IsExistingMatchingCard(c36521459.exfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil,c:GetFieldID())
+	return (f1==nil or f1:IsFacedown()) and (f2==nil or f2:IsFacedown())
+end
+function c36521459.destarget(e,c)
+	return c:IsSetCard(0x23) and c:GetFieldID()>e:GetHandler():GetFieldID()
 end
 function c36521459.antarget(e,c)
 	return c~=e:GetHandler()

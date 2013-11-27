@@ -24,6 +24,7 @@ function c86801871.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_DESTROY)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetOperation(c86801871.damop)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		token:RegisterEffect(e1,true)
 	end
 	Duel.SpecialSummonComplete()

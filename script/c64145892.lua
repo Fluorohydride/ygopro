@@ -9,8 +9,7 @@ function c64145892.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c64145892.rdcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return ep==tp and (c==Duel.GetAttacker() or c==Duel.GetAttackTarget())
+	return ep==tp
 end
 function c64145892.rdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(ep,ev/2)

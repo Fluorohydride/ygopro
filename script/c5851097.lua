@@ -26,11 +26,10 @@ function c5851097.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c5851097.filter(c,tp)
-	local pl=c:GetPreviousLocation()
-	return bit.band(pl,0xd)~=0 and c:IsLocation(LOCATION_GRAVE) and c:GetControler()==tp
+	return c:IsPreviousLocation(LOCATION_DECK+LOCATION_ONFIELD) and c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp)
 end
 function c5851097.descon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c5851097.filter,1,nil,tp)
+	return eg:IsExists(c5851097.filter,1,nil,tp) and e:GetHandler():IsStatus(STATUS_ACTIVATED)
 end
 function c5851097.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

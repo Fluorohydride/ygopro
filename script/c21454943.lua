@@ -50,8 +50,7 @@ function c21454943.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	else Duel.SetTargetCard(a) end
 end
 function c21454943.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
 	if not tc or not tc:IsRelateToEffect(e) or not c:IsRelateToEffect(e) then return end
 	local e1=Effect.CreateEffect(c)

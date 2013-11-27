@@ -70,7 +70,8 @@ public:
 	void MainLoop();
 	void MainServerLoop(int bDuel_mode);
 	void BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 right, f32 bottom, f32 top, f32 znear, f32 zfar);
-	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, wchar_t* text);
+	void InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text);
+	void SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos = 0);
 	void RefreshDeck(irr::gui::IGUIComboBox* cbDeck);
 	void RefreshReplay();
 	void RefreshSingleplay();
@@ -120,6 +121,7 @@ public:
 	int waitFrame;
 	int signalFrame;
 	int actionParam;
+	const wchar_t* showingtext;
 	int showcard;
 	int showcardcode;
 	int showcarddif;
@@ -167,6 +169,7 @@ public:
 	irr::gui::IGUIStaticText* stInfo;
 	irr::gui::IGUIStaticText* stDataInfo;
 	irr::gui::IGUIStaticText* stText;
+	irr::gui::IGUIScrollBar *scrCardText;
 	irr::gui::IGUICheckBox* chkAutoPos;
 	irr::gui::IGUICheckBox* chkRandomPos;
 	irr::gui::IGUICheckBox* chkAutoChain;
@@ -447,6 +450,7 @@ extern unsigned char draw_count;
 #define BUTTON_LEAVE_GAME			263
 #define BUTTON_CLEAR_LOG			270
 #define LISTBOX_LOG					271
+#define SCROLL_CARDTEXT				280
 #define BUTTON_CATEGORY_OK			300
 #define COMBOBOX_DBLFLIST			301
 #define COMBOBOX_DBDECKS			302
@@ -461,7 +465,7 @@ extern unsigned char draw_count;
 #define BUTTON_EFFECT_FILTER		311
 #define BUTTON_START_FILTER			312
 #define SCROLL_FILTER				314
-#define SCROLL_KEYWORD				315
+#define EDITBOX_KEYWORD				315
 #define BUTTON_REPLAY_START			320
 #define BUTTON_REPLAY_PAUSE			321
 #define BUTTON_REPLAY_STEP			322

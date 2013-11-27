@@ -52,6 +52,7 @@ function c28423537.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_END)

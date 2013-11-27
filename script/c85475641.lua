@@ -17,12 +17,16 @@ function c85475641.filter(c,tp)
 		and c:IsControler(tp) and c:GetPreviousControler()==tp and c:GetCode()~=85475641
 end
 function c85475641.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0 and eg:IsExists(c85475641.filter,1,nil,tp)
+	local g=eg:Filter(c85475641.filter,nil,tp)
+	local tc=g:GetFirst()
+	if tc then
+		e:SetLabel(tc:GetLevel())
+		return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)==0
+	else return false end
 end
 function c85475641.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	e:SetLabel(eg:Filter(c85475641.filter,nil,tp):GetFirst():GetLevel())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c85475641.spop(e,tp,eg,ep,ev,re,r,rp)

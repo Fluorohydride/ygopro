@@ -214,7 +214,8 @@ struct processor {
 	std::unordered_set<card*> unique_cards[2];
 	ptr temp_var[4];
 	uint32 global_flag;
-	uint16 pre_field[5];
+	uint16 pre_field[2];
+	uint16 opp_mzone[5];
 	int32 chain_limit;
 	uint8 chain_limp;
 	int32 chain_limit_p;
@@ -349,7 +350,7 @@ public:
 	int32 pay_lp_cost(uint32 step, uint8 playerid, uint32 cost);
 
 	uint32 get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype);
-	int32 effect_replace_check(uint32 code, tevent& e);
+	int32 effect_replace_check(uint32 code, const tevent& e);
 	int32 get_attack_target(card* pcard, card_vector* v, uint8 chain_attack = FALSE);
 	void attack_all_target_check();
 	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max);
@@ -363,6 +364,7 @@ public:
 	int32 is_player_can_summon(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_mset(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_sset(uint8 playerid, card* pcard);
+	int32 is_player_can_spsummon(uint8 playerid);
 	int32 is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card* pcard);
 	int32 is_player_can_flipsummon(uint8 playerid, card* pcard);
 	int32 is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);

@@ -89,6 +89,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetUnionCount", scriptlib::card_get_union_count },
 	{ "GetOverlayGroup", scriptlib::card_get_overlay_group },
 	{ "GetOverlayCount", scriptlib::card_get_overlay_count },
+	{ "GetOverlayTarget", scriptlib::card_get_overlay_target },
 	{ "CheckRemoveOverlayCard", scriptlib::card_check_remove_overlay_card },
 	{ "RemoveOverlayCard", scriptlib::card_remove_overlay_card },
 	{ "GetAttackedGroup", scriptlib::card_get_attacked_group },

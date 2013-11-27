@@ -62,8 +62,7 @@ function c42940404.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c42940404.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
 	if not tc:IsRelateToEffect(e) or not c42940404.filter(tc) then
 		Duel.SendtoGrave(c,REASON_EFFECT)

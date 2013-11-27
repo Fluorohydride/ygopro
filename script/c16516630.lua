@@ -29,8 +29,7 @@ function c16516630.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c16516630.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c16516630.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)

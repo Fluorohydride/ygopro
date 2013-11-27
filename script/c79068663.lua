@@ -13,6 +13,7 @@ function c79068663.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_EQUIP_LIMIT)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	--damage

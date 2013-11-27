@@ -12,7 +12,7 @@ function c38411870.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c38411870.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)+Duel.GetFieldGroupCount(1-tp,LOCATION_MZONE,0)>=4
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)>=4
 end
 function c38411870.filter(c)
 	return c:IsFaceup() and c:IsDestructable()

@@ -23,7 +23,7 @@ function c75733063.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x13)
 end
 function c75733063.val(e,c)
-	return Duel.GetMatchingGroupCount(c75733063.atkfilter,c:GetControler(),LOCATION_MZONE,0,c)*200
+	return Duel.GetMatchingGroupCount(c75733063.atkfilter,0,LOCATION_MZONE,LOCATION_MZONE,c)*200
 end
 function c75733063.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)

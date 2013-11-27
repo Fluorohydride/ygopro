@@ -1,4 +1,4 @@
---®½ç¤Î¼¬×Ïª•
+--ç•°ç•Œã®æ£˜ç´«ç£
 function c80208323.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -18,7 +18,7 @@ function c80208323.spfilter(c,tp)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:GetPreviousControler()==tp and c:IsType(TYPE_MONSTER)
 end
 function c80208323.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c80208323.spfilter,1,nil,tp)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c80208323.spfilter,1,nil,tp)
 end
 function c80208323.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,80208323)==0 end

@@ -11,12 +11,12 @@ function c1539051.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c1539051.gfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1f) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0x1f)
 end
 function c1539051.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(c1539051.gfilter,tp,LOCATION_MZONE,0,nil)
-		local ct=g:GetClassCount(Card.GetCode)
+		local ct=c1539051.count_unique_code(g)
 		e:SetLabel(ct)
 		return ct>0 and Duel.IsPlayerCanDraw(tp,ct)
 	end
@@ -27,6 +27,21 @@ end
 function c1539051.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local g=Duel.GetMatchingGroup(c1539051.gfilter,tp,LOCATION_MZONE,0,nil)
-	local ct=g:GetClassCount(Card.GetCode)
+	local ct=c1539051.count_unique_code(g)
 	Duel.Draw(p,ct,REASON_EFFECT)
+end
+function c1539051.count_unique_code(g)
+	local check={}
+	local count=0
+	local tc=g:GetFirst()
+	while tc do
+		for i,code in ipairs({tc:GetCode()}) do
+			if not check[code] then
+				check[code]=true
+				count=count+1
+			end
+		end
+		tc=g:GetNext()
+	end
+	return count
 end

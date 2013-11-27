@@ -53,8 +53,10 @@ field::field(duel* pduel) {
 		core.shuffle_deck_check[i] = FALSE;
 		core.shuffle_hand_check[i] = FALSE;
 	}
+	core.pre_field[0] = 0;
+	core.pre_field[1] = 0;
 	for (int i = 0; i < 5; ++i)
-		core.pre_field[i] = 0;
+		core.opp_mzone[i] = 0;
 	core.summoning_card = 0;
 	core.summon_depth = 0;
 	core.chain_limit = 0;
@@ -510,8 +512,8 @@ void field::shuffle(uint8 playerid, uint8 location) {
 		pduel->write_buffer8(MSG_SHUFFLE_DECK);
 		pduel->write_buffer8(playerid);
 		core.shuffle_deck_check[playerid] = FALSE;
-		card* ptop = *svector.rbegin();
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
+			card* ptop = svector.back();
 			if(core.deck_reversed || (ptop->current.position == POS_FACEUP_DEFENCE)) {
 				pduel->write_buffer8(MSG_DECK_TOP);
 				pduel->write_buffer8(playerid);
@@ -640,7 +642,7 @@ void field::tag_swap(uint8 playerid) {
 	pduel->write_buffer8(player[playerid].list_extra.size());
 	pduel->write_buffer8(player[playerid].list_hand.size());
 	if(core.deck_reversed && player[playerid].list_main.size())
-		pduel->write_buffer32((*player[playerid].list_main.rbegin())->data.code);
+		pduel->write_buffer32(player[playerid].list_main.back()->data.code);
 	else
 		pduel->write_buffer32(0);
 	for(auto cit = player[playerid].list_hand.begin(); cit != player[playerid].list_hand.end(); ++cit)
@@ -1020,32 +1022,27 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 		}
 		if(location & LOCATION_HAND) {
 			if(pgroup)
-				for(auto cit = player[self].list_hand.begin(); cit != player[self].list_hand.end(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_hand.begin(), player[self].list_hand.end());
 			count += player[self].list_hand.size();
 		}
 		if(location & LOCATION_DECK) {
 			if(pgroup)
-				for(auto cit = player[self].list_main.rbegin(); cit != player[self].list_main.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_main.rbegin(), player[self].list_main.rend());
 			count += player[self].list_main.size();
 		}
 		if(location & LOCATION_EXTRA) {
 			if(pgroup)
-				for(auto cit = player[self].list_extra.rbegin(); cit != player[self].list_extra.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_extra.rbegin(), player[self].list_extra.rend());
 			count += player[self].list_extra.size();
 		}
 		if(location & LOCATION_GRAVE) {
 			if(pgroup)
-				for(auto cit = player[self].list_grave.rbegin(); cit != player[self].list_grave.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_grave.rbegin(), player[self].list_grave.rend());
 			count += player[self].list_grave.size();
 		}
 		if(location & LOCATION_REMOVED) {
 			if(pgroup)
-				for(auto cit = player[self].list_remove.rbegin(); cit != player[self].list_remove.rend(); ++cit)
-					pgroup->container.insert(*cit);
+				pgroup->container.insert(player[self].list_remove.rbegin(), player[self].list_remove.rend());
 			count += player[self].list_remove.size();
 		}
 		location = location2;
@@ -1238,8 +1235,7 @@ void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
 			for(int i = 0; i < 5; ++i) {
 				pcard = player[self].list_mzone[i];
 				if(pcard && !pcard->is_status(STATUS_SUMMONING) && pcard->xyz_materials.size())
-					for(auto clit = pcard->xyz_materials.begin(); clit != pcard->xyz_materials.end(); ++clit)
-						pset->insert(*clit);
+					pset->insert(pcard->xyz_materials.begin(), pcard->xyz_materials.end());
 			}
 		}
 		self = 1 - self;
@@ -1320,6 +1316,8 @@ void field::add_unique_card(card* pcard) {
 
 void field::remove_unique_card(card* pcard) {
 	uint8 con = pcard->current.controler;
+	if(con == PLAYER_NONE)
+		return;
 	if(pcard->unique_pos[0])
 		core.unique_cards[con].erase(pcard);
 	if(pcard->unique_pos[1])
@@ -1399,7 +1397,7 @@ uint32 field::get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype
 	}
 	return count;
 }
-int32 field::effect_replace_check(uint32 code, tevent& e) {
+int32 field::effect_replace_check(uint32 code, const tevent& e) {
 	auto pr = effects.continuous_effect.equal_range(code);
 	for (; pr.first != pr.second; ++pr.first) {
 		effect* peffect = pr.first->second;
@@ -1578,10 +1576,13 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 	if(is_player_affected_by_effect(playerid, EFFECT_CANNOT_DISCARD_DECK))
 		return FALSE;
 	if((count == 1) && core.deck_reversed)
-		return (*player[playerid].list_main.rbegin())->is_capable_cost_to_grave(playerid);
+		return player[playerid].list_main.back()->is_capable_cost_to_grave(playerid);
 	effect_set eset;
 	filter_field_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
+		uint32 redirect = eset[i]->get_value();
+		if((redirect & LOCATION_REMOVED) && player[playerid].list_main.back()->is_affected_by_effect(EFFECT_CANNOT_REMOVE))
+			continue;
 		uint8 p = eset[i]->get_handler_player();
 		if((eset[i]->flag & EFFECT_FLAG_IGNORE_RANGE) || (p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
 			return FALSE;
@@ -1647,6 +1648,15 @@ int32 field::is_player_can_sset(uint8 playerid, card * pcard) {
 		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		if (pduel->lua->check_condition(eset[i]->target, 3))
+			return FALSE;
+	}
+	return TRUE;
+}
+int32 field::is_player_can_spsummon(uint8 playerid) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_CANNOT_SPECIAL_SUMMON, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		if(!eset[i]->target)
 			return FALSE;
 	}
 	return TRUE;

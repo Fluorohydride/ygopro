@@ -12,14 +12,14 @@ function c80485722.initial_effect(c)
 end
 function c80485722.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if tc==c then tc=Duel.GetAttackTarget() end
-	if chk==0 then return tc and tc:IsFaceup() and tc:IsAttribute(ATTRIBUTE_DARK) end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
+	local bc=c:GetBattleTarget()
+	if chk==0 then return bc and bc:IsFaceup() and bc:IsAttribute(ATTRIBUTE_DARK) end
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,bc,1,0,0)
 end
 function c80485722.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if tc==c then tc=Duel.GetAttackTarget() end
-	if tc:IsRelateToBattle() then Duel.Destroy(tc,REASON_EFFECT) end
+	local bc=c:GetBattleTarget()
+	if bc:IsRelateToBattle() then
+		Duel.Destroy(bc,REASON_EFFECT)
+	end
 end

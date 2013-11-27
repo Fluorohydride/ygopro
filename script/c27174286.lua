@@ -15,7 +15,7 @@ function c27174286.filter(c,e,tp)
 end
 function c27174286.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c27174286.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
@@ -30,7 +30,7 @@ function c27174286.op(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
 		while tc do
-			Duel.SpecialSummonStep(tc, 0, tp, tp, false, false, POS_FACEUP)
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 			tc:RegisterFlagEffect(27174286,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 			tc=g:GetNext()
 		end

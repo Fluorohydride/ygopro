@@ -13,7 +13,7 @@ end
 function c99789342.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.CheckSummonActivity(tp)
 		and not Duel.CheckFlipSummonActivity(tp) and not Duel.CheckSpecialSummonActivity(tp) end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

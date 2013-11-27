@@ -46,18 +46,18 @@ function c88341502.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetReset(RESET_PHASE+PHASE_END)
 		e3:SetLabelObject(tc)
 		Duel.RegisterEffect(e3,tp)
-		tc:RegisterFlagEffect(88341502,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		tc:RegisterFlagEffect(88341502,RESET_EVENT+0x1020000+RESET_PHASE+PHASE_END,0,1)
 	end
 end
 function c88341502.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
+	local tc=e:GetLabelObject()
 	local bc=tc:GetBattleTarget()
-	return tc==e:GetLabelObject() and tc:IsRelateToBattle() and tc:GetFlagEffect(88341502)~=0
+	return eg:IsContains(tc) and tc:GetFlagEffect(88341502)~=0
 		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
 end
 function c88341502.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local def=eg:GetFirst():GetBattleTarget():GetBaseDefence()
+	local def=e:GetLabelObject():GetBattleTarget():GetBaseDefence()
 	if def<0 then def=0 end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(def)
