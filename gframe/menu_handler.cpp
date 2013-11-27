@@ -45,12 +45,6 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				char ip[20];
 				const wchar_t* pstr = mainGame->ebJoinIP->getText();
 				BufferIO::CopyWStr(pstr, hostname, 100);
-				if ((status = getaddrinfo(hostname, NULL, &hints, &servinfo)) == -1) {
-					//fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-					//error handling
-					BufferIO::CopyWStr(pstr, ip, 16);
-				} else
-					inet_ntop(AF_INET, &(((struct sockaddr_in *)servinfo->ai_addr)->sin_addr), ip, 20);
 				freeaddrinfo(servinfo);
 				unsigned int remote_addr = htonl(inet_addr(ip));
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
