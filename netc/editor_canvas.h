@@ -18,6 +18,7 @@ namespace ygopro
 		unsigned int glwidth;
 		unsigned int glheight;
         TextureInfo* t_buildbg;
+        TextureInfo* t_limits[3];
         DeckData current_deck;
         
 	public:

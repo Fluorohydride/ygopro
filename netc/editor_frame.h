@@ -20,6 +20,8 @@ namespace ygopro
 			ID_DECK_LOAD = wxID_HIGHEST + 1,
             ID_DECK_SAVE,
             ID_DECK_SAVEAS,
+            ID_DECK_LOADSTR,
+            ID_DECK_SAVESTR,
             ID_TOOL_CLEAR,
             ID_TOOL_SORT,
             ID_TOOL_SHUFFLE,
@@ -37,6 +39,14 @@ namespace ygopro
         void OnDeckLoad(wxCommandEvent& evt);
         void OnDeckSave(wxCommandEvent& evt);
         void OnDeckSaveAs(wxCommandEvent& evt);
+        void OnDeckLoadString(wxCommandEvent& evt);
+        void OnDeckSaveString(wxCommandEvent& evt);
+        
+        void OnToolClear(wxCommandEvent& evt);
+        void OnToolSort(wxCommandEvent& evt);
+        void OnToolShuffle(wxCommandEvent& evt);
+        void OnToolScreenshot(wxCommandEvent& evt);
+        void OnToolSearch(wxCommandEvent& evt);
         
         DECLARE_EVENT_TABLE()
         

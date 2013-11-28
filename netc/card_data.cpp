@@ -35,7 +35,6 @@ namespace ygopro
 				cd.race = sqlite3_column_int(pStmt, 8);
 				cd.attribute = sqlite3_column_int(pStmt, 9);
 				cd.category = sqlite3_column_int(pStmt, 10);
-				_datas.insert(std::make_pair(cd.code, cd));
 				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), unicode_buffer);
 				unicode_buffer[len] = 0;
 				cd.name = unicode_buffer;
@@ -47,6 +46,7 @@ namespace ygopro
                     unicode_buffer[len] = 0;
                     cd.desc[i] = unicode_buffer;
                 }
+                _datas.insert(std::make_pair(cd.code, cd));
 			}
 		} while(step != SQLITE_DONE);
 		sqlite3_finalize(pStmt);

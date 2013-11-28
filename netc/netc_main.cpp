@@ -4,6 +4,7 @@
 #include "editor_frame.h"
 #include "image_mgr.h"
 #include "card_data.h"
+#include "deck_data.h"
 #include "wx/wx.h"
 #include "wx/app.h"
 #include "wx/image.h"
@@ -27,15 +28,13 @@ namespace ygopro {
 
 			wxInitAllImageHandlers();
 			commonCfg.LoadConfig("common.xml");
-
 			if(dataMgr.LoadDatas("cards.cdb"))
 				return true;
-
-			editorFrame = new EditorFrame(1200, 720);
-			editorFrame->Center();
-            
+            deckMgr.LoadBanLists("lflist.conf");
             imageMgr.LoadImageConfig("textures.xml");
             
+			editorFrame = new EditorFrame(1200, 720);
+			editorFrame->Center();
 			editorFrame->Show();
 			return true;
 		}

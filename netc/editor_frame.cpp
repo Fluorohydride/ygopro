@@ -10,6 +10,13 @@ namespace ygopro
         EVT_MENU(ID_DECK_LOAD, EditorFrame::OnDeckLoad)
         EVT_MENU(ID_DECK_SAVE, EditorFrame::OnDeckSave)
         EVT_MENU(ID_DECK_SAVEAS, EditorFrame::OnDeckSaveAs)
+        EVT_MENU(ID_DECK_LOADSTR, EditorFrame::OnDeckLoadString)
+        EVT_MENU(ID_DECK_SAVESTR, EditorFrame::OnDeckSaveString)
+        EVT_MENU(ID_TOOL_CLEAR, EditorFrame::OnToolClear)
+        EVT_MENU(ID_TOOL_SORT, EditorFrame::OnToolSort)
+        EVT_MENU(ID_TOOL_SHUFFLE, EditorFrame::OnToolShuffle)
+        EVT_MENU(ID_TOOL_SCREENSHOT, EditorFrame::OnToolScreenshot)
+        EVT_MENU(ID_TOOL_SEARCH, EditorFrame::OnToolSearch)
 	END_EVENT_TABLE()
 
 	EditorFrame* editorFrame = nullptr;
@@ -21,6 +28,8 @@ namespace ygopro
         m_deck->Append(ID_DECK_LOAD, wxT("Load\tCTRL+D"));
         m_deck->Append(ID_DECK_SAVE, wxT("Save\tCTRL+S"));
         m_deck->Append(ID_DECK_SAVEAS, wxT("Save As\tCTRL+A"));
+        m_deck->Append(ID_DECK_LOADSTR, wxT("Load From String\tCTRL+SHIFT+D"));
+        m_deck->Append(ID_DECK_SAVESTR, wxT("Save To String\tCTRL+SHIFT+S"));
         
         wxMenu* m_tool = new wxMenu;
         m_tool->Append(ID_TOOL_CLEAR, wxT("&Clear\tCTRL+E"));
@@ -66,6 +75,7 @@ namespace ygopro
         if(editor_canvas->getDeck().LoadFromFile(fd.GetPath())) {
             current_file = fd.GetPath();
             SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+            deckMgr.GetDeckCardLimitCount(editor_canvas->getDeck());
             editor_canvas->Refresh();
         } else {
             wxMessageDialog(this, wxT("Cannot load deck file."));
@@ -86,6 +96,33 @@ namespace ygopro
         editor_canvas->getDeck().SaveToFile(fd.GetPath());
         current_file = fd.GetPath();
         SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+    }
+    
+    void EditorFrame::OnDeckLoadString(wxCommandEvent& evt) {
+    }
+    
+    void EditorFrame::OnDeckSaveString(wxCommandEvent& evt) {
+    }
+    
+    void EditorFrame::OnToolClear(wxCommandEvent& evt) {
+        editor_canvas->getDeck().Clear();
+        editor_canvas->Refresh();
+    }
+    
+    void EditorFrame::OnToolSort(wxCommandEvent& evt) {
+        editor_canvas->getDeck().Sort();
+        editor_canvas->Refresh();
+    }
+    
+    void EditorFrame::OnToolShuffle(wxCommandEvent& evt) {
+        editor_canvas->getDeck().Shuffle();
+        editor_canvas->Refresh();
+    }
+    
+    void EditorFrame::OnToolScreenshot(wxCommandEvent& evt) {
+    }
+    
+    void EditorFrame::OnToolSearch(wxCommandEvent& evt) {
     }
     
 }

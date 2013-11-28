@@ -107,7 +107,7 @@ namespace ygopro
 				px[(x + y * tx) * 4 + 1] = pxdata[(x + y * imagex) * 3 + 1];
 				px[(x + y * tx) * 4 + 2] = pxdata[(x + y * imagex) * 3 + 2];
 				if(apdata)
-					px[(x + y * tx) * 4 + 3] = apdata[x + y * imagex];
+					px[(x + y * tx) * 4 + 3] = 255 - apdata[x + y * imagex];
 			}
 		}
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tx, ty, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
@@ -168,7 +168,7 @@ namespace ygopro
                     {
                         src.t_index = 0;
                         src.t_width = texlen(src.img.GetWidth());
-                        src.t_height = texlen(src.img.GetWidth());
+                        src.t_height = texlen(src.img.GetHeight());
                     } else
                         src_images.erase(name);
                 }

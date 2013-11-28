@@ -4,6 +4,7 @@
 #include "wx/string.h"
 #include <map>
 #include <vector>
+#include <tuple>
 
 #define DECK_NOERROR        0
 #define DECK_EXCEED_COUNT   0x10000000
@@ -17,12 +18,14 @@ namespace ygopro
 {
 
     struct CardData;
+    struct TextureInfo;
     
 	struct DeckData {
-		std::vector<std::pair<CardData*, void*> > main_deck;
-		std::vector<std::pair<CardData*, void*> > extra_deck;
-		std::vector<std::pair<CardData*, void*> > side_deck;
+		std::vector<std::tuple<CardData*, TextureInfo*, int> > main_deck;
+		std::vector<std::tuple<CardData*, TextureInfo*, int> > extra_deck;
+		std::vector<std::tuple<CardData*, TextureInfo*, int> > side_deck;
         
+        void Clear();
         void Sort();
         void Shuffle();
         bool LoadFromFile(const wxString& file);
@@ -30,7 +33,7 @@ namespace ygopro
         void SaveToFile(const wxString& file);
         wxString SaveToString();
         
-        static bool deck_sort(const std::pair<CardData*, void*>& c1, const std::pair<CardData*, void*>& c2);
+        static bool deck_sort(const std::tuple<CardData*, TextureInfo*, int>& c1, const std::tuple<CardData*, TextureInfo*, int>& c2);
 	};
 
     struct BanListData {
@@ -49,7 +52,9 @@ namespace ygopro
 		void LoadBanLists(const wxString& file);
 		void SetBanLists(unsigned int hash);
         unsigned int CheckCurrentList(unsigned int pool);
-
+        void GetDeckCardLimitCount(DeckData& deck);
+        unsigned int GetCardLimitCount(unsigned int code);
+        
 	private:
 		BanListData* current_list;
         std::vector<BanListData> banlists;

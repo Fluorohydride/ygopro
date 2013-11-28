@@ -12,6 +12,12 @@ namespace ygopro
     
     DeckMgr deckMgr;
     
+    void DeckData::Clear() {
+        main_deck.clear();
+        extra_deck.clear();
+        side_deck.clear();
+    }
+    
     void DeckData::Sort() {
         std::sort(main_deck.begin(), main_deck.end(), deck_sort);
         std::sort(extra_deck.begin(), extra_deck.end(), deck_sort);
@@ -46,12 +52,12 @@ namespace ygopro
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
             if(side) {
-                side_deck.push_back(std::make_pair(ptr, nullptr));
+                side_deck.push_back(std::make_tuple(ptr, nullptr, 0));
             } else {
                 if(ptr->type & 0x802040)
-                    extra_deck.push_back(std::make_pair(ptr, nullptr));
+                    extra_deck.push_back(std::make_tuple(ptr, nullptr, 0));
                 else
-                    main_deck.push_back(std::make_pair(ptr, nullptr));
+                    main_deck.push_back(std::make_tuple(ptr, nullptr, 0));
             }
         }
         return true;
@@ -81,14 +87,14 @@ namespace ygopro
                 continue;
             if(packed_data & 0x20000000) {
                 for(unsigned int j = 0; j < count; ++j)
-                    side_deck.push_back(std::make_pair(ptr, nullptr));
+                    side_deck.push_back(std::make_tuple(ptr, nullptr, 0));
             } else {
                 if(ptr->type & 0x802040)
                     for(unsigned int j = 0; j < count; ++j)
-                        extra_deck.push_back(std::make_pair(ptr, nullptr));
+                        extra_deck.push_back(std::make_tuple(ptr, nullptr, 0));
                 else
                     for(unsigned int j = 0; j < count; ++j)
-                        main_deck.push_back(std::make_pair(ptr, nullptr));
+                        main_deck.push_back(std::make_tuple(ptr, nullptr, 0));
             }
         }
         return true;
@@ -101,13 +107,13 @@ namespace ygopro
         wxTextOutputStream ts(deck_file);
         ts << "#Created by ygopro deck editor." << endl << "#main" << endl;
         for(auto& cd : main_deck)
-            ts << cd.first->code << " #" << cd.first->name << endl;
+            ts << std::get<0>(cd)->code << " #" << std::get<0>(cd)->name << endl;
         for(auto& cd : extra_deck)
-            ts << cd.first->code << " #" << cd.first->name << endl;
+            ts << std::get<0>(cd)->code << " #" << std::get<0>(cd)->name << endl;
         if(side_deck.size()) {
             ts << "!side" << endl;
             for(auto& cd : side_deck)
-                ts << cd.first->code << " #" << cd.first->name << endl;
+                ts << std::get<0>(cd)->code << " #" << std::get<0>(cd)->name << endl;
         }
     }
     
@@ -118,8 +124,8 @@ namespace ygopro
         char* deck_pstr = deck_string;
         for(size_t i = 0; i < main_deck.size(); ++i) {
             unsigned int count = 1;
-            unsigned int code = main_deck[i].first->code;
-            while(i < main_deck.size() - 1 && code == main_deck[i + 1].first->code) {
+            unsigned int code = std::get<0>(main_deck[i])->code;
+            while(i < main_deck.size() - 1 && code == std::get<0>(main_deck[i + 1])->code) {
                 count++;
                 i++;
             }
@@ -133,8 +139,8 @@ namespace ygopro
         }
         for(size_t i = 0; i < extra_deck.size(); ++i) {
             unsigned int count = 1;
-            unsigned int code = extra_deck[i].first->code;
-            while(i < extra_deck.size() - 1 && code == extra_deck[i + 1].first->code) {
+            unsigned int code = std::get<0>(extra_deck[i])->code;
+            while(i < extra_deck.size() - 1 && code == std::get<0>(extra_deck[i + 1])->code) {
                 count++;
                 i++;
             }
@@ -148,8 +154,8 @@ namespace ygopro
         }
         for(size_t i = 0; i < side_deck.size(); ++i) {
             unsigned int count = 1;
-            unsigned int code = side_deck[i].first->code;
-            while(i < side_deck.size() - 1 && code == side_deck[i + 1].first->code) {
+            unsigned int code = std::get<0>(side_deck[i])->code;
+            while(i < side_deck.size() - 1 && code == std::get<0>(side_deck[i + 1])->code) {
                 count++;
                 i++;
             }
@@ -164,9 +170,9 @@ namespace ygopro
         return deck_string;
     }
     
-    bool DeckData::deck_sort(const std::pair<CardData*, void*>& c1, const std::pair<CardData*, void*>& c2) {
-        CardData* p1 = c1.first;
-        CardData* p2 = c2.first;
+    bool DeckData::deck_sort(const std::tuple<CardData*, TextureInfo*, int>& c1, const std::tuple<CardData*, TextureInfo*, int>& c2) {
+        CardData* p1 = std::get<0>(c1);
+        CardData* p2 = std::get<0>(c2);
         if((p1->type & 0x7) != (p2->type & 0x7))
             return (p1->type & 0x7) < (p2->type & 0x7);
         if((p1->type & 0x7) == 1) {
@@ -247,4 +253,49 @@ namespace ygopro
         return DECK_NOERROR;
     }
     
+    void DeckMgr::GetDeckCardLimitCount(DeckData& deck) {
+        if(!current_list) {
+            for(auto& cd : deck.main_deck)
+                std::get<2>(cd) = 3;
+            for(auto& cd : deck.extra_deck)
+                std::get<2>(cd) = 3;
+            for(auto& cd : deck.side_deck)
+                std::get<2>(cd) = 3;
+            return;
+        }
+        for(auto& cd : deck.main_deck) {
+            unsigned int code = std::get<0>(cd)->code;
+            auto iter = current_list->counts.find(code);
+            if(iter == current_list->counts.end())
+                std::get<2>(cd) = 3;
+            else
+                std::get<2>(cd) = iter->second;
+        }
+        for(auto& cd : deck.extra_deck) {
+            unsigned int code = std::get<0>(cd)->code;
+            auto iter = current_list->counts.find(code);
+            if(iter == current_list->counts.end())
+                std::get<2>(cd) = 3;
+            else
+                std::get<2>(cd) = iter->second;
+        }
+        for(auto& cd : deck.side_deck) {
+            unsigned int code = std::get<0>(cd)->code;
+            auto iter = current_list->counts.find(code);
+            if(iter == current_list->counts.end())
+                std::get<2>(cd) = 3;
+            else
+                std::get<2>(cd) = iter->second;
+        }
+    }
+    
+    unsigned int DeckMgr::GetCardLimitCount(unsigned int code) {
+        if(!current_list)
+            return 3;
+        auto iter = current_list->counts.find(code);
+        if(iter == current_list->counts.end())
+            return 3;
+        else
+            return iter->second;
+    }
 }
