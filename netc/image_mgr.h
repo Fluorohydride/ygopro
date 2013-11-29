@@ -18,6 +18,7 @@ namespace ygopro
 {
     
     struct SrcImageInfo {
+        SrcImageInfo(): t_index(0), t_width(0), t_height(0) {}
         wxImage img;
         unsigned int t_index;
         unsigned int t_width;
@@ -35,6 +36,13 @@ namespace ygopro
             return src ? src->t_index : 0;
         }
 	};
+    
+    struct CardTextureInfo {
+        CardTextureInfo(): ref_count(0), is_system(false) {}
+        TextureInfo ti;
+        unsigned int ref_count;
+        bool is_system;
+    };
     
 	struct LayoutInfo {
 		int style;
@@ -66,19 +74,19 @@ namespace ygopro
 			return len + 1;
 		}
 
-		TextureInfo& GetCardTexture(unsigned int id);
-		TextureInfo& ReloadCardTexture(unsigned int id);
+		CardTextureInfo& GetCardTexture(unsigned int id);
+		CardTextureInfo& ReloadCardTexture(unsigned int id);
         void UnloadCardTexture(unsigned int id);
 		void UnloadAllCardTexture();
 		void LoadTexture(SrcImageInfo& img);
 		void InitTextures(bool force = false);
         
 		void LoadSingleImage(const std::string& name, const wxString& file);
-		void LoadImageConfig(const wxString& file);
+		bool LoadImageConfig(const wxString& file);
 		
         std::unordered_map<std::string, SrcImageInfo> src_images;
         std::unordered_map<unsigned int, SrcImageInfo> card_images;
-		std::unordered_map<unsigned int, TextureInfo> card_textures;
+		std::unordered_map<unsigned int, CardTextureInfo> card_textures;
 		std::unordered_map<std::string, TextureInfo> textures;
         std::unordered_map<std::string, wxString> single_images;
         std::vector<TextureInfo> text_texture;

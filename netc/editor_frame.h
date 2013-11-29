@@ -27,9 +27,9 @@ namespace ygopro
             ID_TOOL_SHUFFLE,
             ID_TOOL_SCREENSHOT,
             ID_TOOL_SEARCH,
-            
+            ID_REGULATION,
+            ID_REGULATION_END = ID_REGULATION + 100,
             ID_MENUEND,
-            ID_BANLISTSTART = wxID_HIGHEST + 100,
 		};
 
 	public:
@@ -48,7 +48,7 @@ namespace ygopro
         void OnToolScreenshot(wxCommandEvent& evt);
         void OnToolSearch(wxCommandEvent& evt);
         
-        DECLARE_EVENT_TABLE()
+        void OnRegulationChange(wxCommandEvent& evt);
         
     private:
         wxAuiManager m_auiManager;

@@ -28,7 +28,7 @@ namespace ygopro
     
 	class DataMgr {
 	public:
-		int LoadDatas(const char* file);
+		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
 
 	private:

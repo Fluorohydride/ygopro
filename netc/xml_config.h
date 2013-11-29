@@ -30,7 +30,7 @@ namespace ygopro
 			return config_map[name];
 		}
 
-		void LoadConfig(const wxString& name);
+		bool LoadConfig(const wxString& name);
 		void SaveConfig(const wxString& name);
 
 	private:

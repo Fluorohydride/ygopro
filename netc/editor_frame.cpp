@@ -1,23 +1,15 @@
 #include "editor_frame.h"
 #include "editor_canvas.h"
+#include "game_frame.h"
 #include "image_mgr.h"
+#include "deck_data.h"
+#include <wx/filename.h>
+#include <wx/clipbrd.h>
 #include <wx/richtext/richtextctrl.h>
+#include <sys/time.h>
 
 namespace ygopro
 {
-    
-    BEGIN_EVENT_TABLE(EditorFrame, wxFrame)
-        EVT_MENU(ID_DECK_LOAD, EditorFrame::OnDeckLoad)
-        EVT_MENU(ID_DECK_SAVE, EditorFrame::OnDeckSave)
-        EVT_MENU(ID_DECK_SAVEAS, EditorFrame::OnDeckSaveAs)
-        EVT_MENU(ID_DECK_LOADSTR, EditorFrame::OnDeckLoadString)
-        EVT_MENU(ID_DECK_SAVESTR, EditorFrame::OnDeckSaveString)
-        EVT_MENU(ID_TOOL_CLEAR, EditorFrame::OnToolClear)
-        EVT_MENU(ID_TOOL_SORT, EditorFrame::OnToolSort)
-        EVT_MENU(ID_TOOL_SHUFFLE, EditorFrame::OnToolShuffle)
-        EVT_MENU(ID_TOOL_SCREENSHOT, EditorFrame::OnToolScreenshot)
-        EVT_MENU(ID_TOOL_SEARCH, EditorFrame::OnToolSearch)
-	END_EVENT_TABLE()
 
 	EditorFrame* editorFrame = nullptr;
 
@@ -27,9 +19,14 @@ namespace ygopro
         wxMenu* m_deck = new wxMenu();
         m_deck->Append(ID_DECK_LOAD, wxT("Load\tCTRL+D"));
         m_deck->Append(ID_DECK_SAVE, wxT("Save\tCTRL+S"));
-        m_deck->Append(ID_DECK_SAVEAS, wxT("Save As\tCTRL+A"));
-        m_deck->Append(ID_DECK_LOADSTR, wxT("Load From String\tCTRL+SHIFT+D"));
-        m_deck->Append(ID_DECK_SAVESTR, wxT("Save To String\tCTRL+SHIFT+S"));
+        m_deck->Append(ID_DECK_SAVEAS, wxT("Save As\tCTRL+SHIFT+S"));
+        m_deck->Append(ID_DECK_LOADSTR, wxT("Load From String\tCTRL+V"));
+        m_deck->Append(ID_DECK_SAVESTR, wxT("Save To String\tCTRL+C"));
+        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoad, this, ID_DECK_LOAD);
+        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSave, this, ID_DECK_SAVE);
+        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveAs, this, ID_DECK_SAVEAS);
+        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoadString, this, ID_DECK_LOADSTR);
+        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveString, this, ID_DECK_SAVESTR);
         
         wxMenu* m_tool = new wxMenu;
         m_tool->Append(ID_TOOL_CLEAR, wxT("&Clear\tCTRL+E"));
@@ -37,9 +34,24 @@ namespace ygopro
         m_tool->Append(ID_TOOL_SHUFFLE, wxT("&Shuffle\tCTRL+T"));
         m_tool->Append(ID_TOOL_SCREENSHOT, wxT("&Screenshot\tCTRL+P"));
         m_tool->Append(ID_TOOL_SEARCH, wxT("&Search\tCTRL+F"));
-
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolClear, this, ID_TOOL_CLEAR);
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSort, this, ID_TOOL_SORT);
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolScreenshot, this, ID_TOOL_SCREENSHOT);
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSearch, this, ID_TOOL_SEARCH);
+        
+        wxMenu* m_limit = new wxMenu;
+        auto& lrs = limitRegulationMgr.GetLimitRegulations();
+        for(unsigned int i = 0; i < lrs.size(); ++i) {
+            m_limit->Append(ID_REGULATION + i, lrs[i].name, wxT("Check to choose this regulation."), true);
+            m_limit->Bind(wxEVT_MENU, &EditorFrame::OnRegulationChange, this, ID_REGULATION + i);
+        }
+        if(lrs.size() > 0)
+            m_limit->GetMenuItems()[0]->Check(true);
+        
         menu_bar->Append(m_deck, wxT("Deck"));
         menu_bar->Append(m_tool, wxT("Tools"));
+        menu_bar->Append(m_limit, wxT("Limit Regulation"));
         SetMenuBar(menu_bar);
 
         wxStaticBitmap* bmpCardImage = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
@@ -75,7 +87,7 @@ namespace ygopro
         if(editor_canvas->getDeck().LoadFromFile(fd.GetPath())) {
             current_file = fd.GetPath();
             SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
-            deckMgr.GetDeckCardLimitCount(editor_canvas->getDeck());
+            limitRegulationMgr.GetDeckCardLimitCount(editor_canvas->getDeck());
             editor_canvas->Refresh();
         } else {
             wxMessageDialog(this, wxT("Cannot load deck file."));
@@ -90,7 +102,7 @@ namespace ygopro
     }
     
     void EditorFrame::OnDeckSaveAs(wxCommandEvent& evt) {
-        wxFileDialog fd(this, wxT("Choose"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        wxFileDialog fd(this, wxT("Save deck file as"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if(fd.ShowModal() != wxID_OK)
             return;
         editor_canvas->getDeck().SaveToFile(fd.GetPath());
@@ -99,9 +111,15 @@ namespace ygopro
     }
     
     void EditorFrame::OnDeckLoadString(wxCommandEvent& evt) {
+        
     }
     
     void EditorFrame::OnDeckSaveString(wxCommandEvent& evt) {
+        wxString deck_string = editor_canvas->getDeck().SaveToString();
+        wxTheClipboard->Open();
+        wxTheClipboard->SetData(new wxTextDataObject(deck_string));
+        wxTheClipboard->Close();
+        wxMessageDialog(this, wxString("The deck has been successfully copied to clipboard."), wxT("Information"), wxICON_INFORMATION).ShowModal();
     }
     
     void EditorFrame::OnToolClear(wxCommandEvent& evt) {
@@ -120,9 +138,33 @@ namespace ygopro
     }
     
     void EditorFrame::OnToolScreenshot(wxCommandEvent& evt) {
+        time_t t = time(0);
+        wxString path = static_cast<const std::string&>(commonCfg["screenshot_path"]);
+        if(*path.rbegin() != wxT('/'))
+            path.Append(wxT('/'));
+        if(!wxFileName::DirExists(path) && !wxFileName::Mkdir(path)) {
+            wxMessageDialog(this, wxString("Cannot create folder ") + path, wxT("Error"), wxICON_ERROR).ShowModal();
+            return;
+        }
+        path += wxString::Format(wxT("%d.png"), t);
+        editor_canvas->saveScreenshot(path);
+        wxMessageDialog(this, wxString("File has been successful saved to:\n") + path, wxT("Information"), wxICON_INFORMATION).ShowModal();
     }
     
     void EditorFrame::OnToolSearch(wxCommandEvent& evt) {
     }
     
+    void EditorFrame::OnRegulationChange(wxCommandEvent& evt) {
+        auto& regs = GetMenuBar()->GetMenu(2)->GetMenuItems();
+        if(regs.GetCount() == 0)
+            return;
+        bool change = true;
+        int id = evt.GetId() - ID_REGULATION;
+        for(size_t i = 0; i < regs.GetCount(); ++i) {
+            auto mi = regs[i];
+            if(mi->IsCheck() && id == i)
+                change = false;
+            mi->Check(id == i);
+        }
+    }
 }

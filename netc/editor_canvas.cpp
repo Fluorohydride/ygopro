@@ -1,8 +1,9 @@
+#include <wx/image.h>
+#include <wx/clipbrd.h>
 #include "image_mgr.h"
 #include "editor_canvas.h"
 #include "card_data.h"
 #include "deck_data.h"
-#include "image_mgr.h"
 
 namespace ygopro
 {
@@ -29,6 +30,34 @@ namespace ygopro
 		delete glcontext;
 	}
 
+    void wxEditorCanvas::saveScreenshot(const wxString& name, bool clipboard) {
+        wxGLCanvas::SetCurrent(*glcontext);
+        imageMgr.InitTextures();
+		drawScene();
+        unsigned char* image_buff = new unsigned char[glwidth * glheight * 4];
+        unsigned char* rgb_buff = new unsigned char[glwidth * glheight * 3];
+        glReadPixels(0, 0, glwidth, glheight, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
+        for(unsigned int h = 0; h < glheight; ++h) {
+            for(unsigned int w = 0; w < glwidth; ++w) {
+                unsigned int ch = glheight - 1 - h;
+                rgb_buff[h * glwidth * 3 + w * 3 + 0] = image_buff[ch * glwidth * 4 + w * 4 + 0];
+                rgb_buff[h * glwidth * 3 + w * 3 + 1] = image_buff[ch * glwidth * 4 + w * 4 + 1];
+                rgb_buff[h * glwidth * 3 + w * 3 + 2] = image_buff[ch * glwidth * 4 + w * 4 + 2];
+            }
+        }
+        wxImage* img = new wxImage(glwidth, glheight, rgb_buff, true);
+        if(clipboard) {
+            wxBitmap bmp(*img);
+            wxTheClipboard->Open();
+            wxTheClipboard->SetData(new wxBitmapDataObject(bmp));
+            wxTheClipboard->Close();
+        } else
+            img->SaveFile(name, wxBITMAP_TYPE_PNG);
+        delete img;
+        delete[] rgb_buff;
+        delete[] image_buff;
+    }
+    
 	void wxEditorCanvas::eventResized(wxSizeEvent& evt) {
 		glwidth = evt.GetSize().GetWidth();
 		glheight = evt.GetSize().GetHeight();
@@ -99,7 +128,7 @@ namespace ygopro
         float iconh = 0.08f;
         size_t line_size = 18.0f / 11 / wd;
         if(main_size > line_size * 4)
-            line_size = 10 + (main_size - 40) / 4;
+            line_size = (main_size - 1) / 4 + 1;
         if(line_size < 10)
             line_size = 10;
         float sx = -0.85f, sy = 0.90f;
@@ -108,12 +137,13 @@ namespace ygopro
             dx = wd * 11.0f / 10.0f;
         float dy = 0.3f;
         for(size_t i = 0; i < main_size; ++i) {
-            TextureInfo* ti = std::get<1>(current_deck.main_deck[i]);
+            CardTextureInfo* cti = std::get<1>(current_deck.main_deck[i]);
             int limit = std::get<2>(current_deck.main_deck[i]);
-            if(ti == nullptr) {
-                ti = &imageMgr.GetCardTexture(std::get<0>(current_deck.main_deck[i])->code);
-                std::get<1>(current_deck.main_deck[i]) = ti;
+            if(cti == nullptr) {
+                cti = &imageMgr.GetCardTexture(std::get<0>(current_deck.main_deck[i])->code);
+                std::get<1>(current_deck.main_deck[i]) = cti;
             }
+            TextureInfo* ti = &cti->ti;
             size_t lx = i % line_size;
             size_t ly = i / line_size;
             glBindTexture(GL_TEXTURE_2D, ti->tex());
@@ -144,12 +174,13 @@ namespace ygopro
         if(dx > wd * 11.0f / 10.0f)
             dx = wd * 11.0f / 10.0f;
         for(size_t i = 0; i < extra_size; ++i) {
-            TextureInfo* ti = std::get<1>(current_deck.extra_deck[i]);
+            CardTextureInfo* cti = std::get<1>(current_deck.extra_deck[i]);
             int limit = std::get<2>(current_deck.extra_deck[i]);
-            if(ti == nullptr) {
-                ti = &imageMgr.GetCardTexture(std::get<0>(current_deck.extra_deck[i])->code);
-                std::get<1>(current_deck.extra_deck[i]) = ti;
+            if(cti == nullptr) {
+                cti = &imageMgr.GetCardTexture(std::get<0>(current_deck.extra_deck[i])->code);
+                std::get<1>(current_deck.extra_deck[i]) = cti;
             }
+            TextureInfo* ti = &cti->ti;
             glBindTexture(GL_TEXTURE_2D, ti->tex());
             glBegin(GL_QUADS);
             {
@@ -178,12 +209,13 @@ namespace ygopro
         if(dx > wd * 11.0f / 10.0f)
             dx = wd * 11.0f / 10.0f;
         for(size_t i = 0; i < side_size; ++i) {
-            TextureInfo* ti = std::get<1>(current_deck.side_deck[i]);
+            CardTextureInfo* cti = std::get<1>(current_deck.side_deck[i]);
             int limit = std::get<2>(current_deck.side_deck[i]);
-            if(ti == nullptr) {
-                ti = &imageMgr.GetCardTexture(std::get<0>(current_deck.side_deck[i])->code);
-                std::get<1>(current_deck.side_deck[i]) = ti;
+            if(cti == nullptr) {
+                cti = &imageMgr.GetCardTexture(std::get<0>(current_deck.side_deck[i])->code);
+                std::get<1>(current_deck.side_deck[i]) = cti;
             }
+            TextureInfo* ti = &cti->ti;
             glBindTexture(GL_TEXTURE_2D, ti->tex());
             glBegin(GL_QUADS);
             {

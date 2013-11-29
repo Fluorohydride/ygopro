@@ -14,75 +14,90 @@ namespace ygopro
 		
 	}
 
-	TextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
+	CardTextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
 			wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
-			auto& ti = card_textures[id];
+			auto& cti = card_textures[id];
 			if(!wxFileExists(file)) {
-				ti = textures["unknown"];
+				cti.ti = textures["unknown"];
+                cti.is_system = true;
 			} else {
                 auto& card_image = card_images[id];
-                if(card_image.img.LoadFile(file)) {
+                if(card_image.img.IsOk() || card_image.img.LoadFile(file)) {
                     LoadTexture(card_image);
-                    ti.src = &card_image;
-                    ti.lx = 0;
-                    ti.ly = 0;
-                    ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
-                    ti.ry = (double)card_image.img.GetHeight() / (double)card_image.t_height;
+                    cti.ti.src = &card_image;
+                    cti.ti.lx = 0;
+                    cti.ti.ly = 0;
+                    cti.ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
+                    cti.ti.ry = (double)card_image.img.GetHeight() / (double)card_image.t_height;
+                    cti.is_system = false;
                 } else {
                     card_images.erase(id);
-                    ti = textures["unknown"];
+                    cti.ti = textures["unknown"];
+                    cti.is_system = true;
                 }
 			}
-            return ti;
+            cti.ref_count++;
+            return cti;
 		}
+        iter->second.ref_count++;
 		return iter->second;
 	}
 
-	TextureInfo& ImageMgr::ReloadCardTexture(unsigned int id) {
-        auto& ti = card_textures[id];
+	CardTextureInfo& ImageMgr::ReloadCardTexture(unsigned int id) {
+        auto& cti = card_textures[id];
         auto iter = card_images.find(id);
         if(iter != card_images.end() && iter->second.t_index)
             glDeleteTextures(1, &iter->second.t_index);
         card_images.erase(id);
         wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
         if(!wxFileExists(file)) {
-            ti = textures["unknown"];
+            cti.ti = textures["unknown"];
+            cti.is_system = true;
         } else {
             auto& card_image = card_images[id];
             if(card_image.img.LoadFile(file)) {
                 LoadTexture(card_image);
-                ti.src = &card_image;
-                ti.lx = 0;
-                ti.ly = 0;
-                ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
-                ti.ry = (double)card_image.img.GetHeight() / (double)card_image.t_height;
+                cti.ti.src = &card_image;
+                cti.ti.lx = 0;
+                cti.ti.ly = 0;
+                cti.ti.rx = (double)card_image.img.GetWidth() / (double)card_image.t_width;
+                cti.ti.ry = (double)card_image.img.GetHeight() / (double)card_image.t_height;
+                cti.is_system = false;
             } else {
                 card_images.erase(id);
-                ti = textures["unknown"];
+                cti.ti = textures["unknown"];
+                cti.is_system = true;
             }
         }
-        return ti;
+        return cti;
 	}
 
     void ImageMgr::UnloadCardTexture(unsigned int id) {
-        card_textures.erase(id);
-        auto iter = card_images.find(id);
-        if(iter == card_images.end())
-           return;
-        if(iter->second.t_index)
-           glDeleteTextures(1, &iter->second.t_index);
-        card_images.erase(id);
+        auto iter = card_textures.find(id);
+        if(iter == card_textures.end())
+            return;
+        auto& cti = iter->second;
+        if(cti.ref_count == 0)
+            return;
+        cti.ref_count--;
+        if(!cti.is_system && cti.ref_count == 0 && cti.ti.src->t_index) {
+            glDeleteTextures(1, &cti.ti.src->t_index);
+            cti.ti.src->t_index = 0;
+        }
+        card_textures.erase(iter);
     }
     
 	void ImageMgr::UnloadAllCardTexture() {
         for(auto& card_image : card_images)
         {
-            unsigned int index = card_image.second.t_index;
-            if(index)
-                glDeleteTextures(1, &index);
+            if(card_image.second.t_index) {
+                glDeleteTextures(1, &card_image.second.t_index);
+                card_image.second.t_index = 0;
+            }
         }
+        card_textures.clear();
         card_images.clear();
 	}
 
@@ -150,12 +165,12 @@ namespace ygopro
             src_images.erase(name);
 	}
 
-	void ImageMgr::LoadImageConfig(const wxString& name) {
+	bool ImageMgr::LoadImageConfig(const wxString& name) {
 		wxXmlDocument doc;
         if(!wxFileExists(name))
-            return;
+            return false;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return;
+			return false;
         wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* child = root->GetChildren();
 		while (child) {
@@ -223,7 +238,6 @@ namespace ygopro
 			}
 			child = child->GetNext();
 		}
-		
 		TextureInfo& ti = textures["number"];
 		float w = (ti.rx - ti.lx) / 4;
 		float h = (ti.ry - ti.ly) / 4;
@@ -236,6 +250,7 @@ namespace ygopro
 			nti.ry = nti.ly + h;
 			text_texture.push_back(nti);
 		}
+        return true;
 	}
 
 }

@@ -10,7 +10,7 @@
 namespace ygopro
 {
     
-    DeckMgr deckMgr;
+    LimitRegulationMgr limitRegulationMgr;
     
     void DeckData::Clear() {
         main_deck.clear();
@@ -40,8 +40,9 @@ namespace ygopro
         wxTextInputStream ts(deck_file);
         bool side = false;
         unsigned long code;
-        for(wxString line = ts.ReadLine(); line.length() > 0; line = ts.ReadLine()) {
-            if(line[0] == wxT('#'))
+        while(!deck_file.Eof()) {
+            wxString line = ts.ReadLine();
+            if(line.IsEmpty() || line[0] == wxT('#'))
                 continue;
             if(line[0] == wxT('!')) {
                 side = true;
@@ -170,7 +171,7 @@ namespace ygopro
         return deck_string;
     }
     
-    bool DeckData::deck_sort(const std::tuple<CardData*, TextureInfo*, int>& c1, const std::tuple<CardData*, TextureInfo*, int>& c2) {
+    bool DeckData::deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2) {
         CardData* p1 = std::get<0>(c1);
         CardData* p2 = std::get<0>(c2);
         if((p1->type & 0x7) != (p2->type & 0x7))
@@ -193,7 +194,7 @@ namespace ygopro
         return p1->code < p2->code;
     }
     
-    unsigned int BanListData::get_hash() {
+    unsigned int LimitRegulation::get_hash() {
         if(hash)
             return hash;
         Hash32_SHA1 out;
@@ -205,23 +206,24 @@ namespace ygopro
         return hash;
     }
     
-    unsigned int BanListData::check_deck(DeckData& deck, unsigned int pool_type) {
+    unsigned int LimitRegulation::check_deck(DeckData& deck, unsigned int pool_type) {
         return 0;
     }
     
-    void DeckMgr::LoadBanLists(const wxString& file) {
+    void LimitRegulationMgr::LoadLimitRegulation(const wxString& file) {
         wxFileInputStream ban_file(file);
         if(!ban_file.IsOk())
             return;
         wxTextInputStream ts(ban_file);
         unsigned long code, count;
-        BanListData* plist = nullptr;
-        for(wxString line = ts.ReadLine(); line.length() > 0; line = ts.ReadLine()) {
-            if(line[0] == wxT('#'))
+        LimitRegulation* plist = nullptr;
+        while(!ban_file.Eof()) {
+            wxString line = ts.ReadLine();
+            if(line.IsEmpty() || line[0] == wxT('#'))
                 continue;
             if(line[0] == wxT('!')) {
-                banlists.resize(banlists.size() + 1);
-                plist = &(*banlists.rbegin());
+                limit_regulations.resize(limit_regulations.size() + 1);
+                plist = &(*limit_regulations.rbegin());
                 plist->name = line.Right(line.Length() - 1);
                 continue;
             }
@@ -234,26 +236,31 @@ namespace ygopro
                 continue;
             plist->counts[(unsigned int)code] = (unsigned int)count;
         }
-        if(banlists.size() > 0)
-            current_list = &banlists[0];
+        if(limit_regulations.size() > 0)
+            current_list = &limit_regulations[0];
     }
     
-    void DeckMgr::SetBanLists(unsigned int hash) {
-        for(auto& bld : banlists) {
-            if(bld.get_hash() == hash) {
-                current_list = &bld;
+    void LimitRegulationMgr::SetLimitRegulation(unsigned int hash) {
+        for(auto& lr : limit_regulations) {
+            if(lr.get_hash() == hash) {
+                current_list = &lr;
                 return;
             }
         }
     }
     
-    unsigned int DeckMgr::CheckCurrentList(unsigned int pool) {
+    void LimitRegulationMgr::SetLimitRegulation(LimitRegulation* lr) {
+        if(lr)
+            current_list = lr;
+    }
+    
+    unsigned int LimitRegulationMgr::CheckCurrentList(unsigned int pool) {
         if(!current_list)
             return DECK_NOERROR;
         return DECK_NOERROR;
     }
     
-    void DeckMgr::GetDeckCardLimitCount(DeckData& deck) {
+    void LimitRegulationMgr::GetDeckCardLimitCount(DeckData& deck) {
         if(!current_list) {
             for(auto& cd : deck.main_deck)
                 std::get<2>(cd) = 3;
@@ -289,7 +296,7 @@ namespace ygopro
         }
     }
     
-    unsigned int DeckMgr::GetCardLimitCount(unsigned int code) {
+    unsigned int LimitRegulationMgr::GetCardLimitCount(unsigned int code) {
         if(!current_list)
             return 3;
         auto iter = current_list->counts.find(code);

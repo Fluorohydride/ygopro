@@ -18,12 +18,12 @@ namespace ygopro
 {
 
     struct CardData;
-    struct TextureInfo;
+    struct CardTextureInfo;
     
 	struct DeckData {
-		std::vector<std::tuple<CardData*, TextureInfo*, int> > main_deck;
-		std::vector<std::tuple<CardData*, TextureInfo*, int> > extra_deck;
-		std::vector<std::tuple<CardData*, TextureInfo*, int> > side_deck;
+		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > main_deck;
+		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > extra_deck;
+		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > side_deck;
         
         void Clear();
         void Sort();
@@ -33,35 +33,37 @@ namespace ygopro
         void SaveToFile(const wxString& file);
         wxString SaveToString();
         
-        static bool deck_sort(const std::tuple<CardData*, TextureInfo*, int>& c1, const std::tuple<CardData*, TextureInfo*, int>& c2);
+        static bool deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
 	};
 
-    struct BanListData {
+    struct LimitRegulation {
         unsigned int hash;
 		wxString name;
 		std::map<unsigned int, unsigned int> counts;
         
-        BanListData(): hash(0) {}
+        LimitRegulation(): hash(0) {}
         unsigned int get_hash();
         unsigned int check_deck(DeckData& deck, unsigned int pool_flag);
 	};
     
-	class DeckMgr {
+	class LimitRegulationMgr {
 	public:
-        DeckMgr(): current_list(nullptr) {}
-		void LoadBanLists(const wxString& file);
-		void SetBanLists(unsigned int hash);
-        unsigned int CheckCurrentList(unsigned int pool);
+        LimitRegulationMgr(): current_list(nullptr) {}
+		void LoadLimitRegulation(const wxString& file);
+		void SetLimitRegulation(unsigned int hash);
+        void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);
         unsigned int GetCardLimitCount(unsigned int code);
+        unsigned int CheckCurrentList(unsigned int pool);
+        inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
         
 	private:
-		BanListData* current_list;
-        std::vector<BanListData> banlists;
+		LimitRegulation* current_list;
+        std::vector<LimitRegulation> limit_regulations;
 	};
 
 
-	extern DeckMgr deckMgr;
+	extern LimitRegulationMgr limitRegulationMgr;
 
 }
 

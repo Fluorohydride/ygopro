@@ -24,16 +24,17 @@ namespace ygopro {
             TransformProcessType(&PSN,kProcessTransformToForegroundApplication);
 #endif
 			if(!wxApp::OnInit())
-				return false;
-
+                return false;
 			wxInitAllImageHandlers();
-			commonCfg.LoadConfig("common.xml");
-			if(dataMgr.LoadDatas("cards.cdb"))
-				return true;
-            deckMgr.LoadBanLists("lflist.conf");
-            imageMgr.LoadImageConfig("textures.xml");
-            
-			editorFrame = new EditorFrame(1200, 720);
+			if(!commonCfg.LoadConfig("common.xml"))
+                return true;
+			if(dataMgr.LoadDatas(wxString(static_cast<const std::string&>(commonCfg["database"]))))
+                return true;
+            if(!imageMgr.LoadImageConfig(wxString(static_cast<const std::string&>(commonCfg["textures"]))))
+                return true;
+            limitRegulationMgr.LoadLimitRegulation(wxString(static_cast<const std::string&>(commonCfg["limit_regulation"])));
+
+			editorFrame = new EditorFrame(1080, 720);
 			editorFrame->Center();
 			editorFrame->Show();
 			return true;

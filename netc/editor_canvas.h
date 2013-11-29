@@ -26,7 +26,8 @@ namespace ygopro
 		virtual ~wxEditorCanvas();
 
         DeckData& getDeck() { return current_deck; }
-
+        void saveScreenshot(const wxString& file, bool clipboard = false);
+        
 		void drawScene();
 
 		// events

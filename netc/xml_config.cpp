@@ -4,10 +4,10 @@
 namespace ygopro
 {
 
-	void CommonConfig::LoadConfig(const wxString& name) {
+	bool CommonConfig::LoadConfig(const wxString& name) {
 		wxXmlDocument doc;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return;
+			return false;
 		wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* child = root->GetChildren();
 		while (child) {
@@ -24,6 +24,7 @@ namespace ygopro
 			}
 			child = child->GetNext();
 		}
+        return true;
 	}
 
 	void CommonConfig::SaveConfig(const wxString& name) {

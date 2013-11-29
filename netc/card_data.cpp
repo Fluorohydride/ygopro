@@ -7,10 +7,10 @@ namespace ygopro
 
 	DataMgr dataMgr;
 
-	int DataMgr::LoadDatas(const char* file) {
+	int DataMgr::LoadDatas(const wxString& file) {
 		_datas.clear();
 		sqlite3* pDB;
-		if(sqlite3_open(file, &pDB) != SQLITE_OK)
+		if(sqlite3_open(file.c_str(), &pDB) != SQLITE_OK)
 			return sqlite3_errcode(pDB);
 		sqlite3_stmt* pStmt;
 		const char* sql = "select * from datas,texts where datas.id=texts.id";
