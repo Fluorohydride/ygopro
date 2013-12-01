@@ -33,6 +33,13 @@ namespace ygopro
         void SaveToFile(const wxString& file);
         wxString SaveToString();
         
+        unsigned int mcount;
+        unsigned int scount;
+        unsigned int tcount;
+        unsigned int syncount;
+        unsigned int xyzcount;
+        unsigned int fuscount;
+
         static bool deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
 	};
 

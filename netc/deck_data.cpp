@@ -16,6 +16,12 @@ namespace ygopro
         main_deck.clear();
         extra_deck.clear();
         side_deck.clear();
+        mcount = 0;
+        scount = 0;
+        tcount = 0;
+        syncount = 0;
+        xyzcount = 0;
+        fuscount = 0;
     }
     
     void DeckData::Sort() {
@@ -52,13 +58,26 @@ namespace ygopro
             CardData* ptr = dataMgr[(unsigned int)code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
-            if(side) {
+            if(side)
                 side_deck.push_back(std::make_tuple(ptr, nullptr, 0));
-            } else {
-                if(ptr->type & 0x802040)
+            else {
+                if(ptr->type & 0x802040) {
                     extra_deck.push_back(std::make_tuple(ptr, nullptr, 0));
-                else
+                    if(ptr->type & 0x800000)
+                        xyzcount++;
+                    else if(ptr->type & 0x2000)
+                        syncount++;
+                    else
+                        fuscount++;
+                } else {
                     main_deck.push_back(std::make_tuple(ptr, nullptr, 0));
+                    if(ptr->type & 0x1)
+                        mcount++;
+                    else if(ptr->type & 0x2)
+                        scount++;
+                    else
+                        tcount++;
+                }
             }
         }
         return true;
@@ -90,12 +109,27 @@ namespace ygopro
                 for(unsigned int j = 0; j < count; ++j)
                     side_deck.push_back(std::make_tuple(ptr, nullptr, 0));
             } else {
-                if(ptr->type & 0x802040)
-                    for(unsigned int j = 0; j < count; ++j)
+                if(ptr->type & 0x802040) {
+                    for(unsigned int j = 0; j < count; ++j) {
                         extra_deck.push_back(std::make_tuple(ptr, nullptr, 0));
-                else
-                    for(unsigned int j = 0; j < count; ++j)
+                        if(ptr->type & 0x800000)
+                            xyzcount++;
+                        else if(ptr->type & 0x2000)
+                            syncount++;
+                        else
+                            fuscount++;
+                    }
+                } else {
+                    for(unsigned int j = 0; j < count; ++j) {
                         main_deck.push_back(std::make_tuple(ptr, nullptr, 0));
+                        if(ptr->type & 0x1)
+                            mcount++;
+                        else if(ptr->type & 0x2)
+                            scount++;
+                        else
+                            tcount++;
+                    }
+                }
             }
         }
         return true;

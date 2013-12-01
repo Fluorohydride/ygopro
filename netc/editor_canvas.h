@@ -20,9 +20,11 @@ namespace ygopro
         TextureInfo* t_buildbg;
         TextureInfo* t_deckbg;
         TextureInfo* t_font;
+        TextureInfo* t_hmask;
         TextureInfo* t_limits[3];
         DeckData current_deck;
-        
+        short hover_field;
+        short hover_index;
 	public:
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxEditorCanvas();
