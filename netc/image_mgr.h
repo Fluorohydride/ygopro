@@ -1,10 +1,8 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
-#include <GL/glew.h>
 #include "wx/image.h"
 #include "wx/xml/xml.h"
-#include <array>
 #include <vector>
 #include <unordered_map>
 

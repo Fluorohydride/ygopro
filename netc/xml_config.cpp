@@ -1,4 +1,3 @@
-#include "../common/common.h"
 #include "xml_config.h"
 
 namespace ygopro

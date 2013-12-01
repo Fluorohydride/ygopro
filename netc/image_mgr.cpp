@@ -1,5 +1,13 @@
 #include "image_mgr.h"
 #include "game_frame.h"
+#include "../common/common.h"
+
+#ifdef __WXMAC__
+#include <OpenGL/OpenGL.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace ygopro
 {
@@ -87,11 +95,11 @@ namespace ygopro
             cti.ti.src->t_index = 0;
         }
         card_textures.erase(iter);
+		card_images.erase(id);
     }
     
 	void ImageMgr::UnloadAllCardTexture() {
-        for(auto& card_image : card_images)
-        {
+        for(auto& card_image : card_images) {
             if(card_image.second.t_index) {
                 glDeleteTextures(1, &card_image.second.t_index);
                 card_image.second.t_index = 0;

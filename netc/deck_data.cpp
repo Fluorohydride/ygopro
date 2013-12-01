@@ -76,11 +76,11 @@ namespace ygopro
         if(deck.size() % 5)
             return false;
         for(size_t i = 0; i < deck.size(); i += 5) {
-            unsigned int packed_data = (unsigned int)base64_dec_table[(unsigned char)deck[i]];
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 1]]) << 6;
+            unsigned int packed_data = (unsigned int)base64_dec_table[(unsigned char)deck[i + 4]];
+            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 3]]) << 6;
             packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 2]]) << 12;
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 3]]) << 18;
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 4]]) << 24;
+            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 1]]) << 18;
+            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 0]]) << 24;
             unsigned int code = packed_data & 0x7ffffff;
             unsigned int count = (packed_data >> 27) & 0x3;
             CardData* ptr = dataMgr[code];
@@ -131,11 +131,11 @@ namespace ygopro
                 i++;
             }
             unsigned int packed_data = (code & 0x7ffffff) | (count << 27);
-            deck_pstr[0] = base64_chars[packed_data & 0x3f];
-            deck_pstr[1] = base64_chars[(packed_data >> 6) & 0x3f];
+            deck_pstr[4] = base64_chars[packed_data & 0x3f];
+            deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
             deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
-            deck_pstr[3] = base64_chars[(packed_data >> 18) & 0x3f];
-            deck_pstr[4] = base64_chars[(packed_data >> 24) & 0x3f];
+            deck_pstr[1] = base64_chars[(packed_data >> 18) & 0x3f];
+            deck_pstr[0] = base64_chars[(packed_data >> 24) & 0x3f];
             deck_pstr += 5;
         }
         for(size_t i = 0; i < extra_deck.size(); ++i) {
@@ -146,11 +146,11 @@ namespace ygopro
                 i++;
             }
             unsigned int packed_data = (code & 0x7ffffff) | (count << 27);
-            deck_pstr[0] = base64_chars[packed_data & 0x3f];
-            deck_pstr[1] = base64_chars[(packed_data >> 6) & 0x3f];
+            deck_pstr[4] = base64_chars[packed_data & 0x3f];
+            deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
             deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
-            deck_pstr[3] = base64_chars[(packed_data >> 18) & 0x3f];
-            deck_pstr[4] = base64_chars[(packed_data >> 24) & 0x3f];
+            deck_pstr[1] = base64_chars[(packed_data >> 18) & 0x3f];
+            deck_pstr[0] = base64_chars[(packed_data >> 24) & 0x3f];
             deck_pstr += 5;
         }
         for(size_t i = 0; i < side_deck.size(); ++i) {
@@ -161,11 +161,11 @@ namespace ygopro
                 i++;
             }
             unsigned int packed_data = (code & 0x7ffffff) | (count << 27) | 0x20000000;
-            deck_pstr[0] = base64_chars[packed_data & 0x3f];
-            deck_pstr[1] = base64_chars[(packed_data >> 6) & 0x3f];
+            deck_pstr[4] = base64_chars[packed_data & 0x3f];
+            deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
             deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
-            deck_pstr[3] = base64_chars[(packed_data >> 18) & 0x3f];
-            deck_pstr[4] = base64_chars[(packed_data >> 24) & 0x3f];
+            deck_pstr[1] = base64_chars[(packed_data >> 18) & 0x3f];
+            deck_pstr[0] = base64_chars[(packed_data >> 24) & 0x3f];
             deck_pstr += 5;
         }
         return deck_string;
@@ -236,17 +236,16 @@ namespace ygopro
                 continue;
             plist->counts[(unsigned int)code] = (unsigned int)count;
         }
-        if(limit_regulations.size() > 0)
-            current_list = &limit_regulations[0];
+        limit_regulations.resize(limit_regulations.size() + 1);
+        plist = &(*limit_regulations.rbegin());
+        plist->name = wxT("-- No limit --");
+        current_list = &limit_regulations[0];
     }
     
-    void LimitRegulationMgr::SetLimitRegulation(unsigned int hash) {
-        for(auto& lr : limit_regulations) {
-            if(lr.get_hash() == hash) {
-                current_list = &lr;
-                return;
-            }
-        }
+    void LimitRegulationMgr::SetLimitRegulation(unsigned int id) {
+		if (id >= limit_regulations.size())
+			return;
+		current_list = &limit_regulations[id];
     }
     
     void LimitRegulationMgr::SetLimitRegulation(LimitRegulation* lr) {

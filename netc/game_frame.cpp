@@ -1,11 +1,7 @@
-#include "game_frame.h"
 #include "wx/wx.h"
 #include "wx/glcanvas.h"
-#include "wx/ribbon/bar.h"
-#include "wx/ribbon/buttonbar.h"
-#include "wx/ribbon/gallery.h"
-#include "wx/ribbon/toolbar.h"
 #include "duel_canvas.h"
+#include "game_frame.h"
 
 namespace ygopro
 {

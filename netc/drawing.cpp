@@ -1,6 +1,12 @@
-#include "GL/glew.h"
 #include "duel_canvas.h"
 #include "image_mgr.h"
+
+#ifdef __WXMAC__
+#include <OpenGL/OpenGL.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 
 namespace ygopro
 {

@@ -50,7 +50,7 @@ namespace ygopro
 	public:
         LimitRegulationMgr(): current_list(nullptr) {}
 		void LoadLimitRegulation(const wxString& file);
-		void SetLimitRegulation(unsigned int hash);
+		void SetLimitRegulation(unsigned int id);
         void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);
         unsigned int GetCardLimitCount(unsigned int code);

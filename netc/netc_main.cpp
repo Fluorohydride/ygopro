@@ -1,5 +1,3 @@
-#include "../common/common.h"
-#include "../common/hash.h"
 #include "game_frame.h"
 #include "editor_frame.h"
 #include "image_mgr.h"

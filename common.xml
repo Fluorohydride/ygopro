@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
-  <setting name="image_path" value="./image" type="string"/>
+  <setting name="image_path" value="../ygo/pics" type="string"/>
   <setting name="image_size_x" value="177" type="integer"/>
   <setting name="image_size_y" value="254" type="integer"/>
   <setting name="tex_size_x" value="256" type="integer"/>
@@ -11,4 +11,5 @@
   <setting name="database" value="./conf/cards.cdb" type="string"/>
   <setting name="textures" value="./conf/textures.xml" type="string"/>
   <setting name="limit_regulation" value="./conf/lflist.conf" type="string"/>
+  <setting name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}" type="string"/>
 </Common>

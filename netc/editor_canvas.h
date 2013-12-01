@@ -18,6 +18,8 @@ namespace ygopro
 		unsigned int glwidth;
 		unsigned int glheight;
         TextureInfo* t_buildbg;
+        TextureInfo* t_deckbg;
+        TextureInfo* t_font;
         TextureInfo* t_limits[3];
         DeckData current_deck;
         
@@ -25,9 +27,12 @@ namespace ygopro
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxEditorCanvas();
 
-        DeckData& getDeck() { return current_deck; }
-        void saveScreenshot(const wxString& file, bool clipboard = false);
+        DeckData& GetDeck() { return current_deck; }
+		void ClearDeck();
+        void SaveScreenshot(const wxString& file, bool clipboard = false);
         
+        void drawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit);
+        void drawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry);
 		void drawScene();
 
 		// events

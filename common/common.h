@@ -18,7 +18,6 @@
 
 #ifdef _WIN32
 
-#include <WinSock2.h>
 #include <Windows.h>
 
 #ifndef HAVE_SOCKLEN_T

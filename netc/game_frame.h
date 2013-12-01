@@ -1,14 +1,12 @@
 #ifndef _GAME_WINDOW_H_
 #define _GAME_WINDOW_H_
 
-#include <gl/glew.h>
-#include "../common/common.h"
 #include "wx/frame.h"
-#include <vector>
-#include <queue>
-
 #include "xml_config.h"
 #include "duel_message.h"
+#include "../common/random.h"
+#include <vector>
+#include <queue>
 
 namespace ygopro
 {

@@ -4,6 +4,7 @@
   <image name="2" path="./conf/sleeve.jpg"/>
   <image name="3" path="./conf/unknown.jpg"/>
   <image name="4" path="./conf/bg.jpg"/>
+  <image name="5" path="./conf/deckbg.png"/>
   <texture src="1" name="field" x="0" y="0" w="256" h="256"/>
   <texture src="1" name="number" x="256" y="0" w="256" h="256"/>
   <texture src="1" name="negated" x="0" y="256" w="128" h="128"/>
@@ -34,6 +35,7 @@
   <texture src="3" name="unknown" x="0" y="0" w="177" h="254"/>
   <texture src="4" name="duelbg" x="0" y="0" w="1024" h="640"/>
   <texture src="4" name="buildbg" x="0" y="0" w="1024" h="640"/>
+  <texture src="5" name="deckbg" x="0" y="0" w="512" h="512"/>
   <layout name="avatar_frame0" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
   <layout name="avatar_frame1" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
   <layout name="avatar0" style="static" click="avatar0" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>

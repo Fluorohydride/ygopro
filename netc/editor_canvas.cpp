@@ -21,6 +21,8 @@ namespace ygopro
         glcontext = new wxGLContext(this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         t_buildbg = &imageMgr.textures["buildbg"];
+        t_deckbg = &imageMgr.textures["deckbg"];
+        t_font = &imageMgr.textures["number"];
         t_limits[0] = &imageMgr.textures["limit0"];
         t_limits[1] = &imageMgr.textures["limit1"];
         t_limits[2] = &imageMgr.textures["limit2"];
@@ -30,7 +32,13 @@ namespace ygopro
 		delete glcontext;
 	}
 
-    void wxEditorCanvas::saveScreenshot(const wxString& name, bool clipboard) {
+	void wxEditorCanvas::ClearDeck() {
+		wxGLCanvas::SetCurrent(*glcontext);
+		current_deck.Clear();
+		imageMgr.UnloadAllCardTexture();
+	}
+
+    void wxEditorCanvas::SaveScreenshot(const wxString& name, bool clipboard) {
         wxGLCanvas::SetCurrent(*glcontext);
         imageMgr.InitTextures();
 		drawScene();
@@ -95,6 +103,52 @@ namespace ygopro
 
 	}
     
+    void wxEditorCanvas::drawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {
+        glBindTexture(GL_TEXTURE_2D, t_font->tex());
+        glBegin(GL_QUADS);
+        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+        if(limit) {
+            float dx = (rx - lx) / size;
+            for(int i = 0; i < size; ++i) {
+                TextureInfo& ti = imageMgr.text_texture[str[i] - '*'];
+                glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+                glTexCoord2f(ti.lx, ti.ly); glVertex2f(lx, ly);
+                glTexCoord2f(ti.lx, ti.ry); glVertex2f(lx, ry);
+                glTexCoord2f(ti.rx, ti.ry); glVertex2f(lx + dx * i, ry);
+                glTexCoord2f(ti.rx, ti.ly); glVertex2f(lx + dx * i, ly);
+            }
+        } else {
+            float dx = rx - ry;
+            for(int i = 0; i < size; ++i) {
+                TextureInfo& ti = imageMgr.text_texture[str[i] - '*'];
+                glTexCoord2f(ti.lx, ti.ly); glVertex2f(lx, ly);
+                glTexCoord2f(ti.lx, ti.ry); glVertex2f(lx, ry);
+                glTexCoord2f(ti.rx, ti.ry); glVertex2f(lx + dx * i, ry);
+                glTexCoord2f(ti.rx, ti.ly); glVertex2f(lx + dx * i, ly);
+            }
+        }
+        glEnd();
+    }
+
+    void wxEditorCanvas::drawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry) {
+        glBindTexture(GL_TEXTURE_2D, t_font->tex());
+        glBegin(GL_QUADS);
+        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+        float dx = (rx - lx) / 2;
+        TextureInfo& ti1 = imageMgr.text_texture[number / 10 + '0'];
+        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+        glTexCoord2f(ti1.lx, ti1.ly); glVertex2f(lx, ly);
+        glTexCoord2f(ti1.lx, ti1.ry); glVertex2f(lx, ry);
+        glTexCoord2f(ti1.rx, ti1.ry); glVertex2f(lx + dx, ry);
+        glTexCoord2f(ti1.rx, ti1.ly); glVertex2f(lx + dx, ly);
+        TextureInfo& ti2 = imageMgr.text_texture[number % 10 + '0'];
+        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+        glTexCoord2f(ti2.lx, ti2.ly); glVertex2f(lx + dx, ly);
+        glTexCoord2f(ti2.lx, ti2.ry); glVertex2f(lx + dx, ry);
+        glTexCoord2f(ti2.rx, ti2.ry); glVertex2f(rx, ry);
+        glTexCoord2f(ti2.rx, ti2.ly); glVertex2f(rx, ly);
+    }
+
 	void wxEditorCanvas::drawScene() {
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
@@ -121,6 +175,15 @@ namespace ygopro
         glEnd();
         glEnable(GL_BLEND);
         glBlendFunc(GL_ONE_MINUS_SRC_ALPHA, GL_SRC_ALPHA);
+        glBindTexture(GL_TEXTURE_2D, t_deckbg->tex());
+        glBegin(GL_QUADS);
+        {
+            glTexCoord2f(t_deckbg->lx, t_deckbg->ly); glVertex2f(-1.0f, 1.0f);
+            glTexCoord2f(t_deckbg->lx, t_deckbg->ry); glVertex2f(-1.0f, -1.0f);
+            glTexCoord2f(t_deckbg->rx, t_deckbg->ry); glVertex2f(1.0f, -1.0f);
+            glTexCoord2f(t_deckbg->rx, t_deckbg->ly); glVertex2f(1.0f, 1.0f);
+        }
+        glEnd();
         size_t main_size = current_deck.main_deck.size();
         float wd = 0.2f * glheight / glwidth;
         float ht = 0.29f;
@@ -131,7 +194,7 @@ namespace ygopro
             line_size = (main_size - 1) / 4 + 1;
         if(line_size < 10)
             line_size = 10;
-        float sx = -0.85f, sy = 0.90f;
+        float sx = -0.85f, sy = 0.92f;
         float dx = (1.8f - wd) / (line_size - 1);
         if(dx > wd * 11.0f / 10.0f)
             dx = wd * 11.0f / 10.0f;
@@ -169,7 +232,7 @@ namespace ygopro
         }
         size_t extra_size = current_deck.extra_deck.size();
         sx = -0.85f;
-        sy = -0.32f;
+        sy = -0.31f;
         dx = (1.8f - wd) / (extra_size - 1);
         if(dx > wd * 11.0f / 10.0f)
             dx = wd * 11.0f / 10.0f;
