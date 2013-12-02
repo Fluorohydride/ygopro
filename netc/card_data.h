@@ -30,9 +30,15 @@ namespace ygopro
 	public:
 		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
-
+        
+        static wxString GetInfoString(unsigned int arctype, unsigned int attr, unsigned int race);
+        static wxString GetAttributeString(unsigned int attr);
+        static wxString GetRaceString(unsigned int race);
+        static wxString GetTypeString(unsigned int arctype);
+        
 	private:
 		std::unordered_map<unsigned int, CardData> _datas;
+        
 	};
 
 	extern DataMgr dataMgr;

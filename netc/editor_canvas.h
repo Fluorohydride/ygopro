@@ -25,6 +25,8 @@ namespace ygopro
         DeckData current_deck;
         short hover_field;
         short hover_index;
+        unsigned int hover_code;
+        
 	public:
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxEditorCanvas();

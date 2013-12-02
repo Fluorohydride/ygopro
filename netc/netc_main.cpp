@@ -31,7 +31,8 @@ namespace ygopro {
             if(!imageMgr.LoadImageConfig(wxString(static_cast<const std::string&>(commonCfg["textures"]))))
                 return true;
             limitRegulationMgr.LoadLimitRegulation(wxString(static_cast<const std::string&>(commonCfg["limit_regulation"])));
-
+            stringCfg.LoadConfig("./conf/strings.xml");
+            
 			editorFrame = new EditorFrame(1080, 720);
 			editorFrame->Center();
 			editorFrame->Show();

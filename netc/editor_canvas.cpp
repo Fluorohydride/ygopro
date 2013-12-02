@@ -1,6 +1,7 @@
-#include <wx/image.h>
-#include <wx/clipbrd.h>
+#include "wx/image.h"
+#include "wx/clipbrd.h"
 #include "image_mgr.h"
+#include "editor_frame.h"
 #include "editor_canvas.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -29,6 +30,7 @@ namespace ygopro
         t_limits[2] = &imageMgr.textures["limit2"];
         hover_field = 0;
         hover_index = 0;
+        hover_code = 0;
 	}
 
 	wxEditorCanvas::~wxEditorCanvas() {
@@ -92,15 +94,16 @@ namespace ygopro
         float fy = -pt.y / (float)glheight * 2.0f + 1.0f;
         short pre_field = hover_field;
         short pre_index = hover_index;
+        unsigned int pre_code = hover_code;
         hover_field = 0;
         hover_index = 0;
         float wd = 0.2f * glheight / glwidth;
         float ht = 0.29f;
         if(fx >= -0.85f && fx <= 0.95f) {
             if(fy <= 0.92f && fy >= -0.28) { //main
-                size_t main_size = current_deck.main_deck.size();
+                int main_size = (int)current_deck.main_deck.size();
                 if(main_size) {
-                    size_t line_size = 18.0f / 11 / wd;
+                    int line_size = 18.0f / 11 / wd;
                     if(main_size > line_size * 4)
                         line_size = (main_size - 1) / 4 + 1;
                     if(line_size < 10)
@@ -109,8 +112,8 @@ namespace ygopro
                     if(dx > wd * 11.0f / 10.0f)
                         dx = wd * 11.0f / 10.0f;
                     float dy = 0.3f;
-                    size_t xindex = (fx + 0.85f) / dx;
-                    size_t yindex = (0.92f - fy) / dy;
+                    int xindex = (fx + 0.85f) / dx;
+                    int yindex = (0.92f - fy) / dy;
                     if(xindex < 0)
                         xindex = 0;
                     if(yindex < 0)
@@ -127,47 +130,48 @@ namespace ygopro
                         if(hover_index >= main_size) {
                             hover_field = 0;
                             hover_index = 0;
-                        }
+                        } else
+                            hover_code = std::get<0>(current_deck.main_deck[hover_index])->code;
                     }
                 }
             } else if(fy <= -0.31f && fy >= -0.60f) { //extra
-                size_t extra_size = current_deck.extra_deck.size();
+                int extra_size = (int)current_deck.extra_deck.size();
                 if(extra_size) {
                     float dx = (1.8f - wd) / (extra_size - 1);
                     if(dx > wd * 11.0f / 10.0f)
                         dx = wd * 11.0f / 10.0f;
-                    size_t index = (fx + 0.85f) / dx;
-                    if(index < 0)
-                        index = 0;
+                    int index = (fx + 0.85f) / dx;
                     if(index >= extra_size)
                         index = extra_size - 1;
                     float sx = -0.85 + dx * index;
                     if(fx - sx <= wd) {
                         hover_field = 2;
                         hover_index = (short)index;
+                        hover_code = std::get<0>(current_deck.extra_deck[hover_index])->code;
                     }
                 }
             } else if(fy <= -0.64f && fy >= -0.93f) { //side
-                size_t side_size = current_deck.side_deck.size();
+                int side_size = (int)current_deck.side_deck.size();
                 if(side_size) {
                     float dx = (1.8f - wd) / (side_size - 1);
                     if(dx > wd * 11.0f / 10.0f)
                         dx = wd * 11.0f / 10.0f;
-                    size_t index = (fx + 0.85f) / dx;
-                    if(index < 0)
-                        index = 0;
+                    int index = (fx + 0.85f) / dx;
                     if(index >= side_size)
                         index = side_size - 1;
                     float sx = -0.85 + dx * index;
                     if(fx - sx <= wd) {
                         hover_field = 3;
                         hover_index = (short)index;
+                        hover_code = std::get<0>(current_deck.side_deck[hover_index])->code;
                     }
                 }
             }
         }
         if(pre_field != hover_field || pre_index != hover_index)
             Refresh();
+        if(pre_code != hover_code && hover_code != 0)
+            editorFrame->SetCardInfo(hover_code);
 	}
 
 	void wxEditorCanvas::eventMouseWheelMoved(wxMouseEvent& evt){
@@ -234,6 +238,7 @@ namespace ygopro
         glTexCoord2f(ti2.lx, ti2.ry); glVertex2f(lx + dx, ry);
         glTexCoord2f(ti2.rx, ti2.ry); glVertex2f(rx, ry);
         glTexCoord2f(ti2.rx, ti2.ly); glVertex2f(rx, ly);
+        glEnd();
     }
 
 	void wxEditorCanvas::drawScene() {

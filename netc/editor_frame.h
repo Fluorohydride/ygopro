@@ -2,15 +2,16 @@
 #define _DEFRAME_H_
 
 #include "wx/wx.h"
-#include "wx/aui/aui.h"
 #include "wx/frame.h"
 #include "wx/glcanvas.h"
+#include "wx/richtext/richtextctrl.h"
+#include "wx/textctrl.h"
 
 namespace ygopro
 {
 
     class wxEditorCanvas;
-
+    
     class EditorFrame : public wxFrame {
 
         enum {
@@ -29,12 +30,15 @@ namespace ygopro
             ID_REGULATION,
             ID_REGULATION_END = ID_REGULATION + 100,
             ID_MENUEND,
+            ID_RTC_CARD,
         };
 
     public:
         EditorFrame(int sx, int sy);
         ~EditorFrame();
 
+        void SetCardInfo(unsigned int id);
+        
         void OnDeckLoad(wxCommandEvent& evt);
         void OnDeckSave(wxCommandEvent& evt);
         void OnDeckSaveAs(wxCommandEvent& evt);
@@ -50,11 +54,14 @@ namespace ygopro
         void OnToolOpenBrowser(wxCommandEvent& evt);
 
         void OnRegulationChange(wxCommandEvent& evt);
-
+        
+        void OnUrlClicked(wxTextUrlEvent& evt);
+        
     private:
-        wxAuiManager m_auiManager;
         wxString current_file;
         wxEditorCanvas* editor_canvas;
+        wxStaticBitmap* card_image;
+        wxRichTextCtrl* card_info;
     };
 
     extern EditorFrame* editorFrame;

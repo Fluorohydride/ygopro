@@ -30,9 +30,9 @@ namespace ygopro
 	};
 
 	extern GameFrame* mainFrame;
-	extern Random globalRandom;
+    extern Random globalRandom;
 	extern CommonConfig commonCfg;
-
+    extern CommonConfig stringCfg;
 }
 
 #endif //_GAME_H_

@@ -12,4 +12,5 @@
   <setting name="textures" value="./conf/textures.xml" type="string"/>
   <setting name="limit_regulation" value="./conf/lflist.conf" type="string"/>
   <setting name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}" type="string"/>
+  <setting name="full_width_space" value="1" type="integer"/>
 </Common>

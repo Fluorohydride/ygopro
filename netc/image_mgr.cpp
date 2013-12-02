@@ -3,7 +3,8 @@
 #include "../common/common.h"
 
 #ifdef __WXMAC__
-#include <OpenGL/OpenGL.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
 #else
 #include <GL/gl.h>
 #include <GL/glu.h>

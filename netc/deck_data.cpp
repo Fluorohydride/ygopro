@@ -1,9 +1,9 @@
 #include "card_data.h"
 #include "deck_data.h"
 
-#include <wx/wfstream.h>
-#include <wx/txtstrm.h>
-#include <wx/tokenzr.h>
+#include "wx/wfstream.h"
+#include "wx/txtstrm.h"
+#include "wx/tokenzr.h"
 #include "../common/hash.h"
 #include <algorithm>
 

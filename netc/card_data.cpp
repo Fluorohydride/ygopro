@@ -61,4 +61,27 @@ namespace ygopro
 		return &iter->second;
 	}
 
+    wxString DataMgr::GetInfoString(unsigned int arctype, unsigned int attr, unsigned int race) {
+        if(arctype & 0x1) {
+            
+        } else if(arctype & 0x2) {
+            
+        } else {
+            
+        }
+        return "";
+    }
+    
+    wxString DataMgr::GetAttributeString(unsigned int attr) {
+        return "";
+    }
+    
+    wxString DataMgr::GetRaceString(unsigned int race) {
+        return "";
+    }
+    
+    wxString DataMgr::GetTypeString(unsigned int arctype) {
+        return "";
+    }
+    
 }

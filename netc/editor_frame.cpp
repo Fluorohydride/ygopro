@@ -1,11 +1,11 @@
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
 #include <wx/utils.h>
-#include <wx/richtext/richtextctrl.h>
 #include "editor_frame.h"
 #include "editor_canvas.h"
 #include "game_frame.h"
 #include "image_mgr.h"
+#include "card_data.h"
 #include "deck_data.h"
 
 namespace ygopro
@@ -14,7 +14,7 @@ namespace ygopro
     EditorFrame* editorFrame = nullptr;
 
     EditorFrame::EditorFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, "YGOpro Deck Editor", wxDefaultPosition, wxSize(sx, sy)) {
-        m_auiManager.SetManagedWindow(this);
+        
         wxMenuBar* menu_bar = new wxMenuBar;
         wxMenu* m_deck = new wxMenu();
         m_deck->Append(ID_DECK_LOAD, wxT("Load\tCTRL+D"));
@@ -27,7 +27,7 @@ namespace ygopro
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveAs, this, ID_DECK_SAVEAS);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoadString, this, ID_DECK_LOADSTR);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveString, this, ID_DECK_SAVESTR);
-
+        
         wxMenu* m_tool = new wxMenu;
         m_tool->Append(ID_TOOL_CLEAR, wxT("Clear\tCTRL+E"));
         m_tool->Append(ID_TOOL_SORT, wxT("Sort\tCTRL+R"));
@@ -58,33 +58,94 @@ namespace ygopro
         menu_bar->Append(m_limit, wxT("Limit Regulation"));
         SetMenuBar(menu_bar);
 
-        wxStaticBitmap* bmpCardImage = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
-        wxRichTextCtrl* textCtrl = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize,
-            wxTE_MULTILINE | wxTE_LEFT | wxTE_BESTWRAP | wxTE_READONLY);
-        int wx_gl_attribs[] ={ WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
-        editor_canvas= new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
+        card_image = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
+        card_info = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(240, 400), wxTE_DONTWRAP | wxRE_READONLY | wxRE_MULTILINE);
+        card_info->Bind(wxEVT_TEXT_URL, &EditorFrame::OnUrlClicked, this, wxID_ANY);
+        card_info->GetCaret()->Hide();
+        int wx_gl_attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
+        editor_canvas = new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
 
-        wxPanel* infoPanel = new wxPanel(this, wxID_ANY, wxPoint(0, 0), wxSize(200, 600));
-        wxBoxSizer *sz=new wxBoxSizer(wxVERTICAL);
-
+        wxBoxSizer *sz = new wxBoxSizer(wxVERTICAL);
         sz->AddSpacer(5);
-        sz->Add(bmpCardImage, 0, wxALIGN_CENTER_HORIZONTAL);
+        sz->Add(card_image, 0, wxALIGN_CENTER_HORIZONTAL, 5);
         sz->AddSpacer(5);
-        sz->Add(textCtrl, 1, wxEXPAND | wxALL);
-        infoPanel->SetSizer(sz);
-
-        m_auiManager.AddPane(infoPanel, wxAuiPaneInfo().Name(wxT("Text")).Caption(wxT("Card Information")).Left()
-            .CloseButton(false).Movable(false).Floatable(false).CaptionVisible(false));
-        m_auiManager.AddPane(editor_canvas, wxAuiPaneInfo().CenterPane());
-        m_auiManager.Update();
+        sz->Add(card_info, 1, wxEXPAND | wxALL, 5);
+        wxBoxSizer *sz2 = new wxBoxSizer(wxHORIZONTAL);
+        sz2->Add(sz);
+        sz2->Add(editor_canvas, 1, wxEXPAND | wxALL);
+        SetSizer(sz2);
 
         editorFrame = this;
+        SetCardInfo(0);
+        editor_canvas->SetFocus();
     }
 
     EditorFrame::~EditorFrame() {
-        m_auiManager.UnInit();
     }
 
+    void EditorFrame::SetCardInfo(unsigned int id) {
+        if(id == 0) {
+            TextureInfo& sv = imageMgr.textures["sleeve1"];
+            if(sv.src == nullptr)
+                return;
+            card_info->Clear();
+            int x1 = sv.src->t_width * sv.lx;
+            int y1 = sv.src->t_height * sv.ly;
+            int x2 = sv.src->t_width * sv.rx;
+            int y2 = sv.src->t_height * sv.ry;
+            card_image->SetBitmap(wxBitmap(sv.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1))));
+        } else {
+            wxImage card_img;
+            wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
+            if(wxFileExists(file) && card_img.LoadFile(file)) {
+                card_image->SetBitmap(wxBitmap(card_img));
+            } else {
+                TextureInfo& sv = imageMgr.textures["unknown"];
+                if(sv.src == nullptr)
+                    return;
+                int x1 = sv.src->t_width * sv.lx;
+                int y1 = sv.src->t_height * sv.ly;
+                int x2 = sv.src->t_width * sv.rx;
+                int y2 = sv.src->t_height * sv.ry;
+                card_image->SetBitmap(wxBitmap(sv.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1))));
+            }
+            card_info->Clear();
+            CardData* cd = dataMgr[id];
+            if(cd == nullptr)
+                return;
+            auto full_width_space = commonCfg["full_width_space"];
+            wxString card_name = cd->name;
+            wxRichTextAttr attr;
+            card_info->SetDefaultStyle(attr);
+            card_info->BeginFontSize(18);
+            card_info->BeginBold();
+            card_info->WriteText(card_name);
+            card_info->EndBold();
+            card_info->EndFontSize();
+            card_info->Newline();
+            if(cd->level) {
+                card_info->BeginTextColour(wxColour(0, 0, 255));
+                for(int i = 0; i < cd->level; ++i)
+                    card_info->WriteText(wxT("★"));
+                card_info->Newline();
+                if(cd->attack >= 0 && cd->defence >= 0)
+                    card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:%d"), cd->attack, cd->defence));
+                else if(cd->attack >= 0)
+                    card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:????"), cd->defence));
+                else
+                    card_info->WriteText(wxString::Format(wxT("ATK:???? / DEF:%d"), cd->attack));
+                card_info->EndTextColour();
+                card_info->Newline();
+            }
+            card_info->WriteText(wxT("====="));
+            card_info->Newline();
+            wxString card_text = cd->texts;
+            if(full_width_space)
+                card_text.Replace(wxT(" "), wxT("　"));
+            card_info->WriteText(card_text);
+        }
+    }
+    
     void EditorFrame::OnDeckLoad(wxCommandEvent& evt) {
         wxFileDialog fd(this, wxT("Choose"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
         if(fd.ShowModal() != wxID_OK)
@@ -211,4 +272,10 @@ namespace ygopro
         limitRegulationMgr.GetDeckCardLimitCount(editor_canvas->GetDeck());
         editor_canvas->Refresh();
     }
+    
+    void EditorFrame::OnUrlClicked(wxTextUrlEvent& evt) {
+        wxString url = evt.GetString();
+        wxLaunchDefaultBrowser(url);
+    }
+
 }

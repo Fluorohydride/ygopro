@@ -9,6 +9,7 @@ namespace ygopro
 	GameFrame* mainFrame = nullptr;
 	Random globalRandom;
 	CommonConfig commonCfg;
+    CommonConfig stringCfg;
 
 	BEGIN_EVENT_TABLE(GameFrame, wxFrame)
 	END_EVENT_TABLE()
