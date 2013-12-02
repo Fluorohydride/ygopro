@@ -78,6 +78,15 @@ namespace ygopro
         editorFrame = this;
         SetCardInfo(0);
         editor_canvas->SetFocus();
+
+        TextureInfo& st = imageMgr.textures["star"];
+        if(st.src) {
+            int x1 = st.src->t_width * st.lx;
+            int y1 = st.src->t_height * st.ly;
+            int x2 = st.src->t_width * st.rx;
+            int y2 = st.src->t_height * st.ry;
+            star_img = st.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1));
+        }
     }
 
     EditorFrame::~EditorFrame() {
@@ -117,17 +126,17 @@ namespace ygopro
             wxString card_name = cd->name;
             wxRichTextAttr attr;
             card_info->SetDefaultStyle(attr);
-            card_info->BeginFontSize(18);
+            card_info->BeginFontSize(16);
             card_info->BeginBold();
             card_info->WriteText(card_name);
             card_info->EndBold();
             card_info->EndFontSize();
             card_info->Newline();
             if(cd->level) {
-                card_info->BeginTextColour(wxColour(0, 0, 255));
-                for(int i = 0; i < cd->level; ++i)
-                    card_info->WriteText(wxT("★"));
+                for(unsigned int i = 0; i < cd->level; ++i)
+                    card_info->WriteImage(star_img);
                 card_info->Newline();
+                card_info->BeginTextColour(wxColour(0, 0, 255));
                 if(cd->attack >= 0 && cd->defence >= 0)
                     card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:%d"), cd->attack, cd->defence));
                 else if(cd->attack >= 0)
@@ -140,9 +149,32 @@ namespace ygopro
             card_info->WriteText(wxT("====="));
             card_info->Newline();
             wxString card_text = cd->texts;
+            wxString space = static_cast<const std::string&>(stringCfg["full_width_space"]);
+            wxString parse_begin = static_cast<const std::string&>(stringCfg["parse_begin"]);
+            wxString parse_end = static_cast<const std::string&>(stringCfg["parse_end"]);
             if(full_width_space)
-                card_text.Replace(wxT(" "), wxT("　"));
-            card_info->WriteText(card_text);
+                card_text.Replace(wxT(" "), space);
+            size_t start = 0, begin = 0, end = 0, length = card_text.length();
+            while(start < length) {
+                begin = card_text.find_first_of(parse_begin, start);
+                if(begin == -1) {
+                    card_info->WriteText(card_text.substr(start));
+                    break;
+                }
+                end = card_text.find_first_of(parse_end, begin + 1);
+                if(end == -1) {
+                    card_info->WriteText(card_text.substr(start));
+                    break;
+                }
+                if(begin > start)
+                    card_info->WriteText(card_text.substr(start, begin - start));
+                card_info->BeginTextColour(wxColour(0, 0, 255));
+                card_info->BeginURL(wxT(""));
+                card_info->WriteText(card_text.substr(begin, end - begin + 1));
+                card_info->EndURL();
+                card_info->EndTextColour();
+                start = end + 1;
+            }
         }
     }
     

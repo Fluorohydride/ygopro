@@ -52,5 +52,7 @@
   <setting name="type_flip" value="反转" type="string"/>
   <setting name="type_toon" value="卡通" type="string"/>
   <setting name="type_xyz" value="超量" type="string"/>
-  <setting name="star" value="" type="string"/>
+  <setting name="full_width_space" value="　" type="string"/>
+  <setting name="parse_begin" value="「" type="string"/>
+  <setting name="parse_end" value="」" type="string"/>
 </Common>

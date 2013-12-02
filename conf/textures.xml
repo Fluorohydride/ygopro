@@ -31,6 +31,7 @@
   <texture src="1" name="lpbar2" x="768" y="64" w="256" h="64"/>
   <texture src="1" name="avatar1" x="128" y="256" w="128" h="128"/>
   <texture src="1" name="avatar2" x="128" y="256" w="128" h="128"/>
+  <texture src="1" name="star" x="484" y="368" w="16" h="16"/>
   <texture src="2" name="sleeve1" x="0" y="0" w="177" h="254"/>
   <texture src="2" name="sleeve2" x="0" y="0" w="177" h="254"/>
   <texture src="3" name="unknown" x="0" y="0" w="177" h="254"/>

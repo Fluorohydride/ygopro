@@ -62,6 +62,7 @@ namespace ygopro
         wxEditorCanvas* editor_canvas;
         wxStaticBitmap* card_image;
         wxRichTextCtrl* card_info;
+        wxImage star_img;
     };
 
     extern EditorFrame* editorFrame;
