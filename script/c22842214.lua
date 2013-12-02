@@ -1,4 +1,4 @@
---¥·©`¡¤¥é¥ó¥µ©`
+--ã‚·ãƒ¼ãƒ»ãƒ©ãƒ³ã‚µãƒ¼
 function c22842214.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -65,20 +65,23 @@ function c22842214.eqop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.EquipComplete()
 end
 function c22842214.eqfilter(c,ec)
-	return c:GetFlagEffect(22842214)~=0 and c:IsHasCardTarget(ec)
+	return c:GetFlagEffect(22842214)~=0 and c:IsHasCardTarget(ec) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)
 end
 function c22842214.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return Duel.IsExistingMatchingCard(c22842214.eqfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,c) end
+	if chk==0 then return not c:IsReason(REASON_REPLACE) and Duel.IsExistingMatchingCard(c22842214.eqfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,c) end
 	if Duel.SelectYesNo(tp,aux.Stringid(22842214,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESREPLACE)
 		local tc=Duel.SelectMatchingCard(tp,c22842214.eqfilter,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,c):GetFirst()
 		e:SetLabelObject(tc)
+		tc:SetStatus(STATUS_DESTROY_CONFIRMED,true)
 		return true
 	else return false end
 end
 function c22842214.desrepop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetLabelObject(),REASON_EFFECT+REASON_REPLACE)
+	local g=e:GetLabelObject()
+	g:SetStatus(STATUS_DESTROY_CONFIRMED,false)
+	Duel.Destroy(g,REASON_EFFECT+REASON_REPLACE)
 end
 function c22842214.atcon(e)
 	return Duel.IsExistingMatchingCard(c22842214.eqfilter,e:GetHandlerPlayer(),LOCATION_SZONE,LOCATION_SZONE,1,nil,e:GetHandler())

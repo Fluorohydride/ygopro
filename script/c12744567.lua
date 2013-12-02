@@ -26,11 +26,12 @@ function c12744567.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c12744567.filter(c)
-	return not c:IsType(TYPE_TOKEN) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return not c:IsType(TYPE_TOKEN) and c:IsAbleToChangeControler()
+		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 end
 function c12744567.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c12744567.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c12744567.filter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ) and Duel.IsExistingTarget(c12744567.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c12744567.filter,tp,0,LOCATION_MZONE,1,1,nil)
 end
