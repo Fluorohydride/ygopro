@@ -226,13 +226,13 @@ namespace ygopro
         glBegin(GL_QUADS);
         glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
         float dx = (rx - lx) / 2;
-        TextureInfo& ti1 = imageMgr.text_texture[number / 10 + '0'];
+        TextureInfo& ti1 = imageMgr.text_texture[number / 10 + '0' - '*'];
         glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
         glTexCoord2f(ti1.lx, ti1.ly); glVertex2f(lx, ly);
         glTexCoord2f(ti1.lx, ti1.ry); glVertex2f(lx, ry);
         glTexCoord2f(ti1.rx, ti1.ry); glVertex2f(lx + dx, ry);
         glTexCoord2f(ti1.rx, ti1.ly); glVertex2f(lx + dx, ly);
-        TextureInfo& ti2 = imageMgr.text_texture[number % 10 + '0'];
+        TextureInfo& ti2 = imageMgr.text_texture[number % 10 + '0' - '*'];
         glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
         glTexCoord2f(ti2.lx, ti2.ly); glVertex2f(lx + dx, ly);
         glTexCoord2f(ti2.lx, ti2.ry); glVertex2f(lx + dx, ry);
@@ -257,6 +257,7 @@ namespace ygopro
 		glDisable(GL_BLEND);
 		glEnable(GL_TEXTURE_2D);
 		glBindTexture(GL_TEXTURE_2D, t_buildbg->tex());
+        glColor3f(1.0f, 1.0f, 1.0f);
 		glBegin(GL_QUADS);
 		{
 			glTexCoord2f(t_buildbg->lx, t_buildbg->ly); glVertex2f(-1.0f, 1.0f);
@@ -417,7 +418,17 @@ namespace ygopro
                 glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + i * dx + iconw, sy + 0.01f - iconh);
                 glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + i * dx + iconw, sy + 0.01f);
             }
+            glEnd();
         }
+        drawNumber(66, 0xffff0000, -0.936f, 0.918f, -0.863f, 0.845f);
+        drawNumber(66, 0xffff0000, -0.936f, 0.830f, -0.863f, 0.757f);
+        drawNumber(66, 0xffff0000, -0.936f, 0.742f, -0.863f, 0.669f);
+        drawNumber(66, 0xffff0000, -0.936f, 0.616f, -0.863f, 0.543f);
+        drawNumber(66, 0xffff0000, -0.936f, 0.528f, -0.863f, 0.455f);
+        drawNumber(66, 0xffff0000, -0.936f, 0.440f, -0.863f, 0.367f);
+        drawNumber(66, 0xffff0000, -0.936f, 0.002f, -0.863f, -0.071f);
+        drawNumber(66, 0xffff0000, -0.936f, -0.308f, -0.863f, -0.381f);
+        drawNumber(66, 0xffff0000, -0.936f, -0.641f, -0.863f, -0.714f);
 		glFlush();
 	}
 

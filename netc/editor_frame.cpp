@@ -123,10 +123,13 @@ namespace ygopro
             if(cd == nullptr)
                 return;
             auto full_width_space = commonCfg["full_width_space"];
+            wxString space = static_cast<const std::string&>(stringCfg["full_width_space"]);
             wxString card_name = cd->name;
+            if(full_width_space)
+                card_name.Replace(wxT(" "), space);
             wxRichTextAttr attr;
             card_info->SetDefaultStyle(attr);
-            card_info->BeginFontSize(16);
+            card_info->BeginFontSize(14);
             card_info->BeginBold();
             card_info->WriteText(card_name);
             card_info->EndBold();
@@ -149,7 +152,6 @@ namespace ygopro
             card_info->WriteText(wxT("====="));
             card_info->Newline();
             wxString card_text = cd->texts;
-            wxString space = static_cast<const std::string&>(stringCfg["full_width_space"]);
             wxString parse_begin = static_cast<const std::string&>(stringCfg["parse_begin"]);
             wxString parse_end = static_cast<const std::string&>(stringCfg["parse_end"]);
             if(full_width_space)
@@ -162,6 +164,8 @@ namespace ygopro
                     break;
                 }
                 end = card_text.find_first_of(parse_end, begin + 1);
+                while(end != -1 && card_text[end - 1] == wxT('\\'))
+                    end = card_text.find_first_of(parse_end, end + 1);
                 if(end == -1) {
                     card_info->WriteText(card_text.substr(start));
                     break;
@@ -169,7 +173,7 @@ namespace ygopro
                 if(begin > start)
                     card_info->WriteText(card_text.substr(start, begin - start));
                 card_info->BeginTextColour(wxColour(0, 0, 255));
-                card_info->BeginURL(wxT(""));
+                card_info->BeginURL(card_text.substr(begin + 1, end - begin - 1));
                 card_info->WriteText(card_text.substr(begin, end - begin + 1));
                 card_info->EndURL();
                 card_info->EndTextColour();
@@ -307,7 +311,6 @@ namespace ygopro
     
     void EditorFrame::OnUrlClicked(wxTextUrlEvent& evt) {
         wxString url = evt.GetString();
-        wxLaunchDefaultBrowser(url);
     }
 
 }
