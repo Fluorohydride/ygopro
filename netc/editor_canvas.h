@@ -15,6 +15,7 @@ namespace ygopro
 
 	private:
 		wxGLContext* glcontext;
+        wxTimer hover_timer;
 		unsigned int glwidth;
 		unsigned int glheight;
         TextureInfo* t_buildbg;
@@ -35,20 +36,20 @@ namespace ygopro
 		void ClearDeck();
         void SaveScreenshot(const wxString& file, bool clipboard = false);
         
-        void drawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit);
-        void drawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry);
-		void drawScene();
+        void DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit);
+        void DrawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry);
+		void DrawScene();
 
 		// events
-		void eventResized(wxSizeEvent& evt);
-		void eventRender(wxPaintEvent& evt);
-		void eventMouseMoved(wxMouseEvent& evt);
-		void eventMouseWheelMoved(wxMouseEvent& evt);
-		void eventMouseDown(wxMouseEvent& evt);
-		void eventMouseReleased(wxMouseEvent& evt);
-		void eventMouseLeftWindow(wxMouseEvent& evt);
+		void EventResized(wxSizeEvent& evt);
+		void EventRender(wxPaintEvent& evt);
+		void EventMouseMoved(wxMouseEvent& evt);
+		void EventMouseWheelMoved(wxMouseEvent& evt);
+		void EventMouseDown(wxMouseEvent& evt);
+		void EventMouseReleased(wxMouseEvent& evt);
+		void EventMouseLeftWindow(wxMouseEvent& evt);
+        void OnHoverTimer(wxTimerEvent& event);
 
-		DECLARE_EVENT_TABLE()
 	};
 
 }

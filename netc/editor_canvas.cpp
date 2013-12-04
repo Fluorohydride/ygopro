@@ -1,6 +1,7 @@
 #include "wx/image.h"
 #include "wx/clipbrd.h"
 #include "image_mgr.h"
+#include "game_frame.h"
 #include "editor_frame.h"
 #include "editor_canvas.h"
 #include "card_data.h"
@@ -8,18 +9,18 @@
 
 namespace ygopro
 {
-	BEGIN_EVENT_TABLE(wxEditorCanvas, wxGLCanvas)
-		EVT_SIZE(wxEditorCanvas::eventResized)
-		EVT_PAINT(wxEditorCanvas::eventRender)
-		EVT_MOTION(wxEditorCanvas::eventMouseMoved)
-		EVT_MOUSEWHEEL(wxEditorCanvas::eventMouseWheelMoved)
-		EVT_LEFT_DOWN(wxEditorCanvas::eventMouseDown)
-		EVT_LEFT_UP(wxEditorCanvas::eventMouseReleased)
-		EVT_LEAVE_WINDOW(wxEditorCanvas::eventMouseLeftWindow)
-	END_EVENT_TABLE()
 
 	wxEditorCanvas::wxEditorCanvas(wxFrame* parent, int id, int* args): wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
         glcontext = new wxGLContext(this);
+        Bind(wxEVT_SIZE, &wxEditorCanvas::EventResized, this);
+        Bind(wxEVT_PAINT, &wxEditorCanvas::EventRender, this);
+		Bind(wxEVT_MOTION, &wxEditorCanvas::EventMouseMoved, this);
+		Bind(wxEVT_MOUSEWHEEL, &wxEditorCanvas::EventMouseWheelMoved, this);
+		Bind(wxEVT_LEFT_DOWN, &wxEditorCanvas::EventMouseDown, this);
+		Bind(wxEVT_LEFT_UP, &wxEditorCanvas::EventMouseReleased, this);
+		Bind(wxEVT_LEAVE_WINDOW, &wxEditorCanvas::EventMouseLeftWindow, this);
+        hover_timer.SetOwner(this);
+        Bind(wxEVT_TIMER, &wxEditorCanvas::OnHoverTimer, this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         t_buildbg = &imageMgr.textures["buildbg"];
         t_deckbg = &imageMgr.textures["deckbg"];
@@ -46,7 +47,7 @@ namespace ygopro
     void wxEditorCanvas::SaveScreenshot(const wxString& name, bool clipboard) {
         wxGLCanvas::SetCurrent(*glcontext);
         imageMgr.InitTextures();
-		drawScene();
+		DrawScene();
         unsigned char* image_buff = new unsigned char[glwidth * glheight * 4];
         unsigned char* rgb_buff = new unsigned char[glwidth * glheight * 3];
         glReadPixels(0, 0, glwidth, glheight, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
@@ -71,24 +72,24 @@ namespace ygopro
         delete[] image_buff;
     }
     
-	void wxEditorCanvas::eventResized(wxSizeEvent& evt) {
+	void wxEditorCanvas::EventResized(wxSizeEvent& evt) {
 		glwidth = evt.GetSize().GetWidth();
 		glheight = evt.GetSize().GetHeight();
 		glViewport(0, 0, glwidth, glheight);
 		Refresh();
 	}
 
-	void wxEditorCanvas::eventRender(wxPaintEvent& evt) {
+	void wxEditorCanvas::EventRender(wxPaintEvent& evt) {
 		if(!IsShown())
 			return;
 		wxGLCanvas::SetCurrent(*glcontext);
 		wxPaintDC(this);
         imageMgr.InitTextures();
-		drawScene();
+		DrawScene();
 		SwapBuffers();
 	}
 
-	void wxEditorCanvas::eventMouseMoved(wxMouseEvent& evt){
+	void wxEditorCanvas::EventMouseMoved(wxMouseEvent& evt){
         wxPoint pt = evt.GetPosition();
         float fx = pt.x / (float)glwidth * 2.0f - 1.0f;
         float fy = -pt.y / (float)glheight * 2.0f + 1.0f;
@@ -97,6 +98,7 @@ namespace ygopro
         unsigned int pre_code = hover_code;
         hover_field = 0;
         hover_index = 0;
+        hover_code = 0;
         float wd = 0.2f * glheight / glwidth;
         float ht = 0.29f;
         if(fx >= -0.85f && fx <= 0.95f) {
@@ -170,31 +172,46 @@ namespace ygopro
         }
         if(pre_field != hover_field || pre_index != hover_index)
             Refresh();
-        if(pre_code != hover_code && hover_code != 0)
-            editorFrame->SetCardInfo(hover_code);
+        int delay = (int)commonCfg["hover_info_delay"];
+        if(pre_code != hover_code && hover_code != 0) {
+            if(delay == 0)
+                editorFrame->SetCardInfo(hover_code);
+            else {
+                hover_timer.Stop();
+                hover_timer.SetClientData((void*)(long)hover_code);
+                hover_timer.StartOnce(delay);
+            }
+        }
 	}
 
-	void wxEditorCanvas::eventMouseWheelMoved(wxMouseEvent& evt){
+	void wxEditorCanvas::EventMouseWheelMoved(wxMouseEvent& evt){
 
 	}
 
-	void wxEditorCanvas::eventMouseDown(wxMouseEvent& evt){
+	void wxEditorCanvas::EventMouseDown(wxMouseEvent& evt){
         
 	}
 
-	void wxEditorCanvas::eventMouseReleased(wxMouseEvent& evt){
+	void wxEditorCanvas::EventMouseReleased(wxMouseEvent& evt){
 
 	}
 
-	void wxEditorCanvas::eventMouseLeftWindow(wxMouseEvent& evt){
+	void wxEditorCanvas::EventMouseLeftWindow(wxMouseEvent& evt){
         if(hover_field != 0) {
             hover_field = 0;
             hover_index = 0;
+            hover_code = 0;
             Refresh();
         }
 	}
     
-    void wxEditorCanvas::drawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {
+    void wxEditorCanvas::OnHoverTimer(wxTimerEvent& evt) {
+        unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
+        if(code == hover_code)
+            editorFrame->SetCardInfo(code);
+    }
+    
+    void wxEditorCanvas::DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {
         glBindTexture(GL_TEXTURE_2D, t_font->tex());
         glBegin(GL_QUADS);
         glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
@@ -221,19 +238,29 @@ namespace ygopro
         glEnd();
     }
 
-    void wxEditorCanvas::drawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry) {
+    void wxEditorCanvas::DrawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry) {
         glBindTexture(GL_TEXTURE_2D, t_font->tex());
         glBegin(GL_QUADS);
-        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
         float dx = (rx - lx) / 2;
-        TextureInfo& ti1 = imageMgr.text_texture[number / 10 + '0' - '*'];
-        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
+        float offset = 0.0035f;
+        TextureInfo& ti1 = imageMgr.text_texture[(number == 0 ? '-' : (number / 10 % 10 + '0')) - '*'];
+        TextureInfo& ti2 = imageMgr.text_texture[(number == 0 ? '-' : (number % 10 + '0')) - '*'];
+        
+        glColor3f(0.1f, 0.1f, 0.0f);
+        glTexCoord2f(ti1.lx, ti1.ly); glVertex2f(lx + offset, ly - offset);
+        glTexCoord2f(ti1.lx, ti1.ry); glVertex2f(lx + offset, ry - offset);
+        glTexCoord2f(ti1.rx, ti1.ry); glVertex2f(lx + dx + offset, ry - offset);
+        glTexCoord2f(ti1.rx, ti1.ly); glVertex2f(lx + dx + offset, ly - offset);
+        glTexCoord2f(ti2.lx, ti2.ly); glVertex2f(lx + dx + offset, ly - offset);
+        glTexCoord2f(ti2.lx, ti2.ry); glVertex2f(lx + dx + offset, ry - offset);
+        glTexCoord2f(ti2.rx, ti2.ry); glVertex2f(rx + offset, ry - offset);
+        glTexCoord2f(ti2.rx, ti2.ly); glVertex2f(rx + offset, ly - offset);
+        
+        glColor3f(((color >> 24) & 0xff) / 255.0f, ((color >> 16) & 0xff) / 255.0f, ((color >> 8) & 0xff) / 255.0f);
         glTexCoord2f(ti1.lx, ti1.ly); glVertex2f(lx, ly);
         glTexCoord2f(ti1.lx, ti1.ry); glVertex2f(lx, ry);
         glTexCoord2f(ti1.rx, ti1.ry); glVertex2f(lx + dx, ry);
         glTexCoord2f(ti1.rx, ti1.ly); glVertex2f(lx + dx, ly);
-        TextureInfo& ti2 = imageMgr.text_texture[number % 10 + '0' - '*'];
-        glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
         glTexCoord2f(ti2.lx, ti2.ly); glVertex2f(lx + dx, ly);
         glTexCoord2f(ti2.lx, ti2.ry); glVertex2f(lx + dx, ry);
         glTexCoord2f(ti2.rx, ti2.ry); glVertex2f(rx, ry);
@@ -241,7 +268,7 @@ namespace ygopro
         glEnd();
     }
 
-	void wxEditorCanvas::drawScene() {
+	void wxEditorCanvas::DrawScene() {
 
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -420,15 +447,15 @@ namespace ygopro
             }
             glEnd();
         }
-        drawNumber(66, 0xffff0000, -0.936f, 0.918f, -0.863f, 0.845f);
-        drawNumber(66, 0xffff0000, -0.936f, 0.830f, -0.863f, 0.757f);
-        drawNumber(66, 0xffff0000, -0.936f, 0.742f, -0.863f, 0.669f);
-        drawNumber(66, 0xffff0000, -0.936f, 0.616f, -0.863f, 0.543f);
-        drawNumber(66, 0xffff0000, -0.936f, 0.528f, -0.863f, 0.455f);
-        drawNumber(66, 0xffff0000, -0.936f, 0.440f, -0.863f, 0.367f);
-        drawNumber(66, 0xffff0000, -0.936f, 0.002f, -0.863f, -0.071f);
-        drawNumber(66, 0xffff0000, -0.936f, -0.308f, -0.863f, -0.381f);
-        drawNumber(66, 0xffff0000, -0.936f, -0.641f, -0.863f, -0.714f);
+        DrawNumber(current_deck.mcount, 0xffffff00, -0.931f, 0.913f, -0.868f, 0.850f);
+        DrawNumber(current_deck.scount, 0xffffff00, -0.931f, 0.825f, -0.868f, 0.762f);
+        DrawNumber(current_deck.tcount, 0xffffff00, -0.931f, 0.737f, -0.868f, 0.674f);
+        DrawNumber(current_deck.syncount, 0xffffff00, -0.931f, 0.611f, -0.868f, 0.548f);
+        DrawNumber(current_deck.xyzcount, 0xffffff00, -0.931f, 0.523f, -0.868f, 0.460f);
+        DrawNumber(current_deck.fuscount, 0xffffff00, -0.931f, 0.435f, -0.868f, 0.372f);
+        DrawNumber((int)current_deck.main_deck.size(), 0xffffff00, -0.931f, -0.003f, -0.868f, -0.066f);
+        DrawNumber((int)current_deck.extra_deck.size(), 0xffffff00, -0.931f, -0.313f, -0.868f, -0.376f);
+        DrawNumber((int)current_deck.side_deck.size(), 0xffffff00, -0.931f, -0.646f, -0.868f, -0.709f);
 		glFlush();
 	}
 

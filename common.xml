@@ -8,9 +8,10 @@
   <setting name="image_count_x" value="1" type="integer"/>
   <setting name="image_count_y" value="1" type="integer"/>
   <setting name="screenshot_path" value="./screenshot" type="string"/>
-  <setting name="database" value="./conf/cards.cdb" type="string"/>
+  <setting name="database" value="../ygo/cards.cdb" type="string"/>
   <setting name="textures" value="./conf/textures.xml" type="string"/>
   <setting name="limit_regulation" value="./conf/lflist.conf" type="string"/>
   <setting name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}" type="string"/>
   <setting name="full_width_space" value="1" type="integer"/>
+  <setting name="hover_info_delay" value="300" type="integer"/>
 </Common>

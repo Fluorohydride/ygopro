@@ -3,7 +3,7 @@
 namespace ygopro
 {
 
-	bool CommonConfig::LoadConfig(const wxString& name) {
+	bool CommonConfig::LoadConfig(const wxString& name, CONFIG_LOAD_CALLBACK cb) {
 		wxXmlDocument doc;
 		if(!doc.Load(name, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return false;
@@ -13,11 +13,13 @@ namespace ygopro
 			if (child->GetName() == wxT("setting")) {
 				wxString name = child->GetAttribute("name");
 				wxString value = child->GetAttribute("value");
+                if(cb)
+                    cb(name, value);
 				if(child->GetAttribute("type") == "string") {
 					config_map[name.ToStdString()] = value;
 				} else {
 					long val = 0;
-					value.ToLong(&val);
+					value.ToLong(&val, 0);
 					config_map[name.ToStdString()] = val;
 				}
 			}

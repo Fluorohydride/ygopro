@@ -31,14 +31,25 @@ namespace ygopro
 		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
         
-        static wxString GetInfoString(unsigned int arctype, unsigned int attr, unsigned int race);
         static wxString GetAttributeString(unsigned int attr);
         static wxString GetRaceString(unsigned int race);
         static wxString GetTypeString(unsigned int arctype);
         
+        void RegisterSetCode(unsigned int code, const wxString& value) {
+            _setcodes[code] = value;
+        }
+        
+        const wxString& GetSetCode(unsigned int code) {
+            static const wxString empt = wxT("");
+            auto iter = _setcodes.find(code);
+            if(iter == _setcodes.end())
+               return empt;
+            return iter->second;
+        }
+        
 	private:
 		std::unordered_map<unsigned int, CardData> _datas;
-        
+        std::unordered_map<unsigned int, wxString> _setcodes;
 	};
 
 	extern DataMgr dataMgr;

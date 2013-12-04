@@ -26,12 +26,18 @@ namespace ygopro {
 			wxInitAllImageHandlers();
 			if(!commonCfg.LoadConfig("common.xml"))
                 return true;
-			if(dataMgr.LoadDatas(wxString(static_cast<const std::string&>(commonCfg["database"]))))
+            stringCfg.LoadConfig("./conf/strings.xml", [](const wxString& name, const wxString& value) {
+                if(name.Left(8) == wxT("setname_")) {
+                    long setcode = 0;
+                    value.ToLong(&setcode, 0);
+                    dataMgr.RegisterSetCode((unsigned int)setcode, name.Right(name.Length() - 8));
+                }
+            });
+			if(dataMgr.LoadDatas(commonCfg["database"]))
                 return true;
-            if(!imageMgr.LoadImageConfig(wxString(static_cast<const std::string&>(commonCfg["textures"]))))
+            if(!imageMgr.LoadImageConfig(commonCfg["textures"]))
                 return true;
-            limitRegulationMgr.LoadLimitRegulation(wxString(static_cast<const std::string&>(commonCfg["limit_regulation"])));
-            stringCfg.LoadConfig("./conf/strings.xml");
+            limitRegulationMgr.LoadLimitRegulation(commonCfg["limit_regulation"]);
             
 			editorFrame = new EditorFrame(1080, 720);
 			editorFrame->Center();

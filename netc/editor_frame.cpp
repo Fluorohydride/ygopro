@@ -59,7 +59,7 @@ namespace ygopro
         SetMenuBar(menu_bar);
 
         card_image = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
-        card_info = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(240, 400), wxTE_DONTWRAP | wxRE_READONLY | wxRE_MULTILINE);
+        card_info = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(240, 400), wxRE_READONLY | wxRE_MULTILINE);
         card_info->Bind(wxEVT_TEXT_URL, &EditorFrame::OnUrlClicked, this, wxID_ANY);
         card_info->GetCaret()->Hide();
         int wx_gl_attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
@@ -74,7 +74,7 @@ namespace ygopro
         sz2->Add(sz);
         sz2->Add(editor_canvas, 1, wxEXPAND | wxALL);
         SetSizer(sz2);
-
+        
         editorFrame = this;
         SetCardInfo(0);
         editor_canvas->SetFocus();
@@ -122,24 +122,25 @@ namespace ygopro
             CardData* cd = dataMgr[id];
             if(cd == nullptr)
                 return;
-            auto full_width_space = commonCfg["full_width_space"];
-            wxString space = static_cast<const std::string&>(stringCfg["full_width_space"]);
             wxString card_name = cd->name;
-            if(full_width_space)
-                card_name.Replace(wxT(" "), space);
             wxRichTextAttr attr;
             card_info->SetDefaultStyle(attr);
-            card_info->BeginFontSize(14);
+            card_info->BeginFontSize(16);
             card_info->BeginBold();
             card_info->WriteText(card_name);
             card_info->EndBold();
             card_info->EndFontSize();
             card_info->Newline();
-            if(cd->level) {
+            if(cd->type & 0x1) {
                 for(unsigned int i = 0; i < cd->level; ++i)
                     card_info->WriteImage(star_img);
                 card_info->Newline();
-                card_info->BeginTextColour(wxColour(0, 0, 255));
+                card_info->BeginTextColour(wxColour(180, 140, 40));
+                wxString infostr = wxT("[") + dataMgr.GetTypeString(cd->type) + wxT("] ") + dataMgr.GetAttributeString(cd->attribute) + wxT("/") + dataMgr.GetRaceString(cd->race);
+                card_info->WriteText(infostr);
+                card_info->EndTextColour();
+                card_info->Newline();
+                card_info->BeginTextColour(wxColour(64, 64, 64));
                 if(cd->attack >= 0 && cd->defence >= 0)
                     card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:%d"), cd->attack, cd->defence));
                 else if(cd->attack >= 0)
@@ -148,14 +149,20 @@ namespace ygopro
                     card_info->WriteText(wxString::Format(wxT("ATK:???? / DEF:%d"), cd->attack));
                 card_info->EndTextColour();
                 card_info->Newline();
+            } else {
+                if(cd->type & 0x2)
+                    card_info->BeginTextColour(wxColour(0, 192, 128));
+                else
+                    card_info->BeginTextColour(wxColour(250, 32, 192));
+                wxString infostr = wxT("[") + dataMgr.GetTypeString(cd->type) + wxT("] ");
+                card_info->WriteText(infostr);
+                card_info->EndTextColour();
+                card_info->Newline();
             }
-            card_info->WriteText(wxT("====="));
             card_info->Newline();
             wxString card_text = cd->texts;
-            wxString parse_begin = static_cast<const std::string&>(stringCfg["parse_begin"]);
-            wxString parse_end = static_cast<const std::string&>(stringCfg["parse_end"]);
-            if(full_width_space)
-                card_text.Replace(wxT(" "), space);
+            wxString parse_begin = stringCfg["parse_begin"];
+            wxString parse_end = stringCfg["parse_end"];
             size_t start = 0, begin = 0, end = 0, length = card_text.length();
             while(start < length) {
                 begin = card_text.find_first_of(parse_begin, start);
@@ -178,6 +185,25 @@ namespace ygopro
                 card_info->EndURL();
                 card_info->EndTextColour();
                 start = end + 1;
+            }
+            card_info->Newline();
+            if(cd->setcode) {
+                card_info->Newline();
+                card_info->WriteText(wxT("Category: "));
+                wxString setname = dataMgr.GetSetCode(cd->setcode & 0xffff);
+                card_info->BeginTextColour(wxColour(0, 0, 255));
+                if(!setname.IsEmpty()) {
+                    card_info->BeginURL(setname);
+                    card_info->WriteText(wxT("[") + setname + wxT("] "));
+                    card_info->EndURL();
+                }
+                setname = dataMgr.GetSetCode(cd->setcode >> 16);
+                if(!setname.IsEmpty()) {
+                    card_info->BeginURL(setname);
+                    card_info->WriteText(wxT("[") + setname + wxT("]"));
+                    card_info->EndURL();
+                }
+                card_info->EndTextColour();
             }
         }
     }
@@ -263,7 +289,7 @@ namespace ygopro
 
     void EditorFrame::OnToolScreenshotSV(wxCommandEvent& evt) {
         time_t t = time(0);
-        wxString path = static_cast<const std::string&>(commonCfg["screenshot_path"]);
+        wxString path = commonCfg["screenshot_path"];
         if(*path.rbegin() != wxT('/'))
             path.Append(wxT('/'));
         if(!wxFileName::DirExists(path) && !wxFileName::Mkdir(path)) {
@@ -279,7 +305,7 @@ namespace ygopro
     }
 
     void EditorFrame::OnToolOpenBrowser(wxCommandEvent& evt) {
-        wxString neturl = static_cast<const std::string&>(commonCfg["deck_neturl"]);
+        wxString neturl = commonCfg["deck_neturl"];
         wxString deck_string = editor_canvas->GetDeck().SaveToString();
         neturl.Replace("{amp}", wxT("&"));
         neturl.Replace("{deck}", deck_string);
@@ -311,6 +337,11 @@ namespace ygopro
     
     void EditorFrame::OnUrlClicked(wxTextUrlEvent& evt) {
         wxString url = evt.GetString();
+        std::string sturl = (wxT("setname_") + url).ToStdString();
+        if(stringCfg.Exists(sturl)) {
+            unsigned int setcode = stringCfg[sturl];
+            setcode++;
+        }
     }
 
 }

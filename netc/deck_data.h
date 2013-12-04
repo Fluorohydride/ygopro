@@ -21,6 +21,8 @@ namespace ygopro
     struct CardTextureInfo;
     
 	struct DeckData {
+        DeckData(): mcount(0), scount(0), tcount(0), syncount(0), xyzcount(0), fuscount(0) {}
+        
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > main_deck;
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > extra_deck;
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > side_deck;
