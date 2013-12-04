@@ -13,6 +13,13 @@ namespace ygopro
     
 	class wxEditorCanvas : public wxGLCanvas {
 
+        enum {
+            ID_POP_ADDCARD = wxID_HIGHEST + 1,
+            ID_POP_DELCARD,
+            ID_POP_TOSIDE,
+            ID_POP_TOMAIN,
+        };
+
 	private:
 		wxGLContext* glcontext;
         wxTimer hover_timer;
@@ -26,6 +33,8 @@ namespace ygopro
         DeckData current_deck;
         short hover_field;
         short hover_index;
+        short click_field;
+        short click_index;
         unsigned int hover_code;
         
 	public:
@@ -48,7 +57,8 @@ namespace ygopro
 		void EventMouseDown(wxMouseEvent& evt);
 		void EventMouseReleased(wxMouseEvent& evt);
 		void EventMouseLeftWindow(wxMouseEvent& evt);
-        void OnHoverTimer(wxTimerEvent& event);
+        void OnHoverTimer(wxTimerEvent& evt);
+        void OnPopupMenu(wxCommandEvent& evt);
 
 	};
 

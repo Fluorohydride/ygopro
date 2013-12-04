@@ -38,7 +38,7 @@ namespace ygopro
         ~EditorFrame();
 
         void SetCardInfo(unsigned int id);
-        
+
         void OnDeckLoad(wxCommandEvent& evt);
         void OnDeckSave(wxCommandEvent& evt);
         void OnDeckSaveAs(wxCommandEvent& evt);
