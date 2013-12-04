@@ -27,7 +27,7 @@ function c2830693.initial_effect(c)
 end
 function c2830693.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,2830693)==0 end
-	Duel.RegisterFlagEffect(tp,2830693,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.RegisterFlagEffect(tp,2830693,RESET_PHASE+PHASE_END,0,1)
 end
 function c2830693.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local at=Duel.GetAttacker()
@@ -66,7 +66,7 @@ function c2830693.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c2830693.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,2830694)==0 end
-	Duel.RegisterFlagEffect(tp,2830694,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.RegisterFlagEffect(tp,2830694,RESET_PHASE+PHASE_END,0,1)
 end
 function c2830693.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

@@ -39,6 +39,12 @@ end
 function c3300267.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsSetCard,1,1,nil,0x69)
 	Duel.Release(g,REASON_COST)
+	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(3300267,2))
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_CLIENT_HINT)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetReset(RESET_EVENT+0x4fc0000)
+	c:RegisterEffect(e1)
 end
 function c3300267.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroupEx(tp,Card.IsSetCard,1,e:GetHandler(),0x69) end
