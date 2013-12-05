@@ -33,7 +33,7 @@ function c5851097.descon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c5851097.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsStatus(STATUS_CHAINING) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c,1,0,0)
 end
 function c5851097.desop(e,tp,eg,ep,ev,re,r,rp)
