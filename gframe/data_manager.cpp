@@ -54,7 +54,7 @@ bool DataManager::LoadDB(const char* file) {
 				if(len) {
 					cs.desc[i - 14] = new wchar_t[len + 1];
 					memcpy(cs.desc[i - 14], strBuffer, (len + 1)*sizeof(wchar_t));
-				} else break;
+				} else cs.desc[i - 14] = 0;
 			}
 			_strings.insert(std::make_pair(cd.code, cs));
 		}

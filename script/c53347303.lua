@@ -55,8 +55,7 @@ function c53347303.discon(e,tp,eg,ep,ev,re,r,rp)
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local loc,tg=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TARGET_CARDS)
 	if not tg or not tg:IsContains(c) then return false end
-	if (not Duel.IsChainNegatable(ev)) or loc==LOCATION_DECK then return false end
-	return true
+	return Duel.IsChainDisablable(ev) and loc~=LOCATION_DECK
 end
 function c53347303.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

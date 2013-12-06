@@ -40,6 +40,7 @@ function c10275411.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local g1=Duel.GetOverlayGroup(tp,0,1)
 		if g1:GetCount()==0 then return end
+		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(10275411,0))
 		local mg=g1:Select(tp,1,1,nil)
 		Duel.Overlay(tc,mg)

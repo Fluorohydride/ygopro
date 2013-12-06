@@ -326,6 +326,16 @@ int32 card::get_attack(uint8 swap) {
 	for (int32 i = 0; i < eset.count; ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_ATTACK:
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+				for (int32 j = 0; j < effects.count; ++j) {
+					if (effects[j]->flag & EFFECT_FLAG_REPEAT) {
+						base = effects[j]->get_value(this);
+						up = 0;
+						upc = 0;
+						temp.attack = base;
+					}
+				}
+			}
 			if (eset[i]->type & EFFECT_TYPE_SINGLE)
 				up += eset[i]->get_value(this);
 			else
@@ -337,7 +347,7 @@ int32 card::get_attack(uint8 swap) {
 				up = 0;
 			break;
 		case EFFECT_SET_ATTACK_FINAL:
-			if (eset[i]->type & EFFECT_TYPE_SINGLE) {
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
 				base = eset[i]->get_value(this);
 				up = 0;
 				upc = 0;
@@ -349,20 +359,10 @@ int32 card::get_attack(uint8 swap) {
 			temp.attack = base + up + upc;
 		else
 			temp.attack = base - up - upc;
-		for (int32 i = 0; i < effects.count; ++i) {
-			if (effects[i]->flag & EFFECT_FLAG_REPEAT) {
-				base = effects[i]->get_value(this);
-				up = 0;
-				upc = 0;
-				temp.attack = base;
-			}
-		}
 	}
 	for (int32 i = 0; i < effects.count; ++i) {
-		if (!(effects[i]->flag & EFFECT_FLAG_REPEAT)) {
-			final = effects[i]->get_value(this);
-			temp.attack = final;
-		}
+		final = effects[i]->get_value(this);
+		temp.attack = final;
 	}
 	if (final == -1) {
 		if (!rev)
@@ -424,6 +424,16 @@ int32 card::get_defence(uint8 swap) {
 	for (int32 i = 0; i < eset.count; ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_DEFENCE:
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+				for (int32 j = 0; j < effects.count; ++j) {
+					if (effects[j]->flag & EFFECT_FLAG_REPEAT) {
+						base = effects[j]->get_value(this);
+						up = 0;
+						upc = 0;
+						temp.defence = base;
+					}
+				}
+			}
 			if (eset[i]->type & EFFECT_TYPE_SINGLE)
 				up += eset[i]->get_value(this);
 			else
@@ -435,7 +445,7 @@ int32 card::get_defence(uint8 swap) {
 				up = 0;
 			break;
 		case EFFECT_SET_DEFENCE_FINAL:
-			if (eset[i]->type & EFFECT_TYPE_SINGLE) {
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
 				base = eset[i]->get_value(this);
 				up = 0;
 				upc = 0;
@@ -447,20 +457,10 @@ int32 card::get_defence(uint8 swap) {
 			temp.defence = base + up + upc;
 		else
 			temp.defence = base - up - upc;
-		for (int32 i = 0; i < effects.count; ++i) {
-			if (effects[i]->flag & EFFECT_FLAG_REPEAT) {
-				base = effects[i]->get_value(this);
-				up = 0;
-				upc = 0;
-				temp.defence = base;
-			}
-		}
 	}
 	for (int32 i = 0; i < effects.count; ++i) {
-		if (!(effects[i]->flag & EFFECT_FLAG_REPEAT)) {
-			final = effects[i]->get_value(this);
-			temp.defence = final;
-		}
+		final = effects[i]->get_value(this);
+		temp.defence = final;
 	}
 	if (final == -1) {
 		if (!rev)
