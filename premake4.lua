@@ -44,9 +44,9 @@ solution "ygo"
     configuration { "Debug", "vs*" }
         defines { "_ITERATOR_DEBUG_LEVEL=0" }
 
-    configuration "Release"
-        flags { "OptimizeSpeed" }
-        targetdir "bin/release"
+    --configuration "Release"
+        --flags { "OptimizeSpeed" }
+        --targetdir "bin/release"
 
     include "ocgcore"
     include "gframe"
