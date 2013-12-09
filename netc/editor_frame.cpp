@@ -218,7 +218,6 @@ namespace ygopro
             editor_canvas->GetDeck() = tempdeck;
             current_file = fd.GetPath();
             SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
-            limitRegulationMgr.GetDeckCardLimitCount(editor_canvas->GetDeck());
             editor_canvas->Refresh();
         } else {
             wxMessageDialog(this, wxT("Cannot load deck file."));
@@ -251,7 +250,6 @@ namespace ygopro
         if(tempdeck.LoadFromString(deck_string)) {
             editor_canvas->ClearDeck();
             editor_canvas->GetDeck() = tempdeck;
-            limitRegulationMgr.GetDeckCardLimitCount(editor_canvas->GetDeck());
             editor_canvas->Refresh();
             wxMessageDialog(this, wxString("Load from string success"), wxT("Information"), wxICON_INFORMATION).ShowModal();
         } else {

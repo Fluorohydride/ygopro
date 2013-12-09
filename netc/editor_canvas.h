@@ -13,13 +13,6 @@ namespace ygopro
     
 	class wxEditorCanvas : public wxGLCanvas {
 
-        enum {
-            ID_POP_ADDCARD = wxID_HIGHEST + 1,
-            ID_POP_DELCARD,
-            ID_POP_TOSIDE,
-            ID_POP_TOMAIN,
-        };
-
 	private:
 		wxGLContext* glcontext;
         wxTimer hover_timer;
@@ -47,18 +40,19 @@ namespace ygopro
         
         void DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit);
         void DrawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry);
+        void DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy);
 		void DrawScene();
 
 		// events
 		void EventResized(wxSizeEvent& evt);
 		void EventRender(wxPaintEvent& evt);
 		void EventMouseMoved(wxMouseEvent& evt);
-		void EventMouseWheelMoved(wxMouseEvent& evt);
-		void EventMouseDown(wxMouseEvent& evt);
-		void EventMouseReleased(wxMouseEvent& evt);
+        void EventMouseLDown(wxMouseEvent& evt);
+        void EventMouseLUp(wxMouseEvent& evt);
+        void EventMouseRDown(wxMouseEvent& evt);
+		void EventMouseDClick(wxMouseEvent& evt);
 		void EventMouseLeftWindow(wxMouseEvent& evt);
         void OnHoverTimer(wxTimerEvent& evt);
-        void OnPopupMenu(wxCommandEvent& evt);
 
 	};
 

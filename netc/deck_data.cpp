@@ -16,6 +16,7 @@ namespace ygopro
         main_deck.clear();
         extra_deck.clear();
         side_deck.clear();
+        counts.clear();
         mcount = 0;
         scount = 0;
         tcount = 0;
@@ -79,7 +80,9 @@ namespace ygopro
                         tcount++;
                 }
             }
+            counts[(unsigned int)code]++;
         }
+        limitRegulationMgr.GetDeckCardLimitCount(*this);
         return true;
     }
     
@@ -131,7 +134,9 @@ namespace ygopro
                     }
                 }
             }
+            counts[code]++;
         }
+        limitRegulationMgr.GetDeckCardLimitCount(*this);
         return true;
     }
     
@@ -203,6 +208,180 @@ namespace ygopro
             deck_pstr += 5;
         }
         return deck_string;
+    }
+    
+    bool DeckData::InsertCard(unsigned int code, unsigned int pos, unsigned int index) {
+        CardData* cd = dataMgr[code];
+        if(cd == nullptr)
+            return false;
+        unsigned int limit = limitRegulationMgr.GetCardLimitCount(code);
+        if(counts[code] >= limit)
+            return false;
+        auto tp = std::make_tuple(cd, nullptr, limit);
+        if(pos == 1 || pos == 2) {
+            if(cd->type & 0x802040) {
+                if(index > extra_deck.size())
+                    index = (unsigned int)extra_deck.size();
+                extra_deck.insert(extra_deck.begin() + index, tp);
+                if(cd->type & 0x800000)
+                    xyzcount++;
+                else if(cd->type & 0x2000)
+                    syncount++;
+                else
+                    fuscount++;
+            } else {
+                if(index > main_deck.size())
+                    index = (unsigned int)main_deck.size();
+                main_deck.insert(main_deck.begin() + index, tp);
+                if(cd->type & 0x1)
+                    mcount++;
+                else if(cd->type & 0x2)
+                    scount++;
+                else
+                    tcount++;
+            }
+        } else if(pos == 3) {
+            if(index > side_deck.size())
+                index = (unsigned int)side_deck.size();
+            side_deck.insert(side_deck.begin() + index, tp);
+        }
+        counts[code]++;
+        return true;
+    }
+    
+    bool DeckData::RemoveCard(unsigned int pos, unsigned int index) {
+        if(pos == 0)
+            return false;
+        if(pos == 1) {
+            if(index >= main_deck.size())
+                return false;
+            auto& ecd = main_deck[index];
+            CardData* cd = std::get<0>(ecd);
+            if(cd->type & 0x1)
+                mcount--;
+            else if(cd->type & 0x2)
+                scount--;
+            else
+                tcount--;
+            main_deck.erase(main_deck.begin() + index);
+            counts[cd->code]--;
+        } else if(pos == 2) {
+            if(index >= extra_deck.size())
+                return false;
+            auto& ecd = extra_deck[index];
+            CardData* cd = std::get<0>(ecd);
+            if(cd->type & 0x800000)
+                xyzcount--;
+            else if(cd->type & 0x2000)
+                syncount--;
+            else
+                fuscount--;
+            extra_deck.erase(extra_deck.begin() + index);
+            counts[cd->code]--;
+        } else if(pos == 3) {
+            if(index >= side_deck.size())
+                return false;
+            auto& ecd = side_deck[index];
+            CardData* cd = std::get<0>(ecd);
+            side_deck.erase(side_deck.begin() + index);
+            counts[cd->code]--;
+        }
+        return true;
+    }
+    
+    bool DeckData::MoveCard(unsigned int pos1, unsigned int index1, unsigned int pos2, unsigned int index2) {
+        if(pos1 == pos2 && index1 == index2)
+            return false;
+        if(pos1 == 0 || pos2 == 0)
+            return false;
+        if(pos1 == pos2) {
+            if(pos1 == 1) {
+                auto data = main_deck[index1];
+                if(index1 > index2) {
+                    for(size_t i = index1; i != index2; --i)
+                        main_deck[i] = main_deck[i - 1];
+                } else {
+                    for(size_t i = index1; i != index2; ++i)
+                        main_deck[i] = main_deck[i + 1];
+                }
+                main_deck[index2] = data;
+            } else if(pos1 == 2) {
+                auto data = extra_deck[index1];
+                if(index1 > index2) {
+                    for(size_t i = index1; i != index2; --i)
+                        extra_deck[i] = extra_deck[i - 1];
+                } else {
+                    for(size_t i = index1; i != index2; ++i)
+                        extra_deck[i] = extra_deck[i + 1];
+                }
+                extra_deck[index2] = data;
+            } else {
+                auto data = side_deck[index1];
+                if(index1 > index2) {
+                    for(size_t i = index1; i != index2; --i)
+                        side_deck[i] = side_deck[i - 1];
+                } else {
+                    for(size_t i = index1; i != index2; ++i)
+                        side_deck[i] = side_deck[i + 1];
+                }
+                side_deck[index2] = data;
+            }
+        } else {
+            if(pos1 == 1) {
+                if(pos2 != 3)
+                    return false;
+                auto& ecd = main_deck[index1];
+                CardData* cd = std::get<0>(ecd);
+                if(cd->type & 0x1)
+                    mcount--;
+                else if(cd->type & 0x2)
+                    scount--;
+                else
+                    tcount--;
+                side_deck.insert(side_deck.begin() + index2, ecd);
+                main_deck.erase(main_deck.begin() + index1);
+            } else if(pos1 == 2) {
+                if(pos2 != 3)
+                    return false;
+                auto& ecd = extra_deck[index1];
+                CardData* cd = std::get<0>(ecd);
+                if(cd->type & 0x800000)
+                    xyzcount--;
+                else if(cd->type & 0x2000)
+                    syncount--;
+                else
+                    fuscount--;
+                side_deck.insert(side_deck.begin() + index2, ecd);
+                extra_deck.erase(extra_deck.begin() + index1);
+            } else if(pos2 == 1) {
+                auto& ecd = side_deck[index1];
+                CardData* cd = std::get<0>(ecd);
+                if(cd->type & 0x802040)
+                    return false;
+                if(cd->type & 0x1)
+                    mcount++;
+                else if(cd->type & 0x2)
+                    scount++;
+                else
+                    tcount++;
+                main_deck.insert(main_deck.begin() + index2, ecd);
+                side_deck.erase(side_deck.begin() + index1);
+            } else {
+                auto& ecd = side_deck[index1];
+                CardData* cd = std::get<0>(ecd);
+                if(!(cd->type & 0x802040))
+                    return false;
+                if(cd->type & 0x800000)
+                    xyzcount++;
+                else if(cd->type & 0x2000)
+                    syncount++;
+                else
+                    fuscount++;
+                extra_deck.insert(extra_deck.begin() + index2, ecd);
+                side_deck.erase(side_deck.begin() + index1);
+            }
+        }
+        return true;
     }
     
     bool DeckData::deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2) {

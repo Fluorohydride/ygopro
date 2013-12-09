@@ -2,7 +2,7 @@
 #define _DECK_DATA_H_
 
 #include "wx/string.h"
-#include <map>
+#include <unordered_map>
 #include <vector>
 #include <tuple>
 
@@ -26,6 +26,7 @@ namespace ygopro
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > main_deck;
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > extra_deck;
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > side_deck;
+        std::unordered_map<unsigned int, unsigned int> counts;
         
         void Clear();
         void Sort();
@@ -34,6 +35,10 @@ namespace ygopro
         bool LoadFromString(const wxString& deck);
         void SaveToFile(const wxString& file);
         wxString SaveToString();
+        
+        bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1);
+        bool RemoveCard(unsigned int pos, unsigned int index);
+        bool MoveCard(unsigned int pos1, unsigned int index1, unsigned int pos2, unsigned int index2);
         
         unsigned int mcount;
         unsigned int scount;
@@ -48,7 +53,7 @@ namespace ygopro
     struct LimitRegulation {
         unsigned int hash;
 		wxString name;
-		std::map<unsigned int, unsigned int> counts;
+		std::unordered_map<unsigned int, unsigned int> counts;
         
         LimitRegulation(): hash(0) {}
         unsigned int get_hash();

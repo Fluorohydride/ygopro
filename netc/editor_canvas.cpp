@@ -15,9 +15,10 @@ namespace ygopro
         Bind(wxEVT_SIZE, &wxEditorCanvas::EventResized, this);
         Bind(wxEVT_PAINT, &wxEditorCanvas::EventRender, this);
         Bind(wxEVT_MOTION, &wxEditorCanvas::EventMouseMoved, this);
-        Bind(wxEVT_MOUSEWHEEL, &wxEditorCanvas::EventMouseWheelMoved, this);
-        Bind(wxEVT_LEFT_DOWN, &wxEditorCanvas::EventMouseDown, this);
-        Bind(wxEVT_LEFT_UP, &wxEditorCanvas::EventMouseReleased, this);
+        Bind(wxEVT_LEFT_DOWN, &wxEditorCanvas::EventMouseLDown, this);
+        Bind(wxEVT_LEFT_UP, &wxEditorCanvas::EventMouseLUp, this);
+        Bind(wxEVT_RIGHT_DOWN, &wxEditorCanvas::EventMouseRDown, this);
+        Bind(wxEVT_LEFT_DCLICK, &wxEditorCanvas::EventMouseDClick, this);
         Bind(wxEVT_LEAVE_WINDOW, &wxEditorCanvas::EventMouseLeftWindow, this);
         hover_timer.SetOwner(this);
         Bind(wxEVT_TIMER, &wxEditorCanvas::OnHoverTimer, this);
@@ -31,6 +32,8 @@ namespace ygopro
         t_limits[2] = &imageMgr.textures["limit2"];
         hover_field = 0;
         hover_index = 0;
+        click_field = 0;
+        click_index = 0;
         hover_code = 0;
     }
 
@@ -170,44 +173,71 @@ namespace ygopro
                 }
             }
         }
-        if(pre_field != hover_field || pre_index != hover_index)
+        if(!evt.Dragging() || click_field == 0) {
+            if(pre_field != hover_field || pre_index != hover_index)
+                Refresh();
+            if(pre_code != hover_code && hover_code != 0) {
+                int delay = (int)commonCfg["hover_info_delay"];
+                if(delay == 0)
+                    editorFrame->SetCardInfo(hover_code);
+                else {
+                    hover_timer.Stop();
+                    hover_timer.SetClientData((void*)(long)hover_code);
+                    hover_timer.StartOnce(delay);
+                }
+            }
+        } else {
+            if(pre_field == hover_field && pre_index == hover_index)
+                return;
+            if(current_deck.MoveCard(click_field, click_index, hover_field, hover_index)) {
+                click_field = hover_field;
+                click_index = hover_index;
+            }
             Refresh();
-        int delay = (int)commonCfg["hover_info_delay"];
-        if(pre_code != hover_code && hover_code != 0) {
-            if(delay == 0)
-                editorFrame->SetCardInfo(hover_code);
-            else {
-                hover_timer.Stop();
-                hover_timer.SetClientData((void*)(long)hover_code);
-                hover_timer.StartOnce(delay);
+        }
+    }
+
+    void wxEditorCanvas::EventMouseLDown(wxMouseEvent& evt) {
+        click_field = hover_field;
+        click_index = hover_index;
+        if(click_field)
+            Refresh();
+    }
+    
+    void wxEditorCanvas::EventMouseLUp(wxMouseEvent& evt) {
+        if(click_field) {
+            click_field = 0;
+            click_index = 0;
+            Refresh();
+        }
+    }
+    
+    void wxEditorCanvas::EventMouseDClick(wxMouseEvent& evt) {
+        if(hover_field == 1) {
+            if(current_deck.InsertCard(std::get<0>(current_deck.main_deck[hover_index])->code, 1)) {
+                Refresh();
+                EventMouseMoved(evt);
+            }
+        } else if(hover_field == 2) {
+            if(current_deck.InsertCard(std::get<0>(current_deck.extra_deck[hover_index])->code, 2)) {
+                Refresh();
+                EventMouseMoved(evt);
+            }
+        } else if(hover_field == 3) {
+            if(current_deck.InsertCard(std::get<0>(current_deck.side_deck[hover_index])->code, 3)) {
+                Refresh();
+                EventMouseMoved(evt);
             }
         }
     }
 
-    void wxEditorCanvas::EventMouseWheelMoved(wxMouseEvent& evt) {
-
+    void wxEditorCanvas::EventMouseRDown(wxMouseEvent& evt) {
+        if(current_deck.RemoveCard(hover_field, hover_index)) {
+            Refresh();
+            EventMouseMoved(evt);
+        }
     }
-
-    void wxEditorCanvas::EventMouseDown(wxMouseEvent& evt) {
-        if(hover_field == 0)
-            return;
-        click_field = hover_field;
-        click_index = hover_index;
-        wxMenu popmenu;
-        popmenu.Append(ID_POP_ADDCARD, "Same card +1");
-        popmenu.Append(ID_POP_DELCARD, "Remove card");
-        if(hover_field == 1 || hover_field == 2)
-            popmenu.Append(ID_POP_TOSIDE, "Move to side deck");
-        else
-            popmenu.Append(ID_POP_TOMAIN, "Move to main deck");
-        popmenu.Bind(wxEVT_COMMAND_MENU_SELECTED, &wxEditorCanvas::OnPopupMenu, this);
-        PopupMenu(&popmenu);
-    }
-
-    void wxEditorCanvas::EventMouseReleased(wxMouseEvent& evt) {
-
-    }
-
+    
     void wxEditorCanvas::EventMouseLeftWindow(wxMouseEvent& evt) {
         if(hover_field != 0) {
             hover_field = 0;
@@ -221,20 +251,6 @@ namespace ygopro
         unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
         if(code == hover_code)
             editorFrame->SetCardInfo(code);
-    }
-
-    void wxEditorCanvas::OnPopupMenu(wxCommandEvent& evt) {
-        unsigned int id = evt.GetId();
-        switch(id) {
-        case ID_POP_ADDCARD:
-            break;
-        case ID_POP_DELCARD:
-            break;
-        case ID_POP_TOMAIN:
-            break;
-        case ID_POP_TOSIDE:
-            break;
-        }
     }
 
     void wxEditorCanvas::DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {
@@ -294,6 +310,38 @@ namespace ygopro
         glEnd();
     }
 
+    void wxEditorCanvas::DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy) {
+        glBindTexture(GL_TEXTURE_2D, ti->tex());
+        glBegin(GL_QUADS);
+        {
+            glTexCoord2f(ti->lx, ti->ly); glVertex2f(lx, ly);
+            glTexCoord2f(ti->lx, ti->ry); glVertex2f(lx, ry);
+            glTexCoord2f(ti->rx, ti->ry); glVertex2f(rx, ry);
+            glTexCoord2f(ti->rx, ti->ly); glVertex2f(rx, ly);
+        }
+        glEnd();
+        if(hl) {
+            glBindTexture(GL_TEXTURE_2D, t_hmask->tex());
+            glBegin(GL_QUADS);
+            glTexCoord2f(t_hmask->lx, t_hmask->ly); glVertex2f(lx, ly);
+            glTexCoord2f(t_hmask->lx, t_hmask->ry); glVertex2f(lx, ry);
+            glTexCoord2f(t_hmask->rx, t_hmask->ry); glVertex2f(rx, ry);
+            glTexCoord2f(t_hmask->rx, t_hmask->ly); glVertex2f(rx, ly);
+            glEnd();
+        }
+        if(limit >= 3)
+            return;
+        glBindTexture(GL_TEXTURE_2D, t_limits[limit]->tex());
+        glBegin(GL_QUADS);
+        {
+            glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ly); glVertex2f(lx - 0.01f, ly + 0.01f);
+            glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ry); glVertex2f(lx - 0.01f, ly + 0.01f - iy);
+            glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(lx - 0.01f + ix, ly + 0.01f - iy);
+            glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(lx - 0.01f + ix, ly + 0.01f);
+        }
+        glEnd();
+    }
+    
     void wxEditorCanvas::DrawScene() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -333,8 +381,8 @@ namespace ygopro
         size_t main_size = current_deck.main_deck.size();
         float wd = 0.2f * glheight / glwidth;
         float ht = 0.29f;
-        float iconw = 0.08f * glheight / glwidth;
-        float iconh = 0.08f;
+        float ix = 0.08f * glheight / glwidth;
+        float iy = 0.08f;
         size_t line_size = 18.0f / 11 / wd;
         if(main_size > line_size * 4)
             line_size = (main_size - 1) / 4 + 1;
@@ -355,35 +403,10 @@ namespace ygopro
             TextureInfo* ti = &cti->ti;
             size_t lx = i % line_size;
             size_t ly = i / line_size;
-            glBindTexture(GL_TEXTURE_2D, ti->tex());
-            glBegin(GL_QUADS);
-            {
-                glTexCoord2f(ti->lx, ti->ly); glVertex2f(sx + lx * dx, sy - ly * dy);
-                glTexCoord2f(ti->lx, ti->ry); glVertex2f(sx + lx * dx, sy - ly * dy - ht);
-                glTexCoord2f(ti->rx, ti->ry); glVertex2f(sx + lx * dx + wd, sy - ly * dy - ht);
-                glTexCoord2f(ti->rx, ti->ly); glVertex2f(sx + lx * dx + wd, sy - ly * dy);
-            }
-            glEnd();
-            if(hover_field == 1 && hover_index == i) {
-                glBindTexture(GL_TEXTURE_2D, t_hmask->tex());
-                glBegin(GL_QUADS);
-                glTexCoord2f(t_hmask->lx, t_hmask->ly); glVertex2f(sx + lx * dx, sy - ly * dy);
-                glTexCoord2f(t_hmask->lx, t_hmask->ry); glVertex2f(sx + lx * dx, sy - ly * dy - ht);
-                glTexCoord2f(t_hmask->rx, t_hmask->ry); glVertex2f(sx + lx * dx + wd, sy - ly * dy - ht);
-                glTexCoord2f(t_hmask->rx, t_hmask->ly); glVertex2f(sx + lx * dx + wd, sy - ly * dy);
-                glEnd();
-            }
-            if(limit >= 3)
-                continue;
-            glBindTexture(GL_TEXTURE_2D, t_limits[limit]->tex());
-            glBegin(GL_QUADS);
-            {
-                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + lx * dx, sy + 0.01f - ly * dy);
-                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + lx * dx, sy + 0.01f - ly * dy - iconh);
-                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + lx * dx + iconw, sy + 0.01f - ly * dy - iconh);
-                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + lx * dx + iconw, sy + 0.01f - ly * dy);
-            }
-            glEnd();
+            if(click_field == 1 && click_index == i)
+                DrawCard(ti, sx + lx * dx, sy - ly * dy + 0.05f, sx + lx * dx + wd, sy - ly * dy - ht + 0.05f, hover_field == 1 && hover_index == i, limit, ix, iy);
+            else
+                DrawCard(ti, sx + lx * dx, sy - ly * dy, sx + lx * dx + wd, sy - ly * dy - ht, hover_field == 1 && hover_index == i, limit, ix, iy);
         }
         size_t extra_size = current_deck.extra_deck.size();
         sx = -0.85f;
@@ -399,35 +422,10 @@ namespace ygopro
                 std::get<1>(current_deck.extra_deck[i]) = cti;
             }
             TextureInfo* ti = &cti->ti;
-            glBindTexture(GL_TEXTURE_2D, ti->tex());
-            glBegin(GL_QUADS);
-            {
-                glTexCoord2f(ti->lx, ti->ly); glVertex2f(sx + i * dx, sy);
-                glTexCoord2f(ti->lx, ti->ry); glVertex2f(sx + i * dx, sy - ht);
-                glTexCoord2f(ti->rx, ti->ry); glVertex2f(sx + i * dx + wd, sy - ht);
-                glTexCoord2f(ti->rx, ti->ly); glVertex2f(sx + i * dx + wd, sy);
-            }
-            glEnd();
-            if(hover_field == 2 && hover_index == i) {
-                glBindTexture(GL_TEXTURE_2D, t_hmask->tex());
-                glBegin(GL_QUADS);
-                glTexCoord2f(t_hmask->lx, t_hmask->ly); glVertex2f(sx + i * dx, sy);
-                glTexCoord2f(t_hmask->lx, t_hmask->ry); glVertex2f(sx + i * dx, sy - ht);
-                glTexCoord2f(t_hmask->rx, t_hmask->ry); glVertex2f(sx + i * dx + wd, sy - ht);
-                glTexCoord2f(t_hmask->rx, t_hmask->ly); glVertex2f(sx + i * dx + wd, sy);
-                glEnd();
-            }
-            if(limit >= 3)
-                continue;
-            glBindTexture(GL_TEXTURE_2D, t_limits[limit]->tex());
-            glBegin(GL_QUADS);
-            {
-                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + i * dx, sy + 0.01f);
-                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + i * dx, sy + 0.01f - iconh);
-                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + i * dx + iconw, sy + 0.01f - iconh);
-                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + i * dx + iconw, sy + 0.01f);
-            }
-            glEnd();
+            if(click_field == 2 && click_index == i)
+                DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 2 && hover_index == i, limit, ix, iy);
+            else
+                DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 2 && hover_index == i, limit, ix, iy);
         }
         size_t side_size = current_deck.side_deck.size();
         sx = -0.85f;
@@ -443,35 +441,10 @@ namespace ygopro
                 std::get<1>(current_deck.side_deck[i]) = cti;
             }
             TextureInfo* ti = &cti->ti;
-            glBindTexture(GL_TEXTURE_2D, ti->tex());
-            glBegin(GL_QUADS);
-            {
-                glTexCoord2f(ti->lx, ti->ly); glVertex2f(sx + i * dx, sy);
-                glTexCoord2f(ti->lx, ti->ry); glVertex2f(sx + i * dx, sy - ht);
-                glTexCoord2f(ti->rx, ti->ry); glVertex2f(sx + i * dx + wd, sy - ht);
-                glTexCoord2f(ti->rx, ti->ly); glVertex2f(sx + i * dx + wd, sy);
-            }
-            glEnd();
-            if(hover_field == 3 && hover_index == i) {
-                glBindTexture(GL_TEXTURE_2D, t_hmask->tex());
-                glBegin(GL_QUADS);
-                glTexCoord2f(t_hmask->lx, t_hmask->ly); glVertex2f(sx + i * dx, sy);
-                glTexCoord2f(t_hmask->lx, t_hmask->ry); glVertex2f(sx + i * dx, sy - ht);
-                glTexCoord2f(t_hmask->rx, t_hmask->ry); glVertex2f(sx + i * dx + wd, sy - ht);
-                glTexCoord2f(t_hmask->rx, t_hmask->ly); glVertex2f(sx + i * dx + wd, sy);
-                glEnd();
-            }
-            if(limit >= 3)
-                continue;
-            glBindTexture(GL_TEXTURE_2D, t_limits[limit]->tex());
-            glBegin(GL_QUADS);
-            {
-                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + i * dx, sy + 0.01f);
-                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + i * dx, sy + 0.01f - iconh);
-                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(sx - 0.01f + i * dx + iconw, sy + 0.01f - iconh);
-                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(sx - 0.01f + i * dx + iconw, sy + 0.01f);
-            }
-            glEnd();
+            if(click_field == 3 && click_index == i)
+                DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 3 && hover_index == i, limit, ix, iy);
+            else
+                DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 3 && hover_index == i, limit, ix, iy);
         }
         DrawNumber(current_deck.mcount, 0xffffff00, -0.931f, 0.913f, -0.868f, 0.850f);
         DrawNumber(current_deck.scount, 0xffffff00, -0.931f, 0.825f, -0.868f, 0.762f);
