@@ -38,7 +38,7 @@ function c27346636.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function c27346636.spfilter1(c,tp)
-	return c:IsCode(78868776) and c:IsAbleToDeckAsCost() and c:IsCanBeFusionMaterial()
+	return c:IsCode(78868776) and c:IsAbleToDeckAsCost() and c:IsCanBeFusionMaterial(true)
 		and Duel.IsExistingMatchingCard(c27346636.spfilter2,tp,LOCATION_MZONE,0,2,c)
 end
 function c27346636.spfilter2(c)

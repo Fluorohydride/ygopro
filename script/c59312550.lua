@@ -14,7 +14,7 @@ end
 function c59312550.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE)
-		and c:GetBattlePosition()==POS_FACEUP_ATTACK and c:GetPreviousControler()==tp
+		and c:IsPreviousPosition(POS_FACEUP_ATTACK) and c:GetPreviousControler()==tp
 end
 function c59312550.filter(c,e,tp)
 	return c:IsSetCard(0x22) and c:IsAttackBelow(1700) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

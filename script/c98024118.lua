@@ -28,7 +28,7 @@ function c98024118.indcon(e)
 end
 function c98024118.filter(c,tp)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:IsType(TYPE_TUNER)
-		and c:GetPreviousControler()==tp and bit.band(c:GetBattlePosition(),POS_FACEUP)~=0
+		and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP)
 end
 function c98024118.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c98024118.filter,1,nil,tp)
