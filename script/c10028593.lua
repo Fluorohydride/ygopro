@@ -1,4 +1,4 @@
---݆�h�칷
+--輪廻天狗
 function c10028593.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

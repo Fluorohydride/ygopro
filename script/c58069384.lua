@@ -66,7 +66,7 @@ function c58069384.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c58069384.atkfilter(c)
-	return c:IsCode(70095154) and c:IsAbleToRemoveAsCost()
+	return c:IsCode(70095154) and c:IsAbleToRemoveAsCost() and (not c:IsOnField() or c:IsFaceup())
 end
 function c58069384.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c58069384.atkfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,nil) end
