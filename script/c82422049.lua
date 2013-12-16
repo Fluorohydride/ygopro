@@ -22,10 +22,10 @@ function c82422049.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c82422049.filter2,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g2=Duel.SelectTarget(tp,c82422049.filter1,tp,LOCATION_GRAVE,0,2,2,g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectTarget(tp,c82422049.filter2,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+	local g2=Duel.SelectTarget(tp,c82422049.filter1,tp,LOCATION_GRAVE,0,2,2,g1:GetFirst())
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g2,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,1,0,0)
 end
