@@ -55,10 +55,10 @@ function c67159705.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
 end
 function c67159705.eqlimit(e,c)
-	return c:IsSetCard(0x103)
+	return c:IsCode(70095154) or c:IsSetCard(0x103)
 end
 function c67159705.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x103) and c:GetUnionCount()==0
+	return c:IsFaceup() and (c:IsCode(70095154) or c:IsSetCard(0x103)) and c:GetUnionCount()==0
 end
 function c67159705.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c67159705.filter(chkc) end
