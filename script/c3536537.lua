@@ -13,15 +13,9 @@ function c3536537.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c3536537.descon(e,tp,eg,ep,ev,re,r,rp)
-	if bit.band(r,REASON_DESTROY)==0 then return false end
-	if bit.band(r,REASON_BATTLE)~=0 then
-		return bit.band(e:GetHandler():GetBattlePosition(),POS_FACEUP)~=0
-			and e:GetHandler():GetPreviousControler()==tp and rp~=tp
-	else
-		return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
-			and e:GetHandler():IsPreviousPosition(POS_FACEUP)
-			and e:GetHandler():GetPreviousControler()==tp and rp~=tp
-	end
+	local c=e:GetHandler()
+	return rp~=tp and c:GetPreviousControler()==tp and bit.band(r,REASON_DESTROY)~=0
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c3536537.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(5) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0 and c:IsDestructable()

@@ -62,11 +62,8 @@ function c93483212.imfilter(e,re)
 end
 function c93483212.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ctl=c:GetPreviousControler()
-	local pos=c:GetPreviousPosition()
-	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
-	if ctl==tp and rp~=tp and c:IsReason(REASON_DESTROY)
-		and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0 and bit.band(pos,POS_FACEUP)~=0 then
+	if rp~=tp and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY)
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP) then
 		c:RegisterFlagEffect(93483212,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	end
 end

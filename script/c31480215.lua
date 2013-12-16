@@ -68,8 +68,8 @@ function c31480215.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsAttribute(ATTRIBUTE_WIND)
 end
 function c31480215.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,31480215)==0 and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x101b) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x101b)
+	if chk==0 then return Duel.GetFlagEffect(tp,31480215)==0 and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0x101b) end
+	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,e:GetHandler(),0x101b)
 	Duel.Release(g,REASON_COST)
 	Duel.RegisterFlagEffect(tp,31480215,RESET_PHASE+PHASE_END,0,1)
 end

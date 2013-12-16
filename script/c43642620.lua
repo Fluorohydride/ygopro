@@ -25,7 +25,6 @@ end
 function c43642620.dmcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP)
-		and (not c:IsReason(REASON_BATTLE) or bit.band(c:GetBattlePosition(),POS_FACEUP)~=0)
 end
 function c43642620.dmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
