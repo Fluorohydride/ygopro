@@ -3658,6 +3658,8 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 40: {
+		core.attacker = 0;
+		core.attack_target = 0;
 		returns.ivalue[0] = core.units.begin()->arg1;
 		returns.ivalue[1] = core.units.begin()->arg2;
 		return TRUE;
