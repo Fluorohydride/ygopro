@@ -14,6 +14,9 @@ function c40343749.initial_effect(c)
 end
 function c40343749.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if c:IsReason(REASON_BATTLE) then
+		return c:GetReasonPlayer()~=tp and bit.band(c:GetBattlePosition(),POS_FACEUP)~=0
+	end
 	return rp~=tp and c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP)
 		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
 end

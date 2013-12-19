@@ -29,8 +29,7 @@ function c96235275.discon(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer()
 end
 function c96235275.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(96235275)==0 end
-	e:GetHandler():RegisterFlagEffect(96235275,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,2)
 end
 function c96235275.disop(e,tp,eg,ep,ev,re,r,rp)

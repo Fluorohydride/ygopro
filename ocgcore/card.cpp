@@ -804,6 +804,8 @@ void card::enable_field_effect(int32 enabled) {
 			for (it = equip_effect.begin(); it != equip_effect.end(); ++it)
 				it->second->id = pduel->game_field->infos.field_id++;
 		}
+		if (get_status(STATUS_DISABLED))
+			reset(RESET_DISABLE, RESET_EVENT);
 	} else
 		set_status(STATUS_EFFECT_ENABLED, FALSE);
 	filter_immune_effect();

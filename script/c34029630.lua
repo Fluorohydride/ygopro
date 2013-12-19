@@ -39,8 +39,7 @@ function c34029630.initial_effect(c)
 end
 function c34029630.ctpermit(e)
 	local c=e:GetHandler()
-	if not c:IsLocation(LOCATION_SZONE) then return false end
-	return not c:IsStatus(STATUS_EFFECT_ENABLED) or not c:IsStatus(STATUS_DISABLED)
+	return c:IsLocation(LOCATION_SZONE) and not c:IsStatus(STATUS_DISABLED)
 end
 function c34029630.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c34029630.filter(chkc) end

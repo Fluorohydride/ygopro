@@ -31,7 +31,7 @@ function c51452091.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c51452091.distarget(e,c)
-	return c~=e:GetHandler() and c:IsType(TYPE_TRAP)
+	return c~=e:GetHandler() and c:IsType(TYPE_TRAP) and c:IsStatus(STATUS_ACTIVATED)
 end
 function c51452091.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
