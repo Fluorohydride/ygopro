@@ -41,6 +41,7 @@ function c77558536.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ct==0 then return end
 	local c=e:GetHandler()
 	if c:IsFaceup() and c:IsRelateToEffect(e) then
+		Duel.BreakEffect()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -58,6 +59,5 @@ function c77558536.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c77558536.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetControler()~=tp or not c:IsRelateToEffect(e) or c:IsFacedown() then return end
 	Duel.DiscardDeck(tp,2,REASON_EFFECT)
 end
