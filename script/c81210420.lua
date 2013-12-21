@@ -18,7 +18,9 @@ function c81210420.filter(c)
 	return c:IsFacedown() or c:IsCanTurnSet()
 end
 function c81210420.spfilter(c,e,tp)
+	local code=c:GetCode()
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsCanBeSpecialSummoned(e,0,tp,true,false,POS_FACEDOWN)
+	and code~=31893528 and code~=67287533 and code~=94772232 and code~=30170981
 end
 function c81210420.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c81210420.filter,tp,LOCATION_MZONE,0,1,nil)
