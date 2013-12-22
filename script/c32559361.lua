@@ -44,7 +44,7 @@ end
 function c32559361.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=c:GetBattleTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToBattle() and not tc:IsImmuneToEffect(e) then
 		local og=tc:GetOverlayGroup()
 		if og:GetCount()>0 then
 			Duel.SendtoGrave(og,REASON_RULE)
