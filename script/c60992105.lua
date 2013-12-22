@@ -35,9 +35,8 @@ function c60992105.operation(e,tp,eg,ep,ev,re,r,rp)
 	for i=1,ct do t[i]=i end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(60992105,1))
 	local ac=Duel.AnnounceNumber(tp,table.unpack(t))
-	local g=Duel.GetDecktopGroup(tp,ac)
-	Duel.DisableShuffleCheck()
-	Duel.SendtoGrave(g,REASON_EFFECT)
+	Duel.DiscardDeck(tp,ac,REASON_EFFECT)
+	local g=Duel.GetOperatedGroup()
 	if g:IsExists(c60992105.filter,1,nil) and c:IsFaceup() and c:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

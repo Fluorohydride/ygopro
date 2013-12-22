@@ -19,13 +19,16 @@ function c34620088.initial_effect(c)
 	e2:SetTarget(c34620088.sptg)
 	e2:SetOperation(c34620088.spop)
 	c:RegisterEffect(e2)
-	--redirect
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_TO_GRAVE_REDIRECT)
-	e3:SetCondition(c34620088.rmcon)
-	e3:SetValue(LOCATION_REMOVED)
-	c:RegisterEffect(e3)
+	if not c34620088.global_check then
+		c34620088.global_check=true
+		local ge1=Effect.GlobalEffect()
+		ge1:SetType(EFFECT_TYPE_FIELD)
+		ge1:SetCode(EFFECT_TO_GRAVE_REDIRECT)
+		ge1:SetTargetRange(LOCATION_OVERLAY,LOCATION_OVERLAY)
+		ge1:SetTarget(aux.TargetBoolFunction(Card.IsCode,34620088))
+		ge1:SetValue(LOCATION_REMOVED)
+		Duel.RegisterEffect(ge1,0)
+	end
 end
 function c34620088.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and eg:GetFirst():IsControler(1-tp) and Duel.GetAttackTarget()==nil
@@ -45,7 +48,4 @@ function c34620088.spop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP_ATTACK)~=0 then
 		Duel.Damage(tp,1000,REASON_EFFECT)
 	end
-end
-function c34620088.rmcon(e)
-	return e:GetHandler():IsLocation(LOCATION_OVERLAY)
 end
