@@ -42,7 +42,8 @@ function c21702241.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c21702241.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetHandler():GetEquipTarget())
+	local tg=e:GetHandler():GetEquipTarget()
+	return tg and eg:IsContains(tg)
 end
 function c21702241.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e)
