@@ -37,9 +37,12 @@ function c50260683.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
+function c50260683.filter(c)
+	return c:IsFaceup() and c:GetAttack()>0
+end
 function c50260683.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c50260683.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
 end
@@ -59,14 +62,14 @@ function c50260683.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x70)
 	Duel.Release(g,REASON_COST)
 end
-function c50260683.filter(c)
+function c50260683.filter2(c)
 	return c:IsFaceup() and c:GetAttack()~=c:GetBaseAttack() and c:IsDestructable()
 end
 function c50260683.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c50260683.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c50260683.filter,tp,0,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c50260683.filter2(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c50260683.filter2,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c50260683.filter,tp,0,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,c50260683.filter2,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c50260683.desop(e,tp,eg,ep,ev,re,r,rp)
