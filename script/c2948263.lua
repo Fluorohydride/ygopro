@@ -61,9 +61,9 @@ function c2948263.rdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(ep,ev/2)
 end
 function c2948263.discon(e,tp,eg,ep,ev,re,r,rp)
-	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
+	local tgp,loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainDisablable(ev)
-		and rp~=tp and re:IsActiveType(TYPE_MONSTER) and loc==LOCATION_MZONE
+		and tgp~=tp and re:IsActiveType(TYPE_MONSTER) and loc==LOCATION_MZONE
 end
 function c2948263.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

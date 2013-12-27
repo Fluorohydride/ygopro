@@ -35,10 +35,9 @@ function c69170557.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c69170557.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c69170557.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	Duel.Destroy(g,REASON_EFFECT)
+	if Duel.Destroy(g,REASON_EFFECT)==0 then return end
 	local og=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_GRAVE)
-	Duel.Draw(tp,1,REASON_EFFECT)
-	if og:GetCount()>0 then
+	if Duel.Draw(tp,1,REASON_EFFECT)~=0 and og:GetCount()>0 then
 		Duel.BreakEffect()
 		local mg,matk=og:GetMaxGroup(Card.GetBaseAttack)
 		if matk>0 then
