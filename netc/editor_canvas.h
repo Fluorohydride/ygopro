@@ -14,21 +14,27 @@ namespace ygopro
 	class wxEditorCanvas : public wxGLCanvas {
 
 	private:
-		wxGLContext* glcontext;
+		wxGLContext* glcontext = nullptr;
         wxTimer hover_timer;
-		unsigned int glwidth;
-		unsigned int glheight;
-        TextureInfo* t_buildbg;
-        TextureInfo* t_deckbg;
-        TextureInfo* t_font;
-        TextureInfo* t_hmask;
-        TextureInfo* t_limits[3];
+		unsigned int glwidth = 0;
+		unsigned int glheight = 0;
+        TextureInfo* t_buildbg = nullptr;
+        TextureInfo* t_deckbg = nullptr;
+        TextureInfo* t_font = nullptr;
+        TextureInfo* t_hmask = nullptr;
+        TextureInfo* t_limits[3] = { nullptr };
+        CardTextureInfo* t_draging = nullptr;
         DeckData current_deck;
-        short hover_field;
-        short hover_index;
-        short click_field;
-        short click_index;
-        unsigned int hover_code;
+        short hover_field = 0;
+        short hover_index = 0;
+        short mouse_field = 0;
+        short click_field = 0;
+        short click_index = 0;
+        unsigned int hover_code = 0;
+        unsigned int draging_code = 0;
+        wxLongLong click_time = 0;
+        double mousex = 0.0;
+        double mousey = 0.0;
         
 	public:
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
@@ -49,8 +55,6 @@ namespace ygopro
 		void EventMouseMoved(wxMouseEvent& evt);
         void EventMouseLDown(wxMouseEvent& evt);
         void EventMouseLUp(wxMouseEvent& evt);
-        void EventMouseRDown(wxMouseEvent& evt);
-		void EventMouseDClick(wxMouseEvent& evt);
 		void EventMouseLeftWindow(wxMouseEvent& evt);
         void OnHoverTimer(wxTimerEvent& evt);
 

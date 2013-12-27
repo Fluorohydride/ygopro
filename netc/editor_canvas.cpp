@@ -1,5 +1,6 @@
 #include "wx/image.h"
 #include "wx/clipbrd.h"
+#include "wx/time.h"
 #include "image_mgr.h"
 #include "game_frame.h"
 #include "editor_frame.h"
@@ -17,8 +18,6 @@ namespace ygopro
         Bind(wxEVT_MOTION, &wxEditorCanvas::EventMouseMoved, this);
         Bind(wxEVT_LEFT_DOWN, &wxEditorCanvas::EventMouseLDown, this);
         Bind(wxEVT_LEFT_UP, &wxEditorCanvas::EventMouseLUp, this);
-        Bind(wxEVT_RIGHT_DOWN, &wxEditorCanvas::EventMouseRDown, this);
-        Bind(wxEVT_LEFT_DCLICK, &wxEditorCanvas::EventMouseDClick, this);
         Bind(wxEVT_LEAVE_WINDOW, &wxEditorCanvas::EventMouseLeftWindow, this);
         hover_timer.SetOwner(this);
         Bind(wxEVT_TIMER, &wxEditorCanvas::OnHoverTimer, this);
@@ -30,11 +29,6 @@ namespace ygopro
         t_limits[0] = &imageMgr.textures["limit0"];
         t_limits[1] = &imageMgr.textures["limit1"];
         t_limits[2] = &imageMgr.textures["limit2"];
-        hover_field = 0;
-        hover_index = 0;
-        click_field = 0;
-        click_index = 0;
-        hover_code = 0;
     }
 
     wxEditorCanvas::~wxEditorCanvas() {
@@ -102,10 +96,12 @@ namespace ygopro
         hover_field = 0;
         hover_index = 0;
         hover_code = 0;
+        mouse_field = 0;
         float wd = 0.2f * glheight / glwidth;
         float ht = 0.29f;
         if(fx >= -0.85f && fx <= 0.95f) {
             if(fy <= 0.92f && fy >= -0.28) { //main
+                mouse_field = 1;
                 int main_size = (int)current_deck.main_deck.size();
                 if(main_size) {
                     int line_size = 18.0f / 11 / wd;
@@ -129,53 +125,61 @@ namespace ygopro
                         yindex = 3;
                     float sx = -0.85 + dx * xindex;
                     float sy = 0.92 - dy * yindex;
-                    if(fx - sx <= wd && sy - fy <= ht) {
+                    hover_index = (short)(yindex * line_size + xindex);
+                    if(hover_index < main_size && fx - sx <= wd && sy - fy <= ht) {
                         hover_field = 1;
-                        hover_index = (short)(yindex * line_size + xindex);
-                        if(hover_index >= main_size) {
-                            hover_field = 0;
-                            hover_index = 0;
-                        } else
-                            hover_code = std::get<0>(current_deck.main_deck[hover_index])->code;
+                        hover_code = std::get<0>(current_deck.main_deck[hover_index])->code;
                     }
                 }
             } else if(fy <= -0.31f && fy >= -0.60f) { //extra
+                mouse_field = 2;
                 int extra_size = (int)current_deck.extra_deck.size();
                 if(extra_size) {
                     float dx = (1.8f - wd) / (extra_size - 1);
                     if(dx > wd * 11.0f / 10.0f)
                         dx = wd * 11.0f / 10.0f;
-                    int index = (fx + 0.85f) / dx;
-                    if(index >= extra_size)
-                        index = extra_size - 1;
-                    float sx = -0.85 + dx * index;
-                    if(fx - sx <= wd) {
+                    hover_index = (fx + 0.85f) / dx;
+                    float sx = -0.85 + dx * hover_index;
+                    if(hover_index < extra_size && fx - sx <= wd) {
                         hover_field = 2;
-                        hover_index = (short)index;
                         hover_code = std::get<0>(current_deck.extra_deck[hover_index])->code;
                     }
                 }
             } else if(fy <= -0.64f && fy >= -0.93f) { //side
+                mouse_field = 2;
                 int side_size = (int)current_deck.side_deck.size();
                 if(side_size) {
                     float dx = (1.8f - wd) / (side_size - 1);
                     if(dx > wd * 11.0f / 10.0f)
                         dx = wd * 11.0f / 10.0f;
-                    int index = (fx + 0.85f) / dx;
-                    if(index >= side_size)
-                        index = side_size - 1;
-                    float sx = -0.85 + dx * index;
-                    if(fx - sx <= wd) {
+                    hover_index = (fx + 0.85f) / dx;
+                    float sx = -0.85 + dx * hover_index;
+                    if(hover_index < side_size && fx - sx <= wd) {
                         hover_field = 3;
-                        hover_index = (short)index;
                         hover_code = std::get<0>(current_deck.side_deck[hover_index])->code;
                     }
                 }
             }
         }
-        if(!evt.Dragging() || click_field == 0) {
-            if(pre_field != hover_field || pre_index != hover_index)
-                Refresh();
+        click_time = 0;
+        mousex = evt.GetX() * 2.0 / glwidth - 1.0;
+        mousey = evt.GetY() * 2.0 / glheight - 1.0;
+        if(pre_field == hover_field && pre_index == hover_index)
+            return;
+        if(click_field) {
+            if(click_field == 1) {
+                draging_code = std::get<0>(current_deck.main_deck[click_index])->code;
+                t_draging = std::get<1>(current_deck.main_deck[click_index]);
+            } else if(click_field == 2) {
+                draging_code = std::get<0>(current_deck.extra_deck[click_index])->code;
+                t_draging = std::get<1>(current_deck.extra_deck[click_index]);
+            } else {
+                draging_code = std::get<0>(current_deck.side_deck[click_index])->code;
+                t_draging = std::get<1>(current_deck.side_deck[click_index]);
+            }
+            current_deck.RemoveCard(click_field, click_index);
+            click_field = 0;
+        } else {
             if(pre_code != hover_code && hover_code != 0) {
                 int delay = (int)commonCfg["hover_info_delay"];
                 if(delay == 0)
@@ -186,14 +190,6 @@ namespace ygopro
                     hover_timer.StartOnce(delay);
                 }
             }
-        } else {
-            if(pre_field == hover_field && pre_index == hover_index)
-                return;
-            if(current_deck.MoveCard(click_field, click_index, hover_field, hover_index)) {
-                click_field = hover_field;
-                click_index = hover_index;
-            }
-            Refresh();
         }
     }
 
@@ -210,31 +206,43 @@ namespace ygopro
             click_index = 0;
             Refresh();
         }
-    }
-    
-    void wxEditorCanvas::EventMouseDClick(wxMouseEvent& evt) {
-        if(hover_field == 1) {
-            if(current_deck.InsertCard(std::get<0>(current_deck.main_deck[hover_index])->code, 1)) {
-                Refresh();
-                EventMouseMoved(evt);
+        if(draging_code) {
+            if(mouse_field == 0) {
+                if(current_deck.RemoveCard(hover_field, hover_index))
+                    EventMouseMoved(evt);
+            } else {
+                if(current_deck.InsertCard(draging_code, mouse_field, hover_index))
+                    EventMouseMoved(evt);
             }
-        } else if(hover_field == 2) {
-            if(current_deck.InsertCard(std::get<0>(current_deck.extra_deck[hover_index])->code, 2)) {
-                Refresh();
-                EventMouseMoved(evt);
-            }
-        } else if(hover_field == 3) {
-            if(current_deck.InsertCard(std::get<0>(current_deck.side_deck[hover_index])->code, 3)) {
-                Refresh();
-                EventMouseMoved(evt);
-            }
-        }
-    }
-
-    void wxEditorCanvas::EventMouseRDown(wxMouseEvent& evt) {
-        if(current_deck.RemoveCard(hover_field, hover_index)) {
+            draging_code = 0;
+            t_draging = nullptr;
             Refresh();
-            EventMouseMoved(evt);
+        }
+        if(click_time == 0)
+            click_time = wxGetUTCTimeMillis();
+        else {
+            auto now = wxGetUTCTimeMillis();
+            long dif = (now - click_time).ToLong();
+            if(dif < 300) {
+                if(hover_field == 1) {
+                    if(current_deck.InsertCard(std::get<0>(current_deck.main_deck[hover_index])->code, 1)) {
+                        Refresh();
+                        EventMouseMoved(evt);
+                    }
+                } else if(hover_field == 2) {
+                    if(current_deck.InsertCard(std::get<0>(current_deck.extra_deck[hover_index])->code, 2)) {
+                        Refresh();
+                        EventMouseMoved(evt);
+                    }
+                } else if(hover_field == 3) {
+                    if(current_deck.InsertCard(std::get<0>(current_deck.side_deck[hover_index])->code, 3)) {
+                        Refresh();
+                        EventMouseMoved(evt);
+                    }
+                }
+                click_time = 0;
+            } else
+                click_time = now;
         }
     }
     

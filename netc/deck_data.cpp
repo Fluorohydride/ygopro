@@ -220,9 +220,12 @@ namespace ygopro
         auto tp = std::make_tuple(cd, nullptr, limit);
         if(pos == 1 || pos == 2) {
             if(cd->type & 0x802040) {
-                if(index > extra_deck.size())
-                    index = (unsigned int)extra_deck.size();
-                extra_deck.insert(extra_deck.begin() + index, tp);
+                if(pos == 1)
+                    return false;
+                if(index >= extra_deck.size())
+                    extra_deck.push_back(tp);
+                else
+                    extra_deck.insert(extra_deck.begin() + index, tp);
                 if(cd->type & 0x800000)
                     xyzcount++;
                 else if(cd->type & 0x2000)
@@ -230,9 +233,12 @@ namespace ygopro
                 else
                     fuscount++;
             } else {
-                if(index > main_deck.size())
-                    index = (unsigned int)main_deck.size();
-                main_deck.insert(main_deck.begin() + index, tp);
+                if(pos == 2)
+                    return false;
+                if(index >= main_deck.size())
+                    main_deck.push_back(tp);
+                else
+                    main_deck.insert(main_deck.begin() + index, tp);
                 if(cd->type & 0x1)
                     mcount++;
                 else if(cd->type & 0x2)
@@ -241,9 +247,10 @@ namespace ygopro
                     tcount++;
             }
         } else if(pos == 3) {
-            if(index > side_deck.size())
-                index = (unsigned int)side_deck.size();
-            side_deck.insert(side_deck.begin() + index, tp);
+            if(index >= side_deck.size())
+                side_deck.push_back(tp);
+            else
+                side_deck.insert(side_deck.begin() + index, tp);
         }
         counts[code]++;
         return true;
@@ -296,6 +303,8 @@ namespace ygopro
             return false;
         if(pos1 == pos2) {
             if(pos1 == 1) {
+                if(index1 >= main_deck.size() || index2 >= main_deck.size())
+                    return false;
                 auto data = main_deck[index1];
                 if(index1 > index2) {
                     for(size_t i = index1; i != index2; --i)
@@ -306,6 +315,8 @@ namespace ygopro
                 }
                 main_deck[index2] = data;
             } else if(pos1 == 2) {
+                if(index1 >= extra_deck.size() || index2 >= extra_deck.size())
+                    return false;
                 auto data = extra_deck[index1];
                 if(index1 > index2) {
                     for(size_t i = index1; i != index2; --i)
@@ -316,6 +327,8 @@ namespace ygopro
                 }
                 extra_deck[index2] = data;
             } else {
+                if(index1 >= side_deck.size() || index2 >= side_deck.size())
+                    return false;
                 auto data = side_deck[index1];
                 if(index1 > index2) {
                     for(size_t i = index1; i != index2; --i)
@@ -338,7 +351,10 @@ namespace ygopro
                     scount--;
                 else
                     tcount--;
-                side_deck.insert(side_deck.begin() + index2, ecd);
+                if(index2 >= side_deck.size())
+                    side_deck.push_back(ecd);
+                else
+                    side_deck.insert(side_deck.begin() + index2, ecd);
                 main_deck.erase(main_deck.begin() + index1);
             } else if(pos1 == 2) {
                 if(pos2 != 3)
@@ -351,7 +367,10 @@ namespace ygopro
                     syncount--;
                 else
                     fuscount--;
-                side_deck.insert(side_deck.begin() + index2, ecd);
+                if(index2 >= side_deck.size())
+                    side_deck.push_back(ecd);
+                else
+                    side_deck.insert(side_deck.begin() + index2, ecd);
                 extra_deck.erase(extra_deck.begin() + index1);
             } else if(pos2 == 1) {
                 auto& ecd = side_deck[index1];
@@ -364,7 +383,10 @@ namespace ygopro
                     scount++;
                 else
                     tcount++;
-                main_deck.insert(main_deck.begin() + index2, ecd);
+                if(index2 >= main_deck.size())
+                    main_deck.push_back(ecd);
+                else
+                    main_deck.insert(main_deck.begin() + index2, ecd);
                 side_deck.erase(side_deck.begin() + index1);
             } else {
                 auto& ecd = side_deck[index1];
@@ -377,6 +399,9 @@ namespace ygopro
                     syncount++;
                 else
                     fuscount++;
+                if(index2 >= extra_deck.size())
+                    extra_deck.push_back(ecd);
+                else
                 extra_deck.insert(extra_deck.begin() + index2, ecd);
                 side_deck.erase(side_deck.begin() + index1);
             }
