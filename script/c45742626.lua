@@ -1,6 +1,6 @@
 --巡死神リーパー
 function c45742626.initial_effect(c)
-	--synchro summon
+	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
 	c:EnableReviveLimit()
 	--atk/def
@@ -29,7 +29,8 @@ function c45742626.value(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsAttribute,0,LOCATION_GRAVE,LOCATION_GRAVE,nil,ATTRIBUTE_DARK)*200
 end
 function c45742626.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,45742626)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,45742626)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	Duel.RegisterFlagEffect(tp,45742626,RESET_PHASE+PHASE_END,0,1)
 end
 function c45742626.target(e,tp,eg,ep,ev,re,r,rp,chk)
