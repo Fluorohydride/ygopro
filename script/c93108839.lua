@@ -13,6 +13,24 @@ function c93108839.initial_effect(c)
 	e1:SetTarget(c93108839.eqtg)
 	e1:SetOperation(c93108839.eqop)
 	c:RegisterEffect(e1)
+	--direct
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_EQUIP)
+	e2:SetCode(EFFECT_DIRECT_ATTACK)
+	c:RegisterEffect(e2)
+	--damage
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(93108839,2))
+	e3:SetCategory(CATEGORY_DAMAGE)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_BATTLE_DAMAGE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCondition(c93108839.damcon)
+	e3:SetCost(c93108839.damcost)
+	e3:SetTarget(c93108839.damtg)
+	e3:SetOperation(c93108839.damop)
+	c:RegisterEffect(e3)
 end
 function c93108839.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
@@ -30,7 +48,7 @@ function c93108839.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
-	if not tc:IsRelateToEffect(e) or tc:IsFacedown() then
+	if not tc:IsRelateToEffect(e) or tc:IsFacedown() or tc:IsControler(1-tp) then
 		Duel.SendtoGrave(c,REASON_EFFECT)
 		return
 	end
@@ -45,26 +63,6 @@ function c93108839.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetOperation(c93108839.spop)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e1)
-	--direct
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_EQUIP)
-	e2:SetCode(EFFECT_DIRECT_ATTACK)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
-	c:RegisterEffect(e2)
-	--damage
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(93108839,2))
-	e3:SetCategory(CATEGORY_DAMAGE)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_BATTLE_DAMAGE)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetCondition(c93108839.damcon)
-	e3:SetCost(c93108839.damcost)
-	e3:SetTarget(c93108839.damtg)
-	e3:SetOperation(c93108839.damop)
-	e3:SetReset(RESET_EVENT+0x1fe0000)
-	c:RegisterEffect(e3)
 	--eqlimit
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
@@ -72,10 +70,11 @@ function c93108839.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetValue(c93108839.eqlimit)
 	e4:SetReset(RESET_EVENT+0x1fe0000)
+	e4:SetLabelObject(tc)
 	c:RegisterEffect(e4)
 end
 function c93108839.eqlimit(e,c)
-	return c:IsType(TYPE_XYZ)
+	return c==e:GetLabelObject()
 end
 function c93108839.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(93108839)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0

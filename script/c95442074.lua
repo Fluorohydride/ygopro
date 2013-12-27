@@ -60,6 +60,15 @@ function c95442074.operation(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EFFECT_MUST_BE_ATTACKED)
 	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_CANNOT_EP)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(0,1)
+	e3:SetCondition(c95442074.atcon)
+	e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e3)
 end
 function c95442074.filter(c)
 	return c:IsFaceup() and c:IsCode(69058960)
@@ -70,4 +79,7 @@ end
 function c95442074.refcon(e)
 	return Duel.IsExistingMatchingCard(c95442074.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 		and Duel.GetAttackTarget()==e:GetHandler()
+end
+function c95442074.atcon(e)
+	return Duel.IsExistingMatchingCard(Card.IsAttackable,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
 end
