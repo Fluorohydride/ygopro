@@ -49,7 +49,7 @@ function c63227401.discon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	if tc:GetFlagEffect(63227401)==0 or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return g:IsContains(tc) and re:IsActiveType(TYPE_MONSTER)
+	return g and g:IsContains(tc) and re:IsActiveType(TYPE_MONSTER)
 end
 function c63227401.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateEffect(ev)
