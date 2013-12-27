@@ -75,6 +75,7 @@ function c95442074.filter(c)
 end
 function c95442074.indcon(e)
 	return Duel.IsExistingMatchingCard(c95442074.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+		and e:GetHandler():GetOverlayCount()~=0
 end
 function c95442074.refcon(e)
 	return Duel.IsExistingMatchingCard(c95442074.filter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
