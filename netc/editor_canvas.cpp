@@ -146,7 +146,7 @@ namespace ygopro
                     }
                 }
             } else if(fy <= -0.64f && fy >= -0.93f) { //side
-                mouse_field = 2;
+                mouse_field = 3;
                 int side_size = (int)current_deck.side_deck.size();
                 if(side_size) {
                     float dx = (1.8f - wd) / (side_size - 1);
@@ -163,7 +163,9 @@ namespace ygopro
         }
         click_time = 0;
         mousex = evt.GetX() * 2.0 / glwidth - 1.0;
-        mousey = evt.GetY() * 2.0 / glheight - 1.0;
+        mousey = 1.0 - evt.GetY() * 2.0 / glheight;
+        if(t_draging)
+            Refresh();
         if(pre_field == hover_field && pre_index == hover_index)
             return;
         if(click_field) {
@@ -191,11 +193,13 @@ namespace ygopro
                 }
             }
         }
+        Refresh();
     }
 
     void wxEditorCanvas::EventMouseLDown(wxMouseEvent& evt) {
         click_field = hover_field;
         click_index = hover_index;
+        click_field_pre = click_field;
         if(click_field)
             Refresh();
     }
@@ -207,12 +211,10 @@ namespace ygopro
             Refresh();
         }
         if(draging_code) {
-            if(mouse_field == 0) {
-                if(current_deck.RemoveCard(hover_field, hover_index))
-                    EventMouseMoved(evt);
-            } else {
-                if(current_deck.InsertCard(draging_code, mouse_field, hover_index))
-                    EventMouseMoved(evt);
+            if(mouse_field != 0) {
+                if(!current_deck.InsertCard(draging_code, mouse_field, hover_index))
+                    current_deck.InsertCard(draging_code, click_field_pre);
+                EventMouseMoved(evt);
             }
             draging_code = 0;
             t_draging = nullptr;
@@ -453,7 +455,7 @@ namespace ygopro
                 DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 3 && hover_index == i, limit, ix, iy);
             else
                 DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 3 && hover_index == i, limit, ix, iy);
-        }
+        } 
         DrawNumber(current_deck.mcount, 0xffffff00, -0.931f, 0.913f, -0.868f, 0.850f);
         DrawNumber(current_deck.scount, 0xffffff00, -0.931f, 0.825f, -0.868f, 0.762f);
         DrawNumber(current_deck.tcount, 0xffffff00, -0.931f, 0.737f, -0.868f, 0.674f);
@@ -463,6 +465,8 @@ namespace ygopro
         DrawNumber((int)current_deck.main_deck.size(), 0xffffff00, -0.931f, -0.003f, -0.868f, -0.066f);
         DrawNumber((int)current_deck.extra_deck.size(), 0xffffff00, -0.931f, -0.313f, -0.868f, -0.376f);
         DrawNumber((int)current_deck.side_deck.size(), 0xffffff00, -0.931f, -0.646f, -0.868f, -0.709f);
+        if(t_draging)
+            DrawCard(&t_draging->ti, mousex - wd / 2, mousey + ht / 2, mousex + wd / 2, mousey - ht / 2, false, 3, 0, 0);
         glFlush();
     }
 

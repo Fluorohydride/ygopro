@@ -22,7 +22,7 @@ namespace ygopro
         TextureInfo* t_deckbg = nullptr;
         TextureInfo* t_font = nullptr;
         TextureInfo* t_hmask = nullptr;
-        TextureInfo* t_limits[3] = { nullptr };
+        TextureInfo* t_limits[3];
         CardTextureInfo* t_draging = nullptr;
         DeckData current_deck;
         short hover_field = 0;
@@ -30,6 +30,7 @@ namespace ygopro
         short mouse_field = 0;
         short click_field = 0;
         short click_index = 0;
+        short click_field_pre = 0;
         unsigned int hover_code = 0;
         unsigned int draging_code = 0;
         wxLongLong click_time = 0;
