@@ -10,18 +10,21 @@ function c73414375.initial_effect(c)
 	e1:SetOperation(c73414375.operation)
 	c:RegisterEffect(e1)
 end
+function c73414375.filter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
+end
 function c73414375.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c73414375.filter(chkc) end
 	if chk==0 then return true end
 	local g=Group.CreateGroup()
-	if Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(73414375,1)) then
+	if Duel.IsExistingTarget(c73414375.filter,tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(73414375,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-		local rg=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,3,nil)
+		local rg=Duel.SelectTarget(tp,c73414375.filter,tp,0,LOCATION_GRAVE,1,3,nil)
 		g:Merge(rg)
 	end
-	if Duel.IsExistingTarget(Card.IsAbleToRemove,1-tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(1-tp,aux.Stringid(73414375,1)) then
+	if Duel.IsExistingTarget(c73414375.filter,1-tp,0,LOCATION_GRAVE,1,nil) and Duel.SelectYesNo(1-tp,aux.Stringid(73414375,1)) then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
-		local rg=Duel.SelectTarget(1-tp,Card.IsAbleToRemove,1-tp,0,LOCATION_GRAVE,1,3,nil)
+		local rg=Duel.SelectTarget(1-tp,c73414375.filter,1-tp,0,LOCATION_GRAVE,1,3,nil)
 		g:Merge(rg)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
