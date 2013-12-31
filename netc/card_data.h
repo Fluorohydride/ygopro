@@ -3,16 +3,33 @@
 
 #include "wx/string.h"
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 namespace ygopro
 {
 
+    struct FilterCondition {
+        unsigned int setcode = 0;
+        unsigned int pool = 0;
+        unsigned int type = 0;
+        int atkmin = -1;
+        int atkmax = -1;
+        int defmin = -1;
+        int defmax = -1;
+        int lvmin = 0;
+        int lvmax = 0;
+        unsigned int race = 0;
+        unsigned int attribute = 0;
+        unsigned int category = 0;
+    };
+    
 	struct CardData {
+        unsigned int dbsrc;
 		unsigned int code;
-		unsigned int ot;
+		unsigned int pool;
 		unsigned int alias;
-		unsigned int setcode;
+		unsigned long long setcode;
 		unsigned int type;
 		int attack;
 		int defence;
@@ -24,12 +41,17 @@ namespace ygopro
 		wxString texts;
         wxString desc[16];
         
+        bool CheckCondition(const FilterCondition& fc, const wxString& keyword);
+        
+        static bool card_sort(const CardData* c1, const CardData* c2);
+        
 	};
     
 	class DataMgr {
 	public:
 		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
+        void FilterCard(const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result);
         
         static wxString GetAttributeString(unsigned int attr);
         static wxString GetRaceString(unsigned int race);
@@ -47,9 +69,21 @@ namespace ygopro
             return iter->second;
         }
         
+        unsigned int RegistrDB(const wxString& db) {
+            _dbsrc.push_back(db);
+            return (unsigned int)_dbsrc.size() - 1;
+        }
+        
+        const wxString& DBName(unsigned int index) {
+            static const wxString empt = wxT("");
+            if(index < _dbsrc.size())
+                return _dbsrc[index];
+            return empt;
+        }
 	private:
 		std::unordered_map<unsigned int, CardData> _datas;
         std::unordered_map<unsigned int, wxString> _setcodes;
+        std::vector<wxString> _dbsrc;
 	};
 
 	extern DataMgr dataMgr;

@@ -21,7 +21,6 @@ namespace ygopro
     struct CardTextureInfo;
     
 	struct DeckData {
-        DeckData(): mcount(0), scount(0), tcount(0), syncount(0), xyzcount(0), fuscount(0) {}
         
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > main_deck;
 		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > extra_deck;
@@ -40,29 +39,27 @@ namespace ygopro
         bool RemoveCard(unsigned int pos, unsigned int index);
         bool MoveCard(unsigned int pos1, unsigned int index1, unsigned int pos2, unsigned int index2);
         
-        unsigned int mcount;
-        unsigned int scount;
-        unsigned int tcount;
-        unsigned int syncount;
-        unsigned int xyzcount;
-        unsigned int fuscount;
+        unsigned int mcount = 0;
+        unsigned int scount = 0;
+        unsigned int tcount = 0;
+        unsigned int syncount = 0;
+        unsigned int xyzcount = 0;
+        unsigned int fuscount = 0;
 
         static bool deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
 	};
 
     struct LimitRegulation {
-        unsigned int hash;
+        unsigned int hash = 0;
 		wxString name;
 		std::unordered_map<unsigned int, unsigned int> counts;
         
-        LimitRegulation(): hash(0) {}
         unsigned int get_hash();
         unsigned int check_deck(DeckData& deck, unsigned int pool_flag);
 	};
     
 	class LimitRegulationMgr {
 	public:
-        LimitRegulationMgr(): current_list(nullptr) {}
 		void LoadLimitRegulation(const wxString& file);
 		void SetLimitRegulation(unsigned int id);
         void SetLimitRegulation(LimitRegulation* lr);
@@ -72,7 +69,7 @@ namespace ygopro
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
         
 	private:
-		LimitRegulation* current_list;
+		LimitRegulation* current_list = nullptr;
         std::vector<LimitRegulation> limit_regulations;
 	};
 

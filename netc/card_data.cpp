@@ -8,6 +8,70 @@ namespace ygopro
 
 	DataMgr dataMgr;
 
+    bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword) {
+        if(fc.atkmin != -1 && attack < fc.atkmin)
+            return false;
+        if(fc.atkmax != -1 && attack > fc.atkmax)
+            return false;
+        if(fc.defmin != -1 && defence < fc.defmin)
+            return false;
+        if(fc.defmax != -1 && defence > fc.defmax)
+            return false;
+        if(fc.lvmin != 0 && level < fc.lvmin)
+            return false;
+        if(fc.lvmax != 0 && level > fc.lvmax)
+            return false;
+        if(fc.type != 0 && (type & fc.type) != fc.type)
+            return false;
+        if(fc.race != 0 && (race & fc.race) == 0)
+            return false;
+        if(fc.attribute != 0 && (attribute & fc.attribute) == 0)
+            return false;
+        if(fc.category != 0 && (category & fc.category) == 0)
+            return false;
+        if(keyword.size()) {
+            wxString kw = keyword.Upper();
+            if(name.Upper().Find(kw) == -1 && texts.Upper().Find(kw) == -1)
+                return false;
+        }
+        if(fc.setcode != 0) {
+            unsigned int scode = fc.setcode & 0xfff;
+            unsigned int subcode = fc.setcode >> 12;
+            unsigned int sc1 = setcode & 0xffff;
+            unsigned int sc2 = (setcode >> 16) & 0xffff;
+            unsigned int sc3 = (setcode >> 32) & 0xffff;
+            if(sc1 && (sc1 & 0xfff) == scode && ((sc1 >> 12) & subcode) == subcode)
+                return true;
+            if(sc2 && (sc2 & 0xfff) == scode && ((sc2 >> 12) & subcode) == subcode)
+                return true;
+            if(sc3 && (sc3 & 0xfff) == scode && ((sc3 >> 12) & subcode) == subcode)
+                return true;
+            return false;
+        }
+        return true;
+    }
+    
+    bool CardData::card_sort(const CardData* p1, const CardData* p2) {
+        if((p1->type & 0x7) != (p2->type & 0x7))
+            return (p1->type & 0x7) < (p2->type & 0x7);
+        if((p1->type & 0x7) == 1) {
+            int type1 = (p1->type & 0x8020c0) ? (p1->type & 0x8020c1) : (p1->type & 0x31);
+            int type2 = (p2->type & 0x8020c0) ? (p2->type & 0x8020c1) : (p2->type & 0x31);
+            if(type1 != type2)
+                return type1 < type2;
+            if(p1->level != p2->level)
+                return p1->level > p2->level;
+            if(p1->attack != p2->attack)
+                return p1->attack > p2->attack;
+            if(p1->defence != p2->defence)
+                return p1->defence > p2->defence;
+            else return p1->code < p2->code;
+        }
+        if((p1->type & 0xfffffff8) != (p2->type & 0xfffffff8))
+            return (p1->type & 0xfffffff8) < (p2->type & 0xfffffff8);
+        return p1->code < p2->code;
+    }
+    
 	int DataMgr::LoadDatas(const wxString& file) {
 		_datas.clear();
 		sqlite3* pDB;
@@ -28,9 +92,9 @@ namespace ygopro
 				return sqlite3_errcode(pDB);
 			else if(step == SQLITE_ROW) {
 				cd.code = sqlite3_column_int(pStmt, 0);
-				cd.ot = sqlite3_column_int(pStmt, 1);
+				cd.pool = sqlite3_column_int(pStmt, 1);
 				cd.alias = sqlite3_column_int(pStmt, 2);
-				cd.setcode = sqlite3_column_int(pStmt, 3);
+				cd.setcode = sqlite3_column_int64(pStmt, 3);
 				cd.type = sqlite3_column_int(pStmt, 4);
 				cd.attack = sqlite3_column_int(pStmt, 5);
 				cd.defence = sqlite3_column_int(pStmt, 6);
@@ -67,6 +131,16 @@ namespace ygopro
 			return nullptr;
 		return &iter->second;
 	}
+    
+    void DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result) {
+        for(auto& iter : _datas) {
+            CardData& cd = iter.second;
+            if(cd.CheckCondition(fc, fs))
+                result.push_back(&cd);
+        }
+        if(result.size())
+            std::sort(result.begin(), result.end(), CardData::card_sort);
+    }
     
     wxString DataMgr::GetAttributeString(unsigned int attr) {
         wxString attname;

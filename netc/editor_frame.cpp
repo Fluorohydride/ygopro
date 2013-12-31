@@ -4,6 +4,7 @@
 #include "editor_frame.h"
 #include "editor_canvas.h"
 #include "game_frame.h"
+#include "filter_frame.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -197,7 +198,13 @@ namespace ygopro
                     card_info->WriteText(wxT("[") + setname + wxT("] "));
                     card_info->EndURL();
                 }
-                setname = dataMgr.GetSetCode(cd->setcode >> 16);
+                setname = dataMgr.GetSetCode((cd->setcode >> 16) & 0xffff);
+                if(!setname.IsEmpty()) {
+                    card_info->BeginURL(setname);
+                    card_info->WriteText(wxT("[") + setname + wxT("]"));
+                    card_info->EndURL();
+                }
+                setname = dataMgr.GetSetCode((cd->setcode >> 32) & 0xffff);
                 if(!setname.IsEmpty()) {
                     card_info->BeginURL(setname);
                     card_info->WriteText(wxT("[") + setname + wxT("]"));
@@ -300,6 +307,13 @@ namespace ygopro
     }
 
     void EditorFrame::OnToolSearch(wxCommandEvent& evt) {
+        if(filterFrame)
+            filterFrame->Raise();
+        else {
+            filterFrame = new FilterFrame(500, 500);
+            filterFrame->Center();
+            filterFrame->Show();
+        }
     }
 
     void EditorFrame::OnToolOpenBrowser(wxCommandEvent& evt) {

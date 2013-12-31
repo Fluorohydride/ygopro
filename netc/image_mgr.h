@@ -16,44 +16,41 @@ namespace ygopro
 {
     
     struct SrcImageInfo {
-        SrcImageInfo(): t_index(0), t_width(0), t_height(0) {}
         wxImage img;
-        unsigned int t_index;
-        unsigned int t_width;
-        unsigned int t_height;
+        unsigned int t_index = 0;
+        unsigned int t_width = 0;
+        unsigned int t_height = 0;
     };
     
 	struct TextureInfo {
-        TextureInfo(): src(nullptr), lx(0.0), ly(0.0), rx(0.0), ry(0.0) {}
-		SrcImageInfo* src;
-		double lx;
-		double ly;
-		double rx;
-		double ry;
+		SrcImageInfo* src = nullptr;
+		double lx = 0.0;
+		double ly = 0.0;
+		double rx = 0.0;
+		double ry = 0.0;
         inline unsigned int tex() {
             return src ? src->t_index : 0;
         }
 	};
     
     struct CardTextureInfo {
-        CardTextureInfo(): ref_count(0), is_system(false) {}
         TextureInfo ti;
-        unsigned int ref_count;
-        bool is_system;
+        unsigned int ref_count = 0;
+        bool is_system = false;
     };
     
 	struct LayoutInfo {
-		int style;
-		double x1;
-		double y1;
-		double x2;
-		double y2;
-		double x3;
-		double y3;
-		double x4;
-		double y4;
+		int style = 0;
+		double x1 = 0.0;
+		double y1 = 0.0;
+		double x2 = 0.0;
+		double y2 = 0.0;
+		double x3 = 0.0;
+		double y3 = 0.0;
+		double x4 = 0.0;
+		double y4 = 0.0;
 		wxString click;
-		TextureInfo* ptex;
+		TextureInfo* ptex = nullptr;
 	};
 
 	class ImageMgr {

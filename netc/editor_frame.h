@@ -1,5 +1,5 @@
-#ifndef _DEFRAME_H_
-#define _DEFRAME_H_
+#ifndef _EDITOR_FRAME_H_
+#define _EDITOR_FRAME_H_
 
 #include "wx/wx.h"
 #include "wx/frame.h"
@@ -68,4 +68,4 @@ namespace ygopro
     extern EditorFrame* editorFrame;
 }
 
-#endif //_GAME_H_
+#endif //_EDITOR_FRAME_H_
