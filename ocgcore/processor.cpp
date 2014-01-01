@@ -481,6 +481,7 @@ int32 field::process() {
 			if(!attacker
 			        || (attacker->fieldid_r != core.pre_field[0])
 			        || (attacker->current.position & POS_FACEDOWN)
+				|| (attacker->current.position & POS_DEFENCE && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
 			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
 				returns.ivalue[0] = 0;
