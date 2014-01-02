@@ -27,7 +27,7 @@ function c49010598.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c49010598.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	if re:GetHandler():GetLocation()==LOCATION_EXTRA or re:GetHandler():IsRelateToEffect(re) then
+	if re:GetActivateLocation()==LOCATION_EXTRA or re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end

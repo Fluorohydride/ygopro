@@ -1,4 +1,4 @@
---¥¨¥ô¥©¥ë¥«¥¤¥¶©`¡¤¥É¥ë¥«
+--ã‚¨ãƒ´ã‚©ãƒ«ã‚«ã‚¤ã‚¶ãƒ¼ãƒ»ãƒ‰ãƒ«ã‚«
 function c42752141.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4),2)
@@ -34,7 +34,7 @@ function c42752141.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c42752141.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(re) then
+	if re:GetActivateLocation()==LOCATION_EXTRA or re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
