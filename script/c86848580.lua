@@ -22,15 +22,13 @@ end
 function c86848580.filter1(c)
 	return c:IsFaceup() and not c:IsDisabled() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT))
 end
-function c86848580.filter2(c)
-	return c:IsFaceup() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT))
-end
 function c86848580.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c86848580.filter1,tp,0,LOCATION_ONFIELD,1,nil) end
 end
 function c86848580.disop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c86848580.filter2,tp,0,LOCATION_ONFIELD,nil)
+	local g=Duel.GetMatchingGroup(c86848580.filter1,tp,0,LOCATION_ONFIELD,nil)
 	local tc=g:GetFirst()
+	if not tc then return end
 	local c=e:GetHandler()
 	while tc do
 		local e1=Effect.CreateEffect(c)
@@ -45,7 +43,7 @@ function c86848580.disop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 		tc=g:GetNext()
 	end
-	local atk=Duel.GetMatchingGroupCount(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())*300
+	local atk=Duel.GetMatchingGroupCount(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,c)*300
 	if atk>0 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
