@@ -17,7 +17,7 @@ function c82732705.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c82732705.disable(e,c)
-	return c:IsType(TYPE_EFFECT)
+	return c:IsType(TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)==TYPE_EFFECT
 end
 function c82732705.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
