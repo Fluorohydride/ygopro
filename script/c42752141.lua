@@ -1,4 +1,4 @@
---ã‚¨ãƒ´ã‚©ãƒ«ã‚«ã‚¤ã‚¶ãƒ¼ãƒ»ãƒ‰ãƒ«ã‚«
+--¥¨¥ô¥©¥ë¥«¥¤¥¶©`¡¤¥É¥ë¥«
 function c42752141.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4),2)

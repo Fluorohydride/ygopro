@@ -11,7 +11,7 @@ namespace ygo {
 struct CardData {
 	unsigned int code;
 	unsigned int alias;
-	unsigned long long setcode;
+	unsigned int setcode;
 	unsigned int type;
 	unsigned int level;
 	unsigned int attribute;
@@ -22,7 +22,7 @@ struct CardData {
 struct CardDataC {
 	unsigned int code;
 	unsigned int alias;
-	unsigned long long setcode;
+	unsigned int setcode;
 	unsigned int type;
 	unsigned int level;
 	unsigned int attribute;

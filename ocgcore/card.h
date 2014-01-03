@@ -21,7 +21,7 @@ class group;
 struct card_data {
 	uint32 code;
 	uint32 alias;
-	uint64 setcode;
+	uint32 setcode;
 	uint32 type;
 	uint32 level;
 	uint32 attribute;
