@@ -27,7 +27,7 @@ bool DataManager::LoadDB(const char* file) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			cd.setcode = sqlite3_column_int(pStmt, 3);
+			cd.setcode = sqlite3_column_int64(pStmt, 3);
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defence = sqlite3_column_int(pStmt, 6);
