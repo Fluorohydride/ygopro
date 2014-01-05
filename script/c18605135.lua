@@ -32,7 +32,8 @@ function c18605135.actcon(e,tp,eg,ep,ev,re,r,rp)
 		or Duel.GetEnvironment()==22702055
 end
 function c18605135.abdcon(e)
-	return Duel.GetAttackTarget()==nil or Duel.GetAttackTarget():IsAttackPos() or Duel.GetAttacker():GetAttack()>Duel.GetAttackTarget():GetDefence()
+	return (Duel.IsExistingMatchingCard(c18605135.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) or Duel.GetEnvironment()==22702055)and
+	Duel.GetAttackTarget()==nil or Duel.GetAttackTarget():IsAttackPos() or Duel.GetAttacker():GetAttack()>Duel.GetAttackTarget():GetDefence()
 end
 function c18605135.sdcon(e)
 	return not Duel.IsExistingMatchingCard(c18605135.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
