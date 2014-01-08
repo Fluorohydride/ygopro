@@ -30,7 +30,7 @@ function c94886282.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-	else if not Duel.IsExistingMatchingCard(c94886282.orifilter,tp,LOCATION_DECK,0,1,nil) then
+	elseif not Duel.IsExistingMatchingCard(c94886282.orifilter,tp,LOCATION_DECK,0,1,nil) then
 		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		Duel.ConfirmCards(1-tp,cg)
 		Duel.ShuffleDeck(tp)
