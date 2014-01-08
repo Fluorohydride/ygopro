@@ -19,6 +19,7 @@ namespace ygopro
 
     struct CardData;
     struct CardTextureInfo;
+    struct FilterCondition;
     
 	struct DeckData {
         
@@ -35,7 +36,7 @@ namespace ygopro
         void SaveToFile(const wxString& file);
         wxString SaveToString();
         
-        bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1);
+        bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1, bool strict = true);
         bool RemoveCard(unsigned int pos, unsigned int index);
         bool MoveCard(unsigned int pos1, unsigned int index1, unsigned int pos2, unsigned int index2);
         
@@ -67,6 +68,7 @@ namespace ygopro
         unsigned int GetCardLimitCount(unsigned int code);
         unsigned int CheckCurrentList(unsigned int pool);
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
+        void FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result);
         
 	private:
 		LimitRegulation* current_list = nullptr;

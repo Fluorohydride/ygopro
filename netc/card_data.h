@@ -13,6 +13,7 @@ namespace ygopro
         unsigned int setcode = 0;
         unsigned int pool = 0;
         unsigned int type = 0;
+        unsigned int subtype = 0;
         int atkmin = -1;
         int atkmax = -1;
         int defmin = -1;
@@ -56,6 +57,7 @@ namespace ygopro
         static wxString GetAttributeString(unsigned int attr);
         static wxString GetRaceString(unsigned int race);
         static wxString GetTypeString(unsigned int arctype);
+        static wxString GetTypeString2(unsigned int arctype);
         
         void RegisterSetCode(unsigned int code, const wxString& value) {
             _setcodes[code] = value;

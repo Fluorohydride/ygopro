@@ -222,6 +222,11 @@
   <setting name="setname_吸血鬼" value="0x8e" type="integer"/>
   <setting name="setname_刷拉拉" value="0x8f" type="integer"/>
   <setting name="setname_森罗" value="0x90" type="integer"/>
-  <setting name="setname_王家沉眠之谷" value="0x91" type="integer"/>
+  <setting name="setname_王家长眠之谷" value="0x91" type="integer"/>
   <setting name="setname_纹章" value="0x92" type="integer"/>
+  <setting name="setname_电子" value="0x93" type="integer"/>
+  <setting name="setname_电子龙" value="0x1093" type="integer"/>
+  <setting name="setname_电子科技" value="0x94" type="integer"/>
+  <setting name="setname_升阶魔法" value="0x95" type="integer"/>
+  <setting name="setname_电子鱼人" value="0x96" type="integer"/>
 </Common>

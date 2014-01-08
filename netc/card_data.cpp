@@ -9,24 +9,28 @@ namespace ygopro
 	DataMgr dataMgr;
 
     bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword) {
-        if(fc.atkmin != -1 && attack < fc.atkmin)
-            return false;
-        if(fc.atkmax != -1 && attack > fc.atkmax)
-            return false;
-        if(fc.defmin != -1 && defence < fc.defmin)
-            return false;
-        if(fc.defmax != -1 && defence > fc.defmax)
-            return false;
-        if(fc.lvmin != 0 && level < fc.lvmin)
-            return false;
-        if(fc.lvmax != 0 && level > fc.lvmax)
-            return false;
         if(fc.type != 0 && (type & fc.type) != fc.type)
             return false;
-        if(fc.race != 0 && (race & fc.race) == 0)
+        if(fc.subtype != 0 && (race & fc.subtype) == 0)
             return false;
-        if(fc.attribute != 0 && (attribute & fc.attribute) == 0)
-            return false;
+        if(fc.type & 0x1) {
+            if(fc.atkmin != -1 && attack < fc.atkmin)
+                return false;
+            if(fc.atkmax != -1 && attack > fc.atkmax)
+                return false;
+            if(fc.defmin != -1 && defence < fc.defmin)
+                return false;
+            if(fc.defmax != -1 && defence > fc.defmax)
+                return false;
+            if(fc.lvmin != 0 && level < fc.lvmin)
+                return false;
+            if(fc.lvmax != 0 && level > fc.lvmax)
+                return false;
+            if(fc.race != 0 && (race & fc.race) == 0)
+                return false;
+            if(fc.attribute != 0 && (attribute & fc.attribute) == 0)
+                return false;
+        }
         if(fc.category != 0 && (category & fc.category) == 0)
             return false;
         if(keyword.size()) {
@@ -274,6 +278,35 @@ namespace ygopro
             tpname += static_cast<const std::string&>(stringCfg["type_trap"]);
         }
         return tpname;
+    }
+    
+    wxString DataMgr::GetTypeString2(unsigned int arctype) {
+        switch(arctype) {
+            case 0x1: return static_cast<const std::string&>(stringCfg["type_spirit"]);
+            case 0x2: return static_cast<const std::string&>(stringCfg["type_spell"]);
+            case 0x4: return static_cast<const std::string&>(stringCfg["type_trap"]);
+            case 0x10: return static_cast<const std::string&>(stringCfg["type_normal"]);
+            case 0x20: return static_cast<const std::string&>(stringCfg["type_effect"]);
+            case 0x40: return static_cast<const std::string&>(stringCfg["type_fusion"]);
+            case 0x80: return static_cast<const std::string&>(stringCfg["type_ritual"]);
+            case 0x100: return static_cast<const std::string&>(stringCfg["type_trap"]);
+            case 0x200: return static_cast<const std::string&>(stringCfg["type_spirit"]);
+            case 0x400: return static_cast<const std::string&>(stringCfg["type_union"]);
+            case 0x800: return static_cast<const std::string&>(stringCfg["type_dual"]);
+            case 0x1000: return static_cast<const std::string&>(stringCfg["type_tuner"]);
+            case 0x2000: return static_cast<const std::string&>(stringCfg["type_synchro"]);
+            case 0x4000: return static_cast<const std::string&>(stringCfg["type_token"]);
+            case 0x8000: return static_cast<const std::string&>(stringCfg["type_trapmonster"]);
+            case 0x10000: return static_cast<const std::string&>(stringCfg["type_quickplay"]);
+            case 0x20000: return static_cast<const std::string&>(stringCfg["type_continuous"]);
+            case 0x40000: return static_cast<const std::string&>(stringCfg["type_equip"]);
+            case 0x80000: return static_cast<const std::string&>(stringCfg["type_field"]);
+            case 0x100000: return static_cast<const std::string&>(stringCfg["type_counter"]);
+            case 0x200000: return static_cast<const std::string&>(stringCfg["type_flip"]);
+            case 0x400000: return static_cast<const std::string&>(stringCfg["type_toon"]);
+            case 0x800000: return static_cast<const std::string&>(stringCfg["type_xyz"]);
+        }
+        return wxT("");
     }
     
 }

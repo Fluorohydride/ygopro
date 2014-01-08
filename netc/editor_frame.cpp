@@ -91,10 +91,12 @@ namespace ygopro
     }
 
     EditorFrame::~EditorFrame() {
+        if(filterFrame)
+            delete filterFrame;
     }
 
-    void EditorFrame::SetCardInfo(unsigned int id) {
-        if(id == 0) {
+    void EditorFrame::SetCardInfo(unsigned int code) {
+        if(code == 0) {
             TextureInfo& sv = imageMgr.textures["sleeve1"];
             if(sv.src == nullptr)
                 return;
@@ -106,7 +108,7 @@ namespace ygopro
             card_image->SetBitmap(wxBitmap(sv.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1))));
         } else {
             wxImage card_img;
-            wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
+            wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), code);
             if(wxFileExists(file) && card_img.LoadFile(file)) {
                 card_image->SetBitmap(wxBitmap(card_img));
             } else {
@@ -120,7 +122,7 @@ namespace ygopro
                 card_image->SetBitmap(wxBitmap(sv.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1))));
             }
             card_info->Clear();
-            CardData* cd = dataMgr[id];
+            CardData* cd = dataMgr[code];
             if(cd == nullptr)
                 return;
             wxString card_name = cd->name;
@@ -145,9 +147,11 @@ namespace ygopro
                 if(cd->attack >= 0 && cd->defence >= 0)
                     card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:%d"), cd->attack, cd->defence));
                 else if(cd->attack >= 0)
-                    card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:????"), cd->defence));
+                    card_info->WriteText(wxString::Format(wxT("ATK:%d / DEF:????"), cd->attack));
+                else if(cd->defence >= 0)
+                    card_info->WriteText(wxString::Format(wxT("ATK:???? / DEF:%d"), cd->defence));
                 else
-                    card_info->WriteText(wxString::Format(wxT("ATK:???? / DEF:%d"), cd->attack));
+                    card_info->WriteText(wxString::Format(wxT("ATK:???? / DEF:????")));
                 card_info->EndTextColour();
                 card_info->Newline();
             } else {
@@ -213,6 +217,11 @@ namespace ygopro
                 card_info->EndTextColour();
             }
         }
+    }
+    
+    void EditorFrame::AddCard(unsigned int code, unsigned int pos) {
+        editor_canvas->GetDeck().InsertCard(code, pos, -1, false);
+        editor_canvas->Refresh();
     }
     
     void EditorFrame::OnDeckLoad(wxCommandEvent& evt) {
@@ -310,7 +319,7 @@ namespace ygopro
         if(filterFrame)
             filterFrame->Raise();
         else {
-            filterFrame = new FilterFrame(500, 500);
+            filterFrame = new FilterFrame(600, 500);
             filterFrame->Center();
             filterFrame->Show();
         }
@@ -349,11 +358,18 @@ namespace ygopro
     
     void EditorFrame::OnUrlClicked(wxTextUrlEvent& evt) {
         wxString url = evt.GetString();
-        std::string sturl = (wxT("setname_") + url).ToStdString();
-        if(stringCfg.Exists(sturl)) {
-            unsigned int setcode = stringCfg[sturl];
-            setcode++;
+        std::string strurl = (wxT("setname_") + url).ToStdString();
+        FilterCondition fc;
+        if(stringCfg.Exists(strurl))
+            fc.setcode = stringCfg[strurl];
+        if(filterFrame)
+            filterFrame->Raise();
+        else {
+            filterFrame = new FilterFrame(600, 500);
+            filterFrame->Center();
+            filterFrame->Show();
         }
+        filterFrame->FilterCards(fc, url);
     }
 
 }
