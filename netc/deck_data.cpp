@@ -529,7 +529,7 @@ namespace ygopro
     void LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result) {
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)
-                return;
+                continue;
             CardData* cd = dataMgr[iter.first];
             if(cd && cd->CheckCondition(fc, fs))
                 result.push_back(cd);

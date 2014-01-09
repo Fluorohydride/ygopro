@@ -1,6 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
   <setting name="unknown" value="？？？" type="string"/>
+  <setting name="full_width_space" value="　" type="string"/>
+  <setting name="parse_begin" value="「" type="string"/>
+  <setting name="parse_end" value="」" type="string"/>
+  <setting name="pool_limit0" value="禁止" type="string"/>
+  <setting name="pool_limit1" value="限制" type="string"/>
+  <setting name="pool_limit2" value="准限制" type="string"/>
+  <setting name="pool_ocg" value="OCG" type="string"/>
+  <setting name="pool_tcg" value="TCG" type="string"/>
   <setting name="attribtue_earth" value="地属性" type="string"/>
   <setting name="attribtue_water" value="水属性" type="string"/>
   <setting name="attribtue_fire" value="火属性" type="string"/>
@@ -53,9 +61,6 @@
   <setting name="type_flip" value="反转" type="string"/>
   <setting name="type_toon" value="卡通" type="string"/>
   <setting name="type_xyz" value="超量" type="string"/>
-  <setting name="full_width_space" value="　" type="string"/>
-  <setting name="parse_begin" value="「" type="string"/>
-  <setting name="parse_end" value="」" type="string"/>
   <setting name="setname_正义盟军" value="0x1ee" type="integer"/>
   <setting name="setname_次世代" value="0x2" type="integer"/>
   <setting name="setname_真次世代" value="0x1002" type="integer"/>

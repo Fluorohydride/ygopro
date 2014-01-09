@@ -9,9 +9,13 @@ namespace ygopro
 	DataMgr dataMgr;
 
     bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword) {
+        if(type & 0x4000)
+            return false;
         if(fc.type != 0 && (type & fc.type) != fc.type)
             return false;
-        if(fc.subtype != 0 && (race & fc.subtype) == 0)
+        if(fc.subtype != 0 && (type & fc.subtype) == 0)
+            return false;
+        if(fc.pool != 0 && pool != fc.pool)
             return false;
         if(fc.type & 0x1) {
             if(fc.atkmin != -1 && attack < fc.atkmin)
@@ -22,9 +26,9 @@ namespace ygopro
                 return false;
             if(fc.defmax != -1 && defence > fc.defmax)
                 return false;
-            if(fc.lvmin != 0 && level < fc.lvmin)
+            if(fc.lvmin != 0 && level < (unsigned int)fc.lvmin)
                 return false;
-            if(fc.lvmax != 0 && level > fc.lvmax)
+            if(fc.lvmax != 0 && level > (unsigned int)fc.lvmax)
                 return false;
             if(fc.race != 0 && (race & fc.race) == 0)
                 return false;
@@ -282,21 +286,20 @@ namespace ygopro
     
     wxString DataMgr::GetTypeString2(unsigned int arctype) {
         switch(arctype) {
-            case 0x1: return static_cast<const std::string&>(stringCfg["type_spirit"]);
+            case 0x1: return static_cast<const std::string&>(stringCfg["type_monster"]);
             case 0x2: return static_cast<const std::string&>(stringCfg["type_spell"]);
             case 0x4: return static_cast<const std::string&>(stringCfg["type_trap"]);
             case 0x10: return static_cast<const std::string&>(stringCfg["type_normal"]);
             case 0x20: return static_cast<const std::string&>(stringCfg["type_effect"]);
             case 0x40: return static_cast<const std::string&>(stringCfg["type_fusion"]);
             case 0x80: return static_cast<const std::string&>(stringCfg["type_ritual"]);
-            case 0x100: return static_cast<const std::string&>(stringCfg["type_trap"]);
+            case 0x100: return static_cast<const std::string&>(stringCfg["type_trapmonster"]);
             case 0x200: return static_cast<const std::string&>(stringCfg["type_spirit"]);
             case 0x400: return static_cast<const std::string&>(stringCfg["type_union"]);
             case 0x800: return static_cast<const std::string&>(stringCfg["type_dual"]);
             case 0x1000: return static_cast<const std::string&>(stringCfg["type_tuner"]);
             case 0x2000: return static_cast<const std::string&>(stringCfg["type_synchro"]);
             case 0x4000: return static_cast<const std::string&>(stringCfg["type_token"]);
-            case 0x8000: return static_cast<const std::string&>(stringCfg["type_trapmonster"]);
             case 0x10000: return static_cast<const std::string&>(stringCfg["type_quickplay"]);
             case 0x20000: return static_cast<const std::string&>(stringCfg["type_continuous"]);
             case 0x40000: return static_cast<const std::string&>(stringCfg["type_equip"]);

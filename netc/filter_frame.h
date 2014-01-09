@@ -3,9 +3,9 @@
 
 #include "wx/wx.h"
 #include "wx/frame.h"
-#include "wx/richtext/richtextctrl.h"
 #include "wx/textctrl.h"
 #include "wx/combobox.h"
+#include "wx/listctrl.h"
 #include <vector>
 
 namespace ygopro
@@ -26,7 +26,7 @@ namespace ygopro
         void OnSearch(wxCommandEvent& evt);
         void OnPrev(wxCommandEvent& evt);
         void OnNext(wxCommandEvent& evt);
-        void OnCmdClicked(wxTextUrlEvent& evt);
+        void OnTypeSelected(wxCommandEvent& evt);
         
     private:
         unsigned int page = 0;
@@ -36,7 +36,7 @@ namespace ygopro
         wxButton* next_page;
         wxTextCtrl* filter_att1[4];
         wxComboBox* filter_att2[5];
-        wxRichTextCtrl* search_result;
+        wxListCtrl* search_result;
         wxStatusBar* result_info;
         std::vector<CardData*> vector_results;
     };
