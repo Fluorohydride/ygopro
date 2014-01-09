@@ -47,11 +47,11 @@ end
 function c23893227.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c23893227.filter,tp,LOCATION_DECK,0,1,1,nil)
+	local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-	elseif not Duel.IsExistingMatchingCard(c23893227.orifilter,tp,LOCATION_DECK,0,1,nil) then
-		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+	elseif not Duel.IsExistingMatchingCard(c23893227.orifilter,tp,LOCATION_DECK,0,1,nil) and cg:FilterCount(Card.IsAbleToHand,nil)>0 then
 		Duel.ConfirmCards(1-tp,cg)
 		Duel.ShuffleDeck(tp)
 	end
