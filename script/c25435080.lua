@@ -21,7 +21,7 @@ function c25435080.cfilter(c,tp)
 	return c:IsSetCard(0x33) and Duel.IsExistingTarget(c25435080.tfilter,tp,LOCATION_MZONE,0,1,c)
 end
 function c25435080.tfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x33) and c:IsType(TYPE_SYNCHRO)
+	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
 end
 function c25435080.cost(e,tp,eg,ep,ev,re,r,rp)
 	e:SetLabel(1)

@@ -15,9 +15,7 @@ function c56840658.initial_effect(c)
 end
 function c56840658.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsPreviousLocation(LOCATION_ONFIELD) then return false end
-	if bit.band(r,REASON_BATTLE)~=0 then return bit.band(c:GetBattlePosition(),POS_FACEUP)~=0
-	else return bit.band(c:GetPreviousPosition(),POS_FACEUP)~=0 end
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c56840658.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

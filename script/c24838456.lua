@@ -16,7 +16,7 @@ function c24838456.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c24838456.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c24838456.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

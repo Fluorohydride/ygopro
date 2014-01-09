@@ -4,15 +4,18 @@ function c53656677.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_BE_BATTLE_TARGET)
 	e1:SetTarget(c53656677.target)
 	e1:SetOperation(c53656677.operation)
 	c:RegisterEffect(e1)
 end
-function c53656677.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c53656677.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc==Duel.GetAttackTarget() end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if chk==0 then return d and d:IsControler(tp) and d:IsFaceup() and d:GetAttack()<a:GetAttack() end
+	if chk==0 then return d and d:IsControler(tp) and d:IsFaceup() and d:IsCanBeEffectTarget(e)
+		and d:GetAttack()<a:GetAttack() end
 	Duel.SetTargetCard(d)
 end
 function c53656677.operation(e,tp,eg,ep,ev,re,r,rp)

@@ -62,11 +62,11 @@ public:
 
 	int32 is_disable_related();
 	int32 is_available();
-	int32 is_activateable(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_action_check(uint8 playerid);
-	int32 is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
-	int32 is_condition_check(uint8 playerid, tevent& e);
-	int32 is_activate_check(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_condition_check(uint8 playerid, const tevent& e);
+	int32 is_activate_check(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_target(card* pcard);
 	int32 is_target_player(uint8 playerid);
 	int32 is_player_effect_target(card* pcard);
@@ -262,6 +262,7 @@ public:
 #define EFFECT_REVERSE_UPDATE			108	//
 #define EFFECT_SWAP_AD					109	//
 #define EFFECT_SWAP_BASE_AD				110	//
+#define EFFECT_ADD_CODE					113	//
 #define EFFECT_CHANGE_CODE				114	//
 #define EFFECT_ADD_TYPE					115	//
 #define EFFECT_REMOVE_TYPE				116	//
@@ -412,9 +413,12 @@ public:
 #define EVENT_LEVEL_UP				1200
 #define EVENT_PAY_LPCOST			1201
 #define EVENT_DETACH_MATERIAL		1202
+#define EVENT_CONFIRM_DECKTOP		1203
+#define EVENT_CONFIRM_CARDS			1204
 #define EVENT_TURN_END				1210
 #define EVENT_PHASE					0x1000
 #define EVENT_PHASE_START			0x2000
+#define EVENT_PHASE_PRESTART		0x2100
 #define EVENT_ADD_COUNTER			0x10000
 #define EVENT_REMOVE_COUNTER		0x20000
 

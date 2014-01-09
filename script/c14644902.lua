@@ -39,5 +39,7 @@ function c14644902.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c14644902.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	if not e:GetHandler():IsHasEffect(66235877) then
+		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	end
 end

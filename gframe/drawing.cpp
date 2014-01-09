@@ -305,7 +305,7 @@ void Game::DrawMisc() {
 	else driver->draw2DImage(imageManager.tLPBar, recti(335, 12, 335 + 290 * dInfo.lp[0] / 8000, 28), recti(0, 0, 16, 16), 0, 0, true);
 	if(dInfo.lp[1] >= 8000)
 		driver->draw2DImage(imageManager.tLPBar, recti(696, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
-	else driver->draw2DImage(imageManager.tLPBar, recti(986 - 290 * dInfo.lp[1] / 8000, 12, 986 , 28), recti(0, 0, 16, 16), 0, 0, true);
+	else driver->draw2DImage(imageManager.tLPBar, recti(986 - 290 * dInfo.lp[1] / 8000, 12, 986, 28), recti(0, 0, 16, 16), 0, 0, true);
 	if(lpframe) {
 		dInfo.lp[lpplayer] -= lpd;
 		myswprintf(dInfo.strLP[lpplayer], L"%d", dInfo.lp[lpplayer]);
@@ -666,31 +666,22 @@ void Game::DrawSpec() {
 		if (attack_sv > 28)
 			attack_sv = 0;
 	}
-
-
-	bool showChat=true;
-	if(hideChat)
-	{
-	    showChat=false;
+	bool showChat = true;
+	if(hideChat) {
+	    showChat = false;
 	    hideChatTimer = 10;
-	}
-	else if (hideChatTimer > 0)
-	{
-	    showChat= false;
+	} else if(hideChatTimer > 0) {
+	    showChat = false;
 	    hideChatTimer--;
 	}
-	int maxChatLines = mainGame->dInfo.isStarted?5:8;
-
-	for(int i = 0; i < maxChatLines ; ++i) {
+	int maxChatLines = mainGame->dInfo.isStarted ? 5 : 8;
+	for(int i = 0; i < maxChatLines; ++i) {
 		static unsigned int chatColor[] = {0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xffffffff, 0xff8080ff, 0xffff4040, 0xffff4040,
-						   0xffff4040,0xff40ff40,0xff4040ff,0xff40ffff,0xffff40ff,0xffffff40,0xffffffff,0xff808080,0xff404040};
-
+		                                   0xffff4040, 0xff40ff40, 0xff4040ff, 0xff40ffff, 0xffff40ff, 0xffffff40, 0xffffffff, 0xff808080, 0xff404040};
 		if(chatTiming[i]) {
 			chatTiming[i]--;
-
-			if(!showChat && i >2)
-                continue;
-
+			if(!showChat && i > 2)
+				continue;
 			int w = textFont->getDimension(chatMsg[i].c_str()).Width;
 			driver->draw2DRectangle(recti(305, 596 - 20 * i, 307 + w, 616 - 20 * i), 0xa0000000, 0xa0000000, 0xa0000000, 0xa0000000);
 			textFont->draw(chatMsg[i].c_str(), rect<s32>(305, 595 - 20 * i, 1020, 615 - 20 * i), 0xff000000, false, false);
@@ -797,7 +788,7 @@ void Game::DrawThumb(code_pointer cp, position2di pos, std::unordered_map<int, i
 	}
 }
 void Game::DrawDeckBd() {
-	wchar_t textBuffer[32];
+	wchar_t textBuffer[64];
 	//main deck
 	driver->draw2DRectangle(recti(310, 137, 410, 157), 0x400000ff, 0x400000ff, 0x40000000, 0x40000000);
 	driver->draw2DRectangleOutline(recti(309, 136, 410, 157));

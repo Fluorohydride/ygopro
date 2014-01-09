@@ -14,7 +14,7 @@ function c62107612.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c62107612.condition(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_EFFECT)~=0 and re:GetHandler():GetCode()==93717133
+	return bit.band(r,REASON_EFFECT)~=0 and re and re:GetHandler():GetCode()==93717133
 end
 function c62107612.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,62107612)==0 and e:GetHandler():IsAbleToGraveAsCost() end

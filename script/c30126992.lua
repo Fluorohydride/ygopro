@@ -30,7 +30,7 @@ function c30126992.spcon(e,c)
 	return ct>4
 end
 function c30126992.cfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToRemove()
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToRemoveAsCost()
 end
 function c30126992.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c30126992.cfilter,tp,LOCATION_GRAVE,0,1,nil) end

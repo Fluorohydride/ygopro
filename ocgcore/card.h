@@ -21,7 +21,7 @@ class group;
 struct card_data {
 	uint32 code;
 	uint32 alias;
-	uint32 setcode;
+	uint64 setcode;
 	uint32 type;
 	uint32 level;
 	uint32 attribute;
@@ -132,6 +132,7 @@ public:
 	uint32 get_infos(byte* buf, int32 query_flag, int32 use_cache = TRUE);
 	uint32 get_info_location();
 	uint32 get_code();
+	uint32 get_another_code();
 	int32 is_set_card(uint32 set_code);
 	uint32 get_type();
 	int32 get_base_attack(uint8 swap = FALSE);
@@ -234,7 +235,7 @@ public:
 	int32 is_control_can_be_changed();
 	int32 is_capable_be_battle_target(card* pcard);
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
-	int32 is_can_be_fusion_material();
+	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
 	int32 is_can_be_xyz_material(card* scard);
 };

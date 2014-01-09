@@ -10,6 +10,8 @@ function c62966332.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_REVERSE_DECK)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetTargetRange(1,1)
 	c:RegisterEffect(e2)
 end

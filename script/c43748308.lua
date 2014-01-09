@@ -5,7 +5,7 @@ function c43748308.initial_effect(c)
 	e1:SetDescription(aux.Stringid(43748308,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_CHAIN_SOLVING)
-	e1:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c43748308.setcon)
@@ -34,7 +34,7 @@ function c43748308.filter(c)
 end
 function c43748308.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and e:GetHandler():IsFaceup()
-		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
+		and not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingMatchingCard(c43748308.filter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c43748308.setop(e,tp,eg,ep,ev,re,r,rp)

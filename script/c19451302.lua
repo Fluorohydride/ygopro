@@ -16,5 +16,5 @@ function c19451302.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c19451302.indtg(e,c)
-	return c:GetAttack()==0
+	return c:GetAttack()==0 and c:IsAttackPos()
 end

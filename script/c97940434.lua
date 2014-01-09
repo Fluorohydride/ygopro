@@ -1,4 +1,4 @@
---カオス·ハンター
+--カオスハンター
 function c97940434.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -20,6 +20,14 @@ function c97940434.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(0,1)
 	c:RegisterEffect(e2)
+	--30459350 chk
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(30459350)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(0,1)
+	c:RegisterEffect(e3)
 end
 function c97940434.spfilter(c,sp)
 	return c:GetSummonPlayer()==sp

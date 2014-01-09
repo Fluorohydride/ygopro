@@ -50,8 +50,7 @@ function c86170989.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c86170989.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==2 then
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		local tc=g:GetFirst()
+		local tc=Duel.GetFirstTarget()
 		if tc and tc:IsRelateToEffect(e) then
 			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 		end
