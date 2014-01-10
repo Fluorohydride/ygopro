@@ -27,7 +27,8 @@ function c10560119.sdcon(e)
 	return Duel.IsExistingMatchingCard(c10560119.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function c10560119.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c10560119.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	local g=Duel.GetFieldGroup(tp,LOCATION_MZONE,0)
+	return g:GetCount()>0 and not g:IsExists(c10560119.cfilter,1,nil)
 end
 function c10560119.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,10560119)==0 end
