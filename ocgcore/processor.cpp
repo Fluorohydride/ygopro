@@ -481,7 +481,7 @@ int32 field::process() {
 			if(!attacker
 			        || (attacker->fieldid_r != core.pre_field[0])
 			        || (attacker->current.position & POS_FACEDOWN)
-				|| (attacker->current.position & POS_DEFENCE && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
+			        || ((attacker->current.position & POS_DEFENCE) && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
 			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
 				returns.ivalue[0] = 0;
@@ -3745,7 +3745,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		card* pcard;
 		for(auto elit = core.used_event.begin(); elit != core.used_event.end(); ++elit) {
 			if(elit->event_cards)
-				pduel->delete_group((group*)elit->event_cards);
+				pduel->delete_group(elit->event_cards);
 		}
 		core.used_event.clear();
 		for(auto eit = core.reseted_effects.begin(); eit != core.reseted_effects.end(); ++eit) {

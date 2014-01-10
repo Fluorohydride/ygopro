@@ -2368,9 +2368,9 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 			dest = ((*cit)->operation_param >> 8) & 0xff;
 			if(!dest)
 				dest = LOCATION_GRAVE;
-			if((dest == LOCATION_HAND && (*cit)->is_affected_by_effect(EFFECT_CANNOT_TO_HAND))
-			        || (dest == LOCATION_DECK && (*cit)->is_affected_by_effect(EFFECT_CANNOT_TO_DECK))
-			        || (dest == LOCATION_REMOVED && (*cit)->is_affected_by_effect(EFFECT_CANNOT_REMOVE)))
+			if((dest == LOCATION_HAND && !(*cit)->is_capable_send_to_hand(reason_player))
+			        || (dest == LOCATION_DECK && !(*cit)->is_capable_send_to_deck(reason_player))
+			        || (dest == LOCATION_REMOVED && !(*cit)->is_removeable(reason_player)))
 				dest = LOCATION_GRAVE;
 			(*cit)->operation_param = ((*cit)->operation_param & 0xffff00ff) + (dest << 8);
 		}
