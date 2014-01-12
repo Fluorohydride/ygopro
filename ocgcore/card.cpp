@@ -238,7 +238,7 @@ uint32 card::get_another_code() {
 }
 int32 card::is_set_card(uint32 set_code) {
 	uint32 code = get_code();
-	uint32 setcode;
+	uint64 setcode;
 	if (code == data.code) {
 		setcode = data.setcode;
 	} else {
@@ -251,6 +251,8 @@ int32 card::is_set_card(uint32 set_code) {
 	if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
 		return TRUE;
 	if (((setcode >> 16) & 0xfff) == settype && ((setcode >> 16) & 0xf000 & setsubtype) == setsubtype)
+		return TRUE;
+	if (((setcode >> 24) & 0xfff) == settype && ((setcode >> 24) & 0xf000 & setsubtype) == setsubtype)
 		return TRUE;
 	return FALSE;
 }
