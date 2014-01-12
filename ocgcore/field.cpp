@@ -704,9 +704,10 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 	}
 }
 void field::remove_effect(effect* peffect) {
-	if (effects.indexer.find(peffect) == effects.indexer.end())
+	auto eit = effects.indexer.find(peffect);
+	if (eit == effects.indexer.end())
 		return;
-	auto it = effects.indexer[peffect];
+	auto it = eit->second;
 	if (!(peffect->type & EFFECT_TYPE_ACTIONS))
 		effects.aura_effect.erase(it);
 	else {
