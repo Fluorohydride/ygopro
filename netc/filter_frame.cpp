@@ -68,10 +68,8 @@ namespace ygopro
         page_info = new wxStaticText(this, wxID_ANY, wxT(" 1 / 1"), wxDefaultPosition, wxDefaultSize);
         result_info = new wxStatusBar(this, wxID_ANY);
         SetStatusBar(result_info);
-        search_result = new wxListCtrl(this, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxLC_REPORT | wxLC_HRULES | wxLC_VRULES | wxLC_ICON);
-        //search_result->Bind(wxEVT_TEXT_URL, &FilterFrame::OnCmdClicked, this, wxID_ANY);
-        search_result->AppendColumn(wxT("Name"));
-        search_result->AppendColumn(wxT("Type"));
+        search_result = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxRE_READONLY | wxRE_MULTILINE);
+        search_result->Bind(wxEVT_TEXT_URL, &FilterFrame::OnCmdClicked, this, wxID_ANY);
         prev_page->Disable();
         next_page->Disable();
         
@@ -143,20 +141,71 @@ namespace ygopro
     }
     
     void FilterFrame::ShowPage(unsigned int page) {
-        size_t maxpage = vector_results.empty() ? 0 : ((vector_results.size() - 1) / 20);
+        size_t maxpage = vector_results.empty() ? 0 : ((vector_results.size() - 1) / 10);
         if(page > maxpage)
             page = (unsigned int)maxpage;
-        search_result->DeleteAllItems();
-        for(unsigned int i = 0; i < 20 && page * 20 + i < vector_results.size(); ++i) {
-            auto& cd = vector_results[page * 20 + i];
-            long itemIndex = search_result->InsertItem(search_result->GetItemCount(), cd->name);
-            search_result->SetItem(itemIndex, 1, dataMgr.GetTypeString(cd->type));
+        search_result->Clear();
+        for(unsigned int i = 0; i < 10 && page * 10 + i < vector_results.size(); ++i) {
+            auto& cd = vector_results[page * 10 + i];
+            wxString card_name = cd->name;
+            wxRichTextAttr attr;
+            search_result->SetDefaultStyle(attr);
+            search_result->BeginFontSize(16);
+            search_result->BeginBold();
+            search_result->BeginTextColour(wxColour(0, 0, 128));
+            search_result->BeginURL(wxString::Format(wxT("/%d"), cd->code));
+            search_result->WriteText(card_name);
+            search_result->EndURL();
+            search_result->EndTextColour();
+            search_result->EndBold();
+            search_result->EndFontSize();
+            search_result->WriteText(wxT("  "));
+            search_result->BeginTextColour(wxColour(0, 0, 255));
+            search_result->BeginURL(wxString::Format(wxT("+%d"), cd->code));
+            search_result->WriteText(wxT("[MAIN]"));
+            search_result->EndURL();
+            search_result->BeginURL(wxString::Format(wxT("-%d"), cd->code));
+            search_result->WriteText(wxT("[SIDE]"));
+            search_result->EndURL();
+            search_result->EndTextColour();
+            search_result->Newline();
+            if(cd->type & 0x1) {
+                for(unsigned int i = 0; i < cd->level; ++i)
+                    search_result->WriteImage(star_img);
+                search_result->Newline();
+                search_result->BeginTextColour(wxColour(180, 140, 40));
+                wxString infostr = wxT("[") + dataMgr.GetTypeString(cd->type) + wxT("] ") + dataMgr.GetAttributeString(cd->attribute) + wxT("/") + dataMgr.GetRaceString(cd->race);
+                search_result->WriteText(infostr);
+                search_result->EndTextColour();
+                search_result->Newline();
+                search_result->BeginTextColour(wxColour(64, 64, 64));
+                if(cd->attack >= 0 && cd->defence >= 0)
+                    search_result->WriteText(wxString::Format(wxT("ATK:%d / DEF:%d"), cd->attack, cd->defence));
+                else if(cd->attack >= 0)
+                    search_result->WriteText(wxString::Format(wxT("ATK:%d / DEF:????"), cd->attack));
+                else if(cd->defence >= 0)
+                    search_result->WriteText(wxString::Format(wxT("ATK:???? / DEF:%d"), cd->defence));
+                else
+                    search_result->WriteText(wxString::Format(wxT("ATK:???? / DEF:????")));
+                search_result->EndTextColour();
+                search_result->Newline();
+            } else {
+                if(cd->type & 0x2)
+                    search_result->BeginTextColour(wxColour(0, 192, 128));
+                else
+                    search_result->BeginTextColour(wxColour(250, 32, 192));
+                wxString infostr = wxT("[") + dataMgr.GetTypeString(cd->type) + wxT("] ");
+                search_result->WriteText(infostr);
+                search_result->EndTextColour();
+                search_result->Newline();
+            }
+            search_result->Newline();
         }
         if(page > 0)
             prev_page->Enable();
         else
             prev_page->Disable();
-        if(page * 20 + 20 < vector_results.size())
+        if(page * 10 + 10 < vector_results.size())
             next_page->Enable();
         else
             next_page->Disable();
@@ -234,13 +283,24 @@ namespace ygopro
     }
     
     void FilterFrame::OnNext(wxCommandEvent& evt) {
-        size_t maxpage = vector_results.empty() ? 0 : ((vector_results.size() - 1) / 20);
+        size_t maxpage = vector_results.empty() ? 0 : ((vector_results.size() - 1) / 10);
         if(page < maxpage) {
             page++;
             ShowPage(page);
         }
     }
     
+    void FilterFrame::OnCmdClicked(wxTextUrlEvent& evt) {
+        wxString url = evt.GetString();
+        long code;
+        url.Right(url.length() - 1).ToLong(&code);
+        if(url[0] == wxT('+'))
+            editorFrame->AddCard((unsigned int)code, 1);
+        else if(url[0] == wxT('-'))
+            editorFrame->AddCard((unsigned int)code, 3);
+        editorFrame->SetCardInfo((unsigned int)code);
+    }
+
     void FilterFrame::OnTypeSelected(wxCommandEvent& evt) {
         switch(filter_att2[0]->GetSelection()) {
             case 0:
