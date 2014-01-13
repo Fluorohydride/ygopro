@@ -19,6 +19,7 @@ namespace ygopro
         Bind(wxEVT_LEFT_DOWN, &wxEditorCanvas::EventMouseLDown, this);
         Bind(wxEVT_LEFT_UP, &wxEditorCanvas::EventMouseLUp, this);
         Bind(wxEVT_LEAVE_WINDOW, &wxEditorCanvas::EventMouseLeftWindow, this);
+        Bind(wxEVT_RIGHT_UP, &wxEditorCanvas::EventMouseRUp, this);
         hover_timer.SetOwner(this);
         Bind(wxEVT_TIMER, &wxEditorCanvas::OnHoverTimer, this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
@@ -257,6 +258,23 @@ namespace ygopro
         }
     }
 
+    void wxEditorCanvas::EventMouseRUp(wxMouseEvent& evt) {
+        if(click_field) {
+            click_field = 0;
+            click_index = 0;
+            Refresh();
+        }
+        if(draging_code) {
+            draging_code = 0;
+            t_draging = nullptr;
+            Refresh();
+        } else if(hover_field) {
+            current_deck.RemoveCard(hover_field, hover_index);
+            EventMouseMoved(evt);
+            Refresh();
+        }
+    }
+    
     void wxEditorCanvas::OnHoverTimer(wxTimerEvent& evt) {
         unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
         if(code == hover_code)
