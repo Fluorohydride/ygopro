@@ -95,7 +95,7 @@ namespace ygopro
             for(int i = 0; i < 64; ++i)
                 base64_dec_table[(int)base64_chars[i]] = i;
         }
-        if(deck.size() % 5)
+        if((deck.size() == 0) || (deck.size() % 5))
             return false;
         for(size_t i = 0; i < deck.size(); i += 5) {
             unsigned int packed_data = (unsigned int)base64_dec_table[(unsigned char)deck[i + 4]];

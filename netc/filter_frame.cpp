@@ -10,7 +10,7 @@ namespace ygopro
 {
     FilterFrame* filterFrame = nullptr;
     
-    FilterFrame::FilterFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, "Card Filter", wxDefaultPosition, wxSize(sx, sy)) {
+    FilterFrame::FilterFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, "Card Filter", wxDefaultPosition, wxSize(sx, sy), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
         wxStaticText* stkey = new wxStaticText(this, wxID_ANY, wxT("Keyword"), wxDefaultPosition, wxDefaultSize);
         filter_att1[0] = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize);
         wxStaticText* st1 = new wxStaticText(this, wxID_ANY, wxT("Attack"), wxDefaultPosition, wxDefaultSize);
@@ -125,7 +125,7 @@ namespace ygopro
             star_img = st.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1));
         }
         
-        SetTransparent(240);
+        SetTransparent(224);
     }
     
     FilterFrame::~FilterFrame() {
@@ -164,6 +164,7 @@ namespace ygopro
             search_result->BeginURL(wxString::Format(wxT("+%d"), cd->code));
             search_result->WriteText(wxT("[MAIN]"));
             search_result->EndURL();
+            search_result->WriteText("  ");
             search_result->BeginURL(wxString::Format(wxT("-%d"), cd->code));
             search_result->WriteText(wxT("[SIDE]"));
             search_result->EndURL();

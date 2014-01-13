@@ -263,11 +263,10 @@ namespace ygopro
         wxTheClipboard->Close();
         wxString deck_string = tdo.GetText();
         DeckData tempdeck;
-        if(tempdeck.LoadFromString(deck_string)) {
+        if(deck_string.Left(6) == wxT("ydk://") && tempdeck.LoadFromString(deck_string.Right(deck_string.Length() - 6))) {
             editor_canvas->ClearDeck();
             editor_canvas->GetDeck() = tempdeck;
             editor_canvas->Refresh();
-            wxMessageDialog(this, wxString("Load from string success"), wxT("Information"), wxICON_INFORMATION).ShowModal();
         } else {
             wxMessageDialog(this, wxString("Load from string failed."), wxT("Error"), wxICON_ERROR).ShowModal();
         }
@@ -275,9 +274,11 @@ namespace ygopro
 
     void EditorFrame::OnDeckSaveString(wxCommandEvent& evt) {
         wxString deck_string = editor_canvas->GetDeck().SaveToString();
+        deck_string = wxT("ydk://") + deck_string;
         wxTheClipboard->Open();
         wxTheClipboard->SetData(new wxTextDataObject(deck_string));
         wxTheClipboard->Close();
+        editor_canvas->Refresh();
         wxMessageDialog(this, wxString("The deck has been successfully copied to clipboard."), wxT("Information"), wxICON_INFORMATION).ShowModal();
     }
 
