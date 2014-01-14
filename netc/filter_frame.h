@@ -27,6 +27,7 @@ namespace ygopro
         void OnPrev(wxCommandEvent& evt);
         void OnNext(wxCommandEvent& evt);
         void OnCmdClicked(wxTextUrlEvent& evt);
+        void OnMenu(wxCommandEvent& evt);
         void OnTypeSelected(wxCommandEvent& evt);
         
     private:

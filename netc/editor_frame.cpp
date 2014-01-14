@@ -337,6 +337,7 @@ namespace ygopro
             wxFileName fn(current_file);
             neturl.Replace("{name}", fn.GetName());
         }
+        editor_canvas->Refresh();
         wxLaunchDefaultBrowser(neturl);
     }
 

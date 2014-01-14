@@ -302,6 +302,10 @@ namespace ygopro
         editorFrame->SetCardInfo((unsigned int)code);
     }
 
+    void FilterFrame::OnMenu(wxCommandEvent& evt) {
+        
+    }
+    
     void FilterFrame::OnTypeSelected(wxCommandEvent& evt) {
         switch(filter_att2[0]->GetSelection()) {
             case 0:
