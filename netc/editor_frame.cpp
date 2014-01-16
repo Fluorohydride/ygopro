@@ -37,6 +37,7 @@ namespace ygopro
         m_tool->Append(ID_TOOL_SCREENSHOT_SV, wxT("Save Screenshot\tCTRL+SHIFT+P"));
         m_tool->Append(ID_TOOL_SEARCH, wxT("Search\tCTRL+F"));
         m_tool->Append(ID_TOOL_BROWSER, wxT("Open in Browser\tCTRL+O"));
+        m_tool->Append(ID_TOOL_REGCHECK, wxT("View Regulation\tCtrl+B"));
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolClear, this, ID_TOOL_CLEAR);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSort, this, ID_TOOL_SORT);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
@@ -44,6 +45,7 @@ namespace ygopro
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolScreenshotSV, this, ID_TOOL_SCREENSHOT_SV);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSearch, this, ID_TOOL_SEARCH);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolOpenBrowser, this, ID_TOOL_BROWSER);
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolCheckRegulation, this, ID_TOOL_REGCHECK);
 
         wxMenu* m_limit = new wxMenu;
         auto& lrs = limitRegulationMgr.GetLimitRegulations();
@@ -341,6 +343,11 @@ namespace ygopro
         wxLaunchDefaultBrowser(neturl);
     }
 
+    void EditorFrame::OnToolCheckRegulation(wxCommandEvent& evt) {
+        limitRegulationMgr.LoadCurrentListToDeck(editor_canvas->GetDeck());
+        editor_canvas->Refresh();
+    }
+    
     void EditorFrame::OnRegulationChange(wxCommandEvent& evt) {
         auto& regs = GetMenuBar()->GetMenu(2)->GetMenuItems();
         if(regs.GetCount() == 0)

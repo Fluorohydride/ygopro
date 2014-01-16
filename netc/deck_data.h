@@ -38,7 +38,6 @@ namespace ygopro
         
         bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1, bool strict = true);
         bool RemoveCard(unsigned int pos, unsigned int index);
-        bool MoveCard(unsigned int pos1, unsigned int index1, unsigned int pos2, unsigned int index2);
         
         unsigned int mcount = 0;
         unsigned int scount = 0;
@@ -48,6 +47,7 @@ namespace ygopro
         unsigned int fuscount = 0;
 
         static bool deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
+        static bool deck_sort_limit(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
 	};
 
     struct LimitRegulation {
@@ -69,6 +69,7 @@ namespace ygopro
         unsigned int CheckCurrentList(unsigned int pool);
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
         void FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result);
+        void LoadCurrentListToDeck(DeckData& deck);
         
 	private:
 		LimitRegulation* current_list = nullptr;

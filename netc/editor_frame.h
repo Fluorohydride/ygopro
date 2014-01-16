@@ -27,6 +27,7 @@ namespace ygopro
             ID_TOOL_SCREENSHOT_SV,
             ID_TOOL_SEARCH,
             ID_TOOL_BROWSER,
+            ID_TOOL_REGCHECK,
             ID_REGULATION,
             ID_REGULATION_END = ID_REGULATION + 100,
             ID_MENUEND,
@@ -53,6 +54,7 @@ namespace ygopro
         void OnToolScreenshotSV(wxCommandEvent& evt);
         void OnToolSearch(wxCommandEvent& evt);
         void OnToolOpenBrowser(wxCommandEvent& evt);
+        void OnToolCheckRegulation(wxCommandEvent& evt);
 
         void OnRegulationChange(wxCommandEvent& evt);
         
