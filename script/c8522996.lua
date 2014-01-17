@@ -11,11 +11,10 @@ function c8522996.initial_effect(c)
 	--change attribute
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(8522996,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCost(c8522996.cost)
 	e2:SetCondition(c8522996.con)
+	e2:SetCost(c8522996.cost)
 	e2:SetTarget(c8522996.tg)
 	e2:SetOperation(c8522996.op)
 	c:RegisterEffect(e2)
@@ -30,16 +29,16 @@ function c8522996.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c8522996.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 
-		Duel.IsPlayerCanSpecialSummonMonster(tp,8522996,0,0x11,0,0,2,1000,2400,6,RACE_FIEND,ATTRIBUTE_DARKNESS) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsPlayerCanSpecialSummonMonster(tp,8522996,0,0x21,1000,2400,6,RACE_FIEND,ATTRIBUTE_DARK) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c8522996.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0
-		or not Duel.IsPlayerCanSpecialSummonMonster(tp,8522996,0,0x11,1000,2400,6,RACE_FIEND,ATTRIBUTE_DARKNESS) then return end
-	c:AddTrapMonsterAttribute(TYPE_EFFECT,ATTRIBUTE_DARKNESS,RACE_FIEND,6,1000,2400)
+		or not Duel.IsPlayerCanSpecialSummonMonster(tp,8522996,0,0x21,1000,2400,6,RACE_FIEND,ATTRIBUTE_DARK) then return end
+	c:AddTrapMonsterAttribute(TYPE_EFFECT,ATTRIBUTE_DARK,RACE_FIEND,6,1000,2400)
 	Duel.SpecialSummon(c,1,tp,tp,true,false,POS_FACEUP)
 	c:TrapMonsterBlock()
 end
@@ -71,6 +70,7 @@ function c8522996.op(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_DOUBLE_TRIBUTE)
 	e2:SetValue(c8522996.condition)
+	e2:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e2)
 end
 function c8522996.condition(e,c)

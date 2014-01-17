@@ -12,7 +12,7 @@ end
 function c46955770.filter(c)
 	return c:IsFaceup() and c:IsCode(47355498)
 end
-function c46955770.con(e,tp,eg,ep,ev,re,r,rp)
+function c46955770.con(e)
 	return Duel.IsExistingMatchingCard(c46955770.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 		or Duel.GetEnvironment()==47355498
 end

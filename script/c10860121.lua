@@ -22,12 +22,12 @@ function c10860121.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c10860121.cfilter,1,nil,tp)
 end
 function c10860121.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,10860121)==0 and e:GetHandler():IsDiscardable() end
-	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
+	if chk==0 then return Duel.GetFlagEffect(tp,10860121)==0 and e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 	Duel.RegisterFlagEffect(tp,10860121,RESET_PHASE+PHASE_END,0,1)
 end
 function c10860121.filter(c,e,tp)
-	return c:IsSetCard(0x88) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
+	return c:IsSetCard(0x88) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c10860121.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

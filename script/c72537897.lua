@@ -34,9 +34,7 @@ end
 function c72537897.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
 		local g=Duel.GetMatchingGroup(c72537897.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
-		return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0,nil)==0 and
-		Duel.GetLocationCount(tp,LOCATION_MZONE)>2 and
-		g:GetClassCount(Card.GetCode)>=3 end
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>2 and g:GetClassCount(Card.GetCode)>=3 end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,3,tp,LOCATION_DECK)
 end
 function c72537897.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -71,7 +69,7 @@ function c72537897.activate(e,tp,eg,ep,ev,re,r,rp)
 			tc=sg1:GetNext()
 		end
 		sg1:KeepAlive()
-		local e3=Effect.CreateEffect(e:GetHandler())
+		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e3:SetCode(EVENT_PHASE+PHASE_END)
 		e3:SetReset(RESET_PHASE+PHASE_END)

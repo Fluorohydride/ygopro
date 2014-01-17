@@ -1,14 +1,5 @@
 --Noble Knight Peredur
 function c73359475.initial_effect(c)
-	--Normal monster
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetCode(EFFECT_CHANGE_TYPE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCondition(c73359475.eqcon1)
-	e1:SetValue(TYPE_NORMAL+TYPE_MONSTER)
-	c:RegisterEffect(e1)
 	--Attribute Dark
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -34,14 +25,8 @@ function c73359475.initial_effect(c)
 	e4:SetOperation(c73359475.thop)
 	c:RegisterEffect(e4)
 end
-function c73359475.eqcon1(e)
-	return not e:GetHandler():GetEquipGroup():IsExists(Card.IsSetCard,1,nil,0x207a)
-end
 function c73359475.eqcon2(e)
 	return e:GetHandler():GetEquipGroup():IsExists(Card.IsSetCard,1,nil,0x207a)
-end
-function c73359475.cfilter(c,tc)
-	return c:IsSetCard(0x207a) and c:GetPreviousEquipTarget()==tc and c:IsReason(REASON_LOST_TARGET)
 end
 function c73359475.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c73359475.eqcon2(e) and e:GetHandler():IsLocation(LOCATION_GRAVE)
@@ -60,5 +45,6 @@ function c73359475.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end

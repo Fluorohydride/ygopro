@@ -29,7 +29,6 @@ function c19748583.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCategory(CATEGORY_DESTROY)
-	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e4:SetCode(EVENT_BATTLE_START)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCondition(c19748583.descon)
@@ -55,7 +54,7 @@ function c19748583.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:GetControler()~=tp or tc:IsFacedown() or not tc:IsRelateToEffect(e) or not c:CheckUniqueOnField(tp) then
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:GetControler()~=tp or tc:IsFacedown() or not tc:IsRelateToEffect(e) then
 		Duel.SendtoGrave(c,REASON_EFFECT)
 		return
 	end
@@ -73,28 +72,26 @@ end
 function c19748583.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	if chk==0 then return bit.band(r,REASON_EFFECT)~=0 and c:GetEquipTarget():IsAttribute(ATTRIBUTE_LIGHT)  end
-	return Duel.SelectYesNo(e:GetOwnerPlayer(),aux.Stringid(19748583,0))
+	return Duel.SelectYesNo(e:GetOwnerPlayer(),aux.Stringid(19748583,1))
 end
 function c19748583.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT+REASON_REPLACE)
 end
-function c19748583.descon(e,re,r,rp)
+function c19748583.descon(e,tp,eg,ep,ev,re,r,rp)
 	local tg=e:GetHandler():GetEquipTarget()
-	return tg:IsAttribute(ATTRIBUTE_DARK) and (Duel.GetAttacker()==tg or Duel.GetAttackTarget()==tg)
+	return tg and tg:IsAttribute(ATTRIBUTE_DARK) and (Duel.GetAttacker()==tg or Duel.GetAttackTarget()==tg)
 end
 function c19748583.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if tc==c:GetEquipTarget() then tc=Duel.GetAttackTarget() end
+	local tc=c:GetEquipTarget():GetBattleTarget()
 	if chk==0 then return tc and tc:IsControler(1-tp) end
-	local g=Group.FromCards(tc,c:GetEquipTarget())
+	local g=Group.FromCards(tc,c)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c19748583.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if tc==c:GetEquipTarget() then tc=Duel.GetAttackTarget() end
-	if tc:IsRelateToBattle() and Duel.Destroy(tc,REASON_EFFECT) then
+	local tc=c:GetEquipTarget():GetBattleTarget()
+	if tc:IsRelateToBattle() and Duel.Destroy(tc,REASON_EFFECT)~=0 then
 		Duel.BreakEffect()
 		Duel.Destroy(c,REASON_EFFECT)
 	end
