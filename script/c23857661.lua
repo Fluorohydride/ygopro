@@ -11,7 +11,7 @@ function c23857661.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c23857661.cfilter(c)
-	return c:IsSetCard(0x88) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x88) and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
 end
 function c23857661.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost()

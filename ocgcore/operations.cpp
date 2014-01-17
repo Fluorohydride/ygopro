@@ -2794,7 +2794,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			} else if(dest == LOCATION_REMOVED) {
 				core.hint_timing[pcard->current.controler] |= TIMING_REMOVE;
 			}
-			if(pcard->current.location != dest) {
+			if(pcard->current.controler != playerid || pcard->current.location != dest) {
 				pduel->write_buffer8(MSG_MOVE);
 				pduel->write_buffer32(pcard->data.code);
 				pduel->write_buffer32(pcard->get_info_location());
