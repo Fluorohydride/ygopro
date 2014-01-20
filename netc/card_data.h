@@ -52,7 +52,7 @@ namespace ygopro
 	public:
 		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
-        void FilterCard(const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result);
+        std::vector<CardData*> FilterCard(const FilterCondition& fc, const wxString& fs);
         
         static wxString GetAttributeString(unsigned int attr);
         static wxString GetRaceString(unsigned int race);

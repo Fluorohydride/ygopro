@@ -140,7 +140,8 @@ namespace ygopro
 		return &iter->second;
 	}
     
-    void DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result) {
+    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs) {
+        std::vector<CardData*> result;
         for(auto& iter : _datas) {
             CardData& cd = iter.second;
             if(cd.CheckCondition(fc, fs))
@@ -148,6 +149,7 @@ namespace ygopro
         }
         if(result.size())
             std::sort(result.begin(), result.end(), CardData::card_sort);
+        return std::move(result);
     }
     
     wxString DataMgr::GetAttributeString(unsigned int attr) {
@@ -167,7 +169,7 @@ namespace ygopro
         if(attr & 0x40)
             attname += static_cast<const std::string&>(stringCfg["attribtue_divine"]) + wxT("|");
         attname.resize(attname.length() - 1);
-        return attname;
+        return std::move(attname);
     }
     
     wxString DataMgr::GetRaceString(unsigned int race) {
@@ -219,7 +221,7 @@ namespace ygopro
         if(race & 0x400000)
             racname += static_cast<const std::string&>(stringCfg["race_creatorgod"]) + wxT("|");
         racname.resize(racname.length() - 1);
-        return racname;
+        return std::move(racname);
     }
     
     wxString DataMgr::GetTypeString(unsigned int arctype) {
@@ -281,7 +283,7 @@ namespace ygopro
                 tpname = static_cast<const std::string&>(stringCfg["type_counter"]);
             tpname += static_cast<const std::string&>(stringCfg["type_trap"]);
         }
-        return tpname;
+        return std::move(tpname);
     }
     
     wxString DataMgr::GetTypeString2(unsigned int arctype) {

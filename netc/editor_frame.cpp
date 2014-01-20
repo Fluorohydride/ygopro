@@ -37,7 +37,7 @@ namespace ygopro
         m_tool->Append(ID_TOOL_SCREENSHOT_SV, wxT("Save Screenshot\tCTRL+SHIFT+P"));
         m_tool->Append(ID_TOOL_SEARCH, wxT("Search\tCTRL+F"));
         m_tool->Append(ID_TOOL_BROWSER, wxT("Open in Browser\tCTRL+O"));
-        m_tool->Append(ID_TOOL_REGCHECK, wxT("View Regulation\tCtrl+B"));
+
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolClear, this, ID_TOOL_CLEAR);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSort, this, ID_TOOL_SORT);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
@@ -45,7 +45,6 @@ namespace ygopro
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolScreenshotSV, this, ID_TOOL_SCREENSHOT_SV);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSearch, this, ID_TOOL_SEARCH);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolOpenBrowser, this, ID_TOOL_BROWSER);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolCheckRegulation, this, ID_TOOL_REGCHECK);
 
         wxMenu* m_limit = new wxMenu;
         auto& lrs = limitRegulationMgr.GetLimitRegulations();
@@ -55,7 +54,13 @@ namespace ygopro
         }
         if(lrs.size() > 0)
             m_limit->GetMenuItems()[0]->Check(true);
-
+        wxMenu* m_vlist = new wxMenu;
+        m_vlist->Append(ID_REG_VIEW1, wxT("Forbidden Cards\tCtrl+1"));
+        m_vlist->Append(ID_REG_VIEW2, wxT("Limited Cards\tCtrl+2"));
+        m_vlist->Append(ID_REG_VIEW3, wxT("Semi-limited Cards\tCtrl+3"));
+        m_vlist->Bind(wxEVT_MENU, &EditorFrame::OnToolViewRegulation, this);
+        m_limit->AppendSubMenu(m_vlist, wxT("-- View Current --"));
+        
         menu_bar->Append(m_deck, wxT("Deck"));
         menu_bar->Append(m_tool, wxT("Tools"));
         menu_bar->Append(m_limit, wxT("Limit Regulation"));
@@ -223,6 +228,7 @@ namespace ygopro
     
     void EditorFrame::AddCard(unsigned int code, unsigned int pos) {
         editor_canvas->GetDeck().InsertCard(code, pos, -1, false);
+        StopViewRegulation();
         editor_canvas->Refresh();
     }
     
@@ -343,8 +349,10 @@ namespace ygopro
         wxLaunchDefaultBrowser(neturl);
     }
 
-    void EditorFrame::OnToolCheckRegulation(wxCommandEvent& evt) {
-        limitRegulationMgr.LoadCurrentListToDeck(editor_canvas->GetDeck());
+    void EditorFrame::OnToolViewRegulation(wxCommandEvent& evt) {
+        int id = evt.GetId() - ID_REG_VIEW1;
+        view_regulation = id + 1;
+        limitRegulationMgr.LoadCurrentListToDeck(editor_canvas->GetDeck(), id);
         editor_canvas->Refresh();
     }
     
@@ -361,6 +369,8 @@ namespace ygopro
             mi->Check(id == i);
         }
         limitRegulationMgr.SetLimitRegulation(id);
+        if(view_regulation)
+            limitRegulationMgr.LoadCurrentListToDeck(editor_canvas->GetDeck(), view_regulation - 1);
         limitRegulationMgr.GetDeckCardLimitCount(editor_canvas->GetDeck());
         editor_canvas->Refresh();
     }

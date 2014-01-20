@@ -133,8 +133,7 @@ namespace ygopro
     }
     
     void FilterFrame::FilterCards(const FilterCondition& fc, const wxString &filter_text) {
-        vector_results.clear();
-        dataMgr.FilterCard(fc, filter_text, vector_results);
+        vector_results = dataMgr.FilterCard(fc, filter_text);
         page = 0;
         ShowPage(0);
         result_info->SetStatusText(wxString::Format(wxT("%d cards found. "), vector_results.size()));
@@ -266,11 +265,10 @@ namespace ygopro
             case 4: fc.pool = 1; break;
             case 5: fc.pool = 2; break;
         }
-        vector_results.clear();
         if(l == 0)
-            dataMgr.FilterCard(fc, fstr, vector_results);
+            vector_results = dataMgr.FilterCard(fc, fstr);
         else
-            limitRegulationMgr.FilterCard(l - 1, fc, fstr, vector_results);
+            vector_results = limitRegulationMgr.FilterCard(l - 1, fc, fstr);
         page = 0;
         ShowPage(0);
         result_info->SetStatusText(wxString::Format(wxT("%d cards found. "), vector_results.size()));

@@ -27,7 +27,9 @@ namespace ygopro
             ID_TOOL_SCREENSHOT_SV,
             ID_TOOL_SEARCH,
             ID_TOOL_BROWSER,
-            ID_TOOL_REGCHECK,
+            ID_REG_VIEW1,
+            ID_REG_VIEW2,
+            ID_REG_VIEW3,
             ID_REGULATION,
             ID_REGULATION_END = ID_REGULATION + 100,
             ID_MENUEND,
@@ -40,6 +42,7 @@ namespace ygopro
 
         void SetCardInfo(unsigned int code);
         void AddCard(unsigned int code, unsigned int pos);
+        void StopViewRegulation() { view_regulation = 0; }
         
         void OnDeckLoad(wxCommandEvent& evt);
         void OnDeckSave(wxCommandEvent& evt);
@@ -54,7 +57,7 @@ namespace ygopro
         void OnToolScreenshotSV(wxCommandEvent& evt);
         void OnToolSearch(wxCommandEvent& evt);
         void OnToolOpenBrowser(wxCommandEvent& evt);
-        void OnToolCheckRegulation(wxCommandEvent& evt);
+        void OnToolViewRegulation(wxCommandEvent& evt);
 
         void OnRegulationChange(wxCommandEvent& evt);
         
@@ -66,6 +69,7 @@ namespace ygopro
         wxStaticBitmap* card_image;
         wxRichTextCtrl* card_info;
         wxImage star_img;
+        int view_regulation = 0;
     };
 
     extern EditorFrame* editorFrame;

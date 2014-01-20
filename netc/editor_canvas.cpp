@@ -182,6 +182,7 @@ namespace ygopro
             }
             current_deck.RemoveCard(click_field, click_index);
             click_field = 0;
+            editorFrame->StopViewRegulation();
         } else {
             if(pre_code != hover_code && hover_code != 0) {
                 int delay = (int)commonCfg["hover_info_delay"];
@@ -271,6 +272,7 @@ namespace ygopro
         } else if(hover_field) {
             current_deck.RemoveCard(hover_field, hover_index);
             EventMouseMoved(evt);
+            editorFrame->StopViewRegulation();
             Refresh();
         }
     }

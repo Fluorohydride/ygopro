@@ -31,6 +31,7 @@ namespace ygopro
         void Clear();
         void Sort();
         void Shuffle();
+        void CalCount();
         bool LoadFromFile(const wxString& file);
         bool LoadFromString(const wxString& deck);
         void SaveToFile(const wxString& file);
@@ -68,8 +69,8 @@ namespace ygopro
         unsigned int GetCardLimitCount(unsigned int code);
         unsigned int CheckCurrentList(unsigned int pool);
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
-        void FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result);
-        void LoadCurrentListToDeck(DeckData& deck);
+        std::vector<CardData*> FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs);
+        void LoadCurrentListToDeck(DeckData& deck, int limit);
         
 	private:
 		LimitRegulation* current_list = nullptr;

@@ -37,6 +37,40 @@ namespace ygopro
         std::random_shuffle(side_deck.begin(), side_deck.end());
     }
     
+    void DeckData::CalCount() {
+        counts.clear();
+        mcount = 0;
+        scount = 0;
+        tcount = 0;
+        syncount = 0;
+        xyzcount = 0;
+        fuscount = 0;
+        for(auto iter : main_deck) {
+            auto cd = std::get<0>(iter);
+            if(cd->type & 0x1)
+                mcount++;
+            else if(cd->type & 0x2)
+                scount++;
+            else
+                tcount++;
+            counts[cd->code]++;
+        }
+        for(auto iter : extra_deck) {
+            auto cd = std::get<0>(iter);
+            if(cd->type & 0x800000)
+                xyzcount++;
+            else if(cd->type & 0x2000)
+                syncount++;
+            else
+                fuscount++;
+            counts[cd->code]++;
+        }
+        for(auto iter : side_deck) {
+            auto cd = std::get<0>(iter);
+            counts[cd->code]++;
+        }
+    }
+    
     bool DeckData::LoadFromFile(const wxString& file) {
         wxFileInputStream deck_file(file);
         if(!deck_file.IsOk())
@@ -213,7 +247,7 @@ namespace ygopro
         main_deck = m;
         extra_deck = e;
         side_deck = s;
-        return deck_string;
+        return std::move(deck_string);
     }
     
     bool DeckData::InsertCard(unsigned int code, unsigned int pos, unsigned int index, bool strict) {
@@ -221,8 +255,8 @@ namespace ygopro
         if(cd == nullptr || (cd->type & 0x4000))
             return false;
         unsigned int limit = limitRegulationMgr.GetCardLimitCount(code);
-        if(counts[code] >= limit)
-            return false;
+        //if(counts[code] >= limit)
+        //   return false;
         auto tp = std::make_tuple(cd, nullptr, limit);
         if(pos == 1 || pos == 2) {
             if(cd->type & 0x802040) {
@@ -429,7 +463,8 @@ namespace ygopro
             return iter->second;
     }
     
-    void LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, std::vector<CardData*>& result) {
+    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs) {
+        std::vector<CardData*> result;
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)
                 continue;
@@ -439,13 +474,16 @@ namespace ygopro
         }
         if(result.size())
             std::sort(result.begin(), result.end(), CardData::card_sort);
+        return std::move(result);
     }
     
-    void LimitRegulationMgr::LoadCurrentListToDeck(DeckData& deck) {
+    void LimitRegulationMgr::LoadCurrentListToDeck(DeckData& deck, int limit) {
         deck.Clear();
         if(!current_list)
             return;
         for(auto& iter : current_list->counts) {
+            if(iter.second != limit)
+                continue;
             CardData* cd = dataMgr[iter.first];
             if(!cd)
                 continue;
@@ -454,6 +492,7 @@ namespace ygopro
             else
                 deck.main_deck.push_back(std::make_tuple(cd, nullptr, iter.second));
         }
+        deck.CalCount();
         std::sort(deck.main_deck.begin(), deck.main_deck.end(), DeckData::deck_sort_limit);
         std::sort(deck.extra_deck.begin(), deck.extra_deck.end(), DeckData::deck_sort_limit);
     }
