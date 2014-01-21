@@ -44,10 +44,12 @@ end
 function c24731453.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	local g=Duel.GetMatchingGroup(c24731453.filter,tp,LOCATION_SZONE,0,nil)
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 and g:GetCount()>0 then
-		Duel.BreakEffect()
-		local ct=Duel.Destroy(g,REASON_EFFECT)
-		Duel.Damage(1-tp,ct*200,REASON_EFFECT)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
+		local g=Duel.GetMatchingGroup(c24731453.filter,tp,LOCATION_SZONE,0,nil)
+		if g:GetCount()>0 then
+			Duel.BreakEffect()
+			local ct=Duel.Destroy(g,REASON_EFFECT)
+			Duel.Damage(1-tp,ct*200,REASON_EFFECT)
+		end
 	end
 end
