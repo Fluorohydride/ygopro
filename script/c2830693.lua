@@ -38,10 +38,12 @@ function c2830693.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(at)
 end
 function c2830693.eqop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToBattle() then
+	local tc=Duel.GetFirstTarget()
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:IsFacedown() or not tc:IsRelateToEffect(e) then
+		Duel.SendtoGrave(c,REASON_EFFECT)
+	else
 		Duel.Equip(tp,c,tc,true)
 		--Add Equip limit
 		local e1=Effect.CreateEffect(tc)
