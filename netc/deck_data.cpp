@@ -250,13 +250,13 @@ namespace ygopro
         return std::move(deck_string);
     }
     
-    bool DeckData::InsertCard(unsigned int code, unsigned int pos, unsigned int index, bool strict) {
+    bool DeckData::InsertCard(unsigned int code, unsigned int pos, unsigned int index, bool strict, bool checkc) {
         CardData* cd = dataMgr[code];
         if(cd == nullptr || (cd->type & 0x4000))
             return false;
         unsigned int limit = limitRegulationMgr.GetCardLimitCount(code);
-        //if(counts[code] >= limit)
-        //   return false;
+        if(checkc && counts[code] >= limit)
+           return false;
         auto tp = std::make_tuple(cd, nullptr, limit);
         if(pos == 1 || pos == 2) {
             if(cd->type & 0x802040) {

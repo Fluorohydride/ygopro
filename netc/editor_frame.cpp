@@ -227,7 +227,7 @@ namespace ygopro
     }
     
     void EditorFrame::AddCard(unsigned int code, unsigned int pos) {
-        editor_canvas->GetDeck().InsertCard(code, pos, -1, false);
+        editor_canvas->GetDeck().InsertCard(code, pos, -1, false, true);
         StopViewRegulation();
         editor_canvas->Refresh();
     }

@@ -37,7 +37,7 @@ namespace ygopro
         void SaveToFile(const wxString& file);
         wxString SaveToString();
         
-        bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1, bool strict = true);
+        bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1, bool strict = true, bool checkc = false);
         bool RemoveCard(unsigned int pos, unsigned int index);
         
         unsigned int mcount = 0;

@@ -152,22 +152,12 @@ namespace ygopro
             search_result->BeginFontSize(16);
             search_result->BeginBold();
             search_result->BeginTextColour(wxColour(0, 0, 128));
-            search_result->BeginURL(wxString::Format(wxT("/%d"), cd->code));
+            search_result->BeginURL(wxString::Format(wxT("%d"), cd->code));
             search_result->WriteText(card_name);
             search_result->EndURL();
             search_result->EndTextColour();
             search_result->EndBold();
             search_result->EndFontSize();
-            search_result->WriteText(wxT("  "));
-            search_result->BeginTextColour(wxColour(0, 0, 255));
-            search_result->BeginURL(wxString::Format(wxT("+%d"), cd->code));
-            search_result->WriteText(wxT("[MAIN]"));
-            search_result->EndURL();
-            search_result->WriteText("  ");
-            search_result->BeginURL(wxString::Format(wxT("-%d"), cd->code));
-            search_result->WriteText(wxT("[SIDE]"));
-            search_result->EndURL();
-            search_result->EndTextColour();
             search_result->Newline();
             if(cd->type & 0x1) {
                 for(unsigned int i = 0; i < cd->level; ++i)
@@ -292,16 +282,23 @@ namespace ygopro
     void FilterFrame::OnCmdClicked(wxTextUrlEvent& evt) {
         wxString url = evt.GetString();
         long code;
-        url.Right(url.length() - 1).ToLong(&code);
-        if(url[0] == wxT('+'))
-            editorFrame->AddCard((unsigned int)code, 1);
-        else if(url[0] == wxT('-'))
-            editorFrame->AddCard((unsigned int)code, 3);
+        url.ToLong(&code);
         editorFrame->SetCardInfo((unsigned int)code);
+        wxMenu popup_menu;
+        popup_menu.Append(wxID_UP, wxT("Add to Main Deck"));
+        popup_menu.Append(wxID_DOWN, wxT("Add to Side Deck"));
+        popup_menu.Bind(wxEVT_MENU, &FilterFrame::OnMenu, this);
+        popup_menu.SetClientData((void*)code);
+        PopupMenu(&popup_menu);
     }
 
     void FilterFrame::OnMenu(wxCommandEvent& evt) {
-        
+        void * data = static_cast<wxMenu*>(evt.GetEventObject())->GetClientData();
+        unsigned int code = (unsigned int)(long)data;
+        if(evt.GetId() == wxID_UP)
+            editorFrame->AddCard(code, 1);
+        else
+            editorFrame->AddCard(code, 3);
     }
     
     void FilterFrame::OnTypeSelected(wxCommandEvent& evt) {
