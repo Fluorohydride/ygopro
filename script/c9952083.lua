@@ -9,7 +9,7 @@ function c9952083.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c9952083.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentChain()>1 and Duel.CheckChainUniqueness()
+	return Duel.GetCurrentChain()>1 and Duel.CheckChainUniqueness() and Duel.GetTurnPlayer()==tp
 end
 function c9952083.activate(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
