@@ -20,7 +20,7 @@ function c36405256.filter(c,e,tp)
 end
 function c36405256.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c36405256.filter(chkc,e,tp) end
-	if chk==0 then return Duel.GetFlagEffect(tp,36405256)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,36405256)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and e:GetHandler():IsLocation(LOCATION_MZONE) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c36405256.filter,tp,0,LOCATION_GRAVE,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
