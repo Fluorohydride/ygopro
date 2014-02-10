@@ -41,7 +41,7 @@ function c36378044.atktg1(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c36378044.atktg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(36378044)==0 end
-	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,1)
+	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,3)
 	e:GetHandler():RegisterFlagEffect(36378044,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c36378044.atkop(e,tp,eg,ep,ev,re,r,rp)

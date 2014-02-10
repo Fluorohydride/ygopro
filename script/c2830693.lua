@@ -19,6 +19,7 @@ function c2830693.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e2:SetCondition(c2830693.spcon)
 	e2:SetCost(c2830693.spcost)
 	e2:SetTarget(c2830693.sptg)
@@ -27,7 +28,7 @@ function c2830693.initial_effect(c)
 end
 function c2830693.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,2830693)==0 end
-	Duel.RegisterFlagEffect(tp,2830693,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.RegisterFlagEffect(tp,2830693,RESET_PHASE+PHASE_END,0,1)
 end
 function c2830693.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local at=Duel.GetAttacker()
@@ -37,10 +38,12 @@ function c2830693.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(at)
 end
 function c2830693.eqop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local c=e:GetHandler()
-	local tc=Duel.GetAttacker()
-	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToBattle() then
+	local tc=Duel.GetFirstTarget()
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:IsFacedown() or not tc:IsRelateToEffect(e) then
+		Duel.SendtoGrave(c,REASON_EFFECT)
+	else
 		Duel.Equip(tp,c,tc,true)
 		--Add Equip limit
 		local e1=Effect.CreateEffect(tc)
@@ -53,7 +56,6 @@ function c2830693.eqop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_EQUIP)
 		e2:SetCode(EFFECT_CANNOT_ATTACK)
-		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e2)
 	end
@@ -66,7 +68,7 @@ function c2830693.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c2830693.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,2830694)==0 end
-	Duel.RegisterFlagEffect(tp,2830694,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.RegisterFlagEffect(tp,2830694,RESET_PHASE+PHASE_END,0,1)
 end
 function c2830693.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

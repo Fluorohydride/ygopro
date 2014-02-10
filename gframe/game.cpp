@@ -48,6 +48,7 @@ bool Game::Initialize() {
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial())
 		return false;
@@ -662,6 +663,7 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		cbDeck->addItem(wname);
 	}
+	closedir(dir);
 #endif
 	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
@@ -697,6 +699,7 @@ void Game::RefreshReplay() {
 		if(Replay::CheckReplay(wname))
 			lstReplayList->addItem(wname);
 	}
+	closedir(dir);
 #endif
 }
 void Game::RefreshSingleplay() {
@@ -724,6 +727,7 @@ void Game::RefreshSingleplay() {
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		lstSinglePlayList->addItem(wname);
 	}
+	closedir(dir);
 #endif
 }
 void Game::LoadConfig() {

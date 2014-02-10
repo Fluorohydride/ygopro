@@ -15,7 +15,9 @@ function c77642288.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c77642288.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(77642288)>0 and e:GetHandler():GetBattledGroupCount()>0
+	local st=e:GetHandler():GetSummonType()
+	return st>=(SUMMON_TYPE_SPECIAL+100) and st<(SUMMON_TYPE_SPECIAL+150)
+		and e:GetHandler():GetBattledGroupCount()>0
 end
 function c77642288.filter(c,e,tp)
 	return not c:IsCode(77642288) and c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,106,tp,false,false)

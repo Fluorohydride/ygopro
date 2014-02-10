@@ -44,7 +44,7 @@ function c10406322.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleHand(tp)
 	else
 		Duel.DisableShuffleCheck()
-		Duel.SendtoGrave(tc,REASON_EFFECT)
+		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 	end
 end
 function c10406322.cfilter(c,tp)

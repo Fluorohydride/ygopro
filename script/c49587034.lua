@@ -27,12 +27,12 @@ function c49587034.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_REMOVED)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetCountLimit(1)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,4)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,4)
 		e1:SetCondition(c49587034.thcon)
 		e1:SetOperation(c49587034.thop)
 		e1:SetLabel(1)
 		card:RegisterEffect(e1)
-		e:GetHandler():RegisterFlagEffect(1082946,RESET_PHASE+PHASE_END+RESET_OPPO_TURN,0,3)
+		e:GetHandler():RegisterFlagEffect(1082946,RESET_PHASE+PHASE_END+RESET_SELF_TURN,0,3)
 		c49587034[e:GetHandler()]=e1
 	end
 end

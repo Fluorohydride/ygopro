@@ -26,8 +26,7 @@ function c25774450.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ex2,cg=Duel.GetOperationInfo(0,CATEGORY_CONTROL)
 	local dc=dg:GetFirst()
 	local cc=cg:GetFirst()
-	if dc:IsRelateToEffect(e) and cc:IsRelateToEffect(e) then
-		Duel.Destroy(dc,REASON_EFFECT)
+	if dc:IsRelateToEffect(e) and cc:IsRelateToEffect(e) and Duel.Destroy(dc,REASON_EFFECT)~=0 then
 		if not Duel.GetControl(cc,1-tp,0,0) and not cc:IsImmuneToEffect(e) and cc:IsAbleToChangeControler() then
 			Duel.Destroy(cc,REASON_EFFECT)
 		end

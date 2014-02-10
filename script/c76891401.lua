@@ -18,12 +18,7 @@ function c76891401.synfilter(c)
 	return c:GetLevel()==3
 end
 function c76891401.filter(c)
-	if not c:IsLevelBelow(3) then return false end
-	local loc=c:GetPreviousLocation()
-	if not (bit.band(loc,LOCATION_ONFIELD)>0) then return false end
-	local pos=c:GetPreviousPosition()
-	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
-	return bit.band(pos,POS_FACEUP)>0
+	return c:IsLevelBelow(3) and c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c76891401.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c76891401.filter,1,nil)
@@ -32,7 +27,7 @@ function c76891401.atkop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	e1:SetValue(3000)
 	c:RegisterEffect(e1)

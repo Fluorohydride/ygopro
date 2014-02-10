@@ -26,11 +26,9 @@ end
 function c80402389.check(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=eg:GetFirst()
-	local ph=Duel.GetCurrentPhase()
 	while tc do
-		local pos=(ph==PHASE_DAMAGE) and tc:GetBattlePosition() or tc:GetPreviousPosition()
 		if tc:IsPreviousLocation(LOCATION_MZONE) and tc:IsReason(REASON_DESTROY)
-			and tc:IsRace(RACE_INSECT) and tc:GetLevel()~=0 and bit.band(pos,POS_FACEUP)~=0 then
+			and tc:IsRace(RACE_INSECT) and tc:GetLevel()~=0 and tc:IsPreviousPosition(POS_FACEUP) then
 			Duel.RaiseSingleEvent(c,80402389,e,r,rp,tc:GetControler(),tc:GetLevel())
 		end
 		tc=eg:GetNext()

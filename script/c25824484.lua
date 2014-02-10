@@ -17,22 +17,6 @@ function c25824484.initial_effect(c)
 	e2:SetCondition(c25824484.sdcon)
 	e2:SetOperation(c25824484.sdop)
 	c:RegisterEffect(e2)
-	if not c25824484.global_check then
-		c25824484.global_check=true
-		c25824484[0]=Group.CreateGroup()
-		c25824484[0]:KeepAlive()
-		c25824484[1]=0
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CONFIRM_DECKTOP)
-		ge1:SetOperation(c25824484.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c25824484.checkop(e,tp,eg,ep,ev,re,r,rp)
-	c25824484[0]:Clear()
-	c25824484[0]:Merge(eg)
-	c25824484[1]=re
 end
 function c25824484.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -44,15 +28,16 @@ function c25824484.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc:IsRace(RACE_PLANT) then
 		Duel.DisableShuffleCheck()
-		Duel.SendtoGrave(tc,REASON_EFFECT)
+		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 		Duel.Draw(tp,1,REASON_EFFECT)
 	else
 		Duel.MoveSequence(tc,1)
 	end
 end
 function c25824484.sdcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and e:GetHandler():IsPreviousLocation(LOCATION_DECK)
-		and c25824484[0]:IsContains(e:GetHandler()) and c25824484[1]==re
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) and
+		(c:IsReason(REASON_REVEAL) or c:IsPreviousPosition(POS_FACEUP) or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
 end
 function c25824484.sdop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)

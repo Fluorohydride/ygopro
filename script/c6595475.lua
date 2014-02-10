@@ -12,7 +12,7 @@ function c6595475.initial_effect(c)
 end
 function c6595475.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,6595475)==0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
+		and Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 	Duel.RegisterFlagEffect(tp,6595475,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end

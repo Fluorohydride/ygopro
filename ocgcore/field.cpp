@@ -568,9 +568,15 @@ void field::swap_deck_and_grave(uint8 playerid) {
 		(*clit)->enable_field_effect(false);
 		(*clit)->cancel_field_effect();
 	}
-	card_vector cl = player[playerid].list_grave;
-	player[playerid].list_grave = player[playerid].list_main;
-	player[playerid].list_main = cl;
+	player[playerid].list_grave.swap(player[playerid].list_main);
+	card_vector ex;
+	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ) {
+		if((*clit)->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) {
+			ex.push_back(*clit);
+			clit = player[playerid].list_main.erase(clit);
+		} else
+			++clit;
+	}
 	for(clit = player[playerid].list_grave.begin(); clit != player[playerid].list_grave.end(); ++clit) {
 		(*clit)->current.location = LOCATION_GRAVE;
 		(*clit)->current.reason = REASON_EFFECT;
@@ -587,7 +593,17 @@ void field::swap_deck_and_grave(uint8 playerid) {
 		(*clit)->apply_field_effect();
 		(*clit)->enable_field_effect(true);
 	}
+	for(clit = ex.begin(); clit != ex.end(); ++clit) {
+		(*clit)->current.location = LOCATION_EXTRA;
+		(*clit)->current.reason = REASON_EFFECT;
+		(*clit)->current.reason_effect = core.reason_effect;
+		(*clit)->current.reason_player = core.reason_player;
+		(*clit)->apply_field_effect();
+		(*clit)->enable_field_effect(true);
+	}
+	player[playerid].list_extra.insert(player[playerid].list_extra.end(), ex.begin(), ex.end());
 	reset_sequence(playerid, LOCATION_GRAVE);
+	reset_sequence(playerid, LOCATION_EXTRA);
 	pduel->write_buffer8(MSG_SWAP_GRAVE_DECK);
 	pduel->write_buffer8(playerid);
 	shuffle(playerid, LOCATION_DECK);
@@ -688,9 +704,10 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 	}
 }
 void field::remove_effect(effect* peffect) {
-	if (effects.indexer.find(peffect) == effects.indexer.end())
+	auto eit = effects.indexer.find(peffect);
+	if (eit == effects.indexer.end())
 		return;
-	auto it = effects.indexer[peffect];
+	auto it = eit->second;
 	if (!(peffect->type & EFFECT_TYPE_ACTIONS))
 		effects.aura_effect.erase(it);
 	else {

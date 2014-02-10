@@ -1,4 +1,4 @@
---Confronting the "C"
+--対峙するG
 function c15721123.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

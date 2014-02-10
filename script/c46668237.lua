@@ -16,7 +16,7 @@ function c46668237.initial_effect(c)
 end
 function c46668237.cfilter(c,tp)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP)
-		and bit.band(c:GetPreviousRaceOnField(),RACE_BEAST)~=0
+		and c:IsPreviousLocation(LOCATION_MZONE) and bit.band(c:GetPreviousRaceOnField(),RACE_BEAST)~=0
 end
 function c46668237.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c46668237.cfilter,1,nil,tp) and bit.band(r,REASON_DESTROY)~=0

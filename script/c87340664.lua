@@ -13,9 +13,8 @@ function c87340664.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c87340664.condition(e,tp,eg,ep,ev,re,r,rp)
-	e:SetLabel(1-e:GetHandler():GetPreviousControler())
-	return e:GetHandler():IsReason(REASON_BATTLE)
-		and bit.band(e:GetHandler():GetBattlePosition(),POS_FACEUP)~=0
+	e:SetLabel(e:GetHandler():GetReasonPlayer())
+	return e:GetHandler():IsReason(REASON_BATTLE) and e:GetHandler():IsPreviousPosition(POS_FACEUP)
 end
 function c87340664.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end

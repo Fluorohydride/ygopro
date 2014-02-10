@@ -77,7 +77,7 @@ function c79106360.sp(e,tp,ct)
 		tc=g:GetNext()
 	end
 	if conf-g:GetCount()>0 then
-		Duel.DiscardDeck(tp,conf-g:GetCount(),REASON_EFFECT)
+		Duel.DiscardDeck(tp,conf-g:GetCount(),REASON_EFFECT+REASON_REVEAL)
 	end
 	return g
 end

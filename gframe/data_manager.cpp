@@ -27,7 +27,7 @@ bool DataManager::LoadDB(const char* file) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			cd.setcode = sqlite3_column_int(pStmt, 3);
+			cd.setcode = sqlite3_column_int64(pStmt, 3);
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defence = sqlite3_column_int(pStmt, 6);
@@ -54,7 +54,7 @@ bool DataManager::LoadDB(const char* file) {
 				if(len) {
 					cs.desc[i - 14] = new wchar_t[len + 1];
 					memcpy(cs.desc[i - 14], strBuffer, (len + 1)*sizeof(wchar_t));
-				} else break;
+				} else cs.desc[i - 14] = 0;
 			}
 			_strings.insert(std::make_pair(cd.code, cs));
 		}

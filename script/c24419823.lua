@@ -14,11 +14,7 @@ function c24419823.initial_effect(c)
 end
 function c24419823.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsLocation(LOCATION_DECK) then return false end
-	if Duel.GetCurrentPhase()==PHASE_DAMAGE and c:GetPreviousLocation()==LOCATION_MZONE then
-		return bit.band(c:GetBattlePosition(),POS_FACEUP)~=0
-	end
-	return bit.band(c:GetPreviousPosition(),POS_FACEUP)~=0
+	return not c:IsLocation(LOCATION_DECK) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c24419823.filter(c)
 	return c:IsType(TYPE_FIELD) and c:IsAbleToHand()

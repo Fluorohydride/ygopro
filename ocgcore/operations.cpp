@@ -2368,9 +2368,9 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 			dest = ((*cit)->operation_param >> 8) & 0xff;
 			if(!dest)
 				dest = LOCATION_GRAVE;
-			if((dest == LOCATION_HAND && (*cit)->is_affected_by_effect(EFFECT_CANNOT_TO_HAND))
-			        || (dest == LOCATION_DECK && (*cit)->is_affected_by_effect(EFFECT_CANNOT_TO_DECK))
-			        || (dest == LOCATION_REMOVED && (*cit)->is_affected_by_effect(EFFECT_CANNOT_REMOVE)))
+			if((dest == LOCATION_HAND && !(*cit)->is_capable_send_to_hand(reason_player))
+			        || (dest == LOCATION_DECK && !(*cit)->is_capable_send_to_deck(reason_player))
+			        || (dest == LOCATION_REMOVED && !(*cit)->is_removeable(reason_player)))
 				dest = LOCATION_GRAVE;
 			(*cit)->operation_param = ((*cit)->operation_param & 0xffff00ff) + (dest << 8);
 		}
@@ -2779,6 +2779,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pcard->current.reason &= ~REASON_TEMPORARY;
 				pcard->fieldid = infos.field_id++;
 				pcard->reset(RESET_LEAVE, RESET_EVENT);
+				pcard->relate_effect.clear();
 				remove_card(pcard);
 				leave.insert(pcard);
 				continue;
@@ -2794,28 +2795,19 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			} else if(dest == LOCATION_REMOVED) {
 				core.hint_timing[pcard->current.controler] |= TIMING_REMOVE;
 			}
-			pduel->write_buffer8(MSG_MOVE);
-			pduel->write_buffer32(pcard->data.code);
-			if(pcard->overlay_target) {
-				pduel->write_buffer8(pcard->overlay_target->current.controler);
-				pduel->write_buffer8(pcard->overlay_target->current.location | LOCATION_OVERLAY);
-				pduel->write_buffer8(pcard->overlay_target->current.sequence);
-				pduel->write_buffer8(pcard->current.sequence);
-				detach.insert(pcard->overlay_target);
-				pcard->overlay_target->xyz_remove(pcard);
-			} else {
-				pduel->write_buffer8(pcard->current.controler);
-				pduel->write_buffer8(pcard->current.location);
-				pduel->write_buffer8(pcard->current.sequence);
-				pduel->write_buffer8(pcard->current.position);
+			if(pcard->current.controler != playerid || pcard->current.location != dest) {
+				pduel->write_buffer8(MSG_MOVE);
+				pduel->write_buffer32(pcard->data.code);
+				pduel->write_buffer32(pcard->get_info_location());
+				if(pcard->overlay_target) {
+					detach.insert(pcard->overlay_target);
+					pcard->overlay_target->xyz_remove(pcard);
+				}
+				move_card(playerid, pcard, dest, seq);
+				pcard->current.position = (pcard->operation_param >> 24);
+				pduel->write_buffer32(pcard->get_info_location());
+				pduel->write_buffer32(pcard->current.reason);
 			}
-			move_card(playerid, pcard, dest, seq);
-			pcard->current.position = (pcard->operation_param >> 24);
-			pduel->write_buffer8(pcard->current.controler);
-			pduel->write_buffer8(pcard->current.location);
-			pduel->write_buffer8(pcard->current.sequence);
-			pduel->write_buffer8(pcard->current.position);
-			pduel->write_buffer32(pcard->current.reason);
 			if((core.deck_reversed && pcard->current.location == LOCATION_DECK) || (pcard->current.position == POS_FACEUP_DEFENCE))
 				show_decktop[pcard->current.controler] = true;
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
@@ -3179,25 +3171,13 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		}
 		pduel->write_buffer8(MSG_MOVE);
 		pduel->write_buffer32(target->data.code);
-		if(target->overlay_target) {
-			pduel->write_buffer8(target->overlay_target->current.controler);
-			pduel->write_buffer8(target->overlay_target->current.location | LOCATION_OVERLAY);
-			pduel->write_buffer8(target->overlay_target->current.sequence);
-			pduel->write_buffer8(target->current.sequence);
+		pduel->write_buffer32(target->get_info_location());
+		if(target->overlay_target)
 			target->overlay_target->xyz_remove(target);
-		} else {
-			pduel->write_buffer8(target->current.controler);
-			pduel->write_buffer8(target->current.location);
-			pduel->write_buffer8(target->current.sequence);
-			pduel->write_buffer8(target->current.position);
-		}
 		move_card(playerid, target, location, target->temp.sequence);
 		target->current.position = returns.ivalue[0];
 		target->set_status(STATUS_LEAVE_CONFIRMED | STATUS_ACTIVATED, FALSE);
-		pduel->write_buffer8(target->current.controler);
-		pduel->write_buffer8(target->current.location);
-		pduel->write_buffer8(target->current.sequence);
-		pduel->write_buffer8(target->current.position);
+		pduel->write_buffer32(target->get_info_location());
 		pduel->write_buffer32(target->current.reason);
 		if((target->current.location != LOCATION_MZONE)) {
 			if(target->equiping_cards.size()) {

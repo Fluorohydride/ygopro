@@ -26,12 +26,15 @@ function c64605089.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	if Duel.GetAttacker():GetAttack()<e:GetHandler():GetDefence() then
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,Duel.GetAttacker(),1,0,0)
+	end
 end
 function c64605089.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local at=Duel.GetAttacker()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
-		and at:IsFaceup() and at:GetAttack()<c:GetDefence() then
+		and at:IsFaceup() and at:IsRelateToBattle() and at:GetAttack()<c:GetDefence() then
 		Duel.BreakEffect()
 		Duel.Destroy(at,REASON_EFFECT)
 	end

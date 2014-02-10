@@ -31,6 +31,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				break;
 			}
 			case BUTTON_JOIN_HOST: {
+			#if WINVER >= 0x0600
 				struct addrinfo hints, *servinfo;
 				memset(&hints, 0, sizeof(struct addrinfo));
 				hints.ai_family = AF_INET;			/* Allow IPv4 or IPv6 */
@@ -46,12 +47,20 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				const wchar_t* pstr = mainGame->ebJoinIP->getText();
 				BufferIO::CopyWStr(pstr, hostname, 100);
 				if ((status = getaddrinfo(hostname, NULL, &hints, &servinfo)) == -1) {
-					//fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
+					fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
 					//error handling
 					BufferIO::CopyWStr(pstr, ip, 16);
 				} else
 					inet_ntop(AF_INET, &(((struct sockaddr_in *)servinfo->ai_addr)->sin_addr), ip, 20);
 				freeaddrinfo(servinfo);
+			#else
+				int status;
+				char hostname[100];
+				char ip[20];
+				const wchar_t* pstr = mainGame->ebJoinIP->getText();
+				BufferIO::CopyWStr(pstr, hostname, 100);
+				BufferIO::CopyWStr(pstr, ip, 16);
+			#endif
 				unsigned int remote_addr = htonl(inet_addr(ip));
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
 				BufferIO::CopyWStr(pstr, mainGame->gameConf.lastip, 20);

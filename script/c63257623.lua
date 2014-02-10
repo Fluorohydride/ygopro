@@ -24,22 +24,6 @@ function c63257623.initial_effect(c)
 	e3:SetTarget(c63257623.sptg)
 	e3:SetOperation(c63257623.spop)
 	c:RegisterEffect(e3)
-	if not c63257623.global_check then
-		c63257623.global_check=true
-		c63257623[0]=Group.CreateGroup()
-		c63257623[0]:KeepAlive()
-		c63257623[1]=0
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CONFIRM_DECKTOP)
-		ge1:SetOperation(c63257623.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c63257623.checkop(e,tp,eg,ep,ev,re,r,rp)
-	c63257623[0]:Clear()
-	c63257623[0]:Merge(eg)
-	c63257623[1]=re
 end
 function c63257623.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
@@ -51,14 +35,15 @@ function c63257623.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc:IsRace(RACE_PLANT) then
 		Duel.DisableShuffleCheck()
-		Duel.SendtoGrave(g,REASON_EFFECT)
+		Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
 	else
 		Duel.MoveSequence(tc,1)
 	end
 end
 function c63257623.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and e:GetHandler():IsPreviousLocation(LOCATION_DECK)
-		and c63257623[0]:IsContains(e:GetHandler()) and c63257623[1]==re
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_DECK) and
+		(c:IsReason(REASON_REVEAL) or c:IsPreviousPosition(POS_FACEUP) or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
 end
 function c63257623.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,63257623)==0 end

@@ -13,10 +13,12 @@ function c79109599.initial_effect(c)
 	--fusion substitute
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e2:SetRange(0x1e)
 	e2:SetCode(EFFECT_FUSION_SUBSTITUTE)
+	e2:SetCondition(c79109599.subcon)
 	c:RegisterEffect(e2)
+end
+function c79109599.subcon(e)
+	return e:GetHandler():IsLocation(LOCATION_HAND+LOCATION_ONFIELD+LOCATION_GRAVE)
 end
 function c79109599.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -26,7 +28,7 @@ end
 function c79109599.filter(c)
 	return c:GetCode()==24094653 and c:IsAbleToHand()
 end
-function c79109599.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c79109599.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c79109599.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end

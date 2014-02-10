@@ -481,6 +481,7 @@ int32 field::process() {
 			if(!attacker
 			        || (attacker->fieldid_r != core.pre_field[0])
 			        || (attacker->current.position & POS_FACEDOWN)
+			        || ((attacker->current.position & POS_DEFENCE) && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
 			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
 				returns.ivalue[0] = 0;
@@ -1963,6 +1964,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.activate_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, *evit)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -1980,6 +1983,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.quick_o_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, *evit)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -2027,6 +2032,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			if(core.global_flag & GLOBALFLAG_DELAYED_QUICKEFFECT) {
 				for(auto eit = core.delayed_quick.begin(); eit != core.delayed_quick.end(); ++eit) {
 					peffect = eit->first;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					const tevent& evt = eit->second;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, evt, TRUE, FALSE, FALSE)) {
 						newchain.flag = 0;
@@ -2047,6 +2054,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -2064,6 +2073,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
 					peffect = pr.first->second;
+					peffect->s_range = peffect->handler->current.location;
+					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
 						newchain.flag = 0;
 						newchain.chain_id = infos.field_id++;
@@ -2391,6 +2402,8 @@ int32 field::process_idle_command(uint16 step) {
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
@@ -2398,12 +2411,16 @@ int32 field::process_idle_command(uint16 step) {
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
 		}
 		for(eit = effects.ignition_effect.begin(); eit != effects.ignition_effect.end(); ++eit) {
 			peffect = eit->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
@@ -2618,6 +2635,8 @@ int32 field::process_battle_command(uint16 step) {
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event) && peffect->get_speed() > 1)
 				core.select_chains.push_back(newchain);
@@ -2625,6 +2644,8 @@ int32 field::process_battle_command(uint16 step) {
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
+			peffect->s_range = peffect->handler->current.location;
+			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
@@ -3658,6 +3679,8 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 40: {
+		core.attacker = 0;
+		core.attack_target = 0;
 		returns.ivalue[0] = core.units.begin()->arg1;
 		returns.ivalue[1] = core.units.begin()->arg2;
 		return TRUE;
@@ -3742,7 +3765,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		card* pcard;
 		for(auto elit = core.used_event.begin(); elit != core.used_event.end(); ++elit) {
 			if(elit->event_cards)
-				pduel->delete_group((group*)elit->event_cards);
+				pduel->delete_group(elit->event_cards);
 		}
 		core.used_event.clear();
 		for(auto eit = core.reseted_effects.begin(); eit != core.reseted_effects.end(); ++eit) {

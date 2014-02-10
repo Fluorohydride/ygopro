@@ -102,6 +102,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::StopClient();
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->wCardImg->setVisible(false);
+					mainGame->wInfos->setVisible(false);
+					mainGame->wPhase->setVisible(false);
+					mainGame->btnLeaveGame->setVisible(false);
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
@@ -1630,6 +1634,10 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		height += 21;
 	} else mainGame->btnMSet->setVisible(false);
 	if(flag & COMMAND_SSET) {
+		if(!(clicked_card->type & TYPE_MONSTER))
+			mainGame->btnSSet->setText(dataManager.GetSysString(1153));
+		else
+			mainGame->btnSSet->setText(dataManager.GetSysString(1159));
 		mainGame->btnSSet->setVisible(true);
 		mainGame->btnSSet->setRelativePosition(position2di(1, height));
 		height += 21;

@@ -1,6 +1,6 @@
 --No.6 先史遺産アトランタル
 function c9161357.initial_effect(c)
-	--synchro summon
+	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
 	c:EnableReviveLimit()
 	--equip

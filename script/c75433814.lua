@@ -1,6 +1,6 @@
 --No.40 ギミック・パペット－ヘブンズ・ストリングス
 function c75433814.initial_effect(c)
-	--synchro summon
+	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),2)
 	c:EnableReviveLimit()
 	--counter

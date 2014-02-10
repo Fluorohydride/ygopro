@@ -21,7 +21,7 @@ function c11047543.filter2(c,e,tp,lv)
 		and Duel.IsExistingMatchingCard(c11047543.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,lv+clv)
 end
 function c11047543.spfilter(c,e,tp,lv)
-	return c:IsRace(RACE_PSYCHO) and c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_SYNCHRO) and c:GetLevel()==lv and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c11047543.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

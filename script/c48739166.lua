@@ -28,7 +28,7 @@ function c48739166.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterFlagEffect(tp,48739166,RESET_PHASE+PHASE_END,0,1)
 end
 function c48739166.filter(c)
-	return c:IsPosition(POS_FACEUP_ATTACK)
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAbleToChangeControler()
 		and not c:IsType(TYPE_TOKEN) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 end
 function c48739166.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -40,7 +40,7 @@ end
 function c48739166.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		local og=tc:GetOverlayGroup()
 		if og:GetCount()>0 then
 			Duel.SendtoGrave(og,REASON_RULE)
