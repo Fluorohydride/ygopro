@@ -2779,6 +2779,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 				pcard->current.reason &= ~REASON_TEMPORARY;
 				pcard->fieldid = infos.field_id++;
 				pcard->reset(RESET_LEAVE, RESET_EVENT);
+				pcard->relate_effect.clear();
 				remove_card(pcard);
 				leave.insert(pcard);
 				continue;

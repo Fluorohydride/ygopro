@@ -34,7 +34,7 @@ function c64605089.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local at=Duel.GetAttacker()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0
-		and at:IsFaceup() and at:GetAttack()<c:GetDefence() then
+		and at:IsFaceup() and at:IsRelateToBattle() and at:GetAttack()<c:GetDefence() then
 		Duel.BreakEffect()
 		Duel.Destroy(at,REASON_EFFECT)
 	end

@@ -36,9 +36,10 @@ function c21768554.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c21768554.filter,tp,0,LOCATION_MZONE,1,nil) end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if ft>3 then ft=3 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c21768554.filter,tp,0,LOCATION_MZONE,1,ft,nil)
-	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,g:GetCount(),0,0)
 end
 function c21768554.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

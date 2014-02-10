@@ -1634,6 +1634,10 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		height += 21;
 	} else mainGame->btnMSet->setVisible(false);
 	if(flag & COMMAND_SSET) {
+		if(!(clicked_card->type & TYPE_MONSTER))
+			mainGame->btnSSet->setText(dataManager.GetSysString(1153));
+		else
+			mainGame->btnSSet->setText(dataManager.GetSysString(1159));
 		mainGame->btnSSet->setVisible(true);
 		mainGame->btnSSet->setRelativePosition(position2di(1, height));
 		height += 21;
