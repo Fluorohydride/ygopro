@@ -247,7 +247,8 @@ namespace ygopro
         main_deck = m;
         extra_deck = e;
         side_deck = s;
-        return std::move(deck_string);
+        wxString deckstr(deck_string);
+        return std::move(deckstr);
     }
     
     bool DeckData::InsertCard(unsigned int code, unsigned int pos, unsigned int index, bool strict, bool checkc) {

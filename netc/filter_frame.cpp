@@ -10,7 +10,7 @@ namespace ygopro
 {
     FilterFrame* filterFrame = nullptr;
     
-    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 430), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
+    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 450), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
         
         TextureInfo& st = imageMgr.textures["star"];
         if(st.src) {
@@ -139,7 +139,7 @@ namespace ygopro
         szV->AddSpacer(5);
         wxGridSizer* szImg = new wxGridSizer(5);
         for(int i = 0; i < 15; ++i) {
-            thumbs[i] = new wxStaticBitmap(this, wxID_ANY, card_sleeve, wxDefaultPosition, wxSize(88, 127));
+            thumbs[i] = new wxStaticBitmap(this, wxID_ANY, wxBitmap(card_sleeve), wxDefaultPosition, wxSize(88, 127));
             thumbs[i]->Bind(wxEVT_ENTER_WINDOW, &FilterFrame::OnImageHover, this, wxID_ANY);
             thumbs[i]->Bind(wxEVT_LEAVE_WINDOW, &FilterFrame::OnImageLeave, this, wxID_ANY);
             thumbs[i]->Bind(wxEVT_LEFT_DOWN, &FilterFrame::OnImageLClick, this, wxID_ANY);
@@ -285,7 +285,7 @@ namespace ygopro
     }
     
     void FilterFrame::OnImageHover(wxMouseEvent& evt) {
-        void * data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
+        void* data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
         unsigned int code = (unsigned int)(long)data;
         if(code == 0)
             return;
@@ -294,31 +294,35 @@ namespace ygopro
             editorFrame->SetCardInfo(code);
         else {
             hover_timer.Stop();
-            hover_timer.SetClientData((void*)(long)code);
+            hover_timer.SetClientData(evt.GetEventObject());
             hover_timer.StartOnce(delay);
         }
     }
 
     void FilterFrame::OnImageLeave(wxMouseEvent& evt) {
+        wxStaticBitmap* ctrl = static_cast<wxStaticBitmap*>(hover_timer.GetClientData());
+        if(ctrl != evt.GetEventObject())
+            return;
         hover_timer.Stop();
     }
     
     void FilterFrame::OnImageLClick(wxMouseEvent& evt) {
-        void * data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
+        void* data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
         unsigned int code = (unsigned int)(long)data;
         editorFrame->SetCardInfo((unsigned int)code);
         editorFrame->AddCard(code, 1);
     }
     
     void FilterFrame::OnImageRClick(wxMouseEvent& evt) {
-        void * data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
+        void* data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
         unsigned int code = (unsigned int)(long)data;
         editorFrame->SetCardInfo((unsigned int)code);
         editorFrame->AddCard(code, 3);
     }
     
     void FilterFrame::OnHoverTimer(wxTimerEvent& evt) {
-        unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
+        wxStaticBitmap* ctrl = static_cast<wxStaticBitmap*>(hover_timer.GetClientData());
+        unsigned int code = (unsigned int)(long)ctrl->GetClientData();
         editorFrame->SetCardInfo(code);
     }
     

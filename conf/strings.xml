@@ -178,6 +178,11 @@
   <setting name="setname_光道" value="0x38" type="integer"/>
   <setting name="setname_熔岩" value="0x39" type="integer"/>
   <setting name="setname_遗式" value="0x3a" type="integer"/>
+  <setting name="setname_真红眼" value="0x3b" type="integer"/>
+  <setting name="setname_爬虫妖女" value="0x3c" type="integer"/>
+  <setting name="setname_六武众" value="0x3d" type="integer"/>
+  <setting name="setname_异虫" value="0x3e" type="integer"/>
+  <setting name="setname_救世" value="0x3f" type="integer"/>
   <setting name="setname_被封印者" value="0x40" type="integer"/>
   <setting name="setname_LV" value="0x41" type="integer"/>
   <setting name="setname_极星" value="0x42" type="integer"/>
