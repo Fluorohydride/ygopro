@@ -14,30 +14,30 @@ namespace ygopro
 
     EditorFrame* editorFrame = nullptr;
 
-    EditorFrame::EditorFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, "YGOpro Deck Editor", wxDefaultPosition, wxSize(sx, sy)) {
+    EditorFrame::EditorFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
         
         wxMenuBar* menu_bar = new wxMenuBar;
         wxMenu* m_deck = new wxMenu();
-        m_deck->Append(ID_DECK_LOAD, wxT("Load\tCTRL+D"));
-        m_deck->Append(ID_DECK_SAVE, wxT("Save\tCTRL+S"));
-        m_deck->Append(ID_DECK_SAVEAS, wxT("Save As\tCTRL+SHIFT+S"));
-        m_deck->Append(ID_DECK_LOADSTR, wxT("Load From String\tCTRL+SHIFT+V"));
-        m_deck->Append(ID_DECK_SAVESTR, wxT("Save To String\tCTRL+SHIFT+C"));
+        wxString stt = stringCfg["eui_menu_deck_load"];
+        m_deck->Append(ID_DECK_LOAD, stt);
+        m_deck->Append(ID_DECK_SAVE, stringCfg["eui_menu_deck_save"]);
+        m_deck->Append(ID_DECK_SAVEAS, stringCfg["eui_menu_deck_saveas"]);
+        m_deck->Append(ID_DECK_LOADSTR, stringCfg["eui_menu_deck_loadstr"]);
+        m_deck->Append(ID_DECK_SAVESTR, stringCfg["eui_menu_deck_savestr"]);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoad, this, ID_DECK_LOAD);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSave, this, ID_DECK_SAVE);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveAs, this, ID_DECK_SAVEAS);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoadString, this, ID_DECK_LOADSTR);
         m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveString, this, ID_DECK_SAVESTR);
         
-        wxMenu* m_tool = new wxMenu;
-        m_tool->Append(ID_TOOL_CLEAR, wxT("Clear\tCTRL+E"));
-        m_tool->Append(ID_TOOL_SORT, wxT("Sort\tCTRL+R"));
-        m_tool->Append(ID_TOOL_SHUFFLE, wxT("Shuffle\tCTRL+T"));
-        m_tool->Append(ID_TOOL_SCREENSHOT, wxT("Screenshot\tCTRL+P"));
-        m_tool->Append(ID_TOOL_SCREENSHOT_SV, wxT("Save Screenshot\tCTRL+SHIFT+P"));
-        m_tool->Append(ID_TOOL_SEARCH, wxT("Search\tCTRL+F"));
-        m_tool->Append(ID_TOOL_BROWSER, wxT("Open in Browser\tCTRL+O"));
-
+        wxMenu* m_tool = new wxMenu();
+        m_tool->Append(ID_TOOL_CLEAR, stringCfg["eui_menu_tool_clear"]);
+        m_tool->Append(ID_TOOL_SORT, stringCfg["eui_menu_tool_sort"]);
+        m_tool->Append(ID_TOOL_SHUFFLE, stringCfg["eui_menu_tool_shuffle"]);
+        m_tool->Append(ID_TOOL_SCREENSHOT, stringCfg["eui_menu_tool_screenshot"]);
+        m_tool->Append(ID_TOOL_SCREENSHOT_SV, stringCfg["eui_menu_tool_saveshot"]);
+        m_tool->Append(ID_TOOL_SEARCH, stringCfg["eui_menu_tool_search"]);
+        m_tool->Append(ID_TOOL_BROWSER, stringCfg["eui_menu_tool_browser"]);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolClear, this, ID_TOOL_CLEAR);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSort, this, ID_TOOL_SORT);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
@@ -46,24 +46,24 @@ namespace ygopro
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSearch, this, ID_TOOL_SEARCH);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolOpenBrowser, this, ID_TOOL_BROWSER);
 
-        wxMenu* m_limit = new wxMenu;
+        wxMenu* m_limit = new wxMenu();
         auto& lrs = limitRegulationMgr.GetLimitRegulations();
         for(unsigned int i = 0; i < lrs.size(); ++i) {
-            m_limit->Append(ID_REGULATION + i, lrs[i].name, wxT("Check to choose this regulation."), true);
+            m_limit->Append(ID_REGULATION + i, lrs[i].name, wxEmptyString, true);
             m_limit->Bind(wxEVT_MENU, &EditorFrame::OnRegulationChange, this, ID_REGULATION + i);
         }
         if(lrs.size() > 0)
             m_limit->GetMenuItems()[0]->Check(true);
         wxMenu* m_vlist = new wxMenu;
-        m_vlist->Append(ID_REG_VIEW1, wxT("Forbidden Cards\tCtrl+1"));
-        m_vlist->Append(ID_REG_VIEW2, wxT("Limited Cards\tCtrl+2"));
-        m_vlist->Append(ID_REG_VIEW3, wxT("Semi-limited Cards\tCtrl+3"));
+        m_vlist->Append(ID_REG_VIEW1, stringCfg["eui_list_forbidden"]);
+        m_vlist->Append(ID_REG_VIEW2, stringCfg["eui_list_limit"]);
+        m_vlist->Append(ID_REG_VIEW3, stringCfg["eui_list_semilimit"]);
         m_vlist->Bind(wxEVT_MENU, &EditorFrame::OnToolViewRegulation, this);
-        m_limit->AppendSubMenu(m_vlist, wxT("-- View Current --"));
+        m_limit->AppendSubMenu(m_vlist, stringCfg["eui_list_view"]);
         
-        menu_bar->Append(m_deck, wxT("Deck"));
-        menu_bar->Append(m_tool, wxT("Tools"));
-        menu_bar->Append(m_limit, wxT("Limit Regulation"));
+        menu_bar->Append(m_deck, stringCfg["eui_menu_deck"]);
+        menu_bar->Append(m_tool, stringCfg["eui_menu_tools"]);
+        menu_bar->Append(m_limit, stringCfg["eui_menu_reg"]);
         SetMenuBar(menu_bar);
 
         card_image = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
@@ -103,6 +103,10 @@ namespace ygopro
     }
 
     void EditorFrame::SetCardInfo(unsigned int code) {
+        static unsigned int current_code = 0;
+        if(current_code == code)
+            return;
+        current_code = code;
         if(code == 0) {
             TextureInfo& sv = imageMgr.textures["sleeve1"];
             if(sv.src == nullptr)
@@ -199,9 +203,17 @@ namespace ygopro
                 start = end + 1;
             }
             card_info->Newline();
+            if((cd->type & 0x4000) == 0) {
+                card_info->Newline();
+                card_info->WriteText(stringCfg["eui_infocode"]);
+                unsigned int code = cd->code;
+                if(cd->alias && ((cd->alias > code && cd->alias - code < 10) || (cd->alias < code && code - cd->alias < 10)))
+                    code = cd->alias;
+                card_info->WriteText(wxString::Format(wxT("%08d"), code));
+            }
             if(cd->setcode) {
                 card_info->Newline();
-                card_info->WriteText(wxT("Category: "));
+                card_info->WriteText(stringCfg["eui_category"]);
                 wxString setname = dataMgr.GetSetCode(cd->setcode & 0xffff);
                 card_info->BeginTextColour(wxColour(0, 0, 255));
                 if(!setname.IsEmpty()) {
@@ -233,7 +245,7 @@ namespace ygopro
     }
     
     void EditorFrame::OnDeckLoad(wxCommandEvent& evt) {
-        wxFileDialog fd(this, wxT("Choose"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+        wxFileDialog fd(this, stringCfg["eui_msg_deck_load"], wxEmptyString, wxEmptyString, stringCfg["eui_msg_deck_filter"], wxFD_OPEN | wxFD_FILE_MUST_EXIST);
         if(fd.ShowModal() != wxID_OK)
             return;
         DeckData tempdeck;
@@ -241,10 +253,12 @@ namespace ygopro
             editor_canvas->ClearDeck();
             editor_canvas->GetDeck() = tempdeck;
             current_file = fd.GetPath();
-            SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+            wxString title = stringCfg["eui_msg_deck_title"];
+            title.Replace(wxT("{deck}"), current_file);
+            SetTitle(title);
             editor_canvas->Refresh();
         } else {
-            wxMessageDialog(this, wxT("Cannot load deck file."));
+            wxMessageDialog(this, stringCfg["eui_msg_deck_load_error"]);
         }
     }
 
@@ -256,12 +270,14 @@ namespace ygopro
     }
 
     void EditorFrame::OnDeckSaveAs(wxCommandEvent& evt) {
-        wxFileDialog fd(this, wxT("Save deck file as"), wxT(""), wxT(""), wxT("YGO Deck File |*.ydk"), wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
+        wxFileDialog fd(this, stringCfg["eui_msg_deck_save"], wxEmptyString, wxEmptyString, stringCfg["eui_msg_deck_filter"], wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if(fd.ShowModal() != wxID_OK)
             return;
         editor_canvas->GetDeck().SaveToFile(fd.GetPath());
         current_file = fd.GetPath();
-        SetTitle(wxT("YGOpro Deck Editor (") + current_file + wxT(")"));
+        wxString title = stringCfg["eui_msg_deck_title"];
+        title.Replace(wxT("{deck}"), current_file);
+        SetTitle(title);
     }
 
     void EditorFrame::OnDeckLoadString(wxCommandEvent& evt) {
@@ -276,7 +292,7 @@ namespace ygopro
             editor_canvas->GetDeck() = tempdeck;
             editor_canvas->Refresh();
         } else {
-            wxMessageDialog(this, wxString("Load from string failed."), wxT("Error"), wxICON_ERROR).ShowModal();
+            wxMessageDialog(this, stringCfg["eui_msg_str_load_error"], wxEmptyString, wxICON_ERROR).ShowModal();
         }
     }
 
@@ -287,7 +303,7 @@ namespace ygopro
         wxTheClipboard->SetData(new wxTextDataObject(deck_string));
         wxTheClipboard->Close();
         editor_canvas->Refresh();
-        wxMessageDialog(this, wxString("The deck has been successfully copied to clipboard."), wxT("Information"), wxICON_INFORMATION).ShowModal();
+        wxMessageDialog(this, stringCfg["eui_msg_str_save"], wxEmptyString, wxICON_INFORMATION).ShowModal();
     }
 
     void EditorFrame::OnToolClear(wxCommandEvent& evt) {
@@ -306,8 +322,8 @@ namespace ygopro
     }
 
     void EditorFrame::OnToolScreenshot(wxCommandEvent& evt) {
-        editor_canvas->SaveScreenshot(wxT(""), true);
-        wxMessageDialog(this, wxString("Screen has been copied to clipboard."), wxT("Information"), wxICON_INFORMATION).ShowModal();
+        editor_canvas->SaveScreenshot(wxEmptyString, true);
+        wxMessageDialog(this, stringCfg["eui_msg_screen_copy"], wxEmptyString, wxICON_INFORMATION).ShowModal();
     }
 
     void EditorFrame::OnToolScreenshotSV(wxCommandEvent& evt) {
@@ -316,19 +332,23 @@ namespace ygopro
         if(*path.rbegin() != wxT('/'))
             path.Append(wxT('/'));
         if(!wxFileName::DirExists(path) && !wxFileName::Mkdir(path)) {
-            wxMessageDialog(this, wxString("Cannot create folder ") + path, wxT("Error"), wxICON_ERROR).ShowModal();
+            wxString err = stringCfg["eui_msg_screen_err"];
+            err.Replace(wxT("{path}"), path);
+            wxMessageDialog(this, err, wxEmptyString, wxICON_ERROR).ShowModal();
             return;
         }
         path += wxString::Format(wxT("%d.png"), (int)t);
         editor_canvas->SaveScreenshot(path);
-        wxMessageDialog(this, wxString("File has been successful saved to:\n") + path, wxT("Information"), wxICON_INFORMATION).ShowModal();
+        wxString savemsg = stringCfg["eui_msg_screen_save"];
+        savemsg.Replace(wxT("{path}"), path);
+        wxMessageDialog(this, savemsg, wxEmptyString, wxICON_INFORMATION).ShowModal();
     }
 
     void EditorFrame::OnToolSearch(wxCommandEvent& evt) {
         if(filterFrame)
             filterFrame->Raise();
         else {
-            filterFrame = new FilterFrame(600, 500);
+            filterFrame = new FilterFrame();
             filterFrame->Center();
             filterFrame->Show();
         }
@@ -340,7 +360,7 @@ namespace ygopro
         neturl.Replace("{amp}", wxT("&"));
         neturl.Replace("{deck}", deck_string);
         if(current_file.IsEmpty())
-            neturl.Replace("{name}", wxT(""));
+            neturl.Replace("{name}", wxEmptyString);
         else {
             wxFileName fn(current_file);
             neturl.Replace("{name}", fn.GetName());
@@ -384,7 +404,7 @@ namespace ygopro
         if(filterFrame)
             filterFrame->Raise();
         else {
-            filterFrame = new FilterFrame(600, 500);
+            filterFrame = new FilterFrame();
             filterFrame->Center();
             filterFrame->Show();
         }

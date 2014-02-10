@@ -368,7 +368,7 @@ namespace ygopro
         return 0;
     }
     
-    void LimitRegulationMgr::LoadLimitRegulation(const wxString& file) {
+    void LimitRegulationMgr::LoadLimitRegulation(const wxString& file, const wxString& default_name) {
         wxFileInputStream ban_file(file);
         if(!ban_file.IsOk())
             return;
@@ -396,7 +396,7 @@ namespace ygopro
         }
         limit_regulations.resize(limit_regulations.size() + 1);
         plist = &(*limit_regulations.rbegin());
-        plist->name = wxT("-- No limit --");
+        plist->name = default_name;
         current_list = &limit_regulations[0];
     }
     

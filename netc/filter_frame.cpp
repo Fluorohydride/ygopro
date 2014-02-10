@@ -10,56 +10,87 @@ namespace ygopro
 {
     FilterFrame* filterFrame = nullptr;
     
-    FilterFrame::FilterFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, "Card Filter", wxDefaultPosition, wxSize(sx, sy), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
-        wxStaticText* stkey = new wxStaticText(this, wxID_ANY, wxT("Keyword"), wxDefaultPosition, wxDefaultSize);
-        filter_att1[0] = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize);
-        wxStaticText* st1 = new wxStaticText(this, wxID_ANY, wxT("Attack"), wxDefaultPosition, wxDefaultSize);
-        filter_att1[1] = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize);
+    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 430), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
+        
+        TextureInfo& st = imageMgr.textures["star"];
+        if(st.src) {
+            int x1 = st.src->t_width * st.lx;
+            int y1 = st.src->t_height * st.ly;
+            int x2 = st.src->t_width * st.rx;
+            int y2 = st.src->t_height * st.ry;
+            star_img = st.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1));
+        }
+        TextureInfo& sv = imageMgr.textures["unknown"];
+        if(sv.src) {
+            int x1 = sv.src->t_width * sv.lx;
+            int y1 = sv.src->t_height * sv.ly;
+            int x2 = sv.src->t_width * sv.rx;
+            int y2 = sv.src->t_height * sv.ry;
+            card_unknown = sv.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1));
+            card_unknown.Rescale(88, 127, wxIMAGE_QUALITY_BICUBIC);
+        }
+        TextureInfo& sl = imageMgr.textures["sleeve1"];
+        if(sl.src) {
+            int x1 = sl.src->t_width * sl.lx;
+            int y1 = sl.src->t_height * sl.ly;
+            int x2 = sl.src->t_width * sl.rx;
+            int y2 = sl.src->t_height * sl.ry;
+            card_sleeve = sl.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1));
+            card_sleeve.Rescale(88, 127, wxIMAGE_QUALITY_BICUBIC);
+        }
+        
+        hover_timer.SetOwner(this);
+        Bind(wxEVT_TIMER, &FilterFrame::OnHoverTimer, this);
+        wxStaticText* stkey = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_keyword"], wxDefaultPosition, wxDefaultSize);
+        filter_att1[0] = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxTE_PROCESS_ENTER);
+        filter_att1[0]->Bind(wxEVT_TEXT_ENTER, &FilterFrame::OnKeywordEnter, this, wxID_ANY);
+        wxStaticText* st1 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_attack"], wxDefaultPosition, wxDefaultSize);
+        filter_att1[1] = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
         filter_att1[1]->Disable();
-        wxStaticText* st2 = new wxStaticText(this, wxID_ANY, wxT("Defence"), wxDefaultPosition, wxDefaultSize);
-        filter_att1[2] = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize);
+        wxStaticText* st2 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_defence"], wxDefaultPosition, wxDefaultSize);
+        filter_att1[2] = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
         filter_att1[2]->Disable();
-        wxStaticText* st3 = new wxStaticText(this, wxID_ANY, wxT("Star"), wxDefaultPosition, wxDefaultSize);
-        filter_att1[3] = new wxTextCtrl(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize);
+        wxStaticText* st3 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_star"], wxDefaultPosition, wxDefaultSize);
+        filter_att1[3] = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize);
         filter_att1[3]->Disable();
-        wxStaticText* st4 = new wxStaticText(this, wxID_ANY, wxT("Type"), wxDefaultPosition, wxDefaultSize);
-        filter_att2[0] = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
-        filter_att2[0]->Append(wxT("---"), (void*)0);
+        wxStaticText* st4 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_type"], wxDefaultPosition, wxDefaultSize);
+        filter_att2[0] = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+        filter_att2[0]->Append(stringCfg["eui_filter_na"], (void*)0);
         filter_att2[0]->Append(dataMgr.GetTypeString2(0x1), (void*)0x1);
         filter_att2[0]->Append(dataMgr.GetTypeString2(0x2), (void*)0x2);
         filter_att2[0]->Append(dataMgr.GetTypeString2(0x4), (void*)0x4);
         filter_att2[0]->SetSelection(0);
         filter_att2[0]->Bind(wxEVT_COMBOBOX, &FilterFrame::OnTypeSelected, this, wxID_ANY);
-        filter_att2[1] = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
-        filter_att2[1]->Append(wxT("---"), (void*)0);
+        filter_att2[1] = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+        filter_att2[1]->Append(stringCfg["eui_filter_na"], (void*)0);
         filter_att2[1]->SetSelection(0);
         filter_att2[1]->Disable();
-        wxStaticText* st6 = new wxStaticText(this, wxID_ANY, wxT("Attribute"), wxDefaultPosition, wxDefaultSize);
-        filter_att2[2] = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
-        filter_att2[2]->Append(wxT("---"), (void*)0);
+        wxStaticText* st6 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_attribute"], wxDefaultPosition, wxDefaultSize);
+        filter_att2[2] = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+        filter_att2[2]->Append(stringCfg["eui_filter_na"], (void*)0);
         for(unsigned int att = 1; att != 0x80; att <<= 1)
             filter_att2[2]->Append(dataMgr.GetAttributeString(att), (void*)(long)att);
         filter_att2[2]->SetSelection(0);
         filter_att2[2]->Disable();
-        wxStaticText* st7 = new wxStaticText(this, wxID_ANY, wxT("Race"), wxDefaultPosition, wxDefaultSize);
-        filter_att2[3] = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
-        filter_att2[3]->Append(wxT("---"), (void*)0);
+        wxStaticText* st7 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_race"], wxDefaultPosition, wxDefaultSize);
+        filter_att2[3] = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+        filter_att2[3]->Append(stringCfg["eui_filter_na"], (void*)0);
         for(unsigned int rac = 1; rac != 0x800000; rac <<= 1)
             filter_att2[3]->Append(dataMgr.GetRaceString(rac), (void*)(long)rac);
         filter_att2[3]->SetSelection(0);
         filter_att2[3]->Disable();
-        wxStaticText* st8 = new wxStaticText(this, wxID_ANY, wxT("Limit"), wxDefaultPosition, wxDefaultSize);
-        filter_att2[4] = new wxComboBox(this, wxID_ANY, wxT(""), wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
-        filter_att2[4]->Append(wxT("---"), (void*)0);
+        wxStaticText* st8 = new wxStaticText(this, wxID_ANY, stringCfg["eui_filter_limit"], wxDefaultPosition, wxDefaultSize);
+        filter_att2[4] = new wxComboBox(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, 0, nullptr, wxCB_READONLY);
+        filter_att2[4]->Append(stringCfg["eui_filter_na"], (void*)0);
         filter_att2[4]->Append(stringCfg["pool_limit0"]);
         filter_att2[4]->Append(stringCfg["pool_limit1"]);
         filter_att2[4]->Append(stringCfg["pool_limit2"]);
         filter_att2[4]->Append(stringCfg["pool_ocg"]);
         filter_att2[4]->Append(stringCfg["pool_tcg"]);
         filter_att2[4]->SetSelection(0);
-        wxButton* btnSearch = new wxButton(this, wxID_ANY, wxT("Search"), wxDefaultPosition, wxDefaultSize);
+        wxButton* btnSearch = new wxButton(this, wxID_ANY, stringCfg["eui_filter_search"], wxDefaultPosition, wxDefaultSize);
         btnSearch->Bind(wxEVT_BUTTON, &FilterFrame::OnSearch, this, wxID_ANY);
-        wxButton* btnClear = new wxButton(this, wxID_ANY, wxT("Clear"), wxDefaultPosition, wxDefaultSize);
+        wxButton* btnClear = new wxButton(this, wxID_ANY, stringCfg["eui_filter_clear"], wxDefaultPosition, wxDefaultSize);
         btnClear->Bind(wxEVT_BUTTON, &FilterFrame::OnClear, this, wxID_ANY);
         prev_page = new wxButton(this, wxID_ANY, wxT("<<"), wxDefaultPosition, wxDefaultSize);
         prev_page->Bind(wxEVT_BUTTON, &FilterFrame::OnPrev, this, wxID_ANY);
@@ -68,8 +99,6 @@ namespace ygopro
         page_info = new wxStaticText(this, wxID_ANY, wxT(" 1 / 1"), wxDefaultPosition, wxDefaultSize);
         result_info = new wxStatusBar(this, wxID_ANY);
         SetStatusBar(result_info);
-        search_result = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxRE_READONLY | wxRE_MULTILINE);
-        search_result->Bind(wxEVT_TEXT_URL, &FilterFrame::OnCmdClicked, this, wxID_ANY);
         prev_page->Disable();
         next_page->Disable();
         
@@ -108,24 +137,24 @@ namespace ygopro
         szV->Add(btnSearch, 0, wxALIGN_CENTER_HORIZONTAL, 5);
         szV->Add(szP, 1, wxEXPAND | wxALL);
         szV->AddSpacer(5);
+        wxGridSizer* szImg = new wxGridSizer(5);
+        for(int i = 0; i < 15; ++i) {
+            thumbs[i] = new wxStaticBitmap(this, wxID_ANY, card_sleeve, wxDefaultPosition, wxSize(88, 127));
+            thumbs[i]->Bind(wxEVT_ENTER_WINDOW, &FilterFrame::OnImageHover, this, wxID_ANY);
+            thumbs[i]->Bind(wxEVT_LEAVE_WINDOW, &FilterFrame::OnImageLeave, this, wxID_ANY);
+            thumbs[i]->Bind(wxEVT_LEFT_DOWN, &FilterFrame::OnImageLClick, this, wxID_ANY);
+            thumbs[i]->Bind(wxEVT_RIGHT_DOWN, &FilterFrame::OnImageRClick, this, wxID_ANY);
+            thumbs[i]->SetClientData(nullptr);
+            szImg->Add(thumbs[i]);
+        }
         wxBoxSizer *szH = new wxBoxSizer(wxHORIZONTAL);
         szH->AddSpacer(5);
-        szH->Add(search_result, 1, wxEXPAND | wxALL);
+        szH->Add(szImg);
         szH->AddSpacer(5);
-        szH->Add(szV);
+        szH->Add(szV, 1, wxEXPAND | wxALL);
         szH->AddSpacer(5);
         SetSizer(szH);
-        
-        TextureInfo& st = imageMgr.textures["star"];
-        if(st.src) {
-            int x1 = st.src->t_width * st.lx;
-            int y1 = st.src->t_height * st.ly;
-            int x2 = st.src->t_width * st.rx;
-            int y2 = st.src->t_height * st.ry;
-            star_img = st.src->img.GetSubImage(wxRect(x1, y1, x2 - x1, y2 - y1));
-        }
-        
-        SetTransparent(224);
+
     }
     
     FilterFrame::~FilterFrame() {
@@ -134,68 +163,44 @@ namespace ygopro
     
     void FilterFrame::FilterCards(const FilterCondition& fc, const wxString &filter_text) {
         vector_results = dataMgr.FilterCard(fc, filter_text);
+        if(!filter_text.empty()) {
+            filter_att1[0]->Clear();
+            filter_att1[0]->AppendText(filter_text);
+        }
         page = 0;
         ShowPage(0);
-        result_info->SetStatusText(wxString::Format(wxT("%d cards found. "), vector_results.size()));
+        wxString ct = wxString::Format(wxT("%d"), vector_results.size());
+        wxString msg = stringCfg["eui_filter_count"];
+        msg.Replace(wxT("{count}"), ct);
+        result_info->SetStatusText(msg);
     }
     
     void FilterFrame::ShowPage(unsigned int page) {
-        size_t maxpage = vector_results.empty() ? 0 : ((vector_results.size() - 1) / 10);
+        size_t maxpage = vector_results.empty() ? 0 : ((vector_results.size() - 1) / 15);
         if(page > maxpage)
             page = (unsigned int)maxpage;
-        search_result->Clear();
-        for(unsigned int i = 0; i < 10 && page * 10 + i < vector_results.size(); ++i) {
-            auto& cd = vector_results[page * 10 + i];
-            wxString card_name = cd->name;
-            wxRichTextAttr attr;
-            search_result->SetDefaultStyle(attr);
-            search_result->BeginFontSize(16);
-            search_result->BeginBold();
-            search_result->BeginTextColour(wxColour(0, 0, 128));
-            search_result->BeginURL(wxString::Format(wxT("%d"), cd->code));
-            search_result->WriteText(card_name);
-            search_result->EndURL();
-            search_result->EndTextColour();
-            search_result->EndBold();
-            search_result->EndFontSize();
-            search_result->Newline();
-            if(cd->type & 0x1) {
-                for(unsigned int i = 0; i < cd->level; ++i)
-                    search_result->WriteImage(star_img);
-                search_result->Newline();
-                search_result->BeginTextColour(wxColour(180, 140, 40));
-                wxString infostr = wxT("[") + dataMgr.GetTypeString(cd->type) + wxT("] ") + dataMgr.GetAttributeString(cd->attribute) + wxT("/") + dataMgr.GetRaceString(cd->race);
-                search_result->WriteText(infostr);
-                search_result->EndTextColour();
-                search_result->Newline();
-                search_result->BeginTextColour(wxColour(64, 64, 64));
-                if(cd->attack >= 0 && cd->defence >= 0)
-                    search_result->WriteText(wxString::Format(wxT("ATK:%d / DEF:%d"), cd->attack, cd->defence));
-                else if(cd->attack >= 0)
-                    search_result->WriteText(wxString::Format(wxT("ATK:%d / DEF:????"), cd->attack));
-                else if(cd->defence >= 0)
-                    search_result->WriteText(wxString::Format(wxT("ATK:???? / DEF:%d"), cd->defence));
-                else
-                    search_result->WriteText(wxString::Format(wxT("ATK:???? / DEF:????")));
-                search_result->EndTextColour();
-                search_result->Newline();
+        for(unsigned int i = 0; i < 15; ++i) {
+            if(page * 15 + i < vector_results.size()) {
+                auto& cd = vector_results[page * 15 + i];
+                wxImage card_img;
+                wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), cd->code);
+                if(wxFileExists(file) && card_img.LoadFile(file)) {
+                    card_img.Rescale(88, 127, wxIMAGE_QUALITY_BICUBIC);
+                    thumbs[i]->SetBitmap(wxBitmap(card_img));
+                } else {
+                    thumbs[i]->SetBitmap(wxBitmap(card_unknown));
+                }
+                thumbs[i]->SetClientData((void*)(long)cd->code);
             } else {
-                if(cd->type & 0x2)
-                    search_result->BeginTextColour(wxColour(0, 192, 128));
-                else
-                    search_result->BeginTextColour(wxColour(250, 32, 192));
-                wxString infostr = wxT("[") + dataMgr.GetTypeString(cd->type) + wxT("] ");
-                search_result->WriteText(infostr);
-                search_result->EndTextColour();
-                search_result->Newline();
+                thumbs[i]->SetBitmap(wxBitmap(card_sleeve));
+                thumbs[i]->SetClientData(nullptr);
             }
-            search_result->Newline();
         }
         if(page > 0)
             prev_page->Enable();
         else
             prev_page->Disable();
-        if(page * 10 + 10 < vector_results.size())
+        if(page * 15 + 15 < vector_results.size())
             next_page->Enable();
         else
             next_page->Disable();
@@ -279,26 +284,46 @@ namespace ygopro
         }
     }
     
-    void FilterFrame::OnCmdClicked(wxTextUrlEvent& evt) {
-        wxString url = evt.GetString();
-        long code;
-        url.ToLong(&code);
-        editorFrame->SetCardInfo((unsigned int)code);
-        wxMenu popup_menu;
-        popup_menu.Append(wxID_UP, wxT("Add to Main Deck"));
-        popup_menu.Append(wxID_DOWN, wxT("Add to Side Deck"));
-        popup_menu.Bind(wxEVT_MENU, &FilterFrame::OnMenu, this);
-        popup_menu.SetClientData((void*)code);
-        PopupMenu(&popup_menu);
+    void FilterFrame::OnImageHover(wxMouseEvent& evt) {
+        void * data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
+        unsigned int code = (unsigned int)(long)data;
+        if(code == 0)
+            return;
+        int delay = (int)commonCfg["hover_info_delay"];
+        if(delay == 0)
+            editorFrame->SetCardInfo(code);
+        else {
+            hover_timer.Stop();
+            hover_timer.SetClientData((void*)(long)code);
+            hover_timer.StartOnce(delay);
+        }
     }
 
-    void FilterFrame::OnMenu(wxCommandEvent& evt) {
-        void * data = static_cast<wxMenu*>(evt.GetEventObject())->GetClientData();
+    void FilterFrame::OnImageLeave(wxMouseEvent& evt) {
+        hover_timer.Stop();
+    }
+    
+    void FilterFrame::OnImageLClick(wxMouseEvent& evt) {
+        void * data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
         unsigned int code = (unsigned int)(long)data;
-        if(evt.GetId() == wxID_UP)
-            editorFrame->AddCard(code, 1);
-        else
-            editorFrame->AddCard(code, 3);
+        editorFrame->SetCardInfo((unsigned int)code);
+        editorFrame->AddCard(code, 1);
+    }
+    
+    void FilterFrame::OnImageRClick(wxMouseEvent& evt) {
+        void * data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
+        unsigned int code = (unsigned int)(long)data;
+        editorFrame->SetCardInfo((unsigned int)code);
+        editorFrame->AddCard(code, 3);
+    }
+    
+    void FilterFrame::OnHoverTimer(wxTimerEvent& evt) {
+        unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
+        editorFrame->SetCardInfo(code);
+    }
+    
+    void FilterFrame::OnKeywordEnter(wxCommandEvent& evt) {
+        OnSearch(evt);
     }
     
     void FilterFrame::OnTypeSelected(wxCommandEvent& evt) {
@@ -314,7 +339,7 @@ namespace ygopro
             case 1:
                 filter_att2[1]->Enable();
                 filter_att2[1]->Clear();
-                filter_att2[1]->Append(wxT("---"), (void*)0);
+                filter_att2[1]->Append(stringCfg["eui_filter_na"], (void*)0);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x10), (void*)0x10);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x20), (void*)0x20);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x40), (void*)0x40);
@@ -337,7 +362,7 @@ namespace ygopro
             case 2:
                 filter_att2[1]->Enable();
                 filter_att2[1]->Clear();
-                filter_att2[1]->Append(wxT("---"), (void*)0);
+                filter_att2[1]->Append(stringCfg["eui_filter_na"], (void*)0);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x10), (void*)0);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x10000), (void*)0x10000);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x20000), (void*)0x20000);
@@ -353,7 +378,7 @@ namespace ygopro
             case 3:
                 filter_att2[1]->Enable();
                 filter_att2[1]->Clear();
-                filter_att2[1]->Append(wxT("---"), (void*)0);
+                filter_att2[1]->Append(stringCfg["eui_filter_na"], (void*)0);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x10), (void*)0);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x20000), (void*)0x20000);
                 filter_att2[1]->Append(dataMgr.GetTypeString2(0x100000), (void*)0x100000);
@@ -368,4 +393,5 @@ namespace ygopro
                 break;
         }
     }
+    
 }

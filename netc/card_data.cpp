@@ -37,11 +37,6 @@ namespace ygopro
         }
         if(fc.category != 0 && (category & fc.category) == 0)
             return false;
-        if(keyword.size()) {
-            wxString kw = keyword.Upper();
-            if(name.Upper().Find(kw) == -1 && texts.Upper().Find(kw) == -1)
-                return false;
-        }
         if(fc.setcode != 0) {
             unsigned int scode = fc.setcode & 0xfff;
             unsigned int subcode = fc.setcode >> 12;
@@ -55,6 +50,12 @@ namespace ygopro
             if(sc3 && (sc3 & 0xfff) == scode && ((sc3 >> 12) & subcode) == subcode)
                 return true;
             return false;
+        } else {
+            if(keyword.size()) {
+                wxString kw = keyword.Upper();
+                if(name.Upper().Find(kw) == -1 && texts.Upper().Find(kw) == -1)
+                    return false;
+            }
         }
         return true;
     }

@@ -37,7 +37,7 @@ namespace ygopro {
                 return true;
             if(!imageMgr.LoadImageConfig(commonCfg["textures"]))
                 return true;
-            limitRegulationMgr.LoadLimitRegulation(commonCfg["limit_regulation"]);
+            limitRegulationMgr.LoadLimitRegulation(commonCfg["limit_regulation"], stringCfg["eui_list_default"]);
             
 			editorFrame = new EditorFrame(1080, 720);
 			editorFrame->Center();

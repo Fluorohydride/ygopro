@@ -1,6 +1,52 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
   <setting name="unknown" value="？？？" type="string"/>
+  <setting name="eui_menu_deck" value="卡组" type="string"/>
+  <setting name="eui_menu_deck_load" value="载入&#009;CTRL+D" type="string"/>
+  <setting name="eui_menu_deck_save" value="保存&#009;CTRL+S" type="string"/>
+  <setting name="eui_menu_deck_saveas" value="另存为&#009;CTRL+SHIFT+S" type="string"/>
+  <setting name="eui_menu_deck_loadstr" value="从文本载入&#009;CTRL+SHIFT+V" type="string"/>
+  <setting name="eui_menu_deck_savestr" value="保存为文本&#009;CTRL+SHIFT+C" type="string"/>
+  <setting name="eui_menu_tools" value="工具" type="string"/>
+  <setting name="eui_menu_tool_clear" value="清空&#009;CTRL+E" type="string"/>
+  <setting name="eui_menu_tool_sort" value="排序&#009;CTRL+R" type="string"/>
+  <setting name="eui_menu_tool_shuffle" value="打乱&#009;CTRL+T" type="string"/>
+  <setting name="eui_menu_tool_screenshot" value="截图&#009;CTRL+P" type="string"/>
+  <setting name="eui_menu_tool_saveshot" value="保存截图&#009;CTRL+SHIFT+P" type="string"/>
+  <setting name="eui_menu_tool_search" value="搜索&#009;CTRL+F" type="string"/>
+  <setting name="eui_menu_tool_browser" value="在网页中查看&#009;CTRL+O" type="string"/>
+  <setting name="eui_menu_reg" value="禁止·限制卡表" type="string"/>
+  <setting name="eui_list_forbidden" value="禁止卡&#009;Ctrl+1" type="string"/>
+  <setting name="eui_list_limit" value="限制卡&#009;Ctrl+2" type="string"/>
+  <setting name="eui_list_semilimit" value="准限制卡&#009;Ctrl+3" type="string"/>
+  <setting name="eui_list_view" value="-- 查看当前卡表 --" type="string"/>
+  <setting name="eui_list_default" value="[ 无限制 ]" type="string"/>
+  <setting name="eui_msg_deck_load" value="请选择要载入的卡组" type="string"/>
+  <setting name="eui_msg_deck_save" value="卡组保存为" type="string"/>
+  <setting name="eui_msg_deck_title_new" value="YGOpro2 卡组编辑器" type="string"/>
+  <setting name="eui_msg_deck_title" value="YGOpro2 卡组编辑器 ({deck})" type="string"/>
+  <setting name="eui_msg_deck_filter" value="卡组文件 |*.ydk" type="string"/>
+  <setting name="eui_msg_deck_load_error" value="无法载入卡组." type="string"/>
+  <setting name="eui_msg_str_load_error" value="从文本载入卡组失败." type="string"/>
+  <setting name="eui_msg_str_save" value="卡组已复制到剪贴板." type="string"/>
+  <setting name="eui_msg_screen_copy" value="截图已复制到剪贴板." type="string"/>
+  <setting name="eui_msg_screen_err" value="无法创建文件夹 {path}." type="string"/>
+  <setting name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}" type="string"/>
+  <setting name="eui_filter_title" value="卡片搜索" type="string"/>
+  <setting name="eui_filter_keyword" value="关键字" type="string"/>
+  <setting name="eui_filter_attack" value="攻击力" type="string"/>
+  <setting name="eui_filter_defence" value="守备力" type="string"/>
+  <setting name="eui_filter_star" value="星数" type="string"/>
+  <setting name="eui_filter_na" value="---" type="string"/>
+  <setting name="eui_filter_type" value="类型" type="string"/>
+  <setting name="eui_filter_attribute" value="属性" type="string"/>
+  <setting name="eui_filter_race" value="种族" type="string"/>
+  <setting name="eui_filter_limit" value="限制" type="string"/>
+  <setting name="eui_filter_search" value="搜索" type="string"/>
+  <setting name="eui_filter_clear" value="清除条件" type="string"/>
+  <setting name="eui_filter_count" value="已找到{count}张卡." type="string"/>
+  <setting name="eui_infocode" value="卡片密码: " type="string"/>
+  <setting name="eui_category" value="包含系列名: " type="string"/>
   <setting name="full_width_space" value="　" type="string"/>
   <setting name="parse_begin" value="「" type="string"/>
   <setting name="parse_end" value="」" type="string"/>
@@ -131,7 +177,8 @@
   <setting name="setname_霞之谷" value="0x37" type="integer"/>
   <setting name="setname_光道" value="0x38" type="integer"/>
   <setting name="setname_熔岩" value="0x39" type="integer"/>
-  <setting name="setname_遗式" value="0x40" type="integer"/>
+  <setting name="setname_遗式" value="0x3a" type="integer"/>
+  <setting name="setname_被封印者" value="0x40" type="integer"/>
   <setting name="setname_LV" value="0x41" type="integer"/>
   <setting name="setname_极星" value="0x42" type="integer"/>
   <setting name="setname_极星天" value="0x3042" type="integer"/>

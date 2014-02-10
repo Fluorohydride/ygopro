@@ -62,7 +62,7 @@ namespace ygopro
     
 	class LimitRegulationMgr {
 	public:
-		void LoadLimitRegulation(const wxString& file);
+		void LoadLimitRegulation(const wxString& file, const wxString& default_name);
 		void SetLimitRegulation(unsigned int id);
         void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);
