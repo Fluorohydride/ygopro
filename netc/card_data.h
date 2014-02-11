@@ -42,7 +42,7 @@ namespace ygopro
 		wxString texts;
         wxString desc[16];
         
-        bool CheckCondition(const FilterCondition& fc, const wxString& keyword);
+        bool CheckCondition(const FilterCondition& fc, const wxString& keyword, bool check_desc);
         
         static bool card_sort(const CardData* c1, const CardData* c2);
         
@@ -52,7 +52,7 @@ namespace ygopro
 	public:
 		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
-        std::vector<CardData*> FilterCard(const FilterCondition& fc, const wxString& fs);
+        std::vector<CardData*> FilterCard(const FilterCondition& fc, const wxString& fs, bool check_desc);
         
         static wxString GetAttributeString(unsigned int attr);
         static wxString GetRaceString(unsigned int race);

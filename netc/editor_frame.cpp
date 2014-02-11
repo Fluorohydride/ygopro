@@ -397,10 +397,6 @@ namespace ygopro
     
     void EditorFrame::OnUrlClicked(wxTextUrlEvent& evt) {
         wxString url = evt.GetString();
-        std::string strurl = (wxT("setname_") + url).ToStdString();
-        FilterCondition fc;
-        if(stringCfg.Exists(strurl))
-            fc.setcode = stringCfg[strurl];
         if(filterFrame)
             filterFrame->Raise();
         else {
@@ -408,7 +404,7 @@ namespace ygopro
             filterFrame->Center();
             filterFrame->Show();
         }
-        filterFrame->FilterCards(fc, url);
+        filterFrame->FilterCards(url);
     }
 
 }

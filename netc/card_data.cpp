@@ -8,7 +8,7 @@ namespace ygopro
 
 	DataMgr dataMgr;
 
-    bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword) {
+    bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword, bool check_desc) {
         if(type & 0x4000)
             return false;
         if(fc.type != 0 && (type & fc.type) != fc.type)
@@ -53,7 +53,7 @@ namespace ygopro
         } else {
             if(keyword.size()) {
                 wxString kw = keyword.Upper();
-                if(name.Upper().Find(kw) == -1 && texts.Upper().Find(kw) == -1)
+                if(name.Upper().Find(kw) == -1 && (!check_desc || texts.Upper().Find(kw) == -1))
                     return false;
             }
         }
@@ -141,11 +141,11 @@ namespace ygopro
 		return &iter->second;
 	}
     
-    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs) {
+    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs, bool check_desc) {
         std::vector<CardData*> result;
         for(auto& iter : _datas) {
             CardData& cd = iter.second;
-            if(cd.CheckCondition(fc, fs))
+            if(cd.CheckCondition(fc, fs, check_desc))
                 result.push_back(&cd);
         }
         if(result.size())

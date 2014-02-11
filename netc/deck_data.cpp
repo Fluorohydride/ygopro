@@ -53,7 +53,7 @@ namespace ygopro
                 scount++;
             else
                 tcount++;
-            counts[cd->code]++;
+            counts[cd->alias ? cd->alias : cd->code]++;
         }
         for(auto iter : extra_deck) {
             auto cd = std::get<0>(iter);
@@ -63,11 +63,11 @@ namespace ygopro
                 syncount++;
             else
                 fuscount++;
-            counts[cd->code]++;
+            counts[cd->alias ? cd->alias : cd->code]++;
         }
         for(auto iter : side_deck) {
             auto cd = std::get<0>(iter);
-            counts[cd->code]++;
+            counts[cd->alias ? cd->alias : cd->code]++;
         }
     }
     
@@ -114,7 +114,7 @@ namespace ygopro
                         tcount++;
                 }
             }
-            counts[(unsigned int)code]++;
+            counts[ptr->alias ? ptr->alias : ptr->code]++;
         }
         limitRegulationMgr.GetDeckCardLimitCount(*this);
         return true;
@@ -168,7 +168,7 @@ namespace ygopro
                     }
                 }
             }
-            counts[code]++;
+            counts[ptr->alias ? ptr->alias : ptr->code]++;
         }
         limitRegulationMgr.GetDeckCardLimitCount(*this);
         return true;
@@ -256,7 +256,7 @@ namespace ygopro
         if(cd == nullptr || (cd->type & 0x4000))
             return false;
         unsigned int limit = limitRegulationMgr.GetCardLimitCount(code);
-        if(checkc && counts[code] >= limit)
+        if(checkc && ((cd->alias && counts[cd->alias] >= limit) || (!cd->alias && counts[code] >= limit)))
            return false;
         auto tp = std::make_tuple(cd, nullptr, limit);
         if(pos == 1 || pos == 2) {
@@ -293,7 +293,7 @@ namespace ygopro
             else
                 side_deck.insert(side_deck.begin() + index, tp);
         }
-        counts[code]++;
+        counts[cd->alias ? cd->alias : code]++;
         return true;
     }
     
@@ -312,7 +312,7 @@ namespace ygopro
             else
                 tcount--;
             main_deck.erase(main_deck.begin() + index);
-            counts[cd->code]--;
+            counts[cd->alias ? cd->alias : cd->code]--;
         } else if(pos == 2) {
             if(index >= extra_deck.size())
                 return false;
@@ -325,14 +325,14 @@ namespace ygopro
             else
                 fuscount--;
             extra_deck.erase(extra_deck.begin() + index);
-            counts[cd->code]--;
+            counts[cd->alias ? cd->alias : cd->code]--;
         } else if(pos == 3) {
             if(index >= side_deck.size())
                 return false;
             auto& ecd = side_deck[index];
             CardData* cd = std::get<0>(ecd);
             side_deck.erase(side_deck.begin() + index);
-            counts[cd->code]--;
+            counts[cd->alias ? cd->alias : cd->code]--;
         }
         return true;
     }
@@ -429,7 +429,8 @@ namespace ygopro
             return;
         }
         for(auto& cd : deck.main_deck) {
-            unsigned int code = std::get<0>(cd)->code;
+            auto cdata = std::get<0>(cd);
+            unsigned int code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
                 std::get<2>(cd) = 3;
@@ -437,7 +438,8 @@ namespace ygopro
                 std::get<2>(cd) = iter->second;
         }
         for(auto& cd : deck.extra_deck) {
-            unsigned int code = std::get<0>(cd)->code;
+            auto cdata = std::get<0>(cd);
+            unsigned int code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
                 std::get<2>(cd) = 3;
@@ -445,7 +447,8 @@ namespace ygopro
                 std::get<2>(cd) = iter->second;
         }
         for(auto& cd : deck.side_deck) {
-            unsigned int code = std::get<0>(cd)->code;
+            auto cdata = std::get<0>(cd);
+            unsigned int code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
                 std::get<2>(cd) = 3;
@@ -464,13 +467,13 @@ namespace ygopro
             return iter->second;
     }
     
-    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs) {
+    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, bool check_desc) {
         std::vector<CardData*> result;
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)
                 continue;
             CardData* cd = dataMgr[iter.first];
-            if(cd && cd->CheckCondition(fc, fs))
+            if(cd && cd->CheckCondition(fc, fs, check_desc))
                 result.push_back(cd);
         }
         if(result.size())

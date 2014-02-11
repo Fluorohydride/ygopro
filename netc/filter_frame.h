@@ -19,7 +19,7 @@ namespace ygopro
         FilterFrame();
         ~FilterFrame();
         
-        void FilterCards(const FilterCondition& fc, const wxString& filter_text);
+        void FilterCards(const wxString& filter_text);
         void ShowPage(unsigned int page);
         void ValueCheck(const wxString& val, int& min, int& max);
         void OnClear(wxCommandEvent& evt);

@@ -34,6 +34,7 @@
   <setting name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}" type="string"/>
   <setting name="eui_filter_title" value="卡片搜索" type="string"/>
   <setting name="eui_filter_keyword" value="关键字" type="string"/>
+  <setting name="eui_filter_tooltip" value="搜索卡名和描述中出现该字段的卡&#013;#系列名: 仅搜索属于该系列的卡&#013;(由于翻译原因，卡名中出现字段并不意味属于那个系列)" type="string"/>
   <setting name="eui_filter_attack" value="攻击力" type="string"/>
   <setting name="eui_filter_defence" value="守备力" type="string"/>
   <setting name="eui_filter_star" value="星数" type="string"/>
@@ -46,7 +47,7 @@
   <setting name="eui_filter_clear" value="清除条件" type="string"/>
   <setting name="eui_filter_count" value="已找到{count}张卡." type="string"/>
   <setting name="eui_infocode" value="卡片密码: " type="string"/>
-  <setting name="eui_category" value="包含系列名: " type="string"/>
+  <setting name="eui_category" value="从属系列: " type="string"/>
   <setting name="full_width_space" value="　" type="string"/>
   <setting name="parse_begin" value="「" type="string"/>
   <setting name="parse_end" value="」" type="string"/>

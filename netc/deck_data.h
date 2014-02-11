@@ -69,7 +69,7 @@ namespace ygopro
         unsigned int GetCardLimitCount(unsigned int code);
         unsigned int CheckCurrentList(unsigned int pool);
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
-        std::vector<CardData*> FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs);
+        std::vector<CardData*> FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, bool check_desc);
         void LoadCurrentListToDeck(DeckData& deck, int limit);
         
 	private:
