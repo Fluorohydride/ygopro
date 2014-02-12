@@ -135,8 +135,10 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			if(handler->current.location == LOCATION_HAND) {
 				if((handler->data.type & TYPE_TRAP) && !handler->is_affected_by_effect(EFFECT_TRAP_ACT_IN_HAND))
 					return FALSE;
-				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != handler->current.controler))
-					return FALSE;
+				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != handler->current.controler)) {
+					if(!(handler->data.type & TYPE_QUICKPLAY) || !handler->is_affected_by_effect(EFFECT_QP_ACT_IN_NTPHAND))
+						return FALSE;
+				}
 				if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(handler->current.controler, LOCATION_SZONE, handler->current.controler, LOCATION_REASON_TOFIELD) <= 0)
 					return FALSE;
 			} else if(handler->current.location == LOCATION_SZONE) {
