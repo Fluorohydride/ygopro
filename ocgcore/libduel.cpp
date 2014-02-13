@@ -1010,7 +1010,10 @@ int32 scriptlib::duel_discard_hand(lua_State *L) {
 }
 int32 scriptlib::duel_disable_shuffle_check(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	pduel->game_field->core.shuffle_check_disabled = TRUE;
+	uint8 disable = TRUE;
+	if(lua_gettop(L) > 0)
+		disable = lua_toboolean(L, 1);
+	pduel->game_field->core.shuffle_check_disabled = disable;
 	return 0;
 }
 int32 scriptlib::duel_shuffle_deck(lua_State *L) {
