@@ -47,7 +47,9 @@ function c47660516.activate(e,tp,eg,ep,ev,re,r,rp)
 			local g1=Duel.GetOverlayGroup(tp,0,1)
 			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(47660516,0))
 			local mg2=g1:Select(tp,1,1,nil)
+			local oc=mg2:GetFirst():GetOverlayTarget()
 			Duel.Overlay(sc,mg2)
+			Duel.RaiseSingleEvent(oc,EVENT_DETACH_MATERIAL,e,0,0,0,0)
 		end
 	end
 end

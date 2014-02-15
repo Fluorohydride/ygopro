@@ -3,11 +3,11 @@ function c51865604.initial_effect(c)
 	--draw
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(51865604,0))
-	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_DRAW)
+	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c51865604.condition)
+	e1:SetCost(c51865604.cost)
 	e1:SetTarget(c51865604.target)
 	e1:SetOperation(c51865604.operation)
 	c:RegisterEffect(e1)
@@ -30,6 +30,10 @@ function c51865604.cfilter(c)
 end
 function c51865604.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c51865604.cfilter,tp,LOCATION_MZONE,0,1,nil)
+end
+function c51865604.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,51865604)==0 end
+	Duel.RegisterFlagEffect(tp,51865604,RESET_PHASE+PHASE_END,0,1)
 end
 function c51865604.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
