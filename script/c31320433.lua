@@ -24,6 +24,7 @@ function c31320433.initial_effect(c)
 	e2:SetOperation(c31320433.daop)
 	c:RegisterEffect(e2)
 end
+c31320433.xyz_number=47
 function c31320433.matfilter(c)
 	return (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and not c:IsType(TYPE_TOKEN) and c:GetLevel()==3 and c:IsAttribute(ATTRIBUTE_WATER)
 end

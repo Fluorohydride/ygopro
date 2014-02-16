@@ -31,6 +31,7 @@ function c54366836.initial_effect(c)
 	e3:SetOperation(c54366836.damop2)
 	c:RegisterEffect(e3)
 end
+c54366836.xyz_number=54
 function c54366836.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return ep==tp and c:IsRelateToBattle()

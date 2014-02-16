@@ -101,7 +101,7 @@ function c12670770.spfilter(c,e,tp)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c12670770.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetTurnPlayer()~=tp or Duel.GetFlagEffect(tp,12670770)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,12670770)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

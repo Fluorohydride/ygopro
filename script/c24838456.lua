@@ -32,7 +32,7 @@ function c24838456.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetTargetCard(dg)
 	Duel.SetOperationInfo(0,CATEGORY_NEGATE,ng,ng:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,dg:GetCount(),0,0)
 end
 function c24838456.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Group.CreateGroup()

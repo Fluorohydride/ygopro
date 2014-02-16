@@ -40,6 +40,7 @@ function c6165656.initial_effect(c)
 	e4:SetOperation(c6165656.winop)
 	c:RegisterEffect(e4)
 end
+c6165656.xyz_number=88
 function c6165656.splimit(e,se,sp,st)
 	return se:GetHandler():IsSetCard(0x95)
 end

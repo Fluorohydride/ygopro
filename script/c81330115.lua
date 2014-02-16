@@ -31,6 +31,7 @@ function c81330115.initial_effect(c)
 	e3:SetTargetRange(1,0)
 	c:RegisterEffect(e3)
 end
+c81330115.xyz_number=30
 function c81330115.atcon(e)
 	return e:GetHandler():GetOverlayCount()==0
 end

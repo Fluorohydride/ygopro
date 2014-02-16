@@ -21,6 +21,7 @@ function c2407234.initial_effect(c)
 	e2:SetOperation(c2407234.operation)
 	c:RegisterEffect(e2)
 end
+c2407234.xyz_number=69
 function c2407234.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end

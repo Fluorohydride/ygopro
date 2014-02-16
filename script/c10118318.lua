@@ -23,7 +23,7 @@ function c10118318.checkop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(Duel.GetTurnPlayer(),10118318,RESET_PHASE+PHASE_END,0,1)
 end
 function c10118318.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetTurnPlayer()~=tp or Duel.GetFlagEffect(tp,10118318)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,10118318)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

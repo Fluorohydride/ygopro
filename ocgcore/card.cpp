@@ -248,12 +248,11 @@ int32 card::is_set_card(uint32 set_code) {
 	}
 	uint32 settype = set_code & 0xfff;
 	uint32 setsubtype = set_code & 0xf000;
-	if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
-		return TRUE;
-	if (((setcode >> 16) & 0xfff) == settype && ((setcode >> 16) & 0xf000 & setsubtype) == setsubtype)
-		return TRUE;
-	if (((setcode >> 24) & 0xfff) == settype && ((setcode >> 24) & 0xf000 & setsubtype) == setsubtype)
-		return TRUE;
+	while(setcode) {
+		if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+			return TRUE;
+		setcode = setcode >> 16;
+	}
 	return FALSE;
 }
 uint32 card::get_type() {

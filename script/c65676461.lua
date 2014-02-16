@@ -16,6 +16,7 @@ function c65676461.initial_effect(c)
 	e1:SetOperation(c65676461.atop)
 	c:RegisterEffect(e1)
 end
+c65676461.xyz_number=32
 function c65676461.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()

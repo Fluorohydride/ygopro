@@ -36,6 +36,7 @@ function c2978414.initial_effect(c)
 	e3:SetOperation(c2978414.efop)
 	c:RegisterEffect(e3)
 end
+c2978414.xyz_number=46
 function c2978414.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<=1
 end

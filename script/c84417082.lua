@@ -26,6 +26,7 @@ function c84417082.initial_effect(c)
 	e2:SetOperation(c84417082.operation2)
 	c:RegisterEffect(e2)
 end
+c84417082.xyz_number=91
 function c84417082.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,3,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())

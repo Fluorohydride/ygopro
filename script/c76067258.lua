@@ -33,6 +33,7 @@ function c76067258.initial_effect(c)
 	e3:SetTarget(c76067258.reptg)
 	c:RegisterEffect(e3)
 end
+c76067258.xyz_number=66
 function c76067258.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

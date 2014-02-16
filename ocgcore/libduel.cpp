@@ -1010,7 +1010,10 @@ int32 scriptlib::duel_discard_hand(lua_State *L) {
 }
 int32 scriptlib::duel_disable_shuffle_check(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	pduel->game_field->core.shuffle_check_disabled = TRUE;
+	uint8 disable = TRUE;
+	if(lua_gettop(L) > 0)
+		disable = lua_toboolean(L, 1);
+	pduel->game_field->core.shuffle_check_disabled = disable;
 	return 0;
 }
 int32 scriptlib::duel_shuffle_deck(lua_State *L) {
@@ -2048,6 +2051,14 @@ int32 scriptlib::duel_check_tuner_material(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* tuner = *(card**) lua_touserdata(L, 2);
 	duel* pduel = pcard->pduel;
+	if(pduel->game_field->core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
+		effect_set eset;
+		pduel->game_field->filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
+		if(eset.count && eset[0]->handler != tuner) {
+			lua_pushboolean(L, false);
+			return 1;
+		}
+	}
 	if(!lua_isnil(L, 3))
 		check_param(L, PARAM_TYPE_FUNCTION, 3);
 	if(!lua_isnil(L, 4))
@@ -2637,11 +2648,12 @@ int32 scriptlib::duel_is_player_affected_by_effect(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1) {
-		lua_pushboolean(L, 0);
+		lua_pushnil(L);
 		return 1;
 	}
 	int32 code = lua_tointeger(L, 2);
-	lua_pushboolean(L, pduel->game_field->is_player_affected_by_effect(playerid, code) ? 1 : 0);
+	effect* peffect = pduel->game_field->is_player_affected_by_effect(playerid, code);
+	interpreter::effect2value(L, peffect);
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_draw(lua_State * L) {

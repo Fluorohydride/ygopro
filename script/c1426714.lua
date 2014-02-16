@@ -34,6 +34,7 @@ function c1426714.initial_effect(c)
 	e3:SetValue(c1426714.atkval)
 	c:RegisterEffect(e3)
 end
+c1426714.xyz_number=48
 function c1426714.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
