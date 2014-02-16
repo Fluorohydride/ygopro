@@ -2648,11 +2648,12 @@ int32 scriptlib::duel_is_player_affected_by_effect(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 playerid = lua_tointeger(L, 1);
 	if(playerid != 0 && playerid != 1) {
-		lua_pushboolean(L, 0);
+		lua_pushnil(L);
 		return 1;
 	}
 	int32 code = lua_tointeger(L, 2);
-	lua_pushboolean(L, pduel->game_field->is_player_affected_by_effect(playerid, code) ? 1 : 0);
+	effect* peffect = pduel->game_field->is_player_affected_by_effect(playerid, code);
+	interpreter::effect2value(L, peffect);
 	return 1;
 }
 int32 scriptlib::duel_is_player_can_draw(lua_State * L) {
