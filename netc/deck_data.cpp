@@ -473,8 +473,12 @@ namespace ygopro
             if(iter.second != limit)
                 continue;
             CardData* cd = dataMgr[iter.first];
-            if(cd && cd->CheckCondition(fc, fs, check_desc))
+            if(cd && cd->CheckCondition(fc, fs, check_desc)) {
                 result.push_back(cd);
+                auto aliases = dataMgr.AllAliases(cd->code);
+                for(auto acd : aliases)
+                    result.push_back(dataMgr[acd]);
+            }
         }
         if(result.size())
             std::sort(result.begin(), result.end(), CardData::card_sort);

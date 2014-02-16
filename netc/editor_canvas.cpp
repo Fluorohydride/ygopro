@@ -30,6 +30,8 @@ namespace ygopro
         t_limits[0] = &imageMgr.textures["limit0"];
         t_limits[1] = &imageMgr.textures["limit1"];
         t_limits[2] = &imageMgr.textures["limit2"];
+        t_ocg = &imageMgr.textures["ocg"];
+        t_tcg = &imageMgr.textures["tcg"];
     }
 
     wxEditorCanvas::~wxEditorCanvas() {
@@ -229,17 +231,17 @@ namespace ygopro
             long dif = (now - click_time).ToLong();
             if(dif < 300) {
                 if(hover_field == 1) {
-                    if(current_deck.InsertCard(std::get<0>(current_deck.main_deck[hover_index])->code, 1)) {
+                    if(current_deck.InsertCard(std::get<0>(current_deck.main_deck[hover_index])->code, 1, -1, true, true)) {
                         Refresh();
                         EventMouseMoved(evt);
                     }
                 } else if(hover_field == 2) {
-                    if(current_deck.InsertCard(std::get<0>(current_deck.extra_deck[hover_index])->code, 2)) {
+                    if(current_deck.InsertCard(std::get<0>(current_deck.extra_deck[hover_index])->code, 2, -1, true, true)) {
                         Refresh();
                         EventMouseMoved(evt);
                     }
                 } else if(hover_field == 3) {
-                    if(current_deck.InsertCard(std::get<0>(current_deck.side_deck[hover_index])->code, 3)) {
+                    if(current_deck.InsertCard(std::get<0>(current_deck.side_deck[hover_index])->code, 3, -1, true, true)) {
                         Refresh();
                         EventMouseMoved(evt);
                     }
@@ -340,7 +342,7 @@ namespace ygopro
         glEnd();
     }
 
-    void wxEditorCanvas::DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy) {
+    void wxEditorCanvas::DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy, int pool) {
         glBindTexture(GL_TEXTURE_2D, ti->tex());
         glBegin(GL_QUADS);
         {
@@ -359,17 +361,30 @@ namespace ygopro
             glTexCoord2f(t_hmask->rx, t_hmask->ly); glVertex2f(rx, ly);
             glEnd();
         }
-        if(limit >= 3)
-            return;
-        glBindTexture(GL_TEXTURE_2D, t_limits[limit]->tex());
-        glBegin(GL_QUADS);
-        {
-            glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ly); glVertex2f(lx - 0.01f, ly + 0.01f);
-            glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ry); glVertex2f(lx - 0.01f, ly + 0.01f - iy);
-            glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(lx - 0.01f + ix, ly + 0.01f - iy);
-            glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(lx - 0.01f + ix, ly + 0.01f);
+        if(limit < 3) {
+            glBindTexture(GL_TEXTURE_2D, t_limits[limit]->tex());
+            glBegin(GL_QUADS);
+            {
+                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ly); glVertex2f(lx - 0.01f, ly + 0.01f);
+                glTexCoord2f(t_limits[limit]->lx, t_limits[limit]->ry); glVertex2f(lx - 0.01f, ly + 0.01f - iy);
+                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ry); glVertex2f(lx - 0.01f + ix, ly + 0.01f - iy);
+                glTexCoord2f(t_limits[limit]->rx, t_limits[limit]->ly); glVertex2f(lx - 0.01f + ix, ly + 0.01f);
+            }
+            glEnd();
         }
-        glEnd();
+        if(show_exclusive && ( pool == 1 || pool == 2)) {
+            TextureInfo* ti = (pool == 1) ? t_ocg : t_tcg;
+            float px = (lx + rx) / 2.0 - ix * 0.75f;
+            glBindTexture(GL_TEXTURE_2D, ti->tex());
+            glBegin(GL_QUADS);
+            {
+                glTexCoord2f(ti->lx, ti->ly); glVertex2f(px, ry + iy * 0.75f - 0.01f);
+                glTexCoord2f(ti->lx, ti->ry); glVertex2f(px, ry - 0.01f);
+                glTexCoord2f(ti->rx, ti->ry); glVertex2f(px + ix * 2.0f * 0.75f, ry - 0.01f);
+                glTexCoord2f(ti->rx, ti->ly); glVertex2f(px + ix * 2.0f * 0.75f, ry + iy * 0.75f - 0.01f);
+            }
+            glEnd();
+        }
     }
     
     void wxEditorCanvas::DrawScene() {
@@ -424,19 +439,20 @@ namespace ygopro
             dx = wd * 11.0f / 10.0f;
         float dy = 0.3f;
         for(size_t i = 0; i < main_size; ++i) {
+            CardData* cd = std::get<0>(current_deck.main_deck[i]);
             CardTextureInfo* cti = std::get<1>(current_deck.main_deck[i]);
             int limit = std::get<2>(current_deck.main_deck[i]);
             if(cti == nullptr) {
-                cti = &imageMgr.GetCardTexture(std::get<0>(current_deck.main_deck[i])->code);
+                cti = &imageMgr.GetCardTexture(cd->code);
                 std::get<1>(current_deck.main_deck[i]) = cti;
             }
             TextureInfo* ti = &cti->ti;
             size_t lx = i % line_size;
             size_t ly = i / line_size;
             if(click_field == 1 && click_index == i)
-                DrawCard(ti, sx + lx * dx, sy - ly * dy + 0.05f, sx + lx * dx + wd, sy - ly * dy - ht + 0.05f, hover_field == 1 && hover_index == i, limit, ix, iy);
+                DrawCard(ti, sx + lx * dx, sy - ly * dy + 0.05f, sx + lx * dx + wd, sy - ly * dy - ht + 0.05f, hover_field == 1 && hover_index == i, limit, ix, iy, cd->pool);
             else
-                DrawCard(ti, sx + lx * dx, sy - ly * dy, sx + lx * dx + wd, sy - ly * dy - ht, hover_field == 1 && hover_index == i, limit, ix, iy);
+                DrawCard(ti, sx + lx * dx, sy - ly * dy, sx + lx * dx + wd, sy - ly * dy - ht, hover_field == 1 && hover_index == i, limit, ix, iy, cd->pool);
         }
         size_t extra_size = current_deck.extra_deck.size();
         sx = -0.85f;
@@ -445,17 +461,18 @@ namespace ygopro
         if(dx > wd * 11.0f / 10.0f)
             dx = wd * 11.0f / 10.0f;
         for(size_t i = 0; i < extra_size; ++i) {
+            CardData* cd = std::get<0>(current_deck.extra_deck[i]);
             CardTextureInfo* cti = std::get<1>(current_deck.extra_deck[i]);
             int limit = std::get<2>(current_deck.extra_deck[i]);
             if(cti == nullptr) {
-                cti = &imageMgr.GetCardTexture(std::get<0>(current_deck.extra_deck[i])->code);
+                cti = &imageMgr.GetCardTexture(cd->code);
                 std::get<1>(current_deck.extra_deck[i]) = cti;
             }
             TextureInfo* ti = &cti->ti;
             if(click_field == 2 && click_index == i)
-                DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 2 && hover_index == i, limit, ix, iy);
+                DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 2 && hover_index == i, limit, ix, iy, cd->pool);
             else
-                DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 2 && hover_index == i, limit, ix, iy);
+                DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 2 && hover_index == i, limit, ix, iy, cd->pool);
         }
         size_t side_size = current_deck.side_deck.size();
         sx = -0.85f;
@@ -464,17 +481,18 @@ namespace ygopro
         if(dx > wd * 11.0f / 10.0f)
             dx = wd * 11.0f / 10.0f;
         for(size_t i = 0; i < side_size; ++i) {
+            CardData* cd = std::get<0>(current_deck.side_deck[i]);
             CardTextureInfo* cti = std::get<1>(current_deck.side_deck[i]);
             int limit = std::get<2>(current_deck.side_deck[i]);
             if(cti == nullptr) {
-                cti = &imageMgr.GetCardTexture(std::get<0>(current_deck.side_deck[i])->code);
+                cti = &imageMgr.GetCardTexture(cd->code);
                 std::get<1>(current_deck.side_deck[i]) = cti;
             }
             TextureInfo* ti = &cti->ti;
             if(click_field == 3 && click_index == i)
-                DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 3 && hover_index == i, limit, ix, iy);
+                DrawCard(ti, sx + i * dx, sy + 0.05f, sx + i * dx + wd, sy - ht + 0.05f, hover_field == 3 && hover_index == i, limit, ix, iy, cd->pool);
             else
-                DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 3 && hover_index == i, limit, ix, iy);
+                DrawCard(ti, sx + i * dx, sy, sx + i * dx + wd, sy - ht, hover_field == 3 && hover_index == i, limit, ix, iy, cd->pool);
         } 
         DrawNumber(current_deck.mcount, 0xffffff00, -0.931f, 0.913f, -0.868f, 0.850f);
         DrawNumber(current_deck.scount, 0xffffff00, -0.931f, 0.825f, -0.868f, 0.762f);
@@ -486,7 +504,7 @@ namespace ygopro
         DrawNumber((int)current_deck.extra_deck.size(), 0xffffff00, -0.931f, -0.313f, -0.868f, -0.376f);
         DrawNumber((int)current_deck.side_deck.size(), 0xffffff00, -0.931f, -0.646f, -0.868f, -0.709f);
         if(t_draging)
-            DrawCard(&t_draging->ti, mousex - wd / 2, mousey + ht / 2, mousex + wd / 2, mousey - ht / 2, false, 3, 0, 0);
+            DrawCard(&t_draging->ti, mousex - wd / 2, mousey + ht / 2, mousex + wd / 2, mousey - ht / 2, false, 3, 0, 0, 0);
         glFlush();
     }
 

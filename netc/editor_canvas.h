@@ -23,6 +23,8 @@ namespace ygopro
         TextureInfo* t_font = nullptr;
         TextureInfo* t_hmask = nullptr;
         TextureInfo* t_limits[3];
+        TextureInfo* t_ocg = nullptr;
+        TextureInfo* t_tcg = nullptr;
         CardTextureInfo* t_draging = nullptr;
         DeckData current_deck;
         short hover_field = 0;
@@ -36,18 +38,20 @@ namespace ygopro
         wxLongLong click_time = 0;
         double mousex = 0.0;
         double mousey = 0.0;
-        
+        bool show_exclusive = false;
+
 	public:
 		wxEditorCanvas(wxFrame* parent, int id, int* args);
 		virtual ~wxEditorCanvas();
 
         DeckData& GetDeck() { return current_deck; }
 		void ClearDeck();
+        void SwitchShowExclusive() { show_exclusive = !show_exclusive; }
         void SaveScreenshot(const wxString& file, bool clipboard = false);
         
         void DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit);
         void DrawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry);
-        void DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy);
+        void DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy, int pool);
 		void DrawScene();
 
 		// events

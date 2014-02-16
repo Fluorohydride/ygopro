@@ -21,6 +21,8 @@
   <texture src="1" name="limit0" x="384" y="0" w="64" h="64"/>
   <texture src="1" name="limit1" x="448" y="0" w="64" h="64"/>
   <texture src="1" name="limit2" x="384" y="64" w="64" h="64"/>
+  <texture src="1" name="ocg" x="384" y="128" w="128" h="64"/>
+  <texture src="1" name="tcg" x="384" y="192" w="128" h="64"/>
   <texture src="1" name="lpframe1" x="768" y="0" w="256" h="64"/>
   <texture src="1" name="lpframe2" x="768" y="0" w="256" h="64"/>
   <texture src="1" name="lpbar1" x="768" y="64" w="256" h="64"/>

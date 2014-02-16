@@ -52,6 +52,7 @@ namespace ygopro
 	public:
 		int LoadDatas(const wxString& file);
 		CardData* operator [] (unsigned int code);
+        std::vector<unsigned int> AllAliases(unsigned int code);
         std::vector<CardData*> FilterCard(const FilterCondition& fc, const wxString& fs, bool check_desc);
         
         static wxString GetAttributeString(unsigned int attr);
@@ -85,6 +86,7 @@ namespace ygopro
 	private:
 		std::unordered_map<unsigned int, CardData> _datas;
         std::unordered_map<unsigned int, wxString> _setcodes;
+        std::unordered_map<unsigned int, std::vector<unsigned int>> _aliases;
         std::vector<wxString> _dbsrc;
 	};
 

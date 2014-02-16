@@ -10,7 +10,7 @@ namespace ygopro
 {
     FilterFrame* filterFrame = nullptr;
     
-    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 450), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
+    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 480), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
         
         TextureInfo& st = imageMgr.textures["star"];
         if(st.src) {
@@ -126,9 +126,9 @@ namespace ygopro
         szV->AddSpacer(10);
         szV->Add(sz);
         szV->AddSpacer(5);
-        szV->Add(btnClear, 0, wxALIGN_CENTER_HORIZONTAL, 5);
-        szV->AddSpacer(5);
         szV->Add(btnSearch, 0, wxALIGN_CENTER_HORIZONTAL, 5);
+        szV->AddSpacer(5);
+        szV->Add(btnClear, 0, wxALIGN_CENTER_HORIZONTAL, 5);
         szV->AddSpacer(5);
         wxFlexGridSizer* szImg = new wxFlexGridSizer(5);
         for(int i = 0; i < 15; ++i) {
@@ -214,14 +214,15 @@ namespace ygopro
             return;
         if(val[0] == wxT('?')) {
             min = max = -2;
+            return;
         }
         wxStringTokenizer tk(val, wxT("-"), wxTOKEN_STRTOK);
         if(tk.CountTokens() == 1) {
-            long v;
+            long v = 0;
             tk.GetNextToken().ToLong(&v);
             min = max = (int)v;
         } else {
-            long v;
+            long v = 0;
             tk.GetNextToken().ToLong(&v);
             min = (int)v;
             tk.GetNextToken().ToLong(&v);
@@ -243,6 +244,10 @@ namespace ygopro
     void FilterFrame::OnSearch(wxCommandEvent& evt) {
         FilterCondition fc;
         wxString fstr = filter_att1[0]->GetValue();
+        if(static_cast<int>(commonCfg["full_width_space"])) {
+            fstr.Replace(wxT(" "), stringCfg["full_width_space"]);
+            filter_att1[0]->SetLabelText(fstr);
+        }
         bool check_desc = true;
         if(fstr[0] == wxT('#')) {
             std::string setstr = (wxT("setname_") + fstr.SubString(1, -1)).ToStdString();

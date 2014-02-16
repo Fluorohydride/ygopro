@@ -38,6 +38,8 @@ namespace ygopro
         m_tool->Append(ID_TOOL_SCREENSHOT_SV, stringCfg["eui_menu_tool_saveshot"]);
         m_tool->Append(ID_TOOL_SEARCH, stringCfg["eui_menu_tool_search"]);
         m_tool->Append(ID_TOOL_BROWSER, stringCfg["eui_menu_tool_browser"]);
+        m_tool->AppendSeparator();
+        m_tool->Append(ID_TOOL_SHOWEXCLUSIVE, stringCfg["eui_menu_tool_show_exclusive"], wxEmptyString, true);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolClear, this, ID_TOOL_CLEAR);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSort, this, ID_TOOL_SORT);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
@@ -45,11 +47,16 @@ namespace ygopro
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolScreenshotSV, this, ID_TOOL_SCREENSHOT_SV);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSearch, this, ID_TOOL_SEARCH);
         m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolOpenBrowser, this, ID_TOOL_BROWSER);
+        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSwitchExclusive, this, ID_TOOL_SHOWEXCLUSIVE);
 
         wxMenu* m_limit = new wxMenu();
         auto& lrs = limitRegulationMgr.GetLimitRegulations();
         for(unsigned int i = 0; i < lrs.size(); ++i) {
-            m_limit->Append(ID_REGULATION + i, lrs[i].name, wxEmptyString, true);
+            if(i < 3) {
+                wxString extra = wxString::Format(wxT("\tALT+%d"), i + 1);
+                m_limit->Append(ID_REGULATION + i, lrs[i].name + extra, wxEmptyString, true);
+            } else
+                m_limit->Append(ID_REGULATION + i, lrs[i].name, wxEmptyString, true);
             m_limit->Bind(wxEVT_MENU, &EditorFrame::OnRegulationChange, this, ID_REGULATION + i);
         }
         if(lrs.size() > 0)
@@ -59,6 +66,7 @@ namespace ygopro
         m_vlist->Append(ID_REG_VIEW2, stringCfg["eui_list_limit"]);
         m_vlist->Append(ID_REG_VIEW3, stringCfg["eui_list_semilimit"]);
         m_vlist->Bind(wxEVT_MENU, &EditorFrame::OnToolViewRegulation, this);
+        m_limit->AppendSeparator();
         m_limit->AppendSubMenu(m_vlist, stringCfg["eui_list_view"]);
         
         menu_bar->Append(m_deck, stringCfg["eui_menu_deck"]);
@@ -211,23 +219,29 @@ namespace ygopro
                     code = cd->alias;
                 card_info->WriteText(wxString::Format(wxT("%08d"), code));
             }
-            if(cd->setcode) {
+            unsigned long long setcode = cd->setcode;
+            if(cd->alias) {
+                CardData* alias = dataMgr[cd->alias];
+                if(alias)
+                    setcode = alias->setcode;
+            }
+            if(setcode) {
                 card_info->Newline();
                 card_info->WriteText(stringCfg["eui_category"]);
-                wxString setname = dataMgr.GetSetCode(cd->setcode & 0xffff);
+                wxString setname = dataMgr.GetSetCode(setcode & 0xffff);
                 card_info->BeginTextColour(wxColour(0, 0, 255));
                 if(!setname.IsEmpty()) {
                     card_info->BeginURL(setname);
                     card_info->WriteText(wxT("[") + setname + wxT("] "));
                     card_info->EndURL();
                 }
-                setname = dataMgr.GetSetCode((cd->setcode >> 16) & 0xffff);
+                setname = dataMgr.GetSetCode((setcode >> 16) & 0xffff);
                 if(!setname.IsEmpty()) {
                     card_info->BeginURL(setname);
                     card_info->WriteText(wxT("[") + setname + wxT("]"));
                     card_info->EndURL();
                 }
-                setname = dataMgr.GetSetCode((cd->setcode >> 32) & 0xffff);
+                setname = dataMgr.GetSetCode((setcode >> 32) & 0xffff);
                 if(!setname.IsEmpty()) {
                     card_info->BeginURL(setname);
                     card_info->WriteText(wxT("[") + setname + wxT("]"));
@@ -367,6 +381,11 @@ namespace ygopro
         }
         editor_canvas->Refresh();
         wxLaunchDefaultBrowser(neturl);
+    }
+
+    void EditorFrame::OnToolSwitchExclusive(wxCommandEvent& evt) {
+        editor_canvas->SwitchShowExclusive();
+        Refresh();
     }
 
     void EditorFrame::OnToolViewRegulation(wxCommandEvent& evt) {

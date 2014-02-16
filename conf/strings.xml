@@ -15,12 +15,13 @@
   <setting name="eui_menu_tool_saveshot" value="保存截图&#009;CTRL+SHIFT+P" type="string"/>
   <setting name="eui_menu_tool_search" value="搜索&#009;CTRL+F" type="string"/>
   <setting name="eui_menu_tool_browser" value="在网页中查看&#009;CTRL+O" type="string"/>
+  <setting name="eui_menu_tool_show_exclusive" value="显示独有卡标记&#009;CTRL+G" type="string"/>
   <setting name="eui_menu_reg" value="禁止·限制卡表" type="string"/>
-  <setting name="eui_list_forbidden" value="禁止卡&#009;Ctrl+1" type="string"/>
-  <setting name="eui_list_limit" value="限制卡&#009;Ctrl+2" type="string"/>
-  <setting name="eui_list_semilimit" value="准限制卡&#009;Ctrl+3" type="string"/>
+  <setting name="eui_list_forbidden" value="禁止卡&#009;ALT+F1" type="string"/>
+  <setting name="eui_list_limit" value="限制卡&#009;ALT+F2" type="string"/>
+  <setting name="eui_list_semilimit" value="准限制卡&#009;ALT+F3" type="string"/>
   <setting name="eui_list_view" value="-- 查看当前卡表 --" type="string"/>
-  <setting name="eui_list_default" value="[ 无限制 ]" type="string"/>
+  <setting name="eui_list_default" value="[ 无限制 ]&#009;ALT+Q" type="string"/>
   <setting name="eui_msg_deck_load" value="请选择要载入的卡组" type="string"/>
   <setting name="eui_msg_deck_save" value="卡组保存为" type="string"/>
   <setting name="eui_msg_deck_title_new" value="YGOpro2 卡组编辑器" type="string"/>
@@ -206,6 +207,7 @@
   <setting name="setname_进化" value="0x4e" type="integer"/>
   <setting name="setname_进化虫" value="0x304e" type="integer"/>
   <setting name="setname_进化龙" value="0x604e" type="integer"/>
+  <setting name="setname_进化帝" value="0x504e" type="integer"/>
   <setting name="setname_爆裂" value="0x4f" type="integer"/>
   <setting name="setname_/爆裂体" value="0x104f" type="integer"/>
   <setting name="setname_蛇毒" value="0x50" type="integer"/>
@@ -240,6 +242,8 @@
   <setting name="setname_魔导" value="0x6e" type="integer"/>
   <setting name="setname_魔导书" value="0x106e" type="integer"/>
   <setting name="setname_英豪" value="0x6f" type="integer"/>
+  <setting name="setname_英豪挑战者" value="0x106f" type="integer"/>
+  <setting name="setname_英豪冠军" value="0x206f" type="integer"/>
   <setting name="setname_先史遗产" value="0x70" type="integer"/>
   <setting name="setname_魔偶甜点" value="0x71" type="integer"/>
   <setting name="setname_齿轮齿轮" value="0x72" type="integer"/>
@@ -255,6 +259,8 @@
   <setting name="setname_圣骑士" value="0x107a" type="integer"/>
   <setting name="setname_圣剑" value="0x207a" type="integer"/>
   <setting name="setname_银河" value="0x7b" type="integer"/>
+  <setting name="setname_银河眼" value="0x107b" type="integer"/>
+  <setting name="setname_银河眼时空龙" value="0x307b" type="integer"/>
   <setting name="setname_炎舞" value="0x7c" type="integer"/>
   <setting name="setname_阳炎" value="0x7d" type="integer"/>
   <setting name="setname_阳炎兽" value="0x107d" type="integer"/>
@@ -287,4 +293,5 @@
   <setting name="setname_电子科技" value="0x94" type="integer"/>
   <setting name="setname_升阶魔法" value="0x95" type="integer"/>
   <setting name="setname_电子鱼人" value="0x96" type="integer"/>
+  <setting name="setname_古遗物" value="0x97" type="integer"/>
 </Common>

@@ -38,17 +38,19 @@ namespace ygopro
         if(fc.category != 0 && (category & fc.category) == 0)
             return false;
         if(fc.setcode != 0) {
+            unsigned long long sc = setcode;
+            if(alias) {
+                CardData* adata = dataMgr[alias];
+                if(adata)
+                    sc = adata->setcode;
+            }
             unsigned int scode = fc.setcode & 0xfff;
             unsigned int subcode = fc.setcode >> 12;
-            unsigned int sc1 = setcode & 0xffff;
-            unsigned int sc2 = (setcode >> 16) & 0xffff;
-            unsigned int sc3 = (setcode >> 32) & 0xffff;
-            if(sc1 && (sc1 & 0xfff) == scode && ((sc1 >> 12) & subcode) == subcode)
-                return true;
-            if(sc2 && (sc2 & 0xfff) == scode && ((sc2 >> 12) & subcode) == subcode)
-                return true;
-            if(sc3 && (sc3 & 0xfff) == scode && ((sc3 >> 12) & subcode) == subcode)
-                return true;
+            for(int i = 0; i < 64; i += 16) {
+                unsigned int partc = (sc >> i) & 0xffff;
+                if(partc && ((partc & 0xfff) == scode) && ((partc >> 12) & subcode) == subcode)
+                    return true;
+            }
             return false;
         } else {
             if(keyword.size()) {
@@ -127,6 +129,8 @@ namespace ygopro
                     cd.desc[i] = unicode_buffer;
                 }
                 _datas.insert(std::make_pair(cd.code, cd));
+                if(cd.alias)
+                    _aliases[cd.alias].push_back(cd.code);
 			}
 		} while(step != SQLITE_DONE);
 		sqlite3_finalize(pStmt);
@@ -141,6 +145,17 @@ namespace ygopro
 		return &iter->second;
 	}
     
+    std::vector<unsigned int> DataMgr::AllAliases(unsigned int code) {
+        std::vector<unsigned int> result;
+        auto iter = _aliases.find(code);
+        if(iter == _aliases.end())
+            return std::move(result);
+        else {
+            result = iter->second;
+            return std::move(result);
+        }
+    }
+
     std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs, bool check_desc) {
         std::vector<CardData*> result;
         for(auto& iter : _datas) {
