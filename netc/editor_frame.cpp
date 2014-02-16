@@ -75,7 +75,7 @@ namespace ygopro
         SetMenuBar(menu_bar);
 
         card_image = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
-        card_info = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(240, 400), wxRE_READONLY | wxRE_MULTILINE);
+        card_info = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(240, 10000), wxRE_READONLY | wxRE_MULTILINE);
         card_info->Bind(wxEVT_TEXT_URL, &EditorFrame::OnUrlClicked, this, wxID_ANY);
         card_info->GetCaret()->Hide();
         int wx_gl_attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
