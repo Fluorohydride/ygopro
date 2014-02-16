@@ -69,12 +69,11 @@ function c56051086.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_EQUIP_LIMIT)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c56051086.eqlimit)
-		e1:SetLabelObject(tc)
 		tc:RegisterEffect(e1)
 	end
 end
 function c56051086.eqlimit(e,c)
-	return c==e:GetLabelObject()
+	return c==e:GetOwner()
 end
 function c56051086.indcon(e)
 	return e:GetHandler():GetEquipGroup():IsExists(Card.IsSetCard,1,nil,0x48)

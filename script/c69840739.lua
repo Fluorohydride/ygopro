@@ -11,6 +11,7 @@ function c69840739.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c69840739.chcon)
 	e1:SetCost(c69840739.cost)
+	e1:SetTarget(c69840739.chtg)
 	e1:SetOperation(c69840739.chop)
 	c:RegisterEffect(e1)
 	--reload
@@ -35,6 +36,9 @@ function c69840739.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	e:GetHandler():RegisterFlagEffect(69840739,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+end
+function c69840739.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c69840739.filter,rp,0,LOCATION_ONFIELD,1,nil) end
 end
 function c69840739.chop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.CreateGroup()

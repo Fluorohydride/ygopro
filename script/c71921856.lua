@@ -33,7 +33,7 @@ function c71921856.initial_effect(c)
 end
 c71921856.xyz_number=79
 function c71921856.filter(c)
-	return c:IsSetCard(0x85)
+	return c:IsSetCard(0x84)
 end
 function c71921856.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c71921856.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
