@@ -1,5 +1,6 @@
 --CNo.102 光堕天使ノーブル・デーモン
 function c67173574.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_DETACH_EVENT)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),5),4)
 	c:EnableReviveLimit()
