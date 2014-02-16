@@ -39,7 +39,7 @@ function c29400787.cfilter(e,c)
 	return c:IsFacedown()
 end
 function c29400787.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()~=nil
+	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil
 end
 function c29400787.filter(c)
 	return c:IsSetCard(0x8d) and c:IsAbleToHand()
