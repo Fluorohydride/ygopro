@@ -23,6 +23,7 @@ function c53244294.initial_effect(c)
 	e2:SetOperation(c53244294.zop)
 	c:RegisterEffect(e2)
 end
+c53244294.xyz_number=57
 function c53244294.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil) end

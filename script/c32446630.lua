@@ -25,6 +25,7 @@ function c32446630.initial_effect(c)
 	e2:SetOperation(c32446630.operation)
 	c:RegisterEffect(e2)
 end
+c32446630.xyz_number=43
 function c32446630.atktg(e,c)
 	return c:IsType(TYPE_TOKEN)
 end

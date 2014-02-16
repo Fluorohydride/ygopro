@@ -16,6 +16,7 @@ function c80764541.initial_effect(c)
 	e1:SetOperation(c80764541.desop)
 	c:RegisterEffect(e1)
 end
+c80764541.xyz_number=44
 function c80764541.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

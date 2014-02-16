@@ -16,6 +16,7 @@ function c29669359.initial_effect(c)
 	e1:SetOperation(c29669359.operation)
 	c:RegisterEffect(e1)
 end
+c29669359.xyz_number=61
 function c29669359.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
 		and not e:GetHandler():IsDirectAttacked() end

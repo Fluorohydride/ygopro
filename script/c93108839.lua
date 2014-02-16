@@ -32,6 +32,7 @@ function c93108839.initial_effect(c)
 	e3:SetOperation(c93108839.damop)
 	c:RegisterEffect(e3)
 end
+c93108839.xyz_number=58
 function c93108839.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end

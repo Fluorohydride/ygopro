@@ -44,6 +44,7 @@ function c16259549.initial_effect(c)
 	e4:SetOperation(c16259549.tdop)
 	c:RegisterEffect(e4)
 end
+c16259549.xyz_number=49
 function c16259549.reccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end

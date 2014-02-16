@@ -14,6 +14,7 @@ function c55067058.initial_effect(c)
 	e1:SetOperation(c55067058.rop)
 	c:RegisterEffect(e1)
 end
+c55067058.xyz_number=19
 function c55067058.rcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_COST)~=0 and re:GetHandler():IsType(TYPE_XYZ)
 		and ep==e:GetOwnerPlayer() and e:GetHandler():GetOverlayCount()>0 and re:GetHandler():GetOverlayCount()>=ev-1

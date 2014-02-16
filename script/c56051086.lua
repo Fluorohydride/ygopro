@@ -39,6 +39,7 @@ function c56051086.initial_effect(c)
 	e4:SetOperation(c56051086.damop)
 	c:RegisterEffect(e4)
 end
+c56051086.xyz_number=43
 function c56051086.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
