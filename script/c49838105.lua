@@ -74,8 +74,8 @@ function c49838105.cfop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmDecktop(tp,1)
 		local g=Duel.GetDecktopGroup(tp,1)
 		local tc=g:GetFirst()
+		Duel.DisableShuffleCheck()
 		if tc:IsRace(RACE_PLANT) then
-			Duel.DisableShuffleCheck()
 			Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 		else
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)

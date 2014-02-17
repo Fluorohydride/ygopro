@@ -24,7 +24,7 @@ function c24658418.initial_effect(c)
 end
 function c24658418.condition(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttackTarget()
-	return at:IsControler(tp) and at:IsSetCard(0x7b)
+	return at:IsFaceup() and at:IsControler(tp) and at:IsSetCard(0x7b)
 end
 function c24658418.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

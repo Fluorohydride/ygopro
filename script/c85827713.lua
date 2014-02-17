@@ -31,8 +31,7 @@ function c85827713.sumcon(e)
 end
 function c85827713.limcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp~=tp and c:IsReason(REASON_DESTROY)
-		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
+	return rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp
 end
 function c85827713.limop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
