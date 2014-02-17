@@ -46,7 +46,7 @@ end
 function c81994591.indop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_INDESTRUCTABLE)
+	e1:SetCode(EFFECT_DESTROY_SUBSTITUTE)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x1d))
 	e1:SetReset(RESET_PHASE+PHASE_END)
