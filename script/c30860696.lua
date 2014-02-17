@@ -23,7 +23,7 @@ function c30860696.initial_effect(c)
 	e3:SetOperation(c30860696.raop)
 	c:RegisterEffect(e3)
 end
-function c30860696.ivcon(e,tp,eg,ep,ev,re,r,rp)
+function c30860696.ivcon(e)
 	return Duel.GetTurnPlayer()==e:GetHandlerPlayer()
 end
 function c30860696.racon(e,tp,eg,ep,ev,re,r,rp)

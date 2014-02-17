@@ -8,6 +8,7 @@
 #ifndef FIELD_H_
 #define FIELD_H_
 
+#include "memory.h"
 #include "common.h"
 #include "effectset.h"
 #include <vector>
@@ -33,6 +34,7 @@ struct tevent {
 	uint32 reason;
 	uint8 event_player;
 	uint8 reason_player;
+	bool operator< (const tevent& v) const;
 };
 struct optarget {
 	group* op_cards;
@@ -142,6 +144,7 @@ struct processor {
 	typedef std::list<processor_unit> processor_list;
 	typedef std::set<card*, card_sort> card_set;
 	typedef std::set<effect*> effect_collection;
+	typedef std::set<std::pair<effect*, tevent> > delayed_effect_collection;
 
 	processor_list units;
 	processor_list subunits;
@@ -178,9 +181,9 @@ struct processor {
 	chain_list flip_chain_b;
 	chain_list new_ochain_h;
 	chain_list new_chains;
-	effect_collection delayed_quick_tmp;
-	effect_collection delayed_quick_break;
-	effect_collection delayed_quick;
+	delayed_effect_collection delayed_quick_tmp;
+	delayed_effect_collection delayed_quick_break;
+	delayed_effect_collection delayed_quick;
 	instant_f_list quick_f_chain;
 	card_set leave_confirmed;
 	card_set special_summoning;
@@ -212,7 +215,8 @@ struct processor {
 	std::unordered_set<card*> unique_cards[2];
 	ptr temp_var[4];
 	uint32 global_flag;
-	uint16 pre_field[5];
+	uint16 pre_field[2];
+	uint16 opp_mzone[5];
 	int32 chain_limit;
 	uint8 chain_limp;
 	int32 chain_limit_p;
@@ -348,7 +352,7 @@ public:
 	int32 pay_lp_cost(uint32 step, uint8 playerid, uint32 cost);
 
 	uint32 get_field_counter(uint8 self, uint8 s, uint8 o, uint16 countertype);
-	int32 effect_replace_check(uint32 code, tevent& e);
+	int32 effect_replace_check(uint32 code, const tevent& e);
 	int32 get_attack_target(card* pcard, card_vector* v, uint8 chain_attack = FALSE);
 	void attack_all_target_check();
 	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max);
@@ -362,6 +366,7 @@ public:
 	int32 is_player_can_summon(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_mset(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_sset(uint8 playerid, card* pcard);
+	int32 is_player_can_spsummon(uint8 playerid);
 	int32 is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card* pcard);
 	int32 is_player_can_flipsummon(uint8 playerid, card* pcard);
 	int32 is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);
@@ -383,7 +388,7 @@ public:
 	int32 execute_target(uint16 step, effect* peffect, uint8 triggering_player);
 	void raise_event(card* event_card, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	void raise_event(card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
-	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value );
+	void raise_single_event(card* trigger_card, card_set* event_cards, uint32 event_code, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 event_player, uint32 event_value);
 	int32 check_event(uint32 code, tevent* pe = 0);
 	int32 check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, int32 neglect_cost, int32 copy_info, tevent* pe = 0);
 	int32 check_hint_timing(effect* peffect);
@@ -516,7 +521,8 @@ public:
 #define GLOBALFLAG_BRAINWASHING_CHECK	0x2
 #define GLOBALFLAG_SCRAP_CHIMERA		0x4
 #define GLOBALFLAG_DELAYED_QUICKEFFECT	0x8
-
+#define GLOBALFLAG_DETACH_EVENT			0x10
+#define GLOBALFLAG_MUST_BE_SMATERIAL	0x20
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000
@@ -582,6 +588,7 @@ public:
 #define PROCESSOR_CONTROL_ADJUST	76
 #define PROCESSOR_PAY_LPCOST		80
 #define PROCESSOR_REMOVE_COUNTER	81
+#define PROCESSOR_ATTACK_DISABLE	82
 
 #define PROCESSOR_DESTROY_S			100
 #define PROCESSOR_RELEASE_S			101

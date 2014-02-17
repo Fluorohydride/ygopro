@@ -19,7 +19,6 @@ function c95503687.initial_effect(c)
 	e2:SetDescription(aux.Stringid(95503687,1))
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c95503687.discon)
 	e2:SetTarget(c95503687.distg)
@@ -42,9 +41,8 @@ function c95503687.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c95503687.spop(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsFaceup() and c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
@@ -56,7 +54,5 @@ function c95503687.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end
 function c95503687.disop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:GetControler()~=tp or not c:IsRelateToEffect(e) or c:IsFacedown() then return end
 	Duel.DiscardDeck(tp,3,REASON_EFFECT)
 end

@@ -35,5 +35,8 @@ function c36088082.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c36088082.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetOwner():GetBattleTarget(),REASON_EFFECT)
+	local tg=e:GetOwner():GetBattleTarget()
+	if tg then
+		Duel.Destroy(tg,REASON_EFFECT)
+	end
 end

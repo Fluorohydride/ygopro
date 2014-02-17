@@ -25,7 +25,9 @@ function c9354555.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c9354555.filter1,tp,LOCATION_HAND,0,nil)
 	if g:GetCount()<3 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	Duel.SendtoDeck(g:Select(tp,3,3,nil),nil,2,REASON_EFFECT)
+	local dg=g:Select(tp,3,3,nil)
+	Duel.ConfirmCards(1-tp,dg)
+	Duel.SendtoDeck(dg,nil,2,REASON_EFFECT)
 	local sg=Duel.GetMatchingGroup(c9354555.filter2,tp,LOCATION_DECK,0,nil)
 	if sg:GetCount()==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

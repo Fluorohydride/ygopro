@@ -21,5 +21,6 @@ function c6104968.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstMatchingCard(c6104968.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if tc and Duel.SelectYesNo(tp,aux.Stringid(6104968,1)) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)
+		Duel.ConfirmCards(1-tp,tc)
 	end
 end

@@ -26,6 +26,13 @@ function c72677437.initial_effect(c)
 	e3:SetTarget(c72677437.target)
 	e3:SetOperation(c72677437.operation)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e4:SetRange(LOCATION_MZONE)
+	e4:SetCode(EFFECT_IMMUNE_EFFECT)
+	e4:SetValue(c72677437.efilter)
+	c:RegisterEffect(e4)
 end
 function c72677437.splimit(e,se,sp,st)
 	return not se:GetHandler():IsType(TYPE_MONSTER)
@@ -54,4 +61,7 @@ function c72677437.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
 	end
+end
+function c72677437.efilter(e,te)
+	return te:GetHandler():IsCode(54306223)
 end

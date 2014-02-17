@@ -62,11 +62,11 @@ public:
 
 	int32 is_disable_related();
 	int32 is_available();
-	int32 is_activateable(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_action_check(uint8 playerid);
-	int32 is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
-	int32 is_condition_check(uint8 playerid, tevent& e);
-	int32 is_activate_check(uint8 playerid, tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
+	int32 is_condition_check(uint8 playerid, const tevent& e);
+	int32 is_activate_check(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_target(card* pcard);
 	int32 is_target_player(uint8 playerid);
 	int32 is_player_effect_target(card* pcard);
@@ -101,6 +101,7 @@ public:
 #define RESET_PHASE			0x0400
 #define RESET_CHAIN			0x0800
 #define RESET_EVENT			0x1000
+#define RESET_CARD			0x2000
 #define RESET_CODE			0x4000
 #define RESET_COPY			0x8000
 
@@ -261,6 +262,7 @@ public:
 #define EFFECT_REVERSE_UPDATE			108	//
 #define EFFECT_SWAP_AD					109	//
 #define EFFECT_SWAP_BASE_AD				110	//
+#define EFFECT_ADD_CODE					113	//
 #define EFFECT_CHANGE_CODE				114	//
 #define EFFECT_ADD_TYPE					115	//
 #define EFFECT_REMOVE_TYPE				116	//
@@ -273,6 +275,8 @@ public:
 #define EFFECT_CHANGE_ATTRIBUTE			127	//
 #define EFFECT_UPDATE_LEVEL				130	//
 #define EFFECT_CHANGE_LEVEL				131	//
+#define EFFECT_UPDATE_RANK				132 //
+#define EFFECT_CHANGE_RANK				133 //
 #define EFFECT_SET_POSITION				140 //
 #define EFFECT_SELF_DESTROY				141 //
 #define EFFECT_DOUBLE_TRIBUTE			150
@@ -347,6 +351,9 @@ public:
 #define EFFECT_BP_TWICE					296
 #define EFFECT_UNIQUE_CHECK				297
 #define EFFECT_MATCH_KILL				300
+#define EFFECT_SYNCHRO_CHECK			310
+#define EFFECT_QP_ACT_IN_NTPHAND		311
+#define EFFECT_MUST_BE_SMATERIAL		312
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001
@@ -408,9 +415,12 @@ public:
 #define EVENT_LEVEL_UP				1200
 #define EVENT_PAY_LPCOST			1201
 #define EVENT_DETACH_MATERIAL		1202
+#define EVENT_CONFIRM_DECKTOP		1203
+#define EVENT_CONFIRM_CARDS			1204
 #define EVENT_TURN_END				1210
 #define EVENT_PHASE					0x1000
 #define EVENT_PHASE_START			0x2000
+#define EVENT_PHASE_PRESTART		0x2100
 #define EVENT_ADD_COUNTER			0x10000
 #define EVENT_REMOVE_COUNTER		0x20000
 

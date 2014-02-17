@@ -16,6 +16,7 @@ function c29669359.initial_effect(c)
 	e1:SetOperation(c29669359.operation)
 	c:RegisterEffect(e1)
 end
+c29669359.xyz_number=61
 function c29669359.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
 		and not e:GetHandler():IsDirectAttacked() end
@@ -35,13 +36,15 @@ function c29669359.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c29669359.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c29669359.filter,tp,0,LOCATION_MZONE,1,1,nil)
+	local atk=g:GetFirst():GetTextAttack()
+	if atk<0 then atk=0 end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,g:GetFirst():GetTextAttack())
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
 end
 function c29669359.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsControler(1-tp) then
-		local atk=tc:GetBaseAttack()
+	if tc:IsRelateToEffect(e) and tc:IsControler(1-tp) then
+		local atk=tc:GetTextAttack()
 		if atk<0 then atk=0 end
 		if Duel.Destroy(tc,REASON_EFFECT)~=0 then
 			Duel.Damage(1-tp,atk,REASON_EFFECT)

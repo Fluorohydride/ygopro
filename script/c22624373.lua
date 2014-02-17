@@ -18,7 +18,6 @@ function c22624373.initial_effect(c)
 	e2:SetDescription(aux.Stringid(22624373,1))
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c22624373.discon)
 	e2:SetTarget(c22624373.distg)
@@ -62,7 +61,5 @@ function c22624373.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end
 function c22624373.disop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:GetControler()~=tp or not c:IsRelateToEffect(e) or c:IsFacedown() then return end
 	Duel.DiscardDeck(tp,3,REASON_EFFECT)
 end

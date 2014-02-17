@@ -51,12 +51,12 @@ function c9126351.tgfilter(c)
 	return c:IsLevelBelow(2) and c:IsAttribute(ATTRIBUTE_WATER) and c:IsRace(RACE_AQUA) and c:IsAbleToGrave()
 end
 function c9126351.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c9126351.tgfilter,tp,LOCATION_DECK+LOCATION_ONFIELD,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_ONFIELD)
+	if chk==0 then return Duel.IsExistingMatchingCard(c9126351.tgfilter,tp,LOCATION_DECK+LOCATION_MZONE,0,1,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK+LOCATION_MZONE)
 end
 function c9126351.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c9126351.tgfilter,tp,LOCATION_DECK+LOCATION_ONFIELD,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c9126351.tgfilter,tp,LOCATION_DECK+LOCATION_MZONE,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end

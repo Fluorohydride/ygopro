@@ -11,14 +11,12 @@ function c8632967.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetOperation(c8632967.sucop)
-	e2:SetReset(RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_CHAIN_END)
 	e3:SetOperation(c8632967.cedop)
-	e3:SetReset(RESET_PHASE+PHASE_END)
 	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
 end
@@ -27,7 +25,7 @@ function c8632967.chainlm(e,rp,tp)
 end
 function c8632967.sucfilter(c)
 	local st=c:GetSummonType()
-	return c:IsSetCard(0x604e) and st>=(SUMMON_TYPE_SPECIAL+150) and st<(SUMMON_TYPE_SPECIAL+180)
+	return c:IsSetCard(0x304e) and st>=(SUMMON_TYPE_SPECIAL+150) and st<(SUMMON_TYPE_SPECIAL+180)
 end
 function c8632967.sucop(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsExists(c8632967.sucfilter,1,nil) then

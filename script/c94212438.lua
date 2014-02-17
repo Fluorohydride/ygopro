@@ -69,16 +69,16 @@ function c94212438.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-function c94212438.cfilter2(c)
+function c94212438.cfilter2(c,tp)
 	local code=c:GetCode()
-	return code==94212438 or code==31893528 or code==67287533 or code==94772232 or code==30170981
+	return (code==94212438 or code==31893528 or code==67287533 or code==94772232 or code==30170981) and c:IsControler(tp)
 end
 function c94212438.cfilter3(c)
 	local code=c:GetCode()
 	return c:IsFaceup() and (code==94212438 or code==31893528 or code==67287533 or code==94772232 or code==30170981)
 end
 function c94212438.tgcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c94212438.cfilter2,1,nil)
+	return eg:IsExists(c94212438.cfilter2,1,nil,tp)
 end
 function c94212438.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c94212438.cfilter3,tp,LOCATION_SZONE,0,nil)

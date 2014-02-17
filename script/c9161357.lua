@@ -1,6 +1,6 @@
 --No.6 先史遺産アトランタル
 function c9161357.initial_effect(c)
-	--synchro summon
+	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
 	c:EnableReviveLimit()
 	--equip
@@ -25,11 +25,12 @@ function c9161357.initial_effect(c)
 	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
 end
+c9161357.xyz_number=6
 function c9161357.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ
 end
 function c9161357.filter(c)
-	return c:IsSetCard(0x48)
+	return c:IsSetCard(0x48) and c:IsType(TYPE_MONSTER)
 end
 function c9161357.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c9161357.filter(chkc) end

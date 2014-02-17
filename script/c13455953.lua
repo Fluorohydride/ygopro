@@ -30,9 +30,7 @@ function c13455953.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c13455953.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local pos=c:GetPreviousPosition()
-	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and bit.band(pos,POS_FACEUP)~=0
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c13455953.filter(c)
 	return c:IsSetCard(0x5042) and c:IsAbleToHand()
@@ -42,7 +40,7 @@ function c13455953.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c13455953.filter,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
 function c13455953.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

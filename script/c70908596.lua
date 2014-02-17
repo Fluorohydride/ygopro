@@ -22,10 +22,10 @@ function c70908596.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x53) and c:IsLevelAbove(1)
 end
 function c70908596.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c70908596.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c70908596.filter,tp,LOCATION_MZONE,0,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c70908596.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c70908596.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c70908596.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	local g=Duel.SelectTarget(tp,c70908596.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	local tc=g:GetFirst()
 	local op=0
 	if tc:GetLevel()==1 then op=Duel.SelectOption(tp,aux.Stringid(70908596,1))

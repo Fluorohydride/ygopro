@@ -91,7 +91,7 @@ function c74530899.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c74530899.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsRelateToEffect(e) then
 		Duel.SendtoDeck(c,nil,2,REASON_EFFECT)
 	end
 end

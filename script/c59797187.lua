@@ -11,8 +11,9 @@ function c59797187.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c59797187.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetBattleTarget():IsRelateToBattle() end
-	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler():GetBattleTarget(),1,0,0)
+	local tg=e:GetHandler():GetBattleTarget()
+	if chk==0 then return tg and tg:IsRelateToBattle() end
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,tg,1,0,0)
 end
 function c59797187.operation(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetHandler():GetBattleTarget()

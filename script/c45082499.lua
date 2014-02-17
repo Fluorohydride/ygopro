@@ -45,6 +45,7 @@ end
 function c45082499.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
+	if c:IsLocation(LOCATION_MZONE) and c:IsFacedown() then return end
 	local tc=Duel.GetFirstTarget()
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or tc:GetControler()~=tp or tc:IsFacedown() or not tc:IsRelateToEffect(e) or not c:CheckUniqueOnField(tp) then
 		Duel.SendtoGrave(c,REASON_EFFECT)

@@ -14,6 +14,7 @@ function c55727845.initial_effect(c)
 	e1:SetOperation(c55727845.atkop)
 	c:RegisterEffect(e1)
 end
+c55727845.xyz_number=96
 function c55727845.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -37,7 +38,7 @@ function c55727845.atkop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetValue(atk)

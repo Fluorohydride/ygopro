@@ -27,6 +27,7 @@ function c2061963.initial_effect(c)
 	e2:SetOperation(c2061963.deckop)
 	c:RegisterEffect(e2)
 end
+c2061963.xyz_number=104
 function c2061963.condition(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ph=Duel.GetCurrentPhase()
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and ep~=tp

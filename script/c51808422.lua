@@ -37,7 +37,7 @@ function c51808422.spcon(e,c)
 		Duel.IsExistingMatchingCard(c51808422.spfilter,c:GetControler(),LOCATION_MZONE,0,2,nil)
 end
 function c51808422.filter(c,e,tp)
-	return c:IsSetCard(0x100d) and c:GetLevel()<=4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x100d) and c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c51808422.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c51808422.filter(chkc,e,tp) end

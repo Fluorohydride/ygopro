@@ -31,12 +31,14 @@ function c1005587.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		tc=g:Select(tp,1,1,nil):GetFirst()
 	end
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_DISABLE)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
-	tc:RegisterEffect(e1)
-	Duel.AdjustInstantly()
-	Duel.NegateRelatedChain(tc,RESET_TURN_SET)
-	Duel.Destroy(tc,REASON_EFFECT)
+	if not tc:IsDisabled() then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_DISABLE)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		tc:RegisterEffect(e1)
+		Duel.AdjustInstantly()
+		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end

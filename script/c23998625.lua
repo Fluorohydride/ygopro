@@ -31,6 +31,7 @@ function c23998625.initial_effect(c)
 	e3:SetOperation(c23998625.spop)
 	c:RegisterEffect(e3)
 end
+c23998625.xyz_number=53
 function c23998625.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetCard(Duel.GetAttacker())

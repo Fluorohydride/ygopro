@@ -16,8 +16,7 @@ function c88753985.initial_effect(c)
 end
 function c88753985.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE)
-		and bit.band(c:GetBattlePosition(),POS_FACEUP)~=0 then
+	if c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:IsPreviousPosition(POS_FACEUP) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(88753985,0))
 		e1:SetCategory(CATEGORY_SPECIAL_SUMMON)

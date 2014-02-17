@@ -19,7 +19,7 @@ function c57103969.initial_effect(c)
 end
 function c57103969.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,57103969)==0 end
-	Duel.RegisterFlagEffect(tp,57103969,RESET_PHASE+PHASE_END,0,1)
+	Duel.RegisterFlagEffect(tp,57103969,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c57103969.filter(c)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_BEASTWARRIOR) and c:IsAbleToHand()

@@ -19,8 +19,8 @@ end
 function c97922283.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	local bc=tc:GetBattleTarget()
-	return tc:IsRelateToBattle() and tc:IsControler(tp) and tc:IsRace(RACE_BEAST)
-		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
+	return tc:IsRelateToBattle() and tc:IsControler(tp)
+		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE) and bc:IsType(TYPE_MONSTER)
 end
 function c97922283.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_BEAST)

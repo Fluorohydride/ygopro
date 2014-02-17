@@ -39,6 +39,14 @@ public:
 	static int32 card_get_defence(lua_State *L);
 	static int32 card_get_origin_defence(lua_State *L);
 	static int32 card_get_text_defence(lua_State *L);
+	static int32 card_get_previous_code_onfield(lua_State *L);
+	static int32 card_get_previous_type_onfield(lua_State *L);
+	static int32 card_get_previous_level_onfield(lua_State *L);
+	static int32 card_get_previous_rank_onfield(lua_State *L);
+	static int32 card_get_previous_attribute_onfield(lua_State *L);
+	static int32 card_get_previous_race_onfield(lua_State *L);
+	static int32 card_get_previous_attack_onfield(lua_State *L);
+	static int32 card_get_previous_defence_onfield(lua_State *L);
 	static int32 card_get_owner(lua_State *L);
 	static int32 card_get_controler(lua_State *L);
 	static int32 card_get_previous_controler(lua_State *L);
@@ -83,6 +91,7 @@ public:
 	static int32 card_get_union_count(lua_State *L);
 	static int32 card_get_overlay_group(lua_State *L);
 	static int32 card_get_overlay_count(lua_State *L);
+	static int32 card_get_overlay_target(lua_State *L);
 	static int32 card_check_remove_overlay_card(lua_State *L);
 	static int32 card_remove_overlay_card(lua_State *L);
 	static int32 card_get_attacked_group(lua_State *L);
@@ -194,7 +203,9 @@ public:
 	static int32 card_reverse_in_deck(lua_State *L);
 	static int32 card_set_unique_onfield(lua_State *L);
 	static int32 card_check_unique_onfield(lua_State *L);
-	
+	static int32 card_reset_negate_effect(lua_State *L);
+	static int32 card_assume_prop(lua_State *L);
+
 	//Effect functions
 	static int32 effect_new(lua_State *L);
 	static int32 effect_newex(lua_State *L);

@@ -1,4 +1,4 @@
---Giant Soldier of Steel
+--鋼鉄の巨兵
 function c57043117.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_ROCK),3),2)

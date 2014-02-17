@@ -35,7 +35,7 @@ function c75840616.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c75840616.filter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
-	if not tc:IsAbleToGrave() or (tc:IsAbleToHand() and Duel.SelectYesNo(tp,aux.Stringid(75840616,1))) then 
+	if tc and tc:IsAbleToHand() and (not tc:IsAbleToGrave() or Duel.SelectYesNo(tp,aux.Stringid(75840616,1))) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
 	else

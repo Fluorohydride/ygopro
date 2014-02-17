@@ -29,8 +29,7 @@ function c89310929.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
 function c89310929.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc=g:GetFirst()
+	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	local c=e:GetHandler()

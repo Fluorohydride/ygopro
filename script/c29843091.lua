@@ -34,6 +34,7 @@ function c29843091.activate(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetCode(EVENT_DESTROY)
 			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e2:SetOperation(c29843091.damop)
+			e2:SetReset(RESET_EVENT+0x1fe0000)
 			token:RegisterEffect(e2,true)
 		end
 	end

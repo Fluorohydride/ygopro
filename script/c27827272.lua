@@ -29,7 +29,8 @@ function c27827272.filter2(c,atk)
 	return c:IsFaceup() and c:IsDefenceBelow(atk) and c:IsDestructable()
 end
 function c27827272.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.IsExistingTarget(c27827272.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c27827272.filter(chkc,tp) end
+	if chk==0 then return Duel.IsExistingTarget(c27827272.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c27827272.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)
 	local dg=Duel.GetMatchingGroup(c27827272.filter2,tp,0,LOCATION_MZONE,nil,g:GetFirst():GetAttack())

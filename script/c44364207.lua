@@ -27,8 +27,8 @@ function c44364207.indesval(e,re)
 	return re:GetHandler():IsType(TYPE_TRAP)
 end
 function c44364207.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
-		and bit.band(e:GetHandler():GetBattlePosition(),POS_FACEUP)~=0
+	local c=e:GetHandler()
+	return c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c44364207.filter(c)
 	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetLevel()==4 and c:IsAbleToHand()

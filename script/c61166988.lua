@@ -3,6 +3,7 @@ function c61166988.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(c61166988.target)
@@ -12,7 +13,8 @@ end
 function c61166988.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_BEAST+RACE_BEASTWARRIOR)
 end
-function c61166988.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c61166988.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c61166988.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c61166988.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c61166988.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

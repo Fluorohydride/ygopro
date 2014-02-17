@@ -75,7 +75,7 @@ function c18631392.retop(code1,code2,code3)
 			end
 			if g:GetCount()~=0 then
 				Duel.DisableShuffleCheck()
-				Duel.SendtoGrave(g,REASON_EFFECT)
+				Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
 			end
 			if c:IsRelateToEffect(e) then
 				local e1=Effect.CreateEffect(c)

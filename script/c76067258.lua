@@ -33,6 +33,7 @@ function c76067258.initial_effect(c)
 	e3:SetTarget(c76067258.reptg)
 	c:RegisterEffect(e3)
 end
+c76067258.xyz_number=66
 function c76067258.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -52,16 +53,20 @@ function c76067258.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsFaceup() and c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
 		c:SetCardTarget(tc)
+		tc:RegisterFlagEffect(76067258,RESET_EVENT+0x1fe0000,0,0)
 	end
 end
 function c76067258.indtg(e,c)
-	return e:GetHandler():IsHasCardTarget(c)
+	return e:GetHandler():IsHasCardTarget(c) and c:GetFlagEffect(76067258)~=0
+end
+function c76067258.repfilter(c,tp)
+	return c:IsControler(tp) and c:GetFlagEffect(76067258)~=0
 end
 function c76067258.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFirstCardTarget()~=nil end
+	if chk==0 then return e:GetHandler():GetCardTarget():IsExists(c76067258.repfilter,1,nil,tp) end
 	if Duel.SelectYesNo(tp,aux.Stringid(76067258,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local g=e:GetHandler():GetCardTarget():Select(tp,1,1,nil)
+		local g=e:GetHandler():GetCardTarget():FilterSelect(tp,c76067258.repfilter,1,1,nil,tp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 		return true
 	else return false end

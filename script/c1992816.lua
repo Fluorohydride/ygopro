@@ -35,6 +35,7 @@ function c1992816.initial_effect(c)
 	e3:SetOperation(c1992816.daop)
 	c:RegisterEffect(e3)
 end
+c1992816.xyz_number=9
 function c1992816.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttackTarget() and e:GetHandler():GetOverlayCount()~=0
 end

@@ -19,7 +19,7 @@ function c22628574.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectMatchingCard(tp,c22628574.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
 end
-function c22628574.filter(c,e,tp,eg,ep,ev,re,r,rp)
+function c22628574.filter(c)
 	return c:GetType()==0x4 and not c:IsCode(22628574) and c:CheckActivateEffect(false,true,false)~=nil
 end
 function c22628574.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -32,6 +32,7 @@ function c22628574.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(22628574,0))
 	local g=Duel.SelectTarget(tp,c22628574.filter,tp,0,LOCATION_GRAVE,1,1,nil)
+	if not g then return false end
 	local te,eg,ep,ev,re,r,rp=g:GetFirst():CheckActivateEffect(false,true,true)
 	e:SetLabelObject(te)
 	Duel.ClearTargetCard()

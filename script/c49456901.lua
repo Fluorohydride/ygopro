@@ -28,6 +28,7 @@ function c49456901.initial_effect(c)
 	e2:SetOperation(c49456901.operation)
 	c:RegisterEffect(e2)
 end
+c49456901.xyz_number=104
 function c49456901.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
@@ -62,7 +63,7 @@ function c49456901.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.NegateActivation(ev) and Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)>0
 		and Duel.SelectYesNo(tp,aux.Stringid(49456901,2)) then
 		local g=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0):RandomSelect(1-tp,1)
-		Duel.SendtoGrave(g,REASON_DISCARD+REASON_EFFECT)
+		Duel.SendtoGrave(g,REASON_EFFECT)
 		Duel.SetLP(1-tp,Duel.GetLP(1-tp)/2)
 	end
 end

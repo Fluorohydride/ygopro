@@ -18,10 +18,23 @@ class duel;
 class effect;
 class group;
 
+struct card_data {
+	uint32 code;
+	uint32 alias;
+	uint64 setcode;
+	uint32 type;
+	uint32 level;
+	uint32 attribute;
+	uint32 race;
+	int32 attack;
+	int32 defence;
+};
+
 struct card_state {
 	uint32 code;
 	uint32 type;
 	uint32 level;
+	uint32 rank;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -89,6 +102,8 @@ public:
 	uint8 unique_pos[2];
 	uint16 unique_uid;
 	uint32 unique_code;
+	uint8 assume_type;
+	uint32 assume_value;
 	effect* unique_effect;
 	card* equiping_target;
 	card* pre_equip_target;
@@ -118,6 +133,7 @@ public:
 	void update_infos_nocache(int32 query_flag);
 	uint32 get_info_location();
 	uint32 get_code();
+	uint32 get_another_code();
 	int32 is_set_card(uint32 set_code);
 	uint32 get_type();
 	int32 get_base_attack(uint8 swap = FALSE);
@@ -220,9 +236,185 @@ public:
 	int32 is_control_can_be_changed();
 	int32 is_capable_be_battle_target(card* pcard);
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
-	int32 is_can_be_fusion_material();
+	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
 	int32 is_can_be_xyz_material(card* scard);
 };
+
+//Locations
+#define LOCATION_DECK		0x01		//
+#define LOCATION_HAND		0x02		//
+#define LOCATION_MZONE		0x04		//
+#define LOCATION_SZONE		0x08		//
+#define LOCATION_GRAVE		0x10		//
+#define LOCATION_REMOVED	0x20		//
+#define LOCATION_EXTRA		0x40		//
+#define LOCATION_OVERLAY	0x80		//
+#define LOCATION_ONFIELD	0x0c		//
+//Positions
+#define POS_FACEUP_ATTACK		0x1
+#define POS_FACEDOWN_ATTACK		0x2
+#define POS_FACEUP_DEFENCE		0x4
+#define POS_FACEDOWN_DEFENCE	0x8
+#define POS_FACEUP				0x5
+#define POS_FACEDOWN			0xa
+#define POS_ATTACK				0x3
+#define POS_DEFENCE				0xc
+#define NO_FLIP_EFFECT			0x10000
+//Types
+#define TYPE_MONSTER		0x1			//
+#define TYPE_SPELL			0x2			//
+#define TYPE_TRAP			0x4			//
+#define TYPE_NORMAL			0x10		//
+#define TYPE_EFFECT			0x20		//
+#define TYPE_FUSION			0x40		//
+#define TYPE_RITUAL			0x80		//
+#define TYPE_TRAPMONSTER	0x100		//
+#define TYPE_SPIRIT			0x200		//
+#define TYPE_UNION			0x400		//
+#define TYPE_DUAL			0x800		//
+#define TYPE_TUNER			0x1000		//
+#define TYPE_SYNCHRO		0x2000		//
+#define TYPE_TOKEN			0x4000		//
+#define TYPE_QUICKPLAY		0x10000		//
+#define TYPE_CONTINUOUS		0x20000		//
+#define TYPE_EQUIP			0x40000		//
+#define TYPE_FIELD			0x80000		//
+#define TYPE_COUNTER		0x100000	//
+#define TYPE_FLIP			0x200000	//
+#define TYPE_TOON			0x400000	//
+#define TYPE_XYZ			0x800000	//
+
+//Attributes
+#define ATTRIBUTE_EARTH		0x01		//
+#define ATTRIBUTE_WATER		0x02		//
+#define ATTRIBUTE_FIRE		0x04		//
+#define ATTRIBUTE_WIND		0x08		//
+#define ATTRIBUTE_LIGHT		0x10		//
+#define ATTRIBUTE_DARK		0x20		//
+#define ATTRIBUTE_DEVINE	0x40		//
+//Races
+#define RACE_WARRIOR		0x1			//
+#define RACE_SPELLCASTER	0x2			//
+#define RACE_FAIRY			0x4			//
+#define RACE_FIEND			0x8			//
+#define RACE_ZOMBIE			0x10		//
+#define RACE_MACHINE		0x20		//
+#define RACE_AQUA			0x40		//
+#define RACE_PYRO			0x80		//
+#define RACE_ROCK			0x100		//
+#define RACE_WINDBEAST		0x200		//
+#define RACE_PLANT			0x400		//
+#define RACE_INSECT			0x800		//
+#define RACE_THUNDER		0x1000		//
+#define RACE_DRAGON			0x2000		//
+#define RACE_BEAST			0x4000		//
+#define RACE_BEASTWARRIOR	0x8000		//
+#define RACE_DINOSAUR		0x10000		//
+#define RACE_FISH			0x20000		//
+#define RACE_SEASERPENT		0x40000		//
+#define RACE_REPTILE		0x80000		//
+#define RACE_PSYCHO			0x100000	//
+#define RACE_DEVINE			0x200000	//
+#define RACE_CREATORGOD		0x400000	//
+//Reason
+#define REASON_DESTROY		0x1		//
+#define REASON_RELEASE		0x2		//
+#define REASON_TEMPORARY	0x4		//
+#define REASON_MATERIAL		0x8		//
+#define REASON_SUMMON		0x10	//
+#define REASON_BATTLE		0x20	//
+#define REASON_EFFECT		0x40	//
+#define REASON_COST			0x80	//
+#define REASON_ADJUST		0x100	//
+#define REASON_LOST_TARGET	0x200	//
+#define REASON_RULE			0x400	//
+#define REASON_SPSUMMON		0x800	//
+#define REASON_DISSUMMON	0x1000	//
+#define REASON_FLIP			0x2000	//
+#define REASON_DISCARD		0x4000	//
+#define REASON_RDAMAGE		0x8000	//
+#define REASON_RRECOVER		0x10000	//
+#define REASON_RETURN		0x20000	//
+#define REASON_FUSION		0x40000	//
+#define REASON_SYNCHRO		0x80000	//
+#define REASON_RITUAL		0x100000	//
+#define REASON_XYZ			0x200000	//
+#define REASON_REPLACE		0x1000000	//
+#define REASON_DRAW			0x2000000	//
+#define REASON_REDIRECT		0x4000000	//
+//Summon Type
+#define SUMMON_TYPE_NORMAL	0x10000000
+#define SUMMON_TYPE_ADVANCE	0x11000000
+#define SUMMON_TYPE_DUAL	0x12000000
+#define SUMMON_TYPE_FLIP	0x20000000
+#define SUMMON_TYPE_SPECIAL	0x40000000
+#define SUMMON_TYPE_FUSION	0x43000000
+#define SUMMON_TYPE_RITUAL	0x45000000
+#define SUMMON_TYPE_SYNCHRO	0x46000000
+#define SUMMON_TYPE_XYZ		0x49000000
+//Status
+#define STATUS_DISABLED				0x0001	//
+#define STATUS_TO_ENABLE			0x0002	//
+#define STATUS_TO_DISABLE			0x0004	//
+#define STATUS_PROC_COMPLETE		0x0008	//
+#define STATUS_SET_TURN				0x0010	//
+#define STATUS_FLIP_SUMMONED		0x0020	//
+#define STATUS_REVIVE_LIMIT			0x0040	//
+#define STATUS_ATTACKED				0x0080	//
+#define STATUS_FORM_CHANGED			0x0100	//
+#define STATUS_SUMMONING			0x0200	//
+#define STATUS_EFFECT_ENABLED		0x0400	//
+#define STATUS_SUMMON_TURN			0x0800	//
+#define STATUS_DESTROY_CONFIRMED	0x1000	//
+#define STATUS_LEAVE_CONFIRMED		0x2000	//
+#define STATUS_BATTLE_DESTROYED		0x4000	//
+#define STATUS_COPYING_EFFECT		0x8000	//
+#define STATUS_CHAINING				0x10000	//
+#define STATUS_SUMMON_DISABLED		0x20000	//
+#define STATUS_ACTIVATE_DISABLED	0x40000	//
+#define STATUS_UNSUMMONABLE_CARD	0x80000	//
+#define STATUS_UNION				0x100000
+#define STATUS_ATTACK_CANCELED		0x200000
+#define STATUS_INITIALIZING			0x400000
+#define STATUS_ACTIVATED			0x800000
+#define STATUS_JUST_POS				0x1000000
+#define STATUS_CONTINUOUS_POS		0x2000000
+#define STATUS_IS_PUBLIC			0x4000000
+#define STATUS_ACT_FROM_HAND		0x8000000
+//Counter
+#define COUNTER_NEED_PERMIT		0x1000
+#define COUNTER_NEED_ENABLE		0x2000
+//Query list
+#define QUERY_CODE			0x1
+#define QUERY_POSITION		0x2
+#define QUERY_ALIAS			0x4
+#define QUERY_TYPE			0x8
+#define QUERY_LEVEL			0x10
+#define QUERY_RANK			0x20
+#define QUERY_ATTRIBUTE		0x40
+#define QUERY_RACE			0x80
+#define QUERY_ATTACK		0x100
+#define QUERY_DEFENCE		0x200
+#define QUERY_BASE_ATTACK	0x400
+#define QUERY_BASE_DEFENCE	0x800
+#define QUERY_REASON		0x1000
+#define QUERY_REASON_CARD	0x2000
+#define QUERY_EQUIP_CARD	0x4000
+#define QUERY_TARGET_CARD	0x8000
+#define QUERY_OVERLAY_CARD	0x10000
+#define QUERY_COUNTERS		0x20000
+#define QUERY_OWNER			0x40000
+#define QUERY_IS_DISABLED	0x80000
+#define QUERY_IS_PUBLIC		0x100000
+
+#define ASSUME_CODE			1
+#define ASSUME_TYPE			2
+#define ASSUME_LEVEL		3
+#define ASSUME_RANK			4
+#define ASSUME_ATTRIBUTE	5
+#define ASSUME_RACE			6
+#define ASSUME_ATTACK		7
+#define ASSUME_DEFENCE		8
 
 #endif /* CARD_H_ */

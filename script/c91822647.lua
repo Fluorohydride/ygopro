@@ -32,11 +32,13 @@ function c91822647.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c91822647.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	if g:GetFirst():IsRelateToEffect(e) and g:GetNext():IsRelateToEffect(e) then
-		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	local tg=g:Filter(Card.IsRelateToEffect,nil,e)
+	if tg:GetCount()==2 then
+		Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=Duel.SelectMatchingCard(tp,c91822647.filter2,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-		if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and sg:GetCount()>0 then 
+		if sg:GetCount()>0 then
 			Duel.BreakEffect()
 			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		end

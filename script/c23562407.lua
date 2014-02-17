@@ -1,4 +1,4 @@
---Noble Arms - Caliburn
+--聖剣カリバーン
 function c23562407.initial_effect(c)
 	c:SetUniqueOnField(1,0,23562407)
 	--Activate

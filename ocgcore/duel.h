@@ -35,6 +35,7 @@ public:
 	field* game_field;
 	mtrandom random;
 	std::set<card*> cards;
+	std::set<card*> assumes;
 	std::set<group*> groups;
 	std::set<group*> sgroups;
 	std::set<effect*> effects;
@@ -52,6 +53,7 @@ public:
 	void delete_group(group* pgroup);
 	void delete_effect(effect* peffect);
 	void release_script_group();
+	void restore_assumes();
 	int32 read_buffer(byte* buf);
 	void write_buffer32(uint32 value);
 	void write_buffer16(uint16 value);

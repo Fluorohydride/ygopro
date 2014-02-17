@@ -10,6 +10,7 @@ function c65824822.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c65824822.repop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():CancelToGrave(false)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 	if g:GetCount()>0 then
 		local sg=g:RandomSelect(1-tp,1,nil)

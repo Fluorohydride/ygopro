@@ -48,7 +48,7 @@ function c30230789.filter(c)
 	return c:IsSetCard(0x11) and c:IsAbleToHand()
 end
 function c30230789.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c30230789.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c30230789.op(e,tp,eg,ep,ev,re,r,rp)

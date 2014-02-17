@@ -2,46 +2,24 @@
 function c65303664.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetDescription(aux.Stringid(65303664,0))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCode(EVENT_DESTROY)
-	e1:SetOperation(c65303664.adjop)
+	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetCondition(c65303664.condition)
+	e1:SetCost(c65303664.cost)
+	e1:SetTarget(c65303664.target)
+	e1:SetOperation(c65303664.operation)
 	c:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(65303664,0))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetRange(LOCATION_HAND)
-	e2:SetCode(EVENT_BATTLE_DESTROYED)
-	e2:SetLabelObject(e1)
-	e2:SetCondition(c65303664.condition)
-	e2:SetCost(c65303664.cost)
-	e2:SetTarget(c65303664.target)
-	e2:SetOperation(c65303664.operation)
-	c:RegisterEffect(e2)
 end
-function c65303664.filter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsControler(tp) and c:IsRace(RACE_BEAST)
-end
-function c65303664.adjop(e,tp,eg,ep,ev,re,r,rp)
-	if bit.band(r,REASON_BATTLE)==0 then return end
-	local pg=e:GetLabelObject()
-	if pg then pg:DeleteGroup() end
-	local dg=eg:Filter(c65303664.filter,nil,tp)
-	e:SetLabelObject(dg)
-	dg:KeepAlive()
-end
-function c65303664.cfilter(c,dg)
-	return c:IsLocation(LOCATION_GRAVE) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and c:IsReason(REASON_BATTLE) and dg:IsContains(c)
+function c65303664.cfilter(c,tp)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEAST) and c:IsReason(REASON_BATTLE)
+		and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousControler()==tp
+		and bit.band(c:GetPreviousRaceOnField(),RACE_BEAST)~=0
 end
 function c65303664.condition(e,tp,eg,ep,ev,re,r,rp)
-	local de=e:GetLabelObject()
-	local dg=de:GetLabelObject()
-	if not dg then return false end
-	local res=eg:IsExists(c65303664.cfilter,1,nil,dg)
-	dg:DeleteGroup()
-	de:SetLabelObject(nil)
-	return res
+	return eg:IsExists(c65303664.cfilter,1,nil,tp)
 end
 function c65303664.rfiletr(c)
 	return c:IsRace(RACE_BEAST) and c:IsAbleToRemoveAsCost()

@@ -13,20 +13,20 @@ function c59019082.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c59019082.cfilter(c)
-	return c:GetPreviousLocation()==LOCATION_DECK
+	return c:IsPreviousLocation(LOCATION_DECK)
 end
 function c59019082.condtion(e,tp,eg,ep,ev,re,r,rp)
 	if not re then return false end
 	local rc=re:GetHandler()
 	return rp==tp and bit.band(r,REASON_EFFECT)~=0 and not rc:IsCode(59019082) and rc:IsSetCard(0x38) and rc:IsType(TYPE_MONSTER)
-		and eg:IsExists(c59019082.cfilter,1,nil)
+		and re:GetActivateLocation()==LOCATION_MZONE and eg:IsExists(c59019082.cfilter,1,nil)
 end
 function c59019082.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,2)
 end
 function c59019082.filter(c)
-	return c:GetLocation()==LOCATION_GRAVE and c:IsSetCard(0x38) and c:IsType(TYPE_MONSTER)
+	return c:IsLocation(LOCATION_GRAVE) and c:IsSetCard(0x38) and c:IsType(TYPE_MONSTER)
 end
 function c59019082.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

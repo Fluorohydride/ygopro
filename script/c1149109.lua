@@ -43,6 +43,6 @@ function c1149109.desop(e,tp,eg,ep,ev,re,r,rp)
 	ct=ct+1
 	c:SetTurnCounter(ct)
 	if ct==2 then
-		Duel.Destroy(c,REASON_EFFECT)
+		Duel.Destroy(c,REASON_RULE)
 	end
 end

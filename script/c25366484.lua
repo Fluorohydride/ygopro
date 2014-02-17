@@ -1,4 +1,4 @@
---E·HERO フレイム·ウィングマン
+--E·HERO シャイニング·フレア·ウィングマン
 function c25366484.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -40,8 +40,8 @@ function c25366484.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c25366484.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
+	local bc=e:GetHandler():GetBattleTarget()
+	Duel.SetTargetCard(bc)
 	local dam=bc:GetAttack()
 	if dam<0 then dam=0 end
 	Duel.SetTargetPlayer(1-tp)
@@ -49,8 +49,13 @@ function c25366484.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
 function c25366484.damop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Damage(p,d,REASON_EFFECT)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
+		local dam=tc:GetAttack()
+		if dam<0 then dam=0 end
+		Duel.Damage(p,dam,REASON_EFFECT)
+	end
 end
 function c25366484.atkup(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsSetCard,c:GetControler(),LOCATION_GRAVE,0,nil,0x3008)*300

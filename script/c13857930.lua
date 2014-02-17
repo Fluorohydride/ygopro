@@ -18,6 +18,13 @@ function c13857930.initial_effect(c)
 	e3:SetTarget(c13857930.target)
 	e3:SetOperation(c13857930.activate)
 	c:RegisterEffect(e3)
+	--add code
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e4:SetCode(EFFECT_ADD_CODE)
+	e4:SetValue(17732278)
+	c:RegisterEffect(e4)
 end
 function c13857930.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker() or e:GetHandler()==Duel.GetAttackTarget()

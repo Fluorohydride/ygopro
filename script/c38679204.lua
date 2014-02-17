@@ -23,13 +23,6 @@ function c38679204.initial_effect(c)
 	e2:SetTarget(c38679204.destg)
 	e2:SetOperation(c38679204.desop)
 	c:RegisterEffect(e2)
-	--equip limit
-	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_EQUIP_LIMIT)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e3:SetValue(c38679204.eqlimit)
-	c:RegisterEffect(e3)
 end
 function c38679204.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
@@ -50,10 +43,18 @@ function c38679204.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)
+		--equip limit
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EQUIP_LIMIT)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetValue(c38679204.eqlimit)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(e1)
 	end
 end
 function c38679204.eqlimit(e,c)
-	return c:GetControler()==e:GetHandler():GetControler()
+	return c:GetControler()==e:GetHandlerPlayer() or e:GetHandler():GetEquipTarget()==c
 end
 function c38679204.descon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetHandler():GetEquipTarget()

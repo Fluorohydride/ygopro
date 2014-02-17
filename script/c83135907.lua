@@ -52,7 +52,7 @@ function c83135907.desop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c83135907.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return bit.band(c:GetReason(),0x41)==0x41 and re:GetOwner():IsSetCard(0x24)
+	return bit.band(c:GetReason(),0x41)==0x41 and re and re:GetOwner():IsSetCard(0x24)
 end
 function c83135907.filter(c)
 	return c:IsSetCard(0x24) and c:IsType(TYPE_MONSTER) and c:GetCode()~=83135907 and c:IsAbleToHand()

@@ -17,6 +17,7 @@ function c48995978.initial_effect(c)
 	e1:SetOperation(c48995978.operation)
 	c:RegisterEffect(e1)
 end
+c48995978.xyz_number=88
 function c48995978.filter(c)
 	return c:GetSequence()~=5
 end

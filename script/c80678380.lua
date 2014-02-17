@@ -15,7 +15,7 @@ function c80678380.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end
 function c80678380.cfilter(c)
-	return c:IsSetCard(0x50) and not c:IsPublic()
+	return c:IsSetCard(0x50) and c:IsType(TYPE_MONSTER) and not c:IsPublic()
 end
 function c80678380.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c80678380.cfilter,tp,LOCATION_HAND,0,1,nil) end

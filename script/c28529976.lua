@@ -32,7 +32,7 @@ function c28529976.filter(c,lv,e,tp)
 	return c:GetLevel()<=lv and c:IsRace(RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c28529976.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(tp,c28529976.cfilter,1,nil,e,tp) end
 	local rg=Duel.SelectReleaseGroup(tp,c28529976.cfilter,1,1,nil,e,tp)
 	e:SetLabel(rg:GetFirst():GetLevel()+3)
@@ -62,5 +62,5 @@ function c28529976.descon2(e,tp,eg,ep,ev,re,r,rp)
 	return tc and eg:IsContains(tc)
 end
 function c28529976.desop2(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(), REASON_EFFECT)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
