@@ -64,7 +64,7 @@ function c46925518.operation(e,tp,eg,ep,ev,re,r,rp)
 	if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(46925518,1)) then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local tg=g:Select(tp,1,1,nil)
+		local tg=sg:Select(tp,1,1,nil)
 		if Duel.SpecialSummon(tg,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)~=0 then
 			Duel.ConfirmCards(1-tp,tg)
 		end

@@ -21,23 +21,41 @@ function c29223325.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c29223325.filter(c)
-	return c:IsSetCard(0x97) and c:IsType(TYPE_MONSTER) and c:IsSSetable()
+	return c:IsSetCard(0x97) and c:IsType(TYPE_MONSTER) and c:IsSSetable(true)
 end
 function c29223325.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
+function c29223325.desfilter2(c)
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable() and c:GetSequence()~=5
+end
 function c29223325.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c29223325.desfilter(chkc) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingTarget(c29223325.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
-		and Duel.IsExistingMatchingCard(c29223325.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then
+		if not Duel.IsExistingMatchingCard(c29223325.filter,tp,LOCATION_DECK,0,1,nil) then return false end
+		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
+		if e:GetHandler():IsLocation(LOCATION_HAND) then ft=ft-1 end
+		if ft<0 then return false
+		elseif ft>0 then
+			return Duel.IsExistingTarget(c29223325.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
+		else
+			return Duel.IsExistingTarget(c29223325.desfilter2,tp,LOCATION_SZONE,0,1,e:GetHandler())
+		end
+	end
+	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
+	local g=nil
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c29223325.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	if ft>0 then
+		g=Duel.SelectTarget(tp,c29223325.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
+	else
+		g=Duel.SelectTarget(tp,c29223325.desfilter2,tp,LOCATION_SZONE,0,1,1,e:GetHandler())
+	end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c29223325.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
+		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 		local g=Duel.SelectMatchingCard(tp,c29223325.filter,tp,LOCATION_DECK,0,1,1,nil)
 		if g:GetCount()>0 then

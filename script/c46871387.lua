@@ -25,7 +25,8 @@ function c46871387.initial_effect(c)
 end
 c46871387.xyz_number=55
 function c46871387.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,46871387)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,46871387)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	Duel.RegisterFlagEffect(tp,46871387,RESET_PHASE+PHASE_END,0,1)
 end
 function c46871387.filter(c)

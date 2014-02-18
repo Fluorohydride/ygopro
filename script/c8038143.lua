@@ -21,6 +21,7 @@ function c8038143.cfilter(c)
 end
 function c8038143.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c8038143.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and rp~=tp and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
 end
 function c8038143.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -28,10 +29,10 @@ function c8038143.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local dg=Group.CreateGroup()
 	for i=1,ev do
 		local te,tgp=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
-		if tgp~=tp and (te:IsActiveType(TYPE_MONSTER) or te:IsHasType(EFFECT_TYPE_ACTIVATE)) then
+		if tgp~=tp then
 			local tc=te:GetHandler()
 			ng:AddCard(tc)
-			if tc:IsOnField() and tc:IsRelateToEffect(te) and tc:IsAbleToDeck() then
+			if tc:IsOnField() and tc:IsRelateToEffect(te) then
 				dg:AddCard(tc)
 			end
 		end
@@ -44,10 +45,10 @@ function c8038143.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Group.CreateGroup()
 	for i=1,ev do
 		local te,tgp=Duel.GetChainInfo(i,CHAININFO_TRIGGERING_EFFECT,CHAININFO_TRIGGERING_PLAYER)
-		if tgp~=tp and (te:IsActiveType(TYPE_MONSTER) or te:IsHasType(EFFECT_TYPE_ACTIVATE)) then
+		if tgp~=tp then
 			Duel.NegateActivation(i)
 			local tc=te:GetHandler()
-			if tc:IsRelateToEffect(e) and tc:IsRelateToEffect(te) and tc:IsAbleToDeck() then
+			if tc:IsRelateToEffect(e) and tc:IsRelateToEffect(te) then
 				tc:CancelToGrave()
 				dg:AddCard(tc)
 			end

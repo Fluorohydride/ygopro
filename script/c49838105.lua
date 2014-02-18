@@ -20,8 +20,7 @@ function c49838105.initial_effect(c)
 	e3:SetDescription(aux.Stringid(49838105,1))
 	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_PHASE+PHASE_DRAW)
-	e3:SetCountLimit(1)
+	e3:SetCode(EVENT_PREDRAW)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCondition(c49838105.cfcon)
 	e3:SetTarget(c49838105.cftg)
@@ -75,11 +74,12 @@ function c49838105.cfop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmDecktop(tp,1)
 		local g=Duel.GetDecktopGroup(tp,1)
 		local tc=g:GetFirst()
+		Duel.DisableShuffleCheck()
 		if tc:IsRace(RACE_PLANT) then
-			Duel.DisableShuffleCheck()
 			Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 		else
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ShuffleHand(tp)
 		end
 	end
 end

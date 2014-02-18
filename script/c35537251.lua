@@ -12,6 +12,25 @@ function c35537251.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c35537251.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,35537251)==0 end
+	Duel.RegisterFlagEffect(tp,35537251,RESET_PHASE+PHASE_END,0,1)
+end
+function c35537251.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then
+		local g=Group.CreateGroup()
+		for i=0,4 do
+			local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
+			if tc and tc:IsFaceup() and tc:IsSetCard(0x84) and tc:IsType(TYPE_XYZ) then
+				g:Merge(tc:GetOverlayGroup())
+			end
+		end
+		if g:GetCount()==0 then return false end
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false)
+	end
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+end
+function c35537251.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Group.CreateGroup()
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
@@ -19,18 +38,10 @@ function c35537251.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 			g:Merge(tc:GetOverlayGroup())
 		end
 	end
-	if chk==0 then return g:GetCount()>0 and Duel.GetFlagEffect(tp,35537251)==0 end
+	if g:GetCount()==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVEXYZ)
 	local sg=g:Select(tp,1,1,nil)
-	Duel.SendtoGrave(sg,REASON_COST)
-	Duel.RegisterFlagEffect(tp,35537251,RESET_PHASE+PHASE_END,0,1)
-end
-function c35537251.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-end
-function c35537251.spop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.SendtoGrave(sg,REASON_EFFECT)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end

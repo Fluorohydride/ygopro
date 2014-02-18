@@ -47,7 +47,8 @@ function c95239444.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c95239444.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
+		and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 end
 function c95239444.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -65,6 +66,7 @@ function c95239444.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local tg=Duel.SelectMatchingCard(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,sg:GetCount(),c)
 		if tg:GetCount()>0 then
+			Duel.BreakEffect()
 			Duel.DisableShuffleCheck(false)
 			Duel.SendtoHand(tg,nil,REASON_EFFECT)
 		end

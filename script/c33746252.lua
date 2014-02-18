@@ -13,7 +13,7 @@ function c33746252.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
-	e2:SetTarget(c33746252.aclimit)
+	e2:SetValue(c33746252.aclimit)
 	c:RegisterEffect(e2)
 end
 function c33746252.aclimit(e,re,tp)
