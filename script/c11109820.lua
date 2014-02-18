@@ -19,11 +19,11 @@ end
 function c11109820.filter2(c,e,tp,rk,ft)
 	if c:IsControler(tp) then ft=ft+1 end
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-		and Duel.IsExistingMatchingCard(c11109820.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rk+c:GetRank(),ft)
+		and ft>0 and Duel.IsExistingMatchingCard(c11109820.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,rk+c:GetRank())
 end
-function c11109820.spfilter(c,e,tp,rk,ft)
+function c11109820.spfilter(c,e,tp,rk)
 	local crk=c:GetRank()
-	return ft>0 and (crk==rk or crk==rk-1) and not c:IsSetCard(0x48) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return (crk==rk or crk==rk-1) and not c:IsSetCard(0x48) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c11109820.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -48,7 +48,8 @@ function c11109820.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if tc1:IsControler(tp) then ft=ft+1 end
 	if tc2:IsControler(tp) then ft=ft+1 end
-	local sg=Duel.GetMatchingGroup(c11109820.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp,tc1:GetRank()+tc2:GetRank(),ft)
+	if ft<=0 then return end
+	local sg=Duel.GetMatchingGroup(c11109820.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp,tc1:GetRank()+tc2:GetRank())
 	if sg:GetCount()==0 then return end
 	Duel.SendtoGrave(g,REASON_EFFECT)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

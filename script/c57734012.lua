@@ -27,7 +27,7 @@ function c57734012.regop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_PUBLIC)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_MAIN1)
 		c:RegisterEffect(e1)
 		c:RegisterFlagEffect(57734012,RESET_PHASE+PHASE_MAIN1,0,1)
 	end

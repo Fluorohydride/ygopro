@@ -79,6 +79,7 @@ function c49838105.cfop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 		else
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
+			Duel.ShuffleHand(tp)
 		end
 	end
 end
