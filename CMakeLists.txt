@@ -38,4 +38,5 @@ endif ()
 add_subdirectory (netc)
 add_subdirectory (sqlite3)
 add_subdirectory (lzma)
-
+add_subdirectory (ocgcore)
+add_subdirectory (nets)

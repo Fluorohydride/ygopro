@@ -569,14 +569,14 @@ void field::swap_deck_and_grave(uint8 playerid) {
 	}
 	player[playerid].list_grave.swap(player[playerid].list_main);
 	card_vector ex;
-	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ) {
+	for(auto clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ) {
 		if((*clit)->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) {
 			ex.push_back(*clit);
 			clit = player[playerid].list_main.erase(clit);
 		} else
 			++clit;
 	}
-	for(clit = player[playerid].list_grave.begin(); clit != player[playerid].list_grave.end(); ++clit) {
+	for(auto clit = player[playerid].list_grave.begin(); clit != player[playerid].list_grave.end(); ++clit) {
 		(*clit)->current.location = LOCATION_GRAVE;
 		(*clit)->current.reason = REASON_EFFECT;
 		(*clit)->current.reason_effect = core.reason_effect;
@@ -584,7 +584,7 @@ void field::swap_deck_and_grave(uint8 playerid) {
 		(*clit)->apply_field_effect();
 		(*clit)->enable_field_effect(true);
 	}
-	for(clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
+	for(auto clit = player[playerid].list_main.begin(); clit != player[playerid].list_main.end(); ++clit) {
 		(*clit)->current.location = LOCATION_DECK;
 		(*clit)->current.reason = REASON_EFFECT;
 		(*clit)->current.reason_effect = core.reason_effect;
@@ -592,7 +592,7 @@ void field::swap_deck_and_grave(uint8 playerid) {
 		(*clit)->apply_field_effect();
 		(*clit)->enable_field_effect(true);
 	}
-	for(clit = ex.begin(); clit != ex.end(); ++clit) {
+	for(auto clit = ex.begin(); clit != ex.end(); ++clit) {
 		(*clit)->current.location = LOCATION_EXTRA;
 		(*clit)->current.reason = REASON_EFFECT;
 		(*clit)->current.reason_effect = core.reason_effect;
@@ -1461,7 +1461,6 @@ void field::attack_all_target_check() {
 		core.attacker->attack_all_target = FALSE;
 }
 int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max) {
-	card* tuner;
 	if(core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 		effect_set eset;
 		filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
@@ -1504,7 +1503,7 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			card_vector nsyn;
 			for(uint8 p = 0; p < 2; ++p) {
 				for(int32 i = 0; i < 5; ++i) {
-					pm = player[p].list_mzone[i];
+					auto pm = player[p].list_mzone[i];
 					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
 						if(pcheck)
 							pcheck->get_value(pm);

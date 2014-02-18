@@ -2382,9 +2382,9 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 			dest = (cit->operation_param >> 8) & 0xff;
 			if(!dest)
 				dest = LOCATION_GRAVE;
-			if((dest == LOCATION_HAND && !(*cit)->is_capable_send_to_hand(reason_player))
-			        || (dest == LOCATION_DECK && !(*cit)->is_capable_send_to_deck(reason_player))
-			        || (dest == LOCATION_REMOVED && !(*cit)->is_removeable(reason_player)))
+			if((dest == LOCATION_HAND && !cit->is_capable_send_to_hand(reason_player))
+			        || (dest == LOCATION_DECK && !cit->is_capable_send_to_deck(reason_player))
+			        || (dest == LOCATION_REMOVED && !cit->is_removeable(reason_player)))
 				dest = LOCATION_GRAVE;
 			cit->operation_param = (cit->operation_param & 0xffff00ff) + (dest << 8);
 		}
@@ -3634,7 +3634,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 						card_vector nsyn;
 						for(uint8 np = 0; np < 2; ++np) {
 							for(int32 j = 0; j < 5; ++j) {
-								pm = player[np].list_mzone[j];
+								auto pm = player[np].list_mzone[j];
 								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
 									if(pcheck)
 										pcheck->get_value(pm);

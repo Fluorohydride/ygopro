@@ -55,9 +55,8 @@ int32 field::select_battle_command(uint16 step, uint8 playerid) {
 	} else {
 		uint32 t = returns.ivalue[0] & 0xffff;
 		uint32 s = returns.ivalue[0] >> 16;
-		if(t < 0 || t > 3 || s < 0
-		        || (t == 0 && s >= core.select_chains.size())
-		        || (t == 1 && s >= core.attackable_cards.size())
+		if(t > 3 || (t == 0 && s >= core.select_chains.size())
+                || (t == 1 && s >= core.attackable_cards.size())
 		        || (t == 2 && !core.to_m2)
 		        || (t == 3 && !core.to_ep)) {
 			pduel->write_buffer8(MSG_RETRY);
@@ -143,8 +142,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 	} else {
 		uint32 t = returns.ivalue[0] & 0xffff;
 		uint32 s = returns.ivalue[0] >> 16;
-		if(t < 0 || t > 7 || s < 0
-		        || (t == 0 && s >= core.summonable_cards.size())
+		if(t > 7 || (t == 0 && s >= core.summonable_cards.size())
 		        || (t == 1 && s >= core.spsummonable_cards.size())
 		        || (t == 2 && s >= core.repositionable_cards.size())
 		        || (t == 3 && s >= core.msetable_cards.size())

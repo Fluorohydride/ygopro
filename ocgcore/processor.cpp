@@ -1266,9 +1266,9 @@ int32 field::check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, i
 		if(eit.event_code == peffect->code &&
 		        peffect->is_activate_ready(playerid, eit, neglect_con, neglect_cost, FALSE)) {
 			if(pe)
-				*pe = *eit;
+				*pe = eit;
 			if(copy_info && !pduel->lua->no_action && core.current_chain.size()) {
-				core.current_chain.back().evt = *eit;
+				core.current_chain.back().evt = eit;
 			}
 			return TRUE;
 		}
@@ -1277,9 +1277,9 @@ int32 field::check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, i
 		if(eit.event_code == peffect->code &&
 		        peffect->is_activate_ready(playerid, eit, neglect_con, neglect_cost, FALSE)) {
 			if(pe)
-				*pe = *eit;
+				*pe = eit;
 			if(copy_info && !pduel->lua->no_action && core.current_chain.size()) {
-				core.current_chain.back().evt = *eit;
+				core.current_chain.back().evt = eit;
 			}
 			return TRUE;
 		}
@@ -1958,7 +1958,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			while(pev || (evit != core.instant_event.end())) {
 				auto pr = effects.activate_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
-					peffect = pr.first->second;
+					effect* peffect = pr.first->second;
 					peffect->s_range = peffect->handler->current.location;
 					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, *evit)) {
@@ -1977,7 +1977,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				}
 				pr = effects.quick_o_effect.equal_range(evit->event_code);
 				for(; pr.first != pr.second; ++pr.first) {
-					peffect = pr.first->second;
+					effect* peffect = pr.first->second;
 					peffect->s_range = peffect->handler->current.location;
 					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, *evit)) {
@@ -2003,10 +2003,10 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			for(auto& clit : core.new_ochain_h) {
 				effect* peffect = clit.triggering_effect;
 				bool act = true;
-				if(clit->triggering_player == priority && !peffect->handler->is_status(STATUS_CHAINING) && peffect->handler->is_has_relation(peffect)
-				        && peffect->is_chainable(priority) && peffect->is_activateable(priority, clit->evt, TRUE)) {
-					for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
-						if(cait->triggering_player == priority) {
+				if(clit.triggering_player == priority && !peffect->handler->is_status(STATUS_CHAINING) && peffect->handler->is_has_relation(peffect)
+				        && peffect->is_chainable(priority) && peffect->is_activateable(priority, clit.evt, TRUE)) {
+					for(auto& cait : core.current_chain) {
+						if(cait.triggering_player == priority) {
 							if(!(peffect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
 								if(cait.triggering_location == LOCATION_HAND || cait.triggering_effect->handler->data.code == peffect->handler->data.code) {
 									act = false;
@@ -2026,7 +2026,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			}
 			if(core.global_flag & GLOBALFLAG_DELAYED_QUICKEFFECT) {
 				for(auto eit = core.delayed_quick.begin(); eit != core.delayed_quick.end(); ++eit) {
-					peffect = eit->first;
+					effect* peffect = eit->first;
 					peffect->s_range = peffect->handler->current.location;
 					peffect->o_range = peffect->handler->current.sequence;
 					const tevent& evt = eit->second;
@@ -2048,7 +2048,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				nil_event.event_code = EVENT_FREE_CHAIN;
 				auto pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
-					peffect = pr.first->second;
+					effect* peffect = pr.first->second;
 					peffect->s_range = peffect->handler->current.location;
 					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
@@ -2067,7 +2067,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				}
 				pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
-					peffect = pr.first->second;
+					effect* peffect = pr.first->second;
 					peffect->s_range = peffect->handler->current.location;
 					peffect->o_range = peffect->handler->current.sequence;
 					if(peffect->is_chainable(priority) && peffect->is_activateable(priority, nil_event)) {
@@ -2234,14 +2234,14 @@ int32 field::process_instant_event() {
 		pr = effects.activate_effect.equal_range(elit.event_code);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if((peffect->flag & EFFECT_FLAG_DELAY) && peffect->is_condition_check(peffect->handler->current.controler, *elit))
-				core.delayed_quick_tmp.insert(make_pair(peffect, *elit));
+			if((peffect->flag & EFFECT_FLAG_DELAY) && peffect->is_condition_check(peffect->handler->current.controler, elit))
+				core.delayed_quick_tmp.insert(make_pair(peffect, elit));
 		}
 		pr = effects.quick_o_effect.equal_range(elit.event_code);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if((peffect->flag & EFFECT_FLAG_DELAY) && peffect->is_condition_check(peffect->handler->current.controler, *elit))
-				core.delayed_quick_tmp.insert(make_pair(peffect, *elit));
+			if((peffect->flag & EFFECT_FLAG_DELAY) && peffect->is_condition_check(peffect->handler->current.controler, elit))
+				core.delayed_quick_tmp.insert(make_pair(peffect, elit));
 		}
 	}
 	for(eit = tp.begin(), evit = tev.begin(); eit != tp.end(); ++eit, ++evit) {
@@ -2272,7 +2272,7 @@ int32 field::process_single_event() {
 		starget = elit.trigger_card;
 		ev = elit.event_code;
 		auto pr = starget->single_effect.equal_range(ev);
-		const tevent& e = *elit;
+		const tevent& e = elit;
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
 			if(!(peffect->type & EFFECT_TYPE_ACTIONS))
@@ -2392,7 +2392,7 @@ int32 field::process_idle_command(uint16 step) {
 		}
 		auto pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
+			effect* peffect = pr.first->second;
 			peffect->s_range = peffect->handler->current.location;
 			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
@@ -2401,15 +2401,15 @@ int32 field::process_idle_command(uint16 step) {
 		}
 		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
+			effect* peffect = pr.first->second;
 			peffect->s_range = peffect->handler->current.location;
 			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
 			if(peffect->is_activateable(infos.turn_player, nil_event))
 				core.select_chains.push_back(newchain);
 		}
-		for(eit = effects.ignition_effect.begin(); eit != effects.ignition_effect.end(); ++eit) {
-			peffect = eit->second;
+		for(auto& eit : effects.ignition_effect) {
+			effect* peffect = eit.second;
 			peffect->s_range = peffect->handler->current.location;
 			peffect->o_range = peffect->handler->current.sequence;
 			newchain.triggering_effect = peffect;
@@ -2598,7 +2598,6 @@ int32 field::process_battle_command(uint16 step) {
 	case 0: {
 		pair<effect_container::iterator, effect_container::iterator> pr;
 		effect* peffect = 0;
-		card* pcard = 0;
 		core.select_chains.clear();
 		chain newchain;
 		nil_event.event_code = EVENT_FREE_CHAIN;
@@ -4106,7 +4105,7 @@ int32 field::add_chain(uint16 step) {
 		clit->disable_reason = 0;
 		clit->disable_player = PLAYER_NONE;
 		clit->replace_op = 0;
-		if((phandler->current.location == LOCATION_HAND))
+		if(phandler->current.location == LOCATION_HAND)
 			clit->flag |= CHAIN_HAND_EFFECT;
 		core.current_chain.push_back(*clit);
 		// triggered events which are not caused by RaiseEvent create relation with the handler
