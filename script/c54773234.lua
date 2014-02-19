@@ -4,8 +4,12 @@ function c54773234.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e1:SetCondition(c54773234.condition)
 	e1:SetOperation(c54773234.activate)
 	c:RegisterEffect(e1)
+end
+function c54773234.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetAttackTarget()~=nil
 end
 function c54773234.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
