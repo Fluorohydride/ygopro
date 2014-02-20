@@ -86,6 +86,7 @@ function c11221418.limcon(e)
 	return e:GetLabelObject():GetLabel()<3
 end
 function c11221418.countop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetTurnPlayer()~=tp then return end
 	local ct=e:GetLabel()
 	e:SetLabel(ct+1)
 end

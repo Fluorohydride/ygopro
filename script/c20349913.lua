@@ -20,7 +20,7 @@ function c20349913.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c20349913.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,20349913)==0
-		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
 	Duel.RegisterFlagEffect(tp,20349913,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
