@@ -1,6 +1,10 @@
 #include <iostream>
+#include <thread>
+#include "card_data_s.h"
+#include <chrono>
 
 int main(int argc, char** argv) {
-    std::cout << "ygo duel server" << std::endl;
+    if(!ygopro::dataMgrs.LoadDatas("../ygo/cards.cdb"))
+        return 0;
     return 0;
 }

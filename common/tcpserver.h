@@ -83,7 +83,7 @@ public:
 	// |              |                        |   proto(8bit)   |       data      |
 	// |    16 bits   |         32 bits        |          packet_size bits         |
 	// packet_size must less then 1024
-	virtual void ClientConnectionSeed::HandleData(bufferevent* bev) {
+	virtual void HandleData(bufferevent* bev) {
 		evbuffer* input = bufferevent_get_input(bev);
 		size_t len = evbuffer_get_length(input);
 		unsigned short packet_len = 0;
@@ -130,9 +130,9 @@ public:
 			return;
 		evconnlistener_set_error_cb(listener, AcceptErrorCallback);
 		event_base_dispatch(loop_base);
-		for(auto bit = connections.begin(); bit != connections.end(); ++bit) {
-			bufferevent_disable((*bit)->bev, EV_READ);
-			bufferevent_free((*bit)->bev);
+		for(auto bit : connections) {
+			bufferevent_disable(bit->bev, EV_READ);
+			bufferevent_free(bit->bev);
 		}
 		connections.clear();
 		evconnlistener_free(listener);
