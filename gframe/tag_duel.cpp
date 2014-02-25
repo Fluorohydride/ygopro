@@ -1525,8 +1525,6 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 	BufferIO::WriteInt8(qbuf, location);
 	BufferIO::WriteInt8(qbuf, sequence);
 	int len = query_card(pduel, player, location, sequence, flag, (unsigned char*)qbuf, 0);
-	if(location == LOCATION_REMOVED && (qbuf[15] & POS_FACEDOWN))
-		return;
 	if(location & LOCATION_ONFIELD) {
 		int pid = (player == 0) ? 0 : 2;
 		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
@@ -1535,9 +1533,15 @@ void TagDuel::RefreshSingle(int player, int location, int sequence, int flag) {
 			pid = 2 - pid;
 			NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
 			NetServer::ReSendToPlayer(players[pid + 1]);
+			for(auto pit = observers.begin(); pit != observers.end(); ++pit)
+				NetServer::ReSendToPlayer(*pit);
 		}
 	} else {
-		NetServer::SendBufferToPlayer(cur_player[player], STOC_GAME_MSG, query_buffer, len + 4);
+		int pid = (player == 0) ? 0 : 2;
+		NetServer::SendBufferToPlayer(players[pid], STOC_GAME_MSG, query_buffer, len + 4);
+		NetServer::ReSendToPlayer(players[pid + 1]);
+		if(location == LOCATION_REMOVED && (qbuf[15] & POS_FACEDOWN))
+			return;
 		if (location & 0x90) {
 			for(int i = 0; i < 4; ++i)
 				if(players[i] != cur_player[player])
