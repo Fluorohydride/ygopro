@@ -810,8 +810,9 @@ void field::reset_chain() {
 void field::filter_field_effect(uint32 code, effect_set* eset, uint8 sort) {
 	effect* peffect;
 	auto rg = effects.aura_effect.equal_range(code);
-	for (; rg.first != rg.second; ++rg.first) {
+	for (; rg.first != rg.second; ) {
 		peffect = rg.first->second;
+		++rg.first;
 		if (peffect->is_available())
 			eset->add_item(peffect);
 	}
