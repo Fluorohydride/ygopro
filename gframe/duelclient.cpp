@@ -578,6 +578,8 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 					break;
 				player = 10;
 			}
+			else if(mainGame->chkIgnore2->isChecked())
+				break; 
 		}
 		wchar_t msg[256];
 		BufferIO::CopyWStr(pkt->msg, msg, 256);
