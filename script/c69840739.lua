@@ -61,7 +61,7 @@ function c69840739.repop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c69840739.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return (Duel.IsPlayerCanDraw(tp) or Duel.IsPlayerCanDraw(1-tp))
+	if chk==0 then return (Duel.IsPlayerCanDraw(tp) and Duel.IsPlayerCanDraw(1-tp))
 		and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,LOCATION_HAND,LOCATION_HAND,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,PLAYER_ALL,LOCATION_HAND)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)
