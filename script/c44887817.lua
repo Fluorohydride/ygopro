@@ -28,7 +28,6 @@ function c44887817.initial_effect(c)
 end
 function c44887817.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) end
-	local c=e:GetHandler()
 end
 function c44887817.filter(c,e,tp)
 	return c:IsRace(RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -57,7 +56,7 @@ function c44887817.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone(e1)
 		e2:SetCode(EFFECT_CANNOT_MSET)
 		Duel.RegisterEffect(e2,tp)
-		end
+	end
 end
 function c44887817.dfilter(c,sg)
 	return sg:IsContains(c)

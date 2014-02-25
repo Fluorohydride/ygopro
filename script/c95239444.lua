@@ -38,7 +38,6 @@ end
 function c95239444.stop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct then
-		Duel.ConfirmDecktop(tp,ct)
 		Duel.SortDecktop(tp,tp,ct)
 	end
 end

@@ -19,7 +19,7 @@ function c49838105.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(49838105,1))
 	e3:SetCategory(CATEGORY_TOHAND)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PREDRAW)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCondition(c49838105.cfcon)
@@ -47,8 +47,7 @@ function c49838105.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c49838105.cfcon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
-		and Duel.GetDrawCount(tp)>0
+	return tp==Duel.GetTurnPlayer() and Duel.GetDrawCount(tp)>0
 end
 function c49838105.cftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
