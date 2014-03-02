@@ -40,7 +40,7 @@ function c53550467.con(e)
 	return Duel.IsExistingMatchingCard(c53550467.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
 end
 function c53550467.tg(e,c)
-	return c~=e:GetHandler() and c:IsAttackBelow(1800)
+	return c~=e:GetHandler() and c:GetAttack()<1800
 end
 function c53550467.efval(e,re,tp)
 	return e:GetHandlerPlayer()~=tp
