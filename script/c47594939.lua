@@ -16,10 +16,10 @@ function c47594939.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c47594939.lvfilter(c,lv)
-	return c:GetLevel()==lv
+	return c:IsFaceup() and c:GetLevel()==lv and not c:IsStatus(STATUS_SUMMONING)
 end
 function c47594939.rkfilter(c,rk)
-	return c:GetRank()==rk
+	return c:IsFaceup() and c:GetRank()==rk and not c:IsStatus(STATUS_SUMMONING)
 end
 function c47594939.splimit(e,c,sump,sumtype,sumpos,targetp)
 	local lv=c:GetLevel()

@@ -51,10 +51,11 @@ function c71921856.atkval(e,c)
 	return c:GetOverlayCount()*100
 end
 function c71921856.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local ct=e:GetHandler():GetOverlayCount()
+	local c=e:GetHandler()
+	local ct=c:GetOverlayCount()
 	e:SetLabel(ct)
-	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():GetReasonPlayer()~=tp
-		and e:GetHandler():GetPreviousControler()==tp
+	return c:IsReason(REASON_DESTROY) and c:GetReasonPlayer()~=tp
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
 function c71921856.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x84) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
