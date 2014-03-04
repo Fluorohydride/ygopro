@@ -45,7 +45,7 @@ function c98645731.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-p,sg)
 			Duel.ShuffleHand(p)
 		else
-			Duel.SendtoGrave(sg,REASON_EFFECT)
+			Duel.SendtoGrave(sg,REASON_RULE)
 		end
 		Duel.ShuffleDeck(p)
 	end
