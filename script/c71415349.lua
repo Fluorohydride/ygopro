@@ -9,13 +9,13 @@ function c71415349.initial_effect(c)
 	e1:SetTarget(c71415349.target)
 	e1:SetOperation(c71415349.operation)
 	c:RegisterEffect(e1)
-	--adup
+	--atkup
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(71415349,1))
 	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_FLIP_SUMMON_SUCCESS)
-	e2:SetOperation(c71415349.adop)
+	e2:SetOperation(c71415349.atkop)
 	c:RegisterEffect(e2)
 end
 function c71415349.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -30,7 +30,7 @@ function c71415349.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(c,POS_FACEDOWN_DEFENCE)
 	end
 end
-function c71415349.adop(e,tp,eg,ep,ev,re,r,rp)
+function c71415349.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		local e1=Effect.CreateEffect(c)
