@@ -2154,7 +2154,6 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		pduel->write_buffer8(target->current.location);
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
-		target->set_status(STATUS_SUMMONING, TRUE);
 		return FALSE;
 	}
 	case 3: {
@@ -2184,7 +2183,6 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 			return TRUE;
 		}
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
-			(*cit)->set_status(STATUS_SUMMONING, FALSE);
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
 				(*cit)->enable_field_effect(TRUE);
