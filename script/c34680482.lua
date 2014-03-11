@@ -79,4 +79,5 @@ function c34680482.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c34680482.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)
+	e:Reset()
 end
