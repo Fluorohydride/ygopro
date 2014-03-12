@@ -32,7 +32,7 @@ function c45986603.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP)
 	e4:SetCode(EFFECT_SET_CONTROL)
-	e4:SetValue(c45247637.val)
+	e4:SetValue(c45986603.val)
 	c:RegisterEffect(e4)
 end
 function c45986603.filter(c)
