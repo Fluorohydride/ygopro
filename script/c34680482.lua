@@ -75,7 +75,7 @@ function c34680482.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c34680482.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()==e:GetLabel()+2 and Duel.GetTurnPlayer()==tp
+	return Duel.GetTurnCount()==e:GetLabel()+2
 end
 function c34680482.tdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)
