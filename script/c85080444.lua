@@ -42,25 +42,21 @@ end
 function c85080444.indcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
-function c85080444.filter(c)
+function c85080444.tg(e,c)
 	return c:IsFaceup() and c:IsSetCard(0x97)
 end
 function c85080444.indop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c85080444.filter,tp,LOCATION_MZONE,0,nil)
-	local tc=g:GetFirst()
-	while tc do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(c85080444.tgvalue)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-		tc:RegisterEffect(e2)
-		tc=g:GetNext()
-	end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e1:SetTarget(c85080444.tg)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetValue(c85080444.tgvalue)
+	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	Duel.RegisterEffect(e2,tp)
 end
 function c85080444.tgvalue(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
