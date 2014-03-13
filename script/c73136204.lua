@@ -47,7 +47,7 @@ end
 function c73136204.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_DECK) and
-		(c:IsReason(REASON_REVEAL) or c:IsPreviousPosition(POS_FACEUP) or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
+		(c:IsReason(REASON_REVEAL) or c:GetPreviousPosition()==POS_FACEUP_DEFENCE or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
 end
 function c73136204.filter(c)
 	return c:IsSetCard(0x90) and not c:IsCode(73136204) and c:IsAbleToDeck()

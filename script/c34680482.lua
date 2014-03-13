@@ -55,6 +55,7 @@ function c34680482.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if tc then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(34680482,RESET_EVENT+0x1fe0000,0,1,Duel.GetTurnCount())
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
@@ -63,21 +64,23 @@ function c34680482.spop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetRange(LOCATION_MZONE)
 		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
 		e2:SetLabel(Duel.GetTurnCount())
+		e2:SetLabelObject(tc)
 		e2:SetCondition(c34680482.tdcon)
 		e2:SetOperation(c34680482.tdop)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
 		e2:SetCountLimit(1)
-		tc:RegisterEffect(e2)
+		Duel.RegisterEffect(e2,tp)
 	end
 end
 function c34680482.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()==e:GetLabel()+2
+	return Duel.GetTurnCount()~=e:GetLabel() and Duel.GetTurnPlayer()==tp
 end
 function c34680482.tdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)
-	e:Reset()
+	local tc=e:GetLabelObject()
+	if tc:GetFlagEffectLabel(34680482)==e:GetLabel() then
+		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
+	end
 end

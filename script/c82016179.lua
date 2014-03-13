@@ -25,23 +25,23 @@ end
 function c82016179.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	if Duel.Draw(p,d,REASON_EFFECT)==3 then
-		Duel.ShuffleHand(tp)
+		Duel.ShuffleHand(p)
 		Duel.BreakEffect()
-		local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_HAND,0,nil)
+		local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,p,LOCATION_HAND,0,nil)
 		if g:GetCount()>1 and g:IsExists(Card.IsSetCard,1,nil,0x90) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-			local sg1=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,0x90)
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-			local sg2=g:Select(tp,1,1,sg1:GetFirst())
+			Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
+			local sg1=g:FilterSelect(p,Card.IsSetCard,1,1,nil,0x90)
+			Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
+			local sg2=g:Select(p,1,1,sg1:GetFirst())
 			sg1:Merge(sg2)
-			Duel.ConfirmCards(1-tp,sg1)
+			Duel.ConfirmCards(1-p,sg1)
 			Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT)
-			Duel.SortDecktop(tp,tp,2)
+			Duel.SortDecktop(p,p,2)
 		else
-			local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-			Duel.ConfirmCards(1-tp,hg)
+			local hg=Duel.GetFieldGroup(p,LOCATION_HAND,0)
+			Duel.ConfirmCards(1-p,hg)
 			local ct=Duel.SendtoDeck(hg,nil,0,REASON_EFFECT)
-			Duel.SortDecktop(tp,tp,ct)
+			Duel.SortDecktop(p,p,ct)
 		end
 	end
 end

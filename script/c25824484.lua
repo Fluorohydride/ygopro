@@ -37,7 +37,7 @@ end
 function c25824484.sdcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_DECK) and
-		(c:IsReason(REASON_REVEAL) or c:IsPreviousPosition(POS_FACEUP) or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
+		(c:IsReason(REASON_REVEAL) or c:GetPreviousPosition()==POS_FACEUP_DEFENCE or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
 end
 function c25824484.sdop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
