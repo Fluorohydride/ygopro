@@ -634,7 +634,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 						}
 					}
 				}
-				for(int seq = 0; seq < 6; ++seq) {
+				for(int seq = 0; seq < 8; ++seq) {
 					val = BufferIO::ReadInt8(pbuf);
 					if(val) {
 						ClientCard* ccard = new ClientCard;

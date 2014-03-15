@@ -28,6 +28,8 @@ struct card_data {
 	uint32 race;
 	int32 attack;
 	int32 defence;
+	uint32 lscale;
+	uint32 rscale;
 };
 
 struct card_state {
@@ -35,6 +37,8 @@ struct card_state {
 	uint32 type;
 	uint32 level;
 	uint32 rank;
+	uint32 lscale;
+	uint32 rscale;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -66,6 +70,8 @@ struct query_cache {
 	uint32 reason;
 	int32 is_public;
 	int32 is_disabled;
+	uint32 lscale;
+	uint32 rscale;
 };
 
 class card {
@@ -146,6 +152,8 @@ public:
 	uint32 is_xyz_level(card* pcard, uint32 lv);
 	uint32 get_attribute();
 	uint32 get_race();
+	uint32 get_lscale();
+	uint32 get_rscale();
 	int32 is_position(int32 pos);
 	void set_status(uint32 status, int32 enabled);
 	int32 get_status(uint32 status);
@@ -193,6 +201,7 @@ public:
 	int32 filter_summon_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
 	int32 filter_set_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
 	void filter_spsummon_procedure(uint8 playerid, effect_set* eset);
+	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
 	effect* is_affected_by_effect(int32 code, card* target);
 	effect* check_equip_control_effect();
@@ -283,6 +292,7 @@ public:
 #define TYPE_FLIP			0x200000	//
 #define TYPE_TOON			0x400000	//
 #define TYPE_XYZ			0x800000	//
+#define TYPE_PENDULUM		0x1000000	//
 
 //Attributes
 #define ATTRIBUTE_EARTH		0x01		//
@@ -406,6 +416,8 @@ public:
 #define QUERY_OWNER			0x40000
 #define QUERY_IS_DISABLED	0x80000
 #define QUERY_IS_PUBLIC		0x100000
+#define QUERY_LSCALE		0x200000
+#define QUERY_RSCALE		0x400000
 
 #define ASSUME_CODE			1
 #define ASSUME_TYPE			2

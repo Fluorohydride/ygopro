@@ -327,7 +327,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MOVETOFIELD: {
-		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2))
+		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -1021,7 +1021,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MOVETOFIELD_S: {
-		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2)) {
+		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff)) {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else
@@ -2480,6 +2480,25 @@ int32 field::process_idle_command(uint16 step) {
 			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player))
 				core.spsummonable_cards.push_back(pcard);
 		}
+		eset.clear();
+		filter_field_effect(EFFECT_SPSUMMON_PROC_G, &eset);
+		for(int32 i = 0; i < eset.count; ++i) {
+			pcard = eset[i]->handler;
+			if(pcard->current.controler != infos.turn_player)
+				continue;
+			effect* oreason = core.reason_effect;
+			uint8 op = core.reason_player;
+			core.reason_effect = eset[i];
+			core.reason_player = pcard->current.controler;
+			save_lp_cost();
+			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
+			pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+			if(pduel->lua->check_condition(eset[i]->condition, 2))
+				core.spsummonable_cards.push_back(pcard);
+			restore_lp_cost();
+			core.reason_effect = oreason;
+			core.reason_player = op;
+		}
 		core.repositionable_cards.clear();
 		for(int i = 0; i < 5; ++i) {
 			pcard = player[infos.turn_player].list_mzone[i];
@@ -3827,7 +3846,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 				pcard->battled_cards.clear();
 				pcard->attack_all_target = TRUE;
 			}
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 8; ++i) {
 				pcard = player[p].list_szone[i];
 				if(!pcard)
 					continue;
@@ -4118,6 +4137,17 @@ int32 field::add_chain(uint16 step) {
 			clit->triggering_controler = phandler->current.controler;
 			clit->triggering_location = phandler->current.location;
 			clit->triggering_sequence = phandler->current.sequence;
+			if(phandler->data.type & TYPE_PENDULUM) {
+				effect* ceffect = pduel->new_effect();
+				ceffect->owner = phandler;
+				ceffect->handler = phandler;
+				ceffect->type = EFFECT_TYPE_SINGLE;
+				ceffect->code = EFFECT_CHANGE_TYPE;
+				ceffect->value = TYPE_PENDULUM + TYPE_SPELL;
+				ceffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
+				ceffect->reset_flag = RESET_EVENT + 0x1fe0000;
+				phandler->add_effect(ceffect);
+			}
 		}
 		pduel->write_buffer8(MSG_CHAINING);
 		pduel->write_buffer32(phandler->data.code);
@@ -4189,7 +4219,7 @@ int32 field::add_chain(uint16 step) {
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
 			core.leave_confirmed.insert(peffect->handler);
-			if(!(peffect->handler->data.type & (TYPE_CONTINUOUS + TYPE_FIELD + TYPE_EQUIP))
+			if(!(peffect->handler->data.type & (TYPE_CONTINUOUS + TYPE_FIELD + TYPE_EQUIP + TYPE_PENDULUM))
 			        && !peffect->handler->is_affected_by_effect(EFFECT_REMAIN_FIELD))
 				peffect->handler->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		}
@@ -4785,7 +4815,7 @@ int32 field::adjust_step(uint16 step) {
 				if(pcard)
 					add_to_disable_check_list(pcard);
 			}
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 8; ++i) {
 				pcard = player[tp].list_szone[i];
 				if(pcard)
 					add_to_disable_check_list(pcard);
@@ -4868,7 +4898,7 @@ int32 field::adjust_step(uint16 step) {
 					pcard->current.reason_player = peffect->get_handler_player();
 				}
 			}
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 8; ++i) {
 				card* pcard = player[tp].list_szone[i];
 				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
 				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
@@ -4894,7 +4924,7 @@ int32 field::adjust_step(uint16 step) {
 		card* pcard;
 		core.destroy_set.clear();
 		for(uint8 p = 0; p < 2; ++p) {
-			for(uint8 i = 0; i < 6; ++i) {
+			for(uint8 i = 0; i < 5; ++i) {
 				pcard = player[tp].list_szone[i];
 				if(pcard && pcard->equiping_target && !pcard->is_affected_by_effect(EFFECT_EQUIP_LIMIT, pcard->equiping_target))
 					core.destroy_set.insert(pcard);

@@ -226,7 +226,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_count(ptr pduel, uint8 playerid, uin
 	}
 	if(location == LOCATION_SZONE) {
 		uint32 count = 0;
-		for(uint32 i = 0; i < 6; ++i)
+		for(uint32 i = 0; i < 8; ++i)
 			if(ptduel->game_field->player[playerid].list_szone[i]) count++;
 		return count;
 	}
@@ -252,7 +252,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_card(ptr pduel, uint8 playerid, uint
 			}
 		}
 	} else if(location == LOCATION_SZONE) {
-		for(uint32 i = 0; i < 6; ++i) {
+		for(uint32 i = 0; i < 8; ++i) {
 			pcard = ptduel->game_field->player[playerid].list_szone[i];
 			if(pcard) {
 				ct += clen = pcard->get_infos(p, query_flag, use_cache);
@@ -301,7 +301,7 @@ extern "C" DECL_DLLEXPORT int32 query_field_info(ptr pduel, byte* buf) {
 				*buf++ = 0;
 			}
 		}
-		for(uint32 i = 0; i < 6; ++i) {
+		for(uint32 i = 0; i < 8; ++i) {
 			pcard = ptduel->game_field->player[playerid].list_szone[i];
 			if(pcard) {
 				*buf++ = 1;

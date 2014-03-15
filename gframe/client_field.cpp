@@ -16,11 +16,12 @@ ClientField::ClientField() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	pzone_act = false;
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
 			mzone[p].push_back(0);
-		for(int i = 0; i < 6; ++i)
+		for(int i = 0; i < 8; ++i)
 			szone[p].push_back(0);
 	}
 }
@@ -61,6 +62,7 @@ void ClientField::Clear() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
+	pzone_act = false;
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -83,6 +85,7 @@ void ClientField::Initial(int player, int deckc, int extrac) {
 		pcard->controler = player;
 		pcard->location = 0x40;
 		pcard->sequence = i;
+		pcard->position = POS_FACEDOWN_DEFENCE;
 		GetCardLocation(pcard, &pcard->curPos, &pcard->curRot);
 		pcard->mTransform.setTranslation(pcard->curPos);
 		pcard->mTransform.setRotationRadians(pcard->curRot);
@@ -313,6 +316,7 @@ void ClientField::ClearCommandFlag() {
 	extra_act = false;
 	grave_act = false;
 	remove_act = false;
+	pzone_act = false;
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -584,8 +588,16 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 				t->X = 1.75f + 1.1f * sequence;
 				t->Y = 2.3f;
 				t->Z = 0.03f;
-			} else {
+			} else if (sequence == 5) {
 				t->X = 0.6f;
+				t->Y = 1.7f;
+				t->Z = 0.03f;
+			} else if (sequence == 6) {
+				t->X = -0.4f;
+				t->Y = 1.7f;
+				t->Z = 0.03f;
+			} else {
+				t->X = 8.3f;
 				t->Y = 1.7f;
 				t->Z = 0.03f;
 			}
@@ -594,8 +606,16 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 				t->X = 6.15f - 1.1f * sequence;
 				t->Y = -2.3f;
 				t->Z = 0.03f;
-			} else {
+			} else if (sequence == 5) {
 				t->X = 7.3f;
+				t->Y = -1.7f;
+				t->Z = 0.03f;
+			} else if (sequence == 6) {
+				t->X = 8.3f;
+				t->Y = -1.7f;
+				t->Z = 0.03f;
+			} else {
+				t->X = -0.4f;
 				t->Y = -1.7f;
 				t->Z = 0.03f;
 			}
@@ -755,8 +775,16 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->X = 1.75f + 1.1f * sequence;
 				t->Y = 2.3f;
 				t->Z = 0.01f;
-			} else {
+			} else if (sequence == 5) {
 				t->X = 0.6f;
+				t->Y = 1.7f;
+				t->Z = 0.01f;
+			} else if (sequence == 6) {
+				t->X = -0.4f;
+				t->Y = 1.7f;
+				t->Z = 0.01f;
+			} else {
+				t->X = 8.3f;
 				t->Y = 1.7f;
 				t->Z = 0.01f;
 			}
@@ -770,8 +798,16 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 				t->X = 6.15f - 1.1f * sequence;
 				t->Y = -2.3f;
 				t->Z = 0.01f;
-			} else {
+			} else if (sequence == 5) {
 				t->X = 7.3f;
+				t->Y = -1.7f;
+				t->Z = 0.01f;
+			} else if (sequence == 6) {
+				t->X = 8.3f;
+				t->Y = -1.7f;
+				t->Z = 0.01f;
+			} else {
+				t->X = -0.4f;
 				t->Y = -1.7f;
 				t->Z = 0.01f;
 			}
@@ -837,14 +873,18 @@ void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, ir
 			t->Y = 3.0f;
 			t->Z = 0.01f + 0.01f * sequence;
 			r->X = 0.0f;
-			r->Y = 3.1415926f;
+			if(pcard->position & POS_FACEUP)
+				r->Y = 0.0f;
+			else r->Y = 3.1415926f;
 			r->Z = 0.0f;
 		} else {
 			t->X = 7.3f;
 			t->Y = -3.0f;
 			t->Z = 0.01f * sequence;
 			r->X = 0.0f;
-			r->Y = 3.1415926f;
+			if(pcard->position & POS_FACEUP)
+				r->Y = 0.0f;
+			else r->Y = 3.1415926f;
 			r->Z = 3.1415926f;
 		}
 		break;

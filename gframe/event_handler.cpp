@@ -1018,7 +1018,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						selected_field |= flag;
 						select_min--;
 						if (select_min == 0) {
-							unsigned char respbuf[64];
+							unsigned char respbuf[80];
 							int filter = 1;
 							int p = 0;
 							for (int i = 0; i < 5; ++i, filter <<= 1) {
@@ -1030,7 +1030,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 							}
 							filter = 0x100;
-							for (int i = 0; i < 6; ++i, filter <<= 1) {
+							for (int i = 0; i < 8; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(0);
 									respbuf[p + 1] = 0x8;
@@ -1048,7 +1048,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 							}
 							filter = 0x1000000;
-							for (int i = 0; i < 6; ++i, filter <<= 1) {
+							for (int i = 0; i < 8; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(1);
 									respbuf[p + 1] = 0x8;
@@ -1365,6 +1365,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								str.append(formatBuffer);
 								myswprintf(formatBuffer, L"\n\x2605%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);
+								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
+									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
+									str.append(formatBuffer);
+								}
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
 										myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
@@ -1393,6 +1397,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
 									myswprintf(formatBuffer, L"\n%ls", dataManager.GetName(mcard->alias));
+									str.append(formatBuffer);
+								}
+								if(mcard->location == LOCATION_SZONE && (mcard->sequence == 6 || mcard->sequence == 7)) {
+									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
 									str.append(formatBuffer);
 								}
 								if(mcard->counters.size()) {
@@ -1560,6 +1568,16 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_DECK;
 			}
+		} else if(boardx >= -0.7 && boardx <= 0.1) {
+			if(boardy >= -2.3 && boardy <= -1.1) {
+				hovered_controler = 1;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 7;
+			} else if(boardy >= 1.1 && boardy <= 2.3) {
+				hovered_controler = 0;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 6;
+			}
 		} else if(boardx >= 6.9 && boardx <= 7.7) {
 			if(boardy >= 2.4 && boardy <= 3.6) {
 				hovered_controler = 0;
@@ -1577,6 +1595,16 @@ void ClientField::GetHoverField(int x, int y) {
 			} else if(boardy >= -3.6 && boardy <= -2.4) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_EXTRA;
+			}
+		} else if(boardx >= 7.8 && boardx <= 8.6) {
+			if(boardy >= -2.3 && boardy <= -1.1) {
+				hovered_controler = 1;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 6;
+			} else if(boardy >= 1.1 && boardy <= 2.3) {
+				hovered_controler = 0;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 7;
 			}
 		} else if(boardx >= 1.2 && boardx <= 6.7) {
 			if(boardy > 1.7 && boardy <= 2.9) {

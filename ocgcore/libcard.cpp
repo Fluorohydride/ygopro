@@ -111,6 +111,20 @@ int32 scriptlib::card_is_xyz_level(lua_State *L) {
 	lua_pushboolean(L, pcard->is_xyz_level(xyzcard, lv));
 	return 1;
 }
+int32 scriptlib::card_get_lscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->get_lscale());
+	return 1;
+}
+int32 scriptlib::card_get_rscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->get_rscale());
+	return 1;
+}
 int32 scriptlib::card_get_attribute(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);

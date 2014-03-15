@@ -976,6 +976,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
+			if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
+				mainGame->dField.pzone_act = true;
 		}
 		mainGame->dField.reposable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -1206,6 +1208,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
+		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
 			int filter;
 			if (mainGame->dField.selectable_field & 0x1f) {
@@ -1216,25 +1219,38 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
 				respbuf[1] = 0x8;
 				filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
+			} else if (mainGame->dField.selectable_field & 0xc000) {
+				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
+				respbuf[1] = 0x8;
+				filter = (mainGame->dField.selectable_field >> 14) & 0x3;
+				pzone = 1;
 			} else if (mainGame->dField.selectable_field & 0x1f0000) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
 				respbuf[1] = 0x4;
 				filter = (mainGame->dField.selectable_field >> 16) & 0x1f;
-			} else {
+			} else if (mainGame->dField.selectable_field & 0x1f000000) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
 				respbuf[1] = 0x8;
 				filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
+			} else {
+				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
+				respbuf[1] = 0x8;
+				filter = (mainGame->dField.selectable_field >> 30) & 0x3;
+				pzone = 1;
 			}
 			if(mainGame->chkRandomPos->isChecked()) {
 				respbuf[2] = rnd.real() * 5;
 				while(!(filter & (1 << respbuf[2])))
 					respbuf[2] = rnd.real() * 5;
-			} else {
+			} else if(!pzone) {
 				if (filter & 0x4) respbuf[2] = 2;
 				else if (filter & 0x2) respbuf[2] = 1;
 				else if (filter & 0x8) respbuf[2] = 3;
 				else if (filter & 0x1) respbuf[2] = 0;
 				else if (filter & 0x10) respbuf[2] = 4;
+			} else {
+				if (filter & 0x1) respbuf[2] = 6;
+				else if (filter & 0x2) respbuf[2] = 7;
 			}
 			mainGame->dField.selectable_field = 0;
 			SetResponseB(respbuf, 3);
@@ -3003,7 +3019,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					}
 				}
 			}
-			for(int seq = 0; seq < 6; ++seq) {
+			for(int seq = 0; seq < 8; ++seq) {
 				val = BufferIO::ReadInt8(pbuf);
 				if(val) {
 					ClientCard* ccard = new ClientCard;
