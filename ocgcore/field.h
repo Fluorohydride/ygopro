@@ -212,6 +212,7 @@ struct processor {
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
 	std::unordered_set<card*> unique_cards[2];
+	std::unordered_map<uint32, uint32> effect_count_code;
 	ptr temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[2];
@@ -320,6 +321,10 @@ public:
 	void reset_effect(uint32 id, uint32 reset_type);
 	void reset_phase(uint32 phase);
 	void reset_chain();
+	void add_effect_code(uint32 code);
+	uint32 get_effect_code(uint32 code);
+	void dec_effect_code(uint32 code);
+	
 	void filter_field_effect(uint32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_affected_cards(effect* peffect, card_set* cset);
 	void filter_player_effect(uint8 playerid, uint32 code, effect_set* eset, uint8 sort = TRUE);

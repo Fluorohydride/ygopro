@@ -220,6 +220,7 @@ static const struct luaL_Reg effectlib[] = {
 	{ "SetTargetRange", scriptlib::effect_set_target_range },
 	{ "SetAbsoluteRange", scriptlib::effect_set_absolute_range },
 	{ "SetCountLimit", scriptlib::effect_set_count_limit },
+	{ "SetCountCode", scriptlib::effect_set_count_code },
 	{ "SetReset", scriptlib::effect_set_reset },
 	{ "SetType", scriptlib::effect_set_type },
 	{ "SetProperty", scriptlib::effect_set_property },

@@ -44,6 +44,7 @@ public:
 	uint16 o_range;
 	uint16 reset_count;
 	uint32 reset_flag;
+	uint32 count_code;
 	uint32 category;
 	uint32 label;
 	uint32 hint_timing[2];

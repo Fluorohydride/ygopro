@@ -145,6 +145,14 @@ int32 scriptlib::effect_set_count_limit(lua_State *L) {
 	peffect->reset_count |= ((v << 12) & 0xf000) | ((v << 8) & 0xf00);
 	return 0;
 }
+int32 scriptlib::effect_set_count_code(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_EFFECT, 1);
+	effect* peffect = *(effect**) lua_touserdata(L, 1);
+	int32 v = lua_tointeger(L, 2);
+	peffect->count_code = v;
+	return 0;
+}
 int32 scriptlib::effect_set_reset(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_EFFECT, 1);

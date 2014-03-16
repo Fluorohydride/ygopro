@@ -3830,6 +3830,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			pduel->delete_effect(*eit);
 		}
 		core.reseted_effects.clear();
+		core.effect_count_code.clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
 				pcard = player[p].list_mzone[i];
@@ -3908,11 +3909,13 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 2: {
-		//Draw
-		int32 count = get_draw_count(infos.turn_player);
-		if(count > 0) {
-			draw(0, REASON_RULE, turn_player, turn_player, count);
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+		// Draw, new ruling
+		if(infos.turn_id > 1) {
+			int32 count = get_draw_count(infos.turn_player);
+			if(count > 0) {
+				draw(0, REASON_RULE, turn_player, turn_player, count);
+				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
+			}
 		}
 		add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_DRAW, 0);
 		return FALSE;
@@ -4137,17 +4140,6 @@ int32 field::add_chain(uint16 step) {
 			clit->triggering_controler = phandler->current.controler;
 			clit->triggering_location = phandler->current.location;
 			clit->triggering_sequence = phandler->current.sequence;
-			if(phandler->data.type & TYPE_PENDULUM) {
-				effect* ceffect = pduel->new_effect();
-				ceffect->owner = phandler;
-				ceffect->handler = phandler;
-				ceffect->type = EFFECT_TYPE_SINGLE;
-				ceffect->code = EFFECT_CHANGE_TYPE;
-				ceffect->value = TYPE_PENDULUM + TYPE_SPELL;
-				ceffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
-				ceffect->reset_flag = RESET_EVENT + 0x1fe0000;
-				phandler->add_effect(ceffect);
-			}
 		}
 		pduel->write_buffer8(MSG_CHAINING);
 		pduel->write_buffer32(phandler->data.code);
@@ -4342,8 +4334,15 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		effect* peffect = cait->triggering_effect;
 		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_negatable(cait->chain_count)) {
 			remove_oath_effect(peffect);
-			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->flag & EFFECT_FLAG_REPEAT))
-				peffect->reset_count += 0x100;
+			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT)) {
+				if(peffect->count_code == 0) {
+					if((peffect->flag & EFFECT_FLAG_REPEAT))
+						peffect->reset_count += 0x100;
+				} else {
+					if(peffect->count_code & 0x80000000)
+						dec_effect_code(peffect->count_code);
+				}
+			}
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
@@ -4360,11 +4359,11 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if((peffect->type & EFFECT_TYPE_ACTIVATE) && pcard->is_has_relation(peffect)) {
 			pcard->set_status(STATUS_ACTIVATED, TRUE);
 			pcard->enable_field_effect(TRUE);
-			if(pcard->data.type & TYPE_FIELD) {
-				card* fscard = player[1 - pcard->current.controler].list_szone[5];
-				if(fscard && fscard->is_position(POS_FACEUP))
-					fscard->enable_field_effect(FALSE);
-			}
+//			if(pcard->data.type & TYPE_FIELD) {
+//				card* fscard = player[1 - pcard->current.controler].list_szone[5];
+//				if(fscard && fscard->is_position(POS_FACEUP))
+//					fscard->enable_field_effect(FALSE);
+//			}
 			adjust_instant();
 		}
 		raise_event((card*)0, EVENT_CHAIN_SOLVING, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
@@ -4439,12 +4438,13 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
 		        && !pcard->equiping_target && (pcard->current.location == LOCATION_SZONE))
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
-		if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
-		        && !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(cait->triggering_effect)) {
-			card* fscard = player[1 - pcard->current.controler].list_szone[5];
-			if(fscard && fscard->is_position(POS_FACEUP))
-				destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
-		}
+		// new ruling allows 2 field cards 
+//		if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
+//		        && !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(cait->triggering_effect)) {
+//			card* fscard = player[1 - pcard->current.controler].list_szone[5];
+//			if(fscard && fscard->is_position(POS_FACEUP))
+//				destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
+//		}
 		pcard->release_relation(cait->triggering_effect);
 		if(cait->target_cards)
 			pduel->delete_group(cait->target_cards);

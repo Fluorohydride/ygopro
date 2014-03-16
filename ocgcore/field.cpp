@@ -813,6 +813,22 @@ void field::reset_chain() {
 			(*rm)->handler->remove_effect((*rm));
 	}
 }
+void field::add_effect_code(uint32 code) {
+	core.effect_count_code[code]++;
+}
+uint32 field::get_effect_code(uint32 code) {
+	auto iter = core.effect_count_code.find(code);
+	if(iter == core.effect_count_code.end())
+		return 0;
+	return iter->second;
+}
+void field::dec_effect_code(uint32 code){
+	auto iter = core.effect_count_code.find(code);
+	if(iter == core.effect_count_code.end())
+		return;
+	if(iter->second > 0)
+		iter->second--;
+}
 void field::filter_field_effect(uint32 code, effect_set* eset, uint8 sort) {
 	effect* peffect;
 	auto rg = effects.aura_effect.equal_range(code);

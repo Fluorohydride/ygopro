@@ -220,6 +220,7 @@ public:
 	static int32 effect_set_target_range(lua_State *L);
 	static int32 effect_set_absolute_range(lua_State *L);
 	static int32 effect_set_count_limit(lua_State *L);
+	static int32 effect_set_count_code(lua_State *L);
 	static int32 effect_set_reset(lua_State *L);
 	static int32 effect_set_type(lua_State *L);
 	static int32 effect_set_property(lua_State *L);
