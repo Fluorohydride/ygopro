@@ -1881,7 +1881,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			if (!(pl & 0x80) && !(cl & 0x80)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
-				if (code != 0 && pcard->code != code)
+				if (pcard->code != code && (code != 0 || cl == 0x40))
 					pcard->SetCode(code);
 				pcard->cHint = 0;
 				pcard->chValue = 0;

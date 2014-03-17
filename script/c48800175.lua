@@ -11,7 +11,7 @@ function c48800175.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c48800175.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 end
 function c48800175.filter(c)

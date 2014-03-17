@@ -932,7 +932,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_EXTRA: {
-					if(extra[hovered_controler].size() == 0 || hovered_controler != 0)
+					if(extra[hovered_controler].size() == 0)
 						break;
 					ShowMenu(COMMAND_LIST, x, y);
 					break;
@@ -996,8 +996,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(size_t i = 0; i < extra[hovered_controler].size(); ++i)
 						command_flag |= extra[hovered_controler][i]->cmdFlag;
-					if(hovered_controler == 0 || mainGame->dInfo.isSingleMode)
-						command_flag |= COMMAND_LIST;
+					command_flag |= COMMAND_LIST;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;

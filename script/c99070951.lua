@@ -34,7 +34,6 @@ function c99070951.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()
 	if not tc or not tc:IsAbleToRemove() then return end
-	Duel.ConfirmCards(tp,tc)
 	Duel.DisableShuffleCheck()
 	Duel.Remove(tc,POS_FACEDOWN,REASON_EFFECT)
 	tc:RegisterFlagEffect(99070951,RESET_EVENT+0x1fe0000,0,1)

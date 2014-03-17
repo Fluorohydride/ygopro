@@ -869,20 +869,12 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			int cs = pbuf[10];
 			int cp = pbuf[11];
 			pbuf += 16;
-			if(cl == LOCATION_REMOVED && (cp & POS_FACEDOWN)) {
-				NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
+			NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
+			if (!(cl & (LOCATION_GRAVE + LOCATION_OVERLAY)) && ((cl & (LOCATION_DECK + LOCATION_HAND)) || (cp & POS_FACEDOWN)))
 				BufferIO::WriteInt32(pbufw, 0);
-				NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-			} else {
-				NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
-				if (!(cl & 0xb0) && !((cl & 0xc) && (cp & POS_FACEUP)))
-					BufferIO::WriteInt32(pbufw, 0);
-				NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-			}
+			NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
 			if (cl != 0 && (cl & 0x80) == 0 && (cl != pl || pc != cc))
 				RefreshSingle(cc, cl, cs);
 			break;

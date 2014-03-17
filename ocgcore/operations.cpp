@@ -2147,7 +2147,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(pcard->current.location);
 		pduel->write_buffer8(pcard->current.sequence);
 		pduel->write_buffer8(pcard->current.position);
-		core.special_summoning.erase(pcard);
 		if(pgroup->it != pgroup->container.end())
 			core.units.begin()->step = 22;
 		return FALSE;
