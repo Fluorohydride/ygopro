@@ -8,6 +8,7 @@
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
+#include "CEGUI/XMLParser.h"
 
 namespace ygopro
 {

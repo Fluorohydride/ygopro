@@ -24,6 +24,11 @@ include (CreateLaunchers)
 
 include (platform/settings)
 
+if (NOT CMAKE_PREFIX_PATH)
+    set (CMAKE_PREFIX_PATH "${CMAKE_SOURCE_DIR}/dependencies" CACHE PATH "Path to dependencies")
+    set (CMAKE_FIND_FRAMEWORK LAST)
+endif()
+
 if (MSVC)
 
 else ()
@@ -31,6 +36,7 @@ else ()
     find_package(wxWidgets REQUIRED core base gl xml)
     find_package(Lua52 REQUIRED)
     find_package(OpenGL REQUIRED)
+    find_package(CEGUI REQUIRED)
     include(${wxWidgets_USE_FILE})
     add_definitions( "-DHAVE_TYPE_TRAITS -DwxUSE_UNICODE" )
 endif ()

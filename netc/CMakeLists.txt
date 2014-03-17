@@ -24,9 +24,9 @@ if (MSVC)
     target_link_libraries (netc wxwidgets sqlite3 lua event)
 else ()
     target_link_libraries (netc ${LIBEVENT_LIBRARIES} ${LUA_LIBRARIES}
-                                   ${wxWidgets_LIBRARIES} ${OPENGL_gl_LIBRARY})
+                                   ${wxWidgets_LIBRARIES} ${OPENGL_gl_LIBRARY} ${CEGUI_LIBRARIES})
     include_directories (${LUA_INCLUDE_DIR} ${LIBEVENT_INCLUDE_DIR}
-                         ${wxWidgets_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR})
+                         ${wxWidgets_INCLUDE_DIRS} ${OPENGL_INCLUDE_DIR} ${CEGUI_INCLUDE_DIR})
     target_link_libraries (netc ${CMAKE_THREAD_LIBS_INIT} ${DL_LIBRARIES})
 endif ()
 if (WIN32)

@@ -10,6 +10,7 @@ namespace ygopro
 {
 
     struct FilterCondition {
+        unsigned int code = 0;
         unsigned int setcode = 0;
         unsigned int pool = 0;
         unsigned int type = 0;

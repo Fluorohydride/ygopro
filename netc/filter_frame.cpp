@@ -10,7 +10,7 @@ namespace ygopro
 {
     FilterFrame* filterFrame = nullptr;
     
-    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 480), wxDEFAULT_FRAME_STYLE | wxSTAY_ON_TOP) {
+    FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 480), wxDEFAULT_FRAME_STYLE) {
         
         TextureInfo& st = imageMgr.textures["star"];
         if(st.src) {
@@ -253,6 +253,11 @@ namespace ygopro
             std::string setstr = (wxT("setname_") + fstr.SubString(1, -1)).ToStdString();
             if(stringCfg.Exists(setstr))
                 fc.setcode = stringCfg[setstr];
+        } else if(fstr[0] == wxT('@')) {
+            long code = 0;
+            fstr.SubString(1, -1).ToLong(&code);
+            fc.code = code;
+            fstr = wxEmptyString;
         }
         fc.type = (unsigned int)(long)filter_att2[0]->GetClientData(filter_att2[0]->GetSelection());
         fc.subtype = (unsigned int)(long)filter_att2[1]->GetClientData(filter_att2[1]->GetSelection());

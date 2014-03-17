@@ -77,7 +77,6 @@ namespace ygopro
 			glTexCoord2f(t_avatar1->lx, t_avatar1->ry);glVertex2f(-1.0f, -1.0f);
 		}
 		glEnd();
-        
         glBindTexture(GL_TEXTURE_2D, 0);
         
 		glFlush();

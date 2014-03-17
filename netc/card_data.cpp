@@ -11,6 +11,8 @@ namespace ygopro
     bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword, bool check_desc) {
         if(type & 0x4000)
             return false;
+        if(fc.code != 0 && code != fc.code && alias != fc.code)
+            return false;
         if(fc.type != 0 && (type & fc.type) != fc.type)
             return false;
         if(fc.subtype != 0 && (type & fc.subtype) == 0)

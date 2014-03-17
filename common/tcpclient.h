@@ -62,7 +62,7 @@ public:
 			return;
 		}
 		if(timeout_ms) {
-			timeval timeout = {timeout_ms / 1000, timeout_ms % 1000};
+			timeval timeout = {(long)(timeout_ms / 1000), (int)(timeout_ms % 1000)};
 			timer_event = event_new(loop_base, 0, EV_TIMEOUT, TimeoutCallback, this);
 			event_add(timer_event, &timeout);
 		}
