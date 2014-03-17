@@ -411,7 +411,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	int opt = 0;
 	if(host_info.enable_priority)
-		opt |= DUEL_ENABLE_PRIORITY;
+		opt |= DUEL_OBSOLETE_RULING;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
 	last_replay.WriteInt32(host_info.start_lp, false);

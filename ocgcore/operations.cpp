@@ -3221,8 +3221,10 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		if(!is_equip && location == LOCATION_SZONE && (target->data.type & TYPE_FIELD) && (target->data.type & TYPE_SPELL)) {
 			card* pcard = get_field_card(playerid, LOCATION_SZONE, 5);
 			if(pcard) {
-				//destroy(pcard, 0, REASON_RULE, pcard->current.controler);
-				send_to(pcard, 0, REASON_RULE, pcard->current.controler, PLAYER_NONE, LOCATION_GRAVE, 0, 0);
+				if(core.duel_options & DUEL_OBSOLETE_RULING)
+					destroy(pcard, 0, REASON_RULE, pcard->current.controler);
+				else // new ruling
+					send_to(pcard, 0, REASON_RULE, pcard->current.controler, PLAYER_NONE, LOCATION_GRAVE, 0, 0);
 				adjust_all();
 			}
 		} else if(!is_equip && location == LOCATION_SZONE && (target->data.type & TYPE_PENDULUM)) {

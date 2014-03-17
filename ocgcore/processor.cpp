@@ -1855,11 +1855,9 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 8: {
-		if(!(core.duel_options & DUEL_ENABLE_PRIORITY) || (infos.phase != PHASE_MAIN1 && infos.phase != PHASE_MAIN2))
+		if(!(core.duel_options & DUEL_OBSOLETE_RULING) || (infos.phase != PHASE_MAIN1 && infos.phase != PHASE_MAIN2))
 			return FALSE;
-		// Due to the new official rules, the priority of ignition effects when summon, special summon, flip summon is canceled
-		// Use DUEL_ENABLE_PRIORITY to enable this feature (TCG)
-		// ignition effects
+		// Obsolete ignition effect ruling
 		tevent e;
 		if(core.current_chain.size() == 0 &&
 		        (check_event(EVENT_SUMMON_SUCCESS, &e) || check_event(EVENT_SPSUMMON_SUCCESS, &e) || check_event(EVENT_FLIP_SUMMON_SUCCESS, &e))
@@ -3910,7 +3908,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 	}
 	case 2: {
 		// Draw, new ruling
-		if(infos.turn_id > 1) {
+		if(!(core.duel_options & DUEL_OBSOLETE_RULING) || (infos.turn_id > 1)) {
 			int32 count = get_draw_count(infos.turn_player);
 			if(count > 0) {
 				draw(0, REASON_RULE, turn_player, turn_player, count);
@@ -4359,11 +4357,13 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if((peffect->type & EFFECT_TYPE_ACTIVATE) && pcard->is_has_relation(peffect)) {
 			pcard->set_status(STATUS_ACTIVATED, TRUE);
 			pcard->enable_field_effect(TRUE);
-//			if(pcard->data.type & TYPE_FIELD) {
-//				card* fscard = player[1 - pcard->current.controler].list_szone[5];
-//				if(fscard && fscard->is_position(POS_FACEUP))
-//					fscard->enable_field_effect(FALSE);
-//			}
+			if(core.duel_options & DUEL_OBSOLETE_RULING) {
+				if(pcard->data.type & TYPE_FIELD) {
+					card* fscard = player[1 - pcard->current.controler].list_szone[5];
+					if(fscard && fscard->is_position(POS_FACEUP))
+						fscard->enable_field_effect(FALSE);
+				}
+			}
 			adjust_instant();
 		}
 		raise_event((card*)0, EVENT_CHAIN_SOLVING, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
@@ -4438,13 +4438,14 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
 		        && !pcard->equiping_target && (pcard->current.location == LOCATION_SZONE))
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
-		// new ruling allows 2 field cards 
-//		if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
-//		        && !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(cait->triggering_effect)) {
-//			card* fscard = player[1 - pcard->current.controler].list_szone[5];
-//			if(fscard && fscard->is_position(POS_FACEUP))
-//				destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
-//		}
+		if(core.duel_options & DUEL_OBSOLETE_RULING) {
+			if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
+					&& !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(cait->triggering_effect)) {
+				card* fscard = player[1 - pcard->current.controler].list_szone[5];
+				if(fscard && fscard->is_position(POS_FACEUP))
+					destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
+			}
+		}
 		pcard->release_relation(cait->triggering_effect);
 		if(cait->target_cards)
 			pduel->delete_group(cait->target_cards);
