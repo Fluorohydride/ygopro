@@ -42,7 +42,7 @@ namespace ygopro
 
 	public:
 		wxGameCanvas(wxFrame* parent, int id, int* args);
-		virtual wxGameCanvas();
+		virtual ~wxGameCanvas();
 
         DeckData& GetDeck() { return current_deck; }
 		void ClearDeck();

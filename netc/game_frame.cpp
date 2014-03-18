@@ -1,25 +1,22 @@
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
 #include <wx/utils.h>
-#include "editor_frame.h"
-#include "editor_canvas.h"
 #include "game_frame.h"
+#include "game_canvas.h"
 #include "filter_frame.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
-#include "CEGUI/XMLParser.h"
 
 namespace ygopro
 {
 
-    EditorFrame* editorFrame = nullptr;
     GameFrame* mainFrame = nullptr;
 	Random globalRandom;
 	CommonConfig commonCfg;
     CommonConfig stringCfg;
     
-    EditorFrame::EditorFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
+    GameFrame::GameFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
         
         wxMenuBar* menu_bar = new wxMenuBar;
         wxMenu* m_deck = new wxMenu();
@@ -29,11 +26,11 @@ namespace ygopro
         m_deck->Append(ID_DECK_SAVEAS, stringCfg["eui_menu_deck_saveas"]);
         m_deck->Append(ID_DECK_LOADSTR, stringCfg["eui_menu_deck_loadstr"]);
         m_deck->Append(ID_DECK_SAVESTR, stringCfg["eui_menu_deck_savestr"]);
-        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoad, this, ID_DECK_LOAD);
-        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSave, this, ID_DECK_SAVE);
-        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveAs, this, ID_DECK_SAVEAS);
-        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckLoadString, this, ID_DECK_LOADSTR);
-        m_deck->Bind(wxEVT_MENU, &EditorFrame::OnDeckSaveString, this, ID_DECK_SAVESTR);
+        m_deck->Bind(wxEVT_MENU, &GameFrame::OnDeckLoad, this, ID_DECK_LOAD);
+        m_deck->Bind(wxEVT_MENU, &GameFrame::OnDeckSave, this, ID_DECK_SAVE);
+        m_deck->Bind(wxEVT_MENU, &GameFrame::OnDeckSaveAs, this, ID_DECK_SAVEAS);
+        m_deck->Bind(wxEVT_MENU, &GameFrame::OnDeckLoadString, this, ID_DECK_LOADSTR);
+        m_deck->Bind(wxEVT_MENU, &GameFrame::OnDeckSaveString, this, ID_DECK_SAVESTR);
         
         wxMenu* m_tool = new wxMenu();
         m_tool->Append(ID_TOOL_CLEAR, stringCfg["eui_menu_tool_clear"]);
@@ -45,14 +42,14 @@ namespace ygopro
         m_tool->Append(ID_TOOL_BROWSER, stringCfg["eui_menu_tool_browser"]);
         m_tool->AppendSeparator();
         m_tool->Append(ID_TOOL_SHOWEXCLUSIVE, stringCfg["eui_menu_tool_show_exclusive"], wxEmptyString, true);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolClear, this, ID_TOOL_CLEAR);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSort, this, ID_TOOL_SORT);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolScreenshot, this, ID_TOOL_SCREENSHOT);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolScreenshotSV, this, ID_TOOL_SCREENSHOT_SV);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSearch, this, ID_TOOL_SEARCH);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolOpenBrowser, this, ID_TOOL_BROWSER);
-        m_tool->Bind(wxEVT_MENU, &EditorFrame::OnToolSwitchExclusive, this, ID_TOOL_SHOWEXCLUSIVE);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolClear, this, ID_TOOL_CLEAR);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolSort, this, ID_TOOL_SORT);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolShuffle, this, ID_TOOL_SHUFFLE);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolScreenshot, this, ID_TOOL_SCREENSHOT);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolScreenshotSV, this, ID_TOOL_SCREENSHOT_SV);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolSearch, this, ID_TOOL_SEARCH);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolOpenBrowser, this, ID_TOOL_BROWSER);
+        m_tool->Bind(wxEVT_MENU, &GameFrame::OnToolSwitchExclusive, this, ID_TOOL_SHOWEXCLUSIVE);
 
         wxMenu* m_limit = new wxMenu();
         auto& lrs = limitRegulationMgr.GetLimitRegulations();
@@ -62,7 +59,7 @@ namespace ygopro
                 m_limit->Append(ID_REGULATION + i, lrs[i].name + extra, wxEmptyString, true);
             } else
                 m_limit->Append(ID_REGULATION + i, lrs[i].name, wxEmptyString, true);
-            m_limit->Bind(wxEVT_MENU, &EditorFrame::OnRegulationChange, this, ID_REGULATION + i);
+            m_limit->Bind(wxEVT_MENU, &GameFrame::OnRegulationChange, this, ID_REGULATION + i);
         }
         if(lrs.size() > 0)
             m_limit->GetMenuItems()[0]->Check(true);
@@ -70,7 +67,7 @@ namespace ygopro
         m_vlist->Append(ID_REG_VIEW1, stringCfg["eui_list_forbidden"]);
         m_vlist->Append(ID_REG_VIEW2, stringCfg["eui_list_limit"]);
         m_vlist->Append(ID_REG_VIEW3, stringCfg["eui_list_semilimit"]);
-        m_vlist->Bind(wxEVT_MENU, &EditorFrame::OnToolViewRegulation, this);
+        m_vlist->Bind(wxEVT_MENU, &GameFrame::OnToolViewRegulation, this);
         m_limit->AppendSeparator();
         m_limit->AppendSubMenu(m_vlist, stringCfg["eui_list_view"]);
         
@@ -81,10 +78,10 @@ namespace ygopro
 
         card_image = new wxStaticBitmap(this, wxID_ANY, wxBitmap(177, 254));
         card_info = new wxRichTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxSize(240, 10000), wxRE_READONLY | wxRE_MULTILINE);
-        card_info->Bind(wxEVT_TEXT_URL, &EditorFrame::OnUrlClicked, this, wxID_ANY);
+        card_info->Bind(wxEVT_TEXT_URL, &GameFrame::OnUrlClicked, this, wxID_ANY);
         card_info->GetCaret()->Hide();
         int wx_gl_attribs[] = { WX_GL_RGBA, WX_GL_DOUBLEBUFFER, WX_GL_DEPTH_SIZE, 16, 0 };
-        editor_canvas = new wxEditorCanvas(this, wxID_ANY, wx_gl_attribs);
+        game_canvas = new wxGameCanvas(this, wxID_ANY, wx_gl_attribs);
 
         wxBoxSizer *sz = new wxBoxSizer(wxVERTICAL);
         sz->AddSpacer(5);
@@ -93,12 +90,12 @@ namespace ygopro
         sz->Add(card_info, 1, wxEXPAND | wxALL, 5);
         wxBoxSizer *sz2 = new wxBoxSizer(wxHORIZONTAL);
         sz2->Add(sz);
-        sz2->Add(editor_canvas, 1, wxEXPAND | wxALL);
+        sz2->Add(game_canvas, 1, wxEXPAND | wxALL);
         SetSizer(sz2);
         
-        editorFrame = this;
+        mainFrame = this;
         SetCardInfo(0);
-        editor_canvas->SetFocus();
+        game_canvas->SetFocus();
 
         TextureInfo& st = imageMgr.textures["star"];
         if(st.src) {
@@ -110,12 +107,12 @@ namespace ygopro
         }
     }
 
-    EditorFrame::~EditorFrame() {
+    GameFrame::~GameFrame() {
         if(filterFrame)
             delete filterFrame;
     }
 
-    void EditorFrame::SetCardInfo(unsigned int code) {
+    void GameFrame::SetCardInfo(unsigned int code) {
         static unsigned int current_code = 0;
         if(current_code == code)
             return;
@@ -257,49 +254,49 @@ namespace ygopro
         }
     }
     
-    void EditorFrame::AddCard(unsigned int code, unsigned int pos) {
-        editor_canvas->GetDeck().InsertCard(code, pos, -1, false, true);
+    void GameFrame::AddCard(unsigned int code, unsigned int pos) {
+        game_canvas->GetDeck().InsertCard(code, pos, -1, false, true);
         StopViewRegulation();
-        editor_canvas->Refresh();
+        game_canvas->Refresh();
     }
     
-    void EditorFrame::OnDeckLoad(wxCommandEvent& evt) {
+    void GameFrame::OnDeckLoad(wxCommandEvent& evt) {
         wxFileDialog fd(this, stringCfg["eui_msg_deck_load"], wxEmptyString, wxEmptyString, stringCfg["eui_msg_deck_filter"], wxFD_OPEN | wxFD_FILE_MUST_EXIST);
         if(fd.ShowModal() != wxID_OK)
             return;
         DeckData tempdeck;
         if(tempdeck.LoadFromFile(fd.GetPath())) {
-            editor_canvas->ClearDeck();
-            editor_canvas->GetDeck() = tempdeck;
+            game_canvas->ClearDeck();
+            game_canvas->GetDeck() = tempdeck;
             current_file = fd.GetPath();
             wxString title = stringCfg["eui_msg_deck_title"];
             title.Replace(wxT("{deck}"), current_file);
             SetTitle(title);
-            editor_canvas->Refresh();
+            game_canvas->Refresh();
         } else {
             wxMessageDialog(this, stringCfg["eui_msg_deck_load_error"]);
         }
     }
 
-    void EditorFrame::OnDeckSave(wxCommandEvent& evt) {
+    void GameFrame::OnDeckSave(wxCommandEvent& evt) {
         if(current_file.IsEmpty())
             OnDeckSaveAs(evt);
         else
-            editor_canvas->GetDeck().SaveToFile(current_file);
+            game_canvas->GetDeck().SaveToFile(current_file);
     }
 
-    void EditorFrame::OnDeckSaveAs(wxCommandEvent& evt) {
+    void GameFrame::OnDeckSaveAs(wxCommandEvent& evt) {
         wxFileDialog fd(this, stringCfg["eui_msg_deck_save"], wxEmptyString, wxEmptyString, stringCfg["eui_msg_deck_filter"], wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
         if(fd.ShowModal() != wxID_OK)
             return;
-        editor_canvas->GetDeck().SaveToFile(fd.GetPath());
+        game_canvas->GetDeck().SaveToFile(fd.GetPath());
         current_file = fd.GetPath();
         wxString title = stringCfg["eui_msg_deck_title"];
         title.Replace(wxT("{deck}"), current_file);
         SetTitle(title);
     }
 
-    void EditorFrame::OnDeckLoadString(wxCommandEvent& evt) {
+    void GameFrame::OnDeckLoadString(wxCommandEvent& evt) {
         wxTextDataObject tdo;
         wxTheClipboard->Open();
         wxTheClipboard->GetData(tdo);
@@ -307,45 +304,45 @@ namespace ygopro
         wxString deck_string = tdo.GetText();
         DeckData tempdeck;
         if(deck_string.Left(6) == wxT("ydk://") && tempdeck.LoadFromString(deck_string.Right(deck_string.Length() - 6))) {
-            editor_canvas->ClearDeck();
-            editor_canvas->GetDeck() = tempdeck;
-            editor_canvas->Refresh();
+            game_canvas->ClearDeck();
+            game_canvas->GetDeck() = tempdeck;
+            game_canvas->Refresh();
         } else {
             wxMessageDialog(this, stringCfg["eui_msg_str_load_error"], wxEmptyString, wxICON_ERROR).ShowModal();
         }
     }
 
-    void EditorFrame::OnDeckSaveString(wxCommandEvent& evt) {
-        wxString deck_string = editor_canvas->GetDeck().SaveToString();
+    void GameFrame::OnDeckSaveString(wxCommandEvent& evt) {
+        wxString deck_string = game_canvas->GetDeck().SaveToString();
         deck_string = wxT("ydk://") + deck_string;
         wxTheClipboard->Open();
         wxTheClipboard->SetData(new wxTextDataObject(deck_string));
         wxTheClipboard->Close();
-        editor_canvas->Refresh();
+        game_canvas->Refresh();
         wxMessageDialog(this, stringCfg["eui_msg_str_save"], wxEmptyString, wxICON_INFORMATION).ShowModal();
     }
 
-    void EditorFrame::OnToolClear(wxCommandEvent& evt) {
-        editor_canvas->ClearDeck();
-        editor_canvas->Refresh();
+    void GameFrame::OnToolClear(wxCommandEvent& evt) {
+        game_canvas->ClearDeck();
+        game_canvas->Refresh();
     }
 
-    void EditorFrame::OnToolSort(wxCommandEvent& evt) {
-        editor_canvas->GetDeck().Sort();
-        editor_canvas->Refresh();
+    void GameFrame::OnToolSort(wxCommandEvent& evt) {
+        game_canvas->GetDeck().Sort();
+        game_canvas->Refresh();
     }
 
-    void EditorFrame::OnToolShuffle(wxCommandEvent& evt) {
-        editor_canvas->GetDeck().Shuffle();
-        editor_canvas->Refresh();
+    void GameFrame::OnToolShuffle(wxCommandEvent& evt) {
+        game_canvas->GetDeck().Shuffle();
+        game_canvas->Refresh();
     }
 
-    void EditorFrame::OnToolScreenshot(wxCommandEvent& evt) {
-        editor_canvas->SaveScreenshot(wxEmptyString, true);
+    void GameFrame::OnToolScreenshot(wxCommandEvent& evt) {
+        game_canvas->SaveScreenshot(wxEmptyString, true);
         wxMessageDialog(this, stringCfg["eui_msg_screen_copy"], wxEmptyString, wxICON_INFORMATION).ShowModal();
     }
 
-    void EditorFrame::OnToolScreenshotSV(wxCommandEvent& evt) {
+    void GameFrame::OnToolScreenshotSV(wxCommandEvent& evt) {
         time_t t = time(0);
         wxString path = commonCfg["screenshot_path"];
         if(*path.rbegin() != wxT('/'))
@@ -357,13 +354,13 @@ namespace ygopro
             return;
         }
         path += wxString::Format(wxT("%d.png"), (int)t);
-        editor_canvas->SaveScreenshot(path);
+        game_canvas->SaveScreenshot(path);
         wxString savemsg = stringCfg["eui_msg_screen_save"];
         savemsg.Replace(wxT("{path}"), path);
         wxMessageDialog(this, savemsg, wxEmptyString, wxICON_INFORMATION).ShowModal();
     }
 
-    void EditorFrame::OnToolSearch(wxCommandEvent& evt) {
+    void GameFrame::OnToolSearch(wxCommandEvent& evt) {
         if(filterFrame)
             filterFrame->Raise();
         else {
@@ -373,9 +370,9 @@ namespace ygopro
         }
     }
 
-    void EditorFrame::OnToolOpenBrowser(wxCommandEvent& evt) {
+    void GameFrame::OnToolOpenBrowser(wxCommandEvent& evt) {
         wxString neturl = commonCfg["deck_neturl"];
-        wxString deck_string = editor_canvas->GetDeck().SaveToString();
+        wxString deck_string = game_canvas->GetDeck().SaveToString();
         neturl.Replace("{amp}", wxT("&"));
         neturl.Replace("{deck}", deck_string);
         if(current_file.IsEmpty())
@@ -384,23 +381,23 @@ namespace ygopro
             wxFileName fn(current_file);
             neturl.Replace("{name}", fn.GetName());
         }
-        editor_canvas->Refresh();
+        game_canvas->Refresh();
         wxLaunchDefaultBrowser(neturl);
     }
 
-    void EditorFrame::OnToolSwitchExclusive(wxCommandEvent& evt) {
-        editor_canvas->SwitchShowExclusive();
+    void GameFrame::OnToolSwitchExclusive(wxCommandEvent& evt) {
+        game_canvas->SwitchShowExclusive();
         Refresh();
     }
 
-    void EditorFrame::OnToolViewRegulation(wxCommandEvent& evt) {
+    void GameFrame::OnToolViewRegulation(wxCommandEvent& evt) {
         int id = evt.GetId() - ID_REG_VIEW1;
         view_regulation = id + 1;
-        limitRegulationMgr.LoadCurrentListToDeck(editor_canvas->GetDeck(), id);
-        editor_canvas->Refresh();
+        limitRegulationMgr.LoadCurrentListToDeck(game_canvas->GetDeck(), id);
+        game_canvas->Refresh();
     }
     
-    void EditorFrame::OnRegulationChange(wxCommandEvent& evt) {
+    void GameFrame::OnRegulationChange(wxCommandEvent& evt) {
         auto& regs = GetMenuBar()->GetMenu(2)->GetMenuItems();
         if(regs.GetCount() == 0)
             return;
@@ -414,12 +411,12 @@ namespace ygopro
         }
         limitRegulationMgr.SetLimitRegulation(id);
         if(view_regulation)
-            limitRegulationMgr.LoadCurrentListToDeck(editor_canvas->GetDeck(), view_regulation - 1);
-        limitRegulationMgr.GetDeckCardLimitCount(editor_canvas->GetDeck());
-        editor_canvas->Refresh();
+            limitRegulationMgr.LoadCurrentListToDeck(game_canvas->GetDeck(), view_regulation - 1);
+        limitRegulationMgr.GetDeckCardLimitCount(game_canvas->GetDeck());
+        game_canvas->Refresh();
     }
     
-    void EditorFrame::OnUrlClicked(wxTextUrlEvent& evt) {
+    void GameFrame::OnUrlClicked(wxTextUrlEvent& evt) {
         wxString url = evt.GetString();
         if(filterFrame)
             filterFrame->Raise();

@@ -12,9 +12,9 @@
 namespace ygopro
 {
 
-    class wxEditorCanvas;
+    class wxGameCanvas;
     
-    class EditorFrame : public wxFrame {
+    class GameFrame : public wxFrame {
 
         enum {
             ID_DECK_LOAD = wxID_HIGHEST + 1,
@@ -40,8 +40,8 @@ namespace ygopro
         };
 
     public:
-        EditorFrame(int sx, int sy);
-        ~EditorFrame();
+        GameFrame(int sx, int sy);
+        ~GameFrame();
 
         void SetCardInfo(unsigned int code);
         void AddCard(unsigned int code, unsigned int pos);
@@ -69,14 +69,14 @@ namespace ygopro
         
     private:
         wxString current_file;
-        wxEditorCanvas* editor_canvas;
+        wxGameCanvas* game_canvas;
         wxStaticBitmap* card_image;
         wxRichTextCtrl* card_info;
         wxImage star_img;
         int view_regulation = 0;
     };
 
-    extern EditorFrame* editorFrame;
+    extern GameFrame* mainFrame;
     extern Random globalRandom;
 	extern CommonConfig commonCfg;
     extern CommonConfig stringCfg;

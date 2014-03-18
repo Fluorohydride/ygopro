@@ -1,7 +1,6 @@
 #include "filter_frame.h"
-#include "editor_frame.h"
 #include "game_frame.h"
-#include "editor_canvas.h"
+#include "game_canvas.h"
 #include "card_data.h"
 #include "image_mgr.h"
 #include "wx/tokenzr.h"
@@ -308,7 +307,7 @@ namespace ygopro
             return;
         int delay = (int)commonCfg["hover_info_delay"];
         if(delay == 0)
-            editorFrame->SetCardInfo(code);
+            mainFrame->SetCardInfo(code);
         else {
             hover_timer.Stop();
             hover_timer.SetClientData(evt.GetEventObject());
@@ -326,21 +325,21 @@ namespace ygopro
     void FilterFrame::OnImageLClick(wxMouseEvent& evt) {
         void* data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
         unsigned int code = (unsigned int)(long)data;
-        editorFrame->SetCardInfo((unsigned int)code);
-        editorFrame->AddCard(code, 1);
+        mainFrame->SetCardInfo((unsigned int)code);
+        mainFrame->AddCard(code, 1);
     }
     
     void FilterFrame::OnImageRClick(wxMouseEvent& evt) {
         void* data = static_cast<wxStaticBitmap*>(evt.GetEventObject())->GetClientData();
         unsigned int code = (unsigned int)(long)data;
-        editorFrame->SetCardInfo((unsigned int)code);
-        editorFrame->AddCard(code, 3);
+        mainFrame->SetCardInfo((unsigned int)code);
+        mainFrame->AddCard(code, 3);
     }
     
     void FilterFrame::OnHoverTimer(wxTimerEvent& evt) {
         wxStaticBitmap* ctrl = static_cast<wxStaticBitmap*>(hover_timer.GetClientData());
         unsigned int code = (unsigned int)(long)ctrl->GetClientData();
-        editorFrame->SetCardInfo(code);
+        mainFrame->SetCardInfo(code);
     }
     
     void FilterFrame::OnKeywordEnter(wxCommandEvent& evt) {

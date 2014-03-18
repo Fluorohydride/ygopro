@@ -4,6 +4,7 @@
 /build/
 /_cache/
 /_res/
+/dependencies/
 *.exe
 *.log
 *.DS_Store

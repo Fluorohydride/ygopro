@@ -3,8 +3,7 @@
 #include "wx/time.h"
 #include "image_mgr.h"
 #include "game_frame.h"
-#include "editor_frame.h"
-#include "editor_canvas.h"
+#include "game_canvas.h"
 #include "card_data.h"
 #include "deck_data.h"
 
@@ -184,12 +183,12 @@ namespace ygopro
             }
             current_deck.RemoveCard(click_field, click_index);
             click_field = 0;
-            editorFrame->StopViewRegulation();
+            mainFrame->StopViewRegulation();
         } else {
             if(pre_code != hover_code && hover_code != 0) {
                 int delay = (int)commonCfg["hover_info_delay"];
                 if(delay == 0)
-                    editorFrame->SetCardInfo(hover_code);
+                    mainFrame->SetCardInfo(hover_code);
                 else {
                     hover_timer.Stop();
                     hover_timer.SetClientData((void*)(long)hover_code);
@@ -274,7 +273,7 @@ namespace ygopro
         } else if(hover_field) {
             current_deck.RemoveCard(hover_field, hover_index);
             EventMouseMoved(evt);
-            editorFrame->StopViewRegulation();
+            mainFrame->StopViewRegulation();
             Refresh();
         }
     }
@@ -282,7 +281,7 @@ namespace ygopro
     void wxGameCanvas::OnHoverTimer(wxTimerEvent& evt) {
         unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
         if(code == hover_code)
-            editorFrame->SetCardInfo(code);
+            mainFrame->SetCardInfo(code);
     }
 
     void wxGameCanvas::DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {

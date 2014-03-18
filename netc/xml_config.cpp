@@ -1,4 +1,5 @@
 #include "xml_config.h"
+#include "wx/xml/xml.h"
 
 namespace ygopro
 {

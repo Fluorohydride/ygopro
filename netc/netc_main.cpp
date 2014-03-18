@@ -1,5 +1,4 @@
 #include "game_frame.h"
-#include "editor_frame.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -39,9 +38,9 @@ namespace ygopro {
                 return true;
             limitRegulationMgr.LoadLimitRegulation(commonCfg["limit_regulation"], stringCfg["eui_list_default"]);
             
-			editorFrame = new EditorFrame(1080, 720);
-			editorFrame->Center();
-			editorFrame->Show();
+			mainFrame = new GameFrame(1080, 720);
+			mainFrame->Center();
+			mainFrame->Show();
 			return true;
 		}
 	};
