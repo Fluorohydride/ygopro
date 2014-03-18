@@ -11,7 +11,7 @@ namespace ygopro
     
     struct TextureInfo;
     
-	class wxEditorCanvas : public wxGLCanvas {
+	class wxGameCanvas : public wxGLCanvas {
 
 	private:
 		wxGLContext* glcontext = nullptr;
@@ -41,8 +41,8 @@ namespace ygopro
         bool show_exclusive = false;
 
 	public:
-		wxEditorCanvas(wxFrame* parent, int id, int* args);
-		virtual ~wxEditorCanvas();
+		wxGameCanvas(wxFrame* parent, int id, int* args);
+		virtual wxGameCanvas();
 
         DeckData& GetDeck() { return current_deck; }
 		void ClearDeck();

@@ -1,7 +1,7 @@
 #ifndef _XML_CONFIG_H_
 #define _XML_CONFIG_H_
 
-#include "wx/xml/xml.h"
+#include "wx/string.h"
 #include <unordered_map>
 
 namespace ygopro

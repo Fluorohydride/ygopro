@@ -11,17 +11,17 @@
 namespace ygopro
 {
 
-    wxEditorCanvas::wxEditorCanvas(wxFrame* parent, int id, int* args) : wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
+    wxGameCanvas::wxGameCanvas(wxFrame* parent, int id, int* args) : wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
         glcontext = new wxGLContext(this);
-        Bind(wxEVT_SIZE, &wxEditorCanvas::EventResized, this);
-        Bind(wxEVT_PAINT, &wxEditorCanvas::EventRender, this);
-        Bind(wxEVT_MOTION, &wxEditorCanvas::EventMouseMoved, this);
-        Bind(wxEVT_LEFT_DOWN, &wxEditorCanvas::EventMouseLDown, this);
-        Bind(wxEVT_LEFT_UP, &wxEditorCanvas::EventMouseLUp, this);
-        Bind(wxEVT_LEAVE_WINDOW, &wxEditorCanvas::EventMouseLeftWindow, this);
-        Bind(wxEVT_RIGHT_UP, &wxEditorCanvas::EventMouseRUp, this);
+        Bind(wxEVT_SIZE, &wxGameCanvas::EventResized, this);
+        Bind(wxEVT_PAINT, &wxGameCanvas::EventRender, this);
+        Bind(wxEVT_MOTION, &wxGameCanvas::EventMouseMoved, this);
+        Bind(wxEVT_LEFT_DOWN, &wxGameCanvas::EventMouseLDown, this);
+        Bind(wxEVT_LEFT_UP, &wxGameCanvas::EventMouseLUp, this);
+        Bind(wxEVT_LEAVE_WINDOW, &wxGameCanvas::EventMouseLeftWindow, this);
+        Bind(wxEVT_RIGHT_UP, &wxGameCanvas::EventMouseRUp, this);
         hover_timer.SetOwner(this);
-        Bind(wxEVT_TIMER, &wxEditorCanvas::OnHoverTimer, this);
+        Bind(wxEVT_TIMER, &wxGameCanvas::OnHoverTimer, this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
         t_buildbg = &imageMgr.textures["buildbg"];
         t_deckbg = &imageMgr.textures["deckbg"];
@@ -34,17 +34,17 @@ namespace ygopro
         t_tcg = &imageMgr.textures["tcg"];
     }
 
-    wxEditorCanvas::~wxEditorCanvas() {
+    wxGameCanvas::~wxGameCanvas() {
         delete glcontext;
     }
 
-    void wxEditorCanvas::ClearDeck() {
+    void wxGameCanvas::ClearDeck() {
         wxGLCanvas::SetCurrent(*glcontext);
         current_deck.Clear();
         imageMgr.UnloadAllCardTexture();
     }
 
-    void wxEditorCanvas::SaveScreenshot(const wxString& name, bool clipboard) {
+    void wxGameCanvas::SaveScreenshot(const wxString& name, bool clipboard) {
         wxGLCanvas::SetCurrent(*glcontext);
         imageMgr.InitTextures();
         DrawScene();
@@ -72,14 +72,14 @@ namespace ygopro
         delete[] image_buff;
     }
 
-    void wxEditorCanvas::EventResized(wxSizeEvent& evt) {
+    void wxGameCanvas::EventResized(wxSizeEvent& evt) {
         glwidth = evt.GetSize().GetWidth();
         glheight = evt.GetSize().GetHeight();
         glViewport(0, 0, glwidth, glheight);
         Refresh();
     }
 
-    void wxEditorCanvas::EventRender(wxPaintEvent& evt) {
+    void wxGameCanvas::EventRender(wxPaintEvent& evt) {
         if(!IsShown())
             return;
         wxGLCanvas::SetCurrent(*glcontext);
@@ -89,7 +89,7 @@ namespace ygopro
         SwapBuffers();
     }
 
-    void wxEditorCanvas::EventMouseMoved(wxMouseEvent& evt) {
+    void wxGameCanvas::EventMouseMoved(wxMouseEvent& evt) {
         wxPoint pt = evt.GetPosition();
         float fx = pt.x / (float)glwidth * 2.0f - 1.0f;
         float fy = -pt.y / (float)glheight * 2.0f + 1.0f;
@@ -200,7 +200,7 @@ namespace ygopro
         Refresh();
     }
 
-    void wxEditorCanvas::EventMouseLDown(wxMouseEvent& evt) {
+    void wxGameCanvas::EventMouseLDown(wxMouseEvent& evt) {
         click_field = hover_field;
         click_index = hover_index;
         click_field_pre = click_field;
@@ -208,7 +208,7 @@ namespace ygopro
             Refresh();
     }
     
-    void wxEditorCanvas::EventMouseLUp(wxMouseEvent& evt) {
+    void wxGameCanvas::EventMouseLUp(wxMouseEvent& evt) {
         if(click_field) {
             click_field = 0;
             click_index = 0;
@@ -252,7 +252,7 @@ namespace ygopro
         }
     }
     
-    void wxEditorCanvas::EventMouseLeftWindow(wxMouseEvent& evt) {
+    void wxGameCanvas::EventMouseLeftWindow(wxMouseEvent& evt) {
         if(hover_field != 0) {
             hover_field = 0;
             hover_index = 0;
@@ -261,7 +261,7 @@ namespace ygopro
         }
     }
 
-    void wxEditorCanvas::EventMouseRUp(wxMouseEvent& evt) {
+    void wxGameCanvas::EventMouseRUp(wxMouseEvent& evt) {
         if(click_field) {
             click_field = 0;
             click_index = 0;
@@ -279,13 +279,13 @@ namespace ygopro
         }
     }
     
-    void wxEditorCanvas::OnHoverTimer(wxTimerEvent& evt) {
+    void wxGameCanvas::OnHoverTimer(wxTimerEvent& evt) {
         unsigned int code = (unsigned int)(long)evt.GetTimer().GetClientData();
         if(code == hover_code)
             editorFrame->SetCardInfo(code);
     }
 
-    void wxEditorCanvas::DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {
+    void wxGameCanvas::DrawString(const char* str, int size, unsigned int color, float lx, float ly, float rx, float ry, bool limit) {
         glBindTexture(GL_TEXTURE_2D, t_font->tex());
         glBegin(GL_QUADS);
         glColor4ui((color >> 24) & 0xff, (color >> 16) & 0xff, (color >> 8) & 0xff, color & 0xff);
@@ -312,7 +312,7 @@ namespace ygopro
         glEnd();
     }
 
-    void wxEditorCanvas::DrawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry) {
+    void wxGameCanvas::DrawNumber(int number, unsigned int color, float lx, float ly, float rx, float ry) {
         glBindTexture(GL_TEXTURE_2D, t_font->tex());
         glBegin(GL_QUADS);
         float dx = (rx - lx) / 2;
@@ -342,7 +342,7 @@ namespace ygopro
         glEnd();
     }
 
-    void wxEditorCanvas::DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy, int pool) {
+    void wxGameCanvas::DrawCard(TextureInfo* ti, float lx, float ly, float rx, float ry, bool hl, int limit, float ix, float iy, int pool) {
         glBindTexture(GL_TEXTURE_2D, ti->tex());
         glBegin(GL_QUADS);
         {
@@ -387,7 +387,7 @@ namespace ygopro
         }
     }
     
-    void wxEditorCanvas::DrawScene() {
+    void wxGameCanvas::DrawScene() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
