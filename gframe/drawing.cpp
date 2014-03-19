@@ -76,19 +76,19 @@ void Game::DrawBackGround() {
 				DrawSelectionLine(&matManager.vFields[16 + i * 4], !(dField.selected_field & filter), 2, cv);
 		}
 		filter = 0x100;
-		for (int i = 0; i < 5; ++i, filter <<= 1) {
+		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if ((dField.selectable_field & filter) > 0)
 				DrawSelectionLine(&matManager.vFields[36 + i * 4], !(dField.selected_field & filter), 2, cv);
 		}
 		filter = 0x10000;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if ((dField.selectable_field & filter) > 0)
-				DrawSelectionLine(&matManager.vFields[76 + i * 4], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(&matManager.vFields[84 + i * 4], !(dField.selected_field & filter), 2, cv);
 		}
 		filter = 0x1000000;
-		for (int i = 0; i < 5; ++i, filter <<= 1) {
+		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if ((dField.selectable_field & filter) > 0)
-				DrawSelectionLine(&matManager.vFields[96 + i * 4], !(dField.selected_field & filter), 2, cv);
+				DrawSelectionLine(&matManager.vFields[104 + i * 4], !(dField.selected_field & filter), 2, cv);
 		}
 	}
 	//disabled field
@@ -102,7 +102,7 @@ void Game::DrawBackGround() {
 			}
 		}
 		filter = 0x100;
-		for (int i = 0; i < 5; ++i, filter <<= 1) {
+		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if ((dField.disabled_field & filter) > 0) {
 				driver->draw3DLine(matManager.vFields[36 + i * 4].Pos, matManager.vFields[36 + i * 4 + 3].Pos, 0xffffffff);
 				driver->draw3DLine(matManager.vFields[36 + i * 4 + 1].Pos, matManager.vFields[36 + i * 4 + 2].Pos, 0xffffffff);
@@ -111,20 +111,20 @@ void Game::DrawBackGround() {
 		filter = 0x10000;
 		for (int i = 0; i < 5; ++i, filter <<= 1) {
 			if ((dField.disabled_field & filter) > 0) {
-				driver->draw3DLine(matManager.vFields[76 + i * 4].Pos, matManager.vFields[76 + i * 4 + 3].Pos, 0xffffffff);
-				driver->draw3DLine(matManager.vFields[76 + i * 4 + 1].Pos, matManager.vFields[76 + i * 4 + 2].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFields[84 + i * 4].Pos, matManager.vFields[84 + i * 4 + 3].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFields[84 + i * 4 + 1].Pos, matManager.vFields[84 + i * 4 + 2].Pos, 0xffffffff);
 			}
 		}
 		filter = 0x1000000;
-		for (int i = 0; i < 5; ++i, filter <<= 1) {
+		for (int i = 0; i < 8; ++i, filter <<= 1) {
 			if ((dField.disabled_field & filter) > 0) {
-				driver->draw3DLine(matManager.vFields[96 + i * 4].Pos, matManager.vFields[96 + i * 4 + 3].Pos, 0xffffffff);
-				driver->draw3DLine(matManager.vFields[96 + i * 4 + 1].Pos, matManager.vFields[96 + i * 4 + 2].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFields[104 + i * 4].Pos, matManager.vFields[104 + i * 4 + 3].Pos, 0xffffffff);
+				driver->draw3DLine(matManager.vFields[104 + i * 4 + 1].Pos, matManager.vFields[104 + i * 4 + 2].Pos, 0xffffffff);
 			}
 		}
 	}
 	//current sel
-	if (dField.hovered_location != 0 && dField.hovered_location  != 2) {
+	if (dField.hovered_location != 0 && dField.hovered_location != 2) {
 		int index = 0;
 		if (dField.hovered_controler == 0) {
 			if (dField.hovered_location == LOCATION_DECK) index = 0;
@@ -134,12 +134,12 @@ void Game::DrawBackGround() {
 			else if (dField.hovered_location == LOCATION_REMOVED) index = 12;
 			else if (dField.hovered_location == LOCATION_EXTRA) index = 8;
 		} else {
-			if (dField.hovered_location == LOCATION_DECK) index = 60;
-			else if (dField.hovered_location == LOCATION_MZONE) index = 76 + dField.hovered_sequence * 4;
-			else if (dField.hovered_location == LOCATION_SZONE) index = 96 + dField.hovered_sequence * 4;
-			else if (dField.hovered_location == LOCATION_GRAVE) index = 64;
-			else if (dField.hovered_location == LOCATION_REMOVED) index = 72;
-			else if (dField.hovered_location == LOCATION_EXTRA) index = 68;
+			if (dField.hovered_location == LOCATION_DECK) index = 68;
+			else if (dField.hovered_location == LOCATION_MZONE) index = 84 + dField.hovered_sequence * 4;
+			else if (dField.hovered_location == LOCATION_SZONE) index = 104 + dField.hovered_sequence * 4;
+			else if (dField.hovered_location == LOCATION_GRAVE) index = 72;
+			else if (dField.hovered_location == LOCATION_REMOVED) index = 80;
+			else if (dField.hovered_location == LOCATION_EXTRA) index = 76;
 		}
 		selFieldAlpha += selFieldDAlpha;
 		if (selFieldAlpha <= 5) {
@@ -161,7 +161,7 @@ void Game::DrawCards() {
 		for(int i = 0; i < 5; ++i)
 			if(dField.mzone[p][i])
 				DrawCard(dField.mzone[p][i]);
-		for(int i = 0; i < 6; ++i)
+		for(int i = 0; i < 8; ++i)
 			if(dField.szone[p][i])
 				DrawCard(dField.szone[p][i]);
 		for(size_t i = 0; i < dField.deck[p].size(); ++i)
@@ -267,6 +267,11 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
+	if(dField.pzone_act) {
+		im.setTranslation(vector3df(-0.4f, 1.7f, 0.03f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
 	if(dField.chains.size() > 1) {
 		for(size_t i = 0; i < dField.chains.size(); ++i) {
 			if(dField.chains[i].solved)
@@ -347,8 +352,9 @@ void Game::DrawMisc() {
 	driver->draw2DRectangle(recti(632, 30, 688, 50), 0xffffffff, 0xffffffff, 0x00000000, 0x00000000);
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn), recti(635, 5, 685, 40), 0x80000000, true, false, 0);
 	lpcFont->draw(dataManager.GetNumString(dInfo.turn), recti(635, 5, 687, 40), 0x8000ffff, true, false, 0);
+	ClientCard* pcard;
 	for(int i = 0; i < 5; ++i) {
-		ClientCard* pcard = dField.mzone[0][i];
+		pcard = dField.mzone[0][i];
 		if(pcard && pcard->code != 0) {
 			int m = 483 + i * 90;
 			adFont->draw(L"/", recti(m - 4, 396, m + 4, 416), 0xff000000, true, false, 0);
@@ -367,7 +373,7 @@ void Game::DrawMisc() {
 		}
 	}
 	for(int i = 0; i < 5; ++i) {
-		ClientCard* pcard = dField.mzone[1][i];
+		pcard = dField.mzone[1][i];
 		if(pcard && (pcard->position & POS_FACEUP)) {
 			int m = 810 - i * 73;
 			adFont->draw(L"/", recti(m - 4, 245, m + 4, 265), 0xff000000, true, false, 0);
@@ -384,6 +390,26 @@ void Game::DrawMisc() {
 			adFont->draw(pcard->lvstring, recti(789 - i * 76, 283, 820 - i * 76, 303),
 			             (pcard->type & TYPE_XYZ) ? 0xffff80ff : (pcard->type & TYPE_TUNER) ? 0xffffff00 : 0xffffffff, false, false, 0);
 		}
+	}
+	pcard = dField.szone[0][6];
+	if(pcard) {
+		adFont->draw(pcard->lscstring, recti(321, 378, 353, 398), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(322, 379, 354, 399), 0xffffffff, true, false, 0);
+	}
+	pcard = dField.szone[0][7];
+	if(pcard) {
+		adFont->draw(pcard->rscstring, recti(975, 378, 1007, 398), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(976, 379, 1008, 399), 0xffffffff, true, false, 0);
+	}
+	pcard = dField.szone[1][6];
+	if(pcard) {
+		adFont->draw(pcard->lscstring, recti(924, 255, 956, 275), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(925, 256, 957, 276), 0xffffffff, true, false, 0);
+	}
+	pcard = dField.szone[1][7];
+	if(pcard) {
+		adFont->draw(pcard->rscstring, recti(373, 255, 405, 275), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(374, 256, 406, 276), 0xffffffff, true, false, 0);
 	}
 	if(dField.extra[0].size()) {
 		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(305, 532, 381, 552), 0xff000000, true, false, 0);
@@ -873,6 +899,11 @@ void Game::DrawDeckBd() {
 			else if(ptr->second.defence < 0)
 				myswprintf(textBuffer, L"%d/?", ptr->second.attack);
 			else myswprintf(textBuffer, L"%d/%d", ptr->second.attack, ptr->second.defence);
+			if(ptr->second.type & TYPE_PENDULUM) {
+				wchar_t scaleBuffer[16];
+				myswprintf(scaleBuffer, L" %d/%d", ptr->second.lscale, ptr->second.rscale);
+				wcscat(textBuffer, scaleBuffer);
+			}
 			if((ptr->second.ot & 0x3) == 1)
 				wcscat(textBuffer, L" [OCG]");
 			else if((ptr->second.ot & 0x3) == 2)

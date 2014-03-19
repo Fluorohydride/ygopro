@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1321;
+const unsigned short PRO_VERSION = 0x1330;
 
 namespace ygo {
 
@@ -846,6 +846,11 @@ void Game::ShowCardInfo(int code) {
 			myswprintf(&formatBuffer[cd.level + 3], L"%d/?", cd.attack);
 		else
 			myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
+		if(cd.type & TYPE_PENDULUM) {
+			wchar_t scaleBuffer[16];
+			myswprintf(scaleBuffer, L" %d/%d", cd.lscale, cd.rscale);
+			wcscat(formatBuffer, scaleBuffer);
+		}
 		stDataInfo->setText(formatBuffer);
 		stText->setRelativePosition(rect<s32>(15, 83, 287, 324));
 		scrCardText->setRelativePosition(rect<s32>(267, 83, 287, 324));

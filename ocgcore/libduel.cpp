@@ -1234,11 +1234,25 @@ int32 scriptlib::duel_negate_related_chain(lua_State *L) {
 }
 int32 scriptlib::duel_disable_summon(lua_State *L) {
 	check_param_count(L, 1);
-	check_param(L, PARAM_TYPE_CARD, 1);
-	card* target = *(card**)lua_touserdata(L, 1);
-	target->set_status(STATUS_SUMMONING, FALSE);
-	target->set_status(STATUS_SUMMON_DISABLED, TRUE);
-	target->set_status(STATUS_PROC_COMPLETE, FALSE);
+	card* pcard = 0;
+	group* pgroup = 0;
+	if(check_param(L, PARAM_TYPE_CARD, 1, TRUE))
+		pcard = *(card**) lua_touserdata(L, 1);
+	else if(check_param(L, PARAM_TYPE_GROUP, 1, TRUE))
+		pgroup = *(group**) lua_touserdata(L, 1);
+	else
+		luaL_error(L, "Parameter %d should be \"Card\" or \"Group\".", 1);
+	if(pcard) {
+		pcard->set_status(STATUS_SUMMONING, FALSE);
+		pcard->set_status(STATUS_SUMMON_DISABLED, TRUE);
+		pcard->set_status(STATUS_PROC_COMPLETE, FALSE);
+	} else {
+		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+			(*cit)->set_status(STATUS_SUMMONING, FALSE);
+			(*cit)->set_status(STATUS_SUMMON_DISABLED, TRUE);
+			(*cit)->set_status(STATUS_PROC_COMPLETE, FALSE);
+		}
+	}
 	return 0;
 }
 int32 scriptlib::duel_increase_summon_count(lua_State *L) {

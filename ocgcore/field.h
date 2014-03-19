@@ -212,6 +212,7 @@ struct processor {
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
 	std::unordered_set<card*> unique_cards[2];
+	std::unordered_map<uint32, uint32> effect_count_code;
 	ptr temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[2];
@@ -320,6 +321,10 @@ public:
 	void reset_effect(uint32 id, uint32 reset_type);
 	void reset_phase(uint32 phase);
 	void reset_chain();
+	void add_effect_code(uint32 code);
+	uint32 get_effect_code(uint32 code);
+	void dec_effect_code(uint32 code);
+	
 	void filter_field_effect(uint32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_affected_cards(effect* peffect, card_set* cset);
 	void filter_player_effect(uint8 playerid, uint32 code, effect_set* eset, uint8 sort = TRUE);
@@ -437,7 +442,7 @@ public:
 	void release(card* target, effect* reason_effect, uint32 reason, uint32 reason_player);
 	void send_to(card_set* targets, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position);
 	void send_to(card* target, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence, uint32 position);
-	void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint32 enable = FALSE, uint32 ret = FALSE);
+	void move_to_field(card* target, uint32 move_player, uint32 playerid, uint32 destination, uint32 positions, uint32 enable = FALSE, uint32 ret = FALSE, uint32 is_equip = FALSE);
 	void change_position(card_set* targets, effect* reason_effect, uint32 reason_player, uint32 au, uint32 ad, uint32 du, uint32 dd, uint32 noflip, uint32 enable = FALSE);
 	void change_position(card* target, effect* reason_effect, uint32 reason_player, uint32 npos, uint32 noflip, uint32 enable = FALSE);
 
@@ -465,7 +470,7 @@ public:
 	int32 send_to(uint16 step, group* targets, card* target);
 	int32 send_to(uint16 step, group* targets, effect* reason_effect, uint32 reason, uint8 reason_player);
 	int32 discard_deck(uint16 step, uint8 playerid, uint8 count, uint32 reason);
-	int32 move_to_field(uint16 step, card* target, uint32 enable, uint32 ret);
+	int32 move_to_field(uint16 step, card* target, uint32 enable, uint32 ret, uint32 is_equip);
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, ptr arg, ptr replace_type);
 	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max);
@@ -548,6 +553,7 @@ public:
 #define GLOBALFLAG_DELAYED_QUICKEFFECT	0x8
 #define GLOBALFLAG_DETACH_EVENT			0x10
 #define GLOBALFLAG_MUST_BE_SMATERIAL	0x20
+#define GLOBALFLAG_SPSUMMON_COUNT		0x40
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

@@ -411,7 +411,7 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	set_player_info(pduel, 1, host_info.start_lp, host_info.start_hand, host_info.draw_count);
 	int opt = 0;
 	if(host_info.enable_priority)
-		opt |= DUEL_ENABLE_PRIORITY;
+		opt |= DUEL_OBSOLETE_RULING;
 	if(host_info.no_shuffle_deck)
 		opt |= DUEL_PSEUDO_SHUFFLE;
 	last_replay.WriteInt32(host_info.start_lp, false);
@@ -869,20 +869,12 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			int cs = pbuf[10];
 			int cp = pbuf[11];
 			pbuf += 16;
-			if(cl == LOCATION_REMOVED && (cp & POS_FACEDOWN)) {
-				NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
-				BufferIO::WriteInt32(pbufw, 0);				
-				NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-			} else {
-				NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
-				if (!(cl & 0xb0) && !((cl & 0xc) && (cp & POS_FACEUP)))
-					BufferIO::WriteInt32(pbufw, 0);
-				NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
-				for(auto oit = observers.begin(); oit != observers.end(); ++oit)
-					NetServer::ReSendToPlayer(*oit);
-			}
+			NetServer::SendBufferToPlayer(players[cc], STOC_GAME_MSG, offset, pbuf - offset);
+			if (!(cl & (LOCATION_GRAVE + LOCATION_OVERLAY)) && ((cl & (LOCATION_DECK + LOCATION_HAND)) || (cp & POS_FACEDOWN)))
+				BufferIO::WriteInt32(pbufw, 0);
+			NetServer::SendBufferToPlayer(players[1 - cc], STOC_GAME_MSG, offset, pbuf - offset);
+			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
+				NetServer::ReSendToPlayer(*oit);
 			if (cl != 0 && (cl & 0x80) == 0 && (cl != pl || pc != cc))
 				RefreshSingle(cc, cl, cs);
 			break;
@@ -1380,7 +1372,7 @@ void SingleDuel::RefreshSzone(int player, int flag, int use_cache) {
 	BufferIO::WriteInt8(qbuf, LOCATION_SZONE);
 	int len = query_field_card(pduel, player, LOCATION_SZONE, flag, (unsigned char*)qbuf, use_cache);
 	NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, query_buffer, len + 3);
-	for (int i = 0; i < 6; ++i) {
+	for (int i = 0; i < 8; ++i) {
 		int clen = BufferIO::ReadInt32(qbuf);
 		if (clen == 4)
 			continue;
@@ -1403,8 +1395,13 @@ void SingleDuel::RefreshHand(int player, int flag, int use_cache) {
 	int qlen = 0, slen;
 	while(qlen < len) {
 		slen = BufferIO::ReadInt32(qbuf);
-		/*int qflag = *(int*)qbuf;*/
-		if(!qbuf[slen - 8])
+		int qflag = *(int*)qbuf;
+		int pos = slen - 8;
+		if(qflag & QUERY_LSCALE)
+			pos -= 4;
+		if(qflag & QUERY_RSCALE)
+			pos -= 4;
+		if(!qbuf[pos])
 			memset(qbuf, 0, slen - 4);
 		qbuf += slen - 4;
 		qlen += slen;

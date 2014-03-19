@@ -897,3 +897,59 @@ function Auxiliary.RPEOperation(filter)
 				end
 			end
 end
+function Auxiliary.AddPendulumProcedure(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetRange(LOCATION_SZONE)
+	e1:SetCondition(Auxiliary.PendCondition())
+	e1:SetOperation(Auxiliary.PendOperation())
+	e1:SetValue(SUMMON_TYPE_PENDULUM)
+	c:RegisterEffect(e1)
+end
+function Auxiliary.PConditionFilter(c,e,tp,lscale,rscale)
+	local lv=c:GetLevel()
+	return (c:IsLocation(LOCATION_HAND) or (c:IsFaceup() and c:IsType(TYPE_PENDULUM)))
+		and lv>lscale and lv<rscale and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_PENDULUM,tp,false,false)
+end
+function Auxiliary.PendCondition()
+	return	function(e,c,og)
+				if c==nil then return true end
+				local tp=c:GetControler()
+				if Duel.GetFlagEffect(tp,10000000)~=0 then return false end
+				if c:GetSequence()~=6 then return false end
+				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+				if rpz==nil then return false end
+				local lscale=c:GetLeftScale()
+				local rscale=rpz:GetRightScale()
+				if lscale>rscale then lscale,rscale=rscale,lscale end
+				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+				if ft<=0 then return false end
+				if og then
+					return og:IsExists(Auxiliary.PConditionFilter,1,nil,e,tp,lscale,rscale)
+				else
+					return Duel.IsExistingMatchingCard(Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,lscale,rscale)
+				end
+			end
+end
+function Auxiliary.PendOperation()
+	return	function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
+				Duel.RegisterFlagEffect(tp,10000000,RESET_PHASE+PHASE_END,0,1)
+				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+				local lscale=c:GetLeftScale()
+				local rscale=rpz:GetRightScale()
+				if lscale>rscale then lscale,rscale=rscale,lscale end
+				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+				if ft<=0 then return false end
+				if og then
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+					local g=og:FilterSelect(tp,Auxiliary.PConditionFilter,1,ft,nil,e,tp,lscale,rscale)
+					sg:Merge(g)
+				else
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+					local g=Duel.SelectMatchingCard(tp,Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
+					sg:Merge(g)
+				end
+			end
+end

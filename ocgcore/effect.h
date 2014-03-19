@@ -44,6 +44,7 @@ public:
 	uint16 o_range;
 	uint16 reset_count;
 	uint32 reset_flag;
+	uint32 count_code;
 	uint32 category;
 	uint32 label;
 	uint32 hint_timing[2];
@@ -277,6 +278,10 @@ public:
 #define EFFECT_CHANGE_LEVEL				131	//
 #define EFFECT_UPDATE_RANK				132 //
 #define EFFECT_CHANGE_RANK				133 //
+#define EFFECT_UPDATE_LSCALE			134 //
+#define EFFECT_CHANGE_LSCALE			135 //
+#define EFFECT_UPDATE_RSCALE			136 //
+#define EFFECT_CHANGE_RSCALE			137 //
 #define EFFECT_SET_POSITION				140 //
 #define EFFECT_SELF_DESTROY				141 //
 #define EFFECT_DOUBLE_TRIBUTE			150
@@ -354,6 +359,7 @@ public:
 #define EFFECT_SYNCHRO_CHECK			310
 #define EFFECT_QP_ACT_IN_NTPHAND		311
 #define EFFECT_MUST_BE_SMATERIAL		312
+#define EFFECT_SPSUMMON_PROC_G			320
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001

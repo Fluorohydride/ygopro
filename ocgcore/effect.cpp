@@ -32,6 +32,7 @@ effect::effect() {
 	o_range = 0;
 	reset_count = 0;
 	reset_flag = 0;
+	count_code = 0;
 	category = 0;
 	label = 0;
 	label_object = 0;
@@ -116,15 +117,26 @@ int32 effect::is_available() {
 int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if(!(type & EFFECT_TYPE_ACTIONS))
 		return FALSE;
-	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (reset_count & 0xf00) == 0)
-		return FALSE;
+	if((flag & EFFECT_FLAG_COUNT_LIMIT)) {
+		if(count_code == 0) {
+			if((reset_count & 0xf00) == 0)
+				return FALSE;
+		} else {
+			uint32 code = count_code & 0x7fffffff;
+			if(code == 1) {
+				if(pduel->game_field->get_effect_code((count_code & 0x80000000) | handler->fieldid) >= ((reset_count >> 12) & 0xf))
+					return false;
+			} else {
+				if(pduel->game_field->get_effect_code(count_code) >= ((reset_count >> 12) & 0xf))
+					return false;
+			}
+		}
+	}
 	if (!(flag & EFFECT_FLAG_FIELD_ONLY)) {
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
 				return FALSE;
 			if(pduel->game_field->check_unique_onfield(handler, playerid))
-				return FALSE;
-			if(handler->data.type & TYPE_MONSTER)
 				return FALSE;
 			if(!(handler->data.type & TYPE_COUNTER)) {
 				if((code < 1132 || code > 1149) && pduel->game_field->infos.phase == PHASE_DAMAGE && !(flag & EFFECT_FLAG_DAMAGE_STEP))
@@ -135,11 +147,16 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			if(handler->current.location == LOCATION_HAND) {
 				if((handler->data.type & TYPE_TRAP) && !handler->is_affected_by_effect(EFFECT_TRAP_ACT_IN_HAND))
 					return FALSE;
-				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != handler->current.controler)) {
+				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != playerid)) {
 					if(!(handler->data.type & TYPE_QUICKPLAY) || !handler->is_affected_by_effect(EFFECT_QP_ACT_IN_NTPHAND))
 						return FALSE;
 				}
-				if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(handler->current.controler, LOCATION_SZONE, handler->current.controler, LOCATION_REASON_TOFIELD) <= 0)
+				if(handler->data.type & TYPE_MONSTER) {
+					if(!(handler->data.type & TYPE_PENDULUM))
+						return FALSE;
+					if(pduel->game_field->player[playerid].list_szone[6] && pduel->game_field->player[playerid].list_szone[7])
+						return FALSE;
+				} else if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(playerid, LOCATION_SZONE, playerid, LOCATION_REASON_TOFIELD) <= 0)
 					return FALSE;
 			} else if(handler->current.location == LOCATION_SZONE) {
 				if(handler->is_position(POS_FACEUP))
@@ -463,12 +480,20 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 void effect::dec_count() {
 	if(!(flag & EFFECT_FLAG_COUNT_LIMIT))
 		return;
-	if((reset_count & 0xf00) == 0)
-		return;
-	reset_count -= 0x100;
+	if(count_code == 0) {
+		if((reset_count & 0xf00) == 0)
+			return;
+		reset_count -= 0x100;
+	} else {
+		uint32 code = count_code & 0x7fffffff;
+		if(code == 1)
+			pduel->game_field->add_effect_code((count_code & 0x80000000) | handler->fieldid);
+		else
+			pduel->game_field->add_effect_code(count_code);
+	}
 }
 void effect::recharge() {
-	if(flag & EFFECT_FLAG_COUNT_LIMIT) {
+	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (count_code == 0)) {
 		reset_count &= 0xf0ff;
 		reset_count |= (reset_count >> 4) & 0xf00;
 	}
