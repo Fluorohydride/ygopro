@@ -11,7 +11,7 @@ function c50323155.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c50323155.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp~=ep and Duel.GetCurrentChain()==0
+	return tp~=ep and eg:GetCount()==1 and Duel.GetCurrentChain()==0
 end
 function c50323155.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

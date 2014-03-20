@@ -3325,7 +3325,10 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			target->overlay_target->xyz_remove(target);
 		move_card(playerid, target, location, target->temp.sequence);
 		target->current.position = returns.ivalue[0];
-		target->set_status(STATUS_LEAVE_CONFIRMED | STATUS_ACTIVATED, FALSE);
+		if((target->previous.location & LOCATION_ONFIELD) && (location & LOCATION_ONFIELD))
+			target->set_status(STATUS_LEAVE_CONFIRMED, FALSE);
+		else
+			target->set_status(STATUS_LEAVE_CONFIRMED | STATUS_ACTIVATED, FALSE);
 		pduel->write_buffer32(target->get_info_location());
 		pduel->write_buffer32(target->current.reason);
 		if((target->current.location != LOCATION_MZONE)) {

@@ -273,7 +273,7 @@ uint32 card::get_type() {
 		return assume_value;
 	if(!(current.location & 0x1e))
 		return data.type;
-	if((current.location == LOCATION_SZONE) && (current.position >= 6))
+	if((current.location == LOCATION_SZONE) && (current.sequence >= 6))
 		return TYPE_PENDULUM + TYPE_SPELL;
 	if (temp.type != 0xffffffff)
 		return temp.type;
@@ -767,14 +767,14 @@ void card::xyz_overlay(card_set* materials) {
 		xyz_add(pcard, &des);
 	} else {
 		field::card_vector cv;
-		for(auto cit : *materials)
-			cv.push_back(cit);
+		for(auto cit = materials->begin(); cit != materials->end(); ++cit)
+			cv.push_back(*cit);
 		std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		for(auto pcard : cv) {
-			pcard->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
-			if(pcard->unique_code)
-				pduel->game_field->remove_unique_card(pcard);
-			xyz_add(pcard, &des);
+		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit) {
+			(*cvit)->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
+			if((*cvit)->unique_code)
+				pduel->game_field->remove_unique_card(*cvit);
+			xyz_add(*cvit, &des);
 		}
 	}
 	if(des.size())

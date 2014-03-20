@@ -21,7 +21,7 @@ function c71564252.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c71564252.condition(e,tp,eg,ep,ev,re,r,rp)
-	return tp~=ep and Duel.GetCurrentChain()==0
+	return tp~=ep and eg:GetCount()==1 and Duel.GetCurrentChain()==0
 end
 function c71564252.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
