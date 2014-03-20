@@ -273,7 +273,7 @@ uint32 card::get_type() {
 		return assume_value;
 	if(!(current.location & 0x1e))
 		return data.type;
-	if((current.location == LOCATION_SZONE) && (current.position >= 6))
+	if((current.location == LOCATION_SZONE) && (current.sequence >= 6))
 		return TYPE_PENDULUM + TYPE_SPELL;
 	if (temp.type != 0xffffffff)
 		return temp.type;

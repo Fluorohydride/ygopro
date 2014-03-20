@@ -1489,15 +1489,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(396, 504, 880, 600);
-	irr::core::recti ofRect(506, 135, 795, 191);
+	irr::core::recti sfRect(393, 504, 875, 600);
+	irr::core::recti ofRect(501, 135, 790, 191);
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 396 + 82 * (6 - hc) / 2;
+			int left = 393 + 82 * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
@@ -1512,17 +1512,17 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 0;
 			hovered_location = LOCATION_HAND;
-			if(x >= 829)
+			if(x >= 804)
 				hovered_sequence = hc - 1;
 			else
-				hovered_sequence = (x - 416) * (hc - 1) / 413;
+				hovered_sequence = (x - 393) * (hc - 1) / 411;
 		}
 	} else if(ofRect.isPointInside(pos)) {
 		int hc = hand[1].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 506 + 49 * (6 - hc) / 2;
+			int left = 501 + 49 * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
@@ -1537,10 +1537,10 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 1;
 			hovered_location = LOCATION_HAND;
-			if(x >= 756)
+			if(x >= 748)
 				hovered_sequence = 0;
 			else
-				hovered_sequence = hc - 1 - (x - 516) * (hc - 1) / 247;
+				hovered_sequence = hc - 1 - (x - 501) * (hc - 1) / 247;
 		}
 	} else {
 		double screenx = x / 1024.0 * 1.25 - 0.81;
