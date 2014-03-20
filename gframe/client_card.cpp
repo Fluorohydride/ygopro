@@ -37,6 +37,8 @@ ClientCard::ClientCard() {
 	atkstring[0] = 0;
 	defstring[0] = 0;
 	lvstring[0] = 0;
+	rscstring[0] = 0;
+	lscstring[0] = 0;
 	overlayTarget = 0;
 	equipTarget = 0;
 }
