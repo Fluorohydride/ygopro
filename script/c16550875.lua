@@ -65,7 +65,7 @@ function c16550875.thfilter(c)
 	return c:IsSetCard(0x56) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c16550875.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c16550875.thfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c16550875.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c16550875.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c16550875.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)

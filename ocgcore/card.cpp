@@ -1246,10 +1246,6 @@ int32 card::destination_redirect(uint8 destination, uint32 reason) {
 	uint32 redirect;
 	if(data.type & TYPE_TOKEN)
 		return 0;
-	if((data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && destination == LOCATION_HAND)
-		destination = LOCATION_DECK;
-	if((data.type & TYPE_PENDULUM) && destination == LOCATION_GRAVE && (current.location & LOCATION_ONFIELD) && !is_status(STATUS_SUMMON_DISABLED))
-		destination = LOCATION_DECK;
 	if(destination == LOCATION_HAND)
 		filter_effect(EFFECT_TO_HAND_REDIRECT, &es);
 	else if(destination == LOCATION_DECK)

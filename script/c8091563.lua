@@ -40,7 +40,8 @@ function c8091563.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c8091563.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return eg:GetCount()==1 and tc:IsPreviousLocation(LOCATION_GRAVE) and (tc:IsSetCard(0x85) or tc:IsCode(71071546))
+	return eg:GetCount()==1 and (tc:IsSetCard(0x85) or tc:IsCode(71071546))
+		and tc:IsControler(tp) and tc:GetPreviousControler()==tp and tc:IsPreviousLocation(LOCATION_GRAVE)
 end
 function c8091563.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
