@@ -645,7 +645,7 @@ int32 field::sort_card(int16 step, uint8 playerid, uint8 is_chain) {
 int32 field::announce_race(int16 step, uint8 playerid, int32 count, int32 available) {
 	if(step == 0) {
 		int32 scount = 0;
-		for(int32 ft = 0x1; ft != 0x800000; ft <<= 1) {
+		for(int32 ft = 0x1; ft != 0x1000000; ft <<= 1) {
 			if(ft & available)
 				scount++;
 		}
@@ -661,7 +661,7 @@ int32 field::announce_race(int16 step, uint8 playerid, int32 count, int32 availa
 	} else {
 		int32 rc = returns.ivalue[0];
 		int32 sel = 0;
-		for(int32 ft = 0x1; ft != 0x800000; ft <<= 1) {
+		for(int32 ft = 0x1; ft != 0x1000000; ft <<= 1) {
 			if(!(ft & rc)) continue;
 			if(!(ft & available)) {
 				pduel->write_buffer8(MSG_RETRY);
