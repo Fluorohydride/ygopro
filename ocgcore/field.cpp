@@ -144,8 +144,8 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	if ((pcard->data.type & TYPE_PENDULUM) && (location == LOCATION_GRAVE)
-	        && (((pcard->previous.location & LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
-	        || ((pcard->previous.location & LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
+	        && (((pcard->previous.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
+	        || ((pcard->previous.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
 		location = LOCATION_EXTRA;
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEUP_DEFENCE << 24);
 	}

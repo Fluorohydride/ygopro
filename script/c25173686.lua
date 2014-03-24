@@ -16,7 +16,7 @@ function c25173686.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ct==6 or (ct==5 and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)==nil)
 end
 function c25173686.filter(c)
-	return c:GetSequence()~=5 and c:IsDestructable()
+	return c:GetSequence()<5 and c:IsDestructable()
 end
 function c25173686.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c25173686.filter,tp,0,LOCATION_SZONE,1,nil) end

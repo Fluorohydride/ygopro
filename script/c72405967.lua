@@ -11,8 +11,7 @@ function c72405967.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c72405967.condition(e,tp,eg,ep,ev,re,r,rp)
-	local env,ent=Duel.GetEnvironment()
-	return env==47355498 and ent==tp
+	return Duel.IsEnvironment(47355498,tp)
 end
 function c72405967.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end

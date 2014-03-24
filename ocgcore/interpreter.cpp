@@ -341,6 +341,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "RaiseSingleEvent", scriptlib::duel_raise_single_event },
 	{ "CheckTiming", scriptlib::duel_check_timing },
 	{ "GetEnvironment", scriptlib::duel_get_environment },
+	{ "IsEnvironment", scriptlib::duel_is_environment },
 	{ "Win", scriptlib::duel_win },
 	{ "Draw", scriptlib::duel_draw },
 	{ "Damage", scriptlib::duel_damage },

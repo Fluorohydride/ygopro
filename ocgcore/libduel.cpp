@@ -811,6 +811,40 @@ int32 scriptlib::duel_get_environment(lua_State *L) {
 	lua_pushinteger(L, p);
 	return 2;
 }
+int32 scriptlib::duel_is_environment(lua_State *L) {
+	check_param_count(L, 1);
+	uint32 code = lua_tointeger(L, 1);
+	uint32 playerid = PLAYER_ALL;
+	if(lua_gettop(L) >= 2)
+		playerid = lua_tointeger(L, 2);
+	if(playerid != 0 && playerid != 1 && playerid != PLAYER_ALL)
+		return 0;
+	duel* pduel = interpreter::get_duel_info(L);
+	int32 ret = 0, fc = 0;
+	card* pcard = pduel->game_field->player[0].list_szone[5];
+	if(pcard && pcard->is_position(POS_FACEUP) && pcard->get_status(STATUS_EFFECT_ENABLED)) {
+		fc = 1;
+		if(code == pcard->get_code() && (playerid == 0 || playerid == PLAYER_ALL))
+			ret = 1;
+	}
+	pcard = pduel->game_field->player[1].list_szone[5];
+	if(pcard && pcard->is_position(POS_FACEUP) && pcard->get_status(STATUS_EFFECT_ENABLED)) {
+		fc = 1;
+		if(code == pcard->get_code() && (playerid == 1 || playerid == PLAYER_ALL))
+			ret = 1;
+	}
+	if(!fc) {
+		effect_set eset;
+		pduel->game_field->filter_field_effect(EFFECT_CHANGE_ENVIRONMENT, &eset);
+		if(eset.count) {
+			effect* peffect = eset.get_last();
+			if(code == peffect->get_value() && (playerid == peffect->get_handler_player() || playerid == PLAYER_ALL))
+				ret = 1;
+		}
+	}
+	lua_pushboolean(L, ret);
+	return 1;
+}
 int32 scriptlib::duel_win(lua_State *L) {
 	check_param_count(L, 2);
 	uint32 playerid = lua_tointeger(L, 1);

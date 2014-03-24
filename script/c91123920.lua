@@ -24,8 +24,8 @@ function c91123920.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL)
 end
 function c91123920.val(e,c)
-	local ev,ep=Duel.GetEnvironment()
-	if ev~=56433456 or ep~=c:GetControler() then return 0 end
-	local v=Duel.GetLP(ep)-Duel.GetLP(1-ep)
+	local tp=c:GetControler()
+	if not Duel.IsEnvironment(56433456,tp) then return 0 end
+	local v=Duel.GetLP(tp)-Duel.GetLP(1-tp)
 	if v>0 then return v else return 0 end
 end

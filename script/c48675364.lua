@@ -39,6 +39,5 @@ function c48675364.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c48675364.descon(e)
-	local ev,ep=Duel.GetEnvironment()
-	return Duel.GetEnvironment()~=94585852
+	return not Duel.IsEnvironment(94585852)
 end

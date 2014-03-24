@@ -11,7 +11,7 @@ function c81066751.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c81066751.condition(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetEnvironment()~=56433456 then return false end
+	if not Duel.IsEnvironment(56433456) then return false end
 	if not Duel.IsChainNegatable(ev) then return false end
 	return re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end

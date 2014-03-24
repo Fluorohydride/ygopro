@@ -1238,16 +1238,18 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				filter = (mainGame->dField.selectable_field >> 30) & 0x3;
 				pzone = 1;
 			}
-			if(mainGame->chkRandomPos->isChecked()) {
-				respbuf[2] = rnd.real() * 5;
-				while(!(filter & (1 << respbuf[2])))
+			if(!pzone) {
+				if(mainGame->chkRandomPos->isChecked()) {
 					respbuf[2] = rnd.real() * 5;
-			} else if(!pzone) {
-				if (filter & 0x4) respbuf[2] = 2;
-				else if (filter & 0x2) respbuf[2] = 1;
-				else if (filter & 0x8) respbuf[2] = 3;
-				else if (filter & 0x1) respbuf[2] = 0;
-				else if (filter & 0x10) respbuf[2] = 4;
+					while(!(filter & (1 << respbuf[2])))
+						respbuf[2] = rnd.real() * 5;
+				} else {
+					if (filter & 0x4) respbuf[2] = 2;
+					else if (filter & 0x2) respbuf[2] = 1;
+					else if (filter & 0x8) respbuf[2] = 3;
+					else if (filter & 0x1) respbuf[2] = 0;
+					else if (filter & 0x10) respbuf[2] = 4;
+				}
 			} else {
 				if (filter & 0x1) respbuf[2] = 6;
 				else if (filter & 0x2) respbuf[2] = 7;

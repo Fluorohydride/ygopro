@@ -15,7 +15,7 @@ function c68167124.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp
 end
 function c68167124.filter(c)
-	return c:IsFaceup() and c:GetSequence()~=5
+	return c:IsFaceup() and c:GetSequence()<5
 end
 function c68167124.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
