@@ -6,16 +6,6 @@ function c71645242.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	--token
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetCondition(c71645242.regcon)
-	e2:SetOperation(c71645242.regop)
-	c:RegisterEffect(e2)
-	local e3=e2:Clone()
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(71645242,0))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
@@ -35,19 +25,32 @@ function c71645242.initial_effect(c)
 	e5:SetTarget(c71645242.sptg2)
 	e5:SetOperation(c71645242.spop2)
 	c:RegisterEffect(e5)
+	if not c71645242.global_check then
+		c71645242.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SUMMON_SUCCESS)
+		ge1:SetCondition(c71645242.regcon)
+		ge1:SetOperation(c71645242.regop)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=ge1:Clone()
+		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		Duel.RegisterEffect(ge2,0)
+	end
+end
+function c71645242.cfilter(c,tp)
+	return c:IsControler(tp) and c:GetSummonType()~=SUMMON_TYPE_SPECIAL+0x20
 end
 function c71645242.regcon(e,tp,eg,ep,ev,re,r,rp)
-	if eg:GetFirst():GetSummonType()~=SUMMON_TYPE_SPECIAL+0x20 then
-		local sf=0
-		if eg:IsExists(Card.IsControler,1,nil,tp) then
-			sf=sf+1
-		end
-		if eg:IsExists(Card.IsControler,1,nil,1-tp) then
-			sf=sf+2
-		end
-		e:SetLabel(sf)
-		return true
-	else return false end
+	local sf=0
+	if eg:IsExists(c71645242.cfilter,1,nil,0) then
+		sf=sf+1
+	end
+	if eg:IsExists(c71645242.cfilter,1,nil,1) then
+		sf=sf+2
+	end
+	e:SetLabel(sf)
+	return sf~=0
 end
 function c71645242.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RaiseEvent(eg,71645242,e,r,rp,ep,e:GetLabel())
@@ -67,18 +70,18 @@ function c71645242.spop(e,tp,eg,ep,ev,re,r,rp)
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-			e1:SetValue(tc:GetAttack()/2)
+			e1:SetValue(math.ceil(tc:GetAttack()/2))
 			e1:SetReset(RESET_EVENT+0x1fe0000)
 			tc:RegisterEffect(e1)
 		end
 		tc=g:GetNext()
 	end
-	if bit.band(ev,0x1)~=0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
+	if bit.band(bit.rshift(ev,tp),1)~=0 and Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,71645243,0,0x4011,800,800,2,RACE_PLANT,ATTRIBUTE_DARK,POS_FACEUP_ATTACK,1-tp) then
 		local token=Duel.CreateToken(tp,71645243)
 		Duel.SpecialSummonStep(token,0x20,tp,1-tp,false,false,POS_FACEUP_ATTACK)
 	end
-	if bit.band(ev,0x2)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if bit.band(bit.rshift(ev,1-tp),1)~=0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,71645243,0,0x4011,800,800,2,RACE_PLANT,ATTRIBUTE_DARK) then
 		local token=Duel.CreateToken(1-tp,71645243)
 		Duel.SpecialSummonStep(token,0x20,tp,tp,false,false,POS_FACEUP_ATTACK)

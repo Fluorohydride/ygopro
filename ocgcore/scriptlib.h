@@ -337,6 +337,7 @@ public:
 	static int32 duel_raise_single_event(lua_State *L);
 	static int32 duel_check_timing(lua_State *L);
 	static int32 duel_get_environment(lua_State *L);
+	static int32 duel_is_environment(lua_State *L);
 	
 	static int32 duel_win(lua_State *L);
 	static int32 duel_draw(lua_State *L);

@@ -38,7 +38,7 @@ function c31053337.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c31053337.filter(c)
-	return c:IsAbleToHand() and c:GetSequence()~=5
+	return c:IsAbleToHand() and c:GetSequence()<5
 end
 function c31053337.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetAttack()>=1000 and Duel.IsExistingMatchingCard(c31053337.filter,tp,0,LOCATION_SZONE,1,nil) end

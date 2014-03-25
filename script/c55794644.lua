@@ -45,7 +45,7 @@ function c55794644.hspop(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 end
 function c55794644.condition(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetEnvironment()==56433456 then return e:GetHandler():GetFlagEffect(55794644)<2
+	if Duel.IsEnvironment(56433456) then return e:GetHandler():GetFlagEffect(55794644)<2
 	else return e:GetHandler():GetFlagEffect(55794644)<1 end
 end
 function c55794644.costfilter(c)

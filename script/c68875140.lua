@@ -22,7 +22,7 @@ function c68875140.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and eg:GetFirst():GetControler()==tp
 end
 function c68875140.filter(c)
-	return c:GetSequence()~=5 and c:IsAbleToHand()
+	return c:GetSequence()<5 and c:IsAbleToHand()
 end
 function c68875140.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and c68875140.filter(chkc) end

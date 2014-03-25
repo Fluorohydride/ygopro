@@ -29,7 +29,7 @@ function c91345518.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,0)
 end
 function c91345518.damop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetEnvironment()~=56433456 then return end
+	if not Duel.IsEnvironment(56433456) then return end
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local val=Duel.GetLP(1-p)-Duel.GetLP(p)
 	if val>0 then
