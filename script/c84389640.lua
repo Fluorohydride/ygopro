@@ -16,6 +16,7 @@ function c84389640.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCondition(c84389640.condition)
 	e2:SetCost(c84389640.cost)
+	e2:SetTarget(c84389640.target)
 	e2:SetOperation(c84389640.operation)
 	c:RegisterEffect(e2)
 end
@@ -52,16 +53,20 @@ function c84389640.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(-pay)
 	e:GetHandler():RegisterFlagEffect(84389640,RESET_PHASE+RESET_DAMAGE,0,1)
 end
+function c84389640.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local tc=e:GetLabelObject()
+	if chkc then return chkc==tc end
+	if chk==0 then return tc:IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(tc)
+end
 function c84389640.operation(e,tp,eg,ep,ev,re,r,rp,chk)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local bc=e:GetLabelObject()
-	if bc:IsRelateToBattle() and bc:IsFaceup() then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetOwnerPlayer(tp)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-		e1:SetValue(e:GetLabel())
-		bc:RegisterEffect(e1)
-	end
+	local bc=Duel.GetFirstTarget()
+	if not e:GetHandler():IsRelateToEffect(e) or not bc or not bc:IsRelateToEffect(e) or not bc:IsControler(1-tp) then return end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetOwnerPlayer(tp)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	e1:SetValue(e:GetLabel())
+	bc:RegisterEffect(e1)
 end

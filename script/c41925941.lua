@@ -35,6 +35,7 @@ function c41925941.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if maxpay<def then maxpay=def end
 	if maxpay<maxc then maxc=maxpay end
 	if maxc>5000 then maxc=5000 end
+	maxc=math.floor(maxc/100)*100
 	local t={}
 	for i=1,maxc/100 do
 		t[i]=i*100
@@ -52,7 +53,7 @@ end
 function c41925941.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local bc=Duel.GetFirstTarget()
 	local val=e:GetLabel()
-	if not bc or not bc:IsRelateToEffect(e) or not bc:IsRelateToBattle() or not bc:IsControler(1-tp) then return end
+	if not bc or not bc:IsRelateToEffect(e) or not bc:IsControler(1-tp) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)

@@ -39,10 +39,10 @@ function c21454943.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if maxpay<def then maxpay=def end
 	if maxpay<lp then lp=maxpay end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(21454943,1))
-	if lp>500 then alp=Duel.AnnounceNumber(tp,100,200,300,400,500)
-	elseif lp>400 then alp=Duel.AnnounceNumber(tp,100,200,300,400)
-	elseif lp>300 then alp=Duel.AnnounceNumber(tp,100,200,300)
-	elseif lp>200 then alp=Duel.AnnounceNumber(tp,100,200)
+	if lp>=500 then alp=Duel.AnnounceNumber(tp,100,200,300,400,500)
+	elseif lp>=400 then alp=Duel.AnnounceNumber(tp,100,200,300,400)
+	elseif lp>=300 then alp=Duel.AnnounceNumber(tp,100,200,300)
+	elseif lp>=200 then alp=Duel.AnnounceNumber(tp,100,200)
 	end
 	Duel.PayLPCost(tp,alp)
 	e:SetLabel(-alp)
@@ -57,7 +57,7 @@ end
 function c21454943.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=Duel.GetFirstTarget()
 	local c=e:GetHandler()
-	if not tc or not tc:IsRelateToEffect(e) or not tc:IsRelateToBattle() or not tc:IsControler(1-tp) then return end
+	if not tc or not tc:IsRelateToEffect(e) or not tc:IsControler(1-tp) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
