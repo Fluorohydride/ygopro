@@ -215,7 +215,7 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 const wchar_t* DataManager::FormatRace(int race) {
 	wchar_t* p = racBuffer;
 	int filter = 1, i = 1020;
-	for(; filter != 0x800000; filter <<= 1, ++i) {
+	for(; filter != 0x1000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
