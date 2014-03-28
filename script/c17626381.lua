@@ -10,7 +10,6 @@ function c17626381.initial_effect(c)
 	e2:SetDescription(aux.Stringid(17626381,0))
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_DESTROYED)
 	e2:SetCountLimit(1)
@@ -23,7 +22,7 @@ function c17626381.cfilter(c,tp)
 	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
 function c17626381.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c17626381.cfilter,1,nil,tp)
+	return eg:IsExists(c17626381.cfilter,1,nil,tp) and not e:GetHandler():IsStatus(STATUS_CHAINING)
 end
 function c17626381.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
