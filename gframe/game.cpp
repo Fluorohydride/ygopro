@@ -402,7 +402,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 51, 70, 71), false, false, wFilter);
 	cbRace = env->addComboBox(rect<s32>(60, 49, 190, 69), wFilter, -1);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter != 0x800000; filter <<= 1)
+	for(int filter = 0x1; filter != 0x1000000; filter <<= 1)
 		cbRace->addItem(dataManager.FormatRace(filter), filter);
 	env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 28, 280, 48), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 26, 340, 46), true, wFilter);

@@ -20,7 +20,7 @@ function c21454943.condition(e,tp,eg,ep,ev,re,r,rp)
 	if phase~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if a:IsControler(tp) then 
+	if a:IsControler(tp) then
 		e:SetLabelObject(d)
 		return a:IsFaceup() and a:IsRace(RACE_PSYCHO) and a:IsRelateToBattle() and d and d:IsFaceup() and d:IsRelateToBattle()
 	else
@@ -30,9 +30,9 @@ function c21454943.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21454943.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local bc=e:GetLabelObject()
-	if chk==0 then return Duel.CheckLPCost(tp,100) and e:GetHandler():GetFlagEffect(21454943)==0 
+	if chk==0 then return Duel.CheckLPCost(tp,100) and e:GetHandler():GetFlagEffect(21454943)==0
 						and (bc:IsAttackAbove(100) or bc:IsDefenceAbove(100)) end
-	local lp=Duel.GetLP(tp)
+	local lp=Duel.GetLP(tp)-1
 	local alp=100
 	local maxpay=bc:GetAttack()
 	local def=bc:GetDefence()
