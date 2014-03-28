@@ -33,7 +33,7 @@ function c74294676.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON)
 	c:RegisterEffect(e3)
 end
-function c74294676.condition1(e,tp,eg,ep,ev,re,r,rp,chk)
+function c74294676.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 		and re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
 end

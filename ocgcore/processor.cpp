@@ -1413,13 +1413,13 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		newchain.flag = 0;
 		newchain.chain_id = infos.field_id++;
 		newchain.evt = nil_event;
-		newchain.triggering_effect = peffect;
 		newchain.triggering_controler = peffect->handler->current.controler;
 		newchain.triggering_location = peffect->handler->current.location;
 		newchain.triggering_sequence = peffect->handler->current.sequence;
 		newchain.triggering_player = infos.turn_player;
 		core.new_chains.push_back(newchain);
-		newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+		peffect->handler->set_status(STATUS_CHAINING, TRUE);
+		peffect->dec_count();
 		core.select_chains.clear();
 		add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 		add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
@@ -1551,13 +1551,13 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		newchain.flag = 0;
 		newchain.chain_id = infos.field_id++;
 		newchain.evt = nil_event;
-		newchain.triggering_effect = peffect;
 		newchain.triggering_controler = peffect->handler->current.controler;
 		newchain.triggering_location = peffect->handler->current.location;
 		newchain.triggering_sequence = peffect->handler->current.sequence;
 		newchain.triggering_player = 1 - infos.turn_player;
 		core.new_chains.push_back(newchain);
-		newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+		peffect->handler->set_status(STATUS_CHAINING, TRUE);
+		peffect->dec_count();
 		core.select_chains.clear();
 		add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 		add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, infos.turn_player);
@@ -1676,13 +1676,15 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.delayed_quick.clear();
 		core.delayed_quick_break.swap(core.delayed_quick);
 		for (auto clit = core.flip_chain.begin(); clit != core.flip_chain.end(); ++clit) {
-			if(clit->triggering_effect->is_chainable(clit->triggering_player)
-			        && clit->triggering_effect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
+			effect* peffect = clit->triggering_effect;
+			if(peffect->is_chainable(clit->triggering_player)
+			        && peffect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
 				if(clit->triggering_player == infos.turn_player)
 					core.tpchain.push_back(*clit);
 				else
 					core.ntpchain.push_back(*clit);
-				clit->triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+				peffect->handler->set_status(STATUS_CHAINING, TRUE);
+				peffect->dec_count();
 			}
 		}
 		if(core.tpchain.size() > 1)
@@ -1738,6 +1740,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				else
 					core.ntpchain.push_back(*clit);
 				peffect->handler->set_status(STATUS_CHAINING, TRUE);
+				peffect->dec_count();
 			}
 		}
 		if(core.tpchain.size() > 1)
@@ -1831,17 +1834,18 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 6: {
-		auto clit = core.new_ochain_s.begin();
-		uint8 tp = clit->triggering_player;
 		if(returns.ivalue[0]) {
-			clit->triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+			auto clit = core.new_ochain_s.begin();
+			effect* peffect = clit->triggering_effect;
+			uint8 tp = clit->triggering_player;
+			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count();
 			if(tp == infos.turn_player)
 				core.tpchain.push_back(*clit);
 			else
 				core.ntpchain.push_back(*clit);
-			if(clit->triggering_effect->flag & EFFECT_FLAG_CVAL_CHECK) {
-				clit->triggering_effect->get_value();
-			}
+			if(peffect->flag & EFFECT_FLAG_CVAL_CHECK)
+				peffect->get_value();
 		}
 		core.new_ochain_s.pop_front();
 		core.units.begin()->step = 4;
@@ -1956,6 +1960,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 					if (act){
 						core.tpchain.push_back(ifit->second);
 						peffect->handler->set_status(STATUS_CHAINING, TRUE);
+						peffect->dec_count();
 					}
 				} else {
 					act = true;
@@ -1977,6 +1982,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 					if (act){
 						core.ntpchain.push_back(ifit->second);
 						peffect->handler->set_status(STATUS_CHAINING, TRUE);
+						peffect->dec_count();
 					}
 				}
 			}
@@ -2146,8 +2152,10 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		if(core.select_chains.size() && returns.ivalue[0] != -1) {
 			chain newchain = core.select_chains[returns.ivalue[0]];
 			core.new_chains.push_back(newchain);
-			core.delayed_quick.erase(make_pair(newchain.triggering_effect, newchain.evt));
-			newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+			effect* peffect = newchain.triggering_effect;
+			core.delayed_quick.erase(make_pair(peffect, newchain.evt));
+			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - priority);
 			infos.priorities[0] = 0;
@@ -2535,6 +2543,7 @@ int32 field::process_idle_command(uint16 step) {
 			newchain.triggering_player = infos.turn_player;
 			core.new_chains.push_back(newchain);
 			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count();
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
@@ -2760,6 +2769,7 @@ int32 field::process_battle_command(uint16 step) {
 			newchain.triggering_player = infos.turn_player;
 			core.new_chains.push_back(newchain);
 			peffect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->dec_count();
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
@@ -4199,12 +4209,12 @@ int32 field::add_chain(uint16 step) {
 		chain_array::iterator clit = --(core.current_chain.end());
 		effect* peffect = clit->triggering_effect;
 		if(clit->target_cards && clit->target_cards->container.size()) {
-			if(clit->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
+			if(peffect->flag & EFFECT_FLAG_CARD_TARGET) {
 				for(auto cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
-					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, 0, clit->chain_count);
+					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, peffect, 0, clit->triggering_player, 0, clit->chain_count);
 				process_single_event();
 				if(clit->target_cards->container.size())
-					raise_event(&clit->target_cards->container, EVENT_BECOME_TARGET, clit->triggering_effect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
+					raise_event(&clit->target_cards->container, EVENT_BECOME_TARGET, peffect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
 			}
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
@@ -4213,11 +4223,10 @@ int32 field::add_chain(uint16 step) {
 			        && !peffect->handler->is_affected_by_effect(EFFECT_REMAIN_FIELD))
 				peffect->handler->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		}
-		clit->triggering_effect->dec_count();
 		core.phase_action = TRUE;
 		pduel->write_buffer8(MSG_CHAINED);
 		pduel->write_buffer8(clit->chain_count);
-		raise_event(clit->triggering_effect->handler, EVENT_CHAINING, clit->triggering_effect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
+		raise_event(peffect->handler, EVENT_CHAINING, peffect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
 		process_instant_event();
 		if(core.new_chains.size())
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);

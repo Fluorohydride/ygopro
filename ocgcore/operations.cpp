@@ -2165,20 +2165,26 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 	}
 	case 26: {
 		group* pgroup = core.units.begin()->ptarget;
-		if((*pgroup->container.begin())->is_status(STATUS_SUMMONING))
-			return FALSE;
 		card_set cset;
-		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
-			if((*cit)->current.location == LOCATION_MZONE)
-				cset.insert(*cit);
+		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ) {
+			card* pcard = *cit++;
+			if(!pcard->is_status(STATUS_SUMMONING)) {
+				pgroup->container.erase(pcard);
+				if(pcard->current.location == LOCATION_MZONE)
+					cset.insert(*cit);
+			}
 		}
+		if(cset.size() == 0)
+			return FALSE;
 		send_to(&cset, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		adjust_instant();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
-		return TRUE;
+		return FALSE;
 	}
 	case 27: {
 		group* pgroup = core.units.begin()->ptarget;
+		if(pgroup->container.size() == 0)
+			return TRUE;
 		for(auto oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
 			if(oeit->second == core.units.begin()->peffect)
 				oeit->second = 0;

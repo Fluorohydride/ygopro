@@ -723,7 +723,7 @@ int TagDuel::Analyze(char* msgbuffer, unsigned int len) {
 					NetServer::SendBufferToPlayer(players[i], STOC_GAME_MSG, offset, pbuf - offset);
 			for(auto oit = observers.begin(); oit != observers.end(); ++oit)
 				NetServer::ReSendToPlayer(*oit);
-			RefreshHand(player, 0x181fff, 0);
+			RefreshHand(player, 0x781fff, 0);
 			break;
 		}
 		case MSG_REFRESH_DECK: {

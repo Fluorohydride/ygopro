@@ -46,17 +46,17 @@ function c97836203.discon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c97836203.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(97836203)==0 end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 	e:GetHandler():RegisterFlagEffect(97836203,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c97836203.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
-	Duel.NegateSummon(eg:GetFirst())
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 end
-function c97836203.spcon(e,tp,eg,ep,ev,re,r,rp,chk)
+function c97836203.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c97836203.filter(c,e,tp)
