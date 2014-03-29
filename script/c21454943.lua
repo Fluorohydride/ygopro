@@ -32,7 +32,7 @@ function c21454943.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local bc=e:GetLabelObject()
 	if chk==0 then return Duel.CheckLPCost(tp,100) and e:GetHandler():GetFlagEffect(21454943)==0
 						and (bc:IsAttackAbove(100) or bc:IsDefenceAbove(100)) end
-	local lp=Duel.GetLP(tp)-1
+	local lp=Duel.GetLP(tp)
 	local alp=100
 	local maxpay=bc:GetAttack()
 	local def=bc:GetDefence()
