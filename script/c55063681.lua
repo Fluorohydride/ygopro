@@ -15,7 +15,7 @@ function c55063681.filter(c,ec)
 	return c:IsFaceup() and ((ec==c and c:GetFlagEffect(55063681)==0) or (ec~=c and not ec:IsHasCardTarget(c)))
 end
 function c55063681.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c55063681.filter(chkc,e:GetHandler()) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c55063681.filter(chkc,e:GetHandler()) end
 	if chk==0 then return Duel.IsExistingTarget(c55063681.filter,tp,LOCATION_MZONE,0,1,nil,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c55063681.filter,tp,LOCATION_MZONE,0,1,1,nil,e:GetHandler())

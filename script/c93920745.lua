@@ -11,7 +11,7 @@ function c93920745.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c93920745.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetControler()~=tp and chkc:GetLocation()==LOCATION_MZONE and chkc:IsAbleToHand() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToHand() end
 	if chk==0 then return true end
 	if Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(93920745,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)

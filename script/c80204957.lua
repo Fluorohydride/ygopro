@@ -17,7 +17,7 @@ function c80204957.filter2(c)
 	return c:IsFaceup() and c:IsSetCard(0x11)
 end
 function c80204957.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c80204957.filter2(chkc) end
 	if chk==0 then return Duel.IsExistingMatchingCard(c80204957.filter1,tp,LOCATION_DECK,0,1,nil)
 		and Duel.IsExistingTarget(c80204957.filter2,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
