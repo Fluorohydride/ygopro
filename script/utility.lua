@@ -256,7 +256,7 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op,alterfmin,altermaxc)
 						local mg2=oc:GetOverlayGroup()
 						while oc do
 							mg2:Merge(oc:GetOverlayGroup())
-							oc=g:GetNext()
+							oc=mg:GetNext()
 						end
 						if mg2:GetCount()~=0 then
 							Duel.Overlay(c,mg2)
