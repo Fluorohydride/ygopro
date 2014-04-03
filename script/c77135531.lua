@@ -22,7 +22,7 @@ function c77135531.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c77135531.cfilter(c)
-	return c:IsRace(RACE_DRAGON) and c:IsAbleToGraveAsCost() 
+	return c:IsRace(RACE_DRAGON) and c:IsAbleToGraveAsCost()
 end
 function c77135531.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c77135531.cfilter,tp,LOCATION_HAND,0,1,nil) end
@@ -49,7 +49,7 @@ function c77135531.spfilter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_NORMAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c77135531.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c77135531.spfilter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c77135531.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c77135531.spfilter,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

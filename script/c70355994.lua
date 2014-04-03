@@ -18,6 +18,7 @@ function c70355994.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetCost(c70355994.descost)
 	e2:SetTarget(c70355994.destg)
 	e2:SetOperation(c70355994.desop)
 	c:RegisterEffect(e2)
@@ -46,15 +47,18 @@ function c70355994.filter1(c)
 	return c:IsFaceup() and c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToGraveAsCost()
 		and Duel.IsExistingTarget(c70355994.filter2,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
 end
+function c70355994.descost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c70355994.filter1,tp,LOCATION_ONFIELD,0,1,nil) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local g=Duel.SelectMatchingCard(tp,c70355994.filter1,tp,LOCATION_ONFIELD,0,1,1,nil)
+	Duel.SendtoGrave(g,REASON_COST)
+end
 function c70355994.filter2(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c70355994.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c70355994.filter2(chkc) end
-	if chk==0 then return Duel.IsExistingMatchingCard(c70355994.filter1,tp,LOCATION_ONFIELD,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g1=Duel.SelectMatchingCard(tp,c70355994.filter1,tp,LOCATION_ONFIELD,0,1,1,nil)
-	Duel.SendtoGrave(g1,REASON_COST)
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g2=Duel.SelectTarget(tp,c70355994.filter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g2,1,0,0)

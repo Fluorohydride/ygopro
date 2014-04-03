@@ -46,7 +46,7 @@ function c99013397.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x19)
 end
 function c99013397.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c99013397.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c99013397.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c99013397.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c99013397.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
@@ -67,7 +67,7 @@ function c99013397.dfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c99013397.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c99013397.filter(chkc) end
+	if chkc then return chkc:IsOnField() and c99013397.dfilter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c99013397.dfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)

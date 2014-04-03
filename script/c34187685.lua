@@ -23,7 +23,8 @@ end
 function c34187685.filter2(c,lv)
 	return c:IsFaceup() and c:IsLevelBelow(lv-1)
 end
-function c34187685.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c34187685.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c34187685.filter2(chkc,e:GetLabel()) end
 	if chk==0 then
 		if e:GetLabel()~=1 then return false end
 		e:SetLabel(0)
@@ -33,6 +34,7 @@ function c34187685.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local cg=Duel.SelectMatchingCard(tp,c34187685.filter1,tp,LOCATION_HAND,0,1,1,nil,tp)
 	Duel.SendtoGrave(cg,REASON_DISCARD+REASON_COST)
 	local lv=cg:GetFirst():GetLevel()
+	e:SetLabel(lv)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c34187685.filter2,tp,LOCATION_MZONE,0,1,1,nil,lv)
 end

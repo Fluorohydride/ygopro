@@ -17,7 +17,7 @@ function c7076131.tgfilter(c,tp)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(c7076131.filter,tp,LOCATION_DECK,0,1,nil,c:GetCode())
 end
 function c7076131.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and c7076131.tgfilter(chkc,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c7076131.tgfilter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c7076131.tgfilter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c7076131.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,tp)

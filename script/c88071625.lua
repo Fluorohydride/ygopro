@@ -89,14 +89,14 @@ end
 function c88071625.copycon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE
 end
-function c88071625.filter(c)
-	return c:IsType(TYPE_EFFECT) and c:IsLocation(LOCATION_GRAVE)
+function c88071625.filter(c,e)
+	return c:IsType(TYPE_EFFECT) and c:IsLocation(LOCATION_GRAVE) and c:IsCanBeEffectTarget(e)
 end
 function c88071625.copytg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return e:GetHandler():GetMaterial():IsContains(chkc) end
+	if chkc then return e:GetHandler():GetMaterial():IsContains(chkc) and c88071625.filter(chkc,e) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=e:GetHandler():GetMaterial():FilterSelect(tp,c88071625.filter,1,1,nil)
+	local g=e:GetHandler():GetMaterial():FilterSelect(tp,c88071625.filter,1,1,nil,e)
 	Duel.SetTargetCard(g)
 end
 function c88071625.copyop(e,tp,eg,ep,ev,re,r,rp)
@@ -104,14 +104,13 @@ function c88071625.copyop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) and c:IsRelateToEffect(e) and c:IsFaceup() then
 		local code=tc:GetOriginalCode()
-		local reset_flag=RESET_EVENT+0x1fe0000
-		c:CopyEffect(code, reset_flag, 1)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(reset_flag)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCode(EFFECT_CHANGE_CODE)
 		e1:SetValue(code)
 		c:RegisterEffect(e1)
+		c:CopyEffect(code,RESET_EVENT+0x1fe0000,1)
 	end
 end
