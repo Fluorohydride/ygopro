@@ -3,11 +3,11 @@ function c66506689.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
 	c:EnableReviveLimit()
-	--tohand
+	--change pos
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(66506689,0))
 	e1:SetCategory(CATEGORY_POSITION)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_FLIP_DISABLE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCountLimit(1)
 	e1:SetCode(EVENT_FREE_CHAIN)

@@ -6,6 +6,7 @@ function c3056267.initial_effect(c)
 	e1:SetCategory(CATEGORY_CONTROL)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetCode(EVENT_FLIP)
 	e1:SetCondition(c3056267.condition)
 	e1:SetTarget(c3056267.target)
 	e1:SetOperation(c3056267.operation)
@@ -16,7 +17,7 @@ function c3056267.swapfilter(c)
 end
 function c3056267.condition(e)
 	local ph=Duel.GetCurrentPhase()
-	return not (ph==PHASE_BATTLE or ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL)
+	return not (ph==PHASE_BATTLE or ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) and not (re and re:IsHasProperty(EFFECT_FLAG_FLIP_DISABLE))
 end
 function c3056267.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

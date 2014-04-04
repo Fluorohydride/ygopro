@@ -5,6 +5,8 @@ function c62121.initial_effect(c)
 	e1:SetDescription(aux.Stringid(62121,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetCode(EVENT_FLIP)
+	e1:SetCondition(aux.flipcon)
 	e1:SetOperation(c62121.operation)
 	c:RegisterEffect(e1)
 end
