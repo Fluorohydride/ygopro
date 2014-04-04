@@ -4,6 +4,8 @@ function c84550200.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(84550200,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetCode(EVENT_FLIP)
+	e1:SetCondition(aux.flipcon)
 	e1:SetOperation(c84550200.operation)
 	c:RegisterEffect(e1)
 end

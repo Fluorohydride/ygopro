@@ -1,4 +1,4 @@
---•›•§•∫•Û•ﬁ•ﬂ©`
+--„Éù„Ç§„Ç∫„É≥„Éû„Éü„Éº
 function c43716289.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
@@ -6,6 +6,8 @@ function c43716289.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetCode(EVENT_FLIP)
+	e1:SetCondition(aux.flipcon)
 	e1:SetTarget(c43716289.target)
 	e1:SetOperation(c43716289.operation)
 	c:RegisterEffect(e1)

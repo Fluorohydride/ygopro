@@ -4,6 +4,8 @@ function c79106360.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetCode(EVENT_FLIP)
+	e1:SetCondition(aux.flipcon)
 	e1:SetOperation(c79106360.operation)
 	c:RegisterEffect(e1)
 end

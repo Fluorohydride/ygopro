@@ -953,3 +953,6 @@ function Auxiliary.PendOperation()
 				end
 			end
 end
+function Auxiliary.flipcon(e,tp,eg,ep,ev,re,r,rp)
+	return not (re and re:IsHasProperty(EFFECT_FLAG_FLIP_DISABLE))
+end

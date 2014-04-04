@@ -5,6 +5,8 @@ function c84926738.initial_effect(c)
 	e1:SetDescription(aux.Stringid(84926738,0))
 	e1:SetCategory(CATEGORY_RECOVER)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP)
+	e1:SetCode(EVENT_FLIP)
+	e1:SetCondition(aux.flipcon)
 	e1:SetOperation(c84926738.flipop)
 	c:RegisterEffect(e1)
 	--lpchange
