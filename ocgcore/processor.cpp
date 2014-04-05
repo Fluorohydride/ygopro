@@ -1675,23 +1675,10 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.ntpchain.clear();
 		core.delayed_quick.clear();
 		core.delayed_quick_break.swap(core.delayed_quick);
-		for (auto clit = core.flip_chain.begin(); clit != core.flip_chain.end(); ++clit) {
-			effect* peffect = clit->triggering_effect;
-			if(peffect->is_chainable(clit->triggering_player)
-			        && peffect->is_activateable(clit->triggering_player, clit->evt, TRUE)) {
-				if(clit->triggering_player == infos.turn_player)
-					core.tpchain.push_back(*clit);
-				else
-					core.ntpchain.push_back(*clit);
-				peffect->handler->set_status(STATUS_CHAINING, TRUE);
-				peffect->dec_count();
-			}
-		}
 		if(core.tpchain.size() > 1)
 			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
 		if(core.ntpchain.size() > 1)
 			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
-		core.flip_chain.clear();
 		return FALSE;
 	}
 	case 1: {
@@ -2374,19 +2361,15 @@ int32 field::process_single_event() {
 						newchain.triggering_player = newchain.triggering_controler;
 				}
 				if(core.flip_delayed && ev == EVENT_FLIP) {
-					if (peffect->type & EFFECT_TYPE_TRIGGER_O) {
+					if (peffect->type & EFFECT_TYPE_TRIGGER_O)
 						core.new_ochain_b.push_back(newchain);
-					} else if (peffect->type & EFFECT_TYPE_TRIGGER_F) {
+					else
 						core.new_fchain_b.push_back(newchain);
-					} else
-						core.flip_chain_b.push_back(newchain);
 				} else {
-					if (peffect->type & EFFECT_TYPE_TRIGGER_O) {
+					if (peffect->type & EFFECT_TYPE_TRIGGER_O)
 						core.new_ochain.push_back(newchain);
-					} else if (peffect->type & EFFECT_TYPE_TRIGGER_F) {
+					else
 						core.new_fchain.push_back(newchain);
-					} else
-						core.flip_chain.push_back(newchain);
 				}
 			}
 		}
@@ -3638,7 +3621,6 @@ int32 field::process_battle_command(uint16 step) {
 		core.flip_delayed = FALSE;
 		core.new_fchain.splice(core.new_fchain.begin(), core.new_fchain_b);
 		core.new_ochain.splice(core.new_ochain.begin(), core.new_ochain_b);
-		core.flip_chain.splice(core.flip_chain.begin(), core.flip_chain_b);
 		if(core.units.begin()->arg1) {
 			raise_single_event(core.attacker, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
 			if(core.attack_target)
@@ -3648,7 +3630,7 @@ int32 field::process_battle_command(uint16 step) {
 			process_instant_event();
 		}
 		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
-			if(core.flip_chain.size() || core.new_fchain.size() || core.new_ochain.size())
+			if(core.new_fchain.size() || core.new_ochain.size())
 				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		} else {
 			break_effect();
@@ -3912,7 +3894,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		pduel->write_buffer8(infos.phase);
 		raise_event((card*)0, EVENT_PREDRAW, 0, 0, 0, turn_player, 0);
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -3954,7 +3936,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 5: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size() || core.instant_event.back().event_code != EVENT_PHASE_START + PHASE_STANDBY)
+		if(core.new_fchain.size() || core.new_ochain.size() || core.instant_event.back().event_code != EVENT_PHASE_START + PHASE_STANDBY)
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		add_process(PROCESSOR_PHASE_EVENT, 0, 0, 0, PHASE_STANDBY, 0);
 		return FALSE;
@@ -3969,7 +3951,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 7: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -4049,7 +4031,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 13: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
@@ -4075,7 +4057,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		return FALSE;
 	}
 	case 16: {
-		if(core.new_fchain.size() || core.new_ochain.size() || core.flip_chain.size())
+		if(core.new_fchain.size() || core.new_ochain.size())
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}

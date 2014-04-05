@@ -175,10 +175,8 @@ struct processor {
 	chain_list new_fchain_s;
 	chain_list new_ochain;
 	chain_list new_ochain_s;
-	chain_list flip_chain;
 	chain_list new_fchain_b;
 	chain_list new_ochain_b;
-	chain_list flip_chain_b;
 	chain_list new_ochain_h;
 	chain_list new_chains;
 	delayed_effect_collection delayed_quick_tmp;
