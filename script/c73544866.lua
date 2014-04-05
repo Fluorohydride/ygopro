@@ -16,7 +16,7 @@ function c73544866.initial_effect(c)
 	--negate
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_BATTLE_END)
+	e4:SetCode(EVENT_BATTLED)
 	e4:SetOperation(c73544866.negop)
 	c:RegisterEffect(e4)
 	--atkup

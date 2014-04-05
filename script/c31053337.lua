@@ -30,7 +30,7 @@ function c31053337.initial_effect(c)
 	e4:SetDescription(aux.Stringid(31053337,1))
 	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_BATTLE_END)
+	e4:SetCode(EVENT_BATTLED)
 	e4:SetOperation(c31053337.operation2)
 	c:RegisterEffect(e4)
 end
