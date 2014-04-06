@@ -17,5 +17,5 @@ function c33746252.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c33746252.aclimit(e,re,tp)
-	return re:GetHandler():IsType(TYPE_MONSTER) and not re:GetType()==EFFECT_TYPE_ACTIVATE
+	return re:GetHandler():IsType(TYPE_MONSTER) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) 
 end
