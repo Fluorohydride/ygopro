@@ -815,17 +815,17 @@ void field::reset_chain() {
 			(*rm)->handler->remove_effect((*rm));
 	}
 }
-void field::add_effect_code(uint32 code) {
-	core.effect_count_code[code]++;
+void field::add_effect_code(uint32 code, uint32 playerid) {
+	core.effect_count_code[code + (playerid << 30)]++;
 }
-uint32 field::get_effect_code(uint32 code) {
-	auto iter = core.effect_count_code.find(code);
+uint32 field::get_effect_code(uint32 code, uint32 playerid) {
+	auto iter = core.effect_count_code.find(code + (playerid << 30));
 	if(iter == core.effect_count_code.end())
 		return 0;
 	return iter->second;
 }
-void field::dec_effect_code(uint32 code){
-	auto iter = core.effect_count_code.find(code);
+void field::dec_effect_code(uint32 code, uint32 playerid) {
+	auto iter = core.effect_count_code.find(code + (playerid << 30));
 	if(iter == core.effect_count_code.end())
 		return;
 	if(iter->second > 0)

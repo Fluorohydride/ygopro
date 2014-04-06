@@ -2554,7 +2554,7 @@ int32 scriptlib::duel_select_disable_field(lua_State * L) {
 		ct4 = pduel->game_field->get_useable_count(1 - playerid, LOCATION_SZONE, PLAYER_NONE, 0, &plist);
 		flag = (flag & 0xffffff) | (plist << 24);
 	}
-	flag |= filter;
+	flag |= filter | 0xe0e0e0e0;
 	if(count > ct1 + ct2 + ct3 + ct4)
 		count = ct1 + ct2 + ct3 + ct4;
 	if(count == 0)
