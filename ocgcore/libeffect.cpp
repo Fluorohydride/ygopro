@@ -178,6 +178,7 @@ int32 scriptlib::effect_set_type(lua_State *L) {
 		peffect->range = LOCATION_SZONE + LOCATION_HAND;
 	if(v & EFFECT_TYPE_FLIP) {
 		peffect->code = EVENT_FLIP;
+		peffect->flag |= EFFECT_FLAG_DAMAGE_STEP;
 		if(!(v & EFFECT_TYPE_TRIGGER_O))
 			v |= EFFECT_TYPE_TRIGGER_F;
 	}
