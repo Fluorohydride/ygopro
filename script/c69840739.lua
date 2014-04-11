@@ -17,6 +17,7 @@ function c69840739.initial_effect(c)
 	--reload
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(69840739,1))
+	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
