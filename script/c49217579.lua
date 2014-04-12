@@ -17,6 +17,13 @@ function c49217579.initial_effect(c)
 	e2:SetCondition(c49217579.rmcon)
 	e2:SetOperation(c49217579.rmop)
 	c:RegisterEffect(e2)
+	--cannot special summon
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e3:SetValue(aux.FALSE)
+	c:RegisterEffect(e3)
 end
 function c49217579.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattleTarget()~=nil
