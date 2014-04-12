@@ -1270,6 +1270,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else {
 					mainGame->PopupElement(mainGame->wQuery);
 				}
+				if(mainGame->wOptions->isVisible()) {
+					DuelClient::SetResponseI(-1);
+					mainGame->HideElement(mainGame->wOptions);
+				}
 				break;
 			}
 			case MSG_SORT_CHAIN:
