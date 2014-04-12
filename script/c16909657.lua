@@ -3,7 +3,7 @@ function c16909657.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetOperation(c16909657.checkop)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)

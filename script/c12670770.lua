@@ -68,6 +68,7 @@ function c12670770.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.SelectYesNo(tp,aux.Stringid(12670770,0)) then
 		Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_DECK)
 		c:RegisterFlagEffect(12670770,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		c:RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(12670770,1))
 	end
 end
 function c12670770.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

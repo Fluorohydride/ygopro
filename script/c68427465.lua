@@ -26,7 +26,7 @@ function c68427465.initial_effect(c)
 	--negate
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_BATTLE_END)
+	e4:SetCode(EVENT_BATTLED)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetOperation(c68427465.negop)
 	c:RegisterEffect(e4)
