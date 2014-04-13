@@ -22,7 +22,7 @@ function c17626381.cfilter(c,tp)
 	return c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp
 end
 function c17626381.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c17626381.cfilter,1,nil,tp)
+	return eg:IsExists(c17626381.cfilter,1,nil,tp) and not e:GetHandler():IsStatus(STATUS_CHAINING)
 end
 function c17626381.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.IsPlayerCanDraw(tp,1) end
