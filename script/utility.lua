@@ -651,8 +651,8 @@ end
 function Auxiliary.FConditionFun2(f1,f2,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return (f1(gc) and g:IsExists(f2,1,nil))
-					or (f2(gc) and g:IsExists(f1,1,nil)) end
+				if gc then return (f1(gc) and g:IsExists(f2,1,gc))
+					or (f2(gc) and g:IsExists(f1,1,gc)) end
 				local g1=Group.CreateGroup() local g2=Group.CreateGroup() local fs=false
 				local tc=g:GetFirst()
 				while tc do
@@ -668,11 +668,9 @@ end
 function Auxiliary.FOperationFun2(f1,f2,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					local sg=eg:Filter(Auxiliary.FConditionFilterF2c,nil,f1,f2)
-					local b1=f1(gc)
-					local b2=f2(gc)
-					if b1 and not b2 then sg:Remove(f1,nil) end
-					if b2 and not b1 then sg:Remove(f2,nil) end
+					local sg=Group.CreateGroup()
+					if f1(gc) then sg:Merge(eg:Filter(f2,gc)) end
+					if f2(gc) then sg:Merge(eg:Filter(f1,gc)) end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,1,1,nil)
 					Duel.SetFusionMaterial(g1)

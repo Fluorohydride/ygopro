@@ -2,11 +2,12 @@
 function c12538374.initial_effect(c)
 	--Special Summon
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(12538374,0))
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetDescription(aux.Stringid(12538374,0))
+	e1:SetCountLimit(1)
 	e1:SetCondition(c12538374.condition)
 	e1:SetTarget(c12538374.target)
 	e1:SetOperation(c12538374.operation)

@@ -21,19 +21,15 @@ end
 function c97970833.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstMatchingCard(c97970833.filter,tp,LOCATION_DECK,0,nil,tp)
 	if tc then
-		if Duel.GetFieldCard(tp,LOCATION_SZONE,5)~=nil then
-			Duel.Destroy(Duel.GetFieldCard(tp,LOCATION_SZONE,5),REASON_RULE)
+		local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+		if fc then
+			Duel.SendtoGrave(fc,REASON_RULE)
 			Duel.BreakEffect()
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		elseif Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)~=nil
-			and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5):IsFaceup() then
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-			Duel.Destroy(Duel.GetFieldCard(1-tp,LOCATION_SZONE,5),REASON_RULE)
-			if Duel.IsPlayerCanDraw(1-tp,1) and Duel.SelectYesNo(tp,aux.Stringid(97970833,0)) then
-				Duel.Draw(1-tp,1,REASON_EFFECT)
-			end
-		else
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		end
+		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+		fc=Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)
+		if fc and fc:IsFaceup() and Duel.IsPlayerCanDraw(1-tp,1) and Duel.SelectYesNo(tp,aux.Stringid(97970833,0)) then
+			Duel.Draw(1-tp,1,REASON_EFFECT)
 		end
 		Duel.RaiseEvent(tc,EVENT_CHAIN_SOLVED,tc:GetActivateEffect(),0,tp,tp,Duel.GetCurrentChain())
 	end

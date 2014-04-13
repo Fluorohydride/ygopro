@@ -23,10 +23,7 @@ function c8310162.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c8310162.descon(e)
-	local c=e:GetHandler()
-	local f1=Duel.GetFieldCard(0,LOCATION_SZONE,5)
-	local f2=Duel.GetFieldCard(1,LOCATION_SZONE,5)
-	return ((f1==nil or not f1:IsFaceup() or f1:GetCode()~=27564031) and (f2==nil or not f2:IsFaceup() or f2:GetCode()~=27564031))
+	return not Duel.IsEnvironment(27564031)
 end
 function c8310162.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
