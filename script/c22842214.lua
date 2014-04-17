@@ -57,7 +57,7 @@ function c22842214.eqop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			tg=tg0:FilterSelect(tp,c22842214.filter,ft,ft,nil)
 		else
-			tg=tg0.Clone()
+			tg=tg0:Clone()
 		end
 		if tg:GetCount()>0 then
 			local tc=tg:GetFirst()

@@ -31,7 +31,7 @@ function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		sg=sg0:FilterSelect(tp,c21007444.filter,ft,ft,nil,e,tp)
 	else
-		sg=sg0.Clone()
+		sg=sg0:Clone()
 	end
 	if sg:GetCount()>0 then
 		local tg=sg:GetFirst()
