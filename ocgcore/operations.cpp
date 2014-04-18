@@ -2173,7 +2173,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			if(!pcard->is_status(STATUS_SUMMONING)) {
 				pgroup->container.erase(pcard);
 				if(pcard->current.location == LOCATION_MZONE)
-					cset.insert(*cit);
+					cset.insert(pcard);
 			}
 		}
 		if(cset.size() == 0)

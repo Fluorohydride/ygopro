@@ -899,7 +899,7 @@ function Auxiliary.AddPendulumProcedure(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCondition(Auxiliary.PendCondition())
 	e1:SetOperation(Auxiliary.PendOperation())
@@ -939,7 +939,6 @@ function Auxiliary.PendOperation()
 				local rscale=rpz:GetRightScale()
 				if lscale>rscale then lscale,rscale=rscale,lscale end
 				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-				if ft<=0 then return false end
 				if og then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 					local g=og:FilterSelect(tp,Auxiliary.PConditionFilter,1,ft,nil,e,tp,lscale,rscale)

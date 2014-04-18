@@ -10,7 +10,7 @@ function c49217579.initial_effect(c)
 	c:RegisterEffect(e1)
 	--remove
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
@@ -41,5 +41,7 @@ function c49217579.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0
 end
 function c49217579.rmop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
+	if e:GetHandler():IsRelateToEffect(e) then
+		Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
+	end
 end
