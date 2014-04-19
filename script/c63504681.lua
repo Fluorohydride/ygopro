@@ -71,6 +71,7 @@ function c63504681.initial_effect(c)
 	e8:SetLabel(5)
 	c:RegisterEffect(e8)
 end
+c63504681.xyz_number=86
 function c63504681.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
