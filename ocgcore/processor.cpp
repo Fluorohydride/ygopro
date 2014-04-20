@@ -2541,12 +2541,26 @@ int32 field::process_idle_command(uint16 step) {
 		} else if(ctype == 4) {
 			core.units.begin()->step = 8;
 			return FALSE;
+		} else if(ctype == 6) {
+			//to battlephase
+			core.units.begin()->step = 9;
+			pduel->write_buffer8(MSG_HINT);
+			pduel->write_buffer8(HINT_EVENT);
+			pduel->write_buffer8(1 - infos.turn_player);
+			pduel->write_buffer32(80);
+			core.select_chains.clear();
+			core.hint_timing[infos.turn_player] = TIMING_MAIN_END;
+			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
+			infos.priorities[infos.turn_player] = 1;
+			infos.priorities[1 - infos.turn_player] = 0;
+			core.units.begin()->arg1 = ctype;
+			return FALSE;
 		} else {
 			core.units.begin()->step = 9;
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_EVENT);
 			pduel->write_buffer8(1 - infos.turn_player);
-			pduel->write_buffer32(23);
+			pduel->write_buffer32(81);
 			core.select_chains.clear();
 			core.hint_timing[infos.turn_player] = TIMING_MAIN_END;
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, FALSE, 1 - infos.turn_player);
