@@ -1453,7 +1453,7 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 		min = -fcount + 1;
 	if(min == 0)
 		return TRUE;
-	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
+	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0, 0);
 	if(m >= min)
 		return TRUE;
 	return FALSE;
@@ -1490,7 +1490,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 		min = -fcount + 1;
 	if(min == 0)
 		return TRUE;
-	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
+	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0, 0);
 	if(m >= min)
 		return TRUE;
 	return FALSE;

@@ -3308,6 +3308,9 @@ int32 field::process_battle_command(uint16 step) {
 		card* reason_card = 0;
 		uint8 bd[2] = {FALSE};
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
+		effect* defattack = core.attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK);
+		if(defattack->get_value(core.attacker) == 1)
+			a = ad;
 		if(core.attack_target) {
 			da = core.attack_target->get_attack();
 			dd = core.attack_target->get_defence();

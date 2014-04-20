@@ -1171,7 +1171,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 	}
 	return FALSE;
 }
-int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list) {
+int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_sum) {
 	uint8 p = target->current.controler;
 	card* pcard;
 	uint32 rcount = 0;
@@ -1187,9 +1187,12 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 			rcount += pcard->operation_param;
 		}
 	}
+	int32 ex_count = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - p].list_mzone[i];
-		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releasable_by_summon(p, target)) {
+		if(!(pcard && pcard->is_releasable_by_summon(p, target)))
+			continue;
+		if(pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)) {
 			if(ex_list)
 				ex_list->insert(pcard);
 			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
@@ -1197,8 +1200,21 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 			else
 				pcard->operation_param = 1;
 			rcount += pcard->operation_param;
+		} else {
+			effect* peffect = pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE_SUM);
+			if(!peffect || ((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->reset_count & 0xf00) == 0))
+				continue;
+			if(ex_list_sum)
+				ex_list_sum->insert(pcard);
+			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
+				pcard->operation_param = 2;
+			else
+				pcard->operation_param = 1;
+			ex_count++;
 		}
 	}
+	if(ex_count)
+		rcount++;
 	return rcount;
 }
 int32 field::get_summon_count_limit(uint8 playerid) {

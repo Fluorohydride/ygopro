@@ -1875,7 +1875,7 @@ int32 scriptlib::duel_get_tribute_group(lua_State *L) {
 	card* target = *(card**) lua_touserdata(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->get_summon_release_list(target, &(pgroup->container), &(pgroup->container));
+	pduel->game_field->get_summon_release_list(target, &(pgroup->container), &(pgroup->container), 0);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -1889,7 +1889,7 @@ int32 scriptlib::duel_get_tribute_count(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* target = *(card**) lua_touserdata(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushinteger(L, pduel->game_field->get_summon_release_list(target, 0, 0));
+	lua_pushinteger(L, pduel->game_field->get_summon_release_list(target, 0, 0, 0));
 	return 1;
 }
 int32 scriptlib::duel_select_tribute(lua_State *L) {
@@ -1905,7 +1905,8 @@ int32 scriptlib::duel_select_tribute(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->game_field->core.release_cards.clear();
 	pduel->game_field->core.release_cards_ex.clear();
-	pduel->game_field->get_summon_release_list(target, &pduel->game_field->core.release_cards, &pduel->game_field->core.release_cards_ex);
+	pduel->game_field->core.release_cards_ex_sum.clear();
+	pduel->game_field->get_summon_release_list(target, &pduel->game_field->core.release_cards, &pduel->game_field->core.release_cards_ex, &pduel->game_field->core.release_cards_ex_sum);
 	pduel->game_field->add_process(PROCESSOR_SELECT_TRIBUTE_S, 0, 0, 0, playerid, (max << 16) + min);
 	return lua_yield(L, 0);
 }
