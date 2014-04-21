@@ -13,6 +13,7 @@
 #include "interpreter.h"
 #include <iostream>
 #include <cstring>
+#include <multimap>
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 
@@ -1629,7 +1630,41 @@ int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int
 	       || (op2 && acc > op2 && check_with_sum_limit(mats, acc - op2, index + 1, count + 1, min, max))
 	       || check_with_sum_limit(mats, acc, index + 1, count, min, max);
 }
-int32 field::check_xyz_material(card* pcard, int32 findex, int32 min, min32 max, group* mg) {
+int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max, group* mg) {
+	card_set mat, cset;
+	pduel->game_field->get_xyz_material(scard, &mat);
+	if(mg) {
+		for (auto pcard : mg->container) {
+			if(pduel->lua->check_matching(pcard, findex, 0))
+				cset.insert(pcard);
+		}
+	} else {
+		for (auto pcard : mat) {
+			if(pduel->lua->check_matching(pcard, findex, 0))
+				cset.insert(pcard);
+		}
+	}
+	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
+		for(auto pcard : cset) {
+			std::multimap<int32, card*> m;
+			effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+			if(peffect) {
+				int32 v = peffect->get_value();
+				m.insert(std::make_pair(v, pcard));
+			}
+			auto iter = m.rbegin();
+			while(iter != m.rend()) {
+				auto cur = iter++;
+				if(cur->first > cset.size()) {
+					cset.erase(cur->second);
+					m.erase(cur);
+				}
+			}
+		}
+		return cset.size() >= min;
+	} else {
+		return cset.size() >= min;
+	}
 	return TRUE;
 }
 int32 field::is_player_can_draw(uint8 playerid) {

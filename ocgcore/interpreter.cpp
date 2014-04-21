@@ -427,7 +427,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "SetOperationInfo", scriptlib::duel_set_operation_info },
 	{ "GetOperationInfo", scriptlib::duel_get_operation_info },
 	{ "GetOperationCount", scriptlib::duel_get_operation_count },
-	{ "CheckXyzMaterial", scriptlib::duel_get_xyz_material },
+	{ "CheckXyzMaterial", scriptlib::duel_check_xyz_material },
 	{ "SelectXyzMaterial", scriptlib::duel_select_xyz_material },
 	{ "Overlay", scriptlib::duel_overlay },
 	{ "GetOverlayGroup", scriptlib::duel_get_overlay_group },
