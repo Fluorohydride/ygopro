@@ -21,7 +21,7 @@ function c8102334.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_CANNOT_PLACE_COUNTER)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetTargetRange(1,1)
+	e3:SetTargetRange(0,1)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
 	--target
