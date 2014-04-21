@@ -1132,12 +1132,20 @@ int32 scriptlib::card_is_synchro_summonable(lua_State *L) {
 	if(!(pcard->data.type & TYPE_SYNCHRO))
 		return 0;
 	card* tuner = 0;
+	group* mg = 0;
 	if(!lua_isnil(L, 2)) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		tuner = *(card**) lua_touserdata(L, 2);
 	}
+	if(lua_gettop(L) >= 3) {
+		if(!lua_isnil(L, 3)) {
+			check_param(L, PARAM_TYPE_GROUP, 3);
+			mg = *(group**) lua_touserdata(L, 3);
+		}
+	}
 	uint32 p = pcard->pduel->game_field->core.reason_player;
 	pcard->pduel->game_field->core.limit_tuner = tuner;
+	pcard->pduel->game_field->core.limit_xyz = mg;
 	lua_pushboolean(L, pcard->is_special_summonable(p));
 	return 1;
 }

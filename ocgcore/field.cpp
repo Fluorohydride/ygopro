@@ -73,6 +73,7 @@ field::field(duel* pduel) {
 	core.check_level = 0;
 	core.limit_tuner = 0;
 	core.limit_xyz = 0;
+	core.limit_syn = 0;
 	core.duel_options = 0;
 	core.attacker = 0;
 	core.attack_target = 0;
@@ -1541,30 +1542,30 @@ void field::attack_all_target_check() {
 	if(!peffect->check_value_condition(1))
 		core.attacker->attack_all_target = FALSE;
 }
-int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max) {
+int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max, group* mg) {
 	card* tuner;
 	if(core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 		effect_set eset;
 		filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
 		if(eset.count)
-			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max);
+			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max, mg);
 	}
 	for(uint8 p = 0; p < 2; ++p) {
 		for(int32 i = 0; i < 5; ++i) {
 			tuner = player[p].list_mzone[i];
-			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max))
+			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max, mg))
 				return TRUE;
 		}
 	}
 	return FALSE;
 }
-int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max) {
+int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, group* mg) {
 	effect* peffect;
 	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
 		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 		if(pcheck)
 			pcheck->get_value(tuner);
-		if(!pduel->lua->check_matching(tuner, findex1, 0)) {
+		if((mg && !mg->has_card(tuner)) || !pduel->lua->check_matching(tuner, findex1, 0)) {
 			pduel->restore_assumes();
 			return FALSE;
 		}
@@ -1588,6 +1589,8 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			for(uint8 p = 0; p < 2; ++p) {
 				for(int32 i = 0; i < 5; ++i) {
 					pm = player[p].list_mzone[i];
+					if(mg && !mg->has_card(pm))
+						continue;
 					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
 						if(pcheck)
 							pcheck->get_value(pm);

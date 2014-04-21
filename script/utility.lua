@@ -131,26 +131,26 @@ function Auxiliary.AddSynchroProcedure(c,f1,f2,ct)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.SynCondition(f1,f2,minc,maxc)
-	return	function(e,c,tuner)
+	return	function(e,c,tuner,mg)
 				if c==nil then return true end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<ct then minc=ct end
 				if maxc<minc then return false end
-				if tuner then return Duel.CheckTunerMaterial(c,tuner,f1,f2,minc,maxc) end
-				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc)
+				if tuner then return Duel.CheckTunerMaterial(c,tuner,f1,f2,minc,maxc,mg) end
+				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc,mg)
 			end
 end
 function Auxiliary.SynOperation(f1,f2,minc,maxc)
-	return	function(e,tp,eg,ep,ev,re,r,rp,c,tuner)
+	return	function(e,tp,eg,ep,ev,re,r,rp,c,tuner,mg)
 				local g=nil
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<ct then minc=ct end
 				if tuner then
-					g=Duel.SelectTunerMaterial(c:GetControler(),c,tuner,f1,f2,minc,maxc)
+					g=Duel.SelectTunerMaterial(c:GetControler(),c,tuner,f1,f2,minc,maxc,mg)
 				else
-					g=Duel.SelectSynchroMaterial(c:GetControler(),c,f1,f2,minc,maxc)
+					g=Duel.SelectSynchroMaterial(c:GetControler(),c,f1,f2,minc,maxc,mg)
 				end
 				c:SetMaterial(g)
 				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)

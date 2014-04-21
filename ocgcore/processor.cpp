@@ -765,7 +765,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_SYNCHRO: {
-		if (select_synchro_material(it->step, it->arg1,  (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16))
+		if (select_synchro_material(it->step, it->arg1,  (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16, (group*)it->peffect))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;

@@ -1931,10 +1931,12 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		target->material_cards.clear();
 		card* tuner = core.limit_tuner;
 		group* materials = core.limit_xyz;
+		group* syn = core.limit_syn;
 		target->filter_spsummon_procedure(sumplayer, &eset);
 		target->filter_spsummon_procedure_g(sumplayer, &eset);
 		core.limit_tuner = tuner;
 		core.limit_xyz = materials;
+		core.limit_syn = syn;
 		if(!eset.count)
 			return TRUE;
 		core.select_effects.clear();
@@ -1959,9 +1961,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		target->summon_type = (peffect->get_value(target) & 0xfffffff) | SUMMON_TYPE_SPECIAL;
 		if(peffect->operation) {
 			pduel->lua->add_param(target, PARAM_TYPE_CARD);
-			if(core.limit_tuner) {
+			if(core.limit_tuner || core.limit_syn) {
 				pduel->lua->add_param(core.limit_tuner, PARAM_TYPE_CARD);
+				pduel->lua->add_param(core.limit_syn, PARAM_TYPE_GROUP);
 				core.limit_tuner = 0;
+				core.limit_syn = 0;
 			}
 			if(core.limit_xyz) {
 				pduel->lua->add_param(core.limit_xyz, PARAM_TYPE_GROUP);
@@ -3731,14 +3735,14 @@ int32 field::operation_replace(uint16 step, effect * replace_effect, group * tar
 	}
 	return TRUE;
 }
-int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, int32 min, int32 max) {
+int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, int32 min, int32 max, group* mg) {
 	switch(step) {
 	case 0: {
 		core.select_cards.clear();
 		if(core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 			effect_set eset;
 			filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
-			if(eset.count) {
+			if(eset.count && (!mg || mg->has_card(eset[0]->handler))) {
 				core.select_cards.push_back(eset[0]->handler);
 				pduel->restore_assumes();
 				pduel->write_buffer8(MSG_HINT);
@@ -3759,6 +3763,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 					effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 					if(pcheck)
 						pcheck->get_value(tuner);
+					if(mg && !mg->has_card(tuner))
+						continue;
 					if(!pduel->lua->check_matching(tuner, -2, 0))
 						continue;
 					if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
@@ -3780,6 +3786,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 								if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
 									if(pcheck)
 										pcheck->get_value(pm);
+									if(mg && !mg->has_card(pm))
+										continue;
 									if(!pduel->lua->check_matching(pm, -1, 0))
 										continue;
 									nsyn.push_back(pm);
