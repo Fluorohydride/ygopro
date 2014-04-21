@@ -197,12 +197,7 @@ function Auxiliary.XyzCondition(f,minc,maxc)
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				if og then
-					return og:IsExists(f,minc,nil)
-				else
-					local g=Duel.GetXyzMaterial(c)
-					return g:IsExists(f,minc,nil)
-				end
+				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 			end
 end
 function Auxiliary.XyzOperation(f,minc,maxc)
@@ -211,9 +206,7 @@ function Auxiliary.XyzOperation(f,minc,maxc)
 					c:SetMaterial(og)
 					Duel.Overlay(c,og)
 				else
-					local g=Duel.GetXyzMaterial(c)
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-					local mg=g:FilterSelect(tp,f,minc,maxc,nil)
+					local mg=Duel.SelectXyzMaterial(tp,c,f,minc,maxc)
 					c:SetMaterial(mg)
 					Duel.Overlay(c,mg)
 				end

@@ -1629,6 +1629,9 @@ int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int
 	       || (op2 && acc > op2 && check_with_sum_limit(mats, acc - op2, index + 1, count + 1, min, max))
 	       || check_with_sum_limit(mats, acc, index + 1, count, min, max);
 }
+int32 field::check_xyz_material(card* pcard, int32 findex, int32 min, min32 max, group* mg) {
+	return TRUE;
+}
 int32 field::is_player_can_draw(uint8 playerid) {
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DRAW);
 }

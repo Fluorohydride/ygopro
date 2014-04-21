@@ -2393,7 +2393,18 @@ int32 scriptlib::duel_get_operation_count(lua_State *L) {
 	}
 	return 1;
 }
-int32 scriptlib::duel_get_xyz_material(lua_State *L) {
+int32 scriptlib::duel_check_xyz_material(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* scard = *(card**) lua_touserdata(L, 1);
+	duel* pduel = scard->pduel;
+	group* pgroup = pduel->new_group();
+	group* mgroup = pduel->new_group();
+	pduel->game_field->get_xyz_material(scard, &pgroup->container);
+	interpreter::group2value(L, pgroup);
+	return 1;
+}
+int32 scriptlib::duel_select_xyz_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* scard = *(card**) lua_touserdata(L, 1);

@@ -870,6 +870,13 @@ int32 field::process() {
 		core.units.pop_front();
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_SELECT_XMATERIAL: {
+		if (select_xyz_material(it->step, it->arg1,  (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16, (group*)it->peffect))
+			core.units.pop_front();
+		else
+			core.units.begin()->step++;
+		return pduel->bufferlen;
+	}
 	case PROCESSOR_DRAW_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DRAW, 0, it->peffect, it->ptarget, it->arg1, it->arg2);

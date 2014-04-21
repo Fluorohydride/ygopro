@@ -361,7 +361,8 @@ public:
 	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max, group* mg);
 	int32 check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, group* mg);
 	int32 check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int32 count, int32 min, int32 max);
-
+	int32 check_xyz_material(card* pcard, int32 findex, int32 min, min32 max, group* mg);
+	
 	int32 is_player_can_draw(uint8 playerid);
 	int32 is_player_can_discard_deck(uint8 playerid, int32 count);
 	int32 is_player_can_discard_deck_as_cost(uint8 playerid, int32 count);
@@ -474,6 +475,7 @@ public:
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, ptr arg, ptr replace_type);
 	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max, group* mg);
+	int32 select_xyz_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max, group* mg);
 	int32 select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max);
 	int32 select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max);
 	int32 toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count);
@@ -652,6 +654,7 @@ public:
 #define PROCESSOR_SPSUMMON_STEP_S	136
 #define PROCESSOR_SPSUMMON_COMP_S	137
 #define PROCESSOR_RANDOM_SELECT_S	138
+#define PROCESSOR_SELECT_XMATERIAL	139
 #define PROCESSOR_DRAW_S			140
 #define PROCESSOR_DAMAGE_S			141
 #define PROCESSOR_RECOVER_S			142

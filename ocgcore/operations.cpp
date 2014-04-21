@@ -3884,6 +3884,9 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card * pcard, i
 	}
 	return TRUE;
 }
+int32 field::select_xyz_material(int16 step, uint8 playerid, card * pcard, int32 min, int32 max, group* mg) {
+	return TRUE;
+}
 int32 field::select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max) {
 	switch(step) {
 	case 0: {
