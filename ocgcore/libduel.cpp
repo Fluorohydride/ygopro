@@ -2058,14 +2058,12 @@ int32 scriptlib::duel_select_synchro_material(lua_State *L) {
 	int32 max = lua_tointeger(L, 6);
 	card* smat = 0;
 	group* mg = 0;
-	if(lua_gettop(L) >= 7) {
-		if(!lua_isnil(L, 7))
-			check_param(L, PARAM_TYPE_CARD, 7);
+	if(lua_gettop(L) >= 7 && !lua_isnil(L, 7)) {
+		check_param(L, PARAM_TYPE_CARD, 7);
 		smat = *(card**) lua_touserdata(L, 7);
 	}
-	if(lua_gettop(L) >= 8) {
-		if(!lua_isnil(L, 8))
-			check_param(L, PARAM_TYPE_GROUP, 8);
+	if(lua_gettop(L) >= 8 && !lua_isnil(L, 8)) {
+		check_param(L, PARAM_TYPE_GROUP, 8);
 		mg = *(group**) lua_touserdata(L, 8);
 	}
 	if(mg)
@@ -2089,14 +2087,12 @@ int32 scriptlib::duel_check_synchro_material(lua_State *L) {
 	int32 max = lua_tointeger(L, 5);
 	card* smat = 0;
 	group* mg = 0;
-	if(lua_gettop(L) >= 6) {
-		if(!lua_isnil(L, 6))
-			check_param(L, PARAM_TYPE_CARD, 6);
+	if(lua_gettop(L) >= 6 && !lua_isnil(L, 6)) {
+		check_param(L, PARAM_TYPE_CARD, 6);
 		smat = *(card**) lua_touserdata(L, 6);
 	}
-	if(lua_gettop(L) >= 7) {
-		if(!lua_isnil(L, 7))
-			check_param(L, PARAM_TYPE_GROUP, 7);
+	if(lua_gettop(L) >= 7 && !lua_isnil(L, 7)) {
+		check_param(L, PARAM_TYPE_GROUP, 7);
 		mg = *(group**) lua_touserdata(L, 7);
 	}
 	lua_pushboolean(L, pduel->game_field->check_synchro_material(pcard, 2, 3, min, max, smat, mg));
@@ -2119,9 +2115,8 @@ int32 scriptlib::duel_select_tuner_material(lua_State *L) {
 	int32 min = lua_tointeger(L, 6);
 	int32 max = lua_tointeger(L, 7);
 	group* mg = 0;
-	if(lua_gettop(L) >= 8) {
-		if(!lua_isnil(L, 8))
-			check_param(L, PARAM_TYPE_GROUP, 8);
+	if(lua_gettop(L) >= 8 && !lua_isnil(L, 8)) {
+		check_param(L, PARAM_TYPE_GROUP, 8);
 		mg = *(group**) lua_touserdata(L, 8);
 	}
 	if(!pduel->game_field->check_tuner_material(pcard, tuner, 4, 5, min, max, 0, mg))
@@ -2156,9 +2151,8 @@ int32 scriptlib::duel_check_tuner_material(lua_State *L) {
 	int32 min = lua_tointeger(L, 5);
 	int32 max = lua_tointeger(L, 6);
 	group* mg = 0;
-	if(lua_gettop(L) >= 7) {
-		if(!lua_isnil(L, 7))
-			check_param(L, PARAM_TYPE_GROUP, 7);
+	if(lua_gettop(L) >= 7 && !lua_isnil(L, 7)) {
+		check_param(L, PARAM_TYPE_GROUP, 7);
 		mg = *(group**) lua_touserdata(L, 7);
 	}
 	lua_pushboolean(L, pduel->game_field->check_tuner_material(pcard, tuner, 3, 4, min, max, 0, mg));
