@@ -39,7 +39,7 @@ function c77783947.sccon(e,tp,eg,ep,ev,re,r,rp)
 	return ph==PHASE_MAIN1 or ph==PHASE_BATTLE or ph==PHASE_MAIN2
 end
 function c77783947.mfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9e)
+	return c:IsSetCard(0x9e)
 end
 function c77783947.cfilter(c,syn)
 	return syn:IsSynchroSummonable(c)

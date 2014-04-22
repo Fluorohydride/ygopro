@@ -3873,6 +3873,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 		int32 lv = pcard->get_level();
 		lv -= l1;
 		if(smat) {
+			if(pcheck)
+				pcheck->get_value(smat);
 			l = smat->get_synchro_level(pcard);
 			l1 = l & 0xffff;
 			lv -= l1;

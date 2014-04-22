@@ -1616,7 +1616,7 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			if(smat) {
 				if(pcheck)
 					pcheck->get_value(smat);
-				if(!pduel->lua->check_matching(smat, findex2, 0)) {
+				if(!smat->is_position(POS_FACEUP) || !smat->is_can_be_synchro_material(pcard, tuner) || !pduel->lua->check_matching(smat, findex2, 0)) {
 					pduel->restore_assumes();
 					return FALSE;
 				}
