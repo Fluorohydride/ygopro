@@ -13,7 +13,7 @@
 #include "interpreter.h"
 #include <iostream>
 #include <cstring>
-#include <multimap>
+#include <map>
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 
@@ -1272,19 +1272,38 @@ void field::ritual_release(card_set* material) {
 	release(&rel, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player);
 	send_to(&rem, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player, PLAYER_NONE, LOCATION_REMOVED, 0, POS_FACEUP);
 }
-void field::get_xyz_material(card* scard, card_set* material) {
+void field::get_xyz_material(card* scard, int32 findex) {
 	card* pcard = 0;
 	int32 playerid = scard->current.controler;
+	core.xmaterial_lst.clear();
+	card_vector cv;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
-		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard))
-			material->insert(pcard);
+		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard)
+				&& pduel->lua->check_matching(pcard, findex, 0))
+			cv.push_back(pcard);
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard)
-		        && pcard->is_affected_by_effect(EFFECT_XYZ_MATERIAL))
-			material->insert(pcard);
+		        && pcard->is_affected_by_effect(EFFECT_XYZ_MATERIAL) && pduel->lua->check_matching(pcard, findex, 0))
+			cv.push_back(pcard);
+	}
+	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
+		for(auto pcard : cv) {
+			effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+			if(peffect) {
+				int32 v = peffect->get_value();
+				core.xmaterial_lst.insert(std::make_pair(v, pcard));
+			} else
+				core.xmaterial_lst.insert(std::make_pair(0, pcard));
+		}
+		auto iter = core.xmaterial_lst.rbegin();
+		while((iter != core.xmaterial_lst.rend()) && (iter->first > core.xmaterial_lst.size()))
+			core.xmaterial_lst.erase((iter++).base());
+	} else {
+		for(auto pcard : cv)
+			core.xmaterial_lst.insert(std::make_pair(0, pcard));
 	}
 }
 void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
@@ -1631,41 +1650,30 @@ int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int
 	       || check_with_sum_limit(mats, acc, index + 1, count, min, max);
 }
 int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max, group* mg) {
-	card_set mat, cset;
-	pduel->game_field->get_xyz_material(scard, &mat);
 	if(mg) {
+		card_vector cv;
+		core.xmaterial_lst.clear();
 		for (auto pcard : mg->container) {
 			if(pduel->lua->check_matching(pcard, findex, 0))
-				cset.insert(pcard);
+				cv.push_back(pcard);
+		}
+		if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
+			for(auto pcard : cv) {
+				effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+				if(peffect) {
+					int32 v = peffect->get_value();
+					core.xmaterial_lst.insert(std::make_pair(v, pcard));
+				} else
+					core.xmaterial_lst.insert(std::make_pair(0, pcard));
+			}
+			auto iter = core.xmaterial_lst.rbegin();
+			while((iter != core.xmaterial_lst.rend()) && (iter->first > core.xmaterial_lst.size()))
+				core.xmaterial_lst.erase((iter++).base());
 		}
 	} else {
-		for (auto pcard : mat) {
-			if(pduel->lua->check_matching(pcard, findex, 0))
-				cset.insert(pcard);
-		}
+		pduel->game_field->get_xyz_material(scard, findex);
 	}
-	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-		for(auto pcard : cset) {
-			std::multimap<int32, card*> m;
-			effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
-			if(peffect) {
-				int32 v = peffect->get_value();
-				m.insert(std::make_pair(v, pcard));
-			}
-			auto iter = m.rbegin();
-			while(iter != m.rend()) {
-				auto cur = iter++;
-				if(cur->first > cset.size()) {
-					cset.erase(cur->second);
-					m.erase(cur);
-				}
-			}
-		}
-		return cset.size() >= min;
-	} else {
-		return cset.size() >= min;
-	}
-	return TRUE;
+	return core.xmaterial_lst.size() >= min;
 }
 int32 field::is_player_can_draw(uint8 playerid) {
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DRAW);

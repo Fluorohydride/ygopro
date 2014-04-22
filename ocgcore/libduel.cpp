@@ -2417,6 +2417,9 @@ int32 scriptlib::duel_select_xyz_material(lua_State *L) {
 	uint32 playerid = lua_tointeger(L, 1);
 	uint32 minc = lua_tointeger(L, 4);
 	uint32 maxc = lua_tointeger(L, 5);
+	field::card_set mat, cset;
+	duel* pduel = scard->pduel;
+	pduel->game_field->get_xyz_material(scard, 3);
 	scard->pduel->game_field->add_process(PROCESSOR_SELECT_XMATERIAL, 0, 0, (group*)scard, playerid, minc + (maxc << 16));
 	return lua_yield(L, 0);
 }

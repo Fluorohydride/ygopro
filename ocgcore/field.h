@@ -212,6 +212,7 @@ struct processor {
 	std::unordered_map<card*, uint32> readjust_map;
 	std::unordered_set<card*> unique_cards[2];
 	std::unordered_map<uint32, uint32> effect_count_code;
+	std::multimap<int32, card*> xmaterial_lst;
 	ptr temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[2];
@@ -339,7 +340,7 @@ public:
 	int32 get_draw_count(uint8 playerid);
 	void get_ritual_material(uint8 playerid, effect* peffect, card_set* material);
 	void ritual_release(card_set* material);
-	void get_xyz_material(card* scard, card_set* material);
+	void get_xyz_material(card* scard, int32 findex);
 	void get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset);
 	int32 get_overlay_count(uint8 self, uint8 s, uint8 o);
 	void update_disable_check_list(effect* peffect);
@@ -475,7 +476,7 @@ public:
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, ptr arg, ptr replace_type);
 	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max, group* mg);
-	int32 select_xyz_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max, group* mg);
+	int32 select_xyz_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max);
 	int32 select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max);
 	int32 select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max);
 	int32 toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count);
