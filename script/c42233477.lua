@@ -47,7 +47,7 @@ function c42233477.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCondition(c42233477.rcon)
 		e2:SetValue(LOCATION_HAND)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
-		c:RegisterEffect(e2)
+		tc:RegisterEffect(e2)
 	end
 end
 function c42233477.rcon(e)

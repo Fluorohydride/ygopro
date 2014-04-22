@@ -1,4 +1,4 @@
----影依融合
+--影依融合
 function c44394295.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
