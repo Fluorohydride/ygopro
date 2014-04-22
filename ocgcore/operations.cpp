@@ -3786,6 +3786,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 						if(lv <= 0)
 							continue;
 						if(smat) {
+							if(pcheck)
+								pcheck->get_value(smat);
 							l = smat->get_synchro_level(pcard);
 							l1 = l & 0xffff;
 							lv -= l1;
@@ -3862,6 +3864,9 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 	}
 	case 3: {
 		card* tuner = (card*)core.units.begin()->ptarget;
+		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
+		if(pcheck)
+			pcheck->get_value(tuner);
 		int32 l = tuner->get_synchro_level(pcard);
 		int32 l1 = l & 0xffff;
 		//int32 l2 = l >> 16;

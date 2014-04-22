@@ -1604,23 +1604,6 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 				return TRUE;
 			}
 		} else {
-			card_vector nsyn;
-			card* pm;
-			for(uint8 p = 0; p < 2; ++p) {
-				for(int32 i = 0; i < 5; ++i) {
-					pm = player[p].list_mzone[i];
-					if(mg && !mg->has_card(pm))
-						continue;
-					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
-						if(pcheck)
-							pcheck->get_value(pm);
-						if(!pduel->lua->check_matching(pm, findex2, 0))
-							continue;
-						nsyn.push_back(pm);
-						pm->operation_param = pm->get_synchro_level(pcard);
-					}
-				}
-			}
 			int32 l = tuner->get_synchro_level(pcard);
 			int32 l1 = l & 0xffff;
 			//int32 l2 = l >> 16;
@@ -1631,19 +1614,44 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 				return FALSE;
 			}
 			if(smat) {
+				if(pcheck)
+					pcheck->get_value(smat);
+				if(!pduel->lua->check_matching(smat, findex2, 0)) {
+					pduel->restore_assumes();
+					return FALSE;
+				}
 				l = smat->get_synchro_level(pcard);
 				l1 = l & 0xffff;
 				lv -= l1;
 				min--;
 				max--;
-				pduel->restore_assumes();
 				if(lv <= 0) {
+					pduel->restore_assumes();
 					if(lv == 0 && min == 0)
 						return TRUE;
 					return FALSE;
 				}
-				if(max == 0)
+				if(max == 0) {
+					pduel->restore_assumes();
 					return FALSE;
+				}
+			}
+			card_vector nsyn;
+			card* pm;
+			for(uint8 p = 0; p < 2; ++p) {
+				for(int32 i = 0; i < 5; ++i) {
+					pm = player[p].list_mzone[i];
+					if(mg && !mg->has_card(pm))
+						continue;
+					if(pm && pm != tuner && pm != smat && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+						if(pcheck)
+							pcheck->get_value(pm);
+						if(!pduel->lua->check_matching(pm, findex2, 0))
+							continue;
+						nsyn.push_back(pm);
+						pm->operation_param = pm->get_synchro_level(pcard);
+					}
+				}
 			}
 			if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
 				pduel->restore_assumes();
