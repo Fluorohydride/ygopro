@@ -1562,24 +1562,24 @@ void field::attack_all_target_check() {
 	if(!peffect->check_value_condition(1))
 		core.attacker->attack_all_target = FALSE;
 }
-int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max, group* mg) {
+int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg) {
 	card* tuner;
 	if(core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 		effect_set eset;
 		filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
 		if(eset.count)
-			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max, mg);
+			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max, smat, mg);
 	}
 	for(uint8 p = 0; p < 2; ++p) {
 		for(int32 i = 0; i < 5; ++i) {
 			tuner = player[p].list_mzone[i];
-			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max, mg))
+			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max, smat, mg))
 				return TRUE;
 		}
 	}
 	return FALSE;
 }
-int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, group* mg) {
+int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg) {
 	effect* peffect;
 	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
 		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
@@ -1625,11 +1625,27 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			int32 l1 = l & 0xffff;
 			//int32 l2 = l >> 16;
 			int32 lv = pcard->get_level();
-			if(lv == l1) {
+			lv -= l1;
+			if(lv <= 0) {
 				pduel->restore_assumes();
 				return FALSE;
 			}
-			if(check_with_sum_limit(&nsyn, lv - l1, 0, 1, min, max)) {
+			if(smat) {
+				l = smat->get_synchro_level(pcard);
+				l1 = l & 0xffff;
+				lv -= l1;
+				min--;
+				max--;
+				pduel->restore_assumes();
+				if(lv <= 0) {
+					if(lv == 0 && min == 0)
+						return TRUE;
+					return FALSE;
+				}
+				if(max == 0)
+					return FALSE;
+			}
+			if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
 				pduel->restore_assumes();
 				return TRUE;
 			}

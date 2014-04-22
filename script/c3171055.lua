@@ -14,7 +14,7 @@ function c3171055.condition(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c3171055.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return end
+	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(Card.IsCode,ep,LOCATION_DECK,0,nil,re:GetHandler():GetCode())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
