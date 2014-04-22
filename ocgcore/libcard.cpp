@@ -1145,7 +1145,7 @@ int32 scriptlib::card_is_synchro_summonable(lua_State *L) {
 	}
 	uint32 p = pcard->pduel->game_field->core.reason_player;
 	pcard->pduel->game_field->core.limit_tuner = tuner;
-	pcard->pduel->game_field->core.limit_xyz = mg;
+	pcard->pduel->game_field->core.limit_syn = mg;
 	lua_pushboolean(L, pcard->is_special_summonable(p));
 	return 1;
 }

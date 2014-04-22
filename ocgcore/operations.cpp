@@ -3902,7 +3902,7 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 		} else
 			core.units.begin()->step = 1;
 		return FALSE;
-		}
+	}
 	case 1: {
 		group* pgroup = pduel->new_group();
 		for(int32 i = 0; i < returns.bvalue[0]; ++i) {

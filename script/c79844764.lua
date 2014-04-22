@@ -22,7 +22,7 @@ function c79844764.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local p1=false
 	local p2=false
 	while tc do
-		if not tc:IsPreviousLocation(LOCATION_EXTRA) then
+		if tc:IsPreviousLocation(LOCATION_EXTRA) then
 			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
 		end
 		tc=eg:GetNext()
@@ -42,7 +42,7 @@ function c79844764.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c79844764.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:IsLocation(LOCATION_EXTRA)
+	return c:IsLocation(LOCATION_EXTRA)
 end
 function c79844764.activate(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
