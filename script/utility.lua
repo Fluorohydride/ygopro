@@ -218,13 +218,8 @@ function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc)
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				if og then
-					return og:IsExists(f,minc,nil)
-				else
-					if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
-					local g=Duel.GetXyzMaterial(c)
-					return g:IsExists(f,minc,nil)
-				end
+				if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
+				Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 			end
 end
 function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
@@ -235,8 +230,7 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 				else
 					local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 					local ct=-ft
-					local g=Duel.GetXyzMaterial(c)
-					local b1=g:IsExists(f,minc,nil)
+					local b1=Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 					local b2=ct<1 and Duel.IsExistingMatchingCard(alterf,tp,LOCATION_MZONE,0,1,nil)
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 					if (b1 and b2 and Duel.SelectYesNo(tp,desc)) or ((not b1) and b2) then
@@ -249,7 +243,7 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 						c:SetMaterial(mg)
 						if op~=nil then op(e,tp) end
 					else
-						local mg=g:FilterSelect(tp,f,minc,maxc,nil)
+						local mg=Duel.SelectXyzMaterial(tp,c,f,minc,maxc)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
 					end
