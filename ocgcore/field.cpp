@@ -1272,7 +1272,7 @@ void field::ritual_release(card_set* material) {
 	release(&rel, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player);
 	send_to(&rem, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player, PLAYER_NONE, LOCATION_REMOVED, 0, POS_FACEUP);
 }
-void field::get_xyz_material(card* scard, int32 findex) {
+void field::get_xyz_material(card* scard, int32 findex, int32 maxc) {
 	card* pcard = 0;
 	int32 playerid = scard->current.controler;
 	core.xmaterial_lst.clear();
@@ -1298,9 +1298,9 @@ void field::get_xyz_material(card* scard, int32 findex) {
 			} else
 				core.xmaterial_lst.insert(std::make_pair(0, pcard));
 		}
-		auto iter = core.xmaterial_lst.rbegin();
-		while((iter != core.xmaterial_lst.rend()) && (iter->first > core.xmaterial_lst.size()))
-			core.xmaterial_lst.erase((iter++).base());
+		auto iter = core.xmaterial_lst.begin();
+		while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > maxc)))
+			core.xmaterial_lst.erase(iter++);
 	} else {
 		for(auto pcard : cv)
 			core.xmaterial_lst.insert(std::make_pair(0, pcard));
@@ -1690,12 +1690,12 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max,
 				} else
 					core.xmaterial_lst.insert(std::make_pair(0, pcard));
 			}
-			auto iter = core.xmaterial_lst.rbegin();
-			while((iter != core.xmaterial_lst.rend()) && (iter->first > core.xmaterial_lst.size()))
-				core.xmaterial_lst.erase((iter++).base());
+			auto iter = core.xmaterial_lst.begin();
+			while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > max)))
+				core.xmaterial_lst.erase(iter++);
 		}
 	} else {
-		pduel->game_field->get_xyz_material(scard, findex);
+		pduel->game_field->get_xyz_material(scard, findex, max);
 	}
 	return core.xmaterial_lst.size() >= min;
 }

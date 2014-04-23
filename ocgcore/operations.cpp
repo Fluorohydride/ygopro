@@ -3965,7 +3965,7 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 	case 0: {
 		int maxv = 0;
 		if(core.xmaterial_lst.size())
-			maxv = core.xmaterial_lst.rbegin()->first;
+			maxv = core.xmaterial_lst.begin()->first;
 		if(min >= maxv) {
 			core.select_cards.clear();
 			for(auto iter : core.xmaterial_lst)
@@ -4039,7 +4039,7 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 		core.select_cards.clear();
 		for(auto iter : core.xmaterial_lst)
 			core.select_cards.push_back(iter.second);
-		int maxv = core.xmaterial_lst.rbegin()->first;
+		int maxv = core.xmaterial_lst.begin()->first;
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_SELECTMSG);
 		pduel->write_buffer8(playerid);

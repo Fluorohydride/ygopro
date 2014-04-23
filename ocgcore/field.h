@@ -212,7 +212,7 @@ struct processor {
 	std::unordered_map<card*, uint32> readjust_map;
 	std::unordered_set<card*> unique_cards[2];
 	std::unordered_map<uint32, uint32> effect_count_code;
-	std::multimap<int32, card*> xmaterial_lst;
+	std::multimap<int32, card*,std::greater<int32> > xmaterial_lst;
 	ptr temp_var[4];
 	uint32 global_flag;
 	uint16 pre_field[2];
@@ -340,7 +340,7 @@ public:
 	int32 get_draw_count(uint8 playerid);
 	void get_ritual_material(uint8 playerid, effect* peffect, card_set* material);
 	void ritual_release(card_set* material);
-	void get_xyz_material(card* scard, int32 findex);
+	void get_xyz_material(card* scard, int32 findex, int32 maxc);
 	void get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset);
 	int32 get_overlay_count(uint8 self, uint8 s, uint8 o);
 	void update_disable_check_list(effect* peffect);
