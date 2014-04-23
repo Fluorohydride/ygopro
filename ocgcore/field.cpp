@@ -1853,6 +1853,9 @@ int32 field::is_player_can_release(uint8 playerid, card * pcard) {
 	}
 	return TRUE;
 }
+int32 field::is_player_can_place_counter(uint8 playerid, card * pcard, uint16 countertype, uint16 count) {
+	return !is_player_affected_by_effect(playerid,EFFECT_CANNOT_PLACE_COUNTER);
+}
 int32 field::is_player_can_remove_counter(uint8 playerid, card * pcard, uint8 s, uint8 o, uint16 countertype, uint16 count, uint32 reason) {
 	if((pcard && pcard->get_counter(countertype) >= count) || (!pcard && get_field_counter(playerid, s, o, countertype) >= count))
 		return TRUE;
