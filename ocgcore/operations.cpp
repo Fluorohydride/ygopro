@@ -3867,10 +3867,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 		return TRUE;
 	}
 	case 3: {
-		if(!smat) {
-			returns.ivalue[0] = TRUE;
+		if(!smat)
 			return FALSE;
-		}
 		card* tuner = core.limit_tuner;
 		int32 l = tuner->get_synchro_level(pcard);
 		int32 l1 = l & 0xffff;
@@ -3880,22 +3878,11 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 		l = smat->get_synchro_level(pcard);
 		l1 = l & 0xffff;
 		lv -= l1;
-		min--;
-		max--;
-		if(min == 0) {
-			if(lv == 0 || max == 0)
-				core.units.begin()->step = 5;
-			else
-				add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, 210);
-		} else
-			returns.ivalue[0] = TRUE;
+		if(lv == 0)
+			core.units.begin()->step = 5;
 		return FALSE;
 	}
 	case 4: {
-		if(!returns.ivalue[0]) {
-			core.units.begin()->step = 5;
-			return FALSE;
-		}
 		card* tuner = core.limit_tuner;
 		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 		int32 l = tuner->get_synchro_level(pcard);
@@ -3917,6 +3904,8 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 				if(pm && pm != tuner && pm != smat && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
 					if(pcheck)
 						pcheck->get_value(pm);
+					if(mg && !mg->has_card(pm))
+						continue;
 					if(!pduel->lua->check_matching(pm, -1, 0))
 						continue;
 					core.select_cards.push_back(pm);

@@ -137,7 +137,8 @@ function Auxiliary.SynCondition(f1,f2,minc,maxc)
 				local ct=-ft
 				if minc<ct then minc=ct end
 				if maxc<minc then return false end
-				if smat and f1(smat) then return Duel.CheckTunerMaterial(c,smat,f1,f2,minc,maxc,mg) end
+				if smat and smat:IsType(TYPE_TUNER) and (not f1 or f1(smat)) then
+					return Duel.CheckTunerMaterial(c,smat,f1,f2,minc,maxc,mg) end
 				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc,smat,mg)
 			end
 end
@@ -147,7 +148,7 @@ function Auxiliary.SynOperation(f1,f2,minc,maxc)
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<ct then minc=ct end
-				if smat and f1(smat) then
+				if smat and smat:IsType(TYPE_TUNER) and (not f1 or f1(smat)) then
 					g=Duel.SelectTunerMaterial(c:GetControler(),c,smat,f1,f2,minc,maxc,mg)
 				else
 					g=Duel.SelectSynchroMaterial(c:GetControler(),c,f1,f2,minc,maxc,smat,mg)
@@ -219,7 +220,7 @@ function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc)
 				local ct=-ft
 				if minc<=ct then return false end
 				if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
-				Duel.CheckXyzMaterial(c,f,minc,maxc,og)
+				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 			end
 end
 function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)

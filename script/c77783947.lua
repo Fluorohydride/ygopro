@@ -23,10 +23,12 @@ function c77783947.initial_effect(c)
 	--synchro effect
 	local e4=Effect.CreateEffect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetType(EFFECT_TYPE_ACTIVATE)
+	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetHintTiming(0,TIMING_BATTLE_START+TIMING_BATTLE_END)
+	e4:SetRange(LOCATION_SZONE)
 	e4:SetCondition(c77783947.sccon)
+	e4:SetCost(c77783947.sccost)
 	e4:SetTarget(c77783947.sctg)
 	e4:SetOperation(c77783947.scop)
 	c:RegisterEffect(e4)
@@ -46,6 +48,10 @@ function c77783947.cfilter(c,syn)
 end
 function c77783947.spfilter(c,mg)
 	return mg:IsExists(c77783947.cfilter,1,nil,c)
+end
+function c77783947.sccost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c77783947.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

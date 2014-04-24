@@ -528,7 +528,7 @@ int32 field::select_with_sum_limit(int16 step, uint8 playerid, int32 acc, int32 
 		if(core.select_cards.empty())
 			return TRUE;
 		pduel->write_buffer8(MSG_SELECT_SUM);
-		if(min)
+		if(max)
 			pduel->write_buffer8(0);
 		else
 			pduel->write_buffer8(1);

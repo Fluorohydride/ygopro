@@ -25,6 +25,7 @@ function c60549248.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetProperty(EFFECT_FLAG_REPEAT)
 	e4:SetCountLimit(1)
+	e4:SetCondition(c60549248.descon)
 	e4:SetTarget(c60549248.destg)
 	e4:SetOperation(c60549248.desop)
 	c:RegisterEffect(e4)
@@ -56,6 +57,9 @@ function c60549248.thop(e,tp,eg,ep,ev,re,r,rp)
 			c:RegisterEffect(e2)
 		end
 	end
+end
+function c60549248.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
 end
 function c60549248.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

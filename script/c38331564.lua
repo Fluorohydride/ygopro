@@ -37,7 +37,7 @@ function c38331564.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c38331564.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_XYZ and e:GetHandler():GetReasonCard():GetMaterial():IsExists(Card.IsLocation,3,nil,LOCATION_MZONE)
+	return r==REASON_XYZ and e:GetHandler():GetReasonCard():GetMaterial():IsExists(Card.IsPreviousLocation,3,nil,LOCATION_MZONE)
 end
 function c38331564.effop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,38331564)
@@ -53,7 +53,7 @@ function c38331564.effop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(c38331564.destg)
 	e1:SetOperation(c38331564.desop)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	rc:RegisterEffect(e1)
+	rc:RegisterEffect(e1,true)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)

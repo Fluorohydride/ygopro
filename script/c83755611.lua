@@ -32,9 +32,9 @@ end
 function c83755611.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToDeck() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	local ct=e:GetHandler():Filter(Card.IsSetCard,nil,0x9e):GetClassCount(Card.GetOriginalAttribute)
+	local ct=e:GetHandler():GetMaterial():Filter(Card.IsSetCard,nil,0x9e):GetClassCount(Card.GetOriginalAttribute)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_GRAVE,0,1,ct,nil)
+	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end
 function c83755611.tdop(e,tp,eg,ep,ev,re,r,rp)

@@ -1,4 +1,4 @@
---エルシャドール・ネフィリム
+--エルシャドール・ミドラーシュ
 function c94977269.initial_effect(c)
 	c:EnableReviveLimit()
 	--fusion material
@@ -33,7 +33,7 @@ function c94977269.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetTargetRange(1,1)
 	e4:SetTarget(c94977269.splimit2)
-	c:RegisterEffect(e3)
+	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -63,7 +63,7 @@ function c94977269.exfilter(c)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial()
 end
 function c94977269.fuscon(e,g,gc,chkf)
-	if g==nil then return false end
+	if g==nil then return true end
 	local tp=e:GetHandlerPlayer()
 	local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
 	local exg=Group.CreateGroup()

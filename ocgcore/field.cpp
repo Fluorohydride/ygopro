@@ -1641,9 +1641,9 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			for(uint8 p = 0; p < 2; ++p) {
 				for(int32 i = 0; i < 5; ++i) {
 					pm = player[p].list_mzone[i];
-					if(mg && !mg->has_card(pm))
-						continue;
 					if(pm && pm != tuner && pm != smat && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+						if(mg && !mg->has_card(pm))
+							continue;
 						if(pcheck)
 							pcheck->get_value(pm);
 						if(!pduel->lua->check_matching(pm, findex2, 0))

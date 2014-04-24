@@ -59,7 +59,7 @@ function c20366274.exfilter(c)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial()
 end
 function c20366274.fuscon(e,g,gc,chkf)
-	if g==nil then return false end
+	if g==nil then return true end
 	local tp=e:GetHandlerPlayer()
 	local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
 	local exg=Group.CreateGroup()
