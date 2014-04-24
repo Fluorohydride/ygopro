@@ -34,7 +34,7 @@ function c26270847.atktg(e,c)
 	return c:IsSetCard(0x9f)
 end
 function c26270847.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9d)
+	return c:IsFaceup() and c:IsSetCard(0x9f)
 end
 function c26270847.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c26270847.filter,tp,LOCATION_MZONE,0,1,nil) end

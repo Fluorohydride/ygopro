@@ -1854,7 +1854,18 @@ int32 field::is_player_can_release(uint8 playerid, card * pcard) {
 	return TRUE;
 }
 int32 field::is_player_can_place_counter(uint8 playerid, card * pcard, uint16 countertype, uint16 count) {
-	return !is_player_affected_by_effect(playerid,EFFECT_CANNOT_PLACE_COUNTER);
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_CANNOT_PLACE_COUNTER, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		if(!eset[i]->target)
+			return FALSE;
+		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		if (pduel->lua->check_condition(eset[i]->target, 3))
+			return FALSE;
+	}
+	return TRUE;
 }
 int32 field::is_player_can_remove_counter(uint8 playerid, card * pcard, uint8 s, uint8 o, uint16 countertype, uint16 count, uint32 reason) {
 	if((pcard && pcard->get_counter(countertype) >= count) || (!pcard && get_field_counter(playerid, s, o, countertype) >= count))

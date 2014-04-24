@@ -1266,8 +1266,8 @@ int32 card::destination_redirect(uint8 destination, uint32 reason) {
 	}
 	return 0;
 }
-int32 card::add_counter(uint16 countertype, uint16 count) {
-	if(!is_can_add_counter(countertype, count))
+int32 card::add_counter(uint8 playerid, uint16 countertype, uint16 count) {
+	if(!is_can_add_counter(playerid, countertype, count))
 		return FALSE;
 	counters[countertype] += count;
 	pduel->write_buffer8(MSG_ADD_COUNTER);
@@ -1293,8 +1293,10 @@ int32 card::remove_counter(uint16 countertype, uint16 count) {
 	pduel->write_buffer8(count);
 	return TRUE;
 }
-int32 card::is_can_add_counter(uint16 countertype, uint16 count) {
+int32 card::is_can_add_counter(uint8 playerid, uint16 countertype, uint16 count) {
 	effect_set eset;
+	if(!pduel->game_field->is_player_can_place_counter(playerid, this, countertype, count))
+		return FALSE;
 	if(!(current.location & LOCATION_ONFIELD) || !is_position(POS_FACEUP))
 		return FALSE;
 	if((countertype & COUNTER_NEED_ENABLE) && is_status(STATUS_DISABLED))
