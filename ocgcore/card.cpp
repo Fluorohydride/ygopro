@@ -1266,8 +1266,8 @@ int32 card::destination_redirect(uint8 destination, uint32 reason) {
 	}
 	return 0;
 }
-int32 card::add_counter(uint16 countertype, uint16 count) {
-	if(!is_can_add_counter(countertype, count))
+int32 card::add_counter(uint8 playerid, uint16 countertype, uint16 count) {
+	if(!is_can_add_counter(playerid, countertype, count))
 		return FALSE;
 	counters[countertype] += count;
 	pduel->write_buffer8(MSG_ADD_COUNTER);
@@ -1293,8 +1293,10 @@ int32 card::remove_counter(uint16 countertype, uint16 count) {
 	pduel->write_buffer8(count);
 	return TRUE;
 }
-int32 card::is_can_add_counter(uint16 countertype, uint16 count) {
+int32 card::is_can_add_counter(uint8 playerid, uint16 countertype, uint16 count) {
 	effect_set eset;
+	if(!pduel->game_field->is_player_can_place_counter(playerid, this, countertype, count))
+		return FALSE;
 	if(!(current.location & LOCATION_ONFIELD) || !is_position(POS_FACEUP))
 		return FALSE;
 	if((countertype & COUNTER_NEED_ENABLE) && is_status(STATUS_DISABLED))
@@ -1453,7 +1455,7 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 		min = -fcount + 1;
 	if(min == 0)
 		return TRUE;
-	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
+	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0, 0);
 	if(m >= min)
 		return TRUE;
 	return FALSE;
@@ -1490,7 +1492,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 		min = -fcount + 1;
 	if(min == 0)
 		return TRUE;
-	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0);
+	int32 m = pduel->game_field->get_summon_release_list(this, 0, 0, 0);
 	if(m >= min)
 		return TRUE;
 	return FALSE;
@@ -1646,9 +1648,10 @@ int32 card::is_summonable(effect* peffect) {
 	pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
 	pduel->lua->add_param(this, PARAM_TYPE_CARD);
 	uint32 result = FALSE;
-	if(pduel->game_field->core.limit_tuner) {
+	if(pduel->game_field->core.limit_tuner || pduel->game_field->core.limit_syn) {
 		pduel->lua->add_param(pduel->game_field->core.limit_tuner, PARAM_TYPE_CARD);
-		if(pduel->lua->check_condition(peffect->condition, 3))
+		pduel->lua->add_param(pduel->game_field->core.limit_syn, PARAM_TYPE_GROUP);
+		if(pduel->lua->check_condition(peffect->condition, 4))
 			result = TRUE;
 	} else if(pduel->game_field->core.limit_xyz) {
 		pduel->lua->add_param(pduel->game_field->core.limit_xyz, PARAM_TYPE_GROUP);
@@ -1821,6 +1824,7 @@ int32 card::is_special_summonable(uint8 playerid) {
 	filter_spsummon_procedure(playerid, &eset);
 	pduel->game_field->core.limit_tuner = 0;
 	pduel->game_field->core.limit_xyz = 0;
+	pduel->game_field->core.limit_syn = 0;
 	pduel->game_field->restore_lp_cost();
 	return eset.count;
 }

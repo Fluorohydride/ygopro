@@ -5,12 +5,9 @@ function c68836428.initial_effect(c)
 	c:EnableReviveLimit()
 	--remove
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(68836428,0))
-	e1:SetCategory(CATEGORY_REMOVE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_BATTLED)
-	e1:SetTarget(c68836428.rmtg)
-	e1:SetOperation(c68836428.rmop)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_BATTLE_DESTROY_REDIRECT)
+	e1:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e1)
 	--negate
 	local e2=Effect.CreateEffect(c)
@@ -26,17 +23,6 @@ function c68836428.initial_effect(c)
 	e2:SetTarget(c68836428.target)
 	e2:SetOperation(c68836428.operation)
 	c:RegisterEffect(e2)
-end
-function c68836428.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local bc=e:GetHandler():GetBattleTarget()
-	if chk==0 then return bc and bc:IsRelateToBattle() and bc:IsStatus(STATUS_BATTLE_DESTROYED) end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,bc,1,0,0)
-end
-function c68836428.rmop(e,tp,eg,ep,ev,re,r,rp)
-	local bc=e:GetHandler():GetBattleTarget()
-	if bc:IsRelateToBattle() then
-		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)
-	end
 end
 function c68836428.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()

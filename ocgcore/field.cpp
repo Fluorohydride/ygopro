@@ -13,6 +13,7 @@
 #include "interpreter.h"
 #include <iostream>
 #include <cstring>
+#include <map>
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 
@@ -73,6 +74,7 @@ field::field(duel* pduel) {
 	core.check_level = 0;
 	core.limit_tuner = 0;
 	core.limit_xyz = 0;
+	core.limit_syn = 0;
 	core.duel_options = 0;
 	core.attacker = 0;
 	core.attack_target = 0;
@@ -1171,7 +1173,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 	}
 	return FALSE;
 }
-int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list) {
+int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_sum) {
 	uint8 p = target->current.controler;
 	card* pcard;
 	uint32 rcount = 0;
@@ -1187,9 +1189,12 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 			rcount += pcard->operation_param;
 		}
 	}
+	int32 ex_count = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - p].list_mzone[i];
-		if(pcard && pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE) && pcard->is_releasable_by_summon(p, target)) {
+		if(!(pcard && pcard->is_releasable_by_summon(p, target)))
+			continue;
+		if(pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)) {
 			if(ex_list)
 				ex_list->insert(pcard);
 			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
@@ -1197,8 +1202,21 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 			else
 				pcard->operation_param = 1;
 			rcount += pcard->operation_param;
+		} else {
+			effect* peffect = pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE_SUM);
+			if(!peffect || ((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->reset_count & 0xf00) == 0))
+				continue;
+			if(ex_list_sum)
+				ex_list_sum->insert(pcard);
+			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
+				pcard->operation_param = 2;
+			else
+				pcard->operation_param = 1;
+			ex_count++;
 		}
 	}
+	if(ex_count)
+		rcount++;
 	return rcount;
 }
 int32 field::get_summon_count_limit(uint8 playerid) {
@@ -1254,19 +1272,38 @@ void field::ritual_release(card_set* material) {
 	release(&rel, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player);
 	send_to(&rem, core.reason_effect, REASON_RITUAL + REASON_EFFECT + REASON_MATERIAL, core.reason_player, PLAYER_NONE, LOCATION_REMOVED, 0, POS_FACEUP);
 }
-void field::get_xyz_material(card* scard, card_set* material) {
+void field::get_xyz_material(card* scard, int32 findex, int32 maxc) {
 	card* pcard = 0;
 	int32 playerid = scard->current.controler;
+	core.xmaterial_lst.clear();
+	card_vector cv;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
-		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard))
-			material->insert(pcard);
+		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard)
+				&& pduel->lua->check_matching(pcard, findex, 0))
+			cv.push_back(pcard);
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
 		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard)
-		        && pcard->is_affected_by_effect(EFFECT_XYZ_MATERIAL))
-			material->insert(pcard);
+		        && pcard->is_affected_by_effect(EFFECT_XYZ_MATERIAL) && pduel->lua->check_matching(pcard, findex, 0))
+			cv.push_back(pcard);
+	}
+	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
+		for(auto pcard : cv) {
+			effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+			if(peffect) {
+				int32 v = peffect->get_value();
+				core.xmaterial_lst.insert(std::make_pair(v, pcard));
+			} else
+				core.xmaterial_lst.insert(std::make_pair(0, pcard));
+		}
+		auto iter = core.xmaterial_lst.begin();
+		while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > maxc)))
+			core.xmaterial_lst.erase(iter++);
+	} else {
+		for(auto pcard : cv)
+			core.xmaterial_lst.insert(std::make_pair(0, pcard));
 	}
 }
 void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
@@ -1525,30 +1562,30 @@ void field::attack_all_target_check() {
 	if(!peffect->check_value_condition(1))
 		core.attacker->attack_all_target = FALSE;
 }
-int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max) {
+int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg) {
 	card* tuner;
 	if(core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 		effect_set eset;
 		filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
 		if(eset.count)
-			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max);
+			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max, smat, mg);
 	}
 	for(uint8 p = 0; p < 2; ++p) {
 		for(int32 i = 0; i < 5; ++i) {
 			tuner = player[p].list_mzone[i];
-			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max))
+			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max, smat, mg))
 				return TRUE;
 		}
 	}
 	return FALSE;
 }
-int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max) {
+int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg) {
 	effect* peffect;
 	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
 		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 		if(pcheck)
 			pcheck->get_value(tuner);
-		if(!pduel->lua->check_matching(tuner, findex1, 0)) {
+		if((mg && !mg->has_card(tuner)) || !pduel->lua->check_matching(tuner, findex1, 0)) {
 			pduel->restore_assumes();
 			return FALSE;
 		}
@@ -1567,12 +1604,46 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 				return TRUE;
 			}
 		} else {
+			int32 l = tuner->get_synchro_level(pcard);
+			int32 l1 = l & 0xffff;
+			//int32 l2 = l >> 16;
+			int32 lv = pcard->get_level();
+			lv -= l1;
+			if(lv <= 0) {
+				pduel->restore_assumes();
+				return FALSE;
+			}
+			if(smat) {
+				if(pcheck)
+					pcheck->get_value(smat);
+				if(!smat->is_position(POS_FACEUP) || !smat->is_can_be_synchro_material(pcard, tuner) || !pduel->lua->check_matching(smat, findex2, 0)) {
+					pduel->restore_assumes();
+					return FALSE;
+				}
+				l = smat->get_synchro_level(pcard);
+				l1 = l & 0xffff;
+				lv -= l1;
+				min--;
+				max--;
+				if(lv <= 0) {
+					pduel->restore_assumes();
+					if(lv == 0 && min == 0)
+						return TRUE;
+					return FALSE;
+				}
+				if(max == 0) {
+					pduel->restore_assumes();
+					return FALSE;
+				}
+			}
 			card_vector nsyn;
 			card* pm;
 			for(uint8 p = 0; p < 2; ++p) {
 				for(int32 i = 0; i < 5; ++i) {
 					pm = player[p].list_mzone[i];
-					if(pm && pm != tuner && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+					if(pm && pm != tuner && pm != smat && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
+						if(mg && !mg->has_card(pm))
+							continue;
 						if(pcheck)
 							pcheck->get_value(pm);
 						if(!pduel->lua->check_matching(pm, findex2, 0))
@@ -1582,15 +1653,7 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 					}
 				}
 			}
-			int32 l = tuner->get_synchro_level(pcard);
-			int32 l1 = l & 0xffff;
-			//int32 l2 = l >> 16;
-			int32 lv = pcard->get_level();
-			if(lv == l1) {
-				pduel->restore_assumes();
-				return FALSE;
-			}
-			if(check_with_sum_limit(&nsyn, lv - l1, 0, 1, min, max)) {
+			if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
 				pduel->restore_assumes();
 				return TRUE;
 			}
@@ -1609,6 +1672,32 @@ int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int
 	return (acc > op1 && check_with_sum_limit(mats, acc - op1, index + 1, count + 1, min, max))
 	       || (op2 && acc > op2 && check_with_sum_limit(mats, acc - op2, index + 1, count + 1, min, max))
 	       || check_with_sum_limit(mats, acc, index + 1, count, min, max);
+}
+int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max, group* mg) {
+	if(mg) {
+		card_vector cv;
+		core.xmaterial_lst.clear();
+		for (auto pcard : mg->container) {
+			if(pduel->lua->check_matching(pcard, findex, 0))
+				cv.push_back(pcard);
+		}
+		if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
+			for(auto pcard : cv) {
+				effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+				if(peffect) {
+					int32 v = peffect->get_value();
+					core.xmaterial_lst.insert(std::make_pair(v, pcard));
+				} else
+					core.xmaterial_lst.insert(std::make_pair(0, pcard));
+			}
+			auto iter = core.xmaterial_lst.begin();
+			while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > max)))
+				core.xmaterial_lst.erase(iter++);
+		}
+	} else {
+		pduel->game_field->get_xyz_material(scard, findex, max);
+	}
+	return core.xmaterial_lst.size() >= min;
 }
 int32 field::is_player_can_draw(uint8 playerid) {
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DRAW);
@@ -1753,6 +1842,20 @@ int32 field::is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint
 int32 field::is_player_can_release(uint8 playerid, card * pcard) {
 	effect_set eset;
 	filter_player_effect(playerid, EFFECT_CANNOT_RELEASE, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		if(!eset[i]->target)
+			return FALSE;
+		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		if (pduel->lua->check_condition(eset[i]->target, 3))
+			return FALSE;
+	}
+	return TRUE;
+}
+int32 field::is_player_can_place_counter(uint8 playerid, card * pcard, uint16 countertype, uint16 count) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_CANNOT_PLACE_COUNTER, &eset);
 	for(int32 i = 0; i < eset.count; ++i) {
 		if(!eset[i]->target)
 			return FALSE;

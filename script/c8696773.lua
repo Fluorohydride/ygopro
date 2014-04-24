@@ -46,7 +46,7 @@ function c8696773.effop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(c8696773.mattg)
 	e1:SetOperation(c8696773.matop)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	rc:RegisterEffect(e1)
+	rc:RegisterEffect(e1,true)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
