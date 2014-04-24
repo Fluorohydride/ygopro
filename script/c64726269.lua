@@ -43,13 +43,8 @@ function c64726269.spop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-<<<<<<< HEAD:script/c64726269.lua
 function c64726269.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_XYZ and e:GetHandler():GetReasonCard():GetMaterial():IsExists(Card.IsLocation,3,nil,LOCATION_MZONE)
-=======
-function c64226269.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_XYZ and e:GetHandler():GetReasonCard():GetMaterial():IsExists(Card.IsPreviousLocation,3,nil,LOCATION_MZONE)
->>>>>>> fix:script/c64226269.lua
 end
 function c64726269.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
