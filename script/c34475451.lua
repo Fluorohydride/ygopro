@@ -11,12 +11,6 @@ function c34475451.initial_effect(c)
 	e1:SetTarget(c34475451.target)
 	e1:SetOperation(c34475451.operation)
 	c:RegisterEffect(e1)
-	--battle indestructable
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetValue(1)
-	c:RegisterEffect(e2)
 end
 function c34475451.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():GetControler()~=tp
@@ -32,6 +26,12 @@ function c34475451.operation(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) then
 		local a=Duel.GetAttacker()
 		if a:IsOnField() and a:IsFaceup() then
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+			e1:SetValue(1)
+			e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
+			c:RegisterEffect(e1)
 			Duel.CalculateDamage(a,c)
 		end
 	end
