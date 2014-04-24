@@ -18,10 +18,10 @@ function c89397517.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(sg,REASON_COST)
 end
 function c89397517.rmfilter(c)
-	return c:IsType(TYPE_SPELL) and  c:IsAbleToRemove() and c:IsSetCard(0xa0) 
+	return c:IsType(TYPE_SPELL) and  c:IsAbleToRemove() and c:IsSetCard(0xa1) 
 end
 function c89397517.spfilter(c,e,tp)
-	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and c:IsSetCard(0x9f)
+	return c:IsType(TYPE_MONSTER) and c:IsCanBeSpecialSummoned(e,0,tp,true,false) and c:IsSetCard(0xa0)
 end
 function c89397517.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return 

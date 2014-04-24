@@ -19,7 +19,7 @@ function c1784686.initial_effect(c)
 	--c:RegisterEffect(e2)
 end
 function c1784686.tgfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0xa1)  
+	return c:IsFaceup() and c:IsSetCard(0xa2)  
 	and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 	and Duel.IsExistingMatchingCard(c1784686.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetCode())
 end
