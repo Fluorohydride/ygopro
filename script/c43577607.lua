@@ -62,8 +62,11 @@ function c43577607.initial_effect(c)
 	e6:SetLabel(5)
 	c:RegisterEffect(e6)
 end
+function c43577607.confilter(c)
+	return c:IsSetCard(0x9e) and c:IsType(TYPE_MONSTER)
+end
 function c43577607.effcon(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(Card.IsSetCard,tp,LOCATION_GRAVE,0,nil,0x9e)
+	local g=Duel.GetMatchingGroup(c43577607.confilter,tp,LOCATION_GRAVE,0,nil)
 	return g:GetClassCount(Card.GetAttribute)>=e:GetLabel()
 end
 function c43577607.atktg(e,c)
