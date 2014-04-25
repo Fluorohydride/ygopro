@@ -1693,6 +1693,9 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max,
 			auto iter = core.xmaterial_lst.begin();
 			while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > max)))
 				core.xmaterial_lst.erase(iter++);
+		} else {
+			for(auto pcard : cv)
+				core.xmaterial_lst.insert(std::make_pair(0, pcard));
 		}
 	} else {
 		pduel->game_field->get_xyz_material(scard, findex, max);
