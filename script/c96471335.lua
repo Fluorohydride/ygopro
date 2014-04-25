@@ -22,8 +22,8 @@ function c96471335.initial_effect(c)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,96471335)
 	e2:SetCondition(c96471335.rmcon)
-	e2:SetCost(c96471335.rmcost)
 	e2:SetTarget(c96471335.rmtg)
 	e2:SetOperation(c96471335.rmop)
 	c:RegisterEffect(e2)
@@ -52,10 +52,6 @@ end
 function c96471335.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	return tc:IsType(TYPE_NORMAL) and tc:IsRace(RACE_SPELLCASTER)
-end
-function c96471335.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,96471335)==0 end
-	Duel.RegisterFlagEffect(tp,96471335,RESET_PHASE+PHASE_END,0,1)
 end
 function c96471335.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end
