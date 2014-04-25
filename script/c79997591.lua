@@ -9,17 +9,14 @@ function c79997591.initial_effect(c)
 	e1:SetOperation(c79997591.cbop)
 	c:RegisterEffect(e1)
 end
-function c79997591.filter(c,tp)
-	return  c:IsFaceup() and c:IsAttackPos() and c:GetControler()==tp
-end
 function c79997591.cbcon(e,tp,eg,ep,ev,re,r,rp)
 	local bt=Duel.GetAttackTarget()
-	return bt and c79997591.filter(bt,e:GetHandlerPlayer())
+	return bt and bt:IsPosition(POS_FACEUP_ATTACK) and bt:IsControler(tp)
 end
 function c79997591.cbop(e,tp,eg,ep,ev,re,r,rp)
 	local bt=Duel.GetAttackTarget()
 	Duel.ChangeAttackTarget(nil)
-	if bt and c79997591.filter(bt,e:GetHandlerPlayer()) then
+	if bt:IsRelateToBattle() and bt:IsControler(tp) then
 		Duel.Damage(1-tp,bt:GetAttack(),REASON_EFFECT)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

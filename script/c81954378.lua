@@ -1,4 +1,4 @@
---死神の大鎌 - デスサイス
+--死神の大鎌－デスサイス
 function c81954378.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -42,22 +42,6 @@ function c81954378.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
 end
-function c81954378.etarget(e,c)
-	local ec=e:GetHandler():GetEquipTarget()
-	return c:IsType(TYPE_TRAP) and ec and c:GetControler()==ec:GetControler()
-end
-function c81954378.efilter(e,re)
-	return re:GetHandler()==e:GetHandler():GetEquipTarget()
-end
-function c81954378.desop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler():GetFirstCardTarget()
-	if tc and tc:IsLocation(LOCATION_MZONE) then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-end
-function c81954378.atkfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
-end
 function c81954378.value(e,c)
-	return Duel.GetMatchingGroupCount(c81954378.atkfilter,0,LOCATION_GRAVE,LOCATION_GRAVE,nil)*500
+	return Duel.GetMatchingGroupCount(Card.IsType,0,LOCATION_GRAVE,LOCATION_GRAVE,nil,TYPE_MONSTER)*500
 end

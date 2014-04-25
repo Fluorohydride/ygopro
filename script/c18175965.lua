@@ -12,10 +12,9 @@ function c18175965.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_SUMMON)
 	c:RegisterEffect(e2)
-	--
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_MSET)
-	c:RegisterEffect(e3)	
+	c:RegisterEffect(e3)
 	--special summon
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(18175965,0))
@@ -34,7 +33,6 @@ function c18175965.initial_effect(c)
 	e5:SetCategory(CATEGORY_EQUIP)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetCondition(c18175965.eqcon)
 	e5:SetTarget(c18175965.eqtg)
 	e5:SetOperation(c18175965.eqop)
 	c:RegisterEffect(e5)
@@ -46,18 +44,16 @@ function c18175965.initial_effect(c)
 	e6:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e6:SetTargetRange(1,0)
 	c:RegisterEffect(e6)
-	--disable spsummon
 	local e7=e6:Clone()
 	e7:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	c:RegisterEffect(e7)
 	--special summon 2
 	local e8=Effect.CreateEffect(c)
 	e8:SetDescription(aux.Stringid(18175965,2))
-	e8:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e8:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e8:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e8:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e8:SetCode(EVENT_TO_GRAVE)
-	e8:SetCondition(c18175965.spcon1)
+	e8:SetCondition(c18175965.spcon2)
 	e8:SetCost(c18175965.spcost)
 	e8:SetTarget(c18175965.sptg)
 	e8:SetOperation(c18175965.spop)
@@ -81,9 +77,6 @@ function c18175965.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
 	end
 end
-function c18175965.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<=1
-end
 function c18175965.filter(c,ec)
 	return c:IsCode(81954378) and c:CheckEquipTarget(ec)
 end
@@ -95,18 +88,16 @@ end
 function c18175965.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 or c:IsFacedown() or not c:IsRelateToEffect(e) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(18175965,1))
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(18175965,3))
 	local g=Duel.SelectMatchingCard(tp,c18175965.filter,tp,LOCATION_DECK,0,1,1,nil,c)
 	if g:GetCount()>0 then
 		Duel.Equip(tp,g:GetFirst(),c)
 	end
 end
-function c18175965.spcon1(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_DESTROY)~=0 and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+function c18175965.spcon2(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c18175965.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
-	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-	local sg=g:FilterSelect(tp,Card.IsAbleToGraveAsCost,1,1,nil)
-	Duel.SendtoGrave(sg,REASON_COST)
+	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 end

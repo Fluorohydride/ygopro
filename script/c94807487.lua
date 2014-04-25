@@ -1,6 +1,5 @@
 --ホープ剣スラッシュ
 function c94807487.initial_effect(c)
-	c:EnableCounterPermit(0x95)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
@@ -51,14 +50,11 @@ end
 function c94807487.eqlimit(e,c)
 	return c:IsSetCard(0x7f)
 end
-function c94807487.tglimit(e,re,rp)
-	return rp~=e:GetHandlerPlayer() and re:IsActiveType(TYPE_TRAP+TYPE_MONSTER)
-end
 function c94807487.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7f)
 end
 function c94807487.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c94807487.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c94807487.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c94807487.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	Duel.SelectTarget(tp,c94807487.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
@@ -72,10 +68,10 @@ function c94807487.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c94807487.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():AddCounter(0x95,1)
+	e:GetHandler():AddCounter(0x31,1)
 end
 function c94807487.value(e,c)
-	return e:GetHandler():GetCounter(0x95)*500
+	return e:GetHandler():GetCounter(0x31)*500
 end
 function c94807487.rcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_COST)~=0 and re:GetHandler():IsType(TYPE_XYZ)
@@ -83,10 +79,8 @@ function c94807487.rcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c94807487.rop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=bit.band(ev,0xffff)
-	if ct==1 then
-		Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-	else
-		Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
+	if ct>1 then
 		re:GetHandler():RemoveOverlayCard(tp,ct-1,ct-1,REASON_COST)
 	end
 end

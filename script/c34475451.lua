@@ -23,7 +23,7 @@ function c34475451.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c34475451.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP) then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local a=Duel.GetAttacker()
 		if a:IsOnField() and a:IsFaceup() then
 			local e1=Effect.CreateEffect(c)

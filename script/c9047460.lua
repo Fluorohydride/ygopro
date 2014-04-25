@@ -1,4 +1,4 @@
---ＢＦ－隠れ蓑のスチーム
+--BF－隠れ蓑のスチーム
 function c9047460.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)
@@ -23,7 +23,7 @@ function c9047460.initial_effect(c)
 end
 function c9047460.tkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsPosition(POS_FACEUP) and c:GetLocation()~=LOCATION_DECK
+	return c:IsFaceup() and c:GetLocation()~=LOCATION_DECK
 end
 function c9047460.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -49,9 +49,9 @@ function c9047460.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c9047460.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SYNCHRO_MATERIAL_CUSTOM)
@@ -59,6 +59,7 @@ function c9047460.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTarget(c9047460.syntg)
 		e1:SetValue(1)
 		e1:SetOperation(c9047460.synop)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e1)
 	end
 end

@@ -10,13 +10,10 @@ function c21414674.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c21414674.filter(c)
-	return c:IsFaceup() and (
-	c:GetCode()==22530212 or
-	c:GetCode()==68535320 or
-	c:GetCode()==95929069)
+	return c:IsFaceup() and (c:IsCode(22530212) or c:IsCode(68535320) or c:IsCode(95929069))
 end
 function c21414674.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and
-		Duel.IsExistingMatchingCard(c21414674.filter,c:GetControler(),LOCATION_MZONE,0,1,nil)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(c21414674.filter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end

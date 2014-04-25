@@ -2,7 +2,7 @@
 function c89719143.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
+	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -13,27 +13,26 @@ function c89719143.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c89719143.condition(e,tp,eg,ep,ev,re,r,rp)
-	local bt=Duel.GetAttacker()
+	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return bt and bt:IsType(TYPE_FUSION) and at and at:IsType(TYPE_FUSION)
-end
-function c89719143.filter(c)
-	return c:IsFaceup() and c:IsDestructable()
+	return a:IsFaceup() and a:IsType(TYPE_FUSION) and at and at:IsFaceup() and at:IsType(TYPE_FUSION)
 end
 function c89719143.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local bt=Duel.GetAttacker()
+	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	if chkc then return chkc==bt or chkc==at end
-	if chk==0 then return bt:IsOnField() and bt:IsCanBeEffectTarget(e) and at:IsOnField() and at:IsCanBeEffectTarget(e) end
-	Duel.SetTargetCard(bt)
+	if chkc then return chkc==a or chkc==at end
+	if chk==0 then return a:IsOnField() and a:IsCanBeEffectTarget(e) and at:IsOnField() and at:IsCanBeEffectTarget(e) end
+	Duel.SetTargetCard(a)
 	Duel.SetTargetCard(at)
-	local dam=bt:GetAttack()+at:GetAttack()
+	local dam=a:GetAttack()+at:GetAttack()
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,PLAYER_ALL,dam)
 end
 function c89719143.activate(e,tp,eg,ep,ev,re,r,rp)
-	local d=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+	local tc1,tc2=Duel.GetFirstTarget()
+	if not tc1:IsRelateToEffect(e) or tc1:IsFacedown() or not tc2:IsRelateToEffect(e) or tc2:IsFacedown() then return end
+	local dam=tc1:GetAttack()+tc2:GetAttack()
 	if Duel.NegateAttack() then
-		Duel.Damage(1-tp,d,REASON_EFFECT)
-		Duel.Damage(tp,d,REASON_EFFECT)
+		Duel.Damage(1-tp,dam,REASON_EFFECT)
+		Duel.Damage(tp,dam,REASON_EFFECT)
 	end
 end

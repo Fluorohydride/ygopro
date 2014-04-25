@@ -9,9 +9,12 @@ function c42776960.initial_effect(c)
 	e1:SetOperation(c42776960.activate)
 	c:RegisterEffect(e1)
 end
+function c42776960.filter(c,e,tp)
+	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
 function c42776960.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(Card.IsCanBeSpecialSummoned,tp,LOCATION_HAND,0,1,nil,e,tp,false,false) end
+		and Duel.IsExistingMatchingCard(c42776960.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c42776960.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -22,7 +25,7 @@ function c42776960.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		local tc=g:GetFirst()
 		--dam
-		local e1=Effect.CreateEffect(c)
+		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CHANGE_DAMAGE)
 		e1:SetRange(LOCATION_MZONE)
@@ -32,15 +35,16 @@ function c42776960.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1)
 		tc:RegisterEffect(e1)
 		--lose
-		local e2=Effect.CreateEffect(c)
+		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_LEAVE_FIELD)
 		e2:SetLabel(1-tp)
 		e2:SetOperation(c42776960.leaveop)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e2)
 	end
 end
 function c42776960.leaveop(e,tp,eg,ep,ev,re,r,rp)
-	local WIN_REASON_RELAY_SOUL=0x20
+	local WIN_REASON_RELAY_SOUL=0x1a
 	Duel.Win(e:GetLabel(),WIN_REASON_RELAY_SOUL)
 end

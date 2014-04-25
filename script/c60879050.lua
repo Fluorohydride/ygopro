@@ -33,15 +33,16 @@ function c60879050.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_FIELD)
 	e5:SetCode(EFFECT_CANNOT_ATTACK)
 	e5:SetProperty(EFFECT_FLAG_OATH)
+	e5:SetRange(LOCATION_SZONE)
 	e5:SetTargetRange(LOCATION_MZONE,0)
 	e5:SetTarget(c60879050.ftarget)
 	c:RegisterEffect(e5)
 end
 function c60879050.eqlimit(e,c)
-	return c:IsRelateToCard(e:GetHandler())
+	return e:GetHandler():GetEquipTarget()==c
 end
 function c60879050.filter(c)
-	return c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH)
+	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH)
 end
 function c60879050.rmfilter(c)
 	return c:IsRace(RACE_MACHINE) and c:IsLevelAbove(10) and c:IsAbleToRemoveAsCost()
@@ -62,13 +63,12 @@ function c60879050.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
 		Duel.Equip(tp,c,tc)
 	end
 end
 function c60879050.value(e,c)
-	return c:GetBaseAttack()*2
+	return c:GetAttack()*2
 end
 function c60879050.ftarget(e,c)
-	return e:GetHandler():GetEquipTarget():GetFieldID()~=c:GetFieldID()
+	return e:GetHandler():GetEquipTarget()~=c
 end

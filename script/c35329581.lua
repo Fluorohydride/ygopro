@@ -13,7 +13,7 @@ function c35329581.initial_effect(c)
 end
 function c35329581.filter(c,e,tp)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsCanBeEffectTarget(e)
-		and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY) and c:IsReason(REASON_BATTLE+REASON_EFFECT) 
+		and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
 		and c:IsType(TYPE_SYNCHRO) and Duel.IsExistingMatchingCard(c35329581.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c)
 end
 function c35329581.spfilter(c,e,tp,tc)

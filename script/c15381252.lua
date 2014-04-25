@@ -4,6 +4,7 @@ function c15381252.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
+	e1:SetCountLimit(1,15381252+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c15381252.condition)
 	e1:SetCost(c15381252.cost)
 	e1:SetTarget(c15381252.target)
@@ -21,9 +22,6 @@ function c15381252.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
-end
-function c15381252.filter(c,e,tp,dam)
-	return c:IsAttackBelow(dam) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c15381252.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end

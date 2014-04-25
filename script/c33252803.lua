@@ -1,4 +1,4 @@
---ＲＵＭ－クイック・カオス
+--RUM－クイック・カオス
 function c33252803.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -12,16 +12,16 @@ function c33252803.initial_effect(c)
 end
 function c33252803.filter1(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x48) and not c:IsSetCard(0x1048)
-	and Duel.IsExistingMatchingCard(c33252803.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetRank()+1,c.xyz_number)
+		and Duel.IsExistingMatchingCard(c33252803.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetRank()+1,c.xyz_number)
 end
 function c33252803.filter2(c,e,tp,rank,no)
-	return c:GetRank()==rank and c:IsSetCard(0x1048) and c.xyz_number==no 
+	return c:GetRank()==rank and c:IsSetCard(0x1048) and c.xyz_number==no
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c33252803.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c33252803.filter1(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(c33252803.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(c33252803.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp)end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c33252803.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)

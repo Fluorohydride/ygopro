@@ -1,6 +1,6 @@
---ＢＦ－竜巻のハリケーン
+--BF－竜巻のハリケーン
 function c36442179.initial_effect(c)
-	--atk def
+	--atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(36442179,0))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
@@ -13,11 +13,11 @@ function c36442179.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c36442179.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) 
+	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
 end
 function c36442179.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c36442179.filter(chkc) end
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingTarget(c36442179.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c36442179.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 end

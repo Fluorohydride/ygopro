@@ -1,7 +1,7 @@
---ＣＮｏ．５亡朧龍カオス・キマイラ・ドラゴン
+--CNo.5 亡朧龍カオス・キマイラ・ドラゴン
 function c69757518.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),3,nil,nil,5)
 	c:EnableReviveLimit()
 	--atk
 	local e1=Effect.CreateEffect(c)
@@ -19,7 +19,7 @@ function c69757518.initial_effect(c)
 	e2:SetCondition(c69757518.atcon)
 	e2:SetCost(c69757518.atcost)
 	e2:SetOperation(c69757518.atop)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -29,7 +29,7 @@ function c69757518.initial_effect(c)
 	e3:SetCountLimit(1)
 	e3:SetCost(c69757518.cost)
 	e3:SetTarget(c69757518.target)
-	e3:SetOperation(c69757518.activate)
+	e3:SetOperation(c69757518.operation)
 	c:RegisterEffect(e3)
 end
 c69757518.xyz_number=5
@@ -38,7 +38,7 @@ function c69757518.atkval(e,c)
 end
 function c69757518.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return Duel.GetAttacker()==c  and c:IsChainAttackable()
+	return Duel.GetAttacker()==c and c:IsChainAttackable()
 end
 function c69757518.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -61,14 +61,14 @@ function c69757518.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_LEAVE_GRAVE,g,2,0,0)
 end
-function c69757518.activate(e,tp,eg,ep,ev,re,r,rp)
+function c69757518.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
 	if sg:GetCount()>1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local sg1=sg:Select(tp,1,1,nil)
 		local c=e:GetHandler()
-		if Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT) and c:IsRelateToEffect(e)then
+		if Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT) and c:IsRelateToEffect(e) then
 			sg:Sub(sg1)
 			Duel.Overlay(c,sg)
 		end

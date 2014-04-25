@@ -1,4 +1,4 @@
---女神の聖剣-エアトス
+--女神の聖剣－エアトス
 function c55569674.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -22,7 +22,7 @@ function c55569674.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetValue(1)
 	c:RegisterEffect(e3)
-	--atkage
+	--atk
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(55569674,0))
 	e4:SetCategory(CATEGORY_ATKCHANGE)
@@ -53,11 +53,11 @@ end
 function c55569674.filter(c)
 	return c:IsFaceup() and c:IsCode(34022290)
 end
-function c55569674.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c55569674.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c55569674.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c55569674.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c55569674.filter,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.SelectTarget(tp,c55569674.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c55569674.atkfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER)
