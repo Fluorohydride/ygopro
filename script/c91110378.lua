@@ -14,7 +14,7 @@ function c91110378.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY)
-	e2:SetCode(EVENT_SUMMON)
+	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(c91110378.spcon)
 	e2:SetTarget(c91110378.sptg)
@@ -43,6 +43,7 @@ function c91110378.spop(e,tp,eg,ep,ev,re,r,rp)
 		local dc=Duel.GetOperatedGroup():GetFirst()
 		if dc:IsSetCard(0x86) and dc:IsCanBeSpecialSummoned(e,0,tp,false,false)
 			and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(91110378,1)) then
+			Duel.BreakEffect()
 			Duel.SpecialSummon(dc,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end

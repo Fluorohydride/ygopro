@@ -7,7 +7,6 @@ function c43577607.initial_effect(c)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_ATKCHANGE)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
@@ -65,8 +64,8 @@ end
 function c43577607.confilter(c)
 	return c:IsSetCard(0x9e) and c:IsType(TYPE_MONSTER)
 end
-function c43577607.effcon(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c43577607.confilter,tp,LOCATION_GRAVE,0,nil)
+function c43577607.effcon(e)
+	local g=Duel.GetMatchingGroup(c43577607.confilter,e:GetHandlerPlayer(),LOCATION_GRAVE,0,nil)
 	return g:GetClassCount(Card.GetAttribute)>=e:GetLabel()
 end
 function c43577607.atktg(e,c)
