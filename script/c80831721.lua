@@ -30,7 +30,7 @@ function c80831721.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c80831721.filter(c)
-	return c:IsSetCard(0xa3) and c:IsAbleToHand()
+	return c:IsSetCard(0x46) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()
 end
 function c80831721.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c80831721.filter,tp,LOCATION_DECK,0,1,nil) end

@@ -43,7 +43,7 @@ end
 function c96864105.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if not a:IsRelateToBattle() or not d:IsRelateToBattle() then return end
+	if not (a:IsRelateToBattle() and d and d:IsRelateToBattle()) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetOwnerPlayer(tp)
 	e1:SetType(EFFECT_TYPE_SINGLE)

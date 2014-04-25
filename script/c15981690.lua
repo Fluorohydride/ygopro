@@ -16,9 +16,9 @@ function c15981690.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCountLimit(1,23893227)
-	e2:SetCost(c23893227.spcost)
-	e2:SetTarget(c23893227.sptg)
-	e2:SetOperation(c23893227.spop)
+	e2:SetCost(c15981690.spcost)
+	e2:SetTarget(c15981690.sptg)
+	e2:SetOperation(c15981690.spop)
 	c:RegisterEffect(e2)
 end
 function c15981690.upcon(e,tp,eg,ep,ev,re,r,rp)
@@ -37,22 +37,22 @@ function c15981690.upop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 	end
 end
-function c23893227.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c15981690.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
-function c23893227.spfilter(c,e,tp)
+function c15981690.spfilter(c,e,tp)
 	return c:IsType(TYPE_NORMAL) and c:IsLevelBelow(7) and c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c23893227.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c15981690.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c23893227.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp) end
+		and Duel.IsExistingMatchingCard(c15981690.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK+LOCATION_HAND)
 end
-function c23893227.spop(e,tp,eg,ep,ev,re,r,rp)
+function c15981690.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c23893227.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c15981690.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
 	end

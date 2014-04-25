@@ -13,8 +13,7 @@ function c21414674.filter(c)
 	return c:IsFaceup() and (
 	c:GetCode()==22530212 or
 	c:GetCode()==68535320 or
-	c:GetCode()==95929069 or
-	)
+	c:GetCode()==95929069)
 end
 function c21414674.spcon(e,c)
 	if c==nil then return true end

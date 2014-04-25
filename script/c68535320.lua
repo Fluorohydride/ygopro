@@ -29,7 +29,7 @@ function c68535320.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 
-function c68535320.spfilter(c)
+function c68535320.spfilter(c,e,tp)
 	return c:GetCode()==95929069 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c68535320.operation(e,tp,eg,ep,ev,re,r,rp)

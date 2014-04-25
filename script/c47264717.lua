@@ -12,7 +12,7 @@ function c47264717.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c47264717.cfilter(c)
-	return c:IsSetCard(0xa4) and c:IsFaceup()
+	return c:IsSetCard(0xa3) and c:IsFaceup()
 end
 function c47264717.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c47264717.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)

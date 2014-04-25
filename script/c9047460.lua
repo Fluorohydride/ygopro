@@ -3,10 +3,10 @@ function c9047460.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(9047460,0))
-	e1:SetCategory(CATEGORY.SPECIAL_SUMMON+CATEGORY_TOKEN)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_LEAVE_FIELD)
-	e4:SetCondition(c4779091.tkcon)
+	e1:SetCondition(c9047460.tkcon)
 	e1:SetTarget(c9047460.tktg)
 	e1:SetOperation(c9047460.tkop)
 	c:RegisterEffect(e1)
@@ -28,11 +28,11 @@ end
 function c9047460.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOKEN,nil,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY.SPECIAL_SUMMON,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,0)
 end
 function c9047460.tkop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if Duel.PlayerCanSpecialSummonMonster(tp,9047461,0,0x4011,100,100,3,RACE_AQUA,ATTRIBUTE_WIND) then
+	if Duel.IsPlayerCanSpecialSummonMonster(tp,9047461,0,0x4011,100,100,3,RACE_AQUA,ATTRIBUTE_WIND) then
 		local token=Duel.CreateToken(tp,9047461)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	end
