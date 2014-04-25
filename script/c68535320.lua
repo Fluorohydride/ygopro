@@ -40,9 +40,9 @@ function c68535320.operation(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.SelectYesNo(tp,aux.Stringid(68535320,1))
 		and g:GetCount()>0
 		then
-			g:Select(tp,1,1,nil)
+			local sg=g:Select(tp,1,1,nil)
 			Duel.BreakEffect()
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
 end
