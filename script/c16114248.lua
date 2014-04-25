@@ -15,7 +15,7 @@ function c16114248.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c16114248.spfilter(c,mg)
-	return c:IsRace(RACE_MACHINE) and mg:IsExists(Card.spfilter,1,c,c:GetCode())
+	return c:IsRace(RACE_MACHINE) and mg:IsExists(Card.IsCode,1,c,c:GetCode())
 end
 function c16114248.spfilter1(c,code)
 	return c:IsRace(RACE_MACHINE) and c:IsCode(code)
