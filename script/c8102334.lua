@@ -32,7 +32,7 @@ function c8102334.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e4:SetTarget(c8102334.tglimit)
-	e4:SetValue(1)
+	e4:SetValue(c8102334.tgvalue)
 	c:RegisterEffect(e4)
 end
 function c8102334.distarget(e,c)
@@ -46,4 +46,7 @@ function c8102334.disoperation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c8102334.tglimit(e,c)
 	return c~=e:GetHandler()
+end
+function c8102334.tgvalue(e,re,rp)
+	return rp~=e:GetHandlerPlayer()
 end
