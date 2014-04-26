@@ -1290,6 +1290,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			core.sub_solving_event.push_back(nil_event);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, proc, 0, sumplayer, 0);
 		}
+		proc->dec_count(sumplayer);
 		return FALSE;
 	}
 	case 5: {
@@ -1693,6 +1694,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		pduel->lua->add_param(target, PARAM_TYPE_CARD);
 		core.sub_solving_event.push_back(nil_event);
 		add_process(PROCESSOR_EXECUTE_OPERATION, 0, proc, 0, setplayer, 0);
+		proc->dec_count(setplayer);
 		return FALSE;
 	}
 	case 5: {
@@ -1974,6 +1976,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			core.sub_solving_event.push_back(nil_event);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, peffect, 0, sumplayer, 0);
 		}
+		peffect->dec_count(sumplayer);
 		return FALSE;
 	}
 	case 3: {

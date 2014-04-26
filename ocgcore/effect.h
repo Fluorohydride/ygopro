@@ -89,6 +89,9 @@ public:
 //status
 #define EFFECT_STATUS_AVAILABLE	0x0001
 
+#define EFFECT_COUNT_CODE_OATH 0x10000000
+#define EFFECT_COUNT_CODE_DUEL 0x20000000
+
 //========== Reset ==========
 #define RESET_DRAW			PHASE_DRAW
 #define RESET_STANDBY		PHASE_STANDBY

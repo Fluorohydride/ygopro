@@ -16,7 +16,7 @@ function c9260791.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCost(c9260791.cost)
+	e2:SetCountLimit(1,9260791+EFFECT_COUNT_CODE_DUEL)
 	e2:SetTarget(c9260791.target)
 	e2:SetOperation(c9260791.operation)
 	c:RegisterEffect(e2)
@@ -42,10 +42,6 @@ function c9260791.spop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
-end
-function c9260791.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,9260792)==0 end
-	Duel.RegisterFlagEffect(tp,9260792,0,0,0)
 end
 function c9260791.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x107b) and c:IsType(TYPE_XYZ)

@@ -4336,7 +4336,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 					if((peffect->flag & EFFECT_FLAG_REPEAT))
 						peffect->reset_count += 0x100;
 				} else {
-					if(peffect->count_code & 0x80000000)
+					if(peffect->count_code & EFFECT_COUNT_CODE_OATH)
 						dec_effect_code(peffect->count_code, cait->triggering_player);
 				}
 			}

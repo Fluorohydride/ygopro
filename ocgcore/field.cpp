@@ -818,17 +818,20 @@ void field::reset_chain() {
 	}
 }
 void field::add_effect_code(uint32 code, uint32 playerid) {
-	core.effect_count_code[code + (playerid << 30)]++;
+	auto& count_map = (code & EFFECT_COUNT_CODE_DUEL) ? core.effect_count_code_duel : core.effect_count_code;
+	count_map[code + (playerid << 30)]++;
 }
 uint32 field::get_effect_code(uint32 code, uint32 playerid) {
-	auto iter = core.effect_count_code.find(code + (playerid << 30));
-	if(iter == core.effect_count_code.end())
+	auto& count_map = (code & EFFECT_COUNT_CODE_DUEL) ? core.effect_count_code_duel : core.effect_count_code;
+	auto iter = count_map.find(code + (playerid << 30));
+	if(iter == count_map.end())
 		return 0;
 	return iter->second;
 }
 void field::dec_effect_code(uint32 code, uint32 playerid) {
-	auto iter = core.effect_count_code.find(code + (playerid << 30));
-	if(iter == core.effect_count_code.end())
+	auto& count_map = (code & EFFECT_COUNT_CODE_DUEL) ? core.effect_count_code_duel : core.effect_count_code;
+	auto iter = count_map.find(code + (playerid << 30));
+	if(iter == count_map.end())
 		return;
 	if(iter->second > 0)
 		iter->second--;

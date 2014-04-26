@@ -6,6 +6,7 @@ function c55204071.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,55204071)
 	e1:SetCondition(c55204071.spcon)
 	e1:SetOperation(c55204071.spop)
 	e1:SetValue(1)
@@ -34,14 +35,12 @@ function c55204071.cfilter(c)
 end
 function c55204071.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetFlagEffect(c:GetControler(),55204071)==0
-		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
 		and Duel.CheckReleaseGroup(c:GetControler(),c55204071.cfilter,1,nil)
 end
 function c55204071.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),c55204071.cfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,55204071,RESET_PHASE+PHASE_END,0,1)
 end
 function c55204071.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1

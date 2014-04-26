@@ -1431,7 +1431,7 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 		return FALSE;
 	if(eset.count) {
 		proc = eset[0];
-		if(is_summonable(proc) && pduel->game_field->is_player_can_summon(proc->get_value(this), playerid, this)) {
+		if(proc->check_count_limit(playerid) && is_summonable(proc) && pduel->game_field->is_player_can_summon(proc->get_value(this), playerid, this)) {
 			peset->add_item(eset[0]);
 			return -1;
 		}
@@ -1440,7 +1440,7 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 	eset.clear();
 	filter_effect(EFFECT_SUMMON_PROC, &eset);
 	for(int32 i = 0; i < eset.count; ++i)
-		if(is_summonable(eset[i]) && pduel->game_field->is_player_can_summon(eset[i]->get_value(this), playerid, this))
+		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i]) && pduel->game_field->is_player_can_summon(eset[i]->get_value(this), playerid, this))
 			peset->add_item(eset[i]);
 	if(!pduel->game_field->is_player_can_summon(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
@@ -1468,7 +1468,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 		return FALSE;
 	if(eset.count) {
 		proc = eset[0];
-		if(is_summonable(proc) && pduel->game_field->is_player_can_mset(proc->get_value(this), playerid, this)) {
+		if(proc->check_count_limit(playerid) && is_summonable(proc) && pduel->game_field->is_player_can_mset(proc->get_value(this), playerid, this)) {
 			peset->add_item(eset[0]);
 			return -1;
 		}
@@ -1477,7 +1477,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 	eset.clear();
 	filter_effect(EFFECT_SET_PROC, &eset);
 	for(int32 i = 0; i < eset.count; ++i)
-		if(is_summonable(eset[i]) && pduel->game_field->is_player_can_mset(eset[i]->get_value(this), playerid, this))
+		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i]) && pduel->game_field->is_player_can_mset(eset[i]->get_value(this), playerid, this))
 			peset->add_item(eset[i]);
 	if(!pduel->game_field->is_player_can_mset(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
@@ -1514,7 +1514,7 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
 			topos = POS_FACEUP;
 			toplayer = playerid;
 		}
-		if(peffect->is_available() && is_summonable(peffect)
+		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect)
 		        && pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
 			peset->add_item(pr.first->second);
 	}
