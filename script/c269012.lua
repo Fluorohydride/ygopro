@@ -6,7 +6,7 @@ function c269012.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
 	--cannot be target
-	local e=Effect.CreateEffect(c)
+	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
@@ -53,7 +53,7 @@ function c269012.target(e,c)
 end
 function c269012.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local des=eg:GetFirst()
-	local rc=des:GetReasonCard()==eqc
+	local rc=des:GetReasonCard()
 	return des:IsLocation(LOCATION_GRAVE) and des:IsType(TYPE_MONSTER) and rc:IsRelateToBattle() and rc:IsLevelAbove(10)
 end
 function c269012.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
