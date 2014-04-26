@@ -616,6 +616,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							unsigned char respbuf[64];
 							for(int i = 0; i < select_max; ++i)
 								respbuf[i] = sort_list[i] - 1;
+							sort_list.clear();
 							DuelClient::SetResponseB(respbuf, select_max);
 							mainGame->HideElement(mainGame->wCardSelect, true);
 						}
