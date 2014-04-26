@@ -21,8 +21,7 @@ function c72913666.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCategory(CATEGORY_DAMAGE)
 	e3:SetCode(EVENT_FLIP)
-	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
-	e3:SetCost(c72913666.damcost)
+	e3:SetCountLimit(1,72913666)
 	e3:SetTarget(c72913666.damtg)
 	e3:SetOperation(c72913666.damop)
 	c:RegisterEffect(e3)
@@ -44,10 +43,6 @@ function c72913666.posop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.ChangePosition(c,POS_FACEDOWN_DEFENCE)
 	end
-end
-function c72913666.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,72913666)==0 end
-	Duel.RegisterFlagEffect(tp,72913666,RESET_PHASE+PHASE_END,0,1)
 end
 function c72913666.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

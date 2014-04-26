@@ -5,8 +5,9 @@ function c35629124.initial_effect(c)
 	e1:SetDescription(aux.Stringid(35629124,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,35629124)
 	e1:SetCondition(c35629124.spcon)
 	e1:SetCost(c35629124.spcost)
 	e1:SetTarget(c35629124.sptg)
@@ -38,8 +39,7 @@ function c35629124.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c35629124.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,35629124)==0
-		and not (Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()>PHASE_MAIN1 and Duel.GetCurrentPhase()<PHASE_END) end
+	if chk==0 then return not (Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()>PHASE_MAIN1 and Duel.GetCurrentPhase()<PHASE_END) end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)
@@ -55,7 +55,6 @@ function c35629124.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetTargetRange(1,0)
 	e2:SetTarget(c35629124.sumlimit)
 	Duel.RegisterEffect(e2,tp)
-	Duel.RegisterFlagEffect(tp,35629124,RESET_PHASE+PHASE_END,0,1)
 end
 function c35629124.sumlimit(e,c)
 	return not c:IsRace(RACE_DRAGON)

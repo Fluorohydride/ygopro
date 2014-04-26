@@ -1,4 +1,4 @@
---Ñý¾«¸o ¥¨¥ó¥·¥§¥ó¥È
+--å¦–ç²¾ç«œ ã‚¨ãƒ³ã‚·ã‚§ãƒ³ãƒˆ
 function c4179255.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
@@ -7,12 +7,12 @@ function c4179255.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetDescription(aux.Stringid(4179255,0))
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_CHAIN_SOLVED)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,4179255)
 	e1:SetCondition(c4179255.drcon)
-	e1:SetCost(c4179255.drcost)
 	e1:SetTarget(c4179255.drtg)
 	e1:SetOperation(c4179255.drop)
 	c:RegisterEffect(e1)
@@ -31,10 +31,6 @@ function c4179255.initial_effect(c)
 end
 function c4179255.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and re and re:IsActiveType(TYPE_FIELD) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
-end
-function c4179255.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,4179255)==0 end
-	Duel.RegisterFlagEffect(tp,4179255,RESET_PHASE+PHASE_END,0,1)
 end
 function c4179255.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and e:GetHandler():IsFaceup() end

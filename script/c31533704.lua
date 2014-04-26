@@ -26,10 +26,9 @@ function c31533704.initial_effect(c)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e4:SetCountLimit(1,31533704)
 	e4:SetCondition(c31533704.spcon)
-	e4:SetCost(c31533704.spcost)
 	e4:SetTarget(c31533704.sptg)
 	e4:SetOperation(c31533704.spop)
 	c:RegisterEffect(e4)
@@ -62,10 +61,6 @@ function c31533704.spfilter(c,tp)
 end
 function c31533704.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c31533704.spfilter,1,nil,tp)
-end
-function c31533704.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,31533704)==0 end
-	Duel.RegisterFlagEffect(tp,31533704,RESET_PHASE+PHASE_END,0,1)
 end
 function c31533704.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

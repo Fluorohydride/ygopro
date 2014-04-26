@@ -1,4 +1,4 @@
---™CÐµ¸o ¥Ñ¥ï©`?¥Ä©`¥ë
+--æ©Ÿæ¢°ç«œ ãƒ‘ãƒ¯ãƒ¼Â·ãƒ„ãƒ¼ãƒ«
 function c68084557.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
@@ -7,11 +7,11 @@ function c68084557.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetDescription(aux.Stringid(68084557,0))
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_EQUIP)
+	e1:SetCountLimit(1,68084557)
 	e1:SetCondition(c68084557.drcon)
-	e1:SetCost(c68084557.drcost)
 	e1:SetTarget(c68084557.drtg)
 	e1:SetOperation(c68084557.drop)
 	c:RegisterEffect(e1)
@@ -29,10 +29,6 @@ function c68084557.initial_effect(c)
 end
 function c68084557.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
-end
-function c68084557.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,68084557)==0 end
-	Duel.RegisterFlagEffect(tp,68084557,RESET_PHASE+PHASE_END,0,1)
 end
 function c68084557.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

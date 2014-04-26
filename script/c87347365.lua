@@ -4,8 +4,8 @@ function c87347365.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(87347365,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,87347365)
 	e1:SetCondition(c87347365.condtion)
 	e1:SetTarget(c87347365.target)
 	e1:SetOperation(c87347365.operation)
@@ -15,7 +15,7 @@ function c87347365.condtion(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_DECK)
 end
 function c87347365.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,87347365)==0 end
+	if chk==0 then return true end
 	local opt=0
 	local c=e:GetHandler()
 	local b1=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -37,7 +37,6 @@ function c87347365.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		e:SetCategory(0)
 	end
-	Duel.RegisterFlagEffect(tp,87347365,RESET_PHASE+PHASE_END,0,1)
 end
 function c87347365.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

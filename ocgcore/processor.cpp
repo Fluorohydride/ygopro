@@ -1930,7 +1930,8 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		bool act = true;
 		for(auto ifit = core.quick_f_chain.begin(); ifit != core.quick_f_chain.end(); ++ifit) {
 			peffect = ifit->first;
-			if(peffect->is_chainable(ifit->second.triggering_player) && peffect->handler->is_has_relation(peffect)) {
+			if(peffect->is_chainable(ifit->second.triggering_player) && peffect->check_count_limit(ifit->second.triggering_player)
+					&& peffect->handler->is_has_relation(peffect)) {
 				if (ifit->second.triggering_player == infos.turn_player){
 					act = true;
 					if (peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {

@@ -114,9 +114,7 @@ int32 effect::is_available() {
 		status &= ~EFFECT_STATUS_AVAILABLE;
 	return res;
 }
-int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
-	if(!(type & EFFECT_TYPE_ACTIONS))
-		return FALSE;
+int32 effect::check_count_limit(uint8 playerid) {
 	if((flag & EFFECT_FLAG_COUNT_LIMIT)) {
 		if(count_code == 0) {
 			if((reset_count & 0xf00) == 0)
@@ -126,13 +124,20 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			uint32 count = (reset_count >> 12) & 0xf;
 			if(code == 1) {
 				if(pduel->game_field->get_effect_code((count_code & 0x80000000) | handler->fieldid, PLAYER_NONE) >= count)
-					return false;
+					return FALSE;
 			} else {
 				if(pduel->game_field->get_effect_code(count_code, playerid) >= count)
-					return false;
+					return FALSE;
 			}
 		}
 	}
+	return TRUE;
+}
+int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+	if(!(type & EFFECT_TYPE_ACTIONS))
+		return FALSE;
+	if(!check_count_limit(playerid))
+		return FALSE;
 	if (!(flag & EFFECT_FLAG_FIELD_ONLY)) {
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
