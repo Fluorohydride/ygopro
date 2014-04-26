@@ -9,9 +9,10 @@ function c76721030.initial_effect(c)
 	--cannot trigger
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_TRIGGER)
+	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetTargetRange(LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE+LOCATION_HAND)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)	
+	e2:SetTargetRange(1,1)
 	e2:SetTarget(c76721030.etarget)
 	c:RegisterEffect(e2)
 end
@@ -20,6 +21,6 @@ function c76721030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local rg=Duel.SelectReleaseGroup(tp,nil,2,2,nil)
 	Duel.Release(rg,REASON_COST)
 end
-function c76721030.etarget(e,c)
-	return c:IsType(TYPE_MONSTER)
+function c76721030.etarget(e,re,c)
+	return re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsLocation(LOCATION_HAND+LOCATION_ONFIELD)
 end
