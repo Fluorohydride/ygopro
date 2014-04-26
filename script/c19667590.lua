@@ -33,7 +33,7 @@ function c19667590.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c19667590.cfilter,1,nil,tp)
 end
 function c19667590.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetFlagEffect(tp,19667590)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

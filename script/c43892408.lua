@@ -2,7 +2,7 @@
 function c43892408.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,38033121,c43892408.fusfilter,1,false,false)
+	aux.AddFusionProcCodeFun(c,38033121,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),1,false,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -24,19 +24,12 @@ function c43892408.initial_effect(c)
 	e2:SetOperation(c43892408.activate)
 	c:RegisterEffect(e2)
 end
-c43892408.material_count=1
-c43892408.material={38033121}
 function c43892408.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():IsCode(1784686)
-end
-function c43892408.fusfilter(c)
-	return c:IsRace(RACE_DRAGON)
+	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or se:GetHandler():IsCode(1784686)
 end
 function c43892408.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
-	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-	local sg=g:FilterSelect(tp,Card.IsAbleToGraveAsCost,1,1,nil)
-	Duel.SendtoGrave(sg,REASON_COST)
+	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 end
 function c43892408.filter(c)
 	return c:IsFaceup() and c:IsDestructable()

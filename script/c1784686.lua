@@ -11,30 +11,30 @@ function c1784686.initial_effect(c)
 	e1:SetOperation(c1784686.activate)
 	c:RegisterEffect(e1)
 	--add code
-	--local e2=Effect.CreateEffect(c)
-	--e2:SetType(EFFECT_TYPE_SINGLE)
-	--e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	--e2:SetCode(EFFECT_ADD_CODE)
-	--e2:SetValue(88888888)
-	--c:RegisterEffect(e2)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetCode(EFFECT_ADD_CODE)
+	e2:SetValue(10000050)
+	c:RegisterEffect(e2)
 end
 function c1784686.tgfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0xa2)  
-	and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
-	and Duel.IsExistingMatchingCard(c1784686.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetCode())
+	return c:IsFaceup() and c:IsSetCard(0xa2)
+		and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
+		and Duel.IsExistingMatchingCard(c1784686.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetCode())
 end
 function c1784686.spfilter(c,e,tp,code)
-	local t=c.material
-	return c:IsType(TYPE_FUSION)
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and
-		aux.Contains(t,code)
+	if not c.material_count or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) then return false end
+	for i=1,c.material_count do
+		if code==c.material[i] then return true end
+	end
+	return false
 end
 function c1784686.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc==0 then return c1784686.tgfilter(chkc) end
-	if chk==0 then return 
-		Duel.IsExistingTarget(c1784686.tgfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) 
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-	end
+	if chkc==0 then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c1784686.tgfilter(chkc,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.IsExistingTarget(c1784686.tgfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c1784686.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end

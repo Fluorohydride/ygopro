@@ -2,7 +2,7 @@
 function c75380687.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcCodeFun(c,46986414,c75380687.fusfilter,1,false,false)
+	aux.AddFusionProcCodeFun(c,46986414,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),1,false,false)
 	--spsummon condition
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -12,18 +12,18 @@ function c75380687.initial_effect(c)
 	c:RegisterEffect(e1)
 	--remove
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(73891874,0))
+	e2:SetDescription(aux.Stringid(75380687,0))
 	e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_REMOVE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetTarget(c75380687.target)
 	e2:SetOperation(c75380687.operation)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
 	--summon
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(73891874,0))
-	e3:SetCategory(CATEGORY_SPSUMMON)
+	e3:SetDescription(aux.Stringid(75380687,1))
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_DESTROYED)
@@ -31,13 +31,8 @@ function c75380687.initial_effect(c)
 	e3:SetOperation(c75380687.spop)
 	c:RegisterEffect(e3)
 end
-c75380687.material_count=1
-c75380687.material={46986414}
 function c75380687.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or e:GetHandler():IsCode(1784686)
-end
-function c75380687.fusfilter(c)
-	return c:IsRace(RACE_DRAGON)
+	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION or se:GetHandler():IsCode(1784686)
 end
 function c75380687.filter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToRemove()
@@ -66,7 +61,7 @@ function c75380687.spfilter(c,e,tp)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c75380687.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetControler()==tp and chkc:GetLocation()==LOCATION_GRAVE and c75380687.filter(chkc,e,tp) end
+	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c75380687.spfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c75380687.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
