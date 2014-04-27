@@ -351,9 +351,8 @@ int32 card::get_attack(uint8 swap) {
 						temp.attack = base;
 					}
 				}
-			}
-			if (eset[i]->type & EFFECT_TYPE_SINGLE)
 				up += eset[i]->get_value(this);
+			}
 			else
 				upc += eset[i]->get_value(this);
 			break;

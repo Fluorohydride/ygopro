@@ -618,6 +618,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								respbuf[i] = sort_list[i] - 1;
 							DuelClient::SetResponseB(respbuf, select_max);
 							mainGame->HideElement(mainGame->wCardSelect, true);
+							sort_list.clear();
 						}
 					}
 					break;
