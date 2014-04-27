@@ -47,6 +47,7 @@ function c16404809.operation(e,tp,eg,ep,ev,re,r,rp)
 			local sg=g:FilterSelect(tp,c16404809.filter,1,1,nil)
 			Duel.SendtoHand(sg,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,sg)
+			Duel.ShuffleHand(p)
 			g:Sub(sg)
 		end
 		Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
