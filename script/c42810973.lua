@@ -16,8 +16,7 @@ function c42810973.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c42810973.tfilter(c)
-	local code=c:GetCode()
-	return code==63977008 or code==20932152
+	return c:IsCode(63977008) or c:IsHasEffect(20932152)
 end
 function c42810973.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and chkc:IsAbleToRemove() end

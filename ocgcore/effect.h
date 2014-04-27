@@ -49,6 +49,7 @@ public:
 	uint32 label;
 	uint32 hint_timing[2];
 	uint32 card_type;
+	uint32 active_type;
 	uint16 field_ref;
 	uint16 status;
 	void* label_object;

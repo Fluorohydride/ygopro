@@ -4161,9 +4161,10 @@ int32 field::add_chain(uint16 step) {
 			negeff->reset_flag = RESET_CHAIN | RESET_EVENT | deffect->get_value();
 			phandler->add_effect(negeff);
 		}
-		clit->triggering_effect->card_type = peffect->handler->get_type();
-		if((clit->triggering_effect->card_type & 0x5) == 0x5)
-			clit->triggering_effect->card_type -= TYPE_TRAP;
+		peffect->card_type = peffect->handler->get_type();
+		if((peffect->card_type & 0x5) == 0x5)
+			peffect->card_type -= TYPE_TRAP;
+		peffect->active_type = peffect->card_type;
 		clit->chain_count = core.current_chain.size() + 1;
 		clit->target_cards = 0;
 		clit->target_player = PLAYER_NONE;
@@ -4427,25 +4428,27 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 10: {
-		card* pcard = cait->triggering_effect->handler;
+		effect* peffect = cait->triggering_effect;
+		card* pcard = peffect->handler;
 		if((cait->flag & CHAIN_HAND_EFFECT) && !pcard->is_status(STATUS_IS_PUBLIC) && (pcard->current.location == LOCATION_HAND))
 			shuffle(pcard->current.controler, LOCATION_HAND);
 		if(cait->target_cards && cait->target_cards->container.size()) {
 			for(auto cit = cait->target_cards->container.begin(); cit != cait->target_cards->container.end(); ++cit)
-				(*cit)->release_relation(cait->triggering_effect);
+				(*cit)->release_relation(peffect);
 		}
-		if((pcard->data.type & TYPE_EQUIP) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
+		if((pcard->data.type & TYPE_EQUIP) && (peffect->type & EFFECT_TYPE_ACTIVATE)
 		        && !pcard->equiping_target && (pcard->current.location == LOCATION_SZONE))
 			pcard->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		if(core.duel_options & DUEL_OBSOLETE_RULING) {
-			if((pcard->data.type & TYPE_FIELD) && (cait->triggering_effect->type & EFFECT_TYPE_ACTIVATE)
-					&& !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(cait->triggering_effect)) {
+			if((pcard->data.type & TYPE_FIELD) && (peffect->type & EFFECT_TYPE_ACTIVATE)
+					&& !pcard->is_status(STATUS_LEAVE_CONFIRMED) && pcard->is_has_relation(peffect)) {
 				card* fscard = player[1 - pcard->current.controler].list_szone[5];
 				if(fscard && fscard->is_position(POS_FACEUP))
 					destroy(fscard, 0, REASON_RULE, 1 - pcard->current.controler);
 			}
 		}
-		pcard->release_relation(cait->triggering_effect);
+		peffect->active_type = 0;
+		pcard->release_relation(peffect);
 		if(cait->target_cards)
 			pduel->delete_group(cait->target_cards);
 		for(auto oit = cait->opinfos.begin(); oit != cait->opinfos.end(); ++oit) {

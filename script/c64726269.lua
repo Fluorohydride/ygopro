@@ -37,6 +37,7 @@ function c64726269.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		local sg=Duel.GetMatchingGroup(c64726269.tdfilter,tp,LOCATION_GRAVE,0,nil)
 		if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(64726269,1)) then
+			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 			local tg=sg:Select(tp,1,1,nil)
 			Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)

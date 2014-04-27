@@ -59,5 +59,5 @@ function c18027138.splimit(e,c)
 	return c:IsLocation(LOCATION_EXTRA)
 end
 function c18027138.atlimit(e,c)
-	return not c:IsCode(18027138)
+	return not c:IsCode(18027139)
 end

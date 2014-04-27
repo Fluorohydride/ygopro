@@ -22,6 +22,7 @@ effect::effect() {
 	description = 0;
 	effect_owner = PLAYER_NONE;
 	card_type = 0;
+	active_type = 0;
 	id = 0;
 	code = 0;
 	type = 0;
@@ -405,8 +406,13 @@ int32 effect::is_immuned(effect_set_v* effects) {
 	effect* peffect;
 	for (int i = 0; i < effects->count; ++i) {
 		peffect = effects->at(i);
-		if(peffect->owner == owner)
-			return FALSE;
+		if(type & 0x7f0) {
+			if(peffect->handler == owner)
+				return FALSE;
+		} else {
+			if(peffect->owner == owner)
+				return FALSE;
+		}
 		if(peffect->value) {
 			pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 			if(peffect->check_value_condition(1))

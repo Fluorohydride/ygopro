@@ -26,6 +26,7 @@ function c4239451.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c4239451.adcon2)
 	e3:SetTarget(c4239451.adtg2)
 	e3:SetOperation(c4239451.adop2)
 	c:RegisterEffect(e3)
@@ -60,6 +61,9 @@ function c4239451.adop1(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
 		tc:RegisterEffect(e2)
 	end
+end
+function c4239451.adcon2(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_BATTLE and Duel.GetCurrentChain()==0
 end
 function c4239451.adtg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c4239451.filter(chkc) end

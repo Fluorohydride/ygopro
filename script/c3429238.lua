@@ -36,8 +36,7 @@ function c3429238.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c3429238.tfilter(c)
-	local code=c:GetCode()
-	return code==56286179 or code==20932152
+	return c:IsCode(56286179) or c:IsHasEffect(20932152)
 end
 function c3429238.datcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
