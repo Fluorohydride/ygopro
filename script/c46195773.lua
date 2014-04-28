@@ -22,8 +22,7 @@ function c46195773.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c46195773.tfilter(c)
-	local code=c:GetCode()
-	return code==67270095 or code==20932152
+	return c:IsCode(67270095) or c:IsHasEffect(20932152)
 end
 function c46195773.efilter(e,re)
 	return re:GetHandler():IsLevelBelow(6)

@@ -20,6 +20,7 @@ function c87911394.initial_effect(c)
 	e2:SetOperation(c87911394.atkop)
 	c:RegisterEffect(e2)
 end
+c87911394.xyz_number=39
 function c87911394.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)

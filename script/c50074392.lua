@@ -25,7 +25,8 @@ end
 function c50074392.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(c50074392.cfilter,tp,LOCATION_MZONE,0,1,nil,RACE_FISH)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingMatchingCard(c50074392.cfilter,tp,LOCATION_MZONE,0,1,nil,RACE_FISH)
 		and Duel.IsExistingMatchingCard(c50074392.cfilter,tp,LOCATION_MZONE,0,1,nil,RACE_WINDBEAST)
 end
 function c50074392.lvcon(e,tp,eg,ep,ev,re,r,rp)
@@ -62,5 +63,5 @@ function c50074392.lvop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function c50074392.actfilter(e,c)
-	return c:GetControler()==e:GetHandlerPlayer() and not c:IsAttribute(ATTRIBUTE_WATER)
+	return c:GetControler()==e:GetHandlerPlayer() and c:IsType(TYPE_MONSTER) and not c:IsAttribute(ATTRIBUTE_WATER)
 end

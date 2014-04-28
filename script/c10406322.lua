@@ -19,8 +19,9 @@ function c10406322.initial_effect(c)
 	e2:SetCategory(CATEGORY_TODECK)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,10406322)
 	e2:SetCondition(c10406322.tdcon)
 	e2:SetCost(c10406322.tdcost)
 	e2:SetTarget(c10406322.tdtg)
@@ -54,9 +55,8 @@ function c10406322.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c10406322.cfilter,1,nil,tp)
 end
 function c10406322.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,10406322)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,10406322,RESET_PHASE+PHASE_END,0,1)
 end
 function c10406322.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToDeck() end

@@ -7,6 +7,7 @@
 #include "image_manager.h"
 #include "replay_mode.h"
 #include "single_mode.h"
+#include "materials.h"
 #include "../ocgcore/field.h"
 
 namespace ygo {
@@ -102,6 +103,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					DuelClient::StopClient();
 					mainGame->dInfo.isStarted = false;
 					mainGame->device->setEventReceiver(&mainGame->menuHandler);
+					mainGame->wCardImg->setVisible(false);
+					mainGame->wInfos->setVisible(false);
+					mainGame->wPhase->setVisible(false);
+					mainGame->btnLeaveGame->setVisible(false);
 					mainGame->btnCreateHost->setEnabled(true);
 					mainGame->btnJoinHost->setEnabled(true);
 					mainGame->btnJoinCancel->setEnabled(true);
@@ -613,6 +618,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								respbuf[i] = sort_list[i] - 1;
 							DuelClient::SetResponseB(respbuf, select_max);
 							mainGame->HideElement(mainGame->wCardSelect, true);
+							sort_list.clear();
 						}
 					}
 					break;
@@ -666,7 +672,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 			}
 			case CHECK_RACE: {
 				int rac = 0, filter = 0x1, count = 0;
-				for(int i = 0; i < 23; ++i, filter <<= 1) {
+				for(int i = 0; i < 24; ++i, filter <<= 1) {
 					if(mainGame->chkRace[i]->isChecked()) {
 						rac |= filter;
 						count++;
@@ -715,8 +721,16 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					else
 						mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 					mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
-					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location),
-					           selectable_cards[i + pos]->sequence + 1);
+					if (sort_list.size()){
+						if (sort_list[pos + i]> 0)
+							myswprintf(formatBuffer, L"%d", sort_list[pos + i]);
+						else
+							myswprintf(formatBuffer, L"");
+					}
+					else{
+						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location),
+							selectable_cards[i + pos]->sequence + 1);
+					}
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					if(selectable_cards[i + pos]->is_selected)
 						mainGame->stCardPos[i]->setBackgroundColor(0xffffff00);
@@ -928,7 +942,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_EXTRA: {
-					if(extra[hovered_controler].size() == 0 || hovered_controler != 0)
+					if(extra[hovered_controler].size() == 0)
 						break;
 					ShowMenu(COMMAND_LIST, x, y);
 					break;
@@ -992,8 +1006,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						break;
 					for(size_t i = 0; i < extra[hovered_controler].size(); ++i)
 						command_flag |= extra[hovered_controler][i]->cmdFlag;
-					if(hovered_controler == 0 || mainGame->dInfo.isSingleMode)
-						command_flag |= COMMAND_LIST;
+					command_flag |= COMMAND_LIST;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;
@@ -1014,7 +1027,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						selected_field |= flag;
 						select_min--;
 						if (select_min == 0) {
-							unsigned char respbuf[64];
+							unsigned char respbuf[80];
 							int filter = 1;
 							int p = 0;
 							for (int i = 0; i < 5; ++i, filter <<= 1) {
@@ -1026,7 +1039,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 							}
 							filter = 0x100;
-							for (int i = 0; i < 6; ++i, filter <<= 1) {
+							for (int i = 0; i < 8; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(0);
 									respbuf[p + 1] = 0x8;
@@ -1044,7 +1057,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								}
 							}
 							filter = 0x1000000;
-							for (int i = 0; i < 6; ++i, filter <<= 1) {
+							for (int i = 0; i < 8; ++i, filter <<= 1) {
 								if (selected_field & filter) {
 									respbuf[p] = mainGame->LocalPlayer(1);
 									respbuf[p + 1] = 0x8;
@@ -1266,6 +1279,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				} else {
 					mainGame->PopupElement(mainGame->wQuery);
 				}
+				if(mainGame->wOptions->isVisible()) {
+					DuelClient::SetResponseI(-1);
+					mainGame->HideElement(mainGame->wOptions);
+				}
 				break;
 			}
 			case MSG_SORT_CHAIN:
@@ -1361,6 +1378,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								str.append(formatBuffer);
 								myswprintf(formatBuffer, L"\n\x2605%d %ls/%ls", (mcard->level ? mcard->level : mcard->rank), dataManager.FormatRace(mcard->race), dataManager.FormatAttribute(mcard->attribute));
 								str.append(formatBuffer);
+								if(mcard->location == LOCATION_HAND && (mcard->type & TYPE_PENDULUM)) {
+									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
+									str.append(formatBuffer);
+								}
 								if(mcard->counters.size()) {
 									for(std::map<int, int>::iterator ctit = mcard->counters.begin(); ctit != mcard->counters.end(); ++ctit) {
 										myswprintf(formatBuffer, L"\n[%ls]: %d", dataManager.GetCounterName(ctit->first), ctit->second);
@@ -1389,6 +1410,10 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 								str.append(formatBuffer);
 								if(mcard->alias && (mcard->alias < mcard->code - 10 || mcard->alias > mcard->code + 10)) {
 									myswprintf(formatBuffer, L"\n%ls", dataManager.GetName(mcard->alias));
+									str.append(formatBuffer);
+								}
+								if(mcard->location == LOCATION_SZONE && (mcard->sequence == 6 || mcard->sequence == 7)) {
+									myswprintf(formatBuffer, L"\n%d/%d", mcard->lscale, mcard->rscale);
 									str.append(formatBuffer);
 								}
 								if(mcard->counters.size()) {
@@ -1477,15 +1502,15 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(416, 504, 900, 600);
-	irr::core::recti ofRect(516, 135, 805, 191);
+	irr::core::recti sfRect(393, 504, 875, 600);
+	irr::core::recti ofRect(501, 135, 790, 191);
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 416 + 82 * (6 - hc) / 2;
+			int left = 393 + 82 * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
@@ -1500,17 +1525,17 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 0;
 			hovered_location = LOCATION_HAND;
-			if(x >= 829)
+			if(x >= 804)
 				hovered_sequence = hc - 1;
 			else
-				hovered_sequence = (x - 416) * (hc - 1) / 413;
+				hovered_sequence = (x - 393) * (hc - 1) / 411;
 		}
 	} else if(ofRect.isPointInside(pos)) {
 		int hc = hand[1].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 516 + 49 * (6 - hc) / 2;
+			int left = 501 + 49 * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
@@ -1525,75 +1550,95 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 1;
 			hovered_location = LOCATION_HAND;
-			if(x >= 756)
+			if(x >= 748)
 				hovered_sequence = 0;
 			else
-				hovered_sequence = hc - 1 - (x - 516) * (hc - 1) / 247;
+				hovered_sequence = hc - 1 - (x - 501) * (hc - 1) / 247;
 		}
 	} else {
 		double screenx = x / 1024.0 * 1.25 - 0.81;
 		double screeny = y / 640.0 * 0.84 - 0.42;
 		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
 		double vlen = sqrt(1.0 + screeny * screeny);
-		double boardx = 3.95 + 7.8 * screenx / vlen / cos(angle);
+		double boardx = 4.2 + 7.8 * screenx / vlen / cos(angle);
 		double boardy = 8.0 - 7.8 * tan(angle);
 		hovered_location = 0;
-		if(boardx >= 0.2 && boardx <= 1.0) {
-			if(boardy >= 2.4 && boardy <= 3.6) {
+		if(boardx >= matManager.vFields[8].Pos.X && boardx <= matManager.vFields[9].Pos.X) {
+			if(boardy >= matManager.vFields[8].Pos.Y && boardy <= matManager.vFields[10].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_EXTRA;
-			} else if(boardy >= 1.1 && boardy <= 2.3) {
+			} else if(boardy >= matManager.vFields[56].Pos.Y && boardy <= matManager.vFields[58].Pos.Y) {//field
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
-			} else if(boardy >= -1.0 && boardy <= 0.2) {
+			} else if(boardy >= matManager.vFields[60].Pos.Y && boardy <= matManager.vFields[62].Pos.Y) {
+				hovered_controler = 0;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 6;
+			} else if(boardy >= matManager.vFields[134].Pos.Y && boardy <= matManager.vFields[132].Pos.Y) {
 				hovered_controler = 1;
-				hovered_location = LOCATION_REMOVED;
-			} else if(boardy >= -2.3 && boardy <= -1.1) {
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 7;
+			} else if(boardy >= matManager.vFields[74].Pos.Y && boardy <= matManager.vFields[72].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_GRAVE;
-			} else if(boardy >= -3.6 && boardy <= -2.4) {
+			} else if(boardy >= matManager.vFields[70].Pos.Y && boardy <= matManager.vFields[68].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_DECK;
 			}
-		} else if(boardx >= 6.9 && boardx <= 7.7) {
-			if(boardy >= 2.4 && boardy <= 3.6) {
+		} else if(boardx >= matManager.vFields[81].Pos.X && boardx <= matManager.vFields[80].Pos.X) {
+			if(boardy >= matManager.vFields[82].Pos.Y && boardy <= matManager.vFields[80].Pos.Y) {
+				hovered_controler = 1;
+				hovered_location = LOCATION_REMOVED;
+			}
+		} else if(boardx >= matManager.vFields[0].Pos.X && boardx <= matManager.vFields[1].Pos.X) {
+			if(boardy >= matManager.vFields[0].Pos.Y && boardy <= matManager.vFields[2].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_DECK;
-			} else if(boardy >= 1.1 && boardy <= 2.3) {
+			} else if(boardy >= matManager.vFields[4].Pos.Y && boardy <= matManager.vFields[6].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_GRAVE;
-			} else if(boardy >= -0.2 && boardy <= 1.0) {
+			} else if(boardy >= matManager.vFields[130].Pos.Y && boardy <= matManager.vFields[128].Pos.Y) {
+				hovered_controler = 1;
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 6;
+			} else if(boardy >= matManager.vFields[64].Pos.Y && boardy <= matManager.vFields[66].Pos.Y) {
 				hovered_controler = 0;
-				hovered_location = LOCATION_REMOVED;
-			} else if(boardy >= -2.3 && boardy <= -1.1) {
+				hovered_location = LOCATION_SZONE;
+				hovered_sequence = 7;
+			} else if(boardy >= matManager.vFields[126].Pos.Y && boardy <= matManager.vFields[124].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 5;
-			} else if(boardy >= -3.6 && boardy <= -2.4) {
+			} else if(boardy >= matManager.vFields[78].Pos.Y && boardy <= matManager.vFields[76].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_EXTRA;
 			}
-		} else if(boardx >= 1.2 && boardx <= 6.7) {
-			if(boardy > 1.7 && boardy <= 2.9) {
+		} else if(boardx >= matManager.vFields[12].Pos.X && boardx <= matManager.vFields[13].Pos.X) {
+			if(boardy >= matManager.vFields[12].Pos.Y && boardy <= matManager.vFields[14].Pos.Y) {
+				hovered_controler = 0;
+				hovered_location = LOCATION_REMOVED;
+			}
+		} else if(boardx >= matManager.vFields[36].Pos.X && boardx <= matManager.vFields[55].Pos.X) {
+			if(boardy > matManager.vFields[36].Pos.Y && boardy <= matManager.vFields[38].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = (boardx - 1.2) / 1.1;
 				if(hovered_sequence > 4)
 					hovered_sequence = 4;
-			} else if(boardy >= 0.5 && boardy <= 1.7) {
+			} else if(boardy >= matManager.vFields[16].Pos.Y && boardy <= matManager.vFields[35].Pos.Y) {
 				hovered_controler = 0;
 				hovered_location = LOCATION_MZONE;
 				hovered_sequence = (boardx - 1.2) / 1.1;
 				if(hovered_sequence > 4)
 					hovered_sequence = 4;
-			} else if(boardy >= -1.7 && boardy <= -0.5) {
+			} else if(boardy >= matManager.vFields[103].Pos.Y && boardy <= matManager.vFields[84].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_MZONE;
 				hovered_sequence = 4 - (int)((boardx - 1.2) / 1.1);
 				if(hovered_sequence < 0)
 					hovered_sequence = 0;
-			} else if(boardy >= -2.9 && boardy < -1.7) {
+			} else if(boardy >= matManager.vFields[123].Pos.Y && boardy < matManager.vFields[104].Pos.Y) {
 				hovered_controler = 1;
 				hovered_location = LOCATION_SZONE;
 				hovered_sequence = 4 - (int)((boardx - 1.2) / 1.1);
@@ -1601,7 +1646,7 @@ void ClientField::GetHoverField(int x, int y) {
 					hovered_sequence = 0;
 			}
 		}
-	}
+}
 }
 void ClientField::ShowMenu(int flag, int x, int y) {
 	if(!flag) {
@@ -1630,6 +1675,10 @@ void ClientField::ShowMenu(int flag, int x, int y) {
 		height += 21;
 	} else mainGame->btnMSet->setVisible(false);
 	if(flag & COMMAND_SSET) {
+		if(!(clicked_card->type & TYPE_MONSTER))
+			mainGame->btnSSet->setText(dataManager.GetSysString(1153));
+		else
+			mainGame->btnSSet->setText(dataManager.GetSysString(1159));
 		mainGame->btnSSet->setVisible(true);
 		mainGame->btnSSet->setRelativePosition(position2di(1, height));
 		height += 21;

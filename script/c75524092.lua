@@ -51,7 +51,8 @@ function c75524092.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c75524092.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetEquipTarget():IsReason(REASON_BATTLE) end
+	local tg=e:GetHandler():GetEquipTarget()
+	if chk==0 then return tg and tg:IsReason(REASON_BATTLE) end
 	return true
 end
 function c75524092.desrepop(e,tp,eg,ep,ev,re,r,rp)

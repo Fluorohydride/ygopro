@@ -26,8 +26,7 @@ function c59771339.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c59771339.tfilter(c)
-	local code=c:GetCode()
-	return code==63977008 or code==20932152
+	return c:IsCode(63977008) or c:IsHasEffect(20932152)
 end
 function c59771339.cfilter(c)
 	return c:IsSetCard(0x43) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()

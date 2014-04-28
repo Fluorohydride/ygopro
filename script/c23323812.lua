@@ -12,7 +12,7 @@ function c23323812.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c23323812.filter(c,tp)
-	return c:GetPreviousControler()==tp and bit.band(c:GetBattlePosition(),POS_FACEUP)~=0
+	return c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP)
 		and c==Duel.GetAttackTarget() and c:IsRace(RACE_PSYCHO)
 end
 function c23323812.condition(e,tp,eg,ep,ev,re,r,rp)

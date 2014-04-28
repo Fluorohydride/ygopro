@@ -30,7 +30,7 @@ function c31053337.initial_effect(c)
 	e4:SetDescription(aux.Stringid(31053337,1))
 	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e4:SetCode(EVENT_BATTLE_END)
+	e4:SetCode(EVENT_BATTLED)
 	e4:SetOperation(c31053337.operation2)
 	c:RegisterEffect(e4)
 end
@@ -38,7 +38,7 @@ function c31053337.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c31053337.filter(c)
-	return c:IsAbleToHand() and c:GetSequence()~=5
+	return c:IsAbleToHand() and c:GetSequence()<5
 end
 function c31053337.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetAttack()>=1000 and Duel.IsExistingMatchingCard(c31053337.filter,tp,0,LOCATION_SZONE,1,nil) end

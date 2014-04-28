@@ -41,9 +41,10 @@ function c1845204.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
 		e2:SetCountLimit(1)
 		e2:SetRange(LOCATION_MZONE)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
 		e2:SetOperation(c1845204.desop)
-		tc:RegisterEffect(e2)
+		tc:RegisterEffect(e2,true)
 		tc:CompleteProcedure()
 	end
 end

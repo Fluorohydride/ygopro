@@ -18,6 +18,7 @@ function c36076683.initial_effect(c)
 	e1:SetOperation(c36076683.atkop)
 	c:RegisterEffect(e1)
 end
+c36076683.xyz_number=73
 function c36076683.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end

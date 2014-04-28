@@ -18,7 +18,7 @@ function c6343408.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c6343408.filter,tp,LOCATION_REMOVED,0,5,nil)
 end
 function c6343408.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and c6343408.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c6343408.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c6343408.filter,tp,LOCATION_REMOVED,0,3,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(6343408,0))
 	local g=Duel.SelectTarget(tp,c6343408.filter,tp,LOCATION_REMOVED,0,3,3,nil)

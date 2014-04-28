@@ -16,8 +16,7 @@ function c74860293.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c74860293.tfilter(c)
-	local code=c:GetCode()
-	return code==63977008 or code==20932152
+	return c:IsCode(63977008) or c:IsHasEffect(20932152)
 end
 function c74860293.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO

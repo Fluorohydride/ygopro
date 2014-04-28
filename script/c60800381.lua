@@ -14,15 +14,13 @@ function c60800381.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c60800381.tfilter(c)
-	local code=c:GetCode()
-	return code==63977008 or code==20932152
+	return c:IsCode(63977008) or c:IsHasEffect(20932152)
 end
 function c60800381.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function c60800381.filter(c)
-	local lv=c:GetLevel()
-	return lv>0 and lv<=2 and c:IsFaceup()
+	return c:IsFaceup() and c:IsLevelBelow(2)
 end
 function c60800381.op(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

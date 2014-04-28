@@ -66,15 +66,8 @@ end
 function c66957584.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 then return end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if ft<=0 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	if sg:GetCount()==0 then return end
-	if ft>=g:GetCount() then
-		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
-	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg2=sg:Select(tp,ft,ft,nil)
-		Duel.SpecialSummon(sg2,0,tp,tp,false,false,POS_FACEUP)
-	end
+	if sg:GetCount()==0 or ft<sg:GetCount() then return end
+	Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 end

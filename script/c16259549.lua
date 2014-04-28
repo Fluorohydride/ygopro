@@ -38,12 +38,14 @@ function c16259549.initial_effect(c)
 	e4:SetCategory(CATEGORY_TODECK)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e4:SetCountLimit(1,16259549)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCondition(c16259549.tdcon)
 	e4:SetTarget(c16259549.tdtg)
 	e4:SetOperation(c16259549.tdop)
 	c:RegisterEffect(e4)
 end
+c16259549.xyz_number=49
 function c16259549.reccon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end

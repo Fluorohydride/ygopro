@@ -12,11 +12,13 @@ function c25173686.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c25173686.condition(e,tp,eg,ep,ev,re,r,rp)
-	local ct=Duel.GetFieldGroupCount(tp,0,LOCATION_SZONE)
-	return ct==6 or (ct==5 and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)==nil)
+	for i=0,4 do
+		if Duel.GetFieldCard(1-tp,LOCATION_SZONE,i)==nil then return false end
+	end
+	return true
 end
 function c25173686.filter(c)
-	return c:GetSequence()~=5 and c:IsDestructable()
+	return c:GetSequence()<5 and c:IsDestructable()
 end
 function c25173686.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c25173686.filter,tp,0,LOCATION_SZONE,1,nil) end

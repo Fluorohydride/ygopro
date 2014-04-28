@@ -28,17 +28,6 @@ function c44887817.initial_effect(c)
 end
 function c44887817.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) end
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetReset(RESET_PHASE+RESET_END)
-	e1:SetTargetRange(1,0)
-	Duel.RegisterEffect(e1,tp)
-	local e2=e1:Clone(e1)
-	e2:SetCode(EFFECT_CANNOT_MSET)
-	Duel.RegisterEffect(e2,tp)
 end
 function c44887817.filter(c,e,tp)
 	return c:IsRace(RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -57,6 +46,16 @@ function c44887817.operation(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
 		if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 		c:SetCardTarget(tc)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD)
+		e1:SetCode(EFFECT_CANNOT_SUMMON)
+		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+		e1:SetReset(RESET_PHASE+RESET_END)
+		e1:SetTargetRange(1,0)
+		Duel.RegisterEffect(e1,tp)
+		local e2=e1:Clone(e1)
+		e2:SetCode(EFFECT_CANNOT_MSET)
+		Duel.RegisterEffect(e2,tp)
 	end
 end
 function c44887817.dfilter(c,sg)

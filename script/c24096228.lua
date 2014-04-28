@@ -81,9 +81,5 @@ function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 		if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
 		Duel.BreakEffect()
 		if op then op(e,tp,eg,ep,ev,re,r,rp) end
-		if bit.band(tpe,TYPE_FIELD)~=0 then
-			local of=Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)
-			if of then Duel.Destroy(of,REASON_RULE) end
-		end
 	end
 end

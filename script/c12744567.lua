@@ -25,6 +25,7 @@ function c12744567.initial_effect(c)
 	e2:SetOperation(c12744567.spop)
 	c:RegisterEffect(e2)
 end
+c12744567.xyz_number=101
 function c12744567.filter(c)
 	return not c:IsType(TYPE_TOKEN) and c:IsAbleToChangeControler()
 		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
@@ -38,7 +39,7 @@ end
 function c12744567.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		local og=tc:GetOverlayGroup()
 		if og:GetCount()>0 then
 			Duel.SendtoGrave(og,REASON_RULE)

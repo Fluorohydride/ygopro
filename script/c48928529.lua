@@ -13,6 +13,7 @@ function c48928529.initial_effect(c)
 	e1:SetOperation(c48928529.operation)
 	c:RegisterEffect(e1)
 end
+c48928529.xyz_number=83
 function c48928529.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

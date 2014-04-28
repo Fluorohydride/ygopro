@@ -30,9 +30,7 @@ function c13455953.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c13455953.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local pos=c:GetPreviousPosition()
-	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and bit.band(pos,POS_FACEUP)~=0
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c13455953.filter(c)
 	return c:IsSetCard(0x5042) and c:IsAbleToHand()

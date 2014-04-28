@@ -15,7 +15,7 @@ function c29071332.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c29071332.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and chkc~=e:GetHandler() end
 	if chk==0 then return e:GetHandler():GetFlagEffect(29071332)==0 and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingTarget(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
@@ -67,9 +67,13 @@ function c29071332.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_EQUIP_LIMIT)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e4:SetValue(1)
+	e4:SetValue(c29071332.eqlimit)
 	e4:SetReset(RESET_EVENT+0x1fe0000)
+	e4:SetLabelObject(tc)
 	c:RegisterEffect(e4)
+end
+function c29071332.eqlimit(e,c)
+	return c==e:GetLabelObject()
 end
 function c29071332.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(29071332)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0

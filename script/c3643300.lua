@@ -23,7 +23,7 @@ function c3643300.filter(c)
 end
 function c3643300.econ(e)
 	return Duel.IsExistingMatchingCard(c3643300.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		or Duel.GetEnvironment()==22702055
+		or Duel.IsEnvironment(22702055)
 end
 function c3643300.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL)

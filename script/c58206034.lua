@@ -3,7 +3,7 @@ function c58206034.initial_effect(c)
 	--disable
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c58206034.discon)
 	e1:SetOperation(c58206034.disop)

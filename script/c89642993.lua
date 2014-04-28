@@ -13,6 +13,7 @@ function c89642993.initial_effect(c)
 	e1:SetOperation(c89642993.efop)
 	c:RegisterEffect(e1)
 end
+c89642993.xyz_number=63
 function c89642993.efcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,89642993)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

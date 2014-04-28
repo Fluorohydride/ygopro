@@ -59,9 +59,8 @@ end
 function c61318483.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local at=Duel.GetAttacker()
-	if at:IsRelateToBattle() and at:IsFaceup() then
-		Duel.ChangePosition(at,POS_FACEDOWN_DEFENCE)
-		if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE) then
+	if at:IsControler(1-tp) and at:IsRelateToBattle() and at:IsFaceup() and Duel.ChangePosition(at,POS_FACEDOWN_DEFENCE)>0 then
+		if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)>0 then
 			Duel.ConfirmCards(1-tp,c)
 		end
 	end

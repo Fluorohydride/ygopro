@@ -5,20 +5,16 @@ function c65961085.initial_effect(c)
 	e1:SetDescription(aux.Stringid(65961085,0))
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,65961085)
 	e1:SetCondition(c65961085.retcon)
-	e1:SetCost(c65961085.retcost)
 	e1:SetTarget(c65961085.rettg)
 	e1:SetOperation(c65961085.retop)
 	c:RegisterEffect(e1)
 end
 function c65961085.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return re and re:GetHandler():IsRace(RACE_SPELLCASTER)
-end
-function c65961085.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,65961085)==0 end
-	Duel.RegisterFlagEffect(tp,65961085,RESET_PHASE+PHASE_END,0,1)
 end
 function c65961085.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsAbleToDeck()

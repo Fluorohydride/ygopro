@@ -3,7 +3,7 @@ function c28912357.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),4),2)
 	c:EnableReviveLimit()
-	--attack up
+	--search
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetDescription(aux.Stringid(28912357,0))
@@ -20,11 +20,17 @@ function c28912357.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e2:SetCode(EVENT_LEAVE_FIELD)
+	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c28912357.spcon)
 	e2:SetTarget(c28912357.sptg)
 	e2:SetOperation(c28912357.spop)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EVENT_REMOVE)
+	c:RegisterEffect(e3)
+	local e4=e2:Clone()
+	e4:SetCode(EVENT_TO_DECK)
+	c:RegisterEffect(e4)
 end
 function c28912357.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -48,8 +54,7 @@ function c28912357.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c28912357.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return not c:IsLocation(LOCATION_DECK) and c:IsPreviousPosition(POS_FACEUP)
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c28912357.spfilter(c,e,tp)
 	return c:IsLevelBelow(3) and c:IsSetCard(0x72) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

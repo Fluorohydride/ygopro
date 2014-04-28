@@ -19,11 +19,8 @@ function c32907538.initial_effect(c)
 	e2:SetOperation(c32907538.mtop)
 	c:RegisterEffect(e2)
 end
-function c32907538.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
-end
 function c32907538.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c32907538.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) end
 	if chk==0 then return Duel.IsExistingTarget(nil,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,nil,tp,0,LOCATION_MZONE,1,1,nil)

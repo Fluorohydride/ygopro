@@ -27,7 +27,7 @@ function c77121851.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(77121851)~=0
 end
 function c77121851.costfilter(c)
-	return c:IsRace(0xc200) and c:IsAbleToGraveAsCost()
+	return c:IsRace(RACE_BEAST+RACE_BEASTWARRIOR+RACE_WINDBEAST) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost()
 end
 function c77121851.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c77121851.costfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end

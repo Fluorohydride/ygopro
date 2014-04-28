@@ -10,8 +10,8 @@ function c60470713.initial_effect(c)
 	e2:SetDescription(aux.Stringid(60470713,0))
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCountLimit(1,60470713)
 	e2:SetCode(EVENT_TO_DECK)
 	e2:SetCondition(c60470713.condition)
 	e2:SetTarget(c60470713.target)
@@ -30,8 +30,7 @@ function c60470713.condition(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0 and eg:IsExists(c60470713.cfilter,1,nil,tp)
 end
 function c60470713.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,60470713)==0 and e:GetHandler():IsRelateToEffect(e) end
-	Duel.RegisterFlagEffect(tp,60470713,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c60470713.mfilter(c)

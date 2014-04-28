@@ -15,6 +15,7 @@ function c47387961.initial_effect(c)
 	e1:SetOperation(c47387961.operation)
 	c:RegisterEffect(e1)
 end
+c47387961.xyz_number=8
 function c47387961.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end

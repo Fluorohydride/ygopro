@@ -29,9 +29,10 @@ function c45950291.filter1(c,e,tp)
 	local rk=c:GetRank()
 	return rk>0 and c:IsFaceup()
 		and not Duel.IsExistingMatchingCard(c45950291.cfilter,tp,LOCATION_MZONE,0,1,nil,rk)
-		and Duel.IsExistingMatchingCard(c45950291.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+2,c:GetRace(),c:GetAttribute(),e,tp)
+		and Duel.IsExistingMatchingCard(c45950291.filter2,tp,LOCATION_EXTRA,0,1,nil,rk+2,c:GetRace(),c:GetAttribute(),c:GetCode(),e,tp)
 end
-function c45950291.filter2(c,rk,rc,att,e,tp)
+function c45950291.filter2(c,rk,rc,att,code,e,tp)
+	if c:IsCode(6165656) and code~=48995978 then return false end
 	return c:GetRank()==rk and c:IsRace(rc) and c:IsAttribute(att)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
@@ -48,7 +49,7 @@ function c45950291.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c45950291.filter2,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank()+2,tc:GetRace(),tc:GetAttribute(),e,tp)
+	local g=Duel.SelectMatchingCard(tp,c45950291.filter2,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank()+2,tc:GetRace(),tc:GetAttribute(),tc:GetCode(),e,tp)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()

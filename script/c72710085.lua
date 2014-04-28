@@ -10,10 +10,10 @@ function c72710085.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_REMOVE)
+	e2:SetCountLimit(1,72710085)
 	e2:SetCondition(c72710085.tgcon)
-	e2:SetCost(c72710085.tgcost)
 	e2:SetTarget(c72710085.tgtg)
 	e2:SetOperation(c72710085.tgop)
 	c:RegisterEffect(e2)
@@ -21,10 +21,6 @@ end
 function c72710085.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	return eg:GetCount()==1 and tc:IsPreviousLocation(LOCATION_GRAVE) and tc:IsControler(tp) and tc:IsType(TYPE_MONSTER)
-end
-function c72710085.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,72710085)==0 end
-	Duel.RegisterFlagEffect(tp,72710085,RESET_PHASE+PHASE_END,0,1)
 end
 function c72710085.filter(c,att)
 	return not c:IsAttribute(att) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()

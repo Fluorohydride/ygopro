@@ -15,6 +15,7 @@ function c10389142.initial_effect(c)
 	e1:SetOperation(c10389142.spop)
 	c:RegisterEffect(e1)
 end
+c10389142.xyz_number=42
 function c10389142.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)

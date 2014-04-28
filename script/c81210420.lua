@@ -15,7 +15,7 @@ function c81210420.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()==PHASE_BATTLE
 end
 function c81210420.filter(c)
-	return c:IsFacedown() or c:IsCanTurnSet()
+	return not c:IsType(TYPE_TOKEN)
 end
 function c81210420.spfilter(c,e,tp)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsCanBeSpecialSummoned(e,0,tp,true,false,POS_FACEDOWN)

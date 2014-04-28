@@ -20,9 +20,9 @@ function c80885284.initial_effect(c)
 	e3:SetDescription(aux.Stringid(80885284,1))
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE+EFFECT_FLAG_DAMAGE_STEP)
+	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCode(EVENT_FLIP)
-	e3:SetCost(c80885284.thcost)
+	e3:SetCountLimit(1,80885284)
 	e3:SetTarget(c80885284.thtg)
 	e3:SetOperation(c80885284.thop)
 	c:RegisterEffect(e3)
@@ -44,10 +44,6 @@ function c80885284.posop(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and c:IsFaceup() then
 		Duel.ChangePosition(c,POS_FACEDOWN_DEFENCE)
 	end
-end
-function c80885284.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,80885284)==0 end
-	Duel.RegisterFlagEffect(tp,80885284,RESET_PHASE+PHASE_END,0,1)
 end
 function c80885284.thfilter(c,lv)
 	return c:IsLevelBelow(lv) and c:IsSetCard(0x8d) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

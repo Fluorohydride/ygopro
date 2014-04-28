@@ -20,7 +20,7 @@ function c72167543.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(72167543,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e3:SetCode(EVENT_BATTLE_END)
+	e3:SetCode(EVENT_BATTLED)
 	e3:SetOperation(c72167543.rmop)
 	c:RegisterEffect(e3)
 end

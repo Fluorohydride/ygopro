@@ -17,11 +17,12 @@ function c16037007.initial_effect(c)
 	e1:SetOperation(c16037007.disop)
 	c:RegisterEffect(e1)
 end
+c16037007.xyz_number=74
 function c16037007.discon(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg:IsContains(e:GetHandler()) and Duel.IsChainNegatable(ev)
+	return tg and tg:IsContains(e:GetHandler()) and Duel.IsChainNegatable(ev)
 end
 function c16037007.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

@@ -5,20 +5,15 @@ function c70089580.initial_effect(c)
 	e1:SetDescription(aux.Stringid(70089580,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetCountLimit(1,70089580)
 	e1:SetCondition(c70089580.condition)
-	e1:SetCost(c70089580.cost)
 	e1:SetTarget(c70089580.target)
 	e1:SetOperation(c70089580.operation)
 	c:RegisterEffect(e1)
 end
 function c70089580.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
-end
-function c70089580.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,70089580)==0 end
-	Duel.RegisterFlagEffect(tp,70089580,RESET_PHASE+PHASE_END,0,1)
 end
 function c70089580.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

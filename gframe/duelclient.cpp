@@ -976,6 +976,8 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
+			if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
+				mainGame->dField.pzone_act = true;
 		}
 		mainGame->dField.reposable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -1206,6 +1208,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.selectable_field = ~BufferIO::ReadInt32(pbuf);
 		mainGame->dField.selected_field = 0;
 		unsigned char respbuf[64];
+		int pzone = 0;
 		if (mainGame->dInfo.curMsg == MSG_SELECT_PLACE && mainGame->chkAutoPos->isChecked()) {
 			int filter;
 			if (mainGame->dField.selectable_field & 0x1f) {
@@ -1216,25 +1219,40 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
 				respbuf[1] = 0x8;
 				filter = (mainGame->dField.selectable_field >> 8) & 0x1f;
+			} else if (mainGame->dField.selectable_field & 0xc000) {
+				respbuf[0] = mainGame->dInfo.isFirst ? 0 : 1;
+				respbuf[1] = 0x8;
+				filter = (mainGame->dField.selectable_field >> 14) & 0x3;
+				pzone = 1;
 			} else if (mainGame->dField.selectable_field & 0x1f0000) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
 				respbuf[1] = 0x4;
 				filter = (mainGame->dField.selectable_field >> 16) & 0x1f;
-			} else {
+			} else if (mainGame->dField.selectable_field & 0x1f000000) {
 				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
 				respbuf[1] = 0x8;
 				filter = (mainGame->dField.selectable_field >> 24) & 0x1f;
-			}
-			if(mainGame->chkRandomPos->isChecked()) {
-				respbuf[2] = rnd.real() * 5;
-				while(!(filter & (1 << respbuf[2])))
-					respbuf[2] = rnd.real() * 5;
 			} else {
-				if (filter & 0x4) respbuf[2] = 2;
-				else if (filter & 0x2) respbuf[2] = 1;
-				else if (filter & 0x8) respbuf[2] = 3;
-				else if (filter & 0x1) respbuf[2] = 0;
-				else if (filter & 0x10) respbuf[2] = 4;
+				respbuf[0] = mainGame->dInfo.isFirst ? 1 : 0;
+				respbuf[1] = 0x8;
+				filter = (mainGame->dField.selectable_field >> 30) & 0x3;
+				pzone = 1;
+			}
+			if(!pzone) {
+				if(mainGame->chkRandomPos->isChecked()) {
+					respbuf[2] = rnd.real() * 5;
+					while(!(filter & (1 << respbuf[2])))
+						respbuf[2] = rnd.real() * 5;
+				} else {
+					if (filter & 0x4) respbuf[2] = 2;
+					else if (filter & 0x2) respbuf[2] = 1;
+					else if (filter & 0x8) respbuf[2] = 3;
+					else if (filter & 0x1) respbuf[2] = 0;
+					else if (filter & 0x10) respbuf[2] = 4;
+				}
+			} else {
+				if (filter & 0x1) respbuf[2] = 6;
+				else if (filter & 0x2) respbuf[2] = 7;
 			}
 			mainGame->dField.selectable_field = 0;
 			SetResponseB(respbuf, 3);
@@ -1407,6 +1425,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.sort_list.push_back(0);
 		}
 		if (mainGame->chkAutoChain->isChecked() && mainGame->dInfo.curMsg == MSG_SORT_CHAIN) {
+			mainGame->dField.sort_list.clear();
 			SetResponseI(-1);
 			DuelClient::SendResponse();
 			return true;
@@ -1641,8 +1660,16 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
 			for (auto cit = mainGame->dField.grave[player].begin(); cit != mainGame->dField.grave[player].end(); ++cit)
 				(*cit)->location = LOCATION_GRAVE;
-			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit)
-				(*cit)->location = LOCATION_DECK;
+			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
+				if ((*cit)->type & 0x802040) {
+					(*cit)->location = LOCATION_EXTRA;
+					mainGame->dField.extra[player].push_back(*cit);
+					cit = mainGame->dField.deck[player].erase(cit);
+				} else {
+					(*cit)->location = LOCATION_DECK;
+					++cit;
+				}
+			}
 		} else {
 			mainGame->gMutex.Lock();
 			mainGame->dField.grave[player].swap(mainGame->dField.deck[player]);
@@ -1650,9 +1677,17 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				(*cit)->location = LOCATION_GRAVE;
 				mainGame->dField.MoveCard(*cit, 10);
 			}
-			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ++cit) {
-				(*cit)->location = LOCATION_DECK;
-				mainGame->dField.MoveCard(*cit, 10);
+			for (auto cit = mainGame->dField.deck[player].begin(); cit != mainGame->dField.deck[player].end(); ) {
+				ClientCard* pcard = *cit;
+				if (pcard->type & 0x802040) {
+					pcard->location = LOCATION_EXTRA;
+					mainGame->dField.extra[player].push_back(pcard);
+					cit = mainGame->dField.deck[player].erase(cit);
+				} else {
+					pcard->location = LOCATION_DECK;
+					++cit;
+				}
+				mainGame->dField.MoveCard(pcard, 10);
 			}
 			mainGame->gMutex.Unlock();
 			mainGame->WaitFrameSignal(11);
@@ -1849,7 +1884,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		} else {
 			if (!(pl & 0x80) && !(cl & 0x80)) {
 				ClientCard* pcard = mainGame->dField.GetCard(pc, pl, ps);
-				if (code != 0 && pcard->code != code)
+				if (pcard->code != code && (code != 0 || cl == 0x40))
 					pcard->SetCode(code);
 				pcard->cHint = 0;
 				pcard->chValue = 0;
@@ -2737,7 +2772,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int player = */mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
 		mainGame->dField.announce_count = BufferIO::ReadInt8(pbuf);
 		int available = BufferIO::ReadInt32(pbuf);
-		for(int i = 0, filter = 0x1; i < 23; ++i, filter <<= 1) {
+		for(int i = 0, filter = 0x1; i < 24; ++i, filter <<= 1) {
 			mainGame->chkRace[i]->setChecked(false);
 			if(filter & available)
 				mainGame->chkRace[i]->setVisible(true);
@@ -2987,7 +3022,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					}
 				}
 			}
-			for(int seq = 0; seq < 6; ++seq) {
+			for(int seq = 0; seq < 8; ++seq) {
 				val = BufferIO::ReadInt8(pbuf);
 				if(val) {
 					ClientCard* ccard = new ClientCard;

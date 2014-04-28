@@ -29,5 +29,7 @@ function c81816475.operation(e,tp,eg,ep,ev,re,r,rp)
 	local mg=g1:Select(tp,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(81816475,1))
 	local tc=g2:Select(tp,1,1,nil):GetFirst()
+	local oc=mg:GetFirst():GetOverlayTarget()
 	Duel.Overlay(tc,mg)
+	Duel.RaiseSingleEvent(oc,EVENT_DETACH_MATERIAL,e,0,0,0,0)
 end

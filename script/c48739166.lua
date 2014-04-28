@@ -22,6 +22,7 @@ function c48739166.initial_effect(c)
 	e2:SetTarget(c48739166.reptg)
 	c:RegisterEffect(e2)
 end
+c48739166.xyz_number=101
 function c48739166.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,48739166)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
@@ -40,7 +41,7 @@ end
 function c48739166.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsFaceup() and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		local og=tc:GetOverlayGroup()
 		if og:GetCount()>0 then
 			Duel.SendtoGrave(og,REASON_RULE)
