@@ -28,7 +28,7 @@ function c91110378.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x86)
 end
 function c91110378.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c91110378.cfilter,1,nil)
+	return eg:IsExists(c91110378.cfilter,1,nil) and rp==tp
 end
 function c91110378.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
