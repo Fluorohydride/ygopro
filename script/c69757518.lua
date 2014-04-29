@@ -45,7 +45,7 @@ function c69757518.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c69757518.atop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToBattle() then
+	if e:GetHandler():IsRelateToBattle() and e:GetHandler():IsChainAttackable(2,true) then
 		Duel.ChainAttack()
 	end
 end

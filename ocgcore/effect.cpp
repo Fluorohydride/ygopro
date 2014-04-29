@@ -407,7 +407,7 @@ int32 effect::is_immuned(effect_set_v* effects) {
 	for (int i = 0; i < effects->count; ++i) {
 		peffect = effects->at(i);
 		if(type & 0x7f0) {
-			if(peffect->handler == owner)
+			if(peffect->owner == handler)
 				return FALSE;
 		} else {
 			if(peffect->owner == owner)

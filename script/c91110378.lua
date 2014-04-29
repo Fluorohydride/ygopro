@@ -24,11 +24,11 @@ function c91110378.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 end
-function c91110378.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x86)
+function c91110378.cfilter(c,tp)
+	return c:IsFaceup() and c:IsSetCard(0x86) and c:GetSummonPlayer()==tp
 end
 function c91110378.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c91110378.cfilter,1,nil) and rp==tp
+	return eg:IsExists(c91110378.cfilter,1,nil,tp)
 end
 function c91110378.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)

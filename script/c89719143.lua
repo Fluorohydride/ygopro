@@ -15,7 +15,7 @@ end
 function c89719143.condition(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return a:IsFaceup() and a:IsType(TYPE_FUSION) and at and at:IsFaceup() and at:IsType(TYPE_FUSION)
+	return a and at and a:IsFaceup() and a:IsType(TYPE_FUSION) and at:IsFaceup() and at:IsType(TYPE_FUSION)
 end
 function c89719143.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local a=Duel.GetAttacker()
