@@ -49,7 +49,7 @@ function c27174286.op(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c27174286.rmfilter(c,fid)
-	return c:GetFlagEffect(27174286)==fid
+	return c:GetFlagEffectLabel(27174286)==fid
 end
 function c27174286.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
