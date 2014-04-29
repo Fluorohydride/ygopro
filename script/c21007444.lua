@@ -57,7 +57,7 @@ function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c21007444.desfilter(c,fid)
-	return c:GetFlagEffect(21007444)==fid
+	return c:GetFlagEffectLabel(21007444)==fid
 end
 function c21007444.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=e:GetLabelObject()
