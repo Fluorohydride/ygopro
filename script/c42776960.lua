@@ -40,7 +40,7 @@ function c42776960.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EVENT_LEAVE_FIELD)
 		e2:SetLabel(1-tp)
 		e2:SetOperation(c42776960.leaveop)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetReset(RESET_EVENT+RESET_OVERLAY)
 		tc:RegisterEffect(e2)
 	end
 end
