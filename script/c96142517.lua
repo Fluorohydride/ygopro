@@ -28,23 +28,27 @@ end
 function c96142517.filter1(c,e,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 	and Duel.IsExistingMatchingCard(c96142517.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetRank()+1)
-
+	and Duel.IsExistingMatchingCard(c96142517.filter3,tp,0,LOCATION_GRAVE,1,nil,c:GetRank())
 end
 function c96142517.filter2(c,e,tp,rank)
 	return c:GetRank()==rank and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
-function c96142517.filter3(c,e,tp,rank)
+function c96142517.filter3(c,rank)
 	return c:GetRank()==rank and c:IsType(TYPE_XYZ)
 end
 function c96142517.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c96142517.filter1(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(c96142517.filter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil,e,tp)end
+		and Duel.IsExistingTarget(c96142517.filter1,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local tg=Duel.SelectTarget(tp,c96142517.filter1,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil,e,tp)
-	e:SetLabel(tg:GetFirst():GetRank())
-	local g=Duel.GetMatchingGroup(c96142517.filter3,tp,LOCATION_GRAVE,LOCATION_GRAVE,tg:GetFirst(),e,tp,tg:GetFirst():GetRank())
+	local tg=Duel.SelectTarget(tp,c96142517.filter1,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
+	local rank=tg:GetFirst():GetRank()
+	e:SetLabel(rank)
+	local tg2=Duel.SelectTarget(tp,c96142517.filter3,tp,0,LOCATION_GRAVE,1,1,nil,rank)
+	tg:Merge(tg2)
+	local g=Duel.GetMatchingGroup(c96142517.filter3,tp,LOCATION_GRAVE,LOCATION_GRAVE,tg:GetFirst(),rank)
+	g:Sub(tg2)
 	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(96142517,1)) then
 		g=g:Select(tp,1,99,nil)
 		tg:Merge(g)
