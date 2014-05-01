@@ -28,6 +28,8 @@ end
 function c4939890.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c4939890.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(4939890,1))
+	Duel.AnnounceNumber(tp,1)
 end
 function c4939890.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
@@ -46,6 +48,8 @@ end
 function c4939890.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c4939890.thfilter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(4939890,1))
+	Duel.AnnounceNumber(tp,2)
 end
 function c4939890.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

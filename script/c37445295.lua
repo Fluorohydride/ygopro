@@ -32,6 +32,8 @@ function c37445295.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c37445295.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(37445295,1))
+	Duel.AnnounceNumber(tp,1)
 end
 function c37445295.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
@@ -47,6 +49,8 @@ function c37445295.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(37445295,1))
+	Duel.AnnounceNumber(tp,2)
 end
 function c37445295.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

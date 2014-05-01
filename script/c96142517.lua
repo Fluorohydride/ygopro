@@ -36,7 +36,7 @@ function c96142517.filter2(c,e,tp,rk)
 end
 function c96142517.spfilter(c,e,tp,rk)
 	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_SPECIAL,tp,false,false)
 end
 function c96142517.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -69,7 +69,7 @@ function c96142517.activate(e,tp,eg,ep,ev,re,r,rp)
 	if sc then
 		local mg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 		Duel.Overlay(sc,mg)
-		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(sc,SUMMON_TYPE_SPECIAL,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
 	end
 end
