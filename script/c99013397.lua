@@ -61,7 +61,7 @@ function c99013397.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c99013397.descon(e,tp,eg,ep,ev,re,r,rp)
 	local eqc=e:GetHandler():GetEquipTarget()
-	return eqc==Duel.GetAttacker() or eqc==Duel.GetAttackTarget()
+	return eqc==Duel.GetAttacker()
 end
 function c99013397.dfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()

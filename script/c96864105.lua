@@ -1,4 +1,4 @@
---ＣＮｏ．７３激瀧瀑神アビス・スープラ
+--CNo.73 激瀧瀑神アビス・スープラ
 function c96864105.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),3)
@@ -21,17 +21,16 @@ function c96864105.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e2:SetCondition(c96864105.indescon)
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e2:SetCondition(c96864105.indcon)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 end
 c96864105.xyz_number=73
 function c96864105.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local at=Duel.GetAttacker()
-	local bt=Duel.GetAttackTarget()
-	return (at and at:GetControler()==tp or bt and bt:GetControler()==tp)
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	return d and a:GetControler()~=d:GetControler()
 		and Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and not Duel.IsDamageCalculated()
 end
 function c96864105.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -43,20 +42,16 @@ end
 function c96864105.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if not (a:IsRelateToBattle() and d and d:IsRelateToBattle()) then return end
+	if not a:IsRelateToBattle() or a:IsFacedown() or not d:IsRelateToBattle() or d:IsFacedown() then return end
+	if a:IsControler(1-tp) then a,d=d,a end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetOwnerPlayer(tp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_DAMAGE_CAL)
-	if a:GetControler()==tp then
-		e1:SetValue(d:GetAttack())
-		a:RegisterEffect(e1)
-	else
-		e1:SetValue(a:GetAttack())
-		d:RegisterEffect(e1)
-	end
+	e1:SetValue(d:GetAttack())
+	a:RegisterEffect(e1)
 end
-function c96864105.indescon(e,tp,eg,ep,ev,re,r,rp)
-	return  e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,36076683)
+function c96864105.indcon(e)
+	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,36076683)
 end

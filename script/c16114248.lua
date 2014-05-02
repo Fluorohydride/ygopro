@@ -22,8 +22,8 @@ function c16114248.spfilter2(c,code)
 	return c:IsRace(RACE_MACHINE) and c:IsCode(code)
 end
 function c16114248.fscondition(e,mg,gc)
-	if mg==nil then return false end
-	if gc then return true end
+	if mg==nil then return true end
+	if gc then return false end
 	return mg:IsExists(c16114248.spfilter,1,nil,mg)
 end
 function c16114248.fsoperation(e,tp,eg,ep,ev,re,r,rp,gc)

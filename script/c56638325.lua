@@ -14,6 +14,12 @@ function c56638325.initial_effect(c)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EVENT_CHAIN_END)
+	e3:SetOperation(c56638325.limop2)
+	c:RegisterEffect(e3)
 	--destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(56638325,0))
@@ -45,7 +51,17 @@ function c56638325.limcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayCount()>0 and eg:IsExists(c56638325.limfilter,1,nil,tp)
 end
 function c56638325.limop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SetChainLimitTillChainEnd(c56638325.chainlm)
+	if Duel.GetCurrentChain()==0 then
+		Duel.SetChainLimitTillChainEnd(c56638325.chainlm)
+	else
+		e:GetHandler():RegisterFlagEffect(56638325,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	end
+end
+function c56638325.limop2(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetOverlayCount()>0 and e:GetHandler():GetFlagEffect(56638325)~=0 then
+		Duel.SetChainLimitTillChainEnd(c56638325.chainlm)
+	end
+	e:GetHandler():ResetFlagEffect(56638325)
 end
 function c56638325.chainlm(e,rp,tp)
 	return tp==rp
