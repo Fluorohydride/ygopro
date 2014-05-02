@@ -28,9 +28,9 @@ function c10282757.activate(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetTarget(c10282757.filter2)
 	Duel.RegisterEffect(e3,tp)
 end
-function c10282757.filter1(c)
+function c10282757.filter1(e,c)
 	return c:IsType(TYPE_XYZ) and c:IsRankBelow(3)
 end
-function c10282757.filter2(c)
+function c10282757.filter2(e,c)
 	return c:IsType(TYPE_XYZ) and c:IsRankAbove(4)
 end
