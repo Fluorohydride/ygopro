@@ -35,7 +35,7 @@ function c4239451.adcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSequence()==6 or e:GetHandler():GetSequence()==7
 end
 function c4239451.filter(c)
-	return c:IsFaceup() and c:GetAttack()~=c:GetDefence()
+	return c:IsFaceup()
 end
 function c4239451.adtg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c4239451.filter(chkc) end

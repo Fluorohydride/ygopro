@@ -16,7 +16,7 @@ function c80566312.repfilter(c,tp)
 		and c:IsReason(REASON_EFFECT+REASON_BATTLE)
 end
 function c80566312.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c80566312.repfilter,1,nil,tp) end
+	if chk==0 then return e:GetHandler():IsAbleToRemove() and eg:IsExists(c80566312.repfilter,1,nil,tp) end
 	return Duel.SelectYesNo(tp,aux.Stringid(80566312,0))
 end
 function c80566312.repval(e,c)

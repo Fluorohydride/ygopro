@@ -19,7 +19,7 @@ function c79967395.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ph==PHASE_MAIN1 or ph==PHASE_MAIN2
 end
 function c79967395.filter(c)
-	return c:IsFaceup() and c:GetAttack()~=c:GetDefence()
+	return c:IsFaceup()
 end
 function c79967395.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c79967395.filter(chkc) end
