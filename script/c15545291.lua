@@ -47,6 +47,9 @@ end
 function c15545291.desfilter(c)
 	return c:IsFacedown() and c:IsDestructable()
 end
+function c15545291.tribfilter(c)
+	return c:GetPreviousAttributeOnField()==ATTRIBUTE_EARTH
+end
 function c15545291.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c15545291.desfilter(chkc) end
 	if chk==0 then return true end
@@ -54,7 +57,7 @@ function c15545291.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c15545291.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	local mg=e:GetHandler():GetMaterial()
-	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_EARTH) then
+	if mg:IsExists(c15545291.tribfilter,1,nil) then
 		e:SetLabel(1)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 	else
