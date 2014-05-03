@@ -5,8 +5,8 @@ function c33611061.initial_effect(c)
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_HANDES)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,33611061+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c33611061.condition)
-	e1:SetCost(c33611061.cost)
 	e1:SetTarget(c33611061.target)
 	e1:SetOperation(c33611061.activate)
 	c:RegisterEffect(e1)
@@ -16,10 +16,6 @@ function c33611061.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c33611061.filter(c)
 	return c:IsSetCard(0x88) and c:IsRace(RACE_BEASTWARRIOR) and c:IsAbleToDeck()
-end
-function c33611061.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,33611061)==0 end
-	Duel.RegisterFlagEffect(tp,33611061,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c33611061.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c33611061.filter,tp,LOCATION_GRAVE,0,1,nil) end

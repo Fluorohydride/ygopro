@@ -28,7 +28,7 @@ function c37781520.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
+	e3:SetCountLimit(1,37781520)
 	e3:SetCost(c37781520.hdcost)
 	e3:SetTarget(c37781520.hdtg)
 	e3:SetOperation(c37781520.hdop)
@@ -77,10 +77,9 @@ function c37781520.costfilter(c)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsSetCard(0x74)
 end
 function c37781520.hdcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,37781520)==0 and Duel.CheckReleaseGroup(tp,c37781520.costfilter,1,e:GetHandler()) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c37781520.costfilter,1,e:GetHandler()) end
 	local sg=Duel.SelectReleaseGroup(tp,c37781520.costfilter,1,1,e:GetHandler())
 	Duel.Release(sg,REASON_COST)
-	Duel.RegisterFlagEffect(tp,37781520,RESET_PHASE+PHASE_END,0,1)
 end
 function c37781520.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)~=0 end

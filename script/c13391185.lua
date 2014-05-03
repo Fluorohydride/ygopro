@@ -16,8 +16,8 @@ function c13391185.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,13391185)
 	e2:SetCondition(c13391185.thcon)
-	e2:SetCost(c13391185.thcost)
 	e2:SetTarget(c13391185.thtg)
 	e2:SetOperation(c13391185.thop)
 	c:RegisterEffect(e2)
@@ -32,10 +32,6 @@ function c13391185.eqcon2(e)
 end
 function c13391185.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c13391185.eqcon2(e)
-end
-function c13391185.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,13391185)==0 end
-	Duel.RegisterFlagEffect(tp,13391185,RESET_PHASE+PHASE_END,0,1)
 end
 function c13391185.thfilter(c)
 	return c:IsSetCard(0x107a) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

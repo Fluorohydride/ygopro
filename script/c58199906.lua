@@ -5,14 +5,14 @@ function c58199906.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,58199906+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c58199906.cost)
 	e1:SetOperation(c58199906.activate)
 	c:RegisterEffect(e1)
 end
 function c58199906.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,58199906)==0 end
+	if chk==0 then return true end
 	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
-	Duel.RegisterFlagEffect(tp,58199906,RESET_PHASE+PHASE_END,0,1)
 end
 function c58199906.activate(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

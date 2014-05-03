@@ -7,15 +7,15 @@ function c45705025.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,45705025)
 	e1:SetCost(c45705025.cost)
 	e1:SetTarget(c45705025.target)
 	e1:SetOperation(c45705025.operation)
 	c:RegisterEffect(e1)
 end
 function c45705025.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,45705025)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,45705025,RESET_PHASE+PHASE_END,0,1)
 end
 function c45705025.filter(c,e,tp)
 	return c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

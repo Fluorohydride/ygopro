@@ -6,14 +6,10 @@ function c35537251.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCost(c35537251.spcost)
+	e1:SetCountLimit(1,35537251)
 	e1:SetTarget(c35537251.sptg)
 	e1:SetOperation(c35537251.spop)
 	c:RegisterEffect(e1)
-end
-function c35537251.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,35537251)==0 end
-	Duel.RegisterFlagEffect(tp,35537251,RESET_PHASE+PHASE_END,0,1)
 end
 function c35537251.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

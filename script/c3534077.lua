@@ -6,16 +6,11 @@ function c3534077.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,3534077)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCost(c3534077.spcost)
 	e1:SetTarget(c3534077.sptg)
 	e1:SetOperation(c3534077.spop)
 	c:RegisterEffect(e1)
-end
-function c3534077.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,3534077)==0 end
-	Duel.RegisterFlagEffect(tp,3534077,RESET_PHASE+PHASE_END,0,1)
 end
 function c3534077.filter(c,e,tp)
 	return c:IsRace(RACE_BEASTWARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:GetLevel()==4 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

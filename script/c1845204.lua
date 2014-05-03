@@ -5,15 +5,15 @@ function c1845204.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,1845204+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c1845204.cost)
 	e1:SetTarget(c1845204.target)
 	e1:SetOperation(c1845204.activate)
 	c:RegisterEffect(e1)
 end
 function c1845204.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,1845204)==0 and Duel.CheckLPCost(tp,1000) end
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
-	Duel.RegisterFlagEffect(tp,1845204,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c1845204.filter(c,e,tp)
 	return c:IsType(TYPE_FUSION) and c:GetLevel()<=5

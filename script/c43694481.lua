@@ -6,20 +6,15 @@ function c43694481.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_NO_TURN_RESET)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,43694481)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c43694481.damcon)
-	e1:SetCost(c43694481.damcost)
 	e1:SetTarget(c43694481.damtg)
 	e1:SetOperation(c43694481.damop)
 	c:RegisterEffect(e1)
 end
 function c43694481.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetAttack()>e:GetHandler():GetBaseAttack()
-end
-function c43694481.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,43694481)==0 end
-	Duel.RegisterFlagEffect(tp,43694481,RESET_PHASE+PHASE_END,0,1)
 end
 function c43694481.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

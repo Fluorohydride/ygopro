@@ -6,6 +6,7 @@ function c62023839.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,62023839)
 	e1:SetCondition(c62023839.spcon)
 	e1:SetCost(c62023839.spcost)
 	e1:SetTarget(c62023839.sptg)
@@ -19,10 +20,8 @@ function c62023839.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsDiscardable()
 end
 function c62023839.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,62023839)==0
-		and Duel.IsExistingMatchingCard(c62023839.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c62023839.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c62023839.cfilter,1,1,REASON_COST+REASON_DISCARD)
-	Duel.RegisterFlagEffect(tp,62023839,RESET_PHASE+PHASE_END,0,1)
 end
 function c62023839.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

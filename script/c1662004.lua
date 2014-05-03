@@ -14,7 +14,7 @@ function c1662004.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e2:SetCost(c1662004.spcost)
+	e2:SetCountLimit(1,1662004)
 	e2:SetTarget(c1662004.sptg)
 	e2:SetOperation(c1662004.spop)
 	c:RegisterEffect(e2)
@@ -22,10 +22,6 @@ end
 function c1662004.synlimit(e,c)
 	if not c then return false end
 	return not c:IsRace(RACE_BEASTWARRIOR)
-end
-function c1662004.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,1662004)==0 end
-	Duel.RegisterFlagEffect(tp,1662004,RESET_PHASE+PHASE_END,0,1)
 end
 function c1662004.spfilter(c,e,tp)
 	return c:IsDefenceBelow(200) and c:IsAttribute(ATTRIBUTE_FIRE) and c:GetLevel()==3 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

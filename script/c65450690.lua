@@ -5,15 +5,15 @@ function c65450690.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,65450690+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c65450690.cost)
 	e1:SetTarget(c65450690.target)
 	e1:SetOperation(c65450690.activate)
 	c:RegisterEffect(e1)
 end
 function c65450690.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,1000) and Duel.GetFlagEffect(tp,65450690)==0 end
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
-	Duel.RegisterFlagEffect(tp,65450690,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c65450690.filter(c,e,tp)
 	return bit.band(c:GetType(),0x81)==0x81 and c:IsCanBeSpecialSummoned(e,0,tp,true,false)

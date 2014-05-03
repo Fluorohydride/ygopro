@@ -6,8 +6,8 @@ function c33551032.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetCountLimit(1,33551032)
 	e1:SetCondition(c33551032.spcon)
-	e1:SetCost(c33551032.spcost)
 	e1:SetTarget(c33551032.sptg)
 	e1:SetOperation(c33551032.spop)
 	c:RegisterEffect(e1)
@@ -15,10 +15,6 @@ end
 function c33551032.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return Duel.GetAttacker()==c and c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE)
-end
-function c33551032.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,33551032)==0 end
-	Duel.RegisterFlagEffect(tp,33551032,RESET_PHASE+PHASE_END,0,1)
 end
 function c33551032.spfilter(c,e,tp)
 	return c:IsSetCard(0x87) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

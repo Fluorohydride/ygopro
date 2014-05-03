@@ -6,7 +6,7 @@ function c24861088.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCost(c24861088.cost)
+	e1:SetCountLimit(1,24861088)
 	e1:SetTarget(c24861088.target)
 	e1:SetOperation(c24861088.operation)
 	c:RegisterEffect(e1)
@@ -16,6 +16,7 @@ function c24861088.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,24861088)
 	e2:SetCondition(c24861088.spcon)
 	e2:SetCost(c24861088.spcost)
 	e2:SetTarget(c24861088.sptg)
@@ -34,10 +35,6 @@ function c24861088.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if not re:GetHandler():IsSetCard(0x70) then
 		Duel.RegisterFlagEffect(rp,24861089,RESET_PHASE+PHASE_END,0,1)
 	end
-end
-function c24861088.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,24861088)==0 end
-	Duel.RegisterFlagEffect(tp,24861088,RESET_PHASE+PHASE_END,0,1)
 end
 function c24861088.filter(c)
 	return c:IsSetCard(0x70) and not c:IsCode(24861088) and c:IsAbleToHand()
@@ -62,8 +59,7 @@ function c24861088.spcon(e,tp,eg,ep,ev,re,r,rp)
 		and not Duel.IsExistingMatchingCard(c24861088.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c24861088.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,24861088)==0 and Duel.GetFlagEffect(tp,24861089)==0 end
-	Duel.RegisterFlagEffect(tp,24861088,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return Duel.GetFlagEffect(tp,24861089)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)

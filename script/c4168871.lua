@@ -6,6 +6,7 @@ function c4168871.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,4168871+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c4168871.cost)
 	e1:SetTarget(c4168871.target)
 	e1:SetOperation(c4168871.activate)
@@ -15,7 +16,7 @@ function c4168871.filter(c)
 	return c:IsSetCard(0x33) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 end
 function c4168871.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) and Duel.GetFlagEffect(tp,4168871)==0
+	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp)
 		and Duel.IsExistingMatchingCard(c4168871.filter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c4168871.filter,tp,LOCATION_HAND,0,1,1,nil)
@@ -27,7 +28,6 @@ function c4168871.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,4168871,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c4168871.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end

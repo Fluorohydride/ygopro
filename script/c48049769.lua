@@ -6,13 +6,14 @@ function c48049769.initial_effect(c)
 	e1:SetCategory(CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,48049769)
 	e1:SetCost(c48049769.cost)
 	e1:SetTarget(c48049769.target)
 	e1:SetOperation(c48049769.operation)
 	c:RegisterEffect(e1)
 end
 function c48049769.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) and Duel.GetFlagEffect(tp,48049769)==0 and e:GetHandler():IsDiscardable() end
+	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) and e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -22,7 +23,6 @@ function c48049769.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,48049769,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c48049769.filter(c)
 	return c:IsRace(RACE_THUNDER) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:GetLevel()==4 and c:IsAttackBelow(1600) and c:IsAbleToHand()

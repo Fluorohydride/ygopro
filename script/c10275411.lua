@@ -7,8 +7,8 @@ function c10275411.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_END_PHASE)
+	e1:SetCountLimit(1,10275411+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c10275411.condition)
-	e1:SetCost(c10275411.cost)
 	e1:SetTarget(c10275411.target)
 	e1:SetOperation(c10275411.activate)
 	c:RegisterEffect(e1)
@@ -18,10 +18,6 @@ function c10275411.cfilter(c)
 end
 function c10275411.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c10275411.cfilter,tp,0,LOCATION_MZONE,1,nil)
-end
-function c10275411.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,10275411)==0 end
-	Duel.RegisterFlagEffect(tp,10275411,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c10275411.filter(c,e,tp)
 	return c:IsType(TYPE_XYZ) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -35,7 +31,6 @@ function c10275411.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
 function c10275411.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local g1=Duel.GetOverlayGroup(tp,0,1)

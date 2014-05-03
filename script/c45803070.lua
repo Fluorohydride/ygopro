@@ -24,7 +24,7 @@ function c45803070.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
-	e3:SetCost(c45803070.setcost)
+	e3:SetCountLimit(1,45803070)
 	e3:SetTarget(c45803070.settg)
 	e3:SetOperation(c45803070.setop)
 	c:RegisterEffect(e3)
@@ -49,10 +49,6 @@ function c45803070.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
 	end
-end
-function c45803070.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,45803070)==0 end
-	Duel.RegisterFlagEffect(tp,45803070,RESET_PHASE+PHASE_END,0,1)
 end
 function c45803070.setfilter(c)
 	return c:GetType()==TYPE_TRAP and (c:IsSetCard(0x4c) or c:IsSetCard(0x89)) and c:IsSSetable()

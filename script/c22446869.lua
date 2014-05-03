@@ -16,6 +16,7 @@ function c22446869.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCountLimit(1,22446869)
 	e2:SetCondition(c22446869.thcon)
 	e2:SetTarget(c22446869.thtg)
 	e2:SetOperation(c22446869.thop)
@@ -47,8 +48,7 @@ function c22446869.thfilter(c)
 	return c:IsSetCard(0x74) and c:IsLevelBelow(4) and c:IsAbleToHand()
 end
 function c22446869.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,22446869)==0 end
-	Duel.RegisterFlagEffect(tp,22446869,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c22446869.thop(e,tp,eg,ep,ev,re,r,rp)
