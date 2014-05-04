@@ -24,6 +24,12 @@ function c69327790.initial_effect(c)
 	e3:SetTarget(c69327790.tdtg)
 	e3:SetOperation(c69327790.tdop)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_MATERIAL_CHECK)
+	e4:SetValue(c69327790.valcheck)
+	e4:SetLabelObject(e3)
+	c:RegisterEffect(e4)
 end
 function c69327790.otfilter(c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
@@ -52,16 +58,12 @@ function c69327790.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g1=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g2=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
-	local mg=e:GetHandler():GetMaterial()
-	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WIND)
+	if e:GetLabel()==1
 		and Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,g1:GetFirst())
 		and Duel.SelectYesNo(tp,aux.Stringid(69327790,2)) then
-		e:SetLabel(1)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 		local g3=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,g1:GetFirst())
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g3,1,0,0)
-	else
-		e:SetLabel(0)
 	end
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g1,2,0,0)
@@ -82,5 +84,13 @@ function c69327790.tdop(e,tp,eg,ep,ev,re,r,rp)
 		if tc:IsRelateToEffect(e) then
 			Duel.SendtoHand(g2,nil,REASON_EFFECT)
 		end
+	end
+end
+function c69327790.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WIND) then
+		e:GetLabelObject():SetLabel(1)
+	else
+		e:GetLabelObject():SetLabel(0)
 	end
 end
