@@ -1376,7 +1376,7 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 			|| attacker->current.controler != pduel->game_field->infos.turn_player
 	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
 	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
-	        || attacker->announce_count >= ac) {
+	        || (ac != 0 && attacker->announce_count >= ac)) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
