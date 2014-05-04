@@ -43,11 +43,14 @@ end
 function c69230391.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE
 end
+function c69230391.tribfilter(c)
+	return c:GetPreviousAttributeOnField()==ATTRIBUTE_FIRE
+end
 function c69230391.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
 	local mg=e:GetHandler():GetMaterial()
-	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_FIRE) then
+	if mg:IsExists(c69230391.tribfilter,1,nil) then
 		e:SetLabel(1)
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1000)
 	else

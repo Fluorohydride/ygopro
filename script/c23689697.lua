@@ -47,6 +47,9 @@ end
 function c23689697.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
+function c23689697.tribfilter(c)
+	return c:GetPreviousAttributeOnField()==ATTRIBUTE_WATER
+end
 function c23689697.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c23689697.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c23689697.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
@@ -54,7 +57,7 @@ function c23689697.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c23689697.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	local mg=e:GetHandler():GetMaterial()
-	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WATER) then
+	if mg:IsExists(c23689697.tribfilter,1,nil) then
 		Duel.SetChainLimit(c23689697.chlimit)
 	end
 end
