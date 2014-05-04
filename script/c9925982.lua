@@ -27,7 +27,7 @@ function c9925982.activate(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,9925983,0,0x4011,0,800,2,RACE_WINDBEAST,ATTRIBUTE_DARK) then
 		for i=1,2 do
 			local token=Duel.CreateToken(tp,9925983)
-			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
+			Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
 		end
 		Duel.SpecialSummonComplete()
 	end
