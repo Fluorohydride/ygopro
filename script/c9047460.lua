@@ -24,7 +24,7 @@ function c9047460.initial_effect(c)
 end
 function c9047460.tkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return c:IsFaceup() and c:GetLocation()~=LOCATION_DECK
+	return c:IsPreviousPosition(POS_FACEUP) and c:GetLocation()~=LOCATION_DECK
 end
 function c9047460.tktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

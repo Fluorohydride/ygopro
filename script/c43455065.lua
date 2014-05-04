@@ -16,7 +16,7 @@ function c43455065.filter(c)
 end
 function c43455065.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(c43455065.filter,tp,0,LOCATION_ONFIELD,nil)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,ct) end
+	if chk==0 then return ct>0 and Duel.IsPlayerCanDraw(tp,ct) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ct)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct)
