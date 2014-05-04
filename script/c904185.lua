@@ -5,6 +5,7 @@ function c904185.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,904185+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c904185.cost)
 	e1:SetTarget(c904185.target)
 	e1:SetOperation(c904185.activate)
@@ -14,11 +15,10 @@ function c904185.rfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WIND) and not c:IsType(TYPE_TOKEN)
 end
 function c904185.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,904185)==0 and Duel.CheckReleaseGroup(tp,c904185.rfilter,1,nil) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c904185.rfilter,1,nil) end
 	local g=Duel.SelectReleaseGroup(tp,c904185.rfilter,1,10,nil)
 	e:SetLabel(g:GetCount())
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,904185,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c904185.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1

@@ -13,6 +13,7 @@ function c95084054.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCondition(c95084054.damcon)
 	e2:SetTarget(c95084054.damtg)
 	e2:SetOperation(c95084054.damop)
@@ -28,11 +29,10 @@ function c95084054.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c95084054.filter,1,nil)
 end
 function c95084054.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(95084054)==0 end
+	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(600)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,600)
-	e:GetHandler():RegisterFlagEffect(95084054,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c95084054.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

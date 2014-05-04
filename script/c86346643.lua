@@ -16,6 +16,7 @@ function c86346643.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetCategory(CATEGORY_TODECK)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCost(c86346643.tdcost1)
 	e2:SetTarget(c86346643.tdtg1)
 	e2:SetOperation(c86346643.tdop1)
@@ -25,6 +26,7 @@ function c86346643.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e3:SetCost(c86346643.tdcost2)
 	e3:SetTarget(c86346643.tdtg2)
 	e3:SetOperation(c86346643.tdop2)
@@ -34,6 +36,7 @@ function c86346643.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetCategory(CATEGORY_TODECK)
 	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e4:SetCost(c86346643.tdcost3)
 	e4:SetTarget(c86346643.tdtg3)
 	e4:SetOperation(c86346643.tdop3)
@@ -57,10 +60,8 @@ function c86346643.tdcost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c86346643.tdtg1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(86346643)==0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_MZONE,nil)
-	e:GetHandler():RegisterFlagEffect(86346643,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end
 function c86346643.tdop1(e,tp,eg,ep,ev,re,r,rp)
@@ -81,10 +82,8 @@ function c86346643.filter2(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToDeck()
 end
 function c86346643.tdtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(86346643)==0
-		and Duel.IsExistingMatchingCard(c86346643.filter2,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c86346643.filter2,tp,0,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(c86346643.filter2,tp,0,LOCATION_ONFIELD,nil)
-	e:GetHandler():RegisterFlagEffect(86346643,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end
 function c86346643.tdop2(e,tp,eg,ep,ev,re,r,rp)
@@ -97,10 +96,8 @@ function c86346643.tdcost3(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardDeck(tp,1,REASON_COST)
 end
 function c86346643.tdtg3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(86346643)==0
-		and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_GRAVE,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,0,LOCATION_GRAVE,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,0,LOCATION_GRAVE,nil)
-	e:GetHandler():RegisterFlagEffect(86346643,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 end
 function c86346643.tdop3(e,tp,eg,ep,ev,re,r,rp)

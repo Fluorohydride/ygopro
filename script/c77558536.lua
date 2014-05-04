@@ -6,7 +6,7 @@ function c77558536.initial_effect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DECKDES)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(c77558536.cost)
+	e1:SetCountLimit(1,77558536)
 	e1:SetTarget(c77558536.target)
 	e1:SetOperation(c77558536.operation)
 	c:RegisterEffect(e1)
@@ -22,10 +22,6 @@ function c77558536.initial_effect(c)
 	e2:SetTarget(c77558536.distg)
 	e2:SetOperation(c77558536.disop)
 	c:RegisterEffect(e2)
-end
-function c77558536.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,77558536)==0 end
-	Duel.RegisterFlagEffect(tp,77558536,RESET_PHASE+PHASE_END,0,1)
 end
 function c77558536.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,2) end

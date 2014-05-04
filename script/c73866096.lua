@@ -5,6 +5,7 @@ function c73866096.initial_effect(c)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,73866096+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c73866096.cost)
 	e1:SetTarget(c73866096.target)
 	e1:SetOperation(c73866096.activate)
@@ -15,12 +16,10 @@ function c73866096.cfilter(c)
 		and (c:IsLocation(LOCATION_HAND) or c:IsFaceup())
 end
 function c73866096.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,73866096)==0
-		and Duel.IsExistingMatchingCard(c73866096.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c73866096.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c73866096.cfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,73866096,RESET_PHASE+PHASE_END,0,1)
 end
 function c73866096.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end

@@ -7,7 +7,7 @@ function c68815132.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(c68815132.cost)
+	e1:SetCountLimit(1,68815132)
 	e1:SetTarget(c68815132.target)
 	e1:SetOperation(c68815132.operation)
 	c:RegisterEffect(e1)
@@ -19,10 +19,6 @@ function c68815132.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e2:SetValue(76812113)
 	c:RegisterEffect(e2)
-end
-function c68815132.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,68815132)==0 end
-	Duel.RegisterFlagEffect(tp,68815132,RESET_PHASE+PHASE_END,0,1)
 end
 function c68815132.filter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WIND) and c:IsAbleToHand()
@@ -38,7 +34,6 @@ function c68815132.sumfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WIND) and c:IsSummonable(true,nil)
 end
 function c68815132.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 and tc:IsLocation(LOCATION_HAND+LOCATION_EXTRA) then
 		if Duel.IsExistingMatchingCard(c68815132.sumfilter,tp,LOCATION_HAND,0,1,nil)

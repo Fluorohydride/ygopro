@@ -6,6 +6,7 @@ function c92418590.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,92418590)
 	e1:SetCost(c92418590.cost)
 	e1:SetTarget(c92418590.target)
 	e1:SetOperation(c92418590.operation)
@@ -22,12 +23,10 @@ function c92418590.cfilter(c)
 	return c:IsSetCard(0x83) and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
 end
 function c92418590.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,92418590)==0
-		and Duel.IsExistingMatchingCard(c92418590.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c92418590.cfilter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c92418590.cfilter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,92418590,RESET_PHASE+PHASE_END,0,1)
 end
 function c92418590.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

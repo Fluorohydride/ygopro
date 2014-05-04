@@ -8,6 +8,7 @@ function c89662736.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_BE_BATTLE_TARGET)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,89662736)
 	e1:SetCondition(c89662736.nacon)
 	e1:SetCost(c89662736.nacost)
 	e1:SetTarget(c89662736.natg)
@@ -19,9 +20,8 @@ function c89662736.nacon(e,tp,eg,ep,ev,re,r,rp)
 	return at:IsControler(tp) and at:IsFaceup() and at:IsSetCard(0x88) and at:IsRace(RACE_BEASTWARRIOR)
 end
 function c89662736.nacost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,89662736)==0 and e:GetHandler():IsAbleToGraveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-	Duel.RegisterFlagEffect(tp,89662736,RESET_PHASE+PHASE_END,0,1)
 end
 function c89662736.natg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end

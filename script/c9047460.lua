@@ -16,6 +16,7 @@ function c9047460.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,9047460+EFFECT_COUNT_CODE_DUEL)
 	e2:SetCost(c9047460.spcost)
 	e2:SetTarget(c9047460.sptg)
 	e2:SetOperation(c9047460.spop)
@@ -38,10 +39,9 @@ function c9047460.tkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c9047460.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) and Duel.GetFlagEffect(tp,9047460)==0 end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
 	local sg=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
 	Duel.Release(sg,REASON_COST)
-	Duel.RegisterFlagEffect(tp,9047460,0,0,0)
 end
 function c9047460.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1

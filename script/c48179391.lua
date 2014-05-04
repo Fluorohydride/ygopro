@@ -47,7 +47,7 @@ function c48179391.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c48179391.actcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,48179391)==0  end
+	if chk==0 then return Duel.GetFlagEffect(tp,48179391)==0 end
 	Duel.RegisterFlagEffect(tp,48179391,0,0,0)
 end
 function c48179391.desfilter(c)

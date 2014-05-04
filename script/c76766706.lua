@@ -6,8 +6,8 @@ function c76766706.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,76766706+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c76766706.condition)
-	e1:SetCost(c76766706.cost)
 	e1:SetTarget(c76766706.target)
 	e1:SetOperation(c76766706.activate)
 	c:RegisterEffect(e1)
@@ -18,10 +18,6 @@ end
 function c76766706.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c76766706.cfilter,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_LIGHT)
 		and Duel.IsExistingMatchingCard(c76766706.cfilter,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_DARK)
-end
-function c76766706.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,76766706)==0 end
-	Duel.RegisterFlagEffect(tp,76766706,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c76766706.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToHand()
