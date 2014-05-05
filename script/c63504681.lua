@@ -41,7 +41,7 @@ function c63504681.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
-	e5:SetValue(1)
+	e5:SetValue(c63504681.efilter)
 	e5:SetCondition(c63504681.effcon)
 	e5:SetLabel(3)
 	c:RegisterEffect(e5)
@@ -83,6 +83,9 @@ function c63504681.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c63504681.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayCount()>=e:GetLabel()
+end
+function c63504681.efilter(e,te)
+	return te:GetOwner()~=e:GetHandler()
 end
 function c63504681.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
