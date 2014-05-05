@@ -74,7 +74,7 @@ function c69757518.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local sg1=sg:Select(tp,1,1,nil)
 		local c=e:GetHandler()
-		if Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT) and c:IsRelateToEffect(e) then
+		if Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
 			sg:Sub(sg1)
 			Duel.Overlay(c,sg)
 		end
