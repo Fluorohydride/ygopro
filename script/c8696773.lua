@@ -37,7 +37,7 @@ end
 function c8696773.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(rc)
 	e1:SetDescription(aux.Stringid(8696773,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
