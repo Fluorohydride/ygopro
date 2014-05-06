@@ -3270,12 +3270,12 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 			}
 			if(move_player == playerid) {
 				if(location == LOCATION_SZONE)
-					flag = ((flag << 8) & 0xff00) | 0xffff00ff;
+					flag = ((flag << 8) & 0xff00) | 0xffffc0ff;
 				else
 					flag = (flag & 0xff) | 0xffffff00;
 			} else {
 				if(location == LOCATION_SZONE)
-					flag = ((flag << 24) & 0xff000000) | 0xffffff;
+					flag = ((flag << 24) & 0xff000000) | 0xc0ffffff;
 				else
 					flag = ((flag << 16) & 0xff0000) | 0xff00ffff;
 			}
