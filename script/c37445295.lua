@@ -50,7 +50,7 @@ function c37445295.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c37445295.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE) then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)~=0 then
 		Duel.ConfirmCards(1-tp,c)
 	end
 end
