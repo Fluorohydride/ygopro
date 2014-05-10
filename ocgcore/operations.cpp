@@ -833,6 +833,7 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 	case 0: {
 		uint8 p1 = pcard1->current.controler, p2 = pcard2->current.controler;
 		uint8 l1 = pcard1->current.location, l2 = pcard2->current.location;
+		uint8 l3 = pcard1->previous.location, l4 = pcard1->previous.location;
 		uint8 s1 = pcard1->current.sequence, s2 = pcard2->current.sequence;
 		returns.ivalue[0] = 0;
 		if(pcard1->overlay_target || pcard2->overlay_target)
@@ -859,6 +860,8 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 			pduel->game_field->add_unique_card(pcard1);
 		if(pcard2->unique_code)
 			pduel->game_field->add_unique_card(pcard2);
+		pcard1->previous.location = l3;
+		pcard2->previous.location = l4;
 		set_control(pcard1, p2, reset_phase, reset_count);
 		set_control(pcard2, p1, reset_phase, reset_count);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);
