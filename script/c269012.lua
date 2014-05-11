@@ -70,7 +70,7 @@ function c269012.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,0x41)==0x41 and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c269012.filter(c)
-	return c:IsRace(RACE_DEVINE) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsAttribute(ATTRIBUTE_DEVINE) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c269012.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c269012.filter,tp,LOCATION_DECK,0,1,nil) end
