@@ -39,7 +39,7 @@ function c81913510.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local code=e:GetLabel()
 	local tc=Duel.GetFirstMatchingCard(c81913510.filter2,tp,LOCATION_EXTRA,0,nil,code,e,tp)
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP) then
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)~=0 then
 		tc:CompleteProcedure()
 	end
 end

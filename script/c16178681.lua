@@ -43,10 +43,12 @@ function c16178681.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	if seq~=6 and seq~=7 then return false end
 	local tc=Duel.GetAttacker()
 	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
-	return ep==tp and tc and tc:IsType(TYPE_PENDULUM) and Duel.SelectYesNo(tp,aux.Stringid(16178681,2))
+	return ep==tp and tc and tc:IsType(TYPE_PENDULUM)
 end
 function c16178681.rdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(tp,0)
+	if Duel.SelectYesNo(tp,aux.Stringid(16178681,2)) then
+		Duel.ChangeBattleDamage(tp,0)
+	end
 end
 function c16178681.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local seq=e:GetHandler():GetSequence()
