@@ -52,17 +52,17 @@ function c55742055.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
 	e5:SetRange(LOCATION_SZONE)
 	e5:SetCode(EVENT_PHASE+PHASE_END)
-	e5:SetLabel(12)
 	e5:SetCountLimit(1)
-	e5:SetCondition(c55742055.effcon)
+	e5:SetCondition(c55742055.condition4)
 	e5:SetTarget(c55742055.target4)
 	e5:SetOperation(c55742055.operation4)
 	c:RegisterEffect(e5)
 end
 function c55742055.confilter(c)
-	return c:IsSetCard(0x107a) and c:IsFaceup()
+	return c:IsFaceup() and c:IsSetCard(0x107a)
 end
-function c55742055.effcon(e)
+function c55742055.effcon(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetTurnPlayer()~=tp then return false end
 	local g=Duel.GetMatchingGroup(c55742055.confilter,e:GetHandlerPlayer(),LOCATION_GRAVE+LOCATION_MZONE,0,nil)
 	return g:GetClassCount(Card.GetCode)>=e:GetLabel()
 end
@@ -96,13 +96,13 @@ function c55742055.operation2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c55742055.filter2,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	local tc=g:GetFirst()
+	if Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end
 	local tg=Duel.GetMatchingGroup(c55742055.eqfilter,tp,LOCATION_HAND,0,nil,tc)
-	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	and tg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(55742055,4))
-	then
-		local ec=tg:Select(tp,1,1,nil):GetFirst()
+	if tg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(55742055,4)) then
 		Duel.BreakEffect()
-		Duel.Equip(tp,ec,tc)
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
+		local sg=tg:Select(tp,1,1,nil)
+		Duel.Equip(tp,sg:GetFirst(),tc,true)
 	end
 end
 function c55742055.thfilter(c)
@@ -121,7 +121,12 @@ function c55742055.operation3(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	end
-end	
+end
+function c55742055.condition4(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetTurnPlayer()~=tp then return false end
+	local g=Duel.GetMatchingGroup(c55742055.confilter,e:GetHandlerPlayer(),LOCATION_GRAVE+LOCATION_MZONE,0,nil)
+	return g:GetClassCount(Card.GetCode)==12
+end
 function c55742055.target4(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

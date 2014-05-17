@@ -53,22 +53,21 @@ end
 function c29357956.spfilter(c)
 	local tpe=c:GetOriginalType()
 	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and
-		((bit.band(tpe,TYPE_FUSION)>0 and c:IsAbleToExtraAsCost()) or 
+		((bit.band(tpe,TYPE_FUSION)>0 and c:IsAbleToExtraAsCost()) or
 		(bit.band(tpe,TYPE_FUSION)==0 and c:IsAbleToDeckAsCost()))
 end
 function c29357956.sprcon(e,c)
-	if c==nil then return true end 
+	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2
-		and Duel.IsExistingMatchingCard(c29357956.spfilter,tp,LOCATION_MZONE,0,2,nil)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-3
+		and Duel.IsExistingMatchingCard(c29357956.spfilter,tp,LOCATION_MZONE,0,3,nil)
 end
 function c29357956.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g=Duel.SelectMatchingCard(tp,c29357956.spfilter,tp,LOCATION_MZONE,0,2,2,nil)
-	local tc=g:GetFirst()
-	while tc do
-		if not tc:IsFaceup() then Duel.ConfirmCards(1-tp,tc) end
-		tc=g:GetNext()
+	local g=Duel.SelectMatchingCard(tp,c29357956.spfilter,tp,LOCATION_MZONE,0,3,3,nil)
+	local cg=g:Filter(Card.IsFacedown,nil)
+	if cg:GetCount()>0 then
+		Duel.ConfirmCards(1-tp,cg)
 	end
 	Duel.SendtoDeck(g,nil,2,REASON_COST)
 end
@@ -91,7 +90,7 @@ function c29357956.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoDeck(c,nil,0,REASON_COST)
 end
 function c29357956.filter(c,e,tp)
-	return c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,120,tp,false,false)
+	return c:IsSetCard(0x19) and c:IsCanBeSpecialSummoned(e,122,tp,false,false)
 end
 function c29357956.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -99,25 +98,17 @@ function c29357956.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function c29357956.spop(e,tp,eg,ep,ev,re,r,rp)
-	local zc=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if zc==0 then return end
-	if not Duel.IsExistingMatchingCard(c29357956.filter,tp,LOCATION_DECK,0,2,nil,e,tp) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c29357956.filter,tp,LOCATION_DECK,0,2,2,nil,e,tp)
-	if zc==1 then
-		local sg=g:Select(tp,1,1,nil)
-		local sc=sg:GetFirst()
-		g:RemoveCard(sc)
-		Duel.SpecialSummon(sc,120,tp,tp,false,false,POS_FACEUP)
-		sc:RegisterFlagEffect(sc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-		Duel.Destroy(g,REASON_EFFECT)
-	else
-		local tc=g:GetFirst()
-		while tc do
-			Duel.SpecialSummonStep(tc,120,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-			tc=g:GetNext()
-		end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
+	local g=Duel.GetMatchingGroup(c29357956.filter,tp,LOCATION_DECK,0,nil,e,tp)
+	if g:GetCount()>=2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,2,2,nil)
+		local tc=sg:GetFirst()
+		Duel.SpecialSummonStep(tc,122,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
+		tc=sg:GetNext()
+		Duel.SpecialSummonStep(tc,122,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
 		Duel.SpecialSummonComplete()
 	end
 end

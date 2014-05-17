@@ -9,9 +9,10 @@ function c57690191.initial_effect(c)
 	--special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(57690191,0))
+	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetTarget(c57690191.sptg)
+	e2:SetTarget(c57690191.sptg)
 	e2:SetOperation(c57690191.spop)
 	c:RegisterEffect(e2)
 	--ret&draw
@@ -26,11 +27,12 @@ function c57690191.initial_effect(c)
 	e3:SetCountLimit(1)
 	c:RegisterEffect(e3)
 end
-function c57690191.atcon(e,c)
-	return not(Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==3 and Duel.GetMatchingGroupCount(c57690191.atkfilter,tp,LOCATION_MZONE,0,nil)==3)
+function c57690191.atcon(e)
+	local g=Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)
+	return g:GetCount()~=3 or g:IsExists(c57690191.atkfilter,1,nil)
 end
 function c57690191.atkfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x107a)
+	return c:IsFacedown() or not c:IsSetCard(0x107a)
 end
 function c57690191.spfilter(c,e,tp)
 	return c:IsSetCard(0x107a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -38,7 +40,7 @@ end
 function c57690191.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c57690191.spfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c57690191.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
@@ -51,7 +53,7 @@ function c57690191.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)

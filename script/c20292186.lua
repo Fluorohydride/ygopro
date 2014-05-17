@@ -1,4 +1,4 @@
---アーティファクト-サイズ
+--Artifact Scythe
 function c20292186.initial_effect(c)
 	--set
 	local e1=Effect.CreateEffect(c)
@@ -16,7 +16,7 @@ function c20292186.initial_effect(c)
 	e2:SetTarget(c20292186.sptg)
 	e2:SetOperation(c20292186.spop)
 	c:RegisterEffect(e2)
-	--indes
+	--cannot spsummon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(20292186,1))
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)

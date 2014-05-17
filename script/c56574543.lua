@@ -31,27 +31,23 @@ end
 function c56574543.atkop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if not a:IsRelateToBattle() or not d:IsRelateToBattle() then return end
-	
-	if a:GetControler()~=tp then
-		a,d=d,a
-	end
-	
+	if not a:IsRelateToBattle() or a:IsFacedown() or not d:IsRelateToBattle() or a:IsFacedown() then return end
+	if a:GetControler()~=tp then a,d=d,a end
+	if not a:IsImmuneToEffect(e) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetOwnerPlayer(tp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE_CAL)
 	e1:SetValue(d:GetAttack())
-	if a:RegisterEffect(e1) then
-		local e2=Effect.CreateEffect(e:GetHandler())
-		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)		
-		e2:SetCondition(c56574543.rdcon)
-		e2:SetOperation(c56574543.rdop)
-		e2:SetReset(RESET_PHASE+PHASE_DAMAGE_CAL)
-		Duel.RegisterEffect(e2,tp)
-	end
+	a:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(e:GetHandler())
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e2:SetCondition(c56574543.rdcon)
+	e2:SetOperation(c56574543.rdop)
+	e2:SetReset(RESET_PHASE+PHASE_DAMAGE_CAL)
+	Duel.RegisterEffect(e2,tp)
 end
 function c56574543.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp

@@ -17,14 +17,14 @@ function c93085839.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_BE_MATERIAL)
 	e2:SetCondition(c93085839.effcon)
-	e2:SetOperation(c93085839.effop)
+	e2:SetOperation(c93085839.effop1)
 	c:RegisterEffect(e2)
 	--effect gain
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_BE_PRE_MATERIAL)
 	e3:SetCondition(c93085839.effcon)
-	e3:SetOperation(c93085839.effop1)
+	e3:SetOperation(c93085839.effop2)
 	c:RegisterEffect(e3)
 end
 function c93085839.spfilter(c)
@@ -48,15 +48,17 @@ function c93085839.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c93085839.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_XYZ+REASON_SYNCHRO)~=0 and e:GetHandler():GetReasonCard():IsSetCard(0x107a)
-end
-function c93085839.effop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SetChainLimitTillChainEnd(aux.FALSE)
+	return (r==REASON_XYZ or r==REASON_SYNCHRO) and e:GetHandler():GetReasonCard():IsSetCard(0x107a)
 end
 function c93085839.effop1(e,tp,eg,ep,ev,re,r,rp)
+	Duel.SetChainLimitTillChainEnd(c93085839.chainlm)
+end
+function c93085839.chainlm(e,rp,tp)
+	return tp==rp
+end
+function c93085839.effop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	--summon
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CANNOT_DISABLE_SPSUMMON)
