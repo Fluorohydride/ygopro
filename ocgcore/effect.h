@@ -402,6 +402,7 @@ public:
 #define EVENT_MSET					1106
 #define EVENT_SSET					1107
 #define EVENT_BE_MATERIAL			1108
+#define EVENT_BE_PRE_MATERIAL			1109
 #define EVENT_DRAW					1110
 #define EVENT_DAMAGE				1111
 #define EVENT_RECOVER				1112
