@@ -39,7 +39,7 @@ function c82962242.initial_effect(c)
 	e4:SetCondition(c82962242.spcon)
 	e4:SetTarget(c82962242.sptg)
 	e4:SetOperation(c82962242.spop)
-	e4:SetLabelObject(e4)
+	e4:SetLabelObject(e3)
 	c:RegisterEffect(e4)
 end
 function c82962242.cfilter(c,tp)

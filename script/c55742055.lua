@@ -63,7 +63,7 @@ function c55742055.confilter(c)
 end
 function c55742055.effcon(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetTurnPlayer()~=tp then return false end
-	local g=Duel.GetMatchingGroup(c55742055.confilter,e:GetHandlerPlayer(),LOCATION_GRAVE+LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(c55742055.confilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,nil)
 	return g:GetClassCount(Card.GetCode)>=e:GetLabel()
 end
 function c55742055.filter1(c)
@@ -124,7 +124,7 @@ function c55742055.operation3(e,tp,eg,ep,ev,re,r,rp)
 end
 function c55742055.condition4(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetTurnPlayer()~=tp then return false end
-	local g=Duel.GetMatchingGroup(c55742055.confilter,e:GetHandlerPlayer(),LOCATION_GRAVE+LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(c55742055.confilter,tp,LOCATION_GRAVE+LOCATION_MZONE,0,nil)
 	return g:GetClassCount(Card.GetCode)==12
 end
 function c55742055.target4(e,tp,eg,ep,ev,re,r,rp,chk)

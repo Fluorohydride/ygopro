@@ -1396,7 +1396,6 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		core.normalsummon_state[sumplayer] = TRUE;
 		core.summoned_cards_pt[sumplayer].insert(target);
 		core.normalsummoned_cards_pt[sumplayer].insert(target);
-		
 		if (target->material_cards.size()) {
 			for (auto mit = target->material_cards.begin(); mit != target->material_cards.end(); ++mit)
 				raise_single_event(*mit, 0, EVENT_BE_PRE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
@@ -1404,7 +1403,9 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		}
 		process_single_event();
 		process_instant_event();
-
+		return FALSE;
+	}
+	case 10: {
 		if(core.current_chain.size() == 0) {
 			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SUMMON))
 				core.units.begin()->step = 14;
@@ -1416,13 +1417,13 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			if(target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SUMMON))
 				core.units.begin()->step = 15;
 			else
-				core.units.begin()->step = 10;
+				core.units.begin()->step = 11;
 			core.reserved = core.units.front();
 			return TRUE;
 		}
 		return FALSE;
 	}
-	case 10: {
+	case 11: {
 		target->set_status(STATUS_SUMMONING, TRUE);
 		target->set_status(STATUS_SUMMON_DISABLED, FALSE);
 		core.summoning_card = 0;
@@ -1431,7 +1432,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
 		return FALSE;
 	}
-	case 11: {
+	case 12: {
 		if(target->is_status(STATUS_SUMMONING)) {
 			core.units.begin()->step = 14;
 			return FALSE;
@@ -2025,11 +2026,9 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(target->current.position);
 		core.spsummon_state[sumplayer] = TRUE;
 		core.spsummoned_cards_pt[sumplayer].insert(target);
-			
 		return FALSE;
 	}
-	case 5:{
-
+	case 5: {
 		effect* proc = core.units.begin()->peffect;
 		int32 matreason = proc->value == SUMMON_TYPE_SYNCHRO ? REASON_SYNCHRO : proc->value == SUMMON_TYPE_XYZ ? REASON_XYZ : REASON_SPSUMMON;
 		if (target->material_cards.size()) {
@@ -2048,12 +2047,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			else
 				core.units.begin()->step = 9;
 			return FALSE;
-		}
-		else if (core.current_chain.size() > 1) {
+		} else if (core.current_chain.size() > 1) {
 			core.units.begin()->step = 14;
 			return FALSE;
-		}
-		else {
+		} else {
 			if (target->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON))
 				core.units.begin()->step = 15;
 			else
@@ -2061,6 +2058,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			core.reserved = core.units.front();
 			return TRUE;
 		}
+		return FALSE;
 	}
 	case 10: {
 		core.summoning_card = 0;

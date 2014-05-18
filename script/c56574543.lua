@@ -31,7 +31,7 @@ end
 function c56574543.atkop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if not a:IsRelateToBattle() or a:IsFacedown() or not d:IsRelateToBattle() or a:IsFacedown() then return end
+	if not a:IsRelateToBattle() or a:IsFacedown() or not d:IsRelateToBattle() or d:IsFacedown() then return end
 	if a:GetControler()~=tp then a,d=d,a end
 	if not a:IsImmuneToEffect(e) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())

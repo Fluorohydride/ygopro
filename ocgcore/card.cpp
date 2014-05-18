@@ -352,8 +352,7 @@ int32 card::get_attack(uint8 swap) {
 					}
 				}
 				up += eset[i]->get_value(this);
-			}
-			else
+			} else
 				upc += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_ATTACK:
@@ -448,10 +447,8 @@ int32 card::get_defence(uint8 swap) {
 						temp.defence = base;
 					}
 				}
-			}
-			if (eset[i]->type & EFFECT_TYPE_SINGLE)
 				up += eset[i]->get_value(this);
-			else
+			} else
 				upc += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_DEFENCE:
