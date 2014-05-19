@@ -28,7 +28,7 @@ function c57690191.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c57690191.atcon(e)
-	local g=Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)
+	local g=Duel.GetFieldGroup(e:GetHandlerPlayer(),LOCATION_MZONE,0)
 	return g:GetCount()~=3 or g:IsExists(c57690191.atkfilter,1,nil)
 end
 function c57690191.atkfilter(c)

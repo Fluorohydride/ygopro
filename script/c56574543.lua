@@ -21,7 +21,6 @@ function c56574543.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=Duel.GetAttackTarget()
 	if not c then return false end
 	if c:IsControler(1-tp) then c=Duel.GetAttacker() end
-	e:SetLabelObject(c)
 	return c and c:IsSetCard(0x88) and c:IsRace(RACE_BEASTWARRIOR) and c:IsRelateToBattle()
 end
 function c56574543.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -33,7 +32,7 @@ function c56574543.atkop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local d=Duel.GetAttackTarget()
 	if not a:IsRelateToBattle() or a:IsFacedown() or not d:IsRelateToBattle() or d:IsFacedown() then return end
 	if a:GetControler()~=tp then a,d=d,a end
-	if not a:IsImmuneToEffect(e) then return end
+	if a:IsImmuneToEffect(e) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetOwnerPlayer(tp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
