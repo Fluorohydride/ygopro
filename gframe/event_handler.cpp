@@ -1556,7 +1556,7 @@ void ClientField::GetHoverField(int x, int y) {
 				hovered_sequence = hc - 1 - (x - 501) * (hc - 1) / 247;
 		}
 	} else {
-		double screenx = x / 1024.0 * 1.25 - 0.81;
+		double screenx = x / 1024.0 * 1.35 - 0.90;
 		double screeny = y / 640.0 * 0.84 - 0.42;
 		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
 		double vlen = sqrt(1.0 + screeny * screeny);
