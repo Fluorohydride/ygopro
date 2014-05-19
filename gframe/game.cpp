@@ -176,7 +176,7 @@ bool Game::Initialize() {
 	imgCard = env->addImage(rect<s32>(9, 9, 187, 262), wCardImg);
 	imgCard->setUseAlphaChannel(true);
 	//phase
-	wPhase = env->addStaticText(L"", rect<s32>(455, 310, 830, 330));
+	wPhase = env->addStaticText(L"", rect<s32>(480, 310, 855, 330));
 	wPhase->setVisible(false);
 	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"\xff24\xff30");
 	btnDP->setEnabled(false);
