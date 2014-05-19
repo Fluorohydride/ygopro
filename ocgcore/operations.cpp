@@ -3986,8 +3986,8 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 			maxv = core.xmaterial_lst.begin()->first;
 		if(min >= maxv) {
 			core.select_cards.clear();
-			for(auto iter : core.xmaterial_lst)
-				core.select_cards.push_back(iter.second);
+			for(auto iter = core.xmaterial_lst.begin(); iter != core.xmaterial_lst.end(); ++iter)
+				core.select_cards.push_back(iter->second);
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_SELECTMSG);
 			pduel->write_buffer8(playerid);
@@ -4009,8 +4009,8 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 	case 2: {
 		core.operated_set.clear();
 		core.select_cards.clear();
-		for(auto iter : core.xmaterial_lst)
-			core.select_cards.push_back(iter.second);
+		for(auto iter = core.xmaterial_lst.begin(); iter != core.xmaterial_lst.end(); ++iter)
+			core.select_cards.push_back(iter->second);
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_SELECTMSG);
 		pduel->write_buffer8(playerid);
@@ -4055,8 +4055,8 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 			return TRUE;
 		}
 		core.select_cards.clear();
-		for(auto iter : core.xmaterial_lst)
-			core.select_cards.push_back(iter.second);
+		for(auto iter = core.xmaterial_lst.begin(); iter != core.xmaterial_lst.end(); iter++)
+			core.select_cards.push_back(iter->second);
 		int maxv = core.xmaterial_lst.begin()->first;
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_SELECTMSG);
@@ -4072,8 +4072,8 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, card* scard, int32 
 	}
 	case 5: {
 		group* pgroup = pduel->new_group();
-		for(auto pcard : core.operated_set)
-			pgroup->container.insert(pcard);
+		for(auto pcard = core.operated_set.begin(); pcard != core.operated_set.end(); ++pcard)
+			pgroup->container.insert(*pcard);
 		for(int32 i = 0; i < returns.bvalue[0]; ++i) {
 			card* pcard = core.select_cards[returns.bvalue[i + 1]];
 			pgroup->container.insert(pcard);
