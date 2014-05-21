@@ -1502,21 +1502,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(393, 504, 875, 600);
-	irr::core::recti ofRect(501, 135, 790, 191);
+	irr::core::recti sfRect(430, 504, 875, 600);
+	irr::core::recti ofRect(531, 135, 800, 191);
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 393 + 82 * (6 - hc) / 2;
+			int cardSize = 66;
+			int cardSpace = 10;
+			int left = sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
-				int seq = (x - left) / 82;
+				int seq = (x - left) / (cardSize + cardSpace);
 				if(seq >= hc) seq = hc - 1;
-				if(x - left - 82 * seq < 71) {
+				if(x - left - (cardSize + cardSpace) * seq < cardSize) {
 					hovered_controler = 0;
 					hovered_location = LOCATION_HAND;
 					hovered_sequence = seq;
@@ -1528,20 +1530,22 @@ void ClientField::GetHoverField(int x, int y) {
 			if(x >= 804)
 				hovered_sequence = hc - 1;
 			else
-				hovered_sequence = (x - 393) * (hc - 1) / 411;
+				hovered_sequence = (x - sfRect.UpperLeftCorner.X) * (hc - 1) / 393;
 		}
 	} else if(ofRect.isPointInside(pos)) {
 		int hc = hand[1].size();
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 501 + 49 * (6 - hc) / 2;
+			int cardSize = 39;
+			int cardSpace = 7;
+			int left = ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
-				int seq = (x - left) / 49;
+				int seq = (x - left) / (cardSize + cardSpace);
 				if(seq >= hc) seq = hc - 1;
-				if(x - left - 49 * seq < 42) {
+				if(x - left - (cardSize + cardSpace) * seq < cardSize) {
 					hovered_controler = 1;
 					hovered_location = LOCATION_HAND;
 					hovered_sequence = hc - 1 - seq;
@@ -1553,7 +1557,7 @@ void ClientField::GetHoverField(int x, int y) {
 			if(x >= 748)
 				hovered_sequence = 0;
 			else
-				hovered_sequence = hc - 1 - (x - 501) * (hc - 1) / 247;
+				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / 247;
 		}
 	} else {
 		double screenx = x / 1024.0 * 1.35 - 0.90;
