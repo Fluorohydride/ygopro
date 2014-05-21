@@ -32,17 +32,12 @@ c51543904.xyz_number=99
 function c51543904.cfilter(c)
 	return c:IsSetCard(0x95) and c:IsType(TYPE_SPELL) and c:IsDiscardable()
 end
-function c51543904.cfilter2(c)
-	return c:GetFlagEffect(51543904)
-end
 function c51543904.ovfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7f)
-		and (Duel.IsExistingMatchingCard(c51543904.cfilter,c:GetControler(),LOCATION_HAND,0,1,nil) 
-				or Duel.IsExistingMatchingCard(c51543904.cfilter2,c:GetControler(),LOCATION_EXTRA,0,1,nil))
 end
-function c51543904.xyzop(e,tp)
+function c51543904.xyzop(e,tp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c51543904.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c51543904.cfilter,1,1,REASON_COST+REASON_DISCARD)
-	e:GetHandler():RegisterFlagEffect(51543904,RESET_EVENT+0x7ff0000,0,1)
 end
 function c51543904.filter(c,e,tp)
 	return c:IsSetCard(0x48) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

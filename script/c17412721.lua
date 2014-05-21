@@ -1,9 +1,9 @@
---Elder God Noden
+--구신 노덴
 function c17412721.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
-	aux.AddFusionProcFun2(c,aux.FilterBoolFunction(c17412721.fusfilter),aux.FilterBoolFunction(c17412721.fusfilter),true)
-		--spsummon
+	aux.AddFusionProcFun2(c,c17412721.ffilter,c17412721.ffilter,true)
+	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(17412721,1))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -21,8 +21,8 @@ function c17412721.initial_effect(c)
 	c:RegisterEffect(e2)
 	e1:SetLabelObject(e2)
 end
-function c17412721.fusfilter(c) 
-	return c:IsType(TYPE_XYZ) or c:IsType(TYPE_SYNCHRO)
+function c17412721.ffilter(c)
+	return c:IsType(TYPE_XYZ+TYPE_SYNCHRO)
 end
 function c17412721.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -38,7 +38,7 @@ end
 function c17412721.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 and c:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -49,11 +49,12 @@ function c17412721.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e2,true)
-		Duel.SpecialSummonComplete()
-		c:SetCardTarget(tc)
-		e:GetLabelObject():SetLabelObject(tc)
-		c:CreateRelation(tc,RESET_EVENT+0x5020000)
-		tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
+		if c:IsRelateToEffect(e) then
+			c:SetCardTarget(tc)
+			e:GetLabelObject():SetLabelObject(tc)
+			c:CreateRelation(tc,RESET_EVENT+0x5020000)
+			tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
+		end
 	end
 end
 function c17412721.leave(e,tp,eg,ep,ev,re,r,rp)
