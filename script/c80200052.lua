@@ -10,6 +10,7 @@ function c80200052.initial_effect(c)
 	e1:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(LOCATION_HAND+LOCATION_DECK,LOCATION_HAND+LOCATION_DECK)
+	e1:SetTarget(c80200052.rmtg)
 	e1:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e1)
 	--Negate
@@ -35,6 +36,9 @@ function c80200052.initial_effect(c)
 	e3:SetTarget(c80200052.sptg)
 	e3:SetOperation(c80200052.spop)
 	c:RegisterEffect(e3)
+end
+function c80200052.rmtg(e,c)
+	return c:IsType(TYPE_MONSTER)
 end
 function c80200052.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

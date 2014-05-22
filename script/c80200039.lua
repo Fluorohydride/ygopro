@@ -88,7 +88,7 @@ function c80200039.spfilter1(c,code,e,tp)
 end
 function c80200039.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		return Duel.IsExistingMatchingCard(c80200039.spfilter,tp,LOCATION_EXTRA,0,2,nil,e,tp)
+		return Duel.IsExistingMatchingCard(c80200039.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)

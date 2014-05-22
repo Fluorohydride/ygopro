@@ -1,3 +1,4 @@
+
 --エルシャドール・エグリスタ
 function c80200048.initial_effect(c)
 	c:EnableReviveLimit()
@@ -17,29 +18,56 @@ function c80200048.initial_effect(c)
 	e2:SetRange(LOCATION_EXTRA)
 	e2:SetValue(c80200048.splimit)
 	c:RegisterEffect(e2)
+
 	--disable spsummon
 	local e3=Effect.CreateEffect(c)
+
+
+
 	e3:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_DESTROY)
 	e3:SetDescription(aux.Stringid(80200048,0))
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetRange(LOCATION_MZONE)
+
 	e3:SetCode(EVENT_SPSUMMON)
 	e3:SetCountLimit(1,80200048)
 	e3:SetCondition(c80200048.condition)
 	e3:SetTarget(c80200048.target)
 	e3:SetOperation(c80200048.operation)
 	c:RegisterEffect(e3)
+
 	--tohand
 	local e4=Effect.CreateEffect(c)
+
 	e4:SetDescription(aux.Stringid(80200048,1))
 	e4:SetCategory(CATEGORY_TOHAND)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+
 	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+
 	e4:SetCondition(c80200048.thcon)
 	e4:SetTarget(c80200048.thtg)
 	e4:SetOperation(c80200048.thop)
 	c:RegisterEffect(e4)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 end
 function c80200048.ffilter1(c)
 	return c:IsSetCard(0x9d)
@@ -120,11 +148,11 @@ function c80200048.fusop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 		Duel.SetFusionMaterial(g1)
 		return
 	end
-	local sg=eg:Filter(Auxiliary.FConditionFilterF2c,nil,c80200048.ffilter1,c80200048.ffilter2)
+	local sg=eg:Filter(aux.FConditionFilterF2c,nil,c80200048.ffilter1,c80200048.ffilter2)
 	local g1=nil
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 	if chkf~=PLAYER_NONE then
-		g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil,chkf)
+		g1=sg:FilterSelect(tp,aux.FConditionCheckF,1,1,nil,chkf)
 	else g1=sg:Select(tp,1,1,nil) end
 	local tc1=g1:GetFirst()
 	local sg1=Group.CreateGroup()
@@ -149,13 +177,31 @@ function c80200048.fusop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 	g1:Merge(g2)
 	Duel.SetFusionMaterial(g1)
 end
+function c80200048.splimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+
+
 function c80200048.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp~=ep and Duel.GetCurrentChain()==0
 end
+
+
+
+
+
+
+
+
+
+
+
+
 function c80200048.disfilter(c)
 	return c:IsSetCard(0x9d)
 end
 function c80200048.target(e,tp,eg,ep,ev,re,r,rp,chk)
+
 	if chk==0 then return Duel.IsExistingMatchingCard(c80200048.disfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
