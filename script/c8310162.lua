@@ -19,6 +19,7 @@ function c8310162.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_SELF_DESTROY)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c8310162.descon)
 	c:RegisterEffect(e2)
 end
