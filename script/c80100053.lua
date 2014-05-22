@@ -20,7 +20,7 @@ function c80100053.tfilter(c,lvl,att,e,tp)
 end
 function c80100053.filter(c,e,tp)
 	return c:IsFaceup() 
-		and Duel.IsExistingMatchingCard(c80100053.tfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetOriginalAttribute(),c:GetOriginalLevel(),e,tp)
+		and Duel.IsExistingMatchingCard(c80100053.tfilter,tp,LOCATION_EXTRA,0,1,nil,c:GetOriginalLevel(),c:GetOriginalAttribute(),e,tp)
 end
 function c80100053.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c80100053.filter(chkc,e,tp) end

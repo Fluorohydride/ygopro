@@ -11,11 +11,11 @@ function c80100044.initial_effect(c)
 	--remove
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE)
 	e2:SetCode(EFFECT_TO_GRAVE_REDIRECT)
-	e2:SetTargetRange(0,LOCATION_GRAVE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetValue(LOCATION_REMOVED)
+	e2:SetTarget(c80100044.rmtg)
 	c:RegisterEffect(e2)
 	--remove Hand
 	local e3=Effect.CreateEffect(c)
@@ -28,6 +28,9 @@ function c80100044.initial_effect(c)
 	e3:SetTarget(c80100044.target)
 	e3:SetOperation(c80100044.activate)
 	c:RegisterEffect(e3)
+end
+function c80100044.rmtg(e,c)
+	return c:GetOwner()~=e:GetOwnerPlayer()
 end
 function c80100044.cfilter(c,tp)
 	return c:IsControler(tp) and c:IsPreviousLocation(LOCATION_DECK) 
