@@ -52,7 +52,7 @@ function c80200001.operation(e,tp,eg,ep,ev,re,r,rp)
 		local batk=tc:GetBaseAttack()
 		if batk==atk then return end
 		local val=1000
-		if batk>atk then
+		if batk<atk then
 			val=-1000
 		end
 		local e1=Effect.CreateEffect(c)
