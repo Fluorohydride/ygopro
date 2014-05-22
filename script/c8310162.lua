@@ -1,4 +1,4 @@
---Sin パラドクス·ドラゴン
+--Sin パラドクス・ドラゴン
 function c8310162.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure2(c,aux.FilterBoolFunction(Card.IsCode,74509280),aux.NonTuner(Card.IsSetCard,0x23))
