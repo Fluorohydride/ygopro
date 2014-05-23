@@ -1,4 +1,4 @@
---Sin パラドクス·ドラゴン
+--Sin パラドクス・ドラゴン
 function c8310162.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure2(c,aux.FilterBoolFunction(Card.IsCode,74509280),aux.NonTuner(Card.IsSetCard,0x23))
@@ -19,6 +19,7 @@ function c8310162.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_SELF_DESTROY)
+	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c8310162.descon)
 	c:RegisterEffect(e2)
 end
