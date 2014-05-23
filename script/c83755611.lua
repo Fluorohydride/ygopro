@@ -32,7 +32,6 @@ function c83755611.initial_effect(c)
 	e3:SetTarget(c83755611.destg)
 	e3:SetOperation(c83755611.desop)
 	c:RegisterEffect(e3)
-	
 end
 function c83755611.matcheck(e,c)
 	local ct=c:GetMaterial():Filter(Card.IsRace,nil,RACE_PHANTOMDRAGON):GetClassCount(Card.GetOriginalAttribute)

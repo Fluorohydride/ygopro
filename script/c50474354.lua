@@ -40,7 +40,6 @@ function c50474354.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(c50474354.aclimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterFlagEffect(tp,50474354,RESET_PHASE+PHASE_END,0,1)
 	Duel.RegisterEffect(e1,tp)
 end
 function c50474354.aclimit(e,re,tp)

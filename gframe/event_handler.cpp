@@ -1507,11 +1507,11 @@ void ClientField::GetHoverField(int x, int y) {
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
+		int cardSize = 66;
+		int cardSpace = 10;
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int cardSize = 66;
-			int cardSpace = 10;
 			int left = sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
@@ -1527,18 +1527,18 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 0;
 			hovered_location = LOCATION_HAND;
-			if(x >= 804)
+			if(x >= sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * 5)
 				hovered_sequence = hc - 1;
 			else
-				hovered_sequence = (x - sfRect.UpperLeftCorner.X) * (hc - 1) / 393;
+				hovered_sequence = (x - sfRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * 5);
 		}
 	} else if(ofRect.isPointInside(pos)) {
 		int hc = hand[1].size();
+		int cardSize = 39;
+		int cardSpace = 7;
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int cardSize = 39;
-			int cardSpace = 7;
 			int left = ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
@@ -1554,10 +1554,10 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 1;
 			hovered_location = LOCATION_HAND;
-			if(x >= 748)
+			if(x >= ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * 5)
 				hovered_sequence = 0;
 			else
-				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / 247;
+				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * 5);
 		}
 	} else {
 		double screenx = x / 1024.0 * 1.35 - 0.90;
