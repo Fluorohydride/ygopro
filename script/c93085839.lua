@@ -51,6 +51,17 @@ function c93085839.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return (r==REASON_XYZ or r==REASON_SYNCHRO) and e:GetHandler():GetReasonCard():IsSetCard(0x107a)
 end
 function c93085839.effop1(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetOperation(c93085839.sumop)
+	rc:RegisterEffect(e1)
+end
+function c93085839.sumop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SetChainLimitTillChainEnd(c93085839.chainlm)
 end
 function c93085839.chainlm(e,rp,tp)
