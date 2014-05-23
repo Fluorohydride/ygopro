@@ -1293,20 +1293,20 @@ void field::get_xyz_material(card* scard, int32 findex, int32 maxc) {
 			cv.push_back(pcard);
 	}
 	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-		for(auto pcard : cv) {
-			effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+		for(auto pcard = cv.begin(); pcard != cv.end(); ++pcard) {
+			effect* peffect = (*pcard)->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
 			if(peffect) {
 				int32 v = peffect->get_value();
-				core.xmaterial_lst.insert(std::make_pair(v, pcard));
+				core.xmaterial_lst.insert(std::make_pair(v, *pcard));
 			} else
-				core.xmaterial_lst.insert(std::make_pair(0, pcard));
+				core.xmaterial_lst.insert(std::make_pair(0, *pcard));
 		}
 		auto iter = core.xmaterial_lst.begin();
 		while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > maxc)))
 			core.xmaterial_lst.erase(iter++);
 	} else {
-		for(auto pcard : cv)
-			core.xmaterial_lst.insert(std::make_pair(0, pcard));
+		for(auto pcard = cv.begin(); pcard != cv.end(); ++pcard)
+			core.xmaterial_lst.insert(std::make_pair(0, *pcard));
 	}
 }
 void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
@@ -1680,25 +1680,25 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max,
 	if(mg) {
 		card_vector cv;
 		core.xmaterial_lst.clear();
-		for (auto pcard : mg->container) {
-			if(pduel->lua->check_matching(pcard, findex, 0))
-				cv.push_back(pcard);
+		for (auto pcard = mg->container.begin(); pcard != mg->container.end(); ++pcard) {
+			if(pduel->lua->check_matching(*pcard, findex, 0))
+				cv.push_back(*pcard);
 		}
 		if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-			for(auto pcard : cv) {
-				effect* peffect = pcard->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
+			for(auto pcard = cv.begin(); pcard != cv.end(); ++pcard) {
+				effect* peffect = (*pcard)->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
 				if(peffect) {
 					int32 v = peffect->get_value();
-					core.xmaterial_lst.insert(std::make_pair(v, pcard));
+					core.xmaterial_lst.insert(std::make_pair(v, *pcard));
 				} else
-					core.xmaterial_lst.insert(std::make_pair(0, pcard));
+					core.xmaterial_lst.insert(std::make_pair(0, *pcard));
 			}
 			auto iter = core.xmaterial_lst.begin();
 			while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > max)))
 				core.xmaterial_lst.erase(iter++);
 		} else {
-			for(auto pcard : cv)
-				core.xmaterial_lst.insert(std::make_pair(0, pcard));
+			for(auto pcard = cv.begin(); pcard != cv.end(); ++pcard)
+				core.xmaterial_lst.insert(std::make_pair(0, *pcard));
 		}
 	} else {
 		pduel->game_field->get_xyz_material(scard, findex, max);
