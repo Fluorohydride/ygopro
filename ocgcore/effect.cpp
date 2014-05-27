@@ -64,7 +64,8 @@ int32 effect::is_available() {
 		if((flag & EFFECT_FLAG_SINGLE_RANGE) && !(range & handler->current.location))
 			return FALSE;
 		if((flag & EFFECT_FLAG_SINGLE_RANGE) && (handler->current.location & LOCATION_ONFIELD)
-		        && (handler->is_position(POS_FACEDOWN) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+			&& (handler->is_position(POS_FACEDOWN) && !(flag & EFFECT_FLAG_IGNORE_FD)
+				|| !handler->is_status(STATUS_EFFECT_ENABLED)))
 			return FALSE;
 		if((flag & EFFECT_FLAG_OWNER_RELATE) && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && owner->is_status(STATUS_DISABLED))
 			return FALSE;
