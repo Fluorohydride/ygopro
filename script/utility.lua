@@ -220,7 +220,7 @@ function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc,op)
 				local ct=-ft
 				if minc<=ct then return false end
 				if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil)
-					and (not op or op(e,tp,0)) then
+					and (not op or op(e,c:GetControler(),0)) then
 					return true
 				end
 				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
