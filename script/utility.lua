@@ -4,6 +4,12 @@ aux=Auxiliary
 function Auxiliary.Stringid(code,id)
 	return code*16+id
 end
+function Auxiliary.Contains(tab,key)
+	for i=1,#tab do 
+		if tab[i]==key then return true end
+	end
+	return false
+end
 function Auxiliary.Next(g)
 	local first=true
 	return	function()
