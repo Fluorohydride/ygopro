@@ -170,6 +170,8 @@ public:
 #define EFFECT_FLAG_NAGA			0x10000000	//
 #define EFFECT_FLAG_COF				0x20000000	//
 #define EFFECT_FLAG_CVAL_CHECK		0x40000000	//
+#define EFFECT_FLAG_IGNORE_FD		0x80000000	//
+
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//
 #define EFFECT_DISABLE					2	//
