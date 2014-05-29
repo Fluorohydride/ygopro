@@ -29,6 +29,7 @@ function c8875971.spop(e,tp,eg,ep,ev,re,r,rp)
 		local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 		if hg:GetCount()>0 then 
 			Duel.ConfirmCards(1-tp,hg)
+			Duel.ShuffleHand(tp)
 		end
 	end
 end
