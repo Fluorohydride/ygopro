@@ -24,6 +24,7 @@ function c3717252.initial_effect(c)
 end
 function c3717252.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end
+	Duel.Hint(HINT_NUMBER,tp,1)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(2)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
@@ -42,6 +43,7 @@ function c3717252.drcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c3717252.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
+	Duel.Hint(HINT_NUMBER,tp,2)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
