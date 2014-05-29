@@ -30,7 +30,7 @@ function c80100044.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c80100044.rmtg(e,c)
-	return c:GetOwner()~=e:GetOwnerPlayer()
+	return c:GetOwner()~=e:GetOwnerPlayer() and not (c:IsType(TYPE_PENDULUM) and c:IsPreviousLocation(LOCATION_ONFIELD))
 end
 function c80100044.cfilter(c,tp)
 	return c:IsControler(tp) and c:IsPreviousLocation(LOCATION_DECK) 
