@@ -2,25 +2,32 @@
 function c4939890.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(4939890,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,4939890)
+	e1:SetCost(c4939890.cost)
 	e1:SetTarget(c4939890.target)
 	e1:SetOperation(c4939890.operation)
 	c:RegisterEffect(e1)
 	--tohand
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(4939890,0))
+	e2:SetDescription(aux.Stringid(4939890,1))
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,4939890)
 	e2:SetCondition(c4939890.thcon)
+	e2:SetCost(c4939890.cost)
 	e2:SetTarget(c4939890.thtg)
 	e2:SetOperation(c4939890.thop)
 	c:RegisterEffect(e2)
+end
+function c4939890.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c4939890.filter(c)
 	return c:IsSetCard(0x9d) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsAbleToHand()
