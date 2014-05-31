@@ -11,7 +11,11 @@ function c88033975.initial_effect(c)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EVENT_BE_BATTLE_TARGET)
+	e2:SetCondition(c88033975.con)
 	c:RegisterEffect(e2)
+end
+function c88033975.con(e,tp)
+	return e:GetHandler():IsFaceup()
 end
 function c88033975.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
