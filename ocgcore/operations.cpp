@@ -3448,9 +3448,12 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 						raise_single_event(pcard, 0, EVENT_FLIP, reason_effect, 0, reason_player, 0, noflip);
 						flips.insert(pcard);
 					}
-					if(enable)
-						pcard->enable_field_effect(TRUE);
-					else
+					if(enable) {
+						if(!reason_effect || !(reason_effect->type & 0x7f0))
+							pcard->enable_field_effect(TRUE);
+						else
+							core.delayed_enable_set.insert(pcard);
+					} else
 						pcard->refresh_disable_status();
 				}
 				if(pcard->current.location == LOCATION_MZONE) {

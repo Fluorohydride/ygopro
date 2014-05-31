@@ -4458,6 +4458,11 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			if(oit->second.op_cards)
 				pduel->delete_group(oit->second.op_cards);
 		}
+		for(auto cit = core.delayed_enable_set.begin(); cit != core.delayed_enable_set.end(); ++cit) {
+			if((*cit)->current.location == LOCATION_MZONE)
+				(*cit)->enable_field_effect(TRUE);
+		}
+		core.delayed_enable_set.clear();
 		adjust_all();
 		core.current_chain.pop_back();
 		if(!core.current_chain.size()) {
