@@ -10,7 +10,6 @@ function c68396121.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCost(c68396121.negcost)
-	e1:SetTarget(c68396121.negtg)
 	e1:SetOperation(c68396121.negop)
 	c:RegisterEffect(e1)
 	--atk
@@ -31,9 +30,6 @@ function c68396121.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c68396121.filter(c)
 	return c:IsFaceup() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT)) and not c:IsDisabled()
-end
-function c68396121.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c68396121.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 end
 function c68396121.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -4214,8 +4214,7 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			card* pcard = core.select_cards[returns.bvalue[i + 1]];
 			core.operated_set.insert(pcard);
 			effect* peffect = pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE_SUM);
-			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->reset_count & 0xf00) > 0)
-				peffect->dec_count();
+			peffect->dec_count();
 		}
 		return FALSE;
 	}
