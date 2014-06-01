@@ -40,9 +40,9 @@ function c440556.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
-	else
+	elseif not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SPECIAL_SUMMON) then
 		local cg=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
-		if cg and cg:GetCount()>0 then
+		if cg:GetCount()>0 then
 			Duel.ConfirmCards(1-tp,cg)
 		end
 	end
