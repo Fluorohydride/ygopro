@@ -25,5 +25,11 @@ function c8875971.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c8875971.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
+	elseif not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SPECIAL_SUMMON) then
+		local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+		if hg:GetCount()>0 then 
+			Duel.ConfirmCards(1-tp,hg)
+			Duel.ShuffleHand(tp)
+		end
 	end
 end
