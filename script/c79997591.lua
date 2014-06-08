@@ -14,10 +14,12 @@ function c79997591.cbcon(e,tp,eg,ep,ev,re,r,rp)
 	return bt and bt:IsPosition(POS_FACEUP_ATTACK) and bt:IsControler(tp)
 end
 function c79997591.cbop(e,tp,eg,ep,ev,re,r,rp)
+	local at=Duel.GetAttacker()
 	local bt=Duel.GetAttackTarget()
-	Duel.ChangeAttackTarget(nil)
+	if at:IsAttackable() and not at:IsStatus(STATUS_ATTACK_CANCELED) and Duel.Damage(1-tp,bt:GetAttack(),REASON_EFFECT)>0 then
+		Duel.ChangeAttackTarget(nil)
+	end
 	if bt:IsRelateToBattle() and bt:IsControler(tp) then
-		Duel.Damage(1-tp,bt:GetAttack(),REASON_EFFECT)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DIRECT_ATTACK)
