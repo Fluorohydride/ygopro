@@ -46,7 +46,6 @@ function c3701074.filter(c,e,tp)
 end
 function c3701074.rectg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c3701074.filter,1,nil,nil,tp) end
-	local g=eg:Filter(c3701074.filter,nil,nil,tp)
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,1-tp,0)
 end
@@ -54,7 +53,10 @@ function c3701074.recop2(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=eg:Filter(c3701074.filter,nil,e,tp)
 	if g:GetCount()>0 then
-		local rec=g:GetSum(Card.GetAttack)/2
-		Duel.Recover(1-tp,rec,REASON_EFFECT)
+		if g:GetCount()>1 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+			g=g:Select(tp,1,1,nil)
+		end
+		Duel.Recover(1-tp,g:GetFirst():GetAttack()/2,REASON_EFFECT)
 	end
 end

@@ -2049,7 +2049,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 					for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
 						if(cait->triggering_player == priority) {
 							if(!(peffect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-								if(cait->triggering_location == LOCATION_HAND || cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
+								if(cait->triggering_location == LOCATION_HAND) {
 									act = false;
 									break;
 								}
