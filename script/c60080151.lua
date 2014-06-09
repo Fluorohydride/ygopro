@@ -16,14 +16,13 @@ end
 function c60080151.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tg=Duel.GetAttacker()
 	if chk==0 then return tg:IsOnField() and tg:IsAbleToRemove() end
-	Duel.SetTargetCard(tg)
 	local dam=tg:GetAttack()
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,dam)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,tg,1,0,0)
 end
 function c60080151.activate(e,tp,eg,ep,ev,re,r,rp)
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	local tc=Duel.GetAttacker()
+	if tc and tc:IsAttackable() and not tc:IsStatus(STATUS_ATTACK_CANCELED) then
 		local dam=tc:GetAttack()
 		if Duel.Damage(tp,dam,REASON_EFFECT)>0 and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)>0 then
 			local e1=Effect.CreateEffect(e:GetHandler())
