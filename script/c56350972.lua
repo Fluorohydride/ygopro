@@ -22,7 +22,7 @@ function c56350972.regcon1(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c56350972.regfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsPreviousLocation(LOCATION_HAND+LOCATION_DECK)
+	return c:IsControler(tp) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsPreviousLocation(LOCATION_HAND+LOCATION_DECK)
 end
 function c56350972.regcon2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c56350972.regfilter,1,nil)
