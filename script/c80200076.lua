@@ -50,7 +50,7 @@ function c80200076.cost(e,tp,eg,ep,ev,re,r,rp,chkc)
 	sg1:Merge(sg2)
 	local rg=sg1:Select(tp,1,1,nil)
 	Duel.Release(rg,REASON_COST)
-	if sg1:GetFirst():GetRace()==RACE_INSECT then
+	if rg:GetFirst():GetRace()==RACE_INSECT then
 		e:SetLabel(RACE_PLANT)
 	else 
 		e:SetLabel(RACE_INSECT)
@@ -66,7 +66,7 @@ function c80200076.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if Duel.GetFlagEffect(tp,80200076)==0 and sg1:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(80200076,2)) then
 		local rg=sg1:Select(tp,1,1,nil)
 		Duel.Release(rg,REASON_COST)
-		if sg1:GetFirst():GetRace()==RACE_INSECT then
+		if rg:GetFirst():GetRace()==RACE_INSECT then
 			e:SetLabel(RACE_PLANT)
 		else 
 			e:SetLabel(RACE_INSECT)
