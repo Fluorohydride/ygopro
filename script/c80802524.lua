@@ -14,11 +14,11 @@ end
 function c80802524.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	e:SetLabel(tc:GetCode())
-	return rp~=tp and eg:GetCount()==1
+	return rp~=tp and eg:GetCount()==1 and tc:IsReason(REASON_DESTROY) and tc:IsReason(REASON_BATTLE+REASON_EFFECT)
 		and tc:IsPreviousLocation(LOCATION_MZONE) and tc:GetPreviousControler()==tp and tc:IsSetCard(0x8d)
 end
 function c80802524.filter(c,e,tp,code)
-	return c:IsSetCard(0x8d) and c:GetCode()~=code and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x8d) and c:GetCode()~=code and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
 end
 function c80802524.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c80802524.filter(chkc,e,tp,e:GetLabel()) end
