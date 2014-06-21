@@ -1883,7 +1883,7 @@ int32 scriptlib::duel_get_tribute_group(lua_State *L) {
 	card* target = *(card**) lua_touserdata(L, 1);
 	duel* pduel = interpreter::get_duel_info(L);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->get_summon_release_list(target, &(pgroup->container), &(pgroup->container), 0);
+	pduel->game_field->get_summon_release_list(target, &(pgroup->container), &(pgroup->container), &(pgroup->container));
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
