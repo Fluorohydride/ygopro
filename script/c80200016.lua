@@ -49,7 +49,7 @@ end
 function c80200016.thfilter(c)
 	return c:IsCode(24094653) and c:IsAbleToHand()
 end
-function c80200016.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c80200016.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c20366274.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c80200016.thfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
