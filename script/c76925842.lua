@@ -15,6 +15,7 @@ function c76925842.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(c76925842.drcon)
 	e2:SetCost(c76925842.drcost)
 	e2:SetTarget(c76925842.drtg)
 	e2:SetOperation(c76925842.drop)
@@ -22,6 +23,10 @@ function c76925842.initial_effect(c)
 end
 function c76925842.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsAttribute,c:GetControler(),LOCATION_GRAVE,0,nil,ATTRIBUTE_DARK)*100
+end
+function c76925842.drcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c76925842.rfilter(c)
 	return c:IsAttribute(ATTRIBUTE_DARK) and c:IsAbleToRemoveAsCost()

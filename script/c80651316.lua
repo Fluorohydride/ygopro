@@ -31,7 +31,7 @@ function c80651316.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
 	e2:SetTarget(c80651316.schtg)
 	e2:SetOperation(c80651316.schop)
-	e2:SetReset(RESET_EVENT+0x1620000)
+	e2:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e2)
 end
 function c80651316.sfilter(c)

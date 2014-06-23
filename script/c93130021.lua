@@ -4,16 +4,21 @@ function c93130021.initial_effect(c)
 	e1:SetDescription(aux.Stringid(93130021,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(c93130021.condition)
 	e1:SetTarget(c93130021.target)
 	e1:SetOperation(c93130021.operation)
 	c:RegisterEffect(e1)
+end
+function c93130021.condition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c93130021.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c93130021.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c93130021.filter(chkc) end
-	if chk==0 then return e:GetHandler():IsRelateToBattle() end
+	if chk==0 then return true end
 	local c=e:GetHandler()
 	local t1=Duel.IsExistingTarget(c93130021.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 	local t2=Duel.GetLocationCount(tp,LOCATION_MZONE)>0
