@@ -23,8 +23,8 @@ function c80200060.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetTarget(c80100002.tg)
-	e3:SetOperation(c80100002.op)
+	e3:SetTarget(c80200060.tg)
+	e3:SetOperation(c80200060.op)
 	c:RegisterEffect(e3)	
 end
 function c80200060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -55,16 +55,16 @@ function c80200060.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleHand(tp)
 	end
 end
-function c80100002.filter(c)
+function c80200060.filter(c)
 	return (c:IsSetCard(0xaa) and c:IsType(TYPE_MONSTER) or c:IsCode(80200014)) and c:IsAbleToHand()
 end
-function c80100002.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c80100002.filter1,tp,LOCATION_DECK,0,1,nil) end
+function c80200060.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c80200060.filter1,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
-function c80100002.op(e,tp,eg,ep,ev,re,r,rp)
+function c80200060.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c80100002.filter1,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c80200060.filter1,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
