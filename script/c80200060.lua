@@ -45,8 +45,8 @@ function c80200060.operation(e,tp,eg,ep,ev,re,r,rp)
 		if not tc:IsSetCard(0xaa) then
 			Duel.SendtoGrave(tc,REASON_EFFECT+REASON_DISCARD)
 		else 
-			local sg=Duel.GetMatchingCard(tp,Card.IsCanBeSpecialSummoned,tp,LOCATION_HAND,0,nil,e,tp)
-			if sg:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(80200060,2)) then
+			local sg=Duel.GetMatchingGroup(Card.IsCanBeSpecialSummoned,tp,LOCATION_HAND,0,nil,e,0,tp,false,false)
+			if sg:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(80200060,1)) then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 				local sc=g:Select(tp,1,1,nil)
 				Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)

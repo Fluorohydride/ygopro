@@ -34,20 +34,16 @@ function c80200022.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_SUMMON_PROC)
 	e4:SetCondition(c80200022.ntcon)
-	e4:SetOperation(c80200022.ntop)
 	c:RegisterEffect(e4)
-	--def
+	--summon
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_SET_BASE_ATTACK)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetCondition(c80200022.statcon)
-	e5:SetValue(1800)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetOperation(c80200022.ntop)
 	c:RegisterEffect(e5)
-	--lvl
 	local e6=e5:Clone()
-	e6:SetCode(EFFECT_CHANGE_LEVEL)
-	e6:SetValue(4)
+	e6:SetCode(EVENT_SUMMON_SUCCESS)
+	e6:SetCondition(c80200022.statcon)
 	c:RegisterEffect(e6)
 	--immune 	
 	local e7=Effect.CreateEffect(c)
@@ -83,10 +79,11 @@ function c80200022.ntcon(e,c)
 	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c80200022.ntop(e,tp,eg,ep,ev,re,r,rp,c)
+	local c=e:GetHandler()
 	--	
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetReset(RESET_EVENT+0xff0000)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
@@ -95,7 +92,7 @@ function c80200022.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetReset(RESET_EVENT+0xff0000)
 	e2:SetCode(EFFECT_SET_BASE_ATTACK)
@@ -103,7 +100,7 @@ function c80200022.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e2)
 end
 function c80200022.statcon(e)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return e:GetHandler():GetMaterialCount()==0
 end
 function c80200022.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL

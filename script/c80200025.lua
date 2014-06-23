@@ -22,10 +22,10 @@ function c80200025.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetTargetRange(LOCATION_MZONE,0)
+	e3:SetTargetRange(0,LOCATION_MZONE)
 	e3:SetCondition(c80200025.con)
 	e3:SetTarget(c80200025.atktg)
-	e3:SetValue(300)
+	e3:SetValue(-300)
 	c:RegisterEffect(e3)	
 	--summon with no tribute
 	local e4=Effect.CreateEffect(c)
@@ -34,20 +34,16 @@ function c80200025.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_SUMMON_PROC)
 	e4:SetCondition(c80200025.ntcon)
-	e4:SetOperation(c80200025.ntop)
 	c:RegisterEffect(e4)
-	--def
+	--summon
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_SET_BASE_ATTACK)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetCondition(c80200025.statcon)
-	e5:SetValue(1800)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetOperation(c80200025.ntop)
 	c:RegisterEffect(e5)
-	--lvl
 	local e6=e5:Clone()
-	e6:SetCode(EFFECT_CHANGE_LEVEL)
-	e6:SetValue(4)
+	e6:SetCode(EVENT_SUMMON_SUCCESS)
+	e6:SetCondition(c80200025.statcon)
 	c:RegisterEffect(e6)
 	--immune 	
 	local e7=Effect.CreateEffect(c)
@@ -81,34 +77,35 @@ function c80200025.splimit(e,c,tp,sumtp,sumpos)
 	return not c:IsSetCard(0xab)
 end
 function c80200025.atktg(e,c)
-	return c:IsSetCard(0xab)
+	return c:IsFaceup()
 end
 function c80200025.ntcon(e,c)
 	if c==nil then return true end
 	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c80200025.ntop(e,tp,eg,ep,ev,re,r,rp,c)
+	local c=e:GetHandler()
 	--	
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetReset(RESET_EVENT+0xff0000)
+	e1:SetReset(RESET_EVENT+0xfe0000)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
 	e1:SetValue(4)
 	c:RegisterEffect(e1)
 	--change base attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetReset(RESET_EVENT+0xff0000)
+	e2:SetReset(RESET_EVENT+0xfe0000)
 	e2:SetCode(EFFECT_SET_BASE_ATTACK)
 	e2:SetValue(1800)
 	c:RegisterEffect(e2)
 end
 function c80200025.statcon(e)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return e:GetHandler():GetMaterialCount()==0
 end
 function c80200025.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
@@ -125,7 +122,7 @@ end
 function c80200025.valcheck(e,c)
 	local g=c:GetMaterial()
 	local flag=0
-	if g:IsExists(Card.IsSetCard,1,nil,0x2a) then flag=1 end
+	if g:IsExists(Card.IsSetCard,1,nil,0xab) then flag=1 end
 	e:SetLabel(flag)
 end
 function c80200025.regcon(e,tp,eg,ep,ev,re,r,rp)

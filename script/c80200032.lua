@@ -20,7 +20,7 @@ function c80200032.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1,80200032)
 	e2:SetCondition(c80200032.spcon)
-	e2:SetCost()
+	e2:SetCost(c80200032.spcost)
 	e2:SetTarget(c80200032.sptg)
 	e2:SetOperation(c80200032.spop)
 	c:RegisterEffect(e2)
@@ -50,14 +50,14 @@ end
 function c80200032.costfilter(c)
 	return c:IsSetCard(0x9e) and c:IsAbleToGraveAsCost()
 end
-function c80200032.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c80200032.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c80200032.costfilter,tp,LOCATION_HAND,0,2,e:GetHandler()) end
 	Duel.DiscardHand(tp,c80200032.costfilter,2,2,REASON_COST)
 end
 function c80200032.spfilter(c,e,tp)
 	return c:IsSetCard(0x9e) and c:GetAttack()==0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c80200032.spfilter2(c,e,tp)
+function c80200032.spfilter1(c,e,tp)
 	return c:IsSetCard(0x9e) and c:GetDefence()==0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c80200032.sptg(e,tp,eg,ep,ev,re,r,rp,chk)

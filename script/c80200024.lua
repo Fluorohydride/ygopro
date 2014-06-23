@@ -34,20 +34,16 @@ function c80200024.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_SUMMON_PROC)
 	e4:SetCondition(c80200024.ntcon)
-	e4:SetOperation(c80200024.ntop)
 	c:RegisterEffect(e4)
-	--def
+	--summon
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetCode(EFFECT_SET_BASE_ATTACK)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetCondition(c80200024.statcon)
-	e5:SetValue(1800)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetOperation(c80200024.ntop)
 	c:RegisterEffect(e5)
-	--lvl
 	local e6=e5:Clone()
-	e6:SetCode(EFFECT_CHANGE_LEVEL)
-	e6:SetValue(4)
+	e6:SetCode(EVENT_SUMMON_SUCCESS)
+	e6:SetCondition(c80200024.statcon)
 	c:RegisterEffect(e6)
 	--immune 	
 	local e7=Effect.CreateEffect(c)
@@ -89,27 +85,28 @@ function c80200024.ntcon(e,c)
 	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c80200024.ntop(e,tp,eg,ep,ev,re,r,rp,c)
+	local c=e:GetHandler()
 	--	
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetReset(RESET_EVENT+0xff0000)
+	e1:SetReset(RESET_EVENT+0xfe0000)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
 	e1:SetValue(4)
 	c:RegisterEffect(e1)
 	--change base attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetReset(RESET_EVENT+0xff0000)
+	e2:SetReset(RESET_EVENT+0xfe0000)
 	e2:SetCode(EFFECT_SET_BASE_ATTACK)
 	e2:SetValue(1800)
 	c:RegisterEffect(e2)
 end
 function c80200024.statcon(e)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return e:GetHandler():GetMaterialCount()==0
 end
 function c80200024.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
@@ -143,7 +140,7 @@ function c80200024.valcheck(e,c)
 	if g:IsExists(Card.IsSetCard,1,nil,0xab) then flag=1 end
 	e:SetLabel(flag)
 end
-function c80200024.regcon(e,tp,eg,ep,ev,re,r,rp)
+function c80200024.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
 		and e:GetLabelObject():GetLabel()~=0
 end
@@ -177,6 +174,13 @@ function c80200024.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(de,tp)
 	end
 end
+function c80200024.desfilter(c)
+	return c:GetFlagEffect(80200024)>0
+end
 function c80200024.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	local g=e:GetLabelObject()
+	local tg=g:Filter(c80200024.desfilter,nil)
+	g:DeleteGroup()
+	Duel.Destroy(tg,REASON_EFFECT)
+	e:Reset()
 end

@@ -12,9 +12,8 @@ function c80200018.initial_effect(c)
 	e1:SetTarget(c80200018.thtg)
 	e1:SetOperation(c80200018.thop)
 	c:RegisterEffect(e1)
-	--
 	local e2=e1:Clone()
-	e2:SetCode(EVENT_SPSUMMON_SUCCES)
+	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
 	--spsummon
 	local e3=Effect.CreateEffect(c)
@@ -32,7 +31,7 @@ function c80200018.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_HAND)
 end
 function c80200018.thfilter(c)
-	return c:GetCode()==24094653 and c:IsAbleToHand()
+	return c:IsCode(24094653) and c:IsAbleToHand()
 end
 function c80200018.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(c80200018.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -53,9 +52,11 @@ end
 function c80200018.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 end
-function c80200018.filter2(c,e,tp,m,gc)
-	return c:IsType(TYPE_FUSION) and c:IsSetCard(0xac)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and c:CheckFusionMaterial(m,gc)
+function c80200018.filter2(c,e,tp,m,chkf)
+	return c:IsType(TYPE_FUSION) 
+		--and c:IsSetCard(0xac)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
+		and c:CheckFusionMaterial(m,nil,chkf)
 end
 function c80200018.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

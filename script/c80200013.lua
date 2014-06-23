@@ -12,11 +12,11 @@ function c80200013.initial_effect(c)
 	c:RegisterEffect(e1)
 	--
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(80200013,0))
+	e2:SetDescription(aux.Stringid(80200013,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetCountLimit(1)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetCost(c80200013.negcost)
 	e2:SetCondition(c80200013.negcon)
@@ -61,8 +61,12 @@ end
 function c80200013.eqlimit(e,c)
 	return c:IsSetCard(0x9a)
 end
+function c80200013.confilter(c)
+	return c:IsSetCard(0x9a) and c:IsDefencePos() and c:IsFaceup()
+end
 function c80200013.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsChainNegatable(ev) and rp~=tp and Duel.GetCurrentPhase()==PHASE_BATTLE
+	and Duel.IsExistingMatchingCard(c80200013.confilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c80200013.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
@@ -83,7 +87,7 @@ function c80200013.negop(e,tp,eg,ep,ev,re,r,rp)
 	if re:GetHandler():IsRelateToEffect(re) and Duel.Destroy(eg,REASON_EFFECT)>0 then
 		Duel.BreakEffect()
 		local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-		if Duel.Destroy(eg,REASON_EFFECT)>0 then
+		if Duel.Destroy(g,REASON_EFFECT)>0 then
 			Duel.Damage(1-tp,1000,REASON_EFFECT)
 			Duel.Damage(tp,1000,REASON_EFFECT)
 		end

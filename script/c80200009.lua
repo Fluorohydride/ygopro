@@ -20,7 +20,7 @@ function c80200009.initial_effect(c)
 	e2:SetOperation(c80200009.spop)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
 end
 function c80200009.spcon(e,c)
