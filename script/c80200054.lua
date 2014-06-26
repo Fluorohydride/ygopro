@@ -72,7 +72,7 @@ function c80200054.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return  not c:IsSetCard(0x9c)
 end
 function c80200054.sumcon(e)
-	return Duel.GetFlagEffect(sump,80200054)~=0
+	return Duel.GetFlagEffect(e:GetOwnerPlayer(),80200054)~=0
 end
 function c80200054.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()

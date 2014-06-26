@@ -1,5 +1,5 @@
 --デストーイ・シザー・ベアー
-function c53539634.initial_effect(c)
+function c80200046.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
 	aux.AddFusionProcCode2(c,80200014,80200016,true,true)
@@ -8,7 +8,7 @@ function c53539634.initial_effect(c)
 	e1:SetDescription(aux.Stringid(80200046,0))
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCondition(c80200046.eqcon)
 	e1:SetTarget(c80200046.eqtg)
 	e1:SetOperation(c80200046.eqop)

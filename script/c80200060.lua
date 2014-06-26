@@ -48,7 +48,7 @@ function c80200060.operation(e,tp,eg,ep,ev,re,r,rp)
 			local sg=Duel.GetMatchingGroup(Card.IsCanBeSpecialSummoned,tp,LOCATION_HAND,0,nil,e,0,tp,false,false)
 			if sg:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.SelectYesNo(tp,aux.Stringid(80200060,1)) then
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-				local sc=g:Select(tp,1,1,nil)
+				local sc=sg:Select(tp,1,1,nil)
 				Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 			end
 		end
@@ -59,12 +59,12 @@ function c80200060.filter(c)
 	return (c:IsSetCard(0xaa) and c:IsType(TYPE_MONSTER) or c:IsCode(80200014)) and c:IsAbleToHand()
 end
 function c80200060.tg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c80200060.filter1,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c80200060.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c80200060.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c80200060.filter1,tp,LOCATION_DECK,0,1,1,nil)
+	local g=Duel.SelectMatchingCard(tp,c80200060.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)

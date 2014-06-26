@@ -39,6 +39,7 @@ function c80200025.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e5:SetOperation(c80200025.ntop)
 	c:RegisterEffect(e5)
 	local e6=e5:Clone()
@@ -51,6 +52,7 @@ function c80200025.initial_effect(c)
 	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetCode(EFFECT_IMMUNE_EFFECT)
+	e7:SetCondition(c80200025.immcon)
 	e7:SetValue(c80200025.efilter)
 	c:RegisterEffect(e7)	
 	--mat check
@@ -130,6 +132,7 @@ function c80200025.regcon(e,tp,eg,ep,ev,re,r,rp)
 		and e:GetLabelObject():GetLabel()~=0
 end
 function c80200025.regop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	--extra att
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

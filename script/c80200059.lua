@@ -34,7 +34,7 @@ function c80200059.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if p2 then Duel.RegisterFlagEffect(1,80200059,RESET_PHASE+PHASE_END,0,1) end
 end
 function c80200059.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c80200059.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,80200059)==0 end
