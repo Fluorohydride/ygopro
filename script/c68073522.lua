@@ -16,8 +16,11 @@ function c68073522.initial_effect(c)
 	e2:SetOperation(c68073522.operation)
 	c:RegisterEffect(e2)
 end
+function c68073522.filter(c,e,tp)
+	return not c:IsType(TYPE_TOKEN)
+end
 function c68073522.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and eg:IsExists(c68073522.filter,1,nil,e,tp) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(eg:GetCount()*500)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,0,0,tp,eg:GetCount()*500)
