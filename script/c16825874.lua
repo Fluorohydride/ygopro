@@ -39,23 +39,24 @@ function c16825874.ccon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c16825874.cop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local rc=c:GetReasonCard()
 	--leave redirect
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
 	e1:SetValue(LOCATION_REMOVED)
 	e1:SetReset(RESET_EVENT+0x7e0000)
-	c:GetReasonCard():RegisterEffect(e1)
+	rc:RegisterEffect(e1)
 	--cannot trigger
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_TRIGGER)
 	e2:SetReset(RESET_EVENT+0x1fe0000)
-	c:GetReasonCard():RegisterEffect(e2)
+	rc:RegisterEffect(e2)
 	--disable
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_DISABLE)
 	e3:SetReset(RESET_EVENT+0x1fe0000)
-	c:GetReasonCard():RegisterEffect(e3)
+	rc:RegisterEffect(e3)
 end

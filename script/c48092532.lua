@@ -20,15 +20,9 @@ function c48092532.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c48092532.rmcon(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsFacedown() then return false end
-	if bit.band(r,REASON_BATTLE)~=0 then
-		return bit.band(e:GetHandler():GetBattlePosition(),POS_FACEUP)~=0
-			and e:GetHandler():GetPreviousControler()==tp
-	else
-		return bit.band(e:GetHandler():GetPreviousLocation(),LOCATION_ONFIELD)~=0
-			and bit.band(e:GetHandler():GetPreviousPosition(),POS_FACEUP)~=0
-			and e:GetHandler():GetPreviousControler()==tp
-	end
+	local c=e:GetHandler()
+	return c:IsFaceup() and c:IsPreviousPosition(POS_FACEUP)
+		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
 end
 function c48092532.rmop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(48092532,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)

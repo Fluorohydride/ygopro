@@ -35,7 +35,6 @@ function c78700060.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c78700060.operation(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if Duel.GetCurrentChain()~=ev+1 then return	end
 	if Duel.NegateActivation(ev) and re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)

@@ -1641,27 +1641,25 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 			}
 			card_vector nsyn;
 			card* pm;
-			if (mg) {
-				for (auto cit = mg->container.begin(); cit != mg->container.end(); ++cit) {
-					pm=*cit;
-					if(pm && pm != tuner && pm != smat && pm->is_can_be_synchro_material(pcard, tuner)) {						
+			if(mg) {
+				for(auto cit = mg->container.begin(); cit != mg->container.end(); ++cit) {
+					pm = *cit;
+					if(pm != tuner && pm != smat && pm->is_can_be_synchro_material(pcard, tuner)) {
 						if(pcheck)
 							pcheck->get_value(pm);
+						if(pm->current.location == LOCATION_MZONE && !pm->is_position(POS_FACEUP))
+							continue;
 						if(!pduel->lua->check_matching(pm, findex2, 0))
 							continue;
 						nsyn.push_back(pm);
 						pm->operation_param = pm->get_synchro_level(pcard);
 					}
 				}
-				if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
-					pduel->restore_assumes();
-					return TRUE;
-				}
 			} else {
 				for(uint8 p = 0; p < 2; ++p) {
 					for(int32 i = 0; i < 5; ++i) {
 						pm = player[p].list_mzone[i];
-						if(pm && pm != tuner && pm != smat && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {	
+						if(pm && pm != tuner && pm != smat && pm->is_position(POS_FACEUP) && pm->is_can_be_synchro_material(pcard, tuner)) {
 							if(pcheck)
 								pcheck->get_value(pm);
 							if(!pduel->lua->check_matching(pm, findex2, 0))
@@ -1671,10 +1669,10 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 						}
 					}
 				}
-				if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
-					pduel->restore_assumes();
-					return TRUE;
-				}
+			}
+			if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
+				pduel->restore_assumes();
+				return TRUE;
 			}
 		}
 	}

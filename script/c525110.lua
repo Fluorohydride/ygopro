@@ -1,4 +1,4 @@
---�ץ��ȥޥܩ`
+--プチトマボー
 function c525110.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -6,7 +6,6 @@ function c525110.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c525110.condition)
 	e1:SetTarget(c525110.target)
 	e1:SetOperation(c525110.operation)

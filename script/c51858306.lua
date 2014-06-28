@@ -51,7 +51,6 @@ function c51858306.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c51858306.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject():GetLabelObject()
 	return e:GetHandler():IsFaceup() and e:GetHandler():GetFlagEffect(51858306)~=0
 end
 function c51858306.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
