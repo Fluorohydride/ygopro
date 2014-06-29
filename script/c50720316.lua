@@ -8,6 +8,7 @@ function c50720316.initial_effect(c)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,50720316)
+	e1:SetCost(c50720316.cost)
 	e1:SetTarget(c50720316.thtg1)
 	e1:SetOperation(c50720316.tgop1)
 	c:RegisterEffect(e1)
@@ -17,6 +18,10 @@ function c50720316.initial_effect(c)
 	e2:SetTarget(c50720316.thtg2)
 	e2:SetOperation(c50720316.tgop2)
 	c:RegisterEffect(e2)
+end
+function c50720316.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c50720316.thfilter1(c)
 	return c:IsSetCard(0xa5) and c:IsType(TYPE_QUICKPLAY) and c:IsAbleToHand()
