@@ -17,7 +17,12 @@ function c17484499.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000)
 	else Duel.PayLPCost(tp,1000) end
 end
+function c17484499.filter(c)
+	return c:IsType(TYPE_SYNCHRO) or c:IsType(TYPE_XYZ) or c:IsType(TYPE_FUSION)
+	end
 function c17484499.activate(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(c17484499.filter,tp,LOCATION_GRAVE,LOCATION_GRAVE,nil)
+	Duel.SendtoDeck(g,nil,nil,nil)
 	Duel.SwapDeckAndGrave(tp)
 	Duel.SwapDeckAndGrave(1-tp)
 end
