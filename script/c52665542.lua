@@ -15,13 +15,15 @@ function c52665542.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCost(c52665542.cost)
 	e2:SetTarget(c52665542.target)
-	e2:SetOperation(c52665542.activate)
+	e2:SetOperation(c52665542.operation)
 	c:RegisterEffect(e2)
 	--add counter
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetRange(LOCATION_SZONE)
+	e3:SetProperty(EFFECT_FLAG_DELAY)
+	e3:SetCondition(c52665542.accon)
 	e3:SetOperation(c52665542.acop)
 	c:RegisterEffect(e3)
 	--destroy replace
@@ -46,17 +48,17 @@ function c52665542.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(sg,REASON_COST)
 end
 function c52665542.tgfilter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x38) and c:IsAbleToHand() 
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x38) and c:IsAbleToHand()
 end
 function c52665542.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetLabelObject()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c52665542.tgfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c52665542.tgfilter,tp,LOCATION_GRAVE,0,1,c) end
+	local cc=e:GetLabelObject()
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c52665542.tgfilter(chkc) and chkc~=cc end
+	if chk==0 then return Duel.IsExistingTarget(c52665542.tgfilter,tp,LOCATION_GRAVE,0,1,cc) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local sg=Duel.SelectTarget(tp,c52665542.tgfilter,tp,LOCATION_GRAVE,0,1,1,c)
+	local sg=Duel.SelectTarget(tp,c52665542.tgfilter,tp,LOCATION_GRAVE,0,1,1,cc)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,sg,sg:GetCount(),0,0)
 end
-function c52665542.activate(e,tp,eg,ep,ev,re,r,rp)
+function c52665542.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsRelateToEffect(e) then
@@ -65,16 +67,17 @@ function c52665542.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c52665542.cfilter(c,tp)
-	return c:GetPreviousLocation()==LOCATION_DECK and c:GetPreviousControler()==tp
+	return c:IsPreviousLocation(LOCATION_DECK) and c:GetPreviousControler()==tp
+end
+function c52665542.accon(e,tp,eg,ep,ev,re,r,rp)
+	return eg:IsExists(c52665542.cfilter,1,nil,tp)
 end
 function c52665542.acop(e,tp,eg,ep,ev,re,r,rp)
-	if eg:IsExists(c52665542.cfilter,1,nil,tp) then
-		e:GetHandler():AddCounter(0x5,1)
-	end
+	e:GetHandler():AddCounter(0x5,1)
 end
 function c52665542.dfilter(c,tp)
 	return c:IsFaceup() and c:IsLocation(LOCATION_ONFIELD)
-		and c:IsSetCard(0x38) and c:IsControler(tp)
+		and c:IsSetCard(0x38) and c:IsControler(tp) and c:IsReason(REASON_EFFECT)
 end
 function c52665542.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -85,8 +88,8 @@ function c52665542.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	return Duel.SelectYesNo(tp,aux.Stringid(52665542,1))
 end
 function c52665542.value(e,c)
-	return c:IsFaceup() and c:IsLocation(LOCATION_ONFIELD) 
-		and c:IsSetCard(0x38) and c:IsControler(e:GetHandlerPlayer())
+	return c:IsFaceup() and c:IsLocation(LOCATION_ONFIELD)
+		and c:IsSetCard(0x38) and c:IsControler(e:GetHandlerPlayer()) and c:IsReason(REASON_EFFECT)
 end
 function c52665542.desop(e,tp,eg,ep,ev,re,r,rp)
 	local count=e:GetLabel()
