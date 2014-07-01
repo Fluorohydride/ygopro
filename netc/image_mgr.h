@@ -4,6 +4,7 @@
 #include "wx/image.h"
 #include "wx/xml/xml.h"
 #include <vector>
+#include <list>
 #include <unordered_map>
 
 #define LAYOUT_STATIC	0
@@ -52,7 +53,7 @@ namespace ygopro
 		wxString click;
 		TextureInfo* ptex = nullptr;
 	};
-
+    
 	class ImageMgr {
 
 	public:
@@ -89,7 +90,7 @@ namespace ygopro
 		std::vector<LayoutInfo> clickable;
 	};
 
-	extern ImageMgr imageMgr;
+    extern ImageMgr imageMgr;
 
 }
 

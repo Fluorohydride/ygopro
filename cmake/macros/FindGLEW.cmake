@@ -1,10 +1,10 @@
 # - Try to find the Lib library
 # Once done this will define
 #
-#  GLEW_FOUND - System has Libevent
-#  GLEW_INCLUDE_DIR - The Libevent include directory
-#  GLEW_LIBRARIES - The libraries needed to use Libevent
-#  GLEW_DEFINITIONS - Compiler switches required for using Libevent
+#  GLEW_FOUND - System has glew
+#  GLEW_INCLUDE_DIR - The glew include directory
+#  GLEW_LIBRARIES - The libraries needed to use glew
+#  GLEW_DEFINITIONS - Compiler switches required for using glew
 
 SET(GLEW_DEFINITIONS ${PC_GLEW_CFLAGS_OTHER})
 

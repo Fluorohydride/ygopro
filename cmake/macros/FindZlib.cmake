@@ -1,10 +1,10 @@
 # - Try to find the Lib library
 # Once done this will define
 #
-#  ZLIB_FOUND - System has Libevent
-#  ZLIB_INCLUDE_DIR - The Libevent include directory
-#  ZLIB_LIBRARIES - The libraries needed to use Libevent
-#  ZLIB_DEFINITIONS - Compiler switches required for using Libevent
+#  ZLIB_FOUND - System has zlib
+#  ZLIB_INCLUDE_DIR - The zlib include directory
+#  ZLIB_LIBRARIES - The libraries needed to use zlib
+#  ZLIB_DEFINITIONS - Compiler switches required for using zlib
 
 SET(ZLIB_DEFINITIONS ${PC_ZLIB_CFLAGS_OTHER})
 

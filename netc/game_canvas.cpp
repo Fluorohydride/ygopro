@@ -1,3 +1,4 @@
+#include "GL/glew.h"
 #include "wx/image.h"
 #include "wx/clipbrd.h"
 #include "wx/time.h"
@@ -17,8 +18,9 @@ namespace ygopro
         Bind(wxEVT_MOTION, &wxGameCanvas::EventMouseMoved, this);
         Bind(wxEVT_LEFT_DOWN, &wxGameCanvas::EventMouseLDown, this);
         Bind(wxEVT_LEFT_UP, &wxGameCanvas::EventMouseLUp, this);
-        Bind(wxEVT_LEAVE_WINDOW, &wxGameCanvas::EventMouseLeftWindow, this);
+        Bind(wxEVT_RIGHT_DOWN, &wxGameCanvas::EventMouseRDown, this);
         Bind(wxEVT_RIGHT_UP, &wxGameCanvas::EventMouseRUp, this);
+        Bind(wxEVT_LEAVE_WINDOW, &wxGameCanvas::EventMouseLeftWindow, this);
         hover_timer.SetOwner(this);
         Bind(wxEVT_TIMER, &wxGameCanvas::OnHoverTimer, this);
         SetBackgroundStyle(wxBG_STYLE_CUSTOM);
@@ -89,6 +91,7 @@ namespace ygopro
     }
 
     void wxGameCanvas::EventMouseMoved(wxMouseEvent& evt) {
+        static wxPoint pre(0, 0);
         wxPoint pt = evt.GetPosition();
         float fx = pt.x / (float)glwidth * 2.0f - 1.0f;
         float fy = -pt.y / (float)glheight * 2.0f + 1.0f;
@@ -251,15 +254,9 @@ namespace ygopro
         }
     }
     
-    void wxGameCanvas::EventMouseLeftWindow(wxMouseEvent& evt) {
-        if(hover_field != 0) {
-            hover_field = 0;
-            hover_index = 0;
-            hover_code = 0;
-            Refresh();
-        }
+    void wxGameCanvas::EventMouseRDown(wxMouseEvent& evt) {
     }
-
+    
     void wxGameCanvas::EventMouseRUp(wxMouseEvent& evt) {
         if(click_field) {
             click_field = 0;
@@ -274,6 +271,15 @@ namespace ygopro
             current_deck.RemoveCard(hover_field, hover_index);
             EventMouseMoved(evt);
             mainFrame->StopViewRegulation();
+            Refresh();
+        }
+    }
+    
+    void wxGameCanvas::EventMouseLeftWindow(wxMouseEvent& evt) {
+        if(hover_field != 0) {
+            hover_field = 0;
+            hover_index = 0;
+            hover_code = 0;
             Refresh();
         }
     }
@@ -389,7 +395,8 @@ namespace ygopro
     void wxGameCanvas::DrawScene() {
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.2f, 0.2f, 0.2f, 0.0f);
+        
         glShadeModel(GL_SMOOTH);
 
         //draw background
@@ -502,9 +509,13 @@ namespace ygopro
         DrawNumber((int)current_deck.main_deck.size(), 0xffffff00, -0.931f, -0.003f, -0.868f, -0.066f);
         DrawNumber((int)current_deck.extra_deck.size(), 0xffffff00, -0.931f, -0.313f, -0.868f, -0.376f);
         DrawNumber((int)current_deck.side_deck.size(), 0xffffff00, -0.931f, -0.646f, -0.868f, -0.709f);
+        
         if(t_draging)
             DrawCard(&t_draging->ti, mousex - wd / 2, mousey + ht / 2, mousex + wd / 2, mousey - ht / 2, false, 3, 0, 0, 0);
+        
         glFlush();
+        Refresh();
     }
 
+    
 }

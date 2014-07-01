@@ -255,7 +255,7 @@ namespace ygopro
         } else if(fstr[0] == wxT('@')) {
             long code = 0;
             fstr.SubString(1, -1).ToLong(&code);
-            fc.code = code;
+            fc.code = (unsigned int)code;
             fstr = wxEmptyString;
         }
         fc.type = (unsigned int)(long)filter_att2[0]->GetClientData(filter_att2[0]->GetSelection());

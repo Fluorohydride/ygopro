@@ -89,7 +89,7 @@ namespace ygopro
         sz->AddSpacer(5);
         sz->Add(card_info, 1, wxEXPAND | wxALL, 5);
         wxBoxSizer *sz2 = new wxBoxSizer(wxHORIZONTAL);
-        sz2->Add(sz);
+        //sz2->Add(sz);
         sz2->Add(game_canvas, 1, wxEXPAND | wxALL);
         SetSizer(sz2);
         

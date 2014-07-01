@@ -1,10 +1,10 @@
 # - Try to find the Lib library
 # Once done this will define
 #
-#  PCRE_FOUND - System has Libevent
-#  PCRE_INCLUDE_DIR - The Libevent include directory
-#  PCRE_LIBRARIES - The libraries needed to use Libevent
-#  PCRE_DEFINITIONS - Compiler switches required for using Libevent
+#  PCRE_FOUND - System has pcre
+#  PCRE_INCLUDE_DIR - The pcre include directory
+#  PCRE_LIBRARIES - The libraries needed to use pcre
+#  PCRE_DEFINITIONS - Compiler switches required for using pcre
 
 SET(PCRE_DEFINITIONS ${PC_PCRE_CFLAGS_OTHER})
 

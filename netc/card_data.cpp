@@ -1,7 +1,7 @@
 #include "card_data.h"
 #include "game_frame.h"
 #include "../common/bufferutil.h"
-#include "../sqlite3/sqlite3.h"
+#include "../buildin/sqlite3.h"
 
 namespace ygopro
 {
@@ -238,6 +238,8 @@ namespace ygopro
             racname += static_cast<const std::string&>(stringCfg["race_divine"]) + wxT("|");
         if(race & 0x400000)
             racname += static_cast<const std::string&>(stringCfg["race_creatorgod"]) + wxT("|");
+        if(race & 0x800000)
+            racname += static_cast<const std::string&>(stringCfg["race_phantomdragon"]) + wxT("|");
         racname.resize(racname.length() - 1);
         return std::move(racname);
     }
@@ -278,6 +280,8 @@ namespace ygopro
                 tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_flip"]);
             if(arctype & 0x400000)
                 tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_toon"]);
+            if(arctype & 0x1000000)
+                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_pendulum"]);
         } else if(arctype & 0x2) {
             if(arctype == 0x2)
                 tpname = static_cast<const std::string&>(stringCfg["type_normal"]);

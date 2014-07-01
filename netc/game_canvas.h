@@ -60,8 +60,9 @@ namespace ygopro
 		void EventMouseMoved(wxMouseEvent& evt);
         void EventMouseLDown(wxMouseEvent& evt);
         void EventMouseLUp(wxMouseEvent& evt);
-		void EventMouseLeftWindow(wxMouseEvent& evt);
+        void EventMouseRDown(wxMouseEvent& evt);
         void EventMouseRUp(wxMouseEvent& evt);
+		void EventMouseLeftWindow(wxMouseEvent& evt);
         void OnHoverTimer(wxTimerEvent& evt);
 
 	};

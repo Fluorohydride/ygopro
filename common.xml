@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
-  <setting name="image_path" value="../ygo/pics" type="string"/>
-  <setting name="image_size_x" value="177" type="integer"/>
-  <setting name="image_size_y" value="254" type="integer"/>
-  <setting name="tex_size_x" value="256" type="integer"/>
-  <setting name="tex_size_y" value="256" type="integer"/>
-  <setting name="image_count_x" value="1" type="integer"/>
-  <setting name="image_count_y" value="1" type="integer"/>
-  <setting name="screenshot_path" value="./screenshot" type="string"/>
-  <setting name="database" value="../ygo/cards.cdb" type="string"/>
-  <setting name="textures" value="./conf/textures.xml" type="string"/>
-  <setting name="limit_regulation" value="./conf/lflist.conf" type="string"/>
-  <setting name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}" type="string"/>
-  <setting name="full_width_space" value="1" type="integer"/>
-  <setting name="hover_info_delay" value="300" type="integer"/>
+  <string name="image_path" value="../ygo/pics"/>
+  <integer name="image_size_x" value="177"/>
+  <integer name="image_size_y" value="254"/>
+  <integer name="tex_size_x" value="256"/>
+  <integer name="tex_size_y" value="256"/>
+  <integer name="image_count_x" value="1"/>
+  <integer name="image_count_y" value="1"/>
+  <string name="screenshot_path" value="./screenshot"/>
+  <string name="database" value="../ygo/cards.cdb"/>
+  <string name="string_path" value="./conf/strings.xml"/>
+  <string name="textures" value="./conf/textures.xml"/>
+  <string name="limit_regulation" value="./conf/lflist.conf"/>
+  <string name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}"/>
+  <integer name="full_width_space" value="1"/>
+  <integer name="hover_info_delay" value="300"/>
 </Common>

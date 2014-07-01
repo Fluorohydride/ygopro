@@ -18,38 +18,24 @@ else ()
     add_executable (netc ${AUTO_FILES_RESULT})
 endif ()
 
-target_link_libraries (netc sqlite3 lzma)
+target_link_libraries (netc buildin)
 
-if (MSVC)
-    target_link_libraries (netc wxwidgets sqlite3 lua event)
-else ()
-    target_link_libraries (netc 
-${LIBEVENT_LIBRARIES}
-${LUA_LIBRARIES}
-${wxWidgets_LIBRARIES}
-${OPENGL_gl_LIBRARY}
-${CEGUI_LIBRARIES}
-${EXPAT_LIBRARIES}
-${FREETYPE_LIBRARIES}
-${PCRE_LIBRARIES}
-${GLEW_LIBRARIES}
-${ZLIB_LIBRARIES}
+target_link_libraries (netc 
+    ${LIBEVENT_LIBRARIES}
+    ${LUA_LIBRARIES}
+    ${wxWidgets_LIBRARIES}
+    ${SFML_LIBRARIES}
+    ${OPENGL_gl_LIBRARY}
 )
-    include_directories (
-${LUA_INCLUDE_DIR}
-${LIBEVENT_INCLUDE_DIR}
-${wxWidgets_INCLUDE_DIRS}
-${OPENGL_INCLUDE_DIR}
-${CEGUI_INCLUDE_DIR}
-${GLM_INCLUDE_DIR}
-${EXPAT_LIB}
-${FREETYPE_INCLUDE_DIR}
-${PCRE_INCLUDE_DIR}
-${GLEW_INCLUDE_DIR}
-${ZLIB_INCLUDE_DIR}
+
+include_directories (
+    ${LUA_INCLUDE_DIR}
+    ${LIBEVENT_INCLUDE_DIR}
+    ${wxWidgets_INCLUDE_DIRS}
+    ${OPENGL_INCLUDE_DIR}
+    ${SFML_INCLUDE_DIR}
 )
-    target_link_libraries (netc ${CMAKE_THREAD_LIBS_INIT} ${DL_LIBRARIES})
-endif ()
+
 if (WIN32)
     target_link_libraries (netc ws2_32 winmm gdi32 kernel32 user32 imm32 opengl32)
 endif ()
