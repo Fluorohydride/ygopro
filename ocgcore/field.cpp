@@ -1735,14 +1735,17 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 	if((count == 1) && core.deck_reversed)
 		return player[playerid].list_main.back()->is_capable_cost_to_grave(playerid);
 	effect_set eset;
-	filter_field_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
-	for(int32 i = 0; i < eset.count; ++i) {
-		uint32 redirect = eset[i]->get_value();
-		if((redirect & LOCATION_REMOVED) && player[playerid].list_main.back()->is_affected_by_effect(EFFECT_CANNOT_REMOVE))
-			continue;
-		uint8 p = eset[i]->get_handler_player();
-		if((eset[i]->flag & EFFECT_FLAG_IGNORE_RANGE) || (p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
+	auto cit = player[playerid].list_main.rbegin();
+	for(int32 j = 0; j < count; ++j) {
+		eset.clear();
+		(*cit)->filter_effect(EFFECT_TO_GRAVE_REDIRECT, &eset);
+		for(int32 i = 0; i < eset.count; ++i) {
+			uint32 redirect = eset[i]->get_value();
+			if((redirect & LOCATION_REMOVED) && (*cit)->is_affected_by_effect(EFFECT_CANNOT_REMOVE))
+				continue;
 			return FALSE;
+		}
+		++cit;
 	}
 	return TRUE;
 }
