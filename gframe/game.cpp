@@ -178,23 +178,23 @@ bool Game::Initialize() {
 	//phase
 	wPhase = env->addStaticText(L"", rect<s32>(480, 310, 855, 330));
 	wPhase->setVisible(false);
-	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"\xff24\xff30");
+	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"DP");
 	btnDP->setEnabled(false);
 	btnDP->setPressed(true);
 	btnDP->setVisible(false);
-	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"\xff33\xff30");
+	btnSP = env->addButton(rect<s32>(65, 0, 115, 20), wPhase, -1, L"SP");
 	btnSP->setEnabled(false);
 	btnSP->setPressed(true);
 	btnSP->setVisible(false);
-	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"\xff2d\xff11");
+	btnM1 = env->addButton(rect<s32>(130, 0, 180, 20), wPhase, -1, L"M1");
 	btnM1->setEnabled(false);
 	btnM1->setPressed(true);
 	btnM1->setVisible(false);
-	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"\xff22\xff30");
+	btnBP = env->addButton(rect<s32>(195, 0, 245, 20), wPhase, BUTTON_BP, L"BP");
 	btnBP->setVisible(false);
-	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"\xff2d\xff12");
+	btnM2 = env->addButton(rect<s32>(260, 0, 310, 20), wPhase, BUTTON_M2, L"M2");
 	btnM2->setVisible(false);
-	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
+	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"EP");
 	btnEP->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
