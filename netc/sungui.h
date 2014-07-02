@@ -269,6 +269,7 @@ namespace sgui
     
     class SGTextBase {
     public:
+        SGTextBase();
         virtual ~SGTextBase();
         virtual void SetFont(sf::Font* ft, unsigned int sz);
         virtual void SetSpacing(unsigned int x, unsigned int y);
@@ -283,10 +284,11 @@ namespace sgui
         virtual void EvaluateSize(const std::wstring& t = L"");
         virtual void UpdateTextVertex();
         virtual void DrawText();
+        virtual std::wstring GetText() { return text; }
         
     protected:
         bool text_update = true;
-        bool text_dirty = true;
+        short mem_size = 0;
         unsigned int tbo[2] = {0, 0};
         sf::Font* font = nullptr;
         unsigned int font_size = 0;
@@ -503,13 +505,8 @@ namespace sgui
         virtual void ClearText();
         virtual void SetText(const std::wstring& t, unsigned int cl);
         virtual void AppendText(const std::wstring& t, unsigned int cl);
-        unsigned int GetHitIndex(v2i pos);
         
     protected:
-        virtual bool EventMouseLeave();
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        
         unsigned int max_width = 0;
         
     public:
@@ -517,6 +514,22 @@ namespace sgui
         static SGConfig label_config;
     };
 
+    class SGIconLabel : public SGLabel {
+    public:
+        virtual ~SGIconLabel();
+        virtual void EvaluateSize(const std::wstring& t = L"");
+        virtual void UpdateTextVertices();
+        virtual void Draw();
+        
+    protected:
+        int icon_size = 0;
+        int icon_mem_size = 0;
+        unsigned int vbo[2] = {0, 0};
+        
+    public:
+        static SGConfig iconlabel_config;
+    };
+    
     class SGSprite : public SGWidget, public SGSpriteBase {
     public:
         virtual ~SGSprite();

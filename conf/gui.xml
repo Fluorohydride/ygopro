@@ -37,6 +37,10 @@
     <integer name="closelw" value="1"/>
     <integer name="closerw" value="1"/>
   </window>
+  <chatlabel>
+    <rect name="iconoffset" u="256" v="0" w="20" h="20"/>
+    <integer name="column" value="12"/>
+  </chatlabel>
   <button>
     <integer name="border" value="5"/>
     <rect name="normal" u="82" v="2" w="32" h="21"/>
@@ -81,7 +85,7 @@
     <integer name="sel_bcolor" value="0xff800000"/>
     <rect name="cursor" u="46" v="107" w="2" h="14"/>
     <rect name="sel_rect" u="47" v="89" w="10" h="10"/>
-    <rect name="text_area" u="5" v="6" w="6" h="6"/>
+    <rect name="text_area" u="5" v="7" w="6" h="6"/>
     <rect name="back" u="62" v="106" w="29" h="32"/>
     <rect name="backh" u="62" v="74" w="29" h="32"/>
   </textedit>

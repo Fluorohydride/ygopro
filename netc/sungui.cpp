@@ -4,6 +4,7 @@
 #include <OpenGL/glu.h>
 #include <array>
 #include <iostream>
+#include <regex>
 
 #include <wx/xml/xml.h>
 #include <wx/clipbrd.h>
@@ -154,9 +155,12 @@ namespace sgui
         return eventDragUpdate.TriggerEvent(*this, delta);
     }
     
+    SGTextBase::SGTextBase() {
+        glGenBuffers(2, tbo);
+    }
+    
     SGTextBase::~SGTextBase() {
-        if(text.length())
-            glDeleteBuffers(2, tbo);
+        glDeleteBuffers(2, tbo);
     }
     
     void SGTextBase::SetFont(sf::Font* ft, unsigned int sz) {
@@ -182,12 +186,11 @@ namespace sgui
     void SGTextBase::ClearText() {
         text.clear();
         color_vec.clear();
-        glDeleteBuffers(2, tbo);
+        text_pos_array.clear();
         text_update = true;
-        text_dirty = true;
         text_width = 0;
         text_height = 0;
-        text_width_cur = font_size;
+        text_width_cur = 0;
     }
     
     unsigned int SGTextBase::GetTextColor(int index) {
@@ -197,27 +200,21 @@ namespace sgui
     void SGTextBase::SetText(const std::wstring& t, unsigned int cl) {
         if(t.length() == 0)
             return;
-        if(text.length() == 0)
-            glGenBuffers(2, tbo);
         text = t;
         color_vec.clear();
         for(size_t i = 0; i < text.length(); ++i)
             color_vec.push_back(cl);
         text_update = true;
-        text_dirty = true;
         EvaluateSize();
     }
     
     void SGTextBase::AppendText(const std::wstring& t, unsigned int cl) {
         if(t.length() == 0)
             return;
-        if(text.length() == 0)
-            glGenBuffers(2, tbo);
         text += t;
         for(size_t i = 0; i < t.length(); ++i)
             color_vec.push_back(cl);
         text_update = true;
-        text_dirty = true;
         EvaluateSize(t);
     }
     
@@ -261,12 +258,9 @@ namespace sgui
         if(!text_update || font == nullptr)
             return;
         text_update = false;
-        int pre_vert_size = vert_size;
         vert_size = 0;
-        if(text.length() == 0) {
-            text_dirty = false;
+        if(text.length() == 0)
             return;
-        }
         std::vector<SGVertexVCT> charvtx;
         std::vector<unsigned short> index;
         auto tex = font->getTexture(font_size);
@@ -320,18 +314,21 @@ namespace sgui
             index.push_back(vert_size * 4 + 3);
             vert_size++;
         }
-        if(text_dirty && vert_size > pre_vert_size) {
+        if(vert_size > mem_size) {
+            if(mem_size == 0)
+                mem_size = 16;
+            while(mem_size < vert_size)
+                mem_size *= 2;
             glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, &charvtx[0], GL_DYNAMIC_DRAW);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, index.size() * sizeof(unsigned short), &index[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), &index[0], GL_DYNAMIC_DRAW);
         } else {
             glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
             glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, index.size() * sizeof(unsigned short), &index[0]);
         }
-        text_dirty = false;
     }
     
     void SGTextBase::DrawText() {
@@ -694,6 +691,7 @@ namespace sgui
         AddConfig("radio", SGRadio::radio_config);
         AddConfig("scroll", SGScrollBar::scroll_config);
         AddConfig("textedit", SGTextEdit::textedit_config);
+        AddConfig("iconlabel", SGIconLabel::iconlabel_config);
         
         wxXmlDocument doc;
 		if(!doc.Load("./conf/gui.xml", wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
@@ -1079,34 +1077,6 @@ namespace sgui
         PostResize(true, false);
     }
     
-    unsigned int SGLabel::GetHitIndex(v2i pos) {
-        unsigned int index = 0;
-//        int ls = GetLineSpacing();
-//        v2i offset = pos - position_abs;
-//        for(auto tpos : text_pos_array) {
-//            if(tpos.y > offset.y)
-//                break;
-//            if(tpos.x > offset.x && tpos.y + ls > offset.y)
-//                break;
-//            index++;
-//        }
-//        if(index > 0)
-//            index--;
-        return index;
-    }
-    
-    bool SGLabel::EventMouseLeave() {
-        return SGWidget::EventMouseLeave();
-    }
-    
-    bool SGLabel::EventMouseMove(sf::Event::MouseMoveEvent evt) {
-        return SGWidget::EventMouseMove(evt);
-    }
-    
-    bool SGLabel::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
-        return SGWidget::EventMouseButtonDown(evt);
-    }
-    
     std::shared_ptr<SGLabel> SGLabel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw) {
         auto ptr = std::make_shared<SGLabel>();
         ptr->parent = p;
@@ -1124,6 +1094,185 @@ namespace sgui
         else
             guiRoot.AddChild(ptr);
         return ptr;
+    }
+    
+    SGConfig SGIconLabel::iconlabel_config;
+    
+    SGIconLabel::~SGIconLabel() {
+        
+    }
+    
+    void SGIconLabel::EvaluateSize(const std::wstring& t) {
+        if(t.length() == 0) {
+            text_width = 0;
+            text_height = font_size;
+            text_width_cur = 0;
+            text_pos_array.clear();
+            if(text.length() == 0)
+                return;
+            EvaluateSize(text);
+        } else {
+            int max_width = GetMaxWidth();
+            int ls = GetLineSpacing();
+            for(auto ch : t) {
+                if(ch < L' ') {
+                    text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
+                    if(ch == L'\n') {
+                        if(text_width_cur > text_width)
+                            text_width = text_width_cur;
+                        text_width_cur = 0;
+                        text_height += ls;
+                    }
+                    continue;
+                }
+                if(ch >= 0xe000 && ch <= 0xefff) { //private use zone
+                    if(text_width_cur + 20 > max_width) {
+                        if(text_width_cur > text_width)
+                            text_width = text_width_cur;
+                        text_width_cur = 0;
+                        text_height += ls;
+                    }
+                    text_width_cur += 20 + spacing_x;
+                } else {
+                    auto& gl = font->getGlyph(ch, font_size, false);
+                    if(text_width_cur + gl.advance > max_width) {
+                        if(text_width_cur > text_width)
+                            text_width = text_width_cur;
+                        text_width_cur = 0;
+                        text_height += ls;
+                    }
+                    text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
+                    text_width_cur += gl.advance + spacing_x;
+                }
+            }
+        }
+    }
+    
+    void SGIconLabel::UpdateTextVertices() {
+        if(!text_update || font == nullptr)
+            return;
+        text_update = false;
+        vert_size = 0;
+        icon_size = 0;
+        if(text.length() == 0)
+            return;
+        std::vector<SGVertexVCT> charvtx;
+        std::vector<unsigned short> charidx;
+        std::vector<SGVertexVCT> iconvtx;
+        std::vector<unsigned short> iconidx;
+        auto tex = font->getTexture(font_size);
+        unsigned int advx = 0, advy = font_size;
+        SGVertexVCT cur_char;
+        int max_width = GetMaxWidth();
+        int ls = GetLineSpacing();
+        v2i text_pos = GetTextOffset();
+        auto iconoffset = iconlabel_config.tex_config["iconoffset"];
+        auto iconrc = iconlabel_config.int_config["column"];
+        for(size_t i = 0; i < text.length(); ++i) {
+            wchar_t ch = text[i];
+            unsigned int color = GetTextColor((int)i);
+            if(ch < L' ') {
+                if(ch == L'\n') {
+                    advx = 0;
+                    advy += ls;
+                }
+                continue;
+            }
+            if(ch >= 0xe000 && ch <= 0xefff) {
+                int index = ch - 0xe000;
+                int x = index % iconrc;
+                int y = index / iconrc;
+                sf::IntRect rct = iconoffset;
+                rct.left += x * iconoffset.width;
+                rct.top += y * iconoffset.height;
+                if(advx + iconoffset.width > max_width) {
+                    advx = 0;
+                    advy += ls;
+                }
+                
+                iconvtx.resize(iconvtx.size() + 4);
+                guiRoot.SetRectVertex(&iconvtx[icon_size * 4], text_pos.x + advx, text_pos.y + advy, iconoffset.width, iconoffset.height, rct);
+                advx += iconoffset.width + spacing_x;
+                
+                iconidx.push_back(icon_size * 4);
+                iconidx.push_back(icon_size * 4 + 2);
+                iconidx.push_back(icon_size * 4 + 1);
+                iconidx.push_back(icon_size * 4 + 1);
+                iconidx.push_back(icon_size * 4 + 2);
+                iconidx.push_back(icon_size * 4 + 3);
+                icon_size++;
+            } else {
+                auto& gl = font->getGlyph(ch, font_size, false);
+                if(advx + gl.advance > max_width) {
+                    advx = 0;
+                    advy += ls;
+                }
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                charvtx.push_back(cur_char);
+                advx += gl.advance + spacing_x;
+                
+                charidx.push_back(vert_size * 4);
+                charidx.push_back(vert_size * 4 + 2);
+                charidx.push_back(vert_size * 4 + 1);
+                charidx.push_back(vert_size * 4 + 1);
+                charidx.push_back(vert_size * 4 + 2);
+                charidx.push_back(vert_size * 4 + 3);
+                vert_size++;
+            }
+        }
+        if(icon_size > icon_mem_size) {
+            if(icon_mem_size == 0)
+                icon_mem_size = 8;
+            while(icon_mem_size < icon_size)
+                icon_mem_size *= 2;
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * icon_mem_size * 4, &iconvtx[0], GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, icon_mem_size * 6 * sizeof(unsigned short), &iconidx[0], GL_DYNAMIC_DRAW);
+        } else {
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * iconvtx.size(), &iconvtx[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, iconidx.size() * sizeof(unsigned short), &iconidx[0]);
+        }
+        if(vert_size > mem_size) {
+            if(mem_size == 0)
+                mem_size = 16;
+            while(mem_size < vert_size)
+                mem_size *= 2;
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, &charvtx[0], GL_DYNAMIC_DRAW);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), &charidx[0], GL_DYNAMIC_DRAW);
+        } else {
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, charidx.size() * sizeof(unsigned short), &charidx[0]);
+        }
+    }
+    
+    void SGIconLabel::Draw() {
+        UpdateVertices();
+        DrawText();
     }
     
     SGConfig SGSprite::sprite_config;
@@ -1989,7 +2138,6 @@ namespace sgui
         if(text_offset != preoff) {
             vertices_dirty = true;
             sel_change = true;
-            text_dirty = true;
         }
     }
     
@@ -2012,7 +2160,6 @@ namespace sgui
         if(text_offset != preoff) {
             vertices_dirty = true;
             sel_change = true;
-            text_dirty = true;
         }
     }
     
@@ -2127,7 +2274,6 @@ namespace sgui
                     cursor_pos = sel_start;
                     EvaluateSize();
                     sel_end = sel_start;
-                    text_dirty = true;
                     vertices_dirty = true;
                     sel_change = true;
                 }
@@ -2162,7 +2308,6 @@ namespace sgui
                     EvaluateSize();
                     sel_end = sel_start;
                     vertices_dirty = true;
-                    text_dirty = true;
                     sel_change = true;
                     cursor_pos += str.length();
                     CheckCursorPos();
@@ -2184,7 +2329,6 @@ namespace sgui
                 EvaluateSize();
                 CheckCursorPos();
                 vertices_dirty = true;
-                text_dirty = true;
                 sel_change = true;
                 break;
             case sf::Keyboard::Delete:
@@ -2202,7 +2346,6 @@ namespace sgui
                 EvaluateSize();
                 CheckCursorPos();
                 vertices_dirty = true;
-                text_dirty = true;
                 sel_change = true;
                 break;
             case sf::Keyboard::Left:
@@ -2255,7 +2398,6 @@ namespace sgui
         EvaluateSize();
         sel_end = sel_start;
         vertices_dirty = true;
-        text_dirty = true;
         sel_change = true;
         cursor_pos += 1;
         CheckCursorPos();

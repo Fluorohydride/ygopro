@@ -49,7 +49,7 @@ int main(int argc, char* argv[]) {
     auto bt1 = sgui::SGButton::Create(w1, {10, 160}, {100, 50});
     bt1->SetText(L"A Button", 0xffff0000);
     auto lb = sgui::SGLabel::Create(w1, {10, 220}, L"", 0);
-    lb->SetText(L"Line1\nLine2Line2", 0xff000000);
+    lb->SetText(L"Line1\nLine2Line2<c:0xff00ff00/>\nLine3", 0xff000000);
     auto t1 = sgui::SGTextEdit::Create(w1, {10, 300}, {150, 30});
     t1->SetText(L"InputText12345  67890", 0xff000000);
     bool running = true;
