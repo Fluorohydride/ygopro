@@ -1,4 +1,4 @@
---ジェムナイト·マディラ
+--ジェムナイト・マディラ
 function c67985943.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
