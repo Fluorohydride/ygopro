@@ -320,9 +320,11 @@ namespace sgui
             while(mem_size < vert_size)
                 mem_size *= 2;
             glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, &charvtx[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), &index[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, index.size() * sizeof(unsigned short), &index[0]);
         } else {
             glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
@@ -615,6 +617,17 @@ namespace sgui
     void SGGUIRoot::BeginScissor(sf::IntRect rt) {
         if(scissor_stack.size() == 0)
             glEnable(GL_SCISSOR_TEST);
+        else {
+            auto prt = scissor_stack.back();
+            if(rt.left < prt.left)
+                rt.left = prt.left;
+            if(rt.top < prt.top)
+                rt.top = prt.top;
+            if(rt.left + rt.width > prt.left + prt.width)
+                rt.width = prt.left + prt.width - rt.left;
+            if(rt.top + rt.height > prt.top + prt.height)
+                rt.height = prt.top + prt.height - rt.top;
+        }
         scissor_stack.push_back(rt);
         glScissor(rt.left, scene_size.y - rt.top - rt.height, rt.width, rt.height);
     }
@@ -880,6 +893,7 @@ namespace sgui
         if(!vertices_dirty)
             return;
         vertices_dirty = false;
+        text_update = true;
         int title_h = window_config.int_config["title_h"];
         int title_lw = window_config.int_config["title_lw"];
         int title_rw = window_config.int_config["title_rw"];
@@ -1099,7 +1113,7 @@ namespace sgui
     SGConfig SGIconLabel::iconlabel_config;
     
     SGIconLabel::~SGIconLabel() {
-        
+        glDeleteBuffers(2, vbo);
     }
     
     void SGIconLabel::EvaluateSize(const std::wstring& t) {
@@ -1113,7 +1127,10 @@ namespace sgui
             EvaluateSize(text);
         } else {
             int max_width = GetMaxWidth();
+            auto iconoffset = iconlabel_config.tex_config["iconoffset"];
             int ls = GetLineSpacing();
+            int ils = ls > (iconoffset.height + spacing_y) ? ls : (iconoffset.height + spacing_y);
+            bool has_icon = false;
             for(auto ch : t) {
                 if(ch < L' ') {
                     text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
@@ -1121,25 +1138,28 @@ namespace sgui
                         if(text_width_cur > text_width)
                             text_width = text_width_cur;
                         text_width_cur = 0;
-                        text_height += ls;
+                        text_height += has_icon ? ils : ls;
+                        has_icon = false;
                     }
                     continue;
                 }
                 if(ch >= 0xe000 && ch <= 0xefff) { //private use zone
-                    if(text_width_cur + 20 > max_width) {
+                    if(text_width_cur + iconoffset.width > max_width) {
                         if(text_width_cur > text_width)
                             text_width = text_width_cur;
                         text_width_cur = 0;
-                        text_height += ls;
+                        text_height += has_icon ? ils : ls;
                     }
-                    text_width_cur += 20 + spacing_x;
+                    has_icon = true;
+                    text_width_cur += iconoffset.width + spacing_x;
                 } else {
                     auto& gl = font->getGlyph(ch, font_size, false);
                     if(text_width_cur + gl.advance > max_width) {
                         if(text_width_cur > text_width)
                             text_width = text_width_cur;
                         text_width_cur = 0;
-                        text_height += ls;
+                        text_height += has_icon ? ils : ls;
+                        has_icon = false;
                     }
                     text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
                     text_width_cur += gl.advance + spacing_x;
@@ -1148,7 +1168,7 @@ namespace sgui
         }
     }
     
-    void SGIconLabel::UpdateTextVertices() {
+    void SGIconLabel::UpdateTextVertex() {
         if(!text_update || font == nullptr)
             return;
         text_update = false;
@@ -1164,17 +1184,20 @@ namespace sgui
         unsigned int advx = 0, advy = font_size;
         SGVertexVCT cur_char;
         int max_width = GetMaxWidth();
-        int ls = GetLineSpacing();
         v2i text_pos = GetTextOffset();
         auto iconoffset = iconlabel_config.tex_config["iconoffset"];
         auto iconrc = iconlabel_config.int_config["column"];
+        int ls = GetLineSpacing();
+        int ils = ls > (iconoffset.height + spacing_y) ? ls : (iconoffset.height + spacing_y);
+        bool has_icon = false;
         for(size_t i = 0; i < text.length(); ++i) {
             wchar_t ch = text[i];
             unsigned int color = GetTextColor((int)i);
             if(ch < L' ') {
                 if(ch == L'\n') {
                     advx = 0;
-                    advy += ls;
+                    advy += has_icon ? ils : ls;
+                    has_icon = false;
                 }
                 continue;
             }
@@ -1187,11 +1210,11 @@ namespace sgui
                 rct.top += y * iconoffset.height;
                 if(advx + iconoffset.width > max_width) {
                     advx = 0;
-                    advy += ls;
+                    advy += has_icon ? ils : ls;
                 }
-                
+                has_icon = true;
                 iconvtx.resize(iconvtx.size() + 4);
-                guiRoot.SetRectVertex(&iconvtx[icon_size * 4], text_pos.x + advx, text_pos.y + advy, iconoffset.width, iconoffset.height, rct);
+                guiRoot.SetRectVertex(&iconvtx[icon_size * 4], text_pos.x + advx, text_pos.y + advy - font_size, iconoffset.width, iconoffset.height, rct);
                 advx += iconoffset.width + spacing_x;
                 
                 iconidx.push_back(icon_size * 4);
@@ -1205,7 +1228,8 @@ namespace sgui
                 auto& gl = font->getGlyph(ch, font_size, false);
                 if(advx + gl.advance > max_width) {
                     advx = 0;
-                    advy += ls;
+                    advy += has_icon ? ils : ls;
+                    has_icon = false;
                 }
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
                 cur_char.color = color;
@@ -1244,9 +1268,11 @@ namespace sgui
             while(icon_mem_size < icon_size)
                 icon_mem_size *= 2;
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * icon_mem_size * 4, &iconvtx[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * icon_mem_size * 4, nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * iconvtx.size(), &iconvtx[0]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, icon_mem_size * 6 * sizeof(unsigned short), &iconidx[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, icon_mem_size * 6 * sizeof(unsigned short), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, iconidx.size() * sizeof(unsigned short), &iconidx[0]);
         } else {
             glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * iconvtx.size(), &iconvtx[0]);
@@ -1259,9 +1285,11 @@ namespace sgui
             while(mem_size < vert_size)
                 mem_size *= 2;
             glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, &charvtx[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), &charidx[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, charidx.size() * sizeof(unsigned short), &charidx[0]);
         } else {
             glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
             glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
@@ -1272,7 +1300,45 @@ namespace sgui
     
     void SGIconLabel::Draw() {
         UpdateVertices();
-        DrawText();
+        UpdateTextVertex();
+        if(icon_size) {
+            guiRoot.BindGuiTexture();
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
+            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glDrawElements(GL_TRIANGLES, icon_size * 6, GL_UNSIGNED_SHORT, 0);
+        }
+        if(vert_size) {
+            guiRoot.BindFontTexture(font_size);
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
+            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glDrawElements(GL_TRIANGLES, vert_size * 6, GL_UNSIGNED_SHORT, 0);
+        }
+    }
+    
+    std::shared_ptr<SGIconLabel> SGIconLabel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw) {
+        auto ptr = std::make_shared<SGIconLabel>();
+        ptr->parent = p;
+        ptr->position = pos;
+        ptr->max_width = mw;
+        auto iter2 = iconlabel_config.int_config.find("font_size");
+        if(iter2 != iconlabel_config.int_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        else
+            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+        ptr->SetText(t, guiRoot.GetDefaultInt("font_color"));
+        ptr->PostResize(false, true);
+        glGenBuffers(2, ptr->vbo);
+        if(p != nullptr)
+            p->AddChild(ptr);
+        else
+            guiRoot.AddChild(ptr);
+        return ptr;
     }
     
     SGConfig SGSprite::sprite_config;

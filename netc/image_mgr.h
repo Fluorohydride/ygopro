@@ -7,12 +7,6 @@
 #include <list>
 #include <unordered_map>
 
-#define LAYOUT_STATIC	0
-#define LAYOUT_LP		1
-#define LAYOUT_TEXT		2
-#define LAYOUT_PHASE	3
-#define LAYOUT_BUTTON	4
-
 namespace ygopro
 {
     
@@ -39,20 +33,6 @@ namespace ygopro
         unsigned int ref_count = 0;
         bool is_system = false;
     };
-    
-	struct LayoutInfo {
-		int style = 0;
-		double x1 = 0.0;
-		double y1 = 0.0;
-		double x2 = 0.0;
-		double y2 = 0.0;
-		double x3 = 0.0;
-		double y3 = 0.0;
-		double x4 = 0.0;
-		double y4 = 0.0;
-		wxString click;
-		TextureInfo* ptex = nullptr;
-	};
     
 	class ImageMgr {
 
@@ -86,8 +66,6 @@ namespace ygopro
 		std::unordered_map<std::string, TextureInfo> textures;
         std::unordered_map<std::string, wxString> single_images;
         std::vector<TextureInfo> text_texture;
-		std::vector<LayoutInfo> layouts;
-		std::vector<LayoutInfo> clickable;
 	};
 
     extern ImageMgr imageMgr;

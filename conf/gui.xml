@@ -37,10 +37,10 @@
     <integer name="closelw" value="1"/>
     <integer name="closerw" value="1"/>
   </window>
-  <chatlabel>
+  <iconlabel>
     <rect name="iconoffset" u="256" v="0" w="20" h="20"/>
     <integer name="column" value="12"/>
-  </chatlabel>
+  </iconlabel>
   <button>
     <integer name="border" value="5"/>
     <rect name="normal" u="82" v="2" w="32" h="21"/>

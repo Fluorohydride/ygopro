@@ -518,7 +518,7 @@ namespace sgui
     public:
         virtual ~SGIconLabel();
         virtual void EvaluateSize(const std::wstring& t = L"");
-        virtual void UpdateTextVertices();
+        virtual void UpdateTextVertex();
         virtual void Draw();
         
     protected:
@@ -527,6 +527,7 @@ namespace sgui
         unsigned int vbo[2] = {0, 0};
         
     public:
+        static std::shared_ptr<SGIconLabel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw = 0xffff);
         static SGConfig iconlabel_config;
     };
     

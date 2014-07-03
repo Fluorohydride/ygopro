@@ -213,37 +213,6 @@ namespace ygopro
                     ti.rx = ti.lx + w / (double)iter->second.t_width;
                     ti.ry = ti.ly + h / (double)iter->second.t_height;
                 }
-			} else if(child->GetName() == wxT("layout")) {
-				LayoutInfo li;
-				std::string name = child->GetAttribute("name").ToStdString();
-				wxString style = child->GetAttribute("style");
-				li.click = child->GetAttribute("click");
-				std::string texture = child->GetAttribute("texture").ToStdString();
-				child->GetAttribute("x1").ToDouble(&li.x1);
-				child->GetAttribute("x2").ToDouble(&li.x2);
-				child->GetAttribute("x3").ToDouble(&li.x3);
-				child->GetAttribute("x4").ToDouble(&li.x4);
-				child->GetAttribute("y1").ToDouble(&li.y1);
-				child->GetAttribute("y2").ToDouble(&li.y2);
-				child->GetAttribute("y3").ToDouble(&li.y3);
-				child->GetAttribute("y4").ToDouble(&li.y4);
-				if(style == "button")
-					li.style = LAYOUT_BUTTON;
-				else if(style == "lp")
-					li.style = LAYOUT_LP;
-				else if(style == "text")
-					li.style = LAYOUT_TEXT;
-				else if(style == "phase")
-					li.style = LAYOUT_PHASE;
-				else
-					li.style = LAYOUT_STATIC;
-				if(texture == "")
-					li.ptex = nullptr;
-				else
-					li.ptex = &textures[texture];
-				layouts.push_back(li);
-				if(li.click != "")
-					clickable.push_back(li);
 			}
 			child = child->GetNext();
 		}

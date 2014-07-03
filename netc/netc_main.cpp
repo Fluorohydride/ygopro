@@ -48,19 +48,23 @@ int main(int argc, char* argv[]) {
     r4->SetGroup(r3);
     auto bt1 = sgui::SGButton::Create(w1, {10, 160}, {100, 50});
     bt1->SetText(L"A Button", 0xffff0000);
-    auto lb = sgui::SGLabel::Create(w1, {10, 220}, L"", 0);
-    lb->SetText(L"Line1\nLine2Line2<c:0xff00ff00/>\nLine3", 0xff000000);
     auto t1 = sgui::SGTextEdit::Create(w1, {10, 300}, {150, 30});
     t1->SetText(L"InputText12345  67890", 0xff000000);
+    auto lb = sgui::SGIconLabel::Create(w1, {10, 220}, L"", 0);
+    lb->SetText(L"Line1\ue004\ue005\ue086\nLine2\ue001Line2\nLine3Line3", 0xff000000);
     bool running = true;
     sf::Clock clock;
     float tm1 = clock.getElapsedTime().asSeconds();
+    int fps = 0;
     while (running) {
+        fps++;
         sf::Event evt;
         float tm2 = clock.getElapsedTime().asSeconds();
-        float tm_delta = tm2 - tm1;
-        tm1 = tm2;
-        tm_delta = 0;
+        if(tm2 - tm1 >= 1.0f) {
+            std::cout << "fps : " << fps << std::endl;
+            tm1 += 1.0f;
+            fps = 0;
+        }
         while (window.pollEvent(evt)) {
             switch(evt.type) {
                 case sf::Event::Closed:
