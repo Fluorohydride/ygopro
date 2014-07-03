@@ -13,11 +13,12 @@ function c67985943.initial_effect(c)
 	--actlimit
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE)
+	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetCode(EFFECT_CANNOT_TRIGGER)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetTargetRange(0,0xff)
 	e3:SetCondition(c67985943.actcon)
-	e3:SetTarget(aux.TRUE)
+	e3:SetTarget(c67985943.acttg)
 	c:RegisterEffect(e3)
 end
 function c67985943.splimit(e,se,sp,st)
@@ -25,4 +26,8 @@ function c67985943.splimit(e,se,sp,st)
 end
 function c67985943.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
+end
+function c67985943.acttg(e,c)
+	local tp=e:GetHandler():GetControler()
+	return not (c:IsLocation(LOCATION_REMOVED) and c:IsReason(REASON_TEMPORARY) and c:GetPreviousControler()==tp)
 end

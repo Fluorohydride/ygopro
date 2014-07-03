@@ -20,9 +20,14 @@ end
 function c402568.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetCode(EFFECT_CANNOT_TRIGGER)
-	e1:SetTarget(aux.TRUE)
+	e1:SetTargetRange(0,0xff)
+	e1:SetTarget(c402568.acttg)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+end
+function c402568.acttg(e,c)
+	local tp=e:GetHandlerPlayer()
+	return not (c:IsLocation(LOCATION_REMOVED) and c:IsReason(REASON_TEMPORARY) and c:GetPreviousControler()==tp)
 end
