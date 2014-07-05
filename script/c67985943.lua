@@ -17,12 +17,15 @@ function c67985943.initial_effect(c)
 	e3:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(0,1)
-	e3:SetValue(1)
+	e3:SetValue(c67985943.aclimit)
 	e3:SetCondition(c67985943.actcon)
 	c:RegisterEffect(e3)
 end
 function c67985943.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA) or bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+function c67985943.aclimit(e,re,tp)
+	return not re:GetHandler():IsImmuneToEffect(e)
 end
 function c67985943.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()

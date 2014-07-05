@@ -3397,7 +3397,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(core.attacker->is_position(POS_FACEUP_DEFENCE)) {
 			effect* defattack = core.attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK);
-			if(defattack && defattack->get_value(core.attacker) == 1)
+			if(defattack && defattack->get_value(core.attacker))
 				a = ad;
 		}
 		if(core.attack_target) {
