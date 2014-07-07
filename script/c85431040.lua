@@ -30,20 +30,41 @@ function c85431040.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c85431040.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	if g:GetCount()==0 then return end
 	if Duel.SelectYesNo(tp,aux.Stringid(85431040,1)) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=g:Select(tp,1,ft,nil)
-		if Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_ATTACK)==0 then return end
-		local tc=sg:GetFirst()
-		while tc do
-			--cannot trigger
+		--negate field card(tmp)
+		local g0=Duel.GetFieldGroup(tp,LOCATION_ONFIELD,LOCATION_ONFIELD)
+		local tmpc=g0:GetFirst()
+		local nlist={}
+		local ctr=1
+		while tmpc do
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-			e1:SetCode(EFFECT_CANNOT_TRIGGER)
-			e1:SetRange(LOCATION_MZONE)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
-			tc:RegisterEffect(e1,true)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_CARD)
+			tmpc:RegisterEffect(e1)
+			nlist[ctr]=e1
+			ctr=ctr+1
+			tmpc=g0:GetNext()
+		end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,1,ft,nil)
+		local tc=sg:GetFirst()
+		while tc do
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+			--cannot trigger
+			local e2=Effect.CreateEffect(e:GetHandler())
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+			e2:SetCode(EFFECT_CANNOT_TRIGGER)
+			e2:SetRange(LOCATION_MZONE)
+			e2:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e2,true)
 			tc=sg:GetNext()
 		end
+		--negate reset
+		local i=0
+		for i=1,ctr-1 do
+			nlist[i]:Reset()
+		end
+		Duel.SpecialSummonComplete()
 	end
 end
