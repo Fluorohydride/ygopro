@@ -32,7 +32,6 @@ function c16404809.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c16404809.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5 end
-	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c16404809.filter(c)
 	return c:IsAbleToHand() and c:IsType(TYPE_SPELL+TYPE_TRAP)

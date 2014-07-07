@@ -32,18 +32,18 @@ function c85431040.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectYesNo(tp,aux.Stringid(85431040,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,ft,nil)
+		if Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_ATTACK)==0 then return end
 		local tc=sg:GetFirst()
 		while tc do
-			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
 			--cannot trigger
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 			e1:SetCode(EFFECT_CANNOT_TRIGGER)
 			e1:SetRange(LOCATION_MZONE)
 			e1:SetReset(RESET_EVENT+0x1fe0000)
-			tc:RegisterEffect(e1)
+			tc:RegisterEffect(e1,true)
 			tc=sg:GetNext()
 		end
-		Duel.SpecialSummonComplete()
 	end
 end
