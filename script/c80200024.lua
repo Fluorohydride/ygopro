@@ -39,7 +39,6 @@ function c80200024.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e5:SetOperation(c80200024.ntop)
 	c:RegisterEffect(e5)
 	local e6=e5:Clone()
@@ -49,7 +48,7 @@ function c80200024.initial_effect(c)
 	--immune 	
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetCode(EFFECT_IMMUNE_EFFECT)
 	e7:SetCondition(c80200024.immcon)
@@ -91,18 +90,18 @@ function c80200024.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--	
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetReset(RESET_EVENT+0xfe0000)
+	e1:SetReset(RESET_EVENT+0xff0000)
 	e1:SetCode(EFFECT_CHANGE_LEVEL)
 	e1:SetValue(4)
 	c:RegisterEffect(e1)
 	--change base attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetReset(RESET_EVENT+0xfe0000)
+	e2:SetReset(RESET_EVENT+0xff0000)
 	e2:SetCode(EFFECT_SET_BASE_ATTACK)
 	e2:SetValue(1800)
 	c:RegisterEffect(e2)
@@ -120,7 +119,7 @@ function c80200024.efilter(e,te)
 	local ec=te:GetHandler()
 	return te:IsHasType(EFFECT_TYPE_ACTIONS) 
 	and ((	ec:IsType(TYPE_XYZ) and ec:GetOriginalRank()<lvl) or
-			ec:GetOriginalLevel()<lvl)
+		(	not ec:IsType(TYPE_XYZ) and ec:GetOriginalLevel()<lvl))
 end
 function c80200024.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsDestructable() end
@@ -150,7 +149,7 @@ function c80200024.spfilter(c,e,tp)
 	return c:IsSetCard(0xab) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c80200024.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
 		and Duel.IsExistingMatchingCard(c80200024.spfilter,tp,LOCATION_DECK,0,2,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
