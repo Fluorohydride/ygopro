@@ -1,9 +1,8 @@
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
 #include <wx/utils.h>
-#include "game_frame.h"
-#include "game_canvas.h"
-#include "filter_frame.h"
+
+#include "game_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -11,11 +10,11 @@
 namespace ygopro
 {
 
-    GameFrame* mainFrame = nullptr;
+//    GameFrame* mainFrame = nullptr;
 	Random globalRandom;
 	CommonConfig commonCfg;
     CommonConfig stringCfg;
-    
+  /*
     GameFrame::GameFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
         
         wxMenuBar* menu_bar = new wxMenuBar;
@@ -427,5 +426,5 @@ namespace ygopro
         }
         filterFrame->FilterCards(url);
     }
-
+*/
 }

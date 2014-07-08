@@ -3,14 +3,13 @@
 #include "wx/clipbrd.h"
 #include "wx/time.h"
 #include "image_mgr.h"
-#include "game_frame.h"
 #include "game_canvas.h"
 #include "card_data.h"
 #include "deck_data.h"
 
 namespace ygopro
 {
-
+/*
     wxGameCanvas::wxGameCanvas(wxFrame* parent, int id, int* args) : wxGLCanvas(parent, id, args, wxDefaultPosition, wxDefaultSize, wxFULL_REPAINT_ON_RESIZE) {
         glcontext = new wxGLContext(this);
         Bind(wxEVT_SIZE, &wxGameCanvas::EventResized, this);
@@ -517,5 +516,5 @@ namespace ygopro
         Refresh();
     }
 
-    
+   */ 
 }

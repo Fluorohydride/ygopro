@@ -1,17 +1,29 @@
-#ifndef _EDITOR_FRAME_H_
-#define _EDITOR_FRAME_H_
+#ifndef _GAME_SCENE_H_
+#define _GAME_SCENE_H_
 
-#include "wx/wx.h"
-#include "wx/frame.h"
-#include "wx/glcanvas.h"
-#include "wx/richtext/richtextctrl.h"
-#include "wx/textctrl.h"
+#include <wx/wx.h>
+
 #include "xml_config.h"
 #include "../common/random.h"
 
 namespace ygopro
 {
-
+    
+    class GameScene {
+    public:
+        GameScene();
+        ~GameScene();
+        
+        void SetCardInfo(unsigned int code);
+        void AddCard(unsigned int code, unsigned int pos);
+        void StopViewRegulation() { view_regulation = 0; }
+        
+    protected:
+    private:
+        wxString current_file;
+        int view_regulation = 0;
+    };
+/*
     class wxGameCanvas;
     
     class GameFrame : public wxFrame {
@@ -75,11 +87,11 @@ namespace ygopro
         wxImage star_img;
         int view_regulation = 0;
     };
-
-    extern GameFrame* mainFrame;
+*/
+//    extern GameFrame* mainFrame;
     extern Random globalRandom;
 	extern CommonConfig commonCfg;
     extern CommonConfig stringCfg;
 }
 
-#endif //_EDITOR_FRAME_H_
+#endif //_GAME_SCENE_H_

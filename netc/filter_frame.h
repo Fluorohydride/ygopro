@@ -10,6 +10,7 @@
 
 namespace ygopro
 {
+    /*
     struct CardData;
     struct FilterCondition;
     
@@ -51,6 +52,7 @@ namespace ygopro
     };
     
     extern FilterFrame* filterFrame;
+     */
 }
 
 #endif //_FILTER_FRAME_H_

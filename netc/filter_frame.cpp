@@ -1,5 +1,4 @@
 #include "filter_frame.h"
-#include "game_frame.h"
 #include "game_canvas.h"
 #include "card_data.h"
 #include "image_mgr.h"
@@ -7,6 +6,7 @@
 
 namespace ygopro
 {
+    /*
     FilterFrame* filterFrame = nullptr;
     
     FilterFrame::FilterFrame() : wxFrame(nullptr, wxID_ANY, stringCfg["eui_filter_title"], wxDefaultPosition, wxSize(680, 480), wxDEFAULT_FRAME_STYLE) {
@@ -413,5 +413,5 @@ namespace ygopro
                 break;
         }
     }
-    
+    */
 }

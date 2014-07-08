@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
   <string name="image_path" value="../ygo/pics"/>
-  <integer name="image_size_x" value="177"/>
-  <integer name="image_size_y" value="254"/>
-  <integer name="tex_size_x" value="256"/>
-  <integer name="tex_size_y" value="256"/>
-  <integer name="image_count_x" value="1"/>
-  <integer name="image_count_y" value="1"/>
+  <integer name="card_size_x" value="100"/>
+  <integer name="card_size_y" value="145"/>
+  <integer name="tex_size_x" value="2048"/>
+  <integer name="tex_size_y" value="2048"/>
   <string name="screenshot_path" value="./screenshot"/>
+  <string name="deck_path" value="./deck"/>
+  <string name="replay_path" value="./replay"/>
   <string name="database" value="../ygo/cards.cdb"/>
   <string name="string_path" value="./conf/strings.xml"/>
   <string name="textures" value="./conf/textures.xml"/>

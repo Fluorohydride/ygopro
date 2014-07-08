@@ -1,59 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Texture>
-  <image name="1" path="./conf/textures.png"/>
-  <image name="2" path="./conf/sleeve.jpg"/>
-  <image name="3" path="./conf/unknown.jpg"/>
-  <image name="4" path="./conf/bg.jpg"/>
-  <image name="5" path="./conf/deckbg.png"/>
-  <texture src="1" name="field" x="0" y="0" w="256" h="256"/>
-  <texture src="1" name="number" x="256" y="0" w="128" h="128"/>
-  <texture src="1" name="negated" x="0" y="256" w="128" h="128"/>
-  <texture src="1" name="attack" x="128" y="256" w="128" h="128"/>
-  <texture src="1" name="activate" x="0" y="384" w="128" h="128"/>
-  <texture src="1" name="chain" x="128" y="384" w="128" h="128"/>
-  <texture src="1" name="mask" x="256" y="256" w="128" h="128"/>
-  <texture src="1" name="fscissors" x="390" y="256" w="89" h="128"/>
-  <texture src="1" name="frock" x="256" y="384" w="89" h="128"/>
-  <texture src="1" name="fpaper" x="350" y="384" w="89" h="128"/>
-  <texture src="1" name="equip" x="450" y="390" w="34" h="34"/>
-  <texture src="1" name="target" x="450" y="430" w="34" h="34"/>
-  <texture src="1" name="hmask" x="450" y="470" w="32" h="32"/>
-  <texture src="1" name="limit0" x="384" y="0" w="64" h="64"/>
-  <texture src="1" name="limit1" x="448" y="0" w="64" h="64"/>
-  <texture src="1" name="limit2" x="384" y="64" w="64" h="64"/>
-  <texture src="1" name="ocg" x="384" y="128" w="128" h="64"/>
-  <texture src="1" name="tcg" x="384" y="192" w="128" h="64"/>
-  <texture src="1" name="lpframe1" x="768" y="0" w="256" h="64"/>
-  <texture src="1" name="lpframe2" x="768" y="0" w="256" h="64"/>
-  <texture src="1" name="lpbar1" x="768" y="64" w="256" h="64"/>
-  <texture src="1" name="lpbar2" x="768" y="64" w="256" h="64"/>
-  <texture src="1" name="avatar1" x="128" y="256" w="128" h="128"/>
-  <texture src="1" name="avatar2" x="128" y="256" w="128" h="128"/>
-  <texture src="1" name="star" x="484" y="368" w="16" h="16"/>
-  <texture src="2" name="sleeve1" x="0" y="0" w="177" h="254"/>
-  <texture src="2" name="sleeve2" x="0" y="0" w="177" h="254"/>
-  <texture src="3" name="unknown" x="0" y="0" w="177" h="254"/>
-  <texture src="4" name="duelbg" x="0" y="0" w="1024" h="640"/>
-  <texture src="4" name="buildbg" x="0" y="0" w="1024" h="640"/>
-  <texture src="5" name="deckbg" x="0" y="0" w="512" h="512"/>
-  <layout name="avatar_frame0" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="avatar_frame1" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="avatar0" style="static" click="avatar0" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="avatar1" style="static" click="avatar1" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp0" style="lp" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp1" style="lp" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp_txt0" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="lp_txt1" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="turn_frame" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="turn_box" style="text" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_frame" style="static" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_dp" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_sp" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_m1" style="phase" click="" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_bp" style="phase" click="bp" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_m2" style="phase" click="m2" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="phase_ep" style="phase" click="ep" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="button_menu" style="button" click="menu" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="button_surrender" style="button" click="surrender" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
-  <layout name="button_confirm" style="button" click="confirm" texture="" x1="" y1="" x2="" y2="" x3="" y3="" x4="" y4=""/>
+  <image name="cards" path="./conf/cards.png"/>
+  <image name="misc" path="./conf/misc.png"/>
+  <image name="bg" path="./conf/bg.jpg"/>
+  <texture name="negated" x="0" y="0" w="128" h="128"/>
+  <texture name="limit0" x="128" y="0" w="64" h="64"/>
+  <texture name="limit1" x="192" y="0" w="64" h="64"/>
+  <texture name="limit2" x="128" y="64" w="64" h="64"/>
+  <texture name="ocg" x="256" y="0" w="64" h="32"/>
+  <texture name="tcg" x="256" y="64" w="64" h="32"/>
+  <texture name="tcg" x="256" y="128" w="64" h="32"/>
+  <texture name="equip" x="330" y="0" w="34" h="34"/>
+  <texture name="target" x="330" y="40" w="34" h="34"/>
+  <texture name="hmask" x="300" y="100" w="32" h="32"/>
+  <texture name="star" x="330" y="80" w="16" h="16"/>
+  <texture name="unknown" x="0" y="0" w="177" h="254"/>
+  <texture name="sleeve1" x="0" y="0" w="177" h="254"/>
+  <texture name="sleeve2" x="0" y="0" w="177" h="254"/>
 </Texture>

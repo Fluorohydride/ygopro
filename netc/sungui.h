@@ -654,6 +654,7 @@ namespace sgui
         virtual void Draw();
         void SetRange(float minv, float maxv, float cur);
         void SetValue(float cur);
+        void SetSliderLength(int length);
         
         SGEventHandler<SGWidget, float> eventValueChange;
         
@@ -671,8 +672,8 @@ namespace sgui
         int current_pos = 0;
         int pos_min = 0;
         int pos_max = 0;
-        int slider_range = 0;
         int slider_diff = 0;
+        int slider_length = 0;
         bool slider_hoving = false;
         bool slider_moving = false;
         bool is_horizontal = true;
@@ -738,6 +739,38 @@ namespace sgui
         static SGConfig textedit_config;
     };
 
+    class SGListBox : public SGWidgetContainer, public SGTextBase {
+    public:
+        ~SGListBox();
+        virtual void UpdateVertices();
+        virtual void Draw();
+        virtual v2i GetTextOffset();
+        virtual int GetMaxWidth();
+        virtual bool IsMultiLine() { return true; };
+        virtual void UpdateTextVertex();
+        virtual void DrawText();
+        void InsertItem(unsigned int index, std::string& item, unsigned int color);
+        void AddItem(std::string& item, unsigned int color);
+        
+        SGEventHandler<SGWidget, int> eventSelChange;
+        SGEventHandler<SGWidget, int> eventDoubleClick;
+        
+    protected:
+        unsigned int sel_color = 0xffffffff;
+        unsigned int sel_bcolor = 0xff000000;
+        unsigned int color1 = 0xffffffff;
+        unsigned int color2 = 0xffeeeeee;
+        int current_sel = 0;
+        int line_spacing = 0;
+        int text_offset = 0;
+        sf::IntRect text_area;
+        unsigned int vbo[2] = {0, 0};
+        std::vector<std::pair<std::string, unsigned int>> items;
+        
+    public:
+        static std::shared_ptr<SGListBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
+        static SGConfig listbox_config;
+    };
     // ===== GUI Components End =====
     
 }

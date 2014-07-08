@@ -1,5 +1,5 @@
 #include "card_data.h"
-#include "game_frame.h"
+#include "game_scene.h"
 #include "../common/bufferutil.h"
 #include "../buildin/sqlite3.h"
 

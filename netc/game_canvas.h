@@ -8,7 +8,7 @@
 
 namespace ygopro
 {
-    
+    /*
     struct TextureInfo;
     
 	class wxGameCanvas : public wxGLCanvas {
@@ -66,7 +66,7 @@ namespace ygopro
         void OnHoverTimer(wxTimerEvent& evt);
 
 	};
-
+*/
 }
 
 #endif

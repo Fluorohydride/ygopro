@@ -1847,11 +1847,11 @@ namespace sgui
         SGWidget::PostResize(res, rep);
         if(is_horizontal) {
             pos_min = position_abs.x;
-            pos_max = position_abs.x + size_abs.x - scroll_config.tex_config["sliderh1"].width;
+            pos_max = position_abs.x + size_abs.x - slider_length;
             size_abs.y = scroll_config.int_config["hheight"];
         } else {
             pos_min = position_abs.y;
-            pos_max = position_abs.y + size_abs.y - scroll_config.tex_config["sliderv1"].height;
+            pos_max = position_abs.y + size_abs.y - slider_length;
             size_abs.x = scroll_config.int_config["vwidth"];
         }
     }
@@ -1860,24 +1860,46 @@ namespace sgui
         if(!vertices_dirty)
             return;
         vertices_dirty = false;
-        std::array<SGVertexVCT, 8> vert;
+        std::array<SGVertexVCT, 16> vert;
         if(is_horizontal) {
             int hheight = scroll_config.int_config["hheight"];
             auto backh = scroll_config.tex_config["backh"];
-            auto sliderh = scroll_config.tex_config[slider_moving ? "sliderh3" : slider_hoving ? "sliderh2" : "sliderh1"];
             guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, size_abs.x, hheight, backh);
-            guiRoot.SetRectVertex(&vert[4], position_abs.x + current_pos, position_abs.y, sliderh.width, hheight, sliderh);
+            if(slider_length) {
+                int slength = scroll_config.int_config["slength"];
+                auto sliderh = scroll_config.tex_config[slider_moving ? "sliderh3" : slider_hoving ? "sliderh2" : "sliderh1"];
+                auto rec = sliderh;
+                rec.width = slength;
+                guiRoot.SetRectVertex(&vert[4], position_abs.x + current_pos, position_abs.y, rec.width, hheight, rec);
+                rec.left = sliderh.left + slength;
+                rec.width = sliderh.width - slength * 2;
+                guiRoot.SetRectVertex(&vert[8], position_abs.x + current_pos + slength, position_abs.y, slider_length - slength * 2, hheight, rec);
+                rec.left = sliderh.left + sliderh.width - slength;
+                rec.width = slength;
+                guiRoot.SetRectVertex(&vert[12], position_abs.x + current_pos + slider_length - slength, position_abs.y, rec.width, hheight, rec);
+            }
         } else {
             int vwidth = scroll_config.int_config["vwidth"];
             auto backv = scroll_config.tex_config["backv"];
-            auto sliderv = scroll_config.tex_config[slider_moving ? "sliderv3" : slider_hoving ? "sliderv2" : "sliderv1"];
             guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, vwidth, size_abs.y, backv);
-            guiRoot.SetRectVertex(&vert[4], position_abs.x, position_abs.y + current_pos, vwidth, sliderv.height, sliderv);
+            if(slider_length) {
+                int slength = scroll_config.int_config["slength"];
+                auto sliderv = scroll_config.tex_config[slider_moving ? "sliderv3" : slider_hoving ? "sliderv2" : "sliderv1"];
+                auto rec = sliderv;
+                rec.height = slength;
+                guiRoot.SetRectVertex(&vert[4], position_abs.x, position_abs.y + current_pos, vwidth, rec.height, rec);
+                rec.top = sliderv.top + slength;
+                rec.height = sliderv.height - slength * 2;
+                guiRoot.SetRectVertex(&vert[8], position_abs.x, position_abs.y + current_pos + slength, vwidth, slider_length - slength * 2, rec);
+                rec.top = sliderv.top + sliderv.height - slength;
+                rec.height = slength;
+                guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + current_pos + slider_length - slength, vwidth, rec.height, rec);
+            }
         }
-        for(int i = 0; i < 8; ++i)
+        for(int i = 0; i < 16; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * 8, &vert);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * 16, &vert);
     }
     
     void SGScrollBar::Draw() {
@@ -1888,7 +1910,10 @@ namespace sgui
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
+        if(slider_length)
+            glDrawElements(GL_TRIANGLES, 24, GL_UNSIGNED_SHORT, 0);
+        else
+            glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
     }
     
     void SGScrollBar::SetRange(float minv, float maxv, float cur) {
@@ -1897,8 +1922,8 @@ namespace sgui
         current_pos = (cur - minv) / maxv * (pos_max - pos_min);
         if(current_pos < 0)
             current_pos = 0;
-        if(current_pos > pos_max - pos_min)
-            current_pos = pos_max - pos_min;
+        if(current_pos > pos_max - slider_length)
+            current_pos = pos_max - slider_length;
         vertices_dirty = true;
     }
     
@@ -1907,8 +1932,8 @@ namespace sgui
         current_pos = (cur - minvalue) / maxvalue * (pos_max - pos_min);
         if(current_pos < 0)
             current_pos = 0;
-        if(current_pos > pos_max - pos_min)
-            current_pos = pos_max - pos_min;
+        if(current_pos > pos_max - slider_length)
+            current_pos = pos_max - slider_length;
         if(prepos != current_pos) {
             vertices_dirty = true;
             float val = (float)current_pos / (pos_max - pos_min) * (maxvalue - minvalue) + minvalue;
@@ -1916,15 +1941,45 @@ namespace sgui
         }
     }
     
+    void SGScrollBar::SetSliderLength(int length) {
+        int prel = slider_length;
+        if(length == 0) {
+            slider_length = 0;
+        } else {
+            int minl, maxl;
+            if(is_horizontal) {
+                minl = scroll_config.tex_config["sliderh1"].width;
+                maxl = size_abs.x;
+            } else {
+                minl = scroll_config.tex_config["sliderv1"].height;
+                maxl = size_abs.y - 1;
+            }
+            if(slider_length < minl)
+                slider_length = minl;
+            if(slider_length > maxl)
+                slider_length = maxl;
+            if(is_horizontal)
+                pos_max = position_abs.x + size_abs.x - slider_length;
+            else
+                pos_max = position_abs.y + size_abs.y - slider_length;
+            if(current_pos + slider_length > pos_max)
+                current_pos = pos_max - slider_length;
+        }
+        if(prel != slider_length)
+            vertices_dirty = true;
+    }
+    
     bool SGScrollBar::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+        if(slider_length == 0)
+            return false;
         bool preh = slider_hoving;
         if(is_horizontal) {
-            if(evt.x >= position_abs.x + current_pos && evt.x <= position_abs.x + current_pos + slider_range)
+            if(evt.x >= position_abs.x + current_pos && evt.x <= position_abs.x + current_pos + slider_length)
                 slider_hoving = true;
             else
                 slider_hoving = false;
         } else {
-            if(evt.y >= position_abs.y + current_pos && evt.y <= position_abs.y + current_pos + slider_range)
+            if(evt.y >= position_abs.y + current_pos && evt.y <= position_abs.y + current_pos + slider_length)
                 slider_hoving = true;
             else
                 slider_hoving = false;
@@ -1947,6 +2002,8 @@ namespace sgui
     }
     
     bool SGScrollBar::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+        if(slider_length == 0)
+            return false;
         int prepos = current_pos;
         current_pos += (pos_max - pos_min) * evt.delta / 100;
         if(current_pos < 0)
@@ -1964,6 +2021,8 @@ namespace sgui
     }
                          
     bool SGScrollBar::DragingBegin(v2i evt) {
+        if(slider_length == 0)
+            return false;
         position_drag = evt;
         if(slider_hoving) {
             slider_moving = true;
@@ -1990,6 +2049,8 @@ namespace sgui
     }
     
     bool SGScrollBar::DragingUpdate(v2i evt) {
+        if(slider_length == 0)
+            return false;
         v2i delta = evt - position_drag;
         position_drag = evt;
         if(slider_moving) {
@@ -2019,6 +2080,8 @@ namespace sgui
     }
     
     bool SGScrollBar::DragingEnd(v2i evt) {
+        if(slider_length == 0)
+            return false;
         slider_diff = 0;
         slider_moving = false;
         vertices_dirty = true;
@@ -2032,9 +2095,9 @@ namespace sgui
         ptr->size = sz;
         ptr->is_horizontal = is_h;
         if(is_h)
-            ptr->slider_range = scroll_config.tex_config["sliderh1"].width;
+            ptr->slider_length = sz.x / 2;
         else
-            ptr->slider_range = scroll_config.tex_config["sliderv1"].height;
+            ptr->slider_length = sz.y / 2;
         ptr->PostResize(true, true);
         auto iter = scroll_config.int_config.find("gui_color");
         if(iter != scroll_config.int_config.end())
@@ -2043,9 +2106,9 @@ namespace sgui
             ptr->color = guiRoot.GetDefaultInt("gui_color");
         glGenBuffers(2, ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 8, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 16, nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
-        unsigned short index[] = {0, 2, 1, 1, 2, 3, 4, 6, 5, 5, 6, 7};
+        unsigned short index[] = {0, 2, 1, 1, 2, 3, 4, 6, 5, 5, 6, 7, 8, 10, 9, 9, 10, 11, 12, 14, 13, 13, 14, 15};
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
         if(p != nullptr)
             p->AddChild(ptr);
@@ -2256,7 +2319,7 @@ namespace sgui
         ptr->cursor_time = ptr->frame_clock.getElapsedTime().asSeconds();
         glGenBuffers(2, ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 52, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 44, nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
         unsigned short index[66];
         for(int i = 0; i < 11; ++i) {
@@ -2481,6 +2544,96 @@ namespace sgui
         if(text_width_cur > offset)
             return index - 1;
         return index;
+    }
+    
+    SGConfig SGListBox::listbox_config;
+    
+    SGListBox::~SGListBox() {
+        glDeleteBuffers(2, vbo);
+    }
+    
+    void SGListBox::UpdateVertices() {
+        
+    }
+    
+    void SGListBox::Draw() {
+        
+    }
+    
+    v2i SGListBox::GetTextOffset() {
+        return position_abs + v2i{text_area.left, text_area.top - text_offset};
+    }
+    
+    int SGListBox::GetMaxWidth() {
+        return 0xffff;
+    }
+
+    void SGListBox::UpdateTextVertex() {
+        
+    }
+    
+    void SGListBox::DrawText() {
+        
+    }
+    
+    void SGListBox::InsertItem(unsigned int index, std::string& item, unsigned int color) {
+        if(index >= items.size()) {
+            AddItem(item, color);
+            return;
+        }
+    }
+    
+    void SGListBox::AddItem(std::string& item, unsigned int color) {
+        
+    }
+    
+    std::shared_ptr<SGListBox> SGListBox::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
+        auto ptr = std::make_shared<SGListBox>();
+        ptr->parent = p;
+        ptr->position = pos;
+        ptr->size = sz;
+        ptr->text_area = listbox_config.tex_config["text_area"];
+        ptr->PostResize(true, true);
+        auto iter = listbox_config.int_config.find("gui_color");
+        if(iter != listbox_config.int_config.end())
+            ptr->color = iter->second;
+        else
+            ptr->color = guiRoot.GetDefaultInt("gui_color");
+        auto iter2 = listbox_config.int_config.find("font_size");
+        if(iter2 != listbox_config.int_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        else
+            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+        ptr->color1 = listbox_config.int_config["color1"];
+        ptr->color2 = listbox_config.int_config["color2"];
+        ptr->sel_color = listbox_config.int_config["sel_color"];
+        ptr->sel_bcolor = listbox_config.int_config["sel_bcolor"];
+        ptr->line_spacing = listbox_config.int_config["spacing"];
+        ptr->text_offset = 0;
+        int itemcount = (ptr->size_abs.y - ptr->text_area.top - ptr->text_area.height) / ptr->line_spacing + 1;
+        glGenBuffers(2, ptr->vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * (9 + itemcount) * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
+        std::vector<unsigned short> index;
+        index.resize((9 + itemcount) * 6);
+        for(int i = 0; i < 9 + itemcount; ++i) {
+            index[i * 6] = i * 4;
+            index[i * 6 + 1] = i * 4 + 2;
+            index[i * 6 + 2] = i * 4 + 1;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
+        }
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * (9 + itemcount) * 6, &index[0], GL_STATIC_DRAW);
+        auto scr = SGScrollBar::Create(ptr, {0, 0}, {0, 0}, false);
+        scr->SetPosition({-scr->GetSize().x - ptr->text_area.width, 0}, {1.0f, 0.0f});
+        scr->SetSliderLength(0);
+        if(p != nullptr)
+            p->AddChild(ptr);
+        else
+            guiRoot.AddChild(ptr);
+        return ptr;
     }
     
 }

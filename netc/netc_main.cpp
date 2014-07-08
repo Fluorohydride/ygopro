@@ -3,7 +3,7 @@
 #include <SFML/OpenGL.hpp>
 #include <iostream>
 
-#include "game_frame.h"
+#include "game_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -12,6 +12,13 @@
 using namespace ygopro;
 
 int main(int argc, char* argv[]) {
+    sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
+    window.setVerticalSyncEnabled(true);
+    //window.setFramerateLimit(120);
+    window.setActive();
+    glewInit();
+    
+    imageMgr.InitTextures();
     if(!commonCfg.LoadConfig("common.xml"))
         return 0;
     if(!stringCfg.LoadConfig(commonCfg["string_path"]))
@@ -27,31 +34,27 @@ int main(int argc, char* argv[]) {
         }
     });
     
-    sf::RenderWindow window(sf::VideoMode(800, 600), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
-    window.setVerticalSyncEnabled(true);
-    //window.setFramerateLimit(120);
-    window.setActive();
-    glewInit();
-    
     sgui::SGGUIRoot::GetSingleton().LoadConfigs();
     sgui::SGGUIRoot::GetSingleton().SetSceneSize({800, 600});
     auto w1 = sgui::SGWindow::Create(nullptr, {100, 100}, {300, 400});
     w1->SetTitle(L"Test Caption");
-    auto b1 = sgui::SGCheckbox::Create(w1, {10, 30}, L"Click me!");
-    auto r1 = sgui::SGRadio::Create(w1, {10, 55}, L"A Radio");
-    auto r2 = sgui::SGRadio::Create(w1, {10, 80}, L"Another Radio");
-    r1->SetCustomValue(100);
-    r2->SetCustomValue(200);
-    r2->SetGroup(r1);
-    auto r3 = sgui::SGRadio::Create(w1, {10, 105}, L"A Radio");
-    auto r4 = sgui::SGRadio::Create(w1, {10, 130}, L"Another Radio");
-    r4->SetGroup(r3);
-    auto bt1 = sgui::SGButton::Create(w1, {10, 160}, {100, 50});
-    bt1->SetText(L"A Button", 0xffff0000);
-    auto t1 = sgui::SGTextEdit::Create(w1, {10, 300}, {150, 30});
-    t1->SetText(L"InputText12345  67890", 0xff000000);
-    auto lb = sgui::SGIconLabel::Create(w1, {10, 220}, L"", 0);
-    lb->SetText(L"Line1\ue004\ue005\ue086\nLine2\ue001Line2\nLine3Line3", 0xff000000);
+//    auto b1 = sgui::SGCheckbox::Create(w1, {10, 30}, L"Click me!");
+//    auto r1 = sgui::SGRadio::Create(w1, {10, 55}, L"A Radio");
+//    auto r2 = sgui::SGRadio::Create(w1, {10, 80}, L"Another Radio");
+//    r1->SetCustomValue(100);
+//    r2->SetCustomValue(200);
+//    r2->SetGroup(r1);
+//    auto r3 = sgui::SGRadio::Create(w1, {10, 105}, L"A Radio");
+//    auto r4 = sgui::SGRadio::Create(w1, {10, 130}, L"Another Radio");
+//    r4->SetGroup(r3);
+//    auto bt1 = sgui::SGButton::Create(w1, {10, 160}, {100, 50});
+//    bt1->SetText(L"A Button", 0xffff0000);
+//    auto t1 = sgui::SGTextEdit::Create(w1, {10, 300}, {150, 30});
+//    t1->SetText(L"InputText12345  67890", 0xff000000);
+//    auto lb = sgui::SGIconLabel::Create(w1, {10, 220}, L"", 0);
+//    lb->SetText(L"Line1\ue004\ue005\ue086\nLine2\ue001Line2\nLine3Line3", 0xff000000);
+    auto sch = sgui::SGScrollBar::Create(w1, {10, 50}, {150, 30}, true);
+    sch->SetSliderLength(50);
     bool running = true;
     sf::Clock clock;
     float tm1 = clock.getElapsedTime().asSeconds();

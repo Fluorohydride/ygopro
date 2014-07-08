@@ -68,6 +68,7 @@
   <scroll>
     <integer name="hheight" value="14"/>
     <integer name="vwidth" value="14"/>
+    <integer name="slength" value="5"/>
     <rect name="backh" u="0" v="88" w="16" h="14"/>
     <rect name="backv" u="19" v="88" w="14" h="16"/>
     <rect name="sliderh1" u="18" v="106" w="19" h="14"/>
@@ -89,4 +90,15 @@
     <rect name="back" u="62" v="106" w="29" h="32"/>
     <rect name="backh" u="62" v="74" w="29" h="32"/>
   </textedit>
+  <listbox>
+    <integer name="border" value="5"/>
+    <integer name="spacing" value="30"/>
+    <integer name="color1" value="0xff800000"/>
+    <integer name="color2" value="0xff800000"/>
+    <integer name="sel_color" value="0xffffffff"/>
+    <integer name="sel_bcolor" value="0xff800000"/>
+    <rect name="sel_rect" u="47" v="89" w="10" h="10"/>
+    <rect name="text_area" u="5" v="7" w="6" h="6"/>
+    <rect name="back" u="62" v="106" w="29" h="32"/>
+  </listbox>
 </Gui>
