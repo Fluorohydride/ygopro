@@ -49,12 +49,14 @@ function c89493368.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
 end
 function c89493368.damop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(89493368,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,0)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.Damage(1-tp,800,REASON_EFFECT)
 	end
 end
 function c89493368.nacon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst():IsControler(1-tp) and e:GetHandler():GetFlagEffect(89493368)~=0
+	if e:GetHandler():GetFlagEffect(89493368)==1 then return eg:GetFirst():IsControler(1-tp)
+end
 end
 function c89493368.natg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tg=Duel.GetAttacker()
