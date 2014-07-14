@@ -187,8 +187,6 @@ namespace sgui
     class SGGUIRoot;
     
     class SGWidget : public std::enable_shared_from_this<SGWidget> {
-        friend class SGWidgetContainer;
-        friend class SGGUIRoot;
         
     public:
         virtual ~SGWidget() {}
@@ -232,7 +230,7 @@ namespace sgui
         SGEventHandler<SGWidget, v2i> eventDragEnd;
         SGEventHandler<SGWidget, v2i> eventDragUpdate;
         
-    protected:
+    public:
         virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
@@ -321,7 +319,6 @@ namespace sgui
         bool img_update = true;
         bool img_dirty = true;
         float frame_time = 0.016f;
-        sf::Clock frame_clock;
         sf::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
@@ -329,17 +326,19 @@ namespace sgui
     };
     
     class SGWidgetContainer : public SGWidget {
-        friend class SGWidget;
         
     public:
         virtual ~SGWidgetContainer();
         virtual void PostResize(bool res, bool rep);
+        virtual v2i GetClientPosition() { return position_abs; }
+        virtual v2i GetClientSize() { return size_abs; }
         
         virtual std::shared_ptr<SGWidget> GetHovingWidget(v2i pos);
         virtual void AddChild(std::shared_ptr<SGWidget> chd);
         virtual void RemoveChild(std::shared_ptr<SGWidget> chd);
+        virtual void BringToTop(std::shared_ptr<SGWidget> chd);
         
-    protected:
+    public:
         virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
@@ -353,7 +352,7 @@ namespace sgui
     protected:
         std::weak_ptr<SGWidget> hoving;
         std::weak_ptr<SGWidget> focus_widget;
-        std::list<std::shared_ptr<SGWidget>> children;
+        std::vector<std::shared_ptr<SGWidget>> children;
     };
     
     struct SGConfig {
@@ -435,6 +434,8 @@ namespace sgui
         sf::Font& GetGUIFont() { return gui_font; }
         sf::Texture& GetGUITexture() { return gui_texture; }
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
+        sf::IntRect& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
+        sf::Time GetTime() { return gui_clock.getElapsedTime(); }
         
         bool InjectMouseMoveEvent(sf::Event::MouseMoveEvent evt);
         bool InjectMouseEnterEvent();
@@ -459,6 +460,7 @@ namespace sgui
         sf::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<sf::IntRect> scissor_stack;
+        sf::Clock gui_clock;
         
         static SGConfig basic_config;
     };
@@ -645,7 +647,6 @@ namespace sgui
     };
 
     class SGScrollBar : public SGWidget {
-        friend class SGTextField;
     public:
         virtual ~SGScrollBar();
         virtual void PostResize(bool res, bool rep);
@@ -727,7 +728,6 @@ namespace sgui
         int drag_check = 0;
         sf::IntRect text_area;
         unsigned int vbo[2] = {0, 0};
-        sf::Clock frame_clock;
         float cursor_time = 0.0f;
         unsigned int cursor_pos = 0;
         bool sel_change = true;
@@ -745,32 +745,139 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth();
+        virtual int GetMaxWidth() { return 0xffff; }
         virtual bool IsMultiLine() { return true; };
         virtual void UpdateTextVertex();
-        virtual void DrawText();
-        void InsertItem(unsigned int index, std::string& item, unsigned int color);
-        void AddItem(std::string& item, unsigned int color);
+        void InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color);
+        void AddItem(unsigned short icon, const std::wstring& item, unsigned int color);
+        void RemoveItem(unsigned int index);
+        void ClearItem();
+        void SetItemIcon(unsigned int index, unsigned short icon);
+        void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
+        const std::tuple<unsigned short, std::wstring, unsigned int>& GetItem(unsigned int index);
+        void SetSelection(int sel);
+        int GetSeletion();
+        int GetItemCount() { return items.size(); }
         
         SGEventHandler<SGWidget, int> eventSelChange;
         SGEventHandler<SGWidget, int> eventDoubleClick;
         
     protected:
+        
+        virtual bool EventMouseEnter();
+        virtual bool EventMouseLeave();
+        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
+        bool ScrollBarChange(SGWidget& sender, float value);
+        
+        bool is_hoving = false;
         unsigned int sel_color = 0xffffffff;
         unsigned int sel_bcolor = 0xff000000;
         unsigned int color1 = 0xffffffff;
         unsigned int color2 = 0xffeeeeee;
-        int current_sel = 0;
+        int current_sel = -1;
         int line_spacing = 0;
         int text_offset = 0;
+        int item_count = 0;
+        int max_item_count = 0;
         sf::IntRect text_area;
+        float click_time = 0.0f;
         unsigned int vbo[2] = {0, 0};
-        std::vector<std::pair<std::string, unsigned int>> items;
+        std::vector<std::tuple<unsigned short, std::wstring, unsigned int>> items;
         
     public:
         static std::shared_ptr<SGListBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
         static SGConfig listbox_config;
     };
+    
+    class SGComboBox : public SGWidgetContainer, public SGTextBase {
+    public:
+        ~SGComboBox();
+        virtual void UpdateVertices();
+        virtual void Draw();
+        virtual void PostResize(bool res, bool rep);
+        virtual v2i GetTextOffset();
+        virtual int GetMaxWidth() { return 0xffff; }
+        virtual bool IsMultiLine() { return true; };
+        void InsertItem(unsigned int index, const std::wstring& item, unsigned int color);
+        void AddItem(const std::wstring& item, unsigned int color);
+        void RemoveItem(unsigned int index);
+        void ClearItem();
+        void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
+        void SetSelection(int sel);
+        int GetSeletion();
+        void ShowList(bool show);
+        
+        SGEventHandler<SGWidget, int> eventSelChange;
+        
+    protected:
+        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseLeave();
+        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
+        virtual bool EventLostFocus();
+        
+        bool show_item = false;
+        bool is_hoving = false;
+        int current_sel = -1;
+        int item_count = 0;
+        sf::IntRect text_area;
+        unsigned int vbo[2] = {0, 0};
+        
+    public:
+        static std::shared_ptr<SGComboBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
+        static SGConfig combobox_config;
+    };
+    
+    class SGTabControl : public SGWidgetContainer , public SGTextBase {
+    public:
+        ~SGTabControl();
+        virtual v2i GetClientPosition();
+        virtual v2i GetClientSize();
+        virtual void UpdateVertices();
+        virtual void Draw();
+        virtual void PostResize(bool res, bool rep);
+        virtual v2i GetTextOffset();
+        virtual int GetMaxWidth() { return 0xffff; }
+        virtual bool IsMultiLine() { return false; }
+        virtual void EvaluateSize(const std::wstring& t = L"");
+        virtual void UpdateTextVertex();;
+        void AddTab(const std::wstring& title, unsigned int color);
+        void RemoveTab(unsigned int index);
+        void SetTabTitle(unsigned int index, const std::wstring& title, unsigned int color);
+        std::shared_ptr<SGWidgetContainer> GetTab(int index);
+        void SetActiveTab(int index);
+        int GetTabCount();
+        int GetActiveTab();
+        
+    protected:
+        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseEnter();
+        virtual bool EventMouseLeave();
+        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
+        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
+        virtual bool EventKeyUp(sf::Event::KeyEvent evt);
+        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        
+        int GetHovingTab(v2i pos);
+        
+        std::weak_ptr<SGWidget> active_tab;
+        std::weak_ptr<SGWidget> hover_tab;
+        unsigned int vbo[2];
+        int max_item_count = 0;
+        int item_count = 0;
+        int tab_height = 0;
+        int tab_ol = 0;
+        int tab_or = 0;
+        bool in_tab = false;
+        bool size_dirty = true;
+        
+    public:
+        static std::shared_ptr<SGTabControl> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
+        static SGConfig tab_config;
+    };
+    
     // ===== GUI Components End =====
     
 }

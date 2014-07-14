@@ -27,13 +27,13 @@ namespace sgui
     void SGWidget::PostResize(bool res, bool rep) {
         vertices_dirty = true;
         auto ptr = parent.lock();
-        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->size_abs;
+        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res)
             size_abs = size + v2i(ssize.x * size_prop.x, ssize.y * size_prop.y);
         if(rep) {
             position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
             if(ptr != nullptr)
-                position_abs += ptr->position_abs;
+                position_abs += ptr->GetClientPosition();
         }
     }
     
@@ -451,7 +451,7 @@ namespace sgui
         UpdateImage();
         long voffset = 0;
         if(texcoords.size() > 1)
-            voffset = ((int)(frame_clock.getElapsedTime().asSeconds() / frame_time) % texcoords.size() * verts.size()) * sizeof(SGVertexVCT);
+            voffset = ((int)(guiRoot.GetTime().asSeconds() / frame_time) % texcoords.size() * verts.size()) * sizeof(SGVertexVCT);
         guiRoot.BindTexture(img_texture);
         glBindBuffer(GL_ARRAY_BUFFER, imgvbo[0]);
         glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
@@ -476,13 +476,13 @@ namespace sgui
     void SGWidgetContainer::PostResize(bool res, bool rep) {
         vertices_dirty = true;
         auto ptr = parent.lock();
-        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->size_abs;
+        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res)
             size_abs = size + v2i(ssize.x * size_prop.x, ssize.y * size_prop.y);
         if(rep) {
             position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
             if(ptr != nullptr)
-                position_abs += ptr->position_abs;
+                position_abs += ptr->GetClientPosition();
         }
         if(res)
             rep = true;
@@ -499,6 +499,18 @@ namespace sgui
             if(*iter == chd) {
                 children.erase(iter);
                 return;
+            }
+        }
+    }
+    
+    void SGWidgetContainer::BringToTop(std::shared_ptr<SGWidget> chd) {
+        for(auto iter = children.begin(); iter != children.end(); ++iter) {
+            if(*iter == chd) {
+                if(chd != children.back()) {
+                    children.erase(iter);
+                    children.push_back(chd);
+                    return;
+                }
             }
         }
     }
@@ -705,6 +717,9 @@ namespace sgui
         AddConfig("scroll", SGScrollBar::scroll_config);
         AddConfig("textedit", SGTextEdit::textedit_config);
         AddConfig("iconlabel", SGIconLabel::iconlabel_config);
+        AddConfig("listbox", SGListBox::listbox_config);
+        AddConfig("combobox", SGComboBox::combobox_config);
+        AddConfig("tabcontrol", SGTabControl::tab_config);
         
         wxXmlDocument doc;
 		if(!doc.Load("./conf/gui.xml", wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
@@ -1185,8 +1200,8 @@ namespace sgui
         SGVertexVCT cur_char;
         int max_width = GetMaxWidth();
         v2i text_pos = GetTextOffset();
-        auto iconoffset = iconlabel_config.tex_config["iconoffset"];
-        auto iconrc = iconlabel_config.int_config["column"];
+        auto iconoffset = guiRoot.GetDefaultRect("iconoffset");
+        auto iconrc = guiRoot.GetDefaultInt("iconcolumn");
         int ls = GetLineSpacing();
         int ils = ls > (iconoffset.height + spacing_y) ? ls : (iconoffset.height + spacing_y);
         bool has_icon = false;
@@ -1557,7 +1572,7 @@ namespace sgui
     void SGCheckbox::PostResize(bool res, bool rep) {
         vertices_dirty = true;
         auto ptr = parent.lock();
-        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetSize();
+        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res) {
             auto rec = checkbox_config.tex_config["offset"];
             size_abs = v2i{rec.left + rec.width + rec.top + text_width_cur, std::max(text_height , rec.height)};
@@ -1565,7 +1580,7 @@ namespace sgui
         if(rep) {
             position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
             if(ptr != nullptr)
-                position_abs += ptr->GetPosition();
+                position_abs += ptr->GetClientPosition();
         }
     }
     
@@ -1954,6 +1969,7 @@ namespace sgui
                 minl = scroll_config.tex_config["sliderv1"].height;
                 maxl = size_abs.y - 1;
             }
+            slider_length = length;
             if(slider_length < minl)
                 slider_length = minl;
             if(slider_length > maxl)
@@ -2167,7 +2183,7 @@ namespace sgui
     
     void SGTextEdit::Draw() {
         if(draging) {
-            float tm = frame_clock.getElapsedTime().asSeconds();
+            float tm = guiRoot.GetTime().asSeconds();
             int chk = (int)((tm - cursor_time) / 0.3f);
             if(chk != drag_check) {
                 drag_check = chk;
@@ -2181,7 +2197,7 @@ namespace sgui
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-        float tm = frame_clock.getElapsedTime().asSeconds();
+        float tm = guiRoot.GetTime().asSeconds();
         if(!focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5f) % 2))
             glDrawElements(GL_TRIANGLES, 54, GL_UNSIGNED_SHORT, 0);
         else
@@ -2316,7 +2332,7 @@ namespace sgui
             ptr->def_color = guiRoot.GetDefaultInt("font_color");
         ptr->sel_color = textedit_config.int_config["sel_color"];
         ptr->sel_bcolor = textedit_config.int_config["sel_bcolor"];
-        ptr->cursor_time = ptr->frame_clock.getElapsedTime().asSeconds();
+        ptr->cursor_time = guiRoot.GetTime().asSeconds();
         glGenBuffers(2, ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 44, nullptr, GL_DYNAMIC_DRAW);
@@ -2369,7 +2385,7 @@ namespace sgui
         position_drag = evt;
         cursor_pos = GetHitIndex(evt);
         SetSelRegion(cursor_pos, cursor_pos);
-        cursor_time = frame_clock.getElapsedTime().asSeconds();
+        cursor_time = guiRoot.GetTime().asSeconds();
         draging = true;
         drag_check = 0;
         return eventDragBegin.TriggerEvent(*this, evt);
@@ -2488,7 +2504,7 @@ namespace sgui
                     cursor_pos--;
                     CheckCursorPos();
                     vertices_dirty = true;
-                    cursor_time = frame_clock.getElapsedTime().asSeconds();
+                    cursor_time = guiRoot.GetTime().asSeconds();
                 }
                 break;
             case sf::Keyboard::Right:
@@ -2503,7 +2519,7 @@ namespace sgui
                     cursor_pos++;
                     CheckCursorPos();
                     vertices_dirty = true;
-                    cursor_time = frame_clock.getElapsedTime().asSeconds();
+                    cursor_time = guiRoot.GetTime().asSeconds();
                 }
                 break;
             case sf::Keyboard::Return:
@@ -2521,6 +2537,7 @@ namespace sgui
         if(sel_start != sel_end) {
             text.erase(text.begin() + sel_start, text.begin() + sel_end);
             color_vec.erase(color_vec.begin() + sel_start, color_vec.begin() + sel_end);
+            cursor_pos = sel_start;
         }
         text.insert(text.begin() + cursor_pos, evt.unicode);
         color_vec.insert(color_vec.begin() + cursor_pos, def_color);
@@ -2553,38 +2570,333 @@ namespace sgui
     }
     
     void SGListBox::UpdateVertices() {
+        if(!vertices_dirty)
+            return;
+        vertices_dirty = false;
+        text_update = true;
+        std::vector<SGVertexVCT> vert;
+        int m_item_count = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
+        vert.resize(36 + m_item_count * 8);
+        std::vector<unsigned short> index;
+        index.resize(54 + m_item_count * 12);
         
+        int bw = listbox_config.int_config["border"];
+        auto back = listbox_config.tex_config[is_hoving ? "backh" : "back"];
+        auto selrect = listbox_config.tex_config["sel_rect"];
+        auto iconoffset = guiRoot.GetDefaultRect("iconoffset");
+        auto iconrc = guiRoot.GetDefaultInt("iconcolumn");
+        guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
+                              sf::IntRect{back.left, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
+                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
+                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, size_abs.y - bw * 2,
+                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, size_abs.y - bw * 2,
+                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, size_abs.y - bw * 2,
+                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
+                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+        guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
+                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
+                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+        for(int i = 0; i < 36; ++i)
+            vert[i].color = color;
+        int begini = text_offset / line_spacing;
+        item_count = 0;
+        unsigned int sel_color = listbox_config.int_config["sel_bcolor"];
+        unsigned int color1 = listbox_config.int_config["color1"];
+        unsigned int color2 = listbox_config.int_config["color2"];
+        for(int i = begini; i < items.size() && i < begini + m_item_count; ++i) {
+            int li = i - begini;
+            guiRoot.SetRectVertex(&vert[36 + li * 8], position_abs.x + bw, position_abs.y + bw + i * line_spacing - text_offset,
+                                  size_abs.x - bw * 2, line_spacing, selrect);
+            unsigned int bcolor = (i == current_sel) ? sel_color : (i % 2) ? color1 : color2;
+            for(int j = 0; j < 4; ++j)
+                vert[36 + li * 8 + j].color = bcolor;
+            int iconi = std::get<0>(items[i]);
+            if(iconi) {
+                int x = (iconi - 1) % iconrc;
+                int y = (iconi - 1) / iconrc;
+                sf::IntRect rct = iconoffset;
+                rct.left += x * iconoffset.width;
+                rct.top += y * iconoffset.height;
+                guiRoot.SetRectVertex(&vert[36 + li * 8 + 4], position_abs.x + bw, position_abs.y + bw + i * line_spacing - text_offset,
+                                      iconoffset.width, iconoffset.height, rct);
+            }
+            item_count++;
+        }
+        
+        for(int i = 0; i < 9 + item_count * 2; ++i) {
+            index[i * 6] = i * 4;
+            index[i * 6 + 1] = i * 4 + 2;
+            index[i * 6 + 2] = i * 4 + 1;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
+        }
+        
+        if(m_item_count > max_item_count) {
+            if(max_item_count == 0)
+                max_item_count = 16;
+            while(max_item_count < m_item_count)
+                max_item_count *= 2;
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * (36 + max_item_count * 8), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * (36 + item_count * 8), &vert[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * (54 + max_item_count * 12), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * (54 + item_count * 12), &index[0]);
+        } else {
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * (36 + item_count * 8), &vert[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * (54 + item_count * 12), &index[0]);
+        }
     }
     
     void SGListBox::Draw() {
-        
+        UpdateVertices();
+        guiRoot.BindGuiTexture();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        glDrawElements(GL_TRIANGLES, 54, GL_UNSIGNED_SHORT, 0);
+        int tw = size_abs.x - text_area.left - text_area.width;
+        int th = size_abs.y - text_area.top - text_area.height;
+        for(auto chd : children)
+            chd->Draw();
+        guiRoot.BeginScissor(sf::IntRect{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        glDrawElements(GL_TRIANGLES, item_count * 12, GL_UNSIGNED_SHORT, (GLvoid*)(uintptr_t)(sizeof(unsigned short) * 54));
+        DrawText();
+        guiRoot.EndScissor();
     }
     
     v2i SGListBox::GetTextOffset() {
         return position_abs + v2i{text_area.left, text_area.top - text_offset};
     }
-    
-    int SGListBox::GetMaxWidth() {
-        return 0xffff;
-    }
-
+ 
     void SGListBox::UpdateTextVertex() {
-        
-    }
-    
-    void SGListBox::DrawText() {
-        
-    }
-    
-    void SGListBox::InsertItem(unsigned int index, std::string& item, unsigned int color) {
-        if(index >= items.size()) {
-            AddItem(item, color);
+        if(!text_update || font == nullptr)
             return;
+        text_update = false;
+        vert_size = 0;
+        if(items.size() == 0)
+            return;
+        std::vector<SGVertexVCT> charvtx;
+        std::vector<unsigned short> charidx;
+        std::vector<SGVertexVCT> iconvtx;
+        std::vector<unsigned short> iconidx;
+        auto tex = font->getTexture(font_size);
+        SGVertexVCT cur_char;
+        v2i text_pos = GetTextOffset();
+        int itemcount = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
+        int begini = text_offset / line_spacing;
+        int scolor = listbox_config.int_config["sel_color"];
+        int iconw = guiRoot.GetDefaultRect("iconoffset").width;
+        for(int i = begini; i < items.size() && i < begini + itemcount; ++i) {
+            unsigned int advx = std::get<0>(items[i]) ? iconw : 0;
+            unsigned int advy = font_size + line_spacing * i;
+            unsigned int color = (i == current_sel) ? scolor : std::get<2>(items[i]);
+            for(auto ch : std::get<1>(items[i])) {
+                if(ch < L' ')
+                    continue;
+                auto& gl = font->getGlyph(ch, font_size, false);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                charvtx.push_back(cur_char);
+                advx += gl.advance + spacing_x;
+                
+                charidx.push_back(vert_size * 4);
+                charidx.push_back(vert_size * 4 + 2);
+                charidx.push_back(vert_size * 4 + 1);
+                charidx.push_back(vert_size * 4 + 1);
+                charidx.push_back(vert_size * 4 + 2);
+                charidx.push_back(vert_size * 4 + 3);
+                vert_size++;
+            }
+        }
+
+        if(vert_size > mem_size) {
+            if(mem_size == 0)
+                mem_size = 16;
+            while(mem_size < vert_size)
+                mem_size *= 2;
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, charidx.size() * sizeof(unsigned short), &charidx[0]);
+        } else {
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, charidx.size() * sizeof(unsigned short), &charidx[0]);
         }
     }
     
-    void SGListBox::AddItem(std::string& item, unsigned int color) {
-        
+    void SGListBox::InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color) {
+        if(index >= items.size())
+            items.push_back(std::make_tuple(icon, item, color));
+        else
+            items.insert(items.begin() + index, std::make_tuple(icon, item, color));
+        if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height) {
+            auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
+            sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
+        }
+        current_sel = -1;
+        vertices_dirty = true;
+    }
+    
+    void SGListBox::AddItem(unsigned short icon, const std::wstring& item, unsigned int color) {
+        items.push_back(std::make_tuple(icon, item, color));
+        if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height) {
+            auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
+            sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
+        }
+        current_sel = -1;
+        vertices_dirty = true;
+    }
+    
+    void SGListBox::RemoveItem(unsigned int index) {
+        if(index >= items.size())
+            return;
+        items.erase(items.begin() + index);
+        auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
+        if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height)
+            sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
+        else {
+            text_offset = 0;
+            sptr->SetSliderLength(0);
+        }
+        current_sel = -1;
+        vertices_dirty = true;
+    }
+    
+    void SGListBox::ClearItem() {
+        if(items.size() == 0)
+            return;
+        items.clear();
+        std::static_pointer_cast<SGScrollBar>(children[0])->SetSliderLength(0);
+        text_offset = 0;
+        current_sel = -1;
+        vertices_dirty = true;
+    }
+    
+    void SGListBox::SetItemIcon(unsigned int index, unsigned short icon) {
+        if(items.size() == 0)
+            return;
+        std::get<0>(items[index]) = icon;
+    }
+    
+    void SGListBox::SetItemText(unsigned int index, const std::wstring& text, unsigned int color) {
+        if(items.size() == 0)
+            return;
+        std::get<1>(items[index]) = text;
+        std::get<2>(items[index]) = color;
+    }
+    
+    const std::tuple<unsigned short, std::wstring, unsigned int>& SGListBox::GetItem(unsigned int index) {
+        static std::tuple<unsigned short, std::wstring, unsigned int> st;
+        if(index >= items.size())
+            return st;
+        return items[index];
+    }
+    
+    void SGListBox::SetSelection(int sel) {
+        if(sel < 0 || sel >= items.size())
+            current_sel = -1;
+        else {
+            current_sel = sel;
+            if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height) {
+                int max_offset = items.size() * line_spacing - (size_abs.y - text_area.top - text_area.height);
+                text_offset = current_sel * line_spacing;
+                if(text_offset > max_offset)
+                    text_offset = max_offset;
+                std::static_pointer_cast<SGScrollBar>(children[0])->SetValue(text_offset * 100.0f / max_offset);
+            }
+        }
+        vertices_dirty = true;
+    }
+    
+    int SGListBox::GetSeletion() {
+        return current_sel;
+    }
+    
+    bool SGListBox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        auto choving = std::static_pointer_cast<SGScrollBar>(hoving.lock());
+        if(choving) {
+            choving->EventMouseButtonDown(evt);
+            return true;
+        } else if(evt.button == sf::Mouse::Left
+                  && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
+                  && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
+            int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+            float now = guiRoot.GetTime().asSeconds();
+            if(sel == current_sel) {
+                if(now - click_time < 0.3f) {
+                    eventDoubleClick.TriggerEvent(*this, sel);
+                    click_time = 0.0f;
+                } else
+                    click_time = now;
+            } else {
+                current_sel = sel;
+                vertices_dirty = true;
+                click_time = now;
+                eventSelChange.TriggerEvent(*this, sel);
+            }
+        }
+        return true;
+    }
+    
+    bool SGListBox::EventMouseEnter() {
+        is_hoving = true;
+        vertices_dirty = true;
+        return SGWidgetContainer::EventMouseEnter();
+    }
+    
+    bool SGListBox::EventMouseLeave() {
+        is_hoving = false;
+        vertices_dirty = true;
+        return SGWidgetContainer::EventMouseLeave();
+    }
+    
+    bool SGListBox::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+        return children[0]->EventMouseWheel(evt);
+    }
+    
+    bool SGListBox::ScrollBarChange(SGWidget& sender, float value) {
+        text_offset = (items.size() * line_spacing - (size_abs.y - text_area.top - text_area.height)) * value / 100.0f;
+        vertices_dirty = true;
+        return true;
     }
     
     std::shared_ptr<SGListBox> SGListBox::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
@@ -2610,25 +2922,13 @@ namespace sgui
         ptr->sel_bcolor = listbox_config.int_config["sel_bcolor"];
         ptr->line_spacing = listbox_config.int_config["spacing"];
         ptr->text_offset = 0;
-        int itemcount = (ptr->size_abs.y - ptr->text_area.top - ptr->text_area.height) / ptr->line_spacing + 1;
         glGenBuffers(2, ptr->vbo);
-        glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * (9 + itemcount) * 4, nullptr, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
-        std::vector<unsigned short> index;
-        index.resize((9 + itemcount) * 6);
-        for(int i = 0; i < 9 + itemcount; ++i) {
-            index[i * 6] = i * 4;
-            index[i * 6 + 1] = i * 4 + 2;
-            index[i * 6 + 2] = i * 4 + 1;
-            index[i * 6 + 3] = i * 4 + 1;
-            index[i * 6 + 4] = i * 4 + 2;
-            index[i * 6 + 5] = i * 4 + 3;
-        }
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * (9 + itemcount) * 6, &index[0], GL_STATIC_DRAW);
+        auto sarea = listbox_config.tex_config["scroll_area"];
         auto scr = SGScrollBar::Create(ptr, {0, 0}, {0, 0}, false);
-        scr->SetPosition({-scr->GetSize().x - ptr->text_area.width, 0}, {1.0f, 0.0f});
+        scr->SetPosition({-sarea.left, sarea.top}, {1.0f, 0.0f});
+        scr->SetSize({0, -sarea.top - sarea.height}, {0.0f, 1.0f});
         scr->SetSliderLength(0);
+        scr->eventValueChange.Bind(ptr.get(), &SGListBox::ScrollBarChange);
         if(p != nullptr)
             p->AddChild(ptr);
         else
@@ -2636,4 +2936,798 @@ namespace sgui
         return ptr;
     }
     
+    class SGListBoxInner : public SGListBox {
+    public:
+        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt) {
+            bool ret = SGWidgetContainer::EventMouseMove(evt);
+            if(hoving.expired()) {
+                int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+                if(current_sel != sel) {
+                    current_sel = sel;
+                    vertices_dirty = true;
+                }
+            }
+            return ret;
+        }
+        
+        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+            auto choving = hoving.lock();
+            if(choving) {
+                choving->EventMouseButtonDown(evt);
+                return true;
+            } else if(evt.button == sf::Mouse::Left
+                      && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
+                      && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
+                int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+                std::static_pointer_cast<SGComboBox>(parent.lock())->SetSelection(sel);
+                std::static_pointer_cast<SGComboBox>(parent.lock())->ShowList(false);
+            }
+            return true;
+        }
+        
+        bool ScrollBarChange(SGWidget& sender, float value) {
+            text_offset = (items.size() * line_spacing - (size_abs.y - text_area.top - text_area.height)) * value / 100.0f;
+            vertices_dirty = true;
+            return true;
+        }
+        
+        static std::shared_ptr<SGListBoxInner> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
+            auto ptr = std::make_shared<SGListBoxInner>();
+            ptr->parent = p;
+            ptr->position = pos;
+            ptr->size = sz;
+            ptr->text_area = listbox_config.tex_config["text_area"];
+            ptr->PostResize(true, true);
+            auto iter = listbox_config.int_config.find("gui_color");
+            if(iter != listbox_config.int_config.end())
+                ptr->color = iter->second;
+            else
+                ptr->color = guiRoot.GetDefaultInt("gui_color");
+            auto iter2 = listbox_config.int_config.find("font_size");
+            if(iter2 != listbox_config.int_config.end())
+                ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+            else
+                ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->color1 = listbox_config.int_config["color1"];
+            ptr->color2 = listbox_config.int_config["color2"];
+            ptr->sel_color = listbox_config.int_config["sel_color"];
+            ptr->sel_bcolor = listbox_config.int_config["sel_bcolor"];
+            ptr->line_spacing = listbox_config.int_config["spacing"];
+            ptr->text_offset = 0;
+            glGenBuffers(2, ptr->vbo);
+            auto sarea = listbox_config.tex_config["scroll_area"];
+            auto scr = SGScrollBar::Create(ptr, {0, 0}, {0, 0}, false);
+            scr->SetPosition({-sarea.left, sarea.top}, {1.0f, 0.0f});
+            scr->SetSize({0, -sarea.top - sarea.height}, {0.0f, 1.0f});
+            scr->SetSliderLength(0);
+            scr->eventValueChange.Bind(ptr.get(), &SGListBoxInner::ScrollBarChange);
+            if(p != nullptr)
+                p->AddChild(ptr);
+            else
+                guiRoot.AddChild(ptr);
+            return ptr;
+        }
+    };
+    
+    SGConfig SGComboBox::combobox_config;
+    
+    SGComboBox::~SGComboBox() {
+        glDeleteBuffers(2, vbo);
+    }
+    
+    void SGComboBox::UpdateVertices() {
+        if(!vertices_dirty)
+            return;
+        vertices_dirty = false;
+        text_update = true;
+        std::array<SGVertexVCT, 40> vert;
+        int bw = combobox_config.int_config["border"];
+        int ht = combobox_config.int_config["height"];
+        auto back = combobox_config.tex_config[is_hoving ? "backh" : "back"];
+        auto down = combobox_config.tex_config[show_item ? "down3" : is_hoving ? "down2" : "down1"];
+        auto drop = combobox_config.tex_config["drop_area"];
+        guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
+                              sf::IntRect{back.left, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
+                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
+                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, ht - bw * 2,
+                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, ht - bw * 2,
+                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, ht - bw * 2,
+                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + ht - bw, bw, bw,
+                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+        guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + ht - bw, size_abs.x - bw * 2, bw,
+                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + ht - bw, bw, bw,
+                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+        guiRoot.SetRectVertex(&vert[36], position_abs.x + size_abs.x - drop.left, position_abs.y + drop.top, drop.width, drop.height, down);
+        for(int i = 0; i < 40; ++i)
+            vert[i].color = color;
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * 40, &vert[0]);
+    }
+    
+    void SGComboBox::Draw() {
+        UpdateVertices();
+        guiRoot.BindGuiTexture();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_SHORT, 0);
+        int tw = size_abs.x - text_area.left - text_area.width;
+        int th = size_abs.y - text_area.top - text_area.height;
+        guiRoot.BeginScissor(sf::IntRect{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
+        DrawText();
+        guiRoot.EndScissor();
+        if(show_item)
+            for(auto chd : children)
+                chd->Draw();
+    }
+    
+    void SGComboBox::PostResize(bool res, bool rep) {
+        SGWidgetContainer::PostResize(res, rep);
+        if(show_item)
+            size_abs.y = combobox_config.int_config["height"] + combobox_config.int_config["listheight"];
+        else
+            size_abs.y = combobox_config.int_config["height"];
+    }
+    
+    v2i SGComboBox::GetTextOffset() {
+        return position_abs + v2i{text_area.left, text_area.top};
+    }
+    
+    void SGComboBox::InsertItem(unsigned int index, const std::wstring& item, unsigned int color) {
+        std::static_pointer_cast<SGListBox>(children[0])->InsertItem(index, 0, item, color);
+        item_count++;
+        if(current_sel >= 0 && index <= current_sel)
+            current_sel++;
+    }
+    
+    void SGComboBox::AddItem(const std::wstring& item, unsigned int color) {
+        std::static_pointer_cast<SGListBox>(children[0])->AddItem(0, item, color);
+        item_count++;
+    }
+    
+    void SGComboBox::RemoveItem(unsigned int index) {
+        if(index >= item_count)
+            return;
+        std::static_pointer_cast<SGListBox>(children[0])->RemoveItem(index);
+        item_count--;
+        if(index == current_sel) {
+            ClearText();
+            current_sel = -1;
+        } else if(index < current_sel)
+            current_sel--;
+    }
+    
+    void SGComboBox::ClearItem() {
+        std::static_pointer_cast<SGListBox>(children[0])->ClearItem();
+        item_count = 0;
+        ClearText();
+        current_sel = -1;
+    }
+    
+    void SGComboBox::SetItemText(unsigned int index, const std::wstring& text, unsigned int color) {
+        std::static_pointer_cast<SGListBox>(children[0])->SetItemText(index, text, color);
+    }
+    
+    void SGComboBox::SetSelection(int sel) {
+        if(sel < 0 || sel >= item_count)
+            sel = -1;
+        if(sel != current_sel) {
+            current_sel = sel;
+            auto item = std::static_pointer_cast<SGListBox>(children[0])->GetItem(sel);
+            SetText(std::get<1>(item), std::get<2>(item));
+            eventSelChange.TriggerEvent(*this, sel);
+        }
+    }
+    
+    int SGComboBox::GetSeletion() {
+        return current_sel;
+    }
+    
+    void SGComboBox::ShowList(bool show) {
+        if(show_item == show)
+            return;
+        if(show)
+            std::static_pointer_cast<SGListBox>(children[0])->SetSelection(current_sel);
+        show_item = show;
+        PostResize(true, false);
+    }
+    
+    bool SGComboBox::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+        bool ret = SGWidgetContainer::EventMouseMove(evt);
+        if(!hoving.lock()) {
+            if(!is_hoving) {
+                is_hoving = true;
+                vertices_dirty = true;
+            }
+        } else {
+            if(is_hoving) {
+                is_hoving = false;
+                vertices_dirty = true;
+            }
+        }
+        return ret;
+    }
+    
+    bool SGComboBox::EventMouseLeave() {
+        is_hoving = false;
+        vertices_dirty = true;
+        return SGWidgetContainer::EventMouseLeave();
+    }
+    
+    bool SGComboBox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        auto choving = hoving.lock();
+        if(choving) {
+            choving->EventMouseButtonDown(evt);
+            return true;
+        } else if(evt.button == sf::Mouse::Left) {
+            ShowList(!show_item);
+            if(!parent.expired())
+                parent.lock()->BringToTop(shared_from_this());
+        }
+        return true;
+    }
+    
+    bool SGComboBox::EventLostFocus() {
+        show_item = false;
+        PostResize(true, false);
+        return SGWidgetContainer::EventLostFocus();
+    }
+    
+    std::shared_ptr<SGComboBox> SGComboBox::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
+        auto ptr = std::make_shared<SGComboBox>();
+        ptr->parent = p;
+        ptr->position = pos;
+        ptr->size = sz;
+        ptr->text_area = combobox_config.tex_config["text_area"];
+        ptr->PostResize(true, true);
+        auto iter = combobox_config.int_config.find("gui_color");
+        if(iter != combobox_config.int_config.end())
+            ptr->color = iter->second;
+        else
+            ptr->color = guiRoot.GetDefaultInt("gui_color");
+        auto iter2 = combobox_config.int_config.find("font_size");
+        if(iter2 != combobox_config.int_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        else
+            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+        glGenBuffers(2, ptr->vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 40, nullptr, GL_DYNAMIC_DRAW);
+        unsigned short index[60];
+        for(int i = 0; i < 10; ++i) {
+            index[i * 6] = i * 4;
+            index[i * 6 + 1] = i * 4 + 2;
+            index[i * 6 + 2] = i * 4 + 1;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
+        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 60, index, GL_STATIC_DRAW);
+        auto lst = SGListBoxInner::Create(ptr, {0, combobox_config.int_config["listoffset"]}, {0, 0});
+        lst->SetSize({0, combobox_config.int_config["listheight"]}, {1.0f, 0.0f});
+        if(p != nullptr)
+            p->AddChild(ptr);
+        else
+            guiRoot.AddChild(ptr);
+        return ptr;
+    }
+    
+    class SGTabInner : public SGWidgetContainer {
+        friend class SGTabControl;
+    public:
+        virtual void PostResize(bool res, bool rep) {
+            auto ptr = std::static_pointer_cast<SGTabControl>(parent.lock());
+            v2i ssize = ptr->GetClientSize();
+            if(res)
+                size_abs = size + v2i(ssize.x * size_prop.x, ssize.y * size_prop.y);
+            if(rep) {
+                position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
+                position_abs += ptr->GetClientPosition();
+            }
+            if(res)
+                rep = true;
+            for(auto& chd : children)
+                chd->PostResize(res, rep);
+        }
+        
+        virtual void UpdateVertices() {
+            
+        }
+        
+        virtual void Draw() {
+            for(auto& iter : children)
+                if(iter->IsVisible())
+                    iter->Draw();
+        }
+        
+        std::wstring title;
+        unsigned int width;
+    };
+    
+    SGConfig SGTabControl::tab_config;
+    
+    SGTabControl::~SGTabControl() {
+        glDeleteBuffers(2, vbo);
+    }
+    
+    v2i SGTabControl::GetClientPosition() {
+        return {position_abs.x, position_abs.y + tab_height};
+    }
+    
+    v2i SGTabControl::GetClientSize() {
+        return {size_abs.x, size_abs.y - tab_height};
+    }
+    
+    void SGTabControl::UpdateVertices() {
+        if(!vertices_dirty)
+            return;
+        vertices_dirty = false;
+        text_update = true;
+        std::vector<SGVertexVCT> vert;
+        std::vector<unsigned short> index;
+        
+        int bw = tab_config.int_config["client_border"];
+        int ht = tab_config.int_config["client_height"];
+        auto back = tab_config.tex_config["client_area"];
+        
+        vert.resize((9 + item_count * 3) * 4);
+        index.resize((9 + item_count * 3) * 6);
+        
+        guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y + ht, bw, bw,
+                              sf::IntRect{back.left, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y + ht, size_abs.x - bw * 2, bw,
+                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y + ht, bw, bw,
+                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + ht + bw, bw, size_abs.y - ht - bw * 2,
+                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + ht + bw, size_abs.x - bw * 2, size_abs.y - ht - bw * 2,
+                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + ht + bw, bw, size_abs.y - ht - bw * 2,
+                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
+                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+        guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
+                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
+                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+        
+        int tb = tab_config.int_config["tab_border"];
+        auto t1 = tab_config.tex_config["tab_title1"];
+        auto t2 = tab_config.tex_config["tab_title2"];
+        auto t3 = tab_config.tex_config["tab_title3"];
+        int ti = tab_ol;
+        int startv = 36;
+        bool act = false;
+        int actti = 0;
+        for(int i = 0; i < item_count; ++i) {
+            auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
+            if(ptr == active_tab.lock()) {
+                act = true;
+                actti = ti;
+                ti += ptr->width;
+                continue;
+            }
+            auto& rct = (ptr == hover_tab.lock()) ? t2 : t3;
+            guiRoot.SetRectVertex(&vert[startv], position_abs.x + ti, position_abs.y, tb, tab_height,
+                                  sf::IntRect{rct.left, rct.top, tb, rct.height});
+            guiRoot.SetRectVertex(&vert[startv + 4], position_abs.x + ti + tb, position_abs.y, ptr->width - tb * 2, tab_height,
+                                  sf::IntRect{rct.left + tb, rct.top, rct.width - tb * 2, rct.height});
+            guiRoot.SetRectVertex(&vert[startv + 8], position_abs.x + ti + ptr->width - tb, position_abs.y, tb, tab_height,
+                                  sf::IntRect{rct.left + rct.width - tb, rct.top, tb, rct.height});
+            ti += ptr->width;
+            startv += 12;
+        }
+        if(act) {
+            auto ptr = std::static_pointer_cast<SGTabInner>(active_tab.lock());
+            ti = actti;
+            guiRoot.SetRectVertex(&vert[startv], position_abs.x + ti, position_abs.y, tb, tab_height,
+                                  sf::IntRect{t1.left, t1.top, tb, t1.height});
+            guiRoot.SetRectVertex(&vert[startv + 4], position_abs.x + ti + tb, position_abs.y, ptr->width - tb * 2, tab_height,
+                                  sf::IntRect{t1.left + tb, t1.top, t1.width - tb * 2, t1.height});
+            guiRoot.SetRectVertex(&vert[startv + 8], position_abs.x + ti + ptr->width - tb, position_abs.y, tb, tab_height,
+                                  sf::IntRect{t1.left + t1.width - tb, t1.top, tb, t1.height});
+        }
+        
+        for(auto& vt : vert)
+            vt.color = color;
+        for(int i = 0; i < 9 + item_count * 3; ++i) {
+            index[i * 6] = i * 4;
+            index[i * 6 + 1] = i * 4 + 2;
+            index[i * 6 + 2] = i * 4 + 1;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
+        }
+        
+        if(max_item_count == 0 || item_count > max_item_count) {
+            if(max_item_count == 0)
+                max_item_count = 8;
+            while(max_item_count < item_count)
+                max_item_count *= 2;
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * ((9 + max_item_count * 3) * 4), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * ((9 + item_count * 3) * 4), &vert[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * ((9 + max_item_count * 3) * 6), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * ((9 + item_count * 3) * 6), &index[0]);
+        } else {
+            glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * ((9 + item_count * 3) * 4), &vert[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * ((9 + item_count * 3) * 6), &index[0]);
+        }
+    }
+    
+    void SGTabControl::Draw() {
+        EvaluateSize();
+        UpdateVertices();
+        guiRoot.BindGuiTexture();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glVertexPointer(2, GL_FLOAT, sizeof(SGVertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(SGVertexVCT), (const GLvoid*)SGVertexVCT::tex_offset);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        guiRoot.BeginScissor(sf::IntRect{position_abs.x, position_abs.y, size_abs.x, size_abs.y});
+        glDrawElements(GL_TRIANGLES, (9 + item_count * 3) * 6, GL_UNSIGNED_SHORT, 0);
+        DrawText();
+        guiRoot.EndScissor();
+        guiRoot.BeginScissor(sf::IntRect{position_abs.x, position_abs.y + tab_height, size_abs.x, size_abs.y - tab_height});
+        if(!active_tab.expired())
+            active_tab.lock()->Draw();
+        guiRoot.EndScissor();
+    }
+    
+    void SGTabControl::PostResize(bool res, bool rep) {
+        SGWidgetContainer::PostResize(res, rep);
+        size_dirty = true;
+    }
+    
+    v2i SGTabControl::GetTextOffset() {
+        return position_abs;
+    }
+    
+    void SGTabControl::EvaluateSize(const std::wstring& t) {
+        if(!size_dirty)
+            return;
+        size_dirty = false;
+        item_count = 0;
+        int sz = children.size();
+        if(sz == 0)
+            return;
+        int width = size_abs.x - tab_ol - tab_or;
+        int w1 = tab_config.int_config["tab_min_width1"];
+        int w2 = tab_config.int_config["tab_min_width2"];
+        int wp = width / sz;
+        int wh = wp;
+        if(wh < w2) {
+            wh = w2;
+            if(sz > 1)
+                wp = (width - wh) / (sz - 1);
+        }
+        if(wp < w1)
+            wp = w1;
+        auto atb = active_tab.lock();
+        int max_w = 0;
+        for(size_t i = 0; i < children.size(); ++i) {
+            auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
+            if(ptr == atb)
+                ptr->width = wh;
+            else
+                ptr->width = wp;
+            if(item_count == 0) {
+                if(max_w + ptr->width > width)
+                    item_count = i + 1;
+                else
+                    max_w += ptr->width;
+            }
+        }
+        if(item_count == 0)
+            item_count = sz;
+    }
+    
+    void SGTabControl::UpdateTextVertex() {
+        if(!text_update || font == nullptr)
+            return;
+        text_update = false;
+        vert_size = 0;
+        if(children.size() == 0)
+            return;
+        std::vector<SGVertexVCT> charvtx;
+        std::vector<unsigned short> charidx;
+        std::vector<SGVertexVCT> iconvtx;
+        std::vector<unsigned short> iconidx;
+        auto tex = font->getTexture(font_size);
+        SGVertexVCT cur_char;
+        v2i text_pos = GetTextOffset();
+        int tb = tab_config.int_config["tab_border"];
+        int ti = tab_ol;
+        text_pos.y += font_size + tab_config.int_config["title_offset"];
+        for(int i = 0; i < children.size(); ++i) {
+            auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
+            unsigned int advx = ti + tb;
+            unsigned int color = ptr->color;
+            ti += ptr->width;
+            unsigned int tw = tb * 2;
+            for(auto ch : ptr->title) {
+                if(ch < L' ')
+                    continue;
+                auto& gl = font->getGlyph(ch, font_size, false);
+                if(tw + gl.advance > ptr->width)
+                    break;
+                tw += gl.advance + spacing_x;
+            }
+            advx += (ptr->width > tw) ? (ptr->width - tw) / 2 : 0;
+            tw = tb * 2;
+            for(auto ch : ptr->title) {
+                if(ch < L' ')
+                    continue;
+                auto& gl = font->getGlyph(ch, font_size, false);
+                if(tw + gl.advance > ptr->width)
+                    break;
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                charvtx.push_back(cur_char);
+                guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height, cur_char.vertex);
+                cur_char.color = color;
+                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                charvtx.push_back(cur_char);
+                advx += gl.advance + spacing_x;
+                tw += gl.advance + spacing_x;
+                
+                charidx.push_back(vert_size * 4);
+                charidx.push_back(vert_size * 4 + 2);
+                charidx.push_back(vert_size * 4 + 1);
+                charidx.push_back(vert_size * 4 + 1);
+                charidx.push_back(vert_size * 4 + 2);
+                charidx.push_back(vert_size * 4 + 3);
+                vert_size++;
+            }
+        }
+        
+        if(vert_size > mem_size) {
+            if(mem_size == 0)
+                mem_size = 16;
+            while(mem_size < vert_size)
+                mem_size *= 2;
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * mem_size * 4, nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glBufferData(GL_ELEMENT_ARRAY_BUFFER, mem_size * 6 * sizeof(unsigned short), nullptr, GL_DYNAMIC_DRAW);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, charidx.size() * sizeof(unsigned short), &charidx[0]);
+        } else {
+            glBindBuffer(GL_ARRAY_BUFFER, tbo[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(SGVertexVCT) * charvtx.size(), &charvtx[0]);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, tbo[1]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, charidx.size() * sizeof(unsigned short), &charidx[0]);
+        }
+    }
+    
+    void SGTabControl::AddTab(const std::wstring& title, unsigned int color) {
+        auto ptr = std::make_shared<SGTabInner>();
+        ptr->parent = std::static_pointer_cast<SGWidgetContainer>(shared_from_this());
+        ptr->title = title;
+        ptr->color = color;
+        ptr->PostResize(true, true);
+        children.push_back(ptr);
+        if(children.size() == 1)
+            active_tab = ptr;
+        vertices_dirty = true;
+        size_dirty = true;
+    }
+    
+    void SGTabControl::RemoveTab(unsigned int index) {
+        if(index >= children.size())
+            return;
+        if(children[index] == active_tab.lock()) {
+            if(index < children.size() - 1)
+                active_tab = children[index + 1];
+            else if(index > 0)
+                active_tab = children[index - 1];
+        }
+        children.erase(children.begin() + index);
+        vertices_dirty = true;
+        size_dirty = true;
+    }
+    
+    void SGTabControl::SetTabTitle(unsigned int index, const std::wstring& title, unsigned int color) {
+        if(index >= children.size())
+            return;
+        auto ptr = std::static_pointer_cast<SGTabInner>(children[index]);
+        ptr->title = title;
+        ptr->color = color;
+        size_dirty = true;
+        text_update = true;
+    }
+    
+    std::shared_ptr<SGWidgetContainer> SGTabControl::GetTab(int index) {
+        if(index >= children.size())
+            return nullptr;
+        return std::static_pointer_cast<SGWidgetContainer>(children[index]);
+    }
+    
+    void SGTabControl::SetActiveTab(int index) {
+        if(index >= children.size())
+            return;
+        active_tab = children[index];
+        vertices_dirty = true;
+    }
+    
+    int SGTabControl::GetTabCount() {
+        return children.size();
+    }
+    
+    int SGTabControl::GetActiveTab() {
+        for(int i = 0; i < children.size(); ++i)
+            if(children[i] == active_tab.lock())
+                return i;
+        return -1;
+    }
+    
+    bool SGTabControl::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+        if(evt.y < position_abs.y + tab_height) {
+            if(in_tab) {
+                if(!active_tab.expired())
+                    active_tab.lock()->EventMouseLeave();
+                in_tab = false;
+            }
+            int ind = GetHovingTab(v2i{evt.x, evt.y});
+            if(ind == -1)
+                return true;
+            auto ptr = children[ind];
+            if(hover_tab.lock() != ptr) {
+                hover_tab = ptr;
+                vertices_dirty = true;
+            }
+            return true;
+        } else {
+            if(!in_tab) {
+                if(active_tab.expired())
+                    active_tab.lock()->EventMouseEnter();
+                in_tab = true;
+            }
+            if(!hover_tab.expired()) {
+                hover_tab.reset();
+                vertices_dirty = true;
+            }
+            if(!active_tab.expired())
+                active_tab.lock()->EventMouseMove(evt);
+            return true;
+        }
+        return false;
+    }
+    
+    bool SGTabControl::EventMouseEnter() {
+        if(in_tab && active_tab.expired())
+            return active_tab.lock()->EventMouseEnter();
+        return false;
+    }
+    
+    bool SGTabControl::EventMouseLeave() {
+        if(!hover_tab.expired()) {
+            hover_tab.reset();
+            vertices_dirty = true;
+        }
+        if(in_tab && !active_tab.expired())
+            return active_tab.lock()->EventMouseLeave();
+        return false;
+    }
+    
+    bool SGTabControl::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        if(!in_tab) {
+            if(evt.button == sf::Mouse::Button::Left) {
+                int ind = GetHovingTab(v2i{evt.x, evt.y});
+                if(ind == -1)
+                    return true;
+                auto ptr = children[ind];
+                if(hover_tab.lock() != ptr) {
+                    hover_tab = ptr;
+                    vertices_dirty = true;
+                }
+                if(active_tab.lock() != ptr) {
+                    active_tab = ptr;
+                    size_dirty = true;
+                    vertices_dirty = true;
+                }
+                return true;
+            }
+        } else
+            if(!active_tab.expired())
+                return active_tab.lock()->EventMouseButtonDown(evt);
+        return false;
+    }
+    
+    bool SGTabControl::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+        if(in_tab && !active_tab.expired())
+            return active_tab.lock()->EventMouseButtonUp(evt);
+        return false;
+    }
+    
+    bool SGTabControl::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+        if(!active_tab.expired())
+            return active_tab.lock()->EventMouseWheel(evt);
+        return false;
+    }
+    
+    bool SGTabControl::EventKeyDown(sf::Event::KeyEvent evt) {
+        if(!active_tab.expired())
+            return active_tab.lock()->EventKeyDown(evt);
+        return false;
+    }
+    
+    bool SGTabControl::EventKeyUp(sf::Event::KeyEvent evt) {
+        if(!active_tab.expired())
+            return active_tab.lock()->EventKeyUp(evt);
+        return false;
+    }
+    
+    bool SGTabControl::EventCharEnter(sf::Event::TextEvent evt) {
+        if(!active_tab.expired())
+            return active_tab.lock()->EventCharEnter(evt);
+        return false;
+    }
+    
+    int SGTabControl::GetHovingTab(v2i pos) {
+        if(children.size() == 0)
+            return -1;
+        int ti = position_abs.x + tab_ol;
+        for(int i = 0; i < children.size(); ++i) {
+            auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
+            if(pos.x >= ti && pos.x <= ti + ptr->width)
+                return i;
+            ti += ptr->width;
+        }
+        return -1;
+    }
+    
+    std::shared_ptr<SGTabControl> SGTabControl::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
+        auto ptr = std::make_shared<SGTabControl>();
+        ptr->parent = p;
+        ptr->position = pos;
+        ptr->size = sz;
+        ptr->PostResize(true, true);
+        auto iter = tab_config.int_config.find("gui_color");
+        if(iter != tab_config.int_config.end())
+            ptr->color = iter->second;
+        else
+            ptr->color = guiRoot.GetDefaultInt("gui_color");
+        auto iter2 = tab_config.int_config.find("font_size");
+        if(iter2 != tab_config.int_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        else
+            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+        ptr->tab_height = tab_config.int_config["tab_height"];
+        ptr->tab_ol = tab_config.int_config["tab_offsetl"];
+        ptr->tab_or = tab_config.int_config["tab_offsetr"];
+        glGenBuffers(2, ptr->vbo);
+        if(p != nullptr)
+            p->AddChild(ptr);
+        else
+            guiRoot.AddChild(ptr);
+        return ptr;
+    }
 }

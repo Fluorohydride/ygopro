@@ -3,13 +3,15 @@
   <basic>
     <string name="gui_font" value="./conf/wqy-zenhei.ttc"/>
     <string name="gui_texture" value="./conf/gui.png"/>
+    <rect name="iconoffset" u="256" v="0" w="20" h="20"/>
+    <integer name="iconcolumn" value="12"/>
     <!-- the following 3 values can be overwritten -->
-    <integer name="gui_color" value="0xff80ffc0"/>
+    <integer name="gui_color" value="0xffc0ffe0"/>
     <integer name="font_color" value="0xff000000"/>
     <integer name="font_size" value="14"/>
   </basic>
   <window>
-    <integer name="gui_color" value="0xffffc0c0"/>
+    <integer name="gui_color" value="0xffffff00"/>
     <integer name="font_color" value="0xffffffff"/>
     <integer name="font_size" value="16"/>
     <integer name="title_h" value="24"/>
@@ -37,10 +39,6 @@
     <integer name="closelw" value="1"/>
     <integer name="closerw" value="1"/>
   </window>
-  <iconlabel>
-    <rect name="iconoffset" u="256" v="0" w="20" h="20"/>
-    <integer name="column" value="12"/>
-  </iconlabel>
   <button>
     <integer name="border" value="5"/>
     <rect name="normal" u="82" v="2" w="32" h="21"/>
@@ -92,13 +90,43 @@
   </textedit>
   <listbox>
     <integer name="border" value="5"/>
-    <integer name="spacing" value="30"/>
-    <integer name="color1" value="0xff800000"/>
-    <integer name="color2" value="0xff800000"/>
+    <integer name="spacing" value="20"/>
+    <integer name="color1" value="0x00ffffff"/>
+    <integer name="color2" value="0x00eeeeee"/>
     <integer name="sel_color" value="0xffffffff"/>
     <integer name="sel_bcolor" value="0xff800000"/>
     <rect name="sel_rect" u="47" v="89" w="10" h="10"/>
-    <rect name="text_area" u="5" v="7" w="6" h="6"/>
+    <rect name="text_area" u="5" v="7" w="17" h="6"/>
+    <rect name="scroll_area" u="16" v="7" w="5" h="4"/>
     <rect name="back" u="62" v="106" w="29" h="32"/>
+    <rect name="backh" u="62" v="74" w="29" h="32"/>
   </listbox>
+  <combobox>
+    <integer name="border" value="5"/>
+    <integer name="height" value="30"/>
+    <integer name="listoffset" value="25"/>
+    <integer name="listheight" value="150"/>
+    <rect name="text_area" u="5" v="7" w="20" h="6"/>
+    <rect name="drop_area" u="19" v="9" w="15" h="12"/>
+    <rect name="back" u="62" v="106" w="29" h="32"/>
+    <rect name="backh" u="62" v="74" w="29" h="32"/>
+    <rect name="down1" u="100" v="80" w="15" h="12"/>
+    <rect name="down2" u="100" v="93" w="15" h="12"/>
+    <rect name="down3" u="100" v="106" w="15" h="12"/>
+  </combobox>
+  <tabcontrol>
+    <integer name="tab_height" value="29"/>
+    <integer name="tab_border" value="5"/>
+    <integer name="tab_offsetl" value="7"/>
+    <integer name="tab_offsetr" value="7"/>
+    <integer name="tab_min_width1" value="10"/>
+    <integer name="tab_min_width2" value="50"/>
+    <integer name="title_offset" value="5"/>
+    <integer name="client_height" value="26"/>
+    <integer name="client_border" value="5"/>
+    <rect name="client_area" u="100" v="122" w="45" h="41"/>
+    <rect name="tab_title1" u="149" v="124" w="24" h="29"/>
+    <rect name="tab_title2" u="176" v="124" w="24" h="29"/>
+    <rect name="tab_title3" u="203" v="124" w="24" h="29"/>
+  </tabcontrol>
 </Gui>

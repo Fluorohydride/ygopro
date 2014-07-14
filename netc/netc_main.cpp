@@ -36,25 +36,36 @@ int main(int argc, char* argv[]) {
     
     sgui::SGGUIRoot::GetSingleton().LoadConfigs();
     sgui::SGGUIRoot::GetSingleton().SetSceneSize({800, 600});
-    auto w1 = sgui::SGWindow::Create(nullptr, {100, 100}, {300, 400});
+    auto w1 = sgui::SGWindow::Create(nullptr, {100, 100}, {500, 400});
     w1->SetTitle(L"Test Caption");
-//    auto b1 = sgui::SGCheckbox::Create(w1, {10, 30}, L"Click me!");
-//    auto r1 = sgui::SGRadio::Create(w1, {10, 55}, L"A Radio");
-//    auto r2 = sgui::SGRadio::Create(w1, {10, 80}, L"Another Radio");
-//    r1->SetCustomValue(100);
-//    r2->SetCustomValue(200);
-//    r2->SetGroup(r1);
-//    auto r3 = sgui::SGRadio::Create(w1, {10, 105}, L"A Radio");
-//    auto r4 = sgui::SGRadio::Create(w1, {10, 130}, L"Another Radio");
-//    r4->SetGroup(r3);
-//    auto bt1 = sgui::SGButton::Create(w1, {10, 160}, {100, 50});
-//    bt1->SetText(L"A Button", 0xffff0000);
-//    auto t1 = sgui::SGTextEdit::Create(w1, {10, 300}, {150, 30});
-//    t1->SetText(L"InputText12345  67890", 0xff000000);
-//    auto lb = sgui::SGIconLabel::Create(w1, {10, 220}, L"", 0);
-//    lb->SetText(L"Line1\ue004\ue005\ue086\nLine2\ue001Line2\nLine3Line3", 0xff000000);
-    auto sch = sgui::SGScrollBar::Create(w1, {10, 50}, {150, 30}, true);
-    sch->SetSliderLength(50);
+    
+    auto tab = sgui::SGTabControl::Create(w1, {10, 30}, {480, 300});
+    for(int i = 0; i < 5; ++i)
+        tab->AddTab(L"Option", 0xffff0000);
+    tab->SetSize({-20, 300}, {1.0f, 0.0f});
+    auto cbx = sgui::SGComboBox::Create(tab->GetTab(0), {10, 10}, {150, 30});
+    for(int i = 0; i < 10; ++i)
+        cbx->AddItem(L"Item", 0xff000000 | globalRandom.GetRandomUInt32());
+    cbx->SetSelection(3);
+    auto sch = sgui::SGListBox::Create(tab->GetTab(1), {10, 10}, {150, 100});
+    for(int i = 0; i < 10; ++i)
+        sch->AddItem(i + 1, L"Item with icon", 0xff000000 | globalRandom.GetRandomUInt32());
+    sch->SetSelection(2);
+    auto b1 = sgui::SGCheckbox::Create(tab->GetTab(2), {10, 30}, L"Click me!");
+    auto r1 = sgui::SGRadio::Create(tab->GetTab(2), {10, 55}, L"A Radio");
+    auto r2 = sgui::SGRadio::Create(tab->GetTab(2), {10, 80}, L"Another Radio");
+    r1->SetCustomValue(100);
+    r2->SetCustomValue(200);
+    r2->SetGroup(r1);
+    auto r3 = sgui::SGRadio::Create(tab->GetTab(2), {10, 115}, L"A Radio");
+    auto r4 = sgui::SGRadio::Create(tab->GetTab(2), {10, 140}, L"Another Radio");
+    r4->SetGroup(r3);
+    auto bt1 = sgui::SGButton::Create(tab->GetTab(3), {10, 10}, {100, 50});
+    bt1->SetText(L"A Button", 0xffff0000);
+    auto t1 = sgui::SGTextEdit::Create(tab->GetTab(3), {10, 150}, {150, 30});
+    t1->SetText(L"InputText12345  67890", 0xff000000);
+    auto lb = sgui::SGIconLabel::Create(tab->GetTab(3), {10, 70}, L"", 0);
+    lb->SetText(L"Line1\ue004\ue005\ue086\nLine2\ue001Line2\nLine3Line3", 0xff000000);
     bool running = true;
     sf::Clock clock;
     float tm1 = clock.getElapsedTime().asSeconds();
@@ -63,9 +74,9 @@ int main(int argc, char* argv[]) {
         fps++;
         sf::Event evt;
         float tm2 = clock.getElapsedTime().asSeconds();
-        if(tm2 - tm1 >= 1.0f) {
-            std::cout << "fps : " << fps << std::endl;
-            tm1 += 1.0f;
+        if(tm2 - tm1 >= 10.0f) {
+            std::cout << "Average fps in 10s : " << fps / 10.0f << std::endl;
+            tm1 += 10.0f;
             fps = 0;
         }
         while (window.pollEvent(evt)) {
