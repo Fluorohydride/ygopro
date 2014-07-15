@@ -51,6 +51,12 @@ function c79844764.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(0,LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c79844764.con)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
+end
+function c79844764.con(e)
+	local tp=e:GetHandlerPlayer()
+	return not Duel.IsPlayerAffectedByEffect(tp,EFFECT_MAX_MZONE) 
+	or Duel.GetLocationCount(tp,LOCATION_MZONE)>Duel.GetLocationCount(1-tp,LOCATION_MZONE)+1
 end
