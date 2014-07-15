@@ -39,18 +39,6 @@ namespace ygopro
 		}
 	};
 
-	class DrawingObject {
-	public:
-		virtual void Draw() = 0;
-	};
-
-	class DrawingObject2D: public DrawingObject {
-	public:
-		
-	protected:
-		vector2d<float> point[4];
-	};
-
 }
 
 #endif

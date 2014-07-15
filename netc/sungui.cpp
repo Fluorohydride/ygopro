@@ -218,6 +218,12 @@ namespace sgui
         EvaluateSize(t);
     }
     
+    void SGTextBase::SetTextColor(unsigned int start, unsigned int end, unsigned int cl) {
+        for(int i = start; i < end && i < color_vec.size(); ++i)
+            color_vec[i] = cl;
+        text_update = true;
+    }
+    
     void SGTextBase::EvaluateSize(const std::wstring& t) {
         if(t.length() == 0) {
             text_width = 0;
@@ -637,8 +643,12 @@ namespace sgui
                 rt.top = prt.top;
             if(rt.left + rt.width > prt.left + prt.width)
                 rt.width = prt.left + prt.width - rt.left;
+            if(rt.width < 0)
+                rt.width = 0;
             if(rt.top + rt.height > prt.top + prt.height)
                 rt.height = prt.top + prt.height - rt.top;
+            if(rt.height < 0)
+                rt.height = 0;
         }
         scissor_stack.push_back(rt);
         glScissor(rt.left, scene_size.y - rt.top - rt.height, rt.width, rt.height);

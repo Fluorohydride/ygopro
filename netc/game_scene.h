@@ -6,22 +6,32 @@
 #include "xml_config.h"
 #include "../common/random.h"
 
+#include "deck_data.h"
+
 namespace ygopro
 {
     
     class GameScene {
     public:
-        GameScene();
-        ~GameScene();
+        void Init();
+        void Uninit();
         
         void SetCardInfo(unsigned int code);
         void AddCard(unsigned int code, unsigned int pos);
         void StopViewRegulation() { view_regulation = 0; }
         
+        void UpdateScene();
+        void UpdateBackGround();
+        void UpdateCard(int pos, int index);
+        void UpdateCardAll();
+        void Draw();
+        
     protected:
     private:
+        unsigned int bo[2];
         wxString current_file;
         int view_regulation = 0;
+        DeckData current_deck;
     };
 /*
     class wxGameCanvas;
@@ -88,7 +98,8 @@ namespace ygopro
         int view_regulation = 0;
     };
 */
-//    extern GameFrame* mainFrame;
+
+    extern GameScene gameScene;
     extern Random globalRandom;
 	extern CommonConfig commonCfg;
     extern CommonConfig stringCfg;

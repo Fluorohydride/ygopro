@@ -279,6 +279,7 @@ namespace sgui
         virtual unsigned int GetTextColor(int index);
         virtual void SetText(const std::wstring& t, unsigned int cl);
         virtual void AppendText(const std::wstring& t, unsigned int cl);
+        virtual void SetTextColor(unsigned int start, unsigned int end, unsigned int cl);
         virtual void EvaluateSize(const std::wstring& t = L"");
         virtual void UpdateTextVertex();
         virtual void DrawText();
@@ -701,6 +702,7 @@ namespace sgui
         void SetSelRegion(unsigned int start, unsigned int end);
         void CheckCursorPos();
         void CheckDragPos();
+        void SetDefaultColor(unsigned int color) { def_color = color; }
         
         SGEventHandler<SGWidget> eventTextEnter;
         

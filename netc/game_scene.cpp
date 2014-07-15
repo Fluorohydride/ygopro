@@ -1,7 +1,13 @@
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <OpenGL/gl.h>
+#include <OpenGL/glu.h>
+
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
 #include <wx/utils.h>
 
+#include "sungui.h"
 #include "game_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
@@ -10,10 +16,40 @@
 namespace ygopro
 {
 
-//    GameFrame* mainFrame = nullptr;
+    GameScene gameScene;
 	Random globalRandom;
 	CommonConfig commonCfg;
     CommonConfig stringCfg;
+    
+    void GameScene::Init() {
+        glGenBuffers(2, bo);
+    }
+    
+    void GameScene::Uninit() {
+        glDeleteBuffers(2, bo);
+    }
+    
+    void GameScene::UpdateScene() {
+        UpdateBackGround();
+        UpdateCardAll();
+    }
+    
+    void GameScene::UpdateBackGround() {
+        
+    }
+    
+    void GameScene::UpdateCard(int pos, int index) {
+        
+    }
+    
+    void GameScene::UpdateCardAll() {
+        
+    }
+    
+    void GameScene::Draw() {
+        
+    }
+    
   /*
     GameFrame::GameFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
         
