@@ -9,6 +9,7 @@ function c69840739.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(c69840739.chcon)
 	e1:SetCost(c69840739.cost)
 	e1:SetTarget(c69840739.chtg)
@@ -17,9 +18,11 @@ function c69840739.initial_effect(c)
 	--reload
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(69840739,1))
+	e2:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCost(c69840739.cost)
 	e2:SetTarget(c69840739.drtg)
 	e2:SetOperation(c69840739.drop)
@@ -32,10 +35,9 @@ function c69840739.chcon(e,tp,eg,ep,ev,re,r,rp)
 		or ((rc:GetType()==TYPE_SPELL or rc:GetType()==TYPE_TRAP) and re:IsHasType(EFFECT_TYPE_ACTIVATE))
 end
 function c69840739.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(69840739)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	e:GetHandler():RegisterFlagEffect(69840739,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c69840739.chtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c69840739.filter,rp,0,LOCATION_ONFIELD,1,nil) end
@@ -61,7 +63,7 @@ function c69840739.repop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c69840739.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return (Duel.IsPlayerCanDraw(tp) or Duel.IsPlayerCanDraw(1-tp))
+	if chk==0 then return (Duel.IsPlayerCanDraw(tp) and Duel.IsPlayerCanDraw(1-tp))
 		and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,LOCATION_HAND,LOCATION_HAND,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,PLAYER_ALL,LOCATION_HAND)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,1)

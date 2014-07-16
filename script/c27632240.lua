@@ -5,11 +5,10 @@ function c27632240.initial_effect(c)
 	e1:SetDescription(aux.Stringid(27632240,0))
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCode(EVENT_TO_HAND)
 	e1:SetCondition(c27632240.tgcon1)
-	e1:SetCost(c27632240.tgcost)
 	e1:SetTarget(c27632240.tgtg)
 	e1:SetOperation(c27632240.tgop)
 	c:RegisterEffect(e1)
@@ -29,10 +28,6 @@ function c27632240.cfilter2(c)
 end
 function c27632240.tgcon2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c27632240.cfilter2,1,nil)
-end
-function c27632240.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,27632240)==0 end
-	Duel.RegisterFlagEffect(tp,27632240,RESET_PHASE+PHASE_END,0,1)
 end
 function c27632240.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

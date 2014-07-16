@@ -8,6 +8,7 @@ function c89642993.initial_effect(c)
 	e1:SetDescription(aux.Stringid(89642993,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,89642993)
 	e1:SetCost(c89642993.efcost)
 	e1:SetTarget(c89642993.eftg)
 	e1:SetOperation(c89642993.efop)
@@ -15,9 +16,8 @@ function c89642993.initial_effect(c)
 end
 c89642993.xyz_number=63
 function c89642993.efcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,89642993)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,89642993,RESET_PHASE+PHASE_END,0,1)
 end
 function c89642993.eftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

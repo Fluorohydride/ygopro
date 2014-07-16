@@ -6,6 +6,7 @@ function c50920465.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,50920465)
 	e1:SetCost(c50920465.cost)
 	e1:SetTarget(c50920465.target)
 	e1:SetOperation(c50920465.operation)
@@ -15,10 +16,8 @@ function c50920465.cfilter(c,e,tp)
 	return c:IsDiscardable() and Duel.IsExistingMatchingCard(c50920465.filter,tp,LOCATION_HAND,0,1,c,e,tp)
 end
 function c50920465.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,50920465)==0
-		and Duel.IsExistingMatchingCard(c50920465.cfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c50920465.cfilter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.DiscardHand(tp,c50920465.cfilter,1,1,REASON_COST+REASON_DISCARD,nil,e,tp)
-	Duel.RegisterFlagEffect(tp,50920465,RESET_PHASE+PHASE_END,0,1)
 end
 function c50920465.filter(c,e,tp)
 	return c:IsRace(RACE_WINDBEAST) and c:IsAttribute(ATTRIBUTE_WATER)

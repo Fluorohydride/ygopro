@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <functional>
 
+#include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 
@@ -363,6 +364,19 @@ namespace sgui
         std::unordered_map<std::string, std::vector<v2i>> coord_config;
     };
     
+    class SGWidgetWrapper : public SGWidgetContainer {
+    public:
+        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseEnter();
+        virtual bool EventMouseLeave();
+        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
+        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
+        virtual bool EventKeyUp(sf::Event::KeyEvent evt);
+        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+    };
+    
     class SGGUIRoot : public SGWidgetContainer {
     public:
         virtual ~SGGUIRoot();
@@ -466,7 +480,7 @@ namespace sgui
         static SGConfig basic_config;
     };
     
-    class SGWindow : public SGWidgetContainer, public SGTextBase {
+    class SGWindow : public SGWidgetWrapper, public SGTextBase {
     public:
         virtual ~SGWindow();
         virtual void UpdateVertices();
@@ -476,7 +490,7 @@ namespace sgui
         virtual int GetMaxWidth();
         virtual bool IsMultiLine();
         void Destroy();
-        std::shared_ptr<SGWidget> GetCloseButton() { return children.front(); }
+        std::shared_ptr<SGWidget> GetCloseButton() { return children[0]; }
         void SetTitle(const std::wstring& t);
         
     protected:
@@ -557,6 +571,7 @@ namespace sgui
         virtual v2i GetImageOffset();
         void SetTextureRect(sf::IntRect r1, sf::IntRect r2, sf::IntRect r3, int lw, int rw);
         void SetTexture(sf::Texture* tex);
+        bool IsPushed() { return is_push && (state == 0x12); }
         
         SGEventHandler<SGWidget> eventButtonClick;
         
@@ -566,6 +581,7 @@ namespace sgui
         virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
         virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
         
+        bool is_push = false;
         unsigned int vbo[2] = {0, 0};
         unsigned int state = 0;
         int lwidth = 0;
@@ -574,10 +590,10 @@ namespace sgui
         sf::Texture* tex_texture = nullptr;
         
     public:
-        static std::shared_ptr<SGButton> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
+        static std::shared_ptr<SGButton> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size, bool is_push = false);
         static SGConfig button_config;
     };
-
+    
     class SGCheckbox : public SGWidget, public SGTextBase {
     public:
         virtual ~SGCheckbox();
@@ -612,35 +628,18 @@ namespace sgui
         static SGConfig checkbox_config;
     };
 
-    class SGRadio;
-
-    class SGRadioGroup {
-    public:
-        void AddRadio(SGRadio* rdo) { rdoset.insert(rdo); }
-        void RemoveRadio(SGRadio* rdo) {
-            rdoset.erase(rdo);
-            if(current == rdo)
-                current = nullptr;
-        }
-        void MakeCurrent(SGRadio* rdo) { current = rdo; }
-        SGRadio* GetCurrent() { return current; }
-        
-    protected:
-        std::set<SGRadio*> rdoset;
-        SGRadio* current = nullptr;
-    };
-
     class SGRadio : public SGCheckbox {
     public:
         virtual ~SGRadio();
         virtual void UpdateVertices();
         virtual void SetChecked(bool chk);
-        void SetGroup(std::shared_ptr<SGRadio> rdo);
+        void AttachGroup(std::shared_ptr<SGRadio> rdo);
+        void DetachGroup();
         std::shared_ptr<SGRadio> GetCheckedTarget();
         
     protected:
         virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
-        std::shared_ptr<SGRadioGroup> group;
+        SGRadio* next_group_member;
         
     public:
         static std::shared_ptr<SGRadio> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t);
@@ -686,7 +685,7 @@ namespace sgui
         static SGConfig scroll_config;
     };
 
-    class SGTextEdit : public SGWidgetContainer, public SGTextBase {
+    class SGTextEdit : public SGWidgetWrapper, public SGTextBase {
     public:
         ~SGTextEdit();
         virtual void PostResize(bool res, bool rep);
@@ -741,7 +740,7 @@ namespace sgui
         static SGConfig textedit_config;
     };
 
-    class SGListBox : public SGWidgetContainer, public SGTextBase {
+    class SGListBox : public SGWidgetWrapper, public SGTextBase {
     public:
         ~SGListBox();
         virtual void UpdateVertices();
@@ -792,7 +791,7 @@ namespace sgui
         static SGConfig listbox_config;
     };
     
-    class SGComboBox : public SGWidgetContainer, public SGTextBase {
+    class SGComboBox : public SGWidgetWrapper, public SGTextBase {
     public:
         ~SGComboBox();
         virtual void UpdateVertices();
@@ -830,7 +829,7 @@ namespace sgui
         static SGConfig combobox_config;
     };
     
-    class SGTabControl : public SGWidgetContainer , public SGTextBase {
+    class SGTabControl : public SGWidgetWrapper , public SGTextBase {
     public:
         ~SGTabControl();
         virtual v2i GetClientPosition();

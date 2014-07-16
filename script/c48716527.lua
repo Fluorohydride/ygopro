@@ -17,7 +17,6 @@ function c48716527.initial_effect(c)
 	--
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetCountLimit(1)
 	e3:SetRange(LOCATION_SZONE)
@@ -33,7 +32,7 @@ function c48716527.actcon(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.IsExistingMatchingCard(c48716527.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c48716527.distg(e,c)
-	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==0
+	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)~=SUMMON_TYPE_ADVANCE
 end
 function c48716527.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

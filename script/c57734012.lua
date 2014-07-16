@@ -19,7 +19,7 @@ end
 function c57734012.regcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return Duel.GetFlagEffect(tp,57734012)==0 and Duel.GetCurrentPhase()==PHASE_DRAW
-		and c:IsReason(REASON_DRAW) and c:IsReason(REASON_RULE) and not c:IsPublic()
+		and c:IsReason(REASON_DRAW) and c:IsReason(REASON_RULE)
 end
 function c57734012.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -27,7 +27,7 @@ function c57734012.regop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_PUBLIC)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_MAIN1)
 		c:RegisterEffect(e1)
 		c:RegisterFlagEffect(57734012,RESET_PHASE+PHASE_MAIN1,0,1)
 	end
@@ -49,10 +49,9 @@ function c57734012.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.GetFlagEffect(tp,57734012)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c57734012.filter1,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_EXTRA)
-	Duel.RegisterFlagEffect(tp,57734012,0,0,0)
+	Duel.RegisterFlagEffect(tp,57734012,0,EFFECT_FLAG_OATH,0)
 end
 function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsPlayerAffectedByEffect(tp,23516703) and c23516703[tp]>0 then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectMatchingCard(tp,c57734012.filter1,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,nil,e,tp)

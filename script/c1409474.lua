@@ -12,19 +12,14 @@ function c1409474.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(1409474,0))
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,1409474)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCost(c1409474.cost)
 	e2:SetTarget(c1409474.target)
 	e2:SetOperation(c1409474.operation)
 	c:RegisterEffect(e2)
 end
 function c1409474.tgvalue(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
-end
-function c1409474.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,1409474)==0 end
-	Duel.RegisterFlagEffect(tp,1409474,RESET_PHASE+PHASE_END,0,1)
 end
 function c1409474.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end

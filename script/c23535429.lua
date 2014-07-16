@@ -6,9 +6,9 @@ function c23535429.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(TIMING_DAMAGE_CAL)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCondition(c23535429.condition)
 	e1:SetCost(c23535429.cost)
 	e1:SetOperation(c23535429.operation)
@@ -16,7 +16,7 @@ function c23535429.initial_effect(c)
 end
 function c23535429.condition(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()
-	if (phase~=PHASE_DAMAGE and phase~=PHASE_DAMAGE_CAL) or Duel.IsDamageCalculated() then return false end
+	if phase~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
 	local d=Duel.GetAttackTarget()
 	return d and d:IsControler(tp) and d:IsDefencePos()
 end

@@ -5,8 +5,8 @@ function c60222582.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,60222582+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c60222582.condition)
-	e1:SetCost(c60222582.cost)
 	e1:SetTarget(c60222582.target)
 	e1:SetOperation(c60222582.activate)
 	c:RegisterEffect(e1)
@@ -16,10 +16,6 @@ function c60222582.cfilter(c)
 end
 function c60222582.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c60222582.cfilter,tp,LOCATION_MZONE,0,1,nil)
-end
-function c60222582.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,60222582)==0 end
-	Duel.RegisterFlagEffect(tp,60222582,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c60222582.spfilter(c,e,tp)
 	return c:IsLevelAbove(5) and (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

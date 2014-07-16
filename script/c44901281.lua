@@ -25,12 +25,10 @@ function c44901281.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c44901281.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 end
 function c44901281.activate(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
-	Duel.NegateSummon(eg:GetFirst())
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 end

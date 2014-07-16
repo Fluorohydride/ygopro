@@ -33,7 +33,7 @@ function c71921856.initial_effect(c)
 end
 c71921856.xyz_number=79
 function c71921856.filter(c)
-	return c:IsSetCard(0x84)
+	return c:IsSetCard(0x84) and c:IsType(TYPE_MONSTER)
 end
 function c71921856.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c71921856.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end
@@ -51,10 +51,11 @@ function c71921856.atkval(e,c)
 	return c:GetOverlayCount()*100
 end
 function c71921856.spcon(e,tp,eg,ep,ev,re,r,rp)
-	local ct=e:GetHandler():GetOverlayCount()
+	local c=e:GetHandler()
+	local ct=c:GetOverlayCount()
 	e:SetLabel(ct)
-	return e:GetHandler():IsReason(REASON_DESTROY) and e:GetHandler():GetReasonPlayer()~=tp
-		and e:GetHandler():GetPreviousControler()==tp
+	return c:IsReason(REASON_DESTROY) and c:GetReasonPlayer()~=tp
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:GetPreviousControler()==tp and ct>0
 end
 function c71921856.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x84) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

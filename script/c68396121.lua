@@ -10,7 +10,6 @@ function c68396121.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCost(c68396121.negcost)
-	e1:SetTarget(c68396121.negtg)
 	e1:SetOperation(c68396121.negop)
 	c:RegisterEffect(e1)
 	--atk
@@ -31,9 +30,6 @@ function c68396121.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c68396121.filter(c)
 	return c:IsFaceup() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT)) and not c:IsDisabled()
-end
-function c68396121.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c68396121.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 end
 function c68396121.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -89,6 +85,17 @@ function c68396121.atkop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
 		e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+RESET_END)
+		e2:SetCondition(c68396121.dircon)
 		c:RegisterEffect(e2)
+		local e3=e2:Clone()
+		e3:SetCode(EFFECT_CANNOT_ATTACK)
+		e3:SetCondition(c68396121.dircon2)
+		c:RegisterEffect(e3)
 	end
+end
+function c68396121.dircon(e)
+	return e:GetHandler():GetAttackAnnouncedCount()>0
+end
+function c68396121.dircon2(e)
+	return e:GetHandler():IsDirectAttacked()
 end

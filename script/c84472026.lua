@@ -45,7 +45,7 @@ function c84472026.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c84472026.indestg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() and c84472026.sfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c84472026.sfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c84472026.sfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c84472026.sfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

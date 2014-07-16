@@ -36,7 +36,7 @@ function c59911557.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c59911557.tgfilter(c)
-	return c:IsSetCard(0x59) and c:IsAbleToGrave()
+	return c:IsSetCard(0x59) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function c59911557.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -20,6 +20,7 @@ function c75367227.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,75367227)
 	e2:SetCost(c75367227.descost)
 	e2:SetTarget(c75367227.destg)
 	e2:SetOperation(c75367227.desop)
@@ -40,9 +41,8 @@ function c75367227.tg(e,c)
 	return c~=e:GetHandler() and (c:IsFacedown() or c:IsSetCard(0x8d))
 end
 function c75367227.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,75367227)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,75367227,RESET_PHASE+PHASE_END,0,1)
 end
 function c75367227.desfilter(c)
 	return c:IsFacedown() and c:IsDestructable()

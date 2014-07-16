@@ -6,14 +6,10 @@ function c75014062.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c75014062.cost)
+	e1:SetCountLimit(1,75014062+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c75014062.target)
 	e1:SetOperation(c75014062.activate)
 	c:RegisterEffect(e1)
-end
-function c75014062.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,75014062)==0 end
-	Duel.RegisterFlagEffect(tp,75014062,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c75014062.filter(c)
 	return c:IsFaceup() and c:IsCanAddCounter(0x3001,1)
@@ -22,7 +18,7 @@ function c75014062.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c75014062.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c75014062.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(75014062,1))
-	local g=Duel.SelectTarget(tp,c75014062.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	Duel.SelectTarget(tp,c75014062.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,0,0x3001)
 end
 function c75014062.tfilter(c)

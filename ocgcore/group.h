@@ -25,6 +25,10 @@ public:
 	card_set::iterator it;
 	uint32 is_readonly;
 	
+	inline bool has_card(card* c) {
+		return container.find(c) != container.end();
+	}
+	
 	group();
 	~group();
 };

@@ -20,6 +20,7 @@ function c93568288.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCountLimit(2,93568288)
 	e2:SetCost(c93568288.rmcost)
 	e2:SetTarget(c93568288.rmtg)
 	e2:SetOperation(c93568288.rmop)
@@ -30,7 +31,7 @@ function c93568288.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
 end
 function c93568288.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c93568288.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c93568288.filter(chkc) and chkc~=e:GetHandler() end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and Duel.IsExistingTarget(c93568288.filter,tp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
@@ -65,9 +66,8 @@ function c93568288.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
 function c93568288.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,93568288)<2 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,93568288,RESET_PHASE+PHASE_END,0,1)
 end
 function c93568288.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and chkc:IsAbleToRemove() end

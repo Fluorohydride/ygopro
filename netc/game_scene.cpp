@@ -1,7 +1,14 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
+#ifdef __WXMAC__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
+
+#include <array>
 
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
@@ -23,6 +30,19 @@ namespace ygopro
     
     void GameScene::Init() {
         glGenBuffers(2, bo);
+        glBindBuffer(GL_ARRAY_BUFFER, bo[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(sgui::SGVertexVCT) * 160 * 4, nullptr, GL_DYNAMIC_DRAW);
+        std::array<unsigned short, 160 * 6> index;
+        for(int i = 0; i < 160; ++i) {
+            index[i * 6] = i * 4;
+            index[i * 6 + 1] = i * 4 + 2;
+            index[i * 6 + 2] = i * 4 + 1;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
+        }
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bo[1]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 160 * 6, nullptr, GL_STATIC_DRAW);
     }
     
     void GameScene::Uninit() {
@@ -35,7 +55,13 @@ namespace ygopro
     }
     
     void GameScene::UpdateBackGround() {
-        
+        std::vector<sgui::SGVertexVCT> verts;
+        std::vector<unsigned short> index;
+        verts.resize(160);
+        index.resize(160);
+        glBindBuffer(GL_ARRAY_BUFFER, bo[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(sgui::SGVertexVCT) * verts.size(), &verts[0]);
+
     }
     
     void GameScene::UpdateCard(int pos, int index) {

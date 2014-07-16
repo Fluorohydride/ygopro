@@ -46,15 +46,11 @@ function c24919805.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCost(c24919805.thcost)
+	e1:SetCountLimit(1,24919805)
 	e1:SetTarget(c24919805.thtg)
 	e1:SetOperation(c24919805.thop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
-end
-function c24919805.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,24919805)==0 end
-	Duel.RegisterFlagEffect(tp,24919805,RESET_PHASE+PHASE_END,0,1)
 end
 function c24919805.filter(c)
 	return c:GetLevel()==10 and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_EARTH) and c:IsAbleToHand()

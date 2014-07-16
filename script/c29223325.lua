@@ -27,10 +27,10 @@ function c29223325.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c29223325.desfilter2(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable() and c:GetSequence()~=5
+	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable() and c:GetSequence()<5
 end
 function c29223325.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c29223325.desfilter(chkc) end
+	if chkc then return chkc:IsOnField() and c29223325.desfilter(chkc) and chkc~=e:GetHandler() end
 	if chk==0 then
 		if not Duel.IsExistingMatchingCard(c29223325.filter,tp,LOCATION_DECK,0,1,nil) then return false end
 		local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
@@ -39,7 +39,7 @@ function c29223325.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		elseif ft>0 then
 			return Duel.IsExistingTarget(c29223325.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
 		else
-			return Duel.IsExistingTarget(c29223325.desfilter2,tp,LOCATION_SZONE,0,1,e:GetHandler())
+			return Duel.IsExistingTarget(c29223325.desfilter2,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
 		end
 	end
 	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
@@ -48,7 +48,7 @@ function c29223325.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if ft>0 then
 		g=Duel.SelectTarget(tp,c29223325.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,e:GetHandler())
 	else
-		g=Duel.SelectTarget(tp,c29223325.desfilter2,tp,LOCATION_SZONE,0,1,1,e:GetHandler())
+		g=Duel.SelectTarget(tp,c29223325.desfilter2,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
 	end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
@@ -68,12 +68,13 @@ function c29223325.descon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and e:GetHandler():GetPreviousControler()==tp
 end
 function c29223325.desop(e,tp,eg,ep,ev,re,r,rp)
+	local ph=Duel.GetCurrentPhase()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SKIP_BP)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(0,1)
-	if Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()==PHASE_BATTLE then
+	if Duel.GetTurnPlayer()~=tp and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
 		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetCondition(c29223325.skipcon)
 		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_OPPO_TURN,2)

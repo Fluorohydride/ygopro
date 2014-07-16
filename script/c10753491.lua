@@ -14,10 +14,10 @@ function c10753491.initial_effect(c)
 	e2:SetDescription(aux.Stringid(10753491,2))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCountLimit(1,10753491)
 	e2:SetCondition(c10753491.spcon)
-	e2:SetCost(c10753491.spcost)
 	e2:SetTarget(c10753491.sptg)
 	e2:SetOperation(c10753491.spop)
 	c:RegisterEffect(e2)
@@ -52,11 +52,7 @@ end
 function c10753491.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_DECK) and
-		(c:IsReason(REASON_REVEAL) or c:IsPreviousPosition(POS_FACEUP) or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
-end
-function c10753491.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,10753491)==0 end
-	Duel.RegisterFlagEffect(tp,10753491,RESET_PHASE+PHASE_END,0,1)
+		(c:IsReason(REASON_REVEAL) or c:GetPreviousPosition()==POS_FACEUP_DEFENCE or Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DECK))
 end
 function c10753491.filter(c,e,tp)
 	return c:GetLevel()==1 and c:IsRace(RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

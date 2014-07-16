@@ -16,8 +16,7 @@ function c46659709.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
-	e2:SetCost(c46659709.cost)
+	e2:SetCountLimit(1,46659709)
 	e2:SetTarget(c46659709.target)
 	e2:SetOperation(c46659709.operation)
 	c:RegisterEffect(e2)
@@ -38,10 +37,6 @@ function c46659709.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP_DEFENCE)
 	end
-end
-function c46659709.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,46659709)==0 end
-	Duel.RegisterFlagEffect(tp,46659709,RESET_PHASE+PHASE_END,0,1)
 end
 function c46659709.filter(c)
 	return c:IsSetCard(0x7b) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

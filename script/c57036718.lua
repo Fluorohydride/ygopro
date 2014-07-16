@@ -3,7 +3,6 @@ function c57036718.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetOperation(c57036718.damop)
 	c:RegisterEffect(e1)

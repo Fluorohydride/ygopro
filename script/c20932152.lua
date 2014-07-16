@@ -9,12 +9,19 @@ function c20932152.initial_effect(c)
 	e1:SetCondition(c20932152.spcon)
 	e1:SetOperation(c20932152.spop)
 	c:RegisterEffect(e1)
+	--
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetValue(c20932152.synlimit)
 	c:RegisterEffect(e2)
+	--
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(20932152)
+	c:RegisterEffect(e3)
 end
 function c20932152.synlimit(e,c)
 	if not c then return false end

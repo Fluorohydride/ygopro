@@ -37,7 +37,7 @@ function c39695323.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)~=0 then
 		Duel.BreakEffect()
 		if c:IsRelateToEffect(e) and c:IsFaceup() then
-			Duel.ChangePosition(e:GetHandler(),POS_FACEUP_DEFENCE)
+			Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 		end
 	end
 end

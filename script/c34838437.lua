@@ -5,6 +5,7 @@ function c34838437.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,34838437+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c34838437.condition)
 	e1:SetCost(c34838437.cost)
 	e1:SetTarget(c34838437.target)
@@ -15,7 +16,7 @@ function c34838437.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c34838437.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,34838437)==0 and not Duel.CheckNormalSummonActivity(tp) end
+	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -26,7 +27,6 @@ function c34838437.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e2,tp)
-	Duel.RegisterFlagEffect(tp,34838437,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c34838437.spfilter(c,e,tp)
 	return c:IsLevelBelow(4) and (c:IsSetCard(0x55) or c:IsSetCard(0x7b)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

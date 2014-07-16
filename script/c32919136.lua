@@ -36,6 +36,12 @@ function c32919136.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetValue(c32919136.eqlimit)
 	c:RegisterEffect(e4)
+	--control
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_EQUIP)
+	e5:SetCode(EFFECT_SET_CONTROL)
+	e5:SetValue(c32919136.ctval)
+	c:RegisterEffect(e5)
 end
 function c32919136.filter(c)
 	return c:IsFaceup() and c:IsControlerCanBeChanged()
@@ -58,12 +64,6 @@ function c32919136.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_EQUIP)
-		e2:SetCode(EFFECT_SET_CONTROL)
-		e2:SetValue(tp)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
-		c:RegisterEffect(e2)
 	end
 end
 function c32919136.damcon(e,tp,eg,ep,ev,re,r,rp)
@@ -85,4 +85,7 @@ function c32919136.desfilter(c)
 end
 function c32919136.descon(e)
 	return not Duel.IsExistingMatchingCard(c32919136.desfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+end
+function c32919136.ctval(e,c)
+	return e:GetHandlerPlayer()
 end

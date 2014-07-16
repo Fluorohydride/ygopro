@@ -18,7 +18,7 @@ function c67464807.filter(c)
 	return c:IsFaceup() and c:GetLevel()>1
 end
 function c67464807.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c67464807.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c67464807.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c67464807.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c67464807.filter,tp,0,LOCATION_MZONE,1,1,nil)

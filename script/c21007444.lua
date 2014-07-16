@@ -24,31 +24,41 @@ end
 function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	if sg:GetCount()==0 then return end
-	local tg=sg:GetFirst()
-	while tg do
-		if Duel.SpecialSummonStep(tg,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
-			tg:RegisterFlagEffect(21007444,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-		end
-		tg=sg:GetNext()
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	if sg:GetCount()==0 or ft<=0 then return end
+	if ft<sg:GetCount() then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		sg=sg:FilterSelect(tp,c21007444.filter,ft,ft,nil,e,tp)
 	end
-	Duel.SpecialSummonComplete()
-	sg:KeepAlive()
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetCountLimit(1)
-	e1:SetOperation(c21007444.desop)
-	e1:SetLabelObject(sg)
-	Duel.RegisterEffect(e1,tp)
+	if sg:GetCount()>0 then
+		local tc=sg:GetFirst()
+		local fid=e:GetHandler():GetFieldID()
+		while tc do
+			if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+				tc:RegisterFlagEffect(21007444,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
+			end
+			tc=sg:GetNext()
+		end
+		Duel.SpecialSummonComplete()
+		sg:KeepAlive()
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetReset(RESET_PHASE+PHASE_END)
+		e1:SetCountLimit(1)
+		e1:SetOperation(c21007444.desop)
+		e1:SetLabel(fid)
+		e1:SetLabelObject(sg)
+		Duel.RegisterEffect(e1,tp)
+	end
 end
-function c21007444.desfilter(c)
-	return c:GetFlagEffect(21007444)>0
+function c21007444.desfilter(c,fid)
+	return c:GetFlagEffectLabel(21007444)==fid
 end
 function c21007444.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=e:GetLabelObject()
-	local dg=sg:Filter(c21007444.desfilter,nil)
+	local dg=sg:Filter(c21007444.desfilter,nil,e:GetLabel())
 	sg:DeleteGroup()
 	if dg:GetCount()>0 then
 		local tg1=dg:GetFirst()

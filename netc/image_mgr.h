@@ -5,6 +5,7 @@
 #include <list>
 #include <unordered_map>
 
+#include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 

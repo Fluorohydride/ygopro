@@ -13,13 +13,13 @@ function c61068510.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c61068510.cfilter(c)
-	return c:GetSequence()~=5
+	return c:GetSequence()<5
 end
 function c61068510.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c61068510.cfilter,tp,0,LOCATION_SZONE,3,nil)
 end
 function c61068510.filter(c)
-	return c:IsDestructable() and c:GetSequence()~=5
+	return c:IsDestructable() and c:GetSequence()<5
 end
 function c61068510.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_SZONE) and chkc:IsControler(1-tp) and c61068510.filter(chkc) end

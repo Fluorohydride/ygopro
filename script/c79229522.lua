@@ -30,24 +30,42 @@ end
 function c79229522.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
-function c79229522.spfilter1(c,tp)
-	return c:IsCode(70095154) and c:IsAbleToGraveAsCost() and (c:IsControler(tp) or c:IsFaceup())
-		and Duel.IsExistingMatchingCard(c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,tp)
+function c79229522.spfilter1(c,tp,ft)
+	if c:IsCode(70095154) and c:IsAbleToGraveAsCost() and c:IsCanBeFusionMaterial(true) and (c:IsControler(tp) or c:IsFaceup()) then
+		if ft>0 or (c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)) then
+			return Duel.IsExistingMatchingCard(c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,c,tp)
+		else
+			return Duel.IsExistingMatchingCard(c79229522.spfilter2,tp,LOCATION_MZONE,0,1,c,tp)
+		end
+	else return false end
 end
 function c79229522.spfilter2(c,tp)
 	return c:IsRace(RACE_MACHINE) and c:IsAbleToGraveAsCost() and c:IsCanBeFusionMaterial() and (c:IsControler(tp) or c:IsFaceup())
 end
 function c79229522.sprcon(e,c)
-	if c==nil then return true end 
+	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingMatchingCard(c79229522.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,tp)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	return ft>-1 and Duel.IsExistingMatchingCard(c79229522.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,tp,ft)
 end
 function c79229522.sprop(e,tp,eg,ep,ev,re,r,rp,c)
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(79229522,0))
-	local g1=Duel.SelectMatchingCard(tp,c79229522.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,tp)
+	local g1=Duel.SelectMatchingCard(tp,c79229522.spfilter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,tp,ft)
+	local tc=g1:GetFirst()
+	local g=Duel.GetMatchingGroup(c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,tc,tp)
+	local g2=nil
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(79229522,1))
-	local g2=Duel.SelectMatchingCard(tp,c79229522.spfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,10,g1:GetFirst(),tp)
+	if ft>0 or (tc:IsControler(tp) and tc:IsLocation(LOCATION_MZONE)) then
+		g2=g:Select(tp,1,10,nil)
+	else
+		g2=g:FilterSelect(tp,Card.IsControler,1,1,nil,tp)
+		if g:GetCount()>1 and Duel.SelectYesNo(tp,210) then
+			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(79229522,1))
+			local g3=g:Select(tp,1,9,g2:GetFirst())
+			g2:Merge(g3)
+		end
+	end
 	g1:Merge(g2)
 	Duel.SendtoGrave(g1,REASON_COST)
 	--spsummon condition

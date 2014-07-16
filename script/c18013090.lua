@@ -24,15 +24,14 @@ function c18013090.initial_effect(c)
 	e3:SetCategory(CATEGORY_POSITION)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_BATTLE_END)
+	e3:SetCode(EVENT_BATTLED)
 	e3:SetCondition(c18013090.cacon)
 	e3:SetTarget(c18013090.catg)
 	e3:SetOperation(c18013090.caop)
 	c:RegisterEffect(e3)
 end
 function c18013090.tfilter(c)
-	local code=c:GetCode()
-	return code==96182448 or code==20932152
+	return c:IsCode(96182448) or c:IsHasEffect(20932152)
 end
 function c18013090.atop1(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetTurnPlayer()~=tp or ep~=tp then return end

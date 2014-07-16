@@ -22,25 +22,20 @@ function c28388296.initial_effect(c)
 	e4:SetDescription(aux.Stringid(28388296,0))
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCode(EVENT_TO_GRAVE)
+	e4:SetCountLimit(1,28388296)
 	e4:SetCondition(c28388296.condition)
-	e4:SetCost(c28388296.cost)
 	e4:SetTarget(c28388296.target)
 	e4:SetOperation(c28388296.operation)
 	c:RegisterEffect(e4)
 end
 function c28388296.cfilter(c,tp)
 	return c:IsSetCard(0x24) and c:IsType(TYPE_MONSTER) and bit.band(c:GetReason(),0x41)==0x41
-		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c28388296.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c28388296.cfilter,1,nil,tp)
-end
-function c28388296.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,28388296)==0 end
-	Duel.RegisterFlagEffect(tp,28388296,RESET_PHASE+PHASE_END,0,1)
 end
 function c28388296.spfilter(c,e,tp)
 	return c:IsSetCard(0x24) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

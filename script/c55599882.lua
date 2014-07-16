@@ -25,17 +25,17 @@ function c55599882.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetDescription(aux.Stringid(55599882,0))
 		e1:SetCategory(CATEGORY_REMOVE)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-		e1:SetCode(EVENT_BATTLED)
+		e1:SetCode(EVENT_BATTLE_DESTROYING)
 		e1:SetTarget(c55599882.rmtg)
 		e1:SetOperation(c55599882.rmop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		e1:SetReset(RESET_EVENT+0x1620000+RESET_PHASE+RESET_END)
 		tc:RegisterEffect(e1)
 	end
 end
 function c55599882.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if chk==0 then return bc and bc:IsRelateToBattle() and bc:IsStatus(STATUS_BATTLE_DESTROYED)
+	if chk==0 then return bc and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE) and bc:IsType(TYPE_MONSTER)
 		and c:GetBaseAttack()<=bc:GetAttack() and bc:IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,bc,1,0,0)
 end

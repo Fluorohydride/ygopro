@@ -7,14 +7,10 @@ function c28577986.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCost(c28577986.cost)
+	e1:SetCountLimit(1,28577986)
 	e1:SetTarget(c28577986.target)
 	e1:SetOperation(c28577986.operation)
 	c:RegisterEffect(e1)
-end
-function c28577986.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,28577986)==0 end
-	Duel.RegisterFlagEffect(tp,28577986,RESET_PHASE+PHASE_END,0,1)
 end
 function c28577986.cfilter(c,e,tp)
 	local lv=c:GetLevel()
@@ -39,7 +35,6 @@ function c28577986.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not tc:IsRelateToEffect(e) then return end
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
-	local c=e:GetHandler()
 	local slv=tc:GetLevel()
 	local sg=Duel.GetMatchingGroup(c28577986.spfilter,tp,LOCATION_DECK,0,nil,slv,e,tp)
 	if sg:GetCount()==0 then return end

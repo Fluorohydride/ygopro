@@ -5,8 +5,9 @@ function c39188539.initial_effect(c)
 	e1:SetDescription(aux.Stringid(39188539,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(c39188539.seqcon)
-	e1:SetTarget(c39188539.seqtg)
+	e1:SetCost(c39188539.cost)
 	e1:SetOperation(c39188539.seqop)
 	c:RegisterEffect(e1)
 	--
@@ -16,6 +17,8 @@ function c39188539.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	e2:SetCost(c39188539.cost)
 	e2:SetTarget(c39188539.thtg)
 	e2:SetOperation(c39188539.thop)
 	c:RegisterEffect(e2)
@@ -25,10 +28,9 @@ function c39188539.seqcon(e,tp,eg,ep,ev,re,r,rp)
 	return (seq>0 and Duel.CheckLocation(tp,LOCATION_MZONE,seq-1))
 		or (seq<4 and Duel.CheckLocation(tp,LOCATION_MZONE,seq+1))
 end
-function c39188539.seqtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(39188539)==0 end
+function c39188539.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-	e:GetHandler():RegisterFlagEffect(39188539,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c39188539.seqop(e,tp,eg,ep,ev,re,r,rp)
 	local seq=e:GetHandler():GetSequence()
@@ -53,12 +55,10 @@ function c39188539.filter(c,seq)
 end
 function c39188539.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c39188539.filter(chkc,4-e:GetHandler():GetSequence()) end
-	if chk==0 then return e:GetHandler():GetFlagEffect(39188539)==0
-		and Duel.IsExistingTarget(c39188539.filter,tp,0,LOCATION_ONFIELD,1,nil,4-e:GetHandler():GetSequence()) end
+	if chk==0 then return Duel.IsExistingTarget(c39188539.filter,tp,0,LOCATION_ONFIELD,1,nil,4-e:GetHandler():GetSequence()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c39188539.filter,tp,0,LOCATION_ONFIELD,1,1,nil,4-e:GetHandler():GetSequence())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
-	e:GetHandler():RegisterFlagEffect(39188539,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c39188539.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

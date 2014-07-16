@@ -48,21 +48,36 @@ end
 function c22842214.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if c:IsFacedown() or not c:IsRelateToEffect(e) or Duel.GetLocationCount(tp,LOCATION_SZONE)<g:GetCount() then return end
-	local tc=g:GetFirst()
-	while tc do
-		Duel.Equip(tp,tc,c,false,true)
-		tc:RegisterFlagEffect(22842214,RESET_EVENT+0x1fe0000,0,0)
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(c22842214.eqlimit)
-		tc:RegisterEffect(e1)
-		tc=g:GetNext()
+	local tg0=g:Filter(Card.IsRelateToEffect,nil,e)
+	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
+	if tg0:GetCount()==0 or ft<=0 then return end
+	if c:IsFaceup() and c:IsRelateToEffect(e) then
+		local tg=nil
+		if ft<tg0:GetCount() then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+			tg=tg0:FilterSelect(tp,c22842214.filter,ft,ft,nil)
+		else
+			tg=tg0:Clone()
+		end
+		if tg:GetCount()>0 then
+			local tc=tg:GetFirst()
+			while tc do
+				Duel.Equip(tp,tc,c,false,true)
+				tc:RegisterFlagEffect(22842214,RESET_EVENT+0x1fe0000,0,0)
+				local e1=Effect.CreateEffect(c)
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_EQUIP_LIMIT)
+				e1:SetProperty(EFFECT_FLAG_COPY_INHERIT+EFFECT_FLAG_OWNER_RELATE)
+				e1:SetReset(RESET_EVENT+0x1fe0000)
+				e1:SetValue(c22842214.eqlimit)
+				tc:RegisterEffect(e1)
+				tc=tg:GetNext()
+			end
+			Duel.EquipComplete()
+		end
+	else
+		Duel.SendtoGrave(tg0,REASON_EFFECT)
 	end
-	Duel.EquipComplete()
 end
 function c22842214.eqfilter(c,ec)
 	return c:GetFlagEffect(22842214)~=0 and c:IsHasCardTarget(ec) and not c:IsStatus(STATUS_DESTROY_CONFIRMED)

@@ -5,8 +5,8 @@ function c75673220.initial_effect(c)
 	e1:SetDescription(aux.Stringid(75673220,0))
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,75673220)
 	e1:SetCondition(c75673220.condition)
 	e1:SetTarget(c75673220.target)
 	e1:SetOperation(c75673220.operation)
@@ -16,8 +16,7 @@ function c75673220.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c75673220.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,75673220)==0 end
-	Duel.RegisterFlagEffect(tp,75673220,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,1-tp,LOCATION_HAND)
 end
 function c75673220.operation(e,tp,eg,ep,ev,re,r,rp)

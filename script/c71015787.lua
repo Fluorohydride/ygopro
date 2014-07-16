@@ -15,8 +15,8 @@ function c71015787.initial_effect(c)
 	e2:SetCategory(CATEGORY_DRAW+CATEGORY_RECOVER)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCountLimit(1,71015787)
 	e2:SetCondition(c71015787.effcon)
-	e2:SetCost(c71015787.effcost)
 	e2:SetTarget(c71015787.efftg)
 	e2:SetOperation(c71015787.effop)
 	c:RegisterEffect(e2)
@@ -43,10 +43,6 @@ function c71015787.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c71015787.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
-end
-function c71015787.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,71015787)==0 end
-	Duel.RegisterFlagEffect(tp,71015787,RESET_PHASE+PHASE_END,0,1)
 end
 function c71015787.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

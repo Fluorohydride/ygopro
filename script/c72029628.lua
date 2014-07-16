@@ -69,10 +69,11 @@ function c72029628.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetOperation(c72029628.desop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetCountLimit(1)
-		tc:RegisterEffect(e1)
+		tc:RegisterEffect(e1,true)
 	end
 end
 function c72029628.desop(e,tp,eg,ep,ev,re,r,rp)

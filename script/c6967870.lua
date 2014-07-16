@@ -17,11 +17,9 @@ function c6967870.filter(c)
 	return c:IsType(TYPE_TRAP+TYPE_SPELL) and c:IsDestructable()
 end
 function c6967870.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then
-		if chkc then return chkc:IsOnField() and c6967870.filter(chkc) end
-		return Duel.IsPlayerCanDiscardDeck(1-tp,2)
-			or Duel.IsExistingTarget(c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-	end
+	if chkc then return chkc:IsOnField() and c6967870.filter(chkc) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(1-tp,2)
+		or Duel.IsExistingTarget(c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	local op=0
 	if Duel.IsExistingTarget(c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 		and Duel.IsPlayerCanDiscardDeck(1-tp,2) then

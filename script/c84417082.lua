@@ -9,7 +9,7 @@ function c84417082.initial_effect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCost(c84417082.cost1)
 	e1:SetTarget(c84417082.target1)
 	e1:SetOperation(c84417082.operation1)
@@ -20,7 +20,7 @@ function c84417082.initial_effect(c)
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCost(c84417082.cost2)
 	e2:SetTarget(c84417082.target2)
 	e2:SetOperation(c84417082.operation2)
@@ -36,9 +36,7 @@ function c84417082.filter1(c)
 	return c:IsFaceup() and c:IsDestructable()
 end
 function c84417082.target1(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(84417082)==0
-		and Duel.IsExistingMatchingCard(c84417082.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
-	e:GetHandler():RegisterFlagEffect(84417082,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return Duel.IsExistingMatchingCard(c84417082.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
 	local g=Duel.GetMatchingGroup(c84417082.filter1,tp,LOCATION_MZONE,LOCATION_MZONE,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
@@ -52,9 +50,7 @@ function c84417082.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,5,5,REASON_COST)
 end
 function c84417082.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(84417082)==0
-		and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
-	e:GetHandler():RegisterFlagEffect(84417082,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end

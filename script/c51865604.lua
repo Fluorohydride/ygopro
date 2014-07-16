@@ -6,8 +6,8 @@ function c51865604.initial_effect(c)
 	e1:SetCategory(CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,51865604)
 	e1:SetCondition(c51865604.condition)
-	e1:SetCost(c51865604.cost)
 	e1:SetTarget(c51865604.target)
 	e1:SetOperation(c51865604.operation)
 	c:RegisterEffect(e1)
@@ -17,8 +17,9 @@ function c51865604.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_REMOVE)
+	e2:SetCountLimit(1,51865604)
 	e2:SetCondition(c51865604.spcon)
 	e2:SetCost(c51865604.spcost)
 	e2:SetTarget(c51865604.sptg)
@@ -30,10 +31,6 @@ function c51865604.cfilter(c)
 end
 function c51865604.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c51865604.cfilter,tp,LOCATION_MZONE,0,1,nil)
-end
-function c51865604.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,51865604)==0 end
-	Duel.RegisterFlagEffect(tp,51865604,RESET_PHASE+PHASE_END,0,1)
 end
 function c51865604.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
@@ -53,9 +50,8 @@ function c51865604.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_BATTLE and eg:IsExists(c51865604.spfilter,1,nil,e,tp)
 end
 function c51865604.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,51865604)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,51865604,RESET_PHASE+PHASE_END,0,1)
 end
 function c51865604.rmfilter(c)
 	return c:IsAttackBelow(3000) and c:IsAbleToRemove()

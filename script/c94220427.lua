@@ -15,10 +15,9 @@ function c94220427.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,94220427+EFFECT_COUNT_CODE_DUEL)
 	e2:SetCondition(c94220427.thcon)
-	e2:SetCost(c94220427.thcost)
 	e2:SetTarget(c94220427.thtg)
 	e2:SetOperation(c94220427.thop)
 	c:RegisterEffect(e2)
@@ -63,10 +62,6 @@ function c94220427.cfilter(c,tp)
 end
 function c94220427.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c94220427.cfilter,1,nil,tp)
-end
-function c94220427.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,94220427)==0 end
-	Duel.RegisterFlagEffect(tp,94220427,0,0,0)
 end
 function c94220427.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end

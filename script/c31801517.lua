@@ -36,7 +36,8 @@ end
 c31801517.xyz_number=62
 function c31801517.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return (c==Duel.GetAttacker() or c==Duel.GetAttackTarget()) and Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL
+	return (c==Duel.GetAttacker() or c==Duel.GetAttackTarget())
+		and Duel.GetCurrentPhase()==PHASE_DAMAGE_CAL and not Duel.IsDamageCalculated()
 end
 function c31801517.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

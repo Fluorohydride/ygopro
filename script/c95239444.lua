@@ -25,7 +25,7 @@ function c95239444.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c95239444.cfilter(c,lv)
-	return c:IsRace(RACE_PLANT) and c:IsLevelBelow(lv) and c:IsAbleToGraveAsCost()
+	return c:IsRace(RACE_PLANT) and c:IsLevelBelow(lv) and (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and c:IsAbleToGraveAsCost()
 end
 function c95239444.stcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
@@ -38,7 +38,6 @@ end
 function c95239444.stop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
 	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ct then
-		Duel.ConfirmDecktop(tp,ct)
 		Duel.SortDecktop(tp,tp,ct)
 	end
 end

@@ -23,6 +23,8 @@ struct card_state {
 	uint32 type;
 	uint32 level;
 	uint32 rank;
+	uint32 lscale;
+	uint32 rscale;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -45,6 +47,8 @@ struct query_cache {
 	uint32 type;
 	uint32 level;
 	uint32 rank;
+    uint32 lscale;
+	uint32 rscale;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -135,6 +139,8 @@ public:
 	uint32 is_xyz_level(card* pcard, uint32 lv);
 	uint32 get_attribute();
 	uint32 get_race();
+	uint32 get_lscale();
+	uint32 get_rscale();
 	int32 is_position(int32 pos);
 	void set_status(uint32 status, int32 enabled);
 	int32 get_status(uint32 status);
@@ -167,9 +173,9 @@ public:
 	void release_relation(effect* peffect);
 	int32 leave_field_redirect(uint32 reason);
 	int32 destination_redirect(uint8 destination, uint32 reason);
-	int32 add_counter(uint16 countertype, uint16 count);
+	int32 add_counter(uint8 playerid, uint16 countertype, uint16 count);
 	int32 remove_counter(uint16 countertype, uint16 count);
-	int32 is_can_add_counter(uint16 countertype, uint16 count);
+	int32 is_can_add_counter(uint8 playerid, uint16 countertype, uint16 count);
 	int32 get_counter(uint16 countertype);
 	void set_material(card_set* materials);
 	void add_card_target(card* pcard);
@@ -182,6 +188,7 @@ public:
 	int32 filter_summon_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
 	int32 filter_set_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
 	void filter_spsummon_procedure(uint8 playerid, effect_set* eset);
+	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
 	effect* is_affected_by_effect(int32 code, card* target);
 	effect* check_equip_control_effect();

@@ -35,7 +35,7 @@ function c69488544.filter(c,e,tp)
 	return c:IsType(TYPE_DUAL) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c69488544.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c69488544.filter(chkc,e,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c69488544.filter(chkc,e,tp) end
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c69488544.filter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -49,7 +49,6 @@ function c69488544.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c69488544.negcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if not aux.IsDualState(e) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or not g:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE) then return false end

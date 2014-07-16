@@ -16,7 +16,7 @@ function c2407234.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCost(c2407234.cost)
+	e2:SetCountLimit(1,2407234)
 	e2:SetTarget(c2407234.target)
 	e2:SetOperation(c2407234.operation)
 	c:RegisterEffect(e2)
@@ -43,12 +43,8 @@ function c2407234.negop(e,tp,eg,ep,ev,re,r,rp)
 		tc=g:GetNext()
 	end
 end
-function c2407234.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,2407234)==0 end
-	Duel.RegisterFlagEffect(tp,2407234,RESET_PHASE+PHASE_END,0,1)
-end
 function c2407234.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c2407234.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c2407234.filter(chkc) and chkc~=e:GetHandler() end
 	if chk==0 then return Duel.IsExistingTarget(c2407234.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c2407234.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())

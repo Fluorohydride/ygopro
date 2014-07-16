@@ -1,4 +1,3 @@
-#include "GL/glew.h"
 #include "wx/image.h"
 #include "wx/clipbrd.h"
 #include "wx/time.h"

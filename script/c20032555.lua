@@ -6,6 +6,7 @@ function c20032555.initial_effect(c)
 	e1:SetDescription(aux.Stringid(20032555,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,20032555)
 	e1:SetTarget(c20032555.efftg)
 	e1:SetOperation(c20032555.effop)
 	c:RegisterEffect(e1)
@@ -14,7 +15,7 @@ function c20032555.cfilter(c)
 	return c:IsSetCard(0x83) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()
 end
 function c20032555.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,20032555)==0 and Duel.IsExistingMatchingCard(c20032555.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c20032555.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c20032555.cfilter,1,1,REASON_COST+REASON_DISCARD)
 	local opt=0
 	if e:GetHandler():GetLevel()==8 then
@@ -26,7 +27,6 @@ function c20032555.efftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if opt==0 then
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
 	end
-	Duel.RegisterFlagEffect(tp,20032555,RESET_PHASE+PHASE_END,0,1)
 end
 function c20032555.effop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 then

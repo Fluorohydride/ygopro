@@ -20,6 +20,7 @@ function c19827717.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetDescription(aux.Stringid(19827717,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c19827717.retcon)
 	e1:SetTarget(c19827717.rettg)
@@ -36,7 +37,7 @@ function c19827717.retcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c19827717.rettg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tid=Duel.GetTurnCount()
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c19827717.filter(chkc,tid) end
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c19827717.filter(chkc,tid) end
 	if chk==0 then return Duel.IsExistingTarget(c19827717.filter,tp,LOCATION_GRAVE,0,1,nil,tid) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c19827717.filter,tp,LOCATION_GRAVE,0,1,1,nil,tid)

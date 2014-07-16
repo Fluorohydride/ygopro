@@ -111,6 +111,20 @@ int32 scriptlib::card_is_xyz_level(lua_State *L) {
 	lua_pushboolean(L, pcard->is_xyz_level(xyzcard, lv));
 	return 1;
 }
+int32 scriptlib::card_get_lscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->get_lscale());
+	return 1;
+}
+int32 scriptlib::card_get_rscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->get_rscale());
+	return 1;
+}
 int32 scriptlib::card_get_attribute(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
@@ -1118,12 +1132,20 @@ int32 scriptlib::card_is_synchro_summonable(lua_State *L) {
 	if(!(pcard->data.type & TYPE_SYNCHRO))
 		return 0;
 	card* tuner = 0;
+	group* mg = 0;
 	if(!lua_isnil(L, 2)) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		tuner = *(card**) lua_touserdata(L, 2);
 	}
+	if(lua_gettop(L) >= 3) {
+		if(!lua_isnil(L, 3)) {
+			check_param(L, PARAM_TYPE_GROUP, 3);
+			mg = *(group**) lua_touserdata(L, 3);
+		}
+	}
 	uint32 p = pcard->pduel->game_field->core.reason_player;
 	pcard->pduel->game_field->core.limit_tuner = tuner;
+	pcard->pduel->game_field->core.limit_syn = mg;
 	lua_pushboolean(L, pcard->is_special_summonable(p));
 	return 1;
 }
@@ -1354,7 +1376,7 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 			|| attacker->current.controler != pduel->game_field->infos.turn_player
 	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
 	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
-	        || attacker->announce_count >= ac) {
+	        || (ac != 0 && attacker->announce_count >= ac)) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
@@ -1596,7 +1618,7 @@ int32 scriptlib::card_add_counter(lua_State *L) {
 	uint32 countertype = lua_tointeger(L, 2);
 	uint32 count = lua_tointeger(L, 3);
 	if(pcard->is_affect_by_effect(pcard->pduel->game_field->core.reason_effect))
-		lua_pushboolean(L, pcard->add_counter(countertype, count));
+		lua_pushboolean(L, pcard->add_counter(pcard->pduel->game_field->core.reason_player, countertype, count));
 	else lua_pushboolean(L, 0);
 	return 1;
 }
@@ -1678,7 +1700,7 @@ int32 scriptlib::card_is_can_add_counter(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 countertype = lua_tointeger(L, 2);
 	uint32 count = lua_tointeger(L, 3);
-	lua_pushboolean(L, pcard->is_can_add_counter(countertype, count));
+	lua_pushboolean(L, pcard->is_can_add_counter(pcard->pduel->game_field->core.reason_player, countertype, count));
 	return 1;
 }
 int32 scriptlib::card_is_can_remove_counter(lua_State *L) {

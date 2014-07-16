@@ -17,7 +17,7 @@ function c61258740.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c61258740.indval(e,re,tp)
-	return e:GetHandler():GetControler()~=tp
+	return e:GetHandlerPlayer()==1-tp
 end
 function c61258740.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -39,6 +39,6 @@ function c61258740.tgop(e,tp,eg,ep,ev,re,r,rp)
 	ct=ct+1
 	c:SetTurnCounter(ct)
 	if ct==3 then
-		Duel.SendtoGrave(c,REASON_EFFECT)
+		Duel.SendtoGrave(c,REASON_RULE)
 	end
 end

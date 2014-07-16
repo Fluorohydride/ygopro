@@ -31,7 +31,7 @@ function c52248570.mtop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c52248570.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetEnvironment()==94585852
+	return Duel.GetTurnPlayer()==tp and Duel.IsEnvironment(94585852)
 end
 function c52248570.filter(c)
 	return c:IsFaceup() and c:IsLevelBelow(4) and c:IsRace(RACE_FIEND)
@@ -43,7 +43,7 @@ function c52248570.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c52248570.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c52248570.atkop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) or Duel.GetEnvironment()~=94585852 then return end
+	if not e:GetHandler():IsRelateToEffect(e) or not Duel.IsEnvironment(94585852) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())

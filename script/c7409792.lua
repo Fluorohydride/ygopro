@@ -6,8 +6,8 @@ function c7409792.initial_effect(c)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,7409792)
 	e1:SetCondition(c7409792.spcon)
-	e1:SetOperation(c7409792.spop)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	--spsummon success
@@ -30,10 +30,7 @@ end
 function c7409792.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetFlagEffect(tp,7409792)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-end
-function c7409792.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	Duel.RegisterFlagEffect(tp,7409792,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c7409792.trigop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1 then

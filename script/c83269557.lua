@@ -24,6 +24,8 @@ function c83269557.initial_effect(c)
 	e3:SetCategory(CATEGORY_COUNTER)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+	e3:SetCountLimit(1)
 	e3:SetCondition(aux.IsDualState)
 	e3:SetTarget(c83269557.target1)
 	e3:SetOperation(c83269557.operation1)
@@ -45,9 +47,7 @@ function c83269557.atkval(e,c)
 	return c:GetCounter(0x3001)*300
 end
 function c83269557.target1(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:IsCanAddCounter(0x3001,1) and c:GetFlagEffect(83269557)==0 end
-	c:RegisterFlagEffect(83269557,RESET_EVENT+0x1fe0000,EFFECT_FLAG_OATH,0)
+	if chk==0 then return e:GetHandler():IsCanAddCounter(0x3001,1) end
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,1,0,0)
 end
 function c83269557.operation1(e,tp,eg,ep,ev,re,r,rp)

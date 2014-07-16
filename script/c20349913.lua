@@ -6,6 +6,7 @@ function c20349913.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,20349913+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c20349913.condition)
 	e1:SetCost(c20349913.cost)
 	e1:SetTarget(c20349913.target)
@@ -19,10 +20,8 @@ function c20349913.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c20349913.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c20349913.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,20349913)==0
-		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD,nil)
-	Duel.RegisterFlagEffect(tp,20349913,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c20349913.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end

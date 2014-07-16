@@ -26,7 +26,7 @@ function c31467372.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c31467372.filter,1,nil,tp)
 end
 function c31467372.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) end
+	if chk==0 then return true end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(800)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)

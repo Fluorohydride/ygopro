@@ -28,10 +28,11 @@ function c27174286.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c27174286.filter,tp,LOCATION_REMOVED,0,ft1,ft1,nil,e,tp)
 	if g:GetCount()>0 then
+		local fid=e:GetHandler():GetFieldID()
 		local tc=g:GetFirst()
 		while tc do
 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(27174286,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+			tc:RegisterFlagEffect(27174286,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
 			tc=g:GetNext()
 		end
 		Duel.SpecialSummonComplete()
@@ -39,19 +40,23 @@ function c27174286.op(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetReset(RESET_PHASE+PHASE_END)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCountLimit(1)
+		e1:SetLabel(fid)
 		e1:SetLabelObject(g)
 		e1:SetOperation(c27174286.rmop)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-function c27174286.rmfilter(c)
-	return c:GetFlagEffect(27174286)>0
+function c27174286.rmfilter(c,fid)
+	return c:GetFlagEffectLabel(27174286)==fid
 end
 function c27174286.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local tg=g:Filter(c27174286.rmfilter,nil)
-	g:DeleteGroup()
+	local tg=g:Filter(c27174286.rmfilter,nil,e:GetLabel())
 	Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
+	if not g:IsExists(c27174286.rmfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+	end
 end

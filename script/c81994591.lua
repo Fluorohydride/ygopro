@@ -14,7 +14,6 @@ function c81994591.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCost(c81994591.indcost)
-	e2:SetTarget(c81994591.indtg)
 	e2:SetOperation(c81994591.indop)
 	c:RegisterEffect(e2)
 end
@@ -36,12 +35,6 @@ end
 function c81994591.indcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-end
-function c81994591.indfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x1d)
-end
-function c81994591.indtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c81994591.indfilter,tp,LOCATION_MZONE,0,1,nil) end
 end
 function c81994591.indop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

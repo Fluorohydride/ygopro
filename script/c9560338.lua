@@ -5,9 +5,8 @@ function c9560338.initial_effect(c)
 	e1:SetDescription(aux.Stringid(9560338,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
-	e1:SetCost(c9560338.effcost)
+	e1:SetCountLimit(1,9560338)
 	e1:SetTarget(c9560338.efftg)
 	e1:SetOperation(c9560338.effop)
 	c:RegisterEffect(e1)
@@ -17,10 +16,6 @@ function c9560338.initial_effect(c)
 end
 function c9560338.cfilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
-end
-function c9560338.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,9560338)==0 end
-	Duel.RegisterFlagEffect(tp,9560338,RESET_PHASE+PHASE_END,0,1)
 end
 function c9560338.filter1(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL) and c:IsAbleToHand()

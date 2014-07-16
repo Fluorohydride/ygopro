@@ -2,7 +2,6 @@
 #define _EDITOR_CANVAS_H_
 
 #include "wx/wx.h"
-#include "wx/glcanvas.h"
 #include "deck_data.h"
 #include <vector>
 

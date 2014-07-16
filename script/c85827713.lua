@@ -27,12 +27,11 @@ function c85827713.sfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x8d)
 end
 function c85827713.sumcon(e)
-	return Duel.IsExistingMatchingCard(c85827713.sfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c85827713.sfilter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function c85827713.limcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp~=tp and c:IsReason(REASON_DESTROY)
-		and c:IsPreviousLocation(LOCATION_ONFIELD) and c:GetPreviousControler()==tp
+	return rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp
 end
 function c85827713.limop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

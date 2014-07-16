@@ -8,8 +8,8 @@ function c32623004.initial_effect(c)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,32623004)
 	e1:SetCondition(c32623004.spcon)
-	e1:SetCost(c32623004.spcost)
 	e1:SetTarget(c32623004.sptg)
 	e1:SetOperation(c32623004.spop)
 	c:RegisterEffect(e1)
@@ -26,14 +26,6 @@ function c32623004.initial_effect(c)
 end
 function c32623004.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:GetHandler():IsSetCard(0x5a)
-end
-function c32623004.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		if Duel.GetFlagEffect(tp,32623005)~=0 then return false end
-		Duel.RegisterFlagEffect(tp,32623005,RESET_CHAIN,0,1)
-		return Duel.GetFlagEffect(tp,32623004)==0
-	end
-	Duel.RegisterFlagEffect(tp,32623004,RESET_PHASE+PHASE_END,0,1)
 end
 function c32623004.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -5,6 +5,8 @@ function c56704140.initial_effect(c)
 	e1:SetDescription(aux.Stringid(56704140,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
+	e1:SetCountLimit(1)
 	e1:SetCost(c56704140.cost)
 	e1:SetTarget(c56704140.target)
 	e1:SetOperation(c56704140.operation)
@@ -15,11 +17,10 @@ function c56704140.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c56704140.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(56704140)==0 end
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,0)
 	local aat=Duel.AnnounceAttribute(tp,1,0x7f)
 	e:SetLabel(aat)
-	e:GetHandler():RegisterFlagEffect(56704140,RESET_EVENT+0x1fe0000,0,1)
 end
 function c56704140.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

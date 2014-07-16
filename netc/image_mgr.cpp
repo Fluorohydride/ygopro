@@ -2,6 +2,8 @@
 #include "game_scene.h"
 #include "../common/common.h"
 
+#define GLEW_STATIC
+#include <GL/glew.h>
 #ifdef __WXMAC__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>

@@ -1,7 +1,12 @@
 #define GLEW_STATIC
 #include <GL/glew.h>
+#ifdef __WXMAC__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
+#else
+#include <GL/gl.h>
+#include <GL/glu.h>
+#endif
 #include <array>
 #include <iostream>
 #include <regex>
@@ -614,6 +619,51 @@ namespace sgui
         if(!focus_widget.expired())
             return focus_widget.lock()->EventCharEnter(evt);
         return false;
+    }
+    
+    bool SGWidgetWrapper::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+        SGWidgetContainer::EventMouseMove(evt);
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventMouseEnter() {
+        SGWidgetContainer::EventMouseEnter();
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventMouseLeave() {
+        SGWidgetContainer::EventMouseLeave();
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        SGWidgetContainer::EventMouseButtonDown(evt);
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+        SGWidgetContainer::EventMouseButtonUp(evt);
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+        SGWidgetContainer::EventMouseWheel(evt);
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventKeyDown(sf::Event::KeyEvent evt) {
+        SGWidgetContainer::EventKeyDown(evt);
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventKeyUp(sf::Event::KeyEvent evt) {
+        SGWidgetContainer::EventKeyUp(evt);
+        return true;
+    }
+    
+    bool SGWidgetWrapper::EventCharEnter(sf::Event::TextEvent evt) {
+        SGWidgetContainer::EventCharEnter(evt);
+        return true;
     }
     
     SGConfig SGGUIRoot::basic_config;
@@ -1416,7 +1466,7 @@ namespace sgui
         text_update = true;
         std::array<SGVertexVCT, 36> vert;
         int bw = button_config.int_config["border"];
-        auto back = tex_rect[state];
+        auto back = tex_rect[state & 0xf];
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
                               sf::IntRect{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
@@ -1494,7 +1544,7 @@ namespace sgui
         tex_texture = tex;
     }
     
-    std::shared_ptr<SGButton> SGButton::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size) {
+    std::shared_ptr<SGButton> SGButton::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size, bool is_push) {
         auto ptr = std::make_shared<SGButton>();
         ptr->parent = p;
         ptr->position = pos;
@@ -1510,6 +1560,7 @@ namespace sgui
             ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
         else
             ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+        ptr->is_push = is_push;
         glGenBuffers(2, ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 36, nullptr, GL_DYNAMIC_DRAW);
@@ -1537,35 +1588,73 @@ namespace sgui
     }
     
     bool SGButton::EventMouseEnter() {
-        if(guiRoot.GetClickObject().get() == this)
-            state = 2;
-        else
-            state = 1;
-        vertices_dirty = true;
+        if(!is_push) {
+            if(guiRoot.GetClickObject().get() == this)
+                state = 2;
+            else
+                state = 1;
+            vertices_dirty = true;
+        } else {
+            if(state == 0) {
+                if(guiRoot.GetClickObject().get() == this)
+                    state = 2;
+                else
+                    state = 1;
+                vertices_dirty = true;
+            }
+        }
         return SGWidget::EventMouseEnter();
     }
     
     bool SGButton::EventMouseLeave() {
-        state = 0;
-        vertices_dirty = true;
+        if(!is_push) {
+            state = 0;
+            vertices_dirty = true;
+        } else {
+            if(state != 0x12) {
+                state = 0;
+                vertices_dirty = true;
+            }
+        }
         return SGWidget::EventMouseLeave();
     }
     
     bool SGButton::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
         if(evt.button == sf::Mouse::Left) {
-            state = 2;
-            vertices_dirty = true;
-            guiRoot.SetClickingObject(shared_from_this());
+            if(!is_push) {
+                state = 2;
+                vertices_dirty = true;
+                guiRoot.SetClickingObject(shared_from_this());
+            } else {
+                if(state != 0x12) {
+                    state = 2;
+                    vertices_dirty = true;
+                }
+                guiRoot.SetClickingObject(shared_from_this());
+            }
         }
         return SGWidget::EventMouseButtonDown(evt);
     }
     
     bool SGButton::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
         bool click = false;
-        if(state == 2 && evt.button == sf::Mouse::Left) {
-            vertices_dirty = true;
-            state = 1;
-            click = true;
+        if(evt.button == sf::Mouse::Left) {
+            if(!is_push) {
+                if(state == 2) {
+                    state = 1;
+                    vertices_dirty = true;
+                    click = true;
+                }
+            } else {
+                if(state == 2) {
+                    state = 0x12;
+                    click = true;
+                } else if(state == 0x12) {
+                    state = 1;
+                    click = true;
+                    vertices_dirty = true;
+                }
+            }
         }
         bool ret = SGWidget::EventMouseButtonUp(evt);
         if(click)
@@ -1750,8 +1839,7 @@ namespace sgui
     SGConfig SGRadio::radio_config;
     
     SGRadio::~SGRadio() {
-        if(group != nullptr)
-            group->RemoveRadio(this);
+        DetachGroup();
     }
     
     void SGRadio::UpdateVertices() {
@@ -1785,37 +1873,42 @@ namespace sgui
     void SGRadio::SetChecked(bool chk) {
         if(checked == chk)
             return;
-        checked = chk;
-        vertices_dirty = true;
-        if(chk && group) {
-            SGRadio* pre = group->GetCurrent();
-            group->MakeCurrent(this);
-            if(pre)
+        if(chk) {
+            auto pre = GetCheckedTarget();
+            if(pre != nullptr)
                 pre->SetChecked(false);
         }
+        checked = chk;
+        vertices_dirty = true;
         eventCheckChange.TriggerEvent(*this, checked);
     }
     
-    void SGRadio::SetGroup(std::shared_ptr<SGRadio> rdo) {
-        if(rdo->group == nullptr) {
-            rdo->group = std::make_shared<SGRadioGroup>();
-            rdo->group->AddRadio(this);
-        }
-        if(group != nullptr)
-            group->RemoveRadio(this);
-        group = rdo->group;
-        group->AddRadio(this);
+    void SGRadio::AttachGroup(std::shared_ptr<SGRadio> rdo) {
+        if(rdo.get() == this)
+            return;
+        if(next_group_member != this)
+            DetachGroup();
+        next_group_member = rdo->next_group_member;
+        rdo->next_group_member = this;
+    }
+    
+    void SGRadio::DetachGroup() {
+        auto next = next_group_member;
+        if(next == this)
+            return;
+        while(next->next_group_member != this)
+            next = next->next_group_member;
+        next->next_group_member = next_group_member;
+        next_group_member = this;
     }
     
     std::shared_ptr<SGRadio> SGRadio::GetCheckedTarget() {
-        if(group == nullptr) {
-            if(checked)
-                return std::static_pointer_cast<SGRadio>(shared_from_this());
-            return nullptr;
-        }
-        SGRadio* rdo = group->GetCurrent();
-        if(rdo)
-            return std::static_pointer_cast<SGRadio>(rdo->shared_from_this());
+        auto current = this;
+        do {
+            if(current->checked)
+                return std::static_pointer_cast<SGRadio>(current->shared_from_this());
+            current = current->next_group_member;
+        } while (current != this);
         return nullptr;
     }
     
@@ -1849,6 +1942,7 @@ namespace sgui
         else
             ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
         ptr->SetText(t, guiRoot.GetDefaultInt("font_color"));
+        ptr->next_group_member = ptr.get();
         glGenBuffers(2, ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(SGVertexVCT) * 12, nullptr, GL_DYNAMIC_DRAW);

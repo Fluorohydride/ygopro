@@ -10,7 +10,7 @@ function c53982768.initial_effect(c)
 	--Disable
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BATTLE_END)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetOperation(c53982768.operation)
 	c:RegisterEffect(e2)

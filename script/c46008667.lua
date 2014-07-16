@@ -16,6 +16,7 @@ function c46008667.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,46008667)
 	e2:SetCondition(c46008667.spcon)
 	e2:SetCost(c46008667.spcost)
 	e2:SetTarget(c46008667.sptg)
@@ -62,9 +63,8 @@ function c46008667.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
 end
 function c46008667.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,46008667)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,46008667,RESET_PHASE+PHASE_END,0,1)
 end
 function c46008667.filter1(c,e,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(0x107a)

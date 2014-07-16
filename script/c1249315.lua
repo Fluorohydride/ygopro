@@ -10,16 +10,15 @@ function c1249315.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,1249315)
 	e2:SetCost(c1249315.thcost)
 	e2:SetTarget(c1249315.thtg)
 	e2:SetOperation(c1249315.thop)
 	c:RegisterEffect(e2)
 end
 function c1249315.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,1249315)==0
-		and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,1249315,RESET_PHASE+PHASE_END,0,1)
 end
 function c1249315.thfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

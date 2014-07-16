@@ -6,6 +6,7 @@ function c92572371.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,92572371)
 	e1:SetCost(c92572371.spcost)
 	e1:SetTarget(c92572371.sptg)
 	e1:SetOperation(c92572371.spop)
@@ -15,12 +16,10 @@ function c92572371.cfilter(c)
 	return (c:IsLocation(LOCATION_HAND) or c:IsFaceup()) and (c:IsSetCard(0x79) or c:IsSetCard(0x7c)) and c:IsAbleToGraveAsCost()
 end
 function c92572371.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,92572371)==0
-		and Duel.IsExistingMatchingCard(c92572371.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,2,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c92572371.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c92572371.cfilter,tp,LOCATION_HAND+LOCATION_ONFIELD,0,2,2,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,92572371,RESET_PHASE+PHASE_END,0,1)
 end
 function c92572371.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

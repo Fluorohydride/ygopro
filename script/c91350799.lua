@@ -17,7 +17,7 @@ function c91350799.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCost(c91350799.spcost)
+	e2:SetCountLimit(1,91350799)
 	e2:SetTarget(c91350799.sptg)
 	e2:SetOperation(c91350799.spop)
 	c:RegisterEffect(e2)
@@ -34,10 +34,6 @@ function c91350799.retop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SendtoDeck(e:GetHandler(),nil,2,REASON_EFFECT)
 	end
-end
-function c91350799.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,91350799)==0 end
-	Duel.RegisterFlagEffect(tp,91350799,RESET_PHASE+PHASE_END,0,1)
 end
 function c91350799.rmfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()

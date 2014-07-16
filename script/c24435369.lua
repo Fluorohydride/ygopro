@@ -12,5 +12,5 @@ function c24435369.filter(c)
 end
 function c24435369.dircon(e)
 	return Duel.IsExistingMatchingCard(c24435369.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		or Duel.GetEnvironment()==22702055
+		or Duel.IsEnvironment(22702055)
 end
