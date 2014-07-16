@@ -25,10 +25,14 @@ namespace ygopro
         void UpdateCard(int pos, int index);
         void UpdateCardAll();
         void Draw();
+        void InitDraw();
         
     protected:
     private:
-        unsigned int bo[2];
+        unsigned int index_buffer = 0;
+        unsigned int deck_buffer = 0;
+        unsigned int back_buffer = 0;
+        unsigned int misc_buffer = 0;
         wxString current_file;
         int view_regulation = 0;
         DeckData current_deck;

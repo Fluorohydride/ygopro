@@ -69,10 +69,18 @@ int main(int argc, char* argv[]) {
     auto lb = sgui::SGIconLabel::Create(tab->GetTab(3), {10, 70}, L"", 0);
     lb->SetText(L"Line1\ue004\ue005\ue086\nLine2\ue001Line2\nLine3Line3", 0xff000000);
     
+    gameScene.Init();
+    gameScene.UpdateScene();
     bool running = true;
     sf::Clock clock;
     float tm1 = clock.getElapsedTime().asSeconds();
     int fps = 0;
+    sf::Texture t;
+    t.loadFromFile("../ygo/pics/98558751.jpg");;
+    sf::Sprite sp(t);
+    sp.setPosition(100, 100);
+    sf::Sprite sp2(t);
+    sp.setPosition(400, 100);
     while (running) {
         fps++;
         sf::Event evt;
@@ -83,6 +91,7 @@ int main(int argc, char* argv[]) {
             fps = 0;
         }
         while (window.pollEvent(evt)) {
+            gameScene.InitDraw();
             switch(evt.type) {
                 case sf::Event::Closed:
                     running = false;
@@ -123,9 +132,12 @@ int main(int argc, char* argv[]) {
             }
         }
         //window.capture().saveToFile("sc.png");
+        glViewport(0, 0, window.getSize().x, window.getSize().y);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-        glClearColor(1.2f, 1.2f, 1.2f, 1.2f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        gameScene.Draw();
         sgui::SGGUIRoot::GetSingleton().Draw();
+
         window.display();
     }
     

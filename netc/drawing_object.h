@@ -13,13 +13,13 @@ namespace ygopro
 			x += op.x;
 			y += op.y;
 		}
-
+        
 		T& operator - (const T& op) {
 			x -= op.x;
 			y -= op.y;
 		}
 	};
-
+    
 	template<typename T>
 	struct vector3d {
 	public:
@@ -31,7 +31,7 @@ namespace ygopro
 			y += op.y;
 			z += op.z;
 		}
-
+        
 		T& operator - (const T& op) {
 			x -= op.x;
 			y -= op.y;

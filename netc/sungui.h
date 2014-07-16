@@ -9,44 +9,12 @@
 #include <unordered_map>
 #include <functional>
 
-#include <GL/glew.h>
+#include "glbase.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 
 namespace sgui
 {
-    
-    struct SGVertexVT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        float texcoord[2] = {0.0f, 0.0f};
-        static const int tex_offset = 12;
-    };
-    
-    struct SGVertexVCT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        unsigned int color = 0xffffffff;
-        float texcoord[2] = {0.0f, 0.0f};
-        static const int color_offset = 12;
-        static const int tex_offset = 16;
-    };
-    
-    struct SGVertexVNT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        float normal[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-        float texcoord[2] = {0.0f, 0.0f};
-        static const int normal_offset = 12;
-        static const int tex_offset = 28;
-    };
-    
-    struct SGVertexVNCT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        float normal[4] = {0.0f, 0.0f, 0.0f, 0.0f};
-        unsigned int color = 0xffffffff;
-        float texcoord[2] = {0.0f, 0.0f};
-        static const int normal_offset = 12;
-        static const int color_offset = 28;
-        static const int tex_offset = 32;
-    };
     
     // ===== Delegate Implement =====
     // OT: Object Type
@@ -307,9 +275,9 @@ namespace sgui
     class SGSpriteBase {
     public:
         virtual ~SGSpriteBase();
-        virtual void SetImage(sf::Texture* img, sf::IntRect varea);
+        virtual void SetImage(glbase::Texture* img, sf::IntRect varea);
         virtual void AddTexRect(sf::IntRect tarea);
-        virtual void SetImage(sf::Texture* img, std::vector<v2i>& verts);
+        virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts);
         virtual void AddTexcoord(std::vector<v2i>& texcoords);
         virtual v2i GetImageOffset() = 0;
         void SetFrameTime(float ft) { frame_time = ft; }
@@ -321,7 +289,7 @@ namespace sgui
         bool img_update = true;
         bool img_dirty = true;
         float frame_time = 0.016f;
-        sf::Texture* img_texture = nullptr;
+        glbase::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
         std::vector<std::vector<v2i>> texcoords;
@@ -413,22 +381,20 @@ namespace sgui
         
         void BindGuiTexture() {
             if(cur_texture != &gui_texture) {
-                sf::Texture::bind(&gui_texture);
+                gui_texture.Bind();
                 cur_texture = &gui_texture;
             }
         }
         
         void BindFontTexture(unsigned int sz) {
             auto& tex = gui_font.getTexture(sz);
-            if(cur_texture != &tex) {
-                sf::Texture::bind(&tex);
-                cur_texture = (sf::Texture*)&tex;
-            }
+            sf::Texture::bind(&tex);
+            cur_texture = nullptr;
         }
         
-        void BindTexture(sf::Texture* t = nullptr) {
+        void BindTexture(glbase::Texture* t = nullptr) {
             if(t != cur_texture) {
-                sf::Texture::bind(t);
+                t->Bind();
                 cur_texture = t;
             }
         }
@@ -447,7 +413,7 @@ namespace sgui
         void LoadConfigs();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
         sf::Font& GetGUIFont() { return gui_font; }
-        sf::Texture& GetGUITexture() { return gui_texture; }
+        glbase::Texture& GetGUITexture() { return gui_texture; }
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         sf::IntRect& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
         sf::Time GetTime() { return gui_clock.getElapsedTime(); }
@@ -471,8 +437,8 @@ namespace sgui
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
         sf::Font gui_font;
-        sf::Texture gui_texture;
-        sf::Texture* cur_texture = nullptr;
+        glbase::Texture gui_texture;
+        glbase::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<sf::IntRect> scissor_stack;
         sf::Clock gui_clock;
@@ -570,7 +536,7 @@ namespace sgui
         virtual bool IsMultiLine();
         virtual v2i GetImageOffset();
         void SetTextureRect(sf::IntRect r1, sf::IntRect r2, sf::IntRect r3, int lw, int rw);
-        void SetTexture(sf::Texture* tex);
+        void SetTexture(glbase::Texture* tex);
         bool IsPushed() { return is_push && (state == 0x12); }
         
         SGEventHandler<SGWidget> eventButtonClick;
@@ -587,7 +553,7 @@ namespace sgui
         int lwidth = 0;
         int rwidth = 0;
         sf::Rect<int> tex_rect[3];
-        sf::Texture* tex_texture = nullptr;
+        glbase::Texture* tex_texture = nullptr;
         
     public:
         static std::shared_ptr<SGButton> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size, bool is_push = false);

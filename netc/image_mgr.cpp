@@ -2,30 +2,12 @@
 #include "game_scene.h"
 #include "../common/common.h"
 
-#define GLEW_STATIC
-#include <GL/glew.h>
-#ifdef __WXMAC__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
 #include "wx/xml/xml.h"
 
 namespace ygopro
 {
 
 	ImageMgr imageMgr;
-
-	ImageMgr::ImageMgr() {
-        
-	}
-
-	ImageMgr::~ImageMgr() {
-		
-	}
 
 	CardTextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
@@ -43,18 +25,35 @@ namespace ygopro
                 } else {
                     sf::Image img;
                     if(img.loadFromFile(file.ToStdString())) {
+                        glbase::VertexVT frame_verts[4];
                         cti.ti.x = (blockid % 20) * 100;
                         cti.ti.y = (blockid / 20) * 145;
                         cti.ti.w = 100;
                         cti.ti.h = 145;
                         cti.ref_block = blockid;
-                        sf::Texture t;
-                        t.loadFromImage(img);
-                        sf::Sprite sp;
-                        sp.setTexture(t);
-                        temp_texture.draw(sp);
-                        temp_texture.display();
-                        card_texture.update(temp_texture.getTexture().copyToImage(), cti.ti.x, cti.ti.y);
+                        card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+                        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+                        glViewport(0, 0, 2048, 2048);
+                        frame_verts[0].vertex[0] = float(cti.ti.x) / 2048;
+                        frame_verts[0].vertex[1] = float(cti.ti.y) / 2048;
+                        frame_verts[1].vertex[0] = float(cti.ti.x + cti.ti.w) / 2048;
+                        frame_verts[1].vertex[1] = float(cti.ti.y) / 2048;
+                        frame_verts[2].vertex[0] = float(cti.ti.x) / 2048;
+                        frame_verts[2].vertex[1] = float(cti.ti.y + cti.ti.h) / 2048;
+                        frame_verts[3].vertex[0] = float(cti.ti.x + cti.ti.w) / 2048;
+                        frame_verts[4].vertex[1] = float(cti.ti.y + cti.ti.h) / 2048;
+                        frame_verts[0].texcoord[0] = 0.0f;
+                        frame_verts[0].texcoord[1] = 0.0f;
+                        frame_verts[1].texcoord[0] = (float)img.getSize().x / card_image.GetWidth();
+                        frame_verts[1].texcoord[1] = 0.0f;
+                        frame_verts[2].texcoord[0] = 0.0f;
+                        frame_verts[2].texcoord[1] = (float)img.getSize().y / card_image.GetHeight();
+                        frame_verts[3].texcoord[0] = frame_verts[1].texcoord[0];
+                        frame_verts[3].texcoord[1] = frame_verts[2].texcoord[1];
+                        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVT), frame_verts[0].vertex);
+                        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVT), frame_verts[0].texcoord);
+                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, frame_index);
+                        glBindFramebuffer(GL_FRAMEBUFFER, 0);
                     } else {
                         FreeBlock(blockid);
                         cti.ti = misc_textures["unknown"];
@@ -115,24 +114,52 @@ namespace ygopro
     }
     
     void ImageMgr::InitTextures() {
-        card_texture.create(2048, 2048);
-        temp_texture.create(100, 145);
+        card_texture.Load(nullptr, 2048, 2048);
         for(short i = 7; i < 280; ++i)
             unuse_block.push_back(i);
-        /*
-        unsigned int tid;
-		glGenTextures(1, &tid);
-		glBindTexture(GL_TEXTURE_2D, tid);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-		unsigned char* px = new unsigned char[2048 * 2048 * 4];
-		memset(px, 0, sizeof(unsigned char) * 2048 * 2048 * 4);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2048, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
-        glBindTexture(GL_TEXTURE_2D, 0);
-        delete[] px;
-        */
+        ref_count.resize(280);
+        glGenFramebuffers(1, &frame_buffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, card_texture.GetTextureId(), 0);
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
 
+    void ImageMgr::UninitTextures() {
+        glDeleteFramebuffers(1, &frame_buffer);
+    }
+    
+    void ImageMgr::BindTexture(int textype) {
+        switch(textype) {
+            case 0:
+                bg_texture.Bind();
+                break;
+            case 1:
+                misc_texture.Bind();
+                break;
+            case 2:
+                card_image.Bind();
+                break;
+            case 3:
+                card_texture.Bind();
+                break;
+        }
+    }
+    
+    glbase::Texture& ImageMgr::GetTexInfo(int textype) {
+        switch(textype) {
+            case 0:
+                return bg_texture;
+            case 1:
+                return misc_texture;
+            case 2:
+                return card_image;
+            case 3:
+                return card_texture;
+            default:
+                return misc_texture;
+        }
+    }
+    
 	bool ImageMgr::LoadImageConfig(const std::string& name) {
 		wxXmlDocument doc;
         if(!wxFileExists(name))
@@ -149,11 +176,11 @@ namespace ygopro
                     sf::Image img;
                     if(img.loadFromFile(path.ToStdString())) {
                         if(name == "cards") {
-                            card_texture.update(img, 0, 0);
+                            card_texture.Update(img.getPixelsPtr(), 0, 0, img.getSize().x, img.getSize().y);
                         } else if(name == "misc") {
-                            misc_texture.loadFromImage(img);
+                            misc_texture.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
                         } else if(name == "bg") {
-                            bg_texture.loadFromImage(img);
+                            bg_texture.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
                         }
                     }
                 }

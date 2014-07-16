@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Texture>
-  <image name="cards" path="./conf/cards.png"/>
+  <image name="cards" path="./conf/card_misc.png"/>
   <image name="misc" path="./conf/misc.png"/>
   <image name="bg" path="./conf/bg.jpg"/>
   <texture name="negated" x="0" y="0" w="128" h="128"/>
@@ -17,4 +17,5 @@
   <texture name="unknown" x="0" y="0" w="177" h="254"/>
   <texture name="sleeve1" x="0" y="0" w="177" h="254"/>
   <texture name="sleeve2" x="0" y="0" w="177" h="254"/>
+  <texture name="bg" x="0" y="0" w="1024" h="640"/>
 </Texture>

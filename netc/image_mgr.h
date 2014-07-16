@@ -5,7 +5,7 @@
 #include <list>
 #include <unordered_map>
 
-#include <GL/glew.h>
+#include "glbase.h"
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 
@@ -27,19 +27,6 @@ namespace ygopro
 	class ImageMgr {
 
 	public:
-		ImageMgr();
-		~ImageMgr();
-
-		inline unsigned int texlen(unsigned int len) {
-			len = len - 1;
-			len = len | (len >> 1);
-			len = len | (len >> 2);
-			len = len | (len >> 4);
-			len = len | (len >> 8);
-			len = len | (len >> 16);
-			return len + 1;
-		}
-
 		CardTextureInfo& GetCardTexture(unsigned int id);
         TextureInfo& LoadBigCardTexture(unsigned int id);
         TextureInfo& GetTexture(const std::string& name);
@@ -50,19 +37,22 @@ namespace ygopro
         bool FreeBlock(unsigned short);
         
 		void InitTextures();
-        
+        void UninitTextures();
+        void BindTexture(int textype);
 		bool LoadImageConfig(const std::string& file);
-		
+        glbase::Texture& GetTexInfo(int textype);
+        
     protected:
         std::unordered_map<unsigned int, CardTextureInfo> card_textures;
         std::unordered_map<std::string, TextureInfo> misc_textures;
         std::list<unsigned short> unuse_block;
         std::vector<int> ref_count;
-        sf::Texture card_texture;
-        sf::Texture misc_texture;
-        sf::Texture bg_texture;
-        sf::Texture card_big_image;
-        sf::RenderTexture temp_texture;
+        glbase::Texture card_texture;
+        glbase::Texture misc_texture;
+        glbase::Texture bg_texture;
+        glbase::Texture card_image;
+        unsigned int frame_buffer = 0;
+        unsigned short frame_index[6] = {0, 2, 1, 1, 2, 3};
 	};
 
     extern ImageMgr imageMgr;

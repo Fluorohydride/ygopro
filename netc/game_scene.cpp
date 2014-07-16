@@ -1,20 +1,10 @@
-#define GLEW_STATIC
-#include <GL/glew.h>
-#ifdef __WXMAC__
-#include <OpenGL/gl.h>
-#include <OpenGL/glu.h>
-#else
-#include <GL/gl.h>
-#include <GL/glu.h>
-#endif
-
 #include <array>
 
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
 #include <wx/utils.h>
 
-#include "sungui.h"
+#include "glbase.h"
 #include "game_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
@@ -29,11 +19,14 @@ namespace ygopro
     CommonConfig stringCfg;
     
     void GameScene::Init() {
-        glGenBuffers(2, bo);
-        glBindBuffer(GL_ARRAY_BUFFER, bo[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(sgui::SGVertexVCT) * 160 * 4, nullptr, GL_DYNAMIC_DRAW);
-        std::array<unsigned short, 160 * 6> index;
-        for(int i = 0; i < 160; ++i) {
+        glGenBuffers(1, &index_buffer);
+        glGenBuffers(1, &deck_buffer);
+        glGenBuffers(1, &back_buffer);
+        glGenBuffers(1, &misc_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
+        std::array<unsigned short, 256 * 6> index;
+        for(int i = 0; i < 256; ++i) {
             index[i * 6] = i * 4;
             index[i * 6 + 1] = i * 4 + 2;
             index[i * 6 + 2] = i * 4 + 1;
@@ -41,12 +34,15 @@ namespace ygopro
             index[i * 6 + 4] = i * 4 + 2;
             index[i * 6 + 5] = i * 4 + 3;
         }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bo[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 160 * 6, nullptr, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 6, &index[0], GL_STATIC_DRAW);
     }
     
     void GameScene::Uninit() {
-        glDeleteBuffers(2, bo);
+        glDeleteBuffers(1, &index_buffer);
+        glDeleteBuffers(1, &deck_buffer);
+        glDeleteBuffers(1, &back_buffer);
+        glDeleteBuffers(1, &misc_buffer);
     }
     
     void GameScene::UpdateScene() {
@@ -55,12 +51,27 @@ namespace ygopro
     }
     
     void GameScene::UpdateBackGround() {
-        std::vector<sgui::SGVertexVCT> verts;
-        std::vector<unsigned short> index;
-        verts.resize(160);
-        index.resize(160);
-        glBindBuffer(GL_ARRAY_BUFFER, bo[0]);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(sgui::SGVertexVCT) * verts.size(), &verts[0]);
+        auto ti = imageMgr.GetTexture("bg");
+        auto tex = imageMgr.GetTexInfo(0);
+        std::array<glbase::VertexVCT, 4> verts;
+        verts[0].vertex[0] = -1.0f;
+        verts[0].vertex[1] = 1.0f;
+        verts[0].texcoord[0] = (float)ti.x / tex.GetWidth();
+        verts[0].texcoord[1] = (float)ti.y / tex.GetHeight();
+        verts[1].vertex[0] = 1.0f;
+        verts[1].vertex[1] = 1.0f;
+        verts[1].texcoord[0] = (float)(ti.x + ti.w) / tex.GetWidth();
+        verts[1].texcoord[1] = (float)ti.y / tex.GetHeight();
+        verts[2].vertex[0] = -1.0f;
+        verts[2].vertex[1] = -1.0f;
+        verts[2].texcoord[0] = (float)ti.x / tex.GetWidth();
+        verts[2].texcoord[1] = (float)(ti.y + ti.h) / tex.GetWidth();
+        verts[3].vertex[0] = 1.0f;
+        verts[3].vertex[1] = -1.0f;
+        verts[3].texcoord[0] = (float)(ti.x + ti.w) / tex.GetWidth();
+        verts[3].texcoord[1] = (float)(ti.y + ti.h) / tex.GetWidth();
+        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * verts.size(), &verts[0]);
 
     }
     
@@ -69,13 +80,34 @@ namespace ygopro
     }
     
     void GameScene::UpdateCardAll() {
-        
+        imageMgr.GetCardTexture(98558751);
     }
     
     void GameScene::Draw() {
-        
+        imageMgr.BindTexture(0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+        //
+        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
+        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+        //
     }
     
+    void GameScene::InitDraw() {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_LIGHTING);
+        glDisable(GL_DEPTH_TEST);
+        glEnableClientState(GL_VERTEX_ARRAY);
+        glEnableClientState(GL_COLOR_ARRAY);
+        glEnableClientState(GL_NORMAL_ARRAY);
+        glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+        glEnableClientState(GL_INDEX_ARRAY);
+        glLoadIdentity();
+    }
   /*
     GameFrame::GameFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
         
