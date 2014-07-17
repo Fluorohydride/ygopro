@@ -1,6 +1,3 @@
-#include <GL/glew.h>
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
 #include <iostream>
 
 #include "game_scene.h"
@@ -75,12 +72,6 @@ int main(int argc, char* argv[]) {
     sf::Clock clock;
     float tm1 = clock.getElapsedTime().asSeconds();
     int fps = 0;
-    sf::Texture t;
-    t.loadFromFile("../ygo/pics/98558751.jpg");;
-    sf::Sprite sp(t);
-    sp.setPosition(100, 100);
-    sf::Sprite sp2(t);
-    sp.setPosition(400, 100);
     while (running) {
         fps++;
         sf::Event evt;
@@ -90,8 +81,8 @@ int main(int argc, char* argv[]) {
             tm1 += 10.0f;
             fps = 0;
         }
+        gameScene.InitDraw();
         while (window.pollEvent(evt)) {
-            gameScene.InitDraw();
             switch(evt.type) {
                 case sf::Event::Closed:
                     running = false;

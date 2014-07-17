@@ -80,13 +80,19 @@ namespace ygopro
     }
     
     void GameScene::UpdateCardAll() {
-        imageMgr.GetCardTexture(98558751);
+        size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
+        if(deck_sz > deck_buffer_size) {
+            if(deck_buffer_size == 0)
+                deck_buffer_size = 128;
+            while(deck_buffer_size < deck_sz)
+                deck_buffer_size *= 1.5f;
+        }
     }
     
     void GameScene::Draw() {
         imageMgr.BindTexture(0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        //
+        // background
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);

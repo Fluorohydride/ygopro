@@ -33,6 +33,7 @@ namespace ygopro
         unsigned int deck_buffer = 0;
         unsigned int back_buffer = 0;
         unsigned int misc_buffer = 0;
+        unsigned int deck_buffer_size = 0;
         wxString current_file;
         int view_regulation = 0;
         DeckData current_deck;

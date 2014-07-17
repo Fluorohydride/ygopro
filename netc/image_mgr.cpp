@@ -25,7 +25,7 @@ namespace ygopro
                 } else {
                     sf::Image img;
                     if(img.loadFromFile(file.ToStdString())) {
-                        glbase::VertexVT frame_verts[4];
+                        glbase::VertexVCT frame_verts[4];
                         cti.ti.x = (blockid % 20) * 100;
                         cti.ti.y = (blockid / 20) * 145;
                         cti.ti.w = 100;
@@ -34,14 +34,14 @@ namespace ygopro
                         card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
                         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
                         glViewport(0, 0, 2048, 2048);
-                        frame_verts[0].vertex[0] = float(cti.ti.x) / 2048;
-                        frame_verts[0].vertex[1] = float(cti.ti.y) / 2048;
-                        frame_verts[1].vertex[0] = float(cti.ti.x + cti.ti.w) / 2048;
-                        frame_verts[1].vertex[1] = float(cti.ti.y) / 2048;
-                        frame_verts[2].vertex[0] = float(cti.ti.x) / 2048;
-                        frame_verts[2].vertex[1] = float(cti.ti.y + cti.ti.h) / 2048;
-                        frame_verts[3].vertex[0] = float(cti.ti.x + cti.ti.w) / 2048;
-                        frame_verts[4].vertex[1] = float(cti.ti.y + cti.ti.h) / 2048;
+                        frame_verts[0].vertex[0] = float(cti.ti.x) / 1024 - 1;
+                        frame_verts[0].vertex[1] = float(cti.ti.y) / 1024 - 1;
+                        frame_verts[1].vertex[0] = float(cti.ti.x + cti.ti.w) / 1024 - 1;
+                        frame_verts[1].vertex[1] = float(cti.ti.y) / 1024 - 1;
+                        frame_verts[2].vertex[0] = float(cti.ti.x) / 1024 - 1;
+                        frame_verts[2].vertex[1] = float(cti.ti.y + cti.ti.h) / 1024 - 1;
+                        frame_verts[3].vertex[0] = float(cti.ti.x + cti.ti.w) / 1024 - 1;
+                        frame_verts[3].vertex[1] = float(cti.ti.y + cti.ti.h) / 1024 - 1;
                         frame_verts[0].texcoord[0] = 0.0f;
                         frame_verts[0].texcoord[1] = 0.0f;
                         frame_verts[1].texcoord[0] = (float)img.getSize().x / card_image.GetWidth();
@@ -50,9 +50,15 @@ namespace ygopro
                         frame_verts[2].texcoord[1] = (float)img.getSize().y / card_image.GetHeight();
                         frame_verts[3].texcoord[0] = frame_verts[1].texcoord[0];
                         frame_verts[3].texcoord[1] = frame_verts[2].texcoord[1];
-                        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVT), frame_verts[0].vertex);
-                        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVT), frame_verts[0].texcoord);
-                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, frame_index);
+                        card_image.Bind();
+                        glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 4, &frame_verts);
+                        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+                        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)(uintptr_t)glbase::VertexVCT::color_offset);
+                        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)(uintptr_t)(glbase::VertexVCT::tex_offset));
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
+                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+                        glBindTexture(GL_TEXTURE_2D, 0);
                         glBindFramebuffer(GL_FRAMEBUFFER, 0);
                     } else {
                         FreeBlock(blockid);
@@ -122,10 +128,19 @@ namespace ygopro
         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, card_texture.GetTextureId(), 0);
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+        glGenBuffers(2, card_buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        unsigned short index[] = {0, 2, 1, 1, 2, 3};
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     }
 
     void ImageMgr::UninitTextures() {
         glDeleteFramebuffers(1, &frame_buffer);
+        glDeleteBuffers(2, card_buffer);
     }
     
     void ImageMgr::BindTexture(int textype) {

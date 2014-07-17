@@ -52,7 +52,7 @@ namespace ygopro
         glbase::Texture bg_texture;
         glbase::Texture card_image;
         unsigned int frame_buffer = 0;
-        unsigned short frame_index[6] = {0, 2, 1, 1, 2, 3};
+        unsigned int card_buffer[2] = {0, 0};
 	};
 
     extern ImageMgr imageMgr;

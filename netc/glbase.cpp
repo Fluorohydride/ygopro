@@ -36,7 +36,9 @@ namespace glbase {
     void Texture::Update(const unsigned char* data, int offx, int offy, int width, int height) {
         if(!texture_id)
             return;
+        glBindTexture(GL_TEXTURE_2D, texture_id);
         glTexSubImage2D(GL_TEXTURE_2D, 0, offx, offy, width, height, GL_RGBA, GL_UNSIGNED_BYTE, data);
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
     
     void Texture::Bind() {
