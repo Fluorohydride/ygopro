@@ -15,8 +15,7 @@ function c2322421.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c2322421.tfilter(c)
-	local code=c:GetCode()
-	return code==71971554 or code==20932152
+	return c:IsCode(71971554) or c:IsHasEffect(20932152)
 end
 function c2322421.filter(c,e,tp)
 	return c:IsLevelBelow(2) and c:IsRace(RACE_WARRIOR+RACE_MACHINE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

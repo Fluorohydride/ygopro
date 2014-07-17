@@ -57,7 +57,7 @@ end
 function c87902575.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=eg:GetFirst()
-	if tc:IsRelateToEffect(e) and tc:IsLocation(LOCATION_MZONE) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY) then
+	if tc:IsRelateToEffect(e) and tc:IsLocation(LOCATION_MZONE) and Duel.Remove(tc,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)~=0 then
 		tc:CreateRelation(e:GetHandler(),RESET_EVENT+0x1fe0000)
 		e:GetLabelObject():GetLabelObject():AddCard(tc)
 	end

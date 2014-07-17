@@ -7,7 +7,7 @@ function c19748583.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCategory(CATEGORY_EQUIP)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
-	e1:SetCost(c19748583.eqcost)
+	e1:SetCountLimit(1,19748583)
 	e1:SetTarget(c19748583.eqtg)
 	e1:SetOperation(c19748583.eqop)
 	c:RegisterEffect(e1)
@@ -35,10 +35,6 @@ function c19748583.initial_effect(c)
 	e4:SetTarget(c19748583.destg)
 	e4:SetOperation(c19748583.desop)
 	c:RegisterEffect(e4)
-end
-function c19748583.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,19748583)==0 end
-	Duel.RegisterFlagEffect(tp,19748583,RESET_PHASE+PHASE_END,0,1)
 end
 function c19748583.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x107a)
@@ -71,7 +67,8 @@ function c19748583.eqlimit(e,c)
 end
 function c19748583.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return bit.band(r,REASON_EFFECT)~=0 and c:GetEquipTarget():IsAttribute(ATTRIBUTE_LIGHT)  end
+	if chk==0 then return bit.band(r,REASON_EFFECT)~=0 and c:GetEquipTarget():IsAttribute(ATTRIBUTE_LIGHT)
+		and not e:GetHandler():IsStatus(STATUS_DESTROY_CONFIRMED) end
 	return Duel.SelectYesNo(e:GetOwnerPlayer(),aux.Stringid(19748583,1))
 end
 function c19748583.repop(e,tp,eg,ep,ev,re,r,rp)

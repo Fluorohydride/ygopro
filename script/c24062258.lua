@@ -7,14 +7,10 @@ function c24062258.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCost(c24062258.spcost)
+	e1:SetCountLimit(1,24062258)
 	e1:SetTarget(c24062258.sptg)
 	e1:SetOperation(c24062258.spop)
 	c:RegisterEffect(e1)
-end
-function c24062258.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,24062258)==0 end
-	Duel.RegisterFlagEffect(tp,24062258,RESET_PHASE+PHASE_END,0,1)
 end
 function c24062258.filter(c,e,tp)
 	return c:GetCode()~=24062258 and c:GetLevel()==4 and c:IsAttribute(ATTRIBUTE_DARK) and (c:GetAttack()==0 or c:GetDefence()==0)

@@ -16,6 +16,7 @@ function c32314730.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(c32314730.thcon)
 	e2:SetTarget(c32314730.thtg)
 	e2:SetOperation(c32314730.thop)
 	c:RegisterEffect(e2)
@@ -52,6 +53,10 @@ function c32314730.ccost(e,tp)
 	else
 		Duel.Destroy(e:GetHandler(),REASON_RULE)
 	end
+end
+function c32314730.thcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c32314730.filter(c)
 	return c:IsSetCard(0x1d) and c:IsAbleToHand()

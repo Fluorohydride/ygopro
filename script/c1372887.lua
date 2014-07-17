@@ -4,13 +4,9 @@ function c1372887.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c1372887.cost)
+	e1:SetCountLimit(1,1372887+EFFECT_COUNT_CODE_OATH)
 	e1:SetOperation(c1372887.activate)
 	c:RegisterEffect(e1)
-end
-function c1372887.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,1372887)==0 end
-	Duel.RegisterFlagEffect(tp,1372887,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c1372887.activate(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

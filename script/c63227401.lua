@@ -25,10 +25,10 @@ function c63227401.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c63227401.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) end
-	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,0,1,nil) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and chkc~=e:GetHandler() end
+	if chk==0 then return Duel.IsExistingTarget(nil,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,0,1,1,nil)
+	Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,0,1,1,e:GetHandler())
 end
 function c63227401.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -37,6 +37,7 @@ function c63227401.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterFlagEffect(63227401,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCode(EVENT_CHAIN_SOLVING)
 		e1:SetCondition(c63227401.discon)
 		e1:SetOperation(c63227401.disop)

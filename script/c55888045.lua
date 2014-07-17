@@ -16,6 +16,7 @@ function c55888045.initial_effect(c)
 	e1:SetOperation(c55888045.negop)
 	c:RegisterEffect(e1)
 end
+c55888045.xyz_number=106
 function c55888045.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
 	return (loc==LOCATION_SZONE or loc==LOCATION_MZONE) and not e:GetHandler():IsStatus(STATUS_CHAINING)

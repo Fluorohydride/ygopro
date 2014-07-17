@@ -8,7 +8,7 @@ function c2830693.initial_effect(c)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCost(c2830693.eqcost)
+	e1:SetCountLimit(1,2830693)
 	e1:SetTarget(c2830693.eqtg)
 	e1:SetOperation(c2830693.eqop)
 	c:RegisterEffect(e1)
@@ -19,16 +19,11 @@ function c2830693.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetRange(LOCATION_GRAVE)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetCountLimit(1,2830694)
 	e2:SetCondition(c2830693.spcon)
-	e2:SetCost(c2830693.spcost)
 	e2:SetTarget(c2830693.sptg)
 	e2:SetOperation(c2830693.spop)
 	c:RegisterEffect(e2)
-end
-function c2830693.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,2830693)==0 end
-	Duel.RegisterFlagEffect(tp,2830693,RESET_PHASE+PHASE_END,0,1)
 end
 function c2830693.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local at=Duel.GetAttacker()
@@ -65,10 +60,6 @@ function c2830693.eqlimit(e,c)
 end
 function c2830693.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil
-end
-function c2830693.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,2830694)==0 end
-	Duel.RegisterFlagEffect(tp,2830694,RESET_PHASE+PHASE_END,0,1)
 end
 function c2830693.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

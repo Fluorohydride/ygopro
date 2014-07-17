@@ -26,6 +26,7 @@ function c25853045.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_BATTLE_DESTROYING)
+	e3:SetCondition(c25853045.descon)
 	e3:SetTarget(c25853045.destg)
 	e3:SetOperation(c25853045.desop)
 	c:RegisterEffect(e3)
@@ -43,6 +44,10 @@ function c25853045.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 		return true
 	else return false end
+end
+function c25853045.descon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c25853045.filter(c)
 	return c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)

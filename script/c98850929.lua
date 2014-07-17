@@ -6,7 +6,7 @@ function c98850929.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c98850929.cost)
+	e1:SetCountLimit(1,98850929+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c98850929.target)
 	e1:SetOperation(c98850929.operation)
 	c:RegisterEffect(e1)
@@ -16,10 +16,6 @@ function c98850929.cfilter(c)
 end
 function c98850929.typecast(c)
 	return bit.band(c:GetType(),TYPE_FUSION+TYPE_RITUAL+TYPE_SYNCHRO+TYPE_XYZ)
-end
-function c98850929.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,98850929)==0 end
-	Duel.RegisterFlagEffect(tp,98850929,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c98850929.filter1(c,e)
 	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and c:IsCanBeEffectTarget(e)

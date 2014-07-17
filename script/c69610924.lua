@@ -20,6 +20,7 @@ function c69610924.initial_effect(c)
 	e2:SetCondition(c69610924.dircon)
 	c:RegisterEffect(e2)
 end
+c69610924.xyz_number=17
 function c69610924.dircon(e)
 	return e:GetHandler():GetOverlayCount()==0
 end

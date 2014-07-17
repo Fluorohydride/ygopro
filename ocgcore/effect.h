@@ -44,10 +44,12 @@ public:
 	uint16 o_range;
 	uint16 reset_count;
 	uint32 reset_flag;
+	uint32 count_code;
 	uint32 category;
 	uint32 label;
 	uint32 hint_timing[2];
 	uint32 card_type;
+	uint32 active_type;
 	uint16 field_ref;
 	uint16 status;
 	void* label_object;
@@ -62,6 +64,7 @@ public:
 
 	int32 is_disable_related();
 	int32 is_available();
+	int32 check_count_limit(uint8 playerid);
 	int32 is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
 	int32 is_action_check(uint8 playerid);
 	int32 is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_cond = FALSE, int32 neglect_cost = FALSE, int32 neglect_target = FALSE);
@@ -73,7 +76,7 @@ public:
 	int32 is_immuned(effect_set_v* effects);
 	int32 is_chainable(uint8 tp);
 	int32 reset(uint32 reset_level, uint32 reset_type);
-	void dec_count();
+	void dec_count(uint32 playerid = 2);
 	void recharge();
 	int32 get_value(uint32 extraargs = 0);
 	int32 get_value(card* pcard, uint32 extraargs = 0);
@@ -86,6 +89,9 @@ public:
 
 //status
 #define EFFECT_STATUS_AVAILABLE	0x0001
+
+#define EFFECT_COUNT_CODE_OATH 0x10000000
+#define EFFECT_COUNT_CODE_DUEL 0x20000000
 
 //========== Reset ==========
 #define RESET_DRAW			PHASE_DRAW
@@ -217,6 +223,7 @@ public:
 #define EFFECT_CANNOT_DISCARD_HAND		55	//
 #define EFFECT_CANNOT_DISCARD_DECK		56	//
 #define EFFECT_CANNOT_USE_AS_COST		57	//
+#define EFFECT_CANNOT_PLACE_COUNTER		58	//
 
 #define EFFECT_LEAVE_FIELD_REDIRECT		60	//
 #define EFFECT_TO_HAND_REDIRECT			61	//
@@ -277,6 +284,10 @@ public:
 #define EFFECT_CHANGE_LEVEL				131	//
 #define EFFECT_UPDATE_RANK				132 //
 #define EFFECT_CHANGE_RANK				133 //
+#define EFFECT_UPDATE_LSCALE			134 //
+#define EFFECT_CHANGE_LSCALE			135 //
+#define EFFECT_UPDATE_RSCALE			136 //
+#define EFFECT_CHANGE_RSCALE			137 //
 #define EFFECT_SET_POSITION				140 //
 #define EFFECT_SELF_DESTROY				141 //
 #define EFFECT_DOUBLE_TRIBUTE			150
@@ -284,6 +295,7 @@ public:
 #define EFFECT_DECREASE_TRIBUTE_SET		152
 #define EFFECT_EXTRA_RELEASE			153
 #define EFFECT_TRIBUTE_LIMIT			154
+#define EFFECT_EXTRA_RELEASE_SUM		155
 #define EFFECT_PUBLIC					160
 #define EFFECT_COUNTER_PERMIT			0x10000
 #define EFFECT_COUNTER_LIMIT			0x20000
@@ -331,6 +343,7 @@ public:
 #define EFFECT_NONTUNER						244
 #define EFFECT_OVERLAY_REMOVE_REPLACE		245
 #define EFFECT_SCRAP_CHIMERA				246
+#define EFFECT_XMAT_COUNT_LIMIT				247
 #define EFFECT_SPSUM_EFFECT_ACTIVATED	250
 #define EFFECT_MATERIAL_CHECK			251
 #define EFFECT_DISABLE_FIELD			260
@@ -352,6 +365,9 @@ public:
 #define EFFECT_UNIQUE_CHECK				297
 #define EFFECT_MATCH_KILL				300
 #define EFFECT_SYNCHRO_CHECK			310
+#define EFFECT_QP_ACT_IN_NTPHAND		311
+#define EFFECT_MUST_BE_SMATERIAL		312
+#define EFFECT_SPSUMMON_PROC_G			320
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001
@@ -386,6 +402,7 @@ public:
 #define EVENT_MSET					1106
 #define EVENT_SSET					1107
 #define EVENT_BE_MATERIAL			1108
+#define EVENT_BE_PRE_MATERIAL			1109
 #define EVENT_DRAW					1110
 #define EVENT_DAMAGE				1111
 #define EVENT_RECOVER				1112

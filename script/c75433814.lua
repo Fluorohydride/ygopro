@@ -25,6 +25,7 @@ function c75433814.initial_effect(c)
 	e2:SetOperation(c75433814.desop)
 	c:RegisterEffect(e2)
 end
+c75433814.xyz_number=40
 function c75433814.ctcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)

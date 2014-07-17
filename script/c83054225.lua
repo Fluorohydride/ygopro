@@ -39,25 +39,34 @@ function c83054225.spop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()<ct then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:Select(tp,ct,ct,nil)
+	local fid=e:GetHandler():GetFieldID()
 	local tc=sg:GetFirst()
 	while tc do
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-		tc:RegisterFlagEffect(83054225,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		tc:RegisterFlagEffect(83054225,RESET_EVENT+0x1fe0000,0,1,fid)
 		tc=sg:GetNext()
 	end
 	Duel.SpecialSummonComplete()
+	sg:KeepAlive()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCountLimit(1)
+	e1:SetLabel(fid)
+	e1:SetLabelObject(sg)
 	e1:SetOperation(c83054225.retop)
 	Duel.RegisterEffect(e1,tp)
 end
-function c83054225.retfilter(c)
-	return c:GetFlagEffect(83054225)>0
+function c83054225.retfilter(c,fid)
+	return c:GetFlagEffectLabel(83054225)==fid
 end
 function c83054225.retop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c83054225.retfilter,tp,LOCATION_MZONE,0,nil)
-	Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+	local g=e:GetLabelObject()
+	local tg=g:Filter(c83054225.retfilter,nil,e:GetLabel())
+	Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
+	if not g:IsExists(c83054225.retfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+	end
 end

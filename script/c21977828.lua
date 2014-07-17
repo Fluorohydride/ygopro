@@ -21,8 +21,9 @@ function c21977828.initial_effect(c)
 	e3:SetDescription(aux.Stringid(21977828,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
+	e3:SetCountLimit(1,21977828)
 	e3:SetCondition(c21977828.spcon)
 	e3:SetTarget(c21977828.sptg)
 	e3:SetOperation(c21977828.spop)
@@ -66,12 +67,11 @@ function c21977828.spfilter(c,e,tp)
 end
 function c21977828.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c21977828.spfilter(chkc,e,tp) end
-	if chk==0 then return Duel.GetFlagEffect(tp,21977828)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c21977828.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c21977828.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
-	Duel.RegisterFlagEffect(tp,21977828,RESET_PHASE+PHASE_END,0,1)
 end
 function c21977828.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

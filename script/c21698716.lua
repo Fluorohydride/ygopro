@@ -41,10 +41,10 @@ function c21698716.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RaiseEvent(c,47408488,e,0,tp,0,0)
 end
 function c21698716.filter(c)
-	return c:IsSetCard(0x34) and c:IsAbleToDeck()  and c:IsFaceup()
+	return c:IsSetCard(0x34) and c:IsAbleToDeck() and c:IsFaceup()
 end
 function c21698716.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c21698716.filter(chkc) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c21698716.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c21698716.filter,tp,LOCATION_ONFIELD,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,c21698716.filter,tp,LOCATION_ONFIELD,0,1,1,nil)

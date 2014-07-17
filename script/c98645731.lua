@@ -6,13 +6,14 @@ function c98645731.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,98645731+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c98645731.cost)
 	e1:SetTarget(c98645731.target)
 	e1:SetOperation(c98645731.activate)
 	c:RegisterEffect(e1)
 end
 function c98645731.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) and Duel.GetFlagEffect(tp,98645731)==0 end
+	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) end
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -21,7 +22,6 @@ function c98645731.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,98645731,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c98645731.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then 
@@ -45,7 +45,7 @@ function c98645731.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-p,sg)
 			Duel.ShuffleHand(p)
 		else
-			Duel.SendtoGrave(sg,REASON_EFFECT)
+			Duel.SendtoGrave(sg,REASON_RULE)
 		end
 		Duel.ShuffleDeck(p)
 	end

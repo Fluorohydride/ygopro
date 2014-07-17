@@ -28,6 +28,7 @@ function c85121942.initial_effect(c)
 	e2:SetOperation(c85121942.desop)
 	c:RegisterEffect(e2)
 end
+c85121942.xyz_number=105
 function c85121942.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()

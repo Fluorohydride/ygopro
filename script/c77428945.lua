@@ -5,16 +5,11 @@ function c77428945.initial_effect(c)
 	e1:SetDescription(aux.Stringid(77428945,0))
 	e1:SetCategory(CATEGORY_POSITION)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetCost(c77428945.cost)
+	e1:SetCountLimit(1,77428945)
 	e1:SetTarget(c77428945.target)
 	e1:SetOperation(c77428945.operation)
 	c:RegisterEffect(e1)
-end
-function c77428945.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,77428945)==0 end
-	Duel.RegisterFlagEffect(tp,77428945,RESET_PHASE+PHASE_END,0,1)
 end
 function c77428945.filter(c)
 	return c:IsFaceup() and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)~=0

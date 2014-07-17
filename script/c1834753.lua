@@ -12,16 +12,17 @@ function c1834753.initial_effect(c)
 	e2:SetDescription(aux.Stringid(1834753,0))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetProperty(EFFECT_FLAG_NO_TURN_RESET)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetCost(c1834753.spcost)
 	e2:SetTarget(c1834753.sptg)
 	e2:SetOperation(c1834753.spop)
 	c:RegisterEffect(e2)
 end
 function c1834753.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(1834753)==0 and Duel.CheckLPCost(tp,2000) end
+	if chk==0 then return Duel.CheckLPCost(tp,2000) end
 	Duel.PayLPCost(tp,2000)
-	e:GetHandler():RegisterFlagEffect(1834753,RESET_EVENT+0x1fe0000,0,0)
 end
 function c1834753.filter(c,e,tp)
 	return c:GetLevel()==3 and c:IsRace(RACE_PSYCHO) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -21,6 +21,7 @@ function c53027855.initial_effect(c)
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e3:SetCountLimit(1,53027855)
 	e3:SetTarget(c53027855.destg)
 	e3:SetOperation(c53027855.desop)
 	c:RegisterEffect(e3)
@@ -40,10 +41,9 @@ function c53027855.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c53027855.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,53027855)==0 end
+	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c53027855.desfilter,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	Duel.RegisterFlagEffect(tp,53027855,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c53027855.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c53027855.desfilter,tp,0,LOCATION_ONFIELD,nil)

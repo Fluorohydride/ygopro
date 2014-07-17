@@ -21,6 +21,8 @@ function c45462639.initial_effect(c)
 	--attackup
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetValue(c45462639.attackup)
 	c:RegisterEffect(e3)
@@ -57,7 +59,7 @@ function c45462639.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,0x3001,2,REASON_COST) end
 	e:GetHandler():RemoveCounter(tp,0x3001,2,REASON_COST)
 end
-function c45462639.destarg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c45462639.destarg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,0,0,1-tp,1)
 end

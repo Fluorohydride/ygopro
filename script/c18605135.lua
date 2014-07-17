@@ -29,7 +29,7 @@ function c18605135.filter(c)
 end
 function c18605135.check()
 	return Duel.IsExistingMatchingCard(c18605135.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		or Duel.GetEnvironment()==22702055
+		or Duel.IsEnvironment(22702055)
 end
 function c18605135.actcon(e,tp,eg,ep,ev,re,r,rp)
 	return c18605135.check()

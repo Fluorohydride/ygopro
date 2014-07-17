@@ -5,10 +5,10 @@ function c30929786.initial_effect(c)
 	e1:SetDescription(aux.Stringid(30929786,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,30929786)
 	e1:SetCondition(c30929786.thcon)
-	e1:SetCost(c30929786.thcost)
 	e1:SetTarget(c30929786.thtg)
 	e1:SetOperation(c30929786.thop)
 	c:RegisterEffect(e1)
@@ -25,10 +25,6 @@ function c30929786.initial_effect(c)
 end
 function c30929786.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:GetHandler():IsSetCard(0x79) and re:GetHandler():IsType(TYPE_MONSTER)
-end
-function c30929786.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,30929786)==0 end
-	Duel.RegisterFlagEffect(tp,30929786,RESET_PHASE+PHASE_END,0,1)
 end
 function c30929786.thfilter(c)
 	return c:IsSetCard(0x79) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()

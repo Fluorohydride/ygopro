@@ -24,6 +24,7 @@ function c88177324.initial_effect(c)
 	e2:SetOperation(c88177324.regop)
 	c:RegisterEffect(e2)
 end
+c88177324.xyz_number=107
 function c88177324.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_BATTLE and not Duel.CheckPhaseActivity() and Duel.GetCurrentChain()==0
 end

@@ -13,8 +13,7 @@ function c84177693.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c84177693.reccon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_BATTLE)
-		and Duel.GetEnvironment()==56433456
+	return not e:GetHandler():IsReason(REASON_BATTLE) and Duel.IsEnvironment(56433456)
 end
 function c84177693.rectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

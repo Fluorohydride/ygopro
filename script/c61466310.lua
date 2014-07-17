@@ -19,11 +19,10 @@ function c61466310.initial_effect(c)
 	e3:SetDescription(aux.Stringid(61466310,0))
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e3:SetRange(LOCATION_SZONE)
+	e3:SetCountLimit(1,61466310)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetCondition(c61466310.thcon)
-	e3:SetCost(c61466310.thcost)
 	e3:SetTarget(c61466310.thtg)
 	e3:SetOperation(c61466310.thop)
 	c:RegisterEffect(e3)
@@ -33,10 +32,6 @@ function c61466310.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 end
 function c61466310.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and bit.band(eg:GetFirst():GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
-end
-function c61466310.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,61466310)==0 end
-	Duel.RegisterFlagEffect(tp,61466310,RESET_PHASE+PHASE_END,0,1)
 end
 function c61466310.filter(c,code)
 	return (c:GetAttack()==2400 or c:GetAttack()==2800) and c:GetDefence()==1000 and c:GetCode()~=code and c:IsAbleToHand()

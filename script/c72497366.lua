@@ -12,9 +12,9 @@ function c72497366.initial_effect(c)
 	e2:SetCode(EFFECT_SUMMON_PROC)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_HAND,0)
+	e2:SetCountLimit(1)
 	e2:SetCondition(c72497366.ntcon)
 	e2:SetTarget(c72497366.nttg)
-	e2:SetOperation(c72497366.ntop)
 	c:RegisterEffect(e2)
 	--destroy replace
 	local e3=Effect.CreateEffect(c)
@@ -27,13 +27,10 @@ function c72497366.initial_effect(c)
 end
 function c72497366.ntcon(e,c)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0 and e:GetHandler():GetFlagEffect(72497366)==0
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c72497366.nttg(e,c)
 	return c:IsLevelAbove(5) and c:IsRace(RACE_FIEND)
-end
-function c72497366.ntop(e,tp,eg,ep,ev,re,r,rp,c)
-	e:GetHandler():RegisterFlagEffect(72497366,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c72497366.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()

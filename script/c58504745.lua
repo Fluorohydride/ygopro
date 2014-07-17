@@ -8,7 +8,7 @@ function c58504745.initial_effect(c)
 	e1:SetDescription(aux.Stringid(58504745,0))
 	e1:SetCategory(CATEGORY_TODECK)
 	e1:SetType(EFFECT_TYPE_IGNITION)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,58504745)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(c58504745.cost)
@@ -17,10 +17,8 @@ function c58504745.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c58504745.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,58504745)==0
-		and e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,2,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,2,2,REASON_COST)
-	Duel.RegisterFlagEffect(tp,58504745,RESET_PHASE+PHASE_END,0,1)
 end
 function c58504745.filter1(c)
 	return (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and (c:IsSetCard(0x79) or c:IsSetCard(0x7c)) and c:IsAbleToDeck()

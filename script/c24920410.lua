@@ -7,13 +7,14 @@ function c24920410.initial_effect(c)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,24920410+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c24920410.condition)
 	e1:SetTarget(c24920410.target)
 	e1:SetOperation(c24920410.activate)
 	c:RegisterEffect(e1)
 end
 function c24920410.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,24920410)==0 and (Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c24920410.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x58)
@@ -22,8 +23,7 @@ function c24920410.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c24920410.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c24920410.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c24920410.filter,tp,LOCATION_MZONE,0,1,1,nil)
-	Duel.RegisterFlagEffect(tp,24920410,RESET_PHASE+PHASE_END,0,1)
+	Duel.SelectTarget(tp,c24920410.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c24920410.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

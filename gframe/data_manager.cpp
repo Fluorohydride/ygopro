@@ -31,7 +31,10 @@ bool DataManager::LoadDB(const char* file) {
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defence = sqlite3_column_int(pStmt, 6);
-			cd.level = sqlite3_column_int(pStmt, 7);
+			unsigned int level = sqlite3_column_int(pStmt, 7);
+			cd.level = level & 0xff;
+			cd.lscale = (level >> 24) & 0xff;
+			cd.rscale = (level >> 16) & 0xff;
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
@@ -212,7 +215,7 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 const wchar_t* DataManager::FormatRace(int race) {
 	wchar_t* p = racBuffer;
 	int filter = 1, i = 1020;
-	for(; filter != 0x800000; filter <<= 1, ++i) {
+	for(; filter != 0x1000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
@@ -228,7 +231,7 @@ const wchar_t* DataManager::FormatRace(int race) {
 const wchar_t* DataManager::FormatType(int type) {
 	wchar_t* p = tpBuffer;
 	int filter = 1, i = 1050;
-	for(; filter != 0x1000000; filter <<= 1, ++i) {
+	for(; filter != 0x2000000; filter <<= 1, ++i) {
 		if(type & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';

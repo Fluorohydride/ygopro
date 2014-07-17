@@ -26,7 +26,7 @@ function c74364659.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and c:IsFaceup() and tc and tc:IsRelateToEffect(e) and c74364659.filter(tc) then
-		c:CreateRelation(tc,RESET_EVENT+0x1fe0000)
+		c:CreateRelation(tc,RESET_EVENT+0x5fe0000)
 		local e1=Effect.CreateEffect(c)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -48,16 +48,20 @@ function c74364659.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c74364659.ctcon(e)
 	if e:GetLabel()==1 then return true end
+	if e:GetLabel()==2 then return false end
 	local c=e:GetOwner()
 	local h=e:GetHandler()
-	return h:IsAttribute(ATTRIBUTE_WATER) and not c:IsDisabled() and c:IsRelateToCard(h)
+	if h:IsAttribute(ATTRIBUTE_WATER) and not c:IsDisabled() and c:IsRelateToCard(h) then
+		return true
+	else
+		e:SetLabel(2)
+		return false
+	end
 end
 function c74364659.posop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabelObject():GetLabel()~=0 then return end
-	local c=e:GetOwner()
 	local h=e:GetHandler()
-	if h:IsAttribute(ATTRIBUTE_WATER) and not c:IsDisabled() and c:IsRelateToCard(h)
-		and h:IsPreviousPosition(POS_FACEUP) and h:IsFacedown() then
+	if h:IsPreviousPosition(POS_FACEUP) and h:IsFacedown() then
 		e:GetLabelObject():SetLabel(1)
 	end
 end

@@ -7,8 +7,8 @@ function c75214390.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SPSUM_PARAM)
 	e1:SetTargetRange(POS_FACEUP_DEFENCE,0)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,75214390)
 	e1:SetCondition(c75214390.spcon)
-	e1:SetOperation(c75214390.spop)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -28,12 +28,8 @@ end
 function c75214390.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetFlagEffect(tp,75214390)==0
-		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c75214390.cfilter,tp,LOCATION_MZONE,0,1,nil)
-end
-function c75214390.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	Duel.RegisterFlagEffect(tp,75214390,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c75214390.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()

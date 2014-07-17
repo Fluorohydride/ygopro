@@ -15,7 +15,6 @@ function c57784563.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c57784563.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local ec=e:GetLabelObject()
 	return ec==nil or ec:GetFlagEffect(57784563)==0
 end

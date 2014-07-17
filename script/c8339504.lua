@@ -5,6 +5,7 @@ function c8339504.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,8339504+EFFECT_COUNT_CODE_OATH)
 	e1:SetLabel(0)
 	e1:SetCost(c8339504.cost)
 	e1:SetTarget(c8339504.target)
@@ -13,8 +14,7 @@ function c8339504.initial_effect(c)
 end
 function c8339504.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(100)
-	if chk==0 then return Duel.GetFlagEffect(tp,8339504)==0 end
-	Duel.RegisterFlagEffect(tp,8339504,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return true end
 end
 function c8339504.cfilter(c,e,tp)
 	local rk=c:GetRank()

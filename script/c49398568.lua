@@ -20,7 +20,7 @@ function c49398568.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	hg:RemoveCard(e:GetHandler())
 	if chk==0 then return hg:GetCount()>0 and hg:FilterCount(c49398568.cfilter,nil)==hg:GetCount() end
-	Duel.SendtoGrave(hg,REASON_COST)
+	Duel.SendtoGrave(hg,REASON_COST+REASON_DISCARD)
 end
 function c49398568.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local ftg=re:GetTarget()

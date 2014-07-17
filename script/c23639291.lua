@@ -15,9 +15,10 @@ function c23639291.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:GetCount()==1 and tc:IsControler(tp) and tc:GetPreviousControler()==tp and tc:IsReason(REASON_DESTROY)
 		and tc:GetReasonEffect() and tc:GetReasonEffect():GetHandler()==tc
 end
-function c23639291.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c23639291.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc==eg:GetFirst() end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and eg:GetFirst():IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		and eg:GetFirst():IsCanBeSpecialSummoned(e,0,tp,false,false) and eg:GetFirst():IsCanBeEffectTarget(e) end
 	Duel.SetTargetCard(eg:GetFirst())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,eg:GetFirst(),1,0,0)
 end

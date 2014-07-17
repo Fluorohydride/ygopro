@@ -32,11 +32,11 @@ function c83438826.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetDescription(aux.Stringid(83438826,1))
 	e5:SetCategory(CATEGORY_EQUIP)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetCountLimit(1,83438826)
 	e5:SetCondition(c83438826.eqcon)
-	e5:SetCost(c83438826.eqcost)
 	e5:SetTarget(c83438826.eqtg)
 	e5:SetOperation(c83438826.operation)
 	c:RegisterEffect(e5)
@@ -77,23 +77,20 @@ function c83438826.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	local eq=c:GetEquipTarget()
-	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) or tc:IsFaceup()
-		or eq:IsImmuneToEffect(e) or not eq:IsAttackAbove(500) then return end
+	if not c:IsRelateToEffect(e) or eq:IsImmuneToEffect(e) or not eq:IsAttackAbove(500) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(-500)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	eq:RegisterEffect(e1)
-	Duel.Destroy(tc,REASON_EFFECT)
+	if tc:IsRelateToEffect(e) and tc:IsControler(1-tp) and tc:IsFacedown() then
+		Duel.Destroy(tc,REASON_EFFECT)
+	end
 end
 function c83438826.eqcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP) and c:IsReason(REASON_DESTROY) and c:CheckUniqueOnField(tp)
-end
-function c83438826.eqcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,83438826)==0 end
-	Duel.RegisterFlagEffect(tp,83438826,RESET_PHASE+PHASE_END,0,1)
 end
 function c83438826.eqfilter2(c)
 	return c:IsFaceup() and c:IsSetCard(0x107a) and c:IsRace(RACE_WARRIOR)

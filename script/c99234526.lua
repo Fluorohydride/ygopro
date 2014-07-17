@@ -13,6 +13,7 @@ function c99234526.initial_effect(c)
 	e2:SetCode(EFFECT_SPSUMMON_PROC)
 	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e2:SetRange(LOCATION_HAND)
+	e2:SetCountLimit(1,99234526)
 	e2:SetCondition(c99234526.spcon)
 	e2:SetOperation(c99234526.spop)
 	c:RegisterEffect(e2)
@@ -35,14 +36,12 @@ function c99234526.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.GetFlagEffect(tp,99234526)==0
 		and Duel.IsExistingMatchingCard(c99234526.spfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
 function c99234526.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c99234526.spfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,99234526,RESET_PHASE+PHASE_END,0,1)
 end
 function c99234526.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)

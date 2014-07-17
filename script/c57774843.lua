@@ -51,8 +51,8 @@ function c57774843.spcon(e,c)
 	return ct>3
 end
 function c57774843.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,1000)
-	else Duel.PayLPCost(tp,1000) end
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
+	Duel.PayLPCost(tp,1000)
 end
 function c57774843.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -14,9 +14,10 @@ function c58947797.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(58947797,1))
 	e2:SetCategory(CATEGORY_TOGRAVE)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCost(c58947797.tgcost)
+	e2:SetCountLimit(1,58947797)
 	e2:SetTarget(c58947797.tgtg)
 	e2:SetOperation(c58947797.tgop)
 	c:RegisterEffect(e2)
@@ -44,10 +45,6 @@ function c58947797.spop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
 	end
-end
-function c58947797.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,58947797)==0 end
-	Duel.RegisterFlagEffect(tp,58947797,RESET_PHASE+PHASE_END,0,1)
 end
 function c58947797.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

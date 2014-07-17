@@ -5,8 +5,8 @@ function c90434657.initial_effect(c)
 	e1:SetCategory(CATEGORY_NEGATE+CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_CHAINING)
+	e1:SetCountLimit(1,90434657+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c90434657.condition)
-	e1:SetCost(c90434657.cost)
 	e1:SetTarget(c90434657.target)
 	e1:SetOperation(c90434657.activate)
 	c:RegisterEffect(e1)
@@ -20,13 +20,9 @@ end
 function c90434657.condition(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsExistingMatchingCard(c90434657.cfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 		or (not Duel.IsExistingMatchingCard(c90434657.cfilter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		and Duel.GetEnvironment()~=47355498) then return false end
+		and not Duel.IsEnvironment(47355498)) then return false end
 	if not Duel.IsChainNegatable(ev) then return false end
 	return re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)
-end
-function c90434657.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90434657)==0 end
-	Duel.RegisterFlagEffect(tp,90434657,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c90434657.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

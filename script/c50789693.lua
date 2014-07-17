@@ -17,7 +17,7 @@ function c50789693.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(50789693,1))
 	e2:SetType(EFFECT_TYPE_QUICK_O)
-	e2:SetCountLimit(1)
+	e2:SetCountLimit(1,50789693+EFFECT_COUNT_CODE_DUEL)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetHintTiming(TIMING_BATTLE_PHASE)
@@ -54,10 +54,8 @@ function c50789693.btcon(e,tp,eg,ep,ev,re,r,rp)
 	return bt and bt:IsControler(tp)
 end
 function c50789693.btcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,50789693)==0
-		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
-	Duel.RegisterFlagEffect(tp,50789693,0,0,0)
 end
 function c50789693.btop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

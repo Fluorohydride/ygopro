@@ -1,4 +1,4 @@
---�إ롤�ƥ�ڥ���
+--ヘル・テンペスト
 function c14391920.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

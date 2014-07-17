@@ -6,6 +6,7 @@ function c38973775.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,38973775)
 	e1:SetCost(c38973775.cost)
 	e1:SetTarget(c38973775.target)
 	e1:SetOperation(c38973775.operation)
@@ -19,10 +20,8 @@ function c38973775.filter(c)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x55) and c:IsAbleToHand()
 end
 function c38973775.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,38973775)==0
-		and Duel.IsExistingMatchingCard(c38973775.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c38973775.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
-	Duel.RegisterFlagEffect(tp,38973775,RESET_PHASE+PHASE_END,0,1)
 end
 function c38973775.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

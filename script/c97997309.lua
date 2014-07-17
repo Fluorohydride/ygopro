@@ -7,6 +7,7 @@ function c97997309.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_END_PHASE)
+	e1:SetCountLimit(1,97997309+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c97997309.condition)
 	e1:SetCost(c97997309.cost)
 	e1:SetTarget(c97997309.target1)
@@ -49,13 +50,11 @@ function c97997309.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c97997309.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=e:GetLabel()
-	if chk==0 then return Duel.GetFlagEffect(tp,97997309)==0
-		and Duel.IsExistingMatchingCard(c97997309.rfilter,tp,LOCATION_GRAVE,0,ct,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c97997309.rfilter,tp,LOCATION_GRAVE,0,ct,nil) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c97997309.rfilter,tp,LOCATION_GRAVE,0,ct,ct,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
-	Duel.RegisterFlagEffect(tp,97997309,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c97997309.filter1(c)
 	return c:IsFacedown() and c:IsAbleToHand()

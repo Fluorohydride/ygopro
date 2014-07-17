@@ -6,6 +6,7 @@ function c36834155.initial_effect(c)
 	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(2,36834155)
 	e1:SetCost(c36834155.cost)
 	e1:SetOperation(c36834155.operation)
 	c:RegisterEffect(e1)
@@ -14,11 +15,10 @@ function c36834155.cfilter(c)
 	return c:IsSetCard(0x55) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 end
 function c36834155.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,36834155)<2 and Duel.IsExistingMatchingCard(c36834155.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c36834155.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c36834155.cfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,36834155,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c36834155.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

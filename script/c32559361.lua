@@ -36,6 +36,7 @@ function c32559361.initial_effect(c)
 	e3:SetOperation(c32559361.damop2)
 	c:RegisterEffect(e3)
 end
+c32559361.xyz_number=9
 function c32559361.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local tc=c:GetBattleTarget()

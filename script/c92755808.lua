@@ -12,7 +12,7 @@ function c92755808.initial_effect(c)
 	--disable
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BATTLE_END)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetCondition(c92755808.discon)
 	e2:SetOperation(c92755808.disop)
 	c:RegisterEffect(e2)

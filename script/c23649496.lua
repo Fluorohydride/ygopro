@@ -22,10 +22,12 @@ function c23649496.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetProperty(EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetCondition(c23649496.tgcon)
 	e2:SetTarget(c23649496.tgtg)
 	e2:SetOperation(c23649496.tgop)
 	c:RegisterEffect(e2)
 end
+c23649496.xyz_number=18
 function c23649496.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -69,6 +71,9 @@ function c23649496.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c23649496.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsCode(e:GetLabel())
+end
+function c23649496.tgcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c23649496.tgfilter(c)
 	return c:IsSetCard(0x76) and c:IsAbleToGrave()

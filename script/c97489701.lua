@@ -81,27 +81,43 @@ function c97489701.syncon(e,c,tuner)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<-2 then return false end
 	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
 	local lv=c:GetLevel()
 	if tuner then
 		local tlv=tuner:GetLevel()
 		if lv-tlv<=0 then return false end
 		local f1=tuner.tuner_filter
-		return g1:IsExists(c97489701.synfilter2,1,tuner,lv-tlv,g2,f1,tuner)
+		if not pe then
+			return g1:IsExists(c97489701.synfilter2,1,tuner,lv-tlv,g2,f1,tuner)
+		else
+			return c97489701.synfilter2(pe:GetOwner(),lv-tlv,g2,f1,tuner)
+		end
 	end
-	return g1:IsExists(c97489701.synfilter1,1,nil,lv,g1,g2)
+	if not pe then
+		return g1:IsExists(c97489701.synfilter1,1,nil,lv,g1,g2)
+	else
+		return c97489701.synfilter1(pe:GetOwner(),lv,g1,g2)
+	end
 end
 function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
 	local g=Group.CreateGroup()
 	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
 	local lv=c:GetLevel()
 	if tuner then
 		g:AddCard(tuner)
 		local lv1=tuner:GetLevel()
 		local f1=tuner.tuner_filter
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t2=g1:FilterSelect(tp,c97489701.synfilter2,1,1,tuner,lv-lv1,g2,f1,tuner)
-		local tuner2=t2:GetFirst()
+		local tuner2=nil
+		if not pe then
+			local t2=g1:FilterSelect(tp,c97489701.synfilter2,1,1,tuner,lv-lv1,g2,f1,tuner)
+			tuner2=t2:GetFirst()
+		else
+			tuner2=pe:GetOwner()
+			Group.FromCards(tuner2):Select(tp,1,1,nil)
+		end
 		g:AddCard(tuner2)
 		local lv2=tuner2:GetLevel()
 		local f2=tuner2.tuner_filter
@@ -110,8 +126,14 @@ function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
 		g:Merge(m3)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t1=g1:FilterSelect(tp,c97489701.synfilter1,1,1,nil,lv,g1,g2)
-		local tuner1=t1:GetFirst()
+		local tuner1=nil
+		if not pe then
+			local t1=g1:FilterSelect(tp,c97489701.synfilter1,1,1,nil,lv,g1,g2)
+			tuner1=t1:GetFirst()
+		else
+			tuner1=pe:GetOwner()
+			Group.FromCards(tuner1):Select(tp,1,1,nil)
+		end
 		g:AddCard(tuner1)
 		local lv1=tuner1:GetLevel()
 		local f1=tuner1.tuner_filter

@@ -10,15 +10,15 @@ function c51960178.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,51960178)
 	e1:SetCost(c51960178.cost)
 	e1:SetTarget(c51960178.target)
 	e1:SetOperation(c51960178.operation)
 	c:RegisterEffect(e1)
 end
 function c51960178.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,51960178)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,51960178,RESET_PHASE+PHASE_END,0,1)
 end
 function c51960178.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

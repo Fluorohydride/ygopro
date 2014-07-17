@@ -5,8 +5,9 @@ function c58471134.initial_effect(c)
 	e1:SetDescription(aux.Stringid(58471134,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCountLimit(1,58471134)
 	e1:SetCost(c58471134.thcost)
 	e1:SetTarget(c58471134.thtg)
 	e1:SetOperation(c58471134.thop)
@@ -19,10 +20,8 @@ function c58471134.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and c:IsDiscardable() and c:IsAbleToGraveAsCost()
 end
 function c58471134.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,58471134)==0
-		and Duel.IsExistingMatchingCard(c58471134.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c58471134.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,c58471134.cfilter,1,1,REASON_COST+REASON_DISCARD)
-	Duel.RegisterFlagEffect(tp,58471134,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c58471134.filter(c)
 	return c:GetLevel()==3 and c:IsAttribute(ATTRIBUTE_WATER) and c:IsAbleToHand()

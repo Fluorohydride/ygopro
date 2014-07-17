@@ -18,6 +18,7 @@ function c62070231.initial_effect(c)
 	e1:SetOperation(c62070231.operation)
 	c:RegisterEffect(e1)
 end
+c62070231.xyz_number=94
 function c62070231.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end

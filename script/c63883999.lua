@@ -21,15 +21,10 @@ function c63883999.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1)
-	e3:SetCost(c63883999.cost)
+	e3:SetCountLimit(1,63883999)
 	e3:SetTarget(c63883999.target)
 	e3:SetOperation(c63883999.operation)
 	c:RegisterEffect(e3)
-end
-function c63883999.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,63883999)==0 end
-	Duel.RegisterFlagEffect(tp,63883999,RESET_PHASE+PHASE_END,0,1)
 end
 function c63883999.filter(c,e,tp)
 	local lv=c:GetLevel()
@@ -49,7 +44,7 @@ function c63883999.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and Duel.IsExistingTarget(c63883999.filter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g=Duel.SelectTarget(tp,c63883999.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
+	Duel.SelectTarget(tp,c63883999.filter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE+LOCATION_DECK)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_MZONE)
 end

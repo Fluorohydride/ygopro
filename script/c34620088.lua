@@ -13,9 +13,8 @@ function c34620088.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCode(EVENT_BATTLE_DAMAGE)
-	e2:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
+	e2:SetCountLimit(1,34620088)
 	e2:SetCondition(c34620088.spcon)
-	e2:SetCost(c34620088.spcost)
 	e2:SetTarget(c34620088.sptg)
 	e2:SetOperation(c34620088.spop)
 	c:RegisterEffect(e2)
@@ -32,10 +31,6 @@ function c34620088.initial_effect(c)
 end
 function c34620088.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and eg:GetFirst():IsControler(1-tp) and Duel.GetAttackTarget()==nil
-end
-function c34620088.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,34620088)==0 end
-	Duel.RegisterFlagEffect(tp,34620088,RESET_PHASE+PHASE_END,0,1)
 end
 function c34620088.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

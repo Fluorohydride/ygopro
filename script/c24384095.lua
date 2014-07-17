@@ -5,20 +5,16 @@ function c24384095.initial_effect(c)
 	e1:SetDescription(aux.Stringid(24384095,0))
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY+EFFECT_FLAG_CHAIN_UNIQUE)
+	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,24384095)
 	e1:SetCondition(c24384095.thcon)
-	e1:SetCost(c24384095.thcost)
 	e1:SetTarget(c24384095.thtg)
 	e1:SetOperation(c24384095.thop)
 	c:RegisterEffect(e1)
 end
 function c24384095.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsReason(REASON_RELEASE)
-end
-function c24384095.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,24384095)==0 end
-	Duel.RegisterFlagEffect(tp,24384095,RESET_PHASE+PHASE_END,0,1)
 end
 function c24384095.filter(c)
 	return c:IsLevelBelow(4) and c:IsAttribute(ATTRIBUTE_WIND) and c:GetCode()~=24384095

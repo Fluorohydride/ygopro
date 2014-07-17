@@ -11,6 +11,7 @@ function c62265044.initial_effect(c)
 	e2:SetDescription(aux.Stringid(62265044,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCost(c62265044.cost)
 	e2:SetTarget(c62265044.target1)
 	e2:SetOperation(c62265044.operation1)
@@ -20,23 +21,22 @@ function c62265044.initial_effect(c)
 	e3:SetDescription(aux.Stringid(62265044,2))
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_SZONE)
+	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e3:SetCost(c62265044.cost)
 	e3:SetTarget(c62265044.target2)
 	e3:SetOperation(c62265044.operation2)
 	c:RegisterEffect(e3)
 end
 function c62265044.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(62265044)==0
-		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
-	e:GetHandler():RegisterFlagEffect(62265044,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c62265044.filter1(c)
-	return c:IsLevelBelow(4) and c:IsSetCard(0x29) and c:IsAbleToHand() 
+	return c:IsLevelBelow(4) and c:IsSetCard(0x29) and c:IsAbleToHand()
 end
 function c62265044.filter2(c)
-	return c:IsRace(RACE_DRAGON) and c:IsAbleToGrave() 
+	return c:IsRace(RACE_DRAGON) and c:IsAbleToGrave()
 end
 function c62265044.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c62265044.filter1,tp,LOCATION_DECK,0,1,nil) end

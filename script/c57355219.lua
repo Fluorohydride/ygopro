@@ -36,11 +36,11 @@ function c57355219.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c57355219.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 end
 function c57355219.activate1(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateSummon(eg:GetFirst())
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 	local tc=e:GetLabelObject()
 	local e1=Effect.CreateEffect(e:GetHandler())

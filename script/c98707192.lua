@@ -23,6 +23,7 @@ function c98707192.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetRange(LOCATION_HAND)
 	e3:SetCode(EVENT_DAMAGE)
+	e3:SetCountLimit(1,98707192)
 	e3:SetCondition(c98707192.condition)
 	e3:SetCost(c98707192.cost)
 	e3:SetTarget(c98707192.target)
@@ -51,9 +52,8 @@ function c98707192.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and bit.band(r,REASON_BATTLE+REASON_EFFECT)~=0
 end
 function c98707192.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,98707192)==0 and e:GetHandler():IsDiscardable() end
+	if chk==0 then return e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
-	Duel.RegisterFlagEffect(tp,98707192,RESET_PHASE+PHASE_END,0,1)
 end
 function c98707192.filter(c,e,tp)
 	return c:IsSetCard(0x8d) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)

@@ -25,17 +25,12 @@ function c48934760.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(48934760,0))
 	local tc=Duel.SelectMatchingCard(tp,c48934760.filter,tp,LOCATION_DECK,0,1,1,nil,tp):GetFirst()
 	if tc then
-		if Duel.GetFieldCard(tp,LOCATION_SZONE,5)~=nil then
-			Duel.Destroy(Duel.GetFieldCard(tp,LOCATION_SZONE,5),REASON_RULE)
+		local fc=Duel.GetFieldCard(tp,LOCATION_SZONE,5)
+		if fc then
+			Duel.SendtoGrave(fc,REASON_RULE)
 			Duel.BreakEffect()
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		elseif Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)~=nil
-			and Duel.GetFieldCard(1-tp,LOCATION_SZONE,5):IsFaceup() then
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-			Duel.Destroy(Duel.GetFieldCard(1-tp,LOCATION_SZONE,5),REASON_RULE)
-		else
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
+		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		local te=tc:GetActivateEffect()
 		local tep=tc:GetControler()
 		local cost=te:GetCost()

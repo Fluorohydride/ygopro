@@ -6,8 +6,8 @@ function c40607210.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetCountLimit(1,40607210)
 	e1:SetCondition(c40607210.condition)
 	e1:SetCost(c40607210.cost)
 	e1:SetTarget(c40607210.target)
@@ -33,9 +33,8 @@ function c40607210.condition(e,tp,eg,ep,ev,re,r,rp)
 		and (re:GetCode()~=EFFECT_SPSUMMON_PROC or not rc:IsStatus(STATUS_REVIVE_LIMIT))
 end
 function c40607210.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,40607210)==0 and Duel.CheckLPCost(tp,2000) end
+	if chk==0 then return Duel.CheckLPCost(tp,2000) end
 	Duel.PayLPCost(tp,2000)
-	Duel.RegisterFlagEffect(tp,40607210,RESET_PHASE+PHASE_END,0,1)
 end
 function c40607210.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

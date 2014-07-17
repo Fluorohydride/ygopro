@@ -23,8 +23,8 @@ function c42216237.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetRange(LOCATION_REMOVED)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
+	e3:SetCountLimit(1,42216237)
 	e3:SetCondition(c42216237.spcon)
-	e3:SetCost(c42216237.spcost)
 	e3:SetTarget(c42216237.sptg)
 	e3:SetOperation(c42216237.spop)
 	e3:SetLabelObject(e2)
@@ -41,10 +41,6 @@ function c42216237.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return e:GetLabelObject():GetLabel()~=Duel.GetTurnCount() and c:GetFlagEffect(42216237)>0
 end
-function c42216237.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,42216237)==0 end
-	Duel.RegisterFlagEffect(tp,42216237,RESET_PHASE+PHASE_END,0,1)
-end
 function c42216237.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local c=e:GetHandler()
@@ -54,6 +50,6 @@ end
 function c42216237.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,1,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

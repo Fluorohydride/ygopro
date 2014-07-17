@@ -6,6 +6,7 @@ function c20822520.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,20822520+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c20822520.condition)
 	e1:SetCost(c20822520.cost)
 	e1:SetTarget(c20822520.target)
@@ -32,9 +33,8 @@ function c20822520.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c20822520.cfilter,tp,LOCATION_GRAVE,0,5,nil)
 end
 function c20822520.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,20822520)==0 and Duel.GetFlagEffect(tp,20822521)==0 end
+	if chk==0 then return Duel.GetFlagEffect(tp,20822521)==0 end
 	--oath effects
-	Duel.RegisterFlagEffect(tp,20822520,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

@@ -15,7 +15,7 @@ function c51282878.initial_effect(c)
 end
 function c51282878.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,51282878)==0 end
-	Duel.RegisterFlagEffect(tp,51282878,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	Duel.RegisterFlagEffect(tp,51282878,RESET_PHASE+PHASE_END,0,1)
 end
 function c51282878.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1)

@@ -7,6 +7,7 @@ function c17243896.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(c17243896.condition)
 	e1:SetTarget(c17243896.target)
 	e1:SetOperation(c17243896.operation)
@@ -18,15 +19,13 @@ end
 function c17243896.filter(c,e,tp)
 	return c:IsPosition(POS_FACEUP_ATTACK) and c:GetSummonPlayer()==1-tp and (not e or c:IsRelateToEffect(e))
 end
-function c17243896.condition(e,tp,eg,ep,ev,re,r,rp,chk)
+function c17243896.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPosition(POS_FACEUP_DEFENCE)
 end
 function c17243896.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(17243896)==0
-		and eg:IsExists(c17243896.filter,1,nil,nil,tp) end
+	if chk==0 then return eg:IsExists(c17243896.filter,1,nil,nil,tp) end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,eg,eg:GetCount(),0,0)
-	e:GetHandler():RegisterFlagEffect(17243896,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c17243896.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=eg:Filter(c17243896.filter,nil,e,tp)

@@ -6,8 +6,8 @@ function c92821268.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetCountLimit(1,92821268)
 	e1:SetCost(c92821268.cost)
 	e1:SetTarget(c92821268.target)
 	e1:SetOperation(c92821268.operation)
@@ -18,10 +18,9 @@ function c92821268.cfilter(c,tp)
 		and c:GetPreviousControler()==tp and c:IsAbleToRemoveAsCost()
 end
 function c92821268.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,92821268)==0 and eg:IsExists(c92821268.cfilter,1,nil,tp) end
+	if chk==0 then return eg:IsExists(c92821268.cfilter,1,nil,tp) end
 	local g=eg:Filter(c92821268.cfilter,nil,tp)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,92821268,RESET_PHASE+PHASE_END,0,1)
 end
 function c92821268.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

@@ -23,10 +23,11 @@ function c74845897.op(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c74845897.filter,tp,LOCATION_GRAVE,0,ft,ft,nil,e,tp)
 	if g:GetCount()>0 then
+		local fid=e:GetHandler():GetFieldID()
 		local tc=g:GetFirst()
 		while tc do
 			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(74845897,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+			tc:RegisterFlagEffect(74845897,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
 			tc=g:GetNext()
 		end
 		Duel.SpecialSummonComplete()
@@ -34,19 +35,21 @@ function c74845897.op(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
+		e1:SetLabel(fid)
 		e1:SetLabelObject(g)
 		e1:SetOperation(c74845897.rmop)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-function c74845897.rmfilter(c)
-	return c:GetFlagEffect(74845897)>0
+function c74845897.rmfilter(c,fid)
+	return c:GetFlagEffectLabel(74845897)==fid
 end
 function c74845897.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local tg=g:Filter(c74845897.rmfilter,nil)
+	local tg=g:Filter(c74845897.rmfilter,nil,e:GetLabel())
 	g:DeleteGroup()
 	Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
 end
