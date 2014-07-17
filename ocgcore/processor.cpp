@@ -1971,7 +1971,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return TRUE;
 	}
 	case 20: {
-		int32 index = (int32)core.select_effects[returns.ivalue[0]];
+		int32 index = (int32)(uintptr_t)core.select_effects[returns.ivalue[0]];
 		auto clit = core.new_ochain_s.begin();
 		std::advance(clit, index);
 		effect* peffect = clit->triggering_effect;
