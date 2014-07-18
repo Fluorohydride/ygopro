@@ -77,7 +77,6 @@ function c56350972.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 	end
-	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c56350972.operation(e,tp,eg,ep,ev,re,r,rp)
 	local sel=e:GetLabel()

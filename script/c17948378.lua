@@ -37,7 +37,6 @@ function c17948378.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(2)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,2)
-	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c17948378.drop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)

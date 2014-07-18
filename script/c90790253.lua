@@ -19,7 +19,6 @@ end
 function c90790253.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,e:GetHandler(),1,0,0)
-	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c90790253.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
