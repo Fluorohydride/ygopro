@@ -398,8 +398,8 @@ void Game::DrawMisc() {
 	}
 	pcard = dField.szone[0][6];
 	if(pcard) {
-		adFont->draw(pcard->lscstring, recti(386, 398, 398, 418), 0xff000000, true, false, 0);
-		adFont->draw(pcard->lscstring, recti(387, 399, 399, 419), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(466, 398, 398, 418), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(467, 399, 399, 419), 0xffffffff, true, false, 0);
 	}
 	pcard = dField.szone[0][7];
 	if(pcard) {
@@ -413,8 +413,8 @@ void Game::DrawMisc() {
 	}
 	pcard = dField.szone[1][7];
 	if(pcard) {
-		adFont->draw(pcard->rscstring, recti(428, 245, 460, 265), 0xff000000, true, false, 0);
-		adFont->draw(pcard->rscstring, recti(429, 246, 461, 266), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(498, 245, 460, 265), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(499, 246, 461, 266), 0xffffffff, true, false, 0);
 	}
 	if(dField.extra[0].size()) {
 		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(330, 562, 381, 552), 0xff000000, true, false, 0);
