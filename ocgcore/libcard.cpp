@@ -101,6 +101,16 @@ int32 scriptlib::card_get_origin_level(lua_State *L) {
 		lua_pushinteger(L, pcard->data.level);
 	return 1;
 }
+int32 scriptlib::card_get_origin_rank(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(!(pcard->data.type & TYPE_XYZ))
+		lua_pushinteger(L, 0);
+	else
+		lua_pushinteger(L, pcard->data.level);
+	return 1;
+}
 int32 scriptlib::card_is_xyz_level(lua_State *L) {
 	check_param_count(L, 3);
 	check_param(L, PARAM_TYPE_CARD, 1);

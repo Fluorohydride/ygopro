@@ -1837,9 +1837,9 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		uint8 tp = clit->triggering_player;
 		core.select_effects.clear();
 		core.select_options.clear();
-		core.select_effects.push_back((effect*)0);
+		uintptr_t index = 0;
+		core.select_effects.push_back((effect*)index);
 		core.select_options.push_back(peffect->description);
-		int32 index = 0;
 		while(++clit != core.new_ochain_s.end()) {
 			++index;
 			peffect = clit->triggering_effect;
@@ -1971,7 +1971,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return TRUE;
 	}
 	case 20: {
-		int32 index = (int32)core.select_effects[returns.ivalue[0]];
+		uintptr_t index = (uintptr_t)core.select_effects[returns.ivalue[0]];
 		auto clit = core.new_ochain_s.begin();
 		std::advance(clit, index);
 		effect* peffect = clit->triggering_effect;

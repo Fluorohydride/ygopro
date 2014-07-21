@@ -46,7 +46,7 @@ function c82962242.cfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x8e) and c:IsControler(tp)
 end
 function c82962242.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsContains(e:GetHandler()) or eg:IsExists(c82962242.cfilter,1,nil,tp)
+	return not eg:IsContains(e:GetHandler()) and eg:IsExists(c82962242.cfilter,1,nil,tp)
 end
 function c82962242.eqfilter(c,atk)
 	return c:IsFaceup() and c:GetAttack()>atk and c:IsAbleToChangeControler()

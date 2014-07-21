@@ -28,6 +28,7 @@ public:
 	static int32 card_get_synchro_level(lua_State *L);
 	static int32 card_get_ritual_level(lua_State *L);
 	static int32 card_get_origin_level(lua_State *L);
+	static int32 card_get_origin_rank(lua_State *L);
 	static int32 card_is_xyz_level(lua_State *L);
 	static int32 card_get_lscale(lua_State *L);
 	static int32 card_get_rscale(lua_State *L);
