@@ -56,7 +56,7 @@ function c269012.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c269012.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local damp=eg:GetFirst():GetPreviousControler()
+	local damp=eg:GetFirst():GetControler()
 	Duel.SetTargetPlayer(damp)
 	Duel.SetTargetParam(1000)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,damp,1000)
