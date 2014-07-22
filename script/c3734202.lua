@@ -35,6 +35,7 @@ function c3734202.initial_effect(c)
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetCode(EVENT_TO_GRAVE)
+	e4:SetCondition(c3734202.thcon)
 	e4:SetTarget(c3734202.thtg)
 	e4:SetOperation(c3734202.thop)
 	c:RegisterEffect(e4)
@@ -90,6 +91,9 @@ function c3734202.spop2(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
+end
+function c3734202.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c3734202.thfilter(c)
 	return c:IsSetCard(0x2a) and not c:IsCode(3734202) and c:IsAbleToHand()

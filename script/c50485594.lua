@@ -140,7 +140,7 @@ function c50485594.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c50485594.desfilter(c,fid)
-	return c:GetFlagEffect(50485594)==fid
+	return c:GetFlagEffectLabel(50485594)==fid
 end
 function c50485594.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
