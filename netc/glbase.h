@@ -13,33 +13,146 @@
 
 namespace glbase {
     
+    template<typename T>
+	struct vector2 {
+		T x;
+		T y;
+        
+		inline void operator += (const vector2<T>& op) {
+			x += op.x;
+			y += op.y;
+		}
+        
+		inline void operator -= (const vector2<T>& op) {
+			x -= op.x;
+			y -= op.y;
+		}
+	};
+    
+	template<typename T>
+	struct vector3 {
+		T x;
+		T y;
+		T z;
+        
+		inline void operator += (const vector3<T>& op) {
+			x += op.x;
+			y += op.y;
+			z += op.z;
+		}
+        
+		inline void operator -= (const vector3<T>& op) {
+			x -= op.x;
+			y -= op.y;
+			z -= op.z;
+		}
+        
+        inline void operator = (const vector2<T>& op) {
+            x = op.x;
+            y = op.y;
+            z = 0.0f;
+        }
+        
+	};
+    
+    template<typename T>
+	struct vector4 {
+		T x;
+		T y;
+		T z;
+        T w;
+	};
+    
+    template<typename T>
+    inline vector2<T> operator + (const vector2<T>& a, const vector2<T>& b) {
+        return vector2<T>{a.x + b.x, a.y + b.y};
+    }
+    
+    template<typename T>
+    inline vector2<T> operator - (const vector2<T>& a, const vector2<T>& b) {
+        return vector2<T>{a.x - b.x, a.y - b.y};
+    }
+    
+    template<typename T, typename S>
+    inline vector2<T> operator * (const vector2<T>& a, S scalar) {
+        return vector2<T>{a.x * scalar, a.y * scalar};
+    }
+    
+    template<typename T>
+    inline T operator * (const vector2<T>& a, const vector2<T>& b) {
+        return a.x * b.x + a.y * b.y;
+    }
+    
+    template<typename T>
+    inline vector3<T> operator ^ (const vector2<T>& a, const vector2<T>& b) {
+        return vector3<T>{0, 0, a.x * b.y - a.y * b.x};
+    }
+    
+    template<typename T>
+    inline vector3<T> operator + (const vector3<T>& a, const vector3<T>& b) {
+        return vector3<T>{a.x + b.x, a.y + b.y, a.z + b.z};
+    }
+    
+    template<typename T>
+    inline vector3<T> operator - (const vector3<T>& a, const vector3<T>& b) {
+        return vector3<T>{a.x - b.x, a.y - b.y, a.z - b.z};
+    }
+    
+    template<typename T>
+    inline vector3<T> operator * (const vector3<T>& a, T scalar) {
+        return vector3<T>{a.x * scalar, a.y * scalar, a.z * scalar};
+    }
+    
+    template<typename T>
+    inline T operator * (const vector3<T>& a, const vector3<T>& b) {
+        return a.x * b.x + a.y * b.y + a.z * b.z;
+    }
+    
+    template<typename T>
+    inline vector3<T> operator ^ (const vector3<T>& a, const vector3<T>& b) {
+        return vector3<T>{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
+    }
+    
+    template<typename T>
+    struct rect {
+        T left;
+        T top;
+        T width;
+        T height;
+    };
+    
+    template<typename T>
+    struct matrix4 {
+        T v[16];
+    };
+    
     struct VertexVT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        float texcoord[2] = {0.0f, 0.0f};
+        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
+        vector2<float> texcoord = {0.0f, 0.0f};
         static const int tex_offset = 12;
     };
     
     struct VertexVCT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
+        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
-        float texcoord[2] = {0.0f, 0.0f};
+        vector2<float> texcoord = {0.0f, 0.0f};
         static const int color_offset = 12;
         static const int tex_offset = 16;
     };
     
     struct VertexVNT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        float normal[4] = {1.0f, 1.0f, 1.0f, 1.0f};
-        float texcoord[2] = {0.0f, 0.0f};
+        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
+        vector4<float> normal = {1.0f, 1.0f, 1.0f, 1.0f};
+        vector2<float> texcoord = {0.0f, 0.0f};
         static const int normal_offset = 12;
         static const int tex_offset = 28;
     };
     
     struct VertexVNCT {
-        float vertex[3] = {0.0f, 0.0f, 0.0f};
-        float normal[4] = {0.0f, 0.0f, 0.0f, 0.0f};
+        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
+        vector4<float> normal = {0.0f, 0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
-        float texcoord[2] = {0.0f, 0.0f};
+        vector2<float> texcoord = {0.0f, 0.0f};
         static const int normal_offset = 12;
         static const int color_offset = 28;
         static const int tex_offset = 32;

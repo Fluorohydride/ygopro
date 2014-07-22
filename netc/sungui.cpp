@@ -26,12 +26,20 @@ namespace sgui
         auto ptr = parent.lock();
         v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res)
-            size_abs = size + v2i(ssize.x * size_prop.x, ssize.y * size_prop.y);
+            size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
         if(rep) {
-            position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
+            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
             if(ptr != nullptr)
                 position_abs += ptr->GetClientPosition();
         }
+    }
+    
+    void SGWidget::Destroy() {
+        auto p = parent.lock();
+        if(p != nullptr)
+            p->RemoveChild(shared_from_this());
+        else
+            guiRoot.RemoveChild(shared_from_this());
     }
     
     void SGWidget::SetPosition(v2i pos, v2f prop) {
@@ -164,7 +172,7 @@ namespace sgui
         font = ft;
         font_size = sz;
         auto tsz = ft->getTexture(sz).getSize();
-        tex_size = v2i(tsz.x, tsz.y);
+        tex_size = v2i{(int)tsz.x, (int)tsz.y};
         text_update = true;
         EvaluateSize();
     }
@@ -289,23 +297,23 @@ namespace sgui
             }
             guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
             cur_char.color = color;
-            cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-            cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+            cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+            cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
             charvtx.push_back(cur_char);
             guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
             cur_char.color = color;
-            cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-            cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+            cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+            cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
             charvtx.push_back(cur_char);
             guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
             cur_char.color = color;
-            cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-            cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+            cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+            cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
             charvtx.push_back(cur_char);
             guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
             cur_char.color = color;
-            cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-            cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+            cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+            cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
             charvtx.push_back(cur_char);
             advx += gl.advance + spacing_x;
             
@@ -354,7 +362,7 @@ namespace sgui
             glDeleteBuffers(2, imgvbo);
     }
     
-    void SGSpriteBase::SetImage(glbase::Texture* img, sf::IntRect varea) {
+    void SGSpriteBase::SetImage(glbase::Texture* img, recti varea) {
         if(img) {
             if(!img_texture)
                 glGenBuffers(2, imgvbo);
@@ -374,7 +382,7 @@ namespace sgui
         verts.push_back(v2i{varea.left + varea.width, varea.top});
     }
     
-    void SGSpriteBase::AddTexRect(sf::IntRect tarea) {
+    void SGSpriteBase::AddTexRect(recti tarea) {
         if(!img_texture)
             return;
         img_update = true;
@@ -425,8 +433,8 @@ namespace sgui
         for(int ti = 0; ti < texcoords.size(); ++ti) {
             for(int i = 0; i < verts.size(); ++i) {
                 guiRoot.ConvertXY(verts[i].x + pos.x, verts[i].y + pos.y, cur.vertex);
-                cur.texcoord[0] = (float)texcoords[ti][i].x / img_texture->GetWidth();
-                cur.texcoord[1] = (float)texcoords[ti][i].y / img_texture->GetHeight();
+                cur.texcoord.x = (float)texcoords[ti][i].x / img_texture->GetWidth();
+                cur.texcoord.y = (float)texcoords[ti][i].y / img_texture->GetHeight();
                 cur.color = 0xffffffff;
                 vert.push_back(cur);
             }
@@ -480,9 +488,9 @@ namespace sgui
         auto ptr = parent.lock();
         v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res)
-            size_abs = size + v2i(ssize.x * size_prop.x, ssize.y * size_prop.y);
+            size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
         if(rep) {
-            position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
+            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
             if(ptr != nullptr)
                 position_abs += ptr->GetClientPosition();
         }
@@ -612,6 +620,15 @@ namespace sgui
         return false;
     }
     
+    bool SGWidgetContainer::EventLostFocus() {
+        bool ret = false;
+        if(!focus_widget.expired())
+            ret = focus_widget.lock()->EventLostFocus() || ret;
+        focus_widget.reset();
+            ret = eventLostFocus.TriggerEvent(*this) || ret;
+        return ret;
+    }
+    
     bool SGWidgetWrapper::EventMouseMove(sf::Event::MouseMoveEvent evt) {
         SGWidgetContainer::EventMouseMove(evt);
         return true;
@@ -657,6 +674,14 @@ namespace sgui
         return true;
     }
     
+    bool SGWidgetWrapper::EventLostFocus() {
+        if(!focus_widget.expired())
+            focus_widget.lock()->EventLostFocus();
+        focus_widget.reset();
+        eventLostFocus.TriggerEvent(*this);
+        return true;
+    }
+    
     SGConfig SGGUIRoot::basic_config;
     
     SGGUIRoot::~SGGUIRoot() {
@@ -673,7 +698,7 @@ namespace sgui
         return scene_size;
     }
     
-    void SGGUIRoot::BeginScissor(sf::IntRect rt) {
+    void SGGUIRoot::BeginScissor(recti rt) {
         if(scissor_stack.size() == 0)
             glEnable(GL_SCISSOR_TEST);
         else {
@@ -700,7 +725,7 @@ namespace sgui
         if(scissor_stack.size() == 0)
             glDisable(GL_SCISSOR_TEST);
         else {
-            sf::IntRect rt = scissor_stack.back();
+            recti rt = scissor_stack.back();
             glScissor(rt.left, scene_size.y - rt.top - rt.height, rt.width, rt.height);
         }
             
@@ -760,6 +785,7 @@ namespace sgui
     
     void SGGUIRoot::LoadConfigs() {
         AddConfig("basic", SGGUIRoot::basic_config);
+        AddConfig("panel", SGPanel::panel_config);
         AddConfig("window", SGWindow::window_config);
         AddConfig("sprite", SGSprite::sprite_config);
         AddConfig("button", SGButton::button_config);
@@ -811,7 +837,7 @@ namespace sgui
                         strv.ToLong(&v, 0);
                         strw.ToLong(&w, 0);
                         strh.ToLong(&h, 0);
-                        iter->second->tex_config[name.ToStdString()] = sf::Rect<int>{(int)u, (int)v, (int)w, (int)h};
+                        iter->second->tex_config[name.ToStdString()] = recti{(int)u, (int)v, (int)w, (int)h};
                     } else {
                         wxString name = child->GetAttribute("name");
                         auto& vec = iter->second->coord_config[name.ToStdString()];
@@ -904,6 +930,94 @@ namespace sgui
     
     SGGUIRoot& SGGUIRoot::GetSingleton() {
         return guiRoot;
+    }
+    
+    SGConfig SGPanel::panel_config;
+    
+    SGPanel::~SGPanel() {
+        glDeleteBuffers(2, vbo);
+    }
+    
+    void SGPanel::UpdateVertices() {
+        if(!vertices_dirty)
+            return;
+        vertices_dirty = false;
+        std::array<glbase::VertexVCT, 36> vert;
+        std::vector<unsigned short> index;
+        
+        int bw = panel_config.int_config["client_border"];
+        auto back = panel_config.tex_config["client_area"];
+        
+        guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
+                              recti{back.left, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
+                              recti{back.left + bw, back.top, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
+                              recti{back.left + back.width - bw, back.top, bw, bw});
+        guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, size_abs.y - bw * 2,
+                              recti{back.left, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, size_abs.y - bw * 2,
+                              recti{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, size_abs.y - bw * 2,
+                              recti{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+        guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
+                              recti{back.left, back.top + back.height - bw, bw, bw});
+        guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
+                              recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+        guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
+                              recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+        for(auto& vt : vert)
+            vt.color = color;
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 36, &vert[0]);
+    }
+    
+    void SGPanel::Draw() {
+        UpdateVertices();
+        guiRoot.BindGuiTexture();
+        glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
+        glDrawElements(GL_TRIANGLES, 54, GL_UNSIGNED_SHORT, 0);
+        guiRoot.BeginScissor(recti{position_abs.x, position_abs.y, size_abs.x, size_abs.y});
+        for(auto& iter : children)
+            if(iter->IsVisible())
+                iter->Draw();
+        guiRoot.EndScissor();
+    }
+    
+    std::shared_ptr<SGPanel> SGPanel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size) {
+        auto ptr = std::make_shared<SGPanel>();
+        ptr->parent = p;
+        ptr->position = pos;
+        ptr->size = size;
+        ptr->PostResize(true, true);
+        auto iter1 = panel_config.int_config.find("gui_color");
+        if(iter1 != panel_config.int_config.end())
+            ptr->color = iter1->second;
+        else
+            ptr->color = guiRoot.GetDefaultInt("gui_color");
+        glGenBuffers(2, ptr->vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo[0]);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 36, nullptr, GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
+        unsigned short index[54];
+        for(int i = 0; i < 9; ++i) {
+            index[i * 6] = i * 4;
+            index[i * 6 + 1] = i * 4 + 2;
+            index[i * 6 + 2] = i * 4 + 1;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
+        }
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
+        if(p != nullptr)
+            p->AddChild(ptr);
+        else
+            guiRoot.AddChild(ptr);
+        return ptr;
     }
     
     SGConfig SGWindow::window_config;
@@ -1023,14 +1137,6 @@ namespace sgui
         return false;
     }
     
-    void SGWindow::Destroy() {
-        auto p = parent.lock();
-        if(p == nullptr)
-            guiRoot.RemoveChild(shared_from_this());
-        else
-            p->RemoveChild(shared_from_this());
-    }
-    
     void SGWindow::SetTitle(const std::wstring& t) {
         ClearText();
         auto iter = window_config.int_config.find("font_color");
@@ -1101,7 +1207,7 @@ namespace sgui
             size_abs = v2i{std::max(text_width_cur, text_width), text_height};
         }
         if(rep) {
-            position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
+            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
             if(ptr != nullptr)
                 position_abs += ptr->GetPosition();
         }
@@ -1272,7 +1378,7 @@ namespace sgui
                 int index = ch - 0xe000;
                 int x = index % iconrc;
                 int y = index / iconrc;
-                sf::IntRect rct = iconoffset;
+                recti rct = iconoffset;
                 rct.left += x * iconoffset.width;
                 rct.top += y * iconoffset.height;
                 if(advx + iconoffset.width > max_width) {
@@ -1300,23 +1406,23 @@ namespace sgui
                 }
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
                 charvtx.push_back(cur_char);
                 advx += gl.advance + spacing_x;
                 
@@ -1460,23 +1566,23 @@ namespace sgui
         int bw = button_config.int_config["border"];
         auto back = tex_rect[state & 0xf];
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
-                              sf::IntRect{back.left, back.top, bw, bw});
+                              recti{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+                              recti{back.left + back.width - bw, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, size_abs.y - bw * 2,
-                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, size_abs.y - bw * 2,
-                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+                              recti{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, size_abs.y - bw * 2,
-                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+                              recti{back.left, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+                              recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         for(int i = 0; i < 36; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
@@ -1523,7 +1629,7 @@ namespace sgui
             return position_abs;
     }
     
-    void SGButton::SetTextureRect(sf::IntRect r1, sf::IntRect r2, sf::IntRect r3, int lw, int rw) {
+    void SGButton::SetTextureRect(recti r1, recti r2, recti r3, int lw, int rw) {
         tex_rect[0] = r1;
         tex_rect[1] = r2;
         tex_rect[2] = r3;
@@ -1669,7 +1775,7 @@ namespace sgui
             size_abs = v2i{rec.left + rec.width + rec.top + text_width_cur, std::max(text_height , rec.height)};
         }
         if(rep) {
-            position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
+            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
             if(ptr != nullptr)
                 position_abs += ptr->GetClientPosition();
         }
@@ -2253,23 +2359,23 @@ namespace sgui
         auto curx = cursor_pos >= text.length() ? text_width_cur : text_pos_array[cursor_pos].x;
         int ht = textedit_config.int_config["sel_height"];
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
-                              sf::IntRect{back.left, back.top, bw, bw});
+                              recti{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+                              recti{back.left + back.width - bw, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, size_abs.y - bw * 2,
-                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, size_abs.y - bw * 2,
-                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+                              recti{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, size_abs.y - bw * 2,
-                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+                              recti{back.left, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+                              recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[36], position_abs.x + curx + text_area.left - text_offset, position_abs.y + text_area.top, crect.width, ht, crect);
         for(int i = 0; i < 40; ++i)
             vert[i].color = color;
@@ -2302,7 +2408,7 @@ namespace sgui
         int th = size_abs.y - text_area.top - text_area.height;
         for(auto chd : children)
             chd->Draw();
-        guiRoot.BeginScissor(sf::IntRect{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
+        guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
         DrawSelectRegion();
         DrawText();
         guiRoot.EndScissor();
@@ -2682,23 +2788,23 @@ namespace sgui
         auto iconoffset = guiRoot.GetDefaultRect("iconoffset");
         auto iconrc = guiRoot.GetDefaultInt("iconcolumn");
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
-                              sf::IntRect{back.left, back.top, bw, bw});
+                              recti{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+                              recti{back.left + back.width - bw, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, size_abs.y - bw * 2,
-                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, size_abs.y - bw * 2,
-                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+                              recti{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, size_abs.y - bw * 2,
-                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+                              recti{back.left, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+                              recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         for(int i = 0; i < 36; ++i)
             vert[i].color = color;
         int begini = text_offset / line_spacing;
@@ -2717,7 +2823,7 @@ namespace sgui
             if(iconi) {
                 int x = (iconi - 1) % iconrc;
                 int y = (iconi - 1) / iconrc;
-                sf::IntRect rct = iconoffset;
+                recti rct = iconoffset;
                 rct.left += x * iconoffset.width;
                 rct.top += y * iconoffset.height;
                 guiRoot.SetRectVertex(&vert[36 + li * 8 + 4], position_abs.x + bw, position_abs.y + bw + i * line_spacing - text_offset,
@@ -2767,7 +2873,7 @@ namespace sgui
         int th = size_abs.y - text_area.top - text_area.height;
         for(auto chd : children)
             chd->Draw();
-        guiRoot.BeginScissor(sf::IntRect{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
+        guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
         glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
@@ -2810,23 +2916,23 @@ namespace sgui
                 auto& gl = font->getGlyph(ch, font_size, false);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height + advy, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
                 charvtx.push_back(cur_char);
                 advx += gl.advance + spacing_x;
                 
@@ -3123,23 +3229,23 @@ namespace sgui
         auto down = combobox_config.tex_config[show_item ? "down3" : is_hoving ? "down2" : "down1"];
         auto drop = combobox_config.tex_config["drop_area"];
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
-                              sf::IntRect{back.left, back.top, bw, bw});
+                              recti{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+                              recti{back.left + back.width - bw, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + bw, bw, ht - bw * 2,
-                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + bw, size_abs.x - bw * 2, ht - bw * 2,
-                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+                              recti{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + bw, bw, ht - bw * 2,
-                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + ht - bw, bw, bw,
-                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+                              recti{back.left, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + ht - bw, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + ht - bw, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+                              recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[36], position_abs.x + size_abs.x - drop.left, position_abs.y + drop.top, drop.width, drop.height, down);
         for(int i = 0; i < 40; ++i)
             vert[i].color = color;
@@ -3158,7 +3264,7 @@ namespace sgui
         glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_SHORT, 0);
         int tw = size_abs.x - text_area.left - text_area.width;
         int th = size_abs.y - text_area.top - text_area.height;
-        guiRoot.BeginScissor(sf::IntRect{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
+        guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
         DrawText();
         guiRoot.EndScissor();
         if(show_item)
@@ -3325,9 +3431,9 @@ namespace sgui
             auto ptr = std::static_pointer_cast<SGTabControl>(parent.lock());
             v2i ssize = ptr->GetClientSize();
             if(res)
-                size_abs = size + v2i(ssize.x * size_prop.x, ssize.y * size_prop.y);
+                size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
             if(rep) {
-                position_abs = position + v2i(ssize.x * position_prop.x, ssize.y * position_prop.y);
+                position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
                 position_abs += ptr->GetClientPosition();
             }
             if(res)
@@ -3380,28 +3486,29 @@ namespace sgui
         index.resize((9 + item_count * 3) * 6);
         
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y + ht, bw, bw,
-                              sf::IntRect{back.left, back.top, bw, bw});
+                              recti{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y + ht, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[8], position_abs.x + size_abs.x - bw, position_abs.y + ht, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top, bw, bw});
+                              recti{back.left + back.width - bw, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + ht + bw, bw, size_abs.y - ht - bw * 2,
-                              sf::IntRect{back.left, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[16], position_abs.x + bw, position_abs.y + ht + bw, size_abs.x - bw * 2, size_abs.y - ht - bw * 2,
-                              sf::IntRect{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
+                              recti{back.left + bw, back.top + bw, back.width - bw * 2, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[20], position_abs.x + size_abs.x - bw, position_abs.y + ht + bw, bw, size_abs.y - ht - bw * 2,
-                              sf::IntRect{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
+                              recti{back.left + back.width - bw, back.top + bw, bw, back.height - bw * 2});
         guiRoot.SetRectVertex(&vert[24], position_abs.x, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left, back.top + back.height - bw, bw, bw});
+                              recti{back.left, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[28], position_abs.x + bw, position_abs.y + size_abs.y - bw, size_abs.x - bw * 2, bw,
-                              sf::IntRect{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
+                              recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
-                              sf::IntRect{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
+                              recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         
         int tb = tab_config.int_config["tab_border"];
         auto t1 = tab_config.tex_config["tab_title1"];
         auto t2 = tab_config.tex_config["tab_title2"];
         auto t3 = tab_config.tex_config["tab_title3"];
+        int ew = tab_config.int_config["extra_width"];
         int ti = tab_ol;
         int startv = 36;
         bool act = false;
@@ -3415,24 +3522,24 @@ namespace sgui
                 continue;
             }
             auto& rct = (ptr == hover_tab.lock()) ? t2 : t3;
-            guiRoot.SetRectVertex(&vert[startv], position_abs.x + ti, position_abs.y, tb, tab_height,
-                                  sf::IntRect{rct.left, rct.top, tb, rct.height});
-            guiRoot.SetRectVertex(&vert[startv + 4], position_abs.x + ti + tb, position_abs.y, ptr->width - tb * 2, tab_height,
-                                  sf::IntRect{rct.left + tb, rct.top, rct.width - tb * 2, rct.height});
-            guiRoot.SetRectVertex(&vert[startv + 8], position_abs.x + ti + ptr->width - tb, position_abs.y, tb, tab_height,
-                                  sf::IntRect{rct.left + rct.width - tb, rct.top, tb, rct.height});
+            guiRoot.SetRectVertex(&vert[startv], position_abs.x + ti - ew, position_abs.y, tb, tab_height,
+                                  recti{rct.left, rct.top, tb, rct.height});
+            guiRoot.SetRectVertex(&vert[startv + 4], position_abs.x + ti - ew + tb, position_abs.y, ptr->width + ew * 2 - tb * 2, tab_height,
+                                  recti{rct.left + tb, rct.top, rct.width - tb * 2, rct.height});
+            guiRoot.SetRectVertex(&vert[startv + 8], position_abs.x + ti + ptr->width + ew - tb, position_abs.y, tb, tab_height,
+                                  recti{rct.left + rct.width - tb, rct.top, tb, rct.height});
             ti += ptr->width;
             startv += 12;
         }
         if(act) {
             auto ptr = std::static_pointer_cast<SGTabInner>(active_tab.lock());
             ti = actti;
-            guiRoot.SetRectVertex(&vert[startv], position_abs.x + ti, position_abs.y, tb, tab_height,
-                                  sf::IntRect{t1.left, t1.top, tb, t1.height});
-            guiRoot.SetRectVertex(&vert[startv + 4], position_abs.x + ti + tb, position_abs.y, ptr->width - tb * 2, tab_height,
-                                  sf::IntRect{t1.left + tb, t1.top, t1.width - tb * 2, t1.height});
-            guiRoot.SetRectVertex(&vert[startv + 8], position_abs.x + ti + ptr->width - tb, position_abs.y, tb, tab_height,
-                                  sf::IntRect{t1.left + t1.width - tb, t1.top, tb, t1.height});
+            guiRoot.SetRectVertex(&vert[startv], position_abs.x + ti - ew, position_abs.y, tb, tab_height,
+                                  recti{t1.left, t1.top, tb, t1.height});
+            guiRoot.SetRectVertex(&vert[startv + 4], position_abs.x + ti - ew + tb, position_abs.y, ptr->width + ew * 2 - tb * 2, tab_height,
+                                  recti{t1.left + tb, t1.top, t1.width - tb * 2, t1.height});
+            guiRoot.SetRectVertex(&vert[startv + 8], position_abs.x + ti + ptr->width + ew - tb, position_abs.y, tb, tab_height,
+                                  recti{t1.left + t1.width - tb, t1.top, tb, t1.height});
         }
         
         for(auto& vt : vert)
@@ -3474,11 +3581,11 @@ namespace sgui
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
-        guiRoot.BeginScissor(sf::IntRect{position_abs.x, position_abs.y, size_abs.x, size_abs.y});
+        guiRoot.BeginScissor(recti{position_abs.x, position_abs.y, size_abs.x, size_abs.y});
         glDrawElements(GL_TRIANGLES, (9 + item_count * 3) * 6, GL_UNSIGNED_SHORT, 0);
         DrawText();
         guiRoot.EndScissor();
-        guiRoot.BeginScissor(sf::IntRect{position_abs.x, position_abs.y + tab_height, size_abs.x, size_abs.y - tab_height});
+        guiRoot.BeginScissor(recti{position_abs.x, position_abs.y + tab_height, size_abs.x, size_abs.y - tab_height});
         if(!active_tab.expired())
             active_tab.lock()->Draw();
         guiRoot.EndScissor();
@@ -3573,23 +3680,23 @@ namespace sgui
                     break;
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-                cur_char.texcoord[1] = (float)gl.textureRect.top / tex_size.y;
+                cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord.y = (float)gl.textureRect.top / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + gl.bounds.height, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)gl.textureRect.left / tex_size.x;
-                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
+                cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
                 charvtx.push_back(cur_char);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx + gl.bounds.width, text_pos.y + gl.bounds.top + gl.bounds.height, cur_char.vertex);
                 cur_char.color = color;
-                cur_char.texcoord[0] = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
-                cur_char.texcoord[1] = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
+                cur_char.texcoord.x = (float)(gl.textureRect.left + gl.textureRect.width) / tex_size.x;
+                cur_char.texcoord.y = (float)(gl.textureRect.top + gl.textureRect.height) / tex_size.y;
                 charvtx.push_back(cur_char);
                 advx += gl.advance + spacing_x;
                 tw += gl.advance + spacing_x;
@@ -3745,6 +3852,8 @@ namespace sgui
                     vertices_dirty = true;
                 }
                 if(active_tab.lock() != ptr) {
+                    if(!active_tab.expired())
+                        active_tab.lock()->EventLostFocus();
                     active_tab = ptr;
                     size_dirty = true;
                     vertices_dirty = true;

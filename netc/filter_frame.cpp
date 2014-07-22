@@ -1,5 +1,4 @@
 #include "filter_frame.h"
-#include "game_canvas.h"
 #include "card_data.h"
 #include "image_mgr.h"
 #include "wx/tokenzr.h"

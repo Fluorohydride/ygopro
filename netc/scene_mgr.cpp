@@ -1,107 +1,35 @@
 #include <array>
+#include <chrono>
 
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
 #include <wx/utils.h>
 
 #include "glbase.h"
-#include "game_scene.h"
+#include "sungui.h"
+#include "scene_mgr.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
+#include "build_scene.h"
 
 namespace ygopro
 {
 
-    GameScene gameScene;
+    SceneMgr sceneMgr;
 	Random globalRandom;
 	CommonConfig commonCfg;
     CommonConfig stringCfg;
     
-    void GameScene::Init() {
-        glGenBuffers(1, &index_buffer);
-        glGenBuffers(1, &deck_buffer);
-        glGenBuffers(1, &back_buffer);
-        glGenBuffers(1, &misc_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
-        std::array<unsigned short, 256 * 6> index;
-        for(int i = 0; i < 256; ++i) {
-            index[i * 6] = i * 4;
-            index[i * 6 + 1] = i * 4 + 2;
-            index[i * 6 + 2] = i * 4 + 1;
-            index[i * 6 + 3] = i * 4 + 1;
-            index[i * 6 + 4] = i * 4 + 2;
-            index[i * 6 + 5] = i * 4 + 3;
-        }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 6, &index[0], GL_STATIC_DRAW);
+    void SceneMgr::Init() {
+        start_time = std::chrono::system_clock::now().time_since_epoch().count();
     }
     
-    void GameScene::Uninit() {
-        glDeleteBuffers(1, &index_buffer);
-        glDeleteBuffers(1, &deck_buffer);
-        glDeleteBuffers(1, &back_buffer);
-        glDeleteBuffers(1, &misc_buffer);
-    }
-    
-    void GameScene::UpdateScene() {
-        UpdateBackGround();
-        UpdateCardAll();
-    }
-    
-    void GameScene::UpdateBackGround() {
-        auto ti = imageMgr.GetTexture("bg");
-        auto tex = imageMgr.GetTexInfo(0);
-        std::array<glbase::VertexVCT, 4> verts;
-        verts[0].vertex[0] = -1.0f;
-        verts[0].vertex[1] = 1.0f;
-        verts[0].texcoord[0] = (float)ti.x / tex.GetWidth();
-        verts[0].texcoord[1] = (float)ti.y / tex.GetHeight();
-        verts[1].vertex[0] = 1.0f;
-        verts[1].vertex[1] = 1.0f;
-        verts[1].texcoord[0] = (float)(ti.x + ti.w) / tex.GetWidth();
-        verts[1].texcoord[1] = (float)ti.y / tex.GetHeight();
-        verts[2].vertex[0] = -1.0f;
-        verts[2].vertex[1] = -1.0f;
-        verts[2].texcoord[0] = (float)ti.x / tex.GetWidth();
-        verts[2].texcoord[1] = (float)(ti.y + ti.h) / tex.GetWidth();
-        verts[3].vertex[0] = 1.0f;
-        verts[3].vertex[1] = -1.0f;
-        verts[3].texcoord[0] = (float)(ti.x + ti.w) / tex.GetWidth();
-        verts[3].texcoord[1] = (float)(ti.y + ti.h) / tex.GetWidth();
-        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * verts.size(), &verts[0]);
-
-    }
-    
-    void GameScene::UpdateCard(int pos, int index) {
+    void SceneMgr::Uninit() {
         
     }
     
-    void GameScene::UpdateCardAll() {
-        size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
-        if(deck_sz > deck_buffer_size) {
-            if(deck_buffer_size == 0)
-                deck_buffer_size = 128;
-            while(deck_buffer_size < deck_sz)
-                deck_buffer_size *= 1.5f;
-        }
-    }
-    
-    void GameScene::Draw() {
-        imageMgr.BindTexture(0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        // background
-        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-        //
-    }
-    
-    void GameScene::InitDraw() {
+    void SceneMgr::InitDraw() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
         glEnable(GL_TEXTURE_2D);
@@ -114,6 +42,72 @@ namespace ygopro
         glEnableClientState(GL_INDEX_ARRAY);
         glLoadIdentity();
     }
+    
+    void SceneMgr::Update() {
+        if(current_scene != nullptr)
+            current_scene->Update();
+    }
+    
+    void SceneMgr::Draw() {
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        if(current_scene != nullptr)
+            current_scene->Draw();
+    }
+    
+    void SceneMgr::MouseMove(sf::Event::MouseMoveEvent evt) {
+        if(current_scene != nullptr)
+            current_scene->MouseMove(evt);
+    }
+    
+    void SceneMgr::MouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        if(current_scene != nullptr)
+            current_scene->MouseButtonDown(evt);
+    }
+    
+    void SceneMgr::MouseButtonUp(sf::Event::MouseButtonEvent evt) {
+        if(current_scene != nullptr)
+            current_scene->MouseButtonUp(evt);
+    }
+    
+    void SceneMgr::SetSceneSize(glbase::vector2<int> sz) {
+        scene_size = sz;
+        if(current_scene != nullptr)
+            current_scene->SetSceneSize(sz);
+    }
+    
+    void SceneMgr::SwitchScene(SceneType st) {
+        if(cur_st == st)
+            return;
+        cur_st = st;
+        switch(st) {
+            case SceneType::None:
+                current_scene = nullptr;
+                break;
+            case SceneType::Builder:
+                sgui::SGGUIRoot::GetSingleton().ClearChild();
+                current_scene = std::make_shared<BuildScene>();
+                current_scene->SetSceneSize(scene_size);
+                current_scene->Activate();
+                break;
+            case SceneType::Duel:
+                break;
+            default:
+                break;
+        }
+    }
+    
+    std::shared_ptr<Scene> SceneMgr::GetScene(SceneType st) {
+        if(cur_st != st)
+            return nullptr;
+        return current_scene;
+    }
+    
+    float SceneMgr::GetGameTime() {
+        unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
+        return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
+    }
+    
   /*
     GameFrame::GameFrame(int sx, int sy) : wxFrame(nullptr, wxID_ANY, stringCfg["eui_msg_deck_title_new"], wxDefaultPosition, wxSize(sx, sy)) {
         

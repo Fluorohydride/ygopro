@@ -3,19 +3,20 @@
   <image name="cards" path="./conf/card_misc.png"/>
   <image name="misc" path="./conf/misc.png"/>
   <image name="bg" path="./conf/bg.jpg"/>
-  <texture name="negated" x="0" y="0" w="128" h="128"/>
-  <texture name="limit0" x="128" y="0" w="64" h="64"/>
-  <texture name="limit1" x="192" y="0" w="64" h="64"/>
-  <texture name="limit2" x="128" y="64" w="64" h="64"/>
-  <texture name="ocg" x="256" y="0" w="64" h="32"/>
-  <texture name="tcg" x="256" y="64" w="64" h="32"/>
-  <texture name="tcg" x="256" y="128" w="64" h="32"/>
-  <texture name="equip" x="330" y="0" w="34" h="34"/>
-  <texture name="target" x="330" y="40" w="34" h="34"/>
-  <texture name="hmask" x="300" y="100" w="32" h="32"/>
-  <texture name="star" x="330" y="80" w="16" h="16"/>
-  <texture name="unknown" x="0" y="0" w="177" h="254"/>
-  <texture name="sleeve1" x="0" y="0" w="177" h="254"/>
-  <texture name="sleeve2" x="0" y="0" w="177" h="254"/>
-  <texture name="bg" x="0" y="0" w="1024" h="640"/>
+  <texture src="cards" name="negated" x="0" y="0" w="128" h="128"/>
+  <texture src="cards" name="limit0" x="128" y="0" w="64" h="64"/>
+  <texture src="cards" name="limit1" x="192" y="0" w="64" h="64"/>
+  <texture src="cards" name="limit2" x="128" y="64" w="64" h="64"/>
+  <texture src="cards" name="pool_ocg" x="256" y="0" w="64" h="32"/>
+  <texture src="cards" name="pool_tcg" x="256" y="32" w="64" h="32"/>
+  <texture src="cards" name="pool_ex" x="256" y="64" w="64" h="32"/>
+  <texture src="cards" name="equip" x="330" y="0" w="34" h="34"/>
+  <texture src="cards" name="target" x="330" y="40" w="34" h="34"/>
+  <texture src="cards" name="hmask" x="330" y="100" w="32" h="32"/>
+  <texture src="cards" name="star" x="330" y="80" w="16" h="16"/>
+  <texture src="cards" name="unknown" x="0" y="0" w="177" h="254"/>
+  <texture src="cards" name="sleeve1" x="0" y="0" w="177" h="254"/>
+  <texture src="cards" name="sleeve2" x="0" y="0" w="177" h="254"/>
+  <texture src="bg" name="bg" x="0" y="0" w="1024" h="640"/>
+  <points src="misc" name="test" x1="1" y1="1" x2="1" y2="1" x3="1" y3="1" x4="1" y4="1"/>
 </Texture>

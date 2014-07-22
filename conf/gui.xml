@@ -10,6 +10,10 @@
     <integer name="font_color" value="0xff000000"/>
     <integer name="font_size" value="14"/>
   </basic>
+  <panel>
+    <integer name="client_border" value="5"/>
+    <rect name="client_area" u="100" v="122" w="45" h="41"/>
+  </panel>
   <window>
     <integer name="gui_color" value="0xffffff00"/>
     <integer name="font_color" value="0xffffffff"/>
@@ -122,6 +126,7 @@
     <integer name="tab_min_width1" value="10"/>
     <integer name="tab_min_width2" value="50"/>
     <integer name="title_offset" value="5"/>
+    <integer name="extra_width" value="0"/>
     <integer name="client_height" value="26"/>
     <integer name="client_border" value="5"/>
     <rect name="client_area" u="100" v="122" w="45" h="41"/>

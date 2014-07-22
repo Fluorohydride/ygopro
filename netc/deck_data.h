@@ -18,14 +18,23 @@ namespace ygopro
 {
 
     struct CardData;
-    struct CardTextureInfo;
     struct FilterCondition;
+    
+    struct DeckCardExtraData {
+        virtual ~DeckCardExtraData() = default;
+    };
+    
+    struct DeckCardData {
+        CardData* data;
+        unsigned int limit;
+        std::shared_ptr<DeckCardExtraData> extra;
+    };
     
 	struct DeckData {
         
-		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > main_deck;
-		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > extra_deck;
-		std::vector<std::tuple<CardData*, CardTextureInfo*, int> > side_deck;
+		std::vector<DeckCardData> main_deck;
+		std::vector<DeckCardData> extra_deck;
+		std::vector<DeckCardData> side_deck;
         std::unordered_map<unsigned int, unsigned int> counts;
         
         void Clear();
@@ -37,7 +46,7 @@ namespace ygopro
         void SaveToFile(const wxString& file);
         wxString SaveToString();
         
-        bool InsertCard(unsigned int code, unsigned int pos, unsigned int index = -1, bool strict = true, bool checkc = false);
+        DeckCardData* InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool strict, bool checkc);
         bool RemoveCard(unsigned int pos, unsigned int index);
         
         unsigned int mcount = 0;
@@ -47,8 +56,8 @@ namespace ygopro
         unsigned int xyzcount = 0;
         unsigned int fuscount = 0;
 
-        static bool deck_sort(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
-        static bool deck_sort_limit(const std::tuple<CardData*, CardTextureInfo*, int>& c1, const std::tuple<CardData*, CardTextureInfo*, int>& c2);
+        static bool deck_sort(const DeckCardData& c1, const DeckCardData& c2);
+        static bool deck_sort_limit(const DeckCardData& c1, const DeckCardData& c2);
 	};
 
     struct LimitRegulation {

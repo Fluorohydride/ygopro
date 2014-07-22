@@ -16,6 +16,10 @@
 namespace sgui
 {
     
+    typedef glbase::vector2<float> v2f;
+    typedef glbase::vector2<int> v2i;
+    typedef glbase::rect<int> recti;
+    
     // ===== Delegate Implement =====
     // OT: Object Type
     // ST: Sender Type
@@ -147,9 +151,6 @@ namespace sgui
     
     // ===== Delegate Implement End =====
     
-    typedef sf::Vector2f v2f;
-    typedef sf::Vector2i v2i;
-    
     // ===== GUI Components =====
     
     class SGWidgetContainer;
@@ -167,8 +168,9 @@ namespace sgui
         virtual void PostResize(bool res, bool rep);
         virtual bool AllowFocus() const { return true; }
         virtual std::shared_ptr<SGWidget> GetDragingTarget() { return nullptr; }
-        void SetPosition(v2i pos, v2f = v2f(0.0f, 0.0f));
-        void SetSize(v2i sz, v2f = v2f(0.0f, 0.0f));
+        virtual void Destroy();
+        void SetPosition(v2i pos, v2f = v2f{0.0f, 0.0f});
+        void SetSize(v2i sz, v2f = v2f{0.0f, 0.0f});
         void SetX(int x, float propx = 0.0f);
         void SetY(int y, float propy = 0.0f);
         void SetWidth(int w, float propw = 0.0f);
@@ -217,13 +219,13 @@ namespace sgui
         virtual bool DragingUpdate(v2i evt);
         
     protected:
-        v2i position;
-        v2i position_abs;
-        v2f position_prop;
-        v2i size;
-        v2i size_abs;
-        v2f size_prop;
-        v2i position_drag;
+        v2i position = {0, 0};
+        v2i position_abs = {0, 0};
+        v2f position_prop = {0, 0};
+        v2i size = {0, 0};
+        v2i size_abs = {0, 0};
+        v2f size_prop = {0, 0};
+        v2i position_drag = {0, 0};
         bool visible = true;
         bool enabled = true;
         unsigned int cvalue = 0;
@@ -263,7 +265,7 @@ namespace sgui
         unsigned int spacing_x = 1;
         unsigned int spacing_y = 1;
         unsigned int vert_size = 0;
-        v2i tex_size;
+        v2i tex_size = {0, 0};
         int text_width = 0;
         int text_height = 0;
         int text_width_cur = 0;
@@ -275,8 +277,8 @@ namespace sgui
     class SGSpriteBase {
     public:
         virtual ~SGSpriteBase();
-        virtual void SetImage(glbase::Texture* img, sf::IntRect varea);
-        virtual void AddTexRect(sf::IntRect tarea);
+        virtual void SetImage(glbase::Texture* img, recti varea);
+        virtual void AddTexRect(recti tarea);
         virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts);
         virtual void AddTexcoord(std::vector<v2i>& texcoords);
         virtual v2i GetImageOffset() = 0;
@@ -307,6 +309,7 @@ namespace sgui
         virtual void AddChild(std::shared_ptr<SGWidget> chd);
         virtual void RemoveChild(std::shared_ptr<SGWidget> chd);
         virtual void BringToTop(std::shared_ptr<SGWidget> chd);
+        virtual void ClearChild() { children.clear(); }
         
     public:
         virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
@@ -318,6 +321,7 @@ namespace sgui
         virtual bool EventKeyDown(sf::Event::KeyEvent evt);
         virtual bool EventKeyUp(sf::Event::KeyEvent evt);
         virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventLostFocus();
         
     protected:
         std::weak_ptr<SGWidget> hoving;
@@ -328,7 +332,7 @@ namespace sgui
     struct SGConfig {
         std::unordered_map<std::string, int> int_config;
         std::unordered_map<std::string, std::string> string_config;
-        std::unordered_map<std::string, sf::Rect<int>> tex_config;
+        std::unordered_map<std::string, recti> tex_config;
         std::unordered_map<std::string, std::vector<v2i>> coord_config;
     };
     
@@ -343,40 +347,43 @@ namespace sgui
         virtual bool EventKeyDown(sf::Event::KeyEvent evt);
         virtual bool EventKeyUp(sf::Event::KeyEvent evt);
         virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventLostFocus();
     };
     
     class SGGUIRoot : public SGWidgetContainer {
     public:
+        SGGUIRoot() {}
         virtual ~SGGUIRoot();
+        SGGUIRoot(const SGGUIRoot&) = delete;
         
         void SetSceneSize(v2i size);
         v2i GetSceneSize();
-        void ConvertXY(int x, int y, float v[]) {
-            v[0] = (float)x / scene_size.x * 2.0f - 1.0f;
-            v[1] = 1.0f - (float)y / scene_size.y * 2.0f;
+        void ConvertXY(int x, int y, glbase::vector3<float>& v) {
+            v.x = (float)x / scene_size.x * 2.0f - 1.0f;
+            v.y = 1.0f - (float)y / scene_size.y * 2.0f;
         }
-        void TexUV(int u, int v, float t[]) {
-            t[0] = (float)u / tex_size.x;
-            t[1] = (float)v / tex_size.y;
+        void TexUV(int u, int v, v2i& t) {
+            t.x = (float)u / tex_size.x;
+            t.y = (float)v / tex_size.y;
         }
         template<typename T>
-        void SetRectVertex(T* v, int x, int y, int w, int h, sf::IntRect uv) {
-            v[0].vertex[0] = (float)x / scene_size.x * 2.0f - 1.0f;
-            v[0].vertex[1] = 1.0f - (float)y / scene_size.y * 2.0f;
-            v[1].vertex[0] = (float)(x + w) / scene_size.x * 2.0f - 1.0f;
-            v[1].vertex[1] = 1.0f - (float)y / scene_size.y * 2.0f;
-            v[2].vertex[0] = (float)x / scene_size.x * 2.0f - 1.0f;
-            v[2].vertex[1] = 1.0f - (float)(y + h) / scene_size.y * 2.0f;
-            v[3].vertex[0] = (float)(x + w) / scene_size.x * 2.0f - 1.0f;
-            v[3].vertex[1] = 1.0f - (float)(y + h) / scene_size.y * 2.0f;
-            v[0].texcoord[0] = (float)uv.left / tex_size.x;
-            v[0].texcoord[1] = (float)uv.top / tex_size.y;
-            v[1].texcoord[0] = (float)(uv.left + uv.width) / tex_size.x;
-            v[1].texcoord[1] = (float)uv.top / tex_size.y;
-            v[2].texcoord[0] = (float)uv.left / tex_size.x;
-            v[2].texcoord[1] = (float)(uv.top + uv.height) / tex_size.y;
-            v[3].texcoord[0] = (float)(uv.left + uv.width) / tex_size.x;
-            v[3].texcoord[1] = (float)(uv.top + uv.height) / tex_size.y;
+        void SetRectVertex(T* v, int x, int y, int w, int h, recti uv) {
+            v[0].vertex.x = (float)x / scene_size.x * 2.0f - 1.0f;
+            v[0].vertex.y = 1.0f - (float)y / scene_size.y * 2.0f;
+            v[1].vertex.x = (float)(x + w) / scene_size.x * 2.0f - 1.0f;
+            v[1].vertex.y = 1.0f - (float)y / scene_size.y * 2.0f;
+            v[2].vertex.x = (float)x / scene_size.x * 2.0f - 1.0f;
+            v[2].vertex.y = 1.0f - (float)(y + h) / scene_size.y * 2.0f;
+            v[3].vertex.x = (float)(x + w) / scene_size.x * 2.0f - 1.0f;
+            v[3].vertex.y = 1.0f - (float)(y + h) / scene_size.y * 2.0f;
+            v[0].texcoord.x = (float)uv.left / tex_size.x;
+            v[0].texcoord.y = (float)uv.top / tex_size.y;
+            v[1].texcoord.x = (float)(uv.left + uv.width) / tex_size.x;
+            v[1].texcoord.y = (float)uv.top / tex_size.y;
+            v[2].texcoord.x = (float)uv.left / tex_size.x;
+            v[2].texcoord.y = (float)(uv.top + uv.height) / tex_size.y;
+            v[3].texcoord.x = (float)(uv.left + uv.width) / tex_size.x;
+            v[3].texcoord.y = (float)(uv.top + uv.height) / tex_size.y;
         }
         
         void BindGuiTexture() {
@@ -399,13 +406,14 @@ namespace sgui
             }
         }
         
-        void BeginScissor(sf::IntRect rt);
+        void BeginScissor(recti rt);
         void EndScissor();
         
         virtual bool CheckInside(v2i pos);
         virtual std::shared_ptr<SGWidget> GetHovingWidget(v2i pos);
         virtual void UpdateVertices();
         virtual void Draw();
+        virtual void Destroy() {}
         void ObjectDragingBegin(std::shared_ptr<SGWidget> d, sf::Event::MouseMoveEvent evt);
         void ObjectDragingEnd(sf::Event::MouseMoveEvent evt);
         void SetClickingObject(std::shared_ptr<SGWidget> ptr) { clicking_object = ptr; }
@@ -415,7 +423,7 @@ namespace sgui
         sf::Font& GetGUIFont() { return gui_font; }
         glbase::Texture& GetGUITexture() { return gui_texture; }
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
-        sf::IntRect& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
+        recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
         sf::Time GetTime() { return gui_clock.getElapsedTime(); }
         
         bool InjectMouseMoveEvent(sf::Event::MouseMoveEvent evt);
@@ -432,18 +440,33 @@ namespace sgui
         
     protected:
         bool inside_scene = false;
-        v2i scene_size;
-        v2i tex_size;
+        v2i scene_size = {0, 0};
+        v2i tex_size = {0, 0};
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
         sf::Font gui_font;
         glbase::Texture gui_texture;
         glbase::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
-        std::list<sf::IntRect> scissor_stack;
+        std::list<recti> scissor_stack;
         sf::Clock gui_clock;
         
+    public:
         static SGConfig basic_config;
+    };
+    
+    class SGPanel : public SGWidgetWrapper {
+    public:
+        virtual ~SGPanel();
+        virtual void UpdateVertices();
+        virtual void Draw();
+        
+    protected:
+        unsigned int vbo[2] = {0, 0};
+        
+    public:
+        static std::shared_ptr<SGPanel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
+        static SGConfig panel_config;
     };
     
     class SGWindow : public SGWidgetWrapper, public SGTextBase {
@@ -455,7 +478,6 @@ namespace sgui
         virtual v2i GetTextOffset();
         virtual int GetMaxWidth();
         virtual bool IsMultiLine();
-        void Destroy();
         std::shared_ptr<SGWidget> GetCloseButton() { return children[0]; }
         void SetTitle(const std::wstring& t);
         
@@ -465,7 +487,7 @@ namespace sgui
         bool CloseButtonClick(SGWidget& sender);
         unsigned int vbo[2] = {0, 0};
         unsigned int drag_type = 0;
-        v2i drag_diff;
+        v2i drag_diff = {0, 0};
         
     public:
         static std::shared_ptr<SGWindow> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
@@ -535,7 +557,7 @@ namespace sgui
         virtual int GetMaxWidth();
         virtual bool IsMultiLine();
         virtual v2i GetImageOffset();
-        void SetTextureRect(sf::IntRect r1, sf::IntRect r2, sf::IntRect r3, int lw, int rw);
+        void SetTextureRect(recti r1, recti r2, recti r3, int lw, int rw);
         void SetTexture(glbase::Texture* tex);
         bool IsPushed() { return is_push && (state == 0x12); }
         
@@ -552,7 +574,7 @@ namespace sgui
         unsigned int state = 0;
         int lwidth = 0;
         int rwidth = 0;
-        sf::Rect<int> tex_rect[3];
+        recti tex_rect[3] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
         glbase::Texture* tex_texture = nullptr;
         
     public:
@@ -693,7 +715,7 @@ namespace sgui
         bool draging = true;
         int text_offset = 0;
         int drag_check = 0;
-        sf::IntRect text_area;
+        recti text_area = {0, 0, 0, 0};
         unsigned int vbo[2] = {0, 0};
         float cursor_time = 0.0f;
         unsigned int cursor_pos = 0;
@@ -747,7 +769,7 @@ namespace sgui
         int text_offset = 0;
         int item_count = 0;
         int max_item_count = 0;
-        sf::IntRect text_area;
+        recti text_area = {0, 0, 0, 0};
         float click_time = 0.0f;
         unsigned int vbo[2] = {0, 0};
         std::vector<std::tuple<unsigned short, std::wstring, unsigned int>> items;
@@ -787,7 +809,7 @@ namespace sgui
         bool is_hoving = false;
         int current_sel = -1;
         int item_count = 0;
-        sf::IntRect text_area;
+        recti text_area = {0, 0, 0, 0};
         unsigned int vbo[2] = {0, 0};
         
     public:

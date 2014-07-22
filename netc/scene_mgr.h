@@ -1,43 +1,61 @@
 #ifndef _GAME_SCENE_H_
 #define _GAME_SCENE_H_
 
-#include <wx/wx.h>
-
 #include "xml_config.h"
 #include "../common/random.h"
 
-#include "deck_data.h"
+#include "glbase.h"
+#include <SFML/Window.hpp>
 
 namespace ygopro
 {
     
-    class GameScene {
+    class Scene {
     public:
+        virtual ~Scene() = default;
+        virtual void Activate() = 0;
+        virtual void Update() = 0;
+        virtual void Draw() = 0;
+        virtual void SetSceneSize(glbase::vector2<int> sz) = 0;
+        virtual void MouseMove(sf::Event::MouseMoveEvent evt) = 0;
+        virtual void MouseButtonDown(sf::Event::MouseButtonEvent evt) = 0;
+        virtual void MouseButtonUp(sf::Event::MouseButtonEvent evt) = 0;
+    };
+    
+    class SceneMgr {
+    public:
+        enum class SceneType {
+            None,
+            Builder,
+            Duel,
+        };
+        
         void Init();
         void Uninit();
-        
-        void SetCardInfo(unsigned int code);
-        void AddCard(unsigned int code, unsigned int pos);
-        void StopViewRegulation() { view_regulation = 0; }
-        
-        void UpdateScene();
-        void UpdateBackGround();
-        void UpdateCard(int pos, int index);
-        void UpdateCardAll();
-        void Draw();
         void InitDraw();
+        void Update();
+        void Draw();
+        void MouseMove(sf::Event::MouseMoveEvent evt);
+        void MouseButtonDown(sf::Event::MouseButtonEvent evt);
+        void MouseButtonUp(sf::Event::MouseButtonEvent evt);
+        void SetSceneSize(glbase::vector2<int> sz);
+        void SwitchScene(SceneType st);
+        std::shared_ptr<Scene> GetScene(SceneType st);
+        
+        float GetGameTime();
         
     protected:
-    private:
-        unsigned int index_buffer = 0;
-        unsigned int deck_buffer = 0;
-        unsigned int back_buffer = 0;
-        unsigned int misc_buffer = 0;
-        unsigned int deck_buffer_size = 0;
-        wxString current_file;
-        int view_regulation = 0;
-        DeckData current_deck;
+        glbase::vector2<int> scene_size;
+        SceneType cur_st = SceneType::None;
+        unsigned long long start_time = 0;
+        std::shared_ptr<Scene> current_scene = nullptr;
     };
+    
+    extern SceneMgr sceneMgr;
+    extern Random globalRandom;
+	extern CommonConfig commonCfg;
+    extern CommonConfig stringCfg;
+    
 /*
     class wxGameCanvas;
     
@@ -103,11 +121,6 @@ namespace ygopro
         int view_regulation = 0;
     };
 */
-
-    extern GameScene gameScene;
-    extern Random globalRandom;
-	extern CommonConfig commonCfg;
-    extern CommonConfig stringCfg;
 }
 
 #endif //_GAME_SCENE_H_

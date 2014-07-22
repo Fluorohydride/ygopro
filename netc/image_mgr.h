@@ -12,15 +12,13 @@
 namespace ygopro
 {
     
+    template<int TCOUNT>
 	struct TextureInfo {
-		long x = 0;
-		long y = 0;
-		long w = 0;
-		long h = 0;
+        glbase::vector2<float> vert[TCOUNT];
 	};
     
     struct CardTextureInfo {
-		TextureInfo ti;
+		TextureInfo<4> ti;
         unsigned short ref_block = 0;
 	};
     
@@ -28,8 +26,8 @@ namespace ygopro
 
 	public:
 		CardTextureInfo& GetCardTexture(unsigned int id);
-        TextureInfo& LoadBigCardTexture(unsigned int id);
-        TextureInfo& GetTexture(const std::string& name);
+        TextureInfo<4>& LoadBigCardTexture(unsigned int id);
+        TextureInfo<4>& GetTexture(const std::string& name);
         void UnloadCardTexture(unsigned int id);
 		void UnloadAllCardTexture();
         
@@ -40,11 +38,10 @@ namespace ygopro
         void UninitTextures();
         void BindTexture(int textype);
 		bool LoadImageConfig(const std::string& file);
-        glbase::Texture& GetTexInfo(int textype);
         
     protected:
         std::unordered_map<unsigned int, CardTextureInfo> card_textures;
-        std::unordered_map<std::string, TextureInfo> misc_textures;
+        std::unordered_map<std::string, TextureInfo<4>> misc_textures;
         std::list<unsigned short> unuse_block;
         std::vector<int> ref_count;
         glbase::Texture card_texture;
