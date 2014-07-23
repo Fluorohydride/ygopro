@@ -66,13 +66,15 @@ function c87602890.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local g1=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_EXTRA,0,lv,lv,nil)
+		local tg=Duel.GetFieldGroup(tp,0,LOCATION_EXTRA)
 		if e:GetLabel()==1 then
+			Duel.ConfirmCards(tp,tg)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-			local g2=Duel.SelectMatchingCard(tp,nil,tp,0,LOCATION_EXTRA,lv,lv,nil)
+			local g2=tg:Select(tp,lv,lv,nil)
 			g1:Merge(g2)
 		else
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
-			local g2=Duel.SelectMatchingCard(1-tp,nil,tp,0,LOCATION_EXTRA,lv,lv,nil)
+			local g2=tg:Select(1-tp,lv,lv,nil)
 			g1:Merge(g2)
 		end
 		if g1:GetCount()>0 then

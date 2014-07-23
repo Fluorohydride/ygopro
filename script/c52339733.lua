@@ -3,7 +3,7 @@ function c52339733.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCode(EVENT_DAMAGE_CALCULATING)
+	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c52339733.atkcon)
 	e1:SetOperation(c52339733.atkop)

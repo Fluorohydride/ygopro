@@ -25,6 +25,7 @@ function c65305468.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e5:SetValue(1)
 	c:RegisterEffect(e5)
 	--control
 	local e6=Effect.CreateEffect(c)
@@ -84,7 +85,7 @@ function c65305468.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c65305468.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetBattleTarget()
-	if tc:IsRelateToEffect(e) and not Duel.GetControl(tc,tp,PHASE_BATTLE,1) then
+	if tc:IsRelateToBattle() and not Duel.GetControl(tc,tp,PHASE_BATTLE,1) then
 		if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 			Duel.Destroy(tc,REASON_EFFECT)
 		end
