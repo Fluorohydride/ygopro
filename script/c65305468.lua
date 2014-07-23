@@ -21,10 +21,12 @@ function c65305468.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetCode(EFFECT_NO_BATTLE_DAMAGE)
+	e4:SetValue(1)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
+	e5:SetValue(1)
 	c:RegisterEffect(e5)
 	--control
 	local e6=Effect.CreateEffect(c)
@@ -32,6 +34,7 @@ function c65305468.initial_effect(c)
 	e6:SetCategory(CATEGORY_CONTROL)
 	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e6:SetCode(EVENT_DAMAGE_STEP_END)
+	e6:SetCondition(c65305468.ctcon)
 	e6:SetTarget(c65305468.cttg)
 	e6:SetOperation(c65305468.ctop)
 	c:RegisterEffect(e6)
@@ -77,16 +80,25 @@ function c65305468.xyzop(e,tp,eg,ep,ev,re,r,rp,c,og)
 	c:SetMaterial(g1)
 	Duel.Overlay(c,g1)
 end
+function c65305468.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToBattle() then return false end
+	local t=nil
+	if ev==0 then t=Duel.GetAttackTarget()
+	else t=Duel.GetAttacker() end
+	e:SetLabelObject(t)
+	return t and t:IsRelateToBattle() and t:IsControlerCanBeChanged()
+end
 function c65305468.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=e:GetHandler():GetBattleTarget()
-	if chk==0 then return tc and tc:IsRelateToBattle() and tc:IsControlerCanBeChanged() end
-	Duel.SetOperationInfo(0,CATEGORY_CONTROL,tc,1,0,0)
+	if chk==0 then return true end
+	Duel.SetOperationInfo(0,CATEGORY_CONTROL,e:GetLabelObject(),1,0,0)
 end
 function c65305468.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetHandler():GetBattleTarget()
-	if tc:IsRelateToEffect(e) and not Duel.GetControl(tc,tp,PHASE_BATTLE,1) then
-		if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
-			Duel.Destroy(tc,REASON_EFFECT)
+	local tc=e:GetLabelObject()
+	if tc:IsRelateToBattle() then
+		if not Duel.GetControl(tc,tp,PHASE_BATTLE,1) then
+			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
+				Duel.Destroy(tc,REASON_EFFECT)
+			end
 		end
 	end
 end
