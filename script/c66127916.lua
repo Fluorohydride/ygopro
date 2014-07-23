@@ -33,8 +33,9 @@ function c66127916.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c66127916.filter2,tp,LOCATION_DECK,0,1,1,nil,cg:GetFirst())
 	if g:GetCount()>0 then
-		Duel.SendtoGrave(g,REASON_EFFECT)
-		local tc=Duel.GetFirstMatchingCard(c66127916.filter3,tp,LOCATION_DECK,0,nil)
+		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
+		local tc=Duel.GetFirstMatchingCard(c66127916.filter3,tp,LOCATION_GRAVE,0,nil)
 		if tc and Duel.SelectYesNo(tp,aux.Stringid(66127916,0)) then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,tc)

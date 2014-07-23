@@ -18,7 +18,7 @@ function c67249508.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c67249508.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local tc=Duel.GetAttackTarget()
+	local tc=e:GetLabelObject()
 	if tc:IsRelateToBattle() then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
