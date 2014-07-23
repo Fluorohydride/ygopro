@@ -7,6 +7,7 @@ function c44256816.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCountLimit(1,44256816+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c44256816.cost)
+	e1:SetCondition(c44256816.con)
 	e1:SetTarget(c44256816.target)
 	e1:SetOperation(c44256816.activate)
 	c:RegisterEffect(e1)
@@ -31,6 +32,9 @@ function c44256816.checkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if p1 then Duel.RegisterFlagEffect(0,44256816,RESET_PHASE+PHASE_END,0,1) end
 	if p2 then Duel.RegisterFlagEffect(1,44256816,RESET_PHASE+PHASE_END,0,1) end
+end
+function c44256816.con(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c44256816.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,44256816)==0 end
