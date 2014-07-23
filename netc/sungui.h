@@ -690,6 +690,7 @@ namespace sgui
         void CheckCursorPos();
         void CheckDragPos();
         void SetDefaultColor(unsigned int color) { def_color = color; }
+        void SetReadOnly(bool ro);
         
         SGEventHandler<SGWidget> eventTextEnter;
         
@@ -712,7 +713,8 @@ namespace sgui
         unsigned int sel_bcolor = 0xff000000;
         bool hoving = false;
         bool focus = false;
-        bool draging = true;
+        bool draging = false;
+        bool read_only = false;
         int text_offset = 0;
         int drag_check = 0;
         recti text_area = {0, 0, 0, 0};

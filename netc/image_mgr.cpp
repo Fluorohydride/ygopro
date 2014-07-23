@@ -13,7 +13,7 @@ namespace ygopro
 	CardTextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-			wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
+			wxString file = wxString::Format("%ls/%d.jpg", static_cast<const std::wstring>(commonCfg[L"image_path"]).c_str(), id);
 			auto& cti = card_textures[id];
 			if(!wxFileExists(file)) {
 				cti.ti = misc_textures["unknown"];
@@ -72,7 +72,7 @@ namespace ygopro
 
     TextureInfo<4>& ImageMgr::LoadBigCardTexture(unsigned int id) {
         static TextureInfo<4> ti;
-        wxString file = wxString::Format("%s/%d.jpg", ((const std::string&)commonCfg["image_path"]).c_str(), id);
+        wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
         sf::Image img;
         if(img.loadFromFile(file.ToStdString())) {
         }
@@ -167,7 +167,7 @@ namespace ygopro
         }
     }
     
-	bool ImageMgr::LoadImageConfig(const std::string& name) {
+	bool ImageMgr::LoadImageConfig(const std::wstring& name) {
 		wxXmlDocument doc;
         if(!wxFileExists(name))
             return false;

@@ -14,9 +14,9 @@
   <texture src="cards" name="target" x="330" y="40" w="34" h="34"/>
   <texture src="cards" name="hmask" x="330" y="100" w="32" h="32"/>
   <texture src="cards" name="star" x="330" y="80" w="16" h="16"/>
-  <texture src="cards" name="unknown" x="0" y="0" w="177" h="254"/>
-  <texture src="cards" name="sleeve1" x="0" y="0" w="177" h="254"/>
-  <texture src="cards" name="sleeve2" x="0" y="0" w="177" h="254"/>
+  <texture src="cards" name="unknown" x="400" y="0" w="100" h="145"/>
+  <texture src="cards" name="sleeve1" x="500" y="0" w="100" h="145"/>
+  <texture src="cards" name="sleeve2" x="600" y="0" w="100" h="145"/>
   <texture src="bg" name="bg" x="0" y="0" w="1024" h="640"/>
   <points src="misc" name="test" x1="1" y1="1" x2="1" y2="1" x3="1" y3="1" x4="1" y4="1"/>
 </Texture>

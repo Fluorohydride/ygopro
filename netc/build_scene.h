@@ -5,6 +5,7 @@
 
 #include "deck_data.h"
 #include "scene_mgr.h"
+#include "gui_extra.h"
 
 namespace ygopro
 {
@@ -47,6 +48,10 @@ namespace ygopro
         void AddCard(unsigned int code, unsigned int pos);
         void StopViewRegulation() { view_regulation = 0; }
         
+        void ClearDeck();
+        void LoadDeckFromFile(const std::wstring& file);
+        void LoadDeckFromString(const std::string& str);
+        
         void UpdateBackGround();
         void UpdateCard();
         void UpdateAllCard();
@@ -86,6 +91,8 @@ namespace ygopro
         std::array<TextureInfo<4>, 3> pool;
         TextureInfo<4> hmask;
         std::set<DeckCardData*> updating_cards;
+        std::shared_ptr<FileDialog> fileDialog;
+        std::shared_ptr<FilterDialog> filterDialog;
     };
     
 }

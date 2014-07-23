@@ -1,6 +1,7 @@
 #include <array>
 #include <algorithm>
 #include <iostream>
+
 #include "glbase.h"
 #include "sungui.h"
 #include "image_mgr.h"
@@ -50,34 +51,14 @@ namespace ygopro
     
     void BuildScene::Activate() {
         view_regulation = 0;
-        auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {250, 200});
-        for(int i = 0; i < 40; ++i) {
-            unsigned int code = (i % 2) ? 14878871 : 94381039;
-            auto pdata = current_deck.InsertCard(1, -1, code, false, false);
-            if(pdata != nullptr) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(code);
-                pdata->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
-            }
-        }
-        for(int i = 0; i < 15; ++i) {
-            unsigned int code = (i % 2) ? 70902743 : 74860293;
-            auto pdata = current_deck.InsertCard(2, -1, code, false, false);
-            if(pdata != nullptr) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(code);
-                pdata->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
-            }
-        }
-        for(int i = 0; i < 15; ++i) {
-            unsigned int code = (i % 2) ? 14878871 : 94381039;
-            auto pdata = current_deck.InsertCard(3, -1, code, false, false);
-            if(pdata != nullptr) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(code);
-                pdata->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
-            }
-        }
+        //auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {250, 200});
+        fileDialog = std::make_shared<FileDialog>();
+        fileDialog->Show(stringCfg[L"eui_deck_load"], L"./deck", L".ydk");
+        fileDialog->SetOKCallback([this](const std::wstring& deck)->void{
+            LoadDeckFromFile(deck);
+        });
+        filterDialog = std::make_shared<FilterDialog>();
+        
         UpdateBackGround();
         RefreshAllCard();
     }
@@ -157,6 +138,45 @@ namespace ygopro
     }
     
     void BuildScene::AddCard(unsigned int code, unsigned int pos) {
+        
+    }
+    
+    void BuildScene::ClearDeck() {
+        for(auto& dcd : current_deck.main_deck)
+            imageMgr.UnloadCardTexture(dcd.data->code);
+        for(auto& dcd : current_deck.extra_deck)
+            imageMgr.UnloadCardTexture(dcd.data->code);
+        for(auto& dcd : current_deck.side_deck)
+            imageMgr.UnloadCardTexture(dcd.data->code);
+        current_deck.Clear();
+    }
+    
+    void BuildScene::LoadDeckFromFile(const std::wstring& file) {
+        DeckData tempdeck;
+        if(tempdeck.LoadFromFile(file)) {
+            ClearDeck();
+            current_deck = tempdeck;
+            current_file = file;
+            for(auto& dcd : current_deck.main_deck) {
+                auto exdata = std::make_shared<BuilderCard>();
+                exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            }
+            for(auto& dcd : current_deck.extra_deck) {
+                auto exdata = std::make_shared<BuilderCard>();
+                exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            }
+            for(auto& dcd : current_deck.side_deck) {
+                auto exdata = std::make_shared<BuilderCard>();
+                exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            }
+        }
+        RefreshAllCard();
+    }
+    
+    void BuildScene::LoadDeckFromString(const std::string& str) {
         
     }
     
@@ -242,6 +262,9 @@ namespace ygopro
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz == 0)
             return;
+        main_row_count = max_row_count;
+        if(current_deck.main_deck.size() > main_row_count * 4)
+            main_row_count = (current_deck.main_deck.size() - 1) / 4 + 1;
         dx[0] = (maxx - minx - card_size.x) / (main_row_count - 1);
         int rc1 = std::max((int)current_deck.extra_deck.size(), max_row_count);
         dx[1] = (rc1 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc1 - 1);

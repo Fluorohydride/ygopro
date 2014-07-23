@@ -37,7 +37,7 @@ namespace ygopro
 		void InitTextures();
         void UninitTextures();
         void BindTexture(int textype);
-		bool LoadImageConfig(const std::string& file);
+		bool LoadImageConfig(const std::wstring& file);
         
     protected:
         std::unordered_map<unsigned int, CardTextureInfo> card_textures;

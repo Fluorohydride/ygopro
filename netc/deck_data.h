@@ -41,10 +41,10 @@ namespace ygopro
         void Sort();
         void Shuffle();
         void CalCount();
-        bool LoadFromFile(const wxString& file);
-        bool LoadFromString(const wxString& deck);
-        void SaveToFile(const wxString& file);
-        wxString SaveToString();
+        bool LoadFromFile(const std::wstring& file);
+        bool LoadFromString(const std::wstring& deck);
+        void SaveToFile(const std::wstring& file);
+        std::string SaveToString();
         
         DeckCardData* InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool strict, bool checkc);
         bool RemoveCard(unsigned int pos, unsigned int index);
@@ -62,7 +62,7 @@ namespace ygopro
 
     struct LimitRegulation {
         unsigned int hash = 0;
-		wxString name;
+		std::wstring name;
 		std::unordered_map<unsigned int, unsigned int> counts;
         
         unsigned int get_hash();
@@ -71,14 +71,14 @@ namespace ygopro
     
 	class LimitRegulationMgr {
 	public:
-		void LoadLimitRegulation(const wxString& file, const wxString& default_name);
+		void LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name);
 		void SetLimitRegulation(unsigned int id);
         void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);
         unsigned int GetCardLimitCount(unsigned int code);
         unsigned int CheckCurrentList(unsigned int pool);
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
-        std::vector<CardData*> FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, bool check_desc);
+        std::vector<CardData*> FilterCard(unsigned int limit, const FilterCondition& fc, const std::wstring& fs, bool check_desc);
         void LoadCurrentListToDeck(DeckData& deck, int limit);
         
 	private:

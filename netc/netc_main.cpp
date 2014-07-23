@@ -9,25 +9,25 @@
 using namespace ygopro;
 
 int main(int argc, char* argv[]) {
-    sf::RenderWindow window(sf::VideoMode(1024, 640), "OpenGL", sf::Style::Default, sf::ContextSettings(32));
-    window.setVerticalSyncEnabled(true);
-    //window.setFramerateLimit(60);
+    sf::RenderWindow window(sf::VideoMode(1024, 640), "Ygopro", sf::Style::Default, sf::ContextSettings(32));
+    //window.setVerticalSyncEnabled(true);
+    window.setFramerateLimit(60);
     window.setActive();
     glewInit();
     
     imageMgr.InitTextures();
-    if(!commonCfg.LoadConfig("common.xml"))
+    if(!commonCfg.LoadConfig(L"common.xml"))
         return 0;
-    if(!stringCfg.LoadConfig(commonCfg["string_path"]))
+    if(!stringCfg.LoadConfig(commonCfg[L"string_path"]))
         return 0;
-    if(dataMgr.LoadDatas(commonCfg["database"]))
+    if(dataMgr.LoadDatas(commonCfg[L"database"]))
         return 0;
-    if(!imageMgr.LoadImageConfig(commonCfg["textures"]))
+    if(!imageMgr.LoadImageConfig(commonCfg[L"textures"]))
         return 0;
-    limitRegulationMgr.LoadLimitRegulation(commonCfg["limit_regulation"], stringCfg["eui_list_default"]);
-    stringCfg.ForEach([](const wxString& name, ValueStruct& value) {
-        if(name.Left(8) == wxT("setname_")) {
-            dataMgr.RegisterSetCode((unsigned int)value, name.Right(name.Length() - 8));
+    limitRegulationMgr.LoadLimitRegulation(commonCfg[L"limit_regulation"], stringCfg[L"eui_list_default"]);
+    stringCfg.ForEach([](const std::wstring& name, ValueStruct& value) {
+        if(name.find(L"setname_") == 0 ) {
+            dataMgr.RegisterSetCode(static_cast<unsigned int>(value), name.substr(8));
         }
     });
     

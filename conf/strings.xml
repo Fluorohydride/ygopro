@@ -1,27 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
   <string name="unknown" value="？？？"/>
-  <string name="eui_menu_deck" value="卡组"/>
-  <string name="eui_menu_deck_load" value="载入&#009;CTRL+D"/>
-  <string name="eui_menu_deck_save" value="保存&#009;CTRL+S"/>
-  <string name="eui_menu_deck_saveas" value="另存为&#009;CTRL+SHIFT+S"/>
-  <string name="eui_menu_deck_loadstr" value="从文本载入&#009;CTRL+SHIFT+V"/>
-  <string name="eui_menu_deck_savestr" value="保存为文本&#009;CTRL+SHIFT+C"/>
-  <string name="eui_menu_tools" value="工具"/>
-  <string name="eui_menu_tool_clear" value="清空&#009;CTRL+E"/>
-  <string name="eui_menu_tool_sort" value="排序&#009;CTRL+R"/>
-  <string name="eui_menu_tool_shuffle" value="打乱&#009;CTRL+T"/>
-  <string name="eui_menu_tool_screenshot" value="截图&#009;CTRL+P"/>
-  <string name="eui_menu_tool_saveshot" value="保存截图&#009;CTRL+SHIFT+P"/>
-  <string name="eui_menu_tool_search" value="搜索&#009;CTRL+F"/>
-  <string name="eui_menu_tool_browser" value="在网页中查看&#009;CTRL+O"/>
-  <string name="eui_menu_tool_show_exclusive" value="显示独有卡标记&#009;CTRL+G"/>
+  <string name="eui_button_ok" value="确定"/>
+  <string name="eui_button_cancel" value="取消"/>
+  <string name="eui_deck_load" value="载入卡组"/>
+  <string name="eui_deck_save" value="保存卡组"/>
+  <string name="eui_deck_saveas" value="另存为卡组"/>
+  <string name="eui_deck_loadstr" value="从文本载入"/>
+  <string name="eui_deck_savestr" value="保存为文本"/>
+  <string name="eui_updir" value="返回上一层目录"/>
+  <string name="eui_tool_clear" value="清空"/>
+  <string name="eui_tool_sort" value="排序"/>
+  <string name="eui_tool_shuffle" value="打乱"/>
+  <string name="eui_tool_screenshot" value="截图"/>
+  <string name="eui_tool_saveshot" value="保存截图"/>
+  <string name="eui_menu_tool_browser" value="在网页中查看"/>
+  <string name="eui_menu_tool_show_exclusive" value="显示独有卡标记"/>
   <string name="eui_menu_reg" value="禁止·限制卡表"/>
-  <string name="eui_list_forbidden" value="禁止卡&#009;ALT+F1"/>
-  <string name="eui_list_limit" value="限制卡&#009;ALT+F2"/>
-  <string name="eui_list_semilimit" value="准限制卡&#009;ALT+F3"/>
+  <string name="eui_list_forbidden" value="禁止卡"/>
+  <string name="eui_list_limit" value="限制卡"/>
+  <string name="eui_list_semilimit" value="准限制卡"/>
   <string name="eui_list_view" value="-- 查看当前卡表 --"/>
-  <string name="eui_list_default" value="[ 无限制 ]&#009;ALT+Q"/>
+  <string name="eui_list_default" value="[ 无限制 ]"/>
   <string name="eui_msg_deck_load" value="请选择要载入的卡组"/>
   <string name="eui_msg_deck_save" value="卡组保存为"/>
   <string name="eui_msg_deck_title_new" value="YGOpro2 卡组编辑器"/>
@@ -49,7 +49,6 @@
   <string name="eui_filter_count" value="已找到{count}张卡."/>
   <string name="eui_infocode" value="卡片密码: "/>
   <string name="eui_category" value="从属系列: "/>
-  <string name="full_width_space" value="　"/>
   <string name="parse_begin" value="「"/>
   <string name="parse_end" value="」"/>
   <string name="pool_limit0" value="禁止"/>
@@ -110,7 +109,7 @@
   <string name="type_flip" value="反转"/>
   <string name="type_toon" value="卡通"/>
   <string name="type_xyz" value="超量"/>
-  <string name="type_xyz" value="摇摆"/>
+  <string name="type_pendulum" value="灵摆"/>
   <integer name="setname_正义盟军" value="0x1ee"/>
   <integer name="setname_次世代" value="0x2"/>
   <integer name="setname_真次世代" value="0x1002"/>
@@ -267,7 +266,7 @@
   <integer name="setname_阳炎" value="0x7d"/>
   <integer name="setname_阳炎兽" value="0x107d"/>
   <integer name="setname_异热同心武器" value="0x7e"/>
-  <integer name="setname_希望皇　霍普" value="0x7f"/>
+  <integer name="setname_希望皇 霍普" value="0x7f"/>
   <integer name="setname_尘妖" value="0x80"/>
   <integer name="setname_炎王" value="0x81"/>
   <integer name="setname_炎王兽" value="0x1081"/>

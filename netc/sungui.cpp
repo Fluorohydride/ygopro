@@ -2400,7 +2400,7 @@ namespace sgui
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vbo[1]);
         float tm = guiRoot.GetTime().asSeconds();
-        if(!focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5f) % 2))
+        if(read_only || !focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5f) % 2))
             glDrawElements(GL_TRIANGLES, 54, GL_UNSIGNED_SHORT, 0);
         else
             glDrawElements(GL_TRIANGLES, 60, GL_UNSIGNED_SHORT, 0);
@@ -2409,7 +2409,8 @@ namespace sgui
         for(auto chd : children)
             chd->Draw();
         guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
-        DrawSelectRegion();
+        if(!read_only)
+            DrawSelectRegion();
         DrawText();
         guiRoot.EndScissor();
     }
@@ -2459,6 +2460,8 @@ namespace sgui
     }
     
     void SGTextEdit::SetSelRegion(unsigned int start, unsigned int end) {
+        if(read_only)
+            return;
         unsigned int pres = sel_start, pree = sel_end;
         sel_start = std::min(start, end);
         sel_end = std::max(start, end);
@@ -2505,6 +2508,16 @@ namespace sgui
                 text_offset = my - size_w;
         }
         if(text_offset != preoff) {
+            vertices_dirty = true;
+            sel_change = true;
+        }
+    }
+    
+    void SGTextEdit::SetReadOnly(bool ro) {
+        if(read_only != ro)
+            read_only = ro;
+        if(sel_start != sel_end) {
+            sel_start = sel_end = 0;
             vertices_dirty = true;
             sel_change = true;
         }
@@ -2584,6 +2597,8 @@ namespace sgui
     }
     
     bool SGTextEdit::DragingBegin(v2i evt) {
+        if(read_only)
+            return false;
         position_drag = evt;
         cursor_pos = GetHitIndex(evt);
         SetSelRegion(cursor_pos, cursor_pos);
@@ -2594,6 +2609,8 @@ namespace sgui
     }
     
     bool SGTextEdit::DragingUpdate(v2i evt) {
+        if(read_only)
+            return false;
         v2i delta = evt - position_drag;
         position_drag = evt;
         CheckDragPos();
@@ -2601,12 +2618,16 @@ namespace sgui
     }
     
     bool SGTextEdit::DragingEnd(v2i evt) {
+        if(read_only)
+            return false;
         vertices_dirty = true;
         draging = false;
         return eventDragEnd.TriggerEvent(*this, evt);
     }
     
     bool SGTextEdit::EventKeyDown(sf::Event::KeyEvent evt) {
+        if(read_only)
+            return false;
         switch(evt.code) {
             case sf::Keyboard::X:
                 if(evt.control) {
@@ -2734,6 +2755,8 @@ namespace sgui
     }
     
     bool SGTextEdit::EventCharEnter(sf::Event::TextEvent evt) {
+        if(read_only)
+            return false;
         if(evt.unicode < 32 || evt.unicode == 127) // control charactors
             return false;
         if(sel_start != sel_end) {

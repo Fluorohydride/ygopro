@@ -71,7 +71,7 @@ namespace ygopro
         }
     }
     
-    bool DeckData::LoadFromFile(const wxString& file) {
+    bool DeckData::LoadFromFile(const std::wstring& file) {
         wxFileInputStream deck_file(file);
         if(!deck_file.IsOk())
             return false;
@@ -120,7 +120,7 @@ namespace ygopro
         return true;
     }
     
-    bool DeckData::LoadFromString(const wxString& deck) {
+    bool DeckData::LoadFromString(const std::wstring& deck) {
         static const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
         static unsigned char base64_dec_table[256] = {0};
         static bool base64_dec_init = false;
@@ -174,7 +174,7 @@ namespace ygopro
         return true;
     }
     
-    void DeckData::SaveToFile(const wxString& file) {
+    void DeckData::SaveToFile(const std::wstring& file) {
         wxFileOutputStream deck_file(file);
         if(!deck_file.IsOk())
             return;
@@ -191,7 +191,7 @@ namespace ygopro
         }
     }
     
-    wxString DeckData::SaveToString() {
+    std::string DeckData::SaveToString() {
         static const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
         auto m = main_deck;
         auto e = extra_deck;
@@ -247,7 +247,7 @@ namespace ygopro
         main_deck = m;
         extra_deck = e;
         side_deck = s;
-        wxString deckstr(deck_string);
+        std::string deckstr(deck_string);
         return std::move(deckstr);
     }
     
@@ -373,7 +373,7 @@ namespace ygopro
         return 0;
     }
     
-    void LimitRegulationMgr::LoadLimitRegulation(const wxString& file, const wxString& default_name) {
+    void LimitRegulationMgr::LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name) {
         wxFileInputStream ban_file(file);
         if(!ban_file.IsOk())
             return;
@@ -471,7 +471,7 @@ namespace ygopro
             return iter->second;
     }
     
-    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const wxString& fs, bool check_desc) {
+    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const std::wstring& fs, bool check_desc) {
         std::vector<CardData*> result;
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)

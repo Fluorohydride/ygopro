@@ -8,7 +8,7 @@ namespace ygopro
 
 	DataMgr dataMgr;
 
-    bool CardData::CheckCondition(const FilterCondition& fc, const wxString& keyword, bool check_desc) {
+    bool CardData::CheckCondition(const FilterCondition& fc, const std::wstring& keyword, bool check_desc) {
         if(type & 0x4000)
             return false;
         if(fc.code != 0 && code != fc.code && alias != fc.code)
@@ -56,9 +56,9 @@ namespace ygopro
             return false;
         } else {
             if(keyword.size()) {
-                wxString kw = keyword.Upper();
-                if(name.Upper().Find(kw) == -1 && (!check_desc || texts.Upper().Find(kw) == -1))
-                    return false;
+//                wxString kw = keyword.Upper();
+//                if(name.Upper().Find(kw) == -1 && (!check_desc || texts.Upper().Find(kw) == -1))
+//                    return false;
             }
         }
         return true;
@@ -85,10 +85,12 @@ namespace ygopro
         return p1->code < p2->code;
     }
     
-	int DataMgr::LoadDatas(const wxString& file) {
+	int DataMgr::LoadDatas(const std::wstring& file) {
 		_datas.clear();
 		sqlite3* pDB;
-		if(sqlite3_open(file.c_str(), &pDB) != SQLITE_OK)
+        char fbuffer[256];
+        BufferUtil::EncodeUTF8(file.c_str(), fbuffer);
+		if(sqlite3_open(fbuffer, &pDB) != SQLITE_OK)
 			return sqlite3_errcode(pDB);
 		sqlite3_stmt* pStmt;
 		const char* sql = "select * from datas,texts where datas.id=texts.id";
@@ -96,8 +98,8 @@ namespace ygopro
 			return sqlite3_errcode(pDB);
 		CardData cd;
 		wchar_t unicode_buffer[2048];
-        int full_width_space = commonCfg["full_width_space"];
-        wxString space = stringCfg["full_width_space"];
+//        int full_width_space = commonCfg["full_width_space"];
+//        wxString space = stringCfg["full_width_space"];
 		int step = 0, len = 0;
 		do {
 			step = sqlite3_step(pStmt);
@@ -118,13 +120,13 @@ namespace ygopro
 				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), unicode_buffer);
 				unicode_buffer[len] = 0;
 				cd.name = unicode_buffer;
-                if(full_width_space)
-                    cd.name.Replace(wxT(" "), space);
+//                if(full_width_space)
+//                    cd.name.Replace(wxT(" "), space);
 				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), unicode_buffer);
 				unicode_buffer[len] = 0;
 				cd.texts = unicode_buffer;
-                if(full_width_space)
-                    cd.texts.Replace(wxT(" "), space);
+//                if(full_width_space)
+//                    cd.texts.Replace(wxT(" "), space);
                 for(unsigned int i = 0; i < 16; ++i) {
                     len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 14 + i), unicode_buffer);
                     unicode_buffer[len] = 0;
@@ -158,7 +160,7 @@ namespace ygopro
         }
     }
 
-    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const wxString& fs, bool check_desc) {
+    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const std::wstring& fs, bool check_desc) {
         std::vector<CardData*> result;
         for(auto& iter : _datas) {
             CardData& cd = iter.second;
@@ -170,170 +172,170 @@ namespace ygopro
         return std::move(result);
     }
     
-    wxString DataMgr::GetAttributeString(unsigned int attr) {
-        wxString attname;
+    std::wstring DataMgr::GetAttributeString(unsigned int attr) {
+        std::wstring attname;
         if(attr & 0x1)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_earth"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_earth"]).append(L"|");
         if(attr & 0x2)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_water"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_water"]).append(L"|");
         if(attr & 0x4)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_fire"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_fire"]).append(L"|");
         if(attr & 0x8)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_wind"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_wind"]).append(L"|");
         if(attr & 0x10)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_light"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_light"]).append(L"|");
         if(attr & 0x20)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_dark"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_dark"]).append(L"|");
         if(attr & 0x40)
-            attname += static_cast<const std::string&>(stringCfg["attribtue_divine"]) + wxT("|");
+            attname.append(stringCfg[L"attribtue_divine"]).append(L"|");
         attname.resize(attname.length() - 1);
         return std::move(attname);
     }
     
-    wxString DataMgr::GetRaceString(unsigned int race) {
-        wxString racname;
+    std::wstring DataMgr::GetRaceString(unsigned int race) {
+        std::wstring racname;
         if(race & 0x1)
-            racname += static_cast<const std::string&>(stringCfg["race_warrior"]) + wxT("|");
+            racname.append(stringCfg[L"race_warrior"]).append(L"|");
         if(race & 0x2)
-            racname += static_cast<const std::string&>(stringCfg["race_spellcaster"]) + wxT("|");
+            racname.append(stringCfg[L"race_spellcaster"]).append(L"|");
         if(race & 0x4)
-            racname += static_cast<const std::string&>(stringCfg["race_fairy"]) + wxT("|");
+            racname.append(stringCfg[L"race_fairy"]).append(L"|");
         if(race & 0x8)
-            racname += static_cast<const std::string&>(stringCfg["race_fiend"]) + wxT("|");
+            racname.append(stringCfg[L"race_fiend"]).append(L"|");
         if(race & 0x10)
-            racname += static_cast<const std::string&>(stringCfg["race_zombie"]) + wxT("|");
+            racname.append(stringCfg[L"race_zombie"]).append(L"|");
         if(race & 0x20)
-            racname += static_cast<const std::string&>(stringCfg["race_machine"]) + wxT("|");
+            racname.append(stringCfg[L"race_machine"]).append(L"|");
         if(race & 0x40)
-            racname += static_cast<const std::string&>(stringCfg["race_aqua"]) + wxT("|");
+            racname.append(stringCfg[L"race_aqua"]).append(L"|");
         if(race & 0x80)
-            racname += static_cast<const std::string&>(stringCfg["race_pyro"]) + wxT("|");
+            racname.append(stringCfg[L"race_pyro"]).append(L"|");
         if(race & 0x100)
-            racname += static_cast<const std::string&>(stringCfg["race_rock"]) + wxT("|");
+            racname.append(stringCfg[L"race_rock"]).append(L"|");
         if(race & 0x200)
-            racname += static_cast<const std::string&>(stringCfg["race_windbeast"]) + wxT("|");
+            racname.append(stringCfg[L"race_windbeast"]).append(L"|");
         if(race & 0x400)
-            racname += static_cast<const std::string&>(stringCfg["race_plant"]) + wxT("|");
+            racname.append(stringCfg[L"race_plant"]).append(L"|");
         if(race & 0x800)
-            racname += static_cast<const std::string&>(stringCfg["race_insect"]) + wxT("|");
+            racname.append(stringCfg[L"race_insect"]).append(L"|");
         if(race & 0x1000)
-            racname += static_cast<const std::string&>(stringCfg["race_thunder"]) + wxT("|");
+            racname.append(stringCfg[L"race_thunder"]).append(L"|");
         if(race & 0x2000)
-            racname += static_cast<const std::string&>(stringCfg["race_dragon"]) + wxT("|");
+            racname.append(stringCfg[L"race_dragon"]).append(L"|");
         if(race & 0x4000)
-            racname += static_cast<const std::string&>(stringCfg["race_beast"]) + wxT("|");
+            racname.append(stringCfg[L"race_beast"]).append(L"|");
         if(race & 0x8000)
-            racname += static_cast<const std::string&>(stringCfg["race_beastwarrior"]) + wxT("|");
+            racname.append(stringCfg[L"race_beastwarrior"]).append(L"|");
         if(race & 0x10000)
-            racname += static_cast<const std::string&>(stringCfg["race_dinosaur"]) + wxT("|");
+            racname.append(stringCfg[L"race_dinosaur"]).append(L"|");
         if(race & 0x20000)
-            racname += static_cast<const std::string&>(stringCfg["race_fish"]) + wxT("|");
+            racname.append(stringCfg[L"race_fish"]).append(L"|");
         if(race & 0x40000)
-            racname += static_cast<const std::string&>(stringCfg["race_seaserpent"]) + wxT("|");
+            racname.append(stringCfg[L"race_seaserpent"]).append(L"|");
         if(race & 0x80000)
-            racname += static_cast<const std::string&>(stringCfg["race_reptile"]) + wxT("|");
+            racname.append(stringCfg[L"race_reptile"]).append(L"|");
         if(race & 0x100000)
-            racname += static_cast<const std::string&>(stringCfg["race_psychic"]) + wxT("|");
+            racname.append(stringCfg[L"race_psychic"]).append(L"|");
         if(race & 0x200000)
-            racname += static_cast<const std::string&>(stringCfg["race_divine"]) + wxT("|");
+            racname.append(stringCfg[L"race_divine"]).append(L"|");
         if(race & 0x400000)
-            racname += static_cast<const std::string&>(stringCfg["race_creatorgod"]) + wxT("|");
+            racname.append(stringCfg[L"race_creatorgod"]).append(L"|");
         if(race & 0x800000)
-            racname += static_cast<const std::string&>(stringCfg["race_phantomdragon"]) + wxT("|");
+            racname.append(stringCfg[L"race_phantomdragon"]).append(L"|");
         racname.resize(racname.length() - 1);
         return std::move(racname);
     }
     
-    wxString DataMgr::GetTypeString(unsigned int arctype) {
-        wxString tpname;
+    std::wstring DataMgr::GetTypeString(unsigned int arctype) {
+        std::wstring tpname;
         if(arctype & 0x1) {
             if(arctype & 0x8020c0) {
                 if(arctype & 0x800000)
-                    tpname = static_cast<const std::string&>(stringCfg["type_xyz"]);
+                    tpname.append(stringCfg[L"type_xyz"]);
                 else if(arctype & 0x2000)
-                    tpname = static_cast<const std::string&>(stringCfg["type_synchro"]);
+                    tpname.append(stringCfg[L"type_synchro"]);
                 else if(arctype & 0x80)
-                    tpname = static_cast<const std::string&>(stringCfg["type_ritual"]);
+                    tpname.append(stringCfg[L"type_ritual"]);
                 else
-                    tpname = static_cast<const std::string&>(stringCfg["type_fusion"]);
-                tpname += static_cast<const std::string&>(stringCfg["type_monster"]);
+                    tpname.append(stringCfg[L"type_fusion"]);
+                tpname.append(stringCfg[L"type_monster"]);
                 if(arctype & 0x20)
-                    tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_effect"]);
+                    tpname.append(L"|").append(stringCfg[L"type_effect"]);
             } else {
                 if(arctype & 0x20)
-                    tpname = static_cast<const std::string&>(stringCfg["type_effect"]);
+                    tpname.append(stringCfg[L"type_effect"]);
                 else
-                    tpname = static_cast<const std::string&>(stringCfg["type_normal"]);
-                tpname += static_cast<const std::string&>(stringCfg["type_monster"]);
+                    tpname .append(stringCfg[L"type_normal"]);
+                tpname.append(stringCfg[L"type_monster"]);
             }
             if(arctype & 0x200)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_spirit"]);
+                tpname.append(L"|").append(stringCfg[L"type_spirit"]);
             if(arctype & 0x400)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_union"]);
+                tpname.append(L"|").append(stringCfg[L"type_union"]);
             if(arctype & 0x800)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_dual"]);
+                tpname.append(L"|").append(stringCfg[L"type_dual"]);
             if(arctype & 0x1000)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_tuner"]);
+                tpname.append(L"|").append(stringCfg[L"type_tuner"]);
             if(arctype & 0x4000)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_token"]);
+                tpname.append(L"|").append(stringCfg[L"type_token"]);
             if(arctype & 0x200000)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_flip"]);
+                tpname.append(L"|").append(stringCfg[L"type_flip"]);
             if(arctype & 0x400000)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_toon"]);
+                tpname.append(L"|").append(stringCfg[L"type_toon"]);
             if(arctype & 0x1000000)
-                tpname += wxT("|") + static_cast<const std::string&>(stringCfg["type_pendulum"]);
+                tpname.append(L"|").append(stringCfg[L"type_pendulum"]);
         } else if(arctype & 0x2) {
             if(arctype == 0x2)
-                tpname = static_cast<const std::string&>(stringCfg["type_normal"]);
+                tpname.append(stringCfg[L"type_normal"]);
             else if(arctype & 0x80)
-                tpname = static_cast<const std::string&>(stringCfg["type_ritual"]);
+                tpname.append(stringCfg[L"type_ritual"]);
             else if(arctype & 0x10000)
-                tpname = static_cast<const std::string&>(stringCfg["type_quickplay"]);
+                tpname.append(stringCfg[L"type_quickplay"]);
             else if(arctype & 0x20000)
-                tpname = static_cast<const std::string&>(stringCfg["type_continuous"]);
+                tpname.append(stringCfg[L"type_continuous"]);
             else if(arctype & 0x40000)
-                tpname = static_cast<const std::string&>(stringCfg["type_equip"]);
+                tpname.append(stringCfg[L"type_equip"]);
             else if(arctype & 0x80000)
-                tpname = static_cast<const std::string&>(stringCfg["type_field"]);
-            tpname += static_cast<const std::string&>(stringCfg["type_spell"]);
+                tpname.append(stringCfg[L"type_field"]);
+            tpname.append(stringCfg[L"type_spell"]);
         } else {
             if(arctype == 0x4)
-                tpname = static_cast<const std::string&>(stringCfg["type_normal"]);
+                tpname.append(stringCfg[L"type_normal"]);
             else if(arctype & 0x20000)
-                tpname = static_cast<const std::string&>(stringCfg["type_continuous"]);
+                tpname.append(stringCfg[L"type_continuous"]);
             else if(arctype & 0x100000)
-                tpname = static_cast<const std::string&>(stringCfg["type_counter"]);
-            tpname += static_cast<const std::string&>(stringCfg["type_trap"]);
+                tpname.append(stringCfg[L"type_counter"]);
+            tpname.append(stringCfg[L"type_trap"]);
         }
         return std::move(tpname);
     }
     
-    wxString DataMgr::GetTypeString2(unsigned int arctype) {
+    std::wstring DataMgr::GetTypeString2(unsigned int arctype) {
         switch(arctype) {
-            case 0x1: return static_cast<const std::string&>(stringCfg["type_monster"]);
-            case 0x2: return static_cast<const std::string&>(stringCfg["type_spell"]);
-            case 0x4: return static_cast<const std::string&>(stringCfg["type_trap"]);
-            case 0x10: return static_cast<const std::string&>(stringCfg["type_normal"]);
-            case 0x20: return static_cast<const std::string&>(stringCfg["type_effect"]);
-            case 0x40: return static_cast<const std::string&>(stringCfg["type_fusion"]);
-            case 0x80: return static_cast<const std::string&>(stringCfg["type_ritual"]);
-            case 0x100: return static_cast<const std::string&>(stringCfg["type_trapmonster"]);
-            case 0x200: return static_cast<const std::string&>(stringCfg["type_spirit"]);
-            case 0x400: return static_cast<const std::string&>(stringCfg["type_union"]);
-            case 0x800: return static_cast<const std::string&>(stringCfg["type_dual"]);
-            case 0x1000: return static_cast<const std::string&>(stringCfg["type_tuner"]);
-            case 0x2000: return static_cast<const std::string&>(stringCfg["type_synchro"]);
-            case 0x4000: return static_cast<const std::string&>(stringCfg["type_token"]);
-            case 0x10000: return static_cast<const std::string&>(stringCfg["type_quickplay"]);
-            case 0x20000: return static_cast<const std::string&>(stringCfg["type_continuous"]);
-            case 0x40000: return static_cast<const std::string&>(stringCfg["type_equip"]);
-            case 0x80000: return static_cast<const std::string&>(stringCfg["type_field"]);
-            case 0x100000: return static_cast<const std::string&>(stringCfg["type_counter"]);
-            case 0x200000: return static_cast<const std::string&>(stringCfg["type_flip"]);
-            case 0x400000: return static_cast<const std::string&>(stringCfg["type_toon"]);
-            case 0x800000: return static_cast<const std::string&>(stringCfg["type_xyz"]);
+            case 0x1: return stringCfg[L"type_monster"];
+            case 0x2: return stringCfg[L"type_spell"];
+            case 0x4: return stringCfg[L"type_trap"];
+            case 0x10: return stringCfg[L"type_normal"];
+            case 0x20: return stringCfg[L"type_effect"];
+            case 0x40: return stringCfg[L"type_fusion"];
+            case 0x80: return stringCfg[L"type_ritual"];
+            case 0x100: return stringCfg[L"type_trapmonster"];
+            case 0x200: return stringCfg[L"type_spirit"];
+            case 0x400: return stringCfg[L"type_union"];
+            case 0x800: return stringCfg[L"type_dual"];
+            case 0x1000: return stringCfg[L"type_tuner"];
+            case 0x2000: return stringCfg[L"type_synchro"];
+            case 0x4000: return stringCfg[L"type_token"];
+            case 0x10000: return stringCfg[L"type_quickplay"];
+            case 0x20000: return stringCfg[L"type_continuous"];
+            case 0x40000: return stringCfg[L"type_equip"];
+            case 0x80000: return stringCfg[L"type_field"];
+            case 0x100000: return stringCfg[L"type_counter"];
+            case 0x200000: return stringCfg[L"type_flip"];
+            case 0x400000: return stringCfg[L"type_toon"];
+            case 0x800000: return stringCfg[L"type_xyz"];
         }
-        return wxT("");
+        return L"";
     }
     
 }
