@@ -53,7 +53,7 @@ end
 function c51617185.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not eg:IsContains(e:GetHandler()) and eg:IsExists(c51617185.cfilter,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g=eg:FilterSelect(tp,c51617185.cfilter,tp,1,1,nil)
+	local g=eg:FilterSelect(tp,c51617185.cfilter,1,1,nil,tp)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c51617185.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)

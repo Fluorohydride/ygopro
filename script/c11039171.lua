@@ -29,8 +29,7 @@ function c11039171.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c11039171.mfilter(c,mg)
-	return (c:IsCode(30068120) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
-		and mg:IsExists(Card.IsSetCard,1,c,0xa9)
+	return c:IsCode(30068120) and mg:IsExists(Card.IsSetCard,1,c,0xa9)
 end
 function c11039171.fscon(e,mg,gc)
 	if mg==nil then return false end

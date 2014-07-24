@@ -46,7 +46,7 @@ end
 function c93016201.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	e:SetLabel(0)
-	if not  Duel.CheckLPCost(tp,800) then return end
+	if not Duel.CheckLPCost(tp,800) then return end
 	local ct=Duel.GetCurrentChain()
 	if ct==1 then return end
 	local pe=Duel.GetChainInfo(ct-1,CHAININFO_TRIGGERING_EFFECT)
