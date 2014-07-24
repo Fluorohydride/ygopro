@@ -46,11 +46,11 @@ end
 function c12948099.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c12948099.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if g:GetCount()>0 then
-		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
+		Duel.SendtoDeck(g,nil,0,REASON_EFFECT)
 	end
 end
 function c12948099.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return r==REASON_SYNCHRO
+	return r==REASON_FUSION
 end
 function c12948099.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
