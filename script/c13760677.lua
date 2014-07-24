@@ -29,12 +29,13 @@ function c13760677.initial_effect(c)
 	e3:SetOperation(c13760677.thop)
 	c:RegisterEffect(e3)
 end
-function c13760677.cfilter(c,tp)
+function c13760677.cfilter(c,e,tp)
 	return c:IsRace(RACE_ZOMBIE) and c:GetSummonPlayer()==tp and c:GetSummonType()==SUMMON_TYPE_PENDULUM
+		and (not e or c:IsRelateToEffect(e))
 end
 function c13760677.indcon(e,tp,eg,ep,ev,re,r,rp)
 	return (e:GetHandler():GetSequence()==6 or e:GetHandler():GetSequence()==7)
-		and eg:IsExists(c13760677.cfilter,1,nil,tp)
+		and eg:IsExists(c13760677.cfilter,1,nil,nil,tp)
 end
 function c13760677.indtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -43,8 +44,8 @@ end
 function c13760677.indop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	local g=eg:Filter(Card.IsRelateToEffect,nil,e)
-	local tc=e:GetFirst()
+	local g=eg:Filter(c13760677.cfilter,nil,e,tp)
+	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

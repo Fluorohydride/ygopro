@@ -236,6 +236,7 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 					local ct=-ft
 					local b1=Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 					local b2=ct<1 and Duel.IsExistingMatchingCard(alterf,tp,LOCATION_MZONE,0,1,nil)
+						and (not op or op(e,tp,0))
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
 						if op then op(e,tp,1) end

@@ -76,7 +76,7 @@ function c91907707.ntcon(e,c)
 	if c==nil then return true end
 	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
-function c91907707.lvcon(e,tp,eg,ep,ev,re,r,rp)
+function c91907707.lvcon(e)
 	return e:GetHandler():GetMaterialCount()==0
 end
 function c91907707.lvop(e,tp,eg,ep,ev,re,r,rp)
