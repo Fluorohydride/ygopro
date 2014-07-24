@@ -27,7 +27,7 @@ function c27279764.initial_effect(c)
 	--immune
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
 	e5:SetCondition(c27279764.immcon)
@@ -47,7 +47,6 @@ function c27279764.initial_effect(c)
 	c:RegisterEffect(e7)
 	--to grave
 	local e8=Effect.CreateEffect(c)
-	e8:SetCategory(CATEGORY_TOGRAVE)
 	e8:SetType(EFFECT_TYPE_IGNITION)
 	e8:SetRange(LOCATION_MZONE)
 	e8:SetCountLimit(1)
@@ -68,27 +67,21 @@ function c27279764.ttop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_SUMMON+REASON_MATERIAL)
 end
 function c27279764.immcon(e)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
+	return bit.band(e:GetHandler():GetSummonType(),0x30000000)==SUMMON_TYPE_NORMAL
 end
 function c27279764.efilter(e,te)
 	if te:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return true end
-	if te:IsActiveType(TYPE_MONSTER) and te:IsHasType(0x7e0) then
-		local lv=e:GetHandler():GetLevel()
-		local ec=te:GetHandler()
-		if ec:IsType(TYPE_XYZ) then
-			return ec:GetOriginalRank()<lv
-		else
-			return ec:GetOriginalLevel()<lv
-		end
-	end
-	return false
+	local lv=e:GetHandler():GetLevel()
+	return te:IsActiveType(TYPE_MONSTER) and 
+		te:IsHasType(EFFECT_TYPE_ACTIONS) and 
+		(te:GetHandler():GetOriginalLevel()<lv or te:GetHandler():GetOriginalRank()<lv)
 end
 function c27279764.adtg(e,c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 end
 function c27279764.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE+LOCATION_HAND)>0 end
-	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,0,LOCATION_MZONE+LOCATION_HAND)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 or 
+		Duel.IsExistingMatchingCard(Card.IsType,tp,0,LOCATION_MZONE,1,nil,TYPE_MONSTER)end
 end
 function c27279764.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsType,1-tp,LOCATION_MZONE+LOCATION_HAND,0,nil,TYPE_MONSTER)
@@ -99,7 +92,7 @@ function c27279764.tgop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(sg,REASON_RULE)
 	else
 		local hg=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
-		Duel.ConfirmCards(1-tp,hg)
+		Duel.ConfirmCards(tp,hg)
 		Duel.ShuffleHand(1-tp)
 	end
 end
