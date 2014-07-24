@@ -31,7 +31,7 @@ function c65331686.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_HAND)
 end
 function c65331686.thfilter(c)
-	return c:IsCode(65331686) and c:IsAbleToHand()
+	return c:IsCode(24094653) and c:IsAbleToHand()
 end
 function c65331686.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingMatchingCard(c65331686.thfilter,tp,LOCATION_DECK,0,1,nil) end
