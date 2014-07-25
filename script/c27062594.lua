@@ -19,7 +19,7 @@ function c27062594.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c27062594.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.NegateAttack()==0 then return end
+	if not Duel.NegateAttack() then return end
 	Duel.BreakEffect()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()

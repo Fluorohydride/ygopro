@@ -59,7 +59,10 @@ function c87602890.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c87602890.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 and tc:IsAttribute(ATTRIBUTE_LIGHT) then
+	if tc and tc:IsRelateToEffect(e) then
+		local att=0
+		if tc:IsFaceup() then att=tc:GetAttribute() end
+		if Duel.Destroy(tc,REASON_EFFECT)==0 or bit.band(att,ATTRIBUTE_LIGHT)==0 then return end
 		local lv=tc:GetLevel()
 		if tc:IsType(TYPE_XYZ) then
 			lv=tc:GetRank()

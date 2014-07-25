@@ -84,7 +84,7 @@ function c42940404.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c42940404.sfilter(c)
-	return c:IsSetCard(0x36) and c:GetCode()~=42940404 and c:IsAbleToHand() and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x36) and c:GetCode()~=42940404 and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c42940404.stg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c42940404.sfilter,tp,LOCATION_DECK,0,1,nil) end
