@@ -831,7 +831,7 @@ void card::apply_field_effect() {
 	if (current.controler == PLAYER_NONE)
 		return;
 	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
-		if ((current.location & it->second->range) || ((it->second->range & LOCATION_HAND)
+		if (it->second->in_range(current.location, current.sequence) || ((it->second->range & LOCATION_HAND)
 		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE)))
 			pduel->game_field->add_effect(it->second);
 	}
@@ -842,7 +842,7 @@ void card::cancel_field_effect() {
 	if (current.controler == PLAYER_NONE)
 		return;
 	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
-		if ((current.location & it->second->range) || ((it->second->range & LOCATION_HAND)
+		if (it->second->in_range(current.location, current.sequence) || ((it->second->range & LOCATION_HAND)
 		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE)))
 			pduel->game_field->remove_effect(it->second);
 	}
@@ -859,11 +859,11 @@ void card::enable_field_effect(int32 enabled) {
 		set_status(STATUS_EFFECT_ENABLED, TRUE);
 		effect_container::iterator it;
 		for (it = single_effect.begin(); it != single_effect.end(); ++it) {
-			if ((it->second->flag & EFFECT_FLAG_SINGLE_RANGE) && (current.location & it->second->range))
+			if ((it->second->flag & EFFECT_FLAG_SINGLE_RANGE) && it->second->in_range(current.location, current.sequence))
 				it->second->id = pduel->game_field->infos.field_id++;
 		}
 		for (it = field_effect.begin(); it != field_effect.end(); ++it) {
-			if (current.location & it->second->range)
+			if (it->second->in_range(current.location, current.sequence))
 				it->second->id = pduel->game_field->infos.field_id++;
 		}
 		if(current.location == LOCATION_SZONE) {
@@ -950,7 +950,7 @@ int32 card::add_effect(effect* peffect) {
 	}
 	indexer.insert(make_pair(peffect, it));
 	peffect->handler = this;
-	if ((current.location & peffect->range) && peffect->type & EFFECT_TYPE_FIELD)
+	if (peffect->in_range(current.location, current.sequence) && (peffect->type & EFFECT_TYPE_FIELD))
 		pduel->game_field->add_effect(peffect);
 	if (current.controler != PLAYER_NONE && check_target) {
 		if (peffect->is_disable_related())
@@ -989,12 +989,12 @@ void card::remove_effect(effect* peffect, effect_container::iterator it) {
 		single_effect.erase(it);
 	else if (peffect->type & EFFECT_TYPE_FIELD) {
 		check_target = 0;
-		if ((current.location & peffect->range) && get_status(STATUS_EFFECT_ENABLED) && !get_status(STATUS_DISABLED)) {
+		if (peffect->in_range(current.location, current.sequence) && get_status(STATUS_EFFECT_ENABLED) && !get_status(STATUS_DISABLED)) {
 			if (peffect->is_disable_related())
 				pduel->game_field->update_disable_check_list(peffect);
 		}
 		field_effect.erase(it);
-		if (current.location & peffect->range)
+		if (peffect->in_range(current.location, current.sequence))
 			pduel->game_field->remove_effect(peffect);
 	} else if (peffect->type & EFFECT_TYPE_EQUIP) {
 		equip_effect.erase(it);

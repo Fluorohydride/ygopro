@@ -579,3 +579,12 @@ uint8 effect::get_handler_player() {
 		return effect_owner;
 	return handler->current.controler;
 }
+int32 effect::in_range(int32 loc, int32 seq) {
+	if(loc != LOCATION_SZONE)
+		return range & loc;
+	if(seq < 5)
+		return range & LOCATION_SZONE;
+	if(seq == 5)
+		return range & LOCATION_FZONE;
+	return range & LOCATION_PZONE;
+}

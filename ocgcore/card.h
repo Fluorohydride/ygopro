@@ -259,6 +259,8 @@ public:
 #define LOCATION_EXTRA		0x40		//
 #define LOCATION_OVERLAY	0x80		//
 #define LOCATION_ONFIELD	0x0c		//
+#define LOCATION_FZONE		0x100		//
+#define LOCATION_PZONE		0x200		//
 //Positions
 #define POS_FACEUP_ATTACK		0x1
 #define POS_FACEDOWN_ATTACK		0x2

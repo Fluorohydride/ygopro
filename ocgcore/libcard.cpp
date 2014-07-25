@@ -1680,7 +1680,7 @@ int32 scriptlib::card_enable_counter_permit(lua_State *L) {
 	if(pcard->data.type & TYPE_MONSTER)
 		peffect->range = LOCATION_MZONE;
 	else
-		peffect->range = LOCATION_SZONE;
+		peffect->range = LOCATION_SZONE | LOCATION_FZONE | LOCATION_PZONE;
 	pcard->add_effect(peffect);
 	return 0;
 }
