@@ -99,7 +99,7 @@ function c27279764.tgop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(sg,REASON_RULE)
 	else
 		local hg=Duel.GetFieldGroup(1-tp,LOCATION_HAND,0)
-		Duel.ConfirmCards(1-tp,hg)
+		Duel.ConfirmCards(tp,hg)
 		Duel.ShuffleHand(1-tp)
 	end
 end

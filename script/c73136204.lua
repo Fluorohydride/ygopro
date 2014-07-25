@@ -23,11 +23,14 @@ function c73136204.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c73136204.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD) end
+	if chk==0 then
+		local ac=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
+		return ac>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=ac
+	end
 end
 function c73136204.operation(e,tp,eg,ep,ev,re,r,rp)
 	local ac=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<ac then return end
+	if ac==0 or Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)<ac then return end
 	Duel.ConfirmDecktop(tp,ac)
 	local g=Duel.GetDecktopGroup(tp,ac)
 	local sg=g:Filter(Card.IsRace,nil,RACE_PLANT)
