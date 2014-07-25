@@ -49,8 +49,13 @@ namespace ygopro
         void StopViewRegulation() { view_regulation = 0; }
         
         void ClearDeck();
+        void SortDeck();
+        void ShuffleDeck();
+        void SetDeckDirty();
         void LoadDeckFromFile(const std::wstring& file);
-        void LoadDeckFromString(const std::string& str);
+        void LoadDeckFromClipboard();
+        void SaveDeckToFile(const std::wstring& file);
+        void SaveDeckToClipboard();
         
         void UpdateBackGround();
         void UpdateCard();
@@ -74,7 +79,7 @@ namespace ygopro
         unsigned int misc_buffer = 0;
         bool update_bg = true;
         bool update_card = true;
-        wxString current_file;
+        std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;
         glbase::vector2<int> scene_size = {0, 0};
@@ -87,12 +92,14 @@ namespace ygopro
         float main_y_spacing = 0.0f;
         float offsety[3] = {0.0f, 0.0f, 0.0f};
         float dx[3] = {0.0f, 0.0f, 0.0f};
+        bool deck_edited = false;
         std::array<TextureInfo<4>, 3> limit;
         std::array<TextureInfo<4>, 3> pool;
         TextureInfo<4> hmask;
         std::set<DeckCardData*> updating_cards;
-        std::shared_ptr<FileDialog> fileDialog;
-        std::shared_ptr<FilterDialog> filterDialog;
+        std::weak_ptr<sgui::SGIconLabel> deck_label;
+        std::shared_ptr<FileDialog> file_dialog;
+        std::shared_ptr<FilterDialog> filter_dialog;
     };
     
 }

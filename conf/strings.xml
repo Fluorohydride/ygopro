@@ -3,15 +3,17 @@
   <string name="unknown" value="？？？"/>
   <string name="eui_button_ok" value="确定"/>
   <string name="eui_button_cancel" value="取消"/>
-  <string name="eui_deck_load" value="载入卡组"/>
-  <string name="eui_deck_save" value="保存卡组"/>
-  <string name="eui_deck_saveas" value="另存为卡组"/>
+  <string name="eui_button_yes" value="是"/>
+  <string name="eui_button_no" value="否"/>
+  <string name="eui_deck_load" value="载入"/>
+  <string name="eui_deck_save" value="保存"/>
+  <string name="eui_deck_saveas" value="另存为"/>
   <string name="eui_deck_loadstr" value="从文本载入"/>
   <string name="eui_deck_savestr" value="保存为文本"/>
   <string name="eui_updir" value="返回上一层目录"/>
-  <string name="eui_tool_clear" value="清空"/>
-  <string name="eui_tool_sort" value="排序"/>
-  <string name="eui_tool_shuffle" value="打乱"/>
+  <string name="eui_button_clear" value="清空"/>
+  <string name="eui_button_sort" value="排序"/>
+  <string name="eui_button_shuffle" value="打乱"/>
   <string name="eui_tool_screenshot" value="截图"/>
   <string name="eui_tool_saveshot" value="保存截图"/>
   <string name="eui_menu_tool_browser" value="在网页中查看"/>
@@ -22,14 +24,11 @@
   <string name="eui_list_semilimit" value="准限制卡"/>
   <string name="eui_list_view" value="-- 查看当前卡表 --"/>
   <string name="eui_list_default" value="[ 无限制 ]"/>
+  <string name="eui_msg_new_deck" value="(新卡组)"/>
   <string name="eui_msg_deck_load" value="请选择要载入的卡组"/>
   <string name="eui_msg_deck_save" value="卡组保存为"/>
-  <string name="eui_msg_deck_title_new" value="YGOpro2 卡组编辑器"/>
-  <string name="eui_msg_deck_title" value="YGOpro2 卡组编辑器 ({deck})"/>
-  <string name="eui_msg_deck_filter" value="卡组文件 |*.ydk"/>
+  <string name="eui_msg_deck_tostr_ok" value="卡组已复制到剪贴板"/>
   <string name="eui_msg_deck_load_error" value="无法载入卡组."/>
-  <string name="eui_msg_str_load_error" value="从文本载入卡组失败."/>
-  <string name="eui_msg_str_save" value="卡组已复制到剪贴板."/>
   <string name="eui_msg_screen_copy" value="截图已复制到剪贴板."/>
   <string name="eui_msg_screen_err" value="无法创建文件夹 {path}."/>
   <string name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}"/>

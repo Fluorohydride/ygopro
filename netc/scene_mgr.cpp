@@ -1,5 +1,7 @@
 #include <array>
 #include <chrono>
+#include <thread>
+#include <iostream>
 
 #include <wx/filename.h>
 #include <wx/clipbrd.h>
@@ -55,6 +57,23 @@ namespace ygopro
             current_scene->Draw();
     }
     
+    float SceneMgr::GetGameTime() {
+        unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
+        return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
+    }
+    
+    void SceneMgr::SetFrameRate(float rate) {
+        frame_interval = 1.0f / rate;
+    }
+    
+    void SceneMgr::CheckFrameRate() {
+        float now = GetGameTime();
+        frame_check += frame_interval - (now - frame_time);
+        if(frame_check >= 0.0f)
+            std::this_thread::sleep_for(std::chrono::microseconds((int)(frame_interval * 1000000)));
+        frame_time = now;
+    }
+    
     void SceneMgr::MouseMove(sf::Event::MouseMoveEvent evt) {
         if(current_scene != nullptr)
             current_scene->MouseMove(evt);
@@ -101,11 +120,6 @@ namespace ygopro
         if(cur_st != st)
             return nullptr;
         return current_scene;
-    }
-    
-    float SceneMgr::GetGameTime() {
-        unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
-        return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
     }
     
   /*

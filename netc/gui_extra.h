@@ -19,6 +19,13 @@ namespace ygopro
         std::weak_ptr<sgui::SGWindow> window;
     };
     
+    class MessageBox {
+    public:
+        static void ShowOK(const std::wstring& title, const std::wstring& text, std::function<void ()> cb = nullptr);
+        static void ShowOKCancel(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1 = nullptr, std::function<void ()> cb2 = nullptr);
+        static void ShowYesNo(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1 = nullptr, std::function<void ()> cb2 = nullptr);
+    };
+    
     class FileDialog : public CommonDialog {
     public:
         void Show(const std::wstring& title, const std::wstring& root, const std::wstring& filter);

@@ -1189,7 +1189,8 @@ namespace sgui
         return eventDragUpdate.TriggerEvent(*this, delta);
     }
     bool SGWindow::CloseButtonClick(SGWidget& sender) {
-        Destroy();
+        if(onClosing.TriggerEvent(sender) == false)
+            Destroy();
         return true;
     }
     

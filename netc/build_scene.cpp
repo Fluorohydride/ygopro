@@ -2,6 +2,8 @@
 #include <algorithm>
 #include <iostream>
 
+#include <wx/clipbrd.h>
+
 #include "glbase.h"
 #include "sungui.h"
 #include "image_mgr.h"
@@ -9,6 +11,29 @@
 #include "card_data.h"
 #include "build_scene.h"
 
+void GLCheckError(int line) {
+    auto err = glGetError();
+    switch (err) {
+        case GL_NO_ERROR:
+            break;
+        case GL_INVALID_ENUM:
+            std::cout << "Invalid enum at " << line << std::endl;
+        case GL_INVALID_VALUE:
+            std::cout << "Invalid value at " << line << std::endl;
+        case GL_INVALID_OPERATION:
+            std::cout << "Invalid operation at " << line << std::endl;
+        case GL_STACK_OVERFLOW:
+            std::cout << "Stack overflow at " << line << std::endl;
+        case GL_STACK_UNDERFLOW:
+            std::cout << "Stack underflow at " << line << std::endl;
+        case GL_OUT_OF_MEMORY:
+            std::cout << "Out of memory at " << line << std::endl;
+        case GL_TABLE_TOO_LARGE:
+            std::cout << "Table to large at " << line << std::endl;
+        default:
+            break;
+    }
+}
 namespace ygopro
 {
     
@@ -19,8 +44,10 @@ namespace ygopro
         glGenBuffers(1, &misc_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
+        GLCheckError(__LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 256 * 16, nullptr, GL_DYNAMIC_DRAW);
+        GLCheckError(__LINE__);
         std::vector<unsigned short> index;
         index.resize(256 * 4 * 6);
         for(int i = 0; i < 256 * 4; ++i) {
@@ -33,6 +60,7 @@ namespace ygopro
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 4 * 6, &index[0], GL_STATIC_DRAW);
+        GLCheckError(__LINE__);
         limit[0] = imageMgr.GetTexture("limit0");
         limit[1] = imageMgr.GetTexture("limit1");
         limit[2] = imageMgr.GetTexture("limit2");
@@ -51,15 +79,72 @@ namespace ygopro
     
     void BuildScene::Activate() {
         view_regulation = 0;
-        //auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {250, 200});
-        fileDialog = std::make_shared<FileDialog>();
-        fileDialog->Show(stringCfg[L"eui_deck_load"], L"./deck", L".ydk");
-        fileDialog->SetOKCallback([this](const std::wstring& deck)->void{
-            LoadDeckFromFile(deck);
+        file_dialog = std::make_shared<FileDialog>();
+        filter_dialog = std::make_shared<FilterDialog>();
+        auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {240, 200});
+        auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 10}, std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]));
+        deck_label = icon_label;
+        auto load_deck = sgui::SGButton::Create(pnl, {10, 40}, {70, 25});
+        load_deck->SetText(stringCfg[L"eui_deck_load"], 0xff000000);
+        load_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            file_dialog->Show(stringCfg[L"eui_msg_deck_load"], commonCfg[L"deck_path"], L".ydk");
+            file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
+                if(deck != current_file)
+                    LoadDeckFromFile(deck);
+            });
+            return true;
         });
-        filterDialog = std::make_shared<FilterDialog>();
-        
-        UpdateBackGround();
+        auto save_deck = sgui::SGButton::Create(pnl, {85, 40}, {70, 25});
+        save_deck->SetText(stringCfg[L"eui_deck_save"], 0xff000000);
+        save_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            if(current_file.length() == 0) {
+                file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
+                file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
+                    SaveDeckToFile(deck);
+                });
+            } else
+                SaveDeckToFile(current_file);
+            return true;
+        });
+        auto save_as = sgui::SGButton::Create(pnl, {160, 40}, {70, 25});
+        save_as->SetText(stringCfg[L"eui_deck_saveas"], 0xff000000);
+        save_as->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
+            file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
+                SaveDeckToFile(deck);
+            });
+            return true;
+        });
+        auto load_str = sgui::SGButton::Create(pnl, {10, 70}, {100, 25});
+        load_str->SetText(stringCfg[L"eui_deck_loadstr"], 0xff000000);
+        load_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            LoadDeckFromClipboard();
+            return true;
+        });
+        auto save_str = sgui::SGButton::Create(pnl, {130, 70}, {100, 25});
+        save_str->SetText(stringCfg[L"eui_deck_savestr"], 0xff000000);
+        save_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            SaveDeckToClipboard();
+            return true;
+        });
+        auto clear_deck = sgui::SGButton::Create(pnl, {10, 100}, {70, 25});
+        clear_deck->SetText(stringCfg[L"eui_button_clear"], 0xff000000);
+        clear_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            ClearDeck();
+            return true;
+        });
+        auto sort_deck = sgui::SGButton::Create(pnl, {85, 100}, {70, 25});
+        sort_deck->SetText(stringCfg[L"eui_button_sort"], 0xff000000);
+        sort_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            SortDeck();
+            return true;
+        });
+        auto shuffle_deck = sgui::SGButton::Create(pnl, {160, 100}, {70, 25});
+        shuffle_deck->SetText(stringCfg[L"eui_button_shuffle"], 0xff000000);
+        shuffle_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            ShuffleDeck();
+            return true;
+        });
         RefreshAllCard();
     }
     
@@ -78,6 +163,7 @@ namespace ygopro
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+        GLCheckError(__LINE__);
         // deck
         imageMgr.BindTexture(3);
         glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
@@ -86,6 +172,7 @@ namespace ygopro
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         glDrawElements(GL_TRIANGLES, deck_sz * 24, GL_UNSIGNED_SHORT, 0);
+        GLCheckError(__LINE__);
     }
     
     void BuildScene::SetSceneSize(glbase::vector2<int> sz) {
@@ -114,14 +201,15 @@ namespace ygopro
     
     void BuildScene::MouseMove(sf::Event::MouseMoveEvent evt) {
         auto hov = GetHoverCard((float)evt.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)evt.y / scene_size.y * 2.0f);
-        static DeckCardData* pre = nullptr;
+        static std::tuple<int, int, int> preh = std::make_tuple(0, 0, 0);
+        auto pre = GetCard(std::get<0>(preh), std::get<1>(preh));
         auto dcd = GetCard(std::get<0>(hov), std::get<1>(hov));
         if(dcd != pre) {
             if(pre)
                 ChangeHL(*pre, 0.1f, 0.0f);
             if(dcd)
                 ChangeHL(*dcd, 0.1f, 0.7f);
-            pre = dcd;
+            preh = hov;
         }
     }
     
@@ -142,6 +230,8 @@ namespace ygopro
     }
     
     void BuildScene::ClearDeck() {
+        if(current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size() == 0)
+            return;
         for(auto& dcd : current_deck.main_deck)
             imageMgr.UnloadCardTexture(dcd.data->code);
         for(auto& dcd : current_deck.extra_deck)
@@ -149,6 +239,27 @@ namespace ygopro
         for(auto& dcd : current_deck.side_deck)
             imageMgr.UnloadCardTexture(dcd.data->code);
         current_deck.Clear();
+        SetDeckDirty();
+    }
+    
+    void BuildScene::SortDeck() {
+        current_deck.Sort();
+        RefreshAllCard();
+    }
+    
+    void BuildScene::ShuffleDeck() {
+        current_deck.Shuffle();
+        RefreshAllCard();
+    }
+    
+    void BuildScene::SetDeckDirty() {
+        if(!deck_edited) {
+            if(current_file.length() == 0)
+                deck_label.lock()->SetText(std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]).append(L"*"), 0xff000000);
+            else
+                deck_label.lock()->SetText(std::wstring(L"\ue08c").append(current_file).append(L"*"), 0xff000000);
+            deck_edited = true;
+        }
     }
     
     void BuildScene::LoadDeckFromFile(const std::wstring& file) {
@@ -157,6 +268,39 @@ namespace ygopro
             ClearDeck();
             current_deck = tempdeck;
             current_file = file;
+            deck_edited = false;
+            for(auto& dcd : current_deck.main_deck) {
+                auto exdata = std::make_shared<BuilderCard>();
+                exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            }
+            for(auto& dcd : current_deck.extra_deck) {
+                auto exdata = std::make_shared<BuilderCard>();
+                exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            }
+            for(auto& dcd : current_deck.side_deck) {
+                auto exdata = std::make_shared<BuilderCard>();
+                exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            }
+            if(!deck_label.expired())
+                deck_label.lock()->SetText(std::wstring(L"\ue08c").append(current_file), 0xff000000);
+        }
+        RefreshAllCard();
+    }
+    
+    void BuildScene::LoadDeckFromClipboard() {
+        DeckData tempdeck;
+        wxTextDataObject tdo;
+        wxTheClipboard->Open();
+        wxTheClipboard->GetData(tdo);
+        wxTheClipboard->Close();
+        auto deck_string = tdo.GetText().ToStdString();
+        if(deck_string.find("ydk://") == 0 && tempdeck.LoadFromString(deck_string.substr(6))) {
+            ClearDeck();
+            current_deck = tempdeck;
+            SetDeckDirty();
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
@@ -176,8 +320,25 @@ namespace ygopro
         RefreshAllCard();
     }
     
-    void BuildScene::LoadDeckFromString(const std::string& str) {
-        
+    void BuildScene::SaveDeckToFile(const std::wstring& file) {
+        auto deckfile = file;
+        if(deckfile.find(L".ydk") != deckfile.length() - 4)
+            deckfile.append(L".ydk");
+        current_deck.SaveToFile(deckfile);
+        current_file = deckfile;
+        deck_edited = false;
+        if(!deck_label.expired())
+            deck_label.lock()->SetText(std::wstring(L"\ue08c").append(current_file), 0xff000000);
+    }
+    
+    void BuildScene::SaveDeckToClipboard() {
+        auto str = current_deck.SaveToString();
+        wxString deck_string;
+        deck_string.append("ydk://").append(str);
+        wxTheClipboard->Open();
+        wxTheClipboard->SetData(new wxTextDataObject(deck_string));
+        wxTheClipboard->Close();
+        MessageBox::ShowOK(L"", stringCfg[L"eui_msg_deck_tostr_ok"]);
     }
     
     void BuildScene::UpdateBackGround() {
@@ -196,6 +357,7 @@ namespace ygopro
         verts[3].texcoord = ti.vert[3];
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * verts.size(), &verts[0]);
+        GLCheckError(__LINE__);
     }
     
     void BuildScene::UpdateCard() {
@@ -349,6 +511,7 @@ namespace ygopro
             verts[15].texcoord = pti.vert[3];
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * ptr->buffer_index * 16, sizeof(glbase::VertexVCT) * 16, &verts[0]);
+        GLCheckError(__LINE__);
     }
     
     void BuildScene::RefreshHL(DeckCardData& dcd) {
@@ -368,6 +531,7 @@ namespace ygopro
         verts[3].texcoord = hmask.vert[3];
         verts[3].color = cl;
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 4), sizeof(glbase::VertexVCT) * 4, &verts[0]);
+        GLCheckError(__LINE__);
     }
     
     void BuildScene::RefreshLimit(DeckCardData& dcd) {
@@ -384,6 +548,7 @@ namespace ygopro
             verts[3].texcoord = limit[dcd.limit].vert[3];
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 8), sizeof(glbase::VertexVCT) * 4, &verts[0]);
+        GLCheckError(__LINE__);
     }
     
     void BuildScene::RefreshEx(DeckCardData& dcd) {
@@ -402,6 +567,7 @@ namespace ygopro
             verts[3].texcoord = pti.vert[3];
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 12), sizeof(glbase::VertexVCT) * 4, &verts[0]);
+        GLCheckError(__LINE__);
     }
     
     void BuildScene::MoveTo(DeckCardData& dcd, float tm, glbase::vector2<float> dst, glbase::vector2<float> dsz) {

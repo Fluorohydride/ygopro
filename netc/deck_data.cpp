@@ -75,6 +75,8 @@ namespace ygopro
         wxFileInputStream deck_file(file);
         if(!deck_file.IsOk())
             return false;
+        if(!deck_file.IsSeekable())
+            return false;
         main_deck.clear();
         extra_deck.clear();
         side_deck.clear();
@@ -120,7 +122,7 @@ namespace ygopro
         return true;
     }
     
-    bool DeckData::LoadFromString(const std::wstring& deck) {
+    bool DeckData::LoadFromString(const std::string& deck) {
         static const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
         static unsigned char base64_dec_table[256] = {0};
         static bool base64_dec_init = false;
@@ -471,13 +473,13 @@ namespace ygopro
             return iter->second;
     }
     
-    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc, const std::wstring& fs, bool check_desc) {
+    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc) {
         std::vector<CardData*> result;
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)
                 continue;
             CardData* cd = dataMgr[iter.first];
-            if(cd && cd->CheckCondition(fc, fs, check_desc)) {
+            if(cd && cd->CheckCondition(fc)) {
                 result.push_back(cd);
                 auto aliases = dataMgr.AllAliases(cd->code);
                 for(auto acd : aliases)

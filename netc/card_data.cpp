@@ -8,7 +8,7 @@ namespace ygopro
 
 	DataMgr dataMgr;
 
-    bool CardData::CheckCondition(const FilterCondition& fc, const std::wstring& keyword, bool check_desc) {
+    bool CardData::CheckCondition(const FilterCondition& fc) {
         if(type & 0x4000)
             return false;
         if(fc.code != 0 && code != fc.code && alias != fc.code)
@@ -55,7 +55,7 @@ namespace ygopro
             }
             return false;
         } else {
-            if(keyword.size()) {
+            if(fc.keyword.size()) {
 //                wxString kw = keyword.Upper();
 //                if(name.Upper().Find(kw) == -1 && (!check_desc || texts.Upper().Find(kw) == -1))
 //                    return false;
@@ -98,8 +98,6 @@ namespace ygopro
 			return sqlite3_errcode(pDB);
 		CardData cd;
 		wchar_t unicode_buffer[2048];
-//        int full_width_space = commonCfg["full_width_space"];
-//        wxString space = stringCfg["full_width_space"];
 		int step = 0, len = 0;
 		do {
 			step = sqlite3_step(pStmt);
@@ -120,13 +118,9 @@ namespace ygopro
 				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), unicode_buffer);
 				unicode_buffer[len] = 0;
 				cd.name = unicode_buffer;
-//                if(full_width_space)
-//                    cd.name.Replace(wxT(" "), space);
 				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), unicode_buffer);
 				unicode_buffer[len] = 0;
 				cd.texts = unicode_buffer;
-//                if(full_width_space)
-//                    cd.texts.Replace(wxT(" "), space);
                 for(unsigned int i = 0; i < 16; ++i) {
                     len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 14 + i), unicode_buffer);
                     unicode_buffer[len] = 0;
@@ -160,11 +154,11 @@ namespace ygopro
         }
     }
 
-    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc, const std::wstring& fs, bool check_desc) {
+    std::vector<CardData*> DataMgr::FilterCard(const FilterCondition& fc) {
         std::vector<CardData*> result;
         for(auto& iter : _datas) {
             CardData& cd = iter.second;
-            if(cd.CheckCondition(fc, fs, check_desc))
+            if(cd.CheckCondition(fc))
                 result.push_back(&cd);
         }
         if(result.size())

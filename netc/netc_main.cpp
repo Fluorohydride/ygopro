@@ -9,15 +9,18 @@
 using namespace ygopro;
 
 int main(int argc, char* argv[]) {
-    sf::RenderWindow window(sf::VideoMode(1024, 640), "Ygopro", sf::Style::Default, sf::ContextSettings(32));
-    //window.setVerticalSyncEnabled(true);
-    window.setFramerateLimit(60);
+    if(!commonCfg.LoadConfig(L"common.xml"))
+        return 0;
+    
+    int width = commonCfg[L"window_width"];
+    int height = commonCfg[L"window_height"];
+    sf::RenderWindow window(sf::VideoMode(width, height), "Ygopro", sf::Style::Default, sf::ContextSettings(32));
+    if((int)commonCfg[L"vertical_sync"])
+        window.setVerticalSyncEnabled(true);
     window.setActive();
     glewInit();
     
     imageMgr.InitTextures();
-    if(!commonCfg.LoadConfig(L"common.xml"))
-        return 0;
     if(!stringCfg.LoadConfig(commonCfg[L"string_path"]))
         return 0;
     if(dataMgr.LoadDatas(commonCfg[L"database"]))
@@ -32,26 +35,28 @@ int main(int argc, char* argv[]) {
     });
     
     sgui::SGGUIRoot::GetSingleton().LoadConfigs();
-    sgui::SGGUIRoot::GetSingleton().SetSceneSize({1024, 640});
+    sgui::SGGUIRoot::GetSingleton().SetSceneSize({width, height});
     
     sceneMgr.Init();
-    sceneMgr.SetSceneSize({1024, 640});
+    sceneMgr.SetSceneSize({width, height});
     sceneMgr.InitDraw();
     sceneMgr.SwitchScene(SceneMgr::SceneType::Builder);
+    sceneMgr.SetFrameRate((int)commonCfg[L"frame_rate"]);
     
     bool running = true;
     sf::Clock clock;
-    float tm1 = clock.getElapsedTime().asSeconds() - 10.0f;
+    float tm1 = clock.getElapsedTime().asSeconds() - 5.0f;
     int fps = 0;
     while (running) {
         fps++;
         sf::Event evt;
         float tm2 = clock.getElapsedTime().asSeconds();
-        if(tm2 - tm1 >= 10.0f) {
-            std::cout << "Average fps in 10s : " << fps / 10.0f << std::endl;
-            tm1 += 10.0f;
+        if(tm2 - tm1 >= 5.0f) {
+            std::cout << "Average fps in 5s : " << fps / 5.0f << std::endl;
+            tm1 += 5.0f;
             fps = 0;
         }
+        sceneMgr.CheckFrameRate();
         sceneMgr.Update();
         sceneMgr.InitDraw();
         while (window.pollEvent(evt)) {
@@ -103,6 +108,8 @@ int main(int argc, char* argv[]) {
 
         window.display();
     }
+    
+    imageMgr.UninitTextures();
     
     return 0;
 }

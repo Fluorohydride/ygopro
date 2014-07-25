@@ -145,6 +145,10 @@ namespace ygopro
     void ImageMgr::UninitTextures() {
         glDeleteFramebuffers(1, &frame_buffer);
         glDeleteBuffers(2, card_buffer);
+        card_texture.Unload();
+        misc_texture.Unload();
+        bg_texture.Unload();
+        card_image.Unload();
     }
     
     void ImageMgr::BindTexture(int textype) {

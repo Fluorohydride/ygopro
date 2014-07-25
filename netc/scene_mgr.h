@@ -35,6 +35,9 @@ namespace ygopro
         void InitDraw();
         void Update();
         void Draw();
+        float GetGameTime();
+        void SetFrameRate(float rate);
+        void CheckFrameRate();
         void MouseMove(sf::Event::MouseMoveEvent evt);
         void MouseButtonDown(sf::Event::MouseButtonEvent evt);
         void MouseButtonUp(sf::Event::MouseButtonEvent evt);
@@ -42,13 +45,14 @@ namespace ygopro
         void SwitchScene(SceneType st);
         std::shared_ptr<Scene> GetScene(SceneType st);
         
-        float GetGameTime();
-        
     protected:
         glbase::vector2<int> scene_size;
         SceneType cur_st = SceneType::None;
         unsigned long long start_time = 0;
         std::shared_ptr<Scene> current_scene = nullptr;
+        float frame_check = 0.0f;
+        float frame_time = 0.0f;
+        float frame_interval = 0.0f;
     };
     
     extern SceneMgr sceneMgr;

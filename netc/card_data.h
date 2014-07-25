@@ -23,6 +23,8 @@ namespace ygopro
         unsigned int race = 0;
         unsigned int attribute = 0;
         unsigned int category = 0;
+        std::wstring keyword;
+        bool check_desc = false;
     };
     
 	struct CardData {
@@ -42,7 +44,7 @@ namespace ygopro
 		std::wstring texts;
         std::wstring desc[16];
         
-        bool CheckCondition(const FilterCondition& fc, const std::wstring& keyword, bool check_desc);
+        bool CheckCondition(const FilterCondition& fc);
         
         static bool card_sort(const CardData* c1, const CardData* c2);
         
@@ -53,7 +55,7 @@ namespace ygopro
 		int LoadDatas(const std::wstring& file);
 		CardData* operator [] (unsigned int code);
         std::vector<unsigned int> AllAliases(unsigned int code);
-        std::vector<CardData*> FilterCard(const FilterCondition& fc, const std::wstring& fs, bool check_desc);
+        std::vector<CardData*> FilterCard(const FilterCondition& fc);
         
         static std::wstring GetAttributeString(unsigned int attr);
         static std::wstring GetRaceString(unsigned int race);

@@ -481,6 +481,8 @@ namespace sgui
         std::shared_ptr<SGWidget> GetCloseButton() { return children[0]; }
         void SetTitle(const std::wstring& t);
         
+        SGEventHandler<SGWidget> onClosing;
+        
     protected:
         virtual bool DragingBegin(v2i evt);
         virtual bool DragingUpdate(v2i evt);
