@@ -2128,6 +2128,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 			pduel->lua->add_param(core.units.begin()->ptarget, PARAM_TYPE_GROUP);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, peffect, 0, sumplayer, 0);
 		}
+		peffect->dec_count(sumplayer);
 		return FALSE;
 	}
 	case 21: {

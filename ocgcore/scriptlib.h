@@ -467,7 +467,6 @@ public:
 	static int32 duel_is_player_can_summon_count(lua_State *L);
 	static int32 duel_is_player_can_spsummon_count(lua_State *L);
 	static int32 duel_is_player_can_flipsummon_count(lua_State *L);
-
 	static int32 duel_is_player_can_release(lua_State *L);
 	static int32 duel_is_player_can_remove(lua_State *L);
 	static int32 duel_is_player_can_send_to_hand(lua_State *L);

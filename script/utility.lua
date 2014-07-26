@@ -892,7 +892,8 @@ function Auxiliary.AddPendulumProcedure(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetRange(LOCATION_SZONE)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetCountLimit(1,10000000)
 	e1:SetCondition(Auxiliary.PendCondition())
 	e1:SetOperation(Auxiliary.PendOperation())
 	e1:SetValue(SUMMON_TYPE_PENDULUM)
@@ -907,7 +908,6 @@ function Auxiliary.PendCondition()
 	return	function(e,c,og)
 				if c==nil then return true end
 				local tp=c:GetControler()
-				if Duel.GetFlagEffect(tp,10000000)~=0 then return false end
 				if c:GetSequence()~=6 then return false end
 				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 				if rpz==nil then return false end
@@ -925,7 +925,6 @@ function Auxiliary.PendCondition()
 end
 function Auxiliary.PendOperation()
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
-				Duel.RegisterFlagEffect(tp,10000000,RESET_PHASE+PHASE_END,0,1)
 				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 				local lscale=c:GetLeftScale()
 				local rscale=rpz:GetRightScale()

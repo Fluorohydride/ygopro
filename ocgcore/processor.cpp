@@ -2547,6 +2547,8 @@ int32 field::process_idle_command(uint16 step) {
 		filter_field_effect(EFFECT_SPSUMMON_PROC, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
 			pcard = eset[i]->handler;
+			if(!eset[i]->check_count_limit(pcard->current.controler))
+				continue;
 			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player))
 				core.spsummonable_cards.push_back(pcard);
 		}
@@ -2554,6 +2556,8 @@ int32 field::process_idle_command(uint16 step) {
 		filter_field_effect(EFFECT_SPSUMMON_PROC_G, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
 			pcard = eset[i]->handler;
+			if(!eset[i]->check_count_limit(pcard->current.controler))
+				continue;
 			if(pcard->current.controler != infos.turn_player)
 				continue;
 			effect* oreason = core.reason_effect;

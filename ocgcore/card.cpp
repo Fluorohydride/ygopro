@@ -1512,14 +1512,14 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
 		}
 		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect)
 		        && pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
-			peset->add_item(pr.first->second);
+			peset->add_item(peffect);
 	}
 }
 void card::filter_spsummon_procedure_g(uint8 playerid, effect_set* peset) {
 	auto pr = field_effect.equal_range(EFFECT_SPSUMMON_PROC_G);
 	for(; pr.first != pr.second; ++pr.first) {
 		effect* peffect = pr.first->second;
-		if(!peffect->is_available())
+		if(!peffect->is_available() || !peffect->check_count_limit(playerid))
 			continue;
 		effect* oreason = pduel->game_field->core.reason_effect;
 		uint8 op = pduel->game_field->core.reason_player;
@@ -1529,7 +1529,7 @@ void card::filter_spsummon_procedure_g(uint8 playerid, effect_set* peset) {
 		pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(this, PARAM_TYPE_CARD);
 		if(pduel->lua->check_condition(peffect->condition, 2))
-			peset->add_item(pr.first->second);
+			peset->add_item(peffect);
 		pduel->game_field->restore_lp_cost();
 		pduel->game_field->core.reason_effect = oreason;
 		pduel->game_field->core.reason_player = op;
