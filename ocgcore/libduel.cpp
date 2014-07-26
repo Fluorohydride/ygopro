@@ -2884,6 +2884,42 @@ int32 scriptlib::duel_is_player_can_spsummon_monster(lua_State * L) {
 	lua_pushboolean(L, pduel->game_field->is_player_can_spsummon_monster(playerid, toplayer, pos, &dat));
 	return 1;
 }
+int32 scriptlib::duel_is_player_can_summon_count(lua_State * L) {
+	check_param_count(L, 2);
+	int32 playerid = lua_tointeger(L, 1);
+	int32 count = lua_tointeger(L, 2);
+	if(playerid != 0 && playerid != 1) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	duel* pduel = interpreter::get_duel_info(L);
+	lua_pushboolean(L, pduel->game_field->is_player_can_summon_count(playerid, count));
+	return 1;
+}
+int32 scriptlib::duel_is_player_can_spsummon_count(lua_State * L) {
+	check_param_count(L, 2);
+	int32 playerid = lua_tointeger(L, 1);
+	int32 count = lua_tointeger(L, 2);
+	if(playerid != 0 && playerid != 1) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	duel* pduel = interpreter::get_duel_info(L);
+	lua_pushboolean(L, pduel->game_field->is_player_can_spsummon_count(playerid, count));
+	return 1;
+}
+int32 scriptlib::duel_is_player_can_flipsummon_count(lua_State * L) {
+	check_param_count(L, 2);
+	int32 playerid = lua_tointeger(L, 1);
+	int32 count = lua_tointeger(L, 2);
+	if(playerid != 0 && playerid != 1) {
+		lua_pushboolean(L, 0);
+		return 1;
+	}
+	duel* pduel = interpreter::get_duel_info(L);
+	lua_pushboolean(L, pduel->game_field->is_player_can_flipsummon_count(playerid, count));
+	return 1;
+}
 int32 scriptlib::duel_is_player_can_release(lua_State * L) {
 	check_param_count(L, 2);
 	int32 playerid = lua_tointeger(L, 1);

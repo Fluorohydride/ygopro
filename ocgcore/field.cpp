@@ -1777,6 +1777,15 @@ int32 field::is_player_can_summon(uint32 sumtype, uint8 playerid, card * pcard) 
 		if (pduel->lua->check_condition(eset[i]->target, 4))
 			return FALSE;
 	}
+	eset.clear();
+	filter_player_effect(playerid, EFFECT_SUMMON_COUNT_LIMIT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		int32 v = eset[i]->get_value(2);
+		if(v <= 0)
+			return FALSE;
+	}
 	return TRUE;
 }
 int32 field::is_player_can_mset(uint32 sumtype, uint8 playerid, card * pcard) {
@@ -1816,6 +1825,15 @@ int32 field::is_player_can_spsummon(uint8 playerid) {
 		if(!eset[i]->target)
 			return FALSE;
 	}
+	eset.clear();
+	filter_player_effect(playerid, EFFECT_SPSUMMON_COUNT_LIMIT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		int32 v = eset[i]->get_value(2);
+		if(v <= 0)
+			return FALSE;
+	}
 	return TRUE;
 }
 int32 field::is_player_can_spsummon(effect * peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card * pcard) {
@@ -1851,6 +1869,15 @@ int32 field::is_player_can_flipsummon(uint8 playerid, card * pcard) {
 		if (pduel->lua->check_condition(eset[i]->target, 3))
 			return FALSE;
 	}
+	eset.clear();
+	filter_player_effect(playerid, EFFECT_FLIP_SUMMON_COUNT_LIMIT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		int32 v = eset[i]->get_value(2);
+		if(v <= 0)
+			return FALSE;
+	}
 	return TRUE;
 }
 int32 field::is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data * pdata) {
@@ -1869,6 +1896,42 @@ int32 field::is_player_can_release(uint8 playerid, card * pcard) {
 		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		if (pduel->lua->check_condition(eset[i]->target, 3))
+			return FALSE;
+	}
+	return TRUE;
+}
+int32 field::is_player_can_summon_count(uint8 playerid, uint32 count) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_SUMMON_COUNT_LIMIT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		int32 v = eset[i]->get_value(2);
+		if(v < count)
+			return FALSE;
+	}
+	return TRUE;
+}
+int32 field::is_player_can_spsummon_count(uint8 playerid, uint32 count) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_SPSUMMON_COUNT_LIMIT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		int32 v = eset[i]->get_value(2);
+		if(v < count)
+			return FALSE;
+	}
+	return TRUE;
+}
+int32 field::is_player_can_flipsummon_count(uint8 playerid, uint32 count) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_FLIP_SUMMON_COUNT_LIMIT, &eset);
+	for(int32 i = 0; i < eset.count; ++i) {
+		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+		int32 v = eset[i]->get_value(2);
+		if(v < count)
 			return FALSE;
 	}
 	return TRUE;

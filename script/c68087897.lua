@@ -4,10 +4,10 @@ function c68087897.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e1:SetCode(EFFECT_SPSUMMON_COUNT_LIMIT)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,1)
-	e1:SetTarget(c68087897.sumlimit)
+	e1:SetValue(c68087897.spval)
 	c:RegisterEffect(e1)
 	--reg
 	local e2=Effect.CreateEffect(c)
@@ -17,8 +17,8 @@ function c68087897.initial_effect(c)
 	e2:SetOperation(c68087897.spreg)
 	c:RegisterEffect(e2)
 end
-function c68087897.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-	return e:GetHandler():GetFlagEffect(68087897+sump)~=0
+function c68087897.spval(e,se,sp)
+	return 1-e:GetHandler():GetFlagEffect(68087897+sp)
 end
 function c68087897.filter(c,tp)
 	return c:GetSummonPlayer()==tp
