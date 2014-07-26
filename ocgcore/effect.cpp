@@ -585,6 +585,6 @@ int32 effect::in_range(int32 loc, int32 seq) {
 	if(seq < 5)
 		return range & LOCATION_SZONE;
 	if(seq == 5)
-		return range & LOCATION_FZONE;
+		return range & (LOCATION_SZONE | LOCATION_FZONE);
 	return range & LOCATION_PZONE;
 }

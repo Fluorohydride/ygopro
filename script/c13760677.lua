@@ -12,7 +12,7 @@ function c13760677.initial_effect(c)
 	e2:SetDescription(aux.Stringid(13760677,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetRange(LOCATION_SZONE)
+	e2:SetRange(LOCATION_PZONE)
 	e2:SetCondition(c13760677.indcon)
 	e2:SetTarget(c13760677.indtg)
 	e2:SetOperation(c13760677.indop)
@@ -34,8 +34,7 @@ function c13760677.cfilter(c,e,tp)
 		and (not e or c:IsRelateToEffect(e))
 end
 function c13760677.indcon(e,tp,eg,ep,ev,re,r,rp)
-	return (e:GetHandler():GetSequence()==6 or e:GetHandler():GetSequence()==7)
-		and eg:IsExists(c13760677.cfilter,1,nil,nil,tp)
+	return eg:IsExists(c13760677.cfilter,1,nil,nil,tp)
 end
 function c13760677.indtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

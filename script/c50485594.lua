@@ -12,9 +12,8 @@ function c50485594.initial_effect(c)
 	e2:SetDescription(aux.Stringid(50485594,0))
 	e2:SetCategory(CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_SZONE)
+	e2:SetRange(LOCATION_PZONE)
 	e2:SetCountLimit(1,50485594+EFFECT_COUNT_CODE_DUEL)
-	e2:SetCondition(c50485594.thcon)
 	e2:SetCost(c50485594.thcost)
 	e2:SetTarget(c50485594.thtg)
 	e2:SetOperation(c50485594.thop)
@@ -36,9 +35,6 @@ function c50485594.initial_effect(c)
 	e4:SetTarget(c50485594.sptg)
 	e4:SetOperation(c50485594.spop)
 	c:RegisterEffect(e4)
-end
-function c50485594.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetSequence()==6 or e:GetHandler():GetSequence()==7
 end
 function c50485594.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

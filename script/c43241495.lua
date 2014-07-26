@@ -14,7 +14,7 @@ function c43241495.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_SZONE)
+	e2:SetRange(LOCATION_PZONE)
 	e2:SetCountLimit(1,43241495)
 	e2:SetCondition(c43241495.thcon)
 	e2:SetTarget(c43241495.thtg)
@@ -35,8 +35,7 @@ function c43241495.cfilter(c,tp)
 	return c:IsControler(tp) and c:GetSummonType()==SUMMON_TYPE_PENDULUM
 end
 function c43241495.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return (e:GetHandler():GetSequence()==6 or e:GetHandler():GetSequence()==7)
-		and eg:IsExists(c43241495.cfilter,1,nil,tp)
+	return eg:IsExists(c43241495.cfilter,1,nil,tp)
 end
 function c43241495.filter(c)
 	return (c:GetSequence()==6 or c:GetSequence()==7) and c:IsAbleToHand()

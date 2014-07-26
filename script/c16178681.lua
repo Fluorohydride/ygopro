@@ -12,7 +12,7 @@ function c16178681.initial_effect(c)
 	e2:SetDescription(aux.Stringid(16178681,0))
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e2:SetRange(LOCATION_SZONE)
+	e2:SetRange(LOCATION_PZONE)
 	e2:SetCountLimit(1,16178681)
 	e2:SetCondition(c16178681.rdcon)
 	e2:SetOperation(c16178681.rdop)
@@ -24,7 +24,7 @@ function c16178681.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetProperty(EFFECT_FLAG_REPEAT)
-	e3:SetRange(LOCATION_SZONE)
+	e3:SetRange(LOCATION_PZONE)
 	e3:SetCountLimit(1,16178682)
 	e3:SetCondition(c16178681.thcon)
 	e3:SetTarget(c16178681.thtg)
@@ -39,8 +39,6 @@ function c16178681.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c16178681.rdcon(e,tp,eg,ep,ev,re,r,rp)
-	local seq=e:GetHandler():GetSequence()
-	if seq~=6 and seq~=7 then return false end
 	local tc=Duel.GetAttacker()
 	if tc:IsControler(1-tp) then tc=Duel.GetAttackTarget() end
 	return ep==tp and tc and tc:IsType(TYPE_PENDULUM)
@@ -51,8 +49,6 @@ function c16178681.rdop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c16178681.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local seq=e:GetHandler():GetSequence()
-	if seq~=6 and seq~=7 then return false end
 	return Duel.GetTurnPlayer()==tp
 end
 function c16178681.filter(c)
