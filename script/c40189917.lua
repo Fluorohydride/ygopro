@@ -29,15 +29,18 @@ function c40189917.initial_effect(c)
 	e3:SetOperation(c40189917.damop)
 	c:RegisterEffect(e3)
 end
+function c40189917.mfilter(c,tp)
+	return c:IsSetCard(0x2c) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c40189917.sumcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1 and g:IsExists(Card.IsSetCard,1,nil,0x2c)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c40189917.mfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.GetTributeCount(c,mg)>0
 end
 function c40189917.sumop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,0x2c)
+	local mg=Duel.GetMatchingGroup(c40189917.mfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

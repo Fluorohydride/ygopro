@@ -33,18 +33,20 @@ function c40921744.initial_effect(c)
 	e3:SetOperation(c40921744.sdesop)
 	c:RegisterEffect(e3)
 end
+function c40921744.mfilter(c,tp)
+	return c:IsAttribute(ATTRIBUTE_DARK) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c40921744.sumcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local g=Duel.GetTributeGroup(c)
+	local mg=Duel.GetMatchingGroup(c40921744.mfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
 	local ag=Duel.GetMatchingGroup(Card.IsAttribute,tp,LOCATION_GRAVE,0,nil,ATTRIBUTE_DARK)
-	return c:IsLevelAbove(7) and g:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_DARK)
+	return c:IsLevelAbove(7) and Duel.GetTributeCount(c,mg)>0
 		and ag:GetClassCount(Card.GetCode)>=4
 end
 function c40921744.sumop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsAttribute,1,1,nil,ATTRIBUTE_DARK)
+	local mg=Duel.GetMatchingGroup(c40921744.mfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
