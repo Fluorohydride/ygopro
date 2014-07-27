@@ -11,7 +11,7 @@ using namespace ygopro;
 int main(int argc, char* argv[]) {
     if(!commonCfg.LoadConfig(L"common.xml"))
         return 0;
-    
+
     int width = commonCfg[L"window_width"];
     int height = commonCfg[L"window_height"];
     sf::RenderWindow window(sf::VideoMode(width, height), "Ygopro", sf::Style::Default, sf::ContextSettings(32));

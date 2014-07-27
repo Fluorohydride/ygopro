@@ -173,9 +173,9 @@ namespace ygopro
         list->ClearItem();
         if(path != root)
             list->AddItem(142, stringCfg[L"eui_updir"], 0xff000000);
-        for(int i = 0; i < dirs.GetCount(); ++i)
+        for(size_t i = 0; i < dirs.GetCount(); ++i)
             list->AddItem(140, dirs[i].ToStdWstring(), 0xff000000);
-        for(int i = 0; i < files.GetCount(); ++i)
+        for(size_t i = 0; i < files.GetCount(); ++i)
             list->AddItem(141, files[i].ToStdWstring(), 0xff000000);
     }
     

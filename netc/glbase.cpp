@@ -1,6 +1,7 @@
 #include "glbase.h"
 
 #include <memory>
+#include <memory.h>
 #include <SFML/Graphics.hpp>
 
 namespace glbase {

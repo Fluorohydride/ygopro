@@ -1,10 +1,13 @@
 #ifndef _DECK_DATA_H_
 #define _DECK_DATA_H_
 
-#include "wx/string.h"
 #include <unordered_map>
 #include <vector>
 #include <tuple>
+#include <memory>
+
+#include "wx/string.h"
+
 
 #define DECK_NOERROR        0
 #define DECK_EXCEED_COUNT   0x10000000

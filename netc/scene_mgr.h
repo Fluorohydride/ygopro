@@ -1,6 +1,7 @@
 #ifndef _GAME_SCENE_H_
 #define _GAME_SCENE_H_
 
+#include <memory>
 #include "xml_config.h"
 #include "../common/random.h"
 

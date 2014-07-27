@@ -258,7 +258,7 @@ namespace sgui
         
     protected:
         bool text_update = true;
-        short mem_size = 0;
+        unsigned short mem_size = 0;
         unsigned int tbo[2] = {0, 0};
         sf::Font* font = nullptr;
         unsigned int font_size = 0;

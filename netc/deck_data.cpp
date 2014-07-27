@@ -496,7 +496,7 @@ namespace ygopro
         if(!current_list)
             return;
         for(auto& iter : current_list->counts) {
-            if(iter.second != limit)
+            if(iter.second != (unsigned int)limit)
                 continue;
             CardData* cd = dataMgr[iter.first];
             if(!cd)

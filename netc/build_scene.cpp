@@ -189,7 +189,7 @@ namespace ygopro
         if(max_row_count < 10)
             max_row_count = 10;
         main_row_count = max_row_count;
-        if(current_deck.main_deck.size() > main_row_count * 4)
+        if((int)current_deck.main_deck.size() > main_row_count * 4)
             main_row_count = (current_deck.main_deck.size() - 1) / 4 + 1;
         dx[0] = (maxx - minx - card_size.x) / (main_row_count - 1);
         int rc1 = std::max((int)current_deck.extra_deck.size(), max_row_count);
@@ -347,13 +347,13 @@ namespace ygopro
         update_bg = false;
         auto ti = imageMgr.GetTexture("bg");
         std::array<glbase::VertexVCT, 4> verts;
-        verts[0].vertex = {-1.0f, 1.0f};
+        verts[0].vertex = {-1.0f, 1.0f, 0.0f};
         verts[0].texcoord = ti.vert[0];
-        verts[1].vertex = {1.0f, 1.0f};
+        verts[1].vertex = {1.0f, 1.0f, 0.0f};
         verts[1].texcoord = ti.vert[1];
-        verts[2].vertex = {-1.0f, -1.0f};
+        verts[2].vertex = {-1.0f, -1.0f, 0.0f};
         verts[2].texcoord = ti.vert[2];
-        verts[3].vertex = {1.0f, -1.0f};
+        verts[3].vertex = {1.0f, -1.0f, 0.0f};
         verts[3].texcoord = ti.vert[3];
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * verts.size(), &verts[0]);
@@ -425,7 +425,7 @@ namespace ygopro
         if(deck_sz == 0)
             return;
         main_row_count = max_row_count;
-        if(current_deck.main_deck.size() > main_row_count * 4)
+        if((int)current_deck.main_deck.size() > main_row_count * 4)
             main_row_count = (current_deck.main_deck.size() - 1) / 4 + 1;
         dx[0] = (maxx - minx - card_size.x) / (main_row_count - 1);
         int rc1 = std::max((int)current_deck.extra_deck.size(), max_row_count);
@@ -469,45 +469,45 @@ namespace ygopro
         std::array<glbase::VertexVCT, 16> verts;
         verts[0].vertex = ptr->pos;
         verts[0].texcoord = ptr->card_tex.ti.vert[0];
-        verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y};
+        verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
         verts[1].texcoord = ptr->card_tex.ti.vert[1];
-        verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y};
+        verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
         verts[2].texcoord = ptr->card_tex.ti.vert[2];
-        verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y};
+        verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
         verts[3].texcoord = ptr->card_tex.ti.vert[3];
         unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
         verts[4].vertex = ptr->pos;
         verts[4].texcoord = hmask.vert[0];
         verts[4].color = cl;
-        verts[5].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y};
+        verts[5].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
         verts[5].texcoord = hmask.vert[1];
         verts[5].color = cl;
-        verts[6].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y};
+        verts[6].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
         verts[6].texcoord = hmask.vert[2];
         verts[6].color = cl;
-        verts[7].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y};
+        verts[7].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
         verts[7].texcoord = hmask.vert[3];
         verts[7].color = cl;
         if(dcd.limit < 3) {
-            verts[8].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f};
+            verts[8].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f, 0.0f};
             verts[8].texcoord = limit[dcd.limit].vert[0];
-            verts[9].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f};
+            verts[9].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f, 0.0f};
             verts[9].texcoord = limit[dcd.limit].vert[1];
-            verts[10].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f - icon_size.y};
+            verts[10].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
             verts[10].texcoord = limit[dcd.limit].vert[2];
-            verts[11].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f - icon_size.y};
+            verts[11].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
             verts[11].texcoord = limit[dcd.limit].vert[3];
         }
         if((ptr->show_exclusive) && dcd.data->pool != 3) {
             float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd.data->pool == 1) ? pool[0] : pool[1];
-            verts[12].vertex = {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f};
+            verts[12].vertex = {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
             verts[12].texcoord = pti.vert[0];
-            verts[13].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f};
+            verts[13].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
             verts[13].texcoord = pti.vert[1];
-            verts[14].vertex = {px, ptr->pos.y - ptr->size.y - 0.01f};
+            verts[14].vertex = {px, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
             verts[14].texcoord = pti.vert[2];
-            verts[15].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y - 0.01f};
+            verts[15].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
             verts[15].texcoord = pti.vert[3];
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * ptr->buffer_index * 16, sizeof(glbase::VertexVCT) * 16, &verts[0]);
@@ -521,13 +521,13 @@ namespace ygopro
         verts[0].vertex = ptr->pos;
         verts[0].texcoord = hmask.vert[0];
         verts[0].color = cl;
-        verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y};
+        verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
         verts[1].texcoord = hmask.vert[1];
         verts[1].color = cl;
-        verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y};
+        verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
         verts[2].texcoord = hmask.vert[2];
         verts[2].color = cl;
-        verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y};
+        verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
         verts[3].texcoord = hmask.vert[3];
         verts[3].color = cl;
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 4), sizeof(glbase::VertexVCT) * 4, &verts[0]);
@@ -538,13 +538,13 @@ namespace ygopro
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd.extra);
         std::array<glbase::VertexVCT, 4> verts;
         if(dcd.limit < 3) {
-            verts[0].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f};
+            verts[0].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f, 0.0f};
             verts[0].texcoord = limit[dcd.limit].vert[0];
-            verts[1].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f};
+            verts[1].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f, 0.0f};
             verts[1].texcoord = limit[dcd.limit].vert[1];
-            verts[2].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f - icon_size.y};
+            verts[2].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
             verts[2].texcoord = limit[dcd.limit].vert[2];
-            verts[3].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f - icon_size.y};
+            verts[3].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
             verts[3].texcoord = limit[dcd.limit].vert[3];
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 8), sizeof(glbase::VertexVCT) * 4, &verts[0]);
@@ -557,13 +557,13 @@ namespace ygopro
         if((ptr->show_exclusive) && dcd.data->pool != 3) {
             float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd.data->pool == 1) ? pool[0] : pool[1];
-            verts[0].vertex = {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f};
+            verts[0].vertex = {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
             verts[0].texcoord = pti.vert[0];
-            verts[1].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f};
+            verts[1].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
             verts[1].texcoord = pti.vert[1];
-            verts[2].vertex = {px, ptr->pos.y - ptr->size.y - 0.01f};
+            verts[2].vertex = {px, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
             verts[2].texcoord = pti.vert[2];
-            verts[3].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y - 0.01f};
+            verts[3].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
             verts[3].texcoord = pti.vert[3];
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 12), sizeof(glbase::VertexVCT) * 4, &verts[0]);
@@ -596,15 +596,15 @@ namespace ygopro
         if(index < 0)
             return nullptr;
         if(pos == 1) {
-            if(index >= current_deck.main_deck.size())
+            if(index >= (int)current_deck.main_deck.size())
                 return nullptr;
             return &current_deck.main_deck[index];
         } else if(pos == 2) {
-            if(index >= current_deck.extra_deck.size())
+            if(index >= (int)current_deck.extra_deck.size())
                 return nullptr;
             return &current_deck.extra_deck[index];
         } else if(pos == 3) {
-            if(index >= current_deck.side_deck.size())
+            if(index >= (int)current_deck.side_deck.size())
                 return nullptr;
             return &current_deck.side_deck[index];
         }
@@ -624,7 +624,7 @@ namespace ygopro
                     index = (int)((x - minx) / dx[0]);
                 int cindex = index;
                 index += row * main_row_count;
-                if(index > current_deck.main_deck.size())
+                if(index > (int)current_deck.main_deck.size())
                     return std::make_tuple(1, -1, current_deck.side_deck.size());
                 else {
                     if(y < offsety[0] - main_y_spacing * row - card_size.y || x > minx + cindex * dx[0] + card_size.x)
@@ -639,7 +639,7 @@ namespace ygopro
                     index = rc - 1;
                 else
                     index = (int)((x - minx) / dx[1]);
-                if(index > current_deck.extra_deck.size())
+                if(index > (int)current_deck.extra_deck.size())
                     return std::make_tuple(2, -1, current_deck.extra_deck.size());
                 else
                     return std::make_tuple(2, index, 0);
@@ -650,7 +650,7 @@ namespace ygopro
                     index = rc - 1;
                 else
                     index = (int)((x - minx) / dx[2]);
-                if(index > current_deck.side_deck.size())
+                if(index > (int)current_deck.side_deck.size())
                     return std::make_tuple(3, -1, current_deck.side_deck.size());
                 else
                     return std::make_tuple(3, index, 0);

@@ -39,10 +39,10 @@ namespace ygopro
                         card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
                         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
                         glViewport(0, 0, 2048, 2048);
-                        frame_verts[0].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f};
-                        frame_verts[1].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f};
-                        frame_verts[2].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f};
-                        frame_verts[3].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f};
+                        frame_verts[0].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f, 0.0f};
+                        frame_verts[1].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f, 0.0f};
+                        frame_verts[2].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f, 0.0f};
+                        frame_verts[3].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f, 0.0f};
                         frame_verts[0].texcoord = {0.0f, 0.0f};
                         frame_verts[1].texcoord = {(float)img.getSize().x / card_image.GetWidth(), 0.0f};
                         frame_verts[2].texcoord = {0.0f, (float)img.getSize().y / card_image.GetHeight()};

@@ -224,7 +224,7 @@ namespace sgui
     }
     
     void SGTextBase::SetTextColor(unsigned int start, unsigned int end, unsigned int cl) {
-        for(int i = start; i < end && i < color_vec.size(); ++i)
+        for(unsigned int i = start; i < end && i < color_vec.size(); ++i)
             color_vec[i] = cl;
         text_update = true;
     }
@@ -277,7 +277,7 @@ namespace sgui
         auto tex = font->getTexture(font_size);
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
-        int max_width = GetMaxWidth();
+        unsigned int max_width = GetMaxWidth();
         int ls = GetLineSpacing();
         v2i text_pos = GetTextOffset();
         for(size_t i = 0; i < text.length(); ++i) {
@@ -430,8 +430,8 @@ namespace sgui
         std::vector<unsigned short> index;
         glbase::VertexVCT cur;
         v2i pos = GetImageOffset();
-        for(int ti = 0; ti < texcoords.size(); ++ti) {
-            for(int i = 0; i < verts.size(); ++i) {
+        for(size_t ti = 0; ti < texcoords.size(); ++ti) {
+            for(size_t i = 0; i < verts.size(); ++i) {
                 guiRoot.ConvertXY(verts[i].x + pos.x, verts[i].y + pos.y, cur.vertex);
                 cur.texcoord.x = (float)texcoords[ti][i].x / img_texture->GetWidth();
                 cur.texcoord.y = (float)texcoords[ti][i].y / img_texture->GetHeight();
@@ -439,7 +439,7 @@ namespace sgui
                 vert.push_back(cur);
             }
         }
-        for(int i = 0; i < verts.size(); ++i)
+        for(size_t i = 0; i < verts.size(); ++i)
             index.push_back(i);
         if(img_dirty) {
             glBindBuffer(GL_ARRAY_BUFFER, imgvbo[0]);
@@ -1303,7 +1303,7 @@ namespace sgui
             int max_width = GetMaxWidth();
             auto iconoffset = iconlabel_config.tex_config["iconoffset"];
             int ls = GetLineSpacing();
-            int ils = ls > (iconoffset.height + spacing_y) ? ls : (iconoffset.height + spacing_y);
+            int ils = (ls > (int)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
             bool has_icon = false;
             for(auto ch : t) {
                 if(ch < L' ') {
@@ -1357,12 +1357,12 @@ namespace sgui
         auto tex = font->getTexture(font_size);
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
-        int max_width = GetMaxWidth();
+        unsigned int max_width = GetMaxWidth();
         v2i text_pos = GetTextOffset();
         auto iconoffset = guiRoot.GetDefaultRect("iconoffset");
         auto iconrc = guiRoot.GetDefaultInt("iconcolumn");
         int ls = GetLineSpacing();
-        int ils = ls > (iconoffset.height + spacing_y) ? ls : (iconoffset.height + spacing_y);
+        int ils = (ls > (int)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
         bool has_icon = false;
         for(size_t i = 0; i < text.length(); ++i) {
             wchar_t ch = text[i];
@@ -2425,7 +2425,7 @@ namespace sgui
     }
     
     unsigned int SGTextEdit::GetTextColor(int index) {
-        if(index >= sel_start && index < sel_end)
+        if(index >= (int)sel_start && index < (int)sel_end)
             return sel_color;
         return color_vec[index];
     }
@@ -2499,7 +2499,7 @@ namespace sgui
         if(text_width_cur <= size_abs.x - text_area.left - text_area.width)
             text_offset = 0;
         else {
-            int my = cur >= text.length() ? text_width_cur : text_pos_array[cur].x;
+            int my = (cur >= (int)text.length()) ? text_width_cur : text_pos_array[cur].x;
             int size_w = size_abs.x - text_area.left - text_area.width - 10;
             if(my < text_offset + 10) {
                 text_offset = my - 10;
@@ -2836,11 +2836,11 @@ namespace sgui
         unsigned int sel_color = listbox_config.int_config["sel_bcolor"];
         unsigned int color1 = listbox_config.int_config["color1"];
         unsigned int color2 = listbox_config.int_config["color2"];
-        for(int i = begini; i < items.size() && i < begini + m_item_count; ++i) {
+        for(size_t i = begini; i < items.size() && i < (size_t)(begini + m_item_count); ++i) {
             int li = i - begini;
             guiRoot.SetRectVertex(&vert[36 + li * 8], position_abs.x + bw, position_abs.y + bw + i * line_spacing - text_offset,
                                   size_abs.x - bw * 2, line_spacing, selrect);
-            unsigned int bcolor = (i == current_sel) ? sel_color : (i % 2) ? color1 : color2;
+            unsigned int bcolor = (i == (size_t)current_sel) ? sel_color : (i % 2) ? color1 : color2;
             for(int j = 0; j < 4; ++j)
                 vert[36 + li * 8 + j].color = bcolor;
             int iconi = std::get<0>(items[i]);
@@ -2930,10 +2930,10 @@ namespace sgui
         int begini = text_offset / line_spacing;
         int scolor = listbox_config.int_config["sel_color"];
         int iconw = guiRoot.GetDefaultRect("iconoffset").width;
-        for(int i = begini; i < items.size() && i < begini + itemcount; ++i) {
+        for(size_t i = begini; i < items.size() && i < (size_t)(begini + itemcount); ++i) {
             unsigned int advx = std::get<0>(items[i]) ? iconw : 0;
             unsigned int advy = font_size + line_spacing * i;
-            unsigned int color = (i == current_sel) ? scolor : std::get<2>(items[i]);
+            unsigned int color = (i == (size_t)current_sel) ? scolor : std::get<2>(items[i]);
             for(auto ch : std::get<1>(items[i])) {
                 if(ch < L' ')
                     continue;
@@ -2994,7 +2994,7 @@ namespace sgui
             items.push_back(std::make_tuple(icon, item, color));
         else
             items.insert(items.begin() + index, std::make_tuple(icon, item, color));
-        if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height) {
+        if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
             auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
             sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
         }
@@ -3004,7 +3004,7 @@ namespace sgui
     
     void SGListBox::AddItem(unsigned short icon, const std::wstring& item, unsigned int color) {
         items.push_back(std::make_tuple(icon, item, color));
-        if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height) {
+        if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
             auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
             sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
         }
@@ -3017,7 +3017,7 @@ namespace sgui
             return;
         items.erase(items.begin() + index);
         auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
-        if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height)
+        if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height))
             sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
         else {
             text_offset = 0;
@@ -3058,11 +3058,11 @@ namespace sgui
     }
     
     void SGListBox::SetSelection(int sel) {
-        if(sel < 0 || sel >= items.size())
+        if(sel < 0 || sel >= (int)items.size())
             current_sel = -1;
         else {
             current_sel = sel;
-            if(items.size() * line_spacing > size_abs.y - text_area.top - text_area.height) {
+            if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
                 int max_offset = items.size() * line_spacing - (size_abs.y - text_area.top - text_area.height);
                 text_offset = current_sel * line_spacing;
                 if(text_offset > max_offset)
@@ -3311,7 +3311,7 @@ namespace sgui
     void SGComboBox::InsertItem(unsigned int index, const std::wstring& item, unsigned int color) {
         std::static_pointer_cast<SGListBox>(children[0])->InsertItem(index, 0, item, color);
         item_count++;
-        if(current_sel >= 0 && index <= current_sel)
+        if(current_sel >= 0 && (int)index <= current_sel)
             current_sel++;
     }
     
@@ -3321,14 +3321,14 @@ namespace sgui
     }
     
     void SGComboBox::RemoveItem(unsigned int index) {
-        if(index >= item_count)
+        if((int)index >= item_count)
             return;
         std::static_pointer_cast<SGListBox>(children[0])->RemoveItem(index);
         item_count--;
-        if(index == current_sel) {
+        if((int)index == current_sel) {
             ClearText();
             current_sel = -1;
-        } else if(index < current_sel)
+        } else if((int)index < current_sel)
             current_sel--;
     }
     
@@ -3653,7 +3653,7 @@ namespace sgui
             else
                 ptr->width = wp;
             if(item_count == 0) {
-                if(max_w + ptr->width > width)
+                if((int)(max_w + ptr->width) > width)
                     item_count = i + 1;
                 else
                     max_w += ptr->width;
@@ -3680,7 +3680,7 @@ namespace sgui
         int tb = tab_config.int_config["tab_border"];
         int ti = tab_ol;
         text_pos.y += font_size + tab_config.int_config["title_offset"];
-        for(int i = 0; i < children.size(); ++i) {
+        for(size_t i = 0; i < children.size(); ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
             unsigned int advx = ti + tb;
             unsigned int color = ptr->color;
@@ -3782,7 +3782,7 @@ namespace sgui
     }
     
     void SGTabControl::SetTabTitle(unsigned int index, const std::wstring& title, unsigned int color) {
-        if(index >= children.size())
+        if((size_t)index >= children.size())
             return;
         auto ptr = std::static_pointer_cast<SGTabInner>(children[index]);
         ptr->title = title;
@@ -3792,13 +3792,13 @@ namespace sgui
     }
     
     std::shared_ptr<SGWidgetContainer> SGTabControl::GetTab(int index) {
-        if(index >= children.size())
+        if(index >= (int)children.size())
             return nullptr;
         return std::static_pointer_cast<SGWidgetContainer>(children[index]);
     }
     
     void SGTabControl::SetActiveTab(int index) {
-        if(index >= children.size())
+        if(index >= (int)children.size())
             return;
         active_tab = children[index];
         vertices_dirty = true;
@@ -3809,7 +3809,7 @@ namespace sgui
     }
     
     int SGTabControl::GetActiveTab() {
-        for(int i = 0; i < children.size(); ++i)
+        for(size_t i = 0; i < children.size(); ++i)
             if(children[i] == active_tab.lock())
                 return i;
         return -1;
@@ -3924,9 +3924,9 @@ namespace sgui
         if(children.size() == 0)
             return -1;
         int ti = position_abs.x + tab_ol;
-        for(int i = 0; i < children.size(); ++i) {
+        for(size_t i = 0; i < children.size(); ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
-            if(pos.x >= ti && pos.x <= ti + ptr->width)
+            if(pos.x >= ti && pos.x <= (int)(ti + ptr->width))
                 return i;
             ti += ptr->width;
         }
