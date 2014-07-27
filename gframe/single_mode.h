@@ -23,7 +23,7 @@ public:
 	static bool SinglePlayAnalyze(char* msg, unsigned int len);
 	
 	static void SinglePlayRefresh(int flag = 0x781fff);
-	static void SinglePlayRefreshHand(int player, int flag = 0x181fff);
+	static void SinglePlayRefreshHand(int player, int flag = 0x781fff);
 	static void SinglePlayRefreshGrave(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshDeck(int player, int flag = 0x181fff);
 	static void SinglePlayRefreshExtra(int player, int flag = 0x181fff);

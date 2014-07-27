@@ -80,6 +80,7 @@ function c87602890.operation(e,tp,eg,ep,ev,re,r,rp)
 			g1:Merge(g2)
 		end
 		if g1:GetCount()>0 then
+			Duel.BreakEffect()
 			Duel.SendtoGrave(g1,REASON_EFFECT)
 		end
 	end

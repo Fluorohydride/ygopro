@@ -649,6 +649,18 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 		}
 		break;
 	}
+	case LOCATION_EXTRA: {
+		if (controler == 0) {
+			t->X = (matManager.vFields[8].Pos.X + matManager.vFields[9].Pos.X) / 2;
+			t->Y = (matManager.vFields[8].Pos.Y + matManager.vFields[10].Pos.Y) / 2;
+			t->Z = extra[controler].size() * 0.01f + 0.03f;
+		} else {
+			t->X = (matManager.vFields[76].Pos.X + matManager.vFields[77].Pos.X) / 2;
+			t->Y = (matManager.vFields[76].Pos.Y + matManager.vFields[78].Pos.Y) / 2;
+			t->Z = extra[controler].size() * 0.01f + 0.03f;
+		}
+		break;
+	}
 	}
 }
 void ClientField::GetCardLocation(ClientCard* pcard, irr::core::vector3df* t, irr::core::vector3df* r, bool setTrans) {

@@ -772,7 +772,7 @@ void card::xyz_overlay(card_set* materials) {
 			(*cvit)->reset(RESET_LEAVE + RESET_OVERLAY, RESET_EVENT);
 			if((*cvit)->unique_code)
 				pduel->game_field->remove_unique_card(*cvit);
-			if((*cvit)->equiping_target) 
+			if((*cvit)->equiping_target)
 				(*cvit)->unequip();
 			xyz_add(*cvit, &des);
 		}
