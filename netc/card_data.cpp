@@ -1,3 +1,6 @@
+#include <algorithm>
+#include <ctype.h>
+
 #include "card_data.h"
 #include "scene_mgr.h"
 #include "../common/bufferutil.h"
@@ -56,9 +59,11 @@ namespace ygopro
             return false;
         } else {
             if(fc.keyword.size()) {
-//                wxString kw = keyword.Upper();
-//                if(name.Upper().Find(kw) == -1 && (!check_desc || texts.Upper().Find(kw) == -1))
-//                    return false;
+                static auto charcmp = [](wchar_t ch1, wchar_t ch2) -> bool { return std::toupper(ch1) == std::toupper(ch2); };
+                if(std::search(name.begin(), name.end(), fc.keyword.begin(), fc.keyword.end(), charcmp) == name.end())
+                    return false;
+                if(std::search(texts.begin(), texts.end(), fc.keyword.begin(), fc.keyword.end(), charcmp) == texts.end())
+                    return false;
             }
         }
         return true;
@@ -182,7 +187,8 @@ namespace ygopro
             attname.append(stringCfg[L"attribtue_dark"]).append(L"|");
         if(attr & 0x40)
             attname.append(stringCfg[L"attribtue_divine"]).append(L"|");
-        attname.resize(attname.length() - 1);
+        if(attname.length() > 0)
+            attname.resize(attname.length() - 1);
         return std::move(attname);
     }
     
@@ -236,7 +242,8 @@ namespace ygopro
             racname.append(stringCfg[L"race_creatorgod"]).append(L"|");
         if(race & 0x800000)
             racname.append(stringCfg[L"race_phantomdragon"]).append(L"|");
-        racname.resize(racname.length() - 1);
+        if(racname.length() > 0)
+            racname.resize(racname.length() - 1);
         return std::move(racname);
     }
     
@@ -328,6 +335,7 @@ namespace ygopro
             case 0x200000: return stringCfg[L"type_flip"];
             case 0x400000: return stringCfg[L"type_toon"];
             case 0x800000: return stringCfg[L"type_xyz"];
+            case 0x1000000: return stringCfg[L"type_pendulum"];
         }
         return L"";
     }

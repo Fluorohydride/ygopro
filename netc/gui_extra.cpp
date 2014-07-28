@@ -3,7 +3,6 @@
 
 #include "gui_extra.h"
 #include "scene_mgr.h"
-#include "card_data.h"
 
 namespace ygopro
 {
@@ -106,7 +105,7 @@ namespace ygopro
         fpath->SetText(root, 0xff000000);
         auto lst = sgui::SGListBox::Create(wd, {10, 55}, {280, 200});
         auto ffile = sgui::SGTextEdit::Create(wd, {10, 255}, {280, 30});
-        auto btn = sgui::SGButton::Create(wd, {190, 285}, {100, 30});
+        auto btn = sgui::SGButton::Create(wd, {190, 290}, {100, 25});
         btn->SetText(stringCfg[L"eui_button_ok"], 0xff000000);
         window = wd;
         auto ppath = fpath.get();
@@ -179,8 +178,67 @@ namespace ygopro
             list->AddItem(141, files[i].ToStdWstring(), 0xff000000);
     }
     
-    void FilterDialog::Show(FilterCondition& fc) {
-        
+    void FilterDialog::Show() {
+        if(!window.expired())
+            return;
+        auto sz = sgui::SGGUIRoot::GetSingleton().GetSceneSize();
+        auto wd = sgui::SGWindow::Create(nullptr, {sz.x / 2 - 150, sz.y / 2 - 200}, {300, 300});
+        wd->SetText(stringCfg[L"eui_filter_title"], 0xff000000);
+        auto label1 = sgui::SGLabel::Create(wd, {10, 35}, stringCfg[L"eui_filter_keyword"]);
+        keyword = sgui::SGTextEdit::Create(wd, {90, 30}, {200, 30});
+        auto label2 = sgui::SGLabel::Create(wd, {10, 60}, stringCfg[L"eui_filter_type"]);
+        auto ptype1 = sgui::SGComboBox::Create(wd, {90, 55}, {180, 30});
+        type1 = ptype1;
+        ptype1->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        ptype1->AddItem(dataMgr.GetTypeString2(0x1), 0xff000000, 0x1);
+        ptype1->AddItem(dataMgr.GetTypeString2(0x2), 0xff000000, 0x2);
+        ptype1->AddItem(dataMgr.GetTypeString2(0x4), 0xff000000, 0x4);
+        ptype1->SetSelection(0);
+        auto ptype2 = sgui::SGComboBox::Create(wd, {90, 80}, {180, 30});
+        type2 = ptype2;
+        ptype2->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        for(unsigned int i = 0x10; i != 0x2000000; i <<=1)
+            if(i != 0x4000 && i != 0x8000)
+                ptype2->AddItem(dataMgr.GetTypeString2(i), 0xff000000, i);
+        ptype2->SetSelection(0);
+        auto label3 = sgui::SGLabel::Create(wd, {10, 110}, stringCfg[L"eui_filter_limit"]);
+        type3 = sgui::SGComboBox::Create(wd, {90, 105}, {180, 30});
+        auto label4 = sgui::SGLabel::Create(wd, {10, 135}, stringCfg[L"eui_filter_attribute"]);
+        auto pattribute = sgui::SGComboBox::Create(wd, {90, 130}, {180, 30});
+        attribute = pattribute;
+        pattribute->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        for(unsigned int i = 1; i != 0x80; i <<=1)
+            pattribute->AddItem(dataMgr.GetAttributeString(i), 0xff000000);
+        pattribute->SetSelection(0);
+        auto label5 = sgui::SGLabel::Create(wd, {10, 160}, stringCfg[L"eui_filter_race"]);
+        auto prace = sgui::SGComboBox::Create(wd, {90, 155}, {180, 30});
+        race = prace;
+        prace->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        for(unsigned int i = 1; i != 0x1000000; i <<=1)
+            prace->AddItem(dataMgr.GetRaceString(i), 0xff000000);
+        prace->SetSelection(0);
+        auto label6 = sgui::SGLabel::Create(wd, {10, 185}, stringCfg[L"eui_filter_attack"]);
+        attack = sgui::SGTextEdit::Create(wd, {90, 180}, {200, 30});
+        auto label7 = sgui::SGLabel::Create(wd, {10, 210}, stringCfg[L"eui_filter_defence"]);
+        defence = sgui::SGTextEdit::Create(wd, {90, 205}, {200, 30});
+        auto label8 = sgui::SGLabel::Create(wd, {10, 235}, stringCfg[L"eui_filter_star"]);
+        star = sgui::SGTextEdit::Create(wd, {90, 230}, {200, 30});
+        auto sch = sgui::SGButton::Create(wd, {190, 260}, {100, 25});
+        sch->SetText(stringCfg[L"eui_filter_search"], 0xff000000);
+        sch->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            BeginSearch();
+            return true;
+        });
+    }
+    
+    void FilterDialog::BeginSearch() {
+        FilterCondition fc;
+        if(cbOK != nullptr)
+            cbOK(fc);
+    }
+    
+    std::pair<int, int> FilterDialog::ParseValue(const std::wstring& valstr) {
+        return std::make_pair(0, 0);
     }
     
 }

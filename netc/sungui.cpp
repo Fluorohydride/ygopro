@@ -171,8 +171,6 @@ namespace sgui
     void SGTextBase::SetFont(sf::Font* ft, unsigned int sz) {
         font = ft;
         font_size = sz;
-        auto tsz = ft->getTexture(sz).getSize();
-        tex_size = v2i{(int)tsz.x, (int)tsz.y};
         text_update = true;
         EvaluateSize();
     }
@@ -275,6 +273,7 @@ namespace sgui
         std::vector<glbase::VertexVCT> charvtx;
         std::vector<unsigned short> index;
         auto tex = font->getTexture(font_size);
+        auto tex_size = tex.getSize();
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
         unsigned int max_width = GetMaxWidth();
@@ -565,6 +564,7 @@ namespace sgui
     
     bool SGWidgetContainer::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
         auto choving = hoving.lock();
+        bool e = eventMouseButtonDown.TriggerEvent(*this, evt);
         if(choving) {
             auto fwidget = focus_widget.lock();
             if(choving != fwidget && choving->AllowFocus()) {
@@ -573,60 +573,56 @@ namespace sgui
                 choving->EventGetFocus();
                 focus_widget = hoving;
             }
-            choving->EventMouseButtonDown(evt);
-            return true;
+            return choving->EventMouseButtonDown(evt) || e;
         } else {
             auto dr = GetDragingTarget();
             if(dr && (evt.button == sf::Mouse::Button::Left))
                 guiRoot.ObjectDragingBegin(dr, sf::Event::MouseMoveEvent{evt.x, evt.y});
-            return eventMouseButtonDown.TriggerEvent(*this, evt);
+            return e;
         }
     }
     
     bool SGWidgetContainer::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
-        if(!hoving.expired()) {
-            hoving.lock()->EventMouseButtonUp(evt);
-            return true;
-        } else {
-            return eventMouseButtonUp.TriggerEvent(*this, evt);
-        }
+        bool e = eventMouseButtonUp.TriggerEvent(*this, evt);
+        if(!hoving.expired())
+            return hoving.lock()->EventMouseButtonUp(evt) || e;
+        return e;
     }
     
     bool SGWidgetContainer::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
-        if(!hoving.expired()) {
-            hoving.lock()->EventMouseWheel(evt);
-            return true;
-        } else {
-            return eventMouseWheel.TriggerEvent(*this, evt);
-        }
-        return true;
+        bool e = eventMouseWheel.TriggerEvent(*this, evt);
+        if(!hoving.expired())
+            return hoving.lock()->EventMouseWheel(evt) || e;
+        return e;
     }
     
     bool SGWidgetContainer::EventKeyDown(sf::Event::KeyEvent evt) {
+        bool e = eventKeyDown.TriggerEvent(*this, evt);
         if(!focus_widget.expired())
-            return focus_widget.lock()->EventKeyDown(evt);
-        return false;
+            return focus_widget.lock()->EventKeyDown(evt) || e;
+        return e;
     }
     
     bool SGWidgetContainer::EventKeyUp(sf::Event::KeyEvent evt) {
+        bool e = eventKeyUp.TriggerEvent(*this, evt);
         if(!focus_widget.expired())
-            return focus_widget.lock()->EventKeyUp(evt);
-        return false;
+            return focus_widget.lock()->EventKeyUp(evt) || e;
+        return e;
     }
     
     bool SGWidgetContainer::EventCharEnter(sf::Event::TextEvent evt) {
+        bool e = eventCharEnter.TriggerEvent(*this, evt);
         if(!focus_widget.expired())
-            return focus_widget.lock()->EventCharEnter(evt);
-        return false;
+            return focus_widget.lock()->EventCharEnter(evt) || e;
+        return e;
     }
     
     bool SGWidgetContainer::EventLostFocus() {
-        bool ret = false;
+        bool e = eventLostFocus.TriggerEvent(*this);
         if(!focus_widget.expired())
-            ret = focus_widget.lock()->EventLostFocus() || ret;
+            e = focus_widget.lock()->EventLostFocus() || e;
         focus_widget.reset();
-            ret = eventLostFocus.TriggerEvent(*this) || ret;
-        return ret;
+        return e;
     }
     
     bool SGWidgetWrapper::EventMouseMove(sf::Event::MouseMoveEvent evt) {
@@ -1355,6 +1351,7 @@ namespace sgui
         std::vector<glbase::VertexVCT> iconvtx;
         std::vector<unsigned short> iconidx;
         auto tex = font->getTexture(font_size);
+        auto tex_size = tex.getSize();
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
         unsigned int max_width = GetMaxWidth();
@@ -2924,6 +2921,7 @@ namespace sgui
         std::vector<glbase::VertexVCT> iconvtx;
         std::vector<unsigned short> iconidx;
         auto tex = font->getTexture(font_size);
+        auto tex_size = tex.getSize();
         glbase::VertexVCT cur_char;
         v2i text_pos = GetTextOffset();
         int itemcount = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
@@ -2989,11 +2987,11 @@ namespace sgui
         }
     }
     
-    void SGListBox::InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color) {
+    void SGListBox::InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color, int val) {
         if(index >= items.size())
-            items.push_back(std::make_tuple(icon, item, color));
+            items.push_back(std::make_tuple(icon, item, color, val));
         else
-            items.insert(items.begin() + index, std::make_tuple(icon, item, color));
+            items.insert(items.begin() + index, std::make_tuple(icon, item, color, val));
         if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
             auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
             sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
@@ -3002,8 +3000,8 @@ namespace sgui
         vertices_dirty = true;
     }
     
-    void SGListBox::AddItem(unsigned short icon, const std::wstring& item, unsigned int color) {
-        items.push_back(std::make_tuple(icon, item, color));
+    void SGListBox::AddItem(unsigned short icon, const std::wstring& item, unsigned int color, int val) {
+        items.push_back(std::make_tuple(icon, item, color, val));
         if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
             auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
             sptr->SetSliderLength(sptr->GetSize().y * (size_abs.y - text_area.top - text_area.height) / (items.size() * line_spacing));
@@ -3050,8 +3048,14 @@ namespace sgui
         std::get<2>(items[index]) = color;
     }
     
-    const std::tuple<unsigned short, std::wstring, unsigned int>& SGListBox::GetItem(unsigned int index) {
-        static std::tuple<unsigned short, std::wstring, unsigned int> st;
+    void SGListBox::SetItemValue(unsigned int index, int val) {
+        if(items.size() == 0)
+            return;
+        std::get<3>(items[index]) = val;
+    }
+    
+    const std::tuple<unsigned short, std::wstring, unsigned int, int>& SGListBox::GetItem(unsigned int index) {
+        static std::tuple<unsigned short, std::wstring, unsigned int, int> st;
         if(index >= items.size())
             return st;
         return items[index];
@@ -3308,15 +3312,15 @@ namespace sgui
         return position_abs + v2i{text_area.left, text_area.top};
     }
     
-    void SGComboBox::InsertItem(unsigned int index, const std::wstring& item, unsigned int color) {
-        std::static_pointer_cast<SGListBox>(children[0])->InsertItem(index, 0, item, color);
+    void SGComboBox::InsertItem(unsigned int index, const std::wstring& item, unsigned int color, int val) {
+        std::static_pointer_cast<SGListBox>(children[0])->InsertItem(index, 0, item, color, val);
         item_count++;
         if(current_sel >= 0 && (int)index <= current_sel)
             current_sel++;
     }
     
-    void SGComboBox::AddItem(const std::wstring& item, unsigned int color) {
-        std::static_pointer_cast<SGListBox>(children[0])->AddItem(0, item, color);
+    void SGComboBox::AddItem(const std::wstring& item, unsigned int color, int val) {
+        std::static_pointer_cast<SGListBox>(children[0])->AddItem(0, item, color, val);
         item_count++;
     }
     
@@ -3343,6 +3347,10 @@ namespace sgui
         std::static_pointer_cast<SGListBox>(children[0])->SetItemText(index, text, color);
     }
     
+    void SGComboBox::SetItemValue(unsigned int index, int val) {
+        std::static_pointer_cast<SGListBox>(children[0])->SetItemValue(index, val);
+    }
+    
     void SGComboBox::SetSelection(int sel) {
         if(sel < 0 || sel >= item_count)
             sel = -1;
@@ -3356,6 +3364,12 @@ namespace sgui
     
     int SGComboBox::GetSeletion() {
         return current_sel;
+    }
+    
+    int SGComboBox::GetSelectedValue() {
+        if(current_sel == -1 || current_sel >= item_count)
+            return 0;
+        return std::get<3>(std::static_pointer_cast<SGListBox>(children[0])->GetItem(current_sel));
     }
     
     void SGComboBox::ShowList(bool show) {
@@ -3675,6 +3689,7 @@ namespace sgui
         std::vector<glbase::VertexVCT> iconvtx;
         std::vector<unsigned short> iconidx;
         auto tex = font->getTexture(font_size);
+        auto tex_size = tex.getSize();
         glbase::VertexVCT cur_char;
         v2i text_pos = GetTextOffset();
         int tb = tab_config.int_config["tab_border"];

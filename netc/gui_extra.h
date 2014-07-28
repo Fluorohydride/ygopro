@@ -4,11 +4,12 @@
 #include <string>
 #include <functional>
 
+#include "card_data.h"
 #include "sungui.h"
 
 namespace ygopro
 {
-    
+
     class CommonDialog {
     public:
         virtual ~CommonDialog() {
@@ -39,15 +40,24 @@ namespace ygopro
         std::function<void (const std::wstring&)> cbOK;
     };
     
-    struct FilterCondition;
-    
     class FilterDialog : public CommonDialog {
     public:
-        void Show(FilterCondition& fc);
+        void Show();
         void SetOKCallback(std::function<void (const FilterCondition&)> cb = nullptr) { cbOK = cb; }
+        void BeginSearch();
+        std::pair<int, int> ParseValue(const std::wstring& valstr);
         
     protected:
         std::function<void (const FilterCondition&)> cbOK;
+        std::weak_ptr<sgui::SGTextEdit> keyword;
+        std::weak_ptr<sgui::SGComboBox> type1;
+        std::weak_ptr<sgui::SGComboBox> type2;
+        std::weak_ptr<sgui::SGComboBox> type3;
+        std::weak_ptr<sgui::SGComboBox> attribute;
+        std::weak_ptr<sgui::SGComboBox> race;
+        std::weak_ptr<sgui::SGTextEdit> attack;
+        std::weak_ptr<sgui::SGTextEdit> defence;
+        std::weak_ptr<sgui::SGTextEdit> star;
     };
     
 }

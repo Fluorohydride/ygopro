@@ -109,7 +109,7 @@
     <integer name="border" value="5"/>
     <integer name="height" value="30"/>
     <integer name="listoffset" value="25"/>
-    <integer name="listheight" value="150"/>
+    <integer name="listheight" value="100"/>
     <rect name="text_area" u="5" v="7" w="20" h="6"/>
     <rect name="drop_area" u="19" v="9" w="15" h="12"/>
     <rect name="back" u="62" v="106" w="29" h="32"/>

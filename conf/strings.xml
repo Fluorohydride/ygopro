@@ -5,24 +5,23 @@
   <string name="eui_button_cancel" value="取消"/>
   <string name="eui_button_yes" value="是"/>
   <string name="eui_button_no" value="否"/>
+  <string name="eui_updir" value="返回上一层目录"/>
   <string name="eui_deck_load" value="载入"/>
   <string name="eui_deck_save" value="保存"/>
   <string name="eui_deck_saveas" value="另存为"/>
   <string name="eui_deck_loadstr" value="从文本载入"/>
   <string name="eui_deck_savestr" value="保存为文本"/>
-  <string name="eui_updir" value="返回上一层目录"/>
   <string name="eui_button_clear" value="清空"/>
   <string name="eui_button_sort" value="排序"/>
   <string name="eui_button_shuffle" value="打乱"/>
+  <string name="eui_button_filter" value="设定详细搜索条件"/>
   <string name="eui_tool_screenshot" value="截图"/>
   <string name="eui_tool_saveshot" value="保存截图"/>
-  <string name="eui_menu_tool_browser" value="在网页中查看"/>
-  <string name="eui_menu_tool_show_exclusive" value="显示独有卡标记"/>
-  <string name="eui_menu_reg" value="禁止·限制卡表"/>
+  <string name="eui_view_browser" value="在网页中查看"/>
+  <string name="eui_show_exclusive" value="显示独有卡标记"/>
   <string name="eui_list_forbidden" value="禁止卡"/>
   <string name="eui_list_limit" value="限制卡"/>
   <string name="eui_list_semilimit" value="准限制卡"/>
-  <string name="eui_list_view" value="-- 查看当前卡表 --"/>
   <string name="eui_list_default" value="[ 无限制 ]"/>
   <string name="eui_msg_new_deck" value="(新卡组)"/>
   <string name="eui_msg_deck_load" value="请选择要载入的卡组"/>
@@ -32,9 +31,9 @@
   <string name="eui_msg_screen_copy" value="截图已复制到剪贴板."/>
   <string name="eui_msg_screen_err" value="无法创建文件夹 {path}."/>
   <string name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}"/>
+  <string name="eui_filter_qsearch" value="快速搜索"/>
   <string name="eui_filter_title" value="卡片搜索"/>
   <string name="eui_filter_keyword" value="关键字"/>
-  <string name="eui_filter_tooltip" value="搜索卡名和描述中出现该字段的卡&#013;#系列名: 仅搜索属于该系列的卡&#013;@密码: 搜索指定密码的卡"/>
   <string name="eui_filter_attack" value="攻击力"/>
   <string name="eui_filter_defence" value="守备力"/>
   <string name="eui_filter_star" value="星数"/>

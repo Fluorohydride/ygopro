@@ -265,7 +265,6 @@ namespace sgui
         unsigned int spacing_x = 1;
         unsigned int spacing_y = 1;
         unsigned int vert_size = 0;
-        v2i tex_size = {0, 0};
         int text_width = 0;
         int text_height = 0;
         int text_width_cur = 0;
@@ -741,13 +740,14 @@ namespace sgui
         virtual int GetMaxWidth() { return 0xffff; }
         virtual bool IsMultiLine() { return true; };
         virtual void UpdateTextVertex();
-        void InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color);
-        void AddItem(unsigned short icon, const std::wstring& item, unsigned int color);
+        void InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color, int val = 0);
+        void AddItem(unsigned short icon, const std::wstring& item, unsigned int color, int val = 0);
         void RemoveItem(unsigned int index);
         void ClearItem();
         void SetItemIcon(unsigned int index, unsigned short icon);
         void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
-        const std::tuple<unsigned short, std::wstring, unsigned int>& GetItem(unsigned int index);
+        void SetItemValue(unsigned int index, int val);
+        const std::tuple<unsigned short, std::wstring, unsigned int, int>& GetItem(unsigned int index);
         void SetSelection(int sel);
         int GetSeletion();
         int GetItemCount() { return items.size(); }
@@ -776,7 +776,7 @@ namespace sgui
         recti text_area = {0, 0, 0, 0};
         float click_time = 0.0f;
         unsigned int vbo[2] = {0, 0};
-        std::vector<std::tuple<unsigned short, std::wstring, unsigned int>> items;
+        std::vector<std::tuple<unsigned short, std::wstring, unsigned int, int>> items;
         
     public:
         static std::shared_ptr<SGListBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
@@ -792,13 +792,15 @@ namespace sgui
         virtual v2i GetTextOffset();
         virtual int GetMaxWidth() { return 0xffff; }
         virtual bool IsMultiLine() { return true; };
-        void InsertItem(unsigned int index, const std::wstring& item, unsigned int color);
-        void AddItem(const std::wstring& item, unsigned int color);
+        void InsertItem(unsigned int index, const std::wstring& item, unsigned int color, int val = 0);
+        void AddItem(const std::wstring& item, unsigned int color, int val = 0);
         void RemoveItem(unsigned int index);
         void ClearItem();
         void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
+        void SetItemValue(unsigned int index, int val);
         void SetSelection(int sel);
         int GetSeletion();
+        int GetSelectedValue();
         void ShowList(bool show);
         
         SGEventHandler<SGWidget, int> eventSelChange;

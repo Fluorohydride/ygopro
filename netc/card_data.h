@@ -24,7 +24,6 @@ namespace ygopro
         unsigned int attribute = 0;
         unsigned int category = 0;
         std::wstring keyword;
-        bool check_desc = false;
     };
     
 	struct CardData {

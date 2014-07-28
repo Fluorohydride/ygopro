@@ -43,6 +43,8 @@ namespace ygopro
         virtual void MouseMove(sf::Event::MouseMoveEvent evt);
         virtual void MouseButtonDown(sf::Event::MouseButtonEvent evt);
         virtual void MouseButtonUp(sf::Event::MouseButtonEvent evt);
+        virtual void KeyDown(sf::Event::KeyEvent evt);
+        virtual void KeyUp(sf::Event::KeyEvent evt);
         
         void SetCardInfo(unsigned int code);
         void AddCard(unsigned int code, unsigned int pos);
@@ -68,6 +70,9 @@ namespace ygopro
         void RefreshEx(DeckCardData& dcd);
         void MoveTo(DeckCardData& dcd, float tm, glbase::vector2<float> dst, glbase::vector2<float> dsz);
         void ChangeHL(DeckCardData& dcd, float tm, float desthl);
+        void ChangeExclusive(bool check);
+        void ChangeRegulation(int index);
+        void ViewRegulation(int limit);
         
         DeckCardData* GetCard(int pos, int index);
         std::tuple<int, int, int> GetHoverCard(float x, float y);
@@ -93,6 +98,7 @@ namespace ygopro
         float offsety[3] = {0.0f, 0.0f, 0.0f};
         float dx[3] = {0.0f, 0.0f, 0.0f};
         bool deck_edited = false;
+        bool show_exclusive = true;
         std::array<TextureInfo<4>, 3> limit;
         std::array<TextureInfo<4>, 3> pool;
         TextureInfo<4> hmask;

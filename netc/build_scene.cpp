@@ -9,6 +9,7 @@
 #include "image_mgr.h"
 
 #include "card_data.h"
+#include "deck_data.h"
 #include "build_scene.h"
 
 void GLCheckError(int line) {
@@ -81,7 +82,11 @@ namespace ygopro
         view_regulation = 0;
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
-        auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {240, 200});
+        auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {240, 300});
+        pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
+            KeyDown(evt);
+            return true;
+        });
         auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 10}, std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]));
         deck_label = icon_label;
         auto load_deck = sgui::SGButton::Create(pnl, {10, 40}, {70, 25});
@@ -89,7 +94,7 @@ namespace ygopro
         load_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             file_dialog->Show(stringCfg[L"eui_msg_deck_load"], commonCfg[L"deck_path"], L".ydk");
             file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
-                if(deck != current_file)
+                if(deck_edited || deck != current_file)
                     LoadDeckFromFile(deck);
             });
             return true;
@@ -115,37 +120,69 @@ namespace ygopro
             });
             return true;
         });
-        auto load_str = sgui::SGButton::Create(pnl, {10, 70}, {100, 25});
-        load_str->SetText(stringCfg[L"eui_deck_loadstr"], 0xff000000);
-        load_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            LoadDeckFromClipboard();
-            return true;
-        });
-        auto save_str = sgui::SGButton::Create(pnl, {130, 70}, {100, 25});
-        save_str->SetText(stringCfg[L"eui_deck_savestr"], 0xff000000);
-        save_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            SaveDeckToClipboard();
-            return true;
-        });
-        auto clear_deck = sgui::SGButton::Create(pnl, {10, 100}, {70, 25});
+        auto clear_deck = sgui::SGButton::Create(pnl, {10, 70}, {70, 25});
         clear_deck->SetText(stringCfg[L"eui_button_clear"], 0xff000000);
         clear_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             ClearDeck();
+            SetDeckDirty();
             return true;
         });
-        auto sort_deck = sgui::SGButton::Create(pnl, {85, 100}, {70, 25});
+        auto sort_deck = sgui::SGButton::Create(pnl, {85, 70}, {70, 25});
         sort_deck->SetText(stringCfg[L"eui_button_sort"], 0xff000000);
         sort_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             SortDeck();
             return true;
         });
-        auto shuffle_deck = sgui::SGButton::Create(pnl, {160, 100}, {70, 25});
+        auto shuffle_deck = sgui::SGButton::Create(pnl, {160, 70}, {70, 25});
         shuffle_deck->SetText(stringCfg[L"eui_button_shuffle"], 0xff000000);
         shuffle_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             ShuffleDeck();
             return true;
         });
+        auto load_str = sgui::SGButton::Create(pnl, {10, 100}, {100, 25});
+        load_str->SetText(stringCfg[L"eui_deck_loadstr"], 0xff000000);
+        load_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            LoadDeckFromClipboard();
+            return true;
+        });
+        auto save_str = sgui::SGButton::Create(pnl, {130, 100}, {100, 25});
+        save_str->SetText(stringCfg[L"eui_deck_savestr"], 0xff000000);
+        save_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            SaveDeckToClipboard();
+            return true;
+        });
+        auto limit_reg = sgui::SGComboBox::Create(pnl, {10, 130}, {150, 30});
+        auto& lrs = limitRegulationMgr.GetLimitRegulations();
+        for(unsigned int i = 0; i < lrs.size(); ++i)
+            limit_reg->AddItem(lrs[i].name, 0xff000000);
+        limit_reg->SetSelection(0);
+        limit_reg->eventSelChange.Bind([this](sgui::SGWidget& sender, int index)->bool {
+            ChangeRegulation(index);
+            return true;
+        });
+        auto show_ex = sgui::SGCheckbox::Create(pnl, {10, 160}, {100, 30});
+        show_ex->SetText(stringCfg[L"eui_show_exclusive"], 0xff000000);
+        show_ex->SetChecked(true);
+        show_ex->eventCheckChange.Bind([this](sgui::SGWidget& sender, bool check)->bool {
+            ChangeExclusive(check);
+            return true;
+        });
+        auto label = sgui::SGLabel::Create(pnl, {10, 190}, stringCfg[L"eui_filter_qsearch"]);
+        auto keyword = sgui::SGTextEdit::Create(pnl, {10, 210}, {200, 30});
+        keyword->eventTextEnter.Bind([this](sgui::SGWidget& sender)->bool {
+            return true;
+        });
+        auto filter = sgui::SGButton::Create(pnl, {30, 240}, {160, 25});
+        filter->SetText(stringCfg[L"eui_button_filter"], 0xff000000);
+        filter->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            filter_dialog->Show();
+            filter_dialog->SetOKCallback([this](const FilterCondition fc)->void {
+                
+            });
+            return true;
+        });
         RefreshAllCard();
+        
     }
     
     void BuildScene::Update() {
@@ -221,6 +258,29 @@ namespace ygopro
         
     }
     
+    void BuildScene::KeyDown(sf::Event::KeyEvent evt) {
+        switch(evt.code) {
+            case sf::Keyboard::Num1:
+                if(evt.alt)
+                    ViewRegulation(0);
+                break;
+            case sf::Keyboard::Num2:
+                if(evt.alt)
+                    ViewRegulation(1);
+                break;
+            case sf::Keyboard::Num3:
+                if(evt.alt)
+                    ViewRegulation(2);
+                break;
+            default:
+                break;
+        }
+    }
+    
+    void BuildScene::KeyUp(sf::Event::KeyEvent evt) {
+        
+    }
+    
     void BuildScene::SetCardInfo(unsigned int code) {
         
     }
@@ -260,6 +320,7 @@ namespace ygopro
                 deck_label.lock()->SetText(std::wstring(L"\ue08c").append(current_file).append(L"*"), 0xff000000);
             deck_edited = true;
         }
+        view_regulation = 0;
     }
     
     void BuildScene::LoadDeckFromFile(const std::wstring& file) {
@@ -269,19 +330,23 @@ namespace ygopro
             current_deck = tempdeck;
             current_file = file;
             deck_edited = false;
+            view_regulation = 0;
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                exdata->show_exclusive = show_exclusive;
                 dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.extra_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                exdata->show_exclusive = show_exclusive;
                 dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.side_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                exdata->show_exclusive = show_exclusive;
                 dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             if(!deck_label.expired())
@@ -301,19 +366,23 @@ namespace ygopro
             ClearDeck();
             current_deck = tempdeck;
             SetDeckDirty();
+            view_regulation = 0;
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                exdata->show_exclusive = show_exclusive;
                 dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.extra_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                exdata->show_exclusive = show_exclusive;
                 dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.side_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+                exdata->show_exclusive = show_exclusive;
                 dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
         }
@@ -609,6 +678,69 @@ namespace ygopro
             return &current_deck.side_deck[index];
         }
         return nullptr;
+    }
+    
+    void BuildScene::ChangeExclusive(bool check) {
+        show_exclusive = check;
+        for(auto& dcd : current_deck.main_deck) {
+            auto ptr = std::static_pointer_cast<BuilderCard>(dcd.extra);
+            ptr->show_exclusive = show_exclusive;
+            RefreshEx(dcd);
+        }
+        for(auto& dcd : current_deck.extra_deck) {
+            auto ptr = std::static_pointer_cast<BuilderCard>(dcd.extra);
+            ptr->show_exclusive = show_exclusive;
+            RefreshEx(dcd);
+        }
+        for(auto& dcd : current_deck.side_deck) {
+            auto ptr = std::static_pointer_cast<BuilderCard>(dcd.extra);
+            ptr->show_exclusive = show_exclusive;
+            RefreshEx(dcd);
+        }
+    }
+    
+    void BuildScene::ChangeRegulation(int index) {
+        limitRegulationMgr.SetLimitRegulation(index);
+        if(view_regulation)
+            ViewRegulation(view_regulation - 1);
+        else
+            limitRegulationMgr.GetDeckCardLimitCount(current_deck);
+        RefreshAllCard();
+    }
+    
+    void BuildScene::ViewRegulation(int limit) {
+        ClearDeck();
+        limitRegulationMgr.LoadCurrentListToDeck(current_deck, limit);
+        for(auto& dcd : current_deck.main_deck) {
+            auto exdata = std::make_shared<BuilderCard>();
+            exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+            exdata->show_exclusive = show_exclusive;
+            dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+        }
+        for(auto& dcd : current_deck.extra_deck) {
+            auto exdata = std::make_shared<BuilderCard>();
+            exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+            exdata->show_exclusive = show_exclusive;
+            dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+        }
+        for(auto& dcd : current_deck.side_deck) {
+            auto exdata = std::make_shared<BuilderCard>();
+            exdata->card_tex = imageMgr.GetCardTexture(dcd.data->code);
+            exdata->show_exclusive = show_exclusive;
+            dcd.extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+        }
+        SetDeckDirty();
+        view_regulation = limit + 1;
+        std::wstring title = L"\ue07a";
+        if(limit == 0)
+            title.append(stringCfg[L"eui_list_forbidden"]);
+        else if(limit == 1)
+            title.append(stringCfg[L"eui_list_limit"]);
+        else
+            title.append(stringCfg[L"eui_list_semilimit"]);
+        deck_label.lock()->SetText(title, 0xff000000);
+        current_file.clear();
+        RefreshAllCard();
     }
     
     std::tuple<int, int, int> BuildScene::GetHoverCard(float x, float y) {

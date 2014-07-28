@@ -21,6 +21,8 @@ namespace ygopro
         virtual void MouseMove(sf::Event::MouseMoveEvent evt) = 0;
         virtual void MouseButtonDown(sf::Event::MouseButtonEvent evt) = 0;
         virtual void MouseButtonUp(sf::Event::MouseButtonEvent evt) = 0;
+        virtual void KeyDown(sf::Event::KeyEvent evt) = 0;
+        virtual void KeyUp(sf::Event::KeyEvent evt) = 0;
     };
     
     class SceneMgr {
@@ -42,6 +44,8 @@ namespace ygopro
         void MouseMove(sf::Event::MouseMoveEvent evt);
         void MouseButtonDown(sf::Event::MouseButtonEvent evt);
         void MouseButtonUp(sf::Event::MouseButtonEvent evt);
+        void KeyDown(sf::Event::KeyEvent evt);
+        void KeyUp(sf::Event::KeyEvent evt);
         void SetSceneSize(glbase::vector2<int> sz);
         void SwitchScene(SceneType st);
         std::shared_ptr<Scene> GetScene(SceneType st);

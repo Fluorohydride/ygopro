@@ -89,6 +89,16 @@ namespace ygopro
             current_scene->MouseButtonUp(evt);
     }
     
+    void SceneMgr::KeyDown(sf::Event::KeyEvent evt) {
+        if(current_scene != nullptr)
+            current_scene->KeyDown(evt);
+    }
+    
+    void SceneMgr::KeyUp(sf::Event::KeyEvent evt) {
+        if(current_scene != nullptr)
+            current_scene->KeyUp(evt);
+    }
+    
     void SceneMgr::SetSceneSize(glbase::vector2<int> sz) {
         scene_size = sz;
         if(current_scene != nullptr)

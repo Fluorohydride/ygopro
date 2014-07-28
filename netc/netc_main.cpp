@@ -72,10 +72,12 @@ int main(int argc, char* argv[]) {
                     sgui::SGGUIRoot::GetSingleton().InjectCharEvent(evt.text);
                     break;
                 case sf::Event::KeyPressed:
-                    sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(evt.key);
+                    if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(evt.key))
+                        sceneMgr.KeyDown(evt.key);
                     break;
                 case sf::Event::KeyReleased:
-                    sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(evt.key);
+                    if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(evt.key))
+                        sceneMgr.KeyUp(evt.key);
                     break;
                 case sf::Event::MouseButtonPressed:
                     if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent(evt.mouseButton))
