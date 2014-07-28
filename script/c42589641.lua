@@ -11,10 +11,12 @@ function c42589641.initial_effect(c)
 	e1:SetCondition(c42589641.regcon)
 	e1:SetOperation(c42589641.regop)
 	c:RegisterEffect(e1)
+	--splimit
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e2:SetRange(LOCATION_EXTRA)
 	e2:SetValue(c42589641.splimit)
 	c:RegisterEffect(e2)
 	--to hand
