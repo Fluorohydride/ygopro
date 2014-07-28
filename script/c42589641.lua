@@ -89,7 +89,11 @@ function c42589641.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x9c)
 end
 function c42589641.splimit(e,se,sp,st,spos,tgp)
-	return bit.band(st,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ and Duel.GetFlagEffect(tgp,42589641)~=0
+	if bit.band(st,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ then
+		return Duel.GetFlagEffect(tgp,42589641)~=0
+	else
+		return true
+	end
 end
 function c42589641.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ
