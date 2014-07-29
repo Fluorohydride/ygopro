@@ -28,7 +28,8 @@ namespace ygopro
     }
     
     void SceneMgr::Uninit() {
-        
+        if(current_scene != nullptr)
+            current_scene.reset();
     }
     
     void SceneMgr::InitDraw() {

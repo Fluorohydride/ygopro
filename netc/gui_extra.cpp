@@ -202,7 +202,15 @@ namespace ygopro
                 ptype2->AddItem(dataMgr.GetTypeString2(i), 0xff000000, i);
         ptype2->SetSelection(0);
         auto label3 = sgui::SGLabel::Create(wd, {10, 110}, stringCfg[L"eui_filter_limit"]);
-        type3 = sgui::SGComboBox::Create(wd, {90, 105}, {180, 30});
+        auto ptype3 = sgui::SGComboBox::Create(wd, {90, 105}, {180, 30});
+        type3 = ptype3;
+        ptype3->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        ptype3->AddItem(stringCfg[L"pool_limit0"], 0xff000000, 1);
+        ptype3->AddItem(stringCfg[L"pool_limit1"], 0xff000000, 2);
+        ptype3->AddItem(stringCfg[L"pool_limit2"], 0xff000000, 3);
+        ptype3->AddItem(stringCfg[L"pool_ocg"], 0xff000000, 0x1);
+        ptype3->AddItem(stringCfg[L"pool_tcg"], 0xff000000, 0x2);
+        ptype3->SetSelection(0);
         auto label4 = sgui::SGLabel::Create(wd, {10, 135}, stringCfg[L"eui_filter_attribute"]);
         auto pattribute = sgui::SGComboBox::Create(wd, {90, 130}, {180, 30});
         attribute = pattribute;
@@ -233,12 +241,78 @@ namespace ygopro
     
     void FilterDialog::BeginSearch() {
         FilterCondition fc;
+        auto keystr = keyword.lock()->GetText();
+        if(keystr.length() > 0) {
+            if(keystr[0] == L'@') {
+                fc.code = ParseInt(&keystr[1], keystr.length() - 1);
+            } else if(keystr[0] == L'#') {
+                std::wstring setstr = L"setname_";
+                setstr.append(keystr.substr(1));
+                if(stringCfg.Exists(setstr))
+                    fc.setcode = stringCfg[setstr];
+                else
+                    fc.setcode = 0xffff;
+            } else
+                fc.keyword = keystr;
+        }
+        fc.type = type1.lock()->GetSelectedValue();
+        fc.subtype = type2.lock()->GetSelectedValue();
+        int lmt = type3.lock()->GetSelection();
+        if(lmt > 3) {
+            fc.pool = type3.lock()->GetSelectedValue();
+            lmt = 0;
+        }
+        if(fc.type == 0x1) {
+            fc.attribute = attribute.lock()->GetSelectedValue();
+            fc.race = race.lock()->GetSelectedValue();
+            auto t1 = ParseValue(attack.lock()->GetText());
+            switch(std::get<0>(t1)) {
+                case 0: break;
+                case 1: fc.atkmin = fc.atkmax = -2; break;
+                case 2: fc.atkmin = fc.atkmax = std::get<1>(t1); break;
+                case 3: fc.atkmin = std::get<1>(t1); fc.atkmax = std::get<2>(t1); break;
+                default: break;
+            }
+            auto t2 = ParseValue(defence.lock()->GetText());
+            switch(std::get<0>(t2)) {
+                case 0: break;
+                case 1: fc.defmin = fc.defmax = -2; break;
+                case 2: fc.defmin = fc.defmax = std::get<1>(t2); break;
+                case 3: fc.defmin = std::get<1>(t2); fc.defmax = std::get<2>(t2); break;
+                default: break;
+            }
+            auto t3 = ParseValue(star.lock()->GetText());
+            switch(std::get<0>(t2)) {
+                case 0: case 1: break;
+                case 2: fc.lvmin = fc.lvmax = std::get<1>(t3); break;
+                case 3: fc.lvmin = std::get<1>(t3); fc.lvmax = std::get<2>(t3); break;
+                default: break;
+            }
+        }
         if(cbOK != nullptr)
-            cbOK(fc);
+            cbOK(fc, lmt);
     }
     
-    std::pair<int, int> FilterDialog::ParseValue(const std::wstring& valstr) {
-        return std::make_pair(0, 0);
+    std::tuple<int, int, int> FilterDialog::ParseValue(const std::wstring& valstr) {
+        if(valstr.length() == 0)
+            return std::make_tuple(0, 0, 0);
+        if(valstr == L"?")
+            return std::make_tuple(1, 0, 0);
+        size_t pos = valstr.find(L':');
+        if(pos == valstr.npos)
+            return std::make_tuple(2, ParseInt(&valstr[1], valstr.length()), 0);
+        else
+            return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], valstr.length() - pos - 1));
     }
     
+    int FilterDialog::ParseInt(const wchar_t* p, int size) {
+        int v = 0;
+        for(size_t i = 0; i < size; ++i) {
+            if(p[i] >= L'0' && p[i] <= L'9') {
+                v = v * 10 + p[i] - L'0';
+            } else
+                return v;
+        }
+        return v;
+    }
 }

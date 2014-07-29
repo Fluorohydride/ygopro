@@ -31,7 +31,7 @@
   <string name="eui_msg_screen_copy" value="截图已复制到剪贴板."/>
   <string name="eui_msg_screen_err" value="无法创建文件夹 {path}."/>
   <string name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}"/>
-  <string name="eui_filter_qsearch" value="快速搜索"/>
+  <string name="eui_filter_qsearch" value="快速搜索(回车键)"/>
   <string name="eui_filter_title" value="卡片搜索"/>
   <string name="eui_filter_keyword" value="关键字"/>
   <string name="eui_filter_attack" value="攻击力"/>

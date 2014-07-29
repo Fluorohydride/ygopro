@@ -22,7 +22,6 @@ namespace ygopro
         int lvmax = 0;
         unsigned int race = 0;
         unsigned int attribute = 0;
-        unsigned int category = 0;
         std::wstring keyword;
     };
     

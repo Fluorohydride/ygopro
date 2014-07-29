@@ -43,12 +43,13 @@ namespace ygopro
     class FilterDialog : public CommonDialog {
     public:
         void Show();
-        void SetOKCallback(std::function<void (const FilterCondition&)> cb = nullptr) { cbOK = cb; }
+        void SetOKCallback(std::function<void (const FilterCondition&, int)> cb = nullptr) { cbOK = cb; }
         void BeginSearch();
-        std::pair<int, int> ParseValue(const std::wstring& valstr);
+        static std::tuple<int, int, int> ParseValue(const std::wstring& valstr);
+        static int ParseInt(const wchar_t* p, int size);
         
     protected:
-        std::function<void (const FilterCondition&)> cbOK;
+        std::function<void (const FilterCondition&, int)> cbOK;
         std::weak_ptr<sgui::SGTextEdit> keyword;
         std::weak_ptr<sgui::SGComboBox> type1;
         std::weak_ptr<sgui::SGComboBox> type2;

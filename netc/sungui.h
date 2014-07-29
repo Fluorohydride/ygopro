@@ -261,6 +261,7 @@ namespace sgui
         unsigned short mem_size = 0;
         unsigned int tbo[2] = {0, 0};
         sf::Font* font = nullptr;
+        v2i tex_check_size = {0, 0};
         unsigned int font_size = 0;
         unsigned int spacing_x = 1;
         unsigned int spacing_y = 1;
@@ -799,7 +800,7 @@ namespace sgui
         void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
         void SetItemValue(unsigned int index, int val);
         void SetSelection(int sel);
-        int GetSeletion();
+        int GetSelection();
         int GetSelectedValue();
         void ShowList(bool show);
         

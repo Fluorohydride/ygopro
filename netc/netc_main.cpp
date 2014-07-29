@@ -111,6 +111,8 @@ int main(int argc, char* argv[]) {
         window.display();
     }
     
+    sceneMgr.Uninit();
+    sgui::SGGUIRoot::GetSingleton().ClearChild();
     imageMgr.UninitTextures();
     
     return 0;

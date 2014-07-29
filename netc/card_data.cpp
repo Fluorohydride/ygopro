@@ -25,11 +25,11 @@ namespace ygopro
         if(fc.type & 0x1) {
             if(fc.atkmin != -1 && attack < fc.atkmin)
                 return false;
-            if(fc.atkmax != -1 && attack > fc.atkmax)
+            if(fc.atkmax != -1 && fc.atkmax != 0 && attack > fc.atkmax)
                 return false;
             if(fc.defmin != -1 && defence < fc.defmin)
                 return false;
-            if(fc.defmax != -1 && defence > fc.defmax)
+            if(fc.defmax != -1 && fc.defmax != 0 && defence > fc.defmax)
                 return false;
             if(fc.lvmin != 0 && level < (unsigned int)fc.lvmin)
                 return false;
@@ -40,8 +40,6 @@ namespace ygopro
             if(fc.attribute != 0 && (attribute & fc.attribute) == 0)
                 return false;
         }
-        if(fc.category != 0 && (category & fc.category) == 0)
-            return false;
         if(fc.setcode != 0) {
             unsigned long long sc = setcode;
             if(alias) {

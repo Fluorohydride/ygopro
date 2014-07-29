@@ -83,6 +83,7 @@ namespace ygopro
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {240, 300});
+        pnl->SetSize({240, -20}, {0.0f, 1.0f});
         pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
             KeyDown(evt);
             return true;
@@ -169,20 +170,47 @@ namespace ygopro
         });
         auto label = sgui::SGLabel::Create(pnl, {10, 190}, stringCfg[L"eui_filter_qsearch"]);
         auto keyword = sgui::SGTextEdit::Create(pnl, {10, 210}, {200, 30});
-        keyword->eventTextEnter.Bind([this](sgui::SGWidget& sender)->bool {
+        auto pkeyword = keyword.get();
+        keyword->eventTextEnter.Bind([this, pkeyword](sgui::SGWidget& sender)->bool {
+            FilterCondition fc;
+            auto keystr = pkeyword->GetText();
+            if(keystr.length() > 0) {
+                if(keystr[0] == L'@') {
+                    fc.code = FilterDialog::ParseInt(&keystr[1], keystr.length() - 1);
+                } else if(keystr[0] == L'#') {
+                    std::wstring setstr = L"setname_";
+                    setstr.append(keystr.substr(1));
+                    if(stringCfg.Exists(setstr))
+                        fc.setcode = stringCfg[setstr];
+                    else
+                        fc.setcode = 0xffff;
+                } else
+                    fc.keyword = keystr;
+                search_result = dataMgr.FilterCard(fc);
+                std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
+                result_page = 0;
+                RefreshSearchResult();
+            }
             return true;
         });
         auto filter = sgui::SGButton::Create(pnl, {30, 240}, {160, 25});
         filter->SetText(stringCfg[L"eui_button_filter"], 0xff000000);
         filter->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             filter_dialog->Show();
-            filter_dialog->SetOKCallback([this](const FilterCondition fc)->void {
-                
+            filter_dialog->SetOKCallback([this](const FilterCondition fc, int lmt)->void {
+                if(lmt == 0)
+                    search_result = dataMgr.FilterCard(fc);
+                else
+                    search_result = limitRegulationMgr.FilterCard(lmt - 1, fc);
+                std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
+                result_page = 0;
+                RefreshSearchResult();
             });
             return true;
         });
+        auto list = sgui::SGListBox::Create(pnl, {10, 270}, {210, 220});
+        result_list = list;
         RefreshAllCard();
-        
     }
     
     void BuildScene::Update() {
@@ -661,25 +689,6 @@ namespace ygopro
         updating_cards.insert(&dcd);
     }
     
-    DeckCardData* BuildScene::GetCard(int pos, int index) {
-        if(index < 0)
-            return nullptr;
-        if(pos == 1) {
-            if(index >= (int)current_deck.main_deck.size())
-                return nullptr;
-            return &current_deck.main_deck[index];
-        } else if(pos == 2) {
-            if(index >= (int)current_deck.extra_deck.size())
-                return nullptr;
-            return &current_deck.extra_deck[index];
-        } else if(pos == 3) {
-            if(index >= (int)current_deck.side_deck.size())
-                return nullptr;
-            return &current_deck.side_deck[index];
-        }
-        return nullptr;
-    }
-    
     void BuildScene::ChangeExclusive(bool check) {
         show_exclusive = check;
         for(auto& dcd : current_deck.main_deck) {
@@ -741,6 +750,36 @@ namespace ygopro
         deck_label.lock()->SetText(title, 0xff000000);
         current_file.clear();
         RefreshAllCard();
+    }
+    
+    void BuildScene::RefreshSearchResult() {
+        auto ptr = result_list.lock();
+        ptr->ClearItem();
+        for(int i = 0; i < 10; ++i) {
+            if(result_page * 10 + i >= search_result.size())
+                break;
+            auto data = search_result[result_page * 10 + i];
+            ptr->AddItem(0, data->name, 0xff000000);
+        }
+    }
+    
+    DeckCardData* BuildScene::GetCard(int pos, int index) {
+        if(index < 0)
+            return nullptr;
+        if(pos == 1) {
+            if(index >= (int)current_deck.main_deck.size())
+                return nullptr;
+            return &current_deck.main_deck[index];
+        } else if(pos == 2) {
+            if(index >= (int)current_deck.extra_deck.size())
+                return nullptr;
+            return &current_deck.extra_deck[index];
+        } else if(pos == 3) {
+            if(index >= (int)current_deck.side_deck.size())
+                return nullptr;
+            return &current_deck.side_deck[index];
+        }
+        return nullptr;
     }
     
     std::tuple<int, int, int> BuildScene::GetHoverCard(float x, float y) {

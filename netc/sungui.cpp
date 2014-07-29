@@ -264,7 +264,14 @@ namespace sgui
     }
     
     void SGTextBase::UpdateTextVertex() {
-        if(!text_update || font == nullptr)
+        if(font == nullptr)
+            return;
+        auto tex_size = font->getTexture(font_size).getSize();
+        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+            text_update = true;
+            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
+        }
+        if(!text_update)
             return;
         text_update = false;
         vert_size = 0;
@@ -272,8 +279,6 @@ namespace sgui
             return;
         std::vector<glbase::VertexVCT> charvtx;
         std::vector<unsigned short> index;
-        auto tex = font->getTexture(font_size);
-        auto tex_size = tex.getSize();
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
         unsigned int max_width = GetMaxWidth();
@@ -1339,7 +1344,14 @@ namespace sgui
     }
     
     void SGIconLabel::UpdateTextVertex() {
-        if(!text_update || font == nullptr)
+        if(font == nullptr)
+            return;
+        auto tex_size = font->getTexture(font_size).getSize();
+        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+            text_update = true;
+            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
+        }
+        if(!text_update)
             return;
         text_update = false;
         vert_size = 0;
@@ -1350,8 +1362,6 @@ namespace sgui
         std::vector<unsigned short> charidx;
         std::vector<glbase::VertexVCT> iconvtx;
         std::vector<unsigned short> iconidx;
-        auto tex = font->getTexture(font_size);
-        auto tex_size = tex.getSize();
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
         unsigned int max_width = GetMaxWidth();
@@ -2910,7 +2920,14 @@ namespace sgui
     }
  
     void SGListBox::UpdateTextVertex() {
-        if(!text_update || font == nullptr)
+        if(font == nullptr)
+            return;
+        auto tex_size = font->getTexture(font_size).getSize();
+        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+            text_update = true;
+            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
+        }
+        if(!text_update)
             return;
         text_update = false;
         vert_size = 0;
@@ -2920,8 +2937,6 @@ namespace sgui
         std::vector<unsigned short> charidx;
         std::vector<glbase::VertexVCT> iconvtx;
         std::vector<unsigned short> iconidx;
-        auto tex = font->getTexture(font_size);
-        auto tex_size = tex.getSize();
         glbase::VertexVCT cur_char;
         v2i text_pos = GetTextOffset();
         int itemcount = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
@@ -3362,7 +3377,7 @@ namespace sgui
         }
     }
     
-    int SGComboBox::GetSeletion() {
+    int SGComboBox::GetSelection() {
         return current_sel;
     }
     
@@ -3678,18 +3693,23 @@ namespace sgui
     }
     
     void SGTabControl::UpdateTextVertex() {
-        if(!text_update || font == nullptr)
+        if(font == nullptr)
+            return;
+        auto tex_size = font->getTexture(font_size).getSize();
+        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+            text_update = true;
+            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
+        }
+        if(!text_update)
+            return;
+        if(children.size() == 0)
             return;
         text_update = false;
         vert_size = 0;
-        if(children.size() == 0)
-            return;
         std::vector<glbase::VertexVCT> charvtx;
         std::vector<unsigned short> charidx;
         std::vector<glbase::VertexVCT> iconvtx;
         std::vector<unsigned short> iconidx;
-        auto tex = font->getTexture(font_size);
-        auto tex_size = tex.getSize();
         glbase::VertexVCT cur_char;
         v2i text_pos = GetTextOffset();
         int tb = tab_config.int_config["tab_border"];
