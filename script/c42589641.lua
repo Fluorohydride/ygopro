@@ -1,7 +1,7 @@
 --星輝士 トライヴェール
 function c42589641.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x9c),4),3)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,c42589641.xyzfilter,4),3)
 	c:EnableReviveLimit()
 	--summon limit
 	local e1=Effect.CreateEffect(c)
@@ -72,6 +72,9 @@ function c42589641.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if p1 then Duel.RegisterFlagEffect(0,42589641,RESET_PHASE+PHASE_END,0,1) end
 	if p2 then Duel.RegisterFlagEffect(1,42589641,RESET_PHASE+PHASE_END,0,1) end
 end
+function c42589641.xyzfilter(c)
+	return Duel.GetFlagEffect(c:GetControler(),42589641)==0 and c:IsSetCard(0x9c)
+end
 function c42589641.regcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ
 end
@@ -89,7 +92,7 @@ function c42589641.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0x9c)
 end
 function c42589641.splimit(e,se,sp,st,spos,tgp)
-	return bit.band(st,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ and Duel.GetFlagEffect(tgp,42589641)~=0
+	return bit.band(st,SUMMON_TYPE_XYZ)~=SUMMON_TYPE_XYZ or Duel.GetFlagEffect(tgp,42589641)==0
 end
 function c42589641.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ
