@@ -49,6 +49,8 @@ namespace ygopro
         void SetSceneSize(glbase::vector2<int> sz);
         void SwitchScene(SceneType st);
         std::shared_ptr<Scene> GetScene(SceneType st);
+        void SetMousePosition(glbase::vector2<int> pos) { mouse_pos = pos; }
+        glbase::vector2<int> GetMousePosition() { return mouse_pos; }
         
     protected:
         glbase::vector2<int> scene_size;
@@ -58,6 +60,7 @@ namespace ygopro
         float frame_check = 0.0f;
         float frame_time = 0.0f;
         float frame_interval = 0.0f;
+        glbase::vector2<int> mouse_pos = {0, 0};
     };
     
     extern SceneMgr sceneMgr;

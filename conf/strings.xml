@@ -6,19 +6,24 @@
   <string name="eui_button_yes" value="是"/>
   <string name="eui_button_no" value="否"/>
   <string name="eui_updir" value="返回上一层目录"/>
+  <string name="eui_menu_deck" value="卡组"/>
   <string name="eui_deck_load" value="载入"/>
   <string name="eui_deck_save" value="保存"/>
   <string name="eui_deck_saveas" value="另存为"/>
   <string name="eui_deck_loadstr" value="从文本载入"/>
   <string name="eui_deck_savestr" value="保存为文本"/>
-  <string name="eui_button_clear" value="清空"/>
-  <string name="eui_button_sort" value="排序"/>
-  <string name="eui_button_shuffle" value="打乱"/>
-  <string name="eui_button_filter" value="设定详细搜索条件"/>
+  <string name="eui_menu_tool" value="工具"/>
+  <string name="eui_tool_clear" value="清空"/>
+  <string name="eui_tool_sort" value="排序"/>
+  <string name="eui_tool_shuffle" value="打乱"/>
   <string name="eui_tool_screenshot" value="截图"/>
   <string name="eui_tool_saveshot" value="保存截图"/>
-  <string name="eui_view_browser" value="在网页中查看"/>
+  <string name="eui_tool_browser" value="查看网页"/>
+  <string name="eui_menu_search" value="搜索"/>
+  <string name="eui_search_quick" value="快速搜索"/>
+  <string name="eui_search_filter" value="设定详细搜索条件"/>
   <string name="eui_show_exclusive" value="显示独有卡标记"/>
+  <string name="eui_menu_list" value="查看"/>
   <string name="eui_list_forbidden" value="禁止卡"/>
   <string name="eui_list_limit" value="限制卡"/>
   <string name="eui_list_semilimit" value="准限制卡"/>

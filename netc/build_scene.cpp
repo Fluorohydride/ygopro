@@ -82,77 +82,71 @@ namespace ygopro
         view_regulation = 0;
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
-        auto pnl = sgui::SGPanel::Create(nullptr, {10, 10}, {240, 300});
-        pnl->SetSize({240, -20}, {0.0f, 1.0f});
+        auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
+        pnl->SetSize({-20, 35}, {1.0f, 0.0f});
         pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
             KeyDown(evt);
             return true;
         });
-        auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 10}, std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]));
+        auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 7}, std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]));
         deck_label = icon_label;
-        auto load_deck = sgui::SGButton::Create(pnl, {10, 40}, {70, 25});
-        load_deck->SetText(stringCfg[L"eui_deck_load"], 0xff000000);
-        load_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            file_dialog->Show(stringCfg[L"eui_msg_deck_load"], commonCfg[L"deck_path"], L".ydk");
-            file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
-                if(deck_edited || deck != current_file)
-                    LoadDeckFromFile(deck);
-            });
+        auto menu_deck = sgui::SGButton::Create(pnl, {250, 5}, {70, 25});
+        menu_deck->SetText(stringCfg[L"eui_menu_deck"], 0xff000000);
+        menu_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
+                OnMenuDeck(id);
+            })
+            .AddButton(stringCfg[L"eui_deck_load"])
+            .AddButton(stringCfg[L"eui_deck_save"])
+            .AddButton(stringCfg[L"eui_deck_saveas"])
+            .AddButton(stringCfg[L"eui_deck_loadstr"])
+            .AddButton(stringCfg[L"eui_deck_savestr"])
+            .End();
             return true;
         });
-        auto save_deck = sgui::SGButton::Create(pnl, {85, 40}, {70, 25});
-        save_deck->SetText(stringCfg[L"eui_deck_save"], 0xff000000);
-        save_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            if(current_file.length() == 0) {
-                file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
-                file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
-                    SaveDeckToFile(deck);
+        auto menu_tool = sgui::SGButton::Create(pnl, {325, 5}, {70, 25});
+        menu_tool->SetText(stringCfg[L"eui_menu_tool"], 0xff000000);
+        menu_tool->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
+                OnMenuTool(id);
+            })
+            .AddButton(stringCfg[L"eui_tool_clear"])
+            .AddButton(stringCfg[L"eui_tool_sort"])
+            .AddButton(stringCfg[L"eui_tool_shuffle"])
+            .AddButton(stringCfg[L"eui_tool_screenshot"])
+            .AddButton(stringCfg[L"eui_tool_saveshot"])
+            .AddButton(stringCfg[L"eui_tool_browser"])
+            .End();
+            return true;
+        });
+        auto menu_list = sgui::SGButton::Create(pnl, {400, 5}, {70, 25});
+        menu_list->SetText(stringCfg[L"eui_menu_list"], 0xff000000);
+        menu_list->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
+                OnMenuList(id);
+            })
+            .AddButton(stringCfg[L"eui_list_forbidden"])
+            .AddButton(stringCfg[L"eui_list_limit"])
+            .AddButton(stringCfg[L"eui_list_semilimit"])
+            .End();
+            return true;
+        });
+        auto menu_search = sgui::SGButton::Create(pnl, {475, 5}, {70, 25});
+        menu_search->SetText(stringCfg[L"eui_menu_search"], 0xff000000);
+        menu_search->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            auto cb1 = [this](const std::wstring& keystr) {
+                QuickSearch(keystr);
+            };
+            auto cb2 = [this]() {
+                filter_dialog->Show();
+                filter_dialog->SetOKCallback([this](const FilterCondition fc, int lmt)->void {
+                    Search(fc, lmt);
                 });
-            } else
-                SaveDeckToFile(current_file);
+            };
+            SearchMenu::Create(sceneMgr.GetMousePosition(), cb1, cb2);
             return true;
         });
-        auto save_as = sgui::SGButton::Create(pnl, {160, 40}, {70, 25});
-        save_as->SetText(stringCfg[L"eui_deck_saveas"], 0xff000000);
-        save_as->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
-            file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
-                SaveDeckToFile(deck);
-            });
-            return true;
-        });
-        auto clear_deck = sgui::SGButton::Create(pnl, {10, 70}, {70, 25});
-        clear_deck->SetText(stringCfg[L"eui_button_clear"], 0xff000000);
-        clear_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            ClearDeck();
-            SetDeckDirty();
-            return true;
-        });
-        auto sort_deck = sgui::SGButton::Create(pnl, {85, 70}, {70, 25});
-        sort_deck->SetText(stringCfg[L"eui_button_sort"], 0xff000000);
-        sort_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            SortDeck();
-            return true;
-        });
-        auto shuffle_deck = sgui::SGButton::Create(pnl, {160, 70}, {70, 25});
-        shuffle_deck->SetText(stringCfg[L"eui_button_shuffle"], 0xff000000);
-        shuffle_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            ShuffleDeck();
-            return true;
-        });
-        auto load_str = sgui::SGButton::Create(pnl, {10, 100}, {100, 25});
-        load_str->SetText(stringCfg[L"eui_deck_loadstr"], 0xff000000);
-        load_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            LoadDeckFromClipboard();
-            return true;
-        });
-        auto save_str = sgui::SGButton::Create(pnl, {130, 100}, {100, 25});
-        save_str->SetText(stringCfg[L"eui_deck_savestr"], 0xff000000);
-        save_str->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            SaveDeckToClipboard();
-            return true;
-        });
-        auto limit_reg = sgui::SGComboBox::Create(pnl, {10, 130}, {150, 30});
+        auto limit_reg = sgui::SGComboBox::Create(pnl, {550, 2}, {150, 30});
         auto& lrs = limitRegulationMgr.GetLimitRegulations();
         for(unsigned int i = 0; i < lrs.size(); ++i)
             limit_reg->AddItem(lrs[i].name, 0xff000000);
@@ -161,55 +155,13 @@ namespace ygopro
             ChangeRegulation(index);
             return true;
         });
-        auto show_ex = sgui::SGCheckbox::Create(pnl, {10, 160}, {100, 30});
+        auto show_ex = sgui::SGCheckbox::Create(pnl, {710, 7}, {100, 30});
         show_ex->SetText(stringCfg[L"eui_show_exclusive"], 0xff000000);
         show_ex->SetChecked(true);
         show_ex->eventCheckChange.Bind([this](sgui::SGWidget& sender, bool check)->bool {
             ChangeExclusive(check);
             return true;
         });
-        auto label = sgui::SGLabel::Create(pnl, {10, 190}, stringCfg[L"eui_filter_qsearch"]);
-        auto keyword = sgui::SGTextEdit::Create(pnl, {10, 210}, {200, 30});
-        auto pkeyword = keyword.get();
-        keyword->eventTextEnter.Bind([this, pkeyword](sgui::SGWidget& sender)->bool {
-            FilterCondition fc;
-            auto keystr = pkeyword->GetText();
-            if(keystr.length() > 0) {
-                if(keystr[0] == L'@') {
-                    fc.code = FilterDialog::ParseInt(&keystr[1], keystr.length() - 1);
-                } else if(keystr[0] == L'#') {
-                    std::wstring setstr = L"setname_";
-                    setstr.append(keystr.substr(1));
-                    if(stringCfg.Exists(setstr))
-                        fc.setcode = stringCfg[setstr];
-                    else
-                        fc.setcode = 0xffff;
-                } else
-                    fc.keyword = keystr;
-                search_result = dataMgr.FilterCard(fc);
-                std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
-                result_page = 0;
-                RefreshSearchResult();
-            }
-            return true;
-        });
-        auto filter = sgui::SGButton::Create(pnl, {30, 240}, {160, 25});
-        filter->SetText(stringCfg[L"eui_button_filter"], 0xff000000);
-        filter->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            filter_dialog->Show();
-            filter_dialog->SetOKCallback([this](const FilterCondition fc, int lmt)->void {
-                if(lmt == 0)
-                    search_result = dataMgr.FilterCard(fc);
-                else
-                    search_result = limitRegulationMgr.FilterCard(lmt - 1, fc);
-                std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
-                result_page = 0;
-                RefreshSearchResult();
-            });
-            return true;
-        });
-        auto list = sgui::SGListBox::Create(pnl, {10, 270}, {210, 220});
-        result_list = list;
         RefreshAllCard();
     }
     
@@ -242,14 +194,15 @@ namespace ygopro
     
     void BuildScene::SetSceneSize(glbase::vector2<int> sz) {
         scene_size = sz;
-        card_size = {0.2f * sz.y / sz.x, 0.29f};
-        icon_size = {0.08f * sz.y / sz.x, 0.08f};
-        minx = 300.0f / sz.x * 2.0f - 1.0f;
-        maxx = 0.95f;
-        main_y_spacing = 0.3f;
-        offsety[0] = 0.92f;
-        offsety[1] = -0.31f;
-        offsety[2] = -0.64f;
+        float yrate = 1.0f - 40.0f / sz.y;
+        card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
+        icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
+        minx = 50.0f / sz.x * 2.0f - 1.0f;
+        maxx = 1.0f - 240.0f / sz.x * 2.0f;
+        main_y_spacing = 0.3f * yrate;
+        offsety[0] = (0.92f + 1.0f) * yrate - 1.0f;
+        offsety[1] = (-0.31f + 1.0f) * yrate - 1.0f;
+        offsety[2] = (-0.64f + 1.0f) * yrate - 1.0f;
         max_row_count = (maxx - minx - card_size.x) / (card_size.x * 1.1f);
         if(max_row_count < 10)
             max_row_count = 10;
@@ -436,6 +389,114 @@ namespace ygopro
         wxTheClipboard->SetData(new wxTextDataObject(deck_string));
         wxTheClipboard->Close();
         MessageBox::ShowOK(L"", stringCfg[L"eui_msg_deck_tostr_ok"]);
+    }
+    
+    void BuildScene::OnMenuDeck(int id) {
+        switch(id) {
+            case 0:
+                file_dialog->Show(stringCfg[L"eui_msg_deck_load"], commonCfg[L"deck_path"], L".ydk");
+                file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
+                    if(deck_edited || deck != current_file)
+                        LoadDeckFromFile(deck);
+                });
+                break;
+            case 1:
+                if(current_file.length() == 0) {
+                    file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
+                    file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
+                        SaveDeckToFile(deck);
+                    });
+                } else
+                    SaveDeckToFile(current_file);
+                break;
+            case 2:
+                file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
+                file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
+                    SaveDeckToFile(deck);
+                });
+                break;
+            case 3:
+                LoadDeckFromClipboard();
+                break;
+            case 4:
+                SaveDeckToClipboard();
+                break;
+            default:
+                break;
+        }
+    }
+    
+    void BuildScene::OnMenuTool(int id) {
+        switch(id) {
+            case 0:
+                ClearDeck();
+                SetDeckDirty();
+                break;
+            case 1:
+                SortDeck();
+                break;
+            case 2:
+                ShuffleDeck();
+                break;
+            case 3: {
+                unsigned char* image_buff = new unsigned char[scene_size.x * scene_size.y * 4];
+                unsigned char* rgb_buff = new unsigned char[scene_size.x * scene_size.y * 3];
+                glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
+                for(unsigned int h = 0; h < scene_size.y; ++h) {
+                    for(unsigned int w = 0; w < scene_size.x; ++w) {
+                        unsigned int ch = scene_size.y - 1 - h;
+                        rgb_buff[h * scene_size.x * 3 + w * 3 + 0] = image_buff[ch * scene_size.x * 4 + w * 4 + 0];
+                        rgb_buff[h * scene_size.x * 3 + w * 3 + 1] = image_buff[ch * scene_size.x * 4 + w * 4 + 1];
+                        rgb_buff[h * scene_size.x * 3 + w * 3 + 2] = image_buff[ch * scene_size.x * 4 + w * 4 + 2];
+                    }
+                }
+                wxImage* img = new wxImage(scene_size.x, scene_size.y, rgb_buff, true);
+                if(true) {
+                    wxBitmap bmp(*img);
+                    wxTheClipboard->Open();
+                    wxTheClipboard->SetData(new wxBitmapDataObject(bmp));
+                    wxTheClipboard->Close();
+                } else
+                    img->SaveFile(L"a.png", wxBITMAP_TYPE_PNG);
+                delete img;
+                delete[] rgb_buff;
+                delete[] image_buff;
+            }
+                break;
+            case 4:
+                break;
+            case 5: {
+                wxString neturl = static_cast<const std::wstring&>(commonCfg[L"deck_neturl"]);
+                wxString deck_string = current_deck.SaveToString();
+                neturl.Replace("{amp}", wxT("&"));
+                neturl.Replace("{deck}", deck_string);
+                auto pos = current_file.find_last_of(L'/');
+                if(pos == std::wstring::npos)
+                    neturl.Replace("{name}", wxEmptyString);
+                else
+                    neturl.Replace("{name}", current_file.substr(pos + 1));
+                wxLaunchDefaultBrowser(neturl);
+                break;
+            }
+            default:
+                break;
+        }
+    }
+    
+    void BuildScene::OnMenuList(int id) {
+        switch(id) {
+            case 0:
+                ViewRegulation(0);
+                break;
+            case 1:
+                ViewRegulation(1);
+                break;
+            case 2:
+                ViewRegulation(2);
+                break;
+            default:
+                break;
+        }
     }
     
     void BuildScene::UpdateBackGround() {
@@ -753,14 +814,38 @@ namespace ygopro
     }
     
     void BuildScene::RefreshSearchResult() {
-        auto ptr = result_list.lock();
-        ptr->ClearItem();
-        for(int i = 0; i < 10; ++i) {
-            if(result_page * 10 + i >= search_result.size())
-                break;
-            auto data = search_result[result_page * 10 + i];
-            ptr->AddItem(0, data->name, 0xff000000);
+
+    }
+    
+    void BuildScene::QuickSearch(const std::wstring& keystr) {
+        FilterCondition fc;
+        if(keystr.length() > 0) {
+            if(keystr[0] == L'@') {
+                fc.code = FilterDialog::ParseInt(&keystr[1], keystr.length() - 1);
+            } else if(keystr[0] == L'#') {
+                std::wstring setstr = L"setname_";
+                setstr.append(keystr.substr(1));
+                if(stringCfg.Exists(setstr))
+                    fc.setcode = stringCfg[setstr];
+                else
+                    fc.setcode = 0xffff;
+            } else
+                fc.keyword = keystr;
+            search_result = dataMgr.FilterCard(fc);
+            std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
+            result_page = 0;
+            RefreshSearchResult();
         }
+    }
+    
+    void BuildScene::Search(const FilterCondition& fc, int lmt) {
+        if(lmt == 0)
+            search_result = dataMgr.FilterCard(fc);
+        else
+            search_result = limitRegulationMgr.FilterCard(lmt - 1, fc);
+        std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
+        result_page = 0;
+        RefreshSearchResult();
     }
     
     DeckCardData* BuildScene::GetCard(int pos, int index) {
@@ -812,8 +897,12 @@ namespace ygopro
                     index = (int)((x - minx) / dx[1]);
                 if(index > (int)current_deck.extra_deck.size())
                     return std::make_tuple(2, -1, current_deck.extra_deck.size());
-                else
-                    return std::make_tuple(2, index, 0);
+                else {
+                    if(x > minx + index * dx[1] + card_size.x)
+                        return std::make_tuple(2, -1, index);
+                    else
+                        return std::make_tuple(2, index, 0);
+                }
             } else if(y <= offsety[2] && y >= offsety[2] - card_size.y) {
                 int rc = std::max((int)current_deck.side_deck.size(), max_row_count);
                 int index = 0;
@@ -823,8 +912,12 @@ namespace ygopro
                     index = (int)((x - minx) / dx[2]);
                 if(index > (int)current_deck.side_deck.size())
                     return std::make_tuple(3, -1, current_deck.side_deck.size());
-                else
-                    return std::make_tuple(3, index, 0);
+                else {
+                    if(x > minx + index * dx[2] + card_size.x)
+                        return std::make_tuple(3, -1, index);
+                    else
+                        return std::make_tuple(3, index, 0);
+                }
             }
         }
         return std::make_tuple(0, 0, 0);

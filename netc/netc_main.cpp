@@ -88,6 +88,7 @@ int main(int argc, char* argv[]) {
                         sceneMgr.MouseButtonUp(evt.mouseButton);
                     break;
                 case sf::Event::MouseMoved:
+                    sceneMgr.SetMousePosition({evt.mouseMove.x, evt.mouseMove.y});
                     if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent(evt.mouseMove))
                         sceneMgr.MouseMove(evt.mouseMove);
                     break;

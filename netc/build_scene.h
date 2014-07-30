@@ -10,6 +10,8 @@
 namespace ygopro
 {
     
+    struct FilterCondition;
+    
     struct BuilderCard : public DeckCardExtraData {
         unsigned int buffer_index = 0;
         CardTextureInfo card_tex;
@@ -59,6 +61,10 @@ namespace ygopro
         void SaveDeckToFile(const std::wstring& file);
         void SaveDeckToClipboard();
         
+        void OnMenuDeck(int id);
+        void OnMenuTool(int id);
+        void OnMenuList(int id);
+        
         void UpdateBackGround();
         void UpdateCard();
         void UpdateAllCard();
@@ -74,6 +80,8 @@ namespace ygopro
         void ChangeRegulation(int index);
         void ViewRegulation(int limit);
         void RefreshSearchResult();
+        void QuickSearch(const std::wstring& keystr);
+        void Search(const FilterCondition& fc, int lmt);
         
         DeckCardData* GetCard(int pos, int index);
         std::tuple<int, int, int> GetHoverCard(float x, float y);
@@ -107,7 +115,6 @@ namespace ygopro
         std::weak_ptr<sgui::SGIconLabel> deck_label;
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
-        std::weak_ptr<sgui::SGListBox> result_list;
         std::vector<CardData*> search_result;
         int result_page = 0;
     };

@@ -159,7 +159,9 @@ namespace sgui
     class SGWidget : public std::enable_shared_from_this<SGWidget> {
         
     public:
-        virtual ~SGWidget() {}
+        virtual ~SGWidget() {
+            eventDestroying.TriggerEvent(*this);
+        }
         
         virtual bool CheckInside(v2i pos);
         virtual void UpdateVertices() = 0;
@@ -169,6 +171,8 @@ namespace sgui
         virtual bool AllowFocus() const { return true; }
         virtual std::shared_ptr<SGWidget> GetDragingTarget() { return nullptr; }
         virtual void Destroy();
+        virtual void SetFocus();
+        
         void SetPosition(v2i pos, v2f = v2f{0.0f, 0.0f});
         void SetSize(v2i sz, v2f = v2f{0.0f, 0.0f});
         void SetX(int x, float propx = 0.0f);
@@ -200,6 +204,8 @@ namespace sgui
         SGEventHandler<SGWidget, v2i> eventDragBegin;
         SGEventHandler<SGWidget, v2i> eventDragEnd;
         SGEventHandler<SGWidget, v2i> eventDragUpdate;
+
+        SGEventHandler<SGWidget> eventDestroying;
         
     public:
         virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
@@ -310,6 +316,7 @@ namespace sgui
         virtual void RemoveChild(std::shared_ptr<SGWidget> chd);
         virtual void BringToTop(std::shared_ptr<SGWidget> chd);
         virtual void ClearChild() { children.clear(); }
+        virtual void SetFocusWidget(std::shared_ptr<SGWidget> chd);
         
     public:
         virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
@@ -418,6 +425,7 @@ namespace sgui
         void ObjectDragingEnd(sf::Event::MouseMoveEvent evt);
         void SetClickingObject(std::shared_ptr<SGWidget> ptr) { clicking_object = ptr; }
         std::shared_ptr<SGWidget> GetClickObject() { return clicking_object.lock(); }
+        void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_object = ptr; }
         void LoadConfigs();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
         sf::Font& GetGUIFont() { return gui_font; }
@@ -444,6 +452,7 @@ namespace sgui
         v2i tex_size = {0, 0};
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
+        std::weak_ptr<SGWidget> popup_object;
         sf::Font gui_font;
         glbase::Texture gui_texture;
         glbase::Texture* cur_texture = nullptr;
@@ -752,6 +761,7 @@ namespace sgui
         void SetSelection(int sel);
         int GetSeletion();
         int GetItemCount() { return items.size(); }
+        int GetHoverItem(int offsetx, int offsety);
         
         SGEventHandler<SGWidget, int> eventSelChange;
         SGEventHandler<SGWidget, int> eventDoubleClick;
@@ -784,7 +794,7 @@ namespace sgui
         static SGConfig listbox_config;
     };
     
-    class SGComboBox : public SGWidgetWrapper, public SGTextBase {
+    class SGComboBox : public SGWidget, public SGTextBase {
     public:
         ~SGComboBox();
         virtual void UpdateVertices();
@@ -807,17 +817,16 @@ namespace sgui
         SGEventHandler<SGWidget, int> eventSelChange;
         
     protected:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
         virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventLostFocus();
         
         bool show_item = false;
         bool is_hoving = false;
         int current_sel = -1;
-        int item_count = 0;
         recti text_area = {0, 0, 0, 0};
         unsigned int vbo[2] = {0, 0};
+        std::vector<std::tuple<std::wstring, unsigned int, int>> items;
         
     public:
         static std::shared_ptr<SGComboBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);

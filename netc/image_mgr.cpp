@@ -75,6 +75,7 @@ namespace ygopro
         wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
         sf::Image img;
         if(img.loadFromFile(file.ToStdString())) {
+            card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
         }
         return ti;
     }

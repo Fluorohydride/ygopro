@@ -89,6 +89,69 @@ namespace ygopro
         });
     }
     
+    PopupMenu& PopupMenu::AddButton(const std::wstring& btn, int id) {
+        if(id == 0)
+            id = ids.size();
+        items.push_back(btn);
+        ids.push_back(id);
+        return *this;
+    }
+    
+    void PopupMenu::End() {
+        auto pnl = sgui::SGPanel::Create(nullptr, pos, {width, (int)(25 * items.size() + 9)});
+        pnl->eventDestroying.Bind([this](sgui::SGWidget& sender)->bool {
+            delete this;
+            return true;
+        });
+        auto ptr = pnl.get();
+        for(size_t i = 0; i < items.size(); ++i) {
+            auto btn = sgui::SGButton::Create(pnl, {3, (int)(5 + 25 * i)}, {0, width});
+            btn->SetSize({-10, 25}, {1.0f, 0.0f});
+            btn->SetText(items[i], 0xff000000);
+            btn->SetCustomValue(ids[i]);
+            btn->eventButtonClick.Bind([this, ptr](sgui::SGWidget& sender)->bool {
+                if(cb != nullptr)
+                    cb(sender.GetCustomValue());
+                ptr->Destroy();
+                return true;
+            });
+        }
+        sgui::SGGUIRoot::GetSingleton().SetPopupObject(pnl);
+    }
+    
+    PopupMenu& PopupMenu::Begin(sgui::v2i pos, int width, std::function<void (int)> cb) {
+        PopupMenu* menu = new PopupMenu();
+        menu->pos = pos;
+        menu->width = width;
+        menu->cb = cb;
+        return *menu;
+    }
+    
+    void SearchMenu::Create(sgui::v2i pos, std::function<void (const std::wstring&)> cb1, std::function<void()> cb2) {
+        auto pnl = sgui::SGPanel::Create(nullptr, pos, {200, 100});
+        auto ppnl = pnl.get();
+        auto keyword = sgui::SGTextEdit::Create(pnl, {5, 5}, {185, 30});
+        auto pkeyword = keyword.get();
+        auto quick = sgui::SGButton::Create(pnl, {35, 35}, {120, 25});
+        quick->SetText(stringCfg[L"eui_search_quick"], 0xff000000);
+        quick->eventButtonClick.Bind([cb1, ppnl, pkeyword](sgui::SGWidget& sender)->bool {
+            if(cb1)
+                cb1(pkeyword->GetText());
+            ppnl->Destroy();
+            return true;
+        });
+        auto filter = sgui::SGButton::Create(pnl, {5, 70}, {185, 25});
+        filter->SetText(stringCfg[L"eui_search_filter"], 0xff000000);
+        filter->eventButtonClick.Bind([cb2, ppnl](sgui::SGWidget& sender)->bool {
+            if(cb2)
+                cb2();
+            ppnl->Destroy();
+            return true;
+        });
+        keyword->SetFocus();
+        sgui::SGGUIRoot::GetSingleton().SetPopupObject(pnl);
+    }
+    
     void FileDialog::Show(const std::wstring& title, const std::wstring& root, const std::wstring& filter) {
         if(!window.expired())
             return;

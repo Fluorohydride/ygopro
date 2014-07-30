@@ -42,6 +42,15 @@ namespace sgui
             guiRoot.RemoveChild(shared_from_this());
     }
     
+    void SGWidget::SetFocus() {
+        auto p = parent.lock();
+        if(p != nullptr) {
+            p->SetFocusWidget(shared_from_this());
+            p->SetFocus();
+        } else
+            guiRoot.SetFocusWidget(shared_from_this());
+    }
+    
     void SGWidget::SetPosition(v2i pos, v2f prop) {
         position = pos;
         position_prop = prop;
@@ -529,6 +538,21 @@ namespace sgui
         }
     }
     
+    void SGWidgetContainer::SetFocusWidget(std::shared_ptr<SGWidget> chd) {
+        for(auto iter = children.begin(); iter != children.end(); ++iter) {
+            if(*iter == chd) {
+                auto f = focus_widget.lock();
+                if(f != chd) {
+                    if(f != nullptr)
+                        f->EventLostFocus();
+                    if(chd != nullptr)
+                        chd->EventGetFocus();
+                    focus_widget = chd;
+                }
+            }
+        }
+    }
+    
     bool SGWidgetContainer::EventMouseMove(sf::Event::MouseMoveEvent evt) {
         auto nhoving = GetHovingWidget(v2i{evt.x, evt.y});
         bool e = eventMouseMove.TriggerEvent(static_cast<SGWidget&>(*this), evt);
@@ -890,6 +914,7 @@ namespace sgui
             InjectMouseEnterEvent();
             InjectMouseMoveEvent(sf::Event::MouseMoveEvent{evt.x, evt.y});
         }
+        auto pwidget = popup_object.lock();
         if(!hoving.expired()) {
             auto hwidget = hoving.lock();
             if(hwidget != children.back()) {
@@ -901,7 +926,11 @@ namespace sgui
                     }
                 }
             }
-        }
+            if(pwidget != nullptr && hwidget != pwidget)
+                pwidget->Destroy();
+        } else
+            if(pwidget != nullptr)
+                pwidget->Destroy();
         return EventMouseButtonDown(evt);
     }
     
@@ -3096,27 +3125,39 @@ namespace sgui
         return current_sel;
     }
     
+    int SGListBox::GetHoverItem(int offsetx, int offsety) {
+        if(offsetx >= position_abs.x + text_area.left
+           && offsetx <= position_abs.x + size_abs.x - text_area.width
+           && offsety >= position_abs.y + text_area.top
+           && offsety <= position_abs.y + size_abs.y - text_area.height)
+            return (offsety - position_abs.y - text_area.top + text_offset) / line_spacing;
+        return -1;
+    }
+    
     bool SGListBox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        eventMouseButtonDown.TriggerEvent(*this, evt);
         auto choving = std::static_pointer_cast<SGScrollBar>(hoving.lock());
         if(choving) {
             choving->EventMouseButtonDown(evt);
             return true;
-        } else if(evt.button == sf::Mouse::Left
-                  && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
-                  && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
-            int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
-            float now = guiRoot.GetTime().asSeconds();
-            if(sel == current_sel) {
-                if(now - click_time < 0.3f) {
-                    eventDoubleClick.TriggerEvent(*this, sel);
-                    click_time = 0.0f;
-                } else
+        } else {
+            if(evt.button == sf::Mouse::Left
+               && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
+               && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
+                int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+                float now = guiRoot.GetTime().asSeconds();
+                if(sel == current_sel) {
+                    if(now - click_time < 0.3f) {
+                        eventDoubleClick.TriggerEvent(*this, sel);
+                        click_time = 0.0f;
+                    } else
+                        click_time = now;
+                } else {
+                    current_sel = sel;
+                    vertices_dirty = true;
                     click_time = now;
-            } else {
-                current_sel = sel;
-                vertices_dirty = true;
-                click_time = now;
-                eventSelChange.TriggerEvent(*this, sel);
+                    eventSelChange.TriggerEvent(*this, sel);
+                }
             }
         }
         return true;
@@ -3204,8 +3245,11 @@ namespace sgui
                       && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
                       && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
                 int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
-                std::static_pointer_cast<SGComboBox>(parent.lock())->SetSelection(sel);
-                std::static_pointer_cast<SGComboBox>(parent.lock())->ShowList(false);
+                auto cb = combo_box.lock();
+                if(cb != nullptr) {
+                    cb->SetSelection(sel);
+                    Destroy();
+                }
             }
             return true;
         }
@@ -3216,13 +3260,14 @@ namespace sgui
             return true;
         }
         
-        static std::shared_ptr<SGListBoxInner> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
+        static std::shared_ptr<SGListBoxInner> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz, std::shared_ptr<SGComboBox> c) {
             auto ptr = std::make_shared<SGListBoxInner>();
             ptr->parent = p;
             ptr->position = pos;
             ptr->size = sz;
             ptr->text_area = listbox_config.tex_config["text_area"];
             ptr->PostResize(true, true);
+            ptr->combo_box = c;
             auto iter = listbox_config.int_config.find("gui_color");
             if(iter != listbox_config.int_config.end())
                 ptr->color = iter->second;
@@ -3252,6 +3297,9 @@ namespace sgui
                 guiRoot.AddChild(ptr);
             return ptr;
         }
+        
+    private:
+        std::weak_ptr<SGComboBox> combo_box;
     };
     
     SGConfig SGComboBox::combobox_config;
@@ -3310,17 +3358,11 @@ namespace sgui
         guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
         DrawText();
         guiRoot.EndScissor();
-        if(show_item)
-            for(auto chd : children)
-                chd->Draw();
     }
     
     void SGComboBox::PostResize(bool res, bool rep) {
-        SGWidgetContainer::PostResize(res, rep);
-        if(show_item)
-            size_abs.y = combobox_config.int_config["height"] + combobox_config.int_config["listheight"];
-        else
-            size_abs.y = combobox_config.int_config["height"];
+        SGWidget::PostResize(res, rep);
+        size_abs.y = combobox_config.int_config["height"];
     }
     
     v2i SGComboBox::GetTextOffset() {
@@ -3328,22 +3370,19 @@ namespace sgui
     }
     
     void SGComboBox::InsertItem(unsigned int index, const std::wstring& item, unsigned int color, int val) {
-        std::static_pointer_cast<SGListBox>(children[0])->InsertItem(index, 0, item, color, val);
-        item_count++;
+        items.insert(items.begin() + index, std::make_tuple(item, color, val));
         if(current_sel >= 0 && (int)index <= current_sel)
             current_sel++;
     }
     
     void SGComboBox::AddItem(const std::wstring& item, unsigned int color, int val) {
-        std::static_pointer_cast<SGListBox>(children[0])->AddItem(0, item, color, val);
-        item_count++;
+        items.push_back(std::make_tuple(item, color, val));
     }
     
     void SGComboBox::RemoveItem(unsigned int index) {
-        if((int)index >= item_count)
+        if((size_t)index >= items.size())
             return;
-        std::static_pointer_cast<SGListBox>(children[0])->RemoveItem(index);
-        item_count--;
+        items.erase(items.begin() + index);
         if((int)index == current_sel) {
             ClearText();
             current_sel = -1;
@@ -3352,27 +3391,34 @@ namespace sgui
     }
     
     void SGComboBox::ClearItem() {
-        std::static_pointer_cast<SGListBox>(children[0])->ClearItem();
-        item_count = 0;
+        items.clear();
         ClearText();
         current_sel = -1;
     }
     
     void SGComboBox::SetItemText(unsigned int index, const std::wstring& text, unsigned int color) {
-        std::static_pointer_cast<SGListBox>(children[0])->SetItemText(index, text, color);
+        if((size_t)index >= items.size())
+            return;
+        auto& it = items[index];
+        std::get<0>(it) = text;
+        std::get<1>(it) = color;
+        if(index == current_sel)
+            SetText(text, color);
     }
     
     void SGComboBox::SetItemValue(unsigned int index, int val) {
-        std::static_pointer_cast<SGListBox>(children[0])->SetItemValue(index, val);
+        if((size_t)index >= items.size())
+            return;
+        std::get<2>(items[index]) = val;
     }
     
     void SGComboBox::SetSelection(int sel) {
-        if(sel < 0 || sel >= item_count)
+        if(sel < 0 || (size_t)sel >= items.size())
             sel = -1;
         if(sel != current_sel) {
             current_sel = sel;
-            auto item = std::static_pointer_cast<SGListBox>(children[0])->GetItem(sel);
-            SetText(std::get<1>(item), std::get<2>(item));
+            auto& item = items[sel];
+            SetText(std::get<0>(item), std::get<1>(item));
             eventSelChange.TriggerEvent(*this, sel);
         }
     }
@@ -3382,59 +3428,49 @@ namespace sgui
     }
     
     int SGComboBox::GetSelectedValue() {
-        if(current_sel == -1 || current_sel >= item_count)
+        if(current_sel == -1 || (size_t)current_sel >= items.size())
             return 0;
-        return std::get<3>(std::static_pointer_cast<SGListBox>(children[0])->GetItem(current_sel));
+        return std::get<2>(items[current_sel]);
     }
     
     void SGComboBox::ShowList(bool show) {
         if(show_item == show)
             return;
-        if(show)
-            std::static_pointer_cast<SGListBox>(children[0])->SetSelection(current_sel);
+        if(show) {
+            auto lst = SGListBoxInner::Create(nullptr, {position_abs.x, position_abs.y + combobox_config.int_config["listoffset"]}, {0, 0},
+                                              std::static_pointer_cast<SGComboBox>(this->shared_from_this()));
+            lst->SetSize({size_abs.x, combobox_config.int_config["listheight"]});
+            for(auto& it : items)
+                lst->AddItem(0, std::get<0>(it), std::get<1>(it));
+            lst->SetSelection(current_sel);
+            lst->eventDestroying.Bind([this](SGWidget& sender)->bool {
+                ShowList(false);
+                return true;
+            });
+            guiRoot.SetPopupObject(lst);
+        }
         show_item = show;
-        PostResize(true, false);
+        vertices_dirty = true;
     }
     
-    bool SGComboBox::EventMouseMove(sf::Event::MouseMoveEvent evt) {
-        bool ret = SGWidgetContainer::EventMouseMove(evt);
-        if(!hoving.lock()) {
-            if(!is_hoving) {
-                is_hoving = true;
-                vertices_dirty = true;
-            }
-        } else {
-            if(is_hoving) {
-                is_hoving = false;
-                vertices_dirty = true;
-            }
+    bool SGComboBox::EventMouseEnter() {
+        if(!is_hoving) {
+            is_hoving = true;
+            vertices_dirty = true;
         }
-        return ret;
+        return SGWidget::EventMouseEnter();
     }
     
     bool SGComboBox::EventMouseLeave() {
         is_hoving = false;
         vertices_dirty = true;
-        return SGWidgetContainer::EventMouseLeave();
+        return SGWidget::EventMouseLeave();
     }
     
     bool SGComboBox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
-        auto choving = hoving.lock();
-        if(choving) {
-            choving->EventMouseButtonDown(evt);
-            return true;
-        } else if(evt.button == sf::Mouse::Left) {
+        if(evt.button == sf::Mouse::Left)
             ShowList(!show_item);
-            if(!parent.expired())
-                parent.lock()->BringToTop(shared_from_this());
-        }
-        return true;
-    }
-    
-    bool SGComboBox::EventLostFocus() {
-        show_item = false;
-        PostResize(true, false);
-        return SGWidgetContainer::EventLostFocus();
+        return SGWidget::EventMouseButtonDown(evt);
     }
     
     std::shared_ptr<SGComboBox> SGComboBox::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i sz) {
@@ -3468,8 +3504,6 @@ namespace sgui
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ptr->vbo[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 60, index, GL_STATIC_DRAW);
-        auto lst = SGListBoxInner::Create(ptr, {0, combobox_config.int_config["listoffset"]}, {0, 0});
-        lst->SetSize({0, combobox_config.int_config["listheight"]}, {1.0f, 0.0f});
         if(p != nullptr)
             p->AddChild(ptr);
         else

@@ -17,7 +17,7 @@ namespace ygopro
                 window.lock()->Destroy();
         }
     protected:
-        std::weak_ptr<sgui::SGWindow> window;
+        std::weak_ptr<sgui::SGWidget> window;
     };
     
     class MessageBox {
@@ -25,6 +25,27 @@ namespace ygopro
         static void ShowOK(const std::wstring& title, const std::wstring& text, std::function<void ()> cb = nullptr);
         static void ShowOKCancel(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1 = nullptr, std::function<void ()> cb2 = nullptr);
         static void ShowYesNo(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1 = nullptr, std::function<void ()> cb2 = nullptr);
+    };
+    
+    class PopupMenu {
+    private:
+        PopupMenu() {};
+    public:
+        PopupMenu& AddButton(const std::wstring& btn, int id = 0);
+        void End();
+    private:
+        sgui::v2i pos;
+        int width;
+        std::function<void (int)> cb;
+        std::vector<std::wstring> items;
+        std::vector<int> ids;
+    public:
+        static PopupMenu& Begin(sgui::v2i pos, int width, std::function<void (int)> cb = nullptr);
+    };
+    
+    class SearchMenu {
+    public:
+        static void Create(sgui::v2i pos, std::function<void (const std::wstring&)> cb1, std::function<void()> cb2);
     };
     
     class FileDialog : public CommonDialog {
@@ -60,7 +81,7 @@ namespace ygopro
         std::weak_ptr<sgui::SGTextEdit> defence;
         std::weak_ptr<sgui::SGTextEdit> star;
     };
-    
+
 }
 
 #endif

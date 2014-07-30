@@ -6,9 +6,6 @@
 #include <tuple>
 #include <memory>
 
-#include "wx/string.h"
-
-
 #define DECK_NOERROR        0
 #define DECK_EXCEED_COUNT   0x10000000
 #define DECK_POOL_MISMATCH  0x20000000
