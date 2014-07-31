@@ -43,11 +43,15 @@ namespace ygopro
         glGenBuffers(1, &deck_buffer);
         glGenBuffers(1, &back_buffer);
         glGenBuffers(1, &misc_buffer);
+        glGenBuffers(1, &result_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 256 * 16, nullptr, GL_DYNAMIC_DRAW);
+        GLCheckError(__LINE__);
+        glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 10 * 16, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__LINE__);
         std::vector<unsigned short> index;
         index.resize(256 * 4 * 6);
@@ -76,15 +80,23 @@ namespace ygopro
         glDeleteBuffers(1, &deck_buffer);
         glDeleteBuffers(1, &back_buffer);
         glDeleteBuffers(1, &misc_buffer);
+        glDeleteBuffers(1, &result_buffer);
     }
     
     void BuildScene::Activate() {
         view_regulation = 0;
+        prev_hov = std::make_tuple(0, 0, 0);
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
         pnl->SetSize({-20, 35}, {1.0f, 0.0f});
         pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
+            KeyDown(evt);
+            return true;
+        });
+        auto rpnl = sgui::SGPanel::Create(nullptr, {0, 0}, {200, 60});
+        rpnl->SetPosition({-210, 40}, {1.0f, 0.0f});
+        rpnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
             KeyDown(evt);
             return true;
         });
@@ -162,12 +174,27 @@ namespace ygopro
             ChangeExclusive(check);
             return true;
         });
+        label_result = sgui::SGLabel::Create(rpnl, {10, 10}, L"");
+        label_page = sgui::SGLabel::Create(rpnl, {30, 33}, L"");
+        auto btn1 = sgui::SGButton::Create(rpnl, {10, 35}, {15, 15});
+        auto btn2 = sgui::SGButton::Create(rpnl, {170, 35}, {15, 15});
+        btn1->SetTextureRect({136, 74, 15, 15}, {136, 90, 15, 15}, {136, 106, 15, 15});
+        btn2->SetTextureRect({154, 74, 15, 15}, {154, 90, 15, 15}, {154, 106, 15, 15});
+        btn1->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            ResultPrevPage();
+            return true;
+        });
+        btn2->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            ResultNextPage();
+            return true;
+        });
         RefreshAllCard();
     }
     
     void BuildScene::Update() {
         UpdateBackGround();
         UpdateCard();
+        UpdateResult();
     }
     
     void BuildScene::Draw() {
@@ -189,6 +216,12 @@ namespace ygopro
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         glDrawElements(GL_TRIANGLES, deck_sz * 24, GL_UNSIGNED_SHORT, 0);
+        
+        glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
+        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+        glDrawElements(GL_TRIANGLES, 10 * 24, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__LINE__);
     }
     
@@ -215,19 +248,37 @@ namespace ygopro
         int rc2 = std::max((int)current_deck.side_deck.size(), max_row_count);
         dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
         UpdateAllCard();
+        update_result = true;
     }
     
     void BuildScene::MouseMove(sf::Event::MouseMoveEvent evt) {
-        auto hov = GetHoverCard((float)evt.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)evt.y / scene_size.y * 2.0f);
-        static std::tuple<int, int, int> preh = std::make_tuple(0, 0, 0);
-        auto pre = GetCard(std::get<0>(preh), std::get<1>(preh));
-        auto dcd = GetCard(std::get<0>(hov), std::get<1>(hov));
+        DeckCardData* dcd = nullptr;
+        auto pre = GetCard(std::get<0>(prev_hov), std::get<1>(prev_hov));
+        if(evt.x >= scene_size.x - 210 && evt.x <= scene_size.x - 10 && evt.y >= 110 && evt.y <= scene_size.y - 10) {
+            int new_sel = (int)((evt.y - 110.0f) / ((scene_size.y - 120.0f) / 5.0f)) * 2;
+            if(new_sel > 8)
+                new_sel = 8;
+            new_sel += (evt.x >= scene_size.x - 110) ? 1 : 0;
+            if(new_sel != current_sel_result) {
+                current_sel_result = new_sel;
+                update_result = true;
+            }
+            std::get<0>(prev_hov) = 4;
+            std::get<1>(prev_hov) = new_sel;
+        } else {
+            auto hov = GetHoverCard((float)evt.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)evt.y / scene_size.y * 2.0f);
+            dcd = GetCard(std::get<0>(hov), std::get<1>(hov));
+            prev_hov = hov;
+        }
         if(dcd != pre) {
             if(pre)
                 ChangeHL(*pre, 0.1f, 0.0f);
             if(dcd)
                 ChangeHL(*dcd, 0.1f, 0.7f);
-            preh = hov;
+            if(current_sel_result >= 0) {
+                current_sel_result = -1;
+                update_result = true;
+            }
         }
     }
     
@@ -672,6 +723,77 @@ namespace ygopro
         GLCheckError(__LINE__);
     }
     
+    void BuildScene::UpdateResult() {
+        if(!update_result)
+            return;
+        update_result = false;
+        if(result_page * 10 >= search_result.size())
+            return;
+        float left = 1.0f - 210.0f / scene_size.x * 2.0f;
+        float right = 1.0f - 10.0f / scene_size.x * 2.0f;
+        float width = (right - left) / 2.0f;
+        float top = 1.0f - 110.0f / scene_size.y * 2.0f;
+        float down = 10.0f / scene_size.y * 2.0f - 1.0f;
+        float height = (top - down) / 5.0f;
+        float cheight = height * 0.9f;
+        float cwidth = cheight / 2.9f * 2.0f * scene_size.y / scene_size.x;
+        float offy = height * 0.05f;
+        float iheight = 0.08f / 0.29f * cheight;
+        float iwidth = iheight * scene_size.y / scene_size.x;
+        
+        std::array<glbase::VertexVCT, 160> verts;
+        for(int i = 0; i < 10 ; ++i) {
+            if(i + result_page * 10 >= search_result.size())
+                continue;
+            auto pvert = &verts[i * 16];
+            unsigned int cl = (i == current_sel_result) ? 0xc0ffffff : 0xc0000000;
+            pvert[0].vertex = {left + (i % 2) * width, top - (i / 2) * height, 0.0f};
+            pvert[0].texcoord = hmask.vert[0];
+            pvert[0].color = cl;
+            pvert[1].vertex = {left + (i % 2) * width + width, top - (i / 2) * height, 0.0f};
+            pvert[1].texcoord = hmask.vert[1];
+            pvert[1].color = cl;
+            pvert[2].vertex = {left + (i % 2) * width, top - (i / 2) * height - height, 0.0f};
+            pvert[2].texcoord = hmask.vert[2];
+            pvert[2].color = cl;
+            pvert[3].vertex = {left + (i % 2) * width + width, top - (i / 2) * height - height, 0.0f};
+            pvert[3].texcoord = hmask.vert[3];
+            pvert[3].color = cl;
+            CardData* pdata = search_result[i + result_page * 10];
+            pvert[4].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy, 0.0f};
+            pvert[4].texcoord = result_tex[i].ti.vert[0];
+            pvert[5].vertex = {left + (i % 2) * width + width / 2 + cwidth / 2, top - (i / 2) * height - offy, 0.0f};
+            pvert[5].texcoord = result_tex[i].ti.vert[1];
+            pvert[6].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - height + offy, 0.0f};
+            pvert[6].texcoord = result_tex[i].ti.vert[2];
+            pvert[7].vertex = {left + (i % 2) * width + width / 2 + cwidth / 2, top - (i / 2) * height - height + offy, 0.0f};
+            pvert[7].texcoord = result_tex[i].ti.vert[3];
+            unsigned int lmt = limitRegulationMgr.GetCardLimitCount(pdata->code);
+            if(lmt < 3) {
+                pvert[8].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f, 0.0f};
+                pvert[8].texcoord = limit[lmt].vert[0];
+                pvert[9].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f + iwidth, top - (i / 2) * height - offy + 0.01f, 0.0f};
+                pvert[9].texcoord = limit[lmt].vert[1];
+                pvert[10].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f - iheight, 0.0f};
+                pvert[10].texcoord = limit[lmt].vert[2];
+                pvert[11].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f + iwidth, top - (i / 2) * height - offy + 0.01f - iheight, 0.0f};
+                pvert[11].texcoord = limit[lmt].vert[3];
+            }
+            if(show_exclusive && pdata->pool != 3) {
+                pvert[12].vertex = {left + (i % 2) * width + width / 2 - iwidth * 0.75f, top - (i / 2) * height + offy - height + iheight * 0.75f - 0.01f, 0.0f};
+                pvert[12].texcoord = pool[pdata->pool].vert[0];
+                pvert[13].vertex = {left + (i % 2) * width + width / 2 + iwidth * 0.75f, top - (i / 2) * height + offy - height + iheight * 0.75f - 0.01f, 0.0f};
+                pvert[13].texcoord = pool[pdata->pool].vert[1];
+                pvert[14].vertex = {left + (i % 2) * width + width / 2 - iwidth * 0.75f, top - (i / 2) * height + offy - height - 0.01f, 0.0f};
+                pvert[14].texcoord = pool[pdata->pool].vert[2];
+                pvert[15].vertex = {left + (i % 2) * width + width / 2 + iwidth * 0.75f, top - (i / 2) * height + offy - height - 0.01f, 0.0f};
+                pvert[15].texcoord = pool[pdata->pool].vert[3];
+            }
+        }
+        glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 160, &verts[0]);
+    }
+    
     void BuildScene::RefreshHL(DeckCardData& dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd.extra);
         std::array<glbase::VertexVCT, 4> verts;
@@ -767,6 +889,7 @@ namespace ygopro
             ptr->show_exclusive = show_exclusive;
             RefreshEx(dcd);
         }
+        update_result = true;
     }
     
     void BuildScene::ChangeRegulation(int index) {
@@ -776,6 +899,7 @@ namespace ygopro
         else
             limitRegulationMgr.GetDeckCardLimitCount(current_deck);
         RefreshAllCard();
+        update_result = true;
     }
     
     void BuildScene::ViewRegulation(int limit) {
@@ -813,8 +937,44 @@ namespace ygopro
         RefreshAllCard();
     }
     
+    void BuildScene::UnloadSearchResult() {
+        for(int i = 0; i < 10; ++i) {
+            if(i + result_page * 10 >= search_result.size())
+                break;
+            imageMgr.UnloadCardTexture(search_result[i + result_page * 10]->code);
+        }
+    }
+    
     void BuildScene::RefreshSearchResult() {
-
+        for(int i = 0; i < 10; ++i) {
+            if(i + result_page * 10 >= search_result.size())
+                break;
+            result_tex[i] = imageMgr.GetCardTexture(search_result[i + result_page * 10]->code);
+        }
+        update_result = true;
+        auto ptr = label_page.lock();
+        if(ptr != nullptr) {
+            int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            wxString s = wxString::Format(L"%d/%d", result_page + 1, pageall);
+            ptr->SetText(s.ToStdWstring(), 0xff000000);
+            ptr->SetPosition({100 - ptr->GetSize().x / 2, 33});
+        }
+    }
+    
+    void BuildScene::ResultPrevPage() {
+        if(result_page == 0)
+            return;
+        UnloadSearchResult();
+        result_page--;
+        RefreshSearchResult();
+    }
+    
+    void BuildScene::ResultNextPage() {
+        if(result_page * 10 + 10 >= search_result.size())
+            return;
+        UnloadSearchResult();
+        result_page++;
+        RefreshSearchResult();
     }
     
     void BuildScene::QuickSearch(const std::wstring& keystr) {
@@ -831,6 +991,7 @@ namespace ygopro
                     fc.setcode = 0xffff;
             } else
                 fc.keyword = keystr;
+            UnloadSearchResult();
             search_result = dataMgr.FilterCard(fc);
             std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
             result_page = 0;
@@ -839,6 +1000,7 @@ namespace ygopro
     }
     
     void BuildScene::Search(const FilterCondition& fc, int lmt) {
+        UnloadSearchResult();
         if(lmt == 0)
             search_result = dataMgr.FilterCard(fc);
         else

@@ -568,7 +568,7 @@ namespace sgui
         virtual int GetMaxWidth();
         virtual bool IsMultiLine();
         virtual v2i GetImageOffset();
-        void SetTextureRect(recti r1, recti r2, recti r3, int lw, int rw);
+        void SetTextureRect(recti r1, recti r2, recti r3);
         void SetTexture(glbase::Texture* tex);
         bool IsPushed() { return is_push && (state == 0x12); }
         

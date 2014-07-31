@@ -22,7 +22,7 @@ namespace ygopro
             return false;
         if(fc.pool != 0 && pool != fc.pool)
             return false;
-        if(fc.type & 0x1) {
+        if((fc.type == 0) || (fc.type & 0x1)) {
             if(fc.atkmin != -1 && attack < fc.atkmin)
                 return false;
             if(fc.atkmax != -1 && fc.atkmax != 0 && attack > fc.atkmax)

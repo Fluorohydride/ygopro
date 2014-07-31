@@ -257,12 +257,46 @@ namespace ygopro
         ptype1->AddItem(dataMgr.GetTypeString2(0x2), 0xff000000, 0x2);
         ptype1->AddItem(dataMgr.GetTypeString2(0x4), 0xff000000, 0x4);
         ptype1->SetSelection(0);
+        ptype1->eventSelChange.Bind([this](sgui::SGWidget& sender, int index)->bool {
+            auto ptr = type2.lock();
+            ptr->ClearItem();
+            if(index == 0) {
+                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+            } else if(index == 1) {
+                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0x1e003ef);
+                ptr->AddItem(dataMgr.GetTypeString2(0x10), 0xff000000, 0x10);
+                ptr->AddItem(dataMgr.GetTypeString2(0x20), 0xff000000, 0x20);
+                ptr->AddItem(dataMgr.GetTypeString2(0x40), 0xff000000, 0x40);
+                ptr->AddItem(dataMgr.GetTypeString2(0x80), 0xff000000, 0x80);
+                ptr->AddItem(dataMgr.GetTypeString2(0x1000), 0xff000000, 0x1000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x2000), 0xff000000, 0x2000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x800000), 0xff000000, 0x800000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x1000000), 0xff000000, 0x1000000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x200000), 0xff000000, 0x200000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x800), 0xff000000, 0x800);
+                ptr->AddItem(dataMgr.GetTypeString2(0x200), 0xff000000, 0x200);
+                ptr->AddItem(dataMgr.GetTypeString2(0x400), 0xff000000, 0x400);
+                ptr->AddItem(dataMgr.GetTypeString2(0x400000), 0xff000000, 0x400000);
+            } else if(index == 2) {
+                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0xf0082);
+                ptr->AddItem(dataMgr.GetTypeString2(0x10), 0xff000000, 0x2);
+                ptr->AddItem(dataMgr.GetTypeString2(0x80), 0xff000000, 0x80);
+                ptr->AddItem(dataMgr.GetTypeString2(0x10000), 0xff000000, 0x10000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x20000), 0xff000000, 0x20000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x40000), 0xff000000, 0x40000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x80000), 0xff000000, 0x80000);
+            } else {
+                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0x120004);
+                ptr->AddItem(dataMgr.GetTypeString2(0x10), 0xff000000, 0x4);
+                ptr->AddItem(dataMgr.GetTypeString2(0x20000), 0xff000000, 0x20000);
+                ptr->AddItem(dataMgr.GetTypeString2(0x100000), 0xff000000, 0x100000);
+            }
+            ptr->SetSelection(0);
+            return true;
+        });
         auto ptype2 = sgui::SGComboBox::Create(wd, {90, 80}, {180, 30});
         type2 = ptype2;
         ptype2->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
-        for(unsigned int i = 0x10; i != 0x2000000; i <<=1)
-            if(i != 0x4000 && i != 0x8000)
-                ptype2->AddItem(dataMgr.GetTypeString2(i), 0xff000000, i);
         ptype2->SetSelection(0);
         auto label3 = sgui::SGLabel::Create(wd, {10, 110}, stringCfg[L"eui_filter_limit"]);
         auto ptype3 = sgui::SGComboBox::Create(wd, {90, 105}, {180, 30});
@@ -279,14 +313,14 @@ namespace ygopro
         attribute = pattribute;
         pattribute->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
         for(unsigned int i = 1; i != 0x80; i <<=1)
-            pattribute->AddItem(dataMgr.GetAttributeString(i), 0xff000000);
+            pattribute->AddItem(dataMgr.GetAttributeString(i), 0xff000000, i);
         pattribute->SetSelection(0);
         auto label5 = sgui::SGLabel::Create(wd, {10, 160}, stringCfg[L"eui_filter_race"]);
         auto prace = sgui::SGComboBox::Create(wd, {90, 155}, {180, 30});
         race = prace;
         prace->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
         for(unsigned int i = 1; i != 0x1000000; i <<=1)
-            prace->AddItem(dataMgr.GetRaceString(i), 0xff000000);
+            prace->AddItem(dataMgr.GetRaceString(i), 0xff000000, i);
         prace->SetSelection(0);
         auto label6 = sgui::SGLabel::Create(wd, {10, 185}, stringCfg[L"eui_filter_attack"]);
         attack = sgui::SGTextEdit::Create(wd, {90, 180}, {200, 30});
@@ -325,7 +359,7 @@ namespace ygopro
             fc.pool = type3.lock()->GetSelectedValue();
             lmt = 0;
         }
-        if(fc.type == 0x1) {
+        if((fc.type == 0) || (fc.type == 0x1)) {
             fc.attribute = attribute.lock()->GetSelectedValue();
             fc.race = race.lock()->GetSelectedValue();
             auto t1 = ParseValue(attack.lock()->GetText());
@@ -363,7 +397,7 @@ namespace ygopro
             return std::make_tuple(1, 0, 0);
         size_t pos = valstr.find(L':');
         if(pos == valstr.npos)
-            return std::make_tuple(2, ParseInt(&valstr[1], valstr.length()), 0);
+            return std::make_tuple(2, ParseInt(&valstr[0], valstr.length()), 0);
         else
             return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], valstr.length() - pos - 1));
     }

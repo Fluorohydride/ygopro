@@ -69,6 +69,7 @@ namespace ygopro
         void UpdateCard();
         void UpdateAllCard();
         void RefreshAllCard();
+        void UpdateResult();
         
         void RefreshCardPos(DeckCardData& dcd);
         void RefreshHL(DeckCardData& dcd);
@@ -79,9 +80,13 @@ namespace ygopro
         void ChangeExclusive(bool check);
         void ChangeRegulation(int index);
         void ViewRegulation(int limit);
+        void UnloadSearchResult();
         void RefreshSearchResult();
+        void ResultPrevPage();
+        void ResultNextPage();
         void QuickSearch(const std::wstring& keystr);
         void Search(const FilterCondition& fc, int lmt);
+        
         
         DeckCardData* GetCard(int pos, int index);
         std::tuple<int, int, int> GetHoverCard(float x, float y);
@@ -91,8 +96,11 @@ namespace ygopro
         unsigned int deck_buffer = 0;
         unsigned int back_buffer = 0;
         unsigned int misc_buffer = 0;
+        unsigned int result_buffer = 0;
         bool update_bg = true;
         bool update_card = true;
+        bool update_result = true;
+        std::tuple<int, int, int> prev_hov;
         std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;
@@ -116,7 +124,11 @@ namespace ygopro
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
         std::vector<CardData*> search_result;
+        std::array<CardTextureInfo, 10> result_tex;
         int result_page = 0;
+        int current_sel_result = -1;
+        std::weak_ptr<sgui::SGLabel> label_result;
+        std::weak_ptr<sgui::SGLabel> label_page;
     };
     
 }

@@ -1094,8 +1094,7 @@ namespace sgui
         auto cbtn = SGButton::Create(ptr, {size.x - rt.left, rt.top}, {rt.width, rt.height});
         cbtn->SetPosition({-rt.left, rt.top}, {1.0f, 0.0f});
         cbtn->eventButtonClick.Bind(ptr.get(), &SGWindow::CloseButtonClick);
-        cbtn->SetTextureRect(window_config.tex_config["close1"], window_config.tex_config["close2"], window_config.tex_config["close3"],
-                             window_config.int_config["closelw"], window_config.int_config["closerw"]);
+        cbtn->SetTextureRect(window_config.tex_config["close1"], window_config.tex_config["close2"], window_config.tex_config["close3"]);
         cbtn->SetColor(ptr->color);
         return ptr;
     }
@@ -1666,12 +1665,10 @@ namespace sgui
             return position_abs;
     }
     
-    void SGButton::SetTextureRect(recti r1, recti r2, recti r3, int lw, int rw) {
+    void SGButton::SetTextureRect(recti r1, recti r2, recti r3) {
         tex_rect[0] = r1;
         tex_rect[1] = r2;
         tex_rect[2] = r3;
-        lwidth = lw;
-        rwidth = rw;
         UpdateVertices();
     }
     
@@ -1717,8 +1714,6 @@ namespace sgui
         ptr->tex_rect[0] = button_config.tex_config["normal"];
         ptr->tex_rect[1] = button_config.tex_config["hover"];
         ptr->tex_rect[2] = button_config.tex_config["down"];
-        ptr->lwidth = button_config.int_config["lwidth"];
-        ptr->rwidth = button_config.int_config["rwidth"];
         return ptr;
     }
     
@@ -2636,6 +2631,8 @@ namespace sgui
     bool SGTextEdit::DragingBegin(v2i evt) {
         if(read_only)
             return false;
+        if(text.size() == 0)
+            return false;
         position_drag = evt;
         cursor_pos = GetHitIndex(evt);
         SetSelRegion(cursor_pos, cursor_pos);
@@ -2646,7 +2643,7 @@ namespace sgui
     }
     
     bool SGTextEdit::DragingUpdate(v2i evt) {
-        if(read_only)
+        if(!draging || read_only)
             return false;
         v2i delta = evt - position_drag;
         position_drag = evt;
