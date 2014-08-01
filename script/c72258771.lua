@@ -54,7 +54,7 @@ function c72258771.ccost(e,tp)
 	end
 end
 function c72258771.otfilter(c,tp)
-	return c:IsSetCard(0x1b) and (c:IsControler(tp) or c:IsFaceup())
+	return c:IsSetCard(0x1d) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c72258771.otcon(e,c)
 	if c==nil then return true end
