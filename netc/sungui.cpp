@@ -914,7 +914,6 @@ namespace sgui
             InjectMouseEnterEvent();
             InjectMouseMoveEvent(sf::Event::MouseMoveEvent{evt.x, evt.y});
         }
-        auto pwidget = popup_object.lock();
         if(!hoving.expired()) {
             auto hwidget = hoving.lock();
             if(hwidget != children.back()) {
@@ -926,11 +925,26 @@ namespace sgui
                     }
                 }
             }
-            if(pwidget != nullptr && hwidget != pwidget)
-                pwidget->Destroy();
-        } else
-            if(pwidget != nullptr)
-                pwidget->Destroy();
+            while(popup_objects.size() > 0) {
+                auto ptr = popup_objects.back().lock();
+                if(ptr == nullptr) {
+                    popup_objects.pop_back();
+                    continue;
+                } else if(hwidget != ptr) {
+                    ptr->Destroy();
+                    popup_objects.pop_back();
+                    continue;
+                } else
+                    break;
+            }
+        } else {
+            for(auto& pop : popup_objects) {
+                auto ptr = pop.lock();
+                if(ptr != nullptr)
+                    ptr->Destroy();
+            }
+            popup_objects.clear();
+        }
         return EventMouseButtonDown(evt);
     }
     

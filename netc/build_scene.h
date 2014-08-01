@@ -2,6 +2,7 @@
 #define _BUILD_SCENE_H_
 
 #include <set>
+#include <functional>
 
 #include "deck_data.h"
 #include "scene_mgr.h"
@@ -19,12 +20,12 @@ namespace ygopro
         float moving_time_e = 0.0f;
         float fading_time_b = 0.0f;
         float fading_time_e = 0.0f;
-        glbase::vector2<float> pos = {0.0f, 0.0f};
-        glbase::vector2<float> size = {0.0f, 0.0f};
-        glbase::vector2<float> start_pos = {0.0f, 0.0f};
-        glbase::vector2<float> start_size = {0.0f, 0.0f};
-        glbase::vector2<float> dest_pos = {0.0f, 0.0f};
-        glbase::vector2<float> dest_size = {0.0f, 0.0f};
+        v2f pos = {0.0f, 0.0f};
+        v2f size = {0.0f, 0.0f};
+        v2f start_pos = {0.0f, 0.0f};
+        v2f start_size = {0.0f, 0.0f};
+        v2f dest_pos = {0.0f, 0.0f};
+        v2f dest_size = {0.0f, 0.0f};
         float hl = 0.0f;
         float start_hl = 0.0f;
         float dest_hl = 1.0f;
@@ -32,6 +33,7 @@ namespace ygopro
         bool update_color = false;
         bool show_limit = true;
         bool show_exclusive = true;
+        std::function<void()> update_callback;
     };
     
     class BuildScene : public Scene {
@@ -41,7 +43,7 @@ namespace ygopro
         virtual void Activate();
         virtual void Update();
         virtual void Draw();
-        virtual void SetSceneSize(glbase::vector2<int> sz);
+        virtual void SetSceneSize(v2i sz);
         virtual void MouseMove(sf::Event::MouseMoveEvent evt);
         virtual void MouseButtonDown(sf::Event::MouseButtonEvent evt);
         virtual void MouseButtonUp(sf::Event::MouseButtonEvent evt);
@@ -68,14 +70,16 @@ namespace ygopro
         void UpdateBackGround();
         void UpdateCard();
         void UpdateAllCard();
+        void RefreshParams();
         void RefreshAllCard();
+        void RefreshAllIndex();
         void UpdateResult();
         
         void RefreshCardPos(DeckCardData& dcd);
         void RefreshHL(DeckCardData& dcd);
         void RefreshLimit(DeckCardData& dcd);
         void RefreshEx(DeckCardData& dcd);
-        void MoveTo(DeckCardData& dcd, float tm, glbase::vector2<float> dst, glbase::vector2<float> dsz);
+        void MoveTo(DeckCardData& dcd, float tm, v2f dst, v2f dsz);
         void ChangeHL(DeckCardData& dcd, float tm, float desthl);
         void ChangeExclusive(bool check);
         void ChangeRegulation(int index);
@@ -100,15 +104,16 @@ namespace ygopro
         bool update_bg = true;
         bool update_card = true;
         bool update_result = true;
+        int update_status = 0;
         std::tuple<int, int, int> prev_hov;
         std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;
-        glbase::vector2<int> scene_size = {0, 0};
+        v2i scene_size = {0, 0};
         int max_row_count = 0;
         int main_row_count = 0;
-        glbase::vector2<float> card_size = {0.0f, 0.0f};
-        glbase::vector2<float> icon_size = {0.0f, 0.0f};
+        v2f card_size = {0.0f, 0.0f};
+        v2f icon_size = {0.0f, 0.0f};
         float minx = 0.0f;
         float maxx = 0.0f;
         float main_y_spacing = 0.0f;

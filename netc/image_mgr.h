@@ -14,7 +14,7 @@ namespace ygopro
     
     template<int TCOUNT>
 	struct TextureInfo {
-        glbase::vector2<float> vert[TCOUNT];
+        v2f vert[TCOUNT];
 	};
     
     struct CardTextureInfo {

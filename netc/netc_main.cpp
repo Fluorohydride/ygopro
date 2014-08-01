@@ -57,7 +57,6 @@ int main(int argc, char* argv[]) {
             fps = 0;
         }
         sceneMgr.CheckFrameRate();
-        sceneMgr.Update();
         sceneMgr.InitDraw();
         while (window.pollEvent(evt)) {
             switch(evt.type) {
@@ -65,8 +64,8 @@ int main(int argc, char* argv[]) {
                     running = false;
                     break;
                 case sf::Event::Resized:
-                    sceneMgr.SetSceneSize(sgui::v2i{(int)evt.size.width, (int)evt.size.height});
-                    sgui::SGGUIRoot::GetSingleton().SetSceneSize(sgui::v2i{(int)evt.size.width, (int)evt.size.height});
+                    sceneMgr.SetSceneSize(v2i{(int)evt.size.width, (int)evt.size.height});
+                    sgui::SGGUIRoot::GetSingleton().SetSceneSize(v2i{(int)evt.size.width, (int)evt.size.height});
                     break;
                 case sf::Event::TextEntered:
                     sgui::SGGUIRoot::GetSingleton().InjectCharEvent(evt.text);
@@ -106,6 +105,7 @@ int main(int argc, char* argv[]) {
             }
         }
         //window.capture().saveToFile("sc.png");
+        sceneMgr.Update();
         sceneMgr.Draw();
         sgui::SGGUIRoot::GetSingleton().Draw();
 

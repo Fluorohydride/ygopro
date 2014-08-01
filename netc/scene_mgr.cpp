@@ -100,7 +100,7 @@ namespace ygopro
             current_scene->KeyUp(evt);
     }
     
-    void SceneMgr::SetSceneSize(glbase::vector2<int> sz) {
+    void SceneMgr::SetSceneSize(v2i sz) {
         scene_size = sz;
         if(current_scene != nullptr)
             current_scene->SetSceneSize(sz);

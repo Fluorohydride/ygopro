@@ -34,18 +34,13 @@ namespace ygopro
         PopupMenu& AddButton(const std::wstring& btn, int id = 0);
         void End();
     private:
-        sgui::v2i pos;
+        v2i pos;
         int width;
         std::function<void (int)> cb;
         std::vector<std::wstring> items;
         std::vector<int> ids;
     public:
-        static PopupMenu& Begin(sgui::v2i pos, int width, std::function<void (int)> cb = nullptr);
-    };
-    
-    class SearchMenu {
-    public:
-        static void Create(sgui::v2i pos, std::function<void (const std::wstring&)> cb1, std::function<void()> cb2);
+        static PopupMenu& Begin(v2i pos, int width, std::function<void (int)> cb = nullptr);
     };
     
     class FileDialog : public CommonDialog {
@@ -63,7 +58,7 @@ namespace ygopro
     
     class FilterDialog : public CommonDialog {
     public:
-        void Show();
+        void Show(v2i pos);
         void SetOKCallback(std::function<void (const FilterCondition&, int)> cb = nullptr) { cbOK = cb; }
         void BeginSearch();
         static std::tuple<int, int, int> ParseValue(const std::wstring& valstr);
@@ -82,6 +77,8 @@ namespace ygopro
         std::weak_ptr<sgui::SGTextEdit> star;
     };
 
+    class InfoPanel : public CommonDialog {
+    };
 }
 
 #endif

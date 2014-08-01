@@ -16,10 +16,6 @@
 namespace sgui
 {
     
-    typedef glbase::vector2<float> v2f;
-    typedef glbase::vector2<int> v2i;
-    typedef glbase::rect<int> recti;
-    
     // ===== Delegate Implement =====
     // OT: Object Type
     // ST: Sender Type
@@ -365,7 +361,7 @@ namespace sgui
         
         void SetSceneSize(v2i size);
         v2i GetSceneSize();
-        void ConvertXY(int x, int y, glbase::vector3<float>& v) {
+        void ConvertXY(int x, int y, v3f& v) {
             v.x = (float)x / scene_size.x * 2.0f - 1.0f;
             v.y = 1.0f - (float)y / scene_size.y * 2.0f;
         }
@@ -425,7 +421,7 @@ namespace sgui
         void ObjectDragingEnd(sf::Event::MouseMoveEvent evt);
         void SetClickingObject(std::shared_ptr<SGWidget> ptr) { clicking_object = ptr; }
         std::shared_ptr<SGWidget> GetClickObject() { return clicking_object.lock(); }
-        void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_object = ptr; }
+        void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_objects.push_back(ptr); }
         void LoadConfigs();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
         sf::Font& GetGUIFont() { return gui_font; }
@@ -452,7 +448,7 @@ namespace sgui
         v2i tex_size = {0, 0};
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
-        std::weak_ptr<SGWidget> popup_object;
+        std::list<std::weak_ptr<SGWidget>> popup_objects;
         sf::Font gui_font;
         glbase::Texture gui_texture;
         glbase::Texture* cur_texture = nullptr;

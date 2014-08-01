@@ -17,7 +17,7 @@ namespace ygopro
         virtual void Activate() = 0;
         virtual void Update() = 0;
         virtual void Draw() = 0;
-        virtual void SetSceneSize(glbase::vector2<int> sz) = 0;
+        virtual void SetSceneSize(v2i sz) = 0;
         virtual void MouseMove(sf::Event::MouseMoveEvent evt) = 0;
         virtual void MouseButtonDown(sf::Event::MouseButtonEvent evt) = 0;
         virtual void MouseButtonUp(sf::Event::MouseButtonEvent evt) = 0;
@@ -46,21 +46,21 @@ namespace ygopro
         void MouseButtonUp(sf::Event::MouseButtonEvent evt);
         void KeyDown(sf::Event::KeyEvent evt);
         void KeyUp(sf::Event::KeyEvent evt);
-        void SetSceneSize(glbase::vector2<int> sz);
+        void SetSceneSize(v2i sz);
         void SwitchScene(SceneType st);
         std::shared_ptr<Scene> GetScene(SceneType st);
-        void SetMousePosition(glbase::vector2<int> pos) { mouse_pos = pos; }
-        glbase::vector2<int> GetMousePosition() { return mouse_pos; }
+        void SetMousePosition(v2i pos) { mouse_pos = pos; }
+        v2i GetMousePosition() { return mouse_pos; }
         
     protected:
-        glbase::vector2<int> scene_size;
+        v2i scene_size;
         SceneType cur_st = SceneType::None;
         unsigned long long start_time = 0;
         std::shared_ptr<Scene> current_scene = nullptr;
         float frame_check = 0.0f;
         float frame_time = 0.0f;
         float frame_interval = 0.0f;
-        glbase::vector2<int> mouse_pos = {0, 0};
+        v2i mouse_pos = {0, 0};
     };
     
     extern SceneMgr sceneMgr;

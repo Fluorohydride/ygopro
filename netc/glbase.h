@@ -11,6 +11,14 @@
 #include <GL/glu.h>
 #endif
 
+#ifdef _DEBUG
+#include <iostream>
+#include <string>
+void GLCheckError(const std::string& file, int line);
+#else
+#define GLCheckError(x)
+#endif
+
 namespace glbase {
     
     template<typename T>
@@ -186,5 +194,12 @@ namespace glbase {
     };
     
 }
+
+typedef glbase::vector2<int> v2i;
+typedef glbase::vector2<float> v2f;
+typedef glbase::vector3<int> v3i;
+typedef glbase::vector3<float> v3f;
+typedef glbase::rect<int> recti;
+typedef glbase::rect<float> rectf;
 
 #endif

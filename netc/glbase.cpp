@@ -1,8 +1,40 @@
+#include <cstring>
 #include "glbase.h"
 
-#include <memory>
-#include <memory.h>
-#include <SFML/Graphics.hpp>
+#ifdef _DEBUG
+#include <iostream>
+void GLCheckError(const std::string& file, int line) {
+    auto err = glGetError();
+    switch (err) {
+        case GL_NO_ERROR:
+            break;
+        case GL_INVALID_ENUM:
+            std::cout << "Invalid enum at " << file << ":" << line << std::endl;
+            break;
+        case GL_INVALID_VALUE:
+            std::cout << "Invalid value at " << file << ":" << line << std::endl;
+            break;
+        case GL_INVALID_OPERATION:
+            std::cout << "Invalid operation at " << file << ":" << line << std::endl;
+            break;
+        case GL_STACK_OVERFLOW:
+            std::cout << "Stack overflow at " << file << ":" << line << std::endl;
+            break;
+        case GL_STACK_UNDERFLOW:
+            std::cout << "Stack underflow at " << file << ":" << line << std::endl;
+            break;
+        case GL_OUT_OF_MEMORY:
+            std::cout << "Out of memory at " << file << ":" << line << std::endl;
+            break;
+        case GL_TABLE_TOO_LARGE:
+            std::cout << "Table to large at " << file << ":" << line << std::endl;
+            break;
+        default:
+            std::cout << "Unknown error #" << err << " at " << file << ":" << line << std::endl;
+            break;
+    }
+}
+#endif
 
 namespace glbase {
     
