@@ -46,7 +46,7 @@ namespace ygopro
         xyzcount = 0;
         fuscount = 0;
         for(auto iter : main_deck) {
-            auto cd = iter.data;
+            auto cd = iter->data;
             if(cd->type & 0x1)
                 mcount++;
             else if(cd->type & 0x2)
@@ -56,7 +56,7 @@ namespace ygopro
             counts[cd->alias ? cd->alias : cd->code]++;
         }
         for(auto iter : extra_deck) {
-            auto cd = iter.data;
+            auto cd = iter->data;
             if(cd->type & 0x800000)
                 xyzcount++;
             else if(cd->type & 0x2000)
@@ -66,7 +66,7 @@ namespace ygopro
             counts[cd->alias ? cd->alias : cd->code]++;
         }
         for(auto iter : side_deck) {
-            auto cd = iter.data;
+            auto cd = iter->data;
             counts[cd->alias ? cd->alias : cd->code]++;
         }
     }
@@ -96,10 +96,10 @@ namespace ygopro
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
             if(side)
-                side_deck.push_back({ptr, 0, nullptr});
+                side_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
             else {
                 if(ptr->type & 0x802040) {
-                    extra_deck.push_back({ptr, 0, nullptr});
+                    extra_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
                     if(ptr->type & 0x800000)
                         xyzcount++;
                     else if(ptr->type & 0x2000)
@@ -107,7 +107,7 @@ namespace ygopro
                     else
                         fuscount++;
                 } else {
-                    main_deck.push_back({ptr, 0, nullptr});
+                    main_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
                     if(ptr->type & 0x1)
                         mcount++;
                     else if(ptr->type & 0x2)
@@ -146,11 +146,11 @@ namespace ygopro
                 continue;
             if(packed_data & 0x20000000) {
                 for(unsigned int j = 0; j < count; ++j)
-                    side_deck.push_back({ptr, 0, nullptr});
+                    side_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
             } else {
                 if(ptr->type & 0x802040) {
                     for(unsigned int j = 0; j < count; ++j) {
-                        extra_deck.push_back({ptr, 0, nullptr});
+                        extra_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
                         if(ptr->type & 0x800000)
                             xyzcount++;
                         else if(ptr->type & 0x2000)
@@ -160,7 +160,7 @@ namespace ygopro
                     }
                 } else {
                     for(unsigned int j = 0; j < count; ++j) {
-                        main_deck.push_back({ptr, 0, nullptr});
+                        main_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
                         if(ptr->type & 0x1)
                             mcount++;
                         else if(ptr->type & 0x2)
@@ -183,13 +183,13 @@ namespace ygopro
         wxTextOutputStream ts(deck_file);
         ts << "#Created by ygopro deck editor." << endl << "#main" << endl;
         for(auto& cd : main_deck)
-            ts << cd.data->code << " #" << cd.data->name << endl;
+            ts << cd->data->code << " #" << cd->data->name << endl;
         for(auto& cd : extra_deck)
-            ts << cd.data->code << " #" << cd.data->name << endl;
+            ts << cd->data->code << " #" << cd->data->name << endl;
         if(side_deck.size()) {
             ts << "!side" << endl;
             for(auto& cd : side_deck)
-                ts << cd.data->code << " #" << cd.data->name << endl;
+                ts << cd->data->code << " #" << cd->data->name << endl;
         }
     }
     
@@ -203,8 +203,8 @@ namespace ygopro
         char* deck_pstr = deck_string;
         for(size_t i = 0; i < main_deck.size(); ++i) {
             unsigned int count = 1;
-            unsigned int code = main_deck[i].data->code;
-            while(i < main_deck.size() - 1 && code == main_deck[i + 1].data->code) {
+            unsigned int code = main_deck[i]->data->code;
+            while(i < main_deck.size() - 1 && code == main_deck[i + 1]->data->code) {
                 count++;
                 i++;
             }
@@ -218,8 +218,8 @@ namespace ygopro
         }
         for(size_t i = 0; i < extra_deck.size(); ++i) {
             unsigned int count = 1;
-            unsigned int code = extra_deck[i].data->code;
-            while(i < extra_deck.size() - 1 && code == extra_deck[i + 1].data->code) {
+            unsigned int code = extra_deck[i]->data->code;
+            while(i < extra_deck.size() - 1 && code == extra_deck[i + 1]->data->code) {
                 count++;
                 i++;
             }
@@ -233,8 +233,8 @@ namespace ygopro
         }
         for(size_t i = 0; i < side_deck.size(); ++i) {
             unsigned int count = 1;
-            unsigned int code = side_deck[i].data->code;
-            while(i < side_deck.size() - 1 && code == side_deck[i + 1].data->code) {
+            unsigned int code = side_deck[i]->data->code;
+            while(i < side_deck.size() - 1 && code == side_deck[i + 1]->data->code) {
                 count++;
                 i++;
             }
@@ -253,25 +253,24 @@ namespace ygopro
         return std::move(deckstr);
     }
     
-    DeckCardData* DeckData::InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool strict, bool checkc) {
+    std::shared_ptr<DeckCardData> DeckData::InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool checkc) {
         CardData* cd = dataMgr[code];
         if(cd == nullptr || (cd->type & 0x4000))
             return nullptr;
         unsigned int limit = limitRegulationMgr.GetCardLimitCount(code);
         if(checkc && ((cd->alias && counts[cd->alias] >= limit) || (!cd->alias && counts[code] >= limit)))
            return nullptr;
-        DeckCardData tp = {cd, limit, nullptr};
-        DeckCardData* ret = nullptr;
+        std::shared_ptr<DeckCardData> ret = nullptr;
         if(pos == 1 || pos == 2) {
             if(cd->type & 0x802040) {
-                if(strict && pos == 1)
-                    return nullptr;
                 if(index >= extra_deck.size()) {
+                    auto tp = std::make_shared<DeckCardData>(cd, limit);
                     extra_deck.push_back(tp);
-                    ret = &*extra_deck.rbegin();
+                    ret = *extra_deck.rbegin();
                 } else {
+                    auto tp = std::make_shared<DeckCardData>(cd, limit);
                     extra_deck.insert(extra_deck.begin() + index, tp);
-                    ret = &extra_deck[index];
+                    ret = extra_deck[index];
                 }
                 if(cd->type & 0x800000)
                     xyzcount++;
@@ -280,14 +279,14 @@ namespace ygopro
                 else
                     fuscount++;
             } else {
-                if(strict && pos == 2)
-                    return nullptr;
                 if(index >= main_deck.size()) {
+                    auto tp = std::make_shared<DeckCardData>(cd, limit);
                     main_deck.push_back(tp);
-                    ret = &*main_deck.rbegin();
+                    ret = *main_deck.rbegin();
                 } else {
+                    auto tp = std::make_shared<DeckCardData>(cd, limit);
                     main_deck.insert(main_deck.begin() + index, tp);
-                    ret = &main_deck[index];
+                    ret = main_deck[index];
                 }
                 if(cd->type & 0x1)
                     mcount++;
@@ -298,11 +297,13 @@ namespace ygopro
             }
         } else if(pos == 3) {
             if(index >= side_deck.size()) {
+                auto tp = std::make_shared<DeckCardData>(cd, limit);
                 side_deck.push_back(tp);
-                ret = &*side_deck.rbegin();
+                ret = *side_deck.rbegin();
             } else {
+                auto tp = std::make_shared<DeckCardData>(cd, limit);
                 side_deck.insert(side_deck.begin() + index, tp);
-                ret = &side_deck[index];
+                ret = side_deck[index];
             }
         }
         counts[cd->alias ? cd->alias : code]++;
@@ -316,7 +317,7 @@ namespace ygopro
             if(index >= main_deck.size())
                 return false;
             auto& ecd = main_deck[index];
-            CardData* cd = ecd.data;
+            CardData* cd = ecd->data;
             if(cd->type & 0x1)
                 mcount--;
             else if(cd->type & 0x2)
@@ -329,7 +330,7 @@ namespace ygopro
             if(index >= extra_deck.size())
                 return false;
             auto& ecd = extra_deck[index];
-            CardData* cd = ecd.data;
+            CardData* cd = ecd->data;
             if(cd->type & 0x800000)
                 xyzcount--;
             else if(cd->type & 0x2000)
@@ -342,21 +343,21 @@ namespace ygopro
             if(index >= side_deck.size())
                 return false;
             auto& ecd = side_deck[index];
-            CardData* cd = ecd.data;
+            CardData* cd = ecd->data;
             side_deck.erase(side_deck.begin() + index);
             counts[cd->alias ? cd->alias : cd->code]--;
         }
         return true;
     }
     
-    bool DeckData::deck_sort(const DeckCardData& c1, const DeckCardData& c2) {
-        return CardData::card_sort(c1.data, c2.data);
+    bool DeckData::deck_sort(const std::shared_ptr<DeckCardData>& c1, const std::shared_ptr<DeckCardData>& c2) {
+        return CardData::card_sort(c1->data, c2->data);
     }
     
-    bool DeckData::deck_sort_limit(const DeckCardData& c1, const DeckCardData& c2) {
-        if(c1.limit != c2.limit)
-            return c1.limit < c2.limit;
-        return CardData::card_sort(c1.data, c2.data);
+    bool DeckData::deck_sort_limit(const std::shared_ptr<DeckCardData>& c1, const std::shared_ptr<DeckCardData>& c2) {
+        if(c1->limit != c2->limit)
+            return c1->limit < c2->limit;
+        return CardData::card_sort(c1->data, c2->data);
     }
     
     unsigned int LimitRegulation::get_hash() {
@@ -427,39 +428,39 @@ namespace ygopro
     void LimitRegulationMgr::GetDeckCardLimitCount(DeckData& deck) {
         if(!current_list) {
             for(auto& cd : deck.main_deck)
-                cd.limit = 3;
+                cd->limit = 3;
             for(auto& cd : deck.extra_deck)
-                cd.limit = 3;
+                cd->limit = 3;
             for(auto& cd : deck.side_deck)
-                cd.limit = 3;
+                cd->limit = 3;
             return;
         }
         for(auto& cd : deck.main_deck) {
-            auto cdata = cd.data;
+            auto cdata = cd->data;
             unsigned int code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
-                cd.limit = 3;
+                cd->limit = 3;
             else
-                cd.limit = iter->second;
+                cd->limit = iter->second;
         }
         for(auto& cd : deck.extra_deck) {
-            auto cdata = cd.data;
+            auto cdata = cd->data;
             unsigned int code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
-                cd.limit = 3;
+                cd->limit = 3;
             else
-                cd.limit = iter->second;
+                cd->limit = iter->second;
         }
         for(auto& cd : deck.side_deck) {
-            auto cdata = cd.data;
+            auto cdata = cd->data;
             unsigned int code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
-                cd.limit = 3;
+                cd->limit = 3;
             else
-                cd.limit = iter->second;
+                cd->limit = iter->second;
         }
     }
     
@@ -502,9 +503,9 @@ namespace ygopro
             if(!cd)
                 continue;
             if(cd->type & 0x802040)
-                deck.extra_deck.push_back({cd, iter.second, nullptr});
+                deck.extra_deck.push_back(std::make_shared<DeckCardData>(cd, iter.second));
             else
-                deck.main_deck.push_back({cd, iter.second, nullptr});
+                deck.main_deck.push_back(std::make_shared<DeckCardData>(cd, iter.second));
         }
         deck.CalCount();
         std::sort(deck.main_deck.begin(), deck.main_deck.end(), DeckData::deck_sort_limit);

@@ -105,6 +105,10 @@ namespace sgui
             delegate_ptrs.push_back(ptr);
         }
         
+        void Reset() {
+            delegate_ptrs.clear();
+        }
+        
         bool TriggerEvent(ST& sender, ET evt) {
             if(delegate_ptrs.size() == 0)
                 return false;
@@ -130,6 +134,10 @@ namespace sgui
         void Bind(FT f) {
             auto ptr = std::make_shared<SGDelegateStdFunction<ST, void>>(std::function<bool (ST&)>(f));
             delegate_ptrs.push_back(ptr);
+        }
+        
+        void Reset() {
+            delegate_ptrs.clear();
         }
         
         bool TriggerEvent(ST& sender) {

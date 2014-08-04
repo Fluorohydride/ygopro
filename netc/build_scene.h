@@ -1,7 +1,7 @@
 #ifndef _BUILD_SCENE_H_
 #define _BUILD_SCENE_H_
 
-#include <set>
+#include <unordered_set>
 #include <functional>
 
 #include "deck_data.h"
@@ -50,8 +50,7 @@ namespace ygopro
         virtual void KeyDown(sf::Event::KeyEvent evt);
         virtual void KeyUp(sf::Event::KeyEvent evt);
         
-        void SetCardInfo(unsigned int code);
-        void AddCard(unsigned int code, unsigned int pos);
+        void ShowCardInfo(unsigned int code);
         void StopViewRegulation() { view_regulation = 0; }
         
         void ClearDeck();
@@ -74,13 +73,14 @@ namespace ygopro
         void RefreshAllCard();
         void RefreshAllIndex();
         void UpdateResult();
+        void UpdateInfo();
         
-        void RefreshCardPos(DeckCardData& dcd);
-        void RefreshHL(DeckCardData& dcd);
-        void RefreshLimit(DeckCardData& dcd);
-        void RefreshEx(DeckCardData& dcd);
-        void MoveTo(DeckCardData& dcd, float tm, v2f dst, v2f dsz);
-        void ChangeHL(DeckCardData& dcd, float tm, float desthl);
+        void RefreshCardPos(std::shared_ptr<DeckCardData> dcd);
+        void RefreshHL(std::shared_ptr<DeckCardData> dcd);
+        void RefreshLimit(std::shared_ptr<DeckCardData> dcd);
+        void RefreshEx(std::shared_ptr<DeckCardData> dcd);
+        void MoveTo(std::shared_ptr<DeckCardData> dcd, float tm, v2f dst, v2f dsz);
+        void ChangeHL(std::shared_ptr<DeckCardData> dcd, float tm, float desthl);
         void ChangeExclusive(bool check);
         void ChangeRegulation(int index);
         void ViewRegulation(int limit);
@@ -92,7 +92,7 @@ namespace ygopro
         void Search(const FilterCondition& fc, int lmt);
         
         
-        DeckCardData* GetCard(int pos, int index);
+        std::shared_ptr<DeckCardData> GetCard(int pos, int index);
         std::tuple<int, int, int> GetHoverCard(float x, float y);
         
     protected:
@@ -106,6 +106,7 @@ namespace ygopro
         bool update_result = true;
         int update_status = 0;
         std::tuple<int, int, int> prev_hov;
+        std::tuple<int, int, int> prev_click;
         std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;
@@ -121,13 +122,17 @@ namespace ygopro
         float dx[3] = {0.0f, 0.0f, 0.0f};
         bool deck_edited = false;
         bool show_exclusive = true;
+        bool show_info = false;
+        bool show_info_begin = false;
+        float show_info_time = 0.0f;
         std::array<TextureInfo<4>, 3> limit;
         std::array<TextureInfo<4>, 3> pool;
         TextureInfo<4> hmask;
-        std::set<DeckCardData*> updating_cards;
+        std::unordered_set<std::shared_ptr<DeckCardData>> updating_cards;
         std::weak_ptr<sgui::SGIconLabel> deck_label;
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
+        std::shared_ptr<InfoPanel> info_panel;
         std::vector<CardData*> search_result;
         std::array<CardTextureInfo, 10> result_tex;
         int result_page = 0;

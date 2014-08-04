@@ -78,6 +78,12 @@ namespace ygopro
     };
 
     class InfoPanel : public CommonDialog {
+    public:
+        void ShowInfo(unsigned int code, v2i pos);
+        void Destroy();
+        
+    protected:
+        unsigned int code = 0;
     };
 }
 

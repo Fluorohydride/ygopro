@@ -25,6 +25,7 @@ namespace ygopro
     };
     
     struct DeckCardData {
+        DeckCardData(CardData* d, unsigned int l): data(d), limit(l) {}
         CardData* data;
         unsigned int limit;
         std::shared_ptr<DeckCardExtraData> extra;
@@ -32,9 +33,9 @@ namespace ygopro
     
 	struct DeckData {
         
-		std::vector<DeckCardData> main_deck;
-		std::vector<DeckCardData> extra_deck;
-		std::vector<DeckCardData> side_deck;
+		std::vector<std::shared_ptr<DeckCardData>> main_deck;
+		std::vector<std::shared_ptr<DeckCardData>> extra_deck;
+		std::vector<std::shared_ptr<DeckCardData>> side_deck;
         std::unordered_map<unsigned int, unsigned int> counts;
         
         void Clear();
@@ -46,7 +47,7 @@ namespace ygopro
         void SaveToFile(const std::wstring& file);
         std::string SaveToString();
         
-        DeckCardData* InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool strict, bool checkc);
+        std::shared_ptr<DeckCardData> InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool checkc);
         bool RemoveCard(unsigned int pos, unsigned int index);
         
         unsigned int mcount = 0;
@@ -56,8 +57,8 @@ namespace ygopro
         unsigned int xyzcount = 0;
         unsigned int fuscount = 0;
 
-        static bool deck_sort(const DeckCardData& c1, const DeckCardData& c2);
-        static bool deck_sort_limit(const DeckCardData& c1, const DeckCardData& c2);
+        static bool deck_sort(const std::shared_ptr<DeckCardData>& c1, const std::shared_ptr<DeckCardData>& c2);
+        static bool deck_sort_limit(const std::shared_ptr<DeckCardData>& c1, const std::shared_ptr<DeckCardData>& c2);
 	};
 
     struct LimitRegulation {

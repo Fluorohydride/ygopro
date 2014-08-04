@@ -390,4 +390,23 @@ namespace ygopro
         }
         return v;
     }
+    
+    void InfoPanel::ShowInfo(unsigned int code, v2i pos) {
+        if(window.expired()) {
+            auto wd = sgui::SGPanel::Create(nullptr, pos, {400, 300});
+            window = wd;
+            this->code = code;
+        } else {
+            auto wd = window.lock();
+            wd->SetPosition(pos);
+            this->code = code;
+        }
+    }
+    
+    void InfoPanel::Destroy() {
+        if(!window.expired())
+            window.lock()->Destroy();
+        code = 0;
+    }
+    
 }

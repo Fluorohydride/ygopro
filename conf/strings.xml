@@ -19,24 +19,12 @@
   <string name="eui_tool_screenshot" value="截图"/>
   <string name="eui_tool_saveshot" value="保存截图"/>
   <string name="eui_tool_browser" value="查看网页"/>
-  <string name="eui_menu_search" value="搜索"/>
-  <string name="eui_search_quick" value="快速搜索"/>
-  <string name="eui_search_filter" value="设定详细搜索条件"/>
-  <string name="eui_show_exclusive" value="显示独有卡标记"/>
   <string name="eui_menu_list" value="查看"/>
   <string name="eui_list_forbidden" value="禁止卡"/>
   <string name="eui_list_limit" value="限制卡"/>
   <string name="eui_list_semilimit" value="准限制卡"/>
   <string name="eui_list_default" value="[ 无限制 ]"/>
-  <string name="eui_msg_new_deck" value="(新卡组)"/>
-  <string name="eui_msg_deck_load" value="请选择要载入的卡组"/>
-  <string name="eui_msg_deck_save" value="卡组保存为"/>
-  <string name="eui_msg_deck_tostr_ok" value="卡组已复制到剪贴板"/>
-  <string name="eui_msg_deck_load_error" value="无法载入卡组."/>
-  <string name="eui_msg_screen_copy" value="截图已复制到剪贴板."/>
-  <string name="eui_msg_screen_err" value="无法创建文件夹 {path}."/>
-  <string name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}"/>
-  <string name="eui_filter_qsearch" value="快速搜索(回车键)"/>
+  <string name="eui_menu_search" value="搜索"/>
   <string name="eui_filter_title" value="卡片搜索"/>
   <string name="eui_filter_keyword" value="关键字"/>
   <string name="eui_filter_attack" value="攻击力"/>
@@ -50,6 +38,15 @@
   <string name="eui_filter_search" value="搜索"/>
   <string name="eui_filter_clear" value="清除条件"/>
   <string name="eui_filter_count" value="已找到{count}张卡."/>
+  <string name="eui_show_exclusive" value="显示独有卡标记"/>
+  <string name="eui_msg_new_deck" value="(新卡组)"/>
+  <string name="eui_msg_deck_load" value="请选择要载入的卡组"/>
+  <string name="eui_msg_deck_save" value="卡组保存为"/>
+  <string name="eui_msg_deck_tostr_ok" value="卡组已复制到剪贴板"/>
+  <string name="eui_msg_deck_load_error" value="无法载入卡组."/>
+  <string name="eui_msg_screen_copy" value="截图已复制到剪贴板."/>
+  <string name="eui_msg_screen_err" value="无法创建文件夹 {path}."/>
+  <string name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}"/>
   <string name="eui_infocode" value="卡片密码: "/>
   <string name="eui_category" value="从属系列: "/>
   <string name="parse_begin" value="「"/>
