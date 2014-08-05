@@ -742,15 +742,15 @@ int32 field::remove_overlay_card(uint16 step, uint32 reason, card* pcard, uint8 
 			core.units.begin()->step = 3;
 			return FALSE;
 		}
-		pduel->game_field->core.select_cards.clear();
+		core.select_cards.clear();
 		if(pcard) {
 			for(auto cit = pcard->xyz_materials.begin(); cit != pcard->xyz_materials.end(); ++cit)
-				pduel->game_field->core.select_cards.push_back(*cit);
+				core.select_cards.push_back(*cit);
 		} else {
 			card_set cset;
-			pduel->game_field->get_overlay_group(rplayer, s, o, &cset);
+			get_overlay_group(rplayer, s, o, &cset);
 			for(auto cit = cset.begin(); cit != cset.end(); ++cit)
-				pduel->game_field->core.select_cards.push_back(*cit);
+				core.select_cards.push_back(*cit);
 		}
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_SELECTMSG);
@@ -800,14 +800,14 @@ int32 field::get_control(uint16 step, effect * reason_effect, uint8 reason_playe
 			return TRUE;
 		pcard->filter_disable_related_cards();
 		if(pcard->unique_code)
-			pduel->game_field->remove_unique_card(pcard);
+			remove_unique_card(pcard);
 		move_to_field(pcard, playerid, playerid, LOCATION_MZONE, pcard->current.position);
 		pcard->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		return FALSE;
 	}
 	case 1: {
 		if(pcard->unique_code)
-			pduel->game_field->add_unique_card(pcard);
+			add_unique_card(pcard);
 		set_control(pcard, playerid, reset_phase, reset_count);
 		pcard->reset(RESET_CONTROL, RESET_EVENT);
 		pcard->filter_disable_related_cards();
@@ -848,17 +848,17 @@ int32 field::swap_control(uint16 step, effect * reason_effect, uint8 reason_play
 		pcard1->filter_disable_related_cards();
 		pcard2->filter_disable_related_cards();
 		if(pcard1->unique_code)
-			pduel->game_field->remove_unique_card(pcard1);
+			remove_unique_card(pcard1);
 		if(pcard2->unique_code)
-			pduel->game_field->remove_unique_card(pcard2);
+			remove_unique_card(pcard2);
 		remove_card(pcard1);
 		remove_card(pcard2);
 		add_card(p2, pcard1, l2, s2);
 		add_card(p1, pcard2, l1, s1);
 		if(pcard1->unique_code)
-			pduel->game_field->add_unique_card(pcard1);
+			add_unique_card(pcard1);
 		if(pcard2->unique_code)
-			pduel->game_field->add_unique_card(pcard2);
+			add_unique_card(pcard2);
 		set_control(pcard1, p2, reset_phase, reset_count);
 		set_control(pcard2, p1, reset_phase, reset_count);
 		pcard1->reset(RESET_CONTROL, RESET_EVENT);
@@ -903,8 +903,8 @@ int32 field::control_adjust(uint16 step) {
 	switch(step) {
 	case 0: {
 		core.operated_set.clear();
-		uint32 b0 = pduel->game_field->get_useable_count(0, LOCATION_MZONE, PLAYER_NONE, 0);
-		uint32 b1 = pduel->game_field->get_useable_count(1, LOCATION_MZONE, PLAYER_NONE, 0);
+		uint32 b0 = get_useable_count(0, LOCATION_MZONE, PLAYER_NONE, 0);
+		uint32 b1 = get_useable_count(1, LOCATION_MZONE, PLAYER_NONE, 0);
 		for(auto cit = core.control_adjust_set[0].begin(); cit != core.control_adjust_set[0].end(); ++cit)
 			(*cit)->filter_disable_related_cards();
 		for(auto cit = core.control_adjust_set[1].begin(); cit != core.control_adjust_set[1].end(); ++cit)
@@ -4258,11 +4258,21 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			rmax += (*cit)->operation_param;
 		min -= rmax;
 		max -= rmin;
+		core.units.begin()->arg2 = (max << 16) + min;
 		if(min <= 0) {
-			core.units.begin()->step = 5;
+			if(max > 0)
+				add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, 210);
+			else
+				core.units.begin()->step = 6;
+		} else
+			returns.ivalue[0] = TRUE;
+		return FALSE;
+	}
+	case 5: {
+		if(!returns.ivalue[0]) {
+			core.units.begin()->step = 6;
 			return FALSE;
 		}
-		core.units.begin()->arg2 = (max << 16) + min;
 		core.select_cards.clear();
 		for(auto cit = core.release_cards.begin(); cit != core.release_cards.end(); ++cit)
 			core.select_cards.push_back(*cit);
@@ -4273,12 +4283,12 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		add_process(PROCESSOR_SELECT_TRIBUTE_P, 0, 0, 0, ((uint32)cancelable << 16) + playerid, (max << 16) + min);
 		return FALSE;
 	}
-	case 5: {
+	case 6: {
 		for(int32 i = 0; i < returns.bvalue[0]; ++i)
 			core.operated_set.insert(core.select_cards[returns.bvalue[i + 1]]);
 		return FALSE;
 	}
-	case 6: {
+	case 7: {
 		core.select_cards.clear();
 		returns.bvalue[0] = core.operated_set.size();
 		int32 i = 0;

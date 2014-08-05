@@ -54,7 +54,6 @@ function c50485594.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,2,tp,LOCATION_EXTRA)
 end
 function c50485594.thop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(c50485594.filter,tp,LOCATION_EXTRA,0,nil)
 	local sg=g:Filter(c50485594.filter2,nil,g)
 	if sg:GetCount()==0 then return end
