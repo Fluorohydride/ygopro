@@ -1,6 +1,7 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
+#include <array>
 #include <vector>
 #include <list>
 #include <unordered_map>
@@ -12,22 +13,19 @@
 namespace ygopro
 {
     
-    template<int TCOUNT>
-	struct TextureInfo {
-        v2f vert[TCOUNT];
-	};
-    
     struct CardTextureInfo {
-		TextureInfo<4> ti;
+		ti4 ti;
         unsigned short ref_block = 0;
 	};
     
 	class ImageMgr {
 
 	public:
-		CardTextureInfo& GetCardTexture(unsigned int id);
-        TextureInfo<4>& LoadBigCardTexture(unsigned int id);
-        TextureInfo<4>& GetTexture(const std::string& name);
+		ti4& GetCardTexture(unsigned int id);
+        ti4& GetTexture(const std::string& name);
+        glbase::Texture& LoadBigCardTexture(unsigned int id);
+        glbase::Texture& GetRawCardTexture() { return card_texture; }
+        ti4& GetCharTex(wchar_t ch);
         void UnloadCardTexture(unsigned int id);
 		void UnloadAllCardTexture();
         
@@ -41,7 +39,8 @@ namespace ygopro
         
     protected:
         std::unordered_map<unsigned int, CardTextureInfo> card_textures;
-        std::unordered_map<std::string, TextureInfo<4>> misc_textures;
+        std::unordered_map<std::string, ti4> misc_textures;
+        std::array<ti4, 16> char_textures;
         std::list<unsigned short> unuse_block;
         std::vector<int> ref_count;
         glbase::Texture card_texture;

@@ -166,6 +166,11 @@ namespace glbase {
         static const int tex_offset = 32;
     };
     
+    template<int TCOUNT>
+	struct TextureInfo {
+        vector2<float> vert[TCOUNT];
+	};
+    
     class Texture {
     public:
         
@@ -184,13 +189,18 @@ namespace glbase {
         void Update(const unsigned char* data, int offx, int offy, int width, int height);
         unsigned int GetTextureId() { return texture_id; }
         void Bind();
+        TextureInfo<4> GetTextureInfo();
         int GetWidth() { return tex_width; }
         int GetHeight() { return tex_height; }
+        int GetImgWidth() { return img_width; }
+        int GetImgHeight() { return img_height; }
         
     protected:
         unsigned int texture_id = 0;
         int tex_width = 0;
         int tex_height = 0;
+        int img_width = 0;
+        int img_height = 0;
     };
     
 }
@@ -201,5 +211,6 @@ typedef glbase::vector3<int> v3i;
 typedef glbase::vector3<float> v3f;
 typedef glbase::rect<int> recti;
 typedef glbase::rect<float> rectf;
+typedef glbase::TextureInfo<4> ti4;
 
 #endif

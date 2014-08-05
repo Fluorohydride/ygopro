@@ -14,6 +14,9 @@
   <texture src="cards" name="target" x="330" y="40" w="34" h="34"/>
   <texture src="cards" name="hmask" x="330" y="100" w="32" h="32"/>
   <texture src="cards" name="star" x="330" y="80" w="16" h="16"/>
+  <texture src="cards" name="lscale" x="220" y="103" w="46" h="35"/>
+  <texture src="cards" name="rscale" x="270" y="103" w="46" h="35"/>
+  <texture src="cards" name="char" x="370" y="0" w="128" h="128"/>
   <texture src="cards" name="unknown" x="400" y="0" w="100" h="145"/>
   <texture src="cards" name="sleeve1" x="500" y="0" w="100" h="145"/>
   <texture src="cards" name="sleeve2" x="600" y="0" w="100" h="145"/>

@@ -37,9 +37,9 @@ namespace ygopro
             index[i * 6] = i * 4;
             index[i * 6 + 1] = i * 4 + 2;
             index[i * 6 + 2] = i * 4 + 1;
-            index[i * 6 + 3] = i * 4 + 1;
-            index[i * 6 + 4] = i * 4 + 2;
-            index[i * 6 + 5] = i * 4 + 3;
+            index[i * 6 + 3] = i * 4 + 3;
+            index[i * 6 + 4] = i * 4 + 3;
+            index[i * 6 + 5] = i * 4 + 4;
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 4 * 6, &index[0], GL_STATIC_DRAW);
@@ -102,11 +102,9 @@ namespace ygopro
             PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
                 OnMenuTool(id);
             })
-            .AddButton(stringCfg[L"eui_tool_clear"])
             .AddButton(stringCfg[L"eui_tool_sort"])
             .AddButton(stringCfg[L"eui_tool_shuffle"])
-            .AddButton(stringCfg[L"eui_tool_screenshot"])
-            .AddButton(stringCfg[L"eui_tool_saveshot"])
+            .AddButton(stringCfg[L"eui_tool_clear"])
             .AddButton(stringCfg[L"eui_tool_browser"])
             .End();
             return true;
@@ -181,7 +179,7 @@ namespace ygopro
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
         imageMgr.BindTexture(3);
@@ -190,15 +188,17 @@ namespace ygopro
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
-        glDrawElements(GL_TRIANGLES, 10 * 24, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLE_STRIP, 10 * 24 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // deck
-        glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
-        glDrawElements(GL_TRIANGLES, deck_sz * 24, GL_UNSIGNED_SHORT, 0);
+        if(deck_sz > 0) {
+            glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
+            glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+            glDrawElements(GL_TRIANGLE_STRIP, deck_sz * 24 - 2, GL_UNSIGNED_SHORT, 0);
+        }
         GLCheckError(__FILE__, __LINE__);
         
     }
@@ -390,14 +390,9 @@ namespace ygopro
     }
     
     void BuildScene::ShowCardInfo(unsigned int code) {
-        auto mpos = sceneMgr.GetMousePosition();
-        int x = (mpos.x >= 490) ? (mpos.x - 480) : (mpos.x + 80);
-        int y = mpos.y - 150;
-        if(y < 10)
-            y = 10;
-        if(y > scene_size.y - 310)
-            y = scene_size.y - 310;
-        info_panel->ShowInfo(code, {x, y});
+        int w = 600;
+        int h = 300;
+        info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2}, {w, h});
     }
     
     void BuildScene::ClearDeck() {
@@ -561,16 +556,29 @@ namespace ygopro
     void BuildScene::OnMenuTool(int id) {
         switch(id) {
             case 0:
+                SortDeck();
+                break;
+            case 1:
+                ShuffleDeck();
+                break;
+            case 2:
                 ClearDeck();
                 SetDeckDirty();
                 break;
-            case 1:
-                SortDeck();
-                break;
-            case 2:
-                ShuffleDeck();
-                break;
             case 3: {
+                wxString neturl = static_cast<const std::wstring&>(commonCfg[L"deck_neturl"]);
+                wxString deck_string = current_deck.SaveToString();
+                neturl.Replace("{amp}", wxT("&"));
+                neturl.Replace("{deck}", deck_string);
+                auto pos = current_file.find_last_of(L'/');
+                if(pos == std::wstring::npos)
+                    neturl.Replace("{name}", wxEmptyString);
+                else
+                    neturl.Replace("{name}", current_file.substr(pos + 1));
+                wxLaunchDefaultBrowser(neturl);
+                break;
+            }
+            case 4: {
                 unsigned char* image_buff = new unsigned char[scene_size.x * scene_size.y * 4];
                 unsigned char* rgb_buff = new unsigned char[scene_size.x * scene_size.y * 3];
                 glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
@@ -593,22 +601,10 @@ namespace ygopro
                 delete img;
                 delete[] rgb_buff;
                 delete[] image_buff;
+                break;
             }
-                break;
-            case 4:
-                break;
             case 5: {
-                wxString neturl = static_cast<const std::wstring&>(commonCfg[L"deck_neturl"]);
-                wxString deck_string = current_deck.SaveToString();
-                neturl.Replace("{amp}", wxT("&"));
-                neturl.Replace("{deck}", deck_string);
-                auto pos = current_file.find_last_of(L'/');
-                if(pos == std::wstring::npos)
-                    neturl.Replace("{name}", wxEmptyString);
-                else
-                    neturl.Replace("{name}", current_file.substr(pos + 1));
-                wxLaunchDefaultBrowser(neturl);
-                break;
+                
             }
             default:
                 break;
@@ -785,13 +781,13 @@ namespace ygopro
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<glbase::VertexVCT, 16> verts;
         verts[0].vertex = ptr->pos;
-        verts[0].texcoord = ptr->card_tex.ti.vert[0];
+        verts[0].texcoord = ptr->card_tex.vert[0];
         verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
-        verts[1].texcoord = ptr->card_tex.ti.vert[1];
+        verts[1].texcoord = ptr->card_tex.vert[1];
         verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[2].texcoord = ptr->card_tex.ti.vert[2];
+        verts[2].texcoord = ptr->card_tex.vert[2];
         verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[3].texcoord = ptr->card_tex.ti.vert[3];
+        verts[3].texcoord = ptr->card_tex.vert[3];
         unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
         verts[4].vertex = ptr->pos;
         verts[4].texcoord = hmask.vert[0];
@@ -870,13 +866,13 @@ namespace ygopro
             pvert[3].color = cl;
             CardData* pdata = search_result[i + result_page * 10];
             pvert[4].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy, 0.0f};
-            pvert[4].texcoord = result_tex[i].ti.vert[0];
+            pvert[4].texcoord = result_tex[i].vert[0];
             pvert[5].vertex = {left + (i % 2) * width + width / 2 + cwidth / 2, top - (i / 2) * height - offy, 0.0f};
-            pvert[5].texcoord = result_tex[i].ti.vert[1];
+            pvert[5].texcoord = result_tex[i].vert[1];
             pvert[6].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - height + offy, 0.0f};
-            pvert[6].texcoord = result_tex[i].ti.vert[2];
+            pvert[6].texcoord = result_tex[i].vert[2];
             pvert[7].vertex = {left + (i % 2) * width + width / 2 + cwidth / 2, top - (i / 2) * height - height + offy, 0.0f};
-            pvert[7].texcoord = result_tex[i].ti.vert[3];
+            pvert[7].texcoord = result_tex[i].vert[3];
             unsigned int lmt = limitRegulationMgr.GetCardLimitCount(pdata->code);
             if(lmt < 3) {
                 pvert[8].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f, 0.0f};
@@ -908,7 +904,7 @@ namespace ygopro
     void BuildScene::UpdateInfo() {
         if(show_info_begin) {
             float now = sceneMgr.GetGameTime();
-            if(now - show_info_time >= 1.0f) {
+            if(now - show_info_time >= 0.5f) {
                 show_info = true;
                 show_info_begin = false;
                 std::get<0>(prev_click) = 0;
@@ -925,11 +921,16 @@ namespace ygopro
                 sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Bind([this](sgui::SGWidget& sender, sf::Event::MouseButtonEvent evt)->bool {
                     if(evt.button == sf::Mouse::Left) {
                         sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Reset();
+                        sgui::SGGUIRoot::GetSingleton().eventMouseMove.Reset();
                         show_info = false;
                         show_info_begin = false;
                         info_panel->Destroy();
                     }
-                    return false;
+                    return true;
+                });
+                sgui::SGGUIRoot::GetSingleton().eventMouseMove.Bind([this](sgui::SGWidget& sender, sf::Event::MouseMoveEvent evt)->bool {
+                    MouseMove(evt);
+                    return true;
                 });
             }
         }

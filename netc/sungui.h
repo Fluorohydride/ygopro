@@ -163,10 +163,7 @@ namespace sgui
     class SGWidget : public std::enable_shared_from_this<SGWidget> {
         
     public:
-        virtual ~SGWidget() {
-            eventDestroying.TriggerEvent(*this);
-        }
-        
+        virtual ~SGWidget();
         virtual bool CheckInside(v2i pos);
         virtual void UpdateVertices() = 0;
         virtual void Draw() = 0;
@@ -237,13 +234,12 @@ namespace sgui
         v2f size_prop = {0, 0};
         v2i position_drag = {0, 0};
         bool visible = true;
-        bool enabled = true;
         unsigned int cvalue = 0;
         unsigned int color = 0xffffffff;
         void* cobject = nullptr;
         std::weak_ptr<SGWidgetContainer> parent;
         bool vertices_dirty = true;
-        int buffer_index = 0;
+        unsigned int vbo = 0;
     };
     
     class SGTextBase {
@@ -269,7 +265,7 @@ namespace sgui
     protected:
         bool text_update = true;
         unsigned short mem_size = 0;
-        unsigned int tbo[2] = {0, 0};
+        unsigned int tbo = 0;
         sf::Font* font = nullptr;
         v2i tex_check_size = {0, 0};
         unsigned int font_size = 0;
@@ -290,21 +286,21 @@ namespace sgui
         virtual void SetImage(glbase::Texture* img, recti varea);
         virtual void AddTexRect(recti tarea);
         virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts);
-        virtual void AddTexcoord(std::vector<v2i>& texcoords);
+        virtual void AddTexcoord(std::vector<v2f>& texcoords);
         virtual v2i GetImageOffset() = 0;
         void SetFrameTime(float ft) { frame_time = ft; }
         virtual void UpdateImage();
         virtual void DrawImage();
         
     protected:
-        unsigned int imgvbo[2] = {0, 0};
+        unsigned int imgbo = 0;
         bool img_update = true;
         bool img_dirty = true;
         float frame_time = 0.016f;
         glbase::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
-        std::vector<std::vector<v2i>> texcoords;
+        std::vector<std::vector<v2f>> texcoords;
     };
     
     class SGWidgetContainer : public SGWidget {
@@ -431,6 +427,7 @@ namespace sgui
         std::shared_ptr<SGWidget> GetClickObject() { return clicking_object.lock(); }
         void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_objects.push_back(ptr); }
         void LoadConfigs();
+        void Unload();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
         sf::Font& GetGUIFont() { return gui_font; }
         glbase::Texture& GetGUITexture() { return gui_texture; }
@@ -463,6 +460,7 @@ namespace sgui
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<recti> scissor_stack;
         sf::Clock gui_clock;
+        unsigned int index_buffer = 0;
         
     public:
         static SGConfig basic_config;
@@ -473,9 +471,6 @@ namespace sgui
         virtual ~SGPanel();
         virtual void UpdateVertices();
         virtual void Draw();
-        
-    protected:
-        unsigned int vbo[2] = {0, 0};
         
     public:
         static std::shared_ptr<SGPanel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
@@ -500,7 +495,6 @@ namespace sgui
         virtual bool DragingBegin(v2i evt);
         virtual bool DragingUpdate(v2i evt);
         bool CloseButtonClick(SGWidget& sender);
-        unsigned int vbo[2] = {0, 0};
         unsigned int drag_type = 0;
         v2i drag_diff = {0, 0};
         
@@ -544,7 +538,6 @@ namespace sgui
     protected:
         int icon_size = 0;
         int icon_mem_size = 0;
-        unsigned int vbo[2] = {0, 0};
         
     public:
         static std::shared_ptr<SGIconLabel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw = 0xffff);
@@ -585,7 +578,6 @@ namespace sgui
         virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
         
         bool is_push = false;
-        unsigned int vbo[2] = {0, 0};
         unsigned int state = 0;
         int lwidth = 0;
         int rwidth = 0;
@@ -622,7 +614,6 @@ namespace sgui
         virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
         virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
         
-        unsigned int vbo[2] = {0, 0};
         unsigned int state = 0;
         bool checked = false;
     
@@ -681,7 +672,6 @@ namespace sgui
         bool slider_hoving = false;
         bool slider_moving = false;
         bool is_horizontal = true;
-        unsigned int vbo[2] = {0, 0};
         
     public:
         static std::shared_ptr<SGScrollBar> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size, bool is_h);
@@ -733,7 +723,6 @@ namespace sgui
         int text_offset = 0;
         int drag_check = 0;
         recti text_area = {0, 0, 0, 0};
-        unsigned int vbo[2] = {0, 0};
         float cursor_time = 0.0f;
         unsigned int cursor_pos = 0;
         bool sel_change = true;
@@ -790,7 +779,6 @@ namespace sgui
         int max_item_count = 0;
         recti text_area = {0, 0, 0, 0};
         float click_time = 0.0f;
-        unsigned int vbo[2] = {0, 0};
         std::vector<std::tuple<unsigned short, std::wstring, unsigned int, int>> items;
         
     public:
@@ -829,7 +817,6 @@ namespace sgui
         bool is_hoving = false;
         int current_sel = -1;
         recti text_area = {0, 0, 0, 0};
-        unsigned int vbo[2] = {0, 0};
         std::vector<std::tuple<std::wstring, unsigned int, int>> items;
         
     public:
@@ -873,7 +860,6 @@ namespace sgui
         
         std::weak_ptr<SGWidget> active_tab;
         std::weak_ptr<SGWidget> hover_tab;
-        unsigned int vbo[2];
         int max_item_count = 0;
         int item_count = 0;
         int tab_height = 0;

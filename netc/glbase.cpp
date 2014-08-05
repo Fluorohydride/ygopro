@@ -43,6 +43,8 @@ namespace glbase {
             glDeleteTextures(1, &texture_id);
         tex_width = texlen(x);
         tex_height = texlen(y);
+        img_width = x;
+        img_height = y;
         glGenTextures(1, &texture_id);
 		glBindTexture(GL_TEXTURE_2D, texture_id);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -77,6 +79,18 @@ namespace glbase {
     void Texture::Bind() {
         if(texture_id)
             glBindTexture(GL_TEXTURE_2D, texture_id);
+    }
+    
+    TextureInfo<4> Texture::GetTextureInfo() {
+        static TextureInfo<4> ti;
+        if(!texture_id)
+            return ti;
+        TextureInfo<4> ret;
+        ret.vert[0] = {0.0f, 0.0f};
+        ret.vert[1] = {(float)img_width / tex_width, 0.0f};
+        ret.vert[2] = {0.0f, (float)img_height / tex_height};
+        ret.vert[3] = {(float)img_width / tex_width, (float)img_height / tex_height};
+        return ret;
     }
     
 }

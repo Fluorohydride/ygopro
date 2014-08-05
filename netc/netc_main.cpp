@@ -71,6 +71,8 @@ int main(int argc, char* argv[]) {
                     sgui::SGGUIRoot::GetSingleton().InjectCharEvent(evt.text);
                     break;
                 case sf::Event::KeyPressed:
+                    if(evt.key.code == sf::Keyboard::Num0)
+                        window.capture().saveToFile("sc.png");
                     if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(evt.key))
                         sceneMgr.KeyDown(evt.key);
                     break;
@@ -104,7 +106,6 @@ int main(int argc, char* argv[]) {
                     break;
             }
         }
-        //window.capture().saveToFile("sc.png");
         sceneMgr.Update();
         sceneMgr.Draw();
         sgui::SGGUIRoot::GetSingleton().Draw();
@@ -113,7 +114,7 @@ int main(int argc, char* argv[]) {
     }
     
     sceneMgr.Uninit();
-    sgui::SGGUIRoot::GetSingleton().ClearChild();
+    sgui::SGGUIRoot::GetSingleton().Unload();
     imageMgr.UninitTextures();
     
     return 0;

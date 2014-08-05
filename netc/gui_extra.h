@@ -17,7 +17,7 @@ namespace ygopro
                 window.lock()->Destroy();
         }
     protected:
-        std::weak_ptr<sgui::SGWidget> window;
+        std::weak_ptr<sgui::SGWidgetContainer> window;
     };
     
     class MessageBox {
@@ -79,11 +79,15 @@ namespace ygopro
 
     class InfoPanel : public CommonDialog {
     public:
-        void ShowInfo(unsigned int code, v2i pos);
+        void ShowInfo(unsigned int code, v2i pos, v2i sz);
         void Destroy();
         
     protected:
         unsigned int code = 0;
+        std::weak_ptr<sgui::SGSprite> imageBox;
+        std::weak_ptr<sgui::SGSprite> misc;
+        std::weak_ptr<sgui::SGLabel> cardName;
+        std::weak_ptr<sgui::SGLabel> cardText;
     };
 }
 

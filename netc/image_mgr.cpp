@@ -10,7 +10,7 @@ namespace ygopro
 
 	ImageMgr imageMgr;
 
-	CardTextureInfo& ImageMgr::GetCardTexture(unsigned int id) {
+	ti4& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
 			wxString file = wxString::Format("%ls/%d.jpg", static_cast<const std::wstring>(commonCfg[L"image_path"]).c_str(), id);
@@ -64,24 +64,34 @@ namespace ygopro
                     }
                 }
 			}
-            return cti;
+            return cti.ti;;
 		}
         ref_count[iter->second.ref_block]++;
-		return iter->second;
+		return iter->second.ti;
 	}
-
-    TextureInfo<4>& ImageMgr::LoadBigCardTexture(unsigned int id) {
-        static TextureInfo<4> ti;
-        wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
-        sf::Image img;
-        if(img.loadFromFile(file.ToStdString())) {
-            card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
-        }
-        return ti;
+    
+    ti4& ImageMgr::GetTexture(const std::string& name) {
+        return misc_textures[name];
     }
     
-    TextureInfo<4>& ImageMgr::GetTexture(const std::string& name) {
-        return misc_textures[name];
+    glbase::Texture& ImageMgr::LoadBigCardTexture(unsigned int id) {
+        static unsigned int pid = 0;
+        if(pid == id)
+            return card_image;
+        wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
+        if(wxFileExists(file)) {
+            sf::Image img;
+            if(img.loadFromFile(file.ToStdString()))
+                card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+        }
+        pid = id;
+        return card_image;
+    }
+    
+    ti4& ImageMgr::GetCharTex(wchar_t ch) {
+        if(ch < L'*' || ch > L'9')
+            return char_textures[2];
+        return char_textures[ch - L'*'];
     }
     
     void ImageMgr::UnloadCardTexture(unsigned int id) {
@@ -96,7 +106,7 @@ namespace ygopro
 	void ImageMgr::UnloadAllCardTexture() {
         card_textures.clear();
         unuse_block.clear();
-        for(short i = 7; i < 280; ++i) {
+        for(short i = 8; i < 280; ++i) {
             ref_count[i] = 0;
             unuse_block.push_back(i);
         }
@@ -126,7 +136,7 @@ namespace ygopro
     
     void ImageMgr::InitTextures() {
         card_texture.Load(nullptr, 2048, 2048);
-        for(short i = 7; i < 280; ++i)
+        for(short i = 8; i < 280; ++i)
             unuse_block.push_back(i);
         ref_count.resize(280);
         glGenFramebuffers(1, &frame_buffer);
@@ -254,6 +264,17 @@ namespace ygopro
             }
 			child = child->GetNext();
 		}
+        auto& char_tex = misc_textures["char"];
+        float difx = (char_tex.vert[1].x = char_tex.vert[0].x) / 4;
+        float dify = (char_tex.vert[2].y = char_tex.vert[0].y) / 4;
+        for(int i = 0; i < 16; ++i) {
+            int x = i % 4;
+            int y = i / 4;
+            char_textures[i].vert[0] = char_tex.vert[0] + v2f{difx * x, dify * y};
+            char_textures[i].vert[1] = char_tex.vert[0] + v2f{difx * (x + 1), dify * y};
+            char_textures[i].vert[2] = char_tex.vert[0] + v2f{difx * x, dify * (y + 1)};
+            char_textures[i].vert[3] = char_tex.vert[0] + v2f{difx * (x + 1), dify * (y + 1)};
+        }
         return true;
 	}
 

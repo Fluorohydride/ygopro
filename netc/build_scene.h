@@ -15,7 +15,7 @@ namespace ygopro
     
     struct BuilderCard : public DeckCardExtraData {
         unsigned int buffer_index = 0;
-        CardTextureInfo card_tex;
+        ti4 card_tex;
         float moving_time_b = 0.0f;
         float moving_time_e = 0.0f;
         float fading_time_b = 0.0f;
@@ -125,16 +125,16 @@ namespace ygopro
         bool show_info = false;
         bool show_info_begin = false;
         float show_info_time = 0.0f;
-        std::array<TextureInfo<4>, 3> limit;
-        std::array<TextureInfo<4>, 3> pool;
-        TextureInfo<4> hmask;
+        std::array<ti4, 3> limit;
+        std::array<ti4, 3> pool;
+        ti4 hmask;
         std::unordered_set<std::shared_ptr<DeckCardData>> updating_cards;
         std::weak_ptr<sgui::SGIconLabel> deck_label;
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
         std::shared_ptr<InfoPanel> info_panel;
         std::vector<CardData*> search_result;
-        std::array<CardTextureInfo, 10> result_tex;
+        std::array<ti4, 10> result_tex;
         int result_page = 0;
         int current_sel_result = -1;
         std::weak_ptr<sgui::SGLabel> label_result;

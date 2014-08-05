@@ -1,8 +1,11 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
 
-#include "gui_extra.h"
+#include "card_data.h"
 #include "scene_mgr.h"
+#include "image_mgr.h"
+
+#include "gui_extra.h"
 
 namespace ygopro
 {
@@ -391,16 +394,47 @@ namespace ygopro
         return v;
     }
     
-    void InfoPanel::ShowInfo(unsigned int code, v2i pos) {
-        if(window.expired()) {
-            auto wd = sgui::SGPanel::Create(nullptr, pos, {400, 300});
+    void InfoPanel::ShowInfo(unsigned int code, v2i pos, v2i sz) {
+        if(this->code == code)
+            return;
+        std::shared_ptr<sgui::SGWidgetContainer> wd = window.lock();
+        if(wd == nullptr) {
+            wd = sgui::SGPanel::Create(nullptr, pos, sz);
             window = wd;
-            this->code = code;
-        } else {
-            auto wd = window.lock();
-            wd->SetPosition(pos);
-            this->code = code;
+            int ch = sz.y - 10;
+            int cw = (sz.y - 10) * 20 / 29;
+            int mw = sz.x - 20 - cw;
+            imageBox = sgui::SGSprite::Create(wd, {5, 5}, {cw, ch});
+            misc = sgui::SGSprite::Create(wd, {cw + 10, 35}, {10, 10});
+            cardName = sgui::SGLabel::Create(wd, {cw + 10, 10}, L"", mw);
+            cardText = sgui::SGLabel::Create(wd, {cw + 10, 60}, L"", mw);
         }
+        this->code = code;
+        auto data = dataMgr[code];
+        auto img = imageBox.lock();
+        auto& ctex = imageMgr.LoadBigCardTexture(code);
+        img->SetImage(&ctex, {0, 0, img->GetSize().x, img->GetSize().y});
+        img->AddTexRect({0, 0, ctex.GetImgWidth(), ctex.GetImgHeight()});
+        auto name = cardName.lock();
+        name->SetText(data->name, 0xff000000);
+        auto text = cardText.lock();
+        text->SetText(data->texts, 0xff000000);
+        auto imgs = misc.lock();
+        std::vector<v2i> verts;
+        std::vector<v2f> coords;
+        auto star = imageMgr.GetTexture("star");
+        for(int i = 0; i < (data->level & 0xffff); ++i) {
+            verts.push_back({16 * i, 0});
+            coords.push_back(star.vert[0]);
+            verts.push_back({16 * (i + 1), 0});
+            coords.push_back(star.vert[1]);
+            verts.push_back({16 * i, 16});
+            coords.push_back(star.vert[2]);
+            verts.push_back({16 * (i + 1), 16});
+            coords.push_back(star.vert[3]);
+        }
+        imgs->SetImage(&imageMgr.GetRawCardTexture(), verts);
+        imgs->AddTexcoord(coords);
     }
     
     void InfoPanel::Destroy() {
