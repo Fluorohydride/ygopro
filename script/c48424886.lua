@@ -20,7 +20,7 @@ function c48424886.initial_effect(c)
 	--disable spsummon
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(48424886,0))
-	e3:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_DESTROY)
+	e3:SetCategory(CATEGORY_DISABLE_SUMMON+CATEGORY_DESTROY+CATEGORY_TOGRAVE)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_SPSUMMON)
