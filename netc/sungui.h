@@ -283,9 +283,9 @@ namespace sgui
     class SGSpriteBase {
     public:
         virtual ~SGSpriteBase();
-        virtual void SetImage(glbase::Texture* img, recti varea);
+        virtual void SetImage(glbase::Texture* img, recti varea, unsigned int cl = 0xffffffff);
         virtual void AddTexRect(recti tarea);
-        virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts);
+        virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts, std::vector<unsigned int>& cl);
         virtual void AddTexcoord(std::vector<v2f>& texcoords);
         virtual v2i GetImageOffset() = 0;
         void SetFrameTime(float ft) { frame_time = ft; }
@@ -300,6 +300,7 @@ namespace sgui
         glbase::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
+        std::vector<unsigned int> colors;
         std::vector<std::vector<v2f>> texcoords;
     };
     

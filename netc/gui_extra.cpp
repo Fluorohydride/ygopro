@@ -1,5 +1,6 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
+#include <strstream>
 
 #include "card_data.h"
 #include "scene_mgr.h"
@@ -360,7 +361,7 @@ namespace ygopro
                 default: break;
             }
             auto t3 = ParseValue(star.lock()->GetText());
-            switch(std::get<0>(t2)) {
+            switch(std::get<0>(t3)) {
                 case 0: case 1: break;
                 case 2: fc.lvmin = fc.lvmax = std::get<1>(t3); break;
                 case 3: fc.lvmin = std::get<1>(t3); fc.lvmax = std::get<2>(t3); break;
@@ -398,42 +399,132 @@ namespace ygopro
         if(this->code == code)
             return;
         std::shared_ptr<sgui::SGWidgetContainer> wd = window.lock();
+        int ch = sz.y - 10;
+        int cw = (sz.y - 10) * 20 / 29;
+        int mw = sz.x - 20 - cw;
         if(wd == nullptr) {
             wd = sgui::SGPanel::Create(nullptr, pos, sz);
             window = wd;
-            int ch = sz.y - 10;
-            int cw = (sz.y - 10) * 20 / 29;
-            int mw = sz.x - 20 - cw;
             imageBox = sgui::SGSprite::Create(wd, {5, 5}, {cw, ch});
-            misc = sgui::SGSprite::Create(wd, {cw + 10, 35}, {10, 10});
-            cardName = sgui::SGLabel::Create(wd, {cw + 10, 10}, L"", mw);
-            cardText = sgui::SGLabel::Create(wd, {cw + 10, 60}, L"", mw);
+            misc = sgui::SGSprite::Create(wd, {cw + 10, 10}, {10, 10});
+            cardName = sgui::SGLabel::Create(wd, {cw + 15, 10}, L"", mw);
+            penText = sgui::SGLabel::Create(wd, {cw + 42, 60}, L"", mw - 64);
+            cardText = sgui::SGLabel::Create(wd, {cw + 15, 60}, L"", mw - 10);
+            adText = sgui::SGLabel::Create(wd, {0, sz.y - 30}, L"");
+            extraText = sgui::SGLabel::Create(wd, {0, sz.y - 30}, L"");
         }
         this->code = code;
         auto data = dataMgr[code];
         auto img = imageBox.lock();
-        auto& ctex = imageMgr.LoadBigCardTexture(code);
-        img->SetImage(&ctex, {0, 0, img->GetSize().x, img->GetSize().y});
-        img->AddTexRect({0, 0, ctex.GetImgWidth(), ctex.GetImgHeight()});
+        auto ctex = imageMgr.LoadBigCardTexture(code);
+        img->SetImage(ctex, {0, 0, img->GetSize().x, img->GetSize().y});
+        if(ctex)
+            img->AddTexRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
         auto name = cardName.lock();
-        name->SetText(data->name, 0xff000000);
+        name->ClearText();
+        name->SetSpacing(1, 5);
+        name->AppendText(data->name, 0xff000000);
+        name->AppendText(L"\n", 0xff000000);
+        name->AppendText(dataMgr.GetTypeString(data->type), 0xff000000);
+        if(data->type & 0x1) {
+            name->AppendText(L"  ", 0xff000000);
+            name->AppendText(dataMgr.GetAttributeString(data->attribute), 0xff000000);
+            name->AppendText(L"/", 0xff000000);
+            name->AppendText(dataMgr.GetRaceString(data->race), 0xff000000);
+        }
+        auto extra = extraText.lock();
+        extra->ClearText();
+        extra->SetSpacing(1, 5);
+        extra->SetPosition({cw + 15, sz.y - 50});
+        if(data->setcode) {
+            extra->AppendText(stringCfg[L"eui_msg_setcode"], 0xff000000);
+            for(int i = 0; i < 4; ++i) {
+                unsigned short sd = (data->setcode >> (i * 16)) & 0xffff;
+                if(sd) {
+                    extra->AppendText(dataMgr.GetSetCode(sd), 0xffff0000);
+                    extra->AppendText(L" ", 0xff000000);
+                }
+            }
+        }
+        extra->AppendText(L"\n", 0xff000000);
+        unsigned int ccode = (data->alias == 0
+                              || (data->alias > data->code && data->alias - data->code > 10)
+                              || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
+        extra->AppendText(wxString::Format(L" [%08d]", ccode).ToStdWstring(), 0xffff0000);
         auto text = cardText.lock();
-        text->SetText(data->texts, 0xff000000);
+        auto pent = penText.lock();
+        auto ad = adText.lock();
         auto imgs = misc.lock();
         std::vector<v2i> verts;
         std::vector<v2f> coords;
+        std::vector<unsigned int> colors;
+        auto pushvert = [&verts, &coords, &colors](v2i pos, v2i sz, ti4& ti, unsigned int cl = 0xffffffff) {
+            verts.push_back({pos.x, pos.y});
+            coords.push_back(ti.vert[0]);
+            verts.push_back({pos.x + sz.x, pos.y});
+            coords.push_back(ti.vert[1]);
+            verts.push_back({pos.x, pos.y + sz.y});
+            coords.push_back(ti.vert[2]);
+            verts.push_back({pos.x + sz.x, pos.y + sz.y});
+            coords.push_back(ti.vert[3]);
+            for(int i = 0; i < 4; ++i)
+                colors.push_back(cl);
+        };
+        auto hmask = imageMgr.GetTexture("hmask");
         auto star = imageMgr.GetTexture("star");
-        for(int i = 0; i < (data->level & 0xffff); ++i) {
-            verts.push_back({16 * i, 0});
-            coords.push_back(star.vert[0]);
-            verts.push_back({16 * (i + 1), 0});
-            coords.push_back(star.vert[1]);
-            verts.push_back({16 * i, 16});
-            coords.push_back(star.vert[2]);
-            verts.push_back({16 * (i + 1), 16});
-            coords.push_back(star.vert[3]);
+        
+        pushvert({0, 0}, {mw, 40}, hmask);
+        if(data->type & 0x1) {
+            for(int i = 0; i < (data->level & 0xffff); ++i)
+                pushvert({mw - 21 - 16 * i, 20}, {16, 16}, star);
+            wxString adstr;
+            if(data->attack >= 0)
+                adstr.append(wxString::Format(L"ATK/% 4ld", data->attack));
+            else
+                adstr.append(L"ATK/  ? ");
+            if(data->defence >= 0)
+                adstr.append(wxString::Format(L" DEF/% 4ld", data->defence));
+            else
+                adstr.append(L" DEF/  ? ");
+            ad->SetText(adstr.ToStdWstring(), 0xff000000);
+            ad->SetPosition({sz.x - 15 - ad->GetSize().x, sz.y - 30});
+        } else {
+            ad->ClearText();
         }
-        imgs->SetImage(&imageMgr.GetRawCardTexture(), verts);
+        if((data->level >> 16) > 0) {
+            auto sz1 = data->texts.find(L"\n");
+            auto sz2 = data->texts.find(L"【怪");
+            pent->SetText(data->texts.substr(sz1 + 1, sz2 - sz1 - 1), 0xff000000);
+            text->SetText(data->texts.substr(sz2 + 7), 0xff000000);
+            int ph = pent->GetSize().y;
+            if(ph < 55)
+                ph = 55;
+            text->SetPosition({cw + 15, 50 + ph});
+            pushvert({0, 45}, {mw, ph}, hmask, 0xc0ffffff);
+            pushvert({0, 50 + ph}, {mw, sz.y - 70 - ph}, hmask, 0xc0ffffff);
+            auto lscale = imageMgr.GetTexture("lscale");
+            auto rscale = imageMgr.GetTexture("rscale");
+            pushvert({0, 50}, {30, 23}, lscale);
+            pushvert({mw - 30, 50}, {30, 23}, rscale);
+            int ls = (data->level >> 16) & 0xff;
+            int rs = (data->level >> 24) & 0xff;
+            if(ls >= 10) {
+                pushvert({0, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (ls % 10)), 0xff000000);
+                pushvert({15, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (ls / 10)), 0xff000000);
+            } else
+                pushvert({8, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + ls), 0xff000000);
+            if(rs >= 10) {
+                pushvert({mw - 30, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (rs % 10)), 0xff000000);
+                pushvert({mw - 15, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (rs / 10)), 0xff000000);
+            } else
+                pushvert({mw - 22, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + rs), 0xff000000);
+        } else {
+            pushvert({0, 45}, {mw, sz.y - 65}, hmask, 0xc0ffffff);
+            pent->SetText(L"", 0xff000000);
+            text->SetText(data->texts, 0xff000000);
+            text->SetPosition({cw + 15, 60});
+        }
+        imgs->SetImage(imageMgr.GetRawCardTexture(), verts, colors);
         imgs->AddTexcoord(coords);
     }
     

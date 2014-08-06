@@ -37,7 +37,7 @@
   <string name="eui_filter_limit" value="限制"/>
   <string name="eui_filter_search" value="搜索"/>
   <string name="eui_filter_clear" value="清除条件"/>
-  <string name="eui_filter_count" value="已找到{count}张卡."/>
+  <string name="eui_filter_count" value="找到{count}张卡."/>
   <string name="eui_show_exclusive" value="显示独有卡标记"/>
   <string name="eui_msg_new_deck" value="(新卡组)"/>
   <string name="eui_msg_deck_load" value="请选择要载入的卡组"/>
@@ -47,8 +47,7 @@
   <string name="eui_msg_screen_copy" value="截图已复制到剪贴板."/>
   <string name="eui_msg_screen_err" value="无法创建文件夹 {path}."/>
   <string name="eui_msg_screen_save" value="卡组已保存至:&#013;{path}"/>
-  <string name="eui_infocode" value="卡片密码: "/>
-  <string name="eui_category" value="从属系列: "/>
+  <string name="eui_msg_setcode" value="从属系列: "/>
   <string name="parse_begin" value="「"/>
   <string name="parse_end" value="」"/>
   <string name="pool_limit0" value="禁止"/>
@@ -295,4 +294,26 @@
   <integer name="setname_升阶魔法" value="0x95"/>
   <integer name="setname_电子鱼人" value="0x96"/>
   <integer name="setname_古遗物" value="0x97"/>
+  <integer name="setname_魔术师" value="0x98"/>
+  <integer name="setname_异色眼" value="0x99"/>
+  <integer name="setname_超重武者" value="0x9a"/>
+  <integer name="setname_幻奏" value="0x9b"/>
+  <integer name="setname_星因士" value="0x9c"/>
+  <integer name="setname_影依" value="0x9d"/>
+  <integer name="setname_龙星" value="0x9e"/>
+  <integer name="setname_娱乐伙伴" value="0x9f"/>
+  <integer name="setname_传说的骑士" value="0xa0"/>
+  <integer name="setname_传说之龙" value="0xa1"/>
+  <integer name="setname_黑魔术" value="0xa2"/>
+  <integer name="setname_星尘" value="0xa3"/>
+  <integer name="setname_羽翼栗子球" value="0xa4"/>
+  <integer name="setname_变化" value="0xa5"/>
+  <integer name="setname_幼芽" value="0xa6"/>
+  <integer name="setname_阿托利斯" value="0xa7"/>
+  <integer name="setname_兰斯洛特" value="0xa8"/>
+  <integer name="setname_毛绒动物" value="0xa9"/>
+  <integer name="setname_机壳" value="0xaa"/>
+  <integer name="setname_文具电子人" value="0xab"/>
+  <integer name="setname_破坏玩具" value="0xac"/>
+  <integer name="setname_哥布林" value="0xad"/>
 </Common>

@@ -217,8 +217,6 @@ namespace sgui
     }
     
     void SGTextBase::SetText(const std::wstring& t, unsigned int cl) {
-        if(t.length() == 0)
-            return;
         text = t;
         color_vec.clear();
         for(size_t i = 0; i < text.length(); ++i)
@@ -368,7 +366,7 @@ namespace sgui
             glDeleteBuffers(1, &imgbo);
     }
     
-    void SGSpriteBase::SetImage(glbase::Texture* img, recti varea) {
+    void SGSpriteBase::SetImage(glbase::Texture* img, recti varea, unsigned int cl) {
         if(img) {
             if(!img_texture)
                 glGenBuffers(1, &imgbo);
@@ -381,11 +379,14 @@ namespace sgui
         if(!img)
             return;
         verts.clear();
+        colors.clear();
         texcoords.clear();
         verts.push_back(v2i{varea.left, varea.top});
         verts.push_back(v2i{varea.left + varea.width, varea.top});
         verts.push_back(v2i{varea.left, varea.top + varea.height});
         verts.push_back(v2i{varea.left + varea.width, varea.top + varea.height});
+        for(int i = 0; i < 4; ++i)
+            colors.push_back(cl);
     }
     
     void SGSpriteBase::AddTexRect(recti tarea) {
@@ -403,7 +404,7 @@ namespace sgui
         texcoords.push_back(tex);
     }
     
-    void SGSpriteBase::SetImage(glbase::Texture* img, std::vector<v2i>& vtx) {
+    void SGSpriteBase::SetImage(glbase::Texture* img, std::vector<v2i>& vtx, std::vector<unsigned int>& cl) {
         if(img) {
             if(!img_texture)
                 glGenBuffers(1, &imgbo);
@@ -416,8 +417,10 @@ namespace sgui
         if(!img)
             return;
         verts.clear();
+        colors.clear();
         texcoords.clear();
         verts = vtx;
+        colors = cl;
     }
     
     void SGSpriteBase::AddTexcoord(std::vector<v2f>& tex) {
@@ -441,7 +444,7 @@ namespace sgui
             for(size_t i = 0; i < verts.size(); ++i) {
                 guiRoot.ConvertXY(verts[i].x + pos.x, verts[i].y + pos.y, cur.vertex);
                 cur.texcoord = texcoords[ti][i];
-                cur.color = 0xffffffff;
+                cur.color = colors[i];
                 vert.push_back(cur);
             }
         }

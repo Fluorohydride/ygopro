@@ -23,8 +23,8 @@ namespace ygopro
 	public:
 		ti4& GetCardTexture(unsigned int id);
         ti4& GetTexture(const std::string& name);
-        glbase::Texture& LoadBigCardTexture(unsigned int id);
-        glbase::Texture& GetRawCardTexture() { return card_texture; }
+        glbase::Texture* LoadBigCardTexture(unsigned int id);
+        glbase::Texture* GetRawCardTexture() { return &card_texture; }
         ti4& GetCharTex(wchar_t ch);
         void UnloadCardTexture(unsigned int id);
 		void UnloadAllCardTexture();

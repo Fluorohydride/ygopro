@@ -74,18 +74,22 @@ namespace ygopro
         return misc_textures[name];
     }
     
-    glbase::Texture& ImageMgr::LoadBigCardTexture(unsigned int id) {
+    glbase::Texture* ImageMgr::LoadBigCardTexture(unsigned int id) {
         static unsigned int pid = 0;
+        static glbase::Texture* pre_ret = nullptr;
         if(pid == id)
-            return card_image;
+            return pre_ret;
         wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
         if(wxFileExists(file)) {
             sf::Image img;
-            if(img.loadFromFile(file.ToStdString()))
+            if(img.loadFromFile(file.ToStdString())) {
                 card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
-        }
-        pid = id;
-        return card_image;
+                pre_ret = &card_image;
+            } else
+                pre_ret = nullptr;
+        } else
+            pre_ret = nullptr;
+        return pre_ret;
     }
     
     ti4& ImageMgr::GetCharTex(wchar_t ch) {
@@ -265,8 +269,8 @@ namespace ygopro
 			child = child->GetNext();
 		}
         auto& char_tex = misc_textures["char"];
-        float difx = (char_tex.vert[1].x = char_tex.vert[0].x) / 4;
-        float dify = (char_tex.vert[2].y = char_tex.vert[0].y) / 4;
+        float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
+        float dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
         for(int i = 0; i < 16; ++i) {
             int x = i % 4;
             int y = i / 4;

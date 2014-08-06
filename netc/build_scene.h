@@ -137,6 +137,7 @@ namespace ygopro
         std::array<ti4, 10> result_tex;
         int result_page = 0;
         int current_sel_result = -1;
+        int result_show_size = 0;
         std::weak_ptr<sgui::SGLabel> label_result;
         std::weak_ptr<sgui::SGLabel> label_page;
     };

@@ -87,7 +87,10 @@ namespace ygopro
         std::weak_ptr<sgui::SGSprite> imageBox;
         std::weak_ptr<sgui::SGSprite> misc;
         std::weak_ptr<sgui::SGLabel> cardName;
+        std::weak_ptr<sgui::SGLabel> penText;
         std::weak_ptr<sgui::SGLabel> cardText;
+        std::weak_ptr<sgui::SGLabel> adText;
+        std::weak_ptr<sgui::SGLabel> extraText;
     };
 }
 

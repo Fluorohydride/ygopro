@@ -1,4 +1,6 @@
 #include <iostream>
+#include <chrono>
+#include <ctime>
 
 #include "scene_mgr.h"
 #include "image_mgr.h"
@@ -71,8 +73,13 @@ int main(int argc, char* argv[]) {
                     sgui::SGGUIRoot::GetSingleton().InjectCharEvent(evt.text);
                     break;
                 case sf::Event::KeyPressed:
-                    if(evt.key.code == sf::Keyboard::Num0)
-                        window.capture().saveToFile("sc.png");
+                    if(evt.key.code == sf::Keyboard::Dash && evt.key.alt) {
+                        auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+                        auto tm = std::localtime(&t);
+                        char buf[256];
+                        sprintf(buf, "./screenshot/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon, tm->tm_mday, t);
+                        window.capture().saveToFile(buf);
+                    }
                     if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(evt.key))
                         sceneMgr.KeyDown(evt.key);
                     break;

@@ -184,12 +184,14 @@ namespace ygopro
         // cards
         imageMgr.BindTexture(3);
         // result
-        glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
-        glDrawElements(GL_TRIANGLE_STRIP, 10 * 24 - 2, GL_UNSIGNED_SHORT, 0);
-        GLCheckError(__FILE__, __LINE__);
+        if(result_show_size) {
+            glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
+            glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+            glDrawElements(GL_TRIANGLE_STRIP, result_show_size * 24 - 2, GL_UNSIGNED_SHORT, 0);
+            GLCheckError(__FILE__, __LINE__);
+        }
         // deck
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz > 0) {
@@ -390,8 +392,8 @@ namespace ygopro
     }
     
     void BuildScene::ShowCardInfo(unsigned int code) {
-        int w = 600;
-        int h = 300;
+        int w = 700;
+        int h = 320;
         info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2}, {w, h});
     }
     
@@ -832,6 +834,7 @@ namespace ygopro
         if(!update_result)
             return;
         update_result = false;
+        result_show_size = 0;
         if(result_page * 10 >= search_result.size())
             return;
         float left = 1.0f - 210.0f / scene_size.x * 2.0f;
@@ -845,11 +848,11 @@ namespace ygopro
         float offy = height * 0.05f;
         float iheight = 0.08f / 0.29f * cheight;
         float iwidth = iheight * scene_size.y / scene_size.x;
-        
         std::array<glbase::VertexVCT, 160> verts;
         for(int i = 0; i < 10 ; ++i) {
             if(i + result_page * 10 >= search_result.size())
                 continue;
+            result_show_size++;
             auto pvert = &verts[i * 16];
             unsigned int cl = (i == current_sel_result) ? 0xc0ffffff : 0xc0000000;
             pvert[0].vertex = {left + (i % 2) * width, top - (i / 2) * height, 0.0f};
@@ -897,7 +900,7 @@ namespace ygopro
             }
         }
         glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 160, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * result_show_size * 16, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -1139,6 +1142,13 @@ namespace ygopro
             std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
             result_page = 0;
             RefreshSearchResult();
+            auto ptr = label_result.lock();
+            if(ptr != nullptr) {
+                wxString s = static_cast<const std::wstring&>(stringCfg[L"eui_filter_count"]);
+                wxString ct = wxString::Format(L"%ld", search_result.size());
+                s.Replace(L"{count}", ct);
+                ptr->SetText(s.ToStdWstring(), 0xff000000);
+            }
         }
     }
     
@@ -1151,6 +1161,13 @@ namespace ygopro
         std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
         result_page = 0;
         RefreshSearchResult();
+        auto ptr = label_result.lock();
+        if(ptr != nullptr) {
+            wxString s = static_cast<const std::wstring&>(stringCfg[L"eui_filter_count"]);
+            wxString ct = wxString::Format(L"%ld", search_result.size());
+            s.Replace(L"{count}", ct);
+            ptr->SetText(s.ToStdWstring(), 0xff000000);
+        }
     }
     
     std::shared_ptr<DeckCardData> BuildScene::GetCard(int pos, int index) {

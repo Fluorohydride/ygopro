@@ -6,7 +6,7 @@
     <rect name="iconoffset" u="256" v="0" w="20" h="20"/>
     <integer name="iconcolumn" value="12"/>
     <!-- the following 3 values can be overwritten -->
-    <integer name="gui_color" value="0xffc0ffe0"/>
+    <integer name="gui_color" value="0xffc0ffff"/>
     <integer name="font_color" value="0xff000000"/>
     <integer name="font_size" value="14"/>
   </basic>

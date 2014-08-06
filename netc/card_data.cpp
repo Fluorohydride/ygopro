@@ -57,10 +57,9 @@ namespace ygopro
             return false;
         } else {
             if(fc.keyword.size()) {
-                static auto charcmp = [](wchar_t ch1, wchar_t ch2) -> bool { return std::toupper(ch1) == std::toupper(ch2); };
-                if(std::search(name.begin(), name.end(), fc.keyword.begin(), fc.keyword.end(), charcmp) == name.end())
-                    return false;
-                if(std::search(texts.begin(), texts.end(), fc.keyword.begin(), fc.keyword.end(), charcmp) == texts.end())
+                static auto charcmp = [](wchar_t ch1, wchar_t ch2) -> bool { return toupper(ch1) == toupper(ch2); };
+                if((std::search(name.begin(), name.end(), fc.keyword.begin(), fc.keyword.end(), charcmp) == name.end())
+                   && (std::search(texts.begin(), texts.end(), fc.keyword.begin(), fc.keyword.end(), charcmp) == texts.end()))
                     return false;
             }
         }
