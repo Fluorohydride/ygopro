@@ -25,7 +25,7 @@ function c89662736.nacost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c89662736.natg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.GetAttacker():IsOnField() and Duel.GetAttacker():IsCanBeEffectTarget(e) end
+	if chk==0 then return Duel.GetAttacker():IsOnField() end
 	local dam=Duel.GetAttacker():GetAttack()/2
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,dam)
 end
