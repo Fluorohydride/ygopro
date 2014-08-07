@@ -256,7 +256,7 @@ namespace ygopro
                 current_sel_result = new_sel;
                 update_result = true;
             }
-            if(show_info && result_page * 10 + new_sel < search_result.size())
+            if((size_t)(show_info && result_page * 10 + new_sel) < search_result.size())
                 ShowCardInfo(search_result[result_page * 10 + new_sel]->code);
             std::get<0>(prev_hov) = 4;
             std::get<1>(prev_hov) = new_sel;
@@ -357,7 +357,7 @@ namespace ygopro
             }
         } else if(pos == 4) {
             int index = std::get<1>(prev_hov);
-            if(result_page * 10 + index >= search_result.size())
+            if((size_t)(result_page * 10 + index) >= search_result.size())
                 return;
             auto data = search_result[result_page * 10 + index];
             std::shared_ptr<DeckCardData> ptr;
@@ -600,8 +600,8 @@ namespace ygopro
                 unsigned char* image_buff = new unsigned char[scene_size.x * scene_size.y * 4];
                 unsigned char* rgb_buff = new unsigned char[scene_size.x * scene_size.y * 3];
                 glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
-                for(unsigned int h = 0; h < scene_size.y; ++h) {
-                    for(unsigned int w = 0; w < scene_size.x; ++w) {
+                for(int h = 0; h < scene_size.y; ++h) {
+                    for(int w = 0; w < scene_size.x; ++w) {
                         unsigned int ch = scene_size.y - 1 - h;
                         rgb_buff[h * scene_size.x * 3 + w * 3 + 0] = image_buff[ch * scene_size.x * 4 + w * 4 + 0];
                         rgb_buff[h * scene_size.x * 3 + w * 3 + 1] = image_buff[ch * scene_size.x * 4 + w * 4 + 1];
@@ -862,7 +862,7 @@ namespace ygopro
             return;
         update_result = false;
         result_show_size = 0;
-        if(result_page * 10 >= search_result.size())
+        if((size_t)(result_page * 10) >= search_result.size())
             return;
         float left = 1.0f - 210.0f / scene_size.x * 2.0f;
         float right = 1.0f - 10.0f / scene_size.x * 2.0f;
@@ -877,7 +877,7 @@ namespace ygopro
         float iwidth = iheight * scene_size.y / scene_size.x;
         std::array<glbase::VertexVCT, 160> verts;
         for(int i = 0; i < 10 ; ++i) {
-            if(i + result_page * 10 >= search_result.size())
+            if((size_t)(i + result_page * 10) >= search_result.size())
                 continue;
             result_show_size++;
             auto pvert = &verts[i * 16];
@@ -915,7 +915,7 @@ namespace ygopro
                         ShowCardInfo(dcd->data->code);
                 } else if(pos == 4) {
                     auto index = std::get<1>(prev_hov);
-                    if(result_page * 10 + index < search_result.size())
+                    if((size_t)(result_page * 10 + index) < search_result.size())
                         ShowCardInfo(search_result[result_page * 10 + index]->code);
                 }
                 sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Bind([this](sgui::SGWidget& sender, sf::Event::MouseButtonEvent evt)->bool {
@@ -1058,7 +1058,7 @@ namespace ygopro
     
     void BuildScene::UnloadSearchResult() {
         for(int i = 0; i < 10; ++i) {
-            if(i + result_page * 10 >= search_result.size())
+            if((size_t)(i + result_page * 10) >= search_result.size())
                 break;
             imageMgr.UnloadCardTexture(search_result[i + result_page * 10]->code);
         }
@@ -1066,7 +1066,7 @@ namespace ygopro
     
     void BuildScene::RefreshSearchResult() {
         for(int i = 0; i < 10; ++i) {
-            if(i + result_page * 10 >= search_result.size())
+            if((size_t)(i + result_page * 10) >= search_result.size())
                 break;
             result_tex[i] = imageMgr.GetCardTexture(search_result[i + result_page * 10]->code);
         }
@@ -1089,7 +1089,7 @@ namespace ygopro
     }
     
     void BuildScene::ResultNextPage() {
-        if(result_page * 10 + 10 >= search_result.size())
+        if((size_t)(result_page * 10 + 10) >= search_result.size())
             return;
         UnloadSearchResult();
         result_page++;

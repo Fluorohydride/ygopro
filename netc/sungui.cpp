@@ -281,7 +281,7 @@ namespace sgui
         if(font == nullptr)
             return;
         auto tex_size = font->getTexture(font_size).getSize();
-        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
             text_update = true;
             tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
         }
@@ -1362,7 +1362,7 @@ namespace sgui
         if(font == nullptr)
             return;
         auto tex_size = font->getTexture(font_size).getSize();
-        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
             text_update = true;
             tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
         }
@@ -2853,7 +2853,7 @@ namespace sgui
         if(font == nullptr)
             return;
         auto tex_size = font->getTexture(font_size).getSize();
-        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
             text_update = true;
             tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
         }
@@ -3288,7 +3288,7 @@ namespace sgui
         auto& it = items[index];
         std::get<0>(it) = text;
         std::get<1>(it) = color;
-        if(index == current_sel)
+        if(index == (unsigned int)current_sel)
             SetText(text, color);
     }
     
@@ -3589,7 +3589,7 @@ namespace sgui
         if(font == nullptr)
             return;
         auto tex_size = font->getTexture(font_size).getSize();
-        if(tex_size.x != tex_check_size.x || tex_size.y != tex_check_size.y) {
+        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
             text_update = true;
             tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
         }

@@ -1,6 +1,5 @@
 #include <wx/dir.h>
 #include <wx/filename.h>
-#include <strstream>
 
 #include "card_data.h"
 #include "scene_mgr.h"
@@ -386,7 +385,7 @@ namespace ygopro
     
     int FilterDialog::ParseInt(const wchar_t* p, int size) {
         int v = 0;
-        for(size_t i = 0; i < size; ++i) {
+        for(int i = 0; i < size; ++i) {
             if(p[i] >= L'0' && p[i] <= L'9') {
                 v = v * 10 + p[i] - L'0';
             } else
@@ -475,8 +474,8 @@ namespace ygopro
         
         pushvert({0, 0}, {mw, 40}, hmask);
         if(data->type & 0x1) {
-            for(int i = 0; i < (data->level & 0xffff); ++i)
-                pushvert({mw - 21 - 16 * i, 20}, {16, 16}, star);
+            for(unsigned int i = 0; i < (data->level & 0xffff); ++i)
+                pushvert({(int)(mw - 21 - 16 * i), 20}, {16, 16}, star);
             wxString adstr;
             if(data->attack >= 0)
                 adstr.append(wxString::Format(L"ATK/% 4ld", data->attack));

@@ -16,7 +16,7 @@
 #include <string>
 void GLCheckError(const std::string& file, int line);
 #else
-#define GLCheckError(x)
+#define GLCheckError(x, y)
 #endif
 
 namespace glbase {
