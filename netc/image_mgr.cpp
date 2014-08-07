@@ -110,7 +110,7 @@ namespace ygopro
 	void ImageMgr::UnloadAllCardTexture() {
         card_textures.clear();
         unuse_block.clear();
-        for(short i = 8; i < 280; ++i) {
+        for(short i = 7; i < 280; ++i) {
             ref_count[i] = 0;
             unuse_block.push_back(i);
         }
@@ -140,7 +140,7 @@ namespace ygopro
     
     void ImageMgr::InitTextures() {
         card_texture.Load(nullptr, 2048, 2048);
-        for(short i = 8; i < 280; ++i)
+        for(short i = 7; i < 280; ++i)
             unuse_block.push_back(i);
         ref_count.resize(280);
         glGenFramebuffers(1, &frame_buffer);
@@ -201,7 +201,7 @@ namespace ygopro
                 if(wxFileExists(path)) {
                     sf::Image img;
                     if(img.loadFromFile(path.ToStdString())) {
-                        if(name == "cards")
+                        if(name == "card")
                             card_texture.Update(img.getPixelsPtr(), 0, 0, img.getSize().x, img.getSize().y);
                         else if(name == "misc")
                             misc_texture.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
@@ -213,7 +213,7 @@ namespace ygopro
 				std::string name = child->GetAttribute("name").ToStdString();
                 std::string src = child->GetAttribute("src").ToStdString();
                 glbase::Texture* ptex = nullptr;
-                if(src == "cards")
+                if(src == "card")
                     ptex = &card_texture;
                 else if(src == "misc")
                     ptex = &misc_texture;
@@ -239,7 +239,7 @@ namespace ygopro
 				std::string name = child->GetAttribute("name").ToStdString();
                 std::string src = child->GetAttribute("src").ToStdString();
                 glbase::Texture* ptex = nullptr;
-                if(src == "cards")
+                if(src == "card")
                     ptex = &card_texture;
                 else if(src == "misc")
                     ptex = &misc_texture;

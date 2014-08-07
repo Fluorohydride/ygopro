@@ -171,6 +171,21 @@ namespace glbase {
         vector2<float> vert[TCOUNT];
 	};
     
+    inline void FillVertex(VertexVCT* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, unsigned int cl = 0xffffffff) {
+        vt[0].vertex = {pos.x, pos.y, 0.0f};
+        vt[0].texcoord = ti.vert[0];
+        vt[0].color = cl;
+        vt[1].vertex = {pos.x + sz.x, pos.y, 0.0f};
+        vt[1].texcoord = ti.vert[1];
+        vt[1].color = cl;
+        vt[2].vertex = {pos.x, pos.y + sz.y, 0.0f};
+        vt[2].texcoord = ti.vert[2];
+        vt[2].color = cl;
+        vt[3].vertex = {pos.x + sz.x, pos.y + sz.y, 0.0f};
+        vt[3].texcoord = ti.vert[3];
+        vt[3].color = cl;
+    };
+    
     class Texture {
     public:
         

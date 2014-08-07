@@ -28,6 +28,9 @@ namespace ygopro
         glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 256 * 16, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
+        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 33 * 4, nullptr, GL_DYNAMIC_DRAW);
+        GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 10 * 16, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
@@ -50,7 +53,7 @@ namespace ygopro
         pool[0] = imageMgr.GetTexture("pool_ocg");
         pool[1] = imageMgr.GetTexture("pool_tcg");
         pool[2] = imageMgr.GetTexture("pool_ex");
-        hmask = imageMgr.GetTexture("hmask");
+        hmask = imageMgr.GetTexture("cmask");
     }
     
     BuildScene::~BuildScene() {
@@ -166,6 +169,7 @@ namespace ygopro
     void BuildScene::Update() {
         UpdateBackGround();
         UpdateCard();
+        UpdateMisc();
         UpdateResult();
         UpdateInfo();
     }
@@ -180,6 +184,14 @@ namespace ygopro
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
+        GLCheckError(__FILE__, __LINE__);
+        // miscs
+        imageMgr.BindTexture(1);
+        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
+        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+        glDrawElements(GL_TRIANGLE_STRIP, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
         imageMgr.BindTexture(3);
@@ -228,6 +240,7 @@ namespace ygopro
         int rc2 = std::max((int)current_deck.side_deck.size(), max_row_count);
         dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
         UpdateAllCard();
+        update_misc = true;
         update_result = true;
     }
     
@@ -306,6 +319,7 @@ namespace ygopro
                     current_deck.main_deck.push_back(current_deck.side_deck[index]);
                     current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
                 }
+                current_deck.CalCount();
                 RefreshParams();
                 RefreshAllIndex();
                 UpdateAllCard();
@@ -430,6 +444,7 @@ namespace ygopro
                 deck_label.lock()->SetText(std::wstring(L"\ue08c").append(current_file).append(L"*"), 0xff000000);
             deck_edited = true;
         }
+        update_misc = true;
         view_regulation = 0;
     }
     
@@ -440,6 +455,7 @@ namespace ygopro
             current_deck = tempdeck;
             current_file = file;
             deck_edited = false;
+            update_misc = true;
             view_regulation = 0;
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
@@ -635,14 +651,7 @@ namespace ygopro
         update_bg = false;
         auto ti = imageMgr.GetTexture("bg");
         std::array<glbase::VertexVCT, 4> verts;
-        verts[0].vertex = {-1.0f, 1.0f, 0.0f};
-        verts[0].texcoord = ti.vert[0];
-        verts[1].vertex = {1.0f, 1.0f, 0.0f};
-        verts[1].texcoord = ti.vert[1];
-        verts[2].vertex = {-1.0f, -1.0f, 0.0f};
-        verts[2].texcoord = ti.vert[2];
-        verts[3].vertex = {1.0f, -1.0f, 0.0f};
-        verts[3].texcoord = ti.vert[3];
+        glbase::FillVertex(&verts[0], {-1.0f, 1.0f}, {2.0f, -2.0f}, ti);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * verts.size(), &verts[0]);
         GLCheckError(__FILE__, __LINE__);
@@ -782,51 +791,69 @@ namespace ygopro
     void BuildScene::RefreshCardPos(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<glbase::VertexVCT, 16> verts;
-        verts[0].vertex = ptr->pos;
-        verts[0].texcoord = ptr->card_tex.vert[0];
-        verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
-        verts[1].texcoord = ptr->card_tex.vert[1];
-        verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[2].texcoord = ptr->card_tex.vert[2];
-        verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[3].texcoord = ptr->card_tex.vert[3];
+        glbase::FillVertex(&verts[0], ptr->pos, {ptr->size.x, -ptr->size.y}, ptr->card_tex);
         unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
-        verts[4].vertex = ptr->pos;
-        verts[4].texcoord = hmask.vert[0];
-        verts[4].color = cl;
-        verts[5].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
-        verts[5].texcoord = hmask.vert[1];
-        verts[5].color = cl;
-        verts[6].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[6].texcoord = hmask.vert[2];
-        verts[6].color = cl;
-        verts[7].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[7].texcoord = hmask.vert[3];
-        verts[7].color = cl;
+        glbase::FillVertex(&verts[4], ptr->pos, {ptr->size.x, -ptr->size.y}, hmask, cl);
         if(dcd->limit < 3) {
             auto& lti = limit[dcd->limit];
-            verts[8].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f, 0.0f};
-            verts[8].texcoord = lti.vert[0];
-            verts[9].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f, 0.0f};
-            verts[9].texcoord = lti.vert[1];
-            verts[10].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
-            verts[10].texcoord = lti.vert[2];
-            verts[11].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
-            verts[11].texcoord = lti.vert[3];
+            glbase::FillVertex(&verts[8], ptr->pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
         }
         if((ptr->show_exclusive) && dcd->data->pool != 3) {
             float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            verts[12].vertex = {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
-            verts[12].texcoord = pti.vert[0];
-            verts[13].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
-            verts[13].texcoord = pti.vert[1];
-            verts[14].vertex = {px, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
-            verts[14].texcoord = pti.vert[2];
-            verts[15].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
-            verts[15].texcoord = pti.vert[3];
+            glbase::FillVertex(&verts[12], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * ptr->buffer_index * 16, sizeof(glbase::VertexVCT) * 16, &verts[0]);
+        GLCheckError(__FILE__, __LINE__);
+    }
+    
+    void BuildScene::UpdateMisc() {
+        if(!update_misc)
+            return;
+        update_misc = false;
+        std::array<glbase::VertexVCT, 33 * 4> verts;
+        auto msk = imageMgr.GetTexture("mmask");
+        auto nbk = imageMgr.GetTexture("numback");
+        float yrate = 1.0f - 40.0f / scene_size.y;
+        float lx = 10.0f / scene_size.x * 2.0f - 1.0f;
+        float rx = 1.0f - 230.0f / scene_size.x * 2.0f;
+        float y0 = (0.95f + 1.0f) * yrate - 1.0f;
+        float y1 = (offsety[0] - main_y_spacing * 3 - card_size.y + offsety[1]) / 2;
+        float y2 = (offsety[1] - card_size.y + offsety[2]) / 2;
+        float y3 = offsety[2] - card_size.y - 0.03f * yrate;
+        float nw = 60.0f / scene_size.x;
+        float nh = 60.0f / scene_size.y;
+        float nx = 15.0f / scene_size.x * 2.0f - 1.0f;
+        float ndy = 64.0f / scene_size.y;
+        float th = 120.0f / scene_size.y;
+        float my = offsety[0] - main_y_spacing * 3 - card_size.y + th;
+        float ey = offsety[1] - card_size.y + th;
+        float sy = offsety[2] - card_size.y + th;
+        auto numblock = [&nw, &nh, &nbk](glbase::VertexVCT* v, v2f pos, unsigned int cl1, unsigned int cl2, int val) {
+            glbase::FillVertex(&v[0], {pos.x, pos.y}, {nw, -nh}, nbk, cl1);
+            if(val >= 10) {
+                glbase::FillVertex(&v[4], {pos.x + nw * 0.1f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + (val % 100) / 10), cl2);
+                glbase::FillVertex(&v[8], {pos.x + nw * 0.5f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + val % 10), cl2);
+            } else
+                glbase::FillVertex(&v[4], {pos.x + nw * 0.3f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + val), cl2);
+        };
+        glbase::FillVertex(&verts[0], {lx, y0}, {rx - lx, y1 - y0}, msk, 0xc0ffffff);
+        glbase::FillVertex(&verts[4], {lx, y1}, {rx - lx, y2 - y1}, msk, 0xc0c0c0c0);
+        glbase::FillVertex(&verts[8], {lx, y2}, {rx - lx, y3 - y2}, msk, 0xc0808080);
+        glbase::FillVertex(&verts[12], {nx, my}, {nw, -th}, imageMgr.GetTexture("main_t"), 0xff80ffff);
+        glbase::FillVertex(&verts[16], {nx, ey}, {nw, -th}, imageMgr.GetTexture("extra_t"), 0xff80ffff);
+        glbase::FillVertex(&verts[20], {nx, sy}, {nw, -th}, imageMgr.GetTexture("side_t"), 0xff80ffff);
+        numblock(&verts[24], {nx, offsety[0] - ndy * 0}, 0xf03399ff, 0xff000000, current_deck.mcount);
+        numblock(&verts[36], {nx, offsety[0] - ndy * 1}, 0xf0a0b858, 0xff000000, current_deck.scount);
+        numblock(&verts[48], {nx, offsety[0] - ndy * 2}, 0xf09060bb, 0xff000000, current_deck.tcount);
+        numblock(&verts[60], {nx, offsety[0] - ndy * 3}, 0xf0b050a0, 0xff000000, current_deck.fuscount);
+        numblock(&verts[72], {nx, offsety[0] - ndy * 4}, 0xf0ffffff, 0xff000000, current_deck.syncount);
+        numblock(&verts[84], {nx, offsety[0] - ndy * 5}, 0xf0000000, 0xffffffff, current_deck.xyzcount);
+        numblock(&verts[96], {nx, my + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.main_deck.size());
+        numblock(&verts[108], {nx, ey + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.extra_deck.size());
+        numblock(&verts[120], {nx, sy + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.side_deck.size());
+        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 33 * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -855,48 +882,18 @@ namespace ygopro
             result_show_size++;
             auto pvert = &verts[i * 16];
             unsigned int cl = (i == current_sel_result) ? 0xc0ffffff : 0xc0000000;
-            pvert[0].vertex = {left + (i % 2) * width, top - (i / 2) * height, 0.0f};
-            pvert[0].texcoord = hmask.vert[0];
-            pvert[0].color = cl;
-            pvert[1].vertex = {left + (i % 2) * width + width, top - (i / 2) * height, 0.0f};
-            pvert[1].texcoord = hmask.vert[1];
-            pvert[1].color = cl;
-            pvert[2].vertex = {left + (i % 2) * width, top - (i / 2) * height - height, 0.0f};
-            pvert[2].texcoord = hmask.vert[2];
-            pvert[2].color = cl;
-            pvert[3].vertex = {left + (i % 2) * width + width, top - (i / 2) * height - height, 0.0f};
-            pvert[3].texcoord = hmask.vert[3];
-            pvert[3].color = cl;
+            glbase::FillVertex(&pvert[0], {left + (i % 2) * width, top - (i / 2) * height}, {width, -height}, hmask, cl);
             CardData* pdata = search_result[i + result_page * 10];
-            pvert[4].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy, 0.0f};
-            pvert[4].texcoord = result_tex[i].vert[0];
-            pvert[5].vertex = {left + (i % 2) * width + width / 2 + cwidth / 2, top - (i / 2) * height - offy, 0.0f};
-            pvert[5].texcoord = result_tex[i].vert[1];
-            pvert[6].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - height + offy, 0.0f};
-            pvert[6].texcoord = result_tex[i].vert[2];
-            pvert[7].vertex = {left + (i % 2) * width + width / 2 + cwidth / 2, top - (i / 2) * height - height + offy, 0.0f};
-            pvert[7].texcoord = result_tex[i].vert[3];
+            glbase::FillVertex(&pvert[4], {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy}, {cwidth, -cheight}, result_tex[i]);
             unsigned int lmt = limitRegulationMgr.GetCardLimitCount(pdata->code);
             if(lmt < 3) {
-                pvert[8].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f, 0.0f};
-                pvert[8].texcoord = limit[lmt].vert[0];
-                pvert[9].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f + iwidth, top - (i / 2) * height - offy + 0.01f, 0.0f};
-                pvert[9].texcoord = limit[lmt].vert[1];
-                pvert[10].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f - iheight, 0.0f};
-                pvert[10].texcoord = limit[lmt].vert[2];
-                pvert[11].vertex = {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f + iwidth, top - (i / 2) * height - offy + 0.01f - iheight, 0.0f};
-                pvert[11].texcoord = limit[lmt].vert[3];
+                glbase::FillVertex(&pvert[8], {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f},
+                                   {iwidth, -iheight}, limit[lmt]);
             }
             if(show_exclusive && pdata->pool != 3) {
                 auto& pti = (pdata->pool == 1) ? pool[0] : pool[1];
-                pvert[12].vertex = {left + (i % 2) * width + width / 2 - iwidth * 0.75f, top - (i / 2) * height + offy - height + iheight * 0.75f - 0.01f, 0.0f};
-                pvert[12].texcoord = pti.vert[0];
-                pvert[13].vertex = {left + (i % 2) * width + width / 2 + iwidth * 0.75f, top - (i / 2) * height + offy - height + iheight * 0.75f - 0.01f, 0.0f};
-                pvert[13].texcoord = pti.vert[1];
-                pvert[14].vertex = {left + (i % 2) * width + width / 2 - iwidth * 0.75f, top - (i / 2) * height + offy - height - 0.01f, 0.0f};
-                pvert[14].texcoord = pti.vert[2];
-                pvert[15].vertex = {left + (i % 2) * width + width / 2 + iwidth * 0.75f, top - (i / 2) * height + offy - height - 0.01f, 0.0f};
-                pvert[15].texcoord = pti.vert[3];
+                glbase::FillVertex(&pvert[12], {left + (i % 2) * width + width / 2 - iwidth * 0.75f, top - (i / 2) * height + offy - height + iheight * 0.75f - 0.01f},
+                                   {iwidth * 1.5f, -iheight * 0.75f}, pti);
             }
         }
         glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
@@ -916,7 +913,7 @@ namespace ygopro
                     auto dcd = GetCard(pos, std::get<1>(prev_hov));
                     if(dcd != nullptr)
                         ShowCardInfo(dcd->data->code);
-                } else {
+                } else if(pos == 4) {
                     auto index = std::get<1>(prev_hov);
                     if(result_page * 10 + index < search_result.size())
                         ShowCardInfo(search_result[result_page * 10 + index]->code);
@@ -943,18 +940,7 @@ namespace ygopro
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<glbase::VertexVCT, 4> verts;
         unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
-        verts[0].vertex = ptr->pos;
-        verts[0].texcoord = hmask.vert[0];
-        verts[0].color = cl;
-        verts[1].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y, 0.0f};
-        verts[1].texcoord = hmask.vert[1];
-        verts[1].color = cl;
-        verts[2].vertex = {ptr->pos.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[2].texcoord = hmask.vert[2];
-        verts[2].color = cl;
-        verts[3].vertex = {ptr->pos.x + ptr->size.x, ptr->pos.y - ptr->size.y, 0.0f};
-        verts[3].texcoord = hmask.vert[3];
-        verts[3].color = cl;
+        glbase::FillVertex(&verts[0], ptr->pos, {ptr->size.x, -ptr->size.y}, hmask, cl);
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 4), sizeof(glbase::VertexVCT) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
@@ -964,14 +950,7 @@ namespace ygopro
         std::array<glbase::VertexVCT, 4> verts;
         if(dcd->limit < 3) {
             auto lti = limit[dcd->limit];
-            verts[0].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f, 0.0f};
-            verts[0].texcoord = lti.vert[0];
-            verts[1].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f, 0.0f};
-            verts[1].texcoord = lti.vert[1];
-            verts[2].vertex = {ptr->pos.x - 0.01f, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
-            verts[2].texcoord = lti.vert[2];
-            verts[3].vertex = {ptr->pos.x - 0.01f + icon_size.x, ptr->pos.y + 0.01f - icon_size.y, 0.0f};
-            verts[3].texcoord = lti.vert[3];
+            glbase::FillVertex(&verts[0], ptr->pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 8), sizeof(glbase::VertexVCT) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
@@ -983,14 +962,7 @@ namespace ygopro
         if((ptr->show_exclusive) && dcd->data->pool != 3) {
             float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            verts[0].vertex = {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
-            verts[0].texcoord = pti.vert[0];
-            verts[1].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f, 0.0f};
-            verts[1].texcoord = pti.vert[1];
-            verts[2].vertex = {px, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
-            verts[2].texcoord = pti.vert[2];
-            verts[3].vertex = {px + icon_size.x * 1.5f, ptr->pos.y - ptr->size.y - 0.01f, 0.0f};
-            verts[3].texcoord = pti.vert[3];
+            glbase::FillVertex(&verts[12], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 12), sizeof(glbase::VertexVCT) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
@@ -1080,6 +1052,7 @@ namespace ygopro
         view_regulation = limit + 1;
         current_file.clear();
         deck_edited = false;
+        update_misc = true;
         RefreshAllCard();
     }
     

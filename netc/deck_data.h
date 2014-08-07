@@ -87,7 +87,6 @@ namespace ygopro
         std::vector<LimitRegulation> limit_regulations;
 	};
 
-
 	extern LimitRegulationMgr limitRegulationMgr;
 
 }

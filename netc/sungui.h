@@ -341,7 +341,6 @@ namespace sgui
         std::unordered_map<std::string, int> int_config;
         std::unordered_map<std::string, std::string> string_config;
         std::unordered_map<std::string, recti> tex_config;
-        std::unordered_map<std::string, std::vector<v2i>> coord_config;
     };
     
     class SGWidgetWrapper : public SGWidgetContainer {

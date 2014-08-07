@@ -470,8 +470,8 @@ namespace ygopro
             for(int i = 0; i < 4; ++i)
                 colors.push_back(cl);
         };
-        auto hmask = imageMgr.GetTexture("hmask");
-        auto star = imageMgr.GetTexture("star");
+        auto hmask = imageMgr.GetTexture("mmask");
+        auto star = imageMgr.GetTexture("mstar");
         
         pushvert({0, 0}, {mw, 40}, hmask);
         if(data->type & 0x1) {
@@ -499,7 +499,7 @@ namespace ygopro
             int ph = pent->GetSize().y;
             if(ph < 55)
                 ph = 55;
-            text->SetPosition({cw + 15, 50 + ph});
+            text->SetPosition({cw + 15, 60 + ph});
             pushvert({0, 45}, {mw, ph}, hmask, 0xc0ffffff);
             pushvert({0, 50 + ph}, {mw, sz.y - 70 - ph}, hmask, 0xc0ffffff);
             auto lscale = imageMgr.GetTexture("lscale");
@@ -524,7 +524,7 @@ namespace ygopro
             text->SetText(data->texts, 0xff000000);
             text->SetPosition({cw + 15, 60});
         }
-        imgs->SetImage(imageMgr.GetRawCardTexture(), verts, colors);
+        imgs->SetImage(imageMgr.GetRawMiscTexture(), verts, colors);
         imgs->AddTexcoord(coords);
     }
     

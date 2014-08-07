@@ -72,6 +72,7 @@ namespace ygopro
         void RefreshParams();
         void RefreshAllCard();
         void RefreshAllIndex();
+        void UpdateMisc();
         void UpdateResult();
         void UpdateInfo();
         
@@ -103,6 +104,7 @@ namespace ygopro
         unsigned int result_buffer = 0;
         bool update_bg = true;
         bool update_card = true;
+        bool update_misc = true;
         bool update_result = true;
         int update_status = 0;
         std::tuple<int, int, int> prev_hov;

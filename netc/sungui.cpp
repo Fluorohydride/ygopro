@@ -856,21 +856,6 @@ namespace sgui
                         strw.ToLong(&w, 0);
                         strh.ToLong(&h, 0);
                         iter->second->tex_config[name.ToStdString()] = recti{(int)u, (int)v, (int)w, (int)h};
-                    } else {
-                        wxString name = child->GetAttribute("name");
-                        auto& vec = iter->second->coord_config[name.ToStdString()];
-                        wxXmlNode* coord_child = child->GetChildren();
-                        while(coord_child) {
-                            if(coord_child->GetType() == wxXmlNodeType::wxXML_ELEMENT_NODE) {
-                                wxString stru = child->GetAttribute("u");
-                                wxString strv = child->GetAttribute("v");
-                                long u, v;
-                                stru.ToLong(&u, 0);
-                                strv.ToLong(&v, 0);
-                                vec.push_back(v2i{(int)u, (int)v});
-                            }
-                            coord_child = coord_child->GetNext();
-                        }
                     }
                     child = child->GetNext();
                 }
