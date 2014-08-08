@@ -3,6 +3,7 @@
 #include <ctime>
 
 #include "scene_mgr.h"
+#include "build_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -42,8 +43,10 @@ int main(int argc, char* argv[]) {
     sceneMgr.Init();
     sceneMgr.SetSceneSize({width, height});
     sceneMgr.InitDraw();
-    sceneMgr.SwitchScene(SceneMgr::SceneType::Builder);
     sceneMgr.SetFrameRate((int)commonCfg[L"frame_rate"]);
+    auto sc = std::make_shared<BuildScene>();
+    sceneMgr.SetScene(std::static_pointer_cast<Scene>(sc));
+    sc->LoadDeckFromFile(L"./deck/807.ydk");
     
     bool running = true;
     sf::Clock clock;
@@ -123,6 +126,5 @@ int main(int argc, char* argv[]) {
     sceneMgr.Uninit();
     sgui::SGGUIRoot::GetSingleton().Unload();
     imageMgr.UninitTextures();
-    
     return 0;
 }

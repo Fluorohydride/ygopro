@@ -11,6 +11,9 @@
 #include <GL/glu.h>
 #endif
 
+#include <ft2build.h>
+#include FT_FREETYPE_H
+
 #ifdef _DEBUG
 #include <iostream>
 #include <string>
@@ -186,6 +189,20 @@ namespace glbase {
         vt[3].color = cl;
     };
     
+    class Image {
+    public:
+        ~Image();
+        bool Load(const std::string& file);
+        inline unsigned char* GetRawData() { return buffer; }
+        inline int GetWidth() { return width; }
+        inline int GetHeight() { return height; }
+        
+    protected:
+        unsigned char* buffer = nullptr;
+        int width = 0;
+        int height = 0;
+    };
+    
     class Texture {
     public:
         
@@ -202,13 +219,14 @@ namespace glbase {
         void Load(const unsigned char* data, int x, int y);
         void Unload();
         void Update(const unsigned char* data, int offx, int offy, int width, int height);
-        unsigned int GetTextureId() { return texture_id; }
         void Bind();
+        inline unsigned int GetTextureId() { return texture_id; }
         TextureInfo<4> GetTextureInfo();
-        int GetWidth() { return tex_width; }
-        int GetHeight() { return tex_height; }
-        int GetImgWidth() { return img_width; }
-        int GetImgHeight() { return img_height; }
+        inline int GetWidth() { return tex_width; }
+        inline int GetHeight() { return tex_height; }
+        inline int GetImgWidth() { return img_width; }
+        inline int GetImgHeight() { return img_height; }
+        inline vector2<int> GetSize() { return {tex_width, tex_height}; }
         
     protected:
         unsigned int texture_id = 0;
@@ -218,6 +236,31 @@ namespace glbase {
         int img_height = 0;
     };
     
+    struct FontGlyph {
+        bool loaded = false;
+        rect<int> textureRect;
+        rect<int> bounds;
+        int advance = 0;
+    };
+    
+    class Font {
+    public:
+        Font();
+        ~Font();
+        bool Load(const std::string& file, unsigned int sz);
+        const FontGlyph& GetGlyph(unsigned int ch);
+        inline Texture& GetTexture() { return char_tex; }
+        inline int GetFontSize() { return font_size; }
+        
+    protected:
+        Texture char_tex;
+        FontGlyph glyphs[0x10000];
+        FT_Face face;
+        FT_Library library;
+        int font_size;
+        int tex_posx = 0;
+        int tex_posy = 0;
+    };
 }
 
 typedef glbase::vector2<int> v2i;

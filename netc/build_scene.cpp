@@ -54,6 +54,9 @@ namespace ygopro
         pool[1] = imageMgr.GetTexture("pool_tcg");
         pool[2] = imageMgr.GetTexture("pool_ex");
         hmask = imageMgr.GetTexture("cmask");
+        file_dialog = std::make_shared<FileDialog>();
+        filter_dialog = std::make_shared<FilterDialog>();
+        info_panel = std::make_shared<InfoPanel>();
     }
     
     BuildScene::~BuildScene() {
@@ -68,9 +71,9 @@ namespace ygopro
     void BuildScene::Activate() {
         view_regulation = 0;
         prev_hov = std::make_tuple(0, 0, 0);
-        file_dialog = std::make_shared<FileDialog>();
-        filter_dialog = std::make_shared<FilterDialog>();
-        info_panel = std::make_shared<InfoPanel>();
+        search_result.clear();
+        result_page = 0;
+        current_deck.Clear();
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
         pnl->SetSize({-20, 35}, {1.0f, 0.0f});
         pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
@@ -223,7 +226,7 @@ namespace ygopro
         card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
         icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
         minx = 50.0f / sz.x * 2.0f - 1.0f;
-        maxx = 1.0f - 240.0f / sz.x * 2.0f;
+        maxx = 1.0f - 235.0f / sz.x * 2.0f;
         main_y_spacing = 0.3f * yrate;
         offsety[0] = (0.92f + 1.0f) * yrate - 1.0f;
         offsety[1] = (-0.31f + 1.0f) * yrate - 1.0f;
@@ -256,7 +259,7 @@ namespace ygopro
                 current_sel_result = new_sel;
                 update_result = true;
             }
-            if((size_t)(show_info && result_page * 10 + new_sel) < search_result.size())
+            if(show_info && (size_t)(result_page * 10 + new_sel) < search_result.size())
                 ShowCardInfo(search_result[result_page * 10 + new_sel]->code);
             std::get<0>(prev_hov) = 4;
             std::get<1>(prev_hov) = new_sel;
@@ -816,7 +819,7 @@ namespace ygopro
         auto nbk = imageMgr.GetTexture("numback");
         float yrate = 1.0f - 40.0f / scene_size.y;
         float lx = 10.0f / scene_size.x * 2.0f - 1.0f;
-        float rx = 1.0f - 230.0f / scene_size.x * 2.0f;
+        float rx = 1.0f - 225.0f / scene_size.x * 2.0f;
         float y0 = (0.95f + 1.0f) * yrate - 1.0f;
         float y1 = (offsety[0] - main_y_spacing * 3 - card_size.y + offsety[1]) / 2;
         float y2 = (offsety[1] - card_size.y + offsety[2]) / 2;

@@ -1,6 +1,7 @@
 #ifndef _BUILD_SCENE_H_
 #define _BUILD_SCENE_H_
 
+#include <array>
 #include <unordered_set>
 #include <functional>
 

@@ -27,11 +27,6 @@ namespace ygopro
     
     class SceneMgr {
     public:
-        enum class SceneType {
-            None,
-            Builder,
-            Duel,
-        };
         
         void Init();
         void Uninit();
@@ -47,14 +42,13 @@ namespace ygopro
         void KeyDown(sf::Event::KeyEvent evt);
         void KeyUp(sf::Event::KeyEvent evt);
         void SetSceneSize(v2i sz);
-        void SwitchScene(SceneType st);
-        std::shared_ptr<Scene> GetScene(SceneType st);
+        void SetScene(std::shared_ptr<Scene> sc);
+        std::shared_ptr<Scene> GetScene() { return current_scene; };
         void SetMousePosition(v2i pos) { mouse_pos = pos; }
         v2i GetMousePosition() { return mouse_pos; }
         
     protected:
         v2i scene_size;
-        SceneType cur_st = SceneType::None;
         unsigned long long start_time = 0;
         std::shared_ptr<Scene> current_scene = nullptr;
         float frame_check = 0.0f;

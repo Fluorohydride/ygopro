@@ -26,6 +26,7 @@ target_link_libraries (netc
     ${wxWidgets_LIBRARIES}
     ${SFML_LIBRARIES}
     ${OPENGL_gl_LIBRARY}
+    ${FREETYPE_LIBRARIES}
 )
 
 include_directories (
@@ -34,6 +35,7 @@ include_directories (
     ${wxWidgets_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
     ${SFML_INCLUDE_DIR}
+    ${FREETYPE_INCLUDE_DIR}
 )
 
 if (WIN32)

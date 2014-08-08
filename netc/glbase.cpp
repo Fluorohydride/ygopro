@@ -1,8 +1,13 @@
 #include <cstring>
+#include <fstream>
+#include <iostream>
 #include "glbase.h"
 
+#define STBI_HEADER_FILE_ONLY
+#include "../buildin/stb_image.c"
+#include "../buildin/stb_image_write.h"
+
 #ifdef _DEBUG
-#include <iostream>
 void GLCheckError(const std::string& file, int line) {
     auto err = glGetError();
     switch (err) {
@@ -37,6 +42,25 @@ void GLCheckError(const std::string& file, int line) {
 #endif
 
 namespace glbase {
+    
+    Image::~Image() {
+        if(buffer != nullptr)
+            delete buffer;
+    }
+    
+    bool Image::Load(const std::string &file) {
+        unsigned char* data = stbi_load(file.c_str(), &width, &height, nullptr, 4);
+        if(data == nullptr) {
+            std::cout << stbi_failure_reason() << std::endl;
+            return false;
+        }
+        if(buffer != nullptr)
+            delete buffer;
+        buffer = new unsigned char[width * height * 4];
+        memcpy(buffer, data, width * height * 4);
+        stbi_image_free(data);
+        return true;
+    }
     
     void Texture::Load(const unsigned char* data, int x, int y) {
         if(texture_id)
@@ -93,4 +117,49 @@ namespace glbase {
         return ret;
     }
     
+    Font::Font() {
+        FT_Init_FreeType(&library);
+    }
+    
+    Font::~Font() {
+        FT_Done_FreeType(library);
+        char_tex.Unload();
+    }
+    
+    bool Font::Load(const std::string &file, unsigned int sz) {
+        if (FT_New_Face(library, file.c_str(), 0, &face))
+            return false;
+        FT_Select_Charmap(face, FT_ENCODING_UNICODE);
+        FT_Set_Pixel_Sizes(face, 0, sz);
+        char_tex.Load(nullptr, 2048, 2048);
+        tex_posx = 0;
+        tex_posy = 0;
+        font_size = sz;
+        return true;
+    }
+    
+    const FontGlyph& Font::GetGlyph(unsigned int ch) {
+        auto& gl = glyphs[ch];
+        if(gl.loaded)
+            return gl;
+        FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
+        FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+        FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
+        gl.bounds = {face->glyph->bitmap_left, -face->glyph->bitmap_top, face->glyph->bitmap.width, face->glyph->bitmap.rows};
+        gl.advance = face->glyph->advance.x / 64.0f;
+        if(2048 - tex_posx < gl.bounds.width) {
+            tex_posx = 0;
+            tex_posy += font_size;
+        }
+        gl.textureRect = {tex_posx, tex_posy, gl.bounds.width, gl.bounds.height};
+        unsigned int* px = new unsigned int[gl.bounds.width * gl.bounds.height];
+        unsigned char* buf = face->glyph->bitmap.buffer;
+        for(int i = 0; i < gl.bounds.width * gl.bounds.height; ++i)
+            px[i] = (((unsigned int)buf[i]) << 24) | 0xffffff;
+        char_tex.Update((const unsigned char*)px, tex_posx, tex_posy, gl.bounds.width, gl.bounds.height);
+        tex_posx += gl.bounds.width;
+        gl.loaded = true;
+        delete px;
+        return gl;
+    }
 }

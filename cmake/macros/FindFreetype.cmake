@@ -12,7 +12,7 @@ FIND_PATH(FREETYPE_INCLUDE_DIR ft2build.h
    HINTS
    ${PC_FREETYPE_INCLUDEDIR}
    ${PC_FREETYPE_INCLUDE_DIRS}
-   PATH_SUFFIXES include
+   PATH_SUFFIXES freetype2
    PATHS
    ~/Library/Frameworks
    /Library/Frameworks

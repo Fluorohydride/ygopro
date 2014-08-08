@@ -1,23 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Gui>
   <basic>
-    <string name="gui_font" value="./conf/wqy-zenhei.ttc"/>
     <string name="gui_texture" value="./conf/gui.png"/>
     <rect name="iconoffset" u="256" v="0" w="20" h="20"/>
     <integer name="iconcolumn" value="12"/>
-    <!-- the following 3 values can be overwritten -->
+    <font name="default" file="./conf/wqy-zenhei.ttc" size="14"/>
+    <font name="window" file="./conf/wqy-zenhei.ttc" size="16"/>
+    <!-- the following 2 values can be overwritten -->
     <integer name="gui_color" value="0xffc0ffff"/>
     <integer name="font_color" value="0xff000000"/>
-    <integer name="font_size" value="14"/>
   </basic>
   <panel>
     <integer name="client_border" value="5"/>
     <rect name="client_area" u="100" v="122" w="45" h="41"/>
   </panel>
   <window>
+    <string name="font_name" value="window"/>
     <integer name="gui_color" value="0xffffff00"/>
     <integer name="font_color" value="0xffffffff"/>
-    <integer name="font_size" value="16"/>
     <integer name="title_h" value="24"/>
     <integer name="title_lw" value="16"/>
     <integer name="title_rw" value="16"/>

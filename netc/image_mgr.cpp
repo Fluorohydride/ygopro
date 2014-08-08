@@ -24,8 +24,8 @@ namespace ygopro
                     cti.ti = misc_textures["unknown"];
                     cti.ref_block = 0xffff;
                 } else {
-                    sf::Image img;
-                    if(img.loadFromFile(file.ToStdString())) {
+                    glbase::Image img;
+                    if(img.Load(file.ToStdString())) {
                         glbase::VertexVCT frame_verts[4];
                         int bx = (blockid % 20) * 100;
                         int by = (blockid / 20) * 145;
@@ -36,7 +36,7 @@ namespace ygopro
                         cti.ti.vert[2] = {(float)(bx) / 2048, (float)(by + bh) / 2048};
                         cti.ti.vert[3] = {(float)(bx + bw) / 2048, (float)(by + bh) / 2048};
                         cti.ref_block = blockid;
-                        card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+                        card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
                         glViewport(0, 0, 2048, 2048);
                         frame_verts[0].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f, 0.0f};
@@ -44,8 +44,8 @@ namespace ygopro
                         frame_verts[2].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f, 0.0f};
                         frame_verts[3].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f, 0.0f};
                         frame_verts[0].texcoord = {0.0f, 0.0f};
-                        frame_verts[1].texcoord = {(float)img.getSize().x / card_image.GetWidth(), 0.0f};
-                        frame_verts[2].texcoord = {0.0f, (float)img.getSize().y / card_image.GetHeight()};
+                        frame_verts[1].texcoord = {(float)img.GetWidth() / card_image.GetWidth(), 0.0f};
+                        frame_verts[2].texcoord = {0.0f, (float)img.GetHeight() / card_image.GetHeight()};
                         frame_verts[3].texcoord = {frame_verts[1].texcoord.x, frame_verts[2].texcoord.y};
                         card_image.Bind();
                         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
@@ -81,9 +81,9 @@ namespace ygopro
             return pre_ret;
         wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
         if(wxFileExists(file)) {
-            sf::Image img;
-            if(img.loadFromFile(file.ToStdString())) {
-                card_image.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+            glbase::Image img;
+            if(img.Load(file.ToStdString())) {
+                card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                 pre_ret = &card_image;
             } else
                 pre_ret = nullptr;
@@ -199,14 +199,14 @@ namespace ygopro
                 wxString name = child->GetAttribute("name");
                 wxString path = child->GetAttribute("path");
                 if(wxFileExists(path)) {
-                    sf::Image img;
-                    if(img.loadFromFile(path.ToStdString())) {
+                    glbase::Image img;
+                    if(img.Load(path.ToStdString())) {
                         if(name == "card")
-                            card_texture.Update(img.getPixelsPtr(), 0, 0, img.getSize().x, img.getSize().y);
+                            card_texture.Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
                         else if(name == "misc")
-                            misc_texture.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+                            misc_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                         else if(name == "bg")
-                            bg_texture.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+                            bg_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                     }
                 }
             } else if (child->GetName() == "texture") {

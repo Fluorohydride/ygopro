@@ -184,9 +184,8 @@ namespace sgui
         glDeleteBuffers(1, &tbo);
     }
     
-    void SGTextBase::SetFont(sf::Font* ft, unsigned int sz) {
+    void SGTextBase::SetFont(glbase::Font* ft) {
         font = ft;
-        font_size = sz;
         text_update = true;
         EvaluateSize();
     }
@@ -199,7 +198,7 @@ namespace sgui
     }
     
     int SGTextBase::GetLineSpacing() {
-        return font_size + spacing_y;
+        return font->GetFontSize() + spacing_y;
     }
     
     void SGTextBase::ClearText() {
@@ -244,7 +243,7 @@ namespace sgui
     void SGTextBase::EvaluateSize(const std::wstring& t) {
         if(t.length() == 0) {
             text_width = 0;
-            text_height = font_size;
+            text_height = font->GetFontSize();
             text_width_cur = 0;
             text_pos_array.clear();
             if(text.length() == 0)
@@ -253,6 +252,7 @@ namespace sgui
         } else {
             int max_width = GetMaxWidth();
             int ls = GetLineSpacing();
+            int font_size = font->GetFontSize();
             for(auto ch : t) {
                 if(ch < L' ') {
                     text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
@@ -264,7 +264,7 @@ namespace sgui
                     }
                     continue;
                 }
-                auto& gl = font->getGlyph(ch, font_size, false);
+                auto& gl = font->GetGlyph(ch);
                 if(text_width_cur + gl.advance > max_width && IsMultiLine()) {
                     if(text_width_cur > text_width)
                         text_width = text_width_cur;
@@ -280,19 +280,15 @@ namespace sgui
     void SGTextBase::UpdateTextVertex() {
         if(font == nullptr)
             return;
-        auto tex_size = font->getTexture(font_size).getSize();
-        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
-            text_update = true;
-            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
-        }
         if(!text_update)
             return;
         text_update = false;
         vert_size = 0;
         if(text.length() == 0)
             return;
+        auto tex_size = font->GetTexture().GetSize();
         std::vector<glbase::VertexVCT> charvtx;
-        unsigned int advx = 0, advy = font_size;
+        unsigned int advx = 0, advy = font->GetFontSize();
         glbase::VertexVCT cur_char;
         unsigned int max_width = GetMaxWidth();
         int ls = GetLineSpacing();
@@ -307,7 +303,7 @@ namespace sgui
                 }
                 continue;
             }
-            auto& gl = font->getGlyph(ch, font_size, false);
+            auto& gl = font->GetGlyph(ch);
             if(advx + gl.advance > max_width) {
                 advx = 0;
                 advy += ls;
@@ -353,7 +349,7 @@ namespace sgui
         UpdateTextVertex();
         if(vert_size == 0)
             return;
-        guiRoot.BindFontTexture(font_size);
+        guiRoot.BindTexture(&font->GetTexture());
         glBindBuffer(GL_ARRAY_BUFFER, tbo);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
@@ -801,7 +797,7 @@ namespace sgui
         draging_object.reset();
     }
     
-    void SGGUIRoot::LoadConfigs() {
+    bool SGGUIRoot::LoadConfigs() {
         AddConfig("basic", SGGUIRoot::basic_config);
         AddConfig("panel", SGPanel::panel_config);
         AddConfig("window", SGWindow::window_config);
@@ -818,7 +814,7 @@ namespace sgui
         
         wxXmlDocument doc;
 		if(!doc.Load("./conf/gui.xml", wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return;
+			false;
 		wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* subtype = root->GetChildren();
 		while (subtype) {
@@ -856,16 +852,27 @@ namespace sgui
                         strw.ToLong(&w, 0);
                         strh.ToLong(&h, 0);
                         iter->second->tex_config[name.ToStdString()] = recti{(int)u, (int)v, (int)w, (int)h};
+                    } else if(child->GetName() == "font") {
+                        std::string name = child->GetAttribute("name").ToStdString();
+                        std::string file = child->GetAttribute("file").ToStdString();
+                        wxString size = child->GetAttribute("size");
+                        auto& ft = font_mgr[name];
+                        long sz = 0;
+                        size.ToLong(&sz);
+                        if(!ft.Load(file, sz))
+                            font_mgr.erase(name);
                     }
                     child = child->GetNext();
                 }
             }
 			subtype = subtype->GetNext();
 		}
-        gui_font.loadFromFile(basic_config.string_config["gui_font"]);
-        sf::Image img;
-        img.loadFromFile(basic_config.string_config["gui_texture"]);
-        gui_texture.Load(img.getPixelsPtr(), img.getSize().x, img.getSize().y);
+        if(font_mgr.find("default") == font_mgr.end())
+            return false;
+        glbase::Image img;
+        if(!img.Load(basic_config.string_config["gui_texture"]))
+            return false;
+        gui_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
         tex_size = v2i{gui_texture.GetWidth(), gui_texture.GetHeight()};
         glGenBuffers(1, &index_buffer);
         std::vector<unsigned short> index;
@@ -880,6 +887,7 @@ namespace sgui
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 1024 * 4 * 6, &index[0], GL_STATIC_DRAW);
+        return true;
     }
     
     void SGGUIRoot::Unload() {
@@ -1066,11 +1074,11 @@ namespace sgui
             ptr->color = iter1->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = window_config.int_config.find("font_size");
-        if(iter2 != window_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = window_config.string_config.find("font_name");
+        if(iter2 != window_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         glGenBuffers(1, &ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 36, nullptr, GL_DYNAMIC_DRAW);
@@ -1242,8 +1250,8 @@ namespace sgui
         DrawText();
     }
     
-    void SGLabel::SetFont(sf::Font* ft, unsigned int sz) {
-        SGTextBase::SetFont(ft, sz);
+    void SGLabel::SetFont(glbase::Font* ft) {
+        SGTextBase::SetFont(ft);
         PostResize(true, false);
     }
     
@@ -1286,11 +1294,11 @@ namespace sgui
         ptr->parent = p;
         ptr->position = pos;
         ptr->max_width = mw;
-        auto iter2 = label_config.int_config.find("font_size");
-        if(iter2 != label_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = label_config.string_config.find("font_name");
+        if(iter2 != label_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->SetText(t, guiRoot.GetDefaultInt("font_color"));
         ptr->PostResize(false, true);
         if(p != nullptr)
@@ -1309,7 +1317,7 @@ namespace sgui
     void SGIconLabel::EvaluateSize(const std::wstring& t) {
         if(t.length() == 0) {
             text_width = 0;
-            text_height = font_size;
+            text_height = font->GetFontSize();
             text_width_cur = 0;
             text_pos_array.clear();
             if(text.length() == 0)
@@ -1321,6 +1329,7 @@ namespace sgui
             int ls = GetLineSpacing();
             int ils = (ls > (int)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
             bool has_icon = false;
+            int font_size = font->GetFontSize();
             for(auto ch : t) {
                 if(ch < L' ') {
                     text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
@@ -1343,7 +1352,7 @@ namespace sgui
                     has_icon = true;
                     text_width_cur += iconoffset.width + spacing_x;
                 } else {
-                    auto& gl = font->getGlyph(ch, font_size, false);
+                    auto& gl = font->GetGlyph(ch);
                     if(text_width_cur + gl.advance > max_width) {
                         if(text_width_cur > text_width)
                             text_width = text_width_cur;
@@ -1361,11 +1370,6 @@ namespace sgui
     void SGIconLabel::UpdateTextVertex() {
         if(font == nullptr)
             return;
-        auto tex_size = font->getTexture(font_size).getSize();
-        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
-            text_update = true;
-            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
-        }
         if(!text_update)
             return;
         text_update = false;
@@ -1373,8 +1377,10 @@ namespace sgui
         icon_size = 0;
         if(text.length() == 0)
             return;
+        auto tex_size = font->GetTexture().GetSize();
         std::vector<glbase::VertexVCT> charvtx;
         std::vector<glbase::VertexVCT> iconvtx;
+        int font_size = font->GetFontSize();
         unsigned int advx = 0, advy = font_size;
         glbase::VertexVCT cur_char;
         unsigned int max_width = GetMaxWidth();
@@ -1412,7 +1418,7 @@ namespace sgui
                 advx += iconoffset.width + spacing_x;
                 icon_size++;
             } else {
-                auto& gl = font->getGlyph(ch, font_size, false);
+                auto& gl = font->GetGlyph(ch);
                 if(advx + gl.advance > max_width) {
                     advx = 0;
                     advy += has_icon ? ils : ls;
@@ -1480,7 +1486,7 @@ namespace sgui
             glDrawElements(GL_TRIANGLE_STRIP, icon_size * 6 - 2, GL_UNSIGNED_SHORT, 0);
         }
         if(vert_size) {
-            guiRoot.BindFontTexture(font_size);
+            guiRoot.BindTexture(&font->GetTexture());
             glBindBuffer(GL_ARRAY_BUFFER, tbo);
             glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
             glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
@@ -1494,11 +1500,11 @@ namespace sgui
         ptr->parent = p;
         ptr->position = pos;
         ptr->max_width = mw;
-        auto iter2 = iconlabel_config.int_config.find("font_size");
-        if(iter2 != iconlabel_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = iconlabel_config.string_config.find("font_name");
+        if(iter2 != iconlabel_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->SetText(t, guiRoot.GetDefaultInt("font_color"));
         ptr->PostResize(false, true);
         glGenBuffers(1, &ptr->vbo);
@@ -1644,11 +1650,11 @@ namespace sgui
             ptr->color = iter1->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = button_config.int_config.find("font_size");
-        if(iter2 != button_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = button_config.string_config.find("font_name");
+        if(iter2 != button_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->is_push = is_push;
         glGenBuffers(1, &ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo);
@@ -1798,8 +1804,8 @@ namespace sgui
         DrawText();
     }
     
-    void SGCheckbox::SetFont(sf::Font* ft, unsigned int sz) {
-        SGTextBase::SetFont(ft, sz);
+    void SGCheckbox::SetFont(glbase::Font* ft) {
+        SGTextBase::SetFont(ft);
         PostResize(true, false);
     }
     
@@ -1854,11 +1860,11 @@ namespace sgui
             ptr->color = iter1->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = checkbox_config.int_config.find("font_size");
-        if(iter2 != checkbox_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = checkbox_config.string_config.find("font_name");
+        if(iter2 != checkbox_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->SetText(t, guiRoot.GetDefaultInt("font_color"));
         glGenBuffers(1, &ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo);
@@ -2008,11 +2014,11 @@ namespace sgui
             ptr->color = iter1->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = checkbox_config.int_config.find("font_size");
-        if(iter2 != checkbox_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = checkbox_config.string_config.find("font_name");
+        if(iter2 != checkbox_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->SetText(t, guiRoot.GetDefaultInt("font_color"));
         ptr->next_group_member = ptr.get();
         glGenBuffers(1, &ptr->vbo);
@@ -2500,11 +2506,11 @@ namespace sgui
             ptr->color = iter->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = textedit_config.int_config.find("font_size");
-        if(iter2 != textedit_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = textedit_config.string_config.find("font_name");
+        if(iter2 != textedit_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         auto iter3 = textedit_config.int_config.find("font_color");
         if(iter3 != textedit_config.int_config.end())
             ptr->def_color = iter3->second;
@@ -2852,17 +2858,14 @@ namespace sgui
     void SGListBox::UpdateTextVertex() {
         if(font == nullptr)
             return;
-        auto tex_size = font->getTexture(font_size).getSize();
-        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
-            text_update = true;
-            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
-        }
         if(!text_update)
             return;
         text_update = false;
         vert_size = 0;
         if(items.size() == 0)
             return;
+        auto tex_size = font->GetTexture().GetSize();
+        int font_size = font->GetFontSize();
         std::vector<glbase::VertexVCT> charvtx;
         std::vector<glbase::VertexVCT> iconvtx;
         glbase::VertexVCT cur_char;
@@ -2878,7 +2881,7 @@ namespace sgui
             for(auto ch : std::get<1>(items[i])) {
                 if(ch < L' ')
                     continue;
-                auto& gl = font->getGlyph(ch, font_size, false);
+                auto& gl = font->GetGlyph(ch);
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top + advy, cur_char.vertex);
                 cur_char.color = color;
                 cur_char.texcoord.x = (float)gl.textureRect.left / tex_size.x;
@@ -3084,11 +3087,11 @@ namespace sgui
             ptr->color = iter->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = listbox_config.int_config.find("font_size");
-        if(iter2 != listbox_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = listbox_config.string_config.find("font_name");
+        if(iter2 != listbox_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->color1 = listbox_config.int_config["color1"];
         ptr->color2 = listbox_config.int_config["color2"];
         ptr->sel_color = listbox_config.int_config["sel_color"];
@@ -3160,11 +3163,11 @@ namespace sgui
                 ptr->color = iter->second;
             else
                 ptr->color = guiRoot.GetDefaultInt("gui_color");
-            auto iter2 = listbox_config.int_config.find("font_size");
-            if(iter2 != listbox_config.int_config.end())
-                ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+            auto iter2 = listbox_config.string_config.find("font_name");
+            if(iter2 != listbox_config.string_config.end())
+                ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
             else
-                ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+                ptr->SetFont(&guiRoot.GetGUIFont("default"));
             ptr->color1 = listbox_config.int_config["color1"];
             ptr->color2 = listbox_config.int_config["color2"];
             ptr->sel_color = listbox_config.int_config["sel_color"];
@@ -3371,11 +3374,11 @@ namespace sgui
             ptr->color = iter->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = combobox_config.int_config.find("font_size");
-        if(iter2 != combobox_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = combobox_config.string_config.find("font_name");
+        if(iter2 != combobox_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         glGenBuffers(1, &ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 40, nullptr, GL_DYNAMIC_DRAW);
@@ -3588,23 +3591,20 @@ namespace sgui
     void SGTabControl::UpdateTextVertex() {
         if(font == nullptr)
             return;
-        auto tex_size = font->getTexture(font_size).getSize();
-        if((int)tex_size.x != tex_check_size.x || (int)tex_size.y != tex_check_size.y) {
-            text_update = true;
-            tex_check_size = v2i{(int)tex_size.x, (int)tex_size.y};
-        }
         if(!text_update)
             return;
         if(children.size() == 0)
             return;
         text_update = false;
         vert_size = 0;
+        auto tex_size = font->GetTexture().GetSize();
         std::vector<glbase::VertexVCT> charvtx;
         std::vector<glbase::VertexVCT> iconvtx;
         glbase::VertexVCT cur_char;
         v2i text_pos = GetTextOffset();
         int tb = tab_config.int_config["tab_border"];
         int ti = tab_ol;
+        int font_size = font->GetFontSize();
         text_pos.y += font_size + tab_config.int_config["title_offset"];
         for(size_t i = 0; i < children.size(); ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
@@ -3615,7 +3615,7 @@ namespace sgui
             for(auto ch : ptr->title) {
                 if(ch < L' ')
                     continue;
-                auto& gl = font->getGlyph(ch, font_size, false);
+                auto& gl = font->GetGlyph(ch);
                 if(tw + gl.advance > ptr->width)
                     break;
                 tw += gl.advance + spacing_x;
@@ -3625,7 +3625,7 @@ namespace sgui
             for(auto ch : ptr->title) {
                 if(ch < L' ')
                     continue;
-                auto& gl = font->getGlyph(ch, font_size, false);
+                auto& gl = font->GetGlyph(ch);
                 if(tw + gl.advance > ptr->width)
                     break;
                 guiRoot.ConvertXY(text_pos.x + gl.bounds.left + advx, text_pos.y + gl.bounds.top, cur_char.vertex);
@@ -3858,11 +3858,11 @@ namespace sgui
             ptr->color = iter->second;
         else
             ptr->color = guiRoot.GetDefaultInt("gui_color");
-        auto iter2 = tab_config.int_config.find("font_size");
-        if(iter2 != tab_config.int_config.end())
-            ptr->SetFont(&guiRoot.GetGUIFont(), iter2->second);
+        auto iter2 = tab_config.string_config.find("font_name");
+        if(iter2 != tab_config.string_config.end())
+            ptr->SetFont(&guiRoot.GetGUIFont(iter2->second));
         else
-            ptr->SetFont(&guiRoot.GetGUIFont(), guiRoot.GetDefaultInt("font_size"));
+            ptr->SetFont(&guiRoot.GetGUIFont("default"));
         ptr->tab_height = tab_config.int_config["tab_height"];
         ptr->tab_ol = tab_config.int_config["tab_offsetl"];
         ptr->tab_or = tab_config.int_config["tab_offsetr"];

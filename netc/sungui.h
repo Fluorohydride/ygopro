@@ -15,7 +15,7 @@
 
 namespace sgui
 {
-    
+
     // ===== Delegate Implement =====
     // OT: Object Type
     // ST: Sender Type
@@ -246,7 +246,7 @@ namespace sgui
     public:
         SGTextBase();
         virtual ~SGTextBase();
-        virtual void SetFont(sf::Font* ft, unsigned int sz);
+        virtual void SetFont(glbase::Font* ft);
         virtual void SetSpacing(unsigned int x, unsigned int y);
         virtual int GetLineSpacing();
         virtual v2i GetTextOffset() = 0;
@@ -266,9 +266,7 @@ namespace sgui
         bool text_update = true;
         unsigned short mem_size = 0;
         unsigned int tbo = 0;
-        sf::Font* font = nullptr;
-        v2i tex_check_size = {0, 0};
-        unsigned int font_size = 0;
+        glbase::Font* font = nullptr;
         unsigned int spacing_x = 1;
         unsigned int spacing_y = 1;
         unsigned int vert_size = 0;
@@ -400,12 +398,6 @@ namespace sgui
             }
         }
         
-        void BindFontTexture(unsigned int sz) {
-            auto& tex = gui_font.getTexture(sz);
-            sf::Texture::bind(&tex);
-            cur_texture = nullptr;
-        }
-        
         void BindTexture(glbase::Texture* t = nullptr) {
             if(t != cur_texture) {
                 t->Bind();
@@ -426,10 +418,10 @@ namespace sgui
         void SetClickingObject(std::shared_ptr<SGWidget> ptr) { clicking_object = ptr; }
         std::shared_ptr<SGWidget> GetClickObject() { return clicking_object.lock(); }
         void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_objects.push_back(ptr); }
-        void LoadConfigs();
+        bool LoadConfigs();
         void Unload();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
-        sf::Font& GetGUIFont() { return gui_font; }
+        glbase::Font& GetGUIFont(const std::string& name) { return font_mgr[name]; }
         glbase::Texture& GetGUITexture() { return gui_texture; }
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
@@ -454,13 +446,13 @@ namespace sgui
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
         std::list<std::weak_ptr<SGWidget>> popup_objects;
-        sf::Font gui_font;
         glbase::Texture gui_texture;
         glbase::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<recti> scissor_stack;
         sf::Clock gui_clock;
         unsigned int index_buffer = 0;
+        std::unordered_map<std::string, glbase::Font> font_mgr;
         
     public:
         static SGConfig basic_config;
@@ -511,7 +503,7 @@ namespace sgui
         virtual std::shared_ptr<SGWidget> GetDragingTarget() { return parent.lock(); }
         virtual void UpdateVertices();
         virtual void Draw();
-        virtual void SetFont(sf::Font* ft, unsigned int sz);
+        virtual void SetFont(glbase::Font* ft);
         virtual void SetSpacing(unsigned int x, unsigned int y);
         virtual v2i GetTextOffset();
         virtual int GetMaxWidth();
@@ -595,7 +587,7 @@ namespace sgui
         virtual void PostResize(bool res, bool rep);
         virtual void UpdateVertices();
         virtual void Draw();
-        virtual void SetFont(sf::Font* ft, unsigned int sz);
+        virtual void SetFont(glbase::Font* ft);
         virtual void SetSpacing(unsigned int x, unsigned int y);
         virtual v2i GetTextOffset();
         virtual int GetMaxWidth();
@@ -753,7 +745,7 @@ namespace sgui
         const std::tuple<unsigned short, std::wstring, unsigned int, int>& GetItem(unsigned int index);
         void SetSelection(int sel);
         int GetSeletion();
-        int GetItemCount() { return items.size(); }
+        int GetItemCount() { return (int)items.size(); }
         int GetHoverItem(int offsetx, int offsety);
         
         SGEventHandler<SGWidget, int> eventSelChange;
