@@ -36,6 +36,7 @@ function c78184733.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
 			tc:RegisterEffect(e1)
+			tc=g:GetNext()
 		end
 	end
 end

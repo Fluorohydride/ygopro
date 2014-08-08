@@ -55,7 +55,7 @@ function c27062594.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	repeat
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local sg=g:Select(tp,1,1,nil)
-		g:Remove(Card.IsCode,nil,sg:GetFirst())
+		g:Remove(Card.IsCode,nil,sg:GetFirst():GetCode())
 		rg:Merge(sg)
 	until g:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(27062594,1))
 	local ct=Duel.Remove(rg,POS_FACEUP,REASON_COST)

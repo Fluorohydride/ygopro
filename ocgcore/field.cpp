@@ -146,6 +146,7 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	if ((pcard->data.type & TYPE_PENDULUM) && (location == LOCATION_GRAVE)
+	        && !pcard->is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && is_player_can_send_to_deck(playerid, pcard)
 	        && (((pcard->previous.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
 	        || ((pcard->previous.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
 		location = LOCATION_EXTRA;
@@ -1719,7 +1720,7 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 min, int32 max,
 				core.xmaterial_lst.insert(std::make_pair(0, *cit));
 		}
 	} else {
-		pduel->game_field->get_xyz_material(scard, findex, max);
+		get_xyz_material(scard, findex, max);
 	}
 	return core.xmaterial_lst.size() >= min;
 }
