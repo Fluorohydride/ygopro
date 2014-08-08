@@ -4,18 +4,43 @@
 #include <string>
 #include <memory>
 #include <vector>
+#include <array>
 #include <list>
-#include <set>
 #include <unordered_map>
 #include <functional>
 
 #include "glbase.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
+#include <GLFW/glfw3.h>
 
 namespace sgui
 {
 
+    struct MouseMoveEvent {
+        int x;
+        int y;
+    };
+    
+    struct MouseButtonEvent {
+        int button;
+        int mods;
+        int x;
+        int y;
+    };
+    
+    struct MouseWheelEvent {
+        float deltax;
+        float deltay;
+    };
+    
+    struct KeyEvent {
+        int key;
+        int mods;
+    };
+    
+    struct TextEvent {
+        unsigned int unichar;
+    };
+    
     // ===== Delegate Implement =====
     // OT: Object Type
     // ST: Sender Type
@@ -190,15 +215,15 @@ namespace sgui
         void SetCustomObject(void* v) { cobject = v; }
         void* GetCustomObject() const { return cobject; }
         
-        SGEventHandler<SGWidget, sf::Event::MouseMoveEvent> eventMouseMove;
+        SGEventHandler<SGWidget, MouseMoveEvent> eventMouseMove;
         SGEventHandler<SGWidget> eventMouseEnter;
         SGEventHandler<SGWidget> eventMouseLeave;
-        SGEventHandler<SGWidget, sf::Event::MouseButtonEvent> eventMouseButtonDown;
-        SGEventHandler<SGWidget, sf::Event::MouseButtonEvent> eventMouseButtonUp;
-        SGEventHandler<SGWidget, sf::Event::MouseWheelEvent> eventMouseWheel;
-        SGEventHandler<SGWidget, sf::Event::KeyEvent> eventKeyDown;
-        SGEventHandler<SGWidget, sf::Event::KeyEvent> eventKeyUp;
-        SGEventHandler<SGWidget, sf::Event::TextEvent> eventCharEnter;
+        SGEventHandler<SGWidget, MouseButtonEvent> eventMouseButtonDown;
+        SGEventHandler<SGWidget, MouseButtonEvent> eventMouseButtonUp;
+        SGEventHandler<SGWidget, MouseWheelEvent> eventMouseWheel;
+        SGEventHandler<SGWidget, KeyEvent> eventKeyDown;
+        SGEventHandler<SGWidget, KeyEvent> eventKeyUp;
+        SGEventHandler<SGWidget, TextEvent> eventCharEnter;
         SGEventHandler<SGWidget> eventGetFocus;
         SGEventHandler<SGWidget> eventLostFocus;
         
@@ -209,15 +234,15 @@ namespace sgui
         SGEventHandler<SGWidget> eventDestroying;
         
     public:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseMove(MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
-        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
-        virtual bool EventKeyUp(sf::Event::KeyEvent evt);
-        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
+        virtual bool EventMouseWheel(MouseWheelEvent evt);
+        virtual bool EventKeyDown(KeyEvent evt);
+        virtual bool EventKeyUp(KeyEvent evt);
+        virtual bool EventCharEnter(TextEvent evt);
         virtual bool EventGetFocus();
         virtual bool EventLostFocus();
         
@@ -318,15 +343,15 @@ namespace sgui
         virtual void SetFocusWidget(std::shared_ptr<SGWidget> chd);
         
     public:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseMove(MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
-        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
-        virtual bool EventKeyUp(sf::Event::KeyEvent evt);
-        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
+        virtual bool EventMouseWheel(MouseWheelEvent evt);
+        virtual bool EventKeyDown(KeyEvent evt);
+        virtual bool EventKeyUp(KeyEvent evt);
+        virtual bool EventCharEnter(TextEvent evt);
         virtual bool EventLostFocus();
         
     protected:
@@ -343,15 +368,15 @@ namespace sgui
     
     class SGWidgetWrapper : public SGWidgetContainer {
     public:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseMove(MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
-        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
-        virtual bool EventKeyUp(sf::Event::KeyEvent evt);
-        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
+        virtual bool EventMouseWheel(MouseWheelEvent evt);
+        virtual bool EventKeyDown(KeyEvent evt);
+        virtual bool EventKeyUp(KeyEvent evt);
+        virtual bool EventCharEnter(TextEvent evt);
         virtual bool EventLostFocus();
     };
     
@@ -413,8 +438,8 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual void Destroy() {}
-        void ObjectDragingBegin(std::shared_ptr<SGWidget> d, sf::Event::MouseMoveEvent evt);
-        void ObjectDragingEnd(sf::Event::MouseMoveEvent evt);
+        void ObjectDragingBegin(std::shared_ptr<SGWidget> d, MouseMoveEvent evt);
+        void ObjectDragingEnd(MouseMoveEvent evt);
         void SetClickingObject(std::shared_ptr<SGWidget> ptr) { clicking_object = ptr; }
         std::shared_ptr<SGWidget> GetClickObject() { return clicking_object.lock(); }
         void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_objects.push_back(ptr); }
@@ -425,17 +450,17 @@ namespace sgui
         glbase::Texture& GetGUITexture() { return gui_texture; }
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
-        sf::Time GetTime() { return gui_clock.getElapsedTime(); }
+        float GetTime();
         
-        bool InjectMouseMoveEvent(sf::Event::MouseMoveEvent evt);
+        bool InjectMouseMoveEvent(MouseMoveEvent evt);
         bool InjectMouseEnterEvent();
         bool InjectMouseLeaveEvent();
-        bool InjectMouseButtonDownEvent(sf::Event::MouseButtonEvent evt);
-        bool InjectMouseButtonUpEvent(sf::Event::MouseButtonEvent evt);
-        bool InjectMouseWheelEvent(sf::Event::MouseWheelEvent evt);
-        bool InjectKeyDownEvent(sf::Event::KeyEvent evt);
-        bool InjectKeyUpEvent(sf::Event::KeyEvent evt);
-        bool InjectCharEvent(sf::Event::TextEvent evt);
+        bool InjectMouseButtonDownEvent(MouseButtonEvent evt);
+        bool InjectMouseButtonUpEvent(MouseButtonEvent evt);
+        bool InjectMouseWheelEvent(MouseWheelEvent evt);
+        bool InjectKeyDownEvent(KeyEvent evt);
+        bool InjectKeyUpEvent(KeyEvent evt);
+        bool InjectCharEvent(TextEvent evt);
         
         static SGGUIRoot& GetSingleton();
         
@@ -450,7 +475,7 @@ namespace sgui
         glbase::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<recti> scissor_stack;
-        sf::Clock gui_clock;
+        unsigned long long start_time = 0;
         unsigned int index_buffer = 0;
         std::unordered_map<std::string, glbase::Font> font_mgr;
         
@@ -566,8 +591,8 @@ namespace sgui
     protected:
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
         
         bool is_push = false;
         unsigned int state = 0;
@@ -603,8 +628,8 @@ namespace sgui
     protected:
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
         
         unsigned int state = 0;
         bool checked = false;
@@ -624,7 +649,7 @@ namespace sgui
         std::shared_ptr<SGRadio> GetCheckedTarget();
         
     protected:
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
         SGRadio* next_group_member;
         
     public:
@@ -646,10 +671,10 @@ namespace sgui
         SGEventHandler<SGWidget, float> eventValueChange;
         
     protected:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseMove(MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
+        virtual bool EventMouseWheel(MouseWheelEvent evt);
         virtual bool DragingBegin(v2i evt);
         virtual bool DragingUpdate(v2i evt);
         virtual bool DragingEnd(v2i evt);
@@ -695,8 +720,8 @@ namespace sgui
 
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
-        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventKeyDown(KeyEvent evt);
+        virtual bool EventCharEnter(TextEvent evt);
         virtual bool EventGetFocus();
         virtual bool EventLostFocus();
         virtual bool DragingBegin(v2i evt);
@@ -755,8 +780,8 @@ namespace sgui
         
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseWheel(MouseWheelEvent evt);
         bool ScrollBarChange(SGWidget& sender, float value);
         
         bool is_hoving = false;
@@ -803,7 +828,7 @@ namespace sgui
     protected:
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
         
         bool show_item = false;
         bool is_hoving = false;
@@ -838,15 +863,15 @@ namespace sgui
         int GetActiveTab();
         
     protected:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt);
+        virtual bool EventMouseMove(MouseMoveEvent evt);
         virtual bool EventMouseEnter();
         virtual bool EventMouseLeave();
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseButtonUp(sf::Event::MouseButtonEvent evt);
-        virtual bool EventMouseWheel(sf::Event::MouseWheelEvent evt);
-        virtual bool EventKeyDown(sf::Event::KeyEvent evt);
-        virtual bool EventKeyUp(sf::Event::KeyEvent evt);
-        virtual bool EventCharEnter(sf::Event::TextEvent evt);
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt);
+        virtual bool EventMouseButtonUp(MouseButtonEvent evt);
+        virtual bool EventMouseWheel(MouseWheelEvent evt);
+        virtual bool EventKeyDown(KeyEvent evt);
+        virtual bool EventKeyUp(KeyEvent evt);
+        virtual bool EventCharEnter(TextEvent evt);
         
         int GetHovingTab(v2i pos);
         

@@ -12,15 +12,18 @@
 using namespace ygopro;
 
 int main(int argc, char* argv[]) {
+    if(!glfwInit())
+        return 0;
     if(!commonCfg.LoadConfig(L"common.xml"))
         return 0;
-
     int width = commonCfg[L"window_width"];
     int height = commonCfg[L"window_height"];
-    sf::RenderWindow window(sf::VideoMode(width, height), "Ygopro", sf::Style::Default, sf::ContextSettings(32));
-    if((int)commonCfg[L"vertical_sync"])
-        window.setVerticalSyncEnabled(true);
-    window.setActive();
+    GLFWwindow* window = glfwCreateWindow(width, height, "Ygopro", nullptr, nullptr);
+    if (!window) {
+        glfwTerminate();
+        return 0;
+    }
+    glfwMakeContextCurrent(window);;
     glewInit();
     
     imageMgr.InitTextures();
@@ -48,83 +51,71 @@ int main(int argc, char* argv[]) {
     sceneMgr.SetScene(std::static_pointer_cast<Scene>(sc));
     sc->LoadDeckFromFile(L"./deck/807.ydk");
     
-    bool running = true;
-    sf::Clock clock;
-    float tm1 = clock.getElapsedTime().asSeconds() - 5.0f;
-    int fps = 0;
-    while (running) {
-        fps++;
-        sf::Event evt;
-        float tm2 = clock.getElapsedTime().asSeconds();
-        if(tm2 - tm1 >= 5.0f) {
-            std::cout << "Average fps in 5s : " << fps / 5.0f << std::endl;
-            tm1 += 5.0f;
-            fps = 0;
+
+    glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
+        if(action == GLFW_PRESS) {
+            if(key == GLFW_KEY_R && (mods & GLFW_MOD_ALT)) {
+//                auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+//                auto tm = std::localtime(&t);
+//                char buf[256];
+//                sprintf(buf, "./screenshot/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon, tm->tm_mday, t);
+//                window.capture().saveToFile(buf);
+            }
+            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent({key, mods}))
+                sceneMgr.KeyDown({key, mods});
+        } else if(action == GLFW_RELEASE) {
+            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent({key, mods}))
+                sceneMgr.KeyUp({key, mods});
         }
+    });
+    glfwSetCharCallback(window, [](GLFWwindow* wnd, unsigned int unichar) {
+        sgui::SGGUIRoot::GetSingleton().InjectCharEvent({unichar});
+    });
+    glfwSetWindowSizeCallback(window, [](GLFWwindow* wnd, int width, int height) {
+        sceneMgr.SetSceneSize(v2i{width, height});
+        sgui::SGGUIRoot::GetSingleton().SetSceneSize(v2i{width, height});
+    });
+    glfwSetCursorEnterCallback(window, [](GLFWwindow* wnd, int enter) {
+        if(enter == GL_TRUE)
+            sgui::SGGUIRoot::GetSingleton().InjectMouseEnterEvent();
+        else
+            sgui::SGGUIRoot::GetSingleton().InjectMouseLeaveEvent();
+    });
+    glfwSetCursorPosCallback(window, [](GLFWwindow* wnd, double xpos, double ypos) {
+        sceneMgr.SetMousePosition({(int)xpos, (int)ypos});
+        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent({(int)xpos, (int)ypos}))
+            sceneMgr.MouseMove({(int)xpos, (int)ypos});
+    });
+    glfwSetMouseButtonCallback(window, [](GLFWwindow* wnd, int button, int action, int mods) {
+        double x, y;
+        glfwGetCursorPos(wnd, &x, &y);
+        if(action == GLFW_PRESS) {
+            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent({button, mods, (int)x, (int)y}))
+                sceneMgr.MouseButtonDown({button, mods, (int)x, (int)y});
+        } else {
+            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent({button, mods, (int)x, (int)y}))
+                sceneMgr.MouseButtonUp({button, mods, (int)x, (int)y});
+        }
+    });
+    glfwSetScrollCallback(window, [](GLFWwindow* wnd, double xoffset, double yoffset) {
+        sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent({(float)xoffset, (float)yoffset});
+    });
+    while (!glfwWindowShouldClose(window)) {
         sceneMgr.CheckFrameRate();
         sceneMgr.InitDraw();
-        while (window.pollEvent(evt)) {
-            switch(evt.type) {
-                case sf::Event::Closed:
-                    running = false;
-                    break;
-                case sf::Event::Resized:
-                    sceneMgr.SetSceneSize(v2i{(int)evt.size.width, (int)evt.size.height});
-                    sgui::SGGUIRoot::GetSingleton().SetSceneSize(v2i{(int)evt.size.width, (int)evt.size.height});
-                    break;
-                case sf::Event::TextEntered:
-                    sgui::SGGUIRoot::GetSingleton().InjectCharEvent(evt.text);
-                    break;
-                case sf::Event::KeyPressed:
-                    if(evt.key.code == sf::Keyboard::Dash && evt.key.alt) {
-                        auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-                        auto tm = std::localtime(&t);
-                        char buf[256];
-                        sprintf(buf, "./screenshot/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon, tm->tm_mday, t);
-                        window.capture().saveToFile(buf);
-                    }
-                    if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(evt.key))
-                        sceneMgr.KeyDown(evt.key);
-                    break;
-                case sf::Event::KeyReleased:
-                    if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(evt.key))
-                        sceneMgr.KeyUp(evt.key);
-                    break;
-                case sf::Event::MouseButtonPressed:
-                    if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent(evt.mouseButton))
-                        sceneMgr.MouseButtonDown(evt.mouseButton);
-                    break;
-                case sf::Event::MouseButtonReleased:
-                    if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent(evt.mouseButton))
-                        sceneMgr.MouseButtonUp(evt.mouseButton);
-                    break;
-                case sf::Event::MouseMoved:
-                    sceneMgr.SetMousePosition({evt.mouseMove.x, evt.mouseMove.y});
-                    if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent(evt.mouseMove))
-                        sceneMgr.MouseMove(evt.mouseMove);
-                    break;
-                case sf::Event::MouseEntered:
-                    sgui::SGGUIRoot::GetSingleton().InjectMouseEnterEvent();
-                    break;
-                case sf::Event::MouseLeft:
-                    sgui::SGGUIRoot::GetSingleton().InjectMouseLeaveEvent();
-                    break;
-                case sf::Event::MouseWheelMoved:
-                    sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent(evt.mouseWheel);
-                    break;
-                default:
-                    break;
-            }
-        }
+        glfwPollEvents();
         sceneMgr.Update();
         sceneMgr.Draw();
         sgui::SGGUIRoot::GetSingleton().Draw();
 
-        window.display();
+        glfwSwapBuffers(window);
     }
     
     sceneMgr.Uninit();
     sgui::SGGUIRoot::GetSingleton().Unload();
     imageMgr.UninitTextures();
+    
+    glfwDestroyWindow(window);
+    glfwTerminate();
     return 0;
 }

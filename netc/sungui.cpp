@@ -1,6 +1,4 @@
-#include <array>
-#include <iostream>
-#include <regex>
+#include <chrono>
 
 #include <wx/xml/xml.h>
 #include <wx/clipbrd.h>
@@ -113,7 +111,7 @@ namespace sgui
         return visible;
     }
     
-    bool SGWidget::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+    bool SGWidget::EventMouseMove(MouseMoveEvent evt) {
         return eventMouseMove.TriggerEvent(*this, evt);
     }
     
@@ -125,31 +123,31 @@ namespace sgui
         return eventMouseLeave.TriggerEvent(*this);
     }
     
-    bool SGWidget::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    bool SGWidget::EventMouseButtonDown(MouseButtonEvent evt) {
         auto dr = GetDragingTarget();
-        if(dr && (evt.button == sf::Mouse::Button::Left)) {
-            guiRoot.ObjectDragingBegin(dr, sf::Event::MouseMoveEvent{evt.x, evt.y});
+        if(dr && (evt.button == GLFW_MOUSE_BUTTON_LEFT)) {
+            guiRoot.ObjectDragingBegin(dr, MouseMoveEvent{evt.x, evt.y});
         }
         return eventMouseButtonDown.TriggerEvent(*this, evt);
     }
     
-    bool SGWidget::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGWidget::EventMouseButtonUp(MouseButtonEvent evt) {
         return eventMouseButtonUp.TriggerEvent(*this, evt);
     }
     
-    bool SGWidget::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+    bool SGWidget::EventMouseWheel(MouseWheelEvent evt) {
         return eventMouseWheel.TriggerEvent(*this, evt);
     }
     
-    bool SGWidget::EventKeyDown(sf::Event::KeyEvent evt) {
+    bool SGWidget::EventKeyDown(KeyEvent evt) {
         return eventKeyDown.TriggerEvent(*this, evt);
     }
     
-    bool SGWidget::EventKeyUp(sf::Event::KeyEvent evt) {
+    bool SGWidget::EventKeyUp(KeyEvent evt) {
         return eventKeyUp.TriggerEvent(*this, evt);
     }
     
-    bool SGWidget::EventCharEnter(sf::Event::TextEvent evt) {
+    bool SGWidget::EventCharEnter(TextEvent evt) {
         return eventCharEnter.TriggerEvent(*this, evt);
     }
     
@@ -462,7 +460,7 @@ namespace sgui
             return;
         long voffset = 0;
         if(texcoords.size() > 1)
-            voffset = ((int)(guiRoot.GetTime().asSeconds() / frame_time) % texcoords.size() * verts.size()) * sizeof(glbase::VertexVCT);
+            voffset = ((int)(guiRoot.GetTime() / frame_time) % texcoords.size() * verts.size()) * sizeof(glbase::VertexVCT);
         guiRoot.BindTexture(img_texture);
         glBindBuffer(GL_ARRAY_BUFFER, imgbo);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
@@ -540,7 +538,7 @@ namespace sgui
         }
     }
     
-    bool SGWidgetContainer::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+    bool SGWidgetContainer::EventMouseMove(MouseMoveEvent evt) {
         auto nhoving = GetHovingWidget(v2i{evt.x, evt.y});
         bool e = eventMouseMove.TriggerEvent(static_cast<SGWidget&>(*this), evt);
         auto choving = hoving.lock();
@@ -578,7 +576,7 @@ namespace sgui
         return evt;
     }
     
-    bool SGWidgetContainer::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    bool SGWidgetContainer::EventMouseButtonDown(MouseButtonEvent evt) {
         auto choving = hoving.lock();
         bool e = eventMouseButtonDown.TriggerEvent(*this, evt);
         if(choving) {
@@ -592,41 +590,41 @@ namespace sgui
             return choving->EventMouseButtonDown(evt) || e;
         } else {
             auto dr = GetDragingTarget();
-            if(dr && (evt.button == sf::Mouse::Button::Left))
-                guiRoot.ObjectDragingBegin(dr, sf::Event::MouseMoveEvent{evt.x, evt.y});
+            if(dr && (evt.button == GLFW_MOUSE_BUTTON_LEFT))
+                guiRoot.ObjectDragingBegin(dr, MouseMoveEvent{evt.x, evt.y});
             return e;
         }
     }
     
-    bool SGWidgetContainer::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGWidgetContainer::EventMouseButtonUp(MouseButtonEvent evt) {
         bool e = eventMouseButtonUp.TriggerEvent(*this, evt);
         if(!hoving.expired())
             return hoving.lock()->EventMouseButtonUp(evt) || e;
         return e;
     }
     
-    bool SGWidgetContainer::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+    bool SGWidgetContainer::EventMouseWheel(MouseWheelEvent evt) {
         bool e = eventMouseWheel.TriggerEvent(*this, evt);
         if(!hoving.expired())
             return hoving.lock()->EventMouseWheel(evt) || e;
         return e;
     }
     
-    bool SGWidgetContainer::EventKeyDown(sf::Event::KeyEvent evt) {
+    bool SGWidgetContainer::EventKeyDown(KeyEvent evt) {
         bool e = eventKeyDown.TriggerEvent(*this, evt);
         if(!focus_widget.expired())
             return focus_widget.lock()->EventKeyDown(evt) || e;
         return e;
     }
     
-    bool SGWidgetContainer::EventKeyUp(sf::Event::KeyEvent evt) {
+    bool SGWidgetContainer::EventKeyUp(KeyEvent evt) {
         bool e = eventKeyUp.TriggerEvent(*this, evt);
         if(!focus_widget.expired())
             return focus_widget.lock()->EventKeyUp(evt) || e;
         return e;
     }
     
-    bool SGWidgetContainer::EventCharEnter(sf::Event::TextEvent evt) {
+    bool SGWidgetContainer::EventCharEnter(TextEvent evt) {
         bool e = eventCharEnter.TriggerEvent(*this, evt);
         if(!focus_widget.expired())
             return focus_widget.lock()->EventCharEnter(evt) || e;
@@ -641,7 +639,7 @@ namespace sgui
         return e;
     }
     
-    bool SGWidgetWrapper::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+    bool SGWidgetWrapper::EventMouseMove(MouseMoveEvent evt) {
         SGWidgetContainer::EventMouseMove(evt);
         return true;
     }
@@ -656,32 +654,32 @@ namespace sgui
         return true;
     }
     
-    bool SGWidgetWrapper::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    bool SGWidgetWrapper::EventMouseButtonDown(MouseButtonEvent evt) {
         SGWidgetContainer::EventMouseButtonDown(evt);
         return true;
     }
     
-    bool SGWidgetWrapper::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGWidgetWrapper::EventMouseButtonUp(MouseButtonEvent evt) {
         SGWidgetContainer::EventMouseButtonUp(evt);
         return true;
     }
     
-    bool SGWidgetWrapper::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+    bool SGWidgetWrapper::EventMouseWheel(MouseWheelEvent evt) {
         SGWidgetContainer::EventMouseWheel(evt);
         return true;
     }
     
-    bool SGWidgetWrapper::EventKeyDown(sf::Event::KeyEvent evt) {
+    bool SGWidgetWrapper::EventKeyDown(KeyEvent evt) {
         SGWidgetContainer::EventKeyDown(evt);
         return true;
     }
     
-    bool SGWidgetWrapper::EventKeyUp(sf::Event::KeyEvent evt) {
+    bool SGWidgetWrapper::EventKeyUp(KeyEvent evt) {
         SGWidgetContainer::EventKeyUp(evt);
         return true;
     }
     
-    bool SGWidgetWrapper::EventCharEnter(sf::Event::TextEvent evt) {
+    bool SGWidgetWrapper::EventCharEnter(TextEvent evt) {
         SGWidgetContainer::EventCharEnter(evt);
         return true;
     }
@@ -783,7 +781,7 @@ namespace sgui
         glPopAttrib();
     }
     
-    void SGGUIRoot::ObjectDragingBegin(std::shared_ptr<SGWidget> dr, sf::Event::MouseMoveEvent evt) {
+    void SGGUIRoot::ObjectDragingBegin(std::shared_ptr<SGWidget> dr, MouseMoveEvent evt) {
         if(!draging_object.expired())
             draging_object.lock()->DragingEnd(v2i{evt.x, evt.y});
         draging_object = dr;
@@ -791,7 +789,7 @@ namespace sgui
             dr->DragingBegin(v2i{evt.x, evt.y});
     }
     
-    void SGGUIRoot::ObjectDragingEnd(sf::Event::MouseMoveEvent evt) {
+    void SGGUIRoot::ObjectDragingEnd(MouseMoveEvent evt) {
         if(!draging_object.expired())
             draging_object.lock()->DragingEnd(v2i{evt.x, evt.y});
         draging_object.reset();
@@ -814,7 +812,7 @@ namespace sgui
         
         wxXmlDocument doc;
 		if(!doc.Load("./conf/gui.xml", wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			false;
+			return false;
 		wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* subtype = root->GetChildren();
 		while (subtype) {
@@ -887,6 +885,7 @@ namespace sgui
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 1024 * 4 * 6, &index[0], GL_STATIC_DRAW);
+        start_time = std::chrono::system_clock::now().time_since_epoch().count();
         return true;
     }
     
@@ -895,6 +894,11 @@ namespace sgui
         if(index_buffer)
             glDeleteBuffers(1, &index_buffer);
         index_buffer = 0;
+    }
+    
+    float SGGUIRoot::GetTime() {
+        unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
+        return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
     }
     
     bool SGGUIRoot::InjectMouseEnterEvent() {
@@ -907,7 +911,7 @@ namespace sgui
         return EventMouseLeave();
     }
     
-    bool SGGUIRoot::InjectMouseMoveEvent(sf::Event::MouseMoveEvent evt) {
+    bool SGGUIRoot::InjectMouseMoveEvent(MouseMoveEvent evt) {
         if(!inside_scene)
             return InjectMouseEnterEvent();
         if(!draging_object.expired())
@@ -915,10 +919,10 @@ namespace sgui
         return EventMouseMove(evt);
     }
     
-    bool SGGUIRoot::InjectMouseButtonDownEvent(sf::Event::MouseButtonEvent evt) {
+    bool SGGUIRoot::InjectMouseButtonDownEvent(MouseButtonEvent evt) {
         if(!inside_scene) {
             InjectMouseEnterEvent();
-            InjectMouseMoveEvent(sf::Event::MouseMoveEvent{evt.x, evt.y});
+            InjectMouseMoveEvent(MouseMoveEvent{evt.x, evt.y});
         }
         if(!hoving.expired()) {
             auto hwidget = hoving.lock();
@@ -954,27 +958,27 @@ namespace sgui
         return EventMouseButtonDown(evt);
     }
     
-    bool SGGUIRoot::InjectMouseButtonUpEvent(sf::Event::MouseButtonEvent evt) {
-        if(!draging_object.expired() && (evt.button == sf::Mouse::Button::Left))
+    bool SGGUIRoot::InjectMouseButtonUpEvent(MouseButtonEvent evt) {
+        if(!draging_object.expired() && (evt.button == GLFW_MOUSE_BUTTON_LEFT))
             draging_object.lock()->DragingEnd(v2i{evt.x, evt.y});
         draging_object.reset();
         clicking_object.reset();
         return EventMouseButtonUp(evt);
     }
     
-    bool SGGUIRoot::InjectMouseWheelEvent(sf::Event::MouseWheelEvent evt) {
+    bool SGGUIRoot::InjectMouseWheelEvent(MouseWheelEvent evt) {
         return EventMouseWheel(evt);
     }
     
-    bool SGGUIRoot::InjectKeyDownEvent(sf::Event::KeyEvent evt) {
+    bool SGGUIRoot::InjectKeyDownEvent(KeyEvent evt) {
         return EventKeyDown(evt);
     }
     
-    bool SGGUIRoot::InjectKeyUpEvent(sf::Event::KeyEvent evt) {
+    bool SGGUIRoot::InjectKeyUpEvent(KeyEvent evt) {
         return EventKeyUp(evt);
     }
     
-    bool SGGUIRoot::InjectCharEvent(sf::Event::TextEvent evt) {
+    bool SGGUIRoot::InjectCharEvent(TextEvent evt) {
         return EventCharEnter(evt);
     }
     
@@ -1701,8 +1705,8 @@ namespace sgui
         return SGWidget::EventMouseLeave();
     }
     
-    bool SGButton::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
-        if(evt.button == sf::Mouse::Left) {
+    bool SGButton::EventMouseButtonDown(MouseButtonEvent evt) {
+        if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             if(!is_push) {
                 state = 2;
                 vertices_dirty = true;
@@ -1718,9 +1722,9 @@ namespace sgui
         return SGWidget::EventMouseButtonDown(evt);
     }
     
-    bool SGButton::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGButton::EventMouseButtonUp(MouseButtonEvent evt) {
         bool click = false;
-        if(evt.button == sf::Mouse::Left) {
+        if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             if(!is_push) {
                 if(state == 2) {
                     state = 1;
@@ -1891,8 +1895,8 @@ namespace sgui
         return SGWidget::EventMouseLeave();
     }
     
-    bool SGCheckbox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
-        if(evt.button == sf::Mouse::Left) {
+    bool SGCheckbox::EventMouseButtonDown(MouseButtonEvent evt) {
+        if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             state = 2;
             vertices_dirty = true;
             guiRoot.SetClickingObject(shared_from_this());
@@ -1900,9 +1904,9 @@ namespace sgui
         return SGWidget::EventMouseButtonDown(evt);
     }
     
-    bool SGCheckbox::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGCheckbox::EventMouseButtonUp(MouseButtonEvent evt) {
         bool click = false;
-        if(state == 2 && evt.button == sf::Mouse::Left) {
+        if(state == 2 && evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             vertices_dirty = true;
             state = 1;
             checked = !checked;
@@ -1990,9 +1994,9 @@ namespace sgui
         return nullptr;
     }
     
-    bool SGRadio::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGRadio::EventMouseButtonUp(MouseButtonEvent evt) {
         bool click = false;
-        if(state == 2 && evt.button == sf::Mouse::Left) {
+        if(state == 2 && evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             vertices_dirty = true;
             state = 1;
             if(!checked)
@@ -2163,7 +2167,7 @@ namespace sgui
             vertices_dirty = true;
     }
     
-    bool SGScrollBar::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+    bool SGScrollBar::EventMouseMove(MouseMoveEvent evt) {
         if(slider_length == 0)
             return false;
         bool preh = slider_hoving;
@@ -2195,11 +2199,11 @@ namespace sgui
         return eventMouseLeave.TriggerEvent(*this);
     }
     
-    bool SGScrollBar::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+    bool SGScrollBar::EventMouseWheel(MouseWheelEvent evt) {
         if(slider_length == 0)
             return false;
         int prepos = current_pos;
-        current_pos += (pos_max - pos_min) * evt.delta / 100;
+        current_pos += (pos_max - pos_min) * evt.deltay / 100;
         if(current_pos < 0)
             current_pos = 0;
         if(current_pos > pos_max - pos_min)
@@ -2358,7 +2362,7 @@ namespace sgui
     
     void SGTextEdit::Draw() {
         if(draging) {
-            float tm = guiRoot.GetTime().asSeconds();
+            float tm = guiRoot.GetTime();
             int chk = (int)((tm - cursor_time) / 0.3f);
             if(chk != drag_check) {
                 drag_check = chk;
@@ -2371,7 +2375,7 @@ namespace sgui
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
-        float tm = guiRoot.GetTime().asSeconds();
+        float tm = guiRoot.GetTime();
         if(read_only || !focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5f) % 2))
             glDrawElements(GL_TRIANGLE_STRIP, 9 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         else
@@ -2518,7 +2522,7 @@ namespace sgui
             ptr->def_color = guiRoot.GetDefaultInt("font_color");
         ptr->sel_color = textedit_config.int_config["sel_color"];
         ptr->sel_bcolor = textedit_config.int_config["sel_bcolor"];
-        ptr->cursor_time = guiRoot.GetTime().asSeconds();
+        ptr->cursor_time = guiRoot.GetTime();
         glGenBuffers(1, &ptr->vbo);
         glBindBuffer(GL_ARRAY_BUFFER, ptr->vbo);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 44, nullptr, GL_DYNAMIC_DRAW);
@@ -2564,7 +2568,7 @@ namespace sgui
         position_drag = evt;
         cursor_pos = GetHitIndex(evt);
         SetSelRegion(cursor_pos, cursor_pos);
-        cursor_time = guiRoot.GetTime().asSeconds();
+        cursor_time = guiRoot.GetTime();
         draging = true;
         drag_check = 0;
         return eventDragBegin.TriggerEvent(*this, evt);
@@ -2587,12 +2591,12 @@ namespace sgui
         return eventDragEnd.TriggerEvent(*this, evt);
     }
     
-    bool SGTextEdit::EventKeyDown(sf::Event::KeyEvent evt) {
+    bool SGTextEdit::EventKeyDown(KeyEvent evt) {
         if(read_only)
             return false;
-        switch(evt.code) {
-            case sf::Keyboard::X:
-                if(evt.control) {
+        switch(evt.key) {
+            case GLFW_KEY_X:
+                if(evt.mods & GLFW_MOD_CONTROL) {
                     if(sel_start == sel_end)
                         break;
                     std::wstring str = text.substr(sel_start, sel_end - sel_start);
@@ -2608,8 +2612,8 @@ namespace sgui
                     sel_change = true;
                 }
                 break;
-            case sf::Keyboard::C:
-                if(evt.control) {
+            case GLFW_KEY_C:
+                if(evt.mods & GLFW_MOD_CONTROL) {
                     if(sel_start == sel_end)
                         break;
                     std::wstring str = text.substr(sel_start, sel_end - sel_start);
@@ -2618,8 +2622,8 @@ namespace sgui
                     wxTheClipboard->Close();
                 }
                 break;
-            case sf::Keyboard::V:
-                if(evt.control) {
+            case GLFW_KEY_V:
+                if(evt.mods & GLFW_MOD_CONTROL) {
                     if(sel_start != sel_end) {
                         cursor_pos = sel_start;
                         text.erase(text.begin() + sel_start, text.begin() + sel_end);
@@ -2643,7 +2647,7 @@ namespace sgui
                     CheckCursorPos();
                 }
                 break;
-            case sf::Keyboard::BackSpace:
+            case GLFW_KEY_BACKSPACE:
                 if(sel_start == sel_end) {
                     if(cursor_pos == 0)
                         break;
@@ -2661,7 +2665,7 @@ namespace sgui
                 vertices_dirty = true;
                 sel_change = true;
                 break;
-            case sf::Keyboard::Delete:
+            case GLFW_KEY_DELETE:
                 if(sel_start == sel_end) {
                     if(cursor_pos == text.length())
                         break;
@@ -2678,7 +2682,7 @@ namespace sgui
                 vertices_dirty = true;
                 sel_change = true;
                 break;
-            case sf::Keyboard::Left:
+            case GLFW_KEY_LEFT:
                 if(sel_start != sel_end) {
                     cursor_pos = sel_start;
                     sel_start = sel_end = 0;
@@ -2689,10 +2693,10 @@ namespace sgui
                     cursor_pos--;
                     CheckCursorPos();
                     vertices_dirty = true;
-                    cursor_time = guiRoot.GetTime().asSeconds();
+                    cursor_time = guiRoot.GetTime();
                 }
                 break;
-            case sf::Keyboard::Right:
+            case GLFW_KEY_RIGHT:
                 if(sel_start != sel_end) {
                     cursor_pos = sel_end;
                     sel_start = sel_end = 0;
@@ -2704,10 +2708,10 @@ namespace sgui
                     cursor_pos++;
                     CheckCursorPos();
                     vertices_dirty = true;
-                    cursor_time = guiRoot.GetTime().asSeconds();
+                    cursor_time = guiRoot.GetTime();
                 }
                 break;
-            case sf::Keyboard::Return:
+            case GLFW_KEY_ENTER:
                 eventTextEnter.TriggerEvent(*this);
                 break;
             default:
@@ -2716,17 +2720,17 @@ namespace sgui
         return eventKeyDown.TriggerEvent(*this, evt);
     }
     
-    bool SGTextEdit::EventCharEnter(sf::Event::TextEvent evt) {
+    bool SGTextEdit::EventCharEnter(TextEvent evt) {
         if(read_only)
             return false;
-        if(evt.unicode < 32 || evt.unicode == 127) // control charactors
+        if(evt.unichar < 32 || evt.unichar == 127) // control charactors
             return false;
         if(sel_start != sel_end) {
             text.erase(text.begin() + sel_start, text.begin() + sel_end);
             color_vec.erase(color_vec.begin() + sel_start, color_vec.begin() + sel_end);
             cursor_pos = sel_start;
         }
-        text.insert(text.begin() + cursor_pos, evt.unicode);
+        text.insert(text.begin() + cursor_pos, evt.unichar);
         color_vec.insert(color_vec.begin() + cursor_pos, def_color);
         EvaluateSize();
         sel_end = sel_start;
@@ -3024,18 +3028,18 @@ namespace sgui
         return -1;
     }
     
-    bool SGListBox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    bool SGListBox::EventMouseButtonDown(MouseButtonEvent evt) {
         eventMouseButtonDown.TriggerEvent(*this, evt);
         auto choving = std::static_pointer_cast<SGScrollBar>(hoving.lock());
         if(choving) {
             choving->EventMouseButtonDown(evt);
             return true;
         } else {
-            if(evt.button == sf::Mouse::Left
+            if(evt.button == GLFW_MOUSE_BUTTON_LEFT
                && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
                && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
                 int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
-                float now = guiRoot.GetTime().asSeconds();
+                float now = guiRoot.GetTime();
                 if(sel == current_sel) {
                     if(now - click_time < 0.3f) {
                         eventDoubleClick.TriggerEvent(*this, sel);
@@ -3065,7 +3069,7 @@ namespace sgui
         return SGWidgetContainer::EventMouseLeave();
     }
     
-    bool SGListBox::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+    bool SGListBox::EventMouseWheel(MouseWheelEvent evt) {
         return children[0]->EventMouseWheel(evt);
     }
     
@@ -3114,7 +3118,7 @@ namespace sgui
     
     class SGListBoxInner : public SGListBox {
     public:
-        virtual bool EventMouseMove(sf::Event::MouseMoveEvent evt) {
+        virtual bool EventMouseMove(MouseMoveEvent evt) {
             bool ret = SGWidgetContainer::EventMouseMove(evt);
             if(hoving.expired()) {
                 int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
@@ -3126,12 +3130,12 @@ namespace sgui
             return ret;
         }
         
-        virtual bool EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+        virtual bool EventMouseButtonDown(MouseButtonEvent evt) {
             auto choving = hoving.lock();
             if(choving) {
                 choving->EventMouseButtonDown(evt);
                 return true;
-            } else if(evt.button == sf::Mouse::Left
+            } else if(evt.button == GLFW_MOUSE_BUTTON_LEFT
                       && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
                       && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
                 int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
@@ -3356,8 +3360,8 @@ namespace sgui
         return SGWidget::EventMouseLeave();
     }
     
-    bool SGComboBox::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
-        if(evt.button == sf::Mouse::Left)
+    bool SGComboBox::EventMouseButtonDown(MouseButtonEvent evt) {
+        if(evt.button == GLFW_MOUSE_BUTTON_LEFT)
             ShowList(!show_item);
         return SGWidget::EventMouseButtonDown(evt);
     }
@@ -3729,7 +3733,7 @@ namespace sgui
         return -1;
     }
     
-    bool SGTabControl::EventMouseMove(sf::Event::MouseMoveEvent evt) {
+    bool SGTabControl::EventMouseMove(MouseMoveEvent evt) {
         if(evt.y < position_abs.y + tab_height) {
             if(in_tab) {
                 if(!active_tab.expired())
@@ -3778,9 +3782,9 @@ namespace sgui
         return false;
     }
     
-    bool SGTabControl::EventMouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    bool SGTabControl::EventMouseButtonDown(MouseButtonEvent evt) {
         if(!in_tab) {
-            if(evt.button == sf::Mouse::Button::Left) {
+            if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
                 int ind = GetHovingTab(v2i{evt.x, evt.y});
                 if(ind == -1)
                     return true;
@@ -3804,31 +3808,31 @@ namespace sgui
         return false;
     }
     
-    bool SGTabControl::EventMouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    bool SGTabControl::EventMouseButtonUp(MouseButtonEvent evt) {
         if(in_tab && !active_tab.expired())
             return active_tab.lock()->EventMouseButtonUp(evt);
         return false;
     }
     
-    bool SGTabControl::EventMouseWheel(sf::Event::MouseWheelEvent evt) {
+    bool SGTabControl::EventMouseWheel(MouseWheelEvent evt) {
         if(!active_tab.expired())
             return active_tab.lock()->EventMouseWheel(evt);
         return false;
     }
     
-    bool SGTabControl::EventKeyDown(sf::Event::KeyEvent evt) {
+    bool SGTabControl::EventKeyDown(KeyEvent evt) {
         if(!active_tab.expired())
             return active_tab.lock()->EventKeyDown(evt);
         return false;
     }
     
-    bool SGTabControl::EventKeyUp(sf::Event::KeyEvent evt) {
+    bool SGTabControl::EventKeyUp(KeyEvent evt) {
         if(!active_tab.expired())
             return active_tab.lock()->EventKeyUp(evt);
         return false;
     }
     
-    bool SGTabControl::EventCharEnter(sf::Event::TextEvent evt) {
+    bool SGTabControl::EventCharEnter(TextEvent evt) {
         if(!active_tab.expired())
             return active_tab.lock()->EventCharEnter(evt);
         return false;

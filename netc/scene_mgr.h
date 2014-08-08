@@ -6,7 +6,7 @@
 #include "../common/random.h"
 
 #include "glbase.h"
-#include <SFML/Window.hpp>
+#include "sungui.h"
 
 namespace ygopro
 {
@@ -18,11 +18,11 @@ namespace ygopro
         virtual void Update() = 0;
         virtual void Draw() = 0;
         virtual void SetSceneSize(v2i sz) = 0;
-        virtual void MouseMove(sf::Event::MouseMoveEvent evt) = 0;
-        virtual void MouseButtonDown(sf::Event::MouseButtonEvent evt) = 0;
-        virtual void MouseButtonUp(sf::Event::MouseButtonEvent evt) = 0;
-        virtual void KeyDown(sf::Event::KeyEvent evt) = 0;
-        virtual void KeyUp(sf::Event::KeyEvent evt) = 0;
+        virtual void MouseMove(sgui::MouseMoveEvent evt) = 0;
+        virtual void MouseButtonDown(sgui::MouseButtonEvent evt) = 0;
+        virtual void MouseButtonUp(sgui::MouseButtonEvent evt) = 0;
+        virtual void KeyDown(sgui::KeyEvent evt) = 0;
+        virtual void KeyUp(sgui::KeyEvent evt) = 0;
     };
     
     class SceneMgr {
@@ -36,11 +36,11 @@ namespace ygopro
         float GetGameTime();
         void SetFrameRate(float rate);
         void CheckFrameRate();
-        void MouseMove(sf::Event::MouseMoveEvent evt);
-        void MouseButtonDown(sf::Event::MouseButtonEvent evt);
-        void MouseButtonUp(sf::Event::MouseButtonEvent evt);
-        void KeyDown(sf::Event::KeyEvent evt);
-        void KeyUp(sf::Event::KeyEvent evt);
+        void MouseMove(sgui::MouseMoveEvent evt);
+        void MouseButtonDown(sgui::MouseButtonEvent evt);
+        void MouseButtonUp(sgui::MouseButtonEvent evt);
+        void KeyDown(sgui::KeyEvent evt);
+        void KeyUp(sgui::KeyEvent evt);
         void SetSceneSize(v2i sz);
         void SetScene(std::shared_ptr<Scene> sc);
         std::shared_ptr<Scene> GetScene() { return current_scene; };

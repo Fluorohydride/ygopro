@@ -75,27 +75,27 @@ namespace ygopro
         frame_time = now;
     }
     
-    void SceneMgr::MouseMove(sf::Event::MouseMoveEvent evt) {
+    void SceneMgr::MouseMove(sgui::MouseMoveEvent evt) {
         if(current_scene != nullptr)
             current_scene->MouseMove(evt);
     }
     
-    void SceneMgr::MouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    void SceneMgr::MouseButtonDown(sgui::MouseButtonEvent evt) {
         if(current_scene != nullptr)
             current_scene->MouseButtonDown(evt);
     }
     
-    void SceneMgr::MouseButtonUp(sf::Event::MouseButtonEvent evt) {
+    void SceneMgr::MouseButtonUp(sgui::MouseButtonEvent evt) {
         if(current_scene != nullptr)
             current_scene->MouseButtonUp(evt);
     }
     
-    void SceneMgr::KeyDown(sf::Event::KeyEvent evt) {
+    void SceneMgr::KeyDown(sgui::KeyEvent evt) {
         if(current_scene != nullptr)
             current_scene->KeyDown(evt);
     }
     
-    void SceneMgr::KeyUp(sf::Event::KeyEvent evt) {
+    void SceneMgr::KeyUp(sgui::KeyEvent evt) {
         if(current_scene != nullptr)
             current_scene->KeyUp(evt);
     }

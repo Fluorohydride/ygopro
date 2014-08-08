@@ -20,13 +20,14 @@ endif ()
 
 target_link_libraries (netc buildin)
 
-target_link_libraries (netc 
-    ${LIBEVENT_LIBRARIES}
+target_link_libraries (netc
     ${LUA_LIBRARIES}
+    ${LIBEVENT_LIBRARIES}
     ${wxWidgets_LIBRARIES}
-    ${SFML_LIBRARIES}
+    ${GLFW3_LIBRARIES}
     ${OPENGL_gl_LIBRARY}
     ${FREETYPE_LIBRARIES}
+    ${GLEW_LIBRARIES}
 )
 
 include_directories (
@@ -34,8 +35,9 @@ include_directories (
     ${LIBEVENT_INCLUDE_DIR}
     ${wxWidgets_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
-    ${SFML_INCLUDE_DIR}
+    ${GLFW3_INCLUDE_DIR}
     ${FREETYPE_INCLUDE_DIR}
+    ${GLEW_INCLUDE_DIR}
 )
 
 if (WIN32)

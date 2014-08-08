@@ -76,13 +76,13 @@ namespace ygopro
         current_deck.Clear();
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
         pnl->SetSize({-20, 35}, {1.0f, 0.0f});
-        pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
+        pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
             KeyDown(evt);
             return true;
         });
         auto rpnl = sgui::SGPanel::Create(nullptr, {0, 0}, {200, 60});
         rpnl->SetPosition({-210, 40}, {1.0f, 0.0f});
-        rpnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sf::Event::KeyEvent evt)->bool {
+        rpnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
             KeyDown(evt);
             return true;
         });
@@ -247,7 +247,7 @@ namespace ygopro
         update_result = true;
     }
     
-    void BuildScene::MouseMove(sf::Event::MouseMoveEvent evt) {
+    void BuildScene::MouseMove(sgui::MouseMoveEvent evt) {
         std::shared_ptr<DeckCardData> dcd = nullptr;
         auto pre = GetCard(std::get<0>(prev_hov), std::get<1>(prev_hov));
         if(evt.x >= scene_size.x - 210 && evt.x <= scene_size.x - 10 && evt.y >= 110 && evt.y <= scene_size.y - 10) {
@@ -282,16 +282,16 @@ namespace ygopro
         }
     }
     
-    void BuildScene::MouseButtonDown(sf::Event::MouseButtonEvent evt) {
+    void BuildScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
         prev_click = prev_hov;
-        if(evt.button == sf::Mouse::Left) {
+        if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             show_info_begin = true;
             show_info_time = sceneMgr.GetGameTime();
         }
     }
     
-    void BuildScene::MouseButtonUp(sf::Event::MouseButtonEvent evt) {
-        if(evt.button == sf::Mouse::Left)
+    void BuildScene::MouseButtonUp(sgui::MouseButtonEvent evt) {
+        if(evt.button == GLFW_MOUSE_BUTTON_LEFT)
             show_info_begin = false;
         if(prev_hov != prev_click)
             return;
@@ -304,7 +304,7 @@ namespace ygopro
             auto dcd = GetCard(pos, index);
             if(dcd == nullptr)
                 return;
-            if(evt.button == sf::Mouse::Left) {
+            if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
                 if(pos == 1) {
                     ChangeHL(current_deck.main_deck[index], 0.1f, 0.0f);
                     current_deck.side_deck.push_back(current_deck.main_deck[index]);
@@ -328,10 +328,7 @@ namespace ygopro
                 UpdateAllCard();
                 SetDeckDirty();
                 std::get<0>(prev_hov) = 0;
-                sf::Event::MouseMoveEvent e;
-                e.x = sceneMgr.GetMousePosition().x;
-                e.y = sceneMgr.GetMousePosition().y;
-                MouseMove(e);
+                MouseMove({sceneMgr.GetMousePosition().x, sceneMgr.GetMousePosition().y});
             } else {
                 if(update_status == 1)
                     return;
@@ -349,10 +346,7 @@ namespace ygopro
                         UpdateAllCard();
                         SetDeckDirty();
                         std::get<0>(prev_hov) = 0;
-                        sf::Event::MouseMoveEvent e;
-                        e.x = sceneMgr.GetMousePosition().x;
-                        e.y = sceneMgr.GetMousePosition().y;
-                        MouseMove(e);
+                        MouseMove({sceneMgr.GetMousePosition().x, sceneMgr.GetMousePosition().y});
                         update_status = 0;
                         UpdateCard();
                     }
@@ -364,7 +358,7 @@ namespace ygopro
                 return;
             auto data = search_result[result_page * 10 + index];
             std::shared_ptr<DeckCardData> ptr;
-            if(evt.button == sf::Mouse::Left)
+            if(evt.button == GLFW_MOUSE_BUTTON_LEFT)
                 ptr = current_deck.InsertCard(1, -1, data->code, true);
             else
                 ptr = current_deck.InsertCard(3, -1, data->code, true);
@@ -385,18 +379,18 @@ namespace ygopro
         }
     }
     
-    void BuildScene::KeyDown(sf::Event::KeyEvent evt) {
-        switch(evt.code) {
-            case sf::Keyboard::Num1:
-                if(evt.alt)
+    void BuildScene::KeyDown(sgui::KeyEvent evt) {
+        switch(evt.key) {
+            case GLFW_KEY_1:
+                if(evt.mods & GLFW_MOD_ALT)
                     ViewRegulation(0);
                 break;
-            case sf::Keyboard::Num2:
-                if(evt.alt)
+            case GLFW_KEY_2:
+                if(evt.mods & GLFW_MOD_ALT)
                     ViewRegulation(1);
                 break;
-            case sf::Keyboard::Num3:
-                if(evt.alt)
+            case GLFW_KEY_3:
+                if(evt.mods & GLFW_MOD_ALT)
                     ViewRegulation(2);
                 break;
             default:
@@ -404,7 +398,7 @@ namespace ygopro
         }
     }
     
-    void BuildScene::KeyUp(sf::Event::KeyEvent evt) {
+    void BuildScene::KeyUp(sgui::KeyEvent evt) {
         
     }
     
@@ -921,8 +915,8 @@ namespace ygopro
                     if((size_t)(result_page * 10 + index) < search_result.size())
                         ShowCardInfo(search_result[result_page * 10 + index]->code);
                 }
-                sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Bind([this](sgui::SGWidget& sender, sf::Event::MouseButtonEvent evt)->bool {
-                    if(evt.button == sf::Mouse::Left) {
+                sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Bind([this](sgui::SGWidget& sender, sgui::MouseButtonEvent evt)->bool {
+                    if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
                         sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Reset();
                         sgui::SGGUIRoot::GetSingleton().eventMouseMove.Reset();
                         show_info = false;
@@ -931,7 +925,7 @@ namespace ygopro
                     }
                     return true;
                 });
-                sgui::SGGUIRoot::GetSingleton().eventMouseMove.Bind([this](sgui::SGWidget& sender, sf::Event::MouseMoveEvent evt)->bool {
+                sgui::SGGUIRoot::GetSingleton().eventMouseMove.Bind([this](sgui::SGWidget& sender, sgui::MouseMoveEvent evt)->bool {
                     MouseMove(evt);
                     return true;
                 });

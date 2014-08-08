@@ -7,8 +7,6 @@
 #include <unordered_map>
 
 #include "glbase.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/OpenGL.hpp>
 
 namespace ygopro
 {
