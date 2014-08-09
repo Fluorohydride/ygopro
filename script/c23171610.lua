@@ -21,21 +21,20 @@ end
 function c23171610.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c23171610.filter,tp,LOCATION_MZONE,0,1,nil) end
 end
-function c23171610.filter2(c,e)
-	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and not c:IsImmuneToEffect(e)
-end
 function c23171610.activate(e,tp,eg,ep,ev,re,r,rp)
-	local sg=Duel.GetMatchingGroup(c23171610.filter2,tp,LOCATION_MZONE,0,nil,e)
+	local sg=Duel.GetMatchingGroup(c23171610.filter,tp,LOCATION_MZONE,0,nil)
 	local c=e:GetHandler()
 	local tc=sg:GetFirst()
 	while tc do
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
-		e1:SetValue(tc:GetAttack()*2)
-		tc:RegisterEffect(e1)
-		tc:RegisterFlagEffect(23171610,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		if not tc:IsImmuneToEffect(e) then 
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+			e1:SetValue(tc:GetAttack()*2)
+			tc:RegisterEffect(e1)
+			tc:RegisterFlagEffect(23171610,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		end
 		tc=sg:GetNext()
 	end
 	sg:KeepAlive()
