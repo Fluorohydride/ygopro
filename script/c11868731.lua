@@ -51,4 +51,3 @@ function c11868731.shop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-

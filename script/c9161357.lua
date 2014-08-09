@@ -88,4 +88,3 @@ end
 function c9161357.lpop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SetLP(1-tp,Duel.GetLP(1-tp)/2)
 end
-

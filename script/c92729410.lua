@@ -49,7 +49,7 @@ function c92729410.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c92729410.splimit(e,c)
-	return not c:IsRace(RACE_BEAST)
+	return c:IsRace(0xffffff-RACE_BEAST)
 end
 function c92729410.filter(c,e,tp)
 	return c:GetCode()~=92729410 and c:GetLevel()==2 and c:IsRace(RACE_BEAST)

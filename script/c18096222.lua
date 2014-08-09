@@ -84,4 +84,3 @@ function c18096222.daop(e,tp,eg,ep,ev,re,r,rp)
 		tc:EnableDualState()
 	end
 end
-

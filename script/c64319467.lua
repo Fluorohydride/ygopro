@@ -45,7 +45,7 @@ function c64319467.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c64319467.splimit(e,c)
-	return not c:IsAttribute(ATTRIBUTE_WATER)
+	return c:IsAttribute(0xff-ATTRIBUTE_WATER)
 end
 function c64319467.filter(c,e,tp)
 	local lv=c:GetLevel()

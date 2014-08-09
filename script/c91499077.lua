@@ -49,7 +49,6 @@ function c91499077.atop(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 	end
 end
-
 function c91499077.cbcon(e,tp,eg,ep,ev,re,r,rp)
 	local bt=eg:GetFirst()
 	return r~=REASON_REPLACE and bt~=e:GetHandler() and bt:IsControler(tp)
