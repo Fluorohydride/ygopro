@@ -45,8 +45,8 @@ function c9765723.cfilter(c)
 	return (c:IsSetCard(0xaf) or c:IsSetCard(0xae)) and c:IsAbleToGraveAsCost()
 end
 function c9765723.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c9765723.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,c9765723.cfilter,1,1,REASON_COST,e:GetHandler())
+	if chk==0 then return Duel.IsExistingMatchingCard(c9765723.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,c9765723.cfilter,1,1,REASON_COST)
 end
 function c9765723.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsDestructable() end

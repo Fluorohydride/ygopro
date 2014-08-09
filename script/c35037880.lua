@@ -36,6 +36,5 @@ function c35037880.operation(e,tp,eg,ep,ev,re,r,rp)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,sg)
-		Duel.ShuffleHand(tp)
 	end
 end

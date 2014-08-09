@@ -59,7 +59,7 @@ end
 function c11609969.scop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
-	local scl=math.max(1,e:GetHandler():GetLeftScale()-2)
+	local scl=math.max(1,c:GetLeftScale()-2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_CHANGE_LSCALE)

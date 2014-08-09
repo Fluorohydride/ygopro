@@ -33,13 +33,12 @@ function c20409757.initial_effect(c)
 	c:RegisterEffect(e5)
 	--
 	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_FIELD)
-	e6:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
+	e6:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e6:SetCode(EFFECT_DESTROY_REPLACE)
 	e6:SetRange(LOCATION_MZONE)
-	e6:SetTargetRange(LOCATION_SZONE,0)
-	e6:SetTarget(c20409757.indtg)
 	e6:SetCountLimit(1)
-	e6:SetValue(c20409757.valcon)
+	e6:SetTarget(c20409757.indtg)
+	e6:SetValue(c20409757.indval)
 	c:RegisterEffect(e6)
 end
 function c20409757.condition(e,tp,eg,ep,ev,re,r,rp)
@@ -68,9 +67,14 @@ function c20409757.slcon(e)
 	local tc=Duel.GetFieldCard(e:GetHandlerPlayer(),LOCATION_SZONE,13-seq)
 	return not tc or (not tc:IsSetCard(0x98) and not tc:IsSetCard(0x99))
 end
-function c20409757.indtg(e,c)
-	return c:GetSequence()==6 or c:GetSequence()==7
+function c20409757.filter(c,tp)
+	return c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and (c:GetSequence()==6 or c:GetSequence()==7)
+		 and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp
 end
-function c20409757.valcon(e,re,r,rp)
-	return rp~=e:GetHandlerPlayer() and bit.band(r,REASON_EFFECT)~=0
+function c20409757.indtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return eg:IsExists(c20409757.filter,1,nil,tp) end
+	return true
+end
+function c20409757.indval(e,c)
+	return c20409757.filter(c,e:GetHandlerPlayer())
 end
