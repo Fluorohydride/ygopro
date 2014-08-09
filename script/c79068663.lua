@@ -62,4 +62,3 @@ function c79068663.damop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Damage(p,dam,REASON_EFFECT)
 	end
 end
-

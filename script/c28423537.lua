@@ -61,7 +61,7 @@ function c28423537.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e3)
 end
 function c28423537.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsRace(RACE_FIEND)
+	return c:IsRace(0xffffff-RACE_FIEND)
 end
 function c28423537.tgop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
