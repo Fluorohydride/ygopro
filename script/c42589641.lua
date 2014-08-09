@@ -121,7 +121,7 @@ function c42589641.hdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(sg,REASON_EFFECT)
 end
 function c42589641.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayCount()>0 and e:GetHandler():IsStatus(STATUS_PROC_COMPLETE)
+	return e:GetHandler():GetOverlayCount()>0 and e:GetHandler():GetPreviousLocation()==LOCATION_MZONE
 end
 function c42589641.spfilter(c,e,tp)
 	return c:IsSetCard(0x9c) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
