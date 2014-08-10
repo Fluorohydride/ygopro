@@ -3,7 +3,7 @@ function c54719828.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
 	c:EnableReviveLimit()
-	--attack up
+	--act limit
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(54719828,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
