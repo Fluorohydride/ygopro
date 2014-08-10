@@ -23,9 +23,10 @@ int main(int argc, char* argv[]) {
         glfwTerminate();
         return 0;
     }
-    glfwMakeContextCurrent(window);;
+    glfwMakeContextCurrent(window);
+	glewExperimental = true;
     glewInit();
-    
+
     imageMgr.InitTextures();
     if(!stringCfg.LoadConfig(commonCfg[L"string_path"]))
         return 0;

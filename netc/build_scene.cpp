@@ -917,11 +917,11 @@ namespace ygopro
                 }
                 sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Bind([this](sgui::SGWidget& sender, sgui::MouseButtonEvent evt)->bool {
                     if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
-                        sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Reset();
-                        sgui::SGGUIRoot::GetSingleton().eventMouseMove.Reset();
-                        show_info = false;
+						show_info = false;
                         show_info_begin = false;
                         info_panel->Destroy();
+						sgui::SGGUIRoot::GetSingleton().eventMouseMove.Reset();
+                        sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Reset();
                     }
                     return true;
                 });
@@ -959,7 +959,7 @@ namespace ygopro
         if((ptr->show_exclusive) && dcd->data->pool != 3) {
             float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            glbase::FillVertex(&verts[12], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
+            glbase::FillVertex(&verts[0], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 12), sizeof(glbase::VertexVCT) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);

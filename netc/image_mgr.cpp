@@ -54,6 +54,7 @@ namespace ygopro
                         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)(uintptr_t)glbase::VertexVCT::color_offset);
                         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)(uintptr_t)(glbase::VertexVCT::tex_offset));
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
+						//unsigned short ind[] = {0, 2, 1, 3};
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
                         glBindTexture(GL_TEXTURE_2D, 0);
                         glBindFramebuffer(GL_FRAMEBUFFER, 0);

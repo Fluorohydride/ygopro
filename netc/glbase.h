@@ -137,26 +137,12 @@ namespace glbase {
         T v[16];
     };
     
-    struct VertexVT {
-        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        vector2<float> texcoord = {0.0f, 0.0f};
-        static const int tex_offset = 12;
-    };
-    
     struct VertexVCT {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
         vector2<float> texcoord = {0.0f, 0.0f};
         static const int color_offset = 12;
         static const int tex_offset = 16;
-    };
-    
-    struct VertexVNT {
-        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        vector4<float> normal = {1.0f, 1.0f, 1.0f, 1.0f};
-        vector2<float> texcoord = {0.0f, 0.0f};
-        static const int normal_offset = 12;
-        static const int tex_offset = 28;
     };
     
     struct VertexVNCT {

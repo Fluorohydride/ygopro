@@ -393,7 +393,7 @@ namespace ygopro
         }
         return v;
     }
-    
+	
     void InfoPanel::ShowInfo(unsigned int code, v2i pos, v2i sz) {
         if(this->code == code)
             return;
