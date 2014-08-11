@@ -86,6 +86,10 @@ namespace ygopro
             return pre_ret;
         std::string file = wxString::Format("%d.jpg", id).ToStdString();
         int length = imageZip.GetFileLength(file);
+        if(length == 0) {
+            file = "unknown.jpg";
+            length = imageZip.GetFileLength(file);
+        }
         if(length != 0) {
             glbase::Image img;
             unsigned char* imgbuf = new unsigned char[length];
@@ -174,26 +178,6 @@ namespace ygopro
         misc_texture.Unload();
         bg_texture.Unload();
         card_image.Unload();
-    }
-    
-    void ImageMgr::BindTexture(int textype) {
-        switch(textype) {
-            case 0:
-                bg_texture.Bind();
-                break;
-            case 1:
-                misc_texture.Bind();
-                break;
-            case 2:
-                card_image.Bind();
-                break;
-            case 3:
-                card_texture.Bind();
-                break;
-            default:
-                misc_texture.Bind();
-                break;
-        }
     }
     
 	bool ImageMgr::LoadImageConfig(const std::wstring& name) {

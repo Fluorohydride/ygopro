@@ -25,6 +25,8 @@ namespace ygopro
         glbase::Texture* LoadBigCardTexture(unsigned int id);
         glbase::Texture* GetRawMiscTexture() { return &misc_texture; }
         glbase::Texture* GetRawCardTexture() { return &card_texture; }
+        glbase::Texture* GetRawBGTexture() { return &bg_texture; }
+        glbase::Texture* GetRawCardImage() { return &card_image; }
         ti4& GetCharTex(wchar_t ch);
         void UnloadCardTexture(unsigned int id);
 		void UnloadAllCardTexture();
@@ -34,7 +36,6 @@ namespace ygopro
         
 		void InitTextures(const std::wstring& image_pack);
         void UninitTextures();
-        void BindTexture(int textype);
 		bool LoadImageConfig(const std::wstring& file);
         
     protected:

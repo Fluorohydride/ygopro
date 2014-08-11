@@ -58,7 +58,6 @@ int main(int argc, char* argv[]) {
     sceneMgr.SetFrameRate((int)commonCfg[L"frame_rate"]);
     auto sc = std::make_shared<BuildScene>();
     sceneMgr.SetScene(std::static_pointer_cast<Scene>(sc));
-    sc->LoadDeckFromFile(L"./deck/807.ydk");
 
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {

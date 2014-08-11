@@ -61,7 +61,7 @@ namespace glbase {
         inline void operator = (const vector2<T>& op) {
             x = op.x;
             y = op.y;
-            z = 0.0f;
+            z = T();
         }
         
 	};
@@ -252,8 +252,10 @@ namespace glbase {
 
 typedef glbase::vector2<int> v2i;
 typedef glbase::vector2<float> v2f;
+typedef glbase::vector2<double> v2d;
 typedef glbase::vector3<int> v3i;
 typedef glbase::vector3<float> v3f;
+typedef glbase::vector3<double> v3d;
 typedef glbase::rect<int> recti;
 typedef glbase::rect<float> rectf;
 typedef glbase::TextureInfo<4> ti4;

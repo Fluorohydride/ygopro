@@ -170,6 +170,15 @@ namespace ygopro
     }
     
     void BuildScene::Update() {
+        static int fps = 0;
+        static float pre = 0;
+        float now = sceneMgr.GetGameTime();
+        if(now - pre >= 1.0f) {
+            std::cout << "at " << now << "s fps: " << fps << std::endl;
+            fps = 0;
+            pre += 1.0f;
+        }
+        fps++;
         UpdateBackGround();
         UpdateCard();
         UpdateMisc();
@@ -181,7 +190,7 @@ namespace ygopro
         glViewport(0, 0, scene_size.x, scene_size.y);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         // background
-        imageMgr.BindTexture(0);
+        imageMgr.GetRawBGTexture()->Bind();
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
@@ -189,7 +198,7 @@ namespace ygopro
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // miscs
-        imageMgr.BindTexture(1);
+        imageMgr.GetRawMiscTexture()->Bind();
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
@@ -197,7 +206,7 @@ namespace ygopro
         glDrawElements(GL_TRIANGLE_STRIP, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
-        imageMgr.BindTexture(3);
+        imageMgr.GetRawCardTexture()->Bind();
         // result
         if(result_show_size) {
             glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
