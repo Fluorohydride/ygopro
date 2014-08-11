@@ -21,6 +21,9 @@ int main(int argc, char* argv[]) {
         return 0;
     int width = commonCfg[L"window_width"];
     int height = commonCfg[L"window_height"];
+	int fsaa = commonCfg[L"fsaa"];
+	if(fsaa)
+		glfwWindowHint(GLFW_SAMPLES, fsaa);
     GLFWwindow* window = glfwCreateWindow(width, height, "Ygopro", nullptr, nullptr);
     if (!window) {
         glfwTerminate();

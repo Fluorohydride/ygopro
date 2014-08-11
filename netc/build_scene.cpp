@@ -493,7 +493,7 @@ namespace ygopro
         wxTheClipboard->Open();
         wxTheClipboard->GetData(tdo);
         wxTheClipboard->Close();
-        auto deck_string = tdo.GetText().ToStdString();
+        std::string deck_string = tdo.GetText().ToUTF8().data();
         if(deck_string.find("ydk://") == 0 && tempdeck.LoadFromString(deck_string.substr(6))) {
             ClearDeck();
             current_deck = tempdeck;

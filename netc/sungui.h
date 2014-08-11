@@ -137,7 +137,7 @@ namespace sgui
         bool TriggerEvent(ST& sender, ET evt) {
             if(delegate_ptrs.size() == 0)
                 return false;
-            bool ret;
+            bool ret = false;
             for(auto& ptr : delegate_ptrs)
                 ret = ptr->Invoke(sender, evt) || ret;
             return ret;
@@ -168,9 +168,9 @@ namespace sgui
         bool TriggerEvent(ST& sender) {
             if(delegate_ptrs.size() == 0)
                 return false;
-            bool ret;
+            bool ret = false;
             for(auto& ptr : delegate_ptrs)
-                ret = ret || ptr->Invoke(sender);
+                ret = ptr->Invoke(sender) || ret;
             return ret;
         }
         

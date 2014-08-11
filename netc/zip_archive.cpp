@@ -20,7 +20,7 @@ namespace ygopro
         wxZipEntry* entry;
         while((entry = zip.GetNextEntry()) != nullptr)
         {
-            auto file = entry->GetInternalName().ToStdString();
+            std::string file = entry->GetInternalName().ToUTF8().data();
             auto& current = entries[file];
             current.reset(entry);
         }

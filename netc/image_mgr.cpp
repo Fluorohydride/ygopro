@@ -1,6 +1,7 @@
 #include "image_mgr.h"
 #include "scene_mgr.h"
 #include "../common/common.h"
+#include "../common/convert.h"
 
 #include "wx/xml/xml.h"
 #include "wx/wfstream.h"
@@ -13,7 +14,7 @@ namespace ygopro
 	ti4& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-            std::string file = wxString::Format("%d.jpg", id).ToStdString();
+            std::string file = wxString::Format("%d.jpg", id).ToUTF8().data();
 			auto& cti = card_textures[id];
             int length = imageZip.GetFileLength(file);
 			if(length == 0) {
@@ -84,7 +85,7 @@ namespace ygopro
         static glbase::Texture* pre_ret = nullptr;
         if(pid == id)
             return pre_ret;
-        std::string file = wxString::Format("%d.jpg", id).ToStdString();
+        std::string file = wxString::Format("%d.jpg", id).ToUTF8().data();
         int length = imageZip.GetFileLength(file);
         if(length == 0) {
             file = "unknown.jpg";
@@ -194,7 +195,7 @@ namespace ygopro
                 wxString path = child->GetAttribute("path");
                 if(wxFileExists(path)) {
                     glbase::Image img;
-                    if(img.LoadFile(path.ToStdString())) {
+                    if(img.LoadFile(path.ToUTF8().data())) {
                         if(name == "card")
                             card_texture.Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
                         else if(name == "misc")
@@ -204,8 +205,8 @@ namespace ygopro
                     }
                 }
             } else if (child->GetName() == "texture") {
-				std::string name = child->GetAttribute("name").ToStdString();
-                std::string src = child->GetAttribute("src").ToStdString();
+				std::string name = child->GetAttribute("name").ToUTF8().data();
+                std::string src = child->GetAttribute("src").ToUTF8().data();
                 glbase::Texture* ptex = nullptr;
                 if(src == "card")
                     ptex = &card_texture;
@@ -215,11 +216,10 @@ namespace ygopro
                     ptex = &bg_texture;
                 if(ptex) {
                     auto& ti = misc_textures[name];
-                    long x, y, w, h;
-                    child->GetAttribute("x").ToLong(&x);
-                    child->GetAttribute("y").ToLong(&y);
-                    child->GetAttribute("w").ToLong(&w);
-                    child->GetAttribute("h").ToLong(&h);
+                    int x = To<int>(child->GetAttribute("x").ToUTF8().data());
+                    int y = To<int>(child->GetAttribute("y").ToUTF8().data());
+                    int w = To<int>(child->GetAttribute("w").ToUTF8().data());
+                    int h = To<int>(child->GetAttribute("h").ToUTF8().data());
                     ti.vert[0].x = (float)x / ptex->GetWidth();
                     ti.vert[0].y = (float)y / ptex->GetHeight();
                     ti.vert[1].x = (float)(x + w) / ptex->GetWidth();
@@ -230,8 +230,8 @@ namespace ygopro
                     ti.vert[3].y = (float)(y + h) / ptex->GetHeight();
                 }
 			} else if (child->GetName() == "points") {
-				std::string name = child->GetAttribute("name").ToStdString();
-                std::string src = child->GetAttribute("src").ToStdString();
+				std::string name = child->GetAttribute("name").ToUTF8().data();
+                std::string src = child->GetAttribute("src").ToUTF8().data();
                 glbase::Texture* ptex = nullptr;
                 if(src == "card")
                     ptex = &card_texture;
@@ -241,15 +241,15 @@ namespace ygopro
                     ptex = &bg_texture;
                 if(ptex) {
                     auto& ti = misc_textures[name];
-                    long val[8];
-                    child->GetAttribute("x1").ToLong(&val[0]);
-                    child->GetAttribute("y1").ToLong(&val[1]);
-                    child->GetAttribute("x2").ToLong(&val[2]);
-                    child->GetAttribute("y2").ToLong(&val[3]);
-                    child->GetAttribute("x3").ToLong(&val[4]);
-                    child->GetAttribute("y3").ToLong(&val[5]);
-                    child->GetAttribute("x4").ToLong(&val[6]);
-                    child->GetAttribute("y4").ToLong(&val[7]);
+                    int val[8];
+                    val[0] = To<int>(child->GetAttribute("x1").ToUTF8().data());
+                    val[1] = To<int>(child->GetAttribute("y1").ToUTF8().data());
+                    val[2] = To<int>(child->GetAttribute("x2").ToUTF8().data());
+                    val[3] = To<int>(child->GetAttribute("y2").ToUTF8().data());
+                    val[4] = To<int>(child->GetAttribute("x3").ToUTF8().data());
+                    val[5] = To<int>(child->GetAttribute("y3").ToUTF8().data());
+                    val[6] = To<int>(child->GetAttribute("x4").ToUTF8().data());
+                    val[7] = To<int>(child->GetAttribute("y4").ToUTF8().data());
                     ti.vert[0].x = (float)val[0] / ptex->GetWidth();
                     ti.vert[0].y = (float)val[1] / ptex->GetHeight();
                     ti.vert[1].x = (float)val[2] / ptex->GetWidth();

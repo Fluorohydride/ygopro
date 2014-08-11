@@ -16,7 +16,7 @@ namespace ygopro
                     wxString name = child->GetAttribute("name");
                     wxString value = child->GetAttribute("value");
                     long val = 0;
-                    value.ToLong(&val, 0);
+                    value.ToCLong(&val, 0);
                     config_map[name.ToStdWstring()] = val;
                 } if (child->GetName() == "float") {
                     wxString name = child->GetAttribute("name");

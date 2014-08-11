@@ -2,6 +2,7 @@
 #define _ZIP_READER_H_
 
 #include <string>
+#include <memory>
 #include <unordered_map>
 
 class wxZipEntry;

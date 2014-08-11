@@ -3,6 +3,7 @@
 #include <wx/xml/xml.h>
 #include <wx/clipbrd.h>
 
+#include "../common/convert.h"
 #include "sungui.h"
 
 
@@ -819,7 +820,7 @@ namespace sgui
                 subtype = subtype->GetNext();
                 continue;
             }
-            auto iter = configs.find(subtype->GetName().ToStdString());
+            auto iter = configs.find(subtype->GetName().ToUTF8().data());
             if(iter != configs.end()) {
                 wxXmlNode* child = subtype->GetChildren();
                 while(child) {
@@ -827,35 +828,26 @@ namespace sgui
                         child = child->GetNext();
                         continue;
                     }
-                    if (child->GetName() == wxT("integer")) {
-                        wxString name = child->GetAttribute("name");
-                        wxString value = child->GetAttribute("value");
-                        long val = 0;
-                        value.ToLong(&val, 0);
-                        iter->second->int_config[name.ToStdString()] = (int)val;
+                    if (child->GetName() == "integer") {
+                        std::string name = child->GetAttribute("name").ToUTF8().data();
+                        int value = To<int>(child->GetAttribute("value").ToUTF8().data());
+                        iter->second->int_config[name] = value;
                     } else if(child->GetName() == "string") {
-                        wxString name = child->GetAttribute("name");
-                        wxString value = child->GetAttribute("value");
-                        iter->second->string_config[name.ToStdString()] = value.ToStdString();
+                        std::string name = child->GetAttribute("name").ToUTF8().data();
+                        std::string value = child->GetAttribute("value").ToUTF8().data();
+                        iter->second->string_config[name] = value;
                     } else if(child->GetName() == "rect") {
-                        wxString name = child->GetAttribute("name");
-                        wxString stru = child->GetAttribute("u");
-                        wxString strv = child->GetAttribute("v");
-                        wxString strw = child->GetAttribute("w");
-                        wxString strh = child->GetAttribute("h");
-                        long u, v, w, h;
-                        stru.ToLong(&u, 0);
-                        strv.ToLong(&v, 0);
-                        strw.ToLong(&w, 0);
-                        strh.ToLong(&h, 0);
-                        iter->second->tex_config[name.ToStdString()] = recti{(int)u, (int)v, (int)w, (int)h};
+                        std::string name = child->GetAttribute("name").ToUTF8().data();
+                        int u = To<int>(child->GetAttribute("u").ToUTF8().data());
+                        int v = To<int>(child->GetAttribute("v").ToUTF8().data());
+                        int w = To<int>(child->GetAttribute("w").ToUTF8().data());
+                        int h = To<int>(child->GetAttribute("h").ToUTF8().data());
+                        iter->second->tex_config[name] = recti{u, v, w, h};
                     } else if(child->GetName() == "font") {
-                        std::string name = child->GetAttribute("name").ToStdString();
-                        std::string file = child->GetAttribute("file").ToStdString();
-                        wxString size = child->GetAttribute("size");
+                        std::string name = child->GetAttribute("name").ToUTF8().data();
+                        std::string file = child->GetAttribute("file").ToUTF8().data();
+                        int sz = To<int>(child->GetAttribute("size").ToUTF8().data());
                         auto& ft = font_mgr[name];
-                        long sz = 0;
-                        size.ToLong(&sz);
                         if(!ft.Load(file, sz))
                             font_mgr.erase(name);
                     }
