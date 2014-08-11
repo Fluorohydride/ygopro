@@ -54,12 +54,11 @@ function c9765723.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsDestructable() end
 	if chk==0 then return true end
 	local ph=Duel.GetCurrentPhase()
-	if ph==PHASE_DAMAGE then return end
 	local b1=Duel.GetFlagEffect(tp,9765723)==0
 		and Duel.IsExistingMatchingCard(c9765723.cfilter,tp,LOCATION_HAND,0,1,nil)
 		and Duel.IsExistingTarget(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 	local b2=Duel.GetTurnPlayer()==tp and ph==PHASE_STANDBY
-	if (b1 or b2) and Duel.SelectYesNo(tp,aux.Stringid(9765723,2)) then
+	if (b1 or b2) and ph~=PHASE_DAMAGE and Duel.SelectYesNo(tp,aux.Stringid(9765723,2)) then
 		local op=0
 		if b1 and b2 then op=Duel.SelectOption(tp,aux.Stringid(9765723,0),aux.Stringid(9765723,1))
 		elseif b1 then op=Duel.SelectOption(tp,aux.Stringid(9765723,0))
