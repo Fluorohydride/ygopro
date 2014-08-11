@@ -55,13 +55,13 @@ function c74605254.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local scl=math.min(10,e:GetHandler():GetLeftScale()+2)
 	local g=Duel.GetMatchingGroup(c74605254.filter,tp,LOCATION_MZONE,0,nil,scl)
-	if c:GetLeftScale()<10 then
+	if e:GetHandler():GetLeftScale()<10 then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	end
 end
 function c74605254.scop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:GetLeftScale()==10 then return end
+	if not c:IsRelateToEffect(e) or c:GetLeftScale()>=10 then return end
 	local scl=math.min(10,c:GetLeftScale()+2)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

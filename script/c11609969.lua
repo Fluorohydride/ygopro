@@ -54,7 +54,7 @@ function c11609969.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local scl=math.max(1,e:GetHandler():GetLeftScale()-2)
 	local g=Duel.GetMatchingGroup(c11609969.filter,tp,LOCATION_MZONE,0,nil,scl)
-	if c:GetLeftScale()>1 then 
+	if e:GetHandler():GetLeftScale()>1 then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	end
 end

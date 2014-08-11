@@ -67,7 +67,7 @@ function c71422989.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c71422989.filter1,tp,LOCATION_HAND+LOCATION_ONFIELD,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(c71422989.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
 		local sg1=Duel.GetMatchingGroup(c71422989.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
 		local mg2=nil
 		local sg2=nil
