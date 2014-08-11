@@ -48,8 +48,22 @@ namespace glbase {
             delete buffer;
     }
     
-    bool Image::Load(const std::string &file) {
+    bool Image::LoadFile(const std::string &file) {
         unsigned char* data = stbi_load(file.c_str(), &width, &height, nullptr, 4);
+        if(data == nullptr) {
+            std::cout << stbi_failure_reason() << std::endl;
+            return false;
+        }
+        if(buffer != nullptr)
+            delete buffer;
+        buffer = new unsigned char[width * height * 4];
+        memcpy(buffer, data, width * height * 4);
+        stbi_image_free(data);
+        return true;
+    }
+    
+    bool Image::LoadMemory(const unsigned char* mem, unsigned int sz) {
+        unsigned char* data = stbi_load_from_memory(mem, sz, &width, &height, nullptr, 4);
         if(data == nullptr) {
             std::cout << stbi_failure_reason() << std::endl;
             return false;

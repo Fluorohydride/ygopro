@@ -178,7 +178,8 @@ namespace glbase {
     class Image {
     public:
         ~Image();
-        bool Load(const std::string& file);
+        bool LoadFile(const std::string& file);
+        bool LoadMemory(const unsigned char* mem, unsigned int sz);
         inline unsigned char* GetRawData() { return buffer; }
         inline int GetWidth() { return width; }
         inline int GetHeight() { return height; }

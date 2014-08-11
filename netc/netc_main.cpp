@@ -11,6 +11,9 @@
 
 using namespace ygopro;
 
+static float xrate = 0.0f;
+static float yrate = 0.0f;
+
 int main(int argc, char* argv[]) {
     if(!glfwInit())
         return 0;
@@ -27,12 +30,12 @@ int main(int argc, char* argv[]) {
 	glewExperimental = true;
     glewInit();
 
-    imageMgr.InitTextures();
-    if(!stringCfg.LoadConfig(commonCfg[L"string_path"]))
+    imageMgr.InitTextures(commonCfg[L"image_file"]);
+    if(!stringCfg.LoadConfig(commonCfg[L"string_conf"]))
         return 0;
-    if(dataMgr.LoadDatas(commonCfg[L"database"]))
+    if(dataMgr.LoadDatas(commonCfg[L"database_file"]))
         return 0;
-    if(!imageMgr.LoadImageConfig(commonCfg[L"textures"]))
+    if(!imageMgr.LoadImageConfig(commonCfg[L"textures_conf"]))
         return 0;
     limitRegulationMgr.LoadLimitRegulation(commonCfg[L"limit_regulation"], stringCfg[L"eui_list_default"]);
     stringCfg.ForEach([](const std::wstring& name, ValueStruct& value) {
@@ -41,17 +44,21 @@ int main(int argc, char* argv[]) {
         }
     });
     
+    int bwidth, bheight;
+    glfwGetFramebufferSize(window, &bwidth, &bheight);
+    xrate = (float)bwidth / width;
+    yrate = (float)bheight / height;
+    
     sgui::SGGUIRoot::GetSingleton().LoadConfigs();
-    sgui::SGGUIRoot::GetSingleton().SetSceneSize({width, height});
+    sgui::SGGUIRoot::GetSingleton().SetSceneSize({bwidth, bheight});
     
     sceneMgr.Init();
-    sceneMgr.SetSceneSize({width, height});
+    sceneMgr.SetSceneSize({bwidth, bheight});
     sceneMgr.InitDraw();
     sceneMgr.SetFrameRate((int)commonCfg[L"frame_rate"]);
     auto sc = std::make_shared<BuildScene>();
     sceneMgr.SetScene(std::static_pointer_cast<Scene>(sc));
     sc->LoadDeckFromFile(L"./deck/807.ydk");
-    
 
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {
@@ -72,7 +79,11 @@ int main(int argc, char* argv[]) {
     glfwSetCharCallback(window, [](GLFWwindow* wnd, unsigned int unichar) {
         sgui::SGGUIRoot::GetSingleton().InjectCharEvent({unichar});
     });
-    glfwSetWindowSizeCallback(window, [](GLFWwindow* wnd, int width, int height) {
+    glfwSetFramebufferSizeCallback(window, [](GLFWwindow* wnd, int width, int height) {
+        int x, y;
+        glfwGetWindowSize(wnd, &x, &y);
+        xrate = (float)width / x;
+        yrate = (float)height / y;
         sceneMgr.SetSceneSize(v2i{width, height});
         sgui::SGGUIRoot::GetSingleton().SetSceneSize(v2i{width, height});
     });
@@ -83,19 +94,22 @@ int main(int argc, char* argv[]) {
             sgui::SGGUIRoot::GetSingleton().InjectMouseLeaveEvent();
     });
     glfwSetCursorPosCallback(window, [](GLFWwindow* wnd, double xpos, double ypos) {
-        sceneMgr.SetMousePosition({(int)xpos, (int)ypos});
-        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent({(int)xpos, (int)ypos}))
-            sceneMgr.MouseMove({(int)xpos, (int)ypos});
+        sceneMgr.SetMousePosition({(int)(xpos * xrate), (int)(ypos * yrate)});
+        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent({(int)(xpos * xrate), (int)(ypos * yrate)}))
+            sceneMgr.MouseMove({(int)(xpos * xrate), (int)(ypos * yrate)});
     });
     glfwSetMouseButtonCallback(window, [](GLFWwindow* wnd, int button, int action, int mods) {
-        double x, y;
-        glfwGetCursorPos(wnd, &x, &y);
+        double xpos, ypos;
+        glfwGetCursorPos(wnd, &xpos, &ypos);
+        xpos *= xrate;
+        ypos *= yrate;
+        sceneMgr.SetMousePosition({(int)xpos, (int)ypos});
         if(action == GLFW_PRESS) {
-            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent({button, mods, (int)x, (int)y}))
-                sceneMgr.MouseButtonDown({button, mods, (int)x, (int)y});
+            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent({button, mods, (int)xpos, (int)ypos}))
+                sceneMgr.MouseButtonDown({button, mods, (int)xpos, (int)ypos});
         } else {
-            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent({button, mods, (int)x, (int)y}))
-                sceneMgr.MouseButtonUp({button, mods, (int)x, (int)y});
+            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent({button, mods, (int)xpos, (int)ypos}))
+                sceneMgr.MouseButtonUp({button, mods, (int)xpos, (int)ypos});
         }
     });
     glfwSetScrollCallback(window, [](GLFWwindow* wnd, double xoffset, double yoffset) {
@@ -108,7 +122,6 @@ int main(int argc, char* argv[]) {
         sceneMgr.Update();
         sceneMgr.Draw();
         sgui::SGGUIRoot::GetSingleton().Draw();
-
         glfwSwapBuffers(window);
     }
     

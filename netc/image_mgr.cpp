@@ -13,9 +13,10 @@ namespace ygopro
 	ti4& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-			wxString file = wxString::Format("%ls/%d.jpg", static_cast<const std::wstring>(commonCfg[L"image_path"]).c_str(), id);
+            std::string file = wxString::Format("%d.jpg", id).ToStdString();
 			auto& cti = card_textures[id];
-			if(!wxFileExists(file)) {
+            int length = imageZip.GetFileLength(file);
+			if(length == 0) {
 				cti.ti = misc_textures["unknown"];
                 cti.ref_block = 0xffff;
 			} else {
@@ -25,7 +26,9 @@ namespace ygopro
                     cti.ref_block = 0xffff;
                 } else {
                     glbase::Image img;
-                    if(img.Load(file.ToStdString())) {
+                    unsigned char* imgbuf = new unsigned char[length];
+                    imageZip.ReadFile(file, imgbuf);
+                    if(img.LoadMemory(imgbuf, length)) {
                         glbase::VertexVCT frame_verts[4];
                         int bx = (blockid % 20) * 100;
                         int by = (blockid / 20) * 145;
@@ -63,6 +66,7 @@ namespace ygopro
                         cti.ti = misc_textures["unknown"];
                         cti.ref_block = 0xffff;
                     }
+                    delete imgbuf;
                 }
 			}
             return cti.ti;;
@@ -80,14 +84,18 @@ namespace ygopro
         static glbase::Texture* pre_ret = nullptr;
         if(pid == id)
             return pre_ret;
-        wxString file = wxString::Format("%ls/%d.jpg", (static_cast<const std::wstring&>(commonCfg[L"image_path"])).c_str(), id);
-        if(wxFileExists(file)) {
+        std::string file = wxString::Format("%d.jpg", id).ToStdString();
+        int length = imageZip.GetFileLength(file);
+        if(length != 0) {
             glbase::Image img;
-            if(img.Load(file.ToStdString())) {
+            unsigned char* imgbuf = new unsigned char[length];
+            imageZip.ReadFile(file, imgbuf);
+            if(img.LoadMemory(imgbuf, length)) {
                 card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                 pre_ret = &card_image;
             } else
                 pre_ret = nullptr;
+            delete imgbuf;
         } else
             pre_ret = nullptr;
         return pre_ret;
@@ -139,7 +147,7 @@ namespace ygopro
         return false;
     }
     
-    void ImageMgr::InitTextures() {
+    void ImageMgr::InitTextures(const std::wstring& image_pack) {
         card_texture.Load(nullptr, 2048, 2048);
         for(short i = 7; i < 280; ++i)
             unuse_block.push_back(i);
@@ -156,6 +164,7 @@ namespace ygopro
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        imageZip.Load(image_pack);
     }
 
     void ImageMgr::UninitTextures() {
@@ -201,7 +210,7 @@ namespace ygopro
                 wxString path = child->GetAttribute("path");
                 if(wxFileExists(path)) {
                     glbase::Image img;
-                    if(img.Load(path.ToStdString())) {
+                    if(img.LoadFile(path.ToStdString())) {
                         if(name == "card")
                             card_texture.Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
                         else if(name == "misc")

@@ -869,7 +869,11 @@ namespace ygopro
         float height = (top - down) / 5.0f;
         float cheight = height * 0.9f;
         float cwidth = cheight / 2.9f * 2.0f * scene_size.y / scene_size.x;
-        float offy = height * 0.05f;
+        if(cwidth >= 200.0f / scene_size.x) {
+            cwidth = 200.0f / scene_size.x;
+            cheight = cwidth * 2.9f / 2.0f * scene_size.x / scene_size.y;
+        }
+        float offy = (height - cheight) * 0.5f;
         float iheight = 0.08f / 0.29f * cheight;
         float iwidth = iheight * scene_size.y / scene_size.x;
         std::array<glbase::VertexVCT, 160> verts;

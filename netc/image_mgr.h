@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "glbase.h"
+#include "zip_archive.h"
 
 namespace ygopro
 {
@@ -31,7 +32,7 @@ namespace ygopro
         unsigned short AllocBlock();
         bool FreeBlock(unsigned short);
         
-		void InitTextures();
+		void InitTextures(const std::wstring& image_pack);
         void UninitTextures();
         void BindTexture(int textype);
 		bool LoadImageConfig(const std::wstring& file);
@@ -48,6 +49,7 @@ namespace ygopro
         glbase::Texture card_image;
         unsigned int frame_buffer = 0;
         unsigned int card_buffer[2] = {0, 0};
+        ZipArchive imageZip;
 	};
 
     extern ImageMgr imageMgr;

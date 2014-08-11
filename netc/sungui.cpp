@@ -867,7 +867,7 @@ namespace sgui
         if(font_mgr.find("default") == font_mgr.end())
             return false;
         glbase::Image img;
-        if(!img.Load(basic_config.string_config["gui_texture"]))
+        if(!img.LoadFile(basic_config.string_config["gui_texture"]))
             return false;
         gui_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
         tex_size = v2i{gui_texture.GetWidth(), gui_texture.GetHeight()};
@@ -2202,7 +2202,7 @@ namespace sgui
         if(slider_length == 0)
             return false;
         int prepos = current_pos;
-        current_pos += (pos_max - pos_min) * evt.deltay / 100;
+        current_pos += (pos_max - pos_min) * evt.deltay / 50;
         if(current_pos < 0)
             current_pos = 0;
         if(current_pos > pos_max - pos_min)
