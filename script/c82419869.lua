@@ -26,7 +26,7 @@ function c82419869.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c82419869.spfilter(c)
-	return c:IsSetCard(0xb2) and c:IsAbleToHandAsCost()
+	return c:IsFaceup() and c:IsSetCard(0xb2) and not c:IsCode(82419869) and c:IsAbleToHandAsCost()
 end
 function c82419869.spcon(e,c)
 	if c==nil then return true end
@@ -36,7 +36,6 @@ end
 function c82419869.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,c82419869.spfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	if not g:GetFirst():IsFaceup then Duel.ConfirmCards(1-tp,g) end
 	Duel.SendtoHand(g,nil,REASON_COST)
 end
 function c82419869.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -45,10 +44,8 @@ function c82419869.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsChainNegatable(ev) and Duel.GetTurnPlayer()~=tp
 end
 function c82419869.discost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,1,nil)
-	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c82419869.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

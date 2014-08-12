@@ -7,7 +7,7 @@ function c84764038.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_SELF_DESTROY)
 	e1:SetCondition(c84764038.sdcon)
-	c:RegisterEffect(e1)	
+	c:RegisterEffect(e1)
 	--Special Summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(84764038,0))
@@ -36,7 +36,7 @@ function c84764038.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c84764038.sscon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and not Duel.IsExistingMatchingCard(c84764038.filter,tp,LOCATION_ONFIELD,0,1,nil) 
+	return not Duel.IsExistingMatchingCard(c84764038.filter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c84764038.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -44,8 +44,9 @@ function c84764038.sstg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c84764038.ssop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToEffect(e) and not Duel.IsExistingMatchingCard(c84764038.filter,tp,LOCATION_ONFIELD,0,1,nil) then
-		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP_ATTACK)
+	if Duel.IsExistingMatchingCard(c84764038.filter,tp,LOCATION_ONFIELD,0,1,nil) then return end
+	if e:GetHandler():IsRelateToEffect(e) then
+		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function c84764038.regop(e,tp,eg,ep,ev,re,r,rp)
@@ -65,7 +66,8 @@ function c84764038.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c84764038.thfilter(c)
-	return c:GetLevel()== 3 and c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND) and not c:IsCode(84764038) and c:IsAbleToHand()
+	return c:GetLevel()==3 and c:IsAttribute(ATTRIBUTE_DARK) and c:IsRace(RACE_FIEND)
+		and not c:IsCode(84764038) and c:IsAbleToHand()
 end
 function c84764038.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c84764038.thfilter,tp,LOCATION_DECK,0,1,nil) end

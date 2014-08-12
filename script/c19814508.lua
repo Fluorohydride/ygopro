@@ -15,7 +15,7 @@ function c19814508.initial_effect(c)
 	e2:SetCode(EVENT_SUMMON_SUCCESS)
 	e2:SetTarget(c19814508.target)
 	e2:SetOperation(c19814508.operation)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
 	--atkup
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(19814508,1))
@@ -25,8 +25,8 @@ function c19814508.initial_effect(c)
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
-	e3:SetCondition(c19814508.condition)
-	e3:SetOperation(c19814508.operation)
+	e3:SetCondition(c19814508.atkcon)
+	e3:SetOperation(c19814508.atkop)
 	c:RegisterEffect(e3)
 end
 function c19814508.filter(c)
@@ -34,16 +34,14 @@ function c19814508.filter(c)
 end
 function c19814508.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()
-	if chk==0 then return tc:IsSetCard(0xb2) and tc:GetControler()==tp
-		and Duel.IsExistingMatchingCard(c19814508.filter,tp,LOCATION_DECK,0,1,nil,tc:GetAttack()) end
-	tc:CreateEffectRelation(e)
+	if chk==0 then return tc:IsSetCard(0xb2) and tc:IsControler(tp)
+		and Duel.IsExistingMatchingCard(c19814508.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c19814508.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectMatchingCard(tp,c19814508.filter,tp,LOCATION_DECK,0,1,1,nil,tc:GetAttack())
+	local g=Duel.SelectMatchingCard(tp,c19814508.filter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
@@ -52,10 +50,10 @@ end
 function c19814508.cfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0xb2) and c:IsControler(tp)
 end
-function c19814508.condition(e,tp,eg,ep,ev,re,r,rp)
+function c19814508.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c19814508.cfilter,1,nil,tp)
 end
-function c19814508.operation(e,tp,eg,ep,ev,re,r,rp)
+function c19814508.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)

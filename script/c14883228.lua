@@ -17,15 +17,16 @@ function c14883228.initial_effect(c)
 	e2:SetCondition(c14883228.handcon)
 	c:RegisterEffect(e2)
 end
-function c14883228.filter(c)
+function c14883228.cfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
-function c14883228.handcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c14883228.filter,tp,LOCATION_ONFIELD,0,1,nil) 
-	and Duel.IsExistingMatchingCard(c14883228.filter,tp,0,LOCATION_ONFIELD,2,nil) 
+function c14883228.handcon(e)
+	local tp=e:GetHandlerPlayer()
+	return not Duel.IsExistingMatchingCard(c14883228.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
+		and Duel.IsExistingMatchingCard(c14883228.cfilter,tp,0,LOCATION_ONFIELD,2,nil)
 end
 function c14883228.filter(c)
-	return c:IsFaceup() and c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)
+	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
 end
 function c14883228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c14883228.filter(chkc) end

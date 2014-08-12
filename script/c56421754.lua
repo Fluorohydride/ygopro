@@ -22,7 +22,7 @@ function c56421754.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c56421754.spfilter(c)
-	return c:IsSetCard(0xb2) and c:GetCode()~=56421754 and c:IsAbleToHandAsCost()
+	return c:IsFaceup() and c:IsSetCard(0xb2) and not c:IsCode(56421754) and c:IsAbleToHandAsCost()
 end
 function c56421754.spcon(e,c)
 	if c==nil then return true end
@@ -32,7 +32,6 @@ end
 function c56421754.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectMatchingCard(tp,c56421754.spfilter,tp,LOCATION_MZONE,0,1,1,nil)
-	if not g:GetFirst():IsFaceup then Duel.ConfirmCards(1-tp,g) end
 	Duel.SendtoHand(g,nil,REASON_COST)
 end
 function c56421754.aclimit(e,re,tp)

@@ -11,7 +11,7 @@ function c83531441.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCost(c83531441.atkcost)
-	e1:SetOperation(c83531441.operation)
+	e1:SetOperation(c83531441.atkop)
 	c:RegisterEffect(e1)
 	--to defence
 	local e2=Effect.CreateEffect(c)
@@ -22,8 +22,8 @@ function c83531441.initial_effect(c)
 	c:RegisterEffect(e2)
 	--to hand
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetDescription(aux.Stringid(83531441,1))
+	e3:SetCategory(CATEGORY_TOHAND)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetCode(EVENT_TO_GRAVE)
@@ -78,7 +78,7 @@ end
 function c83531441.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c83531441.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c83531441.filter,tp,LOCATION_GRAVE,0,1,e:GetHandler()) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectTarget(tp,c83531441.filter,tp,LOCATION_GRAVE,0,1,1,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
 end
