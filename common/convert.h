@@ -4,41 +4,52 @@
 #include <stdlib.h>
 #include <string>
 
-template<typename T>
-struct ConvertType {
-    typedef int conv_type;
+// never use oct
+inline int _GetRadix(const char*& str) {
+    if(str[0] == '0' && (str[1] == 'X' || str[1] == 'x'))
+        return 16;
+    return 10;
+}
+
+template<int type>
+struct Converter {
+    static unsigned long long Convert(const char* str) {
+        const char* s = str;
+        int radix = _GetRadix(s);
+        return strtoull(s, nullptr, radix);
+    }
 };
 
 template<>
-struct ConvertType<float> {
-    typedef double conv_type;
-};
-
-template<>
-struct ConvertType<double> {
-    typedef double conv_type;
+struct Converter<2> {
+    static double Convert(const char* str) {
+        return atof(str);
+    }
 };
 
 template<typename T>
-T As(const char* str) {
-    unsigned long val = strtoul(str, 0, 0);
-    return val;
+struct ConverterType {
+    static const int conv_type = 1;
 };
 
-//template<>
-//double As<double>(const char* str) {
-//    double val = atof(str);
-//    return val;
-//};
+template<>
+struct ConverterType<float> {
+    static const int conv_type = 2;
+};
+
+template<>
+struct ConverterType<double> {
+    static const int conv_type = 2;
+};
 
 template<typename T>
 T To(const char* str) {
-    return static_cast<T>(As<typename ConvertType<T>::conv_type>(str));
+    return static_cast<T>(Converter<ConverterType<T>::conv_type>::Convert(str));
 };
 
 template<typename T>
 T To(const std::string& str) {
-    return static_cast<T>(As<typename ConvertType<T>::conv_type>(str.c_str()));
+    return static_cast<T>(Converter<ConverterType<T>::conv_type>::Convert(str.c_str()));
 };
 
 #endif

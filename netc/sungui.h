@@ -388,11 +388,14 @@ namespace sgui
         
         void SetSceneSize(v2i size);
         v2i GetSceneSize();
-        void ConvertXY(int x, int y, v3f& v) {
+        
+        template<typename T>
+        void ConvertXY(int x, int y, T& v) {
             v.x = (float)x / scene_size.x * 2.0f - 1.0f;
             v.y = 1.0f - (float)y / scene_size.y * 2.0f;
         }
-        void TexUV(int u, int v, v2i& t) {
+        template<typename T>
+        void TexUV(int u, int v, T& t) {
             t.x = (float)u / tex_size.x;
             t.y = (float)v / tex_size.y;
         }

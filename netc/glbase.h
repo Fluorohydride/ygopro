@@ -137,7 +137,15 @@ namespace glbase {
         T v[16];
     };
     
-    struct VertexVCT {
+    struct v2ct {
+        vector2<float> vertex = {0.0f, 0.0f};
+        unsigned int color = 0xffffffff;
+        vector2<float> texcoord = {0.0f, 0.0f};
+        static const int color_offset = 8;
+        static const int tex_offset = 12;
+    };
+    
+    struct v3ct {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
         vector2<float> texcoord = {0.0f, 0.0f};
@@ -145,13 +153,13 @@ namespace glbase {
         static const int tex_offset = 16;
     };
     
-    struct VertexVNCT {
+    struct v3cnt {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        vector4<float> normal = {0.0f, 0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
+        vector4<float> normal = {0.0f, 0.0f, 0.0f, 0.0f};
         vector2<float> texcoord = {0.0f, 0.0f};
-        static const int normal_offset = 12;
-        static const int color_offset = 28;
+        static const int color_offset = 12;
+        static const int normal_offset = 16;
         static const int tex_offset = 32;
     };
     
@@ -160,17 +168,17 @@ namespace glbase {
         vector2<float> vert[TCOUNT];
 	};
     
-    inline void FillVertex(VertexVCT* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, unsigned int cl = 0xffffffff) {
-        vt[0].vertex = {pos.x, pos.y, 0.0f};
+    inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, unsigned int cl = 0xffffffff) {
+        vt[0].vertex = {pos.x, pos.y};
         vt[0].texcoord = ti.vert[0];
         vt[0].color = cl;
-        vt[1].vertex = {pos.x + sz.x, pos.y, 0.0f};
+        vt[1].vertex = {pos.x + sz.x, pos.y};
         vt[1].texcoord = ti.vert[1];
         vt[1].color = cl;
-        vt[2].vertex = {pos.x, pos.y + sz.y, 0.0f};
+        vt[2].vertex = {pos.x, pos.y + sz.y};
         vt[2].texcoord = ti.vert[2];
         vt[2].color = cl;
-        vt[3].vertex = {pos.x + sz.x, pos.y + sz.y, 0.0f};
+        vt[3].vertex = {pos.x + sz.x, pos.y + sz.y};
         vt[3].texcoord = ti.vert[3];
         vt[3].color = cl;
     };

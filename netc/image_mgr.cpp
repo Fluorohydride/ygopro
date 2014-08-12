@@ -30,7 +30,7 @@ namespace ygopro
                     unsigned char* imgbuf = new unsigned char[length];
                     imageZip.ReadFile(file, imgbuf);
                     if(img.LoadMemory(imgbuf, length)) {
-                        glbase::VertexVCT frame_verts[4];
+                        glbase::v2ct frame_verts[4];
                         int bx = (blockid % 20) * 100;
                         int by = (blockid / 20) * 145;
                         int bw = 100;
@@ -43,20 +43,20 @@ namespace ygopro
                         card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
                         glViewport(0, 0, 2048, 2048);
-                        frame_verts[0].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f, 0.0f};
-                        frame_verts[1].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f, 0.0f};
-                        frame_verts[2].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f, 0.0f};
-                        frame_verts[3].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f, 0.0f};
+                        frame_verts[0].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f};
+                        frame_verts[1].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f};
+                        frame_verts[2].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f};
+                        frame_verts[3].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f};
                         frame_verts[0].texcoord = {0.0f, 0.0f};
                         frame_verts[1].texcoord = {(float)img.GetWidth() / card_image.GetWidth(), 0.0f};
                         frame_verts[2].texcoord = {0.0f, (float)img.GetHeight() / card_image.GetHeight()};
                         frame_verts[3].texcoord = {frame_verts[1].texcoord.x, frame_verts[2].texcoord.y};
                         card_image.Bind();
                         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 4, &frame_verts);
-                        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-                        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)(uintptr_t)glbase::VertexVCT::color_offset);
-                        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)(uintptr_t)(glbase::VertexVCT::tex_offset));
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 4, &frame_verts);
+                        glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
+                        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)(uintptr_t)glbase::v2ct::color_offset);
+                        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)(uintptr_t)(glbase::v2ct::tex_offset));
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
 						//unsigned short ind[] = {0, 2, 1, 3};
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
@@ -163,7 +163,7 @@ namespace ygopro
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glGenBuffers(2, card_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 4, nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         unsigned short index[] = {0, 2, 1, 1, 2, 3};
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);

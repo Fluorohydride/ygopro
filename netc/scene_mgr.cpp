@@ -40,9 +40,9 @@ namespace ygopro
         glDisable(GL_DEPTH_TEST);
         glEnableClientState(GL_VERTEX_ARRAY);
         glEnableClientState(GL_COLOR_ARRAY);
-        //glEnableClientState(GL_NORMAL_ARRAY);
         glEnableClientState(GL_TEXTURE_COORD_ARRAY);
         glEnableClientState(GL_INDEX_ARRAY);
+        glDisableClientState(GL_NORMAL_ARRAY);
         glLoadIdentity();
     }
     

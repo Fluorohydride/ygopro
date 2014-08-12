@@ -23,8 +23,8 @@ namespace ygopro
         operator int() { return static_cast<int>(ivalue); }
         operator unsigned long() { return static_cast<unsigned long>(ivalue); }
         operator long() { return ivalue; }
-        operator double() { return static_cast<double>(fvalue); }
-        operator float() { return fvalue; }
+        operator float() { return static_cast<float>(fvalue); }
+        operator double() { return fvalue; }
         operator const std::wstring&() { return svalue; }
     };
     

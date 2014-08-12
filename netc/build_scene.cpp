@@ -23,16 +23,16 @@ namespace ygopro
         glGenBuffers(1, &result_buffer);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 256 * 16, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 256 * 16, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 33 * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 33 * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * 10 * 16, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 10 * 16, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         std::vector<unsigned short> index;
         index.resize(256 * 4 * 6);
@@ -192,17 +192,17 @@ namespace ygopro
         // background
         imageMgr.GetRawBGTexture()->Bind();
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+        glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // miscs
         imageMgr.GetRawMiscTexture()->Bind();
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+        glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
+        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
+        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
         glDrawElements(GL_TRIANGLE_STRIP, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
@@ -210,9 +210,9 @@ namespace ygopro
         // result
         if(result_show_size) {
             glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-            glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+            glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
+            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
             glDrawElements(GL_TRIANGLE_STRIP, result_show_size * 24 - 2, GL_UNSIGNED_SHORT, 0);
             GLCheckError(__FILE__, __LINE__);
         }
@@ -220,9 +220,9 @@ namespace ygopro
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz > 0) {
             glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
-            glVertexPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), 0);
-            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::color_offset);
-            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::VertexVCT), (const GLvoid*)glbase::VertexVCT::tex_offset);
+            glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
+            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
+            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
             glDrawElements(GL_TRIANGLE_STRIP, deck_sz * 24 - 2, GL_UNSIGNED_SHORT, 0);
         }
         GLCheckError(__FILE__, __LINE__);
@@ -656,10 +656,10 @@ namespace ygopro
             return;
         update_bg = false;
         auto ti = imageMgr.GetTexture("bg");
-        std::array<glbase::VertexVCT, 4> verts;
+        std::array<glbase::v2ct, 4> verts;
         glbase::FillVertex(&verts[0], {-1.0f, 1.0f}, {2.0f, -2.0f}, ti);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * verts.size(), &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * verts.size(), &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -796,7 +796,7 @@ namespace ygopro
     
     void BuildScene::RefreshCardPos(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<glbase::VertexVCT, 16> verts;
+        std::array<glbase::v2ct, 16> verts;
         glbase::FillVertex(&verts[0], ptr->pos, {ptr->size.x, -ptr->size.y}, ptr->card_tex);
         unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
         glbase::FillVertex(&verts[4], ptr->pos, {ptr->size.x, -ptr->size.y}, hmask, cl);
@@ -809,7 +809,7 @@ namespace ygopro
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
             glbase::FillVertex(&verts[12], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * ptr->buffer_index * 16, sizeof(glbase::VertexVCT) * 16, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * ptr->buffer_index * 16, sizeof(glbase::v2ct) * 16, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -817,7 +817,7 @@ namespace ygopro
         if(!update_misc)
             return;
         update_misc = false;
-        std::array<glbase::VertexVCT, 33 * 4> verts;
+        std::array<glbase::v2ct, 33 * 4> verts;
         auto msk = imageMgr.GetTexture("mmask");
         auto nbk = imageMgr.GetTexture("numback");
         float yrate = 1.0f - 40.0f / scene_size.y;
@@ -835,7 +835,7 @@ namespace ygopro
         float my = offsety[0] - main_y_spacing * 3 - card_size.y + th;
         float ey = offsety[1] - card_size.y + th;
         float sy = offsety[2] - card_size.y + th;
-        auto numblock = [&nw, &nh, &nbk](glbase::VertexVCT* v, v2f pos, unsigned int cl1, unsigned int cl2, int val) {
+        auto numblock = [&nw, &nh, &nbk](glbase::v2ct* v, v2f pos, unsigned int cl1, unsigned int cl2, int val) {
             glbase::FillVertex(&v[0], {pos.x, pos.y}, {nw, -nh}, nbk, cl1);
             if(val >= 10) {
                 glbase::FillVertex(&v[4], {pos.x + nw * 0.1f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + (val % 100) / 10), cl2);
@@ -859,7 +859,7 @@ namespace ygopro
         numblock(&verts[108], {nx, ey + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.extra_deck.size());
         numblock(&verts[120], {nx, sy + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.side_deck.size());
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * 33 * 4, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 33 * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -885,7 +885,7 @@ namespace ygopro
         float offy = (height - cheight) * 0.5f;
         float iheight = 0.08f / 0.29f * cheight;
         float iwidth = iheight * scene_size.y / scene_size.x;
-        std::array<glbase::VertexVCT, 160> verts;
+        std::array<glbase::v2ct, 160> verts;
         for(int i = 0; i < 10 ; ++i) {
             if((size_t)(i + result_page * 10) >= search_result.size())
                 continue;
@@ -907,7 +907,7 @@ namespace ygopro
             }
         }
         glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::VertexVCT) * result_show_size * 16, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * result_show_size * 16, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -948,33 +948,33 @@ namespace ygopro
     
     void BuildScene::RefreshHL(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<glbase::VertexVCT, 4> verts;
+        std::array<glbase::v2ct, 4> verts;
         unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
         glbase::FillVertex(&verts[0], ptr->pos, {ptr->size.x, -ptr->size.y}, hmask, cl);
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 4), sizeof(glbase::VertexVCT) * 4, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * (ptr->buffer_index * 16 + 4), sizeof(glbase::v2ct) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
     void BuildScene::RefreshLimit(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<glbase::VertexVCT, 4> verts;
+        std::array<glbase::v2ct, 4> verts;
         if(dcd->limit < 3) {
             auto lti = limit[dcd->limit];
             glbase::FillVertex(&verts[0], ptr->pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
         }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 8), sizeof(glbase::VertexVCT) * 4, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * (ptr->buffer_index * 16 + 8), sizeof(glbase::v2ct) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
     void BuildScene::RefreshEx(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<glbase::VertexVCT, 4> verts;
+        std::array<glbase::v2ct, 4> verts;
         if((ptr->show_exclusive) && dcd->data->pool != 3) {
             float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
             glbase::FillVertex(&verts[0], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::VertexVCT) * (ptr->buffer_index * 16 + 12), sizeof(glbase::VertexVCT) * 4, &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * (ptr->buffer_index * 16 + 12), sizeof(glbase::v2ct) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
