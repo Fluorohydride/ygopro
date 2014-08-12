@@ -16,7 +16,7 @@ function c50277973.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		for irac=0,23 do
 			local catt=1
 			for iatt=0,7 do
-				if Duel.IsPlayerCanSpecialSummonMonster(tp,5189,0,0x11,0,2200,4,crac,catt) then
+				if Duel.IsPlayerCanSpecialSummonMonster(tp,50277973,0,0x11,1800,1000,4,crac,catt) then
 					rac=rac+crac
 					break
 				end
