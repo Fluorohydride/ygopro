@@ -15,7 +15,7 @@ function c24218047.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c24218047.filter(c,e,tp)
-	return c:IsDefenceBelow(1500) and c:IsRace(RACE_PHANTOMDRAGON)
+	return c:IsDefenceBelow(1500) and c:IsRace(RACE_WYRM)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c24218047.target(e,tp,eg,ep,ev,re,r,rp,chk)
