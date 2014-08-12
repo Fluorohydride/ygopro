@@ -1,5 +1,7 @@
+#include <wx/xml/xml.h>
+
 #include "xml_config.h"
-#include "wx/xml/xml.h"
+#include "../common/convert.h"
 
 namespace ygopro
 {
@@ -13,21 +15,17 @@ namespace ygopro
 		while (child) {
             if(child->GetType() == wxXmlNodeType::wxXML_ELEMENT_NODE) {
                 if (child->GetName() == "integer") {
-                    wxString name = child->GetAttribute("name");
-                    wxString value = child->GetAttribute("value");
-                    long val = 0;
-                    value.ToCLong(&val, 0);
-                    config_map[name.ToStdWstring()] = val;
+                    std::wstring name = child->GetAttribute("name").ToStdWstring();
+                    long value = To<long>(child->GetAttribute("value").ToUTF8().data());
+                    config_map[name] = value;
                 } if (child->GetName() == "float") {
-                    wxString name = child->GetAttribute("name");
-                    wxString value = child->GetAttribute("value");
-                    double val = 0.0;
-                    value.ToDouble(&val);
-                    config_map[name.ToStdWstring()] = val;
+                    std::wstring name = child->GetAttribute("name").ToStdWstring();
+                    double value = To<long>(child->GetAttribute("value").ToUTF8().data());
+                    config_map[name] = value;
                 } else {
-                    wxString name = child->GetAttribute("name");
-                    wxString value = child->GetAttribute("value");
-                    config_map[name.ToStdWstring()] = value;
+                    std::wstring name = child->GetAttribute("name").ToStdWstring();
+                    std::wstring value = child->GetAttribute("value").ToStdWstring();
+                    config_map[name] = value;
                 }
             }
 			child = child->GetNext();

@@ -5,6 +5,7 @@
 #include "wx/txtstrm.h"
 #include "wx/tokenzr.h"
 #include "../common/hash.h"
+#include "../common/convert.h"
 #include <algorithm>
 
 namespace ygopro
@@ -82,7 +83,7 @@ namespace ygopro
         side_deck.clear();
         wxTextInputStream ts(deck_file);
         bool side = false;
-        unsigned long code;
+        unsigned int code;
         while(!deck_file.Eof()) {
             wxString line = ts.ReadLine();
             if(line.IsEmpty() || line[0] == wxT('#'))
@@ -91,7 +92,7 @@ namespace ygopro
                 side = true;
                 continue;
             }
-            line.ToULong(&code);
+            code = To<unsigned int>(line.ToUTF8().data());
             CardData* ptr = dataMgr[(unsigned int)code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
@@ -381,7 +382,7 @@ namespace ygopro
         if(!ban_file.IsOk())
             return;
         wxTextInputStream ts(ban_file);
-        unsigned long code, count;
+        unsigned int code, count;
         LimitRegulation* plist = nullptr;
         while(!ban_file.Eof()) {
             wxString line = ts.ReadLine();
@@ -396,8 +397,8 @@ namespace ygopro
             if(plist == nullptr)
                 continue;
             wxStringTokenizer tk(line, wxT(" \t\r\n"), wxTOKEN_STRTOK);
-            tk.GetNextToken().ToULong(&code);
-            tk.GetNextToken().ToULong(&count);
+            code = To<unsigned int>(tk.GetNextToken().ToUTF8().data());
+            count = To<unsigned int>(tk.GetNextToken().ToUTF8().data());
             if(code == 0)
                 continue;
             plist->counts[(unsigned int)code] = (unsigned int)count;

@@ -1,19 +1,12 @@
-#include <array>
 #include <chrono>
 #include <thread>
-#include <iostream>
+#include <ctime>
 
-#include <wx/filename.h>
-#include <wx/clipbrd.h>
-#include <wx/utils.h>
-
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "../buildin/stb_image_write.h"
+#include "../common/bufferutil.h"
 #include "glbase.h"
-#include "sungui.h"
 #include "scene_mgr.h"
-#include "image_mgr.h"
-#include "card_data.h"
-#include "deck_data.h"
-#include "build_scene.h"
 
 namespace ygopro
 {
@@ -117,4 +110,28 @@ namespace ygopro
         }
     }
     
+    void SceneMgr::ScreenShot() {
+        if(current_scene == nullptr)
+            return;
+        auto clip = current_scene->GetScreenshotClip();
+        unsigned char* image_buff = new unsigned char[scene_size.x * scene_size.y * 4];
+        unsigned char* clip_buff = new unsigned char[clip.width * clip.height * 4];
+        glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
+        for(int h = 0; h < clip.height; ++h) {
+            int offset = scene_size.x * 4 * (scene_size.y - 1 - clip.top - h);
+            memcpy(&clip_buff[clip.width * 4 * h], &image_buff[offset], clip.width * 4);
+        }
+        auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        auto tm = std::localtime(&t);
+        char file[256];
+        char utf8[256];
+        sprintf(file, "/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
+        std::wstring wpath = commonCfg[L"screenshot_path"];
+        BufferUtil::EncodeUTF8(wpath.c_str(), utf8);
+        std::string path = utf8;
+        path.append(file);
+        stbi_write_png(path.c_str(), clip.width, clip.height, 4, clip_buff, 0);
+        delete[] clip_buff;
+        delete[] image_buff;
+    }
 }

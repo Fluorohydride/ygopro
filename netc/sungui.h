@@ -446,7 +446,7 @@ namespace sgui
         void SetClickingObject(std::shared_ptr<SGWidget> ptr) { clicking_object = ptr; }
         std::shared_ptr<SGWidget> GetClickObject() { return clicking_object.lock(); }
         void SetPopupObject(std::shared_ptr<SGWidget> ptr) { popup_objects.push_back(ptr); }
-        bool LoadConfigs();
+        bool LoadConfigs(const std::wstring& gui_conf);
         void Unload();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
         glbase::Font& GetGUIFont(const std::string& name) { return font_mgr[name]; }

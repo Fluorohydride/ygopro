@@ -81,7 +81,8 @@ namespace ygopro
             return true;
         });
         auto rpnl = sgui::SGPanel::Create(nullptr, {0, 0}, {200, 60});
-        rpnl->SetPosition({-210, 40}, {1.0f, 0.0f});
+        rpnl->SetPosition({0, 40}, {0.795f, 0.0f});
+        rpnl->SetSize({-10, 60}, {0.205f, 0.0f});
         rpnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
             KeyDown(evt);
             return true;
@@ -152,10 +153,15 @@ namespace ygopro
             ChangeExclusive(check);
             return true;
         });
-        label_result = sgui::SGLabel::Create(rpnl, {10, 10}, L"");
-        label_page = sgui::SGLabel::Create(rpnl, {30, 33}, L"");
+        auto lblres = sgui::SGLabel::Create(rpnl, {0, 10}, L"");
+        lblres->SetPosition({0, 10}, {-1.0, 0.0f});
+        label_result = lblres;
+        auto lblpage = sgui::SGLabel::Create(rpnl, {0, 33}, L"");
+        lblpage->SetPosition({0, 33}, {-1.0, 0.0f});
+        label_page = lblpage;
         auto btn1 = sgui::SGButton::Create(rpnl, {10, 35}, {15, 15});
         auto btn2 = sgui::SGButton::Create(rpnl, {170, 35}, {15, 15});
+        btn2->SetPosition({-30, 35}, {1.0f, 0.0f});
         btn1->SetTextureRect({136, 74, 15, 15}, {136, 90, 15, 15}, {136, 106, 15, 15});
         btn2->SetTextureRect({154, 74, 15, 15}, {154, 90, 15, 15}, {154, 106, 15, 15});
         btn1->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
@@ -235,7 +241,7 @@ namespace ygopro
         card_size = {0.2f * yrate * sz.y / sz.x, 0.29f * yrate};
         icon_size = {0.08f * yrate * sz.y / sz.x, 0.08f * yrate};
         minx = 50.0f / sz.x * 2.0f - 1.0f;
-        maxx = 1.0f - 235.0f / sz.x * 2.0f;
+        maxx = 0.541f;
         main_y_spacing = 0.3f * yrate;
         offsety[0] = (0.92f + 1.0f) * yrate - 1.0f;
         offsety[1] = (-0.31f + 1.0f) * yrate - 1.0f;
@@ -256,14 +262,19 @@ namespace ygopro
         update_result = true;
     }
     
+    recti BuildScene::GetScreenshotClip() {
+        int maxx = (int)(scene_size.x * 0.795f) - 1;
+        return {0, 40, maxx, scene_size.y - 40};
+    }
+    
     void BuildScene::MouseMove(sgui::MouseMoveEvent evt) {
         std::shared_ptr<DeckCardData> dcd = nullptr;
         auto pre = GetCard(std::get<0>(prev_hov), std::get<1>(prev_hov));
-        if(evt.x >= scene_size.x - 210 && evt.x <= scene_size.x - 10 && evt.y >= 110 && evt.y <= scene_size.y - 10) {
+        if(evt.x >= (int)(scene_size.x * 0.795f) && evt.x <= scene_size.x - 10 && evt.y >= 110 && evt.y <= scene_size.y - 10) {
             int new_sel = (int)((evt.y - 110.0f) / ((scene_size.y - 120.0f) / 5.0f)) * 2;
             if(new_sel > 8)
                 new_sel = 8;
-            new_sel += (evt.x >= scene_size.x - 110) ? 1 : 0;
+            new_sel += (evt.x >= ((int)(scene_size.x * 0.795f) + scene_size.x - 10) / 2) ? 1 : 0;
             if(new_sel != current_sel_result) {
                 current_sel_result = new_sel;
                 update_result = true;
@@ -602,34 +613,6 @@ namespace ygopro
                 wxLaunchDefaultBrowser(neturl);
                 break;
             }
-            case 4: {
-                unsigned char* image_buff = new unsigned char[scene_size.x * scene_size.y * 4];
-                unsigned char* rgb_buff = new unsigned char[scene_size.x * scene_size.y * 3];
-                glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
-                for(int h = 0; h < scene_size.y; ++h) {
-                    for(int w = 0; w < scene_size.x; ++w) {
-                        unsigned int ch = scene_size.y - 1 - h;
-                        rgb_buff[h * scene_size.x * 3 + w * 3 + 0] = image_buff[ch * scene_size.x * 4 + w * 4 + 0];
-                        rgb_buff[h * scene_size.x * 3 + w * 3 + 1] = image_buff[ch * scene_size.x * 4 + w * 4 + 1];
-                        rgb_buff[h * scene_size.x * 3 + w * 3 + 2] = image_buff[ch * scene_size.x * 4 + w * 4 + 2];
-                    }
-                }
-                wxImage* img = new wxImage(scene_size.x, scene_size.y, rgb_buff, true);
-                if(true) {
-                    wxBitmap bmp(*img);
-                    wxTheClipboard->Open();
-                    wxTheClipboard->SetData(new wxBitmapDataObject(bmp));
-                    wxTheClipboard->Close();
-                } else
-                    img->SaveFile(L"a.png", wxBITMAP_TYPE_PNG);
-                delete img;
-                delete[] rgb_buff;
-                delete[] image_buff;
-                break;
-            }
-            case 5: {
-                
-            }
             default:
                 break;
         }
@@ -822,7 +805,7 @@ namespace ygopro
         auto nbk = imageMgr.GetTexture("numback");
         float yrate = 1.0f - 40.0f / scene_size.y;
         float lx = 10.0f / scene_size.x * 2.0f - 1.0f;
-        float rx = 1.0f - 225.0f / scene_size.x * 2.0f;
+        float rx = 0.5625f;
         float y0 = (0.95f + 1.0f) * yrate - 1.0f;
         float y1 = (offsety[0] - main_y_spacing * 3 - card_size.y + offsety[1]) / 2;
         float y2 = (offsety[1] - card_size.y + offsety[2]) / 2;
@@ -870,7 +853,7 @@ namespace ygopro
         result_show_size = 0;
         if((size_t)(result_page * 10) >= search_result.size())
             return;
-        float left = 1.0f - 210.0f / scene_size.x * 2.0f;
+        float left = 0.59f;
         float right = 1.0f - 10.0f / scene_size.x * 2.0f;
         float width = (right - left) / 2.0f;
         float top = 1.0f - 110.0f / scene_size.y * 2.0f;
@@ -878,8 +861,8 @@ namespace ygopro
         float height = (top - down) / 5.0f;
         float cheight = height * 0.9f;
         float cwidth = cheight / 2.9f * 2.0f * scene_size.y / scene_size.x;
-        if(cwidth >= 200.0f / scene_size.x) {
-            cwidth = 200.0f / scene_size.x;
+        if(cwidth >= (right - left) / 2.0f) {
+            cwidth = (right - left) / 2.0f;
             cheight = cwidth * 2.9f / 2.0f * scene_size.x / scene_size.y;
         }
         float offy = (height - cheight) * 0.5f;
@@ -1086,7 +1069,6 @@ namespace ygopro
             int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
             wxString s = wxString::Format(L"%d/%d", result_page + 1, pageall);
             ptr->SetText(s.ToStdWstring(), 0xff000000);
-            ptr->SetPosition({100 - ptr->GetSize().x / 2, 33});
         }
     }
     

@@ -1,7 +1,3 @@
-#include <iostream>
-#include <chrono>
-#include <ctime>
-
 #include "scene_mgr.h"
 #include "build_scene.h"
 #include "image_mgr.h"
@@ -39,12 +35,14 @@ int main(int argc, char* argv[]) {
     glewInit();
 
     imageMgr.InitTextures(commonCfg[L"image_file"]);
-    if(!stringCfg.LoadConfig(commonCfg[L"string_conf"]))
+    if(!stringCfg.LoadConfig(commonCfg[L"string_conf"])
+       || dataMgr.LoadDatas(commonCfg[L"database_file"])
+       || !imageMgr.LoadImageConfig(commonCfg[L"textures_conf"])
+       || !sgui::SGGUIRoot::GetSingleton().LoadConfigs(commonCfg[L"gui_conf"])) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
         return 0;
-    if(dataMgr.LoadDatas(commonCfg[L"database_file"]))
-        return 0;
-    if(!imageMgr.LoadImageConfig(commonCfg[L"textures_conf"]))
-        return 0;
+    }
     limitRegulationMgr.LoadLimitRegulation(commonCfg[L"limit_regulation"], stringCfg[L"eui_list_default"]);
     stringCfg.ForEach([](const std::wstring& name, ValueStruct& value) {
         if(name.find(L"setname_") == 0 ) {
@@ -56,26 +54,19 @@ int main(int argc, char* argv[]) {
     glfwGetFramebufferSize(window, &bwidth, &bheight);
     xrate = (float)bwidth / width;
     yrate = (float)bheight / height;
-    
-    sgui::SGGUIRoot::GetSingleton().LoadConfigs();
     sgui::SGGUIRoot::GetSingleton().SetSceneSize({bwidth, bheight});
-    
     sceneMgr.Init();
     sceneMgr.SetSceneSize({bwidth, bheight});
     sceneMgr.InitDraw();
     sceneMgr.SetFrameRate((int)commonCfg[L"frame_rate"]);
+    
     auto sc = std::make_shared<BuildScene>();
     sceneMgr.SetScene(std::static_pointer_cast<Scene>(sc));
 
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {
-            if(key == GLFW_KEY_R && (mods & GLFW_MOD_ALT)) {
-//                auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
-//                auto tm = std::localtime(&t);
-//                char buf[256];
-//                sprintf(buf, "./screenshot/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon, tm->tm_mday, t);
-//                window.capture().saveToFile(buf);
-            }
+            if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))
+                sceneMgr.ScreenShot();
             if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent({key, mods}))
                 sceneMgr.KeyDown({key, mods});
         } else if(action == GLFW_RELEASE) {

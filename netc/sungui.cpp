@@ -34,7 +34,9 @@ namespace sgui
         if(res)
             size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
         if(rep) {
-            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
+            int posx = (position_prop.x < 0.0f) ? ((ssize.x - size_abs.x) / 2) : (position.x + (int)(ssize.x * position_prop.x));
+            int posy = (position_prop.y < 0.0f) ? ((ssize.y - size_abs.y) / 2) : (position.y + (int)(ssize.y * position_prop.y));
+            position_abs = {posx, posy};
             if(ptr != nullptr)
                 position_abs += ptr->GetClientPosition();
         }
@@ -483,16 +485,7 @@ namespace sgui
     }
     
     void SGWidgetContainer::PostResize(bool res, bool rep) {
-        vertices_dirty = true;
-        auto ptr = parent.lock();
-        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
-        if(res)
-            size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
-        if(rep) {
-            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
-            if(ptr != nullptr)
-                position_abs += ptr->GetClientPosition();
-        }
+        SGWidget::PostResize(res, rep);
         if(res)
             rep = true;
         for(auto& chd : children)
@@ -798,7 +791,7 @@ namespace sgui
         draging_object.reset();
     }
     
-    bool SGGUIRoot::LoadConfigs() {
+    bool SGGUIRoot::LoadConfigs(const std::wstring& gui_conf) {
         AddConfig("basic", SGGUIRoot::basic_config);
         AddConfig("panel", SGPanel::panel_config);
         AddConfig("window", SGWindow::window_config);
@@ -814,7 +807,7 @@ namespace sgui
         AddConfig("tabcontrol", SGTabControl::tab_config);
         
         wxXmlDocument doc;
-		if(!doc.Load("./conf/gui.xml", wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
+		if(!doc.Load(gui_conf, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
 			return false;
 		wxXmlNode* root = doc.GetRoot();
 		wxXmlNode* subtype = root->GetChildren();
@@ -1228,17 +1221,11 @@ namespace sgui
     }
     
     void SGLabel::PostResize(bool res, bool rep) {
-        vertices_dirty = true;
-        auto ptr = parent.lock();
-        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetSize();
-        if(res) {
+        if(res)
             size_abs = v2i{std::max(text_width_cur, text_width), text_height};
-        }
-        if(rep) {
-            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
-            if(ptr != nullptr)
-                position_abs += ptr->GetPosition();
-        }
+        if(position_prop.x < 0.0f || position_prop.y < 0.0f)
+            rep = true;
+        SGWidget::PostResize(false, rep);
     }
     
     void SGLabel::UpdateVertices() {
@@ -1754,18 +1741,13 @@ namespace sgui
     }
     
     void SGCheckbox::PostResize(bool res, bool rep) {
-        vertices_dirty = true;
-        auto ptr = parent.lock();
-        v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res) {
             auto rec = checkbox_config.tex_config["offset"];
             size_abs = v2i{rec.left + rec.width + rec.top + text_width_cur, std::max(text_height , rec.height)};
         }
-        if(rep) {
-            position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
-            if(ptr != nullptr)
-                position_abs += ptr->GetClientPosition();
-        }
+        if(position_prop.x < 0.0f || position_prop.y < 0.0f)
+            rep = true;
+        SGWidget::PostResize(false, rep);
     }
     
     void SGCheckbox::UpdateVertices() {
@@ -2319,7 +2301,8 @@ namespace sgui
     
     void SGTextEdit::PostResize(bool res, bool rep) {
         SGWidgetContainer::PostResize(res, rep);
-        size_abs.y = textedit_config.int_config["height"];
+        if(res)
+            size_abs.y = textedit_config.int_config["height"];
     }
     
     void SGTextEdit::UpdateVertices() {

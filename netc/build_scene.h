@@ -45,6 +45,7 @@ namespace ygopro
         virtual void Update();
         virtual void Draw();
         virtual void SetSceneSize(v2i sz);
+        virtual recti GetScreenshotClip();
         virtual void MouseMove(sgui::MouseMoveEvent evt);
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt);

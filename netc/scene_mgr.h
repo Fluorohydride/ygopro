@@ -18,6 +18,7 @@ namespace ygopro
         virtual void Update() = 0;
         virtual void Draw() = 0;
         virtual void SetSceneSize(v2i sz) = 0;
+        virtual recti GetScreenshotClip() = 0;
         virtual void MouseMove(sgui::MouseMoveEvent evt) = 0;
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt) = 0;
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt) = 0;
@@ -43,6 +44,7 @@ namespace ygopro
         void KeyUp(sgui::KeyEvent evt);
         void SetSceneSize(v2i sz);
         void SetScene(std::shared_ptr<Scene> sc);
+        void ScreenShot();
         std::shared_ptr<Scene> GetScene() { return current_scene; };
         void SetMousePosition(v2i pos) { mouse_pos = pos; }
         v2i GetMousePosition() { return mouse_pos; }

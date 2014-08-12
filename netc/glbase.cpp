@@ -1,5 +1,4 @@
 #include <cstring>
-#include <fstream>
 #include <iostream>
 #include "glbase.h"
 
