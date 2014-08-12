@@ -212,7 +212,7 @@ public:
 	int32 is_summonable();
 	int32 is_summonable(effect* peffect);
 	int32 is_can_be_summoned(uint8 playerid, uint8 ingore_count, effect* peffect);
-	int32 get_summon_tribute_count();
+	int32 get_summon_tribute_count(uint8 ignore_count = 0);
 	int32 get_set_tribute_count();
 	int32 is_can_be_flip_summoned(uint8 playerid);
 	int32 is_special_summonable(uint8 playerid);

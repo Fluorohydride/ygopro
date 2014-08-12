@@ -1304,8 +1304,10 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			effect* pextra = core.extra_summon[sumplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-				if(pextra->value && (core.summon_count[sumplayer] < get_summon_count_limit(sumplayer)))
+				if((pextra->flag & EFFECT_FLAG_FUNC_VALUE) && (core.summon_count[sumplayer] < get_summon_count_limit(sumplayer)))
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
+				else if(!(pextra->flag & EFFECT_FLAG_FUNC_VALUE) && target->material_cards.size() < pextra->get_value())
+					core.temp_var[0] = 0;
 				else
 					returns.ivalue[0] = TRUE;
 			}
@@ -1356,7 +1358,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			effect* pextra = core.extra_summon[sumplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-				if(pextra->value && (core.summon_count[sumplayer] < get_summon_count_limit(sumplayer)))
+				if((pextra->flag & EFFECT_FLAG_FUNC_VALUE) && (core.summon_count[sumplayer] < get_summon_count_limit(sumplayer)))
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 91);
 				else
 					returns.ivalue[0] = TRUE;
