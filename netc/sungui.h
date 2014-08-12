@@ -453,6 +453,7 @@ namespace sgui
         glbase::Texture& GetGUITexture() { return gui_texture; }
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
+        void CheckMouseMove();
         float GetTime();
         
         bool InjectMouseMoveEvent(MouseMoveEvent evt);
@@ -471,6 +472,7 @@ namespace sgui
         bool inside_scene = false;
         v2i scene_size = {0, 0};
         v2i tex_size = {0, 0};
+        v2i mouse_pos = {0, 0};
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
         std::list<std::weak_ptr<SGWidget>> popup_objects;

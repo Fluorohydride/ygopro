@@ -13,6 +13,7 @@ using namespace ygopro;
 
 static float xrate = 0.0f;
 static float yrate = 0.0f;
+static bool need_draw = true;
 
 int main(int argc, char* argv[]) {
     if(!glfwInit())
@@ -24,11 +25,15 @@ int main(int argc, char* argv[]) {
 	int fsaa = commonCfg[L"fsaa"];
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
+    glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+    auto mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     GLFWwindow* window = glfwCreateWindow(width, height, "Ygopro", nullptr, nullptr);
     if (!window) {
         glfwTerminate();
         return 0;
     }
+    glfwSetWindowPos(window, (mode->width - width) / 2, (mode->height - height) / 2);
+    glfwShowWindow(window);
     glfwMakeContextCurrent(window);
 	glewExperimental = true;
     glewInit();
@@ -117,13 +122,22 @@ int main(int argc, char* argv[]) {
     glfwSetScrollCallback(window, [](GLFWwindow* wnd, double xoffset, double yoffset) {
         sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent({(float)xoffset, (float)yoffset});
     });
+    glfwSetWindowIconifyCallback(window, [](GLFWwindow* wnd, int iconified) {
+        need_draw = (iconified == GL_FALSE);
+        if(need_draw)
+            sceneMgr.SetFrameRate((int)commonCfg[L"frame_rate"]);
+        else
+            sceneMgr.SetFrameRate(10);
+    });
     while (!glfwWindowShouldClose(window)) {
         sceneMgr.CheckFrameRate();
         sceneMgr.InitDraw();
         glfwPollEvents();
         sceneMgr.Update();
-        sceneMgr.Draw();
-        sgui::SGGUIRoot::GetSingleton().Draw();
+        if(need_draw) {
+            sceneMgr.Draw();
+            sgui::SGGUIRoot::GetSingleton().Draw();
+        }
         glfwSwapBuffers(window);
     }
     

@@ -507,6 +507,8 @@ namespace sgui
         for(auto iter = children.begin(); iter != children.end(); ++iter) {
             if(*iter == chd) {
                 children.erase(iter);
+                if(hoving.lock() == chd)
+                    guiRoot.CheckMouseMove();
                 return;
             }
         }
@@ -888,6 +890,10 @@ namespace sgui
         index_buffer = 0;
     }
     
+    void SGGUIRoot::CheckMouseMove() {
+        InjectMouseMoveEvent({mouse_pos.x, mouse_pos.y});
+    }
+    
     float SGGUIRoot::GetTime() {
         unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
         return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
@@ -905,9 +911,10 @@ namespace sgui
     
     bool SGGUIRoot::InjectMouseMoveEvent(MouseMoveEvent evt) {
         if(!inside_scene)
-            return InjectMouseEnterEvent();
+            InjectMouseEnterEvent();
         if(!draging_object.expired())
             draging_object.lock()->DragingUpdate(v2i{evt.x, evt.y});
+        mouse_pos = {evt.x, evt.y};
         return EventMouseMove(evt);
     }
     
@@ -2420,7 +2427,7 @@ namespace sgui
             v2i ta = position_abs + v2i{text_area.left - text_offset, text_area.top};
             guiRoot.SetRectVertex(&vert[0], ta.x + ps, ta.y, pe - ps, ht, textedit_config.tex_config["sel_rect"]);
         }
-        for(int i = 0; i < 11; ++i)
+        for(int i = 0; i < 4; ++i)
             vert[i].color = sel_bcolor;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 40, sizeof(glbase::v2ct) * 4, &vert);
@@ -2715,7 +2722,7 @@ namespace sgui
     bool SGTextEdit::EventCharEnter(TextEvent evt) {
         if(read_only)
             return false;
-        if(evt.unichar < 32 || evt.unichar == 127) // control charactors
+        if(evt.unichar < 32 || evt.unichar == 127 || evt.unichar >= 0xe000) // control charactors
             return false;
         if(sel_start != sel_end) {
             text.erase(text.begin() + sel_start, text.begin() + sel_end);
