@@ -2,7 +2,8 @@
 <Common>
   <integer name="window_width" value="1024"/>
   <integer name="window_height" value="640"/>
-  <integer name="vertical_sync" value="1"/>
+  <integer name="vertical_sync" value="0"/>
+  <integer name="fsaa" value="0"/>
   <integer name="frame_rate" value="60"/>
   <integer name="card_size_x" value="100"/>
   <integer name="card_size_y" value="145"/>

@@ -19,6 +19,7 @@ int main(int argc, char* argv[]) {
     int width = commonCfg[L"window_width"];
     int height = commonCfg[L"window_height"];
 	int fsaa = commonCfg[L"fsaa"];
+    int vsync = commonCfg[L"vertical_sync"];
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -120,6 +121,10 @@ int main(int argc, char* argv[]) {
         else
             sceneMgr.SetFrameRate(10);
     });
+    if(vsync)
+        glfwSwapInterval(1);
+    else
+        glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
         sceneMgr.CheckFrameRate();
         sceneMgr.InitDraw();

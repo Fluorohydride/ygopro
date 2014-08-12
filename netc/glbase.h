@@ -243,6 +243,7 @@ namespace glbase {
         Font();
         ~Font();
         bool Load(const std::string& file, unsigned int sz);
+        void Unload();
         const FontGlyph& GetGlyph(unsigned int ch);
         inline Texture& GetTexture() { return char_tex; }
         inline int GetFontSize() { return font_size; }

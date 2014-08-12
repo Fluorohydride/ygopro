@@ -150,7 +150,11 @@ namespace glbase {
         font_size = sz;
         return true;
     }
-    
+
+    void Font::Unload() {
+        char_tex.Unload();
+    }
+	
     const FontGlyph& Font::GetGlyph(unsigned int ch) {
         auto& gl = glyphs[ch];
         if(gl.loaded)

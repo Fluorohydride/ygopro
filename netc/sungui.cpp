@@ -880,6 +880,8 @@ namespace sgui
         ClearChild();
         if(index_buffer)
             glDeleteBuffers(1, &index_buffer);
+        for(auto& ft : font_mgr)
+            ft.second.Unload();
         index_buffer = 0;
     }
     
