@@ -12,6 +12,7 @@
 #include "interpreter.h"
 #include <algorithm>
 
+class filter_summon_procedure;
 int32 field::negate_chain(uint8 chaincount) {
 	if(core.current_chain.size() == 0)
 		return FALSE;
@@ -4212,9 +4213,12 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			rmax += (*cit)->operation_param;
 		if(rmax < min)
 			returns.ivalue[0] = TRUE;
-		else if(!core.release_cards_ex_sum.empty())
+		else if(!core.release_cards_ex_sum.empty()) {
+			core.temp_var[0] = 0;
+			if(rmax == 0 && min == 2)
+				core.temp_var[0] = 1;
 			add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, 92);
-		else
+		} else
 			core.units.begin()->step = 2;
 		return FALSE;
 	}
@@ -4223,8 +4227,13 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			core.units.begin()->step = 2;
 			return FALSE;
 		}
-		for(auto cit = core.release_cards_ex_sum.begin(); cit != core.release_cards_ex_sum.end(); ++cit)
-			core.select_cards.push_back(*cit);
+		if(core.temp_var[0] == 0)
+			for(auto cit = core.release_cards_ex_sum.begin(); cit != core.release_cards_ex_sum.end(); ++cit)
+				core.select_cards.push_back(*cit);
+		else
+			for(auto cit = core.release_cards_ex_sum.begin(); cit != core.release_cards_ex_sum.end(); ++cit)
+				if((*cit)->operation_param == 2)
+					core.select_cards.push_back(*cit);
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_SELECTMSG);
 		pduel->write_buffer8(playerid);
@@ -4262,7 +4271,7 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		max -= rmin;
 		core.units.begin()->arg2 = (max << 16) + min;
 		if(min <= 0) {
-			if(max > 0)
+			if(max > 0 && !core.release_cards.empty())
 				add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, 210);
 			else
 				core.units.begin()->step = 6;
