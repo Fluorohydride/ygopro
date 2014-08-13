@@ -12,7 +12,6 @@
 #include "interpreter.h"
 #include <algorithm>
 
-class filter_summon_procedure;
 int32 field::negate_chain(uint8 chaincount) {
 	if(core.current_chain.size() == 0)
 		return FALSE;
