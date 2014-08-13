@@ -1,9 +1,6 @@
 #ifndef _XML_CONFIG_H_
 #define _XML_CONFIG_H_
 
-#include <string>
-#include <unordered_map>
-
 namespace ygopro
 {
 

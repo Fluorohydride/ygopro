@@ -15,8 +15,6 @@
 #include FT_FREETYPE_H
 
 #ifdef _DEBUG
-#include <iostream>
-#include <string>
 void GLCheckError(const std::string& file, int line);
 #else
 #define GLCheckError(x, y)
@@ -253,7 +251,7 @@ namespace glbase {
         FontGlyph glyphs[0x10000];
         FT_Face face;
         FT_Library library;
-        int font_size;
+        int font_size = 0;
         int tex_posx = 0;
         int tex_posy = 0;
     };

@@ -1,11 +1,6 @@
 #ifndef _CONVERT_H_
 #define _CONVERT_H_
 
-#include <stdlib.h>
-#include <string>
-
-#include "bufferutil.h"
-
 // never use oct
 inline int _GetRadix(const char*& str) {
     if(str[0] == '0' && (str[1] == 'X' || str[1] == 'x'))

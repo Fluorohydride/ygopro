@@ -1,15 +1,12 @@
-#include <algorithm>
-#include <ctype.h>
+#include "../common/common.h"
+
+#include "../buildin/sqlite3.h"
 
 #include "card_data.h"
 #include "scene_mgr.h"
-#include "../common/bufferutil.h"
-#include "../buildin/sqlite3.h"
 
 namespace ygopro
 {
-
-	DataMgr dataMgr;
 
     bool CardData::CheckCondition(const FilterCondition& fc) {
         if(type & 0x4000)
@@ -43,7 +40,7 @@ namespace ygopro
         if(fc.setcode != 0) {
             unsigned long long sc = setcode;
             if(alias) {
-                CardData* adata = dataMgr[alias];
+                CardData* adata = DataMgr::Get()[alias];
                 if(adata)
                     sc = adata->setcode;
             }

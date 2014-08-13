@@ -1,11 +1,6 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
-#include <array>
-#include <vector>
-#include <list>
-#include <unordered_map>
-
 #include "glbase.h"
 #include "zip_archive.h"
 
@@ -17,7 +12,7 @@ namespace ygopro
         unsigned short ref_block = 0;
 	};
     
-	class ImageMgr {
+	class ImageMgr : public Singleton<ImageMgr> {
 
 	public:
 		ti4& GetCardTexture(unsigned int id);
@@ -52,8 +47,6 @@ namespace ygopro
         unsigned int card_buffer[2] = {0, 0};
         ZipArchive imageZip;
 	};
-
-    extern ImageMgr imageMgr;
 
 }
 

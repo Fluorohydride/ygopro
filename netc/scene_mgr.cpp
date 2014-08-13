@@ -1,18 +1,14 @@
-#include <chrono>
-#include <thread>
-#include <ctime>
+#include "../common/common.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../buildin/stb_image_write.h"
-#include "../common/bufferutil.h"
+
 #include "glbase.h"
 #include "scene_mgr.h"
 
 namespace ygopro
 {
 
-    SceneMgr sceneMgr;
-	Random globalRandom;
 	CommonConfig commonCfg;
     CommonConfig stringCfg;
     
@@ -51,19 +47,19 @@ namespace ygopro
             current_scene->Draw();
     }
     
-    float SceneMgr::GetGameTime() {
+    double SceneMgr::GetGameTime() {
         unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
-        return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
+        return (double)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
     }
     
-    void SceneMgr::SetFrameRate(float rate) {
-        frame_interval = 1.0f / rate;
+    void SceneMgr::SetFrameRate(double rate) {
+        frame_interval = 1.0 / rate;
     }
     
     void SceneMgr::CheckFrameRate() {
-        float now = GetGameTime();
+        double now = GetGameTime();
         frame_check += frame_interval - (now - frame_time);
-        if(frame_check >= 0.0f)
+        if(frame_check >= 0.0)
             std::this_thread::sleep_for(std::chrono::microseconds((int)(frame_interval * 1000000)));
         frame_time = now;
     }

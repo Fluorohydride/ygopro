@@ -1,7 +1,8 @@
+#include "../common/common.h"
+
 #include <wx/xml/xml.h>
 
 #include "xml_config.h"
-#include "../common/convert.h"
 
 namespace ygopro
 {

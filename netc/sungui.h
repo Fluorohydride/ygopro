@@ -1,14 +1,6 @@
 #ifndef _SUNGUI_H_
 #define _SUNGUI_H_
 
-#include <string>
-#include <memory>
-#include <vector>
-#include <array>
-#include <list>
-#include <unordered_map>
-#include <functional>
-
 #include "glbase.h"
 #include <GLFW/glfw3.h>
 
@@ -319,7 +311,7 @@ namespace sgui
         unsigned int imgbo = 0;
         bool img_update = true;
         bool img_dirty = true;
-        float frame_time = 0.016f;
+        double frame_time = 0.016;
         glbase::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
@@ -454,7 +446,7 @@ namespace sgui
         unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
         void CheckMouseMove();
-        float GetTime();
+        double GetTime();
         
         bool InjectMouseMoveEvent(MouseMoveEvent evt);
         bool InjectMouseEnterEvent();
@@ -745,7 +737,7 @@ namespace sgui
         int text_offset = 0;
         int drag_check = 0;
         recti text_area = {0, 0, 0, 0};
-        float cursor_time = 0.0f;
+        double cursor_time = 0.0;
         unsigned int cursor_pos = 0;
         bool sel_change = true;
         unsigned int sel_start = 0;
@@ -800,7 +792,7 @@ namespace sgui
         int item_count = 0;
         int max_item_count = 0;
         recti text_area = {0, 0, 0, 0};
-        float click_time = 0.0f;
+        double click_time = 0.0;
         std::vector<std::tuple<unsigned short, std::wstring, unsigned int, int>> items;
         
     public:

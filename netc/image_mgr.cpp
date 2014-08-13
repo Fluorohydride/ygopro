@@ -1,15 +1,13 @@
+#include "../common/common.h"
+
+#include <wx/xml/xml.h>
+#include <wx/wfstream.h>
+
 #include "image_mgr.h"
 #include "scene_mgr.h"
-#include "../common/common.h"
-#include "../common/convert.h"
-
-#include "wx/xml/xml.h"
-#include "wx/wfstream.h"
 
 namespace ygopro
 {
-
-	ImageMgr imageMgr;
 
 	ti4& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);

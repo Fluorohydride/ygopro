@@ -1,10 +1,11 @@
+#include "../common/common.h"
+
 #include <wx/dir.h>
 #include <wx/filename.h>
 
 #include "card_data.h"
 #include "scene_mgr.h"
 #include "image_mgr.h"
-
 #include "gui_extra.h"
 
 namespace ygopro
@@ -230,9 +231,9 @@ namespace ygopro
         auto ptype1 = sgui::SGComboBox::Create(wd, {90, 35}, {130, 30});
         type1 = ptype1;
         ptype1->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
-        ptype1->AddItem(dataMgr.GetTypeString2(0x1), 0xff000000, 0x1);
-        ptype1->AddItem(dataMgr.GetTypeString2(0x2), 0xff000000, 0x2);
-        ptype1->AddItem(dataMgr.GetTypeString2(0x4), 0xff000000, 0x4);
+        ptype1->AddItem(DataMgr::Get().GetTypeString2(0x1), 0xff000000, 0x1);
+        ptype1->AddItem(DataMgr::Get().GetTypeString2(0x2), 0xff000000, 0x2);
+        ptype1->AddItem(DataMgr::Get().GetTypeString2(0x4), 0xff000000, 0x4);
         ptype1->SetSelection(0);
         ptype1->eventSelChange.Bind([this](sgui::SGWidget& sender, int index)->bool {
             auto ptr = type2.lock();
@@ -241,32 +242,32 @@ namespace ygopro
                 ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
             } else if(index == 1) {
                 ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0x1e003ef);
-                ptr->AddItem(dataMgr.GetTypeString2(0x10), 0xff000000, 0x10);
-                ptr->AddItem(dataMgr.GetTypeString2(0x20), 0xff000000, 0x20);
-                ptr->AddItem(dataMgr.GetTypeString2(0x40), 0xff000000, 0x40);
-                ptr->AddItem(dataMgr.GetTypeString2(0x80), 0xff000000, 0x80);
-                ptr->AddItem(dataMgr.GetTypeString2(0x1000), 0xff000000, 0x1000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x2000), 0xff000000, 0x2000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x800000), 0xff000000, 0x800000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x1000000), 0xff000000, 0x1000000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x200000), 0xff000000, 0x200000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x800), 0xff000000, 0x800);
-                ptr->AddItem(dataMgr.GetTypeString2(0x200), 0xff000000, 0x200);
-                ptr->AddItem(dataMgr.GetTypeString2(0x400), 0xff000000, 0x400);
-                ptr->AddItem(dataMgr.GetTypeString2(0x400000), 0xff000000, 0x400000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x10);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x20), 0xff000000, 0x20);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x40), 0xff000000, 0x40);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x80), 0xff000000, 0x80);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x1000), 0xff000000, 0x1000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x2000), 0xff000000, 0x2000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x800000), 0xff000000, 0x800000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x1000000), 0xff000000, 0x1000000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x200000), 0xff000000, 0x200000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x800), 0xff000000, 0x800);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x200), 0xff000000, 0x200);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x400), 0xff000000, 0x400);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x400000), 0xff000000, 0x400000);
             } else if(index == 2) {
                 ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0xf0082);
-                ptr->AddItem(dataMgr.GetTypeString2(0x10), 0xff000000, 0x2);
-                ptr->AddItem(dataMgr.GetTypeString2(0x80), 0xff000000, 0x80);
-                ptr->AddItem(dataMgr.GetTypeString2(0x10000), 0xff000000, 0x10000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x20000), 0xff000000, 0x20000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x40000), 0xff000000, 0x40000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x80000), 0xff000000, 0x80000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x2);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x80), 0xff000000, 0x80);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10000), 0xff000000, 0x10000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x20000), 0xff000000, 0x20000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x40000), 0xff000000, 0x40000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x80000), 0xff000000, 0x80000);
             } else {
                 ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0x120004);
-                ptr->AddItem(dataMgr.GetTypeString2(0x10), 0xff000000, 0x4);
-                ptr->AddItem(dataMgr.GetTypeString2(0x20000), 0xff000000, 0x20000);
-                ptr->AddItem(dataMgr.GetTypeString2(0x100000), 0xff000000, 0x100000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x4);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x20000), 0xff000000, 0x20000);
+                ptr->AddItem(DataMgr::Get().GetTypeString2(0x100000), 0xff000000, 0x100000);
             }
             ptr->SetSelection(0);
             return true;
@@ -290,14 +291,14 @@ namespace ygopro
         attribute = pattribute;
         pattribute->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
         for(unsigned int i = 1; i != 0x80; i <<=1)
-            pattribute->AddItem(dataMgr.GetAttributeString(i), 0xff000000, i);
+            pattribute->AddItem(DataMgr::Get().GetAttributeString(i), 0xff000000, i);
         pattribute->SetSelection(0);
         auto label5 = sgui::SGLabel::Create(wd, {10, 140}, stringCfg[L"eui_filter_race"]);
         auto prace = sgui::SGComboBox::Create(wd, {90, 135}, {130, 30});
         race = prace;
         prace->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
         for(unsigned int i = 1; i != 0x1000000; i <<=1)
-            prace->AddItem(dataMgr.GetRaceString(i), 0xff000000, i);
+            prace->AddItem(DataMgr::Get().GetRaceString(i), 0xff000000, i);
         prace->SetSelection(0);
         auto label6 = sgui::SGLabel::Create(wd, {10, 165}, stringCfg[L"eui_filter_attack"]);
         attack = sgui::SGTextEdit::Create(wd, {90, 160}, {150, 30});
@@ -413,9 +414,9 @@ namespace ygopro
             extraText = sgui::SGLabel::Create(wd, {0, sz.y - 30}, L"");
         }
         this->code = code;
-        auto data = dataMgr[code];
+        auto data = DataMgr::Get()[code];
         auto img = imageBox.lock();
-        auto ctex = imageMgr.LoadBigCardTexture(code);
+        auto ctex = ImageMgr::Get().LoadBigCardTexture(code);
         img->SetImage(ctex, {0, 0, img->GetSize().x, img->GetSize().y});
         if(ctex)
             img->AddTexRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
@@ -424,12 +425,12 @@ namespace ygopro
         name->SetSpacing(1, 5);
         name->AppendText(data->name, 0xff000000);
         name->AppendText(L"\n", 0xff000000);
-        name->AppendText(dataMgr.GetTypeString(data->type), 0xff000000);
+        name->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
         if(data->type & 0x1) {
             name->AppendText(L"  ", 0xff000000);
-            name->AppendText(dataMgr.GetAttributeString(data->attribute), 0xff000000);
+            name->AppendText(DataMgr::Get().GetAttributeString(data->attribute), 0xff000000);
             name->AppendText(L"/", 0xff000000);
-            name->AppendText(dataMgr.GetRaceString(data->race), 0xff000000);
+            name->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
         }
         auto extra = extraText.lock();
         extra->ClearText();
@@ -440,7 +441,7 @@ namespace ygopro
             for(int i = 0; i < 4; ++i) {
                 unsigned short sd = (data->setcode >> (i * 16)) & 0xffff;
                 if(sd) {
-                    extra->AppendText(dataMgr.GetSetCode(sd), 0xffff0000);
+                    extra->AppendText(DataMgr::Get().GetSetCode(sd), 0xffff0000);
                     extra->AppendText(L" ", 0xff000000);
                 }
             }
@@ -469,8 +470,8 @@ namespace ygopro
             for(int i = 0; i < 4; ++i)
                 colors.push_back(cl);
         };
-        auto hmask = imageMgr.GetTexture("mmask");
-        auto star = imageMgr.GetTexture("mstar");
+        auto hmask = ImageMgr::Get().GetTexture("mmask");
+        auto star = ImageMgr::Get().GetTexture("mstar");
         
         pushvert({0, 0}, {mw, 40}, hmask);
         if(data->type & 0x1) {
@@ -501,29 +502,29 @@ namespace ygopro
             text->SetPosition({cw + 15, 60 + ph});
             pushvert({0, 45}, {mw, ph}, hmask, 0xc0ffffff);
             pushvert({0, 50 + ph}, {mw, sz.y - 70 - ph}, hmask, 0xc0ffffff);
-            auto lscale = imageMgr.GetTexture("lscale");
-            auto rscale = imageMgr.GetTexture("rscale");
+            auto lscale = ImageMgr::Get().GetTexture("lscale");
+            auto rscale = ImageMgr::Get().GetTexture("rscale");
             pushvert({0, 50}, {30, 23}, lscale);
             pushvert({mw - 30, 50}, {30, 23}, rscale);
             int ls = (data->level >> 16) & 0xff;
             int rs = (data->level >> 24) & 0xff;
             if(ls >= 10) {
-                pushvert({0, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (ls % 10)), 0xff000000);
-                pushvert({15, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (ls / 10)), 0xff000000);
+                pushvert({0, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls % 10)), 0xff000000);
+                pushvert({15, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls / 10)), 0xff000000);
             } else
-                pushvert({8, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + ls), 0xff000000);
+                pushvert({8, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + ls), 0xff000000);
             if(rs >= 10) {
-                pushvert({mw - 30, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (rs % 10)), 0xff000000);
-                pushvert({mw - 15, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + (rs / 10)), 0xff000000);
+                pushvert({mw - 30, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs % 10)), 0xff000000);
+                pushvert({mw - 15, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs / 10)), 0xff000000);
             } else
-                pushvert({mw - 22, 73}, {15, 20}, imageMgr.GetCharTex(L'0' + rs), 0xff000000);
+                pushvert({mw - 22, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + rs), 0xff000000);
         } else {
             pushvert({0, 45}, {mw, sz.y - 65}, hmask, 0xc0ffffff);
             pent->SetText(L"", 0xff000000);
             text->SetText(data->texts, 0xff000000);
             text->SetPosition({cw + 15, 60});
         }
-        imgs->SetImage(imageMgr.GetRawMiscTexture(), verts, colors);
+        imgs->SetImage(ImageMgr::Get().GetRawMiscTexture(), verts, colors);
         imgs->AddTexcoord(coords);
     }
     

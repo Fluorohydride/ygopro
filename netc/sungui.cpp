@@ -1,11 +1,9 @@
-#include <chrono>
+#include "../common/common.h"
 
 #include <wx/xml/xml.h>
 #include <wx/clipbrd.h>
 
-#include "../common/convert.h"
 #include "sungui.h"
-
 
 namespace sgui
 {
@@ -889,9 +887,9 @@ namespace sgui
         InjectMouseMoveEvent({mouse_pos.x, mouse_pos.y});
     }
     
-    float SGGUIRoot::GetTime() {
+    double SGGUIRoot::GetTime() {
         unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
-        return (float)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
+        return (double)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
     }
     
     bool SGGUIRoot::InjectMouseEnterEvent() {
@@ -2346,8 +2344,8 @@ namespace sgui
     
     void SGTextEdit::Draw() {
         if(draging) {
-            float tm = guiRoot.GetTime();
-            int chk = (int)((tm - cursor_time) / 0.3f);
+            double tm = guiRoot.GetTime();
+            int chk = (int)((tm - cursor_time) / 0.3);
             if(chk != drag_check) {
                 drag_check = chk;
                 CheckDragPos();
@@ -2359,8 +2357,8 @@ namespace sgui
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
         glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
-        float tm = guiRoot.GetTime();
-        if(read_only || !focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5f) % 2))
+        double tm = guiRoot.GetTime();
+        if(read_only || !focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5) % 2))
             glDrawElements(GL_TRIANGLE_STRIP, 9 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         else
             glDrawElements(GL_TRIANGLE_STRIP, 10 * 6 - 2, GL_UNSIGNED_SHORT, 0);
@@ -3023,9 +3021,9 @@ namespace sgui
                && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
                && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
                 int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
-                float now = guiRoot.GetTime();
+                double now = guiRoot.GetTime();
                 if(sel == current_sel) {
-                    if(now - click_time < 0.3f) {
+                    if(now - click_time < 0.3) {
                         eventDoubleClick.TriggerEvent(*this, sel);
                         click_time = 0.0f;
                     } else

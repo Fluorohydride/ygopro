@@ -8,13 +8,28 @@
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
+#include <vector>
+#include <list>
+#include <array>
+#include <set>
+#include <unordered_set>
+#include <map>
+#include <unordered_map>
+#include <functional>
+#include <algorithm>
+#include <cstring>
+#include <ctime>
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
-#include <time.h>
+#include <ctype.h>
+#include <stdint.h>
+#include "singleton.h"
 #include "bufferutil.h"
+#include "convert.h"
 #include "random.h"
-#include "protocols.h"
+#include "command.h"
+#include "hash.h"
 
 #ifdef _WIN32
 

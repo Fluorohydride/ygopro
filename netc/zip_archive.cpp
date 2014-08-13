@@ -1,3 +1,5 @@
+#include "../common/common.h"
+
 #include <wx/wfstream.h>
 #include <wx/zipstrm.h>
 

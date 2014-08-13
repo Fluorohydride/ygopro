@@ -1,10 +1,10 @@
-#include <cstring>
-#include <iostream>
-#include "glbase.h"
+#include "../common/common.h"
 
 #define STBI_HEADER_FILE_ONLY
 #include "../buildin/stb_image.c"
 #include "../buildin/stb_image_write.h"
+
+#include "glbase.h"
 
 #ifdef _DEBUG
 void GLCheckError(const std::string& file, int line) {

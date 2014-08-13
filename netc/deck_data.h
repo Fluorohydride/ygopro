@@ -1,11 +1,6 @@
 #ifndef _DECK_DATA_H_
 #define _DECK_DATA_H_
 
-#include <unordered_map>
-#include <vector>
-#include <tuple>
-#include <memory>
-
 #define DECK_NOERROR        0
 #define DECK_EXCEED_COUNT   0x10000000
 #define DECK_POOL_MISMATCH  0x20000000
@@ -70,7 +65,7 @@ namespace ygopro
         unsigned int check_deck(DeckData& deck, unsigned int pool_flag);
 	};
     
-	class LimitRegulationMgr {
+	class LimitRegulationMgr : public Singleton<LimitRegulationMgr> {
 	public:
 		void LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name);
 		void SetLimitRegulation(unsigned int id);
@@ -86,8 +81,6 @@ namespace ygopro
 		LimitRegulation* current_list = nullptr;
         std::vector<LimitRegulation> limit_regulations;
 	};
-
-	extern LimitRegulationMgr limitRegulationMgr;
 
 }
 

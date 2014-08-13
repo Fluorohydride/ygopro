@@ -1,17 +1,14 @@
+#include "../common/common.h"
+
+#include <wx/wfstream.h>
+#include <wx/txtstrm.h>
+#include <wx/tokenzr.h>
+
 #include "card_data.h"
 #include "deck_data.h"
 
-#include "wx/wfstream.h"
-#include "wx/txtstrm.h"
-#include "wx/tokenzr.h"
-#include "../common/hash.h"
-#include "../common/convert.h"
-#include <algorithm>
-
 namespace ygopro
 {
-    
-    LimitRegulationMgr limitRegulationMgr;
     
     void DeckData::Clear() {
         main_deck.clear();
@@ -93,7 +90,7 @@ namespace ygopro
                 continue;
             }
             code = To<unsigned int>(line.ToUTF8().data());
-            CardData* ptr = dataMgr[(unsigned int)code];
+            CardData* ptr = DataMgr::Get()[(unsigned int)code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
             if(side)
@@ -119,7 +116,7 @@ namespace ygopro
             }
             counts[ptr->alias ? ptr->alias : ptr->code]++;
         }
-        limitRegulationMgr.GetDeckCardLimitCount(*this);
+        LimitRegulationMgr::Get().GetDeckCardLimitCount(*this);
         return true;
     }
     
@@ -142,7 +139,7 @@ namespace ygopro
             packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 0]]) << 24;
             unsigned int code = packed_data & 0x7ffffff;
             unsigned int count = (packed_data >> 27) & 0x3;
-            CardData* ptr = dataMgr[code];
+            CardData* ptr = DataMgr::Get()[code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
             if(packed_data & 0x20000000) {
@@ -173,7 +170,7 @@ namespace ygopro
             }
             counts[ptr->alias ? ptr->alias : ptr->code]++;
         }
-        limitRegulationMgr.GetDeckCardLimitCount(*this);
+        LimitRegulationMgr::Get().GetDeckCardLimitCount(*this);
         return true;
     }
     
@@ -255,10 +252,10 @@ namespace ygopro
     }
     
     std::shared_ptr<DeckCardData> DeckData::InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool checkc) {
-        CardData* cd = dataMgr[code];
+        CardData* cd = DataMgr::Get()[code];
         if(cd == nullptr || (cd->type & 0x4000))
             return nullptr;
-        unsigned int limit = limitRegulationMgr.GetCardLimitCount(code);
+        unsigned int limit = LimitRegulationMgr::Get().GetCardLimitCount(code);
         if(checkc && ((cd->alias && counts[cd->alias] >= limit) || (!cd->alias && counts[code] >= limit)))
            return nullptr;
         std::shared_ptr<DeckCardData> ret = nullptr;
@@ -480,12 +477,12 @@ namespace ygopro
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)
                 continue;
-            CardData* cd = dataMgr[iter.first];
+            CardData* cd = DataMgr::Get()[iter.first];
             if(cd && cd->CheckCondition(fc)) {
                 result.push_back(cd);
-                auto aliases = dataMgr.AllAliases(cd->code);
+                auto aliases = DataMgr::Get().AllAliases(cd->code);
                 for(auto acd : aliases)
-                    result.push_back(dataMgr[acd]);
+                    result.push_back(DataMgr::Get()[acd]);
             }
         }
         if(result.size())
@@ -500,7 +497,7 @@ namespace ygopro
         for(auto& iter : current_list->counts) {
             if(iter.second != (unsigned int)limit)
                 continue;
-            CardData* cd = dataMgr[iter.first];
+            CardData* cd = DataMgr::Get()[iter.first];
             if(!cd)
                 continue;
             if(cd->type & 0x802040)

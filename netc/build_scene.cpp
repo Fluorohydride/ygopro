@@ -1,13 +1,10 @@
-#include <array>
-#include <algorithm>
-#include <iostream>
+#include "../common/common.h"
 
 #include <wx/clipbrd.h>
 
 #include "glbase.h"
 #include "sungui.h"
 #include "image_mgr.h"
-
 #include "card_data.h"
 #include "deck_data.h"
 #include "build_scene.h"
@@ -47,13 +44,13 @@ namespace ygopro
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 4 * 6, &index[0], GL_STATIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
-        limit[0] = imageMgr.GetTexture("limit0");
-        limit[1] = imageMgr.GetTexture("limit1");
-        limit[2] = imageMgr.GetTexture("limit2");
-        pool[0] = imageMgr.GetTexture("pool_ocg");
-        pool[1] = imageMgr.GetTexture("pool_tcg");
-        pool[2] = imageMgr.GetTexture("pool_ex");
-        hmask = imageMgr.GetTexture("cmask");
+        limit[0] = ImageMgr::Get().GetTexture("limit0");
+        limit[1] = ImageMgr::Get().GetTexture("limit1");
+        limit[2] = ImageMgr::Get().GetTexture("limit2");
+        pool[0] = ImageMgr::Get().GetTexture("pool_ocg");
+        pool[1] = ImageMgr::Get().GetTexture("pool_tcg");
+        pool[2] = ImageMgr::Get().GetTexture("pool_ex");
+        hmask = ImageMgr::Get().GetTexture("cmask");
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         info_panel = std::make_shared<InfoPanel>();
@@ -92,7 +89,7 @@ namespace ygopro
         auto menu_deck = sgui::SGButton::Create(pnl, {250, 5}, {70, 25});
         menu_deck->SetText(stringCfg[L"eui_menu_deck"], 0xff000000);
         menu_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
+            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
                 OnMenuDeck(id);
             })
             .AddButton(stringCfg[L"eui_deck_load"])
@@ -106,7 +103,7 @@ namespace ygopro
         auto menu_tool = sgui::SGButton::Create(pnl, {325, 5}, {70, 25});
         menu_tool->SetText(stringCfg[L"eui_menu_tool"], 0xff000000);
         menu_tool->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
+            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
                 OnMenuTool(id);
             })
             .AddButton(stringCfg[L"eui_tool_sort"])
@@ -119,7 +116,7 @@ namespace ygopro
         auto menu_list = sgui::SGButton::Create(pnl, {400, 5}, {70, 25});
         menu_list->SetText(stringCfg[L"eui_menu_list"], 0xff000000);
         menu_list->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(sceneMgr.GetMousePosition(), 100, [this](int id){
+            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
                 OnMenuList(id);
             })
             .AddButton(stringCfg[L"eui_list_forbidden"])
@@ -131,14 +128,14 @@ namespace ygopro
         auto menu_search = sgui::SGButton::Create(pnl, {475, 5}, {70, 25});
         menu_search->SetText(stringCfg[L"eui_menu_search"], 0xff000000);
         menu_search->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            filter_dialog->Show(sceneMgr.GetMousePosition());
+            filter_dialog->Show(SceneMgr::Get().GetMousePosition());
             filter_dialog->SetOKCallback([this](const FilterCondition fc, int lmt)->void {
                 Search(fc, lmt);
             });
             return true;
         });
         auto limit_reg = sgui::SGComboBox::Create(pnl, {550, 2}, {150, 30});
-        auto& lrs = limitRegulationMgr.GetLimitRegulations();
+        auto& lrs = LimitRegulationMgr::Get().GetLimitRegulations();
         for(unsigned int i = 0; i < lrs.size(); ++i)
             limit_reg->AddItem(lrs[i].name, 0xff000000);
         limit_reg->SetSelection(0);
@@ -176,15 +173,6 @@ namespace ygopro
     }
     
     void BuildScene::Update() {
-        static int fps = 0;
-        static float pre = 0;
-        float now = sceneMgr.GetGameTime();
-        if(now - pre >= 1.0f) {
-            std::cout << "at " << now << "s fps: " << fps << std::endl;
-            fps = 0;
-            pre += 1.0f;
-        }
-        fps++;
         UpdateBackGround();
         UpdateCard();
         UpdateMisc();
@@ -196,7 +184,7 @@ namespace ygopro
         glViewport(0, 0, scene_size.x, scene_size.y);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         // background
-        imageMgr.GetRawBGTexture()->Bind();
+        ImageMgr::Get().GetRawBGTexture()->Bind();
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
@@ -204,7 +192,7 @@ namespace ygopro
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // miscs
-        imageMgr.GetRawMiscTexture()->Bind();
+        ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
         glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
         glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
@@ -212,7 +200,7 @@ namespace ygopro
         glDrawElements(GL_TRIANGLE_STRIP, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
-        imageMgr.GetRawCardTexture()->Bind();
+        ImageMgr::Get().GetRawCardTexture()->Bind();
         // result
         if(result_show_size) {
             glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
@@ -306,7 +294,7 @@ namespace ygopro
         prev_click = prev_hov;
         if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             show_info_begin = true;
-            show_info_time = sceneMgr.GetGameTime();
+            show_info_time = SceneMgr::Get().GetGameTime();
         }
     }
     
@@ -348,7 +336,7 @@ namespace ygopro
                 UpdateAllCard();
                 SetDeckDirty();
                 std::get<0>(prev_hov) = 0;
-                MouseMove({sceneMgr.GetMousePosition().x, sceneMgr.GetMousePosition().y});
+                MouseMove({SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y});
             } else {
                 if(update_status == 1)
                     return;
@@ -360,13 +348,13 @@ namespace ygopro
                 ptr->show_exclusive = false;
                 ptr->update_callback = [pos, index, code, this]() {
                     if(current_deck.RemoveCard(pos, index)) {
-                        imageMgr.UnloadCardTexture(code);
+                        ImageMgr::Get().UnloadCardTexture(code);
                         RefreshParams();
                         RefreshAllIndex();
                         UpdateAllCard();
                         SetDeckDirty();
                         std::get<0>(prev_hov) = 0;
-                        MouseMove({sceneMgr.GetMousePosition().x, sceneMgr.GetMousePosition().y});
+                        MouseMove({SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y});
                         update_status = 0;
                         UpdateCard();
                     }
@@ -384,9 +372,9 @@ namespace ygopro
                 ptr = current_deck.InsertCard(3, -1, data->code, true);
             if(ptr != nullptr) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(data->code);
                 exdata->show_exclusive = show_exclusive;
-                auto mpos = sceneMgr.GetMousePosition();
+                auto mpos = SceneMgr::Get().GetMousePosition();
                 exdata->pos = {(float)mpos.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)mpos.y / scene_size.y * 2.0f};
                 exdata->size = card_size;
                 exdata->hl = 0.0f;
@@ -432,11 +420,11 @@ namespace ygopro
         if(current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size() == 0)
             return;
         for(auto& dcd : current_deck.main_deck)
-            imageMgr.UnloadCardTexture(dcd->data->code);
+            ImageMgr::Get().UnloadCardTexture(dcd->data->code);
         for(auto& dcd : current_deck.extra_deck)
-            imageMgr.UnloadCardTexture(dcd->data->code);
+            ImageMgr::Get().UnloadCardTexture(dcd->data->code);
         for(auto& dcd : current_deck.side_deck)
-            imageMgr.UnloadCardTexture(dcd->data->code);
+            ImageMgr::Get().UnloadCardTexture(dcd->data->code);
         current_deck.Clear();
         SetDeckDirty();
     }
@@ -476,19 +464,19 @@ namespace ygopro
             view_regulation = 0;
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 exdata->show_exclusive = show_exclusive;
                 dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.extra_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 exdata->show_exclusive = show_exclusive;
                 dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.side_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 exdata->show_exclusive = show_exclusive;
                 dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
@@ -512,19 +500,19 @@ namespace ygopro
             view_regulation = 0;
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 exdata->show_exclusive = show_exclusive;
                 dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.extra_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 exdata->show_exclusive = show_exclusive;
                 dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
             for(auto& dcd : current_deck.side_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 exdata->show_exclusive = show_exclusive;
                 dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
             }
@@ -638,7 +626,7 @@ namespace ygopro
         if(!update_bg)
             return;
         update_bg = false;
-        auto ti = imageMgr.GetTexture("bg");
+        auto ti = ImageMgr::Get().GetTexture("bg");
         std::array<glbase::v2ct, 4> verts;
         glbase::FillVertex(&verts[0], {-1.0f, 1.0f}, {2.0f, -2.0f}, ti);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
@@ -648,7 +636,7 @@ namespace ygopro
     
     void BuildScene::UpdateCard() {
         std::function<void()> f = nullptr;
-        float tm = sceneMgr.GetGameTime();
+        double tm = SceneMgr::Get().GetGameTime();
         glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
         for(auto iter = updating_cards.begin(); iter != updating_cards.end();) {
             auto cur = iter++;
@@ -801,8 +789,8 @@ namespace ygopro
             return;
         update_misc = false;
         std::array<glbase::v2ct, 33 * 4> verts;
-        auto msk = imageMgr.GetTexture("mmask");
-        auto nbk = imageMgr.GetTexture("numback");
+        auto msk = ImageMgr::Get().GetTexture("mmask");
+        auto nbk = ImageMgr::Get().GetTexture("numback");
         float yrate = 1.0f - 40.0f / scene_size.y;
         float lx = 10.0f / scene_size.x * 2.0f - 1.0f;
         float rx = 0.5625f;
@@ -821,17 +809,17 @@ namespace ygopro
         auto numblock = [&nw, &nh, &nbk](glbase::v2ct* v, v2f pos, unsigned int cl1, unsigned int cl2, int val) {
             glbase::FillVertex(&v[0], {pos.x, pos.y}, {nw, -nh}, nbk, cl1);
             if(val >= 10) {
-                glbase::FillVertex(&v[4], {pos.x + nw * 0.1f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + (val % 100) / 10), cl2);
-                glbase::FillVertex(&v[8], {pos.x + nw * 0.5f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + val % 10), cl2);
+                glbase::FillVertex(&v[4], {pos.x + nw * 0.1f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + (val % 100) / 10), cl2);
+                glbase::FillVertex(&v[8], {pos.x + nw * 0.5f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + val % 10), cl2);
             } else
-                glbase::FillVertex(&v[4], {pos.x + nw * 0.3f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, imageMgr.GetCharTex(L'0' + val), cl2);
+                glbase::FillVertex(&v[4], {pos.x + nw * 0.3f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + val), cl2);
         };
         glbase::FillVertex(&verts[0], {lx, y0}, {rx - lx, y1 - y0}, msk, 0xc0ffffff);
         glbase::FillVertex(&verts[4], {lx, y1}, {rx - lx, y2 - y1}, msk, 0xc0c0c0c0);
         glbase::FillVertex(&verts[8], {lx, y2}, {rx - lx, y3 - y2}, msk, 0xc0808080);
-        glbase::FillVertex(&verts[12], {nx, my}, {nw, -th}, imageMgr.GetTexture("main_t"), 0xff80ffff);
-        glbase::FillVertex(&verts[16], {nx, ey}, {nw, -th}, imageMgr.GetTexture("extra_t"), 0xff80ffff);
-        glbase::FillVertex(&verts[20], {nx, sy}, {nw, -th}, imageMgr.GetTexture("side_t"), 0xff80ffff);
+        glbase::FillVertex(&verts[12], {nx, my}, {nw, -th}, ImageMgr::Get().GetTexture("main_t"), 0xff80ffff);
+        glbase::FillVertex(&verts[16], {nx, ey}, {nw, -th}, ImageMgr::Get().GetTexture("extra_t"), 0xff80ffff);
+        glbase::FillVertex(&verts[20], {nx, sy}, {nw, -th}, ImageMgr::Get().GetTexture("side_t"), 0xff80ffff);
         numblock(&verts[24], {nx, offsety[0] - ndy * 0}, 0xf03399ff, 0xff000000, current_deck.mcount);
         numblock(&verts[36], {nx, offsety[0] - ndy * 1}, 0xf0a0b858, 0xff000000, current_deck.scount);
         numblock(&verts[48], {nx, offsety[0] - ndy * 2}, 0xf09060bb, 0xff000000, current_deck.tcount);
@@ -878,7 +866,7 @@ namespace ygopro
             glbase::FillVertex(&pvert[0], {left + (i % 2) * width, top - (i / 2) * height}, {width, -height}, hmask, cl);
             CardData* pdata = search_result[i + result_page * 10];
             glbase::FillVertex(&pvert[4], {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy}, {cwidth, -cheight}, result_tex[i]);
-            unsigned int lmt = limitRegulationMgr.GetCardLimitCount(pdata->code);
+            unsigned int lmt = LimitRegulationMgr::Get().GetCardLimitCount(pdata->code);
             if(lmt < 3) {
                 glbase::FillVertex(&pvert[8], {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f},
                                    {iwidth, -iheight}, limit[lmt]);
@@ -896,8 +884,8 @@ namespace ygopro
     
     void BuildScene::UpdateInfo() {
         if(show_info_begin) {
-            float now = sceneMgr.GetGameTime();
-            if(now - show_info_time >= 0.5f) {
+            double now = SceneMgr::Get().GetGameTime();
+            if(now - show_info_time >= 0.5) {
                 show_info = true;
                 show_info_begin = false;
                 std::get<0>(prev_click) = 0;
@@ -967,7 +955,7 @@ namespace ygopro
         ptr->start_size = ptr->size;
         ptr->dest_pos = dst;
         ptr->dest_size = dsz;
-        ptr->moving_time_b = sceneMgr.GetGameTime();
+        ptr->moving_time_b = SceneMgr::Get().GetGameTime();
         ptr->moving_time_e = ptr->moving_time_b + tm;
         ptr->update_pos = true;
         updating_cards.insert(dcd);
@@ -977,7 +965,7 @@ namespace ygopro
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         ptr->start_hl = ptr->hl;
         ptr->dest_hl = desthl;
-        ptr->fading_time_b = sceneMgr.GetGameTime();
+        ptr->fading_time_b = SceneMgr::Get().GetGameTime();
         ptr->fading_time_e = ptr->fading_time_b + tm;
         ptr->update_color = true;
         updating_cards.insert(dcd);
@@ -1004,33 +992,33 @@ namespace ygopro
     }
     
     void BuildScene::ChangeRegulation(int index) {
-        limitRegulationMgr.SetLimitRegulation(index);
+        LimitRegulationMgr::Get().SetLimitRegulation(index);
         if(view_regulation)
             ViewRegulation(view_regulation - 1);
         else
-            limitRegulationMgr.GetDeckCardLimitCount(current_deck);
+            LimitRegulationMgr::Get().GetDeckCardLimitCount(current_deck);
         RefreshAllCard();
         update_result = true;
     }
     
     void BuildScene::ViewRegulation(int limit) {
         ClearDeck();
-        limitRegulationMgr.LoadCurrentListToDeck(current_deck, limit);
+        LimitRegulationMgr::Get().LoadCurrentListToDeck(current_deck, limit);
         for(auto& dcd : current_deck.main_deck) {
             auto exdata = std::make_shared<BuilderCard>();
-            exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+            exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
             exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
         for(auto& dcd : current_deck.extra_deck) {
             auto exdata = std::make_shared<BuilderCard>();
-            exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+            exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
             exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
         for(auto& dcd : current_deck.side_deck) {
             auto exdata = std::make_shared<BuilderCard>();
-            exdata->card_tex = imageMgr.GetCardTexture(dcd->data->code);
+            exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
             exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
@@ -1053,7 +1041,7 @@ namespace ygopro
         for(int i = 0; i < 10; ++i) {
             if((size_t)(i + result_page * 10) >= search_result.size())
                 break;
-            imageMgr.UnloadCardTexture(search_result[i + result_page * 10]->code);
+            ImageMgr::Get().UnloadCardTexture(search_result[i + result_page * 10]->code);
         }
     }
     
@@ -1061,7 +1049,7 @@ namespace ygopro
         for(int i = 0; i < 10; ++i) {
             if((size_t)(i + result_page * 10) >= search_result.size())
                 break;
-            result_tex[i] = imageMgr.GetCardTexture(search_result[i + result_page * 10]->code);
+            result_tex[i] = ImageMgr::Get().GetCardTexture(search_result[i + result_page * 10]->code);
         }
         update_result = true;
         auto ptr = label_page.lock();
@@ -1103,7 +1091,7 @@ namespace ygopro
             } else
                 fc.keyword = keystr;
             UnloadSearchResult();
-            search_result = dataMgr.FilterCard(fc);
+            search_result = DataMgr::Get().FilterCard(fc);
             std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
             result_page = 0;
             RefreshSearchResult();
@@ -1120,9 +1108,9 @@ namespace ygopro
     void BuildScene::Search(const FilterCondition& fc, int lmt) {
         UnloadSearchResult();
         if(lmt == 0)
-            search_result = dataMgr.FilterCard(fc);
+            search_result = DataMgr::Get().FilterCard(fc);
         else
-            search_result = limitRegulationMgr.FilterCard(lmt - 1, fc);
+            search_result = LimitRegulationMgr::Get().FilterCard(lmt - 1, fc);
         std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
         result_page = 0;
         RefreshSearchResult();

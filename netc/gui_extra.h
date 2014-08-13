@@ -1,10 +1,6 @@
 #ifndef _GUI_EXTRA_H_
 #define _GUI_EXTRA_H_
 
-#include <string>
-#include <functional>
-
-#include "card_data.h"
 #include "sungui.h"
 
 namespace ygopro

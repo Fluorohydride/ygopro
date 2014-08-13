@@ -1,10 +1,6 @@
 #ifndef _CARD_DATA_H_
 #define _CARD_DATA_H_
 
-#include <string>
-#include <vector>
-#include <unordered_map>
-
 namespace ygopro
 {
 
@@ -48,7 +44,7 @@ namespace ygopro
         
 	};
     
-	class DataMgr {
+	class DataMgr : public Singleton<DataMgr> {
 	public:
 		int LoadDatas(const std::wstring& file);
 		CardData* operator [] (unsigned int code);
@@ -89,8 +85,6 @@ namespace ygopro
         std::unordered_map<unsigned int, std::vector<unsigned int>> _aliases;
         std::vector<std::wstring> _dbsrc;
 	};
-
-	extern DataMgr dataMgr;
 
 }
 
