@@ -52,6 +52,8 @@ namespace ygopro
         std::function<void (const std::wstring&)> cbOK;
     };
     
+    struct FilterCondition;
+    
     class FilterDialog : public CommonDialog {
     public:
         void Show(v2i pos);

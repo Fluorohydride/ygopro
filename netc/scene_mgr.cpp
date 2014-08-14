@@ -35,9 +35,10 @@ namespace ygopro
         glLoadIdentity();
     }
     
-    void SceneMgr::Update() {
+    bool SceneMgr::Update() {
         if(current_scene != nullptr)
-            current_scene->Update();
+            return current_scene->Update();
+        return true;
     }
     
     void SceneMgr::Draw() {
@@ -120,11 +121,9 @@ namespace ygopro
         auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         auto tm = std::localtime(&t);
         char file[256];
-        char utf8[256];
         sprintf(file, "/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
         std::wstring wpath = commonCfg[L"screenshot_path"];
-        BufferUtil::EncodeUTF8(wpath.c_str(), utf8);
-        std::string path = utf8;
+        std::string path = To<std::string>(wpath);
         path.append(file);
         stbi_write_png(path.c_str(), clip.width, clip.height, 4, clip_buff, 0);
         delete[] clip_buff;

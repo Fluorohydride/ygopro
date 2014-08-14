@@ -87,17 +87,15 @@ namespace ygopro
 	int DataMgr::LoadDatas(const std::wstring& file) {
 		_datas.clear();
 		sqlite3* pDB;
-        char fbuffer[256];
-        BufferUtil::EncodeUTF8(file.c_str(), fbuffer);
-		if(sqlite3_open(fbuffer, &pDB) != SQLITE_OK)
+        std::string dfile = To<std::string>(file);
+		if(sqlite3_open(dfile.c_str(), &pDB) != SQLITE_OK)
 			return sqlite3_errcode(pDB);
 		sqlite3_stmt* pStmt;
 		const char* sql = "select * from datas,texts where datas.id=texts.id";
 		if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 			return sqlite3_errcode(pDB);
 		CardData cd;
-		wchar_t unicode_buffer[2048];
-		int step = 0, len = 0;
+		int step = 0;
 		do {
 			step = sqlite3_step(pStmt);
 			if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
@@ -114,17 +112,10 @@ namespace ygopro
 				cd.race = sqlite3_column_int(pStmt, 8);
 				cd.attribute = sqlite3_column_int(pStmt, 9);
 				cd.category = sqlite3_column_int(pStmt, 10);
-				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 12), unicode_buffer);
-				unicode_buffer[len] = 0;
-				cd.name = unicode_buffer;
-				len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 13), unicode_buffer);
-				unicode_buffer[len] = 0;
-				cd.texts = unicode_buffer;
-                for(unsigned int i = 0; i < 16; ++i) {
-                    len = BufferUtil::DecodeUTF8((const char*)sqlite3_column_text(pStmt, 14 + i), unicode_buffer);
-                    unicode_buffer[len] = 0;
-                    cd.desc[i] = unicode_buffer;
-                }
+                cd.name = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 12)));
+                cd.texts = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 13)));
+                for(unsigned int i = 0; i < 16; ++i)
+                    cd.desc[i] = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 14 + i)));
                 _datas.insert(std::make_pair(cd.code, cd));
                 if(cd.alias)
                     _aliases[cd.alias].push_back(cd.code);

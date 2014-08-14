@@ -21,7 +21,7 @@ namespace ygopro
                     config_map[name] = value;
                 } if (child->GetName() == "float") {
                     std::wstring name = child->GetAttribute("name").ToStdWstring();
-                    double value = To<long>(child->GetAttribute("value").ToUTF8().data());
+                    double value = To<double>(child->GetAttribute("value").ToUTF8().data());
                     config_map[name] = value;
                 } else {
                     std::wstring name = child->GetAttribute("name").ToStdWstring();
@@ -44,17 +44,13 @@ namespace ygopro
 		for(auto iter : config_map) {
             if(iter.second.val_type == 0) {
                 wxXmlNode* element = new wxXmlNode(wxXML_ELEMENT_NODE, "integer");
-				char buf[32];
-				sprintf(buf, "%ld", iter.second.ivalue);
 				element->AddAttribute("name", iter.first);
-				element->AddAttribute("value", buf);
+				element->AddAttribute("value", To<std::string>(iter.second.ivalue));
                 root->AddChild(element);
 			} else if(iter.second.val_type == 1) {
                 wxXmlNode* element = new wxXmlNode(wxXML_ELEMENT_NODE, "float");
-				char buf[32];
-				sprintf(buf, "%lf", iter.second.fvalue);
 				element->AddAttribute("name", iter.first);
-				element->AddAttribute("value", buf);
+				element->AddAttribute("value", To<std::string>(iter.second.fvalue));
                 root->AddChild(element);
             } else {
                 wxXmlNode* element = new wxXmlNode(wxXML_ELEMENT_NODE, "string");

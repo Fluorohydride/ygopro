@@ -15,7 +15,7 @@ public:
     }
     
     virtual std::shared_ptr<T> PullCommand() {
-        cmd_queue.lock();
+        cmd_mutex.lock();
         if(cmd_queue.empty()) {
             cmd_mutex.unlock();
             return nullptr;

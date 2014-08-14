@@ -12,7 +12,7 @@ namespace ygopro
     public:
         virtual ~Scene() = default;
         virtual void Activate() = 0;
-        virtual void Update() = 0;
+        virtual bool Update() = 0;
         virtual void Draw() = 0;
         virtual void SetSceneSize(v2i sz) = 0;
         virtual recti GetScreenshotClip() = 0;
@@ -29,7 +29,7 @@ namespace ygopro
         void Init();
         void Uninit();
         void InitDraw();
-        void Update();
+        bool Update();
         void Draw();
         double GetGameTime();
         void SetFrameRate(double rate);

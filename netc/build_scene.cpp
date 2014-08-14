@@ -172,12 +172,13 @@ namespace ygopro
         RefreshAllCard();
     }
     
-    void BuildScene::Update() {
+    bool BuildScene::Update() {
         UpdateBackGround();
         UpdateCard();
         UpdateMisc();
         UpdateResult();
         UpdateInfo();
+        return true;
     }
     
     void BuildScene::Draw() {

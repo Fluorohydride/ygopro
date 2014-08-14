@@ -131,7 +131,8 @@ int main(int argc, char* argv[]) {
         SceneMgr::Get().CheckFrameRate();
         SceneMgr::Get().InitDraw();
         glfwPollEvents();
-        SceneMgr::Get().Update();
+        if(!SceneMgr::Get().Update())
+            break;
         if(need_draw) {
             SceneMgr::Get().Draw();
             sgui::SGGUIRoot::GetSingleton().Draw();

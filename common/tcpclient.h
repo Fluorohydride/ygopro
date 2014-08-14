@@ -8,14 +8,6 @@
 #include <event2/buffer.h>
 #include <event2/thread.h>
 
-#define TC_CONNECT_ESTABLISHED        1
-#define TC_CONNECT_ERROR              2
-#define TC_CONNECT_TIMEOUT            3
-#define TC_CONNECT_DISCONNECTED       4
-#define TC_CONNECT_RECONNECTED        5
-#define TC_CONNECT_REC_ERROR          6
-#define TC_CONNECT_REC_TIMEOUT        7
-
 #define TC_FLAG_EXTERNAL_BASE         0x1
 
 class TcpClient : public PacketStream {
@@ -67,12 +59,8 @@ public:
         }
     }
     
-    void CheckNetwork() {
+    void PullEvent() {
         event_base_loop(loop_base, EVLOOP_ONCE | EVLOOP_NONBLOCK);
-    }
-    
-    bool IsConnected() {
-        return (connection_status == TC_CONNECT_ESTABLISHED) || (connection_status == TC_CONNECT_RECONNECTED);
     }
     
     void Shutdown() {
@@ -86,7 +74,10 @@ public:
         }
     }
     
-    virtual void ConnectEvent() = 0;
+    virtual void OnConnected() = 0;
+    virtual void OnConnectError() = 0;
+    virtual void OnConnectTimeOut() = 0;
+    virtual void OnDisconnected() = 0;
     
     virtual void SendPacket(unsigned short proto, void* buffer, unsigned short len) {
         unsigned short buf[2];
@@ -138,23 +129,19 @@ public:
                 client->timer_event = nullptr;
             }
             bufferevent_enable(client->client_bev, EV_READ);
-            client->connection_status = TC_CONNECT_ESTABLISHED;
-            client->ConnectEvent();
+            client->OnConnected();
         } else if(events & BEV_EVENT_EOF) {
-            client->connection_status = TC_CONNECT_DISCONNECTED;
-            client->ConnectEvent();
+            client->OnDisconnected();
             client->Shutdown();
         } else if(events & BEV_EVENT_ERROR) {
-            client->connection_status = TC_CONNECT_ERROR;
-            client->ConnectEvent();
+            client->OnConnectError();
             client->Shutdown();
         }
     }
     
     static void TimeoutCallback(evutil_socket_t fd, short events, void* arg) {
         TcpClient* client = (TcpClient*)arg;
-        client->connection_status = TC_CONNECT_TIMEOUT;
-        client->ConnectEvent();
+        client->OnConnectTimeOut();
         client->timer_event = nullptr;
         if(client->client_bev) {
             bufferevent_free(client->client_bev);
@@ -162,6 +149,29 @@ public:
         }
     }
     
+};
+
+class TcpClientSeed : public TcpClient {
+public:
+    virtual void SendPacket(unsigned short proto, void* buffer, unsigned short len) {
+        unsigned short buf[4];
+        buf[0] = 2 + len;
+        *(unsigned int*)&buf[1] = response_seed;
+        buf[3] = proto;
+        bufferevent_write(client_bev, buf, 8);
+        bufferevent_write(client_bev, buffer, len);
+        response_seed = (response_seed * 0x1fd45cc2 + 0xdee89c3a) ^ 0xe7262ca9;
+    }
+    
+    virtual void SendPacket(PacketWriter& pkt) {
+        unsigned short len = pkt.PacketSize();
+        bufferevent_write(client_bev, &len, 2);
+        bufferevent_write(client_bev, &response_seed, 4);
+        bufferevent_write(client_bev, pkt.PacketBuffer(), pkt.PacketSize());
+        response_seed = (response_seed * 0x1fd45cc2 + 0xdee89c3a) ^ 0xe7262ca9;
+    }
+protected:
+    unsigned int response_seed = 0;
 };
 
 #endif
