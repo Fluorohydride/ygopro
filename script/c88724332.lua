@@ -20,12 +20,12 @@ function c88724332.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c88724332.target(e,c)
-	return c:IsPosition(POS_FACEUP_ATTACK) and not c:IsRace(RACE_PHANTOMDRAGON)
+	return c:IsPosition(POS_FACEUP_ATTACK) and not c:IsRace(RACE_WYRM)
 		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 		and c:IsPreviousLocation(LOCATION_DECK+LOCATION_EXTRA)
 end
 function c88724332.deftg(e,c)
-	return c:IsFaceup() and not c:IsRace(RACE_PHANTOMDRAGON)
+	return c:IsFaceup() and not c:IsRace(RACE_WYRM)
 		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
 		and c:IsPreviousLocation(LOCATION_DECK+LOCATION_EXTRA)
 end

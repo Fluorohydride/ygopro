@@ -29,11 +29,11 @@ function c86559484.cfilter(c,rac)
 end
 function c86559484.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c86559484.cfilter,tp,LOCATION_GRAVE,0,1,nil,RACE_DRAGON)
-		and Duel.IsExistingMatchingCard(c86559484.cfilter,tp,LOCATION_GRAVE,0,1,nil,RACE_PHANTOMDRAGON) end
+		and Duel.IsExistingMatchingCard(c86559484.cfilter,tp,LOCATION_GRAVE,0,1,nil,RACE_WYRM) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g1=Duel.SelectMatchingCard(tp,c86559484.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,RACE_DRAGON)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-	local g2=Duel.SelectMatchingCard(tp,c86559484.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,RACE_PHANTOMDRAGON)
+	local g2=Duel.SelectMatchingCard(tp,c86559484.cfilter,tp,LOCATION_GRAVE,0,1,1,nil,RACE_WYRM)
 	g1:Merge(g2)
 	Duel.Remove(g1,POS_FACEUP,REASON_COST)
 end

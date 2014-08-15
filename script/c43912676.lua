@@ -11,7 +11,7 @@ function c43912676.initial_effect(c)
 	e2:SetCode(EFFECT_UPDATE_ATTACK)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_PHANTOMDRAGON))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_WYRM))
 	e2:SetValue(300)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
@@ -31,7 +31,7 @@ function c43912676.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c43912676.cfilter(c)
-	return c:IsRace(RACE_PHANTOMDRAGON) and c:IsAbleToRemoveAsCost()
+	return c:IsRace(RACE_WYRM) and c:IsAbleToRemoveAsCost()
 end
 function c43912676.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c43912676.cfilter,tp,LOCATION_GRAVE,0,3,nil) end

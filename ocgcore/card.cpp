@@ -1444,7 +1444,7 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 			peset->add_item(eset[i]);
 	if(!pduel->game_field->is_player_can_summon(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
-	int32 rcount = get_summon_tribute_count();
+	int32 rcount = get_summon_tribute_count(ignore_count);
 	int32 min = rcount & 0xffff, max = (rcount >> 16) & 0xffff;
 	if(min > 0 && !pduel->game_field->is_player_can_summon(SUMMON_TYPE_ADVANCE, playerid, this))
 		return FALSE;
@@ -1713,7 +1713,7 @@ int32 card::is_can_be_summoned(uint8 playerid, uint8 ignore_count, effect* peffe
 	pduel->game_field->restore_lp_cost();
 	return TRUE;
 }
-int32 card::get_summon_tribute_count() {
+int32 card::get_summon_tribute_count(uint8 ignore_count) {
 	int32 min = 0, max = 0;
 	int32 minul = 0, maxul = 0;
 	int32 level = get_level();
@@ -1739,6 +1739,16 @@ int32 card::get_summon_tribute_count() {
 	}
 	min -= minul;
 	max -= maxul;
+	int32 playerid = current.controler;
+	if(!ignore_count && !pduel->game_field->core.extra_summon[playerid]
+	        && pduel->game_field->core.summon_count[playerid] >= pduel->game_field->get_summon_count_limit(playerid)) {
+		effect* pextra = is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
+		if(pextra && !(pextra->flag & EFFECT_FLAG_FUNC_VALUE)) {
+			int32 count = pextra->get_value();
+			if(min < count)
+				min = count;
+		}
+	}
 	if(min < 0) min = 0;
 	if(max < min) max = min;
 	return min + (max << 16);
