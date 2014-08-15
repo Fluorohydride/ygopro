@@ -120,7 +120,7 @@ function c91907707.immop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
 	e1:SetValue(c91907707.efilter)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetReset(RESET_EVENT+0xfc0000)
 	c:RegisterEffect(e1)
 end
 function c91907707.efilter(e,te)
