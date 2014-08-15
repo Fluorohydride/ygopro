@@ -51,7 +51,7 @@ function c84764038.ssop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c84764038.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_ONFIELD) then
+	if not c:IsReason(REASON_RETURN) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(84764038,1))
 		e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
