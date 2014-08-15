@@ -27,7 +27,7 @@ function c6540606.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetFieldGroup(p,0,LOCATION_HAND)
 	if g:GetCount()>0 then
 		Duel.ConfirmCards(p,g)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TOGRAVE)
 		local sg=g:Select(p,1,1,nil)
 		Duel.SendtoGrave(sg,REASON_EFFECT)
 		Duel.ShuffleHand(1-p)

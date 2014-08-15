@@ -38,5 +38,9 @@ function c72648577.operation(e,tp,eg,ep,ev,re,r,rp)
 		local tg=dg:Select(tp,2,2,nil)
 		Duel.SendtoHand(tg,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tg)
+	else
+		if sg:IsExists(Card.IsLocation,1,nil,LOCATION_DECK) then
+			Duel.ShuffleDeck(tp)
+		end
 	end
 end
