@@ -130,10 +130,107 @@ namespace glbase {
         T height;
     };
     
-    template<typename T>
-    struct matrix4 {
-        T v[16];
+    struct quaternion;
+    inline quaternion operator * (const quaternion& p, const quaternion& q);
+    // q = w + xi + yj + zk
+    struct quaternion {
+        float w;
+        float x;
+        float y;
+        float z;
+        
+        quaternion& Normalize() {
+            float mag = sqrt(w * w + x * x + y * y + z * z);
+            w /= mag;
+            x /= mag;
+            y /= mag;
+            z /= mag;
+            return *this;
+        }
+        
+        // normalized
+        quaternion& FromAxis(vector3<float> vec, float angle) {
+            float mag = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
+            float sinA = sinf(angle * 0.5f);
+            x = (vec.x / mag * sinA);
+            y = (vec.y / mag * sinA);
+            z = (vec.z / mag * sinA);
+            w = cosf(angle * 0.5f);
+            return *this;
+        }
+        
+        // radius
+        quaternion& FromEular(vector3<float> eular) {
+            float sinx = sinf(eular.x * 0.5f);
+            float siny = sinf(eular.y * 0.5f);
+            float sinz = sinf(eular.z * 0.5f);
+            float cosx = cosf(eular.x * 0.5f);
+            float cosy = cosf(eular.y * 0.5f);
+            float cosz = cosf(eular.z * 0.5f);
+            w = cosx * cosy * cosz + sinx * siny * sinz;
+            x = sinx * cosy * cosz - cosx * siny * sinz;
+            y = cosx * siny * cosz + sinx * cosy * sinz;
+            z = cosx * cosy * sinz - sinx * siny * cosz;
+            Normalize();
+            return *this;
+        }
+        
+        // quaternion should normalized
+        quaternion GetInverse() {
+            return quaternion{w, -x, -y, -z};
+        }
+        
+        vector3<float> ApplyToVector(vector3<float> vec) {
+            auto q = *this * quaternion{0.0f, vec.x, vec.y, vec.z} * GetInverse();
+            return {q.x, q.y, q.z};
+        }
+        
+        // apply all transforms
+        vector3<float> ApplyToVector(vector3<float> vec, vector3<float> s, vector3<float> t) {
+            auto q = *this * quaternion{0.0f, vec.x, vec.y, vec.z} * GetInverse();
+            return {q.x * s.x + t.x, q.y * s.y + t.y, q.z * s.z + t.z};
+        }
+        
     };
+    
+    inline quaternion operator + (const quaternion& p, const quaternion& q) {
+        return quaternion {p.w + q.w, p.x + q.x, p.y + q.y, p.z + q.z};
+    }
+    
+    inline quaternion operator - (const quaternion& p, const quaternion& q) {
+        return quaternion {p.w - q.w, p.x - q.x, p.y - q.y, p.z - q.z};
+    }
+    
+    inline quaternion operator * (const quaternion& p, float s) {
+        return quaternion {p.w * s, p.x * s, p.y * s, p.z * s};
+    }
+    
+    // represent p * q
+    inline quaternion operator * (const quaternion& p, const quaternion& q) {
+        return quaternion {
+            p.w * q.w - p.x * q.x - p.y * q.y - p.z * q.z,
+            p.w * q.x + p.x * q.w + p.z * q.y - p.y * q.z,
+            p.w * q.y + p.y * q.w + p.x * q.z - p.z * q.x,
+            p.w * q.z + p.z * q.w + p.y * q.x - p.x * q.y
+        };
+    }
+    
+    inline quaternion QuaternionSlerp(const quaternion& p, const quaternion& q, float t) {
+        float dot = p.w * q.w + p.x * q.x + p.y * q.y + p.z * q.z;
+        bool neg = false;
+        if(dot <= 0.0f) {
+            dot = -dot;
+            neg = true;
+        }
+        float theta = acosf(t);
+        float sinv = sinf(theta);
+        float t1 = sinf((1.0f - t) * theta) / sinv;
+        float t2 = sinf(t * theta) / sinv;
+        if(!neg)
+            return p * t1 + q * t2;
+        else
+            return p * t1 - q * t2;
+    }
     
     struct v2ct {
         vector2<float> vertex = {0.0f, 0.0f};

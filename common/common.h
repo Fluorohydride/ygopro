@@ -19,11 +19,11 @@
 #include <algorithm>
 #include <cstring>
 #include <ctime>
+#include <cmath>
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
 #include <ctype.h>
-#include <stdint.h>
 #include "singleton.h"
 #include "bufferutil.h"
 #include "convert.h"

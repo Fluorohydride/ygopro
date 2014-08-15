@@ -33,7 +33,14 @@ namespace ygopro
         
     protected:
         v2i scene_size = {0, 0};
+        unsigned int index_buffer = 0;
+        unsigned int field_buffer = 0;
+        unsigned int back_buffer = 0;
+        unsigned int card_buffer = 0;
+        unsigned int misc_buffer = 0;
+        double waiting_time = 0.0;
         CommandList<DuelCommand> duel_commands;
+        std::function<void()> current_cb;
         
     };
     
