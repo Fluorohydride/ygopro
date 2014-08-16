@@ -18,10 +18,10 @@ int main(int argc, char* argv[]) {
         return 0;
     if(!commonCfg.LoadConfig(L"common.xml"))
         return 0;
-    int width = commonCfg[L"window_width"];
-    int height = commonCfg[L"window_height"];
-	int fsaa = commonCfg[L"fsaa"];
-    int vsync = commonCfg[L"vertical_sync"];
+    int width = commonCfg["window_width"];
+    int height = commonCfg["window_height"];
+	int fsaa = commonCfg["fsaa"];
+    int vsync = commonCfg["vertical_sync"];
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -37,19 +37,20 @@ int main(int argc, char* argv[]) {
 	glewExperimental = true;
     glewInit();
 
-    ImageMgr::Get().InitTextures(commonCfg[L"image_file"]);
-    if(!stringCfg.LoadConfig(commonCfg[L"string_conf"])
-       || DataMgr::Get().LoadDatas(commonCfg[L"database_file"])
-       || !ImageMgr::Get().LoadImageConfig(commonCfg[L"textures_conf"])
-       || !sgui::SGGUIRoot::GetSingleton().LoadConfigs(commonCfg[L"gui_conf"])) {
+    ImageMgr::Get().InitTextures(commonCfg["image_file"]);
+    if(!stringCfg.LoadConfig(commonCfg["string_conf"])
+       || DataMgr::Get().LoadDatas(commonCfg["database_file"])
+       || !ImageMgr::Get().LoadImageConfig(commonCfg["textures_conf"])
+       || !sgui::SGGUIRoot::GetSingleton().LoadConfigs(commonCfg["gui_conf"])) {
         glfwDestroyWindow(window);
         glfwTerminate();
         return 0;
     }
-    LimitRegulationMgr::Get().LoadLimitRegulation(commonCfg[L"limit_regulation"], stringCfg[L"eui_list_default"]);
-    stringCfg.ForEach([](const std::wstring& name, ValueStruct& value) {
-        if(name.find(L"setname_") == 0 ) {
-            DataMgr::Get().RegisterSetCode(static_cast<unsigned int>(value), name.substr(8));
+    LimitRegulationMgr::Get().LoadLimitRegulation(commonCfg["limit_regulation"], stringCfg["eui_list_default"]);
+    stringCfg.ForEach([](const std::string& name, ValueStruct& value) {
+        if(name.find("setname_") == 0 ) {
+            std::wstring setname = To<std::wstring>(name.substr(8));
+            DataMgr::Get().RegisterSetCode(static_cast<unsigned int>(value), setname);
         }
     });
     
@@ -61,7 +62,7 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().Init();
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
-    SceneMgr::Get().SetFrameRate((int)commonCfg[L"frame_rate"]);
+    SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
     
     auto sc = std::make_shared<BuildScene>();
     SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
@@ -119,7 +120,7 @@ int main(int argc, char* argv[]) {
     glfwSetWindowIconifyCallback(window, [](GLFWwindow* wnd, int iconified) {
         need_draw = (iconified == GL_FALSE);
         if(need_draw)
-            SceneMgr::Get().SetFrameRate((int)commonCfg[L"frame_rate"]);
+            SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
         else
             SceneMgr::Get().SetFrameRate(10);
     });

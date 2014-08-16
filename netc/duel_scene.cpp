@@ -1,5 +1,8 @@
 #include "../common/common.h"
 
+#include "gui_extra.h"
+#include "duel_command.h"
+
 #include "duel_scene.h"
 
 namespace ygopro

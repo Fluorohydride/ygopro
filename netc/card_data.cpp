@@ -159,19 +159,19 @@ namespace ygopro
     std::wstring DataMgr::GetAttributeString(unsigned int attr) {
         std::wstring attname;
         if(attr & 0x1)
-            attname.append(stringCfg[L"attribtue_earth"]).append(L"|");
+            attname.append(stringCfg["attribtue_earth"]).append(L"|");
         if(attr & 0x2)
-            attname.append(stringCfg[L"attribtue_water"]).append(L"|");
+            attname.append(stringCfg["attribtue_water"]).append(L"|");
         if(attr & 0x4)
-            attname.append(stringCfg[L"attribtue_fire"]).append(L"|");
+            attname.append(stringCfg["attribtue_fire"]).append(L"|");
         if(attr & 0x8)
-            attname.append(stringCfg[L"attribtue_wind"]).append(L"|");
+            attname.append(stringCfg["attribtue_wind"]).append(L"|");
         if(attr & 0x10)
-            attname.append(stringCfg[L"attribtue_light"]).append(L"|");
+            attname.append(stringCfg["attribtue_light"]).append(L"|");
         if(attr & 0x20)
-            attname.append(stringCfg[L"attribtue_dark"]).append(L"|");
+            attname.append(stringCfg["attribtue_dark"]).append(L"|");
         if(attr & 0x40)
-            attname.append(stringCfg[L"attribtue_divine"]).append(L"|");
+            attname.append(stringCfg["attribtue_divine"]).append(L"|");
         if(attname.length() > 0)
             attname.resize(attname.length() - 1);
         return std::move(attname);
@@ -180,53 +180,53 @@ namespace ygopro
     std::wstring DataMgr::GetRaceString(unsigned int race) {
         std::wstring racname;
         if(race & 0x1)
-            racname.append(stringCfg[L"race_warrior"]).append(L"|");
+            racname.append(stringCfg["race_warrior"]).append(L"|");
         if(race & 0x2)
-            racname.append(stringCfg[L"race_spellcaster"]).append(L"|");
+            racname.append(stringCfg["race_spellcaster"]).append(L"|");
         if(race & 0x4)
-            racname.append(stringCfg[L"race_fairy"]).append(L"|");
+            racname.append(stringCfg["race_fairy"]).append(L"|");
         if(race & 0x8)
-            racname.append(stringCfg[L"race_fiend"]).append(L"|");
+            racname.append(stringCfg["race_fiend"]).append(L"|");
         if(race & 0x10)
-            racname.append(stringCfg[L"race_zombie"]).append(L"|");
+            racname.append(stringCfg["race_zombie"]).append(L"|");
         if(race & 0x20)
-            racname.append(stringCfg[L"race_machine"]).append(L"|");
+            racname.append(stringCfg["race_machine"]).append(L"|");
         if(race & 0x40)
-            racname.append(stringCfg[L"race_aqua"]).append(L"|");
+            racname.append(stringCfg["race_aqua"]).append(L"|");
         if(race & 0x80)
-            racname.append(stringCfg[L"race_pyro"]).append(L"|");
+            racname.append(stringCfg["race_pyro"]).append(L"|");
         if(race & 0x100)
-            racname.append(stringCfg[L"race_rock"]).append(L"|");
+            racname.append(stringCfg["race_rock"]).append(L"|");
         if(race & 0x200)
-            racname.append(stringCfg[L"race_windbeast"]).append(L"|");
+            racname.append(stringCfg["race_windbeast"]).append(L"|");
         if(race & 0x400)
-            racname.append(stringCfg[L"race_plant"]).append(L"|");
+            racname.append(stringCfg["race_plant"]).append(L"|");
         if(race & 0x800)
-            racname.append(stringCfg[L"race_insect"]).append(L"|");
+            racname.append(stringCfg["race_insect"]).append(L"|");
         if(race & 0x1000)
-            racname.append(stringCfg[L"race_thunder"]).append(L"|");
+            racname.append(stringCfg["race_thunder"]).append(L"|");
         if(race & 0x2000)
-            racname.append(stringCfg[L"race_dragon"]).append(L"|");
+            racname.append(stringCfg["race_dragon"]).append(L"|");
         if(race & 0x4000)
-            racname.append(stringCfg[L"race_beast"]).append(L"|");
+            racname.append(stringCfg["race_beast"]).append(L"|");
         if(race & 0x8000)
-            racname.append(stringCfg[L"race_beastwarrior"]).append(L"|");
+            racname.append(stringCfg["race_beastwarrior"]).append(L"|");
         if(race & 0x10000)
-            racname.append(stringCfg[L"race_dinosaur"]).append(L"|");
+            racname.append(stringCfg["race_dinosaur"]).append(L"|");
         if(race & 0x20000)
-            racname.append(stringCfg[L"race_fish"]).append(L"|");
+            racname.append(stringCfg["race_fish"]).append(L"|");
         if(race & 0x40000)
-            racname.append(stringCfg[L"race_seaserpent"]).append(L"|");
+            racname.append(stringCfg["race_seaserpent"]).append(L"|");
         if(race & 0x80000)
-            racname.append(stringCfg[L"race_reptile"]).append(L"|");
+            racname.append(stringCfg["race_reptile"]).append(L"|");
         if(race & 0x100000)
-            racname.append(stringCfg[L"race_psychic"]).append(L"|");
+            racname.append(stringCfg["race_psychic"]).append(L"|");
         if(race & 0x200000)
-            racname.append(stringCfg[L"race_divine"]).append(L"|");
+            racname.append(stringCfg["race_divine"]).append(L"|");
         if(race & 0x400000)
-            racname.append(stringCfg[L"race_creatorgod"]).append(L"|");
+            racname.append(stringCfg["race_creatorgod"]).append(L"|");
         if(race & 0x800000)
-            racname.append(stringCfg[L"race_phantomdragon"]).append(L"|");
+            racname.append(stringCfg["race_phantomdragon"]).append(L"|");
         if(racname.length() > 0)
             racname.resize(racname.length() - 1);
         return std::move(racname);
@@ -237,90 +237,90 @@ namespace ygopro
         if(arctype & 0x1) {
             if(arctype & 0x8020c0) {
                 if(arctype & 0x800000)
-                    tpname.append(stringCfg[L"type_xyz"]);
+                    tpname.append(stringCfg["type_xyz"]);
                 else if(arctype & 0x2000)
-                    tpname.append(stringCfg[L"type_synchro"]);
+                    tpname.append(stringCfg["type_synchro"]);
                 else if(arctype & 0x80)
-                    tpname.append(stringCfg[L"type_ritual"]);
+                    tpname.append(stringCfg["type_ritual"]);
                 else
-                    tpname.append(stringCfg[L"type_fusion"]);
-                tpname.append(stringCfg[L"type_monster"]);
+                    tpname.append(stringCfg["type_fusion"]);
+                tpname.append(stringCfg["type_monster"]);
                 if(arctype & 0x20)
-                    tpname.append(L"|").append(stringCfg[L"type_effect"]);
+                    tpname.append(L"|").append(stringCfg["type_effect"]);
             } else {
                 if(arctype & 0x20)
-                    tpname.append(stringCfg[L"type_effect"]);
+                    tpname.append(stringCfg["type_effect"]);
                 else
-                    tpname .append(stringCfg[L"type_normal"]);
-                tpname.append(stringCfg[L"type_monster"]);
+                    tpname .append(stringCfg["type_normal"]);
+                tpname.append(stringCfg["type_monster"]);
             }
             if(arctype & 0x200)
-                tpname.append(L"|").append(stringCfg[L"type_spirit"]);
+                tpname.append(L"|").append(stringCfg["type_spirit"]);
             if(arctype & 0x400)
-                tpname.append(L"|").append(stringCfg[L"type_union"]);
+                tpname.append(L"|").append(stringCfg["type_union"]);
             if(arctype & 0x800)
-                tpname.append(L"|").append(stringCfg[L"type_dual"]);
+                tpname.append(L"|").append(stringCfg["type_dual"]);
             if(arctype & 0x1000)
-                tpname.append(L"|").append(stringCfg[L"type_tuner"]);
+                tpname.append(L"|").append(stringCfg["type_tuner"]);
             if(arctype & 0x4000)
-                tpname.append(L"|").append(stringCfg[L"type_token"]);
+                tpname.append(L"|").append(stringCfg["type_token"]);
             if(arctype & 0x200000)
-                tpname.append(L"|").append(stringCfg[L"type_flip"]);
+                tpname.append(L"|").append(stringCfg["type_flip"]);
             if(arctype & 0x400000)
-                tpname.append(L"|").append(stringCfg[L"type_toon"]);
+                tpname.append(L"|").append(stringCfg["type_toon"]);
             if(arctype & 0x1000000)
-                tpname.append(L"|").append(stringCfg[L"type_pendulum"]);
+                tpname.append(L"|").append(stringCfg["type_pendulum"]);
         } else if(arctype & 0x2) {
             if(arctype == 0x2)
-                tpname.append(stringCfg[L"type_normal"]);
+                tpname.append(stringCfg["type_normal"]);
             else if(arctype & 0x80)
-                tpname.append(stringCfg[L"type_ritual"]);
+                tpname.append(stringCfg["type_ritual"]);
             else if(arctype & 0x10000)
-                tpname.append(stringCfg[L"type_quickplay"]);
+                tpname.append(stringCfg["type_quickplay"]);
             else if(arctype & 0x20000)
-                tpname.append(stringCfg[L"type_continuous"]);
+                tpname.append(stringCfg["type_continuous"]);
             else if(arctype & 0x40000)
-                tpname.append(stringCfg[L"type_equip"]);
+                tpname.append(stringCfg["type_equip"]);
             else if(arctype & 0x80000)
-                tpname.append(stringCfg[L"type_field"]);
-            tpname.append(stringCfg[L"type_spell"]);
+                tpname.append(stringCfg["type_field"]);
+            tpname.append(stringCfg["type_spell"]);
         } else {
             if(arctype == 0x4)
-                tpname.append(stringCfg[L"type_normal"]);
+                tpname.append(stringCfg["type_normal"]);
             else if(arctype & 0x20000)
-                tpname.append(stringCfg[L"type_continuous"]);
+                tpname.append(stringCfg["type_continuous"]);
             else if(arctype & 0x100000)
-                tpname.append(stringCfg[L"type_counter"]);
-            tpname.append(stringCfg[L"type_trap"]);
+                tpname.append(stringCfg["type_counter"]);
+            tpname.append(stringCfg["type_trap"]);
         }
         return std::move(tpname);
     }
     
     std::wstring DataMgr::GetTypeString2(unsigned int arctype) {
         switch(arctype) {
-            case 0x1: return stringCfg[L"type_monster"];
-            case 0x2: return stringCfg[L"type_spell"];
-            case 0x4: return stringCfg[L"type_trap"];
-            case 0x10: return stringCfg[L"type_normal"];
-            case 0x20: return stringCfg[L"type_effect"];
-            case 0x40: return stringCfg[L"type_fusion"];
-            case 0x80: return stringCfg[L"type_ritual"];
-            case 0x100: return stringCfg[L"type_trapmonster"];
-            case 0x200: return stringCfg[L"type_spirit"];
-            case 0x400: return stringCfg[L"type_union"];
-            case 0x800: return stringCfg[L"type_dual"];
-            case 0x1000: return stringCfg[L"type_tuner"];
-            case 0x2000: return stringCfg[L"type_synchro"];
-            case 0x4000: return stringCfg[L"type_token"];
-            case 0x10000: return stringCfg[L"type_quickplay"];
-            case 0x20000: return stringCfg[L"type_continuous"];
-            case 0x40000: return stringCfg[L"type_equip"];
-            case 0x80000: return stringCfg[L"type_field"];
-            case 0x100000: return stringCfg[L"type_counter"];
-            case 0x200000: return stringCfg[L"type_flip"];
-            case 0x400000: return stringCfg[L"type_toon"];
-            case 0x800000: return stringCfg[L"type_xyz"];
-            case 0x1000000: return stringCfg[L"type_pendulum"];
+            case 0x1: return stringCfg["type_monster"];
+            case 0x2: return stringCfg["type_spell"];
+            case 0x4: return stringCfg["type_trap"];
+            case 0x10: return stringCfg["type_normal"];
+            case 0x20: return stringCfg["type_effect"];
+            case 0x40: return stringCfg["type_fusion"];
+            case 0x80: return stringCfg["type_ritual"];
+            case 0x100: return stringCfg["type_trapmonster"];
+            case 0x200: return stringCfg["type_spirit"];
+            case 0x400: return stringCfg["type_union"];
+            case 0x800: return stringCfg["type_dual"];
+            case 0x1000: return stringCfg["type_tuner"];
+            case 0x2000: return stringCfg["type_synchro"];
+            case 0x4000: return stringCfg["type_token"];
+            case 0x10000: return stringCfg["type_quickplay"];
+            case 0x20000: return stringCfg["type_continuous"];
+            case 0x40000: return stringCfg["type_equip"];
+            case 0x80000: return stringCfg["type_field"];
+            case 0x100000: return stringCfg["type_counter"];
+            case 0x200000: return stringCfg["type_flip"];
+            case 0x400000: return stringCfg["type_toon"];
+            case 0x800000: return stringCfg["type_xyz"];
+            case 0x1000000: return stringCfg["type_pendulum"];
         }
         return L"";
     }

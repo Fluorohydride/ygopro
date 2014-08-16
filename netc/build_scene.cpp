@@ -84,49 +84,49 @@ namespace ygopro
             KeyDown(evt);
             return true;
         });
-        auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 7}, std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]));
+        auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 7}, std::wstring(L"\ue08c").append(stringCfg["eui_msg_new_deck"]));
         deck_label = icon_label;
         auto menu_deck = sgui::SGButton::Create(pnl, {250, 5}, {70, 25});
-        menu_deck->SetText(stringCfg[L"eui_menu_deck"], 0xff000000);
+        menu_deck->SetText(stringCfg["eui_menu_deck"], 0xff000000);
         menu_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
                 OnMenuDeck(id);
             })
-            .AddButton(stringCfg[L"eui_deck_load"])
-            .AddButton(stringCfg[L"eui_deck_save"])
-            .AddButton(stringCfg[L"eui_deck_saveas"])
-            .AddButton(stringCfg[L"eui_deck_loadstr"])
-            .AddButton(stringCfg[L"eui_deck_savestr"])
+            .AddButton(stringCfg["eui_deck_load"])
+            .AddButton(stringCfg["eui_deck_save"])
+            .AddButton(stringCfg["eui_deck_saveas"])
+            .AddButton(stringCfg["eui_deck_loadstr"])
+            .AddButton(stringCfg["eui_deck_savestr"])
             .End();
             return true;
         });
         auto menu_tool = sgui::SGButton::Create(pnl, {325, 5}, {70, 25});
-        menu_tool->SetText(stringCfg[L"eui_menu_tool"], 0xff000000);
+        menu_tool->SetText(stringCfg["eui_menu_tool"], 0xff000000);
         menu_tool->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
                 OnMenuTool(id);
             })
-            .AddButton(stringCfg[L"eui_tool_sort"])
-            .AddButton(stringCfg[L"eui_tool_shuffle"])
-            .AddButton(stringCfg[L"eui_tool_clear"])
-            .AddButton(stringCfg[L"eui_tool_browser"])
+            .AddButton(stringCfg["eui_tool_sort"])
+            .AddButton(stringCfg["eui_tool_shuffle"])
+            .AddButton(stringCfg["eui_tool_clear"])
+            .AddButton(stringCfg["eui_tool_browser"])
             .End();
             return true;
         });
         auto menu_list = sgui::SGButton::Create(pnl, {400, 5}, {70, 25});
-        menu_list->SetText(stringCfg[L"eui_menu_list"], 0xff000000);
+        menu_list->SetText(stringCfg["eui_menu_list"], 0xff000000);
         menu_list->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
                 OnMenuList(id);
             })
-            .AddButton(stringCfg[L"eui_list_forbidden"])
-            .AddButton(stringCfg[L"eui_list_limit"])
-            .AddButton(stringCfg[L"eui_list_semilimit"])
+            .AddButton(stringCfg["eui_list_forbidden"])
+            .AddButton(stringCfg["eui_list_limit"])
+            .AddButton(stringCfg["eui_list_semilimit"])
             .End();
             return true;
         });
         auto menu_search = sgui::SGButton::Create(pnl, {475, 5}, {70, 25});
-        menu_search->SetText(stringCfg[L"eui_menu_search"], 0xff000000);
+        menu_search->SetText(stringCfg["eui_menu_search"], 0xff000000);
         menu_search->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             filter_dialog->Show(SceneMgr::Get().GetMousePosition());
             filter_dialog->SetOKCallback([this](const FilterCondition fc, int lmt)->void {
@@ -144,7 +144,7 @@ namespace ygopro
             return true;
         });
         auto show_ex = sgui::SGCheckbox::Create(pnl, {710, 7}, {100, 30});
-        show_ex->SetText(stringCfg[L"eui_show_exclusive"], 0xff000000);
+        show_ex->SetText(stringCfg["eui_show_exclusive"], 0xff000000);
         show_ex->SetChecked(true);
         show_ex->eventCheckChange.Bind([this](sgui::SGWidget& sender, bool check)->bool {
             ChangeExclusive(check);
@@ -445,7 +445,7 @@ namespace ygopro
     void BuildScene::SetDeckDirty() {
         if(!deck_edited) {
             if(current_file.length() == 0)
-                deck_label.lock()->SetText(std::wstring(L"\ue08c").append(stringCfg[L"eui_msg_new_deck"]).append(L"*"), 0xff000000);
+                deck_label.lock()->SetText(std::wstring(L"\ue08c").append(stringCfg["eui_msg_new_deck"]).append(L"*"), 0xff000000);
             else
                 deck_label.lock()->SetText(std::wstring(L"\ue08c").append(current_file).append(L"*"), 0xff000000);
             deck_edited = true;
@@ -539,13 +539,13 @@ namespace ygopro
         wxTheClipboard->Open();
         wxTheClipboard->SetData(new wxTextDataObject(deck_string));
         wxTheClipboard->Close();
-        MessageBox::ShowOK(L"", stringCfg[L"eui_msg_deck_tostr_ok"]);
+        MessageBox::ShowOK(L"", stringCfg["eui_msg_deck_tostr_ok"]);
     }
     
     void BuildScene::OnMenuDeck(int id) {
         switch(id) {
             case 0:
-                file_dialog->Show(stringCfg[L"eui_msg_deck_load"], commonCfg[L"deck_path"], L".ydk");
+                file_dialog->Show(stringCfg["eui_msg_deck_load"], commonCfg["deck_path"], L".ydk");
                 file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
                     if(deck_edited || deck != current_file)
                         LoadDeckFromFile(deck);
@@ -553,7 +553,7 @@ namespace ygopro
                 break;
             case 1:
                 if(current_file.length() == 0) {
-                    file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
+                    file_dialog->Show(stringCfg["eui_msg_deck_save"], commonCfg["deck_path"], L".ydk");
                     file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
                         SaveDeckToFile(deck);
                     });
@@ -561,7 +561,7 @@ namespace ygopro
                     SaveDeckToFile(current_file);
                 break;
             case 2:
-                file_dialog->Show(stringCfg[L"eui_msg_deck_save"], commonCfg[L"deck_path"], L".ydk");
+                file_dialog->Show(stringCfg["eui_msg_deck_save"], commonCfg["deck_path"], L".ydk");
                 file_dialog->SetOKCallback([this](const std::wstring& deck)->void {
                     SaveDeckToFile(deck);
                 });
@@ -590,7 +590,7 @@ namespace ygopro
                 SetDeckDirty();
                 break;
             case 3: {
-                wxString neturl = static_cast<const std::wstring&>(commonCfg[L"deck_neturl"]);
+                wxString neturl = static_cast<const std::wstring&>(commonCfg["deck_neturl"]);
                 wxString deck_string = current_deck.SaveToString();
                 neturl.Replace("{amp}", wxT("&"));
                 neturl.Replace("{deck}", deck_string);
@@ -1025,11 +1025,11 @@ namespace ygopro
         }
         std::wstring title = L"\ue07a";
         if(limit == 0)
-            title.append(stringCfg[L"eui_list_forbidden"]);
+            title.append(stringCfg["eui_list_forbidden"]);
         else if(limit == 1)
-            title.append(stringCfg[L"eui_list_limit"]);
+            title.append(stringCfg["eui_list_limit"]);
         else
-            title.append(stringCfg[L"eui_list_semilimit"]);
+            title.append(stringCfg["eui_list_semilimit"]);
         deck_label.lock()->SetText(title, 0xff000000);
         view_regulation = limit + 1;
         current_file.clear();
@@ -1083,8 +1083,8 @@ namespace ygopro
             if(keystr[0] == L'@') {
                 fc.code = FilterDialog::ParseInt(&keystr[1], keystr.length() - 1);
             } else if(keystr[0] == L'#') {
-                std::wstring setstr = L"setname_";
-                setstr.append(keystr.substr(1));
+                std::string setstr = "setname_";
+                setstr.append(To<std::string>(keystr.substr(1)));
                 if(stringCfg.Exists(setstr))
                     fc.setcode = stringCfg[setstr];
                 else
@@ -1098,7 +1098,7 @@ namespace ygopro
             RefreshSearchResult();
             auto ptr = label_result.lock();
             if(ptr != nullptr) {
-                wxString s = static_cast<const std::wstring&>(stringCfg[L"eui_filter_count"]);
+                wxString s = static_cast<const std::wstring&>(stringCfg["eui_filter_count"]);
                 wxString ct = wxString::Format(L"%ld", search_result.size());
                 s.Replace(L"{count}", ct);
                 ptr->SetText(s.ToStdWstring(), 0xff000000);
@@ -1117,7 +1117,7 @@ namespace ygopro
         RefreshSearchResult();
         auto ptr = label_result.lock();
         if(ptr != nullptr) {
-            wxString s = static_cast<const std::wstring&>(stringCfg[L"eui_filter_count"]);
+            wxString s = static_cast<const std::wstring&>(stringCfg["eui_filter_count"]);
             wxString ct = wxString::Format(L"%ld", search_result.size());
             s.Replace(L"{count}", ct);
             ptr->SetText(s.ToStdWstring(), 0xff000000);

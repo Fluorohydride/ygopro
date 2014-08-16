@@ -29,10 +29,10 @@ namespace ygopro
 
 	public:
 
-		inline ValueStruct& operator[] (const std::wstring& name) {
+		inline ValueStruct& operator[] (const std::string& name) {
 			return config_map[name];
 		}
-        inline bool Exists(const std::wstring& name) {
+        inline bool Exists(const std::string& name) {
             return config_map.find(name) != config_map.end();
         }
         
@@ -48,7 +48,7 @@ namespace ygopro
 		void SaveConfig(const std::wstring& name);
 
 	private:
-		std::unordered_map<std::wstring, ValueStruct> config_map;
+		std::unordered_map<std::string, ValueStruct> config_map;
 
 	};
 

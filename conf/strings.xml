@@ -16,8 +16,6 @@
   <string name="eui_tool_clear" value="清空"/>
   <string name="eui_tool_sort" value="排序"/>
   <string name="eui_tool_shuffle" value="打乱"/>
-  <string name="eui_tool_screenshot" value="截图"/>
-  <string name="eui_tool_saveshot" value="保存截图"/>
   <string name="eui_tool_browser" value="查看网页"/>
   <string name="eui_menu_list" value="查看"/>
   <string name="eui_list_forbidden" value="禁止卡"/>

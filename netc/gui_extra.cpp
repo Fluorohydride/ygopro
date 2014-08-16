@@ -23,7 +23,7 @@ namespace ygopro
         wd->SetSize({lbsz.x + 20, lbsz.y + 80});
         wd->SetPosition({sz.x / 2 - lbsz.x / 2 - 10, sz.y / 2 - lbsz.y / 2 - 40});
         auto btn = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 - 30, 45 + lbsz.y}, {60, 25});
-        btn->SetText(stringCfg[L"eui_button_ok"], 0xff000000);
+        btn->SetText(stringCfg["eui_button_ok"], 0xff000000);
         auto ptr = wd.get();
         btn->eventButtonClick.Bind([ptr, cb](sgui::SGWidget& sender)->bool {
             if(cb != nullptr)
@@ -46,7 +46,7 @@ namespace ygopro
         wd->SetPosition({sz.x / 2 - lbsz.x / 2 - 10, sz.y / 2 - lbsz.y / 2 - 40});
         auto ptr = wd.get();
         auto btnOK = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 - 70, 45 + lbsz.y}, {60, 25});
-        btnOK->SetText(stringCfg[L"eui_button_ok"], 0xff000000);
+        btnOK->SetText(stringCfg["eui_button_ok"], 0xff000000);
         btnOK->eventButtonClick.Bind([ptr, cb1](sgui::SGWidget& sender)->bool {
             if(cb1 != nullptr)
                 cb1();
@@ -54,7 +54,7 @@ namespace ygopro
             return true;
         });
         auto btnCancel = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 + 10, 45 + lbsz.y}, {60, 25});
-        btnCancel->SetText(stringCfg[L"eui_button_cancel"], 0xff000000);
+        btnCancel->SetText(stringCfg["eui_button_cancel"], 0xff000000);
         btnCancel->eventButtonClick.Bind([ptr, cb2](sgui::SGWidget& sender)->bool {
             if(cb2 != nullptr)
                 cb2();
@@ -76,7 +76,7 @@ namespace ygopro
         wd->SetPosition({sz.x / 2 - lbsz.x / 2 - 10, sz.y / 2 - lbsz.y / 2 - 40});
         auto ptr = wd.get();
         auto btnOK = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 - 70, 45 + lbsz.y}, {60, 25});
-        btnOK->SetText(stringCfg[L"eui_button_yes"], 0xff000000);
+        btnOK->SetText(stringCfg["eui_button_yes"], 0xff000000);
         btnOK->eventButtonClick.Bind([ptr, cb1](sgui::SGWidget& sender)->bool {
             if(cb1 != nullptr)
                 cb1();
@@ -84,7 +84,7 @@ namespace ygopro
             return true;
         });
         auto btnCancel = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 + 10, 45 + lbsz.y}, {60, 25});
-        btnCancel->SetText(stringCfg[L"eui_button_no"], 0xff000000);
+        btnCancel->SetText(stringCfg["eui_button_no"], 0xff000000);
         btnCancel->eventButtonClick.Bind([ptr, cb2](sgui::SGWidget& sender)->bool {
             if(cb2 != nullptr)
                 cb2();
@@ -148,7 +148,7 @@ namespace ygopro
         auto lst = sgui::SGListBox::Create(wd, {10, 55}, {280, 200});
         auto ffile = sgui::SGTextEdit::Create(wd, {10, 255}, {280, 30});
         auto btn = sgui::SGButton::Create(wd, {190, 290}, {100, 25});
-        btn->SetText(stringCfg[L"eui_button_ok"], 0xff000000);
+        btn->SetText(stringCfg["eui_button_ok"], 0xff000000);
         window = wd;
         auto ppath = fpath.get();
         auto pfile = ffile.get();
@@ -213,7 +213,7 @@ namespace ygopro
         files.Sort();
         list->ClearItem();
         if(path != root)
-            list->AddItem(142, stringCfg[L"eui_updir"], 0xff000000);
+            list->AddItem(142, stringCfg["eui_updir"], 0xff000000);
         for(size_t i = 0; i < dirs.GetCount(); ++i)
             list->AddItem(140, dirs[i].ToStdWstring(), 0xff000000);
         for(size_t i = 0; i < files.GetCount(); ++i)
@@ -224,13 +224,13 @@ namespace ygopro
         if(!window.expired())
             return;
         auto wd = sgui::SGPanel::Create(nullptr, pos, {250, 300});
-        auto label1 = sgui::SGLabel::Create(wd, {10, 15}, stringCfg[L"eui_filter_keyword"]);
+        auto label1 = sgui::SGLabel::Create(wd, {10, 15}, stringCfg["eui_filter_keyword"]);
         auto pkeyword = sgui::SGTextEdit::Create(wd, {90, 10}, {150, 30});
         keyword = pkeyword;
-        auto label2 = sgui::SGLabel::Create(wd, {10, 40}, stringCfg[L"eui_filter_type"]);
+        auto label2 = sgui::SGLabel::Create(wd, {10, 40}, stringCfg["eui_filter_type"]);
         auto ptype1 = sgui::SGComboBox::Create(wd, {90, 35}, {130, 30});
         type1 = ptype1;
-        ptype1->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        ptype1->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x1), 0xff000000, 0x1);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x2), 0xff000000, 0x2);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x4), 0xff000000, 0x4);
@@ -239,9 +239,9 @@ namespace ygopro
             auto ptr = type2.lock();
             ptr->ClearItem();
             if(index == 0) {
-                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
             } else if(index == 1) {
-                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0x1e003ef);
+                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0x1e003ef);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x10);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x20), 0xff000000, 0x20);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x40), 0xff000000, 0x40);
@@ -256,7 +256,7 @@ namespace ygopro
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x400), 0xff000000, 0x400);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x400000), 0xff000000, 0x400000);
             } else if(index == 2) {
-                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0xf0082);
+                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0xf0082);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x2);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x80), 0xff000000, 0x80);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10000), 0xff000000, 0x10000);
@@ -264,7 +264,7 @@ namespace ygopro
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x40000), 0xff000000, 0x40000);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x80000), 0xff000000, 0x80000);
             } else {
-                ptr->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0x120004);
+                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0x120004);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x4);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x20000), 0xff000000, 0x20000);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x100000), 0xff000000, 0x100000);
@@ -274,40 +274,40 @@ namespace ygopro
         });
         auto ptype2 = sgui::SGComboBox::Create(wd, {90, 60}, {130, 30});
         type2 = ptype2;
-        ptype2->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        ptype2->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
         ptype2->SetSelection(0);
-        auto label3 = sgui::SGLabel::Create(wd, {10, 90}, stringCfg[L"eui_filter_limit"]);
+        auto label3 = sgui::SGLabel::Create(wd, {10, 90}, stringCfg["eui_filter_limit"]);
         auto ptype3 = sgui::SGComboBox::Create(wd, {90, 85}, {130, 30});
         type3 = ptype3;
-        ptype3->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
-        ptype3->AddItem(stringCfg[L"pool_limit0"], 0xff000000, 1);
-        ptype3->AddItem(stringCfg[L"pool_limit1"], 0xff000000, 2);
-        ptype3->AddItem(stringCfg[L"pool_limit2"], 0xff000000, 3);
-        ptype3->AddItem(stringCfg[L"pool_ocg"], 0xff000000, 0x1);
-        ptype3->AddItem(stringCfg[L"pool_tcg"], 0xff000000, 0x2);
+        ptype3->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
+        ptype3->AddItem(stringCfg["pool_limit0"], 0xff000000, 1);
+        ptype3->AddItem(stringCfg["pool_limit1"], 0xff000000, 2);
+        ptype3->AddItem(stringCfg["pool_limit2"], 0xff000000, 3);
+        ptype3->AddItem(stringCfg["pool_ocg"], 0xff000000, 0x1);
+        ptype3->AddItem(stringCfg["pool_tcg"], 0xff000000, 0x2);
         ptype3->SetSelection(0);
-        auto label4 = sgui::SGLabel::Create(wd, {10, 115}, stringCfg[L"eui_filter_attribute"]);
+        auto label4 = sgui::SGLabel::Create(wd, {10, 115}, stringCfg["eui_filter_attribute"]);
         auto pattribute = sgui::SGComboBox::Create(wd, {90, 110}, {130, 30});
         attribute = pattribute;
-        pattribute->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        pattribute->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
         for(unsigned int i = 1; i != 0x80; i <<=1)
             pattribute->AddItem(DataMgr::Get().GetAttributeString(i), 0xff000000, i);
         pattribute->SetSelection(0);
-        auto label5 = sgui::SGLabel::Create(wd, {10, 140}, stringCfg[L"eui_filter_race"]);
+        auto label5 = sgui::SGLabel::Create(wd, {10, 140}, stringCfg["eui_filter_race"]);
         auto prace = sgui::SGComboBox::Create(wd, {90, 135}, {130, 30});
         race = prace;
-        prace->AddItem(stringCfg[L"eui_filter_na"], 0xff000000, 0);
+        prace->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
         for(unsigned int i = 1; i != 0x1000000; i <<=1)
             prace->AddItem(DataMgr::Get().GetRaceString(i), 0xff000000, i);
         prace->SetSelection(0);
-        auto label6 = sgui::SGLabel::Create(wd, {10, 165}, stringCfg[L"eui_filter_attack"]);
+        auto label6 = sgui::SGLabel::Create(wd, {10, 165}, stringCfg["eui_filter_attack"]);
         attack = sgui::SGTextEdit::Create(wd, {90, 160}, {150, 30});
-        auto label7 = sgui::SGLabel::Create(wd, {10, 190}, stringCfg[L"eui_filter_defence"]);
+        auto label7 = sgui::SGLabel::Create(wd, {10, 190}, stringCfg["eui_filter_defence"]);
         defence = sgui::SGTextEdit::Create(wd, {90, 185}, {150, 30});
-        auto label8 = sgui::SGLabel::Create(wd, {10, 215}, stringCfg[L"eui_filter_star"]);
+        auto label8 = sgui::SGLabel::Create(wd, {10, 215}, stringCfg["eui_filter_star"]);
         star = sgui::SGTextEdit::Create(wd, {90, 210}, {150, 30});
         auto sch = sgui::SGButton::Create(wd, {140, 260}, {100, 25});
-        sch->SetText(stringCfg[L"eui_filter_search"], 0xff000000);
+        sch->SetText(stringCfg["eui_filter_search"], 0xff000000);
         sch->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             BeginSearch();
             return true;
@@ -325,8 +325,8 @@ namespace ygopro
                 if(fc.code == 0)
                     fc.code = 1;
             } else if(keystr[0] == L'#') {
-                std::wstring setstr = L"setname_";
-                setstr.append(keystr.substr(1));
+                std::string setstr = "setname_";
+                setstr.append(To<std::string>(keystr.substr(1)));
                 if(stringCfg.Exists(setstr))
                     fc.setcode = stringCfg[setstr];
                 else
@@ -437,10 +437,11 @@ namespace ygopro
         extra->SetSpacing(1, 5);
         extra->SetPosition({cw + 15, sz.y - 50});
         if(data->setcode) {
-            extra->AppendText(stringCfg[L"eui_msg_setcode"], 0xff000000);
+            extra->AppendText(stringCfg["eui_msg_setcode"], 0xff000000);
             for(int i = 0; i < 4; ++i) {
                 unsigned short sd = (data->setcode >> (i * 16)) & 0xffff;
                 if(sd) {
+                    extra->AppendText(L"#", 0xff000000);
                     extra->AppendText(DataMgr::Get().GetSetCode(sd), 0xffff0000);
                     extra->AppendText(L" ", 0xff000000);
                 }
@@ -450,7 +451,8 @@ namespace ygopro
         unsigned int ccode = (data->alias == 0
                               || (data->alias > data->code && data->alias - data->code > 10)
                               || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
-        extra->AppendText(wxString::Format(L" [%08d]", ccode).ToStdWstring(), 0xffff0000);
+        extra->AppendText(L" @", 0xff000000);
+        extra->AppendText(wxString::Format(L"%08d", ccode).ToStdWstring(), 0xffff0000);
         auto text = cardText.lock();
         auto pent = penText.lock();
         auto ad = adText.lock();

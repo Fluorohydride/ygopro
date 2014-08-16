@@ -222,7 +222,7 @@ namespace glbase {
             dot = -dot;
             neg = true;
         }
-        float theta = acosf(t);
+        float theta = acosf(dot);
         float sinv = sinf(theta);
         float t1 = sinf((1.0f - t) * theta) / sinv;
         float t2 = sinf(t * theta) / sinv;

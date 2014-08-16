@@ -16,15 +16,15 @@ namespace ygopro
 		while (child) {
             if(child->GetType() == wxXmlNodeType::wxXML_ELEMENT_NODE) {
                 if (child->GetName() == "integer") {
-                    std::wstring name = child->GetAttribute("name").ToStdWstring();
+                    std::string name = child->GetAttribute("name").ToUTF8().data();
                     long value = To<long>(child->GetAttribute("value").ToUTF8().data());
                     config_map[name] = value;
                 } if (child->GetName() == "float") {
-                    std::wstring name = child->GetAttribute("name").ToStdWstring();
+                    std::string name = child->GetAttribute("name").ToUTF8().data();
                     double value = To<double>(child->GetAttribute("value").ToUTF8().data());
                     config_map[name] = value;
                 } else {
-                    std::wstring name = child->GetAttribute("name").ToStdWstring();
+                    std::string name = child->GetAttribute("name").ToUTF8().data();
                     std::wstring value = child->GetAttribute("value").ToStdWstring();
                     config_map[name] = value;
                 }

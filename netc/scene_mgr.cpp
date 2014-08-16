@@ -122,7 +122,7 @@ namespace ygopro
         auto tm = std::localtime(&t);
         char file[256];
         sprintf(file, "/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
-        std::wstring wpath = commonCfg[L"screenshot_path"];
+        std::wstring wpath = commonCfg["screenshot_path"];
         std::string path = To<std::string>(wpath);
         path.append(file);
         stbi_write_png(path.c_str(), clip.width, clip.height, 4, clip_buff, 0);

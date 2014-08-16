@@ -4,11 +4,11 @@
 #include "../common/tcpclient.h"
 
 #include "scene_mgr.h"
-#include "gui_extra.h"
-#include "duel_command.h"
 
 namespace ygopro
 {
+    
+    struct DuelCommand;
     
     class DuelScene : public Scene, public TcpClientSeed {
     public:
