@@ -92,7 +92,7 @@ function c47198668.atkop2(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c47198668.efilter(e,re,rp)
-	if not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
+	if not re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return false end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	return not g:IsContains(e:GetHandler())
+	return g and not g:IsContains(e:GetHandler())
 end
