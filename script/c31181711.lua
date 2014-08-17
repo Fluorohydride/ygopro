@@ -61,10 +61,11 @@ function c31181711.btcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c31181711.btcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	e:SetLabelObject(e:GetHandler():GetEquipTarget())
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c31181711.btop(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetHandler():GetEquipTarget()
+	local ec=e:GetLabelObject()
 	if Duel.NegateAttack() and ec:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
