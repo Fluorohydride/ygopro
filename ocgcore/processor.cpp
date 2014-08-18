@@ -3098,7 +3098,7 @@ int32 field::process_battle_command(uint16 step) {
 					core.attacker->announced_cards[0] = 0;
 				core.attacker->announce_count++;
 				attack_all_target_check();
-				if(!atk_disabled) {
+				if(!core.attacker->is_status(STATUS_ATTACK_CANCELED)) {
 					if(core.attack_target)
 						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
@@ -5168,11 +5168,18 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 13: {
+		//attack cancel
+		card* attacker = core.attacker;
+		if(attacker && attacker->is_affected_by_effect(EFFECT_CANNOT_ATTACK))
+			attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		return FALSE;
+	}
+	case 14: {
 		raise_event((card*)0, EVENT_ADJUST, 0, 0, PLAYER_NONE, PLAYER_NONE, 0);
 		process_instant_event();
 		return FALSE;
 	}
-	case 14: {
+	case 15: {
 		if(core.re_adjust) {
 			core.units.begin()->step = -1;
 			return FALSE;
