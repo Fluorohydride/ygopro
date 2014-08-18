@@ -27,7 +27,7 @@ end
 function c16195942.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) and c:IsRelateToEffect(e) and c:IsFaceup() and not tc:IsImmuneToEffect(e) then
 		local atk=tc:GetAttack()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -35,14 +35,12 @@ function c16195942.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(atk/2)
 		tc:RegisterEffect(e1)
-		if c:IsRelateToEffect(e) and c:IsFaceup() then
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_UPDATE_ATTACK)
-			e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			e2:SetValue(atk/2)
-			c:RegisterEffect(e2)
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_UPDATE_ATTACK)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetValue(atk/2)
+		c:RegisterEffect(e2)
 		end
 	end
-end
