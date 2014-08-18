@@ -69,7 +69,8 @@ function c83531441.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsAttackPos() then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
-	end end
+	end
+end
 function c83531441.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)
 end
