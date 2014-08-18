@@ -9,6 +9,32 @@
 #include "deck_data.h"
 #include "build_scene.h"
 
+static const char* vert_shader = "\
+#version 400\n\
+layout (location = 0) in vec2 v_position;\n\
+layout (location = 1) in vec4 v_color;\n\
+layout (location = 2) in vec2 v_texcoord;\n\
+out vec4 color;\n\
+out vec2 texcoord;\n\
+void main() {\n\
+color = v_color;\n\
+texcoord = v_texcoord;\n\
+gl_Position = vec4(v_position, 0.0, 1.0);\n\
+}\n\
+";
+
+static const char* frag_shader = "\
+#version 400\n\
+in vec4 color;\n\
+in vec2 texcoord;\n\
+layout (location = 0) out vec4 frag_color;\n\
+uniform sampler2D texid;\n\
+void main() {\n\
+vec4 texcolor = texture(texid, texcoord);\n\
+frag_color = texcolor * color;\n\
+}\n\
+";
+
 namespace ygopro
 {
     
@@ -43,6 +69,27 @@ namespace ygopro
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 4 * 6, &index[0], GL_STATIC_DRAW);
+        glGenVertexArrays(1, &deck_vao);
+        glGenVertexArrays(1, &back_vao);
+        glGenVertexArrays(1, &misc_vao);
+        glGenVertexArrays(1, &result_vao);
+        for(int i = 0; i < 4; ++i) {
+            switch(i) {
+                case 0: glBindVertexArray(deck_vao); glBindBuffer(GL_ARRAY_BUFFER, deck_buffer); break;
+                case 1: glBindVertexArray(back_vao); glBindBuffer(GL_ARRAY_BUFFER, back_buffer); break;
+                case 2: glBindVertexArray(misc_vao); glBindBuffer(GL_ARRAY_BUFFER, misc_buffer); break;
+                case 3: glBindVertexArray(result_vao); glBindBuffer(GL_ARRAY_BUFFER, result_buffer); break;
+                default: break;
+            }
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v2ct), 0);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+            glBindVertexArray(0);
+        }
         GLCheckError(__FILE__, __LINE__);
         limit[0] = ImageMgr::Get().GetTexture("limit0");
         limit[1] = ImageMgr::Get().GetTexture("limit1");
@@ -54,6 +101,9 @@ namespace ygopro
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         info_panel = std::make_shared<InfoPanel>();
+        builder_shader.LoadVertShader(vert_shader);
+        builder_shader.LoadFragShader(frag_shader);
+        builder_shader.Link();
     }
     
     BuildScene::~BuildScene() {
@@ -62,6 +112,11 @@ namespace ygopro
         glDeleteBuffers(1, &back_buffer);
         glDeleteBuffers(1, &misc_buffer);
         glDeleteBuffers(1, &result_buffer);
+        glDeleteVertexArrays(1, &deck_vao);
+        glDeleteVertexArrays(1, &back_vao);
+        glDeleteVertexArrays(1, &misc_vao);
+        glDeleteVertexArrays(1, &result_vao);
+        builder_shader.Unload();
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -183,45 +238,35 @@ namespace ygopro
     
     void BuildScene::Draw() {
         glViewport(0, 0, scene_size.x, scene_size.y);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+        builder_shader.Use();
+        builder_shader.SetParam1i("varname", 0);
         // background
         ImageMgr::Get().GetRawBGTexture()->Bind();
-        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
+        glBindVertexArray(back_vao);
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // miscs
         ImageMgr::Get().GetRawMiscTexture()->Bind();
-        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
-        glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
-        glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
+        glBindVertexArray(misc_vao);
         glDrawElements(GL_TRIANGLE_STRIP, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
         ImageMgr::Get().GetRawCardTexture()->Bind();
         // result
         if(result_show_size) {
-            glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-            glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
-            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
-            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
+            glBindVertexArray(result_vao);
             glDrawElements(GL_TRIANGLE_STRIP, result_show_size * 24 - 2, GL_UNSIGNED_SHORT, 0);
             GLCheckError(__FILE__, __LINE__);
         }
         // deck
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz > 0) {
-            glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
-            glVertexPointer(2, GL_FLOAT, sizeof(glbase::v2ct), 0);
-            glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
-            glTexCoordPointer(2, GL_FLOAT, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
+            glBindVertexArray(deck_vao);
             glDrawElements(GL_TRIANGLE_STRIP, deck_sz * 24 - 2, GL_UNSIGNED_SHORT, 0);
         }
         GLCheckError(__FILE__, __LINE__);
-        
+        glBindVertexArray(0);
+        builder_shader.Unuse();
     }
     
     void BuildScene::SetSceneSize(v2i sz) {
@@ -344,7 +389,7 @@ namespace ygopro
                 update_status = 1;
                 unsigned int code = dcd->data->code;
                 auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-                MoveTo(dcd, 0.1f, ptr->pos + v2f{card_size.x / 2, -card_size.y / 2}, {0.0f, 0.0f});
+                MoveTo(dcd, 0.2f, ptr->pos + v2f{card_size.x / 2, -card_size.y / 2}, {0.0f, 0.0f});
                 ptr->show_limit = false;
                 ptr->show_exclusive = false;
                 ptr->update_callback = [pos, index, code, this]() {
@@ -655,13 +700,12 @@ namespace ygopro
                     ptr->update_pos = false;
                 } else {
                     float rate = (tm - ptr->moving_time_b) / (ptr->moving_time_e - ptr->moving_time_b);
-                    ptr->pos = ptr->start_pos + (ptr->dest_pos - ptr->start_pos) * rate;
+                    ptr->pos = ptr->start_pos + (ptr->dest_pos - ptr->start_pos) * (rate * 2.0f - rate * rate);
                     ptr->size = ptr->start_size + (ptr->dest_size - ptr->start_size) * rate;
                 }
             }
             if(ptr->update_color) {
-                if(tm >= ptr->fading_time_e)
-                {
+                if(tm >= ptr->fading_time_e) {
                     ptr->hl = ptr->dest_hl;
                     ptr->update_color = false;
                 } else {
@@ -690,18 +734,18 @@ namespace ygopro
             return;
         for(size_t i = 0; i < current_deck.main_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
-            MoveTo(current_deck.main_deck[i], 0.1f, cpos, card_size);
+            MoveTo(current_deck.main_deck[i], 0.2f, cpos, card_size);
         }
         if(current_deck.extra_deck.size()) {
             for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
                 auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
-                MoveTo(current_deck.extra_deck[i], 0.1f, cpos, card_size);
+                MoveTo(current_deck.extra_deck[i], 0.2f, cpos, card_size);
             }
         }
         if(current_deck.side_deck.size()) {
             for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
                 auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
-                MoveTo(current_deck.side_deck[i], 0.1f, cpos, card_size);
+                MoveTo(current_deck.side_deck[i], 0.2f, cpos, card_size);
             }
         }
     }

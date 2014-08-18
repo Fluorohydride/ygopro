@@ -278,6 +278,23 @@ namespace glbase {
         vt[3].color = cl;
     };
     
+    class Shader {
+    public:
+        ~Shader();
+        bool LoadVertShader(const char* buffer);
+        bool LoadFragShader(const char* buffer);
+        bool Link();
+        bool Use();
+        void Unuse();
+        void Unload();
+        void SetParam1i(const char* varname, int value);
+        
+    protected:
+        unsigned int vert_shader = 0;
+        unsigned int frag_shader = 0;
+        unsigned int program = 0;
+    };
+    
     class Image {
     public:
         ~Image();

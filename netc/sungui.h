@@ -257,6 +257,7 @@ namespace sgui
         std::weak_ptr<SGWidgetContainer> parent;
         bool vertices_dirty = true;
         unsigned int vbo = 0;
+        unsigned int vao = 0;
     };
     
     class SGTextBase {
@@ -283,6 +284,7 @@ namespace sgui
         bool text_update = true;
         unsigned short mem_size = 0;
         unsigned int tbo = 0;
+        unsigned int tao = 0;
         glbase::Font* font = nullptr;
         unsigned int spacing_x = 1;
         unsigned int spacing_y = 1;
@@ -297,6 +299,7 @@ namespace sgui
     
     class SGSpriteBase {
     public:
+        SGSpriteBase();
         virtual ~SGSpriteBase();
         virtual void SetImage(glbase::Texture* img, recti varea, unsigned int cl = 0xffffffff);
         virtual void AddTexRect(recti tarea);
@@ -309,6 +312,7 @@ namespace sgui
         
     protected:
         unsigned int imgbo = 0;
+        unsigned int imgao = 0;
         bool img_update = true;
         bool img_dirty = true;
         double frame_time = 0.016;
@@ -447,6 +451,7 @@ namespace sgui
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
         void CheckMouseMove();
         double GetTime();
+        unsigned int GetIndexBuffer() { return index_buffer; }
         
         bool InjectMouseMoveEvent(MouseMoveEvent evt);
         bool InjectMouseEnterEvent();
@@ -475,6 +480,7 @@ namespace sgui
         unsigned long long start_time = 0;
         unsigned int index_buffer = 0;
         std::unordered_map<std::string, glbase::Font> font_mgr;
+        glbase::Shader gui_shader;
         
     public:
         static SGConfig basic_config;

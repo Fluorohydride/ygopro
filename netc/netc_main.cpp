@@ -25,6 +25,10 @@ int main(int argc, char* argv[]) {
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     auto mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
     GLFWwindow* window = glfwCreateWindow(width, height, "Ygopro", nullptr, nullptr);
     if (!window) {
@@ -36,7 +40,6 @@ int main(int argc, char* argv[]) {
     glfwMakeContextCurrent(window);
 	glewExperimental = true;
     glewInit();
-
     ImageMgr::Get().InitTextures(commonCfg["image_file"]);
     if(!stringCfg.LoadConfig(commonCfg["string_conf"])
        || DataMgr::Get().LoadDatas(commonCfg["database_file"])
@@ -63,10 +66,9 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
-    
     auto sc = std::make_shared<BuildScene>();
     SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
-
+    
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {
             if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))

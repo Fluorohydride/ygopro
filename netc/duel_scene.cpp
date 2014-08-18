@@ -2,6 +2,7 @@
 
 #include "gui_extra.h"
 #include "duel_command.h"
+#include "image_mgr.h"
 
 #include "duel_scene.h"
 
@@ -101,6 +102,26 @@ namespace ygopro
     }
     
     void DuelScene::KeyUp(sgui::KeyEvent evt) {
+        
+    }
+    
+    void DuelScene::UpdateBack() {
+        if(!update_bg)
+            return;
+        update_bg = false;
+        auto ti = ImageMgr::Get().GetTexture("bg");
+        std::array<glbase::v2ct, 4> verts;
+        glbase::FillVertex(&verts[0], {-1.0f, 1.0f}, {2.0f, -2.0f}, ti);
+        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * verts.size(), &verts[0]);
+        GLCheckError(__FILE__, __LINE__);
+    }
+    
+    void DuelScene::UpdateField() {
+        
+    }
+    
+    void DuelScene::UpdateMisc() {
         
     }
     

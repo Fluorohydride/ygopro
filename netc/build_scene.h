@@ -100,6 +100,10 @@ namespace ygopro
         unsigned int back_buffer = 0;
         unsigned int misc_buffer = 0;
         unsigned int result_buffer = 0;
+        unsigned int deck_vao = 0;
+        unsigned int back_vao = 0;
+        unsigned int misc_vao = 0;
+        unsigned int result_vao = 0;
         bool update_bg = true;
         bool update_card = true;
         bool update_misc = true;
@@ -140,6 +144,7 @@ namespace ygopro
         int result_show_size = 0;
         std::weak_ptr<sgui::SGLabel> label_result;
         std::weak_ptr<sgui::SGLabel> label_page;
+        glbase::Shader builder_shader;
     };
     
 }

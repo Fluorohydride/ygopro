@@ -42,6 +42,118 @@ void GLCheckError(const std::string& file, int line) {
 
 namespace glbase {
     
+    Shader::~Shader() {
+        if(vert_shader)
+            glDeleteShader(vert_shader);
+        if(frag_shader)
+            glDeleteShader(frag_shader);
+        if(program)
+            glDeleteProgram(program);
+    }
+    
+    bool Shader::LoadVertShader(const char* buffer) {
+        vert_shader = glCreateShader(GL_VERTEX_SHADER);
+        glShaderSource(vert_shader, 1, &buffer, nullptr);
+        glCompileShader(vert_shader);
+        int result;
+        glGetShaderiv(vert_shader, GL_COMPILE_STATUS, &result);
+        if(result == GL_FALSE) {
+            std::cerr << "Vertex shader compilation failed!" << std::endl;
+            GLint logLen;
+            glGetShaderiv(vert_shader, GL_INFO_LOG_LENGTH, &logLen);
+            if(logLen > 0) {
+                char* log = new char[logLen];
+                GLsizei written;
+                glGetShaderInfoLog(vert_shader, logLen, &written, log);
+                std::cerr << "Shader log:" << log << std::endl;
+                delete[] log;
+            }
+            glDeleteShader(vert_shader);
+            vert_shader = 0;
+            return false;
+        }
+        return true;
+    }
+    
+    bool Shader::LoadFragShader(const char* buffer) {
+        frag_shader = glCreateShader(GL_FRAGMENT_SHADER);
+        glShaderSource(frag_shader, 1, &buffer, nullptr);
+        glCompileShader(frag_shader);
+        int result;
+        glGetShaderiv(frag_shader, GL_COMPILE_STATUS, &result);
+        if(result == GL_FALSE) {
+            std::cerr << "Fragment shader compilation failed!" << std::endl;
+            GLint logLen;
+            glGetShaderiv(frag_shader, GL_INFO_LOG_LENGTH, &logLen);
+            if(logLen > 0) {
+                char* log = new char[logLen];
+                GLsizei written;
+                glGetShaderInfoLog(frag_shader, logLen, &written, log);
+                std::cerr << "Shader log:" << log << std::endl;
+                delete[] log;
+            }
+            glDeleteShader(frag_shader);
+            frag_shader = 0;
+            return false;
+        }
+        return true;
+    }
+    
+    bool Shader::Link() {
+        program = glCreateProgram();
+        glAttachShader(program, vert_shader);
+        glAttachShader(program, frag_shader);
+        glLinkProgram(program);
+        int result;
+        glGetProgramiv(program, GL_LINK_STATUS, &result);
+        if(result == GL_FALSE) {
+            std::cerr << "Failed to link shader program!\n" << std::endl;
+            GLint logLen;
+            glGetProgramiv(program, GL_INFO_LOG_LENGTH, &logLen);
+            if(logLen > 0) {
+                char* log = new char[logLen];
+                GLsizei written;
+                glGetProgramInfoLog(program, logLen, &written, log);
+                std::cerr << "Program log: " << log << std::endl;
+                delete[] log;
+            }
+            glDeleteProgram(program);
+            program = 0;
+            return false;
+        }
+        return true;
+    }
+    
+    bool Shader::Use() {
+        if(program) {
+            glUseProgram(program);
+            return true;
+        }
+        return false;
+    }
+    
+    void Shader::Unuse() {
+        glUseProgram(0);
+    }
+    
+    void Shader::SetParam1i(const char* varname, int value) {
+        auto loc = glGetUniformLocation(program, varname);
+        if(loc >= 0)
+            glUniform1i(loc, value);
+    }
+    
+    void Shader::Unload() {
+        if(vert_shader)
+            glDeleteShader(vert_shader);
+        if(frag_shader)
+            glDeleteShader(frag_shader);
+        if(program)
+            glDeleteProgram(program);
+        vert_shader = 0;
+        frag_shader = 0;
+        program = 0;
+    }
+    
     Image::~Image() {
         if(buffer != nullptr)
             delete buffer;

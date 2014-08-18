@@ -31,6 +31,10 @@ namespace ygopro
         virtual void OnDisconnected();
         virtual void HandlePacket(unsigned short proto, unsigned char data[], unsigned int size);
         
+        void UpdateBack();
+        void UpdateField();
+        void UpdateMisc();
+        
     protected:
         v2i scene_size = {0, 0};
         unsigned int index_buffer = 0;
@@ -38,6 +42,7 @@ namespace ygopro
         unsigned int back_buffer = 0;
         unsigned int card_buffer = 0;
         unsigned int misc_buffer = 0;
+        bool update_bg = true;
         double waiting_time = 0.0;
         CommandList<DuelCommand> duel_commands;
         std::function<void()> current_cb;
