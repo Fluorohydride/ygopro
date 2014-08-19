@@ -40,7 +40,17 @@ int main(int argc, char* argv[]) {
     glfwMakeContextCurrent(window);
 	glewExperimental = true;
     glewInit();
+
+    int major, minor;
+    glGetIntegerv(GL_MAJOR_VERSION, &major);
+    glGetIntegerv(GL_MINOR_VERSION, &minor);
+    std::cout << "GL Vendor    : " << glGetString(GL_VENDOR) << std::endl;
+    std::cout << "GL Renderer  : " << glGetString(GL_RENDERER) << std::endl;
+    std::cout << "GL Version (string)  : " << glGetString(GL_VERSION) << std::endl;
+    std::cout << "GL Version (integer) : " << major << "." << minor << std::endl;
+    std::cout << "GLSL Version : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     glGetError();
+    
     ImageMgr::Get().InitTextures(commonCfg["image_file"]);
     if(!stringCfg.LoadConfig(commonCfg["string_conf"])
        || DataMgr::Get().LoadDatas(commonCfg["database_file"])
