@@ -56,9 +56,7 @@ namespace ygopro
                         shader.Use();
                         shader.SetParam1i("texID", 0);
                         glBindVertexArray(card_vao);
-                        GLCheckError(__FILE__, __LINE__);
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-                        GLCheckError(__FILE__, __LINE__);
                         glBindVertexArray(0);
                         shader.Unuse();
                         glBindTexture(GL_TEXTURE_2D, 0);
