@@ -34,9 +34,9 @@ function c51543904.cfilter(c)
 end
 function c51543904.ovfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7f)
-		and Duel.IsExistingMatchingCard(c51543904.cfilter,c:GetControler(),LOCATION_HAND,0,1,nil)
 end
-function c51543904.xyzop(c,tp)
+function c51543904.xyzop(e,tp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c51543904.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c51543904.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
 function c51543904.filter(c,e,tp)

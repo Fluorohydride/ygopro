@@ -45,7 +45,7 @@ function c63881033.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c63881033.splimit(e,c)
-	return not c:IsRace(RACE_MACHINE)
+	return c:IsRace(0xffffff-RACE_MACHINE)
 end
 function c63881033.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(5) and c:IsRace(RACE_MACHINE)

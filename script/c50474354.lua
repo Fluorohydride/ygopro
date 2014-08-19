@@ -31,7 +31,7 @@ function c50474354.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c50474354.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsAbleToGraveAsCost() end
+	if chk==0 then return Duel.GetFlagEffect(tp,50474354)==0 and c:IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(c,REASON_COST)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)

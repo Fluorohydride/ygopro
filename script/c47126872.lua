@@ -34,7 +34,7 @@ end
 function c47126872.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		if Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 then
+		if Duel.Remove(tc,POS_FACEUP,REASON_EFFECT)~=0 and e:GetHandler():IsRelateToEffect(e) then
 			e:SetLabelObject(tc)
 			tc:RegisterFlagEffect(47126872,RESET_EVENT+0x1fe0000,0,1)
 		end
@@ -47,6 +47,7 @@ end
 function c47126872.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local tc=e:GetLabelObject():GetLabelObject()
+	Duel.SetTargetCard(tc)
 	if tc:IsType(TYPE_MONSTER) then
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,tc,1,0,0)
@@ -55,9 +56,8 @@ function c47126872.settg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c47126872.setop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject():GetLabelObject()
-	if tc:GetFlagEffect(47126872)==0 then return end
-	tc:ResetFlagEffect(47126872)
+	local tc=Duel.GetFirstTarget()
+	if not tc:IsRelateToEffect(e) then return end
 	if tc:IsType(TYPE_MONSTER) then
 		Duel.SpecialSummon(tc,0,tp,1-tp,false,false,POS_FACEDOWN_DEFENCE)
 	else

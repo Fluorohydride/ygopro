@@ -18,7 +18,7 @@ end
 function c53981499.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc:IsType(TYPE_MONSTER)
+	return c:IsRelateToBattle() and bc:IsType(TYPE_MONSTER)
 end
 function c53981499.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

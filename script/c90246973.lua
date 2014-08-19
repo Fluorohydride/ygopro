@@ -1,4 +1,4 @@
---¥Ñ¥ï©`¡¤¥Ô¥«¥¯¥¹
+--ãƒ‘ãƒ¯ãƒ¼ãƒ»ãƒ”ã‚«ã‚¯ã‚¹
 function c90246973.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -50,7 +50,7 @@ function c90246973.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c90246973.rmfilter,tp,0,LOCATION_GRAVE,1,nil,ec:GetLevel()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c90246973.rmfilter,tp,0,LOCATION_GRAVE,1,1,nil,ec:GetLevel())
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)
 end
 function c90246973.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

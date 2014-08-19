@@ -60,7 +60,7 @@ function c59281922.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c59281922.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:IsRace(RACE_MACHINE)
+	return c:IsRace(0xffffff-RACE_MACHINE)
 end
 function c59281922.filter(c)
 	return c:IsFaceup() and c:IsCode(70095154)

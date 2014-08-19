@@ -25,7 +25,7 @@ function c17626381.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c17626381.cfilter,1,nil,tp)
 end
 function c17626381.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.IsPlayerCanDraw(tp,1) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

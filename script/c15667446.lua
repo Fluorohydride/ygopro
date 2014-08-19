@@ -1,4 +1,4 @@
---°µü\½ç¤ÎêLÉñ ¥é¥Á¥Ê
+--æš—é»’ç•Œã®é—˜ç¥ ãƒ©ãƒãƒŠ
 function c15667446.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

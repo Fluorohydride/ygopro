@@ -17,7 +17,8 @@ end
 function c68057622.descon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return at and a:IsControler(1-tp) and at:IsRelateToBattle() and a:IsRelateToBattle() and a:GetAttack()<at:GetDefence()
+	return at and a:IsControler(1-tp) and a:IsRelateToBattle()
+		and at:IsDefencePos() and at:IsRelateToBattle() and a:GetAttack()<at:GetDefence()
 end
 function c68057622.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(Duel.GetAttacker(),REASON_EFFECT)

@@ -11,8 +11,8 @@ function c48800175.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c48800175.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,e:GetHandler()) end
-	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c48800175.filter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsAttackAbove(3000) and c:IsDefenceBelow(2500) and c:IsAbleToHand()

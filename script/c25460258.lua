@@ -21,7 +21,6 @@ function c25460258.initial_effect(c)
 	e2:SetTarget(c25460258.rmtg)
 	e2:SetOperation(c25460258.rmop)
 	c:RegisterEffect(e2)
-	
 end
 function c25460258.spfilter(c,att)
 	return c:IsAttribute(att) and c:IsAbleToRemoveAsCost()

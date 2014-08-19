@@ -19,7 +19,8 @@ end
 function c38495396.ovfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x53) and c:GetCode()~=38495396 and c:IsType(TYPE_XYZ)
 end
-function c38495396.xyzop(e,tp)
+function c38495396.xyzop(e,tp,chk)
+	if chk==0 then return true end
 	e:GetHandler():RegisterFlagEffect(38495396,RESET_EVENT+0xfe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c38495396.thcost(e,tp,eg,ep,ev,re,r,rp,chk)

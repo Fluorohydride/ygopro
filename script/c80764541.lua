@@ -29,7 +29,7 @@ function c80764541.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c80764541.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c80764541.filter,tp,0,LOCATION_MZONE,1,1,nil)
-	if not Duel.CheckLPCost(1-tp,1000) then
+	if Duel.GetLP(1-tp)>1000 then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end
 end

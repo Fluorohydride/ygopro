@@ -36,14 +36,13 @@ function c69327790.otfilter(c)
 end
 function c69327790.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
+	local mg=Duel.GetMatchingGroup(c69327790.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
 	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(c69327790.otfilter,1,nil)
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c69327790.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,c69327790.otfilter,1,1,nil)
+	local mg=Duel.GetMatchingGroup(c69327790.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

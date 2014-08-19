@@ -30,17 +30,17 @@ function c51192573.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c51192573.otfilter(c,tp)
-	return c:IsControler(tp) and c:GetOwner()~=tp
+	return c:GetOwner()==tp
 end
 function c51192573.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and g:IsExists(c51192573.otfilter,1,nil,c:GetControler())
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c51192573.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,1-tp)
+	return c:GetLevel()>6 and Duel.GetTributeCount(c,mg)>0
 end
 function c51192573.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,c51192573.otfilter,1,1,nil,c:GetControler())
+	local mg=Duel.GetMatchingGroup(c51192573.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,1-tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

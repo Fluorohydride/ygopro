@@ -65,6 +65,7 @@ function c37115575.initial_effect(c)
 	e9:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e9:SetCategory(CATEGORY_DESTROY)
 	e9:SetCode(EVENT_BATTLE_DESTROYING)
+	e9:SetCondition(c37115575.decon)
 	e9:SetTarget(c37115575.detg)
 	e9:SetOperation(c37115575.deop)
 	c:RegisterEffect(e9)
@@ -107,6 +108,10 @@ function c37115575.descon(e)
 end
 function c37115575.destarget(e,c)
 	return c:IsSetCard(0x23) and c:GetFieldID()>e:GetHandler():GetFieldID()
+end
+function c37115575.decon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c37115575.defilter(c)
 	return c:IsFaceup() and c:IsDestructable()

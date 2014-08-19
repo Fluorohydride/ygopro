@@ -5,8 +5,13 @@ function c62054060.initial_effect(c)
 	e1:SetDescription(aux.Stringid(62054060,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(c62054060.condition)
 	e1:SetOperation(c62054060.operation)
 	c:RegisterEffect(e1)
+end
+function c62054060.condition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c62054060.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

@@ -14,7 +14,7 @@ function c43225434.condition(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
 	return at and ((a:IsControler(tp) and a:IsType(TYPE_FUSION))
-		or (at:IsControler(tp) and at:IsFaceup() and a:IsType(TYPE_FUSION)))
+		or (at:IsControler(tp) and at:IsFaceup() and at:IsType(TYPE_FUSION)))
 end
 function c43225434.activate(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()

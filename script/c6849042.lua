@@ -22,15 +22,18 @@ function c6849042.initial_effect(c)
 	e2:SetOperation(c6849042.drop)
 	c:RegisterEffect(e2)
 end
+function c6849042.otfilter(c,tp)
+	return c:IsRace(RACE_DINOSAUR) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c6849042.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and g:IsExists(Card.IsRace,1,nil,RACE_DINOSAUR)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c6849042.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	return c:GetLevel()>6 and Duel.GetTributeCount(c,mg)>0
 end
 function c6849042.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsRace,1,1,nil,RACE_DINOSAUR)
+	local mg=Duel.GetMatchingGroup(c6849042.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
