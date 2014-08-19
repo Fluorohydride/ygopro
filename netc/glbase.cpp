@@ -154,9 +154,8 @@ namespace glbase {
         program = 0;
     }
     
-    static Shader default_shader;
-    
-    void Shader::LoadDefaultShader() {
+    Shader& Shader::GetDefaultShader() {
+        static Shader* default_shader = nullptr;
         static const char* vert_shader = "\
         #version 400\n\
         layout (location = 0) in vec2 v_position;\n\
@@ -181,17 +180,13 @@ namespace glbase {
         frag_color = texcolor * color;\n\
         }\n\
         ";
-        default_shader.LoadVertShader(vert_shader);
-        default_shader.LoadFragShader(frag_shader);
-        default_shader.Link();
-    }
-    
-    Shader& Shader::GetDefaultShader() {
-        return default_shader;
-    }
-    
-    void Shader::UnloadDefaultShader() {
-        default_shader.Unload();
+        if(default_shader == nullptr) {
+            default_shader = new Shader;
+            default_shader->LoadVertShader(vert_shader);
+            default_shader->LoadFragShader(frag_shader);
+            default_shader->Link();
+        }
+        return *default_shader;
     }
     
     Image::~Image() {

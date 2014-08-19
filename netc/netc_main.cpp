@@ -57,7 +57,6 @@ int main(int argc, char* argv[]) {
             DataMgr::Get().RegisterSetCode(static_cast<unsigned int>(value), setname);
         }
     });
-    glbase::Shader::LoadDefaultShader();
     
     int bwidth, bheight;
     glfwGetFramebufferSize(window, &bwidth, &bheight);
@@ -148,7 +147,7 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().Uninit();
     sgui::SGGUIRoot::GetSingleton().Unload();
     ImageMgr::Get().UninitTextures();
-    glbase::Shader::UnloadDefaultShader();
+    glbase::Shader::GetDefaultShader().Unload();
     
     glfwDestroyWindow(window);
     glfwTerminate();

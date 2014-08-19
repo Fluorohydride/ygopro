@@ -290,9 +290,7 @@ namespace glbase {
         void SetParam1i(const char* varname, int value);
         
     public:
-        static void LoadDefaultShader();
         static Shader& GetDefaultShader();
-        static void UnloadDefaultShader();
         
     protected:
         unsigned int vert_shader = 0;
