@@ -35,12 +35,12 @@ function c26732909.initial_effect(c)
 	end
 end
 function c26732909.checkop1(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x106e) then
 		c26732909[rp]=c26732909[rp]+1
 	end
 end
 function c26732909.checkop2(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x106e) then
 		c26732909[rp]=c26732909[rp]-1
 	end
 end

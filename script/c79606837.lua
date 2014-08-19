@@ -42,7 +42,7 @@ function c79606837.rmtarget(e,c)
 end
 function c79606837.discon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if ep==tp or c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
+	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	return (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
 end
 function c79606837.discost(e,tp,eg,ep,ev,re,r,rp,chk)

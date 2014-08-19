@@ -177,8 +177,8 @@ function c94977269.checkop(e,tp,eg,ep,ev,re,r,rp)
 		if tc:GetSummonPlayer()==0 then p1=true else p2=true end
 		tc=eg:GetNext()
 	end
-	if p1 then c:RegisterFlagEffect(94977269,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then c:RegisterFlagEffect(94977270,RESET_PHASE+PHASE_END,0,1) end
+	if p1 then c:RegisterFlagEffect(94977269,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1) end
+	if p2 then c:RegisterFlagEffect(94977270,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1) end
 end
 function c94977269.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()

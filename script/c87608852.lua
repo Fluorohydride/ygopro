@@ -48,12 +48,12 @@ function c87608852.checkop1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c87608852.checkop2(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x106e) then
 		c87608852[rp+2]=c87608852[rp+2]+1
 	end
 end
 function c87608852.checkop3(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsSetCard(0x106e) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x106e) then
 		c87608852[rp+2]=c87608852[rp+2]-1
 	end
 end

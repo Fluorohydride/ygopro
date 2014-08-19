@@ -15,8 +15,10 @@ function c83531441.initial_effect(c)
 	c:RegisterEffect(e1)
 	--to defence
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_DAMAGE_STEP_END)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
+	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1)
 	e2:SetCondition(c83531441.poscon)
 	e2:SetOperation(c83531441.posop)
 	c:RegisterEffect(e2)
@@ -61,7 +63,7 @@ function c83531441.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c83531441.poscon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsRelateToBattle()
+	return e:GetHandler():GetAttackedCount()>0
 end
 function c83531441.posop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

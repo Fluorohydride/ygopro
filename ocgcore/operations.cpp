@@ -4210,10 +4210,10 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			rmax += (*cit)->operation_param;
 		for(auto cit = core.release_cards_ex.begin(); cit != core.release_cards_ex.end(); ++cit)
 			rmax += (*cit)->operation_param;
+		core.temp_var[0] = 0;
 		if(rmax < min)
 			returns.ivalue[0] = TRUE;
 		else if(!core.release_cards_ex_sum.empty()) {
-			core.temp_var[0] = 0;
 			if(rmax == 0 && min == 2)
 				core.temp_var[0] = 1;
 			add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, 92);
