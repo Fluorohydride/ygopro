@@ -10,32 +10,6 @@ namespace sgui
     
     static SGGUIRoot guiRoot;
     
-    static const char* vert_shader = "\
-    #version 400\n\
-    layout (location = 0) in vec2 v_position;\n\
-    layout (location = 1) in vec4 v_color;\n\
-    layout (location = 2) in vec2 v_texcoord;\n\
-    out vec4 color;\n\
-    out vec2 texcoord;\n\
-    void main() {\n\
-        color = v_color;\n\
-        texcoord = v_texcoord;\n\
-        gl_Position = vec4(v_position, 0.0, 1.0);\n\
-    }\n\
-    ";
-    
-    static const char* frag_shader = "\
-    #version 400\n\
-    in vec4 color;\n\
-    in vec2 texcoord;\n\
-    layout (location = 0) out vec4 frag_color;\n\
-    uniform sampler2D texid;\n\
-    void main() {\n\
-        vec4 texcolor = texture(texid, texcoord);\n\
-        frag_color = texcolor * color;\n\
-    }\n\
-    ";
-    
     SGWidget::~SGWidget() {
         eventDestroying.TriggerEvent(*this);
         if(vbo)
@@ -789,23 +763,17 @@ namespace sgui
     }
     
     void SGGUIRoot::Draw() {
-        glPushAttrib(GL_ALL_ATTRIB_BITS);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_TEXTURE_2D);
-        glDisable(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
-        glLoadIdentity();
-        glActiveTexture(GL_TEXTURE0);
-        gui_shader.Use();
-        gui_shader.SetParam1i("texid", 0);
+        gui_shader->Use();
+        gui_shader->SetParam1i("texID", 0);
         for(auto& iter : children)
             if(iter->IsVisible())
                 iter->Draw();
         cur_texture = nullptr;
         scissor_stack.clear();
-        gui_shader.Unuse();
-        glPopAttrib();
+        gui_shader->Unuse();
     }
     
     void SGGUIRoot::ObjectDragingBegin(std::shared_ptr<SGWidget> dr, MouseMoveEvent evt) {
@@ -904,12 +872,7 @@ namespace sgui
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 1024 * 4 * 6, &index[0], GL_STATIC_DRAW);
         start_time = std::chrono::system_clock::now().time_since_epoch().count();
-        if(!gui_shader.LoadVertShader(vert_shader))
-            return false;
-        if(!gui_shader.LoadFragShader(frag_shader))
-            return false;
-        if(!gui_shader.Link())
-            return false;
+        gui_shader = &glbase::Shader::GetDefaultShader();
         return true;
     }
     
@@ -919,7 +882,6 @@ namespace sgui
             glDeleteBuffers(1, &index_buffer);
         for(auto& ft : font_mgr)
             ft.second.Unload();
-        gui_shader.Unload();
         index_buffer = 0;
     }
     

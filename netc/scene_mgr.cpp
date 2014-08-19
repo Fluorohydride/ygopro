@@ -24,10 +24,7 @@ namespace ygopro
     void SceneMgr::InitDraw() {
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-        glEnable(GL_TEXTURE_2D);
-        glDisable(GL_LIGHTING);
         glDisable(GL_DEPTH_TEST);
-        glLoadIdentity();
         glActiveTexture(GL_TEXTURE0);
     }
     
@@ -38,7 +35,7 @@ namespace ygopro
     }
     
     void SceneMgr::Draw() {
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT);
         glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
         if(current_scene != nullptr)
             current_scene->Draw();

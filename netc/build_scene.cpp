@@ -9,32 +9,6 @@
 #include "deck_data.h"
 #include "build_scene.h"
 
-static const char* vert_shader = "\
-#version 400\n\
-layout (location = 0) in vec2 v_position;\n\
-layout (location = 1) in vec4 v_color;\n\
-layout (location = 2) in vec2 v_texcoord;\n\
-out vec4 color;\n\
-out vec2 texcoord;\n\
-void main() {\n\
-color = v_color;\n\
-texcoord = v_texcoord;\n\
-gl_Position = vec4(v_position, 0.0, 1.0);\n\
-}\n\
-";
-
-static const char* frag_shader = "\
-#version 400\n\
-in vec4 color;\n\
-in vec2 texcoord;\n\
-layout (location = 0) out vec4 frag_color;\n\
-uniform sampler2D texid;\n\
-void main() {\n\
-vec4 texcolor = texture(texid, texcoord);\n\
-frag_color = texcolor * color;\n\
-}\n\
-";
-
 namespace ygopro
 {
     
@@ -101,9 +75,6 @@ namespace ygopro
         file_dialog = std::make_shared<FileDialog>();
         filter_dialog = std::make_shared<FilterDialog>();
         info_panel = std::make_shared<InfoPanel>();
-        builder_shader.LoadVertShader(vert_shader);
-        builder_shader.LoadFragShader(frag_shader);
-        builder_shader.Link();
     }
     
     BuildScene::~BuildScene() {
@@ -116,7 +87,6 @@ namespace ygopro
         glDeleteVertexArrays(1, &back_vao);
         glDeleteVertexArrays(1, &misc_vao);
         glDeleteVertexArrays(1, &result_vao);
-        builder_shader.Unload();
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -238,8 +208,9 @@ namespace ygopro
     
     void BuildScene::Draw() {
         glViewport(0, 0, scene_size.x, scene_size.y);
-        builder_shader.Use();
-        builder_shader.SetParam1i("varname", 0);
+        auto& shader = glbase::Shader::GetDefaultShader();
+        shader.Use();
+        shader.SetParam1i("texid", 0);
         // background
         ImageMgr::Get().GetRawBGTexture()->Bind();
         glBindVertexArray(back_vao);
@@ -266,7 +237,7 @@ namespace ygopro
         }
         GLCheckError(__FILE__, __LINE__);
         glBindVertexArray(0);
-        builder_shader.Unuse();
+        shader.Unuse();
     }
     
     void BuildScene::SetSceneSize(v2i sz) {

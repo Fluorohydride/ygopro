@@ -480,7 +480,7 @@ namespace sgui
         unsigned long long start_time = 0;
         unsigned int index_buffer = 0;
         std::unordered_map<std::string, glbase::Font> font_mgr;
-        glbase::Shader gui_shader;
+        glbase::Shader* gui_shader;
         
     public:
         static SGConfig basic_config;

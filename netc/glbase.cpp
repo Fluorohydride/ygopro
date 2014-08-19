@@ -154,6 +154,46 @@ namespace glbase {
         program = 0;
     }
     
+    static Shader default_shader;
+    
+    void Shader::LoadDefaultShader() {
+        static const char* vert_shader = "\
+        #version 400\n\
+        layout (location = 0) in vec2 v_position;\n\
+        layout (location = 1) in vec4 v_color;\n\
+        layout (location = 2) in vec2 v_texcoord;\n\
+        out vec4 color;\n\
+        out vec2 texcoord;\n\
+        void main() {\n\
+        color = v_color;\n\
+        texcoord = v_texcoord;\n\
+        gl_Position = vec4(v_position, 0.0, 1.0);\n\
+        }\n\
+        ";
+        static const char* frag_shader = "\
+        #version 400\n\
+        in vec4 color;\n\
+        in vec2 texcoord;\n\
+        layout (location = 0) out vec4 frag_color;\n\
+        uniform sampler2D texid;\n\
+        void main() {\n\
+        vec4 texcolor = texture(texid, texcoord);\n\
+        frag_color = texcolor * color;\n\
+        }\n\
+        ";
+        default_shader.LoadVertShader(vert_shader);
+        default_shader.LoadFragShader(frag_shader);
+        default_shader.Link();
+    }
+    
+    Shader& Shader::GetDefaultShader() {
+        return default_shader;
+    }
+    
+    void Shader::UnloadDefaultShader() {
+        default_shader.Unload();
+    }
+    
     Image::~Image() {
         if(buffer != nullptr)
             delete buffer;

@@ -40,6 +40,7 @@ int main(int argc, char* argv[]) {
     glfwMakeContextCurrent(window);
 	glewExperimental = true;
     glewInit();
+    glGetError();
     ImageMgr::Get().InitTextures(commonCfg["image_file"]);
     if(!stringCfg.LoadConfig(commonCfg["string_conf"])
        || DataMgr::Get().LoadDatas(commonCfg["database_file"])
@@ -56,6 +57,7 @@ int main(int argc, char* argv[]) {
             DataMgr::Get().RegisterSetCode(static_cast<unsigned int>(value), setname);
         }
     });
+    glbase::Shader::LoadDefaultShader();
     
     int bwidth, bheight;
     glfwGetFramebufferSize(window, &bwidth, &bheight);
@@ -68,7 +70,7 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
     auto sc = std::make_shared<BuildScene>();
     SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
-    
+
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {
             if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))
@@ -146,6 +148,7 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().Uninit();
     sgui::SGGUIRoot::GetSingleton().Unload();
     ImageMgr::Get().UninitTextures();
+    glbase::Shader::UnloadDefaultShader();
     
     glfwDestroyWindow(window);
     glfwTerminate();

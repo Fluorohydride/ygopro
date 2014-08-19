@@ -52,9 +52,15 @@ namespace ygopro
                         card_image.Bind();
                         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
                         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 4, &frame_verts);
+                        auto& shader = glbase::Shader::GetDefaultShader();
+                        shader.Use();
+                        shader.SetParam1i("texID", 0);
                         glBindVertexArray(card_vao);
+                        GLCheckError(__FILE__, __LINE__);
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+                        GLCheckError(__FILE__, __LINE__);
                         glBindVertexArray(0);
+                        shader.Unuse();
                         glBindTexture(GL_TEXTURE_2D, 0);
                         glBindFramebuffer(GL_FRAMEBUFFER, 0);
                     } else {
@@ -181,6 +187,7 @@ namespace ygopro
     void ImageMgr::UninitTextures() {
         glDeleteFramebuffers(1, &frame_buffer);
         glDeleteBuffers(2, card_buffer);
+        glDeleteVertexArrays(1, &card_vao);
         card_texture.Unload();
         misc_texture.Unload();
         bg_texture.Unload();

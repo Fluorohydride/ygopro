@@ -144,7 +144,6 @@ namespace ygopro
         int result_show_size = 0;
         std::weak_ptr<sgui::SGLabel> label_result;
         std::weak_ptr<sgui::SGLabel> label_page;
-        glbase::Shader builder_shader;
     };
     
 }
