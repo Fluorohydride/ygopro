@@ -61,7 +61,7 @@ int32 effect::is_available() {
 	if (type & EFFECT_TYPE_SINGLE) {
 		if (handler->current.controler == PLAYER_NONE)
 			return FALSE;
-		if((flag & EFFECT_FLAG_SINGLE_RANGE) && !(range & handler->current.location))
+		if((flag & EFFECT_FLAG_SINGLE_RANGE) && !in_range(handler->current.location, handler->current.sequence))
 			return FALSE;
 		if((flag & EFFECT_FLAG_SINGLE_RANGE) && (handler->current.location & LOCATION_ONFIELD)
 		        && (handler->is_position(POS_FACEDOWN) || !handler->is_status(STATUS_EFFECT_ENABLED)))
@@ -97,7 +97,7 @@ int32 effect::is_available() {
 				return FALSE;
 			if(!(handler->get_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
-			if(!(range & handler->current.location))
+			if(!in_range(handler->current.location, handler->current.sequence))
 				return FALSE;
 			if((handler->current.location & LOCATION_ONFIELD) && !handler->is_position(POS_FACEUP))
 				return FALSE;
@@ -201,7 +201,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			if(((type & EFFECT_TYPE_FIELD) || ((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE))) && (handler->current.location & LOCATION_ONFIELD)
 			        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
-			if((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE) && !(handler->current.location & range))
+			if((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE) && !in_range(handler->current.location, handler->current.sequence))
 				return FALSE;
 			if((flag & EFFECT_FLAG_OWNER_RELATE) && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && owner->is_status(STATUS_DISABLED))
 				return FALSE;
@@ -578,4 +578,13 @@ uint8 effect::get_handler_player() {
 	if(flag & EFFECT_FLAG_FIELD_ONLY)
 		return effect_owner;
 	return handler->current.controler;
+}
+int32 effect::in_range(int32 loc, int32 seq) {
+	if(loc != LOCATION_SZONE)
+		return range & loc;
+	if(seq < 5)
+		return range & LOCATION_SZONE;
+	if(seq == 5)
+		return range & (LOCATION_SZONE | LOCATION_FZONE);
+	return range & LOCATION_PZONE;
 }

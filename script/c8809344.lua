@@ -1,4 +1,4 @@
---외신 나이알라
+--外神ナイアルラ
 function c8809344.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
@@ -37,7 +37,7 @@ function c8809344.rkop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetCode(EFFECT_UPDATE_RANK)
-		e2:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
+		e2:SetReset(RESET_EVENT+0x1ff0000)
 		e2:SetValue(e:GetLabel())
 		c:RegisterEffect(e2)
 	end

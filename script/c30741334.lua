@@ -9,23 +9,23 @@ function c30741334.initial_effect(c)
 	e1:SetDescription(aux.Stringid(30741334,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(3,30741334)
 	e1:SetCost(c30741334.cost)
 	e1:SetTarget(c30741334.target)
 	e1:SetOperation(c30741334.operation)
 	c:RegisterEffect(e1)
 end
 function c30741334.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1 and Duel.GetFlagEffect(tp,30741334)<3
+	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1
 		and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,30741334,RESET_PHASE+PHASE_END,0,1)
 end
 function c30741334.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end

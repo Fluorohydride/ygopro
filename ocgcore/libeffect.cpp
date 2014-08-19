@@ -175,7 +175,7 @@ int32 scriptlib::effect_set_type(lua_State *L) {
 	if(v & 0x550)
 		v |= EFFECT_TYPE_FIELD;
 	if(v & EFFECT_TYPE_ACTIVATE)
-		peffect->range = LOCATION_SZONE + LOCATION_HAND;
+		peffect->range = LOCATION_SZONE + LOCATION_FZONE + LOCATION_HAND;
 	if(v & EFFECT_TYPE_FLIP) {
 		peffect->code = EVENT_FLIP;
 		if(!(v & EFFECT_TYPE_TRIGGER_O))

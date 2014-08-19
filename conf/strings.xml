@@ -312,6 +312,6 @@
   <integer name="setname_毛绒动物" value="0xa9"/>
   <integer name="setname_机壳" value="0xaa"/>
   <integer name="setname_文具电子人" value="0xab"/>
-  <integer name="setname_破坏玩具" value="0xac"/>
-  <integer name="setname_哥布林" value="0xad"/>
+  <integer name="setname_哥布林" value="0xac"/>
+  <integer name="setname_破坏玩具" value="0xad"/>
 </Common>

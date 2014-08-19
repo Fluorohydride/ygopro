@@ -25,8 +25,8 @@ function c68462976.initial_effect(c)
 	e2:SetLabelObject(e3)
 end
 function c68462976.actlimit(e,te,tp)
-	if not te:IsHasType(EFFECT_TYPE_ACTIVATE) or not te:GetHandler():IsType(TYPE_SPELL) then return false end
-	if tp==e:GetHandler():GetControler() then return e:GetLabel()==1
+	if not te:IsHasType(EFFECT_TYPE_ACTIVATE) or not te:IsActiveType(TYPE_SPELL) then return false end
+	if tp==e:GetHandlerPlayer() then return e:GetLabel()==1
 	else return e:GetLabel()==2 end
 end
 function c68462976.filter(c)

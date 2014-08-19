@@ -85,6 +85,7 @@ public:
 	int32 get_speed();
 	uint8 get_owner_player();
 	uint8 get_handler_player();
+	int32 in_range(int32 loc, int32 seq);
 };
 
 //status
@@ -368,6 +369,9 @@ public:
 #define EFFECT_QP_ACT_IN_NTPHAND		311
 #define EFFECT_MUST_BE_SMATERIAL		312
 #define EFFECT_SPSUMMON_PROC_G			320
+#define EFFECT_SUMMON_COUNT_LIMIT		330
+#define EFFECT_SPSUMMON_COUNT_LIMIT		331
+#define EFFECT_FLIP_SUMMON_COUNT_LIMIT	332
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001

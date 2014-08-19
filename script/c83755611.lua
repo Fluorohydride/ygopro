@@ -1,7 +1,7 @@
 --輝竜星－ショウフク
 function c83755611.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_PHANTOMDRAGON),1)
+	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_WYRM),1)
 	c:EnableReviveLimit()
 	--mat check
 	local e1=Effect.CreateEffect(c)
@@ -34,7 +34,7 @@ function c83755611.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c83755611.matcheck(e,c)
-	local ct=c:GetMaterial():Filter(Card.IsRace,nil,RACE_PHANTOMDRAGON):GetClassCount(Card.GetOriginalAttribute)
+	local ct=c:GetMaterial():Filter(Card.IsRace,nil,RACE_WYRM):GetClassCount(Card.GetOriginalAttribute)
 	e:SetLabel(ct)
 end
 function c83755611.tdcon(e,tp,eg,ep,ev,re,r,rp)

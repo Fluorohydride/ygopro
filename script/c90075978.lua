@@ -43,6 +43,7 @@ function c90075978.setop(e,tp,eg,ep,ev,re,r,rp)
 		if dt==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		local sg=Duel.GetMatchingGroup(c90075978.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
 		if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(90075978,0)) then
+			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			Duel.SpecialSummon(sg:Select(tp,1,1,nil),0,tp,tp,false,false,POS_FACEUP)
 		end

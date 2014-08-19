@@ -22,23 +22,25 @@ function c23309606.initial_effect(c)
 	e3:SetValue(c23309606.val)
 	c:RegisterEffect(e3)
 end
+function c23309606.otfilter(c,tp)
+	return c:IsAttackAbove(2000) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c23309606.otcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	hg:RemoveCard(c)
-	local g=Duel.GetTributeGroup(c)
+	local mg=Duel.GetMatchingGroup(c23309606.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
 	return hg:GetCount()>0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and g:IsExists(Card.IsAttackAbove,1,nil,2000)
+		and Duel.GetTributeCount(c,mg)>0
 		and hg:FilterCount(Card.IsAbleToGraveAsCost,nil)==hg:GetCount()
 end
 function c23309606.otop(e,tp,eg,ep,ev,re,r,rp,c)
 	local hg=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	hg:RemoveCard(c)
 	Duel.SendtoGrave(hg,REASON_COST+REASON_DISCARD)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsAttackAbove,1,1,nil,2000)
+	local mg=Duel.GetMatchingGroup(c23309606.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

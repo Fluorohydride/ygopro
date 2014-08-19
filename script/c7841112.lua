@@ -48,7 +48,7 @@ function c7841112.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
 	e5:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_REPEAT)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e5:SetCountLimit(1)
 	e5:SetCode(EVENT_PHASE+PHASE_END)
 	e5:SetTarget(c7841112.sptg)
@@ -64,10 +64,9 @@ function c7841112.synfilter1(c,lv,g)
 	if lv-tlv<=0 then return false end
 	local t=false
 	if c:IsType(TYPE_TUNER) then t=true end
-	g:RemoveCard(c)
-	local res=g:IsExists(c7841112.synfilter2,1,nil,lv-tlv,g,t)
-	g:AddCard(c)
-	return res
+	local wg=g:Clone()
+	wg:RemoveCard(c)
+	return wg:IsExists(c7841112.synfilter2,1,nil,lv-tlv,wg,t)
 end
 function c7841112.synfilter2(c,lv,g,tuner)
 	if not c:IsCode(44508094) then return false end
@@ -91,39 +90,26 @@ function c7841112.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
 	local g=Group.CreateGroup()
 	local mg=Duel.GetMatchingGroup(c7841112.matfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local lv=c:GetLevel()
-	if tuner then
-		local lv1=tuner:GetLevel()
-		local t=false
-		if tuner:IsType(TYPE_TUNER) then t=true end
-		mg:RemoveCard(tuner)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t2=mg:FilterSelect(tp,c7841112.synfilter2,1,1,nil,lv-lv1,mg,t)
-		local m2=t2:GetFirst()
-		g:AddCard(m2)
-		local lv2=m2:GetLevel()
-		mg:RemoveCard(m2)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t3=mg:FilterSelect(tp,c7841112.synfilter3,1,1,nil,lv-lv1-lv2)
-		g:Merge(t3)
-	else
+	local m1=tuner
+	if not tuner then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
 		local t1=mg:FilterSelect(tp,c7841112.synfilter1,1,1,nil,lv,mg)
-		local m1=t1:GetFirst()
+		m1=t1:GetFirst()
 		g:AddCard(m1)
-		local lv1=m1:GetLevel()
-		local t=false
-		if m1:IsType(TYPE_TUNER) then t=true end
-		mg:RemoveCard(m1)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t2=mg:FilterSelect(tp,c7841112.synfilter2,1,1,nil,lv-lv1,mg,t)
-		local m2=t2:GetFirst()
-		g:AddCard(m2)
-		local lv2=m2:GetLevel()
-		mg:RemoveCard(m2)
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t3=mg:FilterSelect(tp,c7841112.synfilter3,1,1,nil,lv-lv1-lv2)
-		g:Merge(t3)
 	end
+	lv=lv-m1:GetLevel()
+	local t=false
+	if m1:IsType(TYPE_TUNER) then t=true end
+	mg:RemoveCard(m1)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
+	local t2=mg:FilterSelect(tp,c7841112.synfilter2,1,1,nil,lv,mg,t)
+	local m2=t2:GetFirst()
+	g:AddCard(m2)
+	lv=lv-m2:GetLevel()
+	mg:RemoveCard(m2)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
+	local t3=mg:FilterSelect(tp,c7841112.synfilter3,1,1,nil,lv)
+	g:Merge(t3)
 	c:SetMaterial(g)
 	Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
 end

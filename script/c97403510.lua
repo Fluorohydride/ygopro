@@ -78,7 +78,6 @@ function c97403510.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c97403510.filter,tp,0,LOCATION_ONFIELD,1,nil,Duel.GetTurnCount()) end
 	local g=Duel.GetMatchingGroup(c97403510.filter,tp,0,LOCATION_ONFIELD,nil,Duel.GetTurnCount())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
-	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c97403510.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c97403510.filter,tp,0,LOCATION_ONFIELD,nil,Duel.GetTurnCount())

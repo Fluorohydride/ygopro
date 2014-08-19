@@ -236,6 +236,7 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 					local ct=-ft
 					local b1=Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 					local b2=ct<1 and Duel.IsExistingMatchingCard(alterf,tp,LOCATION_MZONE,0,1,nil)
+						and (not op or op(e,tp,0))
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
 						if op then op(e,tp,1) end
@@ -891,7 +892,8 @@ function Auxiliary.AddPendulumProcedure(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetRange(LOCATION_SZONE)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetCountLimit(1,10000000)
 	e1:SetCondition(Auxiliary.PendCondition())
 	e1:SetOperation(Auxiliary.PendOperation())
 	e1:SetValue(SUMMON_TYPE_PENDULUM)
@@ -906,7 +908,6 @@ function Auxiliary.PendCondition()
 	return	function(e,c,og)
 				if c==nil then return true end
 				local tp=c:GetControler()
-				if Duel.GetFlagEffect(tp,10000000)~=0 then return false end
 				if c:GetSequence()~=6 then return false end
 				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 				if rpz==nil then return false end
@@ -924,7 +925,6 @@ function Auxiliary.PendCondition()
 end
 function Auxiliary.PendOperation()
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
-				Duel.RegisterFlagEffect(tp,10000000,RESET_PHASE+PHASE_END,0,1)
 				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 				local lscale=c:GetLeftScale()
 				local rscale=rpz:GetRightScale()

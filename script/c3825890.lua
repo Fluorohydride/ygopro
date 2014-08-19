@@ -27,16 +27,19 @@ function c3825890.initial_effect(c)
 	e3:SetTarget(c3825890.desreptg)
 	c:RegisterEffect(e3)
 end
+function c3825890.otfilter(c,tp)
+	return c:IsSetCard(0x2e) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c3825890.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(Card.IsSetCard,1,nil,0x2e)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c3825890.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	return c:GetLevel()>6 and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c3825890.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,0x2e)
+	local mg=Duel.GetMatchingGroup(c3825890.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg, REASON_SUMMON+REASON_MATERIAL)
 end

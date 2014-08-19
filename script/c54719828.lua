@@ -28,30 +28,23 @@ function c54719828.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetTargetRange(1,1)
 	if e:GetLabel()==0 then
-		e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE)
-		e1:SetCode(EFFECT_CANNOT_TRIGGER)
-		e1:SetTarget(c54719828.actg)
+		e1:SetValue(c54719828.aclimit1)
 	elseif e:GetLabel()==1 then
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e1:SetTargetRange(1,1)
 		e1:SetValue(c54719828.aclimit2)
-	else
-		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetCode(EFFECT_CANNOT_ACTIVATE)
-		e1:SetTargetRange(1,1)
-		e1:SetValue(c54719828.aclimit3) 
-	end
+	else e1:SetValue(c54719828.aclimit3) end
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	Duel.RegisterEffect(e1,tp)
 end
-function c54719828.actg(e,c)
-	return c:IsType(TYPE_MONSTER)
+function c54719828.aclimit1(e,re,tp)
+	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
 end
 function c54719828.aclimit2(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and not re:GetHandler():IsImmuneToEffect(e)
 end
 function c54719828.aclimit3(e,re,tp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP) and not re:GetHandler():IsImmuneToEffect(e)
 end

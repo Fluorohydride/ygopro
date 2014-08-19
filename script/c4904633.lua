@@ -2,10 +2,10 @@
 function c4904633.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	e1:SetTarget(c4904633.target)
 	e1:SetOperation(c4904633.activate)
 	c:RegisterEffect(e1)

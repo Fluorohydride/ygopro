@@ -13,9 +13,11 @@ function c80802524.initial_effect(c)
 end
 function c80802524.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	e:SetLabel(tc:GetCode())
-	return rp~=tp and eg:GetCount()==1 and tc:IsReason(REASON_DESTROY) and tc:IsReason(REASON_BATTLE+REASON_EFFECT)
-		and tc:IsPreviousLocation(LOCATION_MZONE) and tc:GetPreviousControler()==tp and tc:IsSetCard(0x8d)
+	if rp~=tp and eg:GetCount()==1 and tc:IsReason(REASON_DESTROY) and tc:IsReason(REASON_BATTLE+REASON_EFFECT)
+		and tc:IsPreviousLocation(LOCATION_MZONE) and tc:GetPreviousControler()==tp and tc:IsSetCard(0x8d) then
+		e:SetLabel(tc:GetCode())
+		return true
+	else return false end
 end
 function c80802524.filter(c,e,tp,code)
 	return c:IsSetCard(0x8d) and c:GetCode()~=code and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)

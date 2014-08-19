@@ -13,21 +13,21 @@ function c9287078.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e2)
 end
-function c9287078.filter(c)
+function c9287078.filter1(c,e,tp)
+	return c:GetSummonPlayer()==1-tp and c:IsLocation(LOCATION_MZONE) and c:IsCanBeEffectTarget(e)
+		and Duel.IsExistingTarget(c9287078.filter2,tp,LOCATION_MZONE,0,1,c)
+end
+function c9287078.filter2(c)
 	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER)
 end
 function c9287078.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then
-		local ec=eg:GetFirst()
-		return eg:GetCount()==1 and ec:GetSummonPlayer()==1-tp and ec:IsCanBeEffectTarget(e)
-			and Duel.IsExistingTarget(c9287078.filter,tp,LOCATION_MZONE,0,1,ec)
-	end
+	if chk==0 then return eg:IsExists(c9287078.filter1,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g1=eg:Select(tp,1,1,nil)
+	local g1=eg:FilterSelect(tp,c9287078.filter1,1,1,nil,e,tp)
 	Duel.SetTargetCard(g1)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g2=Duel.SelectTarget(tp,c9287078.filter,tp,LOCATION_MZONE,0,1,1,g1:GetFirst())
+	local g2=Duel.SelectTarget(tp,c9287078.filter2,tp,LOCATION_MZONE,0,1,1,g1:GetFirst())
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g1,2,0,0)
 end
@@ -37,7 +37,7 @@ function c9287078.spfilter(c,e,tp)
 end
 function c9287078.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if Duel.SendtoGrave(g,REASON_EFFECT)==2 and g:IsExists(Card.IsLocation,2,nil,LOCATION_GRAVE) then
+	if g:GetCount()==2 and Duel.SendtoGrave(g,REASON_EFFECT)==2 and g:IsExists(Card.IsLocation,2,nil,LOCATION_GRAVE) then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		local sg=Duel.GetMatchingGroup(c9287078.spfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,nil,e,tp)
 		if sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(9287078,0)) then
