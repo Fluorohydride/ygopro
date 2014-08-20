@@ -265,6 +265,7 @@ namespace ygopro
         UpdateAllCard();
         update_misc = true;
         update_result = true;
+        GLCheckError(__FILE__, __LINE__);
     }
     
     recti BuildScene::GetScreenshotClip() {

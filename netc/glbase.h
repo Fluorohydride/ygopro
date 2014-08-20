@@ -65,14 +65,6 @@ namespace glbase {
 	};
     
     template<typename T>
-	struct vector4 {
-		T x;
-		T y;
-		T z;
-        T w;
-	};
-    
-    template<typename T>
     inline vector2<T> operator + (const vector2<T>& a, const vector2<T>& b) {
         return vector2<T>{a.x + b.x, a.y + b.y};
     }
@@ -88,16 +80,6 @@ namespace glbase {
     }
     
     template<typename T>
-    inline T operator * (const vector2<T>& a, const vector2<T>& b) {
-        return a.x * b.x + a.y * b.y;
-    }
-    
-    template<typename T>
-    inline vector3<T> operator ^ (const vector2<T>& a, const vector2<T>& b) {
-        return vector3<T>{0, 0, a.x * b.y - a.y * b.x};
-    }
-    
-    template<typename T>
     inline vector3<T> operator + (const vector3<T>& a, const vector3<T>& b) {
         return vector3<T>{a.x + b.x, a.y + b.y, a.z + b.z};
     }
@@ -108,129 +90,12 @@ namespace glbase {
     }
     
     template<typename T>
-    inline vector3<T> operator * (const vector3<T>& a, T scalar) {
-        return vector3<T>{a.x * scalar, a.y * scalar, a.z * scalar};
-    }
-    
-    template<typename T>
-    inline T operator * (const vector3<T>& a, const vector3<T>& b) {
-        return a.x * b.x + a.y * b.y + a.z * b.z;
-    }
-    
-    template<typename T>
-    inline vector3<T> operator ^ (const vector3<T>& a, const vector3<T>& b) {
-        return vector3<T>{a.y * b.z - a.z * b.y, a.z * b.x - a.x * b.z, a.x * b.y - a.y * b.x};
-    }
-    
-    template<typename T>
     struct rect {
         T left;
         T top;
         T width;
         T height;
     };
-    
-    struct quaternion;
-    inline quaternion operator * (const quaternion& p, const quaternion& q);
-    // q = w + xi + yj + zk
-    struct quaternion {
-        float w;
-        float x;
-        float y;
-        float z;
-        
-        quaternion& Normalize() {
-            float mag = sqrt(w * w + x * x + y * y + z * z);
-            w /= mag;
-            x /= mag;
-            y /= mag;
-            z /= mag;
-            return *this;
-        }
-        
-        // normalized
-        quaternion& FromAxis(vector3<float> vec, float angle) {
-            float mag = sqrtf(vec.x * vec.x + vec.y * vec.y + vec.z * vec.z);
-            float sinA = sinf(angle * 0.5f);
-            x = (vec.x / mag * sinA);
-            y = (vec.y / mag * sinA);
-            z = (vec.z / mag * sinA);
-            w = cosf(angle * 0.5f);
-            return *this;
-        }
-        
-        // radius
-        quaternion& FromEular(vector3<float> eular) {
-            float sinx = sinf(eular.x * 0.5f);
-            float siny = sinf(eular.y * 0.5f);
-            float sinz = sinf(eular.z * 0.5f);
-            float cosx = cosf(eular.x * 0.5f);
-            float cosy = cosf(eular.y * 0.5f);
-            float cosz = cosf(eular.z * 0.5f);
-            w = cosx * cosy * cosz + sinx * siny * sinz;
-            x = sinx * cosy * cosz - cosx * siny * sinz;
-            y = cosx * siny * cosz + sinx * cosy * sinz;
-            z = cosx * cosy * sinz - sinx * siny * cosz;
-            Normalize();
-            return *this;
-        }
-        
-        // quaternion should normalized
-        quaternion GetInverse() {
-            return quaternion{w, -x, -y, -z};
-        }
-        
-        vector3<float> ApplyToVector(vector3<float> vec) {
-            auto q = *this * quaternion{0.0f, vec.x, vec.y, vec.z} * GetInverse();
-            return {q.x, q.y, q.z};
-        }
-        
-        // apply all transforms
-        vector3<float> ApplyToVector(vector3<float> vec, vector3<float> s, vector3<float> t) {
-            auto q = *this * quaternion{0.0f, vec.x, vec.y, vec.z} * GetInverse();
-            return {q.x * s.x + t.x, q.y * s.y + t.y, q.z * s.z + t.z};
-        }
-        
-    };
-    
-    inline quaternion operator + (const quaternion& p, const quaternion& q) {
-        return quaternion {p.w + q.w, p.x + q.x, p.y + q.y, p.z + q.z};
-    }
-    
-    inline quaternion operator - (const quaternion& p, const quaternion& q) {
-        return quaternion {p.w - q.w, p.x - q.x, p.y - q.y, p.z - q.z};
-    }
-    
-    inline quaternion operator * (const quaternion& p, float s) {
-        return quaternion {p.w * s, p.x * s, p.y * s, p.z * s};
-    }
-    
-    // represent p * q
-    inline quaternion operator * (const quaternion& p, const quaternion& q) {
-        return quaternion {
-            p.w * q.w - p.x * q.x - p.y * q.y - p.z * q.z,
-            p.w * q.x + p.x * q.w + p.z * q.y - p.y * q.z,
-            p.w * q.y + p.y * q.w + p.x * q.z - p.z * q.x,
-            p.w * q.z + p.z * q.w + p.y * q.x - p.x * q.y
-        };
-    }
-    
-    inline quaternion QuaternionSlerp(const quaternion& p, const quaternion& q, float t) {
-        float dot = p.w * q.w + p.x * q.x + p.y * q.y + p.z * q.z;
-        bool neg = false;
-        if(dot <= 0.0f) {
-            dot = -dot;
-            neg = true;
-        }
-        float theta = acosf(dot);
-        float sinv = sinf(theta);
-        float t1 = sinf((1.0f - t) * theta) / sinv;
-        float t2 = sinf(t * theta) / sinv;
-        if(!neg)
-            return p * t1 + q * t2;
-        else
-            return p * t1 - q * t2;
-    }
     
     struct v2ct {
         vector2<float> vertex = {0.0f, 0.0f};
@@ -251,7 +116,7 @@ namespace glbase {
     struct v3cnt {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
-        vector4<float> normal = {0.0f, 0.0f, 0.0f, 0.0f};
+        vector3<float> normal = {0.0f, 0.0f, 0.0f};
         vector2<float> texcoord = {0.0f, 0.0f};
         static const int color_offset = 12;
         static const int normal_offset = 16;
@@ -287,7 +152,8 @@ namespace glbase {
         bool Use();
         void Unuse();
         void Unload();
-        void SetParam1i(const char* varname, int value);
+        void SetParam1i(const char* varname, const int value);
+        void SetParamMat4(const char* varname, const float m[]);
         
     public:
         static Shader& GetDefaultShader();
@@ -376,10 +242,8 @@ namespace glbase {
 
 typedef glbase::vector2<int> v2i;
 typedef glbase::vector2<float> v2f;
-typedef glbase::vector2<double> v2d;
 typedef glbase::vector3<int> v3i;
 typedef glbase::vector3<float> v3f;
-typedef glbase::vector3<double> v3d;
 typedef glbase::rect<int> recti;
 typedef glbase::rect<float> rectf;
 typedef glbase::TextureInfo<4> ti4;

@@ -10,6 +10,16 @@ namespace ygopro
     
     struct DuelCommand;
     
+    struct v3hct {
+        v3f vertex = {0.0f, 0.0f, 0.0f};
+        unsigned int color = 0xffffffff;
+        unsigned int hcolor = 0;
+        v2f texcoord = {0.0f, 0.0f};
+        static const int color_offset = 12;
+        static const int hcolor_offset = 16;
+        static const int tex_offset = 20;
+    };
+    
     class DuelScene : public Scene, public TcpClientSeed {
     public:
         DuelScene();
@@ -31,7 +41,7 @@ namespace ygopro
         virtual void OnDisconnected();
         virtual void HandlePacket(unsigned short proto, unsigned char data[], unsigned int size);
         
-        void UpdateBack();
+        void UpdateBackground();
         void UpdateField();
         void UpdateMisc();
         
@@ -42,11 +52,15 @@ namespace ygopro
         unsigned int back_buffer = 0;
         unsigned int card_buffer = 0;
         unsigned int misc_buffer = 0;
+        unsigned int field_vao = 0;
+        unsigned int back_vao = 0;
+        unsigned int card_vao = 0;
+        unsigned int misc_vao = 0;
         bool update_bg = true;
         double waiting_time = 0.0;
         CommandList<DuelCommand> duel_commands;
         std::function<void()> current_cb;
-        
+        glbase::Shader duel_shader;
     };
     
 }

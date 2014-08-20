@@ -38,6 +38,7 @@ include_directories (
     ${GLFW3_INCLUDE_DIR}
     ${FREETYPE_INCLUDE_DIR}
     ${GLEW_INCLUDE_DIR}
+    ${GLM_INCLUDE_DIR}
 )
 
 if (WIN32)

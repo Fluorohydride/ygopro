@@ -144,9 +144,13 @@ int main(int argc, char* argv[]) {
     while (!glfwWindowShouldClose(window)) {
         SceneMgr::Get().CheckFrameRate();
         SceneMgr::Get().InitDraw();
+        auto& shader = glbase::Shader::GetDefaultShader();
+        shader.Use();
+        shader.SetParam1i("texID", 0);
         glfwPollEvents();
         if(!SceneMgr::Get().Update())
             break;
+        shader.Unuse();
         if(need_draw) {
             SceneMgr::Get().Draw();
             sgui::SGGUIRoot::GetSingleton().Draw();

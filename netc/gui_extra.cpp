@@ -511,15 +511,15 @@ namespace ygopro
             int ls = (data->level >> 16) & 0xff;
             int rs = (data->level >> 24) & 0xff;
             if(ls >= 10) {
-                pushvert({0, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls % 10)), 0xff000000);
-                pushvert({15, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls / 10)), 0xff000000);
+                pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls / 10)), 0xff000000);
+                pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls % 10)), 0xff000000);
             } else
-                pushvert({8, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + ls), 0xff000000);
+                pushvert({8, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + ls), 0xff000000);
             if(rs >= 10) {
-                pushvert({mw - 30, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs % 10)), 0xff000000);
-                pushvert({mw - 15, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs / 10)), 0xff000000);
+                pushvert({mw - 29, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs / 10)), 0xff000000);
+                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs % 10)), 0xff000000);
             } else
-                pushvert({mw - 22, 73}, {15, 20}, ImageMgr::Get().GetCharTex(L'0' + rs), 0xff000000);
+                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + rs), 0xff000000);
         } else {
             pushvert({0, 45}, {mw, sz.y - 65}, hmask, 0xc0ffffff);
             pent->SetText(L"", 0xff000000);

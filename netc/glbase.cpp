@@ -136,10 +136,16 @@ namespace glbase {
         glUseProgram(0);
     }
     
-    void Shader::SetParam1i(const char* varname, int value) {
+    void Shader::SetParam1i(const char* varname, const int value) {
         auto loc = glGetUniformLocation(program, varname);
         if(loc >= 0)
             glUniform1i(loc, value);
+    }
+    
+    void Shader::SetParamMat4(const char* varname, const float m[]) {
+        auto loc = glGetUniformLocation(program, varname);
+        if(loc >= 0)
+            glUniformMatrix4fv(loc, 1, GL_FALSE, m);
     }
     
     void Shader::Unload() {

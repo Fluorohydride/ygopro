@@ -52,13 +52,9 @@ namespace ygopro
                         card_image.Bind();
                         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
                         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 4, &frame_verts);
-                        auto& shader = glbase::Shader::GetDefaultShader();
-                        shader.Use();
-                        shader.SetParam1i("texID", 0);
                         glBindVertexArray(card_vao);
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
                         glBindVertexArray(0);
-                        shader.Unuse();
                         glBindTexture(GL_TEXTURE_2D, 0);
                         glBindFramebuffer(GL_FRAMEBUFFER, 0);
                     } else {
