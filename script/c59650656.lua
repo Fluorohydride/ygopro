@@ -32,17 +32,17 @@ end
 function c59650656.descon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and eg:IsExists(c59650656.cfilter,1,nil,tp)
 end
-function c59650656.filter(c)
-	return c:IsFaceup() and c:IsDestructable() and c:IsAbleToRemove()
+function c59650656.filter(c,e)
+	return c:IsFaceup() and c:IsRelateToEffect(e) and c:IsDestructable()
 end
 function c59650656.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c59650656.filter,tp,0,LOCATION_ONFIELD,1,nil) end
-	local g=Duel.GetMatchingGroup(c59650656.filter,tp,0,LOCATION_ONFIELD,nil)
+	if chk==0 then return Duel.IsExistingMatchingCard(c59650656.filter,tp,0,LOCATION_ONFIELD,1,nil,e) end
+	local g=Duel.GetMatchingGroup(c59650656.filter,tp,0,LOCATION_ONFIELD,nil,e)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end
 function c59650656.desop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c59650656.filter,tp,0,LOCATION_ONFIELD,nil)
+	local g=Duel.GetMatchingGroup(c59650656.filter,tp,0,LOCATION_ONFIELD,nil,e)
 	if g:GetCount()>0 then
 		Duel.Destroy(g,REASON_EFFECT,LOCATION_REMOVED)
 	end
