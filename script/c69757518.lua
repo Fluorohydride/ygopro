@@ -38,16 +38,22 @@ function c69757518.atkval(e,c)
 end
 function c69757518.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return Duel.GetAttacker()==c and c:IsChainAttackable()
+	return Duel.GetAttacker()==c and c:IsChainAttackable(0,true)
 end
 function c69757518.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c69757518.atop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsRelateToBattle() then
-		Duel.ChainAttack()
-	end
+	local c=e:GetHandler()
+	Duel.ChainAttack()
+	if c:IsHasEffect(EFFECT_CANNOT_DIRECT_ATTACK) then return end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	c:RegisterEffect(e1)
 end
 function c69757518.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -68,7 +74,7 @@ function c69757518.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local sg1=sg:Select(tp,1,1,nil)
 		local c=e:GetHandler()
-		if Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT) and c:IsRelateToEffect(e) then
+		if Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) then
 			sg:Sub(sg1)
 			Duel.Overlay(c,sg)
 		end

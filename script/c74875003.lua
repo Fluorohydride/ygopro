@@ -55,7 +55,7 @@ function c74875003.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c74875003.sumval(c)
+function c74875003.sumval(e,c)
 	return not c:IsCode(10000000) and not c:IsCode(10000010) and not c:IsCode(10000020)
 end
 function c74875003.splimit(e,c,sump,sumtype,sumpos,targetp,se)

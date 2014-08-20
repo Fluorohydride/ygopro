@@ -1,4 +1,4 @@
---魔界発現世行きデスガイド
+--榄旂晫鐧虹従涓栬銇嶃儑銈广偓銈ゃ儔
 function c10802915.initial_effect(c)
 	--spsummon
 	local e2=Effect.CreateEffect(c)

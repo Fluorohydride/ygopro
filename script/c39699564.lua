@@ -5,6 +5,7 @@ function c39699564.initial_effect(c)
 	e1:SetDescription(aux.Stringid(39699564,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,39699564)
 	e1:SetCondition(c39699564.setcon)
 	e1:SetCost(c39699564.setcost)
 	e1:SetTarget(c39699564.settg)
@@ -24,10 +25,9 @@ function c39699564.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(39699564)>0
 end
 function c39699564.setcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,39699564)==0 and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x79) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x79) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x79)
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,39699564,RESET_PHASE+PHASE_END,0,1)
 end
 function c39699564.filter(c)
 	return c:IsSetCard(0x7c) and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()

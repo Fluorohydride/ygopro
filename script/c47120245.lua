@@ -28,8 +28,8 @@ function c47120245.initial_effect(c)
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
+	e4:SetCountLimit(1,47120245)
 	e4:SetCondition(c47120245.thcon)
-	e4:SetCost(c47120245.thcost)
 	e4:SetTarget(c47120245.thtg)
 	e4:SetOperation(c47120245.thop)
 	c:RegisterEffect(e4)
@@ -42,10 +42,6 @@ function c47120245.eqcon2(e)
 end
 function c47120245.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return c47120245.eqcon2(e)
-end
-function c47120245.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,47120245)==0 end
-	Duel.RegisterFlagEffect(tp,47120245,RESET_PHASE+PHASE_END,0,1)
 end
 function c47120245.thfilter(c)
 	return c:IsSetCard(0x207a) and c:IsAbleToHand()

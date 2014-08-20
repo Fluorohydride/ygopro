@@ -62,9 +62,9 @@ function c20644748.mvalue(e,fp,rp,r)
 	return 5-Duel.GetFieldGroupCount(fp,LOCATION_SZONE,0)
 end
 function c20644748.svalue(e,fp,rp,r)
-	if Duel.GetFieldCard(fp,LOCATION_SZONE,5) then
-		return 4-Duel.GetFieldGroupCount(fp,LOCATION_MZONE,0)
-	else
-		return 5-Duel.GetFieldGroupCount(fp,LOCATION_MZONE,0)
+	local ct=5
+	for i=5,7 do
+		if Duel.GetFieldCard(fp,LOCATION_SZONE,i) then ct=ct-1 end
 	end
+	return ct-Duel.GetFieldGroupCount(fp,LOCATION_MZONE,0)
 end

@@ -7,6 +7,7 @@ function c1833916.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c1833916.spcon)
 	e1:SetCost(c1833916.spcost)
 	e1:SetTarget(c1833916.sptg)
 	e1:SetOperation(c1833916.spop)
@@ -20,10 +21,13 @@ function c1833916.initial_effect(c)
 	e2:SetCode(EVENT_DAMAGE)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCountLimit(1,1833916)
-	e2:SetCondition(c1833916.spcon)
+	e2:SetCondition(c1833916.spcon2)
 	e2:SetTarget(c1833916.sptg2)
 	e2:SetOperation(c1833916.spop2)
 	c:RegisterEffect(e2)
+end
+function c1833916.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsAttackPos()
 end
 function c1833916.cfilter(c)
 	return c:IsSetCard(0x6f) and c:IsDiscardable()
@@ -63,7 +67,7 @@ end
 function c1833916.splimit(e,c)
 	return not c:IsSetCard(0x6f)
 end
-function c1833916.spcon(e,tp,eg,ep,ev,re,r,rp)
+function c1833916.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
 end
 function c1833916.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)

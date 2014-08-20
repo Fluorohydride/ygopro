@@ -8,6 +8,7 @@ function c10860121.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCode(EVENT_TO_GRAVE)
+	e1:SetCountLimit(1,10860121)
 	e1:SetCondition(c10860121.condition)
 	e1:SetCost(c10860121.cost)
 	e1:SetTarget(c10860121.target)
@@ -22,9 +23,8 @@ function c10860121.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c10860121.cfilter,1,nil,tp)
 end
 function c10860121.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,10860121)==0 and e:GetHandler():IsAbleToGraveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-	Duel.RegisterFlagEffect(tp,10860121,RESET_PHASE+PHASE_END,0,1)
 end
 function c10860121.filter(c,e,tp)
 	return c:IsSetCard(0x88) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

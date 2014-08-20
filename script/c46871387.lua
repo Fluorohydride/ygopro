@@ -10,6 +10,7 @@ function c46871387.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,46871387)
 	e1:SetCost(c46871387.thcost)
 	e1:SetTarget(c46871387.thtg)
 	e1:SetOperation(c46871387.thop)
@@ -25,9 +26,8 @@ function c46871387.initial_effect(c)
 end
 c46871387.xyz_number=55
 function c46871387.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,46871387)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,46871387,RESET_PHASE+PHASE_END,0,1)
 end
 function c46871387.filter(c)
 	return c:IsRace(RACE_ROCK) and c:IsAttribute(ATTRIBUTE_EARTH) and c:GetLevel()==4 and c:IsAbleToHand()

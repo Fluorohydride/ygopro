@@ -11,7 +11,6 @@ function c76419637.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCondition(c76419637.dccon)
 	e1:SetTarget(c76419637.dctg)
 	e1:SetOperation(c76419637.dcop)
@@ -22,6 +21,7 @@ function c76419637.initial_effect(c)
 	e2:SetCategory(CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,76419637)
 	e2:SetCondition(c76419637.damcon)
 	e2:SetCost(c76419637.damcost)
 	e2:SetTarget(c76419637.damtg)
@@ -45,9 +45,8 @@ function c76419637.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,40424929)
 end
 function c76419637.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,76419637)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,76419637,RESET_PHASE+PHASE_END,0,1)
 end
 function c76419637.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

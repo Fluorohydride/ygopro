@@ -31,14 +31,14 @@ function c64689404.raccost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c64689404.ractg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetLabelObject():GetLabel()~=0x7fffff end
+	if chk==0 then return e:GetLabelObject():GetLabel()~=RACE_ALL end
 	if e:GetHandler():GetFlagEffect(64689404)==0 then
 		e:GetHandler():RegisterFlagEffect(64689404,RESET_EVENT+0x1fe0000,0,0)
 		e:GetLabelObject():SetLabel(0)
 	end
 	local prc=e:GetLabelObject():GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,563)
-	local rc=Duel.AnnounceRace(tp,1,0xffffff-prc)
+	local rc=Duel.AnnounceRace(tp,1,RACE_ALL-prc)
 	e:SetLabel(rc)
 end
 function c64689404.racop(e,tp,eg,ep,ev,re,r,rp)

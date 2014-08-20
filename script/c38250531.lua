@@ -10,6 +10,7 @@ function c38250531.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,38250531)
 	e1:SetCost(c38250531.spcost)
 	e1:SetTarget(c38250531.sptg)
 	e1:SetOperation(c38250531.spop)
@@ -33,9 +34,8 @@ function c38250531.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c38250531.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,38250531)==0 and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.RegisterFlagEffect(tp,38250531,RESET_PHASE+PHASE_END,0,1)
 end
 function c38250531.spfilter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -12,9 +12,9 @@ function c26563200.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,26563200)
 	e1:SetCondition(c26563200.atkcon)
 	e1:SetCost(c26563200.atkcost)
-	e1:SetTarget(c26563200.atktg)
 	e1:SetOperation(c26563200.atkop)
 	c:RegisterEffect(e1)
 end
@@ -27,10 +27,6 @@ end
 function c26563200.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-end
-function c26563200.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,26563200)==0 end
-	Duel.RegisterFlagEffect(tp,26563200,RESET_PHASE+PHASE_END,0,1)
 end
 function c26563200.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()

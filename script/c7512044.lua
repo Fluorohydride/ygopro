@@ -5,14 +5,10 @@ function c7512044.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c7512044.cost)
+	e1:SetCountLimit(1,7512044)
 	e1:SetTarget(c7512044.target)
 	e1:SetOperation(c7512044.activate)
 	c:RegisterEffect(e1)
-end
-function c7512044.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,7512044)==0 end
-	Duel.RegisterFlagEffect(tp,7512044,RESET_PHASE+PHASE_END,0,1)
 end
 function c7512044.filter(c)
 	return c:IsCode(7512044) and c:IsAbleToHand()

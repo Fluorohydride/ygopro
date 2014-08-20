@@ -6,6 +6,7 @@ function c66853752.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,66853752)
 	e1:SetCondition(c66853752.condition)
 	e1:SetTarget(c66853752.target)
 	e1:SetOperation(c66853752.operation)
@@ -26,10 +27,9 @@ function c66853752.condition(e,tp,eg,ep,ev,re,r,rp)
 	return g:GetCount()>0 and g:FilterCount(Card.IsAttribute,nil,ATTRIBUTE_WATER)==g:GetCount()
 end
 function c66853752.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,66853752)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	Duel.RegisterFlagEffect(tp,66853752,RESET_PHASE+PHASE_END,0,1)
 end
 function c66853752.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

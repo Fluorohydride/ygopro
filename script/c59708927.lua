@@ -6,6 +6,7 @@ function c59708927.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,59708927)
 	e1:SetCost(c59708927.spcost)
 	e1:SetTarget(c59708927.sptg)
 	e1:SetOperation(c59708927.spop)
@@ -15,8 +16,7 @@ function c59708927.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_FIEND) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c59708927.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,59708927)==0 and not Duel.CheckNormalSummonActivity(tp) end
-	Duel.RegisterFlagEffect(tp,59708927,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SUMMON)

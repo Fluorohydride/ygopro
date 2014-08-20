@@ -7,6 +7,7 @@ function c62107612.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetCode(EVENT_REMOVE)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,62107612)
 	e1:SetCondition(c62107612.condition)
 	e1:SetCost(c62107612.cost)
 	e1:SetTarget(c62107612.target)
@@ -17,9 +18,8 @@ function c62107612.condition(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0 and re and re:GetHandler():GetCode()==93717133
 end
 function c62107612.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,62107612)==0 and e:GetHandler():IsAbleToGraveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
-	Duel.RegisterFlagEffect(tp,62107612,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c62107612.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

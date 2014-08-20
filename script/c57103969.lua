@@ -4,7 +4,7 @@ function c57103969.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c57103969.cost)
+	e1:SetCountLimit(1,57103969+EFFECT_COUNT_CODE_OATH)
 	e1:SetOperation(c57103969.activate)
 	c:RegisterEffect(e1)
 	--
@@ -16,10 +16,6 @@ function c57103969.initial_effect(c)
 	e2:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_BEASTWARRIOR))
 	e2:SetValue(100)
 	c:RegisterEffect(e2)
-end
-function c57103969.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,57103969)==0 end
-	Duel.RegisterFlagEffect(tp,57103969,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c57103969.filter(c)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_BEASTWARRIOR) and c:IsAbleToHand()

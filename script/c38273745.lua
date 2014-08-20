@@ -10,6 +10,7 @@ function c38273745.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCondition(c38273745.con1)
 	e1:SetCost(c38273745.cost)
 	e1:SetTarget(c38273745.tg1)
@@ -21,6 +22,7 @@ function c38273745.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOGRAVE)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCondition(c38273745.con2)
 	e2:SetCost(c38273745.cost)
 	e2:SetTarget(c38273745.tg2)
@@ -33,6 +35,7 @@ function c38273745.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e3:SetCondition(c38273745.con3)
 	e3:SetCost(c38273745.cost)
 	e3:SetTarget(c38273745.tg3)
@@ -45,14 +48,13 @@ function c38273745.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c38273745.con1(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(38273745)==0 and e:GetHandler():GetFlagEffect(38273746)==0
+	return e:GetHandler():GetFlagEffect(38273746)==0
 end
 function c38273745.tg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and chkc:IsAbleToHand() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,1,nil)
-	e:GetHandler():RegisterFlagEffect(38273745,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	e:GetHandler():RegisterFlagEffect(38273746,RESET_EVENT+0x1fe0000,EFFECT_FLAG_COPY_INHERIT,1)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
@@ -63,12 +65,11 @@ function c38273745.op1(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c38273745.con2(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(38273745)==0 and e:GetHandler():GetFlagEffect(38273747)==0
+	return e:GetHandler():GetFlagEffect(38273747)==0
 end
 function c38273745.tg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(1-tp,LOCATION_HAND,0)~=0 end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,1-tp,LOCATION_HAND)
-	e:GetHandler():RegisterFlagEffect(38273745,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	e:GetHandler():RegisterFlagEffect(38273747,RESET_EVENT+0x1fe0000,EFFECT_FLAG_COPY_INHERIT,1)
 end
 function c38273745.op2(e,tp,eg,ep,ev,re,r,rp)
@@ -78,14 +79,13 @@ function c38273745.op2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.SendtoGrave(sg,REASON_EFFECT)
 end
 function c38273745.con3(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(38273745)==0 and e:GetHandler():GetFlagEffect(38273748)==0
+	return e:GetHandler():GetFlagEffect(38273748)==0
 end
 function c38273745.tg3(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_GRAVE) and chkc:IsAbleToRemove() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,1,1,nil)
-	e:GetHandler():RegisterFlagEffect(38273745,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	e:GetHandler():RegisterFlagEffect(38273748,RESET_EVENT+0x1fe0000,EFFECT_FLAG_COPY_INHERIT,1)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)
 end

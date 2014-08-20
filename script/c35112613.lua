@@ -14,6 +14,7 @@ function c35112613.initial_effect(c)
 	e2:SetDescription(aux.Stringid(35112613,1))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
+	e2:SetCountLimit(1,35112613)
 	e2:SetCost(c35112613.thcost)
 	e2:SetTarget(c35112613.thtg)
 	e2:SetOperation(c35112613.thop)
@@ -38,11 +39,10 @@ function c35112613.cfilter(c)
 	return c:IsSetCard(0x55) and c:IsType(TYPE_MONSTER) and c:GetCode()~=35112613 and c:IsAbleToGraveAsCost()
 end
 function c35112613.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,35112613)==0 and Duel.IsExistingMatchingCard(c35112613.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c35112613.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c35112613.cfilter,tp,LOCATION_HAND,0,1,1,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,35112613,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c35112613.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToHand() end

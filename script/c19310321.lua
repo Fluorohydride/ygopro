@@ -6,15 +6,15 @@ function c19310321.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,19310321)
 	e1:SetCost(c19310321.cost)
 	e1:SetTarget(c19310321.target)
 	e1:SetOperation(c19310321.activate)
 	c:RegisterEffect(e1)
 end
 function c19310321.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,19310321)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,19310321,RESET_PHASE+PHASE_END,0,1)
 end
 function c19310321.filter1(c)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetOverlayCount()==0
@@ -35,7 +35,7 @@ function c19310321.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c19310321.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsImmuneToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,tc,e)
 	if g:GetCount()>0 then
 		Duel.Overlay(tc,g)

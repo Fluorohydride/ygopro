@@ -6,15 +6,15 @@ function c23536866.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1,23536866)
 	e1:SetCost(c23536866.cost)
 	e1:SetTarget(c23536866.target)
 	e1:SetOperation(c23536866.operation)
 	c:RegisterEffect(e1)
 end
 function c23536866.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,23536866)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,23536866,RESET_PHASE+PHASE_END,0,1)
 end
 function c23536866.filter(c,e,tp)
 	return c:GetLevel()==5 and c:IsAttribute(ATTRIBUTE_WATER) and not c:IsCode(23536866)
@@ -33,7 +33,7 @@ end
 function c23536866.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local mg=Duel.GetMatchingGroup(c23536866.filter,tp,LOCATION_GRAVE,0,nil,e,tp)
-	if chk==0 then return (not Duel.IsPlayerAffectedByEffect(tp,23516703) or c23516703[tp]==0)
+	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and mg:GetCount()>1
 		and Duel.IsExistingMatchingCard(c23536866.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,mg) end
 	local exg=Duel.GetMatchingGroup(c23536866.xyzfilter,tp,LOCATION_EXTRA,0,nil,mg)
@@ -51,7 +51,6 @@ function c23536866.filter2(c,e,tp)
 	return c:IsRelateToEffect(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c23536866.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsPlayerAffectedByEffect(tp,23516703) and c23516703[tp]>0 then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c23536866.filter2,nil,e,tp)
 	if g:GetCount()<2 then return end

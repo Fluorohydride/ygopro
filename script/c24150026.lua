@@ -53,4 +53,3 @@ function c24150026.bpop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
 	end
 end
-

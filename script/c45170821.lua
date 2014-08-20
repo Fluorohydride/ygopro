@@ -29,7 +29,7 @@ function c45170821.valtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c45170821.valop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local o=e:GetLabelObject(e)
+	local o=e:GetLabelObject()
 	local s=g:GetFirst()
 	if s==o then s=g:GetNext() end
 	if s:IsFaceup() and o:IsFaceup() and s:IsRelateToEffect(e) and o:IsRelateToEffect(e) then

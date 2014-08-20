@@ -36,6 +36,7 @@ function c66200210.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_IGNITION)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e5:SetCountLimit(1,66200210)
 	e5:SetCost(c66200210.spcost2)
 	e5:SetTarget(c66200210.sptg2)
 	e5:SetOperation(c66200210.spop2)
@@ -69,11 +70,9 @@ function c66200210.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c66200210.spcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,66200210)==0
-		and Duel.CheckReleaseGroup(tp,Card.IsType,1,nil,TYPE_TOKEN) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsType,1,nil,TYPE_TOKEN) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsType,1,1,nil,TYPE_TOKEN)
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,66200210,RESET_PHASE+PHASE_END,0,1)
 end
 function c66200210.filter(c,e,tp)
 	return c:IsSetCard(0x101b) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

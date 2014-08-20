@@ -17,23 +17,25 @@ function c96470883.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c96470883.descon)
 	e2:SetTarget(c96470883.destg)
 	e2:SetOperation(c96470883.desop)
 	c:RegisterEffect(e2)
 end
+function c96470883.otfilter(c,tp)
+	return c:IsRace(RACE_PLANT) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c96470883.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(Card.IsRace,1,nil,RACE_PLANT)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c96470883.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	return c:GetLevel()>6 and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c96470883.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsRace,1,1,nil,RACE_PLANT)
+	local mg=Duel.GetMatchingGroup(c96470883.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

@@ -9,6 +9,7 @@ function c4549095.initial_effect(c)
 	e1:SetHintTiming(TIMING_DAMAGE_STEP)
 	e1:SetRange(LOCATION_HAND+LOCATION_GRAVE)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCountLimit(1,4549095)
 	e1:SetCondition(c4549095.condition)
 	e1:SetCost(c4549095.cost)
 	e1:SetOperation(c4549095.operation)
@@ -23,9 +24,8 @@ function c4549095.condition(e,tp,eg,ep,ev,re,r,rp)
 		or (d and d:GetControler()==tp and d:IsSetCard(0x84) and d:IsRelateToBattle())
 end
 function c4549095.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,4549095)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,4549095,RESET_PHASE+PHASE_END,0,1)
 end
 function c4549095.operation(e,tp,eg,ep,ev,re,r,rp,chk)
 	local a=Duel.GetAttacker()

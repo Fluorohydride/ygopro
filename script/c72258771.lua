@@ -53,16 +53,19 @@ function c72258771.ccost(e,tp)
 		Duel.Destroy(e:GetHandler(),REASON_COST)
 	end
 end
+function c72258771.otfilter(c,tp)
+	return c:IsSetCard(0x1d) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c72258771.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c72258771.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
 	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(Card.IsSetCard,1,nil,0x1d)
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c72258771.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsSetCard,1,1,nil,0x1d)
+	local mg=Duel.GetMatchingGroup(c72258771.otfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

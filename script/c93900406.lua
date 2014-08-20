@@ -7,7 +7,6 @@ function c93900406.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c93900406.damcon)
 	e1:SetTarget(c93900406.damtg)
@@ -47,7 +46,6 @@ end
 function c93900406.ctltg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsControlerCanBeChanged() end
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,e:GetHandler(),1,0,0)
-	e:GetHandler():ResetNegateEffect(25789292,97268402)
 end
 function c93900406.ctlop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

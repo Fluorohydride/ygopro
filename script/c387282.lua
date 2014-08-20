@@ -15,7 +15,7 @@ function c387282.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCost(c387282.lvcost)
+	e2:SetCountLimit(1,387282)
 	e2:SetTarget(c387282.lvtg)
 	e2:SetOperation(c387282.lvop)
 	c:RegisterEffect(e2)
@@ -34,10 +34,6 @@ function c387282.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function c387282.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,387282)==0 end
-	Duel.RegisterFlagEffect(tp,387282,RESET_PHASE+PHASE_END,0,1)
 end
 function c387282.filter(c)
 	return c:IsFaceup() and c:GetLevel()>0 and c:IsSetCard(0x54)

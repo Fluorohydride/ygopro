@@ -23,20 +23,25 @@ function c69230391.initial_effect(c)
 	e3:SetTarget(c69230391.target)
 	e3:SetOperation(c69230391.operation)
 	c:RegisterEffect(e3)
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_SINGLE)
+	e4:SetCode(EFFECT_MATERIAL_CHECK)
+	e4:SetValue(c69230391.valcheck)
+	e4:SetLabelObject(e3)
+	c:RegisterEffect(e4)
 end
 function c69230391.otfilter(c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE
 end
 function c69230391.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
+	local mg=Duel.GetMatchingGroup(c69230391.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
 	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(c69230391.otfilter,1,nil)
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c69230391.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,c69230391.otfilter,1,1,nil)
+	local mg=Duel.GetMatchingGroup(c69230391.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
@@ -46,12 +51,8 @@ end
 function c69230391.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,1)
-	local mg=e:GetHandler():GetMaterial()
-	if mg:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_FIRE) then
-		e:SetLabel(1)
+	if e:GetLabel()==1 then
 		Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,1000)
-	else
-		e:SetLabel(0)
 	end
 end
 function c69230391.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -68,5 +69,13 @@ function c69230391.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if e:GetLabel()==1 then
 		Duel.Damage(1-tp,1000,REASON_EFFECT)
+	end
+end
+function c69230391.valcheck(e,c)
+	local g=c:GetMaterial()
+	if g:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_FIRE) then
+		e:GetLabelObject():SetLabel(1)
+	else
+		e:GetLabelObject():SetLabel(0)
 	end
 end

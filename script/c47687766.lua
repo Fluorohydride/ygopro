@@ -41,5 +41,5 @@ function c47687766.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function c47687766.splimit(e,c)
-	return not c:IsRace(RACE_MACHINE)
+	return c:IsRace(0xffffff-RACE_MACHINE)
 end

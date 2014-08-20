@@ -30,8 +30,8 @@ function c63014935.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
 	e3:SetCondition(c63014935.phcon)
-	e3:SetTarget(c63014935.phtg)
 	e3:SetOperation(c63014935.phop)
 	c:RegisterEffect(e3)
 	--spsummon cost
@@ -72,10 +72,6 @@ end
 function c63014935.phcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
-function c63014935.phtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(63014935)==0 end
-	e:GetHandler():RegisterFlagEffect(63014935,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
-end
 function c63014935.phop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.CheckReleaseGroup(tp,aux.TRUE,1,e:GetHandler()) and Duel.SelectYesNo(tp,aux.Stringid(63014935,2)) then
 		Duel.Release(Duel.SelectReleaseGroup(tp,aux.TRUE,1,1,e:GetHandler()),REASON_EFFECT)
@@ -93,7 +89,7 @@ function c63014935.spcop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+RESET_END)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
-	local e2=e1:Clone(e1)
+	local e2=e1:Clone()
 	e2:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e2,tp)
 end

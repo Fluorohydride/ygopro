@@ -728,8 +728,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"");
 					}
 					else{
-						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location),
-							selectable_cards[i + pos]->sequence + 1);
+						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location,
+							selectable_cards[i + pos]->sequence), selectable_cards[i + pos]->sequence + 1);
 					}
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					if(selectable_cards[i + pos]->is_selected)
@@ -905,6 +905,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					for(int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				}
+				if(selectable_cards.size())
+					ShowSelectCard(true);
+				break;
+			}
+			if(mainGame->dInfo.player_type == 7) {
+				if(mainGame->wCardSelect->isVisible())
+					break;
+				selectable_cards.clear();
+				switch(hovered_location) {
+				case LOCATION_GRAVE: {
+					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(grave[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}
@@ -1502,21 +1519,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 	return false;
 }
 void ClientField::GetHoverField(int x, int y) {
-	irr::core::recti sfRect(393, 504, 875, 600);
-	irr::core::recti ofRect(501, 135, 790, 191);
+	irr::core::recti sfRect(430, 504, 875, 600);
+	irr::core::recti ofRect(531, 135, 800, 191);
 	irr::core::position2di pos(x, y);
 	if(sfRect.isPointInside(pos)) {
 		int hc = hand[0].size();
+		int cardSize = 66;
+		int cardSpace = 10;
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 393 + 82 * (6 - hc) / 2;
+			int left = sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
-				int seq = (x - left) / 82;
+				int seq = (x - left) / (cardSize + cardSpace);
 				if(seq >= hc) seq = hc - 1;
-				if(x - left - 82 * seq < 71) {
+				if(x - left - (cardSize + cardSpace) * seq < cardSize) {
 					hovered_controler = 0;
 					hovered_location = LOCATION_HAND;
 					hovered_sequence = seq;
@@ -1525,23 +1544,25 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 0;
 			hovered_location = LOCATION_HAND;
-			if(x >= 804)
+			if(x >= sfRect.UpperLeftCorner.X + (cardSize + cardSpace) * 5)
 				hovered_sequence = hc - 1;
 			else
-				hovered_sequence = (x - 393) * (hc - 1) / 411;
+				hovered_sequence = (x - sfRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * 5);
 		}
 	} else if(ofRect.isPointInside(pos)) {
 		int hc = hand[1].size();
+		int cardSize = 39;
+		int cardSpace = 7;
 		if(hc == 0)
 			hovered_location = 0;
 		else if(hc < 7) {
-			int left = 501 + 49 * (6 - hc) / 2;
+			int left = ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * (6 - hc) / 2;
 			if(x < left)
 				hovered_location = 0;
 			else {
-				int seq = (x - left) / 49;
+				int seq = (x - left) / (cardSize + cardSpace);
 				if(seq >= hc) seq = hc - 1;
-				if(x - left - 49 * seq < 42) {
+				if(x - left - (cardSize + cardSpace) * seq < cardSize) {
 					hovered_controler = 1;
 					hovered_location = LOCATION_HAND;
 					hovered_sequence = hc - 1 - seq;
@@ -1550,13 +1571,13 @@ void ClientField::GetHoverField(int x, int y) {
 		} else {
 			hovered_controler = 1;
 			hovered_location = LOCATION_HAND;
-			if(x >= 748)
+			if(x >= ofRect.UpperLeftCorner.X + (cardSize + cardSpace) * 5)
 				hovered_sequence = 0;
 			else
-				hovered_sequence = hc - 1 - (x - 501) * (hc - 1) / 247;
+				hovered_sequence = hc - 1 - (x - ofRect.UpperLeftCorner.X) * (hc - 1) / ((cardSize + cardSpace) * 5);
 		}
 	} else {
-		double screenx = x / 1024.0 * 1.25 - 0.81;
+		double screenx = x / 1024.0 * 1.35 - 0.90;
 		double screeny = y / 640.0 * 0.84 - 0.42;
 		double angle = 0.798056 - atan(screeny);	//0.798056 = arctan(8.0/7.8)
 		double vlen = sqrt(1.0 + screeny * screeny);

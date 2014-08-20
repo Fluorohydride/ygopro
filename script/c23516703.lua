@@ -9,24 +9,17 @@ function c23516703.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EFFECT_CANNOT_SUMMON)
+	e2:SetCode(EFFECT_SUMMON_COUNT_LIMIT)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,1)
-	e2:SetTarget(c23516703.tg)
+	e2:SetValue(c23516703.sumval)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
-	e3:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e3:SetCode(EFFECT_SPSUMMON_COUNT_LIMIT)
 	c:RegisterEffect(e3)
 	local e4=e2:Clone()
-	e4:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	e4:SetCode(EFFECT_FLIP_SUMMON_COUNT_LIMIT)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetRange(LOCATION_SZONE)
-	e5:SetCode(23516703)
-	e5:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e5:SetTargetRange(1,1)
-	c:RegisterEffect(e5)
 	if not c23516703.global_check then
 		c23516703.global_check=true
 		c23516703[0]=0
@@ -53,8 +46,8 @@ function c23516703.initial_effect(c)
 		Duel.RegisterEffect(ge4,0)
 	end
 end
-function c23516703.tg(e,sc,sp,st)
-	return c23516703[sp]>=2
+function c23516703.sumval(e,se,sp)
+	return 2-c23516703[sp]
 end
 function c23516703.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local s1=false

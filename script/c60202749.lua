@@ -41,9 +41,9 @@ function c60202749.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetOperation(c60202749.sdesop)
 	if Duel.GetCurrentPhase()==PHASE_END and Duel.GetTurnPlayer()~=tp then
 		e1:SetLabel(1)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_OPPO_TURN,2)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
 	else
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_OPPO_TURN)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 	end
 	e:GetHandler():RegisterEffect(e1)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)

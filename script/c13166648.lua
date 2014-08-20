@@ -5,8 +5,8 @@ function c13166648.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetCountLimit(1,13166648+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c13166648.condition)
-	e1:SetCost(c13166648.cost)
 	e1:SetTarget(c13166648.target)
 	e1:SetOperation(c13166648.activate)
 	c:RegisterEffect(e1)
@@ -14,10 +14,6 @@ end
 function c13166648.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	return tc:IsType(TYPE_XYZ) and tc:IsControler(1-tp) and Duel.GetAttackTarget()==nil
-end
-function c13166648.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,13166648)==0 end
-	Duel.RegisterFlagEffect(tp,13166648,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c13166648.filter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsType(TYPE_XYZ)

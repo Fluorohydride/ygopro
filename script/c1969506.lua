@@ -6,6 +6,7 @@ function c1969506.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,1969506+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c1969506.spcon)
 	e1:SetCost(c1969506.spcost)
 	e1:SetTarget(c1969506.sptg)
@@ -16,8 +17,7 @@ function c1969506.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetLP(tp)<=Duel.GetLP(1-tp)-2000
 end
 function c1969506.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,1969506)==0 and Duel.GetCurrentPhase()~=PHASE_MAIN2 end
-	Duel.RegisterFlagEffect(tp,1969506,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

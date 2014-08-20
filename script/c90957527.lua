@@ -115,26 +115,17 @@ function c90957527.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end
 function c90957527.spop(e,tp,eg,ep,ev,re,r,rp)
-	local zc=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	if zc==0 then return end
-	if not Duel.IsExistingMatchingCard(c90957527.filter,tp,LOCATION_DECK,0,2,nil,e,tp) then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c90957527.filter,tp,LOCATION_DECK,0,2,2,nil,e,tp)
-	if zc==1 then
-		local sg=g:Select(tp,1,1,nil)
-		local sc=sg:GetFirst()
-		g:RemoveCard(sc)
-		Duel.SpecialSummon(sc,121,tp,tp,false,false,POS_FACEUP)
-		sc:RegisterFlagEffect(sc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-		Duel.Destroy(g,REASON_EFFECT)
-	else
-		local tc=g:GetFirst()
-		while tc do
-			Duel.SpecialSummonStep(tc,121,tp,tp,false,false,POS_FACEUP)
-			tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
-			tc=g:GetNext()
-		end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
+	local g=Duel.GetMatchingGroup(c90957527.filter,tp,LOCATION_DECK,0,nil,e,tp)
+	if g:GetCount()>=2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,2,2,nil)
+		local tc=sg:GetFirst()
+		Duel.SpecialSummonStep(tc,121,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
+		tc=sg:GetNext()
+		Duel.SpecialSummonStep(tc,121,tp,tp,false,false,POS_FACEUP)
+		tc:RegisterFlagEffect(tc:GetOriginalCode(),RESET_EVENT+0x1ff0000,0,0)
 		Duel.SpecialSummonComplete()
 	end
-	Duel.ShuffleDeck(tp)
 end

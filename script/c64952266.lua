@@ -23,8 +23,8 @@ function c64952266.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c64952266.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and Duel.SendtoHand(tc,nil,REASON_EFFECT)>0 then
+	if tc and tc:IsRelateToEffect(e) and Duel.Damage(tp,tc:GetAttack(),REASON_EFFECT)~=0 then
+		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
-		Duel.Damage(tp,tc:GetAttack(),REASON_EFFECT)
 	end
 end

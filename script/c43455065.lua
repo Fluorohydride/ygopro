@@ -16,7 +16,7 @@ function c43455065.filter(c)
 end
 function c43455065.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(c43455065.filter,tp,0,LOCATION_ONFIELD,nil)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,ct) end
+	if chk==0 then return ct>0 and Duel.IsPlayerCanDraw(tp,ct) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(ct)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,ct)
@@ -31,6 +31,8 @@ function c43455065.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.DiscardHand(tp,nil,ct,ct,REASON_EFFECT+REASON_DISCARD)
 		end
 	end
+	local rct=1
+	if Duel.GetTurnPlayer()~=tp then rct=2 end
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -39,19 +41,19 @@ function c43455065.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetTarget(c43455065.indtg)
 	e1:SetValue(1)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,rct)
 	Duel.RegisterEffect(e1,tp)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
 	e2:SetCode(EFFECT_CANNOT_INACTIVATE)
 	e2:SetValue(c43455065.efilter)
-	e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	e2:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,rct)
 	Duel.RegisterEffect(e2,tp)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_CANNOT_DISEFFECT)
 	e3:SetValue(c43455065.efilter)
-	e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
+	e3:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,rct)
 	Duel.RegisterEffect(e3,tp)
 end
 function c43455065.indtg(e,c)

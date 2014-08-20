@@ -5,17 +5,13 @@ function c88760522.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c88760522.cost)
+	e1:SetCountLimit(1,88760522+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c88760522.target)
 	e1:SetOperation(c88760522.activate)
 	c:RegisterEffect(e1)
 end
-function c88760522.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,88760522)==0 end
-	Duel.RegisterFlagEffect(tp,88760522,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
-end
 function c88760522.filter(c)
-	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0x304e) or c:IsSetCard(0x604e))  and c:IsAbleToHand()
+	return c:IsType(TYPE_MONSTER) and (c:IsSetCard(0x304e) or c:IsSetCard(0x604e)) and c:IsAbleToHand()
 end
 function c88760522.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c88760522.filter,tp,LOCATION_DECK,0,1,nil) end

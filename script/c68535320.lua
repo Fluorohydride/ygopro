@@ -28,13 +28,13 @@ function c68535320.spfilter(c,e,tp)
 end
 function c68535320.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0 then
+		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		local g=Duel.GetMatchingGroup(c68535320.spfilter,tp,LOCATION_DECK,0,nil,e,tp)
-		if Duel.Destroy(tc,REASON_EFFECT)~=0 and g:GetCount()>0
-			and Duel.SelectYesNo(tp,aux.Stringid(68535320,1)) then
+		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(68535320,1)) then
+			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sg=g:Select(tp,1,1,nil)
-			Duel.BreakEffect()
 			Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end

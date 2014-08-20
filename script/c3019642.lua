@@ -17,6 +17,7 @@ function c3019642.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
+	e2:SetCondition(c3019642.damcon)
 	e2:SetTarget(c3019642.damtg)
 	e2:SetOperation(c3019642.damop)
 	c:RegisterEffect(e2)
@@ -68,6 +69,10 @@ function c3019642.eqlimit(e,c)
 end
 function c3019642.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0
+end
+function c3019642.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c3019642.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -9,6 +9,7 @@ function c34086406.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetCost(c34086406.cost)
 	e1:SetTarget(c34086406.target1)
 	e1:SetOperation(c34086406.operation1)
@@ -18,15 +19,14 @@ function c34086406.initial_effect(c)
 	e2:SetDescription(aux.Stringid(34086406,2))
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCost(c34086406.cost)
 	e2:SetTarget(c34086406.target2)
 	e2:SetOperation(c34086406.operation2)
 	c:RegisterEffect(e2)
 end
 function c34086406.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(34086406)==0
-		and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RegisterFlagEffect(34086406,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end

@@ -22,19 +22,19 @@ function c81254059.initial_effect(c)
 	e2:SetOperation(c81254059.spop)
 	c:RegisterEffect(e2)
 end
-function c81254059.cfilter(c)
-	return c:IsSetCard(0x3e) and c:IsRace(RACE_REPTILE)
+function c81254059.cfilter(c,tp)
+	return c:IsSetCard(0x3e) and c:IsRace(RACE_REPTILE) and (c:IsControler(tp) or c:IsFaceup())
 end
 function c81254059.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(c81254059.cfilter,1,nil)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c81254059.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	return c:GetLevel()>6 and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c81254059.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,c81254059.cfilter,1,1,nil)
+	local mg=Duel.GetMatchingGroup(c81254059.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

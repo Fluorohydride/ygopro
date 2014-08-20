@@ -4,7 +4,7 @@ function c19337371.initial_effect(c)
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c19337371.cost)
+	e1:SetCountLimit(1,19337371+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c19337371.target)
 	e1:SetOperation(c19337371.activate)
 	c:RegisterEffect(e1)
@@ -15,10 +15,6 @@ function c19337371.initial_effect(c)
 	e2:SetCondition(c19337371.regcon)
 	e2:SetOperation(c19337371.regop)
 	c:RegisterEffect(e2)
-end
-function c19337371.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,19337371)==0 end
-	Duel.RegisterFlagEffect(tp,19337371,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c19337371.filter(c)
 	return c:IsCode(90219263) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
@@ -46,7 +42,7 @@ function c19337371.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetRange(LOCATION_GRAVE)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetCountLimit(1)
+	e1:SetCountLimit(1,19337371+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c19337371.thtg)
 	e1:SetOperation(c19337371.thop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
@@ -56,8 +52,7 @@ function c19337371.thfilter(c)
 	return c:IsSetCard(0x64) and c:IsAbleToHand()
 end
 function c19337371.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,19337371)==0 end
-	Duel.RegisterFlagEffect(tp,19337371,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c19337371.thop(e,tp,eg,ep,ev,re,r,rp)

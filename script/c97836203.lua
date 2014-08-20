@@ -17,6 +17,7 @@ function c97836203.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_SUMMON)
+	e2:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e2:SetCondition(c97836203.discon)
 	e2:SetTarget(c97836203.distg)
 	e2:SetOperation(c97836203.disop)
@@ -45,10 +46,9 @@ function c97836203.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
 function c97836203.distg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(97836203)==0 end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
-	e:GetHandler():RegisterFlagEffect(97836203,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c97836203.disop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

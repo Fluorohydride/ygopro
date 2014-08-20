@@ -28,9 +28,7 @@ function c6588580.val(e,c)
 end
 function c6588580.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local t=Duel.GetAttackTarget()
-	if ev==1 then t=Duel.GetAttacker() end
-	return t:IsType(TYPE_MONSTER)
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c6588580.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -33,6 +33,7 @@ function c2134346.retreg(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	e1:SetCondition(c2134346.retcon)
 	e1:SetTarget(c2134346.rettg)
@@ -44,14 +45,13 @@ function c2134346.retreg(e,tp,eg,ep,ev,re,r,rp)
 end
 function c2134346.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetFlagEffect(2134346)>0 or c:IsHasEffect(EFFECT_SPIRIT_DONOT_RETURN) then return false end
+	if c:IsHasEffect(EFFECT_SPIRIT_DONOT_RETURN) then return false end
 	if e:IsHasType(EFFECT_TYPE_TRIGGER_F) then
 		return not c:IsHasEffect(EFFECT_SPIRIT_MAYNOT_RETURN)
 	else return c:IsHasEffect(EFFECT_SPIRIT_MAYNOT_RETURN) end
 end
 function c2134346.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(2134346)==0 end
-	e:GetHandler():RegisterFlagEffect(2134346,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,EFFECT_FLAG_OATH,1)
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler(),1,0,0)
 end
 function c2134346.retop(e,tp,eg,ep,ev,re,r,rp)

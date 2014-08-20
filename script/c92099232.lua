@@ -5,14 +5,10 @@ function c92099232.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c92099232.cost)
+	e1:SetCountLimit(1,92099232+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c92099232.target)
 	e1:SetOperation(c92099232.activate)
 	c:RegisterEffect(e1)
-end
-function c92099232.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,92099232)==0 end
-	Duel.RegisterFlagEffect(tp,92099232,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c92099232.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 

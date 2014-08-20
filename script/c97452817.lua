@@ -49,7 +49,7 @@ function c97452817.arcanareg(c,coin)
 	e2:SetCategory(CATEGORY_CONTROL)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_REPEAT)
+	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c97452817.ctcon)
@@ -92,4 +92,3 @@ function c97452817.ctop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
-

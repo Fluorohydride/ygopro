@@ -1,4 +1,4 @@
---アミュレット・ドラゴン
+--呪符竜
 function c75380687.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -25,7 +25,7 @@ function c75380687.initial_effect(c)
 	e3:SetDescription(aux.Stringid(75380687,1))
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetCode(EVENT_DESTROYED)
 	e3:SetTarget(c75380687.sptg)
 	e3:SetOperation(c75380687.spop)

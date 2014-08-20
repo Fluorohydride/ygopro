@@ -26,7 +26,7 @@ function c16898077.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_SUMMON_SUCCESS)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCountLimit(1)
+	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e3:SetCondition(c16898077.damcon)
 	e3:SetTarget(c16898077.damtg)
 	e3:SetOperation(c16898077.damop)
@@ -40,7 +40,7 @@ function c16898077.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e5:SetCode(EVENT_MSET)
 	e5:SetRange(LOCATION_MZONE)
-	e5:SetCountLimit(1)
+	e5:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e5:SetCondition(c16898077.damcon2)
 	e5:SetTarget(c16898077.damtg2)
 	e5:SetOperation(c16898077.damop2)
@@ -54,7 +54,7 @@ function c16898077.initial_effect(c)
 	e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e7:SetCode(EVENT_CHANGE_POS)
 	e7:SetRange(LOCATION_MZONE)
-	e7:SetCountLimit(1)
+	e7:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e7:SetCondition(c16898077.damcon3)
 	e7:SetTarget(c16898077.damtg3)
 	e7:SetOperation(c16898077.damop3)
@@ -86,9 +86,8 @@ function c16898077.dfilter(c,e,sp)
 	return c:GetSummonPlayer()==sp and c:IsDestructable() and (not e or c:IsRelateToEffect(e))
 end
 function c16898077.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(16898077)==0 and eg:IsExists(c16898077.dfilter,1,nil,nil,1-tp) end
+	if chk==0 then return eg:IsExists(c16898077.dfilter,1,nil,nil,1-tp) end
 	local g=eg:Filter(c16898077.dfilter,nil,nil,1-tp)
-	e:GetHandler():RegisterFlagEffect(16898077,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
@@ -103,8 +102,7 @@ function c16898077.damcon2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp and rp~=tp
 end
 function c16898077.damtg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(16898077)==0 end
-	e:GetHandler():RegisterFlagEffect(16898077,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return true end
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
@@ -122,15 +120,14 @@ function c16898077.sfilter(c,e)
 	return c:IsFacedown() and c:IsDestructable() and (not e or c:IsRelateToEffect(e))
 end
 function c16898077.damtg3(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(16898077)==0 and eg:IsExists(c16898077.sfilter,1,nil,nil,1-tp) end
-	local g=eg:Filter(c16898077.sfilter,nil,nil,1-tp)
-	e:GetHandler():RegisterFlagEffect(16898077,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return eg:IsExists(c16898077.sfilter,1,nil) end
+	local g=eg:Filter(c16898077.sfilter,nil)
 	Duel.SetTargetCard(eg)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
 end
 function c16898077.damop3(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(c16898077.sfilter,nil,e,1-tp)
+	local g=eg:Filter(c16898077.sfilter,nil,e)
 	if e:GetHandler():IsRelateToEffect(e) and g:GetCount()~=0 and Duel.Destroy(g,REASON_EFFECT)~=0 then
 		Duel.Damage(1-tp,800,REASON_EFFECT)
 	end

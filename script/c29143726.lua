@@ -22,6 +22,7 @@ function c29143726.initial_effect(c)
 end
 function c29143726.spcon1(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and bit.band(r,REASON_EFFECT)~=0 and e:GetHandler():GetPreviousControler()==tp
+		and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c29143726.spcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)

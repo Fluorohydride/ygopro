@@ -7,13 +7,13 @@ function c23434538.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,TIMING_STANDBY_PHASE+0x1c0)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(1,23434538)
 	e1:SetCost(c23434538.cost)
 	e1:SetOperation(c23434538.operation)
 	c:RegisterEffect(e1)
 end
 function c23434538.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,23434538)==0 and e:GetHandler():IsAbleToGraveAsCost() end
-	Duel.RegisterFlagEffect(tp,23434538,RESET_PHASE+PHASE_END,0,1)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c23434538.operation(e,tp,eg,ep,ev,re,r,rp)

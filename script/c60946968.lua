@@ -31,4 +31,3 @@ function c60946968.adval(e,tp,eg,ep,ev,re,r,rp)
 	if a:IsControler(1-tp) and d:IsSetCard(0xc) then c60946968.addown(a,e) end
 	if d:IsControler(1-tp) and a:IsSetCard(0xc) then c60946968.addown(d,e) end
 end
-

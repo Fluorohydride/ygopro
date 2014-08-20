@@ -18,8 +18,8 @@ function c31480215.initial_effect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_TOKEN)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_BE_MATERIAL)
+	e3:SetCountLimit(1,31480215)
 	e3:SetCondition(c31480215.spcon)
-	e3:SetCost(c31480215.spcost)
 	e3:SetTarget(c31480215.sptg)
 	e3:SetOperation(c31480215.spop)
 	c:RegisterEffect(e3)
@@ -28,7 +28,7 @@ function c31480215.initial_effect(c)
 	e4:SetDescription(aux.Stringid(31480215,1))
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
+	e4:SetCountLimit(1,31480215)
 	e4:SetCost(c31480215.lvcost)
 	e4:SetOperation(c31480215.lvop)
 	c:RegisterEffect(e4)
@@ -39,10 +39,6 @@ end
 function c31480215.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and r==REASON_SYNCHRO
 		and e:GetHandler():GetReasonCard():IsRace(RACE_MACHINE)
-end
-function c31480215.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,31480215)==0 end
-	Duel.RegisterFlagEffect(tp,31480215,RESET_PHASE+PHASE_END,0,1)
 end
 function c31480215.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -65,13 +61,12 @@ function c31480215.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c31480215.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsAttribute(ATTRIBUTE_WIND)
+	return c:IsAttribute(0xff-ATTRIBUTE_WIND)
 end
 function c31480215.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,31480215)==0 and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0x101b) end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,e:GetHandler(),0x101b) end
 	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,e:GetHandler(),0x101b)
 	Duel.Release(g,REASON_COST)
-	Duel.RegisterFlagEffect(tp,31480215,RESET_PHASE+PHASE_END,0,1)
 end
 function c31480215.lvop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

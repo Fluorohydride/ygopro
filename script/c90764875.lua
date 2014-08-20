@@ -6,6 +6,7 @@ function c90764875.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_HAND)
+	e1:SetCountLimit(2,90764875)
 	e1:SetCondition(c90764875.spcon)
 	e1:SetCost(c90764875.spcost)
 	e1:SetTarget(c90764875.sptg)
@@ -19,9 +20,8 @@ function c90764875.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c90764875.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c90764875.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,90764875)<2 and Duel.CheckLPCost(tp,300) end
+	if chk==0 then return Duel.CheckLPCost(tp,300) end
 	Duel.PayLPCost(tp,300)
-	Duel.RegisterFlagEffect(tp,90764875,RESET_PHASE+PHASE_END,0,1)
 end
 function c90764875.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

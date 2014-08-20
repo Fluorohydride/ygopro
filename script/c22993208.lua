@@ -5,8 +5,8 @@ function c22993208.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,22993208+EFFECT_COUNT_CODE_OATH)
 	e1:SetCondition(c22993208.condition)
-	e1:SetCost(c22993208.cost)
 	e1:SetTarget(c22993208.target)
 	e1:SetOperation(c22993208.activate)
 	c:RegisterEffect(e1)
@@ -14,10 +14,6 @@ end
 function c22993208.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
-end
-function c22993208.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,22993208)==0 end
-	Duel.RegisterFlagEffect(tp,22993208,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c22993208.spfilter(c,e,tp)
 	return c:IsAttribute(ATTRIBUTE_FIRE) and c:IsRace(RACE_BEAST+RACE_BEASTWARRIOR+RACE_WINDBEAST) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -1,4 +1,4 @@
---¥¨¥ô¥©¥ë¥À©`¡¤¥Ú¥ë¥¿
+--ã‚¨ãƒ´ã‚©ãƒ«ãƒ€ãƒ¼ãƒ»ãƒšãƒ«ã‚¿
 function c16480084.initial_effect(c)
 end
 function c16480084.evolreg(c)
@@ -22,14 +22,14 @@ function c16480084.evolreg(c)
 	c:RegisterEffect(e2)
 end
 function c16480084.schcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE) 
+	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c16480084.sfilter(c)
 	return c:IsSetCard(0x304e) and c:IsAbleToHand()
 end
 function c16480084.schtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c16480084.sfilter,tp,LOCATION_DECK,0,1,nil) end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c16480084.schop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)

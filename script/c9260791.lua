@@ -6,6 +6,7 @@ function c9260791.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,9260791)
 	e1:SetCost(c9260791.spcost)
 	e1:SetTarget(c9260791.sptg)
 	e1:SetOperation(c9260791.spop)
@@ -22,9 +23,8 @@ function c9260791.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c9260791.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,9260791)==0 and e:GetHandler():IsReleasable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
-	Duel.RegisterFlagEffect(tp,9260791,RESET_PHASE+PHASE_END,0,1)
 end
 function c9260791.spfilter(c,e,tp)
 	return c:IsSetCard(0x107b) and not c:IsCode(9260791) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -55,7 +55,7 @@ end
 function c9260791.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and not tc:IsImmuneToEffect(e) then
 		Duel.Overlay(tc,Group.FromCards(c))
 	end
 end

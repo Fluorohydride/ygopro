@@ -52,15 +52,18 @@ end
 function c20003527.sdcon(e)
 	return e:GetHandler():IsPosition(POS_FACEUP_DEFENCE)
 end
+function c20003527.cfilter(c,tp)
+	return c:IsAttribute(ATTRIBUTE_WATER) and (c:IsControler(tp) or c:IsFaceup())
+end
 function c20003527.sumcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
-	return c:GetLevel()>4 and g:IsExists(Card.IsAttribute,1,nil,ATTRIBUTE_WATER)
+	local tp=c:GetControler()
+	local mg=Duel.GetMatchingGroup(c20003527.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	return c:GetLevel()>4 and Duel.GetTributeCount(c,mg)>0
 end
 function c20003527.sumop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,Card.IsAttribute,1,10,nil,ATTRIBUTE_WATER)
+	local mg=Duel.GetMatchingGroup(c20003527.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp)
+	local sg=Duel.SelectTribute(tp,c,1,10,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

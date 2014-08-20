@@ -21,5 +21,5 @@ function c56784842.regop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c56784842.aclimit(e,re,tp)
-	return re:GetHandler():IsType(TYPE_MONSTER)
+	return re:IsActiveType(TYPE_MONSTER)
 end

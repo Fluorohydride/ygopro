@@ -25,7 +25,6 @@ function c57774843.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCategory(CATEGORY_DECKDES)
 	e3:SetDescription(aux.Stringid(57774843,2))
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
@@ -51,8 +50,8 @@ function c57774843.spcon(e,c)
 	return ct>3
 end
 function c57774843.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,1000)
-	else Duel.PayLPCost(tp,1000) end
+	if chk==0 then return Duel.CheckLPCost(tp,1000) end
+	Duel.PayLPCost(tp,1000)
 end
 function c57774843.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

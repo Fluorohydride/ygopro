@@ -34,7 +34,7 @@ function c97584500.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c97584500.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsAttribute(ATTRIBUTE_DARK)
+	return c:IsAttribute(0xff-ATTRIBUTE_DARK)
 end
 function c97584500.sfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x8d)

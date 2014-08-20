@@ -62,7 +62,6 @@ function c4179255.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c4179255.desop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsPosition(POS_FACEUP_ATTACK) and c4179255.check() then
 		Duel.Destroy(tc,REASON_EFFECT)

@@ -28,7 +28,7 @@ function c98891840.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-p,hg)
 		Duel.ShuffleHand(p)
 	else
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
+		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TODECK)
 		local sg=g:Select(p,2,2,nil)
 		Duel.ConfirmCards(1-p,sg)
 		Duel.SendtoDeck(sg,nil,2,REASON_EFFECT)

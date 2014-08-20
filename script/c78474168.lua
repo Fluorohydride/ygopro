@@ -25,7 +25,7 @@ function c78474168.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c78474168.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_EFFECT)
+	return c:IsFaceup() and c:IsType(TYPE_EFFECT) and not c:IsDisabled()
 end
 function c78474168.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c78474168.filter(chkc) end

@@ -49,7 +49,6 @@ function c69488544.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c69488544.negcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
 	if not aux.IsDualState(e) or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or not g:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE) then return false end

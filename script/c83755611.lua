@@ -1,38 +1,49 @@
 --輝竜星－ショウフク
 function c83755611.initial_effect(c)
 	--synchro summon
-	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_PHANTOMDRAGON),1)
+	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_WYRM),1)
 	c:EnableReviveLimit()
-	--todeck
+	--mat check
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(83755611,0))
-	e1:SetCategory(CATEGORY_TODECK)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e1:SetCondition(c83755611.tdcon)
-	e1:SetTarget(c83755611.tdtg)
-	e1:SetOperation(c83755611.tdop)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_MATERIAL_CHECK)
+	e1:SetValue(c83755611.matcheck)
 	c:RegisterEffect(e1)
-	--destroy
+	--todeck
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(83755611,1))
-	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetRange(LOCATION_MZONE)
+	e2:SetDescription(aux.Stringid(83755611,0))
+	e2:SetCategory(CATEGORY_TODECK)
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1)
-	e2:SetTarget(c83755611.destg)
-	e2:SetOperation(c83755611.desop)
+	e2:SetCondition(c83755611.tdcon)
+	e2:SetTarget(c83755611.tdtg)
+	e2:SetOperation(c83755611.tdop)
+	e2:SetLabelObject(e1)
 	c:RegisterEffect(e2)
+	--destroy
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(83755611,1))
+	e3:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_IGNITION)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetCountLimit(1)
+	e3:SetTarget(c83755611.destg)
+	e3:SetOperation(c83755611.desop)
+	c:RegisterEffect(e3)
+end
+function c83755611.matcheck(e,c)
+	local ct=c:GetMaterial():Filter(Card.IsRace,nil,RACE_WYRM):GetClassCount(Card.GetOriginalAttribute)
+	e:SetLabel(ct)
 end
 function c83755611.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function c83755611.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToDeck() end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
-	local ct=e:GetHandler():GetMaterial():Filter(Card.IsSetCard,nil,0x9e):GetClassCount(Card.GetOriginalAttribute)
+	local ct=e:GetLabelObject():GetLabel()
+	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) and ct>0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,ct,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)

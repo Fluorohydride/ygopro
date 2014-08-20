@@ -29,7 +29,7 @@ function c8696773.tgvalue(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
 end
 function c8696773.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsAttribute(ATTRIBUTE_FIRE)
+	return c:IsAttribute(0xff-ATTRIBUTE_FIRE)
 end
 function c8696773.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_XYZ
@@ -37,7 +37,7 @@ end
 function c8696773.effop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(rc)
 	e1:SetDescription(aux.Stringid(8696773,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)

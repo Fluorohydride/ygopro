@@ -7,6 +7,7 @@ function c41006930.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,41006930)
 	e1:SetCost(c41006930.rmcost)
 	e1:SetTarget(c41006930.rmtg)
 	e1:SetOperation(c41006930.rmop)
@@ -22,9 +23,8 @@ function c41006930.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c41006930.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,41006930)==0 and e:GetHandler():IsAbleToRemove() end
+	if chk==0 then return e:GetHandler():IsAbleToRemove() end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
-	Duel.RegisterFlagEffect(tp,41006930,RESET_PHASE+PHASE_END,0,1)
 end
 function c41006930.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

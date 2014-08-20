@@ -16,6 +16,7 @@ function c34680482.initial_effect(c)
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCountLimit(1,34680482)
 	e2:SetCost(c34680482.spcost)
 	e2:SetTarget(c34680482.sptg)
 	e2:SetOperation(c34680482.spop)
@@ -35,9 +36,8 @@ function c34680482.retop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c34680482.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,34680482)==0 and e:GetHandler():IsReleasable() end
+	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
-	Duel.RegisterFlagEffect(tp,34680482,RESET_PHASE+PHASE_END,0,1)
 end
 function c34680482.filter(c,e,tp)
 	return c:IsSetCard(0x71) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

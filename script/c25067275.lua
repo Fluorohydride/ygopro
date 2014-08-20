@@ -6,13 +6,14 @@ function c25067275.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCountLimit(1,25067275+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c25067275.cost)
 	e1:SetTarget(c25067275.target)
 	e1:SetOperation(c25067275.operation)
 	c:RegisterEffect(e1)
 end
 function c25067275.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,25067275)==0 end
+	if chk==0 then return true end
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -21,7 +22,6 @@ function c25067275.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTargetRange(1,0)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,25067275,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c25067275.tcfilter(tc,ec)
 	return tc:IsFaceup() and ec:CheckEquipTarget(tc)

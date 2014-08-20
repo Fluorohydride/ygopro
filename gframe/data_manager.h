@@ -24,7 +24,7 @@ public:
 	const wchar_t* GetVictoryString(int code);
 	const wchar_t* GetCounterName(int code);
 	const wchar_t* GetNumString(int num);
-	const wchar_t* FormatLocation(int location);
+	const wchar_t* FormatLocation(int location, int sequence);
 	const wchar_t* FormatAttribute(int attribute);
 	const wchar_t* FormatRace(int race);
 	const wchar_t* FormatType(int type);

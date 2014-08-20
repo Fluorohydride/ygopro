@@ -23,24 +23,21 @@ function c21007444.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local sg0=g:Filter(Card.IsRelateToEffect,nil,e)
+	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local sg=nil
-	if sg0:GetCount()==0 or ft<=0 then return end
-	if ft<sg0:GetCount() then
+	if sg:GetCount()==0 or ft<=0 then return end
+	if ft<sg:GetCount() then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		sg=sg0:FilterSelect(tp,c21007444.filter,ft,ft,nil,e,tp)
-	else
-		sg=sg0:Clone()
+		sg=sg:FilterSelect(tp,c21007444.filter,ft,ft,nil,e,tp)
 	end
 	if sg:GetCount()>0 then
-		local tg=sg:GetFirst()
+		local tc=sg:GetFirst()
 		local fid=e:GetHandler():GetFieldID()
-		while tg do
-			if Duel.SpecialSummonStep(tg,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
-				tg:RegisterFlagEffect(21007444,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
+		while tc do
+			if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+				tc:RegisterFlagEffect(21007444,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
 			end
-			tg=sg:GetNext()
+			tc=sg:GetNext()
 		end
 		Duel.SpecialSummonComplete()
 		sg:KeepAlive()
@@ -57,7 +54,7 @@ function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c21007444.desfilter(c,fid)
-	return c:GetFlagEffect(21007444)==fid
+	return c:GetFlagEffectLabel(21007444)==fid
 end
 function c21007444.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=e:GetLabelObject()

@@ -52,5 +52,5 @@ function c71175527.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c71175527.splimit(e,c,tp,sumtp,sumpos)
-	return not c:IsAttribute(ATTRIBUTE_WIND)
+	return c:IsAttribute(0xff-ATTRIBUTE_WIND)
 end

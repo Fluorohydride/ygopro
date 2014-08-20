@@ -40,7 +40,7 @@ function c32919136.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_EQUIP)
 	e5:SetCode(EFFECT_SET_CONTROL)
-	e5:SetValue(c32919136.val)
+	e5:SetValue(c32919136.ctval)
 	c:RegisterEffect(e5)
 end
 function c32919136.filter(c)
@@ -86,6 +86,6 @@ end
 function c32919136.descon(e)
 	return not Duel.IsExistingMatchingCard(c32919136.desfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
-function c32919136.val(e)
-	return e:GetHandler():GetControler()
+function c32919136.ctval(e,c)
+	return e:GetHandlerPlayer()
 end

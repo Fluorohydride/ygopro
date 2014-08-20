@@ -26,7 +26,7 @@ function c72537897.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c72537897.splimit(e,c)
-	return not c:IsRace(RACE_BEAST)
+	return c:IsRace(0xffffff-RACE_BEAST)
 end
 function c72537897.spfilter(c,e,tp)
 	return c:IsRace(RACE_BEAST) and c:IsLevelBelow(2) and c:IsType(TYPE_EFFECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
