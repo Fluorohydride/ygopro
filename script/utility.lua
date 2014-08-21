@@ -803,6 +803,10 @@ end
 function Auxiliary.RPGFilter(c,filter,e,tp,m)
 	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
 	local result=false
+	local mfilter = c.matfilter
+	if mfilter then 
+		m=m:Filter(mfilter,nil)
+	end
 	if m:IsContains(c) then
 		m:RemoveCard(c)
 		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
@@ -828,6 +832,10 @@ function Auxiliary.RPGOperation(filter)
 				local tg=Duel.SelectMatchingCard(tp,Auxiliary.RPGFilter,tp,LOCATION_HAND,0,1,1,nil,filter,e,tp,mg)
 				if tg:GetCount()>0 then
 					local tc=tg:GetFirst()
+					local mfilter = tc.matfilter
+					if mfilter then 
+						mg=mg:Filter(mfilter,nil)
+					end
 					mg:RemoveCard(tc)
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 					local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
@@ -851,6 +859,10 @@ end
 function Auxiliary.RPEFilter(c,filter,e,tp,m)
 	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
 	local result=false
+	local mfilter = c.matfilter
+	if mfilter then 
+		m=m:Filter(mfilter,nil)
+	end
 	if m:IsContains(c) then
 		m:RemoveCard(c)
 		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
@@ -876,6 +888,10 @@ function Auxiliary.RPEOperation(filter)
 				local tg=Duel.SelectMatchingCard(tp,Auxiliary.RPEFilter,tp,LOCATION_HAND,0,1,1,nil,filter,e,tp,mg)
 				if tg:GetCount()>0 then
 					local tc=tg:GetFirst()
+					local mfilter = tc.matfilter
+					if mfilter then 
+						mg=mg:Filter(mfilter,nil)
+					end
 					mg:RemoveCard(tc)
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 					local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
