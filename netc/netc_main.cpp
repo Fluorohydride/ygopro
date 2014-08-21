@@ -2,6 +2,7 @@
 
 #include "scene_mgr.h"
 #include "build_scene.h"
+#include "duel_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
@@ -77,9 +78,11 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
-    auto sc = std::make_shared<BuildScene>();
+    // sc = std::make_shared<BuildScene>();
+    //SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
+    auto sc = std::make_shared<DuelScene>();
     SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
-
+    
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {
             if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))

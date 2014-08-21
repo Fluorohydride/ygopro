@@ -37,7 +37,7 @@ layout (location = 0) out vec4 frag_color;\n\
 uniform sampler2D texid;\n\
 void main() {\n\
 vec4 texcolor = texture(texid, texcoord);\n\
-frag_color = texcolor * color;\n\
+frag_color = mix(texcolor * color, vec4(hcolor.r, hcolor.g, hcolor.b, 0.0), hcolor.a);\n\
 }\n\
 ";
 
@@ -110,6 +110,7 @@ namespace ygopro
         glDeleteBuffers(1, &field_buffer);
         glDeleteBuffers(1, &card_buffer);
         glDeleteBuffers(1, &misc_buffer);
+        duel_shader.Unload();
     }
     
     void DuelScene::Activate() {
@@ -117,7 +118,7 @@ namespace ygopro
     }
     
     bool DuelScene::Update() {
-        PullEvent();
+        //PullEvent();
         double now = SceneMgr::Get().GetGameTime();
         while(now >= waiting_time) {
             if(current_cb != nullptr) {
@@ -131,6 +132,8 @@ namespace ygopro
             waiting_time = now + cmd->wait_time;
             current_cb = cmd->cb;
         }
+        UpdateBackground();
+        UpdateField();
         return true;
     }
     
@@ -144,10 +147,19 @@ namespace ygopro
         glBindVertexArray(back_vao);
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
-        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 projection = glm::perspective(45.0f, 1.0f * scene_size.x / scene_size.y, 0.1f, 10.0f);
-        glm::mat4 mvp = projection * view;
+        // field
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -5.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 projection = glm::perspective(45.0f, 1.6f, 0.1f, 10.0f);
+        glm::mat4 trscreen;
+        trscreen[3][0] = 0.1f;
+        trscreen[3][1] = 0.2f;
+        glm::mat4 mvp = trscreen * projection * view;
         duel_shader.SetParamMat4("mvp", glm::value_ptr(mvp));
+        ImageMgr::Get().GetRawMiscTexture()->Bind();
+        glBindVertexArray(field_vao);
+        glDrawElements(GL_TRIANGLE_STRIP, 34 * 6 - 2, GL_UNSIGNED_SHORT, 0);
+        // end
+        glBindVertexArray(back_vao);
         duel_shader.Unuse();
     }
     
@@ -184,15 +196,59 @@ namespace ygopro
             return;
         update_bg = false;
         auto ti = ImageMgr::Get().GetTexture("bg");
-        std::array<glbase::v2ct, 4> verts;
-        glbase::FillVertex(&verts[0], {-1.0f, 1.0f}, {2.0f, -2.0f}, ti);
+        std::array<v3hct, 4> verts;
+        verts[0].vertex = {-1.0f, 1.0f, 0.0f};
+        verts[0].texcoord = ti.vert[0];
+        verts[1].vertex = {1.0f, 1.0f, 0.0f};
+        verts[1].texcoord = ti.vert[1];
+        verts[2].vertex = {-1.0f, -1.0f, 0.0f};
+        verts[2].texcoord = ti.vert[2];
+        verts[3].vertex = {1.0f, -1.0f, 0.0f};
+        verts[3].texcoord = ti.vert[3];
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * verts.size(), &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v3hct) * verts.size(), &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     
     void DuelScene::UpdateField() {
+        if(!update_field)
+            return;
+        update_field = false;
+        float zwidth = 0.6f;
+        float zheight = 0.8f;
+        float zwidthm = 0.8f;
+        std::array<v3hct, 136> verts;
+        auto ti = ImageMgr::Get().GetTexture("numback");
+        auto FillVert3 = [](v3hct* vt, v3f pos, v2f sz, ti4& hti, unsigned int cl = 0xffffffff, unsigned int hcl = 0) {
+            vt[0].vertex = {pos.x, pos.y, pos.z};
+            vt[0].texcoord = hti.vert[0];
+            vt[1].vertex = {pos.x + sz.x, pos.y, pos.z};
+            vt[1].texcoord = hti.vert[1];
+            vt[2].vertex = {pos.x, pos.y + sz.y, pos.z};
+            vt[2].texcoord = hti.vert[2];
+            vt[3].vertex = {pos.x + sz.x, pos.y + sz.y, pos.z};
+            vt[3].texcoord = hti.vert[3];
+        };
+        for(int i = 0; i < 5; ++i) {
+            FillVert3(&verts[i * 8 + 0], {-2.08f + 0.84f * i, -0.60f, 0.0f}, {0.8f, -0.8f}, ti);
+            FillVert3(&verts[i * 8 + 4], {-1.98f + 0.84f * i, -1.44f, 0.0f}, {0.6f, -0.8f}, ti);
+        }
+        FillVert3(&verts[40], {-2.72f, -1.10f, 0.0f}, {0.6f, -0.8f}, ti);
+        FillVert3(&verts[44], { 2.12f, -1.10f, 0.0f}, {0.6f, -0.8f}, ti);
+        FillVert3(&verts[48], {-2.92f, -1.94f, 0.0f}, {0.6f, -0.8f}, ti);
+        FillVert3(&verts[52], {-2.92f, -0.26f, 0.0f}, {0.6f, -0.8f}, ti);
+        FillVert3(&verts[56], { 2.32f, -1.94f, 0.0f}, {0.6f, -0.8f}, ti);
+        FillVert3(&verts[60], { 2.32f, -0.26f, 0.0f}, {0.6f, -0.8f}, ti);
+        FillVert3(&verts[64], { 2.96f, -0.26f, 0.0f}, {0.6f, -0.8f}, ti);
         
+        for(int i = 68; i < 136; ++i) {
+            verts[i] = verts[i - 68];
+            verts[i].vertex = {-verts[i - 68].vertex.x, -verts[i - 68].vertex.y, 0.0f};
+        }
+        
+        glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v3hct) * verts.size(), &verts[0]);
+        GLCheckError(__FILE__, __LINE__);
     }
     
     void DuelScene::UpdateMisc() {

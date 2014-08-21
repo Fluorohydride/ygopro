@@ -57,6 +57,7 @@ namespace ygopro
         unsigned int card_vao = 0;
         unsigned int misc_vao = 0;
         bool update_bg = true;
+        bool update_field = true;
         double waiting_time = 0.0;
         CommandList<DuelCommand> duel_commands;
         std::function<void()> current_cb;
