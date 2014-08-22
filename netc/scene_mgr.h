@@ -19,6 +19,7 @@ namespace ygopro
         virtual void MouseMove(sgui::MouseMoveEvent evt) = 0;
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt) = 0;
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt) = 0;
+        virtual void MouseWheel(sgui::MouseWheelEvent evt) = 0;
         virtual void KeyDown(sgui::KeyEvent evt) = 0;
         virtual void KeyUp(sgui::KeyEvent evt) = 0;
     };
@@ -37,6 +38,7 @@ namespace ygopro
         void MouseMove(sgui::MouseMoveEvent evt);
         void MouseButtonDown(sgui::MouseButtonEvent evt);
         void MouseButtonUp(sgui::MouseButtonEvent evt);
+        void MouseWheel(sgui::MouseWheelEvent evt);
         void KeyDown(sgui::KeyEvent evt);
         void KeyUp(sgui::KeyEvent evt);
         void SetSceneSize(v2i sz);

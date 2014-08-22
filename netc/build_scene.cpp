@@ -405,6 +405,10 @@ namespace ygopro
         }
     }
     
+    void BuildScene::MouseWheel(sgui::MouseWheelEvent evt) {
+        
+    }
+    
     void BuildScene::KeyDown(sgui::KeyEvent evt) {
         switch(evt.key) {
             case GLFW_KEY_1:

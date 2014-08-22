@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
   <string name="unknown" value="？？？"/>
+  <string name="pendulum_delimiter" value="[----]"/>
   <string name="eui_button_ok" value="确定"/>
   <string name="eui_button_cancel" value="取消"/>
   <string name="eui_button_yes" value="是"/>

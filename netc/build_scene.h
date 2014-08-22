@@ -45,6 +45,7 @@ namespace ygopro
         virtual void MouseMove(sgui::MouseMoveEvent evt);
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt);
+        virtual void MouseWheel(sgui::MouseWheelEvent evt);
         virtual void KeyDown(sgui::KeyEvent evt);
         virtual void KeyUp(sgui::KeyEvent evt);
         

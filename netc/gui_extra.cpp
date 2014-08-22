@@ -494,14 +494,17 @@ namespace ygopro
             ad->ClearText();
         }
         if((data->level >> 16) > 0) {
-            auto sz1 = data->texts.find(L"\n");
-            auto sz2 = data->texts.find(L"【怪");
-            pent->SetText(data->texts.substr(sz1 + 1, sz2 - sz1 - 1), 0xff000000);
-            text->SetText(data->texts.substr(sz2 + 7), 0xff000000);
-            int ph = pent->GetSize().y;
+            std::wstring pdelimiter = stringCfg["pendulum_delimiter"];
+            auto pd = data->texts.find(pdelimiter);
+            if(pd > 0)
+                pent->SetText(data->texts.substr(0, pd - 1), 0xff000000);
+            else
+                pent->ClearText();
+            text->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+            int ph = pent->GetSize().y + 13;
             if(ph < 55)
                 ph = 55;
-            text->SetPosition({cw + 15, 60 + ph});
+            text->SetPosition({cw + 15, 63 + ph});
             pushvert({0, 45}, {mw, ph}, hmask, 0xc0ffffff);
             pushvert({0, 50 + ph}, {mw, sz.y - 70 - ph}, hmask, 0xc0ffffff);
             auto lscale = ImageMgr::Get().GetTexture("lscale");

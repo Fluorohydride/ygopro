@@ -73,6 +73,11 @@ namespace ygopro
             current_scene->MouseButtonUp(evt);
     }
     
+    void SceneMgr::MouseWheel(sgui::MouseWheelEvent evt) {
+        if(current_scene != nullptr)
+            current_scene->MouseWheel(evt);
+    }
+    
     void SceneMgr::KeyDown(sgui::KeyEvent evt) {
         if(current_scene != nullptr)
             current_scene->KeyDown(evt);

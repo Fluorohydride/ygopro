@@ -32,6 +32,7 @@ namespace ygopro
         virtual void MouseMove(sgui::MouseMoveEvent evt);
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt);
+        virtual void MouseWheel(sgui::MouseWheelEvent evt);
         virtual void KeyDown(sgui::KeyEvent evt);
         virtual void KeyUp(sgui::KeyEvent evt);
         
@@ -58,10 +59,17 @@ namespace ygopro
         unsigned int misc_vao = 0;
         bool update_bg = true;
         bool update_field = true;
+        bool update_misc = true;
         double waiting_time = 0.0;
         CommandList<DuelCommand> duel_commands;
         std::function<void()> current_cb;
         glbase::Shader duel_shader;
+        float angle = 3.1415926f * 0.25f;
+        float r = 6.5f;
+        float xoffset = 0.0f;
+        float yoffset = 0.0f;
+        bool btnDown[2] = {false};
+        v2i btnPos[2];
     };
     
 }

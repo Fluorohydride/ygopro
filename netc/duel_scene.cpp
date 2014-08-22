@@ -148,11 +148,11 @@ namespace ygopro
         glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // field
-        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -5.0f, 4.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 projection = glm::perspective(45.0f, 1.6f, 0.1f, 10.0f);
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -r * cosf(angle), r * sinf(angle)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+        glm::mat4 projection = glm::perspective(45.0f, 1.0f * scene_size.x / scene_size.y, 0.1f, 100.0f);
         glm::mat4 trscreen;
-        trscreen[3][0] = 0.1f;
-        trscreen[3][1] = 0.2f;
+        trscreen[3][0] = xoffset;
+        trscreen[3][1] = yoffset;
         glm::mat4 mvp = trscreen * projection * view;
         duel_shader.SetParamMat4("mvp", glm::value_ptr(mvp));
         ImageMgr::Get().GetRawMiscTexture()->Bind();
@@ -172,15 +172,43 @@ namespace ygopro
     }
     
     void DuelScene::MouseMove(sgui::MouseMoveEvent evt) {
-        
+        if(btnDown[0]) {
+            float ratex = (float)(evt.x - btnPos[0].x) / scene_size.x;
+            float ratey = (float)(evt.y - btnPos[0].y) / scene_size.y;
+            xoffset += ratex;
+            yoffset -= ratey;
+            btnPos[0] = {evt.x, evt.y};
+        }
+        if(btnDown[1]) {
+            float rate = (float)(evt.y - btnPos[1].y) / scene_size.y;
+            angle += 3.1415926f * 0.5f * rate;
+            if(angle < 0.0f)
+                angle = 0.0f;
+            if(angle > 3.1415926f * 0.5f)
+                angle = 3.1415926f * 0.5f;
+            btnPos[1] = {evt.x, evt.y};
+        }
     }
     
     void DuelScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
-        
+        if(evt.button < 2) {
+            btnDown[evt.button] = true;
+            btnPos[evt.button] = {evt.x, evt.y};
+        }
     }
     
     void DuelScene::MouseButtonUp(sgui::MouseButtonEvent evt) {
-        
+        if(evt.button < 2) {
+            btnDown[evt.button] = false;
+        }
+    }
+    
+    void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
+        r += evt.deltay / 30.0f;
+        if(r < 1.0f)
+            r = 1.0f;
+        if(r > 50.0f)
+            r = 50.0f;
     }
     
     void DuelScene::KeyDown(sgui::KeyEvent evt) {
@@ -252,7 +280,8 @@ namespace ygopro
     }
     
     void DuelScene::UpdateMisc() {
-        
+        if(!update_misc)
+            update_misc = true;
     }
     
 }

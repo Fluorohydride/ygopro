@@ -78,7 +78,7 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
-    // sc = std::make_shared<BuildScene>();
+    //auto sc = std::make_shared<BuildScene>();
     //SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
     auto sc = std::make_shared<DuelScene>();
     SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
@@ -131,7 +131,8 @@ int main(int argc, char* argv[]) {
         }
     });
     glfwSetScrollCallback(window, [](GLFWwindow* wnd, double xoffset, double yoffset) {
-        sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent({(float)xoffset, (float)yoffset});
+        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent({(float)xoffset, (float)yoffset}))
+            SceneMgr::Get().MouseWheel({(float)xoffset, (float)yoffset});
     });
     glfwSetWindowIconifyCallback(window, [](GLFWwindow* wnd, int iconified) {
         need_draw = (iconified == GL_FALSE);
