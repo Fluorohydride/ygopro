@@ -12,8 +12,8 @@ function c29400787.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(c99795159.bttg)
-	e2:SetValue(c99795159.btval)
+	e2:SetTarget(c29400787.bttg)
+	e2:SetValue(c29400787.btval)
 	c:RegisterEffect(e2)
 	--direct attack
 	local e3=Effect.CreateEffect(c)
@@ -22,7 +22,7 @@ function c29400787.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetCondition(c99795159.dircon)
+	e3:SetCondition(c29400787.dircon)
 	c:RegisterEffect(e3)
 	--tohand
 	local e4=Effect.CreateEffect(c)
@@ -66,4 +66,14 @@ function c29400787.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
+end
+function c29400787.bttg(e,c)
+	return c:IsFacedown()
+end
+function c29400787.btval(e,c)
+	return not c:IsImmuneToEffect(e)
+end
+function c29400787.dircon(e)
+	local tp=Duel.GetTurnPlayer()
+	return not Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
 end

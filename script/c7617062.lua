@@ -65,6 +65,6 @@ function c7617062.btval(e,c)
 	return not c:IsImmuneToEffect(e)
 end
 function c7617062.dircon(e)
-	local tp=e:GetHandler():GetControler()
+	local tp=Duel.GetTurnPlayer()
 	return not Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
 end
