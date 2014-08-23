@@ -29,7 +29,7 @@ function c39153655.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c39153655.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0xaf)
+	return c:IsFaceup() and c:IsSetCard(0xaf) and c:GetLevel()~=4
 end
 function c39153655.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c39153655.filter(chkc) end
