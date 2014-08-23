@@ -27,7 +27,7 @@ function c84764038.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c84764038.sdfilter(c)
-	return c:IsFaceup() and not c:IsSetCard(0xb1)
+	return not c:IsFaceup() or not c:IsSetCard(0xb1)
 end
 function c84764038.sdcon(e)
 	return Duel.IsExistingMatchingCard(c84764038.sdfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
