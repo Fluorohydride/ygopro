@@ -19,7 +19,7 @@ function c53656677.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(d)
 end
 function c53656677.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateAttack()
+	if not Duel.NegateAttack() then return end
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
