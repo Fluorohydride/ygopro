@@ -1,10 +1,5 @@
 #include "../common/common.h"
 
-#define GLM_FORCE_RADIANS
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/type_ptr.hpp>
-
 #include "gui_extra.h"
 #include "duel_command.h"
 #include "image_mgr.h"
@@ -242,38 +237,38 @@ namespace ygopro
         if(!update_field)
             return;
         update_field = false;
-        float zwidth = 0.6f;
-        float zheight = 0.8f;
-        float zwidthm = 0.8f;
-        std::array<v3hct, 136> verts;
-        auto ti = ImageMgr::Get().GetTexture("numback");
-        auto FillVert3 = [](v3hct* vt, v3f pos, v2f sz, ti4& hti, unsigned int cl = 0xffffffff, unsigned int hcl = 0) {
-            vt[0].vertex = {pos.x, pos.y, pos.z};
+        auto FillVert3 = [](v3hct* vt, rectf center, ti4& hti, unsigned int cl = 0xffffffff, unsigned int hcl = 0) {
+            vt[0].vertex = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
             vt[0].texcoord = hti.vert[0];
-            vt[1].vertex = {pos.x + sz.x, pos.y, pos.z};
+            vt[1].vertex = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
             vt[1].texcoord = hti.vert[1];
-            vt[2].vertex = {pos.x, pos.y + sz.y, pos.z};
+            vt[2].vertex = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
             vt[2].texcoord = hti.vert[2];
-            vt[3].vertex = {pos.x + sz.x, pos.y + sz.y, pos.z};
+            vt[3].vertex = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
             vt[3].texcoord = hti.vert[3];
         };
-        for(int i = 0; i < 5; ++i) {
-            FillVert3(&verts[i * 8 + 0], {-2.08f + 0.84f * i, -0.60f, 0.0f}, {0.8f, -0.8f}, ti);
-            FillVert3(&verts[i * 8 + 4], {-1.98f + 0.84f * i, -1.44f, 0.0f}, {0.6f, -0.8f}, ti);
-        }
-        FillVert3(&verts[40], {-2.72f, -1.10f, 0.0f}, {0.6f, -0.8f}, ti);
-        FillVert3(&verts[44], { 2.12f, -1.10f, 0.0f}, {0.6f, -0.8f}, ti);
-        FillVert3(&verts[48], {-2.92f, -1.94f, 0.0f}, {0.6f, -0.8f}, ti);
-        FillVert3(&verts[52], {-2.92f, -0.26f, 0.0f}, {0.6f, -0.8f}, ti);
-        FillVert3(&verts[56], { 2.32f, -1.94f, 0.0f}, {0.6f, -0.8f}, ti);
-        FillVert3(&verts[60], { 2.32f, -0.26f, 0.0f}, {0.6f, -0.8f}, ti);
-        FillVert3(&verts[64], { 2.96f, -0.26f, 0.0f}, {0.6f, -0.8f}, ti);
-        
+        std::array<v3hct, 136> verts;
+        FillVert3(&verts[0 ], SceneMgr::Get().LayoutRectConfig("mzone1"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[4 ], SceneMgr::Get().LayoutRectConfig("mzone2"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[8 ], SceneMgr::Get().LayoutRectConfig("mzone3"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[12], SceneMgr::Get().LayoutRectConfig("mzone4"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[16], SceneMgr::Get().LayoutRectConfig("mzone5"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[20], SceneMgr::Get().LayoutRectConfig("szone1"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[24], SceneMgr::Get().LayoutRectConfig("szone2"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[28], SceneMgr::Get().LayoutRectConfig("szone3"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[32], SceneMgr::Get().LayoutRectConfig("szone4"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[36], SceneMgr::Get().LayoutRectConfig("szone5"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[40], SceneMgr::Get().LayoutRectConfig("fdzone"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[44], SceneMgr::Get().LayoutRectConfig("pzonel"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[48], SceneMgr::Get().LayoutRectConfig("pzoner"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[52], SceneMgr::Get().LayoutRectConfig("mdeck" ), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[56], SceneMgr::Get().LayoutRectConfig("exdeck"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[60], SceneMgr::Get().LayoutRectConfig("grave" ), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[64], SceneMgr::Get().LayoutRectConfig("banish"), ImageMgr::Get().GetTexture("numback"));
         for(int i = 68; i < 136; ++i) {
             verts[i] = verts[i - 68];
             verts[i].vertex = {-verts[i - 68].vertex.x, -verts[i - 68].vertex.y, 0.0f};
         }
-        
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v3hct) * verts.size(), &verts[0]);
         GLCheckError(__FILE__, __LINE__);

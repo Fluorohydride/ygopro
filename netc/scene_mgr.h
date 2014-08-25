@@ -27,7 +27,7 @@ namespace ygopro
     class SceneMgr : public Singleton<SceneMgr> {
     public:
         
-        void Init();
+        void Init(const std::wstring& layout);
         void Uninit();
         void InitDraw();
         bool Update();
@@ -47,6 +47,7 @@ namespace ygopro
         std::shared_ptr<Scene> GetScene() { return current_scene; };
         void SetMousePosition(v2i pos) { mouse_pos = pos; }
         v2i GetMousePosition() { return mouse_pos; }
+        rectf LayoutRectConfig(const std::string& name) { return rect_config[name]; }
         
     protected:
         v2i scene_size;
@@ -56,6 +57,7 @@ namespace ygopro
         double frame_time = 0.0;
         double frame_interval = 0.0;
         v2i mouse_pos = {0, 0};
+        std::unordered_map<std::string, rectf> rect_config;
     };
 
 	extern CommonConfig commonCfg;

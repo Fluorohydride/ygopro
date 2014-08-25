@@ -17,6 +17,7 @@
   <string name="gui_conf" value="./conf/gui.xml"/>
   <string name="string_conf" value="./conf/strings.xml"/>
   <string name="textures_conf" value="./conf/textures.xml"/>
+  <string name="layout_conf" value="./conf/layout.xml"/>
   <string name="limit_regulation" value="./conf/lflist.conf"/>
   <string name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}"/>
   <integer name="hover_info_delay" value="300"/>

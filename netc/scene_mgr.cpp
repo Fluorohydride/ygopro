@@ -1,5 +1,7 @@
 #include "../common/common.h"
 
+#include <wx/xml/xml.h>
+
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../buildin/stb_image_write.h"
 
@@ -12,8 +14,28 @@ namespace ygopro
 	CommonConfig commonCfg;
     CommonConfig stringCfg;
     
-    void SceneMgr::Init() {
+    void SceneMgr::Init(const std::wstring& layout) {
         start_time = std::chrono::system_clock::now().time_since_epoch().count();
+        wxXmlDocument doc;
+		if(!doc.Load(layout, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
+			return;
+		wxXmlNode* root = doc.GetRoot();
+		wxXmlNode* child = root->GetChildren();
+		while (child) {
+            if(child->GetType() == wxXmlNodeType::wxXML_ELEMENT_NODE) {
+                if (child->GetName() == "integer") {
+                } else if(child->GetName() == "float") {
+                } else if(child->GetName() == "rect") {
+                    std::string name = child->GetAttribute("name").ToUTF8().data();
+                    float x = To<float>(child->GetAttribute("x").ToUTF8().data());
+                    float y = To<float>(child->GetAttribute("y").ToUTF8().data());
+                    float w = To<float>(child->GetAttribute("w").ToUTF8().data());
+                    float h = To<float>(child->GetAttribute("h").ToUTF8().data());
+                    rect_config[name] = rectf{x, y, w, h};
+                }
+            }
+            child = child->GetNext();
+		}
     }
     
     void SceneMgr::Uninit() {

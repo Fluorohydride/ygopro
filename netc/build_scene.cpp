@@ -37,9 +37,9 @@ namespace ygopro
             index[i * 6] = i * 4;
             index[i * 6 + 1] = i * 4 + 2;
             index[i * 6 + 2] = i * 4 + 1;
-            index[i * 6 + 3] = i * 4 + 3;
-            index[i * 6 + 4] = i * 4 + 3;
-            index[i * 6 + 5] = i * 4 + 4;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 256 * 4 * 6, &index[0], GL_STATIC_DRAW);
@@ -214,26 +214,26 @@ namespace ygopro
         // background
         ImageMgr::Get().GetRawBGTexture()->Bind();
         glBindVertexArray(back_vao);
-        glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // miscs
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(misc_vao);
-        glDrawElements(GL_TRIANGLE_STRIP, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
         ImageMgr::Get().GetRawCardTexture()->Bind();
         // result
         if(result_show_size) {
             glBindVertexArray(result_vao);
-            glDrawElements(GL_TRIANGLE_STRIP, result_show_size * 24 - 2, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, result_show_size * 24 - 2, GL_UNSIGNED_SHORT, 0);
             GLCheckError(__FILE__, __LINE__);
         }
         // deck
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz > 0) {
             glBindVertexArray(deck_vao);
-            glDrawElements(GL_TRIANGLE_STRIP, deck_sz * 24 - 2, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, deck_sz * 24 - 2, GL_UNSIGNED_SHORT, 0);
         }
         GLCheckError(__FILE__, __LINE__);
         glBindVertexArray(0);

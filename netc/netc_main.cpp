@@ -68,13 +68,13 @@ int main(int argc, char* argv[]) {
             DataMgr::Get().RegisterSetCode(static_cast<unsigned int>(value), setname);
         }
     });
+    SceneMgr::Get().Init(commonCfg["layout_conf"]);
     
     int bwidth, bheight;
     glfwGetFramebufferSize(window, &bwidth, &bheight);
     xrate = (float)bwidth / width;
     yrate = (float)bheight / height;
     sgui::SGGUIRoot::GetSingleton().SetSceneSize({bwidth, bheight});
-    SceneMgr::Get().Init();
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
