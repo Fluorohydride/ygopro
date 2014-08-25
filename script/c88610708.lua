@@ -26,7 +26,6 @@ function c88610708.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP)
 	e4:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
-	e4:SetCondition(c88610708.damcon)
 	e4:SetValue(1)
 	c:RegisterEffect(e4)
 end
@@ -49,7 +48,4 @@ function c88610708.operation(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		Duel.Equip(tp,c,tc)
 	end
-end
-function c88610708.damcon(e)
-	return Duel.GetAttacker()==e:GetHandler():GetEquipTarget()
 end

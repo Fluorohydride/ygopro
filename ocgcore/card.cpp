@@ -488,7 +488,7 @@ int32 card::get_defence(uint8 swap) {
 	return def;
 }
 uint32 card::get_level() {
-	if(data.type & TYPE_XYZ)
+	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0)
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
@@ -554,7 +554,7 @@ uint32 card::get_rank() {
 	return rank;
 }
 uint32 card::get_synchro_level(card* pcard) {
-	if(data.type & TYPE_XYZ)
+	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0)
 		return 0;
 	uint32 lev;
 	effect_set eset;
@@ -566,7 +566,7 @@ uint32 card::get_synchro_level(card* pcard) {
 	return lev;
 }
 uint32 card::get_ritual_level(card* pcard) {
-	if(data.type & TYPE_XYZ)
+	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0)
 		return 0;
 	uint32 lev;
 	effect_set eset;
