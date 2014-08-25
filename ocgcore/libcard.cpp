@@ -95,7 +95,7 @@ int32 scriptlib::card_get_origin_level(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(pcard->data.type & TYPE_XYZ)
+	if(pcard->data.type & TYPE_XYZ || pcard->single_effect.count(0x14d72c34)>0)
 		lua_pushinteger(L, 0);
 	else
 		lua_pushinteger(L, pcard->data.level);
@@ -181,7 +181,10 @@ int32 scriptlib::card_get_text_attack(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	lua_pushinteger(L, pcard->data.attack);
+	if(pcard->single_effect.count(0x14d72c34)>0)
+		lua_pushinteger(L, 0);
+	else
+		lua_pushinteger(L, pcard->data.attack);
 	return 1;
 }
 int32 scriptlib::card_get_defence(lua_State *L) {
@@ -202,7 +205,10 @@ int32 scriptlib::card_get_text_defence(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	lua_pushinteger(L, pcard->data.defence);
+	if(pcard->single_effect.count(0x14d72c34)>0)
+		lua_pushinteger(L, 0);
+	else
+		lua_pushinteger(L, pcard->data.defence);
 	return 1;
 }
 int32 scriptlib:: card_get_previous_code_onfield(lua_State *L) {
@@ -1490,7 +1496,7 @@ int32 scriptlib::card_is_level_below(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 lvl = lua_tointeger(L, 2);
-	if((pcard->data.type & TYPE_XYZ) || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
+	if((pcard->data.type & TYPE_XYZ) || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)) || pcard->single_effect.count(0x14d72c34)>0)
 		lua_pushboolean(L, 0);
 	else
 		lua_pushboolean(L, pcard->get_level() <= lvl);
@@ -1501,7 +1507,7 @@ int32 scriptlib::card_is_level_above(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 lvl = lua_tointeger(L, 2);
-	if((pcard->data.type & TYPE_XYZ) || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
+	if((pcard->data.type & TYPE_XYZ) || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)) || pcard->single_effect.count(0x14d72c34)>0)
 		lua_pushboolean(L, 0);
 	else
 		lua_pushboolean(L, pcard->get_level() >= lvl);
