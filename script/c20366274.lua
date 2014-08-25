@@ -53,7 +53,7 @@ function c20366274.ffilter1(c)
 	return c:IsSetCard(0x9d)
 end
 function c20366274.ffilter2(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) or (c:GetFlagEffect(4904633)~=0 and not c:IsStatus(STATUS_DISABLED))
+	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsHasEffect(4904633)~=0
 end
 function c20366274.exfilter(c,g)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not g:IsContains(c)
