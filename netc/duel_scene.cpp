@@ -41,6 +41,7 @@ namespace ygopro
     
     DuelScene::DuelScene() {
         glGenBuffers(1, &index_buffer);
+        glGenBuffers(1, &card_index_buffer);
         glGenBuffers(1, &back_buffer);
         glGenBuffers(1, &field_buffer);
         glGenBuffers(1, &card_buffer);
@@ -59,21 +60,25 @@ namespace ygopro
         glBufferData(GL_ARRAY_BUFFER, sizeof(v3hct) * 32 * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         std::vector<unsigned short> index;
-        index.resize(512 * 4 * 6);
-        for(int i = 0; i < 512 * 4; ++i) {
+        index.resize(128 * 6);
+        for(int i = 0; i < 128; ++i) {
             index[i * 6] = i * 4;
             index[i * 6 + 1] = i * 4 + 2;
             index[i * 6 + 2] = i * 4 + 1;
-            index[i * 6 + 3] = i * 4 + 3;
-            index[i * 6 + 4] = i * 4 + 3;
-            index[i * 6 + 5] = i * 4 + 4;
+            index[i * 6 + 3] = i * 4 + 1;
+            index[i * 6 + 4] = i * 4 + 2;
+            index[i * 6 + 5] = i * 4 + 3;
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 512 * 4 * 6, &index[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 128 * 6, &index[0], GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 512 * 4 * 6, nullptr, GL_STATIC_DRAW);
+        GLCheckError(__FILE__, __LINE__);
         glGenVertexArrays(1, &field_vao);
         glGenVertexArrays(1, &back_vao);
         glGenVertexArrays(1, &card_vao);
         glGenVertexArrays(1, &misc_vao);
+        GLCheckError(__FILE__, __LINE__);
         for(int i = 0; i < 4; ++i) {
             switch(i) {
                 case 0: glBindVertexArray(field_vao); glBindBuffer(GL_ARRAY_BUFFER, field_buffer); break;
@@ -90,7 +95,10 @@ namespace ygopro
             glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3hct), (const GLvoid*)v3hct::color_offset);
             glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3hct), (const GLvoid*)v3hct::hcolor_offset);
             glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(v3hct), (const GLvoid*)v3hct::tex_offset);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+            if(i != 2)
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
+            else
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
             glBindVertexArray(0);
         }
         GLCheckError(__FILE__, __LINE__);
@@ -101,10 +109,15 @@ namespace ygopro
     
     DuelScene::~DuelScene() {
         glDeleteBuffers(1, &index_buffer);
+        glDeleteBuffers(1, &card_index_buffer);
         glDeleteBuffers(1, &back_buffer);
         glDeleteBuffers(1, &field_buffer);
         glDeleteBuffers(1, &card_buffer);
         glDeleteBuffers(1, &misc_buffer);
+        glDeleteVertexArrays(1, &back_vao);
+        glDeleteVertexArrays(1, &field_vao);
+        glDeleteVertexArrays(1, &card_vao);
+        glDeleteVertexArrays(1, &misc_vao);
         duel_shader.Unload();
     }
     
@@ -140,7 +153,7 @@ namespace ygopro
         ImageMgr::Get().GetRawBGTexture()->Bind();
         duel_shader.SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
         glBindVertexArray(back_vao);
-        glDrawElements(GL_TRIANGLE_STRIP, 4, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // field
         glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -r * cosf(angle), r * sinf(angle)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
@@ -152,7 +165,7 @@ namespace ygopro
         duel_shader.SetParamMat4("mvp", glm::value_ptr(mvp));
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(field_vao);
-        glDrawElements(GL_TRIANGLE_STRIP, 34 * 6 - 2, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 34 * 6, GL_UNSIGNED_SHORT, 0);
         // end
         glBindVertexArray(back_vao);
         duel_shader.Unuse();
@@ -248,23 +261,23 @@ namespace ygopro
             vt[3].texcoord = hti.vert[3];
         };
         std::array<v3hct, 136> verts;
-        FillVert3(&verts[0 ], SceneMgr::Get().LayoutRectConfig("mzone1"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[4 ], SceneMgr::Get().LayoutRectConfig("mzone2"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[8 ], SceneMgr::Get().LayoutRectConfig("mzone3"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[12], SceneMgr::Get().LayoutRectConfig("mzone4"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[16], SceneMgr::Get().LayoutRectConfig("mzone5"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[20], SceneMgr::Get().LayoutRectConfig("szone1"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[24], SceneMgr::Get().LayoutRectConfig("szone2"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[28], SceneMgr::Get().LayoutRectConfig("szone3"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[32], SceneMgr::Get().LayoutRectConfig("szone4"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[36], SceneMgr::Get().LayoutRectConfig("szone5"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[40], SceneMgr::Get().LayoutRectConfig("fdzone"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[44], SceneMgr::Get().LayoutRectConfig("pzonel"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[48], SceneMgr::Get().LayoutRectConfig("pzoner"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[52], SceneMgr::Get().LayoutRectConfig("mdeck" ), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[56], SceneMgr::Get().LayoutRectConfig("exdeck"), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[60], SceneMgr::Get().LayoutRectConfig("grave" ), ImageMgr::Get().GetTexture("numback"));
-        FillVert3(&verts[64], SceneMgr::Get().LayoutRectConfig("banish"), ImageMgr::Get().GetTexture("numback"));
+        FillVert3(&verts[0 ], SceneMgr::Get().LayoutRectConfig("mzone1"), ImageMgr::Get().GetTexture("mzone"));
+        FillVert3(&verts[4 ], SceneMgr::Get().LayoutRectConfig("mzone2"), ImageMgr::Get().GetTexture("mzone"));
+        FillVert3(&verts[8 ], SceneMgr::Get().LayoutRectConfig("mzone3"), ImageMgr::Get().GetTexture("mzone"));
+        FillVert3(&verts[12], SceneMgr::Get().LayoutRectConfig("mzone4"), ImageMgr::Get().GetTexture("mzone"));
+        FillVert3(&verts[16], SceneMgr::Get().LayoutRectConfig("mzone5"), ImageMgr::Get().GetTexture("mzone"));
+        FillVert3(&verts[20], SceneMgr::Get().LayoutRectConfig("szone1"), ImageMgr::Get().GetTexture("szone"));
+        FillVert3(&verts[24], SceneMgr::Get().LayoutRectConfig("szone2"), ImageMgr::Get().GetTexture("szone"));
+        FillVert3(&verts[28], SceneMgr::Get().LayoutRectConfig("szone3"), ImageMgr::Get().GetTexture("szone"));
+        FillVert3(&verts[32], SceneMgr::Get().LayoutRectConfig("szone4"), ImageMgr::Get().GetTexture("szone"));
+        FillVert3(&verts[36], SceneMgr::Get().LayoutRectConfig("szone5"), ImageMgr::Get().GetTexture("szone"));
+        FillVert3(&verts[40], SceneMgr::Get().LayoutRectConfig("fdzone"), ImageMgr::Get().GetTexture("fdzone"));
+        FillVert3(&verts[44], SceneMgr::Get().LayoutRectConfig("pzonel"), ImageMgr::Get().GetTexture("pzonel"));
+        FillVert3(&verts[48], SceneMgr::Get().LayoutRectConfig("pzoner"), ImageMgr::Get().GetTexture("pzoner"));
+        FillVert3(&verts[52], SceneMgr::Get().LayoutRectConfig("mdeck" ), ImageMgr::Get().GetTexture("mdeck"));
+        FillVert3(&verts[56], SceneMgr::Get().LayoutRectConfig("exdeck"), ImageMgr::Get().GetTexture("exdeck"));
+        FillVert3(&verts[60], SceneMgr::Get().LayoutRectConfig("grave" ), ImageMgr::Get().GetTexture("grave"));
+        FillVert3(&verts[64], SceneMgr::Get().LayoutRectConfig("banish"), ImageMgr::Get().GetTexture("banish"));
         for(int i = 68; i < 136; ++i) {
             verts[i] = verts[i - 68];
             verts[i].vertex = {-verts[i - 68].vertex.x, -verts[i - 68].vertex.y, 0.0f};

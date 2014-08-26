@@ -214,26 +214,26 @@ namespace ygopro
         // background
         ImageMgr::Get().GetRawBGTexture()->Bind();
         glBindVertexArray(back_vao);
-        glDrawElements(GL_TRIANGLES, 4, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // miscs
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(misc_vao);
-        glDrawElements(GL_TRIANGLES, 33 * 6 - 2, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLES, 33 * 6, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // cards
         ImageMgr::Get().GetRawCardTexture()->Bind();
         // result
         if(result_show_size) {
             glBindVertexArray(result_vao);
-            glDrawElements(GL_TRIANGLES, result_show_size * 24 - 2, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, result_show_size * 24, GL_UNSIGNED_SHORT, 0);
             GLCheckError(__FILE__, __LINE__);
         }
         // deck
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz > 0) {
             glBindVertexArray(deck_vao);
-            glDrawElements(GL_TRIANGLES, deck_sz * 24 - 2, GL_UNSIGNED_SHORT, 0);
+            glDrawElements(GL_TRIANGLES, deck_sz * 24, GL_UNSIGNED_SHORT, 0);
         }
         GLCheckError(__FILE__, __LINE__);
         glBindVertexArray(0);
@@ -361,7 +361,7 @@ namespace ygopro
                 update_status = 1;
                 unsigned int code = dcd->data->code;
                 auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-                MoveTo(dcd, 0.2f, ptr->pos + v2f{card_size.x / 2, -card_size.y / 2}, {0.0f, 0.0f});
+                MoveTo(dcd, 0.2f, (v2f)ptr->pos + v2f{card_size.x / 2, -card_size.y / 2}, {0.0f, 0.0f});
                 ptr->show_limit = false;
                 ptr->show_exclusive = false;
                 ptr->update_callback = [pos, index, code, this]() {
@@ -393,7 +393,7 @@ namespace ygopro
                 exdata->card_tex = ImageMgr::Get().GetCardTexture(data->code);
                 exdata->show_exclusive = show_exclusive;
                 auto mpos = SceneMgr::Get().GetMousePosition();
-                exdata->pos = {(float)mpos.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)mpos.y / scene_size.y * 2.0f};
+                exdata->pos = (v2f){(float)mpos.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)mpos.y / scene_size.y * 2.0f};
                 exdata->size = card_size;
                 exdata->hl = 0.0f;
                 ptr->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
@@ -668,32 +668,15 @@ namespace ygopro
                 continue;
             }
             auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-            bool up = ptr->update_pos;
-            if(ptr->update_pos) {
-                if(tm >= ptr->moving_time_e) {
-                    ptr->pos = ptr->dest_pos;
-                    ptr->size = ptr->dest_size;
-                    ptr->update_pos = false;
-                } else {
-                    float rate = (tm - ptr->moving_time_b) / (ptr->moving_time_e - ptr->moving_time_b);
-                    ptr->pos = ptr->start_pos + (ptr->dest_pos - ptr->start_pos) * (rate * 2.0f - rate * rate);
-                    ptr->size = ptr->start_size + (ptr->dest_size - ptr->start_size) * rate;
-                }
-            }
-            if(ptr->update_color) {
-                if(tm >= ptr->fading_time_e) {
-                    ptr->hl = ptr->dest_hl;
-                    ptr->update_color = false;
-                } else {
-                    float rate = (tm - ptr->fading_time_b) / (ptr->fading_time_e - ptr->fading_time_b);
-                    ptr->hl = ptr->start_hl + (ptr->dest_hl - ptr->start_hl) * rate;
-                }
-            }
+            bool up = ptr->pos.NeedUpdate();
+            ptr->pos.Update(tm);
+            ptr->size.Update(tm);
+            ptr->hl.Update(tm);
             if(up)
                 RefreshCardPos(dcd);
             else
                 RefreshHL(dcd);
-            if(!ptr->update_pos && !ptr->update_color) {
+            if(!ptr->pos.NeedUpdate() && !ptr->hl.NeedUpdate()) {
                 updating_cards.erase(cur);
                 if(ptr->update_callback != nullptr)
                     f = ptr->update_callback;
@@ -789,17 +772,19 @@ namespace ygopro
     void BuildScene::RefreshCardPos(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<glbase::v2ct, 16> verts;
-        glbase::FillVertex(&verts[0], ptr->pos, {ptr->size.x, -ptr->size.y}, ptr->card_tex);
-        unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
-        glbase::FillVertex(&verts[4], ptr->pos, {ptr->size.x, -ptr->size.y}, hmask, cl);
+        auto& pos = ptr->pos.Get();
+        auto& sz = ptr->size.Get();
+        glbase::FillVertex(&verts[0], ptr->pos, {sz.x, -sz.y}, ptr->card_tex);
+        unsigned int cl = (((unsigned int)((float)ptr->hl * 255) & 0xff) << 24) | 0xffffff;
+        glbase::FillVertex(&verts[4], ptr->pos, {sz.x, -sz.y}, hmask, cl);
         if(dcd->limit < 3) {
             auto& lti = limit[dcd->limit];
-            glbase::FillVertex(&verts[8], ptr->pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
+            glbase::FillVertex(&verts[8], pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
         }
         if((ptr->show_exclusive) && dcd->data->pool != 3) {
-            float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
+            float px = pos.x + sz.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            glbase::FillVertex(&verts[12], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
+            glbase::FillVertex(&verts[12], {px, pos.y - sz.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * ptr->buffer_index * 16, sizeof(glbase::v2ct) * 16, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
@@ -941,8 +926,9 @@ namespace ygopro
     void BuildScene::RefreshHL(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<glbase::v2ct, 4> verts;
-        unsigned int cl = (((unsigned int)(ptr->hl * 255) & 0xff) << 24) | 0xffffff;
-        glbase::FillVertex(&verts[0], ptr->pos, {ptr->size.x, -ptr->size.y}, hmask, cl);
+        unsigned int cl = (((unsigned int)(ptr->hl.Get() * 255) & 0xff) << 24) | 0xffffff;
+        auto& sz = ptr->size.Get();
+        glbase::FillVertex(&verts[0], ptr->pos.Get(), {sz.x, -sz.y}, hmask, cl);
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * (ptr->buffer_index * 16 + 4), sizeof(glbase::v2ct) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
@@ -952,7 +938,7 @@ namespace ygopro
         std::array<glbase::v2ct, 4> verts;
         if(dcd->limit < 3) {
             auto lti = limit[dcd->limit];
-            glbase::FillVertex(&verts[0], ptr->pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
+            glbase::FillVertex(&verts[0], ptr->pos.Get() + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * (ptr->buffer_index * 16 + 8), sizeof(glbase::v2ct) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
@@ -962,9 +948,11 @@ namespace ygopro
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<glbase::v2ct, 4> verts;
         if((ptr->show_exclusive) && dcd->data->pool != 3) {
-            float px = ptr->pos.x + ptr->size.x / 2.0f - icon_size.x * 0.75f;
+            auto& pos = ptr->pos.Get();
+            auto& sz = ptr->size.Get();
+            float px = pos.x + sz.x / 2.0f - icon_size.x * 0.75f;
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            glbase::FillVertex(&verts[0], {px, ptr->pos.y - ptr->size.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
+            glbase::FillVertex(&verts[0], {px, pos.y - sz.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * (ptr->buffer_index * 16 + 12), sizeof(glbase::v2ct) * 4, &verts[0]);
         GLCheckError(__FILE__, __LINE__);
@@ -972,23 +960,14 @@ namespace ygopro
     
     void BuildScene::MoveTo(std::shared_ptr<DeckCardData> dcd, float tm, v2f dst, v2f dsz) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        ptr->start_pos = ptr->pos;
-        ptr->start_size = ptr->size;
-        ptr->dest_pos = dst;
-        ptr->dest_size = dsz;
-        ptr->moving_time_b = SceneMgr::Get().GetGameTime();
-        ptr->moving_time_e = ptr->moving_time_b + tm;
-        ptr->update_pos = true;
+        ptr->pos.SetInterpolater(std::make_shared<glbase::MoveInterpolater<v2f>>(ptr->pos.Get(), dst, SceneMgr::Get().GetGameTime(), tm));
+        ptr->size.SetInterpolater(std::make_shared<glbase::LinearInterpolater<v2f>>(ptr->size.Get(), dsz, SceneMgr::Get().GetGameTime(), tm));
         updating_cards.insert(dcd);
     }
     
     void BuildScene::ChangeHL(std::shared_ptr<DeckCardData> dcd, float tm, float desthl) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        ptr->start_hl = ptr->hl;
-        ptr->dest_hl = desthl;
-        ptr->fading_time_b = SceneMgr::Get().GetGameTime();
-        ptr->fading_time_e = ptr->fading_time_b + tm;
-        ptr->update_color = true;
+        ptr->hl.SetInterpolater(std::make_shared<glbase::LinearInterpolater<float>>(ptr->hl.Get(), desthl, SceneMgr::Get().GetGameTime(), tm));
         updating_cards.insert(dcd);
     }
     

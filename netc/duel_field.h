@@ -6,71 +6,40 @@
 namespace ygopro
 {
     
-    class FieldBlock {
-    public:
-        virtual void RefreshVertices();
-        virtual void UpdateVertices();
-        virtual void FadeinColor(unsigned int cl, double tm);
-        virtual void FadeinHColor(unsigned int hcl, double tm);
+    struct FieldBlock {
+        void Init(unsigned int idx, rectf center, ti4 ti);
+        void RefreshVertices();
+        bool UpdateVertices(double tm);
         
-    protected:
         unsigned int vertex_index = 0;
-        v3f current_pos;
-        bool update_color = false;
-        unsigned int current_color = 0;
-        unsigned int start_color = 0;
-        unsigned int end_color = 0;
-        double color_time = 0.0;
-        bool update_hcolor = false;
-        unsigned int start_hcolor = 0;
-        unsigned int end_hcolor = 0;
-        double hcolor_time = 0.0;
+        glbase::Attribute<float> alpha;
+        glbase::Attribute<float> hl;
         std::vector<v3f> vertex;
-        std::vector<unsigned short> index;
+        ti4 field_tex;
     };
     
-    class FieldCard {
-    public:
-        virtual void RefreshVertices();
-        virtual void UpdateVertices();
-        virtual void MoveTo(v3i pos, double tm);
-        virtual void FadeinColor(unsigned int cl, double tm);
-        virtual void FadeinHColor(unsigned int hcl, double tm);
+    struct FieldCard {
+        void RefreshVertices();
+        bool UpdateVertices(double tm);
         
-    protected:
         unsigned int vertex_index = 0;
-        bool update_pos = false;
-        v3f current_pos;
-        v3f start_pos;
-        v3f end_pos;
-        double moving_time = 0.0;
-        bool update_vert = false;
-        glm::quat current_quat;
-        glm::quat start_quat;
-        glm::quat end_quat;
-        double rotating_time = 0.0;
-        bool update_color = false;
-        unsigned int current_color = 0;
-        unsigned int start_color = 0;
-        unsigned int end_color = 0;
-        double color_time = 0.0;
-        bool update_hcolor = false;
-        unsigned int start_hcolor = 0;
-        unsigned int end_hcolor = 0;
-        double hcolor_time = 0.0;
+        glbase::Attribute<v3f> pos;
+        glbase::Attribute<glm::quat> rot;
+        glbase::Attribute<float> alpha;
+        glbase::Attribute<float> hl;
         std::vector<v3f> vertex;
-        std::vector<unsigned short> index;
+        ti4 card_tex;
     };
     
-    class DuelField {
-    public:
-        void InitFieldBlock();
-        void InitFieldCard();
+    struct DuelField {
         void AddCard();
-        void MoveCard(int side, int zone, int seq, int toside, int tozone, int toseq);
+        void MoveCard(int side, int zone, int seq, int subs, int toside, int tozone, int toseq, int tosubs);
+        void Update();
+        void Draw();
+        void UpdateIndex();
         
-    protected:
-        std::vector<FieldBlock> field_blocks[2];
+        unsigned int card_count = 0;
+        std::array<FieldBlock, 17> field_blocks[2];
         std::vector<FieldCard> m_zone[2];
         std::vector<FieldCard> s_zone[2];
         std::vector<FieldCard> deck[2];

@@ -13,21 +13,9 @@ namespace ygopro
     struct BuilderCard : public DeckCardExtraData {
         unsigned int buffer_index = 0;
         ti4 card_tex;
-        double moving_time_b = 0.0;
-        double moving_time_e = 0.0;
-        double fading_time_b = 0.0;
-        double fading_time_e = 0.0;
-        v2f pos = {0.0f, 0.0f};
-        v2f size = {0.0f, 0.0f};
-        v2f start_pos = {0.0f, 0.0f};
-        v2f start_size = {0.0f, 0.0f};
-        v2f dest_pos = {0.0f, 0.0f};
-        v2f dest_size = {0.0f, 0.0f};
-        float hl = 0.0f;
-        float start_hl = 0.0f;
-        float dest_hl = 1.0f;
-        bool update_pos = false;
-        bool update_color = false;
+        glbase::Attribute<v2f> pos;
+        glbase::Attribute<v2f> size;
+        glbase::Attribute<float> hl;
         bool show_limit = true;
         bool show_exclusive = true;
         std::function<void()> update_callback;

@@ -49,6 +49,7 @@ namespace ygopro
     protected:
         v2i scene_size = {0, 0};
         unsigned int index_buffer = 0;
+        unsigned int card_index_buffer = 0;
         unsigned int field_buffer = 0;
         unsigned int back_buffer = 0;
         unsigned int card_buffer = 0;

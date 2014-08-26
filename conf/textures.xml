@@ -25,6 +25,15 @@
   <texture src="misc" name="mstar" x="350" y="210" w="16" h="16"/>
   <texture src="misc" name="numback" x="401" y="171" w="30" h="30"/>
   <texture src="misc" name="attack" x="435" y="0" w="72" h="128"/>
+  <texture src="misc" name="mzone" x="380" y="220" w="32" h="32"/>
+  <texture src="misc" name="szone" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="fdzone" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="pzonel" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="pzoner" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="mdeck" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="exdeck" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="grave" x="420" y="220" w="24" h="32"/>
+  <texture src="misc" name="banish" x="420" y="220" w="24" h="32"/>
   <points src="misc" name="main_t" x4="440" y4="156" x3="440" y3="130" x2="500" y2="156" x1="500" y1="130"/>
   <points src="misc" name="extra_t" x4="440" y4="186" x3="440" y3="160" x2="500" y2="186" x1="500" y1="160"/>
   <points src="misc" name="side_t" x4="440" y4="216" x3="440" y3="190" x2="500" y2="216" x1="500" y1="190"/>
