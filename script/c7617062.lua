@@ -27,10 +27,9 @@ function c7617062.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetCode(EFFECT_DIRECT_ATTACK)
-	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e4:SetCondition(c7617062.dircon)
+	e4:SetTarget(c7617062.dirtg)
 	c:RegisterEffect(e4)
 	--pos
 	local e5=Effect.CreateEffect(c)
@@ -39,6 +38,15 @@ function c7617062.initial_effect(c)
 	e5:SetCode(EVENT_BATTLE_DAMAGE)
 	e5:SetOperation(c7617062.operation)
 	c:RegisterEffect(e5)
+end
+function c7617062.bttg(e,c)
+	return c:IsFacedown()
+end
+function c7617062.btval(e,c)
+	return not c:IsImmuneToEffect(e)
+end
+function c7617062.dirtg(e,c)
+	return not Duel.IsExistingMatchingCard(Card.IsFaceup,c:GetControler(),0,LOCATION_MZONE,1,nil)
 end
 function c7617062.ftarget(e,c)
 	return not c:IsSetCard(0x8d)
@@ -57,14 +65,4 @@ function c7617062.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c7617062.posop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangePosition(e:GetHandler(),POS_FACEDOWN_DEFENCE)
-end
-function c7617062.bttg(e,c)
-	return c:IsFacedown()
-end
-function c7617062.btval(e,c)
-	return not c:IsImmuneToEffect(e)
-end
-function c7617062.dircon(e)
-	local tp=Duel.GetTurnPlayer()
-	return not Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
 end

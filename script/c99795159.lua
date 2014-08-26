@@ -19,10 +19,9 @@ function c99795159.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetCode(EFFECT_DIRECT_ATTACK)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetCondition(c99795159.dircon)
+	e3:SetTarget(c99795159.dirtg)
 	c:RegisterEffect(e3)
 	--
 	local e4=Effect.CreateEffect(c)
@@ -34,18 +33,17 @@ function c99795159.initial_effect(c)
 	e4:SetValue(c99795159.val)
 	c:RegisterEffect(e4)
 end
-function c99795159.val(e,re,dam,r,rp,rc)
-	if bit.band(r,REASON_EFFECT)~=0 or (rc and not rc:IsSetCard(0x8d)) then
-		return dam/2
-	else return dam end
-end
 function c99795159.bttg(e,c)
 	return c:IsFacedown()
 end
 function c99795159.btval(e,c)
 	return not c:IsImmuneToEffect(e)
 end
-function c99795159.dircon(e)
-	local tp=Duel.GetTurnPlayer()
-	return not Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
+function c99795159.dirtg(e,c)
+	return not Duel.IsExistingMatchingCard(Card.IsFaceup,c:GetControler(),0,LOCATION_MZONE,1,nil)
+end
+function c99795159.val(e,re,dam,r,rp,rc)
+	if bit.band(r,REASON_EFFECT)~=0 or (rc and not rc:IsSetCard(0x8d)) then
+		return dam/2
+	else return dam end
 end
