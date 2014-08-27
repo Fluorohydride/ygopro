@@ -31,6 +31,8 @@
 #include "random.h"
 #include "command.h"
 #include "hash.h"
+#include "timer.h"
+#include "animator.h"
 
 #ifdef _WIN32
 

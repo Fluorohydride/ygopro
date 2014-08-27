@@ -12,8 +12,8 @@ namespace ygopro
         bool UpdateVertices(double tm);
         
         unsigned int vertex_index = 0;
-        glbase::Attribute<float> alpha;
-        glbase::Attribute<float> hl;
+        MutableAttribute<float> alpha;
+        MutableAttribute<float> hl;
         std::vector<v3f> vertex;
         ti4 field_tex;
     };
@@ -23,10 +23,10 @@ namespace ygopro
         bool UpdateVertices(double tm);
         
         unsigned int vertex_index = 0;
-        glbase::Attribute<v3f> pos;
-        glbase::Attribute<glm::quat> rot;
-        glbase::Attribute<float> alpha;
-        glbase::Attribute<float> hl;
+        MutableAttribute<v3f> pos;
+        MutableAttribute<glm::quat> rot;
+        MutableAttribute<float> alpha;
+        MutableAttribute<float> hl;
         std::vector<v3f> vertex;
         ti4 card_tex;
     };

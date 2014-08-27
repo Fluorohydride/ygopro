@@ -11,14 +11,13 @@ namespace ygopro
     struct FilterCondition;
     
     struct BuilderCard : public DeckCardExtraData {
+        MutableAttribute<v2f> pos;
+        MutableAttribute<v2f> size;
+        MutableAttribute<float> hl;
         unsigned int buffer_index = 0;
         ti4 card_tex;
-        glbase::Attribute<v2f> pos;
-        glbase::Attribute<v2f> size;
-        glbase::Attribute<float> hl;
         bool show_limit = true;
         bool show_exclusive = true;
-        std::function<void()> update_callback;
     };
     
     class BuildScene : public Scene {
@@ -81,7 +80,7 @@ namespace ygopro
         
         
         std::shared_ptr<DeckCardData> GetCard(int pos, int index);
-        std::tuple<int, int, int> GetHoverCard(float x, float y);
+        std::pair<int, int> GetHoverCard(float x, float y);
         
     protected:
         unsigned int index_buffer = 0;
@@ -94,12 +93,12 @@ namespace ygopro
         unsigned int misc_vao = 0;
         unsigned int result_vao = 0;
         bool update_bg = true;
-        bool update_card = true;
         bool update_misc = true;
         bool update_result = true;
         int update_status = 0;
-        std::tuple<int, int, int> prev_hov;
-        std::tuple<int, int, int> prev_click;
+        std::pair<int, int> prev_hov;
+        std::pair<int, int> prev_click;
+        std::weak_ptr<DeckCardData> prev_hov_card;
         std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;
@@ -133,6 +132,7 @@ namespace ygopro
         int result_show_size = 0;
         std::weak_ptr<sgui::SGLabel> label_result;
         std::weak_ptr<sgui::SGLabel> label_page;
+        Timer<double> build_timer;
     };
     
 }
