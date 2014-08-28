@@ -62,12 +62,13 @@ namespace ygopro
                         cti.ti = misc_textures["unknown"];
                         cti.ref_block = 0xffff;
                     }
-                    delete imgbuf;
+                    delete[] imgbuf;
                 }
 			}
             return cti.ti;;
 		}
-        ref_count[iter->second.ref_block]++;
+		if(iter->second.ref_block < 280)
+			ref_count[iter->second.ref_block]++;
 		return iter->second.ti;
 	}
     
@@ -95,7 +96,7 @@ namespace ygopro
                 pre_ret = &card_image;
             } else
                 pre_ret = nullptr;
-            delete imgbuf;
+            delete[] imgbuf;
         } else
             pre_ret = nullptr;
         return pre_ret;

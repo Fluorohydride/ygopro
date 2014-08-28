@@ -4,14 +4,14 @@
 template<typename T>
 class Animator {
 public:
-    inline virtual T GetCurrent(double cur_time) = 0;
-    inline virtual bool IsEnd(double cur_time) = 0;
+	virtual T GetCurrent(double cur_time) = 0;
+	virtual bool IsEnd(double cur_time) = 0;
 };
 
 class TGen {
 public:
-    inline virtual bool IsGenEnd(double cur_time) = 0;
-    inline virtual float GetT(double cur_time) = 0;
+	virtual bool IsGenEnd(double cur_time) = 0;
+	virtual float GetT(double cur_time) = 0;
 };
 
 class TGenLinear : public TGen {

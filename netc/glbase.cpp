@@ -198,7 +198,7 @@ namespace glbase {
     
     Image::~Image() {
         if(buffer != nullptr)
-            delete buffer;
+            delete[] buffer;
     }
     
     bool Image::LoadFile(const std::string &file) {
@@ -208,7 +208,7 @@ namespace glbase {
             return false;
         }
         if(buffer != nullptr)
-            delete buffer;
+            delete[] buffer;
         buffer = new unsigned char[width * height * 4];
         memcpy(buffer, data, width * height * 4);
         stbi_image_free(data);
@@ -222,7 +222,7 @@ namespace glbase {
             return false;
         }
         if(buffer != nullptr)
-            delete buffer;
+            delete[] buffer;
         buffer = new unsigned char[width * height * 4];
         memcpy(buffer, data, width * height * 4);
         stbi_image_free(data);
@@ -246,7 +246,7 @@ namespace glbase {
             for(int h = 0; h < y; ++h)
                 memcpy(&px[tex_width * 4 * h], &data[x * 4 * h], x * 4);
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, px);
-            delete px;
+            delete[] px;
         } else
             glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, tex_width, tex_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -330,7 +330,7 @@ namespace glbase {
         char_tex.Update((const unsigned char*)px, tex_posx, tex_posy, gl.bounds.width, gl.bounds.height);
         tex_posx += gl.bounds.width;
         gl.loaded = true;
-        delete px;
+        delete[] px;
         return gl;
     }
 }

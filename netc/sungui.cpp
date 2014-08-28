@@ -459,11 +459,11 @@ namespace sgui
         }
         if(img_dirty) {
             glBindBuffer(GL_ARRAY_BUFFER, imgbo);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * vert.size() + texcoords.size(), &vert[0], GL_DYNAMIC_DRAW);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * vert.size() * texcoords.size(), &vert[0], GL_DYNAMIC_DRAW);
             img_dirty = false;
         } else {
             glBindBuffer(GL_ARRAY_BUFFER, imgbo);
-            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * vert.size() + texcoords.size(), &vert[0]);
+            glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * vert.size() * texcoords.size(), &vert[0]);
         }
     }
     
@@ -473,12 +473,12 @@ namespace sgui
         UpdateImage();
         if(verts.size() == 0)
             return;
-        long voffset = 0;
+        int frame = 0;
         if(texcoords.size() > 1)
-            voffset = ((int)(guiRoot.GetTime() / frame_time) % texcoords.size() * verts.size()) * sizeof(glbase::v2ct);
+            frame = (int)(guiRoot.GetTime() / frame_time) % texcoords.size() * verts.size();
         guiRoot.BindTexture(img_texture);
         glBindVertexArray(imgao);
-        glDrawElements(GL_TRIANGLE_STRIP, verts.size() / 4 * 6 - 2, GL_UNSIGNED_SHORT, 0);
+        glDrawElements(GL_TRIANGLE_STRIP, verts.size() / 4 * 6 - 2, GL_UNSIGNED_SHORT, (void*)(verts.size() / 4 * 6 * frame));
         glBindVertexArray(0);
     }
     
