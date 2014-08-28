@@ -15,7 +15,6 @@ static float yrate = 0.0f;
 static bool need_draw = true;
 
 int main(int argc, char* argv[]) {
-    return 0;
     if(!glfwInit())
         return 0;
     if(!commonCfg.LoadConfig(L"common.xml"))
