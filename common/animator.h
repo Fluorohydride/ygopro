@@ -8,33 +8,22 @@ public:
     inline virtual bool IsEnd(double cur_time) = 0;
 };
 
-template<typename T>
-class InterpolaterAnimator : public Animator<T> {
+class TGen {
 public:
-    InterpolaterAnimator(T sv, T ev) : start_val(sv), end_val(ev) {}
-    inline virtual float GetRate(double cur_time) = 0;
-    virtual T GetCurrent(double cur_time) {
-        if(this->IsEnd(cur_time))
-            return this->end_val;
-        float rate = this->GetRate(cur_time);
-        return this->start_val + (this->end_val - this->start_val) * rate;
-    }
-protected:
-    T start_val;
-    T end_val;
+    inline virtual bool IsGenEnd(double cur_time) = 0;
+    inline virtual float GetT(double cur_time) = 0;
 };
 
-template<typename T>
-class LinearInterpolater : public InterpolaterAnimator<T> {
+class TGenLinear : public TGen {
 public:
-    LinearInterpolater(T sv, T ev, double stm, double tm) : InterpolaterAnimator<T>(sv, ev) {
+    TGenLinear(double stm, double tm) {
         start_time = stm;
         end_time = stm + tm;
     }
-    inline virtual bool IsEnd(double cur_time) {
+    inline virtual bool IsGenEnd(double cur_time) {
         return cur_time >= end_time;
     }
-    inline virtual float GetRate(double cur_time) {
+    inline virtual float GetT(double cur_time) {
         if(cur_time >= end_time)
             return 1.0f;
         return (cur_time - start_time) / (end_time - start_time);
@@ -44,44 +33,104 @@ protected:
     double end_time;
 };
 
-template<typename T>
-class MoveInterpolater : public InterpolaterAnimator<T> {
+class TGenMove  : public TGen {
 public:
-    MoveInterpolater(T sv, T ev, double stm, double tm) : InterpolaterAnimator<T>(sv, ev) {
+    TGenMove(double stm, double tm, double k) {
         start_time = stm;
         end_time = stm + tm;
+        k_coff = k;
+        v0 = k / (1.0 - pow(2.718281828, -k * tm));
     }
-    inline virtual bool IsEnd(double cur_time) {
+    inline virtual bool IsGenEnd(double cur_time) {
         return cur_time >= end_time;
     }
-    inline virtual float GetRate(double cur_time) {
+    inline virtual float GetT(double cur_time) {
         if(cur_time >= end_time)
             return 1.0f;
-        float rate = (cur_time - start_time) / (end_time - start_time);
-        return rate * 2.0 - rate * rate;
+        double tm = (cur_time - start_time);
+        return v0 / k_coff * (1.0 - pow(2.718281828, -k_coff * tm));
     }
 protected:
     double start_time;
     double end_time;
+    double k_coff;
+    double v0;
 };
 
-template<typename T>
-class PeriodicInterpolater : public InterpolaterAnimator<T> {
+class TGenPeriodic : public TGen {
 public:
-    PeriodicInterpolater(T sv, T ev, double stm, double freq) : InterpolaterAnimator<T>(sv, ev) {
+    TGenPeriodic(double stm, double freq) {
         start_time = stm;
         freq_tm = freq;
     }
-    inline virtual bool IsEnd(double cur_time) {
+    inline virtual bool IsGenEnd(double cur_time) {
         return false;
     }
-    inline virtual float GetRate(double cur_time) {
-        float period = (cur_time - this->start_time) / freq_tm;
+    inline virtual float GetT(double cur_time) {
+        float period = (cur_time - start_time) / freq_tm;
         return period - (int)period;
     }
-    
+protected:
     double start_time;
     double freq_tm;
+};
+
+class TGenPeriodicRet : public TGen {
+public:
+    TGenPeriodicRet(double stm, double freq) {
+        start_time = stm;
+        freq_tm = freq;
+    }
+    inline virtual bool IsGenEnd(double cur_time) {
+        return false;
+    }
+    inline virtual float GetT(double cur_time) {
+        float period = (cur_time - start_time) / freq_tm;
+        period = period - (int)period;
+        if(period <= 0.5f)
+            return period * 2.0f;
+        else
+            return 2.0f - period * 2.0f;
+    }
+    
+protected:
+    double start_time;
+    double freq_tm;
+};
+
+class TGenHarmonic : public TGen {
+public:
+    TGenHarmonic(double stm, double freq) {
+        start_time = stm;
+        freq_tm = freq;
+    }
+    inline virtual bool IsGenEnd(double cur_time) {
+        return false;
+    }
+    inline virtual float GetT(double cur_time) {
+        float period = (cur_time - start_time) / freq_tm;
+        return sinf(period * 3.1415926 * 2.0 - 3.1415926 * 0.5) * 0.5f + 0.5f;
+    }
+protected:
+    double start_time;
+    double freq_tm;
+};
+
+template<typename T, typename TGENTYPE>
+class LerpAnimator : public Animator<T>, public TGENTYPE {
+public:
+    template<typename... ARGS>
+    LerpAnimator(T sv, T ev, ARGS... args) : TGENTYPE(args...), start_val(sv), end_val(ev) {}
+    virtual bool IsEnd(double cur_time) {
+        return this->IsGenEnd(cur_time);
+    }
+    virtual T GetCurrent(double cur_time) {
+        float t = this->GetT(cur_time);
+        return this->start_val + (this->end_val - this->start_val) * t;
+    }
+protected:
+    T start_val;
+    T end_val;
 };
 
 template<typename T>

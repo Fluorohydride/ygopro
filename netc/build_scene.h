@@ -18,6 +18,7 @@ namespace ygopro
         ti4 card_tex;
         bool show_limit = true;
         bool show_exclusive = true;
+        bool updateing = false;
     };
     
     class BuildScene : public Scene {
@@ -66,8 +67,6 @@ namespace ygopro
         void RefreshHL(std::shared_ptr<DeckCardData> dcd);
         void RefreshLimit(std::shared_ptr<DeckCardData> dcd);
         void RefreshEx(std::shared_ptr<DeckCardData> dcd);
-        void MoveTo(std::shared_ptr<DeckCardData> dcd, float tm, v2f dst, v2f dsz);
-        void ChangeHL(std::shared_ptr<DeckCardData> dcd, float tm, float desthl);
         void ChangeExclusive(bool check);
         void ChangeRegulation(int index);
         void ViewRegulation(int limit);
@@ -120,7 +119,7 @@ namespace ygopro
         std::array<ti4, 3> limit;
         std::array<ti4, 3> pool;
         ti4 hmask;
-        std::unordered_set<std::shared_ptr<DeckCardData>> updating_cards;
+        std::list<std::weak_ptr<DeckCardData>> updating_cards;
         std::weak_ptr<sgui::SGIconLabel> deck_label;
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
