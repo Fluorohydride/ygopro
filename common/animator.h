@@ -121,10 +121,10 @@ class LerpAnimator : public Animator<T>, public TGENTYPE {
 public:
     template<typename... ARGS>
     LerpAnimator(T sv, T ev, ARGS... args) : TGENTYPE(args...), start_val(sv), end_val(ev) {}
-    virtual bool IsEnd(double cur_time) {
+    inline virtual bool IsEnd(double cur_time) {
         return this->IsGenEnd(cur_time);
     }
-    virtual T GetCurrent(double cur_time) {
+    inline virtual T GetCurrent(double cur_time) {
         float t = this->GetT(cur_time);
         return this->start_val + (this->end_val - this->start_val) * t;
     }

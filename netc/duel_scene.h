@@ -3,6 +3,7 @@
 
 #include "../common/tcpclient.h"
 
+#include "glbase.h"
 #include "scene_mgr.h"
 
 namespace ygopro
@@ -42,9 +43,12 @@ namespace ygopro
         virtual void OnDisconnected();
         virtual void HandlePacket(unsigned short proto, unsigned char data[], unsigned int size);
         
+        void UpdateParams();
         void UpdateBackground();
         void UpdateField();
         void UpdateMisc();
+        
+        std::pair<int, int> GetHoverPos(int posx, int posy);
         
     protected:
         v2i scene_size = {0, 0};
@@ -57,18 +61,24 @@ namespace ygopro
         unsigned int field_vao = 0;
         unsigned int back_vao = 0;
         unsigned int card_vao = 0;
-        unsigned int misc_vao = 0;
+        unsigned int misc_vao = 0;        
         bool update_bg = true;
+        bool update_param = true;
         bool update_field = true;
         bool update_misc = true;
-        double waiting_time = 0.0;
         CommandList<DuelCommand> duel_commands;
-        std::function<void()> current_cb;
         glbase::Shader duel_shader;
+        std::pair<int, int> hover_pos;
+        std::pair<int, int> click_pos;
+        float fovy = 3.1415926f * 0.25f;
+        float near = 0.1f;
+        float far = 100.0f;
         float angle = 3.1415926f * 0.25f;
-        float r = 6.5f;
+        float r = 7.0f;
         float xoffset = 0.0f;
         float yoffset = 0.0f;
+        glm::mat4 mvp;
+        glm::quat hand_quat;
         bool btnDown[2] = {false};
         v2i btnPos[2];
     };

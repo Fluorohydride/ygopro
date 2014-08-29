@@ -79,7 +79,7 @@ namespace ygopro
         
         
         std::shared_ptr<DeckCardData> GetCard(int pos, int index);
-        std::pair<int, int> GetHoverCard(float x, float y);
+        std::pair<int, int> GetHoverPos(int posx, int posy);
         
     protected:
         unsigned int index_buffer = 0;
@@ -95,9 +95,9 @@ namespace ygopro
         bool update_misc = true;
         bool update_result = true;
         int update_status = 0;
-        std::pair<int, int> prev_hov;
-        std::pair<int, int> prev_click;
-        std::weak_ptr<DeckCardData> prev_hov_card;
+        std::pair<int, int> hover_pos;
+        std::pair<int, int> click_pos;
+        std::weak_ptr<DeckCardData> hover_obj;
         std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;

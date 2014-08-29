@@ -12,20 +12,30 @@ public:
         cmd_queue.push_back(cmd);
     }
     
+    virtual void InsertCommand(std::shared_ptr<T> cmd) {
+        sub_queue.push_back(cmd);
+    }
+    
     virtual std::shared_ptr<T> PullCommand() {
-        if(cmd_queue.empty())
+        if(cmd_queue.empty() && sub_queue.empty())
             return nullptr;
-        auto cmd = cmd_queue.front();
-        cmd_queue.pop_front();
-        return cmd;
+        if(!sub_queue.empty())
+            cmd_queue.splice(cmd_queue.begin(), sub_queue, sub_queue.begin(), sub_queue.end());
+        return cmd_queue.front();
+    }
+    
+    virtual void PopCommand() {
+        if(!cmd_queue.empty())
+            cmd_queue.pop_front();
     }
     
     virtual bool IsEmpty() {
-        return cmd_queue.empty();
+        return cmd_queue.empty() && sub_queue.empty();
     }
     
 protected:
     std::list<std::shared_ptr<T>> cmd_queue;
+    std::list<std::shared_ptr<T>> sub_queue;
 };
 
 
@@ -37,33 +47,37 @@ public:
     }
     
     virtual void PushCommand(std::shared_ptr<T> cmd) {
-        cmd_mutex.lock();
+        std::lock_guard<std::mutex> lck(cmd_mutex);
         cmd_queue.push_back(cmd);
-        cmd_mutex.unlock();
+    }
+    
+    virtual void InsertCommand(std::shared_ptr<T> cmd) {
+        std::lock_guard<std::mutex> lck(cmd_mutex);
+        sub_queue.push_back(cmd);
     }
     
     virtual std::shared_ptr<T> PullCommand() {
-        cmd_mutex.lock();
-        if(cmd_queue.empty()) {
-            cmd_mutex.unlock();
+        std::lock_guard<std::mutex> lck(cmd_mutex);
+        if(cmd_queue.empty() && sub_queue.empty())
             return nullptr;
-        }
-        auto cmd = cmd_queue.front();
-        cmd_queue.pop_front();
-        cmd_mutex.unlock();
-        return cmd;
+        return cmd_queue.front();
+    }
+    
+    virtual void PopCommand() {
+        std::lock_guard<std::mutex> lck(cmd_mutex);
+        if(!cmd_queue.empty())
+            cmd_queue.pop_front();
     }
     
     virtual bool IsEmpty() {
-        cmd_mutex.lock();
-        bool ret = cmd_queue.empty();
-        cmd_mutex.unlock();
-        return ret;
+        std::lock_guard<std::mutex> lck(cmd_mutex);
+        return cmd_queue.empty() && sub_queue.empty();
     }
     
 protected:
     std::mutex cmd_mutex;
     std::list<std::shared_ptr<T>> cmd_queue;
+    std::list<std::shared_ptr<T>> sub_queue;
 };
 
 #endif

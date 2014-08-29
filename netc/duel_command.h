@@ -5,9 +5,9 @@ namespace ygopro
 {
     
     struct DuelCommand {
-        virtual void Handle() = 0;
+        virtual bool Handle() = 0;
         double wait_time = 0.0;
-        std::function<void ()> cb;
+        std::function<bool ()> cb;
     };
     
 }

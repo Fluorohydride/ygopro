@@ -127,19 +127,15 @@ namespace ygopro
     
     bool DuelScene::Update() {
         //PullEvent();
-        double now = SceneMgr::Get().GetGameTime();
-        while(now >= waiting_time) {
-            if(current_cb != nullptr) {
-                current_cb();
-                current_cb = nullptr;
-            }
-            std::shared_ptr<DuelCommand> cmd = duel_commands.PullCommand();
+        do {
+            auto cmd = duel_commands.PullCommand();
             if(cmd == nullptr)
                 break;
-            cmd->Handle();
-            waiting_time = now + cmd->wait_time;
-            current_cb = cmd->cb;
-        }
+            if(!cmd->Handle())
+                break;
+            duel_commands.PopCommand();
+        } while (duel_commands.IsEmpty());
+        UpdateParams();
         UpdateBackground();
         UpdateField();
         return true;
@@ -156,12 +152,6 @@ namespace ygopro
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // field
-        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -r * cosf(angle), r * sinf(angle)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-        glm::mat4 projection = glm::perspective(45.0f, 1.0f * scene_size.x / scene_size.y, 0.1f, 100.0f);
-        glm::mat4 trscreen;
-        trscreen[3][0] = xoffset;
-        trscreen[3][1] = yoffset;
-        glm::mat4 mvp = trscreen * projection * view;
         duel_shader.SetParamMat4("mvp", glm::value_ptr(mvp));
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(field_vao);
@@ -173,6 +163,7 @@ namespace ygopro
     
     void DuelScene::SetSceneSize(v2i sz) {
         scene_size = sz;
+        update_param = true;
     }
     
     recti DuelScene::GetScreenshotClip() {
@@ -186,6 +177,7 @@ namespace ygopro
             xoffset += ratex;
             yoffset -= ratey;
             btnPos[0] = {evt.x, evt.y};
+            update_param = true;
         }
         if(btnDown[1]) {
             float rate = (float)(evt.y - btnPos[1].y) / scene_size.y;
@@ -195,7 +187,9 @@ namespace ygopro
             if(angle > 3.1415926f * 0.5f)
                 angle = 3.1415926f * 0.5f;
             btnPos[1] = {evt.x, evt.y};
+            update_param = true;
         }
+        GetHoverPos(evt.x, evt.y);
     }
     
     void DuelScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
@@ -217,6 +211,7 @@ namespace ygopro
             r = 1.0f;
         if(r > 50.0f)
             r = 50.0f;
+        update_param = true;
     }
     
     void DuelScene::KeyDown(sgui::KeyEvent evt) {
@@ -225,6 +220,18 @@ namespace ygopro
     
     void DuelScene::KeyUp(sgui::KeyEvent evt) {
         
+    }
+    
+    void DuelScene::UpdateParams() {
+        if(!update_param)
+            return;
+        update_param = false;
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -r * cosf(angle), r * sinf(angle)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 projection = glm::perspective(fovy, 1.0f * scene_size.x / scene_size.y, near, far);
+        glm::mat4 trscreen;
+        trscreen[3][0] = xoffset;
+        trscreen[3][1] = yoffset;
+        mvp = trscreen * projection * view;
     }
     
     void DuelScene::UpdateBackground() {
@@ -292,4 +299,13 @@ namespace ygopro
             update_misc = true;
     }
     
+    std::pair<int, int> DuelScene::GetHoverPos(int posx, int posy) {
+        float x = (float)posx / scene_size.x * 2.0f - 1.0f - xoffset;
+        float y = 1.0f - (float)posy / scene_size.y * 2.0f - yoffset;
+        float scry = 2.0f * tan(fovy * 0.5f) * near;
+        float k = tanf(3.1415926f - angle + atanf(scry * y / near));
+        float py = -r * cosf(angle) - r * sinf(angle) / k;
+        std::cout << "y axis: " << py << std::endl;
+        return std::make_pair(0, 0);
+    }
 }

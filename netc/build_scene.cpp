@@ -92,8 +92,8 @@ namespace ygopro
     
     void BuildScene::Activate() {
         view_regulation = 0;
-        prev_hov = std::make_pair(0, 0);
-        prev_click = std::make_pair(0, 0);
+        hover_pos = std::make_pair(0, 0);
+        click_pos = std::make_pair(0, 0);
         search_result.clear();
         result_page = 0;
         current_deck.Clear();
@@ -279,24 +279,17 @@ namespace ygopro
     
     void BuildScene::MouseMove(sgui::MouseMoveEvent evt) {
         std::shared_ptr<DeckCardData> dcd = nullptr;
-        auto pre = prev_hov_card.lock();
-        if(evt.x >= (int)(scene_size.x * 0.795f) && evt.x <= scene_size.x - 10 && evt.y >= 110 && evt.y <= scene_size.y - 10) {
-            int new_sel = (int)((evt.y - 110.0f) / ((scene_size.y - 120.0f) / 5.0f)) * 2;
-            if(new_sel > 8)
-                new_sel = 8;
-            new_sel += (evt.x >= ((int)(scene_size.x * 0.795f) + scene_size.x - 10) / 2) ? 1 : 0;
-            if(new_sel != current_sel_result) {
-                current_sel_result = new_sel;
+        auto pre = hover_obj.lock();
+        auto hov = GetHoverPos(evt.x, evt.y);
+        if(hov.first == 4) {
+            if(hov.second != current_sel_result) {
+                current_sel_result = hov.second;
                 update_result = true;
             }
-            if(show_info && (size_t)(result_page * 10 + new_sel) < search_result.size())
-                ShowCardInfo(search_result[result_page * 10 + new_sel]->code);
-            prev_hov.first = 4;
-            prev_hov.second = new_sel;
+            if(show_info && (size_t)(result_page * 10 + current_sel_result) < search_result.size())
+                ShowCardInfo(search_result[result_page * 10 + current_sel_result]->code);
         } else {
-            auto hov = GetHoverCard((float)evt.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)evt.y / scene_size.y * 2.0f);
             dcd = GetCard(hov.first, hov.second);
-            prev_hov = hov;
             if(current_sel_result >= 0) {
                 current_sel_result = -1;
                 update_result = true;
@@ -318,11 +311,12 @@ namespace ygopro
                 }
             }
         }
-        prev_hov_card = dcd;
+        hover_pos = hov;
+        hover_obj = dcd;
     }
     
     void BuildScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
-        prev_click = prev_hov;
+        click_pos = hover_pos;
         if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             show_info_begin = true;
             show_info_time = SceneMgr::Get().GetGameTime();
@@ -332,12 +326,12 @@ namespace ygopro
     void BuildScene::MouseButtonUp(sgui::MouseButtonEvent evt) {
         if(evt.button == GLFW_MOUSE_BUTTON_LEFT)
             show_info_begin = false;
-        if(prev_hov != prev_click)
+        if(hover_pos != click_pos)
             return;
-        prev_click.first = 0;
-        int pos = prev_hov.first;
+        click_pos.first = 0;
+        int pos = hover_pos.first;
         if(pos > 0 && pos < 4) {
-            int index = prev_hov.second;
+            int index = hover_pos.second;
             if(index < 0)
                 return;
             auto dcd = GetCard(pos, index);
@@ -400,7 +394,7 @@ namespace ygopro
                 }, 0.2, 0, false);
             }
         } else if(pos == 4) {
-            int index = prev_hov.second;
+            int index = hover_pos.second;
             if((size_t)(result_page * 10 + index) >= search_result.size())
                 return;
             auto data = search_result[result_page * 10 + index];
@@ -921,14 +915,14 @@ namespace ygopro
             if(now - show_info_time >= 0.5) {
                 show_info = true;
                 show_info_begin = false;
-                prev_click.first = 0;
-                auto pos = prev_hov.first;
+                click_pos.first = 0;
+                auto pos = hover_pos.first;
                 if(pos > 0 && pos < 4) {
-                    auto dcd = GetCard(pos, prev_hov.second);
+                    auto dcd = GetCard(pos, hover_pos.second);
                     if(dcd != nullptr)
                         ShowCardInfo(dcd->data->code);
                 } else if(pos == 4) {
-                    auto index = prev_hov.second;
+                    auto index = hover_pos.second;
                     if((size_t)(result_page * 10 + index) < search_result.size())
                         ShowCardInfo(search_result[result_page * 10 + index]->code);
                 }
@@ -1156,7 +1150,16 @@ namespace ygopro
         return nullptr;
     }
     
-    std::pair<int, int> BuildScene::GetHoverCard(float x, float y) {
+    std::pair<int, int> BuildScene::GetHoverPos(int posx, int posy) {
+        if(posx >= (int)(scene_size.x * 0.795f) && posx <= scene_size.x - 10 && posy >= 110 && posy <= scene_size.y - 10) {
+            int sel = (int)((posy - 110.0f) / ((scene_size.y - 120.0f) / 5.0f)) * 2;
+            if(sel > 8)
+                sel = 8;
+            sel += (posx >= ((int)(scene_size.x * 0.795f) + scene_size.x - 10) / 2) ? 1 : 0;
+            return std::make_pair(4, sel);
+        }
+        float x = (float)posx / scene_size.x * 2.0f - 1.0f;
+        float y = 1.0f - (float)posy / scene_size.y * 2.0f;
         if(x >= minx && x <= maxx) {
             if(y <= offsety[0] && y >= offsety[0] - main_y_spacing * 4) {
                 unsigned int row = (unsigned int)((offsety[0] - y) / main_y_spacing);
