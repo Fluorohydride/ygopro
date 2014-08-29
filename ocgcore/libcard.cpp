@@ -146,7 +146,7 @@ int32 scriptlib::card_get_origin_attribute(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(pcard->current.location != LOCATION_MZONE && pcard->data.type & (TYPE_SPELL + TYPE_TRAP))
+	if(pcard->single_effect.count(0x14d72c34)>0 || (pcard->current.location != LOCATION_MZONE && pcard->data.type & (TYPE_SPELL + TYPE_TRAP)))
 		lua_pushinteger(L, 0);
 	else
 		lua_pushinteger(L, pcard->data.attribute);
@@ -163,7 +163,7 @@ int32 scriptlib::card_get_origin_race(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(pcard->current.location != LOCATION_MZONE && pcard->data.type & (TYPE_SPELL + TYPE_TRAP))
+	if(pcard->single_effect.count(0x14d72c34)>0 || (pcard->current.location != LOCATION_MZONE && pcard->data.type & (TYPE_SPELL + TYPE_TRAP)))
 		lua_pushinteger(L, 0);
 	else
 		lua_pushinteger(L, pcard->data.race);
