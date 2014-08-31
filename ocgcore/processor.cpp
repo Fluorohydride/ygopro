@@ -1353,7 +1353,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.continuous_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if(!peffect->is_activateable(check_player, nil_event))
+			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
@@ -1394,7 +1394,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			fc_count++;
 		}
 		if(core.select_chains.size() == 0) {
-			core.units.begin()->step = 9;
+			returns.ivalue[0] = -1;
+			core.units.begin()->step = 1;
 			return FALSE;
 		} else if(tf_count == 1 && to_count == 0 && fc_count == 0 && cn_count == 0) {
 			returns.ivalue[0] = 0;
@@ -1428,9 +1429,18 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	case 2: {
 		chain newchain;
 		if(returns.ivalue[0] == -1) {
-			core.units.begin()->step = 9;
+			if(core.units.begin()->arg2 == 1)
+				core.units.begin()->step = 19;
+			else {
+				if(core.units.begin()->arg2 == 0)
+					core.units.begin()->arg2 = 1;
+				else
+					core.units.begin()->arg2 = 0;
+				core.units.begin()->step = 9;
+			}
 			return FALSE;
 		}
+		core.units.begin()->arg2 = 2;
 		newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
 		if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
@@ -1442,7 +1452,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			newchain.triggering_sequence = peffect->handler->current.sequence;
 			newchain.triggering_player = infos.turn_player;
 			core.new_chains.push_back(newchain);
-			newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->handler->set_status(STATUS_CHAINING, TRUE);
 			peffect->dec_count(infos.turn_player);
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
@@ -1511,7 +1521,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		pr = effects.continuous_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
-			if(!peffect->is_activateable(check_player, nil_event))
+			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
 			newchain.triggering_effect = peffect;
@@ -1554,7 +1564,8 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			fc_count++;
 		}
 		if(core.select_chains.size() == 0) {
-			core.units.begin()->step = 19;
+			returns.ivalue[0] = -1;
+			core.units.begin()->step = 11;
 			return FALSE;
 		} else if(tf_count == 1 && to_count == 0 && fc_count == 0 && cn_count == 0) {
 			returns.ivalue[0] = 0;
@@ -1588,9 +1599,18 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	case 12: {
 		chain newchain;
 		if(returns.ivalue[0] == -1) {
-			core.units.begin()->step = 19;
+			if(core.units.begin()->arg2 == 1)
+				core.units.begin()->step = 19;
+			else {
+				if(core.units.begin()->arg2 == 0)
+					core.units.begin()->arg2 = 1;
+				else
+					core.units.begin()->arg2 = 0;
+				core.units.begin()->step = -1;
+			}
 			return FALSE;
 		}
+		core.units.begin()->arg2 = 2;
 		newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
 		if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
@@ -1602,7 +1622,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			newchain.triggering_sequence = peffect->handler->current.sequence;
 			newchain.triggering_player = 1 - infos.turn_player;
 			core.new_chains.push_back(newchain);
-			newchain.triggering_effect->handler->set_status(STATUS_CHAINING, TRUE);
+			peffect->handler->set_status(STATUS_CHAINING, TRUE);
 			peffect->dec_count(1 - infos.turn_player);
 			core.select_chains.clear();
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
