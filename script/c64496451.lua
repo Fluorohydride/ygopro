@@ -160,7 +160,6 @@ function c64496451.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
 		e1:SetLabel(fid)
 		e1:SetLabelObject(sg)
@@ -174,8 +173,11 @@ end
 function c64496451.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	local tg=g:Filter(c64496451.desfilter,nil,e:GetLabel())
-	g:DeleteGroup()
 	Duel.Destroy(tg,REASON_EFFECT)
+	if not g:IsExists(c64496451.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+	end
 end
 function c64496451.valcheck(e,c)
 	local g=c:GetMaterial()
