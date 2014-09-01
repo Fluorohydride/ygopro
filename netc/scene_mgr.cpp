@@ -24,7 +24,13 @@ namespace ygopro
 		while (child) {
             if(child->GetType() == wxXmlNodeType::wxXML_ELEMENT_NODE) {
                 if (child->GetName() == "integer") {
+                    std::string name = child->GetAttribute("name").ToUTF8().data();
+                    int val = To<int>(child->GetAttribute("value").ToUTF8().data());
+                    int_config[name] = val;
                 } else if(child->GetName() == "float") {
+                    std::string name = child->GetAttribute("name").ToUTF8().data();
+                    float val = To<float>(child->GetAttribute("value").ToUTF8().data());
+                    float_config[name] = val;
                 } else if(child->GetName() == "rect") {
                     std::string name = child->GetAttribute("name").ToUTF8().data();
                     float x = To<float>(child->GetAttribute("x").ToUTF8().data());

@@ -5,6 +5,7 @@
 
 #include "glbase.h"
 #include "scene_mgr.h"
+#include "duel_field.h"
 
 namespace ygopro
 {
@@ -19,6 +20,22 @@ namespace ygopro
         static const int color_offset = 12;
         static const int hcolor_offset = 16;
         static const int tex_offset = 20;
+    };
+    
+    struct CameraParam {
+        float fovy = 3.1415926f * 0.25f;
+        float cnear = 0.1f;
+        float cfar = 100.0f;
+        float angle = 3.1415926f * 0.25f;
+        float radius = 7.0f;
+        float xoffset = 0.0f;
+        float yoffset = 0.0f;
+        float cameray = 0.0f;
+        float cameraz = 0.0f;
+        float scrx = 0.0f;
+        float scry = 0.0f;
+        glm::mat4 mvp;
+        glm::quat hand_quat;
     };
     
     class DuelScene : public Scene, public TcpClientSeed {
@@ -63,22 +80,15 @@ namespace ygopro
         unsigned int card_vao = 0;
         unsigned int misc_vao = 0;        
         bool update_bg = true;
-        bool update_param = true;
-        bool update_field = true;
         bool update_misc = true;
         CommandList<DuelCommand> duel_commands;
         glbase::Shader duel_shader;
         std::pair<int, int> hover_pos;
         std::pair<int, int> click_pos;
-        float fovy = 3.1415926f * 0.25f;
-        float near = 0.1f;
-        float far = 100.0f;
-        float angle = 3.1415926f * 0.25f;
-        float r = 7.0f;
-        float xoffset = 0.0f;
-        float yoffset = 0.0f;
-        glm::mat4 mvp;
-        glm::quat hand_quat;
+        std::weak_ptr<FieldObject> hover_obj;
+        DuelField field;
+        std::list<std::weak_ptr<FieldObject>> updating_blocks;
+        CameraParam camera;
         bool btnDown[2] = {false};
         v2i btnPos[2];
     };

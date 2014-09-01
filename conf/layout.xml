@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Common>
+  <float name="handmin" value="-2.08" />
+  <float name="handmax" value=" 2.08" />
+  <float name="handy" value="-2.68" />
   <rect name="mzone1" x="-1.68" y="-1.00" w="0.80" h="-0.80"/>
   <rect name="mzone2" x="-0.84" y="-1.00" w="0.80" h="-0.80"/>
   <rect name="mzone3" x="-0.00" y="-1.00" w="0.80" h="-0.80"/>

@@ -48,6 +48,8 @@ namespace ygopro
         void SetMousePosition(v2i pos) { mouse_pos = pos; }
         v2i GetMousePosition() { return mouse_pos; }
         rectf LayoutRectConfig(const std::string& name) { return rect_config[name]; }
+        int LayoutIntConfig(const std::string& name) { return int_config[name]; }
+        float LayoutFloatConfig(const std::string& name) { return float_config[name]; }
         
     protected:
         v2i scene_size;
@@ -58,6 +60,8 @@ namespace ygopro
         double frame_interval = 0.0;
         v2i mouse_pos = {0, 0};
         std::unordered_map<std::string, rectf> rect_config;
+        std::unordered_map<std::string, int> int_config;
+        std::unordered_map<std::string, float> float_config;
     };
 
 	extern CommonConfig commonCfg;

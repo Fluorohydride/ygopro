@@ -32,7 +32,7 @@ layout (location = 0) out vec4 frag_color;\n\
 uniform sampler2D texid;\n\
 void main() {\n\
 vec4 texcolor = texture(texid, texcoord);\n\
-frag_color = mix(texcolor * color, vec4(hcolor.r, hcolor.g, hcolor.b, 0.0), hcolor.a);\n\
+frag_color = mix(texcolor * color, vec4(hcolor.r, hcolor.g, hcolor.b, 1.0), hcolor.a);\n\
 }\n\
 ";
 
@@ -105,6 +105,9 @@ namespace ygopro
         duel_shader.LoadVertShader(vert_shader);
         duel_shader.LoadFragShader(frag_shader);
         duel_shader.Link();
+        field.InitBlocks();
+        glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
+        field.RefreshBlocks();
     }
     
     DuelScene::~DuelScene() {
@@ -152,7 +155,7 @@ namespace ygopro
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // field
-        duel_shader.SetParamMat4("mvp", glm::value_ptr(mvp));
+        duel_shader.SetParamMat4("mvp", glm::value_ptr(camera.mvp));
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(field_vao);
         glDrawElements(GL_TRIANGLES, 34 * 6, GL_UNSIGNED_SHORT, 0);
@@ -163,7 +166,7 @@ namespace ygopro
     
     void DuelScene::SetSceneSize(v2i sz) {
         scene_size = sz;
-        update_param = true;
+        UpdateParams();
     }
     
     recti DuelScene::GetScreenshotClip() {
@@ -171,25 +174,44 @@ namespace ygopro
     }
     
     void DuelScene::MouseMove(sgui::MouseMoveEvent evt) {
+        bool update_param = false;
         if(btnDown[0]) {
             float ratex = (float)(evt.x - btnPos[0].x) / scene_size.x;
             float ratey = (float)(evt.y - btnPos[0].y) / scene_size.y;
-            xoffset += ratex;
-            yoffset -= ratey;
+            camera.xoffset += ratex;
+            camera.yoffset -= ratey;
             btnPos[0] = {evt.x, evt.y};
             update_param = true;
         }
         if(btnDown[1]) {
             float rate = (float)(evt.y - btnPos[1].y) / scene_size.y;
-            angle += 3.1415926f * 0.5f * rate;
-            if(angle < 0.0f)
-                angle = 0.0f;
-            if(angle > 3.1415926f * 0.5f)
-                angle = 3.1415926f * 0.5f;
+            camera.angle += 3.1415926f * 0.5f * rate;
+            if(camera.angle < 0.0f)
+                camera.angle = 0.0f;
+            if(camera.angle > 3.1415926f * 0.5f)
+                camera.angle = 3.1415926f * 0.5f;
             btnPos[1] = {evt.x, evt.y};
             update_param = true;
         }
-        GetHoverPos(evt.x, evt.y);
+        if(update_param)
+            UpdateParams();
+        auto pre_obj = hover_obj.lock();
+        std::shared_ptr<FieldObject> obj = nullptr;
+        auto hp = GetHoverPos(evt.x, evt.y);
+        if(hp.first != 0)
+            obj = field.field_blocks[hp.first - 1][hp.second];
+        if(pre_obj != obj) {
+            if(pre_obj)
+                pre_obj->hl.Reset(0.0f);
+            if(obj) {
+                obj->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
+                if(!obj->updating) {
+                    updating_blocks.push_back(obj);
+                    obj->updating = true;
+                }
+            }
+            hover_obj = obj;
+        }
     }
     
     void DuelScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
@@ -206,12 +228,12 @@ namespace ygopro
     }
     
     void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
-        r += evt.deltay / 30.0f;
-        if(r < 1.0f)
-            r = 1.0f;
-        if(r > 50.0f)
-            r = 50.0f;
-        update_param = true;
+        camera.radius += evt.deltay / 30.0f;
+        if(camera.radius < 1.0f)
+            camera.radius = 1.0f;
+        if(camera.radius > 50.0f)
+            camera.radius = 50.0f;
+        UpdateParams();
     }
     
     void DuelScene::KeyDown(sgui::KeyEvent evt) {
@@ -223,15 +245,18 @@ namespace ygopro
     }
     
     void DuelScene::UpdateParams() {
-        if(!update_param)
-            return;
-        update_param = false;
-        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -r * cosf(angle), r * sinf(angle)), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-        glm::mat4 projection = glm::perspective(fovy, 1.0f * scene_size.x / scene_size.y, near, far);
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -camera.radius * cosf(camera.angle), camera.radius * sinf(camera.angle)),
+                                     glm::vec3(0.0f, 0.0f, 0.0f),
+                                     glm::vec3(0.0f, 0.0f, 1.0f));
+        glm::mat4 projection = glm::perspective(camera.fovy, 1.0f * scene_size.x / scene_size.y, camera.cnear, camera.cfar);
         glm::mat4 trscreen;
-        trscreen[3][0] = xoffset;
-        trscreen[3][1] = yoffset;
-        mvp = trscreen * projection * view;
+        trscreen[3][0] = camera.xoffset;
+        trscreen[3][1] = camera.yoffset;
+        camera.mvp = trscreen * projection * view;
+        camera.cameray = camera.radius * cosf(camera.angle);
+        camera.cameraz = camera.radius * sinf(camera.angle);
+        camera.scry = 2.0f * tanf(camera.fovy * 0.5f) * camera.cnear;
+        camera.scrx = camera.scry * scene_size.x / scene_size.y;
     }
     
     void DuelScene::UpdateBackground() {
@@ -254,43 +279,20 @@ namespace ygopro
     }
     
     void DuelScene::UpdateField() {
-        if(!update_field)
-            return;
-        update_field = false;
-        auto FillVert3 = [](v3hct* vt, rectf center, ti4& hti, unsigned int cl = 0xffffffff, unsigned int hcl = 0) {
-            vt[0].vertex = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-            vt[0].texcoord = hti.vert[0];
-            vt[1].vertex = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-            vt[1].texcoord = hti.vert[1];
-            vt[2].vertex = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-            vt[2].texcoord = hti.vert[2];
-            vt[3].vertex = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-            vt[3].texcoord = hti.vert[3];
-        };
-        std::array<v3hct, 136> verts;
-        FillVert3(&verts[0 ], SceneMgr::Get().LayoutRectConfig("mzone1"), ImageMgr::Get().GetTexture("mzone"));
-        FillVert3(&verts[4 ], SceneMgr::Get().LayoutRectConfig("mzone2"), ImageMgr::Get().GetTexture("mzone"));
-        FillVert3(&verts[8 ], SceneMgr::Get().LayoutRectConfig("mzone3"), ImageMgr::Get().GetTexture("mzone"));
-        FillVert3(&verts[12], SceneMgr::Get().LayoutRectConfig("mzone4"), ImageMgr::Get().GetTexture("mzone"));
-        FillVert3(&verts[16], SceneMgr::Get().LayoutRectConfig("mzone5"), ImageMgr::Get().GetTexture("mzone"));
-        FillVert3(&verts[20], SceneMgr::Get().LayoutRectConfig("szone1"), ImageMgr::Get().GetTexture("szone"));
-        FillVert3(&verts[24], SceneMgr::Get().LayoutRectConfig("szone2"), ImageMgr::Get().GetTexture("szone"));
-        FillVert3(&verts[28], SceneMgr::Get().LayoutRectConfig("szone3"), ImageMgr::Get().GetTexture("szone"));
-        FillVert3(&verts[32], SceneMgr::Get().LayoutRectConfig("szone4"), ImageMgr::Get().GetTexture("szone"));
-        FillVert3(&verts[36], SceneMgr::Get().LayoutRectConfig("szone5"), ImageMgr::Get().GetTexture("szone"));
-        FillVert3(&verts[40], SceneMgr::Get().LayoutRectConfig("fdzone"), ImageMgr::Get().GetTexture("fdzone"));
-        FillVert3(&verts[44], SceneMgr::Get().LayoutRectConfig("pzonel"), ImageMgr::Get().GetTexture("pzonel"));
-        FillVert3(&verts[48], SceneMgr::Get().LayoutRectConfig("pzoner"), ImageMgr::Get().GetTexture("pzoner"));
-        FillVert3(&verts[52], SceneMgr::Get().LayoutRectConfig("mdeck" ), ImageMgr::Get().GetTexture("mdeck"));
-        FillVert3(&verts[56], SceneMgr::Get().LayoutRectConfig("exdeck"), ImageMgr::Get().GetTexture("exdeck"));
-        FillVert3(&verts[60], SceneMgr::Get().LayoutRectConfig("grave" ), ImageMgr::Get().GetTexture("grave"));
-        FillVert3(&verts[64], SceneMgr::Get().LayoutRectConfig("banish"), ImageMgr::Get().GetTexture("banish"));
-        for(int i = 68; i < 136; ++i) {
-            verts[i] = verts[i - 68];
-            verts[i].vertex = {-verts[i - 68].vertex.x, -verts[i - 68].vertex.y, 0.0f};
-        }
+        double tm = SceneMgr::Get().GetGameTime();
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(v3hct) * verts.size(), &verts[0]);
+        for(auto iter = updating_blocks.begin(); iter != updating_blocks.end();) {
+            auto cur = iter++;
+            auto ptr = (*cur).lock();
+            if(ptr == nullptr) {
+                updating_blocks.erase(cur);
+                continue;
+            }
+            if(!ptr->UpdateVertices(tm)) {
+                ptr->updating = false;
+                updating_blocks.erase(cur);
+            }
+        }
         GLCheckError(__FILE__, __LINE__);
     }
     
@@ -300,12 +302,18 @@ namespace ygopro
     }
     
     std::pair<int, int> DuelScene::GetHoverPos(int posx, int posy) {
-        float x = (float)posx / scene_size.x * 2.0f - 1.0f - xoffset;
-        float y = 1.0f - (float)posy / scene_size.y * 2.0f - yoffset;
-        float scry = 2.0f * tan(fovy * 0.5f) * near;
-        float k = tanf(3.1415926f - angle + atanf(scry * y / near));
-        float py = -r * cosf(angle) - r * sinf(angle) / k;
-        std::cout << "y axis: " << py << std::endl;
+        float x = (float)posx / scene_size.x * 2.0f - 1.0f - camera.xoffset;
+        float y = 1.0f - (float)posy / scene_size.y * 2.0f - camera.yoffset;
+        float projx = camera.scrx * 0.5f * x;
+        float projy = camera.scry * 0.5f * y;
+        float k = tanf(3.1415926f - camera.angle + atanf(projy / camera.cnear));
+        float py = -camera.cameray - camera.cameraz / k;
+        float nearx = sqrtf(camera.cnear * camera.cnear + projy * projy);
+        float radiusx = sqrtf(camera.cameraz * camera.cameraz + (camera.cameray + py) * (camera.cameray + py));
+        float px = projx * radiusx / nearx;
+        auto hb = field.CheckHoverBlock(px, py);
+        if(hb.first != 0)
+            return hb;
         return std::make_pair(0, 0);
     }
 }

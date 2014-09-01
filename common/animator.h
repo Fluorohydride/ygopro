@@ -136,6 +136,13 @@ protected:
 template<typename T>
 class MutableAttribute {
 public:
+    MutableAttribute() = default;
+    
+    MutableAttribute(const MutableAttribute<T>& v) {
+        val = v.val;
+        int_ptr.reset();
+    }
+    
     template<typename PTR>
     inline void SetAnimator(PTR p) {
         int_ptr = std::static_pointer_cast<Animator<T>>(p);
