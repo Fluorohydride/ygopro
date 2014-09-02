@@ -118,6 +118,16 @@ namespace glbase {
         static const int tex_offset = 16;
     };
     
+    struct v3hct {
+        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
+        unsigned int color = 0xffffffff;
+        unsigned int hcolor = 0;
+        vector2<float> texcoord = {0.0f, 0.0f};
+        static const int color_offset = 12;
+        static const int hcolor_offset = 16;
+        static const int tex_offset = 20;
+    };
+    
     struct v3cnt {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
         unsigned int color = 0xffffffff;
