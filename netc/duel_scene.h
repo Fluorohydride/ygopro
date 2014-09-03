@@ -56,13 +56,15 @@ namespace ygopro
         float cnear = 0.1f;
         float cfar = 100.0f;
         float angle = 3.1415926f * 0.25f;
-        float radius = 7.0f;
+        float radius = 8.0f;
         float xoffset = 0.0f;
         float yoffset = 0.0f;
         float cameray = 0.0f;
         float cameraz = 0.0f;
         float scrx = 0.0f;
         float scry = 0.0f;
+        rectf hand_rect[2];
+        float hand_width[2];
         glm::mat4 mvp;
         glm::quat hand_quat;
     };

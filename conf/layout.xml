@@ -2,7 +2,7 @@
 <Common>
   <float name="handmin" value="-2.08" />
   <float name="handmax" value=" 2.08" />
-  <float name="handy" value="-2.68" />
+  <float name="handy" value="-3.00" />
   <rect name="card" x="0" y="0" w="0.4827586" h="-0.70"/>
   <rect name="icon" x="0" y="0" w="0.4827586" h="-0.70"/>
   <rect name="mzone1" x="-1.68" y="-1.00" w="0.80" h="-0.80"/>

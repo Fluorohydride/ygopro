@@ -8,7 +8,7 @@
 
 static const char* vert_shader = "\
 #version 330\n\
-layout (location = 0) in vec2 v_position;\n\
+layout (location = 0) in vec3 v_position;\n\
 layout (location = 1) in vec4 v_color;\n\
 layout (location = 2) in vec4 v_hcolor;\n\
 layout (location = 3) in vec2 v_texcoord;\n\
@@ -20,7 +20,7 @@ void main() {\n\
 color = v_color;\n\
 hcolor = v_hcolor;\n\
 texcoord = v_texcoord;\n\
-gl_Position = mvp * vec4(v_position, 0.0, 1.0);\n\
+gl_Position = mvp * vec4(v_position, 1.0);\n\
 }\n\
 ";
 static const char* frag_shader = "\
@@ -128,7 +128,16 @@ namespace ygopro
         alpha.Update(tm);
         hl.Update(tm);
         translation.Update(tm);
-        rotation.Update(tm);
+        if(rotation.NeedUpdate()) {
+            rotation.Update(tm);
+            auto q = rotation.Get();
+            vertex_r.clear();
+            for(auto& iter : vertex) {
+                glm::vec3 v(iter.x, iter.y, iter.z);
+                auto c = q * v;
+                vertex_r.push_back({c.x, c.y, c.z});
+            }
+        }
         RefreshVertices();
         return alpha.NeedUpdate() || hl.NeedUpdate();
     }
@@ -185,7 +194,7 @@ namespace ygopro
             glEnableVertexAttribArray(1);
             glEnableVertexAttribArray(2);
             glEnableVertexAttribArray(3);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v3hct), 0);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glbase::v3hct), 0);
             glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glbase::v3hct), (const GLvoid*)glbase::v3hct::color_offset);
             glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glbase::v3hct), (const GLvoid*)glbase::v3hct::hcolor_offset);
             glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v3hct), (const GLvoid*)glbase::v3hct::tex_offset);
@@ -233,7 +242,6 @@ namespace ygopro
                 break;
             duel_commands.PopCommand();
         } while (duel_commands.IsEmpty());
-        UpdateParams();
         UpdateBackground();
         UpdateField();
         return true;
@@ -254,8 +262,13 @@ namespace ygopro
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(field_vao);
         glDrawElements(GL_TRIANGLES, 34 * 6, GL_UNSIGNED_SHORT, 0);
+        // misc
+        duel_shader.SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
+        glBindVertexArray(misc_vao);
+        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
+        GLCheckError(__FILE__, __LINE__);
         // end
-        glBindVertexArray(back_vao);
+        glBindVertexArray(0);
         duel_shader.Unuse();
     }
     
@@ -334,7 +347,49 @@ namespace ygopro
     void DuelScene::UpdateHandRect() {
         //glm::mat4 m1 = glm::translate(camera.mvp, glm::vec3(1, -1, 0));
         //glm::mat4 m2 = glm::scale(m1, glm::vec3(scene_size.x * 0.5f, scene_size.y * 0.5f, 0.0f));
-        
+        glm::mat4 m2 = camera.mvp;
+        rectf cardr = SceneMgr::Get().LayoutRectConfig("card");
+        float hmin = SceneMgr::Get().LayoutFloatConfig("handmin");
+        float hmax = SceneMgr::Get().LayoutFloatConfig("handmax");
+        float hy = SceneMgr::Get().LayoutFloatConfig("handy");
+        float hty = cardr.height * 0.5f * glm::sin(camera.angle);
+        float htz = glm::abs(cardr.height * 0.5f) * glm::cos(camera.angle);
+        float hytop = hy - hty;
+        float hybot = hy + hty;
+        glm::vec4 vlt = m2 * glm::vec4(hmin, hytop, htz, 1.0f);
+        glm::vec4 vltw = m2 * glm::vec4(hmin + cardr.width, hytop, htz, 1.0f);
+        glm::vec4 vrb = m2 * glm::vec4(hmax, hybot, -htz, 1.0f);
+        glm::vec4 vlt2 = m2 * glm::vec4(-hmin, -hybot, htz, 1.0f);
+        glm::vec4 vltw2 = m2 * glm::vec4(-hmin - cardr.width, hytop, htz, 1.0f);
+        glm::vec4 vrb2 = m2 * glm::vec4(-hmax, -hytop, -htz, 1.0f);
+        vlt /= vlt.w;
+        vltw /= vltw.w;
+        vrb /= vrb.w;
+        vlt2 /= vlt2.w;
+        vltw2 /= vltw2.w;
+        vrb2 /= vrb2.w;
+        auto ti = ImageMgr::Get().GetTexture("mmask");
+        std::array<glbase::v3hct, 8> verts;
+        verts[0].vertex = {vlt.x, vlt.y, htz};
+        verts[0].texcoord = ti.vert[0];
+        verts[1].vertex = {vrb.x, vlt.y, htz};
+        verts[1].texcoord = ti.vert[1];
+        verts[2].vertex = {vlt.x, vrb.y, -htz};
+        verts[2].texcoord = ti.vert[2];
+        verts[3].vertex = {vrb.x, vrb.y, -htz};
+        verts[3].texcoord = ti.vert[3];
+        verts[4].vertex = {vlt2.x, vlt2.y, htz};
+        verts[4].texcoord = ti.vert[0];
+        verts[5].vertex = {vrb2.x, vlt2.y, htz};
+        verts[5].texcoord = ti.vert[1];
+        verts[6].vertex = {vlt2.x, vrb2.y, -htz};
+        verts[6].texcoord = ti.vert[2];
+        verts[7].vertex = {vrb2.x, vrb2.y, -htz};
+        verts[7].texcoord = ti.vert[3];
+        for(int i = 0; i < 8; ++i)
+            verts[i].color = 0x800000ff;
+        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v3hct) * verts.size(), &verts[0]);
     }
     
     void DuelScene::KeyDown(sgui::KeyEvent evt) {
@@ -346,7 +401,7 @@ namespace ygopro
     }
     
     void DuelScene::UpdateParams() {
-        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -camera.radius * cosf(camera.angle), camera.radius * sinf(camera.angle)),
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -camera.radius * glm::cos(camera.angle), camera.radius * glm::sin(camera.angle)),
                                      glm::vec3(0.0f, 0.0f, 0.0f),
                                      glm::vec3(0.0f, 0.0f, 1.0f));
         glm::mat4 projection = glm::perspective(camera.fovy, 1.0f * scene_size.x / scene_size.y, camera.cnear, camera.cfar);
@@ -354,8 +409,8 @@ namespace ygopro
         trscreen[3][0] = camera.xoffset;
         trscreen[3][1] = camera.yoffset;
         camera.mvp = trscreen * projection * view;
-        camera.cameray = camera.radius * cosf(camera.angle);
-        camera.cameraz = camera.radius * sinf(camera.angle);
+        camera.cameray = camera.radius * glm::cos(camera.angle);
+        camera.cameraz = camera.radius * glm::sin(camera.angle);
         camera.scry = 2.0f * tanf(camera.fovy * 0.5f) * camera.cnear;
         camera.scrx = camera.scry * scene_size.x / scene_size.y;
         UpdateHandRect();
@@ -459,6 +514,9 @@ namespace ygopro
     }
     
     std::shared_ptr<FieldCard> DuelScene::AddCard(unsigned int code, int side, int zone, int seq, int subs) {
+        auto ptr = std::make_shared<FieldCard>();
+        ptr->Init(alloc_cards.size(), code);
+        alloc_cards.push_back(ptr);
         return nullptr;
     }
     
@@ -511,8 +569,8 @@ namespace ygopro
         float projy = camera.scry * 0.5f * y;
         float k = tanf(3.1415926f - camera.angle + atanf(projy / camera.cnear));
         float py = -camera.cameray - camera.cameraz / k;
-        float nearx = sqrtf(camera.cnear * camera.cnear + projy * projy);
-        float radiusx = sqrtf(camera.cameraz * camera.cameraz + (camera.cameray + py) * (camera.cameray + py));
+        float nearx = glm::sqrt(camera.cnear * camera.cnear + projy * projy);
+        float radiusx = glm::sqrt(camera.cameraz * camera.cameraz + (camera.cameray + py) * (camera.cameray + py));
         float px = projx * radiusx / nearx;
         auto hb = CheckHoverBlock(px, py);
         if(hb.first != 0)
