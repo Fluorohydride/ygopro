@@ -378,7 +378,7 @@ namespace ygopro
         if(valstr == L"?")
             return std::make_tuple(1, 0, 0);
         size_t pos = valstr.find(L':');
-        if(pos == valstr.npos)
+        if(pos == std::wstring::npos)
             return std::make_tuple(2, ParseInt(&valstr[0], valstr.length()), 0);
         else
             return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], valstr.length() - pos - 1));
@@ -452,7 +452,7 @@ namespace ygopro
                               || (data->alias > data->code && data->alias - data->code > 10)
                               || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
         extra->AppendText(L" @", 0xff000000);
-        extra->AppendText(wxString::Format(L"%08d", ccode).ToStdWstring(), 0xffff0000);
+        extra->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
         auto text = cardText.lock();
         auto pent = penText.lock();
         auto ad = adText.lock();
@@ -479,16 +479,16 @@ namespace ygopro
         if(data->type & 0x1) {
             for(unsigned int i = 0; i < (data->level & 0xffff); ++i)
                 pushvert({(int)(mw - 21 - 16 * i), 20}, {16, 16}, star);
-            wxString adstr;
+            std::string adstr;
             if(data->attack >= 0)
-                adstr.append(wxString::Format(L"ATK/% 4ld", data->attack));
+                adstr.append(To<std::string>("ATK/% 4ld", data->attack));
             else
-                adstr.append(L"ATK/  ? ");
+                adstr.append("ATK/  ? ");
             if(data->defence >= 0)
-                adstr.append(wxString::Format(L" DEF/% 4ld", data->defence));
+                adstr.append(To<std::string>(" DEF/% 4ld", data->defence));
             else
-                adstr.append(L" DEF/  ? ");
-            ad->SetText(adstr.ToStdWstring(), 0xff000000);
+                adstr.append(" DEF/  ? ");
+            ad->SetText(To<std::wstring>(adstr), 0xff000000);
             ad->SetPosition({sz.x - 15 - ad->GetSize().x, sz.y - 30});
         } else {
             ad->ClearText();

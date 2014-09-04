@@ -12,7 +12,7 @@ namespace ygopro
 	ti4& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-            std::string file = wxString::Format("%d.jpg", id).ToUTF8().data();
+            std::string file = To<std::string>(id).append(".jpg");
 			auto& cti = card_textures[id];
             int length = imageZip.GetFileLength(file);
 			if(length == 0) {
@@ -81,7 +81,7 @@ namespace ygopro
         static glbase::Texture* pre_ret = nullptr;
         if(pid == id)
             return pre_ret;
-        std::string file = wxString::Format("%d.jpg", id).ToUTF8().data();
+        std::string file = To<std::string>("%d.jpg", id);
         int length = imageZip.GetFileLength(file);
         if(length == 0) {
             file = "unknown.jpg";
@@ -199,11 +199,11 @@ namespace ygopro
 		wxXmlNode* child = root->GetChildren();
 		while (child) {
             if (child->GetName() == "image") {
-                wxString name = child->GetAttribute("name");
-                wxString path = child->GetAttribute("path");
+                std::string name = child->GetAttribute("name").ToUTF8().data();
+                std::string path = child->GetAttribute("path").ToUTF8().data();
                 if(wxFileExists(path)) {
                     glbase::Image img;
-                    if(img.LoadFile(path.ToUTF8().data())) {
+                    if(img.LoadFile(path)) {
                         if(name == "card")
                             card_texture.Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
                         else if(name == "misc")

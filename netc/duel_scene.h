@@ -51,7 +51,7 @@ namespace ygopro
         MutableAttribute<glm::quat> rotation;
     };
     
-    struct CameraParam {
+    struct ViewParam {
         float fovy = 3.1415926f * 0.25f;
         float cnear = 0.1f;
         float cfar = 100.0f;
@@ -61,6 +61,10 @@ namespace ygopro
         float yoffset = 0.0f;
         float cameray = 0.0f;
         float cameraz = 0.0f;
+        rectf cardrect;
+        float handmin = 0.0f;
+        float handmax = 0.0f;
+        float handy[2];
         float scrx = 0.0f;
         float scry = 0.0f;
         rectf hand_rect[2];
@@ -125,7 +129,7 @@ namespace ygopro
         CommandList<DuelCommand> duel_commands;
         glbase::Shader duel_shader;
         
-        CameraParam camera;
+        ViewParam vparam;
         bool btnDown[2] = {false};
         v2i btnPos[2];
         

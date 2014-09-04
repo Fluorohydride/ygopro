@@ -82,14 +82,14 @@ namespace ygopro
         bool side = false;
         unsigned int code;
         while(!deck_file.Eof()) {
-            wxString line = ts.ReadLine();
-            if(line.IsEmpty() || line[0] == wxT('#'))
+            std::string line = ts.ReadLine().ToUTF8().data();
+            if(line.empty() || line[0] == '#')
                 continue;
-            if(line[0] == wxT('!')) {
+            if(line[0] == '!') {
                 side = true;
                 continue;
             }
-            code = To<unsigned int>(line.ToUTF8().data());
+            code = To<unsigned int>(line);
             CardData* ptr = DataMgr::Get()[(unsigned int)code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
@@ -382,13 +382,13 @@ namespace ygopro
         unsigned int code, count;
         LimitRegulation* plist = nullptr;
         while(!ban_file.Eof()) {
-            wxString line = ts.ReadLine();
-            if(line.IsEmpty() || line[0] == wxT('#'))
+            std::string line = ts.ReadLine().ToUTF8().data();
+            if(line.empty() || line[0] == '#')
                 continue;
-            if(line[0] == wxT('!')) {
+            if(line[0] == '!') {
                 limit_regulations.resize(limit_regulations.size() + 1);
                 plist = &(*limit_regulations.rbegin());
-                plist->name = line.Right(line.Length() - 1);
+                plist->name = To<std::wstring>(line.substr(1));
                 continue;
             }
             if(plist == nullptr)

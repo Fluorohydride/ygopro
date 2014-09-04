@@ -438,6 +438,14 @@ namespace ygopro
                 if(evt.mods & GLFW_MOD_ALT)
                     ViewRegulation(2);
                 break;
+            case GLFW_KEY_C:
+                if(evt.mods & GLFW_MOD_CONTROL)
+                    SaveDeckToClipboard();
+                break;
+            case GLFW_KEY_V:
+                if(evt.mods & GLFW_MOD_CONTROL)
+                    LoadDeckFromClipboard();
+                break;
             default:
                 break;
         }
@@ -570,7 +578,7 @@ namespace ygopro
     
     void BuildScene::SaveDeckToClipboard() {
         auto str = current_deck.SaveToString();
-        wxString deck_string;
+        std::string deck_string;
         deck_string.append("ydk://").append(str);
         wxTheClipboard->Open();
         wxTheClipboard->SetData(new wxTextDataObject(deck_string));
@@ -626,15 +634,24 @@ namespace ygopro
                 SetDeckDirty();
                 break;
             case 3: {
-                wxString neturl = static_cast<const std::wstring&>(commonCfg["deck_neturl"]);
-                wxString deck_string = current_deck.SaveToString();
-                neturl.Replace("{amp}", wxT("&"));
-                neturl.Replace("{deck}", deck_string);
-                auto pos = current_file.find_last_of(L'/');
-                if(pos == std::wstring::npos)
-                    neturl.Replace("{name}", wxEmptyString);
-                else
-                    neturl.Replace("{name}", current_file.substr(pos + 1));
+                std::wstring neturl = commonCfg["deck_neturl"];
+                std::wstring deck_string = To<std::wstring>(current_deck.SaveToString());
+                auto ntpos = neturl.find(L"{amp}");
+                while(ntpos != std::wstring::npos) {
+                    neturl.replace(ntpos, 5, L"&");
+                    ntpos = neturl.find(L"{amp}");
+                }
+                ntpos = neturl.find(L"{deck}");
+                if(ntpos != std::wstring::npos)
+                    neturl.replace(ntpos, 6, deck_string);
+                ntpos = neturl.find(L"{name}");
+                if(ntpos != std::wstring::npos) {
+                    auto pos = current_file.find_last_of(L'/');
+                    if(pos == std::wstring::npos)
+                        neturl.replace(ntpos, 6, L"");
+                    else
+                        neturl.replace(ntpos, 6, current_file, pos + 1, std::wstring::npos);
+                }
                 wxLaunchDefaultBrowser(neturl);
                 break;
             }
@@ -1063,8 +1080,8 @@ namespace ygopro
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
             int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
-            wxString s = wxString::Format(L"%d/%d", result_page + 1, pageall);
-            ptr->SetText(s.ToStdWstring(), 0xff000000);
+            std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
+            ptr->SetText(s, 0xff000000);
         }
     }
     
@@ -1105,10 +1122,12 @@ namespace ygopro
             RefreshSearchResult();
             auto ptr = label_result.lock();
             if(ptr != nullptr) {
-                wxString s = static_cast<const std::wstring&>(stringCfg["eui_filter_count"]);
-                wxString ct = wxString::Format(L"%ld", search_result.size());
-                s.Replace(L"{count}", ct);
-                ptr->SetText(s.ToStdWstring(), 0xff000000);
+                std::wstring s = stringCfg["eui_filter_count"];
+                std::wstring ct = To<std::wstring>(To<std::string>("%ld", search_result.size()));
+                size_t pos = s.find(L"{count}");
+                if(pos != std::wstring::npos)
+                    s.replace(pos, 7, ct);
+                ptr->SetText(s, 0xff000000);
             }
         }
     }
@@ -1124,10 +1143,12 @@ namespace ygopro
         RefreshSearchResult();
         auto ptr = label_result.lock();
         if(ptr != nullptr) {
-            wxString s = static_cast<const std::wstring&>(stringCfg["eui_filter_count"]);
-            wxString ct = wxString::Format(L"%ld", search_result.size());
-            s.Replace(L"{count}", ct);
-            ptr->SetText(s.ToStdWstring(), 0xff000000);
+            std::wstring s = stringCfg["eui_filter_count"];
+            std::wstring ct = To<std::wstring>(To<std::string>("%ld", search_result.size()));
+            size_t pos = s.find(L"{count}");
+            if(pos != std::wstring::npos)
+                s.replace(pos, 7, ct);
+            ptr->SetText(s, 0xff000000);
         }
     }
     

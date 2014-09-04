@@ -17,7 +17,7 @@ struct ConverteImpl {
     }
     
     template<typename T>
-    static std::string ConvertStr(const T& val, const char* format) {
+    static std::string ConvertStr(const char* format, const T& val) {
         char buf[32];
         sprintf(buf, format, static_cast<long>(val));
         return std::move(std::string(buf));
@@ -39,7 +39,7 @@ struct ConverteImpl<2> {
     }
     
     template<typename T>
-    static std::string ConvertStr(const T& val, const char* format) {
+    static std::string ConvertStr(const char* format, const T& val) {
         char buf[32];
         sprintf(buf, format, val);
         return std::move(std::string(buf));
@@ -96,8 +96,8 @@ struct ToInner<T, std::string> {
         return std::move(ConverteImpl<ConverterType<T>::conv_type>::ConvertStr(val));
     }
     
-    static std::string C(const T& val, const char* format) {
-        return std::move(ConverteImpl<ConverterType<T>::conv_type>::ConvertStr(val, format));
+    static std::string C(const char* format, const T& val) {
+        return std::move(ConverteImpl<ConverterType<T>::conv_type>::ConvertStr(format, val));
     }
 };
 
@@ -159,9 +159,11 @@ TOTYPE To(const T& val) {
     return ToInner<T, TOTYPE>::C(val);
 }
 
-template<typename TOTYPE, typename T>
-TOTYPE To(const T& val, const char* format) {
-    return ToInner<T, TOTYPE>::C(val, format);
+template<typename TOTYPE, typename T, typename... REST>
+TOTYPE To(const char* format, const T& val, const REST&... r) {
+    char buf[32];
+    sprintf(buf, format, val, r...);
+    return std::move(std::string(buf));
 }
 
 template<typename T>

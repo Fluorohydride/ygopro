@@ -211,6 +211,18 @@ namespace ygopro
         InitField();
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
         RefreshBlocks();
+        vparam.fovy = SceneMgr::Get().LayoutFloatConfig("fovy");
+        vparam.cnear = SceneMgr::Get().LayoutFloatConfig("near");
+        vparam.cfar = SceneMgr::Get().LayoutFloatConfig("far");
+        vparam.angle = SceneMgr::Get().LayoutFloatConfig("angle");
+        vparam.radius = SceneMgr::Get().LayoutFloatConfig("radius");
+        vparam.xoffset = SceneMgr::Get().LayoutFloatConfig("xoffset");
+        vparam.yoffset = SceneMgr::Get().LayoutFloatConfig("yoffset");
+        vparam.cardrect = SceneMgr::Get().LayoutRectConfig("card");
+        vparam.handmin = SceneMgr::Get().LayoutFloatConfig("handmin");
+        vparam.handmax = SceneMgr::Get().LayoutFloatConfig("handmax");
+        vparam.handy[0] = SceneMgr::Get().LayoutFloatConfig("handy1");
+        vparam.handy[1] = SceneMgr::Get().LayoutFloatConfig("handy2");
         //pcard = std::make_shared<FieldCard>();
     }
     
@@ -258,14 +270,14 @@ namespace ygopro
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // field
-        duel_shader.SetParamMat4("mvp", glm::value_ptr(camera.mvp));
+        duel_shader.SetParamMat4("mvp", glm::value_ptr(vparam.mvp));
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(field_vao);
         glDrawElements(GL_TRIANGLES, 34 * 6, GL_UNSIGNED_SHORT, 0);
         // misc
         duel_shader.SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
-        glBindVertexArray(misc_vao);
-        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
+        //glBindVertexArray(misc_vao);
+        //glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // end
         glBindVertexArray(0);
@@ -286,18 +298,18 @@ namespace ygopro
         if(btnDown[0]) {
             float ratex = (float)(evt.x - btnPos[0].x) / scene_size.x;
             float ratey = (float)(evt.y - btnPos[0].y) / scene_size.y;
-            camera.xoffset += ratex;
-            camera.yoffset -= ratey;
+            vparam.xoffset += ratex;
+            vparam.yoffset -= ratey;
             btnPos[0] = {evt.x, evt.y};
             update_param = true;
         }
         if(btnDown[1]) {
             float rate = (float)(evt.y - btnPos[1].y) / scene_size.y;
-            camera.angle += 3.1415926f * 0.5f * rate;
-            if(camera.angle < 0.0f)
-                camera.angle = 0.0f;
-            if(camera.angle > 3.1415926f * 0.5f)
-                camera.angle = 3.1415926f * 0.5f;
+            vparam.angle += 3.1415926f * 0.5f * rate;
+            if(vparam.angle < 0.0f)
+                vparam.angle = 0.0f;
+            if(vparam.angle > 3.1415926f * 0.5f)
+                vparam.angle = 3.1415926f * 0.5f;
             btnPos[1] = {evt.x, evt.y};
             update_param = true;
         }
@@ -336,60 +348,34 @@ namespace ygopro
     }
     
     void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
-        camera.radius += evt.deltay / 30.0f;
-        if(camera.radius < 1.0f)
-            camera.radius = 1.0f;
-        if(camera.radius > 50.0f)
-            camera.radius = 50.0f;
+        vparam.radius += evt.deltay / 30.0f;
+        if(vparam.radius < 1.0f)
+            vparam.radius = 1.0f;
+        if(vparam.radius > 50.0f)
+            vparam.radius = 50.0f;
         UpdateParams();
     }
     
     void DuelScene::UpdateHandRect() {
-        //glm::mat4 m1 = glm::translate(camera.mvp, glm::vec3(1, -1, 0));
-        //glm::mat4 m2 = glm::scale(m1, glm::vec3(scene_size.x * 0.5f, scene_size.y * 0.5f, 0.0f));
-        glm::mat4 m2 = camera.mvp;
-        rectf cardr = SceneMgr::Get().LayoutRectConfig("card");
-        float hmin = SceneMgr::Get().LayoutFloatConfig("handmin");
-        float hmax = SceneMgr::Get().LayoutFloatConfig("handmax");
-        float hy = SceneMgr::Get().LayoutFloatConfig("handy");
-        float hty = cardr.height * 0.5f * glm::sin(camera.angle);
-        float htz = glm::abs(cardr.height * 0.5f) * glm::cos(camera.angle);
-        float hytop = hy - hty;
-        float hybot = hy + hty;
-        glm::vec4 vlt = m2 * glm::vec4(hmin, hytop, htz, 1.0f);
-        glm::vec4 vltw = m2 * glm::vec4(hmin + cardr.width, hytop, htz, 1.0f);
-        glm::vec4 vrb = m2 * glm::vec4(hmax, hybot, -htz, 1.0f);
-        glm::vec4 vlt2 = m2 * glm::vec4(-hmin, -hybot, htz, 1.0f);
-        glm::vec4 vltw2 = m2 * glm::vec4(-hmin - cardr.width, hytop, htz, 1.0f);
-        glm::vec4 vrb2 = m2 * glm::vec4(-hmax, -hytop, -htz, 1.0f);
+        float hty = glm::abs(vparam.cardrect.height * 0.5f) * glm::sin(vparam.angle);
+        float htz = glm::abs(vparam.cardrect.height * 0.5f) * glm::cos(vparam.angle);
+        glm::vec4 vlt = vparam.mvp * glm::vec4(vparam.handmin, vparam.handy[0] + hty, htz, 1.0f);
+        glm::vec4 vltw = vparam.mvp * glm::vec4(vparam.handmin + vparam.cardrect.width, vparam.handy[0] + hty, htz, 1.0f);
+        glm::vec4 vrb = vparam.mvp * glm::vec4(vparam.handmax, vparam.handy[0] - hty, -htz, 1.0f);
+        glm::vec4 vlt2 = vparam.mvp * glm::vec4(-vparam.handmin, vparam.handy[1] + hty, htz, 1.0f);
+        glm::vec4 vltw2 = vparam.mvp * glm::vec4(-vparam.handmin - vparam.cardrect.width, vparam.handy[1] + hty, htz, 1.0f);
+        glm::vec4 vrb2 = vparam.mvp * glm::vec4(-vparam.handmax, vparam.handy[1] - hty, -htz, 1.0f);
         vlt /= vlt.w;
         vltw /= vltw.w;
         vrb /= vrb.w;
         vlt2 /= vlt2.w;
         vltw2 /= vltw2.w;
         vrb2 /= vrb2.w;
-        auto ti = ImageMgr::Get().GetTexture("mmask");
-        std::array<glbase::v3hct, 8> verts;
-        verts[0].vertex = {vlt.x, vlt.y, htz};
-        verts[0].texcoord = ti.vert[0];
-        verts[1].vertex = {vrb.x, vlt.y, htz};
-        verts[1].texcoord = ti.vert[1];
-        verts[2].vertex = {vlt.x, vrb.y, -htz};
-        verts[2].texcoord = ti.vert[2];
-        verts[3].vertex = {vrb.x, vrb.y, -htz};
-        verts[3].texcoord = ti.vert[3];
-        verts[4].vertex = {vlt2.x, vlt2.y, htz};
-        verts[4].texcoord = ti.vert[0];
-        verts[5].vertex = {vrb2.x, vlt2.y, htz};
-        verts[5].texcoord = ti.vert[1];
-        verts[6].vertex = {vlt2.x, vrb2.y, -htz};
-        verts[6].texcoord = ti.vert[2];
-        verts[7].vertex = {vrb2.x, vrb2.y, -htz};
-        verts[7].texcoord = ti.vert[3];
-        for(int i = 0; i < 8; ++i)
-            verts[i].color = 0x800000ff;
-        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v3hct) * verts.size(), &verts[0]);
+        vparam.hand_rect[0] = {vlt.x, vlt.y, vrb.x - vlt.x, vrb.y - vlt.y};
+        vparam.hand_rect[1] = {vlt2.x, vlt2.y, vrb2.x - vlt2.x, vrb2.y - vlt2.y};
+        vparam.hand_width[0] = vltw.x - vlt.x;
+        vparam.hand_width[1] = vltw2.x - vlt2.x;
+        vparam.hand_quat = glm::angleAxis(vparam.angle, glm::vec3(1.0f, 0.0f, 0.0f));
     }
     
     void DuelScene::KeyDown(sgui::KeyEvent evt) {
@@ -401,18 +387,18 @@ namespace ygopro
     }
     
     void DuelScene::UpdateParams() {
-        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -camera.radius * glm::cos(camera.angle), camera.radius * glm::sin(camera.angle)),
+        glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -vparam.radius * glm::cos(vparam.angle), vparam.radius * glm::sin(vparam.angle)),
                                      glm::vec3(0.0f, 0.0f, 0.0f),
                                      glm::vec3(0.0f, 0.0f, 1.0f));
-        glm::mat4 projection = glm::perspective(camera.fovy, 1.0f * scene_size.x / scene_size.y, camera.cnear, camera.cfar);
+        glm::mat4 projection = glm::perspective(vparam.fovy, 1.0f * scene_size.x / scene_size.y, vparam.cnear, vparam.cfar);
         glm::mat4 trscreen;
-        trscreen[3][0] = camera.xoffset;
-        trscreen[3][1] = camera.yoffset;
-        camera.mvp = trscreen * projection * view;
-        camera.cameray = camera.radius * glm::cos(camera.angle);
-        camera.cameraz = camera.radius * glm::sin(camera.angle);
-        camera.scry = 2.0f * tanf(camera.fovy * 0.5f) * camera.cnear;
-        camera.scrx = camera.scry * scene_size.x / scene_size.y;
+        trscreen[3][0] = vparam.xoffset;
+        trscreen[3][1] = vparam.yoffset;
+        vparam.mvp = trscreen * projection * view;
+        vparam.cameray = vparam.radius * glm::cos(vparam.angle);
+        vparam.cameraz = vparam.radius * glm::sin(vparam.angle);
+        vparam.scry = 2.0f * tanf(vparam.fovy * 0.5f) * vparam.cnear;
+        vparam.scrx = vparam.scry * scene_size.x / scene_size.y;
         UpdateHandRect();
     }
     
@@ -469,7 +455,8 @@ namespace ygopro
     
     void DuelScene::UpdateMisc() {
         if(!update_misc)
-            update_misc = true;
+            return;
+        update_misc = false;
     }
     
     void DuelScene::InitField() {
@@ -550,6 +537,7 @@ namespace ygopro
     
     void DuelScene::UpdateIndex() {
         
+        
     }
     
     std::pair<int, int> DuelScene::CheckHoverBlock(float px, float py) {
@@ -563,14 +551,14 @@ namespace ygopro
     }
     
     std::pair<int, int> DuelScene::GetHoverPos(int posx, int posy) {
-        float x = (float)posx / scene_size.x * 2.0f - 1.0f - camera.xoffset;
-        float y = 1.0f - (float)posy / scene_size.y * 2.0f - camera.yoffset;
-        float projx = camera.scrx * 0.5f * x;
-        float projy = camera.scry * 0.5f * y;
-        float k = tanf(3.1415926f - camera.angle + atanf(projy / camera.cnear));
-        float py = -camera.cameray - camera.cameraz / k;
-        float nearx = glm::sqrt(camera.cnear * camera.cnear + projy * projy);
-        float radiusx = glm::sqrt(camera.cameraz * camera.cameraz + (camera.cameray + py) * (camera.cameray + py));
+        float x = (float)posx / scene_size.x * 2.0f - 1.0f - vparam.xoffset;
+        float y = 1.0f - (float)posy / scene_size.y * 2.0f - vparam.yoffset;
+        float projx = vparam.scrx * 0.5f * x;
+        float projy = vparam.scry * 0.5f * y;
+        float k = tanf(3.1415926f - vparam.angle + atanf(projy / vparam.cnear));
+        float py = -vparam.cameray - vparam.cameraz / k;
+        float nearx = glm::sqrt(vparam.cnear * vparam.cnear + projy * projy);
+        float radiusx = glm::sqrt(vparam.cameraz * vparam.cameraz + (vparam.cameray + py) * (vparam.cameray + py));
         float px = projx * radiusx / nearx;
         auto hb = CheckHoverBlock(px, py);
         if(hb.first != 0)
