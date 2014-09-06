@@ -1,4 +1,4 @@
---ブラック·ガーデン
+--ブラック・ガーデン
 function c71645242.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -109,14 +109,15 @@ function c71645242.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c71645242.spop2(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local dg=Duel.GetMatchingGroup(c71645242.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local atk=dg:GetSum(Card.GetAttack)
-	dg:AddCard(e:GetHandler())
+	dg:AddCard(c)
 	Duel.Destroy(dg,REASON_EFFECT)
 	Duel.BreakEffect()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:GetAttack()==atk then
+	if not (c:IsLocation(LOCATION_SZONE) and c:GetSequence()==5) and tc:IsRelateToEffect(e) and tc:GetAttack()==atk then
 		Duel.SpecialSummon(tc,0x20,tp,tp,false,false,POS_FACEUP)
 	end
 end
