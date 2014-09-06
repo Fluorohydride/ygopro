@@ -1351,8 +1351,9 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.spe_effect[check_player]++;
 		}
 		pr = effects.continuous_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
+		for(; pr.first != pr.second;) {
 			peffect = pr.first->second;
+			++pr.first;
 			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
@@ -1519,8 +1520,9 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.spe_effect[check_player]++;
 		}
 		pr = effects.continuous_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
+		for(; pr.first != pr.second;) {
 			peffect = pr.first->second;
+			++pr.first;
 			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
