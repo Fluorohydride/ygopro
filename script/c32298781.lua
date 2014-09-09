@@ -38,12 +38,16 @@ function c32298781.activate(e,tp,eg,ep,ev,re,r,rp)
 	de:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	de:SetCode(EVENT_PHASE+PHASE_END)
 	de:SetCountLimit(1)
+	de:SetCondition(c32298781.descon)
 	de:SetOperation(c32298781.desop)
 	de:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(de,tp)
 end
 function c32298781.dfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:GetLevel()==1
+end
+function c32298781.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c32298781.dfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c32298781.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c32298781.dfilter,tp,LOCATION_MZONE,0,nil)

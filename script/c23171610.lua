@@ -13,7 +13,7 @@ function c23171610.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c23171610.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated() 
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c23171610.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
@@ -27,6 +27,7 @@ end
 function c23171610.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(c23171610.filter2,tp,LOCATION_MZONE,0,nil,e)
 	local c=e:GetHandler()
+	local fid=c:GetFieldID()
 	local tc=sg:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(c)
@@ -35,7 +36,7 @@ function c23171610.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
 		e1:SetValue(tc:GetAttack()*2)
 		tc:RegisterEffect(e1)
-		tc:RegisterFlagEffect(23171610,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		tc:RegisterFlagEffect(23171610,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
 		tc=sg:GetNext()
 	end
 	sg:KeepAlive()
@@ -45,16 +46,25 @@ function c23171610.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	e2:SetCountLimit(1)
+	e2:SetLabel(fid)
 	e2:SetLabelObject(sg)
+	e2:SetCondition(c23171610.descon)
 	e2:SetOperation(c23171610.desop)
 	Duel.RegisterEffect(e2,tp)
 end
-function c23171610.desfilter(c)
-	return c:GetFlagEffect(23171610)>0
+function c23171610.desfilter(c,fid)
+	return c:GetFlagEffectLabel(23171610)==fid
+end
+function c23171610.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c23171610.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		return false
+	else return true end
 end
 function c23171610.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local dg=g:Filter(c23171610.desfilter,nil)
+	local dg=g:Filter(c23171610.desfilter,nil,e:GetLabel())
 	g:DeleteGroup()
 	Duel.Destroy(dg,REASON_EFFECT)
 end

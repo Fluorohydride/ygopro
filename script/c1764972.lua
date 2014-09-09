@@ -51,6 +51,7 @@ function c1764972.spop1(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c1764972.sfilter,nil,e,tp)
 	if g:GetCount()==0 or g:GetCount()>ft then return false end
 	local c=e:GetHandler()
+	local fid=c:GetFieldID()
 	local tc=g:GetFirst()
 	while tc do
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
@@ -64,7 +65,7 @@ function c1764972.spop1(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_DISABLE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e2,true)
-		tc:RegisterFlagEffect(1764972,RESET_EVENT+0x1fe0000,0,0)
+		tc:RegisterFlagEffect(1764972,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1,fid)
 		tc=g:GetNext()
 	end
 	Duel.SpecialSummonComplete()
@@ -72,18 +73,28 @@ function c1764972.spop1(e,tp,eg,ep,ev,re,r,rp)
 	local de=Effect.CreateEffect(c)
 	de:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	de:SetCode(EVENT_PHASE+PHASE_END)
+	de:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	de:SetCountLimit(1)
 	de:SetReset(RESET_PHASE+PHASE_END)
+	de:SetLabel(fid)
 	de:SetLabelObject(g)
+	de:SetCondition(c1764972.descon)
 	de:SetOperation(c1764972.desop)
 	Duel.RegisterEffect(de,tp)
 end
-function c1764972.desfilter(c)
-	return c:GetFlagEffect(1764972)~=0
+function c1764972.desfilter(c,fid)
+	return c:GetFlagEffectLabel(1764972)==fid
+end
+function c1764972.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c1764972.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		return false
+	else return true end
 end
 function c1764972.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local dg=g:Filter(c1764972.desfilter,nil)
+	local dg=g:Filter(c1764972.desfilter,nil,e:GetLabel())
 	g:DeleteGroup()
 	Duel.Destroy(dg,REASON_EFFECT)
 end
