@@ -61,6 +61,7 @@ function c85138716.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetLabel(fid)
 		e1:SetLabelObject(sg)
+		e1:SetCondition(c85138716.descon)
 		e1:SetOperation(c85138716.desop)
 		Duel.RegisterEffect(e1,tp)
 	end
@@ -68,12 +69,16 @@ end
 function c85138716.desfilter(c,fid)
 	return c:GetFlagEffectLabel(85138716)==fid
 end
+function c85138716.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c85138716.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	else return true end
+end
 function c85138716.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	local tg=g:Filter(c85138716.desfilter,nil,e:GetLabel())
 	Duel.Destroy(tg,REASON_EFFECT)
-	if not g:IsExists(c85138716.desfilter,1,nil,e:GetLabel()) then
-		g:DeleteGroup()
-		e:Reset()
-	end
 end

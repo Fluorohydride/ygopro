@@ -37,6 +37,7 @@ function c40240595.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetRange(LOCATION_SZONE)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
+		e2:SetCondition(c40240595.checkcon)
 		e2:SetOperation(c40240595.checkop)
 		e2:SetCountLimit(1)
 		e2:SetLabel(0)
@@ -57,8 +58,10 @@ function c40240595.eqop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e4)
 	end
 end
+function c40240595.checkcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c40240595.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=e:GetLabel()
 	ct=ct+1

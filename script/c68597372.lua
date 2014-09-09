@@ -51,14 +51,17 @@ function c68597372.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
 		e1:SetReset(RESET_PHASE+PHASE_END)
-		e1:SetOperation(c68597372.flip)
+		e1:SetCondition(c68597372.flipcon)
+		e1:SetOperation(c68597372.flipop)
 		e1:SetLabelObject(tc)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
-function c68597372.flip(e,tp,eg,ep,ev,re,r,rp)
+function c68597372.flipcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:IsFacedown() and tc:GetFlagEffect(68597372)~=0 then
-		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
-	end
+	return tc:IsFacedown() and tc:GetFlagEffect(68597372)~=0
+end
+function c68597372.flipop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
+	Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
 end

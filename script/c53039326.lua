@@ -12,6 +12,7 @@ function c53039326.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c53039326.mtcon)
 	e2:SetOperation(c53039326.mtop)
 	c:RegisterEffect(e2)
 	--search
@@ -35,8 +36,10 @@ end
 function c53039326.cfilter(c)
 	return c:IsCode(36623431) and not c:IsPublic()
 end
+function c53039326.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c53039326.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	local g=Duel.GetMatchingGroup(c53039326.cfilter,tp,LOCATION_HAND,0,nil)
 	local sel=1
 	if g:GetCount()~=0 then
