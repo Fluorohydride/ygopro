@@ -29,6 +29,7 @@ namespace ygopro
         
         void Init(unsigned int idx, rectf center, ti4 ti);
         bool CheckInside(float px, float py);
+        v3f translation;
     };
     
     struct FieldCard : public FieldObject {
@@ -36,9 +37,8 @@ namespace ygopro
         virtual bool UpdateVertices(double tm);
         
         void Init(unsigned int idx, unsigned int code);
-        void InitPos();
-        void MoveTo();
         void SetCode(unsigned int code);
+        void SetIconTex(ti4 ti);
         
         unsigned int code = 0;
         unsigned int status = 0;
@@ -46,6 +46,7 @@ namespace ygopro
         unsigned int loc = 0;
         unsigned int seq = 0;
         unsigned int pos = 0;
+        bool rotated = true;
         std::vector<v3f> vertex_r;
         MutableAttribute<v3f> translation;
         MutableAttribute<glm::quat> rotation;
@@ -103,6 +104,7 @@ namespace ygopro
         
         void InitField();
         void RefreshBlocks();
+        void GetLocParam(int side, int zone, int seq, int subs, int ocount, v3f& tl, glm::quat& rot);
         std::shared_ptr<FieldCard> AddCard(unsigned int code, int side, int zone, int seq, int subs);
         std::shared_ptr<FieldCard> GetCard(int side, int zone, int seq, int subs);
         void RemoveCard(int side, int zone, int seq, int subs);

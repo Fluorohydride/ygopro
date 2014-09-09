@@ -67,6 +67,7 @@ namespace ygopro
     
     void FieldBlock::Init(unsigned int idx, rectf center, ti4 ti) {
         vertex_index = idx;
+        translation = {center.left, center.top, 0.0f};
         vertex.push_back({center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
         vertex.push_back({center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
         vertex.push_back({center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
@@ -83,6 +84,42 @@ namespace ygopro
         bool cx = (vertex[0].x < vertex[1].x) ? (vertex[0].x <= px && vertex[1].x >= px) : (vertex[0].x >= px && vertex[1].x <= px);
         bool cy = (vertex[0].y < vertex[2].y) ? (vertex[0].y <= py && vertex[2].y >= py) : (vertex[0].y >= py && vertex[2].y <= py);
         return cx && cy;
+    }
+    
+    void FieldCard::RefreshVertices() {
+        std::array<glbase::v3hct, 12> vert;
+        if(rotated) {
+            vertex_r.clear();
+            auto q = rotation.Get();
+            for(auto& iter : vertex) {
+                glm::vec3 v(iter.x, iter.y, iter.z);
+                auto c = q * v;
+                vertex_r.push_back({c.x, c.y, c.z});
+            }
+            rotated = false;
+        }
+        unsigned int cl = ((unsigned int)(alpha.Get() * 255) << 24) | 0xffffff;
+        unsigned int hcl = ((unsigned int)(hl.Get() * 255) << 24) | 0xffffff;
+        auto& tl = translation.Get();
+        for(size_t i = 0; i < 12; ++i) {
+            vert[i].vertex = vertex_r[i] + tl;
+            vert[i].texcoord = texcoord[i];
+            vert[i].color = cl;
+            vert[i].hcolor = hcl;
+        }
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * vertex_index * 12, sizeof(glbase::v3hct) * 12, &vert[0]);
+    }
+    
+    bool FieldCard::UpdateVertices(double tm) {
+        alpha.Update(tm);
+        hl.Update(tm);
+        translation.Update(tm);
+        if(rotation.NeedUpdate()) {
+            rotation.Update(tm);
+            rotated = true;
+        }
+        RefreshVertices();
+        return alpha.NeedUpdate() || hl.NeedUpdate();
     }
     
     void FieldCard::Init(unsigned int idx, unsigned int code) {
@@ -114,32 +151,27 @@ namespace ygopro
             for(int i = 0; i < 4; ++i)
                 texcoord[i] = {0.0f, 0.0f};
         }
+        auto sleeve = ImageMgr::Get().GetTexture("sleeve1");
+        texcoord[4] = sleeve.vert[0];
+        texcoord[5] = sleeve.vert[1];
+        texcoord[6] = sleeve.vert[2];
+        texcoord[7] = sleeve.vert[3];
+        for(int i = 8; i < 12; ++i)
+            texcoord[i] = {0.0f, 0.0f};
         alpha = 1.0f;
         hl = 0.0f;
     }
     
-    void FieldCard::RefreshVertices() {
-        std::array<glbase::v3hct, 12> vert;
-        
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * vertex_index * 12, sizeof(glbase::v3hct) * 12, &vert[0]);
+    void FieldCard::SetCode(unsigned int code) {
+        if(this->code == code)
+            return;
     }
     
-    bool FieldCard::UpdateVertices(double tm) {
-        alpha.Update(tm);
-        hl.Update(tm);
-        translation.Update(tm);
-        if(rotation.NeedUpdate()) {
-            rotation.Update(tm);
-            auto q = rotation.Get();
-            vertex_r.clear();
-            for(auto& iter : vertex) {
-                glm::vec3 v(iter.x, iter.y, iter.z);
-                auto c = q * v;
-                vertex_r.push_back({c.x, c.y, c.z});
-            }
-        }
-        RefreshVertices();
-        return alpha.NeedUpdate() || hl.NeedUpdate();
+    void FieldCard::SetIconTex(ti4 ti) {
+        texcoord[8 ] = ti.vert[0];
+        texcoord[9 ] = ti.vert[1];
+        texcoord[10] = ti.vert[2];
+        texcoord[11] = ti.vert[3];
     }
     
     DuelScene::DuelScene() {
@@ -175,7 +207,7 @@ namespace ygopro
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 128 * 6, &index[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 512 * 4 * 6, nullptr, GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 512 * 3 * 6, nullptr, GL_STATIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glGenVertexArrays(1, &field_vao);
         glGenVertexArrays(1, &back_vao);
@@ -274,10 +306,19 @@ namespace ygopro
         ImageMgr::Get().GetRawMiscTexture()->Bind();
         glBindVertexArray(field_vao);
         glDrawElements(GL_TRIANGLES, 34 * 6, GL_UNSIGNED_SHORT, 0);
+        GLCheckError(__FILE__, __LINE__);
+        // card
+        if(alloc_cards.size()) {
+            ImageMgr::Get().GetRawCardTexture()->Bind();
+            glBindVertexArray(card_vao);
+            glDrawElements(GL_TRIANGLES, alloc_cards.size() * 18, GL_UNSIGNED_SHORT, 0);
+            GLCheckError(__FILE__, __LINE__);
+        }
         // misc
-        duel_shader.SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
-        //glBindVertexArray(misc_vao);
-        //glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
+//        duel_shader.SetParamMat4("mvp", glm::value_ptr(glm::mat4(1.0f)));
+//        ImageMgr::Get().GetRawMiscTexture()->Bind();
+//        glBindVertexArray(misc_vao);
+//        glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_SHORT, 0);
         GLCheckError(__FILE__, __LINE__);
         // end
         glBindVertexArray(0);
@@ -493,6 +534,123 @@ namespace ygopro
         s_zone[1].resize(8);
     }
     
+    void DuelScene::GetLocParam(int side, int zone, int seq, int subs, int ocount, v3f& tl, glm::quat& rot) {
+        // POS_FACEUP_ATTACK		0x1
+        // POS_FACEDOWN_ATTACK		0x2
+        // POS_FACEUP_DEFENCE		0x4
+        // POS_FACEDOWN_DEFENCE     0x8
+        switch(zone & 0x7f) {
+            case 0x1: {
+                tl = field_blocks[side][13]->translation;
+                if(subs & 0x5) {
+                    if(side == 0)
+                        rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                } else if(subs & 0xa) {
+                    if(side == 0)
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                }
+            }
+                break;
+            case 0x2: {
+                
+            }
+                break;
+            case 0x4: {
+                tl = field_blocks[side][seq]->translation;
+                if(zone & 0x80) {
+                    tl.z = 0.01f * subs;
+                } else {
+                    tl.z = 0.01f * ocount;
+                    if(subs == 1) {
+                        if(side == 0)
+                            rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                        else
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                    } else if(subs == 0x2) {
+                        if(side == 0)
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                        else
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                    } else if(subs == 0x4) {
+                        if(side == 0)
+                            rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
+                        else
+                            rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
+                    } else if(subs == 0x8) {
+                        if(side == 0)
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(-1.0f, 1.0f, 0.0f));
+                        else
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 1.0f, 0.0f));
+                    }
+                }
+
+            }
+                break;
+            case 0x8: {
+                tl = field_blocks[side][seq + 5]->translation;
+                if(subs & 0x5) {
+                    if(side == 0)
+                        rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                } else if(subs & 0xa) {
+                    if(side == 0)
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                }
+            }
+                break;
+            case 0x10: {
+                tl = field_blocks[side][15]->translation;
+                tl.z = subs * 0.01f;
+                if(side == 0)
+                    rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                else
+                    rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+            }
+                break;
+            case 0x20: {
+                tl = field_blocks[side][16]->translation;
+                tl.z = subs * 0.01f;
+                if(subs & 0x5) {
+                    if(side == 0)
+                        rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                } else if(subs & 0xa) {
+                    if(side == 0)
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                }
+            }
+                break;
+            case 0x40: {
+                tl = field_blocks[side][14]->translation;
+                tl.z = subs * 0.01f;
+                if(subs & 0x5) {
+                    if(side == 0)
+                        rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
+                } else if(subs & 0xa) {
+                    if(side == 0)
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
+                    else
+                        rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
+                }
+            }
+                break;
+            default:
+                break;
+        }
+    }
+    
     void DuelScene::RefreshBlocks() {
         for(int i = 0 ; i < 17; ++i) {
             field_blocks[0][i]->RefreshVertices();
@@ -504,6 +662,15 @@ namespace ygopro
         auto ptr = std::make_shared<FieldCard>();
         ptr->Init(alloc_cards.size(), code);
         alloc_cards.push_back(ptr);
+        ptr->ctl = side;
+        ptr->loc = zone;
+        ptr->seq = seq;
+        ptr->pos = subs;
+        v3f cur_loc;
+        glm::quat rot;
+        GetLocParam(side, zone, seq, subs, cur_loc, rot);
+        ptr->translation = cur_loc;
+        ptr->rotation = rot;
         return nullptr;
     }
     
@@ -536,8 +703,40 @@ namespace ygopro
     }
     
     void DuelScene::UpdateIndex() {
+        std::vector<unsigned short> index;
+        index.resize(alloc_cards.size() * 18);
+        auto push_index = [&index](std::vector<std::shared_ptr<FieldCard>>& vec) {
+            for(auto& iter : vec) {
+                unsigned int vstart = iter->vertex_index * 12;
+                unsigned int istart = iter->vertex_index * 18;
+                for(int i = 0; i < 3; ++i) {
+                    index[istart + i * 6 + 0] = vstart + i * 4 + 0;
+                    index[istart + i * 6 + 1] = vstart + i * 4 + 2;
+                    index[istart + i * 6 + 2] = vstart + i * 4 + 1;
+                    index[istart + i * 6 + 3] = vstart + i * 4 + 1;
+                    index[istart + i * 6 + 4] = vstart + i * 4 + 2;
+                    index[istart + i * 6 + 5] = vstart + i * 4 + 3;
+                }
+            }
+        };
+        push_index(hand[1]);
+        push_index(deck[1]);
+        push_index(extra[1]);
+        push_index(s_zone[1]);
+        push_index(m_zone[1]);
+        push_index(grave[1]);
+        push_index(banished[1]);
         
-        
+        push_index(grave[0]);
+        push_index(banished[0]);
+        push_index(m_zone[0]);
+        push_index(s_zone[0]);
+        push_index(deck[0]);
+        push_index(extra[0]);
+        push_index(hand[0]);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(unsigned short) * index.size(), &index[0]);
+        GLCheckError(__FILE__, __LINE__);
     }
     
     std::pair<int, int> DuelScene::CheckHoverBlock(float px, float py) {
