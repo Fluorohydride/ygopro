@@ -71,7 +71,7 @@ namespace ygopro
         rectf hand_rect[2];
         float hand_width[2];
         glm::mat4 mvp;
-        glm::quat hand_quat;
+        glm::quat hand_quat[2];
     };
     
     class DuelScene : public Scene, public TcpClientSeed {

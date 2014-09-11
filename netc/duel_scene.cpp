@@ -416,7 +416,8 @@ namespace ygopro
         vparam.hand_rect[1] = {vlt2.x, vlt2.y, vrb2.x - vlt2.x, vrb2.y - vlt2.y};
         vparam.hand_width[0] = vltw.x - vlt.x;
         vparam.hand_width[1] = vltw2.x - vlt2.x;
-        vparam.hand_quat = glm::angleAxis(vparam.angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        vparam.hand_quat[0] = glm::angleAxis(3.1415926f * 0.5f - vparam.angle, glm::vec3(1.0f, 0.0f, 0.0f));
+        vparam.hand_quat[1] = vparam.hand_quat[0] * glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
     }
     
     void DuelScene::KeyDown(sgui::KeyEvent evt) {
@@ -556,7 +557,31 @@ namespace ygopro
             }
                 break;
             case 0x2: {
-                
+                int ct = hand[side].size();
+                if(ct == 0)
+                    return;
+                rot = vparam.hand_quat[side];
+                if(side == 0) {
+                    float wmax = vparam.handmax - vparam.handmin;
+                    if(ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f >= wmax) {
+                        float wcard = (wmax - vparam.cardrect.width) / (ct - 1);
+                        tl = {vparam.handmin + wcard * seq + vparam.cardrect.width * 0.5f, vparam.handy[0], 0.0f};
+                    } else {
+                        float whand = ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f;
+                        float lst = vparam.handmin + (wmax - whand) * 0.5f;
+                        tl = {lst + seq * vparam.cardrect.width * 1.1f + vparam.cardrect.width * 0.5f, vparam.handy[0], 0.0f};
+                    }
+                } else {
+                    float wmax = vparam.handmax - vparam.handmin;
+                    if(ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f >= wmax) {
+                        float wcard = (wmax - vparam.cardrect.width) / (ct - 1);
+                        tl = {-vparam.handmin - wcard * seq - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
+                    } else {
+                        float whand = ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f;
+                        float lst = -vparam.handmin - (wmax - whand) * 0.5f;
+                        tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
+                    }
+                }
             }
                 break;
             case 0x4: {
@@ -668,7 +693,7 @@ namespace ygopro
         ptr->pos = subs;
         v3f cur_loc;
         glm::quat rot;
-        GetLocParam(side, zone, seq, subs, cur_loc, rot);
+        GetLocParam(side, zone, seq, subs, 0, cur_loc, rot);
         ptr->translation = cur_loc;
         ptr->rotation = rot;
         return nullptr;
