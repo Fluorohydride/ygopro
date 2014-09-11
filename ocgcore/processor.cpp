@@ -1737,7 +1737,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		//forced trigger
 		for (auto clit = core.new_fchain_s.begin(); clit != core.new_fchain_s.end(); ++clit) {
 			effect* peffect = clit->triggering_effect;
-			if(!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect)) {
+			if(!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect) && !peffect->type & EFFECT_TYPE_FLIP) {
 				clit->triggering_player = peffect->handler->current.controler;
 				clit->triggering_controler = peffect->handler->current.controler;
 				clit->triggering_location = peffect->handler->current.location;
