@@ -1,4 +1,4 @@
---Powered Inzektron
+--甲化鎧骨格
 function c46132282.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

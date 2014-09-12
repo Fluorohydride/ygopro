@@ -1,4 +1,4 @@
---Bujingi Sinyou
+--武神器－ツムガリ
 function c56574543.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

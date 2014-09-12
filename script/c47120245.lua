@@ -1,4 +1,4 @@
---Noble Knight Borz
+--聖騎士ボールス
 function c47120245.initial_effect(c)
 	--Normal monster
 	local e1=Effect.CreateEffect(c)
