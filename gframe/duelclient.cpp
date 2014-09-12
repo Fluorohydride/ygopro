@@ -1152,6 +1152,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		/*int hint1 = */BufferIO::ReadInt32(pbuf);
 		int c, l, s, ss, desc;
 		ClientCard* pcard;
+		bool panelmode = false;
 		mainGame->dField.chain_forced = (forced != 0);
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
@@ -1168,10 +1169,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_selectable = true;
 			pcard->is_selected = false;
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
-			if (pcard->location == LOCATION_GRAVE)
+			if(l == LOCATION_GRAVE)
 				mainGame->dField.grave_act = true;
-			if (pcard->location == LOCATION_REMOVED)
+			if(l == LOCATION_REMOVED)
 				mainGame->dField.remove_act = true;
+			if(l & 0xc1)
+				panelmode = true;
 		}
 		if(!forced && (mainGame->ignore_chain || ((count == 0 || specount == 0) && !mainGame->always_chain))) {
 			SetResponseI(-1);
@@ -1191,13 +1194,22 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->gMutex.Lock();
 		mainGame->stHintMsg->setText(dataManager.GetSysString(550));
 		mainGame->stHintMsg->setVisible(true);
-		if(!forced) {
-			if(count == 0)
-				myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
-			else
-				myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
-			mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
-			mainGame->PopupElement(mainGame->wQuery);
+		if(panelmode) {
+			mainGame->dField.list_command = COMMAND_ACTIVATE;
+			mainGame->dField.selectable_cards = mainGame->dField.activatable_cards;
+			std::sort(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end());
+			auto eit = std::unique(mainGame->dField.selectable_cards.begin(), mainGame->dField.selectable_cards.end());
+			mainGame->dField.selectable_cards.erase(eit, mainGame->dField.selectable_cards.end());
+			mainGame->dField.ShowChainCard();
+		} else {
+			if(!forced) {
+				if(count == 0)
+					myswprintf(textBuffer, L"%ls\n%ls", dataManager.GetSysString(201), dataManager.GetSysString(202));
+				else
+					myswprintf(textBuffer, L"%ls\n%ls", event_string, dataManager.GetSysString(203));
+				mainGame->SetStaticText(mainGame->stQMessage, 310, mainGame->textFont, (wchar_t*)textBuffer);
+				mainGame->PopupElement(mainGame->wQuery);
+			}
 		}
 		mainGame->gMutex.Unlock();
 		return false;
