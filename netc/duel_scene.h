@@ -42,12 +42,13 @@ namespace ygopro
         
         unsigned int code = 0;
         unsigned int status = 0;
-        unsigned int ctl = 0;
+        unsigned int side = 0;
         unsigned int loc = 0;
         unsigned int seq = 0;
         unsigned int pos = 0;
         bool rotated = true;
         std::vector<v3f> vertex_r;
+        std::vector<std::shared_ptr<FieldCard>> olcards;
         MutableAttribute<v3f> translation;
         MutableAttribute<glm::quat> rotation;
     };
@@ -104,11 +105,12 @@ namespace ygopro
         
         void InitField();
         void RefreshBlocks();
-        void GetLocParam(int side, int zone, int seq, int subs, int ocount, v3f& tl, glm::quat& rot);
         std::shared_ptr<FieldCard> AddCard(unsigned int code, int side, int zone, int seq, int subs);
         std::shared_ptr<FieldCard> GetCard(int side, int zone, int seq, int subs);
+        void RefreshPos(std::shared_ptr<FieldCard> pcard, bool update = true, float tm = 0.0f);
+        void RefreshHand(int side, bool update = true, float tm = 0.0f);
         void RemoveCard(int side, int zone, int seq, int subs);
-        void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs);
+        void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update = true, float tm = 0.0f);
         void ClearField();
         void UpdateIndex();
         std::pair<int, int> CheckHoverBlock(float px, float py);

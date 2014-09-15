@@ -133,6 +133,25 @@ protected:
     T end_val;
 };
 
+template<typename T, typename TGENTYPE>
+class LerpAnimatorCB : public Animator<T>, public TGENTYPE {
+public:
+    typedef std::function<T (const T& st, const T& ed, float t)> callback_type;
+    template<typename... ARGS>
+    LerpAnimatorCB(callback_type cb, T sv, T ev, ARGS... args) : TGENTYPE(args...), call_back(cb), start_val(sv), end_val(ev) {}
+    inline virtual bool IsEnd(double cur_time) {
+        return this->IsGenEnd(cur_time);
+    }
+    inline virtual T GetCurrent(double cur_time) {
+        float t = this->GetT(cur_time);
+        return call_back(start_val, end_val, t);
+    }
+protected:
+    callback_type call_back;
+    T start_val;
+    T end_val;    
+};
+
 template<typename T>
 class MutableAttribute {
 public:
