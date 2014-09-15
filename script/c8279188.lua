@@ -34,6 +34,7 @@ function c8279188.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetCondition(c8279188.descon)
 	e1:SetOperation(c8279188.desop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,3)
 	e:GetHandler():RegisterEffect(e1)
@@ -58,8 +59,10 @@ function c8279188.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.NegateAttack()
 	end
 end
+function c8279188.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
+end
 function c8279188.desop(e,tp,eg,ep,ev,re,r,rp)
-	if tp==Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

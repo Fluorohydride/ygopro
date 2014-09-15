@@ -1,4 +1,4 @@
---Sylvan Princessprout
+--森羅の姫芽君 スプラウト
 function c20579538.initial_effect(c)
 	--deck check
 	local e1=Effect.CreateEffect(c)

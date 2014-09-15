@@ -40,12 +40,20 @@ function c74845897.op(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetLabel(fid)
 		e1:SetLabelObject(g)
+		e1:SetCondition(c74845897.rmcon)
 		e1:SetOperation(c74845897.rmop)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
 function c74845897.rmfilter(c,fid)
 	return c:GetFlagEffectLabel(74845897)==fid
+end
+function c74845897.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c74845897.rmfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		return false
+	else return true end
 end
 function c74845897.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()

@@ -46,11 +46,15 @@ function c11136371.plop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetCondition(c11136371.descon)
 	e1:SetOperation(c11136371.desop)
 	Duel.RegisterEffect(e1,tp)
 end
 function c11136371.desfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x34)
+end
+function c11136371.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c11136371.desfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c11136371.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c11136371.desfilter,tp,LOCATION_ONFIELD,0,nil)

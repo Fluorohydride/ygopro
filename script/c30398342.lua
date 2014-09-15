@@ -45,7 +45,7 @@ function c30398342.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local res,teg,tep,tev,tre,tr,trp=Duel.CheckEvent(EVENT_DESTROYED,true)
 	if Duel.GetCurrentPhase()==PHASE_DAMAGE
-		or (teg:IsExists(c30398342.cfilter,1,nil,tp)
+		or (res and teg:IsExists(c30398342.cfilter,1,nil,tp)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c30398342.filter,tp,LOCATION_DECK,0,1,nil,e,tp)
 		and Duel.SelectYesNo(tp,aux.Stringid(30398342,1))) then

@@ -40,8 +40,12 @@ function c95507060.activate(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetReset(RESET_PHASE+RESET_END)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c95507060.descon)
 	e2:SetOperation(c95507060.desop)
 	Duel.RegisterEffect(e2,tp)
+end
+function c95507060.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c95507060.filter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c95507060.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c95507060.filter,tp,LOCATION_MZONE,0,nil)

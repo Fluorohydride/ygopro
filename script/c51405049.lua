@@ -40,6 +40,7 @@ function c51405049.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
 		e2:SetCountLimit(1)
+		e2:SetCondition(c51405049.damcon)
 		e2:SetOperation(c51405049.damop)
 		e2:SetReset(RESET_PHASE+PHASE_END)
 		e2:SetLabelObject(e1)
@@ -53,8 +54,9 @@ function c51405049.regop(e,tp,eg,ep,ev,re,r,rp)
 		e:SetLabel(0)
 	end
 end
+function c51405049.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetLabelObject():GetLabel()~=0
+end
 function c51405049.damop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabelObject():GetLabel()~=0 then
-		Duel.Damage(tp,2000,REASON_EFFECT)
-	end
+	Duel.Damage(tp,2000,REASON_EFFECT)
 end
