@@ -119,28 +119,19 @@ namespace ygopro
             rotated = true;
         }
         RefreshVertices();
-        return alpha.NeedUpdate() || hl.NeedUpdate();
+        return translation.NeedUpdate() || rotation.NeedUpdate() || alpha.NeedUpdate() || hl.NeedUpdate();
     }
     
     void FieldCard::Init(unsigned int idx, unsigned int code) {
         rectf center = SceneMgr::Get().LayoutRectConfig("card");
         vertex_index = idx;
-        //front
-        vertex.push_back({center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
-        //back
-        vertex.push_back({center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
-        rectf icon = SceneMgr::Get().LayoutRectConfig("icon");
-        vertex.push_back({icon.left - icon.width * 0.5f, icon.top - icon.height * 0.5f, 0.0f});
-        vertex.push_back({icon.left + icon.width * 0.5f, icon.top - icon.height * 0.5f, 0.0f});
-        vertex.push_back({icon.left - icon.width * 0.5f, icon.top + icon.height * 0.5f, 0.0f});
-        vertex.push_back({icon.left + icon.width * 0.5f, icon.top + icon.height * 0.5f, 0.0f});
+        vertex.resize(12);
         texcoord.resize(12);
+        // front
+        vertex[0] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        vertex[1] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        vertex[2] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[3] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
         if(code) {
             auto ti = ImageMgr::Get().GetCardTexture(code);
             texcoord[0] = ti.vert[0];
@@ -151,13 +142,21 @@ namespace ygopro
             for(int i = 0; i < 4; ++i)
                 texcoord[i] = {0.0f, 0.0f};
         }
+        // back
+        vertex[4] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        vertex[5] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        vertex[6] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[7] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
         auto sleeve = ImageMgr::Get().GetTexture("sleeve1");
         texcoord[4] = sleeve.vert[0];
         texcoord[5] = sleeve.vert[1];
         texcoord[6] = sleeve.vert[2];
         texcoord[7] = sleeve.vert[3];
-        for(int i = 8; i < 12; ++i)
+        // icon
+        for(int i = 8; i < 12; ++i) {
+            vertex[i] = {0.0f, 0.0f, 0.0f};
             texcoord[i] = {0.0f, 0.0f};
+        }
         alpha = 1.0f;
         hl = 0.0f;
     }
@@ -167,11 +166,30 @@ namespace ygopro
             return;
     }
     
-    void FieldCard::SetIconTex(ti4 ti) {
-        texcoord[8 ] = ti.vert[0];
-        texcoord[9 ] = ti.vert[1];
-        texcoord[10] = ti.vert[2];
-        texcoord[11] = ti.vert[3];
+    void FieldCard::SetIconTex(int id) {
+        if(id == 0) {
+            for(int i = 8; i < 12; ++i) {
+                vertex[i] = {0.0f, 0.0f, 0.0f};
+                texcoord[i] = {0.0f, 0.0f};
+            }
+        } else {
+            ti4 ti;
+            if(id == 1)
+                ti = ImageMgr::Get().GetTexture("negated");
+            else if(id == 2)
+                ti = ImageMgr::Get().GetTexture("equip");
+            else if(id == 3)
+                ti = ImageMgr::Get().GetTexture("target");
+            rectf icon = SceneMgr::Get().LayoutRectConfig("icon");
+            vertex[8 ] = {icon.left - icon.width * 0.5f, icon.top - icon.height * 0.5f, 0.0f};
+            vertex[9 ] = {icon.left + icon.width * 0.5f, icon.top - icon.height * 0.5f, 0.0f};
+            vertex[10] = {icon.left - icon.width * 0.5f, icon.top + icon.height * 0.5f, 0.0f};
+            vertex[11] = {icon.left + icon.width * 0.5f, icon.top + icon.height * 0.5f, 0.0f};
+            texcoord[8 ] = ti.vert[0];
+            texcoord[9 ] = ti.vert[1];
+            texcoord[10] = ti.vert[2];
+            texcoord[11] = ti.vert[3];
+        }
     }
     
     DuelScene::DuelScene() {
@@ -274,9 +292,7 @@ namespace ygopro
     }
     
     void DuelScene::Activate() {
-        pcard = AddCard(83764718, 0, 1, 0, 1);
-        RefreshPos(pcard);
-        UpdateIndex();
+        
     }
     
     bool DuelScene::Update() {
@@ -291,11 +307,15 @@ namespace ygopro
         } while (duel_commands.IsEmpty());
         UpdateBackground();
         UpdateField();
+        UpdateMisc();
+        UpdateIndex();
         return true;
     }
     
     void DuelScene::Draw() {
         glViewport(0, 0, scene_size.x, scene_size.y);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
         duel_shader.Use();
         duel_shader.SetParam1i("texid", 0);
         // background
@@ -326,6 +346,7 @@ namespace ygopro
         // end
         glBindVertexArray(0);
         duel_shader.Unuse();
+        glDisable(GL_CULL_FACE);
     }
     
     void DuelScene::SetSceneSize(v2i sz) {
@@ -389,6 +410,7 @@ namespace ygopro
         if(evt.button < 2) {
             btnDown[evt.button] = false;
         }
+        MoveCard(pcard, 0, 0x4, 2, 8, false, 1.0f);
     }
     
     void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
@@ -502,6 +524,61 @@ namespace ygopro
         if(!update_misc)
             return;
         update_misc = false;
+        pcard = AddCard(83764718, 1, 0x10, 0, 4);
+        RefreshPos(pcard);
+        update_index = true;
+    }
+    
+    void DuelScene::UpdateIndex() {
+        if(!update_index)
+            return;
+        update_index = false;
+        std::vector<unsigned short> index;
+        index.resize(alloc_cards.size() * 18);
+        auto push_index = [&index](std::vector<std::shared_ptr<FieldCard>>& vec) {
+            for(auto& iter : vec) {
+                if(iter == nullptr)
+                    continue;
+                unsigned int vstart = iter->vertex_index * 12;
+                unsigned int istart = iter->vertex_index * 18;
+                for(int i = 0; i < 3; ++i) {
+                    index[istart + i * 6 + 0] = vstart + i * 4 + 0;
+                    index[istart + i * 6 + 1] = vstart + i * 4 + 2;
+                    index[istart + i * 6 + 2] = vstart + i * 4 + 1;
+                    index[istart + i * 6 + 3] = vstart + i * 4 + 1;
+                    index[istart + i * 6 + 4] = vstart + i * 4 + 2;
+                    index[istart + i * 6 + 5] = vstart + i * 4 + 3;
+                }
+            }
+        };
+        push_index(hand[1]);
+        push_index(deck[1]);
+        push_index(extra[1]);
+        push_index(s_zone[1]);
+        for(auto& iter : m_zone[1]) {
+            if(iter != nullptr)
+                push_index(iter->olcards);
+        }
+        push_index(m_zone[1]);
+        push_index(grave[1]);
+        push_index(banished[1]);
+        
+        push_index(grave[0]);
+        push_index(banished[0]);
+        for(auto& iter : m_zone[0]) {
+            if(iter != nullptr)
+                push_index(iter->olcards);
+        }
+        push_index(m_zone[0]);
+        push_index(s_zone[0]);
+        push_index(deck[0]);
+        push_index(extra[0]);
+        push_index(hand[0]);
+        if(index.size() > 0) {
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * index.size(), &index[0]);
+            GLCheckError(__FILE__, __LINE__);
+        }
     }
     
     void DuelScene::InitField() {
@@ -528,6 +605,7 @@ namespace ygopro
         field_blocks[0][16]->Init(16, SceneMgr::Get().LayoutRectConfig("banish"), ImageMgr::Get().GetTexture("banish"));
         for(int i = 0; i < 17; ++i) {
             *field_blocks[1][i] = *field_blocks[0][i];
+            field_blocks[1][i]->translation = field_blocks[0][i]->translation * -1;
             for(auto& vert : field_blocks[1][i]->vertex)
                 vert = vert * -1;
             field_blocks[1][i]->vertex_index = field_blocks[0][i]->vertex_index + 17;
@@ -578,7 +656,7 @@ namespace ygopro
                 break;
             case 0x2:
                 ptr->seq = hand[side].size();
-                deck[side].push_back(ptr);
+                hand[side].push_back(ptr);
                 break;
             case 0x4:
                 if(zone & 0x80) {
@@ -610,8 +688,47 @@ namespace ygopro
         return nullptr;
     }
     
-    void DuelScene::RemoveCard(int side, int zone, int seq, int subs) {
-        
+    std::shared_ptr<FieldCard> DuelScene::RemoveCard(int side, int zone, int seq, int subs) {
+        std::shared_ptr<FieldCard> ret;
+        switch(zone & 0x7f) {
+            case 0x1:
+                ret = deck[side][seq];
+                deck[side].erase(deck[side].begin() + seq);
+                break;
+            case 0x2:
+                ret = hand[side][pcard->seq];
+                hand[side].erase(hand[side].begin() + seq);
+                break;
+            case 0x4:
+                if(zone & 0x80) {
+                    auto pcard = m_zone[side][seq];
+                    ret = pcard->olcards[subs];
+                    pcard->olcards.erase(pcard->olcards.begin() + subs);
+                } else {
+                    ret = m_zone[side][seq];
+                    m_zone[side][seq] = nullptr;
+                }
+                break;
+            case 0x8:
+                ret = s_zone[side][seq];
+                s_zone[side][seq] = nullptr;
+                break;
+            case 0x10:
+                ret = grave[side][seq];
+                grave[side].erase(grave[side].begin() + seq);
+                break;
+            case 0x20:
+                ret = banished[side][seq];
+                banished[side].erase(banished[side].begin() + seq);
+                break;
+            case 0x40:
+                ret = extra[side][seq];
+                extra[side].erase(extra[side].begin() + seq);
+                break;
+        }
+        if(ret != nullptr)
+            update_index = true;
+        return ret;
     }
     
     void DuelScene::RefreshPos(std::shared_ptr<FieldCard> pcard, bool update, float tm) {
@@ -627,6 +744,7 @@ namespace ygopro
         switch(pcard->loc & 0x7f) {
             case 0x1: {
                 tl = field_blocks[side][13]->translation;
+                tl.z = 0.001f * subs;
                 if(subs & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -675,9 +793,9 @@ namespace ygopro
             case 0x4: {
                 tl = field_blocks[side][seq]->translation;
                 if(pcard->side & 0x80) {
-                    tl.z = 0.01f * subs;
+                    tl.z = 0.001f * subs;
                 } else {
-                    tl.z = 0.01f * pcard->olcards.size();
+                    tl.z = 0.001f * pcard->olcards.size();
                     if(subs == 1) {
                         if(side == 0)
                             rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -695,9 +813,9 @@ namespace ygopro
                             rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
                     } else if(subs == 0x8) {
                         if(side == 0)
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(-1.0f, 1.0f, 0.0f));
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
                         else
-                            rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 1.0f, 0.0f));
+                            rot = glm::angleAxis(3.1415926f, glm::vec3(0.70710678f, 0.70710678f, 0.0f));
                     }
                 }
                 
@@ -720,7 +838,7 @@ namespace ygopro
                 break;
             case 0x10: {
                 tl = field_blocks[side][15]->translation;
-                tl.z = subs * 0.01f;
+                tl.z = subs * 0.001f;
                 if(side == 0)
                     rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                 else
@@ -729,7 +847,7 @@ namespace ygopro
                 break;
             case 0x20: {
                 tl = field_blocks[side][16]->translation;
-                tl.z = subs * 0.01f;
+                tl.z = subs * 0.001f;
                 if(subs & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -745,7 +863,7 @@ namespace ygopro
                 break;
             case 0x40: {
                 tl = field_blocks[side][14]->translation;
-                tl.z = subs * 0.01f;
+                tl.z = subs * 0.001f;
                 if(subs & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
@@ -769,9 +887,9 @@ namespace ygopro
         } else {
             float stm = SceneMgr::Get().GetGameTime();
             pcard->translation.SetAnimator(std::make_shared<LerpAnimator<v3f, TGenMove>>(pcard->translation.Get(), tl, stm, tm, 10));
-            pcard->rotation.SetAnimator(std::make_shared<LerpAnimatorCB<glm::quat, TGenLinear>>([](const glm::quat& st, const glm::quat& ed, float t)->glm::quat {
+            pcard->rotation.SetAnimator(std::make_shared<LerpAnimatorCB<glm::quat, TGenMove>>([](const glm::quat& st, const glm::quat& ed, float t)->glm::quat {
                 return glm::slerp(st, ed, t);
-            }, pcard->rotation.Get(), rot, stm, tm));
+            }, pcard->rotation.Get(), rot, stm, tm, 10));
         }
         if(!pcard->updating) {
             updating_cards.push_back(pcard);
@@ -834,11 +952,50 @@ namespace ygopro
     void DuelScene::MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update, float tm) {
         if(pcard->side == toside && pcard->loc == tozone && pcard->seq == toseq && pcard->pos == tosubs)
             return;
+        RemoveCard(pcard->side, pcard->loc, pcard->seq, pcard->pos);
         pcard->side = toside;
         pcard->loc = tozone;
         pcard->seq = toseq;
         pcard->pos = tosubs;
+        switch(tozone & 0x7f) {
+            case 0x1:
+                pcard->seq = deck[toside].size();
+                deck[toside].push_back(pcard);
+                break;
+            case 0x2:
+                pcard->seq = hand[toside].size();
+                hand[toside].push_back(pcard);
+                break;
+            case 0x4:
+                if(tozone & 0x80) {
+                    auto pre = m_zone[toside][toseq];
+                    pre->olcards.push_back(pcard);
+                } else
+                    m_zone[toside][toseq] = pcard;
+                break;
+            case 0x8:
+                s_zone[toside][toseq] = pcard;
+                break;
+            case 0x10:
+                pcard->seq = grave[toside].size();
+                grave[toside].push_back(pcard);
+                break;
+            case 0x20:
+                pcard->seq = banished[toside].size();
+                banished[toside].push_back(pcard);
+                break;
+            case 0x40:
+                pcard->seq = extra[toside].size();
+                extra[toside].push_back(pcard);
+                break;
+        }
         RefreshPos(pcard, update, tm);
+        update_index = true;
+    }
+    
+    void DuelScene::ReleaseCard(std::shared_ptr<FieldCard> pcard) {
+        if(pcard == nullptr)
+            return;
     }
     
     void DuelScene::ClearField() {
@@ -855,47 +1012,6 @@ namespace ygopro
         }
         ImageMgr::Get().UnloadAllCardTexture();
         alloc_cards.clear();
-    }
-    
-    void DuelScene::UpdateIndex() {
-        std::vector<unsigned short> index;
-        index.resize(alloc_cards.size() * 18);
-        auto push_index = [&index](std::vector<std::shared_ptr<FieldCard>>& vec) {
-            for(auto& iter : vec) {
-                if(iter == nullptr)
-                    continue;
-                unsigned int vstart = iter->vertex_index * 12;
-                unsigned int istart = iter->vertex_index * 18;
-                for(int i = 0; i < 3; ++i) {
-                    index[istart + i * 6 + 0] = vstart + i * 4 + 0;
-                    index[istart + i * 6 + 1] = vstart + i * 4 + 2;
-                    index[istart + i * 6 + 2] = vstart + i * 4 + 1;
-                    index[istart + i * 6 + 3] = vstart + i * 4 + 1;
-                    index[istart + i * 6 + 4] = vstart + i * 4 + 2;
-                    index[istart + i * 6 + 5] = vstart + i * 4 + 3;
-                }
-            }
-        };
-        push_index(hand[1]);
-        push_index(deck[1]);
-        push_index(extra[1]);
-        push_index(s_zone[1]);
-        push_index(m_zone[1]);
-        push_index(grave[1]);
-        push_index(banished[1]);
-        
-        push_index(grave[0]);
-        push_index(banished[0]);
-        push_index(m_zone[0]);
-        push_index(s_zone[0]);
-        push_index(deck[0]);
-        push_index(extra[0]);
-        push_index(hand[0]);
-        if(index.size() > 0) {
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
-            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * index.size(), &index[0]);
-            GLCheckError(__FILE__, __LINE__);
-        }
     }
     
     std::pair<int, int> DuelScene::CheckHoverBlock(float px, float py) {

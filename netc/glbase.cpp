@@ -132,10 +132,6 @@ namespace glbase {
         return false;
     }
     
-    void Shader::Unuse() {
-        glUseProgram(0);
-    }
-    
     void Shader::SetParam1i(const char* varname, const int value) {
         auto loc = glGetUniformLocation(program, varname);
         if(loc >= 0)
@@ -194,6 +190,10 @@ namespace glbase {
             inited = true;
         }
         return default_shader;
+    }
+    
+    void Shader::Unuse() {
+        glUseProgram(0);
     }
     
     Image::~Image() {

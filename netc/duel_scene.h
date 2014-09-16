@@ -38,7 +38,7 @@ namespace ygopro
         
         void Init(unsigned int idx, unsigned int code);
         void SetCode(unsigned int code);
-        void SetIconTex(ti4 ti);
+        void SetIconTex(int id);
         
         unsigned int code = 0;
         unsigned int status = 0;
@@ -102,17 +102,19 @@ namespace ygopro
         void UpdateBackground();
         void UpdateField();
         void UpdateMisc();
+        void UpdateIndex();
         
         void InitField();
         void RefreshBlocks();
         std::shared_ptr<FieldCard> AddCard(unsigned int code, int side, int zone, int seq, int subs);
         std::shared_ptr<FieldCard> GetCard(int side, int zone, int seq, int subs);
+        std::shared_ptr<FieldCard> RemoveCard(int side, int zone, int seq, int subs);
         void RefreshPos(std::shared_ptr<FieldCard> pcard, bool update = true, float tm = 0.0f);
-        void RefreshHand(int side, bool update = true, float tm = 0.0f);
-        void RemoveCard(int side, int zone, int seq, int subs);
+        void RefreshHand(int side, bool update = true, float tm = 0.0f);        
         void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update = true, float tm = 0.0f);
+        void ReleaseCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
-        void UpdateIndex();
+        
         std::pair<int, int> CheckHoverBlock(float px, float py);
         std::pair<int, int> GetHoverPos(int posx, int posy);
         
@@ -130,6 +132,7 @@ namespace ygopro
         unsigned int misc_vao = 0;        
         bool update_bg = true;
         bool update_misc = true;
+        bool update_index = true;
         CommandList<DuelCommand> duel_commands;
         glbase::Shader duel_shader;
         

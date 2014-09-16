@@ -165,13 +165,13 @@ namespace glbase {
         bool LoadFragShader(const char* buffer);
         bool Link();
         bool Use();
-        void Unuse();
         void Unload();
         void SetParam1i(const char* varname, const int value);
         void SetParamMat4(const char* varname, const float m[]);
         
     public:
         static Shader& GetDefaultShader();
+        static void Unuse();
         
     protected:
         unsigned int vert_shader = 0;
