@@ -112,6 +112,7 @@ namespace ygopro
         void RefreshPos(std::shared_ptr<FieldCard> pcard, bool update = true, float tm = 0.0f);
         void RefreshHand(int side, bool update = true, float tm = 0.0f);        
         void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update = true, float tm = 0.0f);
+        void ChangePos(std::shared_ptr<FieldCard> pcard, int pos, bool update = true, float tm = 0.0f);
         void ReleaseCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
         
