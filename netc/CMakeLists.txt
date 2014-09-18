@@ -24,6 +24,7 @@ target_link_libraries (netc
     ${LUA_LIBRARIES}
     ${LIBEVENT_LIBRARIES}
     ${wxWidgets_LIBRARIES}
+    ${SQLITE_LIBRARIES}
     ${GLFW3_LIBRARIES}
     ${OPENGL_gl_LIBRARY}
     ${FREETYPE_LIBRARIES}
@@ -34,6 +35,7 @@ include_directories (
     ${LUA_INCLUDE_DIR}
     ${LIBEVENT_INCLUDE_DIR}
     ${wxWidgets_INCLUDE_DIRS}
+    ${SQLITE_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}
     ${GLFW3_INCLUDE_DIR}
     ${FREETYPE_INCLUDE_DIR}

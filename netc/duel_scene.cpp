@@ -482,6 +482,8 @@ namespace ygopro
         vparam.scry = 2.0f * tanf(vparam.fovy * 0.5f) * vparam.cnear;
         vparam.scrx = vparam.scry * scene_size.x / scene_size.y;
         UpdateHandRect();
+        RefreshHand(0);
+        RefreshHand(1);
     }
     
     void DuelScene::UpdateBackground() {
@@ -539,8 +541,10 @@ namespace ygopro
         if(!update_misc)
             return;
         update_misc = false;
-        testcard = AddCard(83764718, 1, 0x4, 2, 1);
-        RefreshPos(testcard);
+        for(int i = 0; i < 5; ++i)
+            testcard = AddCard(83764718, 0, 0x2, 2, 1);
+        //RefreshPos(testcard);
+        RefreshHand(0);
         update_index = true;
     }
     
@@ -1131,8 +1135,14 @@ namespace ygopro
     }
     
     std::pair<int, int> DuelScene::GetHoverPos(int posx, int posy) {
-        float x = (float)posx / scene_size.x * 2.0f - 1.0f - vparam.xoffset;
-        float y = 1.0f - (float)posy / scene_size.y * 2.0f - vparam.yoffset;
+        float sx = (float)posx / scene_size.x * 2.0f - 1.0f;
+        float sy = 1.0f - (float)posy / scene_size.y * 2.0f;
+        if(sx > vparam.hand_rect[0].left && sx < vparam.hand_rect[0].left + vparam.hand_rect[0].width &&
+           sy > vparam.hand_rect[0].top && sy < vparam.hand_rect[0].top + vparam.hand_rect[0].height) {
+            
+        }
+        float x = sx - vparam.xoffset;
+        float y = sy - vparam.yoffset;
         float projx = vparam.scrx * 0.5f * x;
         float projy = vparam.scry * 0.5f * y;
         float k = tanf(3.1415926f - vparam.angle + atanf(projy / vparam.cnear));

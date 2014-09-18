@@ -1,7 +1,5 @@
 #include "../common/common.h"
 
-#include <wx/wfstream.h>
-#include <wx/txtstrm.h>
 #include <wx/tokenzr.h>
 
 #include "card_data.h"
@@ -70,19 +68,17 @@ namespace ygopro
     }
     
     bool DeckData::LoadFromFile(const std::wstring& file) {
-        wxFileInputStream deck_file(file);
-        if(!deck_file.IsOk())
-            return false;
-        if(!deck_file.IsSeekable())
+        std::ifstream deck_file(To<std::string>(file));
+        if(!deck_file)
             return false;
         main_deck.clear();
         extra_deck.clear();
         side_deck.clear();
-        wxTextInputStream ts(deck_file);
         bool side = false;
         unsigned int code;
-        while(!deck_file.Eof()) {
-            std::string line = ts.ReadLine().ToUTF8().data();
+        while(!deck_file.eof()) {
+            std::string line;
+            std::getline(deck_file, line);
             if(line.empty() || line[0] == '#')
                 continue;
             if(line[0] == '!') {
@@ -175,19 +171,18 @@ namespace ygopro
     }
     
     void DeckData::SaveToFile(const std::wstring& file) {
-        wxFileOutputStream deck_file(file);
-        if(!deck_file.IsOk())
+        std::ofstream deck_file(To<std::string>(file));
+        if(!deck_file)
             return;
-        wxTextOutputStream ts(deck_file);
-        ts << "#Created by ygopro deck editor." << endl << "#main" << endl;
+        deck_file << "#Created by ygopro deck editor." << std::endl << "#main" << std::endl;
         for(auto& cd : main_deck)
-            ts << cd->data->code << " #" << cd->data->name << endl;
+            deck_file << cd->data->code << " #" << cd->data->name << std::endl;
         for(auto& cd : extra_deck)
-            ts << cd->data->code << " #" << cd->data->name << endl;
+            deck_file << cd->data->code << " #" << cd->data->name << std::endl;
         if(side_deck.size()) {
-            ts << "!side" << endl;
+            deck_file << "!side" << std::endl;
             for(auto& cd : side_deck)
-                ts << cd->data->code << " #" << cd->data->name << endl;
+                deck_file << cd->data->code << " #" << cd->data->name << std::endl;
         }
     }
     
@@ -375,14 +370,14 @@ namespace ygopro
     }
     
     void LimitRegulationMgr::LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name) {
-        wxFileInputStream ban_file(file);
-        if(!ban_file.IsOk())
+        std::ifstream ban_file(To<std::string>(file));
+        if(!ban_file)
             return;
-        wxTextInputStream ts(ban_file);
         unsigned int code, count;
         LimitRegulation* plist = nullptr;
-        while(!ban_file.Eof()) {
-            std::string line = ts.ReadLine().ToUTF8().data();
+        while(!ban_file.eof()) {
+            std::string line;
+            std::getline(ban_file, line);
             if(line.empty() || line[0] == '#')
                 continue;
             if(line[0] == '!') {

@@ -1,6 +1,6 @@
 #include "../common/common.h"
 
-#include "../buildin/sqlite3.h"
+#include <sqlite3.h>
 
 #include "card_data.h"
 #include "scene_mgr.h"

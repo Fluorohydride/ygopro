@@ -1,7 +1,6 @@
 #include "../common/common.h"
 
 #include <wx/xml/xml.h>
-#include <wx/clipbrd.h>
 
 #include "sungui.h"
 
@@ -2654,9 +2653,7 @@ namespace sgui
                     if(sel_start == sel_end)
                         break;
                     std::wstring str = text.substr(sel_start, sel_end - sel_start);
-                    wxTheClipboard->Open();
-                    wxTheClipboard->SetData(new wxTextDataObject(str));
-                    wxTheClipboard->Close();
+                    glfwSetClipboardString(nullptr, To<std::string>(str).c_str());
                     text.erase(text.begin() + sel_start, text.begin() + sel_end);
                     color_vec.erase(color_vec.begin() + sel_start, color_vec.begin() + sel_end);
                     cursor_pos = sel_start;
@@ -2671,9 +2668,7 @@ namespace sgui
                     if(sel_start == sel_end)
                         break;
                     std::wstring str = text.substr(sel_start, sel_end - sel_start);
-                    wxTheClipboard->Open();
-                    wxTheClipboard->SetData(new wxTextDataObject(str));
-                    wxTheClipboard->Close();
+                    glfwSetClipboardString(nullptr, To<std::string>(str).c_str());
                 }
                 break;
             case GLFW_KEY_V:
@@ -2683,11 +2678,8 @@ namespace sgui
                         text.erase(text.begin() + sel_start, text.begin() + sel_end);
                         color_vec.erase(color_vec.begin() + sel_start, color_vec.begin() + sel_end);
                     }
-                    wxTextDataObject tdo;
-                    wxTheClipboard->Open();
-                    wxTheClipboard->GetData(tdo);
-                    wxTheClipboard->Close();
-                    std::wstring str = tdo.GetText().ToStdWstring();
+                    std::string utf8str = glfwGetClipboardString(nullptr);
+                    std::wstring str = To<std::wstring>(utf8str);
                     text.insert(cursor_pos, str);
                     std::vector<unsigned int> nvec;
                     for(size_t i = 0; i < str.length(); ++i)

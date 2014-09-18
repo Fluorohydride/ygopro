@@ -1,7 +1,5 @@
 #include "../common/common.h"
 
-#include <wx/clipbrd.h>
-
 #include "glbase.h"
 #include "sungui.h"
 #include "image_mgr.h"
@@ -533,11 +531,7 @@ namespace ygopro
     
     void BuildScene::LoadDeckFromClipboard() {
         DeckData tempdeck;
-        wxTextDataObject tdo;
-        wxTheClipboard->Open();
-        wxTheClipboard->GetData(tdo);
-        wxTheClipboard->Close();
-        std::string deck_string = tdo.GetText().ToUTF8().data();
+        std::string deck_string = glfwGetClipboardString(nullptr);
         if(deck_string.find("ydk://") == 0 && tempdeck.LoadFromString(deck_string.substr(6))) {
             ClearDeck();
             current_deck = tempdeck;
@@ -580,9 +574,7 @@ namespace ygopro
         auto str = current_deck.SaveToString();
         std::string deck_string;
         deck_string.append("ydk://").append(str);
-        wxTheClipboard->Open();
-        wxTheClipboard->SetData(new wxTextDataObject(deck_string));
-        wxTheClipboard->Close();
+        glfwSetClipboardString(nullptr, deck_string.c_str());
         MessageBox::ShowOK(L"", stringCfg["eui_msg_deck_tostr_ok"]);
     }
     
@@ -652,7 +644,13 @@ namespace ygopro
                     else
                         neturl.replace(ntpos, 6, current_file, pos + 1, std::wstring::npos);
                 }
-                wxLaunchDefaultBrowser(neturl);
+#ifdef _WIN32
+                std::string url = "start \"\" \"";
+#else
+                std::string url = "open \"";
+#endif
+                url.append(To<std::string>(neturl)).append("\"");
+                std::system(url.c_str());
                 break;
             }
             default:
