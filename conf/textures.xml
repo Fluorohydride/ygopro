@@ -34,7 +34,7 @@
   <texture src="misc" name="exdeck" x="420" y="220" w="24" h="32"/>
   <texture src="misc" name="grave" x="420" y="220" w="24" h="32"/>
   <texture src="misc" name="banish" x="420" y="220" w="24" h="32"/>
-  <points src="misc" name="main_t" x4="440" y4="156" x3="440" y3="130" x2="500" y2="156" x1="500" y1="130"/>
-  <points src="misc" name="extra_t" x4="440" y4="186" x3="440" y3="160" x2="500" y2="186" x1="500" y1="160"/>
-  <points src="misc" name="side_t" x4="440" y4="216" x3="440" y3="190" x2="500" y2="216" x1="500" y1="190"/>
+  <points src="misc" name="main_t" x1="500" y1="130" x2="500" y2="156" x3="440" y3="130" x4="440" y4="156"/>
+  <points src="misc" name="extra_t" x1="500" y1="160" x2="500" y2="186" x3="440" y3="160" x4="440" y4="186"/>
+  <points src="misc" name="side_t" x1="500" y1="190" x2="500" y2="216" x3="440" y3="190" x4="440" y4="216"/>
 </Texture>

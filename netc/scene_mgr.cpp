@@ -1,6 +1,8 @@
 #include "../common/common.h"
 
-#include <wx/xml/xml.h>
+#include "../buildin/rapidxml.hpp"
+#include "../buildin/rapidxml_print.hpp"
+#include "../buildin/rapidxml_utils.hpp"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../buildin/stb_image_write.h"
@@ -16,32 +18,36 @@ namespace ygopro
     
     void SceneMgr::Init(const std::wstring& layout) {
         start_time = std::chrono::system_clock::now().time_since_epoch().count();
-        wxXmlDocument doc;
-		if(!doc.Load(layout, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return;
-		wxXmlNode* root = doc.GetRoot();
-		wxXmlNode* child = root->GetChildren();
-		while (child) {
-            if(child->GetType() == wxXmlNodeType::wxXML_ELEMENT_NODE) {
-                if (child->GetName() == "integer") {
-                    std::string name = child->GetAttribute("name").ToUTF8().data();
-                    int val = To<int>(child->GetAttribute("value").ToUTF8().data());
-                    int_config[name] = val;
-                } else if(child->GetName() == "float") {
-                    std::string name = child->GetAttribute("name").ToUTF8().data();
-                    float val = To<float>(child->GetAttribute("value").ToUTF8().data());
-                    float_config[name] = val;
-                } else if(child->GetName() == "rect") {
-                    std::string name = child->GetAttribute("name").ToUTF8().data();
-                    float x = To<float>(child->GetAttribute("x").ToUTF8().data());
-                    float y = To<float>(child->GetAttribute("y").ToUTF8().data());
-                    float w = To<float>(child->GetAttribute("w").ToUTF8().data());
-                    float h = To<float>(child->GetAttribute("h").ToUTF8().data());
-                    rect_config[name] = rectf{x, y, w, h};
-                }
+        rapidxml::file<> f(To<std::string>(layout).c_str());
+        rapidxml::xml_document<> doc;
+        doc.parse<0>(f.data());
+        rapidxml::xml_node<>* root = doc.first_node();
+        rapidxml::xml_node<>* config_node = root->first_node();
+        while(config_node) {
+            std::string config_name = config_node->name();
+            rapidxml::xml_attribute<>* attr = config_node->first_attribute();
+            if(config_name == "integer") {
+                std::string name = attr->value();
+                int val = To<int>(attr->next_attribute()->value());
+                int_config[name] = val;
+            } else if(config_name == "float") {
+                std::string name = attr->value();
+                float val = To<float>(attr->next_attribute()->value());
+                float_config[name] = val;
+            } else if(config_name == "rect") {
+                std::string name = attr->value();
+                attr = attr->next_attribute();
+                float x = To<float>(attr->value());
+                attr = attr->next_attribute();
+                float y = To<float>(attr->value());
+                attr = attr->next_attribute();
+                float w = To<float>(attr->value());
+                attr = attr->next_attribute();
+                float h = To<float>(attr->value());
+                rect_config[name] = rectf{x, y, w, h};
             }
-            child = child->GetNext();
-		}
+            config_node = config_node->next_sibling();
+        }
     }
     
     void SceneMgr::Uninit() {

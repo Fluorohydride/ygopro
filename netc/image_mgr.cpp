@@ -1,7 +1,9 @@
 #include "../common/common.h"
+#include "../common/filesystem.h"
 
-#include <wx/xml/xml.h>
-#include <wx/wfstream.h>
+#include "../buildin/rapidxml.hpp"
+#include "../buildin/rapidxml_print.hpp"
+#include "../buildin/rapidxml_utils.hpp"
 
 #include "image_mgr.h"
 #include "scene_mgr.h"
@@ -190,18 +192,21 @@ namespace ygopro
     }
     
 	bool ImageMgr::LoadImageConfig(const std::wstring& name) {
-		wxXmlDocument doc;
-        if(!wxFileExists(name))
+        if(!FileSystem::IsFileExists(name))
             return false;
-		if(!doc.Load(name, "UTF-8", wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return false;
-        wxXmlNode* root = doc.GetRoot();
-		wxXmlNode* child = root->GetChildren();
-		while (child) {
-            if (child->GetName() == "image") {
-                std::string name = child->GetAttribute("name").ToUTF8().data();
-                std::string path = child->GetAttribute("path").ToUTF8().data();
-                if(wxFileExists(path)) {
+        rapidxml::file<> f(To<std::string>(name).c_str());
+        rapidxml::xml_document<> doc;
+        doc.parse<0>(f.data());
+        rapidxml::xml_node<>* root = doc.first_node();
+        rapidxml::xml_node<>* config_node = root->first_node();
+        while(config_node) {
+            std::string config_name = config_node->name();
+            rapidxml::xml_attribute<>* attr = config_node->first_attribute();
+            if(config_name == "image") {
+                std::string name = attr->value();
+                attr = attr->next_attribute();
+                std::string path = attr->value();
+                if(FileSystem::IsFileExists(path)) {
                     glbase::Image img;
                     if(img.LoadFile(path)) {
                         if(name == "card")
@@ -212,10 +217,11 @@ namespace ygopro
                             bg_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                     }
                 }
-            } else if (child->GetName() == "texture") {
-				std::string name = child->GetAttribute("name").ToUTF8().data();
-                std::string src = child->GetAttribute("src").ToUTF8().data();
+            } else if(config_name == "texture") {
                 glbase::Texture* ptex = nullptr;
+                std::string src = attr->value();
+                attr = attr->next_attribute();
+                std::string name = attr->value();
                 if(src == "card")
                     ptex = &card_texture;
                 else if(src == "misc")
@@ -224,10 +230,14 @@ namespace ygopro
                     ptex = &bg_texture;
                 if(ptex) {
                     auto& ti = misc_textures[name];
-                    int x = To<int>(child->GetAttribute("x").ToUTF8().data());
-                    int y = To<int>(child->GetAttribute("y").ToUTF8().data());
-                    int w = To<int>(child->GetAttribute("w").ToUTF8().data());
-                    int h = To<int>(child->GetAttribute("h").ToUTF8().data());
+                    attr = attr->next_attribute();
+                    int x = To<int>(attr->value());
+                    attr = attr->next_attribute();
+                    int y = To<int>(attr->value());
+                    attr = attr->next_attribute();
+                    int w = To<int>(attr->value());
+                    attr = attr->next_attribute();
+                    int h = To<int>(attr->value());
                     ti.vert[0].x = (float)x / ptex->GetWidth();
                     ti.vert[0].y = (float)y / ptex->GetHeight();
                     ti.vert[1].x = (float)(x + w) / ptex->GetWidth();
@@ -237,10 +247,11 @@ namespace ygopro
                     ti.vert[3].x = (float)(x + w) / ptex->GetWidth();
                     ti.vert[3].y = (float)(y + h) / ptex->GetHeight();
                 }
-			} else if (child->GetName() == "points") {
-				std::string name = child->GetAttribute("name").ToUTF8().data();
-                std::string src = child->GetAttribute("src").ToUTF8().data();
+            } else if(config_name == "points") {
                 glbase::Texture* ptex = nullptr;
+                std::string src = attr->value();
+                attr = attr->next_attribute();
+                std::string name = attr->value();
                 if(src == "card")
                     ptex = &card_texture;
                 else if(src == "misc")
@@ -250,14 +261,10 @@ namespace ygopro
                 if(ptex) {
                     auto& ti = misc_textures[name];
                     int val[8];
-                    val[0] = To<int>(child->GetAttribute("x1").ToUTF8().data());
-                    val[1] = To<int>(child->GetAttribute("y1").ToUTF8().data());
-                    val[2] = To<int>(child->GetAttribute("x2").ToUTF8().data());
-                    val[3] = To<int>(child->GetAttribute("y2").ToUTF8().data());
-                    val[4] = To<int>(child->GetAttribute("x3").ToUTF8().data());
-                    val[5] = To<int>(child->GetAttribute("y3").ToUTF8().data());
-                    val[6] = To<int>(child->GetAttribute("x4").ToUTF8().data());
-                    val[7] = To<int>(child->GetAttribute("y4").ToUTF8().data());
+                    for(int i = 0; i < 8; ++i) {
+                        attr = attr->next_attribute();
+                        val[i] = To<int>(attr->value());
+                    }
                     ti.vert[0].x = (float)val[0] / ptex->GetWidth();
                     ti.vert[0].y = (float)val[1] / ptex->GetHeight();
                     ti.vert[1].x = (float)val[2] / ptex->GetWidth();
@@ -268,8 +275,8 @@ namespace ygopro
                     ti.vert[3].y = (float)val[7] / ptex->GetHeight();
                 }
             }
-			child = child->GetNext();
-		}
+            config_node = config_node->next_sibling();
+        }
         auto& char_tex = misc_textures["char"];
         float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
         float dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;

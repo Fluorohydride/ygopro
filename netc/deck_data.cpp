@@ -1,6 +1,5 @@
 #include "../common/common.h"
-
-#include <wx/tokenzr.h>
+#include "../common/tokenizer.h"
 
 #include "card_data.h"
 #include "deck_data.h"
@@ -176,13 +175,13 @@ namespace ygopro
             return;
         deck_file << "#Created by ygopro deck editor." << std::endl << "#main" << std::endl;
         for(auto& cd : main_deck)
-            deck_file << cd->data->code << " #" << cd->data->name << std::endl;
+            deck_file << cd->data->code << " #" << To<std::string>(cd->data->name) << std::endl;
         for(auto& cd : extra_deck)
-            deck_file << cd->data->code << " #" << cd->data->name << std::endl;
+            deck_file << cd->data->code << " #" << To<std::string>(cd->data->name) << std::endl;
         if(side_deck.size()) {
             deck_file << "!side" << std::endl;
             for(auto& cd : side_deck)
-                deck_file << cd->data->code << " #" << cd->data->name << std::endl;
+                deck_file << cd->data->code << " #" << To<std::string>(cd->data->name) << std::endl;
         }
     }
     
@@ -388,9 +387,9 @@ namespace ygopro
             }
             if(plist == nullptr)
                 continue;
-            wxStringTokenizer tk(line, wxT(" \t\r\n"), wxTOKEN_STRTOK);
-            code = To<unsigned int>(tk.GetNextToken().ToUTF8().data());
-            count = To<unsigned int>(tk.GetNextToken().ToUTF8().data());
+            Tokenizer<> tk(line, " \t\r\n");
+            code = To<unsigned int>(tk[0]);
+            count = To<unsigned int>(tk[1]);
             if(code == 0)
                 continue;
             plist->counts[(unsigned int)code] = (unsigned int)count;

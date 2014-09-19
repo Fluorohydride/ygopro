@@ -1,6 +1,8 @@
 #include "../common/common.h"
 
-#include <wx/xml/xml.h>
+#include "../buildin/rapidxml.hpp"
+#include "../buildin/rapidxml_print.hpp"
+#include "../buildin/rapidxml_utils.hpp"
 
 #include "sungui.h"
 
@@ -804,52 +806,54 @@ namespace sgui
         AddConfig("combobox", SGComboBox::combobox_config);
         AddConfig("tabcontrol", SGTabControl::tab_config);
         
-        wxXmlDocument doc;
-		if(!doc.Load(gui_conf, wxT("UTF-8"), wxXMLDOC_KEEP_WHITESPACE_NODES))
-			return false;
-		wxXmlNode* root = doc.GetRoot();
-		wxXmlNode* subtype = root->GetChildren();
-		while (subtype) {
-            if(subtype->GetType() != wxXmlNodeType::wxXML_ELEMENT_NODE) {
-                subtype = subtype->GetNext();
-                continue;
-            }
-            auto iter = configs.find(subtype->GetName().ToUTF8().data());
+        rapidxml::file<> f(To<std::string>(gui_conf).c_str());
+        rapidxml::xml_document<> doc;
+        doc.parse<0>(f.data());
+        rapidxml::xml_node<>* root = doc.first_node();
+        rapidxml::xml_node<>* subtype_node = root->first_node();
+        while(subtype_node) {
+            std::string subtype = subtype_node->name();
+            auto iter = configs.find(subtype);
             if(iter != configs.end()) {
-                wxXmlNode* child = subtype->GetChildren();
-                while(child) {
-                    if(child->GetType() != wxXmlNodeType::wxXML_ELEMENT_NODE) {
-                        child = child->GetNext();
-                        continue;
-                    }
-                    if (child->GetName() == "integer") {
-                        std::string name = child->GetAttribute("name").ToUTF8().data();
-                        int value = To<int>(child->GetAttribute("value").ToUTF8().data());
-                        iter->second->int_config[name] = value;
-                    } else if(child->GetName() == "string") {
-                        std::string name = child->GetAttribute("name").ToUTF8().data();
-                        std::string value = child->GetAttribute("value").ToUTF8().data();
-                        iter->second->string_config[name] = value;
-                    } else if(child->GetName() == "rect") {
-                        std::string name = child->GetAttribute("name").ToUTF8().data();
-                        int u = To<int>(child->GetAttribute("u").ToUTF8().data());
-                        int v = To<int>(child->GetAttribute("v").ToUTF8().data());
-                        int w = To<int>(child->GetAttribute("w").ToUTF8().data());
-                        int h = To<int>(child->GetAttribute("h").ToUTF8().data());
+                rapidxml::xml_node<>* config_node = subtype_node->first_node();
+                while(config_node) {
+                    std::string config_name = config_node->name();
+                    rapidxml::xml_attribute<>* attr = config_node->first_attribute();
+                    if(config_name == "integer") {
+                        std::string name = attr->value();
+                        int val = To<int>(attr->next_attribute()->value());
+                        iter->second->int_config[name] = val;
+                    } else if(config_name == "string") {
+                        std::string name = attr->value();
+                        std::string val = attr->next_attribute()->value();
+                        iter->second->string_config[name] = val;
+                    } else if(config_name == "rect") {
+                        std::string name = attr->value();
+                        attr = attr->next_attribute();
+                        int u = To<int>(attr->value());
+                        attr = attr->next_attribute();
+                        int v = To<int>(attr->value());
+                        attr = attr->next_attribute();
+                        int w = To<int>(attr->value());
+                        attr = attr->next_attribute();
+                        int h = To<int>(attr->value());
                         iter->second->tex_config[name] = recti{u, v, w, h};
-                    } else if(child->GetName() == "font") {
-                        std::string name = child->GetAttribute("name").ToUTF8().data();
-                        std::string file = child->GetAttribute("file").ToUTF8().data();
-                        int sz = To<int>(child->GetAttribute("size").ToUTF8().data());
+                    } else if(config_name == "font") {
+                        std::string name = attr->value();
+                        attr = attr->next_attribute();
+                        std::string file = attr->value();
+                        attr = attr->next_attribute();
+                        int sz = To<int>(attr->value());
                         auto& ft = font_mgr[name];
                         if(!ft.Load(file, sz))
                             font_mgr.erase(name);
                     }
-                    child = child->GetNext();
+                    config_node = config_node->next_sibling();
                 }
             }
-			subtype = subtype->GetNext();
-		}
+            subtype_node = subtype_node->next_sibling();
+        }
+        
         if(font_mgr.find("default") == font_mgr.end())
             return false;
         glbase::Image img;

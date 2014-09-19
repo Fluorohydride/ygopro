@@ -3,7 +3,7 @@
 
 #define GLEW_STATIC
 #include <GL/glew.h>
-#ifdef __WXMAC__
+#ifdef __MACH__
 #include <OpenGL/gl.h>
 #include <OpenGL/glu.h>
 #else

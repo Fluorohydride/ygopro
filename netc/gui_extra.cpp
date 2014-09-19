@@ -1,7 +1,5 @@
 #include "../common/common.h"
-
-#include <wx/dir.h>
-#include <wx/filename.h>
+#include "../common/filesystem.h"
 
 #include "card_data.h"
 #include "scene_mgr.h"
@@ -137,7 +135,7 @@ namespace ygopro
         this->root = root;
         this->path = root;
         this->filter = filter;
-        if(!wxDirExists(root) && !wxMkdir(root))
+        if(!FileSystem::IsDirExists(root) && !FileSystem::MakeDir(root))
             return;
         auto sz = sgui::SGGUIRoot::GetSingleton().GetSceneSize();
         auto wd = sgui::SGWindow::Create(nullptr, {sz.x / 2 - 150, sz.y / 2 - 200}, {300, 330});
@@ -192,32 +190,26 @@ namespace ygopro
     }
     
     void FileDialog::RefreshList(sgui::SGListBox* list) {
-        wxDir dir;
-        if(!dir.Open(path))
-            return;
-        wxArrayString dirs;
-        wxArrayString files;
-        wxString fn;
-        wxString prefix = path + "/";
-        bool res = dir.GetFirst(&fn, wxEmptyString, wxDIR_FILES | wxDIR_DIRS);
-        while(res) {
-            if(wxFileName::DirExists(prefix + fn))
-                dirs.Add(fn);
-            else {
-                if(filter.size() && fn.Right(filter.size()) == filter)
-                    files.Add(fn);
+        std::vector<std::wstring> dirs;
+        std::vector<std::wstring> files;
+        FileSystem::TraversalDir(path, [this, &dirs, &files](const std::wstring& name, bool isdir) {
+            if(isdir) {
+                if(name != L"." && name != L"..")
+                    dirs.push_back(name);
+            } else {
+                if(name.find(filter) == (name.size() - filter.size()))
+                    files.push_back(name);
             }
-            res = dir.GetNext(&fn);
-        }
-        dirs.Sort();
-        files.Sort();
+        });
+        std::sort(dirs.begin(), dirs.end());
+        std::sort(files.begin(), files.end());
         list->ClearItem();
         if(path != root)
             list->AddItem(142, stringCfg["eui_updir"], 0xff000000);
-        for(size_t i = 0; i < dirs.GetCount(); ++i)
-            list->AddItem(140, dirs[i].ToStdWstring(), 0xff000000);
-        for(size_t i = 0; i < files.GetCount(); ++i)
-            list->AddItem(141, files[i].ToStdWstring(), 0xff000000);
+        for(size_t i = 0; i < dirs.size(); ++i)
+            list->AddItem(140, dirs[i], 0xff000000);
+        for(size_t i = 0; i < files.size(); ++i)
+            list->AddItem(141, files[i], 0xff000000);
     }
     
     void FilterDialog::Show(v2i pos) {
