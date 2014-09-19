@@ -1,15 +1,13 @@
 #ifndef _ZIP_READER_H_
 #define _ZIP_READER_H_
 
-class wxZipEntry;
-
 namespace ygopro
 {
-    const int ZIP_HEADER_SIZE = 30;
+    const int ZIP_HEADER_SIZE = 26;
     const int ZIP_FILEDESC_SIZE = 12;
     
+	// header = 0x04034b50
     struct ZipHeader {
-        int header; // 0x04034b50
         short ver_req;
         short global_sig;
         short comp_fun; // only support 00-no compression 08-deflate
@@ -37,7 +35,7 @@ namespace ygopro
         int ReadFile(const std::string& filename, unsigned char* buffer);
         
     protected:
-        std::wstring current_file;
+		std::ifstream zip_file;
         std::unordered_map<std::string, ZipFileInfo> entries;
     };
     

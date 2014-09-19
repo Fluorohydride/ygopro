@@ -17,22 +17,22 @@ class FileSystem {
 public:
     static bool IsFileExists(const std::string& file) {
         struct _stat fileStat;
-        return (_stat(dir.c_str(), &fileStat) == 0) && !(fileStat.st_mode & _S_IFDIR));
+        return (_stat(file.c_str(), &fileStat) == 0) && !(fileStat.st_mode & _S_IFDIR);
     }
     
-    static bool IsFileExists(const std::wstring& file) {
+    static bool IsFileExists(const std::wstring& wfile) {
         struct _stat fileStat;
-        return (_wstat(wdir.c_str(), &fileStat) == 0) && !(fileStat.st_mode & _S_IFDIR));
+        return (_wstat(wfile.c_str(), &fileStat) == 0) && !(fileStat.st_mode & _S_IFDIR);
     }
     
     static bool IsDirExists(const std::string& dir) {
         struct _stat fileStat;
-        return (_stat(dir.c_str(), &fileStat) == 0) && (fileStat.st_mode & _S_IFDIR));
+        return (_stat(dir.c_str(), &fileStat) == 0) && (fileStat.st_mode & _S_IFDIR);
     }
     
     static bool IsDirExists(const std::wstring& wdir) {
         struct _stat fileStat;
-        return (_wstat(wdir.c_str(), &fileStat) == 0) && (fileStat.st_mode & _S_IFDIR));
+        return (_wstat(wdir.c_str(), &fileStat) == 0) && (fileStat.st_mode & _S_IFDIR);
     }
     
     static bool MakeDir(const std::string& dir) {
@@ -40,7 +40,7 @@ public:
     }
     
     static bool MakeDir(const std::wstring& wdir) {
-        return _wmkdir(dir.c_str()) == 0;
+        return _wmkdir(wdir.c_str()) == 0;
     }
     
     static void TraversalDir(const std::string& path, const std::function<void (const std::string&, bool)>& cb) {
@@ -51,7 +51,7 @@ public:
         do {
             std::string file = fdata.cFileName;
             cb(file, (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY));
-        } while(FindNextFile(fh, &fdata));
+        } while(FindNextFileA(fh, &fdata));
         FindClose(fh);
     }
     

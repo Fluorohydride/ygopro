@@ -42,10 +42,10 @@ namespace ygopro
         
         unsigned int code = 0;
         unsigned int status = 0;
-        unsigned int side = 0;
-        unsigned int loc = 0;
-        unsigned int seq = 0;
-        unsigned int pos = 0;
+		int side = 0;
+		int loc = 0;
+		int seq = 0;
+		int pos = 0;
         bool rotated = true;
         std::vector<v3f> vertex_r;
         std::vector<std::shared_ptr<FieldCard>> olcards;
