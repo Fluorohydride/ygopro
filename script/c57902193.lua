@@ -1,4 +1,4 @@
---ø‡úi§Œ‹û…˙
+--Ëã¶Ê∏ã„ÅÆËª¢Áîü
 function c57902193.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -33,8 +33,7 @@ function c57902193.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c57902193.thop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
-	if e:GetHandler():IsLocation(LOCATION_HAND) then
+	if Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)~=0 then
 		Duel.ConfirmCards(1-tp,e:GetHandler())
 	end
 end

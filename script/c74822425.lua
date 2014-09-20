@@ -46,7 +46,7 @@ function c74822425.ffilter1(c)
 	return c:IsSetCard(0x9d)
 end
 function c74822425.ffilter2(c)
-	return c:IsAttribute(ATTRIBUTE_EARTH) or c:GetFlagEffect(4904633)~=0
+	return c:IsAttribute(ATTRIBUTE_EARTH) or c:IsHasEffect(4904633)
 end
 function c74822425.exfilter(c,g)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not g:IsContains(c)

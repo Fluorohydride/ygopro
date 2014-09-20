@@ -27,14 +27,17 @@ function c91148083.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c91148083.rmcon)
 		e1:SetOperation(c91148083.rmop)
 		e1:SetLabelObject(tc)
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function c91148083.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
+end
 function c91148083.rmop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then return end
 	local tc=e:GetLabelObject()
 	if tc:GetFlagEffect(91148083)==0 then return end
 	Duel.Destroy(tc,REASON_EFFECT)

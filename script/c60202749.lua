@@ -40,9 +40,10 @@ function c60202749.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCondition(c60202749.sdescon)
 	e1:SetOperation(c60202749.sdesop)
 	if Duel.GetCurrentPhase()==PHASE_END and Duel.GetTurnPlayer()~=tp then
-		e1:SetLabel(1)
+		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN,2)
 	else
+		e1:SetLabel(0)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 	end
 	e:GetHandler():RegisterEffect(e1)
@@ -71,14 +72,10 @@ function c60202749.rcon(e)
 	return e:GetOwner():IsHasCardTarget(e:GetHandler())
 end
 function c60202749.sdescon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return Duel.GetTurnPlayer()~=tp and Duel.GetTurnCount()~=e:GetLabel()
 end
 function c60202749.sdesop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabel()==0 then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	else
-		e:SetLabel(0)
-	end
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 function c60202749.aclimit(e,re,tp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL)

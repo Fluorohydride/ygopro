@@ -1,4 +1,4 @@
---구신 노덴
+--旧神ノーデン
 function c17412721.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

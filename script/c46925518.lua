@@ -45,6 +45,7 @@ function c46925518.fdop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c46925518.condition)
 	e1:SetOperation(c46925518.operation)
 	e1:SetReset(RESET_PHASE+RESET_END)
 	Duel.RegisterEffect(e1,tp)
@@ -54,6 +55,9 @@ function c46925518.filter(c)
 end
 function c46925518.spfilter(c,e,tp,lv)
 	return c:IsSetCard(0x8d) and c:IsLevelBelow(lv) and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
+end
+function c46925518.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c46925518.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function c46925518.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c46925518.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)

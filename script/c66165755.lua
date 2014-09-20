@@ -50,14 +50,16 @@ function c66165755.spop(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetCondition(c66165755.rmcon)
 	e3:SetOperation(c66165755.rmop)
 	e3:SetReset(RESET_EVENT+0xfe0000)
 	e3:SetCountLimit(1)
 	tc:RegisterEffect(e3)
 	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 end
+function c66165755.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c66165755.rmop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
-	end
+	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_EFFECT)
 end

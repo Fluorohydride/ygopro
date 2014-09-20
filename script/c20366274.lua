@@ -53,7 +53,7 @@ function c20366274.ffilter1(c)
 	return c:IsSetCard(0x9d)
 end
 function c20366274.ffilter2(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:GetFlagEffect(4904633)~=0
+	return c:IsAttribute(ATTRIBUTE_LIGHT) or c:IsHasEffect(4904633)
 end
 function c20366274.exfilter(c,g)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not g:IsContains(c)
@@ -174,7 +174,7 @@ function c20366274.tgop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-function c20366274.descon(e,tp,eg,ep,ev,re,r,rp,chk)
+function c20366274.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return bc and bit.band(bc:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL

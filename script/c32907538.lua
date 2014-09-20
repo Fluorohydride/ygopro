@@ -16,6 +16,7 @@ function c32907538.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c32907538.mtcon)
 	e2:SetOperation(c32907538.mtop)
 	c:RegisterEffect(e2)
 end
@@ -50,8 +51,10 @@ end
 function c32907538.rcon(e)
 	return e:GetOwner():IsHasCardTarget(e:GetHandler())
 end
+function c32907538.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c32907538.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>500 and Duel.SelectYesNo(tp,aux.Stringid(32907538,0)) then
 		Duel.PayLPCost(tp,500)
 	else

@@ -1,4 +1,4 @@
---Vampire Vamp
+--ヴァンプ・オブ・ヴァンパイア
 function c82962242.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

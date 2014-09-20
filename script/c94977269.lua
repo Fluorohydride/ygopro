@@ -37,7 +37,6 @@ function c94977269.initial_effect(c)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetOperation(c94977269.checkop)
 	c:RegisterEffect(e5)
@@ -57,7 +56,7 @@ function c94977269.ffilter1(c)
 	return c:IsSetCard(0x9d)
 end
 function c94977269.ffilter2(c)
-	return c:IsAttribute(ATTRIBUTE_DARK) or c:GetFlagEffect(4904633)~=0
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsHasEffect(4904633)
 end
 function c94977269.exfilter(c,g)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not g:IsContains(c)

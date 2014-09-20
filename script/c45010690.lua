@@ -1,4 +1,4 @@
---플라봇
+--フラボット
 function c45010690.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)
