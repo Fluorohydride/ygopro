@@ -8,16 +8,18 @@ namespace ygopro
     
 	// header = 0x04034b50
     struct ZipHeader {
-        short ver_req;
-        short global_sig;
-        short comp_fun; // only support 00-no compression 08-deflate
-        short mod_time;
-        short mod_date;
-        int crc32;
-        int comp_size;
-        int file_size;
-        short name_size;
-        short ex_size;
+		char data[26];
+		
+        inline short ver_req() { return *(short*)&data[0]; }
+        inline short global_sig()  { return *(short*)&data[2]; }
+        inline short comp_fun() { return *(short*)&data[4]; } // only support 00-no compression 08-deflate
+        inline short mod_time() { return *(short*)&data[6]; }
+        inline short mod_date() { return *(short*)&data[8]; }
+        inline int crc32() { return *(int*)&data[10]; }
+        inline int comp_size() { return *(int*)&data[14]; }
+        inline int file_size() { return *(int*)&data[18]; }
+        inline short name_size() { return *(short*)&data[22]; }
+        inline short ex_size() { return *(short*)&data[24]; }
     };
     
     struct ZipFileInfo {
