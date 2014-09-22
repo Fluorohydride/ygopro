@@ -45,6 +45,7 @@ public:
     
     static void TraversalDir(const std::string& path, const std::function<void (const std::string&, bool)>& cb) {
         WIN32_FIND_DATAA fdata;
+		std::string findstr = path + "/*";
         HANDLE fh = FindFirstFileA("*", &fdata);
         if(fh == INVALID_HANDLE_VALUE)
             return;
@@ -57,7 +58,8 @@ public:
     
     static void TraversalDir(const std::wstring& wpath, const std::function<void (const std::wstring&, bool)>& cb) {
         WIN32_FIND_DATAW fdataw;
-        HANDLE fh = FindFirstFileW(L"*", &fdataw);
+		std::wstring findstr = wpath + L"/*";
+        HANDLE fh = FindFirstFileW(findstr.c_str(), &fdataw);
         if(fh == INVALID_HANDLE_VALUE)
             return;
         do {

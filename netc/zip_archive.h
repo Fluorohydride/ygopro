@@ -7,7 +7,7 @@ namespace ygopro
 {
     const int ZIP_FILEDESC_SIZE = 12;
     
-#ifdef _MSC_VER
+#ifdef _WIN32
     #pragma pack(push, 2)
 #endif
 	// header = 0x04034b50
@@ -22,8 +22,8 @@ namespace ygopro
         int file_size;
         short name_size;
         short ex_size;
-#ifdef _MSC_VER
-    }
+#ifdef _WIN32
+    };
     #pragma pack(pop)
 #else
     } __attribute__((packed));

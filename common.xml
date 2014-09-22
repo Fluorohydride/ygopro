@@ -9,7 +9,7 @@
   <integer name="card_size_y" value="145"/>
   <integer name="tex_size_x" value="2048"/>
   <integer name="tex_size_y" value="2048"/>
-  <string name="image_file" value="./image.zip"/>
+  <string name="image_path" value="./images"/>
   <string name="database_file" value="./conf/cards.cdb"/>
   <string name="screenshot_path" value="./screenshot"/>
   <string name="deck_path" value="./deck"/>

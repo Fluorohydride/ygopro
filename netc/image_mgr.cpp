@@ -150,7 +150,7 @@ namespace ygopro
         return false;
     }
     
-    void ImageMgr::InitTextures(const std::vector<std::wstring>& image_pack) {
+    void ImageMgr::InitTextures(const std::wstring& image_path) {
         card_texture.Load(nullptr, 2048, 2048);
         for(short i = 7; i < 280; ++i)
             unuse_block.push_back(i);
@@ -178,7 +178,14 @@ namespace ygopro
         glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
         glBindVertexArray(0);
-        imageZip.Load(image_pack);
+		std::vector<std::wstring> image_files;
+		FileSystem::TraversalDir(image_path, [&image_path, &image_files](const std::wstring& name, bool isdir) {
+			if(!isdir) {
+                if(name.find(L".zip") == (name.size() - 4))
+                    image_files.push_back(image_path + L"/" + name);
+            }
+		});
+        imageZip.Load(image_files);
     }
 
     void ImageMgr::UninitTextures() {

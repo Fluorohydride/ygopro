@@ -52,10 +52,7 @@ int main(int argc, char* argv[]) {
     std::cout << "GLSL Version : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     glGetError();
     
-    std::vector<std::wstring> image_packs;
-    image_packs.push_back(commonCfg["image_file"]);
-    
-    ImageMgr::Get().InitTextures(image_packs);
+    ImageMgr::Get().InitTextures(commonCfg["image_path"]);
     if(!stringCfg.LoadConfig(commonCfg["string_conf"])
        || DataMgr::Get().LoadDatas(commonCfg["database_file"])
        || !ImageMgr::Get().LoadImageConfig(commonCfg["textures_conf"])

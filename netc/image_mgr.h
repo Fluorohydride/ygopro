@@ -29,7 +29,7 @@ namespace ygopro
         unsigned short AllocBlock();
         bool FreeBlock(unsigned short);
         
-		void InitTextures(const std::vector<std::wstring>& image_pack);
+		void InitTextures(const std::wstring& image_path);
         void UninitTextures();
 		bool LoadImageConfig(const std::wstring& file);
         
