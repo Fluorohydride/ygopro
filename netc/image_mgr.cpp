@@ -150,7 +150,7 @@ namespace ygopro
         return false;
     }
     
-    void ImageMgr::InitTextures(const std::wstring& image_pack) {
+    void ImageMgr::InitTextures(const std::vector<std::wstring>& image_pack) {
         card_texture.Load(nullptr, 2048, 2048);
         for(short i = 7; i < 280; ++i)
             unuse_block.push_back(i);
