@@ -1,4 +1,4 @@
---Sylvan Bladefender
+--森羅の葉心棒 ブレイド
 function c11682713.initial_effect(c)
 	--deck check
 	local e1=Effect.CreateEffect(c)

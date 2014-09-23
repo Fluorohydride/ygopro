@@ -1,4 +1,4 @@
---Archfiend Giant
+--デーモンの巨神
 function c84341431.initial_effect(c)
 	--destroy replace
 	local e1=Effect.CreateEffect(c)

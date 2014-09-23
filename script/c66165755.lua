@@ -57,7 +57,7 @@ function c66165755.spop(e,tp,eg,ep,ev,re,r,rp)
 	tc:RegisterEffect(e3)
 	Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 end
-function c66165755.rmop(e,tp,eg,ep,ev,re,r,rp)
+function c66165755.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
 end
 function c66165755.rmop(e,tp,eg,ep,ev,re,r,rp)

@@ -1,4 +1,4 @@
---아룡포효
+--牙竜咆哮
 function c34898052.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
