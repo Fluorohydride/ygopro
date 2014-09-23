@@ -8,19 +8,12 @@ namespace ygopro
 {
     
     ZipArchive::~ZipArchive() {
-        if(loading_thread) {
-            if(loading_thread->joinable())
-                loading_thread->join();
-            loading_thread.reset();
-        }
     }
     
     void ZipArchive::Load(const std::vector<std::wstring>& files) {
         is_loading = true;
         loading_files = files;
-        if(loading_thread && loading_thread->joinable())
-            loading_thread->detach();
-        loading_thread = std::make_shared<std::thread>(std::bind(&ZipArchive::_load_inner, this));
+        std::thread(std::bind(&ZipArchive::_load_inner, this)).detach();
     }
     
     int ZipArchive::GetFileLength(const std::string& filename) {

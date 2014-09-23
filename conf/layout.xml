@@ -3,31 +3,31 @@
   <float name="fovy" value="0.8" />
   <float name="near" value="0.1" />
   <float name="far" value="100.0" />
-  <float name="angle" value="0.4" />
+  <float name="angle" value="0.7" />
   <float name="radius" value="7.3" />
   <float name="xoffset" value="0.1" />
   <float name="yoffset" value="0.2" />
   <float name="handmin" value="-2.08" />
   <float name="handmax" value=" 2.08" />
-  <float name="handy1" value="-3.00" />
-  <float name="handy2" value=" 3.50" />
-  <rect name="card" x="0" y="0" w="0.4827586" h="-0.70"/>
-  <rect name="icon" x="0" y="0" w="0.4827586" h="-0.70"/>
-  <rect name="mzone1" x="-1.68" y="-1.00" w="0.80" h="-0.80"/>
-  <rect name="mzone2" x="-0.84" y="-1.00" w="0.80" h="-0.80"/>
-  <rect name="mzone3" x="-0.00" y="-1.00" w="0.80" h="-0.80"/>
-  <rect name="mzone4" x=" 0.84" y="-1.00" w="0.80" h="-0.80"/>
-  <rect name="mzone5" x=" 1.68" y="-1.00" w="0.80" h="-0.80"/>
-  <rect name="szone1" x="-1.68" y="-1.84" w="0.60" h="-0.80"/>
-  <rect name="szone2" x="-0.84" y="-1.84" w="0.60" h="-0.80"/>
-  <rect name="szone3" x="-0.00" y="-1.84" w="0.60" h="-0.80"/>
-  <rect name="szone4" x=" 0.84" y="-1.84" w="0.60" h="-0.80"/>
-  <rect name="szone5" x=" 1.68" y="-1.84" w="0.60" h="-0.80"/>
-  <rect name="fdzone" x="-2.62" y="-0.66" w="0.60" h="-0.80"/>
-  <rect name="pzonel" x="-2.42" y="-1.50" w="0.60" h="-0.80"/>
-  <rect name="pzoner" x=" 2.42" y="-1.50" w="0.60" h="-0.80"/>
-  <rect name="mdeck"  x=" 2.62" y="-2.34" w="0.60" h="-0.80"/>
-  <rect name="exdeck" x="-2.62" y="-2.34" w="0.60" h="-0.80"/>
-  <rect name="grave"  x=" 2.62" y="-0.66" w="0.60" h="-0.80"/>
-  <rect name="banish" x=" 3.26" y="-0.66" w="0.60" h="-0.80"/>
+  <float name="handy1" value="-2.70" />
+  <float name="handy2" value=" 3.00" />
+  <rect name="card" x="0" y="0" w="0.4827586" h="0.70"/>
+  <rect name="icon" x="0" y="0" w="0.4827586" h="0.70"/>
+  <rect name="mzone1" x="-1.68" y="-1.00" w="0.80" h="0.80"/>
+  <rect name="mzone2" x="-0.84" y="-1.00" w="0.80" h="0.80"/>
+  <rect name="mzone3" x="-0.00" y="-1.00" w="0.80" h="0.80"/>
+  <rect name="mzone4" x=" 0.84" y="-1.00" w="0.80" h="0.80"/>
+  <rect name="mzone5" x=" 1.68" y="-1.00" w="0.80" h="0.80"/>
+  <rect name="szone1" x="-1.68" y="-1.84" w="0.60" h="0.80"/>
+  <rect name="szone2" x="-0.84" y="-1.84" w="0.60" h="0.80"/>
+  <rect name="szone3" x="-0.00" y="-1.84" w="0.60" h="0.80"/>
+  <rect name="szone4" x=" 0.84" y="-1.84" w="0.60" h="0.80"/>
+  <rect name="szone5" x=" 1.68" y="-1.84" w="0.60" h="0.80"/>
+  <rect name="fdzone" x="-2.62" y="-0.66" w="0.60" h="0.80"/>
+  <rect name="pzonel" x="-2.42" y="-1.50" w="0.60" h="0.80"/>
+  <rect name="pzoner" x=" 2.42" y="-1.50" w="0.60" h="0.80"/>
+  <rect name="mdeck"  x=" 2.62" y="-2.34" w="0.60" h="0.80"/>
+  <rect name="exdeck" x="-2.62" y="-2.34" w="0.60" h="0.80"/>
+  <rect name="grave"  x=" 2.62" y="-0.66" w="0.60" h="0.80"/>
+  <rect name="banish" x=" 3.26" y="-0.66" w="0.60" h="0.80"/>
 </Common>

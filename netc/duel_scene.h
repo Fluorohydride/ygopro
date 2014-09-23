@@ -21,6 +21,7 @@ namespace ygopro
         std::vector<v3f> vertex;
         std::vector<v2f> texcoord;
         bool updating = false;
+        unsigned int hlcolor = 0xffffff;
     };
     
     struct FieldBlock : public FieldObject {
@@ -37,8 +38,8 @@ namespace ygopro
         virtual bool UpdateVertices(double tm);
         
         void Init(unsigned int idx, unsigned int code);
-        void SetCode(unsigned int code);
-        void SetIconTex(int id);
+        void SetCode(unsigned int code, bool refresh = true);
+        void SetIconTex(int iid, bool refresh = true);
         
         unsigned int code = 0;
         unsigned int status = 0;
@@ -116,8 +117,9 @@ namespace ygopro
         void ReleaseCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
         
-        std::pair<int, int> CheckHoverBlock(float px, float py);
-        std::pair<int, int> GetHoverPos(int posx, int posy);
+        v2i CheckHoverBlock(float px, float py);
+        v2f GetProjectXY(float sx, float sy);
+        v2i GetHoverPos(int posx, int posy);
         
     protected:
         v2i scene_size = {0, 0};
@@ -140,6 +142,8 @@ namespace ygopro
         ViewParam vparam;
         bool btnDown[2] = {false};
         v2i btnPos[2];
+        v2i hover_pos = {0, 0};
+        v2i click_pos = {0, 0};
         
         std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
         std::vector<std::shared_ptr<FieldCard>> m_zone[2];
@@ -150,9 +154,6 @@ namespace ygopro
         std::vector<std::shared_ptr<FieldCard>> grave[2];
         std::vector<std::shared_ptr<FieldCard>> banished[2];
         std::vector<std::shared_ptr<FieldCard>> alloc_cards;
-        std::pair<int, int> hover_pos;
-        std::pair<int, int> click_pos;
-        std::weak_ptr<FieldObject> hover_obj;
         std::list<std::weak_ptr<FieldObject>> updating_blocks;
         std::list<std::weak_ptr<FieldObject>> updating_cards;
         

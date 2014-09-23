@@ -49,7 +49,6 @@ namespace ygopro
         
         bool is_loading = false;
         std::vector<std::wstring> loading_files;
-        std::shared_ptr<std::thread> loading_thread;
         std::unordered_map<std::string, ZipFileInfo> entries;
     };
     

@@ -180,11 +180,12 @@ namespace ygopro
         glBindVertexArray(0);
 		std::vector<std::wstring> image_files;
 		FileSystem::TraversalDir(image_path, [&image_path, &image_files](const std::wstring& name, bool isdir) {
-			if(!isdir) {
-                if(name.find(L".zip") == (name.size() - 4))
-                    image_files.push_back(image_path + L"/" + name);
+			if(!isdir && name.find(L".zip") == (name.size() - 4)) {
+                auto path = image_path;
+                image_files.push_back(path.append(L"/").append(name));
             }
 		});
+        std::sort(image_files.begin(), image_files.end());
         imageZip.Load(image_files);
     }
 

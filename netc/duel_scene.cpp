@@ -31,15 +31,17 @@ in vec2 texcoord;\n\
 layout (location = 0) out vec4 frag_color;\n\
 uniform sampler2D texid;\n\
 void main() {\n\
+if(gl_FrontFacing) {\n\
 vec4 texcolor = texture(texid, texcoord);\n\
 frag_color = mix(texcolor * color, vec4(hcolor.r, hcolor.g, hcolor.b, 1.0), hcolor.a);\n\
+} else {\n\
+discard;\n\
+}\n\
 }\n\
 ";
 
 namespace ygopro
 {
-    
-    std::shared_ptr<FieldCard> testcard;
     
     void FieldBlock::RefreshVertices() {
         std::array<glbase::v3hct, 4> vert;
@@ -53,7 +55,7 @@ namespace ygopro
         vert[3].texcoord = texcoord[3];
         for(int i = 0; i < 4; ++i) {
             vert[i].color = ((int)(alpha.Get() * 255) << 24) | 0xffffff;
-            vert[i].hcolor = ((int)(hl.Get() * 255) << 24) | 0xffffff;
+            vert[i].hcolor = ((int)(hl.Get() * 255) << 24) | hlcolor;
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * vertex_index * 4, sizeof(glbase::v3hct) * 4, &vert[0]);
     }
@@ -68,10 +70,10 @@ namespace ygopro
     void FieldBlock::Init(unsigned int idx, rectf center, ti4 ti) {
         vertex_index = idx;
         translation = {center.left, center.top, 0.0f};
-        vertex.push_back({center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
-        vertex.push_back({center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
         vertex.push_back({center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
         vertex.push_back({center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
+        vertex.push_back({center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
+        vertex.push_back({center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f});
         texcoord.push_back(ti.vert[0]);
         texcoord.push_back(ti.vert[1]);
         texcoord.push_back(ti.vert[2]);
@@ -99,7 +101,7 @@ namespace ygopro
             rotated = false;
         }
         unsigned int cl = ((unsigned int)(alpha.Get() * 255) << 24) | 0xffffff;
-        unsigned int hcl = ((unsigned int)(hl.Get() * 255) << 24) | 0xffffff;
+        unsigned int hcl = ((unsigned int)(hl.Get() * 255) << 24) | hlcolor;
         auto& tl = translation.Get();
         for(size_t i = 0; i < 12; ++i) {
             vert[i].vertex = vertex_r[i] + tl;
@@ -128,25 +130,27 @@ namespace ygopro
         vertex.resize(12);
         texcoord.resize(12);
         // front
-        vertex[0] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-        vertex[1] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-        vertex[2] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-        vertex[3] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
         if(code) {
+            vertex[0] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+            vertex[1] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+            vertex[2] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+            vertex[3] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
             auto ti = ImageMgr::Get().GetCardTexture(code);
             texcoord[0] = ti.vert[0];
             texcoord[1] = ti.vert[1];
             texcoord[2] = ti.vert[2];
             texcoord[3] = ti.vert[3];
         } else {
-            for(int i = 0; i < 4; ++i)
+            for(int i = 0; i < 4; ++i) {
+                vertex[i] = {0.0f, 0.0f, 0.0f};
                 texcoord[i] = {0.0f, 0.0f};
+            }
         }
         // back
-        vertex[4] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-        vertex[5] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-        vertex[6] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-        vertex[7] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[4] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[5] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[6] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        vertex[7] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
         auto sleeve = ImageMgr::Get().GetTexture("sleeve1");
         texcoord[4] = sleeve.vert[0];
         texcoord[5] = sleeve.vert[1];
@@ -161,34 +165,43 @@ namespace ygopro
         hl = 0.0f;
     }
     
-    void FieldCard::SetCode(unsigned int code) {
+    void FieldCard::SetCode(unsigned int code, bool refresh) {
         if(this->code == code)
             return;
         ImageMgr::Get().UnloadCardTexture(this->code);
         this->code = code;
         if(code) {
+            rectf center = SceneMgr::Get().LayoutRectConfig("card");
+            vertex[0] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+            vertex[1] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+            vertex[2] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+            vertex[3] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
             auto ti = ImageMgr::Get().GetCardTexture(code);
             for(int i = 0; i < 4; ++i)
                 texcoord[i] = ti.vert[i];
         } else {
-            for(int i = 0; i < 4; ++i)
+            for(int i = 0; i < 4; ++i) {
+                vertex[i] = {0.0f, 0.0f, 0.0f};
                 texcoord[i] = {0.0f, 0.0f};
+            }
         }
+        if(refresh)
+            RefreshVertices();
     }
     
-    void FieldCard::SetIconTex(int id) {
-        if(id == 0) {
+    void FieldCard::SetIconTex(int iid, bool refresh) {
+        if(iid == 0) {
             for(int i = 8; i < 12; ++i) {
                 vertex[i] = {0.0f, 0.0f, 0.0f};
                 texcoord[i] = {0.0f, 0.0f};
             }
         } else {
             ti4 ti;
-            if(id == 1)
+            if(iid == 1)
                 ti = ImageMgr::Get().GetTexture("negated");
-            else if(id == 2)
+            else if(iid == 2)
                 ti = ImageMgr::Get().GetTexture("equip");
-            else if(id == 3)
+            else if(iid == 3)
                 ti = ImageMgr::Get().GetTexture("target");
             rectf icon = SceneMgr::Get().LayoutRectConfig("icon");
             vertex[8 ] = {icon.left - icon.width * 0.5f, icon.top - icon.height * 0.5f, 0.0f};
@@ -200,6 +213,8 @@ namespace ygopro
             texcoord[10] = ti.vert[2];
             texcoord[11] = ti.vert[3];
         }
+        if(refresh)
+            RefreshVertices();
     }
     
     DuelScene::DuelScene() {
@@ -324,8 +339,6 @@ namespace ygopro
     
     void DuelScene::Draw() {
         glViewport(0, 0, scene_size.x, scene_size.y);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
         duel_shader.Use();
         duel_shader.SetParam1i("texid", 0);
         // background
@@ -356,7 +369,6 @@ namespace ygopro
         // end
         glBindVertexArray(0);
         duel_shader.Unuse();
-        glDisable(GL_CULL_FACE);
     }
     
     void DuelScene::SetSceneSize(v2i sz) {
@@ -390,23 +402,46 @@ namespace ygopro
         }
         if(update_param)
             UpdateParams();
-        auto pre_obj = hover_obj.lock();
-        std::shared_ptr<FieldObject> obj = nullptr;
+        std::shared_ptr<FieldBlock> pre_block;
+        std::shared_ptr<FieldCard> pre_card;
+        std::shared_ptr<FieldBlock> hover_block;
+        std::shared_ptr<FieldCard> hover_card;
         auto hp = GetHoverPos(evt.x, evt.y);
-        if(hp.first != 0)
-            obj = field_blocks[hp.first - 1][hp.second];
-        if(pre_obj != obj) {
-            if(pre_obj)
-                pre_obj->hl.Reset(0.0f);
-            if(obj) {
-                obj->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
-                if(!obj->updating) {
-                    updating_blocks.push_back(obj);
-                    obj->updating = true;
+        if(hover_pos.x == 1 || hover_pos.x == 2)
+            if(hover_pos.y < 17)
+                pre_block = field_blocks[hover_pos.x - 1][hover_pos.y];
+        if(hover_pos.x == 3 || hover_pos.x == 4)
+            if(hover_pos.y < hand[hover_pos.x - 3].size())
+                pre_card = hand[hover_pos.x - 3][hover_pos.y];
+        if(hp.x == 1 || hp.x == 2)
+            if(hp.y < 17)
+                hover_block = field_blocks[hp.x - 1][hp.y];
+        if(hp.x == 3 || hp.x == 4)
+            if(hp.y < hand[hp.x - 3].size())
+                hover_card = hand[hp.x - 3][hp.y];
+        if(pre_block != hover_block) {
+            if(pre_block)
+                pre_block->hl.Reset(0.0f);
+            if(hover_block) {
+                hover_block->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
+                if(!hover_block->updating) {
+                    updating_blocks.push_back(hover_block);
+                    hover_block->updating = true;
                 }
             }
-            hover_obj = obj;
         }
+        if(pre_card != hover_card) {
+            if(pre_card)
+                pre_card->hl.Reset(0.0f);
+            if(hover_card) {
+                hover_card->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
+                if(!hover_card->updating) {
+                    updating_cards.push_back(hover_card);
+                    hover_card->updating = true;
+                }
+            }
+        }
+        hover_pos = hp;
     }
     
     void DuelScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
@@ -420,12 +455,6 @@ namespace ygopro
         if(evt.button < 2) {
             btnDown[evt.button] = false;
         }
-        //MoveCard(pcard, 0, 0x4, 2, 8, false, 1.0f);
-        auto pos = testcard->pos;
-        if(pos == 0x8)
-            pos = 1;
-        else pos <<= 1;
-        ChangePos(testcard, pos, false, 0.5f);
     }
     
     void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
@@ -452,10 +481,10 @@ namespace ygopro
         vlt2 /= vlt2.w;
         vltw2 /= vltw2.w;
         vrb2 /= vrb2.w;
-        vparam.hand_rect[0] = {vlt.x, vlt.y, vrb.x - vlt.x, vrb.y - vlt.y};
-        vparam.hand_rect[1] = {vlt2.x, vlt2.y, vrb2.x - vlt2.x, vrb2.y - vlt2.y};
-        vparam.hand_width[0] = vltw.x - vlt.x;
-        vparam.hand_width[1] = vltw2.x - vlt2.x;
+        vparam.hand_rect[0] = {vlt.x, vlt.y, std::abs(vrb.x - vlt.x), std::abs(vrb.y - vlt.y)};
+        vparam.hand_rect[1] = {vlt2.x, vlt2.y, std::abs(vrb2.x - vlt2.x), std::abs(vrb2.y - vlt2.y)};
+        vparam.hand_width[0] = std::abs(vltw.x - vlt.x);
+        vparam.hand_width[1] = std::abs(vltw2.x - vlt2.x);
         vparam.hand_quat[0] = glm::angleAxis(3.1415926f * 0.5f - vparam.angle, glm::vec3(1.0f, 0.0f, 0.0f));
         vparam.hand_quat[1] = vparam.hand_quat[0] * glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
     }
@@ -541,10 +570,12 @@ namespace ygopro
         if(!update_misc)
             return;
         update_misc = false;
-        for(int i = 0; i < 5; ++i)
-            testcard = AddCard(83764718, 0, 0x2, 2, 1);
-        //RefreshPos(testcard);
+        for(int i = 0; i < 5; ++i) {
+            AddCard((i % 2) ? 83764718 : 0, 0, 0x2, 2, 1);
+            AddCard((i % 2) ? 83764718 : 0, 1, 0x2, 2, 1);
+        }
         RefreshHand(0);
+        RefreshHand(1);
         update_index = true;
     }
     
@@ -811,7 +842,6 @@ namespace ygopro
                         float lst = vparam.handmin + (wmax - whand) * 0.5f;
                         tl = {lst + seq * vparam.cardrect.width * 1.1f + vparam.cardrect.width * 0.5f, vparam.handy[0], 0.0f};
                     }
-                    rot = vparam.hand_quat[0];
                 } else {
                     float wmax = vparam.handmax - vparam.handmin;
                     if(ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f >= wmax) {
@@ -822,11 +852,11 @@ namespace ygopro
                         float lst = -vparam.handmin - (wmax - whand) * 0.5f;
                         tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
                     }
-                    if(subs & 0x5)
-                        rot = vparam.hand_quat[0];
-                    else
-                        rot = vparam.hand_quat[1];
                 }
+                if(pcard->code != 0)
+                    rot = vparam.hand_quat[0];
+                else
+                    rot = vparam.hand_quat[1];
             }
                 break;
             case 0x4: {
@@ -1124,23 +1154,17 @@ namespace ygopro
         alloc_cards.clear();
     }
     
-    std::pair<int, int> DuelScene::CheckHoverBlock(float px, float py) {
+    v2i DuelScene::CheckHoverBlock(float px, float py) {
         for(int i = 0 ; i < 17; ++i) {
             if(field_blocks[0][i]->CheckInside(px, py))
-                return std::make_pair(1, i);
+                return {1, i};
             if(field_blocks[1][i]->CheckInside(px, py))
-                return std::make_pair(2, i);
+                return {2, i};
         }
-        return std::make_pair(0, 0);
+        return {0, 0};
     }
     
-    std::pair<int, int> DuelScene::GetHoverPos(int posx, int posy) {
-        float sx = (float)posx / scene_size.x * 2.0f - 1.0f;
-        float sy = 1.0f - (float)posy / scene_size.y * 2.0f;
-        if(sx > vparam.hand_rect[0].left && sx < vparam.hand_rect[0].left + vparam.hand_rect[0].width &&
-           sy > vparam.hand_rect[0].top && sy < vparam.hand_rect[0].top + vparam.hand_rect[0].height) {
-            
-        }
+    v2f DuelScene::GetProjectXY(float sx, float sy) {
         float x = sx - vparam.xoffset;
         float y = sy - vparam.yoffset;
         float projx = vparam.scrx * 0.5f * x;
@@ -1150,9 +1174,76 @@ namespace ygopro
         float nearx = glm::sqrt(vparam.cnear * vparam.cnear + projy * projy);
         float radiusx = glm::sqrt(vparam.cameraz * vparam.cameraz + (vparam.cameray + py) * (vparam.cameray + py));
         float px = projx * radiusx / nearx;
-        auto hb = CheckHoverBlock(px, py);
-        if(hb.first != 0)
+        return {px, py};
+    }
+    
+    v2i DuelScene::GetHoverPos(int posx, int posy) {
+        float sx = (float)posx / scene_size.x * 2.0f - 1.0f;
+        float sy = 1.0f - (float)posy / scene_size.y * 2.0f;
+        if(sx > vparam.hand_rect[0].left && sx < vparam.hand_rect[0].left + vparam.hand_rect[0].width &&
+           sy < vparam.hand_rect[0].top && sy > vparam.hand_rect[0].top - vparam.hand_rect[0].height) {
+            float wwidth = vparam.hand_rect[0].width;
+            int ct = hand[0].size();
+            if(ct > 0) {
+                float whand = ct * vparam.hand_width[0] + (ct - 1) * vparam.hand_width[0] * 0.1f;
+                if(whand >= wwidth) {
+                    float lastleft = vparam.hand_rect[0].left + wwidth - vparam.hand_width[0];
+                    if(sx >= lastleft)
+                        return {3, ct - 1};
+                    else {
+                        float front_width = (lastleft - vparam.hand_rect[0].left) / (ct - 1);
+                        int index = (int)((sx - vparam.hand_rect[0].left) / front_width);
+                        if(sx - vparam.hand_rect[0].left - front_width * index < vparam.hand_width[0])
+                            return {3, index};
+                    }
+                } else {
+                    float wleft = vparam.hand_rect[0].left + (wwidth - whand) * 0.5f;
+                    float lastleft = wleft + whand - vparam.hand_width[0];
+                    if(sx >= lastleft && sx < wleft + whand)
+                        return {3, ct - 1};
+                    else if(sx >= wleft && sx < lastleft) {
+                        float front_width = vparam.hand_width[0] * 1.1f;
+                        int index = (int)((sx - wleft) / front_width);
+                        if(sx - wleft - front_width * index < vparam.hand_width[0])
+                            return {3, index};
+                    }
+                }
+            }
+        }
+        if(sx > vparam.hand_rect[1].left - vparam.hand_rect[1].width && sx < vparam.hand_rect[1].left &&
+           sy < vparam.hand_rect[1].top && sy > vparam.hand_rect[1].top - vparam.hand_rect[1].height) {
+            float wwidth = vparam.hand_rect[1].width;
+            int ct = hand[1].size();
+            if(ct > 0) {
+                float whand = ct * vparam.hand_width[1] + (ct - 1) * vparam.hand_width[1] * 0.1f;
+                if(whand >= wwidth) {
+                    float lastleft = vparam.hand_rect[1].left - wwidth + vparam.hand_width[1];
+                    if(sx <= lastleft)
+                        return {4, ct - 1};
+                    else {
+                        float front_width = (wwidth - vparam.hand_width[1]) / (ct - 1);
+                        int index = (int)((vparam.hand_rect[1].left - sx) / front_width);
+                        if(vparam.hand_rect[1].left - sx - front_width * index < vparam.hand_width[1])
+                            return {4, index};
+                    }
+                } else {
+                    float wleft = vparam.hand_rect[1].left - (wwidth - whand) * 0.5f;
+                    float lastleft = wleft - whand + vparam.hand_width[1];
+                    if(sx >= wleft - whand && sx < lastleft)
+                        return {4, ct - 1};
+                    else if(sx >= lastleft && sx < wleft) {
+                        float front_width = vparam.hand_width[1] * 1.1f;
+                        int index = (int)((wleft - sx) / front_width);
+                        if(wleft - sx - front_width * index < vparam.hand_width[1])
+                            return {4, index};
+                    }
+                }
+            }
+        }
+        auto proj = GetProjectXY(sx, sy);
+        auto hb = CheckHoverBlock(proj.x, proj.y);
+        if(hb.x != 0)
             return hb;
-        return std::make_pair(0, 0);
+        return {0, 0};
     }
 }
