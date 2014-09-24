@@ -2,7 +2,6 @@
 
 #include "../buildin/rapidxml.hpp"
 #include "../buildin/rapidxml_print.hpp"
-#include "../buildin/rapidxml_utils.hpp"
 
 #include "sungui.h"
 
@@ -806,9 +805,9 @@ namespace sgui
         AddConfig("combobox", SGComboBox::combobox_config);
         AddConfig("tabcontrol", SGTabControl::tab_config);
         
-        rapidxml::file<> f(To<std::string>(gui_conf).c_str());
+        TextFile f(To<std::string>(gui_conf));
         rapidxml::xml_document<> doc;
-        doc.parse<0>(f.data());
+        doc.parse<0>(f.Data());
         rapidxml::xml_node<>* root = doc.first_node();
         rapidxml::xml_node<>* subtype_node = root->first_node();
         while(subtype_node) {

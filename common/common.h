@@ -33,6 +33,7 @@
 #include "hash.h"
 #include "timer.h"
 #include "animator.h"
+#include "textfile.h"
 
 #ifdef _WIN32
 

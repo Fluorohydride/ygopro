@@ -6,40 +6,6 @@
 
 #include "duel_scene.h"
 
-static const char* vert_shader = "\
-#version 330\n\
-layout (location = 0) in vec3 v_position;\n\
-layout (location = 1) in vec4 v_color;\n\
-layout (location = 2) in vec4 v_hcolor;\n\
-layout (location = 3) in vec2 v_texcoord;\n\
-uniform mat4 mvp;\n\
-out vec4 color;\n\
-out vec4 hcolor;\n\
-out vec2 texcoord;\n\
-void main() {\n\
-color = v_color;\n\
-hcolor = v_hcolor;\n\
-texcoord = v_texcoord;\n\
-gl_Position = mvp * vec4(v_position, 1.0);\n\
-}\n\
-";
-static const char* frag_shader = "\
-#version 330\n\
-in vec4 color;\n\
-in vec4 hcolor;\n\
-in vec2 texcoord;\n\
-layout (location = 0) out vec4 frag_color;\n\
-uniform sampler2D texid;\n\
-void main() {\n\
-if(gl_FrontFacing) {\n\
-vec4 texcolor = texture(texid, texcoord);\n\
-frag_color = mix(texcolor * color, vec4(hcolor.r, hcolor.g, hcolor.b, 1.0), hcolor.a);\n\
-} else {\n\
-discard;\n\
-}\n\
-}\n\
-";
-
 namespace ygopro
 {
     
@@ -90,15 +56,15 @@ namespace ygopro
     
     void FieldCard::RefreshVertices() {
         std::array<glbase::v3hct, 12> vert;
-        if(rotated) {
+        if(update_rvert) {
             vertex_r.clear();
             auto q = rotation.Get();
             for(auto& iter : vertex) {
-                glm::vec3 v(iter.x, iter.y, iter.z);
+                glm::vec3 v(iter.x, iter.y + dy, iter.z);
                 auto c = q * v;
                 vertex_r.push_back({c.x, c.y, c.z});
             }
-            rotated = false;
+            update_rvert = false;
         }
         unsigned int cl = ((unsigned int)(alpha.Get() * 255) << 24) | 0xffffff;
         unsigned int hcl = ((unsigned int)(hl.Get() * 255) << 24) | hlcolor;
@@ -116,42 +82,40 @@ namespace ygopro
         alpha.Update(tm);
         hl.Update(tm);
         translation.Update(tm);
+        if(dy.NeedUpdate()) {
+            dy.Update(tm);
+            update_rvert = true;
+        }
         if(rotation.NeedUpdate()) {
             rotation.Update(tm);
-            rotated = true;
+            update_rvert = true;
         }
         RefreshVertices();
-        return translation.NeedUpdate() || rotation.NeedUpdate() || alpha.NeedUpdate() || hl.NeedUpdate();
+        return translation.NeedUpdate() || rotation.NeedUpdate() || dy.NeedUpdate() || alpha.NeedUpdate() || hl.NeedUpdate();
     }
     
-    void FieldCard::Init(unsigned int idx, unsigned int code) {
+    void FieldCard::Init(unsigned int idx, unsigned int code, int side) {
         rectf center = SceneMgr::Get().LayoutRectConfig("card");
         vertex_index = idx;
+        this->code = code;
         vertex.resize(12);
         texcoord.resize(12);
         // front
-        if(code) {
-            vertex[0] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-            vertex[1] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-            vertex[2] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-            vertex[3] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-            auto ti = ImageMgr::Get().GetCardTexture(code);
-            texcoord[0] = ti.vert[0];
-            texcoord[1] = ti.vert[1];
-            texcoord[2] = ti.vert[2];
-            texcoord[3] = ti.vert[3];
-        } else {
-            for(int i = 0; i < 4; ++i) {
-                vertex[i] = {0.0f, 0.0f, 0.0f};
-                texcoord[i] = {0.0f, 0.0f};
-            }
-        }
+        vertex[0] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[1] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
+        vertex[2] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        vertex[3] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
+        auto ti = code ? ImageMgr::Get().GetCardTexture(code) : ImageMgr::Get().GetTexture("unknown");
+        texcoord[0] = ti.vert[0];
+        texcoord[1] = ti.vert[1];
+        texcoord[2] = ti.vert[2];
+        texcoord[3] = ti.vert[3];
         // back
         vertex[4] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
         vertex[5] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
         vertex[6] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
         vertex[7] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-        auto sleeve = ImageMgr::Get().GetTexture("sleeve1");
+        auto sleeve = ImageMgr::Get().GetTexture((side == 0) ? "sleeve1" : "sleeve2");
         texcoord[4] = sleeve.vert[0];
         texcoord[5] = sleeve.vert[1];
         texcoord[6] = sleeve.vert[2];
@@ -170,21 +134,9 @@ namespace ygopro
             return;
         ImageMgr::Get().UnloadCardTexture(this->code);
         this->code = code;
-        if(code) {
-            rectf center = SceneMgr::Get().LayoutRectConfig("card");
-            vertex[0] = {center.left - center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-            vertex[1] = {center.left + center.width * 0.5f, center.top - center.height * 0.5f, 0.0f};
-            vertex[2] = {center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-            vertex[3] = {center.left + center.width * 0.5f, center.top + center.height * 0.5f, 0.0f};
-            auto ti = ImageMgr::Get().GetCardTexture(code);
-            for(int i = 0; i < 4; ++i)
-                texcoord[i] = ti.vert[i];
-        } else {
-            for(int i = 0; i < 4; ++i) {
-                vertex[i] = {0.0f, 0.0f, 0.0f};
-                texcoord[i] = {0.0f, 0.0f};
-            }
-        }
+        auto ti = code ? ImageMgr::Get().GetCardTexture(code) : ImageMgr::Get().GetTexture("unknown");
+        for(int i = 0; i < 4; ++i)
+            texcoord[i] = ti.vert[i];
         if(refresh)
             RefreshVertices();
     }
@@ -280,8 +232,10 @@ namespace ygopro
             glBindVertexArray(0);
         }
         GLCheckError(__FILE__, __LINE__);
-        duel_shader.LoadVertShader(vert_shader);
-        duel_shader.LoadFragShader(frag_shader);
+        TextFile vertf("./conf/vert.shader");
+        TextFile fragf("./conf/frag.shader");
+        duel_shader.LoadVertShader(vertf.Data());
+        duel_shader.LoadFragShader(fragf.Data());
         duel_shader.Link();
         InitField();
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
@@ -402,26 +356,20 @@ namespace ygopro
         }
         if(update_param)
             UpdateParams();
-        std::shared_ptr<FieldBlock> pre_block;
-        std::shared_ptr<FieldCard> pre_card;
+        auto pblock = pre_block.lock();
+        auto pcard = pre_card.lock();
         std::shared_ptr<FieldBlock> hover_block;
         std::shared_ptr<FieldCard> hover_card;
         auto hp = GetHoverPos(evt.x, evt.y);
-        if(hover_pos.x == 1 || hover_pos.x == 2)
-            if(hover_pos.y < 17)
-                pre_block = field_blocks[hover_pos.x - 1][hover_pos.y];
-        if(hover_pos.x == 3 || hover_pos.x == 4)
-            if(hover_pos.y < hand[hover_pos.x - 3].size())
-                pre_card = hand[hover_pos.x - 3][hover_pos.y];
         if(hp.x == 1 || hp.x == 2)
             if(hp.y < 17)
                 hover_block = field_blocks[hp.x - 1][hp.y];
         if(hp.x == 3 || hp.x == 4)
             if(hp.y < hand[hp.x - 3].size())
                 hover_card = hand[hp.x - 3][hp.y];
-        if(pre_block != hover_block) {
-            if(pre_block)
-                pre_block->hl.Reset(0.0f);
+        if(pblock != hover_block) {
+            if(pblock)
+                pblock->hl.Reset(0.0f);
             if(hover_block) {
                 hover_block->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
                 if(!hover_block->updating) {
@@ -429,19 +377,19 @@ namespace ygopro
                     hover_block->updating = true;
                 }
             }
+            pre_block = hover_block;
         }
-        if(pre_card != hover_card) {
-            if(pre_card)
-                pre_card->hl.Reset(0.0f);
-            if(hover_card) {
-                hover_card->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
-                if(!hover_card->updating) {
-                    updating_cards.push_back(hover_card);
-                    hover_card->updating = true;
-                }
+        if(pcard != hover_card) {
+            if(pcard) {
+                pcard->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(pcard->dy.Get(), 0.0f, SceneMgr::Get().GetGameTime(), 0.5, 10));
+                AddUpdateCard(pcard);
             }
+            if(hover_card) {
+                hover_card->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(0.0f, 0.2f, SceneMgr::Get().GetGameTime(), 0.5, 10));
+                AddUpdateCard(hover_card);
+            }
+            pre_card = hover_card;
         }
-        hover_pos = hp;
     }
     
     void DuelScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
@@ -571,8 +519,8 @@ namespace ygopro
             return;
         update_misc = false;
         for(int i = 0; i < 5; ++i) {
-            AddCard((i % 2) ? 83764718 : 0, 0, 0x2, 2, 1);
-            AddCard((i % 2) ? 83764718 : 0, 1, 0x2, 2, 1);
+            RefreshPos(AddCard((i % 2) ? 83764718 : 0, 0, 0x2, i, 1));
+            RefreshPos(AddCard((i % 2) ? 83764718 : 0, 1, 0x2, i, 1));
         }
         RefreshHand(0);
         RefreshHand(1);
@@ -585,12 +533,12 @@ namespace ygopro
         update_index = false;
         std::vector<unsigned short> index;
         index.resize(alloc_cards.size() * 18);
-        auto push_index = [&index](std::vector<std::shared_ptr<FieldCard>>& vec) {
+        unsigned short istart = 0;
+        auto push_index = [&index, &istart](std::vector<std::shared_ptr<FieldCard>>& vec) {
             for(auto& iter : vec) {
                 if(iter == nullptr)
                     continue;
                 unsigned int vstart = iter->vertex_index * 12;
-                unsigned int istart = iter->vertex_index * 18;
                 for(int i = 0; i < 3; ++i) {
                     index[istart + i * 6 + 0] = vstart + i * 4 + 0;
                     index[istart + i * 6 + 1] = vstart + i * 4 + 2;
@@ -599,6 +547,7 @@ namespace ygopro
                     index[istart + i * 6 + 4] = vstart + i * 4 + 2;
                     index[istart + i * 6 + 5] = vstart + i * 4 + 3;
                 }
+                istart += 18;
             }
         };
         push_index(hand[1]);
@@ -693,7 +642,7 @@ namespace ygopro
                 return nullptr;
         }
         auto ptr = std::make_shared<FieldCard>();
-        ptr->Init(alloc_cards.size(), code);
+        ptr->Init(alloc_cards.size(), code, side);
         alloc_cards.push_back(ptr);
         ptr->side = side;
         ptr->loc = zone;
@@ -768,6 +717,7 @@ namespace ygopro
             case 0x2:
                 ret = hand[side][seq];
                 hand[side].erase(hand[side].begin() + seq);
+                ret->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(ret->dy.Get(), 0.0f, SceneMgr::Get().GetGameTime(), 0.5, 10));
                 break;
             case 0x4:
                 if(zone & 0x80) {
@@ -952,7 +902,7 @@ namespace ygopro
         if(update) {
             pcard->translation = tl;
             pcard->rotation = rot;
-            pcard->rotated = true;
+            pcard->update_rvert = true;
         } else {
             float stm = SceneMgr::Get().GetGameTime();
             pcard->translation.SetAnimator(std::make_shared<LerpAnimator<v3f, TGenMove>>(pcard->translation.Get(), tl, stm, tm, 10));
@@ -960,10 +910,7 @@ namespace ygopro
                 return glm::slerp(st, ed, t);
             }, pcard->rotation.Get(), rot, stm, tm, 10));
         }
-        if(!pcard->updating) {
-            updating_cards.push_back(pcard);
-            pcard->updating = true;
-        }
+        AddUpdateCard(pcard);
     }
 
     void DuelScene::RefreshHand(int side, bool update, float tm) {
@@ -985,7 +932,6 @@ namespace ygopro
                     float lst = vparam.handmin + (wmax - whand) * 0.5f;
                     tl = {lst + seq * vparam.cardrect.width * 1.1f + vparam.cardrect.width * 0.5f, vparam.handy[0], 0.0f};
                 }
-                rot = vparam.hand_quat[0];
             } else {
                 float wmax = vparam.handmax - vparam.handmin;
                 if(ct * vparam.cardrect.width + (ct - 1) * vparam.cardrect.width * 0.1f >= wmax) {
@@ -996,25 +942,22 @@ namespace ygopro
                     float lst = -vparam.handmin - (wmax - whand) * 0.5f;
                     tl = {lst - seq * vparam.cardrect.width * 1.1f - vparam.cardrect.width * 0.5f, vparam.handy[1], 0.0f};
                 }
-                if(pcard->pos & 0x5)
-                    rot = vparam.hand_quat[0];
-                else
-                    rot = vparam.hand_quat[1];
             }
+            if(pcard->code != 0)
+                rot = vparam.hand_quat[0];
+            else
+                rot = vparam.hand_quat[1];
             if(update) {
                 pcard->translation = tl;
                 pcard->rotation = rot;
-                pcard->rotated = true;
+                pcard->update_rvert = true;
             } else {
                 pcard->translation.SetAnimator(std::make_shared<LerpAnimator<v3f, TGenMove>>(pcard->translation.Get(), tl, stm, tm, 10));
                 pcard->rotation.SetAnimator(std::make_shared<LerpAnimatorCB<glm::quat, TGenMove>>([](const glm::quat& st, const glm::quat& ed, float t)->glm::quat {
                     return glm::slerp(st, ed, t);
                 }, pcard->rotation.Get(), rot, stm, tm, 10));
             }
-            if(!pcard->updating) {
-                updating_cards.push_back(pcard);
-                pcard->updating = true;
-            }
+            AddUpdateCard(pcard);
         }
     }
     
@@ -1106,17 +1049,14 @@ namespace ygopro
         }
         if(update) {
             pcard->rotation = rot;
-            pcard->rotated = true;
+            pcard->update_rvert = true;
         } else {
             float stm = SceneMgr::Get().GetGameTime();
             pcard->rotation.SetAnimator(std::make_shared<LerpAnimatorCB<glm::quat, TGenLinear>>([](const glm::quat& st, const glm::quat& ed, float t)->glm::quat {
                 return glm::slerp(st, ed, t);
             }, pcard->rotation.Get(), rot, stm, tm));
         }
-        if(!pcard->updating) {
-            updating_cards.push_back(pcard);
-            pcard->updating = true;
-        }
+        AddUpdateCard(pcard);
     }
     
     void DuelScene::ReleaseCard(std::shared_ptr<FieldCard> pcard) {
@@ -1131,10 +1071,14 @@ namespace ygopro
             alloc_cards[pcard->vertex_index] = last;
             alloc_cards.pop_back();
             update_index = true;
-            if(!last->updating) {
-                updating_cards.push_back(last);
-                last->updating = true;
-            }
+            AddUpdateCard(last);
+        }
+    }
+    
+    void DuelScene::AddUpdateCard(std::shared_ptr<FieldCard> pcard) {
+        if(!pcard->updating) {
+            updating_cards.push_back(pcard);
+            pcard->updating = true;
         }
     }
     

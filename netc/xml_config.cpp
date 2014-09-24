@@ -2,7 +2,6 @@
 
 #include "../buildin/rapidxml.hpp"
 #include "../buildin/rapidxml_print.hpp"
-#include "../buildin/rapidxml_utils.hpp"
 
 #include "xml_config.h"
 
@@ -10,9 +9,9 @@ namespace ygopro
 {
 
 	bool CommonConfig::LoadConfig(const std::wstring& name) {
-        rapidxml::file<> f(To<std::string>(name).c_str());
+        TextFile f(To<std::string>(name));
         rapidxml::xml_document<> doc;
-        doc.parse<0>(f.data());
+        doc.parse<0>(f.Data());
         rapidxml::xml_node<>* root = doc.first_node();
         rapidxml::xml_node<>* config_node = root->first_node();
         while(config_node) {

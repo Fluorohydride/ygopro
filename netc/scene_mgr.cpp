@@ -2,7 +2,6 @@
 
 #include "../buildin/rapidxml.hpp"
 #include "../buildin/rapidxml_print.hpp"
-#include "../buildin/rapidxml_utils.hpp"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "../buildin/stb_image_write.h"
@@ -18,9 +17,9 @@ namespace ygopro
     
     void SceneMgr::Init(const std::wstring& layout) {
         start_time = std::chrono::system_clock::now().time_since_epoch().count();
-        rapidxml::file<> f(To<std::string>(layout).c_str());
+        TextFile f(To<std::string>(layout));
         rapidxml::xml_document<> doc;
-        doc.parse<0>(f.data());
+        doc.parse<0>(f.Data());
         rapidxml::xml_node<>* root = doc.first_node();
         rapidxml::xml_node<>* config_node = root->first_node();
         while(config_node) {

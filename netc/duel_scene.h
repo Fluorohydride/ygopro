@@ -16,6 +16,7 @@ namespace ygopro
         virtual bool UpdateVertices(double tm) = 0;
         
         unsigned int vertex_index = 0;
+        MutableAttribute<float> dy;
         MutableAttribute<float> alpha;
         MutableAttribute<float> hl;
         std::vector<v3f> vertex;
@@ -37,7 +38,7 @@ namespace ygopro
         virtual void RefreshVertices();
         virtual bool UpdateVertices(double tm);
         
-        void Init(unsigned int idx, unsigned int code);
+        void Init(unsigned int idx, unsigned int code, int side);
         void SetCode(unsigned int code, bool refresh = true);
         void SetIconTex(int iid, bool refresh = true);
         
@@ -47,7 +48,7 @@ namespace ygopro
 		int loc = 0;
 		int seq = 0;
 		int pos = 0;
-        bool rotated = true;
+        bool update_rvert = true;
         std::vector<v3f> vertex_r;
         std::vector<std::shared_ptr<FieldCard>> olcards;
         MutableAttribute<v3f> translation;
@@ -115,6 +116,7 @@ namespace ygopro
         void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update = true, float tm = 0.0f);
         void ChangePos(std::shared_ptr<FieldCard> pcard, int pos, bool update = true, float tm = 0.0f);
         void ReleaseCard(std::shared_ptr<FieldCard> pcard);
+        void AddUpdateCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
         
         v2i CheckHoverBlock(float px, float py);
@@ -142,7 +144,8 @@ namespace ygopro
         ViewParam vparam;
         bool btnDown[2] = {false};
         v2i btnPos[2];
-        v2i hover_pos = {0, 0};
+        std::weak_ptr<FieldBlock> pre_block;
+        std::weak_ptr<FieldCard> pre_card;
         v2i click_pos = {0, 0};
         
         std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
