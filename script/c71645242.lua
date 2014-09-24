@@ -111,14 +111,14 @@ function c71645242.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c71645242.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) then return end
+	if not (c:IsRelateToEffect(e) and c:IsDestructable() and c:IsDestructable(e)) then return end
 	local dg=Duel.GetMatchingGroup(c71645242.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local atk=dg:GetSum(Card.GetAttack)
 	dg:AddCard(c)
 	Duel.Destroy(dg,REASON_EFFECT)
 	Duel.BreakEffect()
 	local tc=Duel.GetFirstTarget()
-	if not (c:IsLocation(LOCATION_SZONE) and c:GetSequence()==5) and tc:IsRelateToEffect(e) and tc:GetAttack()==atk then
+	if tc:IsRelateToEffect(e) and tc:GetAttack()==atk then
 		Duel.SpecialSummon(tc,0x20,tp,tp,false,false,POS_FACEUP)
 	end
 end
