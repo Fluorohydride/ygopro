@@ -112,12 +112,14 @@ namespace ygopro
         std::shared_ptr<FieldCard> GetCard(int side, int zone, int seq, int subs);
         std::shared_ptr<FieldCard> RemoveCard(int side, int zone, int seq, int subs);
         void RefreshPos(std::shared_ptr<FieldCard> pcard, bool update = true, float tm = 0.0f);
-        void RefreshHand(int side, bool update = true, float tm = 0.0f);        
+        void RefreshHand(int side, bool update = true, float tm = 0.0f);
         void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update = true, float tm = 0.0f);
         void ChangePos(std::shared_ptr<FieldCard> pcard, int pos, bool update = true, float tm = 0.0f);
         void ReleaseCard(std::shared_ptr<FieldCard> pcard);
         void AddUpdateCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
+        void RefreshHandIndex(int side);
+        void RefreshDeckIndex(int side);
         
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
@@ -138,6 +140,7 @@ namespace ygopro
         bool update_bg = true;
         bool update_misc = true;
         bool update_index = true;
+        int refresh_hand = 0;
         CommandList<DuelCommand> duel_commands;
         glbase::Shader duel_shader;
         

@@ -4,12 +4,26 @@
 namespace ygopro
 {
     
+    class DuelScene;
+    
     struct DuelCommand {
-        virtual bool Handle() = 0;
-        double wait_time = 0.0;
-        std::function<bool ()> cb;
+        virtual bool Handle(DuelScene* pscene) = 0;
     };
     
+    struct DuelCommandWait : public DuelCommand {
+        DuelCommandWait(double tm);
+        virtual bool Handle(DuelScene* pscene);
+
+        double end_time;
+    };
+    
+    struct DuelCommandMove : public DuelCommand {
+        DuelCommandMove(unsigned int f, unsigned int t);
+        virtual bool Handle(DuelScene* pscene);
+        
+        unsigned char from[4];
+        unsigned char to[4];
+    };
 }
 
 #endif

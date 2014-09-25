@@ -280,7 +280,7 @@ namespace ygopro
             auto cmd = duel_commands.PullCommand();
             if(cmd == nullptr)
                 break;
-            if(!cmd->Handle())
+            if(!cmd->Handle(this))
                 break;
             duel_commands.PopCommand();
         } while (duel_commands.IsEmpty());
@@ -403,6 +403,7 @@ namespace ygopro
         if(evt.button < 2) {
             btnDown[evt.button] = false;
         }
+        duel_commands.PushCommand(std::make_shared<DuelCommandMove>(0, 0));
     }
     
     void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
@@ -483,6 +484,13 @@ namespace ygopro
     }
     
     void DuelScene::UpdateField() {
+        if(refresh_hand) {
+            if(refresh_hand & 0x1)
+                RefreshHand(0, false, 0.5);
+            if(refresh_hand & 0x2)
+                RefreshHand(1, false, 0.5);
+            refresh_hand = 0;
+        }
         double tm = SceneMgr::Get().GetGameTime();
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
         for(auto iter = updating_blocks.begin(); iter != updating_blocks.end();) {
@@ -718,6 +726,8 @@ namespace ygopro
                 ret = hand[side][seq];
                 hand[side].erase(hand[side].begin() + seq);
                 ret->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(ret->dy.Get(), 0.0f, SceneMgr::Get().GetGameTime(), 0.5, 10));
+                RefreshHandIndex(side);
+                refresh_hand |= 1 << side;
                 break;
             case 0x4:
                 if(zone & 0x80) {
@@ -1096,6 +1106,18 @@ namespace ygopro
         }
         ImageMgr::Get().UnloadAllCardTexture();
         alloc_cards.clear();
+    }
+    
+    void DuelScene::RefreshHandIndex(int side) {
+        unsigned int index = 0;
+        for(auto& iter : hand[side])
+            iter->seq = index++;
+    }
+    
+    void DuelScene::RefreshDeckIndex(int side) {
+        unsigned int index = 0;
+        for(auto& iter : deck[side])
+            iter->seq = index++;
     }
     
     v2i DuelScene::CheckHoverBlock(float px, float py) {
