@@ -285,6 +285,7 @@ namespace ygopro
             duel_commands.PopCommand();
         } while (duel_commands.IsEmpty());
         UpdateBackground();
+        UpdateRegion();
         UpdateField();
         UpdateMisc();
         UpdateIndex();
@@ -337,8 +338,8 @@ namespace ygopro
     void DuelScene::MouseMove(sgui::MouseMoveEvent evt) {
         bool update_param = false;
         if(btnDown[0]) {
-            float ratex = (float)(evt.x - btnPos[0].x) / scene_size.x;
-            float ratey = (float)(evt.y - btnPos[0].y) / scene_size.y;
+            float ratex = (float)(evt.x - btnPos[0].x) / scene_size.x * 2.0f;
+            float ratey = (float)(evt.y - btnPos[0].y) / scene_size.y * 2.0f;
             vparam.xoffset += ratex;
             vparam.yoffset -= ratey;
             btnPos[0] = {evt.x, evt.y};
@@ -483,14 +484,38 @@ namespace ygopro
         GLCheckError(__FILE__, __LINE__);
     }
     
-    void DuelScene::UpdateField() {
-        if(refresh_hand) {
-            if(refresh_hand & 0x1)
-                RefreshHand(0, false, 0.5);
-            if(refresh_hand & 0x2)
-                RefreshHand(1, false, 0.5);
-            refresh_hand = 0;
+    void DuelScene::UpdateRegion() {
+        for(int side = 0; side < 1; ++side) {
+            unsigned int region = (refresh_region >> (side * 16)) & 0xffff;
+            if(region & 0x1)
+                for(auto& iter : deck[side])
+                    RefreshPos(iter, false, 0.5);
+            if(region & 0x2)
+                RefreshHand(side, false, 0.5);
+            if(region & 0x4)
+                for(auto& iter : grave[side])
+                    RefreshPos(iter, false, 0.5);
+            if(region & 0x8)
+                for(auto& iter : banished[side])
+                    RefreshPos(iter, false, 0.5);
+            if(region & 0x10)
+                for(auto& iter : extra[side])
+                    RefreshPos(iter, false, 0.5);
+            for(int seq = 0; seq < 5; ++seq) {
+                if(region & (0x20 << seq)) {
+                    auto pcard = m_zone[side][seq];
+                    if(pcard) {
+                        for(auto& iter : pcard->olcards)
+                            RefreshPos(iter, false, 0.5);
+                        RefreshPos(pcard);
+                    }
+                }
+            }
         }
+        refresh_region = 0;
+    }
+    
+    void DuelScene::UpdateField() {
         double tm = SceneMgr::Get().GetGameTime();
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
         for(auto iter = updating_blocks.begin(); iter != updating_blocks.end();) {
@@ -527,7 +552,7 @@ namespace ygopro
             return;
         update_misc = false;
         for(int i = 0; i < 5; ++i) {
-            RefreshPos(AddCard((i % 2) ? 83764718 : 0, 0, 0x2, i, 1));
+            RefreshPos(AddCard((i % 2) ? 83764718 : 0, 0, 0x1, i, 1));
             RefreshPos(AddCard((i % 2) ? 83764718 : 0, 1, 0x2, i, 1));
         }
         RefreshHand(0);
@@ -721,19 +746,33 @@ namespace ygopro
             case 0x1:
                 ret = deck[side][seq];
                 deck[side].erase(deck[side].begin() + seq);
+                if(seq != deck[side].size()) {
+                    unsigned int index = 0;
+                    for(auto& iter : deck[side])
+                        iter->seq = index++;
+                    refresh_region |= 0x1 << (side * 16);
+                }
                 break;
             case 0x2:
                 ret = hand[side][seq];
                 hand[side].erase(hand[side].begin() + seq);
                 ret->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(ret->dy.Get(), 0.0f, SceneMgr::Get().GetGameTime(), 0.5, 10));
-                RefreshHandIndex(side);
-                refresh_hand |= 1 << side;
+                {
+                    unsigned int index = 0;
+                    for(auto& iter : hand[side])
+                        iter->seq = index++;
+                    refresh_region |= 0x2 << (side * 16);
+                }
                 break;
             case 0x4:
                 if(zone & 0x80) {
                     auto pcard = m_zone[side][seq];
                     ret = pcard->olcards[subs];
                     pcard->olcards.erase(pcard->olcards.begin() + subs);
+                    unsigned int index = 0;
+                    for(auto& iter : pcard->olcards)
+                        iter->seq = index++;
+                    refresh_region |= 0x20 << (side * 16 + seq);
                 } else {
                     ret = m_zone[side][seq];
                     m_zone[side][seq] = nullptr;
@@ -746,14 +785,32 @@ namespace ygopro
             case 0x10:
                 ret = grave[side][seq];
                 grave[side].erase(grave[side].begin() + seq);
+                if(seq != grave[side].size()) {
+                    unsigned int index = 0;
+                    for(auto& iter : grave[side])
+                        iter->seq = index++;
+                    refresh_region |= 0x4 << (side * 16);
+                }
                 break;
             case 0x20:
                 ret = banished[side][seq];
                 banished[side].erase(banished[side].begin() + seq);
+                if(seq != banished[side].size()) {
+                    unsigned int index = 0;
+                    for(auto& iter : banished[side])
+                        iter->seq = index++;
+                    refresh_region |= 0x8 << (side * 16);
+                }
                 break;
             case 0x40:
                 ret = extra[side][seq];
                 extra[side].erase(extra[side].begin() + seq);
+                if(seq != extra[side].size()) {
+                    unsigned int index = 0;
+                    for(auto& iter : extra[side])
+                        iter->seq = index++;
+                    refresh_region |= 0x10 << (side * 16);
+                }
                 break;
         }
         if(ret != nullptr)
@@ -987,13 +1044,19 @@ namespace ygopro
             case 0x2:
                 pcard->seq = hand[toside].size();
                 hand[toside].push_back(pcard);
+                refresh_region |= 2 << (toside * 16);
                 break;
             case 0x4:
                 if(tozone & 0x80) {
                     auto pre = m_zone[toside][toseq];
-                    pre->olcards.push_back(pcard);
-                } else
+                    if(pre) {
+                        pre->olcards.push_back(pcard);
+                        refresh_region |= 0x4 << (toside * 16);
+                    }
+                } else {
                     m_zone[toside][toseq] = pcard;
+                    refresh_region |= 0x4 << (toside * 16);
+                }
                 break;
             case 0x8:
                 s_zone[toside][toseq] = pcard;
@@ -1106,18 +1169,6 @@ namespace ygopro
         }
         ImageMgr::Get().UnloadAllCardTexture();
         alloc_cards.clear();
-    }
-    
-    void DuelScene::RefreshHandIndex(int side) {
-        unsigned int index = 0;
-        for(auto& iter : hand[side])
-            iter->seq = index++;
-    }
-    
-    void DuelScene::RefreshDeckIndex(int side) {
-        unsigned int index = 0;
-        for(auto& iter : deck[side])
-            iter->seq = index++;
     }
     
     v2i DuelScene::CheckHoverBlock(float px, float py) {

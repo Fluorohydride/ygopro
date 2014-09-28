@@ -20,8 +20,9 @@ namespace ygopro
     }
     
     bool DuelCommandMove::Handle(DuelScene* pscene) {
-        auto pcard = pscene->GetCard(0, 2, 0, 0);
-        pscene->MoveCard(pcard, 0, 1, 0, 1, false, 1.0);
+        auto pcard = pscene->GetCard(0, 1, 0, 0);
+        if(pcard)
+            pscene->MoveCard(pcard, 0, 2, 0, 1, false, 1.0);
         return true;
     }
     

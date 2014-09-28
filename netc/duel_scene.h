@@ -103,6 +103,7 @@ namespace ygopro
         void UpdateHandRect();
         void UpdateBackground();
         void UpdateField();
+        void UpdateRegion();
         void UpdateMisc();
         void UpdateIndex();
         
@@ -118,8 +119,6 @@ namespace ygopro
         void ReleaseCard(std::shared_ptr<FieldCard> pcard);
         void AddUpdateCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
-        void RefreshHandIndex(int side);
-        void RefreshDeckIndex(int side);
         
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
@@ -140,7 +139,7 @@ namespace ygopro
         bool update_bg = true;
         bool update_misc = true;
         bool update_index = true;
-        int refresh_hand = 0;
+        int refresh_region = 0;
         CommandList<DuelCommand> duel_commands;
         glbase::Shader duel_shader;
         
