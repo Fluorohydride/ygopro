@@ -198,15 +198,19 @@ function c94977269.checkop1(e,tp,eg,ep,ev,re,r,rp)
 	if p2 then c:RegisterFlagEffect(94977270,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1) end
 end
 function c94977269.checkop2(e,tp,eg,ep,ev,re,r,rp)
-	local ex=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
+	local ex,tg,ct,sp=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
 	local c=e:GetHandler()
-	if ex then 
+	if ex then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetAbsoluteRange(rp,1,0)
+		if sp==PLAYER_ALL then
+			e1:SetAbsoluteRange(rp,1,1)
+		else
+			e1:SetAbsoluteRange(rp,1,0)
+		end
 		c:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -223,8 +227,15 @@ function c94977269.rst(e,tp,eg,ep,ev,re,r,rp)
 end
 function c94977269.checkop3(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ex=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
-	if ex then c:RegisterFlagEffect(94977269+rp,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1) end
+	local ex,tg,ct,sp=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
+	if ex then
+		if sp==PLAYER_ALL then
+			c:RegisterFlagEffect(94977269,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+			c:RegisterFlagEffect(94977270,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		else
+			c:RegisterFlagEffect(94977269+rp,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		end
+	end
 end
 function c94977269.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
