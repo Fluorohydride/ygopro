@@ -1414,8 +1414,12 @@ effect* field::check_unique_onfield(card* pcard, uint8 controler) {
 	if(!pcard->unique_code)
 		return 0;
 	for(auto iter = core.unique_cards[controler].begin(); iter != core.unique_cards[controler].end(); ++iter) {
-		card* ucard = *iter;
-		if((ucard != pcard) && ucard->get_status(STATUS_EFFECT_ENABLED) && (ucard->unique_code == pcard->unique_code)
+		card* ucard = *iter;uint32 code= ucard->unique_code;
+		effect_set effects;
+		ucard->filter_effect(EFFECT_CHANGE_CODE, &effects);
+		if (effects.count)
+			code = effects.get_last()->get_value(ucard);
+		if((ucard != pcard) && ucard->get_status(STATUS_EFFECT_ENABLED) && (code == pcard->unique_code)
 			&& (!(pcard->current.location & LOCATION_ONFIELD) || pcard->is_position(POS_FACEDOWN) || (ucard->unique_uid < pcard->unique_uid)))
 			return pcard->unique_effect;
 	}
