@@ -40,7 +40,7 @@ function c78610936.activate(e,tp,eg,ep,ev,re,r,rp)
 			local tc=g:GetFirst()
 			while tc do
 				Duel.SpecialSummonStep(tc,0,tp,1-tp,false,false,POS_FACEUP_DEFENCE)
-				if tc:GetLevewl()>0 then
+				if tc:GetLevel()>0 then
 					local e1=Effect.CreateEffect(e:GetHandler())
 					e1:SetType(EFFECT_TYPE_SINGLE)
 					e1:SetCode(EFFECT_UPDATE_LEVEL)
