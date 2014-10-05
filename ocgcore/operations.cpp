@@ -2218,12 +2218,12 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		send_to(&cset, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
 		adjust_instant();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		if(pgroup->container.size() == 0)
+			return TRUE;
 		return FALSE;
 	}
 	case 27: {
 		group* pgroup = core.units.begin()->ptarget;
-		if(pgroup->container.size() == 0)
-			return TRUE;
 		for(auto oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
 			if(oeit->second == core.units.begin()->peffect)
 				oeit->second = 0;
