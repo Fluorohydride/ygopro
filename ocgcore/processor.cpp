@@ -1841,6 +1841,24 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				act = false;
 			} else if((peffect->flag & EFFECT_FLAG_FIELD_ONLY) || !(peffect->type & EFFECT_TYPE_FIELD)
 		            || peffect->in_range(clit->triggering_location, clit->triggering_sequence)) {
+		            	if(!(peffect->flag & EFFECT_FLAG_MULTIACT_HAND) && (clit->triggering_location== LOCATION_HAND)) {
+					if(tp == infos.turn_player) {
+						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
+							if(tpit->triggering_location == LOCATION_HAND) {
+								act = false;
+								break;
+							}
+						}
+					} else {
+						for(auto ntpit = core.ntpchain.begin(); ntpit != core.ntpchain.end(); ++ntpit) {
+							if(ntpit->triggering_location == LOCATION_HAND) {
+								act = false;
+								break;
+							}
+						}
+					}
+					
+				} 
 				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 					if(tp == infos.turn_player) {
 						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
