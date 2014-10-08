@@ -4,6 +4,8 @@
 namespace ygopro
 {
     
+    struct FieldBlock;
+    struct FieldCard;
     class DuelScene;
     
     struct DuelCommand {
@@ -18,11 +20,11 @@ namespace ygopro
     };
     
     struct DuelCommandMove : public DuelCommand {
-        DuelCommandMove(unsigned int f, unsigned int t);
+        DuelCommandMove(std::shared_ptr<FieldCard> pcard, int side, int loc, int seq, int pos);
         virtual bool Handle(DuelScene* pscene);
         
-        unsigned char from[4];
-        unsigned char to[4];
+        std::shared_ptr<FieldCard> moving_card;
+        unsigned int to[4];
     };
 }
 

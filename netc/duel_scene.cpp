@@ -404,7 +404,6 @@ namespace ygopro
         if(evt.button < 2) {
             btnDown[evt.button] = false;
         }
-        duel_commands.PushCommand(std::make_shared<DuelCommandMove>(0, 0));
     }
     
     void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {

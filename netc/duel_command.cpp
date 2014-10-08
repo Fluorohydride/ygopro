@@ -15,14 +15,17 @@ namespace ygopro
         return SceneMgr::Get().GetGameTime() > end_time;
     }
     
-    DuelCommandMove::DuelCommandMove(unsigned int f, unsigned int t) {
-        
+    DuelCommandMove::DuelCommandMove(std::shared_ptr<FieldCard> pcard, int side, int loc, int seq, int pos) {
+        moving_card = pcard;
+        to[0] = side;
+        to[1] = loc;
+        to[2] = seq;
+        to[3] = pos;
     }
     
     bool DuelCommandMove::Handle(DuelScene* pscene) {
-        auto pcard = pscene->GetCard(0, 1, 0, 0);
-        if(pcard)
-            pscene->MoveCard(pcard, 0, 2, 0, 1, false, 1.0);
+        if(moving_card)
+            pscene->MoveCard(moving_card, to[0], to[1], to[2], to[3], false, 1.0);
         return true;
     }
     

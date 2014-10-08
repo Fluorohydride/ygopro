@@ -5,6 +5,7 @@
 
 namespace ygopro
 {
+    const int ZIP_HEADER_SIZE = 30;
     const int ZIP_FILEDESC_SIZE = 12;
     
 #ifdef _WIN32
@@ -12,6 +13,7 @@ namespace ygopro
 #endif
 	// header = 0x04034b50
     struct ZipHeader {
+        int block_header;
         short ver_req;
         short global_sig;
         short comp_fun; // only support 00-no compression 08-deflate
@@ -22,6 +24,7 @@ namespace ygopro
         int file_size;
         short name_size;
         short ex_size;
+        char name_ptr[1];
 #ifdef _WIN32
     };
     #pragma pack(pop)
