@@ -154,7 +154,7 @@ int32 duelAdapter::query_field_info( byte* buf) {
 			}
 		}
 		for(uint32 i = 0; i < 8; ++i) {
-			pcard = ptduel->game_field->player[playerid].list_szone[i];
+			pcard = pduel->game_field->player[playerid].list_szone[i];
 			if(pcard) {
 				*buf++ = 1;
 				*buf++ = pcard->current.position;

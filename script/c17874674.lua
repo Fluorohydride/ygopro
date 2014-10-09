@@ -22,7 +22,7 @@ function c17874674.initial_effect(c)
 	--cancel target
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetCode(EVENT_TURN_END)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
 	e3:SetCondition(c17874674.condition)

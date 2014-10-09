@@ -48,6 +48,8 @@ struct card_data {
 	uint64 setcode;
 	uint32 type;
 	uint32 level;
+    uint32 lscale;
+    uint32 rscale;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -216,8 +218,6 @@ struct card_data {
 #define QUERY_DEFENCE		0x400
 #define QUERY_BASE_ATTACK	0x800
 #define QUERY_BASE_DEFENCE	0x1000
-#define QUERY_LSCALE		0x2000
-#define QUERY_RSCALE		0x4000
 #define QUERY_REASON		0x10000
 #define QUERY_OWNER			0x20000
 #define QUERY_STATUS		0x40000

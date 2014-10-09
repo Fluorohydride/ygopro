@@ -25,6 +25,7 @@ function c90075978.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetCondition(c90075978.setcon)
 	e1:SetOperation(c90075978.setop)
 	Duel.RegisterEffect(e1,tp)
 end
@@ -34,6 +35,9 @@ end
 function c90075978.spfilter(c,e,tp)
 	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsRace(RACE_REPTILE) and c:GetLevel()>=7
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function c90075978.setcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c90075978.sfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c90075978.setop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c90075978.sfilter,tp,LOCATION_MZONE,0,nil)

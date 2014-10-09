@@ -315,7 +315,7 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 				break;
 			}
 			bool is_public = false;
-			drawed ++;
+			drawed++;
 			pcard = *(player[playerid].list_main.rbegin());
 			pcard->enable_field_effect(FALSE);
 			pcard->cancel_field_effect();

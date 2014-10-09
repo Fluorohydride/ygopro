@@ -1,4 +1,4 @@
---Moon Dance Ritual
+--ムーンダンスの儀式
 function c14005031.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

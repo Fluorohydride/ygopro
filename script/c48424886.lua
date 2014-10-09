@@ -45,7 +45,7 @@ function c48424886.ffilter1(c)
 	return c:IsSetCard(0x9d)
 end
 function c48424886.ffilter2(c)
-	return c:IsAttribute(ATTRIBUTE_FIRE) or c:GetFlagEffect(4904633)~=0
+	return c:IsAttribute(ATTRIBUTE_FIRE) or c:IsHasEffect(4904633)
 end
 function c48424886.exfilter(c,g)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not g:IsContains(c)

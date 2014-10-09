@@ -76,11 +76,10 @@ function c34680482.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c34680482.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=e:GetLabel() and Duel.GetTurnPlayer()==tp
+	local tc=e:GetLabelObject()
+	return Duel.GetTurnCount()~=e:GetLabel() and Duel.GetTurnPlayer()==tp and tc:GetFlagEffectLabel(34680482)==e:GetLabel()
 end
 function c34680482.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetFlagEffectLabel(34680482)==e:GetLabel() then
-		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
-	end
+	Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 end

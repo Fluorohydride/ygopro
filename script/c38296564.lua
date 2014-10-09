@@ -11,18 +11,25 @@ function c38296564.initial_effect(c)
 	--Destroy
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
-	e2:SetCode(EVENT_LEAVE_FIELD)
-	e2:SetOperation(c38296564.desop)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCode(EVENT_LEAVE_FIELD_P)
+	e2:SetOperation(c38296564.checkop)
 	c:RegisterEffect(e2)
-	--Destroy2
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e3:SetRange(LOCATION_SZONE)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e3:SetCode(EVENT_LEAVE_FIELD)
-	e3:SetProperty(EFFECT_FLAG_DELAY)
-	e3:SetCondition(c38296564.descon2)
-	e3:SetOperation(c38296564.desop2)
+	e3:SetOperation(c38296564.desop)
+	e3:SetLabelObject(e2)
 	c:RegisterEffect(e3)
+	--Destroy2
+	local e4=Effect.CreateEffect(c)
+	e4:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e4:SetRange(LOCATION_SZONE)
+	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetProperty(EFFECT_FLAG_DELAY)
+	e4:SetCondition(c38296564.descon2)
+	e4:SetOperation(c38296564.desop2)
+	c:RegisterEffect(e4)
 end
 function c38296564.filter(c)
 	return c:IsFaceup() and c:IsAttackPos()
@@ -70,7 +77,13 @@ end
 function c38296564.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
+function c38296564.checkop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():IsDisabled() then
+		e:SetLabel(1)
+	else e:SetLabel(0) end
+end
 function c38296564.desop(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetLabelObject():GetLabel()~=0 then return end
 	local tc=e:GetHandler():GetFirstCardTarget()
 	if tc and tc:IsLocation(LOCATION_MZONE) then
 		Duel.Destroy(tc,REASON_EFFECT)

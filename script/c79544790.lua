@@ -31,14 +31,16 @@ function c79544790.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetCondition(c79544790.descon)
 		e1:SetOperation(c79544790.desop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
 		e1:SetCountLimit(1)
 		tc:RegisterEffect(e1,true)
 	end
 end
+function c79544790.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c79544790.desop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end

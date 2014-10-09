@@ -25,6 +25,7 @@ function c99173029.initial_effect(c)
 	e4:SetCode(EVENT_PHASE+PHASE_END)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1)
+	e4:SetCondition(c99173029.mtcon)
 	e4:SetOperation(c99173029.mtop)
 	c:RegisterEffect(e4)
 end
@@ -37,8 +38,10 @@ function c99173029.levop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 	end
 end
+function c99173029.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c99173029.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0 and Duel.SelectYesNo(tp,aux.Stringid(99173029,0)) then
 		Duel.DiscardHand(tp,nil,1,1,REASON_COST+REASON_DISCARD)
 	else

@@ -118,14 +118,14 @@ void card::update_infos(int32 query_flag) {
 		} else
 			query_flag &= ~QUERY_RANK;
 	}
-    if((query_flag & QUERY_LSCALE) {
+    if(query_flag & QUERY_LSCALE) {
         if((tdata = get_lscale()) != q_cache.lscale) {
             q_cache.lscale = tdata;
             pduel->write_buffer32(tdata);
         } else
             query_flag &= ~QUERY_LSCALE;
     }
-    if((query_flag & QUERY_RSCALE) {
+    if(query_flag & QUERY_RSCALE) {
         if((tdata = get_rscale()) != q_cache.rscale) {
             q_cache.rscale = tdata;
             pduel->write_buffer32(tdata);

@@ -1,6 +1,8 @@
 #ifndef _PACKET_HANDLER_H_
 #define _PACKET_HANDLER_H_
 
+#include <string>
+
 class PacketReader;
 class PacketWriter;
 

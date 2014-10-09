@@ -108,8 +108,7 @@ void field::reload_field_info() {
 				pduel->write_buffer8(0);
 			}
 		}
-		for(uint32 i = 0; i < 8; ++i) {
-			pcard = player[playerid].list_szone[i];
+		for(auto& pcard : player[playerid].list_szone) {
 			if(pcard) {
 				pduel->write_buffer8(1);
 				pduel->write_buffer8(pcard->current.position);
@@ -865,8 +864,7 @@ void field::filter_affected_cards(effect* peffect, card_set* cset) {
 			}
 		}
 		if (range & LOCATION_SZONE) {
-			for (int i = 0; i < 8; ++i) {
-				pcard = player[self].list_szone[i];
+			for (auto& pcard : player[self].list_szone) {
 				if (pcard && peffect->is_target(pcard))
 					cset->insert(pcard);
 			}
@@ -927,8 +925,7 @@ int32 field::filter_matching_card(int32 findex, uint8 self, uint32 location1, ui
 			}
 		}
 		if(location & LOCATION_SZONE) {
-			for(uint32 i = 0; i < 8; ++i) {
-				pcard = player[self].list_szone[i];
+			for(auto& pcard : player[self].list_szone) {
 				if(pcard && pcard != pexception && pduel->lua->check_matching(pcard, findex, extraargs)
 				        && (!is_target || pcard->is_capable_be_effect_target(core.reason_effect, core.reason_player))) {
 					if(pret) {
@@ -1050,8 +1047,7 @@ int32 field::filter_field_card(uint8 self, uint32 location1, uint32 location2, g
 			}
 		}
 		if(location & LOCATION_SZONE) {
-			for(int i = 0; i < 8; ++i) {
-				pcard = player[self].list_szone[i];
+			for(auto& pcard : player[self].list_szone) {
 				if(pcard) {
 					if(pgroup)
 						pgroup->container.insert(pcard);
@@ -1177,8 +1173,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 		}
 	}
 	int32 ex_sum_max = 0;
-	for(int i = 0; i < 5; ++i) {
-		pcard = player[1 - p].list_mzone[i];
+	for(auto& pcard : player[1 - p].list_mzone) {
 		if(!(pcard && pcard->is_releasable_by_summon(p, target)))
 			continue;
 		if(mg && !mg->has_card(pcard))
@@ -1712,7 +1707,7 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 		if((redirect & LOCATION_REMOVED) && player[playerid].list_main.back()->is_affected_by_effect(EFFECT_CANNOT_REMOVE))
 			continue;
 		uint8 p = eset[i]->get_handler_player();
-		if((eset[i]->flag & EFFECT_FLAG_IGNORE_RANGE) || (p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
+		if((p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
 			return FALSE;
 	}
 	return TRUE;

@@ -1,10 +1,9 @@
-#include <iostream>
-#include <thread>
+#include "../common/common.h"
+
 #include "card_data_s.h"
-#include <chrono>
 
 int main(int argc, char** argv) {
-    if(!ygopro::dataMgrs.LoadDatas("../ygo/cards.cdb"))
+    if(!ygopro::DataMgrS::Get().LoadDatas("./conf/cards.cdb"))
         return 0;
     return 0;
 }

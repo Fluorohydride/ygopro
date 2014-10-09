@@ -1,6 +1,9 @@
+#include "../common/common.h"
+
+#include <sqlite3.h>
+
 #include "card_data_s.h"
-#include "../sqlite3/sqlite3.h"
-#include <mutex>
+
 
 namespace ygopro
 {
@@ -39,6 +42,9 @@ namespace ygopro
 				cd.attack = sqlite3_column_int(pStmt, 5);
 				cd.defence = sqlite3_column_int(pStmt, 6);
 				cd.level = sqlite3_column_int(pStmt, 7);
+                cd.lscale = (cd.level >> 16) & 0xff;
+                cd.rscale = (cd.level >> 24) & 0xff;
+                cd.level = cd.level & 0xffff;
 				cd.race = sqlite3_column_int(pStmt, 8);
 				cd.attribute = sqlite3_column_int(pStmt, 9);
 			}

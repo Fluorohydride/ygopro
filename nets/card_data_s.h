@@ -1,15 +1,12 @@
 #ifndef _CARD_DATA_S_H_
 #define _CARD_DATA_S_H_
 
-#include <string>
-#include <unordered_map>
-#include <mutex>
 #include "../ocgcore/common.h"
 
 namespace ygopro
 {
     
-	class DataMgrS {
+    class DataMgrS : public Singleton<DataMgrS> {
 	public:
         void LockData();
         void UnlockData();
@@ -22,8 +19,6 @@ namespace ygopro
         std::mutex _mlock;
 		std::unordered_map<unsigned int, card_data> _datas;
 	};
-    
-	extern DataMgrS dataMgrs;
     
 }
 

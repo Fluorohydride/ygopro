@@ -11,7 +11,7 @@ function c41098335.initial_effect(c)
 	--atk clear
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetCode(EVENT_TURN_END)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
 	e2:SetOperation(c41098335.retop)

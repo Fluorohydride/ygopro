@@ -52,6 +52,7 @@ function c82760689.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c82760689.drcon)
 	e1:SetOperation(c82760689.drop)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
@@ -59,8 +60,9 @@ end
 function c82760689.filter(c,g)
 	return g:IsExists(Card.IsCode,1,c,c:GetCode())
 end
+function c82760689.drcon(e,tp,eg,ep,ev,re,r,rp)
+	return c82760689[0] or c82760689[1]:IsExists(c82760689.filter,1,nil,c82760689[1])
+end
 function c82760689.drop(e,tp,eg,ep,ev,re,r,rp)
-	if c82760689[0] or c82760689[1]:IsExists(c82760689.filter,1,nil,c82760689[1]) then
-		Duel.Draw(tp,2,REASON_EFFECT)
-	end
+	Duel.Draw(tp,2,REASON_EFFECT)
 end

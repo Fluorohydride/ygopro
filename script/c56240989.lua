@@ -49,14 +49,15 @@ function c56240989.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c56240989.filter,tp,LOCATION_DECK,0,nil,e,tp)
 	local dg=g:Filter(c56240989.filter2,nil,g)
 	if dg:GetCount()>=1 then
+		local fid=c:GetFieldID()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=dg:Select(tp,1,1,nil)
 		local tc1=sg:GetFirst()
 		local tc2=dg:Filter(Card.IsCode,tc1,tc1:GetCode()):GetFirst()
 		Duel.SpecialSummonStep(tc1,154,tp,tp,false,false,POS_FACEUP)
 		Duel.SpecialSummonStep(tc2,154,tp,tp,false,false,POS_FACEUP)
-		tc1:RegisterFlagEffect(56240989,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
-		tc2:RegisterFlagEffect(56240989,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		tc1:RegisterFlagEffect(56240989,RESET_EVENT+0x1fe0000,0,1,fid)
+		tc2:RegisterFlagEffect(56240989,RESET_EVENT+0x1fe0000,0,1,fid)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)
@@ -77,19 +78,27 @@ function c56240989.spop(e,tp,eg,ep,ev,re,r,rp)
 		local e5=Effect.CreateEffect(c)
 		e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e5:SetCode(EVENT_PHASE+PHASE_END)
-		e5:SetReset(RESET_PHASE+PHASE_END)
 		e5:SetCountLimit(1)
+		e5:SetLabel(fid)
 		e5:SetLabelObject(sg)
+		e5:SetCondition(c56240989.rmcon)
 		e5:SetOperation(c56240989.rmop)
 		Duel.RegisterEffect(e5,tp)
 	end
 end
-function c56240989.rmfilter(c)
-	return c:GetFlagEffect(56240989)>0
+function c56240989.rmfilter(c,fid)
+	return c:GetFlagEffectLabel(56240989)==fid
+end
+function c56240989.rmcon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c56240989.rmfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	else return true end
 end
 function c56240989.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local tg=g:Filter(c56240989.rmfilter,nil)
-	g:DeleteGroup()
+	local tg=g:Filter(c56240989.rmfilter,nil,e:GetLabel())
 	Duel.Remove(tg,POS_FACEUP,REASON_EFFECT)
 end

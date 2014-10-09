@@ -1,4 +1,4 @@
---Noble Arms - Excaliburn
+--聖剣 EX－カリバーン
 function c46008667.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

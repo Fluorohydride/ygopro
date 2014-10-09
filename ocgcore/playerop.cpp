@@ -311,9 +311,7 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 fo
 			effect* peffect = core.select_chains[i].triggering_effect;
 			card* pcard = peffect->handler;
 			pduel->write_buffer32(pcard->data.code);
-			pduel->write_buffer8(pcard->current.controler);
-			pduel->write_buffer8(pcard->current.location);
-			pduel->write_buffer8(pcard->current.sequence);
+			pduel->write_buffer32(pcard->get_info_location());
 			pduel->write_buffer32(peffect->description);
 		}
 		return FALSE;
