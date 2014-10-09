@@ -82,6 +82,10 @@ int main(int argc, char* argv[]) {
     //SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
     auto sc = std::make_shared<DuelScene>();
     SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
+    std::wstring server_ip = commonCfg["server_ip"];
+    int server_port = commonCfg["server_port"];
+    int server_timeout = commonCfg["server_timeout"];
+    sc->Connect(To<std::string>(server_ip).c_str(), server_port, server_timeout);
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {

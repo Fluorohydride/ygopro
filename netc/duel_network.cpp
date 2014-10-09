@@ -1,5 +1,6 @@
 #include "../common/common.h"
 
+#include "gui_extra.h"
 #include "duel_scene.h"
 
 namespace ygopro
@@ -10,11 +11,15 @@ namespace ygopro
     }
     
     void DuelScene::OnConnectError() {
-        
+        MessageBox::ShowOK(L"", L"connection error.", [this]() {
+            std::cout << "end" << std::endl;
+        });
     }
     
     void DuelScene::OnConnectTimeOut() {
-        
+        MessageBox::ShowOK(L"", L"connection timeout.", [this]() {
+            std::cout << "end" << std::endl;
+        });
     }
     
     void DuelScene::OnDisconnected() {

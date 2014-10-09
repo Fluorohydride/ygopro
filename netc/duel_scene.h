@@ -9,7 +9,7 @@
 namespace ygopro
 {
     
-    struct DuelCommand;
+    class DuelCommand;
     
     struct FieldObject {
         virtual void RefreshVertices() = 0;

@@ -254,6 +254,7 @@ namespace ygopro
         vparam.handmax = SceneMgr::Get().LayoutFloatConfig("handmax");
         vparam.handy[0] = SceneMgr::Get().LayoutFloatConfig("handy1");
         vparam.handy[1] = SceneMgr::Get().LayoutFloatConfig("handy2");
+        
     }
     
     DuelScene::~DuelScene() {
@@ -275,7 +276,7 @@ namespace ygopro
     }
     
     bool DuelScene::Update() {
-        //PullEvent();
+        PullEvent();
         do {
             auto cmd = duel_commands.PullCommand();
             if(cmd == nullptr)

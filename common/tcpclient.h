@@ -128,7 +128,7 @@ public:
                 event_del(client->timer_event);
                 client->timer_event = nullptr;
             }
-            bufferevent_enable(client->client_bev, EV_READ);
+            bufferevent_enable(client->client_bev, EV_READ | EV_WRITE);
             client->OnConnected();
         } else if(events & BEV_EVENT_EOF) {
             client->OnDisconnected();

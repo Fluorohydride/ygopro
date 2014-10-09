@@ -21,4 +21,7 @@
   <string name="limit_regulation" value="./conf/lflist.conf"/>
   <string name="deck_neturl" value="http://my-card.in/decks/new?name={name}{amp}cards={deck}"/>
   <integer name="hover_info_delay" value="300"/>
+  <string name="server_ip" value="127.0.0.1"/>
+  <integer name="server_port" value="7911"/>
+  <integer name="server_timeout" value="5000"/>
 </Common>
