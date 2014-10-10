@@ -18,7 +18,7 @@ namespace ygopro
         ti4 card_tex;
         bool show_limit = true;
         bool show_exclusive = true;
-        bool updateing = false;
+        bool updating = false;
     };
     
     class BuildScene : public Scene {
@@ -30,13 +30,6 @@ namespace ygopro
         virtual void Draw();
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
-        virtual void MouseMove(sgui::MouseMoveEvent evt);
-        virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
-        virtual void MouseButtonUp(sgui::MouseButtonEvent evt);
-        virtual void MouseWheel(sgui::MouseWheelEvent evt);
-        virtual void KeyDown(sgui::KeyEvent evt);
-        virtual void KeyUp(sgui::KeyEvent evt);
-        
         void ShowCardInfo(unsigned int code);
         void StopViewRegulation() { view_regulation = 0; }
         
@@ -61,7 +54,6 @@ namespace ygopro
         void RefreshAllIndex();
         void UpdateMisc();
         void UpdateResult();
-        void UpdateInfo();
         
         void RefreshCardPos(std::shared_ptr<DeckCardData> dcd);
         void RefreshHL(std::shared_ptr<DeckCardData> dcd);
@@ -77,6 +69,8 @@ namespace ygopro
         void QuickSearch(const std::wstring& keystr);
         void Search(const FilterCondition& fc, int lmt);
         
+        void SetCurrentSelection(int sel, bool show_info);
+        void AddUpdatingCard(std::shared_ptr<DeckCardData> dcd);
         
         std::shared_ptr<DeckCardData> GetCard(int pos, int index);
         std::pair<int, int> GetHoverPos(int posx, int posy);
@@ -95,9 +89,6 @@ namespace ygopro
         bool update_misc = true;
         bool update_result = true;
         int update_status = 0;
-        std::pair<int, int> hover_pos;
-        std::pair<int, int> click_pos;
-        std::weak_ptr<DeckCardData> hover_obj;
         std::wstring current_file;
         int view_regulation = 0;
         DeckData current_deck;
@@ -113,9 +104,6 @@ namespace ygopro
         float dx[3] = {0.0f, 0.0f, 0.0f};
         bool deck_edited = false;
         bool show_exclusive = true;
-        bool show_info = false;
-        bool show_info_begin = false;
-        double show_info_time = 0.0;
         std::array<ti4, 3> limit;
         std::array<ti4, 3> pool;
         ti4 hmask;
@@ -127,8 +115,8 @@ namespace ygopro
         std::vector<CardData*> search_result;
         std::array<ti4, 10> result_tex;
         int result_page = 0;
-        int current_sel_result = -1;
         int result_show_size = 0;
+        int current_sel_result = -1;
         std::weak_ptr<sgui::SGLabel> label_result;
         std::weak_ptr<sgui::SGLabel> label_page;
         Timer<double> build_timer;

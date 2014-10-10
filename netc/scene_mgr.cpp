@@ -62,6 +62,8 @@ namespace ygopro
     }
     
     bool SceneMgr::Update() {
+        unsigned long long now_long = std::chrono::system_clock::now().time_since_epoch().count();
+        now = (double)(now_long - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
         if(current_scene != nullptr)
             return current_scene->Update();
         return true;
@@ -74,11 +76,6 @@ namespace ygopro
             current_scene->Draw();
     }
     
-    double SceneMgr::GetGameTime() {
-        unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
-        return (double)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
-    }
-    
     void SceneMgr::SetFrameRate(double rate) {
         frame_interval = 1.0 / rate;
     }
@@ -89,36 +86,6 @@ namespace ygopro
         if(frame_check >= 0.0)
             std::this_thread::sleep_for(std::chrono::microseconds((int)(frame_interval * 1000000)));
         frame_time = now;
-    }
-    
-    void SceneMgr::MouseMove(sgui::MouseMoveEvent evt) {
-        if(current_scene != nullptr)
-            current_scene->MouseMove(evt);
-    }
-    
-    void SceneMgr::MouseButtonDown(sgui::MouseButtonEvent evt) {
-        if(current_scene != nullptr)
-            current_scene->MouseButtonDown(evt);
-    }
-    
-    void SceneMgr::MouseButtonUp(sgui::MouseButtonEvent evt) {
-        if(current_scene != nullptr)
-            current_scene->MouseButtonUp(evt);
-    }
-    
-    void SceneMgr::MouseWheel(sgui::MouseWheelEvent evt) {
-        if(current_scene != nullptr)
-            current_scene->MouseWheel(evt);
-    }
-    
-    void SceneMgr::KeyDown(sgui::KeyEvent evt) {
-        if(current_scene != nullptr)
-            current_scene->KeyDown(evt);
-    }
-    
-    void SceneMgr::KeyUp(sgui::KeyEvent evt) {
-        if(current_scene != nullptr)
-            current_scene->KeyUp(evt);
     }
     
     void SceneMgr::SetSceneSize(v2i sz) {
@@ -136,6 +103,12 @@ namespace ygopro
             current_scene->SetSceneSize(scene_size);
             current_scene->Activate();
         }
+    }
+    
+    std::shared_ptr<InputHandler> SceneMgr::GetInputHandler() {
+        if(current_scene == nullptr)
+            return nullptr;
+        return current_scene->GetInputHandler();
     }
     
     void SceneMgr::ScreenShot() {
