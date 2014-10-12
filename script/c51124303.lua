@@ -21,7 +21,7 @@ function c51124303.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c51124303.spfilter(c,e,tp,mc)
-	return c:IsSetCard(0xb4) and c:IsType(TYPE_RITUAL) and (not c.mat_filter or c.mat_filter(mc))
+	return c:IsSetCard(0xb4) and bit.band(c:GetType(),0x81)==0x81 and (not c.mat_filter or c.mat_filter(mc))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false)
 end
 function c51124303.rfilter(c,mc)

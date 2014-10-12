@@ -21,7 +21,7 @@ function c14735698.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c14735698.filter(c,e,tp,m)
-	if not c:IsSetCard(0xb4) or not c:IsType(TYPE_RITUAL)
+	if not c:IsSetCard(0xb4) or bit.band(c:GetType(),0x81)~=0x81
 		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
 	local mg=nil
 	if c.mat_filter then
