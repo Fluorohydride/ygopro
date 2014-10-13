@@ -85,7 +85,7 @@ function c65247798.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c65247798.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsRelateToEffect(e) then
 		Duel.SendtoHand(c,nil,REASON_EFFECT)
 	end
 end
