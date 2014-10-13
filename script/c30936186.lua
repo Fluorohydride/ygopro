@@ -7,7 +7,8 @@ function c30936186.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetOperation(c30936186.ccost)
+	e1:SetCondition(c30936186.mtcon)
+	e1:SetOperation(c30936186.mtop)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -21,14 +22,16 @@ function c30936186.initial_effect(c)
 	e2:SetOperation(c30936186.spop)
 	c:RegisterEffect(e2)
 end
+function c30936186.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c30936186.cfilter1(c)
 	return c:IsCode(36623431) and c:IsAbleToGraveAsCost()
 end
 function c30936186.cfilter2(c)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_BEASTWARRIOR) and not c:IsPublic()
 end
-function c30936186.ccost(e,tp)
-	if tp~=Duel.GetTurnPlayer() then return end
+function c30936186.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetMatchingGroup(c30936186.cfilter1,tp,LOCATION_HAND,0,nil)
 	local g2=Duel.GetMatchingGroup(c30936186.cfilter2,tp,LOCATION_HAND,0,nil)
 	local select=2

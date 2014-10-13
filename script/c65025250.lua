@@ -40,7 +40,7 @@ function c65025250.filter(c,tp)
 		and c:IsSetCard(0xb3) and not c:IsReason(REASON_REPLACE)
 end
 function c65025250.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not eg:IsContains(e:GetHandler()) and eg:IsExists(c65025250.filter,1,nil,tp) end
+	if chk==0 then return eg:IsExists(c65025250.filter,1,nil,tp) end
 	return Duel.SelectYesNo(tp,aux.Stringid(65025250,0))
 end
 function c65025250.repval(e,c)
