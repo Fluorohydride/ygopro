@@ -90,8 +90,6 @@ namespace ygopro
     
     void BuildScene::Activate() {
         view_regulation = 0;
-        hover_pos = std::make_pair(0, 0);
-        click_pos = std::make_pair(0, 0);
         search_result.clear();
         result_page = 0;
         current_deck.Clear();
@@ -99,14 +97,14 @@ namespace ygopro
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
         pnl->SetSize({-20, 35}, {1.0f, 0.0f});
         pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
-            KeyDown(evt);
+            input_handler->KeyDown(evt);
             return true;
         });
         auto rpnl = sgui::SGPanel::Create(nullptr, {0, 0}, {200, 60});
         rpnl->SetPosition({0, 40}, {0.795f, 0.0f});
         rpnl->SetSize({-10, 60}, {0.205f, 0.0f});
         rpnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
-            KeyDown(evt);
+            input_handler->KeyDown(evt);
             return true;
         });
         auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 7}, std::wstring(L"\ue08c").append(stringCfg["eui_msg_new_deck"]));
@@ -280,6 +278,21 @@ namespace ygopro
         int w = 700;
         int h = 320;
         info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2}, {w, h});
+    }
+    
+    void BuildScene::HideCardInfo() {
+        info_panel->Destroy();
+    }
+    
+    void BuildScene::ShowSelectedInfo(unsigned int pos, unsigned int index) {
+        if(pos > 0 && pos < 4) {
+            auto dcd = GetCard(pos, index);
+            if(dcd != nullptr)
+                ShowCardInfo(dcd->data->code);
+        } else if(pos == 4) {
+            if((size_t)(result_page * 10 + index) < search_result.size())
+                ShowCardInfo(search_result[result_page * 10 + index]->code);
+        }
     }
     
     void BuildScene::ClearDeck() {
@@ -529,7 +542,7 @@ namespace ygopro
             else
                 RefreshHL(dcd);
             if(!ptr->pos.NeedUpdate() && !ptr->size.NeedUpdate() && !ptr->hl.NeedUpdate()) {
-                ptr->updateing = false;
+                ptr->updating = false;
                 updating_cards.erase(cur);
             }
         }
@@ -543,8 +556,8 @@ namespace ygopro
             auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[i]->extra);
             ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenMove>>(ptr->pos.Get(), cpos, SceneMgr::Get().GetGameTime(), 1.0, 10));
-            if(!ptr->updateing) {
-                ptr->updateing = true;
+            if(!ptr->updating) {
+                ptr->updating = true;
                 updating_cards.push_back(current_deck.main_deck[i]);
             }
         }
@@ -552,8 +565,8 @@ namespace ygopro
             auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[i]->extra);
             ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenMove>>(ptr->pos.Get(), cpos, SceneMgr::Get().GetGameTime(), 1.0, 10));
-            if(!ptr->updateing) {
-                ptr->updateing = true;
+            if(!ptr->updating) {
+                ptr->updating = true;
                 updating_cards.push_back(current_deck.extra_deck[i]);
             }
         }
@@ -561,8 +574,8 @@ namespace ygopro
             auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[i]->extra);
             ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenMove>>(ptr->pos.Get(), cpos, SceneMgr::Get().GetGameTime(), 1.0, 10));
-            if(!ptr->updateing) {
-                ptr->updateing = true;
+            if(!ptr->updating) {
+                ptr->updating = true;
                 updating_cards.push_back(current_deck.side_deck[i]);
             }
         }
@@ -952,6 +965,95 @@ namespace ygopro
         if(!ptr->updating) {
             ptr->updating = true;
             updating_cards.push_back(dcd);
+        }
+    }
+    
+    void BuildScene::MoveCard(int pos, int index) {
+        auto dcd = GetCard(pos, index);
+        if(dcd == nullptr)
+            return;
+        if(pos == 1) {
+            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[index]->extra);
+            ptr->hl.Reset(0.0f);
+            current_deck.side_deck.push_back(current_deck.main_deck[index]);
+            current_deck.main_deck.erase(current_deck.main_deck.begin() + index);
+        } else if(pos == 2) {
+            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[index]->extra);
+            ptr->hl.Reset(0.0f);
+            current_deck.side_deck.push_back(current_deck.extra_deck[index]);
+            current_deck.extra_deck.erase(current_deck.extra_deck.begin() + index);
+        } else if(dcd->data->type & 0x802040) {
+            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[index]->extra);
+            ptr->hl.Reset(0.0f);
+            current_deck.extra_deck.push_back(current_deck.side_deck[index]);
+            current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
+        } else {
+            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[index]->extra);
+            ptr->hl.Reset(0.0f);
+            current_deck.main_deck.push_back(current_deck.side_deck[index]);
+            current_deck.side_deck.erase(current_deck.side_deck.begin() + index);
+        }
+        current_deck.CalCount();
+        RefreshParams();
+        RefreshAllIndex();
+        UpdateAllCard();
+        SetDeckDirty();
+        if(input_handler)
+            input_handler->MouseMove({SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y});
+    }
+    
+    void BuildScene::RemoveCard(int pos, int index) {
+        if(update_status == 1)
+            return;
+        update_status = 1;
+        auto dcd = GetCard(pos, index);
+        if(dcd == nullptr)
+            return;
+        unsigned int code = dcd->data->code;
+        auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
+        v2f dst = ptr->pos.Get() + v2f{card_size.x / 2, -card_size.y / 2};
+        v2f dsz = {0.0f, 0.0f};
+        ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenLinear>>(ptr->pos.Get(), dst, SceneMgr::Get().GetGameTime(), 0.2));
+        ptr->size.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenLinear>>(ptr->size.Get(), dsz, SceneMgr::Get().GetGameTime(), 0.2));
+        ptr->show_limit = false;
+        ptr->show_exclusive = false;
+        AddUpdatingCard(dcd);
+        build_timer.RegisterEvent([pos, index, code, this]() {
+            if(current_deck.RemoveCard(pos, index)) {
+                ImageMgr::Get().UnloadCardTexture(code);
+                RefreshParams();
+                RefreshAllIndex();
+                UpdateAllCard();
+                SetDeckDirty();
+                if(input_handler)
+                    input_handler->MouseMove({SceneMgr::Get().GetMousePosition().x, SceneMgr::Get().GetMousePosition().y});
+                update_status = 0;
+            }
+        }, 0.2, 0, false);
+    }
+    
+    void BuildScene::InsertSearchResult(int index, bool is_side) {
+        if((size_t)(result_page * 10 + index) >= search_result.size())
+            return;
+        auto data = search_result[result_page * 10 + index];
+        std::shared_ptr<DeckCardData> ptr;
+        if(!is_side)
+            ptr = current_deck.InsertCard(1, -1, data->code, true);
+        else
+            ptr = current_deck.InsertCard(3, -1, data->code, true);
+        if(ptr != nullptr) {
+            auto exdata = std::make_shared<BuilderCard>();
+            exdata->card_tex = ImageMgr::Get().GetCardTexture(data->code);
+            exdata->show_exclusive = show_exclusive;
+            auto mpos = SceneMgr::Get().GetMousePosition();
+            exdata->pos = (v2f){(float)mpos.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)mpos.y / scene_size.y * 2.0f};
+            exdata->size = card_size;
+            exdata->hl = 0.0f;
+            ptr->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+            RefreshParams();
+            RefreshAllIndex();
+            UpdateAllCard();
+            SetDeckDirty();
         }
     }
     

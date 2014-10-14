@@ -31,6 +31,8 @@ namespace ygopro
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
         void ShowCardInfo(unsigned int code);
+        void HideCardInfo();
+        void ShowSelectedInfo(unsigned int pos, unsigned int index);
         void StopViewRegulation() { view_regulation = 0; }
         
         void ClearDeck();
@@ -71,6 +73,9 @@ namespace ygopro
         
         void SetCurrentSelection(int sel, bool show_info);
         void AddUpdatingCard(std::shared_ptr<DeckCardData> dcd);
+        void MoveCard(int pos, int index);
+        void RemoveCard(int pos, int index);
+        void InsertSearchResult(int index, bool is_side);
         
         std::shared_ptr<DeckCardData> GetCard(int pos, int index);
         std::pair<int, int> GetHoverPos(int posx, int posy);
