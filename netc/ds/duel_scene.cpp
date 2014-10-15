@@ -1,9 +1,9 @@
-#include "../common/common.h"
+#include "../../common/common.h"
 
-#include "gui_extra.h"
+#include "../gui_extra.h"
+#include "../image_mgr.h"
+
 #include "duel_command.h"
-#include "image_mgr.h"
-
 #include "duel_scene.h"
 
 namespace ygopro

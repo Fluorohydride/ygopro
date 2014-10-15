@@ -20,6 +20,11 @@ namespace ygopro
 
     };
     
+    class SceneHandler {
+    public:
+        virtual void BeginHandler() = 0;
+    };
+    
     class Scene {
     public:
         virtual ~Scene() = default;
@@ -29,16 +34,29 @@ namespace ygopro
         virtual void SetSceneSize(v2i sz) = 0;
         virtual recti GetScreenshotClip() = 0;
         
-        void SetInputHandler(std::shared_ptr<InputHandler> ih) {
-            input_handler = ih;
+        template<typename T>
+        void SetInputHandler(T ih) {
+            input_handler = std::static_pointer_cast<InputHandler>(ih);
         }
         
-        std::shared_ptr<InputHandler> GetInputHandler() {
-            return input_handler;
+        template<typename T = InputHandler>
+        std::shared_ptr<T> GetInputHandler() {
+            return std::static_pointer_cast<T>(input_handler);
+        }
+        
+        template<typename T>
+        void SetSceneHandler(T sh) {
+            scene_handler = std::static_pointer_cast<SceneHandler>(sh);
+        }
+        
+        template<typename T = SceneHandler>
+        std::shared_ptr<T> GetSceneHandler() {
+            return std::static_pointer_cast<T>(scene_handler);
         }
         
     protected:
         std::shared_ptr<InputHandler> input_handler;
+        std::shared_ptr<SceneHandler> scene_handler;
     };
     
     class SceneMgr : public Singleton<SceneMgr> {
@@ -53,15 +71,30 @@ namespace ygopro
         void SetFrameRate(double rate);
         void CheckFrameRate();
         void SetSceneSize(v2i sz);
-        void SetScene(std::shared_ptr<Scene> sc);
-        std::shared_ptr<InputHandler> GetInputHandler();
+        inline v2i GetSceneSize() { return scene_size; }
         void ScreenShot();
-        std::shared_ptr<Scene> GetScene() { return current_scene; };
         void SetMousePosition(v2i pos) { mouse_pos = pos; }
         v2i GetMousePosition() { return mouse_pos; }
         rectf LayoutRectConfig(const std::string& name) { return rect_config[name]; }
         int LayoutIntConfig(const std::string& name) { return int_config[name]; }
         float LayoutFloatConfig(const std::string& name) { return float_config[name]; }
+        
+        template<typename T>
+        void SetScene(T sc) {
+            auto pscene = std::static_pointer_cast<Scene>(sc);
+            if(current_scene == pscene)
+                return;
+            sgui::SGGUIRoot::GetSingleton().ClearChild();
+            current_scene = pscene;
+            if(current_scene != nullptr) {
+                current_scene->SetSceneSize(scene_size);
+                current_scene->Activate();
+            }
+        }
+        template<typename T = Scene>
+        std::shared_ptr<T> GetScene() {
+            return std::static_pointer_cast<T>(current_scene);;
+        };
         
     protected:
         v2i scene_size;

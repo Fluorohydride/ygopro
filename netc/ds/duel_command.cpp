@@ -1,6 +1,7 @@
-#include "../common/common.h"
+#include "../../common/common.h"
 
-#include "scene_mgr.h"
+#include "../scene_mgr.h"
+
 #include "duel_scene.h"
 #include "duel_command.h"
 

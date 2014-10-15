@@ -1,7 +1,7 @@
 #ifndef _BUILD_INPUT_HANDLER_H_
 #define _BUILD_INPUT_HANDLER_H_
 
-#include "scene_mgr.h"
+#include "../scene_mgr.h"
 
 namespace ygopro
 {

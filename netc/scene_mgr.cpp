@@ -94,23 +94,6 @@ namespace ygopro
             current_scene->SetSceneSize(sz);
     }
     
-    void SceneMgr::SetScene(std::shared_ptr<Scene> sc) {
-        if(current_scene == sc)
-            return;
-        sgui::SGGUIRoot::GetSingleton().ClearChild();
-        current_scene = sc;
-        if(current_scene != nullptr) {
-            current_scene->SetSceneSize(scene_size);
-            current_scene->Activate();
-        }
-    }
-    
-    std::shared_ptr<InputHandler> SceneMgr::GetInputHandler() {
-        if(current_scene == nullptr)
-            return nullptr;
-        return current_scene->GetInputHandler();
-    }
-    
     void SceneMgr::ScreenShot() {
         if(current_scene == nullptr)
             return;

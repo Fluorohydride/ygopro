@@ -1,10 +1,9 @@
 #ifndef _DUEL_SCENE_H_
 #define _DUEL_SCENE_H_
 
-#include "../common/tcpclient.h"
-
-#include "glbase.h"
-#include "scene_mgr.h"
+#include "../../common/tcpclient.h"
+#include "../glbase.h"
+#include "../scene_mgr.h"
 
 namespace ygopro
 {

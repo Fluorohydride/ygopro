@@ -1,9 +1,11 @@
-#include "../common/common.h"
+#include "../../common/common.h"
 
-#include "sungui.h"
-#include "card_data.h"
-#include "scene_mgr.h"
+#include "../sungui.h"
+#include "../card_data.h"
+#include "../scene_mgr.h"
+#include "../gui_extra.h"
 #include "build_scene.h"
+#include "build_scene_handler.h"
 #include "build_input_handler.h"
 
 namespace ygopro
@@ -109,24 +111,39 @@ namespace ygopro
         auto pscene = build_scene.lock();
         switch(evt.key) {
             case GLFW_KEY_1:
-                if(evt.mods & GLFW_MOD_ALT)
-                    pscene->ViewRegulation(0);
+                if(evt.mods & GLFW_MOD_CONTROL)
+                    pscene->SortDeck();
+                else if(evt.mods & GLFW_MOD_ALT)
+                    pscene->GetSceneHandler<BuildSceneHandler>()->ViewRegulation(0);
                 break;
             case GLFW_KEY_2:
-                if(evt.mods & GLFW_MOD_ALT)
-                    pscene->ViewRegulation(1);
+                if(evt.mods & GLFW_MOD_CONTROL)
+                    pscene->ShuffleDeck();
+                else if(evt.mods & GLFW_MOD_ALT)
+                    pscene->GetSceneHandler<BuildSceneHandler>()->ViewRegulation(1);
                 break;
             case GLFW_KEY_3:
-                if(evt.mods & GLFW_MOD_ALT)
-                    pscene->ViewRegulation(2);
+                if(evt.mods & GLFW_MOD_CONTROL) {
+                    pscene->ClearDeck();
+                    pscene->SetDeckDirty();
+                } else if(evt.mods & GLFW_MOD_ALT)
+                    pscene->GetSceneHandler<BuildSceneHandler>()->ViewRegulation(2);
                 break;
             case GLFW_KEY_C:
-                if(evt.mods & GLFW_MOD_CONTROL)
-                    pscene->SaveDeckToClipboard();
+                if(evt.mods & GLFW_MOD_CONTROL) {
+                    std::string deck_string;
+                    deck_string.append("ydk://").append(build_scene.lock()->SaveDeckToString());
+                    glfwSetClipboardString(nullptr, deck_string.c_str());
+                    MessageBox::ShowOK(L"", stringCfg["eui_msg_deck_tostr_ok"]);
+                }
                 break;
             case GLFW_KEY_V:
-                if(evt.mods & GLFW_MOD_CONTROL)
-                    pscene->LoadDeckFromClipboard();
+                if(evt.mods & GLFW_MOD_CONTROL) {
+                    auto pscene = build_scene.lock();
+                    std::string deck_string = glfwGetClipboardString(nullptr);
+                    pscene->LoadDeckFromString(deck_string);
+                    pscene->GetSceneHandler<BuildSceneHandler>()->StopViewRegulation();
+                }
                 break;
             default:
                 break;
