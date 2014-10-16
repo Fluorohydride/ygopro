@@ -1,14 +1,11 @@
 #ifndef _DUEL_SCENE_H_
 #define _DUEL_SCENE_H_
 
-#include "../../common/tcpclient.h"
 #include "../glbase.h"
 #include "../scene_mgr.h"
 
 namespace ygopro
 {
-    
-    class DuelCommand;
     
     struct FieldObject {
         virtual void RefreshVertices() = 0;
@@ -76,7 +73,7 @@ namespace ygopro
         glm::quat hand_quat[2];
     };
     
-    class DuelScene : public Scene, public TcpClientSeed {
+    class DuelScene : public Scene {
     public:
         DuelScene();
         virtual ~DuelScene();
@@ -91,12 +88,6 @@ namespace ygopro
         virtual void MouseWheel(sgui::MouseWheelEvent evt);
         virtual void KeyDown(sgui::KeyEvent evt);
         virtual void KeyUp(sgui::KeyEvent evt);
-        
-        virtual void OnConnected();
-        virtual void OnConnectError();
-        virtual void OnConnectTimeOut();
-        virtual void OnDisconnected();
-        virtual void HandlePacket(unsigned short proto, unsigned char data[], unsigned int size);
         
         void UpdateParams();
         void UpdateHandRect();
@@ -139,7 +130,6 @@ namespace ygopro
         bool update_misc = true;
         bool update_index = true;
         int refresh_region = 0;
-        CommandList<DuelCommand> duel_commands;
         glbase::Shader duel_shader;
         
         ViewParam vparam;

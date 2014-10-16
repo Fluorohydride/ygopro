@@ -10,7 +10,7 @@ namespace ygopro
  
     class InputHandler {
     public:
-        virtual bool Update() = 0;
+        virtual bool UpdateInput() = 0;
         virtual void MouseMove(sgui::MouseMoveEvent evt) = 0;
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt) = 0;
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt) = 0;
@@ -22,6 +22,7 @@ namespace ygopro
     
     class SceneHandler {
     public:
+        virtual void UpdateEvent() = 0;
         virtual void BeginHandler() = 0;
     };
     
@@ -33,6 +34,8 @@ namespace ygopro
         virtual void Draw() = 0;
         virtual void SetSceneSize(v2i sz) = 0;
         virtual recti GetScreenshotClip() = 0;
+        virtual bool IsActive() { return is_active; }
+        virtual void Exit() { is_active = false; }
         
         template<typename T>
         void SetInputHandler(T ih) {
@@ -57,6 +60,7 @@ namespace ygopro
     protected:
         std::shared_ptr<InputHandler> input_handler;
         std::shared_ptr<SceneHandler> scene_handler;
+        bool is_active = true;
     };
     
     class SceneMgr : public Singleton<SceneMgr> {

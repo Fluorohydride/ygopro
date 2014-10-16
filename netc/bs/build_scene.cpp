@@ -89,21 +89,26 @@ namespace ygopro
     }
     
     void BuildScene::Activate() {
-        build_timer.Init(SceneMgr::Get().GetGameTime());
+        auto scene_handler = GetSceneHandler<BuildSceneHandler>();
+        scene_handler->InitTimer(SceneMgr::Get().GetGameTime());
         scene_handler->BeginHandler();
         RefreshAllCard();
     }
     
     bool BuildScene::Update() {
-        double tm = SceneMgr::Get().GetGameTime();
-        build_timer.UpdateTime(tm);
+        auto scene_handler = GetSceneHandler<BuildSceneHandler>();
+        if(scene_handler) {
+            double tm = SceneMgr::Get().GetGameTime();
+            scene_handler->UpdateTime(tm);
+            scene_handler->UpdateEvent();
+        }
         if(input_handler)
-            input_handler->Update();
+            input_handler->UpdateInput();
         UpdateBackGround();
         UpdateCard();
         UpdateMisc();
         UpdateResult();
-        return true;
+        return IsActive();
     }
     
     void BuildScene::Draw() {
@@ -720,7 +725,7 @@ namespace ygopro
         ptr->show_limit = false;
         ptr->show_exclusive = false;
         AddUpdatingCard(dcd);
-        build_timer.RegisterEvent([pos, index, code, this]() {
+        GetSceneHandler<BuildSceneHandler>()->RegisterEvent([pos, index, code, this]() {
             if(current_deck.RemoveCard(pos, index)) {
                 ImageMgr::Get().UnloadCardTexture(code);
                 RefreshParams();

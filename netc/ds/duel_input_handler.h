@@ -11,7 +11,7 @@ namespace ygopro
     class DuelInputHandler : public InputHandler {
     public:
         DuelInputHandler(std::shared_ptr<DuelScene> pscene);
-        virtual bool Update();
+        virtual bool UpdateInput();
         virtual void MouseMove(sgui::MouseMoveEvent evt);
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt);
@@ -20,6 +20,7 @@ namespace ygopro
         virtual void KeyUp(sgui::KeyEvent evt);
         
     protected:
+        std::weak_ptr<DuelScene> duel_scene;
     };
     
 }

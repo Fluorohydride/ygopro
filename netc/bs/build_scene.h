@@ -103,7 +103,6 @@ namespace ygopro
         std::array<ti4, 10> result_tex;
         int current_sel_result = -1;
         int result_show_size = 0;
-        Timer<double> build_timer;
     };
     
 }

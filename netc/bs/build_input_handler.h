@@ -11,7 +11,7 @@ namespace ygopro
     class BuildInputHandler : public InputHandler {
     public:
         BuildInputHandler(std::shared_ptr<BuildScene> pscene);
-        virtual bool Update();
+        virtual bool UpdateInput();
         virtual void MouseMove(sgui::MouseMoveEvent evt);
         virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
         virtual void MouseButtonUp(sgui::MouseButtonEvent evt);

@@ -16,6 +16,9 @@ namespace ygopro
         info_panel = std::make_shared<InfoPanel>();
     }
     
+    void BuildSceneHandler::UpdateEvent() {
+    }
+    
     void BuildSceneHandler::BeginHandler() {
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
         pnl->SetSize({-20, 35}, {1.0f, 0.0f});

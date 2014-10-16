@@ -19,7 +19,7 @@ template<typename TIME_TYPE>
 class Timer {
 public:
     Timer() : event_set(TimerEvent<TIME_TYPE>::Comp) {}
-    void Init(TIME_TYPE t) {
+    void InitTimer(TIME_TYPE t) {
         cur_time = t;
     }
     

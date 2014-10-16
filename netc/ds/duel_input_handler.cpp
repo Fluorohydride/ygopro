@@ -11,10 +11,10 @@ namespace ygopro
 {
     
     DuelInputHandler::DuelInputHandler(std::shared_ptr<DuelScene> pscene) {
-
+        duel_scene = pscene;
     }
     
-    bool DuelInputHandler::Update() {
+    bool DuelInputHandler::UpdateInput() {
         return true;
     }
     

@@ -17,7 +17,7 @@ namespace ygopro
         click_pos = std::make_pair(0, 0);
     }
     
-    bool BuildInputHandler::Update() {
+    bool BuildInputHandler::UpdateInput() {
         if(show_info_begin) {
             auto pscene = build_scene.lock();
             double now = SceneMgr::Get().GetGameTime();

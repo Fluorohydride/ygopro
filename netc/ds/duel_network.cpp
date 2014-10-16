@@ -1,32 +1,32 @@
 #include "../../common/common.h"
 
 #include "../gui_extra.h"
-#include "duel_scene.h"
+#include "duel_scene_handler.h"
 
 namespace ygopro
 {
     
-    void DuelScene::OnConnected() {
+    void DuelSceneHandler::OnConnected() {
         
     }
     
-    void DuelScene::OnConnectError() {
+    void DuelSceneHandler::OnConnectError() {
         MessageBox::ShowOK(L"", L"connection error.", [this]() {
             std::cout << "end" << std::endl;
         });
     }
     
-    void DuelScene::OnConnectTimeOut() {
+    void DuelSceneHandler::OnConnectTimeOut() {
         MessageBox::ShowOK(L"", L"connection timeout.", [this]() {
             std::cout << "end" << std::endl;
         });
     }
     
-    void DuelScene::OnDisconnected() {
+    void DuelSceneHandler::OnDisconnected() {
         
     }
     
-    void DuelScene::HandlePacket(unsigned short proto, unsigned char data[], unsigned int size) {
+    void DuelSceneHandler::HandlePacket(unsigned short proto, unsigned char data[], unsigned int size) {
         
     }
     

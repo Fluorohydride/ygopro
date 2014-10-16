@@ -10,13 +10,13 @@ namespace ygopro
     
     class DuelCommand {
     public:
-        virtual bool Handle(DuelScene* pscene) = 0;
+        virtual bool Handle(std::shared_ptr<DuelScene> pscene) = 0;
     };
     
     class DuelCommandWait : public DuelCommand {
     public:
         DuelCommandWait(double tm);
-        virtual bool Handle(DuelScene* pscene);
+        virtual bool Handle(std::shared_ptr<DuelScene> pscene);
         
     protected:
         double end_time;
@@ -37,7 +37,7 @@ namespace ygopro
     class DuelMessageMove : public DuelMessage {
     public:
         using DuelMessage::DuelMessage;
-        virtual bool Handle(DuelScene* pscene);
+        virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     };
 }
 

@@ -3,7 +3,8 @@
 #include "../gui_extra.h"
 #include "../image_mgr.h"
 
-#include "duel_command.h"
+#include "duel_scene_handler.h"
+#include "duel_input_handler.h"
 #include "duel_scene.h"
 
 namespace ygopro
@@ -272,25 +273,26 @@ namespace ygopro
     }
     
     void DuelScene::Activate() {
-        
+        auto scene_handler = GetSceneHandler<DuelSceneHandler>();
+        scene_handler->InitTimer(SceneMgr::Get().GetGameTime());
+        scene_handler->BeginHandler();
     }
     
     bool DuelScene::Update() {
-        PullEvent();
-        do {
-            auto cmd = duel_commands.PullCommand();
-            if(cmd == nullptr)
-                break;
-            if(!cmd->Handle(this))
-                break;
-            duel_commands.PopCommand();
-        } while (duel_commands.IsEmpty());
+        auto scene_handler = GetSceneHandler<DuelSceneHandler>();
+        if(scene_handler) {
+            double tm = SceneMgr::Get().GetGameTime();
+            scene_handler->UpdateTime(tm);
+            scene_handler->UpdateEvent();
+        }
+        if(input_handler)
+            input_handler->UpdateInput();
         UpdateBackground();
         UpdateRegion();
         UpdateField();
         UpdateMisc();
         UpdateIndex();
-        return true;
+        return IsActive();
     }
     
     void DuelScene::Draw() {
