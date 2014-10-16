@@ -1797,7 +1797,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		}
 		for (auto clit = core.new_ochain_s.begin(); clit != core.new_ochain_s.end(); ++clit) {
 			effect* peffect = clit->triggering_effect;
-			if((!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect))
+			if((!(peffect->flag & (EFFECT_FLAG_EVENT_PLAYER | EFFECT_FLAG_BOTH_SIDE)) && peffect->handler->is_has_relation(peffect) && !peffect->type & EFFECT_TYPE_FLIP)
 			        || (!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (peffect->type & EFFECT_TYPE_FIELD)
 			            && (peffect->range & LOCATION_HAND) && peffect->handler->current.location == LOCATION_HAND)) {
 				if(!peffect->handler->is_has_relation(peffect))
