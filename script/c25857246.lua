@@ -66,6 +66,7 @@ function c25857246.operation(e,tp,eg,ep,ev,re,r,rp)
 	if ct>2 then ct=2 end
 	local g=Duel.SelectReleaseGroupEx(tp,c25857246.filter,1,ct,nil)
 	if g:GetCount()>0 then
+		Duel.HintSelection(g)
 		local rct=Duel.Release(g,REASON_EFFECT)
 		Duel.Draw(tp,rct,REASON_EFFECT)
 	end
