@@ -8,7 +8,8 @@ function c65026212.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetOperation(c65026212.ccost)
+	e1:SetCondition(c65026212.mtcon)
+	e1:SetOperation(c65026212.mtop)
 	c:RegisterEffect(e1)
 	--spsummon proc
 	local e2=Effect.CreateEffect(c)
@@ -31,14 +32,16 @@ function c65026212.initial_effect(c)
 	e3:SetOperation(c65026212.desop)
 	c:RegisterEffect(e3)
 end
+function c65026212.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c65026212.cfilter1(c)
 	return c:IsCode(36623431) and c:IsAbleToGraveAsCost()
 end
 function c65026212.cfilter2(c)
 	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0x1d) and c:IsAbleToGraveAsCost()
 end
-function c65026212.ccost(e,tp)
-	if tp~=Duel.GetTurnPlayer() then return end
+function c65026212.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetMatchingGroup(c65026212.cfilter1,tp,LOCATION_HAND,0,nil)
 	local g2=Duel.GetMatchingGroup(c65026212.cfilter2,tp,LOCATION_HAND,0,nil)
 	local select=2

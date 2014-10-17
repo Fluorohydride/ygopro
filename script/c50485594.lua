@@ -60,7 +60,7 @@ function c50485594.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local hg1=sg:Select(tp,1,1,nil)
 	local hg2=sg:Filter(Card.IsCode,hg1:GetFirst(),hg1:GetFirst():GetCode())
-	hg1:Merge(hg2)
+	hg1:AddCard(hg2:GetFirst())
 	Duel.SendtoHand(hg1,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,hg1)
 end
