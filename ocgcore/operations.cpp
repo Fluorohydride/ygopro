@@ -4212,7 +4212,9 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 			rmax += (*cit)->operation_param;
 		core.temp_var[0] = 0;
 		if(rmax < min)
-			returns.ivalue[0] = TRUE;
+			returns.ivalue[0] = TRUE;	
+			if(min == 2)
+				core.temp_var[0] = 1;
 		else if(!core.release_cards_ex_sum.empty()) {
 			if(rmax == 0 && min == 2)
 				core.temp_var[0] = 1;
