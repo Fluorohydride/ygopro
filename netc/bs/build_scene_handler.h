@@ -12,7 +12,7 @@ namespace ygopro
     class BuildSceneHandler : public SceneHandler, public Timer<double> {
     public:
         BuildSceneHandler(std::shared_ptr<BuildScene> pscene);
-        virtual void UpdateEvent();
+        virtual bool UpdateEvent();
         virtual void BeginHandler();
         void ViewRegulation(int id);
         void StopViewRegulation() { view_regulation = 0; }

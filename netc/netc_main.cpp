@@ -1,14 +1,16 @@
 #include "../common/common.h"
 
 #include "scene_mgr.h"
-#include "bs/build_scene.h"
-#include "bs/build_input_handler.h"
-#include "bs/build_scene_handler.h"
-#include "ds/duel_scene.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
 #include "sungui.h"
+#include "bs/build_input_handler.h"
+#include "bs/build_scene_handler.h"
+#include "bs/build_scene.h"
+#include "ds/duel_input_handler.h"
+#include "ds/duel_scene_handler.h"
+#include "ds/duel_scene.h"
 
 using namespace ygopro;
 
@@ -86,12 +88,13 @@ int main(int argc, char* argv[]) {
     sc->SetInputHandler(ih);
     sc->SetSceneHandler(sh);
     SceneMgr::Get().SetScene(sc);
+    
     //auto sc = std::make_shared<DuelScene>();
-    //SceneMgr::Get().SetScene(std::static_pointer_cast<Scene>(sc));
-    //std::wstring server_ip = commonCfg["server_ip"];
-    //int server_port = commonCfg["server_port"];
-    //int server_timeout = commonCfg["server_timeout"];
-    //sc->Connect(To<std::string>(server_ip).c_str(), server_port, server_timeout);
+    //auto ih = std::make_shared<DuelInputHandler>(sc);
+    //auto sh = std::make_shared<DuelSceneHandler>(sc);
+    //sc->SetInputHandler(ih);
+    //sc->SetSceneHandler(sh);
+    //SceneMgr::Get().SetScene(sc);
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {

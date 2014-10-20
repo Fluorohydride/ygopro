@@ -633,14 +633,6 @@ namespace ygopro
             exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
-        std::wstring title = L"\ue07a";
-        if(limit == 0)
-            title.append(stringCfg["eui_list_forbidden"]);
-        else if(limit == 1)
-            title.append(stringCfg["eui_list_limit"]);
-        else
-            title.append(stringCfg["eui_list_semilimit"]);
-        GetSceneHandler<BuildSceneHandler>()->SetDeckLabel(title, 0xff000000);
         update_misc = true;
         RefreshAllCard();
     }
@@ -651,7 +643,7 @@ namespace ygopro
                 result_tex[i] = ImageMgr::Get().GetCardTexture(new_results[i]->code);
         }
         for(int i = 0; i < 10; ++i) {
-            if(result_data[i] != 0)
+            if(result_data[i] != nullptr)
                 ImageMgr::Get().UnloadCardTexture(result_data[i]->code);
             result_data[i] = new_results[i];
         }

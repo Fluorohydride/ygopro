@@ -22,7 +22,7 @@ namespace ygopro
     
     class SceneHandler {
     public:
-        virtual void UpdateEvent() = 0;
+        virtual bool UpdateEvent() = 0;
         virtual void BeginHandler() = 0;
     };
     

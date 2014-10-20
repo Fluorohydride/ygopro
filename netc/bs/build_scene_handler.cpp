@@ -16,7 +16,8 @@ namespace ygopro
         info_panel = std::make_shared<InfoPanel>();
     }
     
-    void BuildSceneHandler::UpdateEvent() {
+    bool BuildSceneHandler::UpdateEvent() {
+        return true;
     }
     
     void BuildSceneHandler::BeginHandler() {
@@ -127,6 +128,14 @@ namespace ygopro
         view_regulation = limit + 1;
         current_file.clear();
         deck_edited = false;
+        std::wstring title = L"\ue07a";
+        if(limit == 0)
+            title.append(stringCfg["eui_list_forbidden"]);
+        else if(limit == 1)
+            title.append(stringCfg["eui_list_limit"]);
+        else
+            title.append(stringCfg["eui_list_semilimit"]);
+        SetDeckLabel(title, 0xff000000);
     }
     
     void BuildSceneHandler::SetDeckEdited() {
@@ -284,6 +293,8 @@ namespace ygopro
         for(int i = 0; i < 10; ++i) {
             if((size_t)(result_page * 10 + i) < search_result.size())
                 new_results[i] = search_result[result_page * 10 + i];
+            else
+                new_results[i] = nullptr;
         }
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_page.lock();
@@ -302,8 +313,16 @@ namespace ygopro
         for(int i = 0; i < 10; ++i) {
             if((size_t)(result_page * 10 + i) < search_result.size())
                 new_results[i] = search_result[result_page * 10 + i];
+            else
+                new_results[i] = nullptr;
         }
         build_scene.lock()->RefreshSearchResult(new_results);
+        auto ptr = label_page.lock();
+        if(ptr != nullptr) {
+            int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
+            ptr->SetText(s, 0xff000000);
+        }
     }
     
     void BuildSceneHandler::Search(const FilterCondition& fc, int lmt) {
@@ -317,6 +336,8 @@ namespace ygopro
         for(int i = 0; i < 10; ++i) {
             if((size_t)(i) < search_result.size())
                 new_results[i] = search_result[i];
+            else
+                new_results[i] = nullptr;
         }
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_result.lock();
@@ -327,6 +348,12 @@ namespace ygopro
             if(pos != std::wstring::npos)
                 s.replace(pos, 7, ct);
             ptr->SetText(s, 0xff000000);
+        }
+        auto ptr2 = label_page.lock();
+        if(ptr2 != nullptr) {
+            int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
+            ptr2->SetText(s, 0xff000000);
         }
     }
     

@@ -11,17 +11,17 @@ namespace ygopro
         duel_scene = pscene;
     }
     
-    void DuelSceneHandler::UpdateEvent() {
+    bool DuelSceneHandler::UpdateEvent() {
         auto pscene = duel_scene.lock();
-        PullEvent();
         do {
-            auto cmd = duel_commands.PullCommand();
+            auto cmd = proto_handler->PullCommand();
             if(cmd == nullptr)
                 break;
             if(!cmd->Handle(pscene))
                 break;
-            duel_commands.PopCommand();
-        } while (duel_commands.IsEmpty());
+            proto_handler->PopCommand();
+        } while (proto_handler->IsEmpty());
+        return !proto_handler->ProtoEnd();
     }
     
     void DuelSceneHandler::BeginHandler() {

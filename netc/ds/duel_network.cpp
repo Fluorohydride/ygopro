@@ -1,32 +1,50 @@
 #include "../../common/common.h"
 
 #include "../gui_extra.h"
-#include "duel_scene_handler.h"
+#include "duel_network.h"
 
 namespace ygopro
 {
     
-    void DuelSceneHandler::OnConnected() {
+    DuelProtoTcp::DuelProtoTcp() {
+        server_ip = static_cast<std::wstring>(commonCfg["server_ip"]);
+        server_port = commonCfg["server_port"];
+        server_timeout = commonCfg["server_timeout"];
+    }
+    
+    void DuelProtoTcp::BeginProto() {
+        //Connect(To<std::string>(server_ip).c_str(), server_port, server_timeout);
+    }
+    
+    void DuelProtoTcp::GetProto() {
+        PullEvent();
+    }
+    
+    bool DuelProtoTcp::ProtoEnd() {
+        return false;
+    }
+    
+    void DuelProtoTcp::OnConnected() {
         
     }
     
-    void DuelSceneHandler::OnConnectError() {
+    void DuelProtoTcp::OnConnectError() {
         MessageBox::ShowOK(L"", L"connection error.", [this]() {
             std::cout << "end" << std::endl;
         });
     }
     
-    void DuelSceneHandler::OnConnectTimeOut() {
+    void DuelProtoTcp::OnConnectTimeOut() {
         MessageBox::ShowOK(L"", L"connection timeout.", [this]() {
             std::cout << "end" << std::endl;
         });
     }
     
-    void DuelSceneHandler::OnDisconnected() {
+    void DuelProtoTcp::OnDisconnected() {
         
     }
     
-    void DuelSceneHandler::HandlePacket(unsigned short proto, unsigned char data[], unsigned int size) {
+    void DuelProtoTcp::HandlePacket(unsigned short proto, unsigned char data[], unsigned int size) {
         
     }
     
