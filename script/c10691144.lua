@@ -38,7 +38,7 @@ function c10691144.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local flag=e:GetLabel()
 	if bit.band(flag,LOCATION_HAND)~=0 then
 		local rg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_HAND,nil)
-		if rg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(10691144,0)) then
+		if rg:GetCount()>0 then
 			local ct=1
 			if rg:GetCount()>1 then ct=Duel.SelectOption(tp,aux.Stringid(10691144,3),aux.Stringid(10691144,4))+1 end
 			g:Merge(rg:RandomSelect(tp,ct))
@@ -46,14 +46,14 @@ function c10691144.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if bit.band(flag,LOCATION_ONFIELD)~=0 then
 		local rg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,nil)
-		if rg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(10691144,1)) then
+		if rg:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			g:Merge(rg:Select(tp,1,2,nil))
 		end
 	end
 	if bit.band(flag,LOCATION_GRAVE)~=0 then
 		local rg=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,nil)
-		if rg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(10691144,2)) then
+		if rg:GetCount()>0 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 			g:Merge(rg:Select(tp,1,2,nil))
 		end
