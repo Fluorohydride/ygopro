@@ -7,6 +7,8 @@ namespace ygopro
 {
     class DuelScene;
     struct DeckCardData;
+    struct FieldBlock;
+    struct FieldCard;
     
     class DuelInputHandler : public InputHandler {
     public:
@@ -21,6 +23,11 @@ namespace ygopro
         
     protected:
         std::weak_ptr<DuelScene> duel_scene;
+        bool btnDown[2] = {false};
+        v2i btnPos[2];
+        std::weak_ptr<FieldBlock> pre_block;
+        std::weak_ptr<FieldCard> pre_card;
+        v2i click_pos = {0, 0};
     };
     
 }

@@ -22,8 +22,9 @@ namespace ygopro
         
     protected:
         std::wstring server_ip;
-        unsigned int server_port;
-        unsigned int server_timeout;
+        unsigned int server_port = 0;
+        unsigned int server_timeout = 0;
+        bool proto_ended = false;
     };
     
 }

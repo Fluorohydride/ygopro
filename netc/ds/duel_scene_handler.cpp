@@ -25,7 +25,7 @@ namespace ygopro
     }
     
     void DuelSceneHandler::BeginHandler() {
-        
+        proto_handler->BeginProto();
     }
     
 }

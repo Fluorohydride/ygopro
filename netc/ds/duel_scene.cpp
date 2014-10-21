@@ -283,7 +283,7 @@ namespace ygopro
         if(scene_handler) {
             double tm = SceneMgr::Get().GetGameTime();
             scene_handler->UpdateTime(tm);
-            scene_handler->UpdateEvent();
+            is_active = scene_handler->UpdateEvent();
         }
         if(input_handler)
             input_handler->UpdateInput();
@@ -338,86 +338,6 @@ namespace ygopro
         return {0, 0, scene_size.x, scene_size.y};
     }
     
-    void DuelScene::MouseMove(sgui::MouseMoveEvent evt) {
-        bool update_param = false;
-        if(btnDown[0]) {
-            float ratex = (float)(evt.x - btnPos[0].x) / scene_size.x * 2.0f;
-            float ratey = (float)(evt.y - btnPos[0].y) / scene_size.y * 2.0f;
-            vparam.xoffset += ratex;
-            vparam.yoffset -= ratey;
-            btnPos[0] = {evt.x, evt.y};
-            update_param = true;
-        }
-        if(btnDown[1]) {
-            float rate = (float)(evt.y - btnPos[1].y) / scene_size.y;
-            vparam.angle += 3.1415926f * 0.5f * rate;
-            if(vparam.angle < 0.0f)
-                vparam.angle = 0.0f;
-            if(vparam.angle > 3.1415926f * 0.5f)
-                vparam.angle = 3.1415926f * 0.5f;
-            btnPos[1] = {evt.x, evt.y};
-            update_param = true;
-        }
-        if(update_param)
-            UpdateParams();
-        auto pblock = pre_block.lock();
-        auto pcard = pre_card.lock();
-        std::shared_ptr<FieldBlock> hover_block;
-        std::shared_ptr<FieldCard> hover_card;
-        auto hp = GetHoverPos(evt.x, evt.y);
-        if(hp.x == 1 || hp.x == 2)
-            if(hp.y < 17)
-                hover_block = field_blocks[hp.x - 1][hp.y];
-        if(hp.x == 3 || hp.x == 4)
-            if(hp.y < hand[hp.x - 3].size())
-                hover_card = hand[hp.x - 3][hp.y];
-        if(pblock != hover_block) {
-            if(pblock)
-                pblock->hl.Reset(0.0f);
-            if(hover_block) {
-                hover_block->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
-                if(!hover_block->updating) {
-                    updating_blocks.push_back(hover_block);
-                    hover_block->updating = true;
-                }
-            }
-            pre_block = hover_block;
-        }
-        if(pcard != hover_card) {
-            if(pcard) {
-                pcard->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(pcard->dy.Get(), 0.0f, SceneMgr::Get().GetGameTime(), 0.5, 10));
-                AddUpdateCard(pcard);
-            }
-            if(hover_card) {
-                hover_card->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(0.0f, 0.2f, SceneMgr::Get().GetGameTime(), 0.5, 10));
-                AddUpdateCard(hover_card);
-            }
-            pre_card = hover_card;
-        }
-    }
-    
-    void DuelScene::MouseButtonDown(sgui::MouseButtonEvent evt) {
-        if(evt.button < 2) {
-            btnDown[evt.button] = true;
-            btnPos[evt.button] = {evt.x, evt.y};
-        }
-    }
-    
-    void DuelScene::MouseButtonUp(sgui::MouseButtonEvent evt) {
-        if(evt.button < 2) {
-            btnDown[evt.button] = false;
-        }
-    }
-    
-    void DuelScene::MouseWheel(sgui::MouseWheelEvent evt) {
-        vparam.radius += evt.deltay / 30.0f;
-        if(vparam.radius < 1.0f)
-            vparam.radius = 1.0f;
-        if(vparam.radius > 50.0f)
-            vparam.radius = 50.0f;
-        UpdateParams();
-    }
-    
     void DuelScene::UpdateHandRect() {
         float hty = glm::abs(vparam.cardrect.height * 0.5f) * glm::sin(vparam.angle);
         float htz = glm::abs(vparam.cardrect.height * 0.5f) * glm::cos(vparam.angle);
@@ -441,19 +361,11 @@ namespace ygopro
         vparam.hand_quat[1] = vparam.hand_quat[0] * glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
     }
     
-    void DuelScene::KeyDown(sgui::KeyEvent evt) {
-        
-    }
-    
-    void DuelScene::KeyUp(sgui::KeyEvent evt) {
-        
-    }
-    
     void DuelScene::UpdateParams() {
         glm::mat4 view = glm::lookAt(glm::vec3(0.0f, -vparam.radius * glm::cos(vparam.angle), vparam.radius * glm::sin(vparam.angle)),
                                      glm::vec3(0.0f, 0.0f, 0.0f),
                                      glm::vec3(0.0f, 0.0f, 1.0f));
-        glm::mat4 projection = glm::perspective(vparam.fovy, 1.0f * scene_size.x / scene_size.y, vparam.cnear, vparam.cfar);
+        glm::mat4 projection = glm::perspective(vparam.fovy, vparam.ratio * scene_size.x / scene_size.y, vparam.cnear, vparam.cfar);
         glm::mat4 trscreen;
         trscreen[3][0] = vparam.xoffset;
         trscreen[3][1] = vparam.yoffset;
@@ -654,6 +566,13 @@ namespace ygopro
         for(int i = 0 ; i < 17; ++i) {
             field_blocks[0][i]->RefreshVertices();
             field_blocks[1][i]->RefreshVertices();
+        }
+    }
+    
+    void DuelScene::AddUpdateBlock(std::shared_ptr<FieldBlock> pblock) {
+        if(!pblock->updating) {
+            updating_blocks.push_back(pblock);
+            pblock->updating = true;
         }
     }
     
@@ -1265,4 +1184,19 @@ namespace ygopro
             return hb;
         return {0, 0};
     }
+    
+    std::shared_ptr<FieldBlock> DuelScene::GetFieldBlock(int x, int y) {
+        if(x == 1 || x == 2)
+            if(y < 17)
+                return field_blocks[x - 1][y];
+        return nullptr;
+    }
+    
+    std::shared_ptr<FieldCard> DuelScene::GetFieldCard(int x, int y) {
+        if(x == 3 || x == 4)
+            if(y < hand[x - 3].size())
+                return hand[x - 3][y];
+        return nullptr;
+    }
+    
 }

@@ -10,6 +10,7 @@
 #include "bs/build_scene.h"
 #include "ds/duel_input_handler.h"
 #include "ds/duel_scene_handler.h"
+#include "ds/duel_network.h"
 #include "ds/duel_scene.h"
 
 using namespace ygopro;
@@ -82,19 +83,21 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
-    auto sc = std::make_shared<BuildScene>();
-    auto ih = std::make_shared<BuildInputHandler>(sc);
-    auto sh = std::make_shared<BuildSceneHandler>(sc);
+//    auto sc = std::make_shared<BuildScene>();
+//    auto ih = std::make_shared<BuildInputHandler>(sc);
+//    auto sh = std::make_shared<BuildSceneHandler>(sc);
+//    sc->SetInputHandler(ih);
+//    sc->SetSceneHandler(sh);
+//    SceneMgr::Get().SetScene(sc);
+    
+    auto sc = std::make_shared<DuelScene>();
+    auto ih = std::make_shared<DuelInputHandler>(sc);
+    auto sh = std::make_shared<DuelSceneHandler>(sc);
+    auto ph = std::make_shared<DuelProtoTcp>();
+    sh->SetProtoHandler(ph);
     sc->SetInputHandler(ih);
     sc->SetSceneHandler(sh);
     SceneMgr::Get().SetScene(sc);
-    
-    //auto sc = std::make_shared<DuelScene>();
-    //auto ih = std::make_shared<DuelInputHandler>(sc);
-    //auto sh = std::make_shared<DuelSceneHandler>(sc);
-    //sc->SetInputHandler(ih);
-    //sc->SetSceneHandler(sh);
-    //SceneMgr::Get().SetScene(sc);
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int key, int scan, int action, int mods) {
         if(action == GLFW_PRESS) {

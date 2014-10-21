@@ -57,6 +57,7 @@ namespace ygopro
         float cfar = 100.0f;
         float angle = 3.1415926f * 0.25f;
         float radius = 8.0f;
+        float ratio = 1.0f;
         float xoffset = 0.0f;
         float yoffset = 0.0f;
         float cameray = 0.0f;
@@ -82,12 +83,6 @@ namespace ygopro
         virtual void Draw();
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
-        virtual void MouseMove(sgui::MouseMoveEvent evt);
-        virtual void MouseButtonDown(sgui::MouseButtonEvent evt);
-        virtual void MouseButtonUp(sgui::MouseButtonEvent evt);
-        virtual void MouseWheel(sgui::MouseWheelEvent evt);
-        virtual void KeyDown(sgui::KeyEvent evt);
-        virtual void KeyUp(sgui::KeyEvent evt);
         
         void UpdateParams();
         void UpdateHandRect();
@@ -99,6 +94,7 @@ namespace ygopro
         
         void InitField();
         void RefreshBlocks();
+        void AddUpdateBlock(std::shared_ptr<FieldBlock> pblock);
         std::shared_ptr<FieldCard> AddCard(unsigned int code, int side, int zone, int seq, int subs);
         std::shared_ptr<FieldCard> GetCard(int side, int zone, int seq, int subs);
         std::shared_ptr<FieldCard> RemoveCard(int side, int zone, int seq, int subs);
@@ -113,6 +109,9 @@ namespace ygopro
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
         v2i GetHoverPos(int posx, int posy);
+        ViewParam& GetViewParams() { return vparam; }
+        std::shared_ptr<FieldBlock> GetFieldBlock(int x, int y);
+        std::shared_ptr<FieldCard> GetFieldCard(int x, int y);
         
     protected:
         v2i scene_size = {0, 0};
@@ -131,13 +130,7 @@ namespace ygopro
         bool update_index = true;
         int refresh_region = 0;
         glbase::Shader duel_shader;
-        
         ViewParam vparam;
-        bool btnDown[2] = {false};
-        v2i btnPos[2];
-        std::weak_ptr<FieldBlock> pre_block;
-        std::weak_ptr<FieldCard> pre_card;
-        v2i click_pos = {0, 0};
         
         std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];
         std::vector<std::shared_ptr<FieldCard>> m_zone[2];

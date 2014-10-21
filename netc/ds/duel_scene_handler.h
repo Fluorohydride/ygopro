@@ -21,6 +21,10 @@ namespace ygopro
         DuelSceneHandler(std::shared_ptr<DuelScene> pscene);
         virtual bool UpdateEvent();
         virtual void BeginHandler();
+        template<typename T>
+        void SetProtoHandler(T ph) {
+            proto_handler = std::static_pointer_cast<DuelProtoHandler>(ph);
+        }
         
     protected:
         std::weak_ptr<DuelScene> duel_scene;

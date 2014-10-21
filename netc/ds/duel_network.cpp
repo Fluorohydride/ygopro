@@ -21,7 +21,7 @@ namespace ygopro
     }
     
     bool DuelProtoTcp::ProtoEnd() {
-        return false;
+        return proto_ended;
     }
     
     void DuelProtoTcp::OnConnected() {
@@ -31,12 +31,14 @@ namespace ygopro
     void DuelProtoTcp::OnConnectError() {
         MessageBox::ShowOK(L"", L"connection error.", [this]() {
             std::cout << "end" << std::endl;
+            proto_ended = true;
         });
     }
     
     void DuelProtoTcp::OnConnectTimeOut() {
         MessageBox::ShowOK(L"", L"connection timeout.", [this]() {
             std::cout << "end" << std::endl;
+            proto_ended = true;
         });
     }
     
