@@ -13,28 +13,28 @@ void GLCheckError(const std::string& file, int line) {
         case GL_NO_ERROR:
             break;
         case GL_INVALID_ENUM:
-            std::cout << "Invalid enum at " << file << ":" << line << std::endl;
+            std::cerr << "Invalid enum at " << file << ":" << line << std::endl;
             break;
         case GL_INVALID_VALUE:
-            std::cout << "Invalid value at " << file << ":" << line << std::endl;
+            std::cerr << "Invalid value at " << file << ":" << line << std::endl;
             break;
         case GL_INVALID_OPERATION:
-            std::cout << "Invalid operation at " << file << ":" << line << std::endl;
+            std::cerr << "Invalid operation at " << file << ":" << line << std::endl;
             break;
         case GL_STACK_OVERFLOW:
-            std::cout << "Stack overflow at " << file << ":" << line << std::endl;
+            std::cerr << "Stack overflow at " << file << ":" << line << std::endl;
             break;
         case GL_STACK_UNDERFLOW:
-            std::cout << "Stack underflow at " << file << ":" << line << std::endl;
+            std::cerr << "Stack underflow at " << file << ":" << line << std::endl;
             break;
         case GL_OUT_OF_MEMORY:
-            std::cout << "Out of memory at " << file << ":" << line << std::endl;
+            std::cerr << "Out of memory at " << file << ":" << line << std::endl;
             break;
         case GL_TABLE_TOO_LARGE:
-            std::cout << "Table to large at " << file << ":" << line << std::endl;
+            std::cerr << "Table to large at " << file << ":" << line << std::endl;
             break;
         default:
-            std::cout << "Unknown error #" << err << " at " << file << ":" << line << std::endl;
+            std::cerr << "Unknown error #" << err << " at " << file << ":" << line << std::endl;
             break;
     }
 }

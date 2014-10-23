@@ -16,7 +16,7 @@ else ()
     add_executable (netc ${AUTO_FILES_RESULT})
 endif ()
 
-target_link_libraries (netc buildin)
+target_link_libraries (netc buildin ocgcore)
 
 target_link_libraries (netc
     ${LUA_LIBRARIES}
