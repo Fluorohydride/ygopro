@@ -44,6 +44,7 @@ function c20579538.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 		local tg=dg:Select(tp,1,1,nil)
+		Duel.HintSelection(tg)
 		Duel.SendtoDeck(tg,nil,0,REASON_EFFECT)
 	end
 end
