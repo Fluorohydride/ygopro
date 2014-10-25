@@ -41,7 +41,7 @@ function c65025250.filter(c,tp)
 end
 function c65025250.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c65025250.filter,1,nil,tp) end
-	return Duel.SelectYesNo(tp,aux.Stringid(65025250,0))
+	return Duel.SelectYesNo(tp,aux.Stringid(65025250,1))
 end
 function c65025250.repval(e,c)
 	return c65025250.filter(c,e:GetHandlerPlayer())

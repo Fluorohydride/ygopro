@@ -4409,6 +4409,10 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 	switch(step) {
 	case 0: {
 		core.solving_event.splice(core.solving_event.begin(), core.sub_solving_event);
+		if(!peffect->check_count_limit(triggering_player)) {
+			core.solving_event.pop_front();
+			return TRUE;
+		}
 		chain newchain;
 		newchain.chain_id = 0;
 		newchain.chain_count = 0;

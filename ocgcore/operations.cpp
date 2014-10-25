@@ -2192,11 +2192,16 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 	}
 	case 25: {
 		group* pgroup = core.units.begin()->ptarget;
+		card_set cset;
 		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMONING, TRUE);
-			raise_single_event(*cit, 0, EVENT_SPSUMMON, (*cit)->current.reason_effect, 0, (*cit)->current.reason_player, (*cit)->summon_player, 0);
+			if(!(*cit)->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON)) {
+				raise_single_event(*cit, 0, EVENT_SPSUMMON, (*cit)->current.reason_effect, 0, (*cit)->current.reason_player, (*cit)->summon_player, 0);
+				cset.insert(*cit);
+			}
 		}
-		raise_event(&pgroup->container, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, PLAYER_NONE, 0);
+		if(cset.size())
+			raise_event(&cset, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, PLAYER_NONE, 0);
 		process_single_event();
 		process_instant_event();
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
@@ -4211,13 +4216,13 @@ int32 field::select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, 
 		for(auto cit = core.release_cards_ex.begin(); cit != core.release_cards_ex.end(); ++cit)
 			rmax += (*cit)->operation_param;
 		core.temp_var[0] = 0;
-		if(rmax < min)
+		if(rmax < min) {
 			returns.ivalue[0] = TRUE;
-		else if(!core.release_cards_ex_sum.empty()) {
 			if(rmax == 0 && min == 2)
 				core.temp_var[0] = 1;
+		} else if(!core.release_cards_ex_sum.empty())
 			add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, 92);
-		} else
+		else
 			core.units.begin()->step = 2;
 		return FALSE;
 	}
