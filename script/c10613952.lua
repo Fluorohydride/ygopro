@@ -1,4 +1,4 @@
---Sacred Noble Knight of King Artorigus
+--神聖騎士王アルトリウス
 function c10613952.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x107a),5),2)

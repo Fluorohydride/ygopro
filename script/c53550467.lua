@@ -1,4 +1,4 @@
---Noble Knight Drystan
+--聖騎士トリスタン
 function c53550467.initial_effect(c)
 	--cannot be battle target
 	local e1=Effect.CreateEffect(c)

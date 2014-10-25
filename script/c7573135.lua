@@ -48,16 +48,19 @@ function c7573135.hspop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
 		e1:SetLabelObject(tc)
+		e1:SetCondition(c7573135.retcon)
 		e1:SetOperation(c7573135.retop)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function c7573135.retcon(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
+	return tc:GetFlagEffect(7573135)>0
+end
 function c7573135.retop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetFlagEffect(7573135)>0 then
-		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
-	end
+	Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 end
 function c7573135.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0

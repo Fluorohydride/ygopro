@@ -172,14 +172,13 @@ function c74822425.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c74822425.disop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.NegateActivation(ev)
-	if re:GetHandler():IsRelateToEffect(re) then
-		Duel.Destroy(eg,REASON_EFFECT)
-	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-	local g=Duel.SelectMatchingCard(tp,c74822425.filter,tp,LOCATION_HAND,0,1,1,nil)
-	if g:GetCount()>0 then
-		Duel.BreakEffect()
-		Duel.SendtoGrave(g,REASON_EFFECT)
+	if re:GetHandler():IsRelateToEffect(re) and Duel.Destroy(eg,REASON_EFFECT)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local g=Duel.SelectMatchingCard(tp,c74822425.filter,tp,LOCATION_HAND,0,1,1,nil)
+		if g:GetCount()>0 then
+			Duel.BreakEffect()
+			Duel.SendtoGrave(g,REASON_EFFECT)
+		end
 	end
 end
 function c74822425.thcon(e,tp,eg,ep,ev,re,r,rp)

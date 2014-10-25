@@ -12,6 +12,7 @@ function c61650133.initial_effect(c)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c61650133.mtcon)
 	e2:SetOperation(c61650133.mtop)
 	c:RegisterEffect(e2)
 	--remove
@@ -25,8 +26,10 @@ function c61650133.initial_effect(c)
 	e3:SetOperation(c61650133.rmop)
 	c:RegisterEffect(e3)
 end
+function c61650133.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c61650133.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>500 and Duel.SelectYesNo(tp,aux.Stringid(61650133,0)) then
 		Duel.PayLPCost(tp,500)
 	else

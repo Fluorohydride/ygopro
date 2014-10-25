@@ -1745,7 +1745,7 @@ int32 field::is_player_can_discard_deck_as_cost(uint8 playerid, int32 count) {
 		if((redirect & LOCATION_REMOVED) && player[playerid].list_main.back()->is_affected_by_effect(EFFECT_CANNOT_REMOVE))
 			continue;
 		uint8 p = eset[i]->get_handler_player();
-		if((eset[i]->flag & EFFECT_FLAG_IGNORE_RANGE) || (p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
+		if((p == playerid && eset[i]->s_range & LOCATION_DECK) || (p != playerid && eset[i]->o_range & LOCATION_DECK))
 			return FALSE;
 	}
 	return TRUE;

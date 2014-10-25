@@ -1,4 +1,4 @@
---Gwenhwyfar, Queen of Noble Arms
+--聖剣を抱く王妃ギネヴィア
 function c19748583.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

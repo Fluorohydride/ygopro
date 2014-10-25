@@ -22,6 +22,7 @@ end
 function c15854426.cfilter(c,tp)
 	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE)
 		and bit.band(c:GetPreviousAttributeOnField(),ATTRIBUTE_WIND)~=0
+		and c:IsPreviousPosition(POS_FACEUP)
 end
 function c15854426.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c15854426.cfilter,1,nil,tp)

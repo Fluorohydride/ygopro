@@ -1336,6 +1336,17 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.select_chains.push_back(newchain);
 			tf_count++;
 		}
+		pr = effects.continuous_effect.equal_range(phase_event);
+		for(; pr.first != pr.second;) {
+			peffect = pr.first->second;
+			++pr.first;
+			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
+				continue;
+			peffect->id = infos.field_id++;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			cn_count++;
+		}
 		core.spe_effect[check_player] = 0;
 		pr = effects.trigger_o_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
@@ -1349,16 +1360,6 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.select_chains.push_back(newchain);
 			to_count++;
 			core.spe_effect[check_player]++;
-		}
-		pr = effects.continuous_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			cn_count++;
 		}
 		if(phase == PHASE_DRAW)
 			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
@@ -1504,6 +1505,17 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.select_chains.push_back(newchain);
 			tf_count++;
 		}
+		pr = effects.continuous_effect.equal_range(phase_event);
+		for(; pr.first != pr.second;) {
+			peffect = pr.first->second;
+			++pr.first;
+			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
+				continue;
+			peffect->id = infos.field_id++;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			cn_count++;
+		}
 		core.spe_effect[check_player] = 0;
 		pr = effects.trigger_o_effect.equal_range(phase_event);
 		for(; pr.first != pr.second; ++pr.first) {
@@ -1517,16 +1529,6 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.select_chains.push_back(newchain);
 			to_count++;
 			core.spe_effect[check_player]++;
-		}
-		pr = effects.continuous_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			cn_count++;
 		}
 		if(phase == PHASE_DRAW)
 			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
@@ -4407,6 +4409,10 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 	switch(step) {
 	case 0: {
 		core.solving_event.splice(core.solving_event.begin(), core.sub_solving_event);
+		if(!peffect->check_count_limit(triggering_player)) {
+			core.solving_event.pop_front();
+			return TRUE;
+		}
 		chain newchain;
 		newchain.chain_id = 0;
 		newchain.chain_count = 0;

@@ -1,4 +1,4 @@
---エンシェント·フェアリー·ドラゴン
+--エンシェント・フェアリー・ドラゴン
 function c25862681.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
@@ -11,6 +11,7 @@ function c25862681.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c25862681.sumcon)
+	e1:SetCost(c25862681.cost)
 	e1:SetTarget(c25862681.sumtg)
 	e1:SetOperation(c25862681.sumop)
 	c:RegisterEffect(e1)
@@ -21,9 +22,14 @@ function c25862681.initial_effect(c)
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_RECOVER+CATEGORY_SEARCH)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetCost(c25862681.cost)
 	e2:SetTarget(c25862681.destg)
 	e2:SetOperation(c25862681.desop)
 	c:RegisterEffect(e2)
+end
+function c25862681.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c25862681.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1

@@ -10,10 +10,10 @@ function c58481572.initial_effect(c)
 	--remove
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_RANGE)
 	e2:SetCode(EFFECT_TO_GRAVE_REDIRECT)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetTargetRange(0xfe,0xff)
+	e2:SetTargetRange(0,0xff)
 	e2:SetValue(LOCATION_REMOVED)
 	e2:SetTarget(c58481572.rmtg)
 	c:RegisterEffect(e2)
@@ -41,7 +41,8 @@ function c58481572.hdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DRAW and eg:IsExists(c58481572.cfilter,1,nil,1-tp)
 end
 function c58481572.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_HAND,1,nil) end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and e:GetHandler():IsFaceup() 
+		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,0,LOCATION_HAND,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,1,tp,LOCATION_HAND)
 end
 function c58481572.hdop(e,tp,eg,ep,ev,re,r,rp)

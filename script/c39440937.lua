@@ -27,15 +27,17 @@ function c39440937.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetOperation(c39440937.todeck)
+	e1:SetCondition(c39440937.tdcon)
+	e1:SetOperation(c39440937.tdop)
 	Duel.RegisterEffect(e1,tp)
 end
-function c39440937.filter2(c)
-	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO)
+function c39440937.tdfilter(c)
+	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsAbleToExtra()
 end
-function c39440937.todeck(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c39440937.filter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
-	if g:GetCount()>0 then
-		Duel.SendtoDeck(g,nil,0,REASON_EFFECT)
-	end
+function c39440937.tdcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c39440937.tdfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+end
+function c39440937.tdop(e,tp,eg,ep,ev,re,r,rp)
+	local g=Duel.GetMatchingGroup(c39440937.tdfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	Duel.SendtoDeck(g,nil,0,REASON_EFFECT)
 end

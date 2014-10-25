@@ -1,4 +1,4 @@
---The First Monarch
+--始源の帝王
 function c8522996.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
