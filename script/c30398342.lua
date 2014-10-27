@@ -78,6 +78,7 @@ end
 function c30398342.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(30398342)==0 then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c30398342.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then
