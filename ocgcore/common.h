@@ -226,7 +226,10 @@ struct card_data {
 #define QUERY_TARGET_CARD	0x200000
 #define QUERY_OVERLAY_CARD	0x400000
 #define QUERY_COUNTERS		0x800000
-
+#define QUERY_ALL			0xff1fff
+#define QUERY_INITM			0xe71f9f
+#define QUERY_INITST		0xb70007
+#define QUERY_INITP         0xb70067
 //Messages
 #define MSG_RETRY				1
 #define MSG_HINT				2

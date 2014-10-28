@@ -31,4 +31,8 @@ namespace ygopro
         proto_handler->BeginProto();
     }
     
+    int DuelProtoHandler::MessageToCmd(unsigned int sz) {
+        return 0;
+    }
+    
 }

@@ -14,6 +14,7 @@
   <string name="screenshot_path" value="./screenshot"/>
   <string name="deck_path" value="./deck"/>
   <string name="replay_path" value="./replay"/>
+  <string name="script_path" value="./script"/>
   <string name="gui_conf" value="./conf/gui.xml"/>
   <string name="string_conf" value="./conf/strings.xml"/>
   <string name="textures_conf" value="./conf/textures.xml"/>

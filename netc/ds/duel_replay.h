@@ -52,6 +52,7 @@ namespace ygopro
         virtual uint32 HandleMessage(void* msg, uint32 message_type);
         
     protected:
+        TextFile script_file;
         unsigned char* rep_data = nullptr;
         size_t rep_size = 0;
         unsigned int seed = 0;

@@ -28,7 +28,7 @@ struct duel_arg {
 class duel {
 public:
 	char strbuffer[256];
-	byte buffer[0x1000];
+	byte buffer[0x2000];
 	uint32 bufferlen;
 	byte* bufferp;
 	interpreter* lua;

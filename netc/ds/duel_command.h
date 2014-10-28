@@ -22,22 +22,20 @@ namespace ygopro
         double end_time;
     };
     
-    class DuelMessage : public DuelCommand {
+    class DuelMessageInit : public DuelCommand {
     public:
-        DuelMessage(unsigned char* data, unsigned int len) {
-            pdata = data;
-            length = len;
-        }
-        
+        DuelMessageInit(unsigned char* data, unsigned int len);
+        virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     protected:
-        unsigned char* pdata;
-        int length;
+        std::vector<unsigned char> init_infos;
     };
     
-    class DuelMessageMove : public DuelMessage {
+    class DuelMessageMove : public DuelCommand {
     public:
-        using DuelMessage::DuelMessage;
+        DuelMessageMove(unsigned char* data, unsigned int len);
         virtual bool Handle(std::shared_ptr<DuelScene> pscene);
+    protected:
+        std::array<unsigned char, 8> move_infos;
     };
 }
 

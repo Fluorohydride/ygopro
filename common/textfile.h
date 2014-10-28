@@ -3,7 +3,17 @@
     
 class TextFile {
 public:
+    TextFile() {
+        file_size = 0;
+        datas.push_back(0);
+    }
+    
     TextFile(const std::string& filename) {
+        Load(filename);
+    }
+    
+    void Load(const std::string& filename) {
+        datas.clear();
         std::ifstream txtfile(filename, std::ios::binary);
         if(txtfile) {
             txtfile.seekg(0, txtfile.end);

@@ -43,15 +43,13 @@ namespace ygopro
         replay_duel->set_adapter(this);
         BufferUtil rep_reader(rep_data);
         if(flag & REPLAY_TAG) {
-            rep_reader.Skip(160);
-//            cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-//            cur_replay.ReadData(mainGame->dInfo.hostname_tag, 40);
-//            cur_replay.ReadData(mainGame->dInfo.clientname_tag, 40);
-//            cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+            std::string hostname = rep_reader.Read(40);
+            std::string hostname_tag = rep_reader.Read(40);
+            std::string clientname_tag = rep_reader.Read(40);
+            std::string clientname = rep_reader.Read(40);
         } else {
-            rep_reader.Skip(80);
-//            cur_replay.ReadData(mainGame->dInfo.hostname, 40);
-//            cur_replay.ReadData(mainGame->dInfo.clientname, 40);
+            std::string hostname = rep_reader.Read(40);
+            std::string clientname = rep_reader.Read(40);
         }
         int start_lp = rep_reader.Read<uint32>();
         int start_hand = rep_reader.Read<uint32>();
@@ -102,10 +100,22 @@ namespace ygopro
             for(int i = 0; i < extra; ++i)
                 replay_duel->new_tag_card(rep_reader.Read<uint32>(), 1, LOCATION_EXTRA);
         }
+    
         replay_duel->start_duel(opt);
+        msg_buffer.resize(4096);
+        replay_duel->query_field_info(&msg_buffer[0]);
     }
     
     void DuelProtoReplay::GetProto() {
+        int32 result = replay_duel->process();
+        int32 len = result & 0xffff;
+        /*int flag = result >> 16;*/
+        if (len > 0) {
+            if(len > msg_buffer.size())
+                msg_buffer.resize(len);
+            replay_duel->get_message(&msg_buffer[0]);
+            MessageToCmd(len);
+        }
         
     }
     
@@ -114,7 +124,11 @@ namespace ygopro
     }
     
     byte* DuelProtoReplay::ReadScript(const char* script_name, int* len) {
-        return nullptr;
+        std::wstring wfile = stringCfg["script_path"];
+        std::string file = To<std::string>(wfile);
+        file.append("/").append(script_name);
+        script_file.Load(file);
+        return (byte*)script_file.Data();
     }
     
     uint32 DuelProtoReplay::ReadCard(uint32 code, card_data* data) {

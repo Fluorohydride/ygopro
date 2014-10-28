@@ -181,6 +181,23 @@ int32 duelAdapter::query_field_info( byte* buf) {
 		*((int*)(buf)) = peffect->description;
 		buf += 4;
 	}
+    for(int playerid = 0; playerid < 2; ++playerid) {
+        for(uint32 i = 0; i < 5; ++i) {
+            pcard = pduel->game_field->player[playerid].list_mzone[i];
+            if(pcard)
+                pcard->update_infos_nocache(QUERY_INITM);
+        }
+        for(uint32 i = 0; i < 6; ++i) {
+            pcard = pduel->game_field->player[playerid].list_szone[i];
+            if(pcard)
+                pcard->update_infos_nocache(QUERY_INITST);
+        }
+        for(uint32 i = 7; i < 8; ++i) {
+            pcard = pduel->game_field->player[playerid].list_szone[i];
+            if(pcard)
+                pcard->update_infos_nocache(QUERY_INITP);
+        }
+    }
 	return 0;
 }
 
