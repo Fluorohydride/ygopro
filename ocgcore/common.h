@@ -237,7 +237,7 @@ struct card_data {
 #define MSG_WIN					4
 #define MSG_UPDATE_CARD			5
 #define MSG_SELECT_BATTLECMD	10
-#define MSG_SELECT_IDLECMD		11
+#define MSG_SELECT_MAINCMD		11
 #define MSG_SELECT_EFFECTYN		12
 #define MSG_SELECT_YESNO		13
 #define MSG_SELECT_OPTION		14
@@ -296,7 +296,7 @@ struct card_data {
 #define MSG_REMOVE_COUNTER		102
 #define MSG_ATTACK				110
 #define MSG_BATTLE				111
-#define MSG_ATTACK_DISABLED		112
+#define MSG_ATTACK_NEGATED		112
 #define MSG_DAMAGE_STEP_START	113
 #define MSG_DAMAGE_STEP_END		114
 #define MSG_MISSED_EFFECT		120
@@ -305,10 +305,10 @@ struct card_data {
 #define MSG_RELEASE_RELATION	123
 #define MSG_TOSS_COIN			130
 #define MSG_TOSS_DICE			131
-#define MSG_ANNOUNCE_RACE		140
-#define MSG_ANNOUNCE_ATTRIB		141
-#define MSG_ANNOUNCE_CARD		142
-#define MSG_ANNOUNCE_NUMBER		143
+#define MSG_DECLEAR_RACE		140
+#define MSG_DECLEAR_ATTRIB		141
+#define MSG_DECLEAR_CARD		142
+#define MSG_DECLEAR_NUMBER		143
 #define MSG_CARD_HINT			160
 #define MSG_TAG_SWAP			161
 #define MSG_RELOAD_FIELD		162
@@ -316,6 +316,26 @@ struct card_data {
 #define MSG_SHOW_HINT			164
 #define MSG_MATCH_KILL			170
 #define MSG_CUSTOM_MSG			180
+
+//Hints
+#define HINT_EVENT				1
+#define HINT_MESSAGE			2
+#define HINT_SELECTMSG			3
+#define HINT_OPSELECTED			4
+#define HINT_EFFECT				5
+#define HINT_RACE				6
+#define HINT_ATTRIB				7
+#define HINT_CODE				8
+#define HINT_NUMBER				9
+#define HINT_CARD				10
+//
+#define CHINT_TURN				1
+#define CHINT_CARD				2
+#define CHINT_RACE				3
+#define CHINT_ATTRIBUTE			4
+#define CHINT_NUMBER			5
+#define CHINT_DESC_ADD			6
+#define CHINT_DESC_REMOVE		7
 
 //Timing
 #define TIMING_DRAW_PHASE			0x1

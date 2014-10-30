@@ -83,6 +83,7 @@ int main(int argc, char* argv[]) {
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int)commonCfg["frame_rate"]);
+    
 //    auto sc = std::make_shared<BuildScene>();
 //    auto ih = std::make_shared<BuildInputHandler>(sc);
 //    auto sh = std::make_shared<BuildSceneHandler>(sc);

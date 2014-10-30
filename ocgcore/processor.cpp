@@ -3084,7 +3084,7 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)) {
 			core.attacker->reset(EFFECT_ATTACK_DISABLED, RESET_CODE);
 			atk_disabled = true;
-			pduel->write_buffer8(MSG_ATTACK_DISABLED);
+			pduel->write_buffer8(MSG_ATTACK_NEGATED);
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 		}
 		effect* peffect;

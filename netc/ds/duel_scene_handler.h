@@ -14,7 +14,8 @@ namespace ygopro
         virtual void BeginProto() = 0;
         virtual void GetProto() = 0;
         virtual bool ProtoEnd() = 0;
-        virtual int MessageToCmd(unsigned int sz);
+        virtual void ProcessMsg(unsigned int sz);
+        virtual int MessageToCmd(unsigned char msg_type, BufferUtil& reader);
         
     protected:
         std::vector<unsigned char> msg_buffer;

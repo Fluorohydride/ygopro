@@ -81,7 +81,7 @@ void card::update_infos(int32 query_flag) {
 	pduel->write_buffer32(get_info_location());
 	uint32* pflag = (uint32*)pduel->bufferp;
 	pduel->write_buffer32(0);
-	query_flag &= 0xff1fff;
+	query_flag &= QUERY_ALL;
 	uint32 tdata;
 	if(query_flag & QUERY_CODE) {
 		if((tdata = data.code) != q_cache.code) {

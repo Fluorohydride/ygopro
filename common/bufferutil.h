@@ -3,8 +3,9 @@
 
 class BufferUtil {
 public:
-    BufferUtil(unsigned char* base) {
+    BufferUtil(unsigned char* base, unsigned int sz) {
         ptr = base;
+        end = ptr + sz;
     }
     
     template<typename T>
@@ -54,8 +55,13 @@ public:
         ptr += offset;
     }
 
+    inline bool IsEnd() {
+        return ptr >= end;
+    }
+    
 private:
     unsigned char* ptr;
+    unsigned char* end;
 
 };
 

@@ -651,24 +651,4 @@ public:
 #define PROCESSOR_REMOVEOL_S		160
 #define PROCESSOR_MOVETOFIELD_S		161
 
-//Hints
-#define HINT_EVENT				1
-#define HINT_MESSAGE			2
-#define HINT_SELECTMSG			3
-#define HINT_OPSELECTED			4
-#define HINT_EFFECT				5
-#define HINT_RACE				6
-#define HINT_ATTRIB				7
-#define HINT_CODE				8
-#define HINT_NUMBER				9
-#define HINT_CARD				10
-//
-#define CHINT_TURN				1
-#define CHINT_CARD				2
-#define CHINT_RACE				3
-#define CHINT_ATTRIBUTE			4
-#define CHINT_NUMBER			5
-#define CHINT_DESC_ADD			6
-#define CHINT_DESC_REMOVE		7
-
 #endif /* FIELD_H_ */

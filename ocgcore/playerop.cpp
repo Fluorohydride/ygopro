@@ -70,7 +70,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 		uint32 i;
 		card* pcard;
 		effect* peffect;
-		pduel->write_buffer8(MSG_SELECT_IDLECMD);
+		pduel->write_buffer8(MSG_SELECT_MAINCMD);
 		pduel->write_buffer8(playerid);
 		//idle summon
 		pduel->write_buffer8(core.summonable_cards.size());
@@ -649,7 +649,7 @@ int32 field::announce_race(int16 step, uint8 playerid, int32 count, int32 availa
 			count = scount;
 			core.units.begin()->arg1 = (count << 16) + playerid;
 		}
-		pduel->write_buffer8(MSG_ANNOUNCE_RACE);
+		pduel->write_buffer8(MSG_DECLEAR_RACE);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(count);
 		pduel->write_buffer32(available);
@@ -688,7 +688,7 @@ int32 field::announce_attribute(int16 step, uint8 playerid, int32 count, int32 a
 			count = scount;
 			core.units.begin()->arg1 = (count << 16) + playerid;
 		}
-		pduel->write_buffer8(MSG_ANNOUNCE_ATTRIB);
+		pduel->write_buffer8(MSG_DECLEAR_ATTRIB);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(count);
 		pduel->write_buffer32(available);
@@ -718,7 +718,7 @@ int32 field::announce_attribute(int16 step, uint8 playerid, int32 count, int32 a
 }
 int32 field::announce_card(int16 step, uint8 playerid) {
 	if(step == 0) {
-		pduel->write_buffer8(MSG_ANNOUNCE_CARD);
+		pduel->write_buffer8(MSG_DECLEAR_CARD);
 		pduel->write_buffer8(playerid);
 		return FALSE;
 	} else {
@@ -732,7 +732,7 @@ int32 field::announce_card(int16 step, uint8 playerid) {
 }
 int32 field::announce_number(int16 step, uint8 playerid) {
 	if(step == 0) {
-		pduel->write_buffer8(MSG_ANNOUNCE_NUMBER);
+		pduel->write_buffer8(MSG_DECLEAR_NUMBER);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer8(core.select_options.size());
 		for(uint32 i = 0; i < core.select_options.size(); ++i)

@@ -41,7 +41,7 @@ namespace ygopro
     void DuelProtoReplay::BeginProto() {
         replay_duel = std::make_shared<duelAdapter>(seed);
         replay_duel->set_adapter(this);
-        BufferUtil rep_reader(rep_data);
+        BufferUtil rep_reader(rep_data, rep_size);
         if(flag & REPLAY_TAG) {
             std::string hostname = rep_reader.Read(40);
             std::string hostname_tag = rep_reader.Read(40);
@@ -100,10 +100,9 @@ namespace ygopro
             for(int i = 0; i < extra; ++i)
                 replay_duel->new_tag_card(rep_reader.Read<uint32>(), 1, LOCATION_EXTRA);
         }
-    
-        replay_duel->start_duel(opt);
         msg_buffer.resize(4096);
         replay_duel->query_field_info(&msg_buffer[0]);
+        replay_duel->start_duel(opt);
     }
     
     void DuelProtoReplay::GetProto() {
@@ -114,7 +113,7 @@ namespace ygopro
             if(len > msg_buffer.size())
                 msg_buffer.resize(len);
             replay_duel->get_message(&msg_buffer[0]);
-            MessageToCmd(len);
+            ProcessMsg(len);
         }
         
     }

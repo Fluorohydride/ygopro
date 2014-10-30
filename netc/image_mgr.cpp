@@ -13,9 +13,13 @@ namespace ygopro
 	ti4& ImageMgr::GetCardTexture(unsigned int id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
-            std::string file = To<std::string>(id).append(".jpg");
+            std::string file = To<std::string>("%d.jpg", id);
 			auto& cti = card_textures[id];
             int length = imageZip.GetFileLength(file);
+            if(length == 0) {
+                file = To<std::string>("%d.png", id);
+                length = imageZip.GetFileLength(file);
+            }
 			if(length == 0) {
 				cti.ti = misc_textures["unknown"];
                 cti.ref_block = 0xffff;
@@ -84,6 +88,10 @@ namespace ygopro
             return pre_ret;
         std::string file = To<std::string>("%d.jpg", id);
         int length = imageZip.GetFileLength(file);
+        if(length == 0) {
+            file = To<std::string>("%d.png", id);
+            length = imageZip.GetFileLength(file);
+        }
         if(length == 0) {
             file = "unknown.jpg";
             length = imageZip.GetFileLength(file);
