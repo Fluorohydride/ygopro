@@ -34,7 +34,7 @@ function c61156777.ctcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c61156777.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and not c:IsImmuneToEffect(e) then
+	if c:IsFaceup() and not c:IsRelateToEffect(e) then
 		c:AddCounter(0x34,1)
 	end
 end
