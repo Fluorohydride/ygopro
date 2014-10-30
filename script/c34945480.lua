@@ -1,8 +1,9 @@
 --외신 아자토트
 function c34945480.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3,c34945480.ovfilter,aux.Stringid(34945480,1),2,nil)
+	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3,c34945480.ovfilter,aux.Stringid(34945480,1))
 	c:EnableReviveLimit()
+	--
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
@@ -15,14 +16,13 @@ function c34945480.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetCondition(c34945480.sumcon)
 	e2:SetOperation(c34945480.sumsuc)
-	c:RegisterEffect(e2)	
+	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(34945480,0))
 	e3:SetCategory(CATEGORY_DESTROY)
 	e3:SetType(EFFECT_TYPE_IGNITION)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetCondition(c34945480.condition)
 	e3:SetCost(c34945480.cost)
 	e3:SetTarget(c34945480.target)
@@ -30,7 +30,7 @@ function c34945480.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c34945480.ovfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0xb7) and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsSetCard(0xb6) and c:IsType(TYPE_XYZ)
 end
 function c34945480.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_XYZ
@@ -45,22 +45,20 @@ function c34945480.sumsuc(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
-function c34945480.actlimit(e,te,tp)
+function c34945480.actlimit(e,re,tp)
 	return re:IsActiveType(TYPE_MONSTER)
 end
-function c34945480.typecast(c)
-	return bit.band(c:GetType(),TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)
-end
 function c34945480.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayGroup():GetClassCount(c34945480.typecast)==3
+	local g=e:GetHandler():GetOverlayGroup()
+	return g:IsExists(Card.IsType,1,nil,TYPE_FUSION) and g:IsExists(Card.IsType,1,nil,TYPE_SYNCHRO)
+		and g:IsExists(Card.IsType,1,nil,TYPE_XYZ)
 end
 function c34945480.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and c:GetFlagEffect(34945480)==0 end
-	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c34945480.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end

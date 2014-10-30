@@ -1,29 +1,41 @@
 --BOX복서
 function c61156777.initial_effect(c)
-	c:SetCounterLimit(0x34,99)
 	--Add counter
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e1:SetDescription(aux.Stringid(61156777,0))
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
-	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c61156777.ctcon)
 	e1:SetOperation(c61156777.ctop)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(61156777,0))
+	e2:SetDescription(aux.Stringid(61156777,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCost(c61156777.spcost)
 	e2:SetTarget(c61156777.sptg)
 	e2:SetOperation(c61156777.spop)
 	c:RegisterEffect(e2)
+	--destroy replace
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCode(EFFECT_DESTROY_REPLACE)
+	e3:SetTarget(c61156777.reptg)
+	e3:SetOperation(c61156777.repop)
+	c:RegisterEffect(e3)
+end
+function c61156777.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c61156777.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local c=re:GetHandler()
-	if c:IsType(TYPE_MONSTER) and c~=e:GetHandler() then
-		e:GetHandler():AddCounter(0x34,1)
+	local c=e:GetHandler()
+	if c:IsFaceup() and not c:IsImmuneToEffect(e) then
+		c:AddCounter(0x34,1)
 	end
 end
 function c61156777.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -42,9 +54,14 @@ function c61156777.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c61156777.filter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	local tc=g:GetFirst()
-	local c=e:GetHandler()
-	if tc then
-		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+	if g:GetCount()>0 then
+		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
+end
+function c61156777.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then e:GetHandler():IsCanRemoveCounter(tp,0x34,1,REASON_EFFECT) end
+	return Duel.SelectYesNo(tp,aux.Stringid(61156777,2))
+end
+function c61156777.repop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RemoveCounter(tp,0x34,1,REASON_EFFECT)
 end

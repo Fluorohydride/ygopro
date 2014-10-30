@@ -19,7 +19,7 @@ function c7541475.postg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c7541475.posop(e,tp,eg,ep,ev,re,r,rp)
 	local d=Duel.GetAttackTarget()
-	if d~=nil and d:IsRelateToBattle() and d:IsDefencePos() then
-		Duel.ChangePosition(d,POS_FACEUP_DEFENCE,0,POS_FACEUP_ATTACK,0)
+	if d:IsRelateToBattle() then
+		Duel.ChangePosition(d,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE,POS_FACEUP_ATTACK,POS_FACEUP_ATTACK)
 	end
 end
