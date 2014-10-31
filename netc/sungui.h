@@ -38,87 +38,33 @@ namespace sgui
     // ST: Sender Type
     // ET: Event Type
     // MT: Method Type
-    // FT: Lambda Type
     
-    template<typename ST, typename ET = void>
+    template<typename ST, typename... ET>
     class SGDelegate {
+        typedef std::function<bool (ST&, ET...)> MT;
     public:
-        virtual bool Invoke(ST& sender, ET evt) = 0;
-    };
-    
-    template<typename ST>
-    class SGDelegate<ST, void> {
-    public:
-        virtual bool Invoke(ST& sender) = 0;
-    };
-    
-    template<typename OT, typename ST, typename ET = void>
-    class SGDelegateObject : public SGDelegate<ST, ET> {
-        typedef bool (OT::*MT)(ST&, ET);
-        
-    public:
-        SGDelegateObject(OT* obj, MT fun): invoke_object(obj), invoke_method(fun) {}
-        virtual bool Invoke(ST& sender, ET evt) {
-            return (invoke_object->*invoke_method)(sender, evt);
+        SGDelegate(const MT& fun): invoke_method(fun) {}
+        virtual bool Invoke(ST& sender, ET... evt) {
+            return invoke_method(sender, evt...);
         }
         
     protected:
-        OT* invoke_object = nullptr;
         MT invoke_method = nullptr;
     };
     
-    template<typename OT, typename ST>
-    class SGDelegateObject<OT, ST, void> : public SGDelegate<ST, void> {
-        typedef bool (OT::*MT)(ST&);
-        
-    public:
-        SGDelegateObject(OT* obj, MT fun): invoke_object(obj), invoke_method(fun) {}
-        virtual bool Invoke(ST& sender) {
-            return (invoke_object->*invoke_method)(sender);
-        }
-        
-    protected:
-        OT* invoke_object = nullptr;
-        MT invoke_method = nullptr;
-    };
-    
-    template<typename ST, typename ET = void>
-    class SGDelegateStdFunction : public SGDelegate<ST, ET> {
-        
-    public:
-        SGDelegateStdFunction(const std::function<bool (ST&, ET)>& fun): invoke_method(fun) {}
-        virtual bool Invoke(ST& sender, ET evt) {
-            return invoke_method(sender, evt);
-        }
-        
-    protected:
-        std::function<bool (ST&, ET)> invoke_method = nullptr;
-    };
-    
-    template<typename ST>
-    class SGDelegateStdFunction<ST, void> : public SGDelegate<ST, void> {
-        
-    public:
-        SGDelegateStdFunction(const std::function<bool (ST&)>& fun): invoke_method(fun) {}
-        virtual bool Invoke(ST& sender) {
-            return invoke_method(sender);
-        }
-        
-    protected:
-        std::function<bool (ST&)> invoke_method = nullptr;
-    };
-    
-    template<typename ST, typename ET = void>
+    template<typename ST, typename... ET>
     class SGEventHandler {
     public:
         template<typename OT>
-        void Bind(OT* obj, bool (OT::*fun)(ST&, ET)) {
-            delegate_ptrs.push_back(std::make_shared<SGDelegateObject<OT, ST, ET>>(obj, fun));
+        void Bind(OT* obj, bool (OT::*fun)(ST&, ET...)) {
+            auto lambda = [obj, fun](ST& sender, ET... evt)->bool { return (obj->*fun)(sender, evt...); };
+            auto ptr = std::make_shared<SGDelegate<ST, ET...>>(lambda);
+            delegate_ptrs.push_back(ptr);
         }
         
         template<typename FT>
         void Bind(FT f) {
-            auto ptr = std::make_shared<SGDelegateStdFunction<ST, ET>>(std::function<bool (ST&, ET)>(f));
+            auto ptr = std::make_shared<SGDelegate<ST, ET...>>(f);
             delegate_ptrs.push_back(ptr);
         }
         
@@ -126,48 +72,17 @@ namespace sgui
             delegate_ptrs.clear();
         }
         
-        bool TriggerEvent(ST& sender, ET evt) {
+        bool TriggerEvent(ST& sender, ET... evt) {
             if(delegate_ptrs.size() == 0)
                 return false;
             bool ret = false;
             for(auto& ptr : delegate_ptrs)
-                ret = ptr->Invoke(sender, evt) || ret;
+                ret = ptr->Invoke(sender, evt...) || ret;
             return ret;
         }
         
     protected:
-        std::vector<std::shared_ptr<SGDelegate<ST, ET>>> delegate_ptrs;
-    };
-    
-    template<typename ST>
-    class SGEventHandler<ST, void> {
-    public:
-        template<typename OT>
-        void Bind(OT* obj, bool (OT::*fun)(ST&)) {
-            delegate_ptrs.push_back(std::make_shared<SGDelegateObject<OT, ST, void>>(obj, fun));
-        }
-        
-        template<typename FT>
-        void Bind(FT f) {
-            auto ptr = std::make_shared<SGDelegateStdFunction<ST, void>>(std::function<bool (ST&)>(f));
-            delegate_ptrs.push_back(ptr);
-        }
-        
-        void Reset() {
-            delegate_ptrs.clear();
-        }
-        
-        bool TriggerEvent(ST& sender) {
-            if(delegate_ptrs.size() == 0)
-                return false;
-            bool ret = false;
-            for(auto& ptr : delegate_ptrs)
-                ret = ptr->Invoke(sender) || ret;
-            return ret;
-        }
-        
-    protected:
-        std::vector<std::shared_ptr<SGDelegate<ST, void>>> delegate_ptrs;
+        std::vector<std::shared_ptr<SGDelegate<ST, ET...>>> delegate_ptrs;
     };
     
     // ===== Delegate Implement End =====

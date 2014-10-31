@@ -12,15 +12,15 @@ namespace ygopro
     DuelCommandWait::DuelCommandWait(double tm) {
         end_time = SceneMgr::Get().GetGameTime() + tm;
     }
-    
+
     bool DuelCommandWait::Handle(std::shared_ptr<DuelScene> pscene) {
         return SceneMgr::Get().GetGameTime() > end_time;
     }
-    
+
     DuelMsgRetry::DuelMsgRetry(BufferUtil& reader) {
         
     }
-    
+
     bool DuelMsgRetry::Handle(std::shared_ptr<DuelScene> pscene) {
         return true;
     }
