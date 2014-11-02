@@ -902,6 +902,7 @@ function Auxiliary.PConditionFilter(c,e,tp,lscale,rscale)
 	local lv=c:GetLevel()
 	return (c:IsLocation(LOCATION_HAND) or (c:IsFaceup() and c:IsType(TYPE_PENDULUM)))
 		and lv>lscale and lv<rscale and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_PENDULUM,tp,false,false)
+		and not c:IsForbidden()
 end
 function Auxiliary.PendCondition()
 	return	function(e,c,og)
