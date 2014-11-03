@@ -77,15 +77,36 @@ namespace ygopro
     }
     
     DuelMsgUpdateCard::DuelMsgUpdateCard(BufferUtil& reader) {
-        
+        unsigned int len = reader.Read<unsigned int>();
+        update_buffer.resize(len);
+        reader.Read(&update_buffer[0], len);
     }
     
     bool DuelMsgUpdateCard::Handle(std::shared_ptr<DuelScene> pscene) {
+        BufferUtil reader(&update_buffer[0], update_buffer.size());
         return true;
     }
     
     DuelMsgSelBattleCmd::DuelMsgSelBattleCmd(BufferUtil& reader) {
-        
+        int playerid = reader.Read<unsigned char>();
+        int act_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < act_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+            unsigned int desc = reader.Read<unsigned int>();
+        }
+        int atk_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < act_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+            unsigned int param = reader.Read<unsigned char>();
+        }
+        bool can_m2 = reader.Read<unsigned char>() == 1;
+        bool can_ep = reader.Read<unsigned char>() == 1;
     }
     
     bool DuelMsgSelBattleCmd::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -93,7 +114,52 @@ namespace ygopro
     }
     
     DuelMsgSelMainCmd::DuelMsgSelMainCmd(BufferUtil& reader) {
-        
+        int playerid = reader.Read<unsigned char>();
+        int summon_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < summon_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+        }
+        int spsummon_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < spsummon_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+        }
+        int repos_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < repos_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+        }
+        int mset_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < mset_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+        }
+        int sset_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < sset_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+        }
+        int act_sz = reader.Read<unsigned char>();
+        for(int i = 0; i < act_sz; ++i) {
+            unsigned int code = reader.Read<unsigned int>();
+            unsigned int con = reader.Read<unsigned char>();
+            unsigned int loc = reader.Read<unsigned char>();
+            unsigned int seq = reader.Read<unsigned char>();
+            unsigned int desc = reader.Read<unsigned int>();
+        }
+        bool can_bp = reader.Read<unsigned char>() == 1;
+        bool can_ep = reader.Read<unsigned char>() == 1;
     }
     
     bool DuelMsgSelMainCmd::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -101,7 +167,9 @@ namespace ygopro
     }
     
     DuelMsgSelEffectYN::DuelMsgSelEffectYN(BufferUtil& reader) {
-        
+        int playerid = reader.Read<unsigned char>();
+        unsigned int code = reader.Read<unsigned int>();
+        unsigned int info_loc = reader.Read<unsigned int>();
     }
     
     bool DuelMsgSelEffectYN::Handle(std::shared_ptr<DuelScene> pscene) {

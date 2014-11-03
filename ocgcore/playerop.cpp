@@ -72,7 +72,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 		effect* peffect;
 		pduel->write_buffer8(MSG_SELECT_MAINCMD);
 		pduel->write_buffer8(playerid);
-		//idle summon
+		//summon
 		pduel->write_buffer8(core.summonable_cards.size());
 		for(i = 0; i < core.summonable_cards.size(); ++i) {
 			pcard = core.summonable_cards[i];
@@ -81,7 +81,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(pcard->current.location);
 			pduel->write_buffer8(pcard->current.sequence);
 		}
-		//idle spsummon
+		//spsummon
 		pduel->write_buffer8(core.spsummonable_cards.size());
 		for(i = 0; i < core.spsummonable_cards.size(); ++i) {
 			pcard = core.spsummonable_cards[i];
@@ -90,7 +90,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(pcard->current.location);
 			pduel->write_buffer8(pcard->current.sequence);
 		}
-		//idle pos change
+		//pos change
 		pduel->write_buffer8(core.repositionable_cards.size());
 		for(i = 0; i < core.repositionable_cards.size(); ++i) {
 			pcard = core.repositionable_cards[i];
@@ -99,7 +99,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(pcard->current.location);
 			pduel->write_buffer8(pcard->current.sequence);
 		}
-		//idle mset
+		//mset
 		pduel->write_buffer8(core.msetable_cards.size());
 		for(i = 0; i < core.msetable_cards.size(); ++i) {
 			pcard = core.msetable_cards[i];
@@ -108,7 +108,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(pcard->current.location);
 			pduel->write_buffer8(pcard->current.sequence);
 		}
-		//idle sset
+		//sset
 		pduel->write_buffer8(core.ssetable_cards.size());
 		for(i = 0; i < core.ssetable_cards.size(); ++i) {
 			pcard = core.ssetable_cards[i];
@@ -117,7 +117,7 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(pcard->current.location);
 			pduel->write_buffer8(pcard->current.sequence);
 		}
-		//idle activate
+		//activate
 		pduel->write_buffer8(core.select_chains.size());
 		std::sort(core.select_chains.begin(), core.select_chains.end(), chain::chain_operation_sort);
 		for(i = 0; i < core.select_chains.size(); ++i) {

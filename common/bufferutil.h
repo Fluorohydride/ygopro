@@ -16,6 +16,12 @@ public:
     }
     
     template<typename T>
+    inline void Read(T* val) {
+        memcpy(val, ptr, sizeof(T));
+        ptr += sizeof(T);
+    }
+    
+    template<typename T>
     inline void Write(T val) {
         (*(T*)ptr) = val;
         ptr += sizeof(T);

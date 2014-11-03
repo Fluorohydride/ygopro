@@ -64,6 +64,7 @@ namespace ygopro
         DuelMsgUpdateCard(BufferUtil& reader);
         virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     protected:
+        std::vector<unsigned char> update_buffer;
     };
     
     // MSG_SELECT_BATTLECMD
