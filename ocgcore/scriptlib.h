@@ -476,16 +476,8 @@ public:
 	static int32 duel_is_chain_disablable(lua_State *L);
 	static int32 duel_check_chain_target(lua_State *L);
 	static int32 duel_check_chain_uniqueness(lua_State *L);
-	static int32 duel_check_summon_activity(lua_State *L);
-	static int32 duel_check_normal_summon_activity(lua_State *L);
-	static int32 duel_check_flip_summon_activity(lua_State *L);
-	static int32 duel_check_special_summon_activity(lua_State *L);
-	static int32 duel_check_attack_activity(lua_State *L);
+	static int32 duel_get_activity_count(lua_State *L);
 	static int32 duel_check_phase_activity(lua_State *L);
-	static int32 duel_get_summoned_cards_this_turn(lua_State *L);
-	static int32 duel_get_normal_summoned_cards_this_turn(lua_State *L);
-	static int32 duel_get_spsummoned_cards_this_turn(lua_State *L);
-	static int32 duel_get_flip_summoned_cards_this_turn(lua_State *L);
 	
 	//specific card functions
 	static int32 duel_venom_swamp_check(lua_State *L);

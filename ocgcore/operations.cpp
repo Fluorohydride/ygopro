@@ -1394,10 +1394,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		pduel->write_buffer8(target->current.location);
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
-		core.summon_state[sumplayer] = TRUE;
-		core.normalsummon_state[sumplayer] = TRUE;
-		core.summoned_cards_pt[sumplayer].insert(target);
-		core.normalsummoned_cards_pt[sumplayer].insert(target);
+		core.summon_state_count[sumplayer]++;
+		core.normalsummon_state_count[sumplayer]++;
 		if (target->material_cards.size()) {
 			for (auto mit = target->material_cards.begin(); mit != target->material_cards.end(); ++mit)
 				raise_single_event(*mit, 0, EVENT_BE_PRE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
@@ -1527,8 +1525,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		target->current.position = POS_FACEUP_ATTACK;
 		target->fieldid = infos.field_id++;
 		core.phase_action = TRUE;
-		core.flipsummon_state[sumplayer] = TRUE;
-		core.flipsummoned_cards_pt[sumplayer].insert(target);
+		core.flipsummon_state_count[sumplayer]++;
 		pduel->write_buffer8(MSG_FLIPSUMMONING);
 		pduel->write_buffer32(target->data.code);
 		pduel->write_buffer8(target->current.controler);
@@ -1746,8 +1743,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		if(target->owner != setplayer)
 			set_control(target, setplayer, 0, 0);
 		core.phase_action = TRUE;
-		core.normalsummon_state[setplayer] = TRUE;
-		core.normalsummoned_cards_pt[setplayer].insert(target);
+		core.normalsummon_state_count[setplayer]++;
 		target->set_status(STATUS_SUMMON_TURN, TRUE);
 		pduel->write_buffer8(MSG_SET);
 		pduel->write_buffer32(target->data.code);
@@ -2026,8 +2022,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(target->current.location);
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
-		core.spsummon_state[sumplayer] = TRUE;
-		core.spsummoned_cards_pt[sumplayer].insert(target);
+		core.spsummon_state_count[sumplayer]++;
 		return FALSE;
 	}
 	case 5: {
@@ -2184,8 +2179,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(pcard->current.location);
 		pduel->write_buffer8(pcard->current.sequence);
 		pduel->write_buffer8(pcard->current.position);
-		core.spsummon_state[sumplayer] = TRUE;
-		core.spsummoned_cards_pt[sumplayer].insert(pcard);
+		core.spsummon_state_count[sumplayer]++;
 		if(pgroup->it != pgroup->container.end())
 			core.units.begin()->step = 22;
 		return FALSE;
@@ -2317,8 +2311,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 			core.special_summoning.insert(target);
 		target->enable_field_effect(FALSE);
 		target->set_status(STATUS_FLIP_SUMMONED, FALSE);
-		core.spsummoned_cards_pt[target->summon_player].insert(target);
-		core.spsummon_state[target->summon_player] = TRUE;
+		core.spsummon_state_count[target->summon_player]++;
 		core.hint_timing[target->summon_player] |= TIMING_SPSUMMON;
 		move_to_field(target, target->summon_player, playerid, LOCATION_MZONE, positions);
 		return FALSE;
