@@ -3066,6 +3066,51 @@ int32 scriptlib::duel_check_phase_activity(lua_State *L) {
 	lua_pushboolean(L, pduel->game_field->core.phase_action);
 	return 1;
 }
+int32 scriptlib::duel_add_custom_activity_counter(lua_State *L) {
+	check_param_count(L, 3);
+	check_param(L, PARAM_TYPE_FUNCTION, 3);
+	int32 counter_id = lua_tointeger(L, 1);
+	int32 activity_type = lua_tointeger(L, 2);
+	int32 counter_filter = interpreter::get_function_handle(L, 3);
+	duel* pduel = interpreter::get_duel_info(L);
+	switch(activity_type) {
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		default:
+			break;
+	}
+	return 0;
+}
+int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
+	check_param_count(L, 3);
+	int32 counter_id = lua_tointeger(L, 1);
+	int32 playerid = lua_tointeger(L, 2);
+	int32 activity_type = lua_tointeger(L, 3);
+	duel* pduel = interpreter::get_duel_info(L);
+	switch(activity_type) {
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		default:
+			break;
+	}
+	return 0;
+}
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 2);
