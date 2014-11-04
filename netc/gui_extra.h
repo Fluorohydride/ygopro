@@ -27,16 +27,16 @@ namespace ygopro
     private:
         PopupMenu() {};
     public:
-        PopupMenu& AddButton(const std::wstring& btn, int id = 0);
+        PopupMenu& AddButton(const std::wstring& btn, int32_t id = 0);
         void End();
     private:
         v2i pos;
-        int width;
-        std::function<void (int)> cb;
+        int32_t width;
+        std::function<void (int32_t)> cb;
         std::vector<std::wstring> items;
-        std::vector<int> ids;
+        std::vector<int32_t> ids;
     public:
-        static PopupMenu& Begin(v2i pos, int width, std::function<void (int)> cb = nullptr);
+        static PopupMenu& Begin(v2i pos, int32_t width, std::function<void (int32_t)> cb = nullptr);
     };
     
     class FileDialog : public CommonDialog {
@@ -57,13 +57,14 @@ namespace ygopro
     class FilterDialog : public CommonDialog {
     public:
         void Show(v2i pos);
-        void SetOKCallback(std::function<void (const FilterCondition&, int)> cb = nullptr) { cbOK = cb; }
+        void SetOKCallback(std::function<void (const FilterCondition&, int32_t)> cb = nullptr) { cbOK = cb; }
         void BeginSearch();
-        static std::tuple<int, int, int> ParseValue(const std::wstring& valstr);
-        static int ParseInt(const wchar_t* p, int size);
+        void ClearCondition();
+        static std::tuple<int32_t, int32_t, int32_t> ParseValue(const std::wstring& valstr);
+        static int32_t ParseInt(const wchar_t* p, int32_t size);
         
     protected:
-        std::function<void (const FilterCondition&, int)> cbOK;
+        std::function<void (const FilterCondition&, int32_t)> cbOK;
         std::weak_ptr<sgui::SGTextEdit> keyword;
         std::weak_ptr<sgui::SGComboBox> type1;
         std::weak_ptr<sgui::SGComboBox> type2;
@@ -73,15 +74,17 @@ namespace ygopro
         std::weak_ptr<sgui::SGTextEdit> attack;
         std::weak_ptr<sgui::SGTextEdit> defence;
         std::weak_ptr<sgui::SGTextEdit> star;
+        std::wstring con_text[4];
+        uint32_t sel[5] = {0};
     };
 
     class InfoPanel : public CommonDialog {
     public:
-        void ShowInfo(unsigned int code, v2i pos, v2i sz);
+        void ShowInfo(uint32_t code, v2i pos, v2i sz);
         void Destroy();
         
     protected:
-        unsigned int code = 0;
+        uint32_t code = 0;
         std::weak_ptr<sgui::SGSprite> imageBox;
         std::weak_ptr<sgui::SGSprite> misc;
         std::weak_ptr<sgui::SGLabel> cardName;

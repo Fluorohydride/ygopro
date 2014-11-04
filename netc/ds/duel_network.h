@@ -7,7 +7,7 @@
 namespace ygopro
 {
     
-    class DuelProtoTcp : public DuelProtoHandler, public TcpClientSeed {
+    class DuelProtoTcp : public DuelProtoHandler, public TcpClientSeed, public ConnectionHandler {
     public:
         DuelProtoTcp();
         virtual void BeginProto();
@@ -18,12 +18,12 @@ namespace ygopro
         virtual void OnConnectError();
         virtual void OnConnectTimeOut();
         virtual void OnDisconnected();
-        virtual void HandlePacket(unsigned short proto, unsigned char data[], unsigned int size);
+        virtual void HandlePacket(uint16_t proto, uint8_t data[], size_t sz);
         
     protected:
         std::wstring server_ip;
-        unsigned int server_port = 0;
-        unsigned int server_timeout = 0;
+        uint32_t server_port = 0;
+        uint32_t server_timeout = 0;
         bool proto_ended = false;
     };
     

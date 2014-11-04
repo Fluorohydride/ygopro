@@ -27,7 +27,7 @@ namespace ygopro
             rapidxml::xml_attribute<>* attr = config_node->first_attribute();
             if(config_name == "integer") {
                 std::string name = attr->value();
-                int val = To<int>(attr->next_attribute()->value());
+                int32_t val = To<int32_t>(attr->next_attribute()->value());
                 int_config[name] = val;
             } else if(config_name == "float") {
                 std::string name = attr->value();
@@ -62,7 +62,7 @@ namespace ygopro
     }
     
     bool SceneMgr::Update() {
-        unsigned long long now_long = std::chrono::system_clock::now().time_since_epoch().count();
+        uint64_t now_long = std::chrono::system_clock::now().time_since_epoch().count();
         now = (double)(now_long - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
         if(current_scene != nullptr)
             return current_scene->Update();
@@ -84,7 +84,7 @@ namespace ygopro
         double now = GetGameTime();
         frame_check += frame_interval - (now - frame_time);
         if(frame_check >= 0.0)
-            std::this_thread::sleep_for(std::chrono::microseconds((int)(frame_interval * 1000000)));
+            std::this_thread::sleep_for(std::chrono::microseconds((int32_t)(frame_interval * 1000000)));
         frame_time = now;
     }
     
@@ -98,11 +98,11 @@ namespace ygopro
         if(current_scene == nullptr)
             return;
         auto clip = current_scene->GetScreenshotClip();
-        unsigned char* image_buff = new unsigned char[scene_size.x * scene_size.y * 4];
-        unsigned char* clip_buff = new unsigned char[clip.width * clip.height * 4];
+        uint8_t* image_buff = new uint8_t[scene_size.x * scene_size.y * 4];
+        uint8_t* clip_buff = new uint8_t[clip.width * clip.height * 4];
         glReadPixels(0, 0, scene_size.x, scene_size.y, GL_RGBA, GL_UNSIGNED_BYTE, image_buff);
-        for(int h = 0; h < clip.height; ++h) {
-            int offset = scene_size.x * 4 * (scene_size.y - 1 - clip.top - h);
+        for(int32_t h = 0; h < clip.height; ++h) {
+            int32_t offset = scene_size.x * 4 * (scene_size.y - 1 - clip.top - h);
             memcpy(&clip_buff[clip.width * 4 * h], &image_buff[offset], clip.width * 4);
         }
         auto t = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());

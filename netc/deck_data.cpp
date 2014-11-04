@@ -27,9 +27,11 @@ namespace ygopro
     }
     
     void DeckData::Shuffle() {
-        std::random_shuffle(main_deck.begin(), main_deck.end());
-        std::random_shuffle(extra_deck.begin(), extra_deck.end());
-        std::random_shuffle(side_deck.begin(), side_deck.end());
+        uint32_t seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::default_random_engine rng(seed);
+        std::shuffle(main_deck.begin(), main_deck.end(), rng);
+        std::shuffle(extra_deck.begin(), extra_deck.end(), rng);
+        std::shuffle(side_deck.begin(), side_deck.end(), rng);
     }
     
     void DeckData::CalCount() {
@@ -74,7 +76,7 @@ namespace ygopro
         extra_deck.clear();
         side_deck.clear();
         bool side = false;
-        unsigned int code;
+        uint32_t code;
         while(!deck_file.eof()) {
             std::string line;
             std::getline(deck_file, line);
@@ -84,8 +86,8 @@ namespace ygopro
                 side = true;
                 continue;
             }
-            code = To<unsigned int>(line);
-            CardData* ptr = DataMgr::Get()[(unsigned int)code];
+            code = To<uint32_t>(line);
+            CardData* ptr = DataMgr::Get()[(uint32_t)code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
             if(side)
@@ -117,32 +119,32 @@ namespace ygopro
     
     bool DeckData::LoadFromString(const std::string& deck) {
         static const char* base64_chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_";
-        static unsigned char base64_dec_table[256] = {0};
+        static uint8_t base64_dec_table[256] = {0};
         static bool base64_dec_init = false;
         if(!base64_dec_init) {
             base64_dec_init = true;
-            for(int i = 0; i < 64; ++i)
-                base64_dec_table[(int)base64_chars[i]] = i;
+            for(int32_t i = 0; i < 64; ++i)
+                base64_dec_table[(int32_t)base64_chars[i]] = i;
         }
         if((deck.size() == 0) || (deck.size() % 5))
             return false;
         for(size_t i = 0; i < deck.size(); i += 5) {
-            unsigned int packed_data = (unsigned int)base64_dec_table[(unsigned char)deck[i + 4]];
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 3]]) << 6;
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 2]]) << 12;
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 1]]) << 18;
-            packed_data |= ((unsigned int)base64_dec_table[(unsigned char)deck[i + 0]]) << 24;
-            unsigned int code = packed_data & 0x7ffffff;
-            unsigned int count = (packed_data >> 27) & 0x3;
+            uint32_t packed_data = (uint32_t)base64_dec_table[(uint8_t)deck[i + 4]];
+            packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck[i + 3]]) << 6;
+            packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck[i + 2]]) << 12;
+            packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck[i + 1]]) << 18;
+            packed_data |= ((uint32_t)base64_dec_table[(uint8_t)deck[i + 0]]) << 24;
+            uint32_t code = packed_data & 0x7ffffff;
+            uint32_t count = (packed_data >> 27) & 0x3;
             CardData* ptr = DataMgr::Get()[code];
             if(ptr == nullptr || (ptr->type & 0x4000))
                 continue;
             if(packed_data & 0x20000000) {
-                for(unsigned int j = 0; j < count; ++j)
+                for(uint32_t j = 0; j < count; ++j)
                     side_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
             } else {
                 if(ptr->type & 0x802040) {
-                    for(unsigned int j = 0; j < count; ++j) {
+                    for(uint32_t j = 0; j < count; ++j) {
                         extra_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
                         if(ptr->type & 0x800000)
                             xyzcount++;
@@ -152,7 +154,7 @@ namespace ygopro
                             fuscount++;
                     }
                 } else {
-                    for(unsigned int j = 0; j < count; ++j) {
+                    for(uint32_t j = 0; j < count; ++j) {
                         main_deck.push_back(std::make_shared<DeckCardData>(ptr, 0));
                         if(ptr->type & 0x1)
                             mcount++;
@@ -194,13 +196,13 @@ namespace ygopro
         char deck_string[1024] = {0};
         char* deck_pstr = deck_string;
         for(size_t i = 0; i < main_deck.size(); ++i) {
-            unsigned int count = 1;
-            unsigned int code = main_deck[i]->data->code;
+            uint32_t count = 1;
+            uint32_t code = main_deck[i]->data->code;
             while(i < main_deck.size() - 1 && code == main_deck[i + 1]->data->code) {
                 count++;
                 i++;
             }
-            unsigned int packed_data = (code & 0x7ffffff) | (count << 27);
+            uint32_t packed_data = (code & 0x7ffffff) | (count << 27);
             deck_pstr[4] = base64_chars[packed_data & 0x3f];
             deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
             deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
@@ -209,13 +211,13 @@ namespace ygopro
             deck_pstr += 5;
         }
         for(size_t i = 0; i < extra_deck.size(); ++i) {
-            unsigned int count = 1;
-            unsigned int code = extra_deck[i]->data->code;
+            uint32_t count = 1;
+            uint32_t code = extra_deck[i]->data->code;
             while(i < extra_deck.size() - 1 && code == extra_deck[i + 1]->data->code) {
                 count++;
                 i++;
             }
-            unsigned int packed_data = (code & 0x7ffffff) | (count << 27);
+            uint32_t packed_data = (code & 0x7ffffff) | (count << 27);
             deck_pstr[4] = base64_chars[packed_data & 0x3f];
             deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
             deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
@@ -224,13 +226,13 @@ namespace ygopro
             deck_pstr += 5;
         }
         for(size_t i = 0; i < side_deck.size(); ++i) {
-            unsigned int count = 1;
-            unsigned int code = side_deck[i]->data->code;
+            uint32_t count = 1;
+            uint32_t code = side_deck[i]->data->code;
             while(i < side_deck.size() - 1 && code == side_deck[i + 1]->data->code) {
                 count++;
                 i++;
             }
-            unsigned int packed_data = (code & 0x7ffffff) | (count << 27) | 0x20000000;
+            uint32_t packed_data = (code & 0x7ffffff) | (count << 27) | 0x20000000;
             deck_pstr[4] = base64_chars[packed_data & 0x3f];
             deck_pstr[3] = base64_chars[(packed_data >> 6) & 0x3f];
             deck_pstr[2] = base64_chars[(packed_data >> 12) & 0x3f];
@@ -245,11 +247,11 @@ namespace ygopro
         return std::move(deckstr);
     }
     
-    std::shared_ptr<DeckCardData> DeckData::InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool checkc) {
+    std::shared_ptr<DeckCardData> DeckData::InsertCard(uint32_t pos, uint32_t index, uint32_t code, bool checkc) {
         CardData* cd = DataMgr::Get()[code];
         if(cd == nullptr || (cd->type & 0x4000))
             return nullptr;
-        unsigned int limit = LimitRegulationMgr::Get().GetCardLimitCount(code);
+        uint32_t limit = LimitRegulationMgr::Get().GetCardLimitCount(code);
         if(checkc && ((cd->alias && counts[cd->alias] >= limit) || (!cd->alias && counts[code] >= limit)))
            return nullptr;
         std::shared_ptr<DeckCardData> ret = nullptr;
@@ -302,7 +304,7 @@ namespace ygopro
         return ret;
     }
     
-    bool DeckData::RemoveCard(unsigned int pos, unsigned int index) {
+    bool DeckData::RemoveCard(uint32_t pos, uint32_t index) {
         if(pos == 0)
             return false;
         if(pos == 1) {
@@ -352,19 +354,20 @@ namespace ygopro
         return CardData::card_sort(c1->data, c2->data);
     }
     
-    unsigned int LimitRegulation::get_hash() {
+    uint32_t LimitRegulation::get_hash() {
         if(hash)
             return hash;
-        Hash32_SHA1 out;
+        SHA1 out;
         for(auto iter : counts) {
             out.Append(&iter.first, sizeof(iter.first));
             out.Append(&iter.second, sizeof(iter.second));
         }
-        hash = out.GetHash();
+        auto result = out.GetHash();
+        hash = result.digest[0] ^ result.digest[1] ^ result.digest[2] ^ result.digest[3] ^ result.digest[4];
         return hash;
     }
     
-    unsigned int LimitRegulation::check_deck(DeckData& deck, unsigned int pool_type) {
+    uint32_t LimitRegulation::check_deck(DeckData& deck, uint32_t pool_type) {
         return 0;
     }
     
@@ -372,7 +375,7 @@ namespace ygopro
         std::ifstream ban_file(To<std::string>(file));
         if(!ban_file)
             return;
-        unsigned int code, count;
+        uint32_t code, count;
         LimitRegulation* plist = nullptr;
         while(!ban_file.eof()) {
             std::string line;
@@ -388,11 +391,11 @@ namespace ygopro
             if(plist == nullptr)
                 continue;
             Tokenizer<> tk(line, " \t\r\n");
-            code = To<unsigned int>(tk[0]);
-            count = To<unsigned int>(tk[1]);
+            code = To<uint32_t>(tk[0]);
+            count = To<uint32_t>(tk[1]);
             if(code == 0)
                 continue;
-            plist->counts[(unsigned int)code] = (unsigned int)count;
+            plist->counts[(uint32_t)code] = (uint32_t)count;
         }
         limit_regulations.resize(limit_regulations.size() + 1);
         plist = &(*limit_regulations.rbegin());
@@ -400,7 +403,7 @@ namespace ygopro
         current_list = &limit_regulations[0];
     }
     
-    void LimitRegulationMgr::SetLimitRegulation(unsigned int id) {
+    void LimitRegulationMgr::SetLimitRegulation(uint32_t id) {
 		if (id >= limit_regulations.size())
 			return;
 		current_list = &limit_regulations[id];
@@ -411,7 +414,7 @@ namespace ygopro
             current_list = lr;
     }
     
-    unsigned int LimitRegulationMgr::CheckCurrentList(unsigned int pool) {
+    uint32_t LimitRegulationMgr::CheckCurrentList(uint32_t pool) {
         if(!current_list)
             return DECK_NOERROR;
         return DECK_NOERROR;
@@ -429,7 +432,7 @@ namespace ygopro
         }
         for(auto& cd : deck.main_deck) {
             auto cdata = cd->data;
-            unsigned int code = cdata->alias ? cdata->alias : cdata->code;
+            uint32_t code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
                 cd->limit = 3;
@@ -438,7 +441,7 @@ namespace ygopro
         }
         for(auto& cd : deck.extra_deck) {
             auto cdata = cd->data;
-            unsigned int code = cdata->alias ? cdata->alias : cdata->code;
+            uint32_t code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
                 cd->limit = 3;
@@ -447,7 +450,7 @@ namespace ygopro
         }
         for(auto& cd : deck.side_deck) {
             auto cdata = cd->data;
-            unsigned int code = cdata->alias ? cdata->alias : cdata->code;
+            uint32_t code = cdata->alias ? cdata->alias : cdata->code;
             auto iter = current_list->counts.find(code);
             if(iter == current_list->counts.end())
                 cd->limit = 3;
@@ -456,7 +459,7 @@ namespace ygopro
         }
     }
     
-    unsigned int LimitRegulationMgr::GetCardLimitCount(unsigned int code) {
+    uint32_t LimitRegulationMgr::GetCardLimitCount(uint32_t code) {
         if(!current_list)
             return 3;
         auto iter = current_list->counts.find(code);
@@ -466,7 +469,7 @@ namespace ygopro
             return iter->second;
     }
     
-    std::vector<CardData*> LimitRegulationMgr::FilterCard(unsigned int limit, const FilterCondition& fc) {
+    std::vector<CardData*> LimitRegulationMgr::FilterCard(uint32_t limit, const FilterCondition& fc) {
         std::vector<CardData*> result;
         for(auto& iter : current_list->counts) {
             if(iter.second != limit)
@@ -484,12 +487,12 @@ namespace ygopro
         return std::move(result);
     }
     
-    void LimitRegulationMgr::LoadCurrentListToDeck(DeckData& deck, int limit) {
+    void LimitRegulationMgr::LoadCurrentListToDeck(DeckData& deck, int32_t limit) {
         deck.Clear();
         if(!current_list)
             return;
         for(auto& iter : current_list->counts) {
-            if(iter.second != (unsigned int)limit)
+            if(iter.second != (uint32_t)limit)
                 continue;
             CardData* cd = DataMgr::Get()[iter.first];
             if(!cd)

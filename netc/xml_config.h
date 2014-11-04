@@ -6,20 +6,20 @@ namespace ygopro
 
     struct ValueStruct {
         
-        unsigned int val_type = 0;
-        long ivalue = 0;
+        uint32_t val_type = 0;
+        int64_t ivalue = 0;
         double fvalue = 0.0;
         std::wstring svalue;
         
-        void operator = (long val) { ivalue = val; val_type = 0; }
+        void operator = (int64_t val) { ivalue = val; val_type = 0; }
         void operator = (double val) { fvalue = val; val_type = 1; }
         void operator = (const wchar_t* val) { svalue = val; val_type = 2; }
         void operator = (const std::wstring& val) { svalue = val; val_type = 2; }
         
-        operator unsigned int() { return static_cast<unsigned int>(ivalue); }
-        operator int() { return static_cast<int>(ivalue); }
-        operator unsigned long() { return static_cast<unsigned long>(ivalue); }
-        operator long() { return ivalue; }
+        operator uint32_t() { return static_cast<uint32_t>(ivalue); }
+        operator int32_t() { return static_cast<int32_t>(ivalue); }
+        operator uint64_t() { return static_cast<uint64_t>(ivalue); }
+        operator int64_t() { return ivalue; }
         operator float() { return static_cast<float>(fvalue); }
         operator double() { return fvalue; }
         operator const std::wstring&() { return svalue; }

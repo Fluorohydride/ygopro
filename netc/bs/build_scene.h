@@ -13,7 +13,7 @@ namespace ygopro
         MutableAttribute<v2f> pos;
         MutableAttribute<v2f> size;
         MutableAttribute<float> hl;
-        unsigned int buffer_index = 0;
+        uint32_t buffer_index = 0;
         ti4 card_tex;
         bool show_limit = true;
         bool show_exclusive = true;
@@ -29,8 +29,8 @@ namespace ygopro
         virtual void Draw();
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
-        void ShowSelectedInfo(unsigned int pos, unsigned int index);
-        void ShowCardInfo(unsigned int code);
+        void ShowSelectedInfo(uint32_t pos, uint32_t index);
+        void ShowCardInfo(uint32_t code);
         void HideCardInfo();
         
         void ClearDeck();
@@ -56,37 +56,37 @@ namespace ygopro
         void RefreshLimit(std::shared_ptr<DeckCardData> dcd);
         void RefreshEx(std::shared_ptr<DeckCardData> dcd);
         void ChangeExclusive(bool check);
-        void ChangeRegulation(int index, int vr);
-        void ViewRegulation(int limit);
+        void ChangeRegulation(int32_t index, int32_t vr);
+        void ViewRegulation(int32_t limit);
         void RefreshSearchResult(const std::array<CardData*, 10> new_results);
         
-        void SetCurrentSelection(int sel, bool show_info);
+        void SetCurrentSelection(int32_t sel, bool show_info);
         void AddUpdatingCard(std::shared_ptr<DeckCardData> dcd);
-        void MoveCard(int pos, int index);
-        void RemoveCard(int pos, int index);
-        void InsertSearchResult(int index, bool is_side);
+        void MoveCard(int32_t pos, int32_t index);
+        void RemoveCard(int32_t pos, int32_t index);
+        void InsertSearchResult(int32_t index, bool is_side);
         
-        std::shared_ptr<DeckCardData> GetCard(int pos, int index);
-        std::pair<int, int> GetHoverPos(int posx, int posy);
+        std::shared_ptr<DeckCardData> GetCard(int32_t pos, int32_t index);
+        std::pair<int32_t, int32_t> GetHoverPos(int32_t posx, int32_t posy);
         
     protected:
-        unsigned int index_buffer = 0;
-        unsigned int deck_buffer = 0;
-        unsigned int back_buffer = 0;
-        unsigned int misc_buffer = 0;
-        unsigned int result_buffer = 0;
-        unsigned int deck_vao = 0;
-        unsigned int back_vao = 0;
-        unsigned int misc_vao = 0;
-        unsigned int result_vao = 0;
+        uint32_t index_buffer = 0;
+        uint32_t deck_buffer = 0;
+        uint32_t back_buffer = 0;
+        uint32_t misc_buffer = 0;
+        uint32_t result_buffer = 0;
+        uint32_t deck_vao = 0;
+        uint32_t back_vao = 0;
+        uint32_t misc_vao = 0;
+        uint32_t result_vao = 0;
         bool update_bg = true;
         bool update_misc = true;
         bool update_result = true;
-        int update_status = 0;
+        int32_t update_status = 0;
         DeckData current_deck;
         v2i scene_size = {0, 0};
-        int max_row_count = 0;
-        int main_row_count = 0;
+        int32_t max_row_count = 0;
+        int32_t main_row_count = 0;
         v2f card_size = {0.0f, 0.0f};
         v2f icon_size = {0.0f, 0.0f};
         float minx = 0.0f;
@@ -101,8 +101,8 @@ namespace ygopro
         std::list<std::weak_ptr<DeckCardData>> updating_cards;
         std::array<CardData*, 10> result_data;
         std::array<ti4, 10> result_tex;
-        int current_sel_result = -1;
-        int result_show_size = 0;
+        int32_t current_sel_result = -1;
+        int32_t result_show_size = 0;
     };
     
 }

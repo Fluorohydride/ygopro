@@ -13,6 +13,7 @@ namespace ygopro
     }
     
     void DuelProtoTcp::BeginProto() {
+        SetConnectionHandler(this);
         //Connect(To<std::string>(server_ip).c_str(), server_port, server_timeout);
     }
     
@@ -46,7 +47,7 @@ namespace ygopro
         
     }
     
-    void DuelProtoTcp::HandlePacket(unsigned short proto, unsigned char data[], unsigned int size) {
+    void DuelProtoTcp::HandlePacket(uint16_t proto, uint8_t data[], size_t sz) {
         
     }
     

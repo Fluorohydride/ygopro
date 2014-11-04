@@ -36,8 +36,8 @@ namespace ygopro
         DuelMsgHint(BufferUtil& reader);
         virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     protected:
-        int hint_type = 0;
-        int hint_data = 0;
+        int32_t hint_type = 0;
+        int32_t hint_data = 0;
     };
     
     // MSG_START
@@ -54,8 +54,8 @@ namespace ygopro
         DuelMsgWin(BufferUtil& reader);
         virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     protected:
-        int win_player = 0;
-        int win_reason = 0;
+        int32_t win_player = 0;
+        int32_t win_reason = 0;
     };
     
     // MSG_UPDATE_CARD
@@ -64,7 +64,7 @@ namespace ygopro
         DuelMsgUpdateCard(BufferUtil& reader);
         virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     protected:
-        std::vector<unsigned char> update_buffer;
+        std::vector<uint8_t> update_buffer;
     };
     
     // MSG_SELECT_BATTLECMD
@@ -281,7 +281,7 @@ namespace ygopro
         DuelMsgMove(BufferUtil& reader);
         virtual bool Handle(std::shared_ptr<DuelScene> pscene);
     protected:
-        std::array<unsigned char, 8> move_infos;
+        std::array<uint8_t, 8> move_infos;
     };
     
     // MSG_POS_CHANGE
@@ -671,26 +671,26 @@ namespace ygopro
     // MSG_RELOAD_FIELD
     class DuelMsgLoad : public DuelCommand {
         struct InitPlayerInfo {
-            unsigned int hp;
-            std::array<int, 5> minfo;
-            std::array<int, 8> sinfo;
-            unsigned int main_size;
-            unsigned int hand_size;
-            unsigned int grave_size;
-            unsigned int remove_size;
-            unsigned int extra_size;
+            uint32_t hp;
+            std::array<int32_t, 5> minfo;
+            std::array<int32_t, 8> sinfo;
+            uint32_t main_size;
+            uint32_t hand_size;
+            uint32_t grave_size;
+            uint32_t remove_size;
+            uint32_t extra_size;
         };
         
         struct InitChainInfo {
-            unsigned int code;
-            unsigned int desc;
-            unsigned char card_con;
-            unsigned char card_loc;
-            unsigned char card_seq;
-            unsigned char card_pos;
-            unsigned char trig_con;
-            unsigned char trig_loc;
-            unsigned char trig_seq;
+            uint32_t code;
+            uint32_t desc;
+            uint8_t card_con;
+            uint8_t card_loc;
+            uint8_t card_seq;
+            uint8_t card_pos;
+            uint8_t trig_con;
+            uint8_t trig_loc;
+            uint8_t trig_seq;
         };
         
     public:

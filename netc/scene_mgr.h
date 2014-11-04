@@ -80,7 +80,7 @@ namespace ygopro
         void SetMousePosition(v2i pos) { mouse_pos = pos; }
         v2i GetMousePosition() { return mouse_pos; }
         rectf LayoutRectConfig(const std::string& name) { return rect_config[name]; }
-        int LayoutIntConfig(const std::string& name) { return int_config[name]; }
+        int32_t LayoutIntConfig(const std::string& name) { return int_config[name]; }
         float LayoutFloatConfig(const std::string& name) { return float_config[name]; }
         
         template<typename T>
@@ -102,7 +102,7 @@ namespace ygopro
         
     protected:
         v2i scene_size;
-        unsigned long long start_time = 0;
+        uint64_t start_time = 0;
         double now = 0.0;
         std::shared_ptr<Scene> current_scene = nullptr;
         double frame_check = 0.0;
@@ -110,7 +110,7 @@ namespace ygopro
         double frame_interval = 0.0;
         v2i mouse_pos = {0, 0};
         std::unordered_map<std::string, rectf> rect_config;
-        std::unordered_map<std::string, int> int_config;
+        std::unordered_map<std::string, int32_t> int_config;
         std::unordered_map<std::string, float> float_config;
     };
 

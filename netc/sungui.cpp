@@ -33,10 +33,10 @@ namespace sgui
         auto ptr = parent.lock();
         v2i ssize = (ptr == nullptr) ? guiRoot.GetSceneSize() : ptr->GetClientSize();
         if(res)
-            size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
+            size_abs = size + v2i{(int32_t)(ssize.x * size_prop.x), (int32_t)(ssize.y * size_prop.y)};
         if(rep) {
-            int posx = (position_prop.x < 0.0f) ? ((ssize.x - size_abs.x) / 2) : (position.x + (int)(ssize.x * position_prop.x));
-            int posy = (position_prop.y < 0.0f) ? ((ssize.y - size_abs.y) / 2) : (position.y + (int)(ssize.y * position_prop.y));
+            int32_t posx = (position_prop.x < 0.0f) ? ((ssize.x - size_abs.x) / 2) : (position.x + (int32_t)(ssize.x * position_prop.x));
+            int32_t posy = (position_prop.y < 0.0f) ? ((ssize.y - size_abs.y) / 2) : (position.y + (int32_t)(ssize.y * position_prop.y));
             position_abs = {posx, posy};
             if(ptr != nullptr)
                 position_abs += ptr->GetClientPosition();
@@ -72,31 +72,31 @@ namespace sgui
         PostResize(true, false);
     }
     
-    void SGWidget::SetX(int x, float propx) {
+    void SGWidget::SetX(int32_t x, float propx) {
         position.x = x;
         position_prop.x = propx;
         PostResize(false, true);
     }
     
-    void SGWidget::SetY(int y, float propy) {
+    void SGWidget::SetY(int32_t y, float propy) {
         position.y = y;
         position_prop.y = propy;
         PostResize(false, true);
     }
     
-    void SGWidget::SetWidth(int w, float propw) {
+    void SGWidget::SetWidth(int32_t w, float propw) {
         size.x = w;
         size_prop.x = propw;
         PostResize(true, false);
     }
     
-    void SGWidget::SetHeight(int h, float proph) {
+    void SGWidget::SetHeight(int32_t h, float proph) {
         size.y = h;
         size_prop.y = proph;
         PostResize(true, false);
     }
     
-    void SGWidget::SetColor(unsigned int c) {
+    void SGWidget::SetColor(uint32_t c) {
         color = c;
         vertices_dirty = true;
     }
@@ -204,14 +204,14 @@ namespace sgui
         EvaluateSize();
     }
     
-    void SGTextBase::SetSpacing(unsigned int x, unsigned int y) {
+    void SGTextBase::SetSpacing(uint32_t x, uint32_t y) {
         spacing_x = x;
         spacing_y = y;
         text_update = true;
         EvaluateSize();
     }
     
-    int SGTextBase::GetLineSpacing() {
+    int32_t SGTextBase::GetLineSpacing() {
         return font->GetFontSize() + spacing_y;
     }
     
@@ -225,11 +225,11 @@ namespace sgui
         text_width_cur = 0;
     }
     
-    unsigned int SGTextBase::GetTextColor(int index) {
+    uint32_t SGTextBase::GetTextColor(int32_t index) {
         return color_vec[index];
     }
     
-    void SGTextBase::SetText(const std::wstring& t, unsigned int cl) {
+    void SGTextBase::SetText(const std::wstring& t, uint32_t cl) {
         text = t;
         color_vec.clear();
         for(size_t i = 0; i < text.length(); ++i)
@@ -238,7 +238,7 @@ namespace sgui
         EvaluateSize();
     }
     
-    void SGTextBase::AppendText(const std::wstring& t, unsigned int cl) {
+    void SGTextBase::AppendText(const std::wstring& t, uint32_t cl) {
         if(t.length() == 0)
             return;
         text += t;
@@ -248,8 +248,8 @@ namespace sgui
         EvaluateSize(t);
     }
     
-    void SGTextBase::SetTextColor(unsigned int start, unsigned int end, unsigned int cl) {
-        for(unsigned int i = start; i < end && i < color_vec.size(); ++i)
+    void SGTextBase::SetTextColor(uint32_t start, uint32_t end, uint32_t cl) {
+        for(uint32_t i = start; i < end && i < color_vec.size(); ++i)
             color_vec[i] = cl;
         text_update = true;
     }
@@ -264,12 +264,12 @@ namespace sgui
                 return;
             EvaluateSize(text);
         } else {
-            int max_width = GetMaxWidth();
-            int ls = GetLineSpacing();
-            int font_size = font->GetFontSize();
+            int32_t max_width = GetMaxWidth();
+            int32_t ls = GetLineSpacing();
+            int32_t font_size = font->GetFontSize();
             for(auto ch : t) {
                 if(ch < L' ') {
-                    text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
+                    text_pos_array.push_back(v2i{text_width_cur, (int32_t)(text_height - font_size)});
                     if(ch == L'\n' && IsMultiLine()) {
                         if(text_width_cur > text_width)
                             text_width = text_width_cur;
@@ -285,7 +285,7 @@ namespace sgui
                     text_width_cur = 0;
                     text_height += ls;
                 }
-                text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
+                text_pos_array.push_back(v2i{text_width_cur, (int32_t)(text_height - font_size)});
                 text_width_cur += gl.advance + spacing_x;
             }
         }
@@ -302,14 +302,14 @@ namespace sgui
             return;
         auto tex_size = font->GetTexture().GetSize();
         std::vector<glbase::v2ct> charvtx;
-        unsigned int advx = 0, advy = font->GetFontSize();
+        uint32_t advx = 0, advy = font->GetFontSize();
         glbase::v2ct cur_char;
-        unsigned int max_width = GetMaxWidth();
-        int ls = GetLineSpacing();
+        uint32_t max_width = GetMaxWidth();
+        int32_t ls = GetLineSpacing();
         v2i text_pos = GetTextOffset();
         for(size_t i = 0; i < text.length(); ++i) {
             wchar_t ch = text[i];
-            unsigned int color = GetTextColor((int)i);
+            uint32_t color = GetTextColor((int32_t)i);
             if(ch < L' ') {
                 if(ch == L'\n' && IsMultiLine()) {
                     advx = 0;
@@ -389,7 +389,7 @@ namespace sgui
         glDeleteVertexArrays(1, &imgao);
     }
     
-    void SGSpriteBase::SetImage(glbase::Texture* img, recti varea, unsigned int cl) {
+    void SGSpriteBase::SetImage(glbase::Texture* img, recti varea, uint32_t cl) {
         img_texture = img;
         img_update = true;
         if(!img)
@@ -401,7 +401,7 @@ namespace sgui
         verts.push_back(v2i{varea.left + varea.width, varea.top});
         verts.push_back(v2i{varea.left, varea.top + varea.height});
         verts.push_back(v2i{varea.left + varea.width, varea.top + varea.height});
-        for(int i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 4; ++i)
             colors.push_back(cl);
     }
     
@@ -420,7 +420,7 @@ namespace sgui
         texcoords.push_back(tex);
     }
     
-    void SGSpriteBase::SetImage(glbase::Texture* img, std::vector<v2i>& vtx, std::vector<unsigned int>& cl) {
+    void SGSpriteBase::SetImage(glbase::Texture* img, std::vector<v2i>& vtx, std::vector<uint32_t>& cl) {
         img_texture = img;
         img_update = true;
         if(!img)
@@ -473,9 +473,9 @@ namespace sgui
         UpdateImage();
         if(verts.size() == 0)
             return;
-        int frame = 0;
+        int32_t frame = 0;
         if(texcoords.size() > 1)
-            frame = (int)(guiRoot.GetTime() / frame_time) % texcoords.size() * verts.size();
+            frame = (int32_t)(guiRoot.GetTime() / frame_time) % texcoords.size() * verts.size();
         guiRoot.BindTexture(img_texture);
         glBindVertexArray(imgao);
         glDrawElements(GL_TRIANGLE_STRIP, verts.size() / 4 * 6 - 2, GL_UNSIGNED_SHORT, (void*)(verts.size() / 4 * 6 * frame));
@@ -820,7 +820,7 @@ namespace sgui
                     rapidxml::xml_attribute<>* attr = config_node->first_attribute();
                     if(config_name == "integer") {
                         std::string name = attr->value();
-                        int val = To<int>(attr->next_attribute()->value());
+                        int32_t val = To<int32_t>(attr->next_attribute()->value());
                         iter->second->int_config[name] = val;
                     } else if(config_name == "string") {
                         std::string name = attr->value();
@@ -829,20 +829,20 @@ namespace sgui
                     } else if(config_name == "rect") {
                         std::string name = attr->value();
                         attr = attr->next_attribute();
-                        int u = To<int>(attr->value());
+                        int32_t u = To<int32_t>(attr->value());
                         attr = attr->next_attribute();
-                        int v = To<int>(attr->value());
+                        int32_t v = To<int32_t>(attr->value());
                         attr = attr->next_attribute();
-                        int w = To<int>(attr->value());
+                        int32_t w = To<int32_t>(attr->value());
                         attr = attr->next_attribute();
-                        int h = To<int>(attr->value());
+                        int32_t h = To<int32_t>(attr->value());
                         iter->second->tex_config[name] = recti{u, v, w, h};
                     } else if(config_name == "font") {
                         std::string name = attr->value();
                         attr = attr->next_attribute();
                         std::string file = attr->value();
                         attr = attr->next_attribute();
-                        int sz = To<int>(attr->value());
+                        int32_t sz = To<int32_t>(attr->value());
                         auto& ft = font_mgr[name];
                         if(!ft.Load(file, sz))
                             font_mgr.erase(name);
@@ -861,9 +861,9 @@ namespace sgui
         gui_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
         tex_size = v2i{gui_texture.GetWidth(), gui_texture.GetHeight()};
         glGenBuffers(1, &index_buffer);
-        std::vector<unsigned short> index;
+        std::vector<uint16_t> index;
         index.resize(1024 * 4 * 6);
-        for(int i = 0; i < 1024 * 4; ++i) {
+        for(int32_t i = 0; i < 1024 * 4; ++i) {
             index[i * 6] = i * 4;
             index[i * 6 + 1] = i * 4 + 2;
             index[i * 6 + 2] = i * 4 + 1;
@@ -872,7 +872,7 @@ namespace sgui
             index[i * 6 + 5] = i * 4 + 4;
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 1024 * 4 * 6, &index[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * 1024 * 4 * 6, &index[0], GL_STATIC_DRAW);
         start_time = std::chrono::system_clock::now().time_since_epoch().count();
         gui_shader = &glbase::Shader::GetDefaultShader();
         return true;
@@ -892,7 +892,7 @@ namespace sgui
     }
     
     double SGGUIRoot::GetTime() {
-        unsigned long long now = std::chrono::system_clock::now().time_since_epoch().count();
+        uint64_t now = std::chrono::system_clock::now().time_since_epoch().count();
         return (double)(now - start_time) * std::chrono::system_clock::period::num / std::chrono::system_clock::period::den;
     }
     
@@ -994,7 +994,7 @@ namespace sgui
         vertices_dirty = false;
         std::array<glbase::v2ct, 36> vert;
         
-        int bw = panel_config.int_config["client_border"];
+        int32_t bw = panel_config.int_config["client_border"];
         auto back = panel_config.tex_config["client_area"];
         
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
@@ -1120,13 +1120,13 @@ namespace sgui
             return;
         vertices_dirty = false;
         text_update = true;
-        int title_h = window_config.int_config["title_h"];
-        int title_lw = window_config.int_config["title_lw"];
-        int title_rw = window_config.int_config["title_rw"];
-        int frame_w = window_config.int_config["frame_w"];
-        int frame_h = window_config.int_config["frame_h"];
-        int size_w = window_config.int_config["size_w"];
-        int size_h = window_config.int_config["size_h"];
+        int32_t title_h = window_config.int_config["title_h"];
+        int32_t title_lw = window_config.int_config["title_lw"];
+        int32_t title_rw = window_config.int_config["title_rw"];
+        int32_t frame_w = window_config.int_config["frame_w"];
+        int32_t frame_h = window_config.int_config["frame_h"];
+        int32_t size_w = window_config.int_config["size_w"];
+        int32_t size_h = window_config.int_config["size_h"];
         
         std::array<glbase::v2ct, 36> vert;
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, title_lw, title_h,
@@ -1147,7 +1147,7 @@ namespace sgui
                               window_config.tex_config["frameb"]);
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - size_w, position_abs.y + size_abs.y - size_h, size_w, size_h,
                               window_config.tex_config["rc"]);
-        for(int i = 0; i < 36; ++i)
+        for(int32_t i = 0; i < 36; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 36, &vert);
@@ -1171,7 +1171,7 @@ namespace sgui
         return position_abs + v2i{5, 1};
     }
     
-    int SGWindow::GetMaxWidth() {
+    int32_t SGWindow::GetMaxWidth() {
         return 0xffff;
     }
     
@@ -1191,8 +1191,8 @@ namespace sgui
     
     bool SGWindow::DragingBegin(v2i evt) {
         position_drag = evt;
-        int size_w = window_config.int_config["size_w"];
-        int size_h = window_config.int_config["size_h"];
+        int32_t size_w = window_config.int_config["size_w"];
+        int32_t size_h = window_config.int_config["size_h"];
         if(evt.x > position_abs.x + size_abs.x - size_w && evt.y > position_abs.y + size_abs.y - size_h)
             drag_type = 1;
         else
@@ -1210,8 +1210,8 @@ namespace sgui
             SetPosition(position + delta);
             text_update = true;
         } else if(drag_type == 1) {
-            int minw = window_config.int_config["min_w"];
-            int minh = window_config.int_config["min_h"];
+            int32_t minw = window_config.int_config["min_w"];
+            int32_t minh = window_config.int_config["min_h"];
             size = size_abs;
             size_prop = {0, 0};
             size += delta;
@@ -1267,7 +1267,7 @@ namespace sgui
         PostResize(true, false);
     }
     
-    void SGLabel::SetSpacing(unsigned int x, unsigned int y) {
+    void SGLabel::SetSpacing(uint32_t x, uint32_t y) {
         SGTextBase::SetSpacing(x, y);
         PostResize(true, false);
     }
@@ -1276,7 +1276,7 @@ namespace sgui
         return position_abs;
     }
     
-    int SGLabel::GetMaxWidth() {
+    int32_t SGLabel::GetMaxWidth() {
         if(max_width)
             return max_width;
         return 0xffff;
@@ -1291,17 +1291,17 @@ namespace sgui
         PostResize(true, false);
     }
     
-    void SGLabel::SetText(const std::wstring& t, unsigned int cl) {
+    void SGLabel::SetText(const std::wstring& t, uint32_t cl) {
         SGTextBase::SetText(t, cl);
         PostResize(true, false);
     }
     
-    void SGLabel::AppendText(const std::wstring& t, unsigned int cl) {
+    void SGLabel::AppendText(const std::wstring& t, uint32_t cl) {
         SGTextBase::AppendText(t, cl);
         PostResize(true, false);
     }
     
-    std::shared_ptr<SGLabel> SGLabel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw) {
+    std::shared_ptr<SGLabel> SGLabel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int32_t mw) {
         auto ptr = std::make_shared<SGLabel>();
         ptr->parent = p;
         ptr->position = pos;
@@ -1336,15 +1336,15 @@ namespace sgui
                 return;
             EvaluateSize(text);
         } else {
-            int max_width = GetMaxWidth();
+            int32_t max_width = GetMaxWidth();
             auto iconoffset = iconlabel_config.tex_config["iconoffset"];
-            int ls = GetLineSpacing();
-            int ils = (ls > (int)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
+            int32_t ls = GetLineSpacing();
+            int32_t ils = (ls > (int32_t)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
             bool has_icon = false;
-            int font_size = font->GetFontSize();
+            int32_t font_size = font->GetFontSize();
             for(auto ch : t) {
                 if(ch < L' ') {
-                    text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
+                    text_pos_array.push_back(v2i{text_width_cur, (int32_t)(text_height - font_size)});
                     if(ch == L'\n') {
                         if(text_width_cur > text_width)
                             text_width = text_width_cur;
@@ -1372,7 +1372,7 @@ namespace sgui
                         text_height += has_icon ? ils : ls;
                         has_icon = false;
                     }
-                    text_pos_array.push_back(v2i{text_width_cur, (int)(text_height - font_size)});
+                    text_pos_array.push_back(v2i{text_width_cur, (int32_t)(text_height - font_size)});
                     text_width_cur += gl.advance + spacing_x;
                 }
             }
@@ -1392,19 +1392,19 @@ namespace sgui
         auto tex_size = font->GetTexture().GetSize();
         std::vector<glbase::v2ct> charvtx;
         std::vector<glbase::v2ct> iconvtx;
-        int font_size = font->GetFontSize();
-        unsigned int advx = 0, advy = font_size;
+        int32_t font_size = font->GetFontSize();
+        uint32_t advx = 0, advy = font_size;
         glbase::v2ct cur_char;
-        unsigned int max_width = GetMaxWidth();
+        uint32_t max_width = GetMaxWidth();
         v2i text_pos = GetTextOffset();
         auto iconoffset = guiRoot.GetDefaultRect("iconoffset");
         auto iconrc = guiRoot.GetDefaultInt("iconcolumn");
-        int ls = GetLineSpacing();
-        int ils = (ls > (int)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
+        int32_t ls = GetLineSpacing();
+        int32_t ils = (ls > (int32_t)(iconoffset.height + spacing_y)) ? ls : (iconoffset.height + spacing_y);
         bool has_icon = false;
         for(size_t i = 0; i < text.length(); ++i) {
             wchar_t ch = text[i];
-            unsigned int color = GetTextColor((int)i);
+            uint32_t color = GetTextColor((int32_t)i);
             if(ch < L' ') {
                 if(ch == L'\n') {
                     advx = 0;
@@ -1414,9 +1414,9 @@ namespace sgui
                 continue;
             }
             if(ch >= 0xe000 && ch <= 0xefff) {
-                int index = ch - 0xe000;
-                int x = index % iconrc;
-                int y = index / iconrc;
+                int32_t index = ch - 0xe000;
+                int32_t x = index % iconrc;
+                int32_t y = index / iconrc;
                 recti rct = iconoffset;
                 rct.left += x * iconoffset.width;
                 rct.top += y * iconoffset.height;
@@ -1503,7 +1503,7 @@ namespace sgui
         }
     }
     
-    std::shared_ptr<SGIconLabel> SGIconLabel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw) {
+    std::shared_ptr<SGIconLabel> SGIconLabel::Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int32_t mw) {
         auto ptr = std::make_shared<SGIconLabel>();
         ptr->parent = p;
         ptr->position = pos;
@@ -1582,7 +1582,7 @@ namespace sgui
         img_update = true;
         text_update = true;
         std::array<glbase::v2ct, 36> vert;
-        int bw = button_config.int_config["border"];
+        int32_t bw = button_config.int_config["border"];
         auto back = tex_rect[state & 0xf];
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
                               recti{back.left, back.top, bw, bw});
@@ -1602,7 +1602,7 @@ namespace sgui
                               recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
                               recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
-        for(int i = 0; i < 36; ++i)
+        for(int32_t i = 0; i < 36; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 36, &vert);
@@ -1622,15 +1622,15 @@ namespace sgui
     }
     
     v2i SGButton::GetTextOffset() {
-        int offx = (size_abs.x - text_width_cur) / 2;
-        int offy = (size_abs.y - text_height) / 2 - 3;
+        int32_t offx = (size_abs.x - text_width_cur) / 2;
+        int32_t offy = (size_abs.y - text_height) / 2 - 3;
         if(state == 2)
             return position_abs + v2i{offx, offy + 1};
         else
             return position_abs + v2i{offx, offy};
     }
     
-    int SGButton::GetMaxWidth() {
+    int32_t SGButton::GetMaxWidth() {
         return 0xffff;
     }
     
@@ -1810,7 +1810,7 @@ namespace sgui
             else
                 guiRoot.SetRectVertex(&vert[0], position_abs.x + rec.left, position_abs.y, rec.width, rec.height, checkbox_config.tex_config["down2"]);
         }
-        for(int i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 4; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 4, &vert);
@@ -1830,7 +1830,7 @@ namespace sgui
         PostResize(true, false);
     }
     
-    void SGCheckbox::SetSpacing(unsigned int x, unsigned int y) {
+    void SGCheckbox::SetSpacing(uint32_t x, uint32_t y) {
         SGTextBase::SetSpacing(x, y);
         PostResize(true, false);
     }
@@ -1840,7 +1840,7 @@ namespace sgui
         return position_abs + v2i{rec.left + rec.width + rec.top, (size_abs.y - text_height) / 2 - 2 };
     }
     
-    int SGCheckbox::GetMaxWidth() {
+    int32_t SGCheckbox::GetMaxWidth() {
         return 0xffff;
     }
     
@@ -1853,12 +1853,12 @@ namespace sgui
         PostResize(true, false);
     }
     
-    void SGCheckbox::SetText(const std::wstring& t, unsigned int cl) {
+    void SGCheckbox::SetText(const std::wstring& t, uint32_t cl) {
         SGTextBase::SetText(t, cl);
         PostResize(true, false);
     }
     
-    void SGCheckbox::AppendText(const std::wstring& t, unsigned int cl) {
+    void SGCheckbox::AppendText(const std::wstring& t, uint32_t cl) {
         SGTextBase::AppendText(t, cl);
         PostResize(true, false);
     }
@@ -1974,7 +1974,7 @@ namespace sgui
             else
                 guiRoot.SetRectVertex(&vert[0], position_abs.x + rec.left, position_abs.y, rec.width, rec.height, radio_config.tex_config["down2"]);
         }
-        for(int i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 4; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 4, &vert);
@@ -2099,11 +2099,11 @@ namespace sgui
         vertices_dirty = false;
         std::array<glbase::v2ct, 16> vert;
         if(is_horizontal) {
-            int hheight = scroll_config.int_config["hheight"];
+            int32_t hheight = scroll_config.int_config["hheight"];
             auto backh = scroll_config.tex_config["backh"];
             guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, size_abs.x, hheight, backh);
             if(slider_length) {
-                int slength = scroll_config.int_config["slength"];
+                int32_t slength = scroll_config.int_config["slength"];
                 auto sliderh = scroll_config.tex_config[slider_moving ? "sliderh3" : slider_hoving ? "sliderh2" : "sliderh1"];
                 auto rec = sliderh;
                 rec.width = slength;
@@ -2116,11 +2116,11 @@ namespace sgui
                 guiRoot.SetRectVertex(&vert[12], position_abs.x + current_pos + slider_length - slength, position_abs.y, rec.width, hheight, rec);
             }
         } else {
-            int vwidth = scroll_config.int_config["vwidth"];
+            int32_t vwidth = scroll_config.int_config["vwidth"];
             auto backv = scroll_config.tex_config["backv"];
             guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, vwidth, size_abs.y, backv);
             if(slider_length) {
-                int slength = scroll_config.int_config["slength"];
+                int32_t slength = scroll_config.int_config["slength"];
                 auto sliderv = scroll_config.tex_config[slider_moving ? "sliderv3" : slider_hoving ? "sliderv2" : "sliderv1"];
                 auto rec = sliderv;
                 rec.height = slength;
@@ -2133,7 +2133,7 @@ namespace sgui
                 guiRoot.SetRectVertex(&vert[12], position_abs.x, position_abs.y + current_pos + slider_length - slength, vwidth, rec.height, rec);
             }
         }
-        for(int i = 0; i < 16; ++i)
+        for(int32_t i = 0; i < 16; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 16, &vert);
@@ -2162,7 +2162,7 @@ namespace sgui
     }
     
     void SGScrollBar::SetValue(float cur) {
-        int prepos = current_pos;
+        int32_t prepos = current_pos;
         current_pos = (cur - minvalue) / maxvalue * (pos_max - pos_min);
         if(current_pos < 0)
             current_pos = 0;
@@ -2175,12 +2175,12 @@ namespace sgui
         }
     }
     
-    void SGScrollBar::SetSliderLength(int length) {
-        int prel = slider_length;
+    void SGScrollBar::SetSliderLength(int32_t length) {
+        int32_t prel = slider_length;
         if(length == 0) {
             slider_length = 0;
         } else {
-            int minl, maxl;
+            int32_t minl, maxl;
             if(is_horizontal) {
                 minl = scroll_config.tex_config["sliderh1"].width;
                 maxl = size_abs.x;
@@ -2239,7 +2239,7 @@ namespace sgui
     bool SGScrollBar::EventMouseWheel(MouseWheelEvent evt) {
         if(slider_length == 0)
             return false;
-        int prepos = current_pos;
+        int32_t prepos = current_pos;
         current_pos += (pos_max - pos_min) * evt.deltay / 50;
         if(current_pos < 0)
             current_pos = 0;
@@ -2289,7 +2289,7 @@ namespace sgui
         v2i delta = evt - position_drag;
         position_drag = evt;
         if(slider_moving) {
-            int prepos = current_pos;
+            int32_t prepos = current_pos;
             if(is_horizontal)
                 current_pos += delta.x + slider_diff;
             else
@@ -2379,11 +2379,11 @@ namespace sgui
         text_update = true;
         sel_change = true;
         std::array<glbase::v2ct, 40> vert;
-        int bw = textedit_config.int_config["border"];
+        int32_t bw = textedit_config.int_config["border"];
         auto back = textedit_config.tex_config[hoving ? "backh" : "back"];
         auto crect = textedit_config.tex_config["cursor"];
         auto curx = cursor_pos >= text.length() ? text_width_cur : text_pos_array[cursor_pos].x;
-        int ht = textedit_config.int_config["sel_height"];
+        int32_t ht = textedit_config.int_config["sel_height"];
         guiRoot.SetRectVertex(&vert[0], position_abs.x, position_abs.y, bw, bw,
                               recti{back.left, back.top, bw, bw});
         guiRoot.SetRectVertex(&vert[4], position_abs.x + bw, position_abs.y, size_abs.x - bw * 2, bw,
@@ -2403,7 +2403,7 @@ namespace sgui
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
                               recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[36], position_abs.x + curx + text_area.left - text_offset, position_abs.y + text_area.top, crect.width, ht, crect);
-        for(int i = 0; i < 40; ++i)
+        for(int32_t i = 0; i < 40; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 40, &vert);
@@ -2412,7 +2412,7 @@ namespace sgui
     void SGTextEdit::Draw() {
         if(draging) {
             double tm = guiRoot.GetTime();
-            int chk = (int)((tm - cursor_time) / 0.3);
+            int32_t chk = (int32_t)((tm - cursor_time) / 0.3);
             if(chk != drag_check) {
                 drag_check = chk;
                 CheckDragPos();
@@ -2422,13 +2422,13 @@ namespace sgui
         guiRoot.BindGuiTexture();
         glBindVertexArray(vao);
         double tm = guiRoot.GetTime();
-        if(read_only || !focus || sel_start != sel_end || ((int)((tm - cursor_time) / 0.5) % 2))
+        if(read_only || !focus || sel_start != sel_end || ((int32_t)((tm - cursor_time) / 0.5) % 2))
             glDrawElements(GL_TRIANGLE_STRIP, 9 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         else
             glDrawElements(GL_TRIANGLE_STRIP, 10 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
-        int tw = size_abs.x - text_area.left - text_area.width;
-        int th = size_abs.y - text_area.top - text_area.height;
+        int32_t tw = size_abs.x - text_area.left - text_area.width;
+        int32_t th = size_abs.y - text_area.top - text_area.height;
         for(auto chd : children)
             chd->Draw();
         guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
@@ -2442,12 +2442,12 @@ namespace sgui
         return position_abs + v2i{text_area.left - text_offset, text_area.top};
     }
     
-    int SGTextEdit::GetMaxWidth() {
+    int32_t SGTextEdit::GetMaxWidth() {
         return 0xffff;
     }
     
-    unsigned int SGTextEdit::GetTextColor(int index) {
-        if(index >= (int)sel_start && index < (int)sel_end)
+    uint32_t SGTextEdit::GetTextColor(int32_t index) {
+        if(index >= (int32_t)sel_start && index < (int32_t)sel_end)
             return sel_color;
         return color_vec[index];
     }
@@ -2456,7 +2456,7 @@ namespace sgui
         UpdateSelRegion();
         if(sel_start != sel_end) {
             glBindVertexArray(vao);
-            glDrawElements(GL_TRIANGLE_STRIP, 6 - 2, GL_UNSIGNED_SHORT, (GLvoid*)(uintptr_t)(sizeof(unsigned short) * 60));
+            glDrawElements(GL_TRIANGLE_STRIP, 6 - 2, GL_UNSIGNED_SHORT, (GLvoid*)(uintptr_t)(sizeof(uint16_t) * 60));
             glBindVertexArray(0);
         }
     }
@@ -2466,23 +2466,23 @@ namespace sgui
             return;
         sel_change = false;
         std::array<glbase::v2ct, 4> vert;
-        int ht = textedit_config.int_config["sel_height"];
+        int32_t ht = textedit_config.int_config["sel_height"];
         if(sel_start != sel_end) {
-            int ps = text_pos_array[sel_start].x;
-            int pe = sel_end >= text.length() ? text_width_cur : text_pos_array[sel_end].x;
+            int32_t ps = text_pos_array[sel_start].x;
+            int32_t pe = sel_end >= text.length() ? text_width_cur : text_pos_array[sel_end].x;
             v2i ta = position_abs + v2i{text_area.left - text_offset, text_area.top};
             guiRoot.SetRectVertex(&vert[0], ta.x + ps, ta.y, pe - ps, ht, textedit_config.tex_config["sel_rect"]);
         }
-        for(int i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 4; ++i)
             vert[i].color = sel_bcolor;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 40, sizeof(glbase::v2ct) * 4, &vert);
     }
     
-    void SGTextEdit::SetSelRegion(unsigned int start, unsigned int end) {
+    void SGTextEdit::SetSelRegion(uint32_t start, uint32_t end) {
         if(read_only)
             return;
-        unsigned int pres = sel_start, pree = sel_end;
+        uint32_t pres = sel_start, pree = sel_end;
         sel_start = std::min(start, end);
         sel_end = std::max(start, end);
         if(pres != sel_start || pree != sel_end) {
@@ -2492,12 +2492,12 @@ namespace sgui
     }
     
     void SGTextEdit::CheckCursorPos() {
-        int preoff = text_offset;
+        int32_t preoff = text_offset;
         if(text_width_cur <= size_abs.x - text_area.left - text_area.width)
             text_offset = 0;
         else {
-            int my = cursor_pos >= text.length() ? text_width_cur : text_pos_array[cursor_pos].x;
-            int size_w = size_abs.x - text_area.left - text_area.width - 10;
+            int32_t my = cursor_pos >= text.length() ? text_width_cur : text_pos_array[cursor_pos].x;
+            int32_t size_w = size_abs.x - text_area.left - text_area.width - 10;
             if(my < text_offset + 10) {
                 text_offset = my - 10;
                 if(text_offset < 0)
@@ -2512,14 +2512,14 @@ namespace sgui
     }
     
     void SGTextEdit::CheckDragPos() {
-        int cur = GetHitIndex(position_drag);
+        int32_t cur = GetHitIndex(position_drag);
         SetSelRegion(cursor_pos, cur);
-        int preoff = text_offset;
+        int32_t preoff = text_offset;
         if(text_width_cur <= size_abs.x - text_area.left - text_area.width)
             text_offset = 0;
         else {
-            int my = (cur >= (int)text.length()) ? text_width_cur : text_pos_array[cur].x;
-            int size_w = size_abs.x - text_area.left - text_area.width - 10;
+            int32_t my = (cur >= (int32_t)text.length()) ? text_width_cur : text_pos_array[cur].x;
+            int32_t size_w = size_abs.x - text_area.left - text_area.width - 10;
             if(my < text_offset + 10) {
                 text_offset = my - 10;
                 if(text_offset < 0)
@@ -2684,7 +2684,7 @@ namespace sgui
                     std::string utf8str = glfwGetClipboardString(nullptr);
                     std::wstring str = To<std::wstring>(utf8str);
                     text.insert(cursor_pos, str);
-                    std::vector<unsigned int> nvec;
+                    std::vector<uint32_t> nvec;
                     for(size_t i = 0; i < str.length(); ++i)
                         nvec.push_back(def_color);
                     color_vec.insert(color_vec.begin() + cursor_pos, nvec.begin(), nvec.end());
@@ -2790,9 +2790,9 @@ namespace sgui
         return true;
     }
     
-    unsigned int SGTextEdit::GetHitIndex(v2i pos) {
-        unsigned int index = 0;
-        int offset = pos.x - position_abs.x - text_area.left + text_offset;
+    uint32_t SGTextEdit::GetHitIndex(v2i pos) {
+        uint32_t index = 0;
+        int32_t offset = pos.x - position_abs.x - text_area.left + text_offset;
         for(auto& tpos : text_pos_array) {
             if(tpos.x > offset)
                 return index ? index - 1 : 0;
@@ -2815,10 +2815,10 @@ namespace sgui
         vertices_dirty = false;
         text_update = true;
         std::vector<glbase::v2ct> vert;
-        int m_item_count = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
+        int32_t m_item_count = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
         vert.resize(36 + m_item_count * 8);
         
-        int bw = listbox_config.int_config["border"];
+        int32_t bw = listbox_config.int_config["border"];
         auto back = listbox_config.tex_config[is_hoving ? "backh" : "back"];
         auto selrect = listbox_config.tex_config["sel_rect"];
         auto iconoffset = guiRoot.GetDefaultRect("iconoffset");
@@ -2841,24 +2841,24 @@ namespace sgui
                               recti{back.left + bw, back.top + back.height - bw, back.width - bw * 2, bw});
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
                               recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
-        for(int i = 0; i < 36; ++i)
+        for(int32_t i = 0; i < 36; ++i)
             vert[i].color = color;
-        int begini = text_offset / line_spacing;
+        int32_t begini = text_offset / line_spacing;
         item_count = 0;
-        unsigned int sel_color = listbox_config.int_config["sel_bcolor"];
-        unsigned int color1 = listbox_config.int_config["color1"];
-        unsigned int color2 = listbox_config.int_config["color2"];
+        uint32_t sel_color = listbox_config.int_config["sel_bcolor"];
+        uint32_t color1 = listbox_config.int_config["color1"];
+        uint32_t color2 = listbox_config.int_config["color2"];
         for(size_t i = begini; i < items.size() && i < (size_t)(begini + m_item_count); ++i) {
-            int li = i - begini;
+            int32_t li = i - begini;
             guiRoot.SetRectVertex(&vert[36 + li * 8], position_abs.x + bw, position_abs.y + bw + i * line_spacing - text_offset,
                                   size_abs.x - bw * 2, line_spacing, selrect);
-            unsigned int bcolor = (i == (size_t)current_sel) ? sel_color : (i % 2) ? color1 : color2;
-            for(int j = 0; j < 4; ++j)
+            uint32_t bcolor = (i == (size_t)current_sel) ? sel_color : (i % 2) ? color1 : color2;
+            for(int32_t j = 0; j < 4; ++j)
                 vert[36 + li * 8 + j].color = bcolor;
-            int iconi = std::get<0>(items[i]);
+            int32_t iconi = std::get<0>(items[i]);
             if(iconi) {
-                int x = (iconi - 1) % iconrc;
-                int y = (iconi - 1) / iconrc;
+                int32_t x = (iconi - 1) % iconrc;
+                int32_t y = (iconi - 1) / iconrc;
                 recti rct = iconoffset;
                 rct.left += x * iconoffset.width;
                 rct.top += y * iconoffset.height;
@@ -2888,13 +2888,13 @@ namespace sgui
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLE_STRIP, 9 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
-        int tw = size_abs.x - text_area.left - text_area.width;
-        int th = size_abs.y - text_area.top - text_area.height;
+        int32_t tw = size_abs.x - text_area.left - text_area.width;
+        int32_t th = size_abs.y - text_area.top - text_area.height;
         for(auto chd : children)
             chd->Draw();
         guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
         glBindVertexArray(vao);
-        glDrawElements(GL_TRIANGLE_STRIP, item_count * 2 * 6 - 2, GL_UNSIGNED_SHORT, (GLvoid*)(uintptr_t)(sizeof(unsigned short) * 54));
+        glDrawElements(GL_TRIANGLE_STRIP, item_count * 2 * 6 - 2, GL_UNSIGNED_SHORT, (GLvoid*)(uintptr_t)(sizeof(uint16_t) * 54));
         glBindVertexArray(0);
         DrawText();
         guiRoot.EndScissor();
@@ -2914,19 +2914,19 @@ namespace sgui
         if(items.size() == 0)
             return;
         auto tex_size = font->GetTexture().GetSize();
-        int font_size = font->GetFontSize();
+        int32_t font_size = font->GetFontSize();
         std::vector<glbase::v2ct> charvtx;
         std::vector<glbase::v2ct> iconvtx;
         glbase::v2ct cur_char;
         v2i text_pos = GetTextOffset();
-        int itemcount = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
-        int begini = text_offset / line_spacing;
-        int scolor = listbox_config.int_config["sel_color"];
-        int iconw = guiRoot.GetDefaultRect("iconoffset").width;
+        int32_t itemcount = (size_abs.y - text_area.top - text_area.height - 1) / line_spacing + 2;
+        int32_t begini = text_offset / line_spacing;
+        int32_t scolor = listbox_config.int_config["sel_color"];
+        int32_t iconw = guiRoot.GetDefaultRect("iconoffset").width;
         for(size_t i = begini; i < items.size() && i < (size_t)(begini + itemcount); ++i) {
-            unsigned int advx = std::get<0>(items[i]) ? iconw : 0;
-            unsigned int advy = font_size + line_spacing * i;
-            unsigned int color = (i == (size_t)current_sel) ? scolor : std::get<2>(items[i]);
+            uint32_t advx = std::get<0>(items[i]) ? iconw : 0;
+            uint32_t advy = font_size + line_spacing * i;
+            uint32_t color = (i == (size_t)current_sel) ? scolor : std::get<2>(items[i]);
             for(auto ch : std::get<1>(items[i])) {
                 if(ch < L' ')
                     continue;
@@ -2970,7 +2970,7 @@ namespace sgui
         }
     }
     
-    void SGListBox::InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color, int val) {
+    void SGListBox::InsertItem(uint32_t index, uint16_t icon, const std::wstring& item, uint32_t color, int32_t val) {
         if(index >= items.size())
             items.push_back(std::make_tuple(icon, item, color, val));
         else
@@ -2983,7 +2983,7 @@ namespace sgui
         vertices_dirty = true;
     }
     
-    void SGListBox::AddItem(unsigned short icon, const std::wstring& item, unsigned int color, int val) {
+    void SGListBox::AddItem(uint16_t icon, const std::wstring& item, uint32_t color, int32_t val) {
         items.push_back(std::make_tuple(icon, item, color, val));
         if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
             auto sptr = std::static_pointer_cast<SGScrollBar>(children[0]);
@@ -2993,7 +2993,7 @@ namespace sgui
         vertices_dirty = true;
     }
     
-    void SGListBox::RemoveItem(unsigned int index) {
+    void SGListBox::RemoveItem(uint32_t index) {
         if(index >= items.size())
             return;
         items.erase(items.begin() + index);
@@ -3018,39 +3018,39 @@ namespace sgui
         vertices_dirty = true;
     }
     
-    void SGListBox::SetItemIcon(unsigned int index, unsigned short icon) {
+    void SGListBox::SetItemIcon(uint32_t index, uint16_t icon) {
         if(items.size() == 0)
             return;
         std::get<0>(items[index]) = icon;
     }
     
-    void SGListBox::SetItemText(unsigned int index, const std::wstring& text, unsigned int color) {
+    void SGListBox::SetItemText(uint32_t index, const std::wstring& text, uint32_t color) {
         if(items.size() == 0)
             return;
         std::get<1>(items[index]) = text;
         std::get<2>(items[index]) = color;
     }
     
-    void SGListBox::SetItemValue(unsigned int index, int val) {
+    void SGListBox::SetItemValue(uint32_t index, int32_t val) {
         if(items.size() == 0)
             return;
         std::get<3>(items[index]) = val;
     }
     
-    const std::tuple<unsigned short, std::wstring, unsigned int, int>& SGListBox::GetItem(unsigned int index) {
-        static std::tuple<unsigned short, std::wstring, unsigned int, int> st;
+    const std::tuple<uint16_t, std::wstring, uint32_t, int32_t>& SGListBox::GetItem(uint32_t index) {
+        static std::tuple<uint16_t, std::wstring, uint32_t, int32_t> st;
         if(index >= items.size())
             return st;
         return items[index];
     }
     
-    void SGListBox::SetSelection(int sel) {
-        if(sel < 0 || sel >= (int)items.size())
+    void SGListBox::SetSelection(int32_t sel) {
+        if(sel < 0 || sel >= (int32_t)items.size())
             current_sel = -1;
         else {
             current_sel = sel;
             if(items.size() * line_spacing > (size_t)(size_abs.y - text_area.top - text_area.height)) {
-                int max_offset = items.size() * line_spacing - (size_abs.y - text_area.top - text_area.height);
+                int32_t max_offset = items.size() * line_spacing - (size_abs.y - text_area.top - text_area.height);
                 text_offset = current_sel * line_spacing;
                 if(text_offset > max_offset)
                     text_offset = max_offset;
@@ -3060,11 +3060,11 @@ namespace sgui
         vertices_dirty = true;
     }
     
-    int SGListBox::GetSeletion() {
+    int32_t SGListBox::GetSeletion() {
         return current_sel;
     }
     
-    int SGListBox::GetHoverItem(int offsetx, int offsety) {
+    int32_t SGListBox::GetHoverItem(int32_t offsetx, int32_t offsety) {
         if(offsetx >= position_abs.x + text_area.left
            && offsetx <= position_abs.x + size_abs.x - text_area.width
            && offsety >= position_abs.y + text_area.top
@@ -3083,7 +3083,7 @@ namespace sgui
             if(evt.button == GLFW_MOUSE_BUTTON_LEFT
                && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
                && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
-                int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+                int32_t sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
                 double now = guiRoot.GetTime();
                 if(sel == current_sel) {
                     if(now - click_time < 0.3) {
@@ -3177,7 +3177,7 @@ namespace sgui
         virtual bool EventMouseMove(MouseMoveEvent evt) {
             bool ret = SGWidgetContainer::EventMouseMove(evt);
             if(hoving.expired()) {
-                int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+                int32_t sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
                 if(current_sel != sel) {
                     current_sel = sel;
                     vertices_dirty = true;
@@ -3194,7 +3194,7 @@ namespace sgui
             } else if(evt.button == GLFW_MOUSE_BUTTON_LEFT
                       && evt.x >= position_abs.x + text_area.left && evt.x <= position_abs.x + size_abs.x - text_area.width
                       && evt.y >= position_abs.y + text_area.top && evt.y <= position_abs.y + size_abs.y - text_area.height) {
-                int sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
+                int32_t sel = (evt.y - position_abs.y - text_area.top + text_offset) / line_spacing;
                 auto cb = combo_box.lock();
                 if(cb != nullptr) {
                     cb->SetSelection(sel);
@@ -3275,8 +3275,8 @@ namespace sgui
         vertices_dirty = false;
         text_update = true;
         std::array<glbase::v2ct, 40> vert;
-        int bw = combobox_config.int_config["border"];
-        int ht = combobox_config.int_config["height"];
+        int32_t bw = combobox_config.int_config["border"];
+        int32_t ht = combobox_config.int_config["height"];
         auto back = combobox_config.tex_config[is_hoving ? "backh" : "back"];
         auto down = combobox_config.tex_config[show_item ? "down3" : is_hoving ? "down2" : "down1"];
         auto drop = combobox_config.tex_config["drop_area"];
@@ -3299,7 +3299,7 @@ namespace sgui
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + ht - bw, bw, bw,
                               recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         guiRoot.SetRectVertex(&vert[36], position_abs.x + size_abs.x - drop.left, position_abs.y + drop.top, drop.width, drop.height, down);
-        for(int i = 0; i < 40; ++i)
+        for(int32_t i = 0; i < 40; ++i)
             vert[i].color = color;
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 40, &vert[0]);
@@ -3311,8 +3311,8 @@ namespace sgui
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLE_STRIP, 10 * 6 - 2, GL_UNSIGNED_SHORT, 0);
         glBindVertexArray(0);
-        int tw = size_abs.x - text_area.left - text_area.width;
-        int th = size_abs.y - text_area.top - text_area.height;
+        int32_t tw = size_abs.x - text_area.left - text_area.width;
+        int32_t th = size_abs.y - text_area.top - text_area.height;
         guiRoot.BeginScissor(recti{position_abs.x + text_area.left, position_abs.y + text_area.top, tw, th});
         DrawText();
         guiRoot.EndScissor();
@@ -3327,24 +3327,24 @@ namespace sgui
         return position_abs + v2i{text_area.left, text_area.top};
     }
     
-    void SGComboBox::InsertItem(unsigned int index, const std::wstring& item, unsigned int color, int val) {
+    void SGComboBox::InsertItem(uint32_t index, const std::wstring& item, uint32_t color, int32_t val) {
         items.insert(items.begin() + index, std::make_tuple(item, color, val));
-        if(current_sel >= 0 && (int)index <= current_sel)
+        if(current_sel >= 0 && (int32_t)index <= current_sel)
             current_sel++;
     }
     
-    void SGComboBox::AddItem(const std::wstring& item, unsigned int color, int val) {
+    void SGComboBox::AddItem(const std::wstring& item, uint32_t color, int32_t val) {
         items.push_back(std::make_tuple(item, color, val));
     }
     
-    void SGComboBox::RemoveItem(unsigned int index) {
+    void SGComboBox::RemoveItem(uint32_t index) {
         if((size_t)index >= items.size())
             return;
         items.erase(items.begin() + index);
-        if((int)index == current_sel) {
+        if((int32_t)index == current_sel) {
             ClearText();
             current_sel = -1;
-        } else if((int)index < current_sel)
+        } else if((int32_t)index < current_sel)
             current_sel--;
     }
     
@@ -3354,23 +3354,23 @@ namespace sgui
         current_sel = -1;
     }
     
-    void SGComboBox::SetItemText(unsigned int index, const std::wstring& text, unsigned int color) {
+    void SGComboBox::SetItemText(uint32_t index, const std::wstring& text, uint32_t color) {
         if((size_t)index >= items.size())
             return;
         auto& it = items[index];
         std::get<0>(it) = text;
         std::get<1>(it) = color;
-        if(index == (unsigned int)current_sel)
+        if(index == (uint32_t)current_sel)
             SetText(text, color);
     }
     
-    void SGComboBox::SetItemValue(unsigned int index, int val) {
+    void SGComboBox::SetItemValue(uint32_t index, int32_t val) {
         if((size_t)index >= items.size())
             return;
         std::get<2>(items[index]) = val;
     }
     
-    void SGComboBox::SetSelection(int sel) {
+    void SGComboBox::SetSelection(int32_t sel) {
         if(sel < 0 || (size_t)sel >= items.size())
             sel = -1;
         if(sel != current_sel) {
@@ -3381,11 +3381,11 @@ namespace sgui
         }
     }
     
-    int SGComboBox::GetSelection() {
+    int32_t SGComboBox::GetSelection() {
         return current_sel;
     }
     
-    int SGComboBox::GetSelectedValue() {
+    int32_t SGComboBox::GetSelectedValue() {
         if(current_sel == -1 || (size_t)current_sel >= items.size())
             return 0;
         return std::get<2>(items[current_sel]);
@@ -3476,9 +3476,9 @@ namespace sgui
             auto ptr = std::static_pointer_cast<SGTabControl>(parent.lock());
             v2i ssize = ptr->GetClientSize();
             if(res)
-                size_abs = size + v2i{(int)(ssize.x * size_prop.x), (int)(ssize.y * size_prop.y)};
+                size_abs = size + v2i{(int32_t)(ssize.x * size_prop.x), (int32_t)(ssize.y * size_prop.y)};
             if(rep) {
-                position_abs = position + v2i{(int)(ssize.x * position_prop.x), (int)(ssize.y * position_prop.y)};
+                position_abs = position + v2i{(int32_t)(ssize.x * position_prop.x), (int32_t)(ssize.y * position_prop.y)};
                 position_abs += ptr->GetClientPosition();
             }
             if(res)
@@ -3498,7 +3498,7 @@ namespace sgui
         }
         
         std::wstring title;
-        unsigned int width;
+        uint32_t width;
     };
     
     SGConfig SGTabControl::tab_config;
@@ -3522,8 +3522,8 @@ namespace sgui
         text_update = true;
         std::vector<glbase::v2ct> vert;
         
-        int bw = tab_config.int_config["client_border"];
-        int ht = tab_config.int_config["client_height"];
+        int32_t bw = tab_config.int_config["client_border"];
+        int32_t ht = tab_config.int_config["client_height"];
         auto back = tab_config.tex_config["client_area"];
         
         vert.resize((9 + item_count * 3) * 4);
@@ -3547,16 +3547,16 @@ namespace sgui
         guiRoot.SetRectVertex(&vert[32], position_abs.x + size_abs.x - bw, position_abs.y + size_abs.y - bw, bw, bw,
                               recti{back.left + back.width - bw, back.top + back.height - bw, bw, bw});
         
-        int tb = tab_config.int_config["tab_border"];
+        int32_t tb = tab_config.int_config["tab_border"];
         auto t1 = tab_config.tex_config["tab_title1"];
         auto t2 = tab_config.tex_config["tab_title2"];
         auto t3 = tab_config.tex_config["tab_title3"];
-        int ew = tab_config.int_config["extra_width"];
-        int ti = tab_ol;
-        int startv = 36;
+        int32_t ew = tab_config.int_config["extra_width"];
+        int32_t ti = tab_ol;
+        int32_t startv = 36;
         bool act = false;
-        int actti = 0;
-        for(int i = 0; i < item_count; ++i) {
+        int32_t actti = 0;
+        for(int32_t i = 0; i < item_count; ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
             if(ptr == active_tab.lock()) {
                 act = true;
@@ -3632,14 +3632,14 @@ namespace sgui
             return;
         size_dirty = false;
         item_count = 0;
-        int sz = children.size();
+        int32_t sz = children.size();
         if(sz == 0)
             return;
-        int width = size_abs.x - tab_ol - tab_or;
-        int w1 = tab_config.int_config["tab_min_width1"];
-        int w2 = tab_config.int_config["tab_min_width2"];
-        int wp = width / sz;
-        int wh = wp;
+        int32_t width = size_abs.x - tab_ol - tab_or;
+        int32_t w1 = tab_config.int_config["tab_min_width1"];
+        int32_t w2 = tab_config.int_config["tab_min_width2"];
+        int32_t wp = width / sz;
+        int32_t wh = wp;
         if(wh < w2) {
             wh = w2;
             if(sz > 1)
@@ -3648,7 +3648,7 @@ namespace sgui
         if(wp < w1)
             wp = w1;
         auto atb = active_tab.lock();
-        int max_w = 0;
+        int32_t max_w = 0;
         for(size_t i = 0; i < children.size(); ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
             if(ptr == atb)
@@ -3656,7 +3656,7 @@ namespace sgui
             else
                 ptr->width = wp;
             if(item_count == 0) {
-                if((int)(max_w + ptr->width) > width)
+                if((int32_t)(max_w + ptr->width) > width)
                     item_count = i + 1;
                 else
                     max_w += ptr->width;
@@ -3680,16 +3680,16 @@ namespace sgui
         std::vector<glbase::v2ct> iconvtx;
         glbase::v2ct cur_char;
         v2i text_pos = GetTextOffset();
-        int tb = tab_config.int_config["tab_border"];
-        int ti = tab_ol;
-        int font_size = font->GetFontSize();
+        int32_t tb = tab_config.int_config["tab_border"];
+        int32_t ti = tab_ol;
+        int32_t font_size = font->GetFontSize();
         text_pos.y += font_size + tab_config.int_config["title_offset"];
         for(size_t i = 0; i < children.size(); ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
-            unsigned int advx = ti + tb;
-            unsigned int color = ptr->color;
+            uint32_t advx = ti + tb;
+            uint32_t color = ptr->color;
             ti += ptr->width;
-            unsigned int tw = tb * 2;
+            uint32_t tw = tb * 2;
             for(auto ch : ptr->title) {
                 if(ch < L' ')
                     continue;
@@ -3746,7 +3746,7 @@ namespace sgui
         }
     }
     
-    void SGTabControl::AddTab(const std::wstring& title, unsigned int color) {
+    void SGTabControl::AddTab(const std::wstring& title, uint32_t color) {
         auto ptr = std::make_shared<SGTabInner>();
         ptr->parent = std::static_pointer_cast<SGWidgetContainer>(shared_from_this());
         ptr->title = title;
@@ -3759,7 +3759,7 @@ namespace sgui
         size_dirty = true;
     }
     
-    void SGTabControl::RemoveTab(unsigned int index) {
+    void SGTabControl::RemoveTab(uint32_t index) {
         if(index >= children.size())
             return;
         if(children[index] == active_tab.lock()) {
@@ -3773,7 +3773,7 @@ namespace sgui
         size_dirty = true;
     }
     
-    void SGTabControl::SetTabTitle(unsigned int index, const std::wstring& title, unsigned int color) {
+    void SGTabControl::SetTabTitle(uint32_t index, const std::wstring& title, uint32_t color) {
         if((size_t)index >= children.size())
             return;
         auto ptr = std::static_pointer_cast<SGTabInner>(children[index]);
@@ -3783,24 +3783,24 @@ namespace sgui
         text_update = true;
     }
     
-    std::shared_ptr<SGWidgetContainer> SGTabControl::GetTab(int index) {
-        if(index >= (int)children.size())
+    std::shared_ptr<SGWidgetContainer> SGTabControl::GetTab(int32_t index) {
+        if(index >= (int32_t)children.size())
             return nullptr;
         return std::static_pointer_cast<SGWidgetContainer>(children[index]);
     }
     
-    void SGTabControl::SetActiveTab(int index) {
-        if(index >= (int)children.size())
+    void SGTabControl::SetActiveTab(int32_t index) {
+        if(index >= (int32_t)children.size())
             return;
         active_tab = children[index];
         vertices_dirty = true;
     }
     
-    int SGTabControl::GetTabCount() {
+    int32_t SGTabControl::GetTabCount() {
         return children.size();
     }
     
-    int SGTabControl::GetActiveTab() {
+    int32_t SGTabControl::GetActiveTab() {
         for(size_t i = 0; i < children.size(); ++i)
             if(children[i] == active_tab.lock())
                 return i;
@@ -3814,7 +3814,7 @@ namespace sgui
                     active_tab.lock()->EventMouseLeave();
                 in_tab = false;
             }
-            int ind = GetHovingTab(v2i{evt.x, evt.y});
+            int32_t ind = GetHovingTab(v2i{evt.x, evt.y});
             if(ind == -1)
                 return true;
             auto ptr = children[ind];
@@ -3859,7 +3859,7 @@ namespace sgui
     bool SGTabControl::EventMouseButtonDown(MouseButtonEvent evt) {
         if(!in_tab) {
             if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
-                int ind = GetHovingTab(v2i{evt.x, evt.y});
+                int32_t ind = GetHovingTab(v2i{evt.x, evt.y});
                 if(ind == -1)
                     return true;
                 auto ptr = children[ind];
@@ -3912,13 +3912,13 @@ namespace sgui
         return false;
     }
     
-    int SGTabControl::GetHovingTab(v2i pos) {
+    int32_t SGTabControl::GetHovingTab(v2i pos) {
         if(children.size() == 0)
             return -1;
-        int ti = position_abs.x + tab_ol;
+        int32_t ti = position_abs.x + tab_ol;
         for(size_t i = 0; i < children.size(); ++i) {
             auto ptr = std::static_pointer_cast<SGTabInner>(children[i]);
-            if(pos.x >= ti && pos.x <= (int)(ti + ptr->width))
+            if(pos.x >= ti && pos.x <= (int32_t)(ti + ptr->width))
                 return i;
             ti += ptr->width;
         }

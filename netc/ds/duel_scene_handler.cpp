@@ -33,15 +33,15 @@ namespace ygopro
         proto_handler->BeginProto();
     }
     
-    void DuelProtoHandler::ProcessMsg(unsigned int sz) {
+    void DuelProtoHandler::ProcessMsg(uint32_t sz) {
         BufferUtil reader(&msg_buffer[0], sz);
         while(!reader.IsEnd()) {
-            unsigned char msg_type = reader.Read<unsigned char>();
+            uint8_t msg_type = reader.Read<uint8_t>();
             MessageToCmd(msg_type, reader);
         }
     }
 
-    int DuelProtoHandler::MessageToCmd(unsigned char msg_type, BufferUtil& reader) {
+    int32_t DuelProtoHandler::MessageToCmd(uint8_t msg_type, BufferUtil& reader) {
         switch(msg_type) {
             case MSG_RETRY:
                 PushCommand(std::make_shared<DuelMsgRetry>(reader));

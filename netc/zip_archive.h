@@ -5,25 +5,25 @@
 
 namespace ygopro
 {
-    const int ZIP_HEADER_SIZE = 30;
-    const int ZIP_FILEDESC_SIZE = 12;
+    const int32_t ZIP_HEADER_SIZE = 30;
+    const int32_t ZIP_FILEDESC_SIZE = 12;
     
 #ifdef _WIN32
     #pragma pack(push, 2)
 #endif
 	// header = 0x04034b50
     struct ZipHeader {
-        int block_header;
-        short ver_req;
-        short global_sig;
-        short comp_fun; // only support 00-no compression 08-deflate
-        short mod_time;
-        short mod_date;
-        int crc32;
-        int comp_size;
-        int file_size;
-        short name_size;
-        short ex_size;
+        int32_t block_header;
+        int16_t ver_req;
+        int16_t global_sig;
+        int16_t comp_fun; // only support 00-no compression 08-deflate
+        int16_t mod_time;
+        int16_t mod_date;
+        int32_t crc32;
+        int32_t comp_size;
+        int32_t file_size;
+        int16_t name_size;
+        int16_t ex_size;
         char name_ptr[1];
 #ifdef _WIN32
     };
@@ -35,17 +35,17 @@ namespace ygopro
     struct ZipFileInfo {
         std::string src_file;
         bool compressed;
-        long data_offset;
-        long comp_size;
-        long file_size;
+        size_t data_offset;
+        size_t comp_size;
+        size_t file_size;
     };
     
     class ZipArchive {
     public:
         ~ZipArchive();
         void Load(const std::vector<std::wstring>& files);
-        int GetFileLength(const std::string& filename);
-        int ReadFile(const std::string& filename, unsigned char* buffer);
+        size_t GetFileLength(const std::string& filename);
+        size_t ReadFile(const std::string& filename, uint8_t* buffer);
     
     protected:
         void _load_inner();

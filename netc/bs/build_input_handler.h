@@ -21,8 +21,8 @@ namespace ygopro
         
     protected:
         std::weak_ptr<BuildScene> build_scene;
-        std::pair<int, int> hover_pos;
-        std::pair<int, int> click_pos;
+        std::pair<int32_t, int32_t> hover_pos;
+        std::pair<int32_t, int32_t> click_pos;
         std::weak_ptr<DeckCardData> hover_obj;
         bool show_info = false;
         bool show_info_begin = false;

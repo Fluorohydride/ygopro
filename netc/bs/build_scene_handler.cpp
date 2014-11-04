@@ -39,7 +39,7 @@ namespace ygopro
         auto menu_deck = sgui::SGButton::Create(pnl, {250, 5}, {70, 25});
         menu_deck->SetText(stringCfg["eui_menu_deck"], 0xff000000);
         menu_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
+            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int32_t id){
                 OnMenuDeck(id);
             })
             .AddButton(stringCfg["eui_deck_load"])
@@ -53,7 +53,7 @@ namespace ygopro
         auto menu_tool = sgui::SGButton::Create(pnl, {325, 5}, {70, 25});
         menu_tool->SetText(stringCfg["eui_menu_tool"], 0xff000000);
         menu_tool->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
+            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int32_t id){
                 OnMenuTool(id);
             })
             .AddButton(stringCfg["eui_tool_sort"])
@@ -66,7 +66,7 @@ namespace ygopro
         auto menu_list = sgui::SGButton::Create(pnl, {400, 5}, {70, 25});
         menu_list->SetText(stringCfg["eui_menu_list"], 0xff000000);
         menu_list->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int id){
+            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int32_t id){
                 OnMenuList(id);
             })
             .AddButton(stringCfg["eui_list_forbidden"])
@@ -79,17 +79,17 @@ namespace ygopro
         menu_search->SetText(stringCfg["eui_menu_search"], 0xff000000);
         menu_search->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             filter_dialog->Show(SceneMgr::Get().GetMousePosition());
-            filter_dialog->SetOKCallback([this](const FilterCondition fc, int lmt)->void {
+            filter_dialog->SetOKCallback([this](const FilterCondition fc, int32_t lmt)->void {
                 Search(fc, lmt);
             });
             return true;
         });
         auto limit_reg = sgui::SGComboBox::Create(pnl, {550, 2}, {150, 30});
         auto& lrs = LimitRegulationMgr::Get().GetLimitRegulations();
-        for(unsigned int i = 0; i < lrs.size(); ++i)
+        for(uint32_t i = 0; i < lrs.size(); ++i)
             limit_reg->AddItem(lrs[i].name, 0xff000000);
         limit_reg->SetSelection(0);
-        limit_reg->eventSelChange.Bind([this](sgui::SGWidget& sender, int index)->bool {
+        limit_reg->eventSelChange.Bind([this](sgui::SGWidget& sender, int32_t index)->bool {
             auto v = view_regulation;
             build_scene.lock()->ChangeRegulation(index, view_regulation);
             view_regulation = v;
@@ -123,7 +123,7 @@ namespace ygopro
         });
     }
     
-    void BuildSceneHandler::ViewRegulation(int limit) {
+    void BuildSceneHandler::ViewRegulation(int32_t limit) {
         build_scene.lock()->ViewRegulation(limit);
         view_regulation = limit + 1;
         current_file.clear();
@@ -149,7 +149,7 @@ namespace ygopro
         view_regulation = 0;
     }
     
-    void BuildSceneHandler::OnMenuDeck(int id) {
+    void BuildSceneHandler::OnMenuDeck(int32_t id) {
         switch(id) {
             case 0:
                 file_dialog->Show(stringCfg["eui_msg_deck_load"], commonCfg["deck_path"], L".ydk");
@@ -208,7 +208,7 @@ namespace ygopro
         }
     }
     
-    void BuildSceneHandler::OnMenuTool(int id) {
+    void BuildSceneHandler::OnMenuTool(int32_t id) {
         switch(id) {
             case 0:
                 build_scene.lock()->SortDeck();
@@ -253,7 +253,7 @@ namespace ygopro
         }
     }
     
-    void BuildSceneHandler::OnMenuList(int id) {
+    void BuildSceneHandler::OnMenuList(int32_t id) {
         switch(id) {
             case 0:
                 ViewRegulation(0);
@@ -269,9 +269,9 @@ namespace ygopro
         }
     }
     
-    void BuildSceneHandler::ShowCardInfo(unsigned int code) {
-        int w = 700;
-        int h = 320;
+    void BuildSceneHandler::ShowCardInfo(uint32_t code) {
+        int32_t w = 700;
+        int32_t h = 320;
         auto scene_size = SceneMgr::Get().GetSceneSize();
         info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2}, {w, h});
     }
@@ -280,7 +280,7 @@ namespace ygopro
         info_panel->Destroy();
     }
     
-    void BuildSceneHandler::SetDeckLabel(const std::wstring& str, unsigned int cl) {
+    void BuildSceneHandler::SetDeckLabel(const std::wstring& str, uint32_t cl) {
         if(!deck_label.expired())
             deck_label.lock()->SetText(str, 0xff000000);
     }
@@ -290,7 +290,7 @@ namespace ygopro
             return;
         result_page--;
         std::array<CardData*, 10> new_results;
-        for(int i = 0; i < 10; ++i) {
+        for(int32_t i = 0; i < 10; ++i) {
             if((size_t)(result_page * 10 + i) < search_result.size())
                 new_results[i] = search_result[result_page * 10 + i];
             else
@@ -299,7 +299,7 @@ namespace ygopro
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
-            int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
             ptr->SetText(s, 0xff000000);
         }
@@ -310,7 +310,7 @@ namespace ygopro
             return;
         result_page++;
         std::array<CardData*, 10> new_results;
-        for(int i = 0; i < 10; ++i) {
+        for(int32_t i = 0; i < 10; ++i) {
             if((size_t)(result_page * 10 + i) < search_result.size())
                 new_results[i] = search_result[result_page * 10 + i];
             else
@@ -319,13 +319,13 @@ namespace ygopro
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
-            int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
             ptr->SetText(s, 0xff000000);
         }
     }
     
-    void BuildSceneHandler::Search(const FilterCondition& fc, int lmt) {
+    void BuildSceneHandler::Search(const FilterCondition& fc, int32_t lmt) {
         if(lmt == 0)
             search_result = DataMgr::Get().FilterCard(fc);
         else
@@ -333,7 +333,7 @@ namespace ygopro
         std::sort(search_result.begin(), search_result.end(), CardData::card_sort);
         result_page = 0;
         std::array<CardData*, 10> new_results;
-        for(int i = 0; i < 10; ++i) {
+        for(int32_t i = 0; i < 10; ++i) {
             if((size_t)(i) < search_result.size())
                 new_results[i] = search_result[i];
             else
@@ -351,7 +351,7 @@ namespace ygopro
         }
         auto ptr2 = label_page.lock();
         if(ptr2 != nullptr) {
-            int pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
             ptr2->SetText(s, 0xff000000);
         }

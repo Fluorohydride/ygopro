@@ -20,7 +20,7 @@ namespace ygopro
             rapidxml::xml_attribute<>* value_attr = key_attr->next_attribute();
             if(config_name == "integer") {
                 std::string key = key_attr->value();
-                long val = To<long>(value_attr->value());
+                int64_t val = To<int64_t>(value_attr->value());
                 config_map[key] = val;
             } else if(config_name == "float") {
                 std::string key = key_attr->value();
@@ -48,7 +48,7 @@ namespace ygopro
             if(iter.second.val_type == 0) {
                 config_node = doc.allocate_node(rapidxml::node_element, "integer", nullptr);
                 config_node->append_attribute(doc.allocate_attribute("name", iter.first.c_str()));
-                config_node->append_attribute(doc.allocate_attribute("value", To<std::string>((long)iter.second).c_str()));
+                config_node->append_attribute(doc.allocate_attribute("value", To<std::string>((int64_t)iter.second).c_str()));
             } else if(iter.second.val_type == 1) {
                 config_node = doc.allocate_node(rapidxml::node_element, "float", nullptr);
                 config_node->append_attribute(doc.allocate_attribute("name", iter.first.c_str()));

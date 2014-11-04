@@ -5,35 +5,35 @@ namespace ygopro
 {
 
     struct FilterCondition {
-        unsigned int code = 0;
-        unsigned int setcode = 0;
-        unsigned int pool = 0;
-        unsigned int type = 0;
-        unsigned int subtype = 0;
-        int atkmin = -1;
-        int atkmax = -1;
-        int defmin = -1;
-        int defmax = -1;
-        int lvmin = 0;
-        int lvmax = 0;
-        unsigned int race = 0;
-        unsigned int attribute = 0;
+        uint32_t code = 0;
+        uint32_t setcode = 0;
+        uint32_t pool = 0;
+        uint32_t type = 0;
+        uint32_t subtype = 0;
+        int32_t atkmin = -1;
+        int32_t atkmax = -1;
+        int32_t defmin = -1;
+        int32_t defmax = -1;
+        int32_t lvmin = 0;
+        int32_t lvmax = 0;
+        uint32_t race = 0;
+        uint32_t attribute = 0;
         std::wstring keyword;
     };
     
 	struct CardData {
-        unsigned int dbsrc;
-		unsigned int code;
-		unsigned int pool;
-		unsigned int alias;
-		unsigned long long setcode;
-		unsigned int type;
-		int attack;
-		int defence;
-		unsigned int level;
-		unsigned int race;
-		unsigned int attribute;
-		unsigned int category;
+        uint32_t dbsrc;
+		uint32_t code;
+		uint32_t pool;
+		uint32_t alias;
+		uint64_t setcode;
+		uint32_t type;
+		int32_t attack;
+		int32_t defence;
+		uint32_t level;
+		uint32_t race;
+		uint32_t attribute;
+		uint32_t category;
         std::wstring name;
 		std::wstring texts;
         std::wstring desc[16];
@@ -46,21 +46,21 @@ namespace ygopro
     
 	class DataMgr : public Singleton<DataMgr> {
 	public:
-		int LoadDatas(const std::wstring& file);
-		CardData* operator [] (unsigned int code);
-        std::vector<unsigned int> AllAliases(unsigned int code);
+		int32_t LoadDatas(const std::wstring& file);
+		CardData* operator [] (uint32_t code);
+        std::vector<uint32_t> AllAliases(uint32_t code);
         std::vector<CardData*> FilterCard(const FilterCondition& fc);
         
-        static std::wstring GetAttributeString(unsigned int attr);
-        static std::wstring GetRaceString(unsigned int race);
-        static std::wstring GetTypeString(unsigned int arctype);
-        static std::wstring GetTypeString2(unsigned int arctype);
+        static std::wstring GetAttributeString(uint32_t attr);
+        static std::wstring GetRaceString(uint32_t race);
+        static std::wstring GetTypeString(uint32_t arctype);
+        static std::wstring GetTypeString2(uint32_t arctype);
         
-        void RegisterSetCode(unsigned int code, const std::wstring& value) {
+        void RegisterSetCode(uint32_t code, const std::wstring& value) {
             _setcodes[code] = value;
         }
         
-        const std::wstring& GetSetCode(unsigned int code) {
+        const std::wstring& GetSetCode(uint32_t code) {
             static const std::wstring empt = L"";
             auto iter = _setcodes.find(code);
             if(iter == _setcodes.end())
@@ -68,21 +68,21 @@ namespace ygopro
             return iter->second;
         }
         
-        unsigned int RegistrDB(const std::wstring& db) {
+        uint32_t RegistrDB(const std::wstring& db) {
             _dbsrc.push_back(db);
-            return (unsigned int)_dbsrc.size() - 1;
+            return (uint32_t)_dbsrc.size() - 1;
         }
         
-        const std::wstring& DBName(unsigned int index) {
+        const std::wstring& DBName(uint32_t index) {
             static const std::wstring empt = L"";
             if(index < _dbsrc.size())
                 return _dbsrc[index];
             return empt;
         }
 	private:
-		std::unordered_map<unsigned int, CardData> _datas;
-        std::unordered_map<unsigned int, std::wstring> _setcodes;
-        std::unordered_map<unsigned int, std::vector<unsigned int>> _aliases;
+		std::unordered_map<uint32_t, CardData> _datas;
+        std::unordered_map<uint32_t, std::wstring> _setcodes;
+        std::unordered_map<uint32_t, std::vector<uint32_t>> _aliases;
         std::vector<std::wstring> _dbsrc;
 	};
 

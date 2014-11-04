@@ -18,23 +18,24 @@ struct TimerEvent {
 template<typename TIME_TYPE>
 class Timer {
 public:
-    Timer() : event_set(TimerEvent<TIME_TYPE>::Comp) {}
     void InitTimer(TIME_TYPE t) {
         cur_time = t;
     }
     
     void UpdateTime(TIME_TYPE t) {
         cur_time = t;
-        auto iter = event_set.begin();
-        while(iter != event_set.end() && t >= (*iter).end_time) {
+        auto iter = event_list.begin();
+        while(!event_list.empty() && (t >= (*iter).end_time)) {
             auto evt = *iter;
-            event_set.erase(iter);
             evt.call_back();
+            std::pop_heap(event_list.begin(), event_list.end(), TimerEvent<TIME_TYPE>::Comp);
+            event_list.pop_back();
             if(evt.repeat) {
                 evt.end_time = cur_time + evt.interval;
-                event_set.insert(evt);
+                event_list.push_back(evt);
+                std::push_heap(event_list.begin(), event_list.end(), TimerEvent<TIME_TYPE>::Comp);
             }
-            iter = event_set.begin();
+            iter = event_list.begin();
         }
     }
     
@@ -46,12 +47,13 @@ public:
         te.interval = inv;
         te.repeat = rep;
         te.call_back = cb;
-        event_set.insert(te);
+        event_list.push_back(te);
+        std::push_heap(event_list.begin(), event_list.end(), TimerEvent<TIME_TYPE>::Comp);
     }
     
 protected:
     TIME_TYPE cur_time;
-    std::multiset<TimerEvent<TIME_TYPE>, typename TimerEvent<TIME_TYPE>::comp_type> event_set;
+    std::vector<TimerEvent<TIME_TYPE>> event_list;
 };
 
 #endif

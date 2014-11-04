@@ -88,8 +88,8 @@ namespace ygopro
             return;
         auto pscene = build_scene.lock();
         click_pos.first = 0;
-        int pos = hover_pos.first;
-        int index = hover_pos.second;
+        int32_t pos = hover_pos.first;
+        int32_t index = hover_pos.second;
         if(pos > 0 && pos < 4) {
             if(index < 0)
                 return;

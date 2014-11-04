@@ -11,21 +11,21 @@ namespace ygopro
         virtual void RefreshVertices() = 0;
         virtual bool UpdateVertices(double tm) = 0;
         
-        unsigned int vertex_index = 0;
+        uint32_t vertex_index = 0;
         MutableAttribute<float> dy;
         MutableAttribute<float> alpha;
         MutableAttribute<float> hl;
         std::vector<v3f> vertex;
         std::vector<v2f> texcoord;
         bool updating = false;
-        unsigned int hlcolor = 0xffffff;
+        uint32_t hlcolor = 0xffffff;
     };
     
     struct FieldBlock : public FieldObject {
         virtual void RefreshVertices();
         virtual bool UpdateVertices(double tm);
         
-        void Init(unsigned int idx, rectf center, ti4 ti);
+        void Init(uint32_t idx, rectf center, ti4 ti);
         bool CheckInside(float px, float py);
         v3f translation;
     };
@@ -34,16 +34,16 @@ namespace ygopro
         virtual void RefreshVertices();
         virtual bool UpdateVertices(double tm);
         
-        void Init(unsigned int idx, unsigned int code, int side);
-        void SetCode(unsigned int code, bool refresh = true);
-        void SetIconTex(int iid, bool refresh = true);
+        void Init(uint32_t idx, uint32_t code, int32_t side);
+        void SetCode(uint32_t code, bool refresh = true);
+        void SetIconTex(int32_t iid, bool refresh = true);
         
-        unsigned int code = 0;
-        unsigned int status = 0;
-		int side = 0;
-		int loc = 0;
-		int seq = 0;
-		int pos = 0;
+        uint32_t code = 0;
+        uint32_t status = 0;
+		int32_t side = 0;
+		int32_t loc = 0;
+		int32_t seq = 0;
+		int32_t pos = 0;
         bool update_rvert = true;
         std::vector<v3f> vertex_r;
         std::vector<std::shared_ptr<FieldCard>> olcards;
@@ -95,40 +95,40 @@ namespace ygopro
         void InitField();
         void RefreshBlocks();
         void AddUpdateBlock(std::shared_ptr<FieldBlock> pblock);
-        std::shared_ptr<FieldCard> AddCard(unsigned int code, int side, int zone, int seq, int subs);
-        std::shared_ptr<FieldCard> GetCard(int side, int zone, int seq, int subs);
-        std::shared_ptr<FieldCard> RemoveCard(int side, int zone, int seq, int subs);
+        std::shared_ptr<FieldCard> AddCard(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs);
+        std::shared_ptr<FieldCard> GetCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
+        std::shared_ptr<FieldCard> RemoveCard(int32_t side, int32_t zone, int32_t seq, int32_t subs);
         void RefreshPos(std::shared_ptr<FieldCard> pcard, bool update = true, float tm = 0.0f);
-        void RefreshHand(int side, bool update = true, float tm = 0.0f);
-        void MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update = true, float tm = 0.0f);
-        void ChangePos(std::shared_ptr<FieldCard> pcard, int pos, bool update = true, float tm = 0.0f);
+        void RefreshHand(int32_t side, bool update = true, float tm = 0.0f);
+        void MoveCard(std::shared_ptr<FieldCard> pcard, int32_t toside, int32_t tozone, int32_t toseq, int32_t tosubs, bool update = true, float tm = 0.0f);
+        void ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos, bool update = true, float tm = 0.0f);
         void ReleaseCard(std::shared_ptr<FieldCard> pcard);
         void AddUpdateCard(std::shared_ptr<FieldCard> pcard);
         void ClearField();
         
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);
-        v2i GetHoverPos(int posx, int posy);
+        v2i GetHoverPos(int32_t posx, int32_t posy);
         ViewParam& GetViewParams() { return vparam; }
-        std::shared_ptr<FieldBlock> GetFieldBlock(int x, int y);
-        std::shared_ptr<FieldCard> GetFieldCard(int x, int y);
+        std::shared_ptr<FieldBlock> GetFieldBlock(int32_t x, int32_t y);
+        std::shared_ptr<FieldCard> GetFieldCard(int32_t x, int32_t y);
         
     protected:
         v2i scene_size = {0, 0};
-        unsigned int index_buffer = 0;
-        unsigned int card_index_buffer = 0;
-        unsigned int field_buffer = 0;
-        unsigned int back_buffer = 0;
-        unsigned int card_buffer = 0;
-        unsigned int misc_buffer = 0;
-        unsigned int field_vao = 0;
-        unsigned int back_vao = 0;
-        unsigned int card_vao = 0;
-        unsigned int misc_vao = 0;        
+        uint32_t index_buffer = 0;
+        uint32_t card_index_buffer = 0;
+        uint32_t field_buffer = 0;
+        uint32_t back_buffer = 0;
+        uint32_t card_buffer = 0;
+        uint32_t misc_buffer = 0;
+        uint32_t field_vao = 0;
+        uint32_t back_vao = 0;
+        uint32_t card_vao = 0;
+        uint32_t misc_vao = 0;        
         bool update_bg = true;
         bool update_misc = true;
         bool update_index = true;
-        int refresh_region = 0;
+        int32_t refresh_region = 0;
         glbase::Shader duel_shader;
         ViewParam vparam;
         

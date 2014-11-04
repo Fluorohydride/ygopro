@@ -91,7 +91,7 @@ namespace ygopro
         });
     }
     
-    PopupMenu& PopupMenu::AddButton(const std::wstring& btn, int id) {
+    PopupMenu& PopupMenu::AddButton(const std::wstring& btn, int32_t id) {
         if(id == 0)
             id = ids.size();
         items.push_back(btn);
@@ -100,14 +100,14 @@ namespace ygopro
     }
     
     void PopupMenu::End() {
-        auto pnl = sgui::SGPanel::Create(nullptr, pos, {width, (int)(25 * items.size() + 9)});
+        auto pnl = sgui::SGPanel::Create(nullptr, pos, {width, (int32_t)(25 * items.size() + 9)});
         pnl->eventDestroying.Bind([this](sgui::SGWidget& sender)->bool {
             delete this;
             return true;
         });
         auto ptr = pnl.get();
         for(size_t i = 0; i < items.size(); ++i) {
-            auto btn = sgui::SGButton::Create(pnl, {3, (int)(5 + 25 * i)}, {0, width});
+            auto btn = sgui::SGButton::Create(pnl, {3, (int32_t)(5 + 25 * i)}, {0, width});
             btn->SetSize({-10, 25}, {1.0f, 0.0f});
             btn->SetText(items[i], 0xff000000);
             btn->SetCustomValue(ids[i]);
@@ -121,7 +121,7 @@ namespace ygopro
         sgui::SGGUIRoot::GetSingleton().SetPopupObject(pnl);
     }
     
-    PopupMenu& PopupMenu::Begin(v2i pos, int width, std::function<void (int)> cb) {
+    PopupMenu& PopupMenu::Begin(v2i pos, int32_t width, std::function<void (int32_t)> cb) {
         PopupMenu* menu = new PopupMenu();
         menu->pos = pos;
         menu->width = width;
@@ -160,7 +160,7 @@ namespace ygopro
             window.lock()->Destroy();
             return true;
         });
-        lst->eventSelChange.Bind([this, pfile, plst](sgui::SGWidget& sender, int index)->bool {
+        lst->eventSelChange.Bind([this, pfile, plst](sgui::SGWidget& sender, int32_t index)->bool {
             if(index < 0)
                 return true;
             auto it = plst->GetItem(index);
@@ -168,10 +168,10 @@ namespace ygopro
                 pfile->SetText(std::get<1>(it), 0xff000000);
             return true;
         });
-        lst->eventDoubleClick.Bind([this, pfile, plst, ppath](sgui::SGWidget& sender, int index)->bool {
+        lst->eventDoubleClick.Bind([this, pfile, plst, ppath](sgui::SGWidget& sender, int32_t index)->bool {
             auto it = plst->GetItem(index);
             if(std::get<0>(it) == 142) {
-                int pos = path.rfind(L'/');
+                int32_t pos = path.rfind(L'/');
                 path = path.substr(0, pos);
                 ppath->SetText(path, 0xff000000);
                 RefreshList(plst);
@@ -227,7 +227,7 @@ namespace ygopro
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x2), 0xff000000, 0x2);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x4), 0xff000000, 0x4);
         ptype1->SetSelection(0);
-        ptype1->eventSelChange.Bind([this](sgui::SGWidget& sender, int index)->bool {
+        ptype1->eventSelChange.Bind([this](sgui::SGWidget& sender, int32_t index)->bool {
             auto ptr = type2.lock();
             ptr->ClearItem();
             if(index == 0) {
@@ -282,35 +282,54 @@ namespace ygopro
         auto pattribute = sgui::SGComboBox::Create(wd, {90, 110}, {130, 30});
         attribute = pattribute;
         pattribute->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
-        for(unsigned int i = 1; i != 0x80; i <<=1)
+        for(uint32_t i = 1; i != 0x80; i <<=1)
             pattribute->AddItem(DataMgr::Get().GetAttributeString(i), 0xff000000, i);
         pattribute->SetSelection(0);
         auto label5 = sgui::SGLabel::Create(wd, {10, 140}, stringCfg["eui_filter_race"]);
         auto prace = sgui::SGComboBox::Create(wd, {90, 135}, {130, 30});
         race = prace;
         prace->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
-        for(unsigned int i = 1; i != 0x1000000; i <<=1)
+        for(uint32_t i = 1; i != 0x1000000; i <<=1)
             prace->AddItem(DataMgr::Get().GetRaceString(i), 0xff000000, i);
         prace->SetSelection(0);
         auto label6 = sgui::SGLabel::Create(wd, {10, 165}, stringCfg["eui_filter_attack"]);
-        attack = sgui::SGTextEdit::Create(wd, {90, 160}, {150, 30});
+        auto pattack = sgui::SGTextEdit::Create(wd, {90, 160}, {150, 30});
+        attack = pattack;
         auto label7 = sgui::SGLabel::Create(wd, {10, 190}, stringCfg["eui_filter_defence"]);
-        defence = sgui::SGTextEdit::Create(wd, {90, 185}, {150, 30});
+        auto pdefence = sgui::SGTextEdit::Create(wd, {90, 185}, {150, 30});
+        defence = pdefence;
         auto label8 = sgui::SGLabel::Create(wd, {10, 215}, stringCfg["eui_filter_star"]);
-        star = sgui::SGTextEdit::Create(wd, {90, 210}, {150, 30});
+        auto pstar = sgui::SGTextEdit::Create(wd, {90, 210}, {150, 30});
+        star = pstar;
         auto sch = sgui::SGButton::Create(wd, {140, 260}, {100, 25});
         sch->SetText(stringCfg["eui_filter_search"], 0xff000000);
         sch->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
             BeginSearch();
             return true;
         });
+        auto clr = sgui::SGButton::Create(wd, {10, 260}, {100, 25});
+        clr->SetText(stringCfg["eui_filter_clear"], 0xff000000);
+        clr->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
+            ClearCondition();
+            return true;
+        });
         pkeyword->SetFocus();
         sgui::SGGUIRoot::GetSingleton().SetPopupObject(wd);
+        pkeyword->SetText(con_text[0], 0xff000000);
+        pattack->SetText(con_text[1], 0xff000000);
+        pdefence->SetText(con_text[1], 0xff000000);
+        pstar->SetText(con_text[1], 0xff000000);
+        ptype1->SetSelection(sel[0]);
+        ptype2->SetSelection(sel[1]);
+        ptype3->SetSelection(sel[2]);
+        pattribute->SetSelection(sel[3]);
+        prace->SetSelection(sel[4]);
     }
     
     void FilterDialog::BeginSearch() {
         FilterCondition fc;
         auto keystr = keyword.lock()->GetText();
+        con_text[0] = keystr;
         if(keystr.length() > 0) {
             if(keystr[0] == L'@') {
                 fc.code = ParseInt(&keystr[1], keystr.length() - 1);
@@ -328,7 +347,10 @@ namespace ygopro
         }
         fc.type = type1.lock()->GetSelectedValue();
         fc.subtype = type2.lock()->GetSelectedValue();
-        int lmt = type3.lock()->GetSelection();
+        int32_t lmt = type3.lock()->GetSelection();
+        sel[0] = type1.lock()->GetSelection();
+        sel[1] = type2.lock()->GetSelection();
+        sel[2] = lmt;
         if(lmt > 3) {
             fc.pool = type3.lock()->GetSelectedValue();
             lmt = 0;
@@ -336,6 +358,8 @@ namespace ygopro
         if((fc.type == 0) || (fc.type == 0x1)) {
             fc.attribute = attribute.lock()->GetSelectedValue();
             fc.race = race.lock()->GetSelectedValue();
+            sel[3] = attribute.lock()->GetSelection();
+            sel[4] = race.lock()->GetSelection();
             auto t1 = ParseValue(attack.lock()->GetText());
             switch(std::get<0>(t1)) {
                 case 0: break;
@@ -364,7 +388,23 @@ namespace ygopro
             cbOK(fc, lmt);
     }
     
-    std::tuple<int, int, int> FilterDialog::ParseValue(const std::wstring& valstr) {
+    void FilterDialog::ClearCondition() {
+        keyword.lock()->ClearText();
+        attack.lock()->ClearText();
+        defence.lock()->ClearText();
+        star.lock()->ClearText();
+        type1.lock()->SetSelection(0);
+        type2.lock()->SetSelection(0);
+        type3.lock()->SetSelection(0);
+        attribute.lock()->SetSelection(0);
+        race.lock()->SetSelection(0);
+        for(int32_t i = 0; i < 4; ++i)
+            con_text[i].clear();
+        for(int32_t i = 0; i < 4; ++i)
+            sel[i] = 0;
+    }
+    
+    std::tuple<int32_t, int32_t, int32_t> FilterDialog::ParseValue(const std::wstring& valstr) {
         if(valstr.length() == 0)
             return std::make_tuple(0, 0, 0);
         if(valstr == L"?")
@@ -376,9 +416,9 @@ namespace ygopro
             return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], valstr.length() - pos - 1));
     }
     
-    int FilterDialog::ParseInt(const wchar_t* p, int size) {
-        int v = 0;
-        for(int i = 0; i < size; ++i) {
+    int32_t FilterDialog::ParseInt(const wchar_t* p, int32_t size) {
+        int32_t v = 0;
+        for(int32_t i = 0; i < size; ++i) {
             if(p[i] >= L'0' && p[i] <= L'9') {
                 v = v * 10 + p[i] - L'0';
             } else
@@ -387,13 +427,13 @@ namespace ygopro
         return v;
     }
 	
-    void InfoPanel::ShowInfo(unsigned int code, v2i pos, v2i sz) {
+    void InfoPanel::ShowInfo(uint32_t code, v2i pos, v2i sz) {
         if(this->code == code)
             return;
         std::shared_ptr<sgui::SGWidgetContainer> wd = window.lock();
-        int ch = sz.y - 10;
-        int cw = (sz.y - 10) * 20 / 29;
-        int mw = sz.x - 20 - cw;
+        int32_t ch = sz.y - 10;
+        int32_t cw = (sz.y - 10) * 20 / 29;
+        int32_t mw = sz.x - 20 - cw;
         if(wd == nullptr) {
             wd = sgui::SGPanel::Create(nullptr, pos, sz);
             window = wd;
@@ -430,8 +470,8 @@ namespace ygopro
         extra->SetPosition({cw + 15, sz.y - 50});
         if(data->setcode) {
             extra->AppendText(stringCfg["eui_msg_setcode"], 0xff000000);
-            for(int i = 0; i < 4; ++i) {
-                unsigned short sd = (data->setcode >> (i * 16)) & 0xffff;
+            for(int32_t i = 0; i < 4; ++i) {
+                uint16_t sd = (data->setcode >> (i * 16)) & 0xffff;
                 if(sd) {
                     extra->AppendText(L"#", 0xff000000);
                     extra->AppendText(DataMgr::Get().GetSetCode(sd), 0xffff0000);
@@ -440,7 +480,7 @@ namespace ygopro
             }
         }
         extra->AppendText(L"\n", 0xff000000);
-        unsigned int ccode = (data->alias == 0
+        uint32_t ccode = (data->alias == 0
                               || (data->alias > data->code && data->alias - data->code > 10)
                               || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
         extra->AppendText(L" @", 0xff000000);
@@ -451,8 +491,8 @@ namespace ygopro
         auto imgs = misc.lock();
         std::vector<v2i> verts;
         std::vector<v2f> coords;
-        std::vector<unsigned int> colors;
-        auto pushvert = [&verts, &coords, &colors](v2i pos, v2i sz, ti4& ti, unsigned int cl = 0xffffffff) {
+        std::vector<uint32_t> colors;
+        auto pushvert = [&verts, &coords, &colors](v2i pos, v2i sz, ti4& ti, uint32_t cl = 0xffffffff) {
             verts.push_back({pos.x, pos.y});
             coords.push_back(ti.vert[0]);
             verts.push_back({pos.x + sz.x, pos.y});
@@ -461,7 +501,7 @@ namespace ygopro
             coords.push_back(ti.vert[2]);
             verts.push_back({pos.x + sz.x, pos.y + sz.y});
             coords.push_back(ti.vert[3]);
-            for(int i = 0; i < 4; ++i)
+            for(int32_t i = 0; i < 4; ++i)
                 colors.push_back(cl);
         };
         auto hmask = ImageMgr::Get().GetTexture("mmask");
@@ -469,8 +509,8 @@ namespace ygopro
         
         pushvert({0, 0}, {mw, 40}, hmask);
         if(data->type & 0x1) {
-            for(unsigned int i = 0; i < (data->level & 0xffff); ++i)
-                pushvert({(int)(mw - 21 - 16 * i), 20}, {16, 16}, star);
+            for(uint32_t i = 0; i < (data->level & 0xffff); ++i)
+                pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
             std::string adstr;
             if(data->attack >= 0)
                 adstr.append(To<std::string>("ATK/% 4ld", data->attack));
@@ -493,7 +533,7 @@ namespace ygopro
             else
                 pent->ClearText();
             text->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
-            int ph = pent->GetSize().y + 13;
+            int32_t ph = pent->GetSize().y + 13;
             if(ph < 55)
                 ph = 55;
             text->SetPosition({cw + 15, 63 + ph});
@@ -503,8 +543,8 @@ namespace ygopro
             auto rscale = ImageMgr::Get().GetTexture("rscale");
             pushvert({0, 50}, {30, 23}, lscale);
             pushvert({mw - 30, 50}, {30, 23}, rscale);
-            int ls = (data->level >> 16) & 0xff;
-            int rs = (data->level >> 24) & 0xff;
+            int32_t ls = (data->level >> 16) & 0xff;
+            int32_t rs = (data->level >> 24) & 0xff;
             if(ls >= 10) {
                 pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls / 10)), 0xff000000);
                 pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls % 10)), 0xff000000);

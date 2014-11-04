@@ -16,7 +16,7 @@ namespace ygopro
         std::thread(std::bind(&ZipArchive::_load_inner, this)).detach();
     }
     
-    int ZipArchive::GetFileLength(const std::string& filename) {
+    size_t ZipArchive::GetFileLength(const std::string& filename) {
         while(is_loading)
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         auto iter = entries.find(filename);
@@ -25,7 +25,7 @@ namespace ygopro
         return iter->second.file_size;
     }
     
-    int ZipArchive::ReadFile(const std::string& filename, unsigned char* buffer) {
+    size_t ZipArchive::ReadFile(const std::string& filename, uint8_t* buffer) {
         while(is_loading)
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         auto iter = entries.find(filename);
@@ -35,10 +35,10 @@ namespace ygopro
         if(!zip_file)
             return 0;
         if(iter->second.compressed) {
-            unsigned char* raw = new unsigned char[iter->second.comp_size];
+            uint8_t* raw = new uint8_t[iter->second.comp_size];
             zip_file.seekg(iter->second.data_offset, zip_file.beg);
             zip_file.read((char*)raw, iter->second.comp_size);
-            unsigned long decom_size = iter->second.file_size;
+            size_t decom_size = iter->second.file_size;
             z_stream strm;
             strm.zalloc = Z_NULL;
             strm.zfree = Z_NULL;
@@ -48,7 +48,7 @@ namespace ygopro
             strm.next_in = raw;
             strm.avail_out = iter->second.file_size;
             strm.next_out = buffer;
-            int ret = inflate(&strm, Z_FINISH);
+            int32_t ret = inflate(&strm, Z_FINISH);
             inflateEnd(&strm);
             delete []raw;
             if(ret != Z_STREAM_END)

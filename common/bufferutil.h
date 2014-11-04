@@ -3,8 +3,8 @@
 
 class BufferUtil {
 public:
-    BufferUtil(unsigned char* base, unsigned int sz) {
-        ptr = base;
+    BufferUtil(void* base, size_t sz) {
+        ptr = static_cast<uint8_t*>(base);
         end = ptr + sz;
     }
     
@@ -32,7 +32,7 @@ public:
         return std::move(str);
     }
     
-    inline std::string Read(unsigned int sz) {
+    inline std::string Read(size_t sz) {
         if(sz == 0)
             return "";
         char buf[1024];
@@ -44,7 +44,7 @@ public:
         return std::move(str);
     }
     
-    inline void Read(void* buf, unsigned int sz) {
+    inline void Read(void* buf, size_t sz) {
         memcpy(buf, ptr, sz);
         ptr += sz;
     }
@@ -57,7 +57,7 @@ public:
         ptr++;
     }
     
-    inline void Skip(unsigned int offset) {
+    inline void Skip(size_t offset) {
         ptr += offset;
     }
 
@@ -66,8 +66,8 @@ public:
     }
     
 private:
-    unsigned char* ptr;
-    unsigned char* end;
+    uint8_t* ptr;
+    uint8_t* end;
 
 };
 

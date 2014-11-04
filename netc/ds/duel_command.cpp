@@ -26,9 +26,9 @@ namespace ygopro
     }
     
     DuelMsgHint::DuelMsgHint(BufferUtil& reader) {
-        hint_type = reader.Read<unsigned char>();
+        hint_type = reader.Read<uint8_t>();
         reader.Skip(1);
-        hint_data = reader.Read<unsigned int>();
+        hint_data = reader.Read<uint32_t>();
     }
     
     bool DuelMsgHint::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -68,8 +68,8 @@ namespace ygopro
     }
     
     DuelMsgWin::DuelMsgWin(BufferUtil& reader) {
-        win_player = reader.Read<unsigned char>();
-        win_reason = reader.Read<unsigned char>();
+        win_player = reader.Read<uint8_t>();
+        win_reason = reader.Read<uint8_t>();
     }
     
     bool DuelMsgWin::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -77,7 +77,7 @@ namespace ygopro
     }
     
     DuelMsgUpdateCard::DuelMsgUpdateCard(BufferUtil& reader) {
-        unsigned int len = reader.Read<unsigned int>();
+        uint32_t len = reader.Read<uint32_t>();
         update_buffer.resize(len);
         reader.Read(&update_buffer[0], len);
     }
@@ -88,25 +88,25 @@ namespace ygopro
     }
     
     DuelMsgSelBattleCmd::DuelMsgSelBattleCmd(BufferUtil& reader) {
-        int playerid = reader.Read<unsigned char>();
-        int act_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < act_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
-            unsigned int desc = reader.Read<unsigned int>();
+        int32_t playerid = reader.Read<uint8_t>();
+        int32_t act_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < act_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
+            uint32_t desc = reader.Read<uint32_t>();
         }
-        int atk_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < act_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
-            unsigned int param = reader.Read<unsigned char>();
+        int32_t atk_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < act_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
+            uint32_t param = reader.Read<uint8_t>();
         }
-        bool can_m2 = reader.Read<unsigned char>() == 1;
-        bool can_ep = reader.Read<unsigned char>() == 1;
+        bool can_m2 = reader.Read<uint8_t>() == 1;
+        bool can_ep = reader.Read<uint8_t>() == 1;
     }
     
     bool DuelMsgSelBattleCmd::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -114,52 +114,52 @@ namespace ygopro
     }
     
     DuelMsgSelMainCmd::DuelMsgSelMainCmd(BufferUtil& reader) {
-        int playerid = reader.Read<unsigned char>();
-        int summon_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < summon_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
+        int32_t playerid = reader.Read<uint8_t>();
+        int32_t summon_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < summon_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
         }
-        int spsummon_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < spsummon_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
+        int32_t spsummon_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < spsummon_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
         }
-        int repos_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < repos_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
+        int32_t repos_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < repos_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
         }
-        int mset_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < mset_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
+        int32_t mset_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < mset_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
         }
-        int sset_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < sset_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
+        int32_t sset_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < sset_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
         }
-        int act_sz = reader.Read<unsigned char>();
-        for(int i = 0; i < act_sz; ++i) {
-            unsigned int code = reader.Read<unsigned int>();
-            unsigned int con = reader.Read<unsigned char>();
-            unsigned int loc = reader.Read<unsigned char>();
-            unsigned int seq = reader.Read<unsigned char>();
-            unsigned int desc = reader.Read<unsigned int>();
+        int32_t act_sz = reader.Read<uint8_t>();
+        for(int32_t i = 0; i < act_sz; ++i) {
+            uint32_t code = reader.Read<uint32_t>();
+            uint32_t con = reader.Read<uint8_t>();
+            uint32_t loc = reader.Read<uint8_t>();
+            uint32_t seq = reader.Read<uint8_t>();
+            uint32_t desc = reader.Read<uint32_t>();
         }
-        bool can_bp = reader.Read<unsigned char>() == 1;
-        bool can_ep = reader.Read<unsigned char>() == 1;
+        bool can_bp = reader.Read<uint8_t>() == 1;
+        bool can_ep = reader.Read<uint8_t>() == 1;
     }
     
     bool DuelMsgSelMainCmd::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -167,9 +167,9 @@ namespace ygopro
     }
     
     DuelMsgSelEffectYN::DuelMsgSelEffectYN(BufferUtil& reader) {
-        int playerid = reader.Read<unsigned char>();
-        unsigned int code = reader.Read<unsigned int>();
-        unsigned int info_loc = reader.Read<unsigned int>();
+        int32_t playerid = reader.Read<uint8_t>();
+        uint32_t code = reader.Read<uint32_t>();
+        uint32_t info_loc = reader.Read<uint32_t>();
     }
     
     bool DuelMsgSelEffectYN::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -177,7 +177,8 @@ namespace ygopro
     }
     
     DuelMsgSelYesNo::DuelMsgSelYesNo(BufferUtil& reader) {
-        
+        int32_t playerid = reader.Read<uint8_t>();
+        uint32_t desc = reader.Read<uint32_t>();
     }
     
     bool DuelMsgSelYesNo::Handle(std::shared_ptr<DuelScene> pscene) {
@@ -757,42 +758,42 @@ namespace ygopro
     
     DuelMsgLoad::DuelMsgLoad(BufferUtil& reader) {
         pinfos.resize(2);
-        for(int p = 0; p < 2; ++p) {
-            pinfos[p].hp = reader.Read<int>();
-            for(int i = 0; i < 5; ++i) {
-                unsigned int exist_card = reader.Read<unsigned char>();
+        for(int32_t p = 0; p < 2; ++p) {
+            pinfos[p].hp = reader.Read<int32_t>();
+            for(int32_t i = 0; i < 5; ++i) {
+                uint32_t exist_card = reader.Read<uint8_t>();
                 if(exist_card) {
-                    unsigned int pos = reader.Read<unsigned char>();
-                    unsigned int sz = reader.Read<unsigned char>();
+                    uint32_t pos = reader.Read<uint8_t>();
+                    uint32_t sz = reader.Read<uint8_t>();
                     pinfos[p].minfo[i] = pos | (sz << 8);
                 } else
                     pinfos[p].minfo[i] = 0;
             }
-            for(int i = 0; i < 8; ++i) {
-                unsigned int exist_card = reader.Read<unsigned char>();
+            for(int32_t i = 0; i < 8; ++i) {
+                uint32_t exist_card = reader.Read<uint8_t>();
                 if(exist_card)
-                    pinfos[p].sinfo[i] = reader.Read<unsigned char>();
+                    pinfos[p].sinfo[i] = reader.Read<uint8_t>();
                 else
                     pinfos[p].sinfo[i] = 0;
             }
-            pinfos[p].main_size = reader.Read<unsigned char>();
-            pinfos[p].hand_size = reader.Read<unsigned char>();
-            pinfos[p].grave_size = reader.Read<unsigned char>();
-            pinfos[p].remove_size = reader.Read<unsigned char>();
-            pinfos[p].extra_size = reader.Read<unsigned char>();
+            pinfos[p].main_size = reader.Read<uint8_t>();
+            pinfos[p].hand_size = reader.Read<uint8_t>();
+            pinfos[p].grave_size = reader.Read<uint8_t>();
+            pinfos[p].remove_size = reader.Read<uint8_t>();
+            pinfos[p].extra_size = reader.Read<uint8_t>();
         }
-        int chainsz = reader.Read<unsigned char>();
+        int32_t chainsz = reader.Read<uint8_t>();
         cinfos.resize(chainsz);
-        for(int i = 0; i < chainsz; ++i) {
-            cinfos[i].code = reader.Read<unsigned int>();
-            cinfos[i].card_con = reader.Read<unsigned char>();
-            cinfos[i].card_loc = reader.Read<unsigned char>();
-            cinfos[i].card_seq = reader.Read<unsigned char>();
-            cinfos[i].card_pos = reader.Read<unsigned char>();
-            cinfos[i].trig_con = reader.Read<unsigned char>();
-            cinfos[i].trig_loc = reader.Read<unsigned char>();
-            cinfos[i].trig_seq = reader.Read<unsigned char>();
-            cinfos[i].desc = reader.Read<unsigned int>();
+        for(int32_t i = 0; i < chainsz; ++i) {
+            cinfos[i].code = reader.Read<uint32_t>();
+            cinfos[i].card_con = reader.Read<uint8_t>();
+            cinfos[i].card_loc = reader.Read<uint8_t>();
+            cinfos[i].card_seq = reader.Read<uint8_t>();
+            cinfos[i].card_pos = reader.Read<uint8_t>();
+            cinfos[i].trig_con = reader.Read<uint8_t>();
+            cinfos[i].trig_loc = reader.Read<uint8_t>();
+            cinfos[i].trig_seq = reader.Read<uint8_t>();
+            cinfos[i].desc = reader.Read<uint32_t>();
         }
     }
     

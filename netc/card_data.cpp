@@ -28,9 +28,9 @@ namespace ygopro
                 return false;
             if(fc.defmax != -1 && fc.defmax != 0 && defence > fc.defmax)
                 return false;
-            if(fc.lvmin != 0 && level < (unsigned int)fc.lvmin)
+            if(fc.lvmin != 0 && level < (uint32_t)fc.lvmin)
                 return false;
-            if(fc.lvmax != 0 && level > (unsigned int)fc.lvmax)
+            if(fc.lvmax != 0 && level > (uint32_t)fc.lvmax)
                 return false;
             if(fc.race != 0 && (race & fc.race) == 0)
                 return false;
@@ -38,16 +38,16 @@ namespace ygopro
                 return false;
         }
         if(fc.setcode != 0) {
-            unsigned long long sc = setcode;
+            uint64_t sc = setcode;
             if(alias) {
                 CardData* adata = DataMgr::Get()[alias];
                 if(adata)
                     sc = adata->setcode;
             }
-            unsigned int scode = fc.setcode & 0xfff;
-            unsigned int subcode = fc.setcode >> 12;
-            for(int i = 0; i < 64; i += 16) {
-                unsigned int partc = (sc >> i) & 0xffff;
+            uint32_t scode = fc.setcode & 0xfff;
+            uint32_t subcode = fc.setcode >> 12;
+            for(int32_t i = 0; i < 64; i += 16) {
+                uint32_t partc = (sc >> i) & 0xffff;
                 if(partc && ((partc & 0xfff) == scode) && ((partc >> 12) & subcode) == subcode)
                     return true;
             }
@@ -67,8 +67,8 @@ namespace ygopro
         if((p1->type & 0x7) != (p2->type & 0x7))
             return (p1->type & 0x7) < (p2->type & 0x7);
         if((p1->type & 0x7) == 1) {
-            int type1 = (p1->type & 0x8020c0) ? (p1->type & 0x8020c1) : (p1->type & 0x31);
-            int type2 = (p2->type & 0x8020c0) ? (p2->type & 0x8020c1) : (p2->type & 0x31);
+            int32_t type1 = (p1->type & 0x8020c0) ? (p1->type & 0x8020c1) : (p1->type & 0x31);
+            int32_t type2 = (p2->type & 0x8020c0) ? (p2->type & 0x8020c1) : (p2->type & 0x31);
             if(type1 != type2)
                 return type1 < type2;
             if(p1->level != p2->level)
@@ -84,7 +84,7 @@ namespace ygopro
         return p1->code < p2->code;
     }
     
-	int DataMgr::LoadDatas(const std::wstring& file) {
+	int32_t DataMgr::LoadDatas(const std::wstring& file) {
 		_datas.clear();
 		sqlite3* pDB;
         std::string dfile = To<std::string>(file);
@@ -95,7 +95,7 @@ namespace ygopro
 		if(sqlite3_prepare_v2(pDB, sql, -1, &pStmt, 0) != SQLITE_OK)
 			return sqlite3_errcode(pDB);
 		CardData cd;
-		int step = 0;
+		int32_t step = 0;
 		do {
 			step = sqlite3_step(pStmt);
 			if(step == SQLITE_BUSY || step == SQLITE_ERROR || step == SQLITE_MISUSE)
@@ -114,7 +114,7 @@ namespace ygopro
 				cd.category = sqlite3_column_int(pStmt, 10);
                 cd.name = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 12)));
                 cd.texts = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 13)));
-                for(unsigned int i = 0; i < 16; ++i)
+                for(uint32_t i = 0; i < 16; ++i)
                     cd.desc[i] = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 14 + i)));
                 _datas.insert(std::make_pair(cd.code, cd));
                 if(cd.alias)
@@ -126,15 +126,15 @@ namespace ygopro
 		return SQLITE_OK;
 	}
 
-	CardData* DataMgr:: operator [] (unsigned int code) {
+	CardData* DataMgr:: operator [] (uint32_t code) {
 		auto iter = _datas.find(code);
 		if(iter == _datas.end())
 			return nullptr;
 		return &iter->second;
 	}
     
-    std::vector<unsigned int> DataMgr::AllAliases(unsigned int code) {
-        std::vector<unsigned int> result;
+    std::vector<uint32_t> DataMgr::AllAliases(uint32_t code) {
+        std::vector<uint32_t> result;
         auto iter = _aliases.find(code);
         if(iter == _aliases.end())
             return std::move(result);
@@ -156,7 +156,7 @@ namespace ygopro
         return std::move(result);
     }
     
-    std::wstring DataMgr::GetAttributeString(unsigned int attr) {
+    std::wstring DataMgr::GetAttributeString(uint32_t attr) {
         std::wstring attname;
         if(attr & 0x1)
             attname.append(stringCfg["attribtue_earth"]).append(L"|");
@@ -177,7 +177,7 @@ namespace ygopro
         return std::move(attname);
     }
     
-    std::wstring DataMgr::GetRaceString(unsigned int race) {
+    std::wstring DataMgr::GetRaceString(uint32_t race) {
         std::wstring racname;
         if(race & 0x1)
             racname.append(stringCfg["race_warrior"]).append(L"|");
@@ -232,7 +232,7 @@ namespace ygopro
         return std::move(racname);
     }
     
-    std::wstring DataMgr::GetTypeString(unsigned int arctype) {
+    std::wstring DataMgr::GetTypeString(uint32_t arctype) {
         std::wstring tpname;
         if(arctype & 0x1) {
             if(arctype & 0x8020c0) {
@@ -296,7 +296,7 @@ namespace ygopro
         return std::move(tpname);
     }
     
-    std::wstring DataMgr::GetTypeString2(unsigned int arctype) {
+    std::wstring DataMgr::GetTypeString2(uint32_t arctype) {
         switch(arctype) {
             case 0x1: return stringCfg["type_monster"];
             case 0x2: return stringCfg["type_spell"];

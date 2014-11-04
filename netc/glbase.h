@@ -21,7 +21,7 @@
 #include FT_FREETYPE_H
 
 #ifdef _DEBUG
-void GLCheckError(const std::string& file, int line);
+void GLCheckError(const std::string& file, int32_t line);
 #else
 #define GLCheckError(x, y)
 #endif
@@ -104,46 +104,46 @@ namespace glbase {
     
     struct v2ct {
         vector2<float> vertex = {0.0f, 0.0f};
-        unsigned int color = 0xffffffff;
+        uint32_t color = 0xffffffff;
         vector2<float> texcoord = {0.0f, 0.0f};
-        static const int color_offset = 8;
-        static const int tex_offset = 12;
+        static const int32_t color_offset = 8;
+        static const int32_t tex_offset = 12;
     };
     
     struct v3ct {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        unsigned int color = 0xffffffff;
+        uint32_t color = 0xffffffff;
         vector2<float> texcoord = {0.0f, 0.0f};
-        static const int color_offset = 12;
-        static const int tex_offset = 16;
+        static const int32_t color_offset = 12;
+        static const int32_t tex_offset = 16;
     };
     
     struct v3hct {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        unsigned int color = 0xffffffff;
-        unsigned int hcolor = 0;
+        uint32_t color = 0xffffffff;
+        uint32_t hcolor = 0;
         vector2<float> texcoord = {0.0f, 0.0f};
-        static const int color_offset = 12;
-        static const int hcolor_offset = 16;
-        static const int tex_offset = 20;
+        static const int32_t color_offset = 12;
+        static const int32_t hcolor_offset = 16;
+        static const int32_t tex_offset = 20;
     };
     
     struct v3cnt {
         vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        unsigned int color = 0xffffffff;
+        uint32_t color = 0xffffffff;
         vector3<float> normal = {0.0f, 0.0f, 0.0f};
         vector2<float> texcoord = {0.0f, 0.0f};
-        static const int color_offset = 12;
-        static const int normal_offset = 16;
-        static const int tex_offset = 32;
+        static const int32_t color_offset = 12;
+        static const int32_t normal_offset = 16;
+        static const int32_t tex_offset = 32;
     };
     
-    template<int TCOUNT>
+    template<int32_t TCOUNT>
 	struct TextureInfo {
         vector2<float> vert[TCOUNT];
 	};
     
-    inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, unsigned int cl = 0xffffffff) {
+    inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, uint32_t cl = 0xffffffff) {
         vt[0].vertex = {pos.x, pos.y};
         vt[0].texcoord = ti.vert[0];
         vt[0].color = cl;
@@ -166,38 +166,38 @@ namespace glbase {
         bool Link();
         bool Use();
         void Unload();
-        void SetParam1i(const char* varname, const int value);
+        void SetParam1i(const char* varname, const int32_t value);
         void SetParamMat4(const char* varname, const float m[]);
         
     public:
-        static Shader& GetDefaultShader();
+        static Shader& GetDefaultShader(bool reload = false);
         static void Unuse();
         
     protected:
-        unsigned int vert_shader = 0;
-        unsigned int frag_shader = 0;
-        unsigned int program = 0;
+        uint32_t vert_shader = 0;
+        uint32_t frag_shader = 0;
+        uint32_t program = 0;
     };
     
     class Image {
     public:
         ~Image();
         bool LoadFile(const std::string& file);
-        bool LoadMemory(const unsigned char* mem, unsigned int sz);
-        inline unsigned char* GetRawData() { return buffer; }
-        inline int GetWidth() { return width; }
-        inline int GetHeight() { return height; }
+        bool LoadMemory(const uint8_t* mem, uint32_t sz);
+        inline uint8_t* GetRawData() { return buffer; }
+        inline int32_t GetWidth() { return width; }
+        inline int32_t GetHeight() { return height; }
         
     protected:
-        unsigned char* buffer = nullptr;
-        int width = 0;
-        int height = 0;
+        uint8_t* buffer = nullptr;
+        int32_t width = 0;
+        int32_t height = 0;
     };
     
     class Texture {
     public:
         
-        inline unsigned int texlen(unsigned int len) {
+        inline uint32_t texlen(uint32_t len) {
 			len = len - 1;
 			len = len | (len >> 1);
 			len = len | (len >> 2);
@@ -207,59 +207,59 @@ namespace glbase {
 			return len + 1;
 		}
         
-        void Load(const unsigned char* data, int x, int y);
+        void Load(const uint8_t* data, int32_t x, int32_t y);
         void Unload();
-        void Update(const unsigned char* data, int offx, int offy, int width, int height);
+        void Update(const uint8_t* data, int32_t offx, int32_t offy, int32_t width, int32_t height);
         void Bind();
-        inline unsigned int GetTextureId() { return texture_id; }
+        inline uint32_t GetTextureId() { return texture_id; }
         TextureInfo<4> GetTextureInfo();
-        inline int GetWidth() { return tex_width; }
-        inline int GetHeight() { return tex_height; }
-        inline int GetImgWidth() { return img_width; }
-        inline int GetImgHeight() { return img_height; }
-        inline vector2<int> GetSize() { return {tex_width, tex_height}; }
+        inline int32_t GetWidth() { return tex_width; }
+        inline int32_t GetHeight() { return tex_height; }
+        inline int32_t GetImgWidth() { return img_width; }
+        inline int32_t GetImgHeight() { return img_height; }
+        inline vector2<int32_t> GetSize() { return {tex_width, tex_height}; }
         
     protected:
-        unsigned int texture_id = 0;
-        int tex_width = 0;
-        int tex_height = 0;
-        int img_width = 0;
-        int img_height = 0;
+        uint32_t texture_id = 0;
+        int32_t tex_width = 0;
+        int32_t tex_height = 0;
+        int32_t img_width = 0;
+        int32_t img_height = 0;
     };
     
     struct FontGlyph {
         bool loaded = false;
-        rect<int> textureRect;
-        rect<int> bounds;
-        int advance = 0;
+        rect<int32_t> textureRect;
+        rect<int32_t> bounds;
+        int32_t advance = 0;
     };
     
     class Font {
     public:
         Font();
         ~Font();
-        bool Load(const std::string& file, unsigned int sz);
+        bool Load(const std::string& file, uint32_t sz);
         void Unload();
-        const FontGlyph& GetGlyph(unsigned int ch);
+        const FontGlyph& GetGlyph(uint32_t ch);
         inline Texture& GetTexture() { return char_tex; }
-        inline int GetFontSize() { return font_size; }
+        inline int32_t GetFontSize() { return font_size; }
         
     protected:
         Texture char_tex;
         FontGlyph glyphs[0x10000];
         FT_Face face;
         FT_Library library;
-        int font_size = 0;
-        int tex_posx = 0;
-        int tex_posy = 0;
+        int32_t font_size = 0;
+        int32_t tex_posx = 0;
+        int32_t tex_posy = 0;
     };
 }
 
-typedef glbase::vector2<int> v2i;
+typedef glbase::vector2<int32_t> v2i;
 typedef glbase::vector2<float> v2f;
-typedef glbase::vector3<int> v3i;
+typedef glbase::vector3<int32_t> v3i;
 typedef glbase::vector3<float> v3f;
-typedef glbase::rect<int> recti;
+typedef glbase::rect<int32_t> recti;
 typedef glbase::rect<float> rectf;
 typedef glbase::TextureInfo<4> ti4;
 

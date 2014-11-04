@@ -20,9 +20,9 @@ namespace ygopro
     };
     
     struct DeckCardData {
-        DeckCardData(CardData* d, unsigned int l): data(d), limit(l) {}
+        DeckCardData(CardData* d, uint32_t l): data(d), limit(l) {}
         CardData* data;
-        unsigned int limit;
+        uint32_t limit;
         std::shared_ptr<DeckCardExtraData> extra;
     };
     
@@ -31,7 +31,7 @@ namespace ygopro
 		std::vector<std::shared_ptr<DeckCardData>> main_deck;
 		std::vector<std::shared_ptr<DeckCardData>> extra_deck;
 		std::vector<std::shared_ptr<DeckCardData>> side_deck;
-        std::unordered_map<unsigned int, unsigned int> counts;
+        std::unordered_map<uint32_t, uint32_t> counts;
         
         void Clear();
         void Sort();
@@ -42,40 +42,40 @@ namespace ygopro
         void SaveToFile(const std::wstring& file);
         std::string SaveToString();
         
-        std::shared_ptr<DeckCardData> InsertCard(unsigned int pos, unsigned int index, unsigned int code, bool checkc);
-        bool RemoveCard(unsigned int pos, unsigned int index);
+        std::shared_ptr<DeckCardData> InsertCard(uint32_t pos, uint32_t index, uint32_t code, bool checkc);
+        bool RemoveCard(uint32_t pos, uint32_t index);
         
-        unsigned int mcount = 0;
-        unsigned int scount = 0;
-        unsigned int tcount = 0;
-        unsigned int syncount = 0;
-        unsigned int xyzcount = 0;
-        unsigned int fuscount = 0;
+        uint32_t mcount = 0;
+        uint32_t scount = 0;
+        uint32_t tcount = 0;
+        uint32_t syncount = 0;
+        uint32_t xyzcount = 0;
+        uint32_t fuscount = 0;
 
         static bool deck_sort(const std::shared_ptr<DeckCardData>& c1, const std::shared_ptr<DeckCardData>& c2);
         static bool deck_sort_limit(const std::shared_ptr<DeckCardData>& c1, const std::shared_ptr<DeckCardData>& c2);
 	};
 
     struct LimitRegulation {
-        unsigned int hash = 0;
+        uint32_t hash = 0;
 		std::wstring name;
-		std::unordered_map<unsigned int, unsigned int> counts;
+		std::unordered_map<uint32_t, uint32_t> counts;
         
-        unsigned int get_hash();
-        unsigned int check_deck(DeckData& deck, unsigned int pool_flag);
+        uint32_t get_hash();
+        uint32_t check_deck(DeckData& deck, uint32_t pool_flag);
 	};
     
 	class LimitRegulationMgr : public Singleton<LimitRegulationMgr> {
 	public:
 		void LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name);
-		void SetLimitRegulation(unsigned int id);
+		void SetLimitRegulation(uint32_t id);
         void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);
-        unsigned int GetCardLimitCount(unsigned int code);
-        unsigned int CheckCurrentList(unsigned int pool);
+        uint32_t GetCardLimitCount(uint32_t code);
+        uint32_t CheckCurrentList(uint32_t pool);
         inline std::vector<LimitRegulation>& GetLimitRegulations() { return limit_regulations; }
-        std::vector<CardData*> FilterCard(unsigned int limit, const FilterCondition& fc);
-        void LoadCurrentListToDeck(DeckData& deck, int limit);
+        std::vector<CardData*> FilterCard(uint32_t limit, const FilterCondition& fc);
+        void LoadCurrentListToDeck(DeckData& deck, int32_t limit);
         
 	private:
 		LimitRegulation* current_list = nullptr;

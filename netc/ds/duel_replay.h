@@ -17,26 +17,26 @@ namespace ygopro
 {
 
     struct ReplayHeader {
-        unsigned int id;
-        unsigned int version;
-        unsigned int flag;
-        unsigned int seed;
-        unsigned int data_size;
-        unsigned int hash;
-        unsigned char props[8];
+        uint32_t id;
+        uint32_t version;
+        uint32_t flag;
+        uint32_t seed;
+        uint32_t data_size;
+        uint32_t hash;
+        uint8_t props[8];
     };
     
     struct ReplayHeader2 {
-        unsigned int id;
-        unsigned int version;
-        unsigned int flag;
-        unsigned int raw_size;
-        unsigned int raw_size_d;
-        unsigned int dec_size;
-        unsigned int dec_size_d;
-        unsigned char props[8];
-        unsigned int inner_id;
-        unsigned int reserved[2];
+        uint32_t id;
+        uint32_t version;
+        uint32_t flag;
+        uint32_t raw_size;
+        uint32_t raw_size_d;
+        uint32_t dec_size;
+        uint32_t dec_size_d;
+        uint8_t props[8];
+        uint32_t inner_id;
+        uint32_t reserved[2];
     };
     
     class DuelProtoReplay : public DuelProtoHandler, public ygoAdapter {
@@ -47,16 +47,16 @@ namespace ygopro
         virtual void GetProto();
         virtual bool ProtoEnd();
         
-        virtual byte* ReadScript(const char* script_name, int* len);
+        virtual byte* ReadScript(const char* script_name, int32_t* len);
         virtual uint32 ReadCard(uint32 code, card_data* data);
         virtual uint32 HandleMessage(void* msg, uint32 message_type);
         
     protected:
         TextFile script_file;
-        unsigned char* rep_data = nullptr;
+        uint8_t* rep_data = nullptr;
         size_t rep_size = 0;
-        unsigned int seed = 0;
-        unsigned int flag = 0;
+        uint32_t seed = 0;
+        uint32_t flag = 0;
         std::shared_ptr<duelAdapter> replay_duel;
     };
     

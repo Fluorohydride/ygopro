@@ -10,12 +10,12 @@
 namespace ygopro
 {
 
-	ti4& ImageMgr::GetCardTexture(unsigned int id) {
+	ti4& ImageMgr::GetCardTexture(uint32_t id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
             std::string file = To<std::string>("%d.jpg", id);
 			auto& cti = card_textures[id];
-            int length = imageZip.GetFileLength(file);
+            int32_t length = imageZip.GetFileLength(file);
             if(length == 0) {
                 file = To<std::string>("%d.png", id);
                 length = imageZip.GetFileLength(file);
@@ -24,7 +24,7 @@ namespace ygopro
 				cti.ti = misc_textures["unknown"];
                 cti.ref_block = 0xffff;
 			} else {
-                unsigned short blockid = AllocBlock();
+                uint16_t blockid = AllocBlock();
                 if(blockid == 0xffff) {
                     cti.ti = misc_textures["unknown"];
                     cti.ref_block = 0xffff;
@@ -34,10 +34,10 @@ namespace ygopro
                     imageZip.ReadFile(file, imgbuf);
                     if(img.LoadMemory(imgbuf, length)) {
                         glbase::v2ct frame_verts[4];
-                        int bx = (blockid % 20) * 100;
-                        int by = (blockid / 20) * 145;
-                        int bw = 100;
-                        int bh = 145;
+                        int32_t bx = (blockid % 20) * 100;
+                        int32_t by = (blockid / 20) * 145;
+                        int32_t bw = 100;
+                        int32_t bh = 145;
                         cti.ti.vert[0] = {(float)(bx) / 2048, (float)(by) / 2048};
                         cti.ti.vert[1] = {(float)(bx + bw) / 2048, (float)(by) / 2048};
                         cti.ti.vert[2] = {(float)(bx) / 2048, (float)(by + bh) / 2048};
@@ -81,13 +81,13 @@ namespace ygopro
         return misc_textures[name];
     }
     
-    glbase::Texture* ImageMgr::LoadBigCardTexture(unsigned int id) {
-        static unsigned int pid = 0;
+    glbase::Texture* ImageMgr::LoadBigCardTexture(uint32_t id) {
+        static uint32_t pid = 0;
         static glbase::Texture* pre_ret = nullptr;
         if(pid == id)
             return pre_ret;
         std::string file = To<std::string>("%d.jpg", id);
-        int length = imageZip.GetFileLength(file);
+        int32_t length = imageZip.GetFileLength(file);
         if(length == 0) {
             file = To<std::string>("%d.png", id);
             length = imageZip.GetFileLength(file);
@@ -117,7 +117,7 @@ namespace ygopro
         return char_textures[ch - L'*'];
     }
     
-    void ImageMgr::UnloadCardTexture(unsigned int id) {
+    void ImageMgr::UnloadCardTexture(uint32_t id) {
         auto iter = card_textures.find(id);
         if(iter == card_textures.end())
             return;
@@ -129,22 +129,22 @@ namespace ygopro
 	void ImageMgr::UnloadAllCardTexture() {
         card_textures.clear();
         unuse_block.clear();
-        for(short i = 7; i < 280; ++i) {
+        for(int16_t i = 7; i < 280; ++i) {
             ref_count[i] = 0;
             unuse_block.push_back(i);
         }
 	}
 
-    unsigned short ImageMgr::AllocBlock() {
+    uint16_t ImageMgr::AllocBlock() {
         if(unuse_block.size() == 0)
             return 0xffff;
-        short ret = unuse_block.front();
+        int16_t ret = unuse_block.front();
         unuse_block.pop_front();
         ref_count[ret]++;
         return ret;
     }
     
-    bool ImageMgr::FreeBlock(unsigned short id) {
+    bool ImageMgr::FreeBlock(uint16_t id) {
         if(id >= 280)
             return false;
         if(ref_count[id] == 0)
@@ -159,7 +159,7 @@ namespace ygopro
     
     void ImageMgr::InitTextures(const std::wstring& image_path) {
         card_texture.Load(nullptr, 2048, 2048);
-        for(short i = 7; i < 280; ++i)
+        for(int16_t i = 7; i < 280; ++i)
             unuse_block.push_back(i);
         ref_count.resize(280);
         glGenFramebuffers(1, &frame_buffer);
@@ -170,7 +170,7 @@ namespace ygopro
         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 4, nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
-        unsigned short index[] = {0, 2, 1, 1, 2, 3};
+        uint16_t index[] = {0, 2, 1, 1, 2, 3};
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
         glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -246,13 +246,13 @@ namespace ygopro
                 if(ptex) {
                     auto& ti = misc_textures[name];
                     attr = attr->next_attribute();
-                    int x = To<int>(attr->value());
+                    int32_t x = To<int32_t>(attr->value());
                     attr = attr->next_attribute();
-                    int y = To<int>(attr->value());
+                    int32_t y = To<int32_t>(attr->value());
                     attr = attr->next_attribute();
-                    int w = To<int>(attr->value());
+                    int32_t w = To<int32_t>(attr->value());
                     attr = attr->next_attribute();
-                    int h = To<int>(attr->value());
+                    int32_t h = To<int32_t>(attr->value());
                     ti.vert[0].x = (float)x / ptex->GetWidth();
                     ti.vert[0].y = (float)y / ptex->GetHeight();
                     ti.vert[1].x = (float)(x + w) / ptex->GetWidth();
@@ -275,10 +275,10 @@ namespace ygopro
                     ptex = &bg_texture;
                 if(ptex) {
                     auto& ti = misc_textures[name];
-                    int val[8];
-                    for(int i = 0; i < 8; ++i) {
+                    int32_t val[8];
+                    for(int32_t i = 0; i < 8; ++i) {
                         attr = attr->next_attribute();
-                        val[i] = To<int>(attr->value());
+                        val[i] = To<int32_t>(attr->value());
                     }
                     ti.vert[0].x = (float)val[0] / ptex->GetWidth();
                     ti.vert[0].y = (float)val[1] / ptex->GetHeight();
@@ -295,9 +295,9 @@ namespace ygopro
         auto& char_tex = misc_textures["char"];
         float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
         float dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
-        for(int i = 0; i < 16; ++i) {
-            int x = i % 4;
-            int y = i / 4;
+        for(int32_t i = 0; i < 16; ++i) {
+            int32_t x = i % 4;
+            int32_t y = i / 4;
             char_textures[i].vert[0] = char_tex.vert[0] + v2f{difx * x, dify * y};
             char_textures[i].vert[1] = char_tex.vert[0] + v2f{difx * (x + 1), dify * y};
             char_textures[i].vert[2] = char_tex.vert[0] + v2f{difx * x, dify * (y + 1)};

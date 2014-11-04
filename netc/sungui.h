@@ -8,15 +8,15 @@ namespace sgui
 {
 
     struct MouseMoveEvent {
-        int x;
-        int y;
+        int32_t x;
+        int32_t y;
     };
     
     struct MouseButtonEvent {
-        int button;
-        int mods;
-        int x;
-        int y;
+        int32_t button;
+        int32_t mods;
+        int32_t x;
+        int32_t y;
     };
     
     struct MouseWheelEvent {
@@ -25,12 +25,12 @@ namespace sgui
     };
     
     struct KeyEvent {
-        int key;
-        int mods;
+        int32_t key;
+        int32_t mods;
     };
     
     struct TextEvent {
-        unsigned int unichar;
+        uint32_t unichar;
     };
     
     // ===== Delegate Implement =====
@@ -108,17 +108,17 @@ namespace sgui
         
         void SetPosition(v2i pos, v2f = v2f{0.0f, 0.0f});
         void SetSize(v2i sz, v2f = v2f{0.0f, 0.0f});
-        void SetX(int x, float propx = 0.0f);
-        void SetY(int y, float propy = 0.0f);
-        void SetWidth(int w, float propw = 0.0f);
-        void SetHeight(int h, float proph = 0.0f);
-        void SetColor(unsigned int c);
+        void SetX(int32_t x, float propx = 0.0f);
+        void SetY(int32_t y, float propy = 0.0f);
+        void SetWidth(int32_t w, float propw = 0.0f);
+        void SetHeight(int32_t h, float proph = 0.0f);
+        void SetColor(uint32_t c);
         v2i GetPosition() const { return position_abs; }
         v2i GetSize() const { return size_abs; }
         void SetVisible(bool v);
         bool IsVisible() const;
-        void SetCustomValue(unsigned int v) { cvalue = v; }
-        unsigned int GetCustomValue() const { return cvalue; }
+        void SetCustomValue(uint32_t v) { cvalue = v; }
+        uint32_t GetCustomValue() const { return cvalue; }
         void SetCustomObject(void* v) { cobject = v; }
         void* GetCustomObject() const { return cobject; }
         
@@ -166,13 +166,13 @@ namespace sgui
         v2f size_prop = {0, 0};
         v2i position_drag = {0, 0};
         bool visible = true;
-        unsigned int cvalue = 0;
-        unsigned int color = 0xffffffff;
+        uint32_t cvalue = 0;
+        uint32_t color = 0xffffffff;
         void* cobject = nullptr;
         std::weak_ptr<SGWidgetContainer> parent;
         bool vertices_dirty = true;
-        unsigned int vbo = 0;
-        unsigned int vao = 0;
+        uint32_t vbo = 0;
+        uint32_t vao = 0;
     };
     
     class SGTextBase {
@@ -180,16 +180,16 @@ namespace sgui
         SGTextBase();
         virtual ~SGTextBase();
         virtual void SetFont(glbase::Font* ft);
-        virtual void SetSpacing(unsigned int x, unsigned int y);
-        virtual int GetLineSpacing();
+        virtual void SetSpacing(uint32_t x, uint32_t y);
+        virtual int32_t GetLineSpacing();
         virtual v2i GetTextOffset() = 0;
-        virtual int GetMaxWidth() = 0;
+        virtual int32_t GetMaxWidth() = 0;
         virtual bool IsMultiLine() = 0;
         virtual void ClearText();
-        virtual unsigned int GetTextColor(int index);
-        virtual void SetText(const std::wstring& t, unsigned int cl);
-        virtual void AppendText(const std::wstring& t, unsigned int cl);
-        virtual void SetTextColor(unsigned int start, unsigned int end, unsigned int cl);
+        virtual uint32_t GetTextColor(int32_t index);
+        virtual void SetText(const std::wstring& t, uint32_t cl);
+        virtual void AppendText(const std::wstring& t, uint32_t cl);
+        virtual void SetTextColor(uint32_t start, uint32_t end, uint32_t cl);
         virtual void EvaluateSize(const std::wstring& t = L"");
         virtual void UpdateTextVertex();
         virtual void DrawText();
@@ -197,18 +197,18 @@ namespace sgui
         
     protected:
         bool text_update = true;
-        unsigned short mem_size = 0;
-        unsigned int tbo = 0;
-        unsigned int tao = 0;
+        uint16_t mem_size = 0;
+        uint32_t tbo = 0;
+        uint32_t tao = 0;
         glbase::Font* font = nullptr;
-        unsigned int spacing_x = 1;
-        unsigned int spacing_y = 1;
-        unsigned int vert_size = 0;
-        int text_width = 0;
-        int text_height = 0;
-        int text_width_cur = 0;
+        uint32_t spacing_x = 1;
+        uint32_t spacing_y = 1;
+        uint32_t vert_size = 0;
+        int32_t text_width = 0;
+        int32_t text_height = 0;
+        int32_t text_width_cur = 0;
         std::wstring text;
-        std::vector<unsigned int> color_vec;
+        std::vector<uint32_t> color_vec;
         std::vector<v2i> text_pos_array;
     };
     
@@ -216,9 +216,9 @@ namespace sgui
     public:
         SGSpriteBase();
         virtual ~SGSpriteBase();
-        virtual void SetImage(glbase::Texture* img, recti varea, unsigned int cl = 0xffffffff);
+        virtual void SetImage(glbase::Texture* img, recti varea, uint32_t cl = 0xffffffff);
         virtual void AddTexRect(recti tarea);
-        virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts, std::vector<unsigned int>& cl);
+        virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts, std::vector<uint32_t>& cl);
         virtual void AddTexcoord(std::vector<v2f>& texcoords);
         virtual v2i GetImageOffset() = 0;
         void SetFrameTime(float ft) { frame_time = ft; }
@@ -226,15 +226,15 @@ namespace sgui
         virtual void DrawImage();
         
     protected:
-        unsigned int imgbo = 0;
-        unsigned int imgao = 0;
+        uint32_t imgbo = 0;
+        uint32_t imgao = 0;
         bool img_update = true;
         bool img_dirty = true;
         double frame_time = 0.016;
         glbase::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
-        std::vector<unsigned int> colors;
+        std::vector<uint32_t> colors;
         std::vector<std::vector<v2f>> texcoords;
     };
     
@@ -272,7 +272,7 @@ namespace sgui
     };
     
     struct SGConfig {
-        std::unordered_map<std::string, int> int_config;
+        std::unordered_map<std::string, int32_t> int_config;
         std::unordered_map<std::string, std::string> string_config;
         std::unordered_map<std::string, recti> tex_config;
     };
@@ -301,17 +301,17 @@ namespace sgui
         v2i GetSceneSize();
         
         template<typename T>
-        void ConvertXY(int x, int y, T& v) {
+        void ConvertXY(int32_t x, int32_t y, T& v) {
             v.x = (float)x / scene_size.x * 2.0f - 1.0f;
             v.y = 1.0f - (float)y / scene_size.y * 2.0f;
         }
         template<typename T>
-        void TexUV(int u, int v, T& t) {
+        void TexUV(int32_t u, int32_t v, T& t) {
             t.x = (float)u / tex_size.x;
             t.y = (float)v / tex_size.y;
         }
         template<typename T>
-        void SetRectVertex(T* v, int x, int y, int w, int h, recti uv) {
+        void SetRectVertex(T* v, int32_t x, int32_t y, int32_t w, int32_t h, recti uv) {
             v[0].vertex.x = (float)x / scene_size.x * 2.0f - 1.0f;
             v[0].vertex.y = 1.0f - (float)y / scene_size.y * 2.0f;
             v[1].vertex.x = (float)(x + w) / scene_size.x * 2.0f - 1.0f;
@@ -362,11 +362,11 @@ namespace sgui
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
         glbase::Font& GetGUIFont(const std::string& name) { return font_mgr[name]; }
         glbase::Texture& GetGUITexture() { return gui_texture; }
-        unsigned int GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
+        uint32_t GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
         void CheckMouseMove();
         double GetTime();
-        unsigned int GetIndexBuffer() { return index_buffer; }
+        uint32_t GetIndexBuffer() { return index_buffer; }
         
         bool InjectMouseMoveEvent(MouseMoveEvent evt);
         bool InjectMouseEnterEvent();
@@ -392,8 +392,8 @@ namespace sgui
         glbase::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<recti> scissor_stack;
-        unsigned long long start_time = 0;
-        unsigned int index_buffer = 0;
+        uint64_t start_time = 0;
+        uint32_t index_buffer = 0;
         std::unordered_map<std::string, glbase::Font> font_mgr;
         glbase::Shader* gui_shader;
         
@@ -419,7 +419,7 @@ namespace sgui
         virtual void Draw();
         virtual std::shared_ptr<SGWidget> GetDragingTarget() { return shared_from_this(); }
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth();
+        virtual int32_t GetMaxWidth();
         virtual bool IsMultiLine();
         std::shared_ptr<SGWidget> GetCloseButton() { return children[0]; }
         void SetTitle(const std::wstring& t);
@@ -430,7 +430,7 @@ namespace sgui
         virtual bool DragingBegin(v2i evt);
         virtual bool DragingUpdate(v2i evt);
         bool CloseButtonClick(SGWidget& sender);
-        unsigned int drag_type = 0;
+        uint32_t drag_type = 0;
         v2i drag_diff = {0, 0};
         
     public:
@@ -447,19 +447,19 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual void SetFont(glbase::Font* ft);
-        virtual void SetSpacing(unsigned int x, unsigned int y);
+        virtual void SetSpacing(uint32_t x, uint32_t y);
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth();
+        virtual int32_t GetMaxWidth();
         virtual bool IsMultiLine();
         virtual void ClearText();
-        virtual void SetText(const std::wstring& t, unsigned int cl);
-        virtual void AppendText(const std::wstring& t, unsigned int cl);
+        virtual void SetText(const std::wstring& t, uint32_t cl);
+        virtual void AppendText(const std::wstring& t, uint32_t cl);
         
     protected:
-        unsigned int max_width = 0;
+        uint32_t max_width = 0;
         
     public:
-        static std::shared_ptr<SGLabel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw = 0xffff);
+        static std::shared_ptr<SGLabel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int32_t mw = 0xffff);
         static SGConfig label_config;
     };
 
@@ -471,11 +471,11 @@ namespace sgui
         virtual void Draw();
         
     protected:
-        int icon_size = 0;
-        int icon_mem_size = 0;
+        int32_t icon_size = 0;
+        int32_t icon_mem_size = 0;
         
     public:
-        static std::shared_ptr<SGIconLabel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int mw = 0xffff);
+        static std::shared_ptr<SGIconLabel> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, const std::wstring& t, int32_t mw = 0xffff);
         static SGConfig iconlabel_config;
     };
     
@@ -497,7 +497,7 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth();
+        virtual int32_t GetMaxWidth();
         virtual bool IsMultiLine();
         virtual v2i GetImageOffset();
         void SetTextureRect(recti r1, recti r2, recti r3);
@@ -513,9 +513,9 @@ namespace sgui
         virtual bool EventMouseButtonUp(MouseButtonEvent evt);
         
         bool is_push = false;
-        unsigned int state = 0;
-        int lwidth = 0;
-        int rwidth = 0;
+        uint32_t state = 0;
+        int32_t lwidth = 0;
+        int32_t rwidth = 0;
         recti tex_rect[3] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
         glbase::Texture* tex_texture = nullptr;
         
@@ -531,13 +531,13 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual void SetFont(glbase::Font* ft);
-        virtual void SetSpacing(unsigned int x, unsigned int y);
+        virtual void SetSpacing(uint32_t x, uint32_t y);
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth();
+        virtual int32_t GetMaxWidth();
         virtual bool IsMultiLine();
         virtual void ClearText();
-        virtual void SetText(const std::wstring& t, unsigned int cl);
-        virtual void AppendText(const std::wstring& t, unsigned int cl);
+        virtual void SetText(const std::wstring& t, uint32_t cl);
+        virtual void AppendText(const std::wstring& t, uint32_t cl);
         
         virtual void SetChecked(bool chk);
         virtual bool IsChecked() { return checked; }
@@ -549,7 +549,7 @@ namespace sgui
         virtual bool EventMouseButtonDown(MouseButtonEvent evt);
         virtual bool EventMouseButtonUp(MouseButtonEvent evt);
         
-        unsigned int state = 0;
+        uint32_t state = 0;
         bool checked = false;
     
     public:
@@ -584,7 +584,7 @@ namespace sgui
         virtual void Draw();
         void SetRange(float minv, float maxv, float cur);
         void SetValue(float cur);
-        void SetSliderLength(int length);
+        void SetSliderLength(int32_t length);
         
         SGEventHandler<SGWidget, float> eventValueChange;
         
@@ -599,11 +599,11 @@ namespace sgui
         
         float minvalue = 0.0f;
         float maxvalue = 100.0f;
-        int current_pos = 0;
-        int pos_min = 0;
-        int pos_max = 0;
-        int slider_diff = 0;
-        int slider_length = 0;
+        int32_t current_pos = 0;
+        int32_t pos_min = 0;
+        int32_t pos_max = 0;
+        int32_t slider_diff = 0;
+        int32_t slider_length = 0;
         bool slider_hoving = false;
         bool slider_moving = false;
         bool is_horizontal = true;
@@ -621,15 +621,15 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth();
+        virtual int32_t GetMaxWidth();
         virtual bool IsMultiLine() { return false; };
-        virtual unsigned int GetTextColor(int index);
+        virtual uint32_t GetTextColor(int32_t index);
         void DrawSelectRegion();
         void UpdateSelRegion();
-        void SetSelRegion(unsigned int start, unsigned int end);
+        void SetSelRegion(uint32_t start, uint32_t end);
         void CheckCursorPos();
         void CheckDragPos();
-        void SetDefaultColor(unsigned int color) { def_color = color; }
+        void SetDefaultColor(uint32_t color) { def_color = color; }
         void SetReadOnly(bool ro);
         
         SGEventHandler<SGWidget> eventTextEnter;
@@ -646,23 +646,23 @@ namespace sgui
         virtual bool DragingUpdate(v2i evt);
         virtual bool DragingEnd(v2i evt);
         
-        unsigned int GetHitIndex(v2i pos);
+        uint32_t GetHitIndex(v2i pos);
         
-        unsigned int def_color = 0xff000000;
-        unsigned int sel_color = 0xffffffff;
-        unsigned int sel_bcolor = 0xff000000;
+        uint32_t def_color = 0xff000000;
+        uint32_t sel_color = 0xffffffff;
+        uint32_t sel_bcolor = 0xff000000;
         bool hoving = false;
         bool focus = false;
         bool draging = false;
         bool read_only = false;
-        int text_offset = 0;
-        int drag_check = 0;
+        int32_t text_offset = 0;
+        int32_t drag_check = 0;
         recti text_area = {0, 0, 0, 0};
         double cursor_time = 0.0;
-        unsigned int cursor_pos = 0;
+        uint32_t cursor_pos = 0;
         bool sel_change = true;
-        unsigned int sel_start = 0;
-        unsigned int sel_end = 0;
+        uint32_t sel_start = 0;
+        uint32_t sel_end = 0;
         
     public:
         static std::shared_ptr<SGTextEdit> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
@@ -675,24 +675,24 @@ namespace sgui
         virtual void UpdateVertices();
         virtual void Draw();
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth() { return 0xffff; }
+        virtual int32_t GetMaxWidth() { return 0xffff; }
         virtual bool IsMultiLine() { return true; };
         virtual void UpdateTextVertex();
-        void InsertItem(unsigned int index, unsigned short icon, const std::wstring& item, unsigned int color, int val = 0);
-        void AddItem(unsigned short icon, const std::wstring& item, unsigned int color, int val = 0);
-        void RemoveItem(unsigned int index);
+        void InsertItem(uint32_t index, uint16_t icon, const std::wstring& item, uint32_t color, int32_t val = 0);
+        void AddItem(uint16_t icon, const std::wstring& item, uint32_t color, int32_t val = 0);
+        void RemoveItem(uint32_t index);
         void ClearItem();
-        void SetItemIcon(unsigned int index, unsigned short icon);
-        void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
-        void SetItemValue(unsigned int index, int val);
-        const std::tuple<unsigned short, std::wstring, unsigned int, int>& GetItem(unsigned int index);
-        void SetSelection(int sel);
-        int GetSeletion();
-        int GetItemCount() { return (int)items.size(); }
-        int GetHoverItem(int offsetx, int offsety);
+        void SetItemIcon(uint32_t index, uint16_t icon);
+        void SetItemText(uint32_t index, const std::wstring& text, uint32_t color);
+        void SetItemValue(uint32_t index, int32_t val);
+        const std::tuple<uint16_t, std::wstring, uint32_t, int32_t>& GetItem(uint32_t index);
+        void SetSelection(int32_t sel);
+        int32_t GetSeletion();
+        int32_t GetItemCount() { return (int32_t)items.size(); }
+        int32_t GetHoverItem(int32_t offsetx, int32_t offsety);
         
-        SGEventHandler<SGWidget, int> eventSelChange;
-        SGEventHandler<SGWidget, int> eventDoubleClick;
+        SGEventHandler<SGWidget, int32_t> eventSelChange;
+        SGEventHandler<SGWidget, int32_t> eventDoubleClick;
         
     protected:
         
@@ -703,18 +703,18 @@ namespace sgui
         bool ScrollBarChange(SGWidget& sender, float value);
         
         bool is_hoving = false;
-        unsigned int sel_color = 0xffffffff;
-        unsigned int sel_bcolor = 0xff000000;
-        unsigned int color1 = 0xffffffff;
-        unsigned int color2 = 0xffeeeeee;
-        int current_sel = -1;
-        int line_spacing = 0;
-        int text_offset = 0;
-        int item_count = 0;
-        int max_item_count = 0;
+        uint32_t sel_color = 0xffffffff;
+        uint32_t sel_bcolor = 0xff000000;
+        uint32_t color1 = 0xffffffff;
+        uint32_t color2 = 0xffeeeeee;
+        int32_t current_sel = -1;
+        int32_t line_spacing = 0;
+        int32_t text_offset = 0;
+        int32_t item_count = 0;
+        int32_t max_item_count = 0;
         recti text_area = {0, 0, 0, 0};
         double click_time = 0.0;
-        std::vector<std::tuple<unsigned short, std::wstring, unsigned int, int>> items;
+        std::vector<std::tuple<uint16_t, std::wstring, uint32_t, int32_t>> items;
         
     public:
         static std::shared_ptr<SGListBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
@@ -728,20 +728,20 @@ namespace sgui
         virtual void Draw();
         virtual void PostResize(bool res, bool rep);
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth() { return 0xffff; }
+        virtual int32_t GetMaxWidth() { return 0xffff; }
         virtual bool IsMultiLine() { return true; };
-        void InsertItem(unsigned int index, const std::wstring& item, unsigned int color, int val = 0);
-        void AddItem(const std::wstring& item, unsigned int color, int val = 0);
-        void RemoveItem(unsigned int index);
+        void InsertItem(uint32_t index, const std::wstring& item, uint32_t color, int32_t val = 0);
+        void AddItem(const std::wstring& item, uint32_t color, int32_t val = 0);
+        void RemoveItem(uint32_t index);
         void ClearItem();
-        void SetItemText(unsigned int index, const std::wstring& text, unsigned int color);
-        void SetItemValue(unsigned int index, int val);
-        void SetSelection(int sel);
-        int GetSelection();
-        int GetSelectedValue();
+        void SetItemText(uint32_t index, const std::wstring& text, uint32_t color);
+        void SetItemValue(uint32_t index, int32_t val);
+        void SetSelection(int32_t sel);
+        int32_t GetSelection();
+        int32_t GetSelectedValue();
         void ShowList(bool show);
         
-        SGEventHandler<SGWidget, int> eventSelChange;
+        SGEventHandler<SGWidget, int32_t> eventSelChange;
         
     protected:
         virtual bool EventMouseEnter();
@@ -750,9 +750,9 @@ namespace sgui
         
         bool show_item = false;
         bool is_hoving = false;
-        int current_sel = -1;
+        int32_t current_sel = -1;
         recti text_area = {0, 0, 0, 0};
-        std::vector<std::tuple<std::wstring, unsigned int, int>> items;
+        std::vector<std::tuple<std::wstring, uint32_t, int32_t>> items;
         
     public:
         static std::shared_ptr<SGComboBox> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size);
@@ -768,17 +768,17 @@ namespace sgui
         virtual void Draw();
         virtual void PostResize(bool res, bool rep);
         virtual v2i GetTextOffset();
-        virtual int GetMaxWidth() { return 0xffff; }
+        virtual int32_t GetMaxWidth() { return 0xffff; }
         virtual bool IsMultiLine() { return false; }
         virtual void EvaluateSize(const std::wstring& t = L"");
         virtual void UpdateTextVertex();;
-        void AddTab(const std::wstring& title, unsigned int color);
-        void RemoveTab(unsigned int index);
-        void SetTabTitle(unsigned int index, const std::wstring& title, unsigned int color);
-        std::shared_ptr<SGWidgetContainer> GetTab(int index);
-        void SetActiveTab(int index);
-        int GetTabCount();
-        int GetActiveTab();
+        void AddTab(const std::wstring& title, uint32_t color);
+        void RemoveTab(uint32_t index);
+        void SetTabTitle(uint32_t index, const std::wstring& title, uint32_t color);
+        std::shared_ptr<SGWidgetContainer> GetTab(int32_t index);
+        void SetActiveTab(int32_t index);
+        int32_t GetTabCount();
+        int32_t GetActiveTab();
         
     protected:
         virtual bool EventMouseMove(MouseMoveEvent evt);
@@ -791,15 +791,15 @@ namespace sgui
         virtual bool EventKeyUp(KeyEvent evt);
         virtual bool EventCharEnter(TextEvent evt);
         
-        int GetHovingTab(v2i pos);
+        int32_t GetHovingTab(v2i pos);
         
         std::weak_ptr<SGWidget> active_tab;
         std::weak_ptr<SGWidget> hover_tab;
-        int max_item_count = 0;
-        int item_count = 0;
-        int tab_height = 0;
-        int tab_ol = 0;
-        int tab_or = 0;
+        int32_t max_item_count = 0;
+        int32_t item_count = 0;
+        int32_t tab_height = 0;
+        int32_t tab_ol = 0;
+        int32_t tab_or = 0;
         bool in_tab = false;
         bool size_dirty = true;
         

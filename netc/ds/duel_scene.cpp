@@ -20,9 +20,9 @@ namespace ygopro
         vert[2].texcoord = texcoord[2];
         vert[3].vertex = vertex[3];
         vert[3].texcoord = texcoord[3];
-        for(int i = 0; i < 4; ++i) {
-            vert[i].color = ((int)(alpha.Get() * 255) << 24) | 0xffffff;
-            vert[i].hcolor = ((int)(hl.Get() * 255) << 24) | hlcolor;
+        for(int32_t i = 0; i < 4; ++i) {
+            vert[i].color = ((int32_t)(alpha.Get() * 255) << 24) | 0xffffff;
+            vert[i].hcolor = ((int32_t)(hl.Get() * 255) << 24) | hlcolor;
         }
         glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * vertex_index * 4, sizeof(glbase::v3hct) * 4, &vert[0]);
     }
@@ -34,7 +34,7 @@ namespace ygopro
         return alpha.NeedUpdate() || hl.NeedUpdate();
     }
     
-    void FieldBlock::Init(unsigned int idx, rectf center, ti4 ti) {
+    void FieldBlock::Init(uint32_t idx, rectf center, ti4 ti) {
         vertex_index = idx;
         translation = {center.left, center.top, 0.0f};
         vertex.push_back({center.left - center.width * 0.5f, center.top + center.height * 0.5f, 0.0f});
@@ -67,8 +67,8 @@ namespace ygopro
             }
             update_rvert = false;
         }
-        unsigned int cl = ((unsigned int)(alpha.Get() * 255) << 24) | 0xffffff;
-        unsigned int hcl = ((unsigned int)(hl.Get() * 255) << 24) | hlcolor;
+        uint32_t cl = ((uint32_t)(alpha.Get() * 255) << 24) | 0xffffff;
+        uint32_t hcl = ((uint32_t)(hl.Get() * 255) << 24) | hlcolor;
         auto& tl = translation.Get();
         for(size_t i = 0; i < 12; ++i) {
             vert[i].vertex = vertex_r[i] + tl;
@@ -95,7 +95,7 @@ namespace ygopro
         return translation.NeedUpdate() || rotation.NeedUpdate() || dy.NeedUpdate() || alpha.NeedUpdate() || hl.NeedUpdate();
     }
     
-    void FieldCard::Init(unsigned int idx, unsigned int code, int side) {
+    void FieldCard::Init(uint32_t idx, uint32_t code, int32_t side) {
         rectf center = SceneMgr::Get().LayoutRectConfig("card");
         vertex_index = idx;
         this->code = code;
@@ -122,7 +122,7 @@ namespace ygopro
         texcoord[6] = sleeve.vert[2];
         texcoord[7] = sleeve.vert[3];
         // icon
-        for(int i = 8; i < 12; ++i) {
+        for(int32_t i = 8; i < 12; ++i) {
             vertex[i] = {0.0f, 0.0f, 0.0f};
             texcoord[i] = {0.0f, 0.0f};
         }
@@ -130,21 +130,21 @@ namespace ygopro
         hl = 0.0f;
     }
     
-    void FieldCard::SetCode(unsigned int code, bool refresh) {
+    void FieldCard::SetCode(uint32_t code, bool refresh) {
         if(this->code == code)
             return;
         ImageMgr::Get().UnloadCardTexture(this->code);
         this->code = code;
         auto ti = code ? ImageMgr::Get().GetCardTexture(code) : ImageMgr::Get().GetTexture("unknown");
-        for(int i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 4; ++i)
             texcoord[i] = ti.vert[i];
         if(refresh)
             RefreshVertices();
     }
     
-    void FieldCard::SetIconTex(int iid, bool refresh) {
+    void FieldCard::SetIconTex(int32_t iid, bool refresh) {
         if(iid == 0) {
-            for(int i = 8; i < 12; ++i) {
+            for(int32_t i = 8; i < 12; ++i) {
                 vertex[i] = {0.0f, 0.0f, 0.0f};
                 texcoord[i] = {0.0f, 0.0f};
             }
@@ -190,9 +190,9 @@ namespace ygopro
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
         glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * 32 * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
-        std::vector<unsigned short> index;
+        std::vector<uint16_t> index;
         index.resize(128 * 6);
-        for(int i = 0; i < 128; ++i) {
+        for(int32_t i = 0; i < 128; ++i) {
             index[i * 6] = i * 4;
             index[i * 6 + 1] = i * 4 + 2;
             index[i * 6 + 2] = i * 4 + 1;
@@ -201,16 +201,16 @@ namespace ygopro
             index[i * 6 + 5] = i * 4 + 3;
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 128 * 6, &index[0], GL_STATIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * 128 * 6, &index[0], GL_STATIC_DRAW);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned short) * 512 * 3 * 6, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * 512 * 3 * 6, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glGenVertexArrays(1, &field_vao);
         glGenVertexArrays(1, &back_vao);
         glGenVertexArrays(1, &card_vao);
         glGenVertexArrays(1, &misc_vao);
         GLCheckError(__FILE__, __LINE__);
-        for(int i = 0; i < 4; ++i) {
+        for(int32_t i = 0; i < 4; ++i) {
             switch(i) {
                 case 0: glBindVertexArray(field_vao); glBindBuffer(GL_ARRAY_BUFFER, field_buffer); break;
                 case 1: glBindVertexArray(back_vao); glBindBuffer(GL_ARRAY_BUFFER, back_buffer); break;
@@ -399,8 +399,8 @@ namespace ygopro
     }
     
     void DuelScene::UpdateRegion() {
-        for(int side = 0; side < 1; ++side) {
-            unsigned int region = (refresh_region >> (side * 16)) & 0xffff;
+        for(int32_t side = 0; side < 1; ++side) {
+            uint32_t region = (refresh_region >> (side * 16)) & 0xffff;
             if(region & 0x1)
                 for(auto& iter : deck[side])
                     RefreshPos(iter, false, 0.5);
@@ -415,7 +415,7 @@ namespace ygopro
             if(region & 0x10)
                 for(auto& iter : extra[side])
                     RefreshPos(iter, false, 0.5);
-            for(int seq = 0; seq < 5; ++seq) {
+            for(int32_t seq = 0; seq < 5; ++seq) {
                 if(region & (0x20 << seq)) {
                     auto pcard = m_zone[side][seq];
                     if(pcard) {
@@ -465,7 +465,7 @@ namespace ygopro
         if(!update_misc)
             return;
         update_misc = false;
-        for(int i = 0; i < 5; ++i) {
+        for(int32_t i = 0; i < 5; ++i) {
             RefreshPos(AddCard((i % 2) ? 83764718 : 0, 0, 0x1, i, 1));
             RefreshPos(AddCard((i % 2) ? 83764718 : 0, 1, 0x2, i, 1));
         }
@@ -478,15 +478,15 @@ namespace ygopro
         if(!update_index)
             return;
         update_index = false;
-        std::vector<unsigned short> index;
+        std::vector<uint16_t> index;
         index.resize(alloc_cards.size() * 18);
-        unsigned short istart = 0;
+        uint16_t istart = 0;
         auto push_index = [&index, &istart](std::vector<std::shared_ptr<FieldCard>>& vec) {
             for(auto& iter : vec) {
                 if(iter == nullptr)
                     continue;
-                unsigned int vstart = iter->vertex_index * 12;
-                for(int i = 0; i < 3; ++i) {
+                uint32_t vstart = iter->vertex_index * 12;
+                for(int32_t i = 0; i < 3; ++i) {
                     index[istart + i * 6 + 0] = vstart + i * 4 + 0;
                     index[istart + i * 6 + 1] = vstart + i * 4 + 2;
                     index[istart + i * 6 + 2] = vstart + i * 4 + 1;
@@ -522,13 +522,13 @@ namespace ygopro
         push_index(hand[0]);
         if(index.size() > 0) {
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_index_buffer);
-            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(unsigned short) * index.size(), &index[0]);
+            glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * index.size(), &index[0]);
             GLCheckError(__FILE__, __LINE__);
         }
     }
     
     void DuelScene::InitField() {
-        for(int i = 0 ; i < 17; ++i) {
+        for(int32_t i = 0 ; i < 17; ++i) {
             field_blocks[0][i] = std::make_shared<FieldBlock>();
             field_blocks[1][i] = std::make_shared<FieldBlock>();
         }
@@ -549,7 +549,7 @@ namespace ygopro
         field_blocks[0][14]->Init(14, SceneMgr::Get().LayoutRectConfig("exdeck"), ImageMgr::Get().GetTexture("exdeck"));
         field_blocks[0][15]->Init(15, SceneMgr::Get().LayoutRectConfig("grave" ), ImageMgr::Get().GetTexture("grave"));
         field_blocks[0][16]->Init(16, SceneMgr::Get().LayoutRectConfig("banish"), ImageMgr::Get().GetTexture("banish"));
-        for(int i = 0; i < 17; ++i) {
+        for(int32_t i = 0; i < 17; ++i) {
             *field_blocks[1][i] = *field_blocks[0][i];
             field_blocks[1][i]->translation = field_blocks[0][i]->translation * -1;
             for(auto& vert : field_blocks[1][i]->vertex)
@@ -563,7 +563,7 @@ namespace ygopro
     }
     
     void DuelScene::RefreshBlocks() {
-        for(int i = 0 ; i < 17; ++i) {
+        for(int32_t i = 0 ; i < 17; ++i) {
             field_blocks[0][i]->RefreshVertices();
             field_blocks[1][i]->RefreshVertices();
         }
@@ -576,7 +576,7 @@ namespace ygopro
         }
     }
     
-    std::shared_ptr<FieldCard> DuelScene::AddCard(unsigned int code, int side, int zone, int seq, int subs) {
+    std::shared_ptr<FieldCard> DuelScene::AddCard(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs) {
         if(side > 1)
             return nullptr;
         if(zone & 0x4) {
@@ -637,7 +637,7 @@ namespace ygopro
         return ptr;
     }
     
-    std::shared_ptr<FieldCard> DuelScene::GetCard(int side, int zone, int seq, int subs) {
+    std::shared_ptr<FieldCard> DuelScene::GetCard(int32_t side, int32_t zone, int32_t seq, int32_t subs) {
         switch(zone & 0x7f) {
             case 0x1:
                 return deck[side][seq];
@@ -661,14 +661,14 @@ namespace ygopro
         return nullptr;
     }
     
-    std::shared_ptr<FieldCard> DuelScene::RemoveCard(int side, int zone, int seq, int subs) {
+    std::shared_ptr<FieldCard> DuelScene::RemoveCard(int32_t side, int32_t zone, int32_t seq, int32_t subs) {
         std::shared_ptr<FieldCard> ret;
         switch(zone & 0x7f) {
             case 0x1:
                 ret = deck[side][seq];
                 deck[side].erase(deck[side].begin() + seq);
                 if(seq != deck[side].size()) {
-                    unsigned int index = 0;
+                    uint32_t index = 0;
                     for(auto& iter : deck[side])
                         iter->seq = index++;
                     refresh_region |= 0x1 << (side * 16);
@@ -679,7 +679,7 @@ namespace ygopro
                 hand[side].erase(hand[side].begin() + seq);
                 ret->dy.SetAnimator(std::make_shared<LerpAnimator<float, TGenMove>>(ret->dy.Get(), 0.0f, SceneMgr::Get().GetGameTime(), 0.5, 10));
                 {
-                    unsigned int index = 0;
+                    uint32_t index = 0;
                     for(auto& iter : hand[side])
                         iter->seq = index++;
                     refresh_region |= 0x2 << (side * 16);
@@ -690,7 +690,7 @@ namespace ygopro
                     auto pcard = m_zone[side][seq];
                     ret = pcard->olcards[subs];
                     pcard->olcards.erase(pcard->olcards.begin() + subs);
-                    unsigned int index = 0;
+                    uint32_t index = 0;
                     for(auto& iter : pcard->olcards)
                         iter->seq = index++;
                     refresh_region |= 0x20 << (side * 16 + seq);
@@ -707,7 +707,7 @@ namespace ygopro
                 ret = grave[side][seq];
                 grave[side].erase(grave[side].begin() + seq);
                 if(seq != grave[side].size()) {
-                    unsigned int index = 0;
+                    uint32_t index = 0;
                     for(auto& iter : grave[side])
                         iter->seq = index++;
                     refresh_region |= 0x4 << (side * 16);
@@ -717,7 +717,7 @@ namespace ygopro
                 ret = banished[side][seq];
                 banished[side].erase(banished[side].begin() + seq);
                 if(seq != banished[side].size()) {
-                    unsigned int index = 0;
+                    uint32_t index = 0;
                     for(auto& iter : banished[side])
                         iter->seq = index++;
                     refresh_region |= 0x8 << (side * 16);
@@ -727,7 +727,7 @@ namespace ygopro
                 ret = extra[side][seq];
                 extra[side].erase(extra[side].begin() + seq);
                 if(seq != extra[side].size()) {
-                    unsigned int index = 0;
+                    uint32_t index = 0;
                     for(auto& iter : extra[side])
                         iter->seq = index++;
                     refresh_region |= 0x10 << (side * 16);
@@ -746,9 +746,9 @@ namespace ygopro
         // POS_FACEDOWN_DEFENCE     0x8
         v3f tl;
         glm::quat rot;
-        unsigned int side = pcard->side;
-        unsigned int seq = pcard->seq;
-        unsigned int subs = pcard->pos;
+        uint32_t side = pcard->side;
+        uint32_t seq = pcard->seq;
+        uint32_t subs = pcard->pos;
         switch(pcard->loc & 0x7f) {
             case 0x1: {
                 tl = field_blocks[side][13]->translation;
@@ -767,7 +767,7 @@ namespace ygopro
             }
                 break;
             case 0x2: {
-                int ct = hand[side].size();
+                int32_t ct = hand[side].size();
                 if(ct == 0)
                     return;
                 if(side == 0) {
@@ -901,8 +901,8 @@ namespace ygopro
         AddUpdateCard(pcard);
     }
 
-    void DuelScene::RefreshHand(int side, bool update, float tm) {
-        int ct = hand[side].size();
+    void DuelScene::RefreshHand(int32_t side, bool update, float tm) {
+        int32_t ct = hand[side].size();
         if(ct == 0)
             return;
         v3f tl;
@@ -949,7 +949,7 @@ namespace ygopro
         }
     }
     
-    void DuelScene::MoveCard(std::shared_ptr<FieldCard> pcard, int toside, int tozone, int toseq, int tosubs, bool update, float tm) {
+    void DuelScene::MoveCard(std::shared_ptr<FieldCard> pcard, int32_t toside, int32_t tozone, int32_t toseq, int32_t tosubs, bool update, float tm) {
         if(pcard->side == toside && pcard->loc == tozone && pcard->seq == toseq && pcard->pos == tosubs)
             return;
         RemoveCard(pcard->side, pcard->loc, pcard->seq, pcard->pos);
@@ -999,7 +999,7 @@ namespace ygopro
         update_index = true;
     }
     
-    void DuelScene::ChangePos(std::shared_ptr<FieldCard> pcard, int pos, bool update, float tm) {
+    void DuelScene::ChangePos(std::shared_ptr<FieldCard> pcard, int32_t pos, bool update, float tm) {
         if(pcard->loc != 0x4 && pcard->loc != 0x8)
             return;
         if(pcard->pos == pos)
@@ -1077,7 +1077,7 @@ namespace ygopro
     }
     
     void DuelScene::ClearField() {
-        for(int i = 0; i < 2; ++i) {
+        for(int32_t i = 0; i < 2; ++i) {
             deck[i].clear();
             hand[i].clear();
             m_zone[i].clear();
@@ -1093,7 +1093,7 @@ namespace ygopro
     }
     
     v2i DuelScene::CheckHoverBlock(float px, float py) {
-        for(int i = 0 ; i < 17; ++i) {
+        for(int32_t i = 0 ; i < 17; ++i) {
             if(field_blocks[0][i]->CheckInside(px, py))
                 return {1, i};
             if(field_blocks[1][i]->CheckInside(px, py))
@@ -1115,13 +1115,13 @@ namespace ygopro
         return {px, py};
     }
     
-    v2i DuelScene::GetHoverPos(int posx, int posy) {
+    v2i DuelScene::GetHoverPos(int32_t posx, int32_t posy) {
         float sx = (float)posx / scene_size.x * 2.0f - 1.0f;
         float sy = 1.0f - (float)posy / scene_size.y * 2.0f;
         if(sx > vparam.hand_rect[0].left && sx < vparam.hand_rect[0].left + vparam.hand_rect[0].width &&
            sy < vparam.hand_rect[0].top && sy > vparam.hand_rect[0].top - vparam.hand_rect[0].height) {
             float wwidth = vparam.hand_rect[0].width;
-            int ct = hand[0].size();
+            int32_t ct = hand[0].size();
             if(ct > 0) {
                 float whand = ct * vparam.hand_width[0] + (ct - 1) * vparam.hand_width[0] * 0.1f;
                 if(whand >= wwidth) {
@@ -1130,7 +1130,7 @@ namespace ygopro
                         return {3, ct - 1};
                     else {
                         float front_width = (lastleft - vparam.hand_rect[0].left) / (ct - 1);
-                        int index = (int)((sx - vparam.hand_rect[0].left) / front_width);
+                        int32_t index = (int32_t)((sx - vparam.hand_rect[0].left) / front_width);
                         if(sx - vparam.hand_rect[0].left - front_width * index < vparam.hand_width[0])
                             return {3, index};
                     }
@@ -1141,7 +1141,7 @@ namespace ygopro
                         return {3, ct - 1};
                     else if(sx >= wleft && sx < lastleft) {
                         float front_width = vparam.hand_width[0] * 1.1f;
-                        int index = (int)((sx - wleft) / front_width);
+                        int32_t index = (int32_t)((sx - wleft) / front_width);
                         if(sx - wleft - front_width * index < vparam.hand_width[0])
                             return {3, index};
                     }
@@ -1151,7 +1151,7 @@ namespace ygopro
         if(sx > vparam.hand_rect[1].left - vparam.hand_rect[1].width && sx < vparam.hand_rect[1].left &&
            sy < vparam.hand_rect[1].top && sy > vparam.hand_rect[1].top - vparam.hand_rect[1].height) {
             float wwidth = vparam.hand_rect[1].width;
-            int ct = hand[1].size();
+            int32_t ct = hand[1].size();
             if(ct > 0) {
                 float whand = ct * vparam.hand_width[1] + (ct - 1) * vparam.hand_width[1] * 0.1f;
                 if(whand >= wwidth) {
@@ -1160,7 +1160,7 @@ namespace ygopro
                         return {4, ct - 1};
                     else {
                         float front_width = (wwidth - vparam.hand_width[1]) / (ct - 1);
-                        int index = (int)((vparam.hand_rect[1].left - sx) / front_width);
+                        int32_t index = (int32_t)((vparam.hand_rect[1].left - sx) / front_width);
                         if(vparam.hand_rect[1].left - sx - front_width * index < vparam.hand_width[1])
                             return {4, index};
                     }
@@ -1171,7 +1171,7 @@ namespace ygopro
                         return {4, ct - 1};
                     else if(sx >= lastleft && sx < wleft) {
                         float front_width = vparam.hand_width[1] * 1.1f;
-                        int index = (int)((wleft - sx) / front_width);
+                        int32_t index = (int32_t)((wleft - sx) / front_width);
                         if(wleft - sx - front_width * index < vparam.hand_width[1])
                             return {4, index};
                     }
@@ -1185,14 +1185,14 @@ namespace ygopro
         return {0, 0};
     }
     
-    std::shared_ptr<FieldBlock> DuelScene::GetFieldBlock(int x, int y) {
+    std::shared_ptr<FieldBlock> DuelScene::GetFieldBlock(int32_t x, int32_t y) {
         if(x == 1 || x == 2)
             if(y < 17)
                 return field_blocks[x - 1][y];
         return nullptr;
     }
     
-    std::shared_ptr<FieldCard> DuelScene::GetFieldCard(int x, int y) {
+    std::shared_ptr<FieldCard> DuelScene::GetFieldCard(int32_t x, int32_t y) {
         if(x == 3 || x == 4)
             if(y < hand[x - 3].size())
                 return hand[x - 3][y];

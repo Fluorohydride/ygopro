@@ -1,65 +1,24 @@
 #ifndef _CONVERT_H_
 #define _CONVERT_H_
 
-template<int type>
-struct ConverteImpl {
-    static unsigned long long ConvertVal(const char* str) {
-        const char* s = str;
-        int radix = (str[0] == '0' && (str[1] == 'X' || str[1] == 'x')) ? 16 : 10;
-        return strtoull(s, nullptr, radix);
-    }
-    
-    template<typename T>
-    static std::string ConvertStr(const T& val) {
-        char buf[32];
-        sprintf(buf, "%ld", static_cast<long>(val));
-        return std::move(std::string(buf));
-    }
-    
-    template<typename T>
-    static std::string ConvertStr(const char* format, const T& val) {
-        char buf[32];
-        sprintf(buf, format, static_cast<long>(val));
-        return std::move(std::string(buf));
-    }
-    
-};
-
-template<>
-struct ConverteImpl<2> {
-    static double ConvertVal(const char* str) {
-        return atof(str);
-    }
-    
-    template<typename T>
-    static std::string ConvertStr(const T& val) {
-        char buf[32];
-        sprintf(buf, "%lf", val);
-        return std::move(std::string(buf));
-    }
-    
-    template<typename T>
-    static std::string ConvertStr(const char* format, const T& val) {
-        char buf[32];
-        sprintf(buf, format, val);
-        return std::move(std::string(buf));
-    }
-    
-};
-
 template<typename T>
-struct ConverterType {
-    static const int conv_type = 1;
-};
-
-template<>
-struct ConverterType<float> {
-    static const int conv_type = 2;
-};
-
-template<>
-struct ConverterType<double> {
-    static const int conv_type = 2;
+struct ConverteImpl {
+    static T ConvertVal(const char* str) {
+        if(std::is_integral<T>::value) {
+            const char* s = str;
+            int radix = (str[0] == '0' && (str[1] == 'X' || str[1] == 'x')) ? 16 : 10;
+            return static_cast<T>(strtoull(s, nullptr, radix));
+        } else
+            return static_cast<T>(atof(str));
+    }
+    static std::string ConvertStr(const T& val) {
+        char buf[256];
+        if(std::is_integral<T>::value)
+            sprintf(buf, "%ld", static_cast<long>(val));
+        else
+            sprintf(buf, "%lf", static_cast<double>(val));
+        return std::move(std::string(buf));
+    }
 };
 
 template<typename T, typename TOTYPE>
@@ -72,32 +31,28 @@ struct ToInner {
 template<typename TOTYPE>
 struct ToInner<char*, TOTYPE> {
     static TOTYPE C(const char* str) {
-        return static_cast<TOTYPE>(ConverteImpl<ConverterType<TOTYPE>::conv_type>::ConvertVal(str));
+        return static_cast<TOTYPE>(ConverteImpl<TOTYPE>::ConvertVal(str));
     };
 };
 
 template<typename TOTYPE>
 struct ToInner<const char*, TOTYPE> {
     static TOTYPE C(const char* str) {
-        return static_cast<TOTYPE>(ConverteImpl<ConverterType<TOTYPE>::conv_type>::ConvertVal(str));
+        return static_cast<TOTYPE>(ConverteImpl<TOTYPE>::ConvertVal(str));
     };
 };
 
 template<typename TOTYPE>
 struct ToInner<std::string, TOTYPE> {
     static TOTYPE C(const std::string& str) {
-        return static_cast<TOTYPE>(ConverteImpl<ConverterType<TOTYPE>::conv_type>::ConvertVal(str.c_str()));
+        return static_cast<TOTYPE>(ConverteImpl<TOTYPE>::ConvertVal(str.c_str()));
     };
 };
 
 template<typename T>
 struct ToInner<T, std::string> {
     static std::string C(const T& val) {
-        return std::move(ConverteImpl<ConverterType<T>::conv_type>::ConvertStr(val));
-    }
-    
-    static std::string C(const char* format, const T& val) {
-        return std::move(ConverteImpl<ConverterType<T>::conv_type>::ConvertStr(format, val));
+        return std::move(ConverteImpl<T>::ConvertStr(val));
     }
 };
 
@@ -161,68 +116,9 @@ TOTYPE To(const T& val) {
 
 template<typename TOTYPE, typename T, typename... REST>
 TOTYPE To(const char* format, const T& val, const REST&... r) {
-    char buf[32];
+    char buf[256];
     sprintf(buf, format, val, r...);
     return std::move(std::string(buf));
 }
-
-template<typename T>
-struct ConvertResult {
-    ConvertResult() = default;
-    ConvertResult(ConvertResult<T>&& rt) {
-        val = std::move(rt.val);
-    }
-    
-    operator T() {
-        return std::move(val);
-    }
-    
-    template<typename TOTYPE>
-    ConvertResult<TOTYPE> To() {
-        ConvertResult<TOTYPE> ret;
-        ret.val = ToInner<T, TOTYPE>::C(val);
-        return std::move(ret);
-    }
-    
-    template<typename TOTYPE>
-    ConvertResult<TOTYPE> To(const char* format) {
-        ConvertResult<TOTYPE> ret;
-        ret.val = ToInner<T, TOTYPE>::C(val, format);
-        return std::move(ret);
-    }
-    
-    T val;
-};
-
-template<typename T>
-struct ConvertRef {
-    ConvertRef() = default;
-    ConvertRef(const T& init_val) {
-        ref_val = &init_val;
-    }
-    
-    template<typename TOTYPE>
-    ConvertResult<TOTYPE> To() {
-        ConvertResult<TOTYPE> ret;
-        ret.val = ToInner<T, TOTYPE>::C(*ref_val);
-        return std::move(ret);
-    }
-    
-    template<typename TOTYPE>
-    ConvertResult<TOTYPE> To(const char* format) {
-        ConvertResult<TOTYPE> ret;
-        ret.val = ToInner<T, TOTYPE>::C(*ref_val, format);
-        return std::move(ret);
-    }
-    
-    const T* ref_val;
-};
-
-struct Converter {
-    template<typename T>
-    static ConvertRef<T> From(const T& val) {
-        return ConvertRef<T>(val);
-    }
-};
 
 #endif

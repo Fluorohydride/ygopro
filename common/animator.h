@@ -68,7 +68,7 @@ public:
     }
     inline virtual float GetT(double cur_time) {
         float period = (cur_time - start_time) / freq_tm;
-        return period - (int)period;
+        return period - (int32_t)period;
     }
 protected:
     double start_time;
@@ -86,7 +86,7 @@ public:
     }
     inline virtual float GetT(double cur_time) {
         float period = (cur_time - start_time) / freq_tm;
-        period = period - (int)period;
+        period = period - (int32_t)period;
         if(period <= 0.5f)
             return period * 2.0f;
         else

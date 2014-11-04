@@ -14,11 +14,11 @@ namespace ygopro
         virtual void BeginProto() = 0;
         virtual void GetProto() = 0;
         virtual bool ProtoEnd() = 0;
-        virtual void ProcessMsg(unsigned int sz);
-        virtual int MessageToCmd(unsigned char msg_type, BufferUtil& reader);
+        virtual void ProcessMsg(uint32_t sz);
+        virtual int32_t MessageToCmd(uint8_t msg_type, BufferUtil& reader);
         
     protected:
-        std::vector<unsigned char> msg_buffer;
+        std::vector<uint8_t> msg_buffer;
     };
     
     class DuelSceneHandler : public SceneHandler, public Timer<double> {

@@ -9,6 +9,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <chrono>
+#include <random>
 #include <vector>
 #include <list>
 #include <array>
@@ -18,6 +19,7 @@
 #include <unordered_map>
 #include <functional>
 #include <algorithm>
+#include <type_traits>
 #include <cstring>
 #include <ctime>
 #include <cmath>
@@ -25,10 +27,10 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <ctype.h>
+#include <stdint.h>
 #include "singleton.h"
 #include "bufferutil.h"
 #include "convert.h"
-#include "random.h"
 #include "command.h"
 #include "hash.h"
 #include "timer.h"

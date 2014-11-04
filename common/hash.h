@@ -9,13 +9,21 @@
         ((n&0xff0000)<<24)|((n&0xff0000000000)>>24)|((n&0xff00000000)>>8)|((n&0xff000000)<<8) )
 
 // use sha1 algorithm
-class Hash32_SHA1 {
-
+class SHA1 {
+    struct SHA1_RESULT {
+        uint32_t digest[5];
+        bool operator == (const SHA1_RESULT& r) {
+            return (digest[0] == r.digest[0])
+                && (digest[1] == r.digest[1])
+                && (digest[2] == r.digest[2])
+                && (digest[3] == r.digest[3])
+                && (digest[4] == r.digest[4]);
+        }
+    };
 public:
-    Hash32_SHA1() {
+    SHA1() {
         pos = 0;
         length = 0;
-        result = 0;
         digest[0] = 0x67452301;
         digest[1] = 0xefcdab89;
         digest[2] = 0x98badcfe;
@@ -23,10 +31,9 @@ public:
         digest[4] = 0xc3d2e1f0;
     }
 
-    explicit Hash32_SHA1(std::string& str) {
+    explicit SHA1(std::string& str) {
         pos = 0;
         length = 0;
-        result = 0;
         digest[0] = 0x67452301;
         digest[1] = 0xefcdab89;
         digest[2] = 0x98badcfe;
@@ -35,10 +42,9 @@ public:
         Append(str.c_str(), str.length());
     }
 
-    explicit Hash32_SHA1(const void* data, unsigned int size) {
+    explicit SHA1(const void* data, size_t size) {
         pos = 0;
         length = 0;
-        result = 0;
         digest[0] = 0x67452301;
         digest[1] = 0xefcdab89;
         digest[2] = 0x98badcfe;
@@ -47,10 +53,10 @@ public:
         Append(data, size);
     }
 
-    Hash32_SHA1& Append(const void* data, size_t size) {
-        unsigned int lcpy;
-        unsigned int pbuf = 0;
-        unsigned char* buffer = (unsigned char*)data;
+    SHA1& Append(const void* data, size_t size) {
+        uint32_t lcpy;
+        uint32_t pbuf = 0;
+        uint8_t* buffer = (uint8_t*)data;
         length += size;
         while(pos + size >= 64){
             lcpy = 64 - pos;
@@ -62,14 +68,11 @@ public:
         }
         if(size)
             memcpy(&tblock[pos], &buffer[pbuf], size);
-        pos += (unsigned int)length;
+        pos += (uint32_t)length;
         return *this;
     }
 
-    unsigned int GetHash() {
-        if(result)
-            return result;
-        unsigned int out[5];
+    SHA1_RESULT GetHash() {
         memset(&tblock[pos], 0, 64 - pos);
         tblock[pos] = 0x80;
         if(pos >= 56){
@@ -80,50 +83,32 @@ public:
         length = LEFT_MOST64(length);
         memcpy(&tblock[56], &length, 8);
         BlockTransform();
-        out[0] = LEFT_MOST(digest[0]);
-        out[1] = LEFT_MOST(digest[1]);
-        out[2] = LEFT_MOST(digest[2]);
-        out[3] = LEFT_MOST(digest[3]);
-        out[4] = LEFT_MOST(digest[4]);
-        result = out[0] ^ out[1] ^ out[2] ^ out[3] ^ out[4];
+        SHA1_RESULT result;
+        result.digest[0] = LEFT_MOST(digest[0]);
+        result.digest[1] = LEFT_MOST(digest[1]);
+        result.digest[2] = LEFT_MOST(digest[2]);
+        result.digest[3] = LEFT_MOST(digest[3]);
+        result.digest[4] = LEFT_MOST(digest[4]);
         return result;
-    }
-
-    void GetHash(unsigned int out[5]) {
-        memset(&tblock[pos], 0, 64 - pos);
-        tblock[pos] = 0x80;
-        if(pos >= 56){
-            BlockTransform();
-            memset(tblock, 0, 64);
-        }
-        length <<= 3;
-        length = LEFT_MOST64(length);
-        memcpy(&tblock[56], &length, 8);
-        BlockTransform();
-        out[0] = LEFT_MOST(digest[0]);
-        out[1] = LEFT_MOST(digest[1]);
-        out[2] = LEFT_MOST(digest[2]);
-        out[3] = LEFT_MOST(digest[3]);
-        out[4] = LEFT_MOST(digest[4]);
     }
 
 private:
 
     void BlockTransform()
     {
-        unsigned int a = digest[0];
-        unsigned int b = digest[1];
-        unsigned int c = digest[2];
-        unsigned int d = digest[3];
-        unsigned int e = digest[4];
-        unsigned int block[80];
-        unsigned int* pb = (unsigned int *)(tblock);
+        uint32_t a = digest[0];
+        uint32_t b = digest[1];
+        uint32_t c = digest[2];
+        uint32_t d = digest[3];
+        uint32_t e = digest[4];
+        uint32_t block[80];
+        uint32_t* pb = (uint32_t *)(tblock);
 
-        for(int i = 0; i < 16; ++i){
+        for(int32_t i = 0; i < 16; ++i){
             block[i] = LEFT_MOST(pb[i]);
         }
-        for(int i = 16; i < 80; ++i){
-            unsigned int tmp = block[i - 3] ^ block[i - 8] ^ block[i - 14] ^ block[i - 16];
+        for(int32_t i = 16; i < 80; ++i){
+            uint32_t tmp = block[i - 3] ^ block[i - 8] ^ block[i - 14] ^ block[i - 16];
             block[i] = (tmp << 1) | (tmp >> 31);
         }
 
@@ -226,11 +211,10 @@ private:
         digest[4] += e;
     }
 
-    unsigned int digest[5];
-    unsigned char tblock[64];
-    unsigned int pos;
-    unsigned long long length;
-    unsigned int result;
+    uint32_t digest[5];
+    uint8_t tblock[64];
+    uint32_t pos;
+    uint64_t length;
 };
 
 #endif
