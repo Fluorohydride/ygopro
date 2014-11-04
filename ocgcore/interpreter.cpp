@@ -63,6 +63,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetSequence", scriptlib::card_get_sequence },
 	{ "GetPreviousSequence", scriptlib::card_get_previous_sequence },
 	{ "GetSummonType", scriptlib::card_get_summon_type },
+	{ "GetSummonLocation", scriptlib::card_get_summon_location },
 	{ "GetSummonPlayer", scriptlib::card_get_summon_player },
 	{ "GetDestination", scriptlib::card_get_destination },
 	{ "GetLeaveFieldDest", scriptlib::card_get_leave_field_dest },

@@ -366,7 +366,14 @@ int32 scriptlib::card_get_summon_type(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	lua_pushinteger(L, pcard->summon_type);
+	lua_pushinteger(L, pcard->summon_info & 0xff00ffff);
+	return 1;
+}
+int32 scriptlib::card_get_summon_location(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, (pcard->summon_info >> 16) & 0xff);
 	return 1;
 }
 int32 scriptlib::card_get_summon_player(lua_State *L) {

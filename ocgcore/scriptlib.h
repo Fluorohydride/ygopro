@@ -65,6 +65,7 @@ public:
 	static int32 card_get_sequence(lua_State *L);
 	static int32 card_get_previous_sequence(lua_State *L);
 	static int32 card_get_summon_type(lua_State *L);
+	static int32 card_get_summon_location(lua_State *L);
 	static int32 card_get_summon_player(lua_State *L);
 	static int32 card_get_destination(lua_State *L);
 	static int32 card_get_leave_field_dest(lua_State *L);
