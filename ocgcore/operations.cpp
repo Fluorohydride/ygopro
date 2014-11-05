@@ -3469,6 +3469,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					pcard->set_status(STATUS_SET_TURN, TRUE);
 					pcard->set_status(STATUS_FLIP_SUMMONED, FALSE);
 					pcard->enable_field_effect(FALSE);
+					pcard->summon_info &= 0xff00ffff;
 				}
 				if((npos & POS_FACEDOWN) && pcard->equiping_cards.size()) {
 					for(auto csit = pcard->equiping_cards.begin(); csit != pcard->equiping_cards.end();) {
