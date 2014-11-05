@@ -199,10 +199,6 @@ struct processor {
 	card_set discarded_set;
 	card_set destroy_canceled;
 	card_set delayed_enable_set;
-	card_set summoned_cards_pt[2];
-	card_set normalsummoned_cards_pt[2];
-	card_set spsummoned_cards_pt[2];
-	card_set flipsummoned_cards_pt[2];
 	effect_set_v disfield_effects;
 	effect_set_v extraz_effects;
 	effect_set_v extraz_effects_e;
@@ -266,13 +262,18 @@ struct processor {
 	uint8 remove_brainwashing;
 	uint8 flip_delayed;
 	uint8 damage_calculated;
-	uint8 summon_state[2];
-	uint8 normalsummon_state[2];
-	uint8 flipsummon_state[2];
-	uint8 spsummon_state[2];
-	uint8 attack_state[2];
+	uint8 summon_state_count[2];
+	uint8 normalsummon_state_count[2];
+	uint8 flipsummon_state_count[2];
+	uint8 spsummon_state_count[2];
+	uint8 attack_state_count[2];
 	uint8 phase_action;
 	uint32 hint_timing[2];
+	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > normalsummon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > spsummon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > flipsummon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > attack_counter;
 };
 class field {
 public:

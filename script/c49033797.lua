@@ -13,8 +13,8 @@ end
 function c49033797.cfilter(c,tpe)
 	return c:IsFaceup() and c:IsType(tpe)
 end
-function c49033797.filter(c,e,tp,code)
-	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c49033797.filter(c,e,tp,cat)
+	return c:IsSetCard(cat) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c49033797.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -25,11 +25,11 @@ function c49033797.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		if Duel.IsExistingMatchingCard(c49033797.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_XYZ) then flag=flag+4 end
 		e:SetLabel(flag)
 		if flag==3 then
-			return Duel.IsExistingMatchingCard(c49033797.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,8809344)
+			return Duel.IsExistingMatchingCard(c49033797.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,0xb6)
 		elseif flag==6 then
-			return Duel.IsExistingMatchingCard(c49033797.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,17412721)
+			return Duel.IsExistingMatchingCard(c49033797.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,0xb7)
 		elseif flag==5 then
-			return Duel.IsExistingMatchingCard(c49033797.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,12948099)
+			return Duel.IsExistingMatchingCard(c49033797.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,0xb8)
 		else return false end
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -39,7 +39,7 @@ function c49033797.activate(e,tp,eg,ep,ev,re,r,rp)
 	local flag=e:GetLabel()
 	if flag==3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c49033797.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,8809344)
+		local g=Duel.SelectMatchingCard(tp,c49033797.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,0xb6)
 		local sc=g:GetFirst()
 		if sc then
 			Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
@@ -51,13 +51,13 @@ function c49033797.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	elseif flag==6 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c49033797.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,17412721)
+		local g=Duel.SelectMatchingCard(tp,c49033797.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,0xb7)
 		if g:GetCount()>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c49033797.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,12948099)
+		local g=Duel.SelectMatchingCard(tp,c49033797.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,0xb8)
 		if g:GetCount()>0 then
 			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 		end

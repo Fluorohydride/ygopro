@@ -3034,7 +3034,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_cancelable = TRUE;
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
-		core.attack_state[infos.turn_player] = TRUE;
+		core.attack_state_count[infos.turn_player]++;
 		pduel->write_buffer8(MSG_ATTACK);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		if(core.attack_target) {
@@ -3989,15 +3989,11 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 					continue;
 				pcard->set_status(STATUS_SET_TURN, FALSE);
 			}
-			core.summon_state[p] = 0;
-			core.normalsummon_state[p] = 0;
-			core.flipsummon_state[p] = 0;
-			core.spsummon_state[p] = 0;
-			core.summoned_cards_pt[p].clear();
-			core.normalsummoned_cards_pt[p].clear();
-			core.spsummoned_cards_pt[p].clear();
-			core.flipsummoned_cards_pt[p].clear();
-			core.attack_state[p] = 0;
+			core.summon_state_count[p] = 0;
+			core.normalsummon_state_count[p] = 0;
+			core.flipsummon_state_count[p] = 0;
+			core.spsummon_state_count[p] = 0;
+			core.attack_state_count[p] = 0;
 			core.summon_count[p] = 0;
 			core.extra_summon[p] = 0;
 		}
@@ -4354,6 +4350,8 @@ int32 field::add_chain(uint16 step) {
 				peffect->handler->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		}
 		core.phase_action = TRUE;
+		if(clit->opinfos.count(0x200))
+			core.spsummon_state_count[clit->triggering_player]++;
 		pduel->write_buffer8(MSG_CHAINED);
 		pduel->write_buffer8(clit->chain_count);
 		raise_event(peffect->handler, EVENT_CHAINING, peffect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
@@ -4487,6 +4485,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
+			if(cait->opinfos.count(0x200))
+				core.spsummon_state_count[cait->triggering_player]--;
 			return FALSE;
 		}
 		for(auto oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
@@ -4494,8 +4494,6 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				oeit->second = 0;
 		break_effect();
 		core.chain_solving = TRUE;
-		if(cait->opinfos.count(0x200))
-			core.spsummon_state[cait->triggering_player] = TRUE;
 		card* pcard = peffect->handler;
 		if((peffect->type & EFFECT_TYPE_ACTIVATE) && pcard->is_has_relation(peffect)) {
 			pcard->set_status(STATUS_ACTIVATED, TRUE);
@@ -4528,6 +4526,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				return FALSE;
 			}
 		}
+		if(cait->opinfos.count(0x200))
+			core.spsummon_state_count[cait->triggering_player]--;
 		core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 		if(cait->replace_op)
 			cait->triggering_effect->operation = cait->replace_op;

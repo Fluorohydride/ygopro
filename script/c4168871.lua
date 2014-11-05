@@ -16,7 +16,7 @@ function c4168871.filter(c)
 	return c:IsSetCard(0x33) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 end
 function c4168871.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp)
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0
 		and Duel.IsExistingMatchingCard(c4168871.filter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c4168871.filter,tp,LOCATION_HAND,0,1,1,nil)

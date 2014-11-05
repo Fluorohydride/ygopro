@@ -94,7 +94,7 @@ public:
 	query_cache q_cache;
 	uint8 owner;
 	uint8 summon_player;
-	uint32 summon_type;
+	uint32 summon_info;
 	uint32 status;
 	uint32 operation_param;
 	uint8 announce_count;
