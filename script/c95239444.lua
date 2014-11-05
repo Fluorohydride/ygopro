@@ -32,8 +32,8 @@ function c95239444.stcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c95239444.cfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,ct) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c95239444.cfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil,ct)
-	e:SetLabel(g:GetFirst():GetLevel())
 	Duel.SendtoGrave(g,REASON_COST)
+	e:SetLabel(Duel.GetOperatedGroup():GetFirst():GetLevel())
 end
 function c95239444.stop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
