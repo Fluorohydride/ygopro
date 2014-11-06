@@ -35,13 +35,11 @@ function c5128859.splimit(e,se,sp,st)
 end
 function c5128859.spfilter(c,code)
 	if c:GetCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckAsCost() or c:IsAbleToExtraAsCost()
 end
 function c5128859.spfilter2(c,code)
 	if c:GetOriginalCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckAsCost() or c:IsAbleToExtraAsCost()
 end
 function c5128859.spcon(e,c)
 	if c==nil then return true end 
