@@ -52,7 +52,7 @@ function c36006208.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			e:SetLabel(0)
 			local rg=Duel.GetMatchingGroup(c36006208.filter,tp,LOCATION_MZONE,0,nil)
 			local dg=Duel.GetMatchingGroup(c36006208.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
-			return rg:IsExists(c36006208.costfilter,2,nil,rg,dg)
+			return rg:IsExists(c36006208.costfilter,1,nil,rg,dg)
 		else
 			return Duel.IsExistingTarget(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler())
 		end
@@ -62,8 +62,22 @@ function c36006208.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		local rg=Duel.GetMatchingGroup(c36006208.filter,tp,LOCATION_MZONE,0,nil)
 		local dg=Duel.GetMatchingGroup(c36006208.tgfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler(),e)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local sg=rg:FilterSelect(tp,c36006208.costfilter,2,2,nil,rg,dg)
-		Duel.SendtoGrave(sg,REASON_COST)
+		local sg1=rg:FilterSelect(tp,c36006208.costfilter,1,1,nil,rg,dg)
+		local sc=sg1:GetFirst()
+		local a=0
+		if dg:IsContains(sc) then a=1 end
+		if sc:GetEquipCount()>0 then
+			local eqg=sc:GetEquipGroup()
+			local tc=eqg:GetFirst()
+			while tc do
+				if dg:IsContains(tc) then a=a+1 end
+				tc=eqg:GetNext()
+			end
+		end
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local sg2=rg:FilterSelect(tp,c36006208.costfilter2,1,1,sc,a,dg)
+		sg1:Merge(sg2)
+		Duel.SendtoGrave(sg1,REASON_COST)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,3,e:GetHandler())
