@@ -2006,6 +2006,23 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		target->current.reason_effect = peffect;
 		target->current.reason_player = sumplayer;
 		target->summon_player = sumplayer;
+		core.spsummon_state_count[sumplayer]++;
+		for(auto& iter : core.spsummon_counter) {
+			auto& info = iter.second;
+			if(info.first) {
+				pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
+				pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
+				pduel->lua->add_param(target->summon_info & 0xff00ffff, PARAM_TYPE_INT);
+				pduel->lua->add_param(positions, PARAM_TYPE_INT);
+				pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
+				if(!pduel->lua->check_condition(info.first, 5)) {
+					if(sumplayer == 0)
+						info.second += 0x1;
+					else
+						info.second += 0x10000;
+				}
+			}
+		}
 		break_effect();
 		return FALSE;
 	}
@@ -2022,7 +2039,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(target->current.location);
 		pduel->write_buffer8(target->current.sequence);
 		pduel->write_buffer8(target->current.position);
-		core.spsummon_state_count[sumplayer]++;
 		return FALSE;
 	}
 	case 5: {
@@ -2166,8 +2182,25 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pcard->current.reason_effect = peffect;
 		pcard->current.reason_player = sumplayer;
 		pcard->summon_player = sumplayer;
-		pcard->summon_info = (peffect->get_value(pcard) & 0xf00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)target->current.location << 16);
+		pcard->summon_info = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)target->current.location << 16);
 		move_to_field(pcard, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
+		core.spsummon_state_count[sumplayer]++;
+		for(auto& iter : core.spsummon_counter) {
+			auto& info = iter.second;
+			if(info.first) {
+				pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
+				pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
+				pduel->lua->add_param(target->summon_info & 0xff00ffff, PARAM_TYPE_INT);
+				pduel->lua->add_param(POS_FACEUP, PARAM_TYPE_INT);
+				pduel->lua->add_param(sumplayer, PARAM_TYPE_INT);
+				if(!pduel->lua->check_condition(info.first, 5)) {
+					if(sumplayer == 0)
+						info.second += 0x1;
+					else
+						info.second += 0x10000;
+				}
+			}
+		}
 		return FALSE;
 	}
 	case 24: {
@@ -2179,7 +2212,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pduel->write_buffer8(pcard->current.location);
 		pduel->write_buffer8(pcard->current.sequence);
 		pduel->write_buffer8(pcard->current.position);
-		core.spsummon_state_count[sumplayer]++;
 		if(pgroup->it != pgroup->container.end())
 			core.units.begin()->step = 22;
 		return FALSE;
@@ -2312,6 +2344,22 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		target->enable_field_effect(FALSE);
 		target->set_status(STATUS_FLIP_SUMMONED, FALSE);
 		core.spsummon_state_count[target->summon_player]++;
+		for(auto& iter : core.spsummon_counter) {
+			auto& info = iter.second;
+			if(info.first) {
+				pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
+				pduel->lua->add_param(target->summon_player, PARAM_TYPE_INT);
+				pduel->lua->add_param(target->summon_info & 0xff00ffff, PARAM_TYPE_INT);
+				pduel->lua->add_param(positions, PARAM_TYPE_INT);
+				pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+				if(!pduel->lua->check_condition(info.first, 5)) {
+					if(playerid == 0)
+						info.second += 0x1;
+					else
+						info.second += 0x10000;
+				}
+			}
+		}
 		core.hint_timing[target->summon_player] |= TIMING_SPSUMMON;
 		move_to_field(target, target->summon_player, playerid, LOCATION_MZONE, positions);
 		return FALSE;

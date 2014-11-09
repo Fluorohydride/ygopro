@@ -3074,16 +3074,41 @@ int32 scriptlib::duel_add_custom_activity_counter(lua_State *L) {
 	int32 counter_filter = interpreter::get_function_handle(L, 3);
 	duel* pduel = interpreter::get_duel_info(L);
 	switch(activity_type) {
-		case 1:
+		case 1: {
+			auto iter = pduel->game_field->core.summon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.summon_counter.end())
+				break;
+			pduel->game_field->core.summon_counter[counter_id] = std::make_pair(counter_filter, 0);
 			break;
-		case 2:
+		}
+		case 2: {
+			auto iter = pduel->game_field->core.normalsummon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.normalsummon_counter.end())
+				break;
+			pduel->game_field->core.normalsummon_counter[counter_id] = std::make_pair(counter_filter, 0);
 			break;
-		case 3:
+		}
+		case 3: {
+			auto iter = pduel->game_field->core.spsummon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.spsummon_counter.end())
+				break;
+			pduel->game_field->core.spsummon_counter[counter_id] = std::make_pair(counter_filter, 0);
 			break;
-		case 4:
+		}
+		case 4: {
+			auto iter = pduel->game_field->core.flipsummon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.flipsummon_counter.end())
+				break;
+			pduel->game_field->core.flipsummon_counter[counter_id] = std::make_pair(counter_filter, 0);
 			break;
-		case 5:
+		}
+		case 5: {
+			auto iter = pduel->game_field->core.attack_counter.find(counter_id);
+			if(iter != pduel->game_field->core.attack_counter.end())
+				break;
+			pduel->game_field->core.attack_counter[counter_id] = std::make_pair(counter_filter, 0);
 			break;
+		}
 		default:
 			break;
 	}
@@ -3095,20 +3120,45 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 	int32 playerid = lua_tointeger(L, 2);
 	int32 activity_type = lua_tointeger(L, 3);
 	duel* pduel = interpreter::get_duel_info(L);
+	int32 val = 0;
 	switch(activity_type) {
-		case 1:
+		case 1:{
+			auto iter = pduel->game_field->core.summon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.summon_counter.end())
+				val = iter->second.second;
 			break;
-		case 2:
+		}
+		case 2: {
+			auto iter = pduel->game_field->core.normalsummon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.normalsummon_counter.end())
+				val = iter->second.second;
 			break;
-		case 3:
+		}
+		case 3: {
+			auto iter = pduel->game_field->core.spsummon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.spsummon_counter.end())
+				val = iter->second.second;
 			break;
-		case 4:
+		}
+		case 4: {
+			auto iter = pduel->game_field->core.flipsummon_counter.find(counter_id);
+			if(iter != pduel->game_field->core.flipsummon_counter.end())
+				val = iter->second.second;
 			break;
-		case 5:
+		}
+		case 5: {
+			auto iter = pduel->game_field->core.attack_counter.find(counter_id);
+			if(iter != pduel->game_field->core.attack_counter.end())
+				val = iter->second.second;
 			break;
+		}
 		default:
 			break;
 	}
+	if(playerid == 0)
+		lua_pushinteger(L, val & 0xffff);
+	else
+		lua_pushinteger(L, (val >> 16) & 0xffff);
 	return 0;
 }
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
