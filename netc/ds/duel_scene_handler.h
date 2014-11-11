@@ -9,16 +9,41 @@ namespace ygopro
         
     class DuelScene;
     
-    class DuelProtoHandler : public CommandList<DuelCommand> {
+    class DuelProtoHandler {
     public:
         virtual void BeginProto() = 0;
-        virtual void GetProto() = 0;
-        virtual bool ProtoEnd() = 0;
+        virtual void EndProto() = 0;
         virtual void ProcessMsg(uint32_t sz);
         virtual int32_t MessageToCmd(uint8_t msg_type, BufferUtil& reader);
         
+        template<typename T>
+        void PushCommand(T cmd) {
+            std::unique_lock<std::mutex> lck(cmd_mtx);
+            if(cmd == nullptr)
+                return;
+            cur_command = std::static_pointer_cast<DuelCommand>(cmd);
+            cmd_notifier.wait(lck);
+        }
+        
+        std::shared_ptr<DuelCommand> GetCommand() {
+            std::unique_lock<std::mutex> lck(cmd_mtx);
+            return cur_command;
+        }
+        
+        void EndCommand() {
+            std::unique_lock<std::mutex> lck(cmd_mtx);
+            if(cur_command == nullptr)
+                return;
+            auto ptr = cur_command;
+            cur_command = nullptr;
+            cmd_notifier.notify_one();
+        }
+        
     protected:
         std::vector<uint8_t> msg_buffer;
+        std::shared_ptr<DuelCommand> cur_command;
+        std::mutex cmd_mtx;
+        std::condition_variable cmd_notifier;
     };
     
     class DuelSceneHandler : public SceneHandler, public Timer<double> {

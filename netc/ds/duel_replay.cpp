@@ -39,6 +39,16 @@ namespace ygopro
     }
     
     void DuelProtoReplay::BeginProto() {
+        std::thread([this]() {
+            this->ReplayLoop();
+        }).detach();
+    }
+    
+    void DuelProtoReplay::EndProto() {
+        replay_end = true;
+    }
+    
+    void DuelProtoReplay::ReplayLoop() {
         replay_duel = std::make_shared<duelAdapter>(seed);
         replay_duel->set_adapter(this);
         BufferUtil rep_reader(rep_data, rep_size);
@@ -64,14 +74,12 @@ namespace ygopro
             int32_t extra = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < extra; ++i)
                 replay_duel->new_card(rep_reader.Read<uint32>(), 0, 0, LOCATION_EXTRA, 0, 0);
-            //mainGame->dField.Initial(0, main, extra);
             main = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < main; ++i)
                 replay_duel->new_card(rep_reader.Read<uint32>(), 1, 1, LOCATION_DECK, 0, 0);
             extra = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < extra; ++i)
                 replay_duel->new_card(rep_reader.Read<uint32>(), 1, 1, LOCATION_EXTRA, 0, 0);
-            //mainGame->dField.Initial(1, main, extra);
         } else {
             int32_t main = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < main; ++i)
@@ -79,7 +87,6 @@ namespace ygopro
             int32_t extra = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < extra; ++i)
                 replay_duel->new_card(rep_reader.Read<uint32>(), 0, 0, LOCATION_EXTRA, 0, 0);
-            //mainGame->dField.Initial(0, main, extra);
             main = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < main; ++i)
                 replay_duel->new_tag_card(rep_reader.Read<uint32>(), 0, LOCATION_DECK);
@@ -92,7 +99,6 @@ namespace ygopro
             extra = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < extra; ++i)
                 replay_duel->new_card(rep_reader.Read<uint32>(), 1, 1, LOCATION_EXTRA, 0, 0);
-            //mainGame->dField.Initial(1, main, extra);
             main = rep_reader.Read<uint32>();
             for(int32_t i = 0; i < main; ++i)
                 replay_duel->new_tag_card(rep_reader.Read<uint32>(), 1, LOCATION_DECK);
@@ -103,9 +109,8 @@ namespace ygopro
         msg_buffer.resize(4096);
         replay_duel->query_field_info(&msg_buffer[0]);
         replay_duel->start_duel(opt);
-    }
-    
-    void DuelProtoReplay::GetProto() {
+        
+        replay_end = false;
         int32 result = replay_duel->process();
         int32 len = result & 0xffff;
         /*int32_t flag = result >> 16;*/
@@ -115,11 +120,6 @@ namespace ygopro
             replay_duel->get_message(&msg_buffer[0]);
             ProcessMsg(len);
         }
-        
-    }
-    
-    bool DuelProtoReplay::ProtoEnd() {
-        return false;
     }
     
     byte* DuelProtoReplay::ReadScript(const char* script_name, int32_t* len) {

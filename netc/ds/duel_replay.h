@@ -44,8 +44,8 @@ namespace ygopro
         DuelProtoReplay(const std::string& file);
         ~DuelProtoReplay();
         virtual void BeginProto();
-        virtual void GetProto();
-        virtual bool ProtoEnd();
+        virtual void EndProto();
+        void ReplayLoop();
         
         virtual byte* ReadScript(const char* script_name, int32_t* len);
         virtual uint32 ReadCard(uint32 code, card_data* data);
@@ -58,6 +58,7 @@ namespace ygopro
         uint32_t seed = 0;
         uint32_t flag = 0;
         std::shared_ptr<duelAdapter> replay_duel;
+        bool replay_end = false;
     };
     
 }

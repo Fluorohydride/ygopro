@@ -1,6 +1,5 @@
 #include "../../common/common.h"
 
-#include "../gui_extra.h"
 #include "duel_network.h"
 
 namespace ygopro
@@ -17,12 +16,8 @@ namespace ygopro
         //Connect(To<std::string>(server_ip).c_str(), server_port, server_timeout);
     }
     
-    void DuelProtoTcp::GetProto() {
-        PullEvent();
-    }
-    
-    bool DuelProtoTcp::ProtoEnd() {
-        return proto_ended;
+    void DuelProtoTcp::EndProto() {
+        
     }
     
     void DuelProtoTcp::OnConnected() {
@@ -30,17 +25,11 @@ namespace ygopro
     }
     
     void DuelProtoTcp::OnConnectError() {
-        MessageBox::ShowOK(L"", L"connection error.", [this]() {
-            std::cout << "end" << std::endl;
-            proto_ended = true;
-        });
+
     }
     
     void DuelProtoTcp::OnConnectTimeOut() {
-        MessageBox::ShowOK(L"", L"connection timeout.", [this]() {
-            std::cout << "end" << std::endl;
-            proto_ended = true;
-        });
+
     }
     
     void DuelProtoTcp::OnDisconnected() {

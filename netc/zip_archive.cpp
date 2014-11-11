@@ -11,14 +11,67 @@ namespace ygopro
     }
     
     void ZipArchive::Load(const std::vector<std::wstring>& files) {
-        is_loading = true;
-        loading_files = files;
-        std::thread(std::bind(&ZipArchive::_load_inner, this)).detach();
+        char name_buffer[1024];
+        ZipEndBlock end_block;
+        for(auto& file : files) {
+            std::string fname = To<std::string>(file);
+            std::ifstream zip_file(fname, std::ios::in | std::ios::binary);
+            if(!zip_file)
+                continue;
+            zip_file.seekg(0, zip_file.end);
+            auto file_size = zip_file.tellg();
+            if(file_size == 0)
+                continue;
+            zip_file.seekg(-ZIP_END_BLOCK_SIZE, zip_file.end);
+            zip_file.read((char*)&end_block, ZIP_END_BLOCK_SIZE);
+            if(end_block.block_header != 0x06054b50) {
+                int32_t end_buffer_size = (file_size >= 0xffff + ZIP_END_BLOCK_SIZE) ? (0xffff + ZIP_END_BLOCK_SIZE) : (int32_t)file_size;
+                char* end_buffer = new char[end_buffer_size];
+                zip_file.seekg(-end_buffer_size, zip_file.end);
+                zip_file.read(end_buffer, end_buffer_size);
+                int32_t end_block_pos = -1;
+                for(int32_t i = end_buffer_size - 4; i >= 0; --i) {
+                    if(end_buffer[i] == 0x50) {
+                        if(end_buffer[i + 1] == 0x4b && end_buffer[i + 2] == 0x05 && end_buffer[i + 3] == 0x06) {
+                            end_block_pos = i;
+                            break;
+                        }
+                    }
+                }
+                delete[] end_buffer;
+                if(end_block_pos == -1)
+                    continue;
+                zip_file.seekg(-(end_buffer_size - end_block_pos), zip_file.end);
+            }
+            zip_file.seekg(end_block.directory_offset, zip_file.beg);
+            ZipDirectoryHeader* dir_header = nullptr;
+            char* buffer = new char[end_block.directory_size];
+            zip_file.read(buffer, end_block.directory_size);
+            auto pos = 0;
+            while(pos + ZIP_DIRECTORY_SIZE < end_block.directory_size) {
+                while(buffer[pos] != 0x50 && pos + ZIP_DIRECTORY_SIZE < end_block.directory_size)
+                    ++pos;
+                if(buffer[pos] == 0x50) {
+                    dir_header = reinterpret_cast<ZipDirectoryHeader*>(&buffer[pos]);
+                    if(dir_header->block_header != 0x02014b50)
+                        continue;
+                    memcpy(name_buffer, &buffer[pos + ZIP_DIRECTORY_SIZE], dir_header->name_size);
+                    name_buffer[dir_header->name_size] = 0;
+                    std::string name = name_buffer;
+                    ZipFileInfo& finfo = entries[name];
+                    finfo.src_file = fname;
+                    finfo.compressed = (dir_header->comp_fun == 0x8);
+                    finfo.comp_size = dir_header->comp_size;
+                    finfo.file_size = dir_header->file_size;
+                    finfo.data_offset = dir_header->data_offset;
+                    pos += ZIP_DIRECTORY_SIZE + dir_header->name_size + dir_header->ex_size + dir_header->cmt_size;
+                }
+            }
+            delete[] buffer;
+        }
     }
     
     size_t ZipArchive::GetFileLength(const std::string& filename) {
-        while(is_loading)
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         auto iter = entries.find(filename);
         if(iter == entries.end())
             return 0;
@@ -26,17 +79,20 @@ namespace ygopro
     }
     
     size_t ZipArchive::ReadFile(const std::string& filename, uint8_t* buffer) {
-        while(is_loading)
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));
         auto iter = entries.find(filename);
         if(iter == entries.end())
             return 0;
         std::ifstream zip_file(iter->second.src_file, std::ios::in | std::ios::binary);
         if(!zip_file)
             return 0;
+        ZipFileHeader file_header;
+        zip_file.seekg(iter->second.data_offset, zip_file.beg);
+        zip_file.read((char*)&file_header, ZIP_FILE_SIZE);
+        if(file_header.block_header != 0x04034b50)
+            return 0;
+        zip_file.seekg(file_header.name_size + file_header.ex_size, zip_file.cur);
         if(iter->second.compressed) {
             uint8_t* raw = new uint8_t[iter->second.comp_size];
-            zip_file.seekg(iter->second.data_offset, zip_file.beg);
             zip_file.read((char*)raw, iter->second.comp_size);
             size_t decom_size = iter->second.file_size;
             z_stream strm;
@@ -55,55 +111,8 @@ namespace ygopro
                 return 0;
             return decom_size;
         } else {
-            zip_file.seekg(iter->second.data_offset, zip_file.beg);
             zip_file.read((char*)buffer, iter->second.file_size);
             return iter->second.file_size;
         }
-    }
-    
-    void ZipArchive::_load_inner() {
-        char name_buffer[1024];
-        for(auto& file : loading_files) {
-            std::string fname = To<std::string>(file);
-            std::ifstream zip_file(fname, std::ios::in | std::ios::binary);
-            if(!zip_file)
-                continue;
-            zip_file.seekg(0, zip_file.end);
-            auto file_size = zip_file.tellg();
-            if(file_size == 0)
-                continue;
-            zip_file.seekg(0, zip_file.beg);
-            ZipHeader* zip_header = nullptr;
-            char* buffer = new char[file_size];
-            zip_file.read(buffer, file_size);
-            auto pos = 0;
-            while(pos + ZIP_HEADER_SIZE < file_size) {
-                while(buffer[pos] != 0x50 && pos + ZIP_HEADER_SIZE < file_size)
-                    ++pos;
-                if(buffer[pos] == 0x50) {
-                    zip_header = reinterpret_cast<ZipHeader*>(&buffer[pos]);
-                    if(zip_header->block_header == 0x02014b50)
-                        break;
-                    if(zip_header->block_header != 0x04034b50)
-                        continue;
-                    memcpy(name_buffer, &buffer[pos + ZIP_HEADER_SIZE], zip_header->name_size);
-                    name_buffer[zip_header->name_size] = 0;
-                    std::string name = name_buffer;
-                    ZipFileInfo& finfo = entries[name];
-                    finfo.src_file = fname;
-                    finfo.compressed = (zip_header->comp_fun == 0x8);
-                    finfo.comp_size = zip_header->comp_size;
-                    finfo.file_size = zip_header->file_size;
-                    finfo.data_offset = pos + ZIP_HEADER_SIZE + zip_header->name_size + zip_header->ex_size;
-                    if(zip_header->global_sig & 0x8)
-                        pos += ZIP_HEADER_SIZE + zip_header->name_size + zip_header->ex_size + zip_header->comp_size + ZIP_FILEDESC_SIZE;
-                    else
-                        pos += ZIP_HEADER_SIZE + zip_header->name_size + zip_header->ex_size + zip_header->comp_size;
-                }
-            }
-            delete[] buffer;
-        }
-        loading_files.clear();
-        is_loading = false;
     }
 }

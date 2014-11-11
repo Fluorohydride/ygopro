@@ -11,6 +11,7 @@ namespace ygopro
     class DuelCommand {
     public:
         virtual bool Handle(std::shared_ptr<DuelScene> pscene) = 0;
+        
     };
     
     class DuelCommandWait : public DuelCommand {
