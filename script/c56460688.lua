@@ -54,7 +54,10 @@ function c56460688.retop(e,tp,eg,ep,ev,re,r,rp)
 		local g=e:GetLabelObject():GetLabelObject()
 		local tc=g:GetFirst()
 		while tc do
-			if tc:GetFlagEffect(56460688)>0 then Duel.ReturnToField(tc) end
+			if tc:GetFlagEffect(56460688)>0 then
+				Duel.ReturnToField(tc)
+				tc:SetStatus(STATUS_SUMMON_TURN+STATUS_FORM_CHANGED,false)
+			end
 			tc=g:GetNext()
 		end
 		g:DeleteGroup()
