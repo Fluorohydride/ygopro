@@ -45,6 +45,7 @@ namespace ygopro
         ~DuelProtoReplay();
         virtual void BeginProto();
         virtual void EndProto();
+        virtual bool IsEnd();
         void ReplayLoop();
         
         virtual byte* ReadScript(const char* script_name, int32_t* len);

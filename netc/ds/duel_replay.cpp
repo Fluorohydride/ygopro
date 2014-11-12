@@ -45,7 +45,16 @@ namespace ygopro
     }
     
     void DuelProtoReplay::EndProto() {
+        std::unique_lock<std::mutex> lck(cmd_mtx);
         replay_end = true;
+        if(cur_command != nullptr) {
+            cur_command = nullptr;
+            cmd_notifier.notify_one();
+        }
+    }
+    
+    bool DuelProtoReplay::IsEnd() {
+        return replay_end;
     }
     
     void DuelProtoReplay::ReplayLoop() {
@@ -106,19 +115,22 @@ namespace ygopro
             for(int32_t i = 0; i < extra; ++i)
                 replay_duel->new_tag_card(rep_reader.Read<uint32>(), 1, LOCATION_EXTRA);
         }
-        msg_buffer.resize(4096);
+        msg_buffer.resize(0x10000);
         replay_duel->query_field_info(&msg_buffer[0]);
         replay_duel->start_duel(opt);
         
         replay_end = false;
-        int32 result = replay_duel->process();
-        int32 len = result & 0xffff;
-        /*int32_t flag = result >> 16;*/
-        if (len > 0) {
-            if(len > msg_buffer.size())
-                msg_buffer.resize(len);
-            replay_duel->get_message(&msg_buffer[0]);
-            ProcessMsg(len);
+        
+        while(!IsEnd()) {
+            int32 result = replay_duel->process();
+            int32 len = result & 0xffff;
+            /*int32_t flag = result >> 16;*/
+            if (len > 0) {
+                if(len > msg_buffer.size())
+                    msg_buffer.resize(len);
+                replay_duel->get_message(&msg_buffer[0]);
+                ProcessMsg(len);
+            }
         }
     }
     

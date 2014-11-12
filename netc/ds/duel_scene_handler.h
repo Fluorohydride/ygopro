@@ -13,6 +13,7 @@ namespace ygopro
     public:
         virtual void BeginProto() = 0;
         virtual void EndProto() = 0;
+        virtual bool IsEnd() = 0;
         virtual void ProcessMsg(uint32_t sz);
         virtual int32_t MessageToCmd(uint8_t msg_type, BufferUtil& reader);
         
@@ -34,7 +35,6 @@ namespace ygopro
             std::unique_lock<std::mutex> lck(cmd_mtx);
             if(cur_command == nullptr)
                 return;
-            auto ptr = cur_command;
             cur_command = nullptr;
             cmd_notifier.notify_one();
         }
@@ -55,9 +55,11 @@ namespace ygopro
         void SetProtoHandler(T ph) {
             proto_handler = std::static_pointer_cast<DuelProtoHandler>(ph);
         }
+        int32_t SolveMessage(uint8_t msg_type, BufferUtil& reader);
         
     protected:
         std::weak_ptr<DuelScene> duel_scene;
+        CommandList<DuelCommand> cur_commands;
         std::shared_ptr<DuelProtoHandler> proto_handler;
     };
     

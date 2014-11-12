@@ -78,8 +78,6 @@ card::~card() {
 }
 void card::update_infos(int32 query_flag) {
 	pduel->write_buffer8(MSG_UPDATE_CARD);
-    byte* plen = pduel->bufferp;
-    pduel->write_buffer32(0);
 	pduel->write_buffer32(get_info_location());
 	uint32* pflag = (uint32*)pduel->bufferp;
 	pduel->write_buffer32(0);
@@ -198,18 +196,15 @@ void card::update_infos(int32 query_flag) {
 		} else
 			query_flag &= ~QUERY_STATUS;
 	}
-    if(query_flag) {
-        *(uint32*)plen = pduel->bufferp - plen - 4;
+    if(query_flag)
 		*pflag = query_flag;
-    } else
-		pduel->rollback_buffer(13);
+    else
+		pduel->rollback_buffer(9);
 }
 void card::update_infos_nocache(int32 query_flag) {
     if(query_flag == 0)
         return;
 	pduel->write_buffer8(MSG_UPDATE_CARD);
-    byte* plen = pduel->bufferp;
-    pduel->write_buffer32(0);
 	pduel->write_buffer32(get_info_location());
 	pduel->write_buffer32(query_flag);
 	if(query_flag & QUERY_CODE) {
@@ -297,7 +292,6 @@ void card::update_infos_nocache(int32 query_flag) {
 		for(auto& ctit : counters)
 			pduel->write_buffer32(ctit.first + (ctit.second << 16));
 	}
-    *(uint32*)plen = pduel->bufferp - plen - 4;
 }
 uint32 card::get_info_location() {
 	if(overlay_target) {

@@ -15,281 +15,361 @@ namespace ygopro
     
     bool DuelSceneHandler::UpdateEvent() {
         auto pscene = duel_scene.lock();
-        return false;
+        if(cur_commands.IsEmpty()) {
+            auto cmd = proto_handler->GetCommand();
+            if(cmd)
+                cur_commands.PushCommand(cmd);
+        } else {
+            while(!cur_commands.IsEmpty()) {
+                auto cmd = cur_commands.PullCommand();
+                bool finished = cmd->Handle(pscene);
+                if(finished)
+                    cur_commands.PopCommand();
+                else
+                    break;
+            }
+            if(cur_commands.IsEmpty())
+                proto_handler->EndCommand();
+        }
+        return true;
     }
     
     void DuelSceneHandler::BeginHandler() {
         proto_handler->BeginProto();
     }
     
+    int32_t DuelSceneHandler::SolveMessage(uint8_t msg_type, BufferUtil& reader) {
+        switch(msg_type) {
+            case MSG_RETRY:
+                break;
+            case MSG_HINT: {
+//                uint8_t hint_type = reader.Read<uint8_t>();
+//                reader.Skip(1);
+//                uint32_t hint_data = reader.Read<uint32_t>();
+//                switch (hint_type) {
+//                    case HINT_EVENT:
+//                        break;
+//                    case HINT_MESSAGE:
+//                        break;
+//                    case HINT_SELECTMSG:
+//                        break;
+//                    case HINT_OPSELECTED:
+//                        break;
+//                    case HINT_EFFECT:
+//                        break;
+//                    case HINT_RACE:
+//                        break;
+//                    case HINT_ATTRIB:
+//                        break;
+//                    case HINT_CODE:
+//                        break;
+//                    case HINT_NUMBER:
+//                        break;
+//                    case HINT_CARD:
+//                        break;
+//                    default:
+//                        break;
+//                }
+                break;
+            }
+            case MSG_START:
+                break;
+            case MSG_WIN: {
+//                uint8_t win_player = reader.Read<uint8_t>();
+//                uint8_t win_reason = reader.Read<uint8_t>();
+                break;
+            }
+            case MSG_UPDATE_CARD:
+                break;
+            case MSG_SELECT_BATTLECMD: {
+//                int32_t playerid = reader.Read<uint8_t>();
+//                int32_t act_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < act_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                    uint32_t desc = reader.Read<uint32_t>();
+//                }
+//                int32_t atk_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < act_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                    uint32_t param = reader.Read<uint8_t>();
+//                }
+//                bool can_m2 = reader.Read<uint8_t>() == 1;
+//                bool can_ep = reader.Read<uint8_t>() == 1;
+                break;
+            }
+            case MSG_SELECT_MAINCMD: {
+//                int32_t playerid = reader.Read<uint8_t>();
+//                int32_t summon_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < summon_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                }
+//                int32_t spsummon_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < spsummon_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                }
+//                int32_t repos_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < repos_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                }
+//                int32_t mset_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < mset_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                }
+//                int32_t sset_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < sset_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                }
+//                int32_t act_sz = reader.Read<uint8_t>();
+//                for(int32_t i = 0; i < act_sz; ++i) {
+//                    uint32_t code = reader.Read<uint32_t>();
+//                    uint32_t con = reader.Read<uint8_t>();
+//                    uint32_t loc = reader.Read<uint8_t>();
+//                    uint32_t seq = reader.Read<uint8_t>();
+//                    uint32_t desc = reader.Read<uint32_t>();
+//                }
+//                bool can_bp = reader.Read<uint8_t>() == 1;
+//                bool can_ep = reader.Read<uint8_t>() == 1;
+                break;
+            }
+            case MSG_SELECT_EFFECTYN: {
+//                int32_t playerid = reader.Read<uint8_t>();
+//                uint32_t code = reader.Read<uint32_t>();
+//                uint32_t info_loc = reader.Read<uint32_t>();
+                break;
+            }
+            case MSG_SELECT_YESNO: {
+//                int32_t playerid = reader.Read<uint8_t>();
+//                uint32_t desc = reader.Read<uint32_t>();
+                break;
+            }
+            case MSG_SELECT_OPTION:
+                break;
+            case MSG_SELECT_CARD:
+                break;
+            case MSG_SELECT_CHAIN:
+                break;
+            case MSG_SELECT_PLACE:
+                break;
+            case MSG_SELECT_POSITION:
+                break;
+            case MSG_SELECT_TRIBUTE:
+                break;
+            case MSG_SORT_CHAIN:
+                break;
+            case MSG_SELECT_COUNTER:
+                break;
+            case MSG_SELECT_SUM:
+                break;
+            case MSG_SELECT_DISFIELD:
+                break;
+            case MSG_SORT_CARD:
+                break;
+            case MSG_CONFIRM_DECKTOP:
+                break;
+            case MSG_CONFIRM_CARDS:
+                break;
+            case MSG_SHUFFLE_DECK:
+                break;
+            case MSG_SHUFFLE_HAND:
+                break;
+            case MSG_REFRESH_DECK:
+                break;
+            case MSG_SWAP_GRAVE_DECK:
+                break;
+            case MSG_SHUFFLE_SET_CARD:
+                break;
+            case MSG_REVERSE_DECK:
+                break;
+            case MSG_DECK_TOP:
+                break;
+            case MSG_NEW_TURN:
+                break;
+            case MSG_NEW_PHASE:
+                break;
+            case MSG_MOVE:
+                break;
+            case MSG_POS_CHANGE:
+                break;
+            case MSG_SET:
+                break;
+            case MSG_SWAP:
+                break;
+            case MSG_FIELD_DISABLED:
+                break;
+            case MSG_SUMMONING:
+                break;
+            case MSG_SUMMONED:
+                break;
+            case MSG_SPSUMMONING:
+                break;
+            case MSG_SPSUMMONED:
+                break;
+            case MSG_FLIPSUMMONING:
+                break;
+            case MSG_FLIPSUMMONED:
+                break;
+            case MSG_CHAINING:
+                break;
+            case MSG_CHAINED:
+                break;
+            case MSG_CHAIN_SOLVING:
+                break;
+            case MSG_CHAIN_SOLVED:
+                break;
+            case MSG_CHAIN_END:
+                break;
+            case MSG_CHAIN_NEGATED:
+                break;
+            case MSG_CHAIN_DISABLED:
+                break;
+            case MSG_CARD_SELECTED:
+                break;
+            case MSG_RANDOM_SELECTED:
+                break;
+            case MSG_BECOME_TARGET:
+                break;
+            case MSG_DRAW:
+                break;
+            case MSG_DAMAGE:
+                break;
+            case MSG_RECOVER:
+                break;
+            case MSG_EQUIP:
+                break;
+            case MSG_LPUPDATE:
+                break;
+            case MSG_UNEQUIP:
+                break;
+            case MSG_CARD_TARGET:
+                break;
+            case MSG_CANCEL_TARGET:
+                break;
+            case MSG_PAY_LPCOST:
+                break;
+            case MSG_ADD_COUNTER:
+                break;
+            case MSG_REMOVE_COUNTER:
+                break;
+            case MSG_ATTACK:
+                break;
+            case MSG_BATTLE:
+                break;
+            case MSG_ATTACK_NEGATED:
+                break;
+            case MSG_DAMAGE_STEP_START:
+                break;
+            case MSG_DAMAGE_STEP_END:
+                break;
+            case MSG_MISSED_EFFECT:
+                break;
+            case MSG_BE_CHAIN_TARGET:
+                break;
+            case MSG_CREATE_RELATION:
+                break;
+            case MSG_RELEASE_RELATION:
+                break;
+            case MSG_TOSS_COIN:
+                break;
+            case MSG_TOSS_DICE:
+                break;
+            case MSG_DECLEAR_RACE:
+                break;
+            case MSG_DECLEAR_ATTRIB:
+                break;
+            case MSG_DECLEAR_CARD:
+                break;
+            case MSG_DECLEAR_NUMBER:
+                break;
+            case MSG_CARD_HINT:
+                break;
+            case MSG_TAG_SWAP:
+                break;
+            case MSG_RELOAD_FIELD: {
+//                pinfos.resize(2);
+//                for(int32_t p = 0; p < 2; ++p) {
+//                    pinfos[p].hp = reader.Read<int32_t>();
+//                    for(int32_t i = 0; i < 5; ++i) {
+//                        uint32_t exist_card = reader.Read<uint8_t>();
+//                        if(exist_card) {
+//                            uint32_t pos = reader.Read<uint8_t>();
+//                            uint32_t sz = reader.Read<uint8_t>();
+//                            pinfos[p].minfo[i] = pos | (sz << 8);
+//                        } else
+//                            pinfos[p].minfo[i] = 0;
+//                    }
+//                    for(int32_t i = 0; i < 8; ++i) {
+//                        uint32_t exist_card = reader.Read<uint8_t>();
+//                        if(exist_card)
+//                            pinfos[p].sinfo[i] = reader.Read<uint8_t>();
+//                        else
+//                            pinfos[p].sinfo[i] = 0;
+//                    }
+//                    pinfos[p].main_size = reader.Read<uint8_t>();
+//                    pinfos[p].hand_size = reader.Read<uint8_t>();
+//                    pinfos[p].grave_size = reader.Read<uint8_t>();
+//                    pinfos[p].remove_size = reader.Read<uint8_t>();
+//                    pinfos[p].extra_size = reader.Read<uint8_t>();
+//                }
+//                int32_t chainsz = reader.Read<uint8_t>();
+//                cinfos.resize(chainsz);
+//                for(int32_t i = 0; i < chainsz; ++i) {
+//                    cinfos[i].code = reader.Read<uint32_t>();
+//                    cinfos[i].card_con = reader.Read<uint8_t>();
+//                    cinfos[i].card_loc = reader.Read<uint8_t>();
+//                    cinfos[i].card_seq = reader.Read<uint8_t>();
+//                    cinfos[i].card_pos = reader.Read<uint8_t>();
+//                    cinfos[i].trig_con = reader.Read<uint8_t>();
+//                    cinfos[i].trig_loc = reader.Read<uint8_t>();
+//                    cinfos[i].trig_seq = reader.Read<uint8_t>();
+//                    cinfos[i].desc = reader.Read<uint32_t>();
+//                }
+                break;
+            }
+            case MSG_AI_NAME:
+                break;
+            case MSG_SHOW_HINT:
+                break;
+            case MSG_MATCH_KILL:
+                break;
+            case MSG_CUSTOM_MSG:
+                break;
+            default:
+                break;
+        }
+        return 0;
+    }
+    
     void DuelProtoHandler::ProcessMsg(uint32_t sz) {
         BufferUtil reader(&msg_buffer[0], sz);
-        while(!reader.IsEnd()) {
+        while(!IsEnd() && !reader.IsEnd()) {
             uint8_t msg_type = reader.Read<uint8_t>();
             MessageToCmd(msg_type, reader);
         }
     }
 
     int32_t DuelProtoHandler::MessageToCmd(uint8_t msg_type, BufferUtil& reader) {
-        switch(msg_type) {
-            case MSG_RETRY:
-                PushCommand(std::make_shared<DuelMsgRetry>(reader));
-                break;
-            case MSG_HINT:
-                PushCommand(std::make_shared<DuelMsgHint>(reader));
-                break;
-            case MSG_START:
-                PushCommand(std::make_shared<DuelMsgStart>(reader));
-                break;
-            case MSG_WIN:
-                PushCommand(std::make_shared<DuelMsgWin>(reader));
-                break;
-            case MSG_UPDATE_CARD:
-                PushCommand(std::make_shared<DuelMsgUpdateCard>(reader));
-                break;
-            case MSG_SELECT_BATTLECMD:
-                PushCommand(std::make_shared<DuelMsgSelBattleCmd>(reader));
-                break;
-            case MSG_SELECT_MAINCMD:
-                PushCommand(std::make_shared<DuelMsgSelMainCmd>(reader));
-                break;
-            case MSG_SELECT_EFFECTYN:
-                PushCommand(std::make_shared<DuelMsgSelEffectYN>(reader));
-                break;
-            case MSG_SELECT_YESNO:
-                PushCommand(std::make_shared<DuelMsgSelYesNo>(reader));
-                break;
-            case MSG_SELECT_OPTION:
-                PushCommand(std::make_shared<DuelMsgSelOption>(reader));
-                break;
-            case MSG_SELECT_CARD:
-                PushCommand(std::make_shared<DuelMsgSelCard>(reader));
-                break;
-            case MSG_SELECT_CHAIN:
-                PushCommand(std::make_shared<DuelMsgSelChain>(reader));
-                break;
-            case MSG_SELECT_PLACE:
-                PushCommand(std::make_shared<DuelMsgSelPlace>(reader));
-                break;
-            case MSG_SELECT_POSITION:
-                PushCommand(std::make_shared<DuelMsgSelPosition>(reader));
-                break;
-            case MSG_SELECT_TRIBUTE:
-                PushCommand(std::make_shared<DuelMsgSelTribute>(reader));
-                break;
-            case MSG_SORT_CHAIN:
-                PushCommand(std::make_shared<DuelMsgSortChain>(reader));
-                break;
-            case MSG_SELECT_COUNTER:
-                PushCommand(std::make_shared<DuelMsgSelCounter>(reader));
-                break;
-            case MSG_SELECT_SUM:
-                PushCommand(std::make_shared<DuelMsgSelSum>(reader));
-                break;
-            case MSG_SELECT_DISFIELD:
-                PushCommand(std::make_shared<DuelMsgSelField>(reader));
-                break;
-            case MSG_SORT_CARD:
-                PushCommand(std::make_shared<DuelMsgSortCard>(reader));
-                break;
-            case MSG_CONFIRM_DECKTOP:
-                PushCommand(std::make_shared<DuelMsgConfirmDeck>(reader));
-                break;
-            case MSG_CONFIRM_CARDS:
-                PushCommand(std::make_shared<DuelMsgConfirmCard>(reader));
-                break;
-            case MSG_SHUFFLE_DECK:
-                PushCommand(std::make_shared<DuelMsgShuffleDeck>(reader));
-                break;
-            case MSG_SHUFFLE_HAND:
-                PushCommand(std::make_shared<DuelMsgShuffleHand>(reader));
-                break;
-            case MSG_REFRESH_DECK:
-                PushCommand(std::make_shared<DuelMsgRefreshDeck>(reader));
-                break;
-            case MSG_SWAP_GRAVE_DECK:
-                PushCommand(std::make_shared<DuelMsgSwapGraveDeck>(reader));
-                break;
-            case MSG_SHUFFLE_SET_CARD:
-                PushCommand(std::make_shared<DuelMsgShuffleSetCard>(reader));
-                break;
-            case MSG_REVERSE_DECK:
-                PushCommand(std::make_shared<DuelMsgReverseDeck>(reader));
-                break;
-            case MSG_DECK_TOP:
-                PushCommand(std::make_shared<DuelMsgDeckTop>(reader));
-                break;
-            case MSG_NEW_TURN:
-                PushCommand(std::make_shared<DuelMsgNewTurn>(reader));
-                break;
-            case MSG_NEW_PHASE:
-                PushCommand(std::make_shared<DuelMsgNewPhase>(reader));
-                break;
-            case MSG_MOVE:
-                PushCommand(std::make_shared<DuelMsgMove>(reader));
-                break;
-            case MSG_POS_CHANGE:
-                PushCommand(std::make_shared<DuelMsgPosChange>(reader));
-                break;
-            case MSG_SET:
-                PushCommand(std::make_shared<DuelMsgSet>(reader));
-                break;
-            case MSG_SWAP:
-                PushCommand(std::make_shared<DuelMsgSwap>(reader));
-                break;
-            case MSG_FIELD_DISABLED:
-                PushCommand(std::make_shared<DuelMsgFieldDisable>(reader));
-                break;
-            case MSG_SUMMONING:
-                PushCommand(std::make_shared<DuelMsgSummoning>(reader));
-                break;
-            case MSG_SUMMONED:
-                PushCommand(std::make_shared<DuelMsgSummoned>(reader));
-                break;
-            case MSG_SPSUMMONING:
-                PushCommand(std::make_shared<DuelMsgSPSummoning>(reader));
-                break;
-            case MSG_SPSUMMONED:
-                PushCommand(std::make_shared<DuelMsgSPSummoned>(reader));
-                break;
-            case MSG_FLIPSUMMONING:
-                PushCommand(std::make_shared<DuelMsgFlipSummoning>(reader));
-                break;
-            case MSG_FLIPSUMMONED:
-                PushCommand(std::make_shared<DuelMsgFlipSummoned>(reader));
-                break;
-            case MSG_CHAINING:
-                PushCommand(std::make_shared<DuelMsgChaining>(reader));
-                break;
-            case MSG_CHAINED:
-                PushCommand(std::make_shared<DuelMsgChained>(reader));
-                break;
-            case MSG_CHAIN_SOLVING:
-                PushCommand(std::make_shared<DuelMsgChainSolving>(reader));
-                break;
-            case MSG_CHAIN_SOLVED:
-                PushCommand(std::make_shared<DuelMsgChainSolved>(reader));
-                break;
-            case MSG_CHAIN_END:
-                PushCommand(std::make_shared<DuelMsgChainEnd>(reader));
-                break;
-            case MSG_CHAIN_NEGATED:
-                PushCommand(std::make_shared<DuelMsgChainNegated>(reader));
-                break;
-            case MSG_CHAIN_DISABLED:
-                PushCommand(std::make_shared<DuelMsgChainDisabled>(reader));
-                break;
-            case MSG_CARD_SELECTED:
-                PushCommand(std::make_shared<DuelMsgCardSelected>(reader));
-                break;
-            case MSG_RANDOM_SELECTED:
-                PushCommand(std::make_shared<DuelMsgRandomSelected>(reader));
-                break;
-            case MSG_BECOME_TARGET:
-                PushCommand(std::make_shared<DuelMsgBecomeTarget>(reader));
-                break;
-            case MSG_DRAW:
-                PushCommand(std::make_shared<DuelMsgDraw>(reader));
-                break;
-            case MSG_DAMAGE:
-                PushCommand(std::make_shared<DuelMsgDamage>(reader));
-                break;
-            case MSG_RECOVER:
-                PushCommand(std::make_shared<DuelMsgRecover>(reader));
-                break;
-            case MSG_EQUIP:
-                PushCommand(std::make_shared<DuelMsgEquip>(reader));
-                break;
-            case MSG_LPUPDATE:
-                PushCommand(std::make_shared<DuelMsgLPUpdate>(reader));
-                break;
-            case MSG_UNEQUIP:
-                PushCommand(std::make_shared<DuelMsgUnequip>(reader));
-                break;
-            case MSG_CARD_TARGET:
-                PushCommand(std::make_shared<DuelMsgCardTarget>(reader));
-                break;
-            case MSG_CANCEL_TARGET:
-                PushCommand(std::make_shared<DuelMsgCancelTarget>(reader));
-                break;
-            case MSG_PAY_LPCOST:
-                PushCommand(std::make_shared<DuelMsgLPCost>(reader));
-                break;
-            case MSG_ADD_COUNTER:
-                PushCommand(std::make_shared<DuelMsgAddCounter>(reader));
-                break;
-            case MSG_REMOVE_COUNTER:
-                PushCommand(std::make_shared<DuelMsgRemoveCounter>(reader));
-                break;
-            case MSG_ATTACK:
-                PushCommand(std::make_shared<DuelMsgAttack>(reader));
-                break;
-            case MSG_BATTLE:
-                PushCommand(std::make_shared<DuelMsgBattle>(reader));
-                break;
-            case MSG_ATTACK_NEGATED:
-                PushCommand(std::make_shared<DuelMsgAttackNegated>(reader));
-                break;
-            case MSG_DAMAGE_STEP_START:
-                PushCommand(std::make_shared<DuelMsgDamageStepStart>(reader));
-                break;
-            case MSG_DAMAGE_STEP_END:
-                PushCommand(std::make_shared<DuelMsgDamageStepEnd>(reader));
-                break;
-            case MSG_MISSED_EFFECT:
-                PushCommand(std::make_shared<DuelMsgMissEffect>(reader));
-                break;
-            case MSG_BE_CHAIN_TARGET:
-                PushCommand(std::make_shared<DuelMsgBeChainTarget>(reader));
-                break;
-            case MSG_CREATE_RELATION:
-                PushCommand(std::make_shared<DuelMsgCreateRelation>(reader));
-                break;
-            case MSG_RELEASE_RELATION:
-                PushCommand(std::make_shared<DuelMsgReleaseRelation>(reader));
-                break;
-            case MSG_TOSS_COIN:
-                PushCommand(std::make_shared<DuelMsgTossCoin>(reader));
-                break;
-            case MSG_TOSS_DICE:
-                PushCommand(std::make_shared<DuelMsgTossDice>(reader));
-                break;
-            case MSG_DECLEAR_RACE:
-                PushCommand(std::make_shared<DuelMsgDeclearRace>(reader));
-                break;
-            case MSG_DECLEAR_ATTRIB:
-                PushCommand(std::make_shared<DuelMsgDeclearAttrib>(reader));
-                break;
-            case MSG_DECLEAR_CARD:
-                PushCommand(std::make_shared<DuelMsgDeclearCard>(reader));
-                break;
-            case MSG_DECLEAR_NUMBER:
-                PushCommand(std::make_shared<DuelMsgDeclearNumber>(reader));
-                break;
-            case MSG_CARD_HINT:
-                PushCommand(std::make_shared<DuelMsgCardHint>(reader));
-                break;
-            case MSG_TAG_SWAP:
-                PushCommand(std::make_shared<DuelMsgTagSwap>(reader));
-                break;
-            case MSG_RELOAD_FIELD:
-                PushCommand(std::make_shared<DuelMsgLoad>(reader));
-                break;
-            case MSG_AI_NAME:
-                PushCommand(std::make_shared<DuelMsgAIName>(reader));
-                break;
-            case MSG_SHOW_HINT:
-                PushCommand(std::make_shared<DuelMsgShowHint>(reader));
-                break;
-            case MSG_MATCH_KILL:
-                PushCommand(std::make_shared<DuelMsgMatchKill>(reader));
-                break;
-            case MSG_CUSTOM_MSG:
-                PushCommand(std::make_shared<DuelMsgCustomMsg>(reader));
-                break;
-            default:
-                break;
-        }
+        PushCommand(std::make_shared<DuelCommandMsg>(msg_type, reader));
         return 0;
     }
     

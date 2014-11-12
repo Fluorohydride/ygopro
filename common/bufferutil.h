@@ -61,6 +61,10 @@ public:
         ptr += offset;
     }
 
+    inline void SetEnd() {
+        ptr = end;
+    }
+    
     inline bool IsEnd() {
         return ptr >= end;
     }
