@@ -353,6 +353,7 @@ public:
 	void add_unique_card(card* pcard);
 	void remove_unique_card(card* pcard);
 	effect* check_unique_onfield(card* pcard, uint8 controler);
+	void CheckCounter(card* pcard, int32 counter_type, int32 playerid);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();

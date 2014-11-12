@@ -1319,6 +1319,18 @@ int32 scriptlib::card_is_able_to_extra_as_cost(lua_State *L) {
 		lua_pushboolean(L, 0);
 	return 1;
 }
+int32 scriptlib::card_is_able_to_deck_or_extra_as_cost(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	uint32 p = pcard->pduel->game_field->core.reason_player;
+	int32 val = (pcard->data.type & 0x802040) ? pcard->is_capable_cost_to_extra(p) : pcard->is_capable_cost_to_deck(p);
+	if(val)
+		lua_pushboolean(L, 1);
+	else
+		lua_pushboolean(L, 0);
+	return 1;
+}
 int32 scriptlib::card_is_able_to_remove_as_cost(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
@@ -1888,6 +1900,7 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	peffect->reset_flag = RESET_EVENT + 0x47e0000;
 	peffect->value = def;
 	pcard->add_effect(peffect);
+	pcard->set_status(STATUS_NO_LEVEL, FALSE);
 	return 0;
 }
 int32 scriptlib::card_trap_monster_block(lua_State *L) {

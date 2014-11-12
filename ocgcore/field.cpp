@@ -1421,7 +1421,25 @@ effect* field::check_unique_onfield(card* pcard, uint8 controler) {
 	}
 	return 0;
 }
-	
+
+void field::CheckCounter(card* pcard, int32 counter_type, int32 playerid) {
+	auto& counter_map = (counter_type == 1) ? core.summon_counter :
+						(counter_type == 2) ? core.normalsummon_counter :
+						(counter_type == 3) ? core.spsummon_counter :
+						(counter_type == 4) ? core.flipsummon_counter : core.attack_counter;
+	for(auto& iter : counter_map) {
+		auto& info = iter.second;
+		if(info.first) {
+			pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+			if(!pduel->lua->check_condition(info.first, 1)) {
+				if(playerid == 0)
+					info.second += 0x1;
+				else
+					info.second += 0x10000;
+			}
+		}
+	}
+}
 int32 field::check_lp_cost(uint8 playerid, uint32 lp) {
 	effect_set eset;
 	int32 val = lp;

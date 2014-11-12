@@ -151,6 +151,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsAbleToHandAsCost", scriptlib::card_is_able_to_hand_as_cost },
 	{ "IsAbleToDeckAsCost", scriptlib::card_is_able_to_deck_as_cost },
 	{ "IsAbleToExtraAsCost", scriptlib::card_is_able_to_extra_as_cost },
+	{ "IsAbleToDeckOrExtraAsCost", scriptlib::card_is_able_to_deck_or_extra_as_cost },
 	{ "IsAbleToGraveAsCost", scriptlib::card_is_able_to_grave_as_cost },
 	{ "IsAbleToRemoveAsCost", scriptlib::card_is_able_to_remove_as_cost },
 	{ "IsReleasable", scriptlib::card_is_releasable },
