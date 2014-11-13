@@ -34,9 +34,9 @@ function c95291684.cfilter(c)
 end
 function c95291684.sprcon(e,c)
 	if c==nil then return true end
-	local p=c:GetControler()
-	return not Duel.CheckNormalSummonActivity(p) and Duel.GetFieldGroupCount(p,0,LOCATION_MZONE)>0
-		and Duel.GetLocationCount(p,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c95291684.cfilter,p,LOCATION_MZONE,0,1,nil)
+	local tp=c:GetControler()
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0 and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingMatchingCard(c95291684.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c95291684.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1

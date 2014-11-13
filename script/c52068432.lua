@@ -70,7 +70,7 @@ function c52068432.remop(e,tp,eg,ep,ev,re,r,rp)
 	local g3=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_GRAVE,nil)
 	if g1:GetCount()>0 and g2:GetCount()>0 and g3:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
-		local sg1=g1:Select(tp,1,1,nil)
+		local sg1=g1:RandomSelect(tp,1)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 		local sg2=g2:Select(tp,1,1,nil)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)

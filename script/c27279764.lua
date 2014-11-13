@@ -26,10 +26,12 @@ function c27279764.initial_effect(c)
 	c:RegisterEffect(e4)
 	--immune
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetCode(EVENT_SUMMON_SUCCESS)
-	e5:SetOperation(c27279764.immop)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetCondition(c27279764.immcon)
+	e5:SetValue(c27279764.efilter)
 	c:RegisterEffect(e5)
 	--atk/def down
 	local e6=Effect.CreateEffect(c)
@@ -65,22 +67,14 @@ function c27279764.ttop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:SetMaterial(g)
 	Duel.Release(g,REASON_SUMMON+REASON_MATERIAL)
 end
-function c27279764.immop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EFFECT_IMMUNE_EFFECT)
-	e1:SetValue(c27279764.efilter)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
-	c:RegisterEffect(e1)
+function c27279764.immcon(e)
+	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
 end
 function c27279764.efilter(e,te)
 	if te:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return true end
-	if te:IsActiveType(TYPE_MONSTER) and te:IsHasType(0x7e0) then
+	if te:IsActiveType(TYPE_MONSTER) and (te:IsHasType(0x7e0) or te:GetHandlerPlayer()~=PLAYER_NONE or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
 		local lv=e:GetHandler():GetLevel()
-		local ec=te:GetHandler()
+		local ec=te:GetOwner()
 		if ec:IsType(TYPE_XYZ) then
 			return ec:GetOriginalRank()<lv
 		else

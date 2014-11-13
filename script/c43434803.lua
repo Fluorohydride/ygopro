@@ -28,7 +28,7 @@ function c43434803.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local sc=sg:GetFirst()
 	local oc=og:GetFirst()
 	local g=Group.FromCards(sc,oc)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,PLAYER_ALL,0)
 	e:SetLabelObject(sc)
 end
 function c43434803.operation(e,tp,eg,ep,ev,re,r,rp)

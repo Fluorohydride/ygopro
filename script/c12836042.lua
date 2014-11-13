@@ -18,7 +18,7 @@ function c12836042.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c12836042.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.CheckSpecialSummonActivity(tp)
+		and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0
 		and e:GetHandler():IsReleasable() end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)

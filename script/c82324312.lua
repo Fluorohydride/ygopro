@@ -4,9 +4,8 @@ function c82324312.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(82324312,0))
 	e1:SetCategory(CATEGORY_TOGRAVE)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c82324312.condition)
 	e1:SetOperation(c82324312.operation)
 	c:RegisterEffect(e1)
@@ -21,10 +20,10 @@ function c82324312.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c82324312.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and Duel.GetAttacker()==e:GetHandler() and Duel.GetAttackTarget()==nil
+	return ep~=tp and Duel.GetAttackTarget()==nil
 end
 function c82324312.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0,nil)
+	local g=Duel.GetFieldGroup(ep,LOCATION_HAND,0)
 	if g:GetCount()==0 then return end
 	local sg=g:RandomSelect(ep,1)
 	Duel.ConfirmCards(tp,sg)

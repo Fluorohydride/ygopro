@@ -57,7 +57,7 @@ function c102380.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c102380.spcost(e,c,tp)
-	return not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c102380.spcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
