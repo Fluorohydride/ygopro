@@ -129,11 +129,12 @@ function Auxiliary.AddSynchroProcedure(c,f1,f2,ct)
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
 end
-function Auxiliary.SynCondition(f1,f2,minc,maxc)
+function Auxiliary.SynCondition(f1,f2,minct,maxc)
 	return	function(e,c,smat,mg)
 				if c==nil then return true end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
+				local minc=minct
 				if minc<ct then minc=ct end
 				if maxc<minc then return false end
 				if smat and smat:IsType(TYPE_TUNER) and (not f1 or f1(smat)) then
