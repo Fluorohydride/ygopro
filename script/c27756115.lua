@@ -53,9 +53,9 @@ function c27756115.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_COUNT)
-	e2:SetReset(RESET_EVENT+0x1fe0000)
-	e2:SetValue(c27756115.valcon)
 	e2:SetCountLimit(1)
+	e2:SetValue(c27756115.valcon)
+	e2:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e2)
 end
 function c27756115.eqlimit(e,c)
@@ -74,7 +74,8 @@ function c27756115.cfilter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEUP)
 end
 function c27756115.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c27756115.cfilter,1,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and eg:IsExists(c27756115.cfilter,1,nil,e,tp) end
 	local g=eg:Filter(c27756115.cfilter,nil,e,tp)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
