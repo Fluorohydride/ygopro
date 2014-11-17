@@ -21,7 +21,7 @@ function c65195959.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c65195959.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,2,nil)
 end
 function c65195959.operation(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(tp,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local tc=g:GetFirst()
 	while tc do
 		local e1=Effect.CreateEffect(e:GetHandler())
