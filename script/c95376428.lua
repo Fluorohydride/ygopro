@@ -1,4 +1,4 @@
---召召喚制限－エクストラネット
+--召喚制限－エクストラネット
 function c95376428.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
