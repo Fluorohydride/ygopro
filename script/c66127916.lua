@@ -35,11 +35,11 @@ function c66127916.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		local tc=Duel.GetFirstMatchingCard(c66127916.filter3,tp,LOCATION_GRAVE,0,nil)
-		if tc and Duel.SelectYesNo(tp,aux.Stringid(66127916,0)) then
+		local tg=Duel.SelectMatchingCard(c66127916.filter3,tp,LOCATION_GRAVE,0,1,1,nil)
+		if tg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(66127916,0)) then
 			Duel.BreakEffect()
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,tc)
+			Duel.SendtoHand(tg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,tg)
 		end
 	end
 end
