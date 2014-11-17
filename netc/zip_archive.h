@@ -83,10 +83,11 @@ struct ZipEndBlock {
     
     struct ZipFileInfo {
         std::string src_file;
-        bool compressed;
-        size_t data_offset;
-        size_t comp_size;
-        size_t file_size;
+        bool compressed = false;
+        size_t data_offset = 0;
+        size_t comp_size = 0;
+        size_t file_size = 0;
+        uint8_t* datas = nullptr;
     };
     
     class ZipArchive {
@@ -94,7 +95,7 @@ struct ZipEndBlock {
         ~ZipArchive();
         void Load(const std::vector<std::wstring>& files);
         size_t GetFileLength(const std::string& filename);
-        size_t ReadFile(const std::string& filename, uint8_t* buffer);
+        std::pair<uint8_t*, size_t> ReadFile(const std::string& filename);
     
     protected:
         std::unordered_map<std::string, ZipFileInfo> entries;

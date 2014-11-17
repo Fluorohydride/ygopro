@@ -8,6 +8,9 @@ namespace ygopro
 {
     
     ZipArchive::~ZipArchive() {
+        for(auto& iter : entries)
+            if(iter.second.datas != nullptr)
+                delete[] iter.second.datas;
     }
     
     void ZipArchive::Load(const std::vector<std::wstring>& files) {
@@ -78,23 +81,25 @@ namespace ygopro
         return iter->second.file_size;
     }
     
-    size_t ZipArchive::ReadFile(const std::string& filename, uint8_t* buffer) {
+    std::pair<uint8_t*, size_t> ZipArchive::ReadFile(const std::string& filename) {
         auto iter = entries.find(filename);
         if(iter == entries.end())
-            return 0;
+            return std::make_pair(nullptr, 0);
+        if(iter->second.datas != nullptr)
+            return std::make_pair(iter->second.datas, iter->second.file_size);
         std::ifstream zip_file(iter->second.src_file, std::ios::in | std::ios::binary);
         if(!zip_file)
-            return 0;
+            return std::make_pair(nullptr, 0);
         ZipFileHeader file_header;
         zip_file.seekg(iter->second.data_offset, zip_file.beg);
         zip_file.read((char*)&file_header, ZIP_FILE_SIZE);
         if(file_header.block_header != 0x04034b50)
-            return 0;
+            return std::make_pair(nullptr, 0);
         zip_file.seekg(file_header.name_size + file_header.ex_size, zip_file.cur);
+        iter->second.datas = new uint8_t[iter->second.file_size];
         if(iter->second.compressed) {
             uint8_t* raw = new uint8_t[iter->second.comp_size];
             zip_file.read((char*)raw, iter->second.comp_size);
-            size_t decom_size = iter->second.file_size;
             z_stream strm;
             strm.zalloc = Z_NULL;
             strm.zfree = Z_NULL;
@@ -103,16 +108,19 @@ namespace ygopro
             strm.avail_in = iter->second.comp_size;
             strm.next_in = raw;
             strm.avail_out = iter->second.file_size;
-            strm.next_out = buffer;
+            strm.next_out = iter->second.datas;
             int32_t ret = inflate(&strm, Z_FINISH);
             inflateEnd(&strm);
             delete []raw;
-            if(ret != Z_STREAM_END)
-                return 0;
-            return decom_size;
+            if(ret != Z_STREAM_END) {
+                delete[] iter->second.datas;
+                iter->second.datas = nullptr;
+                return std::make_pair(nullptr, 0);
+            }
+            return std::make_pair(iter->second.datas, iter->second.file_size);
         } else {
-            zip_file.read((char*)buffer, iter->second.file_size);
-            return iter->second.file_size;
+            zip_file.read((char*)iter->second.datas, iter->second.file_size);
+            return std::make_pair(iter->second.datas, iter->second.file_size);
         }
     }
 }

@@ -26,8 +26,9 @@ namespace ygopro
         void UnloadCardTexture(uint32_t id);
 		void UnloadAllCardTexture();
         
-        uint16_t AllocBlock();
-        bool FreeBlock(uint16_t);
+        uint16_t AllocBlock(uint32_t iid);
+        bool FreeBlock(uint16_t, bool reserve);
+        void IncreaseRef(uint16_t);
         
 		void InitTextures(const std::wstring& image_path);
         void UninitTextures();
@@ -37,8 +38,10 @@ namespace ygopro
         std::unordered_map<uint32_t, CardTextureInfo> card_textures;
         std::unordered_map<std::string, ti4> misc_textures;
         std::array<ti4, 16> char_textures;
-        std::list<uint16_t> unuse_block;
-        std::vector<int32_t> ref_count;
+        std::list<uint16_t> unused_block;
+        std::list<uint16_t> reserved_block;
+        std::vector<std::pair<int32_t, uint32_t>> ref_count;
+        std::unordered_map<uint32_t, std::list<uint16_t>::iterator> reserved_id;
         glbase::Texture card_texture;
         glbase::Texture misc_texture;
         glbase::Texture bg_texture;

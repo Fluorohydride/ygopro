@@ -24,15 +24,14 @@ namespace ygopro
 				cti.ti = misc_textures["unknown"];
                 cti.ref_block = 0xffff;
 			} else {
-                uint16_t blockid = AllocBlock();
+                uint16_t blockid = AllocBlock(id);
                 if(blockid == 0xffff) {
                     cti.ti = misc_textures["unknown"];
                     cti.ref_block = 0xffff;
                 } else {
                     glbase::Image img;
-                    unsigned char* imgbuf = new unsigned char[length];
-                    imageZip.ReadFile(file, imgbuf);
-                    if(img.LoadMemory(imgbuf, length)) {
+                    auto fileinfo = imageZip.ReadFile(file);
+                    if(img.LoadMemory(fileinfo.first, length)) {
                         glbase::v2ct frame_verts[4];
                         int32_t bx = (blockid % 20) * 100;
                         int32_t by = (blockid / 20) * 145;
@@ -63,17 +62,15 @@ namespace ygopro
                         glBindTexture(GL_TEXTURE_2D, 0);
                         glBindFramebuffer(GL_FRAMEBUFFER, 0);
                     } else {
-                        FreeBlock(blockid);
+                        FreeBlock(blockid, false);
                         cti.ti = misc_textures["unknown"];
                         cti.ref_block = 0xffff;
                     }
-                    delete[] imgbuf;
                 }
 			}
             return cti.ti;;
 		}
-		if(iter->second.ref_block < 280)
-			ref_count[iter->second.ref_block]++;
+        IncreaseRef(iter->second.ref_block);
 		return iter->second.ti;
 	}
     
@@ -98,14 +95,12 @@ namespace ygopro
         }
         if(length != 0) {
             glbase::Image img;
-            unsigned char* imgbuf = new unsigned char[length];
-            imageZip.ReadFile(file, imgbuf);
-            if(img.LoadMemory(imgbuf, length)) {
+            auto imginfo = imageZip.ReadFile(file);
+            if(img.LoadMemory(imginfo.first, length)) {
                 card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                 pre_ret = &card_image;
             } else
                 pre_ret = nullptr;
-            delete[] imgbuf;
         } else
             pre_ret = nullptr;
         return pre_ret;
@@ -122,45 +117,74 @@ namespace ygopro
         if(iter == card_textures.end())
             return;
         auto& cti = iter->second;
-        if(FreeBlock(cti.ref_block))
+        if(FreeBlock(cti.ref_block, true))
             card_textures.erase(iter);
     }
     
 	void ImageMgr::UnloadAllCardTexture() {
-        card_textures.clear();
-        unuse_block.clear();
         for(int16_t i = 7; i < 280; ++i) {
-            ref_count[i] = 0;
-            unuse_block.push_back(i);
+            if(ref_count[i].first != 0) {
+                ref_count[i].first = 0;
+                reserved_block.push_back(i);
+                reserved_id[ref_count[i].second] = --reserved_block.end();
+            }
         }
 	}
 
-    uint16_t ImageMgr::AllocBlock() {
-        if(unuse_block.size() == 0)
-            return 0xffff;
-        int16_t ret = unuse_block.front();
-        unuse_block.pop_front();
-        ref_count[ret]++;
+    uint16_t ImageMgr::AllocBlock(uint32_t iid) {
+        uint16_t ret = 0;
+        if(unused_block.size() == 0) {
+            if(reserved_block.size() == 0)
+                return 0xffff;
+            uint16_t ret = reserved_block.front();
+            reserved_id.erase(ref_count[ret].second);
+            card_textures.erase(ref_count[ret].second);
+            reserved_block.pop_front();
+        } else {
+            ret = unused_block.front();
+            unused_block.pop_front();
+        }
+        ref_count[ret].first = 1;
+        ref_count[ret].second = iid;
         return ret;
     }
     
-    bool ImageMgr::FreeBlock(uint16_t id) {
+    bool ImageMgr::FreeBlock(uint16_t id, bool reserve) {
         if(id >= 280)
             return false;
-        if(ref_count[id] == 0)
+        if(ref_count[id].first == 0)
             return false;
-        ref_count[id]--;
-        if(ref_count[id] == 0) {
-            unuse_block.push_back(id);
-            return true;
+        ref_count[id].first--;
+        if(ref_count[id].first == 0) {
+            if(reserve) {
+                reserved_block.push_back(id);
+                reserved_id[ref_count[id].second] = --reserved_block.end();
+                return false;
+            } else {
+                unused_block.push_back(id);
+                return true;
+            }
         }
         return false;
+    }
+    
+    void ImageMgr::IncreaseRef(uint16_t blockid) {
+        if(blockid >= 280)
+            return;
+        if(ref_count[blockid].first == 0) {
+            auto iter = reserved_id.find(ref_count[blockid].second);
+            if(iter != reserved_id.end()) {
+                reserved_block.erase(iter->second);
+                reserved_id.erase(iter);
+            }
+        }
+        ref_count[blockid].first++;
     }
     
     void ImageMgr::InitTextures(const std::wstring& image_path) {
         card_texture.Load(nullptr, 2048, 2048);
         for(int16_t i = 7; i < 280; ++i)
-            unuse_block.push_back(i);
+            unused_block.push_back(i);
         ref_count.resize(280);
         glGenFramebuffers(1, &frame_buffer);
         glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
