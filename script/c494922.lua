@@ -3,7 +3,7 @@ function c494922.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_MACHINE),aux.NonTuner(Card.IsSetCard,0x9a),1)
 	c:EnableReviveLimit()
-	--
+	--defence attack
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DEFENCE_ATTACK)
@@ -32,22 +32,19 @@ end
 function c494922.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_GRAVE,0,1,nil,TYPE_SPELL+TYPE_TRAP) 
 end
-function c494922.filter(c)
-	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()
-end
-function c494922.filter2(c)
-	return c:IsType(TYPE_FIELD) and c:IsSSetable()
+function c494922.filter(c,ct)
+	if ct<=0 then
+		return c:IsType(TYPE_FIELD) and c:IsSSetable()
+	else
+		return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable()
+	end
 end
 function c494922.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControlerCanBeChanged() end
-	if chk==0 then return Duel.IsExistingMatchingCard(c494922.filter,tp,0,LOCATION_GRAVE,1,nil) and (Duel.GetLocationCount(tp,LOCATION_SZONE)>0 or Duel.IsExistingMatchingCard(c494922.filter2,tp,0,LOCATION_GRAVE,1,nil)) end
-	local g=Group.CreateGroup()
+	local ct=Duel.GetLocationCount(tp,LOCATION_SZONE)
+	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControlerCanBeChanged() and c494922.filter(chkc,ct) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c494922.filter,tp,0,LOCATION_GRAVE,1,nil,ct) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)==0 then
-		g=Duel.SelectTarget(tp,c494922.filter2,tp,0,LOCATION_GRAVE,1,1,nil)
-	else
-		g=Duel.SelectTarget(tp,c494922.filter,tp,0,LOCATION_GRAVE,1,1,nil)
-	end
+	local g=Duel.SelectTarget(tp,c494922.filter,tp,0,LOCATION_GRAVE,1,1,nil,ct)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
 end
 function c494922.operation(e,tp,eg,ep,ev,re,r,rp)
