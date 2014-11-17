@@ -1,17 +1,17 @@
 --フロント・オブザーバー
 function c12451640.initial_effect(c)
 	--
-	e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetOperation(c12451640.regop)
 	c:RegisterEffect(e1)
 end
 function c12451640.regop(e,tp,eg,ep,ev,re,r,rp)
-	c=e:GetHandler()
+	local c=e:GetHandler()
 	c:RegisterFlagEffect(12451640,RESET_EVENT+0x1fe0000,0,1,Duel.GetTurnCount())
 	--to hand
-	e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(12451640,0))
 	e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
@@ -24,7 +24,7 @@ function c12451640.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 	--to hand
-	e2=Effect.Clone(e1)
+	local e2=e1:Clone()
 	e2:SetDescription(aux.Stringid(12451640,1))
 	e2:SetCondition(c12451640.thcon)
 	e2:SetCost(c12451640.thcost)
@@ -54,7 +54,7 @@ function c12451640.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c12451640.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return  Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel() and e:GetHandler():GetFlagEffectLabel(12451640)==e:GetLabel()
+	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel() and e:GetHandler():GetFlagEffectLabel(12451640)==e:GetLabel()
 end
 function c12451640.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
