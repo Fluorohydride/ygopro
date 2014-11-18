@@ -75,7 +75,7 @@ function c35952884.disop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c35952884.sumcon(e,tp,eg,ep,ev,re,r,rp,chk)
-	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 end
 function c35952884.filter(c,e,tp)
 	return c:GetCode()==24696097 and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
