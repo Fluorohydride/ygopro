@@ -60,17 +60,17 @@ function c34487429.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c34487429.filter1(c)
-	return c:IsFaceup() and c:IsSetCard(0x34)
+	return c:IsFaceup() and c:IsSetCard(0x1034)
 end
 function c34487429.desrepcon(e)
 	return Duel.IsExistingMatchingCard(c34487429.filter1,e:GetHandler():GetControler(),LOCATION_SZONE,0,1,nil)
 end
 function c34487429.discon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
-		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_SZONE,0,3,nil,0x34)
+		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_SZONE,0,3,nil,0x1034)
 end
 function c34487429.filter2(c)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
 end
 function c34487429.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c34487429.filter2,tp,LOCATION_MZONE,0,1,nil) end
@@ -110,7 +110,7 @@ function c34487429.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c34487429.filter1,tp,LOCATION_SZONE,0,5,nil)
 end
 function c34487429.filter3(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c34487429.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetLocation()==LOCATION_SZONE and chkc:GetControler()==tp and c34487429.filter3(chkc,e,tp) end

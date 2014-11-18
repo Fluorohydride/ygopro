@@ -6,30 +6,18 @@ function c1516510.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_FUSION_MATERIAL)
-	e1:SetCondition(c1516510.fscon)
-	e1:SetOperation(c1516510.fsop)
+	e1:SetCondition(aux.FConditionCodeFun(16178681,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),1,true,false))
+	e1:SetOperation(c1516510.fsop2)
 	c:RegisterEffect(e1)
 end
 c1516510.material_count=1
 c1516510.material={16178681}
-function c1516510.mfilter(c,mg)
-	return (c:IsCode(16178681) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)) and mg:IsExists(Card.IsRace,1,c,RACE_SPELLCASTER)
-end
-function c1516510.fscon(e,mg,gc)
-	if mg==nil then return false end
-	if gc then return false end
-	return mg:IsExists(c1516510.mfilter,1,nil,mg)
-end
+c1516510.fsop1=aux.FOperationCodeFun(16178681,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),1,true,false)
 function c1516510.imfilter(c)
 	return c:IsLocation(LOCATION_MZONE) and c:GetSummonType()==SUMMON_TYPE_PENDULUM
 end
-function c1516510.fsop(e,tp,eg,ep,ev,re,r,rp,gc)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-	local g1=eg:FilterSelect(tp,c1516510.mfilter,1,1,nil,eg)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-	local g2=eg:FilterSelect(tp,Card.IsRace,1,1,g1:GetFirst(),RACE_SPELLCASTER)
-	g1:Merge(g2)
-	Duel.SetFusionMaterial(g1)
+function c1516510.fsop2(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
+	c1516510.fsop1(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

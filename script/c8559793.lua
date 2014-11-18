@@ -23,7 +23,7 @@ function c8559793.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c8559793.cfilter,tp,LOCATION_MZONE,0,2,nil)
 end
 function c8559793.filter(c)
-	return c:IsSetCard(0xb9) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsSetCard(0xba) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c8559793.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c8559793.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
