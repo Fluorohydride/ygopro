@@ -43,7 +43,7 @@ function c94432298.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c94432298.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.IsExistingMatchingCard(c94432298.sdfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil) then
+	if Duel.IsExistingMatchingCard(c94432298.sdfilter,tp,LOCATION_MZONE,0,1,nil) then
 		 Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
 	end
 	if e:GetHandler():GetFlagEffect(94432298)==0 or not e:GetHandler():IsRelateToEffect(e) then return end
