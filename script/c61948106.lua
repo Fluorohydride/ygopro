@@ -35,7 +35,7 @@ function c61948106.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c61948106.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and c61948106.spfilter(chkc) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsExistingTarget(c61948106.spfilter,tp,LOCATION_GRAVE,0,2,nil,e,tp) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1 and Duel.IsExistingTarget(c61948106.spfilter,tp,LOCATION_GRAVE,0,2,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c61948106.spfilter,tp,LOCATION_GRAVE,0,2,2,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
