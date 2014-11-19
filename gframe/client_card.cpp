@@ -72,7 +72,7 @@ void ClientCard::UpdateInfo(char* buf) {
 		type = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LEVEL) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && level != (unsigned int)pdata) {
+		if(level != (unsigned int)pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
