@@ -12,6 +12,7 @@ namespace ygopro
         DuelProtoTcp();
         virtual void BeginProto();
         virtual void EndProto();
+        virtual bool IsEnd();
         
         virtual void OnConnected();
         virtual void OnConnectError();

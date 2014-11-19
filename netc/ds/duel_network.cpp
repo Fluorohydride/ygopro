@@ -20,6 +20,10 @@ namespace ygopro
         
     }
     
+    bool DuelProtoTcp::IsEnd() {
+        return false;
+    }
+    
     void DuelProtoTcp::OnConnected() {
         
     }

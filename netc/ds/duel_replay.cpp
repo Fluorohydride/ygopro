@@ -1,6 +1,7 @@
 #include "../../common/common.h"
 #include "../../buildin/LzmaSDK.h"
 
+#include "../card_data.h"
 #include "duel_replay.h"
 
 namespace ygopro
@@ -143,6 +144,9 @@ namespace ygopro
     }
     
     uint32 DuelProtoReplay::ReadCard(uint32 code, card_data* data) {
+        CardData* cdata = DataMgr::Get()[code];
+        if(cdata != nullptr)
+            memcpy(data, cdata, sizeof(card_data));
         return 0;
     }
     

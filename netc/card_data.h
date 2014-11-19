@@ -20,19 +20,21 @@ namespace ygopro
         uint32_t attribute = 0;
         std::wstring keyword;
     };
-    
+
 	struct CardData {
-        uint32_t dbsrc;
 		uint32_t code;
-		uint32_t pool;
-		uint32_t alias;
+        uint32_t alias;
 		uint64_t setcode;
 		uint32_t type;
+        uint32_t star;
+        uint32_t lscale;
+        uint32_t rscale;
+        uint32_t attribute;
+        uint32_t race;
 		int32_t attack;
 		int32_t defence;
-		uint32_t level;
-		uint32_t race;
-		uint32_t attribute;
+        uint32_t dbsrc;
+        uint32_t pool;
 		uint32_t category;
         std::wstring name;
 		std::wstring texts;

@@ -28,9 +28,9 @@ namespace ygopro
                 return false;
             if(fc.defmax != -1 && fc.defmax != 0 && defence > fc.defmax)
                 return false;
-            if(fc.lvmin != 0 && level < (uint32_t)fc.lvmin)
+            if(fc.lvmin != 0 && star < (uint32_t)fc.lvmin)
                 return false;
-            if(fc.lvmax != 0 && level > (uint32_t)fc.lvmax)
+            if(fc.lvmax != 0 && star > (uint32_t)fc.lvmax)
                 return false;
             if(fc.race != 0 && (race & fc.race) == 0)
                 return false;
@@ -71,8 +71,8 @@ namespace ygopro
             int32_t type2 = (p2->type & 0x8020c0) ? (p2->type & 0x8020c1) : (p2->type & 0x31);
             if(type1 != type2)
                 return type1 < type2;
-            if(p1->level != p2->level)
-                return p1->level > p2->level;
+            if(p1->star != p2->star)
+                return p1->star > p2->star;
             if(p1->attack != p2->attack)
                 return p1->attack > p2->attack;
             if(p1->defence != p2->defence)
@@ -108,7 +108,10 @@ namespace ygopro
 				cd.type = sqlite3_column_int(pStmt, 4);
 				cd.attack = sqlite3_column_int(pStmt, 5);
 				cd.defence = sqlite3_column_int(pStmt, 6);
-				cd.level = sqlite3_column_int(pStmt, 7);
+				cd.star = sqlite3_column_int(pStmt, 7);
+                cd.lscale = (cd.star >> 16) & 0xff;
+                cd.rscale = (cd.star >> 24) & 0xff;
+                cd.star &= 0xffff;
 				cd.race = sqlite3_column_int(pStmt, 8);
 				cd.attribute = sqlite3_column_int(pStmt, 9);
 				cd.category = sqlite3_column_int(pStmt, 10);

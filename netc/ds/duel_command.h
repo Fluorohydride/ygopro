@@ -33,6 +33,14 @@ namespace ygopro
         BufferUtil* reader = nullptr;
     };
     
+    class DuelCommandDraw : public DuelCommand {
+    public:
+        DuelCommandDraw(uint32_t pl, uint32_t data);
+        virtual bool Handle(std::shared_ptr<DuelScene> pscene);
+    protected:
+        uint32_t playerid;
+        uint32_t data;
+    };
 }
 
 #endif

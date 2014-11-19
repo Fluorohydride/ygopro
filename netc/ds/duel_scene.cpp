@@ -1092,6 +1092,14 @@ namespace ygopro
         alloc_cards.clear();
     }
     
+    void DuelScene::InitHp(int32_t local_pl, int32_t hp) {
+        
+    }
+    
+    void DuelScene::AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq) {
+        
+    }
+    
     v2i DuelScene::CheckHoverBlock(float px, float py) {
         for(int32_t i = 0 ; i < 17; ++i) {
             if(field_blocks[0][i]->CheckInside(px, py))

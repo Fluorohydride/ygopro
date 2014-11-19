@@ -509,7 +509,7 @@ namespace ygopro
         
         pushvert({0, 0}, {mw, 40}, hmask);
         if(data->type & 0x1) {
-            for(uint32_t i = 0; i < (data->level & 0xffff); ++i)
+            for(uint32_t i = 0; i < data->star; ++i)
                 pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
             std::string adstr;
             if(data->attack >= 0)
@@ -525,7 +525,7 @@ namespace ygopro
         } else {
             ad->ClearText();
         }
-        if((data->level >> 16) > 0) {
+        if(data->lscale || data->rscale) {
             std::wstring pdelimiter = stringCfg["pendulum_delimiter"];
             auto pd = data->texts.find(pdelimiter);
             if(pd > 0)
@@ -543,18 +543,16 @@ namespace ygopro
             auto rscale = ImageMgr::Get().GetTexture("rscale");
             pushvert({0, 50}, {30, 23}, lscale);
             pushvert({mw - 30, 50}, {30, 23}, rscale);
-            int32_t ls = (data->level >> 16) & 0xff;
-            int32_t rs = (data->level >> 24) & 0xff;
-            if(ls >= 10) {
-                pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls / 10)), 0xff000000);
-                pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (ls % 10)), 0xff000000);
+            if(data->lscale >= 10) {
+                pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale / 10)), 0xff000000);
+                pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale % 10)), 0xff000000);
             } else
-                pushvert({8, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + ls), 0xff000000);
-            if(rs >= 10) {
-                pushvert({mw - 29, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs / 10)), 0xff000000);
-                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (rs % 10)), 0xff000000);
+                pushvert({8, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->lscale), 0xff000000);
+            if(data->rscale >= 10) {
+                pushvert({mw - 29, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale / 10)), 0xff000000);
+                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale % 10)), 0xff000000);
             } else
-                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + rs), 0xff000000);
+                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->rscale), 0xff000000);
         } else {
             pushvert({0, 45}, {mw, sz.y - 65}, hmask, 0xc0ffffff);
             pent->SetText(L"", 0xff000000);

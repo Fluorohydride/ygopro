@@ -28,4 +28,13 @@ namespace ygopro
         return true;
     }
     
+    DuelCommandDraw::DuelCommandDraw(uint32_t pl, uint32_t data) {
+        this->playerid = pl;
+        this->data = data;
+    }
+    
+    bool DuelCommandDraw::Handle(std::shared_ptr<DuelScene> pscene) {
+        return true;
+    }
+    
 }

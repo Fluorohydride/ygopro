@@ -4,6 +4,7 @@
 
 #include "../sungui.h"
 #include "duel_command.h"
+#include "duel_scene.h"
 #include "duel_scene_handler.h"
 
 namespace ygopro
@@ -39,6 +40,7 @@ namespace ygopro
     }
     
     int32_t DuelSceneHandler::SolveMessage(uint8_t msg_type, BufferUtil& reader) {
+        auto pscene = duel_scene.lock();
         switch(msg_type) {
             case MSG_RETRY:
                 break;
@@ -249,8 +251,15 @@ namespace ygopro
                 break;
             case MSG_BECOME_TARGET:
                 break;
-            case MSG_DRAW:
+            case MSG_DRAW: {
+                uint32_t playerid = reader.Read<uint8_t>();
+                uint32_t count = reader.Read<uint8_t>();
+                for(uint32_t i = 0; i < count; ++i) {
+                    uint32_t data = reader.Read<uint32_t>();
+                    cur_commands.InsertCommand(std::make_shared<DuelCommandDraw>(playerid, data));
+                }
                 break;
+            }
             case MSG_DAMAGE:
                 break;
             case MSG_RECOVER:
@@ -306,34 +315,44 @@ namespace ygopro
             case MSG_TAG_SWAP:
                 break;
             case MSG_RELOAD_FIELD: {
-//                pinfos.resize(2);
-//                for(int32_t p = 0; p < 2; ++p) {
-//                    pinfos[p].hp = reader.Read<int32_t>();
-//                    for(int32_t i = 0; i < 5; ++i) {
-//                        uint32_t exist_card = reader.Read<uint8_t>();
-//                        if(exist_card) {
-//                            uint32_t pos = reader.Read<uint8_t>();
-//                            uint32_t sz = reader.Read<uint8_t>();
-//                            pinfos[p].minfo[i] = pos | (sz << 8);
-//                        } else
-//                            pinfos[p].minfo[i] = 0;
-//                    }
-//                    for(int32_t i = 0; i < 8; ++i) {
-//                        uint32_t exist_card = reader.Read<uint8_t>();
-//                        if(exist_card)
-//                            pinfos[p].sinfo[i] = reader.Read<uint8_t>();
-//                        else
-//                            pinfos[p].sinfo[i] = 0;
-//                    }
-//                    pinfos[p].main_size = reader.Read<uint8_t>();
-//                    pinfos[p].hand_size = reader.Read<uint8_t>();
-//                    pinfos[p].grave_size = reader.Read<uint8_t>();
-//                    pinfos[p].remove_size = reader.Read<uint8_t>();
-//                    pinfos[p].extra_size = reader.Read<uint8_t>();
-//                }
-//                int32_t chainsz = reader.Read<uint8_t>();
-//                cinfos.resize(chainsz);
-//                for(int32_t i = 0; i < chainsz; ++i) {
+                for(int32_t p = 0; p < 2; ++p) {
+                    pscene->InitHp(p, reader.Read<int32_t>());
+                    for(int32_t i = 0; i < 5; ++i) {
+                        uint32_t exist_card = reader.Read<uint8_t>();
+                        if(exist_card) {
+                            uint32_t pos = reader.Read<uint8_t>();
+                            uint32_t sz = reader.Read<uint8_t>();
+                            pscene->AddCard(0, p, LOCATION_MZONE, i, pos);
+                            for(int32_t ov = 0; ov < sz; ++ov)
+                                pscene->AddCard(0, p, LOCATION_MZONE | LOCATION_OVERLAY, i, ov);
+                        }
+                    }
+                    for(int32_t i = 0; i < 8; ++i) {
+                        uint32_t exist_card = reader.Read<uint8_t>();
+                        if(exist_card) {
+                            uint32_t pos = reader.Read<uint8_t>();
+                            pscene->AddCard(0, p, LOCATION_SZONE, i, pos);
+                        }
+                    }
+                    int32_t main_sz = reader.Read<uint8_t>();
+                    for(int32_t i = 0; i < main_sz; ++i)
+                        pscene->AddCard(0, p, LOCATION_DECK, i, POS_FACEDOWN);
+                    int32_t hand_sz = reader.Read<uint8_t>();
+                    for(int32_t i = 0; i < hand_sz; ++i)
+                        pscene->AddCard(0, p, LOCATION_HAND, i, POS_FACEDOWN);
+                    int32_t grave_sz = reader.Read<uint8_t>();
+                    for(int32_t i = 0; i < grave_sz; ++i)
+                        pscene->AddCard(0, p, LOCATION_GRAVE, i, POS_FACEUP);
+                    int32_t remove_sz = reader.Read<uint8_t>();
+                    for(int32_t i = 0; i < remove_sz; ++i)
+                        pscene->AddCard(0, p, LOCATION_REMOVED, i, POS_FACEUP);
+                    int32_t extra_sz = reader.Read<uint8_t>();
+                    for(int32_t i = 0; i < extra_sz; ++i)
+                        pscene->AddCard(0, p, LOCATION_EXTRA, i, POS_FACEDOWN);
+                }
+                int32_t chain_sz = reader.Read<uint8_t>();
+                for(int32_t i = 0; i < chain_sz; ++i) {
+                    reader.Skip(15);
 //                    cinfos[i].code = reader.Read<uint32_t>();
 //                    cinfos[i].card_con = reader.Read<uint8_t>();
 //                    cinfos[i].card_loc = reader.Read<uint8_t>();
@@ -343,7 +362,7 @@ namespace ygopro
 //                    cinfos[i].trig_loc = reader.Read<uint8_t>();
 //                    cinfos[i].trig_seq = reader.Read<uint8_t>();
 //                    cinfos[i].desc = reader.Read<uint32_t>();
-//                }
+                }
                 break;
             }
             case MSG_AI_NAME:
