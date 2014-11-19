@@ -38,7 +38,7 @@ function c32710364.repop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RaiseEvent(c,47408488,e,0,tp,0,0)
 end
 function c32710364.filter(c,e,sp)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsCanBeSpecialSummoned(e,0,sp,true,false)
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,sp,true,false)
 end
 function c32710364.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c32710364.filter,tp,LOCATION_SZONE,0,1,nil,e,tp)

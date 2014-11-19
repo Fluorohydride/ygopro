@@ -39,7 +39,7 @@ end
 function c69937550.cbcondition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bt=eg:GetFirst()
-	return r~=REASON_REPLACE and c~=bt and bt:IsFaceup() and bt:IsSetCard(0x34) and bt:GetControler()==c:GetControler()
+	return r~=REASON_REPLACE and c~=bt and bt:IsFaceup() and bt:IsSetCard(0x1034) and bt:GetControler()==c:GetControler()
 end
 function c69937550.cboperation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeAttackTarget(e:GetHandler())

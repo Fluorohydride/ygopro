@@ -11,13 +11,13 @@ function c95326659.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c95326659.cfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x34)
+	return c:IsFaceup() and c:IsSetCard(0x1034)
 end
 function c95326659.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c95326659.cfilter,tp,LOCATION_SZONE,0,2,nil)
 end
 function c95326659.filter(c,e,tp)
-	return c:IsSetCard(0x34) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c95326659.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

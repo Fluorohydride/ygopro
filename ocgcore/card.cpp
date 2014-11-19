@@ -583,9 +583,11 @@ uint32 card::is_xyz_level(card* pcard, uint32 lv) {
 	uint32 lev;
 	effect_set eset;
 	filter_effect(EFFECT_XYZ_LEVEL, &eset);
-	if(eset.count)
-		lev = eset[0]->get_value(pcard);
-	else
+	if(eset.count) {
+		pduel->lua->add_param(this, PARAM_TYPE_CARD);
+		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+		lev = eset[0]->get_value(2);
+	} else
 		lev = get_level();
 	return ((lev & 0xffff) == lv) || ((lev >> 16) == lv);
 }
