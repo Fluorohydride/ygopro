@@ -47,6 +47,6 @@ function c40854824.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
 		g:Remove(Card.IsCode,nil,tc:GetCode())
 		ft=ft-1
-	until ft<=0 or g:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(40854824,1))
+	until ft<=0 or g:GetCount()==0 or not Duel.SelectYesNo(tp,aux.Stringid(40854824,0))
 	Duel.SpecialSummonComplete()
 end

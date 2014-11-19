@@ -5,11 +5,8 @@ function c494922.initial_effect(c)
 	c:EnableReviveLimit()
 	--defence attack
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DEFENCE_ATTACK)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetTarget(c494922.atktg)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	--set
@@ -24,9 +21,6 @@ function c494922.initial_effect(c)
 	e2:SetTarget(c494922.settg)
 	e2:SetOperation(c494922.setop)
 	c:RegisterEffect(e2)
-end
-function c494922.atktg(e,c)
-	return c:IsSetCard(0x9a)
 end
 function c494922.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)
