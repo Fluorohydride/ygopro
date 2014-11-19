@@ -84,6 +84,9 @@ function c20426907.distg3(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
 end
 function c20426907.disop(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsExistingMatchingCard(c20426907.sdfilter,tp,LOCATION_ONFIELD,0,1,nil) then
+		Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
+	end
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local tc=g:GetFirst()
