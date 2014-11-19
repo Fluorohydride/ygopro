@@ -1,7 +1,7 @@
 --星輝士 セイクリッド・ダイヤ
 function c9272381.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),5),3,c9272381.ovfilter,aux.Stringid(9272381,0))
+	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),5),3,c9272381.ovfilter,aux.Stringid(9272381,0),5)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)
