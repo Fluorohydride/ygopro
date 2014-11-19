@@ -5,8 +5,11 @@ function c494922.initial_effect(c)
 	c:EnableReviveLimit()
 	--defence attack
 	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_DEFENCE_ATTACK)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(c494922.atktg)
 	e1:SetValue(1)
 	c:RegisterEffect(e1)
 	--set
@@ -22,6 +25,9 @@ function c494922.initial_effect(c)
 	e2:SetOperation(c494922.setop)
 	c:RegisterEffect(e2)
 end
+function c494922.atktg(e,c)
+	return c:IsSetCard(0x9a)
+end
 function c494922.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
@@ -32,7 +38,7 @@ function c494922.setfilter(c,tp)
 	 return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsSSetable(true) and (c:IsType(TYPE_FIELD) or Duel.GetLocationCount(tp,LOCATION_SZONE)>0)
 end
 function c494922.settg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
- 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_GRAVE) and c494922.setfilter(chkc,tp) end
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_GRAVE) and c494922.setfilter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c494922.setfilter,tp,0,LOCATION_GRAVE,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SET)
 	local g=Duel.SelectTarget(tp,c494922.setfilter,tp,0,LOCATION_GRAVE,1,1,nil,tp)
