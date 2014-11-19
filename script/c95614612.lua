@@ -15,7 +15,7 @@ function c95614612.filter(c)
 end
 function c95614612.econ(e)
 	return Duel.IsExistingMatchingCard(c95614612.filter,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		or Duel.GetEnvironment()==22702055
+		or Duel.IsEnvironment(22702055)
 end
 function c95614612.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL)

@@ -18,7 +18,6 @@ function c22624373.initial_effect(c)
 	e2:SetDescription(aux.Stringid(22624373,1))
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c22624373.discon)
 	e2:SetTarget(c22624373.distg)
@@ -41,14 +40,16 @@ end
 function c22624373.desop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if c:IsRelateToEffect(e) and c:IsPosition(POS_FACEUP_ATTACK) and tc:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) and c:IsPosition(POS_FACEUP_ATTACK) then
 		Duel.ChangePosition(c,POS_FACEUP_DEFENCE)
-		Duel.Destroy(tc,REASON_EFFECT)
+		if tc:IsRelateToEffect(e) then
+			Duel.Destroy(tc,REASON_EFFECT)
+		end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_COPY_INHERIT)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,3)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
 		c:RegisterEffect(e1)
 	end
 end
@@ -60,7 +61,5 @@ function c22624373.distg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,tp,3)
 end
 function c22624373.disop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:GetControler()~=tp or not c:IsRelateToEffect(e) or c:IsFacedown() then return end
 	Duel.DiscardDeck(tp,3,REASON_EFFECT)
 end

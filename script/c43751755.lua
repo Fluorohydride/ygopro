@@ -13,7 +13,7 @@ function c43751755.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c43751755.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetEnvironment()==42015635
+	return Duel.IsEnvironment(42015635)
 end
 function c43751755.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
@@ -29,7 +29,7 @@ function c43751755.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c43751755.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if Duel.GetEnvironment()~=42015635 then return end
+	if not Duel.IsEnvironment(42015635) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c43751755.spfilter,tp,LOCATION_HAND+LOCATION_DECK,0,1,1,nil,e,tp)
 	if g:GetCount()>0 then

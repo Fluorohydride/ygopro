@@ -34,14 +34,14 @@ function c42548470.activate(e,tp,eg,ep,ev,re,r,rp)
 	local lv2=tc2:GetLevel()
 	if lv1==lv2 then return end
 	if tc1:IsFaceup() and tc1:IsRelateToEffect(e) and tc2:IsFaceup() and tc2:IsRelateToEffect(e) then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TARGET)
 		local sg=g:Select(1-tp,1,1,nil)
 		if sg:GetFirst()==tc1 then
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_CHANGE_LEVEL)
 			e1:SetValue(lv1)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
+			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 			tc2:RegisterEffect(e1)
 			if lv1<lv2 then Duel.Draw(tp,1,REASON_EFFECT) end
 		else
@@ -49,7 +49,7 @@ function c42548470.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_CHANGE_LEVEL)
 			e1:SetValue(lv2)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
+			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 			tc1:RegisterEffect(e1)
 			if lv2<lv1 then Duel.Draw(tp,1,REASON_EFFECT) end
 		end

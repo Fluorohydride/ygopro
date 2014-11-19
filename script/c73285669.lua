@@ -32,7 +32,8 @@ end
 function c73285669.sprcon(e,c)
 	if c==nil then return true end 
 	local tp=c:GetControler()
-	return Duel.IsExistingMatchingCard(c73285669.spfilter,tp,LOCATION_MZONE,0,2,nil)
+	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2
+		and Duel.IsExistingMatchingCard(c73285669.spfilter,tp,LOCATION_MZONE,0,2,nil)
 end
 function c73285669.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)

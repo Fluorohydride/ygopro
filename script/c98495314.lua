@@ -31,6 +31,7 @@ function c98495314.initial_effect(c)
 	e5:SetCategory(CATEGORY_TODECK)
 	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetCondition(c98495314.tdcon)
 	e5:SetTarget(c98495314.tdtg)
 	e5:SetOperation(c98495314.tdop)
 	c:RegisterEffect(e5)
@@ -48,8 +49,11 @@ function c98495314.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
 end
+function c98495314.tdcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
+end
 function c98495314.tdtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and e:GetHandler():IsAbleToDeck() end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,e:GetHandler(),1,0,0)
 end
 function c98495314.tdop(e,tp,eg,ep,ev,re,r,rp)

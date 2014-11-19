@@ -15,7 +15,8 @@ function c65549080.spfilter(c)
 end
 function c65549080.spcon(e,c)
 	if c==nil then return true end
-	return Duel.IsExistingMatchingCard(c65549080.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(c65549080.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function c65549080.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
@@ -26,6 +27,6 @@ function c65549080.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetCode(EFFECT_SET_ATTACK)
 	e1:SetValue(1700)
-	e1:SetReset(RESET_EVENT+0xfe0000)
+	e1:SetReset(RESET_EVENT+0xff0000)
 	c:RegisterEffect(e1)
 end

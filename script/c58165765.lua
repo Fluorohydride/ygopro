@@ -1,4 +1,4 @@
---Red Dragon Ninja
+--赤竜の忍者
 function c58165765.initial_effect(c)
 	--todeck
 	local e1=Effect.CreateEffect(c)
@@ -7,6 +7,7 @@ function c58165765.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
+	e1:SetCountLimit(1,58165765)
 	e1:SetCost(c58165765.cost)
 	e1:SetTarget(c58165765.target)
 	e1:SetOperation(c58165765.operation)

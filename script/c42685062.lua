@@ -1,15 +1,21 @@
 --地獄からの使い
 function c42685062.initial_effect(c)
-	--summon
+	--cannot special summon
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(42685062,0))
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCondition(c42685062.sumcon)
-	e1:SetOperation(c42685062.sumop)
-	e1:SetValue(SUMMON_TYPE_ADVANCE)
+	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	c:RegisterEffect(e1)
+	--summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(42685062,0))
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_SUMMON_PROC)
+	e2:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e2:SetCondition(c42685062.sumcon)
+	e2:SetOperation(c42685062.sumop)
+	e2:SetValue(SUMMON_TYPE_ADVANCE)
+	c:RegisterEffect(e2)
 end
 function c42685062.sumcon(e,c)
 	if c==nil then return true end

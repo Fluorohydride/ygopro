@@ -27,8 +27,7 @@ function c99342953.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c99342953.ctfilter(c)
-	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:IsSetCard(0xc)
-		and (not c:IsReason(REASON_BATTLE) or bit.band(c:GetBattlePosition(),POS_FACEUP)~=0)
+	return c:IsFaceup() and c:IsSetCard(0xc) and c:IsLocation(LOCATION_MZONE)
 end
 function c99342953.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c99342953.ctfilter,1,nil)

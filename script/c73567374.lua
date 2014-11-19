@@ -19,22 +19,22 @@ function c73567374.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c73567374.filter,tp,LOCATION_MZONE,0,nil)
 	local tc=g:GetFirst()
 	while tc do
-		if c73567374.filter(tc) then
-			tc:EnableDualState()
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_PHASE+PHASE_END)
-			e1:SetRange(LOCATION_MZONE)
-			e1:SetCountLimit(1)
-			e1:SetOperation(c73567374.flip)
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
-			tc:RegisterEffect(e1,true)
-		end
+		tc:EnableDualState()
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCountLimit(1)
+		e1:SetCondition(c73567374.flipcon)
+		e1:SetOperation(c73567374.flipop)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1,true)
 		tc=g:GetNext()
 	end
 end
-function c73567374.flip(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsCanTurnSet() then
-		Duel.ChangePosition(e:GetHandler(),POS_FACEDOWN_DEFENCE)
-	end
+function c73567374.flipcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsCanTurnSet()
+end
+function c73567374.flipop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.ChangePosition(e:GetHandler(),POS_FACEDOWN_DEFENCE)
 end

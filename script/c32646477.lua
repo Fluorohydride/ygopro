@@ -2,6 +2,7 @@
 function c32646477.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(32646477,0))
@@ -9,10 +10,15 @@ function c32646477.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,32646477)
+	e1:SetCondition(c32646477.condition)
 	e1:SetCost(c32646477.cost)
 	e1:SetTarget(c32646477.target)
 	e1:SetOperation(c32646477.operation)
 	c:RegisterEffect(e1)
+end
+function c32646477.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c32646477.costfilter(c)
 	return c:GetLevel()>0

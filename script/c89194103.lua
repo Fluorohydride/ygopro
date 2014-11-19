@@ -21,6 +21,7 @@ function c89194103.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
 	e3:SetCondition(c89194103.descon)
 	e3:SetTarget(c89194103.destg)
 	e3:SetOperation(c89194103.desop)
@@ -33,9 +34,8 @@ function c89194103.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>=3
 end
 function c89194103.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(89194103)==0 end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
-	e:GetHandler():RegisterFlagEffect(89194103,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c89194103.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

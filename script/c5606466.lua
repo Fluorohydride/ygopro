@@ -27,11 +27,10 @@ function c5606466.filter3(c,e,tp)
 	return c:IsFacedown() and c:GetSummonPlayer()==tp and c:IsCanBeEffectTarget(e) and c:IsDestructable() and c:IsAbleToRemove()
 end
 function c5606466.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local tc=eg:GetFirst()
 	if chkc then return false end
 	if chk==0 then
 		local sg=eg:Filter(c5606466.filter,nil,e,1-tp)
-		return sg:GetCount()==1 and Duel.IsExistingMatchingCard(c5606466.filter2,tp,LOCATION_MZONE,0,1,sg:GetFirst(),e,1-tp)
+		return sg:GetCount()==1 and Duel.IsExistingMatchingCard(c5606466.filter2,tp,LOCATION_MZONE,0,1,sg:GetFirst(),e)
 	end
 	local sg1=eg:Filter(c5606466.filter,nil,e,1-tp)
 	e:SetLabelObject(sg1:GetFirst())
@@ -43,11 +42,10 @@ function c5606466.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,sg1,sg1:GetCount(),0,0)
 end
 function c5606466.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local tc=eg:GetFirst()
 	if chkc then return false end
 	if chk==0 then
 		local sg=eg:Filter(c5606466.filter3,nil,e,1-tp)
-		return sg:GetCount()==1 and Duel.IsExistingMatchingCard(c5606466.filter2,tp,LOCATION_MZONE,0,1,sg:GetFirst(),e,1-tp)
+		return sg:GetCount()==1 and Duel.IsExistingMatchingCard(c5606466.filter2,tp,LOCATION_MZONE,0,1,sg:GetFirst(),e)
 	end
 	local sg1=eg:Filter(c5606466.filter3,nil,e,1-tp)
 	e:SetLabelObject(sg1:GetFirst())

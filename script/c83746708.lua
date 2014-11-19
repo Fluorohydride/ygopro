@@ -42,5 +42,5 @@ function c83746708.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c83746708.value(e,c)
-	return Duel.GetFieldGroupCount(e:GetHandler():GetControler(),LOCATION_SZONE,0)*500
+	return Duel.GetMatchingGroupCount(Card.IsType,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,nil,TYPE_SPELL+TYPE_TRAP)*500
 end

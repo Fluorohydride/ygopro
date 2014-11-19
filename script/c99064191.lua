@@ -1,4 +1,4 @@
---Xyz Wrath
+--エクシーズ・パニッシュ
 function c99064191.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -13,6 +13,7 @@ function c99064191.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_CHAINING)
+	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetCondition(c99064191.condition2)
 	e2:SetCost(c99064191.cost2)
 	e2:SetTarget(c99064191.target2)

@@ -25,7 +25,7 @@ function c56948373.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(56948373,0))
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_REPEAT)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1)
@@ -48,14 +48,14 @@ function c56948373.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c56948373.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler():GetEquipTarget()
-	return c and Duel.GetTurnPlayer()==c:GetControler()
+	return Duel.GetTurnPlayer()==tp and e:GetHandler():GetEquipTarget()~=nil
 end
 function c56948373.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetTargetPlayer(Duel.GetTurnPlayer())
+	local p=e:GetHandler():GetEquipTarget():GetControler()
+	Duel.SetTargetPlayer(p)
 	Duel.SetTargetParam(500)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,Duel.GetTurnPlayer(),500)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,p,500)
 end
 function c56948373.damop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

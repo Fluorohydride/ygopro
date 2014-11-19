@@ -3,7 +3,7 @@ function c89567993.initial_effect(c)
 	--to deck
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_BATTLE_END)
+	e1:SetCode(EVENT_BATTLED)
 	e1:SetCondition(c89567993.tdcon)
 	e1:SetOperation(c89567993.tdop)
 	c:RegisterEffect(e1)

@@ -35,6 +35,7 @@ function c51858306.filter(c)
 		and c:IsAbleToRemove()
 end
 function c51858306.operation(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsPlayerAffectedByEffect(tp,30459350) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c51858306.filter,tp,LOCATION_DECK,0,1,1,nil)
 	local tc=g:GetFirst()
@@ -50,7 +51,6 @@ function c51858306.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c51858306.thcon(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject():GetLabelObject()
 	return e:GetHandler():IsFaceup() and e:GetHandler():GetFlagEffect(51858306)~=0
 end
 function c51858306.thtg(e,tp,eg,ep,ev,re,r,rp,chk)

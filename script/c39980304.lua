@@ -10,7 +10,7 @@ function c39980304.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c39980304.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckAttackActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK)
@@ -29,6 +29,7 @@ function c39980304.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	e1:SetTarget(c39980304.chain_target)
 	e1:SetOperation(c39980304.chain_operation)
+	e1:SetValue(aux.TRUE)
 	Duel.RegisterEffect(e1,tp)
 end
 function c39980304.filter(c,e)

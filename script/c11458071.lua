@@ -60,7 +60,7 @@ function c11458071.tgfilter(c)
 	return c:IsFaceup() and c:IsAbleToRemove()
 end
 function c11458071.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chk:IsLocation(LOCATION_MZONE) and c11458071.tgfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c11458071.tgfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c11458071.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c11458071.tgfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)

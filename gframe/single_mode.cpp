@@ -63,6 +63,7 @@ int SingleMode::SinglePlayThread(void* param) {
 	mainGame->stInfo->setText(L"");
 	mainGame->stDataInfo->setText(L"");
 	mainGame->stText->setText(L"");
+	mainGame->scrCardText->setVisible(false);
 	mainGame->wPhase->setVisible(true);
 	mainGame->dField.panel = 0;
 	mainGame->dField.hovered_card = 0;
@@ -77,11 +78,11 @@ int SingleMode::SinglePlayThread(void* param) {
 	char engineBuffer[0x1000];
 	is_closing = false;
 	is_continuing = true;
-	int len = 0, flag = 0;
+	int len = 0;
 	while (is_continuing) {
 		int result = process(pduel);
 		len = result & 0xffff;
-		flag = result >> 16;
+		/* int flag = result >> 16; */
 		if (len > 0) {
 			get_message(pduel, (byte*)engineBuffer);
 			is_continuing = SinglePlayAnalyze(engineBuffer, len);
@@ -92,18 +93,21 @@ int SingleMode::SinglePlayThread(void* param) {
 		mainGame->gMutex.Lock();
 		mainGame->dInfo.isStarted = false;
 		mainGame->dInfo.isSingleMode = false;
-		mainGame->CloseDuelWindow();
-		mainGame->ClearTextures();
-		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->gMutex.Unlock();
+		mainGame->closeDoneSignal.Reset();
+		mainGame->closeSignal.Set();
+		mainGame->closeDoneSignal.Wait();
+		mainGame->gMutex.Lock();
+		mainGame->ShowElement(mainGame->wSinglePlay);
 		mainGame->device->setEventReceiver(&mainGame->menuHandler);
+		mainGame->gMutex.Unlock();
 	}
 	return 0;
 }
 bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
-	char* offset, *pbufw, *pbuf = msg;
+	char* offset, *pbuf = msg;
 	int player, count;
-	while (pbuf - msg < len) {
+	while (pbuf - msg < (int)len) {
 		if(is_closing || !is_continuing)
 			return false;
 		offset = pbuf;
@@ -119,9 +123,9 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			return false;
 		}
 		case MSG_HINT: {
-			int type = BufferIO::ReadInt8(pbuf);
+			/*int type = */BufferIO::ReadInt8(pbuf);
 			int player = BufferIO::ReadInt8(pbuf);
-			int data = BufferIO::ReadInt32(pbuf);
+			/*int data = */BufferIO::ReadInt32(pbuf);
 			if(player == 0)
 				DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -209,7 +213,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += 10 + count * 11;
+			pbuf += 10 + count * 12;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();
@@ -290,7 +294,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			break;
 		}
 		case MSG_SHUFFLE_HAND: {
-			int oplayer = BufferIO::ReadInt8(pbuf);
+			/*int oplayer = */BufferIO::ReadInt8(pbuf);
 			int count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
@@ -336,12 +340,12 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_MOVE: {
 			int pc = pbuf[4];
 			int pl = pbuf[5];
-			int ps = pbuf[6];
-			int pp = pbuf[7];
+			/*int ps = pbuf[6];*/
+			/*int pp = pbuf[7];*/
 			int cc = pbuf[8];
 			int cl = pbuf[9];
 			int cs = pbuf[10];
-			int cp = pbuf[11];
+			/*int cp = pbuf[11];*/
 			pbuf += 16;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			if(cl && !(cl & 0x80) && (pl != cl || pc != cc))
@@ -454,7 +458,6 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_DRAW: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbufw = pbuf;
 			pbuf += count * 4;
 			DuelClient::ClientAnalyze(offset, pbuf - offset);
 			break;
@@ -631,7 +634,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 						}
 					}
 				}
-				for(int seq = 0; seq < 6; ++seq) {
+				for(int seq = 0; seq < 8; ++seq) {
 					val = BufferIO::ReadInt8(pbuf);
 					if(val) {
 						ClientCard* ccard = new ClientCard;
@@ -704,74 +707,74 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 }
 void SingleMode::SinglePlayRefresh(int flag) {
 	unsigned char queryBuffer[0x1000];
-	int len = query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
+	/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_MZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_SZONE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_SZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_SZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_SZONE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_SZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_SZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_HAND, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_HAND, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshHand(int player, int flag) {
 	unsigned char queryBuffer[0x1000];
-	int len = query_field_card(pduel, player, LOCATION_HAND, flag, queryBuffer, 0);
+	/*int len = */query_field_card(pduel, player, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_HAND, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshGrave(int player, int flag) {
 	unsigned char queryBuffer[0x1000];
-	int len = query_field_card(pduel, player, LOCATION_GRAVE, flag, queryBuffer, 0);
+	/*int len = */query_field_card(pduel, player, LOCATION_GRAVE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_GRAVE, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshDeck(int player, int flag) {
 	unsigned char queryBuffer[0x1000];
-	int len = query_field_card(pduel, player, LOCATION_DECK, flag, queryBuffer, 0);
+	/*int len = */query_field_card(pduel, player, LOCATION_DECK, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_DECK, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshExtra(int player, int flag) {
 	unsigned char queryBuffer[0x1000];
-	int len = query_field_card(pduel, player, LOCATION_EXTRA, flag, queryBuffer, 0);
+	/*int len = */query_field_card(pduel, player, LOCATION_EXTRA, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(player), LOCATION_EXTRA, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence, int flag) {
 	unsigned char queryBuffer[0x1000];
-	int len = query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
+	/*int len = */query_card(pduel, player, location, sequence, flag, queryBuffer, 0);
 	mainGame->dField.UpdateCard(mainGame->LocalPlayer(player), location, sequence, (char*)queryBuffer);
 }
 void SingleMode::SinglePlayReload() {
 	unsigned char queryBuffer[0x1000];
-	unsigned int flag = 0x1fdfff;
-	int len = query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
+	unsigned int flag = 0x7fdfff;
+	/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_MZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_SZONE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_SZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_SZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_SZONE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_SZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_SZONE, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_HAND, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_HAND, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_HAND, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_HAND, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_DECK, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_DECK, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_DECK, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_DECK, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_DECK, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_DECK, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_EXTRA, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_EXTRA, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_EXTRA, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_EXTRA, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_EXTRA, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_EXTRA, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_GRAVE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_GRAVE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_GRAVE, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_GRAVE, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_GRAVE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_GRAVE, (char*)queryBuffer);
-	len = query_field_card(pduel, 0, LOCATION_REMOVED, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 0, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_REMOVED, (char*)queryBuffer);
-	len = query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
+	/*len = */query_field_card(pduel, 1, LOCATION_REMOVED, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(1), LOCATION_REMOVED, (char*)queryBuffer);
 }
 int SingleMode::MessageHandler(long fduel, int type) {

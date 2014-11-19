@@ -18,8 +18,7 @@ function c45037489.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c45037489.tfilter(c)
-	local code=c:GetCode()
-	return code==19642774 or code==20932152
+	return c:IsCode(19642774) or c:IsHasEffect(20932152)
 end
 function c45037489.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and rp~=tp and tp==Duel.GetTurnPlayer()

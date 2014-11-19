@@ -14,8 +14,8 @@ function c57274196.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tc:IsControler(tp) and tc:IsRace(RACE_SPELLCASTER) and tc:IsChainAttackable()
 end
 function c57274196.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSummonActivity(tp)
-		and not Duel.CheckFlipSummonActivity(tp) and not Duel.CheckSpecialSummonActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
+		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0 and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -24,9 +24,9 @@ function c57274196.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTargetRange(1,0)
 	e1:SetLabelObject(e)
 	Duel.RegisterEffect(e1,tp)
-	local e3=e1:Clone()
-	e3:SetCode(EFFECT_CANNOT_SUMMON)
-	Duel.RegisterEffect(e3,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_CANNOT_SUMMON)
+	Duel.RegisterEffect(e2,tp)
 	local e3=e1:Clone()
 	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
 	Duel.RegisterEffect(e3,tp)

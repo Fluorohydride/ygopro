@@ -6,20 +6,19 @@ function c14785765.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,14785765+EFFECT_COUNT_CODE_DUEL)
 	e1:SetCost(c14785765.cost)
 	e1:SetTarget(c14785765.target)
 	e1:SetOperation(c14785765.operation)
 	c:RegisterEffect(e1)
 end
-c14785765[0]=true
-c14785765[1]=true
 function c14785765.costfilter(c)
 	return c:IsFaceup() and c:IsAbleToHandAsCost()
 end
 function c14785765.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if chk==0 then
-		if not c14785765[tp] or ft<0 then return false end
+		if ft<0 then return false end
 		if ft==0 then
 			return Duel.IsExistingMatchingCard(c14785765.costfilter,tp,LOCATION_MZONE,0,1,nil)
 		else
@@ -34,7 +33,6 @@ function c14785765.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 		local g=Duel.SelectMatchingCard(tp,c14785765.costfilter,tp,LOCATION_ONFIELD,0,1,1,nil)
 		Duel.SendtoHand(g,nil,REASON_COST)
 	end
-	c14785765[tp]=false
 end
 function c14785765.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end

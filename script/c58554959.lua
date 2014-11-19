@@ -21,9 +21,7 @@ function c58554959.otcon(e,c)
 	return c:GetLevel()>6 and Duel.GetFieldGroupCount(c:GetControler(),0,LOCATION_MZONE)~=0 and Duel.GetTributeCount(c)>0
 end
 function c58554959.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:Select(tp,1,1,nil)
+	local sg=Duel.SelectTribute(tp,c,1,1)
 	c:SetMaterial(sg)
-	Duel.Release(sg, REASON_SUMMON+REASON_MATERIAL)
+	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end

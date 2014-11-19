@@ -6,15 +6,20 @@ function c12079734.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(c12079734.condition)
 	e1:SetTarget(c12079734.target)
 	e1:SetOperation(c12079734.operation)
 	c:RegisterEffect(e1)
+end
+function c12079734.condition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c12079734.filter1(c,ec)
 	return c:IsType(TYPE_UNION) and c:CheckEquipTarget(ec)
 end
 function c12079734.filter2(c)
-	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT)
+	return c:IsFaceup() and c:IsRace(RACE_MACHINE) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToDeck()
 end
 function c12079734.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local c=e:GetHandler()

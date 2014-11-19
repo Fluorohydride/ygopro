@@ -15,7 +15,7 @@ function c2158562.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE
 end
 function c2158562.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()
+	return c:IsFaceup() and c:IsType(TYPE_SPELL) and c:IsDestructable()
 end
 function c2158562.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

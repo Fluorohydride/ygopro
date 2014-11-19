@@ -32,15 +32,15 @@ function c41420027.condition1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c41420027.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c41420027.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,eg:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,eg:GetCount(),0,0)
 end
 function c41420027.activate1(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateSummon(eg:GetFirst())
+	Duel.NegateSummon(eg)
 	Duel.Destroy(eg,REASON_EFFECT)
 end
 function c41420027.condition2(e,tp,eg,ep,ev,re,r,rp)
@@ -48,7 +48,7 @@ function c41420027.condition2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c41420027.cost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.PayLPCost(tp,Duel.GetLP(tp)/2)
+	Duel.PayLPCost(tp,math.floor(Duel.GetLP(tp)/2))
 end
 function c41420027.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

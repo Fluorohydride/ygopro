@@ -16,13 +16,13 @@ end
 function c90263923.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c90263923.filter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c90263923.filter,tp,0,LOCATION_MZONE,1,nil)
-		and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_MZONE,0,1,nil) end
+		and Duel.IsExistingMatchingCard(Card.IsPosition,tp,LOCATION_MZONE,0,1,nil,POS_FACEUP_ATTACK) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
-	local g=Duel.SelectTarget(tp,c90263923.filter,tp,0,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c90263923.filter,tp,0,LOCATION_MZONE,1,1,nil)
 end
 function c90263923.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,nil)
+	local g=Duel.GetMatchingGroup(Card.IsPosition,tp,LOCATION_MZONE,0,nil,POS_FACEUP_ATTACK)
 	if g:GetCount()>0 and tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local sc=g:GetFirst()
 		local atk=tc:GetAttack()

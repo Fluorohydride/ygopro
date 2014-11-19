@@ -5,16 +5,20 @@ function c14507213.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c14507213.condition)
 	e1:SetCost(c14507213.cost)
 	e1:SetTarget(c14507213.target)
 	e1:SetOperation(c14507213.activate)
 	c:RegisterEffect(e1)
 end
+function c14507213.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp or Duel.GetCurrentPhase()<PHASE_BATTLE
+end
 function c14507213.filter(c)
 	return c:IsFaceup() and c:IsCanBeSynchroMaterial()
 end
 function c14507213.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetCurrentPhase()~=PHASE_MAIN2 end
+	if chk==0 then return true end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

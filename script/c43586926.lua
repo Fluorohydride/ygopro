@@ -7,19 +7,17 @@ function c43586926.initial_effect(c)
 	e1:SetOperation(c43586926.regop)
 	c:RegisterEffect(e1)
 end
-c43586926[0]=true
-c43586926[1]=true
 function c43586926.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c43586926[tp] and c:IsReason(REASON_DESTROY) and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0 then
+	if c:IsReason(REASON_DESTROY) and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0 then
 		--spsummon
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(43586926,0))
 		e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 		e1:SetRange(LOCATION_GRAVE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetCountLimit(1)
+		e1:SetCountLimit(1,43586926+EFFECT_COUNT_CODE_DUEL)
 		e1:SetTarget(c43586926.sptg)
 		e1:SetOperation(c43586926.spop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
@@ -27,9 +25,8 @@ function c43586926.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c43586926.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c43586926[tp] end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
-	c43586926[tp]=false
 end
 function c43586926.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

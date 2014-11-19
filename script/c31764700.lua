@@ -15,7 +15,8 @@ function c31764700.initial_effect(c)
 	--damage
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e3:SetCode(EVENT_BATTLE_END)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetCode(EVENT_BATTLED)
 	e3:SetOperation(c31764700.batop)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
@@ -37,14 +38,16 @@ end
 function c31764700.batop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if bc then
+	if bc and c:IsAttackPos() then
 		e:SetLabel(bc:GetAttack())
 		e:SetLabelObject(bc)
+	else
+		e:SetLabelObject(nil)
 	end
 end
 function c31764700.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local bc=e:GetHandler():GetBattleTarget()
-	if chk==0 then return bc and e:GetHandler():IsAttackPos() end
+	local bc=e:GetLabelObject():GetLabelObject()
+	if chk==0 then return bc end
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,e:GetLabelObject():GetLabel())
 	if bc:IsDestructable() then
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,bc,1,0,0)
@@ -52,7 +55,7 @@ function c31764700.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c31764700.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(1-tp,e:GetLabelObject():GetLabel(),REASON_EFFECT)
-	local bc=e:GetHandler():GetBattleTarget()
+	local bc=e:GetLabelObject():GetLabelObject()
 	if bc:IsRelateToBattle() then
 		Duel.Destroy(bc,REASON_EFFECT)
 	end

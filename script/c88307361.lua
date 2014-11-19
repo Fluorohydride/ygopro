@@ -17,7 +17,6 @@ function c88307361.initial_effect(c)
 	e2:SetCategory(CATEGORY_DISABLE+CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c88307361.discon)
 	e2:SetCost(c88307361.discost)
@@ -71,7 +70,7 @@ function c88307361.discon(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsStatus(STATUS_BATTLE_DESTROYED) then return false end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return end
 	local tg=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
-	return tg:IsContains(c) and Duel.IsChainNegatable(ev)
+	return tg and tg:IsContains(c) and Duel.IsChainNegatable(ev)
 end
 function c88307361.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,e:GetHandler(),RACE_FISH) end

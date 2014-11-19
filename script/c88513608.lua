@@ -13,18 +13,17 @@ function c88513608.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c88513608.check(tp)
-	local at1=-1
-	local at2=-2
+	local at1=0
+	local ct=0
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
-		if tc and tc:IsFaceup() then
-			local atk=tc:GetAttack()
-			if at1<0 or atk<=at1 then at2=at1 at1=atk end
+		if tc and tc:IsPosition(POS_FACEUP_ATTACK) then
+			at1=at1+tc:GetAttack()
+			ct=ct+1
 		end
 	end
-	if at1<0 or at2<0 then return false end
-	at1=at1+at2
-	at2=-1
+	if ct<2 then return false end
+	local at2=-1
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(1-tp,LOCATION_MZONE,i)
 		if tc and tc:IsFaceup() then
@@ -38,8 +37,8 @@ function c88513608.condition(e,tp,eg,ep,ev,re,r,rp)
 	return c88513608.check(tp)
 end
 function c88513608.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSummonActivity(tp)
-		and not Duel.CheckFlipSummonActivity(tp) and not Duel.CheckSpecialSummonActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
+		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0 and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

@@ -36,7 +36,7 @@ function c94243005.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c94243005.ctfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsPreviousLocation(0x80+LOCATION_SZONE)
+	return c:IsFaceup() and c:IsType(TYPE_MONSTER) and not c:IsPreviousLocation(0x80+LOCATION_SZONE) and not c:IsType(TYPE_TOKEN)
 end
 function c94243005.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=eg:FilterCount(c94243005.ctfilter,nil)

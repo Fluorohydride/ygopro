@@ -19,7 +19,6 @@ function c24696097.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DAMAGE_CAL)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c24696097.discon)
 	e2:SetTarget(c24696097.distg)
@@ -29,6 +28,7 @@ function c24696097.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(24696097,2))
 	e3:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_FIELD)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
@@ -86,7 +86,8 @@ end
 function c24696097.dacon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():GetControler()~=tp
 end
-function c24696097.datg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c24696097.datg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc==Duel.GetAttacker() end
 	if chk==0 then return e:GetHandler():IsAbleToRemove() and Duel.GetAttacker():IsCanBeEffectTarget(e)
 		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	Duel.SetTargetCard(Duel.GetAttacker())

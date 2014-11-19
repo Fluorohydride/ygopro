@@ -28,12 +28,15 @@ function c36088082.regop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e2)
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e3:SetCode(EVENT_BATTLE_END)
+		e3:SetCode(EVENT_BATTLED)
 		e3:SetOperation(c36088082.desop)
 		e3:SetReset(RESET_PHASE+PHASE_DAMAGE)
 		Duel.RegisterEffect(e3,tp)
 	end
 end
 function c36088082.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetOwner():GetBattleTarget(),REASON_EFFECT)
+	local tg=e:GetOwner():GetBattleTarget()
+	if tg then
+		Duel.Destroy(tg,REASON_EFFECT)
+	end
 end

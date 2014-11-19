@@ -18,7 +18,7 @@ function c7811875.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c7811875.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentChain()==0
+	return Duel.GetCurrentChain()==0 and eg:IsExists(Card.IsControler,1,nil,1-tp)
 end
 function c7811875.cfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_SYNCHRO) and c:IsAbleToGraveAsCost()
@@ -31,12 +31,14 @@ function c7811875.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c7811875.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,eg,1,0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,eg,1,0,0)
+	local g=eg:Filter(Card.IsControler,nil,1-tp)
+	Duel.SetOperationInfo(0,CATEGORY_DISABLE_SUMMON,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c7811875.activate(e,tp,eg,ep,ev,re,r,rp)
-	Duel.NegateSummon(eg:GetFirst())
-	Duel.Destroy(eg,REASON_EFFECT)
+	local g=eg:Filter(Card.IsControler,nil,1-tp)
+	Duel.NegateSummon(g)
+	Duel.Destroy(g,REASON_EFFECT)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)

@@ -822,7 +822,7 @@ video::IImage* CGUITTFont::createTextureFromChar(const uchar32_t& ch) {
 	video::ITexture* tex = page->texture;
 
 	// Acquire a read-only lock of the corresponding page texture.
-	void* ptr = tex->lock(true);
+	void* ptr = tex->lock(video::ETLM_READ_ONLY);
 
 	video::ECOLOR_FORMAT format = tex->getColorFormat();
 	core::dimension2du tex_size = tex->getOriginalSize();
@@ -966,7 +966,7 @@ core::array<scene::ISceneNode*> CGUITTFont::addTextSceneNode(const wchar_t* text
 				// Now we copy planes corresponding to the letter size.
 				IMeshManipulator* mani = smgr->getMeshManipulator();
 				IMesh* meshcopy = mani->createMeshCopy(shared_plane_ptr_);
-				mani->scaleMesh(meshcopy, vector3df((f32)letter_size.Width, (f32)letter_size.Height, 1));
+				mani->scale(meshcopy, vector3df((f32)letter_size.Width, (f32)letter_size.Height, 1));
 
 				ISceneNode* current_node = smgr->addMeshSceneNode(meshcopy, parent, -1, current_pos);
 				meshcopy->drop();

@@ -20,6 +20,8 @@ public:
 	virtual void setDrawImage(bool b);
 	virtual void setImageRotation(f32 r);
 	virtual void setImageScale(core::vector2df s);
+	virtual IGUIFont* getOverrideFont(void) const;
+	virtual IGUIFont* getActiveFont() const;
 
 private:
 	bool isDrawImage;

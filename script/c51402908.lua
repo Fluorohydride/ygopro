@@ -18,8 +18,6 @@ function c51402908.initial_effect(c)
 	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e3:SetRange(LOCATION_GRAVE)
-	e3:SetCountLimit(1)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetCondition(c51402908.spcon)
 	e3:SetCost(c51402908.spcost)
@@ -29,10 +27,8 @@ function c51402908.initial_effect(c)
 end
 function c51402908.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local pos=c:GetPreviousPosition()
-	if Duel.GetCurrentPhase()==PHASE_DAMAGE then pos=c:GetBattlePosition() end
 	if c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_ONFIELD)
-		and bit.band(pos,POS_FACEUP)~=0 then
+		and c:IsPreviousPosition(POS_FACEUP) then
 		c:RegisterFlagEffect(51402908,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,2)
 	end
 end
@@ -48,6 +44,7 @@ function c51402908.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	e:GetHandler():ResetFlagEffect(51402908)
 end
 function c51402908.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

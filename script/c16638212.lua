@@ -15,7 +15,8 @@ function c16638212.spfilter(c)
 end
 function c16638212.spcon(e,c)
 	if c==nil then return true end
-	return Duel.IsExistingMatchingCard(c16638212.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+		and Duel.IsExistingMatchingCard(c16638212.spfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function c16638212.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
@@ -26,7 +27,6 @@ function c16638212.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetDescription(aux.Stringid(16638212,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_EVENT+0xff0000+RESET_PHASE+PHASE_STANDBY)

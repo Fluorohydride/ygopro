@@ -11,24 +11,28 @@ namespace ygo {
 struct CardData {
 	unsigned int code;
 	unsigned int alias;
-	unsigned int setcode;
+	unsigned long long setcode;
 	unsigned int type;
 	unsigned int level;
 	unsigned int attribute;
 	unsigned int race;
 	int attack;
 	int defence;
+	unsigned int lscale;
+	unsigned int rscale;
 };
 struct CardDataC {
 	unsigned int code;
 	unsigned int alias;
-	unsigned int setcode;
+	unsigned long long setcode;
 	unsigned int type;
 	unsigned int level;
 	unsigned int attribute;
 	unsigned int race;
 	int attack;
 	int defence;
+	unsigned int lscale;
+	unsigned int rscale;
 	unsigned int ot;
 	unsigned int category;
 };
@@ -70,6 +74,8 @@ public:
 	s32 defence;
 	s32 base_attack;
 	s32 base_defence;
+	u32 lscale;
+	u32 rscale;
 	u32 reason;
 	u32 select_seq;
 	u8 owner;
@@ -95,6 +101,8 @@ public:
 	wchar_t atkstring[16];
 	wchar_t defstring[16];
 	wchar_t lvstring[16];
+	wchar_t lscstring[16];
+	wchar_t rscstring[16];
 
 	ClientCard();
 	void SetCode(int code);

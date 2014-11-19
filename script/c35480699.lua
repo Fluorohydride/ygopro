@@ -28,13 +28,15 @@ function c35480699.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetOperation(c35480699.flip)
+	e1:SetCondition(c35480699.flipcon)
+	e1:SetOperation(c35480699.flipop)
 	Duel.RegisterEffect(e1,tp)
 end
-function c35480699.flip(e,tp,eg,ep,ev,re,r,rp)
+function c35480699.flipcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(Card.IsFacedown,tp,0,LOCATION_MZONE,1,nil)
+end
+function c35480699.flipop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFacedown,tp,0,LOCATION_MZONE,nil)
-	if g:GetCount()>0 then
-		Duel.ChangePosition(g,POS_FACEUP_DEFENCE)
-		Duel.Draw(1-tp,g:GetCount(),REASON_EFFECT)
-	end
+	local ct=Duel.ChangePosition(g,POS_FACEUP_DEFENCE)
+	Duel.Draw(1-tp,ct,REASON_EFFECT)
 end

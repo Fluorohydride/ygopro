@@ -29,6 +29,6 @@ function c16135253.operation(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(16135253,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
-		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP_ATTACK)
+		Duel.SpecialSummon(sg,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

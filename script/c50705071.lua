@@ -1,11 +1,12 @@
 --メタル·デビルゾア
 function c50705071.initial_effect(c)
+	c:EnableReviveLimit()
 	--spsummon proc
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
-	e1:SetRange(LOCATION_HAND+LOCATION_DECK)
+	e1:SetRange(LOCATION_DECK)
 	e1:SetCondition(c50705071.spcon)
 	e1:SetOperation(c50705071.spop)
 	c:RegisterEffect(e1)

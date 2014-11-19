@@ -43,6 +43,7 @@ function c17760003.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetDescription(aux.Stringid(17760003,0))
 		e1:SetType(EFFECT_TYPE_IGNITION)
 		e1:SetRange(LOCATION_MZONE)
+		e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 		e1:SetCost(c17760003.cost)
 		e1:SetTarget(c17760003.target1)
 		e1:SetOperation(c17760003.operation1)
@@ -56,6 +57,7 @@ function c17760003.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_IGNITION)
 		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e1:SetRange(LOCATION_MZONE)
+		e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 		e1:SetCost(c17760003.cost)
 		e1:SetTarget(c17760003.target2)
 		e1:SetOperation(c17760003.operation2)
@@ -69,6 +71,7 @@ function c17760003.regop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_IGNITION)
 		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e1:SetRange(LOCATION_MZONE)
+		e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 		e1:SetCost(c17760003.cost)
 		e1:SetTarget(c17760003.target3)
 		e1:SetOperation(c17760003.operation3)
@@ -77,10 +80,8 @@ function c17760003.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c17760003.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():GetFlagEffect(17760003)==0
-		and Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
-	e:GetHandler():RegisterFlagEffect(17760003,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c17760003.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end

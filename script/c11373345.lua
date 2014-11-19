@@ -5,6 +5,7 @@ function c11373345.initial_effect(c)
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,0x1c0)
 	e1:SetCondition(c11373345.condition)
 	e1:SetCost(c11373345.cost)
 	e1:SetTarget(c11373345.target)
@@ -18,7 +19,7 @@ function c11373345.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c11373345.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c11373345.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckAttackActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)

@@ -3,7 +3,7 @@ function c43014054.initial_effect(c)
 	--damage & atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(43014054,0))
-	e1:SetCategory(CATEGORY_DRAW)
+	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BE_MATERIAL)
 	e1:SetCondition(c43014054.damcon)

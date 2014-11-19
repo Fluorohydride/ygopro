@@ -48,6 +48,7 @@ function c33981008.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectMatchingCard(tp,c33981008.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 and Duel.SendtoDeck(g,nil,1,REASON_EFFECT)>0 then
+		Duel.ConfirmCards(1-tp,g)
 		Duel.Draw(tp,1,REASON_EFFECT)
 	end
 end
@@ -74,7 +75,6 @@ function c33981008.spop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=Duel.GetMatchingGroupCount(c33981008.ctfilter,tp,LOCATION_GRAVE,0,nil)
 	local g=Duel.SelectMatchingCard(tp,c33981008.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,1,nil,e,tp,ct)
 	if g:GetCount()>0 then
-		Duel.HintSelection(g)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

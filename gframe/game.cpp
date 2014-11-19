@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x12f0;
+const unsigned short PRO_VERSION = 0x1332;
 
 namespace ygo {
 
@@ -48,6 +48,7 @@ bool Game::Initialize() {
 	deckManager.LoadLFList();
 	driver = device->getVideoDriver();
 	driver->setTextureCreationFlag(irr::video::ETCF_CREATE_MIP_MAPS, false);
+	driver->setTextureCreationFlag(irr::video::ETCF_OPTIMIZED_FOR_QUALITY, true);
 	imageManager.SetDevice(device);
 	if(!imageManager.Initial())
 		return false;
@@ -66,7 +67,7 @@ bool Game::Initialize() {
 	device->setResizable(false);
 	//main menu
 	wchar_t strbuf[256];
-	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X)", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
+	myswprintf(strbuf, L"YGOPro Version:%X.0%X.%X", PRO_VERSION >> 12, (PRO_VERSION >> 4) & 0xff, PRO_VERSION & 0xf);
 	wMainMenu = env->addWindow(rect<s32>(370, 200, 650, 415), false, strbuf);
 	wMainMenu->getCloseButton()->setVisible(false);
 	btnLanMode = env->addButton(rect<s32>(10, 30, 270, 60), wMainMenu, BUTTON_LAN_MODE, dataManager.GetSysString(1200));
@@ -175,7 +176,7 @@ bool Game::Initialize() {
 	imgCard = env->addImage(rect<s32>(9, 9, 187, 262), wCardImg);
 	imgCard->setUseAlphaChannel(true);
 	//phase
-	wPhase = env->addStaticText(L"", rect<s32>(475, 310, 850, 330));
+	wPhase = env->addStaticText(L"", rect<s32>(480, 310, 855, 330));
 	wPhase->setVisible(false);
 	btnDP = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, -1, L"\xff24\xff30");
 	btnDP->setEnabled(false);
@@ -206,7 +207,11 @@ bool Game::Initialize() {
 	stInfo->setOverrideColor(SColor(255, 0, 0, 255));
 	stDataInfo = env->addStaticText(L"", rect<s32>(15, 60, 296, 83), false, true, tabInfo, -1, false);
 	stDataInfo->setOverrideColor(SColor(255, 0, 0, 255));
-	stText = env->addStaticText(L"", rect<s32>(15, 83, 296, 324), false, true, tabInfo, -1, false);
+	stText = env->addStaticText(L"", rect<s32>(15, 83, 287, 324), false, true, tabInfo, -1, false);
+	scrCardText = env->addScrollBar(false, rect<s32>(267, 83, 287, 324), tabInfo, SCROLL_CARDTEXT);
+	scrCardText->setLargeStep(1);
+	scrCardText->setSmallStep(1);
+	scrCardText->setVisible(false);
 	//log
 	irr::gui::IGUITab* tabLog =  wInfos->addTab(dataManager.GetSysString(1271));
 	lstLog = env->addListBox(rect<s32>(10, 10, 290, 290), tabLog, LISTBOX_LOG, false);
@@ -222,7 +227,7 @@ bool Game::Initialize() {
 	chkWaitChain = env->addCheckBox(false, rect<s32>(20, 110, 280, 135), tabSystem, -1, dataManager.GetSysString(1277));
 	chkIgnore1 = env->addCheckBox(false, rect<s32>(20, 170, 280, 195), tabSystem, -1, dataManager.GetSysString(1290));
 	chkIgnore2 = env->addCheckBox(false, rect<s32>(20, 200, 280, 225), tabSystem, -1, dataManager.GetSysString(1291));
-	chkIgnore2->setChecked(true);
+	chkIgnore2->setChecked(false);
 	//
 	wHand = env->addWindow(rect<s32>(500, 450, 825, 605), false, L"");
 	wHand->getCloseButton()->setVisible(false);
@@ -326,7 +331,7 @@ bool Game::Initialize() {
 	wANRace = env->addWindow(rect<s32>(480, 200, 850, 385), false, dataManager.GetSysString(563));
 	wANRace->getCloseButton()->setVisible(false);
 	wANRace->setVisible(false);
-	for(int filter = 0x1, i = 0; i < 23; filter <<= 1, ++i)
+	for(int filter = 0x1, i = 0; i < 24; filter <<= 1, ++i)
 		chkRace[i] = env->addCheckBox(false, rect<s32>(10 + (i % 4) * 90, 25 + (i / 4) * 25, 100 + (i % 4) * 90, 50 + (i / 4) * 25),
 		                              wANRace, CHECK_RACE, dataManager.FormatRace(filter));
 	//selection hint
@@ -379,7 +384,7 @@ bool Game::Initialize() {
 	cbCardType->addItem(dataManager.GetSysString(1312));
 	cbCardType->addItem(dataManager.GetSysString(1313));
 	cbCardType->addItem(dataManager.GetSysString(1314));
-	cbCardType2 = env->addComboBox(rect<s32>(130, 3, 190, 23), wFilter, -1);
+	cbCardType2 = env->addComboBox(rect<s32>(125, 3, 200, 23), wFilter, -1);
 	cbCardType2->addItem(dataManager.GetSysString(1310), 0);
 	env->addStaticText(dataManager.GetSysString(1315), rect<s32>(205, 5, 280, 25), false, false, wFilter);
 	cbLimit = env->addComboBox(rect<s32>(260, 3, 390, 23), wFilter, -1);
@@ -397,7 +402,7 @@ bool Game::Initialize() {
 	env->addStaticText(dataManager.GetSysString(1321), rect<s32>(10, 51, 70, 71), false, false, wFilter);
 	cbRace = env->addComboBox(rect<s32>(60, 49, 190, 69), wFilter, -1);
 	cbRace->addItem(dataManager.GetSysString(1310), 0);
-	for(int filter = 0x1; filter != 0x400000; filter <<= 1)
+	for(int filter = 0x1; filter != 0x1000000; filter <<= 1)
 		cbRace->addItem(dataManager.FormatRace(filter), filter);
 	env->addStaticText(dataManager.GetSysString(1322), rect<s32>(205, 28, 280, 48), false, false, wFilter);
 	ebAttack = env->addEditBox(L"", rect<s32>(260, 26, 340, 46), true, wFilter);
@@ -409,7 +414,7 @@ bool Game::Initialize() {
 	ebStar = env->addEditBox(L"", rect<s32>(60, 72, 140, 92), true, wFilter);
 	ebStar->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	env->addStaticText(dataManager.GetSysString(1325), rect<s32>(205, 74, 280, 94), false, false, wFilter);
-	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, SCROLL_KEYWORD);
+	ebCardName = env->addEditBox(L"", rect<s32>(260, 72, 390, 92), true, wFilter, EDITBOX_KEYWORD);
 	ebCardName->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnEffectFilter = env->addButton(rect<s32>(345, 28, 390, 69), wFilter, BUTTON_EFFECT_FILTER, dataManager.GetSysString(1326));
 	btnStartFilter = env->addButton(rect<s32>(210, 96, 390, 118), wFilter, BUTTON_START_FILTER, dataManager.GetSysString(1327));
@@ -484,15 +489,18 @@ bool Game::Initialize() {
 		col.setAlpha(224);
 		env->getSkin()->setColor((EGUI_DEFAULT_COLOR)i, col);
 	}
+	hideChat = false;
+	hideChatTimer = 0;
 	return true;
 }
 void Game::MainLoop() {
 	wchar_t cap[256];
 	camera = smgr->addCameraSceneNode(0);
 	irr::core::matrix4 mProjection;
-	BuildProjectionMatrix(mProjection, -0.81f, 0.44f, -0.42f, 0.42f, 1.0f, 100.0f);
+	BuildProjectionMatrix(mProjection, -0.90f, 0.45f, -0.42f, 0.42f, 1.0f, 100.0f);
 	camera->setProjectionMatrix(mProjection);
-	mProjection.buildCameraLookAtMatrixLH(vector3df(3.95f, 8.0f, 7.8f), vector3df(3.95f, 0, 0), vector3df(0, 0, 1));
+
+	mProjection.buildCameraLookAtMatrixLH(vector3df(4.2f, 8.0f, 7.8f), vector3df(4.2f, 0, 0), vector3df(0, 0, 1));
 	camera->setViewMatrixAffector(mProjection);
 	smgr->setAmbientLight(SColorf(1.0f, 1.0f, 1.0f));
 	float atkframe = 0.1f;
@@ -540,6 +548,10 @@ void Game::MainLoop() {
 			}
 		}
 		driver->endScene();
+		if(closeSignal.Wait(0))
+			CloseDuelWindow();
+		if(!device->isWindowActive())
+			ignore_chain = false;
 		fps++;
 		cur_time = timer->getTime();
 		if(cur_time < fps * 17 - 20)
@@ -581,16 +593,38 @@ void Game::BuildProjectionMatrix(irr::core::matrix4& mProjection, f32 left, f32 
 	mProjection[11] = 1.0f;
 	mProjection[14] = znear * zfar / (znear - zfar);
 }
-void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, wchar_t* text) {
+void Game::InitStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, u32 cHeight, irr::gui::CGUITTFont* font, const wchar_t* text) {
+	SetStaticText(pControl, cWidth, font, text);
+	if(font->getDimension(dataManager.strBuffer).Height <= cHeight) {
+		scrCardText->setVisible(false);
+		return;
+	}
+	SetStaticText(pControl, cWidth-25, font, text);
+	u32 fontheight = font->getDimension(L"A").Height + font->getKerningHeight();
+	u32 step = (font->getDimension(dataManager.strBuffer).Height - cHeight) / fontheight + 1;
+	scrCardText->setVisible(true);
+	scrCardText->setMin(0);
+	scrCardText->setMax(step);
+	scrCardText->setPos(0);
+}
+void Game::SetStaticText(irr::gui::IGUIStaticText* pControl, u32 cWidth, irr::gui::CGUITTFont* font, const wchar_t* text, u32 pos) {
 	int pbuffer = 0;
-	int _width = 0, w = 0;
+	u32 _width = 0, _height = 0;
 	for(int i = 0; text[i] != 0 && i < 1023; ++i) {
-		w = font->getCharDimension(text[i]).Width;
-		if(text[i] == L'\n')
-			_width = 0;
-		else if(_width > 0 && _width + w > cWidth) {
+		u32 w = font->getCharDimension(text[i]).Width;
+		if(text[i] == L'\n') {
 			dataManager.strBuffer[pbuffer++] = L'\n';
 			_width = 0;
+			_height++;
+			if(_height == pos)
+				pbuffer = 0;
+			continue;
+		} else if(_width > 0 && _width + w > cWidth) {
+			dataManager.strBuffer[pbuffer++] = L'\n';
+			_width = 0;
+			_height++;
+			if(_height == pos)
+				pbuffer = 0;
 		}
 		_width += w;
 		dataManager.strBuffer[pbuffer++] = text[i];
@@ -629,8 +663,9 @@ void Game::RefreshDeck(irr::gui::IGUIComboBox* cbDeck) {
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		cbDeck->addItem(wname);
 	}
+	closedir(dir);
 #endif
-	for(int i = 0; i < cbDeck->getItemCount(); ++i) {
+	for(size_t i = 0; i < cbDeck->getItemCount(); ++i) {
 		if(!wcscmp(cbDeck->getItem(i), gameConf.lastdeck)) {
 			cbDeck->setSelected(i);
 			break;
@@ -664,6 +699,7 @@ void Game::RefreshReplay() {
 		if(Replay::CheckReplay(wname))
 			lstReplayList->addItem(wname);
 	}
+	closedir(dir);
 #endif
 }
 void Game::RefreshSingleplay() {
@@ -691,6 +727,7 @@ void Game::RefreshSingleplay() {
 		BufferIO::DecodeUTF8(dirp->d_name, wname);
 		lstSinglePlayList->addItem(wname);
 	}
+	closedir(dir);
 #endif
 }
 void Game::LoadConfig() {
@@ -713,7 +750,7 @@ void Game::LoadConfig() {
 	gameConf.lastport[0] = 0;
 	gameConf.roompass[0] = 0;
 	fseek(fp, 0, SEEK_END);
-	size_t fsize = ftell(fp);
+	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	while(ftell(fp) < fsize) {
 		fgets(linebuf, 250, fp);
@@ -721,7 +758,7 @@ void Game::LoadConfig() {
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
 		} else if(!strcmp(strbuf, "use_d3d")) {
-			gameConf.use_d3d = atoi(valbuf);
+			gameConf.use_d3d = atoi(valbuf) > 0;
 		} else if(!strcmp(strbuf, "errorlog")) {
 			enable_log = atoi(valbuf);
 		} else if(!strcmp(strbuf, "nickname")) {
@@ -735,12 +772,14 @@ void Game::LoadConfig() {
 			BufferIO::CopyWStr(wstr, gameConf.lastdeck, 64);
 		} else if(!strcmp(strbuf, "textfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
-			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &gameConf.textfontsize);
+			int textfontsize;
+			sscanf(linebuf, "%s = %s %d", strbuf, valbuf, &textfontsize);
+			gameConf.textfontsize = textfontsize;
 			BufferIO::CopyWStr(wstr, gameConf.textfont, 256);
 		} else if(!strcmp(strbuf, "numfont")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
 			BufferIO::CopyWStr(wstr, gameConf.numfont, 256);
-		} else if(!strcmp(strbuf, "servport")) {
+		} else if(!strcmp(strbuf, "serverport")) {
 			gameConf.serverport = atoi(valbuf);
 		} else if(!strcmp(strbuf, "lastip")) {
 			BufferIO::DecodeUTF8(valbuf, wstr);
@@ -783,7 +822,8 @@ void Game::SaveConfig() {
 void Game::ShowCardInfo(int code) {
 	CardData cd;
 	wchar_t formatBuffer[256];
-	dataManager.GetData(code, &cd);
+	if(!dataManager.GetData(code, &cd))
+		memset(&cd, 0, sizeof(CardData));
 	imgCard->setImage(imageManager.GetTexture(code));
 	imgCard->setScaleImage(true);
 	if(cd.alias != 0 && (cd.alias - code < 10 || code - cd.alias < 10))
@@ -794,7 +834,7 @@ void Game::ShowCardInfo(int code) {
 		myswprintf(formatBuffer, L"[%ls] %ls/%ls", dataManager.FormatType(cd.type), dataManager.FormatRace(cd.race), dataManager.FormatAttribute(cd.attribute));
 		stInfo->setText(formatBuffer);
 		formatBuffer[0] = L'[';
-		for(int i = 1; i <= cd.level; ++i)
+		for(unsigned int i = 1; i <= cd.level; ++i)
 			formatBuffer[i] = 0x2605;
 		formatBuffer[cd.level + 1] = L']';
 		formatBuffer[cd.level + 2] = L' ';
@@ -806,18 +846,27 @@ void Game::ShowCardInfo(int code) {
 			myswprintf(&formatBuffer[cd.level + 3], L"%d/?", cd.attack);
 		else
 			myswprintf(&formatBuffer[cd.level + 3], L"%d/%d", cd.attack, cd.defence);
+		if(cd.type & TYPE_PENDULUM) {
+			wchar_t scaleBuffer[16];
+			myswprintf(scaleBuffer, L"   %d/%d", cd.lscale, cd.rscale);
+			wcscat(formatBuffer, scaleBuffer);
+		}
 		stDataInfo->setText(formatBuffer);
-		stText->setRelativePosition(irr::core::position2di(15, 83));
+		stText->setRelativePosition(rect<s32>(15, 83, 287, 324));
+		scrCardText->setRelativePosition(rect<s32>(267, 83, 287, 324));
 	} else {
 		myswprintf(formatBuffer, L"[%ls]", dataManager.FormatType(cd.type));
 		stInfo->setText(formatBuffer);
 		stDataInfo->setText(L"");
-		stText->setRelativePosition(irr::core::position2di(15, 60));
+		stText->setRelativePosition(rect<s32>(15, 60, 287, 324));
+		scrCardText->setRelativePosition(rect<s32>(267, 60, 287, 324));
 	}
-	SetStaticText(stText, 270, textFont, (wchar_t*)dataManager.GetText(code));
+	showingtext = dataManager.GetText(code);
+	const auto& tsize = stText->getRelativePosition();
+	InitStaticText(stText, tsize.getWidth(), tsize.getHeight(), textFont, showingtext);
 }
 void Game::AddChatMsg(wchar_t* msg, int player) {
-	for(int i = 4; i > 0; --i) {
+	for(int i = 7; i > 0; --i) {
 		chatMsg[i] = chatMsg[i - 1];
 		chatTiming[i] = chatTiming[i - 1];
 		chatType[i] = chatType[i - 1];
@@ -853,7 +902,8 @@ void Game::AddChatMsg(wchar_t* msg, int player) {
 		chatMsg[0].append(L"[Script error:] ");
 		break;
 	default: //from watcher or unknown
-		chatMsg[0].append(L"[---]: ");
+		if(player < 11 || player > 19)
+			chatMsg[0].append(L"[---]: ");
 	}
 	chatMsg[0].append(msg);
 }
@@ -901,6 +951,7 @@ void Game::CloseDuelWindow() {
 	lstHostList->clear();
 	DuelClient::hosts.clear();
 	ClearTextures();
+	closeDoneSignal.Set();
 }
 int Game::LocalPlayer(int player) {
 	return dInfo.isFirst ? player : 1 - player;

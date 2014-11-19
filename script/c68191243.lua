@@ -14,7 +14,7 @@ function c68191243.cfilter(c)
 	return c:IsFaceup() and c:IsCode(76922029)
 end
 function c68191243.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c68191243.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c68191243.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c68191243.filter(c,e,tp)
 	return c:IsSetCard(0x1a) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -26,7 +26,6 @@ function c68191243.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c68191243.op(e,tp,eg,ep,ev,re,r,rp)
-	local count=0
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return end
 	local g=Duel.GetMatchingGroup(c68191243.filter,tp,LOCATION_HAND,0,nil,e,tp)

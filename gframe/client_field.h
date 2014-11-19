@@ -40,7 +40,7 @@ public:
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
 	
-	int selected_option;
+	size_t selected_option;
 	ClientCard* attacker;
 	ClientCard* attack_target;
 	int disabled_field;
@@ -64,6 +64,7 @@ public:
 	bool remove_act;
 	bool deck_act;
 	bool extra_act;
+	bool pzone_act;
 	bool chain_forced;
 	ChainInfo current_chain;
 	bool last_chain;
@@ -81,6 +82,7 @@ public:
 	void ClearSelect();
 	void ClearChainSelect();
 	void ShowSelectCard(bool buttonok = false);
+	void ShowChainCard();
 	void ReplaySwap();
 	void RefreshAllCards();
 	
@@ -98,13 +100,14 @@ public:
 	std::vector<int> ancard;
 	int hovered_controler;
 	int hovered_location;
-	int hovered_sequence;
+	size_t hovered_sequence;
 	int command_controler;
 	int command_location;
-	int command_sequence;
+	size_t command_sequence;
 	ClientCard* hovered_card;
 	ClientCard* clicked_card;
 	ClientCard* command_card;
+	ClientCard* highlighting_card;
 	int list_command;
 	wchar_t formatBuffer[2048];
 

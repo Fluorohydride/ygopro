@@ -1,4 +1,4 @@
---¥¨¥ô¥©¥ë¥«¥¤¥¶©`¡¤¥É¥ë¥«
+--ã‚¨ãƒ´ã‚©ãƒ«ã‚«ã‚¤ã‚¶ãƒ¼ãƒ»ãƒ‰ãƒ«ã‚«
 function c42752141.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4),2)
@@ -18,7 +18,7 @@ function c42752141.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c42752141.condition(e,tp,eg,ep,ev,re,r,rp,chk)
-	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+	return re~=e and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
 		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
 function c42752141.cost(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -6,14 +6,10 @@ function c59388357.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c59388357.cost)
+	e1:SetCountLimit(1,59388357+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c59388357.target)
 	e1:SetOperation(c59388357.activate)
 	c:RegisterEffect(e1)
-end
-function c59388357.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,59388357)==0 end
-	Duel.RegisterFlagEffect(tp,59388357,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c59388357.desfilter(c)
 	return c:IsFaceup() and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsDestructable()

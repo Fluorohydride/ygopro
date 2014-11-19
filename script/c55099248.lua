@@ -8,6 +8,7 @@ function c55099248.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_SUMMON_SUCCESS)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
 	e1:SetTarget(c55099248.atktg)
 	e1:SetOperation(c55099248.atkop)
 	c:RegisterEffect(e1)
@@ -20,11 +21,10 @@ function c55099248.filter(c,e,tp)
 end
 function c55099248.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return eg:IsContains(chkc) and c55099248.filter(chkc,e,tp) end
-	if chk==0 then return e:GetHandler():GetFlagEffect(55099248)==0 and eg:IsExists(c55099248.filter,1,nil,e,tp) end
+	if chk==0 then return eg:IsExists(c55099248.filter,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=eg:FilterSelect(tp,c55099248.filter,1,1,nil,e,tp)
 	Duel.SetTargetCard(g)
-	e:GetHandler():RegisterFlagEffect(55099248,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c55099248.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -12,7 +12,8 @@ function c88559132.initial_effect(c)
 end
 function c88559132.spcon(e,c)
 	if c==nil then return true end
-	return Duel.CheckReleaseGroup(c:GetControler(),Card.IsRace,1,nil,RACE_WARRIOR)
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
+		and Duel.CheckReleaseGroup(c:GetControler(),Card.IsRace,1,nil,RACE_WARRIOR)
 end
 function c88559132.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(c:GetControler(),Card.IsRace,1,1,nil,RACE_WARRIOR)
@@ -23,6 +24,6 @@ function c88559132.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetValue(atk)
-	e1:SetReset(RESET_EVENT+0xfe0000)
+	e1:SetReset(RESET_EVENT+0xff0000)
 	c:RegisterEffect(e1)
 end

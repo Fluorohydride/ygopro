@@ -4,9 +4,14 @@ function c35514096.initial_effect(c)
 	e1:SetDescription(aux.Stringid(35514096,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(c35514096.condition)
 	e1:SetTarget(c35514096.target)
 	e1:SetOperation(c35514096.operation)
 	c:RegisterEffect(e1)
+end
+function c35514096.condition(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c35514096.filter(c)
 	return c:IsFacedown() and c:IsDestructable()
@@ -50,8 +55,7 @@ end
 function c35514096.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if e:GetLabel()==2 then
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		local tc=g:GetFirst()
+		local tc=Duel.GetFirstTarget()
 		if tc:IsRelateToEffect(e) then
 			Duel.Destroy(tc,REASON_EFFECT)
 		end

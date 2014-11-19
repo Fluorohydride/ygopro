@@ -1,4 +1,4 @@
---Abyss Dweller
+--深淵に潜む者
 function c21044178.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
@@ -18,6 +18,7 @@ function c21044178.initial_effect(c)
 	e2:SetDescription(aux.Stringid(21044178,0))
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
+	e2:SetHintTiming(0,TIMING_DRAW_PHASE)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCost(c21044178.cost)
@@ -39,10 +40,9 @@ function c21044178.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e1:SetTargetRange(0,1)
 	e1:SetValue(c21044178.aclimit)
-	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function c21044178.aclimit(e,re,tp)
 	return re:GetActivateLocation()==LOCATION_GRAVE
 end
-

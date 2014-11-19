@@ -21,12 +21,13 @@ function c37675138.initial_effect(c)
 end
 function c37675138.descon(e,tp,eg,ep,ev,re,r,rp)
 	return re:GetOwner():IsRace(RACE_ZOMBIE) and e:GetHandler():IsPreviousLocation(LOCATION_GRAVE)
+		and e:GetHandler():GetPreviousControler()==tp
 end
 function c37675138.desfilter(c)
 	return c:IsDestructable() and c:IsType(TYPE_SPELL+TYPE_TRAP)
 end
 function c37675138.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c37675138.desfilter(chkc) end
+	if chkc then return chkc:IsControler(1-tp) and chkc:IsOnField() and c37675138.desfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c37675138.desfilter,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c37675138.desfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
@@ -43,7 +44,6 @@ function c37675138.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetDescription(aux.Stringid(37675138,1))
 	e1:SetCategory(CATEGORY_DESTROY)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)

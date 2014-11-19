@@ -47,19 +47,20 @@ function c3606728.efcon(e,tp,eg,ep,ev,re,r,rp)
 	return not ec:GetMaterial():IsExists(c3606728.ffilter,1,nil) and r==REASON_XYZ
 end
 function c3606728.efop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,3606728)
 	local c=e:GetHandler()
 	local rc=c:GetReasonCard()
-	local e1=Effect.CreateEffect(c)
+	local e1=Effect.CreateEffect(rc)
 	e1:SetDescription(aux.Stringid(3606728,1))
 	e1:SetCategory(CATEGORY_ATKCHANGE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e1:SetCondition(c3606728.atkcon)
 	e1:SetTarget(c3606728.atktg)
 	e1:SetOperation(c3606728.atkop)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	rc:RegisterEffect(e1)
+	rc:RegisterEffect(e1,true)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
@@ -77,7 +78,7 @@ function c3606728.atkfilter(c)
 end
 function c3606728.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c3606728.atkfilter(chkc) end
-	if chk==0 then return true end
+	if chk==0 then return Duel.IsExistingTarget(c3606728.atkfilter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 	Duel.SelectTarget(tp,c3606728.atkfilter,tp,0,LOCATION_MZONE,1,1,nil)
 end

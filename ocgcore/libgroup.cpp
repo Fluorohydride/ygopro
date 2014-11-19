@@ -182,7 +182,7 @@ int32 scriptlib::group_filter_count(lua_State *L) {
 		if((*it) != pexception && pduel->lua->check_matching(*it, 2, extraargs))
 			count++;
 	}
-	lua_pushinteger(L, count);;
+	lua_pushinteger(L, count);
 	return 1;
 }
 int32 scriptlib::group_filter_select(lua_State *L) {
@@ -270,7 +270,7 @@ int32 scriptlib::group_is_exists(lua_State *L) {
 			}
 		}
 	}
-	lua_pushboolean(L, result);;
+	lua_pushboolean(L, result);
 	return 1;
 }
 int32 scriptlib::group_check_with_sum_equal(lua_State *L) {
@@ -453,10 +453,10 @@ int32 scriptlib::group_get_class_count(lua_State *L) {
 	group* pgroup = *(group**) lua_touserdata(L, 1);
 	duel* pduel = pgroup->pduel;
 	int32 extraargs = lua_gettop(L) - 2;
-	card::effect_relation er;
+	std::set<uint32> er;
 	field::card_set::iterator cit = pgroup->container.begin();
 	for(; cit != pgroup->container.end(); ++cit) {
-		er.insert((effect*)(size_t)pduel->lua->get_operation_value(*cit, 2, extraargs));
+		er.insert(pduel->lua->get_operation_value(*cit, 2, extraargs));
 	}
 	lua_pushinteger(L, er.size());
 	return 1;
@@ -492,10 +492,7 @@ int32 scriptlib::group_merge(lua_State *L) {
 	group* mgroup = *(group**) lua_touserdata(L, 2);
 	if(pgroup->is_readonly == 1)
 		return 0;
-	group::card_set::iterator cit;
-	for (cit = mgroup->container.begin(); cit != mgroup->container.end(); ++cit) {
-		pgroup->container.insert(*cit);
-	}
+	pgroup->container.insert(mgroup->container.begin(), mgroup->container.end());
 	return 0;
 }
 int32 scriptlib::group_sub(lua_State *L) {

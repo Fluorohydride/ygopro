@@ -1,6 +1,10 @@
 #ifndef BUFFERIO_H
 #define BUFFERIO_H
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4244)
+#endif
+
 class BufferIO {
 public:
 	inline static int ReadInt32(char*& p) {
@@ -78,7 +82,7 @@ public:
 		return str - pstr;
 	}
 	static int DecodeUTF8(const char * src, wchar_t * wstr) {
-		char* p = (char*)src;
+		const char* p = src;
 		wchar_t* wp = wstr;
 		while(*p != 0) {
 			if((*p & 0x80) == 0) {

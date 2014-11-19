@@ -11,7 +11,7 @@ function c23927567.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK,0,1,1,nil,TYPE_FIELD)
 	local tc=g:GetFirst()
 	if tc then
-		if Duel.GetEnvironment()==47355498 and tc:IsAbleToHand() and Duel.SelectYesNo(tp,aux.Stringid(23927567,0)) then
+		if Duel.IsEnvironment(47355498) and tc:IsAbleToHand() and Duel.SelectYesNo(tp,aux.Stringid(23927567,0)) then
 			Duel.SendtoHand(tc,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,tc)
 		else

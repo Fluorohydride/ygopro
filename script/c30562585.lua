@@ -35,6 +35,9 @@ function c30562585.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c30562585.filter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
+	local tc=g:GetFirst()
+	local dg=Duel.GetMatchingGroup(c30562585.dfilter,tp,LOCATION_MZONE,LOCATION_MZONE,tc,tc:GetAttack())
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,dg:GetCount(),0,0)
 end
 function c30562585.dfilter(c,atk)
 	return c:IsFaceup() and c:IsDestructable() and c:GetAttack()<atk

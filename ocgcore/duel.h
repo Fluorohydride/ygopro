@@ -33,10 +33,12 @@ public:
 	field* game_field;
 	mtrandom random;
 	std::set<card*> cards;
+	std::set<card*> assumes;
 	std::set<group*> groups;
 	std::set<group*> sgroups;
 	std::set<effect*> effects;
 	std::set<effect*> uncopy;
+	
 	duel();
 	~duel();
 	void clear();
@@ -48,6 +50,7 @@ public:
 	void delete_group(group* pgroup);
 	void delete_effect(effect* peffect);
 	void release_script_group();
+	void restore_assumes();
 	int32 read_buffer(byte* buf);
 	void write_buffer32(uint32 value);
 	void write_buffer16(uint16 value);
@@ -74,7 +77,7 @@ public:
 #define DUEL_TEST_MODE			0x01
 #define DUEL_ATTACK_FIRST_TURN	0x02
 #define DUEL_NO_CHAIN_HINT		0x04
-#define DUEL_ENABLE_PRIORITY	0x08
+#define DUEL_OBSOLETE_RULING	0x08
 #define DUEL_PSEUDO_SHUFFLE		0x10
 #define DUEL_TAG_MODE			0x20
 #define DUEL_SIMPLE_AI			0x40

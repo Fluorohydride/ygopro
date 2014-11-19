@@ -30,16 +30,20 @@ ClientCard::ClientCard() {
 	defence = 0;
 	base_attack = 0;
 	base_defence = 0;
+	lscale = 0;
+	rscale = 0;
 	cHint = 0;
 	chValue = 0;
 	atkstring[0] = 0;
 	defstring[0] = 0;
 	lvstring[0] = 0;
+	rscstring[0] = 0;
+	lscstring[0] = 0;
 	overlayTarget = 0;
 	equipTarget = 0;
 }
 void ClientCard::SetCode(int code) {
-	if((location == LOCATION_HAND) && (this->code != code)) {
+	if((location == LOCATION_HAND) && (this->code != (unsigned int)code)) {
 		this->code = code;
 		mainGame->dField.MoveCard(this, 5);
 	} else
@@ -52,7 +56,7 @@ void ClientCard::UpdateInfo(char* buf) {
 	int pdata;
 	if(flag & QUERY_CODE) {
 		pdata = BufferIO::ReadInt32(buf);
-		if((location == LOCATION_HAND) && (pdata != code)) {
+		if((location == LOCATION_HAND) && ((unsigned int)pdata != code)) {
 			code = pdata;
 			mainGame->dField.MoveCard(this, 5);
 		} else
@@ -68,14 +72,14 @@ void ClientCard::UpdateInfo(char* buf) {
 		type = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_LEVEL) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && level != pdata) {
+		if(pdata && level != (unsigned int)pdata) {
 			level = pdata;
 			myswprintf(lvstring, L"L%d", level);
 		}
 	}
 	if(flag & QUERY_RANK) {
 		pdata = BufferIO::ReadInt32(buf);
-		if(pdata && rank != pdata) {
+		if(pdata && rank != (unsigned int)pdata) {
 			rank = pdata;
 			myswprintf(lvstring, L"R%d", rank);
 		}
@@ -147,6 +151,20 @@ void ClientCard::UpdateInfo(char* buf) {
 		is_disabled = BufferIO::ReadInt32(buf);
 	if(flag & QUERY_IS_PUBLIC)
 		is_public = BufferIO::ReadInt32(buf);
+	if(flag & QUERY_LSCALE) {
+		pdata = BufferIO::ReadInt32(buf);
+		if(pdata && lscale != (unsigned int)pdata) {
+			lscale = pdata;
+			myswprintf(lscstring, L"%d", lscale);
+		}
+	}
+	if(flag & QUERY_RSCALE) {
+		pdata = BufferIO::ReadInt32(buf);
+		if(pdata && rscale != (unsigned int)pdata) {
+			rscale = pdata;
+			myswprintf(rscstring, L"%d", rscale);
+		}
+	}
 }
 void ClientCard::ClearTarget() {
 	for(auto cit = cardTarget.begin(); cit != cardTarget.end(); ++cit) {

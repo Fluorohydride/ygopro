@@ -7,15 +7,15 @@ function c52158283.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_GRAVE)
+	e1:SetCountLimit(1,52158283)
 	e1:SetCost(c52158283.cost)
 	e1:SetTarget(c52158283.target)
 	e1:SetOperation(c52158283.operation)
 	c:RegisterEffect(e1)
 end
 function c52158283.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,52158283)==0 and e:GetHandler():IsAbleToRemoveAsCost() end
+	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
-	Duel.RegisterFlagEffect(tp,52158283,RESET_PHASE+PHASE_END,0,1)
 end
 function c52158283.filter(c)
 	return c:IsAttackPos() and c:IsLevelAbove(3)
@@ -32,7 +32,7 @@ function c52158283.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsRelateToEffect(e) then
 		if tc:IsAttackPos() then
 			local pos=0
-			if tc:IsCanTurnSet() then 
+			if tc:IsCanTurnSet() then
 				pos=Duel.SelectPosition(tp,tc,POS_DEFENCE)
 			else
 				pos=Duel.SelectPosition(tp,tc,POS_FACEUP_DEFENCE)

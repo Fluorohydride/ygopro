@@ -13,7 +13,8 @@ function c74458486.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c74458486.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated()
+	local phase=Duel.GetCurrentPhase()
+	return phase==PHASE_DAMAGE and not Duel.IsDamageCalculated()
 		and Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()
 end
 function c74458486.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

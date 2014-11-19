@@ -36,7 +36,7 @@ function c48445393.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		Duel.Draw(tp,1,REASON_EFFECT)
 		local tc=Duel.GetFirstTarget()
-		if tc:IsRelateToEffect(e) then
+		if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 			Duel.BreakEffect()
 			Duel.Destroy(tc,REASON_EFFECT)
 		end

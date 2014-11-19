@@ -16,8 +16,7 @@ function c74860293.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c74860293.tfilter(c)
-	local code=c:GetCode()
-	return code==63977008 or code==20932152
+	return c:IsCode(63977008) or c:IsHasEffect(20932152)
 end
 function c74860293.con(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
@@ -33,6 +32,5 @@ end
 function c74860293.op(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local sg=g:Filter(Card.IsRelateToEffect,nil,e)
-	Duel.HintSelection(sg)
 	Duel.Destroy(sg,REASON_EFFECT)
 end

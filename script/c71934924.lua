@@ -9,7 +9,7 @@ function c71934924.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_SZONE)
-	e2:SetCode(EVENT_BATTLE_END)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetOperation(c71934924.atop)
 	c:RegisterEffect(e2)
 	--atkup

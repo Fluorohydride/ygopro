@@ -51,13 +51,14 @@ end
 function c38522377.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c38522377.atkfilter,nil,e)
 	Duel.SendtoGrave(g,REASON_EFFECT)
-	local tc=g:GetFirst()
+	local og=Duel.GetOperatedGroup()
+	local tc=og:GetFirst()
 	local atk=0
 	while tc do
 		local oatk=tc:GetTextAttack()
 		if oatk<0 then oatk=0 end
 		atk=atk+oatk
-		tc=g:GetNext()
+		tc=og:GetNext()
 	end
 	if atk~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())

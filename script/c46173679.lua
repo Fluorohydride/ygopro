@@ -12,8 +12,8 @@ function c46173679.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c46173679.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSummonActivity(tp)
-		and not Duel.CheckFlipSummonActivity(tp) and not Duel.CheckSpecialSummonActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
+		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0 and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -45,7 +45,7 @@ function c46173679.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
 function c46173679.activate(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>1 
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>1
 		and Duel.IsPlayerCanSpecialSummonMonster(tp,46173680,0,0x4011,0,0,1,RACE_FIEND,ATTRIBUTE_DARK) then
 		for i=1,2 do
 			local token=Duel.CreateToken(tp,46173679+i)
@@ -55,6 +55,7 @@ function c46173679.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCode(EFFECT_UNRELEASABLE_SUM)
 			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e1:SetValue(c46173679.recon)
+			e1:SetReset(RESET_EVENT+0x1fe0000)
 			token:RegisterEffect(e1,true)
 		end
 		Duel.SpecialSummonComplete()

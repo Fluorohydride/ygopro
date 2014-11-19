@@ -16,10 +16,10 @@ function c40384720.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c40384720.dfilter(c)
-	return c:GetSequence()~=5
+	return c:GetSequence()<5
 end
-function c40384720.dircon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c40384720.dfilter,tp,0,LOCATION_SZONE,1,nil)
+function c40384720.dircon(e)
+	return not Duel.IsExistingMatchingCard(c40384720.dfilter,e:GetHandlerPlayer(),0,LOCATION_SZONE,1,nil)
 end
 function c40384720.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

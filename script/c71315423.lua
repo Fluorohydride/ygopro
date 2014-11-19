@@ -3,15 +3,16 @@ function c71315423.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_EQUIP)
-	e1:SetType(EFFECT_TYPE_FLIP+EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_FLIP+EFFECT_TYPE_TRIGGER_O)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetTarget(c71315423.eqtg)
 	e1:SetOperation(c71315423.eqop)
 	c:RegisterEffect(e1)
 end
 function c71315423.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
-	if chk==0 then return e:GetHandler():IsLocation(LOCATION_MZONE)
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and e:GetHandler():IsFaceup()
+		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
 	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,1,nil)
@@ -32,7 +33,6 @@ function c71315423.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetTarget(c71315423.damtg)
@@ -57,5 +57,8 @@ function c71315423.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,e:GetHandler():GetEquipTarget():GetControler(),400)
 end
 function c71315423.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(e:GetHandler():GetEquipTarget():GetControler(),400,REASON_EFFECT)
+	local tg=e:GetHandler():GetEquipTarget()
+	if tg then
+		Duel.Damage(tg:GetControler(),400,REASON_EFFECT)
+	end
 end

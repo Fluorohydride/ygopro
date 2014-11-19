@@ -39,6 +39,7 @@ function c15286412.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c15286412.retcon)
 		e1:SetOperation(c15286412.retop)
 		e1:SetLabel(2)
 		e1:SetLabelObject(e:GetLabelObject())
@@ -46,8 +47,10 @@ function c15286412.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
+function c15286412.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c15286412.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	local ct=e:GetLabel()
 	ct=ct-1
 	e:SetLabel(ct)

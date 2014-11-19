@@ -53,7 +53,7 @@ function c85771019.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
 function c85771019.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
 	if Duel.IsPlayerCanSpecialSummonMonster(tp,85771020,0,0x4011,1800,1300,5,RACE_FAIRY,ATTRIBUTE_DARK) then
 		local token=Duel.CreateToken(tp,85771020)
 		Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP)
@@ -62,6 +62,7 @@ function c85771019.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetValue(1)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		token:RegisterEffect(e1)
 	end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -73,6 +74,7 @@ function c85771019.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetValue(1)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
 		token:RegisterEffect(e1)
 	end
 	Duel.SpecialSummonComplete()

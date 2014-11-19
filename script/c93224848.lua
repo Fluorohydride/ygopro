@@ -17,7 +17,7 @@ function c93224848.filter(c)
 end
 function c93224848.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>=2
-		and Duel.IsExistingMatchingCard(c93224848.filter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c93224848.filter,tp,LOCATION_ONFIELD,0,1,nil)
 end
 function c93224848.cfilter(c)
 	return not c:IsAbleToGraveAsCost()

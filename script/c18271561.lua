@@ -12,7 +12,9 @@ function c18271561.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c18271561.filter(c,tp)
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsPreviousPosition(POS_FACEUP)
+	local pos=c:GetPreviousPosition()
+	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
+	return c:IsPreviousLocation(LOCATION_MZONE) and bit.band(pos,POS_FACEUP)~=0
 		and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY)
 end
 function c18271561.condition(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -25,6 +25,7 @@ function c99594764.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c99594764.thop(e,tp,eg,ep,ev,re,r,rp)
 	local eqc=e:GetHandler():GetEquipTarget()
+	if not eqc then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c99594764.filter,tp,LOCATION_DECK,0,1,1,nil,eqc:GetRace(),eqc:GetAttribute())
 	if g:GetCount()>0 then

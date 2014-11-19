@@ -22,6 +22,7 @@ function c15552258.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if opt==1 then
 		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
+		return
 	end
 	local tc=g:GetFirst()
 	while tc do

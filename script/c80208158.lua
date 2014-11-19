@@ -1,5 +1,6 @@
 --異次元エスパー・スター・ロビン
 function c80208158.initial_effect(c)
+	c:SetUniqueOnField(1,1,80208158)
 	--target
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -25,26 +26,6 @@ function c80208158.initial_effect(c)
 	e3:SetTarget(c80208158.sptg)
 	e3:SetOperation(c80208158.spop)
 	c:RegisterEffect(e3)
-	--only 1 can exists
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_CANNOT_SUMMON)
-	e4:SetCondition(c80208158.excon)
-	c:RegisterEffect(e4)
-	local e5=e4:Clone()
-	e5:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
-	c:RegisterEffect(e5)
-	local e6=Effect.CreateEffect(c)
-	e6:SetType(EFFECT_TYPE_SINGLE)
-	e6:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e6:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e6:SetValue(c80208158.splimit)
-	c:RegisterEffect(e6)
-	local e7=Effect.CreateEffect(c)
-	e7:SetType(EFFECT_TYPE_SINGLE)
-	e7:SetCode(EFFECT_SELF_DESTROY)
-	e7:SetCondition(c80208158.descon)
-	c:RegisterEffect(e7)
 end
 function c80208158.tglimit(e,c)
 	return c~=e:GetHandler()
@@ -71,19 +52,4 @@ function c80208158.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(LOCATION_REMOVED)
 		c:RegisterEffect(e1,true)
 	end
-end
-function c80208158.exfilter(c,fid)
-	return c:IsFaceup() and c:GetCode()==80208158 and (fid==nil or c:GetFieldID()<fid)
-end
-function c80208158.excon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c80208158.exfilter,c:GetControler(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-end
-function c80208158.splimit(e,se,sp,st,spos,tgp)
-	if bit.band(spos,POS_FACEDOWN)~=0 then return true end
-	return not Duel.IsExistingMatchingCard(c80208158.exfilter,tgp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-end
-function c80208158.descon(e)
-	local c=e:GetHandler()
-	return Duel.IsExistingMatchingCard(c80208158.exfilter,c:GetControler(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,c:GetFieldID())
 end

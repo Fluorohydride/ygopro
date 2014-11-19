@@ -37,7 +37,6 @@ function c76862289.retreg(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
 	e1:SetCondition(c76862289.retcon)
@@ -71,7 +70,10 @@ end
 function c76862289.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetTargetPlayer(tp)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	local ht=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
+	if ht<5 then
+		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,5-ht)
+	end
 end
 function c76862289.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)

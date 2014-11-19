@@ -2,33 +2,29 @@
 function c6967870.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(6967870,0))
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_DECKDES)
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c6967870.condition)
 	e1:SetTarget(c6967870.target)
 	e1:SetOperation(c6967870.operation)
 	c:RegisterEffect(e1)
 end
 function c6967870.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp and r==REASON_BATTLE and eg:GetFirst()==e:GetHandler()
+	return ep~=tp
 end
 function c6967870.filter(c)
 	return c:IsType(TYPE_TRAP+TYPE_SPELL) and c:IsDestructable()
 end
 function c6967870.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chk==0 then
-		if chkc then return chkc:IsOnField() and c6967870.filter(chkc) end
-		return Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1
-			or Duel.IsExistingTarget(c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-	end
+	if chkc then return chkc:IsOnField() and c6967870.filter(chkc) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(1-tp,2)
+		or Duel.IsExistingTarget(c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	local op=0
 	if Duel.IsExistingTarget(c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		and Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1 then
+		and Duel.IsPlayerCanDiscardDeck(1-tp,2) then
 		op=Duel.SelectOption(tp,aux.Stringid(6967870,1),aux.Stringid(6967870,2))
-	elseif Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>1 then
+	elseif Duel.IsPlayerCanDiscardDeck(1-tp,2) then
 		Duel.SelectOption(tp,aux.Stringid(6967870,2))
 		op=1
 	else
@@ -40,10 +36,10 @@ function c6967870.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local g=Duel.SelectTarget(tp,c6967870.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-		e:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_CARD_TARGET)
+		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	else
 		Duel.SetOperationInfo(0,CATEGORY_DECKDES,0,0,1-tp,1)
-		e:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
+		e:SetProperty(0)
 	end
 end
 function c6967870.operation(e,tp,eg,ep,ev,re,r,rp)

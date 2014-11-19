@@ -49,7 +49,7 @@ end
 function Auxiliary.BeginPuzzle(effect)
 	local e1=Effect.GlobalEffect()
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e1:SetCode(EVENT_PHASE+PHASE_END)
+	e1:SetCode(EVENT_TURN_END)
 	e1:SetCountLimit(1)
 	e1:SetOperation(Auxiliary.PuzzleOp)
 	Duel.RegisterEffect(e1,0)
@@ -73,7 +73,6 @@ function Auxiliary.EnableDualAttribute(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_DUAL_SUMMONABLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
@@ -130,27 +129,30 @@ function Auxiliary.AddSynchroProcedure(c,f1,f2,ct)
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
 end
-function Auxiliary.SynCondition(f1,f2,minc,maxc)
-	return	function(e,c,tuner)
+function Auxiliary.SynCondition(f1,f2,minct,maxc)
+	return	function(e,c,smat,mg)
 				if c==nil then return true end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
+				local minc=minct
 				if minc<ct then minc=ct end
 				if maxc<minc then return false end
-				if tuner then return Duel.CheckTunerMaterial(c,tuner,f1,f2,minc,maxc) end
-				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc)
+				if smat and smat:IsType(TYPE_TUNER) and (not f1 or f1(smat)) then
+					return Duel.CheckTunerMaterial(c,smat,f1,f2,minc,maxc,mg) end
+				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc,smat,mg)
 			end
 end
-function Auxiliary.SynOperation(f1,f2,minc,maxc)
-	return	function(e,tp,eg,ep,ev,re,r,rp,c,tuner)
+function Auxiliary.SynOperation(f1,f2,minct,maxc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
 				local g=nil
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
+				local minc=minct
 				if minc<ct then minc=ct end
-				if tuner then
-					g=Duel.SelectTunerMaterial(c:GetControler(),c,tuner,f1,f2,minc,maxc)
+				if smat and smat:IsType(TYPE_TUNER) and (not f1 or f1(smat)) then
+					g=Duel.SelectTunerMaterial(c:GetControler(),c,smat,f1,f2,minc,maxc,mg)
 				else
-					g=Duel.SelectSynchroMaterial(c:GetControler(),c,f1,f2,minc,maxc)
+					g=Duel.SelectSynchroMaterial(c:GetControler(),c,f1,f2,minc,maxc,smat,mg)
 				end
 				c:SetMaterial(g)
 				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
@@ -181,7 +183,7 @@ function Auxiliary.AddXyzProcedure(c,f,ct,alterf,desc,maxct,op)
 	e1:SetRange(LOCATION_EXTRA)
 	if not maxct then maxct=ct end
 	if alterf then
-		e1:SetCondition(Auxiliary.XyzCondition2(f,ct,maxct,alterf,desc))
+		e1:SetCondition(Auxiliary.XyzCondition2(f,ct,maxct,alterf,desc,op))
 		e1:SetOperation(Auxiliary.XyzOperation2(f,ct,maxct,alterf,desc,op))
 	else
 		e1:SetCondition(Auxiliary.XyzCondition(f,ct,maxct))
@@ -197,12 +199,7 @@ function Auxiliary.XyzCondition(f,minc,maxc)
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				if og then
-					return og:IsExists(f,minc,nil)
-				else
-					local g=Duel.GetXyzMaterial(c)
-					return g:IsExists(f,minc,nil)
-				end
+				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 			end
 end
 function Auxiliary.XyzOperation(f,minc,maxc)
@@ -211,27 +208,23 @@ function Auxiliary.XyzOperation(f,minc,maxc)
 					c:SetMaterial(og)
 					Duel.Overlay(c,og)
 				else
-					local g=Duel.GetXyzMaterial(c)
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-					local mg=g:FilterSelect(tp,f,minc,maxc,nil)
+					local mg=Duel.SelectXyzMaterial(tp,c,f,minc,maxc)
 					c:SetMaterial(mg)
 					Duel.Overlay(c,mg)
 				end
 			end
 end
-function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc)
+function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc,op)
 	return	function(e,c,og)
 				if c==nil then return true end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				if og then
-					return og:IsExists(f,minc,nil)
-				else
-					if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil) then return true end
-					local g=Duel.GetXyzMaterial(c)
-					return g:IsExists(f,minc,nil)
+				if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil)
+					and (not op or op(e,c:GetControler(),0)) then
+					return true
 				end
+				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 			end
 end
 function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
@@ -242,21 +235,21 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 				else
 					local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 					local ct=-ft
-					local g=Duel.GetXyzMaterial(c)
-					local b1=g:IsExists(f,minc,nil)
+					local b1=Duel.CheckXyzMaterial(c,f,minc,maxc,og)
 					local b2=ct<1 and Duel.IsExistingMatchingCard(alterf,tp,LOCATION_MZONE,0,1,nil)
+						and (not op or op(e,tp,0))
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-					if (b1 and b2 and Duel.SelectYesNo(tp,desc)) or ((not b1) and b2) then
+					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
+						if op then op(e,tp,1) end
 						local mg=Duel.SelectMatchingCard(tp,alterf,tp,LOCATION_MZONE,0,1,1,nil)
 						local mg2=mg:GetFirst():GetOverlayGroup()
 						if mg2:GetCount()~=0 then
 							Duel.Overlay(c,mg2)
 						end
-						Duel.Overlay(c,mg)
 						c:SetMaterial(mg)
-						if op~=nil then op(e,tp) end
+						Duel.Overlay(c,mg)
 					else
-						local mg=g:FilterSelect(tp,f,minc,maxc,nil)
+						local mg=Duel.SelectXyzMaterial(tp,c,f,minc,maxc)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
 					end
@@ -651,8 +644,8 @@ end
 function Auxiliary.FConditionFun2(f1,f2,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return (f1(gc) and g:IsExists(f2,1,nil))
-					or (f2(gc) and g:IsExists(f1,1,nil)) end
+				if gc then return (f1(gc) and g:IsExists(f2,1,gc))
+					or (f2(gc) and g:IsExists(f1,1,gc)) end
 				local g1=Group.CreateGroup() local g2=Group.CreateGroup() local fs=false
 				local tc=g:GetFirst()
 				while tc do
@@ -668,11 +661,9 @@ end
 function Auxiliary.FOperationFun2(f1,f2,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					local sg=eg:Filter(Auxiliary.FConditionFilterF2c,nil,f1,f2)
-					local b1=f1(gc)
-					local b2=f2(gc)
-					if b1 and not b2 then sg:Remove(f1,nil) end
-					if b2 and not b1 then sg:Remove(f2,nil) end
+					local sg=Group.CreateGroup()
+					if f1(gc) then sg:Merge(eg:Filter(f2,gc)) end
+					if f2(gc) then sg:Merge(eg:Filter(f1,gc)) end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,1,1,nil)
 					Duel.SetFusionMaterial(g1)
@@ -894,6 +885,61 @@ function Auxiliary.RPEOperation(filter)
 					Duel.BreakEffect()
 					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
 					tc:CompleteProcedure()
+				end
+			end
+end
+function Auxiliary.AddPendulumProcedure(c)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_SPSUMMON_PROC_G)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetRange(LOCATION_PZONE)
+	e1:SetCountLimit(1,10000000)
+	e1:SetCondition(Auxiliary.PendCondition())
+	e1:SetOperation(Auxiliary.PendOperation())
+	e1:SetValue(SUMMON_TYPE_PENDULUM)
+	c:RegisterEffect(e1)
+end
+function Auxiliary.PConditionFilter(c,e,tp,lscale,rscale)
+	local lv=c:GetLevel()
+	return (c:IsLocation(LOCATION_HAND) or (c:IsFaceup() and c:IsType(TYPE_PENDULUM)))
+		and lv>lscale and lv<rscale and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_PENDULUM,tp,false,false)
+		and not c:IsForbidden()
+end
+function Auxiliary.PendCondition()
+	return	function(e,c,og)
+				if c==nil then return true end
+				local tp=c:GetControler()
+				if c:GetSequence()~=6 then return false end
+				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+				if rpz==nil then return false end
+				local lscale=c:GetLeftScale()
+				local rscale=rpz:GetRightScale()
+				if lscale>rscale then lscale,rscale=rscale,lscale end
+				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+				if ft<=0 then return false end
+				if og then
+					return og:IsExists(Auxiliary.PConditionFilter,1,nil,e,tp,lscale,rscale)
+				else
+					return Duel.IsExistingMatchingCard(Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,nil,e,tp,lscale,rscale)
+				end
+			end
+end
+function Auxiliary.PendOperation()
+	return	function(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
+				local rpz=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+				local lscale=c:GetLeftScale()
+				local rscale=rpz:GetRightScale()
+				if lscale>rscale then lscale,rscale=rscale,lscale end
+				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+				if og then
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+					local g=og:FilterSelect(tp,Auxiliary.PConditionFilter,1,ft,nil,e,tp,lscale,rscale)
+					sg:Merge(g)
+				else
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+					local g=Duel.SelectMatchingCard(tp,Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
+					sg:Merge(g)
 				end
 			end
 end

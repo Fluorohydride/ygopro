@@ -6,38 +6,28 @@ function c1412158.initial_effect(c)
 	--atk up
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(1412158,0))
-	e1:SetCategory(CATEGORY_ATKCHANGE)
-	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetRange(LOCATION_MZONE)
-	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
 	e1:SetCondition(c1412158.atkcon)
-	e1:SetOperation(c1412158.atkop)
+	e1:SetValue(1000)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(1412158,1))
 	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCode(EVENT_CHAIN_SOLVING)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c1412158.spcon)
 	e2:SetTarget(c1412158.sptg)
 	e2:SetOperation(c1412158.spop)
 	c:RegisterEffect(e2)
 end
-function c1412158.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetBattleTarget()~=nil
-end
-function c1412158.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
-		e1:SetValue(1000)
-		c:RegisterEffect(e1)
-	end
+function c1412158.atkcon(e)
+	local ph=Duel.GetCurrentPhase()
+	if not (ph==PHASE_DAMAGE or ph==PHASE_DAMAGE_CAL) then return false end
+	local a=Duel.GetAttacker()
+	local d=Duel.GetAttackTarget()
+	return a==e:GetHandler() and d~=nil
 end
 function c1412158.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()

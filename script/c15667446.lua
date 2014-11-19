@@ -1,4 +1,4 @@
---°µü\½ç¤ÎêLÉñ ¥é¥Á¥Ê
+--æš—é»’ç•Œã®é—˜ç¥ ãƒ©ãƒãƒŠ
 function c15667446.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -13,6 +13,7 @@ function c15667446.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c15667446.spcon(e,tp,eg,ep,ev,re,r,rp)
+	e:SetLabel(e:GetHandler():GetPreviousControler())
 	return e:GetHandler():IsPreviousLocation(LOCATION_HAND) and bit.band(r,0x4040)==0x4040
 end
 function c15667446.atfilter(c)
@@ -21,7 +22,7 @@ end
 function c15667446.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c15667446.atfilter(chkc) end
 	if chk==0 then return true end
-	if rp~=tp then
+	if rp~=tp and tp==e:GetLabel() then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FACEUP)
 		Duel.SelectTarget(tp,c15667446.atfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	end

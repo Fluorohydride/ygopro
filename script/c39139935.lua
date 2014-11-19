@@ -16,6 +16,7 @@ function c39139935.initial_effect(c)
 	e1:SetOperation(c39139935.operation)
 	c:RegisterEffect(e1)
 end
+c39139935.xyz_number=33
 function c39139935.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
@@ -31,7 +32,7 @@ function c39139935.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc=g:GetFirst()
 	local atk=tc:GetAttack()
 	local batk=tc:GetBaseAttack()
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,tp,(batk>atk) and (batk-atk) or (atk-batk))
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,(batk>atk) and (batk-atk) or (atk-batk))
 end
 function c39139935.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

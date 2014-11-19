@@ -5,7 +5,7 @@ function c97489701.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_SPSUMMON_PROC)
-	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
+	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCondition(c97489701.syncon)
 	e1:SetOperation(c97489701.synop)
@@ -32,6 +32,7 @@ function c97489701.initial_effect(c)
 	e4:SetDescription(aux.Stringid(97489701,0))
 	e4:SetCategory(CATEGORY_REMOVE)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCondition(c97489701.nacon)
@@ -80,27 +81,43 @@ function c97489701.syncon(e,c,tuner)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<-2 then return false end
 	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
 	local lv=c:GetLevel()
 	if tuner then
 		local tlv=tuner:GetLevel()
 		if lv-tlv<=0 then return false end
 		local f1=tuner.tuner_filter
-		return g1:IsExists(c97489701.synfilter2,1,tuner,lv-tlv,g2,f1,tuner)
+		if not pe then
+			return g1:IsExists(c97489701.synfilter2,1,tuner,lv-tlv,g2,f1,tuner)
+		else
+			return c97489701.synfilter2(pe:GetOwner(),lv-tlv,g2,f1,tuner)
+		end
 	end
-	return g1:IsExists(c97489701.synfilter1,1,nil,lv,g1,g2)
+	if not pe then
+		return g1:IsExists(c97489701.synfilter1,1,nil,lv,g1,g2)
+	else
+		return c97489701.synfilter1(pe:GetOwner(),lv,g1,g2)
+	end
 end
 function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
 	local g=Group.CreateGroup()
 	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
 	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
 	local lv=c:GetLevel()
 	if tuner then
 		g:AddCard(tuner)
 		local lv1=tuner:GetLevel()
 		local f1=tuner.tuner_filter
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t2=g1:FilterSelect(tp,c97489701.synfilter2,1,1,tuner,lv-lv1,g2,f1,tuner)
-		local tuner2=t2:GetFirst()
+		local tuner2=nil
+		if not pe then
+			local t2=g1:FilterSelect(tp,c97489701.synfilter2,1,1,tuner,lv-lv1,g2,f1,tuner)
+			tuner2=t2:GetFirst()
+		else
+			tuner2=pe:GetOwner()
+			Group.FromCards(tuner2):Select(tp,1,1,nil)
+		end
 		g:AddCard(tuner2)
 		local lv2=tuner2:GetLevel()
 		local f2=tuner2.tuner_filter
@@ -109,8 +126,14 @@ function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
 		g:Merge(m3)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SMATERIAL)
-		local t1=g1:FilterSelect(tp,c97489701.synfilter1,1,1,nil,lv,g1,g2)
-		local tuner1=t1:GetFirst()
+		local tuner1=nil
+		if not pe then
+			local t1=g1:FilterSelect(tp,c97489701.synfilter1,1,1,nil,lv,g1,g2)
+			tuner1=t1:GetFirst()
+		else
+			tuner1=pe:GetOwner()
+			Group.FromCards(tuner1):Select(tp,1,1,nil)
+		end
 		g:AddCard(tuner1)
 		local lv1=tuner1:GetLevel()
 		local f1=tuner1.tuner_filter
@@ -136,7 +159,8 @@ end
 function c97489701.nacon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker():GetControler()~=tp
 end
-function c97489701.natg(e,tp,eg,ep,ev,re,r,rp,chk)
+function c97489701.natg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc==Duel.GetAttacker() end
 	if chk==0 then return e:GetHandler():IsAbleToRemove() and Duel.GetAttacker():IsCanBeEffectTarget(e)
 		and not e:GetHandler():IsStatus(STATUS_CHAINING) end
 	Duel.SetTargetCard(Duel.GetAttacker())

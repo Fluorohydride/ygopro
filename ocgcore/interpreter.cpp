@@ -26,7 +26,10 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetSynchroLevel", scriptlib::card_get_synchro_level },
 	{ "GetRitualLevel", scriptlib::card_get_ritual_level },
 	{ "GetOriginalLevel", scriptlib::card_get_origin_level },
+	{ "GetOriginalRank", scriptlib::card_get_origin_rank },
 	{ "IsXyzLevel", scriptlib::card_is_xyz_level },
+	{ "GetLeftScale", scriptlib::card_get_lscale },
+	{ "GetRightScale", scriptlib::card_get_rscale },
 	{ "GetAttribute", scriptlib::card_get_attribute },
 	{ "GetOriginalAttribute", scriptlib::card_get_origin_attribute },
 	{ "GetRace", scriptlib::card_get_race },
@@ -37,6 +40,14 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetDefence",	scriptlib::card_get_defence },
 	{ "GetBaseDefence", scriptlib::card_get_origin_defence },
 	{ "GetTextDefence", scriptlib::card_get_text_defence },
+	{ "GetPreviousCodeOnField", scriptlib::card_get_previous_code_onfield },
+	{ "GetPreviousTypeOnField", scriptlib::card_get_previous_type_onfield },
+	{ "GetPreviousLevelOnField", scriptlib::card_get_previous_level_onfield },
+	{ "GetPreviousRankOnField", scriptlib::card_get_previous_rank_onfield },
+	{ "GetPreviousAttributeOnField", scriptlib::card_get_previous_attribute_onfield },
+	{ "GetPreviousRaceOnField", scriptlib::card_get_previous_race_onfield },
+	{ "GetPreviousAttackOnField", scriptlib::card_get_previous_attack_onfield },
+	{ "GetPreviousDefenceOnField", scriptlib::card_get_previous_defence_onfield },
 	{ "GetOwner", scriptlib::card_get_owner },
 	{ "GetControler", scriptlib::card_get_controler },
 	{ "GetPreviousControler", scriptlib::card_get_previous_controler },
@@ -52,6 +63,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetSequence", scriptlib::card_get_sequence },
 	{ "GetPreviousSequence", scriptlib::card_get_previous_sequence },
 	{ "GetSummonType", scriptlib::card_get_summon_type },
+	{ "GetSummonLocation", scriptlib::card_get_summon_location },
 	{ "GetSummonPlayer", scriptlib::card_get_summon_player },
 	{ "GetDestination", scriptlib::card_get_destination },
 	{ "GetLeaveFieldDest", scriptlib::card_get_leave_field_dest },
@@ -81,6 +93,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetUnionCount", scriptlib::card_get_union_count },
 	{ "GetOverlayGroup", scriptlib::card_get_overlay_group },
 	{ "GetOverlayCount", scriptlib::card_get_overlay_count },
+	{ "GetOverlayTarget", scriptlib::card_get_overlay_target },
 	{ "CheckRemoveOverlayCard", scriptlib::card_check_remove_overlay_card },
 	{ "RemoveOverlayCard", scriptlib::card_remove_overlay_card },
 	{ "GetAttackedGroup", scriptlib::card_get_attacked_group },
@@ -138,6 +151,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "IsAbleToHandAsCost", scriptlib::card_is_able_to_hand_as_cost },
 	{ "IsAbleToDeckAsCost", scriptlib::card_is_able_to_deck_as_cost },
 	{ "IsAbleToExtraAsCost", scriptlib::card_is_able_to_extra_as_cost },
+	{ "IsAbleToDeckOrExtraAsCost", scriptlib::card_is_able_to_deck_or_extra_as_cost },
 	{ "IsAbleToGraveAsCost", scriptlib::card_is_able_to_grave_as_cost },
 	{ "IsAbleToRemoveAsCost", scriptlib::card_is_able_to_remove_as_cost },
 	{ "IsReleasable", scriptlib::card_is_releasable },
@@ -190,6 +204,10 @@ static const struct luaL_Reg cardlib[] = {
 	{ "GetAttackableTarget", scriptlib::card_get_attackable_target },
 	{ "SetHint", scriptlib::card_set_hint },
 	{ "ReverseInDeck", scriptlib::card_reverse_in_deck },
+	{ "SetUniqueOnField", scriptlib::card_set_unique_onfield },
+	{ "CheckUniqueOnField", scriptlib::card_check_unique_onfield },
+	{ "ResetNegateEffect", scriptlib::card_reset_negate_effect },
+	{ "AssumeProperty", scriptlib::card_assume_prop },
 	{ NULL, NULL }
 };
 
@@ -326,6 +344,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "RaiseSingleEvent", scriptlib::duel_raise_single_event },
 	{ "CheckTiming", scriptlib::duel_check_timing },
 	{ "GetEnvironment", scriptlib::duel_get_environment },
+	{ "IsEnvironment", scriptlib::duel_is_environment },
 	{ "Win", scriptlib::duel_win },
 	{ "Draw", scriptlib::duel_draw },
 	{ "Damage", scriptlib::duel_damage },
@@ -411,7 +430,8 @@ static const struct luaL_Reg duellib[] = {
 	{ "SetOperationInfo", scriptlib::duel_set_operation_info },
 	{ "GetOperationInfo", scriptlib::duel_get_operation_info },
 	{ "GetOperationCount", scriptlib::duel_get_operation_count },
-	{ "GetXyzMaterial", scriptlib::duel_get_xyz_material },
+	{ "CheckXyzMaterial", scriptlib::duel_check_xyz_material },
+	{ "SelectXyzMaterial", scriptlib::duel_select_xyz_material },
 	{ "Overlay", scriptlib::duel_overlay },
 	{ "GetOverlayGroup", scriptlib::duel_get_overlay_group },
 	{ "GetOverlayCount", scriptlib::duel_get_overlay_count },
@@ -446,6 +466,9 @@ static const struct luaL_Reg duellib[] = {
 	{ "IsPlayerCanSpecialSummon", scriptlib::duel_is_player_can_spsummon },
 	{ "IsPlayerCanFlipSummon", scriptlib::duel_is_player_can_flipsummon },
 	{ "IsPlayerCanSpecialSummonMonster", scriptlib::duel_is_player_can_spsummon_monster },
+	{ "IsPlayerCanSummonCount", scriptlib::duel_is_player_can_summon_count },
+	{ "IsPlayerCanSpecialSummonCount", scriptlib::duel_is_player_can_spsummon_count },
+	{ "IsPlayerCanFlipSummonCount", scriptlib::duel_is_player_can_flipsummon_count },
 	{ "IsPlayerCanRelease", scriptlib::duel_is_player_can_release },
 	{ "IsPlayerCanRemove", scriptlib::duel_is_player_can_remove },
 	{ "IsPlayerCanSendtoHand", scriptlib::duel_is_player_can_send_to_hand },
@@ -455,16 +478,10 @@ static const struct luaL_Reg duellib[] = {
 	{ "IsChainDisablable", scriptlib::duel_is_chain_disablable },
 	{ "CheckChainTarget", scriptlib::duel_check_chain_target },
 	{ "CheckChainUniqueness", scriptlib::duel_check_chain_uniqueness },
-	{ "CheckSummonActivity", scriptlib::duel_check_summon_activity },
-	{ "CheckNormalSummonActivity", scriptlib::duel_check_normal_summon_activity },
-	{ "CheckFlipSummonActivity", scriptlib::duel_check_flip_summon_activity },
-	{ "CheckSpecialSummonActivity", scriptlib::duel_check_special_summon_activity },
-	{ "CheckAttackActivity", scriptlib::duel_check_attack_activity },
+	{ "GetActivityCount", scriptlib::duel_get_activity_count },
 	{ "CheckPhaseActivity", scriptlib::duel_check_phase_activity },
-	{ "SummonedCardsThisTurn", scriptlib::duel_get_summoned_cards_this_turn },
-	{ "NormalSummonedCardsThisTurn", scriptlib::duel_get_normal_summoned_cards_this_turn },
-	{ "SpecialSummonedCardsThisTurn", scriptlib::duel_get_spsummoned_cards_this_turn },
-	{ "FlipSummonedCardsThisTurn", scriptlib::duel_get_flip_summoned_cards_this_turn },
+	{ "AddCustomActivityCounter", scriptlib::duel_add_custom_activity_counter },
+	{ "GetCustomActivityCount", scriptlib::duel_get_custom_activity_count },
 	{ "VenomSwampCheck", scriptlib::duel_venom_swamp_check },
 	{ "SwapDeckAndGrave", scriptlib::duel_swap_deck_and_grave },
 	{ "MajesticCopy", scriptlib::duel_majestic_copy },
@@ -545,7 +562,7 @@ int32 interpreter::register_card(card *pcard) {
 	lua_setmetatable(current_state, -2);
 	lua_pop(current_state, 1);
 	//Initial
-	if(pcard->data.code && !(pcard->data.type & TYPE_NORMAL)) {
+	if(pcard->data.code && (!(pcard->data.type & TYPE_NORMAL) || (pcard->data.type & TYPE_PENDULUM))) {
 		pcard->set_status(STATUS_INITIALIZING, TRUE);
 		add_param(pcard, PARAM_TYPE_CARD);
 		call_card_function(pcard, (char*) "initial_effect", 1, 0);
@@ -726,7 +743,7 @@ int32 interpreter::call_function(int32 f, uint32 param_count, uint32 ret_count) 
 		return OPERATION_FAIL;
 	}
 	if (param_count != params.size()) {
-		sprintf(pduel->strbuffer, "\"CallFunction\": incorrect parameter count (%d expected, %d pushed)", param_count, params.size());
+		sprintf(pduel->strbuffer, "\"CallFunction\": incorrect parameter count (%d expected, %ud pushed)", param_count, params.size());
 		handle_message(pduel, 1);
 		params.clear();
 		return OPERATION_FAIL;
@@ -748,14 +765,18 @@ int32 interpreter::call_function(int32 f, uint32 param_count, uint32 ret_count) 
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return OPERATION_FAIL;
 	}
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return OPERATION_SUCCESS;
 }
 int32 interpreter::call_card_function(card* pcard, char* f, uint32 param_count, uint32 ret_count) {
@@ -784,14 +805,18 @@ int32 interpreter::call_card_function(card* pcard, char* f, uint32 param_count, 
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return OPERATION_FAIL;
 	}
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return OPERATION_SUCCESS;
 }
 int32 interpreter::call_code_function(uint32 code, char* f, uint32 param_count, uint32 ret_count) {
@@ -820,14 +845,18 @@ int32 interpreter::call_code_function(uint32 code, char* f, uint32 param_count, 
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return OPERATION_FAIL;
 	}
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return OPERATION_SUCCESS;
 }
 int32 interpreter::check_condition(int32 f, uint32 param_count) {
@@ -843,14 +872,18 @@ int32 interpreter::check_condition(int32 f, uint32 param_count) {
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return result;
 	}
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return OPERATION_FAIL;
 }
 int32 interpreter::check_matching(card* pcard, int32 findex, int32 extraargs) {
@@ -869,16 +902,20 @@ int32 interpreter::check_matching(card* pcard, int32 findex, int32 extraargs) {
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return OPERATION_FAIL;
 	}
 	result = lua_toboolean(current_state, -1);
 	lua_pop(current_state, 1);
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return result;
 }
 int32 interpreter::get_operation_value(card* pcard, int32 findex, int32 extraargs) {
@@ -897,16 +934,20 @@ int32 interpreter::get_operation_value(card* pcard, int32 findex, int32 extraarg
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return OPERATION_FAIL;
 	}
 	result = lua_tointeger(current_state, -1);
 	lua_pop(current_state, 1);
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return result;
 }
 int32 interpreter::get_function_value(int32 f, uint32 param_count) {
@@ -925,14 +966,18 @@ int32 interpreter::get_function_value(int32 f, uint32 param_count) {
 		lua_pop(current_state, 1);
 		no_action--;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return result;
 	}
 	no_action--;
 	call_depth--;
-	if(call_depth == 0)
+	if(call_depth == 0) {
 		pduel->release_script_group();
+		pduel->restore_assumes();
+	}
 	return OPERATION_FAIL;
 }
 int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_value, uint16 step) {
@@ -970,8 +1015,10 @@ int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_va
 			handle_message(pduel, 1);
 			params.clear();
 			call_depth--;
-			if(call_depth == 0)
+			if(call_depth == 0) {
 				pduel->release_script_group();
+				pduel->restore_assumes();
+			}
 			return OPERATION_FAIL;
 		}
 	}
@@ -984,8 +1031,10 @@ int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_va
 			*yield_value = lua_isboolean(rthread, -1) ? lua_toboolean(rthread, -1) : lua_tointeger(rthread, -1);
 		current_state = lua_state;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return COROUTINE_FINISH;
 	} else if (result == LUA_YIELD) {
 		return COROUTINE_YIELD;
@@ -996,8 +1045,10 @@ int32 interpreter::call_coroutine(int32 f, uint32 param_count, uint32 * yield_va
 		lua_pop(rthread, 1);
 		current_state = lua_state;
 		call_depth--;
-		if(call_depth == 0)
+		if(call_depth == 0) {
 			pduel->release_script_group();
+			pduel->restore_assumes();
+		}
 		return COROUTINE_ERROR;
 	}
 }

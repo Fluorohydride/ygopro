@@ -4,7 +4,7 @@ function c5851097.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,0x1c1)
+	e1:SetHintTiming(0,0x1c0)
 	c:RegisterEffect(e1)
 	--disable spsummon
 	local e2=Effect.CreateEffect(c)
@@ -26,15 +26,14 @@ function c5851097.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c5851097.filter(c,tp)
-	local pl=c:GetPreviousLocation()
-	return bit.band(pl,0xd)~=0 and c:IsLocation(LOCATION_GRAVE) and c:GetControler()==tp
+	return c:IsPreviousLocation(LOCATION_DECK+LOCATION_ONFIELD) and c:IsLocation(LOCATION_GRAVE) and c:IsControler(tp)
 end
 function c5851097.descon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c5851097.filter,1,nil,tp)
+	return eg:IsExists(c5851097.filter,1,nil,tp) and e:GetHandler():IsStatus(STATUS_ACTIVATED)
 end
 function c5851097.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return not c:IsStatus(STATUS_CHAINING) end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,c,1,0,0)
 end
 function c5851097.desop(e,tp,eg,ep,ev,re,r,rp)

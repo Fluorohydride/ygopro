@@ -1,4 +1,4 @@
---Spellbook Star Hall
+--魔導書廊エトワール
 function c56321639.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--Activate
@@ -37,6 +37,7 @@ function c56321639.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c56321639.ctcon(e,tp,eg,ep,ev,re,r,rp)
+	if not re then return false end
 	local c=re:GetHandler()
 	return e:GetHandler()~=re:GetHandler() and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:IsSetCard(0x106e)
 end
@@ -65,6 +66,5 @@ function c56321639.thop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		Duel.ShuffleHand(tp)
 	end
 end

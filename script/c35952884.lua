@@ -36,11 +36,17 @@ function c35952884.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_TRIGGER_O+EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e4:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e4:SetCode(EVENT_LEAVE_FIELD)
+	e4:SetCode(EVENT_TO_GRAVE)
 	e4:SetCondition(c35952884.sumcon)
 	e4:SetTarget(c35952884.sumtg)
 	e4:SetOperation(c35952884.sumop)
 	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EVENT_REMOVE)
+	c:RegisterEffect(e5)
+	local e6=e4:Clone()
+	e6:SetCode(EVENT_TO_DECK)
+	c:RegisterEffect(e6)
 end
 function c35952884.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -69,7 +75,7 @@ function c35952884.disop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c35952884.sumcon(e,tp,eg,ep,ev,re,r,rp,chk)
-	return bit.band(e:GetHandler():GetPreviousPosition(),POS_FACEDOWN)==0
+	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c35952884.filter(c,e,tp)
 	return c:GetCode()==24696097 and c:IsCanBeSpecialSummoned(e,0,tp,false,true)

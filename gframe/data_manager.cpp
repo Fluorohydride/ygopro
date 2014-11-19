@@ -27,11 +27,14 @@ bool DataManager::LoadDB(const char* file) {
 			cd.code = sqlite3_column_int(pStmt, 0);
 			cd.ot = sqlite3_column_int(pStmt, 1);
 			cd.alias = sqlite3_column_int(pStmt, 2);
-			cd.setcode = sqlite3_column_int(pStmt, 3);
+			cd.setcode = sqlite3_column_int64(pStmt, 3);
 			cd.type = sqlite3_column_int(pStmt, 4);
 			cd.attack = sqlite3_column_int(pStmt, 5);
 			cd.defence = sqlite3_column_int(pStmt, 6);
-			cd.level = sqlite3_column_int(pStmt, 7);
+			unsigned int level = sqlite3_column_int(pStmt, 7);
+			cd.level = level & 0xff;
+			cd.lscale = (level >> 24) & 0xff;
+			cd.rscale = (level >> 16) & 0xff;
 			cd.race = sqlite3_column_int(pStmt, 8);
 			cd.attribute = sqlite3_column_int(pStmt, 9);
 			cd.category = sqlite3_column_int(pStmt, 10);
@@ -54,7 +57,7 @@ bool DataManager::LoadDB(const char* file) {
 				if(len) {
 					cs.desc[i - 14] = new wchar_t[len + 1];
 					memcpy(cs.desc[i - 14], strBuffer, (len + 1)*sizeof(wchar_t));
-				} else break;
+				} else cs.desc[i - 14] = 0;
 			}
 			_strings.insert(std::make_pair(cd.code, cs));
 		}
@@ -73,7 +76,7 @@ bool DataManager::LoadStrings(const char* file) {
 	char strbuf[256];
 	int value;
 	fseek(fp, 0, SEEK_END);
-	size_t fsize = ftell(fp);
+	int fsize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);
 	fgets(linebuf, 256, fp);
 	while(ftell(fp) < fsize) {
@@ -182,7 +185,15 @@ const wchar_t* DataManager::GetCounterName(int code) {
 const wchar_t* DataManager::GetNumString(int num) {
 	return numStrings[num];
 }
-const wchar_t* DataManager::FormatLocation(int location) {
+const wchar_t* DataManager::FormatLocation(int location, int sequence) {
+	if(location == 0x8) {
+		if(sequence < 5)
+			return GetSysString(1003);
+		else if(sequence == 5)
+			return GetSysString(1008);
+		else
+			return GetSysString(1009);
+	}
 	int filter = 1, i = 1000;
 	while(filter != location) {
 		filter <<= 1;
@@ -205,12 +216,14 @@ const wchar_t* DataManager::FormatAttribute(int attribute) {
 	}
 	if(p != attBuffer)
 		*(p - 1) = 0;
+	else
+		return unknown_string;
 	return attBuffer;
 }
 const wchar_t* DataManager::FormatRace(int race) {
 	wchar_t* p = racBuffer;
 	int filter = 1, i = 1020;
-	for(; filter != 0x800000; filter <<= 1, ++i) {
+	for(; filter != 0x1000000; filter <<= 1, ++i) {
 		if(race & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
@@ -219,12 +232,14 @@ const wchar_t* DataManager::FormatRace(int race) {
 	}
 	if(p != racBuffer)
 		*(p - 1) = 0;
+	else
+		return unknown_string;
 	return racBuffer;
 }
 const wchar_t* DataManager::FormatType(int type) {
 	wchar_t* p = tpBuffer;
 	int filter = 1, i = 1050;
-	for(; filter != 0x1000000; filter <<= 1, ++i) {
+	for(; filter != 0x2000000; filter <<= 1, ++i) {
 		if(type & filter) {
 			BufferIO::CopyWStrRef(GetSysString(i), p, 16);
 			*p = L'|';
@@ -233,6 +248,8 @@ const wchar_t* DataManager::FormatType(int type) {
 	}
 	if(p != tpBuffer)
 		*(p - 1) = 0;
+	else
+		return unknown_string;
 	return tpBuffer;
 }
 int DataManager::CardReader(int code, void* pData) {

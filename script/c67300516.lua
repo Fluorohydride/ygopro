@@ -15,7 +15,7 @@ function c67300516.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c67300516.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetTurnPlayer()==tp and Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c67300516.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end

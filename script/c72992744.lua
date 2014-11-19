@@ -14,7 +14,7 @@ function c72992744.atkcon(e)
 	return not Duel.IsExistingMatchingCard(nil,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function c72992744.filter(c)
-	return c:GetSequence()~=5
+	return c:GetSequence()<5
 end
 function c72992744.atkval(e,c)
 	return Duel.GetMatchingGroupCount(c72992744.filter,0,LOCATION_SZONE,LOCATION_SZONE,nil)*1000

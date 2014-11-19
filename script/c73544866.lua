@@ -16,7 +16,7 @@ function c73544866.initial_effect(c)
 	--negate
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_BATTLE_END)
+	e4:SetCode(EVENT_BATTLED)
 	e4:SetOperation(c73544866.negop)
 	c:RegisterEffect(e4)
 	--atkup
@@ -38,7 +38,7 @@ end
 function c73544866.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if bc:IsType(TYPE_EFFECT) and bc:IsStatus(STATUS_BATTLE_DESTROYED) then
+	if bc and bc:IsType(TYPE_EFFECT) and bc:IsStatus(STATUS_BATTLE_DESTROYED) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DISABLE)

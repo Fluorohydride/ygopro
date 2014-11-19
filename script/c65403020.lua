@@ -10,11 +10,11 @@ function c65403020.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c65403020.gfilter(c)
-	return c:IsLocation(LOCATION_GRAVE) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsLocation(LOCATION_GRAVE)
 end
 function c65403020.condition(e,tp,eg,ep,ev,re,r,rp)
 	local loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if loc==LOCATION_GRAVE and not Duel.IsPlayerAffectedByEffect(rp,EFFECT_NECRO_VALLEY) then return true end
+	if loc==LOCATION_GRAVE then return true end
 	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	return g and g:IsExists(c65403020.gfilter,1,nil)

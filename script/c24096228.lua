@@ -16,10 +16,10 @@ function c24096228.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c24096228.cfilter,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,c24096228.cfilter,1,1,REASON_COST+REASON_DISCARD)
 end
-function c24096228.filter1(c,e,tp,eg,ep,ev,re,r,rp)
+function c24096228.filter1(c)
 	return c:IsType(TYPE_SPELL) and c:CheckActivateEffect(false,false,false)~=nil
 end
-function c24096228.filter2(c,e,tp,eg,ep,ev,re,r,rp)
+function c24096228.filter2(c)
 	return c:IsType(TYPE_SPELL) and not c:IsType(TYPE_EQUIP+TYPE_CONTINUOUS) and c:CheckActivateEffect(false,false,false)~=nil
 end
 function c24096228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -35,7 +35,6 @@ function c24096228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 	e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e:SetCategory(0)
-	local ft=Duel.GetLocationCount(tp,LOCATION_SZONE)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)>0 then
 		Duel.SelectTarget(tp,c24096228.filter1,tp,0,LOCATION_GRAVE,1,1,nil)
@@ -45,7 +44,7 @@ function c24096228.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if not tc or not tc:IsRelateToEffect(e) then return end
 	local tpe=tc:GetType()
 	local te=tc:GetActivateEffect()
 	local tg=te:GetTarget()
@@ -54,7 +53,7 @@ function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 	e:SetCategory(te:GetCategory())
 	e:SetProperty(te:GetProperty())
 	Duel.ClearTargetCard()
-	if bit.band(tpe,TYPE_EQUIP+TYPE_CONTINUOUS)~=0 then
+	if bit.band(tpe,TYPE_EQUIP+TYPE_CONTINUOUS)~=0 or tc:IsHasEffect(EFFECT_REMAIN_FIELD) then
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		tc:CreateEffectRelation(te)
@@ -82,9 +81,5 @@ function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 		if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
 		Duel.BreakEffect()
 		if op then op(e,tp,eg,ep,ev,re,r,rp) end
-		if bit.band(tpe,TYPE_FIELD)~=0 then
-			local of=Duel.GetFieldCard(1-tp,LOCATION_SZONE,5)
-			if of then Duel.Destroy(of,REASON_RULE) end
-		end
 	end
 end

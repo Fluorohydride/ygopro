@@ -7,6 +7,7 @@ function c4756629.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetCountLimit(1,4756629)
 	e1:SetCost(c4756629.thcost)
 	e1:SetTarget(c4756629.thtg)
 	e1:SetOperation(c4756629.thop)
@@ -30,19 +31,17 @@ function c4756629.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c4756629.rmfilter(c,tp)
-	return c:IsSetCard(0xa) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
+	return c:IsSetCard(0xa) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemoveAsCost()
 		and Duel.IsExistingTarget(c4756629.filter,tp,LOCATION_GRAVE,0,1,c)
 end
 function c4756629.filter(c)
 	return c:IsSetCard(0xa) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c4756629.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,4756629)==0
-		and Duel.IsExistingMatchingCard(c4756629.rmfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c4756629.rmfilter,tp,LOCATION_GRAVE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c4756629.rmfilter,tp,LOCATION_GRAVE,0,1,1,nil,tp)
-	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
-	Duel.RegisterFlagEffect(tp,4756629,RESET_PHASE+PHASE_END,0,1)
+	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
 function c4756629.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c4756629.filter(chkc) end
@@ -104,7 +103,7 @@ function c4756629.decop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterFlagEffect(tp,4756630,RESET_PHASE+PHASE_END,0,1)
 end
 function c4756629.econ(e)
-	return Duel.GetFlagEffect(tp,4756631)~=0
+	return Duel.GetFlagEffect(e:GetHandlerPlayer(),4756631)~=0
 end
 function c4756629.rfilter(e,c)
 	return c:IsSetCard(0xa)

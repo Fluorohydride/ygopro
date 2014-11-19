@@ -9,7 +9,6 @@ function c51447164.initial_effect(c)
 	e1:SetCategory(CATEGORY_DISABLE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
-	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c51447164.discon)
 	e1:SetCost(c51447164.discost)
@@ -37,7 +36,6 @@ function c51447164.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_REMOVED)
 	e3:SetCountLimit(1)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCondition(c51447164.spcon)
 	e3:SetTarget(c51447164.sptg)
 	e3:SetOperation(c51447164.spop)
@@ -81,11 +79,16 @@ end
 function c51447164.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.Remove(c,POS_FACEUP,REASON_EFFECT)~=0 then
-		c:RegisterFlagEffect(51447164,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,2)
+		if Duel.GetCurrentPhase()==PHASE_STANDBY then
+			c:RegisterFlagEffect(51447164,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,2,Duel.GetTurnCount())
+		else
+			c:RegisterFlagEffect(51447164,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,1)
+		end
 	end
 end
 function c51447164.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(51447164)~=0
+	local label=e:GetHandler():GetFlagEffectLabel(51447164)
+	return label and label~=Duel.GetTurnCount()
 end
 function c51447164.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -17,12 +17,17 @@ function c1945387.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e3:SetCode(EVENT_BATTLE_DESTROYING)
+	e3:SetCondition(c1945387.drcon)
 	e3:SetTarget(c1945387.drtg)
 	e3:SetOperation(c1945387.drop)
 	c:RegisterEffect(e3)
 end
 function c1945387.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+function c1945387.drcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
 end
 function c1945387.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -22,6 +22,7 @@ effect::effect() {
 	description = 0;
 	effect_owner = PLAYER_NONE;
 	card_type = 0;
+	active_type = 0;
 	id = 0;
 	code = 0;
 	type = 0;
@@ -32,6 +33,7 @@ effect::effect() {
 	o_range = 0;
 	reset_count = 0;
 	reset_flag = 0;
+	count_code = 0;
 	category = 0;
 	label = 0;
 	label_object = 0;
@@ -59,7 +61,7 @@ int32 effect::is_available() {
 	if (type & EFFECT_TYPE_SINGLE) {
 		if (handler->current.controler == PLAYER_NONE)
 			return FALSE;
-		if((flag & EFFECT_FLAG_SINGLE_RANGE) && !(range & handler->current.location))
+		if((flag & EFFECT_FLAG_SINGLE_RANGE) && !in_range(handler->current.location, handler->current.sequence))
 			return FALSE;
 		if((flag & EFFECT_FLAG_SINGLE_RANGE) && (handler->current.location & LOCATION_ONFIELD)
 		        && (handler->is_position(POS_FACEDOWN) || !handler->is_status(STATUS_EFFECT_ENABLED)))
@@ -95,7 +97,7 @@ int32 effect::is_available() {
 				return FALSE;
 			if(!(handler->get_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
-			if(!(range & handler->current.location))
+			if(!in_range(handler->current.location, handler->current.sequence))
 				return FALSE;
 			if((handler->current.location & LOCATION_ONFIELD) && !handler->is_position(POS_FACEUP))
 				return FALSE;
@@ -113,16 +115,35 @@ int32 effect::is_available() {
 		status &= ~EFFECT_STATUS_AVAILABLE;
 	return res;
 }
-int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+int32 effect::check_count_limit(uint8 playerid) {
+	if((flag & EFFECT_FLAG_COUNT_LIMIT)) {
+		if(count_code == 0) {
+			if((reset_count & 0xf00) == 0)
+				return FALSE;
+		} else {
+			uint32 code = count_code & 0xfffffff;
+			uint32 count = (reset_count >> 12) & 0xf;
+			if(code == 1) {
+				if(pduel->game_field->get_effect_code((count_code & 0xf0000000) | handler->fieldid, PLAYER_NONE) >= count)
+					return FALSE;
+			} else {
+				if(pduel->game_field->get_effect_code(count_code, playerid) >= count)
+					return FALSE;
+			}
+		}
+	}
+	return TRUE;
+}
+int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if(!(type & EFFECT_TYPE_ACTIONS))
 		return FALSE;
-	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (reset_count & 0xf00) == 0)
+	if(!check_count_limit(playerid))
 		return FALSE;
 	if (!(flag & EFFECT_FLAG_FIELD_ONLY)) {
 		if (type & EFFECT_TYPE_ACTIVATE) {
 			if(handler->current.controler != playerid)
 				return FALSE;
-			if(handler->data.type & TYPE_MONSTER)
+			if(pduel->game_field->check_unique_onfield(handler, playerid))
 				return FALSE;
 			if(!(handler->data.type & TYPE_COUNTER)) {
 				if((code < 1132 || code > 1149) && pduel->game_field->infos.phase == PHASE_DAMAGE && !(flag & EFFECT_FLAG_DAMAGE_STEP))
@@ -133,9 +154,16 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 			if(handler->current.location == LOCATION_HAND) {
 				if((handler->data.type & TYPE_TRAP) && !handler->is_affected_by_effect(EFFECT_TRAP_ACT_IN_HAND))
 					return FALSE;
-				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != handler->current.controler))
-					return FALSE;
-				if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(handler->current.controler, LOCATION_SZONE, handler->current.controler, LOCATION_REASON_TOFIELD) <= 0)
+				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != playerid)) {
+					if(!(handler->data.type & TYPE_QUICKPLAY) || !handler->is_affected_by_effect(EFFECT_QP_ACT_IN_NTPHAND))
+						return FALSE;
+				}
+				if(handler->data.type & TYPE_MONSTER) {
+					if(!(handler->data.type & TYPE_PENDULUM))
+						return FALSE;
+					if(pduel->game_field->player[playerid].list_szone[6] && pduel->game_field->player[playerid].list_szone[7])
+						return FALSE;
+				} else if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(playerid, LOCATION_SZONE, playerid, LOCATION_REASON_TOFIELD) <= 0)
 					return FALSE;
 			} else if(handler->current.location == LOCATION_SZONE) {
 				if(handler->is_position(POS_FACEUP))
@@ -153,7 +181,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 				return FALSE;
 		} else if(!(type & EFFECT_TYPE_CONTINUOUS)) {
 			if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED))
-			        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+			        && (code != EVENT_FLIP) && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
 			if(!(type & (EFFECT_TYPE_FLIP | EFFECT_TYPE_TRIGGER_F))) {
 				if((code < 1132 || code > 1149) && pduel->game_field->infos.phase == PHASE_DAMAGE && !(flag & EFFECT_FLAG_DAMAGE_STEP))
@@ -173,7 +201,7 @@ int32 effect::is_activateable(uint8 playerid, tevent& e, int32 neglect_cond, int
 			if(((type & EFFECT_TYPE_FIELD) || ((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE))) && (handler->current.location & LOCATION_ONFIELD)
 			        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
-			if((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE) && !(handler->current.location & range))
+			if((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE) && !in_range(handler->current.location, handler->current.sequence))
 				return FALSE;
 			if((flag & EFFECT_FLAG_OWNER_RELATE) && !(flag & EFFECT_FLAG_CANNOT_DISABLE) && owner->is_status(STATUS_DISABLED))
 				return FALSE;
@@ -224,7 +252,7 @@ int32 effect::is_action_check(uint8 playerid) {
 	}
 	return TRUE;
 }
-int32 effect::is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+int32 effect::is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if (!neglect_cond && condition) {
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
@@ -268,8 +296,8 @@ int32 effect::is_activate_ready(uint8 playerid, tevent& e, int32 neglect_cond, i
 	}
 	return TRUE;
 }
-int32 effect::is_condition_check(uint8 playerid, tevent& e) {
-	if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (!handler->is_position(POS_FACEUP)))
+int32 effect::is_condition_check(uint8 playerid, const tevent& e) {
+	if(!(type & EFFECT_TYPE_ACTIVATE) && (handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (!handler->is_position(POS_FACEUP)))
 		return FALSE;
 	if(!condition)
 		return TRUE;
@@ -297,7 +325,7 @@ int32 effect::is_condition_check(uint8 playerid, tevent& e) {
 	pduel->game_field->core.reason_player = op;
 	return TRUE;
 }
-int32 effect::is_activate_check(uint8 playerid, tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
+int32 effect::is_activate_check(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	pduel->game_field->save_lp_cost();
 	effect* oreason = pduel->game_field->core.reason_effect;
 	uint8 op = pduel->game_field->core.reason_player;
@@ -395,7 +423,10 @@ int32 effect::is_chainable(uint8 tp) {
 	if((type & EFFECT_TYPE_ACTIVATE) && (sp <= 1) && !(flag & EFFECT_FLAG_COF))
 		return FALSE;
 	if(pduel->game_field->core.current_chain.size()) {
-		if(sp < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
+		if(!(flag & EFFECT_FLAG_FIELD_ONLY) && (type & EFFECT_TYPE_TRIGGER_O) && (handler->current.location == LOCATION_HAND)) {
+			if(pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed() > 2)
+				return FALSE;
+		} else if(sp < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
 			return FALSE;
 	}
 	if(pduel->game_field->core.chain_limit) {
@@ -416,7 +447,7 @@ int32 effect::is_chainable(uint8 tp) {
 }
 int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 	switch (reset_type) {
-	case RESET_EVENT:
+	case RESET_EVENT: {
 		if(!(reset_flag & RESET_EVENT))
 			return FALSE;
 		if(owner != handler)
@@ -425,6 +456,11 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 			return TRUE;
 		return FALSE;
 		break;
+	}
+	case RESET_CARD: {
+		return owner && (owner->data.code == reset_level);
+		break;
+	}
 	case RESET_PHASE: {
 		if(!(reset_flag & RESET_PHASE))
 			return FALSE;
@@ -437,28 +473,34 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 		return FALSE;
 		break;
 	}
-	case RESET_CODE:
-		if(code == reset_level && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS))
-			return TRUE;
-		return FALSE;
+	case RESET_CODE: {
+		return (code == reset_level) && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS);
 		break;
-	case RESET_COPY:
-		if(copy_id == reset_level)
-			return TRUE;
-		return FALSE;
+	}
+	case RESET_COPY: {
+		return copy_id == reset_level;
 		break;
+	}
 	}
 	return FALSE;
 }
-void effect::dec_count() {
+void effect::dec_count(uint32 playerid) {
 	if(!(flag & EFFECT_FLAG_COUNT_LIMIT))
 		return;
-	if((reset_count & 0xf00) == 0)
-		return;
-	reset_count -= 0x100;
+	if(count_code == 0) {
+		if((reset_count & 0xf00) == 0)
+			return;
+		reset_count -= 0x100;
+	} else {
+		uint32 code = count_code & 0xfffffff;
+		if(code == 1)
+			pduel->game_field->add_effect_code((count_code & 0xf0000000) | handler->fieldid, PLAYER_NONE);
+		else
+			pduel->game_field->add_effect_code(count_code, playerid);
+	}
 }
 void effect::recharge() {
-	if(flag & EFFECT_FLAG_COUNT_LIMIT) {
+	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (count_code == 0)) {
 		reset_count &= 0xf0ff;
 		reset_count |= (reset_count >> 4) & 0xf00;
 	}
@@ -508,9 +550,9 @@ int32 effect::check_value_condition(uint32 extraargs) {
 int32 effect::get_speed() {
 	if(!(type & EFFECT_TYPE_ACTIONS))
 		return 0;
-	if(type & EFFECT_TYPE_TRIGGER_O || type & EFFECT_TYPE_TRIGGER_F || type & EFFECT_TYPE_FLIP || type & EFFECT_TYPE_IGNITION)
+	if(type & (EFFECT_TYPE_TRIGGER_O | EFFECT_TYPE_TRIGGER_F | EFFECT_TYPE_IGNITION))
 		return 1;
-	else if(type & EFFECT_TYPE_QUICK_O || type & EFFECT_TYPE_QUICK_F)
+	else if(type & (EFFECT_TYPE_QUICK_O | EFFECT_TYPE_QUICK_F))
 		return 2;
 	else if(type & EFFECT_TYPE_ACTIVATE) {
 		if(handler->data.type & TYPE_MONSTER)
@@ -536,4 +578,13 @@ uint8 effect::get_handler_player() {
 	if(flag & EFFECT_FLAG_FIELD_ONLY)
 		return effect_owner;
 	return handler->current.controler;
+}
+int32 effect::in_range(int32 loc, int32 seq) {
+	if(loc != LOCATION_SZONE)
+		return range & loc;
+	if(seq < 5)
+		return range & LOCATION_SZONE;
+	if(seq == 5)
+		return range & (LOCATION_SZONE | LOCATION_FZONE);
+	return range & LOCATION_PZONE;
 }

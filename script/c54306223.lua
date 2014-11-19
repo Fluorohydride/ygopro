@@ -12,7 +12,6 @@ function c54306223.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_TRIGGER_F+EFFECT_TYPE_FIELD)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(c54306223.acop)
 	c:RegisterEffect(e2)
@@ -40,13 +39,13 @@ function c54306223.acop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(tp,LOCATION_MZONE,i)
-		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) and not tc:IsCode(72677437) then
+		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) then
 			tc:AddCounter(0x9,1)
 		end
 	end
 	for i=0,4 do
 		local tc=Duel.GetFieldCard(1-tp,LOCATION_MZONE,i)
-		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) and not tc:IsCode(72677437) then
+		if tc and tc:IsCanAddCounter(0x9,1) and not tc:IsSetCard(0x50) then
 			tc:AddCounter(0x9,1)
 		end
 	end

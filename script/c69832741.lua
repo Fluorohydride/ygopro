@@ -14,6 +14,7 @@ function c69832741.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_SEND_REPLACE)
 	e1:SetTarget(c69832741.reptg)
 	e1:SetValue(c69832741.repval)
+	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function c69832741.repfilter(c)

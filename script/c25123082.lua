@@ -6,14 +6,10 @@ function c25123082.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetCost(c25123082.cost)
+	e1:SetCountLimit(1,25123082+EFFECT_COUNT_CODE_OATH)
 	e1:SetTarget(c25123082.target)
 	e1:SetOperation(c25123082.activate)
 	c:RegisterEffect(e1)
-end
-function c25123082.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,25123082)==0 end
-	Duel.RegisterFlagEffect(tp,25123082,RESET_PHASE+PHASE_END,EFFECT_FLAG_OATH,1)
 end
 function c25123082.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_SPELLCASTER)

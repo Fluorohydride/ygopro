@@ -14,10 +14,9 @@ function c52786469.initial_effect(c)
 end
 function c52786469.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local d=Duel.GetAttackTarget()
-	if d==c then d=Duel.GetAttacker() end
-	e:SetLabel(d:GetAttack())
-	return true
+	local bc=c:GetBattleTarget()
+	e:SetLabel(bc:GetAttack())
+	return c:IsRelateToBattle() and bc:IsType(TYPE_MONSTER)
 end
 function c52786469.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

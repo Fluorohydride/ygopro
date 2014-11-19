@@ -1,9 +1,10 @@
---Hieratic Seal From the Ashes
+--復活の聖刻印
 function c53670497.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	e1:SetTarget(c53670497.target1)
 	e1:SetOperation(c53670497.activate)
 	c:RegisterEffect(e1)
@@ -34,7 +35,7 @@ function c53670497.filter1(c)
 	return c:IsSetCard(0x69) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function c53670497.filter2(c)
-	return c:IsSetCard(0x69) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and c:IsSetCard(0x69) and c:IsType(TYPE_MONSTER)
 end
 function c53670497.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

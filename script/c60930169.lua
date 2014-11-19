@@ -13,7 +13,7 @@ function c60930169.initial_effect(c)
 		c60930169.global_check=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_BATTLE_END)
+		ge1:SetCode(EVENT_BATTLED)
 		ge1:SetOperation(c60930169.checkop)
 		Duel.RegisterEffect(ge1,0)
 	end
@@ -21,10 +21,10 @@ end
 function c60930169.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local t=Duel.GetAttackTarget()
-	if a and a:IsPosition(POS_DEFENCE) and a:GetDefence()>a:GetAttack() and a:IsStatus(STATUS_BATTLE_DESTROYED) then
+	if a and a:IsDefencePos() and a:GetDefence()>a:GetAttack() and a:IsStatus(STATUS_BATTLE_DESTROYED) then
 		a:RegisterFlagEffect(60930169,RESET_PHASE+PHASE_DAMAGE,0,1)
 	end
-	if t and t:IsPosition(POS_DEFENCE) and t:GetDefence()>t:GetAttack() and t:IsStatus(STATUS_BATTLE_DESTROYED) then
+	if t and t:IsDefencePos() and t:GetDefence()>t:GetAttack() and t:IsStatus(STATUS_BATTLE_DESTROYED) then
 		t:RegisterFlagEffect(60930169,RESET_PHASE+PHASE_DAMAGE,0,1)
 	end
 end

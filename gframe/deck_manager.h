@@ -41,7 +41,7 @@ public:
 	void LoadDeck(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadSide(Deck& deck, int* dbuf, int mainc, int sidec);
 	bool LoadDeck(const wchar_t* file);
-	void SaveDeck(Deck& deck, const wchar_t* name);
+	bool SaveDeck(Deck& deck, const wchar_t* name);
 };
 
 extern DeckManager deckManager;

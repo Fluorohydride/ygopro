@@ -2,11 +2,12 @@
 function c34815282.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE)
+	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
-	e1:SetHintTiming(0,0x1c0)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetHintTiming(TIMING_DAMAGE_STEP,TIMING_DAMAGE_STEP+0x1c0)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetCondition(c34815282.condition)
 	e1:SetTarget(c34815282.target)
 	e1:SetOperation(c34815282.operation)
 	c:RegisterEffect(e1)
@@ -19,8 +20,11 @@ function c34815282.initial_effect(c)
 	e2:SetOperation(c34815282.desop)
 	c:RegisterEffect(e2)
 end
+function c34815282.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+end
 function c34815282.filter(c)
-	return c:IsFaceup() and c:GetBaseAttack()>1000
+	return c:IsFaceup() and c:GetBaseAttack()>1000 and c:GetLevel()>0
 end
 function c34815282.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c34815282.filter(chkc) end
@@ -58,5 +62,5 @@ function c34815282.descon(e,tp,eg,ep,ev,re,r,rp)
 	return tc and eg:IsContains(tc)
 end
 function c34815282.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(), REASON_EFFECT)
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end

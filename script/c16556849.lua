@@ -26,9 +26,9 @@ function c16556849.filter(c,atk)
 end
 function c16556849.tg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c16556849.filter(chkc,e:GetHandler():GetAttack()) end
-	if chk==0 then return Duel.IsExistingTarget(c16556849.filter,tp,0,LOCATION_MZONE,1,nil,e:GetHandler():GetAttack()) end
+	if chk==0 then return Duel.IsExistingTarget(c16556849.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetHandler():GetAttack()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c16556849.filter,tp,0,LOCATION_MZONE,1,1,nil,e:GetHandler():GetAttack())
+	local g=Duel.SelectTarget(tp,c16556849.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil,e:GetHandler():GetAttack())
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c16556849.op(e,tp,eg,ep,ev,re,r,rp)

@@ -14,10 +14,7 @@ function c46572756.initial_effect(c)
 end
 function c46572756.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local pos=c:GetPreviousPosition()
-	if Duel.GetCurrentPhase()==PHASE_DAMAGE and c==Duel.GetAttackTarget() then pos=c:GetBattlePosition() end
-	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY)
-		and bit.band(pos,POS_FACEUP)~=0
+	return c:IsPreviousLocation(LOCATION_ONFIELD) and c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c46572756.filter(c)
 	return c:IsSetCard(0x2) and c:IsAbleToDeck()

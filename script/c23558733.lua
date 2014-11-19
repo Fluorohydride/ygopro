@@ -10,7 +10,7 @@ function c23558733.initial_effect(c)
 	--damage
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_BATTLE_END)
+	e2:SetCode(EVENT_BATTLED)
 	e2:SetOperation(c23558733.desop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)

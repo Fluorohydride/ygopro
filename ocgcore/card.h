@@ -21,19 +21,24 @@ class group;
 struct card_data {
 	uint32 code;
 	uint32 alias;
-	uint32 setcode;
+	uint64 setcode;
 	uint32 type;
 	uint32 level;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
 	int32 defence;
+	uint32 lscale;
+	uint32 rscale;
 };
 
 struct card_state {
 	uint32 code;
 	uint32 type;
 	uint32 level;
+	uint32 rank;
+	uint32 lscale;
+	uint32 rscale;
 	uint32 attribute;
 	uint32 race;
 	int32 attack;
@@ -65,6 +70,8 @@ struct query_cache {
 	uint32 reason;
 	int32 is_public;
 	int32 is_disabled;
+	uint32 lscale;
+	uint32 rscale;
 };
 
 class card {
@@ -73,7 +80,7 @@ public:
 	typedef std::multimap<uint32, effect*> effect_container;
 	typedef std::set<card*, card_sort> card_set;
 	typedef std::map<effect*, effect_container::iterator> effect_indexer;
-	typedef std::set<effect*> effect_relation;
+	typedef std::map<effect*, uint32> effect_relation;
 	typedef std::map<card*, uint32> relation_map;
 	typedef std::map<uint16, uint16> counter_map;
 	typedef std::map<uint16, card*> attacker_map;
@@ -87,7 +94,7 @@ public:
 	query_cache q_cache;
 	uint8 owner;
 	uint8 summon_player;
-	uint32 summon_type;
+	uint32 summon_info;
 	uint32 status;
 	uint32 operation_param;
 	uint8 announce_count;
@@ -98,6 +105,12 @@ public:
 	uint32 fieldid_r;
 	uint16 turnid;
 	uint16 turn_counter;
+	uint8 unique_pos[2];
+	uint16 unique_uid;
+	uint32 unique_code;
+	uint8 assume_type;
+	uint32 assume_value;
+	effect* unique_effect;
 	card* equiping_target;
 	card* pre_equip_target;
 	card* overlay_target;
@@ -125,6 +138,7 @@ public:
 	uint32 get_infos(byte* buf, int32 query_flag, int32 use_cache = TRUE);
 	uint32 get_info_location();
 	uint32 get_code();
+	uint32 get_another_code();
 	int32 is_set_card(uint32 set_code);
 	uint32 get_type();
 	int32 get_base_attack(uint8 swap = FALSE);
@@ -138,6 +152,8 @@ public:
 	uint32 is_xyz_level(card* pcard, uint32 lv);
 	uint32 get_attribute();
 	uint32 get_race();
+	uint32 get_lscale();
+	uint32 get_rscale();
 	int32 is_position(int32 pos);
 	void set_status(uint32 status, int32 enabled);
 	int32 get_status(uint32 status);
@@ -170,9 +186,9 @@ public:
 	void release_relation(effect* peffect);
 	int32 leave_field_redirect(uint32 reason);
 	int32 destination_redirect(uint8 destination, uint32 reason);
-	int32 add_counter(uint16 countertype, uint16 count);
+	int32 add_counter(uint8 playerid, uint16 countertype, uint16 count);
 	int32 remove_counter(uint16 countertype, uint16 count);
-	int32 is_can_add_counter(uint16 countertype, uint16 count);
+	int32 is_can_add_counter(uint8 playerid, uint16 countertype, uint16 count);
 	int32 get_counter(uint16 countertype);
 	void set_material(card_set* materials);
 	void add_card_target(card* pcard);
@@ -185,6 +201,7 @@ public:
 	int32 filter_summon_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
 	int32 filter_set_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
 	void filter_spsummon_procedure(uint8 playerid, effect_set* eset);
+	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
 	effect* is_affected_by_effect(int32 code, card* target);
 	effect* check_equip_control_effect();
@@ -195,7 +212,7 @@ public:
 	int32 is_summonable();
 	int32 is_summonable(effect* peffect);
 	int32 is_can_be_summoned(uint8 playerid, uint8 ingore_count, effect* peffect);
-	int32 get_summon_tribute_count();
+	int32 get_summon_tribute_count(uint8 ignore_count = 0);
 	int32 get_set_tribute_count();
 	int32 is_can_be_flip_summoned(uint8 playerid);
 	int32 is_special_summonable(uint8 playerid);
@@ -227,7 +244,7 @@ public:
 	int32 is_control_can_be_changed();
 	int32 is_capable_be_battle_target(card* pcard);
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
-	int32 is_can_be_fusion_material();
+	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
 	int32 is_can_be_xyz_material(card* scard);
 };
@@ -242,6 +259,8 @@ public:
 #define LOCATION_EXTRA		0x40		//
 #define LOCATION_OVERLAY	0x80		//
 #define LOCATION_ONFIELD	0x0c		//
+#define LOCATION_FZONE		0x100		//
+#define LOCATION_PZONE		0x200		//
 //Positions
 #define POS_FACEUP_ATTACK		0x1
 #define POS_FACEDOWN_ATTACK		0x2
@@ -275,6 +294,7 @@ public:
 #define TYPE_FLIP			0x200000	//
 #define TYPE_TOON			0x400000	//
 #define TYPE_XYZ			0x800000	//
+#define TYPE_PENDULUM		0x1000000	//
 
 //Attributes
 #define ATTRIBUTE_EARTH		0x01		//
@@ -308,6 +328,7 @@ public:
 #define RACE_PSYCHO			0x100000	//
 #define RACE_DEVINE			0x200000	//
 #define RACE_CREATORGOD		0x400000	//
+#define RACE_PHANTOMDRAGON		0x800000	//
 //Reason
 #define REASON_DESTROY		0x1		//
 #define REASON_RELEASE		0x2		//
@@ -350,7 +371,7 @@ public:
 #define STATUS_TO_DISABLE			0x0004	//
 #define STATUS_PROC_COMPLETE		0x0008	//
 #define STATUS_SET_TURN				0x0010	//
-#define STATUS_FLIP_SUMMONED		0x0020	//
+#define STATUS_NO_LEVEL				0x0020	//
 #define STATUS_REVIVE_LIMIT			0x0040	//
 #define STATUS_ATTACKED				0x0080	//
 #define STATUS_FORM_CHANGED			0x0100	//
@@ -398,5 +419,15 @@ public:
 #define QUERY_OWNER			0x40000
 #define QUERY_IS_DISABLED	0x80000
 #define QUERY_IS_PUBLIC		0x100000
+#define QUERY_LSCALE		0x200000
+#define QUERY_RSCALE		0x400000
 
+#define ASSUME_CODE			1
+#define ASSUME_TYPE			2
+#define ASSUME_LEVEL		3
+#define ASSUME_RANK			4
+#define ASSUME_ATTRIBUTE	5
+#define ASSUME_RACE			6
+#define ASSUME_ATTACK		7
+#define ASSUME_DEFENCE		8
 #endif /* CARD_H_ */
