@@ -4536,9 +4536,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				return FALSE;
 			}
 		}
-		if(cait->opinfos.count(0x200))
-			core.spsummon_state_count[cait->triggering_player]--;
 		core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
+		core.units.begin()->arg2 = core.spsummon_state_count[cait->triggering_player];
 		if(cait->replace_op)
 			cait->triggering_effect->operation = cait->replace_op;
 		if(cait->triggering_effect->operation) {
@@ -4550,6 +4549,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	case 3: {
 		effect* peffect = cait->triggering_effect;
 		peffect->operation = (ptr)core.units.begin()->peffect;
+		if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
+			core.spsummon_state_count[cait->triggering_player]--;
 		if(core.special_summoning.size())
 			core.special_summoning.clear();
 		if(core.equiping_cards.size())

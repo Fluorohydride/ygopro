@@ -496,7 +496,7 @@ int32 card::get_defence(uint8 swap) {
 	return def;
 }
 uint32 card::get_level() {
-	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0 || (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP)))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
@@ -529,7 +529,7 @@ uint32 card::get_level() {
 	return level;
 }
 uint32 card::get_rank() {
-	if(!(data.type & TYPE_XYZ))
+	if(!(data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	if(assume_type == ASSUME_RANK)
 		return assume_value;
@@ -562,7 +562,7 @@ uint32 card::get_rank() {
 	return rank;
 }
 uint32 card::get_synchro_level(card* pcard) {
-	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0 || (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP)))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	uint32 lev;
 	effect_set eset;
@@ -574,7 +574,7 @@ uint32 card::get_synchro_level(card* pcard) {
 	return lev;
 }
 uint32 card::get_ritual_level(card* pcard) {
-	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0 || (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP)))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	uint32 lev;
 	effect_set eset;
@@ -586,7 +586,7 @@ uint32 card::get_ritual_level(card* pcard) {
 	return lev;
 }
 uint32 card::is_xyz_level(card* pcard, uint32 lv) {
-	if(data.type & TYPE_XYZ || single_effect.count(0x14d72c34)>0 || (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP)))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return FALSE;
 	uint32 lev;
 	effect_set eset;
@@ -1825,8 +1825,6 @@ int32 card::is_special_summonable(uint8 playerid) {
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
-		return FALSE;
-	if(current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE))
 		return FALSE;
 	pduel->game_field->save_lp_cost();
 	effect_set eset;

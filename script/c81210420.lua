@@ -68,7 +68,7 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 		e5:SetCode(EFFECT_SET_BASE_DEFENCE)
 		e5:SetValue(0)
 		tg:RegisterEffect(e5,true)
-		tg:RegisterFlagEffect(81210420,RESET_EVENT+0x47c0000+RESET_PHASE+PHASE_BATTLE,0,1)
+		tg:SetStatus(STATUS_NO_LEVEL)
 		tg=sg:GetNext()
 	end
 	Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEDOWN_DEFENCE)
