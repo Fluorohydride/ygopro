@@ -240,9 +240,9 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 						and (not op or op(e,tp,0))
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
-						if op then op(e,tp,1) end
 						local mg=Duel.SelectMatchingCard(tp,alterf,tp,LOCATION_MZONE,0,1,1,nil)
 						local mg2=mg:GetFirst():GetOverlayGroup()
+						if op then op(e,tp,1) end
 						if mg2:GetCount()~=0 then
 							Duel.Overlay(c,mg2)
 						end
