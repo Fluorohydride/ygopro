@@ -37,10 +37,10 @@ function c36776089.retcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c36776089.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetLabelObject(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,e:GetHandler():GetBattleTarget(),1,0,0)
 end
 function c36776089.retop(e,tp,eg,ep,ev,re,r,rp)
-	local bc=e:GetLabelObject()
+	local bc=e:GetHandler():GetBattleTarget()
 	if bc:IsRelateToBattle() then
 		Duel.SendtoHand(bc,nil,REASON_EFFECT)
 	end
