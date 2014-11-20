@@ -68,7 +68,7 @@ function c87288189.operation(e,tp,eg,ep,ev,re,r,rp)
 		local tc=og:GetFirst()
 		while tc do
 			if tc:IsAttribute(ATTRIBUTE_DARK) then
-				local sg=Duel.GetMatchingGroup(Card.IsCode,tp,0x53,0,nil,tc:GetCode())
+				local sg=Duel.GetMatchingGroup(Card.IsCode,tc:GetControler(),0x53,0,nil,tc:GetCode())
 				rg:Merge(sg)
 			end
 			tc=og:GetNext()

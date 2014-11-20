@@ -296,6 +296,8 @@ uint32 card::get_type() {
 	return type;
 }
 int32 card::get_base_attack(uint8 swap) {
+	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
 	if (temp.base_attack != -1)
@@ -322,6 +324,8 @@ int32 card::get_base_attack(uint8 swap) {
 int32 card::get_attack(uint8 swap) {
 	if(assume_type == ASSUME_ATTACK)
 		return assume_value;
+	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
 	if (temp.attack != -1)
@@ -392,6 +396,8 @@ int32 card::get_attack(uint8 swap) {
 	return atk;
 }
 int32 card::get_base_defence(uint8 swap) {
+	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
 	if (temp.base_defence != -1)
@@ -418,6 +424,8 @@ int32 card::get_base_defence(uint8 swap) {
 int32 card::get_defence(uint8 swap) {
 	if(assume_type == ASSUME_DEFENCE)
 		return assume_value;
+	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
 	if (temp.defence != -1)
@@ -488,7 +496,7 @@ int32 card::get_defence(uint8 swap) {
 	return def;
 }
 uint32 card::get_level() {
-	if(data.type & TYPE_XYZ)
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
@@ -521,7 +529,7 @@ uint32 card::get_level() {
 	return level;
 }
 uint32 card::get_rank() {
-	if(!(data.type & TYPE_XYZ))
+	if(!(data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	if(assume_type == ASSUME_RANK)
 		return assume_value;
@@ -554,7 +562,7 @@ uint32 card::get_rank() {
 	return rank;
 }
 uint32 card::get_synchro_level(card* pcard) {
-	if(data.type & TYPE_XYZ)
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	uint32 lev;
 	effect_set eset;
@@ -566,7 +574,7 @@ uint32 card::get_synchro_level(card* pcard) {
 	return lev;
 }
 uint32 card::get_ritual_level(card* pcard) {
-	if(data.type & TYPE_XYZ)
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return 0;
 	uint32 lev;
 	effect_set eset;
@@ -578,7 +586,7 @@ uint32 card::get_ritual_level(card* pcard) {
 	return lev;
 }
 uint32 card::is_xyz_level(card* pcard, uint32 lv) {
-	if(data.type & TYPE_XYZ)
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return FALSE;
 	uint32 lev;
 	effect_set eset;
@@ -594,9 +602,9 @@ uint32 card::is_xyz_level(card* pcard, uint32 lv) {
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
+	if(current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+		return 0;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
-		return data.attribute;
-	if((current.location == LOCATION_GRAVE) && (data.type & (TYPE_SPELL + TYPE_TRAP)))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
@@ -621,9 +629,9 @@ uint32 card::get_attribute() {
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
 		return assume_value;
+	if(current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+		return 0;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
-		return data.race;
-	if((current.location == LOCATION_GRAVE) && (data.type & (TYPE_SPELL + TYPE_TRAP)))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
@@ -1817,8 +1825,6 @@ int32 card::is_special_summonable(uint8 playerid) {
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
-		return FALSE;
-	if(current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE))
 		return FALSE;
 	pduel->game_field->save_lp_cost();
 	effect_set eset;
