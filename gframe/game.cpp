@@ -81,11 +81,11 @@ bool Game::Initialize() {
 	wLanWindow->getCloseButton()->setVisible(false);
 	wLanWindow->setVisible(false);
 	env->addStaticText(dataManager.GetSysString(1220), rect<s32>(10, 30, 220, 50), false, false, wLanWindow);
-	ebNickName = env->addEditBox(gameConf.nickname, rect<s32>(110, 25, 450, 50), true, wLanWindow);
+	ebNickName = env->addEditBox(gameConf.nickname, rect<s32>(60, 25, 330, 50), true, wLanWindow);
 	ebNickName->setTextAlignment(irr::gui::EGUIA_UPPERLEFT, irr::gui::EGUIA_CENTER);
 	lstHostList = env->addListBox(rect<s32>(10, 60, 570, 320), wLanWindow, LISTBOX_LAN_HOST, true);
 	lstHostList->setItemHeight(18);
-	btnLanRefresh = env->addButton(rect<s32>(240, 325, 340, 350), wLanWindow, BUTTON_LAN_REFRESH, dataManager.GetSysString(1217));
+	btnLanRefresh = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_LAN_REFRESH, dataManager.GetSysString(1217));
 	env->addStaticText(dataManager.GetSysString(1221), rect<s32>(10, 360, 220, 380), false, false, wLanWindow);
 	ebJoinIP = env->addEditBox(gameConf.lastip, rect<s32>(110, 355, 250, 380), true, wLanWindow);
 	ebJoinIP->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
@@ -96,7 +96,7 @@ bool Game::Initialize() {
 	ebJoinPass->setTextAlignment(irr::gui::EGUIA_CENTER, irr::gui::EGUIA_CENTER);
 	btnJoinHost = env->addButton(rect<s32>(460, 355, 570, 380), wLanWindow, BUTTON_JOIN_HOST, dataManager.GetSysString(1223));
 	btnJoinCancel = env->addButton(rect<s32>(460, 385, 570, 410), wLanWindow, BUTTON_JOIN_CANCEL, dataManager.GetSysString(1212));
-	btnCreateHost = env->addButton(rect<s32>(460, 25, 570, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));
+	btnCreateHost = env->addButton(rect<s32>(340, 25, 450, 50), wLanWindow, BUTTON_CREATE_HOST, dataManager.GetSysString(1224));
 	//create host
 	wCreateHost = env->addWindow(rect<s32>(320, 100, 700, 520), false, dataManager.GetSysString(1224));
 	wCreateHost->getCloseButton()->setVisible(false);
