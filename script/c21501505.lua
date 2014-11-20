@@ -1,7 +1,7 @@
 --暗遷士 カンゴルゴーム
 function c21501505.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--replace
 	local e1=Effect.CreateEffect(c)

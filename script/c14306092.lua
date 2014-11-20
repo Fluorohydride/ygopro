@@ -1,7 +1,7 @@
 --牙鮫帝シャーク・カイゼル
 function c14306092.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),3,nil,nil,5)
+	aux.AddXyzProcedure(c,nil,3,3,nil,nil,5)
 	c:EnableReviveLimit()
 	--counter
 	local e1=Effect.CreateEffect(c)

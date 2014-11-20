@@ -1,7 +1,7 @@
 --星輝士 デルタテロス
 function c56638325.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--act limit
 	local e1=Effect.CreateEffect(c)

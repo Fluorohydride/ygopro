@@ -1,7 +1,7 @@
 --No.81 超弩級砲塔列車スペリオル・ドーラ
 function c49032236.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,10),2)
+	aux.AddXyzProcedure(c,nil,10,2)
 	c:EnableReviveLimit()
 	--immune
 	local e1=Effect.CreateEffect(c)

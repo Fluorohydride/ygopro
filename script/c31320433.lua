@@ -1,7 +1,7 @@
 --No.47 ナイトメア·シャーク
 function c31320433.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--charge
 	local e1=Effect.CreateEffect(c)

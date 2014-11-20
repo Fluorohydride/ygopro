@@ -2413,33 +2413,43 @@ int32 scriptlib::duel_get_operation_count(lua_State *L) {
 	return 1;
 }
 int32 scriptlib::duel_check_xyz_material(lua_State *L) {
-	check_param_count(L, 5);
+	check_param_count(L, 6);
 	check_param(L, PARAM_TYPE_CARD, 1);
-	check_param(L, PARAM_TYPE_FUNCTION, 2);
-	card* scard = *(card**) lua_touserdata(L, 1);
-	uint32 minc = lua_tointeger(L, 3);
-	uint32 maxc = lua_tointeger(L, 4);
-	group* mg = nullptr;
-	if(!lua_isnil(L, 5)) {
-		check_param(L, PARAM_TYPE_GROUP, 5);
-		mg = *(group**) lua_touserdata(L, 5);
+	uint32 findex = 0;
+	if(!lua_isnil(L, 2)) {
+		check_param(L, PARAM_TYPE_FUNCTION, 2);
+		findex = 2;
 	}
-	lua_pushboolean(L, scard->pduel->game_field->check_xyz_material(scard, 2, minc, maxc, mg));
+	card* scard = *(card**) lua_touserdata(L, 1);
+	uint32 lv = lua_tointeger(L, 3);
+	uint32 minc = lua_tointeger(L, 4);
+	uint32 maxc = lua_tointeger(L, 5);
+	group* mg = nullptr;
+	if(!lua_isnil(L, 6)) {
+		check_param(L, PARAM_TYPE_GROUP, 6);
+		mg = *(group**) lua_touserdata(L, 6);
+	}
+	lua_pushboolean(L, scard->pduel->game_field->check_xyz_material(scard, findex, lv, minc, maxc, mg));
 	return 1;
 }
 int32 scriptlib::duel_select_xyz_material(lua_State *L) {
 	check_action_permission(L);
-	check_param_count(L, 5);
+	check_param_count(L, 6);
 	check_param(L, PARAM_TYPE_CARD, 2);
-	check_param(L, PARAM_TYPE_FUNCTION, 3);
+	uint32 findex = 0;
+	if(!lua_isnil(L, 3)) {
+		check_param(L, PARAM_TYPE_FUNCTION, 3);
+		findex = 3;
+	}
 	card* scard = *(card**) lua_touserdata(L, 2);
 	uint32 playerid = lua_tointeger(L, 1);
-	uint32 minc = lua_tointeger(L, 4);
-	uint32 maxc = lua_tointeger(L, 5);
+	uint32 lv = lua_tointeger(L, 4);
+	uint32 minc = lua_tointeger(L, 5);
+	uint32 maxc = lua_tointeger(L, 6);
 	field::card_set mat, cset;
 	duel* pduel = scard->pduel;
-	pduel->game_field->get_xyz_material(scard, 3, maxc);
-	scard->pduel->game_field->add_process(PROCESSOR_SELECT_XMATERIAL, 0, 0, (group*)scard, playerid, minc + (maxc << 16));
+	pduel->game_field->get_xyz_material(scard, findex, lv, maxc);
+	scard->pduel->game_field->add_process(PROCESSOR_SELECT_XMATERIAL, 0, 0, (group*)scard, playerid + (lv << 16), minc + (maxc << 16));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_overlay(lua_State *L) {

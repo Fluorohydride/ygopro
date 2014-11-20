@@ -597,7 +597,7 @@ uint32 card::is_xyz_level(card* pcard, uint32 lv) {
 		lev = eset[0]->get_value(2);
 	} else
 		lev = get_level();
-	return ((lev & 0xffff) == lv) || ((lev >> 16) == lv);
+	return ((lev & 0xfff) == lv) || (((lev >> 16) & 0xfff) == lv);
 }
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)

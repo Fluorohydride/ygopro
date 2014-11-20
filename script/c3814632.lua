@@ -1,7 +1,7 @@
 --超巨大空中宮殿ガンガリディア
 function c3814632.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,10),2)
+	aux.AddXyzProcedure(c,nil,10,2)
 	c:EnableReviveLimit()
 	--destroy&damage
 	local e1=Effect.CreateEffect(c)

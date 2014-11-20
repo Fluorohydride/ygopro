@@ -103,16 +103,6 @@ function Auxiliary.FilterBoolFunction(f,a,b,c)
 				return f(target,a,b,c)
 			end
 end
-function Auxiliary.XyzFilterFunction(xyzc,lv)
-	return 	function(target)
-				return target:IsXyzLevel(xyzc,lv)
-			end
-end
-function Auxiliary.XyzFilterFunctionF(xyzc,f,lv)
-	return 	function(target)
-				return f(target) and target:IsXyzLevel(xyzc,lv)
-			end
-end
 function Auxiliary.NonTuner(f,a,b,c)
 	return	function(target)
 				return target:IsNotTuner() and (not f or f(target,a,b,c))
@@ -169,7 +159,7 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
 end
-function Auxiliary.AddXyzProcedure(c,f,ct,alterf,desc,maxct,op)
+function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	if c.xyz_filter==nil then
 		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
@@ -183,38 +173,38 @@ function Auxiliary.AddXyzProcedure(c,f,ct,alterf,desc,maxct,op)
 	e1:SetRange(LOCATION_EXTRA)
 	if not maxct then maxct=ct end
 	if alterf then
-		e1:SetCondition(Auxiliary.XyzCondition2(f,ct,maxct,alterf,desc,op))
-		e1:SetOperation(Auxiliary.XyzOperation2(f,ct,maxct,alterf,desc,op))
+		e1:SetCondition(Auxiliary.XyzCondition2(f,lv,ct,maxct,alterf,desc,op))
+		e1:SetOperation(Auxiliary.XyzOperation2(f,lv,ct,maxct,alterf,desc,op))
 	else
-		e1:SetCondition(Auxiliary.XyzCondition(f,ct,maxct))
-		e1:SetOperation(Auxiliary.XyzOperation(f,ct,maxct))
+		e1:SetCondition(Auxiliary.XyzCondition(f,lv,ct,maxct))
+		e1:SetOperation(Auxiliary.XyzOperation(f,lv,ct,maxct))
 	end
 	e1:SetValue(SUMMON_TYPE_XYZ)
 	c:RegisterEffect(e1)
 end
-function Auxiliary.XyzCondition(f,minc,maxc)
+function Auxiliary.XyzCondition(f,lv,minc,maxc)
 	--og: use special material
 	return	function(e,c,og)
 				if c==nil then return true end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
+				return Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
 			end
 end
-function Auxiliary.XyzOperation(f,minc,maxc)
+function Auxiliary.XyzOperation(f,lv,minc,maxc)
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,og)
 				if og then
 					c:SetMaterial(og)
 					Duel.Overlay(c,og)
 				else
-					local mg=Duel.SelectXyzMaterial(tp,c,f,minc,maxc)
+					local mg=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
 					c:SetMaterial(mg)
 					Duel.Overlay(c,mg)
 				end
 			end
 end
-function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc,op)
+function Auxiliary.XyzCondition2(f,lv,minc,maxc,alterf,desc,op)
 	return	function(e,c,og)
 				if c==nil then return true end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
@@ -224,10 +214,10 @@ function Auxiliary.XyzCondition2(f,minc,maxc,alterf,desc,op)
 					and (not op or op(e,c:GetControler(),0)) then
 					return true
 				end
-				return Duel.CheckXyzMaterial(c,f,minc,maxc,og)
+				return Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
 			end
 end
-function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
+function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,og)
 				if og then
 					c:SetMaterial(og)
@@ -249,7 +239,7 @@ function Auxiliary.XyzOperation2(f,minc,maxc,alterf,desc,op)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
 					else
-						local mg=Duel.SelectXyzMaterial(tp,c,f,minc,maxc)
+						local mg=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
 					end

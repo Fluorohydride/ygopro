@@ -1,7 +1,7 @@
 --水精鱗－アビストリーテ
 function c59170782.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),3)
+	aux.AddXyzProcedure(c,nil,3,3)
 	c:EnableReviveLimit()
 	--change target
 	local e1=Effect.CreateEffect(c)

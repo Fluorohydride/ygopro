@@ -1,7 +1,7 @@
 --CXダーク・フェアリー・チア・ガール
 function c23454876.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--draw
 	local e1=Effect.CreateEffect(c)

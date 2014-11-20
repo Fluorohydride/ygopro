@@ -1,7 +1,7 @@
 --プリンセス・コロン
 function c75574498.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--spsummon1
 	local e1=Effect.CreateEffect(c)

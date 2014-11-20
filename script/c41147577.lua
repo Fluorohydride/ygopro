@@ -1,7 +1,7 @@
 --CX 風紀大宮司サイモン
 function c41147577.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,nil,7,3)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --セイクリッド・トレミスM7
 function c38495396.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2,c38495396.ovfilter,aux.Stringid(38495396,1),2,c38495396.xyzop)
+	aux.AddXyzProcedure(c,nil,6,2,c38495396.ovfilter,aux.Stringid(38495396,1),2,c38495396.xyzop)
 	c:EnableReviveLimit()
 	--to hand
 	local e2=Effect.CreateEffect(c)
