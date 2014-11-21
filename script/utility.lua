@@ -933,3 +933,59 @@ function Auxiliary.PendOperation()
 				end
 			end
 end
+function Auxiliary.spchk1(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	local p1=false
+	local p2=false
+	while tc do
+		if tc:IsCode(e:GetHandler():GetOriginalCode()) then
+			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
+		end
+		tc=eg:GetNext()
+	end
+	if p1 then Duel.RegisterFlagEffect(0,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) end
+	if p2 then Duel.RegisterFlagEffect(1,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) end
+end
+function Auxiliary.spchk2(e,tp,eg,ep,ev,re,r,rp)
+	local ex,tg,ct,sp=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
+	local p=PLAYER_NONE
+	local p1=false
+	local p2=false
+	if ex and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
+		if sp==PLAYER_ALL then
+			local g1=re:GetLabelObject()
+			local g2=nil
+			if tg then 
+				g2=tg:Clone()
+				g2:Sub(g1)
+			end
+			if g1 and g1:IsExists(Card.IsCode,1,nil,e:GetHandler():GetOriginalCode()) then 
+				Duel.RegisterFlagEffect(rp,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1)  end
+			if g2 and g2:IsExists(Card.IsCode,1,nil,e:GetHandler():GetOriginalCode()) then 
+				Duel.RegisterFlagEffect(1-rp,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) end
+		else
+			if tg and tg:IsExists(Card.IsCode,1,nil,e:GetHandler():GetOriginalCode()) then 
+				Duel.RegisterFlagEffect(rp,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) end
+		end
+	end
+end
+function Auxiliary.spchk3(e,tp,eg,ep,ev,re,r,rp)
+	local ex,tg,ct,sp=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
+	if ex and re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then
+		if sp==PLAYER_ALL then
+			local g1=re:GetLabelObject()
+			local g2=nil
+			if tg then 
+				g2=tg:Clone()
+				g2:Sub(g1)
+			end
+			if g1 and g1:IsExists(Card.IsCode,1,nil,e:GetHandler():GetOriginalCode()) then 
+				Duel.ResetFlagEffect(rp,e:GetHandler():GetOriginalCode()) end
+			if g2 and g2:IsExists(Card.IsCode,1,nil,e:GetHandler():GetOriginalCode()) then 
+				Duel.ResetFlagEffect(1-rp,e:GetHandler():GetOriginalCode()) end
+		else
+			if tg and tg:IsExists(Card.IsCode,1,nil,e:GetHandler():GetOriginalCode()) then 
+				Duel.ResetFlagEffect(rp,e:GetHandler():GetOriginalCode()) end
+		end
+	end
+end

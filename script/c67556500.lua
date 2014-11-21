@@ -13,12 +13,31 @@ function c67556500.initial_effect(c)
 	e1:SetTarget(c67556500.lvtg)
 	e1:SetOperation(c67556500.lvop)
 	c:RegisterEffect(e1)
-	--
+	--spsummon limit
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetOperation(c67556500.regop)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_SPSUMMON_COST)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetCost(c67556500.spcost)
 	c:RegisterEffect(e2)
+	if not c67556500.global_check then
+		c67556500.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON)
+		ge1:SetOperation(aux.spchk1)
+		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_CHAINING)
+		ge2:SetOperation(aux.spchk2)
+		Duel.RegisterEffect(ge2,0)
+		local ge3=Effect.CreateEffect(c)
+		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge3:SetCode(EVENT_CHAIN_NEGATED)
+		ge3:SetOperation(aux.spchk3)
+		Duel.RegisterEffect(ge3,0)
+	end
 end
 function c67556500.lvcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
@@ -62,16 +81,6 @@ end
 function c67556500.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return sumtype~=SUMMON_TYPE_SYNCHRO or e:GetOwner():GetRealFieldID()~=e:GetLabel() or e:GetOwner():IsFacedown()
 end
-function c67556500.regop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTarget(c67556500.splimit2)
-	Duel.RegisterEffect(e1,tp)
-end
-function c67556500.splimit2(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsCode(67556500)
+function c67556500.spcost(e,c,tp)
+	return Duel.GetFlagEffect(tp,14513016)==0
 end
