@@ -225,7 +225,7 @@ function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 				else
 					local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 					local ct=-ft
-					local b1=Duel.CheckXyzMaterial(c,f,minc,maxc,og)
+					local b1=Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
 					local b2=ct<1 and Duel.IsExistingMatchingCard(alterf,tp,LOCATION_MZONE,0,1,nil)
 						and (not op or op(e,tp,0))
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
