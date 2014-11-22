@@ -1,7 +1,7 @@
 --熱血指導王ジャイアントレーナー
 function c30741334.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),3)
+	aux.AddXyzProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
 	--draw
 	local e1=Effect.CreateEffect(c)

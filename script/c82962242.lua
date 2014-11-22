@@ -1,4 +1,4 @@
---Vampire Vamp
+--ヴァンプ・オブ・ヴァンパイア
 function c82962242.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -63,7 +63,7 @@ function c82962242.eqop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if not tc:IsRelateToEffect(e) or not tc:IsLocation(LOCATION_MZONE) then return end
 	if c:IsFaceup() and c:IsRelateToEffect(e) then
 		local atk=tc:GetTextAttack()
 		if tc:IsFacedown() or atk<0 then atk=0 end

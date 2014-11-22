@@ -1,7 +1,7 @@
 --CNo.73 激瀧瀑神アビス・スープラ
 function c96864105.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),3)
+	aux.AddXyzProcedure(c,nil,6,3)
 	c:EnableReviveLimit()
 	--atk up
 	local e1=Effect.CreateEffect(c)

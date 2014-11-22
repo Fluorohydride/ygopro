@@ -1,7 +1,7 @@
 --妖精王 アルヴェルド
 function c28290705.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),4,2)
 	c:EnableReviveLimit()
 	--addown
 	local e1=Effect.CreateEffect(c)

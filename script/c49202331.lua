@@ -1,7 +1,7 @@
 --CX 超巨大空中要塞バビロン
 function c49202331.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,11),3)
+	aux.AddXyzProcedure(c,nil,11,3)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)

@@ -27,7 +27,7 @@ function c44887817.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c44887817.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0 end
 end
 function c44887817.filter(c,e,tp)
 	return c:IsRace(RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

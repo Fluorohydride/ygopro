@@ -9,7 +9,7 @@ function c14644902.initial_effect(c)
 	e1:SetOperation(c14644902.operation)
 	c:RegisterEffect(e1)
 end
-function c14644902.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c14644902.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
@@ -31,6 +31,7 @@ function c14644902.operation(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 			e1:SetRange(LOCATION_MZONE)
 			e1:SetCode(EVENT_PHASE+PHASE_END)
+			e1:SetCondition(c14644902.descon)
 			e1:SetOperation(c14644902.desop)
 			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 			e1:SetCountLimit(1)
@@ -38,8 +39,9 @@ function c14644902.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function c14644902.descon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsHasEffect(66235877)
+end
 function c14644902.desop(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsHasEffect(66235877) then
-		Duel.Destroy(e:GetHandler(),REASON_EFFECT)
-	end
+	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end

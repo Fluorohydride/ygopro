@@ -47,6 +47,7 @@ function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c21007444.descon)
 		e1:SetOperation(c21007444.desop)
 		e1:SetLabel(fid)
 		e1:SetLabelObject(sg)
@@ -55,6 +56,13 @@ function c21007444.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function c21007444.desfilter(c,fid)
 	return c:GetFlagEffectLabel(21007444)==fid
+end
+function c21007444.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c21007444.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		return false
+	else return true end
 end
 function c21007444.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=e:GetLabelObject()

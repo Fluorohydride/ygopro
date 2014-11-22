@@ -66,17 +66,19 @@ function c27971137.spop(e,tp,eg,ep,ev,re,r,rp)
 		de:SetOperation(c27971137.desop)
 		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_END then
 			de:SetLabel(Duel.GetTurnCount())
-		else de:SetLabel(0) end
+			de:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,2)
+		else
+			de:SetLabel(0)
+			de:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN)
+		end
 		Duel.RegisterEffect(de,tp)
 	end
 end
 function c27971137.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel()
+	local tc=e:GetLabelObject()
+	return Duel.GetTurnPlayer()==tp and Duel.GetTurnCount()~=e:GetLabel() and tc:GetFlagEffect(27971137)~=0
 end
 function c27971137.desop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetFlagEffect(27971137)>0 then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-	e:Reset()
+	Duel.Destroy(tc,REASON_EFFECT)
 end

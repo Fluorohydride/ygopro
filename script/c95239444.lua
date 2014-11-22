@@ -1,7 +1,7 @@
 --森羅の鎮神 オレイア
 function c95239444.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),2)
+	aux.AddXyzProcedure(c,nil,7,2)
 	c:EnableReviveLimit()
 	--sort
 	local e1=Effect.CreateEffect(c)

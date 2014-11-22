@@ -26,7 +26,7 @@ function c4149689.initial_effect(c)
 end
 function c4149689.aclimit(e,re,tp)
 	local rc=re:GetHandler()
-	return re:IsActiveType(TYPE_MONSTER) and rc:IsStatus(STATUS_FLIP_SUMMONED) and rc:IsLevelBelow(2)
+	return re:IsActiveType(TYPE_MONSTER) and bit.band(rc:GetSummonType(),SUMMON_TYPE_FLIP)==SUMMON_TYPE_FLIP and rc:IsLevelBelow(2)
 end
 function c4149689.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:GetFirst():IsLevelBelow(2) end

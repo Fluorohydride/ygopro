@@ -51,12 +51,10 @@ function c86742443.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function c86742443.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp
+	return Duel.GetTurnPlayer()==tp and e:GetLabel()==0
 end
 function c86742443.damop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetLabel()==0 then
-		Duel.Damage(1-tp,1000,REASON_EFFECT)
-	end
+	Duel.Damage(1-tp,1000,REASON_EFFECT)
 end
 function c86742443.damop2(e,tp,eg,ep,ev,re,r,rp)
 	if eg:GetFirst():GetCode()==e:GetLabel() then

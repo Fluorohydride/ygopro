@@ -1,7 +1,7 @@
 --フォトン・バタフライ・アサシン
 function c28150174.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--pos&atk
 	local e1=Effect.CreateEffect(c)

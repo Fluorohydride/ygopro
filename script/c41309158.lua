@@ -1,7 +1,7 @@
 --CX 機装魔人エンジェネラル
 function c41309158.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)

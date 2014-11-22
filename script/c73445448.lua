@@ -1,7 +1,7 @@
 --No.22 不乱健
 function c73445448.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),8),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),8,2)
 	c:EnableReviveLimit()
 	--spsummon limit
 	local e1=Effect.CreateEffect(c)

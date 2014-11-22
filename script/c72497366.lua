@@ -1,4 +1,4 @@
---Sinister Yorishiro
+--悪魔の憑代
 function c72497366.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

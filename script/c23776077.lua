@@ -1,7 +1,7 @@
 --陽炎獣 バジリコック
 function c23776077.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),6),2,nil,nil,5)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_FIRE),6,2,nil,nil,5)
 	c:EnableReviveLimit()
 	--remove
 	local e1=Effect.CreateEffect(c)

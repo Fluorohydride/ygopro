@@ -1,7 +1,7 @@
 --ヴェルズ・ウロボロス
 function c38273745.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--tohand
 	local e1=Effect.CreateEffect(c)

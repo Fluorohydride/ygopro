@@ -13,8 +13,8 @@ function c93431518.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c93431518.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSummonActivity(tp)
-		and not Duel.CheckFlipSummonActivity(tp) and not Duel.CheckSpecialSummonActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
+		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0 and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

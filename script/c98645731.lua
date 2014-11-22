@@ -13,7 +13,7 @@ function c98645731.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c98645731.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 end
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)

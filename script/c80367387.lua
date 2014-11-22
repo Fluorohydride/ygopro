@@ -7,7 +7,8 @@ function c80367387.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetOperation(c80367387.ccost)
+	e1:SetCondition(c80367387.mtcon)
+	e1:SetOperation(c80367387.mtop)
 	c:RegisterEffect(e1)
 	--chain attack
 	local e2=Effect.CreateEffect(c)
@@ -18,14 +19,16 @@ function c80367387.initial_effect(c)
 	e2:SetOperation(c80367387.atop)
 	c:RegisterEffect(e2)
 end
+function c80367387.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c80367387.cfilter1(c)
 	return c:IsCode(36623431) and c:IsAbleToGraveAsCost()
 end
 function c80367387.cfilter2(c)
 	return c:IsType(TYPE_MONSTER) and c:IsRace(RACE_WARRIOR) and not c:IsPublic()
 end
-function c80367387.ccost(e,tp)
-	if tp~=Duel.GetTurnPlayer() then return end
+function c80367387.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetMatchingGroup(c80367387.cfilter1,tp,LOCATION_HAND,0,nil)
 	local g2=Duel.GetMatchingGroup(c80367387.cfilter2,tp,LOCATION_HAND,0,nil)
 	local select=2

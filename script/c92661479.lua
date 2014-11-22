@@ -1,7 +1,7 @@
 --フォトン・ストリーク・バウンサー
 function c92661479.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
+	aux.AddXyzProcedure(c,nil,6,2)
 	c:EnableReviveLimit()
 	--negate activate
 	local e1=Effect.CreateEffect(c)

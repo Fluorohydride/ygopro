@@ -11,7 +11,7 @@ function c72881007.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c72881007.costfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
 end
 function c72881007.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
@@ -21,7 +21,7 @@ function c72881007.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST)
 end
 function c72881007.filter(c,e,tp)
-	return c:IsSetCard(0x34) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c72881007.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

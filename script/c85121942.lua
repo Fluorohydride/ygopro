@@ -1,7 +1,7 @@
 --CNo.105 BK 彗星のカエストス
 function c85121942.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),4)
+	aux.AddXyzProcedure(c,nil,5,4)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)

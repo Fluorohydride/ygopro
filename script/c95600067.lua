@@ -2,13 +2,12 @@
 function c95600067.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)
-	e1:SetDescription(aux.Stringid(95600067,0))
-	e1:SetCode(EFFECT_SEND_REPLACE)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE)
+	e1:SetCode(EVENT_LEAVE_FIELD_P)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTarget(c95600067.reptarget)
-	e1:SetOperation(c95600067.repoperation)
+	e1:SetCondition(c95600067.repcon)
+	e1:SetOperation(c95600067.repop)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -20,20 +19,19 @@ function c95600067.initial_effect(c)
 	e2:SetValue(400)
 	c:RegisterEffect(e2)
 end
-function c95600067.reptarget(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
-	if chk==0 then return c:GetDestination()==LOCATION_GRAVE and c:IsReason(REASON_DESTROY) end
-	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return false end
-	return Duel.SelectEffectYesNo(tp,c)
+function c95600067.repcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetDestination()==LOCATION_GRAVE and e:GetHandler():IsReason(REASON_DESTROY)
 end
-function c95600067.repoperation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c95600067.repop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	local c=e:GetHandler()
+	if not Duel.SelectEffectYesNo(tp,c) then return end
 	Duel.MoveToField(c,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCode(EFFECT_CHANGE_TYPE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetReset(RESET_EVENT+0x1fc0000)
+	e1:SetReset(RESET_EVENT+0x17c0000)
 	e1:SetValue(TYPE_SPELL+TYPE_CONTINUOUS)
 	c:RegisterEffect(e1)
 	Duel.RaiseEvent(c,47408488,e,0,tp,0,0)

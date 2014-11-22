@@ -1,7 +1,7 @@
 --虚構王アンフォームド・ボイド
 function c38180759.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--adup
 	local e1=Effect.CreateEffect(c)

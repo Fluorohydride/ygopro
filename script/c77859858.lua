@@ -38,6 +38,7 @@ function c77859858.initial_effect(c)
 	e6:SetRange(LOCATION_SZONE)
 	e6:SetCode(EVENT_PHASE+PHASE_END)
 	e6:SetCountLimit(1)
+	e6:SetCondition(c77859858.costcon)
 	e6:SetOperation(c77859858.costop)
 	c:RegisterEffect(e6)
 end
@@ -64,8 +65,10 @@ function c77859858.drop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
+function c77859858.costcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c77859858.costop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>=700 then
 		Duel.PayLPCost(tp,700)
 	else

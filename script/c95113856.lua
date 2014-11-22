@@ -1,7 +1,7 @@
 --幻子力空母エンタープラズニル
 function c95113856.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),2)
+	aux.AddXyzProcedure(c,nil,9,2)
 	c:EnableReviveLimit()
 	--remove
 	local e1=Effect.CreateEffect(c)

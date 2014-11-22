@@ -12,9 +12,10 @@ function c69750546.initial_effect(c)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
-	e2:SetDescription(aux.Stringid(69750546,0))
+	e2:SetDescription(aux.Stringid(69750546,1))
 	e2:SetCategory(CATEGORY_DESTROY)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCondition(c69750546.descon)
 	e2:SetCost(c69750546.descost)
@@ -36,9 +37,7 @@ function c69750546.operation(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c69750546.descon(e,tp,eg,ep,ev,re,r,rp)
-	if not re or e:GetHandler():IsReason(REASON_RETURN) then return false end
-	local code=re:GetHandler():GetCode()
-	return code==69537999 or code==21420702
+	return not e:GetHandler():IsReason(REASON_RETURN) and re and re:GetHandler():IsSetCard(0xb9)
 end
 function c69750546.costfilter(c)
 	return c:IsCode(69750546) and c:IsAbleToGraveAsCost()

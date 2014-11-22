@@ -199,10 +199,6 @@ struct processor {
 	card_set discarded_set;
 	card_set destroy_canceled;
 	card_set delayed_enable_set;
-	card_set summoned_cards_pt[2];
-	card_set normalsummoned_cards_pt[2];
-	card_set spsummoned_cards_pt[2];
-	card_set flipsummoned_cards_pt[2];
 	effect_set_v disfield_effects;
 	effect_set_v extraz_effects;
 	effect_set_v extraz_effects_e;
@@ -266,13 +262,18 @@ struct processor {
 	uint8 remove_brainwashing;
 	uint8 flip_delayed;
 	uint8 damage_calculated;
-	uint8 summon_state[2];
-	uint8 normalsummon_state[2];
-	uint8 flipsummon_state[2];
-	uint8 spsummon_state[2];
-	uint8 attack_state[2];
+	uint8 summon_state_count[2];
+	uint8 normalsummon_state_count[2];
+	uint8 flipsummon_state_count[2];
+	uint8 spsummon_state_count[2];
+	uint8 attack_state_count[2];
 	uint8 phase_action;
 	uint32 hint_timing[2];
+	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > normalsummon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > spsummon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > flipsummon_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > attack_counter;
 };
 class field {
 public:
@@ -343,7 +344,7 @@ public:
 	int32 get_draw_count(uint8 playerid);
 	void get_ritual_material(uint8 playerid, effect* peffect, card_set* material);
 	void ritual_release(card_set* material);
-	void get_xyz_material(card* scard, int32 findex, int32 maxc);
+	void get_xyz_material(card* scard, int32 findex, uint32 lv, int32 maxc);
 	void get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset);
 	int32 get_overlay_count(uint8 self, uint8 s, uint8 o);
 	void update_disable_check_list(effect* peffect);
@@ -352,6 +353,7 @@ public:
 	void add_unique_card(card* pcard);
 	void remove_unique_card(card* pcard);
 	effect* check_unique_onfield(card* pcard, uint8 controler);
+	void CheckCounter(card* pcard, int32 counter_type, int32 playerid);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();
@@ -365,7 +367,7 @@ public:
 	int32 check_synchro_material(card* pcard, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg);
 	int32 check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg);
 	int32 check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int32 count, int32 min, int32 max);
-	int32 check_xyz_material(card* pcard, int32 findex, int32 min, int32 max, group* mg);
+	int32 check_xyz_material(card* pcard, int32 findex, int32 lv, int32 min, int32 max, group* mg);
 	
 	int32 is_player_can_draw(uint8 playerid);
 	int32 is_player_can_discard_deck(uint8 playerid, int32 count);
@@ -483,7 +485,7 @@ public:
 	int32 change_position(uint16 step, group* targets, effect* reason_effect, uint8 reason_player, uint32 enable);
 	int32 operation_replace(uint16 step, effect* replace_effect, group* targets, ptr arg, ptr replace_type);
 	int32 select_synchro_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max, card* smat, group* mg);
-	int32 select_xyz_material(int16 step, uint8 playerid, card* pcard, int32 min, int32 max);
+	int32 select_xyz_material(int16 step, uint8 playerid, uint32 lv, card* pcard, int32 min, int32 max);
 	int32 select_release_cards(int16 step, uint8 playerid, uint8 check_field, uint8 cancelable, int32 min, int32 max);
 	int32 select_tribute_cards(int16 step, uint8 playerid, uint8 cancelable, int32 min, int32 max);
 	int32 toss_coin(uint16 step, effect* reason_effect, uint8 reason_player, uint8 playerid, uint8 count);

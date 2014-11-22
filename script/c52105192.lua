@@ -11,7 +11,7 @@ function c52105192.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c52105192.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckNormalSummonActivity(tp) and Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0 and Duel.IsPlayerCanDiscardDeckAsCost(tp,1) end
 	Duel.DiscardDeck(tp,1,REASON_COST)
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())

@@ -11,7 +11,7 @@ function c12644061.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE)
 	e2:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x34))
+	e2:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x1034))
 	e2:SetValue(ATTRIBUTE_DARK)
 	c:RegisterEffect(e2)
 	--negate
@@ -55,10 +55,10 @@ end
 function c12644061.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return ep==tp and ((a:IsControler(tp) and a:IsSetCard(0x34)) or (at and at:IsControler(tp) and at:IsSetCard(0x34)))
+	return ep==tp and ((a:IsControler(tp) and a:IsSetCard(0x1034)) or (at and at:IsControler(tp) and at:IsSetCard(0x1034)))
 end
 function c12644061.dfilter(c)
-	return c:IsSetCard(0x34) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
 end
 function c12644061.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c12644061.dfilter,tp,LOCATION_DECK,0,1,nil) end
