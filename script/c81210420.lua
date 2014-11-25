@@ -44,6 +44,7 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 	local tg=sg:GetFirst()
+	local fid=e:GetHandler():GetFieldID()
 	while tg do
 		local e1=Effect.CreateEffect(tg)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -68,6 +69,7 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 		e5:SetCode(EFFECT_SET_BASE_DEFENCE)
 		e5:SetValue(0)
 		tg:RegisterEffect(e5,true)
+		tg:RegisterFlagEffect(81210420,RESET_EVENT+0x47c0000+RESET_PHASE+PHASE_BATTLE,0,1,fid)
 		tg:SetStatus(STATUS_NO_LEVEL,true)
 		tg=sg:GetNext()
 	end
@@ -82,16 +84,18 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 	de:SetCode(EVENT_PHASE+PHASE_BATTLE)
 	de:SetReset(RESET_PHASE+PHASE_BATTLE)
 	de:SetCountLimit(1)
+	de:SetLabel(fid)
 	de:SetLabelObject(sg)
 	de:SetOperation(c81210420.desop)
 	Duel.RegisterEffect(de,tp)
 end
-function c81210420.desfilter(c)
-	return c:GetFlagEffect(81210420)>0
+function c81210420.desfilter(c,fid)
+	return c:GetFlagEffectLabel(81210420)==fid
 end
 function c81210420.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local tg=g:Filter(c81210420.desfilter,nil)
+	local fid=e:GetLabel()
+	local tg=g:Filter(c81210420.desfilter,nil,fid)
 	g:DeleteGroup()
 	Duel.Destroy(tg,REASON_EFFECT)
 end
