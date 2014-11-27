@@ -23,10 +23,10 @@ function c76136345.initial_effect(c)
 	c:RegisterEffect(e3)
 	--tohand
 	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(76136345,0))
+	e4:SetDescription(aux.Stringid(76136345,1))
 	e4:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e4:SetType(EFFECT_TYPE_IGNITION)
-	e4:SetRange(LOCATION_SZONE)
+	e4:SetRange(LOCATION_FZONE)
 	e4:SetCountLimit(1,76136345)
 	e4:SetCost(c76136345.thcost)
 	e4:SetTarget(c76136345.thtg)
@@ -44,7 +44,7 @@ function c76136345.filter(c,e,tp)
 		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c76136345.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c76136345.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
@@ -65,17 +65,12 @@ function c76136345.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CHANGE_DAMAGE)
+	e2:SetCode(EFFECT_AVOID_BATTLE_DAMAGE)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(0,1)
-	e2:SetValue(c76136345.damval)
+	e2:SetValue(1)
 	e2:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e2,tp)
-end
-function c76136345.damval(e,re,dam,r,rp,rc)
-	if bit.band(r,REASON_BATTLE)~=0 then
-		return 0
-	else return dam end
 end
 function c76136345.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
@@ -89,6 +84,7 @@ function c76136345.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c76136345.thop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c76136345.thfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
