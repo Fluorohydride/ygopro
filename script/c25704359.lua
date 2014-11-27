@@ -64,7 +64,7 @@ function c25704359.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 		local g=eg:Filter(c25704359.cfilter,nil,tp)
-		local att=0
+		local att=0x7f
 		local tc=g:GetFirst()
 		while tc do
 			att=bit.band(att,tc:GetOriginalAttribute())

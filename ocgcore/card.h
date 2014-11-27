@@ -246,7 +246,7 @@ public:
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
 	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
-	int32 is_can_be_xyz_material(card* scard);
+	int32 is_can_be_xyz_material(card* scard, uint8 ignore_xyz = FALSE);
 };
 
 //Locations

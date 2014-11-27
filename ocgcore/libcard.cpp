@@ -1793,11 +1793,14 @@ int32 scriptlib::card_is_can_be_xyz_material(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* scard = 0;
-	if(lua_gettop(L) >= 2) {
+	if(lua_gettop(L) >= 2 && !lua_isnil(L, 2)) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		scard = *(card**) lua_touserdata(L, 2);
 	}
-	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard));
+	uint32 ign = FALSE;
+	if(lua_gettop(L) >= 3)
+		ign = lua_toboolean(L, 3);
+	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard, ign));
 	return 1;
 }
 int32 scriptlib::card_check_fusion_material(lua_State *L) {

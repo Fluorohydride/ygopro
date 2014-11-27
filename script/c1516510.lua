@@ -19,9 +19,11 @@ function c1516510.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 	local g1=nil
 	local g2=nil
 	if gc then
-		g1=Group.CreateGroup()
+		g1=Group.FromCards(gc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 		g2=eg:FilterSelect(tp,Card.IsRace,1,1,nil,RACE_SPELLCASTER)
+		Duel.SetFusionMaterial(g2)
+		g1:Merge(g2)
 	else
 		local sg1=Group.CreateGroup()
 		local sg2=Group.CreateGroup()
@@ -57,9 +59,9 @@ function c1516510.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 			g2=sg2:Select(tp,1,1,g1:GetFirst())
 		end
+		g1:Merge(g2)
+		Duel.SetFusionMaterial(g1)
 	end
-	g1:Merge(g2)
-	Duel.SetFusionMaterial(g1)
 	local c=e:GetHandler()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

@@ -11,6 +11,7 @@
 #include "card.h"
 #include "effect.h"
 #include "group.h"
+#include "ocgapi.h"
 
 int32 scriptlib::duel_enable_global_flag(lua_State *L) {
 	check_param_count(L, 1);
@@ -2884,16 +2885,25 @@ int32 scriptlib::duel_is_player_can_spsummon_monster(lua_State * L) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
+	int32 code = lua_tointeger(L, 2);
 	card_data dat;
-	dat.code = lua_tointeger(L, 2);
+	::read_card(code, &dat);
+	dat.code = code;
 	dat.alias = 0;
-	dat.setcode = lua_tointeger(L, 3);
-	dat.type = lua_tointeger(L, 4);
-	dat.attack = lua_tointeger(L, 5);
-	dat.defence = lua_tointeger(L, 6);
-	dat.level = lua_tointeger(L, 7);
-	dat.race = lua_tointeger(L, 8);
-	dat.attribute = lua_tointeger(L, 9);
+	if(!lua_isnil(L, 3))
+		dat.setcode = lua_tointeger(L, 3);
+	if(!lua_isnil(L, 4))
+		dat.type = lua_tointeger(L, 4);
+	if(!lua_isnil(L, 5))
+		dat.attack = lua_tointeger(L, 5);
+	if(!lua_isnil(L, 6))
+		dat.defence = lua_tointeger(L, 6);
+	if(!lua_isnil(L, 7))
+		dat.level = lua_tointeger(L, 7);
+	if(!lua_isnil(L, 8))
+		dat.race = lua_tointeger(L, 8);
+	if(!lua_isnil(L, 9))
+		dat.attribute = lua_tointeger(L, 9);
 	int32 pos = POS_FACEUP;
 	int32 toplayer = playerid;
 	if(lua_gettop(L) >= 10)
