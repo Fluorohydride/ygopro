@@ -26,7 +26,7 @@ function c57043117.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c57043117.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER)
+	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
 function c57043117.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
