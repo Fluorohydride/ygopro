@@ -44,7 +44,7 @@ function c49919798.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,g)
 	end
 end
-function c49919798.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c49919798.cpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(49919798)==0 end
 	e:GetHandler():RegisterFlagEffect(49919798,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
