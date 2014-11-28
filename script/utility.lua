@@ -943,8 +943,12 @@ function Auxiliary.spchk1(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc=eg:GetNext()
 	end
-	if p1 then Duel.RegisterFlagEffect(0,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) end
+	if p1 and Duel.GetFlagEffect(0,e:GetHandler():GetOriginalCode())==0 then 
+		Duel.RegisterFlagEffect(0,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1)
+	end
+	if p2 and Duel.GetFlagEffect(1,e:GetHandler():GetOriginalCode())==0 then 
+		Duel.RegisterFlagEffect(1,e:GetHandler():GetOriginalCode(),RESET_PHASE+PHASE_END,0,1) 
+	end
 end
 function Auxiliary.spchk2(e,tp,eg,ep,ev,re,r,rp)
 	local ex,tg,ct,sp=Duel.GetOperationInfo(ev,CATEGORY_SPECIAL_SUMMON)
