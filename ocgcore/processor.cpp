@@ -5107,7 +5107,7 @@ int32 field::adjust_step(uint16 step) {
 			tp = 1 - tp;
 		}
 		if(tograve_set.size()) {
-			send_to(&tograve_set, 0, REASON_RULE, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
+			send_to(&tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
 		} else {
 			returns.ivalue[0] = 0;
 		}
