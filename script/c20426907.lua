@@ -56,6 +56,7 @@ function c20426907.distg1(e,tp,eg,ep,ev,re,r,rp,chk)
 			e:SetLabel(1)
 			Duel.SetTargetCard(teg)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,teg,1,0,0)
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(20426907,1))
 		end
 		return
 	end
@@ -66,6 +67,7 @@ function c20426907.distg1(e,tp,eg,ep,ev,re,r,rp,chk)
 			e:SetLabel(2)
 			Duel.SetTargetCard(g)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(20426907,1))
 		end
 	end
 end
