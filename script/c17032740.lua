@@ -53,8 +53,7 @@ function c17032740.splimit(e,se,sp,st)
 end
 function c17032740.spfilter(c,code)
 	if c:GetCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckAsCost() or c:IsAbleToExtraAsCost()
 end
 function c17032740.spcon(e,c)
 	if c==nil then return true end 
