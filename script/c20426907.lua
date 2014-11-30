@@ -32,11 +32,11 @@ function c20426907.initial_effect(c)
 	c:RegisterEffect(e4)
 	--tograve
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_ADJUST)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_SZONE)
+	e5:SetCode(EFFECT_SELF_TOGRAVE)
 	e5:SetCondition(c20426907.sdcon)
-	e5:SetOperation(c20426907.sdop)
 	c:RegisterEffect(e5)
 end
 function c20426907.filter(c)
@@ -84,7 +84,7 @@ function c20426907.distg3(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
 end
 function c20426907.disop(e,tp,eg,ep,ev,re,r,rp)
-	if c20426907.sdcon(e,tp,eg,ep,ev,re,r,rp) then return end
+	if c20426907.sdcon(e) then return end
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local tc=g:GetFirst()
@@ -116,9 +116,6 @@ end
 function c20426907.sdfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xaa) and not c:IsCode(20426907)
 end
-function c20426907.sdcon(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(c20426907.sdfilter,tp,LOCATION_ONFIELD,0,1,nil)
-end
-function c20426907.sdop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SendtoGrave(e:GetHandler(),REASON_EFFECT)
+function c20426907.sdcon(e)
+	return not Duel.IsExistingMatchingCard(c20426907.sdfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
 end
