@@ -199,6 +199,14 @@ function Auxiliary.XyzOperation(f,lv,minc,maxc)
 					Duel.Overlay(c,og)
 				else
 					local mg=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
+					local sg=Group.CreateGroup()
+					local tc=mg:GetFirst()
+					while tc do
+						local sg1=tc:GetOverlayGroup()
+						sg:Merge(sg1)
+						tc=mg:GetNext()
+					end
+					Duel.SendtoGrave(sg,REASON_RULE)
 					c:SetMaterial(mg)
 					Duel.Overlay(c,mg)
 				end
@@ -240,6 +248,14 @@ function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 						Duel.Overlay(c,mg)
 					else
 						local mg=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
+						local sg=Group.CreateGroup()
+						local tc=mg:GetFirst()
+						while tc do
+							local sg1=tc:GetOverlayGroup()
+							sg:Merge(sg1)
+							tc=mg:GetNext()
+						end
+						Duel.SendtoGrave(sg,REASON_RULE)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
 					end
