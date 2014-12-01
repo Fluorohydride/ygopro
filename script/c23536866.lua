@@ -28,7 +28,7 @@ function c23536866.mfilter1(c,exg)
 	return exg:IsExists(c23536866.mfilter2,1,nil,c)
 end
 function c23536866.mfilter2(c,mc)
-	return c.xyz_filter(mc)
+	return not c.xyz_filter or c.xyz_filter(mc)
 end
 function c23536866.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
