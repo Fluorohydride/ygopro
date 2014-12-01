@@ -19,5 +19,5 @@ end
 function c58921041.aclimit(e,re,tp)
 	if not re:IsHasType(EFFECT_TYPE_ACTIVATE) or not re:IsActiveType(TYPE_SPELL) then return false end
 	local c=re:GetHandler()
-	return not c:IsLocation(LOCATION_SZONE) or Duel.GetTurnCount()-c:GetTurnID()<2
+	return not c:IsLocation(LOCATION_SZONE) or (Duel.GetTurnCount()-c:GetTurnID()<2 and c:GetFieldID()>e:GetHandler():GetFieldID())
 end
