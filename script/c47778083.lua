@@ -29,48 +29,47 @@ function c47778083.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local sc=sg:GetFirst()
 	local oc=og:GetFirst()
 	local g=Group.FromCards(sc,oc)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,0,0)
-	e:SetLabelObject(sc)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,PLAYER_ALL,0)
+	e:SetLabelObject(sg)
 end
 function c47778083.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_EFFECT+REASON_DISCARD)==0 then return end
-	local sc=e:GetLabelObject()
+	local c=e:GetHandler()
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local oc=g:GetFirst()
-	if oc==sc then oc=g:GetNext() end
-	if sc:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetCondition(c47778083.descon)
-		e1:SetOperation(c47778083.desop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
-		e1:SetCountLimit(1)
-		e1:SetLabel(Duel.GetTurnCount())
-		sc:RegisterEffect(e1,true)
-	end
-	if oc:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(oc,0,1-tp,1-tp,false,false,POS_FACEUP)
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
-		e1:SetCondition(c47778083.descon)
-		e1:SetOperation(c47778083.desop)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
-		e1:SetCountLimit(1)
-		e1:SetLabel(Duel.GetTurnCount())
-		oc:RegisterEffect(e1,true)
+	local fid=c:GetFieldID()
+	local tc=g:GetFirst()
+	while tc do
+		if tc:IsRelateToEffect(e) and Duel.SpecialSummonStep(tc,0,1-tc:GetControler(),1-tc:GetControler(),false,false,POS_FACEUP) then
+			tc:RegisterFlagEffect(47778083,RESET_EVENT+0x1fe0000,0,0,fid)
+		end
+		tc=g:GetNext()
 	end
 	Duel.SpecialSummonComplete()
+	local e1=Effect.CreateEffect(c)
+	e1:SetLabel(fid)
+	Duel.RegisterEffect(e1,tp)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_PHASE+PHASE_END)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCountLimit(1)
+	e2:SetLabel(Duel.GetTurnCount())
+	e2:SetLabelObject(e1)
+	e2:SetCondition(c47778083.descon)
+	e2:SetOperation(c47778083.desop)
+	e2:SetReset(RESET_PHASE+PHASE_END,2)
+	Duel.RegisterEffect(e2,tp)
+end
+function c47778083.desfilter(c,fid)
+	return c:GetFlagEffectLabel(47778083)==fid
 end
 function c47778083.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=e:GetLabel()
+	if not Duel.IsExistingMatchingCard(c47778083.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetLabelObject():GetLabel()) then
+		e:Reset()
+		return false
+	else return Duel.GetTurnCount()~=e:GetLabel() end
 end
 function c47778083.desop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
+	local tg=Duel.GetMatchingGroup(c47778083.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil,e:GetLabelObject():GetLabel())
+	Duel.Destroy(tg,REASON_EFFECT)
 end
