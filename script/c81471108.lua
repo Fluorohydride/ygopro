@@ -12,10 +12,11 @@ function c81471108.initial_effect(c)
 	e1:SetTarget(c81471108.eqtg)
 	e1:SetOperation(c81471108.eqop)
 	c:RegisterEffect(e1)
-	--
+	--cannot be target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetValue(c81471108.indval)
 	c:RegisterEffect(e2)
 	--destroy sub

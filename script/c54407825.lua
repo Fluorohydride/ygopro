@@ -24,7 +24,7 @@ function c54407825.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c54407825.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsAbleToDeck() end
-	if chk==0 then return true end
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
