@@ -9,23 +9,6 @@ function c44394295.initial_effect(c)
 	e1:SetTarget(c44394295.target)
 	e1:SetOperation(c44394295.activate)
 	c:RegisterEffect(e1)
-	if not c44394295.global_check then
-		c44394295.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c44394295.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c44394295.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		if tc:IsPreviousLocation(LOCATION_EXTRA) then
-			tc:RegisterFlagEffect(44394295,RESET_EVENT+0x46e0000,0,0)
-		end
-		tc=eg:GetNext()
-	end
 end
 function c44394295.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
@@ -36,7 +19,7 @@ function c44394295.filter2(c,e,tp,m,f,chkf)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function c44394295.cfilter(c)
-	return c:GetFlagEffect(44394295)~=0
+	return c:GetSummonLocation()==LOCATION_EXTRA
 end
 function c44394295.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
