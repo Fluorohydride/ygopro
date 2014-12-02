@@ -12,16 +12,16 @@ function c92365601.initial_effect(c)
 end
 function c92365601.filter1(c,e,tp)
 	return c:IsFaceup() and c:GetRank()==4
+		and Duel.IsExistingMatchingCard(c92365601.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c)
 end
-function c92365601.filter2(c,e,tp)
-	return c:GetRank()==5 and c:IsSetCard(0x1048)
+function c92365601.filter2(c,e,tp,mc)
+	return c:GetRank()==5 and c:IsSetCard(0x1048) and mc:IsCanBeXyzMaterial(c,true)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c92365601.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c92365601.filter1(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(c92365601.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp)
-		and Duel.IsExistingMatchingCard(c92365601.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(c92365601.filter1,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c92365601.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -31,7 +31,7 @@ function c92365601.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c92365601.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp)
+	local g=Duel.SelectMatchingCard(tp,c92365601.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()

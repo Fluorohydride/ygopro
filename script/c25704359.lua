@@ -58,7 +58,7 @@ function c25704359.spcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c25704359.spfilter(c,e,tp,att)
 	return c:IsRace(RACE_SPELLCASTER) and c:GetDefence()==1500 and c:IsAttribute(att)
-		 and (c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN))
+		and (c:IsCanBeSpecialSummoned(e,0,tp,false,false) or c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN))
 end
 function c25704359.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

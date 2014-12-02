@@ -69,7 +69,7 @@ function c20409757.slcon(e)
 end
 function c20409757.filter(c,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_SZONE) and (c:GetSequence()==6 or c:GetSequence()==7)
-		 and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp
+		and c:IsReason(REASON_EFFECT) and c:GetReasonPlayer()==1-tp
 end
 function c20409757.indtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c20409757.filter,1,nil,tp) end

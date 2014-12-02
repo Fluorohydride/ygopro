@@ -159,11 +159,18 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
 end
+function Auxiliary.XyzAlterFilter(c,alterf,xyzc)
+	return alterf(c) and c:IsCanBeXyzMaterial(xyzc,true)
+end
 function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	if c.xyz_filter==nil then
 		local code=c:GetOriginalCode()
 		local mt=_G["c" .. code]
-		mt.xyz_filter=f
+		if f then
+			mt.xyz_filter=function(mc) return f(mc) and mc:IsXyzLevel(c,lv) end
+		else
+			mt.xyz_filter=function(mc) return mc:IsXyzLevel(c,lv) end
+		end
 		mt.xyz_count=ct
 	end
 	local e1=Effect.CreateEffect(c)
@@ -210,7 +217,7 @@ function Auxiliary.XyzCondition2(f,lv,minc,maxc,alterf,desc,op)
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				if ct<1 and Duel.IsExistingMatchingCard(alterf,c:GetControler(),LOCATION_MZONE,0,1,nil)
+				if ct<1 and Duel.IsExistingMatchingCard(Auxiliary.XyzAlterFilter,c:GetControler(),LOCATION_MZONE,0,1,nil,alterf,c)
 					and (not op or op(e,c:GetControler(),0)) then
 					return true
 				end
@@ -223,15 +230,15 @@ function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 					c:SetMaterial(og)
 					Duel.Overlay(c,og)
 				else
-					local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
+					local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 					local ct=-ft
 					local b1=Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
-					local b2=ct<1 and Duel.IsExistingMatchingCard(alterf,tp,LOCATION_MZONE,0,1,nil)
+					local b2=ct<1 and Duel.IsExistingMatchingCard(Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,nil,alterf,c)
 						and (not op or op(e,tp,0))
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
 						if op then op(e,tp,1) end
-						local mg=Duel.SelectMatchingCard(tp,alterf,tp,LOCATION_MZONE,0,1,1,nil)
+						local mg=Duel.SelectMatchingCard(tp,Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,1,nil,alterf,c)
 						local mg2=mg:GetFirst():GetOverlayGroup()
 						if mg2:GetCount()~=0 then
 							Duel.Overlay(c,mg2)
