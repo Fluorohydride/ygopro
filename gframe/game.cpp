@@ -818,6 +818,7 @@ void Game::SaveConfig() {
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.roompass, linebuf);
+	if (gameConf.roompass != NULL)
 	fprintf(fp, "roompass = %s\n", linebuf);
 	fclose(fp);
 }
