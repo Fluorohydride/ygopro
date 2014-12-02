@@ -1,4 +1,4 @@
---シューティング·クェーサー·ドラゴン
+--シューティング・クェーサー・ドラゴン
 function c35952884.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),2)
@@ -48,15 +48,21 @@ function c35952884.initial_effect(c)
 	e6:SetCode(EVENT_TO_DECK)
 	c:RegisterEffect(e6)
 end
+function c35952884.mfilter(c)
+	return not c:IsType(TYPE_TUNER)
+end
 function c35952884.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=c:GetMaterialCount()
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_EXTRA_ATTACK)
-	e1:SetReset(RESET_EVENT+0x1ff0000)
-	e1:SetValue(ct-2)
-	c:RegisterEffect(e1)
+	local mg=c:GetMaterial()
+	local ct=mg:FilterCount(mg,c35952884.mfilter,nil)
+	if bit.band(r,REASON_SYNCHRO)~=0 and ct>0 then 
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_EXTRA_ATTACK)
+		e1:SetReset(RESET_EVENT+0x1ff0000)
+		e1:SetValue(ct)
+		c:RegisterEffect(e1)
+	end
 end
 function c35952884.discon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)

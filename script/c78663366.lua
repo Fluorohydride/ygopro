@@ -40,7 +40,9 @@ function c78663366.retcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c78663366.retop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if Duel.ReturnToField(tc) and tc:IsFaceup() then
+	if tc:IsForbidden() then 
+		Duel.SendtoGrave(tc,REASON_RULE)
+	elseif Duel.ReturnToField(tc) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(tc)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
