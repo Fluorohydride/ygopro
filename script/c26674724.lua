@@ -53,8 +53,7 @@ function c26674724.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c26674724.tdfilter(c)
-	return c:IsPreviousLocation(LOCATION_EXTRA)
-		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL and c:IsAbleToDeck()
+	return c:GetSummonLocation()==LOCATION_EXTRA and c:IsAbleToDeck()
 end
 function c26674724.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c26674724.tdfilter(chkc) end
