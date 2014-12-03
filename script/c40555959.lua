@@ -24,6 +24,7 @@ function c40555959.activate(e,tp,eg,ep,ev,re,r,rp)
 		and Duel.SelectYesNo(tp,aux.Stringid(40555959,1)) then
 		c40555959.remop(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(40555959,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(40555959,2))
 	end
 end
 function c40555959.cfilter(c)
