@@ -65,6 +65,7 @@ bool MenuHandler::OnEvent(const irr::SEvent& event) {
 				unsigned int remote_port = _wtoi(mainGame->ebJoinPort->getText());
 				BufferIO::CopyWStr(pstr, mainGame->gameConf.lastip, 20);
 				BufferIO::CopyWStr(mainGame->ebJoinPort->getText(), mainGame->gameConf.lastport, 20);
+				BufferIO::CopyWStr(mainGame->ebJoinPass->getText(), mainGame->gameConf.roompass, 20);
 				if(DuelClient::StartClient(remote_addr, remote_port, false)) {
 					mainGame->btnCreateHost->setEnabled(false);
 					mainGame->btnJoinHost->setEnabled(false);
