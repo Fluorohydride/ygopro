@@ -754,6 +754,7 @@ void Game::LoadConfig() {
 	fseek(fp, 0, SEEK_SET);
 	while(ftell(fp) < fsize) {
 		fgets(linebuf, 250, fp);
+		strcpy(valbuf, "");
 		sscanf(linebuf, "%s = %s", strbuf, valbuf);
 		if(!strcmp(strbuf, "antialias")) {
 			gameConf.antialias = atoi(valbuf);
@@ -817,6 +818,8 @@ void Game::SaveConfig() {
 	fprintf(fp, "lastip = %s\n", linebuf);
 	BufferIO::EncodeUTF8(gameConf.lastport, linebuf);
 	fprintf(fp, "lastport = %s\n", linebuf);
+	BufferIO::EncodeUTF8(gameConf.roompass, linebuf);
+	fprintf(fp, "roompass = %s\n", linebuf);
 	fclose(fp);
 }
 void Game::ShowCardInfo(int code) {
