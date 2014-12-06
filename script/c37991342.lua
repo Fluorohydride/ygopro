@@ -117,13 +117,16 @@ function c37991342.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
 end
 function c37991342.efilter(e,te)
-	if not te:IsActiveType(TYPE_MONSTER) or not te:IsHasType(0x7e0) then return false end
-	local tc=te:GetHandler()
-	local lv=e:GetHandler():GetLevel()
-	if te:IsActiveType(TYPE_XYZ) then
-		return tc:GetOriginalRank()<lv
+	if te:IsActiveType(TYPE_MONSTER) and (te:IsHasType(0x7e0) or te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
+		local lv=e:GetHandler():GetLevel()
+		local ec=te:GetOwner()
+		if ec:IsType(TYPE_XYZ) then
+			return ec:GetOriginalRank()<lv
+		else
+			return ec:GetOriginalLevel()<lv
+		end
 	end
-	return tc:GetOriginalLevel()<lv
+	return false
 end
 function c37991342.desfilter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()

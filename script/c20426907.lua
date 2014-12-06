@@ -56,6 +56,7 @@ function c20426907.distg1(e,tp,eg,ep,ev,re,r,rp,chk)
 			e:SetLabel(1)
 			Duel.SetTargetCard(teg)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,teg,1,0,0)
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(20426907,1))
 		end
 		return
 	end
@@ -66,6 +67,7 @@ function c20426907.distg1(e,tp,eg,ep,ev,re,r,rp,chk)
 			e:SetLabel(2)
 			Duel.SetTargetCard(g)
 			Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(20426907,1))
 		end
 	end
 end
@@ -83,10 +85,13 @@ function c20426907.distg3(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_DISABLE,g,g:GetCount(),0,0)
 end
+function c20426907.disfilter(c,e)
+	return c:IsFaceup() and c:IsRelateToEffect(e)
+end
 function c20426907.disop(e,tp,eg,ep,ev,re,r,rp)
 	if c20426907.sdcon(e) then return end
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c20426907.disfilter,nil,e)
 	local tc=g:GetFirst()
 	while tc do
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
