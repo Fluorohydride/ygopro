@@ -39,22 +39,22 @@ function c30575681.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoGrave(g,REASON_EFFECT)
 	end
 end
-function c30575681.eqfilter1(c,ec)
-	return ec:CheckEquipTarget(c)
-end
-function c30575681.eqfilter2(c,tp)
+function c30575681.eqfilter1(c)
 	return c:IsSetCard(0x207a) and c:GetEquipTarget()
-		and Duel.IsExistingTarget(c30575681.eqfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,c:GetEquipTarget(),c)
+		and Duel.IsExistingTarget(c30575681.eqfilter2,0,LOCATION_MZONE,LOCATION_MZONE,1,c:GetEquipTarget(),c)
+end
+function c30575681.eqfilter2(c,ec)
+	return c:IsFaceup() and ec:CheckEquipTarget(c)
 end
 function c30575681.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() end
-	if chk==0 then return Duel.IsExistingTarget(c30575681.eqfilter2,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil,tp) end
+	if chkc then return false end
+	if chk==0 then return Duel.IsExistingTarget(c30575681.eqfilter1,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local g1=Duel.SelectTarget(tp,c30575681.eqfilter2,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil,tp)
+	local g1=Duel.SelectTarget(tp,c30575681.eqfilter1,tp,LOCATION_SZONE,LOCATION_SZONE,1,1,nil)
 	local tc=g1:GetFirst()
 	e:SetLabelObject(tc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	local g2=Duel.SelectTarget(tp,c30575681.eqfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,tc:GetEquipTarget(),tc)
+	local g2=Duel.SelectTarget(tp,c30575681.eqfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,tc:GetEquipTarget(),tc)
 end
 function c30575681.eqop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetLabelObject()

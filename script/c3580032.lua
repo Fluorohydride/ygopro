@@ -78,8 +78,7 @@ function c3580032.spfilter(c,e,tp)
 end
 function c3580032.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-	and Duel.IsExistingMatchingCard(c3580032.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp)
-	end
+		and Duel.IsExistingMatchingCard(c3580032.spfilter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end 
 function c3580032.spop(e,tp,eg,ep,ev,re,r,rp)
@@ -95,7 +94,7 @@ function c3580032.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c3580032.scfilter(c)
-	return c:IsSetCard(0x107a) and c:IsSynchroSummonable(nil,nil)
+	return c:IsSetCard(0x107a) and c:IsSynchroSummonable(nil)
 end
 function c3580032.sctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c3580032.scfilter,tp,LOCATION_EXTRA,0,1,nil) end

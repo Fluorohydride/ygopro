@@ -20,7 +20,10 @@ function c73125233.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
+	local tc=g:GetFirst()
+	if tc and tc:IsAbleToDeck() then
+		Duel.SetOperationInfo(0,CATEGORY_TODECK,tc,1,0,0)
+	end
 end
 function c73125233.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

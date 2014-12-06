@@ -13,7 +13,7 @@ function c99311109.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c99311109.cfilter(c)
-	return c:GetFlagEffect(LOCATION_EXTRA)~=0
+	return c:GetSummonLocation()==LOCATION_EXTRA
 end
 function c99311109.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(c99311109.cfilter,tp,LOCATION_MZONE,0,1,nil)

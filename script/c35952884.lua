@@ -54,13 +54,13 @@ end
 function c35952884.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local mg=c:GetMaterial()
-	local ct=mg:FilterCount(mg,c35952884.mfilter,nil)
+	local ct=mg:FilterCount(c35952884.mfilter,nil)
 	if bit.band(r,REASON_SYNCHRO)~=0 and ct>0 then 
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
 		e1:SetReset(RESET_EVENT+0x1ff0000)
-		e1:SetValue(ct)
+		e1:SetValue(ct-1)
 		c:RegisterEffect(e1)
 	end
 end
