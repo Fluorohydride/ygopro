@@ -75,9 +75,9 @@ end
 function c13073850.splimit(e,c)
 	return not c:IsSetCard(0xaa)
 end
-function c13073850.ntcon(e,c)
+function c13073850.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c13073850.lvcon(e)
 	return e:GetHandler():GetMaterialCount()==0

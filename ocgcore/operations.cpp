@@ -126,8 +126,8 @@ void field::damage(effect* reason_effect, uint32 reason, uint32 reason_player, c
 void field::recover(effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 amount) {
 	add_process(PROCESSOR_RECOVER, 0, reason_effect, 0, reason, (reason_player << 28) + (playerid << 24) + (amount & 0xffffff));
 }
-void field::summon(uint32 sumplayer, card* target, effect* proc, uint32 ignore_count) {
-	add_process(PROCESSOR_SUMMON_RULE, 0, proc, (group*)target, sumplayer, ignore_count);
+void field::summon(uint32 sumplayer, card* target, effect* proc, uint32 ignore_count, uint32 min_tribute) {
+	add_process(PROCESSOR_SUMMON_RULE, 0, proc, (group*)target, sumplayer, ignore_count + (min_tribute << 8));
 }
 void field::special_summon_rule(uint32 sumplayer, card* target) {
 	add_process(PROCESSOR_SPSUMMON_RULE, 0, 0, (group*)target, sumplayer, 0);
@@ -1102,7 +1102,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 	}
 	return TRUE;
 }
-int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, uint8 ignore_count) {
+int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, uint8 ignore_count, uint8 min_tribute) {
 	switch(step) {
 	case 0: {
 		if(!(target->data.type & TYPE_MONSTER))
@@ -1139,8 +1139,18 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		return FALSE;
 	}
 	case 1: {
+		if(!ignore_count && !core.extra_summon[sumplayer] && core.summon_count[sumplayer] >= get_summon_count_limit(sumplayer)) {
+			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SUMMON_COUNT);
+			if(pextra && !(pextra->flag & EFFECT_FLAG_FUNC_VALUE)) {
+				int32 count = pextra->get_value();
+				if(min_tribute < count) {
+					min_tribute = count;
+					core.units.begin()->arg2 = ignore_count + (min_tribute << 8);
+				}
+			}
+		}
 		effect_set eset;
-		int32 res = target->filter_summon_procedure(sumplayer, &eset, ignore_count);
+		int32 res = target->filter_summon_procedure(sumplayer, &eset, ignore_count, min_tribute);
 		if(proc && res < 0)
 			return TRUE;
 		if(proc) {
@@ -1179,6 +1189,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		int32 required = target->get_summon_tribute_count();
 		int32 min = required & 0xffff;
 		int32 max = required >> 16;
+		if(min < min_tribute)
+			min = min_tribute;
 		uint32 adv = is_player_can_summon(SUMMON_TYPE_ADVANCE, sumplayer, target);
 		if(max == 0 || !adv) {
 			returns.bvalue[0] = 0;
@@ -1582,7 +1594,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 	}
 	return TRUE;
 }
-int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, uint8 ignore_count) {
+int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, uint8 ignore_count, uint8 min_tribute) {
 	switch(step) {
 	case 0: {
 		if(target->is_status(STATUS_REVIVE_LIMIT))
@@ -1606,9 +1618,19 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		return FALSE;
 	}
 	case 1: {
+		if(!ignore_count && !core.extra_summon[setplayer] && core.summon_count[setplayer] >= get_summon_count_limit(setplayer)) {
+			effect* pextra = target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
+			if(pextra && !(pextra->flag & EFFECT_FLAG_FUNC_VALUE)) {
+				int32 count = pextra->get_value();
+				if(min_tribute < count) {
+					min_tribute = count;
+					core.units.begin()->arg2 = ignore_count + (min_tribute << 8);
+				}
+			}
+		}
 		effect_set eset;
 		target->material_cards.clear();
-		int32 res = target->filter_set_procedure(setplayer, &eset, ignore_count);
+		int32 res = target->filter_set_procedure(setplayer, &eset, ignore_count, min_tribute);
 		if(proc && res < 0)
 			return TRUE;
 		if(proc) {
@@ -1647,6 +1669,8 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		int32 required = target->get_set_tribute_count();
 		int32 min = required & 0xffff;
 		int32 max = required >> 16;
+		if(min < min_tribute)
+			min = min_tribute;
 		uint32 adv = is_player_can_mset(SUMMON_TYPE_ADVANCE, setplayer, target);
 		if(max == 0 || !adv)
 			returns.bvalue[0] = 0;
@@ -1715,8 +1739,10 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			effect* pextra = core.extra_summon[setplayer] ? 0 : target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
 			if(pextra) {
 				core.temp_var[0] = (ptr)pextra;
-				if(pextra->value && (core.summon_count[setplayer] < get_summon_count_limit(setplayer)))
+				if((pextra->flag & EFFECT_FLAG_FUNC_VALUE) && (core.summon_count[setplayer] < get_summon_count_limit(setplayer)))
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 91);
+				else if(!(pextra->flag & EFFECT_FLAG_FUNC_VALUE) && target->material_cards.size() < pextra->get_value())
+					core.temp_var[0] = 0;
 				else
 					returns.ivalue[0] = TRUE;
 			}

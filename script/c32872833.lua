@@ -12,8 +12,8 @@ end
 function c32872833.filter(c)
 	return c:IsFaceup() and c:GetLevel()==8
 end
-function c32872833.ntcon(e,c)
+function c32872833.ntcon(e,c,minc)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c32872833.filter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end

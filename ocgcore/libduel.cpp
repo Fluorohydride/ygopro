@@ -217,8 +217,11 @@ int32 scriptlib::duel_summon(lua_State *L) {
 		return 0;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	uint32 ignore_count = lua_toboolean(L, 3);
+	uint32 min_tribute = 0;
+	if(lua_gettop(L) > 4)
+		min_tribute = lua_tointeger(L, 5);
 	duel * pduel = pcard->pduel;
-	pduel->game_field->summon(playerid, pcard, peffect, ignore_count);
+	pduel->game_field->summon(playerid, pcard, peffect, ignore_count, min_tribute);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_special_summon_rule(lua_State *L) {
@@ -291,8 +294,11 @@ int32 scriptlib::duel_setm(lua_State *L) {
 		return 0;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	uint32 ignore_count = lua_toboolean(L, 3);
+	uint32 min_tribute = 0;
+	if(lua_gettop(L) > 4)
+		min_tribute = lua_tointeger(L, 5);
 	duel * pduel = pcard->pduel;
-	pduel->game_field->add_process(PROCESSOR_MSET, 0, peffect, (group*)pcard, playerid, ignore_count);
+	pduel->game_field->add_process(PROCESSOR_MSET, 0, peffect, (group*)pcard, playerid, ignore_count + (min_tribute << 8));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_sets(lua_State *L) {

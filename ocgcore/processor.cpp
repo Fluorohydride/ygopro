@@ -348,7 +348,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SUMMON_RULE: {
-		if (summon(it->step, it->arg1, (card*)it->ptarget, it->peffect, it->arg2))
+		if (summon(it->step, it->arg1, (card*)it->ptarget, it->peffect, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -376,7 +376,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MSET: {
-		if (mset(it->step, it->arg1, (card*)(it->ptarget), it->peffect, it->arg2))
+		if (mset(it->step, it->arg1, (card*)(it->ptarget), it->peffect, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -2576,10 +2576,10 @@ int32 field::process_idle_command(uint16 step) {
 		}
 		core.summonable_cards.clear();
 		for(auto clit = player[infos.turn_player].list_hand.begin(); clit != player[infos.turn_player].list_hand.end(); ++clit)
-			if((*clit)->is_can_be_summoned(infos.turn_player, FALSE, 0))
+			if((*clit)->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
 				core.summonable_cards.push_back(*clit);
 		for(int i = 0; i < 5; ++i) {
-			if(player[infos.turn_player].list_mzone[i] && player[infos.turn_player].list_mzone[i]->is_can_be_summoned(infos.turn_player, FALSE, 0))
+			if(player[infos.turn_player].list_mzone[i] && player[infos.turn_player].list_mzone[i]->is_can_be_summoned(infos.turn_player, FALSE, 0, 0))
 				core.summonable_cards.push_back(player[infos.turn_player].list_mzone[i]);
 		}
 		core.spsummonable_cards.clear();
@@ -2622,7 +2622,7 @@ int32 field::process_idle_command(uint16 step) {
 		core.msetable_cards.clear();
 		core.ssetable_cards.clear();
 		for(auto clit = player[infos.turn_player].list_hand.begin(); clit != player[infos.turn_player].list_hand.end(); ++clit) {
-			if((*clit)->is_setable_mzone(infos.turn_player, FALSE, 0))
+			if((*clit)->is_setable_mzone(infos.turn_player, FALSE, 0, 0))
 				core.msetable_cards.push_back(*clit);
 			if((*clit)->is_setable_szone(infos.turn_player))
 				core.ssetable_cards.push_back(*clit);
@@ -2704,7 +2704,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 5: {
 		card* target = core.summonable_cards[returns.ivalue[0] >> 16];
-		summon(infos.turn_player, target, 0, FALSE);
+		summon(infos.turn_player, target, 0, FALSE, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}

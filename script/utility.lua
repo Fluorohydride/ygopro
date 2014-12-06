@@ -20,17 +20,17 @@ function Auxiliary.FALSE()
 	return false
 end
 function Auxiliary.AND(f1,f2)
-	return 	function(a,b,c)
+	return	function(a,b,c)
 				return f1(a,b,c) and f2(a,b,c)
 			end
 end
 function Auxiliary.OR(f1,f2)
-	return 	function(a,b,c)
+	return	function(a,b,c)
 				return f1(a,b,c) or f2(a,b,c)
 			end
 end
 function Auxiliary.NOT(f)
-	return 	function(a,b,c)
+	return	function(a,b,c)
 				return not f(a,b,c)
 			end
 end
@@ -84,22 +84,22 @@ function Auxiliary.EnableDualAttribute(c)
 	c:RegisterEffect(e2)
 end
 function Auxiliary.TargetEqualFunction(f,value,a,b,c)
-	return 	function(effect,target)
-				return f(target,a,b,c)==value 
+	return	function(effect,target)
+				return f(target,a,b,c)==value
 			end
 end
 function Auxiliary.TargetBoolFunction(f,a,b,c)
-	return 	function(effect,target)
+	return	function(effect,target)
 				return f(target,a,b,c)
 			end
 end
 function Auxiliary.FilterEqualFunction(f,value,a,b,c)
-	return 	function(target)
-				return f(target,a,b,c)==value 
+	return	function(target)
+				return f(target,a,b,c)==value
 			end
 end
 function Auxiliary.FilterBoolFunction(f,a,b,c)
-	return 	function(target)
+	return	function(target)
 				return f(target,a,b,c)
 			end
 end

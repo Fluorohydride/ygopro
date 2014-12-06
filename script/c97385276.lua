@@ -19,10 +19,10 @@ function c97385276.initial_effect(c)
 	e2:SetOperation(c97385276.spop)
 	c:RegisterEffect(e2)
 end
-function c97385276.sumcon(e,c)
+function c97385276.sumcon(e,c,minc)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)==0
+	return minc==0 and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)==0
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c97385276.sumop(e,tp,eg,ep,ev,re,r,rp,c)
