@@ -52,8 +52,11 @@ function c1639384.operation(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CANNOT_DISABLE)
 		e3:SetRange(LOCATION_MZONE)
 		e3:SetCode(EFFECT_IMMUNE_EFFECT)
-		e3:SetValue(1)
+		e3:SetValue(c1639384.efilter)
 		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e3)
 	end
+end
+function c1639384.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end

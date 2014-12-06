@@ -33,5 +33,5 @@ function c10817524.indval(e,c)
 	return not c:IsType(TYPE_NORMAL)
 end
 function c10817524.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER)
+	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end

@@ -406,8 +406,6 @@ int32 effect::is_immuned(effect_set_v* effects) {
 	effect* peffect;
 	for (int i = 0; i < effects->count; ++i) {
 		peffect = effects->at(i);
-		if(peffect->owner == owner)
-			return FALSE;
 		if(peffect->value) {
 			pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 			if(peffect->check_value_condition(1))

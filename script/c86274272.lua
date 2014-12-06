@@ -65,9 +65,12 @@ function c86274272.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_IMMUNE_EFFECT)
-	e1:SetValue(1)
+	e1:SetValue(c86274272.efilter)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 	c:RegisterEffect(e1)
+end
+function c86274272.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end
 function c86274272.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
