@@ -1,4 +1,4 @@
---ÁùÎäĞ\¤ÎÓ°£­×ÏÑ×
+--å…­æ­¦è¡†ã®å½±ï¼ç´«ç‚
 function c1828513.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x3d),4,2)

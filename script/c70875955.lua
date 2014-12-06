@@ -37,6 +37,7 @@ function c70875955.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		e:SetLabel(1)
 		e:GetHandler():RegisterFlagEffect(70875955,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(70875955,3))
 	else
 		e:SetCategory(0)
 		e:SetLabel(0)

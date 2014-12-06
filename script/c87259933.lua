@@ -59,6 +59,7 @@ function c87259933.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 		e:GetHandler():RegisterFlagEffect(87259933,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(87259933,3))
 	else
 		e:SetCategory(0)
 	end

@@ -15,14 +15,11 @@ end
 function c60229110.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE
 end
-function c60229110.filter(c)
-	return c:IsFacedown() and c:IsDestructable()
-end
 function c60229110.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c60229110.filter(chkc) end
+	if chkc then return chkc:IsOnField() and chkc:IsFacedown() end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c60229110.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFacedown(),tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c60229110.operation(e,tp,eg,ep,ev,re,r,rp)

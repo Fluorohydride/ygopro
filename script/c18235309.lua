@@ -42,6 +42,7 @@ function c18235309.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	if e:GetLabel()~=1 then return end
 	e:GetHandler():RegisterFlagEffect(18235309,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(18235309,2))
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
 end
 function c18235309.activate(e,tp,eg,ep,ev,re,r,rp)
