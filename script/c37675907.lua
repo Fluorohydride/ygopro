@@ -48,7 +48,7 @@ function c37675907.regop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c37675907.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsCode(37675907) and bit.band(sump,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
+	return c:IsCode(37675907) and bit.band(sumtype,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c37675907.filter(c)
 	return c:GetLevel()>0 and c:IsSetCard(0x17) and c:IsAbleToGraveAsCost()

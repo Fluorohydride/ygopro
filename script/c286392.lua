@@ -26,7 +26,7 @@ function c286392.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c286392.tfilter(c)
-	return c:IsCode(5474) or c:IsHasEffect(20932152)
+	return c:IsCode(9742784) or c:IsHasEffect(20932152)
 end
 function c286392.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
