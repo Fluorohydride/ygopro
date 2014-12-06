@@ -34,7 +34,7 @@ function c75304793.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c75304793.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:GetHandler():IsSetCard(0x66)
+	return re and re:GetHandler():IsSetCard(0x66) and not re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c75304793.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x35,1)
