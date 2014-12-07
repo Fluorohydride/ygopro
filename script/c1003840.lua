@@ -16,6 +16,7 @@ function c1003840.initial_effect(c)
 	e2:SetTarget(c1003840.sptg)
 	e2:SetOperation(c1003840.spop)
 	c:RegisterEffect(e2)
+	--todeck
 	local e3=Effect.CreateEffect(c)
 	e3:SetCategory(CATEGORY_TODECK)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
