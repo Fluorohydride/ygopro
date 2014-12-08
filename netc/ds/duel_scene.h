@@ -30,13 +30,17 @@ namespace ygopro
         v3f translation;
     };
     
-    struct FieldCard : public FieldObject {
+    struct FieldCard : public FieldObject, public std::enable_shared_from_this<FieldCard> {
         virtual void RefreshVertices();
         virtual bool UpdateVertices(double tm);
         
         void Init(uint32_t idx, uint32_t code, int32_t side);
         void SetCode(uint32_t code, bool refresh = true);
         void SetIconTex(int32_t iid, bool refresh = true);
+        
+        void Attach(std::shared_ptr<FieldCard> target);
+        void Detach();
+        void ResetAttachSeq();
         
         uint32_t code = 0;
         uint32_t status = 0;
@@ -46,7 +50,8 @@ namespace ygopro
 		int32_t pos = 0;
         bool update_rvert = true;
         std::vector<v3f> vertex_r;
-        std::vector<std::shared_ptr<FieldCard>> olcards;
+        std::vector<std::shared_ptr<FieldCard>> attached_cards;
+        std::shared_ptr<FieldCard> attaching_card;
         MutableAttribute<v3f> translation;
         MutableAttribute<glm::quat> rotation;
     };
@@ -107,6 +112,7 @@ namespace ygopro
         void ClearField();
         void InitHp(int32_t local_pl, int32_t hp);
         void AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq);
+        void DrawCard(int32_t pl, int32_t data);
         
         v2i CheckHoverBlock(float px, float py);
         v2f GetProjectXY(float sx, float sy);

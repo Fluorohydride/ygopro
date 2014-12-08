@@ -30,26 +30,19 @@ public:
     template<typename T>
     T Read() {
         if(std::is_integral<T>::value) {
-            uint32_t val = 0;
-            if(current[0] < 0x80) {
-                val = current[0];
-                current += 1;
-            } else if(current[0] < 0xc0) {
-                val = ((uint32_t)current[0] & 0x3f) | ((uint32_t)current[1] << 6);
-                current += 2;
-            } else if(current[0] < 0xe0) {
-                val = ((uint32_t)current[0] & 0x1f) | ((uint32_t)current[1] << 5) | ((uint32_t)current[2] << 13);
-                current += 3;
-            } else if(current[0] < 0xf0) {
-                val = ((uint32_t)current[0] & 0x0f) | ((uint32_t)current[1] << 4) | ((uint32_t)current[2] << 12) | ((uint32_t)current[3] << 20);
-                current += 4;
-            } else {
-                val = *((uint32_t*)(current + 1));
-                current += 5;
+            uint64_t val = 0;
+            uint32_t shift = 0;
+            while(current[0] & 0x80) {
+                val |= (static_cast<uint64_t>(current[0]) & 0x7f) << shift;
+                shift += 7;
+                current++;
             }
+            val |= static_cast<uint64_t>(current[0]) << shift;
+            current++;
             return static_cast<T>(val);
         } else {
-            T val = *((T*)current);
+            T val;
+            memcpy(&val, current, sizeof(T));
             current += sizeof(T);
             return val;
         }
@@ -73,8 +66,8 @@ public:
         return *this;
     }
     
-    PacketReader& operator >> (PacketObject& val) {
-        val.ReadFromPacket(*this);
+    PacketReader& operator >> (PacketObject& obj) {
+        obj.ReadFromPacket(*this);
         return *this;
     }
     
@@ -97,39 +90,24 @@ class PacketWriter {
     
 public:
     PacketWriter(uint16_t proto) {
-        *(uint16_t*)&buffer[0] = proto;
+        buffer[0] = proto & 0xff;
+        buffer[1] = proto >> 8;
         current = &buffer[2];
     }
     
     template<typename T>
     PacketWriter& operator << (T inval) {
         if(std::is_integral<T>::value) {
-            uint32_t val = static_cast<uint32_t>(inval);
-            if(val < 0x80) {
-                current[0] = val;
-                current += 1;
-            } else if(val < 0x4000) {
-                current[0] = (val & 0x3f) | 0x80;
-                current[1] = val >> 6;
-                current += 2;
-            } else if(val < 0x200000) {
-                current[0] = (val & 0x1f) | 0xc0;
-                current[1] = val >> 5;
-                current[2] = val >> 13;
-                current += 3;
-            } else if(val < 0x10000000) {
-                current[0] = (val & 0xf) | 0xe0;
-                current[1] = val >> 4;
-                current[2] = val >> 12;
-                current[3] = val >> 20;
-                current += 4;
-            } else {
-                current[0] = 0xff;
-                *((uint32_t*)(current + 1)) = val;
-                current += 5;
+            uint64_t val = static_cast<uint64_t>(inval);
+            while(val > 0x7f) {
+                current[0] = (val & 0x7f) | 0x80;
+                val >>= 7;
+                current++;
             }
+            current[0] = val;
+            current++;
         } else {
-            *((T*)current) = inval;
+            memcpy(current, &inval, sizeof(T));
             current += sizeof(T);
         }
         return *this;

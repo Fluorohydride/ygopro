@@ -209,8 +209,48 @@ namespace ygopro
                 break;
             case MSG_NEW_PHASE:
                 break;
-            case MSG_MOVE:
+            case MSG_MOVE: {
+                uint32_t code = reader.Read<uint32_t>();
+                uint32_t pcon = reader.Read<uint8_t>();
+                uint32_t ploc = reader.Read<uint8_t>();
+                uint32_t pseq = reader.Read<uint8_t>();
+                uint32_t psubs = reader.Read<uint8_t>();
+                uint32_t con = reader.Read<uint8_t>();
+                uint32_t loc = reader.Read<uint8_t>();
+                uint32_t seq = reader.Read<uint8_t>();
+                uint32_t subs = reader.Read<uint8_t>();
+                uint32_t reason = reader.Read<uint32_t>();
+                auto ptr = pscene->GetCard(pcon, ploc, pseq, psubs);
+                if(ptr != nullptr) {
+                    if(code)
+                        ptr->SetCode(code);
+                    if((ploc & 0x80) && (loc & 0x80)) {
+                        cur_commands.InsertCommand(std::make_shared<DuelCmdMove>(ptr, code, con, loc, seq, subs, reason));
+                    } else if((ploc & 0x80) && !(loc & 0x80)) {
+                        cur_commands.InsertCommand(std::make_shared<DuelCmdMove>(ptr, code, con, loc, seq, subs, reason));
+                    } else if(!(ploc & 0x80) && (loc & 0x80)) {
+                        auto attach_ptr = pscene->GetCard(con, loc, seq, subs);
+                        if(attach_ptr) {
+                            if(loc == LOCATION_EXTRA) {
+                                
+                            }
+                        }
+                    } else {
+                        if(!ptr->attached_cards.empty()) {
+                            if(ploc == LOCATION_EXTRA) {
+                                for(auto pcard : ptr->attached_cards) {
+                                    cur_commands.InsertCommand(std::make_shared<DuelCmdRefreshPos>(pcard, false, 0.5f));
+                                    cur_commands.InsertCommand(std::make_shared<DuelCmdWait>(0.5f));
+                                }
+                                cur_commands.InsertCommand(std::make_shared<DuelCmdMove>(ptr, code, con, loc, seq, subs, reason));
+                            } else {
+                                
+                            }
+                        }
+                    }
+                }
                 break;
+            }
             case MSG_POS_CHANGE:
                 break;
             case MSG_SET:
@@ -256,7 +296,8 @@ namespace ygopro
                 uint32_t count = reader.Read<uint8_t>();
                 for(uint32_t i = 0; i < count; ++i) {
                     uint32_t data = reader.Read<uint32_t>();
-                    cur_commands.InsertCommand(std::make_shared<DuelCommandDraw>(playerid, data));
+                    cur_commands.InsertCommand(std::make_shared<DuelCmdDraw>(playerid, data));
+                    cur_commands.InsertCommand(std::make_shared<DuelCmdWait>(0.5));
                 }
                 break;
             }
@@ -388,7 +429,7 @@ namespace ygopro
     }
 
     int32_t DuelProtoHandler::MessageToCmd(uint8_t msg_type, BufferUtil& reader) {
-        PushCommand(std::make_shared<DuelCommandMsg>(msg_type, reader));
+        PushCommand(std::make_shared<DuelCmdMsg>(msg_type, reader));
         return 0;
     }
     

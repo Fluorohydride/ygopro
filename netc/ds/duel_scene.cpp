@@ -170,6 +170,32 @@ namespace ygopro
             RefreshVertices();
     }
     
+    void FieldCard::Attach(std::shared_ptr<FieldCard> target) {
+        if(attaching_card == target)
+            return;
+        if(attaching_card)
+            Detach();
+        attaching_card = target;
+        target->attached_cards.push_back(shared_from_this());
+        target->ResetAttachSeq();
+        pos = target->attached_cards.size() - 1;
+    }
+    
+    void FieldCard::Detach() {
+        if(!attaching_card)
+            return;
+        auto target = attaching_card;
+        target->attached_cards.erase(target->attached_cards.begin() + pos);
+        target->ResetAttachSeq();
+        attaching_card = nullptr;
+    }
+    
+    void FieldCard::ResetAttachSeq() {
+        int32_t i = 0;
+        for(auto pcard : attached_cards)
+            pcard->pos = i++;
+    }
+    
     DuelScene::DuelScene() {
         glGenBuffers(1, &index_buffer);
         glGenBuffers(1, &card_index_buffer);
@@ -419,7 +445,7 @@ namespace ygopro
                 if(region & (0x20 << seq)) {
                     auto pcard = m_zone[side][seq];
                     if(pcard) {
-                        for(auto& iter : pcard->olcards)
+                        for(auto& iter : pcard->attached_cards)
                             RefreshPos(iter, false, 0.5);
                         RefreshPos(pcard);
                     }
@@ -503,7 +529,7 @@ namespace ygopro
         push_index(s_zone[1]);
         for(auto& iter : m_zone[1]) {
             if(iter != nullptr)
-                push_index(iter->olcards);
+                push_index(iter->attached_cards);
         }
         push_index(m_zone[1]);
         push_index(grave[1]);
@@ -513,7 +539,7 @@ namespace ygopro
         push_index(banished[0]);
         for(auto& iter : m_zone[0]) {
             if(iter != nullptr)
-                push_index(iter->olcards);
+                push_index(iter->attached_cards);
         }
         push_index(m_zone[0]);
         push_index(s_zone[0]);
@@ -614,7 +640,7 @@ namespace ygopro
             case 0x4:
                 if(zone & 0x80) {
                     auto pre = m_zone[side][seq];
-                    pre->olcards.push_back(ptr);
+                    pre->attached_cards.push_back(ptr);
                 } else
                     m_zone[side][seq] = ptr;
                 break;
@@ -646,7 +672,7 @@ namespace ygopro
             case 0x4:
                 if(zone & 0x80) {
                     auto pcard = m_zone[side][seq];
-                    return pcard->olcards[subs];
+                    return pcard->attached_cards[subs];
                 } else
                     return m_zone[side][seq];
             case 0x8:
@@ -688,10 +714,10 @@ namespace ygopro
             case 0x4:
                 if(zone & 0x80) {
                     auto pcard = m_zone[side][seq];
-                    ret = pcard->olcards[subs];
-                    pcard->olcards.erase(pcard->olcards.begin() + subs);
+                    ret = pcard->attached_cards[subs];
+                    pcard->attached_cards.erase(pcard->attached_cards.begin() + subs);
                     uint32_t index = 0;
-                    for(auto& iter : pcard->olcards)
+                    for(auto& iter : pcard->attached_cards)
                         iter->seq = index++;
                     refresh_region |= 0x20 << (side * 16 + seq);
                 } else {
@@ -746,19 +772,21 @@ namespace ygopro
         // POS_FACEDOWN_DEFENCE     0x8
         v3f tl;
         glm::quat rot;
-        uint32_t side = pcard->side;
-        uint32_t seq = pcard->seq;
+        uint32_t side = pcard->attaching_card? pcard->attaching_card->side : pcard->side;
+        uint32_t loc = pcard->attaching_card? pcard->attaching_card->loc : pcard->loc;
+        uint32_t seq = pcard->attaching_card? pcard->attaching_card->seq : pcard->seq;
+        uint32_t pos = pcard->attaching_card? 0x5 : pcard->pos;
         uint32_t subs = pcard->pos;
-        switch(pcard->loc & 0x7f) {
+        switch(loc) {
             case 0x1: {
                 tl = field_blocks[side][13]->translation;
                 tl.z = 0.001f * subs;
-                if(subs & 0x5) {
+                if(pos & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                } else if(subs & 0xa) {
+                } else if(pos & 0xa) {
                     if(side == 0)
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
                     else
@@ -799,26 +827,26 @@ namespace ygopro
                 break;
             case 0x4: {
                 tl = field_blocks[side][seq]->translation;
-                if(pcard->side & 0x80) {
+                if(pcard->attaching_card != nullptr) {
                     tl.z = 0.001f * subs;
                 } else {
-                    tl.z = 0.001f * pcard->olcards.size();
-                    if(subs == 1) {
+                    tl.z = 0.001f * pcard->attached_cards.size();
+                    if(pos == 1) {
                         if(side == 0)
                             rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                         else
                             rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                    } else if(subs == 0x2) {
+                    } else if(pos == 0x2) {
                         if(side == 0)
                             rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
                         else
                             rot = glm::angleAxis(3.1415926f, glm::vec3(1.0f, 0.0f, 0.0f));
-                    } else if(subs == 0x4) {
+                    } else if(pos == 0x4) {
                         if(side == 0)
                             rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, 1.0f));
                         else
                             rot = glm::angleAxis(3.1415926f * 0.5f, glm::vec3(0.0f, 0.0f, -1.0f));
-                    } else if(subs == 0x8) {
+                    } else if(pos == 0x8) {
                         if(side == 0)
                             rot = glm::angleAxis(3.1415926f, glm::vec3(-0.70710678f, 0.70710678f, 0.0f));
                         else
@@ -830,12 +858,12 @@ namespace ygopro
                 break;
             case 0x8: {
                 tl = field_blocks[side][seq + 5]->translation;
-                if(subs & 0x5) {
+                if(pos & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                } else if(subs & 0xa) {
+                } else if(pos & 0xa) {
                     if(side == 0)
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
                     else
@@ -845,7 +873,7 @@ namespace ygopro
                 break;
             case 0x10: {
                 tl = field_blocks[side][15]->translation;
-                tl.z = subs * 0.001f;
+                tl.z = seq * 0.001f;
                 if(side == 0)
                     rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                 else
@@ -854,13 +882,13 @@ namespace ygopro
                 break;
             case 0x20: {
                 tl = field_blocks[side][16]->translation;
-                tl.z = subs * 0.001f;
-                if(subs & 0x5) {
+                tl.z = seq * 0.001f;
+                if(pos & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                } else if(subs & 0xa) {
+                } else if(pos & 0xa) {
                     if(side == 0)
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
                     else
@@ -870,13 +898,13 @@ namespace ygopro
                 break;
             case 0x40: {
                 tl = field_blocks[side][14]->translation;
-                tl.z = subs * 0.001f;
-                if(subs & 0x5) {
+                tl.z = seq * 0.001f;
+                if(pos & 0x5) {
                     if(side == 0)
                         rot = glm::angleAxis(0.0f, glm::vec3(0.0f, 0.0f, 1.0f));
                     else
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 0.0f, 1.0f));
-                } else if(subs & 0xa) {
+                } else if(pos & 0xa) {
                     if(side == 0)
                         rot = glm::angleAxis(3.1415926f, glm::vec3(0.0f, 1.0f, 0.0f));
                     else
@@ -971,7 +999,7 @@ namespace ygopro
                 if(tozone & 0x80) {
                     auto pre = m_zone[toside][toseq];
                     if(pre) {
-                        pre->olcards.push_back(pcard);
+                        pre->attached_cards.push_back(pcard);
                         refresh_region |= 0x4 << (toside * 16);
                     }
                 } else {
@@ -1098,6 +1126,13 @@ namespace ygopro
     
     void DuelScene::AddChain(uint32_t code, int32_t side, int32_t zone, int32_t seq, int32_t subs, int32_t tside, int32_t tzone, int32_t tseq) {
         
+    }
+    
+    void DuelScene::DrawCard(int32_t pl, int32_t data) {
+        if(deck[pl].empty())
+            return;
+        auto ptr = deck[pl].back();
+        MoveCard(ptr, pl, 0x2, 0, 0);
     }
     
     v2i DuelScene::CheckHoverBlock(float px, float py) {

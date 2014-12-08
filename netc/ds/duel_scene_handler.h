@@ -22,11 +22,11 @@ namespace ygopro
             std::unique_lock<std::mutex> lck(cmd_mtx);
             if(cmd == nullptr)
                 return;
-            cur_command = std::static_pointer_cast<DuelCommand>(cmd);
+            cur_command = std::static_pointer_cast<DuelCmd>(cmd);
             cmd_notifier.wait(lck);
         }
         
-        std::shared_ptr<DuelCommand> GetCommand() {
+        std::shared_ptr<DuelCmd> GetCommand() {
             std::unique_lock<std::mutex> lck(cmd_mtx);
             return cur_command;
         }
@@ -41,7 +41,7 @@ namespace ygopro
         
     protected:
         std::vector<uint8_t> msg_buffer;
-        std::shared_ptr<DuelCommand> cur_command;
+        std::shared_ptr<DuelCmd> cur_command;
         std::mutex cmd_mtx;
         std::condition_variable cmd_notifier;
     };
@@ -59,7 +59,7 @@ namespace ygopro
         
     protected:
         std::weak_ptr<DuelScene> duel_scene;
-        CommandList<DuelCommand> cur_commands;
+        CommandList<DuelCmd> cur_commands;
         std::shared_ptr<DuelProtoHandler> proto_handler;
     };
     
