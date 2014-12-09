@@ -1,7 +1,7 @@
 --超銀河眼の光子龍
 function c39272762.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),3)
+	aux.AddXyzProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
 	--negate
 	local e1=Effect.CreateEffect(c)

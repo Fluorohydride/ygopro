@@ -13,7 +13,7 @@ function c48049769.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c48049769.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp) and e:GetHandler():IsDiscardable() end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0 and e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())

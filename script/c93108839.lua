@@ -1,7 +1,7 @@
 --No.58 炎圧鬼バーナー・バイサー
 function c93108839.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)

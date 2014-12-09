@@ -78,7 +78,7 @@ function c63014935.phop(e,tp,eg,ep,ev,re,r,rp)
 	else Duel.Damage(tp,1000,REASON_EFFECT) end
 end
 function c63014935.spcost(e,c,tp)
-	return not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c63014935.spcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -2,7 +2,7 @@
 function c73289035.initial_effect(c)
 	c:SetUniqueOnField(1,0,73289035)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),4,2)
 	c:EnableReviveLimit()
 	--draw
 	local e1=Effect.CreateEffect(c)

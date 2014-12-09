@@ -61,14 +61,12 @@ function c59057152.desfilter(c)
 	return c:IsFaceup() and c:IsType(TYPE_EQUIP)
 end
 function c59057152.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c59057152.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-		if g:GetCount()~=0 then
-			Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
-		end
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+	local g=Duel.SelectMatchingCard(tp,c59057152.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
+	if g:GetCount()>0 and Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENCE)~=0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local dg=Duel.SelectMatchingCard(tp,c59057152.desfilter,tp,LOCATION_SZONE,0,1,1,nil)
+		Duel.Destroy(dg,REASON_EFFECT)
 	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local dg=Duel.SelectMatchingCard(tp,c59057152.desfilter,tp,LOCATION_SZONE,0,1,1,nil)
-	Duel.Destroy(dg,REASON_EFFECT)
 end

@@ -1,7 +1,7 @@
 --CX 激烈華戦艦タオヤメ
 function c76419637.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),4)
+	aux.AddXyzProcedure(c,nil,4,4)
 	c:EnableReviveLimit()
 	--discard
 	local e1=Effect.CreateEffect(c)

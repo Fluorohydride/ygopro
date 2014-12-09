@@ -83,6 +83,6 @@ function c59650656.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	_replace_count=_replace_count+1
 	if _replace_count<=_replace_max and tc:IsRelateToEffect(e) then
-		 Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

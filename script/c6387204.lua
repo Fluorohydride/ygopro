@@ -1,7 +1,7 @@
 --CNo.6 先史遺産カオス・アトランタル
 function c6387204.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,nil,7,3)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)

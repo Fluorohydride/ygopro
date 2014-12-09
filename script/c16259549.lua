@@ -1,7 +1,7 @@
 --No.49 秘鳥フォーチュンチュン
 function c16259549.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--lpup
 	local e1=Effect.CreateEffect(c)

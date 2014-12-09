@@ -1,7 +1,7 @@
 --No.101 S・H・Ark Knight
 function c48739166.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)

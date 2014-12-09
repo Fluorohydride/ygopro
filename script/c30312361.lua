@@ -8,6 +8,7 @@ function c30312361.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCost(c30312361.cost)
 	e1:SetTarget(c30312361.target)
 	e1:SetOperation(c30312361.operation)
 	c:RegisterEffect(e1)
@@ -17,8 +18,12 @@ function c30312361.initial_effect(c)
 	e2:SetCode(EFFECT_NO_BATTLE_DAMAGE)
 	c:RegisterEffect(e2)
 end
+function c30312361.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(30312361)==0 end
+	e:GetHandler():RegisterFlagEffect(30312361,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+end
 function c30312361.filter(c)
-	return c:IsType(TYPE_EFFECT) and not c:IsHasEffect(EFFECT_FORBIDDEN) and c:IsAbleToRemove()
+	return c:IsType(TYPE_EFFECT) and not c:IsForbidden() and c:IsAbleToRemove()
 end
 function c30312361.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c30312361.filter(chkc) end

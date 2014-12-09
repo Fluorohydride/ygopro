@@ -28,7 +28,7 @@ function c86889202.cfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToGraveAsCost()
 end
 function c86889202.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp)
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0
 		and Duel.IsExistingMatchingCard(c86889202.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,c86889202.cfilter,1,1,REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())

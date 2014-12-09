@@ -1,7 +1,7 @@
 --CNo.107 超銀河眼の時空龍
 function c68396121.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),3)
+	aux.AddXyzProcedure(c,nil,9,3)
 	c:EnableReviveLimit()
 	--negate
 	local e1=Effect.CreateEffect(c)

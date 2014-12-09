@@ -19,7 +19,7 @@ function c76348260.cfilter(c)
 end
 function c76348260.condition(e,tp,eg,ep,ev,re,r,rp)
 	return tp==Duel.GetTurnPlayer() and not Duel.CheckPhaseActivity()
-	 and Duel.IsExistingMatchingCard(c76348260.cfilter,tp,LOCATION_MZONE,0,1,nil) 
+		and Duel.IsExistingMatchingCard(c76348260.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c76348260.costfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToGraveAsCost()

@@ -1,7 +1,7 @@
 --No.92 偽骸神龍 Heart－eartH Dragon
 function c97403510.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),3)
+	aux.AddXyzProcedure(c,nil,9,3)
 	c:EnableReviveLimit()
 	--battle
 	local e1=Effect.CreateEffect(c)

@@ -12,7 +12,7 @@ function c96331676.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c96331676.costfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
 end
 function c96331676.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c96331676.costfilter,tp,LOCATION_SZONE,0,1,nil) end

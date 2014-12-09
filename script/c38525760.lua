@@ -32,10 +32,10 @@ end
 function c38525760.tgvalue(e,re,rp)
 	return rp~=e:GetHandlerPlayer()
 end
-function c38525760.ntcon(e,c)
+function c38525760.ntcon(e,c,minc)
 	if c==nil then return true end
 	local mi,ma=c:GetTributeRequirement()
-	return mi>0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and mi>0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c38525760.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack

@@ -1,7 +1,7 @@
 --聖光の宣告者
 function c1249315.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,2),2)
+	aux.AddXyzProcedure(c,nil,2,2)
 	c:EnableReviveLimit()
 	--to hand
 	local e2=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --CNo.106 溶岩掌ジャイアント・ハンド・レッド
 function c55888045.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--Negate
 	local e1=Effect.CreateEffect(c)

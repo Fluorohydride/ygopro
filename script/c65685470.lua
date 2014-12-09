@@ -27,7 +27,7 @@ function c65685470.initial_effect(c)
 	e3:SetValue(500)
 	e3:SetCondition(c65685470.uncon)
 	c:RegisterEffect(e3)
-	--Atk up
+	--Def up
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP)
 	e4:SetCode(EFFECT_UPDATE_DEFENCE)
@@ -100,7 +100,7 @@ end
 function c65685470.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP_ATTACK)
 	end
 end
 function c65685470.drcon(e,tp,eg,ep,ev,re,r,rp)

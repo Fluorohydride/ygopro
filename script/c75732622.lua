@@ -35,7 +35,7 @@ function c75732622.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.SpecialSummonComplete()
 end
 function c75732622.spcost(e,c,tp)
-	return not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c75732622.spcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

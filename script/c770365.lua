@@ -1,7 +1,7 @@
 --魔導皇聖 トリス
 function c770365.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),5),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_SPELLCASTER),5,2)
 	c:EnableReviveLimit()
 	--atklimit
 	local e1=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --No.63 おしゃもじソルジャー
 function c89642993.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),2)
+	aux.AddXyzProcedure(c,nil,1,2)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)

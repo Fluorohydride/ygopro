@@ -17,8 +17,7 @@ function c76459806.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c76459806.filter(c)
-	local code=c:GetCode()
-	return (code==69537999 or code==21420702) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsSetCard(0xb9) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c76459806.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c76459806.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end

@@ -1,7 +1,7 @@
 --超次元ロボ ギャラクシー・デストロイヤー
 function c66523544.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,10),3)
+	aux.AddXyzProcedure(c,nil,10,3)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)

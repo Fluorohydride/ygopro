@@ -1,7 +1,7 @@
 --No.25 重装光学撮影機フォーカス・フォース
 function c64554883.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),2)
+	aux.AddXyzProcedure(c,nil,6,2)
 	c:EnableReviveLimit()
 	--disable
 	local e1=Effect.CreateEffect(c)

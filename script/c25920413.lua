@@ -33,8 +33,9 @@ function c25920413.spfilter(c)
 end
 function c25920413.spcon(e,c)
 	if c==nil then return true end
-	return not Duel.CheckNormalSummonActivity(c:GetControler())
-		and Duel.IsExistingMatchingCard(c25920413.spfilter,c:GetControler(),0,LOCATION_MZONE,1,nil)
+	local tp=c:GetControler()
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
+		and Duel.IsExistingMatchingCard(c25920413.spfilter,tp,0,LOCATION_MZONE,1,nil)
 end
 function c25920413.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
