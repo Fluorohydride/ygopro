@@ -45,7 +45,7 @@ function c64203620.descon(e)
 	return not Duel.IsExistingMatchingCard(c64203620.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function c64203620.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK) and e:GetHandler():IsPreviousPosition(POS_FACEUP_ATTACK)
+	return e:GetHandler():IsPosition(POS_FACEUP_ATTACK) and e:GetHandler():IsPreviousPosition(POS_FACEUP_DEFENCE)
 end
 function c64203620.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

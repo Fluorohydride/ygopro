@@ -21,11 +21,11 @@ function c62125438.initial_effect(c)
 	e2:SetOperation(c62125438.spop)
 	c:RegisterEffect(e2)
 end
-function c62125438.filter(c)
-	return c:IsSetCard(0x17) and c:IsType(TYPE_MONSTER) and c:IsLocation(LOCATION_GRAVE)
+function c62125438.filter(c,tp)
+	return c:IsSetCard(0x17) and c:IsType(TYPE_MONSTER) and c:IsControler(tp) and c:IsLocation(LOCATION_GRAVE)
 end
 function c62125438.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:IsExists(c62125438.filter,1,nil) and r==REASON_SYNCHRO and re:GetHandler():IsRace(RACE_WARRIOR+RACE_MACHINE)
+	return eg:IsExists(c62125438.filter,1,nil,tp) and r==REASON_SYNCHRO and re:GetHandler():IsRace(RACE_WARRIOR+RACE_MACHINE)
 end
 function c62125438.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
