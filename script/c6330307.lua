@@ -28,7 +28,7 @@ function c6330307.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c6330307.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x7f) and c:IsSetCard(0x1048)
+	return c:IsFaceup() and c.xyz_number==39 and c:IsSetCard(0x1048)
 end
 function c6330307.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c6330307.filter(chkc) end
