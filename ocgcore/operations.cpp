@@ -2195,10 +2195,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pcard->current.reason_effect = peffect;
 		pcard->current.reason_player = sumplayer;
 		pcard->summon_player = sumplayer;
-		pcard->summon_info = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)target->current.location << 16);
+		pcard->summon_info = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)pcard->current.location << 16);
 		move_to_field(pcard, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
 		core.spsummon_state_count[sumplayer]++;
-		CheckCounter(target, 3, sumplayer);
+		CheckCounter(pcard, 3, sumplayer);
 		return FALSE;
 	}
 	case 24: {
