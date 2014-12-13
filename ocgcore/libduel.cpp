@@ -3081,6 +3081,9 @@ int32 scriptlib::duel_get_activity_count(lua_State *L) {
 		case 5:
 			lua_pushinteger(L, pduel->game_field->core.attack_state_count[playerid]);
 			break;
+		case 6:
+			lua_pushinteger(L, pduel->game_field->core.battle_phase_count[playerid]);
+			break;
 		default:
 			lua_pushinteger(L, 0);
 			break;
@@ -3185,7 +3188,7 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 		lua_pushinteger(L, val & 0xffff);
 	else
 		lua_pushinteger(L, (val >> 16) & 0xffff);
-	return 0;
+	return 1;
 }
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	check_param_count(L, 2);

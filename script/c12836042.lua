@@ -17,7 +17,7 @@ function c12836042.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)<=1
 end
 function c12836042.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetCurrentPhase()==PHASE_MAIN1
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0
 		and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0
 		and e:GetHandler():IsReleasable() end
 	local e1=Effect.CreateEffect(e:GetHandler())

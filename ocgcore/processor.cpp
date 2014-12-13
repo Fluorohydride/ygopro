@@ -3994,6 +3994,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.flipsummon_state_count[p] = 0;
 			core.spsummon_state_count[p] = 0;
 			core.attack_state_count[p] = 0;
+			core.battle_phase_count[p] = 0;
 			core.summon_count[p] = 0;
 			core.extra_summon[p] = 0;
 		}
@@ -4125,6 +4126,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		}
 		infos.phase = PHASE_BATTLE;
 		core.phase_action = FALSE;
+		core.battle_phase_count[infos.turn_player]++;
 		pduel->write_buffer8(MSG_NEW_PHASE);
 		pduel->write_buffer8(infos.phase);
 		pduel->write_buffer8(MSG_HINT);
