@@ -149,7 +149,7 @@ public:
 	uint32 get_rank();
 	uint32 get_synchro_level(card* pcard);
 	uint32 get_ritual_level(card* pcard);
-	uint32 is_xyz_level(card* pcard, uint32 lv);
+	uint32 check_xyz_level(card* pcard, uint32 lv);
 	uint32 get_attribute();
 	uint32 get_race();
 	uint32 get_lscale();

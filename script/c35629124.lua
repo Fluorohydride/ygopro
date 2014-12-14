@@ -16,7 +16,7 @@ function c35629124.initial_effect(c)
 	Duel.AddCustomActivityCounter(35629124,ACTIVITY_SPSUMMON,c35629124.counterfilter)
 end
 function c35629124.counterfilter(c)
-	return c:IsRace(0xffffff-RACE_DRAGON)
+	return c:IsRace(RACE_DRAGON)
 end
 function c35629124.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)

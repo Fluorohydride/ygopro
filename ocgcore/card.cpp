@@ -585,7 +585,7 @@ uint32 card::get_ritual_level(card* pcard) {
 		lev = get_level();
 	return lev;
 }
-uint32 card::is_xyz_level(card* pcard, uint32 lv) {
+uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
 		return FALSE;
 	uint32 lev;
@@ -597,7 +597,11 @@ uint32 card::is_xyz_level(card* pcard, uint32 lv) {
 		lev = eset[0]->get_value(2);
 	} else
 		lev = get_level();
-	return ((lev & 0xfff) == lv) || (((lev >> 16) & 0xfff) == lv);
+	if(((lev & 0xfff) == lv))
+		return lev & 0xffff;
+	if(((lev >> 16) & 0xfff) == lv)
+		return (lev >> 16) & 0xffff;
+	return 0;
 }
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)

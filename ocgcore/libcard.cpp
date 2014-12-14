@@ -118,7 +118,7 @@ int32 scriptlib::card_is_xyz_level(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* xyzcard = *(card**) lua_touserdata(L, 2);
 	uint32 lv = lua_tointeger(L, 3);
-	lua_pushboolean(L, pcard->is_xyz_level(xyzcard, lv));
+	lua_pushboolean(L, pcard->check_xyz_level(xyzcard, lv));
 	return 1;
 }
 int32 scriptlib::card_get_lscale(lua_State *L) {

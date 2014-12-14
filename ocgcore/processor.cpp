@@ -5086,6 +5086,10 @@ int32 field::adjust_step(uint16 step) {
 		if(returns.ivalue[0] > 0)
 			core.re_adjust = TRUE;
 		//self tograve
+		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE)) {
+			returns.ivalue[0] = 0;
+			return FALSE;
+		}
 		uint8 tp = infos.turn_player;
 		effect* peffect;
 		card_set tograve_set;
