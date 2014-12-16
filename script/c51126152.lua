@@ -17,9 +17,9 @@ function c51126152.initial_effect(c)
 	e2:SetOperation(c51126152.ntop)
 	c:RegisterEffect(e2)
 end
-function c51126152.ntcon(e,c)
+function c51126152.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c51126152.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack

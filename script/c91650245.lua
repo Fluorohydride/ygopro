@@ -48,7 +48,7 @@ function c91650245.activate(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetRange(LOCATION_MZONE)
 			e2:SetCode(EFFECT_IMMUNE_EFFECT)
 			e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
-			e2:SetValue(1)
+			e2:SetValue(c91650245.efilter)
 			sc:RegisterEffect(e2)
 		end
 	end
@@ -61,4 +61,7 @@ function c91650245.tdop(e,tp,eg,ep,ev,re,r,rp)
 	else
 		Duel.SendtoDeck(c,nil,1,REASON_EFFECT)
 	end
+end
+function c91650245.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end

@@ -49,21 +49,18 @@ function c88728507.sumop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetTargetRange(LOCATION_HAND,0)
 		e1:SetCode(EFFECT_SUMMON_PROC)
+		e1:SetCountLimit(1)
 		e1:SetCondition(c88728507.ntcon)
 		e1:SetTarget(c88728507.nttg)
-		e1:SetOperation(c88728507.ntop)
 		e1:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
 		Duel.RegisterFlagEffect(tp,88728507,RESET_PHASE+PHASE_END,0,1)
 	end
 end
-function c88728507.ntcon(e,c)
+function c88728507.ntcon(e,c,minc)
 	if c==nil then return true end
-	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c88728507.nttg(e,c)
 	return c:IsLevelAbove(5) and c:IsSetCard(0x8e) and c:IsAttribute(ATTRIBUTE_DARK)
-end
-function c88728507.ntop(e,tp,eg,ep,ev,re,r,rp,c)
-	e:Reset()
 end

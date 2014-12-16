@@ -1283,34 +1283,23 @@ void field::get_xyz_material(card* scard, int32 findex, uint32 lv, int32 maxc) {
 	card* pcard = 0;
 	int32 playerid = scard->current.controler;
 	core.xmaterial_lst.clear();
-	card_vector cv;
+	uint32 xyz_level;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[playerid].list_mzone[i];
-		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard) && pcard->is_xyz_level(scard, lv)
+		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard) && (xyz_level = pcard->check_xyz_level(scard, lv))
 				&& (findex == 0 || pduel->lua->check_matching(pcard, findex, 0)))
-			cv.push_back(pcard);
+			core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, pcard));
 	}
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - playerid].list_mzone[i];
-		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard) && pcard->is_xyz_level(scard, lv)
+		if(pcard && pcard->is_position(POS_FACEUP) && pcard->is_can_be_xyz_material(scard) && (xyz_level = pcard->check_xyz_level(scard, lv))
 		        && pcard->is_affected_by_effect(EFFECT_XYZ_MATERIAL) && (findex == 0 || pduel->lua->check_matching(pcard, findex, 0)))
-			cv.push_back(pcard);
+			core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, pcard));
 	}
 	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-		for(auto cit = cv.begin(); cit != cv.end(); ++cit) {
-			effect* peffect = (*cit)->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
-			if(peffect) {
-				int32 v = peffect->get_value();
-				core.xmaterial_lst.insert(std::make_pair(v, *cit));
-			} else
-				core.xmaterial_lst.insert(std::make_pair(0, *cit));
-		}
 		auto iter = core.xmaterial_lst.begin();
 		while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > maxc)))
 			core.xmaterial_lst.erase(iter++);
-	} else {
-		for(auto cit = cv.begin(); cit != cv.end(); ++cit)
-			core.xmaterial_lst.insert(std::make_pair(0, *cit));
 	}
 }
 void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
@@ -1714,31 +1703,19 @@ int32 field::check_with_sum_limit(card_vector* mats, int32 acc, int32 index, int
 }
 int32 field::check_xyz_material(card* scard, int32 findex, int32 lv, int32 min, int32 max, group* mg) {
 	if(mg) {
-		card_vector cv;
+		uint32 xyz_level;
 		core.xmaterial_lst.clear();
 		for (auto cit : mg->container) {
-			if(cit->is_xyz_level(scard, lv) && (findex == 0 || pduel->lua->check_matching(cit, findex, 0)))
-				cv.push_back(cit);
+			if((xyz_level = cit->check_xyz_level(scard, lv)) && (findex == 0 || pduel->lua->check_matching(cit, findex, 0)))
+				core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, cit));
 		}
 		if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-			for(auto cit : cv) {
-				effect* peffect = cit->is_affected_by_effect(EFFECT_XMAT_COUNT_LIMIT);
-				if(peffect) {
-					int32 v = peffect->get_value();
-					core.xmaterial_lst.insert(std::make_pair(v, cit));
-				} else
-					core.xmaterial_lst.insert(std::make_pair(0, cit));
-			}
 			auto iter = core.xmaterial_lst.begin();
 			while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > max)))
 				core.xmaterial_lst.erase(iter++);
-		} else {
-			for(auto cit : cv)
-				core.xmaterial_lst.insert(std::make_pair(0, cit));
 		}
-	} else {
+	} else
 		get_xyz_material(scard, findex, lv, max);
-	}
 	return core.xmaterial_lst.size() >= min;
 }
 int32 field::is_player_can_draw(uint8 playerid) {

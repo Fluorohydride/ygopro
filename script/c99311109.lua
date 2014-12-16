@@ -13,8 +13,7 @@ function c99311109.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c99311109.cfilter(c)
-	return c:IsPreviousLocation(LOCATION_EXTRA)
-		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return c:GetSummonLocation()==LOCATION_EXTRA
 end
 function c99311109.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(c99311109.cfilter,tp,LOCATION_MZONE,0,1,nil)
@@ -30,8 +29,7 @@ function c99311109.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c99311109.filter(c)
-	return c:IsFaceup() and c:IsPreviousLocation(LOCATION_EXTRA) and c:IsControlerCanBeChanged()
-		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return c:IsFaceup() and c:IsControlerCanBeChanged() and c:GetSummonLocation()==LOCATION_EXTRA
 end
 function c99311109.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c99311109.filter(chkc) end

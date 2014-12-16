@@ -33,9 +33,9 @@ function c78651105.initial_effect(c)
 	e4:SetOperation(c78651105.desop)
 	c:RegisterEffect(e4)
 end
-function c78651105.ntcon(e,c)
+function c78651105.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c78651105.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack
@@ -64,7 +64,7 @@ end
 function c78651105.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sg,sg:GetCount(),0,0)
 end
 function c78651105.desop(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)

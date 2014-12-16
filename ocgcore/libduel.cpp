@@ -11,6 +11,7 @@
 #include "card.h"
 #include "effect.h"
 #include "group.h"
+#include "ocgapi.h"
 
 int32 scriptlib::duel_enable_global_flag(lua_State *L) {
 	check_param_count(L, 1);
@@ -216,8 +217,11 @@ int32 scriptlib::duel_summon(lua_State *L) {
 		return 0;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	uint32 ignore_count = lua_toboolean(L, 3);
+	uint32 min_tribute = 0;
+	if(lua_gettop(L) > 4)
+		min_tribute = lua_tointeger(L, 5);
 	duel * pduel = pcard->pduel;
-	pduel->game_field->summon(playerid, pcard, peffect, ignore_count);
+	pduel->game_field->summon(playerid, pcard, peffect, ignore_count, min_tribute);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_special_summon_rule(lua_State *L) {
@@ -290,8 +294,11 @@ int32 scriptlib::duel_setm(lua_State *L) {
 		return 0;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	uint32 ignore_count = lua_toboolean(L, 3);
+	uint32 min_tribute = 0;
+	if(lua_gettop(L) > 4)
+		min_tribute = lua_tointeger(L, 5);
 	duel * pduel = pcard->pduel;
-	pduel->game_field->add_process(PROCESSOR_MSET, 0, peffect, (group*)pcard, playerid, ignore_count);
+	pduel->game_field->add_process(PROCESSOR_MSET, 0, peffect, (group*)pcard, playerid, ignore_count + (min_tribute << 8));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_sets(lua_State *L) {
@@ -2884,16 +2891,25 @@ int32 scriptlib::duel_is_player_can_spsummon_monster(lua_State * L) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
+	int32 code = lua_tointeger(L, 2);
 	card_data dat;
-	dat.code = lua_tointeger(L, 2);
+	::read_card(code, &dat);
+	dat.code = code;
 	dat.alias = 0;
-	dat.setcode = lua_tointeger(L, 3);
-	dat.type = lua_tointeger(L, 4);
-	dat.attack = lua_tointeger(L, 5);
-	dat.defence = lua_tointeger(L, 6);
-	dat.level = lua_tointeger(L, 7);
-	dat.race = lua_tointeger(L, 8);
-	dat.attribute = lua_tointeger(L, 9);
+	if(!lua_isnil(L, 3))
+		dat.setcode = lua_tointeger(L, 3);
+	if(!lua_isnil(L, 4))
+		dat.type = lua_tointeger(L, 4);
+	if(!lua_isnil(L, 5))
+		dat.attack = lua_tointeger(L, 5);
+	if(!lua_isnil(L, 6))
+		dat.defence = lua_tointeger(L, 6);
+	if(!lua_isnil(L, 7))
+		dat.level = lua_tointeger(L, 7);
+	if(!lua_isnil(L, 8))
+		dat.race = lua_tointeger(L, 8);
+	if(!lua_isnil(L, 9))
+		dat.attribute = lua_tointeger(L, 9);
 	int32 pos = POS_FACEUP;
 	int32 toplayer = playerid;
 	if(lua_gettop(L) >= 10)
@@ -3065,6 +3081,9 @@ int32 scriptlib::duel_get_activity_count(lua_State *L) {
 		case 5:
 			lua_pushinteger(L, pduel->game_field->core.attack_state_count[playerid]);
 			break;
+		case 6:
+			lua_pushinteger(L, pduel->game_field->core.battle_phase_count[playerid]);
+			break;
 		default:
 			lua_pushinteger(L, 0);
 			break;
@@ -3169,7 +3188,7 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 		lua_pushinteger(L, val & 0xffff);
 	else
 		lua_pushinteger(L, (val >> 16) & 0xffff);
-	return 0;
+	return 1;
 }
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	check_param_count(L, 2);

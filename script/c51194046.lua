@@ -78,5 +78,6 @@ function c51194046.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,c51194046[tp])
 end
 function c51194046.drop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	Duel.Draw(tp,c51194046[tp],REASON_EFFECT)
 end

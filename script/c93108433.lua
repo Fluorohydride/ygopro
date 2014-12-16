@@ -39,5 +39,5 @@ function c93108433.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ShuffleDeck(tp)
 		Duel.BreakEffect()
 		Duel.Draw(tp,ct,REASON_EFFECT)
-	 end 
+	end
 end

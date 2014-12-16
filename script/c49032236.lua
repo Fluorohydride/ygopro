@@ -39,5 +39,5 @@ function c49032236.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c49032236.efilter(e,re)
-	return e:GetHandler()~=re:GetHandler()
+	return e:GetHandler()~=re:GetOwner()
 end

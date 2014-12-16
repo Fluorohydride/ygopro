@@ -118,7 +118,7 @@ int32 scriptlib::card_is_xyz_level(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* xyzcard = *(card**) lua_touserdata(L, 2);
 	uint32 lv = lua_tointeger(L, 3);
-	lua_pushboolean(L, pcard->is_xyz_level(xyzcard, lv));
+	lua_pushboolean(L, pcard->check_xyz_level(xyzcard, lv));
 	return 1;
 }
 int32 scriptlib::card_get_lscale(lua_State *L) {
@@ -1132,7 +1132,10 @@ int32 scriptlib::card_is_msetable(lua_State *L) {
 		check_param(L, PARAM_TYPE_EFFECT, 3);
 		peffect = *(effect**)lua_touserdata(L, 3);
 	}
-	lua_pushboolean(L, pcard->is_setable_mzone(p, ign, peffect));
+	uint32 minc = 0;
+	if(lua_gettop(L) > 3)
+		minc = lua_tointeger(L, 4);
+	lua_pushboolean(L, pcard->is_setable_mzone(p, ign, peffect, minc));
 	return 1;
 }
 int32 scriptlib::card_is_ssetable(lua_State *L) {
@@ -1205,7 +1208,10 @@ int32 scriptlib::card_is_can_be_summoned(lua_State *L) {
 		check_param(L, PARAM_TYPE_EFFECT, 3);
 		peffect = *(effect**)lua_touserdata(L, 3);
 	}
-	lua_pushboolean(L, pcard->is_can_be_summoned(p, ign, peffect));
+	uint32 minc = 0;
+	if(lua_gettop(L) > 3)
+		minc = lua_tointeger(L, 4);
+	lua_pushboolean(L, pcard->is_can_be_summoned(p, ign, peffect, minc));
 	return 1;
 }
 int32 scriptlib::card_is_can_be_special_summoned(lua_State *L) {
@@ -1793,11 +1799,14 @@ int32 scriptlib::card_is_can_be_xyz_material(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	card* scard = 0;
-	if(lua_gettop(L) >= 2) {
+	if(lua_gettop(L) >= 2 && !lua_isnil(L, 2)) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		scard = *(card**) lua_touserdata(L, 2);
 	}
-	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard));
+	uint32 ign = FALSE;
+	if(lua_gettop(L) >= 3)
+		ign = lua_toboolean(L, 3);
+	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard, ign));
 	return 1;
 }
 int32 scriptlib::card_check_fusion_material(lua_State *L) {

@@ -25,7 +25,7 @@ function c99899504.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c99899504.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0
 end
 function c99899504.spfilter(c,e,tp)
 	return c:IsCode(26293219) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

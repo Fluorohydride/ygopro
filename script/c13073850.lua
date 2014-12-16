@@ -75,9 +75,9 @@ end
 function c13073850.splimit(e,c)
 	return not c:IsSetCard(0xaa)
 end
-function c13073850.ntcon(e,c)
+function c13073850.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c13073850.lvcon(e)
 	return e:GetHandler():GetMaterialCount()==0
@@ -126,13 +126,16 @@ function c13073850.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
 end
 function c13073850.efilter(e,te)
-	if not te:IsActiveType(TYPE_MONSTER) or not te:IsHasType(0x7e0) then return false end
-	local tc=te:GetHandler()
-	local lv=e:GetHandler():GetLevel()
-	if te:IsActiveType(TYPE_XYZ) then
-		return tc:GetOriginalRank()<lv
+	if te:IsActiveType(TYPE_MONSTER) and (te:IsHasType(0x7e0) or te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
+		local lv=e:GetHandler():GetLevel()
+		local ec=te:GetOwner()
+		if ec:IsType(TYPE_XYZ) then
+			return ec:GetOriginalRank()<lv
+		else
+			return ec:GetOriginalLevel()<lv
+		end
 	end
-	return tc:GetOriginalLevel()<lv
+	return false
 end
 function c13073850.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE and e:GetLabel()==1

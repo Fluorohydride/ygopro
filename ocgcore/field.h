@@ -267,6 +267,7 @@ struct processor {
 	uint8 flipsummon_state_count[2];
 	uint8 spsummon_state_count[2];
 	uint8 attack_state_count[2];
+	uint8 battle_phase_count[2];
 	uint8 phase_action;
 	uint32 hint_timing[2];
 	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;
@@ -442,7 +443,7 @@ public:
 	void draw(effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 count);
 	void damage(effect* reason_effect, uint32 reason, uint32 reason_player, card* pcard, uint32 playerid, uint32 amount);
 	void recover(effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 amount);
-	void summon(uint32 sumplayer, card* target, effect* proc, uint32 ignore_count);
+	void summon(uint32 sumplayer, card* target, effect* proc, uint32 ignore_count, uint32 min_tribute);
 	void special_summon_rule(uint32 sumplayer, card* target);
 	void special_summon(card_set* target, uint32 sumtype, uint32 sumplayer, uint32 playerid, uint32 nocheck, uint32 nolimit, uint32 positions);
 	void special_summon_step(card* target, uint32 sumtype, uint32 sumplayer, uint32 playerid, uint32 nocheck, uint32 nolimit, uint32 positions);
@@ -466,9 +467,9 @@ public:
 	int32 draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 playerid, uint32 count);
 	int32 damage(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, card* pcard, uint8 playerid, uint32 amount);
 	int32 recover(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 playerid, uint32 amount);
-	int32 summon(uint16 step, uint8 sumplayer, card* target, effect* proc, uint8 ignore_count);
+	int32 summon(uint16 step, uint8 sumplayer, card* target, effect* proc, uint8 ignore_count, uint8 min_tribute);
 	int32 flip_summon(uint16 step, uint8 sumplayer, card* target);
-	int32 mset(uint16 step, uint8 setplayer, card* ptarget, effect* proc, uint8 ignore_count);
+	int32 mset(uint16 step, uint8 setplayer, card* ptarget, effect* proc, uint8 ignore_count, uint8 min_tribute);
 	int32 sset(uint16 step, uint8 setplayer, uint8 toplayer, card* ptarget);
 	int32 sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget);
 	int32 special_summon_rule(uint16 step, uint8 sumplayer, card* target);
@@ -567,6 +568,7 @@ public:
 #define GLOBALFLAG_MUST_BE_SMATERIAL	0x20
 #define GLOBALFLAG_SPSUMMON_COUNT		0x40
 #define GLOBALFLAG_XMAT_COUNT_LIMIT		0x80
+#define GLOBALFLAG_SELF_TOGRAVE			0x100
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

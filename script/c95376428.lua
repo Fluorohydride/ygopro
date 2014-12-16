@@ -13,11 +13,15 @@ function c95376428.initial_effect(c)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCondition(c95376428.condition)
+	e2:SetTarget(c95376428.target)
 	e2:SetOperation(c95376428.operation)
 	c:RegisterEffect(e2)
 end
 function c95376428.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsPreviousLocation,1,nil,LOCATION_EXTRA)
+end
+function c95376428.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 end
 function c95376428.filter(c,tp)
 	return c:GetSummonPlayer()==tp

@@ -42,7 +42,7 @@ function c82382815.activate1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c82382815.condition2(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and Duel.IsChainNegatable(ev)
-		 and Duel.IsExistingMatchingCard(c82382815.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(c82382815.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c82382815.target2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
