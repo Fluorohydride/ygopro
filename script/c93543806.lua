@@ -1,4 +1,4 @@
---œ» ∑ﬂzÆb•Ω•Î?•‚•Œ•Í•π
+--ÂÖàÂè≤ÈÅ∫Áî£„ÇΩ„É´¬∑„É¢„Éé„É™„Çπ
 function c93543806.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -11,35 +11,13 @@ function c93543806.initial_effect(c)
 	e1:SetTarget(c93543806.lvtg)
 	e1:SetOperation(c93543806.lvop)
 	c:RegisterEffect(e1)
-	if not c93543806.global_check then
-		c93543806.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c93543806.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c93543806.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(93543806,ACTIVITY_SPSUMMON,c93543806.counterfilter)
 end
-function c93543806.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		if not tc:IsSetCard(0x70) then
-			c93543806[tc:GetSummonPlayer()]=false
-		end
-		tc=eg:GetNext()
-	end
-end
-function c93543806.clear(e,tp,eg,ep,ev,re,r,rp)
-	c93543806[0]=true
-	c93543806[1]=true
+function c93543806.counterfilter(c)
+	return c:IsSetCard(0x70)
 end
 function c93543806.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c93543806[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(93543806,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

@@ -18,24 +18,10 @@ function c53573406.initial_effect(c)
 	e2:SetTarget(c53573406.sptg)
 	e2:SetOperation(c53573406.spop)
 	c:RegisterEffect(e2)
-	if not c53573406.global_check then
-		c53573406.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c53573406.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(53573406,ACTIVITY_SPSUMMON,c53573406.counterfilter)
 end
-function c53573406.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		local sump=tc:GetSummonPlayer()
-		if not tc:IsPreviousLocation(LOCATION_EXTRA) and Duel.GetFlagEffect(sump,53573406)==0 then
-			Duel.RegisterFlagEffect(sump,53573406,RESET_PHASE+PHASE_END,0,1)
-		end
-		tc=eg:GetNext()
-	end
+function c53573406.counterfilter(c)
+	return c:GetSummonLocation()==LOCATION_EXTRA
 end
 function c53573406.cfilter(c)
 	return c:IsFaceup() and c:IsLevelAbove(5)
@@ -44,7 +30,7 @@ function c53573406.sumcon(e)
 	return Duel.IsExistingMatchingCard(c53573406.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,nil)
 end
 function c53573406.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,53573406)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(53573406,tp,ACTIVITY_SPSUMMON)==0 end
 	local fid=e:GetHandler():GetFieldID()
 	e:SetLabel(fid)
 	local e1=Effect.CreateEffect(e:GetHandler())

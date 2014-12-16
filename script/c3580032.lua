@@ -36,30 +36,14 @@ function c3580032.initial_effect(c)
 	e3:SetTarget(c3580032.xyztg)
 	e3:SetOperation(c3580032.xyzop)
 	c:RegisterEffect(e3)
-	if not c3580032.global_check then
-		c3580032.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c3580032.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(3580032,ACTIVITY_SPSUMMON,c3580032.counterfilter)
 end
-function c3580032.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if not tc:IsSetCard(0x107a) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,3580032,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,3580032,RESET_PHASE+PHASE_END,0,1) end
+function c3580032.counterfilter(c)
+	return c:IsSetCard(0x107a)
 end
 function c3580032.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsReleasable() and Duel.GetFlagEffect(tp,3580032)==0 end
+	if chk==0 then return e:GetHandler():IsReleasable()
+		and Duel.GetCustomActivityCount(3580032,tp,ACTIVITY_SPSUMMON)==0 end
 	Duel.Release(e:GetHandler(),REASON_COST)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)

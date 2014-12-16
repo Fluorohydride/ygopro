@@ -1,4 +1,4 @@
---◊”¿Í§›§Û§›§≥
+--Â≠êÁã∏„ÅΩ„Çì„ÅΩ„Åì
 function c92729410.initial_effect(c)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
@@ -10,35 +10,13 @@ function c92729410.initial_effect(c)
 	e2:SetTarget(c92729410.sptg)
 	e2:SetOperation(c92729410.spop)
 	c:RegisterEffect(e2)
-	if not c92729410.global_check then
-		c92729410.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c92729410.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c92729410.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(92729410,ACTIVITY_SPSUMMON,c92729410.counterfilter)
 end
-function c92729410.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		if not tc:IsRace(RACE_BEAST) then
-			c92729410[tc:GetSummonPlayer()]=false
-		end
-		tc=eg:GetNext()
-	end
-end
-function c92729410.clear(e,tp,eg,ep,ev,re,r,rp)
-	c92729410[0]=true
-	c92729410[1]=true
+function c92729410.counterfilter(c)
+	return c:IsRace(RACE_BEAST)
 end
 function c92729410.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c92729410[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(92729410,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
