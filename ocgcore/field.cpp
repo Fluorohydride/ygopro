@@ -1195,7 +1195,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 			rcount += pcard->operation_param;
 		}
 	}
-	int32 ex_sum_max = 0;
+	uint32 ex_sum_max = 0;
 	for(int i = 0; i < 5; ++i) {
 		pcard = player[1 - p].list_mzone[i];
 		if(!(pcard && pcard->is_releasable_by_summon(p, target)))
@@ -1298,7 +1298,7 @@ void field::get_xyz_material(card* scard, int32 findex, uint32 lv, int32 maxc) {
 	}
 	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
 		auto iter = core.xmaterial_lst.begin();
-		while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > maxc)))
+		while((iter != core.xmaterial_lst.end()) && ((iter->first > (int32)core.xmaterial_lst.size()) || (iter->first > maxc)))
 			core.xmaterial_lst.erase(iter++);
 	}
 }
@@ -1711,12 +1711,12 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 lv, int32 min, 
 		}
 		if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
 			auto iter = core.xmaterial_lst.begin();
-			while((iter != core.xmaterial_lst.end()) && ((iter->first > core.xmaterial_lst.size()) || (iter->first > max)))
+			while((iter != core.xmaterial_lst.end()) && ((iter->first > (int32)core.xmaterial_lst.size()) || (iter->first > max)))
 				core.xmaterial_lst.erase(iter++);
 		}
 	} else
 		get_xyz_material(scard, findex, lv, max);
-	return core.xmaterial_lst.size() >= min;
+	return (int32)core.xmaterial_lst.size() >= min;
 }
 int32 field::is_player_can_draw(uint8 playerid) {
 	return !is_player_affected_by_effect(playerid, EFFECT_CANNOT_DRAW);
@@ -1915,7 +1915,7 @@ int32 field::is_player_can_summon_count(uint8 playerid, uint32 count) {
 		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		int32 v = eset[i]->get_value(2);
-		if(v < count)
+		if(v < (int32)count)
 			return FALSE;
 	}
 	return TRUE;
@@ -1927,7 +1927,7 @@ int32 field::is_player_can_spsummon_count(uint8 playerid, uint32 count) {
 		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		int32 v = eset[i]->get_value(2);
-		if(v < count)
+		if(v < (int32)count)
 			return FALSE;
 	}
 	return TRUE;
@@ -1939,7 +1939,7 @@ int32 field::is_player_can_flipsummon_count(uint8 playerid, uint32 count) {
 		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		int32 v = eset[i]->get_value(2);
-		if(v < count)
+		if(v < (int32)count)
 			return FALSE;
 	}
 	return TRUE;
