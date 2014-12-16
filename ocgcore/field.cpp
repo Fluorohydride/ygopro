@@ -1416,8 +1416,8 @@ void field::CheckCounter(card* pcard, int32 counter_type, int32 playerid) {
 						(counter_type == 2) ? core.normalsummon_counter :
 						(counter_type == 3) ? core.spsummon_counter :
 						(counter_type == 4) ? core.flipsummon_counter : core.attack_counter;
-	for(auto& iter : counter_map) {
-		auto& info = iter.second;
+	for(auto iter = counter_map.begin();iter!=counter_map.end();++iter) {
+		auto& info = iter->second;
 		if(info.first) {
 			pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 			if(!pduel->lua->check_condition(info.first, 1)) {
@@ -1705,9 +1705,9 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 lv, int32 min, 
 	if(mg) {
 		uint32 xyz_level;
 		core.xmaterial_lst.clear();
-		for (auto cit : mg->container) {
-			if((xyz_level = cit->check_xyz_level(scard, lv)) && (findex == 0 || pduel->lua->check_matching(cit, findex, 0)))
-				core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, cit));
+		for (auto cit = mg->container.begin(); cit!=mg->container.end(); ++cit) {
+			if((xyz_level = (*cit)->check_xyz_level(scard, lv)) && (findex == 0 || pduel->lua->check_matching(*cit, findex, 0)))
+				core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, *cit));
 		}
 		if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
 			auto iter = core.xmaterial_lst.begin();
