@@ -3073,10 +3073,10 @@ int32 scriptlib::duel_get_activity_count(lua_State *L) {
 			lua_pushinteger(L, pduel->game_field->core.normalsummon_state_count[playerid]);
 			break;
 		case 3:
-			lua_pushinteger(L, pduel->game_field->core.flipsummon_state_count[playerid]);
+			lua_pushinteger(L, pduel->game_field->core.spsummon_state_count[playerid]);
 			break;
 		case 4:
-			lua_pushinteger(L, pduel->game_field->core.spsummon_state_count[playerid]);
+			lua_pushinteger(L, pduel->game_field->core.flipsummon_state_count[playerid]);
 			break;
 		case 5:
 			lua_pushinteger(L, pduel->game_field->core.attack_state_count[playerid]);

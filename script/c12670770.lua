@@ -48,6 +48,7 @@ function c12670770.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetRange(LOCATION_SZONE)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c12670770.sdescon)
 	e1:SetOperation(c12670770.sdesop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,3)
 	c:RegisterEffect(e1)
@@ -74,8 +75,10 @@ function c12670770.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	end
 end
+function c12670770.sdescon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==Duel.GetTurnPlayer()
+end
 function c12670770.sdesop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

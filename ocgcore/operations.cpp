@@ -3590,7 +3590,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 						pcard->refresh_disable_status();
 				}
 				if(pcard->current.location == LOCATION_MZONE) {
-					raise_single_event(*cvit, 0, EVENT_CHANGE_POS, reason_effect, 0, reason_player, 0, 0);
+					raise_single_event(pcard, 0, EVENT_CHANGE_POS, reason_effect, 0, reason_player, 0, 0);
 					pos_changed.insert(pcard);
 				}
 				bool trapmonster = false;
