@@ -210,21 +210,21 @@ function c94977269.checkop2(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_CHAIN_ACTIVATING)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetLabel(p)
+		e1:SetCountLimit(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_CHAIN)
-		e1:SetOperation(c94977269.rst)
+		e1:SetOperation(c94977269.resetop)
 		c:RegisterEffect(e1)
 	end
 end
-function c94977269.rst(e,tp,eg,ep,ev,re,r,rp)
+function c94977269.resetop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local p=e:GetLabel()
 	if p==PLAYER_ALL then
-		c:ResetFlagEffect(94977269) 
-		c:ResetFlagEffect(94977270) 
+		c:ResetFlagEffect(94977269)
+		c:ResetFlagEffect(94977270)
 	else
 		c:ResetFlagEffect(94977269+p)
 	end
-	e:Reset()
 end
 function c94977269.checkop3(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -235,8 +235,20 @@ function c94977269.checkop3(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e1:SetCode(EVENT_CHAIN_SOLVED)
 		e1:SetRange(LOCATION_MZONE)
+		e1:SetCountLimit(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_CHAIN)
 		e1:SetOperation(c94977269.checkop4)
+		c:RegisterEffect(e1)
+	else
+		local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetLabel(cid)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_CHAIN)
+		e1:SetOperation(c94977269.checkop5)
 		c:RegisterEffect(e1)
 	end
 end
@@ -249,7 +261,21 @@ function c94977269.checkop4(e,tp,eg,ep,ev,re,r,rp)
 	else
 		c:RegisterFlagEffect(94977269+rp,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	end
-	e:Reset()
+end
+function c94977269.checkop5(e,tp,eg,ep,ev,re,r,rp)
+	local cc=Duel.GetCurrentChain()
+	local cid=Duel.GetChainInfo(cc,CHAININFO_CHAIN_ID)
+	if cid~=e:GetLabel() then return end
+	local c=e:GetHandler()
+	local p1=false
+	local p2=false
+	local tc=eg:GetFirst()
+	while tc do
+		if tc:GetSummonPlayer()==0 then p1=true else p2=true end
+		tc=eg:GetNext()
+	end
+	if p1 then c:RegisterFlagEffect(94977269,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1) end
+	if p2 then c:RegisterFlagEffect(94977270,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1) end
 end
 function c94977269.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()
