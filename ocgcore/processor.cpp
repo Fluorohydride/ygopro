@@ -4045,7 +4045,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			iter->second.second = 0;
 		for(auto iter=core.attack_counter.begin();iter!=core.attack_counter.end();++iter)
 			iter->second.second = 0;
-		for(auto iter=core.chain_counter.begin();iter!=core.attack_counter.end();++iter)
+		for(auto iter=core.chain_counter.begin();iter!=core.chain_counter.end();++iter)
 			iter->second.second = 0;
 		infos.turn_id++;
 		infos.turn_player = turn_player;
