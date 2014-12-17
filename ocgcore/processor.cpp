@@ -1727,6 +1727,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.ntpchain.clear();
 		core.delayed_quick.clear();
 		core.delayed_quick_break.swap(core.delayed_quick);
+		core.current_player = infos.turn_player;
 		core.units.begin()->step = 1;
 		return FALSE;
 	}
@@ -1775,18 +1776,30 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 				peffect->dec_count(tp);
 			}
 		}
-		if(core.tpchain.size() > 1)
-			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
-		if(core.ntpchain.size() > 1)
-			add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
 		core.new_fchain_s.clear();
+		if(core.current_player == infos.turn_player){
+			if(core.tpchain.size() > 1)
+				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
+		}
+		else{
+			if(core.ntpchain.size() > 1)
+				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
+		}
 		return FALSE;
 	}
 	case 3: {
-		core.new_chains.splice(core.new_chains.end(), core.tpchain);
-		core.new_chains.splice(core.new_chains.end(), core.ntpchain);
-		if(core.new_chains.size())
-			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		if(core.current_player == infos.turn_player){
+			core.new_chains.splice(core.new_chains.end(), core.tpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+			core.current_player = 1-infos.turn_player;
+			core.units.begin()->step = 1;
+		}
+		else{
+			core.new_chains.splice(core.new_chains.end(), core.ntpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		}
 		return FALSE;
 	}
 	case 4: {
@@ -1816,14 +1829,21 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		core.new_ochain_s.splice(core.new_ochain_s.end(), core.tpchain);
 		core.new_ochain_s.splice(core.new_ochain_s.end(), core.ntpchain);
 		core.new_ochain_h.clear();
+		core.tmp_chain.clear();
+		core.current_player = infos.turn_player;
 		return FALSE;
 	}
 	case 5: {
 		if(core.new_ochain_s.size() == 0) {
-			if(core.tpchain.size() > 1)
-				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
-			if(core.ntpchain.size() > 1)
-				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
+			if(core.current_player == infos.turn_player){
+				if(core.tpchain.size() > 1)
+					add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
+				core.new_ochain_s.splice(core.new_ochain_s.end(), core.tmp_chain);
+			}
+			else{
+				if(core.ntpchain.size() > 1)
+					add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
+			}
 			core.units.begin()->step = 6;
 			return FALSE;
 		}
@@ -1861,8 +1881,14 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			} else
 				act = false;
 		} else act = false;
-		if(act)
-			add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)peffect->handler, tp, 0);
+		if(act){
+			if(tp == core.current_player)
+				add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)peffect->handler, tp, 0);
+			else{
+				core.tmp_chain.push_back(*clit);
+				returns.ivalue[0] = FALSE;
+			}
+		}
 		else returns.ivalue[0] = FALSE;
 		return FALSE;
 	}
@@ -1941,10 +1967,18 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 7: {
-		core.new_chains.splice(core.new_chains.end(), core.tpchain);
-		core.new_chains.splice(core.new_chains.end(), core.ntpchain);
-		if(core.new_chains.size())
-			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		if(core.current_player == infos.turn_player){
+			core.new_chains.splice(core.new_chains.end(), core.tpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+			core.current_player = 1-infos.turn_player;
+			core.units.begin()->step = 4;
+		}
+		else{
+			core.new_chains.splice(core.new_chains.end(), core.ntpchain);
+			if(core.new_chains.size())
+				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
+		}
 		return FALSE;
 	}
 	case 8: {
@@ -4001,16 +4035,16 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
 			if(!((*rit)->flag & EFFECT_FLAG_NO_TURN_RESET))
 				(*rit)->recharge();
-		for(auto& iter : core.summon_counter)
-			iter.second.second = 0;
-		for(auto& iter : core.normalsummon_counter)
-			iter.second.second = 0;
-		for(auto& iter : core.spsummon_counter)
-			iter.second.second = 0;
-		for(auto& iter : core.flipsummon_counter)
-			iter.second.second = 0;
-		for(auto& iter : core.attack_counter)
-			iter.second.second = 0;
+		for(auto iter=core.summon_counter.begin();iter!=core.summon_counter.end();++iter)
+			iter->second.second = 0;
+		for(auto iter=core.normalsummon_counter.begin();iter!=core.normalsummon_counter.end();++iter)
+			iter->second.second = 0;
+		for(auto iter=core.spsummon_counter.begin();iter!=core.spsummon_counter.end();++iter)
+			iter->second.second = 0;
+		for(auto iter=core.flipsummon_counter.begin();iter!=core.flipsummon_counter.end();++iter)
+			iter->second.second = 0;
+		for(auto iter=core.attack_counter.begin();iter!=core.attack_counter.end();++iter)
+			iter->second.second = 0;
 		infos.turn_id++;
 		infos.turn_player = turn_player;
 		pduel->write_buffer8(MSG_NEW_TURN);

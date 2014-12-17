@@ -180,6 +180,7 @@ struct processor {
 	chain_list new_ochain_b;
 	chain_list new_ochain_h;
 	chain_list new_chains;
+	chain_list tmp_chain;
 	delayed_effect_collection delayed_quick_tmp;
 	delayed_effect_collection delayed_quick_break;
 	delayed_effect_collection delayed_quick;
@@ -270,6 +271,7 @@ struct processor {
 	uint8 battle_phase_count[2];
 	uint8 phase_action;
 	uint32 hint_timing[2];
+	uint8 current_player;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > normalsummon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > spsummon_counter;
