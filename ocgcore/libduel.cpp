@@ -3138,6 +3138,14 @@ int32 scriptlib::duel_add_custom_activity_counter(lua_State *L) {
 			pduel->game_field->core.attack_counter[counter_id] = std::make_pair(counter_filter, 0);
 			break;
 		}
+		case 6: break;
+		case 7: {
+			auto iter = pduel->game_field->core.chain_counter.find(counter_id);
+			if(iter != pduel->game_field->core.chain_counter.end())
+				break;
+			pduel->game_field->core.chain_counter[counter_id] = std::make_pair(counter_filter, 0);
+			break;
+		}
 		default:
 			break;
 	}
@@ -3178,6 +3186,14 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 		case 5: {
 			auto iter = pduel->game_field->core.attack_counter.find(counter_id);
 			if(iter != pduel->game_field->core.attack_counter.end())
+				val = iter->second.second;
+			break;
+		}
+		case 6:
+			break;
+		case 7: {
+			auto iter = pduel->game_field->core.chain_counter.find(counter_id);
+			if(iter != pduel->game_field->core.chain_counter.end())
 				val = iter->second.second;
 			break;
 		}

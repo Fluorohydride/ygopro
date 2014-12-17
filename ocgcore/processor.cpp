@@ -4045,6 +4045,8 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			iter->second.second = 0;
 		for(auto iter=core.attack_counter.begin();iter!=core.attack_counter.end();++iter)
 			iter->second.second = 0;
+		for(auto iter=core.chain_counter.begin();iter!=core.attack_counter.end();++iter)
+			iter->second.second = 0;
 		infos.turn_id++;
 		infos.turn_player = turn_player;
 		pduel->write_buffer8(MSG_NEW_TURN);
@@ -4356,6 +4358,7 @@ int32 field::add_chain(uint16 step) {
 		if((phandler->current.location == LOCATION_HAND))
 			clit->flag |= CHAIN_HAND_EFFECT;
 		core.current_chain.push_back(*clit);
+		check_chain_counter(peffect, clit->triggering_controler, clit->chain_count);
 		// triggered events which are not caused by RaiseEvent create relation with the handler
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (!(peffect->type & 0x2a0) || (peffect->code & EVENT_PHASE) == EVENT_PHASE)) {
 			peffect->handler->create_relation(peffect);

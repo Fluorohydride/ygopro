@@ -277,6 +277,7 @@ struct processor {
 	std::unordered_map<uint32, std::pair<uint32, uint32> > spsummon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > flipsummon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > attack_counter;
+	std::unordered_map<uint32, std::pair<uint32, uint32> > chain_counter;
 };
 class field {
 public:
@@ -356,7 +357,10 @@ public:
 	void add_unique_card(card* pcard);
 	void remove_unique_card(card* pcard);
 	effect* check_unique_onfield(card* pcard, uint8 controler);
-	void CheckCounter(card* pcard, int32 counter_type, int32 playerid);
+	void check_card_counter(card* pcard, int32 counter_type, int32 playerid);
+	void check_card_counter(card_set* pcards, int32 counter_type, int32 playerid);
+	void check_card_counter(card_vector* pcards, int32 counter_type, int32 playerid);
+	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();

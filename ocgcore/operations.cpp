@@ -1407,8 +1407,8 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		pduel->write_buffer8(target->current.position);
 		core.summon_state_count[sumplayer]++;
 		core.normalsummon_state_count[sumplayer]++;
-		CheckCounter(target, 1, sumplayer);
-		CheckCounter(target, 2, sumplayer);
+		check_card_counter(target, 1, sumplayer);
+		check_card_counter(target, 2, sumplayer);
 		if (target->material_cards.size()) {
 			for (auto mit = target->material_cards.begin(); mit != target->material_cards.end(); ++mit)
 				raise_single_event(*mit, 0, EVENT_BE_PRE_MATERIAL, proc, REASON_SUMMON, sumplayer, sumplayer, 0);
@@ -1539,7 +1539,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		target->fieldid = infos.field_id++;
 		core.phase_action = TRUE;
 		core.flipsummon_state_count[sumplayer]++;
-		CheckCounter(target, 4, sumplayer);
+		check_card_counter(target, 4, sumplayer);
 		pduel->write_buffer8(MSG_FLIPSUMMONING);
 		pduel->write_buffer32(target->data.code);
 		pduel->write_buffer8(target->current.controler);
@@ -1771,7 +1771,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			set_control(target, setplayer, 0, 0);
 		core.phase_action = TRUE;
 		core.normalsummon_state_count[setplayer]++;
-		CheckCounter(target, 2, setplayer);
+		check_card_counter(target, 2, setplayer);
 		target->set_status(STATUS_SUMMON_TURN, TRUE);
 		pduel->write_buffer8(MSG_SET);
 		pduel->write_buffer32(target->data.code);
@@ -2035,7 +2035,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		target->current.reason_player = sumplayer;
 		target->summon_player = sumplayer;
 		core.spsummon_state_count[sumplayer]++;
-		CheckCounter(target, 3, sumplayer);
+		check_card_counter(target, 3, sumplayer);
 		break_effect();
 		return FALSE;
 	}
@@ -2184,6 +2184,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		if(pgroup->container.size() == 0)
 			return TRUE;
 		core.phase_action = TRUE;
+		check_card_counter(&pgroup->container, 3, sumplayer);
 		pgroup->it = pgroup->container.begin();
 		return FALSE;
 	}
@@ -2197,7 +2198,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pcard->summon_player = sumplayer;
 		pcard->summon_info = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)pcard->current.location << 16);
 		move_to_field(pcard, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
-		CheckCounter(pcard, 3, sumplayer);
 		return FALSE;
 	}
 	case 24: {
@@ -2342,9 +2342,6 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!targets)
 			core.special_summoning.insert(target);
 		target->enable_field_effect(FALSE);
-		core.spsummon_state_count[target->summon_player]++;
-		CheckCounter(target, 3, target->summon_player);
-		core.hint_timing[target->summon_player] |= TIMING_SPSUMMON;
 		move_to_field(target, target->summon_player, playerid, LOCATION_MZONE, positions);
 		return FALSE;
 	}
@@ -2369,11 +2366,32 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_player, group * targets) {
 	switch(step) {
 	case 0: {
-		card_vector cv(targets->container.begin(), targets->container.end());
-		if(cv.size() > 1)
-			std::sort(cv.begin(), cv.end(), card::card_operation_sort);
-		for(auto cvit = cv.begin(); cvit != cv.end(); ++cvit)
-			add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
+		card_vector cvs, cvo;
+		for(auto iter = targets->container.begin(); iter != targets->container.end(); ++iter) {
+			auto pcard = *iter;
+			if(pcard->summon_player == infos.turn_player)
+				cvs.push_back(pcard);
+			else
+				cvo.push_back(pcard);
+		}
+		if(!cvs.empty()) {
+			if(cvs.size() > 1)
+				std::sort(cvs.begin(), cvs.end(), card::card_operation_sort);
+			core.spsummon_state_count[infos.turn_player]++;
+			check_card_counter(&cvs, 3, infos.turn_player);
+			core.hint_timing[infos.turn_player] |= TIMING_SPSUMMON;
+			for(auto cvit = cvs.begin(); cvit != cvs.end(); ++cvit)
+				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
+		}
+		if(!cvo.empty()) {
+			if(cvo.size() > 1)
+				std::sort(cvo.begin(), cvo.end(), card::card_operation_sort);
+			core.spsummon_state_count[1 - infos.turn_player]++;
+			check_card_counter(&cvo, 3, 1 - infos.turn_player);
+			core.hint_timing[1 - infos.turn_player] |= TIMING_SPSUMMON;
+			for(auto cvit = cvo.begin(); cvit != cvo.end(); ++cvit)
+				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
+		}
 		return FALSE;
 	}
 	case 1: {
