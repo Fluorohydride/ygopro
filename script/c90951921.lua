@@ -11,37 +11,13 @@ function c90951921.initial_effect(c)
 	e1:SetTarget(c90951921.target)
 	e1:SetOperation(c90951921.activate)
 	c:RegisterEffect(e1)
-	if not c90951921.global_check then
-		c90951921.global_check=true
-		c90951921[0]=true
-		c90951921[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c90951921.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c90951921.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(90951921,ACTIVITY_SPSUMMON,c90951921.counterfilter)
 end
-function c90951921.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		if not tc:IsSetCard(0x70) then
-			c90951921[tc:GetSummonPlayer()]=false
-		end
-		tc=eg:GetNext()
-	end
-end
-function c90951921.clear(e,tp,eg,ep,ev,re,r,rp)
-	c90951921[0]=true
-	c90951921[1]=true
+function c90951921.counterfilter(c)
+	return c:IsSetCard(0x70)
 end
 function c90951921.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c90951921[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(90951921,tp,ACTIVITY_SPSUMMON)==0 end
 	--oath effects
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
