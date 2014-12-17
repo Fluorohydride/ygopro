@@ -28,7 +28,7 @@ function c3395226.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c3395226.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsAttribute(0xff-ATTRIBUTE_LIGHT)
+	return c:GetAttribute()~=ATTRIBUTE_LIGHT
 end
 function c3395226.filter(c,e,tp)
 	return c:IsRace(RACE_FAIRY) and c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -29,7 +29,7 @@ function c39853199.initial_effect(c)
 end
 function c39853199.destg1(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetHandler():GetBattleTarget()
-	if chk==0 then return tc and tc:IsFaceup() and tc:IsAttribute(0xff-ATTRIBUTE_WIND) end
+	if chk==0 then return tc and tc:IsFaceup() and tc:GetAttribute()~=ATTRIBUTE_WIND end
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,tc,1,0,0)
 end
 function c39853199.desop1(e,tp,eg,ep,ev,re,r,rp)

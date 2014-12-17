@@ -41,7 +41,7 @@ function c35629124.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e2,tp)
 end
 function c35629124.sumlimit(e,c)
-	return c:IsRace(0xffffff-RACE_DRAGON)
+	return c:GetRace()~=RACE_DRAGON
 end
 function c35629124.filter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
