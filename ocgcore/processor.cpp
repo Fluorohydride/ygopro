@@ -3043,7 +3043,7 @@ int32 field::process_battle_command(uint16 step) {
 	}
 	case 6: {
 		if(returns.ivalue[0] == -1) {
-			//roolback
+			//rollback
 			if(core.units.begin()->arg1) {
 				core.attacker->announce_count++;
 				if(core.attack_target)
@@ -3783,14 +3783,14 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 30: {
-		raise_single_event(core.attacker, 0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
-		if(core.attack_target)
-			raise_single_event(core.attack_target, 0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 1);
-		raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
-		process_single_event();
-		process_instant_event();
+		//raise_single_event(core.attacker, 0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
+		//if(core.attack_target)
+		//	raise_single_event(core.attack_target, 0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 1);
+		//raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
+		//process_single_event();
+		//process_instant_event();
 		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
+			//add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
 			core.units.begin()->arg1 = 1;
 		} else {
 			break_effect();
