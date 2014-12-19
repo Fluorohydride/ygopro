@@ -3,8 +3,9 @@ function c14513016.initial_effect(c)
 	--spsummon limit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetCondition(c14513016.limcon)
+	e1:SetCode(EFFECT_SPSUMMON_COST)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCost(c14513016.spcost)
 	c:RegisterEffect(e1)
 	--extra summon
 	local e2=Effect.CreateEffect(c)
@@ -16,26 +17,28 @@ function c14513016.initial_effect(c)
 		c14513016.global_check=true
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c14513016.checkop)
+		ge1:SetCode(EVENT_SPSUMMON)
+		ge1:SetOperation(aux.spchk1)
 		Duel.RegisterEffect(ge1,0)
+		local ge2=Effect.CreateEffect(c)
+		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge2:SetOperation(aux.spchk1)
+		Duel.RegisterEffect(ge2,0)
+		local ge3=Effect.CreateEffect(c)
+		ge3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge3:SetCode(EVENT_CHAINING)
+		ge3:SetOperation(aux.spchk2)
+		Duel.RegisterEffect(ge3,0)
+		local ge4=Effect.CreateEffect(c)
+		ge4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge4:SetCode(EVENT_CHAIN_NEGATED)
+		ge4:SetOperation(aux.spchk3)
+		Duel.RegisterEffect(ge4,0)
 	end
 end
-function c14513016.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if tc:IsCode(14513016) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,14513016,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,14513016,RESET_PHASE+PHASE_END,0,1) end
-end
-function c14513016.limcon(e)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),14513016)~=0
+function c14513016.spcost(e,c,tp)
+	return Duel.GetFlagEffect(tp,14513016)==0
 end
 function c14513016.sumop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,14513017)~=0 then return end

@@ -29,18 +29,16 @@ function c43434803.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local oc=og:GetFirst()
 	local g=Group.FromCards(sc,oc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,2,PLAYER_ALL,0)
-	e:SetLabelObject(sc)
+	e:SetLabelObject(sg)
 end
 function c43434803.operation(e,tp,eg,ep,ev,re,r,rp)
-	local sc=e:GetLabelObject()
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local oc=g:GetFirst()
-	if oc==sc then oc=g:GetNext() end
-	if sc:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(sc,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)
-	end
-	if oc:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(oc,0,1-tp,1-tp,false,false,POS_FACEDOWN_DEFENCE)
+	local tc=g:GetFirst()
+	while tc do
+		if tc:IsRelateToEffect(e) then 
+			Duel.SpecialSummonStep(tc,0,tc:GetControler(),tc:GetControler(),false,false,POS_FACEDOWN_DEFENCE)
+		end
+		tc=g:GetNext()
 	end
 	Duel.SpecialSummonComplete()
 end
