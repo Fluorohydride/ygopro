@@ -4298,9 +4298,39 @@ int32 field::add_chain(uint16 step) {
 				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, clit->triggering_player, 0);
 			}
 		}
-		if (peffect->type & EFFECT_TYPE_ACTIVATE) {
+		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
 			break_effect();
-			if (peffect->handler->current.location == LOCATION_HAND) {
+			int32 ecode = 0;
+			if(peffect->handler->current.location == LOCATION_HAND) {
+				if(peffect->handler->data.type & TYPE_TRAP)
+					ecode = EFFECT_TRAP_ACT_IN_HAND;
+				else if((peffect->handler->data.type & TYPE_SPELL) && (peffect->handler->data.type & TYPE_QUICKPLAY)
+				        && infos.turn_player != peffect->handler->current.controler)
+					ecode = EFFECT_QP_ACT_IN_NTPHAND;
+			} else if(peffect->handler->current.location == LOCATION_SZONE) {
+				if((peffect->handler->data.type & TYPE_TRAP) && peffect->handler->get_status(STATUS_SET_TURN))
+					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
+			}
+			if(ecode) {
+				eset.clear();
+				peffect->handler->filter_effect(ecode, &eset);
+				effect* pactin = 0;
+				for(int32 i = 0; i < eset.count; ++i) {
+					if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
+						pactin = eset[i];
+						break;
+					}
+				}
+				if(!pactin) {
+					for(int32 i = 0; i < eset.count; ++i) {
+						if(eset[i]->check_count_limit(peffect->handler->current.controler)) {
+							eset[i]->dec_count(peffect->handler->current.controler);
+							break;
+						}
+					}
+				}
+			}
+			if(peffect->handler->current.location == LOCATION_HAND) {
 				peffect->handler->enable_field_effect(FALSE);
 				peffect->handler->set_status(STATUS_ACT_FROM_HAND, TRUE);
 				move_to_field(peffect->handler, peffect->handler->current.controler, peffect->handler->current.controler, LOCATION_SZONE, POS_FACEUP);
