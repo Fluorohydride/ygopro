@@ -171,8 +171,12 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			if(handler->current.location == LOCATION_HAND) {
 				if(handler->data.type & TYPE_TRAP)
 					ecode = EFFECT_TRAP_ACT_IN_HAND;
-				else if((handler->data.type & TYPE_SPELL) && (handler->data.type & TYPE_QUICKPLAY) && pduel->game_field->infos.turn_player != playerid)
-					ecode = EFFECT_QP_ACT_IN_NTPHAND;
+				else if((handler->data.type & TYPE_SPELL) && pduel->game_field->infos.turn_player != playerid) {
+					if(handler->data.type & TYPE_QUICKPLAY)
+						ecode = EFFECT_QP_ACT_IN_NTPHAND;
+					else
+						return FALSE;
+				}
 			} else if(handler->current.location == LOCATION_SZONE) {
 				if((handler->data.type & TYPE_TRAP) && handler->get_status(STATUS_SET_TURN))
 					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
