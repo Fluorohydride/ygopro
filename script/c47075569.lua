@@ -68,15 +68,16 @@ function c47075569.thop(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local ct=Duel.Destroy(dg,REASON_EFFECT)
 	local g=Duel.GetMatchingGroup(c47075569.thfilter,tp,LOCATION_DECK,0,nil)
-	if g:GetCount()==0 then return end
-	if ct>g:GetClassCount(Card.GetCode) then return end
+	if ct==0 or g:GetCount()==0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g1=g:Select(tp,1,1,nil)
 	if ct==2 then
 		g:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g2=g:Select(tp,1,1,nil)
-		g1:Merge(g2)
+		if g:GetCount()>0 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local g2=g:Select(tp,1,1,nil)
+			g1:Merge(g2)
+		end
 	end
 	Duel.SendtoHand(g1,nil,REASON_EFFECT)
 	Duel.ConfirmCards(1-tp,g1)

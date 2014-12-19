@@ -51,7 +51,7 @@ function c36736723.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c36736723.filter(c)
-	return c:IsSetCard(0x17) and c:IsAbleToHand()
+	return c:IsSetCard(0x17) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c36736723.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c36736723.filter(chkc) end
