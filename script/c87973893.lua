@@ -1,4 +1,4 @@
---¼×³æ×°™C¤ÎÄ§¸« ¥¼¥¯¥È¥Û©`¥¯
+--ç”²è™«è£…æ©Ÿã®é­”æ–§ ã‚¼ã‚¯ãƒˆãƒ›ãƒ¼ã‚¯
 function c87973893.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

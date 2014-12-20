@@ -1,4 +1,4 @@
---¥¨¥á¥¹¡¤¥¶¡¤¥¤¥ó¥Õ¥£¥Ë¥Æ¥£
+--ã‚¨ãƒ¡ã‚¹ãƒ»ã‚¶ãƒ»ã‚¤ãƒ³ãƒ•ã‚£ãƒ‹ãƒ†ã‚£
 function c43580269.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

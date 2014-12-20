@@ -1,4 +1,4 @@
---•¨©`•«•£•¢•Û°§•π•ø•¡•Â©`
+--„Ç¨„Éº„Éá„Ç£„Ç¢„É≥„Éª„Çπ„Çø„ÉÅ„É•„Éº
 function c75209824.initial_effect(c)
 	--turn set
 	local e1=Effect.CreateEffect(c)

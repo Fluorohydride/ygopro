@@ -1,4 +1,4 @@
---„‡êLª•¥¨¥»¥À¥ê
+--å‰£é—˜ç£ã‚¨ã‚»ãƒ€ãƒª
 function c73285669.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

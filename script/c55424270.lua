@@ -1,4 +1,4 @@
---Ä§Œ§ª• ¥±¥ë¥Ù¥í¥¹
+--é­”å°ç£ ã‚±ãƒ«ãƒ™ãƒ­ã‚¹
 function c55424270.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--add counter

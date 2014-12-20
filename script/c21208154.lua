@@ -1,4 +1,4 @@
---а�񥢥Х��`
+--邪神アバター
 function c21208154.initial_effect(c)
 	--summon with 3 tribute
 	local e1=Effect.CreateEffect(c)

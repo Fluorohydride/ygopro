@@ -1,4 +1,4 @@
---Ä§·¨×å¤Î½Y½ç
+--é­”æ³•æ—ã®çµç•Œ
 function c17896384.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	c:SetCounterLimit(0x3001,4)
