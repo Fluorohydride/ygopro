@@ -26,7 +26,7 @@ function c30127518.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g1:GetFirst()
 	while tc do
 		if tc:IsLocation(LOCATION_GRAVE) then
-			local fg=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND,nil,tc:GetCode())
+			local fg=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_HAND,nil,tc:GetCode())
 			exg:Merge(fg)
 		end
 		tc=g1:GetNext()

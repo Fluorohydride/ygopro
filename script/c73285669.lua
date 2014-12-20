@@ -24,7 +24,7 @@ function c73285669.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function c73285669.spfilter(c)
-	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial(true) and c:IsAbleToDeckOrExtraAsCost()
+	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and c:IsAbleToDeckOrExtraAsCost()
 end
 function c73285669.sprcon(e,c)
 	if c==nil then return true end 

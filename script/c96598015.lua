@@ -31,6 +31,7 @@ function c96598015.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 end
 function c96598015.filter(c)
 	return c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeck()
+		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c96598015.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2)
