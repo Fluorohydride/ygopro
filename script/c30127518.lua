@@ -20,14 +20,17 @@ function c30127518.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c30127518.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c30127518.cfilter,nil,1-tp,e)
-	if g:GetCount()<2 then return end
-	local exg=Group.CreateGroup()
-	local tc=g:GetFirst()
-	while tc do
-		local fg=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND,nil,tc:GetCode())
-		exg:Merge(fg)
-		tc=g:GetNext()
-	end
 	Duel.SendtoGrave(g,REASON_EFFECT)
+	local exg=Group.CreateGroup()
+	local g1=Duel.GetOperatedGroup()
+	local tc=g1:GetFirst()
+	while tc do
+		if tc:IsLocation(LOCATION_GRAVE) then
+			local fg=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_EXTRA+LOCATION_HAND,nil,tc:GetCode())
+			exg:Merge(fg)
+		end
+		tc=g1:GetNext()
+	end
+	Duel.BreakEffect()
 	Duel.SendtoGrave(exg,REASON_EFFECT)
 end
