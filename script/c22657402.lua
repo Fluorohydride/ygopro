@@ -25,7 +25,7 @@ function c22657402.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c22657402.spfilter(c)
-	return c:IsFaceup() and c:IsCode(5522)
+	return c:IsFaceup() and c:IsCode(96163807)
 end
 function c22657402.spcon(e,c)
 	if c==nil then return true end
