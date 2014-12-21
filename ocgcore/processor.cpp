@@ -2384,7 +2384,10 @@ int32 field::process_instant_event() {
 			peffect = pr.first->second;
 			if(!peffect->is_condition_check(peffect->handler->current.controler, *elit))
 				continue;
-			peffect->handler->create_relation(peffect);
+			if((peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+			        || ((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE))
+			        || !(peffect->range & LOCATION_HAND) || (peffect->range & peffect->handler->current.location))
+				peffect->handler->create_relation(peffect);
 			peffect->s_range = peffect->handler->current.location;
 			peffect->o_range = peffect->handler->current.sequence;
 			newchain.flag = 0;
