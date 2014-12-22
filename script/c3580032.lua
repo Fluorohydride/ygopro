@@ -1,4 +1,4 @@
---Merlin
+--伝説の預言者マーリン
 function c3580032.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

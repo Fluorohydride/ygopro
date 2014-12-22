@@ -3582,6 +3582,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 	case 0: {
 		card_set equipings;
 		card_set flips;
+		card_set ssets;
 		card_set pos_changed;
 		uint8 npos, opos, noflip;
 		card_vector cv(targets->container.begin(), targets->container.end());
@@ -3653,6 +3654,8 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 				if(trapmonster) {
 					refresh_location_info_instant();
 					move_to_field(pcard, pcard->current.controler, pcard->current.controler, LOCATION_SZONE, POS_FACEDOWN, FALSE, 2);
+					raise_single_event(pcard, 0, EVENT_SSET, reason_effect, 0, reason_player, 0, 0);
+					ssets.insert(pcard);
 				}
 			}
 		}
@@ -3661,6 +3664,8 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 		process_single_event();
 		if(flips.size())
 			raise_event(&flips, EVENT_FLIP, reason_effect, 0, reason_player, 0, 0);
+		if(ssets.size())
+			raise_event(&ssets, EVENT_SSET, reason_effect, 0, reason_player, 0, 0);
 		if(pos_changed.size())
 			raise_event(&pos_changed, EVENT_CHANGE_POS, reason_effect, 0, reason_player, 0, 0);
 		process_instant_event();

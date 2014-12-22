@@ -1,4 +1,4 @@
---¥µ¥¤¥­¥Ã¥¯¡¤¥Ó©`¥¹¥È
+--ã‚µã‚¤ã‚­ãƒƒã‚¯ãƒ»ãƒ“ãƒ¼ã‚¹ãƒˆ
 function c46291010.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

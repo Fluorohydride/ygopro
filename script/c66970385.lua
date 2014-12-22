@@ -1,4 +1,4 @@
---Last Chapter of the Noble Knights
+--聖騎士伝説の終幕
 function c66970385.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)
