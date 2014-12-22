@@ -316,7 +316,7 @@ namespace glbase {
         FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
         FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
         FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
-        gl.bounds = {face->glyph->bitmap_left, -face->glyph->bitmap_top, face->glyph->bitmap.width, face->glyph->bitmap.rows};
+        gl.bounds = {face->glyph->bitmap_left, -face->glyph->bitmap_top, (int32_t)face->glyph->bitmap.width, (int32_t)face->glyph->bitmap.rows};
         gl.advance = face->glyph->advance.x / 64.0f;
         if(2048 - tex_posx < gl.bounds.width) {
             tex_posx = 0;

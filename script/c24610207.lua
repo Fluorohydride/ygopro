@@ -16,7 +16,7 @@ function c24610207.initial_effect(c)
 	e2:SetOperation(c24610207.efop)
 	c:RegisterEffect(e2)
 end
-function c24610207.xyzlv(e,c)
+function c24610207.xyzlv(e,c,rc)
 	return 0x50000+e:GetHandler():GetLevel()
 end
 function c24610207.efcon(e,tp,eg,ep,ev,re,r,rp)

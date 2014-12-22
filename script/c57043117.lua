@@ -1,7 +1,7 @@
 --鋼鉄の巨兵
 function c57043117.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_ROCK),3),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_ROCK),3,2)
 	c:EnableReviveLimit()
 	--immune
 	local e1=Effect.CreateEffect(c)
@@ -26,7 +26,7 @@ function c57043117.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c57043117.efilter(e,te)
-	return te:IsActiveType(TYPE_MONSTER)
+	return te:IsActiveType(TYPE_MONSTER) and te:GetOwner()~=e:GetOwner()
 end
 function c57043117.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

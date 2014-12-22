@@ -52,6 +52,7 @@ function c30398342.sptg1(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON)
 		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 		e:GetHandler():RegisterFlagEffect(30398342,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(30398342,2))
 	else
 		e:SetCategory(0)
 	end
@@ -71,7 +72,8 @@ function c30398342.filter(c,e,tp)
 	return c:IsSetCard(0x9e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c30398342.sptg2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e)
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c30398342.filter,tp,LOCATION_DECK,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end

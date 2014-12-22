@@ -1,7 +1,7 @@
 --No.34 電算機獣テラ·バイト
 function c32003338.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),3)
+	aux.AddXyzProcedure(c,nil,3,3)
 	c:EnableReviveLimit()
 	--control
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---�όӵ؎�
+--断層地帯
 function c28120197.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

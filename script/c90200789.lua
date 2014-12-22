@@ -20,7 +20,7 @@ end
 function c90200789.filter1(c,tp,slv)
 	local lv1=c:GetLevel()
 	return c:IsFaceup() and c:IsSetCard(0x2b) and lv1>0
-		 and Duel.IsExistingTarget(c90200789.filter2,tp,0,LOCATION_MZONE,1,nil,lv1,slv)
+		and Duel.IsExistingTarget(c90200789.filter2,tp,0,LOCATION_MZONE,1,nil,lv1,slv)
 end
 function c90200789.filter2(c,lv1,slv)
 	local lv2=c:GetLevel()

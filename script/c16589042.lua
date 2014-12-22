@@ -9,8 +9,8 @@ function c16589042.initial_effect(c)
 	e1:SetCondition(c16589042.ntcon)
 	c:RegisterEffect(e1)
 end
-function c16589042.ntcon(e,c)
+function c16589042.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)==1
+	return minc==0 and c:GetLevel()>4 and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_HAND,0)==1
 		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end

@@ -1,7 +1,7 @@
 --森羅の鎮神 オレイア
 function c95239444.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),2)
+	aux.AddXyzProcedure(c,nil,7,2)
 	c:EnableReviveLimit()
 	--sort
 	local e1=Effect.CreateEffect(c)
@@ -32,8 +32,8 @@ function c95239444.stcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c95239444.cfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,nil,ct) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c95239444.cfilter,tp,LOCATION_MZONE+LOCATION_HAND,0,1,1,nil,ct)
-	e:SetLabel(g:GetFirst():GetLevel())
 	Duel.SendtoGrave(g,REASON_COST)
+	e:SetLabel(Duel.GetOperatedGroup():GetFirst():GetLevel())
 end
 function c95239444.stop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()

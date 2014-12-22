@@ -29,11 +29,7 @@ function c33236860.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
 end
 function c33236860.descost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then
-		local ph=Duel.GetCurrentPhase()
-		if Duel.GetTurnPlayer()==tp then return ph~=PHASE_BATTLE and ph~=PHASE_MAIN2 end
-		return true
-	end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

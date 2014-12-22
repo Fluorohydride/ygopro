@@ -1,7 +1,7 @@
 --No.56 ゴールドラット
 function c55935416.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),3)
+	aux.AddXyzProcedure(c,nil,1,3)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)

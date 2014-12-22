@@ -48,7 +48,7 @@ function c79856792.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c79856792.spfilter(c)
-	return c:IsSetCard(0x34) and (not c:IsOnField() or c:IsFaceup())
+	return c:IsSetCard(0x1034) and (not c:IsOnField() or c:IsFaceup())
 end
 function c79856792.spcon(e,c)
 	if c==nil then return true end
@@ -66,7 +66,7 @@ function c79856792.atcon(e,tp,eg,ep,ev,re,r,rp)
 	return phase~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c79856792.afilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x34) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
 end
 function c79856792.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c79856792.afilter,tp,LOCATION_MZONE,0,1,nil) end
@@ -89,7 +89,7 @@ function c79856792.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(79856792)==0
 end
 function c79856792.cfilter(c)
-	return c:IsSetCard(0x34) and c:IsAbleToRemoveAsCost()
+	return c:IsSetCard(0x1034) and c:IsAbleToRemoveAsCost()
 end
 function c79856792.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c79856792.cfilter,tp,LOCATION_GRAVE,0,1,nil) end

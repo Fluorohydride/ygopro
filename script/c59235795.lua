@@ -15,7 +15,7 @@ function c59235795.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
 end
 function c59235795.filter(c)
-	return (c:IsFacedown() or c:IsAttribute(0xff-ATTRIBUTE_WIND)) and c:IsDestructable()
+	return (c:IsFacedown() or c:GetAttribute()~=ATTRIBUTE_WIND) and c:IsDestructable()
 end
 function c59235795.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

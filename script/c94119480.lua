@@ -1,7 +1,7 @@
---½KÑÉ¤ÎÊØ×oÕß¥¢¥É¥ì¥¦¥¹
+--çµ‚ç„‰ã®å®ˆè­·è€…ã‚¢ãƒ‰ãƒ¬ã‚¦ã‚¹
 function c94119480.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),2)
+	aux.AddXyzProcedure(c,nil,5,2)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)

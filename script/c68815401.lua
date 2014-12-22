@@ -12,7 +12,7 @@ function c68815401.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c68815401.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckLPCost(tp,500) and not Duel.CheckAttackActivity(tp) end
+	if chk==0 then return Duel.CheckLPCost(tp,500) and Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0 end
 	Duel.PayLPCost(tp,500)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -23,8 +23,7 @@ function c68815401.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c68815401.filter1(c)
-	local code=c:GetCode()
-	return c:IsFaceup() and (code==69537999 or code==21420702) and c:IsDestructable()
+	return c:IsFaceup() and c:IsSetCard(0xb9) and c:IsDestructable()
 end
 function c68815401.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c68815401.filter1,tp,LOCATION_SZONE,0,1,nil)

@@ -1,7 +1,7 @@
 --No.10 白輝士イルミネーター
 function c11411223.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)

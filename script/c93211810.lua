@@ -101,7 +101,7 @@ function c93211810.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c93211810.efilter(e,te)
-	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP) and te:GetOwner()~=e:GetOwner()
 end
 function c93211810.desfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)

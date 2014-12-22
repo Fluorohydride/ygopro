@@ -1,7 +1,7 @@
 --メリアスの木霊
 function c64245689.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),3),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),3,2)
 	c:EnableReviveLimit()
 	--to grave
 	local e1=Effect.CreateEffect(c)

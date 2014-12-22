@@ -1,7 +1,7 @@
 --ハーピィズペット幻竜
 function c85909450.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WIND),4),3)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WIND),4,3)
 	c:EnableReviveLimit()
 	--direct attack
 	local e1=Effect.CreateEffect(c)
@@ -15,13 +15,14 @@ function c85909450.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCondition(c85909450.effcon)
 	e2:SetTarget(c85909450.target)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetValue(c85909450.tgvalue)
 	c:RegisterEffect(e3)
 	--remove material

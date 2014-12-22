@@ -80,7 +80,7 @@ public:
 	query_cache q_cache;
 	uint8 owner;
 	uint8 summon_player;
-	uint32 summon_type;
+	uint32 summon_info;
 	uint32 status;
 	uint32 operation_param;
 	uint8 announce_count;
@@ -136,7 +136,7 @@ public:
 	uint32 get_rank();
 	uint32 get_synchro_level(card* pcard);
 	uint32 get_ritual_level(card* pcard);
-	uint32 is_xyz_level(card* pcard, uint32 lv);
+	uint32 check_xyz_level(card* pcard, uint32 lv);
 	uint32 get_attribute();
 	uint32 get_race();
 	uint32 get_lscale();
@@ -185,8 +185,8 @@ public:
 	void filter_single_continuous_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_immune_effect();
 	void filter_disable_related_cards();
-	int32 filter_summon_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
-	int32 filter_set_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count);
+	int32 filter_summon_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count, uint8 min_tribute);
+	int32 filter_set_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count, uint8 min_tribute);
 	void filter_spsummon_procedure(uint8 playerid, effect_set* eset);
 	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
@@ -198,13 +198,14 @@ public:
 	int32 is_equipable(card* pcard);
 	int32 is_summonable();
 	int32 is_summonable(effect* peffect);
-	int32 is_can_be_summoned(uint8 playerid, uint8 ingore_count, effect* peffect);
-	int32 get_summon_tribute_count(uint8 ignore_count = 0);
+	int32 is_summonable(effect* peffect, uint8 min_tribute);
+	int32 is_can_be_summoned(uint8 playerid, uint8 ingore_count, effect* peffect, uint8 min_tribute);
+	int32 get_summon_tribute_count();
 	int32 get_set_tribute_count();
 	int32 is_can_be_flip_summoned(uint8 playerid);
 	int32 is_special_summonable(uint8 playerid);
 	int32 is_can_be_special_summoned(effect* reason_effect, uint32 sumtype, uint8 sumpos, uint8 sumplayer, uint8 toplayer, uint8 nocheck, uint8 nolimit);
-	int32 is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect);
+	int32 is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect, uint8 min_tribute);
 	int32 is_setable_szone(uint8 playerid, uint8 ignore_fd = 0);
 	int32 is_affect_by_effect(effect* peffect);
 	int32 is_destructable();
@@ -233,7 +234,7 @@ public:
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
 	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
-	int32 is_can_be_xyz_material(card* scard);
+	int32 is_can_be_xyz_material(card* scard, uint8 ignore_xyz = FALSE);
 };
 
 #define ASSUME_CODE			1

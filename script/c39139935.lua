@@ -1,7 +1,7 @@
 --No.33 先史遺産－超兵器マシュ＝マック
 function c39139935.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),2)
+	aux.AddXyzProcedure(c,nil,5,2)
 	c:EnableReviveLimit()
 	--attack up
 	local e1=Effect.CreateEffect(c)

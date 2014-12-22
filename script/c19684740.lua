@@ -1,7 +1,7 @@
 --妖精騎士イングナル
 function c19684740.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),3)
+	aux.AddXyzProcedure(c,nil,6,3)
 	c:EnableReviveLimit()
 	--tohand
 	local e1=Effect.CreateEffect(c)

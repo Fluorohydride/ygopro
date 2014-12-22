@@ -5,8 +5,8 @@ function c91110378.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetCode(EFFECT_XMAT_COUNT_LIMIT)
-	e1:SetValue(3)
+	e1:SetCode(EFFECT_XYZ_LEVEL)
+	e1:SetValue(c91110378.xyz_level)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
@@ -23,6 +23,9 @@ function c91110378.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
 	c:RegisterEffect(e3)
+end
+function c91110378.xyz_level(e,c,rc)
+	return 0x3000+c:GetLevel()
 end
 function c91110378.cfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x86) and c:GetSummonPlayer()==tp

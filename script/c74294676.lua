@@ -1,7 +1,7 @@
 --エヴォルカイザー·ラギア
 function c74294676.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_DINOSAUR),4,2)
 	c:EnableReviveLimit()
 	--negate activate
 	local e1=Effect.CreateEffect(c)

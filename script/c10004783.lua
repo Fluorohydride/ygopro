@@ -34,10 +34,10 @@ function c10004783.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c10004783.eqlimit(e,c)
-	return c:IsSetCard(0x34)
+	return c:IsSetCard(0x1034)
 end
 function c10004783.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x34)
+	return c:IsFaceup() and c:IsSetCard(0x1034)
 end
 function c10004783.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:GetLocation()==LOCATION_MZONE and c10004783.filter(chkc) end
@@ -57,12 +57,12 @@ function c10004783.tfcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c10004783.tftg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_SZONE)>0
-		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,0x34) end
+		and Duel.IsExistingMatchingCard(Card.IsSetCard,tp,LOCATION_DECK,0,1,nil,0x1034) end
 end
 function c10004783.tfop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,1,1,nil,0x34)
+	local g=Duel.SelectMatchingCard(tp,Card.IsSetCard,tp,LOCATION_DECK,0,1,1,nil,0x1034)
 	if g:GetCount()>0 then
 		local tc=g:GetFirst()
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)

@@ -53,7 +53,7 @@ function c48210156.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c48210156.splimit(e,c)
-	return c:IsRace(0xffffff-RACE_FIEND)
+	return c:GetRace()~=RACE_FIEND
 end
 function c48210156.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(e:GetLabel(),1000,REASON_EFFECT)

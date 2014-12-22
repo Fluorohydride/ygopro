@@ -1,7 +1,7 @@
 --シャイニート·マジシャン
 function c58058134.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),2)
+	aux.AddXyzProcedure(c,nil,1,2)
 	c:EnableReviveLimit()
 	--battle indes
 	local e1=Effect.CreateEffect(c)

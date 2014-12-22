@@ -1,7 +1,7 @@
 --ヴァイロン·ディシグマ
 function c39987164.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)

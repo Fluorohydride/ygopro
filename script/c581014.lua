@@ -1,7 +1,7 @@
 --ダイガスタ·エメラル
 function c581014.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--ret&draw
 	local e1=Effect.CreateEffect(c)

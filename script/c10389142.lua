@@ -1,7 +1,7 @@
 --No.42 スターシップ・ギャラクシー・トマホーク
 function c10389142.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),2)
+	aux.AddXyzProcedure(c,nil,7,2)
 	c:EnableReviveLimit()
 	--token
 	local e1=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --森羅の守神 アルセイ
 function c10406322.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),2)
+	aux.AddXyzProcedure(c,nil,8,2)
 	c:EnableReviveLimit()
 	--announce
 	local e1=Effect.CreateEffect(c)

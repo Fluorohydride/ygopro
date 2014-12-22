@@ -19,9 +19,9 @@ function c42155488.initial_effect(c)
 	e2:SetOperation(c42155488.decop)
 	c:RegisterEffect(e2)
 end
-function c42155488.ntcon(e,c)
+function c42155488.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c42155488.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack
@@ -57,7 +57,7 @@ function c42155488.dectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e2,tp)
 end
 function c42155488.sumlimit(e,c)
-	return c:IsRace(0xffffff-e:GetLabel())
+	return c:GetRace()~=e:GetLabel()
 end
 function c42155488.decop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

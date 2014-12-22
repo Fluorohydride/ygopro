@@ -1,7 +1,7 @@
 --銀嶺の巨神
 function c91895091.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),3),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),3,2)
 	c:EnableReviveLimit()
 	--actlimit
 	local e1=Effect.CreateEffect(c)

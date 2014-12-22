@@ -1,7 +1,7 @@
 --CNo.103 神葬零嬢ラグナ・インフィニティ
 function c20785975.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)
