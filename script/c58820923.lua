@@ -59,6 +59,7 @@ function c58820923.rmfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
 end
 function c58820923.rmop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.IsPlayerAffectedByEffect(1-tp,30459350) then return end
 	local g=Duel.GetMatchingGroup(c58820923.rmfilter,1-tp,LOCATION_DECK,0,nil)
 	if g:GetCount()>2 then
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
@@ -78,7 +79,7 @@ function c58820923.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c58820923.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:IsFaceup() then
+	if c:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
