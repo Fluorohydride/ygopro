@@ -4577,6 +4577,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 						dec_effect_code(peffect->count_code, cait->triggering_player);
 				}
 			}
+			check_chain_counter(peffect, cait->triggering_player, cait->chain_count, true);
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;

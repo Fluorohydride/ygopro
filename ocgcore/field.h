@@ -360,7 +360,7 @@ public:
 	effect* check_unique_onfield(card* pcard, uint8 controler);
 	int32 check_spsummon_once(card* pcard, uint8 playerid);
 	void check_card_counter(card* pcard, int32 counter_type, int32 playerid);
-	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid);
+	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid, bool cancel = false);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();

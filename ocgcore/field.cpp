@@ -1440,22 +1440,25 @@ void field::check_card_counter(card* pcard, int32 counter_type, int32 playerid) 
 		}
 	}
 }
-void field::check_chain_counter(effect* peffect, int32 playerid, int32 chainid) {
-	for(auto iter = core.chain_counter.begin();iter != core.chain_counter.end(); ++iter) {
+void field::check_chain_counter(effect* peffect, int32 playerid, int32 chainid, bool cancel) {
+	for(auto iter = core.chain_counter.begin(); iter != core.chain_counter.end(); ++iter) {
 		auto& info = iter->second;
-		if((playerid == 0) && (info.second & 0xffff) != 0)
-			continue;
-		if((playerid == 1) && (info.second & 0xffff0000) != 0)
-			continue;
 		if(info.first) {
 			pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 			pduel->lua->add_param(chainid, PARAM_TYPE_INT);
 			if(!pduel->lua->check_condition(info.first, 3)) {
-				if(playerid == 0)
-					info.second += 0x1;
-				else
-					info.second += 0x10000;
+				if(playerid == 0) {
+					if(!cancel)
+						info.second += 0x1;
+					else if(info.second & 0xffff)
+						info.second -= 0x1;
+				} else {
+					if(!cancel)
+						info.second += 0x10000;
+					else if(info.second & 0xffff0000)
+						info.second -= 0x10000;
+				}
 				break;
 			}
 		}
