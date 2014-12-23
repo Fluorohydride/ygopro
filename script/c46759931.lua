@@ -24,7 +24,7 @@ function c46759931.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c46759931.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_FUSION
 end
 function c46759931.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -36,5 +36,5 @@ function c46759931.regop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c46759931.atkcon(e)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_FUSION
 end
