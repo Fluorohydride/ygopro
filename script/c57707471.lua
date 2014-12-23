@@ -30,7 +30,7 @@ function c57707471.initial_effect(c)
 	e3:SetOperation(c57707471.desop)
 	c:RegisterEffect(e3)
 	if c57707471.xyz_filter then
-		c57707471.xyz_filter=function(mc) return mc:IsXyzLevel(c,lv) end
+		c57707471.xyz_filter=function(mc) return mc:IsXyzLevel(c,6) end
 	end
 end
 c57707471.xyz_number=21
