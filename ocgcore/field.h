@@ -212,6 +212,7 @@ struct processor {
 	std::unordered_set<card*> unique_cards[2];
 	std::unordered_map<uint32, uint32> effect_count_code;
 	std::unordered_map<uint32, uint32> effect_count_code_duel;
+	std::unordered_map<uint32, uint32> spsummon_once_map[2];
 	std::multimap<int32, card*, std::greater<int32> > xmaterial_lst;
 	ptr temp_var[4];
 	uint32 global_flag;
@@ -357,9 +358,8 @@ public:
 	void add_unique_card(card* pcard);
 	void remove_unique_card(card* pcard);
 	effect* check_unique_onfield(card* pcard, uint8 controler);
+	int32 check_spsummon_once(card* pcard, uint8 playerid);
 	void check_card_counter(card* pcard, int32 counter_type, int32 playerid);
-	void check_card_counter(card_set* pcards, int32 counter_type, int32 playerid);
-	void check_card_counter(card_vector* pcards, int32 counter_type, int32 playerid);
 	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
@@ -575,6 +575,7 @@ public:
 #define GLOBALFLAG_SPSUMMON_COUNT		0x40
 #define GLOBALFLAG_XMAT_COUNT_LIMIT		0x80
 #define GLOBALFLAG_SELF_TOGRAVE			0x100
+#define GLOBALFLAG_SPSUMMON_ONCE		0x200
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

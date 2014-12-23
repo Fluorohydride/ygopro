@@ -208,6 +208,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "CheckUniqueOnField", scriptlib::card_check_unique_onfield },
 	{ "ResetNegateEffect", scriptlib::card_reset_negate_effect },
 	{ "AssumeProperty", scriptlib::card_assume_prop },
+	{ "SetSPSummonOnce", scriptlib::card_set_spsummon_once},
 	{ NULL, NULL }
 };
 

@@ -1,46 +1,17 @@
 --精霊獣 ペトルフィン
 function c13890468.initial_effect(c)
-	--spsummon limit
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetCondition(c13890468.limcon)
-	c:RegisterEffect(e1)
+	c:SetSPSummonOnce(13890468)
 	--tohand
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCost(c13890468.cost)
-	e2:SetTarget(c13890468.target)
-	e2:SetOperation(c13890468.operation)
-	c:RegisterEffect(e2)
-	if not c13890468.global_check then
-		c13890468.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c13890468.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c13890468.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if tc:IsCode(13890468) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,13890468,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,13890468,RESET_PHASE+PHASE_END,0,1) end
-end
-function c13890468.limcon(e)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),13890468)~=0
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TOHAND)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetCountLimit(1)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetCost(c13890468.cost)
+	e1:SetTarget(c13890468.target)
+	e1:SetOperation(c13890468.operation)
+	c:RegisterEffect(e1)
 end
 function c13890468.filter(c)
 	return c:IsSetCard(0xb5) and c:IsAbleToRemoveAsCost()

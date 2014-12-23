@@ -4034,6 +4034,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.battle_phase_count[p] = 0;
 			core.summon_count[p] = 0;
 			core.extra_summon[p] = 0;
+			core.spsummon_once_map[p].clear();
 		}
 		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
 			if(!((*rit)->flag & EFFECT_FLAG_NO_TURN_RESET))
@@ -4284,21 +4285,21 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 int32 field::add_chain(uint16 step) {
 	switch (step) {
 	case 0: {
-		chain_list::iterator clit = core.new_chains.begin();
-		effect* peffect = clit->triggering_effect;
+		auto& clit = core.new_chains.front();
+		effect* peffect = clit.triggering_effect;
 		if (!core.new_chains.size())
 			return TRUE;
 		effect_set eset;
-		filter_player_effect(clit->triggering_player, EFFECT_ACTIVATE_COST, &eset);
+		filter_player_effect(clit.triggering_player, EFFECT_ACTIVATE_COST, &eset);
 		for(int32 i = 0; i < eset.count; ++i) {
 			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
-			pduel->lua->add_param(clit->triggering_effect, PARAM_TYPE_EFFECT);
-			pduel->lua->add_param(clit->triggering_player, PARAM_TYPE_INT);
+			pduel->lua->add_param(clit.triggering_effect, PARAM_TYPE_EFFECT);
+			pduel->lua->add_param(clit.triggering_player, PARAM_TYPE_INT);
 			if(!pduel->lua->check_condition(eset[i]->target, 3))
 				continue;
 			if(eset[i]->operation) {
-				core.sub_solving_event.push_back(clit->evt);
-				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, clit->triggering_player, 0);
+				core.sub_solving_event.push_back(clit.evt);
+				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, clit.triggering_player, 0);
 			}
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
@@ -4347,20 +4348,20 @@ int32 field::add_chain(uint16 step) {
 		return FALSE;
 	}
 	case 1: {
-		chain_list::iterator clit = core.new_chains.begin();
-		effect* peffect = clit->triggering_effect;
+		auto& clit = core.new_chains.front();
+		effect* peffect = clit.triggering_effect;
 		card* phandler = peffect->handler;
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
-			clit->triggering_controler = phandler->current.controler;
-			clit->triggering_location = phandler->current.location;
-			clit->triggering_sequence = phandler->current.sequence;
+			clit.triggering_controler = phandler->current.controler;
+			clit.triggering_location = phandler->current.location;
+			clit.triggering_sequence = phandler->current.sequence;
 		}
 		pduel->write_buffer8(MSG_CHAINING);
 		pduel->write_buffer32(phandler->data.code);
 		pduel->write_buffer32(phandler->get_info_location());
-		pduel->write_buffer8(clit->triggering_controler);
-		pduel->write_buffer8(clit->triggering_location);
-		pduel->write_buffer8(clit->triggering_sequence);
+		pduel->write_buffer8(clit.triggering_controler);
+		pduel->write_buffer8(clit.triggering_location);
+		pduel->write_buffer8(clit.triggering_sequence);
 		pduel->write_buffer32(peffect->description);
 		pduel->write_buffer8(core.current_chain.size() + 1);
 		break_effect();
@@ -4381,48 +4382,48 @@ int32 field::add_chain(uint16 step) {
 		if((peffect->card_type & 0x5) == 0x5)
 			peffect->card_type -= TYPE_TRAP;
 		peffect->active_type = peffect->card_type;
-		clit->chain_count = core.current_chain.size() + 1;
-		clit->target_cards = 0;
-		clit->target_player = PLAYER_NONE;
-		clit->target_param = 0;
-		clit->disable_reason = 0;
-		clit->disable_player = PLAYER_NONE;
-		clit->replace_op = 0;
+		clit.chain_count = core.current_chain.size() + 1;
+		clit.target_cards = 0;
+		clit.target_player = PLAYER_NONE;
+		clit.target_param = 0;
+		clit.disable_reason = 0;
+		clit.disable_player = PLAYER_NONE;
+		clit.replace_op = 0;
 		if((phandler->current.location == LOCATION_HAND))
-			clit->flag |= CHAIN_HAND_EFFECT;
-		core.current_chain.push_back(*clit);
-		check_chain_counter(peffect, clit->triggering_controler, clit->chain_count);
+			clit.flag |= CHAIN_HAND_EFFECT;
+		core.current_chain.push_back(clit);
+		check_chain_counter(peffect, clit.triggering_player, clit.chain_count);
 		// triggered events which are not caused by RaiseEvent create relation with the handler
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (!(peffect->type & 0x2a0) || (peffect->code & EVENT_PHASE) == EVENT_PHASE)) {
 			peffect->handler->create_relation(peffect);
 		}
 		if(peffect->cost) {
-			core.sub_solving_event.push_back(clit->evt);
-			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit->triggering_player, 0);
+			core.sub_solving_event.push_back(clit.evt);
+			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit.triggering_player, 0);
 		}
 		core.new_chains.pop_front();
 		return FALSE;
 	}
 	case 2: {
-		chain_array::iterator clit = --(core.current_chain.end());
-		effect* peffect = clit->triggering_effect;
+		auto& clit = core.current_chain.back();
+		effect* peffect = clit.triggering_effect;
 		if(peffect->target) {
-			core.sub_solving_event.push_back(clit->evt);
-			add_process(PROCESSOR_EXECUTE_TARGET, 0, peffect, 0, clit->triggering_player, 0);
+			core.sub_solving_event.push_back(clit.evt);
+			add_process(PROCESSOR_EXECUTE_TARGET, 0, peffect, 0, clit.triggering_player, 0);
 		}
 		return FALSE;
 	}
 	case 3: {
 		break_effect();
-		chain_array::iterator clit = --(core.current_chain.end());
-		effect* peffect = clit->triggering_effect;
-		if(clit->target_cards && clit->target_cards->container.size()) {
+		auto& clit = core.current_chain.back();
+		effect* peffect = clit.triggering_effect;
+		if(clit.target_cards && clit.target_cards->container.size()) {
 			if(peffect->flag & EFFECT_FLAG_CARD_TARGET) {
-				for(auto cit = clit->target_cards->container.begin(); cit != clit->target_cards->container.end(); ++cit)
-					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, peffect, 0, clit->triggering_player, 0, clit->chain_count);
+				for(auto cit = clit.target_cards->container.begin(); cit != clit.target_cards->container.end(); ++cit)
+					raise_single_event(*cit, 0, EVENT_BECOME_TARGET, peffect, 0, clit.triggering_player, 0, clit.chain_count);
 				process_single_event();
-				if(clit->target_cards->container.size())
-					raise_event(&clit->target_cards->container, EVENT_BECOME_TARGET, peffect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
+				if(clit.target_cards->container.size())
+					raise_event(&clit.target_cards->container, EVENT_BECOME_TARGET, peffect, 0, clit.triggering_player, clit.triggering_player, clit.chain_count);
 			}
 		}
 		if(peffect->type & EFFECT_TYPE_ACTIVATE) {
@@ -4432,11 +4433,23 @@ int32 field::add_chain(uint16 step) {
 				peffect->handler->set_status(STATUS_LEAVE_CONFIRMED, TRUE);
 		}
 		core.phase_action = TRUE;
-		if(clit->opinfos.count(0x200))
-			core.spsummon_state_count[clit->triggering_player]++;
+		if(clit.opinfos.count(0x200)) {
+			core.spsummon_state_count[clit.triggering_player]++;
+			if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
+				auto& optarget = clit.opinfos[0x200];
+				if(optarget.op_cards) {
+					for(auto& spcard : optarget.op_cards->container) {
+						if(spcard->spsummon_code) {
+							uint8 sumpl = optarget.op_player ? 1 : 0;
+							core.spsummon_once_map[sumpl][spcard->spsummon_code]++;
+						}
+					}
+				}
+			}
+		}
 		pduel->write_buffer8(MSG_CHAINED);
-		pduel->write_buffer8(clit->chain_count);
-		raise_event(peffect->handler, EVENT_CHAINING, peffect, 0, clit->triggering_player, clit->triggering_player, clit->chain_count);
+		pduel->write_buffer8(clit.chain_count);
+		raise_event(peffect->handler, EVENT_CHAINING, peffect, 0, clit.triggering_player, clit.triggering_player, clit.chain_count);
 		process_instant_event();
 		if(core.new_chains.size())
 			add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
@@ -4567,8 +4580,20 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
-			if(cait->opinfos.count(0x200))
+			if(cait->opinfos.count(0x200)) {
 				core.spsummon_state_count[cait->triggering_player]--;
+				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
+					auto& optarget = cait->opinfos[0x200];
+					if(optarget.op_cards) {
+						for(auto& spcard : optarget.op_cards->container) {
+							if(spcard->spsummon_code) {
+								uint8 sumpl = optarget.op_player ? 1 : 0;
+								core.spsummon_once_map[sumpl][spcard->spsummon_code]--;
+							}
+						}
+					}
+				}
+			}
 			return FALSE;
 		}
 		for(auto oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
@@ -4608,10 +4633,12 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				return FALSE;
 			}
 		}
-		core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 		core.units.begin()->arg2 = core.spsummon_state_count[cait->triggering_player];
-		if(cait->replace_op)
+		if(cait->replace_op) {
+			core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 			cait->triggering_effect->operation = cait->replace_op;
+		} else
+			core.units.begin()->peffect = 0;
 		if(cait->triggering_effect->operation) {
 			core.sub_solving_event.push_back(cait->evt);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, cait->triggering_effect, 0, cait->triggering_player, 0);
@@ -4620,9 +4647,26 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	}
 	case 3: {
 		effect* peffect = cait->triggering_effect;
-		peffect->operation = (ptr)core.units.begin()->peffect;
-		if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
-			core.spsummon_state_count[cait->triggering_player]--;
+		if(core.units.begin()->peffect) {
+			peffect->operation = (ptr)core.units.begin()->peffect;
+			if(cait->opinfos.count(0x200)) {
+				core.spsummon_state_count[cait->triggering_player]--;
+				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
+					auto& optarget = cait->opinfos[0x200];
+					if(optarget.op_cards) {
+						for(auto& spcard : optarget.op_cards->container) {
+							if(spcard->spsummon_code) {
+								uint8 sumpl = optarget.op_player ? 1 : 0;
+								core.spsummon_once_map[sumpl][spcard->spsummon_code]--;
+							}
+						}
+					}
+				}
+			}
+		} else {
+			if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
+				core.spsummon_state_count[cait->triggering_player]--;
+		}
 		if(core.special_summoning.size())
 			core.special_summoning.clear();
 		if(core.equiping_cards.size())

@@ -63,6 +63,7 @@ card::card() {
 	unique_code = 0;
 	assume_type = 0;
 	assume_value = 0;
+	spsummon_code = 0;
 	current.controler = PLAYER_NONE;
 }
 card::~card() {
@@ -1854,6 +1855,8 @@ int32 card::is_special_summonable(uint8 playerid) {
 		return FALSE;
 	if(pduel->game_field->check_unique_onfield(this, playerid))
 		return FALSE;
+	if(!pduel->game_field->check_spsummon_once(this, playerid))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
@@ -1888,6 +1891,8 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 			return FALSE;
 	}
 	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))
+		return FALSE;
+	if(!pduel->game_field->check_spsummon_once(this, sumplayer))
 		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if((sumplayer == 0 || sumplayer == 1) && !pduel->game_field->is_player_can_spsummon(reason_effect, sumtype, sumpos, sumplayer, toplayer, this))
