@@ -20,7 +20,7 @@ function c75304793.initial_effect(c)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetRange(LOCATION_FZONE)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x66))
+	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x1066))
 	e3:SetValue(c75304793.atkval)
 	c:RegisterEffect(e3)
 	--counter
@@ -34,7 +34,7 @@ function c75304793.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c75304793.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	return re and re:GetHandler():IsSetCard(0x66) and not re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return re and re:GetHandler():IsSetCard(0x1066) and not re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c75304793.ctop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x35,1)
@@ -43,7 +43,7 @@ function c75304793.atkval(e,c)
 	return e:GetHandler():GetCounter(0x35)*100
 end
 function c75304793.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x66)
+	return c:IsFaceup() and c:IsSetCard(0x1066)
 end
 function c75304793.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=Duel.GetMatchingGroupCount(c75304793.filter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
