@@ -8,9 +8,13 @@ function c83555666.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x1e1)
 	e1:SetCountLimit(1,83555666+EFFECT_COUNT_CODE_OATH)
+	e1:SetCondition(c83555666.condition)
 	e1:SetTarget(c83555666.target)
 	e1:SetOperation(c83555666.activate)
 	c:RegisterEffect(e1)
+end
+function c83555666.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()~=tp
 end
 function c83555666.filter(c,lp)
 	return c:IsFaceup() and c:IsAttackBelow(lp) and c:IsDestructable()

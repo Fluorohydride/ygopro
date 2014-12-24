@@ -27,7 +27,7 @@ function c2055403.activate(e,tp,eg,ep,ev,re,r,rp)
 		if Duel.GetLP(tp)>=ct*1000 then
 			Duel.SetLP(tp,Duel.GetLP(tp)-ct*1000)
 		else
-			Duel.SetLP(0)
+			Duel.SetLP(tp,0)
 		end
 	end
 end
