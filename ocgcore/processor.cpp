@@ -4051,6 +4051,14 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			iter->second.second = 0;
 		for(auto iter=core.chain_counter.begin();iter!=core.chain_counter.end();++iter)
 			iter->second.second = 0;
+		if(core.global_flag & GLOBALFLAG_SPSUMMON_COUNT) {
+			for(auto iter = effects.spsummon_count_eff.begin(); iter != effects.spsummon_count_eff.end(); ++iter) {
+				effect* peffect = *iter;
+				card* pcard = peffect->handler;
+				if(!(peffect->flag & EFFECT_FLAG_NO_TURN_RESET))
+					pcard->spsummon_counter[0] = pcard->spsummon_counter[1] = 0;
+			}
+		}
 		infos.turn_id++;
 		infos.turn_player = turn_player;
 		pduel->write_buffer8(MSG_NEW_TURN);
@@ -4434,7 +4442,7 @@ int32 field::add_chain(uint16 step) {
 		}
 		core.phase_action = TRUE;
 		if(clit.opinfos.count(0x200)) {
-			core.spsummon_state_count[clit.triggering_player]++;
+			set_spsummon_counter(clit.triggering_player);
 			if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 				auto& optarget = clit.opinfos[0x200];
 				if(optarget.op_cards) {
@@ -4582,7 +4590,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			process_instant_event();
 			core.units.begin()->step = 9;
 			if(cait->opinfos.count(0x200)) {
-				core.spsummon_state_count[cait->triggering_player]--;
+				set_spsummon_counter(cait->triggering_player, false);
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
@@ -4651,7 +4659,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if(core.units.begin()->peffect) {
 			peffect->operation = (ptr)core.units.begin()->peffect;
 			if(cait->opinfos.count(0x200)) {
-				core.spsummon_state_count[cait->triggering_player]--;
+				set_spsummon_counter(cait->triggering_player,false);
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
@@ -4666,7 +4674,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			}
 		} else {
 			if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
-				core.spsummon_state_count[cait->triggering_player]--;
+				set_spsummon_counter(cait->triggering_player, false);
 		}
 		if(core.special_summoning.size())
 			core.special_summoning.clear();

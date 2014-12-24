@@ -109,6 +109,7 @@ public:
 	uint16 unique_uid;
 	uint32 unique_code;
 	uint32 spsummon_code;
+	uint16 spsummon_counter[2];
 	uint8 assume_type;
 	uint32 assume_value;
 	effect* unique_effect;

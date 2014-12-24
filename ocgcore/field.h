@@ -101,7 +101,8 @@ struct field_effect {
 	effect_collection pheff;
 	effect_collection cheff;
 	effect_collection rechargeable;
-
+	effect_collection spsummon_count_eff;
+	
 	std::list<card*> disable_check_list;
 	std::set<card*, card_sort> disable_check_set;
 };
@@ -361,6 +362,8 @@ public:
 	int32 check_spsummon_once(card* pcard, uint8 playerid);
 	void check_card_counter(card* pcard, int32 counter_type, int32 playerid);
 	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid, bool cancel = false);
+	void set_spsummon_counter(uint8 playerid, bool add = true);
+	int32 check_spsummon_counter(uint8 playerid, uint8 ct = 1);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();
@@ -387,9 +390,7 @@ public:
 	int32 is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card* pcard);
 	int32 is_player_can_flipsummon(uint8 playerid, card* pcard);
 	int32 is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);
-	int32 is_player_can_summon_count(uint8 playerid, uint32 count);
 	int32 is_player_can_spsummon_count(uint8 playerid, uint32 count);
-	int32 is_player_can_flipsummon_count(uint8 playerid, uint32 count);
 	int32 is_player_can_release(uint8 playerid, card* pcard);
 	int32 is_player_can_place_counter(uint8 playerid, card* pcard, uint16 countertype, uint16 count);
 	int32 is_player_can_remove_counter(uint8 playerid, card* pcard, uint8 s, uint8 o, uint16 countertype, uint16 count, uint32 reason);
