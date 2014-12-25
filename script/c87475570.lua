@@ -28,7 +28,7 @@ function c87475570.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c87475570.tgtg(e,c)
-	return c:IsSetCard(0x1034) or (c:IsLocation(TYPE_MONSTER) and (c:IsCode(79407975) or c:IsCode(79856792)))
+	return c:IsSetCard(0x1034) or (c:IsLocation(LOCATION_MZONE) and (c:IsCode(79407975) or c:IsCode(79856792)))
 end
 function c87475570.tgval(e,re,rp)
 	return rp~=e:GetHandlerPlayer()

@@ -1,7 +1,7 @@
 --重機王ドボク·ザーク
 function c29515122.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)

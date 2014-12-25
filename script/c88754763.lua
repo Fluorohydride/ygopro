@@ -1,7 +1,7 @@
 --CX 熱血指導神アルティメットレーナー
 function c88754763.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),4)
+	aux.AddXyzProcedure(c,nil,9,4)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)

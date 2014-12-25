@@ -152,12 +152,6 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 					return FALSE;
 			}
 			if(handler->current.location == LOCATION_HAND) {
-				if((handler->data.type & TYPE_TRAP) && !handler->is_affected_by_effect(EFFECT_TRAP_ACT_IN_HAND))
-					return FALSE;
-				if((handler->data.type & TYPE_SPELL) && (pduel->game_field->infos.turn_player != playerid)) {
-					if(!(handler->data.type & TYPE_QUICKPLAY) || !handler->is_affected_by_effect(EFFECT_QP_ACT_IN_NTPHAND))
-						return FALSE;
-				}
 				if(handler->data.type & TYPE_MONSTER) {
 					if(!(handler->data.type & TYPE_PENDULUM))
 						return FALSE;
@@ -171,9 +165,34 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 				if(handler->get_status(STATUS_SET_TURN)) {
 					if((handler->data.type & TYPE_SPELL) && (handler->data.type & TYPE_QUICKPLAY))
 						return FALSE;
-					if((handler->data.type & TYPE_TRAP) && !handler->is_affected_by_effect(EFFECT_TRAP_ACT_IN_SET_TURN))
+				}
+			}
+			int32 ecode = 0;
+			if(handler->current.location == LOCATION_HAND) {
+				if(handler->data.type & TYPE_TRAP)
+					ecode = EFFECT_TRAP_ACT_IN_HAND;
+				else if((handler->data.type & TYPE_SPELL) && pduel->game_field->infos.turn_player != playerid) {
+					if(handler->data.type & TYPE_QUICKPLAY)
+						ecode = EFFECT_QP_ACT_IN_NTPHAND;
+					else
 						return FALSE;
 				}
+			} else if(handler->current.location == LOCATION_SZONE) {
+				if((handler->data.type & TYPE_TRAP) && handler->get_status(STATUS_SET_TURN))
+					ecode = EFFECT_TRAP_ACT_IN_SET_TURN;
+			}
+			if(ecode) {
+				int32 available = false;
+				effect_set eset;
+				handler->filter_effect(ecode, &eset);
+				for(int32 i = 0; i < eset.count; ++i) {
+					if(eset[i]->check_count_limit(playerid)) {
+						available = true;
+						break;
+					}
+				}
+				if(!available)
+					return FALSE;
 			}
 			if(handler->is_affected_by_effect(EFFECT_FORBIDDEN))
 				return FALSE;
@@ -406,8 +425,6 @@ int32 effect::is_immuned(effect_set_v* effects) {
 	effect* peffect;
 	for (int i = 0; i < effects->count; ++i) {
 		peffect = effects->at(i);
-		if(peffect->owner == owner)
-			return FALSE;
 		if(peffect->value) {
 			pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 			if(peffect->check_value_condition(1))

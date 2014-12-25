@@ -1,7 +1,7 @@
 --烈華砲艦ナデシコ
 function c40424929.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),3)
+	aux.AddXyzProcedure(c,nil,3,3)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)

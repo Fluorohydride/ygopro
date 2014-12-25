@@ -1,7 +1,7 @@
 --ゴーストリック・アルカード
 function c75367227.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--cannot be battle target
 	local e1=Effect.CreateEffect(c)

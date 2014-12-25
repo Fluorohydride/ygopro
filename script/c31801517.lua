@@ -1,7 +1,7 @@
 --No.62 銀河眼の光子竜皇
 function c31801517.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),2)
+	aux.AddXyzProcedure(c,nil,8,2)
 	c:EnableReviveLimit()
 	--atk
 	local e1=Effect.CreateEffect(c)

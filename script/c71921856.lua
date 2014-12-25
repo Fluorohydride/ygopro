@@ -1,7 +1,7 @@
 --No.79 BK 新星のカイザー
 function c71921856.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)

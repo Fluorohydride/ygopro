@@ -1,7 +1,7 @@
 --ギャラクシーアイズ FA・フォトン・ドラゴン
 function c39030163.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),3,c39030163.ovfilter,aux.Stringid(39030163,0))
+	aux.AddXyzProcedure(c,nil,8,3,c39030163.ovfilter,aux.Stringid(39030163,0))
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)

@@ -2,7 +2,7 @@
 function c23232295.initial_effect(c)
 	Duel.EnableGlobalFlag(GLOBALFLAG_DETACH_EVENT)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsSetCard,0x84),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x84),4,2)
 	c:EnableReviveLimit()
 	--destroy replace
 	local e1=Effect.CreateEffect(c)

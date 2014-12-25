@@ -1,7 +1,7 @@
 --星輝士 トライヴェール
 function c42589641.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,c42589641.xyzfilter,4),3)
+	aux.AddXyzProcedure(c,c42589641.xyzfilter,4,3)
 	c:EnableReviveLimit()
 	--summon limit
 	local e1=Effect.CreateEffect(c)

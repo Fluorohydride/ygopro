@@ -1,7 +1,7 @@
 --ガガガザムライ
 function c91499077.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--attack twice
 	local e1=Effect.CreateEffect(c)

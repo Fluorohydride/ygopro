@@ -1,7 +1,7 @@
 --CNo.5 亡朧龍カオス・キマイラ・ドラゴン
 function c69757518.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),3,nil,nil,5)
+	aux.AddXyzProcedure(c,nil,6,3,nil,nil,5)
 	c:EnableReviveLimit()
 	--atk
 	local e1=Effect.CreateEffect(c)

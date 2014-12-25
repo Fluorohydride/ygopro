@@ -55,6 +55,7 @@ function c52198054.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_HAND)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 		e:SetLabel(1)
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(52198054,2))
 	else
 		e:SetCategory(0)
 		e:SetProperty(0)

@@ -1,7 +1,7 @@
 --グレンザウルス
 function c47506081.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)

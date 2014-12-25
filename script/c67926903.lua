@@ -1,7 +1,7 @@
 --CX 冀望皇バリアン
 function c67926903.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3,c67926903.ovfilter,aux.Stringid(67926903,0),5)
+	aux.AddXyzProcedure(c,nil,7,3,c67926903.ovfilter,aux.Stringid(67926903,0),5)
 	c:EnableReviveLimit()
 	--atk
 	local e1=Effect.CreateEffect(c)

@@ -2,7 +2,7 @@
 function c68618157.initial_effect(c)
 	c:SetUniqueOnField(1,0,68618157)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),3)
+	aux.AddXyzProcedure(c,nil,4,3)
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)

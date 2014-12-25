@@ -1,7 +1,7 @@
 --CX－CH レジェンド・アーサー
 function c13030280.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--battle indes
 	local e1=Effect.CreateEffect(c)

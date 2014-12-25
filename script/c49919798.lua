@@ -14,6 +14,7 @@ function c49919798.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1)
+	e2:SetCost(c49919798.cpcost)
 	e2:SetTarget(c49919798.cptg)
 	e2:SetOperation(c49919798.cpop)
 	c:RegisterEffect(e2)
@@ -42,6 +43,10 @@ function c49919798.thop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
+end
+function c49919798.cpcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(49919798)==0 end
+	e:GetHandler():RegisterFlagEffect(49919798,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c49919798.cpfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x66) and not c:IsCode(49919798)

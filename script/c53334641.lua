@@ -1,7 +1,7 @@
 --ゴーストリックの駄天使
 function c53334641.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2,c53334641.ovfilter,aux.Stringid(53334641,0))
+	aux.AddXyzProcedure(c,nil,4,2,c53334641.ovfilter,aux.Stringid(53334641,0))
 	c:EnableReviveLimit()
 	--win
 	local e1=Effect.CreateEffect(c)

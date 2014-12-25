@@ -1,4 +1,4 @@
---˜OÐÇë‘¥¹¥ô¥¡¥ë¥È¥¢©`¥ë¥ô
+--æ¥µæ˜ŸéœŠã‚¹ãƒ´ã‚¡ãƒ«ãƒˆã‚¢ãƒ¼ãƒ«ãƒ´
 function c73417207.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)

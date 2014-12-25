@@ -1,4 +1,4 @@
---¤½¤θοL¤ΞΎ«λ‘
+--γγ‚ιΆ¨γ®η²Ύι
 function c53530069.initial_effect(c)
 	--recover
 	local e1=Effect.CreateEffect(c)

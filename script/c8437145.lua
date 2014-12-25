@@ -42,7 +42,7 @@ function c8437145.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c8437145.efilter(e,re)
-	return e:GetOwnerPlayer()~=re:GetHandlerPlayer()
+	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
 end
 function c8437145.repfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)

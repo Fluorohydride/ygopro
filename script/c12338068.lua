@@ -35,8 +35,9 @@ function c12338068.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local atk=0
 	local tc=g:GetFirst()
 	while tc do
-		if atk>0 then
-			atk=atk+tc:GetBaseAttack()
+		local batk=tc:GetBaseAttack()
+		if batk>0 then
+			atk=atk+batk
 		end
 		tc=g:GetNext()
 	end

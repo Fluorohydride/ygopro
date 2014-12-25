@@ -50,6 +50,5 @@ function c89463537.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c89463537.distg(e,c)
-	return c:IsPreviousLocation(LOCATION_EXTRA)
-		and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return c:GetSummonLocation()==LOCATION_EXTRA
 end

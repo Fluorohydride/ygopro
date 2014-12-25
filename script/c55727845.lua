@@ -1,7 +1,7 @@
 --No.96 ブラック·ミスト
 function c55727845.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,2),3)
+	aux.AddXyzProcedure(c,nil,2,3)
 	c:EnableReviveLimit()
 	--atk u/d
 	local e1=Effect.CreateEffect(c)

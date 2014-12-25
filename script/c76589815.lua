@@ -1,7 +1,7 @@
 --BK チート・コミッショナー
 function c76589815.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--must attack
 	local e1=Effect.CreateEffect(c)

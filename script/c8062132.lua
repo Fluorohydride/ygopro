@@ -36,6 +36,7 @@ function c8062132.initial_effect(c)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetValue(c8062132.efilter)
 	c:RegisterEffect(e5)
 	--win
 	local e6=Effect.CreateEffect(c)
@@ -46,6 +47,9 @@ function c8062132.initial_effect(c)
 	e6:SetCondition(c8062132.ctcon)
 	e6:SetOperation(c8062132.ctop)
 	c:RegisterEffect(e6)
+end
+function c8062132.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end
 function c8062132.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,nil,RACE_REPTILE)*500

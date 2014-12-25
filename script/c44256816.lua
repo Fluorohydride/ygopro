@@ -11,33 +11,16 @@ function c44256816.initial_effect(c)
 	e1:SetTarget(c44256816.target)
 	e1:SetOperation(c44256816.activate)
 	c:RegisterEffect(e1)
-	if not c44256816.global_check then
-		c44256816.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c44256816.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(44256816,ACTIVITY_SPSUMMON,c44256816.counterfilter)
 end
-function c44256816.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if not tc:IsSetCard(0x9b) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,44256816,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,44256816,RESET_PHASE+PHASE_END,0,1) end
+function c44256816.counterfilter(c)
+	return c:IsSetCard(0x9b)
 end
 function c44256816.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end
 function c44256816.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,44256816)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(44256816,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

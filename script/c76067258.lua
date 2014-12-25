@@ -1,7 +1,7 @@
 --No.66 覇鍵甲虫マスター・キー・ビートル
 function c76067258.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),4,2)
 	c:EnableReviveLimit()
 	--target
 	local e1=Effect.CreateEffect(c)

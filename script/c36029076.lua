@@ -10,10 +10,10 @@ function c36029076.initial_effect(c)
 	e1:SetOperation(c36029076.ntop)
 	c:RegisterEffect(e1)
 end
-function c36029076.ntcon(e,c)
+function c36029076.ntcon(e,c,minc)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	return minc==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0
 end

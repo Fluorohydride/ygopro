@@ -1,7 +1,7 @@
 --外神ナイアルラ
 function c8809344.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--rankup
 	local e1=Effect.CreateEffect(c)
@@ -61,12 +61,12 @@ function c8809344.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
 		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-		e1:SetValue(tc:GetAttribute())
+		e1:SetValue(tc:GetOriginalAttribute())
 		e1:SetReset(RESET_EVENT+0x1ff0000)
 		c:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_CHANGE_RACE)
-		e2:SetValue(tc:GetRace())
+		e2:SetValue(tc:GetOriginalRace())
 		c:RegisterEffect(e2)
 	end
 end

@@ -1,7 +1,7 @@
 --No.7 ラッキー·ストライプ
 function c82308875.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,nil,7,3)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
