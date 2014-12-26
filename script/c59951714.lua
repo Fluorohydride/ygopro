@@ -26,7 +26,7 @@ function c59951714.initial_effect(c)
 	Duel.AddCustomActivityCounter(59951714,ACTIVITY_SPSUMMON,c59951714.counterfilter)
 end
 function c59951714.counterfilter(c)
-	return not c:GetSummonLocation()==LOCATION_EXTRA
+	return c:GetSummonLocation()~=LOCATION_EXTRA
 end
 function c59951714.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

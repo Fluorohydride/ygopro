@@ -101,7 +101,8 @@ struct field_effect {
 	effect_collection pheff;
 	effect_collection cheff;
 	effect_collection rechargeable;
-
+	effect_collection spsummon_count_eff;
+	
 	std::list<card*> disable_check_list;
 	std::set<card*, card_sort> disable_check_set;
 };
@@ -214,6 +215,7 @@ struct processor {
 	std::unordered_set<card*> unique_cards[2];
 	std::unordered_map<uint32, uint32> effect_count_code;
 	std::unordered_map<uint32, uint32> effect_count_code_duel;
+	std::unordered_map<uint32, uint32> spsummon_once_map[2];
 	std::multimap<int32, card*, std::greater<int32> > xmaterial_lst;
 	ptr temp_var[4];
 	uint32 global_flag;
@@ -360,10 +362,11 @@ public:
 	void add_unique_card(card* pcard);
 	void remove_unique_card(card* pcard);
 	effect* check_unique_onfield(card* pcard, uint8 controler);
+	int32 check_spsummon_once(card* pcard, uint8 playerid);
 	void check_card_counter(card* pcard, int32 counter_type, int32 playerid);
-	void check_card_counter(card_set* pcards, int32 counter_type, int32 playerid);
-	void check_card_counter(card_vector* pcards, int32 counter_type, int32 playerid);
-	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid);
+	void check_chain_counter(effect* peffect, int32 playerid, int32 chainid, bool cancel = false);
+	void set_spsummon_counter(uint8 playerid, bool add = true);
+	int32 check_spsummon_counter(uint8 playerid, uint8 ct = 1);
 	
 	int32 check_lp_cost(uint8 playerid, uint32 cost);
 	void save_lp_cost();
@@ -390,9 +393,7 @@ public:
 	int32 is_player_can_spsummon(effect* peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card* pcard);
 	int32 is_player_can_flipsummon(uint8 playerid, card* pcard);
 	int32 is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data* pdata);
-	int32 is_player_can_summon_count(uint8 playerid, uint32 count);
 	int32 is_player_can_spsummon_count(uint8 playerid, uint32 count);
-	int32 is_player_can_flipsummon_count(uint8 playerid, uint32 count);
 	int32 is_player_can_release(uint8 playerid, card* pcard);
 	int32 is_player_can_place_counter(uint8 playerid, card* pcard, uint16 countertype, uint16 count);
 	int32 is_player_can_remove_counter(uint8 playerid, card* pcard, uint8 s, uint8 o, uint16 countertype, uint16 count, uint32 reason);
@@ -551,6 +552,7 @@ public:
 #define GLOBALFLAG_SPSUMMON_COUNT		0x40
 #define GLOBALFLAG_XMAT_COUNT_LIMIT		0x80
 #define GLOBALFLAG_SELF_TOGRAVE			0x100
+#define GLOBALFLAG_SPSUMMON_ONCE		0x200
 //
 #define PROCESSOR_NONE		0
 #define PROCESSOR_WAITING	0x10000

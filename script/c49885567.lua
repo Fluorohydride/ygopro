@@ -1,44 +1,15 @@
 --精霊獣 カンナホーク
 function c49885567.initial_effect(c)
-	--spsummon limit
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetCondition(c49885567.limcon)
-	c:RegisterEffect(e1)
+	c:SetSPSummonOnce(49885567)
 	--tohand
-	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_REMOVE)
-	e2:SetType(EFFECT_TYPE_IGNITION)
-	e2:SetCountLimit(1)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetTarget(c49885567.target)
-	e2:SetOperation(c49885567.operation)
-	c:RegisterEffect(e2)
-	if not c49885567.global_check then
-		c49885567.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c49885567.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c49885567.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if tc:IsCode(49885567) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,49885567,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,49885567,RESET_PHASE+PHASE_END,0,1) end
-end
-function c49885567.limcon(e)
-	return Duel.GetFlagEffect(e:GetHandlerPlayer(),49885567)~=0
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_REMOVE)
+	e1:SetType(EFFECT_TYPE_IGNITION)
+	e1:SetCountLimit(1)
+	e1:SetRange(LOCATION_MZONE)
+	e1:SetTarget(c49885567.target)
+	e1:SetOperation(c49885567.operation)
+	c:RegisterEffect(e1)
 end
 function c49885567.filter(c)
 	return c:IsSetCard(0xb5) and c:IsAbleToRemove()

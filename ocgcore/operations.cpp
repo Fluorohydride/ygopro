@@ -2049,8 +2049,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		target->current.reason_effect = peffect;
 		target->current.reason_player = sumplayer;
 		target->summon_player = sumplayer;
-		core.spsummon_state_count[sumplayer]++;
+		set_spsummon_counter(sumplayer);
 		check_card_counter(target, 3, sumplayer);
+		if(target->spsummon_code)
+			core.spsummon_once_map[sumplayer][target->spsummon_code]++;
 		break_effect();
 		return FALSE;
 	}
@@ -2201,7 +2203,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		if(pgroup->container.size() == 0)
 			return TRUE;
 		core.phase_action = TRUE;
-		check_card_counter(&pgroup->container, 3, sumplayer);
 		pgroup->it = pgroup->container.begin();
 		return FALSE;
 	}
@@ -2214,6 +2215,9 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		pcard->current.reason_player = sumplayer;
 		pcard->summon_player = sumplayer;
 		pcard->summon_info = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)pcard->current.location << 16);
+		check_card_counter(pcard, 3, sumplayer);
+		if(pcard->spsummon_code)
+			core.spsummon_once_map[sumplayer][pcard->spsummon_code]++;
 		move_to_field(pcard, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
 		return FALSE;
 	}
@@ -2235,7 +2239,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 	case 25: {
 		group* pgroup = core.units.begin()->ptarget;
 		card_set cset;
-		core.spsummon_state_count[sumplayer]++;
+		set_spsummon_counter(sumplayer);
 		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMONING, TRUE);
 			if(!(*cit)->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON)) {
@@ -2359,6 +2363,9 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!targets)
 			core.special_summoning.insert(target);
 		target->enable_field_effect(FALSE);
+		if(target->spsummon_code)
+			core.spsummon_once_map[target->summon_player][target->spsummon_code]++;
+		check_card_counter(target, 3, target->summon_player);
 		move_to_field(target, target->summon_player, playerid, LOCATION_MZONE, positions);
 		return FALSE;
 	}
@@ -2393,8 +2400,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		if(!cvs.empty()) {
 			if(cvs.size() > 1)
 				std::sort(cvs.begin(), cvs.end(), card::card_operation_sort);
-			core.spsummon_state_count[infos.turn_player]++;
-			check_card_counter(&cvs, 3, infos.turn_player);
+			set_spsummon_counter(infos.turn_player);
 			core.hint_timing[infos.turn_player] |= TIMING_SPSUMMON;
 			for(auto cvit = cvs.begin(); cvit != cvs.end(); ++cvit)
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
@@ -2402,8 +2408,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		if(!cvo.empty()) {
 			if(cvo.size() > 1)
 				std::sort(cvo.begin(), cvo.end(), card::card_operation_sort);
-			core.spsummon_state_count[1 - infos.turn_player]++;
-			check_card_counter(&cvo, 3, 1 - infos.turn_player);
+			set_spsummon_counter(1 - infos.turn_player);
 			core.hint_timing[1 - infos.turn_player] |= TIMING_SPSUMMON;
 			for(auto cvit = cvo.begin(); cvit != cvo.end(); ++cvit)
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
@@ -3641,6 +3646,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					pcard->set_status(STATUS_SET_TURN, TRUE);
 					pcard->enable_field_effect(FALSE);
 					pcard->summon_info &= 0xdf00ffff;
+					pcard->spsummon_counter[0] = pcard->spsummon_counter[1] = 0;
 				}
 				if((npos & POS_FACEDOWN) && pcard->equiping_cards.size()) {
 					for(auto csit = pcard->equiping_cards.begin(); csit != pcard->equiping_cards.end();) {

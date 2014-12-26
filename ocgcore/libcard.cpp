@@ -2069,3 +2069,13 @@ int32 scriptlib::card_assume_prop(lua_State *L) {
 	pcard->pduel->assumes.insert(pcard);
 	return 0;
 }
+int32 scriptlib::card_set_spsummon_once(lua_State *L) {
+	check_param_count(L, 2);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(pcard->status & STATUS_COPYING_EFFECT)
+		return 0;
+	pcard->spsummon_code = lua_tointeger(L, 2);
+	pcard->pduel->game_field->core.global_flag |= GLOBALFLAG_SPSUMMON_ONCE;
+	return 0;
+}

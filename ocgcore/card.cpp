@@ -60,9 +60,11 @@ card::card() {
 	memset(&previous, 0, sizeof(card_state));
 	memset(&temp, 0xff, sizeof(card_state));
 	unique_pos[0] = unique_pos[1] = 0;
+	spsummon_counter[0] = spsummon_counter[1] = 0;
 	unique_code = 0;
 	assume_type = 0;
 	assume_value = 0;
+	spsummon_code = 0;
 	current.controler = PLAYER_NONE;
 }
 card::~card() {
@@ -949,19 +951,26 @@ void card::apply_field_effect() {
 		return;
 	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
 		if (it->second->in_range(current.location, current.sequence) || ((it->second->range & LOCATION_HAND)
-		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE)))
+		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE))) {
 			pduel->game_field->add_effect(it->second);
+			if(it->second->code == EFFECT_SPSUMMON_COUNT_LIMIT)
+				pduel->game_field->effects.spsummon_count_eff.insert(it->second);
+		}
 	}
 	if(unique_code && (current.location & LOCATION_ONFIELD))
 		pduel->game_field->add_unique_card(this);
+	spsummon_counter[0] = spsummon_counter[1] = 0;
 }
 void card::cancel_field_effect() {
 	if (current.controler == PLAYER_NONE)
 		return;
 	for (auto it = field_effect.begin(); it != field_effect.end(); ++it) {
 		if (it->second->in_range(current.location, current.sequence) || ((it->second->range & LOCATION_HAND)
-		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE)))
+		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE))) {
 			pduel->game_field->remove_effect(it->second);
+			if(it->second->code == EFFECT_SPSUMMON_COUNT_LIMIT)
+				pduel->game_field->effects.spsummon_count_eff.erase(it->second);
+		}
 	}
 	if(unique_code && (current.location & LOCATION_ONFIELD))
 		pduel->game_field->remove_unique_card(this);
@@ -1953,6 +1962,10 @@ int32 card::is_special_summonable(uint8 playerid) {
 		return FALSE;
 	if(pduel->game_field->check_unique_onfield(this, playerid))
 		return FALSE;
+	if(!pduel->game_field->check_spsummon_once(this, playerid))
+		return FALSE;
+	if(!pduel->game_field->check_spsummon_counter(playerid))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
@@ -1987,6 +2000,10 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 			return FALSE;
 	}
 	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))
+		return FALSE;
+	if(!pduel->game_field->check_spsummon_once(this, sumplayer))
+		return FALSE;
+	if(!pduel->game_field->check_spsummon_counter(sumplayer))
 		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if((sumplayer == 0 || sumplayer == 1) && !pduel->game_field->is_player_can_spsummon(reason_effect, sumtype, sumpos, sumplayer, toplayer, this))
