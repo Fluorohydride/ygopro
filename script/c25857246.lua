@@ -47,11 +47,8 @@ function c25857246.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 end
 function c25857246.atkop(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	if at:IsAttackable() then
-		if Duel.NegateAttack() then
-			Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
-		end
+	if Duel.NegateAttack() then
+		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
 	end
 end
 function c25857246.filter(c)

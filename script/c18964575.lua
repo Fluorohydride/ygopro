@@ -20,10 +20,7 @@ function c18964575.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
 end
 function c18964575.operation(e,tp,eg,ep,ev,re,r,rp)
-	local at=Duel.GetAttacker()
-	if at:IsAttackable() then
-		if Duel.NegateAttack() then
-			Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
-		end
+	if Duel.NegateAttack() then
+		Duel.SkipPhase(1-tp,PHASE_BATTLE,RESET_PHASE+PHASE_BATTLE,1)
 	end
 end
