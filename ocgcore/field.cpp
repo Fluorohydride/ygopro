@@ -1465,24 +1465,22 @@ void field::check_chain_counter(effect* peffect, int32 playerid, int32 chainid, 
 	}
 }
 void field::set_spsummon_counter(uint8 playerid, bool add, bool chain) {
-	if(add){
+	if(add) {
 		core.spsummon_state_count[playerid]++;
 		if(chain)
 			core.spsummon_state_count_rst[playerid]++;
-	}
-	else{
-		if(chain){
-			core.spsummon_state_count[playerid]-=core.spsummon_state_count_rst[playerid];
+	} else {
+		if(chain) {
+			core.spsummon_state_count[playerid] -= core.spsummon_state_count_rst[playerid];
 			core.spsummon_state_count_rst[playerid] = 0;
-		}
-		else
+		} else
 			core.spsummon_state_count[playerid]--;
 	}
 	if(core.global_flag & GLOBALFLAG_SPSUMMON_COUNT) {
 		for(auto iter = effects.spsummon_count_eff.begin(); iter != effects.spsummon_count_eff.end(); ++iter) {
 			effect* peffect = *iter;
 			card* pcard = peffect->handler;
-			if(add){
+			if(add) {
 				if(pcard->is_status(STATUS_EFFECT_ENABLED) && !pcard->is_status(STATUS_DISABLED) && pcard->is_position(POS_FACEUP)) {
 					if(((playerid == pcard->current.controler) && peffect->s_range) || ((playerid != pcard->current.controler) && peffect->o_range)) {
 						pcard->spsummon_counter[playerid]++;
@@ -1490,9 +1488,8 @@ void field::set_spsummon_counter(uint8 playerid, bool add, bool chain) {
 							pcard->spsummon_counter_rst[playerid]++;
 					}
 				}
-			}
-			else{
-				pcard->spsummon_counter[playerid]-=pcard->spsummon_counter_rst[playerid];
+			} else {
+				pcard->spsummon_counter[playerid] -= pcard->spsummon_counter_rst[playerid];
 				pcard->spsummon_counter_rst[playerid] = 0;
 			}
 		}
@@ -1788,7 +1785,7 @@ int32 field::check_xyz_material(card* scard, int32 findex, int32 lv, int32 min, 
 	if(mg) {
 		uint32 xyz_level;
 		core.xmaterial_lst.clear();
-		for (auto cit = mg->container.begin(); cit!=mg->container.end(); ++cit) {
+		for (auto cit = mg->container.begin(); cit != mg->container.end(); ++cit) {
 			if((xyz_level = (*cit)->check_xyz_level(scard, lv)) && (findex == 0 || pduel->lua->check_matching(*cit, findex, 0)))
 				core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, *cit));
 		}

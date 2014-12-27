@@ -2400,7 +2400,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		return FALSE;
 	}
 	case 1: {
-		bool tp=false, ntp=false;
+		bool tp = false, ntp = false;
 		if(targets->container.size() == 0) {
 			returns.ivalue[0] = 0;
 			core.operated_set.clear();
@@ -2409,14 +2409,14 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		}
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			if((*cit)->summon_player == infos.turn_player)
-				tp=true;
+				tp = true;
 			else
-				ntp=true;
+				ntp = true;
 		}
 		if(tp)
 			set_spsummon_counter(infos.turn_player);
 		if(ntp)
-			set_spsummon_counter(1-infos.turn_player);
+			set_spsummon_counter(1 - infos.turn_player);
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
@@ -2968,7 +2968,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 4: {
-		exargs *param = new exargs;
+		exargs* param = new exargs;
 		core.units.begin()->ptarget = (group*)param;
 		param->targets = targets;
 		param->show_decktop[0] = false;
@@ -3017,7 +3017,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 5: {
-		exargs *param = (exargs*)targets;
+		exargs* param = (exargs*)targets;
 		if(param->cvit == param->cv.end()) {
 			core.units.begin()->step = 8;
 			return FALSE;
@@ -3063,7 +3063,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 	case 6: {
 		if(returns.ivalue[0])
 			return FALSE;
-		exargs *param = (exargs*)targets;
+		exargs* param = (exargs*)targets;
 		card* pcard = *param->cvit;
 		uint8 oloc = pcard->current.location;
 		uint8 playerid = (pcard->operation_param >> 16) & 0xf;
@@ -3110,7 +3110,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 7: {
-		exargs *param = (exargs*)targets;
+		exargs* param = (exargs*)targets;
 		card* pcard = *param->cvit;
 		uint32 flag;
 		get_useable_count(pcard->current.controler, LOCATION_SZONE, pcard->current.controler, LOCATION_REASON_TOFIELD, &flag);
@@ -3119,7 +3119,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 8: {
-		exargs *param = (exargs*)targets;
+		exargs* param = (exargs*)targets;
 		card* pcard = *param->cvit;
 		uint8 oloc = pcard->current.location;
 		uint8 seq = returns.bvalue[2];
@@ -3160,7 +3160,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 9: {
-		exargs *param = (exargs*)targets;
+		exargs* param = (exargs*)targets;
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 			if(param->show_decktop[0]) {
 				card* ptop = *player[0].list_main.rbegin();
@@ -3205,7 +3205,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 10: {
-		exargs *param = (exargs*)targets;
+		exargs* param = (exargs*)targets;
 		core.units.begin()->ptarget = param->targets;
 		targets = param->targets;
 		delete param;
