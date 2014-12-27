@@ -29,7 +29,7 @@ function c36736723.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return false end
 	if tc:IsControler(1-tp) then tc=Duel.GetAttacker() end
 	e:SetLabelObject(tc)
-	return tc and tc:IsRelateToBattle() and tc:IsSetCard(0xc1) and tc:IsType(TYPE_SYNCHRO)
+	return tc and tc:IsRelateToBattle() and tc:IsSetCard(0x66) and tc:IsType(TYPE_SYNCHRO)
 end
 function c36736723.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
