@@ -483,7 +483,8 @@ int32 field::process() {
 			        || (attacker->current.location != LOCATION_MZONE)
 			        || (attacker->current.position & POS_FACEDOWN)
 			        || ((attacker->current.position & POS_DEFENCE) && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
-			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
+			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)		        
+			        || attacker->is_affected_by_effect(EFFECT_CANNOT_ATTACK)
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
 				returns.ivalue[0] = 0;
 				pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
