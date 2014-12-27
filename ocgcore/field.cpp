@@ -1464,22 +1464,36 @@ void field::check_chain_counter(effect* peffect, int32 playerid, int32 chainid, 
 		}
 	}
 }
-void field::set_spsummon_counter(uint8 playerid, bool add) {
-	if(add)
+void field::set_spsummon_counter(uint8 playerid, bool add, bool chain) {
+	if(add){
 		core.spsummon_state_count[playerid]++;
-	else
-		core.spsummon_state_count[playerid]--;
+		if(chain)
+			core.spsummon_state_count_rst[playerid]++;
+	}
+	else{
+		if(chain){
+			core.spsummon_state_count[playerid]-=core.spsummon_state_count_rst[playerid];
+			core.spsummon_state_count_rst[playerid] = 0;
+		}
+		else
+			core.spsummon_state_count[playerid]--;
+	}
 	if(core.global_flag & GLOBALFLAG_SPSUMMON_COUNT) {
 		for(auto iter = effects.spsummon_count_eff.begin(); iter != effects.spsummon_count_eff.end(); ++iter) {
 			effect* peffect = *iter;
 			card* pcard = peffect->handler;
-			if(pcard->is_status(STATUS_EFFECT_ENABLED) && !pcard->is_status(STATUS_DISABLED) && pcard->is_position(POS_FACEUP)) {
-				if(((playerid == pcard->current.controler) && peffect->s_range) || ((playerid != pcard->current.controler) && peffect->o_range)) {
-					if(add)
+			if(add){
+				if(pcard->is_status(STATUS_EFFECT_ENABLED) && !pcard->is_status(STATUS_DISABLED) && pcard->is_position(POS_FACEUP)) {
+					if(((playerid == pcard->current.controler) && peffect->s_range) || ((playerid != pcard->current.controler) && peffect->o_range)) {
 						pcard->spsummon_counter[playerid]++;
-					else if(pcard->spsummon_counter[playerid] > 0)
-						pcard->spsummon_counter[playerid]--;
+						if(chain)
+							pcard->spsummon_counter_rst[playerid]++;
+					}
 				}
+			}
+			else{
+				pcard->spsummon_counter[playerid]-=pcard->spsummon_counter_rst[playerid];
+				pcard->spsummon_counter_rst[playerid] = 0;
 			}
 		}
 	}
@@ -1885,14 +1899,6 @@ int32 field::is_player_can_spsummon(uint8 playerid) {
 			return FALSE;
 	}
 	eset.clear();
-	filter_player_effect(playerid, EFFECT_SPSUMMON_COUNT_LIMIT, &eset);
-	for(int32 i = 0; i < eset.count; ++i) {
-		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
-		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
-		int32 v = eset[i]->get_value(2);
-		if(v <= 0)
-			return FALSE;
-	}
 	return TRUE;
 }
 int32 field::is_player_can_spsummon(effect * peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card * pcard) {
@@ -1915,14 +1921,10 @@ int32 field::is_player_can_spsummon(effect * peffect, uint32 sumtype, uint8 sump
 			return FALSE;
 	}
 	eset.clear();
-	filter_player_effect(playerid, EFFECT_SPSUMMON_COUNT_LIMIT, &eset);
-	for(int32 i = 0; i < eset.count; ++i) {
-		pduel->lua->add_param(core.reason_effect, PARAM_TYPE_EFFECT);
-		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
-		int32 v = eset[i]->get_value(2);
-		if(v <= 0)
-			return FALSE;
-	}
+	if(!check_spsummon_once(pcard, playerid))
+		return FALSE;
+	if(!check_spsummon_counter(playerid))
+		return FALSE;
 	return TRUE;
 }
 int32 field::is_player_can_flipsummon(uint8 playerid, card * pcard) {

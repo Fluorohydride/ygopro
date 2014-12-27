@@ -2384,7 +2384,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		if(!cvs.empty()) {
 			if(cvs.size() > 1)
 				std::sort(cvs.begin(), cvs.end(), card::card_operation_sort);
-			set_spsummon_counter(infos.turn_player);
+			//set_spsummon_counter(infos.turn_player);
 			core.hint_timing[infos.turn_player] |= TIMING_SPSUMMON;
 			for(auto cvit = cvs.begin(); cvit != cvs.end(); ++cvit)
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
@@ -2392,7 +2392,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		if(!cvo.empty()) {
 			if(cvo.size() > 1)
 				std::sort(cvo.begin(), cvo.end(), card::card_operation_sort);
-			set_spsummon_counter(1 - infos.turn_player);
+			//set_spsummon_counter(1 - infos.turn_player);
 			core.hint_timing[1 - infos.turn_player] |= TIMING_SPSUMMON;
 			for(auto cvit = cvo.begin(); cvit != cvo.end(); ++cvit)
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
@@ -2400,12 +2400,23 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		return FALSE;
 	}
 	case 1: {
+		bool tp=false, ntp=false;
 		if(targets->container.size() == 0) {
 			returns.ivalue[0] = 0;
 			core.operated_set.clear();
 			pduel->delete_group(targets);
 			return TRUE;
 		}
+		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
+			if((*cit)->summon_player == infos.turn_player)
+				tp=true;
+			else
+				ntp=true;
+		}
+		if(tp)
+			set_spsummon_counter(infos.turn_player);
+		if(ntp)
+			set_spsummon_counter(1-infos.turn_player);
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
@@ -3626,6 +3637,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 					pcard->enable_field_effect(FALSE);
 					pcard->summon_info &= 0xdf00ffff;
 					pcard->spsummon_counter[0] = pcard->spsummon_counter[1] = 0;
+					pcard->spsummon_counter_rst[0] = pcard->spsummon_counter_rst[1] = 0;
 				}
 				if((npos & POS_FACEDOWN) && pcard->equiping_cards.size()) {
 					for(auto csit = pcard->equiping_cards.begin(); csit != pcard->equiping_cards.end();) {
