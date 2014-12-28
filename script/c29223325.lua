@@ -74,14 +74,21 @@ function c29223325.desop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_SKIP_BP)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(0,1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_SKIP_M2)
 	if Duel.GetTurnPlayer()~=tp and ph>PHASE_MAIN1 and ph<PHASE_MAIN2 then
 		e1:SetLabel(Duel.GetTurnCount())
 		e1:SetCondition(c29223325.skipcon)
 		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_OPPO_TURN,2)
+		e2:SetLabel(Duel.GetTurnCount())
+		e2:SetCondition(c29223325.skipcon)
+		e2:SetReset(RESET_PHASE+PHASE_MAIN2+RESET_OPPO_TURN,2)
 	else
 		e1:SetReset(RESET_PHASE+PHASE_BATTLE+RESET_OPPO_TURN,1)
+		e2:SetReset(RESET_PHASE+PHASE_MAIN2+RESET_OPPO_TURN,1)
 	end
 	Duel.RegisterEffect(e1,tp)
+	Duel.RegisterEffect(e2,tp)
 end
 function c29223325.skipcon(e)
 	return Duel.GetTurnCount()~=e:GetLabel()

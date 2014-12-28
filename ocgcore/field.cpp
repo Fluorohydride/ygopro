@@ -1532,7 +1532,7 @@ int32 field::check_lp_cost(uint8 playerid, uint32 lp) {
 	if(effect_replace_check(EFFECT_LPCOST_REPLACE, e))
 		return true;
 	cost[playerid].amount += val;
-	if(cost[playerid].amount < player[playerid].lp)
+	if(cost[playerid].amount <= player[playerid].lp)
 		return TRUE;
 	return FALSE;
 }

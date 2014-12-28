@@ -64,6 +64,9 @@ function c53027855.leaveop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_SELF_TURN,1)
 	end
 	Duel.RegisterEffect(e1,effp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_SKIP_M2)
+	Duel.RegisterEffect(e2,effp)
 end
 function c53027855.skipcon(e)
 	return Duel.GetTurnCount()~=e:GetLabel()

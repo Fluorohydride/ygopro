@@ -42,6 +42,9 @@ function c2356994.skipop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN,1)
 	end
 	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_SKIP_M2)
+	Duel.RegisterEffect(e2,tp)
 end
 function c2356994.bpcon(e)
 	return Duel.GetTurnCount()~=e:GetLabel()
