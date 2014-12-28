@@ -19,27 +19,37 @@ function c57728570.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.SelectReleaseGroup(tp,c57728570.costfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
-function c57728570.tgfilter(c)
-	return c:IsFaceup() and c:GetAttack()>=1500 and c:IsDestructable()
-end
-function c57728570.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local g=Duel.GetMatchingGroup(c57728570.tgfilter,tp,0,LOCATION_MZONE,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-end
 function c57728570.filter(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAttackAbove(1500) and c:IsDestructable()
 end
+function c57728570.hgfilter(c)
+	return not c:IsPublic() or c57728570.filter(c)
+end
+function c57728570.fgfilter(c)
+	return not c:IsFaceup() or c57728570.filter(c)
+end
+function c57728570.tgfilter(c)
+	return ((c:IsLocation(LOCATION_HAND) and c:IsPublic()) or (c:IsLocation(LOCATION_HAND) and c:IsFaceup())) and c57728570.filter(c)
+end
+function c57728570.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct1=Duel.GetFieldGroup(tp,0,LOCATION_HAND):FilterCount(c57728570.hgfilter,nil)
+	local ct2=Duel.GetFieldGroup(tp,0,LOCATION_MZONE):FilterCount(c57728570.fgfilter,nil)
+	if chk==0 then return ct1+ct2>0 end
+	local g=Duel.GetMatchingGroup(c57728570.tgfilter,tp,0,LOCATION_MZONE+LOCATION_HAND,nil)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+end
+
 function c57728570.activate(e,tp,eg,ep,ev,re,r,rp)
 	local conf=Duel.GetFieldGroup(tp,0,LOCATION_MZONE+LOCATION_HAND)
+	local ct=0
 	if conf:GetCount()>0 then
 		Duel.ConfirmCards(tp,conf)
 		local dg=conf:Filter(c57728570.filter,nil)
-		Duel.Destroy(dg,REASON_EFFECT)
+		ct=Duel.Destroy(dg,REASON_EFFECT)
 		Duel.ShuffleHand(1-tp)
 	end
 	local g=Duel.GetMatchingGroup(c57728570.filter,1-tp,LOCATION_DECK,0,nil)
-	if g:GetCount()>0 and Duel.SelectYesNo(1-tp,aux.Stringid(57728570,0)) then
+	if ct>0 and g:GetCount()>0 and Duel.SelectYesNo(1-tp,aux.Stringid(57728570,0)) then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_DESTROY)
 		local dg=g:Select(1-tp,1,3,nil)
