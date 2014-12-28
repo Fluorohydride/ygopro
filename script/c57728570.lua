@@ -20,25 +20,23 @@ function c57728570.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(g,REASON_COST)
 end
 function c57728570.filter(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAttackAbove(1500) and c:IsDestructable()
+	return c:IsAttackAbove(1500) and c:IsDestructable()
 end
 function c57728570.hgfilter(c)
 	return not c:IsPublic() or c57728570.filter(c)
 end
 function c57728570.fgfilter(c)
-	return not c:IsFaceup() or c57728570.filter(c)
+	return c:IsFacedown() or c57728570.filter(c)
 end
 function c57728570.tgfilter(c)
-	return ((c:IsLocation(LOCATION_HAND) and c:IsPublic()) or (c:IsLocation(LOCATION_HAND) and c:IsFaceup())) and c57728570.filter(c)
+	return ((c:IsLocation(LOCATION_HAND) and c:IsPublic()) or (c:IsLocation(LOCATION_MZONE) and c:IsFaceup())) and c57728570.filter(c)
 end
 function c57728570.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local ct1=Duel.GetFieldGroup(tp,0,LOCATION_HAND):FilterCount(c57728570.hgfilter,nil)
-	local ct2=Duel.GetFieldGroup(tp,0,LOCATION_MZONE):FilterCount(c57728570.fgfilter,nil)
-	if chk==0 then return ct1+ct2>0 end
+	if chk==0 then return Duel.IsExistingMatchingCard(c57728570.hgfilter,tp,0,LOCATION_HAND,1,nil)
+		or Duel.IsExistingMatchingCard(c57728570.fgfilter,tp,0,LOCATION_MZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(c57728570.tgfilter,tp,0,LOCATION_MZONE+LOCATION_HAND,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
-
 function c57728570.activate(e,tp,eg,ep,ev,re,r,rp)
 	local conf=Duel.GetFieldGroup(tp,0,LOCATION_MZONE+LOCATION_HAND)
 	local ct=0

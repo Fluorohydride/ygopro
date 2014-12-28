@@ -4024,7 +4024,6 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.flipsummon_state_count[p] = 0;
 			core.spsummon_state_count[p] = 0;
 			core.spsummon_state_count_rst[p] = 0;
-			core.spsummon_rst = false;
 			core.attack_state_count[p] = 0;
 			core.battle_phase_count[p] = 0;
 			core.summon_count[p] = 0;
@@ -4032,6 +4031,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.spsummon_once_map[p].clear();
 			core.spsummon_once_map_rst[p].clear();
 		}
+		core.spsummon_rst = false;
 		for(auto rit = effects.rechargeable.begin(); rit != effects.rechargeable.end(); ++rit)
 			if(!((*rit)->flag & EFFECT_FLAG_NO_TURN_RESET))
 				(*rit)->recharge();
@@ -4051,7 +4051,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			for(auto iter = effects.spsummon_count_eff.begin(); iter != effects.spsummon_count_eff.end(); ++iter) {
 				effect* peffect = *iter;
 				card* pcard = peffect->handler;
-				if(!(peffect->flag & EFFECT_FLAG_NO_TURN_RESET)){
+				if(!(peffect->flag & EFFECT_FLAG_NO_TURN_RESET)) {
 					pcard->spsummon_counter[0] = pcard->spsummon_counter[1] = 0;
 					pcard->spsummon_counter_rst[0] = pcard->spsummon_counter_rst[1] = 0;
 				}
@@ -4448,22 +4448,25 @@ int32 field::add_chain(uint16 step) {
 				auto& optarget = clit.opinfos[0x200];
 				if(optarget.op_cards) {
 					if(optarget.op_player == PLAYER_ALL) {
-						auto spcard = optarget.op_cards->container.begin();
-						uint32 plr = optarget.op_param;
-						if((*spcard)->spsummon_code) {
-							core.spsummon_once_map[plr][(*spcard)->spsummon_code]++;
-							core.spsummon_once_map_rst[plr][(*spcard)->spsummon_code]++;
+						auto opit = optarget.op_cards->container.begin();
+						uint32 sumplayer = optarget.op_param;
+						if((*opit)->spsummon_code) {
+							core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+							core.spsummon_once_map_rst[sumplayer][(*opit)->spsummon_code]++;
 						}
-						++spcard;
-						if((*spcard)->spsummon_code) {
-							core.spsummon_once_map[1 - plr][(*spcard)->spsummon_code]++;
-							core.spsummon_once_map_rst[1 - plr][(*spcard)->spsummon_code]++;
+						++opit;
+						if((*opit)->spsummon_code) {
+							core.spsummon_once_map[1 - sumplayer][(*opit)->spsummon_code]++;
+							core.spsummon_once_map_rst[1 - sumplayer][(*opit)->spsummon_code]++;
 						}
 					} else {
-						for(auto spcard = optarget.op_cards->container.begin(); spcard != optarget.op_cards->container.end(); ++spcard) {
-							if((*spcard)->spsummon_code) {
-								core.spsummon_once_map[clit.triggering_player][(*spcard)->spsummon_code]++;
-								core.spsummon_once_map_rst[clit.triggering_player][(*spcard)->spsummon_code]++;
+						uint32 sumplayer = clit.triggering_player;
+						if(optarget.op_player == 1)
+							sumplayer = 1 - sumplayer;
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
+								core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								core.spsummon_once_map_rst[sumplayer][(*opit)->spsummon_code]++;
 							}
 						}
 					}
@@ -4582,7 +4585,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		if(core.spsummon_rst) {
 			set_spsummon_counter(0, false, true);
 			set_spsummon_counter(1, false, true);
-			for(int plr = 0; plr <= 1; ++plr) {
+			for(int plr = 0; plr < 2; ++plr) {
 				for(auto iter = core.spsummon_once_map[plr].begin(); iter != core.spsummon_once_map[plr].end(); ++iter) {
 					auto spcode = iter->first;
 					core.spsummon_once_map[plr][spcode] -= core.spsummon_once_map_rst[plr][spcode];
@@ -4621,10 +4624,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
-						for(auto spcard = optarget.op_cards->container.begin(); spcard != optarget.op_cards->container.end(); ++spcard) {
-							if((*spcard)->spsummon_code) {
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
 								uint8 sumpl = optarget.op_player ? 1 : 0;
-								core.spsummon_once_map[sumpl][(*spcard)->spsummon_code]--;
+								core.spsummon_once_map[sumpl][(*opit)->spsummon_code]--;
 							}
 						}
 					}
@@ -4692,10 +4695,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
-						for(auto spcard = optarget.op_cards->container.begin(); spcard!= optarget.op_cards->container.end(); ++spcard) {
-							if((*spcard)->spsummon_code) {
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
 								uint8 sumpl = optarget.op_player ? 1 : 0;
-								core.spsummon_once_map[sumpl][(*spcard)->spsummon_code]--;
+								core.spsummon_once_map[sumpl][(*opit)->spsummon_code]--;
 							}
 						}
 					}
@@ -4712,7 +4715,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 4: {
-		if(core.units.begin()->peffect == 0){
+		if(core.units.begin()->peffect == 0) {
 			if(cait->opinfos.count(0x200)) {
 				if(core.spsummon_state_count_tmp[cait->triggering_player] == core.spsummon_state_count[cait->triggering_player])
 					set_spsummon_counter(cait->triggering_player);
@@ -4723,22 +4726,27 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
 						if(optarget.op_player == PLAYER_ALL) {
-							auto spcard = optarget.op_cards->container.begin();
-							uint32 plr = optarget.op_param;
-							if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (*spcard)->spsummon_code) {
-								core.spsummon_once_map[plr][(*spcard)->spsummon_code]++;
-								++spcard;
-								core.spsummon_once_map[1 - plr][(*spcard)->spsummon_code]++;
+							uint32 sumplayer = optarget.op_param;
+							if(core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) {
+								auto opit = optarget.op_cards->container.begin();
+								if((*opit)->spsummon_code)
+									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								++opit;
+								if((*opit)->spsummon_code)
+									core.spsummon_once_map[1 - sumplayer][(*opit)->spsummon_code]++;
 							}
-							spcard = optarget.op_cards->container.begin();
-							check_card_counter(*spcard, 3, plr);
-							++spcard;
-							check_card_counter(*spcard, 3, 1 - plr);
+							auto opit = optarget.op_cards->container.begin();
+							check_card_counter(*opit, 3, sumplayer);
+							++opit;
+							check_card_counter(*opit, 3, 1 - sumplayer);
 						} else {
-							for(auto spcard = optarget.op_cards->container.begin(); spcard != optarget.op_cards->container.end(); ++spcard) {
-								if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (*spcard)->spsummon_code)
-									core.spsummon_once_map[cait->triggering_player][(*spcard)->spsummon_code]++;
-								check_card_counter(*spcard, 3, cait->triggering_player);
+							uint32 sumplayer = cait.triggering_player;
+							if(optarget.op_player == 1)
+								sumplayer = 1 - sumplayer;
+							for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+								if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (*opit)->spsummon_code)
+									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								check_card_counter(*opit, 3, sumplayer);
 							}
 						}
 					}

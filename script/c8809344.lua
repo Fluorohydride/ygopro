@@ -44,10 +44,9 @@ function c8809344.rkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c8809344.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsType(TYPE_XYZ) and e:GetOverlayGroup():GetCount()>0
+	return e:GetHandler():IsType(TYPE_XYZ) and e:GetHandler():GetOverlayCount()>0
 end
 function c8809344.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	local c=e:GetHandler()
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and chkc:IsType(TYPE_MONSTER) end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsType,tp,LOCATION_GRAVE,0,1,nil,TYPE_MONSTER) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

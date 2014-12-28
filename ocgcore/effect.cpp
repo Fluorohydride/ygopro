@@ -350,8 +350,7 @@ int32 effect::is_activate_check(uint8 playerid, const tevent& e, int32 neglect_c
 	uint8 op = pduel->game_field->core.reason_player;
 	pduel->game_field->core.reason_effect = this;
 	pduel->game_field->core.reason_player = playerid;
-	int32 result = TRUE;
-	result = is_activate_ready(playerid, e, neglect_cond, neglect_cost, neglect_target);
+	int32 result = is_activate_ready(playerid, e, neglect_cond, neglect_cost, neglect_target);
 	pduel->game_field->core.reason_effect = oreason;
 	pduel->game_field->core.reason_player = op;
 	pduel->game_field->restore_lp_cost();
