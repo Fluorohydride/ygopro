@@ -2822,7 +2822,9 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_target = 0;
 		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
 			core.units.begin()->step = 39;
-			core.units.begin()->arg1 = 2;
+			if(core.battle_phase_action)
+				core.units.begin()->arg1 = 2;
+			else core.units.begin()->arg1 = 3;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
 				core.units.begin()->arg2 = 1;
 			else core.units.begin()->arg2 = 0;
@@ -2835,6 +2837,7 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			return FALSE;
 		}
+		core.battle_phase_action = TRUE;
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
@@ -4172,6 +4175,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		}
 		infos.phase = PHASE_BATTLE;
 		core.phase_action = FALSE;
+		core.battle_phase_action = FALSE;
 		core.battle_phase_count[infos.turn_player]++;
 		pduel->write_buffer8(MSG_NEW_PHASE);
 		pduel->write_buffer8(infos.phase);
@@ -4740,7 +4744,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 							++opit;
 							check_card_counter(*opit, 3, 1 - sumplayer);
 						} else {
-							uint32 sumplayer = cait.triggering_player;
+							uint32 sumplayer = cait->triggering_player;
 							if(optarget.op_player == 1)
 								sumplayer = 1 - sumplayer;
 							for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {

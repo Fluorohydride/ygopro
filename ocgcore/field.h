@@ -276,6 +276,7 @@ struct processor {
 	uint8 attack_state_count[2];
 	uint8 battle_phase_count[2];
 	uint8 phase_action;
+	uint8 battle_phase_action;
 	uint32 hint_timing[2];
 	uint8 current_player;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;

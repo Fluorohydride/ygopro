@@ -3138,7 +3138,7 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 val = 0;
 	switch(activity_type) {
-		case 1:{
+		case 1: {
 			auto iter = pduel->game_field->core.summon_counter.find(counter_id);
 			if(iter != pduel->game_field->core.summon_counter.end())
 				val = iter->second.second;
