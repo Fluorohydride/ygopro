@@ -2541,6 +2541,8 @@ int32 scriptlib::duel_hint(lua_State * L) {
 	if(playerid != 0 && playerid != 1)
 		return 0;
 	int32 desc = lua_tointeger(L, 3);
+	if(htype == HINT_OPSELECTED)
+		playerid = 1 - playerid;
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->write_buffer8(MSG_HINT);
 	pduel->write_buffer8(htype);
