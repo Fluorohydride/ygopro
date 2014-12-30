@@ -9,6 +9,7 @@ function c27796375.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCountLimit(1,27796375)
 	e1:SetCondition(c27796375.thcon)
+	e1:SetCost(c27796375.cost)
 	e1:SetTarget(c27796375.thtg)
 	e1:SetOperation(c27796375.thop)
 	c:RegisterEffect(e1)
@@ -20,9 +21,14 @@ function c27796375.initial_effect(c)
 	e2:SetCode(EVENT_REMOVE)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCountLimit(1,27796375)
+	e2:SetCost(c27796375.cost)
 	e2:SetTarget(c27796375.tgtg)
 	e2:SetOperation(c27796375.tgop)
 	c:RegisterEffect(e2)
+end
+function c27796375.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c27796375.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0
