@@ -468,10 +468,16 @@ namespace ygopro
         extra->ClearText();
         extra->SetSpacing(1, 5);
         extra->SetPosition({cw + 15, sz.y - 50});
-        if(data->setcode) {
+        uint64_t setcode = data->setcode;
+        if(data->alias) {
+            auto aliasdata = DataMgr::Get()[data->alias];
+            if(aliasdata)
+                setcode = aliasdata->setcode;
+        }
+        if(setcode) {
             extra->AppendText(stringCfg["eui_msg_setcode"], 0xff000000);
             for(int32_t i = 0; i < 4; ++i) {
-                uint16_t sd = (data->setcode >> (i * 16)) & 0xffff;
+                uint16_t sd = (setcode >> (i * 16)) & 0xffff;
                 if(sd) {
                     extra->AppendText(L"#", 0xff000000);
                     extra->AppendText(DataMgr::Get().GetSetCode(sd), 0xffff0000);

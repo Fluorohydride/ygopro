@@ -84,20 +84,20 @@ int32_t main(int32_t argc, char* argv[]) {
     SceneMgr::Get().InitDraw();
     SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"]);
     
-//    auto sc = std::make_shared<BuildScene>();
-//    auto ih = std::make_shared<BuildInputHandler>(sc);
-//    auto sh = std::make_shared<BuildSceneHandler>(sc);
-//    sc->SetInputHandler(ih);
-//    sc->SetSceneHandler(sh);
-//    SceneMgr::Get().SetScene(sc);
-    
-    auto sc = std::make_shared<DuelScene>();
-    auto ih = std::make_shared<DuelInputHandler>(sc);
-    auto sh = std::make_shared<DuelSceneHandler>(sc);
-    auto ph = std::make_shared<DuelProtoTcp>();
-    sh->SetProtoHandler(ph);
+    auto sc = std::make_shared<BuildScene>();
+    auto ih = std::make_shared<BuildInputHandler>(sc);
+    auto sh = std::make_shared<BuildSceneHandler>(sc);
     sc->SetInputHandler(ih);
     sc->SetSceneHandler(sh);
+    SceneMgr::Get().SetScene(sc);
+    
+//    auto sc = std::make_shared<DuelScene>();
+//    auto ih = std::make_shared<DuelInputHandler>(sc);
+//    auto sh = std::make_shared<DuelSceneHandler>(sc);
+//    auto ph = std::make_shared<DuelProtoTcp>();
+//    sh->SetProtoHandler(ph);
+//    sc->SetInputHandler(ih);
+//    sc->SetSceneHandler(sh);
     SceneMgr::Get().SetScene(sc);
     
     glfwSetKeyCallback(window, [](GLFWwindow* wnd, int32_t key, int32_t scan, int32_t action, int32_t mods) {

@@ -530,7 +530,7 @@ namespace ygopro
             glbase::FillVertex(&pvert[0], {left + (i % 2) * width, top - (i / 2) * height}, {width, -height}, hmask, cl);
             CardData* pdata = result_data[i];
             glbase::FillVertex(&pvert[4], {left + (i % 2) * width + width / 2 - cwidth / 2, top - (i / 2) * height - offy}, {cwidth, -cheight}, result_tex[i]);
-            uint32_t lmt = LimitRegulationMgr::Get().GetCardLimitCount(pdata->code);
+            uint32_t lmt = LimitRegulationMgr::Get().GetCardLimitCount(pdata->alias ? pdata->alias : pdata->code);
             if(lmt < 3) {
                 glbase::FillVertex(&pvert[8], {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f},
                                    {iwidth, -iheight}, limit[lmt]);

@@ -1,6 +1,12 @@
 #include "../common/common.h"
 
-#include <zlib.h>
+#define STBI_NO_PSD
+#define STBI_NO_TGA
+#define STBI_NO_GIF
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PNM
+#include "../buildin/stb_image.h"
 
 #include "zip_archive.h"
 
@@ -100,19 +106,9 @@ namespace ygopro
         if(iter->second.compressed) {
             uint8_t* raw = new uint8_t[iter->second.comp_size];
             zip_file.read((char*)raw, iter->second.comp_size);
-            z_stream strm;
-            strm.zalloc = Z_NULL;
-            strm.zfree = Z_NULL;
-            strm.opaque = Z_NULL;
-            inflateInit2(&strm, -15);
-            strm.avail_in = iter->second.comp_size;
-            strm.next_in = raw;
-            strm.avail_out = iter->second.file_size;
-            strm.next_out = iter->second.datas;
-            int32_t ret = inflate(&strm, Z_FINISH);
-            inflateEnd(&strm);
+            int32_t ret = stbi_zlib_decode_noheader_buffer((char*)iter->second.datas, iter->second.file_size, (char const*)raw, iter->second.comp_size);
             delete []raw;
-            if(ret != Z_STREAM_END) {
+            if(ret == -1) {
                 delete[] iter->second.datas;
                 iter->second.datas = nullptr;
                 return std::make_pair(nullptr, 0);

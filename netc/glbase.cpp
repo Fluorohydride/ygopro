@@ -1,7 +1,13 @@
 #include "../common/common.h"
 
-#define STBI_HEADER_FILE_ONLY
-#include "../buildin/stb_image.c"
+#define STB_IMAGE_IMPLEMENTATION
+#define STBI_NO_PSD
+#define STBI_NO_TGA
+#define STBI_NO_GIF
+#define STBI_NO_HDR
+#define STBI_NO_PIC
+#define STBI_NO_PNM
+#include "../buildin/stb_image.h"
 #include "../buildin/stb_image_write.h"
 
 #include "glbase.h"

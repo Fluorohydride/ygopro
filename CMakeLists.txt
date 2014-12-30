@@ -40,7 +40,6 @@ else ()
     find_package(FREETYPE REQUIRED)
     find_package(GLFW3 REQUIRED)
     find_package(glm REQUIRED)
-    find_package(zlib REQUIRED)
 endif ()
 
 add_subdirectory (netc)
