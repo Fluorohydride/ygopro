@@ -355,7 +355,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON_RULE: {
-		if (special_summon_rule(it->step, it->arg1, (card*)it->ptarget))
+		if (special_summon_rule(it->step, it->arg1, (card*)it->ptarget, it->arg2))
 			core.units.pop_front();
 		else
 			core.units.begin()->step++;
@@ -2619,7 +2619,7 @@ int32 field::process_idle_command(uint16 step) {
 			pcard = eset[i]->handler;
 			if(!eset[i]->check_count_limit(pcard->current.controler))
 				continue;
-			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player))
+			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player, 0))
 				core.spsummonable_cards.push_back(pcard);
 		}
 		eset.clear();
@@ -2740,7 +2740,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 6: {
 		card* target = core.spsummonable_cards[returns.ivalue[0] >> 16];
-		special_summon_rule(infos.turn_player, target);
+		special_summon_rule(infos.turn_player, target, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}

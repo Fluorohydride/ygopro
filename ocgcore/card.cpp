@@ -1534,7 +1534,7 @@ int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore
 		return TRUE;
 	return FALSE;
 }
-void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
+void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset, uint32 summon_type) {
 	auto pr = field_effect.equal_range(EFFECT_SPSUMMON_PROC);
 	uint8 toplayer;
 	uint8 topos;
@@ -1551,9 +1551,12 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset) {
 			topos = POS_FACEUP;
 			toplayer = playerid;
 		}
-		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect)
-		        && pduel->game_field->is_player_can_spsummon(peffect, peffect->get_value(this), topos, playerid, toplayer, this))
-			peset->add_item(peffect);
+		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect)) {
+			uint32 sumtype = peffect->get_value(this);
+			if((!summon_type || summon_type == sumtype)
+			        && pduel->game_field->is_player_can_spsummon(peffect, sumtype, topos, playerid, toplayer, this))
+				peset->add_item(peffect);
+		}
 	}
 }
 void card::filter_spsummon_procedure_g(uint8 playerid, effect_set* peset) {
@@ -1860,7 +1863,7 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 	pduel->game_field->restore_lp_cost();
 	return TRUE;
 }
-int32 card::is_special_summonable(uint8 playerid) {
+int32 card::is_special_summonable(uint8 playerid, uint32 summon_type) {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
 	if(pduel->game_field->check_unique_onfield(this, playerid))
@@ -1886,7 +1889,7 @@ int32 card::is_special_summonable(uint8 playerid) {
 		}
 	}
 	eset.clear();
-	filter_spsummon_procedure(playerid, &eset);
+	filter_spsummon_procedure(playerid, &eset, summon_type);
 	pduel->game_field->core.limit_tuner = 0;
 	pduel->game_field->core.limit_xyz = 0;
 	pduel->game_field->core.limit_syn = 0;

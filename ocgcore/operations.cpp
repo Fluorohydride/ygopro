@@ -129,8 +129,8 @@ void field::recover(effect* reason_effect, uint32 reason, uint32 reason_player, 
 void field::summon(uint32 sumplayer, card* target, effect* proc, uint32 ignore_count, uint32 min_tribute) {
 	add_process(PROCESSOR_SUMMON_RULE, 0, proc, (group*)target, sumplayer, ignore_count + (min_tribute << 8));
 }
-void field::special_summon_rule(uint32 sumplayer, card* target) {
-	add_process(PROCESSOR_SPSUMMON_RULE, 0, 0, (group*)target, sumplayer, 0);
+void field::special_summon_rule(uint32 sumplayer, card* target, uint32 summon_type) {
+	add_process(PROCESSOR_SPSUMMON_RULE, 0, 0, (group*)target, sumplayer, summon_type);
 }
 void field::special_summon(card_set* target, uint32 sumtype, uint32 sumplayer, uint32 playerid, uint32 nocheck, uint32 nolimit, uint32 positions) {
 	if((positions & POS_FACEDOWN) && is_player_affected_by_effect(sumplayer, EFFECT_DEVINE_LIGHT))
@@ -1943,7 +1943,7 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 	}
 	return TRUE;
 }
-int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
+int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, uint32 summon_type) {
 	switch(step) {
 	case 0: {
 		if(!(target->data.type & TYPE_MONSTER))
@@ -1970,7 +1970,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target) {
 		card* tuner = core.limit_tuner;
 		group* materials = core.limit_xyz;
 		group* syn = core.limit_syn;
-		target->filter_spsummon_procedure(sumplayer, &eset);
+		target->filter_spsummon_procedure(sumplayer, &eset, summon_type);
 		target->filter_spsummon_procedure_g(sumplayer, &eset);
 		core.limit_tuner = tuner;
 		core.limit_xyz = materials;
