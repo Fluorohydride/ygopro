@@ -1,4 +1,4 @@
---先史遺産ソル·モノリス
+--先史遺産ソル・モノリス
 function c93543806.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)
