@@ -939,5 +939,7 @@ function Auxiliary.PendOperation()
 					local g=Duel.SelectMatchingCard(tp,Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
 					sg:Merge(g)
 				end
+				local pg=Group.FromCards(c,rpz)
+				Duel.HintSelection(pg)
 			end
 end
