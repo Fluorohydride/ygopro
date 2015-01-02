@@ -1,4 +1,4 @@
---アゲインスト·ウィンド
+--アゲインスト・ウィンド
 function c64952266.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---フォース·リゾネーター
+--フォース・リゾネーター
 function c40583194.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)

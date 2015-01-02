@@ -1,4 +1,4 @@
---ジャンク·ディフェンダー
+--ジャンク・ディフェンダー
 function c68120130.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

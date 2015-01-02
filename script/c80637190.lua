@@ -1,4 +1,4 @@
---スパイダー·スパイダー
+--スパイダー・スパイダー
 function c80637190.initial_effect(c)
 	--spsummon
 	local e2=Effect.CreateEffect(c)

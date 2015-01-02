@@ -1,4 +1,4 @@
---セイクリッド·エスカ
+--セイクリッド・エスカ
 function c14759024.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

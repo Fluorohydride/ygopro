@@ -1,4 +1,4 @@
---ブラック·マジシャン·ガール
+--ブラック・マジシャン・ガール
 function c38033121.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

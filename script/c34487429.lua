@@ -1,4 +1,4 @@
---虹の古代都市－レインボー·ルイン
+--虹の古代都市－レインボー・ルイン
 function c34487429.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

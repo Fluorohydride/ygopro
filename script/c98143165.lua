@@ -1,4 +1,4 @@
---シンクロ·ヒーロー
+--シンクロ・ヒーロー
 function c98143165.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

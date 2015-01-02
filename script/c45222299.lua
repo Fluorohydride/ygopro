@@ -1,4 +1,4 @@
---イビリチュア·ガストクラーケ
+--イビリチュア・ガストクラーケ
 function c45222299.initial_effect(c)
 	c:EnableReviveLimit()
 	--confirm

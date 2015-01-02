@@ -1,4 +1,4 @@
---ビークロイド·コネクション·ゾーン
+--ビークロイド・コネクション・ゾーン
 function c23299957.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

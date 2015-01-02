@@ -1,4 +1,4 @@
---ライトロード·ビースト ウォルフ
+--ライトロード・ビースト ウォルフ
 function c58996430.initial_effect(c)
 	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
 	--special summon

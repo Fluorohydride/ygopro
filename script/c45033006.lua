@@ -1,4 +1,4 @@
---A·O·J エネミー·キャッチャー
+--A・O・J エネミー・キャッチャー
 function c45033006.initial_effect(c)
 	--control
 	local e1=Effect.CreateEffect(c)

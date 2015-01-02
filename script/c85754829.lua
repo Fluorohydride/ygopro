@@ -1,4 +1,4 @@
---ワーム·グルス
+--ワーム・グルス
 function c85754829.initial_effect(c)
 	--add counter
 	local e1=Effect.CreateEffect(c)

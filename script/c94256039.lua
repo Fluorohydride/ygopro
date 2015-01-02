@@ -1,4 +1,4 @@
---バベル·タワー
+--バベル・タワー
 function c94256039.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--Activate

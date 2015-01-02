@@ -1,4 +1,4 @@
---ブラックフェザー·シュート
+--ブラックフェザー・シュート
 function c67779172.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---A·O·J ブラインド·サッカー
+--A・O・J ブラインド・サッカー
 function c76650663.initial_effect(c)
 	--Disable
 	local e1=Effect.CreateEffect(c)

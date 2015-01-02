@@ -1,4 +1,4 @@
---E－HERO インフェルノ·ウィング
+--E－HERO インフェルノ・ウィング
 function c22160245.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

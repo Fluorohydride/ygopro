@@ -1,4 +1,4 @@
---デス·ヴォルストガルフ
+--デス・ヴォルストガルフ
 function c81059524.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

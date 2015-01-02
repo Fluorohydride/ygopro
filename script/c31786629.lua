@@ -1,4 +1,4 @@
---サンダー·ドラゴン
+--サンダー・ドラゴン
 function c31786629.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

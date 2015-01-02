@@ -1,4 +1,4 @@
---マルチ·ピース·ゴーレム
+--マルチ・ピース・ゴーレム
 function c71628381.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

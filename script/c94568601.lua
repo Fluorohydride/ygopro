@@ -1,4 +1,4 @@
---タイラント·ドラゴン
+--タイラント・ドラゴン
 --not fully implemented
 function c94568601.initial_effect(c)
 	--disable

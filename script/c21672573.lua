@@ -1,4 +1,4 @@
---エンペラー·ストゥム
+--エンペラー・ストゥム
 function c21672573.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(21672573,0))

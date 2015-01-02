@@ -1,4 +1,4 @@
---レベル·ウォリアー
+--レベル・ウォリアー
 function c97385276.initial_effect(c)
 	--summon
 	local e1=Effect.CreateEffect(c)

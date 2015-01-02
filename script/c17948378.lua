@@ -1,4 +1,4 @@
---ジュラック·デイノ
+--ジュラック・デイノ
 function c17948378.initial_effect(c)
 	--reg
 	local e1=Effect.CreateEffect(c)

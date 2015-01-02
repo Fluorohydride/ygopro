@@ -1,4 +1,4 @@
---レジェンド·デビル
+--レジェンド・デビル
 function c99747800.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---マドルチェ·ワルツ
+--マドルチェ・ワルツ
 function c48439321.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

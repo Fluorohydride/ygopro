@@ -1,4 +1,4 @@
---ウォーム·ワーム
+--ウォーム・ワーム
 function c16751086.initial_effect(c)
 	--deckdes
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---サボウ·ファイター
+--サボウ・ファイター
 function c74440055.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---アルティメット·インセクト LV7
+--アルティメット・インセクト LV7
 function c19877898.initial_effect(c)
 	--atk,def down
 	local e1=Effect.CreateEffect(c)

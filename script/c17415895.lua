@@ -1,4 +1,4 @@
---ヴォルカニック·エッジ
+--ヴォルカニック・エッジ
 function c17415895.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

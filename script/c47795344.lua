@@ -1,4 +1,4 @@
---ナチュル·ハイドランジー
+--ナチュル・ハイドランジー
 function c47795344.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

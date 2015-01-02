@@ -1,4 +1,4 @@
---E·HERO レディ·オブ·ファイア
+--E・HERO レディ・オブ・ファイア
 function c95362816.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

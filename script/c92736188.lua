@@ -1,4 +1,4 @@
---グレート·スピリット
+--グレート・スピリット
 function c92736188.initial_effect(c)
 	--turn set
 	local e1=Effect.CreateEffect(c)

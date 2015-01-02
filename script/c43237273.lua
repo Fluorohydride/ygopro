@@ -1,4 +1,4 @@
---N·ブラック·パンサー
+--N・ブラック・パンサー
 function c43237273.initial_effect(c)
 	--copy
 	local e1=Effect.CreateEffect(c)

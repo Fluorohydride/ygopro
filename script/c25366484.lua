@@ -1,4 +1,4 @@
---E·HERO シャイニング·フレア·ウィングマン
+--E・HERO シャイニング・フレア・ウィングマン
 function c25366484.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

@@ -1,4 +1,4 @@
---ハーピィ·レディ1
+--ハーピィ・レディ1
 function c91932350.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ワーム·カルタロス
+--ワーム・カルタロス
 function c51043243.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---デストラクト·ポーション
+--デストラクト・ポーション
 function c18739764.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

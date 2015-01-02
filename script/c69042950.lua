@@ -1,4 +1,4 @@
---バグ·ロード
+--バグ・ロード
 function c69042950.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

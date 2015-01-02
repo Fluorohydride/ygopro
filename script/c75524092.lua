@@ -1,4 +1,4 @@
---ヴィシャス·クロー
+--ヴィシャス・クロー
 function c75524092.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

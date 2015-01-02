@@ -1,4 +1,4 @@
---トゥーン·ドラゴン·エッガー
+--トゥーン・ドラゴン・エッガー
 function c38369349.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

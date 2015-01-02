@@ -1,4 +1,4 @@
---サイクロン·ブーメラン
+--サイクロン・ブーメラン
 function c29612557.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

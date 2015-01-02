@@ -1,4 +1,4 @@
---氷結界のロイヤル·ナイト
+--氷結界のロイヤル・ナイト
 function c66661678.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ツイン·ブレイカー
+--ツイン・ブレイカー
 function c40225398.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)

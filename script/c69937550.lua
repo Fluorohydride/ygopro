@@ -1,4 +1,4 @@
---宝玉獣 アンバー·マンモス
+--宝玉獣 アンバー・マンモス
 function c69937550.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)

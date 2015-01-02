@@ -1,4 +1,4 @@
---サウザンド·アイズ·サクリファイス
+--サウザンド・アイズ・サクリファイス
 function c63519819.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

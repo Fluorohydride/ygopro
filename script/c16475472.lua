@@ -1,4 +1,4 @@
---レッサー·デーモン
+--レッサー・デーモン
 function c16475472.initial_effect(c)
 	--redirect
 	local e1=Effect.CreateEffect(c)

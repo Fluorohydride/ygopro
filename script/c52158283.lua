@@ -1,4 +1,4 @@
---先史遺産コロッサル·ヘッド
+--先史遺産コロッサル・ヘッド
 function c52158283.initial_effect(c)
 	--adchange
 	local e1=Effect.CreateEffect(c)

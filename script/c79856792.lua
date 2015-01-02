@@ -1,4 +1,4 @@
---究極宝玉神 レインボー·ドラゴン
+--究極宝玉神 レインボー・ドラゴン
 function c79856792.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

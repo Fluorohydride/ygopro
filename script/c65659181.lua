@@ -1,4 +1,4 @@
---ヴァイロン·ポリトープ
+--ヴァイロン・ポリトープ
 function c65659181.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

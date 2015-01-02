@@ -1,4 +1,4 @@
---E·HERO フレア·ネオス
+--E・HERO フレア・ネオス
 function c81566151.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

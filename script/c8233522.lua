@@ -1,4 +1,4 @@
---A·O·J サイクルリーダー
+--A・O・J サイクルリーダー
 function c8233522.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

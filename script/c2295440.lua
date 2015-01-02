@@ -1,4 +1,4 @@
---ワン·フォー·ワン
+--ワン・フォー・ワン
 function c2295440.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

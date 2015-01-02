@@ -1,4 +1,4 @@
---メタル·リフレクト·スライム
+--メタル・リフレクト・スライム
 function c26905245.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

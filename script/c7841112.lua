@@ -1,4 +1,4 @@
---セイヴァー·スター·ドラゴン
+--セイヴァー・スター・ドラゴン
 function c7841112.initial_effect(c)
 	--synchro summon
 	c:EnableReviveLimit()

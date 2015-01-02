@@ -1,4 +1,4 @@
---サイバー·ブレイダー
+--サイバー・ブレイダー
 function c10248389.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

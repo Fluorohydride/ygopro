@@ -1,4 +1,4 @@
---C·スネーク
+--C・スネーク
 function c80769747.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---スーパービークロイド－ステルス·ユニオン
+--スーパービークロイド－ステルス・ユニオン
 function c3897065.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

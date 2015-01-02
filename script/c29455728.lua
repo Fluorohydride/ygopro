@@ -1,4 +1,4 @@
---ツイン·フォトン·リザード
+--ツイン・フォトン・リザード
 function c29455728.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

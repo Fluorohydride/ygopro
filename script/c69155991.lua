@@ -1,4 +1,4 @@
---スクラップ·シャーク
+--スクラップ・シャーク
 function c69155991.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

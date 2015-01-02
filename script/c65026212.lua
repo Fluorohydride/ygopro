@@ -1,4 +1,4 @@
---コアキメイル·マキシマム
+--コアキメイル・マキシマム
 function c65026212.initial_effect(c)
 	c:EnableReviveLimit()
 	--cost

@@ -1,4 +1,4 @@
---マンモ·フォッシル
+--マンモ・フォッシル
 function c17706537.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

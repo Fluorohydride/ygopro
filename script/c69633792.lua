@@ -1,4 +1,4 @@
---エヴォルダー·テリアス
+--エヴォルダー・テリアス
 function c69633792.initial_effect(c)
 	--atkdown
 	local e1=Effect.CreateEffect(c)

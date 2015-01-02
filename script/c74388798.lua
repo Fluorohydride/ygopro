@@ -1,4 +1,4 @@
---サイレント·ソードマン LV5
+--サイレント・ソードマン LV5
 function c74388798.initial_effect(c)
 	--immune spell
 	local e1=Effect.CreateEffect(c)

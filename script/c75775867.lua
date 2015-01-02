@@ -1,4 +1,4 @@
---D·パッチン
+--D・パッチン
 function c75775867.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

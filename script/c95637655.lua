@@ -1,4 +1,4 @@
---バックアップ·ウォリアー
+--バックアップ・ウォリアー
 function c95637655.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

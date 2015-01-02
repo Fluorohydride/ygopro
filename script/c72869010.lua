@@ -1,4 +1,4 @@
---ソウル·ハンター
+--ソウル・ハンター
 function c72869010.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

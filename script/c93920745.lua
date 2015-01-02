@@ -1,4 +1,4 @@
---ペンギン·ソルジャー
+--ペンギン・ソルジャー
 function c93920745.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

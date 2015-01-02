@@ -1,4 +1,4 @@
---スレイブ·エイプ
+--スレイブ・エイプ
 function c3030892.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

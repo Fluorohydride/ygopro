@@ -1,4 +1,4 @@
---X·E·N·O
+--X・E・N・O
 function c5257687.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

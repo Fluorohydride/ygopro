@@ -1,4 +1,4 @@
---E·HERO ジ·アース
+--E・HERO ジ・アース
 function c74711057.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

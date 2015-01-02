@@ -1,4 +1,4 @@
---ヒーロー·ヘイロー
+--ヒーロー・ヘイロー
 function c26647858.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

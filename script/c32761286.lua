@@ -1,4 +1,4 @@
---スクラップ·ワーム
+--スクラップ・ワーム
 function c32761286.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

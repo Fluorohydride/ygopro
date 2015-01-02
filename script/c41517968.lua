@@ -1,4 +1,4 @@
---E·HERO ダーク·ブライトマン
+--E・HERO ダーク・ブライトマン
 function c41517968.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

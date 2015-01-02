@@ -1,4 +1,4 @@
---A·O·J サウザンド·アームズ
+--A・O・J サウザンド・アームズ
 function c85876417.initial_effect(c)
 	--attack all
 	local e1=Effect.CreateEffect(c)

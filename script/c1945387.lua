@@ -1,4 +1,4 @@
---E·HERO ノヴァマスター
+--E・HERO ノヴァマスター
 function c1945387.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

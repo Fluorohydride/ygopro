@@ -1,4 +1,4 @@
---トラスト·ガーディアン
+--トラスト・ガーディアン
 function c87319876.initial_effect(c)
 	--synchro
 	local e1=Effect.CreateEffect(c)

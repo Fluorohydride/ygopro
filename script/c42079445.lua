@@ -1,4 +1,4 @@
---ロスト·スター·ディセント
+--ロスト・スター・ディセント
 function c42079445.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

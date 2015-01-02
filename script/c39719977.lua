@@ -1,4 +1,4 @@
---デルタ·アタッカー
+--デルタ・アタッカー
 function c39719977.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

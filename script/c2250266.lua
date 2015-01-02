@@ -1,4 +1,4 @@
---D·ステープラン
+--D・ステープラン
 function c2250266.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

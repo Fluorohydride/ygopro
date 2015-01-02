@@ -1,4 +1,4 @@
---フォトン·ジェネレーター·ユニット
+--フォトン・ジェネレーター・ユニット
 function c66607691.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

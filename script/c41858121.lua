@@ -1,4 +1,4 @@
---ヴァイロン·マター
+--ヴァイロン・マター
 function c41858121.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

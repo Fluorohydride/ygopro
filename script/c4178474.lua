@@ -1,4 +1,4 @@
---サンダー·ブレイク
+--サンダー・ブレイク
 function c4178474.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

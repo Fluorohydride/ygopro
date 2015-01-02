@@ -1,4 +1,4 @@
---ワーム·ミリディス
+--ワーム・ミリディス
 function c71315423.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

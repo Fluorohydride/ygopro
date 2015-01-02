@@ -1,4 +1,4 @@
---ジェムナイト·アイオーラ
+--ジェムナイト・アイオーラ
 function c45662855.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--salvage

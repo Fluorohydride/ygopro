@@ -1,4 +1,4 @@
---人造人間－サイコ·リターナー
+--人造人間－サイコ・リターナー
 function c9418534.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ジェムナイト·パーズ
+--ジェムナイト・パーズ
 function c49597193.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

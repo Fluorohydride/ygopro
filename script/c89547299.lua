@@ -1,4 +1,4 @@
---パワー·インジェクター
+--パワー・インジェクター
 function c89547299.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

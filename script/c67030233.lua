@@ -1,4 +1,4 @@
---セイヴァー·デモン·ドラゴン
+--セイヴァー・デモン・ドラゴン
 function c67030233.initial_effect(c)
 	--synchro summon
 	c:EnableReviveLimit()

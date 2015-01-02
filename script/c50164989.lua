@@ -1,4 +1,4 @@
---ダーク·ヴァージャー
+--ダーク・ヴァージャー
 function c50164989.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

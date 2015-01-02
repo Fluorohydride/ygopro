@@ -1,4 +1,4 @@
---ホワイト·ホール
+--ホワイト・ホール
 function c43487744.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

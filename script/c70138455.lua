@@ -1,4 +1,4 @@
---ミスター·ボンバー
+--ミスター・ボンバー
 function c70138455.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

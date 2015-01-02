@@ -1,4 +1,4 @@
---シンクロ·チェンジ
+--シンクロ・チェンジ
 function c36737092.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

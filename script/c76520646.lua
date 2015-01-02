@@ -1,4 +1,4 @@
---インフィニティ·ダーク
+--インフィニティ・ダーク
 function c76520646.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--pos

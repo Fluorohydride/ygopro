@@ -1,4 +1,4 @@
---ソリテア·マジカル
+--ソリテア・マジカル
 function c28966434.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

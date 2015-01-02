@@ -1,4 +1,4 @@
---ワンダー·クローバー
+--ワンダー・クローバー
 function c38568567.initial_effect(c)
 	--multi attack
 	local e1=Effect.CreateEffect(c)

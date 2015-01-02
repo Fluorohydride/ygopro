@@ -1,4 +1,4 @@
---ロケット·パイルダー
+--ロケット・パイルダー
 function c27863269.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

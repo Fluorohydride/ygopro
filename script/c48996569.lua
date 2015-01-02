@@ -1,4 +1,4 @@
---E·HERO グラン·ネオス
+--E・HERO グラン・ネオス
 function c48996569.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

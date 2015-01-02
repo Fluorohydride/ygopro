@@ -1,4 +1,4 @@
---おジャマ·ナイト
+--おジャマ・ナイト
 function c40391316.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

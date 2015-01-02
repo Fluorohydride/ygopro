@@ -1,4 +1,4 @@
---バブル·シャッフル
+--バブル・シャッフル
 function c61968753.initial_effect(c)
 	--pos
 	local e1=Effect.CreateEffect(c)

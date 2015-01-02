@@ -1,4 +1,4 @@
---サンダー·ボトル
+--サンダー・ボトル
 function c11741041.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---バルーン·リザード
+--バルーン・リザード
 function c39892082.initial_effect(c)
 	--counter
 	local e1=Effect.CreateEffect(c)

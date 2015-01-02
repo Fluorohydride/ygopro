@@ -1,4 +1,4 @@
---D·スクランブル
+--D・スクランブル
 function c49833312.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

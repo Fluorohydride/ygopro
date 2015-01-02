@@ -1,4 +1,4 @@
---E·HERO ガイア
+--E・HERO ガイア
 function c16304628.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

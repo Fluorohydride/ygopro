@@ -1,4 +1,4 @@
---ジュッテ·ナイト
+--ジュッテ・ナイト
 function c60410769.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

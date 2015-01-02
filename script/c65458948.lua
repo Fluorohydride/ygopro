@@ -1,4 +1,4 @@
---トゥーン·マーメイド
+--トゥーン・マーメイド
 function c65458948.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

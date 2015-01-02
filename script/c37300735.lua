@@ -1,4 +1,4 @@
---TG ジェット·ファルコン
+--TG ジェット・ファルコン
 function c37300735.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

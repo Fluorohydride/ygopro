@@ -1,4 +1,4 @@
---フォーチュンレディ·アーシー
+--フォーチュンレディ・アーシー
 function c82971335.initial_effect(c)
 	--atk,def
 	local e1=Effect.CreateEffect(c)

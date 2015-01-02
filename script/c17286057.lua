@@ -1,4 +1,4 @@
---ヘリオス·トリス·メギストス
+--ヘリオス・トリス・メギストス
 function c17286057.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ダーク·シムルグ
+--ダーク・シムルグ
 function c11366199.initial_effect(c)
 	--Attribute Dark
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ハンドレス·フェイク
+--ハンドレス・フェイク
 function c40555959.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

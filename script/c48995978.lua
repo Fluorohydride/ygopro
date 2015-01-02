@@ -1,4 +1,4 @@
---No.88 ギミック·パペット－デステニー·レオ
+--No.88 ギミック・パペット－デステニー・レオ
 function c48995978.initial_effect(c)
 	c:EnableCounterPermit(0x302b)
 	--xyz summon

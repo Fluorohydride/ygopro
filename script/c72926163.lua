@@ -1,4 +1,4 @@
---E·HERO ネオス·ナイト
+--E・HERO ネオス・ナイト
 function c72926163.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

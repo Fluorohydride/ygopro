@@ -1,4 +1,4 @@
---ヴァイロン·オメガ
+--ヴァイロン・オメガ
 function c93157004.initial_effect(c)
 	--synchro summon
 	c:EnableReviveLimit()

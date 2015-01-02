@@ -1,4 +1,4 @@
---シンクロ·マグネーター
+--シンクロ・マグネーター
 function c50702124.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon

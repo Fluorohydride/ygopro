@@ -1,4 +1,4 @@
---炎獄魔人ヘル·バーナー
+--炎獄魔人ヘル・バーナー
 function c23309606.initial_effect(c)
 	--summon
 	local e1=Effect.CreateEffect(c)

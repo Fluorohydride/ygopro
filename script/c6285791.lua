@@ -1,4 +1,4 @@
---邪悪なるワーム·ビースト
+--邪悪なるワーム・ビースト
 function c6285791.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(6285791,0))

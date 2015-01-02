@@ -1,4 +1,4 @@
---エーリアン·マザー
+--エーリアン・マザー
 function c24104865.initial_effect(c)
 	--check
 	local e1=Effect.CreateEffect(c)

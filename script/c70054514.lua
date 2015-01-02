@@ -1,4 +1,4 @@
---ダークシー·フロート
+--ダークシー・フロート
 function c70054514.initial_effect(c)
 	--draw
 	local e1=Effect.CreateEffect(c)

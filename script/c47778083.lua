@@ -1,4 +1,4 @@
---ボーン·テンプル·ブロック
+--ボーン・テンプル・ブロック
 function c47778083.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

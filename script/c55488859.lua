@@ -1,4 +1,4 @@
---エヴォルド·ゲフィロス
+--エヴォルド・ゲフィロス
 function c55488859.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

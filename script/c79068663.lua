@@ -1,4 +1,4 @@
---ジャンク·アタック
+--ジャンク・アタック
 function c79068663.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

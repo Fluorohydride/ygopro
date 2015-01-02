@@ -1,4 +1,4 @@
---ダーク·スパイダー
+--ダーク・スパイダー
 function c81759748.initial_effect(c)
 	--lv up
 	local e1=Effect.CreateEffect(c)

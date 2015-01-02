@@ -1,4 +1,4 @@
---クリムゾン·ヘル·セキュア
+--クリムゾン・ヘル・セキュア
 function c50215517.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

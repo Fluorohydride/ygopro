@@ -1,4 +1,4 @@
---スカーレッド·ノヴァ·ドラゴン
+--スカーレッド・ノヴァ・ドラゴン
 function c97489701.initial_effect(c)
 	--synchro summon
 	c:EnableReviveLimit()

@@ -1,4 +1,4 @@
---E·HERO プラズマヴァイスマン
+--E・HERO プラズマヴァイスマン
 function c60493189.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

@@ -1,4 +1,4 @@
---D·マグネンU
+--D・マグネンU
 function c29947751.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

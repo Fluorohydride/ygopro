@@ -1,4 +1,4 @@
---イービル·ブラスト
+--イービル・ブラスト
 function c15684835.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

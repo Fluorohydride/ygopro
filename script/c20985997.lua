@@ -1,4 +1,4 @@
---デストラクト·サークル－A
+--デストラクト・サークル－A
 function c20985997.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

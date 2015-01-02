@@ -1,4 +1,4 @@
---マジック·リアクター·AID
+--マジック・リアクター・AID
 function c15175429.initial_effect(c)
 	--destroy&damage
 	local e1=Effect.CreateEffect(c)

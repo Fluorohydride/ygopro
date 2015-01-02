@@ -1,4 +1,4 @@
---プロミネンス·ドラゴン
+--プロミネンス・ドラゴン
 function c45985838.initial_effect(c)
 	--cannot be target
 	local e1=Effect.CreateEffect(c)

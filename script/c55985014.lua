@@ -1,4 +1,4 @@
---ミラクル·キッズ
+--ミラクル・キッズ
 function c55985014.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---アームズ·シーハンター
+--アームズ・シーハンター
 function c20470500.initial_effect(c)
 	--Disable
 	local e1=Effect.CreateEffect(c)

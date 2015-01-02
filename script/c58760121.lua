@@ -1,4 +1,4 @@
---ワーム·ファルコ
+--ワーム・ファルコ
 function c58760121.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
