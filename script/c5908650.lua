@@ -12,22 +12,13 @@ function c5908650.initial_effect(c)
 	e1:SetTarget(c5908650.thtg)
 	e1:SetOperation(c5908650.thop)
 	c:RegisterEffect(e1)
-	if not c5908650.global_check then
-		c5908650.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CHAIN_SOLVED)
-		ge1:SetOperation(c5908650.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(5908650,ACTIVITY_CHAIN,c5908650.chainfilter)
 end
-function c5908650.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsAttribute(ATTRIBUTE_LIGHT) then
-		Duel.RegisterFlagEffect(rp,5908650,RESET_PHASE+PHASE_END,0,1)
-	end
+function c5908650.chainfilter(re,tp,cid)
+	return not (re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsAttribute(ATTRIBUTE_LIGHT))
 end
 function c5908650.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,5908650)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(5908650,tp,ACTIVITY_CHAIN)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

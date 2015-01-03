@@ -754,8 +754,7 @@ int32 field::process() {
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, it->peffect, 0, it->arg1 & 0xffff, 0);
 			core.units.begin()->step++;
 		} else {
-			group* pgroup = pduel->new_group();
-			pgroup->container.insert(core.fusion_materials.begin(), core.fusion_materials.end());
+			group* pgroup = pduel->new_group(core.fusion_materials);
 			if(it->arg2)
 				pgroup->container.insert((card*)it->arg2);
 			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
@@ -1222,9 +1221,8 @@ void field::raise_event(card_set* event_cards, uint32 event_code, effect* reason
 	tevent new_event;
 	new_event.trigger_card = 0;
 	if (event_cards) {
-		group* pgroup = pduel->new_group();
+		group* pgroup = pduel->new_group(*event_cards);
 		pgroup->is_readonly = TRUE;
-		pgroup->container = *event_cards;
 		new_event.event_cards = pgroup;
 	} else
 		new_event.event_cards = 0;
@@ -1240,9 +1238,8 @@ void field::raise_single_event(card* trigger_card, card_set* event_cards, uint32
 	tevent new_event;
 	new_event.trigger_card = trigger_card;
 	if (event_cards) {
-		group* pgroup = pduel->new_group();
+		group* pgroup = pduel->new_group(*event_cards);
 		pgroup->is_readonly = TRUE;
-		pgroup->container = *event_cards;
 		new_event.event_cards = pgroup;
 	} else
 		new_event.event_cards = 0;
@@ -3762,7 +3759,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.desrep_chain.clear();
 		if(des.size()) {
 			group* ng = pduel->new_group();
-			ng->container = des;
+			ng->container.swap(des);
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_DESTROY, 10, 0, ng, REASON_BATTLE, PLAYER_NONE);
 			core.units.begin()->ptarget = ng;
@@ -3864,10 +3861,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
-			core.units.begin()->step = 38;
 		} else {
 			break_effect();
 		}
+		core.units.begin()->step = 38;
 		return FALSE;
 	}
 	case 39: {
@@ -4399,7 +4396,7 @@ int32 field::add_chain(uint16 step) {
 		clit.disable_reason = 0;
 		clit.disable_player = PLAYER_NONE;
 		clit.replace_op = 0;
-		if((phandler->current.location == LOCATION_HAND))
+		if(phandler->current.location == LOCATION_HAND)
 			clit.flag |= CHAIN_HAND_EFFECT;
 		core.current_chain.push_back(clit);
 		check_chain_counter(peffect, clit.triggering_player, clit.chain_count);
@@ -5371,7 +5368,7 @@ int32 field::adjust_step(uint16 step) {
 		if(pos_adjust.size()) {
 			core.re_adjust = TRUE;
 			group* ng = pduel->new_group();
-			ng->container = pos_adjust;
+			ng->container.swap(pos_adjust);
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_CHANGEPOS, 0, 0, ng, PLAYER_NONE, TRUE);
 		}

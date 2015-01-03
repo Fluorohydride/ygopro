@@ -23,7 +23,7 @@ function c63942761.operation(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:Filter(c63942761.filter,nil)
 	if sg:GetCount()>0 then
 		Duel.DisableShuffleCheck()
-		Duel.SendtoGrave(sg,REASON_EFFECT)
+		Duel.SendtoGrave(sg,REASON_EFFECT+REASON_REVEAL)
 	end
 	Duel.SortDecktop(tp,tp,5-sg:GetCount())
 	for i=1,5-sg:GetCount() do

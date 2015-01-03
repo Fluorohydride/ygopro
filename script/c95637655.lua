@@ -17,41 +17,20 @@ function c95637655.initial_effect(c)
 	e2:SetCost(c95637655.spcost)
 	e2:SetOperation(c95637655.spop)
 	c:RegisterEffect(e2)
-	if not c95637655.global_check then
-		c95637655.global_check=true
-		c95637655[0]=true
-		c95637655[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON)
-		ge1:SetOperation(c95637655.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c95637655.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(95637655,ACTIVITY_SPSUMMON,c95637655.counterfilter)
 end
-function c95637655.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	if tc:IsType(TYPE_SYNCHRO) then
-		c95637655[tc:GetControler()]=false
-	end
-end
-function c95637655.clear(e,tp,eg,ep,ev,re,r,rp)
-	c95637655[0]=true
-	c95637655[1]=true
+function c95637655.counterfilter(c)
+	return c:GetSummonType()~=SUMMON_TYPE_SYNCHRO
 end
 function c95637655.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	return c95637655[tp] and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0,nil)==2
+	return Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==2
 		and not Duel.IsExistingMatchingCard(Card.IsAttackPos,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c95637655.spcost(e,c,tp)
-	return c95637655[tp]
+	return Duel.GetCustomActivityCount(95637655,tp,ACTIVITY_SPSUMMON)==0
 end
 function c95637655.spop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

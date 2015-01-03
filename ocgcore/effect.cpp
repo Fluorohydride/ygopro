@@ -14,9 +14,10 @@
 bool effect_sort_id(const effect* e1, const effect* e2) {
 	return e1->id < e2->id;
 };
-effect::effect() {
+effect::effect(duel* pd) {
 	scrtype = 3;
 	ref_handle = 0;
+	pduel = pd;
 	owner = 0;
 	handler = 0;
 	description = 0;

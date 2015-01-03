@@ -84,7 +84,7 @@ struct player_info {
 };
 struct field_effect {
 	typedef std::multimap<uint32, effect*> effect_container;
-	typedef std::map<effect*, effect_container::iterator > effect_indexer;
+	typedef std::map<effect*, effect_container::iterator> effect_indexer;
 	typedef std::map<effect*, effect*> oath_effects;
 	typedef std::set<effect*> effect_collection;
 
@@ -289,12 +289,10 @@ struct processor {
 class field {
 public:
 	typedef std::multimap<uint32, effect*> effect_container;
-	typedef std::list<card*> check_list;
-	typedef std::map <effect*, effect_container::iterator> effect_indexer;
+	typedef std::map<effect*, effect_container::iterator> effect_indexer;
 	typedef std::set<card*, card_sort> card_set;
 	typedef std::vector<effect*> effect_vector;
 	typedef std::vector<card*> card_vector;
-	typedef std::vector<uint32> option_vector;
 	typedef std::list<card*> card_list;
 	typedef std::list<tevent> event_list;
 	typedef std::list<chain> chain_list;

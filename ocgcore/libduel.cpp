@@ -450,8 +450,7 @@ int32 scriptlib::duel_sendto_deck(lua_State *L) {
 }
 int32 scriptlib::duel_get_operated_group(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	group* pgroup = pduel->new_group();
-	pgroup->container = pduel->game_field->core.operated_set;
+	group* pgroup = pduel->new_group(pduel->game_field->core.operated_set);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -1046,10 +1045,8 @@ int32 scriptlib::duel_discard_hand(lua_State *L) {
 	uint32 max = lua_tointeger(L, 4);
 	uint32 reason = lua_tointeger(L, 5);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, playerid, LOCATION_HAND, 0, pgroup, pexception, extraargs);
-	for(field::card_set::iterator cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
-		pduel->game_field->core.select_cards.push_back(*cit);
+	pduel->game_field->core.select_cards.assign(pgroup->container.begin(), pgroup->container.end());
 	if(pduel->game_field->core.select_cards.size() == 0) {
 		lua_pushinteger(L, 0);
 		return 1;
@@ -1738,10 +1735,8 @@ int32 scriptlib::duel_select_matching_cards(lua_State *L) {
 	uint32 min = lua_tointeger(L, 6);
 	uint32 max = lua_tointeger(L, 7);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, (uint8)self, location1, location2, pgroup, pexception, extraargs);
-	for(field::card_set::iterator cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
-		pduel->game_field->core.select_cards.push_back(*cit);
+	pduel->game_field->core.select_cards.assign(pgroup->container.begin(), pgroup->container.end());
 	pduel->game_field->add_process(PROCESSOR_SELECT_CARD_S, 0, 0, 0, playerid, min + (max << 16));
 	return lua_yield(L, 0);
 }
@@ -2015,10 +2010,8 @@ int32 scriptlib::duel_select_target(lua_State *L) {
 	if(pduel->game_field->core.current_chain.size() == 0)
 		return 0;
 	group* pgroup = pduel->new_group();
-	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, (uint8)self, location1, location2, pgroup, pexception, extraargs, 0, 0, TRUE);
-	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
-		pduel->game_field->core.select_cards.push_back(*cit);
+	pduel->game_field->core.select_cards.assign(pgroup->container.begin(), pgroup->container.end());
 	pduel->game_field->add_process(PROCESSOR_SELECT_TARGET, 0, 0, 0, playerid, min + (max << 16));
 	return lua_yield(L, 0);
 }
@@ -2317,13 +2310,11 @@ int32 scriptlib::duel_set_operation_info(lua_State *L) {
 	if( ct && !pduel->game_field->core.current_chain.size())
 		return 0;
 	if(pgroup) {
-		pg = pduel->new_group();
+		pg = pduel->new_group(pgroup->container);
 		pg->is_readonly = TRUE;
-		pg->container = pgroup->container;
 	} else if(pcard) {
-		pg = pduel->new_group();
+		pg = pduel->new_group(pcard);
 		pg->is_readonly = TRUE;
-		pg->container.insert(pcard);
 	} else
 		pg = 0;
 	optarget opt;

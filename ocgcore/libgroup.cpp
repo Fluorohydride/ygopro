@@ -22,8 +22,7 @@ int32 scriptlib::group_clone(lua_State *L) {
 	check_param(L, PARAM_TYPE_GROUP, 1);
 	group* pgroup = *(group**) lua_touserdata(L, 1);
 	duel* pduel = pgroup->pduel;
-	group* newgroup = pduel->new_group();
-	newgroup->container = pgroup->container;
+	group* newgroup = pduel->new_group(pgroup->container);
 	interpreter::group2value(L, newgroup);
 	return 1;
 }

@@ -567,8 +567,7 @@ int32 scriptlib::card_get_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container.insert(pcard->material_cards.begin(), pcard->material_cards.end());
+	group* pgroup = pcard->pduel->new_group(pcard->material_cards);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -583,8 +582,7 @@ int32 scriptlib::card_get_equip_group(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container.insert(pcard->equiping_cards.begin(), pcard->equiping_cards.end());
+	group* pgroup = pcard->pduel->new_group(pcard->equiping_cards);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -758,8 +756,7 @@ int32 scriptlib::card_get_card_target(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container = pcard->effect_target_cards;
+	group* pgroup = pcard->pduel->new_group(pcard->effect_target_cards);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -801,8 +798,7 @@ int32 scriptlib::card_get_owner_target(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container = pcard->effect_target_owner;
+	group* pgroup = pcard->pduel->new_group(pcard->effect_target_owner);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }

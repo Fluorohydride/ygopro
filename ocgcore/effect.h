@@ -59,7 +59,7 @@ public:
 	int32 value;
 	int32 operation;
 
-	effect();
+	effect(duel* pd);
 	~effect();
 
 	int32 is_disable_related();

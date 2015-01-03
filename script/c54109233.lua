@@ -37,7 +37,7 @@ function c54109233.filter(c)
 	return c:IsLevelBelow(3) and c:GetFlagEffect(54109233)~=0 and c:IsDestructable()
 end
 function c54109233.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c54109233.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c54109233.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end

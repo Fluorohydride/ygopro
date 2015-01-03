@@ -147,9 +147,8 @@ void field::special_summon(card_set* target, uint32 sumtype, uint32 sumplayer, u
 		pcard->current.reason_player = core.reason_player;
 		pcard->operation_param = (playerid << 24) + (nocheck << 16) + (nolimit << 8) + positions;
 	}
-	group* pgroup = pduel->new_group();
+	group* pgroup = pduel->new_group(*target);
 	pgroup->is_readonly = TRUE;
-	pgroup->container = *target;
 	add_process(PROCESSOR_SPSUMMON, 0, core.reason_effect, pgroup, core.reason_player, 0);
 }
 void field::special_summon_step(card* target, uint32 sumtype, uint32 sumplayer, uint32 playerid, uint32 nocheck, uint32 nolimit, uint32 positions) {
@@ -170,9 +169,9 @@ void field::special_summon_complete(effect* reason_effect, uint8 reason_player) 
 	if(core.special_summoning.size() == 0)
 		return;
 	group* ng = pduel->new_group();
-	ng->container = core.special_summoning;
+	ng->container.swap(core.special_summoning);
 	ng->is_readonly = TRUE;
-	core.special_summoning.clear();
+	//core.special_summoning.clear();
 	add_process(PROCESSOR_SPSUMMON_COMP_S, 0, reason_effect, ng, reason_player, 0);
 }
 void field::destroy(card_set* targets, effect* reason_effect, uint32 reason, uint32 reason_player, uint32 playerid, uint32 destination, uint32 sequence) {
@@ -202,8 +201,7 @@ void field::destroy(card_set* targets, effect* reason_effect, uint32 reason, uin
 		pcard->operation_param = (POS_FACEUP << 24) + (p << 16) + (destination << 8) + sequence;
 		++cit;
 	}
-	group* ng = pduel->new_group();
-	ng->container = *targets;
+	group* ng = pduel->new_group(*targets);
 	ng->is_readonly = TRUE;
 	add_process(PROCESSOR_DESTROY, 0, reason_effect, ng, reason, reason_player);
 }
@@ -223,8 +221,7 @@ void field::release(card_set* targets, effect* reason_effect, uint32 reason, uin
 		pcard->current.reason_player = reason_player;
 		pcard->operation_param = (POS_FACEUP << 24) + ((uint32)(pcard->owner) << 16) + (LOCATION_GRAVE << 8);
 	}
-	group* ng = pduel->new_group();
-	ng->container = *targets;
+	group* ng = pduel->new_group(*targets);
 	ng->is_readonly = TRUE;
 	add_process(PROCESSOR_RELEASE, 0, reason_effect, ng, reason, reason_player);
 }
@@ -255,8 +252,7 @@ void field::send_to(card_set* targets, effect* reason_effect, uint32 reason, uin
 		else pos = position;
 		pcard->operation_param = (pos << 24) + (p << 16) + (destination << 8) + (sequence);
 	}
-	group* ng = pduel->new_group();
-	ng->container = *targets;
+	group* ng = pduel->new_group(*targets);
 	ng->is_readonly = TRUE;
 	add_process(PROCESSOR_SENDTO, 0, reason_effect, ng, reason, reason_player);
 }
@@ -274,8 +270,7 @@ void field::move_to_field(card* target, uint32 move_player, uint32 playerid, uin
 	add_process(PROCESSOR_MOVETOFIELD, 0, 0, (group*)target, enable, ret + (is_equip << 8));
 }
 void field::change_position(card_set* targets, effect* reason_effect, uint32 reason_player, uint32 au, uint32 ad, uint32 du, uint32 dd, uint32 noflip, uint32 enable) {
-	group* ng = pduel->new_group();
-	ng->container = *targets;
+	group* ng = pduel->new_group(*targets);
 	ng->is_readonly = TRUE;
 	for(auto cit = targets->begin(); cit != targets->end(); ++cit) {
 		card* pcard = *cit;
@@ -289,8 +284,7 @@ void field::change_position(card_set* targets, effect* reason_effect, uint32 rea
 	add_process(PROCESSOR_CHANGEPOS, 0, reason_effect, ng, reason_player, enable);
 }
 void field::change_position(card* target, effect* reason_effect, uint32 reason_player, uint32 npos, uint32 noflip, uint32 enable) {
-	group* ng = pduel->new_group();
-	ng->container.insert(target);
+	group* ng = pduel->new_group(target);
 	ng->is_readonly = TRUE;
 	target->operation_param = npos;
 	if(noflip)
@@ -309,14 +303,12 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			return TRUE;
 		}
 		core.overdraw[playerid] = FALSE;
-		group* drawed_set = new group;
-		core.units.begin()->ptarget = drawed_set;
 		for(uint32 i = 0; i < count; ++i) {
 			if(player[playerid].list_main.size() == 0) {
 				core.overdraw[playerid] = TRUE;
 				break;
 			}
-			drawed ++;
+			drawed++;
 			pcard = *(player[playerid].list_main.rbegin());
 			pcard->enable_field_effect(FALSE);
 			pcard->cancel_field_effect();
@@ -338,12 +330,14 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 					pcard->set_status(STATUS_IS_PUBLIC, TRUE);
 			}
 			cv.push_back(pcard);
-			drawed_set->container.insert(pcard);
 			pcard->reset(RESET_TOHAND, RESET_EVENT);
 		}
 		core.hint_timing[playerid] |= TIMING_DRAW + TIMING_TOHAND;
 		adjust_instant();
 		core.units.begin()->arg2 = (core.units.begin()->arg2 & 0xff000000) + drawed;
+		card_set* drawed_set = new card_set;
+		core.units.begin()->ptarget = (group*)drawed_set;
+		drawed_set->insert(cv.begin(), cv.end());
 		if(drawed) {
 			if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 				if(player[playerid].list_main.size()) {
@@ -367,8 +361,8 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 			if(core.deck_reversed && (public_count < drawed)) {
 				pduel->write_buffer8(MSG_CONFIRM_CARDS);
 				pduel->write_buffer8(1 - playerid);
-				pduel->write_buffer8(drawed_set->container.size());
-				for(auto cit = drawed_set->container.begin(); cit != drawed_set->container.end(); ++cit) {
+				pduel->write_buffer8(drawed_set->size());
+				for(auto cit = drawed_set->begin(); cit != drawed_set->end(); ++cit) {
 					pduel->write_buffer32((*cit)->data.code);
 					pduel->write_buffer8((*cit)->current.controler);
 					pduel->write_buffer8((*cit)->current.location);
@@ -376,18 +370,18 @@ int32 field::draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reaso
 				}
 				shuffle(playerid, LOCATION_HAND);
 			}
-			for(auto cit = drawed_set->container.begin(); cit != drawed_set->container.end(); ++cit)
+			for(auto cit = drawed_set->begin(); cit != drawed_set->end(); ++cit)
 				raise_single_event((*cit), 0, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, 0);
 			process_single_event();
-			raise_event(&drawed_set->container, EVENT_DRAW, reason_effect, reason, reason_player, playerid, drawed);
-			raise_event(&drawed_set->container, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, drawed);
+			raise_event(drawed_set, EVENT_DRAW, reason_effect, reason, reason_player, playerid, drawed);
+			raise_event(drawed_set, EVENT_TO_HAND, reason_effect, reason, reason_player, playerid, drawed);
 			process_instant_event();
 		}
 		return FALSE;
 	}
 	case 1: {
-		group* drawed_set = core.units.begin()->ptarget;
-		core.operated_set = drawed_set->container;
+		card_set* drawed_set = (card_set*)core.units.begin()->ptarget;
+		core.operated_set.swap(*drawed_set);
 		delete drawed_set;
 		returns.ivalue[0] = count;
 		return TRUE;
@@ -2604,9 +2598,8 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 4: {
-		group* sendtargets = pduel->new_group();
+		group* sendtargets = pduel->new_group(targets->container);
 		sendtargets->is_readonly = TRUE;
-		sendtargets->container = targets->container;
 		uint32 dest;
 		for(auto cit = sendtargets->container.begin(); cit != sendtargets->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_DESTROY_CONFIRMED, FALSE);
@@ -2794,9 +2787,8 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 		return FALSE;
 	}
 	case 3: {
-		group* sendtargets = pduel->new_group();
+		group* sendtargets = pduel->new_group(targets->container);
 		sendtargets->is_readonly = TRUE;
-		sendtargets->container = targets->container;
 		auto pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, sendtargets, 0, 0);
@@ -4070,8 +4062,7 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 	}
 	case 2: {
 		lua_pop(pduel->lua->current_state, 2);
-		group* pgroup = pduel->new_group();
-		pgroup->container = core.synchro_materials;
+		group* pgroup = pduel->new_group(core.synchro_materials);
 		pgroup->container.insert(core.limit_tuner);
 		pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
 		pduel->restore_assumes();
@@ -4229,8 +4220,7 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, uint32 lv, card* sc
 		min--;
 		max--;
 		if(max == 0 || core.xmaterial_lst.size() == 0) {
-			group* pgroup = pduel->new_group();
-			pgroup->container = core.operated_set;
+			group* pgroup = pduel->new_group(core.operated_set);
 			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
 			return TRUE;
 		}
@@ -4246,8 +4236,7 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, uint32 lv, card* sc
 	}
 	case 4: {
 		if(!returns.ivalue[0]) {
-			group* pgroup = pduel->new_group();
-			pgroup->container = core.operated_set;
+			group* pgroup = pduel->new_group(core.operated_set);
 			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
 			return TRUE;
 		}
@@ -4268,9 +4257,7 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, uint32 lv, card* sc
 		return FALSE;
 	}
 	case 5: {
-		group* pgroup = pduel->new_group();
-		for(auto cit = core.operated_set.begin(); cit != core.operated_set.end(); ++cit)
-			pgroup->container.insert(*cit);
+		group* pgroup = pduel->new_group(core.operated_set);
 		for(int32 i = 0; i < returns.bvalue[0]; ++i) {
 			card* pcard = core.select_cards[returns.bvalue[i + 1]];
 			pgroup->container.insert(pcard);

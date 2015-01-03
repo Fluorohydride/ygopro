@@ -12,30 +12,10 @@ function c40230018.initial_effect(c)
 	e1:SetTarget(c40230018.target)
 	e1:SetOperation(c40230018.operation)
 	c:RegisterEffect(e1)
-	if not c40230018.global_check then
-		c40230018.global_check=true
-		c40230018[0]=true
-		c40230018[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CHAINING)
-		ge1:SetOperation(c40230018.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c40230018.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(40230018,ACTIVITY_CHAIN,c40230018.chainfilter)
 end
-function c40230018.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and not re:GetHandler():IsSetCard(0x106e) then
-		c40230018[rp]=false
-	end
-end
-function c40230018.clear(e,tp,eg,ep,ev,re,r,rp)
-	c40230018[0]=true
-	c40230018[1]=true
+function c40230018.chainfilter(re,tp,cid)
+	return not (re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and not re:GetHandler():IsSetCard(0x106e))
 end
 function c40230018.cfilter(c)
 	return c:IsSetCard(0x106e) and c:IsType(TYPE_SPELL)
@@ -44,7 +24,7 @@ function c40230018.condition(e,tp,eg,ep,ev,re,r,rp)
 	return not Duel.IsExistingMatchingCard(c40230018.cfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
 function c40230018.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c40230018[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(40230018,tp,ACTIVITY_CHAIN)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

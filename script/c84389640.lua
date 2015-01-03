@@ -25,20 +25,15 @@ function c84389640.condition(e,tp,eg,ep,ev,re,r,rp)
 	if phase~=PHASE_DAMAGE or Duel.IsDamageCalculated() then return false end
 	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if a:IsControler(tp) then 
-		e:SetLabelObject(d)
-		return a:IsFaceup() and a:IsLevelBelow(3) and a:IsType(TYPE_NORMAL) and a:IsRelateToBattle() 
-				and d and d:IsFaceup() and d:IsRelateToBattle()
-	else
-		e:SetLabelObject(a)
-		return d:IsFaceup() and d:IsLevelBelow(3) and d:IsType(TYPE_NORMAL) and d:IsRelateToBattle() 
-				and a and a:IsFaceup() and a:IsRelateToBattle()
-	end
+	if not d then return false end
+	if d:IsControler(tp) then a,d=d,a end
+	e:SetLabelObject(d)
+	return a:IsFaceup() and a:IsLevelBelow(3) and a:IsType(TYPE_NORMAL) and a:IsRelateToBattle()
+		and d:IsFaceup() and d:IsRelateToBattle()
 end
 function c84389640.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(84389640)==0 and Duel.CheckLPCost(tp,100)
 		and e:GetLabelObject():IsAttackAbove(100) end
-	local bc=e:GetLabelObject()
 	local lp=Duel.GetLP(tp)
 	local atk=e:GetLabelObject():GetAttack()
 	local maxc=lp>atk and atk or lp
@@ -59,7 +54,7 @@ function c84389640.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return tc:IsCanBeEffectTarget(e) end
 	Duel.SetTargetCard(tc)
 end
-function c84389640.operation(e,tp,eg,ep,ev,re,r,rp,chk)
+function c84389640.operation(e,tp,eg,ep,ev,re,r,rp)
 	local bc=Duel.GetFirstTarget()
 	if not e:GetHandler():IsRelateToEffect(e) or not bc or not bc:IsRelateToEffect(e) or not bc:IsControler(1-tp) then return end
 	local e1=Effect.CreateEffect(e:GetHandler())
