@@ -2174,7 +2174,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						core.delayed_quick_break.erase(make_pair(peffect, *evit));
 					}
 				}
-				evit++;
+				++evit;
 				if(pev && evit == core.point_event.end()) {
 					evit = core.instant_event.begin();
 					pev = false;
@@ -4709,10 +4709,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
 				set_spsummon_counter(cait->triggering_player, false);
 		}*/
-		if(core.special_summoning.size())
-			core.special_summoning.clear();
-		if(core.equiping_cards.size())
-			core.equiping_cards.clear();
+		core.special_summoning.clear();
+		core.equiping_cards.clear();
 		return FALSE;
 	}
 	case 4: {

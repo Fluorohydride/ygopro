@@ -312,7 +312,7 @@ public:
 	tevent nil_event;
 
 	static int32 field_used_count[32];
-	field(duel* pduel);
+	explicit field(duel* pduel);
 	~field();
 	void reload_field_info();
 	

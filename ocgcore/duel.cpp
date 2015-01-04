@@ -17,9 +17,7 @@
 duel::duel() {
 	lua = new interpreter(this);
 	game_field = new field(this);
-	game_field->temp_card = new_card(0);
-	bufferlen = 0;
-	bufferp = buffer;
+	clear_buffer();
 }
 duel::~duel() {
 	for(std::set<card*>::iterator cit = cards.begin(); cit != cards.end(); ++cit)
@@ -43,15 +41,13 @@ void duel::clear() {
 	groups.clear();
 	effects.clear();
 	game_field = new field(this);
-	game_field->temp_card = new_card(0);
 }
 card* duel::new_card(uint32 code) {
-	card* pcard = new card();
+	card* pcard = new card(this);
 	cards.insert(pcard);
 	if(code)
 		::read_card(code, &(pcard->data));
 	pcard->data.code = code;
-	pcard->pduel = this;
 	lua->register_card(pcard);
 	return pcard;
 }

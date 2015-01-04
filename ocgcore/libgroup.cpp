@@ -101,7 +101,7 @@ int32 scriptlib::group_get_next(lua_State *L) {
 	if(pgroup->it == pgroup->container.end())
 		lua_pushnil(L);
 	else {
-		pgroup->it++;
+		++pgroup->it;
 		if (pgroup->it == pgroup->container.end())
 			lua_pushnil(L);
 		else
@@ -386,7 +386,7 @@ int32 scriptlib::group_get_min_group(lua_State *L) {
 	field::card_set::iterator cit = pgroup->container.begin();
 	min = pduel->lua->get_operation_value(*cit, 2, extraargs);
 	newgroup->container.insert(*cit);
-	cit++;
+	++cit;
 	for(; cit != pgroup->container.end(); ++cit) {
 		op = pduel->lua->get_operation_value(*cit, 2, extraargs);
 		if(op == min)
@@ -415,7 +415,7 @@ int32 scriptlib::group_get_max_group(lua_State *L) {
 	field::card_set::iterator cit = pgroup->container.begin();
 	max = pduel->lua->get_operation_value(*cit, 2, extraargs);
 	newgroup->container.insert(*cit);
-	cit++;
+	++cit;
 	for(; cit != pgroup->container.end(); ++cit) {
 		op = pduel->lua->get_operation_value(*cit, 2, extraargs);
 		if(op == max)

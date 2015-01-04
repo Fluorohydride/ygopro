@@ -46,9 +46,10 @@ bool card::card_operation_sort(card* c1, card* c2) {
 			return c1->current.sequence < c2->current.sequence;
 	}
 }
-card::card() {
+card::card(duel* pd) {
 	scrtype = 1;
 	ref_handle = 0;
+	pduel = pd;
 	owner = PLAYER_NONE;
 	operation_param = 0;
 	status = 0;

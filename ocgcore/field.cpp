@@ -25,6 +25,7 @@ bool tevent::operator< (const tevent& v) const {
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
+	temp_card = pduel->new_card(0);
 	infos.copy_id = 1;
 	infos.turn_player = 0;
 	infos.turn_id = 0;

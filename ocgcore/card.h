@@ -134,7 +134,7 @@ public:
 	effect_relation relate_effect;
 	effect_set_v immune_effect;
 
-	card();
+	explicit card(duel* pd);
 	~card();
 	static bool card_operation_sort(card* c1, card* c2);
 

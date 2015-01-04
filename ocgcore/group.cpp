@@ -22,7 +22,7 @@ group::group(duel* pd, card* pcard) {
 	pduel = pd;
 	is_readonly = FALSE;
 }
-group::group(duel* pd, const card_set& cset) : container(cset) {
+group::group(duel* pd, const card_set& cset): container(cset) {
 	scrtype = 2;
 	ref_handle = 0;
 	pduel = pd;
