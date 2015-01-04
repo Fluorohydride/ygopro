@@ -31,7 +31,7 @@ function c73176465.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c73176465.splimit(e,se,sp,st)
-	return se:GetCode()~=EFFECT_SPSUMMON_PROC_G
+	return bit.band(st,SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
 end
 function c73176465.condtion(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0 and re:IsActiveType(TYPE_MONSTER)

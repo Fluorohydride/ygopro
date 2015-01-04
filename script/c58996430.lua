@@ -20,7 +20,7 @@ function c58996430.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c58996430.splimit(e,se,sp,st)
-	return se:GetCode()~=EFFECT_SPSUMMON_PROC_G
+	return bit.band(st,SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
 end
 function c58996430.condtion(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK

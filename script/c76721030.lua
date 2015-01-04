@@ -13,7 +13,7 @@ function c76721030.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_ACTIVATE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(1,1)
-	e2:SetTarget(c76721030.aclimit)
+	e2:SetValue(c76721030.aclimit)
 	c:RegisterEffect(e2)
 end
 function c76721030.cost(e,tp,eg,ep,ev,re,r,rp,chk)
