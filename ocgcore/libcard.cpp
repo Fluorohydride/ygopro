@@ -901,7 +901,7 @@ int32 scriptlib::card_get_effect_count(lua_State *L) {
 	uint32 code = lua_tointeger(L, 2);
 	effect_set eset;
 	pcard->filter_effect(code, &eset);
-	lua_pushinteger(L, eset.count);
+	lua_pushinteger(L, eset.size());
 	return 1;
 }
 int32 scriptlib::card_register_flag_effect(lua_State *L) {

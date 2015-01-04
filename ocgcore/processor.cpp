@@ -1658,7 +1658,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		int32 limit = 6;
 		effect_set eset;
 		filter_player_effect(infos.turn_player, EFFECT_HAND_LIMIT, &eset);
-		if(eset.count)
+		if(eset.size())
 			limit = eset.get_last()->get_value();
 		int32 hd = player[infos.turn_player].list_hand.size();
 		if(hd <= limit) {
@@ -2612,7 +2612,7 @@ int32 field::process_idle_command(uint16 step) {
 		core.spsummonable_cards.clear();
 		effect_set eset;
 		filter_field_effect(EFFECT_SPSUMMON_PROC, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		for(int32 i = 0; i < eset.size(); ++i) {
 			pcard = eset[i]->handler;
 			if(!eset[i]->check_count_limit(pcard->current.controler))
 				continue;
@@ -2621,7 +2621,7 @@ int32 field::process_idle_command(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_SPSUMMON_PROC_G, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		for(int32 i = 0; i < eset.size(); ++i) {
 			pcard = eset[i]->handler;
 			if(!eset[i]->check_count_limit(pcard->current.controler))
 				continue;
@@ -2924,7 +2924,7 @@ int32 field::process_battle_command(uint16 step) {
 			effect_set eset;
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
+			for(int32 i = 0; i < eset.size(); ++i) {
 				if(eset[i]->operation) {
 					core.attack_cancelable = FALSE;
 					core.sub_solving_event.push_back(nil_event);
@@ -3545,9 +3545,9 @@ int32 field::process_battle_command(uint16 step) {
 					uint8 dp[2];
 					dp[0] = dp[1] = 0;
 					core.attacker->filter_effect(EFFECT_PIERCE, &eset);
-					if(eset.count && !core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+					if(eset.size() && !core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
 					        && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)) {
-						for(int32 i = 0; i < eset.count; ++i)
+						for(int32 i = 0; i < eset.size(); ++i)
 							dp[1 - eset[i]->get_handler_player()] = 1;
 						if(dp[0] && is_player_affected_by_effect(0, EFFECT_AVOID_BATTLE_DAMAGE))
 							dp[0] = 0;
@@ -3892,7 +3892,7 @@ int32 field::process_battle_command(uint16 step) {
 			effect_set eset;
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
+			for(int32 i = 0; i < eset.size(); ++i) {
 				if(eset[i]->operation) {
 					core.sub_solving_event.push_back(nil_event);
 					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
@@ -4298,7 +4298,7 @@ int32 field::add_chain(uint16 step) {
 			return TRUE;
 		effect_set eset;
 		filter_player_effect(clit.triggering_player, EFFECT_ACTIVATE_COST, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		for(int32 i = 0; i < eset.size(); ++i) {
 			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit.triggering_effect, PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit.triggering_player, PARAM_TYPE_INT);
@@ -4326,14 +4326,14 @@ int32 field::add_chain(uint16 step) {
 				eset.clear();
 				peffect->handler->filter_effect(ecode, &eset);
 				effect* pactin = 0;
-				for(int32 i = 0; i < eset.count; ++i) {
+				for(int32 i = 0; i < eset.size(); ++i) {
 					if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
 						pactin = eset[i];
 						break;
 					}
 				}
 				if(!pactin) {
-					for(int32 i = 0; i < eset.count; ++i) {
+					for(int32 i = 0; i < eset.size(); ++i) {
 						if(eset[i]->check_count_limit(peffect->handler->current.controler)) {
 							eset[i]->dec_count(peffect->handler->current.controler);
 							break;
@@ -4896,21 +4896,21 @@ void field::refresh_location_info_instant() {
 	player[0].disabled_location = 0;
 	player[1].disabled_location = 0;
 	filter_field_effect(EFFECT_DISABLE_FIELD, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		value = eset[i]->get_value();
 		player[0].disabled_location |= value & 0x1f1f;
 		player[1].disabled_location |= (value >> 16) & 0x1f1f;
 	}
 	eset.clear();
 	filter_field_effect(EFFECT_USE_EXTRA_MZONE, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		p = eset[i]->get_handler_player();
 		value = eset[i]->get_value();
 		player[p].disabled_location |= (value >> 16) & 0x1f;
 	}
 	eset.clear();
 	filter_field_effect(EFFECT_USE_EXTRA_SZONE, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		p = eset[i]->get_handler_player();
 		value = eset[i]->get_value();
 		player[p].disabled_location |= (value >> 8) & 0x1f00;
@@ -4934,7 +4934,7 @@ int32 field::refresh_location_info(uint16 step) {
 		core.extraz_effects.clear();
 		core.extraz_effects_e.clear();
 		filter_field_effect(EFFECT_DISABLE_FIELD, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			value = eset[i]->get_value();
 			if(value) {
 				player[0].disabled_location |= value & 0x1f1f;
@@ -4944,7 +4944,7 @@ int32 field::refresh_location_info(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_USE_EXTRA_MZONE, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			p = eset[i]->get_handler_player();
 			value = eset[i]->get_value();
 			player[p].disabled_location |= (value >> 16) & 0x1f;
@@ -4955,7 +4955,7 @@ int32 field::refresh_location_info(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_USE_EXTRA_SZONE, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			p = eset[i]->get_handler_player();
 			value = eset[i]->get_value();
 			player[p].disabled_location |= (value >> 8) & 0x1f00;
@@ -5347,7 +5347,7 @@ int32 field::adjust_step(uint16 step) {
 					continue;
 				eset.clear();
 				pcard->filter_effect(EFFECT_SET_POSITION, &eset);
-				if(eset.count) {
+				if(eset.size()) {
 					pos = eset.get_last()->get_value();
 					if((pos & 0xff) != pcard->current.position) {
 						pos_adjust.insert(pcard);
@@ -5400,7 +5400,7 @@ int32 field::adjust_step(uint16 step) {
 		uint32 res = 0;
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 			filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
-			res = eset.count ? TRUE : FALSE;
+			res = eset.size() ? TRUE : FALSE;
 			if(core.deck_reversed ^ res) {
 				reverse_deck(0);
 				reverse_deck(1);
@@ -5433,7 +5433,7 @@ int32 field::adjust_step(uint16 step) {
 		}
 		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
 			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
-			res = eset.count ? TRUE : FALSE;
+			res = eset.size() ? TRUE : FALSE;
 			if(res && !core.remove_brainwashing) {
 				for(int i = 0; i < 5; ++i) {
 					card* pcard = player[0].list_mzone[i];

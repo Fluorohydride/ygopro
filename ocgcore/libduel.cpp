@@ -112,7 +112,7 @@ int32 scriptlib::duel_get_flag_effect(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	effect_set eset;
 	pduel->game_field->filter_player_effect(playerid, code, &eset);
-	lua_pushinteger(L, eset.count);
+	lua_pushinteger(L, eset.size());
 	return 1;
 }
 int32 scriptlib::duel_reset_flag_effect(lua_State *L) {
@@ -623,7 +623,7 @@ int32 scriptlib::duel_get_chain_material(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	effect_set eset;
 	pduel->game_field->filter_player_effect(playerid, EFFECT_CHAIN_MATERIAL, &eset);
-	if(!eset.count)
+	if(!eset.size())
 		return 0;
 	interpreter::effect2value(L, eset[0]);
 	return 1;
@@ -812,7 +812,7 @@ int32 scriptlib::duel_get_environment(lua_State *L) {
 		pcard = pduel->game_field->player[1].list_szone[5];
 	if(pcard == 0 || pcard->is_position(POS_FACEDOWN) || !pcard->get_status(STATUS_EFFECT_ENABLED)) {
 		pduel->game_field->filter_field_effect(EFFECT_CHANGE_ENVIRONMENT, &eset);
-		if(eset.count) {
+		if(eset.size()) {
 			effect* peffect = eset.get_last();
 			code = peffect->get_value();
 			p = peffect->get_handler_player();
@@ -850,7 +850,7 @@ int32 scriptlib::duel_is_environment(lua_State *L) {
 	if(!fc) {
 		effect_set eset;
 		pduel->game_field->filter_field_effect(EFFECT_CHANGE_ENVIRONMENT, &eset);
-		if(eset.count) {
+		if(eset.size()) {
 			effect* peffect = eset.get_last();
 			if(code == (uint32)peffect->get_value() && (playerid == peffect->get_handler_player() || playerid == PLAYER_ALL))
 				ret = 1;
@@ -2149,7 +2149,7 @@ int32 scriptlib::duel_check_tuner_material(lua_State *L) {
 	if(pduel->game_field->core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 		effect_set eset;
 		pduel->game_field->filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
-		if(eset.count && eset[0]->handler != tuner) {
+		if(eset.size() && eset[0]->handler != tuner) {
 			lua_pushboolean(L, false);
 			return 1;
 		}
@@ -3194,7 +3194,7 @@ int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	pcard->filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
 	pcard->filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
 	pcard->filter_effect(EFFECT_SET_ATTACK_FINAL, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_ATTACK: {
 			if (eset[i]->type & EFFECT_TYPE_SINGLE && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
