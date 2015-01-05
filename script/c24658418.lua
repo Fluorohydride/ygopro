@@ -40,7 +40,7 @@ function c24658418.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
 end
 function c24658418.mfilter(c)
-	return c:IsSetCard(0x7b) and not c:IsType(TYPE_TOKEN) and c:IsFaceup()
+	return c:IsFaceup() and c:IsSetCard(0x7b) and not c:IsType(TYPE_TOKEN)
 end
 function c24658418.xyzfilter(c,mg)
 	return c:IsSetCard(0x7b) and c:IsXyzSummonable(mg)
