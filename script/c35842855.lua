@@ -63,7 +63,7 @@ function c35842855.leaveop(e,tp,eg,ep,ev,re,r,rp)
 	local effp=e:GetHandler():GetPreviousControler()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_SKIP_BP)
+	e1:SetCode(EFFECT_CANNOT_BP)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
 	if Duel.GetTurnPlayer()==effp then
