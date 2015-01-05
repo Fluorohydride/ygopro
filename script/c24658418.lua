@@ -40,7 +40,7 @@ function c24658418.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
 end
 function c24658418.mfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x7b) and not c:IsType(TYPE_TOKEN)
+	return c:IsSetCard(0x7b) and not c:IsType(TYPE_TOKEN) and c:IsFaceup()
 end
 function c24658418.xyzfilter(c,mg)
 	return c:IsSetCard(0x7b) and c:IsXyzSummonable(mg)
@@ -52,6 +52,15 @@ function c24658418.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
+function c24658418.select(e,tp,b1,b2)
+	local op=0
+	if b1 and b2 then
+		op=Duel.SelectOption(tp,aux.Stringid(24658418,2),aux.Stringid(24658418,3))+1
+	elseif b1 then
+		op=Duel.SelectOption(tp,aux.Stringid(24658418,2))+1
+	else op=Duel.SelectOption(tp,aux.Stringid(24658418,3))+2 end
+	return op
+end
 function c24658418.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c24658418.mfilter,tp,LOCATION_MZONE,0,nil)
 	local xyzg=Duel.GetMatchingGroup(c24658418.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
@@ -59,7 +68,23 @@ function c24658418.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-		local sg=g:FilterSelect(tp,xyz.xyz_filter,xyz.xyz_count,xyz.xyz_count,nil)
+		
+		local b1=g:GetCount()>=xyz.xyz_count
+		local b2=g:IsExists(aux.XyzAlterFilter,1,nil,xyz.ovfilter,xyz)
+		
+		local op=0
+		if b1 and b2 then
+			op=Duel.SelectOption(tp,aux.Stringid(24658418,2),aux.Stringid(24658418,3))+1
+		elseif b1 then
+			op=Duel.SelectOption(tp,aux.Stringid(24658418,2))+1
+		else op=Duel.SelectOption(tp,aux.Stringid(24658418,3))+2 end
+		
+		local sg=nil
+		if (op==1) then
+			sg=g:FilterSelect(tp,xyz.xyz_filter,xyz.xyz_count,xyz.xyz_count,nil)
+		else
+			sg=g:FilterSelect(tp,xyz.ovfilter,1,1,nil)
+		end
 		Duel.XyzSummon(tp,xyz,sg)
 	end
 end
