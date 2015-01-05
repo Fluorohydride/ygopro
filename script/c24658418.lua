@@ -52,15 +52,6 @@ function c24658418.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function c24658418.select(e,tp,b1,b2)
-	local op=0
-	if b1 and b2 then
-		op=Duel.SelectOption(tp,aux.Stringid(24658418,2),aux.Stringid(24658418,3))+1
-	elseif b1 then
-		op=Duel.SelectOption(tp,aux.Stringid(24658418,2))+1
-	else op=Duel.SelectOption(tp,aux.Stringid(24658418,3))+2 end
-	return op
-end
 function c24658418.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c24658418.mfilter,tp,LOCATION_MZONE,0,nil)
 	local xyzg=Duel.GetMatchingGroup(c24658418.xyzfilter,tp,LOCATION_EXTRA,0,nil,g)
