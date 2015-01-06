@@ -1,4 +1,4 @@
---メンタルオーバー·デーモン
+--メンタルオーバー・デーモン
 function c24221808.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_PSYCHO),aux.NonTuner(Card.IsRace,RACE_PSYCHO),2)

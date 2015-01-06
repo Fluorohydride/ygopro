@@ -1,4 +1,4 @@
---マンモス·ゾンビ
+--マンモス・ゾンビ
 function c43642620.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ワーム·ルクイエ
+--ワーム・ルクイエ
 function c17649753.initial_effect(c)
 	--attack limit
 	local e1=Effect.CreateEffect(c)

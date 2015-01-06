@@ -1,4 +1,4 @@
---トライアングル·エリア
+--トライアングル・エリア
 function c53291093.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

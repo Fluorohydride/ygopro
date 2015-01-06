@@ -1,4 +1,4 @@
---フォトン·ベール
+--フォトン・ベール
 function c9354555.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

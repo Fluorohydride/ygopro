@@ -1,4 +1,4 @@
---闇·道化師のペーテン
+--闇・道化師のペーテン
 function c52624755.initial_effect(c)
 	--sp summon
 	local e1=Effect.CreateEffect(c)

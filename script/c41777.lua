@@ -1,4 +1,4 @@
---ジェム·エンハンス
+--ジェム・エンハンス
 function c41777.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

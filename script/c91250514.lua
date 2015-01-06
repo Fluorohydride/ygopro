@@ -1,4 +1,4 @@
---タン·ツイスター
+--タン・ツイスター
 function c91250514.initial_effect(c)
 	--draw
 	local e1=Effect.CreateEffect(c)

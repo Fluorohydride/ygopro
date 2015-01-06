@@ -1,4 +1,4 @@
---スピリッツ·オブ·ファラオ
+--スピリッツ・オブ・ファラオ
 function c25343280.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

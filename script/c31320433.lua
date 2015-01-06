@@ -1,4 +1,4 @@
---No.47 ナイトメア·シャーク
+--No.47 ナイトメア・シャーク
 function c31320433.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,3,2)

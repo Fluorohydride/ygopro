@@ -1,4 +1,4 @@
---A·ジェネクス·ケミストリ
+--A・ジェネクス・ケミストリ
 function c38049541.initial_effect(c)
 	--att change
 	local e1=Effect.CreateEffect(c)

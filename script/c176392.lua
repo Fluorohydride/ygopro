@@ -1,4 +1,4 @@
---コアキメイル·テストベッド
+--コアキメイル・テストベッド
 function c176392.initial_effect(c)
 	--destroy replace
 	local e1=Effect.CreateEffect(c)

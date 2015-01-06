@@ -1,4 +1,4 @@
---W－ウィング·カタパルト
+--W－ウィング・カタパルト
 function c96300057.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

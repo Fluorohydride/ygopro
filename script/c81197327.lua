@@ -1,4 +1,4 @@
---E·HERO スチーム·ヒーラー
+--E・HERO スチーム・ヒーラー
 function c81197327.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

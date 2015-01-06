@@ -1,4 +1,4 @@
---レインボー·フラワー
+--レインボー・フラワー
 function c21347810.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

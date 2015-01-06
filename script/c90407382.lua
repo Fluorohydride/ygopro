@@ -1,4 +1,4 @@
---ザ·キックマン
+--ザ・キックマン
 function c90407382.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---カオス·ソルジャー －開闢の使者－
+--カオス・ソルジャー －開闢の使者－
 function c72989439.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

@@ -1,4 +1,4 @@
---TG ハルバード·キャノン
+--TG ハルバード・キャノン
 function c97836203.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),2)

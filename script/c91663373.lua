@@ -1,4 +1,4 @@
---サイバー·エスパー
+--サイバー・エスパー
 function c91663373.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(91663373,0))

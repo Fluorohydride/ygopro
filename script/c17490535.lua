@@ -1,4 +1,4 @@
---エーリアン·ブレイン
+--エーリアン・ブレイン
 function c17490535.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

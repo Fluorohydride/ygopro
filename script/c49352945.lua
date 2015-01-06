@@ -1,4 +1,4 @@
---E·HERO ストーム·ネオス
+--E・HERO ストーム・ネオス
 function c49352945.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

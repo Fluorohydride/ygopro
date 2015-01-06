@@ -1,4 +1,4 @@
---ミラクル·フリッパー
+--ミラクル・フリッパー
 function c131182.initial_effect(c)
 	--sumlimit
 	local e1=Effect.CreateEffect(c)

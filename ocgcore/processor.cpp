@@ -35,7 +35,7 @@ int32 field::process() {
 		if (adjust_step(it->step))
 			core.units.pop_front();
 		else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -43,7 +43,7 @@ int32 field::process() {
 		if (process_turn(it->step, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_WAIT: {
@@ -54,7 +54,7 @@ int32 field::process() {
 		if (refresh_location_info(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_BATTLECMD: {
@@ -62,7 +62,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -71,7 +71,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -80,7 +80,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -89,7 +89,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -98,7 +98,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -107,7 +107,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -116,7 +116,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -126,7 +126,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -135,7 +135,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -144,7 +144,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -152,7 +152,7 @@ int32 field::process() {
 		if (sort_chain(it->step, it->arg1)) {
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -161,7 +161,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -170,7 +170,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -179,7 +179,7 @@ int32 field::process() {
 			core.units.pop_front();
 			return pduel->bufferlen;
 		} else {
-			core.units.begin()->step = 1;
+			it->step = 1;
 			return PROCESSOR_WAITING + pduel->bufferlen;
 		}
 	}
@@ -187,77 +187,77 @@ int32 field::process() {
 		if (select_release_cards(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg1 >> 24) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_TRIBUTE: {
 		if (select_tribute_cards(it->step, it->arg1 & 0xff, (it->arg1 >> 16) & 0xff, (it->arg2) & 0xff, (it->arg2 >> 16) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_POINT_EVENT: {
 		if(process_point_event(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_QUICK_EFFECT: {
 		if(process_quick_effect(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_IDLE_COMMAND: {
 		if(process_idle_command(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_PHASE_EVENT: {
 		if(process_phase_event(it->step, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_BATTLE_COMMAND: {
 		if(process_battle_command(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DAMAGE_STEP: {
 		if(process_damage_step(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_ADD_CHAIN: {
 		if (add_chain(it->step))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SOLVE_CHAIN: {
 		if (solve_chain(it->step, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SOLVE_CONTINUOUS: {
 		if (solve_continuous(it->step, it->peffect, it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EXECUTE_COST: {
@@ -265,7 +265,7 @@ int32 field::process() {
 			core.units.pop_front();
 			core.solving_event.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EXECUTE_OPERATION: {
@@ -273,7 +273,7 @@ int32 field::process() {
 			core.units.pop_front();
 			core.solving_event.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EXECUTE_TARGET: {
@@ -281,119 +281,119 @@ int32 field::process() {
 			core.units.pop_front();
 			core.solving_event.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DESTROY: {
 		if (destroy(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_RELEASE: {
 		if (release(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SENDTO: {
 		if (send_to(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DESTROY_STEP: {
 		if(destroy(it->step, it->ptarget, (card*)it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_RELEASE_STEP: {
 		if (release(it->step, it->ptarget, (card*)it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SENDTO_STEP: {
 		if (send_to(it->step, it->ptarget, (card*)it->arg1))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MOVETOFIELD: {
 		if (move_to_field(it->step, (card*)it->ptarget, it->arg1, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_CHANGEPOS: {
 		if (change_position(it->step, it->ptarget, it->peffect, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_OPERATION_REPLACE: {
 		if (operation_replace(it->step, it->peffect, it->ptarget, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SUMMON_RULE: {
 		if (summon(it->step, it->arg1, (card*)it->ptarget, it->peffect, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON_RULE: {
-		if (special_summon_rule(it->step, it->arg1, (card*)it->ptarget))
+		if (special_summon_rule(it->step, it->arg1, (card*)it->ptarget, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON: {
 		if (special_summon(it->step, it->peffect, it->arg1, it->ptarget))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_FLIP_SUMMON: {
 		if (flip_summon(it->step, it->arg1, (card*)(it->ptarget)))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_MSET: {
 		if (mset(it->step, it->arg1, (card*)(it->ptarget), it->peffect, it->arg2 & 0xff, (it->arg2 >> 8) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SSET: {
 		if (sset(it->step, it->arg1, it->arg2, (card*)(it->ptarget)))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SPSUMMON_STEP: {
 		if (special_summon_step(it->step, it->ptarget, (card*)(it->arg2)))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SSET_G: {
@@ -401,14 +401,14 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DRAW	: {
 		if (draw(it->step, it->peffect, it->arg1, (it->arg2 >> 28) & 0xf, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DAMAGE: {
@@ -422,49 +422,49 @@ int32 field::process() {
 		if (damage(it->step, peffect, reason, (it->arg2 >> 28) & 0xf, pcard, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_RECOVER: {
 		if (recover(it->step, it->peffect, it->arg1, (it->arg2 >> 28) & 0xf, (it->arg2 >> 24) & 0xf, it->arg2 & 0xffffff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_EQUIP: {
 		if (equip(it->step, it->arg2 & 0xffff, (card*)it->arg1, (card*)it->ptarget, (it->arg2 >> 16) & 0xff, (it->arg2 >> 24) & 0xff))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_GET_CONTROL: {
 		if (get_control(it->step, it->peffect, (it->arg2 >> 28) & 0xf, (card*)it->ptarget, (it->arg2 >> 24) & 0xf, (it->arg2 >> 8) & 0x3ff, it->arg2 & 0xff)) {
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SWAP_CONTROL: {
 		if (swap_control(it->step, it->peffect, (it->arg2 >> 28) & 0xf, (card*)it->ptarget, (card*)it->arg1, (it->arg2 >> 8) & 0x3ff, it->arg2 & 0xff)) {
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_CONTROL_ADJUST: {
 		if (control_adjust(it->step)) {
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_PAY_LPCOST: {
 		if (pay_lp_cost(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_REMOVE_COUNTER: {
@@ -472,7 +472,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_ATTACK_DISABLE: {
@@ -481,9 +481,7 @@ int32 field::process() {
 			if(!attacker
 			        || (attacker->fieldid_r != core.pre_field[0])
 			        || (attacker->current.location != LOCATION_MZONE)
-			        || (attacker->current.position & POS_FACEDOWN)
-			        || ((attacker->current.position & POS_DEFENCE) && !(attacker->is_affected_by_effect(EFFECT_DEFENCE_ATTACK)))
-			        || attacker->is_affected_by_effect(EFFECT_ATTACK_DISABLED)
+			        || !attacker->is_capable_attack()
 			        || !attacker->is_affect_by_effect(core.reason_effect)) {
 				returns.ivalue[0] = 0;
 				pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
@@ -496,7 +494,7 @@ int32 field::process() {
 				attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
 				raise_event(attacker, EVENT_ATTACK_DISABLED, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
 				process_instant_event();
-				core.units.begin()->step++;
+				it->step++;
 			}
 		} else {
 			returns.ivalue[0] = 1;
@@ -508,7 +506,7 @@ int32 field::process() {
 	case PROCESSOR_DESTROY_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DESTROY, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -518,7 +516,7 @@ int32 field::process() {
 	case PROCESSOR_RELEASE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_RELEASE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -528,7 +526,7 @@ int32 field::process() {
 	case PROCESSOR_SENDTO_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SENDTO, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -538,7 +536,7 @@ int32 field::process() {
 	case PROCESSOR_CHANGEPOS_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_CHANGEPOS, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -550,7 +548,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
@@ -559,7 +557,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
@@ -568,7 +566,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
@@ -577,7 +575,7 @@ int32 field::process() {
 			pduel->lua->add_param(core.select_options[returns.ivalue[0]], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
@@ -587,7 +585,7 @@ int32 field::process() {
 				pduel->lua->add_param(core.dice_result[i], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_TOSS_COIN: {
@@ -596,13 +594,13 @@ int32 field::process() {
 				pduel->lua->add_param(core.coin_result[i], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_EFFECTYN_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_EFFECTYN, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -612,7 +610,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_YESNO_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_YESNO, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -622,12 +620,12 @@ int32 field::process() {
 	case PROCESSOR_SELECT_OPTION_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_OPTION, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_OPSELECTED);
-			pduel->write_buffer8(1 - it->arg1);
+			pduel->write_buffer8(it->arg1);
 			pduel->write_buffer32(core.select_options[returns.ivalue[0]]);
 			core.units.pop_front();
 		}
@@ -636,7 +634,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_CARD_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_CARD, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -654,7 +652,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_POSITION_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_POSITION, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -664,7 +662,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_RELEASE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_RELEASE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -680,7 +678,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_TRIBUTE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_TRIBUTE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			card* pcard;
@@ -699,7 +697,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_TARGET: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_CARD, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			if(core.continuous_chain.size()) {
 				if(!core.continuous_chain.rbegin()->target_cards) {
@@ -754,10 +752,9 @@ int32 field::process() {
 			pduel->lua->add_param(it->arg2, PARAM_TYPE_CARD);
 			pduel->lua->add_param(it->arg1 >> 16, PARAM_TYPE_INT);
 			add_process(PROCESSOR_EXECUTE_OPERATION, 0, it->peffect, 0, it->arg1 & 0xffff, 0);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
-			group* pgroup = pduel->new_group();
-			pgroup->container.insert(core.fusion_materials.begin(), core.fusion_materials.end());
+			group* pgroup = pduel->new_group(core.fusion_materials);
 			if(it->arg2)
 				pgroup->container.insert((card*)it->arg2);
 			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
@@ -774,13 +771,13 @@ int32 field::process() {
 		if(ret)
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SELECT_SUM_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_SUM, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			group* pgroup = pduel->new_group();
 			for(int32 i = 0; i < returns.bvalue[0]; ++i) {
@@ -795,7 +792,7 @@ int32 field::process() {
 	case PROCESSOR_SELECT_DISFIELD_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SELECT_DISFIELD, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			int32 playerid = it->arg1 & 0xffff;
 			int32 count = (it->arg1) >> 16;
@@ -816,7 +813,7 @@ int32 field::process() {
 	case PROCESSOR_SPSUMMON_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SPSUMMON, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -826,7 +823,7 @@ int32 field::process() {
 	case PROCESSOR_SPSUMMON_STEP_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SPSUMMON_STEP, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -836,7 +833,7 @@ int32 field::process() {
 	case PROCESSOR_SPSUMMON_COMP_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SPSUMMON, 1, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -878,13 +875,13 @@ int32 field::process() {
 		if (select_xyz_material(it->step, it->arg1 & 0xffff, it->arg1 >> 16, (card*)it->ptarget, it->arg2 & 0xffff, it->arg2 >> 16))
 			core.units.pop_front();
 		else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_DRAW_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DRAW, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -894,7 +891,7 @@ int32 field::process() {
 	case PROCESSOR_DAMAGE_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_DAMAGE, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -904,7 +901,7 @@ int32 field::process() {
 	case PROCESSOR_RECOVER_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_RECOVER, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -914,7 +911,7 @@ int32 field::process() {
 	case PROCESSOR_EQUIP_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_EQUIP, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -924,7 +921,7 @@ int32 field::process() {
 	case PROCESSOR_GET_CONTROL_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_GET_CONTROL, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -934,7 +931,7 @@ int32 field::process() {
 	case PROCESSOR_SWAP_CONTROL_S: {
 		if(it->step == 0) {
 			add_process(PROCESSOR_SWAP_CONTROL, 0, it->peffect, it->ptarget, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
@@ -951,7 +948,7 @@ int32 field::process() {
 			else
 				pduel->write_buffer32(504);
 			add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, it->arg1, it->arg2);
-			core.units.begin()->step++;
+			it->step++;
 		} else if(it->step == 1) {
 			card_set cset;
 			card* pcard;
@@ -963,7 +960,7 @@ int32 field::process() {
 				send_to(&cset, core.reason_effect, (ptr)(it->ptarget), core.reason_player, it->arg1, LOCATION_GRAVE, 0, POS_FACEUP);
 			else
 				returns.ivalue[0] = 0;
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
@@ -975,7 +972,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -990,7 +987,7 @@ int32 field::process() {
 			for(auto clit = player[target_player].list_main.rbegin(); i < count; ++i, ++clit)
 				core.select_cards.push_back(*clit);
 			add_process(PROCESSOR_SORT_CARD, 0, 0, 0, sort_player, 0);
-			core.units.begin()->step++;
+			it->step++;
 		} else {
 			if(returns.bvalue[0] != -1) {
 				card* tc[16];
@@ -1027,7 +1024,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else {
-			core.units.begin()->step++;
+			it->step++;
 		}
 		return pduel->bufferlen;
 	}
@@ -1036,7 +1033,7 @@ int32 field::process() {
 			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_BOOLEAN);
 			core.units.pop_front();
 		} else
-			core.units.begin()->step++;
+			it->step++;
 		return pduel->bufferlen;
 	}
 	}
@@ -1222,9 +1219,8 @@ void field::raise_event(card_set* event_cards, uint32 event_code, effect* reason
 	tevent new_event;
 	new_event.trigger_card = 0;
 	if (event_cards) {
-		group* pgroup = pduel->new_group();
+		group* pgroup = pduel->new_group(*event_cards);
 		pgroup->is_readonly = TRUE;
-		pgroup->container = *event_cards;
 		new_event.event_cards = pgroup;
 	} else
 		new_event.event_cards = 0;
@@ -1240,9 +1236,8 @@ void field::raise_single_event(card* trigger_card, card_set* event_cards, uint32
 	tevent new_event;
 	new_event.trigger_card = trigger_card;
 	if (event_cards) {
-		group* pgroup = pduel->new_group();
+		group* pgroup = pduel->new_group(*event_cards);
 		pgroup->is_readonly = TRUE;
-		pgroup->container = *event_cards;
 		new_event.event_cards = pgroup;
 	} else
 		new_event.event_cards = 0;
@@ -1661,7 +1656,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		int32 limit = 6;
 		effect_set eset;
 		filter_player_effect(infos.turn_player, EFFECT_HAND_LIMIT, &eset);
-		if(eset.count)
+		if(eset.size())
 			limit = eset.get_last()->get_value();
 		int32 hd = player[infos.turn_player].list_hand.size();
 		if(hd <= limit) {
@@ -1775,25 +1770,23 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			}
 		}
 		core.new_fchain_s.clear();
-		if(core.current_player == infos.turn_player){
+		if(core.current_player == infos.turn_player) {
 			if(core.tpchain.size() > 1)
 				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
-		}
-		else{
+		} else {
 			if(core.ntpchain.size() > 1)
 				add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
 		}
 		return FALSE;
 	}
 	case 3: {
-		if(core.current_player == infos.turn_player){
+		if(core.current_player == infos.turn_player) {
 			core.new_chains.splice(core.new_chains.end(), core.tpchain);
 			if(core.new_chains.size())
 				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
-			core.current_player = 1-infos.turn_player;
+			core.current_player = 1 - infos.turn_player;
 			core.units.begin()->step = 1;
-		}
-		else{
+		} else {
 			core.new_chains.splice(core.new_chains.end(), core.ntpchain);
 			if(core.new_chains.size())
 				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
@@ -1833,12 +1826,11 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	}
 	case 5: {
 		if(core.new_ochain_s.size() == 0) {
-			if(core.current_player == infos.turn_player){
+			if(core.current_player == infos.turn_player) {
 				if(core.tpchain.size() > 1)
 					add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 1, infos.turn_player);
 				core.new_ochain_s.splice(core.new_ochain_s.end(), core.tmp_chain);
-			}
-			else{
+			} else {
 				if(core.ntpchain.size() > 1)
 					add_process(PROCESSOR_SORT_CHAIN, 0, 0, 0, 0, infos.turn_player);
 			}
@@ -1879,15 +1871,14 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 			} else
 				act = false;
 		} else act = false;
-		if(act){
+		if(act) {
 			if(tp == core.current_player)
 				add_process(PROCESSOR_SELECT_EFFECTYN, 0, 0, (group*)peffect->handler, tp, 0);
-			else{
+			else {
 				core.tmp_chain.push_back(*clit);
 				returns.ivalue[0] = FALSE;
 			}
-		}
-		else returns.ivalue[0] = FALSE;
+		} else returns.ivalue[0] = FALSE;
 		return FALSE;
 	}
 	case 6: {
@@ -1965,14 +1956,13 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		return FALSE;
 	}
 	case 7: {
-		if(core.current_player == infos.turn_player){
+		if(core.current_player == infos.turn_player) {
 			core.new_chains.splice(core.new_chains.end(), core.tpchain);
 			if(core.new_chains.size())
 				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
-			core.current_player = 1-infos.turn_player;
+			core.current_player = 1 - infos.turn_player;
 			core.units.begin()->step = 4;
-		}
-		else{
+		} else {
 			core.new_chains.splice(core.new_chains.end(), core.ntpchain);
 			if(core.new_chains.size())
 				add_process(PROCESSOR_ADD_CHAIN, 0, 0, 0, 0, 0);
@@ -2179,7 +2169,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 						core.delayed_quick_break.erase(make_pair(peffect, *evit));
 					}
 				}
-				evit++;
+				++evit;
 				if(pev && evit == core.point_event.end()) {
 					evit = core.instant_event.begin();
 					pev = false;
@@ -2613,16 +2603,17 @@ int32 field::process_idle_command(uint16 step) {
 		core.spsummonable_cards.clear();
 		effect_set eset;
 		filter_field_effect(EFFECT_SPSUMMON_PROC, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		for(int32 i = 0; i < eset.size(); ++i) {
 			auto pcard = eset[i]->handler;
 			if(!eset[i]->check_count_limit(pcard->current.controler))
 				continue;
-			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player))
+			if(pcard->current.controler == infos.turn_player && pcard->is_special_summonable(infos.turn_player, 0))
 				core.spsummonable_cards.push_back(pcard);
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_SPSUMMON_PROC_G, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+
+		for(int32 i = 0; i < eset.size(); ++i) {
 			auto pcard = eset[i]->handler;
 			if(!eset[i]->check_count_limit(pcard->current.controler))
 				continue;
@@ -2736,7 +2727,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 6: {
 		card* target = core.spsummonable_cards[returns.ivalue[0] >> 16];
-		special_summon_rule(infos.turn_player, target);
+		special_summon_rule(infos.turn_player, target, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
 	}
@@ -2817,7 +2808,9 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_target = 0;
 		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
 			core.units.begin()->step = 39;
-			core.units.begin()->arg1 = 2;
+			if(core.battle_phase_action)
+				core.units.begin()->arg1 = 2;
+			else core.units.begin()->arg1 = 3;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
 				core.units.begin()->arg2 = 1;
 			else core.units.begin()->arg2 = 0;
@@ -2831,6 +2824,7 @@ int32 field::process_battle_command(uint16 step) {
 			}
 			return FALSE;
 		}
+		core.battle_phase_action = TRUE;
 		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
@@ -2919,7 +2913,7 @@ int32 field::process_battle_command(uint16 step) {
 			effect_set eset;
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
+			for(int32 i = 0; i < eset.size(); ++i) {
 				if(eset[i]->operation) {
 					core.attack_cancelable = FALSE;
 					core.sub_solving_event.push_back(nil_event);
@@ -3542,9 +3536,9 @@ int32 field::process_battle_command(uint16 step) {
 					uint8 dp[2];
 					dp[0] = dp[1] = 0;
 					core.attacker->filter_effect(EFFECT_PIERCE, &eset);
-					if(eset.count && !core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
+					if(eset.size() && !core.attacker->is_affected_by_effect(EFFECT_NO_BATTLE_DAMAGE)
 					        && !core.attack_target->is_affected_by_effect(EFFECT_AVOID_BATTLE_DAMAGE, core.attacker)) {
-						for(int32 i = 0; i < eset.count; ++i)
+						for(int32 i = 0; i < eset.size(); ++i)
 							dp[1 - eset[i]->get_handler_player()] = 1;
 						if(dp[0] && is_player_affected_by_effect(0, EFFECT_AVOID_BATTLE_DAMAGE))
 							dp[0] = 0;
@@ -3756,7 +3750,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.desrep_chain.clear();
 		if(des.size()) {
 			group* ng = pduel->new_group();
-			ng->container = des;
+			ng->container.swap(des);
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_DESTROY, 10, 0, ng, REASON_BATTLE, PLAYER_NONE);
 			core.units.begin()->ptarget = ng;
@@ -3857,10 +3851,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
-			core.units.begin()->step = 38;
 		} else {
 			break_effect();
 		}
+		core.units.begin()->step = 38;
 		return FALSE;
 	}
 	case 39: {
@@ -3889,7 +3883,7 @@ int32 field::process_battle_command(uint16 step) {
 			effect_set eset;
 			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
 			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.count; ++i) {
+			for(int32 i = 0; i < eset.size(); ++i) {
 				if(eset[i]->operation) {
 					core.sub_solving_event.push_back(nil_event);
 					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
@@ -4018,12 +4012,15 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 			core.normalsummon_state_count[p] = 0;
 			core.flipsummon_state_count[p] = 0;
 			core.spsummon_state_count[p] = 0;
+			core.spsummon_state_count_rst[p] = 0;
 			core.attack_state_count[p] = 0;
 			core.battle_phase_count[p] = 0;
 			core.summon_count[p] = 0;
 			core.extra_summon[p] = 0;
 			core.spsummon_once_map[p].clear();
+			core.spsummon_once_map_rst[p].clear();
 		}
+        core.spsummon_rst = false;
 		for(auto& rit : effects.rechargeable)
 			if(!(rit->flag & EFFECT_FLAG_NO_TURN_RESET))
 				rit->recharge();
@@ -4042,8 +4039,10 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		if(core.global_flag & GLOBALFLAG_SPSUMMON_COUNT) {
             for(auto& peffect : effects.spsummon_count_eff) {
 				card* pcard = peffect->handler;
-				if(!(peffect->flag & EFFECT_FLAG_NO_TURN_RESET))
+				if(!(peffect->flag & EFFECT_FLAG_NO_TURN_RESET)) {
 					pcard->spsummon_counter[0] = pcard->spsummon_counter[1] = 0;
+					pcard->spsummon_counter_rst[0] = pcard->spsummon_counter_rst[1] = 0;
+				}
 			}
 		}
 		infos.turn_id++;
@@ -4164,6 +4163,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		}
 		infos.phase = PHASE_BATTLE;
 		core.phase_action = FALSE;
+		core.battle_phase_action = FALSE;
 		core.battle_phase_count[infos.turn_player]++;
 		pduel->write_buffer8(MSG_NEW_PHASE);
 		pduel->write_buffer8(infos.phase);
@@ -4292,7 +4292,7 @@ int32 field::add_chain(uint16 step) {
 			return TRUE;
 		effect_set eset;
 		filter_player_effect(clit.triggering_player, EFFECT_ACTIVATE_COST, &eset);
-		for(int32 i = 0; i < eset.count; ++i) {
+		for(int32 i = 0; i < eset.size(); ++i) {
 			pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit.triggering_effect, PARAM_TYPE_EFFECT);
 			pduel->lua->add_param(clit.triggering_player, PARAM_TYPE_INT);
@@ -4320,14 +4320,14 @@ int32 field::add_chain(uint16 step) {
 				eset.clear();
 				peffect->handler->filter_effect(ecode, &eset);
 				effect* pactin = 0;
-				for(int32 i = 0; i < eset.count; ++i) {
+				for(int32 i = 0; i < eset.size(); ++i) {
 					if(!(eset[i]->flag & EFFECT_FLAG_COUNT_LIMIT)) {
 						pactin = eset[i];
 						break;
 					}
 				}
 				if(!pactin) {
-					for(int32 i = 0; i < eset.count; ++i) {
+					for(int32 i = 0; i < eset.size(); ++i) {
 						if(eset[i]->check_count_limit(peffect->handler->current.controler)) {
 							eset[i]->dec_count(peffect->handler->current.controler);
 							break;
@@ -4435,14 +4435,34 @@ int32 field::add_chain(uint16 step) {
 		}
 		core.phase_action = TRUE;
 		if(clit.opinfos.count(0x200)) {
-			set_spsummon_counter(clit.triggering_player);
+			core.spsummon_rst = true;
+			set_spsummon_counter(clit.triggering_player, true, true);
+			if(clit.opinfos[0x200].op_player == PLAYER_ALL)
+				set_spsummon_counter(1 - clit.triggering_player, true, true);
 			if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 				auto& optarget = clit.opinfos[0x200];
 				if(optarget.op_cards) {
-					for(auto& spcard : optarget.op_cards->container) {
-						if(spcard->spsummon_code) {
-							uint8 sumpl = optarget.op_player ? 1 : 0;
-							core.spsummon_once_map[sumpl][spcard->spsummon_code]++;
+					if(optarget.op_player == PLAYER_ALL) {
+						auto opit = optarget.op_cards->container.begin();
+						uint32 sumplayer = optarget.op_param;
+						if((*opit)->spsummon_code) {
+							core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+							core.spsummon_once_map_rst[sumplayer][(*opit)->spsummon_code]++;
+						}
+						++opit;
+						if((*opit)->spsummon_code) {
+							core.spsummon_once_map[1 - sumplayer][(*opit)->spsummon_code]++;
+							core.spsummon_once_map_rst[1 - sumplayer][(*opit)->spsummon_code]++;
+						}
+					} else {
+						uint32 sumplayer = clit.triggering_player;
+						if(optarget.op_player == 1)
+							sumplayer = 1 - sumplayer;
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
+								core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								core.spsummon_once_map_rst[sumplayer][(*opit)->spsummon_code]++;
+							}
 						}
 					}
 				}
@@ -4558,6 +4578,18 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	chain_array::reverse_iterator cait = core.current_chain.rbegin();
 	switch(step) {
 	case 0: {
+		if(core.spsummon_rst) {
+			set_spsummon_counter(0, false, true);
+			set_spsummon_counter(1, false, true);
+			for(int plr = 0; plr < 2; ++plr) {
+				for(auto iter = core.spsummon_once_map[plr].begin(); iter != core.spsummon_once_map[plr].end(); ++iter) {
+					auto spcode = iter->first;
+					core.spsummon_once_map[plr][spcode] -= core.spsummon_once_map_rst[plr][spcode];
+					core.spsummon_once_map_rst[plr][spcode] = 0;
+				}
+			}
+			core.spsummon_rst = false;
+		}
 		pduel->write_buffer8(MSG_CHAIN_SOLVING);
 		pduel->write_buffer8(cait->chain_count);
 		add_to_disable_check_list(cait->triggering_effect->handler);
@@ -4583,20 +4615,20 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
-			if(cait->opinfos.count(0x200)) {
+			/*if(cait->opinfos.count(0x200)) {
 				set_spsummon_counter(cait->triggering_player, false);
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
-						for(auto& spcard : optarget.op_cards->container) {
-							if(spcard->spsummon_code) {
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
 								uint8 sumpl = optarget.op_player ? 1 : 0;
-								core.spsummon_once_map[sumpl][spcard->spsummon_code]--;
+								core.spsummon_once_map[sumpl][(*opit)->spsummon_code]--;
 							}
 						}
 					}
 				}
-			}
+			}*/
 			return FALSE;
 		}
 		for(auto& oeit : effects.oath)
@@ -4622,6 +4654,8 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 2: {
+		core.spsummon_state_count_tmp[0] = core.spsummon_state_count[0];
+		core.spsummon_state_count_tmp[1] = core.spsummon_state_count[1];
 		card* pcard = cait->triggering_effect->handler;
 		if(is_chain_disablable(cait->chain_count)) {
 			if((cait->flag & CHAIN_DISABLE_EFFECT) || pcard->is_affected_by_effect(EFFECT_DISABLE_CHAIN)
@@ -4636,7 +4670,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				return FALSE;
 			}
 		}
-		core.units.begin()->arg2 = core.spsummon_state_count[cait->triggering_player];
+		//core.units.begin()->arg2 = core.spsummon_state_count[cait->triggering_player];
 		if(cait->replace_op) {
 			core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 			cait->triggering_effect->operation = cait->replace_op;
@@ -4649,7 +4683,7 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 3: {
-		effect* peffect = cait->triggering_effect;
+		/*effect* peffect = cait->triggering_effect;
 		if(core.units.begin()->peffect) {
 			peffect->operation = (ptr)core.units.begin()->peffect;
 			if(cait->opinfos.count(0x200)) {
@@ -4657,10 +4691,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
 					if(optarget.op_cards) {
-						for(auto& spcard : optarget.op_cards->container) {
-							if(spcard->spsummon_code) {
+						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+							if((*opit)->spsummon_code) {
 								uint8 sumpl = optarget.op_player ? 1 : 0;
-								core.spsummon_once_map[sumpl][spcard->spsummon_code]--;
+								core.spsummon_once_map[sumpl][(*opit)->spsummon_code]--;
 							}
 						}
 					}
@@ -4669,14 +4703,52 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		} else {
 			if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
 				set_spsummon_counter(cait->triggering_player, false);
-		}
-		if(core.special_summoning.size())
-			core.special_summoning.clear();
-		if(core.equiping_cards.size())
-			core.equiping_cards.clear();
+		}*/
+		core.special_summoning.clear();
+		core.equiping_cards.clear();
 		return FALSE;
 	}
 	case 4: {
+		if(core.units.begin()->peffect == 0) {
+			if(cait->opinfos.count(0x200)) {
+				if(core.spsummon_state_count_tmp[cait->triggering_player] == core.spsummon_state_count[cait->triggering_player])
+					set_spsummon_counter(cait->triggering_player);
+				if(cait->opinfos[0x200].op_player == PLAYER_ALL && core.spsummon_state_count_tmp[1 - cait->triggering_player] == core.spsummon_state_count[1 - cait->triggering_player])
+					set_spsummon_counter(1 - cait->triggering_player);
+				//sometimes it may add twice, only works for once per turn
+				if(cait->triggering_effect->flag & EFFECT_FLAG_CARD_TARGET) {
+					auto& optarget = cait->opinfos[0x200];
+					if(optarget.op_cards) {
+						if(optarget.op_player == PLAYER_ALL) {
+							uint32 sumplayer = optarget.op_param;
+							if(core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) {
+								auto opit = optarget.op_cards->container.begin();
+								if((*opit)->spsummon_code)
+									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								++opit;
+								if((*opit)->spsummon_code)
+									core.spsummon_once_map[1 - sumplayer][(*opit)->spsummon_code]++;
+							}
+							auto opit = optarget.op_cards->container.begin();
+							check_card_counter(*opit, 3, sumplayer);
+							++opit;
+							check_card_counter(*opit, 3, 1 - sumplayer);
+						} else {
+							uint32 sumplayer = cait->triggering_player;
+							if(optarget.op_player == 1)
+								sumplayer = 1 - sumplayer;
+							for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
+								if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (*opit)->spsummon_code)
+									core.spsummon_once_map[sumplayer][(*opit)->spsummon_code]++;
+								check_card_counter(*opit, 3, sumplayer);
+							}
+						}
+					}
+				}
+			}
+		}
+		core.spsummon_state_count_tmp[0] = 0;
+		core.spsummon_state_count_tmp[1] = 0;
 		core.chain_solving = FALSE;
 		effect_vector::iterator eit;
 		event_list::iterator evit;
@@ -4820,21 +4892,21 @@ void field::refresh_location_info_instant() {
 	player[0].disabled_location = 0;
 	player[1].disabled_location = 0;
 	filter_field_effect(EFFECT_DISABLE_FIELD, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		value = eset[i]->get_value();
 		player[0].disabled_location |= value & 0x1f1f;
 		player[1].disabled_location |= (value >> 16) & 0x1f1f;
 	}
 	eset.clear();
 	filter_field_effect(EFFECT_USE_EXTRA_MZONE, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		p = eset[i]->get_handler_player();
 		value = eset[i]->get_value();
 		player[p].disabled_location |= (value >> 16) & 0x1f;
 	}
 	eset.clear();
 	filter_field_effect(EFFECT_USE_EXTRA_SZONE, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		p = eset[i]->get_handler_player();
 		value = eset[i]->get_value();
 		player[p].disabled_location |= (value >> 8) & 0x1f00;
@@ -4858,7 +4930,7 @@ int32 field::refresh_location_info(uint16 step) {
 		core.extraz_effects.clear();
 		core.extraz_effects_e.clear();
 		filter_field_effect(EFFECT_DISABLE_FIELD, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			value = eset[i]->get_value();
 			if(value) {
 				player[0].disabled_location |= value & 0x1f1f;
@@ -4868,7 +4940,7 @@ int32 field::refresh_location_info(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_USE_EXTRA_MZONE, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			p = eset[i]->get_handler_player();
 			value = eset[i]->get_value();
 			player[p].disabled_location |= (value >> 16) & 0x1f;
@@ -4879,7 +4951,7 @@ int32 field::refresh_location_info(uint16 step) {
 		}
 		eset.clear();
 		filter_field_effect(EFFECT_USE_EXTRA_SZONE, &eset);
-		for (int32 i = 0; i < eset.count; ++i) {
+		for (int32 i = 0; i < eset.size(); ++i) {
 			p = eset[i]->get_handler_player();
 			value = eset[i]->get_value();
 			player[p].disabled_location |= (value >> 8) & 0x1f00;
@@ -5261,7 +5333,7 @@ int32 field::adjust_step(uint16 step) {
 					continue;
 				eset.clear();
 				pcard->filter_effect(EFFECT_SET_POSITION, &eset);
-				if(eset.count) {
+				if(eset.size()) {
 					pos = eset.get_last()->get_value();
 					if((pos & 0xff) != pcard->current.position) {
 						pos_adjust.insert(pcard);
@@ -5280,7 +5352,7 @@ int32 field::adjust_step(uint16 step) {
 		if(pos_adjust.size()) {
 			core.re_adjust = TRUE;
 			group* ng = pduel->new_group();
-			ng->container = pos_adjust;
+			ng->container.swap(pos_adjust);
 			ng->is_readonly = TRUE;
 			add_process(PROCESSOR_CHANGEPOS, 0, 0, ng, PLAYER_NONE, TRUE);
 		}
@@ -5312,7 +5384,7 @@ int32 field::adjust_step(uint16 step) {
 		uint32 res = 0;
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
 			filter_field_effect(EFFECT_REVERSE_DECK, &eset, FALSE);
-			res = eset.count ? TRUE : FALSE;
+			res = eset.size() ? TRUE : FALSE;
 			if(core.deck_reversed ^ res) {
 				reverse_deck(0);
 				reverse_deck(1);
@@ -5345,7 +5417,7 @@ int32 field::adjust_step(uint16 step) {
 		}
 		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
 			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
-			res = eset.count ? TRUE : FALSE;
+			res = eset.size() ? TRUE : FALSE;
 			if(res && !core.remove_brainwashing) {
 				for(auto& pcard : player[0].list_mzone) {
 					if(pcard)

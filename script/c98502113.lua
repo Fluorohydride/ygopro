@@ -1,4 +1,4 @@
---超魔導剣士－ブラック·パラディン
+--超魔導剣士－ブラック・パラディン
 function c98502113.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

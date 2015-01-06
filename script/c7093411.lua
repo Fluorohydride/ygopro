@@ -1,4 +1,4 @@
---宝玉獣 サファイア·ペガサス
+--宝玉獣 サファイア・ペガサス
 function c7093411.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)

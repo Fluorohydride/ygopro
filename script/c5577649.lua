@@ -1,4 +1,4 @@
---スクラップ·クラッシュ
+--スクラップ・クラッシュ
 function c5577649.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---バルキリー·ナイト
+--バルキリー・ナイト
 function c99348756.initial_effect(c)
 	--cannot be battle target
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ダーク·シティ
+--ダーク・シティ
 function c53527835.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---パワー·インベーダー
+--パワー・インベーダー
 function c18842395.initial_effect(c)
 	--summon with no tribute
 	local e1=Effect.CreateEffect(c)

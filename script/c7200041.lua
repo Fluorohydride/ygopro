@@ -1,4 +1,4 @@
---メタル·シューター
+--メタル・シューター
 function c7200041.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)

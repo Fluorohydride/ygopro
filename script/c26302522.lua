@@ -1,4 +1,4 @@
---スフィア·ボム球体時限爆弾
+--スフィア・ボム球体時限爆弾
 function c26302522.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

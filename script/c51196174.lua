@@ -1,4 +1,4 @@
---ザ·カリキュレーター
+--ザ・カリキュレーター
 function c51196174.initial_effect(c)
 	--attack
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---トゥーン·デーモン
+--トゥーン・デーモン
 function c91842653.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

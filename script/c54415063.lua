@@ -1,4 +1,4 @@
---ハーピィ·レディ3
+--ハーピィ・レディ3
 function c54415063.initial_effect(c)
 	--atk limit
 	local e1=Effect.CreateEffect(c)

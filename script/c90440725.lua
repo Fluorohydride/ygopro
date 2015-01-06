@@ -1,4 +1,4 @@
---サイバー·シャドー·ガードナー
+--サイバー・シャドー・ガードナー
 function c90440725.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

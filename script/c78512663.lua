@@ -1,4 +1,4 @@
---E·HERO マグマ·ネオス
+--E・HERO マグマ・ネオス
 function c78512663.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

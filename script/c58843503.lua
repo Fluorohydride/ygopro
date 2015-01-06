@@ -1,4 +1,4 @@
---ミッド·ピース·ゴーレム
+--ミッド・ピース・ゴーレム
 function c58843503.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

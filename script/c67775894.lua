@@ -1,4 +1,4 @@
---ワンダー·ワンド
+--ワンダー・ワンド
 function c67775894.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

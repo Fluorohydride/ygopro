@@ -1,4 +1,4 @@
---星蝕－レベル·クライム－
+--星蝕－レベル・クライム－
 function c70391588.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

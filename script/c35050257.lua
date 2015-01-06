@@ -1,4 +1,4 @@
---サイバー·ラーバァ
+--サイバー・ラーバァ
 function c35050257.initial_effect(c)
 	--avoid battle damage
 	local e1=Effect.CreateEffect(c)

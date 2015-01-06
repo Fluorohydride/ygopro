@@ -1,4 +1,4 @@
---E·HERO フォレストマン
+--E・HERO フォレストマン
 function c75434695.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

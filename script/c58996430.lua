@@ -1,4 +1,4 @@
---ライトロード·ビースト ウォルフ
+--ライトロード・ビースト ウォルフ
 function c58996430.initial_effect(c)
 	c:SetStatus(STATUS_UNSUMMONABLE_CARD,true)
 	--special summon
@@ -11,6 +11,16 @@ function c58996430.initial_effect(c)
 	e1:SetTarget(c58996430.target)
 	e1:SetOperation(c58996430.operation)
 	c:RegisterEffect(e1)
+	--cannot pendulum summon
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e2:SetValue(c58996430.splimit)
+	c:RegisterEffect(e2)
+end
+function c58996430.splimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
 end
 function c58996430.condtion(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetPreviousLocation()==LOCATION_DECK

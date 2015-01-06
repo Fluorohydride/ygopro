@@ -1,4 +1,4 @@
---リターン·ゾンビ
+--リターン・ゾンビ
 function c3072077.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

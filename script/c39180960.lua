@@ -1,4 +1,4 @@
---リグラス·リーパー
+--リグラス・リーパー
 function c39180960.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

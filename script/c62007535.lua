@@ -1,4 +1,4 @@
---インヴェルズ·ホーン
+--インヴェルズ・ホーン
 function c62007535.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)

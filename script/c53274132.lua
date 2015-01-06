@@ -1,4 +1,4 @@
---C·リペアラー
+--C・リペアラー
 function c53274132.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

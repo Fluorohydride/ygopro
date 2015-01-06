@@ -1,4 +1,4 @@
---ダーク·エルフ
+--ダーク・エルフ
 function c21417692.initial_effect(c)
 	--attack cost
 	local e1=Effect.CreateEffect(c)

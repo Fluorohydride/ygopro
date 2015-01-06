@@ -1,4 +1,4 @@
---アームド·ドラゴン LV10
+--アームド・ドラゴン LV10
 function c59464593.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

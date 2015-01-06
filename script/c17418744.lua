@@ -1,4 +1,4 @@
---フォトン·サンクチュアリ
+--フォトン・サンクチュアリ
 function c17418744.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

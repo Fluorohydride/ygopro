@@ -1,4 +1,4 @@
---バスター·モード
+--バスター・モード
 function c80280737.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

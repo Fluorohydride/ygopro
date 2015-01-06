@@ -1,4 +1,4 @@
---イーグル·アイ
+--イーグル・アイ
 function c53693416.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)

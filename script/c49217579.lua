@@ -1,4 +1,4 @@
---幻影の騎士－ミラージュ·ナイト－
+--幻影の騎士－ミラージュ・ナイト－
 function c49217579.initial_effect(c)
 	c:EnableReviveLimit()
 	--atkup

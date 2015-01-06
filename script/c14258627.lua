@@ -1,4 +1,4 @@
---地球巨人 ガイア·プレート
+--地球巨人 ガイア・プレート
 function c14258627.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

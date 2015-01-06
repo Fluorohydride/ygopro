@@ -1,4 +1,4 @@
---アーカナイト·マジシャン
+--アーカナイト・マジシャン
 function c31924889.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--synchro summon

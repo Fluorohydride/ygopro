@@ -1,4 +1,4 @@
---コアキメイル·ベルグザーク
+--コアキメイル・ベルグザーク
 function c80367387.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

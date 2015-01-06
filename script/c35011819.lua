@@ -1,4 +1,4 @@
---エンペラー·オーダー
+--エンペラー・オーダー
 function c35011819.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

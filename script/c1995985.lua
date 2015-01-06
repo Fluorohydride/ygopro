@@ -1,4 +1,4 @@
---サイレント·ソードマン LV3
+--サイレント・ソードマン LV3
 function c1995985.initial_effect(c)
 	--disable effect
 	local e1=Effect.CreateEffect(c)

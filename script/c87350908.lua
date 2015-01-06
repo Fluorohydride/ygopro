@@ -1,4 +1,4 @@
---マスクド·チョッパー
+--マスクド・チョッパー
 function c87350908.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

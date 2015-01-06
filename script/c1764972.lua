@@ -1,4 +1,4 @@
---デスカイザー·ドラゴン／バスター
+--デスカイザー・ドラゴン／バスター
 function c1764972.initial_effect(c)
 	c:EnableReviveLimit()
 	--Cannot special summon

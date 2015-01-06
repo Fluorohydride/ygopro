@@ -1,4 +1,4 @@
---インセクト·プリンセス
+--インセクト・プリンセス
 function c37957847.initial_effect(c)
 	--Pos Change
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---インヴェルズ·モース
+--インヴェルズ・モース
 function c22009013.initial_effect(c)
 	--summon success
 	local e1=Effect.CreateEffect(c)

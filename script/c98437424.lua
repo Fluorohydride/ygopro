@@ -1,4 +1,4 @@
---ナチュル·コスモスビート
+--ナチュル・コスモスビート
 function c98437424.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

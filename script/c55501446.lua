@@ -1,4 +1,4 @@
---ライト·サーペント
+--ライト・サーペント
 function c55501446.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ジェネクス·ガイア
+--ジェネクス・ガイア
 function c89333528.initial_effect(c)
 	--Destroy replace
 	local e2=Effect.CreateEffect(c)

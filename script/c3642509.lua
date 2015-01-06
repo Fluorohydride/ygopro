@@ -1,4 +1,4 @@
---E·HERO Great TORNADO
+--E・HERO Great TORNADO
 function c3642509.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

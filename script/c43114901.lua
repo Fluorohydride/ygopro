@@ -1,4 +1,4 @@
---ジェムナイト·サニクス
+--ジェムナイト・サニクス
 function c43114901.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--search

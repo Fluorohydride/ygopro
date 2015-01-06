@@ -1,4 +1,4 @@
---Sin サイバー·エンド·ドラゴン
+--Sin サイバー・エンド・ドラゴン
 function c1710476.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

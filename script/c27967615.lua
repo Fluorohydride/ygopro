@@ -1,4 +1,4 @@
---フュージョン·ウェポン
+--フュージョン・ウェポン
 function c27967615.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

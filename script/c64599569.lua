@@ -1,4 +1,4 @@
---キメラテック·オーバー·ドラゴン
+--キメラテック・オーバー・ドラゴン
 function c64599569.initial_effect(c)
 	c:EnableReviveLimit()
 	--fusion material

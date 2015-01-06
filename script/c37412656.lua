@@ -1,4 +1,4 @@
---ヒーロー·ブラスト
+--ヒーロー・ブラスト
 function c37412656.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

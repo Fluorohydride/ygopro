@@ -1,4 +1,4 @@
---暗黒魔族ギルファー·デーモン
+--暗黒魔族ギルファー・デーモン
 function c50287060.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

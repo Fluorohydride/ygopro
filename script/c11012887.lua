@@ -1,4 +1,4 @@
---ジュラック·グアイバ
+--ジュラック・グアイバ
 function c11012887.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

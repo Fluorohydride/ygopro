@@ -1,4 +1,4 @@
---ワーム·ホール
+--ワーム・ホール
 function c22959079.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

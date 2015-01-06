@@ -1,4 +1,4 @@
---トゥーン·ワールド
+--トゥーン・ワールド
 function c15259703.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

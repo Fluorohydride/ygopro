@@ -1,4 +1,4 @@
---マイン·ゴーレム
+--マイン・ゴーレム
 function c76321376.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

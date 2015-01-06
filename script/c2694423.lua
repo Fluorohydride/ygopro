@@ -1,4 +1,4 @@
---メデューサ·ワーム
+--メデューサ・ワーム
 function c2694423.initial_effect(c)
 	--turn set
 	local e1=Effect.CreateEffect(c)

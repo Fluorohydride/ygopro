@@ -1,4 +1,4 @@
---魔天使ローズ·ソーサラー
+--魔天使ローズ・ソーサラー
 function c49674183.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---マザー·スパイダー
+--マザー・スパイダー
 function c17021204.initial_effect(c)
 	--spsummon proc
 	local e1=Effect.CreateEffect(c)

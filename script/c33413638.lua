@@ -1,4 +1,4 @@
---コカローチ·ナイト
+--コカローチ・ナイト
 function c33413638.initial_effect(c)
 	--to deck top
 	local e1=Effect.CreateEffect(c)

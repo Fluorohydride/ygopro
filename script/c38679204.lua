@@ -1,4 +1,4 @@
---ヴァイロン·ステラ
+--ヴァイロン・ステラ
 function c38679204.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---フレムベル·ベビー
+--フレムベル・ベビー
 function c13761956.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---英雄変化－リフレクター·レイ
+--英雄変化－リフレクター・レイ
 function c74095602.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

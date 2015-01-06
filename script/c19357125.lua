@@ -1,4 +1,4 @@
---ダーク·アサシン
+--ダーク・アサシン
 function c19357125.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

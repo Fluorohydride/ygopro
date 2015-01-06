@@ -1,4 +1,4 @@
---ガスタ·ガルド
+--ガスタ・ガルド
 function c65277087.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

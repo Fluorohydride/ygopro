@@ -1,4 +1,4 @@
---インフルーエンス·ドラゴン
+--インフルーエンス・ドラゴン
 function c54936498.initial_effect(c)
 	--lv up
 	local e1=Effect.CreateEffect(c)

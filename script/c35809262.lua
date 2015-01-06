@@ -1,4 +1,4 @@
---E·HERO フレイム·ウィングマン
+--E・HERO フレイム・ウィングマン
 function c35809262.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

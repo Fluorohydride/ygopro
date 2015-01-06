@@ -1,4 +1,4 @@
---グランド·スパイダー
+--グランド・スパイダー
 function c17243896.initial_effect(c)
 	--pos
 	local e1=Effect.CreateEffect(c)

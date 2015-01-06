@@ -1,4 +1,4 @@
---インフェルニティ·アーチャー
+--インフェルニティ・アーチャー
 function c18724123.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---カオス·ソーサラー
+--カオス・ソーサラー
 function c9596126.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

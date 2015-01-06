@@ -1,4 +1,4 @@
---ライトロード·シーフ ライニャン
+--ライトロード・シーフ ライニャン
 function c38815069.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

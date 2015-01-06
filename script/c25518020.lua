@@ -1,4 +1,4 @@
---マシン·デベロッパー
+--マシン・デベロッパー
 function c25518020.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---No.83 ギャラクシー·クィーン
+--No.83 ギャラクシー・クィーン
 function c48928529.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,1,3)

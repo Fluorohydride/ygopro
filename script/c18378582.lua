@@ -31,9 +31,8 @@ function c18378582.rfilter(c,code)
 	return c:IsFaceup() and c:IsCode(code)
 end
 function c18378582.spcon(e,c)
-	if c==nil then return true end
-	return Duel.IsEnvironment(56433456)
-		and Duel.CheckReleaseGroup(c:GetControler(),c18378582.rfilter,1,nil,66073051)
+	if c==nil then return Duel.IsEnvironment(56433456) end
+	return Duel.CheckReleaseGroup(c:GetControler(),c18378582.rfilter,1,nil,66073051)
 end
 function c18378582.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(tp,c18378582.rfilter,1,1,nil,66073051)
@@ -51,7 +50,7 @@ function c18378582.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
-function c18378582.desop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c18378582.desop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsEnvironment(56433456) then
 		local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
 		Duel.Destroy(g,REASON_EFFECT)

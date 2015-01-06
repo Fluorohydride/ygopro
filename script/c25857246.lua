@@ -62,7 +62,7 @@ end
 function c25857246.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsPlayerCanDraw(tp) then return end
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
-	if ct==0 then return end
+	if ct==0 then ct=1 end
 	if ct>2 then ct=2 end
 	local g=Duel.SelectReleaseGroupEx(tp,c25857246.filter,1,ct,nil)
 	if g:GetCount()>0 then

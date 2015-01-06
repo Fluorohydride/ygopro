@@ -1,4 +1,4 @@
---ローズ·テンタクルス
+--ローズ・テンタクルス
 function c41160533.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

@@ -27,6 +27,7 @@ struct duel_arg {
 
 class duel {
 public:
+	typedef std::set<card*, card_sort> card_set;
 	char strbuffer[256];
 	byte buffer[0x2000];
 	uint32 bufferlen;
@@ -47,7 +48,9 @@ public:
 	void clear();
 	
 	card* new_card(uint32 code);
-	group* new_group(card* pcard = 0);
+	group* new_group();
+	group* new_group(card* pcard);
+	group* new_group(const card_set& cset);
 	effect* new_effect();
 	void delete_card(card* pcard);
 	void delete_group(group* pgroup);
@@ -63,6 +66,8 @@ public:
 	void set_responsei(uint32 resp);
 	void set_responseb(byte* resp);
 	int32 get_next_integer(int32 l, int32 h);
+private:
+	group* register_group(group* pgroup);
 };
 
 //Player

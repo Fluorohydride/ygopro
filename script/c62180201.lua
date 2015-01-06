@@ -1,4 +1,4 @@
---邪神ドレッド·ルート
+--邪神ドレッド・ルート
 function c62180201.initial_effect(c)
 	--summon with 3 tribute
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---幻影王 ハイド·ライド
+--幻影王 ハイド・ライド
 function c6901008.initial_effect(c)
 	--nontuner
 	local e1=Effect.CreateEffect(c)

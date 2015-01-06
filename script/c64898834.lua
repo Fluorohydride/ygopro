@@ -1,4 +1,4 @@
---TG カタパルト·ドラゴン
+--TG カタパルト・ドラゴン
 function c64898834.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

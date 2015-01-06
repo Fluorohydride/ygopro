@@ -1,4 +1,4 @@
---雲魔物－ストーム·ドラゴン
+--雲魔物－ストーム・ドラゴン
 function c13474291.initial_effect(c)
 	c:EnableReviveLimit()
 	--battle indestructable

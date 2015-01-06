@@ -1,4 +1,4 @@
---エレメント·ザウルス
+--エレメント・ザウルス
 function c92755808.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

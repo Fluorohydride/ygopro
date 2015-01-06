@@ -1,4 +1,4 @@
---機甲忍法ゴールド·コンバージョン
+--機甲忍法ゴールド・コンバージョン
 function c16272453.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

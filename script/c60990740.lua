@@ -48,7 +48,7 @@ function c60990740.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
 	else
-		Duel.SendtoGrave(tc,REASON_EFFECT)
+		Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
 	end
 end
 function c60990740.sdcon(e,tp,eg,ep,ev,re,r,rp)

@@ -1,4 +1,4 @@
---黒·魔·導
+--黒・魔・導
 function c2314238.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

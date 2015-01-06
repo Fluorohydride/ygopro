@@ -1,4 +1,4 @@
---サイバネティック·ヒドゥン·テクノロジー
+--サイバネティック・ヒドゥン・テクノロジー
 function c92773018.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

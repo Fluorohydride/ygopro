@@ -1,4 +1,4 @@
---ゼータ·レティキュラント
+--ゼータ・レティキュラント
 function c64382839.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)

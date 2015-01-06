@@ -1,4 +1,4 @@
---ゴッドハンド·スマッシュ
+--ゴッドハンド・スマッシュ
 function c97570038.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

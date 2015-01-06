@@ -1,4 +1,4 @@
---機動砦のギア·ゴーレム
+--機動砦のギア・ゴーレム
 function c30190809.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

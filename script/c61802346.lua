@@ -1,4 +1,4 @@
---ブリザード·ドラゴン
+--ブリザード・ドラゴン
 function c61802346.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---E·HERO テンペスター
+--E・HERO テンペスター
 function c83121692.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

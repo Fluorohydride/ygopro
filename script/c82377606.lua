@@ -1,4 +1,4 @@
---A·O·J アンリミッター
+--A・O・J アンリミッター
 function c82377606.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

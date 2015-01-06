@@ -1,4 +1,4 @@
---E·HERO アクア·ネオス
+--E・HERO アクア・ネオス
 function c55171412.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

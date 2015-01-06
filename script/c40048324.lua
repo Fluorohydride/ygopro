@@ -1,4 +1,4 @@
---アーケイン·ファイロ
+--アーケイン・ファイロ
 function c40048324.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

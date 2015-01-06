@@ -1,4 +1,4 @@
---ダーク·アイズ·イリュージョニスト
+--ダーク・アイズ・イリュージョニスト
 function c38247752.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

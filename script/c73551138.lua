@@ -1,4 +1,4 @@
---リチュア·エミリア
+--リチュア・エミリア
 function c73551138.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

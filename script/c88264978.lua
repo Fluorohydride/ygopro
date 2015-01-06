@@ -1,4 +1,4 @@
---レッドアイズ·ダークネスメタルドラゴン
+--レッドアイズ・ダークネスメタルドラゴン
 function c88264978.initial_effect(c)
 	--spsummon proc
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---サイコ·フィール·ゾーン
+--サイコ・フィール・ゾーン
 function c11047543.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

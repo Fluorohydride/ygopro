@@ -10,33 +10,13 @@ function c82386016.initial_effect(c)
 	e1:SetTarget(c82386016.target)
 	e1:SetOperation(c82386016.activate)
 	c:RegisterEffect(e1)
-	if not c82386016.global_check then
-		c82386016.global_check=true
-		c82386016[0]=true
-		c82386016[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CHAINING)
-		ge1:SetOperation(c82386016.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c82386016.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(82386016,ACTIVITY_CHAIN,c82386016.chainfilter)
 end
-function c82386016.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsActiveType(TYPE_SPELL+TYPE_TRAP) then
-		c82386016[rp]=false
-	end
-end
-function c82386016.clear(e,tp,eg,ep,ev,re,r,rp)
-	c82386016[0]=true
-	c82386016[1]=true
+function c82386016.chainfilter(re,tp,cid)
+	return not re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 function c82386016.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c82386016[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(82386016,tp,ACTIVITY_CHAIN)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -47,7 +27,7 @@ function c82386016.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c82386016.aclimit(e,re,tp)
-	return re:GetHandler():IsType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 function c82386016.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_BEAST+RACE_BEASTWARRIOR+RACE_WINDBEAST)

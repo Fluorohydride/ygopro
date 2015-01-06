@@ -1,4 +1,4 @@
---ヴォルカニック·ロケット
+--ヴォルカニック・ロケット
 function c76459806.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

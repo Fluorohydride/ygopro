@@ -1,4 +1,4 @@
---ハイドロ·ジェネクス
+--ハイドロ・ジェネクス
 function c47421985.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsCode,68505803),aux.NonTuner(Card.IsAttribute,ATTRIBUTE_WATER),1)

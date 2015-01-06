@@ -1,4 +1,4 @@
---フォッシル·ダイナ パキケファロ
+--フォッシル・ダイナ パキケファロ
 function c42009836.initial_effect(c)
 	--disable spsummon
 	local e1=Effect.CreateEffect(c)

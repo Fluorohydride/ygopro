@@ -1,4 +1,4 @@
---Sin スターダスト·ドラゴン
+--Sin スターダスト・ドラゴン
 function c36521459.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

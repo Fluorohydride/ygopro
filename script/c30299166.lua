@@ -1,4 +1,4 @@
---ワーム·テンタクルス
+--ワーム・テンタクルス
 function c30299166.initial_effect(c)
 	--multi atk
 	local e1=Effect.CreateEffect(c)

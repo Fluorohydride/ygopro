@@ -1,4 +1,4 @@
---イクイップ·シュート
+--イクイップ・シュート
 function c62878208.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

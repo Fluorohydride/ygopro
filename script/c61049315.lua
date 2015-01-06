@@ -1,4 +1,4 @@
---ナチュル·ローズウィップ
+--ナチュル・ローズウィップ
 function c61049315.initial_effect(c)
 	--activate limit
 	local e1=Effect.CreateEffect(c)

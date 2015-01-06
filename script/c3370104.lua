@@ -1,4 +1,4 @@
---サイバー·フェニックス
+--サイバー・フェニックス
 function c3370104.initial_effect(c)
 	--disable
 	local e1=Effect.CreateEffect(c)

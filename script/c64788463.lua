@@ -1,4 +1,4 @@
---キングス·ナイト
+--キングス・ナイト
 function c64788463.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

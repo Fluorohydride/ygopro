@@ -24,8 +24,8 @@ function c62279055.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c62279055.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttackable() then
-		if Duel.NegateAttack(tc) then
+	if tc:IsRelateToEffect(e) then
+		if Duel.NegateAttack() then
 			Duel.Damage(1-tp,tc:GetAttack(),REASON_EFFECT)
 		end
 	end

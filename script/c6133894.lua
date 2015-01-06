@@ -30,9 +30,8 @@ function c6133894.rfilter(c,code)
 	return c:IsFaceup() and c:IsCode(code)
 end
 function c6133894.spcon(e,c)
-	if c==nil then return true end
-	return Duel.IsEnvironment(94585852)
-		and Duel.CheckReleaseGroup(c:GetControler(),c6133894.rfilter,1,nil,66073051)
+	if c==nil then return Duel.IsEnvironment(94585852) end
+	return Duel.CheckReleaseGroup(c:GetControler(),c6133894.rfilter,1,nil,66073051)
 end
 function c6133894.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectReleaseGroup(tp,c6133894.rfilter,1,1,nil,66073051)
@@ -42,7 +41,7 @@ function c6133894.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,1-tp,3)
 end
-function c6133894.hdop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c6133894.hdop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.IsEnvironment(94585852) then
 		local g=Duel.GetFieldGroup(tp,0,LOCATION_HAND):RandomSelect(tp,3)
 		Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)

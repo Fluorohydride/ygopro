@@ -1,4 +1,4 @@
---ヒステリック·パーティー
+--ヒステリック・パーティー
 function c77778835.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

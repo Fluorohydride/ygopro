@@ -1,4 +1,4 @@
---人造人間－サイコ·ロード
+--人造人間－サイコ・ロード
 function c35803249.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

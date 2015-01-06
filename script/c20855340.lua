@@ -1,4 +1,4 @@
---エヴォルド·プレウロス
+--エヴォルド・プレウロス
 function c20855340.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

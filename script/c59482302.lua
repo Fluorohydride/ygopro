@@ -1,4 +1,4 @@
---A·ボム
+--A・ボム
 function c59482302.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ナチュル·ガーディアン
+--ナチュル・ガーディアン
 function c80555116.initial_effect(c)
 	--atk up
 	local e1=Effect.CreateEffect(c)

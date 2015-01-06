@@ -1,4 +1,4 @@
---ブラック·アロー
+--ブラック・アロー
 function c88341502.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

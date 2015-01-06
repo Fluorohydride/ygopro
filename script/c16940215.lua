@@ -1,4 +1,4 @@
---ナチュル·ナーブ
+--ナチュル・ナーブ
 function c16940215.initial_effect(c)
 	--Negate
 	local e1=Effect.CreateEffect(c)

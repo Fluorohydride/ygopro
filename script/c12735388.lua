@@ -1,4 +1,4 @@
---レインボー·ヴェール
+--レインボー・ヴェール
 function c12735388.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---E·HERO グロー·ネオス
+--E・HERO グロー・ネオス
 function c85507811.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

@@ -1,4 +1,4 @@
---VW－タイガー·カタパルト
+--VW－タイガー・カタパルト
 function c58859575.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

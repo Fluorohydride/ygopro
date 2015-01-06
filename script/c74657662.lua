@@ -1,4 +1,4 @@
---ヴァイロン·マテリアル
+--ヴァイロン・マテリアル
 function c74657662.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---オレイカルコス·シュノロス
+--オレイカルコス・シュノロス
 function c7634581.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

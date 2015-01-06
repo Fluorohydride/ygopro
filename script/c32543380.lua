@@ -1,4 +1,4 @@
---ヴォルカニック·デビル
+--ヴォルカニック・デビル
 function c32543380.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

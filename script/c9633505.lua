@@ -1,4 +1,4 @@
---ガーディアン·ケースト
+--ガーディアン・ケースト
 function c9633505.initial_effect(c)
 	--sum limit
 	local e1=Effect.CreateEffect(c)

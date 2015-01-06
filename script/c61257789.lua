@@ -1,4 +1,4 @@
---スターダスト·ドラゴン／バスター
+--スターダスト・ドラゴン／バスター
 function c61257789.initial_effect(c)
 	c:EnableReviveLimit()
 	--Cannot special summon

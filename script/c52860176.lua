@@ -1,4 +1,4 @@
---憑依するブラッド·ソウル
+--憑依するブラッド・ソウル
 function c52860176.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---レアル·ジェネクス·マグナ
+--レアル・ジェネクス・マグナ
 function c1533292.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

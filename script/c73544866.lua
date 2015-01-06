@@ -1,4 +1,4 @@
---ガーディアン·バオウ
+--ガーディアン・バオウ
 function c73544866.initial_effect(c)
 	--sum limit
 	local e1=Effect.CreateEffect(c)
