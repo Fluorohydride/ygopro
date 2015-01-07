@@ -45,7 +45,7 @@ function c4022819.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	c:RegisterEffect(e1)
 end
 function c4022819.lvfilter(c)
-	return c:IsType(TYPE_NORMAL) and c:IsRace(RACE_DRAGON)
+	return c:IsFaceup() and c:IsType(TYPE_NORMAL) and c:IsRace(RACE_DRAGON)
 end
 function c4022819.lvtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c4022819.lvfilter(chkc) end
