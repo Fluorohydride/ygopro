@@ -15,7 +15,7 @@ function c94380860.initial_effect(c)
 	e1:SetCost(c94380860.cost)
 	e1:SetTarget(c94380860.target)
 	e1:SetOperation(c94380860.operation)
-    e1:SetHintTiming(0,0x1e0)
+	e1:SetHintTiming(0,0x1e0)
 	c:RegisterEffect(e1)
 end
 c94380860.xyz_number=103
