@@ -65,6 +65,13 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 			e2:SetCode(EFFECT_DISABLE_EFFECT)
 			e2:SetReset(RESET_EVENT+0x1fe0000)
 			nc:RegisterEffect(e2)
+			if nc:IsType(TYPE_TRAPMONSTER) then
+				local e3=Effect.CreateEffect(c)
+				e3:SetType(EFFECT_TYPE_SINGLE)
+				e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+				e3:SetReset(RESET_EVENT+0x1fe0000)
+				nc:RegisterEffect(e3)
+			end
 			nc=ng:GetNext()
 		end
 	end
