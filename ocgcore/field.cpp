@@ -25,11 +25,12 @@ bool tevent::operator< (const tevent& v) const {
 }
 field::field(duel* pduel) {
 	this->pduel = pduel;
-	infos.copy_id = 1;
-	infos.turn_player = 0;
-	infos.turn_id = 0;
 	infos.field_id = 1;
+	infos.copy_id = 1;
+	infos.turn_id = 0;
 	infos.card_id = 1;
+	infos.phase = 0;
+	infos.turn_player = 0;
 	for (int i = 0; i < 2; ++i) {
 		cost[i].count = 0;
 		cost[i].amount = 0;
