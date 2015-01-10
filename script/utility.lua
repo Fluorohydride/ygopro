@@ -943,3 +943,7 @@ function Auxiliary.PendOperation()
 				Duel.HintSelection(pg)
 			end
 end
+function Auxiliary.disfilter1(c)
+	return (c:IsFaceup() and not c:IsDisabled() and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0))
+		or c:IsType(TYPE_TRAPMONSTER)
+end

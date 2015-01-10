@@ -28,9 +28,6 @@ function c48333324.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c48333324.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function c48333324.negfilter(c)
-	return not c:IsDisabled()
-end
 function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
 	local c=e:GetHandler()
@@ -52,7 +49,7 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 		if g1:GetFirst() then
 			Duel.BreakEffect()
 		end
-		local ng=g1:Filter(c48333324.negfilter,nil)
+		local ng=g1:Filter(aux.disfilter1,nil)
 		local nc=ng:GetFirst()
 		while nc do
 			local e1=Effect.CreateEffect(c)
