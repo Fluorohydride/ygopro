@@ -77,8 +77,26 @@ end
 function c72989439.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc and c:GetFlagEffect(72989439)==0 and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:IsChainAttackable()
+	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:GetFlagEffect(72989439)==0 and c:IsChainAttackable()
 end
 function c72989439.atop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChainAttack()
+	local c=e:GetHandler()
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCode(EFFECT_EXTRA_ATTACK)
+	e1:SetValue(1)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
+	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e2:SetLabelObject(e1)
+	e2:SetOperation(c72989439.rst)
+	e2:SetReset(RESET_PHASE+PHASE_BATTLE)
+	Duel.RegisterEffect(e2,tp)
+end
+function c72989439.rst(e,tp,eg,ep,ev,re,r,rp)
+	local e1=e:GetLabelObject()
+	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
