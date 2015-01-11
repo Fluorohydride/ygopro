@@ -13,11 +13,8 @@ function c58820853.initial_effect(c)
 end
 function c58820853.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	if a~=c then d=a end
-	return c:IsRelateToBattle() and c:IsFaceup()
-		and d and d:GetLocation()==LOCATION_GRAVE and d:IsType(TYPE_MONSTER)
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c58820853.filter(c,e,tp)
 	return c:IsAttackBelow(1500) and c:IsSetCard(0x33) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

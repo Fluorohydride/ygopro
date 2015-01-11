@@ -12,8 +12,7 @@ function c11012887.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c11012887.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsRelateToBattle() and c:GetBattleTarget():IsType(TYPE_MONSTER)
+	return e:GetHandler():IsRelateToBattle()
 end
 function c11012887.filter(c,e,tp)
 	return c:IsSetCard(0x22) and c:IsAttackBelow(1700) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

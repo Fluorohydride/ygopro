@@ -15,8 +15,7 @@ end
 function c80321197.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	if not c:IsRelateToBattle() or c:IsFacedown() then return false end
-	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+	return c:IsRelateToBattle() and bc and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c80321197.spop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
