@@ -1,4 +1,4 @@
---セイクリッド·ヒアデス
+--セイクリッド・ヒアデス
 function c47579719.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),3,2)

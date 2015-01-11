@@ -53,7 +53,7 @@ function c90846359.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	local rc=c90846359[sump]
 	if targetp then rc=c90846359[targetp] end
 	if rc==0 then return false end
-	return c:IsRace(0xffffff-rc)
+	return c:GetRace()~=rc
 end
 function c90846359.getrace(g)
 	local arc=0
@@ -65,7 +65,7 @@ function c90846359.getrace(g)
 	return arc
 end
 function c90846359.rmfilter(c,rc)
-	return not c:IsRace(0xffffff-rc)
+	return c:GetRace()==rc
 end
 function c90846359.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()

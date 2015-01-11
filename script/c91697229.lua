@@ -39,11 +39,10 @@ function c91697229.initial_effect(c)
 	c:RegisterEffect(e6)
 end
 function c91697229.spcon(e,c)
-	if c==nil then return true end
+	if c==nil then return Duel.GetCurrentPhase()==PHASE_MAIN2 end
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c91697229.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
-		and Duel.GetCurrentPhase()==PHASE_MAIN2
 end
 function c91697229.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x4b)

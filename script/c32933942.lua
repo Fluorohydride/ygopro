@@ -1,4 +1,4 @@
---宝玉獣 アメジスト·キャット
+--宝玉獣 アメジスト・キャット
 function c32933942.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)

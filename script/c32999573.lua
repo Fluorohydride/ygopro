@@ -18,7 +18,7 @@ function c32999573.initial_effect(c)
 end
 function c32999573.rcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(32999573+ep)==0
-		and bit.band(r,REASON_COST)~=0 and re:GetHandler():IsType(TYPE_XYZ)
+		and bit.band(r,REASON_COST)~=0 and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_XYZ)
 		and re:GetHandler():GetOverlayCount()>=ev-1
 		and Duel.IsExistingMatchingCard(Card.IsAbleToRemove,tp,LOCATION_HAND,0,1,nil)
 end

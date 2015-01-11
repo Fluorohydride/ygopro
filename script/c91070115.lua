@@ -1,4 +1,4 @@
---エーリアン·テレパス
+--エーリアン・テレパス
 function c91070115.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

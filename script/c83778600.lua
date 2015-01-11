@@ -1,4 +1,4 @@
---ミス·リバイブ
+--ミス・リバイブ
 function c83778600.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

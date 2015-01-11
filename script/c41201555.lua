@@ -1,4 +1,4 @@
---コアキメイル·グラヴィローズ
+--コアキメイル・グラヴィローズ
 function c41201555.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

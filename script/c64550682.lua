@@ -1,4 +1,4 @@
---スクラップ·オルトロス
+--スクラップ・オルトロス
 function c64550682.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

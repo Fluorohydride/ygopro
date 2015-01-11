@@ -1,4 +1,4 @@
---時の機械－タイム·マシーン
+--時の機械－タイム・マシーン
 function c80987696.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

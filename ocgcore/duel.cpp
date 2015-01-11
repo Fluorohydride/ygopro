@@ -18,8 +18,7 @@ duel::duel() {
 	lua = new interpreter(this);
 	game_field = new field(this);
 	game_field->temp_card = new_card(0);
-	bufferlen = 0;
-	bufferp = buffer;
+	clear_buffer();
 }
 duel::~duel() {
 	for(std::set<card*>::iterator cit = cards.begin(); cit != cards.end(); ++cit)
@@ -46,29 +45,35 @@ void duel::clear() {
 	game_field->temp_card = new_card(0);
 }
 card* duel::new_card(uint32 code) {
-	card* pcard = new card();
+	card* pcard = new card(this);
 	cards.insert(pcard);
 	if(code)
 		::read_card(code, &(pcard->data));
 	pcard->data.code = code;
-	pcard->pduel = this;
 	lua->register_card(pcard);
 	return pcard;
 }
-group* duel::new_group(card* pcard) {
-	group* pgroup = new group();
+group* duel::register_group(group* pgroup) {
 	groups.insert(pgroup);
-	if (pcard)
-		pgroup->container.insert(pcard);
 	if(lua->call_depth)
 		sgroups.insert(pgroup);
-	pgroup->pduel = this;
 	lua->register_group(pgroup);
 	return pgroup;
 }
+group* duel::new_group() {
+	group* pgroup = new group(this);
+	return register_group(pgroup);
+}
+group* duel::new_group(card* pcard) {
+	group* pgroup = new group(this, pcard);
+	return register_group(pgroup);
+}
+group* duel::new_group(const card_set& cset) {
+	group* pgroup = new group(this, cset);
+	return register_group(pgroup);
+}
 effect* duel::new_effect() {
-	effect* peffect = new effect();
-	peffect->pduel = this;
+	effect* peffect = new effect(this);
 	effects.insert(peffect);
 	lua->register_effect(peffect);
 	return peffect;

@@ -1,4 +1,4 @@
---グローアップ·バルブ
+--グローアップ・バルブ
 function c67441435.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

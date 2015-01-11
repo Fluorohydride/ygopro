@@ -1,4 +1,4 @@
---E·HERO The シャイニング
+--E・HERO The シャイニング
 function c22061412.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

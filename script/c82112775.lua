@@ -1,4 +1,4 @@
---D·D·M
+--D・D・M
 function c82112775.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

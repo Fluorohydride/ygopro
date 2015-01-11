@@ -1,4 +1,4 @@
---ジェネティック·ウーマン
+--ジェネティック・ウーマン
 function c98147766.initial_effect(c)
 	--salvage
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ターボ·ウォリアー
+--ターボ・ウォリアー
 function c46195773.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,c46195773.tfilter,aux.NonTuner(nil),1)

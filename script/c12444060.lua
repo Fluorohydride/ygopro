@@ -7,6 +7,7 @@ function c12444060.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetHintTiming(0,0x11e8)
+	e1:SetCountLimit(1,12444060+EFFECT_COUNT_CODE_OATH)
 	e1:SetCost(c12444060.cost)
 	e1:SetTarget(c12444060.target)
 	e1:SetOperation(c12444060.activate)
@@ -22,20 +23,9 @@ function c12444060.initial_effect(c)
 	e2:SetTarget(c12444060.destg)
 	e2:SetOperation(c12444060.desop)
 	c:RegisterEffect(e2)
-	if not c12444060.global_check then
-		c12444060.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_PHASE_START+PHASE_BATTLE)
-		ge1:SetOperation(c12444060.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c12444060.checkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(Duel.GetTurnPlayer(),12444060,RESET_PHASE+PHASE_END,0,1)
 end
 function c12444060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,12444060)==0 end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)
@@ -43,7 +33,6 @@ function c12444060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetTargetRange(1,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
-	Duel.RegisterFlagEffect(tp,12444060,RESET_PHASE+PHASE_END,0,1)
 end
 function c12444060.filter(c,e,tp)
 	return c:IsSetCard(0x97) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

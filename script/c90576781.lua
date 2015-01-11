@@ -1,4 +1,4 @@
---レプティレス·ポイズン
+--レプティレス・ポイズン
 function c90576781.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

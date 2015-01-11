@@ -21,8 +21,10 @@ function c31036355.activate(e,tp,eg,ep,ev,re,r,rp)
 	then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g1=Duel.SelectMatchingCard(tp,Card.IsAbleToChangeControler,tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.HintSelection(g1)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_CONTROL)
 	local g2=Duel.SelectMatchingCard(1-tp,Card.IsAbleToChangeControler,1-tp,LOCATION_MZONE,0,1,1,nil)
+	Duel.HintSelection(g2)
 	local c1=g1:GetFirst()
 	local c2=g2:GetFirst()
 	if Duel.SwapControl(c1,c2,0,0) then

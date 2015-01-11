@@ -1,4 +1,4 @@
---煉獄龍 オーガ·ドラグーン
+--煉獄龍 オーガ・ドラグーン
 function c81020646.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_DARK),aux.NonTuner(nil),1)

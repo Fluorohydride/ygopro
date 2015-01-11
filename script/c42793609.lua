@@ -1,4 +1,4 @@
---極星宝ブリージンガ·メン
+--極星宝ブリージンガ・メン
 function c42793609.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

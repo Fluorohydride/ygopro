@@ -16,8 +16,9 @@ function c55067058.initial_effect(c)
 end
 c55067058.xyz_number=19
 function c55067058.rcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_COST)~=0 and re:GetHandler():IsType(TYPE_XYZ)
-		and ep==e:GetOwnerPlayer() and e:GetHandler():GetOverlayCount()>0 and re:GetHandler():GetOverlayCount()>=ev-1
+	return bit.band(r,REASON_COST)~=0 and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_XYZ)
+		and e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_EFFECT)
+		and ep==e:GetOwnerPlayer() and re:GetHandler():GetOverlayCount()>=ev-1
 end
 function c55067058.rop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=bit.band(ev,0xffff)

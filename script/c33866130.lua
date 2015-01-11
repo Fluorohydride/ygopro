@@ -1,4 +1,4 @@
---ナチュル·クリフ
+--ナチュル・クリフ
 function c33866130.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

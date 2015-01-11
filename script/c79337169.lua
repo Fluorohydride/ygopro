@@ -1,4 +1,4 @@
---ガントレット·ウォリアー
+--ガントレット・ウォリアー
 function c79337169.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

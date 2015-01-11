@@ -1,4 +1,4 @@
---バブル·ショット
+--バブル・ショット
 function c53586134.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

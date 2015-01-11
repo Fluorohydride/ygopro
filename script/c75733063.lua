@@ -1,4 +1,4 @@
---機皇兵スキエル·アイン
+--機皇兵スキエル・アイン
 function c75733063.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

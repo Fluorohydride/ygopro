@@ -1,4 +1,4 @@
---竜影魚レイ·ブロント
+--竜影魚レイ・ブロント
 function c43191636.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--change base attack

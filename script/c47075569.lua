@@ -68,7 +68,7 @@ function c47075569.thop(e,tp,eg,ep,ev,re,r,rp)
 	local dg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	local ct=Duel.Destroy(dg,REASON_EFFECT)
 	local g=Duel.GetMatchingGroup(c47075569.thfilter,tp,LOCATION_DECK,0,nil)
-	if g:GetCount()==0 then return end
+	if ct==0 or g:GetCount()==0 then return end
 	if ct>g:GetClassCount(Card.GetCode) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g1=g:Select(tp,1,1,nil)

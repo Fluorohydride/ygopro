@@ -60,7 +60,7 @@ function c61156777.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c61156777.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then e:GetHandler():IsCanRemoveCounter(tp,0x34,1,REASON_EFFECT) end
+	if chk==0 then return e:GetHandler():IsCanRemoveCounter(tp,0x34,1,REASON_EFFECT) end
 	return Duel.SelectYesNo(tp,aux.Stringid(61156777,2))
 end
 function c61156777.repop(e,tp,eg,ep,ev,re,r,rp)

@@ -6,7 +6,7 @@ function c36736723.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCountLimit(1.36736723)
+	e1:SetCountLimit(1,36736723)
 	e1:SetCondition(c36736723.atkcon)
 	e1:SetCost(c36736723.atkcost)
 	e1:SetOperation(c36736723.atkop)
@@ -18,7 +18,7 @@ function c36736723.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e2:SetCountLimit(1.36736724)
+	e2:SetCountLimit(1,36736724)
 	e2:SetCost(c36736723.thcost)
 	e2:SetTarget(c36736723.thtg)
 	e2:SetOperation(c36736723.thop)
@@ -29,7 +29,7 @@ function c36736723.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	if not tc then return false end
 	if tc:IsControler(1-tp) then tc=Duel.GetAttacker() end
 	e:SetLabelObject(tc)
-	return tc and tc:IsRelateToBattle() and tc:IsSetCard(0xc1) and tc:IsType(TYPE_SYNCHRO)
+	return tc and tc:IsRelateToBattle() and tc:IsSetCard(0x66) and tc:IsType(TYPE_SYNCHRO)
 end
 function c36736723.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
@@ -51,7 +51,7 @@ function c36736723.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c36736723.filter(c)
-	return c:IsSetCard(0x17) and c:IsAbleToHand()
+	return c:IsSetCard(0x17) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c36736723.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c36736723.filter(chkc) end

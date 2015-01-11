@@ -1,4 +1,4 @@
---覇魔導士アーカナイト·マジシャン
+--覇魔導士アーカナイト・マジシャン
 function c21113684.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--fusion material

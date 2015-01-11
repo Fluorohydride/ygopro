@@ -1,4 +1,4 @@
---�ǵѳZ��
+--角笛砕き
 function c93396832.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

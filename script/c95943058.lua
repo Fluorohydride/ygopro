@@ -1,4 +1,4 @@
---E－HERO ヘル·ゲイナー
+--E－HERO ヘル・ゲイナー
 function c95943058.initial_effect(c)
 	-- extra atk
 	local e1=Effect.CreateEffect(c)

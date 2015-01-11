@@ -1,4 +1,4 @@
---サイバー·ダーク·キール
+--サイバー・ダーク・キール
 function c3019642.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

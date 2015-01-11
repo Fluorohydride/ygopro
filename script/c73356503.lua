@@ -11,5 +11,5 @@ function c73356503.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c73356503.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsAttribute(0xff-ATTRIBUTE_WIND)
+	return c:GetAttribute()~=ATTRIBUTE_WIND
 end

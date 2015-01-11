@@ -1,4 +1,4 @@
---ブラッド·オーキス
+--ブラッド・オーキス
 function c46571052.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

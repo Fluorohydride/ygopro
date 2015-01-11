@@ -1,4 +1,4 @@
---¥Ú¥¤¥ó¥Ú¥¤¥ó¥¿©`
+--ãƒšã‚¤ãƒ³ãƒšã‚¤ãƒ³ã‚¿ãƒ¼
 function c21620076.initial_effect(c)
 	--alias
 	local e1=Effect.CreateEffect(c)

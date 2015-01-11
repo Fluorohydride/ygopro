@@ -1,4 +1,4 @@
---死のマジック·ボックス
+--死のマジック・ボックス
 function c25774450.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

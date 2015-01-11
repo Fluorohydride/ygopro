@@ -1,4 +1,4 @@
---ヴァイロン·エレメント
+--ヴァイロン・エレメント
 function c92035412.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---エーリアン·ハンター
+--エーリアン・ハンター
 function c62315111.initial_effect(c)
 	--chain attack
 	local e1=Effect.CreateEffect(c)

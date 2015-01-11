@@ -1,4 +1,4 @@
---モザイク·マンティコア
+--モザイク・マンティコア
 function c8483333.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

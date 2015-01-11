@@ -1,4 +1,4 @@
---スクラップ·ハンター
+--スクラップ・ハンター
 function c55624610.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---A·O·J リバース·ブレイク
+--A・O・J リバース・ブレイク
 function c55982698.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

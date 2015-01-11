@@ -1,4 +1,4 @@
---アイヴィ·ウォール
+--アイヴィ・ウォール
 function c30069398.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)

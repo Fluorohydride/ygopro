@@ -9,23 +9,14 @@ function c40854824.initial_effect(c)
 	e1:SetTarget(c40854824.target)
 	e1:SetOperation(c40854824.activate)
 	c:RegisterEffect(e1)
-	if not c40854824.global_check then
-		c40854824.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CHAIN_SOLVED)
-		ge1:SetOperation(c40854824.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(40854824,ACTIVITY_CHAIN,c40854824.chainfilter)
 end
-function c40854824.checkop(e,tp,eg,ep,ev,re,r,rp)
+function c40854824.chainfilter(re,tp,cid)
 	local code=re:GetHandler():GetOriginalCode()
-	if re:IsActiveType(TYPE_MONSTER) and (code==79407975 or code==79856792) then
-		Duel.RegisterFlagEffect(rp,40854824,RESET_PHASE+PHASE_END,0,1)
-	end
+	return not (re:IsActiveType(TYPE_MONSTER) and (code==79407975 or code==79856792))
 end
 function c40854824.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,40854824)~=0
+	return Duel.GetCustomActivityCount(40854824,tp,ACTIVITY_CHAIN)~=0
 end
 function c40854824.filter(c,e,tp)
 	return c:IsSetCard(0x1034) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

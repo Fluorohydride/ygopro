@@ -1,4 +1,4 @@
---サイバー·オーガ·2
+--サイバー・オーガ・2
 function c37057012.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

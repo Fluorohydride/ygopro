@@ -1,4 +1,4 @@
---機甲忍法フリーズ·ロック
+--機甲忍法フリーズ・ロック
 function c65150219.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

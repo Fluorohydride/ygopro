@@ -1,4 +1,4 @@
---A·ジェネクス·トライアーム
+--A・ジェネクス・トライアーム
 function c17760003.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsCode,68505803),aux.NonTuner(nil),1)

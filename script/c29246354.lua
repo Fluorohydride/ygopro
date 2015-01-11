@@ -1,4 +1,4 @@
---C·ピニー
+--C・ピニー
 function c29246354.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

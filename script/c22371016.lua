@@ -1,4 +1,4 @@
---A·O·J アンノウン·クラッシャー
+--A・O・J アンノウン・クラッシャー
 function c22371016.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ジェネクス·ブラスト
+--ジェネクス・ブラスト
 function c24432029.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

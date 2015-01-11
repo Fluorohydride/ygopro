@@ -1,4 +1,4 @@
---ジャンク·ウォリアー
+--ジャンク・ウォリアー
 function c60800381.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,c60800381.tfilter,aux.NonTuner(nil),1)

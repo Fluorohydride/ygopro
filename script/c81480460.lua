@@ -1,4 +1,4 @@
---リボルバー·ドラゴン
+--リボルバー・ドラゴン
 function c81480460.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

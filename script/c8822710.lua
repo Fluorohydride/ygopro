@@ -1,4 +1,4 @@
---A·O·J コズミック·クローザー
+--A・O・J コズミック・クローザー
 function c8822710.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

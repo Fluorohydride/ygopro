@@ -1,4 +1,4 @@
---カース·オブ·スタチュー
+--カース・オブ・スタチュー
 function c3129635.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

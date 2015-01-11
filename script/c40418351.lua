@@ -1,4 +1,4 @@
---鎧黒竜－サイバー·ダーク·ドラゴン
+--鎧黒竜－サイバー・ダーク・ドラゴン
 function c40418351.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

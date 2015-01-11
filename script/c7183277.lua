@@ -1,4 +1,4 @@
---ライトロード·ドルイド オルクス
+--ライトロード・ドルイド オルクス
 function c7183277.initial_effect(c)
 	--cannot be target
 	local e1=Effect.CreateEffect(c)

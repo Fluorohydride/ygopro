@@ -1,4 +1,4 @@
---ハーフ·シャット
+--ハーフ・シャット
 function c73048641.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

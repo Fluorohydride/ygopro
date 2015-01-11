@@ -1,4 +1,4 @@
---冥界の魔王 ハ·デス
+--冥界の魔王 ハ・デス
 function c53982768.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
@@ -9,7 +9,7 @@ function c53982768.initial_effect(c)
 	c:RegisterEffect(e1)
 	--Disable
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD + EFFECT_TYPE_CONTINUOUS)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_BATTLED)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetOperation(c53982768.operation)

@@ -1,4 +1,4 @@
---ダーク·カタパルター
+--ダーク・カタパルター
 function c33875961.initial_effect(c)
 	c:EnableCounterPermit(0x3028)
 	--counter

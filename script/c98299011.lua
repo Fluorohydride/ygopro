@@ -1,4 +1,4 @@
---ホーリー·エルフの祝福
+--ホーリー・エルフの祝福
 function c98299011.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

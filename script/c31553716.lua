@@ -1,4 +1,4 @@
---スピア·ドラゴン
+--スピア・ドラゴン
 function c31553716.initial_effect(c)
 	--to defence
 	local e1=Effect.CreateEffect(c)

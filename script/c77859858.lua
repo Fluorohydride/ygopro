@@ -1,4 +1,4 @@
---破滅へのクイック·ドロー
+--破滅へのクイック・ドロー
 function c77859858.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

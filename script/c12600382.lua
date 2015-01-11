@@ -1,4 +1,4 @@
---エクゾディア·ネクロス
+--エクゾディア・ネクロス
 function c12600382.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot destroy

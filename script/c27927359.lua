@@ -1,4 +1,4 @@
---ハーピィ·レディ2
+--ハーピィ・レディ2
 function c27927359.initial_effect(c)
 	--Disable
 	local e1=Effect.CreateEffect(c)

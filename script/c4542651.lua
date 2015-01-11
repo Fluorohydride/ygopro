@@ -1,4 +1,4 @@
---カオス·シールド
+--カオス・シールド
 function c4542651.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

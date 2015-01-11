@@ -11,23 +11,12 @@ function c13683298.initial_effect(c)
 	e1:SetTarget(c13683298.target)
 	e1:SetOperation(c13683298.operation)
 	c:RegisterEffect(e1)
-	if not c13683298.global_check then
-		c13683298.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_PHASE_START+PHASE_BATTLE)
-		ge1:SetOperation(c13683298.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
-end
-function c13683298.checkop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.RegisterFlagEffect(Duel.GetTurnPlayer(),13683298,RESET_PHASE+PHASE_END,0,1)
 end
 function c13683298.condition(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_GRAVE)
 end
 function c13683298.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,13683298)==0 end
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BP)

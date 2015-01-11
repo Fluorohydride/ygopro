@@ -1,4 +1,4 @@
---ドリル·バーニカル
+--ドリル・バーニカル
 function c24137081.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

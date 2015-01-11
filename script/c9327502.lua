@@ -1,4 +1,4 @@
---E·HERO ボルテック
+--E・HERO ボルテック
 function c9327502.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)

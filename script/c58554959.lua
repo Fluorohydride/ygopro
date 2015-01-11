@@ -1,4 +1,4 @@
---E－HERO マリシャス·エッジ
+--E－HERO マリシャス・エッジ
 function c58554959.initial_effect(c)
 	--summon with 1 tribute
 	local e1=Effect.CreateEffect(c)

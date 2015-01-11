@@ -1,4 +1,4 @@
---メンタル·カウンセラー リリー
+--メンタル・カウンセラー リリー
 function c5519829.initial_effect(c)
 	--atk change
 	local e1=Effect.CreateEffect(c)

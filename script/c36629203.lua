@@ -1,4 +1,4 @@
---A·O·J コアデストロイ
+--A・O・J コアデストロイ
 function c36629203.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

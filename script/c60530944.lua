@@ -27,7 +27,7 @@ function c60530944.getattr(g)
 	return aat
 end
 function c60530944.rmfilter(c,at)
-	return not c:IsAttribute(0xff-at)
+	return not c:GetAttribute()~=at
 end
 function c60530944.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==0

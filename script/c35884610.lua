@@ -22,7 +22,7 @@ function c35884610.initial_effect(c)
 	e3:SetCode(EFFECT_UPDATE_ATTACK)
 	e3:SetValue(1000)
 	c:RegisterEffect(e3)
-	local e4=Effect.Clone(e3)
+	local e4=e3:Clone()
 	e4:SetCode(EFFECT_UPDATE_DEFENCE)
 	c:RegisterEffect(e4)
 	--damage double

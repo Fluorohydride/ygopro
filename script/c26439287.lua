@@ -1,4 +1,4 @@
---プロト·サイバー·ドラゴン
+--プロト・サイバー・ドラゴン
 function c26439287.initial_effect(c)
 	--code
 	local e1=Effect.CreateEffect(c)

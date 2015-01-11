@@ -1,4 +1,4 @@
---°×¸o¤ÎÈÌÕß
+--ç™½ç«œã®å¿è€…
 function c99212922.initial_effect(c)
 	--spsummon limit
 	local e1=Effect.CreateEffect(c)

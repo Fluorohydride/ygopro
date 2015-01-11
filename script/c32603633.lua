@@ -1,4 +1,4 @@
---究極·背水の陣
+--究極・背水の陣
 function c32603633.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

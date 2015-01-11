@@ -1,4 +1,4 @@
---ライオ·アリゲーター
+--ライオ・アリゲーター
 function c4611269.initial_effect(c)
 	--pierce
 	local e1=Effect.CreateEffect(c)

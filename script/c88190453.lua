@@ -1,4 +1,4 @@
---チェイン·スラッシャー
+--チェイン・スラッシャー
 function c88190453.initial_effect(c)
 	--multiattack
 	local e1=Effect.CreateEffect(c)

@@ -10,6 +10,7 @@ function c39030163.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1)
+	e1:SetCost(c39030163.mtcost)
 	e1:SetTarget(c39030163.mttg)
 	e1:SetOperation(c39030163.mtop)
 	c:RegisterEffect(e1)
@@ -28,6 +29,10 @@ function c39030163.initial_effect(c)
 end
 function c39030163.ovfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x107b) and c:IsType(TYPE_XYZ) and not c:IsCode(39030163)
+end
+function c39030163.mtcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c39030163.mttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=e:GetHandler():GetEquipGroup()
@@ -51,6 +56,7 @@ end
 function c39030163.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c39030163.desfilter(c)
 	return c:IsFaceup() and c:IsDestructable()

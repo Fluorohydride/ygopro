@@ -1,4 +1,4 @@
---アンデット·ウォーリアー
+--アンデット・ウォーリアー
 function c31339260.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

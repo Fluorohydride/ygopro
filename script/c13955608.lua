@@ -1,4 +1,4 @@
---機動砦 ストロング·ホールド
+--機動砦 ストロング・ホールド
 function c13955608.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

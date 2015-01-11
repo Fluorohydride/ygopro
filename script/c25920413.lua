@@ -1,4 +1,4 @@
---エーリアン·スカル
+--エーリアン・スカル
 function c25920413.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

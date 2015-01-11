@@ -1,4 +1,4 @@
---デーモン·テイマー
+--デーモン・テイマー
 function c37620434.initial_effect(c)
 	--control
 	local e1=Effect.CreateEffect(c)

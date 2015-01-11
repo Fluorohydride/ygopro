@@ -1,4 +1,4 @@
---シールド·ウィング
+--シールド・ウィング
 function c28859794.initial_effect(c)
 	--battle indes
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---¥Ñ¥È¥í©`¥ë¡¤¥í¥Ü
+--ãƒ‘ãƒˆãƒ­ãƒ¼ãƒ«ãƒ»ãƒ­ãƒœ
 function c76775123.initial_effect(c)
 	--confirm
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ジュラック·アウロ
+--ジュラック・アウロ
 function c80727721.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---チェンジ·シンクロン
+--チェンジ・シンクロン
 function c25652655.initial_effect(c)
 	--position
 	local e1=Effect.CreateEffect(c)

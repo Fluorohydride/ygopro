@@ -1,4 +1,4 @@
---重爆撃禽 ボム·フェネクス
+--重爆撃禽 ボム・フェネクス
 function c6602300.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

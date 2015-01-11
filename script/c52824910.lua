@@ -1,4 +1,4 @@
---カイザー·グライダー
+--カイザー・グライダー
 function c52824910.initial_effect(c)
 	--indes
 	local e1=Effect.CreateEffect(c)

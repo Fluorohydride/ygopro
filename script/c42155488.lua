@@ -57,7 +57,7 @@ function c42155488.dectg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e2,tp)
 end
 function c42155488.sumlimit(e,c)
-	return c:IsRace(0xffffff-e:GetLabel())
+	return c:GetRace()~=e:GetLabel()
 end
 function c42155488.decop(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

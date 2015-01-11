@@ -1,4 +1,4 @@
---フォッグ·コントロール
+--フォッグ・コントロール
 function c63741331.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

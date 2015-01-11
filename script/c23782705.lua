@@ -1,4 +1,4 @@
---マシンナーズ·スナイパー
+--マシンナーズ・スナイパー
 function c23782705.initial_effect(c)
 	--atk limit
 	local e1=Effect.CreateEffect(c)

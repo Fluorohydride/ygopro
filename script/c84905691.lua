@@ -1,4 +1,4 @@
---ナチュル·ホーストニードル
+--ナチュル・ホーストニードル
 function c84905691.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(84905691,0))

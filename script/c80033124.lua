@@ -1,4 +1,4 @@
---サイバーダーク·インパクト！
+--サイバーダーク・インパクト！
 function c80033124.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

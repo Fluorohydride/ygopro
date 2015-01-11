@@ -1,4 +1,4 @@
---ダーク·グレファー
+--ダーク・グレファー
 function c14536035.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

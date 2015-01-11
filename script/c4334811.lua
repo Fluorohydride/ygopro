@@ -1,4 +1,4 @@
---スクラップ·リサイクラー
+--スクラップ・リサイクラー
 function c4334811.initial_effect(c)
 	--send to grave
 	local e1=Effect.CreateEffect(c)

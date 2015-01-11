@@ -1,4 +1,4 @@
---サテライト·キャノン
+--サテライト・キャノン
 function c50400231.initial_effect(c)
 	--ind
 	local e1=Effect.CreateEffect(c)

@@ -601,11 +601,11 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			case 1:
 			case 2:
 			case 3:
-			case 4:
 			case 5: {
 				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 				break;
 			}
+			case 4:
 			case 6:
 			case 7:
 			case 8:

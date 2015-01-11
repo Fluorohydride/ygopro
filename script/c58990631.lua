@@ -1,4 +1,4 @@
---オートマチック·レーザー
+--オートマチック・レーザー
 function c58990631.initial_effect(c)
 	--Activate(summon)
 	local e1=Effect.CreateEffect(c)

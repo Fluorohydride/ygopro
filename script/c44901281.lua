@@ -1,4 +1,4 @@
---セイバー·ホール
+--セイバー・ホール
 function c44901281.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -67,7 +67,7 @@ function c60879050.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c60879050.value(e,c)
-	return c:GetAttack()*2
+	return c:GetBaseAttack()*2
 end
 function c60879050.ftarget(e,c)
 	return e:GetHandler():GetEquipTarget()~=c

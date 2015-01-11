@@ -1,4 +1,4 @@
---ワーム·バルサス
+--ワーム・バルサス
 function c15658249.initial_effect(c)
 	--position
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---エーリアン·マーズ
+--エーリアン・マーズ
 function c99532708.initial_effect(c)
 	--disable
 	local e1=Effect.CreateEffect(c)

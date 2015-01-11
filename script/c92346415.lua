@@ -1,4 +1,4 @@
---サイコ·ソード
+--サイコ・ソード
 function c92346415.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

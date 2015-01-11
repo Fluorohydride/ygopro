@@ -1,4 +1,4 @@
---ヴィクトリー·ドラゴン
+--ヴィクトリー・ドラゴン
 function c44910027.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

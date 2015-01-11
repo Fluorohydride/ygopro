@@ -1,4 +1,4 @@
---おジャマ·キング
+--おジャマ・キング
 function c90140980.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

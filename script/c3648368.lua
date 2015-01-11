@@ -1,4 +1,4 @@
---A·O·J リサーチャー
+--A・O・J リサーチャー
 function c3648368.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

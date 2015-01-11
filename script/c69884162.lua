@@ -1,4 +1,4 @@
---E·HERO アナザー·ネオス
+--E・HERO アナザー・ネオス
 function c69884162.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--code

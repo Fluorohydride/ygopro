@@ -1,4 +1,4 @@
---A·O·J サイクロン·クリエイター
+--A・O・J サイクロン・クリエイター
 function c45586855.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

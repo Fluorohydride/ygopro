@@ -1,4 +1,4 @@
---ビクトリー·バイパーXX03
+--ビクトリー・バイパーXX03
 function c93130021.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(93130021,0))

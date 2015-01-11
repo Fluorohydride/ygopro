@@ -1,4 +1,4 @@
---ナチュル·パイナポー
+--ナチュル・パイナポー
 function c7304544.initial_effect(c)
 	--Change race
 	local e1=Effect.CreateEffect(c)

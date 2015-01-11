@@ -1,4 +1,4 @@
---C·チッキー
+--C・チッキー
 function c17363041.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

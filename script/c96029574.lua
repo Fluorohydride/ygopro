@@ -1,4 +1,4 @@
---ブラック·ブルドラゴ
+--ブラック・ブルドラゴ
 function c96029574.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsType,TYPE_DUAL),1)

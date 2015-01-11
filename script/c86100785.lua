@@ -1,4 +1,4 @@
---ゾーン·イーター
+--ゾーン・イーター
 function c86100785.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(86100785,0))

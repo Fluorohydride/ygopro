@@ -208,6 +208,7 @@ static const struct luaL_Reg cardlib[] = {
 	{ "CheckUniqueOnField", scriptlib::card_check_unique_onfield },
 	{ "ResetNegateEffect", scriptlib::card_reset_negate_effect },
 	{ "AssumeProperty", scriptlib::card_assume_prop },
+	{ "SetSPSummonOnce", scriptlib::card_set_spsummon_once },
 	{ NULL, NULL }
 };
 
@@ -466,9 +467,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "IsPlayerCanSpecialSummon", scriptlib::duel_is_player_can_spsummon },
 	{ "IsPlayerCanFlipSummon", scriptlib::duel_is_player_can_flipsummon },
 	{ "IsPlayerCanSpecialSummonMonster", scriptlib::duel_is_player_can_spsummon_monster },
-	{ "IsPlayerCanSummonCount", scriptlib::duel_is_player_can_summon_count },
 	{ "IsPlayerCanSpecialSummonCount", scriptlib::duel_is_player_can_spsummon_count },
-	{ "IsPlayerCanFlipSummonCount", scriptlib::duel_is_player_can_flipsummon_count },
 	{ "IsPlayerCanRelease", scriptlib::duel_is_player_can_release },
 	{ "IsPlayerCanRemove", scriptlib::duel_is_player_can_remove },
 	{ "IsPlayerCanSendtoHand", scriptlib::duel_is_player_can_send_to_hand },

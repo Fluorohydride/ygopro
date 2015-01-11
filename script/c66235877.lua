@@ -1,4 +1,4 @@
---デス·デーモン·ドラゴン
+--デス・デーモン・ドラゴン
 function c66235877.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

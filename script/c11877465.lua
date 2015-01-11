@@ -1,4 +1,4 @@
---イビリチュア·マインドオーガス
+--イビリチュア・マインドオーガス
 function c11877465.initial_effect(c)
 	c:EnableReviveLimit()
 	--return to deck

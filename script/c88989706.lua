@@ -1,4 +1,4 @@
---大神官デ·ザード
+--大神官デ・ザード
 function c88989706.initial_effect(c)
 	--check
 	local e1=Effect.CreateEffect(c)

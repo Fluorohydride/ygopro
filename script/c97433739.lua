@@ -10,34 +10,13 @@ function c97433739.initial_effect(c)
 	e1:SetTarget(c97433739.target)
 	e1:SetOperation(c97433739.operation)
 	c:RegisterEffect(e1)
-	if not c97433739.global_check then
-		c97433739.global_check=true
-		c97433739[0]=true
-		c97433739[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c97433739.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c97433739.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(97433739,ACTIVITY_SPSUMMON,c97433739.counterfilter)
 end
-function c97433739.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	if tc:GetSummonType()~=SUMMON_TYPE_XYZ then
-		c97433739[tc:GetControler()]=false
-	end
-end
-function c97433739.clear(e,tp,eg,ep,ev,re,r,rp)
-	c97433739[0]=true
-	c97433739[1]=true
+function c97433739.counterfilter(c)
+	return c:GetSummonType()==SUMMON_TYPE_XYZ
 end
 function c97433739.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c97433739[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(97433739,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)

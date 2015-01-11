@@ -34,7 +34,7 @@ function c12525049.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
 function c12525049.spfilter(c,e,tp)
-	return c:IsSetCard(0x66) and not c:IsCode(12525049) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x1066) and not c:IsCode(12525049) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c12525049.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -51,7 +51,7 @@ function c12525049.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c12525049.filter(c,e,tp)
-	return c:IsSetCard(0x66) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0x1066) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c12525049.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c12525049.filter(chkc,e,tp) end

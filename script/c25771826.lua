@@ -1,4 +1,4 @@
---A·O·J ガラドホルグ
+--A・O・J ガラドホルグ
 function c25771826.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

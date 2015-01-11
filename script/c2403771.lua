@@ -1,4 +1,4 @@
---パワー·ツール·ドラゴン
+--パワー・ツール・ドラゴン
 function c2403771.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

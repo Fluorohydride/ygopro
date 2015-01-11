@@ -1,4 +1,4 @@
---エレメント·デビル
+--エレメント・デビル
 function c23118924.initial_effect(c)
 	--disable
 	local e1=Effect.CreateEffect(c)

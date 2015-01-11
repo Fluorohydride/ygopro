@@ -1,4 +1,4 @@
---シンクロ·ガンナー
+--シンクロ・ガンナー
 function c79796561.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---E·HERO ゴッド·ネオス
+--E・HERO ゴッド・ネオス
 function c31111109.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

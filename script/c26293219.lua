@@ -1,4 +1,4 @@
---バーニング·スカルヘッド
+--バーニング・スカルヘッド
 function c26293219.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

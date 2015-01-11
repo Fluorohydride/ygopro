@@ -1,4 +1,4 @@
---宣告者の預言
+--宣告者の神託
 function c79306385.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

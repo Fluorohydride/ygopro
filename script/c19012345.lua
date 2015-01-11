@@ -1,4 +1,4 @@
---灰塵王 アッシュ·ガッシュ
+--灰塵王 アッシュ・ガッシュ
 function c19012345.initial_effect(c)
 	--lvup
 	local e1=Effect.CreateEffect(c)

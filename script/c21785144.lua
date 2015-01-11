@@ -1,4 +1,4 @@
---ライトロード·ドラゴン グラゴニス
+--ライトロード・ドラゴン グラゴニス
 function c21785144.initial_effect(c)
 	--atk def
 	local e1=Effect.CreateEffect(c)

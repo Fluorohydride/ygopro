@@ -1,4 +1,4 @@
---ドル·ドラ
+--ドル・ドラ
 function c43586926.initial_effect(c)
 	--to grave
 	local e1=Effect.CreateEffect(c)

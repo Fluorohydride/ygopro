@@ -1,4 +1,4 @@
---スカル·マイスター
+--スカル・マイスター
 function c67750322.initial_effect(c)
 	--Inactivate
 	local e1=Effect.CreateEffect(c)

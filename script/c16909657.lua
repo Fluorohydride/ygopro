@@ -1,4 +1,4 @@
---レプティレス·スキュラ
+--レプティレス・スキュラ
 function c16909657.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

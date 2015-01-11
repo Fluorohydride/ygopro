@@ -1,4 +1,4 @@
---No.16 色の支配者ショック·ルーラー
+--No.16 色の支配者ショック・ルーラー
 function c54719828.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,4,3)

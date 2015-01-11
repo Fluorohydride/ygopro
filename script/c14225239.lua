@@ -1,4 +1,4 @@
---E·HERO セイラーマン
+--E・HERO セイラーマン
 function c14225239.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

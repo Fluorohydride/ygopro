@@ -1,4 +1,4 @@
---ポセイドン·ウェーブ
+--ポセイドン・ウェーブ
 function c25642998.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -29,7 +29,7 @@ function c25642998.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c25642998.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsAttackable() and Duel.NegateAttack() then
+	if tc:IsRelateToEffect(e) and Duel.NegateAttack() then
 		local dam=Duel.GetMatchingGroupCount(c25642998.dfilter,tp,LOCATION_MZONE,0,nil)*800
 		if dam>0 then
 			Duel.Damage(1-tp,dam,REASON_EFFECT)

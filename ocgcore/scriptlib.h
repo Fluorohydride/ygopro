@@ -210,7 +210,8 @@ public:
 	static int32 card_check_unique_onfield(lua_State *L);
 	static int32 card_reset_negate_effect(lua_State *L);
 	static int32 card_assume_prop(lua_State *L);
-
+	static int32 card_set_spsummon_once(lua_State *L);
+	
 	//Effect functions
 	static int32 effect_new(lua_State *L);
 	static int32 effect_newex(lua_State *L);
@@ -466,9 +467,7 @@ public:
 	static int32 duel_is_player_can_spsummon(lua_State *L);
 	static int32 duel_is_player_can_flipsummon(lua_State *L);
 	static int32 duel_is_player_can_spsummon_monster(lua_State *L);
-	static int32 duel_is_player_can_summon_count(lua_State *L);
 	static int32 duel_is_player_can_spsummon_count(lua_State *L);
-	static int32 duel_is_player_can_flipsummon_count(lua_State *L);
 	static int32 duel_is_player_can_release(lua_State *L);
 	static int32 duel_is_player_can_remove(lua_State *L);
 	static int32 duel_is_player_can_send_to_hand(lua_State *L);

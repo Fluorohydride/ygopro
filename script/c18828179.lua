@@ -1,4 +1,4 @@
---マザー·ブレイン
+--マザー・ブレイン
 function c18828179.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
