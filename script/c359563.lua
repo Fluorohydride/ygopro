@@ -16,7 +16,7 @@ function c359563.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c359563.filter(c,e,tp)
-	return c:IsFaceup() and c:IsControler(1-tp) and (not e or c:IsRelateToEffect(e))
+	return c:IsFaceup() and c:GetSummonPlayer()==1-tp and (not e or c:IsRelateToEffect(e))
 end
 function c359563.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
