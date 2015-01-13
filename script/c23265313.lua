@@ -12,12 +12,22 @@ function c23265313.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,e:GetHandler()) end
 	Duel.DiscardHand(tp,Card.IsDiscardable,1,1,REASON_COST+REASON_DISCARD)
 end
+
+function c23265313.filter(c)
+	return c:IsLevelAbove(2)
+end
+
 function c23265313.activate(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_UPDATE_LEVEL)
-	e1:SetTargetRange(LOCATION_HAND,0)
-	e1:SetValue(-2)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	local g=Duel.GetMatchingGroup(c23265313.filter,tp,LOCATION_HAND,0,nil)
+	local tc=g:GetFirst()
+	while tc do
+		local e4=Effect.CreateEffect(e:GetHandler())
+		e4:SetType(EFFECT_TYPE_SINGLE)
+		e4:SetCode(EFFECT_UPDATE_LEVEL)
+		e4:SetValue(-2)
+		e4:SetTargetRange(LOCATION_MZONE+LOCATION_HAND,0)
+		e4:SetReset(RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e4)
+		tc=g:GetNext()
+	end
 end
