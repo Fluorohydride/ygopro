@@ -53,13 +53,9 @@ function c21435914.atop(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e3:SetLabelObject(e1)
-	e3:SetOperation(c21435914.rst)
+	e3:SetOperation(aux.atrst)
 	e3:SetReset(RESET_PHASE+PHASE_BATTLE)
 	Duel.RegisterEffect(e3,tp)
-end
-function c21435914.rst(e,tp,eg,ep,ev,re,r,rp)
-	local e1=e:GetLabelObject()
-	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
 function c21435914.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

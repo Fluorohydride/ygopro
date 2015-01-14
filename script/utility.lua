@@ -947,3 +947,7 @@ function Auxiliary.disfilter1(c)
 	return (c:IsFaceup() and not c:IsDisabled() and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0))
 		or c:IsType(TYPE_TRAPMONSTER)
 end
+function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
+	local e1=e:GetLabelObject()
+	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
+end

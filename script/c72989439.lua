@@ -92,11 +92,7 @@ function c72989439.atop(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
 	e2:SetLabelObject(e1)
-	e2:SetOperation(c72989439.rst)
+	e2:SetOperation(aux.atrst)
 	e2:SetReset(RESET_PHASE+PHASE_BATTLE)
 	Duel.RegisterEffect(e2,tp)
-end
-function c72989439.rst(e,tp,eg,ep,ev,re,r,rp)
-	local e1=e:GetLabelObject()
-	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
