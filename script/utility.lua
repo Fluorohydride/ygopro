@@ -948,6 +948,13 @@ function Auxiliary.disfilter1(c)
 		or c:IsType(TYPE_TRAPMONSTER)
 end
 function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
+	--reset of chain attack
 	local e1=e:GetLabelObject()
 	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
+end
+function Auxiliary.bdcon1(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING + to_grave
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
