@@ -61,7 +61,7 @@ function c81146288.disop(e,tp,eg,ep,ev,re,r,rp)
 			local e3=Effect.CreateEffect(c)
 			e3:SetType(EFFECT_TYPE_SINGLE)
 			e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
-			e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,2)
+			e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 			tc:RegisterEffect(e3)
 		end
 		tc=g:GetNext()

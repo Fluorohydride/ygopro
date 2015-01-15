@@ -17,7 +17,7 @@
 
 int32 field::field_used_count[32] = {0, 1, 1, 2, 1, 2, 2, 3, 1, 2, 2, 3, 2, 3, 3, 4, 1, 2, 2, 3, 2, 3, 3, 4, 2, 3, 3, 4, 3, 4, 4, 5};
 
-bool chain::chain_operation_sort(chain c1, chain c2) {
+bool chain::chain_operation_sort(const chain& c1, const chain& c2) {
 	return c1.triggering_effect->id < c2.triggering_effect->id;
 }
 bool tevent::operator< (const tevent& v) const {
@@ -34,7 +34,6 @@ field::field(duel* pduel) {
 	for (int i = 0; i < 2; ++i) {
 		cost[i].count = 0;
 		cost[i].amount = 0;
-		cost[i].lpstack[i] = 0;
 		core.hint_timing[i] = 0;
 		player[i].lp = 8000;
 		player[i].start_count = 5;

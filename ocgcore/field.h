@@ -61,7 +61,7 @@ struct chain {
 	tevent evt;
 	opmap opinfos;
 	uint32 flag;
-	static bool chain_operation_sort(chain c1, chain c2);
+	static bool chain_operation_sort(const chain& c1, const chain& c2);
 };
 
 struct player_info {
