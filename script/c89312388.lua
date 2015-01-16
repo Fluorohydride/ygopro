@@ -55,6 +55,7 @@ function c89312388.cosoperation(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 end
 function c89312388.rstop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local e1=e:GetLabelObject()
 	e1:Reset()
 	Duel.HintSelection(Group.FromCards(c))
