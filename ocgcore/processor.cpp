@@ -3484,6 +3484,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->q_cache.defence = dd;
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			pd = core.attack_target->current.controler;
+			if(pa == pd){
+				core.attacker->set_status(STATUS_SELF_BATTLE, TRUE);
+				core.attack_target->set_status(STATUS_SELF_BATTLE, TRUE);
+			}
 			if(core.attack_target->is_position(POS_ATTACK)) {
 				d = da;
 				if(a > d) {
@@ -3673,7 +3677,7 @@ int32 field::process_battle_command(uint16 step) {
 			break_effect();
 		}
 		core.damage_calculated = TRUE;
-		if(core.effect_damage_step && core.current_chain.size() <= 1)
+		if(core.effect_damage_step)
 			return TRUE;
 		return FALSE;
 	}
@@ -3785,7 +3789,7 @@ int32 field::process_battle_command(uint16 step) {
 		//raise_event((card*)0, EVENT_BATTLE_END, 0, 0, PLAYER_NONE, 0, 0);
 		//process_single_event();
 		//process_instant_event();
-		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
+		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
 			//add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
 			core.units.begin()->arg1 = 1;
 		} else {
@@ -3805,7 +3809,7 @@ int32 field::process_battle_command(uint16 step) {
 			process_single_event();
 			process_instant_event();
 		}
-		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
+		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
 			if(core.new_fchain.size() || core.new_ochain.size())
 				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		} else {
@@ -3857,9 +3861,12 @@ int32 field::process_battle_command(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		if(core.attack_target)
+		core.attacker->set_status(STATUS_SELF_BATTLE, FALSE);
+		if(core.attack_target){
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		if(!core.effect_damage_step || ((core.effect_damage_step != 3) && (core.current_chain.size() <= 1))) {
+			core.attack_target->set_status(STATUS_SELF_BATTLE, FALSE);
+		}
+		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		} else {
 			break_effect();
@@ -3952,7 +3959,7 @@ int32 field::process_damage_step(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		add_process(PROCESSOR_BATTLE_COMMAND, 26, 0, 0, 0, 0);
-		if(core.current_chain.size() > 1 || core.units.begin()->arg2) {	//skip timing
+		if(core.units.begin()->arg2) {	//skip timing
 			core.units.begin()->step = 2;
 			core.effect_damage_step = 3;
 			add_process(PROCESSOR_BATTLE_COMMAND, 27, 0, 0, 0, 0);

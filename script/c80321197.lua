@@ -8,7 +8,7 @@ function c80321197.initial_effect(c)
 	e1:SetDescription(aux.Stringid(80321197,0))
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCondition(aux.bdcon1)
+	e1:SetCondition(aux.bdogcon)
 	e1:SetOperation(c80321197.spop)
 	c:RegisterEffect(e1)
 end

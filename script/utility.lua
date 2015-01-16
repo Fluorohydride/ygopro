@@ -952,9 +952,25 @@ function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
 	local e1=e:GetLabelObject()
 	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
-function Auxiliary.bdcon1(e,tp,eg,ep,ev,re,r,rp)
+function Auxiliary.bdcon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING
+	local c=e:GetHandler()
+	return c:IsRelateToBattle()
+end
+function Auxiliary.bdocon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING + opponent monster
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and not c:IsStatus(STATUS_SELF_BATTLE)
+end
+function Auxiliary.bdgcon(e,tp,eg,ep,ev,re,r,rp)
 	--condition of EVENT_BATTLE_DESTROYING + to_grave
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+end
+function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and not c:IsStatus(STATUS_SELF_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end

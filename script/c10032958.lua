@@ -58,7 +58,7 @@ function c10032958.reg(c,opt)
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetCode(EVENT_BATTLE_DESTROYING)
-		e1:SetCondition(c10032958.damcon)
+		e1:SetCondition(aux.bdgcon)
 		e1:SetTarget(c10032958.damtg)
 		e1:SetOperation(c10032958.damop)
 		e1:SetReset(RESET_EVENT+0x1ff0000)
@@ -72,11 +72,6 @@ function c10032958.atcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c10032958.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChainAttack()
-end
-function c10032958.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c10032958.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
