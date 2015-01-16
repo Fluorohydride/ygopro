@@ -77,10 +77,12 @@ end
 function c72989439.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:GetFlagEffect(72989439)==0 and c:IsChainAttackable()
+	return bc and bc:IsStatus(STATUS_BATTLE_DESTROYED) and c:GetFlagEffect(72989439)==0 
+		and c:IsChainAttackable() and not c:IsHasEffect(EFFECT_EXTRA_ATTACK) and not c:IsStatus(STATUS_SELF_BATTLE)
 end
 function c72989439.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToBattle() then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
