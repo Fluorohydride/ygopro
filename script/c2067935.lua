@@ -56,6 +56,7 @@ function c2067935.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetDescription(aux.Stringid(89312388,1))
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE+PHASE_END)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 		e2:SetCountLimit(1)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
@@ -67,6 +68,8 @@ end
 function c2067935.rstop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=e:GetLabelObject()
 	e1:Reset()
+	Duel.HintSelection(Group.FromCards(c))
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c2067935.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetBattledGroupCount()>0
