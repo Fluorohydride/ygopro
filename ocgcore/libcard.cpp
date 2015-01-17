@@ -1414,12 +1414,12 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	if(lua_gettop(L) > 2)
 		monsteronly = lua_toboolean(L, 3);
 	card* attacker = pduel->game_field->core.attacker;
-	if(pduel->game_field->core.effect_damage_step
-	        || attacker->is_status(STATUS_BATTLE_DESTROYED)
+	if(attacker->is_status(STATUS_BATTLE_DESTROYED)
 			|| attacker->current.controler != pduel->game_field->infos.turn_player
-	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
-	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
-	        || (ac != 0 && attacker->announce_count >= ac)) {
+			|| attacker->fieldid_r != pduel->game_field->core.pre_field[0]
+			|| !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
+			|| (ac != 0 && attacker->announce_count >= ac)
+			|| (ac == 2 && attacker->is_affected_by_effect(EFFECT_EXTRA_ATTACK))) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}

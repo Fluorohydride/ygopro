@@ -960,7 +960,7 @@ end
 function Auxiliary.bdocon(e,tp,eg,ep,ev,re,r,rp)
 	--condition of EVENT_BATTLE_DESTROYING + opponent monster
 	local c=e:GetHandler()
-	return c:IsRelateToBattle() and not c:IsStatus(STATUS_SELF_BATTLE)
+	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE)
 end
 function Auxiliary.bdgcon(e,tp,eg,ep,ev,re,r,rp)
 	--condition of EVENT_BATTLE_DESTROYING + to_grave
@@ -972,5 +972,5 @@ function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 	--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and not c:IsStatus(STATUS_SELF_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end

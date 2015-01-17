@@ -32,8 +32,7 @@ end
 function c21435914.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) 
-		and c:IsChainAttackable(2,true) and not c:IsHasEffect(EFFECT_EXTRA_ATTACK) and not c:IsStatus(STATUS_SELF_BATTLE)
+	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) and c:IsChainAttackable(2,true) and c:IsStatus(STATUS_OPPO_BATTLE)
 end
 function c21435914.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

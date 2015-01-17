@@ -105,13 +105,6 @@ function c35884610.atop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(1)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
 	tc:RegisterEffect(e1)
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-	e2:SetLabelObject(e1)
-	e2:SetOperation(aux.atrst)
-	e2:SetReset(RESET_PHASE+PHASE_BATTLE)
-	Duel.RegisterEffect(e2,tp)
 end
 function c35884610.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

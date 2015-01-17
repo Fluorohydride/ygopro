@@ -3484,9 +3484,9 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->q_cache.defence = dd;
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			pd = core.attack_target->current.controler;
-			if(pa == pd){
-				core.attacker->set_status(STATUS_SELF_BATTLE, TRUE);
-				core.attack_target->set_status(STATUS_SELF_BATTLE, TRUE);
+			if(pa != pd){
+				core.attacker->set_status(STATUS_OPPO_BATTLE, TRUE);
+				core.attack_target->set_status(STATUS_OPPO_BATTLE, TRUE);
 			}
 			if(core.attack_target->is_position(POS_ATTACK)) {
 				d = da;
@@ -3861,10 +3861,10 @@ int32 field::process_battle_command(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-		core.attacker->set_status(STATUS_SELF_BATTLE, FALSE);
+		core.attacker->set_status(STATUS_OPPO_BATTLE, FALSE);
 		if(core.attack_target){
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
-			core.attack_target->set_status(STATUS_SELF_BATTLE, FALSE);
+			core.attack_target->set_status(STATUS_OPPO_BATTLE, FALSE);
 		}
 		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
