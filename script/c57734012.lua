@@ -64,6 +64,7 @@ function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc2=g2:GetFirst()
 		if tc2 then
 			Duel.Overlay(tc2,g1)
+			tc2:SetMaterial(g1)
 			Duel.SpecialSummon(tc2,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 			tc2:CompleteProcedure()
 		end
