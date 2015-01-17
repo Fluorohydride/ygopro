@@ -8,9 +8,9 @@ function c35330871.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetValue(c35330871.splimit)
 	c:RegisterEffect(e1)
-	--atk down
+	--atk & def down
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_ATKCHANGE)
+	e2:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_MZONE)
