@@ -4695,10 +4695,10 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 		return FALSE;
 	}
 	case 3: {
-		/*effect* peffect = cait->triggering_effect;
+		effect* peffect = cait->triggering_effect;
 		if(core.units.begin()->peffect) {
 			peffect->operation = (ptr)core.units.begin()->peffect;
-			if(cait->opinfos.count(0x200)) {
+			/*if(cait->opinfos.count(0x200)) {
 				set_spsummon_counter(cait->triggering_player,false);
 				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
 					auto& optarget = cait->opinfos[0x200];
@@ -4711,8 +4711,9 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 						}
 					}
 				}
-			}
-		} else {
+			}*/
+		}
+		/*else {
 			if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
 				set_spsummon_counter(cait->triggering_player, false);
 		}*/
