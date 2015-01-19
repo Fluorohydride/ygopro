@@ -26,10 +26,10 @@ function c27383110.filter(c,e,tp,m)
 	if cd~=44665365 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
 	if m:IsContains(c) then
 		m:RemoveCard(c)
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetOriginalLevel(),1,99,c)
 		m:AddCard(c)
 	else
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetOriginalLevel(),1,99,c)
 	end
 	return result
 end
@@ -48,7 +48,7 @@ function c27383110.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc=tg:GetFirst()
 		mg:RemoveCard(tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
+		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetOriginalLevel(),1,99,tc)
 		tc:SetMaterial(mat)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()
