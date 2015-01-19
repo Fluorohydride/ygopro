@@ -24,7 +24,7 @@ function c29401950.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c29401950.filter(c,tp,ep)
-	return c:IsFaceup() and c:GetAttack()>=1500
+	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:GetAttack()>=1500
 		and ep~=tp and c:IsDestructable() and c:IsAbleToRemove()
 end
 function c29401950.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -41,7 +41,7 @@ function c29401950.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c29401950.filter2(c,tp)
-	return c:IsFaceup() and c:GetAttack()>=1500 and c:GetSummonPlayer()~=tp
+	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and c:GetAttack()>=1500 and c:GetSummonPlayer()~=tp
 		and c:IsDestructable() and c:IsAbleToRemove()
 end
 function c29401950.target2(e,tp,eg,ep,ev,re,r,rp,chk)
