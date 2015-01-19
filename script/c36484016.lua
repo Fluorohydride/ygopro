@@ -26,7 +26,7 @@ end
 function c36484016.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x101) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
-		and (not c:IsCode(17412721) or m:IsExists(Card.IsType,1,nil,TYPE_SYNCHRO))
+		and (not c:GetOriginalCode()==17412721 or m:IsExists(Card.IsType,1,nil,TYPE_SYNCHRO))
 end
 function c36484016.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -66,11 +66,21 @@ function c36484016.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tg=sg:Select(tp,1,1,nil)
 		local tc=tg:GetFirst()
 		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
-			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
-			tc:SetMaterial(mat1)
-			Duel.Remove(mat1,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
-			Duel.BreakEffect()
-			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+			if tc:GetOriginalCode()==17412721 then
+				local nmat1=mg1:FilterSelect(tp,Card.IsType,1,1,nil,TYPE_SYNCHRO)
+				mg1:RemoveCard(nmat1:GetFirst())
+				local nmat2=Duel.SelectFusionMaterial(tp,tc,mg1,nmat1:GetFirst(),chkf)
+				nmat2:Merge(nmat1)
+				Duel.Remove(nmat2,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+				Duel.BreakEffect()
+				Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+			else
+				local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
+				tc:SetMaterial(mat1)
+				Duel.Remove(mat1,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
+				Duel.BreakEffect()
+				Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
+			end
 		else
 			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
 			local fop=ce:GetOperation()
