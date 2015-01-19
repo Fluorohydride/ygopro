@@ -65,7 +65,7 @@ function c53334471.getattribute(g)
 	return aat
 end
 function c53334471.rmfilter(c,at)
-	return not c:GetAttribute()~=at
+	return c:GetAttribute()==at
 end
 function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()

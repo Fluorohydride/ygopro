@@ -286,7 +286,17 @@ function Auxiliary.FConditionCode2(code1,code2,sub,insf)
 	--chkf: check field, default:PLAYER_NONE
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return g:IsExists(Auxiliary.FConditionFilter21,1,nil,code1,code2) end
+				if gc then
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						return g:IsExists(Auxiliary.FConditionFilter21,1,gc,code1,code2)
+					elseif gc:IsCode(code1) then
+						return g:IsExists(Card.IsCode,1,gc,code2)
+					elseif gc:IsCode(code2) then
+						return g:IsExists(Card.IsCode,1,gc,code1)
+					else
+						return false
+					end
+				end
 				local b1=0 local b2=0 local bs=0
 				local f1=false local f2=false local fs=false
 				local tc=g:GetFirst()
@@ -310,8 +320,15 @@ end
 function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
+					local g1=nil
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g1=eg:FilterSelect(tp,Auxiliary.FConditionFilter21,1,1,nil,code1,code2)
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						g1=eg:FilterSelect(tp,Auxiliary.FConditionFilter21,1,1,gc,code1,code2)
+					elseif gc:IsCode(code1) then
+						g1=eg:FilterSelect(tp,Card.IsCode,1,1,gc,code2)
+					else
+						g1=eg:FilterSelect(tp,Card.IsCode,1,1,gc,code1)
+					end
 					Duel.SetFusionMaterial(g1)
 					return
 				end
@@ -366,7 +383,16 @@ function Auxiliary.FConditionCode3(code1,code2,code3,sub,insf)
 						end
 						tc=g:GetNext()
 					end
-					return b1+b2+b3>1
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						return b1+b2+b3>1
+					else
+						local code=gc:GetCode()
+						if code==code1 then b1=1
+						elseif code==code2 then b2=1
+						elseif code==code3 then b3=1
+						end
+						return b1+b2+b3>2
+					end
 				end
 				local b1=0 local b2=0 local b3=0 local bs=0
 				local f1=false local f2=false local f3=false local fs=false
@@ -394,7 +420,10 @@ end
 function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					local sg=eg:Filter(Auxiliary.FConditionFilter31,nil,code1,code2,code3)
+					local sg=eg:Filter(Auxiliary.FConditionFilter31,gc,code1,code2,code3)
+					if not gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						sg:Remove(Card.IsCode,nil,gc:GetCode())
+					end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,1,1,nil)
 					sg:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
@@ -462,7 +491,17 @@ function Auxiliary.FConditionCode4(code1,code2,code3,code4,sub,insf)
 						end
 						tc=g:GetNext()
 					end
-					return b1+b2+b3+b4>2
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						return b1+b2+b3+b4>2
+					else
+						local code=gc:GetCode()
+						if code==code1 then b1=1
+						elseif code==code2 then b2=1
+						elseif code==code3 then b3=1
+						elseif code==code4 then b4=1
+						end
+						return b1+b2+b3+b4>3
+					end
 				end
 				local b1=0 local b2=0 local b3=0 local b4=0 local bs=0
 				local f1=false local f2=false local f3=false local f4=false local fs=false
@@ -492,7 +531,10 @@ end
 function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					local sg=eg:Filter(Auxiliary.FConditionFilter41,nil,code1,code2,code3,code4)
+					local sg=eg:Filter(Auxiliary.FConditionFilter41,gc,code1,code2,code3,code4)
+					if not gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						sg:Remove(Card.IsCode,nil,gc:GetCode())
+					end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,1,1,nil)
 					sg:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
