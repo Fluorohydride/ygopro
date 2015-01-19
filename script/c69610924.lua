@@ -1,4 +1,4 @@
---No.17 リバイス·ドラゴン
+--No.17 リバイス・ドラゴン
 function c69610924.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,3,2)

@@ -1,4 +1,4 @@
---ダーク·アームド·ドラゴン
+--ダーク・アームド・ドラゴン
 function c65192027.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

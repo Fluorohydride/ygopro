@@ -1,4 +1,4 @@
---エクスプローシブ·マジシャン
+--エクスプローシブ・マジシャン
 function c33413279.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_SPELLCASTER),1)

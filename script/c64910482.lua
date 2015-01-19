@@ -1,4 +1,4 @@
---TG サイバー·マジシャン
+--TG サイバー・マジシャン
 function c64910482.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)

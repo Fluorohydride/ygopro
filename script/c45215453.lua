@@ -1,4 +1,4 @@
---ヴァイロン·デルタ
+--ヴァイロン・デルタ
 function c45215453.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsAttribute,ATTRIBUTE_LIGHT),1)

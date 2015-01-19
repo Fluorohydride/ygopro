@@ -1,4 +1,4 @@
---超弩級砲塔列車グスタフ·マックス
+--超弩級砲塔列車グスタフ・マックス
 function c56910167.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,10,2)

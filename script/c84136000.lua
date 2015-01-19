@@ -31,7 +31,7 @@ function c84136000.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
 	local g2=Duel.SelectTarget(1-tp,c84136000.spfilter,1-tp,LOCATION_GRAVE,0,1,1,nil,e,1-tp)
 	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,PLAYER_ALL,g1:GetFirst():GetOwner())
 end
 function c84136000.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)

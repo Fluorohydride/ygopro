@@ -1,4 +1,4 @@
---サイバー·ツイン·ドラゴン
+--サイバー・ツイン・ドラゴン
 function c74157028.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

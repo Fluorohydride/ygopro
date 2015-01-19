@@ -1,4 +1,4 @@
---A·O·J サンダー·アーマー
+--A・O・J サンダー・アーマー
 function c71438011.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

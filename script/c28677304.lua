@@ -1,4 +1,4 @@
---E·HERO ブラック·ネオス
+--E・HERO ブラック・ネオス
 function c28677304.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

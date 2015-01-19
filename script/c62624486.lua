@@ -1,4 +1,4 @@
---M·HERO ダイアン
+--M・HERO ダイアン
 function c62624486.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon condition

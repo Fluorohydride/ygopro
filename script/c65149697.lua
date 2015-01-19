@@ -1,4 +1,4 @@
---レアル·ジェネクス·クラッシャー
+--レアル・ジェネクス・クラッシャー
 function c65149697.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---E·HERO ネクロダークマン
+--E・HERO ネクロダークマン
 function c89252153.initial_effect(c)
 	--summon with no tribute
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---リバース·オブ·ネオス
+--リバース・オブ・ネオス
 function c18302224.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

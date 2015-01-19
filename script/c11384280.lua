@@ -1,4 +1,4 @@
---キャノン·ソルジャー
+--キャノン・ソルジャー
 function c11384280.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

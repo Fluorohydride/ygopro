@@ -1,4 +1,4 @@
---ウィングド·ライノ
+--ウィングド・ライノ
 function c18430390.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

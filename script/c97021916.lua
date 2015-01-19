@@ -1,4 +1,4 @@
---ダーク·リゾネーター
+--ダーク・リゾネーター
 function c97021916.initial_effect(c)
 	--battle indes
 	local e1=Effect.CreateEffect(c)

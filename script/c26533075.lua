@@ -1,4 +1,4 @@
---セキュリティー·ボール
+--セキュリティー・ボール
 function c26533075.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

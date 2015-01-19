@@ -1,4 +1,4 @@
---スペシャル·デュアル·サモン
+--スペシャル・デュアル・サモン
 function c26120084.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

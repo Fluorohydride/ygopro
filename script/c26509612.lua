@@ -1,4 +1,4 @@
---アース·グラビティ
+--アース・グラビティ
 function c26509612.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

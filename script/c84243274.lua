@@ -1,4 +1,4 @@
---VWXYZ－ドラゴン·カタパルトキャノン
+--VWXYZ－ドラゴン・カタパルトキャノン
 function c84243274.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

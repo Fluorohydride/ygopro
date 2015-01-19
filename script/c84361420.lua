@@ -1,4 +1,4 @@
---エッジ·ハンマー
+--エッジ・ハンマー
 function c84361420.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---デルタ·クロウ－アンチ·リバース
+--デルタ・クロウ－アンチ・リバース
 function c59839761.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

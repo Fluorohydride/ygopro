@@ -1,4 +1,4 @@
---レアメタル·ヴァルキリー
+--レアメタル・ヴァルキリー
 function c75923050.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

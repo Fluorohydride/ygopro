@@ -1,4 +1,4 @@
---宝玉獣 コバルト·イーグル
+--宝玉獣 コバルト・イーグル
 function c21698716.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---コアキメイル·デビル
+--コアキメイル・デビル
 function c80925836.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

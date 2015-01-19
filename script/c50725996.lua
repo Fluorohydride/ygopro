@@ -1,4 +1,4 @@
---ブラック·マジシャンズ·ナイト
+--ブラック・マジシャンズ・ナイト
 function c50725996.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon limit

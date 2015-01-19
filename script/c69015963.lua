@@ -1,4 +1,4 @@
---デビル·フランケン
+--デビル・フランケン
 function c69015963.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

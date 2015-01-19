@@ -1,4 +1,4 @@
---デステニー·ドロー
+--デステニー・ドロー
 function c45809008.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

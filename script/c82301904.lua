@@ -60,11 +60,15 @@ function c82301904.sgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
+function c82301904.damfilter(c,p)
+	return c:GetOwner()==p and c:IsAbleToGrave()
+end
 function c82301904.sgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetFieldGroup(tp,0xe,0xe)
+	local dc=g:FilterCount(c82301904.damfilter,nil,1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,g:GetCount(),0,0)
-	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,g:GetCount()*300)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,0,0,1-tp,dc*300)
 end
 function c82301904.sgfilter(c,p)
 	return c:IsLocation(LOCATION_GRAVE) and c:IsControler(p)

@@ -1,4 +1,4 @@
---リチュア·アビス
+--リチュア・アビス
 function c67111213.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

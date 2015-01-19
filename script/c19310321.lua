@@ -1,4 +1,4 @@
---紋章獣ツインヘッド·イーグル
+--紋章獣ツインヘッド・イーグル
 function c19310321.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

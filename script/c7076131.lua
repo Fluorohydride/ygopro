@@ -1,4 +1,4 @@
---ロスト·ネクスト
+--ロスト・ネクスト
 function c7076131.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

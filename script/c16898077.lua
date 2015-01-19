@@ -1,4 +1,4 @@
---ジャイアント·ボマー·エアレイド
+--ジャイアント・ボマー・エアレイド
 function c16898077.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

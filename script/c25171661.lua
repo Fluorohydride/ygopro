@@ -1,4 +1,4 @@
---インフェルニティ·ドワーフ
+--インフェルニティ・ドワーフ
 function c25171661.initial_effect(c)
 	--pierce
 	local e1=Effect.CreateEffect(c)

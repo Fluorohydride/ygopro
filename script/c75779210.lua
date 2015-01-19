@@ -1,4 +1,4 @@
---ヴァイロン·エプシロン
+--ヴァイロン・エプシロン
 function c75779210.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),aux.NonTuner(nil),1)

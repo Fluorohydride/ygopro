@@ -1,4 +1,4 @@
---トライアングル·X·スパーク
+--トライアングル・X・スパーク
 function c12181376.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

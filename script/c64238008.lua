@@ -10,34 +10,14 @@ function c64238008.initial_effect(c)
 	e1:SetTarget(c64238008.target)
 	e1:SetOperation(c64238008.activate)
 	c:RegisterEffect(e1)
-	if not c64238008.global_check then
-		c64238008.global_check=true
-		c64238008[0]=true
-		c64238008[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_CHAINING)
-		ge1:SetOperation(c64238008.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c64238008.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(64238008,ACTIVITY_CHAIN,c64238008.chainfilter)
 end
-function c64238008.checkop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) then
-		c64238008[rp]=false
-	end
-end
-function c64238008.clear(e,tp,eg,ep,ev,re,r,rp)
-	c64238008[0]=true
-	c64238008[1]=true
+function c64238008.chainfilter(re,tp,cid)
+	return not (re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL))
 end
 function c64238008.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)
-	if chk==0 then return c64238008[tp] and Duel.CheckReleaseGroup(tp,nil,1,nil) end
+	if chk==0 then return Duel.GetCustomActivityCount(64238008,tp,ACTIVITY_CHAIN)==0 and Duel.CheckReleaseGroup(tp,nil,1,nil) end
 	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
 	local atk=g:GetFirst():GetTextAttack()/2
 	if atk<0 then atk=0 end

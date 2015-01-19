@@ -1,4 +1,4 @@
---デッド·ガードナー
+--デッド・ガードナー
 function c59965151.initial_effect(c)
 	--change battle target
 	local e1=Effect.CreateEffect(c)

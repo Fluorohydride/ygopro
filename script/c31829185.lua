@@ -1,4 +1,4 @@
---ダーク·ネクロフィア
+--ダーク・ネクロフィア
 function c31829185.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

@@ -26,6 +26,7 @@ end
 function c36484016.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x101) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
+		and (not c:IsCode(17412721) or m:IsExists(Card.IsType,1,nil,TYPE_SYNCHRO))
 end
 function c36484016.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then

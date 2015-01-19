@@ -110,6 +110,7 @@ public:
 	uint32 unique_code;
 	uint32 spsummon_code;
 	uint16 spsummon_counter[2];
+	uint16 spsummon_counter_rst[2];
 	uint8 assume_type;
 	uint32 assume_value;
 	effect* unique_effect;
@@ -133,7 +134,7 @@ public:
 	effect_relation relate_effect;
 	effect_set_v immune_effect;
 
-	card();
+	explicit card(duel* pd);
 	~card();
 	static bool card_operation_sort(card* c1, card* c2);
 
@@ -202,7 +203,7 @@ public:
 	void filter_disable_related_cards();
 	int32 filter_summon_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count, uint8 min_tribute);
 	int32 filter_set_procedure(uint8 playerid, effect_set* eset, uint8 ignore_count, uint8 min_tribute);
-	void filter_spsummon_procedure(uint8 playerid, effect_set* eset);
+	void filter_spsummon_procedure(uint8 playerid, effect_set* eset, uint32 summon_type);
 	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
 	effect* is_affected_by_effect(int32 code, card* target);
@@ -218,7 +219,7 @@ public:
 	int32 get_summon_tribute_count();
 	int32 get_set_tribute_count();
 	int32 is_can_be_flip_summoned(uint8 playerid);
-	int32 is_special_summonable(uint8 playerid);
+	int32 is_special_summonable(uint8 playerid, uint32 summon_type);
 	int32 is_can_be_special_summoned(effect* reason_effect, uint32 sumtype, uint8 sumpos, uint8 sumplayer, uint8 toplayer, uint8 nocheck, uint8 nolimit);
 	int32 is_setable_mzone(uint8 playerid, uint8 ignore_count, effect* peffect, uint8 min_tribute);
 	int32 is_setable_szone(uint8 playerid, uint8 ignore_fd = 0);
@@ -397,6 +398,7 @@ public:
 #define STATUS_CONTINUOUS_POS		0x2000000
 #define STATUS_IS_PUBLIC			0x4000000
 #define STATUS_ACT_FROM_HAND		0x8000000
+#define STATUS_OPPO_BATTLE			0x10000000
 //Counter
 #define COUNTER_NEED_PERMIT		0x1000
 #define COUNTER_NEED_ENABLE		0x2000

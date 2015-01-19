@@ -112,7 +112,7 @@ int32 scriptlib::duel_get_flag_effect(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	effect_set eset;
 	pduel->game_field->filter_player_effect(playerid, code, &eset);
-	lua_pushinteger(L, eset.count);
+	lua_pushinteger(L, eset.size());
 	return 1;
 }
 int32 scriptlib::duel_reset_flag_effect(lua_State *L) {
@@ -233,7 +233,7 @@ int32 scriptlib::duel_special_summon_rule(lua_State *L) {
 		return 0;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	duel * pduel = pcard->pduel;
-	pduel->game_field->special_summon_rule(playerid, pcard);
+	pduel->game_field->special_summon_rule(playerid, pcard, 0);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_synchro_summon(lua_State *L) {
@@ -259,7 +259,7 @@ int32 scriptlib::duel_synchro_summon(lua_State *L) {
 	duel * pduel = pcard->pduel;
 	pduel->game_field->core.limit_tuner = tuner;
 	pduel->game_field->core.limit_syn = mg;
-	pduel->game_field->special_summon_rule(playerid, pcard);
+	pduel->game_field->special_summon_rule(playerid, pcard, SUMMON_TYPE_SYNCHRO);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_xyz_summon(lua_State *L) {
@@ -277,7 +277,7 @@ int32 scriptlib::duel_xyz_summon(lua_State *L) {
 	}
 	duel * pduel = pcard->pduel;
 	pduel->game_field->core.limit_xyz = materials;
-	pduel->game_field->special_summon_rule(playerid, pcard);
+	pduel->game_field->special_summon_rule(playerid, pcard, SUMMON_TYPE_XYZ);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_setm(lua_State *L) {
@@ -450,8 +450,7 @@ int32 scriptlib::duel_sendto_deck(lua_State *L) {
 }
 int32 scriptlib::duel_get_operated_group(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
-	group* pgroup = pduel->new_group();
-	pgroup->container = pduel->game_field->core.operated_set;
+	group* pgroup = pduel->new_group(pduel->game_field->core.operated_set);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -624,7 +623,7 @@ int32 scriptlib::duel_get_chain_material(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	effect_set eset;
 	pduel->game_field->filter_player_effect(playerid, EFFECT_CHAIN_MATERIAL, &eset);
-	if(!eset.count)
+	if(!eset.size())
 		return 0;
 	interpreter::effect2value(L, eset[0]);
 	return 1;
@@ -813,7 +812,7 @@ int32 scriptlib::duel_get_environment(lua_State *L) {
 		pcard = pduel->game_field->player[1].list_szone[5];
 	if(pcard == 0 || pcard->is_position(POS_FACEDOWN) || !pcard->get_status(STATUS_EFFECT_ENABLED)) {
 		pduel->game_field->filter_field_effect(EFFECT_CHANGE_ENVIRONMENT, &eset);
-		if(eset.count) {
+		if(eset.size()) {
 			effect* peffect = eset.get_last();
 			code = peffect->get_value();
 			p = peffect->get_handler_player();
@@ -851,7 +850,7 @@ int32 scriptlib::duel_is_environment(lua_State *L) {
 	if(!fc) {
 		effect_set eset;
 		pduel->game_field->filter_field_effect(EFFECT_CHANGE_ENVIRONMENT, &eset);
-		if(eset.count) {
+		if(eset.size()) {
 			effect* peffect = eset.get_last();
 			if(code == (uint32)peffect->get_value() && (playerid == peffect->get_handler_player() || playerid == PLAYER_ALL))
 				ret = 1;
@@ -1046,10 +1045,8 @@ int32 scriptlib::duel_discard_hand(lua_State *L) {
 	uint32 max = lua_tointeger(L, 4);
 	uint32 reason = lua_tointeger(L, 5);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, playerid, LOCATION_HAND, 0, pgroup, pexception, extraargs);
-	for(field::card_set::iterator cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
-		pduel->game_field->core.select_cards.push_back(*cit);
+	pduel->game_field->core.select_cards.assign(pgroup->container.begin(), pgroup->container.end());
 	if(pduel->game_field->core.select_cards.size() == 0) {
 		lua_pushinteger(L, 0);
 		return 1;
@@ -1738,10 +1735,8 @@ int32 scriptlib::duel_select_matching_cards(lua_State *L) {
 	uint32 min = lua_tointeger(L, 6);
 	uint32 max = lua_tointeger(L, 7);
 	group* pgroup = pduel->new_group();
-	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, (uint8)self, location1, location2, pgroup, pexception, extraargs);
-	for(field::card_set::iterator cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
-		pduel->game_field->core.select_cards.push_back(*cit);
+	pduel->game_field->core.select_cards.assign(pgroup->container.begin(), pgroup->container.end());
 	pduel->game_field->add_process(PROCESSOR_SELECT_CARD_S, 0, 0, 0, playerid, min + (max << 16));
 	return lua_yield(L, 0);
 }
@@ -2015,10 +2010,8 @@ int32 scriptlib::duel_select_target(lua_State *L) {
 	if(pduel->game_field->core.current_chain.size() == 0)
 		return 0;
 	group* pgroup = pduel->new_group();
-	pduel->game_field->core.select_cards.clear();
 	pduel->game_field->filter_matching_card(2, (uint8)self, location1, location2, pgroup, pexception, extraargs, 0, 0, TRUE);
-	for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit)
-		pduel->game_field->core.select_cards.push_back(*cit);
+	pduel->game_field->core.select_cards.assign(pgroup->container.begin(), pgroup->container.end());
 	pduel->game_field->add_process(PROCESSOR_SELECT_TARGET, 0, 0, 0, playerid, min + (max << 16));
 	return lua_yield(L, 0);
 }
@@ -2156,7 +2149,7 @@ int32 scriptlib::duel_check_tuner_material(lua_State *L) {
 	if(pduel->game_field->core.global_flag & GLOBALFLAG_MUST_BE_SMATERIAL) {
 		effect_set eset;
 		pduel->game_field->filter_player_effect(pcard->current.controler, EFFECT_MUST_BE_SMATERIAL, &eset);
-		if(eset.count && eset[0]->handler != tuner) {
+		if(eset.size() && eset[0]->handler != tuner) {
 			lua_pushboolean(L, false);
 			return 1;
 		}
@@ -2317,13 +2310,11 @@ int32 scriptlib::duel_set_operation_info(lua_State *L) {
 	if( ct && !pduel->game_field->core.current_chain.size())
 		return 0;
 	if(pgroup) {
-		pg = pduel->new_group();
+		pg = pduel->new_group(pgroup->container);
 		pg->is_readonly = TRUE;
-		pg->container = pgroup->container;
 	} else if(pcard) {
-		pg = pduel->new_group();
+		pg = pduel->new_group(pcard);
 		pg->is_readonly = TRUE;
-		pg->container.insert(pcard);
 	} else
 		pg = 0;
 	optarget opt;
@@ -2453,7 +2444,6 @@ int32 scriptlib::duel_select_xyz_material(lua_State *L) {
 	uint32 lv = lua_tointeger(L, 4);
 	uint32 minc = lua_tointeger(L, 5);
 	uint32 maxc = lua_tointeger(L, 6);
-	field::card_set mat, cset;
 	duel* pduel = scard->pduel;
 	pduel->game_field->get_xyz_material(scard, findex, lv, maxc);
 	scard->pduel->game_field->add_process(PROCESSOR_SELECT_XMATERIAL, 0, 0, (group*)scard, playerid + (lv << 16), minc + (maxc << 16));
@@ -2541,6 +2531,8 @@ int32 scriptlib::duel_hint(lua_State * L) {
 	if(playerid != 0 && playerid != 1)
 		return 0;
 	int32 desc = lua_tointeger(L, 3);
+	if(htype == HINT_OPSELECTED)
+		playerid = 1 - playerid;
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->write_buffer8(MSG_HINT);
 	pduel->write_buffer8(htype);
@@ -3138,7 +3130,7 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 val = 0;
 	switch(activity_type) {
-		case 1:{
+		case 1: {
 			auto iter = pduel->game_field->core.summon_counter.find(counter_id);
 			if(iter != pduel->game_field->core.summon_counter.end())
 				val = iter->second.second;
@@ -3202,7 +3194,7 @@ int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	pcard->filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
 	pcard->filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
 	pcard->filter_effect(EFFECT_SET_ATTACK_FINAL, &eset);
-	for (int32 i = 0; i < eset.count; ++i) {
+	for (int32 i = 0; i < eset.size(); ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_ATTACK: {
 			if (eset[i]->type & EFFECT_TYPE_SINGLE && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))

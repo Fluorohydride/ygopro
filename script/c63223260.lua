@@ -1,4 +1,4 @@
---フォトン·サテライト
+--フォトン・サテライト
 function c63223260.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

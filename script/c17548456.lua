@@ -1,4 +1,4 @@
---ジュラック·メテオ
+--ジュラック・メテオ
 function c17548456.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0x22),aux.NonTuner(Card.IsRace,RACE_DINOSAUR),2)

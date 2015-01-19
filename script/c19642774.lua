@@ -1,4 +1,4 @@
---フルール·シンクロン
+--フルール・シンクロン
 function c19642774.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

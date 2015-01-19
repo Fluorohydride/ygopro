@@ -1,4 +1,4 @@
---ヴェルズ·バハムート
+--ヴェルズ・バハムート
 function c36757171.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsSetCard,0xa),4,2)

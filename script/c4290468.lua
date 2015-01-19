@@ -1,4 +1,4 @@
---スプレンディッド·ローズ
+--スプレンディッド・ローズ
 function c4290468.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

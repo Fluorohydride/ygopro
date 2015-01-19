@@ -1,4 +1,4 @@
---ディフェンダーズ·クロス
+--ディフェンダーズ・クロス
 function c71417170.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

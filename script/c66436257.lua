@@ -1,4 +1,4 @@
---ヴォルカニック·カウンター
+--ヴォルカニック・カウンター
 function c66436257.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

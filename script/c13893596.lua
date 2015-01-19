@@ -42,8 +42,7 @@ function c13893596.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c13893596.cfilter(c)
-	if c:IsType(TYPE_SYNCHRO+TYPE_FUSION+TYPE_XYZ) then return not c:IsAbleToExtraAsCost()
-	else return not c:IsAbleToDeckAsCost() end
+	return not c:IsAbleToDeckOrExtraAsCost()
 end
 function c13893596.spcon(e,c)
 	if c==nil then return true end

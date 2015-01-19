@@ -1112,7 +1112,7 @@ bool ClientField::check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::
 	int m = (op2 > 0 && op1 > op2) ? op2 : op1;
 	if (m >= min && m <= max)
 		return true;
-	index++;
+	++index;
 	return (min > m && check_min(left, index, min - m, max - m))
 	        || check_min(left, index, min, max);
 }
@@ -1158,7 +1158,7 @@ bool ClientField::check_sum(std::set<ClientCard*>& testlist, std::set<ClientCard
 	int l2 = l >> 16;
 	if ((l1 == acc || (l2 > 0 && l2 == acc)) && (count + 1 >= select_min) && (count + 1 <= select_max))
 		return true;
-	index++;
+	++index;
 	return (acc > l1 && check_sum(testlist, index, acc - l1, count + 1))
 	       || (l2 > 0 && acc > l2 && check_sum(testlist, index, acc - l2, count + 1))
 	       || check_sum(testlist, index, acc, count);

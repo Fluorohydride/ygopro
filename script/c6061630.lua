@@ -1,4 +1,4 @@
---マジカル·コンダクター
+--マジカル・コンダクター
 function c6061630.initial_effect(c)
 	c:EnableCounterPermit(0x3001)
 	--add counter

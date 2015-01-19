@@ -1,4 +1,4 @@
---E－HERO ライトニング·ゴーレム
+--E－HERO ライトニング・ゴーレム
 function c21947653.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

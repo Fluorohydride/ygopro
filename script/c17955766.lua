@@ -1,4 +1,4 @@
---N·アクア·ドルフィン
+--N・アクア・ドルフィン
 function c17955766.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ワーム·オペラ
+--ワーム・オペラ
 function c28465301.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

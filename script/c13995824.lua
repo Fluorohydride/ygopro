@@ -1,4 +1,4 @@
---ボルテック·バイコーン
+--ボルテック・バイコーン
 function c13995824.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_BEAST),aux.NonTuner(nil),1)

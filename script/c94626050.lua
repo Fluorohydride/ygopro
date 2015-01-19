@@ -1,4 +1,4 @@
---フィッシュ·レイン
+--フィッシュ・レイン
 function c94626050.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

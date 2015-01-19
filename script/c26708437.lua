@@ -1,4 +1,4 @@
---エクシーズ·リボーン
+--エクシーズ・リボーン
 function c26708437.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

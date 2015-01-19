@@ -1,4 +1,4 @@
---プリベント·スター
+--プリベント・スター
 function c94303232.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

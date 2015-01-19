@@ -1,4 +1,4 @@
---フェザー·ウィンド
+--フェザー・ウィンド
 function c71060915.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

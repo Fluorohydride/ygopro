@@ -1,4 +1,4 @@
---N·グロー·モス
+--N・グロー・モス
 function c17732278.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

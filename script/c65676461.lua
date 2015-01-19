@@ -20,8 +20,8 @@ c65676461.xyz_number=32
 function c65676461.atcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return c==Duel.GetAttacker() and c:IsChainAttackable()
-		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
+	return c==Duel.GetAttacker() and c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) 
+		and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c65676461.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

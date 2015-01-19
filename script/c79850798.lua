@@ -56,9 +56,10 @@ function c79850798.initial_effect(c)
 end
 function c79850798.spcon(e,c)
 	if c==nil then return true end
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
-		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD,0,nil)==0
-		and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	local tp=c:GetControler()
+	return Duel.GetActivityCount(tp,ACTIVITY_BATTLE_PHASE)==0
+		and Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 end
 function c79850798.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local e1=Effect.CreateEffect(c)

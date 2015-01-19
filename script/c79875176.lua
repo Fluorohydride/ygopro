@@ -1,4 +1,4 @@
---トゥーン·キャノン·ソルジャー
+--トゥーン・キャノン・ソルジャー
 function c79875176.initial_effect(c)
 	--cannot attack
 	local e1=Effect.CreateEffect(c)

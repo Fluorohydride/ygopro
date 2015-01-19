@@ -1,4 +1,4 @@
---エンド·オブ·ザ·ワールド
+--エンド・オブ・ザ・ワールド
 function c8198712.initial_effect(c)
 	aux.AddRitualProcEqual(c,c8198712.ritual_filter)
 end

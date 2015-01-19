@@ -1,4 +1,4 @@
---No.91 サンダー·スパーク·ドラゴン
+--No.91 サンダー・スパーク・ドラゴン
 function c84417082.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,4,3)

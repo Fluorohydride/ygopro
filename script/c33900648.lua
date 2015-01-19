@@ -1,4 +1,4 @@
---クリアー·ワールド
+--クリアー・ワールド
 function c33900648.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

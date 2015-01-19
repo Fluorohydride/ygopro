@@ -1,4 +1,4 @@
---コアキメイル·ロック
+--コアキメイル・ロック
 function c6320631.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

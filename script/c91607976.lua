@@ -1,4 +1,4 @@
---D·クロックン
+--D・クロックン
 function c91607976.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

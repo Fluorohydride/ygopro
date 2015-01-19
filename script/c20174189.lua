@@ -1,4 +1,4 @@
---ナチュル·バンブーシュート
+--ナチュル・バンブーシュート
 function c20174189.initial_effect(c)
 	--mat check
 	local e1=Effect.CreateEffect(c)

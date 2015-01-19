@@ -1,4 +1,4 @@
---ゼロ·ガードナー
+--ゼロ・ガードナー
 function c93816465.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

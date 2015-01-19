@@ -39,7 +39,7 @@ function c5795980.cfilter(c,e,dg)
 	return dg:GetCount()-a>=1
 end
 function c5795980.tgfilter(c,e)
-	return c:IsFaceup() and c:IsCanBeEffectTarget(e)
+	return aux.disfilter1(c) and c:IsCanBeEffectTarget(e)
 end
 function c5795980.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c5795980.tgfilter(chkc,e) and chkc~=e:GetHandler() end
@@ -70,7 +70,7 @@ end
 function c5795980.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc:IsRelateToEffect(e) and ((tc:IsFaceup() and not tc:IsDisabled()) or tc:IsType(TYPE_TRAPMONSTER)) then
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

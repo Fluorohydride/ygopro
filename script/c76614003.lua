@@ -1,4 +1,4 @@
---ダーク·リペアラー
+--ダーク・リペアラー
 function c76614003.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76614003,0))

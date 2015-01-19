@@ -1,4 +1,4 @@
---G·B·ハンター
+--G・B・ハンター
 function c4130270.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)

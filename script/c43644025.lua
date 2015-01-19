@@ -1,4 +1,4 @@
---コクーン·リボーン
+--コクーン・リボーン
 function c43644025.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

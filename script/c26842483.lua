@@ -1,4 +1,4 @@
---ジャスティス·ブリンガー
+--ジャスティス・ブリンガー
 function c26842483.initial_effect(c)
 	--negate
 	local e1=Effect.CreateEffect(c)

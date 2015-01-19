@@ -1,4 +1,4 @@
---サイキック·ブロッカー
+--サイキック・ブロッカー
 function c29417188.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

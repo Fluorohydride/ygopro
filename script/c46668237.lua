@@ -1,4 +1,4 @@
---森の番人グリーン·バブーン
+--森の番人グリーン・バブーン
 function c46668237.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

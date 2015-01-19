@@ -1,4 +1,4 @@
---ソーラー·エクスチェンジ
+--ソーラー・エクスチェンジ
 function c691925.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

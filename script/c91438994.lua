@@ -1,4 +1,4 @@
---A·ジェネクス·ベルフレイム
+--A・ジェネクス・ベルフレイム
 function c91438994.initial_effect(c)
 	--add counter
 	local e1=Effect.CreateEffect(c)

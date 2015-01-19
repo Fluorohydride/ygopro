@@ -1,4 +1,4 @@
---E·HERO クノスペ
+--E・HERO クノスペ
 function c62107981.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

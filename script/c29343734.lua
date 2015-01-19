@@ -1,4 +1,4 @@
---E·HERO エリクシーラー
+--E・HERO エリクシーラー
 function c29343734.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

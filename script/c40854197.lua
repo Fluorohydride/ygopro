@@ -1,4 +1,4 @@
---E·HERO アブソルートZero
+--E・HERO アブソルートZero
 function c40854197.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

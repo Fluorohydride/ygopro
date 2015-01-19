@@ -14,9 +14,10 @@
 bool effect_sort_id(const effect* e1, const effect* e2) {
 	return e1->id < e2->id;
 };
-effect::effect() {
+effect::effect(duel* pd) {
 	scrtype = 3;
 	ref_handle = 0;
+	pduel = pd;
 	owner = 0;
 	handler = 0;
 	description = 0;
@@ -185,7 +186,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 				int32 available = false;
 				effect_set eset;
 				handler->filter_effect(ecode, &eset);
-				for(int32 i = 0; i < eset.count; ++i) {
+				for(int32 i = 0; i < eset.size(); ++i) {
 					if(eset[i]->check_count_limit(playerid)) {
 						available = true;
 						break;
@@ -249,7 +250,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 int32 effect::is_action_check(uint8 playerid) {
 	effect_set eset;
 	pduel->game_field->filter_player_effect(playerid, EFFECT_CANNOT_ACTIVATE, &eset);
-	for(int i = 0; i < eset.count; ++i) {
+	for(int i = 0; i < eset.size(); ++i) {
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		if(eset[i]->check_value_condition(2))
@@ -257,7 +258,7 @@ int32 effect::is_action_check(uint8 playerid) {
 	}
 	eset.clear();
 	pduel->game_field->filter_player_effect(playerid, EFFECT_ACTIVATE_COST, &eset);
-	for(int i = 0; i < eset.count; ++i) {
+	for(int i = 0; i < eset.size(); ++i) {
 		pduel->lua->add_param(eset[i], PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
@@ -350,8 +351,7 @@ int32 effect::is_activate_check(uint8 playerid, const tevent& e, int32 neglect_c
 	uint8 op = pduel->game_field->core.reason_player;
 	pduel->game_field->core.reason_effect = this;
 	pduel->game_field->core.reason_player = playerid;
-	int32 result = TRUE;
-	result = is_activate_ready(playerid, e, neglect_cond, neglect_cost, neglect_target);
+	int32 result = is_activate_ready(playerid, e, neglect_cond, neglect_cost, neglect_target);
 	pduel->game_field->core.reason_effect = oreason;
 	pduel->game_field->core.reason_player = op;
 	pduel->game_field->restore_lp_cost();

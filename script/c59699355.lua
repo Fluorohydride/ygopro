@@ -1,4 +1,4 @@
---スクラップ·カウンター
+--スクラップ・カウンター
 function c59699355.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

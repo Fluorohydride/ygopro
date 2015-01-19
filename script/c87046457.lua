@@ -1,4 +1,4 @@
---オーバー·デッド·ライン
+--オーバー・デッド・ライン
 function c87046457.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

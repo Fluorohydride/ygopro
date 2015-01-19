@@ -1,4 +1,4 @@
---レッド·デーモンズ·ドラゴン
+--レッド・デーモンズ・ドラゴン
 function c70902743.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

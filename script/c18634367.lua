@@ -1,4 +1,4 @@
---スクリーン·オブ·レッド
+--スクリーン・オブ・レッド
 function c18634367.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

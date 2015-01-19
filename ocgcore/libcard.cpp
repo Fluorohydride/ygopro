@@ -567,8 +567,7 @@ int32 scriptlib::card_get_material(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container.insert(pcard->material_cards.begin(), pcard->material_cards.end());
+	group* pgroup = pcard->pduel->new_group(pcard->material_cards);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -583,8 +582,7 @@ int32 scriptlib::card_get_equip_group(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container.insert(pcard->equiping_cards.begin(), pcard->equiping_cards.end());
+	group* pgroup = pcard->pduel->new_group(pcard->equiping_cards);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -758,8 +756,7 @@ int32 scriptlib::card_get_card_target(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container = pcard->effect_target_cards;
+	group* pgroup = pcard->pduel->new_group(pcard->effect_target_cards);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -801,8 +798,7 @@ int32 scriptlib::card_get_owner_target(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = pcard->pduel->new_group();
-	pgroup->container = pcard->effect_target_owner;
+	group* pgroup = pcard->pduel->new_group(pcard->effect_target_owner);
 	interpreter::group2value(L, pgroup);
 	return 1;
 }
@@ -905,7 +901,7 @@ int32 scriptlib::card_get_effect_count(lua_State *L) {
 	uint32 code = lua_tointeger(L, 2);
 	effect_set eset;
 	pcard->filter_effect(code, &eset);
-	lua_pushinteger(L, eset.count);
+	lua_pushinteger(L, eset.size());
 	return 1;
 }
 int32 scriptlib::card_register_flag_effect(lua_State *L) {
@@ -1154,7 +1150,7 @@ int32 scriptlib::card_is_special_summonable(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 p = pcard->pduel->game_field->core.reason_player;
-	lua_pushboolean(L, pcard->is_special_summonable(p));
+	lua_pushboolean(L, pcard->is_special_summonable(p, 0));
 	return 1;
 }
 int32 scriptlib::card_is_synchro_summonable(lua_State *L) {
@@ -1178,7 +1174,7 @@ int32 scriptlib::card_is_synchro_summonable(lua_State *L) {
 	uint32 p = pcard->pduel->game_field->core.reason_player;
 	pcard->pduel->game_field->core.limit_tuner = tuner;
 	pcard->pduel->game_field->core.limit_syn = mg;
-	lua_pushboolean(L, pcard->is_special_summonable(p));
+	lua_pushboolean(L, pcard->is_special_summonable(p, SUMMON_TYPE_SYNCHRO));
 	return 1;
 }
 int32 scriptlib::card_is_xyz_summonable(lua_State *L) {
@@ -1194,7 +1190,7 @@ int32 scriptlib::card_is_xyz_summonable(lua_State *L) {
 	}
 	uint32 p = pcard->pduel->game_field->core.reason_player;
 	pcard->pduel->game_field->core.limit_xyz = materials;
-	lua_pushboolean(L, pcard->is_special_summonable(p));
+	lua_pushboolean(L, pcard->is_special_summonable(p, SUMMON_TYPE_XYZ));
 	return 1;
 }
 int32 scriptlib::card_is_can_be_summoned(lua_State *L) {
@@ -1418,12 +1414,12 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	if(lua_gettop(L) > 2)
 		monsteronly = lua_toboolean(L, 3);
 	card* attacker = pduel->game_field->core.attacker;
-	if(pduel->game_field->core.effect_damage_step
-	        || attacker->is_status(STATUS_BATTLE_DESTROYED)
+	if(attacker->is_status(STATUS_BATTLE_DESTROYED)
 			|| attacker->current.controler != pduel->game_field->infos.turn_player
-	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
-	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
-	        || (ac != 0 && attacker->announce_count >= ac)) {
+			|| attacker->fieldid_r != pduel->game_field->core.pre_field[0]
+			|| !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
+			|| (ac != 0 && attacker->announce_count >= ac)
+			|| (ac == 2 && attacker->is_affected_by_effect(EFFECT_EXTRA_ATTACK))) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}

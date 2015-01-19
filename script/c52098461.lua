@@ -1,4 +1,4 @@
---ラス·オブ·ネオス
+--ラス・オブ・ネオス
 function c52098461.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

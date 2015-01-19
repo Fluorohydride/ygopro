@@ -1,4 +1,4 @@
---シンクロ·イジェクション
+--シンクロ・イジェクション
 function c75105429.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ジェムナイト·プリズムオーラ
+--ジェムナイト・プリズムオーラ
 function c93379652.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

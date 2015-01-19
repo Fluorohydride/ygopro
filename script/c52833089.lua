@@ -1,4 +1,4 @@
---ブラック·サンダー
+--ブラック・サンダー
 function c52833089.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

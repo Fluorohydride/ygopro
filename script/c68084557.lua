@@ -1,4 +1,4 @@
---機械竜 パワー·ツール
+--機械竜 パワー・ツール
 function c68084557.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

@@ -1,4 +1,4 @@
---F·G·D
+--F・G・D
 function c99267150.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

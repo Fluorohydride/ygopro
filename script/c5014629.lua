@@ -1,4 +1,4 @@
---潜航母艦エアロ·シャーク
+--潜航母艦エアロ・シャーク
 function c5014629.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,nil,3,2)

@@ -1,4 +1,4 @@
---ガスタ·グリフ
+--ガスタ・グリフ
 function c42082363.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

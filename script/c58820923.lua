@@ -65,10 +65,14 @@ function c58820923.rmop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_REMOVE)
 		local sg=g:Select(1-tp,3,3,nil)
 		Duel.Remove(sg,POS_FACEUP,REASON_EFFECT)
+	else
+		local cg=Duel.GetFieldGroup(1-tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(1-tp)
 	end
 end
 function c58820923.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c58820923.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

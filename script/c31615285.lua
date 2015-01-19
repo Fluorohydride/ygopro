@@ -1,4 +1,4 @@
---サボウ·クローザー
+--サボウ・クローザー
 function c31615285.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

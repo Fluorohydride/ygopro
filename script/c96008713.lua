@@ -1,4 +1,4 @@
---マジックアーム·シールド
+--マジックアーム・シールド
 function c96008713.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -27,13 +27,14 @@ function c96008713.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c96008713.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
+	local a=Duel.GetAttacker()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		if not Duel.GetControl(tc,tp,PHASE_BATTLE,1) then
 			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 				Duel.Destroy(tc,REASON_EFFECT)
 			end
-		else
-			Duel.ChangeAttackTarget(tc)
+		elseif a:IsAttackable() and not a:IsImmuneToEffect(e) then
+			Duel.CalculateDamage(a,tc)
 		end
 	end
 end

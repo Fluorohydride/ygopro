@@ -1,4 +1,4 @@
---C·モーグ
+--C・モーグ
 function c42239546.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

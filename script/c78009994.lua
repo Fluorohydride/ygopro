@@ -1,4 +1,4 @@
---ドラゴニック·ガード
+--ドラゴニック・ガード
 function c78009994.initial_effect(c)
 	--add counter
 	local e1=Effect.CreateEffect(c)

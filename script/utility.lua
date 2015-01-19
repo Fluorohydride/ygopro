@@ -218,7 +218,7 @@ function Auxiliary.XyzCondition2(f,lv,minc,maxc,alterf,desc,op)
 				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
-				if ct<1 and Duel.IsExistingMatchingCard(Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,nil,alterf,c)
+				if ct<1 and not og and Duel.IsExistingMatchingCard(Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,nil,alterf,c)
 					and (not op or op(e,tp,0)) then
 					return true
 				end
@@ -939,5 +939,38 @@ function Auxiliary.PendOperation()
 					local g=Duel.SelectMatchingCard(tp,Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
 					sg:Merge(g)
 				end
+				local pg=Group.FromCards(c,rpz)
+				Duel.HintSelection(pg)
 			end
+end
+function Auxiliary.disfilter1(c)
+	return c:IsFaceup() and not c:IsDisabled() 
+		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0)
+end
+function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
+	--reset of chain attack
+	local e1=e:GetLabelObject()
+	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
+end
+function Auxiliary.bdcon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING
+	local c=e:GetHandler()
+	return c:IsRelateToBattle()
+end
+function Auxiliary.bdocon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING + opponent monster
+	local c=e:GetHandler()
+	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE)
+end
+function Auxiliary.bdgcon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING + to_grave
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+end
+function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
+	--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end

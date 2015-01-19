@@ -1,4 +1,4 @@
---レアル·ジェネクス·オラクル
+--レアル・ジェネクス・オラクル
 function c10178757.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

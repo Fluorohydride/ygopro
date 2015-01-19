@@ -1,4 +1,4 @@
---凛天使クイーン·オブ·ローズ
+--凛天使クイーン・オブ・ローズ
 function c96470883.initial_effect(c)
 	--summon with 1 tribute
 	local e1=Effect.CreateEffect(c)

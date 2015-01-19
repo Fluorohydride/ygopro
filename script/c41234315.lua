@@ -1,4 +1,4 @@
---フェイク·エクスプロージョン·ペンタ
+--フェイク・エクスプロージョン・ペンタ
 function c41234315.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

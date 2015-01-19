@@ -20,8 +20,8 @@ function c97750534.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c97750534.spcon(e,c)
-	if c==nil then return true end
-	return Duel.IsEnvironment(56433456) and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	if c==nil then return Duel.IsEnvironment(56433456) end
+	return Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c97750534.filter(c)
 	return c:IsSetCard(0x44) and c:IsAbleToGrave()

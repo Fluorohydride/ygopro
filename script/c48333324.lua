@@ -28,9 +28,6 @@ function c48333324.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c48333324.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
 end
-function c48333324.negfilter(c)
-	return c:IsFaceup() and (c:IsLocation(LOCATION_SZONE) or c:IsType(TYPE_EFFECT))
-end
 function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
 	local c=e:GetHandler()
@@ -47,23 +44,32 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
-	end
-	g=Duel.GetMatchingGroup(c48333324.negfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,sc)
-	tc=g:GetFirst()
-	if tc then
-		Duel.BreakEffect()
-	end
-	while tc do
-		local e1=Effect.CreateEffect(c)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(c)
-		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_DISABLE_EFFECT)
-		e2:SetReset(RESET_EVENT+0x1fe0000)
-		tc:RegisterEffect(e2)
-		tc=g:GetNext()
+		local g1=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,sc)
+		g1:RemoveCard(c)
+		if g1:GetFirst() then
+			Duel.BreakEffect()
+		end
+		local ng=g1:Filter(aux.disfilter1,nil)
+		local nc=ng:GetFirst()
+		while nc do
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT+0x1fe0000)
+			nc:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			e2:SetReset(RESET_EVENT+0x1fe0000)
+			nc:RegisterEffect(e2)
+			if nc:IsType(TYPE_TRAPMONSTER) then
+				local e3=Effect.CreateEffect(c)
+				e3:SetType(EFFECT_TYPE_SINGLE)
+				e3:SetCode(EFFECT_DISABLE_TRAPMONSTER)
+				e3:SetReset(RESET_EVENT+0x1fe0000)
+				nc:RegisterEffect(e3)
+			end
+			nc=ng:GetNext()
+		end
 	end
 end

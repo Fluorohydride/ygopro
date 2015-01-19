@@ -18,8 +18,7 @@ function c8339504.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c8339504.cfilter(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsFaceup()
-		and Duel.IsExistingMatchingCard(c8339504.spfilter,tp,LOCATION_EXTRA,0,1,nil,rk,c:GetRace(),c:GetAttribute(),c:GetCode(),e,tp)
+	return rk>0 and Duel.IsExistingMatchingCard(c8339504.spfilter,tp,LOCATION_EXTRA,0,1,nil,rk,c:GetRace(),c:GetAttribute(),c:GetCode(),e,tp)
 end
 function c8339504.spfilter(c,rk,rc,att,code,e,tp)
 	return c:GetRank()==rk and c:IsRace(rc) and c:IsAttribute(att) and not c:IsCode(code)
@@ -42,9 +41,8 @@ function c8339504.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c8339504.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetRank(),tc:GetRace(),tc:GetAttribute(),tc:GetCode(),e,tp)
+	local g=Duel.SelectMatchingCard(tp,c8339504.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetPreviousRankOnField(),tc:GetPreviousRaceOnField(),tc:GetPreviousAttributeOnField(),tc:GetPreviousCodeOnField(),e,tp)
 	local sc=g:GetFirst()
 	if sc then
 		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
@@ -54,6 +52,7 @@ function c8339504.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)

@@ -1,4 +1,4 @@
---ガスタ·イグル
+--ガスタ・イグル
 function c91662792.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

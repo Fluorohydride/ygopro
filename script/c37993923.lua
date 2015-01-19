@@ -1,4 +1,4 @@
---ジャンク·ガードナー
+--ジャンク・ガードナー
 function c37993923.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,c37993923.tfilter,aux.NonTuner(nil),1)

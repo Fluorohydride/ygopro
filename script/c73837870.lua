@@ -1,4 +1,4 @@
---サニー·ピクシー
+--サニー・ピクシー
 function c73837870.initial_effect(c)
 	--lp rec
 	local e1=Effect.CreateEffect(c)

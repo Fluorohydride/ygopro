@@ -1,4 +1,4 @@
---宝玉獣 エメラルド·タートル
+--宝玉獣 エメラルド・タートル
 function c68215963.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)

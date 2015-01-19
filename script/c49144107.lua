@@ -1,4 +1,4 @@
---デス·ウサギ
+--デス・ウサギ
 function c49144107.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

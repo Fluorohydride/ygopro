@@ -1,4 +1,4 @@
---究極完全態·グレート·モス
+--究極完全態・グレート・モス
 function c48579379.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

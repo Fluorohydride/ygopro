@@ -1,4 +1,4 @@
---エーリアン·ヒュプノ
+--エーリアン・ヒュプノ
 function c38468214.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--add counter

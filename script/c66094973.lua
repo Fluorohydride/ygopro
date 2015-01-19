@@ -1,4 +1,4 @@
---トランスフォーム·スフィア
+--トランスフォーム・スフィア
 function c66094973.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -42,7 +42,8 @@ public:
 	coroutine_map coroutines;
 	int32 no_action;
 	int32 call_depth;
-	interpreter(duel* pd);
+
+	explicit interpreter(duel* pd);
 	~interpreter();
 
 	int32 register_card(card *pcard);

@@ -14,7 +14,9 @@ function c39454112.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c39454112.diceop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.SelectYesNo(tp,aux.Stringid(39454112,0)) then
+	local cc=Duel.GetCurrentChain()
+	local cid=Duel.GetChainInfo(cc,CHAININFO_CHAIN_ID)
+	if c39454112[0]~=cid and Duel.SelectYesNo(tp,aux.Stringid(39454112,0)) then
 		Duel.Hint(HINT_CARD,0,39454112)
 		local dc={Duel.GetDiceResult()}
 		local ac=1
@@ -27,5 +29,6 @@ function c39454112.diceop(e,tp,eg,ep,ev,re,r,rp)
 		if dc[ac]==1 or dc[ac]==3 or dc[ac]==5 then dc[ac]=6
 		else dc[ac]=1 end
 		Duel.SetDiceResult(table.unpack(dc))
+		c39454112[0]=cid
 	end
 end

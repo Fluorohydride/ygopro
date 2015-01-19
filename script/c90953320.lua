@@ -1,4 +1,4 @@
---TG ハイパー·ライブラリアン
+--TG ハイパー・ライブラリアン
 function c90953320.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

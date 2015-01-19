@@ -1,4 +1,4 @@
---ジェムナイト·フュージョン
+--ジェムナイト・フュージョン
 function c1264319.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

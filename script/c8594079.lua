@@ -1,4 +1,4 @@
---ジュラック·ブラキス
+--ジュラック・ブラキス
 function c8594079.initial_effect(c)
 	--battle indestructable
 	local e2=Effect.CreateEffect(c)

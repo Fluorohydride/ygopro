@@ -1,4 +1,4 @@
---ダイガスタ·イグルス
+--ダイガスタ・イグルス
 function c10755984.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsSetCard,0x10),1)

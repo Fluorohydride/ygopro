@@ -1,4 +1,4 @@
---ブレイン·クラッシャー
+--ブレイン・クラッシャー
 function c81919143.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(81919143,0))

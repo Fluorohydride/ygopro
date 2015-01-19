@@ -1,4 +1,4 @@
---コアキメイル·サンドマン
+--コアキメイル・サンドマン
 function c49680980.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

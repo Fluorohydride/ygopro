@@ -1,4 +1,4 @@
---トゥーン·ブラック·マジシャン·ガール
+--トゥーン・ブラック・マジシャン・ガール
 function c90960358.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

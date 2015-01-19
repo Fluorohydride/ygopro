@@ -1,4 +1,4 @@
---YZ－キャタピラー·ドラゴン
+--YZ－キャタピラー・ドラゴン
 function c25119460.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

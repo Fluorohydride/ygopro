@@ -1,4 +1,4 @@
---万力魔神バイサー·デス
+--万力魔神バイサー・デス
 function c56043446.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

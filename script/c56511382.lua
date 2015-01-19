@@ -1,4 +1,4 @@
---A·ジェネクス·ボルキャノン
+--A・ジェネクス・ボルキャノン
 function c56511382.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

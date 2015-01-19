@@ -1,4 +1,4 @@
---インフェルノ·ハンマー
+--インフェルノ・ハンマー
 function c17185260.initial_effect(c)
 	--pos
 	local e1=Effect.CreateEffect(c)
@@ -7,15 +7,10 @@ function c17185260.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
-	e1:SetCondition(c17185260.poscon)
+	e1:SetCondition(aux.bdogcon)
 	e1:SetTarget(c17185260.postg)
 	e1:SetOperation(c17185260.posop)
 	c:RegisterEffect(e1)
-end
-function c17185260.poscon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and c:IsFaceup() and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
 end
 function c17185260.filter(c)
 	return c:IsFaceup() and c:IsCanTurnSet()

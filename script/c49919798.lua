@@ -30,7 +30,7 @@ function c49919798.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c49919798.thfilter(c)
-	return c:IsSetCard(0x66) and not c:IsCode(49919798) and c:IsAbleToHand()
+	return c:IsSetCard(0x1066) and not c:IsCode(49919798) and c:IsAbleToHand()
 end
 function c49919798.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c49919798.thfilter,tp,LOCATION_DECK,0,1,nil) end
@@ -49,7 +49,7 @@ function c49919798.cpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RegisterFlagEffect(49919798,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c49919798.cpfilter(c)
-	return c:IsFaceup() and c:IsSetCard(0x66) and not c:IsCode(49919798)
+	return c:IsFaceup() and c:IsSetCard(0x1066) and not c:IsCode(49919798)
 end
 function c49919798.cptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE+LOCATION_GRAVE) and c49919798.cpfilter(chkc) end
@@ -77,7 +77,7 @@ function c49919798.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c49919798.spfilter(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x66) and not c:IsCode(49919798) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsFaceup() and c:IsSetCard(0x1066) and not c:IsCode(49919798) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c49919798.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c49919798.spfilter(chkc,e,tp) end

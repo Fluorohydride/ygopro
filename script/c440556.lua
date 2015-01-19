@@ -1,4 +1,4 @@
---バハムート·シャーク
+--バハムート・シャーク
 function c440556.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_WATER),4,2)

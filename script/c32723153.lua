@@ -1,4 +1,4 @@
---マジカル·エクスプロージョン
+--マジカル・エクスプロージョン
 function c32723153.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

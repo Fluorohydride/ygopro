@@ -1,4 +1,4 @@
---マシンナーズ·ギアフレーム
+--マシンナーズ・ギアフレーム
 function c42940404.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ディメンション·マジック
+--ディメンション・マジック
 function c28553439.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

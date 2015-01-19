@@ -1,4 +1,4 @@
---宝玉獣 トパーズ·タイガー
+--宝玉獣 トパーズ・タイガー
 function c95600067.initial_effect(c)
 	--send replace
 	local e1=Effect.CreateEffect(c)

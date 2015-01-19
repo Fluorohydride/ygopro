@@ -1,4 +1,4 @@
---魔鏡導士リフレクト·バウンダー
+--魔鏡導士リフレクト・バウンダー
 function c2851070.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

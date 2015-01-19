@@ -1,4 +1,4 @@
---コアキメイル·ヴァラファール
+--コアキメイル・ヴァラファール
 function c72258771.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---フォトン·クラッシャー
+--フォトン・クラッシャー
 function c1362589.initial_effect(c)
 	--to defence
 	local e1=Effect.CreateEffect(c)

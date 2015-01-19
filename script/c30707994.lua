@@ -1,4 +1,4 @@
---マキシマム·シックス
+--マキシマム・シックス
 function c30707994.initial_effect(c)
 	--dice
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---レアメタル·ナイト
+--レアメタル・ナイト
 function c1412158.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

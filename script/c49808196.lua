@@ -1,4 +1,4 @@
---メタボ·サッカー
+--メタボ・サッカー
 function c49808196.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)

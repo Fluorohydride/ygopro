@@ -1,4 +1,4 @@
---エンシェント·シャーク ハイパー·メガロドン
+--エンシェント・シャーク ハイパー・メガロドン
 function c10532969.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

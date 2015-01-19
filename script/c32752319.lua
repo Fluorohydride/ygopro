@@ -1,4 +1,4 @@
---ユーフォロイド·ファイター
+--ユーフォロイド・ファイター
 function c32752319.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
