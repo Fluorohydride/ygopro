@@ -2193,8 +2193,6 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 		pcard->summon_player = sumplayer;
 		pcard->summon_info = (peffect->get_value(pcard) & 0xff00ffff) | SUMMON_TYPE_SPECIAL | ((uint32)pcard->current.location << 16);
 		check_card_counter(pcard, 3, sumplayer);
-		if(pcard->spsummon_code)
-			core.spsummon_once_map[sumplayer][pcard->spsummon_code]++;
 		move_to_field(pcard, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
 		return FALSE;
 	}
@@ -2215,8 +2213,15 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 	}
 	case 25: {
 		group* pgroup = core.units.begin()->ptarget;
-		card_set cset;
 		set_spsummon_counter(sumplayer);
+		std::set<uint32> spsummon_once_set;
+		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
+			if((*cit)->spsummon_code)
+				spsummon_once_set.insert((*cit)->spsummon_code);
+		}
+		for(auto cit = spsummon_once_set.begin(); cit != spsummon_once_set.end(); ++cit)
+			core.spsummon_once_map[sumplayer][*cit]++;
+		card_set cset;
 		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMONING, TRUE);
 			if(!(*cit)->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON)) {
@@ -2340,8 +2345,6 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!targets)
 			core.special_summoning.insert(target);
 		target->enable_field_effect(FALSE);
-		if(target->spsummon_code)
-			core.spsummon_once_map[target->summon_player][target->spsummon_code]++;
 		check_card_counter(target, 3, target->summon_player);
 		move_to_field(target, target->summon_player, playerid, LOCATION_MZONE, positions);
 		return FALSE;
@@ -2394,23 +2397,30 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		return FALSE;
 	}
 	case 1: {
-		bool tp = false, ntp = false;
 		if(targets->container.size() == 0) {
 			returns.ivalue[0] = 0;
 			core.operated_set.clear();
 			pduel->delete_group(targets);
 			return TRUE;
 		}
+		bool tp = false, ntp = false;
+		std::set<uint32> spsummon_once_set[2];
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			if((*cit)->summon_player == infos.turn_player)
 				tp = true;
 			else
 				ntp = true;
+			if((*cit)->spsummon_code)
+				spsummon_once_set[(*cit)->summon_player].insert((*cit)->spsummon_code);
 		}
 		if(tp)
 			set_spsummon_counter(infos.turn_player);
 		if(ntp)
 			set_spsummon_counter(1 - infos.turn_player);
+		for(auto cit = spsummon_once_set[0].begin(); cit != spsummon_once_set[0].end(); ++cit)
+			core.spsummon_once_map[0][*cit]++;
+		for(auto cit = spsummon_once_set[1].begin(); cit != spsummon_once_set[1].end(); ++cit)
+			core.spsummon_once_map[1][*cit]++;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
