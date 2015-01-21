@@ -53,7 +53,7 @@ function c56585883.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsReason(REASON_RETURN) then
 		local e1=Effect.CreateEffect(c)
-		e1:SetDescription(aux.Stringid(56585883,0))
+		e1:SetDescription(aux.Stringid(56585883,1))
 		e1:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
