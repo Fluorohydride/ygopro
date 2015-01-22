@@ -672,6 +672,6 @@ ACTIVITY_SUMMON			=1		--
 ACTIVITY_NORMALSUMMON	=2		--
 ACTIVITY_SPSUMMON		=3		--
 ACTIVITY_FLIPSUMMON		=4		--
-ACTIVITY_ATTACK			=5		-- only available in custom counter
+ACTIVITY_ATTACK			=5		--
 ACTIVITY_BATTLE_PHASE	=6		-- not available in custom counter
 ACTIVITY_CHAIN			=7		-- only available in custom counter

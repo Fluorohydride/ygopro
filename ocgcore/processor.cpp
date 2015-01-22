@@ -3065,6 +3065,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
 		core.attack_state_count[infos.turn_player]++;
+		check_card_counter(core.attacker,5,infos.turn_player);
 		pduel->write_buffer8(MSG_ATTACK);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		if(core.attack_target) {
