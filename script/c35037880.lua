@@ -13,7 +13,7 @@ function c35037880.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c35037880.cfilter(c)
-	return (c:IsFaceup()) or (c:IsPreviousLocation(LOCATION_MZONE) and c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE)) and c:IsSetCard(0x100d)
+	return ((c:IsFaceup()) or (c:IsPreviousLocation(LOCATION_MZONE) and c:IsLocation(LOCATION_GRAVE) and c:IsReason(REASON_BATTLE))) and c:IsSetCard(0x100d)
 end
 function c35037880.condition(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and Duel.IsExistingMatchingCard(c35037880.cfilter,tp,LOCATION_MZONE+LOCATION_GRAVE,0,1,nil)
