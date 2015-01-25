@@ -59,7 +59,23 @@ function c24658418.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-		local sg=g:FilterSelect(tp,xyz.xyz_filter,xyz.xyz_count,xyz.xyz_count,nil)
+		
+		local b1=g:GetCount()>=xyz.xyz_count
+		local b2=g:IsExists(aux.XyzAlterFilter,1,nil,xyz.ovfilter,xyz)
+		
+		local op=0
+		if b1 and b2 then
+			op=Duel.SelectOption(tp,aux.Stringid(24658418,2),aux.Stringid(24658418,3))+1
+		elseif b1 then
+			op=Duel.SelectOption(tp,aux.Stringid(24658418,2))+1
+		else op=Duel.SelectOption(tp,aux.Stringid(24658418,3))+2 end
+		
+		local sg=nil
+		if (op==1) then
+			sg=g:FilterSelect(tp,xyz.xyz_filter,xyz.xyz_count,xyz.xyz_count,nil)
+		else
+			sg=g:FilterSelect(tp,xyz.ovfilter,1,1,nil)
+		end
 		Duel.XyzSummon(tp,xyz,sg)
 	end
 end
