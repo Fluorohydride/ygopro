@@ -73,8 +73,8 @@ function c18175965.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c18175965.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP)>0 then
+		c:CompleteProcedure()
 	end
 end
 function c18175965.filter(c,ec)
@@ -105,7 +105,7 @@ end
 function c18175965.spop2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if Duel.DiscardHand(tp,nil,1,1,REASON_EFFECT)==0 then return end
-	if c:IsRelateToEffect(e) then
-		Duel.SpecialSummon(c,0,tp,tp,true,true,POS_FACEUP)
+	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,true,true,POS_FACEUP)>0 then
+		c:CompleteProcedure()
 	end
 end
