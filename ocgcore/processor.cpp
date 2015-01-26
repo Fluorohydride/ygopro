@@ -3811,7 +3811,6 @@ int32 field::process_battle_command(uint16 step) {
 			process_instant_event();
 		}
 		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
-			if(core.new_fchain.size() || core.new_ochain.size())
 				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		} else {
 			break_effect();
