@@ -14,9 +14,12 @@ end
 function c6260554.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsChainNegatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
 end
+function c6260554.filter(c)
+	return c:IsReleasable() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function c6260554.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(Card.IsCode,tp,LOCATION_MZONE,0,nil,31533705)
-	if chk==0 then return g:GetCount()>0 and g:FilterCount(Card.IsReleasable,nil)==g:GetCount() end
+	if chk==0 then return g:GetCount()>0 and g:FilterCount(c6260554.filter,nil)==g:GetCount() end
 	Duel.Release(g,REASON_COST)
 end
 function c6260554.target(e,tp,eg,ep,ev,re,r,rp,chk)
