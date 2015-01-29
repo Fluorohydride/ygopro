@@ -53,8 +53,8 @@ function c57734012.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,57734012)~=0 then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	if not Duel.IsPlayerCanSpecialSummonCount(tp,2) then return end
+	Duel.RegisterFlagEffect(tp,57734012,0,0,0)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not Duel.IsPlayerCanSpecialSummonCount(tp,2) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectMatchingCard(tp,c57734012.filter1,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,1,nil,e,tp)
 	local tc1=g1:GetFirst()
@@ -68,5 +68,4 @@ function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
 			tc2:CompleteProcedure()
 		end
 	end
-	Duel.RegisterFlagEffect(tp,57734012,0,EFFECT_FLAG_OATH,0)
 end
