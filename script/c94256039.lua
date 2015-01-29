@@ -5,6 +5,7 @@ function c94256039.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetOperation(c94256039.regop)
 	c:RegisterEffect(e1)
 	--add counter
 	local e2=Effect.CreateEffect(c)
@@ -24,10 +25,13 @@ function c94256039.initial_effect(c)
 	e3:SetOperation(c94256039.damop)
 	c:RegisterEffect(e3)
 end
+function c94256039.regop(e,tp,eg,ep,ev,re,r,rp)
+	e:GetHandler():RegisterFlagEffect(94256039,RESET_CHAIN,0,1)
+end
 function c94256039.acop(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_PLAYER)
 	local c=e:GetHandler()
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and c:GetFlagEffect(94256039)==0 then
 		c:AddCounter(0x3001,1)
 		if c:GetCounter(0x3001)==4 then
 			Duel.RaiseSingleEvent(c,94256039,re,0,0,p,0)
