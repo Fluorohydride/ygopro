@@ -50,9 +50,9 @@ function c57734012.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.GetFlagEffect(tp,57734012)==0 and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c57734012.filter1,tp,LOCATION_GRAVE+LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_GRAVE+LOCATION_EXTRA)
-	Duel.RegisterFlagEffect(tp,57734012,0,EFFECT_FLAG_OATH,0)
 end
 function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetFlagEffect(tp,57734012)~=0 then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	if not Duel.IsPlayerCanSpecialSummonCount(tp,2) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -68,4 +68,5 @@ function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
 			tc2:CompleteProcedure()
 		end
 	end
+	Duel.RegisterFlagEffect(tp,57734012,0,EFFECT_FLAG_OATH,0)
 end
