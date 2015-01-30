@@ -4389,7 +4389,7 @@ int32 field::add_chain(uint16 step) {
 			negeff->owner = deffect->owner;
 			negeff->type = EFFECT_TYPE_SINGLE;
 			negeff->code = EFFECT_DISABLE_CHAIN;
-			negeff->reset_flag = RESET_CHAIN | RESET_EVENT | RESET_TURN_SET;
+			negeff->reset_flag = RESET_CHAIN | RESET_EVENT | deffect->get_value();
 			phandler->add_effect(negeff);
 		}
 		peffect->card_type = peffect->handler->get_type();
