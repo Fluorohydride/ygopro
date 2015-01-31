@@ -34,7 +34,7 @@ function c45742626.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c45742626.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,5) and Duel.IsPlayerCanDiscardDeck(1-tp,5) end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,5) or Duel.IsPlayerCanDiscardDeck(1-tp,5) end
 	Duel.SetOperationInfo(0,CATEGORY_DECKDES,nil,0,PLAYER_ALL,5)
 end
 function c45742626.operation(e,tp,eg,ep,ev,re,r,rp)
