@@ -28,6 +28,7 @@ function c41517789.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c41517789.sumsuc(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetSummonType()~=SUMMON_TYPE_SYNCHRO then return end
 	Duel.SetChainLimitTillChainEnd(aux.FALSE)
 end
 function c41517789.atkop(e,tp,eg,ep,ev,re,r,rp)
