@@ -248,7 +248,7 @@ namespace base {
         virtual ~RenderObject();
         
         virtual int32_t PushVertices(VTYPE* vert_data, int16_t* index_data, int16_t count, int16_t pri_type, int16_t texid) {
-            
+            return 0;
         }
         
         virtual void UpdateVertices(VTYPE* vert_data, int16_t start_index, int16_t count) {

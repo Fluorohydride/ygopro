@@ -1,5 +1,6 @@
 #include "buildin/common.h"
 
+#define STBI_NO_SIMD
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_PSD
 #define STBI_NO_TGA
