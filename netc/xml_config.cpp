@@ -1,7 +1,7 @@
-#include "../common/common.h"
+#include "buildin/common.h"
 
-#include "../buildin/rapidxml.hpp"
-#include "../buildin/rapidxml_print.hpp"
+#include "buildin/rapidxml.hpp"
+#include "buildin/rapidxml_print.hpp"
 
 #include "xml_config.h"
 

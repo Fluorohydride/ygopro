@@ -1,6 +1,8 @@
 #ifndef _TOKENIZER_H_
 #define _TOKENIZER_H_
 
+#include "common.h"
+
 template<typename CHARTYPE = char>
 class Tokenizer {
 public:

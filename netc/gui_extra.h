@@ -1,7 +1,7 @@
 #ifndef _GUI_EXTRA_H_
 #define _GUI_EXTRA_H_
 
-#include "sungui.h"
+#include "base/sungui.h"
 
 namespace ygopro
 {

@@ -1,8 +1,7 @@
 #ifndef _HASH32_SHA1_H
 #define _HASH32_SHA1_H
 
-#include <memory.h>
-#include <string>
+#include "common.h"
 
 #define LEFT_MOST(n) ((n<<24)|(n>>24)|((n<<8)&0xff0000)|((n>>8)&0xff00))
 #define LEFT_MOST64(n) ( (n<<56)|(n>>56)|((n&0xff00)<<40)|((n&0xff000000000000)>>40)|    \

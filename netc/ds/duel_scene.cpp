@@ -1,4 +1,4 @@
-#include "../../common/common.h"
+#include "buildin/common.h"
 
 #include "../gui_extra.h"
 #include "../image_mgr.h"
@@ -11,7 +11,7 @@ namespace ygopro
 {
     
     void FieldBlock::RefreshVertices() {
-        std::array<glbase::v3hct, 4> vert;
+        std::array<base::v3hct, 4> vert;
         vert[0].vertex = vertex[0];
         vert[0].texcoord = texcoord[0];
         vert[1].vertex = vertex[1];
@@ -24,7 +24,7 @@ namespace ygopro
             vert[i].color = ((int32_t)(alpha.Get() * 255) << 24) | 0xffffff;
             vert[i].hcolor = ((int32_t)(hl.Get() * 255) << 24) | hlcolor;
         }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * vertex_index * 4, sizeof(glbase::v3hct) * 4, &vert[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(base::v3hct) * vertex_index * 4, sizeof(base::v3hct) * 4, &vert[0]);
     }
     
     bool FieldBlock::UpdateVertices(double tm) {
@@ -56,7 +56,7 @@ namespace ygopro
     }
     
     void FieldCard::RefreshVertices() {
-        std::array<glbase::v3hct, 12> vert;
+        std::array<base::v3hct, 12> vert;
         if(update_rvert) {
             vertex_r.clear();
             auto q = rotation.Get();
@@ -76,7 +76,7 @@ namespace ygopro
             vert[i].color = cl;
             vert[i].hcolor = hcl;
         }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * vertex_index * 12, sizeof(glbase::v3hct) * 12, &vert[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, sizeof(base::v3hct) * vertex_index * 12, sizeof(base::v3hct) * 12, &vert[0]);
     }
     
     bool FieldCard::UpdateVertices(double tm) {
@@ -205,16 +205,16 @@ namespace ygopro
         glGenBuffers(1, &misc_buffer);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(base::v3hct) * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, field_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * 36 * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(base::v3hct) * 36 * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, card_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * 512 * 16, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(base::v3hct) * 512 * 16, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v3hct) * 32 * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(base::v3hct) * 32 * 4, nullptr, GL_DYNAMIC_DRAW);
         GLCheckError(__FILE__, __LINE__);
         std::vector<uint16_t> index;
         index.resize(128 * 6);
@@ -248,10 +248,10 @@ namespace ygopro
             glEnableVertexAttribArray(1);
             glEnableVertexAttribArray(2);
             glEnableVertexAttribArray(3);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glbase::v3hct), 0);
-            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glbase::v3hct), (const GLvoid*)glbase::v3hct::color_offset);
-            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glbase::v3hct), (const GLvoid*)glbase::v3hct::hcolor_offset);
-            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v3hct), (const GLvoid*)glbase::v3hct::tex_offset);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(base::v3hct), 0);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(base::v3hct), (const GLvoid*)base::v3hct::color_offset);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(base::v3hct), (const GLvoid*)base::v3hct::hcolor_offset);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(base::v3hct), (const GLvoid*)base::v3hct::tex_offset);
             if(i != 2)
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, index_buffer);
             else
@@ -410,7 +410,7 @@ namespace ygopro
             return;
         update_bg = false;
         auto ti = ImageMgr::Get().GetTexture("bg");
-        std::array<glbase::v3hct, 4> verts;
+        std::array<base::v3hct, 4> verts;
         verts[0].vertex = {-1.0f, 1.0f, 0.0f};
         verts[0].texcoord = ti.vert[0];
         verts[1].vertex = {1.0f, 1.0f, 0.0f};
@@ -420,7 +420,7 @@ namespace ygopro
         verts[3].vertex = {1.0f, -1.0f, 0.0f};
         verts[3].texcoord = ti.vert[3];
         glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v3hct) * verts.size(), &verts[0]);
+        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(base::v3hct) * verts.size(), &verts[0]);
         GLCheckError(__FILE__, __LINE__);
     }
     

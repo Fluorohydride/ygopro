@@ -1,6 +1,6 @@
-#include "../../common/common.h"
+#include "buildin/common.h"
 
-#include "../../ocgcore/common.h"
+#include "ocgcore/common.h"
 
 #include "../scene_mgr.h"
 #include "duel_scene.h"

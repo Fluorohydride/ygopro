@@ -1,6 +1,8 @@
 #ifndef _COMMAND_H_
 #define _COMMAND_H_
 
+#include "common.h"
+
 template<typename T>
 class CommandList {
 public:

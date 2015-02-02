@@ -1,5 +1,5 @@
-#include "../../common/common.h"
-#include "../../buildin/LzmaSDK.h"
+#include "buildin/common.h"
+#include "buildin/LzmaSDK.h"
 
 #include "../card_data.h"
 #include "duel_replay.h"

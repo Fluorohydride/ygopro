@@ -1,7 +1,7 @@
 #ifndef _DUEL_NETWORK_H_
 #define _DUEL_NETWORK_H_
 
-#include "../../common/tcpclient.h"
+#include "../../buildin/tcpclient.h"
 #include "duel_scene_handler.h"
 
 namespace ygopro

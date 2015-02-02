@@ -28,14 +28,6 @@
 #include <memory.h>
 #include <ctype.h>
 #include <stdint.h>
-#include "singleton.h"
-#include "bufferutil.h"
-#include "convert.h"
-#include "command.h"
-#include "hash.h"
-#include "timer.h"
-#include "animator.h"
-#include "textfile.h"
 
 #ifdef _WIN32
 
@@ -70,6 +62,14 @@
 
 #endif //_WIN32
 
-extern unsigned int proto_version;
+#include "bufferutil.h"
+#include "command.h"
+#include "convert.h"
+#include "filesystem.h"
+#include "hash.h"
+#include "singleton.h"
+#include "textfile.h"
+#include "timer.h"
+#include "tokenizer.h"
 
 #endif //_COMMON_H_

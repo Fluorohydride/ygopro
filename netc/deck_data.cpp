@@ -1,5 +1,4 @@
-#include "../common/common.h"
-#include "../common/tokenizer.h"
+#include "buildin/common.h"
 
 #include "card_data.h"
 #include "deck_data.h"

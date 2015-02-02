@@ -1,12 +1,12 @@
-#include "../common/common.h"
+#include "buildin/common.h"
 
-#include "../buildin/rapidxml.hpp"
-#include "../buildin/rapidxml_print.hpp"
+#include "buildin/rapidxml.hpp"
+#include "buildin/rapidxml_print.hpp"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
-#include "../buildin/stb_image_write.h"
+#include "buildin/stb_image_write.h"
 
-#include "glbase.h"
+#include "base/render_base.h"
 #include "scene_mgr.h"
 
 namespace ygopro

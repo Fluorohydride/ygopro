@@ -1,6 +1,6 @@
-#include "../../common/common.h"
+#include "buildin/common.h"
 
-#include "../sungui.h"
+#include "../base/sungui.h"
 #include "../card_data.h"
 #include "../scene_mgr.h"
 #include "../gui_extra.h"

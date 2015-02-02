@@ -1,5 +1,4 @@
-#include "../common/common.h"
-#include "../common/filesystem.h"
+#include "buildin/common.h"
 
 #include "card_data.h"
 #include "scene_mgr.h"

@@ -29,6 +29,7 @@ target_link_libraries (netc
 )
 
 include_directories (
+    ${CMAKE_SOURCE_DIR}
     ${LUA_INCLUDE_DIR}
     ${LIBEVENT_INCLUDE_DIR}
     ${SQLITE_INCLUDE_DIRS}

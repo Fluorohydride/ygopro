@@ -1,8 +1,7 @@
-#include "../common/common.h"
-#include "../common/filesystem.h"
+#include "buildin/common.h"
 
-#include "../buildin/rapidxml.hpp"
-#include "../buildin/rapidxml_print.hpp"
+#include "buildin/rapidxml.hpp"
+#include "buildin/rapidxml_print.hpp"
 
 #include "image_mgr.h"
 #include "scene_mgr.h"
@@ -29,10 +28,10 @@ namespace ygopro
                     cti.ti = misc_textures["unknown"];
                     cti.ref_block = 0xffff;
                 } else {
-                    glbase::Image img;
+                    base::Image img;
                     auto fileinfo = imageZip.ReadFile(file);
                     if(img.LoadMemory(fileinfo.first, length)) {
-                        glbase::v2ct frame_verts[4];
+                        base::v2ct frame_verts[4];
                         int32_t bx = (blockid % 20) * 100;
                         int32_t by = (blockid / 20) * 145;
                         int32_t bw = 100;
@@ -55,7 +54,7 @@ namespace ygopro
                         frame_verts[3].texcoord = {frame_verts[1].texcoord.x, frame_verts[2].texcoord.y};
                         card_image.Bind();
                         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(glbase::v2ct) * 4, &frame_verts);
+                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(base::v2ct) * 4, &frame_verts);
                         glBindVertexArray(card_vao);
                         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
                         glBindVertexArray(0);
@@ -78,9 +77,9 @@ namespace ygopro
         return misc_textures[name];
     }
     
-    glbase::Texture* ImageMgr::LoadBigCardTexture(uint32_t id) {
+    base::Texture* ImageMgr::LoadBigCardTexture(uint32_t id) {
         static uint32_t pid = 0;
-        static glbase::Texture* pre_ret = nullptr;
+        static base::Texture* pre_ret = nullptr;
         if(pid == id)
             return pre_ret;
         std::string file = To<std::string>("%d.jpg", id);
@@ -94,7 +93,7 @@ namespace ygopro
             length = imageZip.GetFileLength(file);
         }
         if(length != 0) {
-            glbase::Image img;
+            base::Image img;
             auto imginfo = imageZip.ReadFile(file);
             if(img.LoadMemory(imginfo.first, length)) {
                 card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
@@ -192,7 +191,7 @@ namespace ygopro
         glBindFramebuffer(GL_FRAMEBUFFER, 0);
         glGenBuffers(2, card_buffer);
         glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(glbase::v2ct) * 4, nullptr, GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(base::v2ct) * 4, nullptr, GL_DYNAMIC_DRAW);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         uint16_t index[] = {0, 2, 1, 1, 2, 3};
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
@@ -204,9 +203,9 @@ namespace ygopro
         glEnableVertexAttribArray(0);
         glEnableVertexAttribArray(1);
         glEnableVertexAttribArray(2);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v2ct), 0);
-        glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::color_offset);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(glbase::v2ct), (const GLvoid*)glbase::v2ct::tex_offset);
+        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(base::v2ct), 0);
+        glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(base::v2ct), (const GLvoid*)base::v2ct::color_offset);
+        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(base::v2ct), (const GLvoid*)base::v2ct::tex_offset);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
         glBindVertexArray(0);
 		std::vector<std::wstring> image_files;
@@ -246,7 +245,7 @@ namespace ygopro
                 attr = attr->next_attribute();
                 std::string path = attr->value();
                 if(FileSystem::IsFileExists(path)) {
-                    glbase::Image img;
+                    base::Image img;
                     if(img.LoadFile(path)) {
                         if(name == "card")
                             card_texture.Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
@@ -257,7 +256,7 @@ namespace ygopro
                     }
                 }
             } else if(config_name == "texture") {
-                glbase::Texture* ptex = nullptr;
+                base::Texture* ptex = nullptr;
                 std::string src = attr->value();
                 attr = attr->next_attribute();
                 std::string name = attr->value();
@@ -287,7 +286,7 @@ namespace ygopro
                     ti.vert[3].y = (float)(y + h) / ptex->GetHeight();
                 }
             } else if(config_name == "points") {
-                glbase::Texture* ptex = nullptr;
+                base::Texture* ptex = nullptr;
                 std::string src = attr->value();
                 attr = attr->next_attribute();
                 std::string name = attr->value();

@@ -1,6 +1,7 @@
 #ifndef _FILESYSTEM_H_
 #define _FILESYSTEM_H_
 
+#include "common.h"
 #include "convert.h"
 
 #ifdef _WIN32

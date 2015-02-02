@@ -1,6 +1,8 @@
 #ifndef _BUILD_SCENE_H_
 #define _BUILD_SCENE_H_
 
+#include "../base/animator.h"
+
 #include "../deck_data.h"
 #include "../scene_mgr.h"
 

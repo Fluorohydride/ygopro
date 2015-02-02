@@ -1,8 +1,8 @@
-#include "../../common/common.h"
+#include "buildin/common.h"
 
-#include "../../ocgcore/common.h"
+#include "ocgcore/common.h"
 
-#include "../sungui.h"
+#include "../base/sungui.h"
 #include "duel_command.h"
 #include "duel_scene.h"
 #include "duel_scene_handler.h"

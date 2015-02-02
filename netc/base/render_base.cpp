@@ -1,4 +1,4 @@
-#include "../common/common.h"
+#include "buildin/common.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #define STBI_NO_PSD
@@ -7,10 +7,10 @@
 #define STBI_NO_HDR
 #define STBI_NO_PIC
 #define STBI_NO_PNM
-#include "../buildin/stb_image.h"
-#include "../buildin/stb_image_write.h"
+#include "buildin/stb_image.h"
+#include "buildin/stb_image_write.h"
 
-#include "glbase.h"
+#include "render_base.h"
 
 #ifdef _DEBUG
 void GLCheckError(const std::string& file, int32_t line) {
@@ -46,7 +46,7 @@ void GLCheckError(const std::string& file, int32_t line) {
 }
 #endif
 
-namespace glbase {
+namespace base {
     
     Shader::~Shader() {
         if(vert_shader)
@@ -189,6 +189,7 @@ namespace glbase {
         frag_color = texcolor * color;\n\
         }\n\
         ";
+        
         if(!inited || reload) {
             default_shader.LoadVertShader(vert_shader);
             default_shader.LoadFragShader(frag_shader);

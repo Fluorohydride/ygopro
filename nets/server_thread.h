@@ -1,7 +1,7 @@
 #ifndef _SERVER_THREAD_H_
 #define _SERVER_THREAD_H_
 
-#include "../common/tcpserver.h"
+#include "../buildin/tcpserver.h"
 
 namespace ygopro
 {

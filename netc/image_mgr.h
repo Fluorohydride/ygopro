@@ -1,7 +1,7 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
-#include "glbase.h"
+#include "base/render_base.h"
 #include "zip_archive.h"
 
 namespace ygopro
@@ -17,11 +17,11 @@ namespace ygopro
 	public:
 		ti4& GetCardTexture(uint32_t id);
         ti4& GetTexture(const std::string& name);
-        glbase::Texture* LoadBigCardTexture(uint32_t id);
-        glbase::Texture* GetRawMiscTexture() { return &misc_texture; }
-        glbase::Texture* GetRawCardTexture() { return &card_texture; }
-        glbase::Texture* GetRawBGTexture() { return &bg_texture; }
-        glbase::Texture* GetRawCardImage() { return &card_image; }
+        base::Texture* LoadBigCardTexture(uint32_t id);
+        base::Texture* GetRawMiscTexture() { return &misc_texture; }
+        base::Texture* GetRawCardTexture() { return &card_texture; }
+        base::Texture* GetRawBGTexture() { return &bg_texture; }
+        base::Texture* GetRawCardImage() { return &card_image; }
         ti4& GetCharTex(wchar_t ch);
         void UnloadCardTexture(uint32_t id);
 		void UnloadAllCardTexture();
@@ -42,10 +42,10 @@ namespace ygopro
         std::list<uint16_t> reserved_block;
         std::vector<std::pair<int32_t, uint32_t>> ref_count;
         std::unordered_map<uint32_t, std::list<uint16_t>::iterator> reserved_id;
-        glbase::Texture card_texture;
-        glbase::Texture misc_texture;
-        glbase::Texture bg_texture;
-        glbase::Texture card_image;
+        base::Texture card_texture;
+        base::Texture misc_texture;
+        base::Texture bg_texture;
+        base::Texture card_image;
         uint32_t frame_buffer = 0;
         uint32_t card_buffer[2] = {0, 0};
         uint32_t card_vao = 0;

@@ -1,6 +1,8 @@
 #ifndef _BUFFERUTIL_H_
 #define _BUFFERUTIL_H_
 
+#include "common.h"
+
 class BufferUtil {
 public:
     BufferUtil(void* base, size_t sz) {

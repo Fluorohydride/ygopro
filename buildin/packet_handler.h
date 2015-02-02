@@ -1,7 +1,7 @@
 #ifndef _PACKET_HANDLER_H_
 #define _PACKET_HANDLER_H_
 
-#include <string>
+#include "common.h"
 
 class PacketReader;
 class PacketWriter;

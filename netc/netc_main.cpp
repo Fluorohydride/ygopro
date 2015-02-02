@@ -1,10 +1,10 @@
-#include "../common/common.h"
+#include "buildin/common.h"
 
 #include "scene_mgr.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
-#include "sungui.h"
+#include "base/sungui.h"
 #include "bs/build_input_handler.h"
 #include "bs/build_scene_handler.h"
 #include "bs/build_scene.h"
@@ -165,7 +165,7 @@ int32_t main(int32_t argc, char* argv[]) {
     while (!glfwWindowShouldClose(window)) {
         SceneMgr::Get().CheckFrameRate();
         SceneMgr::Get().InitDraw();
-        auto& shader = glbase::Shader::GetDefaultShader();
+        auto& shader = base::Shader::GetDefaultShader();
         shader.Use();
         shader.SetParam1i("texID", 0);
         glfwPollEvents();
@@ -182,7 +182,7 @@ int32_t main(int32_t argc, char* argv[]) {
     SceneMgr::Get().Uninit();
     sgui::SGGUIRoot::GetSingleton().Unload();
     ImageMgr::Get().UninitTextures();
-    glbase::Shader::GetDefaultShader().Unload();
+    base::Shader::GetDefaultShader().Unload();
     
     glfwDestroyWindow(window);
     glfwTerminate();

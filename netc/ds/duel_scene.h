@@ -1,7 +1,9 @@
 #ifndef _DUEL_SCENE_H_
 #define _DUEL_SCENE_H_
 
-#include "../glbase.h"
+#include "../base/render_base.h"
+#include "../base/animator.h"
+
 #include "../scene_mgr.h"
 
 namespace ygopro
@@ -137,7 +139,7 @@ namespace ygopro
         bool update_misc = true;
         bool update_index = true;
         int32_t refresh_region = 0;
-        glbase::Shader duel_shader;
+        base::Shader duel_shader;
         ViewParam vparam;
         
         std::array<std::shared_ptr<FieldBlock>, 17> field_blocks[2];

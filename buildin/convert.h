@@ -1,6 +1,8 @@
 #ifndef _CONVERT_H_
 #define _CONVERT_H_
 
+#include "common.h"
+
 template<typename T>
 struct ConverteImpl {
     static T ConvertVal(const char* str) {

@@ -1,6 +1,8 @@
 #ifndef _TEXTFILE_H_
 #define _TEXTFILE_H_
-    
+
+#include "common.h"
+
 class TextFile {
 public:
     TextFile() {

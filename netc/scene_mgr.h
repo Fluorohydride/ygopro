@@ -1,8 +1,8 @@
 #ifndef _GAME_SCENE_H_
 #define _GAME_SCENE_H_
 
-#include "glbase.h"
-#include "sungui.h"
+#include "base/render_base.h"
+#include "base/sungui.h"
 #include "xml_config.h"
 
 namespace ygopro

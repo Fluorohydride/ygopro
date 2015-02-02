@@ -1,7 +1,7 @@
 #ifndef _SUNGUI_H_
 #define _SUNGUI_H_
 
-#include "glbase.h"
+#include "render_base.h"
 #include <GLFW/glfw3.h>
 
 namespace sgui
@@ -179,7 +179,7 @@ namespace sgui
     public:
         SGTextBase();
         virtual ~SGTextBase();
-        virtual void SetFont(glbase::Font* ft);
+        virtual void SetFont(base::Font* ft);
         virtual void SetSpacing(uint32_t x, uint32_t y);
         virtual int32_t GetLineSpacing();
         virtual v2i GetTextOffset() = 0;
@@ -200,7 +200,7 @@ namespace sgui
         uint16_t mem_size = 0;
         uint32_t tbo = 0;
         uint32_t tao = 0;
-        glbase::Font* font = nullptr;
+        base::Font* font = nullptr;
         uint32_t spacing_x = 1;
         uint32_t spacing_y = 1;
         uint32_t vert_size = 0;
@@ -216,9 +216,9 @@ namespace sgui
     public:
         SGSpriteBase();
         virtual ~SGSpriteBase();
-        virtual void SetImage(glbase::Texture* img, recti varea, uint32_t cl = 0xffffffff);
+        virtual void SetImage(base::Texture* img, recti varea, uint32_t cl = 0xffffffff);
         virtual void AddTexRect(recti tarea);
-        virtual void SetImage(glbase::Texture* img, std::vector<v2i>& verts, std::vector<uint32_t>& cl);
+        virtual void SetImage(base::Texture* img, std::vector<v2i>& verts, std::vector<uint32_t>& cl);
         virtual void AddTexcoord(std::vector<v2f>& texcoords);
         virtual v2i GetImageOffset() = 0;
         void SetFrameTime(float ft) { frame_time = ft; }
@@ -231,7 +231,7 @@ namespace sgui
         bool img_update = true;
         bool img_dirty = true;
         double frame_time = 0.016;
-        glbase::Texture* img_texture = nullptr;
+        base::Texture* img_texture = nullptr;
         v2i img_offset = {0, 0};
         std::vector<v2i> verts;
         std::vector<uint32_t> colors;
@@ -337,7 +337,7 @@ namespace sgui
             }
         }
         
-        void BindTexture(glbase::Texture* t = nullptr) {
+        void BindTexture(base::Texture* t = nullptr) {
             if(t != cur_texture) {
                 t->Bind();
                 cur_texture = t;
@@ -360,8 +360,8 @@ namespace sgui
         bool LoadConfigs(const std::wstring& gui_conf);
         void Unload();
         void AddConfig(const std::string& wtype, SGConfig& conf) { configs[wtype] = &conf; }
-        glbase::Font& GetGUIFont(const std::string& name) { return font_mgr[name]; }
-        glbase::Texture& GetGUITexture() { return gui_texture; }
+        base::Font& GetGUIFont(const std::string& name) { return font_mgr[name]; }
+        base::Texture& GetGUITexture() { return gui_texture; }
         uint32_t GetDefaultInt(const std::string& key) { return basic_config.int_config[key]; }
         recti& GetDefaultRect(const std::string& key) { return basic_config.tex_config[key]; }
         void CheckMouseMove();
@@ -388,14 +388,14 @@ namespace sgui
         std::weak_ptr<SGWidget> draging_object;
         std::weak_ptr<SGWidget> clicking_object;
         std::list<std::weak_ptr<SGWidget>> popup_objects;
-        glbase::Texture gui_texture;
-        glbase::Texture* cur_texture = nullptr;
+        base::Texture gui_texture;
+        base::Texture* cur_texture = nullptr;
         std::unordered_map<std::string, SGConfig*> configs;
         std::list<recti> scissor_stack;
         uint64_t start_time = 0;
         uint32_t index_buffer = 0;
-        std::unordered_map<std::string, glbase::Font> font_mgr;
-        glbase::Shader* gui_shader;
+        std::unordered_map<std::string, base::Font> font_mgr;
+        base::Shader* gui_shader;
         
     public:
         static SGConfig basic_config;
@@ -446,7 +446,7 @@ namespace sgui
         virtual std::shared_ptr<SGWidget> GetDragingTarget() { return parent.lock(); }
         virtual void UpdateVertices();
         virtual void Draw();
-        virtual void SetFont(glbase::Font* ft);
+        virtual void SetFont(base::Font* ft);
         virtual void SetSpacing(uint32_t x, uint32_t y);
         virtual v2i GetTextOffset();
         virtual int32_t GetMaxWidth();
@@ -501,7 +501,7 @@ namespace sgui
         virtual bool IsMultiLine();
         virtual v2i GetImageOffset();
         void SetTextureRect(recti r1, recti r2, recti r3);
-        void SetTexture(glbase::Texture* tex);
+        void SetTexture(base::Texture* tex);
         bool IsPushed() { return is_push && (state == 0x12); }
         
         SGEventHandler<SGWidget> eventButtonClick;
@@ -517,7 +517,7 @@ namespace sgui
         int32_t lwidth = 0;
         int32_t rwidth = 0;
         recti tex_rect[3] = {{0, 0, 0, 0}, {0, 0, 0, 0}, {0, 0, 0, 0}};
-        glbase::Texture* tex_texture = nullptr;
+        base::Texture* tex_texture = nullptr;
         
     public:
         static std::shared_ptr<SGButton> Create(std::shared_ptr<SGWidgetContainer> p, v2i pos, v2i size, bool is_push = false);
@@ -530,7 +530,7 @@ namespace sgui
         virtual void PostResize(bool res, bool rep);
         virtual void UpdateVertices();
         virtual void Draw();
-        virtual void SetFont(glbase::Font* ft);
+        virtual void SetFont(base::Font* ft);
         virtual void SetSpacing(uint32_t x, uint32_t y);
         virtual v2i GetTextOffset();
         virtual int32_t GetMaxWidth();

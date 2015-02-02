@@ -1,4 +1,4 @@
-#include "../common/common.h"
+#include "../buildin/common.h"
 
 #include "server_thread.h"
 
