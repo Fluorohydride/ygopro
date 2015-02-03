@@ -235,46 +235,6 @@ namespace base {
         int32_t tex_posy = 0;
     };
     
-    struct RenserState {
-        int16_t primitive_type = 0;
-        int16_t count = 0;
-        int16_t texture_id = 0;
-    };
-    
-    template<typename VTYPE>
-    class RenderObject {
-    public:
-        RenderObject();
-        virtual ~RenderObject();
-        
-        virtual int32_t PushVertices(VTYPE* vert_data, int16_t* index_data, int16_t count, int16_t pri_type, int16_t texid) {
-            return 0;
-        }
-        
-        virtual void UpdateVertices(VTYPE* vert_data, int16_t start_index, int16_t count) {
-            
-        }
-        
-        virtual void Render();
-        void ClearVertices() {
-            vertex_buffer.clear();
-            render_states.clear();
-            render_states.emplace_back();
-        }
-    protected:
-        std::vector<VTYPE> vertex_buffer;
-        std::vector<RenserState> render_states;
-    };
-    
-    template<typename VTYPE>
-    class RenderUnit {
-    public:
-        void PushVertices(RenderObject<VTYPE>& render_obj);
-        void UpdateVertices(RenderObject<VTYPE>& render_obj);
-    protected:
-        int16_t vert_index;
-    };
-    
 }
 
 typedef base::vector2<int32_t> v2i;
@@ -284,5 +244,7 @@ typedef base::vector3<float> v3f;
 typedef base::rect<int32_t> recti;
 typedef base::rect<float> rectf;
 typedef base::TextureInfo<4> ti4;
+
+#include "render_util.h"
 
 #endif
