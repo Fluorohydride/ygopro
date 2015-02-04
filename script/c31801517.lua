@@ -59,8 +59,9 @@ function c31801517.atkop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c31801517.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and e:GetHandler():IsReason(REASON_EFFECT)
-		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,93717133)
+	local c=e:GetHandler()
+	return rp~=tp and c:IsReason(REASON_EFFECT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+		and c:GetOverlayGroup():IsExists(Card.IsCode,1,nil,93717133)
 end
 function c31801517.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
