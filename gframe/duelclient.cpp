@@ -519,6 +519,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_REPLAY: {
 		mainGame->gMutex.Lock();
+		mainGame->wPhase->setVisible(false);
+		if(mainGame->dInfo.player_type < 7)
+			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->ebRSName->setText(L"");
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.Unlock();

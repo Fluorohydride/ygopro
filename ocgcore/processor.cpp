@@ -2819,7 +2819,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.attack_target = 0;
 		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
 			core.units.begin()->step = 39;
-			if(core.battle_phase_action)
+			if(core.phase_action || core.battle_phase_action)
 				core.units.begin()->arg1 = 2;
 			else core.units.begin()->arg1 = 3;
 			if(is_player_affected_by_effect(infos.turn_player, EFFECT_BP_TWICE))
