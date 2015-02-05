@@ -1113,3 +1113,8 @@ function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
+function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetFlagEffect(1)==0 then
+		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
+	end
+end
