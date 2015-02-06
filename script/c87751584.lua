@@ -24,6 +24,7 @@ function c87751584.desop(e,tp,eg,ep,ev,re,r,rp)
 	local c1,c2,c3=Duel.TossCoin(tp,3)
 	local ct=c1+c2+c3
 	if ct==0 then return end
+	if ct>g:GetCount() then ct=g:GetCount() end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=g:Select(tp,ct,ct,nil)
 	Duel.HintSelection(dg)
