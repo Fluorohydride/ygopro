@@ -13,7 +13,7 @@ function c41142615.filter(c)
 	return c:IsType(TYPE_MONSTER)
 end
 function c41142615.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingTarget(c41142615.filter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c41142615.filter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_HANDES,nil,0,tp,1)
 end
 function c41142615.activate(e,tp,eg,ep,ev,re,r,rp)
