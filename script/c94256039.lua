@@ -9,7 +9,7 @@ function c94256039.initial_effect(c)
 	--add counter
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e2:SetProperty(EFFECT_CANNOT_DISABLE)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetOperation(aux.chainreg)

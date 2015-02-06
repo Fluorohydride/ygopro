@@ -28,7 +28,7 @@ function c23171610.filter2(c,e,tp)
 end
 function c23171610.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	sg=g:Filter(c23171610.filter2,nil,e,tp)
+	local sg=g:Filter(c23171610.filter2,nil,e,tp)
 	local c=e:GetHandler()
 	local fid=c:GetFieldID()
 	local tc=sg:GetFirst()
