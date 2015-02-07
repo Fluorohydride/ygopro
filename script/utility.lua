@@ -798,7 +798,7 @@ end
 function Auxiliary.FConditionFunRep(f,cc,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return f(gc) and g:IsExists(f,cc-1,nil) end
+				if gc then return f(gc) and g:IsExists(f,cc-1,gc) end
 				local g1=g:Filter(f,nil)
 				if chkf~=PLAYER_NONE then
 					return g1:FilterCount(Card.IsOnField,nil)~=0 and g1:GetCount()>=cc
