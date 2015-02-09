@@ -28,12 +28,15 @@ function c61613388.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_DECK)
 end
+function c61613388.locfilter(c,sp)
+	return c:IsLocation(LOCATION_DECK) and c:IsControler(sp)
+end
 function c61613388.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
 	Duel.ShuffleDeck(tp)
-	local ct1=Duel.GetOperatedGroup():FilterCount(Card.IsControler,nil,tp)
-	local ct2=Duel.GetOperatedGroup():FilterCount(Card.IsControler,nil,1-tp)
+	local ct1=Duel.GetOperatedGroup():FilterCount(c61613388.locfilter,nil,tp)
+	local ct2=Duel.GetOperatedGroup():FilterCount(c61613388.locfilter,nil,1-tp)
 	if ct1>Duel.GetLocationCount(tp,LOCATION_MZONE) then ct1=Duel.GetLocationCount(tp,LOCATION_MZONE) end
 	if ct2>Duel.GetLocationCount(1-tp,LOCATION_MZONE) then ct2=Duel.GetLocationCount(1-tp,LOCATION_MZONE) end
 	if ct1<=0 then return end
