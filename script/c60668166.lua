@@ -15,6 +15,7 @@ end
 function c60668166.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return rp~=tp and c:GetPreviousControler()==tp and bit.band(c:GetPreviousLocation(),LOCATION_ONFIELD)~=0
+	and bit.band(c:GetReason(),REASON_DESTROY+REASON_BATTLE)~=0
 end
 function c60668166.filter(c,e,tp)
 	return c:GetCode()==60668166 and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
