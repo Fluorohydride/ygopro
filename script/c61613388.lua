@@ -32,8 +32,8 @@ function c61613388.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetMatchingGroup(Card.IsAbleToDeck,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SendtoDeck(tg,nil,2,REASON_EFFECT)
 	Duel.ShuffleDeck(tp)
-	local ct1=Duel.GetOperatedGroup():FilterCount(Card.IsControler,nil,tp)
-	local ct2=Duel.GetOperatedGroup():FilterCount(Card.IsControler,nil,1-tp)
+	local ct1=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_DECK):FilterCount(Card.IsControler,nil,tp):
+	local ct2=Duel.GetOperatedGroup():Filter(Card.IsLocation,nil,LOCATION_DECK):FilterCount(Card.IsControler,nil,1-tp)
 	if ct1>Duel.GetLocationCount(tp,LOCATION_MZONE) then ct1=Duel.GetLocationCount(tp,LOCATION_MZONE) end
 	if ct2>Duel.GetLocationCount(1-tp,LOCATION_MZONE) then ct2=Duel.GetLocationCount(1-tp,LOCATION_MZONE) end
 	if ct1<=0 then return end
