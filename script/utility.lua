@@ -1086,33 +1086,34 @@ function Auxiliary.disfilter1(c)
 	return c:IsFaceup() and not c:IsDisabled()
 		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0)
 end
+--reset op of chain attack
 function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
-	--reset of chain attack
 	local e1=e:GetLabelObject()
 	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
+--condition of EVENT_BATTLE_DESTROYING
 function Auxiliary.bdcon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING
 	local c=e:GetHandler()
 	return c:IsRelateToBattle()
 end
+--condition of EVENT_BATTLE_DESTROYING + opponent monster
 function Auxiliary.bdocon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING + opponent monster
 	local c=e:GetHandler()
 	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE)
 end
+--condition of EVENT_BATTLE_DESTROYING + to_grave
 function Auxiliary.bdgcon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING + to_grave
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
+--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
 function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
+--flag effect for spell counter
 function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(1)==0 then
 		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
