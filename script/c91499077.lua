@@ -10,6 +10,7 @@ function c91499077.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c91499077.atcon)
 	e1:SetCost(c91499077.atcost)
 	e1:SetTarget(c91499077.attg)
 	e1:SetOperation(c91499077.atop)
@@ -23,6 +24,10 @@ function c91499077.initial_effect(c)
 	e2:SetCondition(c91499077.cbcon)
 	e2:SetOperation(c91499077.cbop)
 	c:RegisterEffect(e2)
+end
+function c91499077.atcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c91499077.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -39,7 +44,7 @@ function c91499077.attg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c91499077.atop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)

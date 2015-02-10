@@ -8,6 +8,7 @@ function c49959355.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1,49959355)
+	e1:SetCost(c49959355.lvcost)
 	e1:SetTarget(c49959355.lvtg1)
 	e1:SetOperation(c49959355.lvop1)
 	c:RegisterEffect(e1)
@@ -19,9 +20,14 @@ function c49959355.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1,49959356)
+	e2:SetCost(c49959355.lvcost)
 	e2:SetTarget(c49959355.lvtg2)
 	e2:SetOperation(c49959355.lvop2)
 	c:RegisterEffect(e2)
+end
+function c49959355.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c49959355.filter(c)
 	return c:IsFaceup() and c:GetLevel()>0

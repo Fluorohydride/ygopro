@@ -25,7 +25,6 @@ function c75524092.initial_effect(c)
 	--destroy sub
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP+EFFECT_TYPE_CONTINUOUS)
-	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetCode(EFFECT_DESTROY_REPLACE)
 	e4:SetTarget(c75524092.desreptg)
 	e4:SetOperation(c75524092.desrepop)

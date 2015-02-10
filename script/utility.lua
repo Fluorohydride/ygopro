@@ -286,7 +286,17 @@ function Auxiliary.FConditionCode2(code1,code2,sub,insf)
 	--chkf: check field, default:PLAYER_NONE
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return g:IsExists(Auxiliary.FConditionFilter21,1,nil,code1,code2) end
+				if gc then
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						return g:IsExists(Auxiliary.FConditionFilter21,1,gc,code1,code2)
+					elseif gc:IsCode(code1) then
+						return g:IsExists(Card.IsCode,1,gc,code2)
+					elseif gc:IsCode(code2) then
+						return g:IsExists(Card.IsCode,1,gc,code1)
+					else
+						return false
+					end
+				end
 				local b1=0 local b2=0 local bs=0
 				local f1=false local f2=false local fs=false
 				local tc=g:GetFirst()
@@ -310,8 +320,15 @@ end
 function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
+					local g1=nil
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g1=eg:FilterSelect(tp,Auxiliary.FConditionFilter21,1,1,nil,code1,code2)
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						g1=eg:FilterSelect(tp,Auxiliary.FConditionFilter21,1,1,gc,code1,code2)
+					elseif gc:IsCode(code1) then
+						g1=eg:FilterSelect(tp,Card.IsCode,1,1,gc,code2)
+					else
+						g1=eg:FilterSelect(tp,Card.IsCode,1,1,gc,code1)
+					end
 					Duel.SetFusionMaterial(g1)
 					return
 				end
@@ -366,7 +383,17 @@ function Auxiliary.FConditionCode3(code1,code2,code3,sub,insf)
 						end
 						tc=g:GetNext()
 					end
-					return b1+b2+b3>1
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						return b1+b2+b3>1
+					else
+						local code=gc:GetCode()
+						if code==code1 then b1=1
+						elseif code==code2 then b2=1
+						elseif code==code3 then b3=1
+						else return false
+						end
+						return b1+b2+b3>2
+					end
 				end
 				local b1=0 local b2=0 local b3=0 local bs=0
 				local f1=false local f2=false local f3=false local fs=false
@@ -394,7 +421,10 @@ end
 function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					local sg=eg:Filter(Auxiliary.FConditionFilter31,nil,code1,code2,code3)
+					local sg=eg:Filter(Auxiliary.FConditionFilter31,gc,code1,code2,code3)
+					if not gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						sg:Remove(Card.IsCode,nil,gc:GetCode())
+					end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,1,1,nil)
 					sg:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
@@ -459,10 +489,21 @@ function Auxiliary.FConditionCode4(code1,code2,code3,code4,sub,insf)
 						elseif code==code2 then b2=1
 						elseif code==code3 then b3=1
 						elseif code==code4 then b4=1
+						else return false
 						end
 						tc=g:GetNext()
 					end
-					return b1+b2+b3+b4>2
+					if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						return b1+b2+b3+b4>2
+					else
+						local code=gc:GetCode()
+						if code==code1 then b1=1
+						elseif code==code2 then b2=1
+						elseif code==code3 then b3=1
+						elseif code==code4 then b4=1
+						end
+						return b1+b2+b3+b4>3
+					end
 				end
 				local b1=0 local b2=0 local b3=0 local b4=0 local bs=0
 				local f1=false local f2=false local f3=false local f4=false local fs=false
@@ -492,7 +533,10 @@ end
 function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					local sg=eg:Filter(Auxiliary.FConditionFilter41,nil,code1,code2,code3,code4)
+					local sg=eg:Filter(Auxiliary.FConditionFilter41,gc,code1,code2,code3,code4)
+					if not gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
+						sg:Remove(Card.IsCode,nil,gc:GetCode())
+					end
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,1,1,nil)
 					sg:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
@@ -553,8 +597,26 @@ end
 function Auxiliary.FConditionCodeFun(code,f,cc,sub,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return (gc:IsCode(code) or (sub and gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)))
-					and g:IsExists(f,cc,nil) end
+				if gc then
+					if gc:IsCode(code) or (sub and gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)) then
+						return g:IsExists(f,cc,gc)
+					elseif f(gc) then
+						local g1=Group.CreateGroup() local g2=Group.CreateGroup()
+						local tc=g:GetFirst()
+						while tc do
+							if tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
+								then g1:AddCard(tc) end
+							if f(tc) then g2:AddCard(tc) end
+							tc=g:GetNext()
+						end
+						if cc>1 then
+							g2:RemoveCard(gc)
+							return g1:IsExists(Auxiliary.FConditionFilterCF,1,nil,g2,cc-1)
+						else
+							return g1:GetCount()>0
+						end
+					else return false end
+				end
 				local g1=Group.CreateGroup() local g2=Group.CreateGroup() local fs=false
 				local tc=g:GetFirst()
 				while tc do
@@ -571,9 +633,35 @@ end
 function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
-					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g1=eg:FilterSelect(tp,f,cc,cc,nil)
-					Duel.SetFusionMaterial(g1)
+					if gc:IsCode(code) or (sub and gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)) then
+						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+						local g1=eg:FilterSelect(tp,f,cc,cc,gc)
+						Duel.SetFusionMaterial(g1)
+					else
+						local sg1=Group.CreateGroup() local sg2=Group.CreateGroup()
+						local tc=eg:GetFirst()
+						while tc do
+							if tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)) then sg1:AddCard(tc) end
+							if f(tc) then sg2:AddCard(tc) end
+							tc=eg:GetNext()
+						end
+						if cc>1 then
+							sg2:RemoveCard(gc)
+							if sg2:GetCount()==cc-1 then
+								sg1:Sub(sg2)
+							end
+							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+							local g1=sg1:Select(tp,1,1,nil)
+							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+							local g2=sg2:Select(tp,cc-1,cc-1,g1:GetFirst())
+							g1:Merge(g2)
+							Duel.SetFusionMaterial(g1)
+						else
+							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
+							local g1=sg1:Select(tp,1,1,nil)
+							Duel.SetFusionMaterial(g1)
+						end
+					end
 					return
 				end
 				local sg1=Group.CreateGroup() local sg2=Group.CreateGroup() local fs=false
@@ -706,7 +794,7 @@ end
 function Auxiliary.FConditionCodeRep(code,cc,sub,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) and g:IsExists(Card.IsCode,cc-1,nil,code) end
+				if gc then return (gc:IsCode(code) or gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)) and g:IsExists(Card.IsCode,cc-1,gc,code) end
 				local g1=g:Filter(Card.IsCode,nil,code)
 				if not sub then
 					if chkf~=PLAYER_NONE then return g1:GetCount()>=cc and g1:FilterCount(Card.IsOnField,nil)~=0
@@ -723,7 +811,7 @@ function Auxiliary.FOperationCodeRep(code,cc,sub,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g1=eg:FilterSelect(tp,Card.IsCode,cc-1,cc-1,nil,code)
+					local g1=eg:FilterSelect(tp,Card.IsCode,cc-1,cc-1,gc,code)
 					Duel.SetFusionMaterial(g1)
 					return
 				end
@@ -756,7 +844,7 @@ end
 function Auxiliary.FConditionFunRep(f,cc,insf)
 	return	function(e,g,gc,chkf)
 				if g==nil then return insf end
-				if gc then return f(gc) and g:IsExists(f,cc-1,nil) end
+				if gc then return f(gc) and g:IsExists(f,cc-1,gc) end
 				local g1=g:Filter(f,nil)
 				if chkf~=PLAYER_NONE then
 					return g1:FilterCount(Card.IsOnField,nil)~=0 and g1:GetCount()>=cc
@@ -767,7 +855,7 @@ function Auxiliary.FOperationFunRep(f,cc,insf)
 	return	function(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 				if gc then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g1=eg:FilterSelect(tp,f,cc-1,cc-1,nil)
+					local g1=eg:FilterSelect(tp,f,cc-1,cc-1,gc)
 					Duel.SetFusionMaterial(g1)
 					return
 				end
@@ -790,6 +878,7 @@ function Auxiliary.FOperationFunRep(f,cc,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+--Ritual Summon, geq fixed lv
 function Auxiliary.AddRitualProcGreater(c,filter)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -804,10 +893,10 @@ function Auxiliary.RPGFilter(c,filter,e,tp,m)
 	local result=false
 	if m:IsContains(c) then
 		m:RemoveCard(c)
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
+		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetOriginalLevel(),c)
 		m:AddCard(c)
 	else
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
+		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetOriginalLevel(),c)
 	end
 	return result
 end
@@ -829,7 +918,7 @@ function Auxiliary.RPGOperation(filter)
 					local tc=tg:GetFirst()
 					mg:RemoveCard(tc)
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-					local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
+					local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetOriginalLevel(),tc)
 					tc:SetMaterial(mat)
 					Duel.ReleaseRitualMaterial(mat)
 					Duel.BreakEffect()
@@ -838,6 +927,7 @@ function Auxiliary.RPGOperation(filter)
 				end
 			end
 end
+--Ritual Summon, equal to fixed lv
 function Auxiliary.AddRitualProcEqual(c,filter)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
@@ -852,10 +942,10 @@ function Auxiliary.RPEFilter(c,filter,e,tp,m)
 	local result=false
 	if m:IsContains(c) then
 		m:RemoveCard(c)
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetOriginalLevel(),1,99,c)
 		m:AddCard(c)
 	else
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetOriginalLevel(),1,99,c)
 	end
 	return result
 end
@@ -873,6 +963,55 @@ function Auxiliary.RPEOperation(filter)
 				local mg=Duel.GetRitualMaterial(tp)
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 				local tg=Duel.SelectMatchingCard(tp,Auxiliary.RPEFilter,tp,LOCATION_HAND,0,1,1,nil,filter,e,tp,mg)
+				if tg:GetCount()>0 then
+					local tc=tg:GetFirst()
+					mg:RemoveCard(tc)
+					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+					local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetOriginalLevel(),1,99,tc)
+					tc:SetMaterial(mat)
+					Duel.ReleaseRitualMaterial(mat)
+					Duel.BreakEffect()
+					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+					tc:CompleteProcedure()
+				end
+			end
+end
+--Ritual Summon, equal to monster lv
+function Auxiliary.AddRitualProcEqual2(c,filter)
+	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetTarget(Auxiliary.RPETarget2(filter))
+	e1:SetOperation(Auxiliary.RPEOperation2(filter))
+	c:RegisterEffect(e1)
+end
+function Auxiliary.RPEFilter2(c,filter,e,tp,m)
+	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	local result=false
+	if m:IsContains(c) then
+		m:RemoveCard(c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		m:AddCard(c)
+	else
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+	end
+	return result
+end
+function Auxiliary.RPETarget2(filter)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk)
+				if chk==0 then
+					local mg=Duel.GetRitualMaterial(tp)
+					return Duel.IsExistingMatchingCard(Auxiliary.RPEFilter2,tp,LOCATION_HAND,0,1,nil,filter,e,tp,mg)
+				end
+				Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
+			end
+end
+function Auxiliary.RPEOperation2(filter)
+	return	function(e,tp,eg,ep,ev,re,r,rp)
+				local mg=Duel.GetRitualMaterial(tp)
+				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+				local tg=Duel.SelectMatchingCard(tp,Auxiliary.RPEFilter2,tp,LOCATION_HAND,0,1,1,nil,filter,e,tp,mg)
 				if tg:GetCount()>0 then
 					local tc=tg:GetFirst()
 					mg:RemoveCard(tc)
@@ -944,33 +1083,39 @@ function Auxiliary.PendOperation()
 			end
 end
 function Auxiliary.disfilter1(c)
-	return c:IsFaceup() and not c:IsDisabled() 
+	return c:IsFaceup() and not c:IsDisabled()
 		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0)
 end
+--reset op of chain attack
 function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
-	--reset of chain attack
 	local e1=e:GetLabelObject()
 	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
+--condition of EVENT_BATTLE_DESTROYING
 function Auxiliary.bdcon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING
 	local c=e:GetHandler()
 	return c:IsRelateToBattle()
 end
+--condition of EVENT_BATTLE_DESTROYING + opponent monster
 function Auxiliary.bdocon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING + opponent monster
 	local c=e:GetHandler()
 	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE)
 end
+--condition of EVENT_BATTLE_DESTROYING + to_grave
 function Auxiliary.bdgcon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING + to_grave
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
+--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
 function Auxiliary.bdogcon(e,tp,eg,ep,ev,re,r,rp)
-	--condition of EVENT_BATTLE_DESTROYING + opponent monster + to_grave
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
 	return c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE) and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
+end
+--flag effect for spell counter
+function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
+	if e:GetHandler():GetFlagEffect(1)==0 then
+		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
+	end
 end

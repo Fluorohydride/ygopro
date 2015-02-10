@@ -23,12 +23,17 @@ function c78835747.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c78835747.condition)
 	e3:SetTarget(c78835747.target)
 	e3:SetOperation(c78835747.operation)
 	c:RegisterEffect(e3)
 end
 function c78835747.atktg(e,c)
 	return c:IsAttribute(ATTRIBUTE_LIGHT)
+end
+function c78835747.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c78835747.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and chkc:IsFaceup() end

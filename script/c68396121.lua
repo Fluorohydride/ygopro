@@ -62,6 +62,7 @@ function c68396121.aclimit(e,re,tp)
 end
 function c68396121.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 		and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,88177324)
 end
 function c68396121.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
