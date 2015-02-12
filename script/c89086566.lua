@@ -15,7 +15,8 @@ function c89086566.cfilter(c)
 	return c:IsFaceup() and (code==40640057 or code==40703223) and c:IsDestructable()
 end
 function c89086566.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c89086566.cfilter,tp,LOCATION_MZONE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c89086566.cfilter,tp,LOCATION_MZONE,0,1,nil)
+		and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
 	local g=Duel.GetMatchingGroup(c89086566.cfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
@@ -24,7 +25,7 @@ function c89086566.activate(e,tp,eg,ep,ev,re,r,rp)
 	local dt=Duel.Destroy(g,REASON_EFFECT)
 	if dt==0 then return end
 	local dg=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_ONFIELD,nil)
-	if dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(89086566,0)) then
+	if dg:GetCount()>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local sg=dg:Select(tp,1,dt,nil)
