@@ -69,7 +69,7 @@ function c6387204.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c6387204.lpcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,9161357)
+	return Duel.GetLP(1-tp)~=100 and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,9161357)
 end
 function c6387204.filter(c)
 	return c:GetFlagEffect(6387204)~=0 and c:IsSetCard(0x48) and c:IsAbleToGraveAsCost()
