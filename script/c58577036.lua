@@ -12,8 +12,8 @@ end
 function c58577036.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsPlayerCanSpecialSummon(tp)
 end
-function c58577036.filter(c)
-	return c:IsSummonableCard()
+function c58577036.filter(c,e,tp)
+	return c:IsSummonableCard() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c58577036.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

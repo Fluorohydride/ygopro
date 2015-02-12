@@ -13,8 +13,8 @@ end
 function c43040603.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsPlayerCanSpecialSummon(tp)
 end
-function c43040603.filter(c)
-	return c:IsSummonableCard()
+function c43040603.filter(c,e,tp)
+	return c:IsSummonableCard() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c43040603.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,nil,1,nil) end
