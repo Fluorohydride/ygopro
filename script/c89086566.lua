@@ -15,8 +15,7 @@ function c89086566.cfilter(c)
 	return c:IsFaceup() and (code==40640057 or code==40703223) and c:IsDestructable()
 end
 function c89086566.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c89086566.cfilter,tp,LOCATION_MZONE,0,1,nil)
-		and Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c89086566.cfilter,tp,LOCATION_MZONE,0,1,nil) end
 	local g=Duel.GetMatchingGroup(c89086566.cfilter,tp,LOCATION_MZONE,0,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
