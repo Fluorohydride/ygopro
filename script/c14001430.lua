@@ -51,17 +51,17 @@ function c14001430.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return bit.band(r,REASON_EFFECT)~=0 and re and re:IsActiveType(TYPE_MONSTER)
 		and re:GetHandler():IsSetCard(0x71) and eg:IsExists(c14001430.repfilter,1,nil,tp) end
 	if Duel.SelectYesNo(tp,aux.Stringid(14001430,0)) then
-		local g=eg:Filter(c14001430.repfilter,nil,tp)
-		local ct=g:GetCount()
+		local ct=eg:FilterCount(c14001430.repfilter,nil,tp)
 		if ct>1 then
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-			g=g:Select(tp,1,ct,nil)
+			g=eg:FilterSelect(tp,c14001430.repfilter,1,ct,nil,tp)
+		else
+			g=eg:Filter(c14001430.repfilter,nil,tp)
 		end
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		if g:GetCount()==ct then return true end
-	end
-	return false
+		return true
+	else return false end
 end
 function c14001430.repval(e,c)
 	return c14001430.repfilter(c,e:GetHandlerPlayer())
