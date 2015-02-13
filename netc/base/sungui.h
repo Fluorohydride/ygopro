@@ -87,6 +87,45 @@ namespace sgui
     
     // ===== Delegate Implement End =====
     
+    // == basic ui elements ==
+    class UISprite : public base::RenderUnit<base::v2ct> {
+    public:
+        virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
+            std::array<base::v2ct, 4> verts;
+            std::array<int16_t, 6> indices;
+        }
+        virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
+        }
+    protected:
+        v2f positions;
+        v2f size;
+    };
+    
+    class UISprite9 : public base::RenderUnit<base::v2ct> {
+    public:
+        virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
+        }
+        virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
+        }
+    protected:
+        v2f position;
+        v2f size;
+        rectf frame_rect;
+    };
+    
+    class UITextBase : public base::RenderUnit<base::v2ct> {
+    public:
+        virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
+            
+        }
+        virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
+            
+        }
+    protected:
+        std::wstring texts;
+        std::vector<int32_t> colors;
+    };
+    
     // ===== GUI Components =====
     
     class SGWidgetContainer;

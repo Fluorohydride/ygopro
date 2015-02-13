@@ -89,6 +89,51 @@ namespace base {
         vector2<float> texcoord = {0.0f, 0.0f};
         static const int32_t color_offset = 8;
         static const int32_t tex_offset = 12;
+        static uint32_t InitVao(uint32_t vbo, uint32_t ibo) {
+            uint32_t vao_id;
+            glGenVertexArrays(1, &vao_id);
+            glBindVertexArray(vao_id);
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(v2ct), 0);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v2ct), (const GLvoid*)v2ct::color_offset);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(v2ct), (const GLvoid*)v2ct::tex_offset);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+            glBindVertexArray(0);
+            return vao_id;
+        }
+        static void DrawBegin(uint32_t vbo, uint32_t ibo, uint32_t vao) {
+            if(vao) {
+                glBindVertexArray(vao);
+            } else {
+                glEnableClientState(GL_VERTEX_ARRAY);
+                glEnableClientState(GL_COLOR_ARRAY);
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+                glEnableClientState(GL_INDEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glBindBuffer(GL_ARRAY_BUFFER, vbo);
+                glVertexPointer(2, GL_FLOAT, sizeof(v2ct), 0);
+                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v2ct), (const GLvoid*)v2ct::color_offset);
+                glTexCoordPointer(2, GL_FLOAT, sizeof(v2ct), (const GLvoid*)v2ct::tex_offset);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+                glIndexPointer(GL_UNSIGNED_SHORT, sizeof(GL_UNSIGNED_SHORT), 0);
+            }
+        }
+        static void DrawEnd(uint32_t vbo, uint32_t ibo, uint32_t vao) {
+            if(vao) {
+                glBindVertexArray(0);
+            } else {
+                glDisableClientState(GL_VERTEX_ARRAY);
+                glDisableClientState(GL_COLOR_ARRAY);
+                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+                glDisableClientState(GL_INDEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            }
+        }
     };
     
     struct v3ct {
@@ -97,6 +142,51 @@ namespace base {
         vector2<float> texcoord = {0.0f, 0.0f};
         static const int32_t color_offset = 12;
         static const int32_t tex_offset = 16;
+        static uint32_t InitVao(uint32_t vbo, uint32_t ibo) {
+            uint32_t vao_id;
+            glGenVertexArrays(1, &vao_id);
+            glBindVertexArray(vao_id);
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(v3ct), 0);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3ct), (const GLvoid*)v3ct::color_offset);
+            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(v3ct), (const GLvoid*)v3ct::tex_offset);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+            glBindVertexArray(0);
+            return vao_id;
+        }
+        static void DrawBegin(uint32_t vbo, uint32_t ibo, uint32_t vao) {
+            if(vao) {
+                glBindVertexArray(vao);
+            } else {
+                glEnableClientState(GL_VERTEX_ARRAY);
+                glEnableClientState(GL_COLOR_ARRAY);
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+                glEnableClientState(GL_INDEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glBindBuffer(GL_ARRAY_BUFFER, vbo);
+                glVertexPointer(3, GL_FLOAT, sizeof(v3ct), 0);
+                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v3ct), (const GLvoid*)v3ct::color_offset);
+                glTexCoordPointer(2, GL_FLOAT, sizeof(v3ct), (const GLvoid*)v3ct::tex_offset);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+                glIndexPointer(GL_UNSIGNED_SHORT, sizeof(GL_UNSIGNED_SHORT), 0);
+            }
+        }
+        static void DrawEnd(uint32_t vbo, uint32_t ibo, uint32_t vao) {
+            if(vao) {
+                glBindVertexArray(0);
+            } else {
+                glDisableClientState(GL_VERTEX_ARRAY);
+                glDisableClientState(GL_COLOR_ARRAY);
+                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+                glDisableClientState(GL_INDEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            }
+        }
     };
     
     struct v3hct {
@@ -107,16 +197,56 @@ namespace base {
         static const int32_t color_offset = 12;
         static const int32_t hcolor_offset = 16;
         static const int32_t tex_offset = 20;
-    };
-    
-    struct v3cnt {
-        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        uint32_t color = 0xffffffff;
-        vector3<float> normal = {0.0f, 0.0f, 0.0f};
-        vector2<float> texcoord = {0.0f, 0.0f};
-        static const int32_t color_offset = 12;
-        static const int32_t normal_offset = 16;
-        static const int32_t tex_offset = 32;
+        static uint32_t InitVao(uint32_t vbo, uint32_t ibo) {
+            uint32_t vao_id;
+            glGenVertexArrays(1, &vao_id);
+            glBindVertexArray(vao_id);
+            glEnableVertexAttribArray(0);
+            glEnableVertexAttribArray(1);
+            glEnableVertexAttribArray(2);
+            glEnableVertexAttribArray(3);
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(v3hct), 0);
+            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3hct), (const GLvoid*)v3hct::color_offset);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3hct), (const GLvoid*)v3hct::hcolor_offset);
+            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(v3hct), (const GLvoid*)v3hct::tex_offset);
+            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+            glBindVertexArray(0);
+            return vao_id;
+        }
+        static void DrawBegin(uint32_t vbo, uint32_t ibo, uint32_t vao) {
+            if(vao) {
+                glBindVertexArray(vao);
+            } else {
+                glEnableClientState(GL_VERTEX_ARRAY);
+                glEnableClientState(GL_COLOR_ARRAY);
+                glEnableClientState(GL_SECONDARY_COLOR_ARRAY);
+                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+                glEnableClientState(GL_INDEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glBindBuffer(GL_ARRAY_BUFFER, vbo);
+                glVertexPointer(3, GL_FLOAT, sizeof(v3hct), 0);
+                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v3hct), (const GLvoid*)v3hct::color_offset);
+                glSecondaryColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v3hct), (const GLvoid*)v3hct::hcolor_offset);
+                glTexCoordPointer(2, GL_FLOAT, sizeof(v3hct), (const GLvoid*)v3hct::tex_offset);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+                glIndexPointer(GL_UNSIGNED_SHORT, sizeof(GL_UNSIGNED_SHORT), 0);
+            }
+        }
+        static void DrawEnd(uint32_t vbo, uint32_t ibo, uint32_t vao) {
+            if(vao) {
+                glBindVertexArray(0);
+            } else {
+                glDisableClientState(GL_VERTEX_ARRAY);
+                glDisableClientState(GL_COLOR_ARRAY);
+                glDisableClientState(GL_SECONDARY_COLOR_ARRAY);
+                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+                glDisableClientState(GL_INDEX_ARRAY);
+                glDisableClientState(GL_NORMAL_ARRAY);
+                glBindBuffer(GL_ARRAY_BUFFER, 0);
+                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+            }
+        }
     };
     
     template<int32_t TCOUNT>
