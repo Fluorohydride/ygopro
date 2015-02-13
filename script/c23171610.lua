@@ -21,6 +21,7 @@ end
 function c23171610.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c23171610.filter,tp,LOCATION_MZONE,0,1,nil) end
 	local g=Duel.GetMatchingGroup(c23171610.filter,tp,LOCATION_MZONE,0,nil)
+	g:KeepAlive()
 	e:SetLabelObject(g)
 end
 function c23171610.filter2(c,e,tp)
