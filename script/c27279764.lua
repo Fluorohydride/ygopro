@@ -27,7 +27,7 @@ function c27279764.initial_effect(c)
 	--immune
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
 	e5:SetCondition(c27279764.immcon)
