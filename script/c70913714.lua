@@ -1,5 +1,8 @@
 --고신 하스톨
 function c70913714.initial_effect(c)
+	--synchro summon
+	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(70913714,0))
@@ -63,7 +66,7 @@ end
 function c70913714.ctcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ec=c:GetEquipTarget()
-	return c:GetLocation()~=LOCATION_DECK
+	e:SetLabelObject(ec)
 	return ec and c:GetLocation()~=LOCATION_DECK and ec:IsLocation(LOCATION_MZONE) and ec:IsControler(1-tp)
 end
 function c70913714.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
