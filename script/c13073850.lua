@@ -14,6 +14,7 @@ function c13073850.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(1,0)
+	e2:SetCondition(c13073850.splimcon)
 	e2:SetTarget(c13073850.splimit)
 	c:RegisterEffect(e2)
 	--atk up
@@ -71,6 +72,9 @@ function c13073850.initial_effect(c)
 	e9:SetValue(c13073850.valcheck)
 	e9:SetLabelObject(e8)
 	c:RegisterEffect(e9)
+end
+function c13073850.splimcon(e)
+	return not e:GetHandler():IsForbidden()
 end
 function c13073850.splimit(e,c)
 	return not c:IsSetCard(0xaa)
