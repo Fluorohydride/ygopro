@@ -51,20 +51,18 @@ function c75944053.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c75944053.filter,tp,LOCATION_MZONE,0,1,1,nil)
 end
 function c75944053.operation(e,tp,eg,ep,ev,re,r,rp)
+	local val=Duel.GetMatchingGroupCount(c75944053.filter,tp,LOCATION_ONFIELD,0,nil)*500
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetValue(c75944053.adval)
+		e1:SetValue(val)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENCE)
 		tc:RegisterEffect(e2)
 	end
-end
-function c75944053.adval(e,c)
-	return Duel.GetMatchingGroupCount(c75944053.filter,c:GetControler(),LOCATION_ONFIELD,0,nil)*500
 end
