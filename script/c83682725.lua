@@ -17,7 +17,8 @@ end
 function c83682725.dfilter(c,lv)
 	return (c:IsFacedown() or c:IsLevelBelow(lv-1)) and c:IsAbleToHand()
 end
-function c83682725.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c83682725.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c83682725.filter(chkc,tp) end
 	if chk==0 then return Duel.IsExistingTarget(c83682725.filter,tp,LOCATION_MZONE,0,1,nil,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c83682725.filter,tp,LOCATION_MZONE,0,1,1,nil,tp)

@@ -27,7 +27,7 @@ function c60953118.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c60953118.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return true
+	return Duel.GetBattleDamage(tp)>0
 end
 function c60953118.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
@@ -38,6 +38,7 @@ function c60953118.damop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e1:SetOperation(c60953118.dop)
+	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
 end
 function c60953118.dop(e,tp,eg,ep,ev,re,r,rp)
