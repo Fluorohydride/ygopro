@@ -19,15 +19,14 @@ function c128454.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c128454.thfilter(c)
 	return ((c:IsLocation(LOCATION_SZONE) and (c:GetSequence()==6 or c:GetSequence()==7) and (c:IsSetCard(0x9f) or c:IsSetCard(0x98)))
-		or (c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_PENDULUM)))
-		and c:IsAbleToHand()
+		or (c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_PENDULUM))) and c:IsAbleToHand()
 end
 function c128454.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c128454.thfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c128454.thfilter,tp,LOCATION_ONFIELD,0,2,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c128454.thfilter,tp,LOCATION_ONFIELD,0,2,2,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,2,0,0)
 end
 function c128454.thop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
