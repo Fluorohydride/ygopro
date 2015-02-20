@@ -37,8 +37,7 @@ function c98280324.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoHand(g,nil,REASON_COST)
 end
 function c98280324.spfilter(c,e,tp)
-	return (c:IsSetCard(0xc4) or c:IsCode(30068120)) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsSetCard(0xc3) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c98280324.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
