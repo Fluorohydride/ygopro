@@ -62,7 +62,7 @@ function c92246806.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetTarget(c92246806.rettg)
 	e1:SetOperation(c92246806.retop)
-	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
 function c92246806.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
