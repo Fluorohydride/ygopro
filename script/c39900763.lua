@@ -12,32 +12,27 @@ end
 function c39900763.filter(c,e,tp)
 	return c:IsFaceup() and c:IsCanBeSpecialSummoned(e,0,tp,false,false,POS_FACEDOWN)
 end
-function c39900763.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return false end
+function c39900763.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			and Duel.IsExistingTarget(c39900763.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp)
+			and Duel.IsExistingMatchingCard(c39900763.filter,tp,LOCATION_REMOVED,0,1,nil,e,tp)
 			and Duel.GetLocationCount(1-tp,LOCATION_MZONE,1-tp)>0
-			and Duel.IsExistingTarget(c39900763.filter,1-tp,LOCATION_REMOVED,0,1,nil,e,1-tp)
+			and Duel.IsExistingMatchingCard(c39900763.filter,1-tp,LOCATION_REMOVED,0,1,nil,e,1-tp)
 	end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g1=Duel.SelectTarget(tp,c39900763.filter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp)
-	e:SetLabelObject(g1:GetFirst())
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
-	local g2=Duel.SelectTarget(1-tp,c39900763.filter,1-tp,LOCATION_REMOVED,0,1,1,nil,e,1-tp)
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g1,2,PLAYER_ALL,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,PLAYER_ALL,0)
 end
 function c39900763.operation(e,tp,eg,ep,ev,re,r,rp)
-	local tc1=e:GetLabelObject()
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-	local tc2=g:GetFirst()
-	if tc1==tc2 then tc2=g:GetNext() end
-	if tc1:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(tc1,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(tp,c39900763.filter,tp,LOCATION_REMOVED,0,1,1,nil,e,tp)
+		local tc=g:GetFirst()
+		if tc then Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEDOWN_DEFENCE) end
 	end
-	if tc2:IsRelateToEffect(e) then
-		Duel.SpecialSummonStep(tc2,0,1-tp,1-tp,false,false,POS_FACEDOWN_DEFENCE)
+	if Duel.GetLocationCount(1-tp,LOCATION_MZONE)>0 then
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
+		local g=Duel.SelectMatchingCard(1-tp,c39900763.filter,1-tp,LOCATION_REMOVED,0,1,1,nil,e,1-tp)
+		local tc=g:GetFirst()
+		if tc then Duel.SpecialSummonStep(tc,0,1-tp,1-tp,false,false,POS_FACEDOWN_DEFENCE) end
 	end
 	Duel.SpecialSummonComplete()
 end
