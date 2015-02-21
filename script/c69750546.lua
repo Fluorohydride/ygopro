@@ -7,7 +7,6 @@ function c69750546.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_TO_GRAVE)
 	e1:SetCondition(c69750546.condition)
-	e1:SetCost(aux.msgcost)
 	e1:SetTarget(c69750546.target)
 	e1:SetOperation(c69750546.operation)
 	c:RegisterEffect(e1)
@@ -29,6 +28,7 @@ function c69750546.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c69750546.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetTargetParam(500)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
@@ -48,10 +48,10 @@ function c69750546.descost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.GetMatchingGroup(c69750546.costfilter,tp,LOCATION_DECK+LOCATION_HAND,0,nil)
 	Duel.SendtoGrave(g,REASON_COST)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c69750546.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	local g=Duel.GetMatchingGroup(Card.IsDestructable,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
