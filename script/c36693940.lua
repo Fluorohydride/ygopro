@@ -29,5 +29,6 @@ function c36693940.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(36693940)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
+		tc:RegisterFlagEffect(0,RESET_EVENT+0x1fe0000,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(36693940,0))
 	end
 end
