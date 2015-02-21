@@ -8,6 +8,7 @@ function c83236601.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,83236601)
 	e1:SetCondition(c83236601.tgcon)
+	e1:SetCost(aux.msgcost)
 	e1:SetTarget(c83236601.tgtg)
 	e1:SetOperation(c83236601.tgop)
 	c:RegisterEffect(e1)
@@ -24,6 +25,7 @@ function c83236601.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,83236602)
 	e3:SetCondition(c83236601.thcon)
+	e3:SetCost(aux.msgcost)
 	e3:SetTarget(c83236601.thtg)
 	e3:SetOperation(c83236601.thop)
 	c:RegisterEffect(e3)
@@ -42,7 +44,7 @@ end
 function c83236601.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		tc:RegisterFlagEffect(83236601,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
+		tc:RegisterFlagEffect(83236601,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
 		tc=eg:GetNext()
 	end
 end
@@ -64,10 +66,10 @@ function c83236601.tgop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c83236601.regop(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(83236601,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(83236602,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c83236601.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffect(83236601)>0 and Duel.GetCurrentPhase()==PHASE_MAIN2
+	return e:GetHandler():GetFlagEffect(83236602)>0 and Duel.GetCurrentPhase()==PHASE_MAIN2
 end
 function c83236601.filter(c)
 	return c:IsSetCard(0x95) and c:GetType()==TYPE_SPELL+TYPE_QUICKPLAY and c:IsAbleToHand()

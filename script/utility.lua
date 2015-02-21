@@ -1117,3 +1117,8 @@ function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
 	end
 end
+--cost function for message sending
+function Auxiliary.msgcost(e,tp,eg,ep,ev,re,r,rp)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+end
