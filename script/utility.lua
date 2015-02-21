@@ -1118,7 +1118,7 @@ function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 --cost function for message sending
-function Auxiliary.msgcost(e,tp,eg,ep,ev,re,r,rp)
+function Auxiliary.msgcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
