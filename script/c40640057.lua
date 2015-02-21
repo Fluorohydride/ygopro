@@ -12,7 +12,7 @@ function c40640057.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c40640057.con(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=tp
+	return Duel.GetTurnPlayer()~=tp and Duel.GetBattleDamage(tp)>0
 end
 function c40640057.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
@@ -23,6 +23,7 @@ function c40640057.op(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e1:SetOperation(c40640057.damop)
+	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
 end
 function c40640057.damop(e,tp,eg,ep,ev,re,r,rp)

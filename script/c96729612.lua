@@ -25,13 +25,13 @@ function c96729612.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-	end
-	local g=Duel.GetMatchingGroup(c96729612.filter2,tp,LOCATION_GRAVE,0,nil)
-	if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(96729612,0)) then
-		Duel.BreakEffect()
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local sg=g:Select(tp,1,1,nil)
-		Duel.SendtoHand(sg,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,sg)
+		local mg=Duel.GetMatchingGroup(c96729612.filter2,tp,LOCATION_GRAVE,0,nil)
+		if mg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(96729612,0)) then
+			Duel.BreakEffect()
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=mg:Select(tp,1,1,nil)
+			Duel.SendtoHand(sg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sg)
+		end
 	end
 end

@@ -55,7 +55,8 @@ end
 function c12644061.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local a=Duel.GetAttacker()
 	local at=Duel.GetAttackTarget()
-	return ep==tp and ((a:IsControler(tp) and a:IsSetCard(0x1034)) or (at and at:IsControler(tp) and at:IsSetCard(0x1034)))
+	return Duel.GetBattleDamage(tp)>0
+		and ((a:IsControler(tp) and a:IsSetCard(0x1034)) or (at and at:IsControler(tp) and at:IsSetCard(0x1034)))
 end
 function c12644061.dfilter(c)
 	return c:IsSetCard(0x1034) and c:IsAbleToGraveAsCost()
@@ -74,7 +75,8 @@ function c12644061.damop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
 	e1:SetRange(LOCATION_FZONE)
 	e1:SetOperation(c12644061.dop)
-	c:RegisterEffect(e1,tp)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
+	c:RegisterEffect(e1)
 end
 function c12644061.dop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(tp,0)

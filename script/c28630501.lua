@@ -73,7 +73,7 @@ function c28630501.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetTarget(c28630501.rettg)
 	e1:SetOperation(c28630501.retop)
-	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
 function c28630501.rettg(e,tp,eg,ep,ev,re,r,rp,chk)

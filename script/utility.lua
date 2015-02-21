@@ -860,7 +860,7 @@ function Auxiliary.FOperationFunRep(f,cc,insf)
 					return
 				end
 				local sg=eg:Filter(f,nil)
-				if chkf==PLAYER_NONE or sg:GetCount()>=cc then
+				if chkf==PLAYER_NONE or sg:GetCount()==cc then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 					local g1=sg:Select(tp,cc,cc,nil)
 					Duel.SetFusionMaterial(g1)
@@ -868,11 +868,9 @@ function Auxiliary.FOperationFunRep(f,cc,insf)
 				end
 				Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 				local g1=sg:FilterSelect(tp,Auxiliary.FConditionCheckF,1,1,nil,chkf)
-				local tc1=g1:GetFirst()
-				sg:RemoveCard(tc1)
 				if cc>1 then
 					Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-					local g2=sg:Select(tp,cc-1,cc-1,nil)
+					local g2=sg:Select(tp,cc-1,cc-1,g1:GetFirst())
 					g1:Merge(g2)
 				end
 				Duel.SetFusionMaterial(g1)
@@ -1118,4 +1116,9 @@ function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(1)==0 then
 		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
 	end
+end
+--cost function for message sending
+function Auxiliary.msgcost(e,tp,eg,ep,ev,re,r,rp)
+	if chk==0 then return true end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end

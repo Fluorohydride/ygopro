@@ -25,7 +25,7 @@ end
 function c53251824.checkop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	while tc do
-		tc:RegisterFlagEffect(53251824,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
+		tc:RegisterFlagEffect(53251824,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
 		tc=eg:GetNext()
 	end
 end

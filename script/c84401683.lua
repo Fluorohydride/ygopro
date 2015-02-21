@@ -27,6 +27,7 @@ function c84401683.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCountLimit(1)
+	e2:SetCost(aux.msgcost)
 	e2:SetTarget(c84401683.destg)
 	e2:SetOperation(c84401683.desop)
 	c:RegisterEffect(e2)
@@ -37,6 +38,7 @@ end
 function c84401683.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c84401683.filter(c)
 	return c:IsFaceup() and c:GetAttack()>0

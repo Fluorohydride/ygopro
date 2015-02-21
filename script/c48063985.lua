@@ -26,6 +26,7 @@ function c48063985.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
+	e3:SetCost(aux.msgcost)
 	e3:SetTarget(c48063985.thtg)
 	e3:SetOperation(c48063985.thop)
 	c:RegisterEffect(e3)
@@ -94,6 +95,7 @@ end
 function c48063985.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
 	Duel.SendtoDeck(e:GetHandler(),nil,0,REASON_COST)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c48063985.filter1(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x10b5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

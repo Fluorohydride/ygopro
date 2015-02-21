@@ -980,7 +980,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
 			if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
-				mainGame->dField.pzone_act = true;
+				mainGame->dField.pzone_act[pcard->controler] = true;
 		}
 		mainGame->dField.reposable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
