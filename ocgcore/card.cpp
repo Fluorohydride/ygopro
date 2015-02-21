@@ -1566,6 +1566,8 @@ void card::filter_spsummon_procedure_g(uint8 playerid, effect_set* peset) {
 		effect* peffect = pr.first->second;
 		if(!peffect->is_available() || !peffect->check_count_limit(playerid))
 			continue;
+		if(current.controler != playerid && !(peffect->flag & EFFECT_FLAG_BOTH_SIDE))
+			continue;
 		effect* oreason = pduel->game_field->core.reason_effect;
 		uint8 op = pduel->game_field->core.reason_player;
 		pduel->game_field->core.reason_effect = peffect;

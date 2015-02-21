@@ -2623,7 +2623,7 @@ int32 field::process_idle_command(uint16 step) {
 		filter_field_effect(EFFECT_SPSUMMON_PROC_G, &eset);
 		for(int32 i = 0; i < eset.size(); ++i) {
 			pcard = eset[i]->handler;
-			if(!eset[i]->check_count_limit(pcard->current.controler))
+			if(!eset[i]->check_count_limit(infos.turn_player))
 				continue;
 			if(pcard->current.controler != infos.turn_player && !(eset[i]->flag & EFFECT_FLAG_BOTH_SIDE))
 				continue;
