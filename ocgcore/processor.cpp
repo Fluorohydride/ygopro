@@ -3465,6 +3465,7 @@ int32 field::process_battle_command(uint16 step) {
 	case 26: {
 		uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
 		uint32 da = 0, dd = 0;
+		uint8 pa = core.attacker->current.controler, pd;
 		core.attacker->q_cache.attack = aa;
 		core.attacker->q_cache.defence = ad;
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
@@ -3474,6 +3475,11 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->q_cache.attack = da;
 			core.attack_target->q_cache.defence = dd;
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
+			pd = core.attack_target->current.controler;
+			if(pa != pd){
+				core.attacker->set_status(STATUS_OPPO_BATTLE, TRUE);
+				core.attack_target->set_status(STATUS_OPPO_BATTLE, TRUE);
+			}
 		}
 		effect* damchange = 0;
 		card* reason_card = 0;
@@ -4136,6 +4142,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 	}
 	case 3: {
 		//Standby Phase
+		shuffle(turn_player, LOCATION_HAND);
 		infos.phase = PHASE_STANDBY;
 		core.phase_action = FALSE;
 		raise_event((card*)0, EVENT_PHASE_PRESTART + PHASE_STANDBY, 0, 0, 0, turn_player, 0);
