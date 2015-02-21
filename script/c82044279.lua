@@ -25,17 +25,17 @@ function c82044279.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local rc=re:GetHandler()
 	local tgp,loc=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_CONTROLER,CHAININFO_TRIGGERING_LOCATION)
-	return re:IsActiveType(TYPE_MONSTER) and rc:IsLevelAbove(5) and loc==LOCATION_MZONE
-		and not c:IsStatus(STATUS_BATTLE_DESTROYED) and not c:IsStatus(STATUS_CHAINING) and Duel.IsChainNegatable(ev)
+	return re:IsActiveType(TYPE_MONSTER) and rc~=c and rc:IsLevelAbove(5) and loc==LOCATION_MZONE
+		and not c:IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
 function c82044279.condition2(e,tp,eg,ep,ev,re,r,rp)
-	if e==re or not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
+	if not re:IsHasProperty(EFFECT_FLAG_CARD_TARGET) then return false end
 	local g=Duel.GetChainInfo(ev,CHAININFO_TARGET_CARDS)
 	if not g or g:GetCount()~=1 then return false end
 	local tc=g:GetFirst()
 	local c=e:GetHandler()
 	return re:IsActiveType(TYPE_MONSTER) and tc:IsLevelAbove(5) and tc:IsLocation(LOCATION_MZONE)
-		and not c:IsStatus(STATUS_BATTLE_DESTROYED) and not c:IsStatus(STATUS_CHAINING) and Duel.IsChainNegatable(ev)
+		and not c:IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
 function c82044279.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -50,7 +50,7 @@ function c82044279.operation(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
 	if not rc:IsRelateToEffect(re) then return end
 	if Duel.Destroy(rc,REASON_EFFECT)~=0 and c:IsRelateToEffect(e) and c:IsFaceup() then
-		local atk=rc:GetBaseAttack()
+		local atk=rc:GetTextAttack()
 		if atk<0 then atk=0 end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
