@@ -70,8 +70,8 @@ function c82044279.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local atk=0
 	local tc=g:GetFirst()
 	while tc do
-		if tc:GetBaseAttack()>0 then
-			atk=atk+tc:GetBaseAttack()
+		if tc:GetTextAttack()>0 then
+			atk=atk+tc:GetTextAttack()
 		end
 		tc=g:GetNext()
 	end
