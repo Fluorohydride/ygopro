@@ -17,7 +17,7 @@ function c13317419.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c13317419.filter(c)
-	return c:IsFaceup() and c:IsAttackAbove(800)
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsAttackAbove(800)
 end
 function c13317419.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c13317419.filter(chkc) end
@@ -82,20 +82,18 @@ end
 function c13317419.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ec=e:GetLabelObject()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Duel.Destroy(tc,REASON_EFFECT)
-		if ec then
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_SET_ATTACK_FINAL)
-			e1:SetValue(0)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
-			ec:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(e:GetHandler())
-			e2:SetType(EFFECT_TYPE_SINGLE)
-			e2:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
-			e2:SetReset(RESET_EVENT+0x1fe0000)
-			ec:RegisterEffect(e2)
-		end
+	if tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)~=0
+		and ec and ec:IsFaceup() and ec:IsLocation(LOCATION_MZONE) then
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
+		e1:SetValue(0)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		ec:RegisterEffect(e1)
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_CANNOT_CHANGE_POSITION)
+		e2:SetReset(RESET_EVENT+0x1fe0000)
+		ec:RegisterEffect(e2)
 	end
 end

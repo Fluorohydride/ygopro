@@ -16,8 +16,7 @@ function c70913714.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c70913714.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:GetPreviousLocation()==LOCATION_MZONE
+	return e:GetHandler():IsPreviousLocation(LOCATION_MZONE)
 end
 function c70913714.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsFaceup() end
@@ -57,27 +56,23 @@ function c70913714.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetCategory(CATEGORY_CONTROL)
 		e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 		e4:SetCode(EVENT_LEAVE_FIELD)
-		e4:SetCondition(c70913714.ctcon)
 		e4:SetTarget(c70913714.cttg)
 		e4:SetOperation(c70913714.ctop)
+		e4:SetReset(RESET_EVENT+0x1020000)
 		c:RegisterEffect(e4)
 	end
 end
-function c70913714.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local ec=c:GetEquipTarget()
-	e:SetLabelObject(ec)
-	return ec and c:GetLocation()~=LOCATION_DECK and ec:IsLocation(LOCATION_MZONE) and ec:IsControler(1-tp)
-end
-function c70913714.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c70913714.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
-	local ec=e:GetLabelObject()
-	Duel.SetTargetCard(ec)
-	Duel.SetOperationInfo(0,CATEGORY_CONTROL,ec,1,0,0)
+	local ec=e:GetHandler():GetPreviousEquipTarget()
+	if ec:IsLocation(LOCATION_MZONE) and ec:IsControlerCanBeChanged() then
+		Duel.SetTargetCard(ec)
+		Duel.SetOperationInfo(0,CATEGORY_CONTROL,ec,1,0,0)
+	end
 end
 function c70913714.ctop(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetLabelObject()
-	if ec:IsRelateToEffect(e) and ec:IsFaceup() and not Duel.GetControl(ec,tp) then
+	local ec=Duel.GetFirstTarget()
+	if ec and ec:IsRelateToEffect(e) and not Duel.GetControl(ec,tp) then
 		if not ec:IsImmuneToEffect(e) and ec:IsAbleToChangeControler() then
 			Duel.Destroy(ec,REASON_EFFECT)
 		end
