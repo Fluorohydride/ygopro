@@ -69,7 +69,6 @@ function c69838592.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
-		e2:SetValue(bc:GetBaseDefence())
 		c:RegisterEffect(e2)
 	end
 end
