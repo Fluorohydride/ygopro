@@ -45,6 +45,7 @@ function c18326736.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and Duel.IsExistingMatchingCard(c18326736.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,e:GetHandler():GetRank()) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c18326736.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
@@ -66,6 +67,7 @@ end
 function c18326736.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,7,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,7,7,REASON_COST)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -85,6 +87,7 @@ function c18326736.mtfilter(c)
 end
 function c18326736.mttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c18326736.mtfilter,tp,LOCATION_EXTRA,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c18326736.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
