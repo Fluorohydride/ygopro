@@ -2072,9 +2072,9 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			peffect = ifit->first;
 			if(peffect->is_chainable(ifit->second.triggering_player) && peffect->check_count_limit(ifit->second.triggering_player)
 					&& peffect->handler->is_has_relation(peffect)) {
-				if (ifit->second.triggering_player == infos.turn_player){
+				if(ifit->second.triggering_player == infos.turn_player) {
 					act = true;
-					if (peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 						for (auto cait = core.tpchain.begin(); cait != core.tpchain.end(); ++cait) {
 							if (cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
 								act = false;
@@ -2089,14 +2089,14 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 							}
 						}
 					}
-					if (act){
+					if(act) {
 						core.tpchain.push_back(ifit->second);
 						peffect->handler->set_status(STATUS_CHAINING, TRUE);
 						peffect->dec_count(infos.turn_player);
 					}
 				} else {
 					act = true;
-					if (peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 						for (auto cait = core.ntpchain.begin(); cait != core.ntpchain.end(); ++cait) {
 							if (cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
 								act = false;
@@ -2111,7 +2111,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 							}
 						}
 					}
-					if (act){
+					if(act) {
 						core.ntpchain.push_back(ifit->second);
 						peffect->handler->set_status(STATUS_CHAINING, TRUE);
 						peffect->dec_count(1 - infos.turn_player);
@@ -3476,7 +3476,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->q_cache.defence = dd;
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			pd = core.attack_target->current.controler;
-			if(pa != pd){
+			if(pa != pd) {
 				core.attacker->set_status(STATUS_OPPO_BATTLE, TRUE);
 				core.attack_target->set_status(STATUS_OPPO_BATTLE, TRUE);
 			}
@@ -3677,7 +3677,7 @@ int32 field::process_battle_command(uint16 step) {
 			process_instant_event();
 		}
 		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
-				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		} else {
 			break_effect();
 		}
@@ -3728,7 +3728,7 @@ int32 field::process_battle_command(uint16 step) {
 		process_instant_event();
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		core.attacker->set_status(STATUS_OPPO_BATTLE, FALSE);
-		if(core.attack_target){
+		if(core.attack_target) {
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			core.attack_target->set_status(STATUS_OPPO_BATTLE, FALSE);
 		}
@@ -3855,7 +3855,7 @@ int32 field::process_damage_step(uint16 step) {
 	}
 	return TRUE;
 }
-void field::calculate_battle_damage(effect** pdamchange, card** preason_card, uint8 *battle_destroyed)
+void field::calculate_battle_damage(effect** pdamchange, card** preason_card, uint8* battle_destroyed)
 {
 	uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
 	uint32 da = 0, dd = 0, a = aa, d;
@@ -4142,7 +4142,6 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 	}
 	case 3: {
 		//Standby Phase
-		shuffle(turn_player, LOCATION_HAND);
 		infos.phase = PHASE_STANDBY;
 		core.phase_action = FALSE;
 		raise_event((card*)0, EVENT_PHASE_PRESTART + PHASE_STANDBY, 0, 0, 0, turn_player, 0);
