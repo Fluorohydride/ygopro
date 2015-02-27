@@ -10,9 +10,11 @@ function c44394295.initial_effect(c)
 	e1:SetOperation(c44394295.activate)
 	c:RegisterEffect(e1)
 end
+function c44394295.filter0(c)
+	return c:IsCanBeFusionMaterial() and (c:IsAbleToGrave() or c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT))
+end
 function c44394295.filter1(c,e)
-	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
-	and ( (not c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT) and c:IsAbleToGrave()) or c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT) )
+	return c:IsCanBeFusionMaterial() and (c:IsAbleToGrave() or c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT)) and not c:IsImmuneToEffect(e)
 end
 function c44394295.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x9d) and (not f or f(c))
@@ -24,9 +26,9 @@ end
 function c44394295.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c44394295.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(c44394295.filter0,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		if Duel.IsExistingMatchingCard(c44394295.cfilter,tp,0,LOCATION_MZONE,1,nil) then
-			local sg=Duel.GetMatchingGroup(c44394295.filter1,tp,LOCATION_DECK,0,nil,e)
+			local sg=Duel.GetMatchingGroup(c44394295.filter0,tp,LOCATION_DECK,0,nil)
 			mg1:Merge(sg)
 		end
 		local res=Duel.IsExistingMatchingCard(c44394295.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)

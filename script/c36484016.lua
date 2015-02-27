@@ -20,6 +20,9 @@ function c36484016.initial_effect(c)
 	e2:SetOperation(c36484016.drop)
 	c:RegisterEffect(e2)
 end
+function c36484016.filter0(c)
+	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
+end
 function c36484016.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
@@ -33,7 +36,7 @@ end
 function c36484016.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c36484016.filter1,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(c36484016.filter0,tp,LOCATION_MZONE+LOCATION_GRAVE,0,nil)
 		local res=Duel.IsExistingMatchingCard(c36484016.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)

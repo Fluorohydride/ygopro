@@ -18,6 +18,10 @@ function c1784686.initial_effect(c)
 	e2:SetValue(10000050)
 	c:RegisterEffect(e2)
 end
+function c1784686.tgfilter0(c,e,tp)
+	return c:IsFaceup() and c:IsSetCard(0xa2)
+		and c:IsCanBeFusionMaterial() and Duel.IsExistingMatchingCard(c1784686.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,c:GetCode())
+end
 function c1784686.tgfilter(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0xa2)
 		and c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
@@ -33,7 +37,7 @@ end
 function c1784686.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc==0 then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c1784686.tgfilter(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
-		and Duel.IsExistingTarget(c1784686.tgfilter,tp,LOCATION_MZONE,0,1,nil,e,tp) end
+		and Duel.IsExistingTarget(c1784686.tgfilter0,tp,LOCATION_MZONE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c1784686.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
