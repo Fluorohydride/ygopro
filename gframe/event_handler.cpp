@@ -250,6 +250,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wANCard, true);
 				break;
 			}
+			case BUTTON_CMD_SHUFFLE: {
+				mainGame->wCmdMenu->setVisible(false);
+				DuelClient::SetResponseI(8);
+				DuelClient::SendResponse();
+				break;
+			}
 			case BUTTON_CMD_ACTIVATE: {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!list_command) {
@@ -984,17 +990,17 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					break;
 				}
 				case LOCATION_HAND: {
-										if (!clicked_card)
-											break;
-										int command_flag = clicked_card->cmdFlag;
-										if (clicked_card->overlayed.size())
-											command_flag |= COMMAND_LIST;
-										list_command = 0;
-										if (hovered_location & LOCATION_HAND && mainGame->canShuffle
-											&& mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD)
-											command_flag |= COMMAND_SHUFFLE;
-										ShowMenu(command_flag, x, y);
-										break;
+					if (!clicked_card)
+						break;
+					int command_flag = clicked_card->cmdFlag;
+					if (clicked_card->overlayed.size())
+						command_flag |= COMMAND_LIST;
+					list_command = 0;
+					if (hovered_location & LOCATION_HAND && mainGame->canShuffle
+						&& mainGame->dInfo.curMsg == MSG_SELECT_IDLECMD)
+						command_flag |= COMMAND_SHUFFLE;
+					ShowMenu(command_flag, x, y);
+					break;
 				}
 				case LOCATION_MZONE:
 				case LOCATION_SZONE: {

@@ -428,6 +428,7 @@ extern Game* mainGame;
 #define BUTTON_CMD_REPOS			245
 #define BUTTON_CMD_ATTACK			246
 #define BUTTON_CMD_SHOWLIST			247
+#define BUTTON_CMD_SHUFFLE			248
 #define BUTTON_ANNUMBER_OK			250
 #define BUTTON_ANCARD_OK			251
 #define EDITBOX_ANCARD				252
