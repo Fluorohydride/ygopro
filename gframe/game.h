@@ -112,6 +112,7 @@ public:
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
 
+	bool canShuffle;
 	int hideChatTimer;
 	bool hideChat;
 	int chatTiming[8];

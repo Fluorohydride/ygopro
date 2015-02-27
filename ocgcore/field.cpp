@@ -27,6 +27,7 @@ field::field(duel* pduel) {
 	this->pduel = pduel;
 	infos.field_id = 1;
 	infos.copy_id = 1;
+	infos.shuffle_count = 0;
 	infos.turn_id = 0;
 	infos.card_id = 1;
 	infos.phase = 0;

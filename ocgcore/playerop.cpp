@@ -139,11 +139,15 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 			pduel->write_buffer8(1);
 		else
 			pduel->write_buffer8(0);
+		if(infos.shuffle_count <5 && player[(uint32)playerid].list_hand.size() > 1)
+			pduel->write_buffer8(1);
+		else
+			pduel->write_buffer8(0);
 		return FALSE;
 	} else {
 		uint32 t = returns.ivalue[0] & 0xffff;
 		uint32 s = returns.ivalue[0] >> 16;
-		if(t < 0 || t > 7 || s < 0
+		if(t < 0 || t > 8 || s < 0
 		        || (t == 0 && s >= core.summonable_cards.size())
 		        || (t == 1 && s >= core.spsummonable_cards.size())
 		        || (t == 2 && s >= core.repositionable_cards.size())
@@ -151,7 +155,8 @@ int32 field::select_idle_command(uint16 step, uint8 playerid) {
 		        || (t == 4 && s >= core.ssetable_cards.size())
 		        || (t == 5 && s >= core.select_chains.size())
 		        || (t == 6 && (infos.phase != PHASE_MAIN1 || !core.to_bp))
-		        || (t == 7 && !core.to_ep)) {
+		        || (t == 7 && !core.to_ep)
+				|| (t == 8 && !(infos.shuffle_count <5 && player[(uint32)playerid].list_hand.size() > 1))) {
 			pduel->write_buffer8(MSG_RETRY);
 			return FALSE;
 		}
