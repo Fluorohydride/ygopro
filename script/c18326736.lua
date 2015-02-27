@@ -9,7 +9,6 @@ function c18326736.initial_effect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_CHAIN_UNIQUE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetCost(c18326736.spcost)
 	e1:SetTarget(c18326736.sptg)
@@ -35,8 +34,10 @@ function c18326736.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c18326736.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,3,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,3,3,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,3,REASON_COST) and c:GetFlagEffect(18326736)==0 end
+	c:RemoveOverlayCard(tp,3,3,REASON_COST)
+	c:RegisterFlagEffect(18326736,RESET_CHAIN,0,1)
 end
 function c18326736.filter(c,e,tp,rk)
 	return c:GetRank()==rk+1 and not c:IsSetCard(0x48) and e:GetHandler():IsCanBeXyzMaterial(c,true)
@@ -46,7 +47,6 @@ function c18326736.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and Duel.IsExistingMatchingCard(c18326736.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,e:GetHandler():GetRank()) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c18326736.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
@@ -68,7 +68,6 @@ end
 function c18326736.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,7,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,7,7,REASON_COST)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -88,11 +87,10 @@ function c18326736.mtfilter(c)
 end
 function c18326736.mttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c18326736.mtfilter,tp,LOCATION_EXTRA,0,1,nil) end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c18326736.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	local g=Duel.SelectMatchingCard(tp,c18326736.mtfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if g:GetCount()>0 then
