@@ -88,40 +88,201 @@ namespace sgui
     // ===== Delegate Implement End =====
     
     // == basic ui elements ==
-    class UISprite : public base::RenderUnit<base::v2ct> {
-    public:
-        virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
-            std::array<base::v2ct, 4> verts;
-            std::array<int16_t, 6> indices;
-        }
-        virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
-        }
-    protected:
-        v2f positions;
-        v2f size;
+    struct UICommonStatus {
+        v2i screen_size;
+        bool need_update;
     };
     
-    class UISprite9 : public base::RenderUnit<base::v2ct> {
+    class UIBase {
     public:
-        virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
+        inline static v2f ConvScreenCoord(v2i pos) {
+            auto& status = CommonStatus();
+            return v2f{pos.x * 2.0f / status.screen_size.x - 1.0f, 1.0f - pos.y * 2.0f / status.screen_size.y};
         }
-        virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
+        
+        inline static void SetScreenSize(v2i sz) {
+            auto& status = CommonStatus();
+            if(sz == status.screen_size)
+                return;
+            status.screen_size = sz;
+            status.need_update = true;
         }
-    protected:
-        v2f position;
-        v2f size;
-        rectf frame_rect;
+        
+        inline static void EndUpdate() { CommonStatus().need_update = false; }
+        inline static UICommonStatus& CommonStatus() { static UICommonStatus status; return status; }
     };
     
-    class UITextBase : public base::RenderUnit<base::v2ct> {
+    class UIComponent : public UIBase, public base::RenderUnit<base::v2ct> {
     public:
+        virtual int32_t GetPrimitiveType() = 0;
+        virtual int32_t GetTextureId() = 0;
+        
         virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
-            
+            std::tie(vert_index, index_index) = render_obj.BeginPrimitive(GetPrimitiveType(), GetTextureId());
+            RefreshVertices();
+            render_obj.PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
         }
+        
         virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
+            RefreshVertices();
+            render_obj.UpdateVertices(&vertices[0], vert_index, vertices.size());
+            render_obj.Updateindices(&indices[0], index_index, indices.size());
+        }
+        
+        inline void SetPosition(v2i pos) {
+            if(pos == position)
+                return;
+            position = pos;
+            need_update = true;
+        }
+        
+        inline void SetSize(v2i sz) {
+            if(sz == size)
+                return;
+            size = sz;
+            need_update = true;
+        }
+        
+        inline bool NeedUpdate() {
+            return need_update || CommonStatus().need_update;
+        }
+        
+    protected:
+        v2i position;
+        v2i size;
+    };
+    
+    class UISprite : public UIComponent {
+    public:
+        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
+        virtual int32_t GetTextureId() { return texture->GetTextureId(); }
+        
+        virtual void RefreshVertices() {
+            if(!NeedUpdate())
+                return;
+            need_update = false;
+            vertices.resize(4);
+            indices.resize(6);
+            FillQuad(&vertices[0], &indices[0]);
+        }
+        
+        void SetTexure(recti trct, base::Texture* tex) {
+            tex_rect = trct;
+            texture = tex;
+            need_update = true;
+        }
+        
+        void FillQuad(base::v2ct* v, int16_t* idx) {
+            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
+            v[0].vertex = ConvScreenCoord({position.x, position.y});
+            v[1].vertex = ConvScreenCoord({position.x + size.x, position.y});
+            v[2].vertex = ConvScreenCoord({position.x, position.y + size.y});
+            v[3].vertex = ConvScreenCoord({position.x + size.x, position.y + size.y});
+            v[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
+            v[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
+            v[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
+            v[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
+            for(int16_t i = 0; i < 6; ++i)
+                idx[i] = index_index + quad_idx[i];
+        }
+        
+    protected:
+        recti tex_rect;
+        base::Texture* texture = nullptr;
+    };
+    
+    class UISprite9 : UISprite {
+    public:
+        virtual void RefreshVertices() {
+            if(!NeedUpdate())
+                return;
+            need_update = false;
+            vertices.resize(20);
+            indices.resize(60);
+            FillQuad9(&vertices[0], &indices[0]);
+        }
+        
+        void SetFrameRect(recti frct, recti ftrct, recti brct) {
+            frame = frct;
+            frame_tex = ftrct;
+            back_tex = brct;
+            need_update = true;
+        }
+        
+        void FillQuad9(base::v2ct* v, int16_t* idx) {
+            static const int16_t quad9_idx[] = {    16,17,18,18,17,19,
+                0, 1, 4, 4, 1, 5, 1, 2, 5, 5, 2, 6, 2, 3, 6, 6, 3, 7,
+                4, 5, 8, 8, 5, 9, 5, 6, 9, 9, 6, 10,6, 7, 10,10,7, 11,
+                8, 9, 12,12,9, 13,9, 10,13,13,10,14,10,11,14,14,11,15
+            };
+            v2f verts[4], texcoord[4];
+            verts[0] = ConvScreenCoord({position.x, position.y});
+            verts[1] = ConvScreenCoord({position.x + frame.left, position.y + frame.top});
+            verts[2] = ConvScreenCoord({position.x + size.x - frame.width, position.y + size.y - frame.height});
+            verts[3] = ConvScreenCoord({position.x + size.x, position.y + size.y});
+            texcoord[0] = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
+            texcoord[1] = texture->ConvTexCoord({tex_rect.left + frame_tex.left, tex_rect.top + frame_tex.top});
+            texcoord[2] = texture->ConvTexCoord({tex_rect.left + tex_rect.width - frame_tex.width, tex_rect.top + tex_rect.height - frame_tex.height});
+            texcoord[3] = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
+            for(int32_t i = 0; i < 4; ++i) {
+                for(int32_t j = 0; j < 4; ++j) {
+                    v[i * 4 + j].vertex = v2f{verts[j].x, verts[i].y};
+                    v[i * 4 + j].texcoord = v2f{texcoord[j].x, texcoord[i].y};
+                }
+            }
+            v[16].vertex = v[0].vertex;
+            v[17].vertex = v[3].vertex;
+            v[18].vertex = v[12].vertex;
+            v[19].vertex = v[15].vertex;
+            v[16].texcoord = texture->ConvTexCoord({back_tex.left, back_tex.top});
+            v[17].texcoord = texture->ConvTexCoord({back_tex.left + back_tex.width, back_tex.top});
+            v[18].texcoord = texture->ConvTexCoord({back_tex.left, back_tex.top + back_tex.height});
+            v[19].texcoord = texture->ConvTexCoord({back_tex.left + back_tex.width, back_tex.top + back_tex.height});
+            for(int32_t i = 0; i < 60; ++i)
+                idx[i] = quad9_idx[i];
+        }
+        
+    protected:
+        recti frame;
+        recti frame_tex;
+        recti back_tex;
+    };
+    
+    class UITextBase : UIComponent {
+    public:
+        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
+        virtual int32_t GetTextureId() { return text_font->GetTexture().GetTextureId(); }
+        
+        virtual void RefreshVertices() {
+            if(!NeedUpdate())
+                return;
+            need_update = false;
+        }
+        
+        void SetFont(base::Font* ft) {
+            if(!ft)
+                return;
+            text_font = ft;
+            need_update = true;
+        }
+        
+        void SetMaxWidth(int32_t mw) {
+            if(max_width == mw)
+                return;
+        }
+        
+        bool AppendText(std::wstring& t, int32_t cl) {
+            return false;
+        }
+        
+        void Clear() {
             
         }
+        
     protected:
+        base::Font* text_font = nullptr;
+        int32_t max_width;
+        int32_t vert_cap;
         std::wstring texts;
         std::vector<int32_t> colors;
     };

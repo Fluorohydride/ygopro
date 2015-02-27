@@ -117,6 +117,11 @@ namespace base
     template<typename VTYPE>
     class RenderObject : public IRenderState<VTYPE> {
     public:
+        RenderObject() {
+            vertex_buffer.reserve(4096);
+            index_buffer.reserve(6144);
+        }
+        
         std::tuple<int16_t, int16_t> BeginPrimitive(int16_t pri_type, int16_t texid) {
             bool merge = false;
             if(!render_commands.empty() && render_commands.back()->CheckPrimitive(pri_type, texid))
@@ -131,7 +136,7 @@ namespace base
                 vertex_buffer.push_back(vert_data[i]);
             for(int32_t i = 0; i < icount; ++i)
                 index_buffer.push_back(index_data[i]);
-            render_commands.back().count += icount;
+            std::static_pointer_cast<RenderCmdDraw<VTYPE>>(render_commands.back())->count += icount;
         }
         
         void BeginUpdate() {
@@ -204,45 +209,60 @@ namespace base
     template<typename VTYPE>
     class RenderUnit {
     public:
-        virtual void PushVertices(RenderObject<VTYPE>& render_obj) { need_update = false; }
-        virtual void UpdateVertices(RenderObject<VTYPE>& render_obj) { need_update = false; }
-        bool NeedUpdate() { return need_update; }
-        void SetUpdate(bool up) { need_update = up; }
+        virtual void RefreshVertices() {}
+        virtual void PushVertices(RenderObject<VTYPE>& render_obj) {}
+        virtual void UpdateVertices(RenderObject<VTYPE>& render_obj) {}
+        
+    protected:
+        bool need_update = true;
+        int16_t vert_index = 0;
+        int16_t index_index = 0;
+        std::vector<VTYPE> vertices;
+        std::vector<int16_t> indices;
+    };
+    
+    class UpdateUnit {
+    public:
+        virtual void Update() { need_update = false; }
+        inline bool NeedUpdate() { return need_update; }
+        inline void SetUpdate(bool up) { need_update = up; }
         
     protected:
         bool need_update = false;
-        int16_t vert_index = 0;
-        int16_t index_index = 0;
     };
     
-    template<typename VTYPE>
-    class RenderUnitMgr {
+    template<typename UUT>
+    class UpdateUnitMgr {
     public:
-        void AddUpdateUnit(std::shared_ptr<RenderUnit<VTYPE>> unit) {
-            if(unit->NeedUpdate())
+        template<typename UT>
+        void AddUpdateUnit(UT ptr) {
+            auto unit = std::const_pointer_cast<UUT>(ptr);
+            if(unit->NeedUpdate)
                 return;
             unit->SetUpdate(true);
             update_units.push_back(unit);
         }
-        void UpdateAll(RenderObject<VTYPE>& render_obj) {
+        
+        void UpdateAll() {
             for(auto& punit : update_units) {
                 auto unit = punit.lock();
                 if(unit)
-                    unit->UpdateVertices(render_obj);
+                    unit->Update();
             }
             update_units.clear();
         }
+        
         void Clear() {
+            for(auto& punit : update_units) {
+                auto unit = punit.lock();
+                if(unit)
+                    unit->SetUpdate(false);
+            }
             update_units.clear();
         }
         
-        template<typename T>
-        std::shared_ptr<T> Create() {
-            static_assert(!std::is_base_of<RenderUnit<VTYPE>, T>::value, "Must Create Subclass of RenderUnit<>.");
-            auto ptr = std::make_shared<T>();
-        }
     protected:
-        std::vector<std::weak_ptr<RenderUnit<VTYPE>>> update_units;
+        std::vector<std::weak_ptr<UUT>> update_units;
     };
     
 }

@@ -34,6 +34,7 @@ namespace base {
 		T y;
         inline void operator += (const vector2<T>& op) { x += op.x; y += op.y; }
 		inline void operator -= (const vector2<T>& op) { x -= op.x; y -= op.y; }
+        inline bool operator == (const vector2<T>& op) { return x == op.x && y == op.y; }
 	};
     
 	template<typename T>
@@ -43,6 +44,7 @@ namespace base {
 		T z;
         inline void operator += (const vector3<T>& op) { x += op.x; y += op.y; z += op.z; }
         inline void operator -= (const vector3<T>& op) { x -= op.x; y -= op.y; z -= op.z; }
+        inline bool operator == (const vector3<T>& op) { return x == op.x && y == op.y && z == op.z; }
 	};
     
     template<typename T>
@@ -317,6 +319,10 @@ namespace base {
 			len = len | (len >> 16);
 			return len + 1;
 		}
+        
+        inline vector2<float> ConvTexCoord(vector2<int32_t> texpos) {
+            return vector2<float>{(float)texpos.x / tex_width, (float)texpos.y / tex_height};
+        }
         
         void Load(const uint8_t* data, int32_t x, int32_t y);
         void Unload();
