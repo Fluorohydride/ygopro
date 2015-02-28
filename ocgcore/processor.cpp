@@ -2701,6 +2701,11 @@ int32 field::process_idle_command(uint16 step) {
 		} else if(ctype == 4) {
 			core.units.begin()->step = 8;
 			return FALSE;
+		} else if (ctype == 8) {
+			core.units.begin()->step = -1;
+			shuffle(infos.turn_player, LOCATION_HAND);
+			infos.shuffle_count++;
+			return FALSE;
 		} else {
 			core.units.begin()->step = 9;
 			pduel->write_buffer8(MSG_HINT);
@@ -2789,6 +2794,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 11: {
 		returns.ivalue[0] = core.units.begin()->arg1;
+		infos.shuffle_count = 0;
 		return TRUE;
 	}
 	case 12: {
@@ -4142,7 +4148,6 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 	}
 	case 3: {
 		//Standby Phase
-		shuffle(turn_player, LOCATION_HAND);
 		infos.phase = PHASE_STANDBY;
 		core.phase_action = FALSE;
 		raise_event((card*)0, EVENT_PHASE_PRESTART + PHASE_STANDBY, 0, 0, 0, turn_player, 0);

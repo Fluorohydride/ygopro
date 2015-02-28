@@ -112,6 +112,7 @@ public:
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
 
+	bool canShuffle;
 	int hideChatTimer;
 	bool hideChat;
 	int chatTiming[8];
@@ -298,6 +299,7 @@ public:
 	irr::gui::IGUIButton* btnRepos;
 	irr::gui::IGUIButton* btnAttack;
 	irr::gui::IGUIButton* btnShowList;
+	irr::gui::IGUIButton* btnShuffle;
 	//chat window
 	irr::gui::IGUIWindow* wChat;
 	irr::gui::IGUIListBox* lstChatLog;
@@ -373,6 +375,7 @@ extern Game* mainGame;
 #define COMMAND_REPOS		0x0020
 #define COMMAND_ATTACK		0x0040
 #define COMMAND_LIST		0x0080
+#define COMMAND_SHUFFLE		0x0100
 
 #define BUTTON_LAN_MODE				100
 #define BUTTON_SINGLE_MODE			101
@@ -427,6 +430,7 @@ extern Game* mainGame;
 #define BUTTON_CMD_REPOS			245
 #define BUTTON_CMD_ATTACK			246
 #define BUTTON_CMD_SHOWLIST			247
+#define BUTTON_CMD_SHUFFLE			248
 #define BUTTON_ANNUMBER_OK			250
 #define BUTTON_ANCARD_OK			251
 #define EDITBOX_ANCARD				252
