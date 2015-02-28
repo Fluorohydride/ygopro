@@ -299,6 +299,7 @@ public:
 	irr::gui::IGUIButton* btnRepos;
 	irr::gui::IGUIButton* btnAttack;
 	irr::gui::IGUIButton* btnShowList;
+	irr::gui::IGUIButton* btnShuffle;
 	//chat window
 	irr::gui::IGUIWindow* wChat;
 	irr::gui::IGUIListBox* lstChatLog;
