@@ -1,5 +1,4 @@
 --財宝への隠し通路
---not fully implemented
 function c77876207.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -21,15 +20,11 @@ function c77876207.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c77876207.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and c77876207.filter(tc) then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_DIRECT_ATTACK)
-		e1:SetCondition(c77876207.atcon)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 	end
-end
-function c77876207.atcon(e)
-	return e:GetHandler():IsAttackBelow(1000)
 end
