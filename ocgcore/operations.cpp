@@ -1436,7 +1436,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		core.summoning_card = 0;
 		raise_event(target, EVENT_SUMMON, proc, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0x101, TRUE);
 		return FALSE;
 	}
 	case 12: {
@@ -1547,7 +1547,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 			target->set_status(STATUS_SUMMON_DISABLED, FALSE);
 			raise_event(target, EVENT_FLIP_SUMMON, 0, 0, sumplayer, sumplayer, 0);
 			process_instant_event();
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0x101, TRUE);
 		}
 		return FALSE;
 	}
@@ -2088,7 +2088,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 		target->set_status(STATUS_SUMMON_DISABLED, FALSE);
 		raise_event(target, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
 		process_instant_event();
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0x101, TRUE);
 		return FALSE;
 	}
 	case 11: {
@@ -2233,7 +2233,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 			raise_event(&cset, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, PLAYER_NONE, 0);
 		process_single_event();
 		process_instant_event();
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, TRUE, TRUE);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0x101, TRUE);
 		return FALSE;
 	}
 	case 26: {
