@@ -74,10 +74,11 @@ function c12927849.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c12927849.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 end
 function c12927849.eqlimit(e,c)
-	return c:IsSetCard(0x7f)
+	return c==e:GetLabelObject()
 end
 function c12927849.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local ec=eg:GetFirst()

@@ -34,8 +34,10 @@ function c18326736.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c18326736.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,3,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,3,3,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,3,REASON_COST) and c:GetFlagEffect(18326736)==0 end
+	c:RemoveOverlayCard(tp,3,3,REASON_COST)
+	c:RegisterFlagEffect(18326736,RESET_CHAIN,0,1)
 end
 function c18326736.filter(c,e,tp,rk)
 	return c:GetRank()==rk+1 and not c:IsSetCard(0x48) and e:GetHandler():IsCanBeXyzMaterial(c,true)
@@ -88,7 +90,7 @@ function c18326736.mttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c18326736.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+	if not c:IsRelateToEffect(e) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	local g=Duel.SelectMatchingCard(tp,c18326736.mtfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if g:GetCount()>0 then

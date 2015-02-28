@@ -26,7 +26,6 @@ function c48063985.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
-	e3:SetCost(aux.msgcost)
 	e3:SetTarget(c48063985.thtg)
 	e3:SetOperation(c48063985.thop)
 	c:RegisterEffect(e3)
@@ -75,6 +74,7 @@ function c48063985.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_REMOVED) and chkc:IsControler(tp) and c48063985.tgfilter(chkc) end
 	if chk==0 then return Duel.IsExistingTarget(c48063985.tgfilter,tp,LOCATION_REMOVED,0,2,nil)
 		and Duel.IsExistingMatchingCard(c48063985.thfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectTarget(tp,c48063985.tgfilter,tp,LOCATION_REMOVED,0,2,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,2,0,0)
@@ -95,7 +95,6 @@ end
 function c48063985.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToExtraAsCost() end
 	Duel.SendtoDeck(e:GetHandler(),nil,0,REASON_COST)
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c48063985.filter1(c,e,tp)
 	return c:IsFaceup() and c:IsSetCard(0x10b5) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -108,6 +107,7 @@ function c48063985.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingTarget(c48063985.filter1,tp,LOCATION_REMOVED,0,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g1=Duel.SelectTarget(tp,c48063985.filter1,tp,LOCATION_REMOVED,0,1,1,nil,e,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)

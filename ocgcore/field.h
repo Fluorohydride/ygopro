@@ -418,20 +418,20 @@ public:
 	int32 check_event_c(effect* peffect, uint8 playerid, int32 neglect_con, int32 neglect_cost, int32 copy_info, tevent* pe = 0);
 	int32 check_hint_timing(effect* peffect);
 	int32 process_phase_event(int16 step, int32 phase_event);
-	int32 process_point_event(int16 step, int32 special, int32 skip_new);
-	int32 process_quick_effect(int16 step, int32 special, uint8 priority);
+	int32 process_point_event(int16 step, int32 skip_trigger, int32 skip_freechain, int32 skip_new);
+	int32 process_quick_effect(int16 step, int32 skip_freechain, uint8 priority);
 	int32 process_instant_event();
 	int32 process_single_event();
 	int32 process_idle_command(uint16 step);
 	int32 process_battle_command(uint16 step);
 	int32 process_damage_step(uint16 step);
-	void calculate_battle_damage(effect** pdamchange, card** preason_card, uint8 *battle_destroyed);
+	void calculate_battle_damage(effect** pdamchange, card** preason_card, uint8* battle_destroyed);
 	int32 process_turn(uint16 step, uint8 turn_player);
 
 	int32 add_chain(uint16 step);
 	int32 sort_chain(uint16 step, uint8 tp);
 	int32 solve_continuous(uint16 step, effect* peffect, uint8 triggering_player);
-	int32 solve_chain(uint16 step, uint32 skip_new);
+	int32 solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2);
 	int32 break_effect();
 	void adjust_instant();
 	void adjust_all();

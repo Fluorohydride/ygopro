@@ -1076,13 +1076,13 @@ function Auxiliary.PendOperation()
 					local g=Duel.SelectMatchingCard(tp,Auxiliary.PConditionFilter,tp,LOCATION_HAND+LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
 					sg:Merge(g)
 				end
-				local pg=Group.FromCards(c,rpz)
-				Duel.HintSelection(pg)
+				Duel.HintSelection(Group.FromCards(c))
+				Duel.HintSelection(Group.FromCards(rpz))
 			end
 end
 function Auxiliary.disfilter1(c)
 	return c:IsFaceup() and not c:IsDisabled()
-		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)>0)
+		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)~=0)
 end
 --reset op of chain attack
 function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
@@ -1116,9 +1116,4 @@ function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():GetFlagEffect(1)==0 then
 		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
 	end
-end
---cost function for message sending
-function Auxiliary.msgcost(e,tp,eg,ep,ev,re,r,rp)
-	if chk==0 then return true end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end

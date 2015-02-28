@@ -198,7 +198,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_POINT_EVENT: {
-		if(process_point_event(it->step, it->arg1, it->arg2))
+		if(process_point_event(it->step, it->arg1 & 0xff, (it->arg1 >> 8) & 0xff, it->arg2))
 			core.units.pop_front();
 		else
 			it->step++;
@@ -247,7 +247,7 @@ int32 field::process() {
 		return pduel->bufferlen;
 	}
 	case PROCESSOR_SOLVE_CHAIN: {
-		if (solve_chain(it->step, it->arg1))
+		if (solve_chain(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
 		else
 			it->step++;
@@ -1707,12 +1707,12 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 	}
 	return TRUE;
 }
-int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
+int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_freechain, int32 skip_new) {
 	switch(step) {
 	case 0: {
 		core.select_chains.clear();
 		core.point_event.splice(core.point_event.end(), core.instant_event);
-		if(special) {
+		if(skip_trigger) {
 			core.units.begin()->step = 7;
 			return FALSE;
 		}
@@ -2010,9 +2010,9 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		infos.priorities[0] = 0;
 		infos.priorities[1] = 0;
 		if(core.current_chain.size() == 0)
-			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, special, infos.turn_player);
+			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, infos.turn_player);
 		else
-			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, special, 1 - core.current_chain.back().triggering_player);
+			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, 1 - core.current_chain.back().triggering_player);
 		return FALSE;
 	}
 	case 10: {
@@ -2024,7 +2024,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 		if(core.current_chain.size()) {
 			for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait)
 				cait->triggering_effect->handler->set_status(STATUS_CHAINING, FALSE);
-			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_new, 0);
+			add_process(PROCESSOR_SOLVE_CHAIN, 0, 0, 0, skip_trigger | ((skip_freechain | skip_new) << 8), skip_new);
 		} else {
 			core.used_event.splice(core.used_event.end(), core.point_event);
 			if(core.chain_limit_p) {
@@ -2057,7 +2057,7 @@ int32 field::process_point_event(int16 step, int32 special, int32 skip_new) {
 	}
 	return TRUE;
 }
-int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
+int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priority) {
 	pair<effect_container::iterator, effect_container::iterator> pr;
 	event_list::iterator evit;
 	effect* peffect;
@@ -2072,9 +2072,9 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 			peffect = ifit->first;
 			if(peffect->is_chainable(ifit->second.triggering_player) && peffect->check_count_limit(ifit->second.triggering_player)
 					&& peffect->handler->is_has_relation(peffect)) {
-				if (ifit->second.triggering_player == infos.turn_player){
+				if(ifit->second.triggering_player == infos.turn_player) {
 					act = true;
-					if (peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 						for (auto cait = core.tpchain.begin(); cait != core.tpchain.end(); ++cait) {
 							if (cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
 								act = false;
@@ -2089,14 +2089,14 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 							}
 						}
 					}
-					if (act){
+					if(act) {
 						core.tpchain.push_back(ifit->second);
 						peffect->handler->set_status(STATUS_CHAINING, TRUE);
 						peffect->dec_count(infos.turn_player);
 					}
 				} else {
 					act = true;
-					if (peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
+					if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 						for (auto cait = core.ntpchain.begin(); cait != core.ntpchain.end(); ++cait) {
 							if (cait->triggering_effect->handler->data.code == peffect->handler->data.code) {
 								act = false;
@@ -2111,7 +2111,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 							}
 						}
 					}
-					if (act){
+					if(act) {
 						core.ntpchain.push_back(ifit->second);
 						peffect->handler->set_status(STATUS_CHAINING, TRUE);
 						peffect->dec_count(1 - infos.turn_player);
@@ -2224,7 +2224,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 				}
 			}
 			core.spe_effect[priority] = core.select_chains.size();
-			if(!special) {
+			if(!skip_freechain) {
 				nil_event.event_code = EVENT_FREE_CHAIN;
 				pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 				for(; pr.first != pr.second; ++pr.first) {
@@ -2295,7 +2295,7 @@ int32 field::process_quick_effect(int16 step, int32 special, uint8 priority) {
 		} else {
 			infos.priorities[priority] = 1;
 			if(!infos.priorities[0] || !infos.priorities[1])
-				add_process(PROCESSOR_QUICK_EFFECT, 1, 0, 0, special, 1 - priority);
+				add_process(PROCESSOR_QUICK_EFFECT, 1, 0, 0, skip_freechain, 1 - priority);
 			else {
 				core.hint_timing[0] = 0;
 				core.hint_timing[1] = 0;
@@ -3465,6 +3465,7 @@ int32 field::process_battle_command(uint16 step) {
 	case 26: {
 		uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
 		uint32 da = 0, dd = 0;
+		uint8 pa = core.attacker->current.controler, pd;
 		core.attacker->q_cache.attack = aa;
 		core.attacker->q_cache.defence = ad;
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
@@ -3474,6 +3475,11 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->q_cache.attack = da;
 			core.attack_target->q_cache.defence = dd;
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
+			pd = core.attack_target->current.controler;
+			if(pa != pd) {
+				core.attacker->set_status(STATUS_OPPO_BATTLE, TRUE);
+				core.attack_target->set_status(STATUS_OPPO_BATTLE, TRUE);
+			}
 		}
 		effect* damchange = 0;
 		card* reason_card = 0;
@@ -3671,7 +3677,7 @@ int32 field::process_battle_command(uint16 step) {
 			process_instant_event();
 		}
 		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
-				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
 		} else {
 			break_effect();
 		}
@@ -3722,7 +3728,7 @@ int32 field::process_battle_command(uint16 step) {
 		process_instant_event();
 		core.attacker->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 		core.attacker->set_status(STATUS_OPPO_BATTLE, FALSE);
-		if(core.attack_target){
+		if(core.attack_target) {
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			core.attack_target->set_status(STATUS_OPPO_BATTLE, FALSE);
 		}
@@ -3849,7 +3855,7 @@ int32 field::process_damage_step(uint16 step) {
 	}
 	return TRUE;
 }
-void field::calculate_battle_damage(effect** pdamchange, card** preason_card, uint8 *battle_destroyed)
+void field::calculate_battle_damage(effect** pdamchange, card** preason_card, uint8* battle_destroyed)
 {
 	uint32 aa = core.attacker->get_attack(), ad = core.attacker->get_defence();
 	uint32 da = 0, dd = 0, a = aa, d;
@@ -4136,6 +4142,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 	}
 	case 3: {
 		//Standby Phase
+		shuffle(turn_player, LOCATION_HAND);
 		infos.phase = PHASE_STANDBY;
 		core.phase_action = FALSE;
 		raise_event((card*)0, EVENT_PHASE_PRESTART + PHASE_STANDBY, 0, 0, 0, turn_player, 0);
@@ -4602,7 +4609,7 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 	}
 	return TRUE;
 }
-int32 field::solve_chain(uint16 step, uint32 skip_new) {
+int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2) {
 	if(core.current_chain.size() == 0 && step == 0)
 		return TRUE;
 	chain_array::reverse_iterator cait = core.current_chain.rbegin();
@@ -4873,11 +4880,9 @@ int32 field::solve_chain(uint16 step, uint32 skip_new) {
 	case 13: {
 		raise_event((card*)0, EVENT_CHAIN_END, 0, 0, 0, 0, 0);
 		process_instant_event();
-		if(!skip_new) {
-			core.hint_timing[0] |= TIMING_CHAIN_END;
-			core.hint_timing[1] |= TIMING_CHAIN_END;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		}
+		core.hint_timing[0] |= TIMING_CHAIN_END;
+		core.hint_timing[1] |= TIMING_CHAIN_END;
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, chainend_arg1, chainend_arg2);
 		returns.ivalue[0] = TRUE;
 		return TRUE;
 	}

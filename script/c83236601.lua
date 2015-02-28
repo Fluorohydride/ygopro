@@ -8,7 +8,6 @@ function c83236601.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1,83236601)
 	e1:SetCondition(c83236601.tgcon)
-	e1:SetCost(aux.msgcost)
 	e1:SetTarget(c83236601.tgtg)
 	e1:SetOperation(c83236601.tgop)
 	c:RegisterEffect(e1)
@@ -25,7 +24,6 @@ function c83236601.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,83236602)
 	e3:SetCondition(c83236601.thcon)
-	e3:SetCost(aux.msgcost)
 	e3:SetTarget(c83236601.thtg)
 	e3:SetOperation(c83236601.thop)
 	c:RegisterEffect(e3)
@@ -56,6 +54,7 @@ function c83236601.tgfilter(c)
 end
 function c83236601.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c83236601.tgfilter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 end
 function c83236601.tgop(e,tp,eg,ep,ev,re,r,rp)
@@ -76,6 +75,7 @@ function c83236601.filter(c)
 end
 function c83236601.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c83236601.filter,tp,LOCATION_DECK,0,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c83236601.thop(e,tp,eg,ep,ev,re,r,rp)

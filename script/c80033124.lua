@@ -9,6 +9,10 @@ function c80033124.initial_effect(c)
 	e1:SetOperation(c80033124.activate)
 	c:RegisterEffect(e1)
 end
+function c80033124.ffilter0(c)
+	local code=c:GetCode()
+	return (code==41230939 or code==77625948 or code==3019642) and c:IsAbleToDeck() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+end
 function c80033124.ffilter(c,e)
 	local code=c:GetCode()
 	return (code==41230939 or code==77625948 or code==3019642) and c:IsAbleToDeck()
@@ -20,7 +24,7 @@ end
 function c80033124.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		if not Duel.IsExistingMatchingCard(c80033124.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) then return false end
-		local g=Duel.GetMatchingGroup(c80033124.ffilter,tp,0x1e,0,nil,e)
+		local g=Duel.GetMatchingGroup(c80033124.ffilter0,tp,0x1e,0,nil)
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 and not g:IsExists(Card.IsLocation,1,nil,LOCATION_MZONE) then return false end
 		return g:IsExists(Card.IsCode,1,nil,41230939)
 			and g:IsExists(Card.IsCode,1,nil,77625948)

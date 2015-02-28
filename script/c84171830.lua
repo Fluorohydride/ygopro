@@ -43,7 +43,7 @@ function c84171830.cfilter(c)
 end
 function c84171830.discon(e)
 	local tp=e:GetHandlerPlayer()
-	return Duel.GetFieldGroupCount(tp,0,LOCATION_EXTRA)==0
+	return Duel.GetFieldGroupCount(tp,LOCATION_EXTRA,0)==0
 		and Duel.IsExistingMatchingCard(c84171830.cfilter,tp,LOCATION_MZONE,0,1,nil)
 		and not Duel.IsExistingMatchingCard(c84171830.cfilter,tp,0,LOCATION_MZONE,1,nil)
 end

@@ -84,6 +84,7 @@ function c60992364.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c60992364.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -94,7 +95,7 @@ function c60992364.eqop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 end
 function c60992364.eqlimit(e,c)
-	return c:IsSetCard(0x7f)
+	return c==e:GetLabelObject()
 end
 function c60992364.atcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_BATTLE and Duel.GetCurrentChain()==0
