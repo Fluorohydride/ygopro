@@ -26,6 +26,7 @@ function c87294988.bttg(e,c)
 end
 function c87294988.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and e:GetHandler():GetPreviousControler()==tp
+	and bit.band(c:GetReason(),REASON_DESTROY+REASON_BATTLE)~=0
 end
 function c87294988.filter(c,e,tp)
 	return c:IsRace(RACE_PLANT) and not c:IsCode(87294988) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
