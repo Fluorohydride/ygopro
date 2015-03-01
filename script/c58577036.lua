@@ -17,7 +17,7 @@ function c58577036.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_DECK)
 end
 function c58577036.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsPlayerCanSpecialSummon(tp) or not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
+	if not Duel.IsPlayerCanSpecialSummon(tp) or not Duel.IsPlayerCanSpecialSummonCount(tp,1) or not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.Hint(HINT_SELECTMSG,1-tp,567)
 	local lv=Duel.AnnounceNumber(1-tp,1,2,3,4,5,6,7,8,9,10,11,12)
 	local g=Duel.GetMatchingGroup(Card.IsSummonableCard,tp,LOCATION_DECK,0,nil)

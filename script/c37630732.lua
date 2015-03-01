@@ -79,6 +79,11 @@ function c37630732.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_PHASE+PHASE_END)
 		e2:SetOperation(c37630732.damop)
 		Duel.RegisterEffect(e2,tp)
+	elseif Duel.IsPlayerCanSpecialSummon(tp) and Duel.IsPlayerCanSpecialSummonCount(tp,1) then
+		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
+		Duel.ConfirmCards(1-tp,cg1)
+		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+		Duel.ConfirmCards(1-tp,cg2)
 	end
 end
 function c37630732.damop(e,tp,eg,ep,ev,re,r,rp)
