@@ -608,10 +608,6 @@ uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 	return 0;
 }
 uint32 card::get_base_attribute() {
-	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
-		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
-		return data.attribute;
 	int32 batt = data.attribute;
 	effect_set effects;
 	filter_effect(EFFECT_CHANGE_BASE_ATTRIBUTE, &effects);
@@ -622,9 +618,9 @@ uint32 card::get_base_attribute() {
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
-	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+	if(current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_TRAPMONSTER))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
@@ -647,10 +643,6 @@ uint32 card::get_attribute() {
 	return attribute;
 }
 uint32 card::get_base_race() {
-	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
-		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
-		return data.race;
 	int32 brac = data.race;
 	effect_set effects;
 	filter_effect(EFFECT_CHANGE_BASE_RACE, &effects);
@@ -661,9 +653,9 @@ uint32 card::get_base_race() {
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
 		return assume_value;
-	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+	if(current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_TRAPMONSTER))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
