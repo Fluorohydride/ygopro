@@ -607,6 +607,18 @@ uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 		return (lev >> 16) & 0xffff;
 	return 0;
 }
+uint32 card::get_base_attribute() {
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+		return 0;
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+		return data.attribute;
+	int32 batt = data.attribute;
+	effect_set effects;
+	filter_effect(EFFECT_CHANGE_BASE_ATTRIBUTE, &effects);
+	if(effects.size())
+		batt = effects.get_last()->get_value(this);
+	return batt;
+}
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
@@ -617,8 +629,8 @@ uint32 card::get_attribute() {
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
 	effect_set effects;
-	int32 attribute = data.attribute;
-	temp.attribute = data.attribute;
+	int32 attribute = get_base_attribute();
+	temp.attribute = attribute;
 	filter_effect(EFFECT_ADD_ATTRIBUTE, &effects, FALSE);
 	filter_effect(EFFECT_REMOVE_ATTRIBUTE, &effects, FALSE);
 	filter_effect(EFFECT_CHANGE_ATTRIBUTE, &effects);
@@ -634,6 +646,18 @@ uint32 card::get_attribute() {
 	temp.attribute = 0xffffffff;
 	return attribute;
 }
+uint32 card::get_base_race() {
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+		return 0;
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+		return data.race;
+	int32 brac = data.race;
+	effect_set effects;
+	filter_effect(EFFECT_CHANGE_BASE_RACE, &effects);
+	if(effects.size())
+		brac = effects.get_last()->get_value(this);
+	return brac;
+}
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
 		return assume_value;
@@ -644,8 +668,8 @@ uint32 card::get_race() {
 	if (temp.race != 0xffffffff)
 		return temp.race;
 	effect_set effects;
-	int32 race = data.race;
-	temp.race = data.race;
+	int32 race = get_base_race();
+	temp.race = race;
 	filter_effect(EFFECT_ADD_RACE, &effects, FALSE);
 	filter_effect(EFFECT_REMOVE_RACE, &effects, FALSE);
 	filter_effect(EFFECT_CHANGE_RACE, &effects);

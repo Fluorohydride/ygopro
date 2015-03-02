@@ -149,7 +149,7 @@ int32 scriptlib::card_get_origin_attribute(lua_State *L) {
 	if(pcard->status & STATUS_NO_LEVEL)
 		lua_pushinteger(L, 0);
 	else
-		lua_pushinteger(L, pcard->data.attribute);
+		lua_pushinteger(L, pcard->get_base_attribute());
 	return 1;
 }
 int32 scriptlib::card_get_race(lua_State *L) {
@@ -166,7 +166,7 @@ int32 scriptlib::card_get_origin_race(lua_State *L) {
 	if(pcard->status & STATUS_NO_LEVEL)
 		lua_pushinteger(L, 0);
 	else
-		lua_pushinteger(L, pcard->data.race);
+		lua_pushinteger(L, pcard->get_base_race());
 	return 1;
 }
 int32 scriptlib::card_get_attack(lua_State *L) {
@@ -1880,7 +1880,7 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	peffect = pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
-	peffect->code = EFFECT_CHANGE_ATTRIBUTE;
+	peffect->code = EFFECT_CHANGE_BASE_ATTRIBUTE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_flag = RESET_EVENT + 0x47e0000;
 	peffect->value = attribute;
@@ -1889,7 +1889,7 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	peffect = pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
-	peffect->code = EFFECT_CHANGE_RACE;
+	peffect->code = EFFECT_CHANGE_BASE_RACE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_flag = RESET_EVENT + 0x47e0000;
 	peffect->value = race;

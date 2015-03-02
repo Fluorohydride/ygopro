@@ -580,8 +580,8 @@ int32 field::process() {
 		return PROCESSOR_WAITING + pduel->bufferlen;
 	}
 	case PROCESSOR_TOSS_DICE: {
-		if (toss_dice(it->step, it->peffect, (it->arg1 >> 16), it->arg1 & 0xff, it->arg2)) {
-			for(int32 i = 0; i < it->arg2; ++i)
+		if(toss_dice(it->step, it->peffect, it->arg1 >> 16, it->arg1 & 0xff, it->arg2 & 0xff, it->arg2 >> 16)) {
+			for(int32 i = 0; i < (it->arg2 & 0xff) + (it->arg2 >> 16); ++i)
 				pduel->lua->add_param(core.dice_result[i], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else

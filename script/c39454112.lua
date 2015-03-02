@@ -20,11 +20,10 @@ function c39454112.diceop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_CARD,0,39454112)
 		local dc={Duel.GetDiceResult()}
 		local ac=1
-		if ev>1 then
-			local t={}
-			for i=1,ev do t[i]=i end
+		local ct=bit.band(ev,0xff)+bit.rshift(ev,16)
+		if ct>1 then
 			Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(39454112,1))
-			ac=Duel.AnnounceNumber(tp,table.unpack(t))
+			ac=Duel.AnnounceNumber(tp,table.unpack(dc,1,ct))
 		end
 		if dc[ac]==1 or dc[ac]==3 or dc[ac]==5 then dc[ac]=6
 		else dc[ac]=1 end

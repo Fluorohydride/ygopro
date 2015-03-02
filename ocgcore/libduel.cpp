@@ -2731,12 +2731,17 @@ int32 scriptlib::duel_toss_dice(lua_State * L) {
 	check_param_count(L, 2);
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 playerid = lua_tointeger(L, 1);
-	int32 count = lua_tointeger(L, 2);
-	if((playerid != 0 && playerid != 1) || count <= 0)
+	int32 count1 = lua_tointeger(L, 2);
+	int32 count2 = 0;
+	if(lua_gettop(L) > 2)
+		count2 = lua_tointeger(L, 3);
+	if((playerid != 0 && playerid != 1) || count1 <= 0 || count2 < 0)
 		return 0;
-	if(count > 5)
-		count = 5;
-	pduel->game_field->add_process(PROCESSOR_TOSS_DICE, 0, pduel->game_field->core.reason_effect, 0, (pduel->game_field->core.reason_player << 16) + playerid, count);
+	if(count1 > 5)
+		count1 = 5;
+	if(count2 > 5 - count1)
+		count2 = 5 - count1;
+	pduel->game_field->add_process(PROCESSOR_TOSS_DICE, 0, pduel->game_field->core.reason_effect, 0, (pduel->game_field->core.reason_player << 16) + playerid, count1 + (count2 << 16));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_get_coin_result(lua_State * L) {

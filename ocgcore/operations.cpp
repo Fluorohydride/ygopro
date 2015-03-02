@@ -4524,7 +4524,7 @@ int32 field::toss_coin(uint16 step, effect * reason_effect, uint8 reason_player,
 	}
 	return TRUE;
 }
-int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player, uint8 playerid, uint8 count) {
+int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player, uint8 playerid, uint8 count1, uint8 count2) {
 	switch(step) {
 	case 0: {
 		effect_set eset;
@@ -4535,7 +4535,7 @@ int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player,
 		e.reason_player = core.reason_player;
 		e.event_player = playerid;
 		e.event_value = count;
-		for(uint8 i = 0; i < 5; ++i)
+		for(int32 i = 0; i < 5; ++i)
 			core.dice_result[i] = 0;
 		filter_field_effect(EFFECT_TOSS_DICE_REPLACE, &eset);
 		for(int32 i = eset.size() - 1; i >= 0; --i) {
@@ -4547,12 +4547,21 @@ int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player,
 		if(!peffect) {
 			pduel->write_buffer8(MSG_TOSS_DICE);
 			pduel->write_buffer8(playerid);
-			pduel->write_buffer8(count);
-			for(int32 i = 0; i < count; ++i) {
+			pduel->write_buffer8(count1);
+			for(int32 i = 0; i < count1; ++i) {
 				core.dice_result[i] = pduel->get_next_integer(1, 6);
 				pduel->write_buffer8(core.dice_result[i]);
 			}
-			raise_event((card*)0, EVENT_TOSS_DICE_NEGATE, reason_effect, 0, reason_player, playerid, count);
+			if(count2 > 0) {
+				pduel->write_buffer8(MSG_TOSS_DICE);
+				pduel->write_buffer8(1 - playerid);
+				pduel->write_buffer8(count2);
+				for(int32 i = 0; i < count2; ++i) {
+					core.dice_result[count1 + i] = pduel->get_next_integer(1, 6);
+					pduel->write_buffer8(core.dice_result[count1 + i]);
+				}
+			}
+			raise_event((card*)0, EVENT_TOSS_DICE_NEGATE, reason_effect, 0, reason_player, playerid, count1 + (count2 << 16));
 			process_instant_event();
 			return FALSE;
 		} else {
@@ -4562,7 +4571,7 @@ int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player,
 		}
 	}
 	case 1: {
-		raise_event((card*)0, EVENT_TOSS_DICE, reason_effect, 0, reason_player, playerid, count);
+		raise_event((card*)0, EVENT_TOSS_DICE, reason_effect, 0, reason_player, playerid, count1 + (count2 << 16));
 		process_instant_event();
 		return TRUE;
 	}
