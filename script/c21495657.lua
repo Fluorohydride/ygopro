@@ -58,11 +58,13 @@ function c21495657.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(TYPE_TUNER)
 		tc:RegisterEffect(e1)
 	end
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e2:SetReset(RESET_EVENT+0x47e0000)
-	e2:SetValue(LOCATION_DECKBOT)
-	c:RegisterEffect(e2)
+	if c:IsRelateToEffect(e) then
+		local e2=Effect.CreateEffect(c)
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e2:SetReset(RESET_EVENT+0x47e0000)
+		e2:SetValue(LOCATION_DECKBOT)
+		c:RegisterEffect(e2)
+	end
 end
