@@ -60,6 +60,7 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_FACEUP)
 	local sg=Duel.SelectMatchingCard(1-tp,c12247206.selfilter,1-tp,LOCATION_MZONE,0,1,1,nil)
+	if Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)<5 then
 	if sg:GetCount()>0 then
 		local g=Duel.GetMatchingGroup(c12247206.filter,1-tp,0x13,0,nil,sg:GetFirst():GetCode(),e,1-tp)
 		if g:GetCount()<=ft2 then c12247206.sp(g,1-tp,POS_FACEUP)
@@ -69,6 +70,8 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 			c12247206.sp(fg,1-tp,POS_FACEUP)
 			g:Remove(c12247206.rmfilter,nil)
 			gg:Merge(g)
+		end
+		else
 		end
 	end
 	Duel.SpecialSummonComplete()
