@@ -40,6 +40,7 @@ end
 function c84388461.filter(c,e,tp,m)
 	if not c:IsSetCard(0xb4) or bit.band(c:GetType(),0x81)~=0x81
 		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	if c:IsCode(21105106) then return c:fuscon() end
 	local mg=nil
 	if c.mat_filter then
 		mg=m:Filter(c.mat_filter,c)
@@ -67,14 +68,20 @@ function c84388461.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,c84388461.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
 	if tg:GetCount()>0 then
 		local tc=tg:GetFirst()
-		mg:RemoveCard(tc)
-		if tc.mat_filter then
-			mg=mg:Filter(tc.mat_filter,nil)
+		if tc:IsCode(21105106) then
+			tc:fusop()
+			local mat=tc:GetMaterial()
+			Duel.ReleaseRitualMaterial(mat)
+		else
+			mg:RemoveCard(tc)
+			if tc.mat_filter then
+				mg=mg:Filter(tc.mat_filter,nil)
+			end
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
+			local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
+			tc:SetMaterial(mat)
+			Duel.ReleaseRitualMaterial(mat)
 		end
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
-		tc:SetMaterial(mat)
-		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
 		tc:CompleteProcedure()
