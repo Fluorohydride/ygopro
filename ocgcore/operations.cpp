@@ -4534,7 +4534,7 @@ int32 field::toss_dice(uint16 step, effect * reason_effect, uint8 reason_player,
 		e.reason_effect = core.reason_effect;
 		e.reason_player = core.reason_player;
 		e.event_player = playerid;
-		e.event_value = count;
+		e.event_value = count1 + (count2 << 16);
 		for(int32 i = 0; i < 5; ++i)
 			core.dice_result[i] = 0;
 		filter_field_effect(EFFECT_TOSS_DICE_REPLACE, &eset);
