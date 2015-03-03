@@ -24,14 +24,10 @@ function c97211663.filter(c,e,tp,m)
 	if not c:IsSetCard(0xb4) or bit.band(c:GetType(),0x81)~=0x81
 		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,true) or c:IsHasEffect(EFFECT_NECRO_VALLEY) then return false end
 	if c:IsCode(21105106) then return c:IsLocation(LOCATION_HAND) and c:fuscon() end
-	local mg=nil
 	if c.mat_filter then
-		mg=m:Filter(c.mat_filter,c)
-	else
-		mg=m:Clone()
-		mg:RemoveCard(c)
+		m=m:Filter(c.mat_filter,nil)
 	end
-	return mg:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+	return m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
 end
 function c97211663.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -56,7 +52,7 @@ function c97211663.activate(e,tp,eg,ep,ev,re,r,rp)
 				mg1=mg1:Filter(tc.mat_filter,nil)
 			end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-			local mat=mg1:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
+			local mat=mg1:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,nil)
 			tc:SetMaterial(mat)
 			Duel.ReleaseRitualMaterial(mat)
 		end
