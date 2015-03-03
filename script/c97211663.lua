@@ -47,12 +47,11 @@ function c97211663.activate(e,tp,eg,ep,ev,re,r,rp)
 			local mat=tc:GetMaterial()
 			Duel.ReleaseRitualMaterial(mat)
 		else
-			mg1:RemoveCard(tc)
 			if tc.mat_filter then
 				mg1=mg1:Filter(tc.mat_filter,nil)
 			end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-			local mat=mg1:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,nil)
+			local mat=mg1:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
 			tc:SetMaterial(mat)
 			Duel.ReleaseRitualMaterial(mat)
 		end
