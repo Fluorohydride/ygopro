@@ -1462,7 +1462,6 @@ void field::check_chain_counter(effect* peffect, int32 playerid, int32 chainid, 
 					else if(info.second & 0xffff0000)
 						info.second -= 0x10000;
 				}
-				break;
 			}
 		}
 	}
