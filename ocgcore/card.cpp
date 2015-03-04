@@ -328,7 +328,7 @@ int32 card::get_base_attack(uint8 swap) {
 int32 card::get_attack(uint8 swap) {
 	if(assume_type == ASSUME_ATTACK)
 		return assume_value;
-	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+	if (!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
 		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
@@ -428,7 +428,7 @@ int32 card::get_base_defence(uint8 swap) {
 int32 card::get_defence(uint8 swap) {
 	if(assume_type == ASSUME_DEFENCE)
 		return assume_value;
-	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+	if (!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
 		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
@@ -500,7 +500,7 @@ int32 card::get_defence(uint8 swap) {
 	return def;
 }
 uint32 card::get_level() {
-	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) || (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER)))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) || (!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER)))
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
@@ -618,9 +618,9 @@ uint32 card::get_base_attribute() {
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
-	if(current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
+	if(!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_TRAPMONSTER))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
@@ -653,9 +653,9 @@ uint32 card::get_base_race() {
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
 		return assume_value;
-	if(current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
+	if(!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_TRAPMONSTER))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
