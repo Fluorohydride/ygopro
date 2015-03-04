@@ -23,7 +23,9 @@ function c56832966.initial_effect(c)
 	--atk
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(56832966,1))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCategory(CATEGORY_ATKCHANGE)
+	e3:SetType(EFFECT_TYPE_QUICK_O+EFFECT_TYPE_FIELD)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e3:SetCondition(c56832966.atkcon)
 	e3:SetCost(c56832966.atkcost)
@@ -44,8 +46,9 @@ function c56832966.atkcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c56832966.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,2,REASON_COST) end
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,2,REASON_COST) and c:GetFlagEffect(56832966)==0 end
 	c:RemoveOverlayCard(tp,2,2,REASON_COST)
+	c:RegisterFlagEffect(56832966,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE_CAL,0,1)
 end
 function c56832966.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
