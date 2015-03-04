@@ -32,6 +32,7 @@ function c56832966.initial_effect(c)
 	e3:SetOperation(c56832966.atkop)
 	c:RegisterEffect(e3)
 end
+c56832966.xyz_number=39
 function c56832966.ovfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x7f) and c:IsType(TYPE_XYZ) and c:GetRank()==4
 end
@@ -42,9 +43,7 @@ function c56832966.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
 function c56832966.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return (Duel.GetAttacker()==c or Duel.GetAttackTarget()==c)
-		and c:GetBattleTarget()~=nil and c:GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
+	return e:GetHandler():GetBattleTarget()~=nil and e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
 end
 function c56832966.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
