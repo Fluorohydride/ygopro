@@ -42,7 +42,9 @@ function c56832966.actcon(e)
 	return Duel.GetAttacker()==e:GetHandler() or Duel.GetAttackTarget()==e:GetHandler()
 end
 function c56832966.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetBattleTarget()~=nil and e:GetHandler():GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
+	local c=e:GetHandler()
+	return (Duel.GetAttacker()==c or Duel.GetAttackTarget()==c)
+		and c:GetBattleTarget()~=nil and c:GetOverlayGroup():IsExists(Card.IsSetCard,1,nil,0x7f)
 end
 function c56832966.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

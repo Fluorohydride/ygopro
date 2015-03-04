@@ -32,5 +32,6 @@ function c16067089.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc then
 		Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP)
+		tc:CompleteProcedure()
 	end
 end

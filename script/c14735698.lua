@@ -23,7 +23,7 @@ end
 function c14735698.filter(c,e,tp,m)
 	if not c:IsSetCard(0xb4) or bit.band(c:GetType(),0x81)~=0x81
 		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
-	if c:IsCode(21105106) then return c:fuscon() end
+	if c:IsCode(21105106) then return c:ritual_custom_operation(m) end
 	local mg=nil
 	if c.mat_filter then
 		mg=m:Filter(c.mat_filter,c)
@@ -54,7 +54,7 @@ function c14735698.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tg:GetCount()>0 then
 		local tc=tg:GetFirst()
 		if tc:IsCode(21105106) then
-			tc:fusop()
+			tc:ritual_custom_operation(mg1)
 			local mat=tc:GetMaterial()
 			Duel.ReleaseRitualMaterial(mat)
 		else
