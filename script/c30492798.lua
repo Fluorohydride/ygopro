@@ -29,7 +29,7 @@ function c30492798.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_IMMUNE_EFFECT)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c30492798.efilter)
-		rc:RegisterEffect(e1)
+		rc:RegisterEffect(e1,true)
 		rc:RegisterFlagEffect(30492798,RESET_EVENT+0x1fe0000,0,1)
 	end
 end
