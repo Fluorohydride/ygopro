@@ -511,21 +511,30 @@ uint32 card::get_level() {
 		return temp.level;
 	effect_set effects;
 	int32 level = data.level;
-	temp.level = data.level;
+	temp.level = level;
 	int32 up = 0, upc = 0;
 	filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_LEVEL, &effects);
+	filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
+	filter_effect(EFFECT_CHANGE_LEVEL_FINAL, &effects);
 	for (int32 i = 0; i < effects.size(); ++i) {
-		if (effects[i]->code == EFFECT_UPDATE_LEVEL) {
+		switch (effects[i]->code) {
+		case EFFECT_UPDATE_LEVEL:
 			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up += effects[i]->get_value(this);
 			else
 				upc += effects[i]->get_value(this);
-		} else {
+			break;
+		case EFFECT_CHANGE_LEVEL:
 			level = effects[i]->get_value(this);
 			up = 0;
+			break;
+		case EFFECT_CHANGE_LEVEL_FINAL:
+			level = effects[i]->get_value(this);
+			up = 0;
+			upc = 0;
+			break;
 		}
-		temp.level = level;
+		temp.level = level + up + upc;
 	}
 	level += up + upc;
 	if(level < 1 && (get_type() & TYPE_MONSTER))
@@ -544,21 +553,30 @@ uint32 card::get_rank() {
 		return temp.level;
 	effect_set effects;
 	int32 rank = data.level;
-	temp.level = data.level;
+	temp.level = rank;
 	int32 up = 0, upc = 0;
 	filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_RANK, &effects);
+	filter_effect(EFFECT_CHANGE_RANK, &effects, FALSE);
+	filter_effect(EFFECT_CHANGE_RANK_FINAL, &effects);
 	for (int32 i = 0; i < effects.size(); ++i) {
-		if (effects[i]->code == EFFECT_UPDATE_RANK) {
+		switch (effects[i]->code) {
+		case EFFECT_UPDATE_RANK:
 			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up += effects[i]->get_value(this);
 			else
 				upc += effects[i]->get_value(this);
-		} else {
+			break;
+		case EFFECT_CHANGE_RANK:
 			rank = effects[i]->get_value(this);
 			up = 0;
+			break;
+		case EFFECT_CHANGE_RANK_FINAL:
+			rank = effects[i]->get_value(this);
+			up = 0;
+			upc = 0;
+			break;
 		}
-		temp.level = rank;
+		temp.level = rank + up + upc;
 	}
 	rank += up + upc;
 	if(rank < 1 && (get_type() & TYPE_MONSTER))

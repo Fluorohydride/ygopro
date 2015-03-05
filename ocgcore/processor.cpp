@@ -1393,7 +1393,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			returns.ivalue[0] = -1;
 			core.units.begin()->step = 1;
 			return FALSE;
-		} else if(tf_count == 1 && to_count == 0 && fc_count == 0 && cn_count == 0) {
+		} else if(tf_count + cn_count == 1 && to_count == 0 && fc_count == 0) {
 			returns.ivalue[0] = 0;
 			core.units.begin()->step = 1;
 			return FALSE;
@@ -1412,7 +1412,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 				pduel->write_buffer32(25);
 			else
 				pduel->write_buffer32(26);
-			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count+cn_count ? 0x10000 : 0));
+			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count + cn_count ? 0x10000 : 0));
 			core.units.begin()->step = 1;
 			return FALSE;
 		}
@@ -1564,7 +1564,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			returns.ivalue[0] = -1;
 			core.units.begin()->step = 11;
 			return FALSE;
-		} else if(tf_count == 1 && to_count == 0 && fc_count == 0 && cn_count == 0) {
+		} else if(tf_count + cn_count == 1 && to_count == 0 && fc_count == 0) {
 			returns.ivalue[0] = 0;
 			core.units.begin()->step = 11;
 			return FALSE;
@@ -1583,7 +1583,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 				pduel->write_buffer32(25);
 			else
 				pduel->write_buffer32(26);
-			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count+cn_count ? 0x10000 : 0));
+			add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, check_player, core.spe_effect[check_player] | (tf_count + cn_count ? 0x10000 : 0));
 			core.units.begin()->step = 11;
 			return FALSE;
 		}
@@ -2297,8 +2297,8 @@ int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priori
 			if(!infos.priorities[0] || !infos.priorities[1])
 				add_process(PROCESSOR_QUICK_EFFECT, 1, 0, 0, skip_freechain, 1 - priority);
 			else {
-				core.hint_timing[0] = 0;
-				core.hint_timing[1] = 0;
+				core.hint_timing[0] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
+				core.hint_timing[1] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
 				core.delayed_quick.clear();
 			}
 		}
@@ -4895,8 +4895,8 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 	return TRUE;
 }
 int32 field::break_effect() {
-	core.hint_timing[0] = 0;
-	core.hint_timing[1] = 0;
+	core.hint_timing[0] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
+	core.hint_timing[1] &= TIMING_DAMAGE_STEP | TIMING_DAMAGE_CAL;
 	for (auto chit = core.new_ochain.begin(); chit != core.new_ochain.end();) {
 		auto rm = chit++;
 		effect* peffect = rm->triggering_effect;
