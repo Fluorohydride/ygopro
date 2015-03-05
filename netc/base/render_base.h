@@ -356,6 +356,7 @@ namespace base {
         Font();
         ~Font();
         bool Load(const std::string& file, uint32_t sz);
+        void LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount);
         void Unload();
         const FontGlyph& GetGlyph(uint32_t ch);
         inline Texture& GetTexture() { return char_tex; }
@@ -367,8 +368,9 @@ namespace base {
         FT_Face face;
         FT_Library library;
         int32_t font_size = 0;
-        int32_t tex_posx = 0;
-        int32_t tex_posy = 0;
+        vector2<int32_t> tex_pos;
+        vector2<int32_t> emoji_size;
+        vector2<int32_t> emoji_img_size;
     };
     
 }

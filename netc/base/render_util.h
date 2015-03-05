@@ -209,12 +209,11 @@ namespace base
     template<typename VTYPE>
     class RenderUnit {
     public:
-        virtual void RefreshVertices() {}
         virtual void PushVertices(RenderObject<VTYPE>& render_obj) {}
         virtual void UpdateVertices(RenderObject<VTYPE>& render_obj) {}
         
     protected:
-        bool need_update = true;
+        bool need_update;
         int16_t vert_index = 0;
         int16_t index_index = 0;
         std::vector<VTYPE> vertices;

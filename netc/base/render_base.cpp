@@ -307,12 +307,25 @@ namespace base {
         FT_Select_Charmap(face, FT_ENCODING_UNICODE);
         FT_Set_Pixel_Sizes(face, 0, sz);
         char_tex.Load(nullptr, 2048, 2048);
-        tex_posx = 0;
-        tex_posy = 0;
+        tex_pos.x = 0;
+        tex_pos.y = 0;
         font_size = sz;
         return true;
     }
 
+    void Font::LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount) {
+        emoji_size = esize;
+        emoji_img_size = v2i{emoji_img.GetWidth(), emoji_img.GetHeight()};
+        char_tex.Update(emoji_img.GetRawData(), 0, 0, emoji_img_size.x, emoji_img_size.y);
+        if(tex_pos.x < emoji_img_size.x)
+            tex_pos.x = emoji_img_size.x;
+        for(int32_t i = 0; i < ecount.x; ++i) {
+            for(int32_t j = 0; j < ecount.y; ++j) {
+                
+            }
+        }
+    }
+    
     void Font::Unload() {
         char_tex.Unload();
     }
@@ -326,17 +339,17 @@ namespace base {
         FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         gl.bounds = {face->glyph->bitmap_left, -face->glyph->bitmap_top, (int32_t)face->glyph->bitmap.width, (int32_t)face->glyph->bitmap.rows};
         gl.advance = face->glyph->advance.x / 64.0f;
-        if(2048 - tex_posx < gl.bounds.width) {
-            tex_posx = 0;
-            tex_posy += font_size;
+        if(2048 - tex_pos.x < gl.bounds.width) {
+            tex_pos.x = 0;
+            tex_pos.y += font_size;
         }
-        gl.textureRect = {tex_posx, tex_posy, gl.bounds.width, gl.bounds.height};
+        gl.textureRect = {tex_pos.x, tex_pos.y, gl.bounds.width, gl.bounds.height};
         uint32_t* px = new uint32_t[gl.bounds.width * gl.bounds.height];
         uint8_t* buf = face->glyph->bitmap.buffer;
         for(int32_t i = 0; i < gl.bounds.width * gl.bounds.height; ++i)
             px[i] = (((uint32_t)buf[i]) << 24) | 0xffffff;
-        char_tex.Update((const uint8_t*)px, tex_posx, tex_posy, gl.bounds.width, gl.bounds.height);
-        tex_posx += gl.bounds.width;
+        char_tex.Update((const uint8_t*)px, tex_pos.x, tex_pos.y, gl.bounds.width, gl.bounds.height);
+        tex_pos.x += gl.bounds.width;
         gl.loaded = true;
         delete[] px;
         return gl;

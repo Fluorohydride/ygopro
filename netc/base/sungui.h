@@ -117,16 +117,25 @@ namespace sgui
         virtual int32_t GetPrimitiveType() = 0;
         virtual int32_t GetTextureId() = 0;
         
+        virtual void RefreshVertices() {}
+        
         virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
             std::tie(vert_index, index_index) = render_obj.BeginPrimitive(GetPrimitiveType(), GetTextureId());
-            RefreshVertices();
+            Update();
             render_obj.PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
         }
         
         virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
-            RefreshVertices();
+            Update();
             render_obj.UpdateVertices(&vertices[0], vert_index, vertices.size());
             render_obj.Updateindices(&indices[0], index_index, indices.size());
+        }
+        
+        inline void Update() {
+            if(!(need_update || CommonStatus().need_update))
+                return;
+            RefreshVertices();
+            need_update = 0;
         }
         
         inline void SetPosition(v2i pos) {
@@ -143,10 +152,6 @@ namespace sgui
             need_update = true;
         }
         
-        inline bool NeedUpdate() {
-            return need_update || CommonStatus().need_update;
-        }
-        
     protected:
         v2i position;
         v2i size;
@@ -158,15 +163,12 @@ namespace sgui
         virtual int32_t GetTextureId() { return texture->GetTextureId(); }
         
         virtual void RefreshVertices() {
-            if(!NeedUpdate())
-                return;
-            need_update = false;
             vertices.resize(4);
             indices.resize(6);
             FillQuad(&vertices[0], &indices[0]);
         }
         
-        void SetTexure(recti trct, base::Texture* tex) {
+        inline void SetTexure(recti trct, base::Texture* tex) {
             tex_rect = trct;
             texture = tex;
             need_update = true;
@@ -194,15 +196,12 @@ namespace sgui
     class UISprite9 : UISprite {
     public:
         virtual void RefreshVertices() {
-            if(!NeedUpdate())
-                return;
-            need_update = false;
             vertices.resize(20);
             indices.resize(60);
             FillQuad9(&vertices[0], &indices[0]);
         }
         
-        void SetFrameRect(recti frct, recti ftrct, recti brct) {
+        inline void SetFrameRect(recti frct, recti ftrct, recti brct) {
             frame = frct;
             frame_tex = ftrct;
             back_tex = brct;
@@ -254,28 +253,26 @@ namespace sgui
         virtual int32_t GetTextureId() { return text_font->GetTexture().GetTextureId(); }
         
         virtual void RefreshVertices() {
-            if(!NeedUpdate())
-                return;
-            need_update = false;
+
         }
         
-        void SetFont(base::Font* ft) {
+        inline void SetFont(base::Font* ft) {
             if(!ft)
                 return;
             text_font = ft;
             need_update = true;
         }
         
-        void SetMaxWidth(int32_t mw) {
+        inline void SetMaxWidth(int32_t mw) {
             if(max_width == mw)
                 return;
         }
         
-        bool AppendText(std::wstring& t, int32_t cl) {
+        inline bool AppendText(std::wstring& t, int32_t cl) {
             return false;
         }
         
-        void Clear() {
+        inline void Clear() {
             
         }
         
