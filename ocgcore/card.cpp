@@ -1208,7 +1208,7 @@ void card::reset_effect_count() {
 int32 card::refresh_disable_status() {
 	int32 pre_dis = is_status(STATUS_DISABLED);
 	filter_immune_effect();
-	if (!is_affected_by_effect(EFFECT_CANNOT_DISABLE) && is_affected_by_effect(EFFECT_DISABLE))
+	if (!is_affected_by_effect(EFFECT_CANNOT_DISABLE) && is_affected_by_effect(EFFECT_DISABLE)  || is_affected_by_effect(EFFECT_FORBIDDEN))
 		set_status(STATUS_DISABLED, TRUE);
 	else
 		set_status(STATUS_DISABLED, FALSE);
