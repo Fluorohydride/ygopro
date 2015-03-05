@@ -328,7 +328,7 @@ int32 card::get_base_attack(uint8 swap) {
 int32 card::get_attack(uint8 swap) {
 	if(assume_type == ASSUME_ATTACK)
 		return assume_value;
-	if (!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.attack;
@@ -428,7 +428,7 @@ int32 card::get_base_defence(uint8 swap) {
 int32 card::get_defence(uint8 swap) {
 	if(assume_type == ASSUME_DEFENCE)
 		return assume_value;
-	if (!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
 	if (current.location != LOCATION_MZONE)
 		return data.defence;
@@ -500,7 +500,8 @@ int32 card::get_defence(uint8 swap) {
 	return def;
 }
 uint32 card::get_level() {
-	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) || (!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER)))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) 
+	        || (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER)))
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
@@ -618,25 +619,28 @@ uint32 card::get_base_attribute() {
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
-	if(!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
+	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
 	effect_set effects;
-	int32 attribute = get_base_attribute();
-	temp.attribute = attribute;
+	effect_set effects2;
+	int32 attribute = data.attribute;
+	temp.attribute = data.attribute;
 	filter_effect(EFFECT_ADD_ATTRIBUTE, &effects, FALSE);
-	filter_effect(EFFECT_REMOVE_ATTRIBUTE, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_ATTRIBUTE, &effects);
+	filter_effect(EFFECT_REMOVE_ATTRIBUTE, &effects);
+	filter_effect(EFFECT_CHANGE_ATTRIBUTE, &effects2);
 	for (int32 i = 0; i < effects.size(); ++i) {
 		if (effects[i]->code == EFFECT_ADD_ATTRIBUTE)
 			attribute |= effects[i]->get_value(this);
-		else if (effects[i]->code == EFFECT_REMOVE_ATTRIBUTE)
-			attribute &= ~(effects[i]->get_value(this));
 		else
-			attribute = effects[i]->get_value(this);
+			attribute &= ~(effects[i]->get_value(this));
+		temp.attribute = attribute;
+	}
+	for (int32 i = 0; i < effects2.size(); ++i) {
+		attribute = effects2[i]->get_value(this);
 		temp.attribute = attribute;
 	}
 	temp.attribute = 0xffffffff;
@@ -653,25 +657,28 @@ uint32 card::get_base_race() {
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
 		return assume_value;
-	if(!(current.location & LOCATION_ONFIELD) && !(data.type & TYPE_MONSTER))
+	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
 	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
 	effect_set effects;
-	int32 race = get_base_race();
-	temp.race = race;
+	effect_set effects2;
+	int32 race = data.race;
+	temp.race = data.race;
 	filter_effect(EFFECT_ADD_RACE, &effects, FALSE);
-	filter_effect(EFFECT_REMOVE_RACE, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_RACE, &effects);
+	filter_effect(EFFECT_REMOVE_RACE, &effects);
+	filter_effect(EFFECT_CHANGE_RACE, &effects2);
 	for (int32 i = 0; i < effects.size(); ++i) {
 		if (effects[i]->code == EFFECT_ADD_RACE)
 			race |= effects[i]->get_value(this);
-		else if (effects[i]->code == EFFECT_REMOVE_RACE)
-			race &= ~(effects[i]->get_value(this));
 		else
-			race = effects[i]->get_value(this);
+			race &= ~(effects[i]->get_value(this));
+		temp.race = race;
+	}
+	for (int32 i = 0; i < effects2.size(); ++i) {
+		race = effects2[i]->get_value(this);
 		temp.race = race;
 	}
 	temp.race = 0xffffffff;
