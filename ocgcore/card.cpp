@@ -300,9 +300,9 @@ uint32 card::get_type() {
 	return type;
 }
 int32 card::get_base_attack(uint8 swap) {
-	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.attack;
 	if (temp.base_attack != -1)
 		return temp.base_attack;
@@ -330,7 +330,7 @@ int32 card::get_attack(uint8 swap) {
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.attack;
 	if (temp.attack != -1)
 		return temp.attack;
@@ -400,9 +400,9 @@ int32 card::get_attack(uint8 swap) {
 	return atk;
 }
 int32 card::get_base_defence(uint8 swap) {
-	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.defence;
 	if (temp.base_defence != -1)
 		return temp.base_defence;
@@ -430,7 +430,7 @@ int32 card::get_defence(uint8 swap) {
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.defence;
 	if (temp.defence != -1)
 		return temp.defence;
@@ -505,7 +505,7 @@ uint32 card::get_level() {
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_HAND)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_HAND)) && !(get_type() & TYPE_MONSTER))
 		return data.level;
 	if (temp.level != 0xffffffff)
 		return temp.level;
@@ -639,7 +639,7 @@ uint32 card::get_attribute() {
 		return assume_value;
 	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_MONSTER))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
@@ -677,7 +677,7 @@ uint32 card::get_race() {
 		return assume_value;
 	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_MONSTER))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
