@@ -42,14 +42,14 @@ end
 function c58820923.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetMatchingGroup(c58820923.cfilter,tp,LOCATION_DECK,0,nil)
 	if chk==0 then return g:GetClassCount(Card.GetCode)>2 end
-	local tg=Group.CreateGroup()
-	for i=1,3 do
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-		local sg=g:Select(tp,1,1,nil)
-		g:Remove(Card.IsCode,nil,sg:GetFirst():GetCode())
-		tg:Merge(sg)
+	local tc1=g:GetFirst()
+	while tc1 do
+		g:Remove(Card.IsCode,tc1,tc1:GetCode())
+		tc1=g:GetNext()
 	end
-	Duel.SendtoGrave(tg,REASON_COST)
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+	local sg=g:Select(tp,3,3,nil)
+	Duel.SendtoGrave(sg,REASON_COST)
 end
 function c58820923.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_DECK)>2
