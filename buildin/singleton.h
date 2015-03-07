@@ -18,5 +18,18 @@ public:
     
 };
 
+class GlobalVars {
+public:
+    template<typename T>
+    static inline T &Get() {
+        static T obj;
+        return obj;
+    }
+    
+    template<typename T>
+    static inline T *GetPtr() {
+        return &Get<T>();
+    }
+};
 
 #endif

@@ -356,7 +356,7 @@ namespace base {
         Font();
         ~Font();
         bool Load(const std::string& file, uint32_t sz);
-        void LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount);
+        void LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount, rect<int32_t> erect);
         void Unload();
         const FontGlyph& GetGlyph(uint32_t ch);
         inline Texture& GetTexture() { return char_tex; }

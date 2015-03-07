@@ -313,7 +313,7 @@ namespace base {
         return true;
     }
 
-    void Font::LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount) {
+    void Font::LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount, rect<int32_t> erect) {
         emoji_size = esize;
         emoji_img_size = v2i{emoji_img.GetWidth(), emoji_img.GetHeight()};
         char_tex.Update(emoji_img.GetRawData(), 0, 0, emoji_img_size.x, emoji_img_size.y);
@@ -321,7 +321,12 @@ namespace base {
             tex_pos.x = emoji_img_size.x;
         for(int32_t i = 0; i < ecount.x; ++i) {
             for(int32_t j = 0; j < ecount.y; ++j) {
-                
+                int32_t idx = 0xe000 + i * ecount.y + j;
+                auto gl = glyphs[idx];
+                gl.bounds = erect;
+                gl.textureRect = rect<int32_t>{j * esize.x, i * esize.y, esize.x, esize.y};
+                gl.advance = erect.width + 1;
+                gl.loaded = true;
             }
         }
     }

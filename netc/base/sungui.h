@@ -253,7 +253,16 @@ namespace sgui
         virtual int32_t GetTextureId() { return text_font->GetTexture().GetTextureId(); }
         
         virtual void RefreshVertices() {
+            uint32_t advx = 0;
+            for(size_t i = 0; i < texts.length(); ++i) {
+                auto ch = texts[i];
+                auto color = colors[i];
+                auto& gl = text_font->GetGlyph(ch);
+                if(advx + gl.advance > max_width) {
 
+                }
+            }
+            
         }
         
         inline void SetFont(base::Font* ft) {
@@ -281,7 +290,7 @@ namespace sgui
         int32_t max_width;
         int32_t vert_cap;
         std::wstring texts;
-        std::vector<int32_t> colors;
+        std::vector<uint32_t> colors;
     };
     
     // ===== GUI Components =====
