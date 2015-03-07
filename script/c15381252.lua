@@ -29,6 +29,7 @@ end
 function c15381252.activate(e,tp,eg,ep,ev,re,r,rp)
 	local count=8
 	while count>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 and Duel.GetLP(1-tp)>0 do
+		if count<8 then Duel.BreakEffect() end
 		Duel.ConfirmDecktop(tp,1)
 		local g=Duel.GetDecktopGroup(tp,1)
 		local tc=g:GetFirst()
