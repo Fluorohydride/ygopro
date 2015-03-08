@@ -65,15 +65,16 @@ end
 function c11609969.scop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:GetLeftScale()==1 then return end
-	local scl=math.max(1,c:GetLeftScale()-2)
+	local scl=2
+	if c:GetLeftScale()==2 then scl=1 end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CHANGE_LSCALE)
-	e1:SetValue(scl)
+	e1:SetCode(EFFECT_UPDATE_LSCALE)
+	e1:SetValue(-scl)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CHANGE_RSCALE)
+	e2:SetCode(EFFECT_UPDATE_RSCALE)
 	c:RegisterEffect(e2)
 	local g=Duel.GetMatchingGroup(c11609969.filter,tp,LOCATION_MZONE,0,nil,scl)
 	if g:GetCount()>0 then
