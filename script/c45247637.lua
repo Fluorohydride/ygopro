@@ -31,6 +31,13 @@ function c45247637.initial_effect(c)
 	c:RegisterEffect(e4)
 	e2:SetLabelObject(e4)
 	e3:SetLabelObject(e4)
+	--Equip limit
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_EQUIP_LIMIT)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetValue(c45247637.eqlimit)
+	c:RegisterEffect(e5)
 end
 function c45247637.costfilter(c)
 	return c:IsRace(RACE_PLANT) and c:IsAbleToRemove()
@@ -54,21 +61,13 @@ function c45247637.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c45247637.eqlimit(e,c)
-	return e:GetOwner()==c
+	return e:GetHandlerPlayer()~=c:GetControler() or e:GetHandler():GetEquipTarget()==c
 end
 function c45247637.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)
-		--Add Equip limit
-		local e1=Effect.CreateEffect(tc)
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_EQUIP_LIMIT)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(c45247637.eqlimit)
-		c:RegisterEffect(e1)
 	end
 end
 function c45247637.ccon(e,tp,eg,ep,ev,re,r,rp)
