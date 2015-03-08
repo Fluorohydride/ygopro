@@ -1897,7 +1897,7 @@ int32 field::is_player_can_spsummon(uint8 playerid) {
 		if(!eset[i]->target)
 			return FALSE;
 	}
-	return TRUE;
+	return is_player_can_spsummon_count(playerid, 1);
 }
 int32 field::is_player_can_spsummon(effect * peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card * pcard) {
 	effect_set eset;
