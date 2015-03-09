@@ -112,7 +112,6 @@ public:
 	std::vector<int> logParam;
 	std::wstring chatMsg[8];
 
-	bool canShuffle;
 	int hideChatTimer;
 	bool hideChat;
 	int chatTiming[8];
@@ -375,7 +374,6 @@ extern Game* mainGame;
 #define COMMAND_REPOS		0x0020
 #define COMMAND_ATTACK		0x0040
 #define COMMAND_LIST		0x0080
-#define COMMAND_SHUFFLE		0x0100
 
 #define BUTTON_LAN_MODE				100
 #define BUTTON_SINGLE_MODE			101
