@@ -356,11 +356,13 @@ namespace base {
         Font();
         ~Font();
         bool Load(const std::string& file, uint32_t sz);
-        void LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount, rect<int32_t> erect);
+        void LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount, rect<int32_t> erect, int32_t ls);
         void Unload();
         const FontGlyph& GetGlyph(uint32_t ch);
         inline Texture& GetTexture() { return char_tex; }
         inline int32_t GetFontSize() { return font_size; }
+        inline int32_t GetLineSpacing(uint32_t ch) { return (ch < 0xe000) ? font_size : emoji_spacing; }
+        inline int32_t IsEmoji(uint32_t ch) { return ch >= 0xe000; }
         
     protected:
         Texture char_tex;
@@ -368,8 +370,8 @@ namespace base {
         FT_Face face;
         FT_Library library;
         int32_t font_size = 0;
+        int32_t emoji_spacing = 0;
         vector2<int32_t> tex_pos;
-        vector2<int32_t> emoji_size;
         vector2<int32_t> emoji_img_size;
     };
     

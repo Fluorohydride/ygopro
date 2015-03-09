@@ -152,9 +152,17 @@ namespace sgui
             need_update = true;
         }
         
+        inline void SetColor(uint32_t cl) {
+            if(color == cl)
+                return;
+            color = cl;
+            need_update = true;
+        }
+        
     protected:
         v2i position;
         v2i size;
+        uint32_t color;
     };
     
     class UISprite : public UIComponent {
@@ -186,6 +194,8 @@ namespace sgui
             v[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
             for(int16_t i = 0; i < 6; ++i)
                 idx[i] = index_index + quad_idx[i];
+            for(int16_t i = 0; i < 4; ++i)
+                v[i].color = color;
         }
         
     protected:
@@ -239,6 +249,8 @@ namespace sgui
             v[19].texcoord = texture->ConvTexCoord({back_tex.left + back_tex.width, back_tex.top + back_tex.height});
             for(int32_t i = 0; i < 60; ++i)
                 idx[i] = quad9_idx[i];
+            for(int16_t i = 0; i < 20; ++i)
+                v[i].color = color;
         }
         
     protected:
@@ -249,20 +261,60 @@ namespace sgui
     
     class UITextBase : UIComponent {
     public:
+        UITextBase(int32_t capacity) {
+            vertices.resize(capacity * 4);
+            indices.resize(capacity * 6);
+            vert_cap = capacity;
+        }
+        
         virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
         virtual int32_t GetTextureId() { return text_font->GetTexture().GetTextureId(); }
         
         virtual void RefreshVertices() {
-            uint32_t advx = 0;
-            for(size_t i = 0; i < texts.length(); ++i) {
+            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
+            advx = 0;
+            advy = 0;
+            line_spacing = 0;
+            int32_t actual_size = 0;
+            auto len = texts.length();
+            for(size_t i = 0; i < len; ++i) {
                 auto ch = texts[i];
+                if(ch < L' ') {
+                    if(ch == L'\n') {
+                        advy += line_spacing;
+                        line_spacing = 0;
+                    }
+                    continue;
+                }
                 auto color = colors[i];
                 auto& gl = text_font->GetGlyph(ch);
                 if(advx + gl.advance > max_width) {
-
+                    advy += line_spacing;
+                    line_spacing = 0;
                 }
+                line_spacing = std::max(text_font->GetLineSpacing(ch), line_spacing);
+                auto v = &vertices[actual_size * 4];
+                auto idx = &indices[actual_size * 6];
+                actual_size++;
+                v[0].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left, position.y + advy + gl.bounds.top});
+                v[1].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left + gl.bounds.width, position.y + advy + gl.bounds.top});
+                v[2].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left, position.y + advy + gl.bounds.top + gl.bounds.height});
+                v[3].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left + gl.bounds.width, position.y + advy + gl.bounds.top + gl.bounds.height});
+                v[0].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top});
+                v[1].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left + gl.textureRect.width, gl.textureRect.top});
+                v[2].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top + gl.textureRect.height});
+                v[3].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left + gl.textureRect.width, gl.textureRect.top + gl.textureRect.height});
+                for(int16_t i = 0; i < 6; ++i)
+                    idx[i] = index_index + quad_idx[i];
+                if(!text_font->IsEmoji(ch))
+                    for(int16_t i = 0; i < 4; ++i)
+                        v[i].color = color;
             }
-            
+            for(size_t i = len; i < vert_cap; ++i) {
+                auto idx = &indices[i * 6];
+                for(auto j = 0; j < 6; ++j)
+                    idx[j] = 0;
+            }
         }
         
         inline void SetFont(base::Font* ft) {
@@ -277,18 +329,47 @@ namespace sgui
                 return;
         }
         
+        inline bool SetText(std::wstring& t, int32_t cl) {
+            vertices.clear();
+            indices.clear();
+            need_update = true;
+            return AppendText(t, cl);
+        }
+        
         inline bool AppendText(std::wstring& t, int32_t cl) {
-            return false;
+            int32_t app_size = 0;
+            for(auto& ch : t) {
+                if(ch >= ' ')
+                    app_size++;
+            }
+            auto redraw = false;
+            if(vertices.size() + app_size > vert_cap) {
+                while(vertices.size() + app_size > vert_cap)
+                    vert_cap *= 2;
+                vertices.resize(vert_cap);
+                indices.resize(vert_cap);
+                redraw = true;
+            }
+            texts.append(t);
+            for(auto i = 0; i < app_size; ++i)
+                colors.push_back(cl);
+            need_update = true;
+            return redraw;
         }
         
         inline void Clear() {
-            
+            vertices.clear();
+            indices.clear();
+            need_update = true;
         }
         
     protected:
         base::Font* text_font = nullptr;
-        int32_t max_width;
-        int32_t vert_cap;
+        int32_t max_width = 0xffffffff;
+        int32_t vert_cap = 0;
+        int32_t advx = 0;
+        int32_t advy = 0;
+        int32_t line_spacing = 0;
         std::wstring texts;
         std::vector<uint32_t> colors;
     };
