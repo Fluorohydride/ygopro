@@ -17,7 +17,7 @@ function c43476205.filter1(c,e,tp)
 end
 function c43476205.filter2(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsFaceup() and c:GetOverlayCount()==0 and c:IsAbleToChangeControler()
+	return rk>0 and c:IsFaceup() and c:GetOverlayCount()==0 and c:IsControlerCanBeChanged()
 		and Duel.IsExistingMatchingCard(c43476205.filter3,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1)
 end
 function c43476205.filter3(c,e,tp,mc,rk)
@@ -34,8 +34,7 @@ function c43476205.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.SelectTarget(tp,c43476205.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	else
 		if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c43476205.filter2(chkc,e,tp) end
-		if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			and Duel.IsExistingTarget(c43476205.filter2,tp,0,LOCATION_MZONE,1,nil,e,tp) end
+		if chk==0 then return Duel.IsExistingTarget(c43476205.filter2,tp,0,LOCATION_MZONE,1,nil,e,tp) end
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_CONTROL)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 		local g=Duel.SelectTarget(tp,c43476205.filter2,tp,0,LOCATION_MZONE,1,1,nil,e,tp)
