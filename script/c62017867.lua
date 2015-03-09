@@ -17,6 +17,7 @@ function c62017867.initial_effect(c)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetCondition(c62017867.atkcon)
 	e2:SetCost(c62017867.atkcost)
+	e2:SetTarget(c62017867.atktg)
 	e2:SetOperation(c62017867.atkop)
 	c:RegisterEffect(e2)
 end
@@ -38,8 +39,11 @@ function c62017867.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
+function c62017867.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
+end
 function c62017867.atkop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()

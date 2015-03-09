@@ -46,11 +46,12 @@ function c95239444.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c95239444.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1)
 		and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,e:GetHandler()) end
 end
 function c95239444.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
 	if ct==0 then return end
 	if ct>3 then ct=3 end
