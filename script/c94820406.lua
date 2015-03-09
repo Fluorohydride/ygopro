@@ -71,7 +71,7 @@ function c94820406.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		e1:SetValue(c94820406.efilter)
 		tc:RegisterEffect(e1)
-	elseif Duel.IsPlayerCanSpecialSummon(tp) and Duel.IsPlayerCanSpecialSummonCount(tp,1) then
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
 		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
 		Duel.ConfirmCards(1-tp,cg1)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)

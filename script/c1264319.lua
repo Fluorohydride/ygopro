@@ -75,7 +75,7 @@ function c1264319.activate(e,tp,eg,ep,ev,re,r,rp)
 			fop(ce,e,tp,tc,mat2)
 		end
 		tc:CompleteProcedure()
-	elseif Duel.IsPlayerCanSpecialSummon(tp) and Duel.IsPlayerCanSpecialSummonCount(tp,1) then
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
 		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
 		Duel.ConfirmCards(1-tp,cg1)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
