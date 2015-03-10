@@ -3152,8 +3152,8 @@ int32 field::process_battle_command(uint16 step) {
 						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
 						core.attacker->attacked_cards[0] = 0;
+					core.attacker->attacked_count++;
 				}
-				core.attacker->attacked_count++;
 				core.attacker->announce_count++;
 				attack_all_target_check();
 			}
