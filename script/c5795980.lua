@@ -99,17 +99,21 @@ function c5795980.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c5795980.attg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,562)
 	local rc=Duel.AnnounceAttribute(tp,1,0xffff)
 	e:SetLabel(rc)
 end
 function c5795980.atop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-	e1:SetValue(e:GetLabel())
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local tc=g:GetFirst()
+	while tc do
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+		e1:SetValue(e:GetLabel())
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		tc=g:GetNext()
+	end
 end
