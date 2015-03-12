@@ -82,13 +82,22 @@ function c97489701.synfilter3(c,syncard,lv,f1,f2)
 	local lv2=bit.rshift(mlv,16)
 	return (lv1==lv or lv2==lv) and (not f1 or f1(c)) and (not f2 or f2(c))
 end
-function c97489701.syncon(e,c,tuner)
+function c97489701.syncon(e,c,tuner,mg)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<-2 then return false end
-	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-	local g3=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
+	local g1=Group.CreateGroup()
+	local g2=Group.CreateGroup()
+	local g3=Group.CreateGroup()
+	if mg then
+		g1=mg:Filter(c97489701.matfilter1,nil,c)
+		g2=mg:Filter(c97489701.matfilter2,nil,c)
+		g3=mg:Filter(c97489701.matfilter1,nil,c)
+	else
+		g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+		g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+		g3=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
+	end
 	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
 	local lv=c:GetLevel()
 	if tuner then
@@ -107,11 +116,20 @@ function c97489701.syncon(e,c,tuner)
 		return c97489701.synfilter1(pe:GetOwner(),c,lv,g1,g2)
 	end
 end
-function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner)
+function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner,mg)
 	local g=Group.CreateGroup()
-	local g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-	local g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
-	local g3=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
+	local g1=Group.CreateGroup()
+	local g2=Group.CreateGroup()
+	local g3=Group.CreateGroup()
+	if mg then
+		g1=mg:Filter(c97489701.matfilter1,nil,c)
+		g2=mg:Filter(c97489701.matfilter2,nil,c)
+		g3=mg:Filter(c97489701.matfilter1,nil,c)
+	else
+		g1=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+		g2=Duel.GetMatchingGroup(c97489701.matfilter2,tp,LOCATION_MZONE,LOCATION_MZONE,nil,c)
+		g3=Duel.GetMatchingGroup(c97489701.matfilter1,tp,LOCATION_MZONE+LOCATION_HAND,LOCATION_MZONE,nil,c)
+	end
 	local pe=Duel.IsPlayerAffectedByEffect(tp,EFFECT_MUST_BE_SMATERIAL)
 	local lv=c:GetLevel()
 	if tuner then
