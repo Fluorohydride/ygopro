@@ -33,7 +33,7 @@ function c35073065.spop(e,tp,eg,ep,ev,re,r,rp)
 			local e1=Effect.CreateEffect(c)
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_CHANGE_RACE)
-			if ec:IsHasEffect(EFFECT_ADD_RACE) then
+			if ec:IsHasEffect(EFFECT_ADD_RACE) and not ec:IsHasEffect(EFFECT_CHANGE_RACE) then
 				e1:SetValue(ec:GetOriginalRace())
 			else
 				e1:SetValue(ec:GetRace())
@@ -43,7 +43,7 @@ function c35073065.spop(e,tp,eg,ep,ev,re,r,rp)
 			local e2=Effect.CreateEffect(c)
 			e2:SetType(EFFECT_TYPE_SINGLE)
 			e2:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-			if ec:IsHasEffect(EFFECT_ADD_ATTRIBUTE) then
+			if ec:IsHasEffect(EFFECT_ADD_ATTRIBUTE) and not ec:IsHasEffect(EFFECT_CHANGE_ATTRIBUTE) then
 				e2:SetValue(ec:GetOriginalAttribute())
 			else
 				e2:SetValue(ec:GetAttribute())
