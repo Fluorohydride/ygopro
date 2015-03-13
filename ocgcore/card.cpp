@@ -300,9 +300,9 @@ uint32 card::get_type() {
 	return type;
 }
 int32 card::get_base_attack(uint8 swap) {
-	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.attack;
 	if (temp.base_attack != -1)
 		return temp.base_attack;
@@ -328,9 +328,9 @@ int32 card::get_base_attack(uint8 swap) {
 int32 card::get_attack(uint8 swap) {
 	if(assume_type == ASSUME_ATTACK)
 		return assume_value;
-	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.attack;
 	if (temp.attack != -1)
 		return temp.attack;
@@ -400,9 +400,9 @@ int32 card::get_attack(uint8 swap) {
 	return atk;
 }
 int32 card::get_base_defence(uint8 swap) {
-	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.defence;
 	if (temp.base_defence != -1)
 		return temp.base_defence;
@@ -428,9 +428,9 @@ int32 card::get_base_defence(uint8 swap) {
 int32 card::get_defence(uint8 swap) {
 	if(assume_type == ASSUME_DEFENCE)
 		return assume_value;
-	if (current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE)
+	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
 		return data.defence;
 	if (temp.defence != -1)
 		return temp.defence;
@@ -500,31 +500,41 @@ int32 card::get_defence(uint8 swap) {
 	return def;
 }
 uint32 card::get_level() {
-	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
+	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) 
+	        || (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER)))
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_HAND)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_HAND)) && !(get_type() & TYPE_MONSTER))
 		return data.level;
 	if (temp.level != 0xffffffff)
 		return temp.level;
 	effect_set effects;
 	int32 level = data.level;
-	temp.level = data.level;
+	temp.level = level;
 	int32 up = 0, upc = 0;
 	filter_effect(EFFECT_UPDATE_LEVEL, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_LEVEL, &effects);
+	filter_effect(EFFECT_CHANGE_LEVEL, &effects, FALSE);
+	filter_effect(EFFECT_CHANGE_LEVEL_FINAL, &effects);
 	for (int32 i = 0; i < effects.size(); ++i) {
-		if (effects[i]->code == EFFECT_UPDATE_LEVEL) {
+		switch (effects[i]->code) {
+		case EFFECT_UPDATE_LEVEL:
 			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up += effects[i]->get_value(this);
 			else
 				upc += effects[i]->get_value(this);
-		} else {
+			break;
+		case EFFECT_CHANGE_LEVEL:
 			level = effects[i]->get_value(this);
 			up = 0;
+			break;
+		case EFFECT_CHANGE_LEVEL_FINAL:
+			level = effects[i]->get_value(this);
+			up = 0;
+			upc = 0;
+			break;
 		}
-		temp.level = level;
+		temp.level = level + up + upc;
 	}
 	level += up + upc;
 	if(level < 1 && (get_type() & TYPE_MONSTER))
@@ -543,21 +553,30 @@ uint32 card::get_rank() {
 		return temp.level;
 	effect_set effects;
 	int32 rank = data.level;
-	temp.level = data.level;
+	temp.level = rank;
 	int32 up = 0, upc = 0;
 	filter_effect(EFFECT_UPDATE_RANK, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_RANK, &effects);
+	filter_effect(EFFECT_CHANGE_RANK, &effects, FALSE);
+	filter_effect(EFFECT_CHANGE_RANK_FINAL, &effects);
 	for (int32 i = 0; i < effects.size(); ++i) {
-		if (effects[i]->code == EFFECT_UPDATE_RANK) {
+		switch (effects[i]->code) {
+		case EFFECT_UPDATE_RANK:
 			if ((effects[i]->type & EFFECT_TYPE_SINGLE) && !(effects[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up += effects[i]->get_value(this);
 			else
 				upc += effects[i]->get_value(this);
-		} else {
+			break;
+		case EFFECT_CHANGE_RANK:
 			rank = effects[i]->get_value(this);
 			up = 0;
+			break;
+		case EFFECT_CHANGE_RANK_FINAL:
+			rank = effects[i]->get_value(this);
+			up = 0;
+			upc = 0;
+			break;
 		}
-		temp.level = rank;
+		temp.level = rank + up + upc;
 	}
 	rank += up + upc;
 	if(rank < 1 && (get_type() & TYPE_MONSTER))
@@ -607,55 +626,77 @@ uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 		return (lev >> 16) & 0xffff;
 	return 0;
 }
+uint32 card::get_base_attribute() {
+	int32 batt = data.attribute;
+	effect_set effects;
+	filter_effect(EFFECT_CHANGE_BASE_ATTRIBUTE, &effects);
+	if(effects.size())
+		batt = effects.get_last()->get_value(this);
+	return batt;
+}
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
-	if(current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_MONSTER))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
 	effect_set effects;
+	effect_set effects2;
 	int32 attribute = data.attribute;
 	temp.attribute = data.attribute;
 	filter_effect(EFFECT_ADD_ATTRIBUTE, &effects, FALSE);
-	filter_effect(EFFECT_REMOVE_ATTRIBUTE, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_ATTRIBUTE, &effects);
+	filter_effect(EFFECT_REMOVE_ATTRIBUTE, &effects);
+	filter_effect(EFFECT_CHANGE_ATTRIBUTE, &effects2);
 	for (int32 i = 0; i < effects.size(); ++i) {
 		if (effects[i]->code == EFFECT_ADD_ATTRIBUTE)
 			attribute |= effects[i]->get_value(this);
-		else if (effects[i]->code == EFFECT_REMOVE_ATTRIBUTE)
-			attribute &= ~(effects[i]->get_value(this));
 		else
-			attribute = effects[i]->get_value(this);
+			attribute &= ~(effects[i]->get_value(this));
+		temp.attribute = attribute;
+	}
+	for (int32 i = 0; i < effects2.size(); ++i) {
+		attribute = effects2[i]->get_value(this);
 		temp.attribute = attribute;
 	}
 	temp.attribute = 0xffffffff;
 	return attribute;
 }
+uint32 card::get_base_race() {
+	int32 brac = data.race;
+	effect_set effects;
+	filter_effect(EFFECT_CHANGE_BASE_RACE, &effects);
+	if(effects.size())
+		brac = effects.get_last()->get_value(this);
+	return brac;
+}
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
 		return assume_value;
-	if(current.location != LOCATION_MZONE && data.type & (TYPE_SPELL + TYPE_TRAP))
+	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)))
+	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_MONSTER))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
 	effect_set effects;
+	effect_set effects2;
 	int32 race = data.race;
 	temp.race = data.race;
 	filter_effect(EFFECT_ADD_RACE, &effects, FALSE);
-	filter_effect(EFFECT_REMOVE_RACE, &effects, FALSE);
-	filter_effect(EFFECT_CHANGE_RACE, &effects);
+	filter_effect(EFFECT_REMOVE_RACE, &effects);
+	filter_effect(EFFECT_CHANGE_RACE, &effects2);
 	for (int32 i = 0; i < effects.size(); ++i) {
 		if (effects[i]->code == EFFECT_ADD_RACE)
 			race |= effects[i]->get_value(this);
-		else if (effects[i]->code == EFFECT_REMOVE_RACE)
-			race &= ~(effects[i]->get_value(this));
 		else
-			race = effects[i]->get_value(this);
+			race &= ~(effects[i]->get_value(this));
+		temp.race = race;
+	}
+	for (int32 i = 0; i < effects2.size(); ++i) {
+		race = effects2[i]->get_value(this);
 		temp.race = race;
 	}
 	temp.race = 0xffffffff;
@@ -1565,6 +1606,8 @@ void card::filter_spsummon_procedure_g(uint8 playerid, effect_set* peset) {
 	for(; pr.first != pr.second; ++pr.first) {
 		effect* peffect = pr.first->second;
 		if(!peffect->is_available() || !peffect->check_count_limit(playerid))
+			continue;
+		if(current.controler != playerid && !(peffect->flag & EFFECT_FLAG_BOTH_SIDE))
 			continue;
 		effect* oreason = pduel->game_field->core.reason_effect;
 		uint8 op = pduel->game_field->core.reason_player;

@@ -24,6 +24,7 @@ function c33365932.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c33365932.op(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsLocation(LOCATION_GRAVE) then return end
 	local tc=Duel.GetFirstMatchingCard(c33365932.filter,tp,LOCATION_DECK,0,nil)
 	if tc then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)

@@ -5,7 +5,7 @@ function c60953118.initial_effect(c)
 	e1:SetDescription(aux.Stringid(60953118,1))
 	e1:SetType(EFFECT_TYPE_QUICK_O+EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_HAND)
-	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetCondition(c60953118.damcon)
 	e1:SetCost(c60953118.damcost)
 	e1:SetOperation(c60953118.damop)
@@ -27,14 +27,22 @@ function c60953118.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c60953118.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp
+	return Duel.GetBattleDamage(tp)>0
 end
 function c60953118.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c60953118.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,0)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e1:SetOperation(c60953118.dop)
+	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
+	Duel.RegisterEffect(e1,tp)
+end
+function c60953118.dop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.ChangeBattleDamage(tp,0)
 end
 function c60953118.cointg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

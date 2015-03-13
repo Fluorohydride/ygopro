@@ -36,6 +36,9 @@ function c71422989.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c71422989.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
+function c71422989.filter0(c)
+	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
+end
 function c71422989.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
@@ -50,7 +53,7 @@ function c71422989.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c71422989.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(c71422989.filter0,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		local sg1=Duel.GetMatchingGroup(c71422989.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
 		local mg2=nil
 		local sg2=nil
@@ -80,6 +83,11 @@ function c71422989.activate(e,tp,eg,ep,ev,re,r,rp)
 				fop(ce,e,tp,tc,mat2)
 			end
 			tc:CompleteProcedure()
+		elseif Duel.IsPlayerCanSpecialSummon(tp) then
+			local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
+			Duel.ConfirmCards(1-tp,cg1)
+			local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+			Duel.ConfirmCards(1-tp,cg2)
 		end
 	end
 end

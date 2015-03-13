@@ -5,10 +5,15 @@ function c87880531.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetCondition(c87880531.condition)
 	e1:SetCost(c87880531.cost)
 	e1:SetTarget(c87880531.target)
 	e1:SetOperation(c87880531.activate)
 	c:RegisterEffect(e1)
+end
+function c87880531.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c87880531.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end

@@ -40,7 +40,7 @@ function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
 			local cost=te:GetCost()
 			local target=te:GetTarget()
 			local operation=te:GetOperation()
-			if te:GetCode()==EVENT_FREE_CHAIN and not tc:IsStatus(STATUS_SET_TURN)
+			if te:GetCode()==EVENT_FREE_CHAIN and te:IsActivatable(tep)
 				and (not condition or condition(te,tep,eg,ep,ev,re,r,rp))
 				and (not cost or cost(te,tep,eg,ep,ev,re,r,rp,0))
 				and (not target or target(te,tep,eg,ep,ev,re,r,rp,0)) then
@@ -60,6 +60,7 @@ function c7165085.activate(e,tp,eg,ep,ev,re,r,rp)
 					tg:CreateEffectRelation(te)
 					tg=g:GetNext()
 				end
+				tc:SetStatus(STATUS_ACTIVATED,true)
 				if operation then operation(te,tep,eg,ep,ev,re,r,rp) end
 				tc:ReleaseEffectRelation(te)
 				tg=g:GetFirst()

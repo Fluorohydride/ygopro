@@ -1,6 +1,6 @@
 --エンド・オブ・ザ・ワールド
 function c8198712.initial_effect(c)
-	aux.AddRitualProcEqual(c,c8198712.ritual_filter)
+	aux.AddRitualProcEqual2(c,c8198712.ritual_filter)
 end
 function c8198712.ritual_filter(c)
 	local code=c:GetCode()

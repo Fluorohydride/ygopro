@@ -14,7 +14,7 @@ end
 function c13438207.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
 	local bc=tc:GetBattleTarget()
-	return eg:GetCount()==1 and tc:IsControler(tp) and tc:IsRace(RACE_PLANT)
+	return tc:IsRelateToBattle() and tc:IsStatus(STATUS_OPPO_BATTLE) and tc:IsControler(tp) and tc:IsRace(RACE_PLANT)
 		and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
 end
 function c13438207.target(e,tp,eg,ep,ev,re,r,rp,chk)

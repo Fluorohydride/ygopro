@@ -10,6 +10,7 @@ function c73659078.initial_effect(c)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCost(c73659078.cost)
+	e1:SetTarget(c73659078.target)
 	e1:SetOperation(c73659078.operation)
 	c:RegisterEffect(e1)
 	--atkdown
@@ -26,19 +27,20 @@ function c73659078.cfilter(c)
 	return c:IsAttribute(ATTRIBUTE_WATER) and not c:IsPublic()
 end
 function c73659078.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
-		and Duel.IsExistingMatchingCard(c73659078.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
-	local g=Duel.SelectMatchingCard(tp,c73659078.cfilter,tp,LOCATION_HAND,0,1,99,nil)
-	Duel.ConfirmCards(1-tp,g)
-	Duel.ShuffleHand(tp)
-	e:SetLabel(g:GetCount())
+end
+function c73659078.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsExistingMatchingCard(c73659078.cfilter,tp,LOCATION_HAND,0,1,nil) end
 end
 function c73659078.operation(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	if g:GetCount()==0 then return end
-	local ct=e:GetLabel()
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
+	local cg=Duel.SelectMatchingCard(tp,c73659078.cfilter,tp,LOCATION_HAND,0,1,99,nil)
+	Duel.ConfirmCards(1-tp,cg)
+	Duel.ShuffleHand(tp)
+	local ct=cg:GetCount()
 	for i=1,ct do
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(73659078,1))
 		local tc=g:Select(tp,1,1,nil):GetFirst()

@@ -4,14 +4,14 @@ function c29389368.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCategory(CATEGORY_RECOVER)
-	e1:SetCode(EVENT_PRE_BATTLE_DAMAGE)
+	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetCondition(c29389368.condition)
 	e1:SetTarget(c29389368.target)
 	e1:SetOperation(c29389368.activate)
 	c:RegisterEffect(e1)
 end
 function c29389368.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and Duel.GetBattleDamage(tp)>=2000
+	return Duel.GetBattleDamage(tp)>=2000
 end
 function c29389368.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

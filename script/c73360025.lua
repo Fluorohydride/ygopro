@@ -27,6 +27,9 @@ function c73360025.initial_effect(c)
 	e3:SetOperation(c73360025.damop)
 	c:RegisterEffect(e3)
 end
+function c73360025.mfilter0(c)
+	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
+end
 function c73360025.mfilter1(c,e)
 	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 end
@@ -44,10 +47,10 @@ end
 function c73360025.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c73360025.mfilter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(Card.IsCanBeFusionMaterial,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		local res=Duel.IsExistingMatchingCard(c73360025.spfilter1,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if res then return true end
-		local mg2=Duel.GetMatchingGroup(c73360025.mfilter2,tp,LOCATION_GRAVE,0,nil,e)
+		local mg2=Duel.GetMatchingGroup(c73360025.mfilter0,tp,LOCATION_GRAVE,0,nil)
 		mg2:Merge(mg1)
 		res=Duel.IsExistingMatchingCard(c73360025.spfilter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg2,nil,chkf)
 		if not res then
@@ -108,6 +111,11 @@ function c73360025.spop(e,tp,eg,ep,ev,re,r,rp)
 			fop(ce,e,tp,tc,mat)
 		end
 		tc:CompleteProcedure()
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
+		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
+		Duel.ConfirmCards(1-tp,cg1)
+		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+		Duel.ConfirmCards(1-tp,cg2)
 	end
 end
 function c73360025.damcon(e,tp,eg,ep,ev,re,r,rp)

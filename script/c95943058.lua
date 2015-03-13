@@ -13,14 +13,15 @@ function c95943058.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c95943058.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c95943058.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c95943058.filter(c)
-	return c:IsFaceup() and c:IsRace(RACE_FIEND)
+	return c:IsFaceup() and c:IsRace(RACE_FIEND) and not c:IsHasEffect(EFFECT_EXTRA_ATTACK)
 end
 function c95943058.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c95943058.filter(chkc) end
@@ -32,7 +33,7 @@ function c95943058.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--extra atk
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)

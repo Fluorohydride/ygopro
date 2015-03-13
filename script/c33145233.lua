@@ -29,7 +29,7 @@ function c33145233.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 		e1:SetValue(c33145233.tglimit)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		rc:RegisterEffect(e1)
+		rc:RegisterEffect(e1,true)
 		rc:RegisterFlagEffect(33145233,RESET_EVENT+0x1fe0000,0,1)
 	end
 end

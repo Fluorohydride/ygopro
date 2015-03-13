@@ -67,6 +67,7 @@ function c10389142.descon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	if not g:IsExists(c10389142.desfilter,1,nil,e:GetLabel()) then
 		g:DeleteGroup()
+		e:Reset()
 		return false
 	else return true end
 end

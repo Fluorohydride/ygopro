@@ -8,6 +8,7 @@ function c94766498.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c94766498.hspcon)
+	c:RegisterEffect(e1)
 	Duel.AddCustomActivityCounter(94766498,ACTIVITY_CHAIN,c94766498.chainfilter)
 end
 function c94766498.chainfilter(re,tp,cid)

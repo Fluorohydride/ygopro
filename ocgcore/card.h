@@ -153,7 +153,9 @@ public:
 	uint32 get_synchro_level(card* pcard);
 	uint32 get_ritual_level(card* pcard);
 	uint32 check_xyz_level(card* pcard, uint32 lv);
+	uint32 get_base_attribute();
 	uint32 get_attribute();
+	uint32 get_base_race();
 	uint32 get_race();
 	uint32 get_lscale();
 	uint32 get_rscale();
@@ -398,6 +400,7 @@ public:
 #define STATUS_CONTINUOUS_POS		0x2000000
 #define STATUS_IS_PUBLIC			0x4000000
 #define STATUS_ACT_FROM_HAND		0x8000000
+#define STATUS_OPPO_BATTLE			0x10000000
 //Counter
 #define COUNTER_NEED_PERMIT		0x1000
 #define COUNTER_NEED_ENABLE		0x2000

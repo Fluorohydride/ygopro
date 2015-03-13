@@ -99,21 +99,30 @@ function c77498348.rmop(e,tp,eg,ep,ev,re,r,rp)
 		local g=Duel.GetMatchingGroup(Card.IsAbleToRemove,tp,0,LOCATION_HAND,nil)
 		if g:GetCount()==0 then return end
 		local rg=g:RandomSelect(tp,1)
-		Duel.Remove(rg,POS_FACEDOWN,REASON_EFFECT)
+		local tc=rg:GetFirst()
+		Duel.Remove(tc,POS_FACEDOWN,REASON_EFFECT)
+		tc:RegisterFlagEffect(77498348,RESET_EVENT+0x1fe0000,0,1)
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e1:SetRange(LOCATION_REMOVED)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
+		e1:SetLabelObject(tc)
+		e1:SetReset(RESET_PHASE+PHASE_END,2)
 		e1:SetCondition(c77498348.retcon)
 		e1:SetOperation(c77498348.retop)
-		rg:GetFirst():RegisterEffect(e1)
+		Duel.RegisterEffect(e1,tp)
 	end
 end
 function c77498348.retcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()~=e:GetOwnerPlayer()
+	local tc=e:GetLabelObject()
+	if tc:GetFlagEffect(77498348)==0 then
+		e:Reset()
+		return false
+	else
+		return Duel.GetTurnPlayer()==1-tp
+	end
 end
 function c77498348.retop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
+	local tc=e:GetLabelObject()
+	Duel.SendtoHand(tc,1-tp,REASON_EFFECT)
 end

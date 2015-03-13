@@ -45,7 +45,7 @@ function c28630501.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c28630501.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc:IsControler(tp) and tc:IsSetCard(0xb3) and tc~=e:GetHandler()
+	return ep~=tp and tc:IsControler(tp) and tc:IsSetCard(0xb3) and tc~=e:GetHandler()
 end
 function c28630501.thfilter(c)
 	return c:IsSetCard(0xb3) and not c:IsCode(28630501) and c:IsAbleToHand()
@@ -73,7 +73,7 @@ function c28630501.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetTarget(c28630501.rettg)
 	e1:SetOperation(c28630501.retop)
-	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
+	e1:SetReset(RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1)
 end
 function c28630501.rettg(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -5,7 +5,7 @@ function c11682713.initial_effect(c)
 	e1:SetDescription(aux.Stringid(11682713,0))
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
-	e1:SetCondition(c11682713.condition)
+	e1:SetCondition(aux.bdogcon)
 	e1:SetTarget(c11682713.target)
 	e1:SetOperation(c11682713.operation)
 	c:RegisterEffect(e1)
@@ -20,17 +20,11 @@ function c11682713.initial_effect(c)
 	e2:SetOperation(c11682713.tdop)
 	c:RegisterEffect(e2)
 end
-function c11682713.condition(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and c:IsFaceup()
-		and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) and bc:IsReason(REASON_BATTLE)
-end
 function c11682713.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function c11682713.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()

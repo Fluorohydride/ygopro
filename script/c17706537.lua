@@ -6,15 +6,10 @@ function c17706537.initial_effect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
-	e1:SetCondition(c17706537.damcon)
+	e1:SetCondition(aux.bdogcon)
 	e1:SetTarget(c17706537.damtg)
 	e1:SetOperation(c17706537.damop)
 	c:RegisterEffect(e1)
-end
-function c17706537.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE)
 end
 function c17706537.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

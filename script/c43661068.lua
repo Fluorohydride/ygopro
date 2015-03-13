@@ -25,13 +25,13 @@ end
 function c43661068.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		local g=Duel.GetMatchingGroup(c43661068.filter,tp,LOCATION_MZONE,0,nil,tc:GetAttack(),tc:GetDefence())
+		local g=Duel.GetMatchingGroup(c43661068.filter,tp,LOCATION_MZONE,0,tc,tc:GetAttack(),tc:GetDefence())
 		local lv=tc:GetLevel()
 		local lc=g:GetFirst()
 		while lc do
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CHANGE_LEVEL)
+			e1:SetCode(EFFECT_CHANGE_LEVEL_FINAL)
 			e1:SetValue(lv)
 			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 			lc:RegisterEffect(e1)

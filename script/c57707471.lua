@@ -29,7 +29,7 @@ function c57707471.initial_effect(c)
 	e3:SetTarget(c57707471.destg)
 	e3:SetOperation(c57707471.desop)
 	c:RegisterEffect(e3)
-	if c57707471.xyz_filter then
+	if not c57707471.xyz_filter then
 		c57707471.xyz_filter=function(mc) return mc:IsXyzLevel(c,6) end
 	end
 end

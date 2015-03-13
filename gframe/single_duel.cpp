@@ -429,12 +429,12 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteData(players[0]->name, 40, false);
 	last_replay.WriteData(players[1]->name, 40, false);
 	if(!host_info.no_shuffle_deck) {
-		for(size_t i = 0; i < pdeck[0].main.size(); ++i) {
-			int swap = rnd.real() * pdeck[0].main.size();
+		for(size_t i = pdeck[0].main.size() - 1; i > 0; --i) {
+			int swap = rnd.real() * (i + 1);
 			std::swap(pdeck[0].main[i], pdeck[0].main[swap]);
 		}
-		for(size_t i = 0; i < pdeck[1].main.size(); ++i) {
-			int swap = rnd.real() * pdeck[1].main.size();
+		for(size_t i = pdeck[1].main.size() - 1; i > 0; --i) {
+			int swap = rnd.real() * (i + 1);
 			std::swap(pdeck[1].main[i], pdeck[1].main[swap]);
 		}
 	}
@@ -674,7 +674,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 11 + 2;
+			pbuf += count * 11 + 3;
 			RefreshMzone(0);
 			RefreshMzone(1);
 			RefreshSzone(0);

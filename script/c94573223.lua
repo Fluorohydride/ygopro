@@ -53,10 +53,11 @@ function c94573223.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c94573223.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 end
 function c94573223.eqlimit(e,c)
-	return c:IsSetCard(0x56)
+	return c==e:GetLabelObject()
 end
 function c94573223.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -1414,12 +1414,12 @@ int32 scriptlib::card_is_chain_attackable(lua_State *L) {
 	if(lua_gettop(L) > 2)
 		monsteronly = lua_toboolean(L, 3);
 	card* attacker = pduel->game_field->core.attacker;
-	if(pduel->game_field->core.effect_damage_step
-	        || attacker->is_status(STATUS_BATTLE_DESTROYED)
+	if(attacker->is_status(STATUS_BATTLE_DESTROYED)
 			|| attacker->current.controler != pduel->game_field->infos.turn_player
-	        || attacker->fieldid_r != pduel->game_field->core.pre_field[0]
-	        || !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
-	        || (ac != 0 && attacker->announce_count >= ac)) {
+			|| attacker->fieldid_r != pduel->game_field->core.pre_field[0]
+			|| !attacker->is_capable_attack_announce(pduel->game_field->infos.turn_player)
+			|| (ac != 0 && attacker->announce_count >= ac)
+			|| (ac == 2 && attacker->is_affected_by_effect(EFFECT_EXTRA_ATTACK))) {
 		lua_pushboolean(L, 0);
 		return 1;
 	}
@@ -1524,7 +1524,7 @@ int32 scriptlib::card_is_level_below(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 lvl = lua_tointeger(L, 2);
 	if((pcard->data.type & TYPE_XYZ) || (pcard->status & STATUS_NO_LEVEL)
-	        || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
+	        || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
 		lua_pushboolean(L, 0);
 	else
 		lua_pushboolean(L, pcard->get_level() <= lvl);
@@ -1536,7 +1536,7 @@ int32 scriptlib::card_is_level_above(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 lvl = lua_tointeger(L, 2);
 	if((pcard->data.type & TYPE_XYZ) || (pcard->status & STATUS_NO_LEVEL)
-	        || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
+	        || (!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE)))
 		lua_pushboolean(L, 0);
 	else
 		lua_pushboolean(L, pcard->get_level() >= lvl);
@@ -1571,7 +1571,7 @@ int32 scriptlib::card_is_attack_below(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 atk = lua_tointeger(L, 2);
-	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
+	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
 		lua_pushboolean(L, 0);
 	else {
 		int _atk = pcard->get_attack();
@@ -1584,7 +1584,7 @@ int32 scriptlib::card_is_attack_above(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 atk = lua_tointeger(L, 2);
-	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
+	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
 		lua_pushboolean(L, 0);
 	else {
 		int _atk = pcard->get_attack();
@@ -1597,7 +1597,7 @@ int32 scriptlib::card_is_defence_below(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 def = lua_tointeger(L, 2);
-	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
+	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
 		lua_pushboolean(L, 0);
 	else {
 		int _def = pcard->get_defence();
@@ -1610,7 +1610,7 @@ int32 scriptlib::card_is_defence_above(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 def = lua_tointeger(L, 2);
-	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
+	if(!(pcard->data.type & TYPE_MONSTER) && !(pcard->get_type() & TYPE_MONSTER) && !(pcard->current.location & LOCATION_MZONE))
 		lua_pushboolean(L, 0);
 	else {
 		int _def = pcard->get_defence();
@@ -1880,7 +1880,7 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	peffect = pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
-	peffect->code = EFFECT_CHANGE_ATTRIBUTE;
+	peffect->code = EFFECT_ADD_ATTRIBUTE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_flag = RESET_EVENT + 0x47e0000;
 	peffect->value = attribute;
@@ -1889,7 +1889,7 @@ int32 scriptlib::card_add_trap_monster_attribute(lua_State *L) {
 	peffect = pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
-	peffect->code = EFFECT_CHANGE_RACE;
+	peffect->code = EFFECT_ADD_RACE;
 	peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
 	peffect->reset_flag = RESET_EVENT + 0x47e0000;
 	peffect->value = race;

@@ -55,6 +55,7 @@ function c81471108.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c81471108.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -65,7 +66,7 @@ function c81471108.eqop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 end
 function c81471108.eqlimit(e,c)
-	return c:IsSetCard(0x7f)
+	return c==e:GetLabelObject()
 end
 function c81471108.indval(e,re,tp)
 	return e:GetHandler():GetControler()~=tp
