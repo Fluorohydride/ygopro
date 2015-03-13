@@ -18,7 +18,7 @@ function c61965407.initial_effect(c)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetCondition(c61965407.thcon)
-	e2:SetCost(c61965407.cost)
+	e2:SetCost(c61965407.thcost)
 	e2:SetTarget(c61965407.thtg)
 	e2:SetOperation(c61965407.operation)
 	e2:SetLabel(1)
@@ -31,7 +31,7 @@ function c61965407.initial_effect(c)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetCondition(c61965407.tgcon)
-	e3:SetCost(c61965407.cost)
+	e3:SetCost(c61965407.tgcost)
 	e3:SetTarget(c61965407.tgtg)
 	e3:SetOperation(c61965407.operation)
 	e3:SetLabel(2)
@@ -53,6 +53,7 @@ function c61965407.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return true end
 	if Duel.GetTurnPlayer()~=tp and Duel.GetCurrentPhase()==PHASE_STANDBY
 		and Duel.IsExistingTarget(c61965407.thfilter,tp,LOCATION_GRAVE,0,1,nil)
+		and Duel.GetFlagEffect(tp,61965407)==0
 		and Duel.SelectYesNo(tp,aux.Stringid(61965407,0)) then
 		e:SetCategory(CATEGORY_TOHAND)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -63,13 +64,14 @@ function c61965407.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e:SetLabel(1)
 	elseif Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY
 		and Duel.IsExistingTarget(c61965407.tgfilter,tp,LOCATION_REMOVED,0,1,nil)
+		and Duel.GetFlagEffect(tp,61965408)==0
 		and Duel.SelectYesNo(tp,aux.Stringid(61965407,0)) then
 		e:SetCategory(CATEGORY_TOGRAVE)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local g=Duel.SelectTarget(tp,c61965407.tgfilter,tp,LOCATION_REMOVED,0,1,1,nil)
 		Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
-		Duel.RegisterFlagEffect(tp,61965407,RESET_PHASE+PHASE_END,0,1)
+		Duel.RegisterFlagEffect(tp,61965408,RESET_PHASE+PHASE_END,0,1)
 		e:SetLabel(2)
 	else
 		e:SetCategory(0)
@@ -80,7 +82,7 @@ end
 function c61965407.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
 end
-function c61965407.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+function c61965407.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFlagEffect(tp,61965407)==0 end
 	Duel.RegisterFlagEffect(tp,61965407,RESET_PHASE+PHASE_END,0,1)
 end
@@ -96,6 +98,10 @@ function c61965407.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c61965407.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
+end
+function c61965407.tgcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFlagEffect(tp,61965408)==0 end
+	Duel.RegisterFlagEffect(tp,61965408,RESET_PHASE+PHASE_END,0,1)
 end
 function c61965407.tgfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xbb)
