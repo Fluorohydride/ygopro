@@ -17,7 +17,7 @@ function c22160245.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCode(EVENT_BATTLE_DESTROYING)
-	e2:SetCondition(c22160245.damcon)
+	e2:SetCondition(aux.bdgcon)
 	e2:SetTarget(c22160245.damtg)
 	e2:SetOperation(c22160245.damop)
 	c:RegisterEffect(e2)
@@ -29,11 +29,6 @@ function c22160245.initial_effect(c)
 end
 function c22160245.splimit(e,se,sp,st)
 	return st==SUMMON_TYPE_FUSION+0x10
-end
-function c22160245.damcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER)
 end
 function c22160245.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
