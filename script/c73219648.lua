@@ -21,6 +21,7 @@ function c73219648.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(LOCATION_MZONE,0)
+	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e3:SetTarget(c73219648.atktg)
 	e3:SetValue(1)
@@ -48,5 +49,5 @@ function c73219648.disop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c73219648.atktg(e,c)
-	return c:IsFaceup() and c:IsSetCard(0x45) and c:GetCode()~=73219648
+	return c:IsSetCard(0x45) and c:GetCode()~=73219648
 end
