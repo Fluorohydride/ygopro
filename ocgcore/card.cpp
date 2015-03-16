@@ -609,7 +609,7 @@ uint32 card::get_ritual_level(card* pcard) {
 	return lev;
 }
 uint32 card::check_xyz_level(card* pcard, uint32 lv) {
-	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL))
+	if(status & STATUS_NO_LEVEL)
 		return FALSE;
 	uint32 lev;
 	effect_set eset;
