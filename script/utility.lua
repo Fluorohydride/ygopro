@@ -1038,7 +1038,12 @@ function Auxiliary.AddPendulumProcedure(c)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.PConditionFilter(c,e,tp,lscale,rscale)
-	local lv=c:GetLevel()
+	local lv=0
+	if c:IsType(TYPE_XYZ) then
+		lv=c:GetRank()
+	else
+		lv=c:GetLevel()
+	end
 	return (c:IsLocation(LOCATION_HAND) or (c:IsFaceup() and c:IsType(TYPE_PENDULUM)))
 		and lv>lscale and lv<rscale and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_PENDULUM,tp,false,false)
 		and not c:IsForbidden()
