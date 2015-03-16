@@ -11,10 +11,10 @@ function c44394295.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c44394295.filter0(c)
-	return c:IsCanBeFusionMaterial() and (c:IsAbleToGrave() or c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT))
+	return c:IsCanBeFusionMaterial() and c:IsAbleToGrave()
 end
 function c44394295.filter1(c,e)
-	return c:IsCanBeFusionMaterial() and (c:IsAbleToGrave() or c:IsHasEffect(EFFECT_TO_GRAVE_REDIRECT)) and not c:IsImmuneToEffect(e)
+	return c:IsCanBeFusionMaterial() and c:IsAbleToGrave() and not c:IsImmuneToEffect(e)
 end
 function c44394295.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x9d) and (not f or f(c))
