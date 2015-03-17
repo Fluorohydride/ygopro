@@ -80,9 +80,10 @@ function c96142517.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c96142517.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
-	local rk=e:GetLabel()
 	local mg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local rg=mg:Filter(Card.IsRelateToEffect,nil,e)
+	if rg:GetCount()==0 then return end
+	local rk=e:GetLabel()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c96142517.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,rk+1,mg)
 	local sc=g:GetFirst()
