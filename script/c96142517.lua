@@ -68,6 +68,7 @@ function c96142517.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+		sc:SetMaterial(mg)
 		Duel.Overlay(sc,mg)
 		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)
 	end
