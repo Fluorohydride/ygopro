@@ -42,9 +42,6 @@ end
 function c96142517.targetcheck2(c)
 	return c:GetOriginalCode()~=6165656
 end
-function c96142517.targetcheck3(c,rk)
-	return not c:IsRank(rk)
-end
 function c96142517.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local g1=Duel.GetMatchingGroup(c96142517.filter1,tp,LOCATION_GRAVE,0,nil,e) --avaliable targets in your graveyard
