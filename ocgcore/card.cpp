@@ -610,16 +610,19 @@ uint32 card::get_ritual_level(card* pcard) {
 }
 uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 	if(status & STATUS_NO_LEVEL)
-		return FALSE;
+		return 0;
 	uint32 lev;
 	effect_set eset;
 	filter_effect(EFFECT_XYZ_LEVEL, &eset);
-	if(eset.size()) {
-		pduel->lua->add_param(this, PARAM_TYPE_CARD);
-		pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
-		lev = eset[0]->get_value(2);
-	} else
+	if(!eset.size()) {
 		lev = get_level();
+		if(lev == lv)
+			return lev;
+		return 0;
+	}
+	pduel->lua->add_param(this, PARAM_TYPE_CARD);
+	pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
+	lev = eset[0]->get_value(2);
 	if(((lev & 0xfff) == lv))
 		return lev & 0xffff;
 	if(((lev >> 16) & 0xfff) == lv)
@@ -1117,6 +1120,7 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	read_card(code, &cdata);
 	if(cdata.type & TYPE_NORMAL)
 		return -1;
+	cancel_field_effect();
 	set_status(STATUS_COPYING_EFFECT, TRUE);
 	uint32 cr = pduel->game_field->core.copy_reset;
 	uint8 crc = pduel->game_field->core.copy_reset_count;
@@ -1131,6 +1135,7 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	for(auto eit = pduel->uncopy.begin(); eit != pduel->uncopy.end(); ++eit)
 		pduel->delete_effect(*eit);
 	pduel->uncopy.clear();
+	apply_field_effect();
 	return pduel->game_field->infos.copy_id - 1;
 }
 void card::reset(uint32 id, uint32 reset_type) {
