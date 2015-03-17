@@ -86,9 +86,9 @@ function c97489701.syncon(e,c,tuner,mg)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<-2 then return false end
-	local g1=Group.CreateGroup()
-	local g2=Group.CreateGroup()
-	local g3=Group.CreateGroup()
+	local g1=nil
+	local g2=nil
+	local g3=nil
 	if mg then
 		g1=mg:Filter(c97489701.matfilter1,nil,c)
 		g2=mg:Filter(c97489701.matfilter2,nil,c)
@@ -118,9 +118,9 @@ function c97489701.syncon(e,c,tuner,mg)
 end
 function c97489701.synop(e,tp,eg,ep,ev,re,r,rp,c,tuner,mg)
 	local g=Group.CreateGroup()
-	local g1=Group.CreateGroup()
-	local g2=Group.CreateGroup()
-	local g3=Group.CreateGroup()
+	local g1=nil
+	local g2=nil
+	local g3=nil
 	if mg then
 		g1=mg:Filter(c97489701.matfilter1,nil,c)
 		g2=mg:Filter(c97489701.matfilter2,nil,c)

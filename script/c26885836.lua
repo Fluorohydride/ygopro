@@ -12,6 +12,7 @@ function c26885836.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26885836.eqcon(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetHandler():GetBattleTarget()
 	e:SetLabelObject(tc)
 	return aux.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 end
