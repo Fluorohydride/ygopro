@@ -32,17 +32,29 @@ function c42776960.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetTargetRange(1,0)
 		e1:SetValue(0)
-		tc:RegisterEffect(e1)
+		tc:RegisterEffect(e1,true)
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_LEAVE_FIELD)
 		e2:SetLabel(1-tp)
 		e2:SetOperation(c42776960.leaveop)
-		e2:SetReset(RESET_EVENT+RESET_OVERLAY)
-		tc:RegisterEffect(e2)
+		e2:SetReset(RESET_EVENT+RESET_OVERLAY+RESET_TURN_SET)
+		tc:RegisterEffect(e2,true)
+		local e3=Effect.GlobalEffect()
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetCode(EVENT_ADJUST)
+		e3:SetOperation(c42776960.adjust(e2))
+		Duel.RegisterEffect(e3,tp)
 	end
 end
 function c42776960.leaveop(e,tp,eg,ep,ev,re,r,rp)
 	local WIN_REASON_RELAY_SOUL=0x1a
 	Duel.Win(e:GetLabel(),WIN_REASON_RELAY_SOUL)
+end
+function c42776960.adjust(e2)
+	return function(e,tp,eg,ep,ev,re,r,rp)
+		local tc=e2:GetHandler()
+		if not tc then e:Reset() return end
+		if tc:IsLocation(LOCATION_SZONE) then e2:Reset() e:Reset() end
+	end
 end
