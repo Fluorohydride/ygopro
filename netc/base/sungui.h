@@ -262,8 +262,8 @@ namespace sgui
     class UITextBase : UIComponent {
     public:
         UITextBase(int32_t capacity) {
-            vertices.resize(capacity * 4);
-            indices.resize(capacity * 6);
+            vertices.resize((capacity + 4) * 4);
+            indices.resize((capacity + 4) * 6);
             vert_cap = capacity;
         }
         
@@ -272,8 +272,8 @@ namespace sgui
         
         virtual void RefreshVertices() {
             static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
-            advx = 0;
-            advy = 0;
+            advance.x = 0;
+            advance.y = 0;
             line_spacing = 0;
             int32_t actual_size = 0;
             auto len = texts.length();
@@ -281,25 +281,25 @@ namespace sgui
                 auto ch = texts[i];
                 if(ch < L' ') {
                     if(ch == L'\n') {
-                        advy += line_spacing;
+                        advance.y += line_spacing;
                         line_spacing = 0;
                     }
                     continue;
                 }
                 auto color = colors[i];
                 auto& gl = text_font->GetGlyph(ch);
-                if(advx + gl.advance > max_width) {
-                    advy += line_spacing;
+                if(advance.x + gl.advance > max_width) {
+                    advance.y += line_spacing;
                     line_spacing = 0;
                 }
                 line_spacing = std::max(text_font->GetLineSpacing(ch), line_spacing);
                 auto v = &vertices[actual_size * 4];
                 auto idx = &indices[actual_size * 6];
                 actual_size++;
-                v[0].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left, position.y + advy + gl.bounds.top});
-                v[1].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left + gl.bounds.width, position.y + advy + gl.bounds.top});
-                v[2].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left, position.y + advy + gl.bounds.top + gl.bounds.height});
-                v[3].vertex = ConvScreenCoord({position.x + advx + gl.bounds.left + gl.bounds.width, position.y + advy + gl.bounds.top + gl.bounds.height});
+                v[0].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y + gl.bounds.top});
+                v[1].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left + gl.bounds.width, position.y + advance.y + gl.bounds.top});
+                v[2].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y + gl.bounds.top + gl.bounds.height});
+                v[3].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left + gl.bounds.width, position.y + advance.y + gl.bounds.top + gl.bounds.height});
                 v[0].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top});
                 v[1].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left + gl.textureRect.width, gl.textureRect.top});
                 v[2].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top + gl.textureRect.height});
@@ -307,8 +307,9 @@ namespace sgui
                 for(int16_t i = 0; i < 6; ++i)
                     idx[i] = index_index + quad_idx[i];
                 if(!text_font->IsEmoji(ch))
-                    for(int16_t i = 0; i < 4; ++i)
+                    for(int16_t i = 0; i < 4; ++i) {
                         v[i].color = color;
+                    }
             }
             for(size_t i = len; i < vert_cap; ++i) {
                 auto idx = &indices[i * 6];
@@ -327,6 +328,8 @@ namespace sgui
         inline void SetMaxWidth(int32_t mw) {
             if(max_width == mw)
                 return;
+            max_width = mw;
+            need_update = true;
         }
         
         inline bool SetText(std::wstring& t, int32_t cl) {
@@ -346,8 +349,8 @@ namespace sgui
             if(vertices.size() + app_size > vert_cap) {
                 while(vertices.size() + app_size > vert_cap)
                     vert_cap *= 2;
-                vertices.resize(vert_cap);
-                indices.resize(vert_cap);
+                vertices.resize((vert_cap + 4) * 4);
+                indices.resize((vert_cap + 4) * 6);
                 redraw = true;
             }
             texts.append(t);
@@ -367,9 +370,9 @@ namespace sgui
         base::Font* text_font = nullptr;
         int32_t max_width = 0xffffffff;
         int32_t vert_cap = 0;
-        int32_t advx = 0;
-        int32_t advy = 0;
         int32_t line_spacing = 0;
+        v2i advance = {0, 0};
+        v2i selection = {0, 0};
         std::wstring texts;
         std::vector<uint32_t> colors;
     };
