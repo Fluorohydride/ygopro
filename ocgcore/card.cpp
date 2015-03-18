@@ -629,14 +629,6 @@ uint32 card::check_xyz_level(card* pcard, uint32 lv) {
 		return (lev >> 16) & 0xffff;
 	return 0;
 }
-uint32 card::get_base_attribute() {
-	int32 batt = data.attribute;
-	effect_set effects;
-	filter_effect(EFFECT_CHANGE_BASE_ATTRIBUTE, &effects);
-	if(effects.size())
-		batt = effects.get_last()->get_value(this);
-	return batt;
-}
 uint32 card::get_attribute() {
 	if(assume_type == ASSUME_ATTRIBUTE)
 		return assume_value;
@@ -666,14 +658,6 @@ uint32 card::get_attribute() {
 	}
 	temp.attribute = 0xffffffff;
 	return attribute;
-}
-uint32 card::get_base_race() {
-	int32 brac = data.race;
-	effect_set effects;
-	filter_effect(EFFECT_CHANGE_BASE_RACE, &effects);
-	if(effects.size())
-		brac = effects.get_last()->get_value(this);
-	return brac;
 }
 uint32 card::get_race() {
 	if(assume_type == ASSUME_RACE)
