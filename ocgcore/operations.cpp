@@ -3141,7 +3141,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			pcard->set_status(STATUS_SUMMON_DISABLED | STATUS_ACTIVATE_DISABLED, FALSE);
 			pcard->previous.location = 0;
 		} else if(oloc & LOCATION_ONFIELD) {
-			pcard->reset(RESET_LEAVE, RESET_EVENT);
+			pcard->reset(RESET_LEAVE + RESET_MSCHANGE, RESET_EVENT);
 			param->leave.insert(pcard);
 		}
 		if(pcard->current.reason & REASON_DISCARD)
