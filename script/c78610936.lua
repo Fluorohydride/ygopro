@@ -29,6 +29,7 @@ function c78610936.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end
 	local mg=tc:GetOverlayGroup()
+	tc:RemoveOverlayCard(tp,mg:GetCount(),mg:GetCount(),REASON_EFFECT)
 	if Duel.SendtoDeck(tc,nil,0,REASON_EFFECT)>0 then
 		local g=mg:Filter(c78610936.spfilter,nil,e,tp)
 		local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
