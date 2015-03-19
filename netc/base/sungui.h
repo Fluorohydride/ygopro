@@ -262,8 +262,8 @@ namespace sgui
     class UITextBase : UIComponent {
     public:
         UITextBase(int32_t capacity) {
-            vertices.resize((capacity + 4) * 4);
-            indices.resize((capacity + 4) * 6);
+            vertices.resize((capacity + 3) * 4);
+            indices.resize((capacity + 3) * 6);
             vert_cap = capacity;
         }
         
@@ -277,6 +277,10 @@ namespace sgui
             line_spacing = 0;
             int32_t actual_size = 0;
             auto len = texts.length();
+            bool start_pos = false;
+            bool end_pos = false;
+            int32_t back_lines = 0;
+            bool cursor_pos = false;
             for(size_t i = 0; i < len; ++i) {
                 auto ch = texts[i];
                 if(ch < L' ') {
@@ -292,9 +296,14 @@ namespace sgui
                     advance.y += line_spacing;
                     line_spacing = 0;
                 }
-                line_spacing = std::max(text_font->GetLineSpacing(ch), line_spacing);
-                auto v = &vertices[actual_size * 4];
-                auto idx = &indices[actual_size * 6];
+                if(start_pos && line_spacing == 0)
+                    back_lines++;
+                if(!start_pos && i > selection.x) {
+                    start_pos = true;
+                    vertices[0].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y - text_font->GetFontSize()});
+                }
+                auto v = &vertices[actual_size * 4 + 12];
+                auto idx = &indices[actual_size * 6 + 18];
                 actual_size++;
                 v[0].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y + gl.bounds.top});
                 v[1].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left + gl.bounds.width, position.y + advance.y + gl.bounds.top});
@@ -307,9 +316,9 @@ namespace sgui
                 for(int16_t i = 0; i < 6; ++i)
                     idx[i] = index_index + quad_idx[i];
                 if(!text_font->IsEmoji(ch))
-                    for(int16_t i = 0; i < 4; ++i) {
+                    for(int16_t i = 0; i < 4; ++i)
                         v[i].color = color;
-                    }
+                line_spacing = std::max(text_font->GetLineSpacing(ch), line_spacing);
             }
             for(size_t i = len; i < vert_cap; ++i) {
                 auto idx = &indices[i * 6];
@@ -349,8 +358,8 @@ namespace sgui
             if(vertices.size() + app_size > vert_cap) {
                 while(vertices.size() + app_size > vert_cap)
                     vert_cap *= 2;
-                vertices.resize((vert_cap + 4) * 4);
-                indices.resize((vert_cap + 4) * 6);
+                vertices.resize((vert_cap + 3) * 4);
+                indices.resize((vert_cap + 3) * 6);
                 redraw = true;
             }
             texts.append(t);
@@ -371,6 +380,8 @@ namespace sgui
         int32_t max_width = 0xffffffff;
         int32_t vert_cap = 0;
         int32_t line_spacing = 0;
+        int32_t cursor_offset = 0;
+        uint32_t back_color = 0x40404040;
         v2i advance = {0, 0};
         v2i selection = {0, 0};
         std::wstring texts;
