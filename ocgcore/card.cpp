@@ -2404,10 +2404,8 @@ int32 card::is_can_be_synchro_material(card* scard, card* tuner) {
 			return FALSE;
 	return TRUE;
 }
-int32 card::is_can_be_xyz_material(card* scard, uint8 ignore_xyz) {
+int32 card::is_can_be_xyz_material(card* scard) {
 	if(data.type & TYPE_TOKEN)
-		return FALSE;
-	if(!ignore_xyz && (data.type & TYPE_XYZ))
 		return FALSE;
 	if(!(get_type()&TYPE_MONSTER))
 		return FALSE;

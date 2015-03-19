@@ -29,7 +29,7 @@ function c94220427.filter1(c,e,tp)
 end
 function c94220427.filter2(c,e,tp,mc,rk,code)
 	if c:GetOriginalCode()==6165656 and code~=48995978 then return false end
-	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073)) and mc:IsCanBeXyzMaterial(c,true)
+	return c:GetRank()==rk and (c:IsSetCard(0x1048) or c:IsSetCard(0x1073)) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c94220427.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

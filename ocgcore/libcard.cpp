@@ -1799,10 +1799,7 @@ int32 scriptlib::card_is_can_be_xyz_material(lua_State *L) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		scard = *(card**) lua_touserdata(L, 2);
 	}
-	uint32 ign = FALSE;
-	if(lua_gettop(L) >= 3)
-		ign = lua_toboolean(L, 3);
-	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard, ign));
+	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard));
 	return 1;
 }
 int32 scriptlib::card_check_fusion_material(lua_State *L) {

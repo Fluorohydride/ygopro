@@ -21,7 +21,7 @@ function c43476205.filter2(c,e,tp)
 		and Duel.IsExistingMatchingCard(c43476205.filter3,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1)
 end
 function c43476205.filter3(c,e,tp,mc,rk)
-	return c:GetRank()==rk and c:IsSetCard(0xba) and mc:IsCanBeXyzMaterial(c,true)
+	return c:GetRank()==rk and c:IsSetCard(0xba) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c43476205.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

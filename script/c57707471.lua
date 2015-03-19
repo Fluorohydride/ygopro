@@ -36,7 +36,7 @@ end
 c57707471.xyz_number=21
 c57707471.xyz_count=2
 function c57707471.ovfilter(c,tp,xyzc)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetRank()==5 and c:IsCanBeXyzMaterial(xyzc,true)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:GetRank()==5 and c:IsCanBeXyzMaterial(xyzc)
 		and c:CheckRemoveOverlayCard(tp,1,REASON_COST)
 end
 function c57707471.xyzcon(e,c,og)

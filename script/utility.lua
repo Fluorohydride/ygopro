@@ -162,7 +162,7 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.XyzAlterFilter(c,alterf,xyzc)
-	return alterf(c) and c:IsCanBeXyzMaterial(xyzc,true)
+	return alterf(c) and c:IsCanBeXyzMaterial(xyzc)
 end
 function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	if c.xyz_filter==nil then

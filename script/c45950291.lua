@@ -33,7 +33,7 @@ function c45950291.filter1(c,e,tp)
 end
 function c45950291.filter2(c,e,tp,mc,rk,rc,att,code)
 	if c:GetOriginalCode()==6165656 and code~=48995978 then return false end
-	return c:GetRank()==rk and c:IsRace(rc) and c:IsAttribute(att) and mc:IsCanBeXyzMaterial(c,true)
+	return c:GetRank()==rk and c:IsRace(rc) and c:IsAttribute(att) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c45950291.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
