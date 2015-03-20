@@ -27,6 +27,7 @@ function c8038143.condition(e,tp,eg,ep,ev,re,r,rp)
 			return true
 		end
 	end
+	return false
 end
 function c8038143.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
