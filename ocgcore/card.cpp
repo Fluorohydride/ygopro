@@ -831,7 +831,6 @@ void card::xyz_add(card* mat, card_set* des) {
 		return;
 	pduel->write_buffer8(MSG_MOVE);
 	pduel->write_buffer32(mat->data.code);
-	mat->enable_field_effect(false);
 	if(mat->overlay_target) {
 		pduel->write_buffer8(mat->overlay_target->current.controler);
 		pduel->write_buffer8(mat->overlay_target->current.location | LOCATION_OVERLAY);
@@ -845,6 +844,7 @@ void card::xyz_add(card* mat, card_set* des) {
 		pduel->write_buffer8(mat->current.position);
 		mat->enable_field_effect(false);
 		pduel->game_field->remove_card(mat);
+		pduel->game_field->add_to_disable_check_list(mat);
 	}
 	pduel->write_buffer8(current.controler);
 	pduel->write_buffer8(current.location | LOCATION_OVERLAY);
