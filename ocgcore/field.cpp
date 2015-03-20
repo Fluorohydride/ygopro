@@ -2148,3 +2148,8 @@ int32 field::check_chain_target(uint8 chaincount, card * pcard) {
 	pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
 	return pduel->lua->check_condition(peffect->target, 10);
 }
+int32 field::is_able_to_enter_bp() {
+	return ((core.duel_options & DUEL_ATTACK_FIRST_TURN) || infos.turn_id != 1)
+	        && infos.phase < PHASE_BATTLE
+	        && !is_player_affected_by_effect(infos.turn_player, EFFECT_CANNOT_BP);
+}

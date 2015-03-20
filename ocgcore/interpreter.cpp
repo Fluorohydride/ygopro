@@ -481,6 +481,7 @@ static const struct luaL_Reg duellib[] = {
 	{ "CheckPhaseActivity", scriptlib::duel_check_phase_activity },
 	{ "AddCustomActivityCounter", scriptlib::duel_add_custom_activity_counter },
 	{ "GetCustomActivityCount", scriptlib::duel_get_custom_activity_count },
+	{ "IsAbleToEnterBP", scriptlib::duel_is_able_to_enter_bp },
 	{ "VenomSwampCheck", scriptlib::duel_venom_swamp_check },
 	{ "SwapDeckAndGrave", scriptlib::duel_swap_deck_and_grave },
 	{ "MajesticCopy", scriptlib::duel_majestic_copy },

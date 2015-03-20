@@ -481,6 +481,7 @@ public:
 	static int32 duel_check_phase_activity(lua_State *L);
 	static int32 duel_add_custom_activity_counter(lua_State *L);
 	static int32 duel_get_custom_activity_count(lua_State *L);
+	static int32 duel_is_able_to_enter_bp(lua_State *L);
 	
 	//specific card functions
 	static int32 duel_venom_swamp_check(lua_State *L);

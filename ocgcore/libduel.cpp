@@ -3175,6 +3175,11 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 		lua_pushinteger(L, (val >> 16) & 0xffff);
 	return 1;
 }
+int32 scriptlib::duel_is_able_to_enter_bp(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	lua_pushboolean(L, pduel->game_field->is_able_to_enter_bp());
+	return 1;
+}
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 2);
