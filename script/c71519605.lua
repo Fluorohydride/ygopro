@@ -19,7 +19,7 @@ function c71519605.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e2:SetCondition(c71519605.atcon)
 	e2:SetTarget(c71519605.atlimit)
-	e2:SetValue(1)
+	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 end
 function c71519605.atcon(e)

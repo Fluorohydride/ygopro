@@ -8,7 +8,7 @@ function c70458081.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetTarget(c70458081.bttg)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--destroy replace
 	local e2=Effect.CreateEffect(c)

@@ -11,7 +11,7 @@ function c45298492.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetTarget(c45298492.tg)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--battle indes
 	local e2=Effect.CreateEffect(c)

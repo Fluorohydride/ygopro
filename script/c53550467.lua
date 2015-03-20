@@ -9,7 +9,7 @@ function c53550467.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCondition(c53550467.con)
 	e1:SetTarget(c53550467.tg)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--cannot be effect target
 	local e2=Effect.CreateEffect(c)

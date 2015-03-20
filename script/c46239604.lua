@@ -27,7 +27,7 @@ function c46239604.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e3:SetTarget(c46239604.atlimit)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 end
 function c46239604.atlimit(e,c)

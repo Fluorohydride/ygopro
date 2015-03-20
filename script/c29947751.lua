@@ -25,7 +25,7 @@ function c29947751.initial_effect(c)
 	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e3:SetCondition(c29947751.cond)
 	e3:SetTarget(c29947751.atlimit)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 end
 function c29947751.cona(e)

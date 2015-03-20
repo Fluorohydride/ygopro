@@ -23,7 +23,7 @@ function c51085303.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(LOCATION_MZONE,0)
 	e3:SetTarget(c51085303.attg)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 end
 function c51085303.adcon(e,tp,eg,ep,ev,re,r,rp)

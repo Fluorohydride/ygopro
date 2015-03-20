@@ -105,7 +105,7 @@ function c82670878.adop(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 		e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 		e3:SetTarget(c82670878.atlimit)
-		e3:SetValue(1)
+		e3:SetValue(aux.imval1)
 		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e3)
 	end

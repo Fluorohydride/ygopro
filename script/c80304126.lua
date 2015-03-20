@@ -8,7 +8,7 @@ function c80304126.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetTarget(c80304126.tg)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 end
 function c80304126.tg(e,c)

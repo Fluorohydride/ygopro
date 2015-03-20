@@ -1156,3 +1156,7 @@ function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
 	end
 end
+--immune test for EFFECT_CANNOT_BE_BATTLE_TARGET
+function Auxiliary.imval1(e,c)
+	return not c:IsImmuneToEffect(e)
+end

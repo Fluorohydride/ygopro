@@ -44,7 +44,7 @@ function c48179391.initial_effect(c)
 	e5:SetTargetRange(LOCATION_MZONE,0)
 	e5:SetCondition(c48179391.atkcon)
 	e5:SetTarget(c48179391.atktg)
-	e5:SetValue(1)
+	e5:SetValue(aux.imval1)
 	c:RegisterEffect(e5)
 end
 function c48179391.actcost(e,tp,eg,ep,ev,re,r,rp,chk)

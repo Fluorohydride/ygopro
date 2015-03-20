@@ -14,7 +14,7 @@ function c66865880.initial_effect(c)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetCondition(c66865880.con)
 	e2:SetTarget(c66865880.target)
-	e2:SetValue(1)
+	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 end
 function c66865880.cfilter(c)

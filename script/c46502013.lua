@@ -13,7 +13,7 @@ function c46502013.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCondition(c46502013.con)
 	e1:SetTarget(c46502013.tg)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 end
 function c46502013.con(e)

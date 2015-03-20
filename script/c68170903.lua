@@ -16,7 +16,7 @@ function c68170903.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetTarget(c68170903.target)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	e1:SetReset(RESET_PHASE+PHASE_END,1)
 	Duel.RegisterEffect(e1,tp)
 end

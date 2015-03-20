@@ -24,7 +24,7 @@ function c73219648.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e3:SetTarget(c73219648.atktg)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 end
 function c73219648.mtop(e,tp,eg,ep,ev,re,r,rp)

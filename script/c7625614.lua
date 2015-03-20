@@ -18,7 +18,7 @@ function c7625614.initial_effect(c)
 	e2:SetCondition(c7625614.atkcon)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(c7625614.atktg)
-	e2:SetValue(1)
+	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 	--Equip limit
 	local e4=Effect.CreateEffect(c)

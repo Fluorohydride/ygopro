@@ -33,7 +33,7 @@ function c91420254.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e4:SetTarget(c91420254.bttg)
-	e4:SetValue(1)
+	e4:SetValue(aux.imval1)
 	c:RegisterEffect(e4)
 end
 function c91420254.sccon(e,tp,eg,ep,ev,re,r,rp)

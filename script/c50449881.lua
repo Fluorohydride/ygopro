@@ -23,7 +23,7 @@ function c50449881.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e2:SetTarget(c50449881.atlimit)
-	e2:SetValue(1)
+	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 end
 function c50449881.condition(e,tp,eg,ep,ev,re,r,rp)

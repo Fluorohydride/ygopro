@@ -32,10 +32,11 @@ function c34822850.initial_effect(c)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetTarget(c34822850.tgtg)
-	e4:SetValue(c34822850.tgval)
+	e4:SetValue(aux.imval1)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e5:SetValue(c34822850.tgval)
 	c:RegisterEffect(e5)
 end
 function c34822850.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -64,5 +65,5 @@ function c34822850.tgtg(e,c)
 	return c:IsSetCard(0xbb) and Duel.IsExistingMatchingCard(c34822850.filter,c:GetControler(),LOCATION_MZONE,0,1,nil,c:GetLevel())
 end
 function c34822850.tgval(e,re,tp)
-	return e:GetHandlerPlayer()~=tp
+	return e:GetHandlerPlayer()~=tp and not re:GetHandler():IsImmuneToEffect(e)
 end
