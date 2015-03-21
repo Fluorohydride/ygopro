@@ -3491,10 +3491,28 @@ int32 field::process_battle_command(uint16 step) {
 		card* reason_card = 0;
 		uint8 bd[2];
 		calculate_battle_damage(&damchange, &reason_card, bd);
-		if(bd[0])
-			core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		if(bd[0]) {
+			effect* indestructable_effect = core.attacker->is_affected_by_effect(EFFECT_INDESTRUCTABLE_BATTLE, core.attack_target);
+			if(indestructable_effect) {
+				pduel->write_buffer8(MSG_HINT);
+				pduel->write_buffer8(HINT_CARD);
+				pduel->write_buffer8(0);
+				pduel->write_buffer32(indestructable_effect->owner->data.code);
+				bd[0] = FALSE;
+			} else
+				core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		}
 		if(bd[1])
-			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+			effect* indestructable_effect = core.attack_target->is_affected_by_effect(EFFECT_INDESTRUCTABLE_BATTLE, core.attacker);
+			if(indestructable_effect) {
+				pduel->write_buffer8(MSG_HINT);
+				pduel->write_buffer8(HINT_CARD);
+				pduel->write_buffer8(0);
+				pduel->write_buffer32(indestructable_effect->owner->data.code);
+				bd[1] = FALSE;
+			} else
+				core.attack_target->set_status(STATUS_BATTLE_DESTROYED, TRUE);
+		}
 		pduel->write_buffer8(MSG_BATTLE);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		pduel->write_buffer32(aa);
@@ -3902,8 +3920,7 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 						reason_card = core.attacker;
 					}
 				}
-				if(core.attack_target->is_destructable_by_battle(core.attacker))
-					bd[1] = TRUE;
+				bd[1] = TRUE;
 			} else if (a < d) {
 				damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
 				if(damchange) {
@@ -3924,14 +3941,11 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 						reason_card = core.attack_target;
 					}
 				}
-				if(core.attacker->is_destructable_by_battle(core.attack_target))
-					bd[0] = TRUE;
+				bd[0] = TRUE;
 			} else {
 				if(a != 0) {
-					if(core.attack_target->is_destructable_by_battle(core.attacker))
-						bd[1] = TRUE;
-					if(core.attacker->is_destructable_by_battle(core.attack_target))
-						bd[0] = TRUE;
+					bd[0] = TRUE;
+					bd[1] = TRUE;
 				}
 			}
 		} else {
@@ -3969,8 +3983,7 @@ void field::calculate_battle_damage(effect** pdamchange, card** preason_card, ui
 						core.battle_damage[1 - pd] = a - d;
 					reason_card = core.attacker;
 				}
-				if(core.attack_target->is_destructable_by_battle(core.attacker))
-					bd[1] = TRUE;
+				bd[1] = TRUE;
 			} else if (a < d) {
 				damchange = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DAMAGE_TO_EFFECT);
 				if(damchange) {

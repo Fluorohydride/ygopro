@@ -226,6 +226,7 @@ public:
 	int32 is_affect_by_effect(effect* peffect);
 	int32 is_destructable();
 	int32 is_destructable_by_battle(card* pcard);
+	effect* check_indestructable_by_effect(effect* peffect, uint8 playerid);
 	int32 is_destructable_by_effect(effect* peffect, uint8 playerid);
 	int32 is_removeable(uint8 playerid);
 	int32 is_removeable_as_cost(uint8 playerid);

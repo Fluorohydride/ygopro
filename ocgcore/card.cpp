@@ -2077,9 +2077,9 @@ int32 card::is_destructable_by_battle(card * pcard) {
 		return FALSE;
 	return TRUE;
 }
-int32 card::is_destructable_by_effect(effect* peffect, uint8 playerid) {
+effect* card::check_indestructable_by_effect(effect* peffect, uint8 playerid) {
 	if(!peffect)
-		return TRUE;
+		return 0;
 	effect_set eset;
 	filter_effect(EFFECT_INDESTRUCTABLE_EFFECT, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
@@ -2087,9 +2087,12 @@ int32 card::is_destructable_by_effect(effect* peffect, uint8 playerid) {
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		pduel->lua->add_param(this, PARAM_TYPE_CARD);
 		if(eset[i]->check_value_condition(3))
-			return FALSE;
+			return eset[i];
 	}
-	return TRUE;
+	return 0;
+}
+int32 card::is_destructable_by_effect(effect* peffect, uint8 playerid) {
+	return !check_indestructable_by_effect(peffect, playerid);
 }
 int32 card::is_removeable(uint8 playerid) {
 	if(!pduel->game_field->is_player_can_remove(playerid, this))
