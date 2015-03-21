@@ -3502,7 +3502,7 @@ int32 field::process_battle_command(uint16 step) {
 			} else
 				core.attacker->set_status(STATUS_BATTLE_DESTROYED, TRUE);
 		}
-		if(bd[1])
+		if(bd[1]) {
 			effect* indestructable_effect = core.attack_target->is_affected_by_effect(EFFECT_INDESTRUCTABLE_BATTLE, core.attacker);
 			if(indestructable_effect) {
 				pduel->write_buffer8(MSG_HINT);
