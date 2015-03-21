@@ -687,9 +687,11 @@ void field::add_effect(effect* peffect, uint8 owner_player) {
 	}
 	peffect->card_type = peffect->owner->data.type;
 	effect_container::iterator it;
-	if (!(peffect->type & EFFECT_TYPE_ACTIONS))
+	if (!(peffect->type & EFFECT_TYPE_ACTIONS)) {
 		it = effects.aura_effect.insert(make_pair(peffect->code, peffect));
-	else {
+		if(peffect->code == EFFECT_SPSUMMON_COUNT_LIMIT)
+			effects.spsummon_count_eff.insert(peffect);
+	} else {
 		if (peffect->type & EFFECT_TYPE_IGNITION)
 			it = effects.ignition_effect.insert(make_pair(peffect->code, peffect));
 		else if (peffect->type & EFFECT_TYPE_ACTIVATE)
@@ -722,9 +724,11 @@ void field::remove_effect(effect* peffect) {
 	if (eit == effects.indexer.end())
 		return;
 	auto it = eit->second;
-	if (!(peffect->type & EFFECT_TYPE_ACTIONS))
+	if (!(peffect->type & EFFECT_TYPE_ACTIONS)) {
 		effects.aura_effect.erase(it);
-	else {
+		if(peffect->code == EFFECT_SPSUMMON_COUNT_LIMIT)
+			effects.spsummon_count_eff.erase(peffect);
+	} else {
 		if (peffect->type & EFFECT_TYPE_IGNITION)
 			effects.ignition_effect.erase(it);
 		else if (peffect->type & EFFECT_TYPE_ACTIVATE)

@@ -884,8 +884,6 @@ void card::apply_field_effect() {
 		if (it->second->in_range(current.location, current.sequence) || ((it->second->range & LOCATION_HAND)
 		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE))) {
 			pduel->game_field->add_effect(it->second);
-			if(it->second->code == EFFECT_SPSUMMON_COUNT_LIMIT)
-				pduel->game_field->effects.spsummon_count_eff.insert(it->second);
 		}
 	}
 	if(unique_code && (current.location & LOCATION_ONFIELD))
@@ -900,8 +898,6 @@ void card::cancel_field_effect() {
 		if (it->second->in_range(current.location, current.sequence) || ((it->second->range & LOCATION_HAND)
 		        && (it->second->type & EFFECT_TYPE_TRIGGER_O) && !(it->second->code & EVENT_PHASE))) {
 			pduel->game_field->remove_effect(it->second);
-			if(it->second->code == EFFECT_SPSUMMON_COUNT_LIMIT)
-				pduel->game_field->effects.spsummon_count_eff.erase(it->second);
 		}
 	}
 	if(unique_code && (current.location & LOCATION_ONFIELD))
@@ -1104,7 +1100,6 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	read_card(code, &cdata);
 	if(cdata.type & TYPE_NORMAL)
 		return -1;
-	cancel_field_effect();
 	set_status(STATUS_COPYING_EFFECT, TRUE);
 	uint32 cr = pduel->game_field->core.copy_reset;
 	uint8 crc = pduel->game_field->core.copy_reset_count;
@@ -1119,7 +1114,6 @@ int32 card::copy_effect(uint32 code, uint32 reset, uint32 count) {
 	for(auto eit = pduel->uncopy.begin(); eit != pduel->uncopy.end(); ++eit)
 		pduel->delete_effect(*eit);
 	pduel->uncopy.clear();
-	apply_field_effect();
 	return pduel->game_field->infos.copy_id - 1;
 }
 void card::reset(uint32 id, uint32 reset_type) {
