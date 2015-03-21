@@ -70,7 +70,8 @@ function c93238626.filter(c,e,tp,no)
 end
 function c93238626.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
-		local no=Duel.GetAttackTarget().xyz_number
+		local m=_G["c" .. Duel.GetAttackTarget():GetCode()]
+		local no=m.xyz_number
 		return no and Duel.IsExistingMatchingCard(c93238626.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,no)
 	end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
@@ -80,14 +81,16 @@ function c93238626.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
 	local tc=Duel.GetAttackTarget()
 	if tc:IsFacedown() or not tc:IsRelateToBattle() or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
+	local m=_G["tc" .. Duel.GetAttackTarget():GetCode()]
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c93238626.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc.xyz_number)
+	local g=Duel.SelectMatchingCard(tp,c93238626.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,m.xyz_number)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()
