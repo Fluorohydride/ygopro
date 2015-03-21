@@ -34,7 +34,7 @@ function c59048135.etarget(e,c)
 	return c:IsRace(RACE_PSYCHO) and c:IsType(TYPE_XYZ)
 end
 function c59048135.evalue(e,re,rp)
-	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and aux.tgval(e,re,rp)
 end
 function c59048135.cfilter(c)
 	return c:IsSetCard(0x76) and c:IsType(TYPE_MONSTER) and c:IsDiscardable()

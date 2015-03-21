@@ -22,7 +22,7 @@ function c16259549.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetValue(1)
+	e2:SetValue(aux.tgval)
 	c:RegisterEffect(e2)
 	--destroy replace
 	local e3=Effect.CreateEffect(c)

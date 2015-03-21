@@ -671,6 +671,8 @@ DUEL_PSEUDO_SHUFFLE		=0x10		--不洗牌
 DUEL_TAG_MODE			=0x20		--双打PP
 DUEL_SIMPLE_AI			=0x40		--AI
 --Activity counter
+--global: 1-6 (binary: 5,6)
+--custom: 1-5,7 (binary: 1-5)
 ACTIVITY_SUMMON			=1		--
 ACTIVITY_NORMALSUMMON	=2		--
 ACTIVITY_SPSUMMON		=3		--

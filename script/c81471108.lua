@@ -17,7 +17,7 @@ function c81471108.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
-	e2:SetValue(c81471108.indval)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--destroy sub
 	local e3=Effect.CreateEffect(c)
@@ -67,9 +67,6 @@ function c81471108.eqop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c81471108.eqlimit(e,c)
 	return c==e:GetLabelObject()
-end
-function c81471108.indval(e,re,tp)
-	return e:GetHandler():GetControler()~=tp
 end
 function c81471108.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0

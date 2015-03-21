@@ -6,7 +6,7 @@ function c8696773.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c8696773.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--sum limit
 	local e2=Effect.CreateEffect(c)
@@ -24,9 +24,6 @@ function c8696773.initial_effect(c)
 	e3:SetCondition(c8696773.effcon)
 	e3:SetOperation(c8696773.effop)
 	c:RegisterEffect(e3)
-end
-function c8696773.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c8696773.splimit(e,c,tp,sumtp,sumpos)
 	return c:GetAttribute()~=ATTRIBUTE_FIRE

@@ -11,7 +11,7 @@ function c13756293.initial_effect(c)
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetTarget(c13756293.etarget)
-	e1:SetValue(c13756293.evalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--spsummon
 	local e2=Effect.CreateEffect(c)
@@ -26,9 +26,6 @@ function c13756293.initial_effect(c)
 end
 function c13756293.etarget(e,c)
 	return c:IsRace(RACE_DRAGON)
-end
-function c13756293.evalue(e,re,rp)
-	return e:GetHandlerPlayer()~=rp
 end
 function c13756293.filter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

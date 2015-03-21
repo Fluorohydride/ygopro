@@ -26,7 +26,7 @@ function c46008667.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_EQUIP)
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetValue(c46008667.tglimit)
+	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
 	--Equip limit
 	local e4=Effect.CreateEffect(c)
@@ -38,9 +38,6 @@ function c46008667.initial_effect(c)
 end
 function c46008667.eqlimit(e,c)
 	return c:IsSetCard(0x107a)
-end
-function c46008667.tglimit(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c46008667.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x107a)

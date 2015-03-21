@@ -25,7 +25,7 @@ function c75574498.initial_effect(c)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetValue(c75574498.effval)
+	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
 	--spsummon
 	local e4=Effect.CreateEffect(c)
@@ -63,9 +63,6 @@ function c75574498.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c75574498.tgcon(e)
 	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)>=2
-end
-function c75574498.effval(e,te,tp)
-	return tp~=e:GetHandlerPlayer() and not te:GetHandler():IsImmuneToEffect(e)
 end
 function c75574498.cfilter(c,tp)
 	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)

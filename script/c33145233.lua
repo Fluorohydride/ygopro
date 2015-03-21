@@ -27,12 +27,9 @@ function c33145233.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-		e1:SetValue(c33145233.tglimit)
+		e1:SetValue(aux.tgoval)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		rc:RegisterEffect(e1,true)
 		rc:RegisterFlagEffect(33145233,RESET_EVENT+0x1fe0000,0,1)
 	end
-end
-function c33145233.tglimit(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end

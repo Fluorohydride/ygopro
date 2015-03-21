@@ -38,6 +38,7 @@ function c1686814.initial_effect(c)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+	e5:SetValue(aux.tgval)
 	c:RegisterEffect(e5)
 end
 function c1686814.sprfilter1(c,tp)

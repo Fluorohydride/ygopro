@@ -20,7 +20,7 @@ function c53550467.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e2:SetCondition(c53550467.con)
 	e2:SetTarget(c53550467.tg)
-	e2:SetValue(c53550467.efval)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--destroy
 	local e3=Effect.CreateEffect(c)
@@ -43,9 +43,6 @@ function c53550467.con(e)
 end
 function c53550467.tg(e,c)
 	return c~=e:GetHandler() and c:GetAttack()<1800
-end
-function c53550467.efval(e,re,tp)
-	return e:GetHandlerPlayer()~=tp
 end
 function c53550467.descon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(Card.IsSetCard,1,nil,0x207a)

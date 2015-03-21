@@ -25,13 +25,13 @@ function c87564935.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_EQUIP)
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e3:SetCondition(c87564935.uncon)
-	e3:SetValue(c87564935.efilter)
+	e3:SetValue(c87564935.efilter1)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_EQUIP)
 	e4:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	e4:SetCondition(c87564935.uncon)
-	e4:SetValue(c87564935.efilter)
+	e4:SetValue(c87564935.efilter2)
 	c:RegisterEffect(e4)
 	--destroy sub
 	local e5=Effect.CreateEffect(c)
@@ -90,6 +90,9 @@ function c87564935.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(c,0,tp,tp,true,false,POS_FACEUP_ATTACK)
 	end
 end
-function c87564935.efilter(e,te)
-	return te:GetOwnerPlayer()~=e:GetHandlerPlayer() and te:IsActiveType(TYPE_MONSTER)
+function c87564935.efilter1(e,re,rp)
+	return aux.tgoval(e,re,rp) and re:IsActiveType(TYPE_MONSTER)
+end
+function c87564935.efilter2(e,te)
+	return te:GetHandlerPlayer()~=e:GetHandlerPlayer() and te:IsActiveType(TYPE_MONSTER)
 end

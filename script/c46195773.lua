@@ -24,8 +24,8 @@ end
 function c46195773.tfilter(c)
 	return c:IsCode(67270095) or c:IsHasEffect(20932152)
 end
-function c46195773.efilter(e,re)
-	return re:GetHandler():IsLevelBelow(6)
+function c46195773.efilter(e,re,rp)
+	return re:GetHandler():IsLevelBelow(6) and aux.tgval(e,re,rp)
 end
 function c46195773.atktg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local d=Duel.GetAttackTarget()

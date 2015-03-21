@@ -25,7 +25,7 @@ function c28124263.initial_effect(c)
 	e3:SetCondition(c28124263.cond)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e3:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x26))
-	e3:SetValue(1)
+	e3:SetValue(aux.tgval)
 	c:RegisterEffect(e3)
 end
 function c28124263.check(e,tp,eg,ep,ev,re,r,rp)

@@ -17,7 +17,7 @@ function c33114323.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTarget(c33114323.efftg)
-	e2:SetValue(c33114323.effval)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--Equip limit
 	local e3=Effect.CreateEffect(c)
@@ -42,7 +42,4 @@ function c33114323.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c33114323.efftg(e,c)
 	return c~=e:GetHandler():GetEquipTarget() and c:IsType(TYPE_MONSTER)
-end
-function c33114323.effval(e,re,rp)
-	return e:GetHandlerPlayer()~=rp
 end

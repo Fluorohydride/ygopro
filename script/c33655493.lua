@@ -19,5 +19,5 @@ function c33655493.tg(e,c)
 	return c:IsFaceup() and c:GetCode()~=33655493
 end
 function c33655493.tglimit(e,re,rp)
-	return rp~=e:GetHandlerPlayer() and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return aux.tgoval(e,re,rp) and re:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end

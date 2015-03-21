@@ -34,7 +34,7 @@ function c23776077.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCondition(c23776077.tgcon)
-	e4:SetValue(c23776077.tgvalue)
+	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 	--cannot be destroyed
 	local e5=Effect.CreateEffect(c)
@@ -74,9 +74,6 @@ function c23776077.adval(e,c)
 end
 function c23776077.tgcon(e)
 	return e:GetHandler():GetOverlayCount()>=4
-end
-function c23776077.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c23776077.indcon(e)
 	return e:GetHandler():GetOverlayCount()==5

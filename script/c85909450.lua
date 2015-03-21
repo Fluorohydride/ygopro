@@ -23,7 +23,7 @@ function c85909450.initial_effect(c)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e3:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE)
-	e3:SetValue(c85909450.tgvalue)
+	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
 	--remove material
 	local e4=Effect.CreateEffect(c)
@@ -41,9 +41,6 @@ function c85909450.effcon(e)
 end
 function c85909450.target(e,c)
 	return c:IsSetCard(0x64) and c:IsType(TYPE_MONSTER)
-end
-function c85909450.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c85909450.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

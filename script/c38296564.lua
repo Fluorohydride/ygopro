@@ -61,6 +61,7 @@ function c38296564.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2,true)
 		local e3=e2:Clone()
 		e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
+		e3:SetValue(c38296564.tgval)
 		tc:RegisterEffect(e3,true)
 		local e4=e1:Clone()
 		e4:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
@@ -77,6 +78,9 @@ function c38296564.acon(e)
 end
 function c38296564.efilter(e,re)
 	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
+end
+function c38296564.tgval(e,re,rp)
+	return rp~=e:GetOwnerPlayer() and aux.tgval(e,re,rp)
 end
 function c38296564.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsDisabled() then

@@ -33,7 +33,7 @@ function c65025250.initial_effect(c)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetTarget(c65025250.tgtg)
-	e4:SetValue(c65025250.tgval)
+	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
 function c65025250.filter(c,tp)
@@ -62,7 +62,4 @@ function c65025250.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65025250.tgtg(e,c)
 	return c:IsSetCard(0xb3) and c~=e:GetHandler()
-end
-function c65025250.tgval(e,re,tp)
-	return e:GetHandlerPlayer()~=tp
 end
