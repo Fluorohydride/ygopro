@@ -1,4 +1,4 @@
---ダメージ·トランスレーション
+--ダメージ・トランスレーション
 function c35268887.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---機皇兵グランエル·アイン
+--機皇兵グランエル・アイン
 function c2137678.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

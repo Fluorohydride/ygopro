@@ -1,4 +1,4 @@
---デモンバルサム·シード
+--デモンバルサム・シード
 function c60406591.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

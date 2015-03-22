@@ -48,8 +48,10 @@ function c86049351.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		sc:RegisterEffect(e1)
 		if bc==Duel.GetAttackTarget() then bc,sc=sc,bc end
-		Duel.CalculateDamage(bc,sc)
-		Duel.BreakEffect()
-		Duel.Damage(tp,atk,REASON_EFFECT)
+		if bc:IsAttackable() and not bc:IsImmuneToEffect(e) and not sc:IsImmuneToEffect(e) then
+			Duel.CalculateDamage(bc,sc)
+			Duel.BreakEffect()
+			Duel.Damage(tp,atk,REASON_EFFECT)
+		end
 	end
 end

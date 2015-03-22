@@ -4,6 +4,7 @@ function c66127916.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetTarget(c66127916.target)
 	e1:SetOperation(c66127916.activate)
@@ -35,11 +36,13 @@ function c66127916.activate(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
-		local tc=Duel.GetFirstMatchingCard(c66127916.filter3,tp,LOCATION_GRAVE,0,nil)
-		if tc and Duel.SelectYesNo(tp,aux.Stringid(66127916,0)) then
+		local tg=Duel.GetMatchingGroup(c66127916.filter3,tp,LOCATION_GRAVE,0,nil)
+		if tg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(66127916,0)) then
 			Duel.BreakEffect()
-			Duel.SendtoHand(tc,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,tc)
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+			local sg=tg:Select(tp,1,1,nil)
+			Duel.SendtoHand(sg,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,sg)
 		end
 	end
 end

@@ -1,4 +1,4 @@
---ヘイト·バスター
+--ヘイト・バスター
 function c93895605.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

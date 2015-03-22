@@ -1,4 +1,4 @@
---デュアル·サモナー
+--デュアル・サモナー
 function c19041767.initial_effect(c)
 	--battle indes
 	local e1=Effect.CreateEffect(c)

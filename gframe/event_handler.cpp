@@ -250,6 +250,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wANCard, true);
 				break;
 			}
+			case BUTTON_CMD_SHUFFLE: {
+				mainGame->btnShuffle->setVisible(false);
+				DuelClient::SetResponseI(8);
+				DuelClient::SendResponse();
+				break;
+			}
 			case BUTTON_CMD_ACTIVATE: {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!list_command) {

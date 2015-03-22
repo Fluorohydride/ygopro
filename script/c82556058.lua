@@ -1,4 +1,4 @@
---デモニック·モーター·Ω
+--デモニック・モーター・Ω
 function c82556058.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)

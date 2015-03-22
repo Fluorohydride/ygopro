@@ -1,4 +1,4 @@
---サイバー·レーザー·ドラゴン
+--サイバー・レーザー・ドラゴン
 function c4162088.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

@@ -1,4 +1,4 @@
---エンシェント·クリムゾン·エイプ
+--エンシェント・クリムゾン・エイプ
 function c50781944.initial_effect(c)
 	--lp rec
 	local e1=Effect.CreateEffect(c)

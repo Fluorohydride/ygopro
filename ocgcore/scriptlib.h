@@ -154,6 +154,7 @@ public:
 	static int32 card_is_able_to_grave_as_cost(lua_State *L);
 	static int32 card_is_able_to_deck_as_cost(lua_State *L);
 	static int32 card_is_able_to_extra_as_cost(lua_State *L);
+	static int32 card_is_able_to_deck_or_extra_as_cost(lua_State *L);
 	static int32 card_is_able_to_remove_as_cost(lua_State *L);
 	static int32 card_is_releasable(lua_State *L);
 	static int32 card_is_releasable_by_effect(lua_State *L);
@@ -209,7 +210,8 @@ public:
 	static int32 card_check_unique_onfield(lua_State *L);
 	static int32 card_reset_negate_effect(lua_State *L);
 	static int32 card_assume_prop(lua_State *L);
-
+	static int32 card_set_spsummon_once(lua_State *L);
+	
 	//Effect functions
 	static int32 effect_new(lua_State *L);
 	static int32 effect_newex(lua_State *L);
@@ -465,9 +467,7 @@ public:
 	static int32 duel_is_player_can_spsummon(lua_State *L);
 	static int32 duel_is_player_can_flipsummon(lua_State *L);
 	static int32 duel_is_player_can_spsummon_monster(lua_State *L);
-	static int32 duel_is_player_can_summon_count(lua_State *L);
 	static int32 duel_is_player_can_spsummon_count(lua_State *L);
-	static int32 duel_is_player_can_flipsummon_count(lua_State *L);
 	static int32 duel_is_player_can_release(lua_State *L);
 	static int32 duel_is_player_can_remove(lua_State *L);
 	static int32 duel_is_player_can_send_to_hand(lua_State *L);
@@ -481,6 +481,7 @@ public:
 	static int32 duel_check_phase_activity(lua_State *L);
 	static int32 duel_add_custom_activity_counter(lua_State *L);
 	static int32 duel_get_custom_activity_count(lua_State *L);
+	static int32 duel_is_able_to_enter_bp(lua_State *L);
 	
 	//specific card functions
 	static int32 duel_venom_swamp_check(lua_State *L);

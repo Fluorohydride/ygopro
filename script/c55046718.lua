@@ -1,4 +1,4 @@
---ヴァイロン·コンポーネント
+--ヴァイロン・コンポーネント
 function c55046718.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

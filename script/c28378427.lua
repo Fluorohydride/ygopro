@@ -1,4 +1,4 @@
---ダメージ·コンデンサー
+--ダメージ・コンデンサー
 function c28378427.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

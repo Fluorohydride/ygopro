@@ -17,7 +17,8 @@ ClientField::ClientField() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
-	pzone_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
@@ -63,7 +64,8 @@ void ClientField::Clear() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
-	pzone_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -317,7 +319,8 @@ void ClientField::ClearCommandFlag() {
 	extra_act = false;
 	grave_act = false;
 	remove_act = false;
-	pzone_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -1112,7 +1115,7 @@ bool ClientField::check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::
 	int m = (op2 > 0 && op1 > op2) ? op2 : op1;
 	if (m >= min && m <= max)
 		return true;
-	index++;
+	++index;
 	return (min > m && check_min(left, index, min - m, max - m))
 	        || check_min(left, index, min, max);
 }
@@ -1158,7 +1161,7 @@ bool ClientField::check_sum(std::set<ClientCard*>& testlist, std::set<ClientCard
 	int l2 = l >> 16;
 	if ((l1 == acc || (l2 > 0 && l2 == acc)) && (count + 1 >= select_min) && (count + 1 <= select_max))
 		return true;
-	index++;
+	++index;
 	return (acc > l1 && check_sum(testlist, index, acc - l1, count + 1))
 	       || (l2 > 0 && acc > l2 && check_sum(testlist, index, acc - l2, count + 1))
 	       || check_sum(testlist, index, acc, count);

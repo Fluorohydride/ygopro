@@ -45,7 +45,7 @@ function c70245411.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetOperatedGroup():GetFirst()
 	Duel.ConfirmCards(1-tp,tc)
 	Duel.BreakEffect()
-	if tc:IsSetCard(0xa9) then
+	if tc:IsSetCard(0xa9) and tc:IsType(TYPE_MONSTER) then
 		if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 		local g=Duel.GetMatchingGroup(c70245411.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
 		if g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(70245411,2)) then

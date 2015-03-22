@@ -1,4 +1,4 @@
---バスター·ショットマン
+--バスター・ショットマン
 function c63676256.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

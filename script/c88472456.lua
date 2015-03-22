@@ -1,4 +1,4 @@
---ダーク·ヒーロー ゾンバイア
+--ダーク・ヒーロー ゾンバイア
 function c88472456.initial_effect(c)
 	--cannot direct attack
 	local e1=Effect.CreateEffect(c)

@@ -6,7 +6,7 @@ function c38525760.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c38525760.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--summon
 	local e2=Effect.CreateEffect(c)
@@ -29,13 +29,10 @@ function c38525760.initial_effect(c)
 	e3:SetOperation(c38525760.thop)
 	c:RegisterEffect(e3)
 end
-function c38525760.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
-end
-function c38525760.ntcon(e,c)
+function c38525760.ntcon(e,c,minc)
 	if c==nil then return true end
 	local mi,ma=c:GetTributeRequirement()
-	return mi>0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and mi>0 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c38525760.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--change base attack

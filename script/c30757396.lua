@@ -1,4 +1,4 @@
---ブラッド·メフィスト
+--ブラッド・メフィスト
 function c30757396.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
@@ -44,7 +44,7 @@ function c30757396.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,ct*300,REASON_EFFECT)
 end
 function c30757396.damcon2(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp
+	return eg:IsExists(Card.IsControler,1,nil,1-tp)
 end
 function c30757396.damtg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

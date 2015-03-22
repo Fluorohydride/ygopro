@@ -1,4 +1,4 @@
---カオス·グリード
+--カオス・グリード
 function c97439308.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

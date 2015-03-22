@@ -1,4 +1,4 @@
---グラビティ·ボール
+--グラビティ・ボール
 function c29216198.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

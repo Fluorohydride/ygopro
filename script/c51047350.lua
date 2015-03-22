@@ -1,4 +1,4 @@
---カード·ブレイカー
+--カード・ブレイカー
 function c51047350.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

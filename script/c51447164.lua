@@ -1,4 +1,4 @@
---TG ブレード·ガンナー
+--TG ブレード・ガンナー
 function c51447164.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),1)

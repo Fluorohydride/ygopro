@@ -27,5 +27,5 @@ function c4064256.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c4064256.sumlimit(e,c,tp,sumtp)
-	return bit.band(sumtp,SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE and c:IsRace(0xffffff-RACE_ZOMBIE)
+	return bit.band(sumtp,SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE and c:GetRace()~=RACE_ZOMBIE
 end

@@ -1,4 +1,4 @@
---エンシェント·ホーリー·ワイバーン
+--エンシェント・ホーリー・ワイバーン
 function c25958491.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_LIGHT),aux.NonTuner(nil),1)

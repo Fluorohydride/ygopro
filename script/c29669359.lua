@@ -1,7 +1,7 @@
 --No.61 ヴォルカザウルス
 function c29669359.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),2)
+	aux.AddXyzProcedure(c,nil,5,2)
 	c:EnableReviveLimit()
 	--destroy&damage
 	local e1=Effect.CreateEffect(c)

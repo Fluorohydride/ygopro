@@ -1,7 +1,7 @@
 --외신 아자토트
 function c34945480.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3,c34945480.ovfilter,aux.Stringid(34945480,1))
+	aux.AddXyzProcedure(c,nil,5,3,c34945480.ovfilter,aux.Stringid(34945480,1))
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)

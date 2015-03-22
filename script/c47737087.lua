@@ -1,4 +1,4 @@
---E·HERO ランパートガンナー
+--E・HERO ランパートガンナー
 function c47737087.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

@@ -1,4 +1,4 @@
---バスター·モード
+--バスター・モード
 function c80280737.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -42,7 +42,7 @@ function c80280737.activate(e,tp,eg,ep,ev,re,r,rp)
 	local code=e:GetLabel()
 	local tcode=c80280737.list[code]
 	local tc=Duel.GetFirstMatchingCard(c80280737.filter2,tp,LOCATION_DECK,0,nil,tcode,e,tp)
-	if tc and Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP_ATTACK) then
+	if tc and Duel.SpecialSummon(tc,0,tp,tp,true,false,POS_FACEUP_ATTACK)>0 then
 		tc:CompleteProcedure()
 	end
 end

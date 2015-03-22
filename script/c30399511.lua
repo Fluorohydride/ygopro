@@ -1,4 +1,4 @@
---ジェネクス·パワー·プランナー
+--ジェネクス・パワー・プランナー
 function c30399511.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

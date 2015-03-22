@@ -1,4 +1,4 @@
---シューティング·スター·ドラゴン
+--シューティング・スター・ドラゴン
 function c24696097.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure2(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.FilterBoolFunction(Card.IsCode,44508094))
@@ -49,7 +49,8 @@ function c24696097.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c24696097.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP) and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
 end
 function c24696097.mtop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(tp,5)

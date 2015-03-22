@@ -1,7 +1,7 @@
---ダイガスタ·フェニクス
+--ダイガスタ・フェニクス
 function c2766877.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,2),2)
+	aux.AddXyzProcedure(c,nil,2,2)
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)
@@ -10,10 +10,15 @@ function c2766877.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCondition(c2766877.condition)
 	e1:SetCost(c2766877.cost)
 	e1:SetTarget(c2766877.target)
 	e1:SetOperation(c2766877.operation)
 	c:RegisterEffect(e1)
+end
+function c2766877.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c2766877.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -30,7 +35,7 @@ function c2766877.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c2766877.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)

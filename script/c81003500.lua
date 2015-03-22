@@ -1,4 +1,4 @@
---E·HERO ネクロイド·シャーマン
+--E・HERO ネクロイド・シャーマン
 function c81003500.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

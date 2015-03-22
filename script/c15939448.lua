@@ -1,4 +1,4 @@
---シールド·ワーム
+--シールド・ワーム
 function c15939448.initial_effect(c)
 	--deckdes
 	local e1=Effect.CreateEffect(c)

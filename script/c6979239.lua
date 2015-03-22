@@ -1,4 +1,4 @@
---リーフ·フェアリー
+--リーフ・フェアリー
 function c6979239.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

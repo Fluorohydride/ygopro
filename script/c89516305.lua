@@ -1,7 +1,7 @@
 --No.87 雪月花美神クイーン・オブ・ナイツ
 function c89516305.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),3)
+	aux.AddXyzProcedure(c,nil,8,3)
 	c:EnableReviveLimit()
 	--s/t
 	local e1=Effect.CreateEffect(c)

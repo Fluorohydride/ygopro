@@ -1,4 +1,4 @@
---E·HERO ブラック·ネオス
+--E・HERO ブラック・ネオス
 function c28677304.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -52,9 +52,7 @@ function c28677304.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 function c28677304.spfilter(c,code)
-	if c:GetCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckOrExtraAsCost() and c:GetCode()==code
 end
 function c28677304.spcon(e,c)
 	if c==nil then return true end 

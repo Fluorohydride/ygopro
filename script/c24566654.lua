@@ -1,4 +1,4 @@
---クリムゾン·ヘルフレア
+--クリムゾン・ヘルフレア
 function c24566654.initial_effect(c)
 	--reflect
 	local e1=Effect.CreateEffect(c)

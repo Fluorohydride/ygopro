@@ -1,4 +1,4 @@
---デス·バード
+--デス・バード
 function c8327462.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

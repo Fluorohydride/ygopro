@@ -1,4 +1,4 @@
---レプティレス·ガードナー
+--レプティレス・ガードナー
 function c43002864.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

@@ -10,30 +10,13 @@ function c71422989.initial_effect(c)
 	e1:SetTarget(c71422989.target)
 	e1:SetOperation(c71422989.activate)
 	c:RegisterEffect(e1)
-	if not c71422989.global_check then
-		c71422989.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c71422989.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(71422989,ACTIVITY_SPSUMMON,c71422989.counterfilter)
 end
-function c71422989.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	local p1=false
-	local p2=false
-	while tc do
-		if not tc:IsSetCard(0x1047) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,71422989,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,71422989,RESET_PHASE+PHASE_END,0,1) end
+function c71422989.counterfilter(c)
+	return c:IsSetCard(0x1047)
 end
 function c71422989.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,71422989)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(71422989,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -53,6 +36,9 @@ function c71422989.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c71422989.filter,tp,LOCATION_DECK,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
+function c71422989.filter0(c)
+	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove()
+end
 function c71422989.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and c:IsAbleToRemove() and not c:IsImmuneToEffect(e)
 end
@@ -67,7 +53,7 @@ function c71422989.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c71422989.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(c71422989.filter0,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		local sg1=Duel.GetMatchingGroup(c71422989.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
 		local mg2=nil
 		local sg2=nil
@@ -97,6 +83,11 @@ function c71422989.activate(e,tp,eg,ep,ev,re,r,rp)
 				fop(ce,e,tp,tc,mat2)
 			end
 			tc:CompleteProcedure()
+		elseif Duel.IsPlayerCanSpecialSummon(tp) then
+			local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
+			Duel.ConfirmCards(1-tp,cg1)
+			local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+			Duel.ConfirmCards(1-tp,cg2)
 		end
 	end
 end

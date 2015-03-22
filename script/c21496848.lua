@@ -1,4 +1,4 @@
---イビリチュア·テトラオーグル
+--イビリチュア・テトラオーグル
 function c21496848.initial_effect(c)
 	c:EnableReviveLimit()
 	--send to grave

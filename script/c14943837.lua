@@ -1,4 +1,4 @@
---デブリ·ドラゴン
+--デブリ・ドラゴン
 function c14943837.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)

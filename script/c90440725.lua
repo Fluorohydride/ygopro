@@ -1,4 +1,4 @@
---サイバー·シャドー·ガードナー
+--サイバー・シャドー・ガードナー
 function c90440725.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -12,7 +12,8 @@ function c90440725.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c90440725.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==1-tp and Duel.GetCurrentPhase()==PHASE_MAIN1
+	local ph=Duel.GetCurrentPhase()
+	return Duel.GetTurnPlayer()==1-tp and (ph==PHASE_MAIN1 or ph==PHASE_MAIN2)
 end
 function c90440725.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and 

@@ -1,4 +1,4 @@
---コアキメイル·ウルナイト
+--コアキメイル・ウルナイト
 function c30936186.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

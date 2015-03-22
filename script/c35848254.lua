@@ -1,4 +1,4 @@
---フォトン·リード
+--フォトン・リード
 function c35848254.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

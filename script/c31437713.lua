@@ -1,7 +1,7 @@
 --No.82 ハートランドラコ
 function c31437713.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--cannot be battle target
 	local e1=Effect.CreateEffect(c)
@@ -10,7 +10,7 @@ function c31437713.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetCondition(c31437713.atkcon)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--direct
 	local e2=Effect.CreateEffect(c)

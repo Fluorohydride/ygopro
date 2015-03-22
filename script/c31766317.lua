@@ -1,4 +1,4 @@
---ヘル·エンプレス·デーモン
+--ヘル・エンプレス・デーモン
 function c31766317.initial_effect(c)
 	--destroy replace
 	local e1=Effect.CreateEffect(c)

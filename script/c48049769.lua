@@ -1,4 +1,4 @@
---サンダー·シーホース
+--サンダー・シーホース
 function c48049769.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

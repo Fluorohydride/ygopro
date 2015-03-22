@@ -52,12 +52,9 @@ function c85080444.indop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetTarget(c85080444.tg)
 	e1:SetTargetRange(LOCATION_MZONE,0)
 	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetValue(c85080444.tgvalue)
+	e1:SetValue(aux.tgoval)
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
 	Duel.RegisterEffect(e2,tp)
-end
-function c85080444.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end

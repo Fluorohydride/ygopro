@@ -28,7 +28,7 @@ function c4141820.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_BATTLE_DAMAGE)
 		e1:SetOperation(c4141820.hdop)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		rc:RegisterEffect(e1)
+		rc:RegisterEffect(e1,true)
 		rc:RegisterFlagEffect(4141820,RESET_EVENT+0x1fe0000,0,1)
 	end
 end

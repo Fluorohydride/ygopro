@@ -1,4 +1,4 @@
---A·O·J D.D.チェッカー
+--A・O・J D.D.チェッカー
 function c72845813.initial_effect(c)
 	--disable spsummon
 	local e1=Effect.CreateEffect(c)

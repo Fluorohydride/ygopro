@@ -1,4 +1,4 @@
---ミスティック·ソードマン LV6
+--ミスティック・ソードマン LV6
 function c60482781.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

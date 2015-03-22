@@ -23,27 +23,10 @@ function c59951714.initial_effect(c)
 	e3:SetTarget(c59951714.sptg)
 	e3:SetOperation(c59951714.spop)
 	c:RegisterEffect(e3)
-	if not c59951714.global_check then
-		c59951714.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c59951714.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(59951714,ACTIVITY_SPSUMMON,c59951714.counterfilter)
 end
-function c59951714.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local p1=nil
-	local p2=nil
-	local tc=eg:GetFirst()
-	while tc do
-		if tc:IsPreviousLocation(LOCATION_EXTRA) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,59951714,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,59951714,RESET_PHASE+PHASE_END,0,1) end
+function c59951714.counterfilter(c)
+	return c:GetSummonLocation()~=LOCATION_EXTRA
 end
 function c59951714.spr(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -56,7 +39,7 @@ function c59951714.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:GetTurnID()~=Duel.GetTurnCount() and tp==Duel.GetTurnPlayer() and c:GetFlagEffect(59951714)>0
 end
 function c59951714.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,59951714)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(59951714,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)

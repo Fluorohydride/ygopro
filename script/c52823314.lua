@@ -1,4 +1,4 @@
---Ä§½ç°k¬FÊÀĞĞ¤­¥Ğ¥¹
+--é­”ç•Œç™ºç¾ä¸–è¡Œããƒã‚¹
 function c52823314.initial_effect(c)
 	--to deck
 	local e1=Effect.CreateEffect(c)

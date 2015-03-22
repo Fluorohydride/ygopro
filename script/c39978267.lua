@@ -1,4 +1,4 @@
---サイバー·レイダー
+--サイバー・レイダー
 function c39978267.initial_effect(c)
 	--effect
 	local e1=Effect.CreateEffect(c)

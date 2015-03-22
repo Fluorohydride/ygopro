@@ -1,4 +1,4 @@
---スペア·ジェネクス
+--スペア・ジェネクス
 function c16828633.initial_effect(c)
 	--cos
 	local e1=Effect.CreateEffect(c)

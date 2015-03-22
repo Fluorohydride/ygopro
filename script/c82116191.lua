@@ -1,4 +1,4 @@
---ギガント·セファロタス
+--ギガント・セファロタス
 function c82116191.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

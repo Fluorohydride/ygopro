@@ -1,4 +1,4 @@
---グリーン·ダストン
+--グリーン・ダストン
 function c52182715.initial_effect(c)
 	c:SetUniqueOnField(1,0,52182715)
 	--cannot release

@@ -31,8 +31,9 @@ function c65025250.initial_effect(c)
 	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
+	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetTarget(c65025250.tgtg)
-	e4:SetValue(c65025250.tgval)
+	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
 function c65025250.filter(c,tp)
@@ -40,7 +41,7 @@ function c65025250.filter(c,tp)
 		and c:IsSetCard(0xb3) and not c:IsReason(REASON_REPLACE)
 end
 function c65025250.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c65025250.filter,1,nil,tp) end
+	if chk==0 then return eg:IsExists(c65025250.filter,1,nil,tp) and not e:GetHandler():IsStatus(STATUS_DESTROY_CONFIRMED) end
 	return Duel.SelectYesNo(tp,aux.Stringid(65025250,1))
 end
 function c65025250.repval(e,c)
@@ -61,7 +62,4 @@ function c65025250.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65025250.tgtg(e,c)
 	return c:IsSetCard(0xb3) and c~=e:GetHandler()
-end
-function c65025250.tgval(e,re,tp)
-	return e:GetHandlerPlayer()~=tp
 end

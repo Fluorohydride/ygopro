@@ -1,4 +1,4 @@
---エキセントリック·ボーイ
+--エキセントリック・ボーイ
 function c16825874.initial_effect(c)
 	--synchro custom
 	local e1=Effect.CreateEffect(c)

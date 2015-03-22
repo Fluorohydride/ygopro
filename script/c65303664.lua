@@ -1,4 +1,4 @@
---森の狩人イエロー·バブーン
+--森の狩人イエロー・バブーン
 function c65303664.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

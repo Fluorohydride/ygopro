@@ -1,4 +1,4 @@
---フェイク·フェザー
+--フェイク・フェザー
 function c22628574.initial_effect(c)
 	--copy trap
 	local e1=Effect.CreateEffect(c)

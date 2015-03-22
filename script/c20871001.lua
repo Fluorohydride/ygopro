@@ -1,4 +1,4 @@
---ブルー·ポーション
+--ブルー・ポーション
 function c20871001.initial_effect(c)
 	--recover
 	local e1=Effect.CreateEffect(c)

@@ -34,5 +34,5 @@ function c56704140.operation(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e1)
 end
 function c56704140.tgval(e,c)
-	return c:IsAttribute(e:GetLabel())
+	return c:IsAttribute(e:GetLabel()) and not c:IsImmuneToEffect(e)
 end

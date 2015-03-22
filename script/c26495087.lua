@@ -1,4 +1,4 @@
---ヴァンパイア·レディ
+--ヴァンパイア・レディ
 function c26495087.initial_effect(c)
 	--to grave
 	local e1=Effect.CreateEffect(c)

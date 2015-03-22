@@ -1,4 +1,4 @@
---死の花－ネクロ·フルール
+--死の花－ネクロ・フルール
 function c99000151.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

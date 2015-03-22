@@ -1,4 +1,4 @@
---スピリット·バーナー
+--スピリット・バーナー
 function c50418970.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

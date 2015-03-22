@@ -24,9 +24,9 @@ end
 function c40160226.ntfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_SEASERPENT)
 end
-function c40160226.ntcon(e,c)
+function c40160226.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c40160226.ntfilter,c:GetControler(),LOCATION_MZONE,0,1,nil)
 end
 function c40160226.cost(e,tp,eg,ep,ev,re,r,rp,chk)

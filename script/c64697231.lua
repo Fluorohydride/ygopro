@@ -1,4 +1,4 @@
---ダスト·シュート
+--ダスト・シュート
 function c64697231.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

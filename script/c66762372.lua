@@ -49,7 +49,7 @@ function c66762372.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c66762372.cfilter(c,tp)
-	return c:IsFaceup() and c:IsSetCard(0x79) and c:IsPreviousLocation(LOCATION_EXTRA) and c:GetPreviousControler()==tp
+	return c:IsFaceup() and c:IsSetCard(0x79) and c:GetSummonLocation()==LOCATION_EXTRA and c:GetPreviousControler()==tp
 end
 function c66762372.setcon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c66762372.cfilter,1,nil,tp)

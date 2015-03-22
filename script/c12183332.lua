@@ -1,4 +1,4 @@
---ショット·ガン·シャッフル
+--ショット・ガン・シャッフル
 function c12183332.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---爆弾ウニ－ボム·アーチン－
+--爆弾ウニ－ボム・アーチン－
 function c52140003.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

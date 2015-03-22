@@ -18,30 +18,13 @@ function c63193879.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-	if not c63193879.global_check then
-		c63193879.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c63193879.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(63193879,ACTIVITY_SPSUMMON,c63193879.counterfilter)
 end
-function c63193879.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local p1=nil
-	local p2=nil
-	local tc=eg:GetFirst()
-	while tc do
-		if not tc:IsAttribute(ATTRIBUTE_WATER) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,63193879,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,63193879,RESET_PHASE+PHASE_END,0,1) end
+function c63193879.counterfilter(c)
+	return c:IsAttribute(ATTRIBUTE_WATER)
 end
 function c63193879.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,63193879)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(63193879,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -52,7 +35,7 @@ function c63193879.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c63193879.splimit(e,c)
-	return c:IsAttribute(0xff-ATTRIBUTE_WATER)
+	return c:GetAttribute()~=ATTRIBUTE_WATER
 end
 function c63193879.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_FISH) and c:GetLevel()>0

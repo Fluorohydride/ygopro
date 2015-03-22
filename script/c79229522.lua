@@ -1,4 +1,4 @@
---キメラテック·フォートレス·ドラゴン
+--キメラテック・フォートレス・ドラゴン
 function c79229522.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

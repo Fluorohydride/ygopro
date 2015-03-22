@@ -1,11 +1,11 @@
---D·マグネンU
+--D・マグネンU
 function c29947751.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(0,LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetCondition(c29947751.cona)
 	e1:SetTarget(c29947751.tga)
@@ -25,7 +25,7 @@ function c29947751.initial_effect(c)
 	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e3:SetCondition(c29947751.cond)
 	e3:SetTarget(c29947751.atlimit)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 end
 function c29947751.cona(e)

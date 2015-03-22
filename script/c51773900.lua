@@ -1,4 +1,4 @@
---カーム·マジック
+--カーム・マジック
 function c51773900.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

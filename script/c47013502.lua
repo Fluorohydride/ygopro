@@ -1,4 +1,4 @@
---¥¢¥Ü¥¤¥É¡¤¥É¥é¥´¥ó
+--ã‚¢ãƒœã‚¤ãƒ‰ãƒ»ãƒ‰ãƒ©ã‚´ãƒ³
 function c47013502.initial_effect(c)
 	--summon
 	local e1=Effect.CreateEffect(c)

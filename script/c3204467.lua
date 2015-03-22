@@ -1,4 +1,4 @@
---ワーム·ソリッド
+--ワーム・ソリッド
 function c3204467.initial_effect(c)
 	--defup
 	local e1=Effect.CreateEffect(c)

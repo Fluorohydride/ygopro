@@ -1,4 +1,4 @@
---ジェネレーション·チェンジ
+--ジェネレーション・チェンジ
 function c34460239.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

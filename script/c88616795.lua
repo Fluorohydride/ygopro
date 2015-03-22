@@ -29,14 +29,18 @@ function c88616795.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCode(EFFECT_IMMUNE_EFFECT)
-		e2:SetValue(c88616795.efilter)
 		if e:GetLabel()==0 then
-			e2:SetLabel(TYPE_SPELL)
-		else e2:SetLabel(TYPE_TRAP) end
+			e2:SetValue(c88616795.efilter1)
+		else 
+			e2:SetValue(c88616795.efilter2) 
+		end
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e2)
 	end
 end
-function c88616795.efilter(e,te)
-	return te:IsActiveType(e:GetLabel())
+function c88616795.efilter1(e,te)
+	return te:IsActiveType(TYPE_SPELL) and te:GetOwner()~=e:GetOwner()
+end
+function c88616795.efilter2(e,te)
+	return te:IsActiveType(TYPE_TRAP)
 end

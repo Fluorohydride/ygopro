@@ -1,4 +1,4 @@
---フェザー·ウィンド·アタック
+--フェザー・ウィンド・アタック
 function c94681654.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

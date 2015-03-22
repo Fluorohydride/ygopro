@@ -1,4 +1,4 @@
---溶岩魔神ラヴァ·ゴーレム
+--溶岩魔神ラヴァ・ゴーレム
 function c102380.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

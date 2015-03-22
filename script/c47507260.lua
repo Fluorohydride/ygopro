@@ -1,4 +1,4 @@
---ミスティック·ソードマン LV2
+--ミスティック・ソードマン LV2
 function c47507260.initial_effect(c)
 	--battle destroy
 	local e1=Effect.CreateEffect(c)

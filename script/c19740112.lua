@@ -11,5 +11,5 @@ function c19740112.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c19740112.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsAttribute(0xff-ATTRIBUTE_EARTH)
+	return c:GetAttribute()~=ATTRIBUTE_EARTH
 end

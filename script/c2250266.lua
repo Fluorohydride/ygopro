@@ -1,4 +1,4 @@
---D·ステープラン
+--D・ステープラン
 function c2250266.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)
@@ -20,11 +20,11 @@ function c2250266.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e3:SetCondition(c2250266.cona2)
 	e3:SetTarget(c2250266.atlimit)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 	--def
 	local e4=Effect.CreateEffect(c)

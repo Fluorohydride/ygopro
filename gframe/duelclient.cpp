@@ -454,6 +454,7 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		mainGame->wChat->setVisible(true);
 		mainGame->imgCard->setImage(imageManager.tCover);
 		mainGame->device->setEventReceiver(&mainGame->dField);
@@ -519,6 +520,9 @@ void DuelClient::HandleSTOCPacketLan(char* data, unsigned int len) {
 	}
 	case STOC_REPLAY: {
 		mainGame->gMutex.Lock();
+		mainGame->wPhase->setVisible(false);
+		if(mainGame->dInfo.player_type < 7)
+			mainGame->btnLeaveGame->setVisible(false);
 		mainGame->ebRSName->setText(L"");
 		mainGame->PopupElement(mainGame->wReplaySave);
 		mainGame->gMutex.Unlock();
@@ -977,7 +981,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
 			if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
-				mainGame->dField.pzone_act = true;
+				mainGame->dField.pzone_act[pcard->controler] = true;
 		}
 		mainGame->dField.reposable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -1039,6 +1043,12 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->btnEP->setVisible(true);
 			mainGame->btnEP->setEnabled(true);
 			mainGame->btnEP->setPressed(false);
+		}
+		if (BufferIO::ReadInt8(pbuf)) {
+			mainGame->btnShuffle->setVisible(true);
+		}
+		else {
+			mainGame->btnShuffle->setVisible(false);
 		}
 		return false;
 	}
@@ -1808,6 +1818,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnM2->setVisible(false);
 		mainGame->btnEP->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		mainGame->showcarddif = 30;
 		mainGame->showcardp = 0;
 		switch (phase) {
@@ -1962,6 +1973,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 					pcard->SetCode(code);
 				pcard->counters.clear();
 				pcard->ClearTarget();
+				pcard->is_showtarget = false;
 				ClientCard* olcard = mainGame->dField.GetCard(cc, cl & 0x7f, cs);
 				if(mainGame->dInfo.isReplay && mainGame->dInfo.isReplaySkiping) {
 					mainGame->dField.RemoveCard(pc, pl, ps);
@@ -3141,6 +3153,7 @@ void DuelClient::SendResponse() {
 		mainGame->dField.ClearCommandFlag();
 		mainGame->btnBP->setVisible(false);
 		mainGame->btnEP->setVisible(false);
+		mainGame->btnShuffle->setVisible(false);
 		break;
 	}
 	case MSG_SELECT_CARD: {

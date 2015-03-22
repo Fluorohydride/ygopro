@@ -1,4 +1,4 @@
---閃光を吸い込むマジック·ミラー
+--閃光を吸い込むマジック・ミラー
 function c53341729.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

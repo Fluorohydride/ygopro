@@ -1,4 +1,4 @@
---サモン·リアクター·AI
+--サモン・リアクター・AI
 function c89493368.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

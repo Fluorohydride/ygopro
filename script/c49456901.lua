@@ -1,7 +1,7 @@
 --CNo.104 仮面魔踏士アンブラル
 function c49456901.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),4)
+	aux.AddXyzProcedure(c,nil,5,4)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---グラヴィティ·ベヒモス
+--グラヴィティ・ベヒモス
 function c56931015.initial_effect(c)
 	--summon with no tribute
 	local e1=Effect.CreateEffect(c)
@@ -20,9 +20,9 @@ function c56931015.initial_effect(c)
 	e2:SetOperation(c56931015.desop)
 	c:RegisterEffect(e2)
 end
-function c56931015.ntcon(e,c)
-	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetTurnCount()~=1 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+function c56931015.ntcon(e,c,minc)
+	if c==nil then return Duel.GetTurnCount()~=1 end
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_ONFIELD,LOCATION_ONFIELD)==0
 end
 function c56931015.descost(e,tp,eg,ep,ev,re,r,rp,chk)

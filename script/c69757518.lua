@@ -1,7 +1,7 @@
 --CNo.5 亡朧龍カオス・キマイラ・ドラゴン
 function c69757518.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,6),3,nil,nil,5)
+	aux.AddXyzProcedure(c,nil,6,3,nil,nil,5)
 	c:EnableReviveLimit()
 	--atk
 	local e1=Effect.CreateEffect(c)
@@ -46,14 +46,27 @@ function c69757518.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c69757518.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	Duel.ChainAttack()
-	if c:IsHasEffect(EFFECT_CANNOT_DIRECT_ATTACK) then return end
+	if not c:IsRelateToBattle() then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+	e1:SetCode(EFFECT_EXTRA_ATTACK)
+	e1:SetValue(1)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
 	c:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_SINGLE)
+	e2:SetCode(EFFECT_CANNOT_DIRECT_ATTACK)
+	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
+	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e3:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e3:SetLabelObject(e1)
+	e3:SetOperation(aux.atrst)
+	e3:SetReset(RESET_PHASE+PHASE_BATTLE)
+	Duel.RegisterEffect(e3,tp)
 end
 function c69757518.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

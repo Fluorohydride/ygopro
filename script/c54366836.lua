@@ -1,7 +1,7 @@
 --No.54 反骨の闘士ライオンハート
 function c54366836.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,1),3)
+	aux.AddXyzProcedure(c,nil,1,3)
 	c:EnableReviveLimit()
 	--ind
 	local e1=Effect.CreateEffect(c)

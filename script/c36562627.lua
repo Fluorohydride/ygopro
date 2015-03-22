@@ -1,4 +1,4 @@
---セカンド·チャンス
+--セカンド・チャンス
 function c36562627.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

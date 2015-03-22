@@ -1,4 +1,4 @@
---トラップ·スタン
+--トラップ・スタン
 function c59616123.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

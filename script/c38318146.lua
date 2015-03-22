@@ -32,7 +32,7 @@ function c38318146.acfilter(c)
 	return c:IsType(TYPE_SPELL) and c:IsAbleToGraveAsCost()
 end
 function c38318146.actarget(e,te,tp)
-	return te:GetHandler():IsType(TYPE_SPELL) and te:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return te:IsActiveType(TYPE_SPELL) and te:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c38318146.accost(e,te,tp)
 	return Duel.IsExistingMatchingCard(c38318146.acfilter,tp,LOCATION_DECK,0,1,nil)

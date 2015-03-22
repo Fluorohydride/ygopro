@@ -1,9 +1,10 @@
---ジュラック·デイノ
+--ジュラック・デイノ
 function c17948378.initial_effect(c)
 	--reg
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_BATTLE_DESTROYING)
+	e1:SetCondition(aux.bdocon)
 	e1:SetOperation(c17948378.regop)
 	c:RegisterEffect(e1)
 	--draw

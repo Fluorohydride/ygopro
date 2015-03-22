@@ -1,4 +1,4 @@
---ディメンション·ウォール
+--ディメンション・ウォール
 function c67095270.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

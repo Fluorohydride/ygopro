@@ -1,4 +1,4 @@
---フォトン·パイレーツ
+--フォトン・パイレーツ
 function c36834155.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)

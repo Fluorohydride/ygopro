@@ -1,4 +1,4 @@
---クロス·ポーター
+--クロス・ポーター
 function c73146473.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

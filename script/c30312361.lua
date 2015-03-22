@@ -1,4 +1,4 @@
---ファントム·オブ·カオス
+--ファントム・オブ・カオス
 function c30312361.initial_effect(c)
 	--copy
 	local e1=Effect.CreateEffect(c)
@@ -8,6 +8,7 @@ function c30312361.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_MZONE)
+	e1:SetCost(c30312361.cost)
 	e1:SetTarget(c30312361.target)
 	e1:SetOperation(c30312361.operation)
 	c:RegisterEffect(e1)
@@ -17,8 +18,12 @@ function c30312361.initial_effect(c)
 	e2:SetCode(EFFECT_NO_BATTLE_DAMAGE)
 	c:RegisterEffect(e2)
 end
+function c30312361.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(30312361)==0 end
+	e:GetHandler():RegisterFlagEffect(30312361,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+end
 function c30312361.filter(c)
-	return c:IsType(TYPE_EFFECT) and not c:IsHasEffect(EFFECT_FORBIDDEN) and c:IsAbleToRemove()
+	return c:IsType(TYPE_EFFECT) and not c:IsForbidden() and c:IsAbleToRemove()
 end
 function c30312361.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c30312361.filter(chkc) end
@@ -45,9 +50,33 @@ function c30312361.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetType(EFFECT_TYPE_SINGLE)
 		e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		e2:SetLabelObject(e1)
 		e2:SetCode(EFFECT_SET_BASE_ATTACK)
 		e2:SetValue(ba)
 		c:RegisterEffect(e2)
-		c:CopyEffect(code,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,1)
+		local cid=c:CopyEffect(code,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,1)
+		local e3=Effect.CreateEffect(c)
+		e3:SetDescription(aux.Stringid(30312361,1))
+		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e3:SetCode(EVENT_PHASE+PHASE_END)
+		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+		e3:SetCountLimit(1)
+		e3:SetRange(LOCATION_MZONE)
+		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		e3:SetLabel(cid)
+		e3:SetLabelObject(e2)
+		e3:SetOperation(c30312361.rstop)
+		c:RegisterEffect(e3)
 	end
+end
+function c30312361.rstop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local cid=e:GetLabel()
+	c:ResetEffect(cid,RESET_COPY)
+	local e2=e:GetLabelObject()
+	local e1=e2:GetLabelObject()
+	e1:Reset()
+	e2:Reset()
+	Duel.HintSelection(Group.FromCards(c))
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end

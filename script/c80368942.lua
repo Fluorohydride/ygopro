@@ -1,4 +1,4 @@
---コクーン·パーティ
+--コクーン・パーティ
 function c80368942.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---E·HERO フレイム·ブラスト
+--E・HERO フレイム・ブラスト
 function c68745629.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

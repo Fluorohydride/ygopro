@@ -6,7 +6,7 @@ function c74010769.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c74010769.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
@@ -16,9 +16,6 @@ function c74010769.initial_effect(c)
 	e2:SetRange(LOCATION_HAND)
 	e2:SetCondition(c74010769.spcon)
 	c:RegisterEffect(e2)
-end
-function c74010769.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c74010769.cfilter(c)
 	return (c:IsFacedown() or not c:IsAttribute(ATTRIBUTE_FIRE)) and c:IsType(TYPE_MONSTER)

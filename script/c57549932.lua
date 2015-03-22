@@ -1,4 +1,4 @@
---サンライズ·ガードナー
+--サンライズ・ガードナー
 function c57549932.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--change base defence

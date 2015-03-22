@@ -1,4 +1,4 @@
---カタパルト·タートル
+--カタパルト・タートル
 function c95727991.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

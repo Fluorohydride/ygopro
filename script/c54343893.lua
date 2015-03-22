@@ -1,4 +1,4 @@
---バイス·ドラゴン
+--バイス・ドラゴン
 function c54343893.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

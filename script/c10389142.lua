@@ -1,7 +1,7 @@
 --No.42 スターシップ・ギャラクシー・トマホーク
 function c10389142.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),2)
+	aux.AddXyzProcedure(c,nil,7,2)
 	c:EnableReviveLimit()
 	--token
 	local e1=Effect.CreateEffect(c)
@@ -67,6 +67,7 @@ function c10389142.descon(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
 	if not g:IsExists(c10389142.desfilter,1,nil,e:GetLabel()) then
 		g:DeleteGroup()
+		e:Reset()
 		return false
 	else return true end
 end

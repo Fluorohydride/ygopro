@@ -43,5 +43,5 @@ function c82452993.rcon(e)
 	return e:GetOwner():IsHasCardTarget(e:GetHandler())
 end
 function c82452993.efilter(e,re)
-	return re:IsActiveType(TYPE_MONSTER)
+	return re:IsActiveType(TYPE_MONSTER) and re:GetOwnerPlayer()~=e:GetOwnerPlayer()
 end

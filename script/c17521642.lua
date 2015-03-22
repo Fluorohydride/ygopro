@@ -1,4 +1,4 @@
---ゼロ·フォース
+--ゼロ・フォース
 function c17521642.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

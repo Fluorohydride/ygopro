@@ -1,4 +1,4 @@
---サイコ·ウォールド
+--サイコ・ウォールド
 function c58453942.initial_effect(c)
 	-- extra atk
 	local e1=Effect.CreateEffect(c)
@@ -13,7 +13,8 @@ function c58453942.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c58453942.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
 end
 function c58453942.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,800) end
@@ -38,7 +39,7 @@ function c58453942.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	--extra atk
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)

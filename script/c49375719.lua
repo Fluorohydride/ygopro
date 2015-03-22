@@ -1,4 +1,4 @@
---•µ•§•–©`°§•¡•Â•¡•Â
+--„Çµ„Ç§„Éê„Éº„Éª„ÉÅ„É•„ÉÅ„É•
 function c49375719.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

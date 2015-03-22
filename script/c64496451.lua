@@ -14,6 +14,7 @@ function c64496451.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetTargetRange(1,0)
+	e2:SetCondition(c64496451.splimcon)
 	e2:SetTarget(c64496451.splimit)
 	c:RegisterEffect(e2)
 	--atk up
@@ -48,7 +49,7 @@ function c64496451.initial_effect(c)
 	local e7=Effect.CreateEffect(c)
 	e7:SetType(EFFECT_TYPE_SINGLE)
 	e7:SetCode(EFFECT_IMMUNE_EFFECT)
-	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
+	e7:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_UNCOPYABLE)
 	e7:SetRange(LOCATION_MZONE)
 	e7:SetCondition(c64496451.immcon)
 	e7:SetValue(c64496451.efilter)
@@ -71,12 +72,15 @@ function c64496451.initial_effect(c)
 	e9:SetLabelObject(e8)
 	c:RegisterEffect(e9)
 end
+function c64496451.splimcon(e)
+	return not e:GetHandler():IsForbidden()
+end
 function c64496451.splimit(e,c)
 	return not c:IsSetCard(0xaa)
 end
-function c64496451.ntcon(e,c)
+function c64496451.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c64496451.lvcon(e)
 	return e:GetHandler():GetMaterialCount()==0
@@ -125,13 +129,16 @@ function c64496451.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
 end
 function c64496451.efilter(e,te)
-	if not te:IsActiveType(TYPE_MONSTER) or not te:IsHasType(0x7e0) then return false end
-	local tc=te:GetHandler()
-	local lv=e:GetHandler():GetLevel()
-	if te:IsActiveType(TYPE_XYZ) then
-		return tc:GetOriginalRank()<lv
+	if te:IsActiveType(TYPE_MONSTER) and (te:IsHasType(0x7e0) or te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
+		local lv=e:GetHandler():GetLevel()
+		local ec=te:GetOwner()
+		if ec:IsType(TYPE_XYZ) then
+			return ec:GetOriginalRank()<lv
+		else
+			return ec:GetOriginalLevel()<lv
+		end
 	end
-	return tc:GetOriginalLevel()<lv
+	return false
 end
 function c64496451.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_ADVANCE and e:GetLabel()==1

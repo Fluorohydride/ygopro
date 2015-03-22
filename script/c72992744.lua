@@ -1,4 +1,4 @@
---ジェスター·ロード
+--ジェスター・ロード
 function c72992744.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)

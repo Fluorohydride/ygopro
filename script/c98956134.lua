@@ -1,4 +1,4 @@
---デストラクション·ジャマー
+--デストラクション・ジャマー
 function c98956134.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -11,7 +11,7 @@ function c57274196.initial_effect(c)
 end
 function c57274196.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc:IsControler(tp) and tc:IsRace(RACE_SPELLCASTER) and tc:IsChainAttackable()
+	return tc:IsControler(tp) and tc:IsRace(RACE_SPELLCASTER) and tc:IsChainAttackable() and tc:IsStatus(STATUS_OPPO_BATTLE)
 end
 function c57274196.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
@@ -32,5 +32,21 @@ function c57274196.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e3,tp)
 end
 function c57274196.operation(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChainAttack()
+	local c=e:GetHandler()
+	local tc=eg:GetFirst()
+	if not tc:IsRelateToBattle() then return end
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e1:SetCode(EFFECT_EXTRA_ATTACK)
+	e1:SetValue(1)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
+	tc:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(c)
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e2:SetLabelObject(e1)
+	e2:SetOperation(aux.atrst)
+	e2:SetReset(RESET_PHASE+PHASE_BATTLE)
+	Duel.RegisterEffect(e2,tp)
 end

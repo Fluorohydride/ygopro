@@ -25,7 +25,7 @@ function c94331452.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c94331452.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x66) and c:IsLevelAbove(1)
+	return c:IsFaceup() and c:IsSetCard(0x1066) and c:IsLevelAbove(1)
 end
 function c94331452.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c94331452.filter(chkc) end

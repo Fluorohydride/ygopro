@@ -15,6 +15,7 @@ function c74605254.initial_effect(c)
 	e2:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_CANNOT_DISABLE)
 	e2:SetTargetRange(1,0)
+	e2:SetCondition(c74605254.splimcon)
 	e2:SetTarget(c74605254.splimit)
 	c:RegisterEffect(e2)
 	--scale change
@@ -42,6 +43,9 @@ function c74605254.initial_effect(c)
 	e4:SetOperation(c74605254.thop)
 	c:RegisterEffect(e4)
 end
+function c74605254.splimcon(e)
+	return not e:GetHandler():IsForbidden()
+end
 function c74605254.splimit(e,c,sump,sumtype,sumpos,targetp)
 	return not c:IsSetCard(0xaf) and bit.band(sumtype,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
@@ -62,15 +66,16 @@ end
 function c74605254.scop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) or c:GetLeftScale()>=10 then return end
-	local scl=math.min(10,c:GetLeftScale()+2)
+	local scl=2
+	if c:GetLeftScale()==9 then scl=1 end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_CHANGE_LSCALE)
+	e1:SetCode(EFFECT_UPDATE_LSCALE)
 	e1:SetValue(scl)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
-	e2:SetCode(EFFECT_CHANGE_RSCALE)
+	e2:SetCode(EFFECT_UPDATE_RSCALE)
 	c:RegisterEffect(e2)
 	local g=Duel.GetMatchingGroup(c74605254.filter,tp,LOCATION_MZONE,0,nil,scl)
 	if g:GetCount()>0 then

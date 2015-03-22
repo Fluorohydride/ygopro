@@ -2,7 +2,7 @@
 function c5795980.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_DISABLE)
+	e1:SetCategory(CATEGORY_DISABLE+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -39,12 +39,12 @@ function c5795980.cfilter(c,e,dg)
 	return dg:GetCount()-a>=1
 end
 function c5795980.tgfilter(c,e)
-	return c:IsFaceup() and c:IsCanBeEffectTarget(e)
+	return aux.disfilter1(c) and c:IsCanBeEffectTarget(e)
 end
 function c5795980.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and c5795980.tgfilter(chkc,e) and chkc~=e:GetHandler() end
 	if chk==0 then
-		if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return false end
+		if not Duel.IsPlayerCanDraw(tp,1) then return false end
 		if e:GetLabel()==1 then
 			e:SetLabel(0)
 			local rg=Duel.GetReleaseGroup(tp)
@@ -70,7 +70,7 @@ end
 function c5795980.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc:IsRelateToEffect(e) and ((tc:IsFaceup() and not tc:IsDisabled()) or tc:IsType(TYPE_TRAPMONSTER)) then
 		Duel.NegateRelatedChain(tc,RESET_TURN_SET)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
@@ -99,17 +99,21 @@ function c5795980.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c5795980.attg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,562)
 	local rc=Duel.AnnounceAttribute(tp,1,0xffff)
 	e:SetLabel(rc)
 end
 function c5795980.atop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
-	e1:SetValue(e:GetLabel())
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	Duel.RegisterEffect(e1,tp)
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local tc=g:GetFirst()
+	while tc do
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CHANGE_ATTRIBUTE)
+		e1:SetValue(e:GetLabel())
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
+		tc:RegisterEffect(e1)
+		tc=g:GetNext()
+	end
 end

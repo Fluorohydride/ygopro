@@ -12,11 +12,12 @@ function c81471108.initial_effect(c)
 	e1:SetTarget(c81471108.eqtg)
 	e1:SetOperation(c81471108.eqop)
 	c:RegisterEffect(e1)
-	--
+	--cannot be target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_EQUIP)
 	e2:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e2:SetValue(c81471108.indval)
+	e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--destroy sub
 	local e3=Effect.CreateEffect(c)
@@ -54,6 +55,7 @@ function c81471108.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	e1:SetValue(c81471108.eqlimit)
+	e1:SetLabelObject(tc)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -64,10 +66,7 @@ function c81471108.eqop(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 end
 function c81471108.eqlimit(e,c)
-	return c:IsSetCard(0x7f)
-end
-function c81471108.indval(e,re,tp)
-	return e:GetHandler():GetControler()~=tp
+	return c==e:GetLabelObject()
 end
 function c81471108.repval(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0

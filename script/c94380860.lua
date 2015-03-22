@@ -1,7 +1,7 @@
 --No.103 神葬零嬢ラグナ・ゼロ
 function c94380860.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--
 	local e1=Effect.CreateEffect(c)
@@ -15,6 +15,7 @@ function c94380860.initial_effect(c)
 	e1:SetCost(c94380860.cost)
 	e1:SetTarget(c94380860.target)
 	e1:SetOperation(c94380860.operation)
+	e1:SetHintTiming(0,0x1e0)
 	c:RegisterEffect(e1)
 end
 c94380860.xyz_number=103

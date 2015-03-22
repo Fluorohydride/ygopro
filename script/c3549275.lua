@@ -1,4 +1,4 @@
---ダイス·ポット
+--ダイス・ポット
 function c3549275.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
@@ -16,12 +16,11 @@ function c3549275.operation(e,tp,eg,ep,ev,re,r,rp)
 	local d1=0
 	local d2=0
 	while d1==d2 do
-		d1=Duel.TossDice(tp,1)
-		d2=Duel.TossDice(1-tp,1)
-		if d1<d2 then
-			if d2==6 then Duel.Damage(tp,6000,REASON_EFFECT) else Duel.Damage(tp,d2*500,REASON_EFFECT) end
-		elseif d1>d2 then
-			if d1==6 then Duel.Damage(1-tp,6000,REASON_EFFECT) else Duel.Damage(1-tp,d1*500,REASON_EFFECT) end
-		end
+		d1,d2=Duel.TossDice(tp,1,1)
+	end
+	if d1<d2 then
+		if d2==6 then Duel.Damage(tp,6000,REASON_EFFECT) else Duel.Damage(tp,d2*500,REASON_EFFECT) end
+	else
+		if d1==6 then Duel.Damage(1-tp,6000,REASON_EFFECT) else Duel.Damage(1-tp,d1*500,REASON_EFFECT) end
 	end
 end

@@ -1,4 +1,4 @@
---ディープ·ダイバー
+--ディープ・ダイバー
 function c17559367.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

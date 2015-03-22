@@ -1,4 +1,4 @@
---A·ジェネクス·リバイバー
+--A・ジェネクス・リバイバー
 function c63211608.initial_effect(c)
 	--counter
 	local e1=Effect.CreateEffect(c)

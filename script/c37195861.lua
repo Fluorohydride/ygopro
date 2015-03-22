@@ -1,4 +1,4 @@
---E·HERO オーシャン
+--E・HERO オーシャン
 function c37195861.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

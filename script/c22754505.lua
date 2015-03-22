@@ -1,4 +1,4 @@
---スモール·ピース·ゴーレム
+--スモール・ピース・ゴーレム
 function c22754505.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---デステニー·シグナル
+--デステニー・シグナル
 function c35464895.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

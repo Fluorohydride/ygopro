@@ -1,4 +1,4 @@
---ジュラック·タイタン
+--ジュラック・タイタン
 function c85028288.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)
@@ -26,7 +26,7 @@ function c85028288.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c85028288.efilter(e,re)
-	return re:GetHandler():IsType(TYPE_TRAP+TYPE_MONSTER)
+	return re:GetHandler():IsType(TYPE_TRAP+TYPE_MONSTER) and aux.tgval(e,re,rp)
 end
 function c85028288.cfilter(c)
 	return c:IsAttackBelow(1700) and c:IsSetCard(0x22) and c:IsAbleToRemoveAsCost()

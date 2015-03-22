@@ -1,7 +1,7 @@
 --励輝士 ヴェルズビュート
 function c46772449.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -10,6 +10,7 @@ function c46772449.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(TIMING_SPSUMMON)
 	e1:SetCondition(c46772449.condition)
 	e1:SetCost(c46772449.cost)
 	e1:SetTarget(c46772449.target)

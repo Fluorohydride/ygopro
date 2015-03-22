@@ -1,4 +1,4 @@
---E－HERO ヘル·ブラット
+--E－HERO ヘル・ブラット
 function c50304345.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

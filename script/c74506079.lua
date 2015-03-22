@@ -1,4 +1,4 @@
---ワーム·ゼロ
+--ワーム・ゼロ
 function c74506079.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

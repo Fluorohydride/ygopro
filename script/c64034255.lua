@@ -1,4 +1,4 @@
---A·ジェネクス·バードマン
+--A・ジェネクス・バードマン
 function c64034255.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

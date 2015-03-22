@@ -1,4 +1,4 @@
---カイザー·サクリファイス
+--カイザー・サクリファイス
 function c72237166.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

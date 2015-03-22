@@ -1,4 +1,4 @@
---D·ラジカッセン
+--D・ラジカッセン
 function c92720564.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

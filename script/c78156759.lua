@@ -1,7 +1,7 @@
 --発条機雷ゼンマイン 
 function c78156759.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--destroy replace
 	local e1=Effect.CreateEffect(c)

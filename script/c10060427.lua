@@ -1,4 +1,4 @@
---コアキメイル·ルークロード
+--コアキメイル・ルークロード
 function c10060427.initial_effect(c)
 	--cost
 	local e1=Effect.CreateEffect(c)

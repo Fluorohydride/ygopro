@@ -1,4 +1,4 @@
---デス·ドーナツ
+--デス・ドーナツ
 function c10389794.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

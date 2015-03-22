@@ -1,4 +1,4 @@
---E·HERO サンダー·ジャイアント
+--E・HERO サンダー・ジャイアント
 function c61204971.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

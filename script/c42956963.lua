@@ -1,4 +1,4 @@
---ナイトメア·デーモンズ
+--ナイトメア・デーモンズ
 function c42956963.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

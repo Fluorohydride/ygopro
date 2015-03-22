@@ -1,4 +1,4 @@
---クワガー·ヘラクレス
+--クワガー・ヘラクレス
 function c95144193.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

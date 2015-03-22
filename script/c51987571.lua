@@ -1,4 +1,4 @@
---ロックストーン·ウォリアー
+--ロックストーン・ウォリアー
 function c51987571.initial_effect(c)
 	--token
 	local e1=Effect.CreateEffect(c)

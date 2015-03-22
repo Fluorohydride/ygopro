@@ -1,4 +1,4 @@
---N·エア·ハミングバード
+--N・エア・ハミングバード
 function c54959865.initial_effect(c)
 	--recover
 	local e1=Effect.CreateEffect(c)

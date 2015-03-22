@@ -1,4 +1,4 @@
---トゥーン·ゴブリン突撃部隊
+--トゥーン・ゴブリン突撃部隊
 function c15270885.initial_effect(c)
 	--cannot attack
 	local e1=Effect.CreateEffect(c)

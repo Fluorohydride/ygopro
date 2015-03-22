@@ -1,4 +1,4 @@
---フェイク·ヒーロー
+--フェイク・ヒーロー
 function c78387742.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

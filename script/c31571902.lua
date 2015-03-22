@@ -10,9 +10,9 @@ function c31571902.initial_effect(c)
 	e1:SetOperation(c31571902.ntop)
 	c:RegisterEffect(e1)
 end
-function c31571902.ntcon(e,c)
+function c31571902.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c31571902.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--to grave

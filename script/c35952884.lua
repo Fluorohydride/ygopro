@@ -1,4 +1,4 @@
---シューティング·クェーサー·ドラゴン
+--シューティング・クェーサー・ドラゴン
 function c35952884.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsType,TYPE_SYNCHRO),aux.NonTuner(Card.IsType,TYPE_SYNCHRO),2)
@@ -8,15 +8,20 @@ function c35952884.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
 	c:RegisterEffect(e1)
 	--multi attack
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetCountLimit(1)
+	e2:SetCondition(c35952884.mtcon)
 	e2:SetOperation(c35952884.mtop)
 	c:RegisterEffect(e2)
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_MATERIAL_CHECK)
+	e3:SetValue(c35952884.valcheck)
+	e3:SetLabelObject(e2)
+	c:RegisterEffect(e3)
 	--negate
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(35952884,0))
@@ -48,14 +53,25 @@ function c35952884.initial_effect(c)
 	e6:SetCode(EVENT_TO_DECK)
 	c:RegisterEffect(e6)
 end
+function c35952884.mfilter(c)
+	return not c:IsType(TYPE_TUNER)
+end
+function c35952884.valcheck(e,c)
+	local g=c:GetMaterial()
+	local ct=g:FilterCount(c35952884.mfilter,nil)
+	e:GetLabelObject():SetLabel(ct)
+end
+function c35952884.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO and e:GetLabel()>0
+end
 function c35952884.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local ct=c:GetMaterialCount()
+	local ct=e:GetLabel()
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_EXTRA_ATTACK)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
-	e1:SetValue(ct-2)
+	e1:SetValue(ct-1)
 	c:RegisterEffect(e1)
 end
 function c35952884.discon(e,tp,eg,ep,ev,re,r,rp)
@@ -74,14 +90,13 @@ function c35952884.disop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
 end
-function c35952884.sumcon(e,tp,eg,ep,ev,re,r,rp,chk)
+function c35952884.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousPosition(POS_FACEUP) and e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c35952884.filter(c,e,tp)
 	return c:GetCode()==24696097 and c:IsCanBeSpecialSummoned(e,0,tp,false,true)
 end
 function c35952884.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	local c=e:GetHandler()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c35952884.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)

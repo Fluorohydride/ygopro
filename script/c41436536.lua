@@ -1,4 +1,4 @@
---E·HERO フェニックスガイ
+--E・HERO フェニックスガイ
 function c41436536.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
