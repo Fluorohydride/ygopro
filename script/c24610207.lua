@@ -39,10 +39,10 @@ function c24610207.efop(e,tp,eg,ep,ev,re,r,rp)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CHANGE_TYPE)
-		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
-		rc:RegisterEffect(e2)
+		rc:RegisterEffect(e2,true)
 	end
 end
 function c24610207.drcon(e,tp,eg,ep,ev,re,r,rp)
