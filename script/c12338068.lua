@@ -35,7 +35,7 @@ function c12338068.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local atk=0
 	local tc=g:GetFirst()
 	while tc do
-		local batk=tc:GetBaseAttack()
+		local batk=tc:GetTextAttack()
 		if batk>0 then
 			atk=atk+batk
 		end
