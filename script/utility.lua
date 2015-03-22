@@ -1168,3 +1168,11 @@ end
 function Auxiliary.tgoval(e,re,rp)
 	return rp~=e:GetHandlerPlayer() and not re:GetHandler():IsImmuneToEffect(e)
 end
+--filter for non-zero ATK 
+function Auxiliary.nzatk(c)
+	return c:IsFaceup() and c:GetAttack()>0
+end
+--filter for non-zero DEF
+function Auxiliary.nzdef(c)
+	return c:IsFaceup() and c:GetDefence()>0
+end
