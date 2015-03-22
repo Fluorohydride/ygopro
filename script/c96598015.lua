@@ -30,6 +30,7 @@ function c96598015.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return bit.band(sumtype,SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
 end
 function c96598015.filter(c)
+	if c:IsLocation(LOCATION_EXTRA) and bit.band(c:GetOriginalType(),TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)~=0 then return end
 	return c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeck()
 		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
@@ -46,7 +47,7 @@ function c96598015.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:Select(tp,3,3,nil)
 	Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)
 	Duel.ShuffleDeck(tp)
-	if sg:IsExists(Card.IsLocation,3,nil,LOCATION_DECK) then
+	if sg:IsExists(Card.IsLocation,3,nil,LOCATION_DECK+LOCATION_EXTRA) then
 		Duel.BreakEffect()
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end
