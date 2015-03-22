@@ -12,7 +12,7 @@ LOCATION_DECKBOT	=0x10001	--卡组底部
 LOCATION_DECKSHF	=0x20001	--卡组顶部
 --Locations (for SetRange)
 LOCATION_FZONE		=0x100		--场地区
-LOCATION_PZONE		=0x200		--摇摆区
+LOCATION_PZONE		=0x200		--灵摆区
 --Positions 表示形式
 POS_FACEUP_ATTACK		=0x1	--表侧攻击
 POS_FACEDOWN_ATTACK		=0x2	--里侧攻击
@@ -46,7 +46,7 @@ TYPE_COUNTER		=0x100000	--反击
 TYPE_FLIP			=0x200000	--翻转
 TYPE_TOON			=0x400000	--卡通
 TYPE_XYZ			=0x800000	--超量
-TYPE_PENDULUM		=0x1000000	--摇摆
+TYPE_PENDULUM		=0x1000000	--灵摆
 --Attributes 属性
 ATTRIBUTE_EARTH		=0x01		--地
 ATTRIBUTE_WATER		=0x02		--水
@@ -121,7 +121,7 @@ SUMMON_TYPE_FUSION		=0x43000000	--融合召唤
 SUMMON_TYPE_RITUAL		=0x45000000	--仪式召唤
 SUMMON_TYPE_SYNCHRO		=0x46000000	--同调召唤
 SUMMON_TYPE_XYZ			=0x49000000	--超量召唤
-SUMMON_TYPE_PENDULUM	=0x4a000000 --摇摆召唤
+SUMMON_TYPE_PENDULUM	=0x4a000000 --灵摆召唤
 --Status	--卡片当前状态
 STATUS_DISABLED				=0x0001		--效果被无效
 STATUS_TO_ENABLE			=0x0002		--将变成有效
@@ -219,6 +219,7 @@ RESET_LEAVE			=0x00800000			--从场上离开重置
 RESET_TOFIELD		=0x01000000			--到场上重置
 RESET_CONTROL		=0x02000000			--控制者变更重置
 RESET_OVERLAY		=0x04000000			--超量叠放重置
+RESET_MSCHANGE  =0x08000000			--从怪兽区到魔法区，或者从魔法区到怪兽区
 --========== Types ==========	--效果类型（定义效果触发类型，和codes一起使用）
 EFFECT_TYPE_SINGLE			=0x0001		--自己状态变化时触发
 EFFECT_TYPE_FIELD			=0x0002		--场上所有卡状态变化时触发
