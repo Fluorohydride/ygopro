@@ -262,8 +262,8 @@ namespace sgui
     class UITextBase : UIComponent {
     public:
         UITextBase(int32_t capacity) {
-            vertices.resize((capacity + 3) * 4);
-            indices.resize((capacity + 3) * 6);
+            vertices.resize((capacity + 1) * 4);
+            indices.resize((capacity + 1) * 6);
             vert_cap = capacity;
         }
         
@@ -277,10 +277,7 @@ namespace sgui
             line_spacing = 0;
             int32_t actual_size = 0;
             auto len = texts.length();
-            bool start_pos = false;
-            bool end_pos = false;
-            int32_t back_lines = 0;
-            bool cursor_pos = false;
+            bool cursor_pass = false;
             for(size_t i = 0; i < len; ++i) {
                 auto ch = texts[i];
                 if(ch < L' ') {
@@ -296,19 +293,18 @@ namespace sgui
                     advance.y += line_spacing;
                     line_spacing = 0;
                 }
-                if(start_pos && line_spacing == 0)
-                    back_lines++;
-                if(!start_pos && i > selection.x) {
-                    start_pos = true;
-                    vertices[0].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y - text_font->GetFontSize()});
+                auto final_offset = position + advance + offset;
+                if(cursor_pos >= 0 && !cursor_pass && i >= cursor_pos) {
+                    cursor_pass = true;
+                    vertices[0].vertex = ConvScreenCoord(v2i{gl.bounds.left, -text_font->GetFontSize()} + final_offset);
                 }
-                auto v = &vertices[actual_size * 4 + 12];
-                auto idx = &indices[actual_size * 6 + 18];
+                auto v = &vertices[actual_size * 4 + 4];
+                auto idx = &indices[actual_size * 6 + 6];
                 actual_size++;
-                v[0].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y + gl.bounds.top});
-                v[1].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left + gl.bounds.width, position.y + advance.y + gl.bounds.top});
-                v[2].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left, position.y + advance.y + gl.bounds.top + gl.bounds.height});
-                v[3].vertex = ConvScreenCoord({position.x + advance.x + gl.bounds.left + gl.bounds.width, position.y + advance.y + gl.bounds.top + gl.bounds.height});
+                v[0].vertex = ConvScreenCoord(v2i{gl.bounds.left, gl.bounds.top} + final_offset);
+                v[1].vertex = ConvScreenCoord(v2i{gl.bounds.left + gl.bounds.width, gl.bounds.top} + final_offset);
+                v[2].vertex = ConvScreenCoord(v2i{gl.bounds.left, gl.bounds.top + gl.bounds.height} + final_offset);
+                v[3].vertex = ConvScreenCoord(v2i{gl.bounds.left + gl.bounds.width, gl.bounds.top + gl.bounds.height} + final_offset);
                 v[0].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top});
                 v[1].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left + gl.textureRect.width, gl.textureRect.top});
                 v[2].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top + gl.textureRect.height});
@@ -348,6 +344,10 @@ namespace sgui
             return AppendText(t, cl);
         }
         
+        inline bool SetCursorRect(recti sz, recti tex) {
+            
+        }
+        
         inline bool AppendText(std::wstring& t, int32_t cl) {
             int32_t app_size = 0;
             for(auto& ch : t) {
@@ -380,10 +380,11 @@ namespace sgui
         int32_t max_width = 0xffffffff;
         int32_t vert_cap = 0;
         int32_t line_spacing = 0;
-        int32_t cursor_offset = 0;
+        int32_t cursor_pos = 0;
         uint32_t back_color = 0x40404040;
         v2i advance = {0, 0};
-        v2i selection = {0, 0};
+        v2i offset = {0, 0};
+        
         std::wstring texts;
         std::vector<uint32_t> colors;
     };
