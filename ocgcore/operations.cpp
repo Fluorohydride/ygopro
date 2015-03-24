@@ -1942,18 +1942,26 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 	case 0: {
 		if(!(target->data.type & TYPE_MONSTER))
 			return FALSE;
-		if(check_unique_onfield(target, sumplayer))
+		if(target->current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && !target->is_status(STATUS_REVIVE_LIMIT))
+			return FALSE;
+		effect_set eset1;
+		target->material_cards.clear();
+		card* tuner = core.limit_tuner;
+		group* materials = core.limit_xyz;
+		group* syn = core.limit_syn;
+		target->filter_spsummon_procedure(sumplayer, &eset1, summon_type);
+		target->filter_spsummon_procedure_g(sumplayer, &eset1);
+		core.limit_tuner = tuner;
+		core.limit_xyz = materials;
+		core.limit_syn = syn;
+		if(!eset1.size())
 			return TRUE;
-		if(target->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
-			return FALSE;
-		if(target->current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && !target->is_status(STATUS_REVIVE_LIMIT) && target->is_affected_by_effect(EFFECT_REVIVE_LIMIT))
-			return FALSE;
-		effect_set eset;
-		target->filter_effect(EFFECT_SPSUMMON_COST, &eset);
-		for(int32 i = 0; i < eset.size(); ++i) {
-			if(eset[i]->operation) {
+		effect_set eset2;
+		target->filter_effect(EFFECT_SPSUMMON_COST, &eset2);
+		for(int32 i = 0; i < eset2.size(); ++i) {
+			if(eset2[i]->operation) {
 				core.sub_solving_event.push_back(nil_event);
-				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, sumplayer, 0);
+				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset2[i], 0, sumplayer, 0);
 			}
 		}
 		return FALSE;
@@ -2305,7 +2313,6 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		if(!result || (target->current.location == LOCATION_MZONE)
 				|| check_unique_onfield(target, playerid)
 		        || !is_player_can_spsummon(core.reason_effect, target->summon_info & 0xff00ffff, positions, target->summon_player, playerid, target)
-		        || target->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON)
 		        || get_useable_count(playerid, LOCATION_MZONE, target->summon_player, LOCATION_REASON_TOFIELD) <= 0
 		        || (!nocheck && !(target->data.type & TYPE_MONSTER)))
 			result = FALSE;

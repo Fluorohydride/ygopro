@@ -1576,7 +1576,8 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset, uint32 s
 			topos = POS_FACEUP;
 			toplayer = playerid;
 		}
-		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect)) {
+		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect) 
+				&& !pduel->game_field->check_unique_onfield(this, toplayer)) {
 			uint32 sumtype = peffect->get_value(this);
 			if((!summon_type || summon_type == sumtype)
 			        && pduel->game_field->is_player_can_spsummon(peffect, sumtype, topos, playerid, toplayer, this))
@@ -1893,12 +1894,6 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 int32 card::is_special_summonable(uint8 playerid, uint32 summon_type) {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
-	if(pduel->game_field->check_unique_onfield(this, playerid))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_once(this, playerid))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_counter(playerid))
-		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
@@ -1934,14 +1929,12 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 	}
 	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))
 		return FALSE;
-	if(!pduel->game_field->check_spsummon_once(this, sumplayer))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_counter(sumplayer))
-		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if((sumplayer == 0 || sumplayer == 1) && !pduel->game_field->is_player_can_spsummon(reason_effect, sumtype, sumpos, sumplayer, toplayer, this))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	pduel->game_field->save_lp_cost();
 	effect_set eset;

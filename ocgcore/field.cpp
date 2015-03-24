@@ -1905,6 +1905,10 @@ int32 field::is_player_can_spsummon(uint8 playerid) {
 }
 int32 field::is_player_can_spsummon(effect * peffect, uint32 sumtype, uint8 sumpos, uint8 playerid, uint8 toplayer, card * pcard) {
 	effect_set eset;
+	if(pcard->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
+		return FALSE;
+	if(pcard->is_affected_by_effect(EFFECT_FORBIDDEN))
+		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if(sumpos & POS_FACEDOWN && is_player_affected_by_effect(playerid, EFFECT_DEVINE_LIGHT))
 		sumpos = (sumpos & POS_FACEUP) | (sumpos >> 1);
@@ -1944,9 +1948,7 @@ int32 field::is_player_can_flipsummon(uint8 playerid, card * pcard) {
 }
 int32 field::is_player_can_spsummon_monster(uint8 playerid, uint8 toplayer, uint8 sumpos, card_data * pdata) {
 	temp_card->data = *pdata;
-	if(!is_player_can_spsummon(core.reason_effect, SUMMON_TYPE_SPECIAL, sumpos, playerid, toplayer, temp_card))
-		return FALSE;
-	return temp_card->is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON) ? FALSE : TRUE;
+	return is_player_can_spsummon(core.reason_effect, SUMMON_TYPE_SPECIAL, sumpos, playerid, toplayer, temp_card);
 }
 int32 field::is_player_can_release(uint8 playerid, card * pcard) {
 	effect_set eset;
