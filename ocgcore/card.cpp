@@ -1924,7 +1924,7 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 	if(current.location == LOCATION_REMOVED && (current.position & POS_FACEDOWN))
 		return FALSE;
 	if(is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE)) {
-		if((!nolimit && (current.location & 0x38)) || (!nocheck && (current.location & 0x3)))
+		if((!nolimit && (current.location & 0x38)) || (!nocheck && !nolimit && (current.location & 0x3)))
 			return FALSE;
 	}
 	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))

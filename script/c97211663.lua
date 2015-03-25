@@ -22,8 +22,8 @@ function c97211663.initial_effect(c)
 end
 function c97211663.filter(c,e,tp,m)
 	if not c:IsSetCard(0xb4) or bit.band(c:GetType(),0x81)~=0x81
-		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,true) or c:IsHasEffect(EFFECT_NECRO_VALLEY) then return false end
-	if c:IsCode(21105106) then return c:IsLocation(LOCATION_HAND) and c:ritual_custom_condition(m) end
+		or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) or c:IsHasEffect(EFFECT_NECRO_VALLEY) then return false end
+	if c:IsCode(21105106) then return c:ritual_custom_condition(m) end
 	local mg=nil
 	if c.mat_filter then
 		mg=m:Filter(c.mat_filter,c)
@@ -61,7 +61,7 @@ function c97211663.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ReleaseRitualMaterial(mat)
 		end
 		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,true,POS_FACEUP)
+		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	end
 end

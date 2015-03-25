@@ -6,6 +6,7 @@ function c99185129.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c99185129.splimit)
 	c:RegisterEffect(e1)
 	--tohand
 	local e2=Effect.CreateEffect(c)
@@ -33,6 +34,9 @@ function c99185129.initial_effect(c)
 	e3:SetTarget(c99185129.target)
 	e3:SetOperation(c99185129.operation)
 	c:RegisterEffect(e3)
+end
+function c99185129.splimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c99185129.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end

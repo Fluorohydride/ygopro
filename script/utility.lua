@@ -921,7 +921,7 @@ function Auxiliary.AddRitualProcGreater(c,filter)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.RPGFilter(c,filter,e,tp,m)
-	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
 	local result=false
 	if m:IsContains(c) then
 		m:RemoveCard(c)
@@ -954,7 +954,7 @@ function Auxiliary.RPGOperation(filter)
 					tc:SetMaterial(mat)
 					Duel.ReleaseRitualMaterial(mat)
 					Duel.BreakEffect()
-					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 					tc:CompleteProcedure()
 				end
 			end
@@ -970,7 +970,7 @@ function Auxiliary.AddRitualProcEqual(c,filter)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.RPEFilter(c,filter,e,tp,m)
-	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
 	local result=false
 	if m:IsContains(c) then
 		m:RemoveCard(c)
@@ -1003,7 +1003,7 @@ function Auxiliary.RPEOperation(filter)
 					tc:SetMaterial(mat)
 					Duel.ReleaseRitualMaterial(mat)
 					Duel.BreakEffect()
-					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 					tc:CompleteProcedure()
 				end
 			end
@@ -1019,7 +1019,7 @@ function Auxiliary.AddRitualProcEqual2(c,filter)
 	c:RegisterEffect(e1)
 end
 function Auxiliary.RPEFilter2(c,filter,e,tp,m)
-	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	if (filter and not filter(c)) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
 	local result=false
 	if m:IsContains(c) then
 		m:RemoveCard(c)
@@ -1052,7 +1052,7 @@ function Auxiliary.RPEOperation2(filter)
 					tc:SetMaterial(mat)
 					Duel.ReleaseRitualMaterial(mat)
 					Duel.BreakEffect()
-					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+					Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 					tc:CompleteProcedure()
 				end
 			end
