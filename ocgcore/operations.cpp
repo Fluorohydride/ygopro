@@ -2307,7 +2307,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		uint32 result = TRUE;
 		effect_set eset;
 		if(target->is_status(STATUS_REVIVE_LIMIT) && !target->is_status(STATUS_PROC_COMPLETE)) {
-			if((!nolimit && (target->current.location & 0x38)) || (!nocheck && (target->current.location & 0x3)))
+			if((!nolimit && (target->current.location & 0x38)) || (!nocheck && !nolimit && (target->current.location & 0x3)))
 				result = FALSE;
 		}
 		if(!result || (target->current.location == LOCATION_MZONE)
