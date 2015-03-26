@@ -44,6 +44,7 @@ function c24348804.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 			Duel.SetTargetCard(g)
 			Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
 			e:SetLabel(1)
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(24348804,1))
 		end
 	end
 end
