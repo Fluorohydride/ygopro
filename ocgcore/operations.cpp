@@ -3649,7 +3649,7 @@ int32 field::change_position(uint16 step, group * targets, effect * reason_effec
 						flips.insert(pcard);
 					}
 					if(enable) {
-						if(!reason_effect || !(reason_effect->type & 0x7f0))
+						if(!reason_effect || !(reason_effect->type & 0x7f0) || pcard->current.location != LOCATION_MZONE)
 							pcard->enable_field_effect(TRUE);
 						else
 							core.delayed_enable_set.insert(pcard);

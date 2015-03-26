@@ -27,6 +27,21 @@ function c24348804.initial_effect(c)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e3:SetTarget(c24348804.distg)
 	c:RegisterEffect(e3)
+	if not c24348804.global_check then
+		c24348804.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetOperation(c24348804.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end
+end
+function c24348804.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	while tc do
+		tc:RegisterFlagEffect(24348804,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
+		tc=eg:GetNext()
+	end
 end
 function c24348804.cfilter(c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
@@ -65,5 +80,5 @@ function c24348804.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c24348804.distg(e,c)
-	return c:IsStatus(STATUS_SUMMON_TURN) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return c:GetFlagEffect(24348804)~=0
 end

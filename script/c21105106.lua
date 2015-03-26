@@ -65,8 +65,7 @@ function c21105106.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_RITUAL
 end
 function c21105106.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
-		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 		and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==1 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)

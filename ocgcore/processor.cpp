@@ -573,6 +573,7 @@ int32 field::process() {
 	case PROCESSOR_ANNOUNCE_NUMBER: {
 		if(announce_number(it->step, it->arg1)) {
 			pduel->lua->add_param(core.select_options[returns.ivalue[0]], PARAM_TYPE_INT);
+			pduel->lua->add_param(returns.ivalue[0], PARAM_TYPE_INT);
 			core.units.pop_front();
 		} else {
 			it->step++;
