@@ -78,7 +78,7 @@ function c21105106.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetCode(EFFECT_CANNOT_SUMMON)
 	Duel.RegisterEffect(e2,tp)
 	local e3=e1:Clone()
-	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	e3:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e3,tp)
 end
 function c21105106.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)

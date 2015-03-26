@@ -12,6 +12,7 @@ function c57734012.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetCondition(c57734012.condition)
+	e2:SetCost(c57734012.cost)
 	e2:SetTarget(c57734012.target)
 	e2:SetOperation(c57734012.activate)
 	c:RegisterEffect(e2)
@@ -33,7 +34,10 @@ function c57734012.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c57734012.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity() and e:GetHandler():GetFlagEffect(57734012)~=0
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity()
+end
+function c57734012.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	return e:GetHandler():GetFlagEffect(57734012)~=0
 end
 function c57734012.filter1(c,e,tp)
 	local m=_G["c"..c:GetCode()]

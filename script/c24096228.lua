@@ -77,9 +77,9 @@ function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 		if bit.band(tpe,TYPE_FIELD)~=0 then
 			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 		end
-		if co then co(e,tp,eg,ep,ev,re,r,rp,1) end
-		if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
+		if co then co(te,tp,eg,ep,ev,re,r,rp,1) end
+		if tg then tg(te,tp,eg,ep,ev,re,r,rp,1) end
 		Duel.BreakEffect()
-		if op then op(e,tp,eg,ep,ev,re,r,rp) end
+		if op then op(te,tp,eg,ep,ev,re,r,rp) end
 	end
 end

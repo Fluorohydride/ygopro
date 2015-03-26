@@ -79,7 +79,7 @@ function c93238626.spop(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.NegateAttack() then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
 	local tc=Duel.GetAttackTarget()
-	local m=_G["c"..Duel.GetAttackTarget():GetCode()]
+	local m=_G["c"..tc:GetCode()]
 	if tc:IsFacedown() or not tc:IsRelateToBattle() or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) or not m then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c93238626.filter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,m.xyz_number)
