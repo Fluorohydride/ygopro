@@ -219,7 +219,7 @@ RESET_LEAVE			=0x00800000			--从场上离开重置
 RESET_TOFIELD		=0x01000000			--到场上重置
 RESET_CONTROL		=0x02000000			--控制者变更重置
 RESET_OVERLAY		=0x04000000			--超量叠放重置
-RESET_MSCHANGE  =0x08000000			--从怪兽区到魔法区，或者从魔法区到怪兽区
+RESET_MSCHANGE		=0x08000000			--从怪兽区到魔法区，或者从魔法区到怪兽区
 --========== Types ==========	--效果类型（定义效果触发类型，和codes一起使用）
 EFFECT_TYPE_SINGLE			=0x0001		--自己状态变化时触发
 EFFECT_TYPE_FIELD			=0x0002		--场上所有卡状态变化时触发
