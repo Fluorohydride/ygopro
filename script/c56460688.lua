@@ -56,7 +56,6 @@ function c56460688.retop(e,tp,eg,ep,ev,re,r,rp)
 		while tc do
 			if tc:GetFlagEffect(56460688)>0 then
 				Duel.ReturnToField(tc)
-				tc:SetStatus(STATUS_SUMMON_TURN+STATUS_FORM_CHANGED,false)
 			end
 			tc=g:GetNext()
 		end

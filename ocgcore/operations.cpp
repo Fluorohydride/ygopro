@@ -1564,7 +1564,7 @@ int32 field::flip_summon(uint16 step, uint8 sumplayer, card * target) {
 		target->enable_field_effect(TRUE);
 		if(target->is_status(STATUS_DISABLED))
 			target->reset(RESET_DISABLE, RESET_EVENT);
-		target->set_status(STATUS_SUMMON_TURN, TRUE);
+		target->set_status(STATUS_FLIP_SUMMON_TURN, TRUE);
 		return FALSE;
 	}
 	case 4: {
@@ -3528,6 +3528,7 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 		} else {
 			if(target->turnid != infos.turn_id) {
 				target->set_status(STATUS_SUMMON_TURN, FALSE);
+				target->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
 				target->set_status(STATUS_SET_TURN, FALSE);
 				target->set_status(STATUS_FORM_CHANGED, FALSE);
 				target->set_status(STATUS_ATTACKED, FALSE);

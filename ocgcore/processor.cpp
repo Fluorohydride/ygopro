@@ -4054,6 +4054,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 				if(!pcard)
 					continue;
 				pcard->set_status(STATUS_SUMMON_TURN, FALSE);
+				pcard->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
 				pcard->set_status(STATUS_SET_TURN, FALSE);
 				pcard->set_status(STATUS_FORM_CHANGED, FALSE);
 				pcard->set_status(STATUS_ATTACKED, FALSE);

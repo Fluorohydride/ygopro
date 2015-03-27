@@ -1858,7 +1858,7 @@ int32 card::get_set_tribute_count() {
 	return min + (max << 16);
 }
 int32 card::is_can_be_flip_summoned(uint8 playerid) {
-	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
+	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
 		return FALSE;
@@ -2304,7 +2304,7 @@ int32 card::is_capable_attack_announce(uint8 playerid) {
 	return TRUE;
 }
 int32 card::is_capable_change_position(uint8 playerid) {
-	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
+	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
 		return FALSE;
