@@ -98,6 +98,7 @@ function c43698897.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ConfirmCards(1-tp,cg1)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
 		Duel.ConfirmCards(1-tp,cg2)
+		Duel.ShuffleHand(tp)
 	end
 end
 function c43698897.thcon(e,tp,eg,ep,ev,re,r,rp)
