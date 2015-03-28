@@ -37,7 +37,7 @@ function c57734012.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1 and not Duel.CheckPhaseActivity()
 end
 function c57734012.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	return e:GetHandler():GetFlagEffect(57734012)~=0
+	if chk==0 then return e:GetHandler():GetFlagEffect(57734012)~=0 end
 end
 function c57734012.filter1(c,e,tp)
 	local m=_G["c"..c:GetCode()]

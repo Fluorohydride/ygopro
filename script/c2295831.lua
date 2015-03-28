@@ -37,7 +37,7 @@ function c2295831.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()==PHASE_MAIN1
 end
 function c2295831.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	return e:GetHandler():GetFlagEffect(2295831)~=0
+	if chk==0 then return e:GetHandler():GetFlagEffect(2295831)~=0 end
 end
 function c2295831.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_DECK,0,1,nil) end
