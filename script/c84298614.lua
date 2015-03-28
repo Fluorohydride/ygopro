@@ -53,7 +53,7 @@ function c84298614.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c84298614.rcon(e)
-	return e:GetOwner():IsHasCardTarget(e:GetHandler())
+	return e:GetOwner():IsHasCardTarget(e:GetHandler()) and not e:GetHandler():IsImmuneToEffect(e)
 end
 function c84298614.descon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetFirstCardTarget()
