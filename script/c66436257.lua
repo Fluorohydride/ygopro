@@ -6,14 +6,14 @@ function c66436257.initial_effect(c)
 	e1:SetCategory(CATEGORY_REMOVE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetRange(LOCATION_GRAVE)
-	e1:SetCode(EVENT_DAMAGE)
+	e1:SetCode(EVENT_BATTLE_DAMAGE)
 	e1:SetCondition(c66436257.condition)
 	e1:SetTarget(c66436257.target)
 	e1:SetOperation(c66436257.operation)
 	c:RegisterEffect(e1)
 end
 function c66436257.condition(e,tp,eg,ep,ev,re,r,rp)
-	return ep==tp and r==REASON_BATTLE
+	return ep==tp
 end
 function c66436257.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
