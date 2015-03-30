@@ -49,8 +49,7 @@ function c47737087.val(e,c)
 end
 function c47737087.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return ep~=tp and c==Duel.GetAttacker() and Duel.GetAttackTarget()==nil and c:IsDefencePos()
-		and c:GetEffectCount(EFFECT_DIRECT_ATTACK)<2 and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0
+	return c:IsDefencePos() and c==Duel.GetAttacker() and Duel.GetAttackTarget()==nil and c:GetEffectCount(EFFECT_DIRECT_ATTACK)==1
 end
 function c47737087.rdop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
