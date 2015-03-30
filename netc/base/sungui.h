@@ -337,15 +337,18 @@ namespace sgui
             need_update = true;
         }
         
+        
+        inline bool SetCursorRect(recti sz, recti tex) {
+            vertices.clear();
+            indices.clear();
+            need_update = true;
+        }
+        
         inline bool SetText(std::wstring& t, int32_t cl) {
             vertices.clear();
             indices.clear();
             need_update = true;
             return AppendText(t, cl);
-        }
-        
-        inline bool SetCursorRect(recti sz, recti tex) {
-            
         }
         
         inline bool AppendText(std::wstring& t, int32_t cl) {

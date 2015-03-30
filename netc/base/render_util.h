@@ -24,6 +24,7 @@ namespace base
         }
         
         std::vector<recti> scissor_stack;
+        std::vector<float> global_alpha;
         uint32_t vbo_id = 0;
         uint32_t vbo_idx = 0;
         uint32_t vao_id = 0;
@@ -111,6 +112,22 @@ namespace base
                 recti rt = state.scissor_stack.back();
                 glScissor(rt.left, rt.top, rt.width, rt.height);
             }
+        }
+    };
+    
+    template<typename VTYPE>
+    struct RenderCmdBeginGlobalAlpha : public RenderCmd<VTYPE> {
+        RenderCmdBeginGlobalAlpha(float alpha) : global_alpha(alpha) {}
+        virtual void Execute(const IRenderState<VTYPE>& state) {
+
+        }
+        float global_alpha;
+    };
+    
+    template<typename VTYPE>
+    struct RenderCmdEndGlobalAlpha  : public RenderCmd<VTYPE> {
+        virtual void Execute(const IRenderState<VTYPE>& state) {
+
         }
     };
     
@@ -207,40 +224,29 @@ namespace base
     };
     
     template<typename VTYPE>
+    class RenderUnitMgr;
+    
+    template<typename VTYPE>
     class RenderUnit {
     public:
+        virtual ~RenderUnit() {}
         virtual void PushVertices(RenderObject<VTYPE>& render_obj) {}
         virtual void UpdateVertices(RenderObject<VTYPE>& render_obj) {}
         
+        void SetUpdate() {}
+        void SetRedraw() {}
+        
     protected:
-        bool need_update;
         int16_t vert_index = 0;
         int16_t index_index = 0;
         std::vector<VTYPE> vertices;
         std::vector<int16_t> indices;
+        RenderUnitMgr<VTYPE>* manager = nullptr;
     };
     
-    class UpdateUnit {
+    template<typename VTYPE>
+    class RenderUnitMgr {
     public:
-        virtual void Update() { need_update = false; }
-        inline bool NeedUpdate() { return need_update; }
-        inline void SetUpdate(bool up) { need_update = up; }
-        
-    protected:
-        bool need_update = false;
-    };
-    
-    template<typename UUT>
-    class UpdateUnitMgr {
-    public:
-        template<typename UT>
-        void AddUpdateUnit(UT ptr) {
-            auto unit = std::const_pointer_cast<UUT>(ptr);
-            if(unit->NeedUpdate)
-                return;
-            unit->SetUpdate(true);
-            update_units.push_back(unit);
-        }
         
         void UpdateAll() {
             for(auto& punit : update_units) {
@@ -260,8 +266,16 @@ namespace base
             update_units.clear();
         }
         
+        template<typename ALLOC_TYPE, typename... TR>
+        ALLOC_TYPE* AllocObject(TR... tr) {
+            static_assert(std::is_base_of<RenderUnit<VTYPE>, ALLOC_TYPE>::value, "error!");
+            auto ptr = std::make_shared<ALLOC_TYPE>(std::forward<TR>(tr)...);
+        }
+        
+        
     protected:
-        std::vector<std::weak_ptr<UUT>> update_units;
+        std::set<RenderUnit<VTYPE>*> all_units;
+        std::set<RenderUnit<VTYPE>*> update_units;
     };
     
 }
