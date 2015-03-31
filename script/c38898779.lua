@@ -37,6 +37,7 @@ function c38898779.initial_effect(c)
 	e4:SetOperation(c38898779.spop)
 	c:RegisterEffect(e4)
 end
+c38898779.Assault_Protocode=23693634
 function c38898779.tgfilter(c)
 	return c:IsRace(RACE_WARRIOR) and c:IsAbleToGrave()
 end
