@@ -5,6 +5,29 @@ namespace base
 {
     
     template<typename VTYPE>
+    class RenderObject;
+    
+    template<typename VTYPE>
+    class RenderUnit {
+        friend class RenderObject<VTYPE>;
+    public:
+        virtual ~RenderUnit() {}
+        virtual void PushVertices() {}
+        virtual void UpdateVertices() {}
+        
+        inline void SetUpdate();
+        inline void SetRedraw();
+        
+    protected:
+        int16_t vert_index = 0;
+        int16_t index_index = 0;
+        bool need_update = true;
+        std::vector<VTYPE> vertices;
+        std::vector<int16_t> indices;
+        RenderObject<VTYPE>* manager = nullptr;
+    };
+    
+    template<typename VTYPE>
     class IRenderState {
     public:
         virtual ~IRenderState() {
@@ -139,12 +162,18 @@ namespace base
             index_buffer.reserve(6144);
         }
         
+        virtual ~RenderObject() {
+            for(auto unit : all_units)
+                delete unit;
+            all_units.clear();
+        }
+        
         std::tuple<int16_t, int16_t> BeginPrimitive(int16_t pri_type, int16_t texid) {
             bool merge = false;
             if(!render_commands.empty() && render_commands.back()->CheckPrimitive(pri_type, texid))
                 merge = true;
             if(!merge)
-                render_commands.push_back(std::make_shared<RenderCmdDraw<VTYPE>>(pri_type, texid, (int16_t)index_buffer.size()));
+                render_commands.push_back(new RenderCmdDraw<VTYPE>(pri_type, texid, (int16_t)index_buffer.size()));
             return std::make_tuple((int16_t)vertex_buffer.size(), (int16_t)index_buffer.size());
         }
         
@@ -153,7 +182,7 @@ namespace base
                 vertex_buffer.push_back(vert_data[i]);
             for(int32_t i = 0; i < icount; ++i)
                 index_buffer.push_back(index_data[i]);
-            std::static_pointer_cast<RenderCmdDraw<VTYPE>>(render_commands.back())->count += icount;
+            static_cast<RenderCmdDraw<VTYPE>*>(render_commands.back())->count += icount;
         }
         
         void BeginUpdate() {
@@ -169,7 +198,9 @@ namespace base
             glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int16_t) * start_index, sizeof(int16_t) * count, index_data);
         }
         
-        void UpdateAll() {
+        virtual void PushVerticesAll() { Clear(); }
+        
+        void UploadVertices() {
             glBindBuffer(GL_ARRAY_BUFFER, IRenderState<VTYPE>::vbo_id);
             if(vertex_buffer.size() > pre_vert_size) {
                 glBufferData(GL_ARRAY_BUFFER, sizeof(VTYPE) * vertex_buffer.size(), &vertex_buffer[0], GL_DYNAMIC_DRAW);
@@ -184,27 +215,24 @@ namespace base
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(int16_t) * index_buffer.size(), &index_buffer[0]);
         }
         
-        void BeginScissor(recti srect) {
-            render_commands.push_back(std::make_shared<RenderCmdBeginScissor<VTYPE>>(srect));
+        template<template<typename> class CMD_TYPE, typename... TR>
+        void PushCommand(TR... tr) {
+            static_assert(std::is_base_of<RenderCmd<VTYPE>, CMD_TYPE<VTYPE>>::value, "command type should be subclass of RenderCmd.");
+            render_commands.push_back(new CMD_TYPE<VTYPE>(std::forward<TR>(tr)...));
         }
-        
-        void EndScissor() {
-            render_commands.push_back(std::make_shared<RenderCmdEndScissor<VTYPE>>());
-        }
-        
-        void CancelScissor() {
-            render_commands.push_back(std::make_shared<RenderCmdCancelScissor<VTYPE>>());
-        }
-        
-        void RestoreScissor() {
-            render_commands.push_back(std::make_shared<RenderCmdRestoreScissor<VTYPE>>());
-        }
-        
+
         void Render() {
+            if(need_redraw) {
+                PushVerticesAll();
+                UploadVertices();
+            } else
+                UpdateUnits();
             typename VTYPE::DrawBegin(IRenderState<VTYPE>::vbo_id, IRenderState<VTYPE>::vbo_idx, IRenderState<VTYPE>::vao_id);
             for(auto& rc : render_commands)
                 rc->Execute(*this);
             typename VTYPE::DrawEnd(IRenderState<VTYPE>::vbo_id, IRenderState<VTYPE>::vbo_idx, IRenderState<VTYPE>::vao_id);
+            need_redraw = false;
+            all_need_update = false;
         }
         
         void Clear() {
@@ -212,70 +240,78 @@ namespace base
             index_buffer.clear();
             pre_vert_size = 0;
             pre_index_size = 0;
+            for(auto& rc : render_commands)
+                delete rc;
             render_commands.clear();
+            update_units.clear();
         }
+        
+        template<typename ALLOC_TYPE, typename... TR>
+        ALLOC_TYPE* NewObject(TR... tr) {
+            static_assert(std::is_base_of<RenderUnit<VTYPE>, ALLOC_TYPE>::value, "object type should be subclass of RenderUnit.");
+            auto ptr = new ALLOC_TYPE(std::forward<TR>(tr)...);
+            ptr->manager = this;
+            return ptr;
+        }
+        
+        template<typename ALLOC_TYPE>
+        bool DeleteObject(ALLOC_TYPE* at) {
+            static_assert(std::is_base_of<RenderUnit<VTYPE>, ALLOC_TYPE>::value, "object type should be subclass of RenderUnit.");
+            auto iter = all_units.find(at);
+            if(iter != all_units.end()) {
+                update_units.erase(at);
+                all_units.erase(iter);
+                delete at;
+                return true;
+            }
+            return false;
+        }
+        
+        inline void AddUpdateUnit(RenderUnit<VTYPE>* unit) { if(!need_redraw) update_units.insert(unit); }
+        inline void UpdateUnits() { for(auto& punit : update_units) punit->Update(); update_units.clear(); }
+        inline void ClearUpdatingUnits() { update_units.clear(); }
+        inline void SetRedraw() { need_redraw = true; }
+        inline bool AllUnitNeedUpdate() { return all_need_update; }
         
     protected:
         std::vector<VTYPE> vertex_buffer;
         std::vector<int16_t> index_buffer;
         int32_t pre_vert_size = 0;
         int32_t pre_index_size = 0;
-        std::vector<std::shared_ptr<RenderCmd<VTYPE>>> render_commands;
+        bool need_redraw = true;
+        bool all_need_update = false;
+        std::vector<RenderCmd<VTYPE>*> render_commands;
+        std::set<RenderUnit<VTYPE>*> all_units;     // owner
+        std::set<RenderUnit<VTYPE>*> update_units;  // weak reference
     };
     
     template<typename VTYPE>
-    class RenderUnitMgr;
+    inline void RenderUnit<VTYPE>::SetUpdate() {
+        need_update = true;
+        manager->AddUpdateUnit(this);
+    }
     
     template<typename VTYPE>
-    class RenderUnit {
+    inline void RenderUnit<VTYPE>::SetRedraw() {
+        need_update = true;
+        manager->SetRedraw();
+    }
+
+    class RenderObject2DLayout : public base::RenderObject<base::v2ct> {
     public:
-        virtual ~RenderUnit() {}
-        virtual void PushVertices(RenderObject<VTYPE>& render_obj) {}
-        virtual void UpdateVertices(RenderObject<VTYPE>& render_obj) {}
+        inline void SetScreenSize(v2i sz) {
+            if(sz == screen_size)
+                return;
+            screen_size = sz;
+            all_need_update = true;
+        }
         
-        void SetUpdate() {}
-        void SetRedraw() {}
+        inline v2f ConvScreenCoord(v2i pos) {
+            return v2f{pos.x * 2.0f / screen_size.x - 1.0f, 1.0f - pos.y * 2.0f / screen_size.y};
+        }
         
     protected:
-        int16_t vert_index = 0;
-        int16_t index_index = 0;
-        std::vector<VTYPE> vertices;
-        std::vector<int16_t> indices;
-        RenderUnitMgr<VTYPE>* manager = nullptr;
-    };
-    
-    template<typename VTYPE>
-    class RenderUnitMgr {
-    public:
-        
-        void UpdateAll() {
-            for(auto& punit : update_units) {
-                auto unit = punit.lock();
-                if(unit)
-                    unit->Update();
-            }
-            update_units.clear();
-        }
-        
-        void Clear() {
-            for(auto& punit : update_units) {
-                auto unit = punit.lock();
-                if(unit)
-                    unit->SetUpdate(false);
-            }
-            update_units.clear();
-        }
-        
-        template<typename ALLOC_TYPE, typename... TR>
-        ALLOC_TYPE* AllocObject(TR... tr) {
-            static_assert(std::is_base_of<RenderUnit<VTYPE>, ALLOC_TYPE>::value, "error!");
-            auto ptr = std::make_shared<ALLOC_TYPE>(std::forward<TR>(tr)...);
-        }
-        
-        
-    protected:
-        std::set<RenderUnit<VTYPE>*> all_units;
-        std::set<RenderUnit<VTYPE>*> update_units;
+        v2i screen_size = {1, 1};
     };
     
 }

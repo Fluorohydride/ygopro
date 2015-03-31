@@ -87,77 +87,38 @@ namespace sgui
     
     // ===== Delegate Implement End =====
     
-    // == basic ui elements ==
-    struct UICommonStatus {
-        v2i screen_size;
-        bool need_update;
-    };
+    // == basic ui elements =
     
-    class UIBase {
-    public:
-        inline static v2f ConvScreenCoord(v2i pos) {
-            auto& status = CommonStatus();
-            return v2f{pos.x * 2.0f / status.screen_size.x - 1.0f, 1.0f - pos.y * 2.0f / status.screen_size.y};
-        }
-        
-        inline static void SetScreenSize(v2i sz) {
-            auto& status = CommonStatus();
-            if(sz == status.screen_size)
-                return;
-            status.screen_size = sz;
-            status.need_update = true;
-        }
-        
-        inline static void EndUpdate() { CommonStatus().need_update = false; }
-        inline static UICommonStatus& CommonStatus() { static UICommonStatus status; return status; }
-    };
-    
-    class UIComponent : public UIBase, public base::RenderUnit<base::v2ct> {
+    class UIComponent : public base::RenderUnit<base::v2ct> {
     public:
         virtual int32_t GetPrimitiveType() = 0;
         virtual int32_t GetTextureId() = 0;
         
         virtual void RefreshVertices() {}
         
-        virtual void PushVertices(base::RenderObject<base::v2ct>& render_obj) {
-            std::tie(vert_index, index_index) = render_obj.BeginPrimitive(GetPrimitiveType(), GetTextureId());
+        virtual void PushVertices() {
             Update();
-            render_obj.PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
+            std::tie(vert_index, index_index) = manager->BeginPrimitive(GetPrimitiveType(), GetTextureId());
+            manager->PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
         }
         
-        virtual void UpdateVertices(base::RenderObject<base::v2ct>& render_obj) {
+        virtual void UpdateVertices() {
             Update();
-            render_obj.UpdateVertices(&vertices[0], vert_index, vertices.size());
-            render_obj.Updateindices(&indices[0], index_index, indices.size());
+            manager->UpdateVertices(&vertices[0], vert_index, vertices.size());
+            manager->Updateindices(&indices[0], index_index, indices.size());
         }
         
         inline void Update() {
-            if(!(need_update || CommonStatus().need_update))
+            if(!need_update || !manager->AllUnitNeedUpdate())
                 return;
             RefreshVertices();
-            need_update = 0;
+            need_update = false;
         }
         
-        inline void SetPosition(v2i pos) {
-            if(pos == position)
-                return;
-            position = pos;
-            need_update = true;
-        }
-        
-        inline void SetSize(v2i sz) {
-            if(sz == size)
-                return;
-            size = sz;
-            need_update = true;
-        }
-        
-        inline void SetColor(uint32_t cl) {
-            if(color == cl)
-                return;
-            color = cl;
-            need_update = true;
-        }
+        inline v2f ConvScreenCoord(v2i pos) { return (static_cast<base::RenderObject2DLayout*>(manager))->ConvScreenCoord(pos);}
+        inline void SetPosition(v2i pos)    { if(pos == position) return; position = pos; SetUpdate(); }
+        inline void SetSize(v2i sz)         { if(sz == size) return; size = sz; SetUpdate(); }
+        inline void SetColor(uint32_t cl)   { if(color == cl) return; color = cl; SetUpdate(); }
         
     protected:
         v2i position;
@@ -176,12 +137,6 @@ namespace sgui
             FillQuad(&vertices[0], &indices[0]);
         }
         
-        inline void SetTexure(recti trct, base::Texture* tex) {
-            tex_rect = trct;
-            texture = tex;
-            need_update = true;
-        }
-        
         void FillQuad(base::v2ct* v, int16_t* idx) {
             static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
             v[0].vertex = ConvScreenCoord({position.x, position.y});
@@ -198,6 +153,8 @@ namespace sgui
                 v[i].color = color;
         }
         
+        inline void SetTexure(recti trct, base::Texture* tex) { tex_rect = trct; texture = tex; SetUpdate(); }
+        
     protected:
         recti tex_rect;
         base::Texture* texture = nullptr;
@@ -209,13 +166,6 @@ namespace sgui
             vertices.resize(20);
             indices.resize(60);
             FillQuad9(&vertices[0], &indices[0]);
-        }
-        
-        inline void SetFrameRect(recti frct, recti ftrct, recti brct) {
-            frame = frct;
-            frame_tex = ftrct;
-            back_tex = brct;
-            need_update = true;
         }
         
         void FillQuad9(base::v2ct* v, int16_t* idx) {
@@ -253,12 +203,14 @@ namespace sgui
                 v[i].color = color;
         }
         
+        inline void SetFrameRect(recti frct, recti ftrct, recti brct) {frame = frct; frame_tex = ftrct; back_tex = brct; SetUpdate();}
+        
     protected:
         recti frame;
         recti frame_tex;
         recti back_tex;
     };
-    
+
     class UITextBase : UIComponent {
     public:
         UITextBase(int32_t capacity) {
@@ -323,35 +275,12 @@ namespace sgui
             }
         }
         
-        inline void SetFont(base::Font* ft) {
-            if(!ft)
-                return;
-            text_font = ft;
-            need_update = true;
-        }
+        inline void SetFont(base::Font* ft) { if(!ft) return; text_font = ft; SetUpdate(); }
+        inline void SetMaxWidth(int32_t mw) { if(max_width == mw) return; max_width = mw; SetUpdate(); }
+        inline void SetCursorRect(recti sz, recti tex) { vertices.clear(); indices.clear(); SetUpdate(); }
+        inline void SetText(std::wstring& t, int32_t cl) { vertices.clear(); indices.clear(); AppendText(t, cl); }
         
-        inline void SetMaxWidth(int32_t mw) {
-            if(max_width == mw)
-                return;
-            max_width = mw;
-            need_update = true;
-        }
-        
-        
-        inline bool SetCursorRect(recti sz, recti tex) {
-            vertices.clear();
-            indices.clear();
-            need_update = true;
-        }
-        
-        inline bool SetText(std::wstring& t, int32_t cl) {
-            vertices.clear();
-            indices.clear();
-            need_update = true;
-            return AppendText(t, cl);
-        }
-        
-        inline bool AppendText(std::wstring& t, int32_t cl) {
+        void AppendText(std::wstring& t, int32_t cl) {
             int32_t app_size = 0;
             for(auto& ch : t) {
                 if(ch >= ' ')
@@ -368,15 +297,13 @@ namespace sgui
             texts.append(t);
             for(auto i = 0; i < app_size; ++i)
                 colors.push_back(cl);
-            need_update = true;
-            return redraw;
+            if(redraw)
+                SetRedraw();
+            else
+                SetUpdate();
         }
         
-        inline void Clear() {
-            vertices.clear();
-            indices.clear();
-            need_update = true;
-        }
+        inline void Clear() { vertices.clear(); indices.clear(); SetUpdate(); }
         
     protected:
         base::Font* text_font = nullptr;
