@@ -30,6 +30,7 @@ function c1764972.initial_effect(c)
 	e3:SetOperation(c1764972.spop2)
 	c:RegisterEffect(e3)
 end
+c1764972.Assault_Protocode=6021033
 function c1764972.filter1(c,e,tp)
 	return c:IsRace(RACE_ZOMBIE) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
