@@ -30,7 +30,7 @@ function c77336644.initial_effect(c)
 	e3:SetOperation(c77336644.spop)
 	c:RegisterEffect(e3)
 end
-c61257789.Assault_Protocode=70902743
+c61257789.assault_protocode=70902743
 function c77336644.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetAttacker()==e:GetHandler()
 end
