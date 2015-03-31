@@ -13,10 +13,11 @@ function c69176131.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c69176131.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.GetMatchingGroup(Card.CheckRemoveOverlayCard,tp,LOCATION_MZONE,LOCATION_MZONE,nil,tp,1,REASON_EFFECT)
-	local rg=nil
-	if sg:GetCount()==1 then rg=sg else
-		rg=sg:Select(tp,1,1,nil)
-		Duel.HintSelection(rg)
+	if sg:GetCount()==0 then return end
+	if sg:GetCount()>1 then
+		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(69176131,0))
+		sg=sg:Select(tp,1,1,nil)
+		Duel.HintSelection(sg)
 	end
-	rg:GetFirst():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
+	sg:GetFirst():RemoveOverlayCard(tp,1,1,REASON_EFFECT)
 end

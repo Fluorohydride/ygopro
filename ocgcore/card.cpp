@@ -302,7 +302,7 @@ uint32 card::get_type() {
 int32 card::get_base_attack(uint8 swap) {
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE)
 		return data.attack;
 	if (temp.base_attack != -1)
 		return temp.base_attack;
@@ -330,7 +330,7 @@ int32 card::get_attack(uint8 swap) {
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE)
 		return data.attack;
 	if (temp.attack != -1)
 		return temp.attack;
@@ -402,7 +402,7 @@ int32 card::get_attack(uint8 swap) {
 int32 card::get_base_defence(uint8 swap) {
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE)
 		return data.defence;
 	if (temp.base_defence != -1)
 		return temp.base_defence;
@@ -430,7 +430,7 @@ int32 card::get_defence(uint8 swap) {
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if (current.location != LOCATION_MZONE && !(get_type() & TYPE_MONSTER))
+	if (current.location != LOCATION_MZONE)
 		return data.defence;
 	if (temp.defence != -1)
 		return temp.defence;
@@ -505,7 +505,7 @@ uint32 card::get_level() {
 		return 0;
 	if(assume_type == ASSUME_LEVEL)
 		return assume_value;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_HAND)) && !(get_type() & TYPE_MONSTER))
+	if(!(current.location & LOCATION_MZONE) && !(data.type & TYPE_MONSTER))
 		return data.level;
 	if (temp.level != 0xffffffff)
 		return temp.level;
@@ -634,7 +634,7 @@ uint32 card::get_attribute() {
 		return assume_value;
 	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_MONSTER))
+	if(!(current.location & (LOCATION_MZONE)) && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_TRAPMONSTER))
 		return data.attribute;
 	if (temp.attribute != 0xffffffff)
 		return temp.attribute;
@@ -664,7 +664,7 @@ uint32 card::get_race() {
 		return assume_value;
 	if(current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
 		return 0;
-	if(!(current.location & (LOCATION_MZONE + LOCATION_GRAVE)) && !(get_type() & TYPE_MONSTER))
+	if(!(current.location & (LOCATION_MZONE)) && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_TRAPMONSTER))
 		return data.race;
 	if (temp.race != 0xffffffff)
 		return temp.race;
@@ -1576,7 +1576,8 @@ void card::filter_spsummon_procedure(uint8 playerid, effect_set* peset, uint32 s
 			topos = POS_FACEUP;
 			toplayer = playerid;
 		}
-		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect)) {
+		if(peffect->is_available() && peffect->check_count_limit(playerid) && is_summonable(peffect) 
+				&& !pduel->game_field->check_unique_onfield(this, toplayer)) {
 			uint32 sumtype = peffect->get_value(this);
 			if((!summon_type || summon_type == sumtype)
 			        && pduel->game_field->is_player_can_spsummon(peffect, sumtype, topos, playerid, toplayer, this))
@@ -1857,7 +1858,7 @@ int32 card::get_set_tribute_count() {
 	return min + (max << 16);
 }
 int32 card::is_can_be_flip_summoned(uint8 playerid) {
-	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
+	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
 		return FALSE;
@@ -1893,12 +1894,6 @@ int32 card::is_can_be_flip_summoned(uint8 playerid) {
 int32 card::is_special_summonable(uint8 playerid, uint32 summon_type) {
 	if(!(data.type & TYPE_MONSTER))
 		return FALSE;
-	if(pduel->game_field->check_unique_onfield(this, playerid))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_once(this, playerid))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_counter(playerid))
-		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
@@ -1929,19 +1924,17 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 	if(current.location == LOCATION_REMOVED && (current.position & POS_FACEDOWN))
 		return FALSE;
 	if(is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE)) {
-		if((!nolimit && (current.location & 0x38)) || (!nocheck && (current.location & 0x3)))
+		if((!nolimit && (current.location & 0x38)) || (!nocheck && !nolimit && (current.location & 0x3)))
 			return FALSE;
 	}
 	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_once(this, sumplayer))
-		return FALSE;
-	if(!pduel->game_field->check_spsummon_counter(sumplayer))
 		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
 	if((sumplayer == 0 || sumplayer == 1) && !pduel->game_field->is_player_can_spsummon(reason_effect, sumtype, sumpos, sumplayer, toplayer, this))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_SPECIAL_SUMMON))
+		return FALSE;
+	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;
 	pduel->game_field->save_lp_cost();
 	effect_set eset;
@@ -2311,7 +2304,7 @@ int32 card::is_capable_attack_announce(uint8 playerid) {
 	return TRUE;
 }
 int32 card::is_capable_change_position(uint8 playerid) {
-	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
+	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
 		return FALSE;

@@ -22,7 +22,7 @@ function c51124303.initial_effect(c)
 end
 function c51124303.spfilter(c,e,tp,mc)
 	return c:IsSetCard(0xb4) and bit.band(c:GetType(),0x81)==0x81 and (not c.mat_filter or c.mat_filter(mc))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false)
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true)
 end
 function c51124303.rfilter(c,mc)
 	local mlv=mc:GetRitualLevel(c)
@@ -83,7 +83,7 @@ function c51124303.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SendtoGrave(mat,REASON_EFFECT+REASON_MATERIAL+REASON_RITUAL)
 		end
 		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -101,7 +101,7 @@ function c51124303.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.BreakEffect()
 		tc=tg:GetFirst()
 		while tc do
-			Duel.SpecialSummonStep(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+			Duel.SpecialSummonStep(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 			tc:CompleteProcedure()
 			tc=tg:GetNext()
 		end
