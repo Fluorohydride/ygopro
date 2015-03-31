@@ -29,7 +29,7 @@ function c37169670.initial_effect(c)
 	e3:SetOperation(c37169670.spop)
 	c:RegisterEffect(e3)
 end
-c37169670.Assault_Protocode=95526884
+c37169670.assault_protocode=95526884
 function c37169670.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetAttackTarget()~=nil end
 	local c=e:GetHandler()
