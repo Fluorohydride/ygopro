@@ -44,6 +44,7 @@ function c61257789.initial_effect(c)
 	e4:SetOperation(c61257789.spop)
 	c:RegisterEffect(e4)
 end
+c61257789.Assault_Protocode=44508094
 function c61257789.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
 end
