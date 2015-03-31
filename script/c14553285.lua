@@ -46,7 +46,7 @@ function c14553285.initial_effect(c)
 	e5:SetOperation(c14553285.spop)
 	c:RegisterEffect(e5)
 end
-c14553285.Assault_Protocode=31924889
+c14553285.assault_protocode=31924889
 function c14553285.addct(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COUNTER,nil,2,0,0x3001)
