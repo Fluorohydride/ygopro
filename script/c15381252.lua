@@ -35,9 +35,11 @@ function c15381252.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc=g:GetFirst()
 		if tc:IsType(TYPE_MONSTER) then
 			Duel.DisableShuffleCheck()
-			Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
-			Duel.Damage(1-tp,500,REASON_EFFECT)
-			count=count-1
+			Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
+			if tc:IsLocation(LOCATION_GRAVE) then
+				Duel.Damage(1-tp,500,REASON_EFFECT)
+				count=count-1
+			else count=0 end
 		else
 			count=0
 		end

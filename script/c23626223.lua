@@ -44,7 +44,7 @@ function c23626223.activate(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 end
 function c23626223.tgfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_TRAP) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and bit.band(c:GetOriginalType(),TYPE_TRAP)~=0 and c:IsType(TYPE_MONSTER)
 end
 function c23626223.tgcon(e)
 	return Duel.IsExistingMatchingCard(c23626223.tgfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())

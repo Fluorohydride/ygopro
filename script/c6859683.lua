@@ -9,7 +9,7 @@ function c6859683.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c6859683.filter(c)
-	not c:IsType(TYPE_PENDULUM)
+	return c:IsFacedown() or not c:IsType(TYPE_PENDULUM)
 end
 function c6859683.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetFieldGroup(tp,0,LOCATION_EXTRA)
