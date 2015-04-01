@@ -54,6 +54,7 @@ function c58272005.operation(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetRange(LOCATION_SZONE)
 		e3:SetCode(EVENT_BATTLE_DESTROYING)
 		e3:SetCondition(c58272005.atcon)
+		e3:SetTarget(c58272005.attg)
 		e3:SetOperation(c58272005.atop)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e3)
@@ -67,6 +68,9 @@ function c58272005.atcon(e,tp,eg,ep,ev,re,r,rp)
 	if not eg:IsContains(ec) then return false end
 	local bc=ec:GetBattleTarget()
 	return bc:IsLocation(LOCATION_GRAVE) and bc:IsType(TYPE_MONSTER) and ec:IsChainAttackable(2,true) and ec:IsStatus(STATUS_OPPO_BATTLE)
+end
+function c58272005.attg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 end
 end
 function c58272005.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

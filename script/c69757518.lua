@@ -18,6 +18,7 @@ function c69757518.initial_effect(c)
 	e2:SetCode(EVENT_DAMAGE_STEP_END)
 	e2:SetCondition(c69757518.atcon)
 	e2:SetCost(c69757518.atcost)
+	e2:SetTarget(c69757518.attg)
 	e2:SetOperation(c69757518.atop)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -43,6 +44,9 @@ end
 function c69757518.atcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+end
+function c69757518.attg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>0 end
 end
 function c69757518.atop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
