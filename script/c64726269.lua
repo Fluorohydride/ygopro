@@ -27,7 +27,7 @@ function c64726269.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c64726269.tdfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToDeck()
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToDeck() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c64726269.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
