@@ -8,6 +8,7 @@ function c76224717.initial_effect(c)
 	--destroy/draw/salvage
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(76224717,0))
+	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_SZONE)
@@ -57,21 +58,16 @@ function c76224717.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local b2=c76224717[tp]>1 and Duel.IsPlayerCanDraw(tp,1)
 	local b3=c76224717[tp]>2 and Duel.IsExistingMatchingCard(c76224717.filter2,tp,LOCATION_GRAVE,0,1,nil)
 	if chk==0 then return b1 or b2 or b3 end
-	local cat=0
 	if b1 then
-		cat=cat+CATEGORY_DESTROY
 		local g=Duel.GetMatchingGroup(c76224717.filter1,tp,0,LOCATION_ONFIELD,nil)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end
 	if b2 then
-		cat=cat+CATEGORY_DRAW
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 	end
 	if b3 then
-		cat=cat+CATEGORY_TOHAND
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
 	end
-	e:SetCategory(cat)
 end
 function c76224717.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

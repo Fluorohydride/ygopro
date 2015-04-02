@@ -2505,7 +2505,8 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 				if (pcard->is_destructable() && pcard->is_affect_by_effect(pcard->current.reason_effect)) {
 					effect* indestructable_effect = pcard->check_indestructable_by_effect(pcard->current.reason_effect, reason_player);
 					if (indestructable_effect) {
-						indestructable_effect_set.insert(indestructable_effect);
+						if(reason_player != 5)
+							indestructable_effect_set.insert(indestructable_effect);
 						is_destructable = false;
 					}
 				} else
@@ -2527,7 +2528,8 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 					pduel->lua->add_param(pcard->current.reason_player, PARAM_TYPE_INT);
 					if(eset[i]->check_value_condition(3)) {
 						eset[i]->dec_count();
-						indestructable_effect_set.insert(eset[i]);
+						if(reason_player != 5)
+							indestructable_effect_set.insert(eset[i]);
 						is_destructable = false;
 						break;
 					}

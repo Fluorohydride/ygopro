@@ -685,14 +685,14 @@ function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
 								sg1:Sub(sg2)
 							end
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-							local g1=sg1:Select(tp,1,1,nil)
+							local g1=sg1:Select(tp,1,1,gc)
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 							local g2=sg2:Select(tp,cc-1,cc-1,g1:GetFirst())
 							g1:Merge(g2)
 							Duel.SetFusionMaterial(g1)
 						else
 							Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-							local g1=sg1:Select(tp,1,1,nil)
+							local g1=sg1:Select(tp,1,1,gc)
 							Duel.SetFusionMaterial(g1)
 						end
 					end

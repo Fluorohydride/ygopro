@@ -21,12 +21,15 @@ function c45458027.initial_effect(c)
 	e2:SetOperation(c45458027.operation)
 	c:RegisterEffect(e2)
 end
+function c45458027.cfilter(c)
+	return c:GetRace()~=RACE_MACHINE
+end
 function c45458027.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return false end
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
-	return g:GetCount()>0 and not g:IsExists(Card.IsRace,1,nil,0xffffff-RACE_MACHINE)
+	return g:GetCount()>0 and not g:IsExists(c45458027.cfilter,1,nil)
 end
 function c45458027.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsFaceup() and chkc:IsLocation(LOCATION_MZONE) end
