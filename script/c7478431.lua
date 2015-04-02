@@ -18,10 +18,13 @@ function c7478431.discon(e,tp,eg,ep,ev,re,r,rp)
 	return ep~=tp and re:IsActiveType(TYPE_MONSTER)
 		and Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)~=LOCATION_DECK and Duel.IsChainNegatable(ev)
 end
+function c7478431.cfilter(c)
+	return c:IsSetCard(0x2a) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function c7478431.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:IsReleasable() and Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,c,0x2a) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,c,0x2a)
+	if chk==0 then return c:IsReleasable() and not c:IsStatus(STATUS_BATTLE_DESTROYED) and Duel.CheckReleaseGroup(tp,c7478431.cfilter,1,c) end
+	local g=Duel.SelectReleaseGroup(tp,c7478431.cfilter,1,1,c)
 	g:AddCard(c)
 	Duel.Release(g,REASON_COST)
 end
