@@ -645,8 +645,9 @@ function Auxiliary.FConditionCodeFun(code,f,cc,sub,insf)
 						end
 						if cc>1 then
 							g2:RemoveCard(gc)
-							return g1:IsExists(Auxiliary.FConditionFilterCF,1,nil,g2,cc-1)
+							return g1:IsExists(Auxiliary.FConditionFilterCF,1,gc,g2,cc-1)
 						else
+							g1:RemoveCard(gc)
 							return g1:GetCount()>0
 						end
 					else return false end
