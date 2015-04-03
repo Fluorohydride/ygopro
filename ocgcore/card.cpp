@@ -325,7 +325,7 @@ int32 card::get_base_attack(uint8 swap) {
 	temp.base_attack = -1;
 	return batk;
 }
-int32 card::get_attack(uint8 swap) {
+int32 card::get_attack() {
 	if(assume_type == ASSUME_ATTACK)
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
@@ -334,69 +334,8 @@ int32 card::get_attack(uint8 swap) {
 		return data.attack;
 	if (temp.attack != -1)
 		return temp.attack;
-	if(!swap && is_affected_by_effect(EFFECT_SWAP_AD))
-		return get_defence(TRUE);
-	uint32 base = get_base_attack();
-	temp.base_attack = base;
-	temp.attack = base;
-	int32 up = 0, upc = 0, final = -1, atk, rev = FALSE;
-	effect_set eset;
-	effect_set effects;
-	filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
-	filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
-	filter_effect(EFFECT_SET_ATTACK_FINAL, &eset);
-	if (is_affected_by_effect(EFFECT_REVERSE_UPDATE))
-		rev = TRUE;
-	for (int32 i = 0; i < eset.size(); ++i) {
-		switch (eset[i]->code) {
-		case EFFECT_UPDATE_ATTACK:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
-				for (int32 j = 0; j < effects.size(); ++j) {
-					if (effects[j]->flag & EFFECT_FLAG_REPEAT) {
-						base = effects[j]->get_value(this);
-						up = 0;
-						upc = 0;
-						temp.attack = base;
-					}
-				}
-				up += eset[i]->get_value(this);
-			} else
-				upc += eset[i]->get_value(this);
-			break;
-		case EFFECT_SET_ATTACK:
-			base = eset[i]->get_value(this);
-			if (!(eset[i]->type & EFFECT_TYPE_SINGLE))
-				up = 0;
-			break;
-		case EFFECT_SET_ATTACK_FINAL:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
-				base = eset[i]->get_value(this);
-				up = 0;
-				upc = 0;
-			} else
-				effects.add_item(eset[i]);
-			break;
-		}
-		if (!rev)
-			temp.attack = base + up + upc;
-		else
-			temp.attack = base - up - upc;
-	}
-	for (int32 i = 0; i < effects.size(); ++i) {
-		final = effects[i]->get_value(this);
-		temp.attack = final;
-	}
-	if (final == -1) {
-		if (!rev)
-			atk = base + up + upc;
-		else
-			atk = base - up - upc;
-	} else
-		atk = final;
-	if (atk < 0)
-		atk = 0;
-	temp.base_attack = -1;
-	temp.attack = -1;
+	int32 atk;
+	calc_attack_defence(&atk, 0);
 	return atk;
 }
 int32 card::get_base_defence(uint8 swap) {
@@ -425,7 +364,7 @@ int32 card::get_base_defence(uint8 swap) {
 	temp.base_defence = -1;
 	return bdef;
 }
-int32 card::get_defence(uint8 swap) {
+int32 card::get_defence() {
 	if(assume_type == ASSUME_DEFENCE)
 		return assume_value;
 	if (current.location != LOCATION_MZONE && !(data.type & TYPE_MONSTER) && !(get_type() & TYPE_MONSTER))
@@ -434,70 +373,140 @@ int32 card::get_defence(uint8 swap) {
 		return data.defence;
 	if (temp.defence != -1)
 		return temp.defence;
-	if(!swap && is_affected_by_effect(EFFECT_SWAP_AD))
-		return get_attack(TRUE);
-	uint32 base = get_base_defence();
-	temp.base_defence = base;
-	temp.defence = base;
-	int32 up = 0, upc = 0, final = -1, def, rev = FALSE;
+	int32 def;
+	calc_attack_defence(0, &def);
+	return def;
+}
+void card::calc_attack_defence(int32 *patk, int32 *pdef) {
+	uint32 base_atk = get_base_attack();
+	temp.base_attack = base_atk;
+	temp.attack = base_atk;
+	uint32 base_def = get_base_defence();
+	temp.base_defence = base_def;
+	temp.defence = base_def;
+	int32 up_atk = 0, upc_atk = 0, final_atk = -1, atk;
+	int32 up_def = 0, upc_def = 0, final_def = -1, def;
 	effect_set eset;
-	effect_set effects;
+	filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
+	filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
+	filter_effect(EFFECT_SET_ATTACK_FINAL, &eset, FALSE);
 	filter_effect(EFFECT_UPDATE_DEFENCE, &eset, FALSE);
 	filter_effect(EFFECT_SET_DEFENCE, &eset, FALSE);
-	filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset);
+	filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset, FALSE);
+	filter_effect(EFFECT_SWAP_AD, &eset);
+	int32 rev = FALSE;
 	if (is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		rev = TRUE;
+	effect_set effects_atk, effects_def;
 	for (int32 i = 0; i < eset.size(); ++i) {
 		switch (eset[i]->code) {
-		case EFFECT_UPDATE_DEFENCE:
+		case EFFECT_UPDATE_ATTACK:
 			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
-				for (int32 j = 0; j < effects.size(); ++j) {
-					if (effects[j]->flag & EFFECT_FLAG_REPEAT) {
-						base = effects[j]->get_value(this);
-						up = 0;
-						upc = 0;
-						temp.defence = base;
+				for (int32 j = 0; j < effects_atk.size(); ++j) {
+					if (effects_atk[j]->flag & EFFECT_FLAG_REPEAT) {
+						base_atk = effects_atk[j]->get_value(this);
+						up_atk = 0;
+						upc_atk = 0;
+						temp.attack = base_atk;
 					}
 				}
-				up += eset[i]->get_value(this);
+				up_atk += eset[i]->get_value(this);
 			} else
-				upc += eset[i]->get_value(this);
+				upc_atk += eset[i]->get_value(this);
+			break;
+		case EFFECT_SET_ATTACK:
+			base_atk = eset[i]->get_value(this);
+			if (!(eset[i]->type & EFFECT_TYPE_SINGLE))
+				up_atk = 0;
+			break;
+		case EFFECT_SET_ATTACK_FINAL:
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+				base_atk = eset[i]->get_value(this);
+				up_atk = 0;
+				upc_atk = 0;
+			} else
+				effects_atk.add_item(eset[i]);
+			break;
+		case EFFECT_UPDATE_DEFENCE:
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+				for (int32 j = 0; j < effects_def.size(); ++j) {
+					if (effects_def[j]->flag & EFFECT_FLAG_REPEAT) {
+						base_def = effects_def[j]->get_value(this);
+						up_def = 0;
+						upc_def = 0;
+						temp.attack = base_def;
+					}
+				}
+				up_def += eset[i]->get_value(this);
+			} else
+				upc_def += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_DEFENCE:
-			base = eset[i]->get_value(this);
+			base_def = eset[i]->get_value(this);
 			if (!(eset[i]->type & EFFECT_TYPE_SINGLE))
-				up = 0;
+				up_def = 0;
 			break;
 		case EFFECT_SET_DEFENCE_FINAL:
 			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
-				base = eset[i]->get_value(this);
-				up = 0;
-				upc = 0;
+				base_def = eset[i]->get_value(this);
+				up_def = 0;
+				upc_def = 0;
 			} else
-				effects.add_item(eset[i]);
+				effects_def.add_item(eset[i]);
+			break;
+		case EFFECT_SWAP_AD:
+			int32 a = base_atk + up_atk + upc_atk;
+			int32 d = base_def + up_def + upc_def;
+			base_atk = d;
+			up_atk = 0;
+			upc_atk = 0;
+			base_def = a;
+			up_def = 0;
+			upc_def = 0;
 			break;
 		}
-		if (!rev)
-			temp.defence = base + up + upc;
-		else
-			temp.defence = base - up - upc;
+		if (!rev) {
+			temp.attack = base_atk + up_atk + upc_atk;
+			temp.defence = base_def + up_def + upc_def;
+		} else {
+			temp.attack = base_atk - up_atk - upc_atk;
+			temp.defence = base_def - up_def - upc_def;
+		}
 	}
-	for (int32 i = 0; i < effects.size(); ++i) {
-		final = effects[i]->get_value(this);
-		temp.defence = final;
+	for (int32 i = 0; i < effects_atk.size(); ++i) {
+		final_atk = effects_atk[i]->get_value(this);
+		temp.attack = final_atk;
 	}
-	if (final == -1) {
+	for (int32 i = 0; i < effects_def.size(); ++i) {
+		final_def = effects_def[i]->get_value(this);
+		temp.defence = final_def;
+	}
+	if (final_atk == -1) {
 		if (!rev)
-			def = base + up + upc;
+			atk = base_atk + up_atk + upc_atk;
 		else
-			def = base - up - upc;
+			atk = base_atk - up_atk - upc_atk;
 	} else
-		def = final;
+		atk = final_atk;
+	if (final_def == -1) {
+		if (!rev)
+			def = base_def + up_def + upc_def;
+		else
+			def = base_def - up_def - upc_def;
+	} else
+		def = final_def;
+	if (atk < 0)
+		atk = 0;
 	if (def < 0)
 		def = 0;
+	temp.base_attack = -1;
+	temp.attack = -1;
 	temp.base_defence = -1;
 	temp.defence = -1;
-	return def;
+	if (patk)
+		*patk = atk;
+	if (pdef)
+		*pdef = def;
 }
 uint32 card::get_level() {
 	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) 
