@@ -21,7 +21,7 @@ function c5288597.cfilter(c,e,tp)
 	local rc=nil
 	if Duel.IsEnvironment(4064256) then rc=RACE_ZOMBIE
 	else rc=c:GetOriginalRace() end
-	return lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
+	return bit.band(c:GetOriginalType(),TYPE_MONSTER)~=0 and lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(c5288597.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,rc,c:GetOriginalAttribute(),e,tp)
 end
 function c5288597.spfilter(c,lv,rc,att,e,tp)
