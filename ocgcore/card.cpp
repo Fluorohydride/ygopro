@@ -434,7 +434,7 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 						base_def = effects_def[j]->get_value(this);
 						up_def = 0;
 						upc_def = 0;
-						temp.attack = base_def;
+						temp.defence = base_def;
 					}
 				}
 				up_def += eset[i]->get_value(this);
