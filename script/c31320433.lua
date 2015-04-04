@@ -33,13 +33,14 @@ function c31320433.mattg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c31320433.matop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	local g=Duel.SelectMatchingCard(tp,c31320433.matfilter,tp,LOCATION_HAND+LOCATION_MZONE,0,1,1,nil)
 	if g:GetCount()>=0 then
 		Duel.Overlay(e:GetHandler(),g)
 	end
 end
 function c31320433.dacon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 and Duel.GetTurnCount()~=1
+	return Duel.IsAbleToEnterBP()
 end
 function c31320433.dacost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

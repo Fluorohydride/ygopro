@@ -11,8 +11,7 @@ function c19394153.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c19394153.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
+	return Duel.IsAbleToEnterBP()
 end
 function c19394153.filter(c)
 	return c:IsFaceup() and c:IsCode(21844576)
