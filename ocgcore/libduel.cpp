@@ -1170,6 +1170,7 @@ int32 scriptlib::duel_calculate_damage(lua_State *L) {
 	int32 skip_timing = lua_toboolean(L, 3);
 	if(attacker == attack_target)
 		return 0;
+	attacker->attacked_count++;
 	attacker->pduel->game_field->add_process(PROCESSOR_DAMAGE_STEP, 0, (effect*)attacker, (group*)attack_target, 0, skip_timing);
 	return lua_yield(L, 0);
 }
