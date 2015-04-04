@@ -379,21 +379,27 @@ int32 card::get_defence() {
 }
 void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 	uint32 base_atk = get_base_attack();
+	uint32 base_def = get_base_defence();
 	temp.base_attack = base_atk;
 	temp.attack = base_atk;
-	uint32 base_def = get_base_defence();
 	temp.base_defence = base_def;
 	temp.defence = base_def;
-	int32 up_atk = 0, upc_atk = 0, final_atk = -1, atk;
-	int32 up_def = 0, upc_def = 0, final_def = -1, def;
+	int32 up_atk = 0, upc_atk = 0;
+	int32 up_def = 0, upc_def = 0;
 	effect_set eset;
-	filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
-	filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
-	filter_effect(EFFECT_SET_ATTACK_FINAL, &eset, FALSE);
-	filter_effect(EFFECT_UPDATE_DEFENCE, &eset, FALSE);
-	filter_effect(EFFECT_SET_DEFENCE, &eset, FALSE);
-	filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset, FALSE);
-	filter_effect(EFFECT_SWAP_AD, &eset);
+	filter_effect(EFFECT_SWAP_AD, &eset, FALSE);
+	int32 swap = eset.size();
+	if(swap || patk) {
+		filter_effect(EFFECT_UPDATE_ATTACK, &eset, FALSE);
+		filter_effect(EFFECT_SET_ATTACK, &eset, FALSE);
+		filter_effect(EFFECT_SET_ATTACK_FINAL, &eset, FALSE);
+	}
+	if(swap || pdef) {
+		filter_effect(EFFECT_UPDATE_DEFENCE, &eset, FALSE);
+		filter_effect(EFFECT_SET_DEFENCE, &eset, FALSE);
+		filter_effect(EFFECT_SET_DEFENCE_FINAL, &eset, FALSE);
+	}
+	eset.sort();
 	int32 rev = FALSE;
 	if (is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		rev = TRUE;
@@ -473,40 +479,44 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 			temp.defence = base_def - up_def - upc_def;
 		}
 	}
-	for (int32 i = 0; i < effects_atk.size(); ++i) {
-		final_atk = effects_atk[i]->get_value(this);
-		temp.attack = final_atk;
+	if (patk) {
+		int32 final = -1, atk;
+		for (int32 i = 0; i < effects_atk.size(); ++i) {
+			final = effects_atk[i]->get_value(this);
+			temp.attack = final;
+		}
+		if (final == -1) {
+			if (!rev)
+				atk = base_atk + up_atk + upc_atk;
+			else
+				atk = base_atk - up_atk - upc_atk;
+		} else
+			atk = final;
+		if (atk < 0)
+			atk = 0;
+		*patk = atk;
 	}
-	for (int32 i = 0; i < effects_def.size(); ++i) {
-		final_def = effects_def[i]->get_value(this);
-		temp.defence = final_def;
+	if (pdef) {
+		int32 final = -1, def;
+		for (int32 i = 0; i < effects_def.size(); ++i) {
+			final = effects_def[i]->get_value(this);
+			temp.defence = final;
+		}
+		if (final == -1) {
+			if (!rev)
+				def = base_def + up_def + upc_def;
+			else
+				def = base_def - up_def - upc_def;
+		} else
+			def = final;
+		if (def < 0)
+			def = 0;
+		*pdef = def;
 	}
-	if (final_atk == -1) {
-		if (!rev)
-			atk = base_atk + up_atk + upc_atk;
-		else
-			atk = base_atk - up_atk - upc_atk;
-	} else
-		atk = final_atk;
-	if (final_def == -1) {
-		if (!rev)
-			def = base_def + up_def + upc_def;
-		else
-			def = base_def - up_def - upc_def;
-	} else
-		def = final_def;
-	if (atk < 0)
-		atk = 0;
-	if (def < 0)
-		def = 0;
 	temp.base_attack = -1;
 	temp.attack = -1;
 	temp.base_defence = -1;
 	temp.defence = -1;
-	if (patk)
-		*patk = atk;
-	if (pdef)
-		*pdef = def;
 }
 uint32 card::get_level() {
 	if((data.type & TYPE_XYZ) || (status & STATUS_NO_LEVEL) 
