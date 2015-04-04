@@ -39,7 +39,7 @@ function c46195773.atkop(e,tp,eg,ep,ev,re,r,rp)
 	if d:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(d:GetAttack()/2)
 		e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 		d:RegisterEffect(e1)
