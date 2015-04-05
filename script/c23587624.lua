@@ -36,6 +36,7 @@ function c23587624.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_IMMUNE_EFFECT)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c23587624.efilter)
+		e1:SetOwnerPlayer(tp)
 		tc:RegisterEffect(e1,true)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -72,7 +73,7 @@ function c23587624.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e4,tp)
 end
 function c23587624.efilter(e,re)
-	return e:GetHandlerPlayer()==re:GetHandlerPlayer() and e:GetHandler()~=re:GetHandler()
+	return e:GetOwnerPlayer()==re:GetHandlerPlayer() and e:GetHandler()~=re:GetHandler()
 end
 function c23587624.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
