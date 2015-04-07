@@ -18,8 +18,10 @@ function c32271987.filter(c)
 	return c:IsType(TYPE_DUAL) and c:IsAbleToGrave()
 end
 function c32271987.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1)
-		and Duel.IsExistingMatchingCard(c32271987.filter,tp,LOCATION_DECK,0,1,nil) end
+	if chk==0 then
+		local ct=Duel.GetMatchingGroupCount(c32271987.filter,tp,LOCATION_DECK,0,nil)
+		if ct==1 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==1 then return false end
+		return Duel.IsPlayerCanDraw(tp,1) and ct>=1 end
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,1,tp,LOCATION_DECK)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
 end
