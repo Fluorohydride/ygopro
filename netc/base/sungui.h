@@ -126,6 +126,50 @@ namespace sgui
         uint32_t color;
     };
     
+    class UIPrimitiveList : public UIComponent {
+    public:
+        virtual int32_t GetTextureId() { return texture->GetTextureId(); }
+        
+        inline void SetPoints(std::vector<v2i> pts) { points = std::move(pts); SetUpdate(); }
+        inline void SetTexure(std::vector<v2i> tps, base::Texture* tex) { tex_points = std::move(tps); texture = tex; SetUpdate(); }
+        
+    protected:
+        std::vector<v2i> points;
+        std::vector<v2i> tex_points;
+        base::Texture* texture = nullptr;
+    };
+    
+    class UIRegion : public UIPrimitiveList {
+    public:
+        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
+        
+        virtual void RefreshVertices() {
+            if(points.size() < 3) {
+                vertices.clear();
+                indices.clear();
+            } else {
+                vertices.resize(points.size());
+                indices.resize(points.size() * 3 - 6);
+                FillRegion(&vertices[0], &indices[0]);
+            }
+        }
+        
+        void FillRegion(base::v2ct* v, int16_t* idx) {
+            int32_t vsize = points.size();
+            for(int32_t i = 0; i < vsize; ++i) {
+                v[i].vertex = ConvScreenCoord(points[i]);
+                v[i].texcoord = texture->ConvTexCoord(tex_points[i]);
+                v[i].color = color;
+            }
+            for(size_t i = 0; i < vsize - 2; ++i) {
+                idx[i * 3] = 0;
+                idx[i * 3 + 1] = i + 2;
+                idx[i * 3 + 2] = i + 1;
+            }
+        }
+
+    };
+    
     class UISprite : public UIComponent {
     public:
         virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
@@ -210,7 +254,7 @@ namespace sgui
         recti frame_tex;
         recti back_tex;
     };
-
+    
     class UITextBase : UIComponent {
     public:
         UITextBase(int32_t capacity) {
@@ -248,7 +292,10 @@ namespace sgui
                 auto final_offset = position + advance + offset;
                 if(cursor_pos >= 0 && !cursor_pass && i >= cursor_pos) {
                     cursor_pass = true;
-                    vertices[0].vertex = ConvScreenCoord(v2i{gl.bounds.left, -text_font->GetFontSize()} + final_offset);
+                    vertices[0].vertex = ConvScreenCoord(v2i{gl.bounds.left, -cursor_sz.y} + final_offset);
+                    vertices[1].vertex = ConvScreenCoord(v2i{gl.bounds.left + cursor_sz.x, -cursor_sz.y} + final_offset);
+                    vertices[2].vertex = ConvScreenCoord(v2i{gl.bounds.left, 0} + final_offset);
+                    vertices[3].vertex = ConvScreenCoord(v2i{gl.bounds.left + cursor_sz.x, 0} + final_offset);
                 }
                 auto v = &vertices[actual_size * 4 + 4];
                 auto idx = &indices[actual_size * 6 + 6];
@@ -277,7 +324,7 @@ namespace sgui
         
         inline void SetFont(base::Font* ft) { if(!ft) return; text_font = ft; SetUpdate(); }
         inline void SetMaxWidth(int32_t mw) { if(max_width == mw) return; max_width = mw; SetUpdate(); }
-        inline void SetCursorRect(recti sz, recti tex) { vertices.clear(); indices.clear(); SetUpdate(); }
+        inline void SetCursorRect(v2i sz, recti tex) { cursor_sz = sz; cursor_tex = tex; SetUpdate(); }
         inline void SetText(std::wstring& t, int32_t cl) { vertices.clear(); indices.clear(); AppendText(t, cl); }
         
         void AppendText(std::wstring& t, int32_t cl) {
@@ -314,9 +361,23 @@ namespace sgui
         uint32_t back_color = 0x40404040;
         v2i advance = {0, 0};
         v2i offset = {0, 0};
+        v2i cursor_sz = {0, 0};
+        recti cursor_tex;
         
         std::wstring texts;
         std::vector<uint32_t> colors;
+    };
+    
+    //
+
+    //
+    
+    class Widget {
+        
+    };
+    
+    class WidgetContainer : public Widget {
+        
     };
     
     // ===== GUI Components =====
