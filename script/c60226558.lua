@@ -88,7 +88,7 @@ function c60226558.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local ec=c:GetEquipTarget()
-	if ec:IsControler(1-tp) then return end
+	if ec:IsControler(1-tp) or ec:IsImmuneToEffect(e) then return end
 	local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
 	local mg1=Duel.GetMatchingGroup(c60226558.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,ec,e)
 	local sg1=Duel.GetMatchingGroup(c60226558.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,ec,nil,chkf)
