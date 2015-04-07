@@ -1,4 +1,4 @@
---Escalation of the Monarchs
+--連撃の帝王
 function c18235309.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -24,8 +24,7 @@ function c18235309.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c18235309.filter(c)
-	local mi,ma=c:GetTributeRequirement()
-	return c:IsSummonable(true,nil) and mi>0
+	return c:IsSummonable(true,nil,1) or c:IsMSetable(true,nil,1)
 end
 function c18235309.cost1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
@@ -42,6 +41,7 @@ function c18235309.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	if e:GetLabel()~=1 then return end
 	e:GetHandler():RegisterFlagEffect(18235309,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(18235309,2))
 	Duel.SetOperationInfo(0,CATEGORY_SUMMON,nil,1,0,0)
 end
 function c18235309.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -51,7 +51,13 @@ function c18235309.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c18235309.filter,tp,LOCATION_HAND,0,1,1,nil)
 	local tc=g:GetFirst()
 	if tc then
-		Duel.Summon(tp,tc,true,nil)
+		local s1=tc:IsSummonable(true,nil,1)
+		local s2=tc:IsMSetable(true,nil,1)
+		if (s1 and s2 and Duel.SelectPosition(tp,tc,POS_FACEUP_ATTACK+POS_FACEDOWN_DEFENCE)==POS_FACEUP_ATTACK) or not s2 then
+			Duel.Summon(tp,tc,true,nil,1)
+		else
+			Duel.MSet(tp,tc,true,nil,1)
+		end
 	end
 end
 function c18235309.condition2(e,tp,eg,ep,ev,re,r,rp)

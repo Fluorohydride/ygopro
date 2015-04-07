@@ -1,4 +1,4 @@
---おジャマ·ブルー
+--おジャマ・ブルー
 function c64627453.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

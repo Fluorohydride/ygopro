@@ -55,7 +55,7 @@ function c13032689.atkval(e,c)
 	return c:GetRank()*200
 end
 function c13032689.rcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_COST)~=0 and re:GetHandler():IsType(TYPE_XYZ)
+	return bit.band(r,REASON_COST)~=0 and re:IsHasType(0x7e0) and re:IsActiveType(TYPE_XYZ)
 		and ep==e:GetOwnerPlayer() and e:GetHandler():GetEquipTarget()==re:GetHandler() and re:GetHandler():GetOverlayCount()>=ev-1
 end
 function c13032689.rop(e,tp,eg,ep,ev,re,r,rp)

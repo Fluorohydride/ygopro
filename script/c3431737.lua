@@ -1,4 +1,4 @@
---バスター·ビースト
+--バスター・ビースト
 function c3431737.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

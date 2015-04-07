@@ -1,7 +1,7 @@
 --幻想の黒魔導師
 function c96471335.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),2,c96471335.ovfilter,aux.Stringid(96471335,0))
+	aux.AddXyzProcedure(c,nil,7,2,c96471335.ovfilter,aux.Stringid(96471335,0))
 	c:EnableReviveLimit()
 	--spsummon
 	local e1=Effect.CreateEffect(c)

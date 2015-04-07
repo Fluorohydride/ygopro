@@ -1,4 +1,4 @@
---ライトロード·サモナー ルミナス
+--ライトロード・サモナー ルミナス
 function c95503687.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

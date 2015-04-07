@@ -54,15 +54,12 @@ function c25343017.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_HAND,0,1,nil) end
 	Duel.DiscardHand(tp,Card.IsAbleToGraveAsCost,1,1,REASON_COST)
 end
-function c25343017.cfilter(c,e,tp)
-	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemove() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function c25343017.filter(c)
 	return c:IsRace(RACE_PSYCHO) and c:IsAbleToRemove()
 end
 function c25343017.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c25343017.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c25343017.cfilter,tp,LOCATION_GRAVE,0,1,nil,e,PLAYER_NONE) end
+	if chk==0 then return Duel.IsExistingTarget(c25343017.filter,tp,LOCATION_GRAVE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c25343017.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,1,0,0)

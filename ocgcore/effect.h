@@ -59,7 +59,7 @@ public:
 	int32 value;
 	int32 operation;
 
-	effect();
+	explicit effect(duel* pd);
 	~effect();
 
 	int32 is_disable_related();
@@ -85,6 +85,7 @@ public:
 	int32 get_speed();
 	uint8 get_owner_player();
 	uint8 get_handler_player();
+	int32 in_range(int32 loc, int32 seq);
 };
 
 //status
@@ -290,6 +291,7 @@ public:
 #define EFFECT_CHANGE_RSCALE			137 //
 #define EFFECT_SET_POSITION				140 //
 #define EFFECT_SELF_DESTROY				141 //
+#define EFFECT_SELF_TOGRAVE				142
 #define EFFECT_DOUBLE_TRIBUTE			150
 #define EFFECT_DECREASE_TRIBUTE			151
 #define EFFECT_DECREASE_TRIBUTE_SET		152
@@ -343,7 +345,6 @@ public:
 #define EFFECT_NONTUNER						244
 #define EFFECT_OVERLAY_REMOVE_REPLACE		245
 #define EFFECT_SCRAP_CHIMERA				246
-#define EFFECT_XMAT_COUNT_LIMIT				247
 #define EFFECT_SPSUM_EFFECT_ACTIVATED	250
 #define EFFECT_MATERIAL_CHECK			251
 #define EFFECT_DISABLE_FIELD			260
@@ -367,7 +368,12 @@ public:
 #define EFFECT_SYNCHRO_CHECK			310
 #define EFFECT_QP_ACT_IN_NTPHAND		311
 #define EFFECT_MUST_BE_SMATERIAL		312
+#define EFFECT_TO_GRAVE_REDIRECT_CB		313
+#define EFFECT_CHANGE_LEVEL_FINAL		314
+#define EFFECT_CHANGE_RANK_FINAL		315
 #define EFFECT_SPSUMMON_PROC_G			320
+#define EFFECT_SPSUMMON_COUNT_LIMIT		330
+#define EFFECT_LEFT_SPSUMMON_COUNT		331
 
 #define EVENT_STARTUP		1000
 #define EVENT_FLIP			1001
@@ -430,8 +436,6 @@ public:
 #define EVENT_LEVEL_UP				1200
 #define EVENT_PAY_LPCOST			1201
 #define EVENT_DETACH_MATERIAL		1202
-#define EVENT_CONFIRM_DECKTOP		1203
-#define EVENT_CONFIRM_CARDS			1204
 #define EVENT_TURN_END				1210
 #define EVENT_PHASE					0x1000
 #define EVENT_PHASE_START			0x2000

@@ -1,4 +1,4 @@
---ヘル·ブラスト
+--ヘル・ブラスト
 function c18271561.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

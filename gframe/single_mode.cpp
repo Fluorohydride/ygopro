@@ -161,7 +161,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 11 + 2;
+			pbuf += count * 11 + 3;
 			SinglePlayRefresh();
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
@@ -213,7 +213,7 @@ bool SingleMode::SinglePlayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += 10 + count * 11;
+			pbuf += 10 + count * 12;
 			if(!DuelClient::ClientAnalyze(offset, pbuf - offset)) {
 				mainGame->singleSignal.Reset();
 				mainGame->singleSignal.Wait();
@@ -747,7 +747,7 @@ void SingleMode::SinglePlayRefreshSingle(int player, int location, int sequence,
 }
 void SingleMode::SinglePlayReload() {
 	unsigned char queryBuffer[0x1000];
-	unsigned int flag = 0x1fdfff;
+	unsigned int flag = 0x7fdfff;
 	/*int len = */query_field_card(pduel, 0, LOCATION_MZONE, flag, queryBuffer, 0);
 	mainGame->dField.UpdateFieldCard(mainGame->LocalPlayer(0), LOCATION_MZONE, (char*)queryBuffer);
 	/*len = */query_field_card(pduel, 1, LOCATION_MZONE, flag, queryBuffer, 0);

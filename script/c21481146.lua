@@ -1,4 +1,4 @@
---閃光のバリア－シャイニング·フォース－
+--閃光のバリア－シャイニング・フォース－
 function c21481146.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

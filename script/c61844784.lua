@@ -1,4 +1,4 @@
---マジック·ガードナー
+--マジック・ガードナー
 function c61844784.initial_effect(c)
 	--destroy rep
 	local e1=Effect.CreateEffect(c)

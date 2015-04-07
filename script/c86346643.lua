@@ -1,4 +1,4 @@
---レインボー·ネオス
+--レインボー・ネオス
 function c86346643.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

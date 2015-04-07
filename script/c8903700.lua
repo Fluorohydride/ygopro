@@ -29,7 +29,7 @@ function c8903700.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetAbsoluteRange(rp,0,1)
-		rc:RegisterEffect(e1)
+		rc:RegisterEffect(e1,true)
 		rc:RegisterFlagEffect(8903700,RESET_EVENT+0x1fe0000,0,1)
 	end
 end

@@ -46,7 +46,7 @@ function c85668449.lrcon(e,tp,eg,ep,ev,re,r,rp)
 	if lp<=ev then return false end
 	if not re then return false end
 	local rc=re:GetHandler()
-	return rc:IsRace(RACE_PSYCHO)
+	return rc:IsLocation(LOCATION_MZONE) and rc:IsRace(RACE_PSYCHO)
 end
 function c85668449.lrop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():AddCounter(0x3004,1)

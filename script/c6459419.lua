@@ -13,7 +13,7 @@ function c6459419.dfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x4) and c:IsDestructable()
 end
 function c6459419.spfilter(c,e,tp)
-	return c:IsLevelBelow(4) and c:IsSetCard(0x4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsLevelBelow(4) and c:IsSetCard(0x4) and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c6459419.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c6459419.dfilter,tp,LOCATION_MZONE,0,1,nil) end

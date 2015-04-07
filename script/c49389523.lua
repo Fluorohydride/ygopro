@@ -1,4 +1,4 @@
---ライトニング·トライコーン
+--ライトニング・トライコーン
 function c49389523.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_BEAST),1)

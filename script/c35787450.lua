@@ -1,4 +1,4 @@
---エターナル·ドレッド
+--エターナル・ドレッド
 function c35787450.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

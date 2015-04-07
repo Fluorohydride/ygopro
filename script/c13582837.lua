@@ -1,4 +1,4 @@
---インフェルニティ·リローダー
+--インフェルニティ・リローダー
 function c13582837.initial_effect(c)
 	--draw
 	local e1=Effect.CreateEffect(c)

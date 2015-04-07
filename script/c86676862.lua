@@ -1,4 +1,4 @@
---E－HERO マリシャス·デビル
+--E－HERO マリシャス・デビル
 function c86676862.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

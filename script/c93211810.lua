@@ -73,7 +73,7 @@ function c93211810.activate(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(tc:GetBaseAttack()*2)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
@@ -94,16 +94,20 @@ function c93211810.activate(e,tp,eg,ep,ev,re,r,rp)
 		e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e4:SetCode(EVENT_PHASE+PHASE_END)
 		e4:SetCountLimit(1)
+		e4:SetCondition(c93211810.descon)
 		e4:SetOperation(c93211810.desop)
 		e4:SetReset(RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e4,tp)
 	end
 end
 function c93211810.efilter(e,te)
-	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP) and te:GetOwner()~=e:GetOwner()
 end
 function c93211810.desfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_MACHINE)
+end
+function c93211810.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c93211810.desfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c93211810.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c93211810.desfilter,tp,LOCATION_MZONE,0,nil)

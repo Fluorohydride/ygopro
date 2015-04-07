@@ -1,4 +1,4 @@
---トゥーン·ヂェミナイ·エルフ
+--トゥーン・ヂェミナイ・エルフ
 function c42386471.initial_effect(c)
 	--cannot attack
 	local e1=Effect.CreateEffect(c)

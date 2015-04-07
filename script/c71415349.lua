@@ -1,4 +1,4 @@
---험프티 댄디 
+--ハンプティ・ダンディ
 function c71415349.initial_effect(c)
 	--turn set
 	local e1=Effect.CreateEffect(c)

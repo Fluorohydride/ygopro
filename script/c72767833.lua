@@ -1,4 +1,4 @@
---カード·フリッパー
+--カード・フリッパー
 function c72767833.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

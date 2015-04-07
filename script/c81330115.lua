@@ -1,7 +1,7 @@
---No.30 破滅のアシッド·ゴーレム
+--No.30 破滅のアシッド・ゴーレム
 function c81330115.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,3),2)
+	aux.AddXyzProcedure(c,nil,3,2)
 	c:EnableReviveLimit()
 	--remove material
 	local e1=Effect.CreateEffect(c)
@@ -10,7 +10,6 @@ function c81330115.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c81330115.rmcon)
 	e1:SetTarget(c81330115.rmtg)

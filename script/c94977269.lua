@@ -1,5 +1,6 @@
 --エルシャドール・ミドラーシュ
 function c94977269.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_SPSUMMON_COUNT)
 	c:EnableReviveLimit()
 	--fusion material
 	local e1=Effect.CreateEffect(c)
@@ -25,39 +26,32 @@ function c94977269.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetValue(c94977269.indval)
 	c:RegisterEffect(e3)
-	--disable summon
+	--spsummon count limit
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
-	e4:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+	e4:SetCode(EFFECT_SPSUMMON_COUNT_LIMIT)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e4:SetTargetRange(1,1)
-	e4:SetTarget(c94977269.splimit2)
+	e4:SetValue(1)
 	c:RegisterEffect(e4)
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetRange(LOCATION_MZONE)
-	e5:SetOperation(c94977269.checkop)
-	c:RegisterEffect(e5)
 	--tohand
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(94977269,0))
-	e6:SetCategory(CATEGORY_TOHAND)
-	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e6:SetCode(EVENT_TO_GRAVE)
-	e6:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
-	e6:SetCondition(c94977269.thcon)
-	e6:SetTarget(c94977269.thtg)
-	e6:SetOperation(c94977269.thop)
-	c:RegisterEffect(e6)
+	local e5=Effect.CreateEffect(c)
+	e5:SetDescription(aux.Stringid(94977269,0))
+	e5:SetCategory(CATEGORY_TOHAND)
+	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e5:SetCode(EVENT_TO_GRAVE)
+	e5:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e5:SetCondition(c94977269.thcon)
+	e5:SetTarget(c94977269.thtg)
+	e5:SetOperation(c94977269.thop)
+	c:RegisterEffect(e5)
 end
 function c94977269.ffilter1(c)
 	return c:IsSetCard(0x9d)
 end
 function c94977269.ffilter2(c)
-	return c:IsAttribute(ATTRIBUTE_DARK) or c:GetFlagEffect(4904633)~=0
+	return c:IsAttribute(ATTRIBUTE_DARK) or c:IsHasEffect(4904633)
 end
 function c94977269.exfilter(c,g)
 	return c:IsFaceup() and c:IsCanBeFusionMaterial() and not g:IsContains(c)
@@ -163,22 +157,6 @@ function c94977269.fusop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 end
 function c94977269.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
-end
-function c94977269.splimit2(e,c,sump,sumtype,sumpos,targetp)
-	return e:GetHandler():GetFlagEffect(94977269+sump)>0
-end
-function c94977269.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	if eg:IsContains(c) then return end
-	local p1=false
-	local p2=false
-	local tc=eg:GetFirst()
-	while tc do
-		if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		tc=eg:GetNext()
-	end
-	if p1 then c:RegisterFlagEffect(94977269,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then c:RegisterFlagEffect(94977270,RESET_PHASE+PHASE_END,0,1) end
 end
 function c94977269.indval(e,re,tp)
 	return tp~=e:GetHandlerPlayer()

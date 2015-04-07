@@ -1,7 +1,7 @@
 --妖精王 アルヴェルド
 function c28290705.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),4),2)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsAttribute,ATTRIBUTE_EARTH),4,2)
 	c:EnableReviveLimit()
 	--addown
 	local e1=Effect.CreateEffect(c)
@@ -20,7 +20,7 @@ function c28290705.adcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c28290705.filter(c)
-	return c:IsFaceup() and c:IsAttribute(0xffff-ATTRIBUTE_EARTH)
+	return c:IsFaceup() and c:GetAttribute()~=ATTRIBUTE_EARTH
 end
 function c28290705.adtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c28290705.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end

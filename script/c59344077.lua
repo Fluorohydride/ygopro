@@ -1,4 +1,4 @@
---マジック·ドレイン
+--マジック・ドレイン
 function c59344077.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

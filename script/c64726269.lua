@@ -27,7 +27,7 @@ function c64726269.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)
 end
 function c64726269.tdfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToDeck()
+	return c:IsAttribute(ATTRIBUTE_LIGHT) and c:IsAbleToDeck() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c64726269.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
@@ -54,6 +54,7 @@ function c64726269.effop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(rc)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e1:SetProperty(EFFECT_FLAG_DELAY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c64726269.drcon)
@@ -63,10 +64,10 @@ function c64726269.effop(e,tp,eg,ep,ev,re,r,rp)
 	if not rc:IsType(TYPE_EFFECT) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_SINGLE)
-		e2:SetCode(EFFECT_CHANGE_TYPE)
-		e2:SetValue(TYPE_MONSTER+TYPE_EFFECT+TYPE_XYZ)
+		e2:SetCode(EFFECT_ADD_TYPE)
+		e2:SetValue(TYPE_EFFECT)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
-		rc:RegisterEffect(e2)
+		rc:RegisterEffect(e2,true)
 	end
 end
 function c64726269.drcon(e,tp,eg,ep,ev,re,r,rp)

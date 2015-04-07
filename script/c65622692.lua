@@ -1,4 +1,4 @@
---Y－ドラゴン·ヘッド
+--Y－ドラゴン・ヘッド
 function c65622692.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

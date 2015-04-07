@@ -1,4 +1,4 @@
---暗黒魔族ギルファー·デーモン
+--暗黒魔族ギルファー・デーモン
 function c50287060.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -39,7 +39,7 @@ function c50287060.eqop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		e1:SetValue(c50287060.eqlimit)
 		c:RegisterEffect(e1)
-		local e2=Effect.CreateEffect(tc)
+		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_EQUIP)
 		e2:SetCode(EFFECT_UPDATE_ATTACK)
 		e2:SetValue(-500)

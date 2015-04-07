@@ -1,4 +1,4 @@
---D·バリア
+--D・バリア
 function c77229910.initial_effect(c)
 	--Negate
 	local e1=Effect.CreateEffect(c)

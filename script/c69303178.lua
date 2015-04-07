@@ -10,9 +10,9 @@ function c69303178.initial_effect(c)
 	e1:SetOperation(c69303178.ntop)
 	c:RegisterEffect(e1)
 end
-function c69303178.ntcon(e,c)
+function c69303178.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c69303178.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--to grave
@@ -21,7 +21,6 @@ function c69303178.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetTarget(c69303178.tgtg)

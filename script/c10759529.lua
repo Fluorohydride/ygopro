@@ -1,4 +1,4 @@
---キッズ·ガード
+--キッズ・ガード
 function c10759529.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

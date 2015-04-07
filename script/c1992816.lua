@@ -1,7 +1,7 @@
 --No.9 天蓋星ダイソン・スフィア
 function c1992816.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,9),2)
+	aux.AddXyzProcedure(c,nil,9,2)
 	c:EnableReviveLimit()
 	--negate attack
 	local e1=Effect.CreateEffect(c)

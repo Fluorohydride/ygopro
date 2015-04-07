@@ -1,4 +1,4 @@
---グラディアル·チェンジ
+--グラディアル・チェンジ
 function c97234686.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

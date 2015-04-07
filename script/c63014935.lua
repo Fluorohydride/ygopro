@@ -1,4 +1,4 @@
---ヴォルカニック·クイーン
+--ヴォルカニック・クイーン
 function c63014935.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon
@@ -30,7 +30,6 @@ function c63014935.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCountLimit(1)
 	e3:SetCondition(c63014935.phcon)
 	e3:SetOperation(c63014935.phop)
@@ -79,7 +78,7 @@ function c63014935.phop(e,tp,eg,ep,ev,re,r,rp)
 	else Duel.Damage(tp,1000,REASON_EFFECT) end
 end
 function c63014935.spcost(e,c,tp)
-	return not Duel.CheckNormalSummonActivity(tp)
+	return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 end
 function c63014935.spcop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

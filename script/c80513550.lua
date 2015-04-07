@@ -1,4 +1,4 @@
---バッド·エンド·クイーン·ドラゴン
+--バッド・エンド・クイーン・ドラゴン
 function c80513550.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

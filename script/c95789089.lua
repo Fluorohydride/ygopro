@@ -1,4 +1,4 @@
---カンガルー·チャンプ
+--カンガルー・チャンプ
 function c95789089.initial_effect(c)
 	--change position
 	local e1=Effect.CreateEffect(c)

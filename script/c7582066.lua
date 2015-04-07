@@ -1,4 +1,4 @@
---サイコ·デビル
+--サイコ・デビル
 function c7582066.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_PSYCHO),1)

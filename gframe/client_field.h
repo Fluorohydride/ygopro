@@ -64,7 +64,7 @@ public:
 	bool remove_act;
 	bool deck_act;
 	bool extra_act;
-	bool pzone_act;
+	bool pzone_act[2];
 	bool chain_forced;
 	ChainInfo current_chain;
 	bool last_chain;
@@ -82,6 +82,7 @@ public:
 	void ClearSelect();
 	void ClearChainSelect();
 	void ShowSelectCard(bool buttonok = false);
+	void ShowChainCard();
 	void ReplaySwap();
 	void RefreshAllCards();
 	

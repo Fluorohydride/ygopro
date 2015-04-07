@@ -12,7 +12,6 @@ function c54109233.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetTarget(c54109233.target)
 	e2:SetOperation(c54109233.activate)
@@ -38,7 +37,7 @@ function c54109233.filter(c)
 	return c:IsLevelBelow(3) and c:GetFlagEffect(54109233)~=0 and c:IsDestructable()
 end
 function c54109233.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c54109233.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c54109233.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end

@@ -1,4 +1,4 @@
---ポイズン·チェーン
+--ポイズン・チェーン
 function c33302407.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -19,7 +19,7 @@ function c33302407.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c33302407.discon(e,tp,eg,ep,ev,re,r,rp)
-	return tp==Duel.GetTurnPlayer() and not Duel.CheckAttackActivity(tp)
+	return tp==Duel.GetTurnPlayer() and Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0
 end
 function c33302407.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x25)

@@ -1,4 +1,4 @@
---E·HERO エスクリダオ
+--E・HERO エスクリダオ
 function c33574806.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

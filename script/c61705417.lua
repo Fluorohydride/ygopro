@@ -31,7 +31,8 @@ function c61705417.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
 		e1:SetCountLimit(1)
-		e1:SetOperation(c61705417.tograve)
+		e1:SetCondition(c61705417.tgcon)
+		e1:SetOperation(c61705417.tgop)
 		e1:SetLabelObject(tc)
 		e1:SetReset(RESET_EVENT+0x5c0000+RESET_PHASE+PHASE_END)
 		Duel.RegisterEffect(e1,tp)
@@ -43,7 +44,7 @@ function c61705417.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e2)
 		local e3=Effect.CreateEffect(e:GetHandler())
 		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		e3:SetCode(EVENT_CHAINING)
+		e3:SetCode(EVENT_CHAIN_SOLVED)
 		e3:SetCondition(c61705417.actcon)
 		e3:SetOperation(c61705417.actop)
 		e3:SetLabelObject(tc)
@@ -51,11 +52,13 @@ function c61705417.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.RegisterEffect(e3,tp)
 	end
 end
-function c61705417.tograve(e,tp,eg,ep,ev,re,r,rp)
+function c61705417.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetControler()~=tc:GetOwner() and tc:GetFlagEffect(61705417)~=0 then
-		Duel.SendtoGrave(tc,REASON_EFFECT)
-	end
+	return tc:GetControler()~=tc:GetOwner() and tc:GetFlagEffect(61705417)~=0
+end
+function c61705417.tgop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
+	Duel.SendtoGrave(tc,REASON_EFFECT)
 end
 function c61705417.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

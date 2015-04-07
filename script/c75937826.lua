@@ -1,4 +1,4 @@
---巨大戦艦 ビッグ·コアＭｋ－ＩＩ
+--巨大戦艦 ビッグ・コアＭｋ－ＩＩ
 function c75937826.initial_effect(c)
 	--spsummon success
 	local e1=Effect.CreateEffect(c)
@@ -73,8 +73,8 @@ function c75937826.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(c,REASON_EFFECT)
 	end
 end
-function c75937826.ntcon(e,c)
+function c75937826.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 		and Duel.GetFieldGroupCount(c:GetControler(),LOCATION_MZONE,0)==0
 end

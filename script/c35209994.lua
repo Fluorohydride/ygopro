@@ -1,4 +1,4 @@
---ヴェルズ·フレイス
+--ヴェルズ・フレイス
 function c35209994.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

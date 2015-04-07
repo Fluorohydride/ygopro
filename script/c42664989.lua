@@ -12,8 +12,7 @@ function c42664989.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c42664989.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND,0,1,e:GetHandler())
-		and Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_ONFIELD,0,1,e:GetHandler())end
+	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND+LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	local g=Duel.GetMatchingGroup(Card.IsAbleToRemoveAsCost,tp,LOCATION_HAND+LOCATION_ONFIELD,0,e:GetHandler())
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
 end
@@ -27,7 +26,7 @@ end
 function c42664989.operation(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local ht=Duel.GetFieldGroupCount(p,LOCATION_HAND,0)
-	if(ht<2) then
+	if ht<2 then
 		Duel.Draw(p,2-ht,REASON_EFFECT)
 	end
 end

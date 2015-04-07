@@ -1,4 +1,4 @@
---マインド·ハック
+--マインド・ハック
 function c75392615.initial_effect(c)
 	--confirm
 	local e1=Effect.CreateEffect(c)

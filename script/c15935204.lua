@@ -1,4 +1,4 @@
---ストーム·サモナー
+--ストーム・サモナー
 function c15935204.initial_effect(c)
 	--to deck
 	local e1=Effect.CreateEffect(c)

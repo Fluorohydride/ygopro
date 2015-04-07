@@ -1,4 +1,4 @@
---ビークロイド·コネクション·ゾーン
+--ビークロイド・コネクション・ゾーン
 function c23299957.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -19,7 +19,7 @@ end
 function c23299957.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c23299957.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
+		local mg1=Duel.GetMatchingGroup(Card.IsCanBeFusionMaterial,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
 		local res=Duel.IsExistingMatchingCard(c23299957.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)
@@ -82,5 +82,11 @@ function c23299957.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetCode(EFFECT_CANNOT_DISEFFECT)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e3,true)
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
+		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
+		Duel.ConfirmCards(1-tp,cg1)
+		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+		Duel.ConfirmCards(1-tp,cg2)
+		Duel.ShuffleHand(tp)
 	end
 end

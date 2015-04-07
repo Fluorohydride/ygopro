@@ -5,51 +5,17 @@ function c76224717.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	c:RegisterEffect(e1)
-	--search
+	--destroy/draw/salvage
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(76224717,0))
-	e2:SetCategory(CATEGORY_DESTROY)
+	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DRAW+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCountLimit(1)
-	e2:SetCondition(c76224717.condition)
-	e2:SetCost(c76224717.cost)
-	e2:SetTarget(c76224717.target1)
-	e2:SetOperation(c76224717.operation1)
-	e2:SetLabel(1)
+	e2:SetTarget(c76224717.target)
+	e2:SetOperation(c76224717.operation)
 	c:RegisterEffect(e2)
-	--draw
-	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(76224717,1))
-	e3:SetCategory(CATEGORY_DRAW)
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetRange(LOCATION_SZONE)
-	e3:SetCountLimit(1)
-	e3:SetCondition(c76224717.condition)
-	e3:SetCost(c76224717.cost)
-	e3:SetTarget(c76224717.target2)
-	e3:SetOperation(c76224717.operation2)
-	e3:SetLabel(2)
-	c:RegisterEffect(e3)
-	--salvage
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(76224717,2))
-	e4:SetCategory(CATEGORY_TOHAND)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
-	e4:SetCode(EVENT_PHASE+PHASE_END)
-	e4:SetRange(LOCATION_SZONE)
-	e4:SetCountLimit(1)
-	e4:SetCondition(c76224717.condition)
-	e4:SetCost(c76224717.cost)
-	e4:SetTarget(c76224717.target3)
-	e4:SetOperation(c76224717.operation3)
-	e4:SetLabel(3)
-	c:RegisterEffect(e4)
 	if not c76224717.global_check then
 		c76224717.global_check=true
 		c76224717[0]=0
@@ -81,56 +47,51 @@ function c76224717.clear(e,tp,eg,ep,ev,re,r,rp)
 	c76224717[0]=0
 	c76224717[1]=0
 end
-function c76224717.condition(e,tp,eg,ep,ev,re,r,rp)
-	return c76224717[tp]>=e:GetLabel()
-end
-function c76224717.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
-end
 function c76224717.filter1(c)
 	return c:IsFacedown() and c:IsDestructable()
 end
-function c76224717.target1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c76224717.filter1(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c76224717.filter1,tp,0,LOCATION_ONFIELD,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c76224717.filter1,tp,0,LOCATION_ONFIELD,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
-end
-function c76224717.operation1(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFacedown() then
-		Duel.Destroy(tc,REASON_EFFECT)
-	end
-end
-function c76224717.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
-	Duel.SetTargetPlayer(tp)
-	Duel.SetTargetParam(1)
-	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
-end
-function c76224717.operation2(e,tp,eg,ep,ev,re,r,rp)
-	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-	Duel.Draw(p,d,REASON_EFFECT)
-end
-function c76224717.filter3(c)
+function c76224717.filter2(c)
 	return c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
-function c76224717.target3(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c76224717.filter3(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c76224717.filter3,tp,LOCATION_GRAVE,0,1,nil) end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-	local g=Duel.SelectTarget(tp,c76224717.filter3,tp,LOCATION_GRAVE,0,1,1,nil)
-	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,1,0,0)
+function c76224717.target(e,tp,eg,ep,ev,re,r,rp,chk)
+	local b1=c76224717[tp]>0 and Duel.IsExistingMatchingCard(c76224717.filter1,tp,0,LOCATION_ONFIELD,1,nil)
+	local b2=c76224717[tp]>1 and Duel.IsPlayerCanDraw(tp,1)
+	local b3=c76224717[tp]>2 and Duel.IsExistingMatchingCard(c76224717.filter2,tp,LOCATION_GRAVE,0,1,nil)
+	if chk==0 then return b1 or b2 or b3 end
+	if b1 then
+		local g=Duel.GetMatchingGroup(c76224717.filter1,tp,0,LOCATION_ONFIELD,nil)
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
+	end
+	if b2 then
+		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)
+	end
+	if b3 then
+		Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_GRAVE)
+	end
 end
-function c76224717.operation3(e,tp,eg,ep,ev,re,r,rp)
+function c76224717.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
-	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
-		Duel.SendtoHand(tc,nil,REASON_EFFECT)
-		Duel.ConfirmCards(1-tp,tc)
+	local act=false
+	if c76224717[tp]>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
+		local g=Duel.SelectMatchingCard(tp,c76224717.filter1,tp,0,LOCATION_ONFIELD,1,1,nil)
+		if g:GetCount()>0 then
+			Duel.Destroy(g,REASON_EFFECT)
+			act=true
+		end
+	end
+	if c76224717[tp]>1 and Duel.IsPlayerCanDraw(tp,1) then
+		if act then Duel.BreakEffect() end
+		Duel.Draw(tp,1,REASON_EFFECT)
+		act=true
+	end
+	if c76224717[tp]>2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
+		local g=Duel.SelectMatchingCard(tp,c76224717.filter2,tp,LOCATION_GRAVE,0,1,1,nil)
+		if g:GetCount()>0 then
+			if act then Duel.BreakEffect() end
+			Duel.SendtoHand(g,nil,REASON_EFFECT)
+			Duel.ConfirmCards(1-tp,g)
+		end
 	end
 end

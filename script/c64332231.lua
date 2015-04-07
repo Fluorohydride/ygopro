@@ -1,7 +1,7 @@
 --聖刻神龍－エネアード
 function c64332231.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,8),2)
+	aux.AddXyzProcedure(c,nil,8,2)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -28,9 +28,9 @@ end
 function c64332231.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ct1=Duel.GetMatchingGroupCount(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	local rg=Duel.SelectReleaseGroupEx(tp,Card.IsReleasableByEffect,1,ct1,nil)
-	Duel.Release(rg,REASON_EFFECT)
+	local ct2=Duel.Release(rg,REASON_EFFECT)
+	if ct2==0 then return end
 	Duel.BreakEffect()
-	local ct2=rg:GetCount()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local dg=Duel.SelectMatchingCard(tp,Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,ct2,ct2,nil)
 	Duel.HintSelection(dg)

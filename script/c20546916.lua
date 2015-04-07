@@ -1,4 +1,4 @@
---ボタニカル·ライオ
+--ボタニカル・ライオ
 function c20546916.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

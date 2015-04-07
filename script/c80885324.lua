@@ -1,4 +1,4 @@
---サーチ·ストライカー
+--サーチ・ストライカー
 function c80885324.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

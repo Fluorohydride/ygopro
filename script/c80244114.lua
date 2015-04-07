@@ -1,4 +1,4 @@
---スターダスト·ファントム
+--スターダスト・ファントム
 function c80244114.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---マジック·ホール·ゴーレム
+--マジック・ホール・ゴーレム
 function c82458280.initial_effect(c)
 	--direct attack
 	local e1=Effect.CreateEffect(c)

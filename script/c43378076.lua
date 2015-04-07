@@ -36,7 +36,7 @@ function c43378076.cfilter(c)
 	return c:IsType(TYPE_SPIRIT) and c:GetCode()~=43378076 and not c:IsPublic()
 end
 function c43378076.sretcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.CheckSpecialSummonActivity(tp)
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==0
 		and Duel.IsExistingMatchingCard(c43378076.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g=Duel.SelectMatchingCard(tp,c43378076.cfilter,tp,LOCATION_HAND,0,1,1,nil)
@@ -75,7 +75,6 @@ function c43378076.retreg(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_EVENT+0x1ee0000+RESET_PHASE+PHASE_END)
 	e1:SetCondition(c43378076.retcon)

@@ -1,4 +1,4 @@
---エンペラー·オーダー
+--エンペラー・オーダー
 function c35011819.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -34,6 +34,7 @@ function c35011819.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 		Duel.SetTargetPlayer(tc:GetControler())
 		Duel.SetTargetParam(1)
 		Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tc:GetControler(),1)
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(35011819,2))
 	end
 end
 function c35011819.activate1(e,tp,eg,ep,ev,re,r,rp)

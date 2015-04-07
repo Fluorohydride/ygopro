@@ -271,9 +271,15 @@ void Game::DrawMisc() {
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.pzone_act) {
+	if(dField.pzone_act[0]) {
 		im.setTranslation(vector3df(matManager.vFields[60].Pos.X - (matManager.vFields[60].Pos.X - matManager.vFields[61].Pos.X)/2,
 			matManager.vFields[60].Pos.Y - (matManager.vFields[60].Pos.Y - matManager.vFields[62].Pos.Y)/2, 0.03f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	if(dField.pzone_act[1]) {
+		im.setTranslation(vector3df(matManager.vFields[128].Pos.X - (matManager.vFields[128].Pos.X - matManager.vFields[129].Pos.X)/2,
+			matManager.vFields[128].Pos.Y - (matManager.vFields[128].Pos.Y - matManager.vFields[130].Pos.Y)/2, 0.03f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
@@ -398,23 +404,23 @@ void Game::DrawMisc() {
 	}
 	pcard = dField.szone[0][6];
 	if(pcard) {
-		adFont->draw(pcard->lscstring, recti(386, 398, 398, 418), 0xff000000, true, false, 0);
-		adFont->draw(pcard->lscstring, recti(387, 399, 399, 419), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(426, 394, 438, 414), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(427, 395, 439, 415), 0xffffffff, true, false, 0);
 	}
 	pcard = dField.szone[0][7];
 	if(pcard) {
-		adFont->draw(pcard->rscstring, recti(880, 398, 912, 418), 0xff000000, true, false, 0);
-		adFont->draw(pcard->rscstring, recti(881, 399, 913, 419), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(880, 394, 912, 414), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(881, 395, 913, 415), 0xffffffff, true, false, 0);
 	}
 	pcard = dField.szone[1][6];
 	if(pcard) {
-		adFont->draw(pcard->lscstring, recti(834, 245, 866, 265), 0xff000000, true, false, 0);
-		adFont->draw(pcard->lscstring, recti(835, 246, 867, 266), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(839, 245, 871, 265), 0xff000000, true, false, 0);
+		adFont->draw(pcard->lscstring, recti(840, 246, 872, 266), 0xffffffff, true, false, 0);
 	}
 	pcard = dField.szone[1][7];
 	if(pcard) {
-		adFont->draw(pcard->rscstring, recti(428, 245, 460, 265), 0xff000000, true, false, 0);
-		adFont->draw(pcard->rscstring, recti(429, 246, 461, 266), 0xffffffff, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(463, 245, 495, 265), 0xff000000, true, false, 0);
+		adFont->draw(pcard->rscstring, recti(464, 246, 496, 266), 0xffffffff, true, false, 0);
 	}
 	if(dField.extra[0].size()) {
 		numFont->draw(dataManager.GetNumString(dField.extra[0].size()), recti(330, 562, 381, 552), 0xff000000, true, false, 0);

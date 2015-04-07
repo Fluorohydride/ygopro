@@ -1,4 +1,4 @@
---マジック·ランプ
+--マジック・ランプ
 function c54912977.initial_effect(c)
 	--change target
 	local e1=Effect.CreateEffect(c)

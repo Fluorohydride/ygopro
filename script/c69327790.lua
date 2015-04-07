@@ -36,14 +36,13 @@ function c69327790.otfilter(c)
 end
 function c69327790.otcon(e,c)
 	if c==nil then return true end
-	local g=Duel.GetTributeGroup(c)
+	local mg=Duel.GetMatchingGroup(c69327790.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
 	return c:GetLevel()>6 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-1
-		and g:IsExists(c69327790.otfilter,1,nil)
+		and Duel.GetTributeCount(c,mg)>0
 end
 function c69327790.otop(e,tp,eg,ep,ev,re,r,rp,c)
-	local g=Duel.GetTributeGroup(c)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local sg=g:FilterSelect(tp,c69327790.otfilter,1,1,nil)
+	local mg=Duel.GetMatchingGroup(c69327790.otfilter,0,LOCATION_MZONE,LOCATION_MZONE,nil)
+	local sg=Duel.SelectTribute(tp,c,1,1,mg)
 	c:SetMaterial(sg)
 	Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 end
@@ -52,12 +51,11 @@ function c69327790.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c69327790.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
-	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
-		and Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,nil) end
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g1=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
+	local g1=Duel.SelectTarget(tp,nil,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g2=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
+	local g2=Duel.SelectTarget(tp,nil,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,nil)
 	if e:GetLabel()==1
 		and Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,g1:GetFirst())
 		and Duel.SelectYesNo(tp,aux.Stringid(69327790,2)) then
@@ -72,7 +70,7 @@ function c69327790.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local ex,g1=Duel.GetOperationInfo(0,CATEGORY_TODECK)
 	local ex,g2=Duel.GetOperationInfo(0,CATEGORY_TOHAND)
 	local sg1=g1:Filter(Card.IsRelateToEffect,nil,e)
-	if sg1:GetCount()>0 and Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT)~=0 then
+	if sg1:GetCount()>0 and Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT)>1 then
 		local tc1=sg1:GetFirst()
 		local tc2=sg1:GetNext()
 		if tc1:GetControler()==tc2:GetControler() and tc1:IsLocation(LOCATION_DECK) and tc2:IsLocation(LOCATION_DECK) then

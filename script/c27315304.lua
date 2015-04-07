@@ -1,4 +1,4 @@
---ミスト·ウォーム
+--ミスト・ウォーム
 function c27315304.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),2)

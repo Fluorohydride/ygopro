@@ -250,7 +250,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 11 + 2;
+			pbuf += count * 11 + 3;
 			ReplayRefresh();
 			return ReadReplayResponse();
 		}
@@ -281,7 +281,7 @@ bool ReplayMode::ReplayAnalyze(char* msg, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += 10 + count * 11;
+			pbuf += 10 + count * 12;
 			return ReadReplayResponse();
 		}
 		case MSG_SELECT_PLACE:

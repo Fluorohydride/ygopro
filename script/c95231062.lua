@@ -1,4 +1,4 @@
---¥í¥¹¥È¡¤¥Ö¥ë©`¡¤¥Ö¥ì¥¤¥«©`
+--ãƒ­ã‚¹ãƒˆãƒ»ãƒ–ãƒ«ãƒ¼ãƒ»ãƒ–ãƒ¬ã‚¤ã‚«ãƒ¼
 function c95231062.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

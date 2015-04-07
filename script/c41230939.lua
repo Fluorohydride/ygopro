@@ -1,4 +1,4 @@
---サイバー·ダーク·ホーン
+--サイバー・ダーク・ホーン
 function c41230939.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

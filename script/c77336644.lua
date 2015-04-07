@@ -1,4 +1,4 @@
---レッド·デーモンズ·ドラゴン／バスター
+--レッド・デーモンズ・ドラゴン／バスター
 function c77336644.initial_effect(c)
 	c:EnableReviveLimit()
 	--Cannot special summon

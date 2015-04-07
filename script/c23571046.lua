@@ -1,4 +1,4 @@
---ボルト·ヘッジホッグ
+--ボルト・ヘッジホッグ
 function c23571046.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -23,6 +23,7 @@ function c23571046.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c23571046.operation(e,tp,eg,ep,ev,re,r,rp)
+	if not Duel.IsExistingMatchingCard(c23571046.cfilter,tp,LOCATION_MZONE,0,1,nil) then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)>0 then
 		local e1=Effect.CreateEffect(c)

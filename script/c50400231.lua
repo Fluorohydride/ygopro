@@ -1,4 +1,4 @@
---サテライト·キャノン
+--サテライト・キャノン
 function c50400231.initial_effect(c)
 	--ind
 	local e1=Effect.CreateEffect(c)
@@ -13,7 +13,6 @@ function c50400231.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_PHASE+PHASE_END)
 	e2:SetCountLimit(1)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCondition(c50400231.atkcon)
 	e2:SetOperation(c50400231.atkop)
 	c:RegisterEffect(e2)

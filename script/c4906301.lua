@@ -1,4 +1,4 @@
---ネクロ·ガードナー
+--ネクロ・ガードナー
 function c4906301.initial_effect(c)
 	--disable attack
 	local e1=Effect.CreateEffect(c)

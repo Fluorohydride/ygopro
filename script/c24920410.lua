@@ -1,4 +1,4 @@
---オーバー·レンチ
+--オーバー・レンチ
 function c24920410.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

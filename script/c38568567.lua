@@ -1,4 +1,4 @@
---ワンダー·クローバー
+--ワンダー・クローバー
 function c38568567.initial_effect(c)
 	--multi attack
 	local e1=Effect.CreateEffect(c)
@@ -12,7 +12,7 @@ function c38568567.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c38568567.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c38568567.cfilter(c)
 	return c:GetLevel()==4 and c:IsRace(RACE_PLANT) and c:IsAbleToGraveAsCost()
@@ -47,7 +47,7 @@ function c38568567.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c38568567.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)

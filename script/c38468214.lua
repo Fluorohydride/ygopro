@@ -1,4 +1,4 @@
---エーリアン·ヒュプノ
+--エーリアン・ヒュプノ
 function c38468214.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--add counter
@@ -18,8 +18,7 @@ function c38468214.filter(c)
 end
 function c38468214.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c38468214.filter(chkc) end
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(c38468214.filter,tp,0,LOCATION_MZONE,1,nil) end
+	if chk==0 then return Duel.IsExistingTarget(c38468214.filter,tp,0,LOCATION_MZONE,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c38468214.filter,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,1,0,0)
@@ -36,7 +35,7 @@ function c38468214.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_SET_CONTROL)
 		e1:SetValue(tp)
 		e1:SetReset(RESET_EVENT+0x1fc0000)
-		e1:SetCondition(c38468214.con)
+		e1:SetCondition(c38468214.ctcon)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -45,6 +44,7 @@ function c38468214.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCountLimit(1)
 		e2:SetLabel(tp)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
+		e2:SetCondition(c38468214.rmctcon)
 		e2:SetOperation(c38468214.rmctop)
 		tc:RegisterEffect(e2)
 		local e3=Effect.CreateEffect(c)
@@ -55,14 +55,15 @@ function c38468214.operation(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e3)
 	end
 end
-function c38468214.con(e)
+function c38468214.ctcon(e)
 	local c=e:GetOwner()
 	return c:IsHasCardTarget(e:GetHandler()) and not c:IsDisabled()
 end
+function c38468214.rmctcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==e:GetLabel()
+end
 function c38468214.rmctop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==e:GetLabel() then
-		e:GetHandler():RemoveCounter(tp,0xe,1,REASON_EFFECT)
-	end
+	e:GetHandler():RemoveCounter(tp,0xe,1,REASON_EFFECT)
 end
 function c38468214.descon(e)
 	return e:GetHandler():GetCounter(0xe)==0

@@ -1,4 +1,4 @@
---ヴォルカニック·ハンマー
+--ヴォルカニック・ハンマー
 function c54514594.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)

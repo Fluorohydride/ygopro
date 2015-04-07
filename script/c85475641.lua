@@ -1,4 +1,4 @@
---インフェルニティ·リベンジャー
+--インフェルニティ・リベンジャー
 function c85475641.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

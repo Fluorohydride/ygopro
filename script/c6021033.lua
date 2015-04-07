@@ -1,4 +1,4 @@
---デスカイザー·ドラゴン
+--デスカイザー・ドラゴン
 function c6021033.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,aux.FilterBoolFunction(Card.IsCode,33420078),aux.NonTuner(Card.IsRace,RACE_ZOMBIE),1)

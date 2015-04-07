@@ -29,7 +29,9 @@ public:
 		return container.find(c) != container.end();
 	}
 	
-	group();
+	explicit group(duel* pd);
+	group(duel* pd, card* pcard);
+	group(duel* pd, const card_set& cset);
 	~group();
 };
 

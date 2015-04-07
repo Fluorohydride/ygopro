@@ -1,4 +1,4 @@
---バード·フェイス
+--バード・フェイス
 function c45547649.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

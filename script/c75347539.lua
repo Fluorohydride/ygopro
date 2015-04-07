@@ -1,4 +1,4 @@
---磁石の戦士マグネット·バルキリオン
+--磁石の戦士マグネット・バルキリオン
 function c75347539.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

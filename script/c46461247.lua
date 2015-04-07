@@ -1,4 +1,4 @@
---トラップ·マスター
+--トラップ・マスター
 function c46461247.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

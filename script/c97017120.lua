@@ -12,7 +12,7 @@ function c97017120.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c97017120.condition(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)
+	return e:GetHandler():IsLocation(LOCATION_GRAVE)
 end
 function c97017120.filter(c,e,tp)
 	return c:IsAttackBelow(1500) and c:IsAttribute(ATTRIBUTE_EARTH)

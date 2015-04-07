@@ -1,4 +1,4 @@
---マシンナーズ·フォース
+--マシンナーズ・フォース
 function c58054262.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

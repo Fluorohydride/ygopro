@@ -1,4 +1,4 @@
---�ʹ�ѩ
+--猛吹雪
 function c473469.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

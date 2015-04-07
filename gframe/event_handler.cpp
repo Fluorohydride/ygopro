@@ -250,6 +250,12 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				mainGame->HideElement(mainGame->wANCard, true);
 				break;
 			}
+			case BUTTON_CMD_SHUFFLE: {
+				mainGame->btnShuffle->setVisible(false);
+				DuelClient::SetResponseI(8);
+				DuelClient::SendResponse();
+				break;
+			}
 			case BUTTON_CMD_ACTIVATE: {
 				mainGame->wCmdMenu->setVisible(false);
 				if(!list_command) {
@@ -728,8 +734,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 							myswprintf(formatBuffer, L"");
 					}
 					else{
-						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location),
-							selectable_cards[i + pos]->sequence + 1);
+						myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i + pos]->location,
+							selectable_cards[i + pos]->sequence), selectable_cards[i + pos]->sequence + 1);
 					}
 					mainGame->stCardPos[i]->setText(formatBuffer);
 					if(selectable_cards[i + pos]->is_selected)
@@ -754,7 +760,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				const wchar_t* pname = mainGame->ebANCard->getText();
 				int trycode = BufferIO::GetVal(pname);
 				CardString cstr;
-				if(dataManager.GetString(trycode, &cstr)) {
+				CardData cd;
+				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
+					&& !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -768,7 +776,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						auto cp = dataManager.GetCodePointer(cit->first);
-						if(!cp->second.alias) {
+						if(!cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
 							ancard.push_back(cit->first);
 						}
@@ -785,7 +793,9 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				const wchar_t* pname = mainGame->ebANCard->getText();
 				int trycode = BufferIO::GetVal(pname);
 				CardString cstr;
-				if(dataManager.GetString(trycode, &cstr)) {
+				CardData cd;
+				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
+					&& !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -798,8 +808,11 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				ancard.clear();
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
-						mainGame->lstANCard->addItem(cit->second.name);
-						ancard.push_back(cit->first);
+						auto cp = dataManager.GetCodePointer(cit->first);
+						if(!cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
+							mainGame->lstANCard->addItem(cit->second.name);
+							ancard.push_back(cit->first);
+						}
 					}
 				}
 				break;
@@ -905,6 +918,23 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					for(int32 i = (int32)extra[hovered_controler].size() - 1; i >= 0 ; --i)
 						selectable_cards.push_back(extra[hovered_controler][i]);
 					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1006), extra[hovered_controler].size());
+					mainGame->wCardSelect->setText(formatBuffer);
+					break;
+				}
+				}
+				if(selectable_cards.size())
+					ShowSelectCard(true);
+				break;
+			}
+			if(mainGame->dInfo.player_type == 7) {
+				if(mainGame->wCardSelect->isVisible())
+					break;
+				selectable_cards.clear();
+				switch(hovered_location) {
+				case LOCATION_GRAVE: {
+					for(int32 i = (int32)grave[hovered_controler].size() - 1; i >= 0 ; --i)
+						selectable_cards.push_back(grave[hovered_controler][i]);
+					myswprintf(formatBuffer, L"%ls(%d)", dataManager.GetSysString(1004), grave[hovered_controler].size());
 					mainGame->wCardSelect->setText(formatBuffer);
 					break;
 				}

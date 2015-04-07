@@ -1,7 +1,7 @@
---No.7 ラッキー·ストライプ
+--No.7 ラッキー・ストライプ
 function c82308875.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,nil,7,3)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -32,7 +32,7 @@ function c82308875.operation(e,tp,eg,ep,ev,re,r,rp)
 	if d2>d1 then d1,d2=d2,d1 end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e1:SetValue(d1*700)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
 	c:RegisterEffect(e1)

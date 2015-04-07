@@ -26,6 +26,7 @@ function c39537362.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 		and Duel.SelectYesNo(tp,aux.Stringid(39537362,1)) then 
 		e:SetLabel(1)
 		Duel.SetTargetCard(Duel.GetAttacker())
+		e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(39537362,2))
 	else e:SetLabel(0) end
 end
 function c39537362.condition(e,tp,eg,ep,ev,re,r,rp)

@@ -1,4 +1,4 @@
---エクシーズ·ディメンション·スプラッシュ
+--エクシーズ・ディメンション・スプラッシュ
 function c71541986.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

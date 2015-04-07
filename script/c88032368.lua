@@ -1,4 +1,4 @@
---セカンド·ブースター
+--セカンド・ブースター
 function c88032368.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

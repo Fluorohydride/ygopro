@@ -1,4 +1,4 @@
---シャドウ·グール
+--シャドウ・グール
 function c30778711.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

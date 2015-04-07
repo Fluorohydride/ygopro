@@ -1,4 +1,4 @@
---トラップ·リアクター·RR
+--トラップ・リアクター・RR
 function c52286175.initial_effect(c)
 	--destroy&damage
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ガーディアン·トライス
+--ガーディアン・トライス
 function c46037213.initial_effect(c)
 	--sum limit
 	local e1=Effect.CreateEffect(c)

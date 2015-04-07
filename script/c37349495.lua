@@ -1,4 +1,4 @@
---ナチュル·エッグプラント
+--ナチュル・エッグプラント
 function c37349495.initial_effect(c)
 	--to hand
 	local e1=Effect.CreateEffect(c)

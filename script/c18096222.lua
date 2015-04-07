@@ -1,4 +1,4 @@
---デュアル·ブースター
+--デュアル・ブースター
 function c18096222.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -84,4 +84,3 @@ function c18096222.daop(e,tp,eg,ep,ev,re,r,rp)
 		tc:EnableDualState()
 	end
 end
-

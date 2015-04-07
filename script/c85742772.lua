@@ -1,4 +1,4 @@
---グラヴィティ·バインド－超重力の網－
+--グラヴィティ・バインド－超重力の網－
 function c85742772.initial_effect(c)
 	--activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ナチュル·モスキート
+--ナチュル・モスキート
 function c17285476.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)
@@ -7,7 +7,7 @@ function c17285476.initial_effect(c)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e1:SetCondition(c17285476.atcon)
-	e1:SetValue(1)
+	e1:SetValue(aux.imval1)
 	c:RegisterEffect(e1)
 	--reflect
 	local e2=Effect.CreateEffect(c)

@@ -1,7 +1,7 @@
 --No.53 偽骸神 Heart－eartH
 function c23998625.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,5),3)
+	aux.AddXyzProcedure(c,nil,5,3)
 	c:EnableReviveLimit()
 	--atkup
 	local e1=Effect.CreateEffect(c)

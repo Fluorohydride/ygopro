@@ -33,7 +33,8 @@ function c29307554.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if p2 then Duel.RegisterFlagEffect(1,29307554,RESET_PHASE+PHASE_END,0,1) end
 end
 function c29307554.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,29307554)~=0 and Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()<=PHASE_BATTLE
+	return Duel.GetFlagEffect(tp,29307554)~=0 and Duel.GetTurnPlayer()==tp
+		and (Duel.IsAbleToEnterBP() or Duel.GetCurrentPhase()==PHASE_BATTLE)
 end
 function c29307554.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(8) and c:GetEffectCount(EFFECT_EXTRA_ATTACK)==0
@@ -46,7 +47,7 @@ function c29307554.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c29307554.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and c29307554.filter(tc) then
+	if tc:IsRelateToEffect(e) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)

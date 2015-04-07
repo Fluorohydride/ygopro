@@ -1,7 +1,7 @@
 --No.18 紋章祖プレイン・コート
 function c23649496.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -29,8 +29,10 @@ function c23649496.initial_effect(c)
 end
 c23649496.xyz_number=18
 function c23649496.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and c:GetFlagEffect(23649496)==0 end
+	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	c:RegisterFlagEffect(23649496,RESET_CHAIN,0,1)
 end
 function c23649496.cfilter(c)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(c23649496.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,c,c:GetCode())

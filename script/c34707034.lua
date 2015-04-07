@@ -27,6 +27,7 @@ function c34707034.operation(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()==0 then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<g:GetCount() then return end
 	local c=e:GetHandler()
+	local fid=c:GetFieldID()
 	local tc=g:GetFirst()
 	while tc do
 		Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
@@ -45,7 +46,7 @@ function c34707034.operation(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetCode(EFFECT_DISABLE_EFFECT)
 		e3:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e3)
-		tc:RegisterFlagEffect(34707034,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+		tc:RegisterFlagEffect(34707034,RESET_EVENT+0x1fe0000,0,1,fid)
 		tc=g:GetNext()
 	end
 	Duel.SpecialSummonComplete()
@@ -53,18 +54,27 @@ function c34707034.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
-	e1:SetReset(RESET_PHASE+PHASE_END)
+	e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetCountLimit(1)
+	e1:SetLabel(fid)
 	e1:SetLabelObject(g)
+	e1:SetCondition(c34707034.descon)
 	e1:SetOperation(c34707034.desop)
 	Duel.RegisterEffect(e1,tp)
 end
-function c34707034.desfilter(c)
-	return c:GetFlagEffect(34707034)>0
+function c34707034.desfilter(c,fid)
+	return c:GetFlagEffectLabel(34707034)==fid
+end
+function c34707034.descon(e,tp,eg,ep,ev,re,r,rp)
+	local g=e:GetLabelObject()
+	if not g:IsExists(c34707034.desfilter,1,nil,e:GetLabel()) then
+		g:DeleteGroup()
+		e:Reset()
+		return false
+	else return true end
 end
 function c34707034.desop(e,tp,eg,ep,ev,re,r,rp)
 	local g=e:GetLabelObject()
-	local tg=g:Filter(c34707034.desfilter,nil)
-	g:DeleteGroup()
+	local tg=g:Filter(c34707034.desfilter,nil,e:GetLabel())
 	Duel.Destroy(tg,REASON_EFFECT)
 end

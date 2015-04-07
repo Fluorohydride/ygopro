@@ -1,4 +1,4 @@
---雲魔物－ゴースト·フォッグ
+--雲魔物－ゴースト・フォッグ
 function c83604828.initial_effect(c)
 	--cannot special summon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---Tour Bus To Forbidden Realms
+--魔界発冥界行きバス
 function c89732524.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

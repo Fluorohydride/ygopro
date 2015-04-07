@@ -1,7 +1,7 @@
 --No.86 H－C ロンゴミアント
 function c63504681.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunctionF(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4),2,nil,nil,5)
+	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_WARRIOR),4,2,nil,nil,5)
 	c:EnableReviveLimit()
 	--remove material
 	local e1=Effect.CreateEffect(c)
@@ -9,7 +9,6 @@ function c63504681.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCondition(c63504681.rmcon)
 	e1:SetOperation(c63504681.rmop)
@@ -41,7 +40,7 @@ function c63504681.initial_effect(c)
 	e5:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
-	e5:SetValue(1)
+	e5:SetValue(c63504681.efilter)
 	e5:SetCondition(c63504681.effcon)
 	e5:SetLabel(3)
 	c:RegisterEffect(e5)
@@ -83,6 +82,9 @@ function c63504681.rmop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c63504681.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetOverlayCount()>=e:GetLabel()
+end
+function c63504681.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end
 function c63504681.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_ONFIELD,1,nil) end

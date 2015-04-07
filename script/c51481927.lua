@@ -16,8 +16,7 @@ function c51481927.initial_effect(c)
 end
 function c51481927.operation(e,tp,eg,ep,ev,re,r,rp)
 	local te=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
-	local c=te:GetHandler()
-	if te:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_SPELL) and c~=e:GetHandler() then
+	if te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:IsActiveType(TYPE_SPELL) and te:GetHandler()~=e:GetHandler() then
 		Duel.Recover(e:GetHandlerPlayer(),500,REASON_EFFECT)
 	end
 end

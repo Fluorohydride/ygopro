@@ -53,7 +53,7 @@ function c53334471.sumlimit(e,c,sump,sumtype,sumpos,targetp)
 	local at=c53334471[sump]
 	if targetp then at=c53334471[targetp] end
 	if at==0 then return false end
-	return c:IsAttribute(0xff-at)
+	return c:GetAttribute()~=at
 end
 function c53334471.getattribute(g)
 	local aat=0
@@ -65,7 +65,7 @@ function c53334471.getattribute(g)
 	return aat
 end
 function c53334471.rmfilter(c,at)
-	return not c:IsAttribute(0xff-at)
+	return c:GetAttribute()==at
 end
 function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	local phase=Duel.GetCurrentPhase()

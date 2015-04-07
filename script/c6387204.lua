@@ -1,7 +1,7 @@
 --CNo.6 先史遺産カオス・アトランタル
 function c6387204.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,7),3)
+	aux.AddXyzProcedure(c,nil,7,3)
 	c:EnableReviveLimit()
 	--equip
 	local e1=Effect.CreateEffect(c)
@@ -69,10 +69,10 @@ function c6387204.eqlimit(e,c)
 	return e:GetOwner()==c
 end
 function c6387204.lpcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,9161357)
+	return Duel.GetLP(1-tp)~=100 and e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,9161357)
 end
 function c6387204.filter(c)
-	return c:GetFlagEffect(6387204)~=0 and c:IsSetCard(0x48) and c:IsAbleToGraveAsCost()
+	return c:GetFlagEffect(6387204)~=0 and c:IsSetCard(0x48) and c:IsFaceup() and c:IsAbleToGraveAsCost()
 end
 function c6387204.lpcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,3,REASON_COST)

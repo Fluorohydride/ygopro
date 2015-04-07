@@ -1,4 +1,4 @@
---スクラップ·ビースト
+--スクラップ・ビースト
 function c19139516.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -13,7 +13,6 @@ function c19139516.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetTarget(c19139516.destg)
 	e2:SetOperation(c19139516.desop)
@@ -24,7 +23,7 @@ function c19139516.initial_effect(c)
 	e3:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e3:SetCondition(c19139516.thcon)
 	e3:SetTarget(c19139516.thtg)
 	e3:SetOperation(c19139516.thop)

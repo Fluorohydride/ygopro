@@ -17,7 +17,8 @@ ClientField::ClientField() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
-	pzone_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
@@ -63,7 +64,8 @@ void ClientField::Clear() {
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
-	pzone_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -317,7 +319,8 @@ void ClientField::ClearCommandFlag() {
 	extra_act = false;
 	grave_act = false;
 	remove_act = false;
-	pzone_act = false;
+	pzone_act[0] = false;
+	pzone_act[1] = false;
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -348,7 +351,8 @@ void ClientField::ShowSelectCard(bool buttonok) {
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
+				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+					selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);;
 				if(selectable_cards[i]->controler)
@@ -379,7 +383,8 @@ void ClientField::ShowSelectCard(bool buttonok) {
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location), selectable_cards[i]->sequence + 1);
+				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+					selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);
 				if(selectable_cards[i]->controler)
@@ -400,6 +405,60 @@ void ClientField::ShowSelectCard(bool buttonok) {
 		mainGame->scrCardList->setPos(0);
 	}
 	if(buttonok)
+		mainGame->btnSelectOK->setVisible(true);
+	else mainGame->btnSelectOK->setVisible(false);
+	mainGame->PopupElement(mainGame->wCardSelect);
+}
+void ClientField::ShowChainCard() {
+	if(selectable_cards.size() <= 5) {
+		int startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
+		for(size_t i = 0; i < selectable_cards.size(); ++i) {
+			if(selectable_cards[i]->code)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else
+				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
+			mainGame->btnCardSelect[i]->setPressed(false);
+			mainGame->btnCardSelect[i]->setVisible(true);
+			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+				selectable_cards[i]->sequence + 1);
+			mainGame->stCardPos[i]->setText(formatBuffer);
+			mainGame->stCardPos[i]->setVisible(true);;
+			if(selectable_cards[i]->controler)
+				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(startpos + 10 + i * 125, 30, startpos + 109 + i * 125, 50));
+		}
+		for(int i = selectable_cards.size(); i < 5; ++i) {
+			mainGame->btnCardSelect[i]->setVisible(false);
+			mainGame->stCardPos[i]->setVisible(false);
+		}
+		mainGame->scrCardList->setPos(0);
+		mainGame->scrCardList->setVisible(false);
+	} else {
+		for(int i = 0; i < 5; ++i) {
+			if(selectable_cards[i]->code)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else
+				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
+			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
+			mainGame->btnCardSelect[i]->setPressed(false);
+			mainGame->btnCardSelect[i]->setVisible(true);
+			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+				selectable_cards[i]->sequence + 1);
+			mainGame->stCardPos[i]->setText(formatBuffer);
+			mainGame->stCardPos[i]->setVisible(true);
+			if(selectable_cards[i]->controler)
+				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
+			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
+			mainGame->stCardPos[i]->setRelativePosition(rect<s32>(40 + i * 125, 30, 139 + i * 125, 50));
+		}
+		mainGame->scrCardList->setVisible(true);
+		mainGame->scrCardList->setMin(0);
+		mainGame->scrCardList->setMax((selectable_cards.size() - 5) * 10 + 9);
+		mainGame->scrCardList->setPos(0);
+	}
+	if(!chain_forced)
 		mainGame->btnSelectOK->setVisible(true);
 	else mainGame->btnSelectOK->setVisible(false);
 	mainGame->PopupElement(mainGame->wCardSelect);
@@ -644,6 +703,18 @@ void ClientField::GetChainLocation(int controler, int location, int sequence, ir
 			t->X = (matManager.vFields[80].Pos.X + matManager.vFields[81].Pos.X) / 2;
 			t->Y = (matManager.vFields[80].Pos.Y + matManager.vFields[82].Pos.Y) / 2;
 			t->Z = remove[controler].size() * 0.01f + 0.03f;
+		}
+		break;
+	}
+	case LOCATION_EXTRA: {
+		if (controler == 0) {
+			t->X = (matManager.vFields[8].Pos.X + matManager.vFields[9].Pos.X) / 2;
+			t->Y = (matManager.vFields[8].Pos.Y + matManager.vFields[10].Pos.Y) / 2;
+			t->Z = extra[controler].size() * 0.01f + 0.03f;
+		} else {
+			t->X = (matManager.vFields[76].Pos.X + matManager.vFields[77].Pos.X) / 2;
+			t->Y = (matManager.vFields[76].Pos.Y + matManager.vFields[78].Pos.Y) / 2;
+			t->Z = extra[controler].size() * 0.01f + 0.03f;
 		}
 		break;
 	}
@@ -1044,7 +1115,7 @@ bool ClientField::check_min(std::set<ClientCard*>& left, std::set<ClientCard*>::
 	int m = (op2 > 0 && op1 > op2) ? op2 : op1;
 	if (m >= min && m <= max)
 		return true;
-	index++;
+	++index;
 	return (min > m && check_min(left, index, min - m, max - m))
 	        || check_min(left, index, min, max);
 }
@@ -1090,7 +1161,7 @@ bool ClientField::check_sum(std::set<ClientCard*>& testlist, std::set<ClientCard
 	int l2 = l >> 16;
 	if ((l1 == acc || (l2 > 0 && l2 == acc)) && (count + 1 >= select_min) && (count + 1 <= select_max))
 		return true;
-	index++;
+	++index;
 	return (acc > l1 && check_sum(testlist, index, acc - l1, count + 1))
 	       || (l2 > 0 && acc > l2 && check_sum(testlist, index, acc - l2, count + 1))
 	       || check_sum(testlist, index, acc, count);

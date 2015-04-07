@@ -1,4 +1,4 @@
---Bujingi Pavo
+--武神器－イオツミ
 function c10860121.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

@@ -14,11 +14,7 @@ function c22377815.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c22377815.con(e,tp,eg,ep,ev,re,r,rp)
-	if not aux.IsDualState(e) then return false end
-	local c=e:GetHandler()
-	local bc=c:GetBattleTarget()
-	if not c:IsRelateToBattle() or c:IsFacedown() then return false end
-	return bc:IsLocation(LOCATION_GRAVE) and bc:IsReason(REASON_BATTLE) and bc:IsType(TYPE_MONSTER)
+	return aux.IsDualState(e) and aux.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c22377815.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

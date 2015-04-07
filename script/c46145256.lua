@@ -11,5 +11,5 @@ function c46145256.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c46145256.sumlimit(e,c,sump,sumtype,sumpos,targetp)
-	return c:IsAttribute(0xff-ATTRIBUTE_LIGHT)
+	return c:GetAttribute()~=ATTRIBUTE_LIGHT
 end

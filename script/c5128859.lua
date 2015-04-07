@@ -1,4 +1,4 @@
---E·HERO マリン·ネオス
+--E・HERO マリン・ネオス
 function c5128859.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -34,14 +34,10 @@ function c5128859.splimit(e,se,sp,st)
 	return not e:GetHandler():IsLocation(LOCATION_EXTRA)
 end
 function c5128859.spfilter(c,code)
-	if c:GetCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckOrExtraAsCost() and c:GetCode()==code
 end
 function c5128859.spfilter2(c,code)
-	if c:GetOriginalCode()~=code then return false end
-	if c:IsType(TYPE_FUSION) then return c:IsAbleToExtraAsCost()
-	else return c:IsAbleToDeckAsCost() end
+	return c:IsAbleToDeckOrExtraAsCost() and c:GetOriginalCode()==code
 end
 function c5128859.spcon(e,c)
 	if c==nil then return true end 

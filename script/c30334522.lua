@@ -1,4 +1,4 @@
---イビリチュア·プシュケローネ
+--イビリチュア・プシュケローネ
 function c30334522.initial_effect(c)
 	c:EnableReviveLimit()
 	--confirm

@@ -28,10 +28,10 @@ function c8102334.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e4:SetTarget(c8102334.tglimit)
-	e4:SetValue(c8102334.tgvalue)
+	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
 function c8102334.distg(e,c)
@@ -39,13 +39,10 @@ function c8102334.distg(e,c)
 end
 function c8102334.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if tl==LOCATION_SZONE and re:IsActiveType(TYPE_FIELD) then
+	if tl==LOCATION_SZONE and re:IsActiveType(TYPE_FIELD) and tp~=rp then
 		Duel.NegateEffect(ev)
 	end
 end
 function c8102334.tglimit(e,c)
 	return c~=e:GetHandler()
-end
-function c8102334.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end

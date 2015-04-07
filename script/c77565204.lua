@@ -1,4 +1,4 @@
---未来融合－フューチャー·フュージョン
+--未来融合－フューチャー・フュージョン
 function c77565204.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -26,14 +26,13 @@ end
 function c77565204.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and not c:IsImmuneToEffect(e)
 end
-function c77565204.filter2(c,e,tp,m)
-	return c:IsType(TYPE_FUSION) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,PLAYER_NONE,false,false)
-		and c:CheckFusionMaterial(m)
+function c77565204.filter2(c,m)
+	return c:IsType(TYPE_FUSION) and c:CheckFusionMaterial(m)
 end
 function c77565204.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local mg=Duel.GetMatchingGroup(c77565204.filter1,tp,LOCATION_DECK,0,nil,e)
-		return Duel.IsExistingMatchingCard(c77565204.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg)
+		return Duel.IsExistingMatchingCard(c77565204.filter2,tp,LOCATION_EXTRA,0,1,nil,mg)
 	end
 	e:GetHandler():SetTurnCounter(0)
 end
@@ -41,7 +40,7 @@ function c77565204.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if not c:IsRelateToEffect(e) then return end
 	local mg=Duel.GetMatchingGroup(c77565204.filter1,tp,LOCATION_DECK,0,nil,e)
-	local sg=Duel.GetMatchingGroup(c77565204.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg)
+	local sg=Duel.GetMatchingGroup(c77565204.filter2,tp,LOCATION_EXTRA,0,nil,mg)
 	if sg:GetCount()>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local tg=sg:Select(tp,1,1,nil)

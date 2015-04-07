@@ -10,38 +10,17 @@ function c52684508.initial_effect(c)
 	e1:SetTarget(c52684508.target)
 	e1:SetOperation(c52684508.activate)
 	c:RegisterEffect(e1)
-	if not c52684508.global_check then
-		c52684508.global_check=true
-		c52684508[0]=true
-		c52684508[1]=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_ATTACK_ANNOUNCE)
-		ge1:SetOperation(c52684508.checkop)
-		Duel.RegisterEffect(ge1,0)
-		local ge2=Effect.CreateEffect(c)
-		ge2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge2:SetCode(EVENT_PHASE_START+PHASE_DRAW)
-		ge2:SetOperation(c52684508.clear)
-		Duel.RegisterEffect(ge2,0)
-	end
+	Duel.AddCustomActivityCounter(52684508,ACTIVITY_ATTACK,c52684508.counterfilter)
 end
-function c52684508.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	if tc:IsCode(74677422) then
-		c52684508[tc:GetControler()]=false
-	end
-end
-function c52684508.clear(e,tp,eg,ep,ev,re,r,rp)
-	c52684508[0]=true
-	c52684508[1]=true
+function c52684508.counterfilter(c)
+    return not c:IsCode(74677422)
 end
 function c52684508.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return c52684508[tp] end
+	if chk==0 then return Duel.GetCustomActivityCount(52684508,tp,ACTIVITY_ATTACK)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
-	e1:SetProperty(EFFECT_FLAG_OATH)
+	e1:SetProperty(EFFECT_FLAG_OATH+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetTarget(aux.TargetBoolFunction(Card.IsCode,74677422))
 	e1:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e1:SetReset(RESET_PHASE+RESET_END)

@@ -1,4 +1,4 @@
---Angel of Zera
+--ゼラの天使
 function c42216237.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)

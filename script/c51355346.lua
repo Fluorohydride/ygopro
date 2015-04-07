@@ -1,4 +1,4 @@
---爆炎集合体 ガイヤ·ソウル
+--爆炎集合体 ガイヤ・ソウル
 function c51355346.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)
@@ -21,7 +21,6 @@ function c51355346.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCountLimit(1)
 	e3:SetTarget(c51355346.destg)
 	e3:SetOperation(c51355346.desop)

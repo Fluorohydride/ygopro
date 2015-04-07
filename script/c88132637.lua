@@ -1,4 +1,4 @@
---ツインヘッド·ケルベロス
+--ツインヘッド・ケルベロス
 function c88132637.initial_effect(c)
 	--disable
 	local e1=Effect.CreateEffect(c)

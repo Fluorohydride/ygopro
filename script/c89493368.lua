@@ -1,4 +1,4 @@
---サモン·リアクター·AI
+--サモン・リアクター・AI
 function c89493368.initial_effect(c)
 	--damage
 	local e1=Effect.CreateEffect(c)
@@ -46,6 +46,7 @@ function c89493368.damcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c89493368.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
+	e:GetHandler():RegisterFlagEffect(89493368,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,800)
 end
 function c89493368.damop(e,tp,eg,ep,ev,re,r,rp)
@@ -65,7 +66,7 @@ end
 function c89493368.naop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetAttacker()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		Duel.NegateAttack(tc)
+		Duel.NegateAttack()
 	end
 end
 function c89493368.spcfilter(c,code)

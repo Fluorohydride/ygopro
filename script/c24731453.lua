@@ -22,7 +22,7 @@ function c24731453.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c24731453.splimit(e,c)
-	return not c:IsRace(RACE_MACHINE)
+	return c:GetRace()~=RACE_MACHINE
 end
 function c24731453.cfilter(c)
 	return c:GetSequence()<5

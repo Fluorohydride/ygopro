@@ -1,4 +1,4 @@
---E·HERO ワイルド·ウィングマン
+--E・HERO ワイルド・ウィングマン
 function c55615891.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

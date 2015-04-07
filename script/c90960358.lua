@@ -1,4 +1,4 @@
---トゥーン·ブラック·マジシャン·ガール
+--トゥーン・ブラック・マジシャン・ガール
 function c90960358.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon
@@ -33,6 +33,7 @@ function c90960358.initial_effect(c)
 	c:RegisterEffect(e4)
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD)
+	e5:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e5:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetTargetRange(0,LOCATION_MZONE)

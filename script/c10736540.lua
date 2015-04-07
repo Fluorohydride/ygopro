@@ -1,4 +1,4 @@
---Lady of the Lake
+--湖の乙女ヴィヴィアン
 function c10736540.initial_effect(c)
 	--synchro limit
 	local e1=Effect.CreateEffect(c)

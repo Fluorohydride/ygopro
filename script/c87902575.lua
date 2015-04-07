@@ -1,4 +1,4 @@
---フューチャー·ヴィジョン
+--フューチャー・ヴィジョン
 function c87902575.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -27,7 +27,6 @@ function c87902575.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetCountLimit(1)
 	e3:SetCondition(c87902575.retcon)
 	e3:SetOperation(c87902575.retop)
@@ -35,8 +34,8 @@ function c87902575.initial_effect(c)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
-	e3:SetRange(LOCATION_SZONE)
+	e4:SetCode(EVENT_PHASE_START+PHASE_MAIN1)
+	e4:SetRange(LOCATION_SZONE)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e4:SetCountLimit(1)
 	e4:SetOperation(c87902575.clearop)
@@ -78,13 +77,16 @@ function c87902575.retop(e,tp,eg,ep,ev,re,r,rp)
 	local ft=Duel.GetLocationCount(p,LOCATION_MZONE)
 	if g:GetCount()>ft then
 		local sg=g
-		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(87902575,2))
+		Duel.Hint(HINT_SELECTMSG,p,aux.Stringid(87902575,2))
 		g=g:Select(p,ft,ft,nil)
 		sg:Sub(g)
 		Duel.SendtoGrave(sg,REASON_EFFECT)
 	end
 	local tc=g:GetFirst()
-	while tc do Duel.ReturnToField(tc) tc=g:GetNext() end
+	while tc do
+		Duel.ReturnToField(tc,POS_FACEUP_ATTACK)
+		tc=g:GetNext()
+	end
 end
 function c87902575.clfilter(c,ec,tp)
 	return (not c:IsRelateToCard(ec)) or c:GetPreviousControler()==tp

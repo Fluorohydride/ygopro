@@ -1,4 +1,4 @@
---N·ティンクル·モス
+--N・ティンクル・モス
 function c13857930.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

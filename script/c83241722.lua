@@ -24,6 +24,8 @@ function c83241722.coinop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.SelectYesNo(tp,aux.Stringid(83241722,0)) then
 		Duel.Hint(HINT_CARD,0,83241722)
 		Duel.RegisterFlagEffect(tp,83241722,RESET_PHASE+PHASE_END,0,1)
-		Duel.TossDice(ep,ev)
+		local ct1=bit.band(ev,0xff)
+		local ct2=bit.rshift(ev,16)
+		Duel.TossDice(ep,ct1,ct2)
 	end
 end

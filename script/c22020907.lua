@@ -1,4 +1,4 @@
---ヒーロー·シグナル
+--ヒーロー・シグナル
 function c22020907.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

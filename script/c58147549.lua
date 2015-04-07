@@ -1,4 +1,4 @@
---M·HERO 剛火
+--M・HERO 剛火
 function c58147549.initial_effect(c)
 	c:EnableReviveLimit()
 	--spsummon condition

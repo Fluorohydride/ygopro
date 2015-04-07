@@ -1,7 +1,8 @@
---カタパルト·ウォリアー
+--カタパルト・ウォリアー
 function c37474917.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
+	c:EnableReviveLimit()
 	--damage
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(37474917,0))

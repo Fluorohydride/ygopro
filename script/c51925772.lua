@@ -1,4 +1,4 @@
---ドレッド·ドラゴン
+--ドレッド・ドラゴン
 function c51925772.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

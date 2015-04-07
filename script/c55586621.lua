@@ -1,4 +1,4 @@
---フォーチュンレディ·ダルキー
+--フォーチュンレディ・ダルキー
 function c55586621.initial_effect(c)
 	--atk,def
 	local e1=Effect.CreateEffect(c)
@@ -15,7 +15,6 @@ function c55586621.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(55586621,0))
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-	e3:SetProperty(EFFECT_FLAG_REPEAT)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)

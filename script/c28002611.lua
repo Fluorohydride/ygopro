@@ -1,4 +1,4 @@
---ガジェット·トレーラー
+--ガジェット・トレーラー
 function c28002611.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(28002611,0))

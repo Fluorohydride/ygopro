@@ -1,4 +1,4 @@
---フォトン·リザード
+--フォトン・リザード
 function c38973775.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

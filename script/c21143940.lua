@@ -1,4 +1,4 @@
---マスク·チェンジ
+--マスク・チェンジ
 function c21143940.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -6,6 +6,7 @@ function c21143940.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	e1:SetTarget(c21143940.target)
 	e1:SetOperation(c21143940.activate)
 	c:RegisterEffect(e1)

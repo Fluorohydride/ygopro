@@ -1,4 +1,4 @@
---カイザー·シーホース
+--カイザー・シーホース
 function c17444133.initial_effect(c)
 	--double tribute
 	local e1=Effect.CreateEffect(c)

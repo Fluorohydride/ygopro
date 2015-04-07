@@ -1,4 +1,4 @@
---サイバー·ボンテージ
+--サイバー・ボンテージ
 function c63224564.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -77,6 +77,7 @@ function c65384188.reg(c,tc1,tc2)
 	tc1:RegisterEffect(e4)
 	local e5=e2:Clone()
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetValue(c65384188.efilter)
 	tc1:RegisterEffect(e5)
 end
 function c65384188.posop(e,tp,eg,ep,ev,re,r,rp)
@@ -87,4 +88,7 @@ function c65384188.posop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65384188.effcon(e)
 	return e:GetHandler():GetFlagEffect(65384188)~=0 and e:GetLabelObject():GetFlagEffect(65384188)~=0
+end
+function c65384188.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end

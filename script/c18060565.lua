@@ -1,4 +1,4 @@
---ドラグニティ－プリムス·ピルス
+--ドラグニティ－プリムス・ピルス
 function c18060565.initial_effect(c)
 	--equip
 	local e1=Effect.CreateEffect(c)

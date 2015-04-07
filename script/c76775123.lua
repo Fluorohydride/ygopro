@@ -1,10 +1,10 @@
---¥Ñ¥È¥í©`¥ë¡¤¥í¥Ü
+--ãƒ‘ãƒˆãƒ­ãƒ¼ãƒ«ãƒ»ãƒ­ãƒœ
 function c76775123.initial_effect(c)
 	--confirm
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(76775123,0))
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_REPEAT)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)

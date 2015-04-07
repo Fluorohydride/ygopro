@@ -1,7 +1,7 @@
 --No.79 BK 新星のカイザー
 function c71921856.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,4),2)
+	aux.AddXyzProcedure(c,nil,4,2)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)
@@ -33,7 +33,7 @@ function c71921856.initial_effect(c)
 end
 c71921856.xyz_number=79
 function c71921856.filter(c)
-	return c:IsSetCard(0x84) and c:IsType(TYPE_MONSTER)
+	return c:IsSetCard(0x84) and c:IsType(TYPE_MONSTER) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c71921856.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c71921856.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil) end

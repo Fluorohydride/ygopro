@@ -1,6 +1,7 @@
 --波動竜フォノン・ドラゴン
 function c67556500.initial_effect(c)
 	Duel.EnableGlobalFlag(GLOBALFLAG_MUST_BE_SMATERIAL)
+	c:SetSPSummonOnce(67556500)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(nil),1)
 	c:EnableReviveLimit()
@@ -13,12 +14,6 @@ function c67556500.initial_effect(c)
 	e1:SetTarget(c67556500.lvtg)
 	e1:SetOperation(c67556500.lvop)
 	c:RegisterEffect(e1)
-	--
-	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e2:SetOperation(c67556500.regop)
-	c:RegisterEffect(e2)
 end
 function c67556500.lvcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO
@@ -61,17 +56,4 @@ function c67556500.lvop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c67556500.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return sumtype~=SUMMON_TYPE_SYNCHRO or e:GetOwner():GetRealFieldID()~=e:GetLabel() or e:GetOwner():IsFacedown()
-end
-function c67556500.regop(e,tp,eg,ep,ev,re,r,rp)
-	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e1:SetTargetRange(1,0)
-	e1:SetReset(RESET_PHASE+PHASE_END)
-	e1:SetTarget(c67556500.splimit2)
-	Duel.RegisterEffect(e1,tp)
-end
-function c67556500.splimit2(e,c,sump,sumtype,sumpos,targetp,se)
-	return c:IsCode(67556500)
 end

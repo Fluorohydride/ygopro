@@ -1,4 +1,4 @@
---Sin トゥルース·ドラゴン
+--Sin トゥルース・ドラゴン
 function c37115575.initial_effect(c)
 	c:EnableReviveLimit()
 	--special summon

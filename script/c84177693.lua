@@ -1,4 +1,4 @@
---ホーリー·ジェラル
+--ホーリー・ジェラル
 function c84177693.initial_effect(c)
 	--recover
 	local e1=Effect.CreateEffect(c)

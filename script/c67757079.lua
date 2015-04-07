@@ -1,4 +1,4 @@
---キング·オブ·ビースト
+--キング・オブ・ビースト
 function c67757079.initial_effect(c)
 	c:SetUniqueOnField(1,1,67757079)
 	--special summon

@@ -1,4 +1,4 @@
---タイム·ボマー
+--タイム・ボマー
 function c90020065.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

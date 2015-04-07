@@ -1,4 +1,4 @@
---E·HERO ガイア
+--E・HERO ガイア
 function c16304628.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -38,7 +38,7 @@ end
 function c16304628.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc and tc:IsRelateToEffect(e) and tc:IsFaceup() and not tc:IsImmuneToEffect(e) then
 		local atk=tc:GetAttack()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

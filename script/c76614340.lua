@@ -1,4 +1,4 @@
---ジェムナイト·ルビーズ
+--ジェムナイト・ルビーズ
 function c76614340.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

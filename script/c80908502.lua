@@ -1,4 +1,4 @@
---E·HERO キャプテン·ゴールド
+--E・HERO キャプテン・ゴールド
 function c80908502.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

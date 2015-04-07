@@ -392,12 +392,12 @@ void SingleDuel::TPResult(DuelPlayer* dp, unsigned char tp) {
 	last_replay.WriteData(players[0]->name, 40, false);
 	last_replay.WriteData(players[1]->name, 40, false);
 	if(!host_info.no_shuffle_deck) {
-		for(size_t i = 0; i < pdeck[0].main.size(); ++i) {
-			int swap = rnd.real() * pdeck[0].main.size();
+		for(size_t i = pdeck[0].main.size() - 1; i > 0; --i) {
+			int swap = rnd.real() * (i + 1);
 			std::swap(pdeck[0].main[i], pdeck[0].main[swap]);
 		}
-		for(size_t i = 0; i < pdeck[1].main.size(); ++i) {
-			int swap = rnd.real() * pdeck[1].main.size();
+		for(size_t i = pdeck[1].main.size() - 1; i > 0; --i) {
+			int swap = rnd.real() * (i + 1);
 			std::swap(pdeck[1].main[i], pdeck[1].main[swap]);
 		}
 	}
@@ -564,11 +564,11 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			case 1:
 			case 2:
 			case 3:
-			case 4:
 			case 5: {
 				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 				break;
 			}
+			case 4:
 			case 6:
 			case 7:
 			case 8:
@@ -637,7 +637,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 11 + 2;
+			pbuf += count * 11 + 3;
 			RefreshMzone(0);
 			RefreshMzone(1);
 			RefreshSzone(0);
@@ -692,7 +692,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_SELECT_CHAIN: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += 10 + count * 11;
+			pbuf += 10 + count * 12;
 			WaitforResponse(player);
 			NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 			return 1;
@@ -753,7 +753,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			if(pbuf[5] == LOCATION_HAND) {
+			if(pbuf[5] != LOCATION_REMOVED) {
 				pbuf += count * 7;
 				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 				NetServer::ReSendToPlayer(players[1 - player]);

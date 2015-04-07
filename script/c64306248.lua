@@ -1,4 +1,4 @@
---髑髏顔·天道虫
+--髑髏顔・天道虫
 function c64306248.initial_effect(c)
 	--recover
 	local e1=Effect.CreateEffect(c)

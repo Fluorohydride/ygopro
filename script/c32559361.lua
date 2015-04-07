@@ -1,7 +1,7 @@
 --CNo.9 天蓋妖星カオス・ダイソン・スフィア
 function c32559361.initial_effect(c)
 	--xyz summon
-	aux.AddXyzProcedure(c,aux.XyzFilterFunction(c,10),3)
+	aux.AddXyzProcedure(c,nil,10,3)
 	c:EnableReviveLimit()
 	--material
 	local e1=Effect.CreateEffect(c)

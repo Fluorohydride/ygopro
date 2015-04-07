@@ -1,4 +1,4 @@
---スクラップ·エリア
+--スクラップ・エリア
 function c1050684.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ヘル·セキュリティ
+--ヘル・セキュリティ
 function c50732780.initial_effect(c)
 	--special summon
 	local e1=Effect.CreateEffect(c)

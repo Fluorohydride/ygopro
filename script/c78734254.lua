@@ -1,4 +1,4 @@
---N·マリン·ドルフィン
+--N・マリン・ドルフィン
 function c78734254.initial_effect(c)
 	c:EnableReviveLimit()
 	--cannot special summon

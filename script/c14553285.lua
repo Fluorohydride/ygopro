@@ -1,4 +1,4 @@
---アーカナイト·マジシャン／バスター
+--アーカナイト・マジシャン／バスター
 function c14553285.initial_effect(c)
 	c:EnableReviveLimit()
 	c:EnableCounterPermit(0x3001)

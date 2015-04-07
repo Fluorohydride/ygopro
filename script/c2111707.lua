@@ -1,4 +1,4 @@
---XY－ドラゴン·キャノン
+--XY－ドラゴン・キャノン
 function c2111707.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

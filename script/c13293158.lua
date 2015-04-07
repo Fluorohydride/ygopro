@@ -1,4 +1,4 @@
---E－HERO ワイルド·サイクロン
+--E－HERO ワイルド・サイクロン
 function c13293158.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

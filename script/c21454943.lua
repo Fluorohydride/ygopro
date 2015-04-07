@@ -1,4 +1,4 @@
---サイコ·コマンダー
+--サイコ・コマンダー
 function c21454943.initial_effect(c)
 	--atkdown
 	local e1=Effect.CreateEffect(c)

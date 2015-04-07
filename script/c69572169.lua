@@ -1,4 +1,4 @@
---E·HERO フラッシュ
+--E・HERO フラッシュ
 function c69572169.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)

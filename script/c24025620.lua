@@ -1,4 +1,4 @@
---ダブル·プロテクター
+--ダブル・プロテクター
 function c24025620.initial_effect(c)
 	--atkdown
 	local e1=Effect.CreateEffect(c)

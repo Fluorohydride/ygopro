@@ -1,4 +1,4 @@
---トリッキーズ·マジック4
+--トリッキーズ・マジック4
 function c75622824.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ヴォルカニック·リボルバー
+--ヴォルカニック・リボルバー
 function c81020140.initial_effect(c)
 	--search
 	local e1=Effect.CreateEffect(c)

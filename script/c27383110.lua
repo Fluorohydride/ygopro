@@ -23,13 +23,13 @@ function c27383110.initial_effect(c)
 end
 function c27383110.filter(c,e,tp,m)
 	local cd=c:GetCode()
-	if cd~=44665365 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
+	if cd~=44665365 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
 	if m:IsContains(c) then
 		m:RemoveCard(c)
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,6,1,99,c)
 		m:AddCard(c)
 	else
-		result=m:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
+		result=m:CheckWithSumEqual(Card.GetRitualLevel,6,1,99,c)
 	end
 	return result
 end
@@ -48,11 +48,11 @@ function c27383110.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tc=tg:GetFirst()
 		mg:RemoveCard(tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,tc:GetLevel(),1,99,tc)
+		local mat=mg:SelectWithSumEqual(tp,Card.GetRitualLevel,6,1,99,tc)
 		tc:SetMaterial(mat)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
 		e:SetLabelObject(tc)
 		Duel.RaiseSingleEvent(e:GetHandler(),27383110,e,0,tp,tp,0)

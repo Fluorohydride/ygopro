@@ -1,4 +1,4 @@
---ヘル·ブランブル
+--ヘル・ブランブル
 function c45500495.initial_effect(c)
 	--synchro summon
 	aux.AddSynchroProcedure(c,nil,aux.NonTuner(Card.IsRace,RACE_PLANT),1)
@@ -18,7 +18,7 @@ function c45500495.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c45500495.sumtg(e,c)
-	return not c:IsRace(RACE_PLANT)
+	return c:GetRace()~=RACE_PLANT
 end
 function c45500495.ccost(e,c,tp)
 	return Duel.CheckLPCost(tp,1000)

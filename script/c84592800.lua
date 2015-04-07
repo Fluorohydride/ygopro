@@ -1,4 +1,4 @@
---D·ビデオン
+--D・ビデオン
 function c84592800.initial_effect(c)
 	--atk
 	local e1=Effect.CreateEffect(c)

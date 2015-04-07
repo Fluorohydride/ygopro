@@ -1,4 +1,4 @@
---レア·フィッシュ
+--レア・フィッシュ
 function c80516007.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

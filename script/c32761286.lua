@@ -1,4 +1,4 @@
---スクラップ·ワーム
+--スクラップ・ワーム
 function c32761286.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -13,7 +13,6 @@ function c32761286.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
-	e2:SetProperty(EFFECT_FLAG_REPEAT)
 	e2:SetCountLimit(1)
 	e2:SetTarget(c32761286.destg)
 	e2:SetOperation(c32761286.desop)

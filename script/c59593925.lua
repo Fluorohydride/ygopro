@@ -24,6 +24,7 @@ function c59593925.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_END)
 	e3:SetCountLimit(1)
 	e3:SetRange(LOCATION_SZONE)
+	e3:SetCondition(c59593925.sdescon)
 	e3:SetOperation(c59593925.sdesop)
 	c:RegisterEffect(e3)
 end
@@ -51,8 +52,10 @@ function c59593925.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(tc,REASON_EFFECT)
 	end
 end
+function c59593925.sdescon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c59593925.sdesop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

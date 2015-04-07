@@ -1,4 +1,4 @@
---ライトロード·マジシャン ライラ
+--ライトロード・マジシャン ライラ
 function c22624373.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)

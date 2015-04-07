@@ -1,4 +1,4 @@
---紋章獣ツインヘッド·イーグル
+--紋章獣ツインヘッド・イーグル
 function c19310321.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -35,7 +35,7 @@ function c19310321.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c19310321.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsImmuneToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,tc,e)
 	if g:GetCount()>0 then
 		Duel.Overlay(tc,g)

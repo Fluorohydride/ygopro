@@ -6,7 +6,7 @@ function c37803172.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetValue(c37803172.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--spsummon limit
 	local e2=Effect.CreateEffect(c)
@@ -26,9 +26,6 @@ function c37803172.initial_effect(c)
 	e3:SetTarget(c37803172.sptg)
 	e3:SetOperation(c37803172.spop)
 	c:RegisterEffect(e3)
-end
-function c37803172.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c37803172.splimit(e,se,sp,st)
 	return se:GetHandler():IsSetCard(0x107d)

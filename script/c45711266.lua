@@ -1,4 +1,4 @@
---ジュラック·プティラ
+--ジュラック・プティラ
 function c45711266.initial_effect(c)
 	--tohand
 	local e1=Effect.CreateEffect(c)

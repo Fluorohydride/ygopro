@@ -1,4 +1,4 @@
---C·ラーバ
+--C・ラーバ
 function c16241441.initial_effect(c)
 	--spsummon
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---Gladiator Beast Nerokius
+--剣闘獣ネロキウス
 function c29357956.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()
@@ -52,10 +52,7 @@ function c29357956.splimit(e,se,sp,st)
 	return e:GetHandler():GetLocation()~=LOCATION_EXTRA
 end
 function c29357956.spfilter(c)
-	local tpe=c:GetOriginalType()
-	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and
-		((bit.band(tpe,TYPE_FUSION)>0 and c:IsAbleToExtraAsCost()) or
-		(bit.band(tpe,TYPE_FUSION)==0 and c:IsAbleToDeckAsCost()))
+	return c:IsSetCard(0x19) and c:IsCanBeFusionMaterial() and c:IsAbleToDeckOrExtraAsCost()
 end
 function c29357956.sprcon(e,c)
 	if c==nil then return true end

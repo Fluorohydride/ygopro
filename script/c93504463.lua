@@ -30,8 +30,8 @@ function c93504463.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		local a=Duel.GetAttacker()
-		if a:IsOnField() and a:IsFaceup() then
-			Duel.CalculateDamage(a, tc)
+		if a:IsAttackable() and not a:IsImmuneToEffect(e) then
+			Duel.CalculateDamage(a,tc)
 		end
 	end
 end

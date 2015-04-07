@@ -26,30 +26,13 @@ function c59281922.initial_effect(c)
 	e3:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e3:SetValue(70095154)
 	c:RegisterEffect(e3)
-	if not c59281922.global_check then
-		c59281922.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
-		ge1:SetOperation(c59281922.checkop)
-		Duel.RegisterEffect(ge1,0)
-	end
+	Duel.AddCustomActivityCounter(59281922,ACTIVITY_SPSUMMON,c59281922.counterfilter)
 end
-function c59281922.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local p1=nil
-	local p2=nil
-	local tc=eg:GetFirst()
-	while tc do
-		if not tc:IsRace(RACE_MACHINE) then
-			if tc:GetSummonPlayer()==0 then p1=true else p2=true end
-		end
-		tc=eg:GetNext()
-	end
-	if p1 then Duel.RegisterFlagEffect(0,59281922,RESET_PHASE+PHASE_END,0,1) end
-	if p2 then Duel.RegisterFlagEffect(1,59281922,RESET_PHASE+PHASE_END,0,1) end
+function c59281922.counterfilter(c)
+	return c:IsRace(RACE_MACHINE)
 end
 function c59281922.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFlagEffect(tp,59281922)==0 end
+	if chk==0 then return Duel.GetCustomActivityCount(59281922,tp,ACTIVITY_SPSUMMON)==0 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
@@ -60,7 +43,7 @@ function c59281922.lvcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.RegisterEffect(e1,tp)
 end
 function c59281922.splimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return not c:IsRace(RACE_MACHINE)
+	return c:GetRace()~=RACE_MACHINE
 end
 function c59281922.filter(c)
 	return c:IsFaceup() and c:IsCode(70095154)

@@ -30,5 +30,5 @@ function c27541267.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c27541267.efilter(e,te)
-	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
+	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP) and te:GetOwner()~=e:GetOwner()
 end

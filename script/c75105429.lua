@@ -1,4 +1,4 @@
---シンクロ·イジェクション
+--シンクロ・イジェクション
 function c75105429.initial_effect(c)
 	--remove
 	local e1=Effect.CreateEffect(c)
@@ -28,4 +28,3 @@ function c75105429.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Draw(1-tp,1,REASON_EFFECT)
 	end
 end
-

@@ -1,4 +1,4 @@
---スクラップ·シャーク
+--スクラップ・シャーク
 function c69155991.initial_effect(c)
 	--destroy
 	local e1=Effect.CreateEffect(c)
@@ -11,7 +11,7 @@ function c69155991.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCode(EVENT_CHAIN_END)
+	e2:SetCode(EVENT_CHAIN_SOLVED)
 	e2:SetOperation(c69155991.desop1)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
@@ -36,7 +36,7 @@ function c69155991.initial_effect(c)
 end
 function c69155991.chop(e,tp,eg,ep,ev,re,r,rp)
 	if re:IsHasType(EFFECT_TYPE_ACTIVATE) or re:GetHandler():IsType(TYPE_MONSTER) then
-		e:GetHandler():RegisterFlagEffect(69155991,RESET_EVENT+0x1ff0000+RESET_PHASE+RESET_END,0,1)
+		e:GetHandler():RegisterFlagEffect(69155991,RESET_EVENT+0x1fe0000+RESET_CHAIN,0,1)
 	end
 end
 function c69155991.desop1(e,tp,eg,ep,ev,re,r,rp)

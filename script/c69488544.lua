@@ -1,4 +1,4 @@
---フェニックス·ギア·フリード
+--フェニックス・ギア・フリード
 function c69488544.initial_effect(c)
 	aux.EnableDualAttribute(c)
 	--special summon

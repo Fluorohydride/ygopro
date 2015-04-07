@@ -32,10 +32,11 @@ function c8062132.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e4:SetValue(1)
+	e4:SetValue(aux.tgval)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
+	e5:SetValue(c8062132.efilter)
 	c:RegisterEffect(e5)
 	--win
 	local e6=Effect.CreateEffect(c)
@@ -46,6 +47,9 @@ function c8062132.initial_effect(c)
 	e6:SetCondition(c8062132.ctcon)
 	e6:SetOperation(c8062132.ctop)
 	c:RegisterEffect(e6)
+end
+function c8062132.efilter(e,te)
+	return te:GetOwner()~=e:GetOwner()
 end
 function c8062132.atkval(e,c)
 	return Duel.GetMatchingGroupCount(Card.IsRace,c:GetControler(),LOCATION_GRAVE,0,nil,RACE_REPTILE)*500
@@ -64,12 +68,13 @@ function c8062132.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c8062132.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,true) end
+		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,true,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
 end
 function c8062132.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
-		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,true,POS_FACEUP)
+		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
+		e:GetHandler():CompleteProcedure()
 	end
 end
 function c8062132.ctcon(e,tp,eg,ep,ev,re,r,rp)

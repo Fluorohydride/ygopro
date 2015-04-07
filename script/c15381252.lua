@@ -24,19 +24,22 @@ function c15381252.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SendtoGrave(g,REASON_COST+REASON_DISCARD)
 end
 function c15381252.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function c15381252.activate(e,tp,eg,ep,ev,re,r,rp)
 	local count=8
-	while count>0 and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 do
+	while count>0 and Duel.IsPlayerCanDiscardDeck(tp,1) and Duel.GetLP(1-tp)>0 do
+		if count<8 then Duel.BreakEffect() end
 		Duel.ConfirmDecktop(tp,1)
 		local g=Duel.GetDecktopGroup(tp,1)
 		local tc=g:GetFirst()
 		if tc:IsType(TYPE_MONSTER) then
 			Duel.DisableShuffleCheck()
-			Duel.SendtoGrave(g,REASON_EFFECT+REASON_REVEAL)
-			Duel.Damage(1-tp,500,REASON_EFFECT)
-			count=count-1
+			Duel.SendtoGrave(tc,REASON_EFFECT+REASON_REVEAL)
+			if tc:IsLocation(LOCATION_GRAVE) then
+				Duel.Damage(1-tp,500,REASON_EFFECT)
+				count=count-1
+			else count=0 end
 		else
 			count=0
 		end

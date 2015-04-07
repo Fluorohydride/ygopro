@@ -1,4 +1,4 @@
---Ｇ·コザッキー
+--Ｇ・コザッキー
 function c58185394.initial_effect(c)
 	--self destroy
 	local e1=Effect.CreateEffect(c)

@@ -1,4 +1,4 @@
---ドラゴン·ウォリアー
+--ドラゴン・ウォリアー
 function c49868263.initial_effect(c)
 	--fusion material
 	c:EnableReviveLimit()

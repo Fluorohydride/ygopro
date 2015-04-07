@@ -1,4 +1,4 @@
---ラヴァル·ランスロッド
+--ラヴァル・ランスロッド
 function c123709.initial_effect(c)
 	--summon with no tribute
 	local e1=Effect.CreateEffect(c)
@@ -21,9 +21,9 @@ function c123709.initial_effect(c)
 	e2:SetOperation(c123709.operation)
 	c:RegisterEffect(e2)
 end
-function c123709.ntcon(e,c)
+function c123709.ntcon(e,c,minc)
 	if c==nil then return true end
-	return c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
+	return minc==0 and c:GetLevel()>4 and Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>0
 end
 function c123709.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	--to grave
@@ -32,7 +32,6 @@ function c123709.ntop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetCategory(CATEGORY_TOGRAVE)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_REPEAT)
 	e1:SetCountLimit(1)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCondition(c123709.tgcon)

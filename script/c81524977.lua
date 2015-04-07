@@ -1,4 +1,4 @@
---·N×ÓÍè
+--ç¨®å­å¼¾ä¸¸
 function c81524977.initial_effect(c)
 	c:SetCounterLimit(0x20,5)
 	--Activate

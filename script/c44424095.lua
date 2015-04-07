@@ -1,4 +1,4 @@
---D·スピードユニット
+--D・スピードユニット
 function c44424095.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)

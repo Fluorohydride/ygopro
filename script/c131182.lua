@@ -1,4 +1,4 @@
---ミラクル·フリッパー
+--ミラクル・フリッパー
 function c131182.initial_effect(c)
 	--sumlimit
 	local e1=Effect.CreateEffect(c)
@@ -21,8 +21,9 @@ function c131182.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e4:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	e4:SetTarget(c131182.atktg)
-	e4:SetValue(1)
+	e4:SetValue(aux.imval1)
 	c:RegisterEffect(e4)
 	--spsummon
 	local e5=Effect.CreateEffect(c)

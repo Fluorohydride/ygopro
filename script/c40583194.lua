@@ -1,4 +1,4 @@
---フォース·リゾネーター
+--フォース・リゾネーター
 function c40583194.initial_effect(c)
 	--
 	local e1=Effect.CreateEffect(c)
@@ -38,7 +38,6 @@ function c40583194.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetRange(LOCATION_MZONE)
 	e1:SetTarget(c40583194.etarget)
 	e1:SetValue(c40583194.evalue)
 	e1:SetLabel(tp)
@@ -49,5 +48,5 @@ function c40583194.etarget(e,c)
 	return c:IsType(TYPE_MONSTER)
 end
 function c40583194.evalue(e,re,rp)
-	return rp~=e:GetLabel()
+	return rp~=e:GetLabel() and aux.tgval(e,re,rp)
 end
