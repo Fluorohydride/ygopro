@@ -14,7 +14,7 @@ function c87608852.initial_effect(c)
 	Duel.AddCustomActivityCounter(87608852,ACTIVITY_CHAIN,c87608852.chainfilter)
 end
 function c87608852.counterfilter(c)
-	return not c:IsLevelAbove(5)
+	return not c:IsLevelAbove(5) or (c:GetReasonEffect():GetHandler():IsCode(52628687) and c:GetOriginalLevel()<5)
 end
 function c87608852.chainfilter(re,tp,cid)
 	return not (re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and re:GetHandler():IsSetCard(0x106e))
