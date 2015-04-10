@@ -1767,9 +1767,50 @@ int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32
 					}
 				}
 			}
-			if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
-				pduel->restore_assumes();
-				return TRUE;
+			if(!(core.global_flag & GLOBALFLAG_SCRAP_CHIMERA)) {
+				if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
+					pduel->restore_assumes();
+					return TRUE;
+				}
+			} else {
+				effect* pscrap = 0;
+				for(auto cit = nsyn.begin(); cit != nsyn.end(); ++cit) {
+					pscrap = (*cit)->is_affected_by_effect(EFFECT_SCRAP_CHIMERA);
+					if(pscrap)
+						break;
+				}
+				if(pscrap) {
+					card_vector nsyn_filtered;
+					for(auto cit = nsyn.begin(); cit != nsyn.end(); ++cit) {
+						if(!pscrap->get_value(*cit))
+							nsyn_filtered.push_back(*cit);
+					}
+					if(nsyn_filtered.size() == nsyn.size()) {
+						if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
+							pduel->restore_assumes();
+							return TRUE;
+						}
+					} else {
+						if(check_with_sum_limit(&nsyn_filtered, lv, 0, 1, min, max)) {
+							pduel->restore_assumes();
+							return TRUE;
+						}
+						card_vector nsyn_removed;
+						for(auto cit = nsyn.begin(); cit != nsyn.end(); ++cit) {
+							if(!(*cit)->is_affected_by_effect(EFFECT_SCRAP_CHIMERA))
+								nsyn_removed.push_back(*cit);
+						}
+						if(check_with_sum_limit(&nsyn_removed, lv, 0, 1, min, max)) {
+							pduel->restore_assumes();
+							return TRUE;
+						}
+					}
+				} else {
+					if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max)) {
+						pduel->restore_assumes();
+						return TRUE;
+					}
+				}
 			}
 		}
 	}

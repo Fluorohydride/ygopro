@@ -3994,84 +3994,20 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 				return FALSE;
 			}
 		}
-		card_set cset;
-		card_set* mset;
-		if(mg)
-			mset = &mg->container;
-		else {
+		if(mg) {
+			for(auto cit = mg->container.begin(); cit != mg->container.end(); ++cit) {
+				if(check_tuner_material(pcard, *cit, -2, -1, min, max, smat, mg))
+					core.select_cards.push_back(*cit);
+			}
+		} else {
 			for(uint8 p = 0; p < 2; ++p) {
 				for(int32 i = 0; i < 5; ++i) {
-					card* pm = player[p].list_mzone[i];
-					if(pm && (pm->current.location != LOCATION_MZONE || pm->is_position(POS_FACEUP)))
-						cset.insert(pm);
-				}
-			}
-			mset = &cset;
-		}
-		card* tuner;
-		effect* peffect;
-		for(auto cit = mset->begin(); cit != mset->end(); ++cit) {
-			pduel->restore_assumes();
-			tuner = *cit;
-			if((tuner->get_type() & TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
-				effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
-				if(pcheck)
-					pcheck->get_value(tuner);
-				if(!pduel->lua->check_matching(tuner, -2, 0))
-					continue;
-				if((peffect = tuner->is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL_CUSTOM, pcard))) {
-					if(!peffect->target)
-						continue;
-					pduel->lua->add_param(peffect, PARAM_TYPE_EFFECT);
-					pduel->lua->add_param(pcard, PARAM_TYPE_CARD);
-					pduel->lua->add_param(-1, PARAM_TYPE_INDEX);
-					pduel->lua->add_param(min, PARAM_TYPE_INT);
-					pduel->lua->add_param(max, PARAM_TYPE_INT);
-					if(pduel->lua->check_condition(peffect->target, 5))
-						core.select_cards.push_back(tuner);
-				} else {
-					int32 l = tuner->get_synchro_level(pcard);
-					int32 l1 = l & 0xffff;
-					//int32 l2 = l >> 16;
-					int32 lv = pcard->get_level();
-					lv -= l1;
-					if(lv <= 0)
-						continue;
-					if(smat) {
-						if(pcheck)
-							pcheck->get_value(smat);
-						l = smat->get_synchro_level(pcard);
-						l1 = l & 0xffff;
-						lv -= l1;
-						min--;
-						max--;
-						if(lv <= 0) {
-							if(lv == 0 && min == 0)
-								core.select_cards.push_back(tuner);
-							continue;
-						}
-						if(max == 0)
-							continue;
-					}
-					card_vector nsyn;
-					card* pm;
-					for(auto mit = mset->begin(); mit != mset->end(); ++mit) {
-						pm = *mit;
-						if(pm != tuner && pm->is_can_be_synchro_material(pcard, tuner)) {
-							if(pcheck)
-								pcheck->get_value(pm);
-							if(!pduel->lua->check_matching(pm, -1, 0))
-								continue;
-							nsyn.push_back(pm);
-							pm->operation_param = pm->get_synchro_level(pcard);
-						}
-					}
-					if(check_with_sum_limit(&nsyn, lv, 0, 1, min, max))
+					card* tuner = player[p].list_mzone[i];
+					if(check_tuner_material(pcard, tuner, -2, -1, min, max, smat, mg))
 						core.select_cards.push_back(tuner);
 				}
 			}
 		}
-		pduel->restore_assumes();
 		if(core.select_cards.size() == 0)
 			return TRUE;
 		pduel->write_buffer8(MSG_HINT);
@@ -4173,6 +4109,37 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 				}
 			}
 		}
+		if(core.global_flag & GLOBALFLAG_SCRAP_CHIMERA) {
+			effect* peffect = 0;
+			for(auto cit = core.select_cards.begin(); cit != core.select_cards.end(); ++cit) {
+				peffect = (*cit)->is_affected_by_effect(EFFECT_SCRAP_CHIMERA);
+				if(peffect)
+					break;
+			}
+			if(peffect) {
+				card_vector nsyn_filtered;
+				for(auto cit = core.select_cards.begin(); cit != core.select_cards.end(); ++cit) {
+					if(!peffect->get_value(*cit))
+						nsyn_filtered.push_back(*cit);
+				}
+				if(nsyn_filtered.size() < core.select_cards.size()) {
+					card_vector nsyn_removed;
+					for(auto cit = core.select_cards.begin(); cit != core.select_cards.end(); ++cit) {
+						if(!(*cit)->is_affected_by_effect(EFFECT_SCRAP_CHIMERA))
+							nsyn_removed.push_back(*cit);
+					}
+					if(check_with_sum_limit(&nsyn_filtered, lv, 0, 1, min, max)) {
+						if(check_with_sum_limit(&nsyn_removed, lv, 0, 1, min, max)) {
+							add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, playerid, peffect->description);
+							core.units.begin()->step = 6;
+							return FALSE;
+						} else
+							core.select_cards.swap(nsyn_filtered);
+					} else
+						core.select_cards.swap(nsyn_removed);
+				}
+			}
+		}
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_SELECTMSG);
 		pduel->write_buffer8(playerid);
@@ -4205,6 +4172,49 @@ int32 field::select_synchro_material(int16 step, uint8 playerid, card* pcard, in
 		pduel->restore_assumes();
 		core.limit_tuner = 0;
 		return TRUE;
+	}
+	case 7: {
+		card* tuner = core.limit_tuner;
+		int32 l = tuner->get_synchro_level(pcard);
+		int32 l1 = l & 0xffff;
+		//int32 l2 = l >> 16;
+		int32 lv = pcard->get_level();
+		lv -= l1;
+		if(smat) {
+			l = smat->get_synchro_level(pcard);
+			l1 = l & 0xffff;
+			lv -= l1;
+			min--;
+			max--;
+		}
+		if(returns.ivalue[0]) {
+			effect* peffect = 0;
+			for(auto cit = core.select_cards.begin(); cit != core.select_cards.end(); ++cit) {
+				peffect = (*cit)->is_affected_by_effect(EFFECT_SCRAP_CHIMERA);
+				if(peffect)
+					break;
+			}
+			card_vector nsyn_filtered;
+			for(auto cit = core.select_cards.begin(); cit != core.select_cards.end(); ++cit) {
+				if(!peffect->get_value(*cit))
+					nsyn_filtered.push_back(*cit);
+			}
+			core.select_cards.swap(nsyn_filtered);
+		} else {
+			card_vector nsyn_removed;
+			for(auto cit = core.select_cards.begin(); cit != core.select_cards.end(); ++cit) {
+				if(!(*cit)->is_affected_by_effect(EFFECT_SCRAP_CHIMERA))
+					nsyn_removed.push_back(*cit);
+			}
+			core.select_cards.swap(nsyn_removed);
+		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_SELECTMSG);
+		pduel->write_buffer8(playerid);
+		pduel->write_buffer32(512);
+		add_process(PROCESSOR_SELECT_SUM, 0, 0, 0, lv, playerid + (min << 16) + (max << 24));
+		core.units.begin()->step = 4;
+		return FALSE;
 	}
 	}
 	return TRUE;
