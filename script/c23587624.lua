@@ -73,7 +73,7 @@ function c23587624.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e4,tp)
 end
 function c23587624.efilter(e,re)
-	return e:GetOwnerPlayer()==re:GetHandlerPlayer() and e:GetHandler()~=re:GetHandler()
+	return e:GetOwnerPlayer()==re:GetOwnerPlayer() and e:GetHandler()~=re:GetHandler()
 end
 function c23587624.tdcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp
