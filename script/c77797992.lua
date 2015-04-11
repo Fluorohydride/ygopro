@@ -22,6 +22,7 @@ function c77797992.initial_effect(c)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e3:SetValue(1)
 	c:RegisterEffect(e3)
 end
 function c77797992.cona(e)

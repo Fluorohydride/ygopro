@@ -56,5 +56,9 @@ function c85080444.indop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	e2:SetValue(c85080444.tgvalue)
 	Duel.RegisterEffect(e2,tp)
+end
+function c85080444.tgvalue(e,re,rp)
+	return rp~=e:GetHandlerPlayer()
 end

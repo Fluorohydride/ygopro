@@ -42,5 +42,5 @@ function c31476755.desop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c31476755.efilter(e,re)
-	return e:GetHandlerPlayer()~=re:GetHandlerPlayer() and re:IsActiveType(TYPE_SPELL)
+	return e:GetHandlerPlayer()~=re:GetOwnerPlayer() and re:IsActiveType(TYPE_SPELL)
 end

@@ -4456,6 +4456,7 @@ int32 field::add_chain(uint16 step) {
 		if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && (!(peffect->type & 0x2a0) || (peffect->code & EVENT_PHASE) == EVENT_PHASE)) {
 			peffect->handler->create_relation(peffect);
 		}
+		peffect->effect_owner = clit.triggering_player;
 		if(peffect->cost) {
 			core.sub_solving_event.push_back(clit.evt);
 			add_process(PROCESSOR_EXECUTE_COST, 0, peffect, 0, clit.triggering_player, 0);

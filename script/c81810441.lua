@@ -60,7 +60,7 @@ function c81810441.eqlimit(e,c)
 	return c:IsSetCard(0x9c)
 end
 function c81810441.efilter(e,re)
-	return e:GetHandlerPlayer()~=re:GetHandlerPlayer()
+	return e:GetHandlerPlayer()~=re:GetOwnerPlayer()
 end
 function c81810441.cfilter(c)
 	return c:IsFaceup() and not c:IsSetCard(0x9c)
