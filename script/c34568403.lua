@@ -49,7 +49,9 @@ function c34568403.arcanareg(c,coin)
 	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c34568403.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffectLabel(36690018)==1 and e:GetHandler():IsRelateToBattle()
+	local c=e:GetHandler()
+	local bc=c:GetBattleTarget()
+	return c:GetFlagEffectLabel(36690018)==1 and c:IsRelateToBattle() and (bc:IsLocation(LOCATION_GRAVE) or bc:IsLocation(LOCATION_REMOVED))
 end
 function c34568403.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetHandler():GetBattleTarget()
