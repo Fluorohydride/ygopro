@@ -88,7 +88,7 @@ function c91842653.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	end
 end
 function c91842653.sfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:IsCode(15259703) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsReason(REASON_DESTROY) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c91842653.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c91842653.sfilter,1,nil)
