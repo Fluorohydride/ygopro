@@ -74,7 +74,6 @@ end
 function c8062132.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
-		e:GetHandler():CompleteProcedure()
 	end
 end
 function c8062132.ctcon(e,tp,eg,ep,ev,re,r,rp)
