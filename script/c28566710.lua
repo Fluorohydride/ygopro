@@ -26,7 +26,7 @@ function c28566710.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,nil,tp,LOCATION_MZONE,0,1,1,nil)
 	local tc=tg:GetFirst()
 	local hg=Duel.GetFieldGroup(tp,0xe,0xe)
-	hg:RemoveCard(tc)
+	if tc then hg:RemoveCard(tc) end
 	Duel.SendtoGrave(hg,REASON_EFFECT)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(1-tp,c28566710.spfilter,1-tp,LOCATION_DECK,0,1,1,nil,e,tp)
@@ -41,7 +41,7 @@ function c28566710.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetTargetRange(1,1)
 		e1:SetReset(RESET_CHAIN)
 		Duel.RegisterEffect(e1,tp)
-		Duel.CalculateDamage(sc,tc)
+		if tc then Duel.CalculateDamage(sc,tc) end
 	end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
