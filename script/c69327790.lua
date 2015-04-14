@@ -79,7 +79,7 @@ function c69327790.tdop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	if e:GetLabel()==1 then
 		local tc=g2:GetFirst()
-		if tc:IsRelateToEffect(e) then
+		if tc and tc:IsRelateToEffect(e) then
 			Duel.SendtoHand(g2,nil,REASON_EFFECT)
 		end
 	end
