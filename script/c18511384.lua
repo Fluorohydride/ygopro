@@ -14,7 +14,7 @@ function c18511384.filter1(c)
 	return c:IsCode(24094653) and c:IsAbleToHand()
 end
 function c18511384.filter2(c)
-	return bit.band(c:GetReason(),0x40008)==0x40008 and c:IsAbleToHand()
+	return bit.band(c:GetReason(),0x40008)==0x40008 and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c18511384.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
