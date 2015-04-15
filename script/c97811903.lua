@@ -4,7 +4,7 @@ function c97811903.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_DAMAGE_CALCULATING)
 	e1:SetCondition(c97811903.condtion)
-	e1:SetOperation(c97811903.atkval)
+	e1:SetOperation(c97811903.atkop)
 	c:RegisterEffect(e1)
 	--
 	local e2=Effect.CreateEffect(c)
@@ -26,11 +26,11 @@ end
 function c97811903.condtion(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker() and Duel.GetAttackTarget()~=nil
 end
-function c97811903.atkval(e,tp,eg,ep,ev,re,r,rp)
+function c97811903.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=Duel.GetAttackTarget()
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetCode(EFFECT_SET_ATTACK)
 	e1:SetReset(RESET_PHASE+RESET_DAMAGE_CAL)
 	e1:SetValue(bc:GetAttack()*2)
 	e:GetHandler():RegisterEffect(e1)
