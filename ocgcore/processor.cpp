@@ -3831,10 +3831,14 @@ int32 field::process_damage_step(uint16 step) {
 		infos.phase = PHASE_DAMAGE;
 		pduel->write_buffer8(MSG_DAMAGE_STEP_START);
 		core.pre_field[0] = core.attacker->fieldid_r;
-		if(core.attack_target)
+		if(core.attack_target) {
 			core.pre_field[1] = core.attack_target->fieldid_r;
-		else
+			core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
+		} else {
 			core.pre_field[1] = 0;
+			core.attacker->attacked_cards[0] = 0;
+		}
+		core.attacker->attacked_count++;
 		if(core.attack_target->is_position(POS_FACEDOWN)) {
 			change_position(core.attack_target, 0, PLAYER_NONE, core.attack_target->current.position >> 1, 0, TRUE);
 			adjust_all();
