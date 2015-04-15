@@ -3153,7 +3153,6 @@ int32 field::process_battle_command(uint16 step) {
 						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
 						core.attacker->attacked_cards[0] = 0;
-					core.attacker->attacked_count++;
 				}
 				core.attacker->announce_count++;
 				attack_all_target_check();
@@ -3181,7 +3180,6 @@ int32 field::process_battle_command(uint16 step) {
 						core.attacker->attacked_cards[core.attack_target->fieldid_r] = core.attack_target;
 					else
 						core.attacker->attacked_cards[0] = 0;
-					core.attacker->attacked_count++;
 				}
 			}
 			core.units.begin()->step = -1;
@@ -3206,7 +3204,6 @@ int32 field::process_battle_command(uint16 step) {
 			core.sub_attacker = 0;
 			core.sub_attack_target = (card*)0xffffffff;
 			core.attacker->announce_count++;
-			core.attacker->attacked_count++;
 			attack_all_target_check();
 			pduel->write_buffer8(MSG_ATTACK);
 			pduel->write_buffer32(core.attacker->get_info_location());
@@ -3258,7 +3255,6 @@ int32 field::process_battle_command(uint16 step) {
 			rollback = true;
 		if(!rollback) {
 			core.attacker->announce_count++;
-			core.attacker->attacked_count++;
 			attack_all_target_check();
 			if(core.attack_target) {
 				core.attacker->announced_cards[core.attack_target->fieldid_r] = core.attack_target;
@@ -3324,6 +3320,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.pre_field[1] = core.attack_target->fieldid_r;
 		else
 			core.pre_field[1] = 0;
+		core.attacker->attacked_count++;
 		raise_single_event(core.attacker, 0, EVENT_BATTLE_START, 0, 0, 0, 0, 0);
 		if(core.attack_target)
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_START, 0, 0, 0, 0, 1);
@@ -3831,6 +3828,7 @@ int32 field::process_damage_step(uint16 step) {
 		infos.phase = PHASE_DAMAGE;
 		pduel->write_buffer8(MSG_DAMAGE_STEP_START);
 		core.pre_field[0] = core.attacker->fieldid_r;
+		core.attacker->attacked_count++;
 		if(core.attack_target)
 			core.pre_field[1] = core.attack_target->fieldid_r;
 		else
