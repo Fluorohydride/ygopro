@@ -2583,6 +2583,9 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 			targets->container.erase(*cit);
 		}
 		for (auto eit = indestructable_effect_set.begin(); eit != indestructable_effect_set.end(); ++eit) {
+			if ((*eit)->flag&EFFECT_FLAG_NO_HINT)
+				continue;
+			
 			pduel->write_buffer8(MSG_HINT);
 			pduel->write_buffer8(HINT_CARD);
 			pduel->write_buffer8(0);

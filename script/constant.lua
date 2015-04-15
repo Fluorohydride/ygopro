@@ -266,6 +266,7 @@ EFFECT_FLAG_CHAIN_UNIQUE	=0x8000000	--同一组连锁只能发动一次
 EFFECT_FLAG_NAGA			=0x10000000 --神卡纳迦！
 EFFECT_FLAG_COF				=0x20000000 --邪恶的仪式
 EFFECT_FLAG_CVAL_CHECK		=0x40000000	--以卡为COST的诱发效果需要使用
+EFFECT_FLAG_NO_HINT			=0x80000000	--
 --========== Codes ==========	--对永续性效果表示效果类型 EFFECT开头，对诱发型效果表示触发效果的事件/时点 EVENT开头
 EFFECT_IMMUNE_EFFECT			=1		--效果免疫
 EFFECT_DISABLE					=2		--效果无效（技能抽取）
