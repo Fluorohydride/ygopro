@@ -128,11 +128,31 @@ int32 scriptlib::card_get_lscale(lua_State *L) {
 	lua_pushinteger(L, pcard->get_lscale());
 	return 1;
 }
+int32 scriptlib::card_get_origin_lscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(pcard->status & STATUS_NO_LEVEL)
+		lua_pushinteger(L, 0);
+	else
+		lua_pushinteger(L, pcard->data.lscale);
+	return 1;
+}
 int32 scriptlib::card_get_rscale(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->get_rscale());
+	return 1;
+}
+int32 scriptlib::card_get_origin_rscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	if(pcard->status & STATUS_NO_LEVEL)
+		lua_pushinteger(L, 0);
+	else
+		lua_pushinteger(L, pcard->data.rscale);
 	return 1;
 }
 int32 scriptlib::card_get_attribute(lua_State *L) {
