@@ -40,7 +40,7 @@ function c26509612.activate(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e3:SetTargetRange(LOCATION_MZONE,0)
 	e3:SetTarget(c26509612.attg2)
-	e3:SetValue(c26509612.attg)
+	e3:SetValue(1)
 	e3:SetReset(RESET_PHASE+PHASE_BATTLE)
 	Duel.RegisterEffect(e3,tp)
 end
