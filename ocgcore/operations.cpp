@@ -1038,6 +1038,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 			return TRUE;
 		if(equip_card->equiping_target) {
 			equip_card->unequip();
+			equip_card->enable_field_effect(FALSE);
 			return FALSE;
 		}
 		if(equip_card->current.location == LOCATION_SZONE) {
