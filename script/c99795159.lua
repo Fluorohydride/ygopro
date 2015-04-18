@@ -8,12 +8,10 @@ function c99795159.initial_effect(c)
 	--atklimit
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE+EFFECT_FLAG_IGNORE_IMMUNE)
+	e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(c99795159.bttg)
-	e2:SetValue(aux.imval1)
+	e2:SetValue(c99795159.atlimit)
 	c:RegisterEffect(e2)
 	--direct attack
 	local e3=Effect.CreateEffect(c)
@@ -33,7 +31,7 @@ function c99795159.initial_effect(c)
 	e4:SetValue(c99795159.val)
 	c:RegisterEffect(e4)
 end
-function c99795159.bttg(e,c)
+function c99795159.atlimit(e,c)
 	return c:IsFacedown()
 end
 function c99795159.dirtg(e,c)

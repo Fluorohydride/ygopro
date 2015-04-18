@@ -2367,6 +2367,8 @@ int32 card::is_control_can_be_changed() {
 int32 card::is_capable_be_battle_target(card* pcard) {
 	if(is_affected_by_effect(EFFECT_CANNOT_BE_BATTLE_TARGET, pcard))
 		return FALSE;
+	if(pcard->is_affected_by_effect(EFFECT_CANNOT_SELECT_BATTLE_TARGET, this))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_IGNORE_BATTLE_TARGET))
 		return FALSE;
 	return TRUE;
