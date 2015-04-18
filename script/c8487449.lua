@@ -54,7 +54,7 @@ function c8487449.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-sp) and c8487449.filter(chkc) and chkc~=c end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,c8487449.filter,sp,0,LOCATION_MZONE,1,1,c)
+	local g=Duel.SelectTarget(sp,c8487449.filter,sp,0,LOCATION_MZONE,1,1,c)
 	if g:GetCount()>0 then
 		g:AddCard(c)
 		Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,2,0,0)
