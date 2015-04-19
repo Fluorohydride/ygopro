@@ -80,12 +80,5 @@ function c4068622.operation(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_BASE_ATTACK)
 		e2:SetValue(ba)
 		c:RegisterEffect(e2)
-		local e3=Effect.CreateEffect(c)
-		e3:SetType(EFFECT_TYPE_SINGLE)
-		e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-		e3:SetReset(reset_flag)
-		e3:SetCode(EFFECT_SET_BASE_DEFENCE)
-		e3:SetValue(bd)
-		c:RegisterEffect(e3)
 	end
 end
