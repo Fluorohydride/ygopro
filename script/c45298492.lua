@@ -22,7 +22,7 @@ function c45298492.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c45298492.atlimit(e,c)
-	return c~=e:GetHandler() and c:IsRace(RACE_WARRIOR)
+	return c~=e:GetHandler() and c:IsFaceup() and c:IsRace(RACE_WARRIOR)
 end
 function c45298492.valcon(e,re,r,rp)
 	return bit.band(r,REASON_BATTLE)~=0

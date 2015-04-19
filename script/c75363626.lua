@@ -33,5 +33,5 @@ function c75363626.retop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c75363626.atktg(e,c)
-	return c:GetCode()~=75363626 and c:IsSetCard(0x71)
+	return c:IsFaceup() and c:GetCode()~=75363626 and c:IsSetCard(0x71)
 end

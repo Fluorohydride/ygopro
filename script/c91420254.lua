@@ -74,5 +74,5 @@ function c91420254.posop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c91420254.bttg(e,c)
-	return c:IsSetCard(0xb3) and c~=e:GetHandler()
+	return c:IsFaceup() and c:IsSetCard(0xb3) and c~=e:GetHandler()
 end

@@ -10,5 +10,5 @@ function c25034083.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c25034083.atlimit(e,c)
-	return not c:IsCode(25034083)
+	return not c:IsCode(25034083) and c:IsFaceup()
 end

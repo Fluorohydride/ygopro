@@ -20,7 +20,7 @@ function c91559748.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c91559748.tg(e,c)
-	return c:IsRace(RACE_INSECT)
+	return c:IsFaceup() and c:IsRace(RACE_INSECT)
 end
 function c91559748.cpcon(e,tp,eg,ep,ev,re,r,rp)
 	local t=e:GetHandler():GetBattleTarget()

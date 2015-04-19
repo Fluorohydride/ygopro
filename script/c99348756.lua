@@ -21,7 +21,7 @@ function c99348756.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c99348756.atktg(e,c)
-	return c:GetCode()~=99348756 and c:IsRace(RACE_WARRIOR)
+	return c:GetCode()~=99348756 and c:IsFaceup() and c:IsRace(RACE_WARRIOR)
 end
 function c99348756.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsLocation(LOCATION_GRAVE) and e:GetHandler():IsReason(REASON_BATTLE)

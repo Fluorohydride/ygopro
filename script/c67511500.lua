@@ -6,7 +6,7 @@ function c67511500.initial_effect(c)
 	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(0,LOCATION_MZONE)
-	e1:SetValue(aux.TargetBoolFunction(Card.IsRace,RACE_DRAGON))
+	e1:SetValue(c67511500.atlimit)
 	c:RegisterEffect(e1)
 	--destroy replace
 	local e2=Effect.CreateEffect(c)
@@ -16,6 +16,9 @@ function c67511500.initial_effect(c)
 	e2:SetCode(EFFECT_DESTROY_REPLACE)
 	e2:SetTarget(c67511500.desreptg)
 	c:RegisterEffect(e2)
+end
+function c67511500.atlimit(e,c)
+	return c:IsFaceup() and c:IsRace(RACE_DRAGON)
 end
 function c67511500.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

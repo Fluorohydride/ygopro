@@ -21,7 +21,7 @@ function c87294988.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c87294988.bttg(e,c)
-	return c~=e:GetHandler() and c:IsRace(RACE_PLANT)
+	return c~=e:GetHandler() and c:IsFaceup() and c:IsRace(RACE_PLANT)
 end
 function c87294988.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and e:GetHandler():GetPreviousControler()==tp

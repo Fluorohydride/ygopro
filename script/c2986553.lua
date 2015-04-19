@@ -19,7 +19,7 @@ function c2986553.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c2986553.atlimit(e,c)
-	return c:IsRace(RACE_PLANT)
+	return c:IsFaceup() and c:IsRace(RACE_PLANT)
 end
 function c2986553.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsRace(RACE_PLANT) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

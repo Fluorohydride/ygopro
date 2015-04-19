@@ -25,5 +25,5 @@ function c10979723.filter(c)
 	return c:IsFaceup() and c:IsSetCard(0x4)
 end
 function c10979723.atlimit(e,c)
-	return c:IsSetCard(0x4) and c~=e:GetHandler()
+	return c:IsFaceup() and c:IsSetCard(0x4) and c~=e:GetHandler()
 end

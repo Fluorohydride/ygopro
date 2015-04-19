@@ -19,7 +19,7 @@ function c70458081.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c70458081.atlimit(e,c)
-	return c:IsSetCard(0x9f) and c~=e:GetHandler()
+	return c:IsFaceup() and c:IsSetCard(0x9f) and c~=e:GetHandler()
 end
 function c70458081.repfilter(c,tp)
 	return c:IsFaceup() and c:IsSetCard(0x9f) and not c:IsCode(70458081)

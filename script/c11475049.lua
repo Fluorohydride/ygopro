@@ -52,5 +52,5 @@ function c11475049.atop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e1,tp)
 end
 function c11475049.atlimit(e,c)
-	return c:IsSetCard(0x97)
+	return c:IsFaceup() and c:IsSetCard(0x97)
 end

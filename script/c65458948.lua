@@ -102,7 +102,7 @@ function c65458948.atcon(e)
 	return Duel.IsExistingMatchingCard(c65458948.atkfilter,e:GetHandlerPlayer(),0,LOCATION_MZONE,1,nil)
 end
 function c65458948.atlimit(e,c)
-	return not c:IsType(TYPE_TOON)
+	return not c:IsType(TYPE_TOON) or c:IsFacedown()
 end
 function c65458948.atklimit(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

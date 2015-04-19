@@ -21,7 +21,7 @@ function c79636594.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c79636594.bttg(e,c)
-	return c:IsRace(RACE_INSECT) and c~=e:GetHandler()
+	return c:IsFaceup() and c:IsRace(RACE_INSECT) and c~=e:GetHandler()
 end
 function c79636594.filter(c,e,tp)
 	return c:IsCode(79636594) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

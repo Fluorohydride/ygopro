@@ -11,5 +11,5 @@ function c9264485.initial_effect(c)
 end
 function c9264485.etarget(e,re,c)
 	local code=c:GetCode()
-	return c:IsLocation(LOCATION_MZONE) and (code==75830094 or code==11224103 or code==48229808)
+	return c:IsLocation(LOCATION_MZONE) and c:IsFaceup() and (code==75830094 or code==11224103 or code==48229808)
 end

@@ -10,5 +10,5 @@ function c9666558.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c9666558.tg(e,c)
-	return c~=e:GetHandler() and c:IsRace(RACE_DRAGON)
+	return c~=e:GetHandler() and c:IsFaceup() and c:IsRace(RACE_DRAGON)
 end

@@ -19,5 +19,5 @@ function c95466842.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c95466842.atlimit(e,c)
-	return c~=e:GetHandler() and c:IsAttribute(ATTRIBUTE_WATER)
+	return c~=e:GetHandler() and c:IsFaceup() and c:IsAttribute(ATTRIBUTE_WATER)
 end

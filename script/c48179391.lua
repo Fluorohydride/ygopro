@@ -77,5 +77,5 @@ function c48179391.atkfilter(c,atk)
 	return c:IsFaceup() and c:GetAttack()<atk
 end
 function c48179391.atlimit(e,c)
-	return not Duel.IsExistingMatchingCard(c48179391.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,c,c:GetAttack())
+	return c:IsFaceup() and not Duel.IsExistingMatchingCard(c48179391.atkfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,c,c:GetAttack())
 end

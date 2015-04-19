@@ -24,5 +24,5 @@ function c2333365.descon(e)
 	return not Duel.IsExistingMatchingCard(c2333365.filter,0,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler())
 end
 function c2333365.atlimit(e,c)
-	return c:GetCode()~=2333365 and c:IsSetCard(0x42)
+	return c:IsFaceup() and c:GetCode()~=2333365 and c:IsSetCard(0x42)
 end
