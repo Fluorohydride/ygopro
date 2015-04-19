@@ -36,17 +36,12 @@ end
 function c40583194.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetOwner())
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetTarget(c40583194.etarget)
-	e1:SetValue(c40583194.evalue)
-	e1:SetLabel(tp)
+	e1:SetCode(EFFECT_CANNOT_SELECT_EFFECT_TARGET)
+	e1:SetTargetRange(0,0xff)
+	e1:SetValue(c40583194.etarget)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
 end
-function c40583194.etarget(e,c)
+function c40583194.etarget(e,re,c)
 	return c:IsType(TYPE_MONSTER)
-end
-function c40583194.evalue(e,re,rp)
-	return rp~=e:GetLabel() and aux.tgval(e,re,rp)
 end

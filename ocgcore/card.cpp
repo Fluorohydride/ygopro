@@ -2376,11 +2376,17 @@ int32 card::is_capable_be_battle_target(card* pcard) {
 int32 card::is_capable_be_effect_target(effect* peffect, uint8 playerid) {
 	if(is_status(STATUS_SUMMONING) || is_status(STATUS_BATTLE_DESTROYED))
 		return FALSE;
-	effect_set eset;
+	effect_set eset,eset2;
 	filter_effect(EFFECT_CANNOT_BE_EFFECT_TARGET, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		if(eset[i]->get_value(peffect, 1))
+			return FALSE;
+	}
+	peffect->handler->filter_effect(EFFECT_CANNOT_SELECT_EFFECT_TARGET, &eset2);
+	for(int32 i = 0; i < eset2.size(); ++i) {
+		pduel->lua->add_param(this, PARAM_TYPE_CARD);
+		if(eset2[i]->get_value(peffect, 1))
 			return FALSE;
 	}
 	return TRUE;
