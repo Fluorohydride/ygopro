@@ -1334,11 +1334,17 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 			pduel->write_buffer8(0);
 			pduel->write_buffer32(pextra->handler->data.code);
 		}
-		target->enable_field_effect(FALSE);
+		uint8 targetplayer = sumplayer;
+		uint8 positions = POS_FACEUP_ATTACK;
 		if(is_player_affected_by_effect(sumplayer, EFFECT_DEVINE_LIGHT))
-			move_to_field(target, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP);
-		else
-			move_to_field(target, sumplayer, sumplayer, LOCATION_MZONE, POS_FACEUP_ATTACK);
+			positions = POS_FACEUP;
+		if(proc && (proc->flag & EFFECT_FLAG_SPSUM_PARAM)) {
+			positions = proc->s_range;
+			if(proc->o_range)
+				targetplayer = 1 - sumplayer;
+		}
+		target->enable_field_effect(FALSE);
+		move_to_field(target, sumplayer, targetplayer, LOCATION_MZONE, positions);
 		core.summoning_card = target;
 		core.units.begin()->step = 8;
 		return FALSE;
@@ -1389,8 +1395,9 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		return FALSE;
 	}
 	case 9: {
-		if(target->owner != sumplayer)
-			set_control(target, sumplayer, 0, 0);
+		uint8 targetplayer = target->current.controler;
+		if(target->owner != targetplayer)
+			set_control(target, targetplayer, 0, 0);
 		core.phase_action = TRUE;
 		target->current.reason = REASON_SUMMON;
 		target->summon_player = sumplayer;
@@ -1757,13 +1764,21 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			pduel->write_buffer8(0);
 			pduel->write_buffer32(pextra->handler->data.code);
 		}
+		uint8 targetplayer = setplayer;
+		uint8 positions = POS_FACEDOWN_DEFENCE;
+		if(proc && (proc->flag & EFFECT_FLAG_SPSUM_PARAM)) {
+			positions = proc->s_range;
+			if(proc->o_range)
+				targetplayer = 1 - setplayer;
+		}
 		target->enable_field_effect(FALSE);
-		move_to_field(target, setplayer, setplayer, LOCATION_MZONE, POS_FACEDOWN_DEFENCE);
+		move_to_field(target, setplayer, targetplayer, LOCATION_MZONE, positions);
 		return FALSE;
 	}
 	case 7: {
-		if(target->owner != setplayer)
-			set_control(target, setplayer, 0, 0);
+		uint8 targetplayer = target->current.controler;
+		if(target->owner != targetplayer)
+			set_control(target, targetplayer, 0, 0);
 		core.phase_action = TRUE;
 		core.normalsummon_state_count[setplayer]++;
 		check_card_counter(target, 2, setplayer);
