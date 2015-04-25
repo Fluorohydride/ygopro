@@ -38,12 +38,17 @@ end
 function c39980304.chain_target(e,te,tp)
 	return Duel.GetMatchingGroup(c39980304.filter,tp,LOCATION_MZONE+LOCATION_GRAVE+LOCATION_HAND+LOCATION_DECK,0,nil,te)
 end
-function c39980304.chain_operation(e,te,tp,tc,mat,sumtype)
+function c39980304.chain_operation(e,te,tp,tc,mat,sumtype,step)
 	if not sumtype then sumtype=SUMMON_TYPE_FUSION end
+	if not step then step=false end
 	tc:SetMaterial(mat)
 	Duel.Remove(mat,POS_FACEUP,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 	Duel.BreakEffect()
-	Duel.SpecialSummon(tc,sumtype,tp,tp,false,false,POS_FACEUP)
+	if step then
+		Duel.SpecialSummonStep(tc,sumtype,tp,tp,false,false,POS_FACEUP)
+	else
+		Duel.SpecialSummon(tc,sumtype,tp,tp,false,false,POS_FACEUP)
+	end
 	tc:RegisterFlagEffect(39980304,RESET_EVENT+0x1fc0000+RESET_PHASE+RESET_END,0,1)
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetOwnerPlayer(tp)

@@ -80,7 +80,7 @@ function c7394770.activate(e,tp,eg,ep,ev,re,r,rp)
 		else
 			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
 			local fop=ce:GetOperation()
-			fop(ce,e,tp,tc,mat2,true)
+			fop(ce,e,tp,tc,mat2,nil,true)
 		end
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)

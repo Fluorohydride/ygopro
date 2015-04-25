@@ -23,12 +23,14 @@ function c66752837.tricon(e,c)
 	return c:IsRace(RACE_DRAGON)
 end
 function c66752837.cfilter(c)
-	return c:GetPreviousRaceOnField()==RACE_DRAGON and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsCode(66752837)
+	return c:GetPreviousRaceOnField()==RACE_DRAGON and c:IsPreviousPosition(POS_FACEUP)
+		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsCode(66752837)
 end
 function c66752837.cfilter2(c)
 	return c66752837.cfilter(c) and c:IsType(TYPE_NORMAL)
 end
 function c66752837.spcon(e,tp,eg,ep,ev,re,r,rp)
+	if eg:IsContains(e:GetHandler()) then return false end
 	if eg:IsExists(c66752837.cfilter2,1,nil) then
 		e:SetLabel(1)
 		return true
@@ -46,13 +48,12 @@ function c66752837.thfilter(c)
 end
 function c66752837.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	local g=Duel.GetMatchingGroup(c66752837.thfilter,tp,LOCATION_GRAVE,0,nil)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and e:GetLabel()==1
-		and Duel.IsExistingMatchingCard(c66752837.thfilter,tp,LOCATION_GRAVE,0,1,nil) and Duel.SelectYesNo(tp,aux.Stringid(66752837,0)) then
+		and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(66752837,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
-		local g=Duel.SelectMatchingCard(tp,c66752837.thfilter,tp,LOCATION_GRAVE,0,1,1,nil)
-		if g:GetCount()>0 then
-			Duel.SendtoHand(g,nil,REASON_EFFECT)
-			Duel.ConfirmCards(1-tp,g)
-		end
+		local sg=g:Select(tp,1,1,nil)
+		Duel.SendtoHand(sg,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,sg)
 	end
 end

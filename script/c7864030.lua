@@ -56,9 +56,9 @@ function c7864030.condition2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c7864030.operation2(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFaceup() and c:IsRelateToEffect(e) then
+	if c:IsRelateToEffect(e) then
 		local at=Duel.GetAttacker()
-		if at:IsAttackable() and not at:IsImmuneToEffect(e) and not c:IsImmuneToEffect(e) then
+		if at:IsAttackable() and not at:IsImmuneToEffect(e) then
 			Duel.CalculateDamage(at,c)
 		end
 	end

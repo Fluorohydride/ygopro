@@ -28,22 +28,16 @@ end
 function c43268675.indcon(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_FUSION and e:GetHandler():IsLocation(LOCATION_GRAVE)
 end
-function c43268675.filter(c)
-	return c:IsFaceup() and c:IsSetCard(0x9b)
-end
 function c43268675.indop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(c43268675.filter,tp,LOCATION_MZONE,0,nil)
-	local tc=g:GetFirst()
-	while tc do
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-		e1:SetValue(1)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
-		tc:RegisterEffect(e1)
-		local e2=e1:Clone()
-		e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
-		tc:RegisterEffect(e2)
-		tc=g:GetNext()
-	end
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
+	e1:SetTargetRange(LOCATION_MZONE,0)
+	e1:SetTarget(aux.TargetBoolFunction(Card.IsSetCard,0x9b))
+	e1:SetValue(1)
+	e1:SetReset(RESET_PHASE+RESET_END)
+	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_INDESTRUCTABLE_EFFECT)
+	Duel.RegisterEffect(e2,tp)
 end
