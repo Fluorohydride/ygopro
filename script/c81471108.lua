@@ -70,7 +70,7 @@ end
 function c81471108.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
-function c81471108.tgcon(e,tp,eg,ep,ev,re,r,rp)
+function c81471108.tgcon(e)
 	return e:GetHandler():GetEquipTarget()~=nil
 end
 function c81471108.tglimit(e,re,c)
