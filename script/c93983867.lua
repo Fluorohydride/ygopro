@@ -45,7 +45,7 @@ function c93983867.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 			e1:SetCountLimit(1)
 			e1:SetOperation(c93983867.retop)
-			e1:SetReset(RESET_PHASE+RESET_END)
+			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
 			tc:RegisterEffect(e1)
 		end
 	else

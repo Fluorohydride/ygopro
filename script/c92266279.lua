@@ -47,6 +47,7 @@ function c92266279.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		end
 		if opt==0 then
 			e:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
+			e:SetProperty(0)
 			e:SetOperation(c92266279.thop)
 			c92266279.thcost(e,tp,eg,ep,ev,re,r,rp,1)
 			c92266279.thtg(e,tp,eg,ep,ev,re,r,rp,1)
@@ -56,7 +57,13 @@ function c92266279.target(e,tp,eg,ep,ev,re,r,rp,chk)
 			e:SetOperation(c92266279.recop)
 			c92266279.rectg(e,tp,eg,ep,ev,re,r,rp,1)
 		end
+	else
+		e:SetCategory(0)
+		e:SetProperty(0)
+		e:SetOperation(c92266279.nop)
 	end
+end
+function c92266279.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c92266279.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) and Duel.GetFlagEffect(tp,92266279)==0 end

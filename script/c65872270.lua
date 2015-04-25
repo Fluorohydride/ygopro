@@ -34,7 +34,12 @@ function c65872270.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		e:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
 		e:SetOperation(c65872270.desop)
 		c65872270.destg(e,tp,eg,ep,ev,re,r,rp,1)
+	else
+		e:SetCategory(0)
+		e:SetOperation(c65872270.nop)
 	end
+end
+function c65872270.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65872270.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp
@@ -62,7 +67,7 @@ function c65872270.desop(e,tp,eg,ep,ev,re,r,rp)
 	if ct2>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-		rg=g:Select(tp,1,ct2,nil)
+		local rg=g:Select(tp,1,ct2,nil)
 		Duel.SendtoHand(rg,nil,REASON_EFFECT)
 	end
 end

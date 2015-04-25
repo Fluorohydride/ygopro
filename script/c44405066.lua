@@ -40,7 +40,7 @@ function c44405066.initial_effect(c)
 	e4:SetOperation(c44405066.spop)
 	c:RegisterEffect(e4)
 end
-function c44405066.indcon(e,c)
+function c44405066.indcon(e)
 	return e:GetHandler():GetOverlayCount()>0
 end
 function c44405066.regop(e,tp,eg,ep,ev,re,r,rp)

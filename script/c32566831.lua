@@ -34,6 +34,7 @@ function c32566831.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c32566831.tgfilter,p,LOCATION_DECK,0,nil)
 	if dr~=0 and g:GetCount()>0 and Duel.SelectYesNo(p,aux.Stringid(32566831,0)) then
 		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,p,HINTMSG_TOGRAVE)
 		local sg=g:Select(p,1,1,nil)
 		Duel.SendtoGrave(sg,REASON_EFFECT)
 	end

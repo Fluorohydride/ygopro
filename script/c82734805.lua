@@ -88,7 +88,7 @@ function c82734805.exop(e,tp,eg,ep,ev,re,r,rp)
 	local g2=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,nil)
 	local sg2=nil
 	if g2:GetCount()>=3 then
-		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
 		sg2=g2:Select(1-tp,3,3,nil)
 	else sg2=g2 end
 	sg1:Merge(sg2)
@@ -150,13 +150,13 @@ function c82734805.fscon(e,g,gc,chkf)
 	if g==nil then return true end
 	if gc then
 		if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
-			return g:IsExists(c82734805.fcfilter1,1,gc,code1,code2,g)
+			return g:IsExists(c82734805.fcfilter1,1,gc,14799437,23440231,g)
 		elseif gc:IsCode(14799437) then
 			return g:IsExists(c82734805.fcfilter2,1,gc,23440231,g)
 		elseif gc:IsCode(23440231) then
 			return g:IsExists(c82734805.fcfilter2,1,gc,14799437,g)
 		elseif gc:IsSetCard(0xbb) then
-			return g:IsExists(c82734805.fcfilter3,1,gc)
+			return g:IsExists(c82734805.fcfilter3,1,gc,g)
 		end
 	end
 	local b1=0 local b2=0 local bs=0
@@ -178,9 +178,6 @@ function c82734805.fscon(e,g,gc,chkf)
 	else
 		return b1+b2+bs>=2 and g2:GetCount()>=3-bs
 	end
-end
-function c82734805.fofilter(c)
-	return c:IsSetCard(0xbb) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)
 end
 function c82734805.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 	if gc then

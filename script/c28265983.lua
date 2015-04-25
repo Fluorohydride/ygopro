@@ -56,21 +56,29 @@ function c28265983.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			c28265983.destg1(e,tp,teg,tep,tev,tre,tr,trp,1)
 		else
 			e:SetCategory(CATEGORY_DESTROY)
+			e:SetProperty(0)
 			e:SetOperation(c28265983.desop2)
 			c28265983.descost2(e,tp,eg,ep,ev,re,r,rp,1)
 			c28265983.destg2(e,tp,eg,ep,ev,re,r,rp,1)
 		end
+	else
+		e:SetCategory(0)
+		e:SetProperty(0)
+		e:SetOperation(c28265983.nop)
 	end
+end
+function c28265983.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c28265983.descon1(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
 end
-function c28265983.desfilter11(c)
+function c28265983.desfilter1(c)
 	return c:IsFaceup() and c:IsDestructable()
 end
 function c28265983.destg1(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c28265983.desfilter1(chkc) end
 	if chk==0 then return Duel.GetFlagEffect(tp,28265983)==0 end
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g=Duel.SelectTarget(tp,c28265983.desfilter1,tp,0,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 	Duel.RegisterFlagEffect(tp,28265983,RESET_PHASE+RESET_END,0,1)

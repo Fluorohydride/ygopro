@@ -34,8 +34,8 @@ function c70479321.initial_effect(c)
 	c:RegisterEffect(e4)
 	--atk
 	local e5=e2:Clone()
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetOperation(c70479321.atkop2)
+	e5:SetRange(LOCATION_MZONE)
+	e5:SetOperation(c70479321.atkop2)
 	c:RegisterEffect(e5)
 end
 function c70479321.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

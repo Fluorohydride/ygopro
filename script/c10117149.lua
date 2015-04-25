@@ -75,7 +75,7 @@ function c10117149.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xab)
 end
 function c10117149.atkval(e,c)
-	return Duel.GetMatchingGroupCount(c10117149.cfilter,tp,LOCATION_EXTRA,0,nil)*500
+	return Duel.GetMatchingGroupCount(c10117149.cfilter,c:GetControler(),LOCATION_EXTRA,0,nil)*500
 end
 function c10117149.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

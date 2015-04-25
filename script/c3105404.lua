@@ -1,5 +1,6 @@
 --ブリリアント・スパーク
 function c3105404.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_DELAYED_QUICKEFFECT)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_DAMAGE)

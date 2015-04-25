@@ -41,7 +41,8 @@ function c19355597.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,c19355597.tgfilter,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	local tc=tg:GetFirst()
 	local g=Duel.GetMatchingGroup(c19355597.spfilter,tp,LOCATION_EXTRA,0,nil,e,tp)
-	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_GRAVE)  and g:GetCount()>0 then
+	if tc and Duel.SendtoGrave(tc,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_GRAVE) and g:GetCount()>0 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SpecialSummon(sg,0,tp,tp,true,false,POS_FACEUP)
 	end
