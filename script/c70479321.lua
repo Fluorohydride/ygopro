@@ -15,6 +15,7 @@ function c70479321.initial_effect(c)
 	e2:SetRange(LOCATION_PZONE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e2:SetCountLimit(1)
+	e2:SetCondition(c70479321.atkcon)
 	e2:SetTarget(c70479321.atktg)
 	e2:SetOperation(c70479321.atkop)
 	c:RegisterEffect(e2)
@@ -38,14 +39,20 @@ function c70479321.initial_effect(c)
 	e5:SetOperation(c70479321.atkop2)
 	c:RegisterEffect(e5)
 end
-function c70479321.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c70479321.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	local a=Duel.GetAttacker()
 	local d=Duel.GetAttackTarget()
-	if d and not d:IsControler(tp) then
-		d=d:GetBattleTarget()
-	end
-	if chkc then return chkc==d end
-	if chk==0 then return d and d:IsOnField() and d:IsCanBeEffectTarget() end
-	Duel.SetTargetCard(d)
+	if d and a:GetControler()~=d:GetControler() then
+		if a:IsControler(tp) then e:SetLabelObject(a)
+		else e:SetLabelObject(d) end
+		return true
+	else return false end
+end
+function c70479321.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	local tc=e:GetLabelObject()
+	if chkc then return chkc==tc end
+	if chk==0 then return tc:IsOnField() and tc:IsCanBeEffectTarget() end
+	Duel.SetTargetCard(tc)
 end
 function c70479321.atkop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end

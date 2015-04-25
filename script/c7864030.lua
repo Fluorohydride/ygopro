@@ -11,6 +11,7 @@ function c7864030.initial_effect(c)
 	e1:SetTarget(c7864030.target1)
 	e1:SetOperation(c7864030.operation1)
 	c:RegisterEffect(e1)
+	--change battle target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_ATTACK_ANNOUNCE)

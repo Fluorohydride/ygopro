@@ -30,10 +30,8 @@ function c17086528.initial_effect(c)
 	c:RegisterEffect(e4)
 	--damage 0
 	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-	e5:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e5:SetCondition(c17086528.damcon)
-	e5:SetOperation(c17086528.damop)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetCode(EFFECT_NO_BATTLE_DAMAGE)
 	c:RegisterEffect(e5)
 	--atk
 	local e6=Effect.CreateEffect(c)
@@ -48,7 +46,7 @@ function c17086528.initial_effect(c)
 end
 function c17086528.rkfilter(c,tp)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ)
-		and Duel.IsExistingMatchingCard(c17086528.lvfilter,tp,LOCATION_MZONE,0,1,c,c:GetRank())
+		and Duel.IsExistingTarget(c17086528.lvfilter,tp,LOCATION_MZONE,0,1,c,c:GetRank())
 end
 function c17086528.lvfilter(c,rk)
 	return c:IsFaceup() and c:IsLevelAbove(5) and c:GetLevel()~=rk
@@ -79,12 +77,6 @@ end
 function c17086528.slcon(e)
 	local tp=e:GetHandlerPlayer()
 	return Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)>Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
-end
-function c17086528.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return ep~=tp
-end
-function c17086528.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,0)
 end
 function c17086528.atkfilter(c,atk)
 	return c:IsFaceup() and c:GetAttack()~=atk

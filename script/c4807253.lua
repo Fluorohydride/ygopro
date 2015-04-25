@@ -37,12 +37,13 @@ end
 function c4807253.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+		local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CHANGE_DAMAGE)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
-		e1:SetLabelObject(re)
+		e1:SetLabel(cid)
 		e1:SetValue(c4807253.damval)
 		e1:SetReset(RESET_CHAIN)
 		Duel.RegisterEffect(e1,tp)
@@ -64,8 +65,11 @@ function c4807253.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e2,tp)
 end
 function c4807253.damval(e,re,val,r,rp,rc)
-	if bit.band(r,REASON_EFFECT)~=0 and re==e:GetLabelObject() then return 0 end
-	return val
+	local cc=Duel.GetCurrentChain()
+	if cc==0 or bit.band(r,REASON_EFFECT)==0 then return val end
+	local cid=Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)
+	if cid~=e:GetLabel() then return val end
+	return 0
 end
 function c4807253.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return not c:IsSetCard(0xc6)

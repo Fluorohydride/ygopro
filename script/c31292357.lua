@@ -44,28 +44,28 @@ function c31292357.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c31292357.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and c:AddCounter(0x3036,1) then
+	if c:IsRelateToEffect(e) and c:AddCounter(0x3036,1)~=0 then
 		if c:GetCounter(0x3036)==3 then
 			Duel.RaiseSingleEvent(c,31292357,e,0,0,tp,0)
 		end
-		local re=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_EFFECT)
+		local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD)
 		e1:SetCode(EFFECT_CHANGE_DAMAGE)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 		e1:SetTargetRange(1,0)
-		e1:SetLabelObject(re)
+		e1:SetLabel(cid)
 		e1:SetValue(c31292357.damval)
 		e1:SetReset(RESET_CHAIN)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
 function c31292357.damval(e,re,val,r,rp,rc)
-	if re==e:GetLabelObject() then
-		return 0
-	else
-		return val
-	end
+	local cc=Duel.GetCurrentChain()
+	if cc==0 or bit.band(r,REASON_EFFECT)==0 then return val end
+	local cid=Duel.GetChainInfo(0,CHAININFO_CHAIN_ID)
+	if cid~=e:GetLabel() then return val end
+	return 0
 end
 function c31292357.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
@@ -73,7 +73,7 @@ function c31292357.atkop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e1:SetValue(3300)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
