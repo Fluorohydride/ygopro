@@ -37,7 +37,8 @@ function c65872270.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 end
 function c65872270.descon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
+	return Duel.GetTurnPlayer()==tp
+		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function c65872270.desfilter(c)
 	return c:IsSetCard(0xc8) and c:IsDestructable()

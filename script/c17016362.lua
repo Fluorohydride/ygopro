@@ -40,9 +40,7 @@ function c17016362.damval(e,re,val,r,rp,rc)
 	if val<=atk then return 0 else return val end
 end
 function c17016362.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	local p=Duel.GetTurnPlayer()
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.IsPlayerAffectedByEffect(p,EFFECT_CANNOT_BP)
+	return Duel.IsAbleToEnterBP()
 end
 function c17016362.mtcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

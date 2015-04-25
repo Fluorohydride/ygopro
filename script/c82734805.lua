@@ -80,16 +80,18 @@ function c82734805.extg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c82734805.exop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,LOCATION_EXTRA,0,nil)
+	local sg1=nil
 	if g1:GetCount()>=3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		sg1=g1:Select(tp,3,3,nil)
-	end
+	else sg1=g1 end
 	local g2=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,nil)
+	local sg2=nil
 	if g2:GetCount()>=3 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		sg2=g2:Select(1-tp,3,3,nil)
-		sg1:Merge(sg2)
-	end
+	else sg2=g2 end
+	sg1:Merge(sg2)
 	if sg1:GetCount()>0 then
 		Duel.SendtoGrave(sg1,REASON_EFFECT)
 	end

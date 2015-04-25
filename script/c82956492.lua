@@ -14,5 +14,5 @@ function c82956492.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c82956492.rev(e,re,r,rp,rc)
-	return bit.band(r,REASON_EFFECT)>0
+	return bit.band(r,REASON_EFFECT)~=0
 end

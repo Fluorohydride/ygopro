@@ -4,8 +4,8 @@ function c30500113.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TOHAND)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
-	e1:SetCode(EVENT_DESTROYED)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_BATTLE_DESTROYED)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DELAY)
 	e1:SetCondition(c30500113.condition)
 	e1:SetTarget(c30500113.target)
 	e1:SetOperation(c30500113.activate)
@@ -25,7 +25,7 @@ function c30500113.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c30500113.cfilter1(c,tp)
-	return c:IsSetCard(0xba) and c:IsReason(REASON_BATTLE) and c:GetPreviousControler()==tp
+	return c:IsSetCard(0xba) and c:GetPreviousControler()==tp
 end
 function c30500113.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c30500113.cfilter1,1,nil,tp)

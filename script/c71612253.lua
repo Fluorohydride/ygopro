@@ -62,7 +62,7 @@ function c71612253.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c71612253.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsType(TYPE_MONSTER) then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
@@ -72,8 +72,7 @@ function c71612253.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENCE)
 		tc:RegisterEffect(e2)
-		local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
-		Duel.Damage(p,d,REASON_EFFECT)
+		Duel.Damage(1-tp,1000,REASON_EFFECT)
 	end
 end
 function c71612253.tgcon(e,tp,eg,ep,ev,re,r,rp)

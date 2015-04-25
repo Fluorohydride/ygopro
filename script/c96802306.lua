@@ -26,8 +26,9 @@ function c96802306.filter(c)
 	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c96802306.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c96802306.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
 	local pc=Duel.GetFieldCard(tp,LOCATION_SZONE,13-e:GetHandler():GetSequence())
+	if chk==0 then return e:GetHandler():IsDestructable() and pc:IsDestructable()
+		and Duel.IsExistingMatchingCard(c96802306.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
 	local g=Group.FromCards(e:GetHandler(),pc)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,2,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
