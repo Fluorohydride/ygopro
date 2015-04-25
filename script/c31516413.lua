@@ -83,5 +83,10 @@ function c31516413.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_DEFENCE)
 		tc:RegisterEffect(e2)
 		Duel.SpecialSummonComplete()
+	else
+		local cg=Duel.GetFieldGroup(tp,0x13,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ShuffleHand(tp)
+		Duel.ShuffleDeck(tp)
 	end
 end
