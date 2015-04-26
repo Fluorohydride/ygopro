@@ -13,7 +13,7 @@ function c54360049.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c54360049.cfilter(c)
-	return c:GetAttack()==-2 and c:IsAbleToRemoveAsCost()
+	return c:GetTextAttack()==-2 and c:IsAbleToRemoveAsCost() and c:IsType(TYPE_MONSTER)
 end
 function c54360049.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c54360049.cfilter,tp,LOCATION_GRAVE,0,1,nil) end
