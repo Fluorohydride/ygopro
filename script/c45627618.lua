@@ -2,6 +2,7 @@
 function c45627618.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),7,2)
+	c:EnableReviveLimit()
 	--pendulum summon
 	aux.AddPendulumProcedure(c)
 	--pendulum set
@@ -37,6 +38,15 @@ function c45627618.initial_effect(c)
 	e4:SetTarget(c45627618.pentg)
 	e4:SetOperation(c45627618.penop)
 	c:RegisterEffect(e4)
+	--spsummon limit
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+	e5:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e5:SetRange(LOCATION_EXTRA)
+	e5:SetCondition(c45627618.spcon)
+	e5:SetValue(c45627618.splimit)
+	c:RegisterEffect(e5)
 end
 c45627618.pendulum_level=7
 function c45627618.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -104,4 +114,10 @@ function c45627618.penop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Destroy(g,REASON_EFFECT)~=0 then
 		Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
+end
+function c45627618.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():IsFaceup()
+end
+function c45627618.splimit(e,se,sp,st)
+	return e:GetHandler():IsStatus(STATUS_PROC_COMPLETE) and bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
