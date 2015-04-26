@@ -9,73 +9,96 @@ function c82734805.initial_effect(c)
 	e1:SetCondition(c82734805.fscon)
 	e1:SetOperation(c82734805.fsop)
 	c:RegisterEffect(e1)
-	--material check
+	--spsummon success
 	local e2=Effect.CreateEffect(c)
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_MATERIAL_CHECK)
-	e2:SetValue(c82734805.valcheck)
+	e2:SetDescription(aux.Stringid(82734805,0))
+	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
+	e2:SetCondition(c82734805.con)
+	e2:SetTarget(c82734805.tg)
+	e2:SetOperation(c82734805.op)
 	c:RegisterEffect(e2)
-	--to grave from extra
+	--material check
 	local e3=Effect.CreateEffect(c)
-	e3:SetDescription(aux.Stringid(82734805,0))
-	e3:SetCategory(CATEGORY_TOGRAVE)
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e3:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e3:SetLabel(3)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetCode(EFFECT_MATERIAL_CHECK)
+	e3:SetValue(c82734805.valcheck)
 	e3:SetLabelObject(e2)
-	e3:SetCondition(c82734805.effcon)
-	e3:SetTarget(c82734805.extg)
-	e3:SetOperation(c82734805.exop)
 	c:RegisterEffect(e3)
-	--discard deck
-	local e4=Effect.CreateEffect(c)
-	e4:SetDescription(aux.Stringid(82734805,1))
-	e4:SetCategory(CATEGORY_DECKDES)
-	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e4:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e4:SetLabel(5)
-	e4:SetLabelObject(e2)
-	e4:SetCondition(c82734805.effcon)
-	e4:SetTarget(c82734805.decktg)
-	e4:SetOperation(c82734805.deckop)
-	c:RegisterEffect(e4)
-	--return
-	local e5=Effect.CreateEffect(c)
-	e5:SetDescription(aux.Stringid(82734805,2))
-	e5:SetCategory(CATEGORY_TOGRAVE)
-	e5:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e5:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e5:SetLabel(8)
-	e5:SetLabelObject(e2)
-	e5:SetCondition(c82734805.effcon)
-	e5:SetTarget(c82734805.rettg)
-	e5:SetOperation(c82734805.retop)
-	c:RegisterEffect(e5)
-	--discard hand
-	local e6=Effect.CreateEffect(c)
-	e6:SetDescription(aux.Stringid(82734805,3))
-	e6:SetCategory(CATEGORY_HANDES+CATEGORY_TOGRAVE)
-	e6:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
-	e6:SetCode(EVENT_SPSUMMON_SUCCESS)
-	e6:SetLabel(10)
-	e6:SetLabelObject(e2)
-	e6:SetCondition(c82734805.effcon)
-	e6:SetTarget(c82734805.handtg)
-	e6:SetOperation(c82734805.handop)
-	c:RegisterEffect(e6)
 end
 c82734805.material_count=2
 c82734805.material={14799437,23440231}
 function c82734805.valcheck(e,c)
 	local ct=e:GetHandler():GetMaterial():GetClassCount(Card.GetCode)
-	e:SetLabel(ct)
+	e:GetLabelObject():SetLabel(ct)
 end
-function c82734805.effcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION and e:GetLabelObject():GetLabel()>=e:GetLabel()
+function c82734805.con(e,tp,eg,ep,ev,re,r,rp)
+	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION 
 end
-function c82734805.extg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_EXTRA,0,3,nil)
-		and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,3,nil) end
+function c82734805.tg(e,tp,eg,ep,ev,re,r,rp,chk)
+	local ct=e:GetLabel()
+	local con3,con5,con8,con10=nil
+	if ct>=3 then 
+		con3=Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_EXTRA,0,3,nil)
+			and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,3,nil) 
+	end
+	if ct>=5 then
+		con5=Duel.IsPlayerCanDiscardDeck(tp,3) and Duel.IsPlayerCanDiscardDeck(1-tp,3) 
+	end
+	if ct>=8 then
+		con8=Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_REMOVED,0,1,nil) 
+			and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_REMOVED,1,nil)
+	end
+	if ct>=10 then
+		con10=Duel.GetFieldGroupCount(tp,LOCATION_HAND,LOCATION_HAND)>0
+	end
+	if chk=0 then return con3 or con5 or con8 or con10 end
+end
+function c82734805.op(e,tp,eg,ep,ev,re,r,rp)
+	local ct=e:GetLabel()
+	if ct>=3 then
+		local g1=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,LOCATION_EXTRA,0,nil)
+		local sg1=nil
+		if g1:GetCount()>=3 then
+			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+			sg1=g1:Select(tp,3,3,nil)
+		else sg1=g1 end
+		local g2=Duel.GetMatchingGroup(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,nil)
+		local sg2=nil
+		if g2:GetCount()>=3 then
+			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
+			sg2=g2:Select(1-tp,3,3,nil)
+		else sg2=g2 end
+		sg1:Merge(sg2)
+		if sg1:GetCount()>0 then
+			Duel.SendtoGrave(sg1,REASON_EFFECT)
+		end
+	end
+	if ct>=5 then
+		Duel.BreakEffect()
+		Duel.DiscardDeck(tp,3,REASON_EFFECT)
+		Duel.DiscardDeck(1-tp,3,REASON_EFFECT)
+	end
+	if ct>=8 then
+		Duel.BreakEffect()
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
+		local g1=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,LOCATION_REMOVED,0,1,3,nil)
+		Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TOGRAVE)
+		local g2=Duel.SelectMatchingCard(1-tp,Card.IsFaceup,1-tp,LOCATION_REMOVED,0,1,3,nil)
+		g1:Merge(g2)
+		if g1:GetCount()>0 then
+			Duel.SendtoGrave(g1,REASON_EFFECT+REASON_RETURN)
+		end
+	end
+	if ct>=10 then
+		Duel.BreakEffect()
+		local g1=Duel.GetFieldGroup(tp,LOCATION_HAND,LOCATION_HAND)
+		Duel.SendtoGrave(g1,REASON_EFFECT)
+	end
+end
+--[[function c82734805.extg(tp)
+	return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_EXTRA,0,3,nil)
+		and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,3,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,nil,6,PLAYER_ALL,LOCATION_EXTRA)
 end
 function c82734805.exop(e,tp,eg,ep,ev,re,r,rp)
@@ -134,7 +157,7 @@ end
 function c82734805.handop(e,tp,eg,ep,ev,re,r,rp)
 	local g1=Duel.GetFieldGroup(tp,LOCATION_HAND,LOCATION_HAND)
 	Duel.SendtoGrave(g1,REASON_EFFECT)
-end
+end--]]
 function c82734805.fcfilter1(c,code1,code2,g)
 	local code=c:GetCode()
 	return (code==code1 or code==code2) and g:IsExists(Card.IsSetCard,1,c,0xbb)
