@@ -48,9 +48,11 @@ function c30500113.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c30500113.cfilter2(c,tp)
-	return c:IsSetCard(0xba) and c:IsReason(REASON_EFFECT) and c:GetPreviousControler()==tp
+	return c:IsSetCard(0xba) and c:IsReason(REASON_EFFECT)
+		and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP)
 end
 function c30500113.thcon(e,tp,eg,ep,ev,re,r,rp)
+	if eg:IsContains(e:GetHandler()) then return false end
 	return eg:IsExists(c30500113.cfilter2,1,nil,tp)
 end
 function c30500113.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
