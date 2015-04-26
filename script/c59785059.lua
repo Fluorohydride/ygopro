@@ -44,6 +44,7 @@ function c59785059.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 			local g2=tg:Select(tp,3-ct,3-ct,nil)
 			g:Merge(g2)
 		end
+		Duel.SetTargetCard(g)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		g=Duel.SelectTarget(tp,c59785059.desfilter,tp,LOCATION_ONFIELD,0,3,3,nil)

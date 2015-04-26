@@ -44,6 +44,7 @@ function c92746535.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return sc:IsDestructable()
 		and Duel.IsExistingMatchingCard(c92746535.thfilter,tp,LOCATION_DECK,0,1,nil,sc:GetOriginalCode()) end
 	Duel.SetTargetCard(sc)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c92746535.thop(e,tp,eg,ep,ev,re,r,rp)
