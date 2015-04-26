@@ -20,7 +20,7 @@ end
 function c67443336.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local t=Duel.GetFieldGroupCount(tp,0,LOCATION_ONFIELD)
 	local s=Duel.GetFieldGroupCount(tp,LOCATION_HAND+LOCATION_ONFIELD,0)
-	if chk==0 then return Duel.IsPlayerCanDraw(t-s) end
+	if chk==0 then return Duel.IsPlayerCanDraw(tp,t-s) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(t-s)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,t-s)
@@ -29,5 +29,7 @@ function c67443336.activate(e,tp,eg,ep,ev,re,r,rp)
 	local p=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER)
 	local t=Duel.GetFieldGroupCount(p,0,LOCATION_ONFIELD)
 	local s=Duel.GetFieldGroupCount(p,LOCATION_HAND+LOCATION_ONFIELD,0)
-	Duel.Draw(p,t-s,REASON_EFFECT)
+	if t>s then
+		Duel.Draw(p,t-s,REASON_EFFECT)
+	end
 end

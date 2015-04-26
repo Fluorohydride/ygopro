@@ -98,23 +98,24 @@ function c28265983.descon2(e,tp,eg,ep,ev,re,r,rp)
 end
 function c28265983.descost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lp=Duel.GetLP(tp)-Duel.GetLP(1-tp)
-	if chk==0 then return Duel.CheckLPCost(tp,lp) end
+	if chk==0 then return Duel.CheckLPCost(tp,lp) and Duel.GetFlagEffect(tp,28265984)==0 end
 	Duel.PayLPCost(tp,lp)
 	e:SetLabel(lp)
+	Duel.RegisterFlagEffect(tp,28265984,RESET_PHASE+RESET_END,0,1)
 end
 function c28265983.desfilter2(c,num)
-	return c:IsFaceup() and c:IsDestructable() and c:GetAttack()<=num
+	return c:IsFaceup() and c:IsAttackBelow(num) and c:IsDestructable()
 end
 function c28265983.destg2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lp=Duel.GetLP(tp)-Duel.GetLP(1-tp)
-	if chk==0 then return Duel.IsExistingMatchingCard(c28265983.desfilter2,tp,0,LOCATION_MZONE,1,nil,lp) and Duel.GetFlagEffect(tp,28265984)==0 end
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,0,LOCATION_MZONE)
-	Duel.RegisterFlagEffect(tp,28265984,RESET_PHASE+RESET_END,0,1)
+	if chk==0 then return Duel.IsExistingMatchingCard(c28265983.desfilter2,tp,0,LOCATION_MZONE,1,nil,lp) end
+	local g=Duel.GetMatchingGroup(c28265983.desfilter2,tp,0,LOCATION_MZONE,nil,e:GetLabel())
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 end
 function c28265983.desop2(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local num=e:GetLabel()
-	local g=Duel.GetMatchingGroup(c28265983.desfilter1,tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(c28265983.desfilter2,tp,0,LOCATION_MZONE,nil,num)
 	if g:GetCount()==0 then return end
 	local dg=Group.CreateGroup()
 	repeat

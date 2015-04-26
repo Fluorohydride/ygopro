@@ -39,8 +39,14 @@ function c39387565.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e:SetOperation(c39387565.spop1)
 		c39387565.sptg1(e,tp,eg,ep,ev,re,r,rp,1)
+	else
+		e:SetCategory(0)
+		e:SetProperty(0)
+		e:SetOperation(c39387565.nop)
 	end
-end 
+end
+function c39387565.nop(e,tp,eg,ep,ev,re,r,rp)
+end
 function c39387565.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3b)
 end

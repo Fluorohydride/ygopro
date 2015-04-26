@@ -25,7 +25,7 @@ function c67310848.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(67310848)~=0
 end
 function c67310848.thfilter(c)
-	return c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToHand()
+	return c:GetLevel()==7 and c:IsAttribute(ATTRIBUTE_LIGHT+ATTRIBUTE_DARK) and c:IsAbleToHand()
 end
 function c67310848.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c67310848.thfilter,tp,LOCATION_DECK,0,1,nil) end

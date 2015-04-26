@@ -8,7 +8,7 @@ function c65872270.initial_effect(c)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
-	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
+	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_SZONE)
@@ -31,7 +31,7 @@ end
 function c65872270.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	if c65872270.descon(e,tp,eg,ep,ev,re,r,rp) and c65872270.destg(e,tp,eg,ep,ev,re,r,rp,0) and Duel.SelectYesNo(tp,aux.Stringid(65872270,0)) then
-		e:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND+CATEGORY_SEARCH)
+		e:SetCategory(CATEGORY_DESTROY+CATEGORY_TOHAND)
 		e:SetOperation(c65872270.desop)
 		c65872270.destg(e,tp,eg,ep,ev,re,r,rp,1)
 	else
@@ -46,11 +46,11 @@ function c65872270.descon(e,tp,eg,ep,ev,re,r,rp)
 		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function c65872270.desfilter(c)
-	return c:IsSetCard(0xc8) and c:IsDestructable()
+	return c:IsFaceup() and c:IsSetCard(0xc8) and c:IsDestructable()
 end
 function c65872270.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c65872270.desfilter,tp,LOCATION_ONFIELD,0,1,e:GetHandler())
-		and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,nil) 
+		and Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,0,LOCATION_ONFIELD,1,nil)
 		and e:GetHandler():GetFlagEffect(65872270)==0 end
 	e:GetHandler():RegisterFlagEffect(65872270,RESET_PHASE+RESET_END,0,1)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,nil,1,tp,LOCATION_ONFIELD)
@@ -67,7 +67,7 @@ function c65872270.desop(e,tp,eg,ep,ev,re,r,rp)
 	if ct2>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-		local rg=g:Select(tp,1,ct2,nil)
+		local rg=g:Select(tp,ct2,ct2,nil)
 		Duel.SendtoHand(rg,nil,REASON_EFFECT)
 	end
 end
@@ -75,7 +75,7 @@ function c65872270.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c65872270.thfilter(c)
-	return c:IsSetCard(0xc8) and c:IsFaceup() and c:IsAbleToHand()
+	return c:IsFaceup() and c:IsSetCard(0xc8) and c:IsAbleToHand()
 end
 function c65872270.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c65872270.thfilter,tp,LOCATION_EXTRA,0,1,nil) end
@@ -86,5 +86,6 @@ function c65872270.thop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.SelectMatchingCard(tp,c65872270.thfilter,tp,LOCATION_EXTRA,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
+		Duel.ConfirmCards(1-tp,g)
 	end
 end

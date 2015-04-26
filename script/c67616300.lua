@@ -13,7 +13,7 @@ function c67616300.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,0)
 	e2:SetCondition(c67616300.damcon1)
-	e2:SetValue(c67616300.damval)
+	e2:SetValue(0)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetTargetRange(0,1)
@@ -63,9 +63,6 @@ end
 function c67616300.damcon2(e)
 	local tp=e:GetHandlerPlayer()
 	return Duel.GetLP(1-tp)<Duel.GetLP(tp)
-end
-function c67616300.damval(e,re,val,r,rp,rc)
-	return 0
 end
 function c67616300.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
