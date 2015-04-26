@@ -2,6 +2,7 @@
 function c45627618.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),7,2)
+	c:EnableReviveLimit()
 	--pendulum summon
 	aux.AddPendulumProcedure(c)
 	--pendulum set
