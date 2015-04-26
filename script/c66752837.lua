@@ -23,20 +23,19 @@ function c66752837.tricon(e,c)
 	return c:IsRace(RACE_DRAGON)
 end
 function c66752837.cfilter(c)
-	return c:GetPreviousRaceOnField()==RACE_DRAGON and c:IsPreviousPosition(POS_FACEUP)
-		and c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsCode(66752837)
-end
-function c66752837.cfilter2(c)
-	return c66752837.cfilter(c) and c:IsType(TYPE_NORMAL)
+	return c:IsRace(RACE_DRAGON) and c:GetPreviousRaceOnField()==RACE_DRAGON
+		and c:IsPreviousPosition(POS_FACEUP) and c:IsPreviousLocation(LOCATION_MZONE)
+		and c:IsReason(REASON_EFFECT+REASON_BATTLE) and not c:IsCode(66752837)
 end
 function c66752837.spcon(e,tp,eg,ep,ev,re,r,rp)
 	if eg:IsContains(e:GetHandler()) then return false end
-	if eg:IsExists(c66752837.cfilter2,1,nil) then
+	local g=eg:Filter(c66752837.cfilter,nil)
+	if g:GetCount()==0 then return false end
+	e:SetLabel(0)
+	if g:IsExists(Card.IsType,1,nil,TYPE_NORMAL) then
 		e:SetLabel(1)
-		return true
-	else
-		return eg:IsExists(c66752837.cfilter,1,nil)
 	end
+	return true
 end
 function c66752837.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -47,10 +46,12 @@ function c66752837.thfilter(c)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_NORMAL) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c66752837.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(c66752837.thfilter,tp,LOCATION_GRAVE,0,nil)
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 and e:GetLabel()==1
 		and g:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(66752837,0)) then
+		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local sg=g:Select(tp,1,1,nil)
 		Duel.SendtoHand(sg,nil,REASON_EFFECT)

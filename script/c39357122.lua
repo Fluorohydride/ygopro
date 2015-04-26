@@ -13,7 +13,7 @@ function c39357122.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c39357122.filter(c,atk)
-	return c:IsFaceup() and c:IsDestructable() and c:IsDefenceBelow(atk)
+	return c:IsFaceup() and c:IsDefenceBelow(atk) and c:IsDestructable()
 end
 function c39357122.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local atk=e:GetHandler():GetAttack()
@@ -22,7 +22,9 @@ function c39357122.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c39357122.desop(e,tp,eg,ep,ev,re,r,rp)
-	local atk=e:GetHandler():GetAttack()
+	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) or c:IsFacedown() then return end
+	local atk=c:GetAttack()
 	local g=Duel.GetMatchingGroup(c39357122.filter,tp,0,LOCATION_MZONE,nil,atk)
 	Duel.Destroy(g,REASON_EFFECT)
 end
