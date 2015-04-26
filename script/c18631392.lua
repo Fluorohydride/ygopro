@@ -46,7 +46,7 @@ function c18631392.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.SendtoGrave(g1,REASON_COST)
 end
 function c18631392.anctg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=3 end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,3) end
 	Duel.Hint(HINT_SELECTMSG,tp,0)
 	local ac1=Duel.AnnounceCard(tp)
 	Duel.Hint(HINT_SELECTMSG,tp,0)
@@ -62,6 +62,7 @@ end
 function c18631392.retop(code1,code2,code3)
 	return
 		function (e,tp,eg,ep,ev,re,r,rp)
+			if not Duel.IsPlayerCanDiscardDeck(tp,3) then return end
 			local c=e:GetHandler()
 			Duel.ConfirmDecktop(tp,3)
 			local g=Duel.GetDecktopGroup(tp,3)
@@ -80,13 +81,12 @@ function c18631392.retop(code1,code2,code3)
 			if c:IsRelateToEffect(e) then
 				local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
-				e1:SetCode(EFFECT_SET_ATTACK)
+				e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 				e1:SetValue(hg:GetCount()*1000)
 				e1:SetReset(RESET_EVENT+0x1ff0000)
 				c:RegisterEffect(e1)
 				local e2=e1:Clone()
-				e2:SetCode(EFFECT_SET_DEFENCE)
+				e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
 				c:RegisterEffect(e2)
 			end
 		end

@@ -34,8 +34,7 @@ function c81927732.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c81927732.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not e:GetHandler():IsHasEffect(EFFECT_ATTACK_ALL)
+	return Duel.IsAbleToEnterBP() and not e:GetHandler():IsHasEffect(EFFECT_ATTACK_ALL)
 end
 function c81927732.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

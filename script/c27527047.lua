@@ -12,5 +12,5 @@ function c27527047.initial_effect(c)
 end
 function c27527047.tgval(e,re,rp)
 	local tp=e:GetHandler():GetControler()
-	return tp~=rp and re:GetHandler():IsType(TYPE_MONSTER)
+	return tp~=rp and re:GetHandler():IsType(TYPE_MONSTER) and aux.tgval(e,re,rp)
 end

@@ -637,7 +637,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 			count = BufferIO::ReadInt8(pbuf);
 			pbuf += count * 7;
 			count = BufferIO::ReadInt8(pbuf);
-			pbuf += count * 11 + 2;
+			pbuf += count * 11 + 3;
 			RefreshMzone(0);
 			RefreshMzone(1);
 			RefreshSzone(0);
@@ -753,7 +753,7 @@ int SingleDuel::Analyze(char* msgbuffer, unsigned int len) {
 		case MSG_CONFIRM_CARDS: {
 			player = BufferIO::ReadInt8(pbuf);
 			count = BufferIO::ReadInt8(pbuf);
-			if(pbuf[5] == LOCATION_HAND) {
+			if(pbuf[5] != LOCATION_REMOVED) {
 				pbuf += count * 7;
 				NetServer::SendBufferToPlayer(players[player], STOC_GAME_MSG, offset, pbuf - offset);
 				NetServer::ReSendToPlayer(players[1 - player]);

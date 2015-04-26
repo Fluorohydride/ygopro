@@ -6,6 +6,7 @@ function c74122412.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c74122412.splimit)
 	c:RegisterEffect(e1)
 	--indes
 	local e2=Effect.CreateEffect(c)
@@ -30,6 +31,9 @@ function c74122412.initial_effect(c)
 	e3:SetTarget(c74122412.destg)
 	e3:SetOperation(c74122412.desop)
 	c:RegisterEffect(e3)
+end
+function c74122412.splimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c74122412.mat_filter(c)
 	return c:GetLevel()~=7

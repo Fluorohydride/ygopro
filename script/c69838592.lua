@@ -52,10 +52,14 @@ function c69838592.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)
 	end
 end
+function c69838592.filter(c,tc)
+	if not c:IsFaceup() then return false end
+	return tc:GetBaseAttack()~=c:GetAttack() or tc:GetBaseAttack()~=c:GetDefence()
+end
 function c69838592.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local bc=c:GetBattleTarget()
-	return c:IsRelateToBattle() and bc and bc:IsFaceup() and bc:IsRelateToBattle()
+	return c:IsRelateToBattle() and bc and c69838592.filter(c,bc) and bc:IsFaceup() and bc:IsRelateToBattle()
 end
 function c69838592.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -27,7 +27,7 @@ function c32441317.mgfilter(c,e,tp,sync)
 end
 function c32441317.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
 	local mg=tc:GetMaterial()
 	local sumable=true
 	local sumtype=tc:GetSummonType()

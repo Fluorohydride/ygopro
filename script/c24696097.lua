@@ -49,8 +49,7 @@ function c24696097.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c24696097.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP) and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
+	return Duel.IsAbleToEnterBP() and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>=5
 end
 function c24696097.mtop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ConfirmDecktop(tp,5)
@@ -94,7 +93,7 @@ function c24696097.datg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetTargetCard(Duel.GetAttacker())
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,e:GetHandler(),1,0,0)
 end
-function c24696097.daop(e,tp,eg,ep,ev,re,r,rp,chk)
+function c24696097.daop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) then
 		Duel.Remove(c,POS_FACEUP,REASON_EFFECT)

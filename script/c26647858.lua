@@ -49,5 +49,5 @@ function c26647858.eqlimit(e,c)
 	return c:IsAttackBelow(1500) and c:IsRace(RACE_WARRIOR)
 end
 function c26647858.atval(e,c)
-	return c:IsAttackAbove(1900)
+	return c:IsAttackAbove(1900) and not c:IsImmuneToEffect(e)
 end

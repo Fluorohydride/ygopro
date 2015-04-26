@@ -15,6 +15,14 @@ function c27581098.initial_effect(c)
 	e2:SetTargetRange(1,1)
 	e2:SetTarget(c27581098.splimit)
 	c:RegisterEffect(e2)
+	--
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetRange(LOCATION_SZONE)
+	e3:SetCode(27581098)
+	e3:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e3:SetTargetRange(1,1)
+	c:RegisterEffect(e3)
 end
 function c27581098.splimit(e,c,tp,sumtp,sumpos)
 	return bit.band(sumtp,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION

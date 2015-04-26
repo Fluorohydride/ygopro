@@ -68,5 +68,18 @@ function c12071500.activate(e,tp,eg,ep,ev,re,r,rp)
 			fop(ce,e,tp,tc,mat2,SUMMON_TYPE_FUSION+0x10)
 		end
 		tc:CompleteProcedure()
+	else
+		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
+		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+		local ct=cg1:GetCount()
+		if not Duel.IsPlayerAffectedByEffect(tp,30459350) then
+			ct=ct+Duel.GetMatchingGroupCount(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
+		end
+		if ct>1 and cg2:IsExists(Card.IsFacedown,1,nil)
+			and Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,27581098) then
+			Duel.ConfirmCards(1-tp,cg1)
+			Duel.ConfirmCards(1-tp,cg2)
+			Duel.ShuffleHand(tp)
+		end
 	end
 end

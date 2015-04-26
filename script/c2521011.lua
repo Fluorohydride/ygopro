@@ -29,7 +29,7 @@ function c2521011.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetTarget(aux.TargetBoolFunction(Card.IsRace,RACE_BEASTWARRIOR))
-	e4:SetValue(c2521011.tgvalue)
+	e4:SetValue(aux.tgoval)
 	c:RegisterEffect(e4)
 end
 function c2521011.spfilter(c)
@@ -59,7 +59,4 @@ function c2521011.setop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SSet(tp,g:GetFirst())
 		Duel.ConfirmCards(1-tp,g)
 	end
-end
-function c2521011.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end

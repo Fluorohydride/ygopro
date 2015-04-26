@@ -26,10 +26,10 @@ function c63257623.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c63257623.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function c63257623.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()

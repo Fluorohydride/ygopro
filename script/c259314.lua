@@ -58,6 +58,6 @@ end
 function c259314.eqlimit(e,c)
 	return c:IsSetCard(0x56)
 end
-function c259314.efilter(e,re)
-	return e:GetOwnerPlayer()~=re:GetOwnerPlayer()
+function c259314.efilter(e,re,rp)
+	return e:GetHandlerPlayer()~=rp
 end

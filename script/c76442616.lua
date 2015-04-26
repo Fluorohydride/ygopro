@@ -14,7 +14,7 @@ function c76442616.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x8)
 end
 function c76442616.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c76442616.cfilter,tp,LOCATION_MZONE,0,1,nil)
+	return Duel.IsExistingMatchingCard(c76442616.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
 end
 function c76442616.filter(c,e,tp)
 	return c:IsLevelBelow(4) and c:IsSetCard(0x3008) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

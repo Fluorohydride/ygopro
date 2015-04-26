@@ -27,6 +27,21 @@ function c24348804.initial_effect(c)
 	e3:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
 	e3:SetTarget(c24348804.distg)
 	c:RegisterEffect(e3)
+	if not c24348804.global_check then
+		c24348804.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetOperation(c24348804.checkop)
+		Duel.RegisterEffect(ge1,0)
+	end
+end
+function c24348804.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	while tc do
+		tc:RegisterFlagEffect(24348804,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
+		tc=eg:GetNext()
+	end
 end
 function c24348804.cfilter(c)
 	return bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
@@ -44,6 +59,7 @@ function c24348804.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 			Duel.SetTargetCard(g)
 			Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
 			e:SetLabel(1)
+			e:GetHandler():RegisterFlagEffect(0,RESET_CHAIN,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(24348804,1))
 		end
 	end
 end
@@ -60,9 +76,9 @@ function c24348804.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if g:GetCount()>0 then
-		Duel.ChangePosition(g,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE,0,0)
+		Duel.ChangePosition(g,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE,POS_FACEUP_DEFENCE,POS_FACEDOWN_DEFENCE)
 	end
 end
 function c24348804.distg(e,c)
-	return c:IsStatus(STATUS_SUMMON_TURN) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return c:GetFlagEffect(24348804)~=0
 end

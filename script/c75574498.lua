@@ -14,18 +14,18 @@ function c75574498.initial_effect(c)
 	e1:SetTarget(c75574498.sptg)
 	e1:SetOperation(c75574498.spop)
 	c:RegisterEffect(e1)
-	--
+	--cannot be target
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e2:SetCondition(c75574498.tgcon)
-	e2:SetValue(1)
+	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 	local e3=e2:Clone()
 	e3:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e3:SetValue(c75574498.effval)
+	e3:SetValue(aux.tgoval)
 	c:RegisterEffect(e3)
 	--spsummon
 	local e4=Effect.CreateEffect(c)
@@ -63,9 +63,6 @@ function c75574498.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c75574498.tgcon(e)
 	return Duel.GetFieldGroupCount(e:GetHandlerPlayer(),LOCATION_MZONE,0)>=2
-end
-function c75574498.effval(e,te,tp)
-	return tp~=e:GetHandlerPlayer()
 end
 function c75574498.cfilter(c,tp)
 	return c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsReason(REASON_DESTROY)

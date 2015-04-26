@@ -19,10 +19,9 @@ function c131182.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetTargetRange(LOCATION_MZONE,0)
-	e4:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e4:SetTarget(c131182.atktg)
-	e4:SetValue(1)
+	e4:SetTargetRange(0,LOCATION_MZONE)
+	e4:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+	e4:SetValue(c131182.atlimit)
 	c:RegisterEffect(e4)
 	--spsummon
 	local e5=Effect.CreateEffect(c)
@@ -63,7 +62,7 @@ end
 function c131182.splimit(e,se,sp,st,spos,tgp)
 	return not Duel.IsExistingMatchingCard(c131182.exfilter,tgp,LOCATION_ONFIELD,0,1,nil)
 end
-function c131182.atktg(e,c)
+function c131182.atlimit(e,c)
 	return c:IsFaceup() and c~=e:GetHandler()
 end
 function c131182.battleop(e,tp,eg,ep,ev,re,r,rp)

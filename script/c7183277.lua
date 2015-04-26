@@ -7,7 +7,7 @@ function c7183277.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTarget(c7183277.etarget)
-	e1:SetValue(1)
+	e1:SetValue(aux.tgval)
 	c:RegisterEffect(e1)
 	--discard deck
 	local e2=Effect.CreateEffect(c)

@@ -46,7 +46,7 @@ function c96598015.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=g:Select(tp,3,3,nil)
 	Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)
 	Duel.ShuffleDeck(tp)
-	if sg:IsExists(Card.IsLocation,3,nil,LOCATION_DECK) then
+	if sg:IsExists(Card.IsLocation,3,nil,LOCATION_DECK+LOCATION_EXTRA) then
 		Duel.BreakEffect()
 		Duel.Draw(tp,2,REASON_EFFECT)
 	end

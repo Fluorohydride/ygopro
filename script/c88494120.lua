@@ -13,7 +13,7 @@ function c88494120.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c88494120.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
+	return (Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated())
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)==1
 end
 function c88494120.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)

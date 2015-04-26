@@ -9,7 +9,7 @@ function c43202238.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e1:SetValue(c43202238.tgvalue)
+	e1:SetValue(aux.tgoval)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -34,9 +34,6 @@ function c43202238.initial_effect(c)
 	e3:SetTarget(c43202238.sptg)
 	e3:SetOperation(c43202238.spop)
 	c:RegisterEffect(e3)
-end
-function c43202238.tgvalue(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c43202238.desfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x9e) and c:IsDestructable()

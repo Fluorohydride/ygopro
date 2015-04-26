@@ -12,8 +12,7 @@ function c69724380.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c69724380.condition(e,tp,eg,ep,ev,re,r,rp)
-	local rc=re:GetHandler()
-	return ep~=tp and rc:IsType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return ep~=tp and re:IsActiveType(TYPE_SPELL) and re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c69724380.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end

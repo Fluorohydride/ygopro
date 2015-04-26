@@ -18,8 +18,11 @@ function c5288597.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c5288597.cfilter(c,e,tp)
 	local lv=c:GetOriginalLevel()
-	return lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
-		and Duel.IsExistingMatchingCard(c5288597.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,c:GetOriginalRace(),c:GetOriginalAttribute(),e,tp)
+	local rc=nil
+	if Duel.IsEnvironment(4064256) then rc=RACE_ZOMBIE
+	else rc=c:GetOriginalRace() end
+	return bit.band(c:GetOriginalType(),TYPE_MONSTER)~=0 and lv>0 and c:IsFaceup() and c:IsAbleToGraveAsCost()
+		and Duel.IsExistingMatchingCard(c5288597.spfilter,tp,LOCATION_DECK,0,1,nil,lv+1,rc,c:GetOriginalAttribute(),e,tp)
 end
 function c5288597.spfilter(c,lv,rc,att,e,tp)
 	return c:GetLevel()==lv and c:IsRace(rc) and c:IsAttribute(att) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -62,6 +62,7 @@ function c48063985.sprop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g2=Duel.SelectMatchingCard(tp,c48063985.spfilter2,tp,LOCATION_MZONE,0,1,1,g1:GetFirst())
 	g1:Merge(g2)
+	c:SetMaterial(g1)
 	Duel.Remove(g1,POS_FACEUP,REASON_COST)
 end
 function c48063985.tgfilter(c)

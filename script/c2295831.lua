@@ -12,6 +12,7 @@ function c2295831.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_ACTIVATE)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetCondition(c2295831.condition)
+	e2:SetCost(c2295831.cost)
 	e2:SetTarget(c2295831.target)
 	e2:SetOperation(c2295831.activate)
 	c:RegisterEffect(e2)
@@ -33,7 +34,10 @@ function c2295831.regop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2295831.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 and e:GetHandler():GetFlagEffect(2295831)~=0
+	return Duel.GetCurrentPhase()==PHASE_MAIN1
+end
+function c2295831.cost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(2295831)~=0 end
 end
 function c2295831.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToHand,tp,LOCATION_DECK,0,1,nil) end

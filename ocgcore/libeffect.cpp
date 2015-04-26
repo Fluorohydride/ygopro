@@ -40,7 +40,7 @@ int32 scriptlib::effect_clone(lua_State *L) {
 	*ceffect = *peffect;
 	ceffect->ref_handle = ref;
 	ceffect->handler = 0;
-	ceffect->effect_owner = PLAYER_NONE;
+	ceffect->effect_owner = peffect->effect_owner;
 	if(peffect->condition) {
 		lua_rawgeti(L, LUA_REGISTRYINDEX, peffect->condition);
 		ceffect->condition = luaL_ref(L, LUA_REGISTRYINDEX);

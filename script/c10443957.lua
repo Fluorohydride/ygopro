@@ -52,7 +52,7 @@ function c10443957.filter(c,tp)
 		and (c:IsControler(tp) or c:IsAbleToChangeControler())
 end
 function c10443957.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c10443957.filter(chkc,tp) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c10443957.filter(chkc,tp) and chkc~=e:GetHandler() end
 	if chk==0 then return e:GetHandler():IsType(TYPE_XYZ)
 		and Duel.IsExistingTarget(c10443957.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler(),tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)

@@ -13,9 +13,12 @@ end
 function c17021204.spfilter(c)
 	return c:IsPosition(POS_FACEUP_DEFENCE) and c:IsAbleToGraveAsCost()
 end
+function c17021204.cfilter(c)
+	return c:GetRace()~=RACE_INSECT
+end
 function c17021204.check(tp)
 	local g=Duel.GetMatchingGroup(Card.IsType,tp,LOCATION_GRAVE,0,nil,TYPE_MONSTER)
-	return g:GetCount()~=0 and not g:IsExists(Card.IsRace,1,nil,0xfffffff-RACE_INSECT)
+	return g:GetCount()~=0 and not g:IsExists(c17021204.cfilter,1,nil)
 end
 function c17021204.spcon(e,c)
 	if c==nil then return true end

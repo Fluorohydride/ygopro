@@ -651,7 +651,6 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 			}
 		}
 	}
-	field::card_set cset;
 	auto cit = pduel->game_field->player[playerid].list_main.rbegin();
 	pduel->write_buffer8(MSG_CONFIRM_DECKTOP);
 	pduel->write_buffer8(playerid);
@@ -661,10 +660,8 @@ int32 scriptlib::duel_confirm_decktop(lua_State *L) {
 		pduel->write_buffer8((*cit)->current.controler);
 		pduel->write_buffer8((*cit)->current.location);
 		pduel->write_buffer8((*cit)->current.sequence);
-		cset.insert(*cit);
 	}
-	pduel->game_field->raise_event(&cset, EVENT_CONFIRM_DECKTOP, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
-	pduel->game_field->process_instant_event();
+	pduel->game_field->add_process(PROCESSOR_WAIT, 0, 0, 0, 0, 0);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_confirm_cards(lua_State *L) {
@@ -702,11 +699,7 @@ int32 scriptlib::duel_confirm_cards(lua_State *L) {
 			pduel->write_buffer8((*cit)->current.sequence);
 		}
 	}
-	if(pcard)
-		pduel->game_field->raise_event(pcard, EVENT_CONFIRM_CARDS, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
-	else
-		pduel->game_field->raise_event(&pgroup->container, EVENT_CONFIRM_CARDS, pduel->game_field->core.reason_effect, 0, pduel->game_field->core.reason_player, 0, 0);
-	pduel->game_field->process_instant_event();
+	pduel->game_field->add_process(PROCESSOR_WAIT, 0, 0, 0, 0, 0);
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_sort_decktop(lua_State *L) {
@@ -1134,7 +1127,6 @@ int32 scriptlib::duel_change_attacker(lua_State *L) {
 	card* attacker = pduel->game_field->core.attacker;
 	card* attack_target = pduel->game_field->core.attack_target;
 	attacker->announce_count++;
-	attacker->attacked_count++;
 	if(attack_target) {
 		attacker->announced_cards[attack_target->fieldid_r] = attack_target;
 	} else {
@@ -2731,12 +2723,17 @@ int32 scriptlib::duel_toss_dice(lua_State * L) {
 	check_param_count(L, 2);
 	duel* pduel = interpreter::get_duel_info(L);
 	int32 playerid = lua_tointeger(L, 1);
-	int32 count = lua_tointeger(L, 2);
-	if((playerid != 0 && playerid != 1) || count <= 0)
+	int32 count1 = lua_tointeger(L, 2);
+	int32 count2 = 0;
+	if(lua_gettop(L) > 2)
+		count2 = lua_tointeger(L, 3);
+	if((playerid != 0 && playerid != 1) || count1 <= 0 || count2 < 0)
 		return 0;
-	if(count > 5)
-		count = 5;
-	pduel->game_field->add_process(PROCESSOR_TOSS_DICE, 0, pduel->game_field->core.reason_effect, 0, (pduel->game_field->core.reason_player << 16) + playerid, count);
+	if(count1 > 5)
+		count1 = 5;
+	if(count2 > 5 - count1)
+		count2 = 5 - count1;
+	pduel->game_field->add_process(PROCESSOR_TOSS_DICE, 0, pduel->game_field->core.reason_effect, 0, (pduel->game_field->core.reason_player << 16) + playerid, count1 + (count2 << 16));
 	return lua_yield(L, 0);
 }
 int32 scriptlib::duel_get_coin_result(lua_State * L) {
@@ -3175,6 +3172,11 @@ int32 scriptlib::duel_get_custom_activity_count(lua_State *L) {
 		lua_pushinteger(L, val & 0xffff);
 	else
 		lua_pushinteger(L, (val >> 16) & 0xffff);
+	return 1;
+}
+int32 scriptlib::duel_is_able_to_enter_bp(lua_State *L) {
+	duel* pduel = interpreter::get_duel_info(L);
+	lua_pushboolean(L, pduel->game_field->is_able_to_enter_bp());
 	return 1;
 }
 int32 scriptlib::duel_venom_swamp_check(lua_State *L) {

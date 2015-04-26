@@ -22,7 +22,7 @@ function c32224143.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
 	e2:SetCondition(c32224143.atkcon)
-	e2:SetValue(1)
+	e2:SetValue(aux.imval1)
 	c:RegisterEffect(e2)
 end
 function c32224143.cost(e,tp,eg,ep,ev,re,r,rp,chk)

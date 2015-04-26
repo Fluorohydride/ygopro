@@ -28,8 +28,7 @@ function c60258960.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c60258960.acop(e,tp,eg,ep,ev,re,r,rp)
-	local c=re:GetHandler()
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and c:IsType(TYPE_SPELL) and e:GetHandler():GetFlagEffect(1)>0 then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and e:GetHandler():GetFlagEffect(1)>0 then
 		e:GetHandler():AddCounter(0x3001,1)
 	end
 end

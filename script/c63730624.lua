@@ -34,13 +34,11 @@ function c63730624.initial_effect(c)
 	--atk
 	local e5=Effect.CreateEffect(c)
 	e5:SetType(EFFECT_TYPE_FIELD)
-	e5:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
+	e5:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e5:SetRange(LOCATION_SZONE)
-	e5:SetTargetRange(LOCATION_MZONE,0)
-	e5:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e5:SetTargetRange(0,LOCATION_MZONE)
 	e5:SetCondition(c63730624.ocon1)
-	e5:SetTarget(c63730624.otg1)
-	e5:SetValue(1)
+	e5:SetValue(c63730624.atlimit)
 	c:RegisterEffect(e5)
 	--destroy
 	local e6=Effect.CreateEffect(c)
@@ -77,7 +75,7 @@ function c63730624.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c63730624.scon1(e)
-	return Duel.GetTurnPlayer()==e:GetHandler():GetControler()
+	return e:GetHandler():GetEquipTarget() and Duel.GetTurnPlayer()==e:GetHandler():GetControler()
 end
 function c63730624.scon2(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp and Duel.GetAttacker()==e:GetHandler():GetEquipTarget()
@@ -99,7 +97,7 @@ end
 function c63730624.ocon1(e)
 	return Duel.GetTurnPlayer()~=e:GetHandler():GetControler()
 end
-function c63730624.otg1(e,c)
+function c63730624.atlimit(e,c)
 	return c~=e:GetHandler():GetEquipTarget()
 end
 function c63730624.ocon2(e,tp,eg,ep,ev,re,r,rp)

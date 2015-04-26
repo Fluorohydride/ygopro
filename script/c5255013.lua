@@ -24,7 +24,7 @@ function c5255013.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCondition(c5255013.tgcon)
-	e3:SetValue(1)
+	e3:SetValue(aux.tgval)
 	c:RegisterEffect(e3)
 	--self destroy
 	local e4=Effect.CreateEffect(c)

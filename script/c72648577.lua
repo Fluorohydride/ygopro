@@ -17,7 +17,7 @@ function c72648577.filter(c)
 	return c:IsSetCard(0xaf) and c:IsAbleToDeck()
 end
 function c72648577.thfilter(c)
-	return c:IsSetCard(0xaf) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c:IsSetCard(0xaf) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c72648577.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c72648577.filter,tp,LOCATION_ONFIELD+LOCATION_GRAVE+LOCATION_HAND,0,3,nil) end

@@ -54,7 +54,7 @@ function c17412721.spop(e,tp,eg,ep,ev,re,r,rp)
 			c:SetCardTarget(tc)
 			e:GetLabelObject():SetLabelObject(tc)
 			c:CreateRelation(tc,RESET_EVENT+0x5020000)
-			tc:CreateRelation(c,RESET_EVENT+0x1fe0000)
+			tc:CreateRelation(c,RESET_EVENT+0x5fe0000)
 		end
 	end
 end

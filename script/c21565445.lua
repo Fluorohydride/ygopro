@@ -25,7 +25,7 @@ function c21565445.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c21565445.cfilter(c,tp)
-	return c:IsSetCard(0x77) and not c:IsCode(21565445) and c:IsAbleToGraveAsCost()
+	return c:IsSetCard(0x77) and c:IsType(TYPE_MONSTER) and not c:IsCode(21565445) and c:IsAbleToGraveAsCost()
 		and Duel.IsExistingMatchingCard(c21565445.filter,tp,LOCATION_DECK,0,1,c)
 end
 function c21565445.cost(e,tp,eg,ep,ev,re,r,rp,chk)

@@ -40,11 +40,11 @@ end
 function c64373401.hspcon2(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SPECIAL+1
 end
-function c64373401.hspop(e,tp,eg,ep,ev,re,r,rp,c)
-	local e1=Effect.CreateEffect(c)
+function c64373401.hspop(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_OATH)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(1,0)
 	e1:SetTarget(c64373401.splimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)

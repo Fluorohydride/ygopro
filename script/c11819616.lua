@@ -21,7 +21,7 @@ function c11819616.discon(e,tp,eg,ep,ev,re,r,rp)
 	return tg and tg:IsExists(Card.IsOnField,1,nil) and Duel.IsChainNegatable(ev)
 end
 function c11819616.costfilter(c)
-	return c:IsFaceup() and c:IsRace(RACE_PLANT)
+	return c:IsFaceup() and c:IsRace(RACE_PLANT) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c11819616.discost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c11819616.costfilter,1,nil) end

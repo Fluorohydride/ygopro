@@ -8,12 +8,10 @@ function c29400787.initial_effect(c)
 	--atklimit
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
-	e2:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e2:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e2:SetRange(LOCATION_SZONE)
+	e2:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
+	e2:SetRange(LOCATION_FZONE)
 	e2:SetTargetRange(LOCATION_MZONE,LOCATION_MZONE)
-	e2:SetTarget(c29400787.bttg)
-	e2:SetValue(c29400787.btval)
+	e2:SetValue(c29400787.atlimit)
 	c:RegisterEffect(e2)
 	--direct attack
 	local e3=Effect.CreateEffect(c)
@@ -44,11 +42,8 @@ function c29400787.initial_effect(c)
 	e5:SetValue(0)
 	c:RegisterEffect(e5)
 end
-function c29400787.bttg(e,c)
+function c29400787.atlimit(e,c)
 	return c:IsFacedown()
-end
-function c29400787.btval(e,c)
-	return not c:IsImmuneToEffect(e)
 end
 function c29400787.dirtg(e,c)
 	return not Duel.IsExistingMatchingCard(Card.IsFaceup,c:GetControler(),0,LOCATION_MZONE,1,nil)

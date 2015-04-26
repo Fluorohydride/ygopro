@@ -42,7 +42,6 @@ function c25148255.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c25148255.scop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<1 then return end
-	if not Duel.IsPlayerCanSpecialSummonCount(tp,2) then return end
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) or Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)==0 then return end

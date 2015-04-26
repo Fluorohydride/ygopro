@@ -12,8 +12,7 @@ function c29618570.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c29618570.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
+	return Duel.IsAbleToEnterBP()
 end
 function c29618570.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end

@@ -6,6 +6,7 @@ function c21105106.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c21105106.splimit)
 	c:RegisterEffect(e1)
 	--cannot spsummon
 	local e2=Effect.CreateEffect(c)
@@ -26,6 +27,9 @@ function c21105106.initial_effect(c)
 	e3:SetTarget(c21105106.rmtg)
 	e3:SetOperation(c21105106.rmop)
 	c:RegisterEffect(e3)
+end
+function c21105106.splimit(e,se,sp,st)
+	return e:GetHandler():IsLocation(LOCATION_HAND) and bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c21105106.mat_filter(c)
 	return false
@@ -61,8 +65,7 @@ function c21105106.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_RITUAL
 end
 function c21105106.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
-		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 		and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==1 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -75,7 +78,7 @@ function c21105106.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetCode(EFFECT_CANNOT_SUMMON)
 	Duel.RegisterEffect(e2,tp)
 	local e3=e1:Clone()
-	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	e3:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e3,tp)
 end
 function c21105106.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -90,47 +93,45 @@ end
 function c21105106.filter(c,fc,tp)
 	return c:IsControler(tp) and c:IsLocation(LOCATION_MZONE) and c:GetRitualLevel(fc)==c:GetLevel()
 end
-function c21105106.fuscon(c)
+function c21105106.ritual_custom_condition(c,mg)
 	local tp=c:GetControler()
-	local mg=Duel.GetRitualMaterial(tp)
 	local g=mg:Filter(c21105106.filter,c,c,tp)
-	return g:IsExists(c21105106.fusfilter1,1,nil,c:GetLevel(),g)
+	return g:IsExists(c21105106.ritfilter1,1,nil,c:GetLevel(),g)
 end
-function c21105106.fusfilter1(c,lv,mg)
+function c21105106.ritfilter1(c,lv,mg)
 	lv=lv-c:GetLevel()
 	if lv<2 then return false end
 	local mg2=mg:Clone()
 	mg2:Remove(Card.IsRace,nil,c:GetRace())
-	return mg2:IsExists(c21105106.fusfilter2,1,nil,lv,mg2)
+	return mg2:IsExists(c21105106.ritfilter2,1,nil,lv,mg2)
 end
-function c21105106.fusfilter2(c,lv,mg)
+function c21105106.ritfilter2(c,lv,mg)
 	local clv=c:GetLevel()
 	lv=lv-clv
 	if lv<1 then return false end
 	local mg2=mg:Clone()
 	mg2:Remove(Card.IsRace,nil,c:GetRace())
-	return mg2:IsExists(c21105106.fusfilter3,1,nil,lv)
+	return mg2:IsExists(c21105106.ritfilter3,1,nil,lv)
 end
-function c21105106.fusfilter3(c,lv)
+function c21105106.ritfilter3(c,lv)
 	return c:GetLevel()==lv
 end
-function c21105106.fusop(c)
+function c21105106.ritual_custom_operation(c,mg)
 	local tp=c:GetControler()
 	local lv=c:GetLevel()
-	local mg=Duel.GetRitualMaterial(tp)
 	local g=mg:Filter(c21105106.filter,c,c,tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g1=g:FilterSelect(tp,c21105106.fusfilter1,1,1,nil,lv,g)
+	local g1=g:FilterSelect(tp,c21105106.ritfilter1,1,1,nil,lv,g)
 	local tc1=g1:GetFirst()
 	lv=lv-tc1:GetLevel()
 	g:Remove(Card.IsRace,nil,tc1:GetRace())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g2=g:FilterSelect(tp,c21105106.fusfilter2,1,1,nil,lv,g)
+	local g2=g:FilterSelect(tp,c21105106.ritfilter2,1,1,nil,lv,g)
 	local tc2=g2:GetFirst()
 	lv=lv-tc2:GetLevel()
 	g:Remove(Card.IsRace,nil,tc2:GetRace())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
-	local g3=g:FilterSelect(tp,c21105106.fusfilter3,1,1,nil,lv)
+	local g3=g:FilterSelect(tp,c21105106.ritfilter3,1,1,nil,lv)
 	g1:Merge(g2)
 	g1:Merge(g3)
 	c:SetMaterial(g1)

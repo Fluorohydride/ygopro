@@ -3,11 +3,10 @@ function c6924874.initial_effect(c)
 	--at limit
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
+	e1:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetTargetRange(LOCATION_MZONE,0)
-	e1:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e1:SetTarget(c6924874.atlimit)
-	e1:SetValue(1)
+	e1:SetTargetRange(0,LOCATION_MZONE)
+	e1:SetValue(c6924874.atlimit)
 	c:RegisterEffect(e1)
 	--atk/def
 	local e2=Effect.CreateEffect(c)
@@ -39,7 +38,7 @@ function c6924874.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x64) and c:GetCode()~=6924874
 end
 function c6924874.atlimit(e,c)
-	return c:IsSetCard(0x64) and c:GetCode()~=6924874
+	return c:IsFaceup() and c:IsSetCard(0x64) and c:GetCode()~=6924874
 end
 function c6924874.adcon(e)
 	return Duel.IsExistingMatchingCard(c6924874.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,2,nil)

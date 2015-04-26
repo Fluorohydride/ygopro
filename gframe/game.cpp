@@ -14,7 +14,7 @@
 #include <dirent.h>
 #endif
 
-const unsigned short PRO_VERSION = 0x1333;
+const unsigned short PRO_VERSION = 0x1334;
 
 namespace ygo {
 
@@ -196,6 +196,8 @@ bool Game::Initialize() {
 	btnM2->setVisible(false);
 	btnEP = env->addButton(rect<s32>(325, 0, 375, 20), wPhase, BUTTON_EP, L"\xff25\xff30");
 	btnEP->setVisible(false);
+	btnShuffle = env->addButton(rect<s32>(0, 0, 50, 20), wPhase, BUTTON_CMD_SHUFFLE, dataManager.GetSysString(1307));
+	btnShuffle->setVisible(false);
 	//tab
 	wInfos = env->addTabControl(rect<s32>(1, 275, 301, 639), 0, true);
 	wInfos->setVisible(false);

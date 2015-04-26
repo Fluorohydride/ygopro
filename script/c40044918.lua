@@ -37,6 +37,10 @@ function c40044918.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if sel==3 then
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(40044918,0))
 		sel=Duel.SelectOption(tp,aux.Stringid(40044918,1),aux.Stringid(40044918,2))+1
+	elseif sel==1 then
+		Duel.SelectOption(tp,aux.Stringid(40044918,1))
+	else
+		Duel.SelectOption(tp,aux.Stringid(40044918,2))
 	end
 	e:SetLabel(sel)
 	if sel==1 then

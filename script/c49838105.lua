@@ -36,16 +36,16 @@ end
 function c49838105.target1(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	if Duel.CheckEvent(EVENT_ATTACK_ANNOUNCE) and Duel.GetAttacker():IsControler(1-tp) and Duel.GetAttackTarget()==nil
-		and Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 and Duel.SelectYesNo(tp,aux.Stringid(49838105,2)) then
+		and Duel.IsPlayerCanDiscardDeck(tp,1) and Duel.SelectYesNo(tp,aux.Stringid(49838105,2)) then
 		e:SetLabel(1)
 	else e:SetLabel(0) end
 end
 function c49838105.target2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)>0 end
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1) end
 end
 function c49838105.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
-	if Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)==0 then return end
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local g=Duel.GetDecktopGroup(tp,1)
 	local tc=g:GetFirst()

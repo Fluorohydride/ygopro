@@ -34,12 +34,6 @@ function c31531170.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetLabel(tc2:GetFieldID())
 	tc1:RegisterEffect(e1)
 end
-function c31531170.filter(c,e,tp,lscale,rscale)
-	local lv=c:GetLevel()
-	return c:IsFaceup() and c:IsType(TYPE_PENDULUM)
-		and lv>lscale and lv<rscale and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_PENDULUM,tp,false,false)
-		and not c:IsForbidden()
-end
 function c31531170.pendcon(e,c,og)
 	if c==nil then return true end
 	local tp=e:GetOwnerPlayer()
@@ -51,9 +45,9 @@ function c31531170.pendcon(e,c,og)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if ft<=0 then return false end
 	if og then
-		return og:IsExists(c31531170.filter,1,nil,e,tp,lscale,rscale)
+		return og:IsExists(aux.PConditionFilter,1,nil,e,tp,lscale,rscale)
 	else
-		return Duel.IsExistingMatchingCard(c31531170.filter,tp,LOCATION_EXTRA,0,1,nil,e,tp,lscale,rscale)
+		return Duel.IsExistingMatchingCard(aux.PConditionFilter,tp,LOCATION_EXTRA,0,1,nil,e,tp,lscale,rscale)
 	end
 end
 function c31531170.pendop(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
@@ -65,11 +59,11 @@ function c31531170.pendop(e,tp,eg,ep,ev,re,r,rp,c,sg,og)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	if og then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=og:FilterSelect(tp,c31531170.filter,1,ft,nil,e,tp,lscale,rscale)
+		local g=og:FilterSelect(tp,aux.PConditionFilter,1,ft,nil,e,tp,lscale,rscale)
 		sg:Merge(g)
 	else
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local g=Duel.SelectMatchingCard(tp,c31531170.filter,tp,LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
+		local g=Duel.SelectMatchingCard(tp,aux.PConditionFilter,tp,LOCATION_EXTRA,0,1,ft,nil,e,tp,lscale,rscale)
 		sg:Merge(g)
 	end
 end

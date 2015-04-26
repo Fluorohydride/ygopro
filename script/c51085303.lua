@@ -18,12 +18,10 @@ function c51085303.initial_effect(c)
 	--
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
-	e3:SetCode(EFFECT_CANNOT_BE_BATTLE_TARGET)
-	e3:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
+	e3:SetCode(EFFECT_CANNOT_SELECT_BATTLE_TARGET)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetTargetRange(LOCATION_MZONE,0)
-	e3:SetTarget(c51085303.attg)
-	e3:SetValue(1)
+	e3:SetTargetRange(0,LOCATION_MZONE)
+	e3:SetValue(c51085303.atlimit)
 	c:RegisterEffect(e3)
 end
 function c51085303.adcon(e,tp,eg,ep,ev,re,r,rp)
@@ -45,6 +43,6 @@ function c51085303.adop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e2)
 	end
 end
-function c51085303.attg(e,c)
+function c51085303.atlimit(e,c)
 	return c:IsFacedown() or not c:IsCode(51085303)
 end

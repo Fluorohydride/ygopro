@@ -28,7 +28,7 @@ function c23626223.activate(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCondition(c23626223.tgcon)
-	e1:SetValue(c23626223.tgval)
+	e1:SetValue(aux.tgoval)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
@@ -44,13 +44,10 @@ function c23626223.activate(e,tp,eg,ep,ev,re,r,rp)
 	c:RegisterEffect(e2)
 end
 function c23626223.tgfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_TRAP) and c:IsType(TYPE_MONSTER)
+	return c:IsFaceup() and bit.band(c:GetOriginalType(),TYPE_TRAP)~=0 and c:IsType(TYPE_MONSTER)
 end
 function c23626223.tgcon(e)
 	return Duel.IsExistingMatchingCard(c23626223.tgfilter,e:GetHandlerPlayer(),LOCATION_MZONE,0,1,e:GetHandler())
-end
-function c23626223.tgval(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c23626223.cfilter(c,tp)
 	return c:IsPreviousLocation(LOCATION_SZONE) and c:GetPreviousControler()==tp

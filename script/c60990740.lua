@@ -30,12 +30,12 @@ function c60990740.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c60990740.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,nil)
+	if chk==0 then return Duel.IsPlayerCanDiscardDeck(tp,1)
 		and Duel.GetLocationCount(tp,LOCATION_SZONE)>0
 		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SSET) end
 end
 function c60990740.operation(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_DECK,0,1,nil) then return end
+	if not Duel.IsPlayerCanDiscardDeck(tp,1) then return end
 	Duel.ConfirmDecktop(tp,1)
 	local tc=Duel.GetDecktopGroup(tp,1):GetFirst()
 	Duel.DisableShuffleCheck()

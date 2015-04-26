@@ -15,7 +15,7 @@ function c23289281.operaion(e,tp,eg,ep,ev,re,r,rp)
 	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetCode(EFFECT_SET_ATTACK)
+	e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 	e1:SetValue(c:GetBaseAttack()*2)
 	e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_END)
 	c:RegisterEffect(e1,true)

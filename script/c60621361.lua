@@ -32,9 +32,28 @@ function c60621361.initial_effect(c)
 	e4:SetCondition(c60621361.descon)
 	e4:SetOperation(c60621361.desop)
 	c:RegisterEffect(e4)
+	if not c60621361.global_check then
+		c60621361.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetOperation(c60621361.spcheckop)
+		Duel.RegisterEffect(ge1,0)
+	end
+end
+function c60621361.spcheckop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	local p1=false
+	local p2=false
+	while tc do
+		if tc:GetSummonPlayer()==0 then p1=true else p2=true end
+		tc=eg:GetNext()
+	end
+	if p1 then Duel.RegisterFlagEffect(0,60621361,RESET_PHASE+PHASE_END,0,1) end
+	if p2 then Duel.RegisterFlagEffect(1,60621361,RESET_PHASE+PHASE_END,0,1) end
 end
 function c60621361.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetActivityCount(1-tp,ACTIVITY_SPSUMMON)~=0
+	return Duel.GetFlagEffect(1-tp,60621361)~=0
 end
 function c60621361.filter(c,e,tp)
 	return c:IsCanBeSpecialSummoned(e,0,tp,false,false)

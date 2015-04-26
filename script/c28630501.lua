@@ -45,7 +45,7 @@ function c28630501.sumop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c28630501.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return tc:IsControler(tp) and tc:IsSetCard(0xb3) and tc~=e:GetHandler()
+	return ep~=tp and tc:IsControler(tp) and tc:IsSetCard(0xb3) and tc~=e:GetHandler()
 end
 function c28630501.thfilter(c)
 	return c:IsSetCard(0xb3) and not c:IsCode(28630501) and c:IsAbleToHand()

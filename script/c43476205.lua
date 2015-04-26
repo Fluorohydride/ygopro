@@ -17,11 +17,11 @@ function c43476205.filter1(c,e,tp)
 end
 function c43476205.filter2(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and c:IsFaceup() and c:GetOverlayCount()==0 and c:IsAbleToChangeControler()
+	return rk>0 and c:IsFaceup() and c:GetOverlayCount()==0 and c:IsControlerCanBeChanged()
 		and Duel.IsExistingMatchingCard(c43476205.filter3,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,rk+1)
 end
 function c43476205.filter3(c,e,tp,mc,rk)
-	return c:GetRank()==rk and c:IsSetCard(0xba) and mc:IsCanBeXyzMaterial(c,true)
+	return c:GetRank()==rk and c:IsSetCard(0xba) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c43476205.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -34,8 +34,7 @@ function c43476205.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		Duel.SelectTarget(tp,c43476205.filter1,tp,LOCATION_MZONE,0,1,1,nil,e,tp)
 	else
 		if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c43476205.filter2(chkc,e,tp) end
-		if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-			and Duel.IsExistingTarget(c43476205.filter2,tp,0,LOCATION_MZONE,1,nil,e,tp) end
+		if chk==0 then return Duel.IsExistingTarget(c43476205.filter2,tp,0,LOCATION_MZONE,1,nil,e,tp) end
 		e:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_CONTROL)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 		local g=Duel.SelectTarget(tp,c43476205.filter2,tp,0,LOCATION_MZONE,1,1,nil,e,tp)
@@ -47,7 +46,7 @@ function c43476205.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if Duel.GetTurnPlayer()~=tp then
 		if not tc:IsRelateToEffect(e) or not tc:IsFaceup() then return end
-		if not Duel.GetControl(tc,tp,PHASE_END,1) then
+		if not Duel.GetControl(tc,tp) then
 			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 				Duel.Destroy(tc,REASON_EFFECT)
 			end
@@ -65,6 +64,7 @@ function c43476205.activate(e,tp,eg,ep,ev,re,r,rp)
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()

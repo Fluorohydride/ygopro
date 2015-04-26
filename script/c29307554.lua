@@ -33,8 +33,8 @@ function c29307554.checkop(e,tp,eg,ep,ev,re,r,rp)
 	if p2 then Duel.RegisterFlagEffect(1,29307554,RESET_PHASE+PHASE_END,0,1) end
 end
 function c29307554.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetFlagEffect(tp,29307554)~=0 and Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()<=PHASE_BATTLE
-		and Duel.GetTurnCount()~=1 and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
+	return Duel.GetFlagEffect(tp,29307554)~=0 and Duel.GetTurnPlayer()==tp
+		and (Duel.IsAbleToEnterBP() or Duel.GetCurrentPhase()==PHASE_BATTLE)
 end
 function c29307554.filter(c)
 	return c:IsFaceup() and c:IsLevelAbove(8) and c:GetEffectCount(EFFECT_EXTRA_ATTACK)==0

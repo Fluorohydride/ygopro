@@ -21,7 +21,7 @@ function c12181376.activate(e,tp,eg,ep,ev,re,r,rp)
 	while tc do
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_SET_ATTACK)
+		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(2700)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)

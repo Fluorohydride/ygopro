@@ -52,6 +52,7 @@ function c56655675.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g3=Duel.SelectMatchingCard(tp,c56655675.spfilter3,tp,LOCATION_MZONE,0,1,1,nil)
 	g1:Merge(g2)
 	g1:Merge(g3)
+	c:SetMaterial(g1)
 	Duel.Remove(g1,POS_FACEUP,REASON_COST)
 end
 function c56655675.condition(e,tp,eg,ep,ev,re,r,rp)

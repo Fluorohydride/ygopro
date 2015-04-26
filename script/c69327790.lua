@@ -68,7 +68,7 @@ function c69327790.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c69327790.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local ex,g1=Duel.GetOperationInfo(0,CATEGORY_TODECK)
-	local ex,g2=Duel.GetOperationInfo(0,CATEGORY_TOHAND)
+	local ex2,g2=Duel.GetOperationInfo(0,CATEGORY_TOHAND)
 	local sg1=g1:Filter(Card.IsRelateToEffect,nil,e)
 	if sg1:GetCount()>0 and Duel.SendtoDeck(sg1,nil,0,REASON_EFFECT)>1 then
 		local tc1=sg1:GetFirst()
@@ -77,7 +77,7 @@ function c69327790.tdop(e,tp,eg,ep,ev,re,r,rp)
 			Duel.SortDecktop(tp,tc1:GetControler(),2)
 		end
 	end
-	if e:GetLabel()==1 then
+	if e:GetLabel()==1 and g2 then
 		local tc=g2:GetFirst()
 		if tc:IsRelateToEffect(e) then
 			Duel.SendtoHand(g2,nil,REASON_EFFECT)

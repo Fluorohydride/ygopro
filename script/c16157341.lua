@@ -13,7 +13,7 @@ function c16157341.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c16157341.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
+	return Duel.IsAbleToEnterBP()
 end
 function c16157341.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end

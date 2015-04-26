@@ -37,7 +37,7 @@ function c98076754.initial_effect(c)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetTargetRange(LOCATION_MZONE,0)
 	e4:SetCondition(c98076754.effcon)
-	e4:SetValue(c98076754.indval)
+	e4:SetValue(aux.tgoval)
 	e4:SetLabel(8)
 	c:RegisterEffect(e4)
 	--todeck
