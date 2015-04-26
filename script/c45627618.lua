@@ -2,10 +2,12 @@
 function c45627618.initial_effect(c)
 	--xyz summon
 	aux.AddXyzProcedure(c,aux.FilterBoolFunction(Card.IsRace,RACE_DRAGON),7,2)
+	c:EnableReviveLimit()
 	--pendulum summon
 	aux.AddPendulumProcedure(c)
 	--pendulum set
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(45627618,0))
 	e1:SetType(EFFECT_TYPE_IGNITION)
 	e1:SetRange(LOCATION_PZONE)
 	e1:SetCountLimit(1)
@@ -14,6 +16,7 @@ function c45627618.initial_effect(c)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(45627618,1))
 	e2:SetCategory(CATEGORY_DESTROY+CATEGORY_DAMAGE)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_SPSUMMON_SUCCESS)
@@ -29,6 +32,7 @@ function c45627618.initial_effect(c)
 	c:RegisterEffect(e3)
 	--pendulum
 	local e4=Effect.CreateEffect(c)
+	e4:SetDescription(aux.Stringid(45627618,2))
 	e4:SetCategory(CATEGORY_DESTROY)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e4:SetCode(EVENT_DESTROYED)
@@ -37,6 +41,13 @@ function c45627618.initial_effect(c)
 	e4:SetTarget(c45627618.pentg)
 	e4:SetOperation(c45627618.penop)
 	c:RegisterEffect(e4)
+	--splimit
+	local e5=Effect.CreateEffect(c)
+	e5:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_SINGLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e5:SetCode(EVENT_LEAVE_FIELD_P)
+	e5:SetOperation(c45627618.checkop)
+	c:RegisterEffect(e5)
 end
 c45627618.pendulum_level=7
 function c45627618.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -103,4 +114,26 @@ function c45627618.penop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 and Duel.Destroy(g,REASON_EFFECT)~=0 then
 		Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
+end
+function c45627618.checkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if c:GetSummonType()==SUMMON_TYPE_XYZ or c:GetSummonType()==SUMMON_TYPE_XYZ then
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+		e1:SetRange(LOCATION_EXTRA)
+		e1:SetValue(c45627618.splimit)
+		c:RegisterEffect(e1)
+	else
+		local e1=Effect.CreateEffect(c)
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
+		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+		e1:SetRange(LOCATION_EXTRA)
+		c:RegisterEffect(e1)
+	end
+end
+function c45627618.splimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
