@@ -47,13 +47,14 @@ function c17016362.mtcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c17016362.mtfilter(c)
-	return c:IsAttackPos() and c:IsDestructable() and not c:IsHasEffect(EFFECT_EXTRA_ATTACK)
+	return c:IsPosition(POS_FACEUP_ATTACK) and c:IsDestructable() and not c:IsHasEffect(EFFECT_EXTRA_ATTACK)
 end
 function c17016362.mttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c17016362.mtfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c17016362.mtfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,e:GetHandler()) end
+	local turnp=Duel.GetTurnPlayer()
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(turnp) and c17016362.mtfilter(chkc) and chkc~=e:GetHandler() end
+	if chk==0 then return Duel.IsExistingTarget(c17016362.mtfilter,turnp,LOCATION_MZONE,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,c17016362.mtfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,e:GetHandler())
+	Duel.SelectTarget(tp,c17016362.mtfilter,turnp,LOCATION_MZONE,0,1,1,e:GetHandler())
 end
 function c17016362.mtop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

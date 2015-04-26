@@ -33,11 +33,8 @@ function c6172122.filter1(c,e)
 	return c:IsCanBeFusionMaterial() and c:IsAbleToGrave() and not c:IsImmuneToEffect(e)
 end
 function c6172122.filter2(c,e,tp,m,f,chkf)
-	return c:IsType(TYPE_FUSION) and (c:IsSetCard(0x104) or c:IsCode(11901678) or c:IsCode(90660762)) and (not f or f(c))
-		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and m:IsExists(c6172122.filter3,1,nil,c,m,chkf)
-end
-function c6172122.filter3(c,fusc,m,chkf)
-	return c:IsSetCard(0x3b) and fusc:CheckFusionMaterial(m,c,chkf)
+	return c:IsType(TYPE_FUSION) and c:IsSetCard(0x104) and (not f or f(c))
+		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function c6172122.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -77,19 +74,13 @@ function c6172122.activate(e,tp,eg,ep,ev,re,r,rp)
 		local tg=sg:Select(tp,1,1,nil)
 		local tc=tg:GetFirst()
 		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-			local gc=mg1:FilterSelect(tp,c6172122.filter3,1,1,nil,tc,mg1,chkf):GetFirst()
-			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,gc,chkf)
-			mat1:AddCard(gc)
+			local mat1=Duel.SelectFusionMaterial(tp,tc,mg1,nil,chkf)
 			tc:SetMaterial(mat1)
 			Duel.SendtoGrave(mat1,REASON_EFFECT+REASON_MATERIAL+REASON_FUSION)
 			Duel.BreakEffect()
 			Duel.SpecialSummon(tc,SUMMON_TYPE_FUSION,tp,tp,false,false,POS_FACEUP)
 		else
-			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
-			local gc=mg2:FilterSelect(tp,c6172122.filter3,1,1,nil,tc,mg2,chkf):GetFirst()
-			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,gc,chkf)
-			mat2:AddCard(gc)
+			local mat2=Duel.SelectFusionMaterial(tp,tc,mg2,nil,chkf)
 			local fop=ce:GetOperation()
 			fop(ce,e,tp,tc,mat2)
 		end

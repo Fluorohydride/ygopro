@@ -22,6 +22,9 @@ function c79777187.initial_effect(c)
 	e3:SetTarget(c79777187.reptg)
 	e3:SetValue(c79777187.repval)
 	c:RegisterEffect(e3)
+	local g=Group.CreateGroup()
+	g:KeepAlive()
+	e3:SetLabelObject(g)
 end
 function c79777187.target(e,c)
 	return c:IsSetCard(0xc6) or c:IsSetCard(0x9f)
@@ -32,15 +35,14 @@ function c79777187.repfilter(c,tp)
 end
 function c79777187.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return eg:IsExists(c79777187.repfilter,1,nil,tp) end
-	Duel.Hint(HINT_CARD,0,79777187)
 	local g=eg:Filter(c79777187.repfilter,nil,tp)
-	e:SetLabelObject(g)
 	local tc=g:GetFirst()
 	while tc do
-		tc:RegisterFlagEffect(79777187,RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(79777187,0))
+		tc:RegisterFlagEffect(79777187,RESET_EVENT+0x1fc0000+RESET_PHASE+RESET_END,EFFECT_FLAG_CLIENT_HINT,1,0,aux.Stringid(79777187,0))
 		tc=g:GetNext()
 	end
-	g:KeepAlive()
+	e:GetLabelObject():Clear()
+	e:GetLabelObject():Merge(g)
 	return true
 end
 function c79777187.repval(e,c)

@@ -27,21 +27,20 @@ function c18239909.initial_effect(c)
 end
 function c18239909.tgfilter(c)
 	if c:IsLocation(LOCATION_MZONE) then
-		return c:IsType(TYPE_PENDULUM)
-	elseif c:IsLocation(LOCATION_SZONE) then
+		return c:IsFaceup() and c:IsType(TYPE_PENDULUM)
+	else
 		return c:GetSequence()==6 or c:GetSequence()==7
 	end
-	return false
 end
-function c18239909.desfilter(c,tp)
-	return c:IsFaceup() and c18239909.tgfilter(c) and c:IsDestructable()
-		and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+function c18239909.desfilter(c)
+	return c18239909.tgfilter(c) and c:IsDestructable()
+		and Duel.IsExistingMatchingCard(Card.IsAbleToDeck,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
 end
 function c18239909.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and c18239909.desfilter(chkc,tp) end
-	if chk==0 then return Duel.IsExistingTarget(c18239909.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil,tp) end
+	if chkc then return chkc:IsOnField() and c18239909.desfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c18239909.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g=Duel.SelectTarget(tp,c18239909.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil,tp)
+	local g=Duel.SelectTarget(tp,c18239909.desfilter,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,nil,1,0,LOCATION_ONFIELD)
 end
@@ -67,7 +66,14 @@ function c18239909.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectMatchingCard(tp,c18239909.spfilter,tp,LOCATION_DECK,0,1,1,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
+	local tc=g:GetFirst()
+	if tc then
+		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_CANNOT_BE_SYNCHRO_MATERIAL)
+		e1:SetReset(RESET_EVENT+0x1fe0000)
+		e1:SetValue(1)
+		tc:RegisterEffect(e1)
 	end
 end

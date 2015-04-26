@@ -41,13 +41,13 @@ end
 c45627618.pendulum_level=7
 function c45627618.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local seq=e:GetHandler():GetSequence()
-	if chk==0 then return Duel.CheckLocation(tp,LOCATION_SZONE,13-seq)
+	if chk==0 then return Duel.CheckLocation(tp,LOCATION_SZONE,13-seq)==nil
 		and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_DECK,0,1,nil,TYPE_PENDULUM) end
 end
 function c45627618.pcop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local seq=e:GetHandler():GetSequence()
-	if not Duel.CheckLocation(tp,LOCATION_SZONE,13-seq) then return end
+	if Duel.CheckLocation(tp,LOCATION_SZONE,13-seq) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
 	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK,0,1,1,nil,TYPE_PENDULUM)
 	if g:GetCount()>0 then
@@ -64,8 +64,6 @@ function c45627618.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local g=Duel.GetMatchingGroup(c45627618.desfilter,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(g:GetCount()*1000)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,g:GetCount()*1000)
 end
 function c45627618.desop(e,tp,eg,ep,ev,re,r,rp)
@@ -76,7 +74,7 @@ function c45627618.desop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_EXTRA_ATTACK)
-		e1:SetValue(3)
+		e1:SetValue(2)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
 		c:RegisterEffect(e1)
 	end
@@ -85,6 +83,8 @@ function c45627618.valcheck(e,c)
 	local g=c:GetMaterial()
 	if g:IsExists(Card.IsType,1,nil,TYPE_XYZ) then
 		e:GetLabelObject():SetLabel(1)
+	else
+		e:GetLabelObject():SetLabel(0)
 	end
 end
 function c45627618.pencon(e,tp,eg,ep,ev,re,r,rp)
@@ -93,14 +93,15 @@ end
 function c45627618.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local lsc=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
 	local rsc=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
-	local g=Group.FromCards(lsc,rsc)
+	local g=Group.FromCards(lsc,rsc):Filter(Card.IsDestructable,nil)
 	if chk==0 then return g:GetCount()>0 end
-	Duel.SetTargetCard(g)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c45627618.penop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
-	if g:GetCount()>0 and Duel.Destroy(g,REASON_EFFECT)~=0 then
+	local lsc=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
+	local rsc=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
+	local g=Group.FromCards(lsc,rsc)
+	if Duel.Destroy(g,REASON_EFFECT)~=0 then
 		Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
 end

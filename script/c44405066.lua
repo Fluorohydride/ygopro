@@ -51,6 +51,7 @@ function c44405066.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return c:GetOverlayCount()>0 and ep~=tp and c:GetFlagEffect(44405066)~=0
 end
 function c44405066.damop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Hint(HINT_CARD,0,44405066)
 	Duel.Damage(1-tp,500,REASON_EFFECT)
 end
 function c44405066.spcost(e,tp,eg,ep,ev,re,r,rp,chk)

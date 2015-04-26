@@ -7,6 +7,7 @@ function c46502744.initial_effect(c)
 	e1:SetCode(EVENT_CHAINING)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCondition(c46502744.spcon)
+	e1:SetCost(c46502744.spcost)
 	e1:SetTarget(c46502744.sptg)
 	e1:SetOperation(c46502744.spop)
 	c:RegisterEffect(e1)
@@ -33,6 +34,10 @@ function c46502744.initial_effect(c)
 end
 function c46502744.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) and re:IsHasCategory(CATEGORY_SPECIAL_SUMMON)
+end
+function c46502744.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():GetFlagEffect(46502744)==0 end
+	e:GetHandler():RegisterFlagEffect(46502744,RESET_CHAIN,0,1)
 end
 function c46502744.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0

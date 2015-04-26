@@ -52,15 +52,12 @@ function c45349196.damtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	local g=Duel.SelectTarget(tp,c45349196.filter,tp,LOCATION_GRAVE,0,1,1,nil)
 	local atk=g:GetFirst():GetBaseAttack()
-	Duel.SetTargetPlayer(1-tp)
-	Duel.SetTargetParam(atk)
 	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,atk)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
 function c45349196.damop(e,tp,eg,ep,ev,re,r,rp)
-	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	local tc=Duel.GetFirstTarget()
-	if Duel.Damage(p,d,REASON_EFFECT)~=0 and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and Duel.Damage(1-tp,tc:GetBaseAttack(),REASON_EFFECT)~=0 then
 		Duel.BreakEffect()
 		Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 	end
