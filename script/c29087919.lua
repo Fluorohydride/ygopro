@@ -60,13 +60,10 @@ function c29087919.filter2(c,e,tp)
 end
 function c29087919.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c29087919.filter2,nil,e,tp)
-	local ct=g:GetCount()
-	if ct<2 then return end
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<ct then return end
-	Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	Duel.BreakEffect()
+	local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	local xyzg=Duel.GetMatchingGroup(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,nil,g,ct)
-	if xyzg:GetCount()>0 then
+	if ct>=2 and xyzg:GetCount()>0 then
+		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local xyz=xyzg:Select(tp,1,1,nil):GetFirst()
 		Duel.XyzSummon(tp,xyz,g)
