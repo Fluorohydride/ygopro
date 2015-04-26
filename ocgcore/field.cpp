@@ -2095,6 +2095,8 @@ int32 field::is_player_can_send_to_grave(uint8 playerid, card * pcard) {
 }
 int32 field::is_player_can_send_to_hand(uint8 playerid, card * pcard) {
 	effect_set eset;
+	if((pcard->current.location == LOCATION_EXTRA) && (pcard->data.type & (TYPE_FUSION + TYPE_SYNCHRO + TYPE_XYZ)))
+		return FALSE;
 	filter_player_effect(playerid, EFFECT_CANNOT_TO_HAND, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		if(!eset[i]->target)
@@ -2109,6 +2111,8 @@ int32 field::is_player_can_send_to_hand(uint8 playerid, card * pcard) {
 }
 int32 field::is_player_can_send_to_deck(uint8 playerid, card * pcard) {
 	effect_set eset;
+	if((pcard->current.location == LOCATION_EXTRA) && (pcard->data.type & (TYPE_FUSION + TYPE_SYNCHRO + TYPE_XYZ)))
+		return FALSE;
 	filter_player_effect(playerid, EFFECT_CANNOT_TO_DECK, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		if(!eset[i]->target)
