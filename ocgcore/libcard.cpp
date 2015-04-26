@@ -1723,15 +1723,20 @@ int32 scriptlib::card_enable_counter_permit(lua_State *L) {
 	check_param_count(L, 2);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 countertype = lua_tointeger(L, 2);
+	uint16 prange;
+	if(pcard->data.type & TYPE_MONSTER)
+		prange = LOCATION_MZONE;
+	else
+		prange = LOCATION_SZONE | LOCATION_FZONE;
+	if(lua_gettop(L) > 2) {
+		prange |= lua_tointeger(L, 3);
+	}
 	effect* peffect = pcard->pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
 	peffect->code = EFFECT_COUNTER_PERMIT | countertype;
 	peffect->flag = EFFECT_FLAG_SINGLE_RANGE;
-	if(pcard->data.type & TYPE_MONSTER)
-		peffect->range = LOCATION_MZONE;
-	else
-		peffect->range = LOCATION_SZONE | LOCATION_FZONE;
+	peffect->range = prange;
 	pcard->add_effect(peffect);
 	return 0;
 }
