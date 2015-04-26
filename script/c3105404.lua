@@ -49,7 +49,9 @@ function c3105404.cfilter(c)
 	return c:IsSetCard(0x1047) and c:IsAbleToGraveAsCost()
 end
 function c3105404.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c3105404.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return e:GetHandler():GetFlagEffect(3105404)==0
+		and Duel.IsExistingMatchingCard(c3105404.cfilter,tp,LOCATION_HAND,0,1,nil) end
+	e:GetHandler():RegisterFlagEffect(3105404,RESET_CHAIN,0,1)
 	Duel.DiscardHand(tp,c3105404.cfilter,1,1,REASON_COST,nil)
 end
 function c3105404.thtg(e,tp,eg,ep,ev,re,r,rp,chk)

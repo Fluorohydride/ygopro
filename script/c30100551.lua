@@ -43,7 +43,10 @@ function c30100551.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.DiscardDeck(p,d,REASON_EFFECT)
 	local g=Duel.GetOperatedGroup()
 	local ct=g:FilterCount(c30100551.cfilter,nil)
-	Duel.Draw(tp,ct,REASON_EFFECT)
+	if ct>0 then
+		Duel.BreakEffect()
+		Duel.Draw(tp,ct,REASON_EFFECT)
+	end
 end
 function c30100551.descon(e,tp,eg,ep,ev,re,r,rp)
 	return rp~=tp and e:GetHandler():IsReason(REASON_BATTLE+REASON_EFFECT)
@@ -55,6 +58,7 @@ function c30100551.desop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:FilterCount(c30100551.cfilter,nil)
 	local dg=Duel.GetMatchingGroup(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,nil)
 	if ct~=0 and dg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(30100551,0)) then
+		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		local sdg=dg:Select(tp,1,ct,nil)
 		Duel.Destroy(sdg,REASON_EFFECT)

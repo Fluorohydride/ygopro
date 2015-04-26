@@ -11,7 +11,7 @@ function c30922149.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c30922149.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsPlayerCanDraw(1-tp) end
+	if chk==0 then return Duel.IsPlayerCanDraw(1-tp,1) end
 	Duel.SetTargetPlayer(1-tp)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,1-tp,1)
 end
