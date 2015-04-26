@@ -52,7 +52,7 @@ function c82734805.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if ct>=10 then
 		con10=Duel.GetFieldGroupCount(tp,LOCATION_HAND,LOCATION_HAND)>0
 	end
-	if chk=0 then return con3 or con5 or con8 or con10 end
+	if chk==0 then return con3 or con5 or con8 or con10 end
 end
 function c82734805.op(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
