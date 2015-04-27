@@ -35,7 +35,8 @@ function c29087919.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local maxg,maxc=exg:GetMaxGroup(c29087919.xyzct)
 	if ct>mct then ct=mct end
 	if ct>maxc then ct=maxc end
-	if chk==0 then return ct>1 and Duel.IsExistingMatchingCard(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,mg,ct) end
+	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
+		and ct>1 and Duel.IsExistingMatchingCard(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,mg,ct) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg1=mg:FilterSelect(tp,c29087919.mfilter1,1,1,nil,exg)
 	local tc1=sg1:GetFirst()
