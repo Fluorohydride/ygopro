@@ -332,23 +332,17 @@ function Auxiliary.FConditionCode2(code1,code2,sub,insf)
 					end
 				end
 				local b1=0 local b2=0 local bs=0
-				local f1=false local f2=false local fs=false
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
 					local code=tc:GetCode()
-					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then f1=true end
-					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then f2=true end
-					elseif tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
 					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					if sub then	return (b1~=0 and f1 and b2+bs~=0) or (b2~=0 and f2 and b1+bs~=0) or (bs~=0 and fs and b1+b2~=0)
-					else return (b1~=0 and f1 and b2==1) or (b2~=0 and f2 and b1==1) end
-				else
-					if sub then return b1+b2+bs>1
-					else return b1+b2==2 end
-				end
+				return b1+b2+bs>=2 and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCode2(code1,code2,sub,insf)
@@ -430,26 +424,18 @@ function Auxiliary.FConditionCode3(code1,code2,code3,sub,insf)
 					end
 				end
 				local b1=0 local b2=0 local b3=0 local bs=0
-				local f1=false local f2=false local f3=false local fs=false
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
 					local code=tc:GetCode()
-					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then f1=true end
-					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then f2=true end
-					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then f3=true end
-					elseif tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
 					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					if sub then	return (b1~=0 and f1 and b2+b3+bs>1) or (b2~=0 and f2 and b1+b3+bs>1)
-						or (b3~=0 and f3 and b1+b2+bs>1) or (bs~=0 and fs and b1+b2+b3>1)
-					else return (b1~=0 and f1 and b2+b3==2) or (b2~=0 and f2 and b1+b3==2)
-						or (b3~=0 and f3 and b1+b2==2) end
-				else
-					if sub then return b1+b2+b3+bs>2
-					else return b1+b2+b3==3 end
-				end
+				return b1+b2+b3+bs>=3 and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
@@ -540,28 +526,19 @@ function Auxiliary.FConditionCode4(code1,code2,code3,code4,sub,insf)
 					end
 				end
 				local b1=0 local b2=0 local b3=0 local b4=0 local bs=0
-				local f1=false local f2=false local f3=false local f4=false local fs=false
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
 					local code=tc:GetCode()
-					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then f1=true end
-					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then f2=true end
-					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then f3=true end
-					elseif code==code4 then b4=1 if Auxiliary.FConditionCheckF(tc,chkf) then f4=true end
-					elseif tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code4 then b4=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
 					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					if sub then	return (b1~=0 and f1 and b2+b3+b4+bs>2) or (b2~=0 and f2 and b1+b3+b4+bs>2)
-						or (b3~=0 and f3 and b1+b2+b4+bs>2) or (b4~=0 and f4 and b1+b2+b3+bs>2)
-						or (bs~=0 and fs and b1+b2+b3+b4>2)
-					else return (b1~=0 and f1 and b2+b3+b4==3) or (b2~=0 and f2 and b1+b3+b4==3)
-						or (b3~=0 and f3 and b1+b2+b4==3) or (b4~=0 and f4 and b1+b2+b3==3) end
-				else
-					if sub then return b1+b2+b3+b4+bs>3
-					else return b1+b2+b3+b4==4 end
-				end
+				return b1+b2+b3+b4+bs>=4 and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
@@ -652,17 +629,23 @@ function Auxiliary.FConditionCodeFun(code,f,cc,sub,insf)
 						end
 					else return false end
 				end
-				local g1=Group.CreateGroup() local g2=Group.CreateGroup() local fs=false
+				local b1=0 local b2=0 local bw=0
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
-					if tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
-						then g1:AddCard(tc) if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end end
-					if f(tc) then g2:AddCard(tc) if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end end
+					local b1=tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
+					local b2=f(tc)
+					if b1 or b2 then
+						if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+						if b1 and b2 then bw=bw+1
+						elseif b1 then b1=1
+						else b2=b2+1
+						end
+					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					return fs and g1:IsExists(Auxiliary.FConditionFilterCF,1,nil,g2,cc)
-				else return g1:IsExists(Auxiliary.FConditionFilterCF,1,nil,g2,cc) end
+				if b2>cc then b2=cc end
+				return b1+b2+bw>=1+cc and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
