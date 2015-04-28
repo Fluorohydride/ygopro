@@ -15,7 +15,7 @@ function c29087919.filter(c,e,tp)
 	return c:IsSetCard(0x1072) and c:IsCanBeEffectTarget(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c29087919.xyzfilter(c,mg,ct)
-	return c:IsXyzSummonable(mg) and c.xyz_count>=ct
+	return c:IsXyzSummonable(mg) and c.xyz_count<=ct
 end
 function c29087919.mfilter1(c,exg)
 	return exg:IsExists(c29087919.mfilter2,1,nil,c)
@@ -34,7 +34,7 @@ function c29087919.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local exg=Duel.GetMatchingGroup(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,nil,mg,ct)
 	local maxg,maxc=exg:GetMaxGroup(c29087919.xyzct)
 	if ct>mct then ct=mct end
-	if ct>maxc then ct=maxc end
+	if maxc and ct>maxc then ct=maxc end
 	if chk==0 then return Duel.IsPlayerCanSpecialSummonCount(tp,2)
 		and ct>1 and Duel.IsExistingMatchingCard(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,1,nil,mg,ct) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -47,11 +47,15 @@ function c29087919.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	sg1:Merge(sg2)
 	mg:Remove(Card.IsCode,nil,sg2:GetFirst():GetCode())
 	ct=ct-2
-	while mg:GetCount()>0 and ct>0 and Duel.SelectYesNo(tp,aux.Stringid(29087919,0)) do
+	local minc=2
+	local exg3=Duel.GetMatchingGroup(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,nil,sg1,minc)
+	while mg:GetCount()>0 and ct>0 and (exg3:GetCount()==0 or Duel.SelectYesNo(tp,aux.Stringid(29087919,0))) do
 		local sg3=mg:FilterSelect(tp,c29087919.mfilter1,1,1,nil,exg2)
 		sg1:Merge(sg3)
 		mg:Remove(Card.IsCode,nil,sg3:GetFirst():GetCode())
 		ct=ct-1
+		minc=minc+1
+		exg3=Duel.GetMatchingGroup(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,nil,sg1,minc)
 	end
 	Duel.SetTargetCard(sg1)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,sg1,sg1:GetCount(),0,0)
@@ -59,10 +63,13 @@ end
 function c29087919.filter2(c,e,tp)
 	return c:IsRelateToEffect(e) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
+function c29087919.spfilter(c,mg,ct)
+	return c:IsXyzSummonable(mg) and c.xyz_count==ct
+end
 function c29087919.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c29087919.filter2,nil,e,tp)
 	local ct=Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
-	local xyzg=Duel.GetMatchingGroup(c29087919.xyzfilter,tp,LOCATION_EXTRA,0,nil,g,ct)
+	local xyzg=Duel.GetMatchingGroup(c29087919.spfilter,tp,LOCATION_EXTRA,0,nil,g,ct)
 	if ct>=2 and xyzg:GetCount()>0 then
 		Duel.BreakEffect()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
