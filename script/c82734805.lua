@@ -235,7 +235,9 @@ function c82734805.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 		g1:Merge(sg)
 		ok=true
 	end
-	mg:Remove(Card.IsLocation,nil,LOCATION_DECK)
+	if e:GetHandler():GetFlagEffect(31444249)~=0 then
+		mg:Remove(Card.IsLocation,nil,LOCATION_DECK)
+	end
 	if mg:GetCount()==0 or (ok and not Duel.SelectYesNo(tp,93)) then
 		Duel.SetFusionMaterial(g1)
 		return
