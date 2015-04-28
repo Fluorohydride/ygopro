@@ -633,12 +633,12 @@ function Auxiliary.FConditionCodeFun(code,f,cc,sub,insf)
 				local fs=false
 				local tc=g:GetFirst()
 				while tc do
-					local b1=tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
-					local b2=f(tc)
-					if b1 or b2 then
+					local c1=tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
+					local c2=f(tc)
+					if c1 or c2 then
 						if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
-						if b1 and b2 then bw=bw+1
-						elseif b1 then b1=1
+						if c1 and c2 then bw=bw+1
+						elseif c1 then b1=1
 						else b2=b2+1
 						end
 					end
