@@ -33,20 +33,20 @@ function c82734805.valcheck(e,c)
 	e:GetLabelObject():SetLabel(ct)
 end
 function c82734805.con(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION 
+	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c82734805.tg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local ct=e:GetLabel()
 	local con3,con5,con8,con10=nil
-	if ct>=3 then 
+	if ct>=3 then
 		con3=Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,LOCATION_EXTRA,0,3,nil)
-			and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,3,nil) 
+			and Duel.IsExistingMatchingCard(Card.IsAbleToGrave,tp,0,LOCATION_EXTRA,3,nil)
 	end
 	if ct>=5 then
-		con5=Duel.IsPlayerCanDiscardDeck(tp,3) and Duel.IsPlayerCanDiscardDeck(1-tp,3) 
+		con5=Duel.IsPlayerCanDiscardDeck(tp,3) and Duel.IsPlayerCanDiscardDeck(1-tp,3)
 	end
 	if ct>=8 then
-		con8=Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_REMOVED,0,1,nil) 
+		con8=Duel.IsExistingMatchingCard(Card.IsFaceup,tp,LOCATION_REMOVED,0,1,nil)
 			and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_REMOVED,1,nil)
 	end
 	if ct>=10 then
@@ -125,7 +125,7 @@ function c82734805.fcfilter6(c,g,ct,sub)
 	return ct>0 and (c:IsCode(23440231) or (sub and c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE)))
 end
 function c82734805.fcfilter7(c,chkf)
-	return aux.FConditionCheckF(tc,chkf) and (c:IsSetCard(0xbb) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
+	return aux.FConditionCheckF(c,chkf) and (c:IsSetCard(0xbb) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
 end
 function c82734805.fscon(e,g,gc,chkf)
 	if g==nil then return true end
@@ -160,9 +160,9 @@ function c82734805.fscon(e,g,gc,chkf)
 		tc=g:GetNext()
 	end
 	if chkf~=PLAYER_NONE then
-		return fs and b1+b2+bs>=2 and b3>=1
+		return fs and b1+b2+b3+bs>=3
 	else
-		return b1+b2+bs>=2 and b3>=1
+		return b1+b2+b3+bs>=3
 	end
 end
 function c82734805.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
@@ -173,7 +173,7 @@ function c82734805.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 		g1:AddCard(gc)
 	end
 	local mg=eg:Clone()
-	mg:RemoveCard(gc)
+	if gc then mg:RemoveCard(gc) end
 	local ok=false
 	if gc then
 		if gc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then
