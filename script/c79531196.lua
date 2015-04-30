@@ -21,7 +21,7 @@ function c79531196.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c79531196.filter(c)
-	return (c:IsSetCard(0x1047) or c:IsSetCard(0x9b)) and c:IsAbleToGrave()
+	return (c:IsSetCard(0x1047) or c:IsSetCard(0x9b)) and c:IsType(TYPE_MONSTER) and c:IsAbleToGrave()
 end
 function c79531196.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c79531196.filter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil) end
