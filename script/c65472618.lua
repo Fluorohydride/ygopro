@@ -71,12 +71,16 @@ function c65472618.regop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	e1:SetCode(EVENT_PHASE+PHASE_END)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c65472618.thcon)
 	e1:SetOperation(c65472618.thop)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 end
 function c65472618.thfilter2(c)
 	return c65472618.thfilter(c) and c:IsAbleToHand()
+end
+function c65472618.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.IsExistingMatchingCard(c65472618.thfilter2,tp,LOCATION_DECK,0,1,nil)
 end
 function c65472618.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_CARD,0,65472618)
