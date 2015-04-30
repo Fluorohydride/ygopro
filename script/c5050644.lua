@@ -57,7 +57,7 @@ function c5050644.reop1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c5050644.cfilter2(c,tp)
 	return c:IsSetCard(0xc9) and c:IsReason(REASON_DESTROY) and c:IsReason(REASON_BATTLE+REASON_EFFECT)
-		and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP)
+		and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 end
 function c5050644.recon2(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c5050644.cfilter2,1,nil,tp)

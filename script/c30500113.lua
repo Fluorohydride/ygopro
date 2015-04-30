@@ -48,7 +48,7 @@ function c30500113.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c30500113.cfilter2(c,tp)
-	return c:IsSetCard(0xba) and c:IsReason(REASON_EFFECT)
+	return c:IsSetCard(0xba) and c:IsReason(REASON_EFFECT) and c:IsPreviousLocation(LOCATION_MZONE)
 		and c:GetPreviousControler()==tp and c:IsPreviousPosition(POS_FACEUP)
 end
 function c30500113.thcon(e,tp,eg,ep,ev,re,r,rp)
