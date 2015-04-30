@@ -14,7 +14,7 @@ function c58446973.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c58446973.filter(c)
-	return c:IsSetCard(0xbb) and not c:IsCode(58446973) and c:IsAbleToGrave()
+	return c:IsSetCard(0xbb) and c:IsType(TYPE_MONSTER) and not c:IsCode(58446973) and c:IsAbleToGrave()
 end
 function c58446973.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c58446973.filter,tp,LOCATION_DECK,0,1,nil) end
