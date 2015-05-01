@@ -35,6 +35,7 @@ end
 function c68819554.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c68819554.negcon(e,tp,eg,ep,ev,re,r,rp)
 	if not Duel.IsChainNegatable(ev) then return false end
