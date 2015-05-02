@@ -45,7 +45,6 @@ function c44481227.operation(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
-	if not tc:IsRelateToEffect(e) then return end
 	if g:GetCount()==0 then return end
 	local gc=g:GetFirst()
 	while gc do
@@ -57,11 +56,13 @@ function c44481227.operation(e,tp,eg,ep,ev,re,r,rp)
 		gc:RegisterEffect(e1)
 		gc=g:GetNext()
 	end
-	local e2=Effect.CreateEffect(e:GetHandler())
-	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_PIERCE)
-	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
-	tc:RegisterEffect(e2)
+	if tc:IsRelateToEffect(e) then
+		local e2=Effect.CreateEffect(e:GetHandler())
+		e2:SetType(EFFECT_TYPE_SINGLE)
+		e2:SetCode(EFFECT_PIERCE)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		tc:RegisterEffect(e2)
+	end
 end
 function c44481227.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local rc=e:GetHandler():GetReasonCard()
