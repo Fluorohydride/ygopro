@@ -728,6 +728,8 @@ void Game::DrawSpec() {
 	}
 }
 void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
+	if(exit_on_return && win == mainGame->wMainMenu)
+		mainGame->device->closeDevice();
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
 	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
@@ -759,6 +761,8 @@ void Game::ShowElement(irr::gui::IGUIElement * win, int autoframe) {
 	fadingList.push_back(fu);
 }
 void Game::HideElement(irr::gui::IGUIElement * win, bool set_action) {
+	//new
+	if (! win->isVisible() )return;
 	FadingUnit fu;
 	fu.fadingSize = win->getRelativePosition();
 	for(auto fit = fadingList.begin(); fit != fadingList.end(); ++fit)
