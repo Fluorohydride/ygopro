@@ -37,7 +37,7 @@ function c31444249.lvtg(e,c)
 end
 function c31444249.rdcon(e,tp,eg,ep,ev,re,r,rp)
 	local ac=Duel.GetAttacker()
-	return ep~=tp and ac:IsSetCard(0xbb) and ac:GetOriginalLevel()>=2
+	return ep~=tp and ac:IsSetCard(0xbb) and ac:GetOriginalLevel()>=2 and not ac:IsImmuneToEffect(e)
 end
 function c31444249.rdop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.ChangeBattleDamage(ep,ev/2)

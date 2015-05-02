@@ -38,7 +38,7 @@ function c8038143.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		if tgp~=tp and (te:IsActiveType(TYPE_MONSTER) or te:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(i) then
 			local tc=te:GetHandler()
 			ng:AddCard(tc)
-			if tc:IsOnField() and tc:IsRelateToEffect(te) and tc:IsAbleToDeck() then
+			if tc:IsOnField() and tc:IsRelateToEffect(te) and not tc:IsHasEffect(EFFECT_CANNOT_TO_DECK) and IsPlayerCanSendtoDeck(tp,tc) then
 				dg:AddCard(tc)
 			end
 		end
@@ -54,7 +54,7 @@ function c8038143.activate(e,tp,eg,ep,ev,re,r,rp)
 		if tgp~=tp and (te:IsActiveType(TYPE_MONSTER) or te:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(i) then
 			Duel.NegateActivation(i)
 			local tc=te:GetHandler()
-			if tc:IsRelateToEffect(e) and tc:IsRelateToEffect(te) and tc:IsAbleToDeck() then
+			if tc:IsRelateToEffect(e) and tc:IsRelateToEffect(te) and not tc:IsHasEffect(EFFECT_CANNOT_TO_DECK) and IsPlayerCanSendtoDeck(tp,tc) then
 				tc:CancelToGrave()
 				dg:AddCard(tc)
 			end
