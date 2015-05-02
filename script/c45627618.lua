@@ -119,5 +119,5 @@ function c45627618.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsFaceup()
 end
 function c45627618.splimit(e,se,sp,st)
-	return e:GetHandler():IsStatus(STATUS_PROC_COMPLETE) and bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
+	return e:GetHandler():IsStatus(STATUS_PROC_COMPLETE) and bit.band(st,SUMMON_TYPE_XYZ)~=SUMMON_TYPE_XYZ
 end
