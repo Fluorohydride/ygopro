@@ -28,7 +28,7 @@ int main(int argc, char* argv[]) {
 		 * -r: replay */
 		if(argv[i][0] == '-' && argv[i][1] == 'e') {
 			ygo::dataManager.LoadDB(&argv[i][2]);
-		} else if(!strcmp(argv[i], "-j") || !strcmp(argv[i], "-d") || !strcmp(argv[i], "-r") || !strcmp(argv[i], "-s")) {
+		} else if(argv[i][1] == 'j' || argv[i][1] == 'd' || argv[i][1] == 'r' || argv[i][1] == 's' && argv[i][0] == '-') {
 			exit_on_return = true;
 			irr::SEvent event;
 			event.EventType = irr::EET_GUI_EVENT;
@@ -42,16 +42,18 @@ int main(int argc, char* argv[]) {
 			} else if(!strcmp(argv[i], "-d")) {
 				event.GUIEvent.Caller = ygo::mainGame->btnDeckEdit;
 				ygo::mainGame->device->postEventFromUser(event);
-			} else if(!strcmp(argv[i], "-r")) {
+			} else if(argv[i][0] == '-' && argv[i][1] == 'r') {
 				event.GUIEvent.Caller = ygo::mainGame->btnReplayMode;
 				ygo::mainGame->device->postEventFromUser(event);
-				ygo::mainGame->lstReplayList->setSelected(0);
+				if(argv[i][2]<'0' || argv[i][2]>'9') continue;
+				ygo::mainGame->lstReplayList->setSelected(argv[i][2]-'0');
 				event.GUIEvent.Caller = ygo::mainGame->btnLoadReplay;
 				ygo::mainGame->device->postEventFromUser(event);
-			} else if(!strcmp(argv[i], "-s")) {
+			} else if(argv[i][0] == '-' && argv[i][1] == 's') {
 				event.GUIEvent.Caller = ygo::mainGame->btnServerMode;
 				ygo::mainGame->device->postEventFromUser(event);
-				ygo::mainGame->lstSinglePlayList->setSelected(0);
+				if(argv[i][2]<'0' || argv[i][2]>'9') continue;
+				ygo::mainGame->lstSinglePlayList->setSelected(argv[i][2]-'0');
 				event.GUIEvent.Caller = ygo::mainGame->btnLoadSinglePlay;
 				ygo::mainGame->device->postEventFromUser(event);
 			}
