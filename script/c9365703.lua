@@ -23,7 +23,7 @@ function c9365703.sumop(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(9365703,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c9365703.dacon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_BATTLE and Duel.GetCurrentChain()==0
+	return Duel.GetAttacker() and Duel.GetCurrentChain()==0
 		and e:GetHandler():GetFlagEffect(9365703)~=0
 end
 function c9365703.daop(e,tp,eg,ep,ev,re,r,rp)
