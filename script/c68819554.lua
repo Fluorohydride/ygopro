@@ -2,6 +2,7 @@
 function c68819554.initial_effect(c)
 	--negate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(68819554,0))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_NEGATE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
@@ -14,6 +15,7 @@ function c68819554.initial_effect(c)
 	c:RegisterEffect(e1)
 	--reduce damage
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(68819554,1))
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_HAND)
