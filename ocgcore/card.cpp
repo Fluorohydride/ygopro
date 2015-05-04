@@ -1961,10 +1961,14 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 	 * This is minimal impacted modification. 
 	 */
 	if(is_status(STATUS_REVIVE_LIMIT) && !nolimit && current.location == LOCATION_EXTRA && (current.position & POS_FACEUP)) {
-		if((sumtype & SUMMON_TYPE_RITUAL) == SUMMON_TYPE_RITUAL && (data.type & TYPE_RITUAL))
-			return FALSE;
-		if((sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION && (data.type & TYPE_FUSION))
-			return FALSE;
+		/* 
+		 * Do not really sure for this part. Let's keep it as a note. 
+		 * 
+		 * if((sumtype & SUMMON_TYPE_RITUAL) == SUMMON_TYPE_RITUAL && (data.type & TYPE_RITUAL))
+		 * 	return FALSE;
+		 * if((sumtype & SUMMON_TYPE_FUSION) == SUMMON_TYPE_FUSION && (data.type & TYPE_FUSION))
+		 * 	return FALSE;
+		 */
 		if((sumtype & SUMMON_TYPE_SYNCHRO) == SUMMON_TYPE_SYNCHRO && (data.type & TYPE_SYNCHRO))
 			return FALSE;
 		if((sumtype & SUMMON_TYPE_XYZ) == SUMMON_TYPE_XYZ && (data.type & TYPE_XYZ))
