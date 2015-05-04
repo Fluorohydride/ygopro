@@ -42,6 +42,7 @@ function c50485594.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c50485594.filter(c)
 	return c:IsFaceup() and c:IsType(TYPE_PENDULUM) and c:IsAbleToHand()
+		and bit.band(c:GetOriginalType(),TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)==0
 end
 function c50485594.filter2(c,g)
 	return g:IsExists(Card.IsCode,1,c,c:GetCode())
