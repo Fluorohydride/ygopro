@@ -30,8 +30,8 @@ function c96598015.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return bit.band(sumtype,SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
 end
 function c96598015.filter(c)
-	return c:IsType(TYPE_PENDULUM) and (c:IsLocation(LOCATION_GRAVE) or c:IsFaceup()) and c:IsAbleToDeck()
-		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsType(TYPE_PENDULUM) and not c:IsHasEffect(EFFECT_NECRO_VALLEY) and c:IsAbleToDeck() and
+		(c:IsLocation(LOCATION_GRAVE) or c:IsFaceup() and bit.band(c:GetOriginalType(),TYPE_FUSION+TYPE_SYNCHRO+TYPE_XYZ)==0)
 end
 function c96598015.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2)
