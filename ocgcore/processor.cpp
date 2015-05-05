@@ -2642,7 +2642,7 @@ int32 field::process_idle_command(uint16 step) {
 		core.repositionable_cards.clear();
 		for(int i = 0; i < 5; ++i) {
 			pcard = player[infos.turn_player].list_mzone[i];
-			if(pcard && ((pcard->is_position(POS_FACEUP+POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player))
+			if(pcard && ((pcard->is_position(POS_FACEUP | POS_FACEDOWN_ATTACK) && pcard->is_capable_change_position(infos.turn_player))
 		        || (pcard->is_position(POS_FACEDOWN) && pcard->is_can_be_flip_summoned(infos.turn_player))))
 				core.repositionable_cards.push_back(player[infos.turn_player].list_mzone[i]);
 		}
@@ -3095,7 +3095,7 @@ int32 field::process_battle_command(uint16 step) {
 		core.sub_attacker = 0;
 		core.sub_attack_target = (card*)0xffffffff;
 		core.attack_state_count[infos.turn_player]++;
-		check_card_counter(core.attacker,5,infos.turn_player);
+		check_card_counter(core.attacker, 5, infos.turn_player);
 		pduel->write_buffer8(MSG_ATTACK);
 		pduel->write_buffer32(core.attacker->get_info_location());
 		if(core.attack_target) {
@@ -3563,13 +3563,13 @@ int32 field::process_battle_command(uint16 step) {
 				raise_single_event(core.attacker, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
 				if(core.attack_target)
 					raise_single_event(core.attack_target, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
-				raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
+				raise_event(reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, infos.turn_player, core.battle_damage[infos.turn_player]);
 			}
 			if(core.battle_damage[1 - infos.turn_player]) {
 				raise_single_event(core.attacker, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
 				if(core.attack_target)
 					raise_single_event(core.attack_target, 0, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
-				raise_event((card*)reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
+				raise_event(reason_card, EVENT_PRE_BATTLE_DAMAGE, 0, 0, reason_card->current.controler, 1 - infos.turn_player, core.battle_damage[1 - infos.turn_player]);
 			}
 		}
 		process_single_event();
