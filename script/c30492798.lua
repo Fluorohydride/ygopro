@@ -18,19 +18,22 @@ function c30492798.condition(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_RITUAL
 end
 function c30492798.operation(e,tp,eg,ep,ev,re,r,rp)
-	local rc=e:GetHandler():GetReasonCard()
-	if rc:GetFlagEffect(30492798)==0 then
-		--immune
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetDescription(aux.Stringid(30492798,0))
-		e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EFFECT_IMMUNE_EFFECT)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetValue(c30492798.efilter)
-		rc:RegisterEffect(e1,true)
-		rc:RegisterFlagEffect(30492798,RESET_EVENT+0x1fe0000,0,1)
+	local rc=eg:GetFirst()
+	while rc do
+		if rc:GetFlagEffect(30492798)==0 then
+			--immune
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetDescription(aux.Stringid(30492798,0))
+			e1:SetProperty(EFFECT_FLAG_SINGLE_RANGE+EFFECT_FLAG_CLIENT_HINT)
+			e1:SetRange(LOCATION_MZONE)
+			e1:SetCode(EFFECT_IMMUNE_EFFECT)
+			e1:SetReset(RESET_EVENT+0x1fe0000)
+			e1:SetValue(c30492798.efilter)
+			rc:RegisterEffect(e1,true)
+			rc:RegisterFlagEffect(30492798,RESET_EVENT+0x1fe0000,0,1)
+		end
+		rc=eg:GetNext()
 	end
 end
 function c30492798.efilter(e,te)
