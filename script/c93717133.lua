@@ -87,7 +87,6 @@ function c93717133.retop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(e:GetLabel()*500)
 			e:GetOwner():RegisterEffect(e1)
 		end
-		tc:SetStatus(STATUS_SUMMON_TURN+STATUS_FORM_CHANGED,false)
 		tc=sg:GetNext()
 	end
 end

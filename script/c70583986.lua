@@ -19,10 +19,10 @@ function c70583986.filter(c)
 	return c:IsFaceup() and c:IsAbleToHand()
 end
 function c70583986.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c70583986.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c70583986.filter,tp,LOCATION_ONFIELD,0,1,nil) end
+	if chkc then return chkc:IsOnField() and chkc:IsControler(tp) and c70583986.filter(chkc) and chkc~=e:GetHandler() end
+	if chk==0 then return Duel.IsExistingTarget(c70583986.filter,tp,LOCATION_ONFIELD,0,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
-	local g=Duel.SelectTarget(tp,c70583986.filter,tp,LOCATION_ONFIELD,0,1,11,nil)
+	local g=Duel.SelectTarget(tp,c70583986.filter,tp,LOCATION_ONFIELD,0,1,12,e:GetHandler())
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)
 end
 function c70583986.operation(e,tp,eg,ep,ev,re,r,rp)

@@ -77,7 +77,7 @@ function c74605254.scop(e,tp,eg,ep,ev,re,r,rp)
 	local e2=e1:Clone()
 	e2:SetCode(EFFECT_UPDATE_RSCALE)
 	c:RegisterEffect(e2)
-	local g=Duel.GetMatchingGroup(c74605254.filter,tp,LOCATION_MZONE,0,nil,scl)
+	local g=Duel.GetMatchingGroup(c74605254.filter,tp,LOCATION_MZONE,0,nil,c:GetLeftScale())
 	if g:GetCount()>0 then
 		Duel.BreakEffect()
 		Duel.Destroy(g,REASON_EFFECT)

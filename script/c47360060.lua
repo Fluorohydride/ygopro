@@ -14,9 +14,12 @@ end
 function c47360060.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsChainNegatable(ev) and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE))
 end
+function c47360060.cfilter(c)
+	return c:IsSetCard(0x69) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function c47360060.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsSetCard,1,nil,0x69) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsSetCard,1,1,nil,0x69)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c47360060.cfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,c47360060.cfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c47360060.target(e,tp,eg,ep,ev,re,r,rp,chk)

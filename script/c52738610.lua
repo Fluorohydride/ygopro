@@ -14,7 +14,7 @@ function c52738610.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetTargetRange(LOCATION_MZONE,0)
 	e2:SetTarget(c52738610.tgtg)
-	e2:SetValue(c52738610.tgval)
+	e2:SetValue(aux.tgoval)
 	c:RegisterEffect(e2)
 	--tohand
 	local e3=Effect.CreateEffect(c)
@@ -39,9 +39,6 @@ function c52738610.chainlm(e,rp,tp)
 end
 function c52738610.tgtg(e,c)
 	return c:IsSetCard(0xb4) and c:IsType(TYPE_RITUAL)
-end
-function c52738610.tgval(e,re,rp)
-	return rp~=e:GetHandlerPlayer()
 end
 function c52738610.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(r,REASON_EFFECT)~=0

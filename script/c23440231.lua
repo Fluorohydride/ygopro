@@ -108,9 +108,12 @@ function c23440231.negcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and re:GetHandler()~=e:GetHandler()
 		and re:IsActiveType(TYPE_MONSTER) and Duel.IsChainNegatable(ev)
 end
+function c23440231.cfilter(c)
+	return not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function c23440231.negcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsReleasable,1,nil) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsReleasable,1,1,nil)
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c23440231.cfilter,1,nil) end
+	local g=Duel.SelectReleaseGroup(tp,c23440231.cfilter,1,1,nil)
 	Duel.Release(g,REASON_COST)
 end
 function c23440231.negtg(e,tp,eg,ep,ev,re,r,rp,chk)

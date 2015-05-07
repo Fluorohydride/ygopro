@@ -41,7 +41,7 @@ function c23454876.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c23454876.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,51960178)
+	return e:GetHandler():GetOverlayGroup():IsExists(Card.IsCode,1,nil,51960178) and aux.bdocon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c23454876.damcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end

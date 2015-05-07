@@ -8,12 +8,9 @@ function c58577036.initial_effect(c)
 	e1:SetOperation(c58577036.operation)
 	c:RegisterEffect(e1)
 end
-function c58577036.filter(c,e,tp)
-	return c:IsSummonableCard() and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
-end
 function c58577036.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c58577036.filter,tp,LOCATION_DECK,0,1,nil,e,tp) and Duel.IsPlayerCanDiscardDeck(tp,1) end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and Duel.IsPlayerCanSpecialSummon(tp)
+		and Duel.IsExistingMatchingCard(Card.IsSummonableCard,tp,LOCATION_DECK,0,1,nil) and Duel.IsPlayerCanDiscardDeck(tp,1) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,0,LOCATION_DECK)
 end
 function c58577036.operation(e,tp,eg,ep,ev,re,r,rp)

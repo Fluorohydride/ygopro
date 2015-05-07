@@ -32,7 +32,7 @@ function c8062132.initial_effect(c)
 	e4:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetCode(EFFECT_CANNOT_BE_EFFECT_TARGET)
-	e4:SetValue(1)
+	e4:SetValue(aux.tgval)
 	c:RegisterEffect(e4)
 	local e5=e4:Clone()
 	e5:SetCode(EFFECT_IMMUNE_EFFECT)
@@ -74,7 +74,6 @@ end
 function c8062132.operation(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) then
 		Duel.SpecialSummon(e:GetHandler(),0,tp,tp,true,false,POS_FACEUP)
-		e:GetHandler():CompleteProcedure()
 	end
 end
 function c8062132.ctcon(e,tp,eg,ep,ev,re,r,rp)

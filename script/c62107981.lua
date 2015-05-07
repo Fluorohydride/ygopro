@@ -21,7 +21,7 @@ function c62107981.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCondition(c62107981.atcon)
-	e3:SetValue(1)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 end
 function c62107981.adcon(e,tp,eg,ep,ev,re,r,rp)

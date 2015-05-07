@@ -64,7 +64,7 @@ function c62895219.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c62895219.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:IsFacedown() or not c:IsRelateToEffect(e) then return end
+	if c:IsFacedown() or not c:IsRelateToEffect(e) or c:IsImmuneToEffect(e) then return end
 	local mg1=Duel.GetMatchingGroup(c62895219.filter1,tp,LOCATION_MZONE,0,c,e)
 	local sg1=Duel.GetMatchingGroup(c62895219.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,c)
 	local mg2=nil

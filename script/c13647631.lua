@@ -42,7 +42,7 @@ end
 function c13647631.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if c:IsRelateToEffect(e) and Duel.SpecialSummonStep(c,0,tp,tp,false,false,POS_FACEUP) then
 		local atk=c:GetBaseAttack()
 		local def=c:GetBaseDefence()
 		local e1=Effect.CreateEffect(c)
@@ -55,6 +55,7 @@ function c13647631.spop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCode(EFFECT_SET_BASE_DEFENCE)
 		e2:SetValue(def/2)
 		c:RegisterEffect(e2)
+		Duel.SpecialSummonComplete()
 	end
 end
 function c13647631.descon(e,tp,eg,ep,ev,re,r,rp)

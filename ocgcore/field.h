@@ -406,6 +406,7 @@ public:
 	int32 is_chain_negatable(uint8 chaincount, uint8 naga_check = FALSE);
 	int32 is_chain_disablable(uint8 chaincount, uint8 naga_check = FALSE);
 	int32 check_chain_target(uint8 chaincount, card* pcard);
+	int32 is_able_to_enter_bp();
 
 	void add_process(uint16 type, uint16 step, effect* peffect, group* target, ptr arg1, ptr arg2);
 	int32 process();

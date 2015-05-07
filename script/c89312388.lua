@@ -12,7 +12,7 @@ function c89312388.initial_effect(c)
 end
 function c89312388.filter2(c,fc)
 	local fd=c:GetCode()
-	if c:IsHasEffect(EFFECT_FORBIDDEN) or not c:IsAbleToGraveAsCost() then return false end
+	if not c:IsAbleToGraveAsCost() then return false end
 	for i=1,fc.material_count do
 		if fd==fc.material[i] then return true end
 	end

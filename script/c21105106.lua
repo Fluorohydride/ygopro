@@ -6,6 +6,7 @@ function c21105106.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c21105106.splimit)
 	c:RegisterEffect(e1)
 	--cannot spsummon
 	local e2=Effect.CreateEffect(c)
@@ -26,6 +27,9 @@ function c21105106.initial_effect(c)
 	e3:SetTarget(c21105106.rmtg)
 	e3:SetOperation(c21105106.rmop)
 	c:RegisterEffect(e3)
+end
+function c21105106.splimit(e,se,sp,st)
+	return e:GetHandler():IsLocation(LOCATION_HAND) and bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c21105106.mat_filter(c)
 	return false
@@ -61,8 +65,7 @@ function c21105106.rmcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_RITUAL
 end
 function c21105106.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_SUMMON)==0
-		and Duel.GetActivityCount(tp,ACTIVITY_FLIPSUMMON)==0
+	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_NORMALSUMMON)==0
 		and Duel.GetActivityCount(tp,ACTIVITY_SPSUMMON)==1 end
 	local e1=Effect.CreateEffect(e:GetHandler())
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -75,7 +78,7 @@ function c21105106.rmcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetCode(EFFECT_CANNOT_SUMMON)
 	Duel.RegisterEffect(e2,tp)
 	local e3=e1:Clone()
-	e3:SetCode(EFFECT_CANNOT_FLIP_SUMMON)
+	e3:SetCode(EFFECT_CANNOT_MSET)
 	Duel.RegisterEffect(e3,tp)
 end
 function c21105106.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)

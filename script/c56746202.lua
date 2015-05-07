@@ -20,6 +20,7 @@ function c56746202.initial_effect(c)
 	c:RegisterEffect(e2)
 	--
 	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(56746202,1))
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_SCRAP_CHIMERA)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

@@ -145,17 +145,16 @@ public:
 	int32 is_set_card(uint32 set_code);
 	uint32 get_type();
 	int32 get_base_attack(uint8 swap = FALSE);
-	int32 get_attack(uint8 swap = FALSE);
+	int32 get_attack();
 	int32 get_base_defence(uint8 swap = FALSE);
-	int32 get_defence(uint8 swap = FALSE);
+	int32 get_defence();
+	void calc_attack_defence(int32 *patk, int32 *pdef);
 	uint32 get_level();
 	uint32 get_rank();
 	uint32 get_synchro_level(card* pcard);
 	uint32 get_ritual_level(card* pcard);
 	uint32 check_xyz_level(card* pcard, uint32 lv);
-	uint32 get_base_attribute();
 	uint32 get_attribute();
-	uint32 get_base_race();
 	uint32 get_race();
 	uint32 get_lscale();
 	uint32 get_rscale();
@@ -228,6 +227,7 @@ public:
 	int32 is_affect_by_effect(effect* peffect);
 	int32 is_destructable();
 	int32 is_destructable_by_battle(card* pcard);
+	effect* check_indestructable_by_effect(effect* peffect, uint8 playerid);
 	int32 is_destructable_by_effect(effect* peffect, uint8 playerid);
 	int32 is_removeable(uint8 playerid);
 	int32 is_removeable_as_cost(uint8 playerid);
@@ -252,7 +252,7 @@ public:
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
 	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
-	int32 is_can_be_xyz_material(card* scard, uint8 ignore_xyz = FALSE);
+	int32 is_can_be_xyz_material(card* scard);
 };
 
 //Locations
@@ -371,6 +371,7 @@ public:
 #define SUMMON_TYPE_RITUAL	0x45000000
 #define SUMMON_TYPE_SYNCHRO	0x46000000
 #define SUMMON_TYPE_XYZ		0x49000000
+#define SUMMON_TYPE_PENDULUM	0x4a000000
 //Status
 #define STATUS_DISABLED				0x0001	//
 #define STATUS_TO_ENABLE			0x0002	//
@@ -401,6 +402,7 @@ public:
 #define STATUS_IS_PUBLIC			0x4000000
 #define STATUS_ACT_FROM_HAND		0x8000000
 #define STATUS_OPPO_BATTLE			0x10000000
+#define STATUS_FLIP_SUMMON_TURN		0x20000000
 //Counter
 #define COUNTER_NEED_PERMIT		0x1000
 #define COUNTER_NEED_ENABLE		0x2000

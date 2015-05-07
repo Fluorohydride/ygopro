@@ -42,6 +42,6 @@ function c71209500.efop(e,tp,eg,ep,ev,re,r,rp)
 		tc=g:GetNext()
 	end
 end
-function c71209500.efilter(e,re)
-	return re:GetHandler():IsType(TYPE_MONSTER)
+function c71209500.efilter(e,re,rp)
+	return re:IsActiveType(TYPE_MONSTER) and aux.tgval(e,re,rp)
 end

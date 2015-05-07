@@ -12,8 +12,7 @@ function c90470931.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c90470931.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
+	return Duel.IsAbleToEnterBP()
 end
 function c90470931.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:SetLabel(1)

@@ -11,11 +11,12 @@ function c33252803.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c33252803.filter1(c,e,tp)
-	return c:IsFaceup() and c:IsSetCard(0x48) and not c:IsSetCard(0x1048)
-		and Duel.IsExistingMatchingCard(c33252803.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()+1,c.xyz_number)
+	local m=_G["c"..c:GetCode()]
+	return c:IsFaceup() and c:IsSetCard(0x48) and not c:IsSetCard(0x1048) and m
+		and Duel.IsExistingMatchingCard(c33252803.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,c,c:GetRank()+1,m.xyz_number)
 end
 function c33252803.filter2(c,e,tp,mc,rk,no)
-	return c:GetRank()==rk and c:IsSetCard(0x1048) and c.xyz_number==no and mc:IsCanBeXyzMaterial(c,true)
+	return c:GetRank()==rk and c:IsSetCard(0x1048) and c.xyz_number==no and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c33252803.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -29,15 +30,17 @@ end
 function c33252803.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<0 then return end
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) then return end
+	local m=_G["c"..tc:GetCode()]
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) or tc:IsControler(1-tp) or tc:IsImmuneToEffect(e) or not m then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c33252803.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()+1,tc.xyz_number)
+	local g=Duel.SelectMatchingCard(tp,c33252803.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc,tc:GetRank()+1,m.xyz_number)
 	local sc=g:GetFirst()
 	if sc then
 		local mg=tc:GetOverlayGroup()
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(tc))
 		Duel.Overlay(sc,Group.FromCards(tc))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()

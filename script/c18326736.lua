@@ -40,7 +40,7 @@ function c18326736.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	c:RegisterFlagEffect(18326736,RESET_CHAIN,0,1)
 end
 function c18326736.filter(c,e,tp,rk)
-	return c:GetRank()==rk+1 and not c:IsSetCard(0x48) and e:GetHandler():IsCanBeXyzMaterial(c,true)
+	return c:GetRank()==rk+1 and not c:IsSetCard(0x48) and e:GetHandler():IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
 function c18326736.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -60,6 +60,7 @@ function c18326736.spop(e,tp,eg,ep,ev,re,r,rp)
 		if mg:GetCount()~=0 then
 			Duel.Overlay(sc,mg)
 		end
+		sc:SetMaterial(Group.FromCards(c))
 		Duel.Overlay(sc,Group.FromCards(c))
 		Duel.SpecialSummon(sc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		sc:CompleteProcedure()

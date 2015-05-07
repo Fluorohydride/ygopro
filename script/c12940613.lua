@@ -30,7 +30,7 @@ function c12940613.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,1,0,0)
 end
 function c12940613.tdfilter2(c)
-	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck()
+	return c:IsType(TYPE_MONSTER) and c:IsAbleToDeck() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c12940613.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()

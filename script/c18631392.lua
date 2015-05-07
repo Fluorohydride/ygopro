@@ -81,13 +81,12 @@ function c18631392.retop(code1,code2,code3)
 			if c:IsRelateToEffect(e) then
 				local e1=Effect.CreateEffect(c)
 				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
-				e1:SetCode(EFFECT_SET_ATTACK)
+				e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 				e1:SetValue(hg:GetCount()*1000)
 				e1:SetReset(RESET_EVENT+0x1ff0000)
 				c:RegisterEffect(e1)
 				local e2=e1:Clone()
-				e2:SetCode(EFFECT_SET_DEFENCE)
+				e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
 				c:RegisterEffect(e2)
 			end
 		end

@@ -105,10 +105,14 @@ function c65331686.operation(e,tp,eg,ep,ev,re,r,rp)
 			fop(ce,e,tp,tc,mat2)
 		end
 		tc:CompleteProcedure()
-	elseif Duel.IsPlayerCanSpecialSummon(tp) then
+	else
 		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
-		Duel.ConfirmCards(1-tp,cg1)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
-		Duel.ConfirmCards(1-tp,cg2)
+		if cg1:GetCount()>1 and cg2:IsExists(Card.IsFacedown,1,nil)
+			and Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,27581098) then
+			Duel.ConfirmCards(1-tp,cg1)
+			Duel.ConfirmCards(1-tp,cg2)
+			Duel.ShuffleHand(tp)
+		end
 	end
 end

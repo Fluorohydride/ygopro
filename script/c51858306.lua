@@ -47,6 +47,7 @@ function c51858306.operation(e,tp,eg,ep,ev,re,r,rp)
 	else
 		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
 		Duel.ShuffleDeck(tp)
 	end
 end

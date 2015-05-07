@@ -11,8 +11,11 @@ function c64973456.initial_effect(c)
 	e1:SetOperation(c64973456.activate)
 	c:RegisterEffect(e1)
 end
+function c64973456.cfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:GetRace()~=RACE_REPTILE
+end
 function c64973456.condition(e,tp,eg,ep,ev,re,r,rp)
-	return not Duel.IsExistingMatchingCard(Card.IsRace,tp,LOCATION_GRAVE,0,1,nil,0xf7ffff)
+	return not Duel.IsExistingMatchingCard(c64973456.cfilter,tp,LOCATION_GRAVE,0,1,nil)
 end
 function c64973456.filter(c,e,tp)
 	return not c:IsType(TYPE_TUNER) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -13,12 +13,9 @@ function c26993374.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26993374.tdcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local t=Duel.GetAttackTarget()
-	if ev==1 then t=Duel.GetAttacker() end
-	if not c:IsRelateToBattle() or c:IsFacedown() then return false end
+	local t=e:GetHandler():GetBattleTarget()
 	e:SetLabelObject(t)
-	return t:GetLocation()==LOCATION_GRAVE and t:IsType(TYPE_MONSTER)
+	return aux.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c26993374.tdcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

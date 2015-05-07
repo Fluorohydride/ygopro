@@ -12,11 +12,9 @@ function c26885836.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c26885836.eqcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	local tc=c:GetBattleTarget()
-	if not c:IsRelateToBattle() or c:IsFacedown() then return false end
+	local tc=e:GetHandler():GetBattleTarget()
 	e:SetLabelObject(tc)
-	return tc:IsLocation(LOCATION_GRAVE) and tc:IsType(TYPE_MONSTER) and tc:IsReason(REASON_BATTLE)
+	return aux.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c26885836.eqtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsHasEffect(26885836)

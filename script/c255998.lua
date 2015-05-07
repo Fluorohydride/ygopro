@@ -11,8 +11,7 @@ function c255998.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c255998.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_MAIN1 and Duel.GetTurnCount()~=1
-		and not e:GetHandler():IsHasEffect(EFFECT_DIRECT_ATTACK)
+	return Duel.IsAbleToEnterBP() and not e:GetHandler():IsHasEffect(EFFECT_DIRECT_ATTACK)
 end
 function c255998.ftarget(e,c)
 	return e:GetLabel()~=c:GetFieldID()

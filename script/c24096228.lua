@@ -56,30 +56,24 @@ function c24096228.operation(e,tp,eg,ep,ev,re,r,rp)
 	if bit.band(tpe,TYPE_EQUIP+TYPE_CONTINUOUS)~=0 or tc:IsHasEffect(EFFECT_REMAIN_FIELD) then
 		if Duel.GetLocationCount(tp,LOCATION_SZONE)<=0 then return end
 		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		tc:CreateEffectRelation(te)
-		if co then co(te,tp,eg,ep,ev,re,r,rp,1) end
-		if tg then tg(te,tp,eg,ep,ev,re,r,rp,1) end
-		Duel.BreakEffect()
-		local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
-		local etc=g:GetFirst()
-		while etc do
-			etc:CreateEffectRelation(te)
-			etc=g:GetNext()
-		end
-		if op then op(te,tp,eg,ep,ev,re,r,rp) end
-		tc:ReleaseEffectRelation(te)
-		etc=g:GetFirst()
-		while etc do
-			etc:ReleaseEffectRelation(te)
-			etc=g:GetNext()
-		end
-	else
-		if bit.band(tpe,TYPE_FIELD)~=0 then
-			Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
-		end
-		if co then co(e,tp,eg,ep,ev,re,r,rp,1) end
-		if tg then tg(e,tp,eg,ep,ev,re,r,rp,1) end
-		Duel.BreakEffect()
-		if op then op(e,tp,eg,ep,ev,re,r,rp) end
+	elseif bit.band(tpe,TYPE_FIELD)~=0 then
+		Duel.MoveToField(tc,tp,tp,LOCATION_SZONE,POS_FACEUP,true)
+	end
+	tc:CreateEffectRelation(te)
+	if co then co(te,tp,eg,ep,ev,re,r,rp,1) end
+	if tg then tg(te,tp,eg,ep,ev,re,r,rp,1) end
+	Duel.BreakEffect()
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
+	local etc=g:GetFirst()
+	while etc do
+		etc:CreateEffectRelation(te)
+		etc=g:GetNext()
+	end
+	if op then op(te,tp,eg,ep,ev,re,r,rp) end
+	tc:ReleaseEffectRelation(te)
+	etc=g:GetFirst()
+	while etc do
+		etc:ReleaseEffectRelation(te)
+		etc=g:GetNext()
 	end
 end

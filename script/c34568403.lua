@@ -49,12 +49,13 @@ function c34568403.arcanareg(c,coin)
 	c:RegisterFlagEffect(36690018,RESET_EVENT+0x1ff0000,EFFECT_FLAG_CLIENT_HINT,1,coin,63-coin)
 end
 function c34568403.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetFlagEffectLabel(36690018)==1 and e:GetHandler():IsRelateToBattle()
+	local c=e:GetHandler()
+	return c:GetFlagEffectLabel(36690018)==1 and c:IsRelateToBattle() and c:IsStatus(STATUS_OPPO_BATTLE)
 end
 function c34568403.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=e:GetHandler():GetBattleTarget()
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and not tc:IsLocation(LOCATION_SZONE) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
+		and tc:IsLocation(LOCATION_GRAVE+LOCATION_REMOVED) and tc:IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetTargetCard(tc)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,tc,1,0,0)
 end

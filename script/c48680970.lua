@@ -115,8 +115,8 @@ end
 function c48680970.etarget(e,c)
 	return c:IsCode(46986414)
 end
-function c48680970.efilter(e,re,rp)
-	return re:GetHandlerPlayer()~=e:GetHandlerPlayer()
+function c48680970.efilter(e,re)
+	return re:GetOwnerPlayer()~=e:GetHandlerPlayer()
 end
 function c48680970.descon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

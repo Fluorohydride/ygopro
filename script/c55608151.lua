@@ -11,7 +11,7 @@ function c55608151.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c55608151.condition(e,tp,eg,ep,ev,re,r,rp)
-	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsCode(18144506) and Duel.IsChainDisablable(ev)
+	return rp~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsCode(18144506) and Duel.IsChainDisablable(ev)
 end
 function c55608151.filter(c)
 	return c:IsType(TYPE_SPELL+TYPE_TRAP) and c:IsDestructable()

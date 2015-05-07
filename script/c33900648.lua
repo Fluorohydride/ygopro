@@ -195,7 +195,7 @@ function c33900648.windcon2(e)
 	return bit.band(c33900648[1-e:GetHandlerPlayer()],ATTRIBUTE_WIND)~=0
 end
 function c33900648.actarget(e,te,tp)
-	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:GetHandler():IsType(TYPE_SPELL)
+	return te:IsHasType(EFFECT_TYPE_ACTIVATE) and te:IsActiveType(TYPE_SPELL)
 end
 function c33900648.costchk(e,te_or_c,tp)
 	return Duel.CheckLPCost(tp,500)

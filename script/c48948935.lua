@@ -74,7 +74,7 @@ function c48948935.eqop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=Effect.CreateEffect(eqc)
 		e2:SetType(EFFECT_TYPE_EQUIP)
 		e2:SetCode(EFFECT_SET_CONTROL)
-		e2:SetValue(1-tc:GetControler())
+		e2:SetValue(tp)
 		e2:SetReset(RESET_EVENT+0x1fe0000)
 		eqc:RegisterEffect(e2)
 	end

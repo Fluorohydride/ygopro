@@ -1,6 +1,6 @@
 --サイコ・ウォールド
 function c58453942.initial_effect(c)
-	-- extra atk
+	--extra atk
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(58453942,0))
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
@@ -13,8 +13,7 @@ function c58453942.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c58453942.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetTurnCount()~=1 and Duel.GetCurrentPhase()==PHASE_MAIN1
-		and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_BP)
+	return Duel.IsAbleToEnterBP()
 end
 function c58453942.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,800) end

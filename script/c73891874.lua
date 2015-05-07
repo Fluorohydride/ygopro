@@ -19,7 +19,7 @@ function c73891874.filter(c)
 end
 function c73891874.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(1-tp) and c73891874.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c73891874.filter,tp,0,LOCATION_GRAVE,1,nil) end
+	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectTarget(tp,c73891874.filter,tp,0,LOCATION_GRAVE,1,5,nil)
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,g,g:GetCount(),0,0)

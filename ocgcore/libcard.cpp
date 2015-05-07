@@ -128,11 +128,25 @@ int32 scriptlib::card_get_lscale(lua_State *L) {
 	lua_pushinteger(L, pcard->get_lscale());
 	return 1;
 }
+int32 scriptlib::card_get_origin_lscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->data.lscale);
+	return 1;
+}
 int32 scriptlib::card_get_rscale(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->get_rscale());
+	return 1;
+}
+int32 scriptlib::card_get_origin_rscale(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	lua_pushinteger(L, pcard->data.rscale);
 	return 1;
 }
 int32 scriptlib::card_get_attribute(lua_State *L) {
@@ -1709,15 +1723,19 @@ int32 scriptlib::card_enable_counter_permit(lua_State *L) {
 	check_param_count(L, 2);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	int32 countertype = lua_tointeger(L, 2);
+	uint32 prange;
+	if(lua_gettop(L) > 2) 
+		prange = lua_tointeger(L, 3);
+	else if(pcard->data.type & TYPE_MONSTER)
+		prange = LOCATION_MZONE;
+	else
+		prange = LOCATION_SZONE | LOCATION_FZONE;
 	effect* peffect = pcard->pduel->new_effect();
 	peffect->owner = pcard;
 	peffect->type = EFFECT_TYPE_SINGLE;
 	peffect->code = EFFECT_COUNTER_PERMIT | countertype;
 	peffect->flag = EFFECT_FLAG_SINGLE_RANGE;
-	if(pcard->data.type & TYPE_MONSTER)
-		peffect->range = LOCATION_MZONE;
-	else
-		peffect->range = LOCATION_SZONE | LOCATION_FZONE | LOCATION_PZONE;
+	peffect->range = prange;
 	pcard->add_effect(peffect);
 	return 0;
 }
@@ -1799,10 +1817,7 @@ int32 scriptlib::card_is_can_be_xyz_material(lua_State *L) {
 		check_param(L, PARAM_TYPE_CARD, 2);
 		scard = *(card**) lua_touserdata(L, 2);
 	}
-	uint32 ign = FALSE;
-	if(lua_gettop(L) >= 3)
-		ign = lua_toboolean(L, 3);
-	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard, ign));
+	lua_pushboolean(L, pcard->is_can_be_xyz_material(scard));
 	return 1;
 }
 int32 scriptlib::card_check_fusion_material(lua_State *L) {

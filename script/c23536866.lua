@@ -52,7 +52,6 @@ function c23536866.filter2(c,e,tp)
 end
 function c23536866.operation(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
-	if not Duel.IsPlayerCanSpecialSummonCount(tp,2) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c23536866.filter2,nil,e,tp)
 	if g:GetCount()<2 then return end
 	local tc1=g:GetFirst()

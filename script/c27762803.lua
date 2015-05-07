@@ -24,7 +24,7 @@ function c27762803.con(e)
 	return e:GetHandler():GetFlagEffect(27762803)~=0
 end
 function c27762803.adop(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:GetHandler():IsType(TYPE_SPELL) then
+	if re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_SPELL) then
 		if e:GetHandler():GetFlagEffect(27762803)==0 then
 			e:GetHandler():RegisterFlagEffect(27762803,RESET_EVENT+0x1ff0000,0,0)
 		else

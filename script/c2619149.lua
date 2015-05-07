@@ -25,11 +25,7 @@ function c2619149.initial_effect(c)
 end
 function c2619149.scon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	local a=Duel.GetAttacker()
-	local d=Duel.GetAttackTarget()
-	return c:GetFlagEffect(2619149)>0
-		and ((c==a and d:GetLocation()==LOCATION_GRAVE and d:IsType(TYPE_MONSTER)) 
-		or (c==d and a:GetLocation()==LOCATION_GRAVE and a:IsType(TYPE_MONSTER)))
+	return c:GetFlagEffect(2619149)>0 and aux.bdogcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c2619149.sfilter(c)
 	return c:IsSetCard(0x19) and c:IsAbleToHand()

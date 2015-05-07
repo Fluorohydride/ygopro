@@ -111,12 +111,23 @@ function c73360025.spop(e,tp,eg,ep,ev,re,r,rp)
 			fop(ce,e,tp,tc,mat)
 		end
 		tc:CompleteProcedure()
-	elseif Duel.IsPlayerCanSpecialSummon(tp) then
+	else
 		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
-		Duel.ConfirmCards(1-tp,cg1)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
-		Duel.ConfirmCards(1-tp,cg2)
+		local ct=cg1:GetCount()
+		if not Duel.IsPlayerAffectedByEffect(tp,30459350) then
+			ct=ct+Duel.GetMatchingGroupCount(c73360025.ctfilter,tp,LOCATION_GRAVE,0,nil)
+		end
+		if ct>1 and cg2:IsExists(Card.IsFacedown,1,nil)
+			and Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,27581098) then
+			Duel.ConfirmCards(1-tp,cg1)
+			Duel.ConfirmCards(1-tp,cg2)
+			Duel.ShuffleHand(tp)
+		end
 	end
+end
+function c73360025.ctfilter(c)
+	return c:IsType(TYPE_MONSTER) and c:IsSetCard(0xaf)
 end
 function c73360025.damcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

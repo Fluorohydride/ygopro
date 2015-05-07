@@ -25,8 +25,8 @@ function c85028288.initial_effect(c)
 	e3:SetOperation(c85028288.atkop)
 	c:RegisterEffect(e3)
 end
-function c85028288.efilter(e,re)
-	return re:GetHandler():IsType(TYPE_TRAP+TYPE_MONSTER)
+function c85028288.efilter(e,re,rp)
+	return re:GetHandler():IsType(TYPE_TRAP+TYPE_MONSTER) and aux.tgval(e,re,rp)
 end
 function c85028288.cfilter(c)
 	return c:IsAttackBelow(1700) and c:IsSetCard(0x22) and c:IsAbleToRemoveAsCost()

@@ -26,7 +26,7 @@ function c1347977.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g1=Duel.SelectTarget(tp,c1347977.filter1,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,nil)
 	if g1:GetCount()==0 then return end
 	Duel.SetOperationInfo(0,CATEGORY_TODECK,g1,1,0,0)
-	if Duel.IsExistingMatchingCard(c1347977.filter3,tp,LOCATION_ONFIELD,0,1,nil)
+	if Duel.IsExistingMatchingCard(c1347977.filter3,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.IsExistingTarget(c1347977.filter2,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,g1:GetFirst())
 		and Duel.SelectYesNo(tp,aux.Stringid(1347977,1)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
