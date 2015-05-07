@@ -1945,12 +1945,13 @@ int32 card::is_can_be_special_summoned(effect * reason_effect, uint32 sumtype, u
 	if(is_status(STATUS_REVIVE_LIMIT) && !is_status(STATUS_PROC_COMPLETE)) {
 		if((!nolimit && (current.location & 0x38)) || (!nocheck && !nolimit && (current.location & 0x3)))
 			return FALSE;
-		if(!nolimit && current.location == LOCATION_EXTRA && (current.position & POS_FACEUP))
+		if(!nolimit && (data.type & TYPE_PENDULUM) && current.location == LOCATION_EXTRA && (current.position & POS_FACEUP))
 			return FALSE;
 	}
 	//face-up pendulum xyz/syn, STATUS_PROC_COMPLETE
-	if(current.location == LOCATION_EXTRA && (current.position & POS_FACEUP) && (sumtype == SUMMON_TYPE_SYNCHRO || sumtype == SUMMON_TYPE_XYZ))
-			return FALSE;
+	if((data.type & TYPE_PENDULUM) && current.location == LOCATION_EXTRA && (current.position & POS_FACEUP) && 
+			(sumtype == SUMMON_TYPE_SYNCHRO || sumtype == SUMMON_TYPE_XYZ))
+		return FALSE;
 	if(((sumpos & POS_FACEDOWN) == 0) && pduel->game_field->check_unique_onfield(this, toplayer))
 		return FALSE;
 	sumtype |= SUMMON_TYPE_SPECIAL;
