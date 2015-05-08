@@ -20,6 +20,15 @@ function c49249907.initial_effect(c)
 	e2:SetTarget(c49249907.rettg)
 	e2:SetOperation(c49249907.retop)
 	c:RegisterEffect(e2)
+	if not c49249907.global_check then
+		c49249907.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetLabel(49249907)
+		ge1:SetOperation(aux.sumreg)
+		Duel.RegisterEffect(ge1,0)
+	end
 end
 function c49249907.filter(c,e,tp)
 	return c:IsSetCard(0xb3) and not c:IsCode(49249907) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
@@ -38,8 +47,7 @@ function c49249907.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c49249907.retcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsStatus(STATUS_SUMMON_TURN) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return e:GetHandler():GetFlagEffect(49249907)~=0
 end
 function c49249907.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

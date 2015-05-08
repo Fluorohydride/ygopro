@@ -67,7 +67,7 @@ function c64681432.tgreg1(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterFlagEffect(64681432,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c64681432.tgreg2(e,tp,eg,ep,ev,re,r,rp)
-	e:GetHandler():RegisterFlagEffect(64681432,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	e:GetHandler():RegisterFlagEffect(64681432,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
 end
 function c64681432.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetFlagEffect(64681432)~=0

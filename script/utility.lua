@@ -1163,3 +1163,14 @@ end
 function Auxiliary.nzdef(c)
 	return c:IsFaceup() and c:GetDefence()>0
 end
+--flag effect for summon/sp_summon turn
+function Auxiliary.sumreg(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	local code=e:GetLabel()
+	while tc do
+		if tc:GetOriginalCode()==code then 
+			tc:RegisterFlagEffect(code,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1) 
+		end
+		tc=eg:GetNext()
+	end
+end
