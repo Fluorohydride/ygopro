@@ -23,7 +23,7 @@ function c50407691.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return pc and pc:IsSetCard(0xc8)
 end
 function c50407691.filter(c)
-	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToHand()
 end
 function c50407691.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

@@ -90,7 +90,7 @@ function c91584698.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c91584698.thfilter(c)
-	return c:IsCode(24094653) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsCode(24094653) and c:IsAbleToHand()
 end
 function c91584698.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c91584698.thfilter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
