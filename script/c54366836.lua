@@ -25,8 +25,9 @@ function c54366836.initial_effect(c)
 	--damage
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(54366836,0))
-	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
+	e3:SetRange(LOCATION_MZONE)
 	e3:SetCost(c54366836.damcost2)
 	e3:SetOperation(c54366836.damop2)
 	c:RegisterEffect(e3)
@@ -47,8 +48,10 @@ function c54366836.damop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Damage(p,d,REASON_EFFECT)
 end
 function c54366836.damcost2(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:GetFlagEffect(54366836)==0 and c:CheckRemoveOverlayCard(tp,1,REASON_COST) end
+	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	c:RegisterFlagEffect(54366836,RESET_CHAIN,0,1)
 end
 function c54366836.damop2(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
