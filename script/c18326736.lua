@@ -13,6 +13,7 @@ function c18326736.initial_effect(c)
 	e1:SetCost(c18326736.spcost)
 	e1:SetTarget(c18326736.sptg)
 	e1:SetOperation(c18326736.spop)
+	e1:SetHintTiming(0,TIMING_END_PHASE)
 	c:RegisterEffect(e1)
 	--turn skip
 	local e2=Effect.CreateEffect(c)
