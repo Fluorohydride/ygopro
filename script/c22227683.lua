@@ -2,6 +2,7 @@
 function c22227683.initial_effect(c)
 	--atk/def up
 	local e1=Effect.CreateEffect(c)
+	e1:SetCategory(CATEGORY_TOGRAVE+CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e1:SetRange(LOCATION_MZONE)
@@ -20,7 +21,7 @@ function c22227683.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c22227683.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetAttackTarget()~=nil
+	return e:GetHandler():GetBattleTarget()~=nil
 end
 function c22227683.tgfilter(c)
 	return c:IsSetCard(0xab) and c:IsType(TYPE_MONSTER) and not c:IsCode(22227683) and c:IsAbleToGrave()
