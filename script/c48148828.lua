@@ -18,6 +18,6 @@ end
 function c48148828.operation(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetHandler():GetBattleTarget()
 	if bc:IsRelateToBattle() then
-		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)
+		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT+REASON_BATTLE)
 	end
 end
