@@ -28,6 +28,7 @@ function c54366836.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetCondition(c54366836.damcon2)
 	e3:SetCost(c54366836.damcost2)
 	e3:SetOperation(c54366836.damop2)
 	c:RegisterEffect(e3)
@@ -46,6 +47,9 @@ end
 function c54366836.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
+end
+function c54366836.damcon2(e,tp,eg,ep,ev,re,r,rp)
+	return e:GetHandler():GetBattleTarget()~=nil
 end
 function c54366836.damcost2(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()

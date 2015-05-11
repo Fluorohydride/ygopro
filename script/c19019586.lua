@@ -12,10 +12,11 @@ function c19019586.initial_effect(c)
 	--defup
 	local e2=Effect.CreateEffect(c)
 	e2:SetDescription(aux.Stringid(19019586,1))
-	e2:SetCategory(CATEGORY_ATKCHANGE)
+	e2:SetCategory(CATEGORY_DEFCHANGE)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetCondition(c19019586.defcon)
 	e2:SetCost(c19019586.defcost)
 	e2:SetOperation(c19019586.defop)
 	c:RegisterEffect(e2)
@@ -32,6 +33,10 @@ function c19019586.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c19019586.cfilter(c)
 	return c:IsType(TYPE_NORMAL) and c:IsAbleToGraveAsCost()
+end
+function c19019586.defcon(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	return c==Duel.GetAttacker() or c==Duel.GetAttackTarget()
 end
 function c19019586.defcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():GetFlagEffect(19019586)==0
