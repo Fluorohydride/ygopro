@@ -27,6 +27,7 @@ function c40737112.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCondition(c40737112.recon)
 	e3:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e3)
@@ -78,7 +79,12 @@ end
 function c40737112.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()
 	if bc:IsRelateToBattle() then
-		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT+REASON_BATTLE)
+		local e1=Effect.CreateEffect(e:GetHandler())
+		e1:SetType(EFFECT_TYPE_SINGLE)
+		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+		e1:SetValue(LOCATION_REMOVED)
+		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
+		bc:RegisterEffect(e1,true)
 	end
 end
 function c40737112.recon(e)
