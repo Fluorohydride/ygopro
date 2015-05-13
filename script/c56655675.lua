@@ -73,7 +73,8 @@ function c56655675.operation(e,tp,eg,ep,ev,re,r,rp)
 	e:GetHandler():RegisterEffect(e1)
 end
 function c56655675.discon(e,tp,eg,ep,ev,re,r,rp)
-	return re~=e and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED) and Duel.IsChainNegatable(ev)
+	return re~=e and not e:GetHandler():IsStatus(STATUS_BATTLE_DESTROYED)
+		and (re:IsActiveType(TYPE_MONSTER) or re:IsHasType(EFFECT_TYPE_ACTIVATE)) and Duel.IsChainNegatable(ev)
 end
 function c56655675.filter(c)
 	return c:IsSetCard(0xb5) and c:IsAbleToRemoveAsCost()
