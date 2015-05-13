@@ -41,7 +41,7 @@ function c19221310.spop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c19221310.filter,tp,LOCATION_ONFIELD+LOCATION_HAND+LOCATION_DECK,0,1,1,nil)
 	if Duel.SendtoGrave(g,REASON_EFFECT)~=0 then
-		if c:IsRelateToEffect(e) then
+		if c:IsRelateToEffect(e) and g:GetFirst():IsLocation(LOCATION_GRAVE) then
 			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 		end
 	end
