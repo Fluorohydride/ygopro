@@ -473,13 +473,14 @@ int32 field::get_useable_count(uint8 playerid, uint8 location, uint8 uplayer, ui
 	if(list)
 		*list = flag;
 	if(eset.size()) {
-		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
-		pduel->lua->add_param(uplayer, PARAM_TYPE_INT);
-		pduel->lua->add_param(reason, PARAM_TYPE_INT);
-		int32 max = eset[0]->get_value(3);
-		for (int32 i = 1; i < eset.size(); ++i) {
-			if (max > eset[i]->get_value(3))
-				max = eset[i]->get_value(3);
+		int32 max = 5;
+		for (int32 i = 0; i < eset.size(); ++i) {
+			pduel->lua->add_param(playerid, PARAM_TYPE_INT);
+			pduel->lua->add_param(uplayer, PARAM_TYPE_INT);
+			pduel->lua->add_param(reason, PARAM_TYPE_INT);
+			int32 v = eset[i]->get_value(3);
+			if (max > v)
+				max = v;
 		}
 		int32 block = 5 - field_used_count[flag];
 		int32 limit = max - field_used_count[used_flag];
