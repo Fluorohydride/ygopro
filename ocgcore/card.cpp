@@ -404,6 +404,7 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 	if (is_affected_by_effect(EFFECT_REVERSE_UPDATE))
 		rev = TRUE;
 	effect_set effects_atk, effects_def;
+	int32 swap_final = FALSE;
 	for (int32 i = 0; i < eset.size(); ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_ATTACK:
@@ -461,14 +462,17 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 				effects_def.add_item(eset[i]);
 			break;
 		case EFFECT_SWAP_AD:
-			int32 a = base_atk + up_atk + upc_atk;
-			int32 d = base_def + up_def + upc_def;
-			base_atk = d;
-			up_atk = 0;
-			upc_atk = 0;
-			base_def = a;
-			up_def = 0;
-			upc_def = 0;
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
+				int32 a = base_atk + up_atk + upc_atk;
+				int32 d = base_def + up_def + upc_def;
+				base_atk = d;
+				up_atk = 0;
+				upc_atk = 0;
+				base_def = a;
+				up_def = 0;
+				upc_def = 0;
+			} else
+				swap_final = !swap_final;
 			break;
 		}
 		if (!rev) {
@@ -479,36 +483,24 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 			temp.defence = base_def - up_def - upc_def;
 		}
 	}
+	if (swap_final) {
+		int32 atk = temp.attack;
+		int32 def = temp.defence;
+		temp.attack = def;
+		temp.defence = atk;
+	}
 	if (patk) {
-		int32 final = -1, atk;
-		for (int32 i = 0; i < effects_atk.size(); ++i) {
-			final = effects_atk[i]->get_value(this);
-			temp.attack = final;
-		}
-		if (final == -1) {
-			if (!rev)
-				atk = base_atk + up_atk + upc_atk;
-			else
-				atk = base_atk - up_atk - upc_atk;
-		} else
-			atk = final;
+		for (int32 i = 0; i < effects_atk.size(); ++i)
+			temp.attack = effects_atk[i]->get_value(this);
+		int32 atk = temp.attack;
 		if (atk < 0)
 			atk = 0;
 		*patk = atk;
 	}
 	if (pdef) {
-		int32 final = -1, def;
-		for (int32 i = 0; i < effects_def.size(); ++i) {
-			final = effects_def[i]->get_value(this);
-			temp.defence = final;
-		}
-		if (final == -1) {
-			if (!rev)
-				def = base_def + up_def + upc_def;
-			else
-				def = base_def - up_def - upc_def;
-		} else
-			def = final;
+		for (int32 i = 0; i < effects_def.size(); ++i)
+			temp.defence = effects_def[i]->get_value(this);
+		int32 def = temp.defence;
 		if (def < 0)
 			def = 0;
 		*pdef = def;
