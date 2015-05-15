@@ -78,13 +78,8 @@ function c40737112.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c40737112.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()
-	if bc:IsRelateToBattle() then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
-		e1:SetValue(LOCATION_REMOVED)
-		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
-		bc:RegisterEffect(e1,true)
+	if bc:IsRelateToBattle() and bc:IsAbleToRemove() then
+		Duel.Destroy(bc,REASON_EFFECT+REASON_BATTLE,LOCATION_REMOVED)
 	end
 end
 function c40737112.recon(e)
