@@ -40,9 +40,9 @@ function c94997874.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c94997874.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
 	if g:GetFirst():IsFacedown() then
-		return e:SetLabel(0)
+		e:SetLabel(0)
 	else
-		return e:SetLabel(1)
+		e:SetLabel(1)
 	end
 end
 function c94997874.posop(e,tp,eg,ep,ev,re,r,rp)

@@ -39,7 +39,7 @@ function c43175858.initial_effect(c)
 end
 function c43175858.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetDecktopGroup(tp,3)
-	if chk==0 then return g:IsExists(Card.IsAbleToRemove,3,nil) end
+	if chk==0 then return g:FilterCount(Card.IsAbleToRemove,nil)==3 end
 	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,3,tp,LOCATION_DECK)
 end
 function c43175858.activate(e,tp,eg,ep,ev,re,r,rp)
