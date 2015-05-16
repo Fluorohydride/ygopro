@@ -64,10 +64,8 @@ function c28265983.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	else
 		e:SetCategory(0)
 		e:SetProperty(0)
-		e:SetOperation(c28265983.nop)
+		e:SetOperation(nil)
 	end
-end
-function c28265983.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c28265983.descon1(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp

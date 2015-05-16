@@ -60,10 +60,8 @@ function c92266279.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		e:SetCategory(0)
 		e:SetProperty(0)
-		e:SetOperation(c92266279.nop)
+		e:SetOperation(nil)
 	end
-end
-function c92266279.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c92266279.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) and Duel.GetFlagEffect(tp,92266279)==0 end
