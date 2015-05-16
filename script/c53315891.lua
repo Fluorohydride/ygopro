@@ -46,7 +46,7 @@ function c53315891.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c53315891.sprfilter(c,code)
-	return c:IsFaceup() and c:IsCode(code) and c:IsAbleToGraveAsCost() 
+	return c:IsCode(code) and c:IsAbleToGraveAsCost() 
 end
 function c53315891.sprcon(e,c)
 	if c==nil then return true end 

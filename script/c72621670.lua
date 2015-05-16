@@ -27,13 +27,22 @@ function c72621670.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,c72621670.filter,tp,0,LOCATION_MZONE,2,2,nil)
 	Duel.SetOperationInfo(0,CATEGORY_CONTROL,g,2,0,0)
 end
+function c72621670.tfilter(c,e)
+	return c:IsRelateToEffect(e) and c:IsFaceup()
+end
 function c72621670.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c72621670.tfilter,nil,e)
 	if g:GetCount()<2 then return end
+	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE,1-tp,LOCATION_REASON_CONTROL)
+	local sg=g
+	if ct==1 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
+		sg=g:Select(tp,1,1,nil)
+	end
 	local tc=g:GetFirst()
 	while tc do
-		if tc:IsFaceup() and not Duel.GetControl(tc,tp,PHASE_END,1) then
-			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
+		if not sg:IsContains(tc) or not Duel.GetControl(tc,tp,PHASE_END,1) then
+			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() and then
 				Duel.Destroy(tc,REASON_EFFECT)
 			end
 		end
