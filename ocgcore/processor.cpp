@@ -460,6 +460,13 @@ int32 field::process() {
 			it->step++;
 		return pduel->bufferlen;
 	}
+	case PROCESSOR_SELF_DESTROY: {
+		if (self_destroy(it->step)) {
+			core.units.pop_front();
+		} else
+			it->step++;
+		return pduel->bufferlen;
+	}
 	case PROCESSOR_PAY_LPCOST: {
 		if (pay_lp_cost(it->step, it->arg1, it->arg2))
 			core.units.pop_front();
@@ -4727,6 +4734,9 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 				}
 			}
 			adjust_instant();
+			core.self_destroy_set.clear();
+			core.self_destroy_set.insert(pcard);
+			add_process(PROCESSOR_SELF_DESTROY, 0, 0, 0, 0, 0);
 		}
 		raise_event((card*)0, EVENT_CHAIN_SOLVING, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 		process_instant_event();
@@ -5318,77 +5328,31 @@ int32 field::adjust_step(uint16 step) {
 			return FALSE;
 		}
 		//self destroy
-		uint8 tp = infos.turn_player;
-		effect* peffect;
-		core.destroy_set.clear();
+		core.self_destroy_set.clear();
 		for(uint8 p = 0; p < 2; ++p) {
 			for(uint8 i = 0; i < 5; ++i) {
-				card* pcard = player[tp].list_mzone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
-				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
-					core.destroy_set.insert(pcard);
-					pcard->current.reason_effect = peffect;
-					pcard->current.reason_player = peffect->get_handler_player();
-				}
+				card* pcard = player[p].list_mzone[i];
+				if(pcard)
+					core.self_destroy_set.insert(pcard);
 			}
 			for(uint8 i = 0; i < 8; ++i) {
-				card* pcard = player[tp].list_szone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, tp)))
-				        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
-					core.destroy_set.insert(pcard);
-					pcard->current.reason_effect = peffect;
-					pcard->current.reason_player = peffect->get_handler_player();
-				}
+				card* pcard = player[p].list_szone[i];
+				if(pcard)
+					core.self_destroy_set.insert(pcard);
 			}
-			tp = 1 - tp;
 		}
-		if(core.destroy_set.size()) {
-			destroy(&core.destroy_set, 0, REASON_EFFECT, 5);
-		} else {
-			returns.ivalue[0] = 0;
-		}
+		if(core.self_destroy_set.size())
+			add_process(PROCESSOR_SELF_DESTROY, 0, 0, 0, 0, 0);
+		else
+			core.units.begin()->step = 9;
 		return FALSE;
 	}
 	case 9: {
 		if(returns.ivalue[0] > 0)
 			core.re_adjust = TRUE;
-		//self tograve
-		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE)) {
-			returns.ivalue[0] = 0;
-			return FALSE;
-		}
-		uint8 tp = infos.turn_player;
-		effect* peffect;
-		card_set tograve_set;
-		for(uint8 p = 0; p < 2; ++p) {
-			for(uint8 i = 0; i < 5; ++i) {
-				card* pcard = player[tp].list_mzone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_TOGRAVE))) {
-					tograve_set.insert(pcard);
-					pcard->current.reason_effect = peffect;
-					pcard->current.reason_player = peffect->get_handler_player();
-				}
-			}
-			for(uint8 i = 0; i < 8; ++i) {
-				card* pcard = player[tp].list_szone[i];
-				if(pcard && pcard->is_position(POS_FACEUP) && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_TOGRAVE))) {
-					tograve_set.insert(pcard);
-					pcard->current.reason_effect = peffect;
-					pcard->current.reason_player = peffect->get_handler_player();
-				}
-			}
-			tp = 1 - tp;
-		}
-		if(tograve_set.size()) {
-			send_to(&tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
-		} else {
-			returns.ivalue[0] = 0;
-		}
 		return FALSE;
 	}
 	case 10: {
-		if(returns.ivalue[0] > 0)
-			core.re_adjust = TRUE;
 		//equip check
 		uint8 tp = infos.turn_player;
 		card* pcard;

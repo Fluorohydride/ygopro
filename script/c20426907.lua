@@ -90,7 +90,6 @@ function c20426907.disfilter(c,e)
 	return c:IsFaceup() and c:IsRelateToEffect(e)
 end
 function c20426907.disop(e,tp,eg,ep,ev,re,r,rp)
-	if c20426907.sdcon(e) then return end
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c20426907.disfilter,nil,e)
 	local tc=g:GetFirst()
