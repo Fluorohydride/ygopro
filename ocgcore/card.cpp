@@ -1383,9 +1383,12 @@ int32 card::get_counter(uint16 countertype) {
 	return cmit->second;
 }
 void card::set_material(card_set* materials) {
+	if(!materials) {
+		material_cards.clear();
+		return;
+	}
 	material_cards = *materials;
-	card_set::iterator cit;
-	for(cit = material_cards.begin(); cit != material_cards.end(); ++cit)
+	for(auto cit = material_cards.begin(); cit != material_cards.end(); ++cit)
 		(*cit)->current.reason_card = this;
 	effect_set eset;
 	filter_effect(EFFECT_MATERIAL_CHECK, &eset);

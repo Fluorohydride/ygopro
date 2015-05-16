@@ -571,10 +571,13 @@ int32 scriptlib::card_get_turn_counter(lua_State *L) {
 int32 scriptlib::card_set_material(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
-	check_param(L, PARAM_TYPE_GROUP, 2);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	group* pgroup = *(group**) lua_touserdata(L, 2);
-	pcard->set_material(&pgroup->container);
+	if(!lua_isnil(L, 2)) {
+		check_param(L, PARAM_TYPE_GROUP, 2);
+		group* pgroup = *(group**) lua_touserdata(L, 2);
+		pcard->set_material(&pgroup->container);
+	} else
+		pcard->set_material(0);
 	return 0;
 }
 int32 scriptlib::card_get_material(lua_State *L) {
