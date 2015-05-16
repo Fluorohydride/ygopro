@@ -77,24 +77,33 @@ function c10960419.rmop(e,tp,eg,ep,ev,re,r,rp)
 			tc:SetTurnCounter(0)
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
+			e1:SetCode(EVENT_PHASE_START+PHASE_DRAW)
 			e1:SetReset(RESET_PHASE+RESET_STANDBY,ct)
 			e1:SetLabel(ct)
 			e1:SetLabelObject(tc)
 			e1:SetCountLimit(1)
-			e1:SetOperation(c10960419.retop)
+			e1:SetOperation(c10960419.turnop)
 			Duel.RegisterEffect(e1,tp)
+			local e2=e1:Clone()
+			e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
+			e2:SetOperation(c10960419.retop)
+			Duel.RegisterEffect(e2,tp)
 			tc:RegisterFlagEffect(1082946,RESET_PHASE+RESET_STANDBY,0,ct)
-			c10960419[tc]=e1
+			local mt=_G["c"..tc:GetCode()]
+			mt[tc]=e1
 		end
 	end
 end
-function c10960419.retop(e,tp,eg,ep,ev,re,r,rp)
+function c10960419.turnop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	local ct=tc:GetTurnCounter()
 	ct=ct+1
 	tc:SetTurnCounter(ct)
-	if ct==e:GetLabel() and Duel.GetCurrentPhase()==PHASE_STANDBY then
+end
+function c10960419.retop(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
+	local ct=tc:GetTurnCounter()
+	if ct==e:GetLabel() then
 		Duel.ReturnToField(tc)
 	end
 	if ct>=e:GetLabel() then
