@@ -84,6 +84,8 @@ function c10960419.rmop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetCountLimit(1)
 			e1:SetOperation(c10960419.retop)
 			Duel.RegisterEffect(e1,tp)
+			tc:RegisterFlagEffect(1082946,RESET_PHASE+RESET_STANDBY,0,ct)
+			c10960419[tc]=e1
 		end
 	end
 end
@@ -92,7 +94,10 @@ function c10960419.retop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=tc:GetTurnCounter()
 	ct=ct+1
 	tc:SetTurnCounter(ct)
-	if ct==e:GetLabel() then
+	if ct==e:GetLabel() and Duel.GetCurrentPhase()==PHASE_STANDBY then
 		Duel.ReturnToField(tc)
+	end
+	if ct>=e:GetLabel() then
+		tc:ResetFlagEffect(1082946)
 	end
 end
