@@ -39,16 +39,20 @@ function c94997874.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
 	local g=Duel.SelectTarget(tp,c94997874.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
-	if g:GetFirst():IsFaceup() then
-		return e:SetLabel(POS_FACEUP)
+	if g:GetFirst():IsFacedown() then
+		return e:SetLabel(0)
 	else
-		return e:SetLabel(POS_FACEDOWN)
+		return e:SetLabel(1)
 	end
 end
 function c94997874.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) and tc:IsPosition(e:GetLabel()) then
-		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE,POS_FACEUP_ATTACK,POS_FACEDOWN_DEFENCE,POS_FACEUP_ATTACK)
+	if tc:IsRelateToEffect(e) then
+		if e:GetLabel()==0 then
+			Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+		elseif e:GetLabel()==1 then
+			Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
+		end
 	end
 end
 function c94997874.spcon(e,tp,eg,ep,ev,re,r,rp)

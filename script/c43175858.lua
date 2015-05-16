@@ -38,10 +38,9 @@ function c43175858.initial_effect(c)
 	e4:SetLabelObject(g)
 end
 function c43175858.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
-	local ct=Duel.GetFieldGroupCount(tp,LOCATION_DECK,0)
-	if ct>3 then ct=3 end
-	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,ct,tp,LOCATION_DECK)
+	local g=Duel.GetDecktopGroup(tp,3)
+	if chk==0 then return g:IsExists(Card.IsAbleToRemove,3,nil) end
+	Duel.SetOperationInfo(0,CATEGORY_REMOVE,nil,3,tp,LOCATION_DECK)
 end
 function c43175858.activate(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
