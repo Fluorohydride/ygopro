@@ -23,7 +23,7 @@ function c61639289.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return pc and pc:IsSetCard(0xc8)
 end
 function c61639289.filter(c)
-	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+	return c:IsRace(RACE_WARRIOR) and c:IsAttribute(ATTRIBUTE_FIRE) and c:IsAbleToHand()
 end
 function c61639289.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
@@ -43,7 +43,7 @@ function c61639289.thop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.Destroy(dg,REASON_EFFECT)~=2 then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c61639289.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
-	if g:GetCount()>0 then
+	if g:GetCount()>0 and not g:GetFirst():IsHasEffect(EFFECT_NECRO_VALLEY) then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
 	end
