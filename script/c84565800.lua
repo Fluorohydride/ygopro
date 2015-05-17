@@ -44,7 +44,7 @@ function c84565800.rmop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c84565800.cpfilter(c)
-	return c:IsType(TYPE_EFFECT) and not c:IsCode(84565800)
+	return c:IsType(TYPE_EFFECT)
 end
 function c84565800.cptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_GRAVE) and c84565800.cpfilter(chkc) end
@@ -55,7 +55,7 @@ end
 function c84565800.cpop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and c:IsFaceup() and c:IsRelateToEffect(e) then
 		local code=tc:GetCode()
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)

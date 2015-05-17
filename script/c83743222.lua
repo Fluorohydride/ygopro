@@ -57,7 +57,8 @@ function c83743222.eqlimit(e,c)
 	return c==e:GetLabelObject()
 end
 function c83743222.negcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetEquipTarget() and Duel.GetCurrentPhase()==PHASE_BATTLE and ep~=tp
+	local ph=Duel.GetCurrentPhase()
+	return e:GetHandler():GetEquipTarget() and (ph>PHASE_MAIN1 and ph<PHASE_MAIN2) and ep~=tp
 end
 function c83743222.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

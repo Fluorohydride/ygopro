@@ -46,7 +46,7 @@ function c53315891.initial_effect(c)
 	c:RegisterEffect(e5)
 end
 function c53315891.sprfilter(c,code)
-	return c:IsCode(code) and c:IsAbleToGraveAsCost() 
+	return c:IsCode(code) and c:IsAbleToGraveAsCost()
 end
 function c53315891.sprcon(e,c)
 	if c==nil then return true end 
@@ -98,7 +98,6 @@ function c53315891.atkop(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e1)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
-		e2:SetValue(atk)
 		c:RegisterEffect(e2)
 	end
 end
@@ -113,9 +112,10 @@ function c53315891.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c53315891.spop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<3 then return end
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c53315891.spfilter,tp,0x13,0,3,3,nil,e,tp)
-	if g:GetCount()>0 then
-		Duel.SpecialSummon(g,0,tp,tp,true,true,POS_FACEUP)
+	local g=Duel.GetMatchingGroup(c53315891.spfilter,tp,0x13,0,nil,e,tp)
+	if g:GetCount()>2 then
+		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
+		local sg=g:Select(tp,3,3,nil)
+		Duel.SpecialSummon(sg,0,tp,tp,true,true,POS_FACEUP)
 	end
 end
