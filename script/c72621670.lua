@@ -42,7 +42,7 @@ function c72621670.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	while tc do
 		if not sg:IsContains(tc) or not Duel.GetControl(tc,tp,PHASE_END,1) then
-			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() and then
+			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
 				Duel.Destroy(tc,REASON_EFFECT)
 			end
 		end

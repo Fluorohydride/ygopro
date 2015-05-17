@@ -10,7 +10,7 @@ function c39260991.initial_effect(c)
 	e1:SetOperation(c39260991.thop)
 	c:RegisterEffect(e1)
 end
-function c39260991.thfilter(c)
+function c39260991.filter(c)
 	return c:IsSetCard(0xce) and c:IsAbleToHand()
 end
 function c39260991.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
