@@ -79,7 +79,7 @@ end
 function c40737112.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()
 	if bc:IsRelateToBattle() and bc:IsAbleToRemove() then
-		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT+REASON_BATTLE)
+		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)
 	end
 end
 function c40737112.recon(e)
