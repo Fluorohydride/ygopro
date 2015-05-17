@@ -13,46 +13,54 @@ function c94997874.initial_effect(c)
 	e1:SetTarget(c94997874.postg)
 	e1:SetOperation(c94997874.posop)
 	c:RegisterEffect(e1)
-	--spsummon
-	local e2=Effect.CreateEffect(c)
+	local e2=e1:Clone()
 	e2:SetDescription(aux.Stringid(94997874,1))
-	e2:SetCategory(CATEGORY_SPECIAL_SUMMON)
-	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetCode(EVENT_PHASE+PHASE_END)
-	e2:SetRange(LOCATION_MZONE)
-	e2:SetCountLimit(1)
-	e2:SetCondition(c94997874.spcon)
-	e2:SetTarget(c94997874.sptg)
-	e2:SetOperation(c94997874.spop)
+	e2:SetTarget(c94997874.postg2)
+	e2:SetOperation(c94997874.posop2)
 	c:RegisterEffect(e2)
-end
-function c94997874.posfilter(c)
-	if c:IsFaceup() then
-		return c:IsCanTurnSet()
-	else
-		return true
-	end
+	--spsummon
+	local e3=Effect.CreateEffect(c)
+	e3:SetDescription(aux.Stringid(94997874,2))
+	e3:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetCode(EVENT_PHASE+PHASE_END)
+	e3:SetRange(LOCATION_MZONE)
+	e3:SetCountLimit(1)
+	e3:SetCondition(c94997874.spcon)
+	e3:SetTarget(c94997874.sptg)
+	e3:SetOperation(c94997874.spop)
+	c:RegisterEffect(e3)
 end
 function c94997874.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c94997874.posfilter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c94997874.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFacedown() end
+	if chk==0 then return Duel.IsExistingTarget(Card.IsFacedown,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-	local g=Duel.SelectTarget(tp,c94997874.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	local g=Duel.SelectTarget(tp,Card.IsFacedown,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
-	if g:GetFirst():IsFacedown() then
-		e:SetLabel(0)
-	else
-		e:SetLabel(1)
-	end
 end
 function c94997874.posop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) then
-		if e:GetLabel()==0 then
-			Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
-		elseif e:GetLabel()==1 then
-			Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
-		end
+		Duel.ChangePosition(tc,POS_FACEUP_ATTACK)
+	end
+end
+function c94997874.posfilter(c)
+	return c:IsFaceup() and c:IsCanTurnSet()
+end
+function c94997874.postg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c94997874.posfilter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c94997874.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
+	local g=Duel.SelectTarget(tp,c94997874.posfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,1,0,0)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
+end
+function c94997874.posop2(e,tp,eg,ep,ev,re,r,rp)
+	local tc=Duel.GetFirstTarget()
+	if tc:IsRelateToEffect(e) then
+		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
 	end
 end
 function c94997874.spcon(e,tp,eg,ep,ev,re,r,rp)
@@ -65,6 +73,7 @@ end
 function c94997874.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c94997874.spfilter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil,e,tp) end
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND+LOCATION_GRAVE)
 end
 function c94997874.spop(e,tp,eg,ep,ev,re,r,rp)

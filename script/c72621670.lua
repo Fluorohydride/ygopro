@@ -30,22 +30,26 @@ end
 function c72621670.tfilter(c,e)
 	return c:IsRelateToEffect(e) and c:IsFaceup()
 end
+function c72621670.tfilter2(c,e)
+	return not c:IsImmuneToEffect(e) and c:IsAbleToChangeControler()
+end
 function c72621670.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c72621670.tfilter,nil,e)
 	if g:GetCount()<2 then return end
 	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE,1-tp,LOCATION_REASON_CONTROL)
-	local sg=g
-	if ct==1 then
+	local sg=Group.CreateGroup()
+	local dg=Group.CreateGroup()
+	if ct==1 and g:FilterCount(c72621670.tfilter2,nil,e)>1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
-		sg=g:Select(tp,1,1,nil)
+		sg=g:FilterSelect(tp,c72621670.tfilter2,1,1,nil,e)
+		dg=g:Sub(sg)
+	else
+		sg=g:Filter(c72621670.tfilter2,nil,e)
 	end
-	local tc=g:GetFirst()
+	local tc=sg:GetFirst()
 	while tc do
-		if not sg:IsContains(tc) or not Duel.GetControl(tc,tp,PHASE_END,1) then
-			if not tc:IsImmuneToEffect(e) and tc:IsAbleToChangeControler() then
-				Duel.Destroy(tc,REASON_EFFECT)
-			end
-		end
-		tc=g:GetNext()
+		Duel.GetControl(tc,tp,PHASE_END,1)
+		tc=sg:GetNext()
 	end
+	if dg:GetCount()>0 then Duel.Destroy(dg,REASON_RULE) end
 end
