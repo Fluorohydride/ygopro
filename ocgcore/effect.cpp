@@ -96,7 +96,7 @@ int32 effect::is_available() {
 				return FALSE;
 			if(handler->is_status(STATUS_BATTLE_DESTROYED) && !(flag & EFFECT_FLAG_AVAILABLE_BD))
 				return FALSE;
-			if(!(handler->get_status(STATUS_EFFECT_ENABLED)))
+			if(!handler->get_status(STATUS_EFFECT_ENABLED) && !(flag & EFFECT_FLAG_IMMEDIATELY_APPLY))
 				return FALSE;
 			if(!in_range(handler->current.location, handler->current.sequence))
 				return FALSE;

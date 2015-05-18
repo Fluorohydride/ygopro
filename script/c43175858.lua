@@ -18,18 +18,13 @@ function c43175858.initial_effect(c)
 	c:RegisterEffect(e2)
 	--cannot be target
 	local e3=Effect.CreateEffect(c)
-	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(43175858)
+	e3:SetType(EFFECT_TYPE_FIELD)
+	e3:SetCode(EFFECT_CANNOT_SELECT_EFFECT_TARGET)
+	e3:SetProperty(EFFECT_FLAG_IMMEDIATELY_APPLY)
+	e3:SetRange(LOCATION_FZONE)
+	e3:SetTargetRange(0,0xff)
+	e3:SetValue(c43175858.etarget)
 	c:RegisterEffect(e3)
-	if not c43175858.global_check then
-		c43175858.global_check=true
-		local ge1=Effect.CreateEffect(c)
-		ge1:SetType(EFFECT_TYPE_FIELD)
-		ge1:SetCode(EFFECT_CANNOT_SELECT_EFFECT_TARGET)
-		ge1:SetProperty(EFFECT_FLAG_IGNORE_RANGE)
-		ge1:SetValue(c43175858.etarget)
-		Duel.RegisterEffect(ge1,0)
-	end
 	--destroy replace
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
@@ -54,10 +49,7 @@ function c43175858.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 end
 function c43175858.etarget(e,re,c)
-	local rp=re:GetHandlerPlayer()
-	local fc=Duel.GetFieldCard(1-rp,LOCATION_SZONE,5)
-	return fc and fc:IsFaceup() and fc:IsHasEffect(43175858)
-		and c:IsFaceup() and c:IsControler(1-rp) and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_TOON)
+	return c:IsFaceup() and c:IsLocation(LOCATION_MZONE) and c:IsType(TYPE_TOON)
 end
 function c43175858.repfilter(c,tp)
 	return c:IsFaceup() and c:IsControler(tp) and c:IsLocation(LOCATION_MZONE)
@@ -68,9 +60,8 @@ function c43175858.reptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=Duel.GetDecktopGroup(tp,ct)
 	if chk==0 then return g:IsExists(Card.IsAbleToRemove,ct,nil) end
 	if Duel.SelectYesNo(tp,aux.Stringid(43175858,0)) then
-		local dg=Duel.GetDecktopGroup(tp,ct)
 		Duel.DisableShuffleCheck()
-		Duel.Remove(dg,POS_FACEDOWN,REASON_EFFECT)
+		Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
 		return true
 	else return false end
 end
