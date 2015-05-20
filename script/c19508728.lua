@@ -18,7 +18,7 @@ function c19508728.initial_effect(c)
 	c:RegisterEffect(e2)
 	--atk
 	local e3=Effect.CreateEffect(c)
-	e3:SetCategory(CATEGORY_ATKCHANGE)
+	e3:SetCategory(CATEGORY_ATKCHANGE+CATEGORY_DEFCHANGE)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e3:SetRange(LOCATION_SZONE)
@@ -71,6 +71,9 @@ function c19508728.atkop(e,tp,eg,ep,ev,re,r,rp)
 		end
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_DAMAGE_CAL)
 		ec:RegisterEffect(e1)
+		local e2=e1:Clone()
+		e2:SetCode(EFFECT_SET_DEFENCE_FINAL)
+		ec:RegisterEffect(e2)
 	end
 end
 function c19508728.tdcon(e,tp,eg,ep,ev,re,r,rp)

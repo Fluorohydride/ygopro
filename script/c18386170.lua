@@ -85,9 +85,8 @@ end
 function c18386170.fscon(e,g,gc,chkf)
 	if g==nil then return true end
 	if gc then
-		local mg=g
+		local mg=g:Filter(Card.IsSetCard,nil,0xb1)
 		mg:AddCard(gc)
-		mg=mg:Filter(Card.IsSetCard,nil,0xb1)
 		return gc:IsSetCard(0xb1) and mg:GetClassCount(Card.GetCode)>=3
 	end
 	local fs=false
@@ -98,6 +97,7 @@ end
 function c18386170.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 	if gc then
 		local sg=eg:Filter(Card.IsSetCard,gc,0xb1)
+		sg:Remove(Card.IsCode,nil,gc:GetCode())
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 		local g1=sg:Select(tp,1,1,nil)
 		sg:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
@@ -107,7 +107,7 @@ function c18386170.fsop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 		Duel.SetFusionMaterial(g1)
 		return
 	end
-	local sg=eg:Filter(Card.IsSetCard,gc,0xb1)
+	local sg=eg:Filter(Card.IsSetCard,nil,0xb1)
 	local g1=nil
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_FMATERIAL)
 	if chkf~=PLAYER_NONE then g1=sg:FilterSelect(tp,aux.FConditionCheckF,1,1,nil,chkf)
