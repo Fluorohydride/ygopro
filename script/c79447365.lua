@@ -27,7 +27,7 @@ function c79447365.filter(c,e,tp)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(c79447365.spfilter,tp,LOCATION_DECK+LOCATION_HAND,0,1,nil,e,tp,lv)
 end
 function c79447365.spfilter(c,e,tp,lv)
-	return c:IsLevelBelow(lv) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
+	return c:IsLevelBelow(lv) and c:IsType(TYPE_TOON) and c:IsCanBeSpecialSummoned(e,0,tp,true,false)
 end
 function c79447365.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c79447365.filter(chkc,e,tp) end
