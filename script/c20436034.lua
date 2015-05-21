@@ -28,7 +28,7 @@ function c20436034.initial_effect(c)
 	e5:SetType(EFFECT_TYPE_SINGLE)
 	e5:SetCode(EFFECT_EQUIP_LIMIT)
 	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-	e5:SetValue(1)
+	e5:SetValue(c20436034.eqlimit)
 	c:RegisterEffect(e5)
 end
 function c20436034.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
@@ -40,7 +40,10 @@ function c20436034.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c20436034.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() then
+	if e:GetHandler():IsRelateToEffect(e) and tc:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsControler(tp) then
 		Duel.Equip(tp,e:GetHandler(),tc)
 	end
+end
+function c20436034.eqlimit(e,c)
+	return e:GetHandlerPlayer()==c:GetControler()
 end
