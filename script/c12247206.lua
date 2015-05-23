@@ -9,28 +9,29 @@ function c12247206.initial_effect(c)
 	e1:SetOperation(c12247206.activate)
 	c:RegisterEffect(e1)
 end
-function c12247206.cfilter(c,tp)
-	return c:IsLocation(LOCATION_MZONE) and c:IsControler(tp)
-end
 function c12247206.condition(e,tp,eg,ep,ev,re,r,rp)
-	local g=eg:Filter(c12247206.cfilter,nil,tp)
-	if g:GetCount()~=1 then return end
-	local tc=g:GetFirst()
-	e:SetLabelObject(tc)
-	return tc:IsAttackBelow(1500) and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
+	local tc=eg:GetFirst()
+	return eg:GetCount()==1 and tc:IsLocation(LOCATION_MZONE) and tc:IsControler(tp) and tc:IsAttackBelow(1500) 
+		and Duel.IsExistingMatchingCard(Card.IsFaceup,tp,0,LOCATION_MZONE,1,nil)
 end
-function c12247206.filter(c,code,e,tp)
-	return c:GetCode()==code and c:IsCanBeSpecialSummoned(e,0,tp,false,false) and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
+function c12247206.filter(c,tc,e,tp)
+	return c12247206.nfilter(c,tc) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function c12247206.nfilter(c,tc)
+	local code1,code2=tc:GetCode()
+	return c:IsCode(code1) or (code2 and c:IsCode(code2))
 end
 function c12247206.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	local tc=e:GetLabelObject()
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c12247206.filter,tp,0x13,0,1,nil,tc:GetCode(),e,tp) end
+	local tc=eg:GetFirst()
+	if chk==0 then
+		local g=Duel.GetMatchingGroup(c12247206.nfilter,tp,0x13,0,nil,tc)
+		return g:GetCount()==g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+	end
 	tc:CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,PLAYER_ALL,0x13)
 end
-function c12247206.selfilter(c)
-	return c:IsFaceup() and not c:IsType(TYPE_TOKEN+TYPE_TRAP)
+function c12247206.selfilter(c,e,tp)
+	return c:IsFaceup() and Duel.IsExistingMatchingCard(c12247206.filter,tp,0x13,0,1,nil,c,e,tp)
 end
 function c12247206.rmfilter(c)
 	return c:IsLocation(LOCATION_MZONE) or c:IsLocation(LOCATION_GRAVE)
@@ -47,7 +48,7 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local gg=Group.CreateGroup()
 	if ft1>0 and tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		local g=Duel.GetMatchingGroup(c12247206.filter,tp,0x13,0,nil,tc:GetCode(),e,tp)
+		local g=Duel.GetMatchingGroup(c12247206.filter,tp,0x13,0,nil,tc,e,tp)
 		if g:GetCount()<=ft1 then c12247206.sp(g,tp,POS_FACEUP_ATTACK)
 		else
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
@@ -59,9 +60,9 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 	local ft2=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
 	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_FACEUP)
-	local sg=Duel.SelectMatchingCard(1-tp,c12247206.selfilter,1-tp,LOCATION_MZONE,0,1,1,nil)
+	local sg=Duel.SelectMatchingCard(1-tp,c12247206.selfilter,1-tp,LOCATION_MZONE,0,1,1,nil,e,1-tp)
 	if ft2>0 and sg:GetCount()>0 then
-		local g=Duel.GetMatchingGroup(c12247206.filter,1-tp,0x13,0,nil,sg:GetFirst():GetCode(),e,1-tp)
+		local g=Duel.GetMatchingGroup(c12247206.filter,1-tp,0x13,0,nil,sg:GetFirst(),e,1-tp)
 		if g:GetCount()<=ft2 then c12247206.sp(g,1-tp,POS_FACEUP)
 		else
 			Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_SPSUMMON)
