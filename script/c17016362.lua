@@ -8,7 +8,7 @@ function c17016362.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CHANGE_DAMAGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_AVAILABLE_BD)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(c17016362.damval)
 	c:RegisterEffect(e1)
@@ -41,7 +41,7 @@ function c17016362.damval(e,re,val,r,rp,rc)
 	if val<=atk then return 0 else return val end
 end
 function c17016362.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsAbleToEnterBP()
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 and Duel.IsAbleToEnterBP()
 end
 function c17016362.mtcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
