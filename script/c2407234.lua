@@ -23,7 +23,7 @@ function c2407234.initial_effect(c)
 end
 c2407234.xyz_number=69
 function c2407234.filter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and not c:IsDisabled()
 end
 function c2407234.negop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

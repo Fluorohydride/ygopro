@@ -20,6 +20,9 @@ function c48333324.filter2(c,e,tp,mc,rk,rc,code)
 	return c:GetRank()==rk and c:IsRace(rc) and c:IsSetCard(0x1048) and mc:IsCanBeXyzMaterial(c)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_XYZ,tp,false,false)
 end
+function c48333324.disfilter(c)
+	return (not c:IsDisabled() or c:IsType(TYPE_TRAPMONSTER)) and not (c:IsType(TYPE_NORMAL) and bit.band(c:GetOriginalType(),TYPE_NORMAL))
+end
 function c48333324.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_MZONE) and c48333324.filter1(chkc,e,tp) end
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
@@ -47,10 +50,10 @@ function c48333324.activate(e,tp,eg,ep,ev,re,r,rp)
 		sc:CompleteProcedure()
 		local g1=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,sc)
 		g1:RemoveCard(c)
-		if g1:GetFirst() then
+		if g1:GetCount()>0 then
 			Duel.BreakEffect()
 		end
-		local ng=g1:Filter(aux.disfilter1,nil)
+		local ng=g1:Filter(c48333324.disfilter,nil)
 		local nc=ng:GetFirst()
 		while nc do
 			local e1=Effect.CreateEffect(c)
