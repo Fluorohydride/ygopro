@@ -200,8 +200,8 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			if(handler->is_affected_by_effect(EFFECT_CANNOT_TRIGGER))
 				return FALSE;
 		} else if(!(type & EFFECT_TYPE_CONTINUOUS)) {
-			if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED))
-			        && (code != EVENT_FLIP) && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+			if((handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (code != EVENT_FLIP && !(flag & EFFECT_FLAG_SET_AVAILABLE))
+					&& (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
 			if(!(type & (EFFECT_TYPE_FLIP | EFFECT_TYPE_TRIGGER_F)) 
 					&& !((type & EFFECT_TYPE_SINGLE) && (code == EVENT_TO_GRAVE || code == EVENT_DESTROYED || code == EVENT_SPSUMMON_SUCCESS))) {
@@ -239,7 +239,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 	pduel->game_field->core.reason_effect = this;
 	pduel->game_field->core.reason_player = playerid;
 	int32 result = TRUE;
-	if(!(type & EFFECT_TYPE_CONTINUOUS) )
+	if(!(type & EFFECT_TYPE_CONTINUOUS))
 		result = is_action_check(playerid);
 	if(result)
 		result = is_activate_ready(playerid, e, neglect_cond, neglect_cost, neglect_target);
