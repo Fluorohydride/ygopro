@@ -1108,8 +1108,7 @@ function Auxiliary.PendOperation()
 end
 --card effect disable filter
 function Auxiliary.disfilter1(c)
-	return c:IsFaceup() and not c:IsDisabled()
-		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)~=0)
+	return c:IsFaceup() and not c:IsDisabled() and (not c:IsType(TYPE_NORMAL) or bit.band(c:GetOriginalType(),TYPE_EFFECT)~=0)
 end
 --reset op of chain attack
 function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
