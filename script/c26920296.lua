@@ -48,14 +48,14 @@ end
 function c26920296.cfilter(c,type)
 	return c:IsFaceup() and c:IsType(type)
 end
-function c26920296.drcfilter()
+function c26920296.drcfilter(c)
 	return c:IsPreviousLocation(LOCATION_HAND+LOCATION_MZONE) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT)
 end
 function c26920296.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c26920296.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_FUSION)
 		and eg:IsExists(c26920296.drcfilter,1,nil)
 end
-function c26920296.drtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c26920296.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
@@ -68,7 +68,7 @@ function c26920296.drop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Draw(p,d,REASON_EFFECT)
 end
 function c26920296.lvcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c5803.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_SYNCHRO)
+	return Duel.IsExistingMatchingCard(c26920296.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_SYNCHRO)
 end
 function c26920296.lvfilter(c)
 	return c:IsFaceup() and c:GetLevel()>0
