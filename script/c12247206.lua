@@ -22,7 +22,7 @@ function c12247206.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(c12247206.nfilter,tp,0x13,0,nil,tc)
-		return g:GetCount()==g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,tp) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		return g:GetCount()==g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 	end
 	tc:CreateEffectRelation(e)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,PLAYER_ALL,0x13)
@@ -34,7 +34,7 @@ function c12247206.selfilter(c,e,tp)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(c12247206.filter,tp,0x13,0,1,nil,c,e,tp)
 end
 function c12247206.rmfilter(c)
-	return c:IsLocation(LOCATION_MZONE) or c:IsLocation(LOCATION_GRAVE)
+	return c:IsLocation(LOCATION_MZONE+LOCATION_GRAVE)
 end
 function c12247206.sp(g,tp,pos)
 	local sc=g:GetFirst()
@@ -48,7 +48,7 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ft1=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local gg=Group.CreateGroup()
 	local g=Duel.GetMatchingGroup(c12247206.filter,tp,0x13,0,nil,tc,e,tp)
-	if g:IsExist(Card.IsHasEffect,1,nil,EFFECT_NECRO_VALLEY) then return end
+	if g:IsExists(Card.IsHasEffect,1,nil,EFFECT_NECRO_VALLEY) then return end
 	if ft1>0 and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		if g:GetCount()<=ft1 then c12247206.sp(g,tp,POS_FACEUP_ATTACK)
 		else
@@ -64,7 +64,7 @@ function c12247206.activate(e,tp,eg,ep,ev,re,r,rp)
 	local sg=Duel.SelectMatchingCard(1-tp,c12247206.selfilter,1-tp,LOCATION_MZONE,0,1,1,nil,e,1-tp)
 	if ft2>0 and sg:GetCount()>0 then
 		local g2=Duel.GetMatchingGroup(c12247206.filter,1-tp,0x13,0,nil,sg:GetFirst(),e,1-tp)
-		if not g2:IsExist(Card.IsHasEffect,1,nil,EFFECT_NECRO_VALLEY) then
+		if not g2:IsExists(Card.IsHasEffect,1,nil,EFFECT_NECRO_VALLEY) then
 			if g2:GetCount()<=ft2 then 
 				c12247206.sp(g2,1-tp,POS_FACEUP)
 			else
