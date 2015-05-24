@@ -1040,6 +1040,10 @@ int32 card::add_effect(effect* peffect) {
 		pduel->write_buffer8(CHINT_DESC_ADD);
 		pduel->write_buffer32(peffect->description);
 	}
+	if(peffect->type & EFFECT_TYPE_SINGLE && peffect->code == EFFECT_UPDATE_LEVEL && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->value > 0) {
+			pduel->game_field->raise_single_event(this, 0, EVENT_LEVEL_UP, peffect, 0, 0, 0, 0);
+			pduel->game_field->process_single_event();
+	}
 	return peffect->id;
 }
 void card::remove_effect(effect* peffect) {
