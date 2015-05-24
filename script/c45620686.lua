@@ -33,5 +33,6 @@ function c45620686.lvop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
+		Duel.RaiseSingleEvent(tc,EVENT_LEVEL_UP,e,0,0,0,0,0)
 	end
 end

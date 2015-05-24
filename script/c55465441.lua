@@ -41,5 +41,6 @@ function c55465441.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetValue(tc2:GetLevel())
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc1:RegisterEffect(e1)
+		Duel.RaiseSingleEvent(tc,EVENT_LEVEL_UP,e,0,0,0,0,0)
 	end
 end

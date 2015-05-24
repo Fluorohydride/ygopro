@@ -40,6 +40,7 @@ function c35544402.operation(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(1)
 		else e1:SetValue(2) end
 		tc:RegisterEffect(e1)
+		Duel.RaiseSingleEvent(tc,EVENT_LEVEL_UP,e,0,0,0,0,0)
 	end
 end
 function c35544402.thfilter(c)

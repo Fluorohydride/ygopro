@@ -33,6 +33,7 @@ function c63485233.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		if e:GetLabel()==0 then
 			e1:SetValue(1)
+			Duel.RaiseSingleEvent(tc,EVENT_LEVEL_UP,e,0,0,0,0,0)
 		else e1:SetValue(-1) end
 		tc:RegisterEffect(e1)
 	end
