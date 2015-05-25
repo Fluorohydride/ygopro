@@ -65,5 +65,5 @@ function c19747827.cfilter(c)
 	return c:IsFaceup() and c:IsRace(RACE_DRAGON)
 end
 function c19747827.atkval(e,c)
-	return Duel.GetMatchingGroupCount(c19747827.cfilter,e:GetHandlerPlayer(),LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,nil)*500
+	return Duel.GetMatchingGroupCount(c19747827.cfilter,0,LOCATION_MZONE+LOCATION_GRAVE,LOCATION_MZONE+LOCATION_GRAVE,nil)*500
 end

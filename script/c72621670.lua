@@ -37,14 +37,17 @@ function c72621670.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c72621670.tfilter,nil,e)
 	if g:GetCount()<2 then return end
 	local ct=Duel.GetLocationCount(tp,LOCATION_MZONE,1-tp,LOCATION_REASON_CONTROL)
-	local sg=Group.CreateGroup()
-	local dg=Group.CreateGroup()
+	local sg=nil
+	local dg=g
 	if ct==1 and g:FilterCount(c72621670.tfilter2,nil,e)>1 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 		sg=g:FilterSelect(tp,c72621670.tfilter2,1,1,nil,e)
-		dg=g:Sub(sg)
-	else
+		dg:Sub(sg)
+	elseif ct>0 then
 		sg=g:Filter(c72621670.tfilter2,nil,e)
+		dg:Clear()
+	else
+		sg=Group.CreateGroup()
 	end
 	local tc=sg:GetFirst()
 	while tc do
