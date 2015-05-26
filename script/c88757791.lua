@@ -40,8 +40,8 @@ function c88757791.cfilter(c,tp)
 end
 function c88757791.scfilter(c,pc)
 	return c:IsSetCard(0x98)
-		and ((pc:GetSequence()==6 and c:GetLeftScale()~=pc:GetLeftScale())
-		or (pc:GetSequence()==7 and c:GetRightScale()~=pc:GetRightScale()))
+		and ((c:GetSequence()==6 and c:GetLeftScale()~=pc:GetLeftScale())
+		or (c:GetSequence()==7 and c:GetRightScale()~=pc:GetRightScale()))
 end
 function c88757791.sctg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(tp) and chkc:IsLocation(LOCATION_SZONE) and c88757791.scfilter(chkc,e:GetLabelObject()) end
