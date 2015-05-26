@@ -42,7 +42,7 @@ function c53485634.spop(e,tp,eg,ep,ev,re,r,rp)
 		local ct=Duel.GetLocationCount(tp,LOCATION_MZONE)
 		if ct<=0 then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=eg:FilterSelect(tp,c53485634.spfilter，ct,ct,nil,e,tp)
+		local sg=eg:FilterSelect(tp,c53485634.spfilter,ct,ct,nil,e,tp)
 		local sc=sg:GetFirst()
 		while sc do
 			local pos=sc:GetPreviousPosition()
