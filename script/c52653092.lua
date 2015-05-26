@@ -119,6 +119,7 @@ function c52653092.xyzop(e,tp,eg,ep,ev,re,r,rp,c,og)
 	local mg=Duel.GetMatchingGroup(c52653092.mfilter,tp,LOCATION_MZONE,0,nil)
 	local b1=mg:IsExists(c52653092.xyzfilter1,1,nil,mg)
 	local b2=ct<1 and Duel.IsExistingMatchingCard(c52653092.ovfilter,tp,LOCATION_MZONE,0,1,nil,c)
+		and Duel.IsExistingMatchingCard(c52653092.disfilter,tp,LOCATION_HAND,0,1,nil)
 	if b2 and (not b1 or Duel.SelectYesNo(tp,aux.Stringid(52653092,0))) then
 		Duel.DiscardHand(tp,c52653092.disfilter,1,1,REASON_COST,nil)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
