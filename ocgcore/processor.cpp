@@ -2844,14 +2844,13 @@ int32 field::process_idle_command(uint16 step) {
 int32 field::process_battle_command(uint16 step) {
 	switch(step) {
 	case 0: {
-		pair<effect_container::iterator, effect_container::iterator> pr;
 		effect* peffect = 0;
 		card* pcard = 0;
 		core.select_chains.clear();
 		chain newchain;
 		nil_event.event_code = EVENT_FREE_CHAIN;
-		core.chain_attack = FALSE;
-		core.chain_attack_target = 0;
+		if(!core.chain_attack)
+			core.chain_attack_target = 0;
 		core.attacker = 0;
 		core.attack_target = 0;
 		if((peffect = is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP))) {
@@ -2872,7 +2871,7 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		}
 		core.battle_phase_action = TRUE;
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+		auto pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
 		for(; pr.first != pr.second; ++pr.first) {
 			peffect = pr.first->second;
 			peffect->s_range = peffect->handler->current.location;
@@ -2901,7 +2900,10 @@ int32 field::process_battle_command(uint16 step) {
 				if(!pcard->is_capable_attack_announce(infos.turn_player))
 					continue;
 				core.select_cards.clear();
-				get_attack_target(pcard, &core.select_cards);
+				uint8 chain_attack = FALSE;
+				if(core.chain_attack && core.pre_field[0] == pcard->fieldid_r)
+					chain_attack = TRUE;
+				get_attack_target(pcard, &core.select_cards, chain_attack);
 				if(core.select_cards.size() == 0 && pcard->operation_param == 0)
 					continue;
 				core.attackable_cards.push_back(pcard);
@@ -2954,7 +2956,12 @@ int32 field::process_battle_command(uint16 step) {
 			return FALSE;
 		} else if(ctype == 1) {
 			core.units.begin()->step = 2;
-			core.attacker = core.attackable_cards[sel];
+			card* attacker = core.attackable_cards[sel];
+			if(core.chain_attack && core.pre_field[0] != attacker->fieldid_r) {
+				core.chain_attack = FALSE;
+				core.chain_attack_target = 0;
+			}
+			core.attacker = attacker;
 			core.attacker->set_status(STATUS_ATTACK_CANCELED, FALSE);
 			core.pre_field[0] = core.attacker->fieldid_r;
 			core.phase_action = TRUE;
@@ -3796,6 +3803,7 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.effect_damage_step)
 			return TRUE;
 		if(core.chain_attack) {
+			core.chain_attack = FALSE;
 			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid_r != core.pre_field[0]
 			        || (core.attacker->current.controler != infos.turn_player) || !core.attacker->is_capable_attack_announce(infos.turn_player))
 				return FALSE;
@@ -3818,7 +3826,7 @@ int32 field::process_battle_command(uint16 step) {
 					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
 				}
 			}
-			core.units.begin()->step = 2;
+			core.chain_attack = TRUE;
 		}
 		return FALSE;
 	}
@@ -4274,6 +4282,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		core.new_ochain.clear();
 		core.quick_f_chain.clear();
 		core.delayed_quick_tmp.clear();
+		core.chain_attack = FALSE;
 		add_process(PROCESSOR_BATTLE_COMMAND, 0, 0, 0, 0, 0);
 		return FALSE;
 	}

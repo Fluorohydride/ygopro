@@ -66,20 +66,7 @@ function c35514096.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(token,0,tp,tp,false,false,POS_FACEUP)
 	elseif e:GetLabel()==1 then
 		if c:IsRelateToBattle() then
-			local e1=Effect.CreateEffect(c)
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
-			e1:SetCode(EFFECT_EXTRA_ATTACK)
-			e1:SetValue(1)
-			e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
-			c:RegisterEffect(e1)
-			local e2=Effect.CreateEffect(c)
-			e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
-			e2:SetCode(EVENT_ATTACK_ANNOUNCE)
-			e2:SetLabelObject(e1)
-			e2:SetOperation(aux.atrst)
-			e2:SetReset(RESET_PHASE+PHASE_BATTLE)
-			Duel.RegisterEffect(e2,tp)
+			Duel.ChainAttack()
 		end
 	end
 end
