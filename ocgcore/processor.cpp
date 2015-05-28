@@ -3007,11 +3007,6 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		core.select_cards.clear();
 		core.units.begin()->arg1 = FALSE;
-		if(core.chain_attack && core.chain_attack_target) {
-			core.attack_target = core.chain_attack_target;
-			core.units.begin()->step = 6;
-			return FALSE;
-		}
 		core.units.begin()->arg2 = get_attack_target(core.attacker, &core.select_cards, core.chain_attack);
 		return FALSE;
 	}
@@ -3252,23 +3247,6 @@ int32 field::process_battle_command(uint16 step) {
 				core.attacker->announced_cards[0] = 0;
 				core.attacker->attacked_cards[0] = 0;
 				pduel->write_buffer32(0);
-			}
-			core.units.begin()->step = 19;
-			return FALSE;
-		}
-		if(core.chain_attack && core.chain_attack_target) {
-			core.attacker->announce_count++;
-			attack_all_target_check();
-			if(!(core.chain_attack_target->current.location & LOCATION_MZONE)) {
-				core.units.begin()->step = -1;
-				reset_phase(PHASE_DAMAGE);
-				return FALSE;
-			}
-			uint8 seq = core.chain_attack_target->current.sequence;
-			if(core.opp_mzone[seq] != core.chain_attack_target->fieldid_r) {
-				core.units.begin()->step = -1;
-				reset_phase(PHASE_DAMAGE);
-				return FALSE;
 			}
 			core.units.begin()->step = 19;
 			return FALSE;
@@ -3803,29 +3781,6 @@ int32 field::process_battle_command(uint16 step) {
 		if(core.effect_damage_step)
 			return TRUE;
 		if(core.chain_attack) {
-			core.chain_attack = FALSE;
-			if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) || core.attacker->fieldid_r != core.pre_field[0]
-			        || (core.attacker->current.controler != infos.turn_player) || !core.attacker->is_capable_attack_announce(infos.turn_player))
-				return FALSE;
-			if(core.chain_attack_target) {
-				if(!core.chain_attack_target->is_capable_be_battle_target(core.attacker)
-				        || core.chain_attack_target->current.location != LOCATION_MZONE)
-					return FALSE;
-			} else {
-				core.select_cards.clear();
-				get_attack_target(core.attacker, &core.select_cards, TRUE);
-				if(core.select_cards.size() == 0 && core.attacker->operation_param == 0)
-					return FALSE;
-			}
-			effect_set eset;
-			filter_player_effect(infos.turn_player, EFFECT_ATTACK_COST, &eset, FALSE);
-			core.attacker->filter_effect(EFFECT_ATTACK_COST, &eset);
-			for(int32 i = 0; i < eset.size(); ++i) {
-				if(eset[i]->operation) {
-					core.sub_solving_event.push_back(nil_event);
-					add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, infos.turn_player, 0);
-				}
-			}
 			core.chain_attack = TRUE;
 		}
 		return FALSE;

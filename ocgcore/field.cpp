@@ -1649,11 +1649,14 @@ int32 field::get_attack_target(card* pcard, card_vector* v, uint8 chain_attack) 
 			continue;
 		if(pcard->is_affected_by_effect(EFFECT_CANNOT_SELECT_BATTLE_TARGET, atarget))
 			continue;
+		if(chain_attack && core.chain_attack_target && atarget != core.chain_attack_target)
+			continue;
 		v->push_back(atarget);
 	}
 	if(must_be_attack.size())
 		return TRUE;
-	if((mcount == 0 || pcard->is_affected_by_effect(EFFECT_DIRECT_ATTACK)) && !pcard->is_affected_by_effect(EFFECT_CANNOT_DIRECT_ATTACK))
+	if((mcount == 0 || pcard->is_affected_by_effect(EFFECT_DIRECT_ATTACK)) && !pcard->is_affected_by_effect(EFFECT_CANNOT_DIRECT_ATTACK) 
+			&& !core.chain_attack_target)
 		pcard->operation_param = 1;
 	return must_be_attack.size() ? TRUE : FALSE;
 }
