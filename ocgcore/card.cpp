@@ -270,6 +270,23 @@ int32 card::is_set_card(uint32 set_code) {
 			return TRUE;
 		setcode = setcode >> 16;
 	}
+	//another code
+	uint32 code2 = get_another_code();
+	uint64 setcode2;
+	if (code2 != 0) {
+		card_data dat;
+		::read_card(code2, &dat);
+		setcode2 = dat.setcode;
+	} else {
+		return FALSE;
+	}
+	uint32 settype2 = setcode2 & 0xfff;
+	uint32 setsubtype2 = setcode2 & 0xf000;
+	while(setcode2) {
+		if ((setcode2 & 0xfff) == settype2 && (setcode2 & 0xf000 & setsubtype2) == setsubtype2)
+			return TRUE;
+		setcode2 = setcode2 >> 16;
+	}
 	return FALSE;
 }
 uint32 card::get_type() {
