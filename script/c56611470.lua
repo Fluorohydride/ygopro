@@ -34,6 +34,9 @@ end
 function c56611470.mfilter2(c,mc)
 	return c.xyz_filter(mc)
 end
+function c56611470.mfilter3(c,mc,exg)
+	return exg:IsExists(Card.IsXyzSummonable,1,nil,Group.FromCards(c,mc))
+end
 function c56611470.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
 	local mg=Duel.GetMatchingGroup(c56611470.filter,tp,LOCATION_MZONE,0,nil,e)
@@ -45,7 +48,7 @@ function c56611470.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local tc1=sg1:GetFirst()
 	local exg2=exg:Filter(c56611470.mfilter2,nil,tc1)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	local sg2=mg:FilterSelect(tp,c56611470.mfilter1,1,1,tc1,exg2)
+	local sg2=mg:FilterSelect(tp,c56611470.mfilter3,1,1,tc1,tc1,exg2)
 	sg1:Merge(sg2)
 	Duel.SetTargetCard(sg1)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_EXTRA)
