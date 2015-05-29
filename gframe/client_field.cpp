@@ -13,12 +13,13 @@ ClientField::ClientField() {
 	hovered_card = 0;
 	clicked_card = 0;
 	highlighting_card = 0;
-	deck_act = false;
-	grave_act = false;
-	remove_act = false;
-	extra_act = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	for(int p = 0; p < 2; ++p) {
+		deck_act[p] = false;
+		grave_act[p] = false;
+		remove_act[p] = false;
+		extra_act[p] = false;
+		pzone_act[p] = false;
+	}
 	deck_reversed = false;
 	for(int p = 0; p < 2; ++p) {
 		for(int i = 0; i < 5; ++i)
@@ -60,12 +61,13 @@ void ClientField::Clear() {
 	overlay_cards.clear();
 	chains.clear();
 	disabled_field = 0;
-	deck_act = false;
-	grave_act = false;
-	remove_act = false;
-	extra_act = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	for(int p = 0; p < 2; ++p) {
+		deck_act[p] = false;
+		grave_act[p] = false;
+		remove_act[p] = false;
+		extra_act[p] = false;
+		pzone_act[p] = false;
+	}
 	deck_reversed = false;
 }
 void ClientField::Initial(int player, int deckc, int extrac) {
@@ -315,12 +317,13 @@ void ClientField::ClearCommandFlag() {
 		(*cit)->cmdFlag = 0;
 	for(cit = attackable_cards.begin(); cit != attackable_cards.end(); ++cit)
 		(*cit)->cmdFlag = 0;
-	deck_act = false;
-	extra_act = false;
-	grave_act = false;
-	remove_act = false;
-	pzone_act[0] = false;
-	pzone_act[1] = false;
+	for(int p = 0; p < 2; ++p) {
+		deck_act[p] = false;
+		grave_act[p] = false;
+		remove_act[p] = false;
+		extra_act[p] = false;
+		pzone_act[p] = false;
+	}
 }
 void ClientField::ClearSelect() {
 	std::vector<ClientCard*>::iterator cit;
@@ -336,8 +339,10 @@ void ClientField::ClearChainSelect() {
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 	}
-	grave_act = false;
-	remove_act = false;
+	for(int p = 0; p < 2; ++p) {
+		grave_act[p] = false;
+		remove_act[p] = false;
+	}
 }
 void ClientField::ShowSelectCard(bool buttonok) {
 	if(selectable_cards.size() <= 5) {

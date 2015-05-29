@@ -915,9 +915,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_descs.push_back(desc);
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
 			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 		}
 		mainGame->dField.attackable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -972,14 +972,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->cmdFlag |= COMMAND_SPSUMMON;
 			if (pcard->location == LOCATION_DECK) {
 				pcard->SetCode(code);
-				mainGame->dField.deck_act = true;
+				mainGame->dField.deck_act[pcard->controler] = true;
 			}
 			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_EXTRA)
-				mainGame->dField.extra_act = true;
+				mainGame->dField.extra_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
 				mainGame->dField.pzone_act[pcard->controler] = true;
 		}
@@ -1030,9 +1030,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_descs.push_back(desc);
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
 			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 		}
 		if(BufferIO::ReadInt8(pbuf)) {
 			mainGame->btnBP->setVisible(true);
@@ -1180,9 +1180,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->is_selected = false;
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
 			if(l == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if(l == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 			if(l & 0xc1)
 				panelmode = true;
 		}

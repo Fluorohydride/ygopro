@@ -60,10 +60,10 @@ public:
 	std::set<ClientCard*> selectsum_cards;
 	std::vector<ClientCard*> selectsum_all;
 	std::vector<int> sort_list;
-	bool grave_act;
-	bool remove_act;
-	bool deck_act;
-	bool extra_act;
+	bool grave_act[2];
+	bool remove_act[2];
+	bool deck_act[2];
+	bool extra_act[2];
 	bool pzone_act[2];
 	bool chain_forced;
 	ChainInfo current_chain;
