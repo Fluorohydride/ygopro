@@ -272,7 +272,7 @@ int32 card::is_set_card(uint32 set_code) {
 	}
 	//add set code
 	effect_set eset;
-	filter_effect(EFFECT_ADD_SET_CODE, &eset);
+	filter_effect(EFFECT_ADD_SETCODE, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		uint32 value = eset[i]->get_value(this);
 		if ((value & 0xfff) == settype && (value & 0xf000 & setsubtype) == setsubtype)
