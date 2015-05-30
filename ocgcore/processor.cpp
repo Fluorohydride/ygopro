@@ -3342,11 +3342,15 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_BATTLE_START, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size()) {
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->arg1 = TRUE;
-		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(40);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(40);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		core.temp_var[2] = 0;
 		return FALSE;
 	}
@@ -3356,23 +3360,10 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.selfdes_disabled = FALSE;
-			core.units.begin()->step = 30;
+			core.units.begin()->step = 38;
 			return FALSE;
 		}
 		if(!core.attack_target) {
-			core.units.begin()->step = 23;
-			if(!core.units.begin()->arg1) {
-				pduel->write_buffer8(MSG_HINT);
-				pduel->write_buffer8(HINT_EVENT);
-				pduel->write_buffer8(0);
-				pduel->write_buffer32(40);
-				pduel->write_buffer8(MSG_HINT);
-				pduel->write_buffer8(HINT_EVENT);
-				pduel->write_buffer8(1);
-				pduel->write_buffer32(40);
-				core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-				add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			}
 			return FALSE;
 		}
 		core.sub_attacker = 0;
@@ -3396,23 +3387,16 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_BATTLE_CONFIRM, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
-		if(core.new_fchain.size() || core.new_ochain.size()) {
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->arg1 = TRUE;
-		}
-		if(!core.units.begin()->arg1) {
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(0);
-			pduel->write_buffer32(40);
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(1);
-			pduel->write_buffer32(40);
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(41);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(41);
+		core.hint_timing[infos.turn_player] = TIMING_DAMAGE_STEP;
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		return FALSE;
 	}
 	case 23: {
@@ -3436,7 +3420,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.selfdes_disabled = FALSE;
-			core.units.begin()->step = 30;
+			core.units.begin()->step = 38;
 			return FALSE;
 		}
 		return FALSE;
@@ -3453,11 +3437,11 @@ int32 field::process_battle_command(uint16 step) {
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_EVENT);
 		pduel->write_buffer8(0);
-		pduel->write_buffer32(41);
+		pduel->write_buffer32(42);
 		pduel->write_buffer8(MSG_HINT);
 		pduel->write_buffer8(HINT_EVENT);
 		pduel->write_buffer8(1);
-		pduel->write_buffer32(41);
+		pduel->write_buffer32(42);
 		core.hint_timing[infos.turn_player] = TIMING_DAMAGE_CAL;
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		return FALSE;
@@ -3468,7 +3452,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.selfdes_disabled = FALSE;
-			core.units.begin()->step = 30;
+			core.units.begin()->step = 38;
 			return FALSE;
 		}
 		raise_single_event(core.attacker, 0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
@@ -3477,6 +3461,7 @@ int32 field::process_battle_command(uint16 step) {
 		raise_event((card*)0, EVENT_DAMAGE_CALCULATING, 0, 0, 0, 0, 0);
 		process_single_event();
 		process_instant_event();
+		//this timing does not exist in Master Rule 3
 		core.new_ochain.clear();
 		core.new_fchain.clear();
 		return FALSE;
@@ -3566,20 +3551,7 @@ int32 field::process_battle_command(uint16 step) {
 		}
 		process_single_event();
 		process_instant_event();
-		if(!core.effect_damage_step) {
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(0);
-			pduel->write_buffer32(43);
-			pduel->write_buffer8(MSG_HINT);
-			pduel->write_buffer8(HINT_EVENT);
-			pduel->write_buffer8(1);
-			pduel->write_buffer32(43);
-			core.hint_timing[infos.turn_player] = TIMING_DAMAGE_CAL;
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-		} else {
-			break_effect();
-		}
+		//this timing does not exist in Master Rule 3
 		core.damage_calculated = TRUE;
 		if(core.effect_damage_step)
 			return TRUE;
@@ -3687,30 +3659,29 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 30: {
-		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
-			core.units.begin()->arg1 = 1;
-		} else {
-			break_effect();
-		}
+		//EVENT_BATTLE_END was here, but this timing does not exist in Master Rule 3
+		core.units.begin()->arg1 = 1;
 		return FALSE;
 	}
 	case 31: {
 		core.flip_delayed = FALSE;
 		core.new_fchain.splice(core.new_fchain.begin(), core.new_fchain_b);
 		core.new_ochain.splice(core.new_ochain.begin(), core.new_ochain_b);
-		if(core.units.begin()->arg1) {
-			raise_single_event(core.attacker, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
-			if(core.attack_target)
-				raise_single_event(core.attack_target, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 1);
-			raise_event((card*)0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
-			process_single_event();
-			process_instant_event();
-		}
-		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, TRUE);
-		} else {
-			break_effect();
-		}
+		raise_single_event(core.attacker, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
+		if(core.attack_target)
+			raise_single_event(core.attack_target, 0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 1);
+		raise_event((card*)0, EVENT_BATTLED, 0, 0, PLAYER_NONE, 0, 0);
+		process_single_event();
+		process_instant_event();
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(43);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(43);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		return FALSE;
 	}
 	case 32: {
@@ -3764,15 +3735,20 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->set_status(STATUS_BATTLE_DESTROYED, FALSE);
 			core.attack_target->set_status(STATUS_OPPO_BATTLE, FALSE);
 		}
-		if(!core.effect_damage_step || (core.effect_damage_step != 3)) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
-		} else {
-			break_effect();
-		}
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(0);
+		pduel->write_buffer32(44);
+		pduel->write_buffer8(MSG_HINT);
+		pduel->write_buffer8(HINT_EVENT);
+		pduel->write_buffer8(1);
+		pduel->write_buffer32(44);
+		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, TRUE);
 		core.units.begin()->step = 38;
 		return FALSE;
 	}
 	case 39: {
+		//end of damage step
 		core.units.begin()->step = -1;
 		infos.phase = PHASE_BATTLE;
 		pduel->write_buffer8(MSG_DAMAGE_STEP_END);
@@ -3780,9 +3756,6 @@ int32 field::process_battle_command(uint16 step) {
 		adjust_all();
 		if(core.effect_damage_step)
 			return TRUE;
-		if(core.chain_attack) {
-			core.chain_attack = TRUE;
-		}
 		return FALSE;
 	}
 	case 40: {
@@ -3836,16 +3809,9 @@ int32 field::process_damage_step(uint16 step) {
 		process_single_event();
 		process_instant_event();
 		add_process(PROCESSOR_BATTLE_COMMAND, 26, 0, 0, 0, 0);
-		if(core.units.begin()->arg2) {	//skip timing
-			core.units.begin()->step = 2;
-			core.effect_damage_step = 3;
-			add_process(PROCESSOR_BATTLE_COMMAND, 27, 0, 0, 0, 0);
-			return FALSE;
-		} else {
-			core.units.begin()->step = 2;
-			core.reserved = core.units.front();
-			return TRUE;
-		}
+		core.units.begin()->step = 2;
+		core.reserved = core.units.front();
+		return TRUE;
 	}
 	case 2: {
 		core.effect_damage_step = 2;
