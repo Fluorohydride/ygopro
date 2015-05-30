@@ -11,7 +11,7 @@ function c34566435.initial_effect(c)
 	e1:SetTarget(c34566435.target)
 	e1:SetOperation(c34566435.operation)
 	c:RegisterEffect(e1)
-	--treat as fightfur
+	--add setcode
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

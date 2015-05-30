@@ -31,7 +31,7 @@ function c23204029.initial_effect(c)
 	e3:SetTarget(c23204029.target)
 	e3:SetOperation(c23204029.operation)
 	c:RegisterEffect(e3)
-	--treat as EHERO
+	--add setcode
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)

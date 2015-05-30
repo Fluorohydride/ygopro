@@ -18,7 +18,7 @@ function c36953371.initial_effect(c)
 	e2:SetTarget(c36953371.destg)
 	e2:SetOperation(c36953371.desop)
 	c:RegisterEffect(e2)
-	--treat as choujuubusha
+	--add setcode
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
