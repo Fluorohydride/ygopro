@@ -12,9 +12,7 @@ function c2196767.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c2196767.destg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDestructable,tp,0,LOCATION_MZONE,1,nil)
-		and Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)>0
-		and Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
+	if chk==0 then return true end
 	Duel.SetOperationInfo(0,CATEGORY_COIN,nil,0,tp,3)
 end
 function c2196767.desop(e,tp,eg,ep,ev,re,r,rp)
