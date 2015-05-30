@@ -445,7 +445,7 @@ int32 scriptlib::card_is_code(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	uint32 tcode = lua_tointeger(L, 2);
-	uint32 code2 = pcard->get_another_code()
+	uint32 code2 = pcard->get_another_code();
 	if(pcard->get_code() == tcode || (code2 && code2 == tcode))
 		lua_pushboolean(L, 1);
 	else
