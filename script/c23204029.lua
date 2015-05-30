@@ -35,7 +35,7 @@ function c23204029.initial_effect(c)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e4:SetCode(EFFECT_ADD_SET_CODE)
+	e4:SetCode(EFFECT_ADD_SETCODE)
 	e4:SetValue(0x3008)
 	c:RegisterEffect(e4)
 end

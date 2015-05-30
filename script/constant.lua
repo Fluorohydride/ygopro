@@ -473,7 +473,7 @@ EFFECT_SPSUMMON_COUNT_LIMIT		=330	--特殊召唤次数限制
 EFFECT_LEFT_SPSUMMON_COUNT		=331	--剩餘召喚次數(召喚限制網)
 EFFECT_CANNOT_SELECT_BATTLE_TARGET	=332	--對手不能選擇為攻擊對象
 EFFECT_CANNOT_SELECT_EFFECT_TARGET	=333	--對手不能選擇為效果對象
-EFFECT_ADD_SET_CODE				=334	--规则上视为「XX」字段
+EFFECT_ADD_SETCODE				=334	--规则上视为「XX」字段
 
 --下面是诱发效果的诱发事件、时点 （如果是TYPE_SINGLE则自己发生以下事件后触发，如果TYPE_FIELD则场上任何卡发生以下事件都触发）
 EVENT_STARTUP					=1000	--游戏开始时

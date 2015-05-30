@@ -29,7 +29,7 @@ function c21521304.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e3:SetCode(EFFECT_ADD_SET_CODE)
+	e3:SetCode(EFFECT_ADD_SETCODE)
 	e3:SetValue(0x7f)
 	c:RegisterEffect(e3)
 end
