@@ -16,7 +16,7 @@ function c12247206.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c12247206.nfilter(c,tc)
 	local code1,code2=tc:GetCode()
-	return c:IsCode(code1) or (code2 and c:IsCode(code2))
+	return c:IsCode(code1) or c:IsCode(code2)
 end
 function c12247206.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()
