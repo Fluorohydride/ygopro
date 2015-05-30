@@ -250,6 +250,8 @@ uint32 card::get_another_code() {
 	uint32 otcode = eset.get_last()->get_value(this);
 	if(get_code() != otcode)
 		return otcode;
+	if(data.alias == otcode)
+		return data.code;
 	return 0;
 }
 int32 card::is_set_card(uint32 set_code) {
