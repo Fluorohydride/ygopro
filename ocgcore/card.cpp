@@ -270,6 +270,14 @@ int32 card::is_set_card(uint32 set_code) {
 			return TRUE;
 		setcode = setcode >> 16;
 	}
+	//add set code
+	effect_set eset;
+	filter_effect(EFFECT_ADD_SET_CODE, &eset);
+	for(int32 i = 0; i < eset.size(); ++i) {
+		uint32 value = eset[i]->get_value(this);
+		if ((value & 0xfff) == settype && (value & 0xf000 & setsubtype) == setsubtype)
+			return TRUE;
+	}
 	//another code
 	uint32 code2 = get_another_code();
 	uint64 setcode2;
@@ -280,10 +288,8 @@ int32 card::is_set_card(uint32 set_code) {
 	} else {
 		return FALSE;
 	}
-	uint32 settype2 = setcode2 & 0xfff;
-	uint32 setsubtype2 = setcode2 & 0xf000;
 	while(setcode2) {
-		if ((setcode2 & 0xfff) == settype2 && (setcode2 & 0xf000 & setsubtype2) == setsubtype2)
+		if ((setcode2 & 0xfff) == settype && (setcode2 & 0xf000 & setsubtype) == setsubtype)
 			return TRUE;
 		setcode2 = setcode2 >> 16;
 	}
