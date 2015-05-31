@@ -2308,11 +2308,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 			core.spsummon_once_map[sumplayer][*cit]++;
 		card_set cset;
 		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
-			(*cit)->set_status(STATUS_SUMMONING, TRUE);
 			if(!(*cit)->is_affected_by_effect(EFFECT_CANNOT_DISABLE_SPSUMMON)) {
 				raise_single_event(*cit, 0, EVENT_SPSUMMON, (*cit)->current.reason_effect, 0, (*cit)->current.reason_player, (*cit)->summon_player, 0);
 				cset.insert(*cit);
 			}
+			(*cit)->set_status(STATUS_SUMMONING, TRUE);
 		}
 		if(cset.size())
 			raise_event(&cset, EVENT_SPSUMMON, core.units.begin()->peffect, 0, sumplayer, PLAYER_NONE, 0);
