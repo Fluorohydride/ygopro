@@ -2093,7 +2093,7 @@ int32 card::is_setable_szone(uint8 playerid, uint8 ignore_fd) {
 	return TRUE;
 }
 int32 card::is_affect_by_effect(effect* peffect) {
-	if(is_status(STATUS_SUMMONING))
+	if(!(!peffect || (peffect->flag & EFFECT_FLAG_IGNORE_RANGE)) & is_status(STATUS_SUMMONING))
 		return FALSE;
 	if(!peffect || (peffect->flag & EFFECT_FLAG_IGNORE_IMMUNE))
 		return TRUE;
