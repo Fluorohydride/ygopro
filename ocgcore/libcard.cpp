@@ -18,8 +18,12 @@ int32 scriptlib::card_get_code(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->get_code());
-	lua_pushinteger(L, pcard->get_another_code());
-	return 2;
+	uint32 otcode = pcard->get_another_code();
+	if(otcode) {
+		lua_pushinteger(L, otcode);
+		return 2;
+	}
+	return 1;
 }
 int32 scriptlib::card_get_origin_code(lua_State *L) {
 	check_param_count(L, 1);
@@ -444,12 +448,20 @@ int32 scriptlib::card_is_code(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	uint32 tcode = lua_tointeger(L, 2);
+	uint32 code1 = pcard->get_code();
 	uint32 code2 = pcard->get_another_code();
-	if(pcard->get_code() == tcode || (code2 && code2 == tcode))
-		lua_pushboolean(L, 1);
-	else
-		lua_pushboolean(L, 0);
+	uint32 count = lua_gettop(L) - 1;
+	uint32 result = FALSE;
+	for(uint32 i = 0; i < count; ++i) {
+		if(lua_isnil(L, i + 2))
+			continue;
+		uint32 tcode = lua_tointeger(L, i + 2);
+		if(code1 == tcode || (code2 && code2 == tcode)) {
+			result = TRUE;
+			break;
+		}
+	}
+	lua_pushboolean(L, result);
 	return 1;
 }
 int32 scriptlib::card_is_type(lua_State *L) {

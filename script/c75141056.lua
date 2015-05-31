@@ -13,8 +13,7 @@ function c75141056.tgfilter(c)
 	return c:IsFaceup() and Duel.IsExistingMatchingCard(c75141056.cfilter,c:GetControler(),LOCATION_DECK,0,1,nil,c)
 end
 function c75141056.cfilter(c,tc)
-	local code1,code2=tc:GetCode()
-	return c:IsSetCard(0x3008) and not c:IsCode(code1) and not c:IsCode(code2) and c:IsAbleToGrave()
+	return c:IsSetCard(0x3008) and not c:IsCode(tc:GetCode()) and c:IsAbleToGrave()
 end
 function c75141056.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c75141056.tgfilter(chkc) end
@@ -36,7 +35,7 @@ function c75141056.activate(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetValue(gc:GetCode())
 			tc:RegisterEffect(e1)
 		end
-	elseif IsPlayerCanDiscardDeck(tp,1) then
+	elseif Duel.IsPlayerCanDiscardDeck(tp,1) then
 		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		Duel.ConfirmCards(1-tp,cg)
 		Duel.ConfirmCards(tp,cg)
