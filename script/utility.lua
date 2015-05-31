@@ -165,6 +165,8 @@ end
 function Auxiliary.XyzAlterFilter(c,alterf,xyzc)
 	return alterf(c) and c:IsCanBeXyzMaterial(xyzc)
 end
+--Xyz monster, lv k*n
+--set c.xyz_filter, c.xyz_count
 function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	if c.xyz_filter==nil then
 		local code=c:GetOriginalCode()
@@ -192,6 +194,7 @@ function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	e1:SetValue(SUMMON_TYPE_XYZ)
 	c:RegisterEffect(e1)
 end
+--Xyz Summon(normnal)
 function Auxiliary.XyzCondition(f,lv,minc,maxc)
 	--og: use special material
 	return	function(e,c,og)
@@ -231,6 +234,7 @@ function Auxiliary.XyzOperation(f,lv,minc,maxc)
 				end
 			end
 end
+--Xyz summon(alterf)
 function Auxiliary.XyzCondition2(f,lv,minc,maxc,alterf,desc,op)
 	return	function(e,c,og)
 				if c==nil then return true end
@@ -1044,6 +1048,7 @@ function Auxiliary.RPEOperation2(filter)
 				end
 			end
 end
+--add procedure to Pendulum monster
 function Auxiliary.AddPendulumProcedure(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -1109,11 +1114,6 @@ end
 --card effect disable filter(target)
 function Auxiliary.disfilter1(c)
 	return c:IsFaceup() and not c:IsDisabled() and (not c:IsType(TYPE_NORMAL) or bit.band(c:GetOriginalType(),TYPE_EFFECT)~=0)
-end
---reset op of chain attack
-function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
-	local e1=e:GetLabelObject()
-	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
 end
 --condition of EVENT_BATTLE_DESTROYING
 function Auxiliary.bdcon(e,tp,eg,ep,ev,re,r,rp)
