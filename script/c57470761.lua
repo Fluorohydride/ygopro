@@ -65,16 +65,30 @@ function c57470761.activate(e,tp,eg,ep,ev,re,r,rp)
 		e6:SetCondition(c57470761.atkcon)
 		c:RegisterEffect(e6)
 		local e7=Effect.CreateEffect(c)
-		e7:SetCategory(CATEGORY_DESTROY)
-		e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-		e7:SetCode(EVENT_PHASE+PHASE_END)
+		e7:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e7:SetCode(EVENT_BATTLE_START)
 		e7:SetRange(LOCATION_SZONE)
-		e7:SetCountLimit(1)
-		e7:SetCondition(c57470761.descon)
-		e7:SetTarget(c57470761.destg)
-		e7:SetOperation(c57470761.desop)
+		e7:SetOperation(c57470761.regop)
 		e7:SetReset(RESET_EVENT+0x1fe0000)
 		c:RegisterEffect(e7)
+		local e8=Effect.CreateEffect(c)
+		e8:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e8:SetCode(EVENT_EQUIP)
+		e8:SetRange(LOCATION_SZONE)
+		e8:SetOperation(c57470761.resetop)
+		e8:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(e8)
+		local e9=Effect.CreateEffect(c)
+		e9:SetCategory(CATEGORY_DESTROY)
+		e9:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
+		e9:SetCode(EVENT_PHASE+PHASE_END)
+		e9:SetRange(LOCATION_SZONE)
+		e9:SetCountLimit(1)
+		e9:SetCondition(c57470761.descon)
+		e9:SetTarget(c57470761.destg)
+		e9:SetOperation(c57470761.desop)
+		e9:SetReset(RESET_EVENT+0x1fe0000)
+		c:RegisterEffect(e9)
 	end
 end
 function c57470761.eqlimit(e,c)
@@ -86,9 +100,23 @@ end
 function c57470761.atkcon(e)
 	return e:GetHandler():GetEquipTarget():IsDirectAttacked()
 end
+function c57470761.regop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local ec=c:GetEquipTarget()
+	if not ec:IsRelateToBattle() then return end
+	local bc=ec:GetBattleTarget()
+	if bc and bc:IsControler(1-tp) then
+		c:RegisterFlagEffect(57470761,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,0,1)
+	end
+end
+function c57470761.resetop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	if eg:IsContains(c) then
+		c:ResetFlagEffect(57470761)
+	end
+end
 function c57470761.descon(e,tp,eg,ep,ev,re,r,rp)
-	local ec=e:GetHandler():GetEquipTarget()
-	return ec and ec:GetAttackedGroupCount()>0
+	return e:GetHandler():GetFlagEffect(57470761)~=0
 end
 function c57470761.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
