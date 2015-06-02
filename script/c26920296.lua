@@ -48,12 +48,12 @@ end
 function c26920296.cfilter(c,type)
 	return c:IsFaceup() and c:IsType(type)
 end
-function c26920296.drcfilter(c)
-	return c:IsPreviousLocation(LOCATION_HAND+LOCATION_MZONE) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT)
+function c26920296.drcfilter(c,tp)
+	return c:IsPreviousLocation(LOCATION_HAND+LOCATION_MZONE) and c:IsType(TYPE_MONSTER) and c:GetPreviousControler()==tp
 end
 function c26920296.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c26920296.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_FUSION)
-		and eg:IsExists(c26920296.drcfilter,1,nil)
+		and eg:IsExists(c26920296.drcfilter,1,nil,tp)
 end
 function c26920296.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
