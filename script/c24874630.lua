@@ -39,12 +39,15 @@ function c24874630.activate(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetCountLimit(1)
-	e3:SetOperation(c24874630.rtcost)
+	e3:SetCondition(c24874630.descon)
+	e3:SetOperation(c24874630.desop)
 	e3:SetReset(RESET_EVENT+0x1fe0000)
 	token:RegisterEffect(e3,true)
 end
-function c24874630.rtcost(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
+function c24874630.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
+function c24874630.desop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLP(tp)>1000 and Duel.SelectYesNo(tp,aux.Stringid(24874630,0)) then
 		Duel.PayLPCost(tp,1000)
 	else

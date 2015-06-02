@@ -24,6 +24,7 @@ function c51670553.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetCountLimit(1)
 	e3:SetRange(LOCATION_SZONE)
+	e3:SetCondition(c51670553.descon)
 	e3:SetOperation(c51670553.desop)
 	c:RegisterEffect(e3)
 end
@@ -65,8 +66,10 @@ function c51670553.skipdp(e)
 	local tc=e:GetHandler():GetFirstCardTarget()
 	return tc and c51670553.filter(tc)
 end
+function c51670553.descon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==Duel.GetTurnPlayer()
+end
 function c51670553.desop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

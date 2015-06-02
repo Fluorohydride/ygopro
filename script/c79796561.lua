@@ -32,13 +32,15 @@ function c79796561.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		e1:SetLabelObject(tc)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c79796561.retcon)
 		e1:SetOperation(c79796561.retop)
 		Duel.RegisterEffect(e1,tp)
 		Duel.Damage(1-tp,600,REASON_EFFECT)
 	end
 end
+function c79796561.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c79796561.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.ReturnToField(e:GetLabelObject())
-	end
+	Duel.ReturnToField(e:GetLabelObject())
 end

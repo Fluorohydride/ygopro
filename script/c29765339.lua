@@ -38,12 +38,15 @@ function c29765339.operation(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
-	e1:SetOperation(c29765339.tohand)
+	e1:SetCondition(c29765339.thcon)
+	e1:SetOperation(c29765339.thop)
 	e1:SetLabel(0)
 	tg:RegisterEffect(e1)
 end
-function c29765339.tohand(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
+function c29765339.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
+function c29765339.thop(e,tp,eg,ep,ev,re,r,rp)
 	local ct=e:GetLabel()
 	if ct==1 then
 		Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)

@@ -34,6 +34,7 @@ function c22318971.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c22318971.retcon)
 		e1:SetOperation(c22318971.retop)
 		Duel.RegisterEffect(e1,tp)
 		local ac=Duel.GetFirstTarget()
@@ -46,8 +47,9 @@ function c22318971.operation(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function c22318971.retcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c22318971.retop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()==tp then
-		Duel.ReturnToField(e:GetOwner())
-	end
+	Duel.ReturnToField(e:GetOwner())
 end

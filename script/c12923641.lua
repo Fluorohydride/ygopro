@@ -31,6 +31,7 @@ function c12923641.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e2:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e2:SetCountLimit(1)
 	e2:SetRange(LOCATION_SZONE)
+	e2:SetCondition(c12923641.descon)
 	e2:SetOperation(c12923641.desop)
 	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	c:RegisterEffect(e2)
@@ -42,8 +43,10 @@ function c12923641.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.ChangePosition(g,POS_FACEDOWN_DEFENCE)
 	end
 end
+function c12923641.descon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c12923641.desop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

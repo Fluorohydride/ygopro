@@ -27,6 +27,7 @@ function c61740673.initial_effect(c)
 	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCountLimit(1)
+	e4:SetCondition(c61740673.mtcon)
 	e4:SetOperation(c61740673.mtop)
 	c:RegisterEffect(e4)
 end
@@ -39,8 +40,10 @@ function c61740673.disoperation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.NegateEffect(ev)
 	end
 end
+function c61740673.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c61740673.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>700 and Duel.SelectYesNo(tp,aux.Stringid(61740673,0)) then
 		Duel.PayLPCost(tp,700)
 	else

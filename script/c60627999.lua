@@ -13,7 +13,7 @@ function c60627999.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_SZONE)
 	e2:SetCode(EFFECT_SELF_DESTROY)
-	e2:SetCondition(c60627999.descon)
+	e2:SetCondition(c60627999.sdescon)
 	c:RegisterEffect(e2)
 	--disable spsummon
 	local e3=Effect.CreateEffect(c)
@@ -36,12 +36,15 @@ function c60627999.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
 	e1:SetRange(LOCATION_SZONE)
+	e1:SetCondition(c60627999.descon)
 	e1:SetOperation(c60627999.desop)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	c:RegisterEffect(e1)
 end
+function c60627999.descon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==Duel.GetTurnPlayer()
+end
 function c60627999.desop(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1
@@ -50,7 +53,7 @@ function c60627999.desop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Destroy(c,REASON_EFFECT)
 	end
 end
-function c60627999.descon(e)
+function c60627999.sdescon(e)
 	return Duel.IsExistingMatchingCard(Card.IsType,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,e:GetHandler(),TYPE_SPELL+TYPE_TRAP)
 end
 function c60627999.acttg(e,c)

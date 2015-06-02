@@ -35,6 +35,7 @@ function c17874674.initial_effect(c)
 	e4:SetRange(LOCATION_SZONE)
 	e4:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e4:SetCountLimit(1)
+	e4:SetCondition(c17874674.costcon)
 	e4:SetOperation(c17874674.costop)
 	c:RegisterEffect(e4)
 end
@@ -92,8 +93,10 @@ function c17874674.ctarget(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetHandler():GetFirstCardTarget()
 	if tc then e:GetHandler():CancelCardTarget(tc) end
 end
+function c17874674.costcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c17874674.costop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.CheckLPCost(tp,500) and Duel.SelectYesNo(tp,aux.Stringid(17874674,1)) then
 		Duel.PayLPCost(tp,500)
 	else

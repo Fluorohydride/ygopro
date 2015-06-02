@@ -73,12 +73,15 @@ function c31801517.spop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 	end
 	e1:SetCountLimit(1)
+	e1:SetCondition(c31801517.spcon2)
 	e1:SetOperation(c31801517.spop2)
 	c:RegisterEffect(e1)
 	c:SetTurnCounter(0)
 end
+function c31801517.spcon2(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c31801517.spop2(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1
