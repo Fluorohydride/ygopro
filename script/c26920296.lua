@@ -11,7 +11,7 @@ function c26920296.initial_effect(c)
 	e2:SetDescription(aux.Stringid(26920296,0))
 	e2:SetCategory(CATEGORY_DRAW)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_DELAY+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetRange(LOCATION_FZONE)
 	e2:SetCountLimit(1)
@@ -48,12 +48,12 @@ end
 function c26920296.cfilter(c,type)
 	return c:IsFaceup() and c:IsType(type)
 end
-function c26920296.drcfilter(c)
-	return c:IsPreviousLocation(LOCATION_HAND+LOCATION_MZONE) and c:IsType(TYPE_MONSTER) and c:IsReason(REASON_EFFECT)
+function c26920296.drcfilter(c,tp)
+	return c:IsPreviousLocation(LOCATION_HAND+LOCATION_MZONE) and c:IsType(TYPE_MONSTER) and c:GetPreviousControler()==tp
 end
 function c26920296.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c26920296.cfilter,tp,LOCATION_MZONE,0,1,nil,TYPE_FUSION)
-		and eg:IsExists(c26920296.drcfilter,1,nil)
+		and eg:IsExists(c26920296.drcfilter,1,nil,tp)
 end
 function c26920296.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
