@@ -55,7 +55,7 @@ function c11662742.dmop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:GetControler()~=ep then return end
 	if bit.band(r,REASON_BATTLE)~=0 then
-		c:RegisterFlagEffect(11662742,RESET_PHASE+RESET_DAMAGE,0,0)
+		c:RegisterFlagEffect(11662742,RESET_PHASE+RESET_DAMAGE,0,1)
 	elseif Duel.GetCurrentPhase()==PHASE_DAMAGE and not Duel.IsDamageCalculated() then
 		c:RegisterFlagEffect(11662743,RESET_PHASE+RESET_DAMAGE,0,1)
 	end
