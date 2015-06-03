@@ -8,6 +8,7 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
+#include <io.h>
 
 #ifndef WIN32
 #include <sys/types.h>
@@ -21,6 +22,9 @@ namespace ygo {
 Game* mainGame;
 
 bool Game::Initialize() {
+	_finddata_t fdata;
+	long fhandle;
+	char fpath[1000] = "expansions\\";
 	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -56,6 +60,17 @@ bool Game::Initialize() {
 		return false;
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
+	fhandle = _findfirst("expansions\\*.cdb", &fdata);
+	if(fhandle != -1) {
+		strcat(fpath, fdata.name);
+		dataManager.LoadDB(fpath);
+		while(_findnext(fhandle, &fdata) != -1) {
+			strcpy(fpath, "expansions\\");
+			strcat(fpath, fdata.name);
+			dataManager.LoadDB(fpath);
+		}
+		_findclose(fhandle);
+	}
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
