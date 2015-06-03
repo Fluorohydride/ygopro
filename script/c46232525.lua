@@ -37,10 +37,11 @@ function c46232525.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=g:GetFirst()
 	if tc and not tc:IsImmuneToEffect(e) then
 		if tc:IsFacedown() then Duel.ConfirmCards(1-tp,tc) end
+		local race=tc:GetRace()
 		Duel.SendtoGrave(tc,REASON_EFFECT)
 		if not tc:IsLocation(LOCATION_GRAVE) then return end
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-		local sg=Duel.SelectMatchingCard(tp,c46232525.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc:GetRace())
+		local sg=Duel.SelectMatchingCard(tp,c46232525.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,race)
 		local sc=sg:GetFirst()
 		if sc then
 			Duel.BreakEffect()

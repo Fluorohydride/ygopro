@@ -3,6 +3,7 @@ function c44811425.initial_effect(c)
 	--flip
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
+	e1:SetCode(EVENT_FLIP)
 	e1:SetOperation(c44811425.flipop)
 	c:RegisterEffect(e1)
 	--draw
