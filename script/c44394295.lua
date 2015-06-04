@@ -88,6 +88,9 @@ function c44394295.activate(e,tp,eg,ep,ev,re,r,rp)
 			Duel.ConfirmCards(1-tp,cg1)
 			Duel.ConfirmCards(1-tp,cg2)
 			Duel.ShuffleHand(tp)
+			if bit.band(loc,LOCATION_DECK)==LOCATION_DECK then
+				Duel.ShuffleDeck(tp)
+			end
 		end
 	end
 end
