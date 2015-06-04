@@ -10,5 +10,5 @@ function c55401221.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c55401221.atlimit(e,c)
-	return return c:IsFaceup() and c:IsRace(RACE_THUNDER) and c:GetCode()~=55401221
+	return c:IsFaceup() and c:IsRace(RACE_THUNDER) and c:GetCode()~=55401221
 end
