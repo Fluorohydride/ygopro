@@ -16,10 +16,11 @@ function c12181376.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c12181376.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
 end
 function c12181376.activate(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
 	local g=Duel.GetMatchingGroup(c12181376.filter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 	local tc=g:GetFirst()
 	while tc do
-		local e1=Effect.CreateEffect(e:GetHandler())
+		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
 		e1:SetValue(2700)
@@ -27,14 +28,13 @@ function c12181376.activate(e,tp,eg,ep,ev,re,r,rp)
 		tc:RegisterEffect(e1)
 		tc=g:GetNext()
 	end
-	local c=e:GetHandler()
-	--cannot trigger
+	--cannot activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
-	e1:SetCode(EFFECT_CANNOT_TRIGGER)
-	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
-	e1:SetTargetRange(0,LOCATION_SZONE)
-	e1:SetTarget(c12181376.distg)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetCode(EFFECT_CANNOT_ACTIVATE)
+	e1:SetTargetRange(0,1)
+	e1:SetValue(c12181376.aclimit)
 	e1:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e1,tp)
 	--disable
@@ -53,6 +53,9 @@ function c12181376.activate(e,tp,eg,ep,ev,re,r,rp)
 	e3:SetTarget(c12181376.distg)
 	e3:SetReset(RESET_PHASE+PHASE_END)
 	Duel.RegisterEffect(e3,tp)
+end
+function c12181376.aclimit(e,re,tp)
+	return re:IsActiveType(TYPE_TRAP)
 end
 function c12181376.distg(e,c)
 	return c:IsType(TYPE_TRAP)
