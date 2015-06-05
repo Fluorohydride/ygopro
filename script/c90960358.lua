@@ -65,7 +65,7 @@ function c90960358.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	Duel.Release(g,REASON_COST)
 end
 function c90960358.sfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c90960358.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c90960358.sfilter,1,nil)
