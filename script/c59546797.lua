@@ -27,7 +27,7 @@ function c59546797.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c59546797.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_BATTLE
+	return Duel.GetCurrentPhase()==PHASE_BATTLE and not Duel.CheckTiming(TIMING_BATTLE_START) and not Duel.CheckTiming(TIMING_BATTLE_END)
 end
 function c59546797.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
@@ -38,6 +38,8 @@ function c59546797.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		Duel.Recover(tp,1000,REASON_EFFECT)
+	else
+		Duel.SendtoGrave(c,REASON_RULE)
 	end
 end
 function c59546797.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)

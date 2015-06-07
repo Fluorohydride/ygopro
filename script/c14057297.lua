@@ -1,6 +1,6 @@
 --死なばもろとも
 function c14057297.initial_effect(c)
-	--draw
+	--Activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_TODECK+CATEGORY_DRAW)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
@@ -31,7 +31,7 @@ function c14057297.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g2=Duel.SelectMatchingCard(1-tp,aux.TRUE,tp,0,LOCATION_HAND,ct2,ct2,nil)
 	g1:Merge(g2)
 	local count=Duel.SendtoDeck(g1,nil,1,REASON_EFFECT)
-	if count>1 then
+	if count>0 then
 		Duel.BreakEffect()
 		local lp=Duel.GetLP(tp)
 		if lp<=count*300 then
@@ -39,6 +39,7 @@ function c14057297.activate(e,tp,eg,ep,ev,re,r,rp)
 		else
 			Duel.SetLP(tp,lp-count*300)
 		end
+		if lp==0 then return end
 		Duel.Draw(tp,5,REASON_EFFECT)
 		Duel.Draw(1-tp,5,REASON_EFFECT)
 	end
