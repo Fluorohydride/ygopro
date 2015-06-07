@@ -38,7 +38,7 @@ function c59546797.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		Duel.Recover(tp,1000,REASON_EFFECT)
-	else
+	elseif Duel.IsPlayerCanSpecialSummon(tp) then
 		Duel.SendtoGrave(c,REASON_RULE)
 	end
 end
