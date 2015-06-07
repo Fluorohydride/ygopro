@@ -17,8 +17,7 @@ function c10000050.initial_effect(c)
 	c:RegisterEffect(e2)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetCode(EFFECT_LIMIT_SET_PROC)
-	e3:SetCondition(c10000050.setcon)
+	e3:SetCode(EFFECT_CANNOT_MSET)
 	c:RegisterEffect(e3)
 	local e4=Effect.CreateEffect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
@@ -53,47 +52,30 @@ function c10000050.initial_effect(c)
 	e8:SetTarget(c10000050.sptg)
 	e8:SetOperation(c10000050.spop)
 	c:RegisterEffect(e8)
-	local e9=Effect.CreateEffect(c)
-	e9:SetType(EFFECT_TYPE_FIELD)
-	e9:SetCode(EFFECT_EXTRA_RELEASE)
-	e9:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE+EFFECT_FLAG_SET_AVAILABLE)
-	e9:SetRange(LOCATION_HAND)
-	e9:SetTargetRange(0,LOCATION_MZONE)
-	e9:SetCondition(c10000050.check)
-	c:RegisterEffect(e9)
-end
-function c10000050.check(e)
-	return e:GetHandler():GetFlagEffect(10000050)~=0
 end
 function c10000050.ttcon(e,c)
 	if c==nil then return true end
-	local b1=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3 and Duel.GetTributeCount(c)>=3
-	c:RegisterFlagEffect(10000050,0,0,1)
-	local g=Duel.GetFieldGroup(c:GetControler(),0,LOCATION_MZONE)
-	local b2=Duel.GetLocationCount(1-c:GetControler(),LOCATION_MZONE)>-3 and Duel.GetTributeCount(c,g)>=3
-	c:ResetFlagEffect(10000050)
-	return b1 or b2
+	local tp=c:GetControler()
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_MZONE)
+	return (Duel.GetLocationCount(tp,LOCATION_MZONE)>-3 and Duel.GetTributeCount(c)>=3)
+		or (Duel.GetLocationCount(1-tp,LOCATION_MZONE)>-3 and Duel.IsExistingMatchingCard(Card.IsReleasable,c:GetControler(),0,LOCATION_MZONE,3,nil))
 end
 function c10000050.ttop(e,tp,eg,ep,ev,re,r,rp,c)
-	local c=e:GetHandler()
 	local b1=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)>-3 and Duel.GetTributeCount(c)>=3
-	c:RegisterFlagEffect(10000050,0,0,1)
 	local g=Duel.GetFieldGroup(c:GetControler(),0,LOCATION_MZONE)
-	local b2=Duel.GetLocationCount(1-c:GetControler(),LOCATION_MZONE)>-3 and Duel.GetTributeCount(c,g)>=3
+	local b2=Duel.GetLocationCount(1-c:GetControler(),LOCATION_MZONE)>-3 and Duel.IsExistingMatchingCard(Card.IsReleasable,c:GetControler(),0,LOCATION_MZONE,3,nil)
 	local op=0
 	if b1 and b2 then op=Duel.SelectOption(tp,aux.Stringid(10000050,0),aux.Stringid(10000050,1))
 	elseif b1 then op=Duel.SelectOption(tp,aux.Stringid(10000050,0))
 	else op=Duel.SelectOption(tp,aux.Stringid(10000050,1))+1 end
 	if op==0 then
-		c:ResetFlagEffect(10000050)
 		local mg=Duel.SelectTribute(tp,c,3,3)
 		c:SetMaterial(mg)
 		Duel.Release(mg,REASON_SUMMON+REASON_MATERIAL)
 	else
-		local mg=Duel.SelectTribute(tp,c,3,3,g)
-		c:SetMaterial(mg)
-		Duel.Release(mg,REASON_SUMMON+REASON_MATERIAL)
-		c:ResetFlagEffect(10000050)
+		local sg=Duel.SelectMatchingCard(tp,Card.IsReleasable,tp,0,LOCATION_MZONE,3,3,nil)
+		c:SetMaterial(sg)
+		Duel.Release(sg,REASON_SUMMON+REASON_MATERIAL)
 		e:SetProperty(EFFECT_FLAG_SPSUM_PARAM)
 		e:SetTargetRange(POS_FACEUP_ATTACK,1)
 	end
