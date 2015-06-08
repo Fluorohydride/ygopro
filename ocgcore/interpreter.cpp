@@ -14,6 +14,7 @@
 #include "scriptlib.h"
 #include "ocgapi.h"
 #include "interpreter.h"
+#include <io.h>
 
 static const struct luaL_Reg cardlib[] = {
 	{ "GetCode", scriptlib::card_get_code },
@@ -544,6 +545,25 @@ interpreter::interpreter(duel* pd): coroutines(256) {
 	//extra scripts
 	load_script((char*) "./script/constant.lua");
 	load_script((char*) "./script/utility.lua");
+	//expansions
+	_finddata_t fdata;
+	long fhandle;
+	char fpath[1000];
+	char script_name[255];
+	fhandle = _findfirst("expansions\\*.cdb", &fdata);
+	if(fhandle != -1) {
+		strcpy(fpath, fdata.name);
+		fpath[strlen(fpath)-4]='\0';
+		sprintf(script_name, "./expansions/%s/%s.lua",fpath,fpath);
+		load_script(script_name);
+		while(_findnext(fhandle, &fdata) != -1) {
+			strcpy(fpath, fdata.name);
+			fpath[strlen(fpath)-4]='\0';
+			sprintf(script_name, "./expansions/%s/%s.lua",fpath,fpath);
+			load_script(script_name);
+		}
+		_findclose(fhandle);
+	}
 }
 interpreter::~interpreter() {
 	lua_close(lua_state);
@@ -658,7 +678,31 @@ int32 interpreter::load_card_script(uint32 code) {
 		lua_rawset(current_state, -3);
 		//load extra scripts
 		sprintf(script_name, "./script/c%d.lua", code);
+		//expansions
 		if (!load_script(script_name)) {
+			_finddata_t fdata;
+			long fhandle;
+			char fpath[1000];
+			fhandle = _findfirst("expansions\\*.cdb", &fdata);
+			if(fhandle != -1) {
+				strcpy(fpath, fdata.name);
+				fpath[strlen(fpath)-4]='\0';
+				sprintf(script_name, "./expansions/%s/script/c%d.lua",fpath,code);
+				if (load_script(script_name)) {
+					_findclose(fhandle);
+					return OPERATION_SUCCESS;
+				}
+				while(_findnext(fhandle, &fdata) != -1) {
+					strcpy(fpath, fdata.name);
+					fpath[strlen(fpath)-4]='\0';
+					sprintf(script_name, "./expansions/%s/script/c%d.lua",fpath,code);
+					if (load_script(script_name)) {
+						_findclose(fhandle);
+						return OPERATION_SUCCESS;
+					}
+				}
+				_findclose(fhandle);
+			}
 			return OPERATION_FAIL;
 		}
 	}
