@@ -55,7 +55,7 @@ function c12181376.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function c12181376.aclimit(e,re,tp)
-	return re:IsActiveType(TYPE_TRAP)
+	return re:IsHasType(EFFECT_TYPE_ACTIVATE) and re:IsActiveType(TYPE_TRAP)
 end
 function c12181376.distg(e,c)
 	return c:IsType(TYPE_TRAP)
