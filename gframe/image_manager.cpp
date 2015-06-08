@@ -1,4 +1,5 @@
 #include "image_manager.h"
+#include <io.h>
 
 namespace ygo {
 
@@ -57,6 +58,27 @@ irr::video::ITexture* ImageManager::GetTexture(int code) {
 		char file[256];
 		sprintf(file, "pics/%d.jpg", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		//expansions
+		if(img == NULL) {
+			_finddata_t fdata;
+			long fhandle;
+			char fpath[1000];
+			char file2[256];
+			fhandle = _findfirst("expansions\\*.cdb", &fdata);
+			if(fhandle != -1) {
+				strcpy(fpath, fdata.name);
+				fpath[strlen(fpath)-4]='\0';
+				sprintf(file2, "./expansions/%s/%s",fpath,file);
+				img = driver->getTexture(file2);
+				while(_findnext(fhandle, &fdata) != -1 && img == NULL) {
+					strcpy(fpath, fdata.name);
+					fpath[strlen(fpath)-4]='\0';
+					sprintf(file2, "./expansions/%s/%s",fpath,file);
+					img = driver->getTexture(file2);
+				}
+				_findclose(fhandle);
+			}
+		}
 		if(img == NULL) {
 			tMap[code] = NULL;
 			return GetTextureThumb(code);
@@ -78,6 +100,27 @@ irr::video::ITexture* ImageManager::GetTextureThumb(int code) {
 		char file[256];
 		sprintf(file, "pics/thumbnail/%d.jpg", code);
 		irr::video::ITexture* img = driver->getTexture(file);
+		//expansions
+		if(img == NULL) {
+			_finddata_t fdata;
+			long fhandle;
+			char fpath[1000];
+			char file2[256];
+			fhandle = _findfirst("expansions\\*.cdb", &fdata);
+			if(fhandle != -1) {
+				strcpy(fpath, fdata.name);
+				fpath[strlen(fpath)-4]='\0';
+				sprintf(file2, "./expansions/%s/%s",fpath,file);
+				img = driver->getTexture(file2);
+				while(_findnext(fhandle, &fdata) != -1 && img == NULL) {
+					strcpy(fpath, fdata.name);
+					fpath[strlen(fpath)-4]='\0';
+					sprintf(file2, "./expansions/%s/%s",fpath,file);
+					img = driver->getTexture(file2);
+				}
+				_findclose(fhandle);
+			}
+		}
 		if(img == NULL) {
 			tThumb[code] = NULL;
 			return tUnknown;
