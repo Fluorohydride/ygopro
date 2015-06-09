@@ -678,13 +678,23 @@ int32 interpreter::load_card_script(uint32 code) {
 		lua_rawset(current_state, -3);
 		//load extra scripts
 		sprintf(script_name, "./script/c%d.lua", code);
+		if (load_script(script_name)) {
+			return OPERATION_SUCCESS;
+		}
 		//expansions
-		if (!load_script(script_name)) {
-			_finddata_t fdata;
-			long fhandle;
-			char fpath[1000];
-			fhandle = _findfirst("expansions\\*.cdb", &fdata);
-			if(fhandle != -1) {
+		_finddata_t fdata;
+		long fhandle;
+		char fpath[1000];
+		fhandle = _findfirst("expansions\\*.cdb", &fdata);
+		if(fhandle != -1) {
+			strcpy(fpath, fdata.name);
+			fpath[strlen(fpath)-4]='\0';
+			sprintf(script_name, "./expansions/%s/script/c%d.lua",fpath,code);
+			if (load_script(script_name)) {
+				_findclose(fhandle);
+				return OPERATION_SUCCESS;
+			}
+			while(_findnext(fhandle, &fdata) != -1) {
 				strcpy(fpath, fdata.name);
 				fpath[strlen(fpath)-4]='\0';
 				sprintf(script_name, "./expansions/%s/script/c%d.lua",fpath,code);
@@ -692,19 +702,10 @@ int32 interpreter::load_card_script(uint32 code) {
 					_findclose(fhandle);
 					return OPERATION_SUCCESS;
 				}
-				while(_findnext(fhandle, &fdata) != -1) {
-					strcpy(fpath, fdata.name);
-					fpath[strlen(fpath)-4]='\0';
-					sprintf(script_name, "./expansions/%s/script/c%d.lua",fpath,code);
-					if (load_script(script_name)) {
-						_findclose(fhandle);
-						return OPERATION_SUCCESS;
-					}
-				}
-				_findclose(fhandle);
 			}
-			return OPERATION_FAIL;
+			_findclose(fhandle);
 		}
+		return OPERATION_FAIL;
 	}
 	return OPERATION_SUCCESS;
 }
