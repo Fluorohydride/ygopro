@@ -1894,8 +1894,11 @@ int32 scriptlib::duel_get_tribute_count(lua_State *L) {
 		check_param(L, PARAM_TYPE_GROUP, 2);
 		mg = *(group**) lua_touserdata(L, 2);
 	}
+	uint32 ex = 0;
+	if(lua_gettop(L) >= 3)
+		ex = lua_toboolean(L, 3);
 	duel* pduel = interpreter::get_duel_info(L);
-	lua_pushinteger(L, pduel->game_field->get_summon_release_list(target, 0, 0, 0, mg));
+	lua_pushinteger(L, pduel->game_field->get_summon_release_list(target, 0, 0, 0, mg, ex));
 	return 1;
 }
 int32 scriptlib::duel_select_tribute(lua_State *L) {
@@ -1913,11 +1916,14 @@ int32 scriptlib::duel_select_tribute(lua_State *L) {
 		check_param(L, PARAM_TYPE_GROUP, 5);
 		mg = *(group**) lua_touserdata(L, 5);
 	}
+	uint32 ex = 0;
+	if(lua_gettop(L) >= 6)
+		ex = lua_toboolean(L, 6);
 	duel* pduel = interpreter::get_duel_info(L);
 	pduel->game_field->core.release_cards.clear();
 	pduel->game_field->core.release_cards_ex.clear();
 	pduel->game_field->core.release_cards_ex_sum.clear();
-	pduel->game_field->get_summon_release_list(target, &pduel->game_field->core.release_cards, &pduel->game_field->core.release_cards_ex, &pduel->game_field->core.release_cards_ex_sum, mg);
+	pduel->game_field->get_summon_release_list(target, &pduel->game_field->core.release_cards, &pduel->game_field->core.release_cards_ex, &pduel->game_field->core.release_cards_ex_sum, mg, ex);
 	pduel->game_field->add_process(PROCESSOR_SELECT_TRIBUTE_S, 0, 0, 0, playerid, (max << 16) + min);
 	return lua_yield(L, 0);
 }
