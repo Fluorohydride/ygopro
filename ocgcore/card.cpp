@@ -1520,17 +1520,14 @@ void card::filter_disable_related_cards() {
 }
 int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ignore_count, uint8 min_tribute) {
 	effect_set eset;
-	effect* proc;
 	filter_effect(EFFECT_LIMIT_SUMMON_PROC, &eset);
-	if(eset.size() > 1)
-		return FALSE;
+	for(int32 i = 0; i < eset.size(); ++i)
+		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
+		        && pduel->game_field->is_player_can_summon(eset[i]->get_value(this), playerid, this))
+			peset->add_item(eset[i]);
 	if(eset.size()) {
-		proc = eset[0];
-		if(proc->check_count_limit(playerid) && is_summonable(proc, min_tribute)
-		        && pduel->game_field->is_player_can_summon(proc->get_value(this), playerid, this)) {
-			peset->add_item(eset[0]);
+		if(peset->size())
 			return -1;
-		}
 		return -2;
 	}
 	eset.clear();
@@ -1563,17 +1560,14 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 }
 int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore_count, uint8 min_tribute) {
 	effect_set eset;
-	effect* proc;
 	filter_effect(EFFECT_LIMIT_SET_PROC, &eset);
-	if(eset.size() > 1)
-		return FALSE;
+	for(int32 i = 0; i < eset.size(); ++i)
+		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
+		        && pduel->game_field->is_player_can_mset(eset[i]->get_value(this), playerid, this))
+			peset->add_item(eset[i]);
 	if(eset.size()) {
-		proc = eset[0];
-		if(proc->check_count_limit(playerid) && is_summonable(proc, min_tribute)
-		        && pduel->game_field->is_player_can_mset(proc->get_value(this), playerid, this)) {
-			peset->add_item(eset[0]);
+		if(peset->size())
 			return -1;
-		}
 		return -2;
 	}
 	eset.clear();
