@@ -38,7 +38,7 @@ function c10000080.initial_effect(c)
 	e5:SetCode(EVENT_PHASE+PHASE_END)
 	e5:SetRange(LOCATION_MZONE)
 	e5:SetCountLimit(1)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SET_AVAILABLE)
 	e5:SetCondition(c10000080.retcon)
 	e5:SetOperation(c10000080.retop)
 	c:RegisterEffect(e5)
@@ -77,6 +77,7 @@ function c10000080.ttop1(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectTribute(tp,c,3,3)
 	c:SetMaterial(g)
 	Duel.Release(g,REASON_SUMMON+REASON_MATERIAL)
+	c:RegisterFlagEffect(10000080,RESET_EVENT+0xfc0000,0,1)
 end
 function c10000080.ttcon2(e,c)
 	if c==nil then return true end
@@ -89,6 +90,7 @@ function c10000080.ttop2(e,tp,eg,ep,ev,re,r,rp,c)
 	local g=Duel.SelectTribute(tp,c,3,3,mg,true)
 	c:SetMaterial(g)
 	Duel.Release(g,REASON_SUMMON+REASON_MATERIAL)
+	c:RegisterFlagEffect(10000080,RESET_EVENT+0xfc0000,0,1)
 end
 function c10000080.setcon(e,c)
 	if not c then return true end
@@ -96,11 +98,10 @@ function c10000080.setcon(e,c)
 end
 function c10000080.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return bit.band(c:GetSummonType(),SUMMON_TYPE_NORMAL)~=0 and Duel.GetTurnCount()==c:GetTurnID()+1
+	return c:GetFlagEffect(10000080)~=0 and Duel.GetTurnCount()==c:GetTurnID()+1
 end
 function c10000080.retop(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	Duel.GetControl(c,c:GetOwner())
+	e:GetHandler():ResetEffect(EFFECT_SET_CONTROL,RESET_CODE)
 end
 function c10000080.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
