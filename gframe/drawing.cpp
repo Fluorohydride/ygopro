@@ -247,27 +247,51 @@ void Game::DrawMisc() {
 	im.setRotationRadians(act_rot);
 	matManager.mTexture.setTexture(0, imageManager.tAct);
 	driver->setMaterial(matManager.mTexture);
-	if(dField.deck_act) {
+	if(dField.deck_act[0]) {
 		im.setTranslation(vector3df(matManager.vFields[0].Pos.X - (matManager.vFields[0].Pos.X - matManager.vFields[1].Pos.X)/2,
 			matManager.vFields[0].Pos.Y - (matManager.vFields[0].Pos.Y - matManager.vFields[3].Pos.Y)/2, dField.deck[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.grave_act) {
+	if(dField.deck_act[1]) {
+		im.setTranslation(vector3df(matManager.vFields[68].Pos.X - (matManager.vFields[68].Pos.X - matManager.vFields[69].Pos.X)/2,
+			matManager.vFields[68].Pos.Y - (matManager.vFields[68].Pos.Y - matManager.vFields[71].Pos.Y)/2, dField.deck[1].size() * 0.01f + 0.02f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	if(dField.grave_act[0]) {
 		im.setTranslation(vector3df(matManager.vFields[4].Pos.X - (matManager.vFields[4].Pos.X - matManager.vFields[5].Pos.X)/2,
 			matManager.vFields[4].Pos.Y - (matManager.vFields[4].Pos.Y - matManager.vFields[6].Pos.Y)/2, dField.grave[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.remove_act) {
+	if(dField.grave_act[1]) {
+		im.setTranslation(vector3df(matManager.vFields[72].Pos.X - (matManager.vFields[72].Pos.X - matManager.vFields[73].Pos.X)/2,
+			matManager.vFields[72].Pos.Y - (matManager.vFields[72].Pos.Y - matManager.vFields[74].Pos.Y)/2, dField.grave[1].size() * 0.01f + 0.02f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	if(dField.remove_act[0]) {
 		im.setTranslation(vector3df(matManager.vFields[12].Pos.X - (matManager.vFields[12].Pos.X - matManager.vFields[13].Pos.X)/2,
 			matManager.vFields[12].Pos.Y - (matManager.vFields[12].Pos.Y - matManager.vFields[14].Pos.Y)/2, dField.remove[0].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
-	if(dField.extra_act) {
+	if(dField.remove_act[1]) {
+		im.setTranslation(vector3df(matManager.vFields[80].Pos.X - (matManager.vFields[80].Pos.X - matManager.vFields[81].Pos.X)/2,
+			matManager.vFields[80].Pos.Y - (matManager.vFields[80].Pos.Y - matManager.vFields[82].Pos.Y)/2, dField.remove[1].size() * 0.01f + 0.02f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	if(dField.extra_act[0]) {
 		im.setTranslation(vector3df(matManager.vFields[8].Pos.X - (matManager.vFields[8].Pos.X - matManager.vFields[9].Pos.X)/2,
 			matManager.vFields[8].Pos.Y - (matManager.vFields[8].Pos.Y - matManager.vFields[10].Pos.Y)/2, dField.extra[0].size() * 0.01f + 0.02f));
+		driver->setTransform(irr::video::ETS_WORLD, im);
+		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
+	}
+	if(dField.extra_act[1]) {
+		im.setTranslation(vector3df(matManager.vFields[76].Pos.X - (matManager.vFields[76].Pos.X - matManager.vFields[77].Pos.X)/2,
+			matManager.vFields[76].Pos.Y - (matManager.vFields[76].Pos.Y - matManager.vFields[78].Pos.Y)/2, dField.extra[1].size() * 0.01f + 0.02f));
 		driver->setTransform(irr::video::ETS_WORLD, im);
 		driver->drawVertexPrimitiveList(matManager.vActivate, 4, matManager.iRectangle, 2);
 	}
