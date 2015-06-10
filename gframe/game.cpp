@@ -24,7 +24,7 @@ Game* mainGame;
 bool Game::Initialize() {
 	_finddata_t fdata;
 	long fhandle;
-	char fpath[1000] = "expansions\\";
+	char fpath[1000] = "./expansions/";
 	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -60,12 +60,12 @@ bool Game::Initialize() {
 		return false;
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
-	fhandle = _findfirst("expansions\\*.cdb", &fdata);
+	fhandle = _findfirst("./expansions/*.cdb", &fdata);
 	if(fhandle != -1) {
 		strcat(fpath, fdata.name);
 		dataManager.LoadDB(fpath);
 		while(_findnext(fhandle, &fdata) != -1) {
-			strcpy(fpath, "expansions\\");
+			strcpy(fpath, "./expansions/");
 			strcat(fpath, fdata.name);
 			dataManager.LoadDB(fpath);
 		}
