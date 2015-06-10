@@ -1282,12 +1282,16 @@ int32 scriptlib::duel_disable_summon(lua_State *L) {
 	if(pcard) {
 		pcard->set_status(STATUS_SUMMONING, FALSE);
 		pcard->set_status(STATUS_SUMMON_DISABLED, TRUE);
-		pcard->set_status(STATUS_PROC_COMPLETE, FALSE);
+		if (!((pcard->summon_info) & 0xff00ffff) == SUMMON_TYPE_PENDULUM){
+			pcard->set_status(STATUS_PROC_COMPLETE, FALSE);
+		}
 	} else {
 		for(auto cit = pgroup->container.begin(); cit != pgroup->container.end(); ++cit) {
 			(*cit)->set_status(STATUS_SUMMONING, FALSE);
 			(*cit)->set_status(STATUS_SUMMON_DISABLED, TRUE);
-			(*cit)->set_status(STATUS_PROC_COMPLETE, FALSE);
+			if (!(((*cit)->summon_info) & 0xff00ffff) == SUMMON_TYPE_PENDULUM){
+				(*cit)->set_status(STATUS_PROC_COMPLETE, FALSE);
+			}
 		}
 	}
 	return 0;
