@@ -33,11 +33,13 @@ function c93108433.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	local ct=g:GetCount()
-	if ct>0 and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		g:AddCard(tc)
 		Duel.SendtoDeck(g,nil,2,REASON_EFFECT)
 		Duel.ShuffleDeck(tp)
-		Duel.BreakEffect()
-		Duel.Draw(tp,ct,REASON_EFFECT)
+		if ct>0 then
+			Duel.BreakEffect()
+			Duel.Draw(tp,ct,REASON_EFFECT)
+		end
 	end
 end

@@ -333,26 +333,34 @@ void ClientField::ClearChainSelect() {
 	std::vector<ClientCard*>::iterator cit;
 	for(cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
 		(*cit)->cmdFlag = 0;
+		(*cit)->conti_code = 0;
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
+		(*cit)->is_conti = false;
 	}
 	grave_act = false;
 	remove_act = false;
+	extra_act = false;
 }
-void ClientField::ShowSelectCard(bool buttonok) {
+void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 	if(selectable_cards.size() <= 5) {
 		int startpos = 30 + 125 * (5 - selectable_cards.size()) / 2;
 		for(size_t i = 0; i < selectable_cards.size(); ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else if(chain && selectable_cards[i]->is_conti)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->conti_code));
 			else
 				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
-					selectable_cards[i]->sequence + 1);
+				if(chain && selectable_cards[i]->is_conti)
+					myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				else
+					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);;
 				if(selectable_cards[i]->controler)
@@ -377,14 +385,19 @@ void ClientField::ShowSelectCard(bool buttonok) {
 		for(int i = 0; i < 5; ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
+			else if(chain && selectable_cards[i]->is_conti)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->conti_code));
 			else
 				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));
 			mainGame->btnCardSelect[i]->setPressed(false);
 			mainGame->btnCardSelect[i]->setVisible(true);
 			if(mainGame->dInfo.curMsg != MSG_SORT_CHAIN && mainGame->dInfo.curMsg != MSG_SORT_CARD) {
-				myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
-					selectable_cards[i]->sequence + 1);
+				if(chain && selectable_cards[i]->is_conti)
+					myswprintf(formatBuffer, L"%ls", DataManager::unknown_string);
+				else
+					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
+						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
 				mainGame->stCardPos[i]->setVisible(true);
 				if(selectable_cards[i]->controler)
