@@ -23,11 +23,6 @@ namespace ygo {
 Game* mainGame;
 
 bool Game::Initialize() {
-#ifdef _WIN32
-	_finddata_t fdata;
-	long fhandle;
-	char fpath[1000] = "./expansions/";
-#endif
 	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -64,16 +59,17 @@ bool Game::Initialize() {
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
 #ifdef _WIN32
-	fhandle = _findfirst("./expansions/*.cdb", &fdata);
-	if(fhandle != -1) {
-		strcat(fpath, fdata.name);
-		dataManager.LoadDB(fpath);
-		while(_findnext(fhandle, &fdata) != -1) {
-			strcpy(fpath, "./expansions/");
-			strcat(fpath, fdata.name);
-			dataManager.LoadDB(fpath);
-		}
-		_findclose(fhandle);
+	char fpath[1000];
+	WIN32_FIND_DATAW fdataw;
+	HANDLE fh = FindFirstFileW(L"./expansions/*.cdb", &fdataw);
+	if(fh != INVALID_HANDLE_VALUE) {
+		do {
+			if(!(fdataw.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)) {
+				sprintf(fpath, "./expansions/%ls", fdataw.cFileName);
+				dataManager.LoadDB(fpath);
+			}
+		} while(FindNextFileW(fh, &fdataw));
+		FindClose(fh);
 	}
 #else
         DIR * dir;
