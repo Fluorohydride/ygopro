@@ -3605,7 +3605,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attacker->current.reason_player = core.attack_target->current.controler;
 			dest = LOCATION_GRAVE;
 			seq = 0;
-			if((peffect = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT))) {
+			if((peffect = core.attack_target->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) && (core.attacker->data.type & TYPE_MONSTER)) {
 				dest = peffect->get_value(core.attacker);
 				seq = dest >> 16;
 				dest &= 0xffff;
@@ -3625,7 +3625,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.attack_target->current.reason_player = core.attacker->current.controler;
 			dest = LOCATION_GRAVE;
 			seq = 0;
-			if((peffect = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT))) {
+			if((peffect = core.attacker->is_affected_by_effect(EFFECT_BATTLE_DESTROY_REDIRECT)) && (core.attack_target->data.type & TYPE_MONSTER)) {
 				dest = peffect->get_value(core.attack_target);
 				seq = dest >> 16;
 				dest &= 0xffff;
