@@ -1401,7 +1401,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			returns.ivalue[0] = -1;
 			core.units.begin()->step = 1;
 			return FALSE;
-		} else if(tf_count + cn_count == 1 && to_count == 0 && fc_count == 0) {
+		} else if(tf_count == 0 && cn_count == 1 && to_count == 0 && fc_count == 0) {
 			returns.ivalue[0] = 0;
 			core.units.begin()->step = 1;
 			return FALSE;
@@ -1572,7 +1572,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			returns.ivalue[0] = -1;
 			core.units.begin()->step = 11;
 			return FALSE;
-		} else if(tf_count + cn_count == 1 && to_count == 0 && fc_count == 0) {
+		} else if(tf_count == 0 && cn_count == 1 && to_count == 0 && fc_count == 0) {
 			returns.ivalue[0] = 0;
 			core.units.begin()->step = 11;
 			return FALSE;
@@ -2273,7 +2273,7 @@ int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priori
 					}
 				}
 			}
-			if(core.current_chain.size() || (core.hint_timing[0]&TIMING_ATTACK) || (core.hint_timing[1]&TIMING_ATTACK))
+			if(core.current_chain.size() || (core.hint_timing[0] & TIMING_ATTACK) || (core.hint_timing[1] & TIMING_ATTACK))
 				core.spe_effect[priority] = core.select_chains.size();
 			if(!(core.duel_options & DUEL_NO_CHAIN_HINT) || core.select_chains.size())
 				add_process(PROCESSOR_SELECT_CHAIN, 0, 0, 0, priority, core.spe_effect[priority]);
