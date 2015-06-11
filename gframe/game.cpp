@@ -8,9 +8,10 @@
 #include "duelclient.h"
 #include "netserver.h"
 #include "single_mode.h"
-#include <io.h>
 
-#ifndef WIN32
+#ifdef _WIN32
+#include <io.h>
+#else
 #include <sys/types.h>
 #include <dirent.h>
 #endif
@@ -22,9 +23,11 @@ namespace ygo {
 Game* mainGame;
 
 bool Game::Initialize() {
+#ifdef _WIN32
 	_finddata_t fdata;
 	long fhandle;
 	char fpath[1000] = "./expansions/";
+#endif
 	srand(time(0));
 	LoadConfig();
 	irr::SIrrlichtCreationParameters params = irr::SIrrlichtCreationParameters();
@@ -60,6 +63,7 @@ bool Game::Initialize() {
 		return false;
 	if(!dataManager.LoadStrings("strings.conf"))
 		return false;
+#ifdef _WIN32
 	fhandle = _findfirst("./expansions/*.cdb", &fdata);
 	if(fhandle != -1) {
 		strcat(fpath, fdata.name);
@@ -71,6 +75,26 @@ bool Game::Initialize() {
 		}
 		_findclose(fhandle);
 	}
+#else
+        DIR * dir;
+        struct dirent * dirp;
+        const char *foldername = "./expansions/";
+        if((dir = opendir(foldername)) != NULL) {
+	        while((dirp = readdir(dir)) != NULL) {
+		        size_t len = strlen(dirp->d_name);
+		        if(len < 5 || strcasecmp(dirp->d_name + len - 4, ".cdb") != 0)
+			        continue;
+                        char *filepath = (char *)malloc(sizeof(char)*(len + strlen(foldername)));
+                        strncpy(filepath, foldername, strlen(foldername)+1);
+                        strncat(filepath, dirp->d_name, len);
+                        std::cout << "Found file " << filepath << std::endl;
+                        if (!dataManager.LoadDB(filepath))
+	                        std::cout << "Error loading file" << std::endl;
+                        free(filepath);
+	        }
+	        closedir(dir);
+        }
+#endif
 	env = device->getGUIEnvironment();
 	numFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 16);
 	adFont = irr::gui::CGUITTFont::createTTFont(env, gameConf.numfont, 12);
