@@ -362,7 +362,7 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 					myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 						selectable_cards[i]->sequence + 1);
 				mainGame->stCardPos[i]->setText(formatBuffer);
-				mainGame->stCardPos[i]->setVisible(true);;
+				mainGame->stCardPos[i]->setVisible(true);
 				if(selectable_cards[i]->controler)
 					mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 				else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);
@@ -436,7 +436,7 @@ void ClientField::ShowChainCard() {
 			myswprintf(formatBuffer, L"%ls[%d]", dataManager.FormatLocation(selectable_cards[i]->location, selectable_cards[i]->sequence),
 				selectable_cards[i]->sequence + 1);
 			mainGame->stCardPos[i]->setText(formatBuffer);
-			mainGame->stCardPos[i]->setVisible(true);;
+			mainGame->stCardPos[i]->setVisible(true);
 			if(selectable_cards[i]->controler)
 				mainGame->stCardPos[i]->setBackgroundColor(0xffd0d0d0);
 			else mainGame->stCardPos[i]->setBackgroundColor(0xffffffff);

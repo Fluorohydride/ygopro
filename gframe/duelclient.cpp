@@ -1166,6 +1166,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		mainGame->dField.chain_forced = (forced != 0);
 		mainGame->dField.activatable_cards.clear();
 		mainGame->dField.activatable_descs.clear();
+		mainGame->dField.conti_cards.clear();
 		for (int i = 0; i < count; ++i) {
 			code = BufferIO::ReadInt32(pbuf);
 			c = mainGame->LocalPlayer(BufferIO::ReadInt8(pbuf));
@@ -1176,7 +1177,6 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard = mainGame->dField.GetCard(c, l, s, ss);
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(desc);
-			pcard->is_selectable = true;
 			pcard->is_selected = false;
 			if(code) {
 				pcard->is_conti = true;
@@ -1185,6 +1185,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.remove_act = true;
 			}
 			else {
+				pcard->is_selectable = true;
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if(l == LOCATION_GRAVE)
 					mainGame->dField.grave_act = true;
