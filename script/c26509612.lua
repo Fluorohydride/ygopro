@@ -44,7 +44,7 @@ function c26509612.activate(e,tp,eg,ep,ev,re,r,rp)
 	Duel.RegisterEffect(e3,tp)
 end
 function c26509612.attg(e,c)
-	return c:IsLevelBelow(4)
+	return c:IsLevelBelow(4) and not c:IsImmuneToEffect(e)
 end
 function c26509612.attg2(e,c)
 	return c:IsCode(74711057)
