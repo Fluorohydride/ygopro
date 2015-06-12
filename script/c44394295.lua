@@ -26,11 +26,11 @@ end
 function c44394295.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
 		local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-		local mg1=Duel.GetMatchingGroup(c44394295.filter0,tp,LOCATION_HAND+LOCATION_MZONE,0,nil)
+		local loc=LOCATION_HAND+LOCATION_MZONE
 		if Duel.IsExistingMatchingCard(c44394295.cfilter,tp,0,LOCATION_MZONE,1,nil) then
-			local sg=Duel.GetMatchingGroup(c44394295.filter0,tp,LOCATION_DECK,0,nil)
-			mg1:Merge(sg)
+			loc=loc+LOCATION_DECK
 		end
+		local mg1=Duel.GetMatchingGroup(c44394295.filter0,tp,loc,0,nil)
 		local res=Duel.IsExistingMatchingCard(c44394295.filter2,tp,LOCATION_EXTRA,0,1,nil,e,tp,mg1,nil,chkf)
 		if not res then
 			local ce=Duel.GetChainMaterial(tp)
@@ -47,11 +47,11 @@ function c44394295.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c44394295.activate(e,tp,eg,ep,ev,re,r,rp)
 	local chkf=Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and PLAYER_NONE or tp
-	local mg1=Duel.GetMatchingGroup(c44394295.filter1,tp,LOCATION_HAND+LOCATION_MZONE,0,nil,e)
+	local loc=LOCATION_HAND+LOCATION_MZONE
 	if Duel.IsExistingMatchingCard(c44394295.cfilter,tp,0,LOCATION_MZONE,1,nil) then
-		local sg=Duel.GetMatchingGroup(c44394295.filter1,tp,LOCATION_DECK,0,nil,e)
-		mg1:Merge(sg)
+		loc=loc+LOCATION_DECK
 	end
+	local mg1=Duel.GetMatchingGroup(c44394295.filter1,tp,loc,0,nil,e)
 	local sg1=Duel.GetMatchingGroup(c44394295.filter2,tp,LOCATION_EXTRA,0,nil,e,tp,mg1,nil,chkf)
 	local mg2=nil
 	local sg2=nil
@@ -81,13 +81,16 @@ function c44394295.activate(e,tp,eg,ep,ev,re,r,rp)
 		end
 		tc:CompleteProcedure()
 	else
-		local cg1=Duel.GetFieldGroup(tp,LOCATION_HAND+LOCATION_MZONE,0)
+		local cg1=Duel.GetFieldGroup(tp,loc,0)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
 		if cg1:GetCount()>1 and cg2:IsExists(Card.IsFacedown,1,nil)
 			and Duel.IsPlayerCanSpecialSummon(tp) and not Duel.IsPlayerAffectedByEffect(tp,27581098) then
 			Duel.ConfirmCards(1-tp,cg1)
 			Duel.ConfirmCards(1-tp,cg2)
 			Duel.ShuffleHand(tp)
+			if bit.band(loc,LOCATION_DECK)==LOCATION_DECK then
+				Duel.ShuffleDeck(tp)
+			end
 		end
 	end
 end
