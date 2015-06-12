@@ -220,7 +220,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 			if(!(flag & EFFECT_FLAG_AVAILABLE_BD) && (type & EFFECT_TYPE_FIELD) && handler->is_status(STATUS_BATTLE_DESTROYED))
 				return FALSE;
 			if(((type & EFFECT_TYPE_FIELD) || ((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE))) && (handler->current.location & LOCATION_ONFIELD)
-			        && !(flag & EFFECT_FLAG_SET_AVAILABLE) && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
+			        && (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
 			if((type & EFFECT_TYPE_SINGLE) && (flag & EFFECT_FLAG_SINGLE_RANGE) && !in_range(handler->current.location, handler->current.sequence))
 				return FALSE;
