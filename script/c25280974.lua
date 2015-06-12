@@ -17,22 +17,22 @@ function c25280974.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e2:SetCode(EVENT_TO_GRAVE)
 	e2:SetCountLimit(1,25280974)
-	e2:SetCondition(c25280974.condition)
-	e2:SetTarget(c25280974.target)
-	e2:SetOperation(c25280974.operation)
+	e2:SetCondition(c25280974.thcon)
+	e2:SetTarget(c25280974.thtg)
+	e2:SetOperation(c25280974.thop)
 	c:RegisterEffect(e2)
 end
-function c25280974.condition(e,tp,eg,ep,ev,re,r,rp)
+function c25280974.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c25280974.filter(c)
 	return c:IsType(TYPE_NORMAL) and c:IsRace(RACE_SPELLCASTER) and c:IsAbleToHand() and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
-function c25280974.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c25280974.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c25280974.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,nil) end
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK+LOCATION_GRAVE)
 end
-function c25280974.operation(e,tp,eg,ep,ev,re,r,rp)
+function c25280974.thop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 	local g=Duel.SelectMatchingCard(tp,c25280974.filter,tp,LOCATION_DECK+LOCATION_GRAVE,0,1,1,nil)
 	if g:GetCount()>0 then
