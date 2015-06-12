@@ -16,30 +16,33 @@ function c14057297.condition(e,tp,eg,ep,ev,re,r,rp)
 end
 function c14057297.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,5) and Duel.IsPlayerCanDraw(1-tp,5) end
-	local g1=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
-	local g2=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
-	g1:Merge(g2)
-	Duel.SetOperationInfo(0,CATEGORY_TODECK,g1,g1:GetCount(),0,0)
+	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,LOCATION_HAND)
+	Duel.SetOperationInfo(0,CATEGORY_TODECK,g,g:GetCount(),0,0)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,PLAYER_ALL,5)
 end
 function c14057297.activate(e,tp,eg,ep,ev,re,r,rp)
-	local ct1=Duel.GetFieldGroupCount(tp,LOCATION_HAND,0)
-	local ct2=Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)
-	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
-	local g1=Duel.SelectMatchingCard(tp,aux.TRUE,tp,LOCATION_HAND,0,ct1,ct1,nil)
-	Duel.Hint(HINT_SELECTMSG,1-tp,HINTMSG_TODECK)
-	local g2=Duel.SelectMatchingCard(1-tp,aux.TRUE,tp,0,LOCATION_HAND,ct2,ct2,nil)
-	g1:Merge(g2)
-	local count=Duel.SendtoDeck(g1,nil,1,REASON_EFFECT)
-	if count>0 then
-		Duel.BreakEffect()
-		local lp=Duel.GetLP(tp)
-		if lp<=count*300 then
-			Duel.SetLP(tp,0)
-		else
-			Duel.SetLP(tp,lp-count*300)
+	if Duel.GetFieldGroupCount(tp,LOCATION_HAND,LOCATION_HAND)==0 then return end
+	local p=tp
+	local st=0
+	for i=1,2 do
+		local sg=Duel.GetFieldGroup(p,LOCATION_HAND,0)
+		Duel.SendtoDeck(sg,nil,0,REASON_EFFECT)
+		local og=Duel.GetOperatedGroup()
+		local ct=og:FilterCount(Card.IsLocation,nil,LOCATION_DECK)
+		if ct>0 then
+			st=st+ct
+			Duel.SortDecktop(p,p,ct)
+			for j=1,ct do
+				local mg=Duel.GetDecktopGroup(p,1)
+				Duel.MoveSequence(mg:GetFirst(),1)
+			end
 		end
-		if lp==0 then return end
+		p=1-p
+	end
+	local lp=Duel.GetLP(tp)
+	Duel.SetLP(tp,lp-st*300)
+	if Duel.GetLP(tp)>0 then
+		Duel.BreakEffect()
 		Duel.Draw(tp,5,REASON_EFFECT)
 		Duel.Draw(1-tp,5,REASON_EFFECT)
 	end

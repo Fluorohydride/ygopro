@@ -1,6 +1,6 @@
 --ジュラゲド
 function c59546797.initial_effect(c)
-	--summon
+	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetDescription(aux.Stringid(59546797,0))
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON+CATEGORY_RECOVER)
@@ -8,9 +8,9 @@ function c59546797.initial_effect(c)
 	e1:SetCode(EVENT_FREE_CHAIN)
 	e1:SetRange(LOCATION_HAND)
 	e1:SetCountLimit(1,59546797)
-	e1:SetCondition(c59546797.condition)
-	e1:SetTarget(c59546797.target)
-	e1:SetOperation(c59546797.operation)
+	e1:SetCondition(c59546797.spcon)
+	e1:SetTarget(c59546797.sptg)
+	e1:SetOperation(c59546797.spop)
 	c:RegisterEffect(e1)
 	--atk
 	local e2=Effect.CreateEffect(c)
@@ -19,28 +19,32 @@ function c59546797.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e2:SetCode(EVENT_FREE_CHAIN)
-	e2:SetHintTiming(TIMING_DAMAGE_STEP)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetHintTiming(TIMING_DAMAGE_STEP)
+	e2:SetCondition(c59546797.atkcon)
 	e2:SetCost(c59546797.atkcost)
 	e2:SetTarget(c59546797.atktg)
 	e2:SetOperation(c59546797.atkop)
 	c:RegisterEffect(e2)
 end
-function c59546797.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.GetCurrentPhase()==PHASE_BATTLE and not Duel.CheckTiming(TIMING_BATTLE_START) and not Duel.CheckTiming(TIMING_BATTLE_END)
+function c59546797.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_BATTLE and not Duel.CheckTiming(TIMING_BATTLE_START+TIMING_BATTLE_END)
 end
-function c59546797.target(e,tp,eg,ep,ev,re,r,rp,chk)
+function c59546797.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsStatus(STATUS_CHAINING) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and e:GetHandler():IsCanBeSpecialSummoned(e,0,tp,false,false) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
-function c59546797.operation(e,tp,eg,ep,ev,re,r,rp)
+function c59546797.spop(e,tp,eg,ep,ev,re,r,rp)
+	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
 	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		Duel.Recover(tp,1000,REASON_EFFECT)
-	elseif Duel.IsPlayerCanSpecialSummon(tp) then
-		Duel.SendtoGrave(c,REASON_RULE)
 	end
+end
+function c59546797.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c59546797.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end

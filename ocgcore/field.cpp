@@ -1189,7 +1189,7 @@ int32 field::check_release_list(uint8 playerid, int32 count, int32 use_con, int3
 	}
 	return FALSE;
 }
-int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_sum, group* mg) {
+int32 field::get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_sum, group* mg, uint32 ex) {
 	uint8 p = target->current.controler;
 	card* pcard;
 	uint32 rcount = 0;
@@ -1214,7 +1214,7 @@ int32 field::get_summon_release_list(card* target, card_set* release_list, card_
 			continue;
 		if(mg && !mg->has_card(pcard))
 			continue;
-		if(pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)) {
+		if(ex || pcard->is_affected_by_effect(EFFECT_EXTRA_RELEASE)) {
 			if(ex_list)
 				ex_list->insert(pcard);
 			if(pcard->is_affected_by_effect(EFFECT_DOUBLE_TRIBUTE, target))
