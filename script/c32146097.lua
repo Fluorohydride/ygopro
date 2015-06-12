@@ -12,7 +12,9 @@ function c32146097.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c32146097.drcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and e:GetHandler():IsReason(REASON_DESTROY)
+	local c=e:GetHandler()
+	return (c:IsReason(REASON_BATTLE)
+		or rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp)
 		and Duel.GetFieldGroupCount(tp,LOCATION_ONFIELD,0)==0
 end
 function c32146097.drtg(e,tp,eg,ep,ev,re,r,rp,chk)

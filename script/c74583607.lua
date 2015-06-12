@@ -50,7 +50,9 @@ function c74583607.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c74583607.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and e:GetHandler():GetPreviousControler()==tp
+	local c=e:GetHandler()
+	return c:IsReason(REASON_BATTLE)
+		or (rp~=tp and c:IsReason(REASON_EFFECT) and c:GetPreviousControler()==tp)
 end
 function c74583607.thfilter(c)
 	return c:IsSetCard(0xae) and c:IsAbleToHand()
