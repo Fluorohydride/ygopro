@@ -242,10 +242,11 @@ uint32 card::get_code() {
 	return code;
 }
 uint32 card::get_another_code() {
-	effect_set eset, eset2;
+	if(is_affected_by_effect(EFFECT_CHANGE_CODE))
+		return 0;
+	effect_set eset;
 	filter_effect(EFFECT_ADD_CODE, &eset);
-	filter_effect(EFFECT_CHANGE_CODE, &eset2);
-	if(!eset.size() || eset2.size())
+	if(!eset.size())
 		return 0;
 	uint32 otcode = eset.get_last()->get_value(this);
 	if(get_code() != otcode)
@@ -1521,21 +1522,23 @@ void card::filter_disable_related_cards() {
 int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ignore_count, uint8 min_tribute) {
 	effect_set eset;
 	filter_effect(EFFECT_LIMIT_SUMMON_PROC, &eset);
-	for(int32 i = 0; i < eset.size(); ++i)
-		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
-		        && pduel->game_field->is_player_can_summon(eset[i]->get_value(this), playerid, this))
-			peset->add_item(eset[i]);
 	if(eset.size()) {
+		for(int32 i = 0; i < eset.size(); ++i) {
+			if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
+			        && pduel->game_field->is_player_can_summon(eset[i]->get_value(this), playerid, this))
+				peset->add_item(eset[i]);
+		}
 		if(peset->size())
 			return -1;
 		return -2;
 	}
 	eset.clear();
 	filter_effect(EFFECT_SUMMON_PROC, &eset);
-	for(int32 i = 0; i < eset.size(); ++i)
+	for(int32 i = 0; i < eset.size(); ++i) {
 		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
 		        && pduel->game_field->is_player_can_summon(eset[i]->get_value(this), playerid, this))
 			peset->add_item(eset[i]);
+	}
 	if(!pduel->game_field->is_player_can_summon(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
 	int32 rcount = get_summon_tribute_count();
@@ -1561,21 +1564,23 @@ int32 card::filter_summon_procedure(uint8 playerid, effect_set* peset, uint8 ign
 int32 card::filter_set_procedure(uint8 playerid, effect_set* peset, uint8 ignore_count, uint8 min_tribute) {
 	effect_set eset;
 	filter_effect(EFFECT_LIMIT_SET_PROC, &eset);
-	for(int32 i = 0; i < eset.size(); ++i)
-		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
-		        && pduel->game_field->is_player_can_mset(eset[i]->get_value(this), playerid, this))
-			peset->add_item(eset[i]);
 	if(eset.size()) {
+		for(int32 i = 0; i < eset.size(); ++i) {
+			if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
+			        && pduel->game_field->is_player_can_mset(eset[i]->get_value(this), playerid, this))
+				peset->add_item(eset[i]);
+		}
 		if(peset->size())
 			return -1;
 		return -2;
 	}
 	eset.clear();
 	filter_effect(EFFECT_SET_PROC, &eset);
-	for(int32 i = 0; i < eset.size(); ++i)
+	for(int32 i = 0; i < eset.size(); ++i) {
 		if(eset[i]->check_count_limit(playerid) && is_summonable(eset[i], min_tribute)
 		        && pduel->game_field->is_player_can_mset(eset[i]->get_value(this), playerid, this))
 			peset->add_item(eset[i]);
+	}
 	if(!pduel->game_field->is_player_can_mset(SUMMON_TYPE_NORMAL, playerid, this))
 		return FALSE;
 	int32 rcount = get_set_tribute_count();
@@ -2402,17 +2407,18 @@ int32 card::is_capable_be_battle_target(card* pcard) {
 int32 card::is_capable_be_effect_target(effect* peffect, uint8 playerid) {
 	if(is_status(STATUS_SUMMONING) || is_status(STATUS_BATTLE_DESTROYED))
 		return FALSE;
-	effect_set eset,eset2;
+	effect_set eset;
 	filter_effect(EFFECT_CANNOT_BE_EFFECT_TARGET, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		pduel->lua->add_param(playerid, PARAM_TYPE_INT);
 		if(eset[i]->get_value(peffect, 1))
 			return FALSE;
 	}
-	peffect->handler->filter_effect(EFFECT_CANNOT_SELECT_EFFECT_TARGET, &eset2);
-	for(int32 i = 0; i < eset2.size(); ++i) {
+	eset.clear();
+	peffect->handler->filter_effect(EFFECT_CANNOT_SELECT_EFFECT_TARGET, &eset);
+	for(int32 i = 0; i < eset.size(); ++i) {
 		pduel->lua->add_param(this, PARAM_TYPE_CARD);
-		if(eset2[i]->get_value(peffect, 1))
+		if(eset[i]->get_value(peffect, 1))
 			return FALSE;
 	}
 	return TRUE;
