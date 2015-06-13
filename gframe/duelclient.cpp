@@ -915,9 +915,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_descs.push_back(desc);
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
 			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 		}
 		mainGame->dField.attackable_cards.clear();
 		count = BufferIO::ReadInt8(pbuf);
@@ -975,9 +975,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 				mainGame->dField.deck_act = true;
 			}
 			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_EXTRA)
 				mainGame->dField.extra_act = true;
 			if (pcard->location == LOCATION_SZONE && pcard->sequence == 6)
@@ -1030,9 +1030,9 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_descs.push_back(desc);
 			pcard->cmdFlag |= COMMAND_ACTIVATE;
 			if (pcard->location == LOCATION_GRAVE)
-				mainGame->dField.grave_act = true;
+				mainGame->dField.grave_act[pcard->controler] = true;
 			if (pcard->location == LOCATION_REMOVED)
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[pcard->controler] = true;
 		}
 		if(BufferIO::ReadInt8(pbuf)) {
 			mainGame->btnBP->setVisible(true);
@@ -1154,7 +1154,7 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 		return false;
 	}
 	case MSG_SELECT_CHAIN: {
-		/*int selecting_player = */BufferIO::ReadInt8(pbuf);
+		int selecting_player = BufferIO::ReadInt8(pbuf);
 		int count = BufferIO::ReadInt8(pbuf);
 		int specount = BufferIO::ReadInt8(pbuf);
 		int forced = BufferIO::ReadInt8(pbuf);
@@ -1178,19 +1178,19 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(desc);
 			pcard->is_selected = false;
-			if(code) {
+			if(code && ((l & 0x3) || ((l & 0x60) && (ss & POS_FACEDOWN)))) {
 				pcard->is_conti = true;
 				pcard->conti_code = code;
 				mainGame->dField.conti_cards.push_back(pcard);
-				mainGame->dField.remove_act = true;
+				mainGame->dField.remove_act[selecting_player] = true;
 			}
 			else {
 				pcard->is_selectable = true;
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if(l == LOCATION_GRAVE)
-					mainGame->dField.grave_act = true;
+					mainGame->dField.grave_act[pcard->controler] = true;
 				if(l == LOCATION_REMOVED)
-					mainGame->dField.remove_act = true;
+					mainGame->dField.remove_act[pcard->controler] = true;
 				if(l == LOCATION_EXTRA)
 					mainGame->dField.extra_act = true;
 				if(l == LOCATION_OVERLAY)
