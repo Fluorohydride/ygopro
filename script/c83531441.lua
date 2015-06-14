@@ -44,8 +44,8 @@ function c83531441.atkcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	else
 		local ac=0
 		Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(83531441,2))
-		if ct==2 then ac=Duel.AnnounceNumber(tp,1,2)
-		else ac=Duel.AnnounceNumber(tp,1,2,3) end
+		if ct==2 then ac=Duel.AnnounceNumber(tp,2,1)
+		else ac=Duel.AnnounceNumber(tp,3,2,1) end
 		Duel.DiscardDeck(tp,ac,REASON_COST)
 		e:SetLabel(ac)
 	end
