@@ -70,11 +70,12 @@ function c17016362.mtop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
+		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCountLimit(1)
 		e2:SetOperation(c17016362.desop)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_BATTLE)
-		tc:RegisterEffect(e2)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
+		tc:RegisterEffect(e2,true)
 	end
 end
 function c17016362.desop(e,tp,eg,ep,ev,re,r,rp)
@@ -83,7 +84,7 @@ end
 function c17016362.spcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	return c:IsReason(REASON_BATTLE)
-		or rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp
+		or (rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp)
 end
 function c17016362.spfilter(c,e,tp)
 	return c:IsSetCard(0xc6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

@@ -47,10 +47,11 @@ function c64662453.activate(e,tp,eg,ep,ev,re,r,rp)
 		e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e3:SetRange(LOCATION_MZONE)
 		e3:SetCode(EVENT_PHASE+PHASE_END)
+		e3:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e3:SetOperation(c64662453.desop)
 		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		e3:SetCountLimit(1)
-		tc:RegisterEffect(e3)
+		tc:RegisterEffect(e3,true)
 		Duel.SpecialSummonComplete()
 	end
 end
