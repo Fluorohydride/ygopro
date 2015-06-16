@@ -102,7 +102,7 @@ function c45627618.penop(e,tp,eg,ep,ev,re,r,rp)
 	local lsc=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
 	local rsc=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 	local g=Group.FromCards(lsc,rsc)
-	if Duel.Destroy(g,REASON_EFFECT)~=0 then
+	if Duel.Destroy(g,REASON_EFFECT)~=0 and e:GetHandler():IsRelateToEffect(e) then
 		Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
 end
