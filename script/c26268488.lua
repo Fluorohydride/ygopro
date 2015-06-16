@@ -8,6 +8,7 @@ function c26268488.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
+	e1:SetValue(c26268488.sumlimit)
 	c:RegisterEffect(e1)
 	--indes
 	local e2=Effect.CreateEffect(c)
@@ -43,6 +44,9 @@ function c26268488.initial_effect(c)
 	e4:SetTarget(c26268488.sptg)
 	e4:SetOperation(c26268488.spop)
 	c:RegisterEffect(e4)
+end
+function c26268488.sumlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c26268488.repfilter(c,tp)
 	return c:IsControler(tp) and c:IsOnField() and c:IsReason(REASON_BATTLE+REASON_EFFECT) and c:GetFlagEffect(26268488)==0
