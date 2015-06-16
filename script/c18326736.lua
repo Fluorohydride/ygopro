@@ -68,8 +68,9 @@ function c18326736.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c18326736.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,7,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,7,7,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,7,REASON_COST) and c:GetFlagEffect(18326737)==0 end
+	c:RemoveOverlayCard(tp,7,7,REASON_COST)
 end
 function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
@@ -80,6 +81,7 @@ function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 	e1:SetCondition(c18326736.skipcon)
 	Duel.RegisterEffect(e1,tp)
+	e:GetHandler():RegisterFlagEffect(18326737,RESET_PHASE+PHASE_END,0,1)
 end
 function c18326736.skipcon(e)
 	return Duel.GetTurnPlayer()~=e:GetHandlerPlayer()
