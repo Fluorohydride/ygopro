@@ -99,6 +99,7 @@ function c45627618.pentg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
 end
 function c45627618.penop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local lsc=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
 	local rsc=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 	local g=Group.FromCards(lsc,rsc)
