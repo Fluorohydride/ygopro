@@ -8,7 +8,7 @@ function c97836203.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(aux.FALSE)
+	e1:SetValue(c97836203.sumlimit)
 	c:RegisterEffect(e1)
 	--Negate summon
 	local e2=Effect.CreateEffect(c)
@@ -41,6 +41,9 @@ function c97836203.initial_effect(c)
 	e5:SetTarget(c97836203.sptg)
 	e5:SetOperation(c97836203.spop)
 	c:RegisterEffect(e5)
+end
+function c97836203.sumlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c97836203.discon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
