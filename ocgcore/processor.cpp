@@ -2196,7 +2196,10 @@ int32 field::process_quick_effect(int16 step, int32 skip_freechain, uint8 priori
 					for(auto cait = core.current_chain.begin(); cait != core.current_chain.end(); ++cait) {
 						if(cait->triggering_player == priority) {
 							if(!(peffect->flag & EFFECT_FLAG_MULTIACT_HAND)) {
-								if(cait->triggering_location == LOCATION_HAND) {
+								effect* pchaineff = cait->triggering_effect;
+								if(!(pchaineff->flag & EFFECT_FLAG_FIELD_ONLY) && (pchaineff->type & EFFECT_TYPE_TRIGGER_O)
+								        && (!(pchaineff->type & EFFECT_TYPE_SINGLE) || (pchaineff->flag & EFFECT_FLAG_SINGLE_RANGE))
+								        && (pchaineff->range & LOCATION_HAND)) {
 									act = false;
 									break;
 								}
