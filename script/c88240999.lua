@@ -6,7 +6,7 @@ function c88240999.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c88240999.splimit)
+	e1:SetValue(aux.ritlimit)
 	c:RegisterEffect(e1)
 	--boost
 	local e2=Effect.CreateEffect(c)
@@ -34,9 +34,6 @@ function c88240999.initial_effect(c)
 	e3:SetTarget(c88240999.destg)
 	e3:SetOperation(c88240999.desop)
 	c:RegisterEffect(e3)
-end
-function c88240999.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c88240999.mat_filter(c)
 	return c:GetLevel()~=10

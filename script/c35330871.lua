@@ -6,7 +6,7 @@ function c35330871.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetValue(c35330871.splimit)
+	e1:SetValue(aux.ritlimit)
 	c:RegisterEffect(e1)
 	--atk & def down
 	local e2=Effect.CreateEffect(c)
@@ -32,9 +32,6 @@ function c35330871.initial_effect(c)
 	e3:SetTarget(c35330871.tgtg)
 	e3:SetOperation(c35330871.tgop)
 	c:RegisterEffect(e3)
-end
-function c35330871.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c35330871.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()

@@ -8,7 +8,7 @@ function c95486586.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c95486586.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--atkup
 	local e2=Effect.CreateEffect(c)
@@ -41,9 +41,6 @@ function c95486586.initial_effect(c)
 	e4:SetTarget(c95486586.sptg)
 	e4:SetOperation(c95486586.spop)
 	c:RegisterEffect(e4)
-end
-function c95486586.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c95486586.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

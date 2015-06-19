@@ -8,7 +8,7 @@ function c29343734.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e2:SetValue(c29343734.splimit)
+	e2:SetValue(aux.fuslimit)
 	c:RegisterEffect(e2)
 	--attribute
 	local e3=Effect.CreateEffect(c)
@@ -36,9 +36,6 @@ function c29343734.initial_effect(c)
 	e5:SetCode(EFFECT_UPDATE_ATTACK)
 	e5:SetValue(c29343734.val)
 	c:RegisterEffect(e5)
-end
-function c29343734.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c29343734.retcon(e,tp,eg,ep,ev,re,r,rp)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
