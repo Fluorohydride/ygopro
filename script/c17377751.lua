@@ -9,7 +9,7 @@ function c17377751.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c17377751.sumlimit)
+	e1:SetValue(aux.synlimit)
 	c:RegisterEffect(e1)
 	--Special Summon
 	local e2=Effect.CreateEffect(c)
@@ -21,9 +21,6 @@ function c17377751.initial_effect(c)
 	e2:SetTarget(c17377751.sptg)
 	e2:SetOperation(c17377751.spop)
 	c:RegisterEffect(e2)
-end
-function c17377751.sumlimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c17377751.spcon(e,tp,eg,ep,ev,re,r,rp,chk)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO

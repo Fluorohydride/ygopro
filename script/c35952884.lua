@@ -8,7 +8,7 @@ function c35952884.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c35952884.sumlimit)
+	e1:SetValue(aux.synlimit)
 	c:RegisterEffect(e1)
 	--multi attack
 	local e2=Effect.CreateEffect(c)
@@ -53,9 +53,6 @@ function c35952884.initial_effect(c)
 	local e6=e4:Clone()
 	e6:SetCode(EVENT_TO_DECK)
 	c:RegisterEffect(e6)
-end
-function c35952884.sumlimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c35952884.mfilter(c)
 	return not c:IsType(TYPE_TUNER)

@@ -8,7 +8,7 @@ function c39402797.initial_effect(c)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c39402797.sumlimit)
+	e1:SetValue(aux.synlimit)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -21,9 +21,6 @@ function c39402797.initial_effect(c)
 	e2:SetTarget(c39402797.destg)
 	e2:SetOperation(c39402797.desop)
 	c:RegisterEffect(e2)
-end
-function c39402797.sumlimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c39402797.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO

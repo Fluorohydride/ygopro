@@ -1178,3 +1178,7 @@ function Auxiliary.sumreg(e,tp,eg,ep,ev,re,r,rp)
 		tc=eg:GetNext()
 	end
 end
+--sp_summon condition for synchron monster
+function Auxiliary.synlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
+end

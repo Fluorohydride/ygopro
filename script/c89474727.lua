@@ -8,7 +8,7 @@ function c89474727.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetValue(c89474727.sumlimit)
+	e1:SetValue(aux.synlimit)
 	c:RegisterEffect(e1)
 	--immune
 	local e2=Effect.CreateEffect(c)
@@ -31,9 +31,6 @@ function c89474727.initial_effect(c)
 	e3:SetTarget(c89474727.sptg)
 	e3:SetOperation(c89474727.spop)
 	c:RegisterEffect(e3)
-end
-function c89474727.sumlimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
 end
 function c89474727.cfilter(c)
 	return c:IsType(TYPE_SYNCHRO) and c:IsAbleToRemoveAsCost()
