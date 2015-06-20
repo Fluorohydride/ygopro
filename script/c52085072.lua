@@ -16,11 +16,11 @@ function c52085072.initial_effect(c)
 	e2:SetCondition(c52085072.spcon)
 	e2:SetOperation(c52085072.spop)
 	c:RegisterEffect(e2)
-	--cannot attack announce
+	--cannot attack
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_FIELD)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetCode(EFFECT_CANNOT_ATTACK_ANNOUNCE)
+	e3:SetCode(EFFECT_CANNOT_ATTACK)
 	e3:SetTargetRange(LOCATION_MZONE,0)
 	e3:SetTarget(c52085072.antarget)
 	c:RegisterEffect(e3)
@@ -37,7 +37,7 @@ function c52085072.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 function c52085072.spcfilter(c)
-	return c:IsFaceup() and c:GetLevel()==1 and c:IsType(TYPE_MONSTER) and c:IsAbleToGraveAsCost()
+	return c:IsFaceup() and c:GetLevel()==1 and c:IsAbleToGraveAsCost()
 end
 function c52085072.spcon(e,c)
 	if c==nil then return true end
