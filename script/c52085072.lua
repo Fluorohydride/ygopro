@@ -30,7 +30,6 @@ function c52085072.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_QUICK_O)
 	e4:SetCode(EVENT_FREE_CHAIN)
 	e4:SetRange(LOCATION_MZONE)
-	e4:SetCountLimit(1)
 	e4:SetHintTiming(TIMING_BATTLE_PHASE)
 	e4:SetCondition(c52085072.btcon)
 	e4:SetCost(c52085072.btcost)
@@ -62,10 +61,12 @@ function c52085072.btcfilter(c)
 	return c:IsType(TYPE_MONSTER) and c:GetLevel()==1 and c:IsAbleToRemoveAsCost()
 end
 function c52085072.btcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(c52085072.btcfilter,tp,LOCATION_GRAVE,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c52085072.btcfilter,tp,LOCATION_GRAVE,0,1,nil)
+		and e:GetHandler():GetFlagEffect(52085072)==0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c52085072.btcfilter,tp,LOCATION_GRAVE,0,1,1,nil)
 	Duel.Remove(g,POS_FACEUP,REASON_COST)
+	e:GetHandler():RegisterFlagEffect(52085072,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE,0,1)
 end
 function c52085072.btop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
