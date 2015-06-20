@@ -16,7 +16,7 @@ function c11373345.cfilter(c)
 	return c:IsFaceup() and c:IsLevelAbove(7)
 end
 function c11373345.condition(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsExistingMatchingCard(c11373345.cfilter,tp,LOCATION_ONFIELD,0,1,nil)
+	return Duel.IsExistingMatchingCard(c11373345.cfilter,tp,LOCATION_MZONE,0,1,nil)
 end
 function c11373345.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetActivityCount(tp,ACTIVITY_ATTACK)==0 end
