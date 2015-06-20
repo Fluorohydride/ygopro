@@ -15,8 +15,9 @@ function c53208660.initial_effect(c)
 end
 function c53208660.chainfilter(re,tp,cid)
 	local rc=re:GetHandler()
+	local loc,seq=Duel.GetChainInfo(cid,CHAININFO_TRIGGERING_LOCATION,CHAININFO_TRIGGERING_SEQUENCE)
 	return not (re:IsActiveType(TYPE_SPELL) and not re:IsHasType(EFFECT_TYPE_ACTIVATE)
-		and (rc:GetSequence()==6 or rc:GetSequence()==7) and rc:IsSetCard(0x98))
+		and loc==LOCATION_SZONE and (seq==6 or seq==7) and rc:IsSetCard(0x98))
 end
 function c53208660.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCustomActivityCount(53208660,tp,ACTIVITY_CHAIN)==0
@@ -37,13 +38,12 @@ function c53208660.target(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c53208660.activate(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c53208660.thfilter,tp,LOCATION_DECK,0,nil)
-	if g:GetCount()>=2 then
+	if g:GetClassCount(Card.GetCode)>=2 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g1=g:Select(tp,1,1,nil)
 		g:Remove(Card.IsCode,nil,g1:GetFirst():GetCode())
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_ATOHAND)
 		local g2=g:Select(tp,1,1,nil)
-		g:Remove(Card.IsCode,nil,g2:GetFirst():GetCode())
 		g1:Merge(g2)
 		Duel.SendtoHand(g1,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g1)

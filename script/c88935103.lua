@@ -51,9 +51,6 @@ function c88935103.synlimit(e,c)
 	if not c then return false end
 	return not c:IsRace(RACE_DRAGON)
 end
-function c88935103.synfilter(c,syncard,tuner,f)
-	return c:IsFaceup() and c:IsNotTuner() and c:IsCanBeSynchroMaterial(syncard,tuner) and (f==nil or f(c))
-end
 function c88935103.sfilter(c)
 	return not c:IsSetCard(0x99)
 end
@@ -66,7 +63,7 @@ function c88935103.cfilter(c)
 	return c:IsFaceup() and c:GetLevel()>=7 and c:IsSetCard(0x99)
 end
 function c88935103.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c5723.cfilter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c88935103.cfilter(chkc) end
 	local c=e:GetHandler()
 	if chk==0 then return Duel.IsExistingTarget(c88935103.cfilter,tp,LOCATION_MZONE,0,1,nil)
 		and Duel.GetLocationCount(tp,LOCATION_MZONE)>0 and c:IsCanBeSpecialSummoned(e,0,tp,false,false) end

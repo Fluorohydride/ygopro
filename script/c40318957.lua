@@ -1,4 +1,4 @@
---ＥＭドクロバット・ジョーカー
+--EMドクロバット・ジョーカー
 function c40318957.initial_effect(c)
 	--pendulum summon
 	aux.AddPendulumProcedure(c)
@@ -37,7 +37,7 @@ function c40318957.splimit(e,c,tp,sumtp,sumpos)
 	return not c40318957.filter(c) and bit.band(sumtp,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
 function c40318957.thfilter(c)
-	return c5806.filter(c) and not c:IsCode(40318957) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
+	return c40318957.filter(c) and not c:IsCode(40318957) and c:IsType(TYPE_MONSTER) and c:IsAbleToHand()
 end
 function c40318957.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c40318957.thfilter,tp,LOCATION_DECK,0,1,nil) end
