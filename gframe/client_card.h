@@ -65,7 +65,7 @@ public:
 	bool is_reversed;
 	bool is_conti;
 	u32 code;
-	u32 conti_code;
+	u32 chain_code;
 	u32 alias;
 	u32 type;
 	u32 level;

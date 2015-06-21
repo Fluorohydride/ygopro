@@ -333,11 +333,12 @@ void ClientField::ClearChainSelect() {
 	std::vector<ClientCard*>::iterator cit;
 	for(cit = activatable_cards.begin(); cit != activatable_cards.end(); ++cit) {
 		(*cit)->cmdFlag = 0;
-		(*cit)->conti_code = 0;
+		(*cit)->chain_code = 0;
 		(*cit)->is_selectable = false;
 		(*cit)->is_selected = false;
 		(*cit)->is_conti = false;
 	}
+	conti_cards.clear();
 	grave_act = false;
 	remove_act = false;
 	extra_act = false;
@@ -348,8 +349,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		for(size_t i = 0; i < selectable_cards.size(); ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
-			else if(chain && selectable_cards[i]->is_conti)
-				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->conti_code));
+			else if(chain)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 			else
 				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(startpos + i * 125, 55, startpos + 120 + i * 125, 225));
@@ -385,8 +386,8 @@ void ClientField::ShowSelectCard(bool buttonok, bool chain) {
 		for(int i = 0; i < 5; ++i) {
 			if(selectable_cards[i]->code)
 				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->code));
-			else if(chain && selectable_cards[i]->is_conti)
-				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->conti_code));
+			else if(chain)
+				mainGame->imageLoading.insert(std::make_pair(mainGame->btnCardSelect[i], selectable_cards[i]->chain_code));
 			else
 				mainGame->btnCardSelect[i]->setImage(imageManager.tCover);
 			mainGame->btnCardSelect[i]->setRelativePosition(rect<s32>(30 + i * 125, 55, 30 + 120 + i * 125, 225));

@@ -21,7 +21,7 @@ ClientCard::ClientCard() {
 	is_conti = false;
 	cmdFlag = 0;
 	code = 0;
-	conti_code = 0;
+	chain_code = 0;
 	type = 0;
 	alias = 0;
 	level = 0;

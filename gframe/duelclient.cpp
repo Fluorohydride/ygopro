@@ -1178,13 +1178,14 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			mainGame->dField.activatable_cards.push_back(pcard);
 			mainGame->dField.activatable_descs.push_back(desc);
 			pcard->is_selected = false;
-			if(code) {
+			if(code >= 1000000000) {
 				pcard->is_conti = true;
-				pcard->conti_code = code;
+				pcard->chain_code = code % 1000000000;
 				mainGame->dField.conti_cards.push_back(pcard);
 				mainGame->dField.remove_act = true;
 			}
 			else {
+				pcard->chain_code = code;
 				pcard->is_selectable = true;
 				pcard->cmdFlag |= COMMAND_ACTIVATE;
 				if(l == LOCATION_GRAVE)
