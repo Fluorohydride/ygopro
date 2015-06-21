@@ -24,7 +24,7 @@ function c31111109.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c31111109.splimit)
+	e3:SetValue(aux.fuslimit)
 	c:RegisterEffect(e3)
 end
 function c31111109.fuscon(e,g,gc,chkf)
@@ -78,9 +78,6 @@ function c31111109.fusop(e,tp,eg,ep,ev,re,r,rp,gc,chkf)
 		end
 	end
 	Duel.SetFusionMaterial(mg)
-end
-function c31111109.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c31111109.filter(c)
 	return (c:IsSetCard(0x9) or c:IsSetCard(0x1f) or c:IsSetCard(0x8)) and c:IsType(TYPE_MONSTER)

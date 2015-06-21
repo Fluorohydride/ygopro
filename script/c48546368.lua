@@ -6,7 +6,7 @@ function c48546368.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c48546368.splimit)
+	e1:SetValue(aux.ritlimit)
 	c:RegisterEffect(e1)
 	--negate
 	local e2=Effect.CreateEffect(c)
@@ -33,9 +33,6 @@ function c48546368.initial_effect(c)
 	e3:SetTarget(c48546368.distg)
 	e3:SetOperation(c48546368.disop)
 	c:RegisterEffect(e3)
-end
-function c48546368.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
 end
 function c48546368.negcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

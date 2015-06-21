@@ -8,7 +8,7 @@ function c83866861.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c83866861.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--actlimit
 	local e2=Effect.CreateEffect(c)
@@ -41,9 +41,6 @@ function c83866861.initial_effect(c)
 end
 function c83866861.ffilter(c)
 	return c:IsSetCard(0xad) or c:IsHasEffect(36693940)
-end
-function c83866861.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c83866861.aclimit(e,re,tp)
 	return not re:GetHandler():IsImmuneToEffect(e)

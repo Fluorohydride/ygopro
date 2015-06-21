@@ -8,7 +8,7 @@ function c81197327.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c81197327.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--recover
 	local e2=Effect.CreateEffect(c)
@@ -21,9 +21,6 @@ function c81197327.initial_effect(c)
 	e2:SetTarget(c81197327.rectg)
 	e2:SetOperation(c81197327.recop)
 	c:RegisterEffect(e2)
-end
-function c81197327.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c81197327.reccon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

@@ -14,7 +14,7 @@ function c18386170.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e2:SetValue(c18386170.splimit)
+	e2:SetValue(aux.fuslimit)
 	c:RegisterEffect(e2)
 	--cannot be target
 	local e3=Effect.CreateEffect(c)
@@ -46,9 +46,6 @@ function c18386170.initial_effect(c)
 	e5:SetTarget(c18386170.hdtg)
 	e5:SetOperation(c18386170.hdop)
 	c:RegisterEffect(e5)
-end
-function c18386170.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c18386170.tgval(e,re,rp)
 	return rp~=e:GetHandlerPlayer() and not re:GetHandler():IsImmuneToEffect(e)

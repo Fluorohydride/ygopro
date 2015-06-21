@@ -14,7 +14,7 @@ function c64599569.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e2:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e2:SetValue(c64599569.splimit)
+	e2:SetValue(aux.fuslimit)
 	c:RegisterEffect(e2)
 	--spsummon success
 	local e3=Effect.CreateEffect(c)
@@ -30,9 +30,6 @@ function c64599569.initial_effect(c)
 end
 c64599569.material_count=1
 c64599569.material={70095154}
-function c64599569.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
-end
 function c64599569.spfilter(c,mg)
 	return (c:IsCode(70095154) or c:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
 		and mg:IsExists(Card.IsRace,1,c,RACE_MACHINE)

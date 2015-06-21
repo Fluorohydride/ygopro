@@ -26,11 +26,8 @@ function c40418351.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c40418351.splimit)
+	e3:SetValue(aux.fuslimit)
 	c:RegisterEffect(e3)
-end
-function c40418351.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c40418351.filter(c)
 	return c:IsRace(RACE_DRAGON)

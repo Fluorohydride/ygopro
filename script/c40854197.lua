@@ -8,7 +8,7 @@ function c40854197.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c40854197.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -34,9 +34,6 @@ function c40854197.initial_effect(c)
 	e5:SetCode(EFFECT_UPDATE_ATTACK)
 	e5:SetValue(c40854197.atkup)
 	c:RegisterEffect(e5)
-end
-function c40854197.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c40854197.atkfilter(c)
 	return c:IsFaceup() and c:GetCode()~=40854197 and c:IsAttribute(ATTRIBUTE_WATER)

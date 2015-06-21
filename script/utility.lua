@@ -1178,7 +1178,23 @@ function Auxiliary.sumreg(e,tp,eg,ep,ev,re,r,rp)
 		tc=eg:GetNext()
 	end
 end
---sp_summon condition for synchron monster
+--sp_summon condition for fusion monster
+function Auxiliary.fuslimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+--sp_summon condition for ritual monster
+function Auxiliary.ritlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
+end
+--sp_summon condition for synchro monster
 function Auxiliary.synlimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
+end
+--sp_summon condition for xyz monster
+function Auxiliary.xyzlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ
+end
+--sp_summon condition for pendulum monster
+function Auxiliary.penlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
