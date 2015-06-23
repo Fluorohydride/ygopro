@@ -3363,6 +3363,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.selfdes_disabled = FALSE;
+			core.flip_delayed = FALSE;
 			core.units.begin()->step = 38;
 			return FALSE;
 		}
@@ -3423,6 +3424,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.selfdes_disabled = FALSE;
+			core.flip_delayed = FALSE;
 			core.units.begin()->step = 38;
 			return FALSE;
 		}
@@ -3455,6 +3457,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->arg1 = 0;
 			core.damage_calculated = TRUE;
 			core.selfdes_disabled = FALSE;
+			core.flip_delayed = FALSE;
 			core.units.begin()->step = 38;
 			return FALSE;
 		}
