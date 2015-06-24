@@ -60,7 +60,7 @@ function c72378329.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	local g2=Duel.SelectReleaseGroup(tp,c72378329.spfilter2,1,1,g1:GetFirst())
 	g1:Merge(g2)
 	c:SetMaterial(g1)
-	Duel.Release(g1,REASON_COST)
+	Duel.Release(g1,REASON_COST+REASON_FUSION+REASON_MATERIAL)
 end
 function c72378329.damcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
