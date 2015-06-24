@@ -33,7 +33,7 @@ function c29587993.distg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c29587993.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if not tc:IsRelateToEffect(e) then return end
+	if tc:IsFacedown() or not tc:IsRelateToEffect(e) then return end
 	Duel.SendtoHand(tc,nil,REASON_EFFECT)
 	if not tc:IsLocation(LOCATION_HAND) then return end
 	Duel.NegateActivation(ev)
