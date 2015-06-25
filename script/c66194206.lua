@@ -31,7 +31,8 @@ function c66194206.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c66194206.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x38)
+	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x38) 
+		and bit.band(r,REASON_EFFECT)~=0
 end
 function c66194206.thfilter(c)
 	return c:IsCode(57774843) and c:IsAbleToHand()
