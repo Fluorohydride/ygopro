@@ -46,7 +46,7 @@ function c18302224.activate(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		e2:SetCountLimit(1)
 		tc:RegisterEffect(e2,true)
-		tc:CompleteProcedure()
+		Duel.SpecialSummonComplete()
 	end
 end
 function c18302224.desop(e,tp,eg,ep,ev,re,r,rp)
