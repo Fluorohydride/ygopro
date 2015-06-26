@@ -9,11 +9,14 @@ function c12923641.initial_effect(c)
 	e1:SetOperation(c12923641.activate)
 	c:RegisterEffect(e1)
 end
+function c12923641.filter(c)
+	return c:IsFaceup() and not c:IsType(TYPE_TOKEN)
+end
 function c12923641.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
 	local c=e:GetHandler()
 	c:SetTurnCounter(0)
-	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,0,LOCATION_MZONE,nil)
+	local g=Duel.GetMatchingGroup(c35480699.filter,tp,0,LOCATION_MZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
 	--cannot change position
 	local e1=Effect.CreateEffect(c)

@@ -18,16 +18,19 @@ function c86516889.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	local g=Duel.SelectTarget(tp,Card.IsFacedown,tp,LOCATION_MZONE,0,1,5,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)
 end
-function c86516889.filter(c,e)
+function c86516889.filter1(c,e)
 	return c:IsFacedown() and c:IsRelateToEffect(e)
 end
+function c86516889.filter2(c)
+	return c:IsFaceup() and not c:IsType(TYPE_TOKEN)
+end
 function c86516889.activate(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c86516889.filter,nil,e)
+	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(c86516889.filter1,nil,e)
 	Duel.ChangePosition(g,POS_FACEUP_DEFENCE)
 	local ct=g:FilterCount(Card.IsSetCard,nil,0x8d)
 	if ct>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-		local sg=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,ct,nil)
+		local sg=Duel.SelectMatchingCard(tp,c86516889.filter2,tp,0,LOCATION_MZONE,1,ct,nil)
 		if sg:GetCount()>0 then
 			Duel.HintSelection(sg)
 			Duel.ChangePosition(sg,POS_FACEDOWN_DEFENCE)
