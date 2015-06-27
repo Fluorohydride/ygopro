@@ -1039,16 +1039,16 @@ int32 field::self_destroy(uint16 step) {
 	}
 	case 1: {
 		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE))
-			return FALSE;
+			return TRUE;
 		core.units.begin()->arg1 = returns.ivalue[0];
 		if(!core.self_tograve_set.empty())
 			send_to(&core.self_tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
+		else
+			return TRUE;
 		return FALSE;
 	}
 	case 2: {
 		returns.ivalue[0] += core.units.begin()->arg1;
-		if(returns.ivalue[0])
-			adjust_instant();
 		return TRUE;
 	}
 	}
