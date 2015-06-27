@@ -4665,9 +4665,6 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 				}
 			}
 			adjust_instant();
-			core.self_destroy_set.clear();
-			core.self_destroy_set.insert(pcard);
-			add_process(PROCESSOR_SELF_DESTROY, 0, 0, 0, 0, 0);
 		}
 		raise_event((card*)0, EVENT_CHAIN_SOLVING, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 		process_instant_event();
@@ -4898,6 +4895,7 @@ int32 field::break_effect() {
 }
 void field::adjust_instant() {
 	adjust_disable_check_list();
+	adjust_self_destroy_set();
 }
 void field::adjust_all() {
 	core.readjust_map.clear();
@@ -5259,28 +5257,10 @@ int32 field::adjust_step(uint16 step) {
 			return FALSE;
 		}
 		//self destroy
-		core.self_destroy_set.clear();
-		for(uint8 p = 0; p < 2; ++p) {
-			for(uint8 i = 0; i < 5; ++i) {
-				card* pcard = player[p].list_mzone[i];
-				if(pcard)
-					core.self_destroy_set.insert(pcard);
-			}
-			for(uint8 i = 0; i < 8; ++i) {
-				card* pcard = player[p].list_szone[i];
-				if(pcard)
-					core.self_destroy_set.insert(pcard);
-			}
-		}
-		if(core.self_destroy_set.size())
-			add_process(PROCESSOR_SELF_DESTROY, 0, 0, 0, 0, 0);
-		else
-			core.units.begin()->step = 9;
+		adjust_self_destroy_set();
 		return FALSE;
 	}
 	case 9: {
-		if(returns.ivalue[0] > 0)
-			core.re_adjust = TRUE;
 		return FALSE;
 	}
 	case 10: {

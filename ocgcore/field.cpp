@@ -1347,9 +1347,8 @@ int32 field::get_overlay_count(uint8 self, uint8 s, uint8 o) {
 }
 void field::update_disable_check_list(effect* peffect) {
 	card_set cset;
-	card_set::iterator it;
 	filter_affected_cards(peffect, &cset);
-	for (it = cset.begin(); it != cset.end(); ++it)
+	for (auto it = cset.begin(); it != cset.end(); ++it)
 		add_to_disable_check_list(*it);
 }
 void field::add_to_disable_check_list(card* pcard) {
@@ -1391,7 +1390,47 @@ void field::adjust_disable_check_list() {
 		}
 	} while(effects.disable_check_list.size());
 }
-
+void field::adjust_self_destroy_set() {
+	if(core.selfdes_disabled)
+		return;
+	card_set cset;
+	for(uint8 p = 0; p < 2; ++p) {
+		for(uint8 i = 0; i < 5; ++i) {
+			card* pcard = player[p].list_mzone[i];
+			if(pcard && pcard->is_position(POS_FACEUP))
+				cset.insert(pcard);
+		}
+		for(uint8 i = 0; i < 8; ++i) {
+			card* pcard = player[p].list_szone[i];
+			if(pcard && pcard->is_position(POS_FACEUP))
+				cset.insert(pcard);
+		}
+	}
+	core.self_destroy_set.clear();
+	core.self_tograve_set.clear();
+	effect* peffect;
+	for(auto cit = cset.begin(); cit != cset.end(); ++cit) {
+		card* pcard = *cit;
+		if((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, pcard->current.controler)))
+		        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY))) {
+			core.self_destroy_set.insert(pcard);
+			pcard->current.reason_effect = peffect;
+			pcard->current.reason_player = peffect->get_handler_player();
+		}
+	}
+	if(core.global_flag & GLOBALFLAG_SELF_TOGRAVE) {
+		for(auto cit = cset.begin(); cit != cset.end(); ++cit) {
+			card* pcard = *cit;
+			if(peffect = pcard->is_affected_by_effect(EFFECT_SELF_TOGRAVE)) {
+				core.self_tograve_set.insert(pcard);
+				pcard->current.reason_effect = peffect;
+				pcard->current.reason_player = peffect->get_handler_player();
+			}
+		}
+	}
+	if(!core.self_destroy_set.empty() || !core.self_tograve_set.empty())
+		add_process(PROCESSOR_SELF_DESTROY, 0, 0, 0, 0, 0);
+}
 void field::add_unique_card(card* pcard) {
 	uint8 con = pcard->current.controler;
 	if(pcard->unique_pos[0])

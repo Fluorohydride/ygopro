@@ -1031,47 +1031,24 @@ int32 field::control_adjust(uint16 step) {
 int32 field::self_destroy(uint16 step) {
 	switch(step) {
 	case 0: {
-		effect* peffect;
-		core.destroy_set.clear();
-		for(auto cit = core.self_destroy_set.begin(); cit != core.self_destroy_set.end(); ++cit) {
-			card* pcard = *cit;
-			if(pcard->is_position(POS_FACEUP) && (pcard->current.location & LOCATION_ONFIELD)
-			        && ((!pcard->is_status(STATUS_DISABLED) && (peffect = check_unique_onfield(pcard, pcard->current.controler)))
-			        || (peffect = pcard->is_affected_by_effect(EFFECT_SELF_DESTROY)))) {
-				core.destroy_set.insert(pcard);
-				pcard->current.reason_effect = peffect;
-				pcard->current.reason_player = peffect->get_handler_player();
-			}
-		}
-		if(core.destroy_set.size())
-			destroy(&core.destroy_set, 0, REASON_EFFECT, 5);
+		if(!core.self_destroy_set.empty())
+			destroy(&core.self_destroy_set, 0, REASON_EFFECT, 5);
 		else
 			returns.ivalue[0] = 0;
 		return FALSE;
 	}
 	case 1: {
 		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE))
-			return TRUE;
+			return FALSE;
 		core.units.begin()->arg1 = returns.ivalue[0];
-		effect* peffect;
-		card_set tograve_set;
-		for(auto cit = core.self_destroy_set.begin(); cit != core.self_destroy_set.end(); ++cit) {
-			card* pcard = *cit;
-			if(pcard->is_position(POS_FACEUP) && (pcard->current.location & LOCATION_ONFIELD)
-			        && (peffect = pcard->is_affected_by_effect(EFFECT_SELF_TOGRAVE))) {
-				tograve_set.insert(pcard);
-				pcard->current.reason_effect = peffect;
-				pcard->current.reason_player = peffect->get_handler_player();
-			}
-		}
-		if(tograve_set.size())
-			send_to(&tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
-		else
-			return TRUE;
+		if(!core.self_tograve_set.empty())
+			send_to(&core.self_tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
 		return FALSE;
 	}
 	case 2: {
 		returns.ivalue[0] += core.units.begin()->arg1;
+		if(returns.ivalue[0])
+			adjust_instant();
 		return TRUE;
 	}
 	}
