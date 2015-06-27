@@ -62,7 +62,7 @@ function c23846921.skipcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c23846921.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,2,nil)
-		and c:GetFlagEffect(23846921)==0 end
+		and e:GetHandler():GetFlagEffect(23846921)==0 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,Card.IsAbleToGraveAsCost,tp,LOCATION_MZONE,0,2,2,nil)
 	Duel.SendtoGrave(g,REASON_COST)
