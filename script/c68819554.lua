@@ -40,11 +40,7 @@ function c68819554.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c68819554.negcon(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsChainNegatable(ev) then return false end
-	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
-	if ex and (cp==tp or cp==PLAYER_ALL) then return true end
-	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
-	return ex and (cp==tp or cp==PLAYER_ALL) and Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_RECOVER)
+	return Duel.IsChainNegatable(ev) and aux.damcon1(e,tp,eg,ep,ev,re,r,rp) end
 end
 function c68819554.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

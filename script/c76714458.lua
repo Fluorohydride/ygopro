@@ -9,11 +9,7 @@ function c76714458.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c76714458.condition(e,tp,eg,ep,ev,re,r,rp)
-	if ep==tp then return false end
-	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
-	if ex and (cp==tp or cp==PLAYER_ALL) then return true end
-	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
-	return ex and (cp==tp or cp==PLAYER_ALL) and Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_RECOVER)
+	return ep~=tp and aux.damcon1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c76714458.operation(e,tp,eg,ep,ev,re,r,rp)
 	local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)
