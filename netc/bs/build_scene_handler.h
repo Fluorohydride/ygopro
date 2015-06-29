@@ -1,6 +1,8 @@
 #ifndef _BUILD_SCENE_HANDLER_H_
 #define _BUILD_SCENE_HANDLER_H_
 
+#include "utils/timer.h"
+
 #include "../scene_mgr.h"
 #include "../gui_extra.h"
 
@@ -9,7 +11,7 @@ namespace ygopro
     
     class BuildScene;
     
-    class BuildSceneHandler : public SceneHandler, public Timer<double> {
+    class BuildSceneHandler : public SceneHandler {
     public:
         BuildSceneHandler(std::shared_ptr<BuildScene> pscene);
         virtual bool UpdateEvent();

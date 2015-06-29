@@ -1,8 +1,10 @@
 #ifndef _IMAGE_MGR_H_
 #define _IMAGE_MGR_H_
 
-#include "base/render_base.h"
-#include "zip_archive.h"
+#include "utils/singleton.h"
+#include "utils/render_base.h"
+#include "utils/render_util.h"
+#include "utils/zip_reader.h"
 
 namespace ygopro
 {
@@ -30,9 +32,9 @@ namespace ygopro
         bool FreeBlock(uint16_t, bool reserve);
         void IncreaseRef(uint16_t);
         
-		void InitTextures(const std::wstring& image_path);
+		void InitTextures(const std::string& image_path);
         void UninitTextures();
-		bool LoadImageConfig(const std::wstring& file);
+		bool LoadImageConfig(const std::string& file);
         
     protected:
         std::unordered_map<uint32_t, CardTextureInfo> card_textures;
@@ -46,10 +48,7 @@ namespace ygopro
         base::Texture misc_texture;
         base::Texture bg_texture;
         base::Texture card_image;
-        uint32_t frame_buffer = 0;
-        uint32_t card_buffer[2] = {0, 0};
-        uint32_t card_vao = 0;
-        ZipArchive imageZip;
+        ZipReader imageZip;
 	};
 
 }

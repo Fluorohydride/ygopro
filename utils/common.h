@@ -62,14 +62,4 @@
 
 #endif //_WIN32
 
-#include "bufferutil.h"
-#include "command.h"
-#include "convert.h"
-#include "filesystem.h"
-#include "hash.h"
-#include "singleton.h"
-#include "textfile.h"
-#include "timer.h"
-#include "tokenizer.h"
-
 #endif //_COMMON_H_

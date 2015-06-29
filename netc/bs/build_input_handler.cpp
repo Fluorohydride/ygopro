@@ -45,7 +45,7 @@ namespace ygopro
         return true;
     }
     
-    void BuildInputHandler::MouseMove(sgui::MouseMoveEvent evt) {
+    void BuildInputHandler::MouseMove(int32_t x, int32_t y) {
         std::shared_ptr<DeckCardData> dcd = nullptr;
         auto pscene = build_scene.lock();
         auto pre = hover_obj.lock();
@@ -73,7 +73,7 @@ namespace ygopro
         hover_obj = dcd;
     }
     
-    void BuildInputHandler::MouseButtonDown(sgui::MouseButtonEvent evt) {
+    void BuildInputHandler::MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y) {
         click_pos = hover_pos;
         if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
             show_info_begin = true;
@@ -81,7 +81,7 @@ namespace ygopro
         }
     }
     
-    void BuildInputHandler::MouseButtonUp(sgui::MouseButtonEvent evt) {
+    void BuildInputHandler::MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y) {
         if(evt.button == GLFW_MOUSE_BUTTON_LEFT)
             show_info_begin = false;
         if(hover_pos != click_pos)
@@ -103,11 +103,11 @@ namespace ygopro
         }
     }
     
-    void BuildInputHandler::MouseWheel(sgui::MouseWheelEvent evt) {
+    void BuildInputHandler::MouseWheel(float deltax, float deltay) {
         
     }
     
-    void BuildInputHandler::KeyDown(sgui::KeyEvent evt) {
+    void BuildInputHandler::KeyDown(int32_t key, int32_t mods) {
         auto pscene = build_scene.lock();
         switch(evt.key) {
             case GLFW_KEY_1:
@@ -150,7 +150,7 @@ namespace ygopro
         }
     }
     
-    void BuildInputHandler::KeyUp(sgui::KeyEvent evt) {
+    void BuildInputHandler::KeyUp(int32_t key, int32_t mods) {
         
     }
     

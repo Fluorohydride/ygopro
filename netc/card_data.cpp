@@ -1,4 +1,4 @@
-#include "buildin/common.h"
+#include "utils/common.h"
 
 #include <sqlite3.h>
 
@@ -84,11 +84,10 @@ namespace ygopro
         return p1->code < p2->code;
     }
     
-	int32_t DataMgr::LoadDatas(const std::wstring& file) {
+	int32_t DataMgr::LoadDatas(const std::string& file) {
 		_datas.clear();
 		sqlite3* pDB;
-        std::string dfile = To<std::string>(file);
-		if(sqlite3_open(dfile.c_str(), &pDB) != SQLITE_OK)
+		if(sqlite3_open(file.c_str(), &pDB) != SQLITE_OK)
 			return sqlite3_errcode(pDB);
 		sqlite3_stmt* pStmt;
 		const char* sql = "select * from datas,texts where datas.id=texts.id";

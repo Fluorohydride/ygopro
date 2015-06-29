@@ -1,6 +1,8 @@
 #ifndef _CARD_DATA_H_
 #define _CARD_DATA_H_
 
+#include "utils/singleton.h"
+
 namespace ygopro
 {
 
@@ -48,7 +50,7 @@ namespace ygopro
     
 	class DataMgr : public Singleton<DataMgr> {
 	public:
-		int32_t LoadDatas(const std::wstring& file);
+		int32_t LoadDatas(const std::string& file);
 		CardData* operator [] (uint32_t code);
         std::vector<uint32_t> AllAliases(uint32_t code);
         std::vector<CardData*> FilterCard(const FilterCondition& fc);

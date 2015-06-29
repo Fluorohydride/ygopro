@@ -34,6 +34,8 @@ public:
         return &datas[0];
     }
     
+    inline size_t Length() { return file_size; }
+    
 private:
     size_t file_size = 0;
     std::vector<char> datas;

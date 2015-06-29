@@ -1,7 +1,6 @@
-#include "buildin/common.h"
-
-#include "buildin/rapidxml.hpp"
-#include "buildin/rapidxml_print.hpp"
+#include "utils/common.h"
+#include "utils/jaweson.h"
+#include "utils/filesystem.h"
 
 #include "image_mgr.h"
 #include "scene_mgr.h"
@@ -14,7 +13,7 @@ namespace ygopro
 		if(iter == card_textures.end()) {
             std::string file = To<std::string>("%d.jpg", id);
 			auto& cti = card_textures[id];
-            int32_t length = imageZip.GetFileLength(file);
+            size_t length = imageZip.GetFileLength(file);
             if(length == 0) {
                 file = To<std::string>("%d.png", id);
                 length = imageZip.GetFileLength(file);
@@ -30,7 +29,7 @@ namespace ygopro
                 } else {
                     base::Image img;
                     auto fileinfo = imageZip.ReadFile(file);
-                    if(img.LoadMemory(fileinfo.first, length)) {
+                    if(img.LoadMemory(fileinfo.first, (uint32_t)length)) {
                         base::v2ct frame_verts[4];
                         int32_t bx = (blockid % 20) * 100;
                         int32_t by = (blockid / 20) * 145;
@@ -83,7 +82,7 @@ namespace ygopro
         if(pid == id)
             return pre_ret;
         std::string file = To<std::string>("%d.jpg", id);
-        int32_t length = imageZip.GetFileLength(file);
+        size_t length = imageZip.GetFileLength(file);
         if(length == 0) {
             file = To<std::string>("%d.png", id);
             length = imageZip.GetFileLength(file);
@@ -95,7 +94,7 @@ namespace ygopro
         if(length != 0) {
             base::Image img;
             auto imginfo = imageZip.ReadFile(file);
-            if(img.LoadMemory(imginfo.first, length)) {
+            if(img.LoadMemory(imginfo.first, (uint32_t)length)) {
                 card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
                 pre_ret = &card_image;
             } else
@@ -180,34 +179,11 @@ namespace ygopro
         ref_count[blockid].first++;
     }
     
-    void ImageMgr::InitTextures(const std::wstring& image_path) {
+    void ImageMgr::InitTextures(const std::string& image_path) {
         card_texture.Load(nullptr, 2048, 2048);
         for(int16_t i = 7; i < 280; ++i)
             unused_block.push_back(i);
         ref_count.resize(280);
-        glGenFramebuffers(1, &frame_buffer);
-        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, card_texture.GetTextureId(), 0);
-        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-        glGenBuffers(2, card_buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(base::v2ct) * 4, nullptr, GL_DYNAMIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        uint16_t index[] = {0, 2, 1, 1, 2, 3};
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(index), index, GL_STATIC_DRAW);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-        glGenVertexArrays(1, &card_vao);
-        glBindVertexArray(card_vao);
-        glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-        glEnableVertexAttribArray(0);
-        glEnableVertexAttribArray(1);
-        glEnableVertexAttribArray(2);
-        glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(base::v2ct), 0);
-        glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(base::v2ct), (const GLvoid*)base::v2ct::color_offset);
-        glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(base::v2ct), (const GLvoid*)base::v2ct::tex_offset);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, card_buffer[1]);
-        glBindVertexArray(0);
 		std::vector<std::wstring> image_files;
 		FileSystem::TraversalDir(image_path, [&image_path, &image_files](const std::wstring& name, bool isdir) {
 			if(!isdir && name.find(L".zip") == (name.size() - 4)) {
@@ -220,19 +196,16 @@ namespace ygopro
     }
 
     void ImageMgr::UninitTextures() {
-        glDeleteFramebuffers(1, &frame_buffer);
-        glDeleteBuffers(2, card_buffer);
-        glDeleteVertexArrays(1, &card_vao);
         card_texture.Unload();
         misc_texture.Unload();
         bg_texture.Unload();
         card_image.Unload();
     }
     
-	bool ImageMgr::LoadImageConfig(const std::wstring& name) {
+	bool ImageMgr::LoadImageConfig(const std::string& name) {
         if(!FileSystem::IsFileExists(name))
             return false;
-        TextFile f(To<std::string>(name));
+        TextFile f(name);
         rapidxml::xml_document<> doc;
         doc.parse<0>(f.Data());
         rapidxml::xml_node<>* root = doc.first_node();

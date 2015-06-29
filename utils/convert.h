@@ -61,53 +61,52 @@ struct ToInner<T, std::string> {
 template<>
 struct ToInner<std::wstring, std::string> {
     static std::string C(const std::wstring& val) {
-        char buffer[2048], *str = buffer;
+        static std::vector<char> buffer(2048);
+        buffer.clear();
         const wchar_t* wsrc = val.c_str();
         while(*wsrc != 0) {
             if(*wsrc < 0x80) {
-                *str = (char)*wsrc;
-                ++str;
+                buffer.push_back((char)*wsrc);
             } else if(*wsrc < 0x800) {
-                str[0] = ((*wsrc >> 6) & 0x1f) | 0xc0;
-                str[1] = ((*wsrc) & 0x3f) | 0x80;
-                str += 2;
+                buffer.push_back(((*wsrc >> 6) & 0x1f) | 0xc0);
+                buffer.push_back(((*wsrc) & 0x3f) | 0x80);
             } else {
-                str[0] = ((*wsrc >> 12) & 0xf) | 0xe0;
-                str[1] = ((*wsrc >> 6) & 0x3f) | 0x80;
-                str[2] = ((*wsrc) & 0x3f) | 0x80;
-                str += 3;
+                buffer.push_back(((*wsrc >> 12) & 0xf) | 0xe0);
+                buffer.push_back(((*wsrc >> 6) & 0x3f) | 0x80);
+                buffer.push_back(((*wsrc) & 0x3f) | 0x80);
             }
             wsrc++;
         }
-        *str = 0;
-        return std::move(std::string(buffer));
+        std::string str;
+        str.insert(str.begin(), buffer.begin(), buffer.end());
+        return std::move(str);
     }
 };
 
 template<>
 struct ToInner<std::string, std::wstring> {
     static std::wstring C(const std::string& val) {
-        wchar_t buffer[1024], *wstr = buffer;
+        static std::vector<wchar_t> buffer(2048);
         const char* p = val.c_str();
         while(*p != 0) {
             if((*p & 0x80) == 0) {
-                *wstr = *p;
+                buffer.push_back(*p);
                 p++;
             } else if((*p & 0xe0) == 0xc0) {
-                *wstr = (((int)p[0] & 0x1f) << 6) | ((int)p[1] & 0x3f);
+                buffer.push_back((((int)p[0] & 0x1f) << 6) | ((int)p[1] & 0x3f));
                 p += 2;
             } else if((*p & 0xf0) == 0xe0) {
-                *wstr = (((int)p[0] & 0xf) << 12) | (((int)p[1] & 0x3f) << 6) | ((int)p[2] & 0x3f);
+                buffer.push_back((((int)p[0] & 0xf) << 12) | (((int)p[1] & 0x3f) << 6) | ((int)p[2] & 0x3f));
                 p += 3;
             } else if((*p & 0xf8) == 0xf0) {
-                *wstr = (((int)p[0] & 0x7) << 18) | (((int)p[1] & 0x3f) << 12) | (((int)p[2] & 0x3f) << 6) | ((int)p[3] & 0x3f);
+                buffer.push_back((((int)p[0] & 0x7) << 18) | (((int)p[1] & 0x3f) << 12) | (((int)p[2] & 0x3f) << 6) | ((int)p[3] & 0x3f));
                 p += 4;
             } else
                 p++;
-            wstr++;
         }
-        *wstr = 0;
-        return std::move(std::wstring(buffer));
+        std::wstring str;
+        str.insert(str.begin(), buffer.begin(), buffer.end());
+        return std::move(str);
     }
 };
 

@@ -1,9 +1,8 @@
 #ifndef _GAME_SCENE_H_
 #define _GAME_SCENE_H_
 
-#include "base/render_base.h"
-#include "base/sungui.h"
-#include "xml_config.h"
+#include "utils/singleton.h"
+#include "utils/render_util.h"
 
 namespace ygopro
 {
@@ -11,13 +10,12 @@ namespace ygopro
     class InputHandler {
     public:
         virtual bool UpdateInput() = 0;
-        virtual void MouseMove(sgui::MouseMoveEvent evt) = 0;
-        virtual void MouseButtonDown(sgui::MouseButtonEvent evt) = 0;
-        virtual void MouseButtonUp(sgui::MouseButtonEvent evt) = 0;
-        virtual void MouseWheel(sgui::MouseWheelEvent evt) = 0;
-        virtual void KeyDown(sgui::KeyEvent evt) = 0;
-        virtual void KeyUp(sgui::KeyEvent evt) = 0;
-
+        virtual void MouseMove(int32_t x, int32_t y) = 0;
+        virtual void MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y) = 0;
+        virtual void MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y) = 0;
+        virtual void MouseWheel(int32_t deltax, int32_t deltay) = 0;
+        virtual void KeyDown(int32_t key, int32_t mods) = 0;
+        virtual void KeyUp(int32_t key, int32_t mods) = 0;
     };
     
     class SceneHandler {
@@ -37,25 +35,10 @@ namespace ygopro
         virtual bool IsActive() { return is_active; }
         virtual void Exit() { is_active = false; }
         
-        template<typename T>
-        void SetInputHandler(T ih) {
-            input_handler = std::static_pointer_cast<InputHandler>(ih);
-        }
-        
-        template<typename T = InputHandler>
-        std::shared_ptr<T> GetInputHandler() {
-            return std::static_pointer_cast<T>(input_handler);
-        }
-        
-        template<typename T>
-        void SetSceneHandler(T sh) {
-            scene_handler = std::static_pointer_cast<SceneHandler>(sh);
-        }
-        
-        template<typename T = SceneHandler>
-        std::shared_ptr<T> GetSceneHandler() {
-            return std::static_pointer_cast<T>(scene_handler);
-        }
+        inline void SetInputHandler(std::shared_ptr<InputHandler> ih) { input_handler = ih; }
+        inline std::shared_ptr<InputHandler> GetInputHandler() { return input_handler; }
+        inline void SetSceneHandler(std::shared_ptr<SceneHandler> sh) { scene_handler = sh; }
+        inline std::shared_ptr<SceneHandler> GetSceneHandler() { return scene_handler; }
         
     protected:
         std::shared_ptr<InputHandler> input_handler;
@@ -63,59 +46,29 @@ namespace ygopro
         bool is_active = true;
     };
     
-    class SceneMgr : public Singleton<SceneMgr> {
+    class SceneMgr : public base::FrameControler, public Singleton<SceneMgr> {
     public:
         
-        void Init(const std::wstring& layout);
+        void Init();
         void Uninit();
-        void InitDraw();
         bool Update();
         void Draw();
-        inline double GetGameTime() { return now; }
-        void SetFrameRate(double rate);
-        void CheckFrameRate();
         void SetSceneSize(v2i sz);
         inline v2i GetSceneSize() { return scene_size; }
         void ScreenShot();
-        void SetMousePosition(v2i pos) { mouse_pos = pos; }
-        v2i GetMousePosition() { return mouse_pos; }
-        rectf LayoutRectConfig(const std::string& name) { return rect_config[name]; }
-        int32_t LayoutIntConfig(const std::string& name) { return int_config[name]; }
-        float LayoutFloatConfig(const std::string& name) { return float_config[name]; }
+        inline void SetMousePosition(v2i pos) { mouse_pos = pos; }
+        inline v2i GetMousePosition() { return mouse_pos; }
         
-        template<typename T>
-        void SetScene(T sc) {
-            auto pscene = std::static_pointer_cast<Scene>(sc);
-            if(current_scene == pscene)
-                return;
-            sgui::SGGUIRoot::GetSingleton().ClearChild();
-            current_scene = pscene;
-            if(current_scene != nullptr) {
-                current_scene->SetSceneSize(scene_size);
-                current_scene->Activate();
-            }
-        }
-        template<typename T = Scene>
-        std::shared_ptr<T> GetScene() {
-            return std::static_pointer_cast<T>(current_scene);;
-        };
+        void SetScene(std::shared_ptr<Scene> sc);
+        inline std::shared_ptr<Scene> GetScene() { return current_scene; };
         
     protected:
-        v2i scene_size;
-        uint64_t start_time = 0;
-        double now = 0.0;
-        std::shared_ptr<Scene> current_scene = nullptr;
-        double frame_check = 0.0;
-        double frame_time = 0.0;
-        double frame_interval = 0.0;
+        v2i scene_size = {1, 1};
         v2i mouse_pos = {0, 0};
-        std::unordered_map<std::string, rectf> rect_config;
-        std::unordered_map<std::string, int32_t> int_config;
-        std::unordered_map<std::string, float> float_config;
+        std::shared_ptr<Scene> current_scene = nullptr;
+        
     };
 
-	extern CommonConfig commonCfg;
-    extern CommonConfig stringCfg;
 }
 
 #endif

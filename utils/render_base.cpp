@@ -1,4 +1,4 @@
-#include "buildin/common.h"
+#include "common.h"
 
 #define STBI_NO_SIMD
 #define STB_IMAGE_IMPLEMENTATION
@@ -8,10 +8,13 @@
 #define STBI_NO_HDR
 #define STBI_NO_PIC
 #define STBI_NO_PNM
-#include "buildin/stb_image.h"
-#include "buildin/stb_image_write.h"
+#include "stb_image.h"
 
 #include "render_base.h"
+
+#include FT_FREETYPE_H
+#include FT_OUTLINE_H
+#include FT_SYNTHESIS_H
 
 #ifdef _DEBUG
 void GLCheckError(const std::string& file, int32_t line) {
@@ -145,6 +148,12 @@ namespace base {
             glUniform1i(loc, value);
     }
     
+    void Shader::SetParam1f(const char* varname, const float value) {
+        auto loc = glGetUniformLocation(program, varname);
+        if(loc >= 0)
+            glUniform1f(loc, value);
+    }
+    
     void Shader::SetParamMat4(const char* varname, const float m[]) {
         auto loc = glGetUniformLocation(program, varname);
         if(loc >= 0)
@@ -166,30 +175,29 @@ namespace base {
     Shader& Shader::GetDefaultShader(bool reload) {
         static Shader default_shader;
         static bool inited = false;
-        static const char* vert_shader = "\
-        #version 330\n\
-        layout (location = 0) in vec2 v_position;\n\
-        layout (location = 1) in vec4 v_color;\n\
-        layout (location = 2) in vec2 v_texcoord;\n\
-        out vec4 color;\n\
-        out vec2 texcoord;\n\
-        void main() {\n\
-        color = v_color;\n\
-        texcoord = v_texcoord;\n\
-        gl_Position = vec4(v_position, 0.0, 1.0);\n\
-        }\n\
-        ";
-        static const char* frag_shader = "\
-        #version 330\n\
-        in vec4 color;\n\
-        in vec2 texcoord;\n\
-        layout (location = 0) out vec4 frag_color;\n\
-        uniform sampler2D texid;\n\
-        void main() {\n\
-        vec4 texcolor = texture(texid, texcoord);\n\
-        frag_color = texcolor * color;\n\
-        }\n\
-        ";
+        static const char* vert_shader =
+        "#version 330\n"
+        "layout (location = 0) in vec2 v_position;\n"
+        "layout (location = 1) in vec4 v_color;\n"
+        "layout (location = 2) in vec2 v_texcoord;\n"
+        "out vec4 color;\n"
+        "out vec2 texcoord;\n"
+        "void main() {\n"
+        "color = v_color;\n"
+        "texcoord = v_texcoord;\n"
+        "gl_Position = vec4(v_position, 0.0, 1.0);\n"
+        "}\n";
+        static const char* frag_shader =
+        "#version 330\n"
+        "in vec4 color;\n"
+        "in vec2 texcoord;\n"
+        "layout (location = 0) out vec4 frag_color;\n"
+        "uniform sampler2D texid;\n"
+        "uniform float alpha;\n"
+        "void main() {\n"
+        "vec4 texcolor = texture(texid, texcoord);\n"
+        "frag_color = texcolor * color * vec4(1.0, 1.0, 1.0, alpha);\n"
+        "}\n";
         
         if(!inited || reload) {
             default_shader.LoadVertShader(vert_shader);
@@ -237,7 +245,7 @@ namespace base {
         return true;
     }
     
-    void Texture::Load(const uint8_t* data, int32_t x, int32_t y) {
+    void Texture::Load(const uint8_t* data, int32_t x, int32_t y, int32_t filter_type) {
         if(texture_id)
             glDeleteTextures(1, &texture_id);
         tex_width = texlen(x);
@@ -246,8 +254,8 @@ namespace base {
         img_height = y;
         glGenTextures(1, &texture_id);
 		glBindTexture(GL_TEXTURE_2D, texture_id);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filter_type);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filter_type);
         if(data) {
             uint8_t* px = new uint8_t[tex_width * tex_height * 4];
             memset(px, 0, tex_width * tex_height * 4);
@@ -301,7 +309,7 @@ namespace base {
         char_tex.Unload();
     }
     
-    bool Font::Load(const std::string &file, uint32_t sz) {
+    bool Font::Load(const std::string &file, uint32_t sz, const std::string& style, vector2<int32_t> offset) {
         if (FT_New_Face(library, file.c_str(), 0, &face))
             return false;
         FT_Select_Charmap(face, FT_ENCODING_UNICODE);
@@ -310,6 +318,18 @@ namespace base {
         tex_pos.x = 0;
         tex_pos.y = 0;
         font_size = sz;
+        if(style.find("bold") != std::string::npos)
+            is_bold = true;
+        if(style.find("italic") != std::string::npos) {
+            float lean = 0.4f;
+            FT_Matrix matrix;
+            matrix.xx = 0x10000;
+            matrix.xy = lean * 0x10000;
+            matrix.yx = 0;
+            matrix.yy = 0x10000;
+            FT_Set_Transform(face, &matrix, 0);
+        }
+        text_offset = offset;
         return true;
     }
 
@@ -319,12 +339,12 @@ namespace base {
         if(tex_pos.x < emoji_img_size.x)
             tex_pos.x = emoji_img_size.x;
         emoji_spacing = ls;
-        for(int32_t i = 0; i < ecount.x; ++i) {
-            for(int32_t j = 0; j < ecount.y; ++j) {
-                int32_t idx = 0xe000 + i * ecount.y + j;
-                auto gl = glyphs[idx];
+        for(int32_t y = 0; y < ecount.y; ++y) {
+            for(int32_t x = 0; x < ecount.x; ++x) {
+                int32_t idx = 0xe000 + y * ecount.x + x;
+                auto& gl = glyphs[idx];
                 gl.bounds = erect;
-                gl.textureRect = rect<int32_t>{j * esize.x, i * esize.y, esize.x, esize.y};
+                gl.textureRect = rect<int32_t>{x * esize.x, y * esize.y, esize.x, esize.y};
                 gl.advance = erect.width + 1;
                 gl.loaded = true;                
             }
@@ -341,6 +361,8 @@ namespace base {
             return gl;
         FT_UInt glyph_index = FT_Get_Char_Index(face, ch);
         FT_Load_Glyph(face, glyph_index, FT_LOAD_DEFAULT);
+        if(is_bold)
+            FT_Outline_Embolden(&face->glyph->outline, 1 << 6);
         FT_Render_Glyph(face->glyph, FT_RENDER_MODE_NORMAL);
         gl.bounds = {face->glyph->bitmap_left, -face->glyph->bitmap_top, (int32_t)face->glyph->bitmap.width, (int32_t)face->glyph->bitmap.rows};
         gl.advance = face->glyph->advance.x / 64.0f;

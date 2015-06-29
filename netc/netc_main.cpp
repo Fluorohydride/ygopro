@@ -1,17 +1,23 @@
-#include "buildin/common.h"
+#include "utils/common.h"
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
+#include "utils/textfile.h"
+#include "utils/sgui.h"
+
+#include "config.h"
 
 #include "scene_mgr.h"
 #include "image_mgr.h"
 #include "card_data.h"
 #include "deck_data.h"
-#include "base/sungui.h"
 #include "bs/build_input_handler.h"
 #include "bs/build_scene_handler.h"
 #include "bs/build_scene.h"
-#include "ds/duel_input_handler.h"
-#include "ds/duel_scene_handler.h"
-#include "ds/duel_network.h"
-#include "ds/duel_scene.h"
+//#include "ds/duel_input_handler.h"
+//#include "ds/duel_scene_handler.h"
+//#include "ds/duel_network.h"
+//#include "ds/duel_scene.h"
 
 using namespace ygopro;
 
@@ -19,15 +25,29 @@ static float xrate = 0.0f;
 static float yrate = 0.0f;
 static bool need_draw = true;
 
+jaweson::JsonRoot<> commonCfg;
+jaweson::JsonRoot<> stringCfg;
+jaweson::JsonRoot<> layoutCfg;
+
 int32_t main(int32_t argc, char* argv[]) {
     if(!glfwInit())
         return 0;
-    if(!commonCfg.LoadConfig(L"common.xml"))
-        return 0;
-    int32_t width = commonCfg["window_width"];
-    int32_t height = commonCfg["window_height"];
-	int32_t fsaa = commonCfg["fsaa"];
-    int32_t vsync = commonCfg["vertical_sync"];
+    {
+        TextFile jsonfile;
+        jsonfile.Load("common.json");
+        if(!commonCfg.parse(jsonfile.Data(), jsonfile.Length()))
+            return 0;
+        jsonfile.Load(commonCfg["string_conf"].to_string());
+        if(!stringCfg.parse(jsonfile.Data(), jsonfile.Length()))
+            return 0;
+        jsonfile.Load(commonCfg["layout_conf"].to_string());
+        if(!layoutCfg.parse(jsonfile.Data(), jsonfile.Length()))
+            return 0;
+    }
+    int32_t width = commonCfg["window_width"].to_integer();
+    int32_t height = commonCfg["window_height"].to_integer();;
+	int32_t fsaa = commonCfg["fsaa"].to_integer();;
+    int32_t vsync = commonCfg["vertical_sync"].to_integer();;
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -57,32 +77,28 @@ int32_t main(int32_t argc, char* argv[]) {
     std::cout << "GLSL Version : " << glGetString(GL_SHADING_LANGUAGE_VERSION) << std::endl;
     glGetError();
     
-    ImageMgr::Get().InitTextures(commonCfg["image_path"]);
-    if(!stringCfg.LoadConfig(commonCfg["string_conf"])
-       || DataMgr::Get().LoadDatas(commonCfg["database_file"])
-       || !ImageMgr::Get().LoadImageConfig(commonCfg["textures_conf"])
-       || !sgui::SGGUIRoot::GetSingleton().LoadConfigs(commonCfg["gui_conf"])) {
-        glfwDestroyWindow(window);
-        glfwTerminate();
-        return 0;
-    }
-    LimitRegulationMgr::Get().LoadLimitRegulation(commonCfg["limit_regulation"], stringCfg["eui_list_default"]);
-    stringCfg.ForEach([](const std::string& name, ValueStruct& value) {
-        if(name.find("setname_") == 0 ) {
-            std::wstring setname = To<std::wstring>(name.substr(8));
-            DataMgr::Get().RegisterSetCode(static_cast<uint32_t>(value), setname);
-        }
-    });
-    SceneMgr::Get().Init(commonCfg["layout_conf"]);
-    
     int32_t bwidth, bheight;
     glfwGetFramebufferSize(window, &bwidth, &bheight);
     xrate = (float)bwidth / width;
     yrate = (float)bheight / height;
-    sgui::SGGUIRoot::GetSingleton().SetSceneSize({bwidth, bheight});
+    
+    ImageMgr::Get().InitTextures(commonCfg["image_path"].to_string());
+    if(DataMgr::Get().LoadDatas(commonCfg["database_file"].to_string())
+       || !ImageMgr::Get().LoadImageConfig(commonCfg["textures_conf"].to_string())
+       || !sgui::SGGUIRoot::GetSingleton().Init(commonCfg["gui_conf"].to_string(), {bwidth, bheight}, true)) {
+        glfwDestroyWindow(window);
+        glfwTerminate();
+        return 0;
+    }
+    LimitRegulationMgr::Get().LoadLimitRegulation(commonCfg["limit_regulation"].to_string(), stringCfg["eui_list_default"].to_string());
+    stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
+        std::wstring setname = To<std::wstring>(name.substr(8));
+        DataMgr::Get().RegisterSetCode(To<uint32_t>(node.to_string()), setname);
+    });
+    
+    SceneMgr::Get().Init();
     SceneMgr::Get().SetSceneSize({bwidth, bheight});
-    SceneMgr::Get().InitDraw();
-    SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"]);
+    SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
     
     auto sc = std::make_shared<BuildScene>();
     auto ih = std::make_shared<BuildInputHandler>(sc);
@@ -104,11 +120,11 @@ int32_t main(int32_t argc, char* argv[]) {
         if(action == GLFW_PRESS) {
             if(key == GLFW_KEY_GRAVE_ACCENT && (mods & GLFW_MOD_ALT))
                 SceneMgr::Get().ScreenShot();
-            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent({key, mods}))
-                SceneMgr::Get().GetScene()->GetInputHandler()->KeyDown({key, mods});
+            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyDownEvent(key, mods))
+                SceneMgr::Get().GetScene()->GetInputHandler()->KeyDown(key, mods);
         } else if(action == GLFW_RELEASE) {
-            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent({key, mods}))
-                SceneMgr::Get().GetScene()->GetInputHandler()->KeyUp({key, mods});
+            if(!sgui::SGGUIRoot::GetSingleton().InjectKeyUpEvent(key, mods))
+                SceneMgr::Get().GetScene()->GetInputHandler()->KeyUp(key, mods);
         }
     });
     glfwSetCharCallback(window, [](GLFWwindow* wnd, uint32_t unichar) {
@@ -119,8 +135,8 @@ int32_t main(int32_t argc, char* argv[]) {
         glfwGetWindowSize(wnd, &x, &y);
         xrate = (float)width / x;
         yrate = (float)height / y;
-        SceneMgr::Get().SetSceneSize(v2i{width, height});
-        sgui::SGGUIRoot::GetSingleton().SetSceneSize(v2i{width, height});
+        SceneMgr::Get().SetSceneSize({width, height});
+        sgui::SGGUIRoot::GetSingleton().SetScreenSize({width, height});
     });
     glfwSetCursorEnterCallback(window, [](GLFWwindow* wnd, int32_t enter) {
         if(enter == GL_TRUE)
@@ -130,8 +146,8 @@ int32_t main(int32_t argc, char* argv[]) {
     });
     glfwSetCursorPosCallback(window, [](GLFWwindow* wnd, double xpos, double ypos) {
         SceneMgr::Get().SetMousePosition({(int32_t)(xpos * xrate), (int32_t)(ypos * yrate)});
-        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent({(int32_t)(xpos * xrate), (int32_t)(ypos * yrate)}))
-            SceneMgr::Get().GetScene()->GetInputHandler()->MouseMove({(int32_t)(xpos * xrate), (int32_t)(ypos * yrate)});
+        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseMoveEvent((int32_t)(xpos * xrate), (int32_t)(ypos * yrate)))
+            SceneMgr::Get().GetScene()->GetInputHandler()->MouseMove((int32_t)(xpos * xrate), (int32_t)(ypos * yrate));
     });
     glfwSetMouseButtonCallback(window, [](GLFWwindow* wnd, int32_t button, int32_t action, int32_t mods) {
         double xpos, ypos;
@@ -140,21 +156,21 @@ int32_t main(int32_t argc, char* argv[]) {
         ypos *= yrate;
         SceneMgr::Get().SetMousePosition({(int32_t)xpos, (int32_t)ypos});
         if(action == GLFW_PRESS) {
-            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent({button, mods, (int32_t)xpos, (int32_t)ypos}))
-                SceneMgr::Get().GetScene()->GetInputHandler()->MouseButtonDown({button, mods, (int32_t)xpos, (int32_t)ypos});
+            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonDownEvent(button, mods, (int32_t)xpos, (int32_t)ypos))
+                SceneMgr::Get().GetScene()->GetInputHandler()->MouseButtonDown(button, mods, (int32_t)xpos, (int32_t)ypos);
         } else {
-            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent({button, mods, (int32_t)xpos, (int32_t)ypos}))
-                SceneMgr::Get().GetScene()->GetInputHandler()->MouseButtonUp({button, mods, (int32_t)xpos, (int32_t)ypos});
+            if(!sgui::SGGUIRoot::GetSingleton().InjectMouseButtonUpEvent(button, mods, (int32_t)xpos, (int32_t)ypos))
+                SceneMgr::Get().GetScene()->GetInputHandler()->MouseButtonUp(button, mods, (int32_t)xpos, (int32_t)ypos);
         }
     });
     glfwSetScrollCallback(window, [](GLFWwindow* wnd, double xoffset, double yoffset) {
-        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent({(float)xoffset, (float)yoffset}))
-            SceneMgr::Get().GetScene()->GetInputHandler()->MouseWheel({(float)xoffset, (float)yoffset});
+        if(!sgui::SGGUIRoot::GetSingleton().InjectMouseWheelEvent((float)xoffset, (float)yoffset))
+            SceneMgr::Get().GetScene()->GetInputHandler()->MouseWheel((float)xoffset, (float)yoffset);
     });
     glfwSetWindowIconifyCallback(window, [](GLFWwindow* wnd, int32_t iconified) {
         need_draw = (iconified == GL_FALSE);
         if(need_draw)
-            SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"]);
+            SceneMgr::Get().SetFrameRate((int32_t)commonCfg["frame_rate"].to_integer());
         else
             SceneMgr::Get().SetFrameRate(10);
     });
@@ -164,7 +180,6 @@ int32_t main(int32_t argc, char* argv[]) {
         glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
         SceneMgr::Get().CheckFrameRate();
-        SceneMgr::Get().InitDraw();
         auto& shader = base::Shader::GetDefaultShader();
         shader.Use();
         shader.SetParam1i("texID", 0);
@@ -174,13 +189,13 @@ int32_t main(int32_t argc, char* argv[]) {
         shader.Unuse();
         if(need_draw) {
             SceneMgr::Get().Draw();
-            sgui::SGGUIRoot::GetSingleton().Draw();
+            sgui::SGGUIRoot::GetSingleton().Render();
         }
         glfwSwapBuffers(window);
     }
     
     SceneMgr::Get().Uninit();
-    sgui::SGGUIRoot::GetSingleton().Unload();
+    sgui::SGGUIRoot::GetSingleton().Uninit();
     ImageMgr::Get().UninitTextures();
     base::Shader::GetDefaultShader().Unload();
     

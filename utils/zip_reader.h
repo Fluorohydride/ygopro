@@ -1,25 +1,100 @@
-#include "buildin/common.h"
+#ifndef _ZIP_READER_H_
+#define _ZIP_READER_H_
 
-#define STBI_NO_PSD
-#define STBI_NO_TGA
-#define STBI_NO_GIF
-#define STBI_NO_HDR
-#define STBI_NO_PIC
-#define STBI_NO_PNM
-#include "buildin/stb_image.h"
+const int32_t ZIP_FILE_SIZE = 30;
+const int32_t ZIP_DIRECTORY_SIZE = 46;
+const int32_t ZIP_END_BLOCK_SIZE = 22;
 
-#include "zip_archive.h"
+#ifdef _WIN32
+#pragma pack(push, 2)
+#endif
+// header = 0x02014b50
+struct ZipDirectoryHeader {
+    int32_t block_header;
+    int16_t ver_compress;
+    int16_t ver_decompress;
+    int16_t global_sig;
+    int16_t comp_fun;  // only support 00-no compression 08-deflate
+    int16_t mod_time;
+    int16_t mod_date;
+    int32_t crc32;
+    int32_t comp_size;
+    int32_t file_size;
+    int16_t name_size;
+    int16_t ex_size;
+    int16_t cmt_size;
+    int16_t start_disk; // generally 0
+    int16_t inter_att;
+    int32_t exter_att;
+    int32_t data_offset;
+#ifdef _WIN32
+};
+#pragma pack(pop)
+#else
+} __attribute__((packed));
+#endif
 
-namespace ygopro
-{
-    
-    ZipArchive::~ZipArchive() {
+#ifdef _WIN32
+#pragma pack(push, 2)
+#endif
+// header = 0x04034b50
+struct ZipFileHeader {
+    int32_t block_header;
+    int16_t ver_req;
+    int16_t global_sig;
+    int16_t comp_fun; // only support 00-no compression 08-deflate
+    int16_t mod_time;
+    int16_t mod_date;
+    int32_t crc32;
+    int32_t comp_size;
+    int32_t file_size;
+    int16_t name_size;
+    int16_t ex_size;
+#ifdef _WIN32
+};
+#pragma pack(pop)
+#else
+} __attribute__((packed));
+#endif
+
+#ifdef _WIN32
+#pragma pack(push, 2)
+#endif
+// header = 0x06054b50
+struct ZipEndBlock {
+    int32_t block_header;
+    int16_t disk_number; // generally 0
+    int16_t directory_disk; // generally 0
+    int16_t directory_count_disk;
+    int16_t directory_count; // generally same as directory_count_disk
+    int32_t directory_size;
+    int32_t directory_offset;
+    int16_t comment_size;
+#ifdef _WIN32
+};
+#pragma pack(pop)
+#else
+} __attribute__((packed));
+#endif
+
+struct ZipFileInfo {
+    std::string src_file;
+    bool compressed = false;
+    size_t data_offset = 0;
+    size_t comp_size = 0;
+    size_t file_size = 0;
+    uint8_t* datas = nullptr;
+};
+
+class ZipReader {
+public:
+    ~ZipReader() {
         for(auto& iter : entries)
             if(iter.second.datas != nullptr)
                 delete[] iter.second.datas;
     }
     
-    void ZipArchive::Load(const std::vector<std::wstring>& files) {
+    void Load(const std::vector<std::wstring>& files) {
         char name_buffer[1024];
         ZipEndBlock end_block;
         for(auto& file : files) {
@@ -80,14 +155,14 @@ namespace ygopro
         }
     }
     
-    size_t ZipArchive::GetFileLength(const std::string& filename) {
+    size_t GetFileLength(const std::string& filename) {
         auto iter = entries.find(filename);
         if(iter == entries.end())
             return 0;
         return iter->second.file_size;
     }
     
-    std::pair<uint8_t*, size_t> ZipArchive::ReadFile(const std::string& filename) {
+    std::pair<uint8_t*, size_t> ReadFile(const std::string& filename) {
         auto iter = entries.find(filename);
         if(iter == entries.end())
             return std::make_pair(nullptr, 0);
@@ -119,4 +194,9 @@ namespace ygopro
             return std::make_pair(iter->second.datas, iter->second.file_size);
         }
     }
-}
+    
+protected:
+    std::unordered_map<std::string, ZipFileInfo> entries;
+};
+
+#endif /* _ZIP_READER_H_ */

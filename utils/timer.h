@@ -6,12 +6,10 @@
 template<typename TIME_TYPE>
 struct TimerEvent {
     TIME_TYPE end_time;
-    TIME_TYPE interval;
-    bool repeat;
-    std::function<void()> call_back;
+    std::function<TIME_TYPE()> call_back;
     
     static bool Comp(const TimerEvent<TIME_TYPE>& a, const TimerEvent<TIME_TYPE>& b) {
-        return a.end_time < b.end_time;
+        return a.end_time > b.end_time;
     }
     
     typedef decltype(&Comp) comp_type;
@@ -24,30 +22,28 @@ public:
         cur_time = t;
     }
     
-    void UpdateTime(TIME_TYPE t) {
+    void UpdateTimer(TIME_TYPE t) {
         cur_time = t;
-        auto iter = event_list.begin();
-        while(!event_list.empty() && (t >= (*iter).end_time)) {
-            auto evt = *iter;
-            evt.call_back();
+        while(!event_list.empty()) {
+            if(t < event_list.front().end_time)
+                break;
+            auto evt = event_list.front();
+            TIME_TYPE next_interval = evt.call_back();
             std::pop_heap(event_list.begin(), event_list.end(), TimerEvent<TIME_TYPE>::Comp);
             event_list.pop_back();
-            if(evt.repeat) {
-                evt.end_time = cur_time + evt.interval;
+            if(next_interval > TIME_TYPE()) {
+                evt.end_time = cur_time + next_interval;
                 event_list.push_back(evt);
                 std::push_heap(event_list.begin(), event_list.end(), TimerEvent<TIME_TYPE>::Comp);
             }
-            iter = event_list.begin();
         }
     }
     
-    void RegisterEvent(std::function<void()> cb, TIME_TYPE first, TIME_TYPE inv, bool rep) {
+    void RegisterTimerEvent(std::function<TIME_TYPE()> cb, TIME_TYPE first) {
         if(cb == nullptr)
             return;
         TimerEvent<TIME_TYPE> te;
         te.end_time = cur_time + first;
-        te.interval = inv;
-        te.repeat = rep;
         te.call_back = cb;
         event_list.push_back(te);
         std::push_heap(event_list.begin(), event_list.end(), TimerEvent<TIME_TYPE>::Comp);

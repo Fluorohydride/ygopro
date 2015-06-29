@@ -1,6 +1,8 @@
 #ifndef _DECK_DATA_H_
 #define _DECK_DATA_H_
 
+#include "utils/singleton.h"
+
 #define DECK_NOERROR        0
 #define DECK_EXCEED_COUNT   0x10000000
 #define DECK_POOL_MISMATCH  0x20000000
@@ -67,7 +69,7 @@ namespace ygopro
     
 	class LimitRegulationMgr : public Singleton<LimitRegulationMgr> {
 	public:
-		void LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name);
+		void LoadLimitRegulation(const std::string& file, const std::string& default_name);
 		void SetLimitRegulation(uint32_t id);
         void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);

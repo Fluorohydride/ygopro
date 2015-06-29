@@ -43,6 +43,6 @@ else ()
 endif ()
 
 add_subdirectory (netc)
-add_subdirectory (buildin)
+add_subdirectory (utils)
 add_subdirectory (ocgcore)
 add_subdirectory (nets)

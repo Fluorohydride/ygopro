@@ -20,6 +20,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#define _DEBUG
 #ifdef _DEBUG
 void GLCheckError(const std::string& file, int32_t line);
 #else
@@ -35,6 +36,7 @@ namespace base {
         inline void operator += (const vector2<T>& op) { x += op.x; y += op.y; }
 		inline void operator -= (const vector2<T>& op) { x -= op.x; y -= op.y; }
         inline bool operator == (const vector2<T>& op) { return x == op.x && y == op.y; }
+        inline bool operator != (const vector2<T>& op) { return x != op.x || y != op.y; }
 	};
     
 	template<typename T>
@@ -45,6 +47,7 @@ namespace base {
         inline void operator += (const vector3<T>& op) { x += op.x; y += op.y; z += op.z; }
         inline void operator -= (const vector3<T>& op) { x -= op.x; y -= op.y; z -= op.z; }
         inline bool operator == (const vector3<T>& op) { return x == op.x && y == op.y && z == op.z; }
+        inline bool operator != (const vector3<T>& op) { return x != op.x || y != op.y || z != op.z; }
 	};
     
     template<typename T>
@@ -280,6 +283,7 @@ namespace base {
         bool Use();
         void Unload();
         void SetParam1i(const char* varname, const int32_t value);
+        void SetParam1f(const char* varname, const float value);
         void SetParamMat4(const char* varname, const float m[]);
         
     public:
@@ -321,10 +325,13 @@ namespace base {
 		}
         
         inline vector2<float> ConvTexCoord(vector2<int32_t> texpos) {
-            return vector2<float>{(float)texpos.x / tex_width, (float)texpos.y / tex_height};
+            if(!frame_tex)
+                return vector2<float>{(float)texpos.x / tex_width, (float)texpos.y / tex_height};
+            else
+                return vector2<float>{(float)texpos.x / tex_width, ymax - (float)texpos.y / tex_height};
         }
         
-        void Load(const uint8_t* data, int32_t x, int32_t y);
+        void Load(const uint8_t* data, int32_t x, int32_t y, int32_t filter_type = GL_LINEAR);
         void Unload();
         void Update(const uint8_t* data, int32_t offx, int32_t offy, int32_t width, int32_t height);
         void Bind();
@@ -335,13 +342,17 @@ namespace base {
         inline int32_t GetImgWidth() { return img_width; }
         inline int32_t GetImgHeight() { return img_height; }
         inline vector2<int32_t> GetSize() { return {tex_width, tex_height}; }
+        inline void SetFrameBufferTexture(bool f) { frame_tex = f; ymax = (float)img_height / tex_height; }
+        inline bool IsFrameBufferTexture() { return frame_tex; }
         
     protected:
         uint32_t texture_id = 0;
-        int32_t tex_width = 0;
-        int32_t tex_height = 0;
+        int32_t tex_width = 1;
+        int32_t tex_height = 1;
         int32_t img_width = 0;
         int32_t img_height = 0;
+        bool frame_tex = false;
+        float ymax = 0.0f;
     };
     
     struct FontGlyph {
@@ -355,7 +366,7 @@ namespace base {
     public:
         Font();
         ~Font();
-        bool Load(const std::string& file, uint32_t sz);
+        bool Load(const std::string& file, uint32_t sz, const std::string& style, vector2<int32_t> offset);
         void LoadEmoji(Image& emoji_img, vector2<int32_t> esize, vector2<int32_t> ecount, rect<int32_t> erect, int32_t ls);
         void Unload();
         const FontGlyph& GetGlyph(uint32_t ch);
@@ -363,16 +374,19 @@ namespace base {
         inline int32_t GetFontSize() { return font_size; }
         inline int32_t GetLineSpacing(uint32_t ch) { return (ch < 0xe000) ? font_size : emoji_spacing; }
         inline int32_t IsEmoji(uint32_t ch) { return ch >= 0xe000; }
+        inline vector2<int32_t> GetTextOffset() { return text_offset; }
         
     protected:
         Texture char_tex;
         FontGlyph glyphs[0x10000];
         FT_Face face;
         FT_Library library;
+        bool is_bold = false;
         int32_t font_size = 0;
         int32_t emoji_spacing = 0;
         vector2<int32_t> tex_pos;
         vector2<int32_t> emoji_img_size;
+        vector2<int32_t> text_offset;
     };
     
 }

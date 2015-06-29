@@ -370,8 +370,8 @@ namespace ygopro
         return 0;
     }
     
-    void LimitRegulationMgr::LoadLimitRegulation(const std::wstring& file, const std::wstring& default_name) {
-        std::ifstream ban_file(To<std::string>(file));
+    void LimitRegulationMgr::LoadLimitRegulation(const std::string& file, const std::string& default_name) {
+        std::ifstream ban_file(file);
         if(!ban_file)
             return;
         uint32_t code, count;
