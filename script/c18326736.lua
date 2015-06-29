@@ -69,7 +69,7 @@ function c18326736.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c18326736.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,7,REASON_COST) and c:GetFlagEffect(18326737)==0 end
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,7,REASON_COST) and not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_SKIP_TURN) end
 	c:RemoveOverlayCard(tp,7,7,REASON_COST)
 end
 function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
