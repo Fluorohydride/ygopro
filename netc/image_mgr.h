@@ -14,14 +14,15 @@ namespace ygopro
         uint16_t ref_block = 0;
 	};
     
-	class ImageMgr : public Singleton<ImageMgr> {
-
+	class ImageMgr : public base::FrameBufferRenderer, public Singleton<ImageMgr> {
 	public:
+        ImageMgr() : base::FrameBufferRenderer(2048, 2048, false, false) {}
+        
 		ti4& GetCardTexture(uint32_t id);
         ti4& GetTexture(const std::string& name);
         base::Texture* LoadBigCardTexture(uint32_t id);
+        base::Texture* GetRawCardTexture() { return render_tex }
         base::Texture* GetRawMiscTexture() { return &misc_texture; }
-        base::Texture* GetRawCardTexture() { return &card_texture; }
         base::Texture* GetRawBGTexture() { return &bg_texture; }
         base::Texture* GetRawCardImage() { return &card_image; }
         ti4& GetCharTex(wchar_t ch);
@@ -34,7 +35,7 @@ namespace ygopro
         
 		void InitTextures(const std::string& image_path);
         void UninitTextures();
-		bool LoadImageConfig(const std::string& file);
+		bool LoadImageConfig();
         
     protected:
         std::unordered_map<uint32_t, CardTextureInfo> card_textures;
@@ -44,11 +45,11 @@ namespace ygopro
         std::list<uint16_t> reserved_block;
         std::vector<std::pair<int32_t, uint32_t>> ref_count;
         std::unordered_map<uint32_t, std::list<uint16_t>::iterator> reserved_id;
-        base::Texture card_texture;
         base::Texture misc_texture;
         base::Texture bg_texture;
         base::Texture card_image;
         ZipReader imageZip;
+        std::shared_ptr<base::SimpleTextureRenderer> image_render;
 	};
 
 }

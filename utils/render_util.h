@@ -454,10 +454,10 @@ namespace base
     
     class FrameBufferRenderer : public IRenderer {
     public:
-        FrameBufferRenderer(int32_t texw, int32_t texh, bool nc = false) {
+        FrameBufferRenderer(int32_t texw, int32_t texh, bool nc = false, bool auto_revert_tex = true) {
             render_tex = new Texture();
             render_tex->Load(nullptr, texw, texh);
-            render_tex->SetFrameBufferTexture(true);
+            render_tex->SetFrameBufferTexture(auto_revert_tex);
             frame_size = {texw, texh};
             need_clear = nc;
             glGenFramebuffers(1, &frame_buffer);
@@ -496,7 +496,7 @@ namespace base
             }
         }
         
-        inline void SetObject(IRenderer* r) { renderer = r; if(r) r->SetBlendMode(BlendMode::FrameBuffer); }
+        inline void SetRenderObject(IRenderer* r) { renderer = r; if(r) r->SetBlendMode(BlendMode::FrameBuffer); }
         inline Texture* GetFrameBufferTexture() { return render_tex; }
         
     protected:
@@ -515,22 +515,25 @@ namespace base
             InitGLState(with_vao);
         }
         
-        void SetVertices(Texture* texture, recti vert, recti tex_rect, uint32_t cl = 0xffffffff) {
-            render_commands.clear();
-            BeginPrimitive(GL_TRIANGLES, texture->GetTextureId());
-            index_buffer = {0, 1, 2, 2, 1, 3};
-            vertex_buffer.resize(4);
-            vertex_buffer[0].vertex = ConvScreenCoord({vert.left, vert.top});
-            vertex_buffer[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
-            vertex_buffer[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
-            vertex_buffer[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
-            vertex_buffer[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
-            vertex_buffer[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
-            vertex_buffer[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
-            vertex_buffer[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
+        inline void ClearVertices() { this->Clear(); }
+        
+        void AddVertices(Texture* texture, recti vert, recti tex_rect, uint32_t cl = 0xffffffff) {
+            auto sz = BeginPrimitive(GL_TRIANGLES, texture->GetTextureId());
+            int16_t idx[6] = {0, 1, 2, 2, 1, 3};
+            for(int32_t i = 0; i < 6; ++i)
+                idx[i] += std::get<1>(sz);
+            v2ct verts[4];
+            verts[0].vertex = ConvScreenCoord({vert.left, vert.top});
+            verts[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
+            verts[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
+            verts[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
+            verts[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
+            verts[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
+            verts[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
+            verts[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
             for(int32_t i = 0; i < 4; ++i)
-                vertex_buffer[i].color = cl;
-            static_cast<RenderCmdDraw<v2ct>*>(render_commands.back())->count = 6;
+                verts[i].color = cl;
+            PushVertices(verts, idx, 4, 6);
             need_redraw = true;
         }
         
@@ -539,8 +542,6 @@ namespace base
                 UploadVertices();
             return need_redraw;
         }
-        
-    protected:
         
     };
     

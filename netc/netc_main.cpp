@@ -28,6 +28,7 @@ static bool need_draw = true;
 jaweson::JsonRoot<> commonCfg;
 jaweson::JsonRoot<> stringCfg;
 jaweson::JsonRoot<> layoutCfg;
+jaweson::JsonRoot<> textureCfg;
 
 int32_t main(int32_t argc, char* argv[]) {
     if(!glfwInit())
@@ -43,11 +44,14 @@ int32_t main(int32_t argc, char* argv[]) {
         jsonfile.Load(commonCfg["layout_conf"].to_string());
         if(!layoutCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
+        jsonfile.Load(commonCfg["textures_conf"].to_string());
+        if(!textureCfg.parse(jsonfile.Data(), jsonfile.Length()))
+            return 0;
     }
-    int32_t width = commonCfg["window_width"].to_integer();
-    int32_t height = commonCfg["window_height"].to_integer();;
-	int32_t fsaa = commonCfg["fsaa"].to_integer();;
-    int32_t vsync = commonCfg["vertical_sync"].to_integer();;
+    int32_t width = (int32_t)commonCfg["window_width"].to_integer();
+    int32_t height = (int32_t)commonCfg["window_height"].to_integer();;
+	int32_t fsaa = (int32_t)commonCfg["fsaa"].to_integer();;
+    int32_t vsync = (int32_t)commonCfg["vertical_sync"].to_integer();;
 	if(fsaa)
 		glfwWindowHint(GLFW_SAMPLES, fsaa);
     glfwWindowHint(GLFW_VISIBLE, GL_FALSE);
@@ -84,7 +88,7 @@ int32_t main(int32_t argc, char* argv[]) {
     
     ImageMgr::Get().InitTextures(commonCfg["image_path"].to_string());
     if(DataMgr::Get().LoadDatas(commonCfg["database_file"].to_string())
-       || !ImageMgr::Get().LoadImageConfig(commonCfg["textures_conf"].to_string())
+       || !ImageMgr::Get().LoadImageConfig()
        || !sgui::SGGUIRoot::GetSingleton().Init(commonCfg["gui_conf"].to_string(), {bwidth, bheight}, true)) {
         glfwDestroyWindow(window);
         glfwTerminate();

@@ -2,6 +2,8 @@
 #include "utils/jaweson.h"
 #include "utils/filesystem.h"
 
+#include "config.h"
+
 #include "image_mgr.h"
 #include "scene_mgr.h"
 
@@ -59,6 +61,7 @@ namespace ygopro
                         glBindVertexArray(0);
                         glBindTexture(GL_TEXTURE_2D, 0);
                         glBindFramebuffer(GL_FRAMEBUFFER, 0);
+                        image_render->AddVertices(&card_image, <#recti vert#>, <#recti tex_rect#>)
                     } else {
                         FreeBlock(blockid, false);
                         cti.ti = misc_textures["unknown"];
@@ -180,31 +183,46 @@ namespace ygopro
     }
     
     void ImageMgr::InitTextures(const std::string& image_path) {
-        card_texture.Load(nullptr, 2048, 2048);
         for(int16_t i = 7; i < 280; ++i)
             unused_block.push_back(i);
         ref_count.resize(280);
-		std::vector<std::wstring> image_files;
-		FileSystem::TraversalDir(image_path, [&image_path, &image_files](const std::wstring& name, bool isdir) {
-			if(!isdir && name.find(L".zip") == (name.size() - 4)) {
+		std::vector<std::string> image_files;
+		FileSystem::TraversalDir(image_path, [&image_path, &image_files](const std::string& name, bool isdir) {
+			if(!isdir && name.find(".zip") == (name.size() - 4)) {
                 auto path = image_path;
-                image_files.push_back(path.append(L"/").append(name));
+                image_files.push_back(path.append("/").append(name));
             }
 		});
         std::sort(image_files.begin(), image_files.end());
         imageZip.Load(image_files);
+        image_render = std::make_shared<base::SimpleTextureRenderer>();
+        image_render->SetScreenSize({2048, 2048});
+        image_render->SetShader(&base::Shader::GetDefaultShader());
+        SetRenderObject(image_render.get());
     }
 
     void ImageMgr::UninitTextures() {
-        card_texture.Unload();
         misc_texture.Unload();
         bg_texture.Unload();
         card_image.Unload();
     }
     
-	bool ImageMgr::LoadImageConfig(const std::string& name) {
-        if(!FileSystem::IsFileExists(name))
-            return false;
+	bool ImageMgr::LoadImageConfig() {
+        auto& imageNode = textureCfg["image"];
+        imageNode.for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+            std::string path = node.to_string();
+            if(FileSystem::IsFileExists(path)) {
+                base::Image img;
+                if(img.LoadFile(path)) {
+                    if(name == "card")
+                        render_tex->Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
+                    else if(name == "misc")
+                        misc_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
+                    else if(name == "bg")
+                        bg_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
+                }
+            }
+        });
         TextFile f(name);
         rapidxml::xml_document<> doc;
         doc.parse<0>(f.Data());
@@ -214,20 +232,7 @@ namespace ygopro
             std::string config_name = config_node->name();
             rapidxml::xml_attribute<>* attr = config_node->first_attribute();
             if(config_name == "image") {
-                std::string name = attr->value();
-                attr = attr->next_attribute();
-                std::string path = attr->value();
-                if(FileSystem::IsFileExists(path)) {
-                    base::Image img;
-                    if(img.LoadFile(path)) {
-                        if(name == "card")
-                            card_texture.Update(img.GetRawData(), 0, 0, img.GetWidth(), img.GetHeight());
-                        else if(name == "misc")
-                            misc_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
-                        else if(name == "bg")
-                            bg_texture.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
-                    }
-                }
+                
             } else if(config_name == "texture") {
                 base::Texture* ptex = nullptr;
                 std::string src = attr->value();

@@ -77,6 +77,8 @@ struct ZipEndBlock {
 } __attribute__((packed));
 #endif
 
+#include "utils/stb_image.h"
+
 struct ZipFileInfo {
     std::string src_file;
     bool compressed = false;
@@ -94,12 +96,11 @@ public:
                 delete[] iter.second.datas;
     }
     
-    void Load(const std::vector<std::wstring>& files) {
+    void Load(const std::vector<std::string>& files) {
         char name_buffer[1024];
         ZipEndBlock end_block;
         for(auto& file : files) {
-            std::string fname = To<std::string>(file);
-            std::ifstream zip_file(fname, std::ios::in | std::ios::binary);
+            std::ifstream zip_file(file, std::ios::in | std::ios::binary);
             if(!zip_file)
                 continue;
             zip_file.seekg(0, zip_file.end);
@@ -143,7 +144,7 @@ public:
                     name_buffer[dir_header->name_size] = 0;
                     std::string name = name_buffer;
                     ZipFileInfo& finfo = entries[name];
-                    finfo.src_file = fname;
+                    finfo.src_file = file;
                     finfo.compressed = (dir_header->comp_fun == 0x8);
                     finfo.comp_size = dir_header->comp_size;
                     finfo.file_size = dir_header->file_size;
@@ -181,7 +182,7 @@ public:
         if(iter->second.compressed) {
             uint8_t* raw = new uint8_t[iter->second.comp_size];
             zip_file.read((char*)raw, iter->second.comp_size);
-            int32_t ret = stbi_zlib_decode_noheader_buffer((char*)iter->second.datas, iter->second.file_size, (char const*)raw, iter->second.comp_size);
+            int32_t ret = stbi_zlib_decode_noheader_buffer((char*)iter->second.datas, (int)iter->second.file_size, (char const*)raw, iter->second.comp_size);
             delete []raw;
             if(ret == -1) {
                 delete[] iter->second.datas;
