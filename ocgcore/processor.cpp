@@ -4583,6 +4583,7 @@ int32 field::solve_continuous(uint16 step, effect * peffect, uint8 triggering_pl
 		}
 		core.continuous_chain.pop_back();
 		core.solving_event.pop_front();
+		adjust_all();
 		return TRUE;
 	}
 	}
