@@ -81,7 +81,6 @@ function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetReset(RESET_PHASE+PHASE_END+RESET_OPPO_TURN)
 	e1:SetCondition(c18326736.skipcon)
 	Duel.RegisterEffect(e1,tp)
-	e:GetHandler():RegisterFlagEffect(18326737,RESET_PHASE+PHASE_END,0,1)
 end
 function c18326736.skipcon(e)
 	return Duel.GetTurnPlayer()~=e:GetHandlerPlayer()
