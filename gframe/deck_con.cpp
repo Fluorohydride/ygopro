@@ -649,7 +649,7 @@ void DeckBuilder::FilterCards() {
 		myswprintf(result_string, L"%d", results.size());
 		return;
 	}
-	if(pstr[0] == 0 || (pstr[0] == L'$' and pstr[1] == 0))
+	if(pstr[0] == 0 || (pstr[0] == L'$' && pstr[1] == 0))
 		pstr = 0;
 	auto strpointer = dataManager._strings.begin();
 	for(code_pointer ptr = dataManager._datas.begin(); ptr != dataManager._datas.end(); ++ptr, ++strpointer) {
