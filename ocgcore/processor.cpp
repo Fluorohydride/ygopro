@@ -499,6 +499,8 @@ int32 field::process() {
 				peffect->type = EFFECT_TYPE_SINGLE;
 				attacker->add_effect(peffect);
 				attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+				core.chain_attack = false;
+				core.chain_attack_target = 0;
 				raise_event(attacker, EVENT_ATTACK_DISABLED, core.reason_effect, 0, core.reason_player, PLAYER_NONE, 0);
 				process_instant_event();
 				it->step++;
