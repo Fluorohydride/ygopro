@@ -21,6 +21,7 @@ function c18326736.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_IGNITION)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCost(c18326736.skipcost)
+	e2:SetTarget(c18326736.skiptg)
 	e2:SetOperation(c18326736.skipop)
 	c:RegisterEffect(e2)
 	--material
@@ -69,8 +70,11 @@ function c18326736.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c18326736.skipcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	local c=e:GetHandler()
-	if chk==0 then return c:CheckRemoveOverlayCard(tp,7,REASON_COST) and not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_SKIP_TURN) end
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,7,REASON_COST) end
 	c:RemoveOverlayCard(tp,7,7,REASON_COST)
+end
+function c18326736.skiptg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not Duel.IsPlayerAffectedByEffect(1-tp,EFFECT_SKIP_TURN) end
 end
 function c18326736.skipop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
