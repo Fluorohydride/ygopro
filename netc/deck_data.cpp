@@ -1,4 +1,7 @@
-#include "buildin/common.h"
+#include "utils/common.h"
+#include "utils/convert.h"
+#include "utils/hash.h"
+#include "utils/tokenizer.h"
 
 #include "card_data.h"
 #include "deck_data.h"
@@ -26,7 +29,7 @@ namespace ygopro
     }
     
     void DeckData::Shuffle() {
-        uint32_t seed = std::chrono::system_clock::now().time_since_epoch().count();
+        uint32_t seed = (uint32_t)std::chrono::system_clock::now().time_since_epoch().count();
         std::default_random_engine rng(seed);
         std::shuffle(main_deck.begin(), main_deck.end(), rng);
         std::shuffle(extra_deck.begin(), extra_deck.end(), rng);
@@ -67,8 +70,8 @@ namespace ygopro
         }
     }
     
-    bool DeckData::LoadFromFile(const std::wstring& file) {
-        std::ifstream deck_file(To<std::string>(file));
+    bool DeckData::LoadFromFile(const std::string& file) {
+        std::ifstream deck_file(file);
         if(!deck_file)
             return false;
         main_deck.clear();
@@ -170,8 +173,8 @@ namespace ygopro
         return true;
     }
     
-    void DeckData::SaveToFile(const std::wstring& file) {
-        std::ofstream deck_file(To<std::string>(file));
+    void DeckData::SaveToFile(const std::string& file) {
+        std::ofstream deck_file(file);
         if(!deck_file)
             return;
         deck_file << "#Created by ygopro deck editor." << std::endl << "#main" << std::endl;
@@ -370,7 +373,7 @@ namespace ygopro
         return 0;
     }
     
-    void LimitRegulationMgr::LoadLimitRegulation(const std::string& file, const std::string& default_name) {
+    void LimitRegulationMgr::LoadLimitRegulation(const std::string& file, const std::wstring& default_name) {
         std::ifstream ban_file(file);
         if(!ban_file)
             return;

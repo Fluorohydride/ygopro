@@ -1,5 +1,6 @@
-#include "buildin/common.h"
+#include "utils/common.h"
 
+#include "config.h"
 #include "card_data.h"
 #include "scene_mgr.h"
 #include "image_mgr.h"
@@ -9,7 +10,7 @@ namespace ygopro
 {
     
     void MessageBox::ShowOK(const std::wstring& title, const std::wstring& text, std::function<void ()> cb) {
-        auto sz = sgui::SGGUIRoot::GetSingleton().GetSceneSize();
+        auto sz = sgui::SGGUIRoot::GetSingleton().GetScreenSize();
         auto wd = sgui::SGWindow::Create(nullptr, {0, 0}, {0, 0});
         wd->GetCloseButton()->SetVisible(false);
         wd->SetText(title, 0xff000000);

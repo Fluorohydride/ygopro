@@ -393,11 +393,16 @@ namespace base
             need_redraw = true;
         }
         
+        inline void GetScreenSize() { return screen_size; }
+        inline void SetFlip(bool f) { flip_ycoord = f; }
         inline v2f ConvScreenCoord(v2i pos) {
+            if(flip_ycoord)
+                return v2f{pos.x * 2.0f / screen_size.x - 1.0f, pos.y * 2.0f / screen_size.y - 1.0f};
             return v2f{pos.x * 2.0f / screen_size.x - 1.0f, 1.0f - pos.y * 2.0f / screen_size.y};
         }
         
     protected:
+        bool flip_ycoord = false;
         v2i screen_size = {1, 1};
     };
     

@@ -293,19 +293,19 @@ namespace sgui
         virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
         
         virtual void RefreshVertices() {
-            int32_t vsize = points.size();
+            size_t vsize = points.size();
             if(vsize < 3) {
                 vertices.clear();
                 indices.clear();
             } else {
                 vertices.resize(vsize);
                 indices.resize(vsize * 3 - 6);
-                for(int32_t i = 0; i < vsize; ++i) {
+                for(size_t i = 0; i < vsize; ++i) {
                     vertices[i].vertex = CalUIVertex(points[i]);
                     vertices[i].texcoord = texture->ConvTexCoord(points[i].texcoord);
                     vertices[i].color = points[i].color;
                 }
-                for(int32_t i = 0; i < vsize - 2; ++i) {
+                for(size_t i = 0; i < vsize - 2; ++i) {
                     indices[i * 3] = vert_index;
                     indices[i * 3 + 1] = vert_index + i + 1;
                     indices[i * 3 + 2] = vert_index + i + 2;
@@ -325,9 +325,9 @@ namespace sgui
                 vertices[i].texcoord = texture->ConvTexCoord(points[i].texcoord);
                 vertices[i].color = points[i].color;
             }
-            int32_t pt_size = points.size() / 4;
-            for(int32_t i = 0; i < pt_size; ++i) {
-                for(int32_t j = 0; j < 6; ++j)
+            size_t pt_size = points.size() / 4;
+            for(size_t i = 0; i < pt_size; ++i) {
+                for(size_t j = 0; j < 6; ++j)
                     indices[i * 6 + j] = vert_index + i * 4 + quad_idx[j];
             }
             for(size_t i = pt_size * 6; i < indices.size(); ++i)
@@ -606,8 +606,8 @@ namespace sgui
         }
         
         void InsertText(int32_t start, const std::wstring& txt, uint32_t cl) {
-            if(start >= texts.size())
-                start = texts.size();
+            if(start >= (int32_t)texts.size())
+                start = (int32_t)texts.size();
             auto new_texts = std::move(texts);
             auto new_color = std::move(colors);
             new_texts.insert(new_texts.begin() + start, txt.begin(), txt.end());
@@ -622,7 +622,7 @@ namespace sgui
             if(start >= texts.size() || len <= 0)
                 return;
             if(start + len > texts.size())
-                len = texts.size() - start;
+                len = (int32_t)texts.size() - start;
             auto new_texts = std::move(texts);
             auto new_color = std::move(colors);
             new_texts.erase(new_texts.begin() + start, new_texts.begin() + start + len);
@@ -637,7 +637,7 @@ namespace sgui
             if(start >= texts.size() || len <= 0)
                 return;
             if(start + len > texts.size())
-                len = texts.size() - start;
+                len = (int32_t)texts.size() - start;
             auto new_texts = std::move(texts);
             auto new_color = std::move(colors);
             new_texts.erase(new_texts.begin() + start, new_texts.begin() + start + len);
@@ -681,7 +681,7 @@ namespace sgui
         int32_t CheckHitPositionSingleLine(int32_t x) {
             for(size_t i = 0; i < texts.size(); ++i)
                 if(text_pos[i].x > x)
-                    return (i > 0) ? (i - 1) : 0;
+                    return (i > 0) ? ((int32_t)i - 1) : 0;
             if(last_text_pos.x > x)
                 return (int32_t)texts.size() - 1;
             else
@@ -712,8 +712,8 @@ namespace sgui
         static v2i ConvertV2i(jaweson::JsonNode<>& node, int32_t index) {
             v2i ret = {0, 0};
             if(node.is_array()) {
-                ret.x = node[index].to_integer();
-                ret.y = node[index + 1].to_integer();
+                ret.x = (int32_t)node[index].to_integer();
+                ret.y = (int32_t)node[index + 1].to_integer();
             }
             return ret;
         }
@@ -730,10 +730,10 @@ namespace sgui
         static recti ConvertRect(jaweson::JsonNode<>& node) {
             recti ret = {0, 0, 0, 0};
             if(node.is_array()) {
-                ret.left = node[0].to_integer();
-                ret.top = node[1].to_integer();
-                ret.width = node[2].to_integer();
-                ret.height = node[3].to_integer();
+                ret.left = (int32_t)node[0].to_integer();
+                ret.top = (int32_t)node[1].to_integer();
+                ret.width = (int32_t)node[2].to_integer();
+                ret.height = (int32_t)node[3].to_integer();
             }
             return ret;
         }
@@ -1140,7 +1140,7 @@ namespace sgui
             auto ct = SGJsonUtil::ConvertV2i(emoji_node["count"], 0);
             font_node.for_each([this, &emoji, &sz, &ct](const std::string& name, jaweson::JsonNode<>& info) {
                 std::string font_file = info[0].to_string();
-                int32_t font_size = info[1].to_integer();
+                int32_t font_size = (int32_t)info[1].to_integer();
                 std::string style = info[2].to_string();
                 auto off = SGJsonUtil::ConvertV2i(info, 3);
                 auto ft = std::make_shared<base::Font>();
@@ -2362,7 +2362,7 @@ namespace sgui
             if(ret.second) {
                 int32_t new_offset = item_offset;
                 auto sc = static_cast<SGScrollBar<>*>(children[0].get());
-                int32_t item_height_all = (ui_components.size() - 2) * item_height;
+                int32_t item_height_all = (int32_t)(ui_components.size() - 2) * item_height;
                 if(item_height_all > area_size.absolute.y - bounds.top - bounds.height) {
                     if(!sc->IsVisible()) {
                         sc->SetVisible(true);
@@ -2486,7 +2486,7 @@ namespace sgui
             item_pos_pro = SGJsonUtil::ConvertV2f(offset_node, 4);
             item_size_pro = SGJsonUtil::ConvertV2f(offset_node, 6);
             item_self_factor = SGJsonUtil::ConvertV2f(offset_node, 8);
-            item_height = lb_node["item_height"].to_integer();
+            item_height = (int32_t)lb_node["item_height"].to_integer();
             bounds = SGJsonUtil::ConvertRect(lb_node["text_area"]);
             sel_tex = SGJsonUtil::ConvertRect(lb_node["sel_tex"]);
             color[0] = SGJsonUtil::ConvertRGBA(lb_node["item_bcolor1"]);
@@ -2674,8 +2674,8 @@ namespace sgui
             button_surface->SetColor(SGJsonUtil::ConvertRGBA(cb_node["button_color"]));
             button_surface->SetTextureRect(button_style[status]);
             SGJsonUtil::SetUIPositionSize(cb_node["button_offset"], button_surface, {0, 0});
-            drop_offset = cb_node["drop_offset"].to_integer();
-            drop_height = cb_node["drop_height"].to_integer();
+            drop_offset = (int32_t)cb_node["drop_offset"].to_integer();
+            drop_height = (int32_t)cb_node["drop_height"].to_integer();
         }
         
         virtual bool OnMouseEnter() {
@@ -2849,10 +2849,10 @@ namespace sgui
             tab_style[0] = SGJsonUtil::ConvertRect(tab_node["tab_normal"]);
             tab_style[1] = SGJsonUtil::ConvertRect(tab_node["tab_hover"]);
             tab_style[2] = SGJsonUtil::ConvertRect(tab_node["tab_down"]);
-            tab_offset = tab_node["tab_offset"].to_integer();
-            title_indent = tab_node["title_indent"].to_integer();
-            title_height = tab_node["title_height"].to_integer();
-            title_rblank = tab_node["title_rblank"].to_integer();
+            tab_offset = (int32_t)tab_node["tab_offset"].to_integer();
+            title_indent = (int32_t)tab_node["title_indent"].to_integer();
+            title_height = (int32_t)tab_node["title_height"].to_integer();
+            title_rblank = (int32_t)tab_node["title_rblank"].to_integer();
             back_surface->SetPositionSize({0, tab_offset}, {0, -tab_offset}, {0.0f, 0.0f}, {1.0f, 1.0f});
             text_font = SGGUIRoot::GetSingleton().GetGuiFont(tab_node["font"].to_string());
             text_offset = SGJsonUtil::ConvertV2i(tab_node["text_offset"], 0) + text_font->GetTextOffset();
@@ -2943,7 +2943,7 @@ namespace sgui
             } else {
                 if(current_tab >= 0)
                     tabs[current_tab]->OnMouseLeave();
-                auto tab_size = tabs.size();
+                int32_t tab_size = (int32_t)tabs.size();
                 if(tab_size > 0) {
                     int32_t ht = (x - area_pos.absolute.x) * tab_size / (area_size.absolute.x - title_rblank);
                     if(ht >= tabs.size())
@@ -3056,7 +3056,7 @@ namespace sgui
         }
         
         void RefreshTitle() {
-            int32_t tab_size = tabs.size();
+            int32_t tab_size = (int32_t)tabs.size();
             if(tab_size > 0) {
                 int32_t l = (area_size.absolute.x - title_rblank - title_indent) / tab_size + title_indent;
                 for(int32_t i = 0; i < tab_size; ++i) {
@@ -3177,7 +3177,7 @@ namespace sgui
             static_cast<UISprite*>(this->ui_components[3])->SetTextureRect(cursor_tex);
             static_cast<UISprite*>(this->ui_components[3])->SetSize({cursor_tex.width, 0}, {0.0, 1.0});
             static_cast<UISprite*>(this->ui_components[3])->SetColor(0x0);
-            max_cursor_offset = eb_node["max_cursor_offset"].to_integer();
+            max_cursor_offset = (int32_t)eb_node["max_cursor_offset"].to_integer();
         }
         
         void ChangeCursorStatus() {
@@ -3209,7 +3209,7 @@ namespace sgui
             if(start < 0)
                 start = 0;
             if(end < 0 || end > txt->GetText().size())
-                end = txt->GetText().size();
+                end = (int32_t)txt->GetText().size();
             if(start == end) {
                 SetCursorPos(start);
                 return;
@@ -3303,7 +3303,7 @@ namespace sgui
                                 txt->InsertText(selection.x, wstr, default_text_color);
                             else
                                 txt->ReplaceText(selection.x, selection.y - selection.x, wstr, default_text_color);
-                            SetCursorPos(selection.x + wstr.length());
+                            SetCursorPos(selection.x + (int32_t)wstr.length());
                         }
                     }
                     break;

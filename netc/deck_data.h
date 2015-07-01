@@ -39,9 +39,9 @@ namespace ygopro
         void Sort();
         void Shuffle();
         void CalCount();
-        bool LoadFromFile(const std::wstring& file);
+        bool LoadFromFile(const std::string& file);
         bool LoadFromString(const std::string& deck);
-        void SaveToFile(const std::wstring& file);
+        void SaveToFile(const std::string& file);
         std::string SaveToString();
         
         std::shared_ptr<DeckCardData> InsertCard(uint32_t pos, uint32_t index, uint32_t code, bool checkc);
@@ -69,7 +69,7 @@ namespace ygopro
     
 	class LimitRegulationMgr : public Singleton<LimitRegulationMgr> {
 	public:
-		void LoadLimitRegulation(const std::string& file, const std::string& default_name);
+		void LoadLimitRegulation(const std::string& file, const std::wstring& default_name);
 		void SetLimitRegulation(uint32_t id);
         void SetLimitRegulation(LimitRegulation* lr);
         void GetDeckCardLimitCount(DeckData& deck);

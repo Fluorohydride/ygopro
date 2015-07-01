@@ -254,9 +254,9 @@ namespace base {
         }
     };
     
-    template<int32_t TCOUNT>
+    template<typename T, int32_t TCOUNT>
 	struct TextureInfo {
-        vector2<float> vert[TCOUNT];
+        vector2<T> vert[TCOUNT];
 	};
     
     inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, uint32_t cl = 0xffffffff) {
@@ -397,7 +397,8 @@ typedef base::vector3<int32_t> v3i;
 typedef base::vector3<float> v3f;
 typedef base::rect<int32_t> recti;
 typedef base::rect<float> rectf;
-typedef base::TextureInfo<4> ti4;
+typedef base::TextureInfo<int32_t, 4> texi4;
+typedef base::TextureInfo<float, 4> texf4;
 
 #include "render_util.h"
 

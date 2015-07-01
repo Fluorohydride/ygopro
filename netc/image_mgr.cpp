@@ -10,7 +10,7 @@
 namespace ygopro
 {
 
-	ti4& ImageMgr::GetCardTexture(uint32_t id) {
+	texi4& ImageMgr::GetCardTexture(uint32_t id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
             std::string file = To<std::string>("%d.jpg", id);
@@ -21,61 +21,42 @@ namespace ygopro
                 length = imageZip.GetFileLength(file);
             }
 			if(length == 0) {
-				cti.ti = misc_textures["unknown"];
+				cti.tex_info = misc_textures["unknown"];
                 cti.ref_block = 0xffff;
 			} else {
                 uint16_t blockid = AllocBlock(id);
                 if(blockid == 0xffff) {
-                    cti.ti = misc_textures["unknown"];
+                    cti.tex_info = misc_textures["unknown"];
                     cti.ref_block = 0xffff;
                 } else {
                     base::Image img;
                     auto fileinfo = imageZip.ReadFile(file);
                     if(img.LoadMemory(fileinfo.first, (uint32_t)length)) {
-                        base::v2ct frame_verts[4];
                         int32_t bx = (blockid % 20) * 100;
                         int32_t by = (blockid / 20) * 145;
                         int32_t bw = 100;
                         int32_t bh = 145;
-                        cti.ti.vert[0] = {(float)(bx) / 2048, (float)(by) / 2048};
-                        cti.ti.vert[1] = {(float)(bx + bw) / 2048, (float)(by) / 2048};
-                        cti.ti.vert[2] = {(float)(bx) / 2048, (float)(by + bh) / 2048};
-                        cti.ti.vert[3] = {(float)(bx + bw) / 2048, (float)(by + bh) / 2048};
+                        cti.tex_info.vert[0] = {bx, by};
+                        cti.tex_info.vert[1] = {bx + bw, by};
+                        cti.tex_info.vert[2] = {bx, by + bh};
+                        cti.tex_info.vert[3] = {bx + bw, by + bh};
                         cti.ref_block = blockid;
                         card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
-                        glBindFramebuffer(GL_FRAMEBUFFER, frame_buffer);
-                        glViewport(0, 0, 2048, 2048);
-                        frame_verts[0].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f};
-                        frame_verts[1].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by) / 1024 - 1.0f};
-                        frame_verts[2].vertex = {(float)(bx) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f};
-                        frame_verts[3].vertex = {(float)(bx + bw) / 1024 - 1.0f, (float)(by + bh) / 1024 - 1.0f};
-                        frame_verts[0].texcoord = {0.0f, 0.0f};
-                        frame_verts[1].texcoord = {(float)img.GetWidth() / card_image.GetWidth(), 0.0f};
-                        frame_verts[2].texcoord = {0.0f, (float)img.GetHeight() / card_image.GetHeight()};
-                        frame_verts[3].texcoord = {frame_verts[1].texcoord.x, frame_verts[2].texcoord.y};
-                        card_image.Bind();
-                        glBindBuffer(GL_ARRAY_BUFFER, card_buffer[0]);
-                        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(base::v2ct) * 4, &frame_verts);
-                        glBindVertexArray(card_vao);
-                        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-                        glBindVertexArray(0);
-                        glBindTexture(GL_TEXTURE_2D, 0);
-                        glBindFramebuffer(GL_FRAMEBUFFER, 0);
-                        image_render->AddVertices(&card_image, <#recti vert#>, <#recti tex_rect#>)
+                        image_render->AddVertices(&card_image, {bx, by, bw, bh}, {0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
                     } else {
                         FreeBlock(blockid, false);
-                        cti.ti = misc_textures["unknown"];
+                        cti.tex_info = misc_textures["unknown"];
                         cti.ref_block = 0xffff;
                     }
                 }
 			}
-            return cti.ti;;
+            return cti.tex_info;;
 		}
         IncreaseRef(iter->second.ref_block);
-		return iter->second.ti;
+		return iter->second.tex_info;
 	}
     
-    ti4& ImageMgr::GetTexture(const std::string& name) {
+    texi4& ImageMgr::GetTexture(const std::string& name) {
         return misc_textures[name];
     }
     
@@ -107,7 +88,7 @@ namespace ygopro
         return pre_ret;
     }
     
-    ti4& ImageMgr::GetCharTex(wchar_t ch) {
+    texi4& ImageMgr::GetCharTex(wchar_t ch) {
         if(ch < L'*' || ch > L'9')
             return char_textures[2];
         return char_textures[ch - L'*'];
@@ -196,6 +177,7 @@ namespace ygopro
         std::sort(image_files.begin(), image_files.end());
         imageZip.Load(image_files);
         image_render = std::make_shared<base::SimpleTextureRenderer>();
+        image_render->SetFlip(true);
         image_render->SetScreenSize({2048, 2048});
         image_render->SetShader(&base::Shader::GetDefaultShader());
         SetRenderObject(image_render.get());
@@ -208,8 +190,7 @@ namespace ygopro
     }
     
 	bool ImageMgr::LoadImageConfig() {
-        auto& imageNode = textureCfg["image"];
-        imageNode.for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+        textureCfg["image"].for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
             std::string path = node.to_string();
             if(FileSystem::IsFileExists(path)) {
                 base::Image img;
@@ -223,86 +204,57 @@ namespace ygopro
                 }
             }
         });
-        TextFile f(name);
-        rapidxml::xml_document<> doc;
-        doc.parse<0>(f.Data());
-        rapidxml::xml_node<>* root = doc.first_node();
-        rapidxml::xml_node<>* config_node = root->first_node();
-        while(config_node) {
-            std::string config_name = config_node->name();
-            rapidxml::xml_attribute<>* attr = config_node->first_attribute();
-            if(config_name == "image") {
-                
-            } else if(config_name == "texture") {
-                base::Texture* ptex = nullptr;
-                std::string src = attr->value();
-                attr = attr->next_attribute();
-                std::string name = attr->value();
-                if(src == "card")
-                    ptex = &card_texture;
-                else if(src == "misc")
-                    ptex = &misc_texture;
-                else if(src == "bg")
-                    ptex = &bg_texture;
-                if(ptex) {
-                    auto& ti = misc_textures[name];
-                    attr = attr->next_attribute();
-                    int32_t x = To<int32_t>(attr->value());
-                    attr = attr->next_attribute();
-                    int32_t y = To<int32_t>(attr->value());
-                    attr = attr->next_attribute();
-                    int32_t w = To<int32_t>(attr->value());
-                    attr = attr->next_attribute();
-                    int32_t h = To<int32_t>(attr->value());
-                    ti.vert[0].x = (float)x / ptex->GetWidth();
-                    ti.vert[0].y = (float)y / ptex->GetHeight();
-                    ti.vert[1].x = (float)(x + w) / ptex->GetWidth();
-                    ti.vert[1].y = (float)y / ptex->GetHeight();
-                    ti.vert[2].x = (float)x / ptex->GetWidth();
-                    ti.vert[2].y = (float)(y + h) / ptex->GetHeight();
-                    ti.vert[3].x = (float)(x + w) / ptex->GetWidth();
-                    ti.vert[3].y = (float)(y + h) / ptex->GetHeight();
-                }
-            } else if(config_name == "points") {
-                base::Texture* ptex = nullptr;
-                std::string src = attr->value();
-                attr = attr->next_attribute();
-                std::string name = attr->value();
-                if(src == "card")
-                    ptex = &card_texture;
-                else if(src == "misc")
-                    ptex = &misc_texture;
-                else if(src == "bg")
-                    ptex = &bg_texture;
-                if(ptex) {
-                    auto& ti = misc_textures[name];
-                    int32_t val[8];
-                    for(int32_t i = 0; i < 8; ++i) {
-                        attr = attr->next_attribute();
-                        val[i] = To<int32_t>(attr->value());
-                    }
-                    ti.vert[0].x = (float)val[0] / ptex->GetWidth();
-                    ti.vert[0].y = (float)val[1] / ptex->GetHeight();
-                    ti.vert[1].x = (float)val[2] / ptex->GetWidth();
-                    ti.vert[1].y = (float)val[3] / ptex->GetHeight();
-                    ti.vert[2].x = (float)val[4] / ptex->GetWidth();
-                    ti.vert[2].y = (float)val[5] / ptex->GetHeight();
-                    ti.vert[3].x = (float)val[6] / ptex->GetWidth();
-                    ti.vert[3].y = (float)val[7] / ptex->GetHeight();
-                }
+        textureCfg["texture"].for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+            base::Texture* ptex = nullptr;
+            std::string src = node[0].to_string();
+            if(src == "card")
+                ptex = render_tex;
+            else if(src == "misc")
+                ptex = &misc_texture;
+            else if(src == "bg")
+                ptex = &bg_texture;
+            if(ptex) {
+                auto& ti = misc_textures[name];
+                int32_t x = (int32_t)node[1].to_integer();
+                int32_t y = (int32_t)node[2].to_integer();
+                int32_t w = (int32_t)node[3].to_integer();
+                int32_t h = (int32_t)node[4].to_integer();
+                ti.vert[0] = {x, y};
+                ti.vert[1] = {x + w, y};
+                ti.vert[2] = {x, y + h};
+                ti.vert[3] = {x + w, y + h};
             }
-            config_node = config_node->next_sibling();
-        }
+        });
+        textureCfg["points"].for_each([this](const std::string& name, jaweson::JsonNode<>& node) {
+            base::Texture* ptex = nullptr;
+            std::string src = node[0].to_string();
+            if(src == "card")
+                ptex = render_tex;
+            else if(src == "misc")
+                ptex = &misc_texture;
+            else if(src == "bg")
+                ptex = &bg_texture;
+            if(ptex) {
+                auto& ti = misc_textures[name];
+                int32_t val[8];
+                for(int32_t i = 0; i < 8; ++i)
+                    val[i] = (int32_t)node[i + 1].to_integer();
+                ti.vert[0] = {val[0], val[1]};
+                ti.vert[1] = {val[2], val[3]};
+                ti.vert[2] = {val[4], val[5]};
+                ti.vert[3] = {val[6], val[7]};
+            }
+        });
         auto& char_tex = misc_textures["char"];
-        float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
-        float dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
+        int32_t difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
+        int32_t dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
         for(int32_t i = 0; i < 16; ++i) {
             int32_t x = i % 4;
             int32_t y = i / 4;
-            char_textures[i].vert[0] = char_tex.vert[0] + v2f{difx * x, dify * y};
-            char_textures[i].vert[1] = char_tex.vert[0] + v2f{difx * (x + 1), dify * y};
-            char_textures[i].vert[2] = char_tex.vert[0] + v2f{difx * x, dify * (y + 1)};
-            char_textures[i].vert[3] = char_tex.vert[0] + v2f{difx * (x + 1), dify * (y + 1)};
+            char_textures[i].vert[0] = char_tex.vert[0] + v2i{difx * x, dify * y};
+            char_textures[i].vert[1] = char_tex.vert[0] + v2i{difx * (x + 1), dify * y};
+            char_textures[i].vert[2] = char_tex.vert[0] + v2i{difx * x, dify * (y + 1)};
+            char_textures[i].vert[3] = char_tex.vert[0] + v2i{difx * (x + 1), dify * (y + 1)};
         }
         return true;
 	}
