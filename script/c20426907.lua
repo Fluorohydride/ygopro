@@ -122,5 +122,5 @@ function c20426907.sdfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0xaa) and not c:IsCode(20426907)
 end
 function c20426907.sdcon(e)
-	return not Duel.IsExistingMatchingCard(c20426907.sdfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,0,1,nil)
+	return not Duel.IsExistingMatchingCard(c20426907.sdfilter,e:GetHandlerPlayer(),LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil)
 end
