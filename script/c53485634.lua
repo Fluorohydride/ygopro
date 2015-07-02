@@ -19,6 +19,7 @@ function c53485634.initial_effect(c)
 	e2:SetRange(LOCATION_MZONE)
 	e2:SetCondition(c53485634.sumcon)
 	e2:SetCost(c53485634.sumcost)
+	e2:SetTarget(c53485634.sumtg)
 	e2:SetOperation(c53485634.sumop)
 	c:RegisterEffect(e2)
 end
@@ -70,6 +71,9 @@ end
 function c53485634.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
 	Duel.Release(e:GetHandler(),REASON_COST)
+end
+function c53485634.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SUMMON) end
 end
 function c53485634.sumop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
