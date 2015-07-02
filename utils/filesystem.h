@@ -70,6 +70,14 @@ public:
         FindClose(fh);
     }
     
+    static std::string UTF8ToLocalFilename(const std::string& utf8_name) {
+        char buffer[2048];
+        std::wstring wname = To<std::wstring>(utf8_name);
+        size_t count = wcstombs(buffer, wname.c_str(), 2047);
+        buffer[count] = 0;
+        return std::move(std::string(buffer));
+    }
+    
 };
 
 #else
@@ -131,6 +139,10 @@ public:
             cb(To<std::wstring>(name), S_ISDIR(fileStat.st_mode));
         }
         closedir(dir);
+    }
+    
+    static std::string UTF8ToLocalFilename(const std::string& utf8_name) {
+        return utf8_name;
     }
     
 };

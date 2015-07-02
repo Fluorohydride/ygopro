@@ -393,7 +393,7 @@ namespace base
             need_redraw = true;
         }
         
-        inline void GetScreenSize() { return screen_size; }
+        inline v2i GetScreenSize() { return screen_size; }
         inline void SetFlip(bool f) { flip_ycoord = f; }
         inline v2f ConvScreenCoord(v2i pos) {
             if(flip_ycoord)

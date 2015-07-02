@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 
 #include "utils/textfile.h"
+#include "utils/filesystem.h"
 #include "utils/sgui.h"
 
 #include "config.h"
@@ -38,13 +39,13 @@ int32_t main(int32_t argc, char* argv[]) {
         jsonfile.Load("common.json");
         if(!commonCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
-        jsonfile.Load(commonCfg["string_conf"].to_string());
+        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["string_conf"].to_string()));
         if(!stringCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
-        jsonfile.Load(commonCfg["layout_conf"].to_string());
+        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["layout_conf"].to_string()));
         if(!layoutCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
-        jsonfile.Load(commonCfg["textures_conf"].to_string());
+        jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["textures_conf"].to_string()));
         if(!textureCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
     }
@@ -86,17 +87,18 @@ int32_t main(int32_t argc, char* argv[]) {
     xrate = (float)bwidth / width;
     yrate = (float)bheight / height;
     
-    ImageMgr::Get().InitTextures(commonCfg["image_path"].to_string());
-    if(DataMgr::Get().LoadDatas(commonCfg["database_file"].to_string())
+    ImageMgr::Get().InitTextures(FileSystem::UTF8ToLocalFilename(commonCfg["image_path"].to_string()));
+    if(DataMgr::Get().LoadDatas(FileSystem::UTF8ToLocalFilename(commonCfg["database_file"].to_string()))
        || !ImageMgr::Get().LoadImageConfig()
-       || !sgui::SGGUIRoot::GetSingleton().Init(commonCfg["gui_conf"].to_string(), {bwidth, bheight}, true)) {
+       || !sgui::SGGUIRoot::GetSingleton().Init(FileSystem::UTF8ToLocalFilename(commonCfg["gui_conf"].to_string()), {bwidth, bheight}, true)) {
         glfwDestroyWindow(window);
         glfwTerminate();
         return 0;
     }
-    LimitRegulationMgr::Get().LoadLimitRegulation(commonCfg["limit_regulation"].to_string(), stringCfg["eui_list_default"].to_string());
+    LimitRegulationMgr::Get().LoadLimitRegulation(FileSystem::UTF8ToLocalFilename(commonCfg["limit_regulation"].to_string()),
+                                                  To<std::wstring>(stringCfg["eui_list_default"].to_string()));
     stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
-        std::wstring setname = To<std::wstring>(name.substr(8));
+        std::wstring setname = To<std::wstring>(name);
         DataMgr::Get().RegisterSetCode(To<uint32_t>(node.to_string()), setname);
     });
     

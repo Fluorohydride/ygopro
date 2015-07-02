@@ -9,86 +9,52 @@
 namespace ygopro
 {
     
-    void MessageBox::ShowOK(const std::wstring& title, const std::wstring& text, std::function<void ()> cb) {
-        auto sz = sgui::SGGUIRoot::GetSingleton().GetScreenSize();
-        auto wd = sgui::SGWindow::Create(nullptr, {0, 0}, {0, 0});
-        wd->GetCloseButton()->SetVisible(false);
-        wd->SetText(title, 0xff000000);
-        auto label = sgui::SGLabel::Create(wd, {10, 30}, text);
-        auto lbsz = label->GetSize();
+    sgui::SGWindow* GenMessageBox(const std::wstring& title, const std::wstring& text, int32_t min_size) {
+        auto wd = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGWindow>();
+        wd->SetCloseButtonVisible(false);
+        wd->GetCaption()->SetText(title, 0xff000000);
+        auto label = wd->NewChild<sgui::SGLabel>();
+        label->GetTextUI()->SetText(text, 0xff000000);
+        auto lbsz = label->GetAbsoluteSize();
         if(lbsz.x < 100)
             lbsz.x = 100;
         wd->SetSize({lbsz.x + 20, lbsz.y + 80});
-        wd->SetPosition({sz.x / 2 - lbsz.x / 2 - 10, sz.y / 2 - lbsz.y / 2 - 40});
-        auto btn = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 - 30, 45 + lbsz.y}, {60, 25});
-        btn->SetText(stringCfg["eui_button_ok"], 0xff000000);
-        auto ptr = wd.get();
-        btn->eventButtonClick.Bind([ptr, cb](sgui::SGWidget& sender)->bool {
-            if(cb != nullptr)
+        wd->SetPosition({0, 0}, {0.5f, 0.5f}, {-0.5f, -0.5f});
+        return wd;
+    }
+    
+    sgui::SGTextButton* MessageBoxAddButton(sgui::SGWindow* wd, const std::wstring text, std::function<void ()> cb) {
+        auto btn = wd->NewChild<sgui::SGTextButton>();
+        btn->GetTextUI()->SetText(text, 0xff000000);
+        if(cb)
+            btn->event_click += [wd, cb](sgui::SGWidget& sender)->bool {
                 cb();
-            ptr->Destroy();
-            return true;
-        });
+                wd->RemoveFromParent();
+                return true;
+            };
+        return btn;
+    }
+    
+    void MessageBox::ShowOK(const std::wstring& title, const std::wstring& text, std::function<void ()> cb) {
+        auto wd = GenMessageBox(title, text, 100);
+        auto btn = MessageBoxAddButton(wd, To<std::wstring>(stringCfg["eui_button_ok"].to_string()), cb);
+        btn->SetPositionSize({0, -10}, {100, 40}, {0.5f, 1.0f}, {0.0f, 0.0f}, {-0.5f, -1.0f});
     }
 
     void MessageBox::ShowOKCancel(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1, std::function<void ()> cb2) {
-        auto sz = sgui::SGGUIRoot::GetSingleton().GetSceneSize();
-        auto wd = sgui::SGWindow::Create(nullptr, {0, 0}, {0, 0});
-        wd->GetCloseButton()->SetVisible(false);
-        wd->SetText(title, 0xff000000);
-        auto label = sgui::SGLabel::Create(wd, {10, 30}, text);
-        auto lbsz = label->GetSize();
-        if(lbsz.x < 160)
-            lbsz.x = 160;
-        wd->SetSize({lbsz.x + 20, lbsz.y + 80});
-        wd->SetPosition({sz.x / 2 - lbsz.x / 2 - 10, sz.y / 2 - lbsz.y / 2 - 40});
-        auto ptr = wd.get();
-        auto btnOK = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 - 70, 45 + lbsz.y}, {60, 25});
-        btnOK->SetText(stringCfg["eui_button_ok"], 0xff000000);
-        btnOK->eventButtonClick.Bind([ptr, cb1](sgui::SGWidget& sender)->bool {
-            if(cb1 != nullptr)
-                cb1();
-            ptr->Destroy();
-            return true;
-        });
-        auto btnCancel = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 + 10, 45 + lbsz.y}, {60, 25});
-        btnCancel->SetText(stringCfg["eui_button_cancel"], 0xff000000);
-        btnCancel->eventButtonClick.Bind([ptr, cb2](sgui::SGWidget& sender)->bool {
-            if(cb2 != nullptr)
-                cb2();
-            ptr->Destroy();
-            return true;
-        });
+        auto wd = GenMessageBox(title, text, 160);
+        auto btnOK = MessageBoxAddButton(wd, To<std::wstring>(stringCfg["eui_button_ok"].to_string()), cb1);
+        btnOK->SetPositionSize({0, -10}, {100, 40}, {0.3f, 1.0f}, {0.0f, 0.0f}, {-0.5f, -1.0f});
+        auto btnCancel = MessageBoxAddButton(wd, To<std::wstring>(stringCfg["eui_button_cancel"].to_string()), cb2);
+        btnCancel->SetPositionSize({0, -10}, {100, 40}, {0.7f, 1.0f}, {0.0f, 0.0f}, {-0.5f, -1.0f});
     }
     
     void MessageBox::ShowYesNo(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1, std::function<void ()> cb2) {
-        auto sz = sgui::SGGUIRoot::GetSingleton().GetSceneSize();
-        auto wd = sgui::SGWindow::Create(nullptr, {0, 0}, {0, 0});
-        wd->GetCloseButton()->SetVisible(false);
-        wd->SetText(title, 0xff000000);
-        auto label = sgui::SGLabel::Create(wd, {10, 30}, text);
-        auto lbsz = label->GetSize();
-        if(lbsz.x < 160)
-            lbsz.x = 160;
-        wd->SetSize({lbsz.x + 20, lbsz.y + 80});
-        wd->SetPosition({sz.x / 2 - lbsz.x / 2 - 10, sz.y / 2 - lbsz.y / 2 - 40});
-        auto ptr = wd.get();
-        auto btnOK = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 - 70, 45 + lbsz.y}, {60, 25});
-        btnOK->SetText(stringCfg["eui_button_yes"], 0xff000000);
-        btnOK->eventButtonClick.Bind([ptr, cb1](sgui::SGWidget& sender)->bool {
-            if(cb1 != nullptr)
-                cb1();
-            ptr->Destroy();
-            return true;
-        });
-        auto btnCancel = sgui::SGButton::Create(wd, {lbsz.x / 2 + 10 + 10, 45 + lbsz.y}, {60, 25});
-        btnCancel->SetText(stringCfg["eui_button_no"], 0xff000000);
-        btnCancel->eventButtonClick.Bind([ptr, cb2](sgui::SGWidget& sender)->bool {
-            if(cb2 != nullptr)
-                cb2();
-            ptr->Destroy();
-            return true;
-        });
+        auto wd = GenMessageBox(title, text, 160);
+        auto btnYes = MessageBoxAddButton(wd, To<std::wstring>(stringCfg["eui_button_yes"].to_string()), cb1);
+        btnYes->SetPositionSize({0, -10}, {100, 40}, {0.3f, 1.0f}, {0.0f, 0.0f}, {-0.5f, -1.0f});
+        auto btnNo = MessageBoxAddButton(wd, To<std::wstring>(stringCfg["eui_button_no"].to_string()), cb2);
+        btnNo->SetPositionSize({0, -10}, {100, 40}, {0.7f, 1.0f}, {0.0f, 0.0f}, {-0.5f, -1.0f});
     }
     
     PopupMenu& PopupMenu::AddButton(const std::wstring& btn, int32_t id) {

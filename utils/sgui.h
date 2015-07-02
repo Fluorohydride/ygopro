@@ -3085,7 +3085,7 @@ namespace sgui
         v2i text_offset = {0, 0};
     };
     
-    class SGEditBox : public SGWidget {
+    class SGTextEdit : public SGWidget {
     public:
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = SGWidget::OnPositionSizeChange(re_pos, re_size);
@@ -3395,7 +3395,7 @@ namespace sgui
             if(timer_version == timever)
                 return;
             timer_version = timever;
-            std::weak_ptr<SGEditBox> thiseb = std::static_pointer_cast<SGEditBox>(shared_from_this());
+            std::weak_ptr<SGTextEdit> thiseb = std::static_pointer_cast<SGTextEdit>(shared_from_this());
             SGGUIRoot::GetSingleton().RegisterTimerEvent([thiseb, timever]()->uint64_t {
                 if(thiseb.expired())
                     return 0;

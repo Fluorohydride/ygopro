@@ -10,7 +10,7 @@ namespace ygopro
     public:
         virtual ~CommonDialog() {
             if(!window.expired())
-                window.lock()->Destroy();
+                window.lock()->RemoveFromParent();
         }
     protected:
         std::weak_ptr<sgui::SGWidgetContainer> window;
@@ -85,8 +85,8 @@ namespace ygopro
         
     protected:
         uint32_t code = 0;
-        std::weak_ptr<sgui::SGSprite> imageBox;
-        std::weak_ptr<sgui::SGSprite> misc;
+        std::weak_ptr<sgui::SGImage> imageBox;
+        std::weak_ptr<sgui::SGImage> misc;
         std::weak_ptr<sgui::SGLabel> cardName;
         std::weak_ptr<sgui::SGLabel> penText;
         std::weak_ptr<sgui::SGLabel> cardText;
