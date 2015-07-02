@@ -47,9 +47,6 @@ function c14235211.eqop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_EQUIP_LIMIT)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
-	e1:SetValue(c14235211.eqlimit)
+	e1:SetValue(1)
 	c:RegisterEffect(e1)
-end
-function c14235211.eqlimit(e,c)
-	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_NORMAL)
 end
