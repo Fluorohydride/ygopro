@@ -45,7 +45,7 @@ function c23740893.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
 end
 function c23740893.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SUMMON) end
+	if chk==0 then return Duel.IsPlayerCanSummon(tp) end
 end
 function c23740893.sumop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,23740893)~=0 then return end

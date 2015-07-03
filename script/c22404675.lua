@@ -16,7 +16,7 @@ function c22404675.initial_effect(c)
 	e2:SetCode(EVENT_RELEASE)
 	e2:SetCountLimit(1,22404676)
 	e2:SetCondition(c22404675.sumcon)
-	e2:SetTarget(c22404676.sumtg)
+	e2:SetTarget(c22404675.sumtg)
 	e2:SetOperation(c22404675.sumop)
 	c:RegisterEffect(e2)
 end
@@ -58,8 +58,8 @@ end
 function c22404675.sumcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():IsReason(REASON_SUMMON)
 end
-function c22404676.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SUMMON) end
+function c22404675.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return Duel.IsPlayerCanSummon(tp) end
 end
 function c22404675.sumop(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetFlagEffect(tp,22404675)~=0 then return end

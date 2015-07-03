@@ -1941,6 +1941,15 @@ int32 field::is_player_can_discard_hand(uint8 playerid, card * pcard, effect * p
 	}
 	return TRUE;
 }
+int32 field::is_player_can_summon(uint8 playerid) {
+	effect_set eset;
+	filter_player_effect(playerid, EFFECT_CANNOT_SUMMON, &eset);
+	for(int32 i = 0; i < eset.size(); ++i) {
+		if(!eset[i]->target)
+			return FALSE;
+	}
+	return TRUE;
+}
 int32 field::is_player_can_summon(uint32 sumtype, uint8 playerid, card * pcard) {
 	effect_set eset;
 	sumtype |= SUMMON_TYPE_NORMAL;

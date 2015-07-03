@@ -73,7 +73,7 @@ function c53485634.sumcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.Release(e:GetHandler(),REASON_COST)
 end
 function c53485634.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return not Duel.IsPlayerAffectedByEffect(tp,EFFECT_CANNOT_SUMMON) end
+	if chk==0 then return Duel.IsPlayerCanSummon(tp) end
 end
 function c53485634.sumop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
