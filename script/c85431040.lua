@@ -34,14 +34,15 @@ function c85431040.operation(e,tp,eg,ep,ev,re,r,rp)
 		local sg=g:Select(tp,1,ft,nil)
 		local tc=sg:GetFirst()
 		while tc do
-			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK)
-			--cannot trigger
-			local e1=Effect.CreateEffect(e:GetHandler())
-			e1:SetType(EFFECT_TYPE_SINGLE)
-			e1:SetCode(EFFECT_CANNOT_TRIGGER)
-			e1:SetRange(LOCATION_MZONE)
-			e1:SetReset(RESET_EVENT+0x1fe0000)
-			tc:RegisterEffect(e1)
+			if Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP_ATTACK) then
+				--cannot trigger
+				local e1=Effect.CreateEffect(e:GetHandler())
+				e1:SetType(EFFECT_TYPE_SINGLE)
+				e1:SetCode(EFFECT_CANNOT_TRIGGER)
+				e1:SetRange(LOCATION_MZONE)
+				e1:SetReset(RESET_EVENT+0x1fe0000)
+				tc:RegisterEffect(e1)
+			end
 			tc=sg:GetNext()
 		end
 		Duel.SpecialSummonComplete()

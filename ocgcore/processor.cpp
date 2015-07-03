@@ -4632,20 +4632,6 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
 			process_instant_event();
 			core.units.begin()->step = 9;
-			/*if(cait->opinfos.count(0x200)) {
-				set_spsummon_counter(cait->triggering_player, false);
-				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
-					auto& optarget = cait->opinfos[0x200];
-					if(optarget.op_cards) {
-						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
-							if((*opit)->spsummon_code) {
-								uint8 sumpl = optarget.op_player ? 1 : 0;
-								core.spsummon_once_map[sumpl][(*opit)->spsummon_code]--;
-							}
-						}
-					}
-				}
-			}*/
 			return FALSE;
 		}
 		for(auto oeit = effects.oath.begin(); oeit != effects.oath.end(); ++oeit)
@@ -4687,7 +4673,6 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 				return FALSE;
 			}
 		}
-		//core.units.begin()->arg2 = core.spsummon_state_count[cait->triggering_player];
 		if(cait->replace_op) {
 			core.units.begin()->peffect = (effect*)(size_t)cait->triggering_effect->operation;
 			cait->triggering_effect->operation = cait->replace_op;
@@ -4703,25 +4688,7 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 		effect* peffect = cait->triggering_effect;
 		if(core.units.begin()->peffect) {
 			peffect->operation = (ptr)core.units.begin()->peffect;
-			/*if(cait->opinfos.count(0x200)) {
-				set_spsummon_counter(cait->triggering_player,false);
-				if((core.global_flag & GLOBALFLAG_SPSUMMON_ONCE) && (peffect->flag & EFFECT_FLAG_CARD_TARGET)) {
-					auto& optarget = cait->opinfos[0x200];
-					if(optarget.op_cards) {
-						for(auto opit = optarget.op_cards->container.begin(); opit != optarget.op_cards->container.end(); ++opit) {
-							if((*opit)->spsummon_code) {
-								uint8 sumpl = optarget.op_player ? 1 : 0;
-								core.spsummon_once_map[sumpl][(*opit)->spsummon_code]--;
-							}
-						}
-					}
-				}
-			}*/
 		}
-		/*else {
-			if(cait->opinfos.count(0x200) && (core.units.begin()->arg2 != core.spsummon_state_count[cait->triggering_player]))
-				set_spsummon_counter(cait->triggering_player, false);
-		}*/
 		core.special_summoning.clear();
 		core.equiping_cards.clear();
 		return FALSE;

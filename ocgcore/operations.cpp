@@ -2182,7 +2182,7 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 		raise_event(&target->material_cards, EVENT_BE_MATERIAL, proc, matreason, sumplayer, sumplayer, 0);
 		process_single_event();
 		process_instant_event();
-		return false;
+		return FALSE;
 	}
 	case 17: {
 		raise_single_event(target, 0, EVENT_SPSUMMON_SUCCESS, core.units.begin()->peffect, 0, sumplayer, sumplayer, 0);
@@ -2416,6 +2416,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		returns.ivalue[0] = TRUE;
 		if(target->owner != target->current.controler)
 			set_control(target, target->current.controler, 0, 0);
+		target->set_status(STATUS_SUMMONING, TRUE);
 		return TRUE;
 	}
 	}
@@ -2435,7 +2436,6 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		if(!cvs.empty()) {
 			if(cvs.size() > 1)
 				std::sort(cvs.begin(), cvs.end(), card::card_operation_sort);
-			//set_spsummon_counter(infos.turn_player);
 			core.hint_timing[infos.turn_player] |= TIMING_SPSUMMON;
 			for(auto cvit = cvs.begin(); cvit != cvs.end(); ++cvit)
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
@@ -2443,7 +2443,6 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		if(!cvo.empty()) {
 			if(cvo.size() > 1)
 				std::sort(cvo.begin(), cvo.end(), card::card_operation_sort);
-			//set_spsummon_counter(1 - infos.turn_player);
 			core.hint_timing[1 - infos.turn_player] |= TIMING_SPSUMMON;
 			for(auto cvit = cvo.begin(); cvit != cvo.end(); ++cvit)
 				add_process(PROCESSOR_SPSUMMON_STEP, 0, 0, targets, 0, (ptr)(*cvit));
@@ -2476,6 +2475,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		for(auto cit = spsummon_once_set[1].begin(); cit != spsummon_once_set[1].end(); ++cit)
 			core.spsummon_once_map[1][*cit]++;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
+			(*cit)->set_status(STATUS_SUMMONING, FALSE);
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
 				(*cit)->enable_field_effect(TRUE);
