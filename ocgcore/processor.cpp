@@ -4862,6 +4862,7 @@ int32 field::break_effect() {
 void field::adjust_instant() {
 	adjust_disable_check_list();
 	adjust_self_destroy_set();
+	refresh_location_info_instant();
 }
 void field::adjust_all() {
 	core.readjust_map.clear();
