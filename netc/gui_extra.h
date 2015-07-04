@@ -36,7 +36,7 @@ namespace ygopro
         std::vector<std::wstring> items;
         std::vector<int32_t> ids;
     public:
-        static PopupMenu& Begin(v2i pos, int32_t width, std::function<void (int32_t)> cb = nullptr);
+        static PopupMenu& Create(v2i pos, int32_t width, std::function<void (int32_t)> cb = nullptr);
     };
     
     class FileDialog : public CommonDialog {

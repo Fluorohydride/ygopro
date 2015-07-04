@@ -26,12 +26,11 @@ namespace ygopro
     sgui::SGTextButton* MessageBoxAddButton(sgui::SGWindow* wd, const std::wstring text, std::function<void ()> cb) {
         auto btn = wd->NewChild<sgui::SGTextButton>();
         btn->GetTextUI()->SetText(text, 0xff000000);
-        if(cb)
-            btn->event_click += [wd, cb](sgui::SGWidget& sender)->bool {
-                cb();
-                wd->RemoveFromParent();
-                return true;
-            };
+        btn->event_click += [wd, cb](sgui::SGWidget& sender)->bool {
+            if(cb) cb();
+            wd->RemoveFromParent();
+            return true;
+        };
         return btn;
     }
     
@@ -59,14 +58,14 @@ namespace ygopro
     
     PopupMenu& PopupMenu::AddButton(const std::wstring& btn, int32_t id) {
         if(id == 0)
-            id = ids.size();
+            id = (int32_t)ids.size();
         items.push_back(btn);
         ids.push_back(id);
         return *this;
     }
     
     void PopupMenu::End() {
-        auto pnl = sgui::SGPanel::Create(nullptr, pos, {width, (int32_t)(25 * items.size() + 9)});
+        auto pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
         pnl->eventDestroying.Bind([this](sgui::SGWidget& sender)->bool {
             delete this;
             return true;
@@ -84,10 +83,10 @@ namespace ygopro
                 return true;
             });
         }
-        sgui::SGGUIRoot::GetSingleton().SetPopupObject(pnl);
+        sgui::SGGUIRoot::GetSingleton().PopupObject(pnl);
     }
     
-    PopupMenu& PopupMenu::Begin(v2i pos, int32_t width, std::function<void (int32_t)> cb) {
+    PopupMenu& PopupMenu::Create(v2i pos, int32_t width, std::function<void (int32_t)> cb) {
         PopupMenu* menu = new PopupMenu();
         menu->pos = pos;
         menu->width = width;
