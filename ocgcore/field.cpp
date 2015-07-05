@@ -1391,7 +1391,7 @@ void field::adjust_disable_check_list() {
 	} while(effects.disable_check_list.size());
 }
 void field::adjust_self_destroy_set() {
-	if(core.selfdes_disabled)
+	if(core.selfdes_disabled || !core.self_destroy_set.empty() || !core.self_tograve_set.empty())
 		return;
 	card_set cset;
 	for(uint8 p = 0; p < 2; ++p) {

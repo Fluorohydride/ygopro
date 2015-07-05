@@ -1038,6 +1038,7 @@ int32 field::self_destroy(uint16 step) {
 		return FALSE;
 	}
 	case 1: {
+		core.self_destroy_set.clear();
 		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE))
 			return TRUE;
 		core.units.begin()->arg1 = returns.ivalue[0];
@@ -1048,6 +1049,7 @@ int32 field::self_destroy(uint16 step) {
 		return FALSE;
 	}
 	case 2: {
+		core.self_tograve_set.clear();
 		returns.ivalue[0] += core.units.begin()->arg1;
 		return TRUE;
 	}
