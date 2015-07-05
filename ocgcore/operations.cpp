@@ -2416,7 +2416,6 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		returns.ivalue[0] = TRUE;
 		if(target->owner != target->current.controler)
 			set_control(target, target->current.controler, 0, 0);
-		target->set_status(STATUS_SUMMONING, TRUE);
 		return TRUE;
 	}
 	}
@@ -2475,7 +2474,6 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		for(auto cit = spsummon_once_set[1].begin(); cit != spsummon_once_set[1].end(); ++cit)
 			core.spsummon_once_map[1][*cit]++;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
-			(*cit)->set_status(STATUS_SUMMONING, FALSE);
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
 				(*cit)->enable_field_effect(TRUE);
