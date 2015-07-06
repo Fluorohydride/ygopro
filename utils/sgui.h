@@ -2494,7 +2494,7 @@ namespace sgui
             color[2] = SGJsonUtil::ConvertRGBA(lb_node["sel_bcolor"]);
         }
         
-        void AddItem(const std::wstring& str, int32_t cl) {
+        void AddItem(const std::wstring& str, int32_t cl, int32_t cvalue  = 0) {
             UIText* item_surface = SGGUIRoot::GetSingleton().NewObject<UIText>();
             item_surface->SetContainer(this);
             item_surface->SetCapacity(16);
@@ -2509,6 +2509,7 @@ namespace sgui
                 sc->SetValue(0.0f);
                 sc->SetVisible(true);
             }
+            custom_value.push_back(cvalue);
         }
         
         void RemoveItem(int32_t index) {
@@ -2525,6 +2526,20 @@ namespace sgui
                 sc->SetVisible(false);
                 sc->SetValue(0.0f);
             }
+            custom_value.erase(custom_value.begin() + index);
+        }
+        
+        const std::wstring& GetItemText(int32_t index) {
+            static std::wstring empty_val = L"";
+            if(index >= (int32_t)ui_components.size() - 2)
+                return empty_val;
+            return static_cast<UIText*>(ui_components[index + 2])->GetText();
+        }
+        
+        int32_t GetItemCustomValue(int32_t index) {
+            if(index >= (int32_t)ui_components.size() - 2)
+                return 0;
+            return custom_value[index];
         }
         
         void ChangeOffset(int32_t offset) {
@@ -2633,6 +2648,7 @@ namespace sgui
         v2f item_size_pro = {0, 0};
         v2f item_self_factor = {0, 0};
         base::RenderCmdBeginScissor<base::v2ct>* cmd = nullptr;
+        std::vector<int32_t> custom_value;
     };
     
     class SGComboBox : public SGCommonUIText {

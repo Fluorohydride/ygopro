@@ -1,4 +1,5 @@
 #include "utils/common.h"
+#include "utils/filesystem.h"
 
 #include "config.h"
 #include "card_data.h"
@@ -66,24 +67,23 @@ namespace ygopro
     
     void PopupMenu::End() {
         auto pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
-        pnl->eventDestroying.Bind([this](sgui::SGWidget& sender)->bool {
+        pnl->event_on_destroy += [this](sgui::SGWidget& sender)->bool {
             delete this;
             return true;
-        });
-        auto ptr = pnl.get();
+        };
         for(size_t i = 0; i < items.size(); ++i) {
-            auto btn = sgui::SGButton::Create(pnl, {3, (int32_t)(5 + 25 * i)}, {0, width});
-            btn->SetSize({-10, 25}, {1.0f, 0.0f});
-            btn->SetText(items[i], 0xff000000);
+            auto btn = pnl->NewChild<sgui::SGTextButton>();
+            btn->SetPositionSize({10, 10 + (int32_t)i * 40}, {-20, 35}, {0.0f, 0.0f}, {1.0f, 0.0f});
+            btn->GetTextUI()->SetText(items[i], 0xff000000);
             btn->SetCustomValue(ids[i]);
-            btn->eventButtonClick.Bind([this, ptr](sgui::SGWidget& sender)->bool {
+            btn->event_click += [this, pnl](sgui::SGWidget& sender)->bool {
                 if(cb != nullptr)
-                    cb(sender.GetCustomValue());
-                ptr->Destroy();
+                    cb(static_cast<int32_t>(sender.GetCustomValue()));
+                pnl->RemoveFromParent();
                 return true;
-            });
+            };
         }
-        sgui::SGGUIRoot::GetSingleton().PopupObject(pnl);
+        sgui::SGGUIRoot::GetSingleton().PopupObject(pnl->shared_from_this());
     }
     
     PopupMenu& PopupMenu::Create(v2i pos, int32_t width, std::function<void (int32_t)> cb) {
@@ -102,56 +102,56 @@ namespace ygopro
         this->filter = filter;
         if(!FileSystem::IsDirExists(root) && !FileSystem::MakeDir(root))
             return;
-        auto sz = sgui::SGGUIRoot::GetSingleton().GetSceneSize();
-        auto wd = sgui::SGWindow::Create(nullptr, {sz.x / 2 - 150, sz.y / 2 - 200}, {300, 330});
-        wd->SetText(title, 0xff000000);
-        auto fpath = sgui::SGTextEdit::Create(wd, {10, 25}, {280, 30});
-        fpath->SetReadOnly(true);
-        fpath->SetText(root, 0xff000000);
-        auto lst = sgui::SGListBox::Create(wd, {10, 55}, {280, 200});
-        auto ffile = sgui::SGTextEdit::Create(wd, {10, 255}, {280, 30});
-        auto btn = sgui::SGButton::Create(wd, {190, 290}, {100, 25});
-        btn->SetText(stringCfg["eui_button_ok"], 0xff000000);
-        window = wd;
-        auto ppath = fpath.get();
-        auto pfile = ffile.get();
-        auto plst = lst.get();
-        btn->eventButtonClick.Bind([this, pfile](sgui::SGWidget& sender)->bool {
-            auto file = pfile->GetText();
+        auto wnd = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGWindow>();
+        wnd->SetPositionSize({0, 0}, {300, 330}, {0.5f, 0.5f}, {0.0f, 0.0f}, {-0.5f, -0.5f});
+        wnd->GetCaption()->SetText(title, 0xff000000);
+        auto fpath = wnd->NewChild<sgui::SGTextEdit>();
+        fpath->SetPositionSize({10, 25}, {280, 30});
+        //fpath->SetReadOnly(true);
+        fpath->GetTextUI()->SetText(root, 0xff000000);
+        auto lst = wnd->NewChild<sgui::SGListBox>();
+        lst->SetPositionSize({10, 55}, {280, 200});
+        auto ffile = wnd->NewChild<sgui::SGTextEdit>();
+        ffile->SetPositionSize({10, 255}, {280, 30});
+        auto btn = wnd->NewChild<sgui::SGTextButton>();
+        btn->SetPositionSize({190, 290}, {100, 25});
+        btn->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_button_ok"].to_string()), 0xff000000);
+        btn->event_click.Bind([this, wnd, ffile](sgui::SGWidget& sender)->bool {
+            auto file = ffile->GetTextUI()->GetText();
             if(file.length() == 0)
                 return true;
             if(cbOK != nullptr)
                 cbOK(path + L"/" + file);
-            window.lock()->Destroy();
+            wnd->RemoveFromParent();
             return true;
         });
-        lst->eventSelChange.Bind([this, pfile, plst](sgui::SGWidget& sender, int32_t index)->bool {
+        lst->event_sel_change.Bind([this, ffile, lst](sgui::SGWidget& sender, int32_t index)->bool {
             if(index < 0)
                 return true;
-            auto it = plst->GetItem(index);
-            if(std::get<0>(it) == 141)
-                pfile->SetText(std::get<1>(it), 0xff000000);
+//            auto it = lst->i
+//            if(std::get<0>(it) == 141)
+//                pfile->SetText(std::get<1>(it), 0xff000000);
             return true;
         });
-        lst->eventDoubleClick.Bind([this, pfile, plst, ppath](sgui::SGWidget& sender, int32_t index)->bool {
-            auto it = plst->GetItem(index);
-            if(std::get<0>(it) == 142) {
-                int32_t pos = path.rfind(L'/');
-                path = path.substr(0, pos);
-                ppath->SetText(path, 0xff000000);
-                RefreshList(plst);
-            } else if(std::get<0>(it) == 140) {
-                path.append(L"/").append(std::get<1>(it));
-                ppath->SetText(path, 0xff000000);
-                RefreshList(plst);
-            } else {
-                if(cbOK != nullptr)
-                    cbOK(path + L"/" + pfile->GetText());
-                window.lock()->Destroy();
-            }
-            return true;
-        });
-        RefreshList(plst);
+//        lst->eventDoubleClick.Bind([this, ffile, lst, fpath](sgui::SGWidget& sender, int32_t index)->bool {
+//            auto it = plst->GetItem(index);
+//            if(std::get<0>(it) == 142) {
+//                int32_t pos = path.rfind(L'/');
+//                path = path.substr(0, pos);
+//                ppath->SetText(path, 0xff000000);
+//                RefreshList(plst);
+//            } else if(std::get<0>(it) == 140) {
+//                path.append(L"/").append(std::get<1>(it));
+//                ppath->SetText(path, 0xff000000);
+//                RefreshList(plst);
+//            } else {
+//                if(cbOK != nullptr)
+//                    cbOK(path + L"/" + pfile->GetText());
+//                window.lock()->Destroy();
+//            }
+//            return true;
+//        });
+        RefreshList(lst);
     }
     
     void FileDialog::RefreshList(sgui::SGListBox* list) {
