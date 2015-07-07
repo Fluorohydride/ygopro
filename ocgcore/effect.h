@@ -35,7 +35,7 @@ public:
 	uint8 effect_owner;
 	uint32 description;
 	uint32 code;
-	uint32 flag;
+	uint64 flag;
 	uint32 id;
 	uint16 type;
 	uint16 copy_id;
@@ -172,6 +172,7 @@ public:
 #define EFFECT_FLAG_COF				0x20000000	//
 #define EFFECT_FLAG_CVAL_CHECK		0x40000000	//
 #define EFFECT_FLAG_IMMEDIATELY_APPLY	0x80000000	//
+#define EFFECT_FLAG_NON_EFFECT	0x100000000	//
 //========== Codes ==========
 #define EFFECT_IMMUNE_EFFECT			1	//
 #define EFFECT_DISABLE					2	//
