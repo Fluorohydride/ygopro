@@ -107,7 +107,7 @@ namespace ygopro
         wnd->GetCaption()->SetText(title, 0xff000000);
         auto fpath = wnd->NewChild<sgui::SGTextEdit>();
         fpath->SetPositionSize({10, 25}, {280, 30});
-        //fpath->SetReadOnly(true);
+        fpath->SetReadonly(true);
         fpath->GetTextUI()->SetText(root, 0xff000000);
         auto lst = wnd->NewChild<sgui::SGListBox>();
         lst->SetPositionSize({10, 55}, {280, 200});
@@ -128,29 +128,27 @@ namespace ygopro
         lst->event_sel_change.Bind([this, ffile, lst](sgui::SGWidget& sender, int32_t index)->bool {
             if(index < 0)
                 return true;
-//            auto it = lst->i
-//            if(std::get<0>(it) == 141)
-//                pfile->SetText(std::get<1>(it), 0xff000000);
+            if(lst->GetItemCustomValue(index) == 141)
+                ffile->GetTextUI()->SetText(lst->GetItemText(index), 0xff000000);
             return true;
         });
-//        lst->eventDoubleClick.Bind([this, ffile, lst, fpath](sgui::SGWidget& sender, int32_t index)->bool {
-//            auto it = plst->GetItem(index);
-//            if(std::get<0>(it) == 142) {
-//                int32_t pos = path.rfind(L'/');
-//                path = path.substr(0, pos);
-//                ppath->SetText(path, 0xff000000);
-//                RefreshList(plst);
-//            } else if(std::get<0>(it) == 140) {
-//                path.append(L"/").append(std::get<1>(it));
-//                ppath->SetText(path, 0xff000000);
-//                RefreshList(plst);
-//            } else {
-//                if(cbOK != nullptr)
-//                    cbOK(path + L"/" + pfile->GetText());
-//                window.lock()->Destroy();
-//            }
-//            return true;
-//        });
+        lst->event_item_double_click += [this, ffile, lst, fpath](sgui::SGWidget& sender, int32_t index)->bool {
+            if(lst->GetItemCustomValue(index) == 142) {
+                size_t pos = path.rfind(L'/');
+                path = path.substr(0, pos);
+                fpath->GetTextUI()->SetText(path, 0xff000000);
+                RefreshList(lst);
+            } else if(lst->GetItemCustomValue(index) == 140) {
+                path.append(L"/").append(lst->GetItemText(index));
+                fpath->GetTextUI()->SetText(path, 0xff000000);
+                RefreshList(lst);
+            } else {
+                if(cbOK != nullptr)
+                    cbOK(path + L"/" + ffile->GetTextUI()->GetText());
+                window.lock()->RemoveFromParent();
+            }
+            return true;
+        };
         RefreshList(lst);
     }
     
@@ -168,13 +166,13 @@ namespace ygopro
         });
         std::sort(dirs.begin(), dirs.end());
         std::sort(files.begin(), files.end());
-        list->ClearItem();
+        list->ClearItems();
         if(path != root)
-            list->AddItem(142, stringCfg["eui_updir"], 0xff000000);
+            list->AddItem(To<std::wstring>(stringCfg["eui_updir"].to_string()), 0xff000000, 142);
         for(size_t i = 0; i < dirs.size(); ++i)
-            list->AddItem(140, dirs[i], 0xff000000);
+            list->AddItem(dirs[i], 0xff000000, 140);
         for(size_t i = 0; i < files.size(); ++i)
-            list->AddItem(141, files[i], 0xff000000);
+            list->AddItem(files[i], 0xff000000, 141);
     }
     
     void FilterDialog::Show(v2i pos) {

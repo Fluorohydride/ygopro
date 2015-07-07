@@ -2346,6 +2346,7 @@ namespace sgui
     class SGListBox : public SGWidgetContainer {
     public:
         SGEventHandler<SGWidget, int32_t> event_sel_change;
+        SGEventHandler<SGWidget, int32_t> event_item_double_click;
         
     public:
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
@@ -2409,6 +2410,18 @@ namespace sgui
                 if(item_height_all <= area_size.absolute.y - bounds.top - bounds.height)
                     return true;
                 ChangeOffset((item_height_all - (area_size.absolute.y - bounds.top - bounds.height)) * val);
+                return true;
+            };
+            int64_t last_click_time = 0;
+            int32_t index = -1;
+            this->event_click += [this, index, last_click_time](SGWidget& sender) mutable ->bool {
+                int64_t tm = SGGUIRoot::GetSingleton().GetSysClock();
+                if(selection == index && tm - last_click_time < 200) {
+                    event_item_double_click.Trigger(sender, selection);
+                    index = -1;
+                } else
+                    index = selection;
+                last_click_time = tm;
                 return true;
             };
             back_surface->SetPositionSize({bounds.left, bounds.top}, {-bounds.left - bounds.width, 0}, {0.0, 0.0}, {1.0, 0.0});
@@ -2529,6 +2542,16 @@ namespace sgui
             custom_value.erase(custom_value.begin() + index);
         }
         
+        void ClearItems() {
+            ui_components.erase(ui_components.begin() + 2, ui_components.end());
+            custom_value.clear();
+            SetRedraw();
+            auto sc = static_cast<SGScrollBar<>*>(children[0].get());
+            sc->SetVisible(false);
+            sc->SetValue(0.0f);
+            SetSelection(-1);
+        }
+        
         const std::wstring& GetItemText(int32_t index) {
             static std::wstring empty_val = L"";
             if(index >= (int32_t)ui_components.size() - 2)
@@ -2615,7 +2638,7 @@ namespace sgui
             if(sel >= 0)
                 back_surface->SetSpriteColor(color[2], sel - item_begin);
             selection = (sel >= 0) ? sel : -1;
-            if(trigger)
+            if(sel >= 0 && trigger)
                 event_sel_change.Trigger(*this, selection);
         }
         
@@ -3276,6 +3299,7 @@ namespace sgui
                         SetCursorPos(selection.y);
                     break;
                 case GLFW_KEY_BACKSPACE:
+                    if(read_only) break;
                     if(selection.x == selection.y) {
                         if(selection.x > 0) {
                             txt->RemoveText(selection.x - 1, 1);
@@ -3287,6 +3311,7 @@ namespace sgui
                     }
                     break;
                 case GLFW_KEY_DELETE:
+                    if(read_only) break;
                     if(selection.x == selection.y) {
                         if(selection.x < txt->GetText().size())
                             txt->RemoveText(selection.x, 1);
@@ -3301,7 +3326,7 @@ namespace sgui
                             std::wstring str = txt->GetText().substr(selection.x, selection.y - selection.x);
                             std::string clipstr = To<std::string>(str);
                             SGGUIRoot::GetSingleton().SetClipboardString(clipstr);
-                            if(key == GLFW_KEY_X) {
+                            if(key == GLFW_KEY_X && !read_only) {
                                 txt->RemoveText(selection.x, selection.y - selection.x);
                                 SetCursorPos(selection.x);
                             }
@@ -3310,6 +3335,7 @@ namespace sgui
                     break;
                 }
                 case GLFW_KEY_V: {
+                    if(read_only) break;
                     if(mods & GLFW_MOD_SUPER) {
                         std::string str = SGGUIRoot::GetSingleton().GetClipboardString();
                         std::wstring wstr = To<std::wstring>(str);
@@ -3331,7 +3357,7 @@ namespace sgui
         }
 
         virtual bool OnTextEnter(uint32_t unichar) {
-            if(unichar < L' ')
+            if(read_only || unichar < L' ')
                 return SGWidget::OnTextEnter(unichar);
             auto txt = static_cast<UIText*>(this->ui_components[2]);
             std::wstring str;
@@ -3444,7 +3470,10 @@ namespace sgui
             txt->SetPositionR({text_offset.x + text_area.left - display_offset, text_offset.y});
         }
         
+        inline void SetReadonly(bool r) { read_only = r; }
+        
     protected:
+        bool read_only = false;
         bool cursor_show = false;
         int32_t display_offset = 0;
         int32_t max_display_offset = 0;
