@@ -82,6 +82,7 @@ function c10960419.rmop(e,tp,eg,ep,ev,re,r,rp)
 			e1:SetLabel(ct)
 			e1:SetLabelObject(tc)
 			e1:SetCountLimit(1)
+			e1:SetCondition(c10960419.turncon)
 			e1:SetOperation(c10960419.turnop)
 			Duel.RegisterEffect(e1,tp)
 			local e2=e1:Clone()
@@ -95,6 +96,10 @@ function c10960419.rmop(e,tp,eg,ep,ev,re,r,rp)
 		end
 	end
 end
+function c10960419.turncon(e,tp,eg,ep,ev,re,r,rp)
+	local tc=e:GetLabelObject()
+	return tc:GetFlagEffect(1082946)~=0
+end
 function c10960419.turnop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
 	local ct=tc:GetTurnCounter()
@@ -107,17 +112,15 @@ function c10960419.turnop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c10960419.retcon(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
-	if tc:GetTurnCounter()>e:GetLabel() then
-		e:Reset()
-		return false
-	else
-		return true
-	end
-end
-function c10960419.retop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=e:GetLabelObject()
 	local ct=tc:GetTurnCounter()
 	if ct==e:GetLabel() then
-		Duel.ReturnToField(tc)
+		return true
 	end
+	if ct>e:GetLabel() then
+		e:Reset()
+	end
+	return false
+end
+function c10960419.retop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.ReturnToField(tc)
 end

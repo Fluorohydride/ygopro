@@ -79,6 +79,7 @@ field::field(duel* pduel) {
 	core.duel_options = 0;
 	core.attacker = 0;
 	core.attack_target = 0;
+	core.attack_rollback = FALSE;
 	core.deck_reversed = FALSE;
 	core.remove_brainwashing = FALSE;
 	core.effect_damage_step = FALSE;

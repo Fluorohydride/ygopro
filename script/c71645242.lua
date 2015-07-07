@@ -117,6 +117,7 @@ function c71645242.spop2(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(dg,REASON_EFFECT)
 	Duel.BreakEffect()
 	local og=Duel.GetOperatedGroup()
+	if not og:IsContains(c) then return end
 	og:RemoveCard(c)
 	local atk=og:GetSum(Card.GetPreviousAttackOnField)
 	local tc=Duel.GetFirstTarget()

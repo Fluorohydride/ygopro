@@ -3120,6 +3120,7 @@ int32 field::process_battle_command(uint16 step) {
 			core.units.begin()->step = -1;
 			return FALSE;
 		}
+		core.attack_rollback = FALSE;
 		for(uint32 i = 0; i < 5; ++i) {
 			if(player[1 - infos.turn_player].list_mzone[i])
 				core.opp_mzone[i] = player[1 - infos.turn_player].list_mzone[i]->fieldid_r;
@@ -3139,7 +3140,7 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 8: {
-		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP)) {
+		if(is_player_affected_by_effect(infos.turn_player, EFFECT_SKIP_BP) || core.attack_rollback) {
 			core.units.begin()->step = 9;
 			return FALSE;
 		}
@@ -3164,7 +3165,7 @@ int32 field::process_battle_command(uint16 step) {
 		return FALSE;
 	}
 	case 10: {
-		bool rollback = false;
+		uint8 rollback = core.attack_rollback;
 		bool atk_disabled = false;
 		uint32 acon = core.units.begin()->arg2 >> 16;
 		uint32 afid = core.units.begin()->arg2 & 0xffff;
@@ -5368,8 +5369,26 @@ int32 field::adjust_step(uint16 step) {
 	case 14: {
 		//attack cancel
 		card* attacker = core.attacker;
-		if(attacker && attacker->is_affected_by_effect(EFFECT_CANNOT_ATTACK))
+		if(!attacker)
+			return FALSE;
+		if(attacker->is_affected_by_effect(EFFECT_CANNOT_ATTACK))
 			attacker->set_status(STATUS_ATTACK_CANCELED, TRUE);
+		if(core.attack_rollback)
+			return FALSE;
+		for(uint32 i = 0; i < 5; ++i) {
+			card* pcard = player[1 - infos.turn_player].list_mzone[i];
+			if(pcard) {
+				if(!core.opp_mzone[i] || core.opp_mzone[i] != pcard->fieldid_r) {
+					core.attack_rollback = TRUE;
+					break;
+				}
+			} else {
+				if(core.opp_mzone[i]) {
+					core.attack_rollback = TRUE;
+					break;
+				}
+			}
+		}
 		return FALSE;
 	}
 	case 15: {
