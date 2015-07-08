@@ -1,0 +1,25 @@
+{
+  "message_box_ok" : {
+    "type" : "window",
+    "position" : [],
+    "caption" : "hello",
+    "close button" : true,
+    "children" : {
+        "msg label" : {
+        "type" : "label",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "ok button" : {
+        "type" : "text button",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "message_box_ok_cancel" : {
+
+  },
+  "message_box_yes_no" : {
+
+  },
+
+}

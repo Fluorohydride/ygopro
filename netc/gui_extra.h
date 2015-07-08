@@ -12,7 +12,7 @@ namespace ygopro
             if(!window.expired())
                 window.lock()->RemoveFromParent();
         }
-    protected:
+        
         std::weak_ptr<sgui::SGWidgetContainer> window;
     };
     

@@ -846,7 +846,7 @@ namespace sgui
         SGWidget(const SGWidget&) = delete;
         virtual ~SGWidget();
         template<typename T>
-        inline std::shared_ptr<T> CastPtr() { return std::static_pointer_cast<T>(shared_from_this()); }
+        inline std::shared_ptr<T> CastPtr() { return std::dynamic_pointer_cast<T>(shared_from_this()); }
         
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = RegionObject::OnPositionSizeChange(re_pos, re_size);
@@ -915,6 +915,9 @@ namespace sgui
         virtual void InitUIComponents() = 0;
         virtual void PushUIComponents() { if(is_visible) for(auto comp : ui_components) comp->PushVertices(); }
         
+        void SetName(std::string nm) { name = std::move(nm); }
+        virtual SGWidget* FindWidget(const std::string& nm) { return name == nm ? this : nullptr; }
+        
     protected:
         bool is_visible = true;
         bool is_entity = true;
@@ -922,6 +925,7 @@ namespace sgui
         uintptr_t custom_value = 0;
         std::weak_ptr<SGWidgetContainer> parent;
         std::vector<UIComponent*> ui_components;
+        std::string name;
     };
     
     class SGWidgetContainer : public SGWidget {
@@ -1081,6 +1085,15 @@ namespace sgui
         
         virtual void InitUIComponents() {}
         virtual void PushUIComponents();
+        
+        virtual SGWidget* FindWidget(const std::string& nm) {
+            for(auto& iter : children) {
+                auto ret = iter->FindWidget(nm);
+                if(ret)
+                    return ret;
+            }
+            return nullptr;
+        }
         
         void SetContainerAlpha(float f) {
             container_alpha = f;
@@ -1474,6 +1487,7 @@ namespace sgui
         virtual v2i GetAutoSize() {
             return common_ui->GetAbsoluteSize();
         }
+        
     };
     
     class SGImage : public SGCommonUISprite {
@@ -1485,6 +1499,7 @@ namespace sgui
             auto& image_node = SGGUIRoot::GetSingleton().GetConfig()["image"];
             InitUIComponentsExtra(image_node);
         }
+        
     };
     
     const static int32_t STATUS_NORMAL = 0;
@@ -1627,8 +1642,8 @@ namespace sgui
             style[1] = SGJsonUtil::ConvertRect(button_node["hover_tex"]);
             style[2] = SGJsonUtil::ConvertRect(button_node["down_tex"]);
             auto styleindex = (status <= STATUS_DOWN) ? status : STATUS_DOWN;
-            static_cast<UISprite9*>(this->ui_components[0])->SetColor(cl);
-            static_cast<UISprite9*>(this->ui_components[0])->SetTextureRect(style[styleindex]);
+            static_cast<UISprite*>(this->ui_components[0])->SetColor(cl);
+            static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(style[styleindex]);
         }
         
         inline bool IsPushed() { return status == STATUS_PUSHED; }
@@ -1637,12 +1652,12 @@ namespace sgui
                 return;
             if(pushed) {
                 status = STATUS_PUSHED;
-                static_cast<UISprite9*>(this->ui_components[0])->SetTextureRect(style[STATUS_PUSHED]);
+                static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(style[STATUS_PUSHED]);
                 if(this->common_ui)
                     this->common_ui->SetPositionR(common_ui_offset + press_offset);
             } else {
                 status = STATUS_NORMAL;
-                static_cast<UISprite9*>(this->ui_components[0])->SetTextureRect(style[STATUS_NORMAL]);
+                static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(style[STATUS_NORMAL]);
                 if(this->common_ui)
                     this->common_ui->SetPositionR(common_ui_offset);
             }
@@ -2785,7 +2800,25 @@ namespace sgui
             }
         }
         
-        void AddItem(const std::wstring it, uint32_t cl) { items.push_back(it); color.push_back(cl); }
+        void AddItem(const std::wstring it, uint32_t cl, int32_t cvalue  = 0) {
+            items.push_back(it);
+            color.push_back(cl);
+            custom_value.push_back(cvalue);
+        }
+        
+        const std::wstring& GetItemText(int32_t index) {
+            static std::wstring empty_val = L"";
+            if(index >= items.size())
+                return empty_val;
+            return items[index];
+        }
+        
+        int32_t GetItemCustomValue(int32_t index) {
+            if(index >= custom_value.size())
+                return 0;
+            return custom_value[index];
+        }
+        
         void RemoveItem(int32_t index) {
             if(index < 0 || index >= items.size())
                 return;
@@ -2794,9 +2827,11 @@ namespace sgui
             if(selection == index)
                 SetSelection(-1);
         }
-        void Clear() {
+        
+        void ClearItems() {
             items.clear();
             color.clear();
+            custom_value.clear();
             SetSelection(-1);
         }
         
@@ -2827,6 +2862,7 @@ namespace sgui
         int32_t selection = -1;
         std::vector<std::wstring> items;
         std::vector<uint32_t> color;
+        std::vector<int32_t> custom_value;
     };
     
     class SGTabControl : public SGWidget {

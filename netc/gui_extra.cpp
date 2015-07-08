@@ -10,6 +10,41 @@
 namespace ygopro
 {
     
+    void LoadWidget(const std::string& templ) {
+
+    }
+    
+    void LoadWindow(sgui::SGWindow* container, jaweson::JsonNode<>& node) {
+        node.for_each([](const std::string& name, jaweson::JsonNode<>& sub_node){
+            if(name == "position") {
+                
+            }
+        });
+    }
+    
+    sgui::SGWidgetContainer* LoadChild(sgui::SGWidgetContainer* parent, jaweson::JsonNode<>& node) {
+        std::string widget_type = node["type"].to_string();
+        if(widget_type == "window") {
+            auto wnd = parent->NewChild<sgui::SGWindow>();
+            return wnd;
+        } else if(widget_type == "panel") {
+            auto ent = node["is entity"].to_bool();
+            auto pnl = parent->NewChild<sgui::SGPanel>(ent);
+            return pnl;
+        } else if(widget_type == "tab") {
+            
+        } else if(widget_type == "label") {
+        }
+        return nullptr;
+    }
+    
+    sgui::SGWidgetContainer* LoadDialog(const std::string& templ) {
+        auto& node = dialogCfg[templ];
+        if(!node.is_object())
+            return nullptr;
+        return LoadChild(&sgui::SGGUIRoot::GetSingleton(), node);
+    }
+    
     sgui::SGWindow* GenMessageBox(const std::wstring& title, const std::wstring& text, int32_t min_size) {
         auto wd = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGWindow>();
         wd->SetCloseButtonVisible(false);
@@ -178,25 +213,35 @@ namespace ygopro
     void FilterDialog::Show(v2i pos) {
         if(!window.expired())
             return;
-        auto wd = sgui::SGPanel::Create(nullptr, pos, {250, 300});
-        auto label1 = sgui::SGLabel::Create(wd, {10, 15}, stringCfg["eui_filter_keyword"]);
-        auto pkeyword = sgui::SGTextEdit::Create(wd, {90, 10}, {150, 30});
-        keyword = pkeyword;
-        auto label2 = sgui::SGLabel::Create(wd, {10, 40}, stringCfg["eui_filter_type"]);
-        auto ptype1 = sgui::SGComboBox::Create(wd, {90, 35}, {130, 30});
-        type1 = ptype1;
-        ptype1->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
+        auto wnd = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
+        wnd->SetPositionSize({0, 0}, {250, 300}, {0.5f, 0.5f}, {0.0f, 0.0f}, {-0.5f, -0.5f});
+        
+        auto label1 = wnd->NewChild<sgui::SGLabel>();
+        label1->SetPosition({10, 15});
+        label1->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_keyword"].to_string()), 0xff000000);
+        
+        auto pkeyword = wnd->NewChild<sgui::SGTextEdit>();
+        pkeyword->SetPositionSize({90, 10}, {150, 30});
+        keyword = pkeyword->CastPtr<sgui::SGTextEdit>();
+        
+        auto label2 = wnd->NewChild<sgui::SGLabel>();
+        label2->SetPosition({10, 40});
+        label2->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_type"].to_string()), 0xff000000);
+        auto ptype1 = wnd->NewChild<sgui::SGComboBox>();
+        ptype1->SetPositionSize({90, 35}, {130, 30});
+        type1 = ptype1->CastPtr<sgui::SGComboBox>();
+        ptype1->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x1), 0xff000000, 0x1);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x2), 0xff000000, 0x2);
         ptype1->AddItem(DataMgr::Get().GetTypeString2(0x4), 0xff000000, 0x4);
         ptype1->SetSelection(0);
-        ptype1->eventSelChange.Bind([this](sgui::SGWidget& sender, int32_t index)->bool {
+        ptype1->event_sel_change += [this](sgui::SGWidget& sender, int32_t index)->bool {
             auto ptr = type2.lock();
-            ptr->ClearItem();
+            ptr->ClearItems();
             if(index == 0) {
-                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
+                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0);
             } else if(index == 1) {
-                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0x1e003ef);
+                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0x1e003ef);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x10);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x20), 0xff000000, 0x20);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x40), 0xff000000, 0x40);
@@ -211,7 +256,7 @@ namespace ygopro
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x400), 0xff000000, 0x400);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x400000), 0xff000000, 0x400000);
             } else if(index == 2) {
-                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0xf0082);
+                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0xf0082);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x2);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x80), 0xff000000, 0x80);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10000), 0xff000000, 0x10000);
@@ -219,51 +264,78 @@ namespace ygopro
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x40000), 0xff000000, 0x40000);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x80000), 0xff000000, 0x80000);
             } else {
-                ptr->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0x120004);
+                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0x120004);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x4);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x20000), 0xff000000, 0x20000);
                 ptr->AddItem(DataMgr::Get().GetTypeString2(0x100000), 0xff000000, 0x100000);
             }
             ptr->SetSelection(0);
             return true;
-        });
-        auto ptype2 = sgui::SGComboBox::Create(wd, {90, 60}, {130, 30});
-        type2 = ptype2;
-        ptype2->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
+        };
+        
+        auto ptype2 = wnd->NewChild<sgui::SGComboBox>();
+        ptype2->SetPositionSize({90, 60}, {130, 30});
+        type2 = ptype2->CastPtr<sgui::SGComboBox>();
+        ptype2->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
         ptype2->SetSelection(0);
-        auto label3 = sgui::SGLabel::Create(wd, {10, 90}, stringCfg["eui_filter_limit"]);
-        auto ptype3 = sgui::SGComboBox::Create(wd, {90, 85}, {130, 30});
-        type3 = ptype3;
-        ptype3->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
-        ptype3->AddItem(stringCfg["pool_limit0"], 0xff000000, 1);
-        ptype3->AddItem(stringCfg["pool_limit1"], 0xff000000, 2);
-        ptype3->AddItem(stringCfg["pool_limit2"], 0xff000000, 3);
-        ptype3->AddItem(stringCfg["pool_ocg"], 0xff000000, 0x1);
-        ptype3->AddItem(stringCfg["pool_tcg"], 0xff000000, 0x2);
+        
+        auto label3 = wnd->NewChild<sgui::SGLabel>();
+        label3->SetPosition({10, 90});
+        label3->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_limit"].to_string()), 0xff000000);
+        auto ptype3 = wnd->NewChild<sgui::SGComboBox>();
+        ptype3->SetPositionSize({90, 85}, {130, 30});
+        type3 = ptype3->CastPtr<sgui::SGComboBox>();
+        ptype3->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
+        ptype3->AddItem(To<std::wstring>(stringCfg["pool_limit0"].to_string()), 0xff000000, 1);
+        ptype3->AddItem(To<std::wstring>(stringCfg["pool_limit1"].to_string()), 0xff000000, 2);
+        ptype3->AddItem(To<std::wstring>(stringCfg["pool_limit2"].to_string()), 0xff000000, 3);
+        ptype3->AddItem(To<std::wstring>(stringCfg["pool_ocg"].to_string()), 0xff000000, 0x1);
+        ptype3->AddItem(To<std::wstring>(stringCfg["pool_tcg"].to_string()), 0xff000000, 0x2);
         ptype3->SetSelection(0);
-        auto label4 = sgui::SGLabel::Create(wd, {10, 115}, stringCfg["eui_filter_attribute"]);
-        auto pattribute = sgui::SGComboBox::Create(wd, {90, 110}, {130, 30});
-        attribute = pattribute;
-        pattribute->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
+        
+        auto label4 = wnd->NewChild<sgui::SGLabel>();
+        label4->SetPosition({10, 115});
+        label4->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_attribute"].to_string()), 0xff000000);
+        auto pattribute = wnd->NewChild<sgui::SGComboBox>();
+        pattribute->SetPositionSize({90, 110}, {130, 30});
+        attribute = pattribute->CastPtr<sgui::SGComboBox>();
+        pattribute->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
         for(uint32_t i = 1; i != 0x80; i <<=1)
             pattribute->AddItem(DataMgr::Get().GetAttributeString(i), 0xff000000, i);
         pattribute->SetSelection(0);
-        auto label5 = sgui::SGLabel::Create(wd, {10, 140}, stringCfg["eui_filter_race"]);
-        auto prace = sgui::SGComboBox::Create(wd, {90, 135}, {130, 30});
-        race = prace;
-        prace->AddItem(stringCfg["eui_filter_na"], 0xff000000, 0);
+        
+        auto label5 = wnd->NewChild<sgui::SGLabel>();
+        label5->SetPosition({10, 140});
+        label5->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_race"].to_string()), 0xff000000);
+        auto prace = wnd->NewChild<sgui::SGComboBox>();
+        prace->SetPositionSize({90, 135}, {130, 30});
+        race = prace->CastPtr<sgui::SGComboBox>();
+        prace->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
         for(uint32_t i = 1; i != 0x1000000; i <<=1)
             prace->AddItem(DataMgr::Get().GetRaceString(i), 0xff000000, i);
         prace->SetSelection(0);
-        auto label6 = sgui::SGLabel::Create(wd, {10, 165}, stringCfg["eui_filter_attack"]);
-        auto pattack = sgui::SGTextEdit::Create(wd, {90, 160}, {150, 30});
-        attack = pattack;
-        auto label7 = sgui::SGLabel::Create(wd, {10, 190}, stringCfg["eui_filter_defence"]);
-        auto pdefence = sgui::SGTextEdit::Create(wd, {90, 185}, {150, 30});
-        defence = pdefence;
-        auto label8 = sgui::SGLabel::Create(wd, {10, 215}, stringCfg["eui_filter_star"]);
-        auto pstar = sgui::SGTextEdit::Create(wd, {90, 210}, {150, 30});
-        star = pstar;
+        
+        auto label6 = wnd->NewChild<sgui::SGLabel>();
+        label6->SetPosition({10, 165});
+        label6->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_attack"].to_string()), 0xff000000);
+        auto pattack = wnd->NewChild<sgui::SGTextEdit>();
+        pattack->SetPositionSize({90, 160}, {150, 30});
+        attack = pattack->CastPtr<sgui::SGTextEdit>();
+        
+        auto label7 = wnd->NewChild<sgui::SGLabel>();
+        label7->SetPosition({10, 190});
+        label7->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_defence"].to_string()), 0xff000000);
+        auto pdefence = wnd->NewChild<sgui::SGTextEdit>();
+        pdefence->SetPositionSize({90, 185}, {150, 30});
+        defence = pdefence->CastPtr<sgui::SGTextEdit>();
+        
+        auto label8 = wnd->NewChild<sgui::SGLabel>();
+        label8->SetPosition({10, 215});
+        label8->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_star"].to_string()), 0xff000000);
+        auto pstar = wnd->NewChild<sgui::SGTextEdit>();
+        pstar->SetPositionSize({90, 210}, {150, 30});
+        star = pstar->CastPtr<sgui::SGTextEdit>();
+
         auto sch = sgui::SGButton::Create(wd, {140, 260}, {100, 25});
         sch->SetText(stringCfg["eui_filter_search"], 0xff000000);
         sch->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {

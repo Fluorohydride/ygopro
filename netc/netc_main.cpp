@@ -30,6 +30,7 @@ jaweson::JsonRoot<> commonCfg;
 jaweson::JsonRoot<> stringCfg;
 jaweson::JsonRoot<> layoutCfg;
 jaweson::JsonRoot<> textureCfg;
+jaweson::JsonNode<> dialogCfg;
 
 int32_t main(int32_t argc, char* argv[]) {
     if(!glfwInit())

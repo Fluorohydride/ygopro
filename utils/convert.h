@@ -118,7 +118,7 @@ TOTYPE To(const T& val) {
 template<typename TOTYPE, typename T, typename... REST>
 TOTYPE To(const char* format, const T& val, const REST&... r) {
     char buf[256];
-    sprintf(buf, format, val, r...);
+    sprintf(buf, 256, format, val, std::forward<REST>(r)...);
     return std::move(std::string(buf));
 }
 
