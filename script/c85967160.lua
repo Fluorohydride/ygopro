@@ -15,8 +15,10 @@ function c85967160.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_RECOVER)
 	e2:SetRange(LOCATION_MZONE)
+	e2:SetProperty(EFFECT_FLAG_EVENT_PLAYER)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c85967160.adcon)
+	e2:SetTarget(c85967160.adtg)
 	e2:SetOperation(c85967160.adop)
 	c:RegisterEffect(e2)
 end
@@ -26,6 +28,9 @@ function c85967160.pccon(e)
 end
 function c85967160.adcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
+end
+function c85967160.adtg(e,tp,eg,ep,ev,re,r,rp,chk)
+	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
 end
 function c85967160.adop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
