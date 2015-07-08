@@ -4305,28 +4305,31 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, uint32 lv, card* sc
 		pduel->write_buffer8(HINT_SELECTMSG);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer32(513);
-		add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid, 0x10001);
+		add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid, min + (min << 16));
 		return FALSE;
 	}
 	case 3: {
-		card* pcard = core.select_cards[returns.bvalue[1]];
-		core.operated_set.insert(pcard);
 		int32 pv = 0;
-		for(auto iter = core.xmaterial_lst.begin(); iter != core.xmaterial_lst.end(); ++iter) {
-			if(iter->second == pcard) {
-				pv = iter->first;
-				core.xmaterial_lst.erase(iter);
-				break;
+		for(int32 i = 0; i < returns.bvalue[0]; ++i) {
+			card* pcard = core.select_cards[returns.bvalue[i + 1]];
+			core.operated_set.insert(pcard);
+			for(auto iter = core.xmaterial_lst.begin(); iter != core.xmaterial_lst.end(); ++iter) {
+				if(iter->second == pcard) {
+					if(pv < iter->first)
+						pv = iter->first;
+					core.xmaterial_lst.erase(iter);
+					break;
+				}
 			}
 		}
-		min--;
-		max--;
+		max -= returns.bvalue[0];
 		if(max == 0 || core.xmaterial_lst.size() == 0) {
 			group* pgroup = pduel->new_group(core.operated_set);
 			pduel->lua->add_param(pgroup, PARAM_TYPE_GROUP);
 			return TRUE;
 		}
-		if(min + (int32)core.operated_set.size() < pv)
+		min = 0;
+		if((int32)core.operated_set.size() < pv)
 			min = pv - core.operated_set.size();
 		core.units.begin()->arg2 = min + (max << 16);
 		if(min == 0) {
@@ -4350,10 +4353,12 @@ int32 field::select_xyz_material(int16 step, uint8 playerid, uint32 lv, card* sc
 		pduel->write_buffer8(HINT_SELECTMSG);
 		pduel->write_buffer8(playerid);
 		pduel->write_buffer32(513);
+		if(min == 0)
+			min = 1;
 		if(min + (int32)core.operated_set.size() >= maxv)
 			add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid, min + (max << 16));
 		else {
-			add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid, 0x10001);
+			add_process(PROCESSOR_SELECT_CARD, 0, 0, 0, playerid, min + (min << 16));
 			core.units.begin()->step = 2;
 		}
 		return FALSE;

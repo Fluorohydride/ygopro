@@ -1310,9 +1310,10 @@ void field::get_xyz_material(card* scard, int32 findex, uint32 lv, int32 maxc) {
 			core.xmaterial_lst.insert(std::make_pair((xyz_level >> 12) & 0xf, pcard));
 	}
 	if(core.global_flag & GLOBALFLAG_XMAT_COUNT_LIMIT) {
-		auto iter = core.xmaterial_lst.begin();
-		while((iter != core.xmaterial_lst.end()) && ((iter->first > (int32)core.xmaterial_lst.size()) || (iter->first > maxc)))
-			core.xmaterial_lst.erase(iter++);
+		if(maxc > (int32)core.xmaterial_lst.size())
+			maxc = (int32)core.xmaterial_lst.size();
+		auto iter = core.xmaterial_lst.lower_bound(maxc);
+		core.xmaterial_lst.erase(core.xmaterial_lst.begin(), iter);
 	}
 }
 void field::get_overlay_group(uint8 self, uint8 s, uint8 o, card_set* pset) {
