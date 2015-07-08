@@ -61,6 +61,7 @@ function c17086528.rktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SelectTarget(tp,c17086528.lvfilter,tp,LOCATION_MZONE,0,1,1,g:GetFirst(),g:GetFirst():GetRank())
 end
 function c17086528.rkop(e,tp,eg,ep,ev,re,r,rp)
+	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=e:GetLabelObject()
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local lc=tg:GetFirst()
