@@ -4620,11 +4620,11 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_negatable(cait->chain_count)) {
 			remove_oath_effect(peffect);
 			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT)) {
-				if(peffect->count_code == 0) {
-					if((peffect->flag & EFFECT_FLAG_REPEAT))
-						peffect->reset_count += 0x100;
-				} else {
-					if(peffect->count_code & EFFECT_COUNT_CODE_OATH)
+				if(peffect->count_code & EFFECT_COUNT_CODE_OATH) {
+					uint32 code = peffect->count_code & 0xfffffff;
+					if(code == 1)
+						dec_effect_code((peffect->count_code & 0xf0000000) | peffect->handler->fieldid, PLAYER_NONE);
+					else
 						dec_effect_code(peffect->count_code, cait->triggering_player);
 				}
 			}
