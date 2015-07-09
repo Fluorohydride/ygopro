@@ -2,7 +2,7 @@
   "message_box_ok" : {
     "type" : "window",
     "position" : [],
-    "caption" : "hello",
+    "caption" : ["hello", "0x000000ff"],
     "close button" : true,
     "children" : {
         "msg label" : {

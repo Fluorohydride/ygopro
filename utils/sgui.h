@@ -1673,8 +1673,8 @@ namespace sgui
     
     using SGSimpleButton = SGButton<SGCommonUIWidget<void>, false>;
     using SGTextButton = SGButton<SGCommonUIText, true>;
-    using SGSpriteButton = SGButton<SGCommonUISprite, true>;
-    using SGImageButton = SGButton<SGCommonUIRegion, true>;
+    using SGImageButton = SGButton<SGCommonUISprite, true>;
+    using SGTextureButton = SGButton<SGCommonUIRegion, true>;
     
     template<bool USE_SPRITE9 = false>
     class SGCheckBox : public SGAutoSizeTextWidget {
