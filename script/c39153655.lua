@@ -40,6 +40,7 @@ function c39153655.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c39153655.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
+	if not c:IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:GetLevel()~=4 then
 		local e1=Effect.CreateEffect(c)
