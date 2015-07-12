@@ -15,7 +15,7 @@ function c96789758.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e2:SetCode(EVENT_RECOVER)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_EVENT_PLAYER)
+	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetCountLimit(1)
 	e2:SetCondition(c96789758.drcon)
 	e2:SetTarget(c96789758.drtg)
@@ -33,7 +33,7 @@ function c96789758.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
 end
 function c96789758.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
+	if chk==0 then return ep==tp and e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

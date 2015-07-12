@@ -75,7 +75,7 @@ function c17016362.mtop(e,tp,eg,ep,ev,re,r,rp)
 		e2:SetCountLimit(1)
 		e2:SetOperation(c17016362.desop)
 		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
-		tc:RegisterEffect(e2,true)
+		tc:RegisterEffect(e2)
 	end
 end
 function c17016362.desop(e,tp,eg,ep,ev,re,r,rp)

@@ -18,7 +18,7 @@ function c22174866.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 	e3:SetCode(EVENT_RECOVER)
 	e3:SetRange(LOCATION_MZONE)
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_EVENT_PLAYER)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e3:SetCountLimit(1)
 	e3:SetCondition(c22174866.thcon)
 	e3:SetTarget(c22174866.thtg)
@@ -37,7 +37,7 @@ function c22174866.thfilter(c)
 end
 function c22174866.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsControler(1-tp) and c22174866.thfilter(chkc) end
-	if chk==0 then return e:GetHandler():IsRelateToEffect(e) end
+	if chk==0 then return ep==tp and e:GetHandler():IsRelateToEffect(e) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RTOHAND)
 	local g=Duel.SelectTarget(tp,c22174866.thfilter,tp,0,LOCATION_ONFIELD,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,g,g:GetCount(),0,0)

@@ -37,10 +37,12 @@ function c59546797.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_RECOVER,nil,0,tp,1000)
 end
 function c59546797.spop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
 	local c=e:GetHandler()
-	if c:IsRelateToEffect(e) and Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
+	if not c:IsRelateToEffect(e) then return end
+	if Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)~=0 then
 		Duel.Recover(tp,1000,REASON_EFFECT)
+	elseif Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then
+		Duel.SendtoGrave(c,REASON_EFFECT)
 	end
 end
 function c59546797.atkcon(e,tp,eg,ep,ev,re,r,rp)

@@ -50,8 +50,8 @@ function c65305468.initial_effect(c)
 end
 c65305468.xyz_number=0
 c65305468.xyz_count=2
-function c65305468.mfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_XYZ) and not c:IsSetCard(0x48)
+function c65305468.mfilter(c,xyzc)
+	return c:IsFaceup() and c:IsType(TYPE_XYZ) and not c:IsSetCard(0x48) and c:IsCanBeXyzMaterial(xyzc)
 end
 function c65305468.xyzfilter1(c,g)
 	return g:IsExists(c65305468.xyzfilter2,1,c,c:GetRank())
@@ -62,31 +62,34 @@ end
 function c65305468.xyzcon(e,c,og)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	local mg=Duel.GetMatchingGroup(c65305468.mfilter,tp,LOCATION_MZONE,0,nil)
-	if og then mg=og end
+	local mg=nil
+	if og then
+		mg=og:Filter(c65305468.mfilter,nil,c)
+	else
+		mg=Duel.GetMatchingGroup(c65305468.mfilter,tp,LOCATION_MZONE,0,nil,c)
+	end
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1
 		and mg:IsExists(c65305468.xyzfilter1,1,nil,mg)
 end
 function c65305468.xyzop(e,tp,eg,ep,ev,re,r,rp,c,og)
-	local g=Group.CreateGroup()
+	local g=nil
 	local sg=Group.CreateGroup()
 	if og then
+		g=og
 		local tc=og:GetFirst()
 		while tc do
-			g:AddCard(tc)
 			sg:Merge(tc:GetOverlayGroup())
 			tc=og:GetNext()
 		end
 	else
 		local mg=Duel.GetMatchingGroup(c65305468.mfilter,tp,LOCATION_MZONE,0,nil)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-		local g1=mg:FilterSelect(tp,c65305468.xyzfilter1,1,1,nil,mg)
-		local tc1=g1:GetFirst()
+		g=mg:FilterSelect(tp,c65305468.xyzfilter1,1,1,nil,mg)
+		local tc1=g:GetFirst()
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 		local g2=mg:FilterSelect(tp,c65305468.xyzfilter2,1,1,tc1,tc1:GetRank())
 		local tc2=g2:GetFirst()
-		g:AddCard(tc1)
-		g:AddCard(tc2)
+		g:Merge(g2)
 		sg:Merge(tc1:GetOverlayGroup())
 		sg:Merge(tc2:GetOverlayGroup())
 	end
