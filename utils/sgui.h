@@ -918,6 +918,14 @@ namespace sgui
         void SetName(std::string nm) { name = std::move(nm); }
         virtual SGWidget* FindWidget(const std::string& nm) { return name == nm ? this : nullptr; }
         
+        template<typename T>
+        inline T* FindWidgetAs(const std::string& nm) {
+            auto ptr = FindWidget(nm);
+            if(ptr)
+                return dynamic_cast<T>(ptr);
+            return nullptr;
+        }
+        
     protected:
         bool is_visible = true;
         bool is_entity = true;
@@ -2358,9 +2366,24 @@ namespace sgui
         base::RenderCmdBeginScissor<base::v2ct>* cmd = nullptr;
     };
     
-    class SGListBox : public SGWidgetContainer {
+    class SGItemListWidget {
     public:
         SGEventHandler<SGWidget, int32_t> event_sel_change;
+        
+        virtual void AddItem(const std::wstring& str, int32_t cl, int32_t cvalue) = 0;
+        virtual void RemoveItem(int32_t index) = 0;
+        virtual const std::wstring& GetItemText(int32_t index) = 0;
+        virtual int32_t GetItemCustomValue(int32_t) = 0;
+        virtual void ClearItems() = 0;
+        virtual void SetSelection(int32_t index, bool trigger) = 0;
+        inline int32_t GetSelection() { return selection; }
+        
+    protected:
+        int32_t selection = -1;
+    };
+    
+    class SGListBox : public SGWidgetContainer, public SGItemListWidget {
+    public:
         SGEventHandler<SGWidget, int32_t> event_item_double_click;
         
     public:
@@ -2522,7 +2545,7 @@ namespace sgui
             color[2] = SGJsonUtil::ConvertRGBA(lb_node["sel_bcolor"]);
         }
         
-        void AddItem(const std::wstring& str, int32_t cl, int32_t cvalue  = 0) {
+        virtual void AddItem(const std::wstring& str, int32_t cl, int32_t cvalue  = 0) {
             UIText* item_surface = SGGUIRoot::GetSingleton().NewObject<UIText>();
             item_surface->SetContainer(this);
             item_surface->SetCapacity(16);
@@ -2540,7 +2563,7 @@ namespace sgui
             custom_value.push_back(cvalue);
         }
         
-        void RemoveItem(int32_t index) {
+        virtual void RemoveItem(int32_t index) {
             if(index >= (int32_t)ui_components.size() - 2)
                 return;
             auto rm = ui_components[index + 2];
@@ -2557,7 +2580,7 @@ namespace sgui
             custom_value.erase(custom_value.begin() + index);
         }
         
-        void ClearItems() {
+        virtual void ClearItems() {
             ui_components.erase(ui_components.begin() + 2, ui_components.end());
             custom_value.clear();
             SetRedraw();
@@ -2567,14 +2590,14 @@ namespace sgui
             SetSelection(-1);
         }
         
-        const std::wstring& GetItemText(int32_t index) {
+        virtual const std::wstring& GetItemText(int32_t index) {
             static std::wstring empty_val = L"";
             if(index >= (int32_t)ui_components.size() - 2)
                 return empty_val;
             return static_cast<UIText*>(ui_components[index + 2])->GetText();
         }
         
-        int32_t GetItemCustomValue(int32_t index) {
+        virtual int32_t GetItemCustomValue(int32_t index) {
             if(index >= (int32_t)ui_components.size() - 2)
                 return 0;
             return custom_value[index];
@@ -2644,7 +2667,7 @@ namespace sgui
             v[3].color = bcolor;
         }
         
-        void SetSelection(int32_t sel, bool trigger = true) {
+        virtual void SetSelection(int32_t sel, bool trigger = true) {
             if(selection == sel)
                 return;
             auto back_surface = static_cast<UISpriteList*>(ui_components[1]);
@@ -2668,10 +2691,7 @@ namespace sgui
             static_cast<SGScrollBar<>*>(children[0].get())->SetValue((float)offset / max_offset);
         }
         
-        inline int32_t GetSelection() { return selection; }
-        
     protected:
-        int32_t selection = -1;
         recti bounds = {0, 0, 0, 0};
         recti sel_tex = {0, 0, 0, 0};
         recti client_tex[2];
@@ -2689,9 +2709,7 @@ namespace sgui
         std::vector<int32_t> custom_value;
     };
     
-    class SGComboBox : public SGCommonUIText {
-    public:
-        SGEventHandler<SGWidget, int32_t> event_sel_change;
+    class SGComboBox : public SGCommonUIText, public SGItemListWidget {
     public:
         virtual void InitUIComponents() {
             SGCommonUIText::InitUIComponents();
@@ -2800,26 +2818,13 @@ namespace sgui
             }
         }
         
-        void AddItem(const std::wstring it, uint32_t cl, int32_t cvalue  = 0) {
+        virtual void AddItem(const std::wstring it, uint32_t cl, int32_t cvalue  = 0) {
             items.push_back(it);
             color.push_back(cl);
             custom_value.push_back(cvalue);
         }
         
-        const std::wstring& GetItemText(int32_t index) {
-            static std::wstring empty_val = L"";
-            if(index >= items.size())
-                return empty_val;
-            return items[index];
-        }
-        
-        int32_t GetItemCustomValue(int32_t index) {
-            if(index >= custom_value.size())
-                return 0;
-            return custom_value[index];
-        }
-        
-        void RemoveItem(int32_t index) {
+        virtual void RemoveItem(int32_t index) {
             if(index < 0 || index >= items.size())
                 return;
             items.erase(items.begin() + index);
@@ -2828,14 +2833,27 @@ namespace sgui
                 SetSelection(-1);
         }
         
-        void ClearItems() {
+        virtual const std::wstring& GetItemText(int32_t index) {
+            static std::wstring empty_val = L"";
+            if(index >= items.size())
+                return empty_val;
+            return items[index];
+        }
+        
+        virtual int32_t GetItemCustomValue(int32_t index) {
+            if(index >= custom_value.size())
+                return 0;
+            return custom_value[index];
+        }
+        
+        virtual void ClearItems() {
             items.clear();
             color.clear();
             custom_value.clear();
             SetSelection(-1);
         }
         
-        void SetSelection(int32_t index) {
+        virtual void SetSelection(int32_t index, bool trigger = true) {
             if((selection == index) || (index >= items.size()))
                 return;
             if(index < 0) {
@@ -2849,7 +2867,8 @@ namespace sgui
                     common_ui->SetText(items[index], color[index]);
                 }
             }
-            event_sel_change.Trigger(*this, index);
+            if(trigger)
+                event_sel_change.Trigger(*this, index);
         }
         
     protected:
@@ -2859,7 +2878,6 @@ namespace sgui
         int8_t status = 0;
         int32_t drop_offset = 0;
         int32_t drop_height = 100;
-        int32_t selection = -1;
         std::vector<std::wstring> items;
         std::vector<uint32_t> color;
         std::vector<int32_t> custom_value;
@@ -2947,6 +2965,15 @@ namespace sgui
                 if(current_tab >= 0)
                     tabs[current_tab]->PushUIComponents();
             }
+        }
+        
+        virtual SGWidget* FindWidget(const std::string& nm) {
+            for(auto& iter : tabs) {
+                auto ret = iter->FindWidget(nm);
+                if(ret)
+                    return ret;
+            }
+            return nullptr;
         }
         
         SGTab* AddTab(const std::wstring title, uint32_t cl) {
@@ -3507,6 +3534,7 @@ namespace sgui
         }
         
         inline void SetReadonly(bool r) { read_only = r; }
+        inline void SetDefaultTextColor(uint32_t cl) { default_text_color = cl; }
         
     protected:
         bool read_only = false;

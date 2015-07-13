@@ -18,9 +18,10 @@ namespace ygopro
     
     class MessageBox {
     public:
-        static void ShowOK(const std::wstring& title, const std::wstring& text, std::function<void ()> cb = nullptr);
-        static void ShowOKCancel(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1 = nullptr, std::function<void ()> cb2 = nullptr);
-        static void ShowYesNo(const std::wstring& title, const std::wstring& text, std::function<void ()> cb1 = nullptr, std::function<void ()> cb2 = nullptr);
+        static void ShowOK(const std::wstring& title, const std::wstring msg, std::function<void ()> cb);
+        static void ShowOKCancel(const std::wstring& title, const std::wstring msg, std::function<void ()> cb1, std::function<void ()> cb2);
+        static void ShowYesNo(const std::wstring& title, const std::wstring msg, std::function<void ()> cb1, std::function<void ()> cb2);
+
     };
     
     class PopupMenu {

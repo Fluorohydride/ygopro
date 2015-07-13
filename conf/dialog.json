@@ -1,25 +1,63 @@
 {
-  "message_box_ok" : {
+  "default msg color" : "0x000000ff",
+  "default input color" : "0x000000ff",
+  "messagebox ok" : {
     "type" : "window",
     "position" : [],
-    "caption" : ["hello", "0x000000ff"],
     "close button" : true,
     "children" : {
-        "msg label" : {
+      "msg label" : {
         "type" : "label",
         "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
       },
       "ok button" : {
         "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
         "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
       }
     }
   },
-  "message_box_ok_cancel" : {
-
+  "messagebox ok,cancel" : {
+    "type" : "window",
+    "position" : [],
+    "close button" : true,
+    "children" : {
+      "msg label" : {
+        "type" : "label",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "ok button" : {
+        "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "cancel button" : {
+        "type" : "text button",
+        "text" : ["eui_button_cancel", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
   },
-  "message_box_yes_no" : {
-
+  "messagebox yes,no" : {
+    "type" : "window",
+    "position" : [],
+    "close button" : true,
+    "children" : {
+      "msg label" : {
+        "type" : "label",
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "yes button" : {
+        "type" : "text button",
+        "text" : ["eui_button_yes", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "no button" : {
+        "type" : "text button",
+        "text" : ["eui_button_no", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
   },
 
 }
