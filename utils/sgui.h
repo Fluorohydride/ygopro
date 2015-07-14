@@ -900,8 +900,8 @@ namespace sgui
         inline bool AllowFocus() { return allow_focus; }
         inline void SetAllowFocus(bool foc) { allow_focus = foc; }
         inline void SetColor(uint32_t cl) { for(auto& ui : ui_components) ui->SetColor(cl); }
-        inline void SetCustomValue(uintptr_t val) { custom_value = val; }
-        inline uintptr_t GetCustomValue() { return custom_value; }
+        inline void SetCustomValue(intptr_t val) { custom_value = val; }
+        inline intptr_t GetCustomValue() { return custom_value; }
         
         virtual bool CheckInside(int32_t x, int32_t y) {
             return x >= area_pos.absolute.x && x <= area_pos.absolute.x + area_size.absolute.x
@@ -919,18 +919,13 @@ namespace sgui
         virtual SGWidget* FindWidget(const std::string& nm) { return name == nm ? this : nullptr; }
         
         template<typename T>
-        inline T* FindWidgetAs(const std::string& nm) {
-            auto ptr = FindWidget(nm);
-            if(ptr)
-                return dynamic_cast<T>(ptr);
-            return nullptr;
-        }
+        inline T* FindWidgetAs(const std::string& nm) { return dynamic_cast<T>(FindWidget(nm)); }
         
     protected:
         bool is_visible = true;
         bool is_entity = true;
         bool allow_focus = true;
-        uintptr_t custom_value = 0;
+        intptr_t custom_value = 0;
         std::weak_ptr<SGWidgetContainer> parent;
         std::vector<UIComponent*> ui_components;
         std::string name;

@@ -1,10 +1,9 @@
 {
-  "default msg color" : "0x000000ff",
+  "default text color" : "0x000000ff",
   "default input color" : "0x000000ff",
   "messagebox ok" : {
     "type" : "window",
-    "position" : [],
-    "close button" : true,
+    "close button" : false,
     "children" : {
       "msg label" : {
         "type" : "label",
@@ -19,8 +18,7 @@
   },
   "messagebox ok,cancel" : {
     "type" : "window",
-    "position" : [],
-    "close button" : true,
+    "close button" : false,
     "children" : {
       "msg label" : {
         "type" : "label",
@@ -40,8 +38,7 @@
   },
   "messagebox yes,no" : {
     "type" : "window",
-    "position" : [],
-    "close button" : true,
+    "close button" : false,
     "children" : {
       "msg label" : {
         "type" : "label",
@@ -59,5 +56,32 @@
       }
     }
   },
-
+  "popup menu width" : 100,
+  "popup menu height" : 100,
+  "popup menu margin" : [5, 5, 5, 5],
+  "file dialog" : {
+    "type" : "window",
+    "close button" : false,
+    "position" : [0, 0, 500, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "path" : {
+        "type" : "textedit",
+        "readonly" : true,
+        "position" : [10, 50, -20, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+      },
+      "file list" : {
+        "type" : "listbox",
+        "position" : [10, 100, -20, 200, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "file" : {
+        "type" : "textedit",
+        "position" : [10, 50, -20, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "ok button" : {
+        "type" : "text button",
+        "text" : ["eui_button_ok", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+    }
+  }
 }

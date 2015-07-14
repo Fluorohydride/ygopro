@@ -61,7 +61,8 @@ namespace ygopro
                     } else if(name == "style") {
                         wnd->SetStyle(sub_node);
                     } else if(name == "caption") {
-                        wnd->GetCaption()->SetText(To<std::wstring>(sub_node[0].to_string()), sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        wnd->GetCaption()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "close button") {
                         wnd->SetCloseButtonVisible(sub_node.to_bool());
                     } else if(name == "children") {
@@ -115,7 +116,8 @@ namespace ygopro
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, lbl, {0, 0});
                     } else if(name == "text") {
-                        lbl->GetTextUI()->SetText(To<std::wstring>(sub_node[0].to_string()), sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        lbl->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     }
                 });
                 return lbl;
@@ -153,7 +155,8 @@ namespace ygopro
                     } else if(name == "style") {
                         btn->SetStyle(sub_node);
                     } else if(name == "text") {
-                        btn->GetTextUI()->SetText(To<std::wstring>(sub_node[0].to_string()), sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        btn->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     }
                 });
                 return btn;
@@ -263,7 +266,8 @@ namespace ygopro
                     } else if(name == "input color") {
                         te->SetDefaultTextColor(sgui::SGJsonUtil::ConvertRGBA(sub_node));
                     } else if(name == "text") {
-                        te->GetTextUI()->SetText(To<std::wstring>(sub_node[0].to_string()), sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        te->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "readonly") {
                         te->SetReadonly(sub_node.to_bool());
                     }
@@ -310,22 +314,18 @@ namespace ygopro
     }
     
     template<typename T>
-    T* LoadDialogAs(const std::string& templ) {
-        auto ptr = LoadDialog(templ);
-        if(ptr)
-            return dynamic_cast<T*>(ptr);
-        return nullptr;
-    }
+    T* LoadDialogAs(const std::string& templ) { return dynamic_cast<T*>(LoadDialog(templ)); }
     
     void MessageBox::ShowOK(const std::wstring& title, const std::wstring msg, std::function<void ()> cb) {
         auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
-        auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default msg color"]);
+        auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
         if(wnd)
-            wnd->GetCaption()->SetText(title, color);
+            return;
+        wnd->GetCaption()->SetText(title, color);
         auto label = wnd->FindWidgetAs<sgui::SGLabel>("msg label");
-        auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
         if(label)
             label->GetTextUI()->SetText(msg, color);
+        auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
         if(ok_button) {
             ok_button->event_click += [wnd, cb](sgui::SGWidget& sender) {
                 if(cb) cb();
@@ -334,40 +334,88 @@ namespace ygopro
         }
     }
     
-    PopupMenu& PopupMenu::AddButton(const std::wstring& btn, int32_t id) {
-        if(id == 0)
-            id = (int32_t)ids.size();
-        items.push_back(btn);
-        ids.push_back(id);
+    void MessageBox::ShowOKCancel(const std::wstring& title, const std::wstring msg, std::function<void ()> cb1, std::function<void ()> cb2) {
+        auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
+        auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
+        if(!wnd)
+            return;
+        wnd->GetCaption()->SetText(title, color);
+        auto label = wnd->FindWidgetAs<sgui::SGLabel>("msg label");
+        if(label)
+            label->GetTextUI()->SetText(msg, color);
+        auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
+        if(ok_button) {
+            ok_button->event_click += [wnd, cb1](sgui::SGWidget& sender) {
+                if(cb1) cb1();
+                wnd->RemoveFromParent();
+            };
+        }
+        auto cancel_button = wnd->FindWidgetAs<sgui::SGTextButton>("cancel button");
+        if(cancel_button) {
+            cancel_button->event_click += [wnd, cb2](sgui::SGWidget& sender) {
+                if(cb2) cb2();
+                wnd->RemoveFromParent();
+            };
+        }
+    }
+    
+    void MessageBox::ShowYesNo(const std::wstring& title, const std::wstring msg, std::function<void ()> cb1, std::function<void ()> cb2) {
+        auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
+        auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
+        if(!wnd)
+            return;
+        wnd->GetCaption()->SetText(title, color);
+        auto label = wnd->FindWidgetAs<sgui::SGLabel>("msg label");
+        if(label)
+            label->GetTextUI()->SetText(msg, color);
+        auto yes_button = wnd->FindWidgetAs<sgui::SGTextButton>("yes button");
+        if(yes_button) {
+            yes_button->event_click += [wnd, cb1](sgui::SGWidget& sender) {
+                if(cb1) cb1();
+                wnd->RemoveFromParent();
+            };
+        }
+        auto no_button = wnd->FindWidgetAs<sgui::SGTextButton>("no button");
+        if(no_button) {
+            no_button->event_click += [wnd, cb2](sgui::SGWidget& sender) {
+                if(cb2) cb2();
+                wnd->RemoveFromParent();
+            };
+        }
+    }
+    
+    PopupMenu& PopupMenu::AddButton(const std::wstring& text, intptr_t cval) {
+        auto btn = pnl->NewChild<sgui::SGTextButton>();
+        btn->SetPositionSize({margin.left, margin.top + (item_count + margin.top) * item_height}, {item_width, item_height});
+        btn->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]));
+        btn->SetCustomValue(cval);
+        btn->event_click += [this](sgui::SGWidget& sender)->bool {
+            if(btn_cb != nullptr)
+                btn_cb(static_cast<int32_t>(sender.GetCustomValue()));
+            pnl->RemoveFromParent();
+            return true;
+        };
+        item_count++;
         return *this;
     }
     
     void PopupMenu::End() {
-        auto pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
+        pnl->SetPositionSize(pos, {item_width + margin.left + margin.width, (item_count + margin.top) * item_height + margin.height});
         pnl->event_on_destroy += [this](sgui::SGWidget& sender)->bool {
             delete this;
             return true;
         };
-        for(size_t i = 0; i < items.size(); ++i) {
-            auto btn = pnl->NewChild<sgui::SGTextButton>();
-            btn->SetPositionSize({10, 10 + (int32_t)i * 40}, {-20, 35}, {0.0f, 0.0f}, {1.0f, 0.0f});
-            btn->GetTextUI()->SetText(items[i], 0xff000000);
-            btn->SetCustomValue(ids[i]);
-            btn->event_click += [this, pnl](sgui::SGWidget& sender)->bool {
-                if(cb != nullptr)
-                    cb(static_cast<int32_t>(sender.GetCustomValue()));
-                pnl->RemoveFromParent();
-                return true;
-            };
-        }
         sgui::SGGUIRoot::GetSingleton().PopupObject(pnl->shared_from_this());
     }
     
-    PopupMenu& PopupMenu::Create(v2i pos, int32_t width, std::function<void (int32_t)> cb) {
+    PopupMenu& PopupMenu::Create(v2i pos, std::function<void (int32_t)> cb) {
         PopupMenu* menu = new PopupMenu();
         menu->pos = pos;
-        menu->width = width;
-        menu->cb = cb;
+        menu->item_width = (int32_t)dialogCfg["popup menu width"].to_integer();
+        menu->item_height = (int32_t)dialogCfg["popup menu height"].to_integer();
+        menu->margin = sgui::SGJsonUtil::ConvertRect(dialogCfg["popup menu margin"]);
+        menu->pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
+        menu->btn_cb = cb;
         return *menu;
     }
     
@@ -379,20 +427,18 @@ namespace ygopro
         this->filter = filter;
         if(!FileSystem::IsDirExists(root) && !FileSystem::MakeDir(root))
             return;
-        auto wnd = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGWindow>();
-        wnd->SetPositionSize({0, 0}, {300, 330}, {0.5f, 0.5f}, {0.0f, 0.0f}, {-0.5f, -0.5f});
+        auto wnd = LoadDialogAs<sgui::SGWindow>("file dialog");
+        if(!wnd)
+            return;
         wnd->GetCaption()->SetText(title, 0xff000000);
-        auto fpath = wnd->NewChild<sgui::SGTextEdit>();
-        fpath->SetPositionSize({10, 25}, {280, 30});
-        fpath->SetReadonly(true);
-        fpath->GetTextUI()->SetText(root, 0xff000000);
-        auto lst = wnd->NewChild<sgui::SGListBox>();
-        lst->SetPositionSize({10, 55}, {280, 200});
-        auto ffile = wnd->NewChild<sgui::SGTextEdit>();
-        ffile->SetPositionSize({10, 255}, {280, 30});
-        auto btn = wnd->NewChild<sgui::SGTextButton>();
-        btn->SetPositionSize({190, 290}, {100, 25});
-        btn->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_button_ok"].to_string()), 0xff000000);
+        auto fpath = wnd->FindWidgetAs<sgui::SGTextEdit>("path");
+        if(fpath)
+            fpath->GetTextUI()->SetText(root, 0xff000000);
+        auto lst = wnd->FindWidgetAs<sgui::SGListBox>("file list");
+        auto ffile = wnd->FindWidgetAs<sgui::SGTextEdit>("file");
+        auto btn = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
+        if(!lst || !ffile || !btn)
+            return;
         btn->event_click.Bind([this, wnd, ffile](sgui::SGWidget& sender)->bool {
             auto file = ffile->GetTextUI()->GetText();
             if(file.length() == 0)

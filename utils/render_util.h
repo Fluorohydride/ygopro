@@ -99,7 +99,7 @@ namespace base
         virtual void Execute(IRenderState<VTYPE>& state) {
             if(count > 0) {
                 glBindTexture(GL_TEXTURE_2D, texture_id);
-                glDrawElements(primitive_type, count, GL_UNSIGNED_SHORT, (const void*)(uintptr_t)(start_index * sizeof(int16_t)));
+                glDrawElements(primitive_type, count, GL_UNSIGNED_SHORT, (const void*)(intptr_t)(start_index * sizeof(int16_t)));
             }
         }
         int16_t primitive_type;

@@ -28,16 +28,20 @@ namespace ygopro
     private:
         PopupMenu() {};
     public:
-        PopupMenu& AddButton(const std::wstring& btn, int32_t id = 0);
+        PopupMenu& AddButton(const std::wstring& text, intptr_t cval);
         void End();
+        
     private:
         v2i pos;
-        int32_t width;
-        std::function<void (int32_t)> cb;
-        std::vector<std::wstring> items;
-        std::vector<int32_t> ids;
+        int32_t item_count = 0;
+        int32_t item_width = 0;
+        int32_t item_height = 0;
+        recti margin;
+        std::function<void (int32_t)> btn_cb;
+        sgui::SGPanel* pnl = nullptr;
+        
     public:
-        static PopupMenu& Create(v2i pos, int32_t width, std::function<void (int32_t)> cb = nullptr);
+        static PopupMenu& Create(v2i pos, std::function<void (int32_t)> cb = nullptr);
     };
     
     class FileDialog : public CommonDialog {
