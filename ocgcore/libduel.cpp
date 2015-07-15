@@ -221,6 +221,7 @@ int32 scriptlib::duel_summon(lua_State *L) {
 	if(lua_gettop(L) > 4)
 		min_tribute = lua_tointeger(L, 5);
 	duel * pduel = pcard->pduel;
+	pduel->game_field->core.summon_cancelable = FALSE;
 	pduel->game_field->summon(playerid, pcard, peffect, ignore_count, min_tribute);
 	return lua_yield(L, 0);
 }

@@ -1365,8 +1365,15 @@ int DuelClient::ClientAnalyze(char * msg, unsigned int len) {
 			pcard->select_seq = i;
 			pcard->is_selectable = true;
 		}
-		mainGame->stHintMsg->setText(dataManager.GetSysString(531));
-		mainGame->stHintMsg->setVisible(false);
+		if(select_hint)
+			myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetDesc(select_hint),
+			           mainGame->dField.select_min, mainGame->dField.select_max);
+		else myswprintf(textBuffer, L"%ls(%d-%d)", dataManager.GetSysString(531), mainGame->dField.select_min, mainGame->dField.select_max);
+		select_hint = 0;
+		mainGame->gMutex.Lock();
+		mainGame->stHintMsg->setText(textBuffer);
+		mainGame->stHintMsg->setVisible(true);
+		mainGame->gMutex.Unlock();
 		return false;
 	}
 	case MSG_SELECT_COUNTER: {

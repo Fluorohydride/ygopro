@@ -235,6 +235,7 @@ struct processor {
 	uint8 reason_player;
 	card* summoning_card;
 	uint8 summon_depth;
+	uint8 summon_cancelable;
 	card* attacker;
 	card* sub_attacker;
 	card* attack_target;

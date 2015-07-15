@@ -452,6 +452,8 @@ int32 field::select_tribute(uint16 step, uint8 playerid, uint8 cancelable, uint8
 		}
 		return FALSE;
 	} else {
+		if(cancelable && returns.ivalue[0] == -1)
+			return TRUE;
 		byte c[64];
 		memset(c, 0, 64);
 		if(returns.bvalue[0] > max) {

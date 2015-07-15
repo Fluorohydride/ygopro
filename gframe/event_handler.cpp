@@ -1290,7 +1290,27 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case MSG_SELECT_TRIBUTE:
+			case MSG_SELECT_TRIBUTE: {
+				if(selected_cards.size() == 0) {
+					if(select_cancelable) {
+						DuelClient::SetResponseI(-1);
+						if(mainGame->wCardSelect->isVisible())
+							mainGame->HideElement(mainGame->wCardSelect, true);
+						else
+							DuelClient::SendResponse();
+					}
+					break;
+				}
+				if(mainGame->wQuery->isVisible()) {
+					unsigned char respbuf[64];
+					respbuf[0] = selected_cards.size();
+					for (size_t i = 0; i < selected_cards.size(); ++i)
+						respbuf[i + 1] = selected_cards[i]->select_seq;
+					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					mainGame->HideElement(mainGame->wQuery, true);
+					break;
+				}
+			}
 			case MSG_SELECT_SUM: {
 				if(mainGame->wQuery->isVisible()) {
 					unsigned char respbuf[64];
