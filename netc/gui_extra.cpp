@@ -1,5 +1,6 @@
 #include "utils/common.h"
 #include "utils/filesystem.h"
+#include "utils/tokenizer.h"
 
 #include "config.h"
 #include "card_data.h"
@@ -28,6 +29,12 @@ namespace ygopro
         ScrollBar = 15,
         ScrollArea = 16,
     };
+    
+    void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonNode<>& node) {
+        node.for_each([widget](const std::string& name, jaweson::JsonNode<>& item_node) {
+            widget->AddItem(To<std::wstring>(stringCfg[name]), (uint32_t)item_node[0].to_integer(), (int32_t)item_node[1].to_integer());
+        });
+    }
     
     sgui::SGWidget* LoadChild(sgui::SGWidgetContainer* parent, const std::string& child_name, jaweson::JsonNode<>& node) {
         static std::map<std::string, WidgetType> widget_type_id = {
@@ -228,9 +235,7 @@ namespace ygopro
                     } else if(name == "style") {
                         lb->SetStyle(sub_node);
                     } else if(name == "items") {
-                        sub_node.for_each([lb](const std::string& name, jaweson::JsonNode<>& item_node) {
-                            lb->AddItem(To<std::wstring>(name), (uint32_t)item_node[0].to_integer(), (int32_t)item_node[1].to_integer());
-                        });
+                        LoadItemList(lb, dialogCfg[sub_node.to_string()]);
                     } else if(name == "selection") {
                         lb->SetSelection((int32_t)sub_node.to_integer());
                     }
@@ -246,9 +251,7 @@ namespace ygopro
                     } else if(name == "style") {
                         cb->SetStyle(sub_node);
                     } else if(name == "items") {
-                        sub_node.for_each([cb](const std::string& name, jaweson::JsonNode<>& item_node) {
-                            cb->AddItem(To<std::wstring>(name), (uint32_t)item_node[0].to_integer(), (int32_t)item_node[1].to_integer());
-                        });
+                        LoadItemList(cb, dialogCfg[sub_node.to_string()]);
                     } else if(name == "selection") {
                         cb->SetSelection((int32_t)sub_node.to_integer());
                     }
@@ -501,229 +504,199 @@ namespace ygopro
     void FilterDialog::Show(v2i pos) {
         if(!window.expired())
             return;
-        auto wnd = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
-        wnd->SetPositionSize({0, 0}, {250, 300}, {0.5f, 0.5f}, {0.0f, 0.0f}, {-0.5f, -0.5f});
+        auto wnd = LoadDialogAs<sgui::SGWindow>("filter dialog");
+        if(!wnd)
+            return;
+        window = wnd->CastPtr<sgui::SGWidgetContainer>();
         
-        auto label1 = wnd->NewChild<sgui::SGLabel>();
-        label1->SetPosition({10, 15});
-        label1->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_keyword"].to_string()), 0xff000000);
+        auto pkeyword = wnd->FindWidgetAs<sgui::SGTextEdit>("keyword");
+        if(pkeyword)
+            keyword = pkeyword->CastPtr<sgui::SGTextEdit>();
         
-        auto pkeyword = wnd->NewChild<sgui::SGTextEdit>();
-        pkeyword->SetPositionSize({90, 10}, {150, 30});
-        keyword = pkeyword->CastPtr<sgui::SGTextEdit>();
+        auto ptype1 = wnd->FindWidgetAs<sgui::SGComboBox>("arctype");
+        auto ptype2 = wnd->FindWidgetAs<sgui::SGComboBox>("subtype");
+        if(ptype1 && ptype2) {
+            arctype = ptype1->CastPtr<sgui::SGComboBox>();
+            subtype = ptype2->CastPtr<sgui::SGComboBox>();
+            ptype1->event_sel_change += [ptype2](sgui::SGWidget& sender, int32_t index)->bool {
+                ptype2->ClearItems();
+                if(index == 0) {
+                    LoadItemList(ptype2, dialogCfg["no type"]);
+                } else if(index == 1) {
+                    LoadItemList(ptype2, dialogCfg["monster types"]);
+                } else if(index == 2) {
+                    LoadItemList(ptype2, dialogCfg["spell types"]);
+                } else {
+                    LoadItemList(ptype2, dialogCfg["trap types"]);
+                }
+                ptype2->SetSelection(0);
+                return true;
+            };
+        }
+        auto plimit = wnd->FindWidgetAs<sgui::SGComboBox>("limit");
+        if(plimit)
+            limit_type = plimit->CastPtr<sgui::SGComboBox>();
+        auto ppool = wnd->FindWidgetAs<sgui::SGComboBox>("limit");
+        if(ppool)
+            pool_type = ppool->CastPtr<sgui::SGComboBox>();
+        auto pattribute = wnd->FindWidgetAs<sgui::SGComboBox>("attribute");
+        if(pattribute)
+            attribute = pattribute->CastPtr<sgui::SGComboBox>();
+        auto prace = wnd->FindWidgetAs<sgui::SGComboBox>("race");
+        if(prace)
+            race = prace->CastPtr<sgui::SGComboBox>();
+        auto pattack = wnd->FindWidgetAs<sgui::SGTextEdit>("attack");
+        if(pattack)
+            attack = pattack->CastPtr<sgui::SGTextEdit>();
+        auto pdefence = wnd->FindWidgetAs<sgui::SGTextEdit>("defence");
+        if(pdefence)
+            defence = pdefence->CastPtr<sgui::SGTextEdit>();
+        auto pstar = wnd->FindWidgetAs<sgui::SGTextEdit>("star");
+        if(pstar)
+            star = pstar->CastPtr<sgui::SGTextEdit>();
+        auto pscale = wnd->FindWidgetAs<sgui::SGTextEdit>("pscale");
+        if(pscale)
+            scale = pscale->CastPtr<sgui::SGTextEdit>();
         
-        auto label2 = wnd->NewChild<sgui::SGLabel>();
-        label2->SetPosition({10, 40});
-        label2->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_type"].to_string()), 0xff000000);
-        auto ptype1 = wnd->NewChild<sgui::SGComboBox>();
-        ptype1->SetPositionSize({90, 35}, {130, 30});
-        type1 = ptype1->CastPtr<sgui::SGComboBox>();
-        ptype1->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
-        ptype1->AddItem(DataMgr::Get().GetTypeString2(0x1), 0xff000000, 0x1);
-        ptype1->AddItem(DataMgr::Get().GetTypeString2(0x2), 0xff000000, 0x2);
-        ptype1->AddItem(DataMgr::Get().GetTypeString2(0x4), 0xff000000, 0x4);
-        ptype1->SetSelection(0);
-        ptype1->event_sel_change += [this](sgui::SGWidget& sender, int32_t index)->bool {
-            auto ptr = type2.lock();
-            ptr->ClearItems();
-            if(index == 0) {
-                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0);
-            } else if(index == 1) {
-                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0x1e003ef);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x10);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x20), 0xff000000, 0x20);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x40), 0xff000000, 0x40);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x80), 0xff000000, 0x80);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x1000), 0xff000000, 0x1000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x2000), 0xff000000, 0x2000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x800000), 0xff000000, 0x800000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x1000000), 0xff000000, 0x1000000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x200000), 0xff000000, 0x200000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x800), 0xff000000, 0x800);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x200), 0xff000000, 0x200);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x400), 0xff000000, 0x400);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x400000), 0xff000000, 0x400000);
-            } else if(index == 2) {
-                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0xf0082);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x2);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x80), 0xff000000, 0x80);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10000), 0xff000000, 0x10000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x20000), 0xff000000, 0x20000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x40000), 0xff000000, 0x40000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x80000), 0xff000000, 0x80000);
-            } else {
-                ptr->AddItem(To<std::wstring>(stringCfg["eui_filter_na"]), 0xff000000, 0x120004);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x10), 0xff000000, 0x4);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x20000), 0xff000000, 0x20000);
-                ptr->AddItem(DataMgr::Get().GetTypeString2(0x100000), 0xff000000, 0x100000);
-            }
-            ptr->SetSelection(0);
-            return true;
-        };
+        auto sch = wnd->FindWidgetAs<sgui::SGTextButton>("search");
+        auto clr = wnd->FindWidgetAs<sgui::SGTextButton>("clear");
+        if(sch)
+            sch->event_click += [this](sgui::SGWidget& sender)->bool { BeginSearch(); return true; };
+        if(clr)
+            clr->event_click += [this](sgui::SGWidget& sender)->bool { ClearCondition(); return true; };
         
-        auto ptype2 = wnd->NewChild<sgui::SGComboBox>();
-        ptype2->SetPositionSize({90, 60}, {130, 30});
-        type2 = ptype2->CastPtr<sgui::SGComboBox>();
-        ptype2->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
-        ptype2->SetSelection(0);
-        
-        auto label3 = wnd->NewChild<sgui::SGLabel>();
-        label3->SetPosition({10, 90});
-        label3->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_limit"].to_string()), 0xff000000);
-        auto ptype3 = wnd->NewChild<sgui::SGComboBox>();
-        ptype3->SetPositionSize({90, 85}, {130, 30});
-        type3 = ptype3->CastPtr<sgui::SGComboBox>();
-        ptype3->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
-        ptype3->AddItem(To<std::wstring>(stringCfg["pool_limit0"].to_string()), 0xff000000, 1);
-        ptype3->AddItem(To<std::wstring>(stringCfg["pool_limit1"].to_string()), 0xff000000, 2);
-        ptype3->AddItem(To<std::wstring>(stringCfg["pool_limit2"].to_string()), 0xff000000, 3);
-        ptype3->AddItem(To<std::wstring>(stringCfg["pool_ocg"].to_string()), 0xff000000, 0x1);
-        ptype3->AddItem(To<std::wstring>(stringCfg["pool_tcg"].to_string()), 0xff000000, 0x2);
-        ptype3->SetSelection(0);
-        
-        auto label4 = wnd->NewChild<sgui::SGLabel>();
-        label4->SetPosition({10, 115});
-        label4->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_attribute"].to_string()), 0xff000000);
-        auto pattribute = wnd->NewChild<sgui::SGComboBox>();
-        pattribute->SetPositionSize({90, 110}, {130, 30});
-        attribute = pattribute->CastPtr<sgui::SGComboBox>();
-        pattribute->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
-        for(uint32_t i = 1; i != 0x80; i <<=1)
-            pattribute->AddItem(DataMgr::Get().GetAttributeString(i), 0xff000000, i);
-        pattribute->SetSelection(0);
-        
-        auto label5 = wnd->NewChild<sgui::SGLabel>();
-        label5->SetPosition({10, 140});
-        label5->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_race"].to_string()), 0xff000000);
-        auto prace = wnd->NewChild<sgui::SGComboBox>();
-        prace->SetPositionSize({90, 135}, {130, 30});
-        race = prace->CastPtr<sgui::SGComboBox>();
-        prace->AddItem(To<std::wstring>(stringCfg["eui_filter_na"].to_string()), 0xff000000, 0);
-        for(uint32_t i = 1; i != 0x1000000; i <<=1)
-            prace->AddItem(DataMgr::Get().GetRaceString(i), 0xff000000, i);
-        prace->SetSelection(0);
-        
-        auto label6 = wnd->NewChild<sgui::SGLabel>();
-        label6->SetPosition({10, 165});
-        label6->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_attack"].to_string()), 0xff000000);
-        auto pattack = wnd->NewChild<sgui::SGTextEdit>();
-        pattack->SetPositionSize({90, 160}, {150, 30});
-        attack = pattack->CastPtr<sgui::SGTextEdit>();
-        
-        auto label7 = wnd->NewChild<sgui::SGLabel>();
-        label7->SetPosition({10, 190});
-        label7->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_defence"].to_string()), 0xff000000);
-        auto pdefence = wnd->NewChild<sgui::SGTextEdit>();
-        pdefence->SetPositionSize({90, 185}, {150, 30});
-        defence = pdefence->CastPtr<sgui::SGTextEdit>();
-        
-        auto label8 = wnd->NewChild<sgui::SGLabel>();
-        label8->SetPosition({10, 215});
-        label8->GetTextUI()->SetText(To<std::wstring>(stringCfg["eui_filter_star"].to_string()), 0xff000000);
-        auto pstar = wnd->NewChild<sgui::SGTextEdit>();
-        pstar->SetPositionSize({90, 210}, {150, 30});
-        star = pstar->CastPtr<sgui::SGTextEdit>();
-
-        auto sch = sgui::SGButton::Create(wd, {140, 260}, {100, 25});
-        sch->SetText(stringCfg["eui_filter_search"], 0xff000000);
-        sch->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            BeginSearch();
-            return true;
-        });
-        auto clr = sgui::SGButton::Create(wd, {10, 260}, {100, 25});
-        clr->SetText(stringCfg["eui_filter_clear"], 0xff000000);
-        clr->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            ClearCondition();
-            return true;
-        });
         pkeyword->SetFocus();
-        sgui::SGGUIRoot::GetSingleton().SetPopupObject(wd);
-        pkeyword->SetText(con_text[0], 0xff000000);
-        pattack->SetText(con_text[1], 0xff000000);
-        pdefence->SetText(con_text[1], 0xff000000);
-        pstar->SetText(con_text[1], 0xff000000);
-        ptype1->SetSelection(sel[0]);
-        ptype2->SetSelection(sel[1]);
-        ptype3->SetSelection(sel[2]);
-        pattribute->SetSelection(sel[3]);
-        prace->SetSelection(sel[4]);
+
+        sgui::SGGUIRoot::GetSingleton().PopupObject(wnd->shared_from_this());
+        if(pkeyword)
+            pkeyword->GetTextUI()->SetText(con_text[0], 0xff000000);
+        if(pattack)
+            pattack->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(pdefence)
+            pdefence->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(pstar)
+            pstar->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(pscale)
+            pscale->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(ptype1)
+            ptype1->SetSelection(sel[0]);
+        if(ptype2)
+            ptype2->SetSelection(sel[1]);
+        if(plimit)
+            plimit->SetSelection(sel[2]);
+        if(ppool)
+            ppool->SetSelection(sel[3]);
+        if(pattribute)
+            pattribute->SetSelection(sel[4]);
+        if(prace)
+            prace->SetSelection(sel[5]);
     }
     
     void FilterDialog::BeginSearch() {
         FilterCondition fc;
-        auto keystr = keyword.lock()->GetText();
+        std::wstring keystr = keyword.expired() ? L"" : keyword.lock()->GetTextUI()->GetText();
         con_text[0] = keystr;
-        if(keystr.length() > 0) {
-            if(keystr[0] == L'@') {
-                fc.code = ParseInt(&keystr[1], keystr.length() - 1);
-                if(fc.code == 0)
-                    fc.code = 1;
-            } else if(keystr[0] == L'#') {
-                std::string setstr = "setname_";
-                setstr.append(To<std::string>(keystr.substr(1)));
-                if(stringCfg.Exists(setstr))
-                    fc.setcode = stringCfg[setstr];
-                else
-                    fc.setcode = 0xffff;
-            } else
-                fc.keyword = keystr;
+        Tokenizer<wchar_t> tokens(keystr, L" ");
+        for(size_t i = 0; i < tokens.size(); ++i) {
+            auto& sep_keyword = tokens[i];
+            if(sep_keyword.length() > 0) {
+                if(sep_keyword[0] == L'!') {
+                    fc.code = ParseInt(&sep_keyword[1], (int32_t)sep_keyword.length() - 1);
+                    if(fc.code == 0)
+                        fc.code = 1;
+                } else if(sep_keyword[0] == L'@') {
+                    auto setcode = DataMgr::Get().GetSetCode(sep_keyword.substr(1));
+                    if(setcode)
+                        fc.setcode = setcode;
+                    else
+                        fc.setcode = 0xffff;
+                } else if(sep_keyword[0] == L'#') {
+                    fc.tags.push_back(sep_keyword.substr(1));
+                } else
+                    fc.keywords.push_back(sep_keyword);
+            }
         }
-        fc.type = type1.lock()->GetSelectedValue();
-        fc.subtype = type2.lock()->GetSelectedValue();
-        int32_t lmt = type3.lock()->GetSelection();
-        sel[0] = type1.lock()->GetSelection();
-        sel[1] = type2.lock()->GetSelection();
-        sel[2] = lmt;
-        if(lmt > 3) {
-            fc.pool = type3.lock()->GetSelectedValue();
-            lmt = 0;
+        if(!arctype.expired()) {
+            sel[0] = arctype.lock()->GetSelection();
+            fc.type = arctype.lock()->GetItemCustomValue(sel[0]);
+        }
+        if(!subtype.expired()) {
+            sel[1] = subtype.lock()->GetSelection();
+            fc.subtype = subtype.lock()->GetItemCustomValue(sel[1]);
+        }
+        if(!limit_type.expired()) {
+            sel[2] = limit_type.lock()->GetSelection();
+        }
+        if(!pool_type.expired()) {
+            sel[3] = pool_type.lock()->GetSelection();
+            fc.pool = pool_type.lock()->GetItemCustomValue(sel[3]);
         }
         if((fc.type == 0) || (fc.type == 0x1)) {
-            fc.attribute = attribute.lock()->GetSelectedValue();
-            fc.race = race.lock()->GetSelectedValue();
-            sel[3] = attribute.lock()->GetSelection();
-            sel[4] = race.lock()->GetSelection();
-            auto t1 = ParseValue(attack.lock()->GetText());
-            switch(std::get<0>(t1)) {
-                case 0: break;
-                case 1: fc.atkmin = fc.atkmax = -2; break;
-                case 2: fc.atkmin = fc.atkmax = std::get<1>(t1); break;
-                case 3: fc.atkmin = std::get<1>(t1); fc.atkmax = std::get<2>(t1); break;
-                default: break;
+            if(!attribute.expired()) {
+                sel[4] = attribute.lock()->GetSelection();
+                fc.attribute = attribute.lock()->GetItemCustomValue(sel[4]);
             }
-            auto t2 = ParseValue(defence.lock()->GetText());
-            switch(std::get<0>(t2)) {
-                case 0: break;
-                case 1: fc.defmin = fc.defmax = -2; break;
-                case 2: fc.defmin = fc.defmax = std::get<1>(t2); break;
-                case 3: fc.defmin = std::get<1>(t2); fc.defmax = std::get<2>(t2); break;
-                default: break;
+            if(!race.expired()) {
+                sel[4] = race.lock()->GetSelection();
+                fc.race = race.lock()->GetItemCustomValue(sel[4]);
             }
-            auto t3 = ParseValue(star.lock()->GetText());
-            switch(std::get<0>(t3)) {
-                case 0: case 1: break;
-                case 2: fc.lvmin = fc.lvmax = std::get<1>(t3); break;
-                case 3: fc.lvmin = std::get<1>(t3); fc.lvmax = std::get<2>(t3); break;
-                default: break;
+            if(!attack.expired()) {
+                auto t1 = ParseValue(attack.lock()->GetTextUI()->GetText());
+                switch(std::get<0>(t1)) {
+                    case 0: break;
+                    case 1: fc.atkmin = fc.atkmax = -2; break;
+                    case 2: fc.atkmin = fc.atkmax = std::get<1>(t1); break;
+                    case 3: fc.atkmin = std::get<1>(t1); fc.atkmax = std::get<2>(t1); break;
+                    default: break;
+                }
+            }
+            if(!defence.expired()) {
+                auto t2 = ParseValue(defence.lock()->GetTextUI()->GetText());
+                switch(std::get<0>(t2)) {
+                    case 0: break;
+                    case 1: fc.defmin = fc.defmax = -2; break;
+                    case 2: fc.defmin = fc.defmax = std::get<1>(t2); break;
+                    case 3: fc.defmin = std::get<1>(t2); fc.defmax = std::get<2>(t2); break;
+                    default: break;
+                }
+            }
+            if(!star.expired()) {
+                auto t3 = ParseValue(star.lock()->GetTextUI()->GetText());
+                switch(std::get<0>(t3)) {
+                    case 0: case 1: break;
+                    case 2: fc.lvmin = fc.lvmax = std::get<1>(t3); break;
+                    case 3: fc.lvmin = std::get<1>(t3); fc.lvmax = std::get<2>(t3); break;
+                    default: break;
+                }
+            }
+            if(!scale.expired()) {
+                auto t4 = ParseValue(star.lock()->GetTextUI()->GetText());
+                switch(std::get<0>(t4)) {
+                    case 0: case 1: break;
+                    case 2: fc.scalemin = fc.scalemax = std::get<1>(t4); break;
+                    case 3: fc.scalemin = std::get<1>(t4); fc.scalemax = std::get<2>(t4); break;
+                    default: break;
+                }
             }
         }
-        if(cbOK != nullptr)
-            cbOK(fc, lmt);
+        if(cbOK)
+            cbOK(fc, sel[2]);
     }
     
     void FilterDialog::ClearCondition() {
-        keyword.lock()->ClearText();
-        attack.lock()->ClearText();
-        defence.lock()->ClearText();
-        star.lock()->ClearText();
-        type1.lock()->SetSelection(0);
-        type2.lock()->SetSelection(0);
-        type3.lock()->SetSelection(0);
+        keyword.lock()->GetTextUI()->Clear();
+        attack.lock()->GetTextUI()->Clear();
+        defence.lock()->GetTextUI()->Clear();
+        star.lock()->GetTextUI()->Clear();
+        arctype.lock()->SetSelection(0);
+        subtype.lock()->SetSelection(0);
+        limit_type.lock()->SetSelection(0);
+        pool_type.lock()->SetSelection(0);
         attribute.lock()->SetSelection(0);
         race.lock()->SetSelection(0);
-        for(int32_t i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 5; ++i)
             con_text[i].clear();
-        for(int32_t i = 0; i < 4; ++i)
+        for(int32_t i = 0; i < 6; ++i)
             sel[i] = 0;
     }
     
@@ -732,11 +705,11 @@ namespace ygopro
             return std::make_tuple(0, 0, 0);
         if(valstr == L"?")
             return std::make_tuple(1, 0, 0);
-        size_t pos = valstr.find(L':');
+        int32_t pos = (int32_t)valstr.find(L':');
         if(pos == std::wstring::npos)
-            return std::make_tuple(2, ParseInt(&valstr[0], valstr.length()), 0);
+            return std::make_tuple(2, ParseInt(&valstr[0], (int32_t)valstr.length()), 0);
         else
-            return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], valstr.length() - pos - 1));
+            return std::make_tuple(3, ParseInt(&valstr[0], pos), ParseInt(&valstr[pos + 1], (int32_t)valstr.length() - pos - 1));
     }
     
     int32_t FilterDialog::ParseInt(const wchar_t* p, int32_t size) {
@@ -803,7 +776,7 @@ namespace ygopro
                 uint16_t sd = (setcode >> (i * 16)) & 0xffff;
                 if(sd) {
                     extra->AppendText(L"#", 0xff000000);
-                    extra->AppendText(DataMgr::Get().GetSetCode(sd), 0xffff0000);
+                    extra->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
                     extra->AppendText(L" ", 0xff000000);
                 }
             }

@@ -18,9 +18,12 @@ namespace ygopro
         int32_t defmax = -1;
         int32_t lvmin = 0;
         int32_t lvmax = 0;
+        int32_t scalemin = 0;
+        int32_t scalemax = 0;
         uint32_t race = 0;
         uint32_t attribute = 0;
-        std::wstring keyword;
+        std::vector<std::wstring> keywords;
+        std::vector<std::wstring> tags;
     };
 
 	struct CardData {
@@ -58,13 +61,20 @@ namespace ygopro
         static std::wstring GetAttributeString(uint32_t attr);
         static std::wstring GetRaceString(uint32_t race);
         static std::wstring GetTypeString(uint32_t arctype);
-        static std::wstring GetTypeString2(uint32_t arctype);
         
         void RegisterSetCode(uint32_t code, const std::wstring& value) {
             _setcodes[code] = value;
+            _setnames[value] = code;
         }
         
-        const std::wstring& GetSetCode(uint32_t code) {
+        uint32_t GetSetCode(const std::wstring& name) {
+            auto iter = _setnames.find(name);
+            if(iter == _setcodes.end())
+                return 0;
+            return iter->second;
+        }
+        
+        const std::wstring& GetSetName(uint32_t code) {
             static const std::wstring empt = L"";
             auto iter = _setcodes.find(code);
             if(iter == _setcodes.end())
@@ -86,6 +96,7 @@ namespace ygopro
 	private:
 		std::unordered_map<uint32_t, CardData> _datas;
         std::unordered_map<uint32_t, std::wstring> _setcodes;
+        std::unordered_map<std::wstring, uint32_t> _setnames;
         std::unordered_map<uint32_t, std::vector<uint32_t>> _aliases;
         std::vector<std::wstring> _dbsrc;
 	};

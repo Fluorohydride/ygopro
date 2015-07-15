@@ -71,16 +71,18 @@ namespace ygopro
     protected:
         std::function<void (const FilterCondition&, int32_t)> cbOK;
         std::weak_ptr<sgui::SGTextEdit> keyword;
-        std::weak_ptr<sgui::SGComboBox> type1;
-        std::weak_ptr<sgui::SGComboBox> type2;
-        std::weak_ptr<sgui::SGComboBox> type3;
+        std::weak_ptr<sgui::SGComboBox> arctype;
+        std::weak_ptr<sgui::SGComboBox> subtype;
+        std::weak_ptr<sgui::SGComboBox> limit_type;
+        std::weak_ptr<sgui::SGComboBox> pool_type;
         std::weak_ptr<sgui::SGComboBox> attribute;
         std::weak_ptr<sgui::SGComboBox> race;
         std::weak_ptr<sgui::SGTextEdit> attack;
         std::weak_ptr<sgui::SGTextEdit> defence;
         std::weak_ptr<sgui::SGTextEdit> star;
-        std::wstring con_text[4];
-        uint32_t sel[5] = {0};
+        std::weak_ptr<sgui::SGTextEdit> scale;
+        std::wstring con_text[5];
+        int32_t sel[6] = {0};
     };
 
     class InfoPanel : public CommonDialog {

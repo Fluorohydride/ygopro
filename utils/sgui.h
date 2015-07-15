@@ -908,6 +908,7 @@ namespace sgui
                 && y >= area_pos.absolute.y && y <= area_pos.absolute.y + area_size.absolute.y;
         }
         
+        virtual void SetFocus();
         virtual void RemoveFromParent();
         virtual void SetRedraw();
         virtual void SetUpdate();
@@ -1328,6 +1329,11 @@ namespace sgui
         for(auto comp : ui_components)
             SGGUIRoot::GetSingleton().DeleteObject(comp);
         event_on_destroy.Trigger(*this);
+    }
+    
+    void SGWidget::SetFocus() {
+        if(!parent.expired())
+            parent.lock()->SetFocusWidget(this);
     }
     
     void SGWidget::RemoveFromParent() {

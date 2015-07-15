@@ -1,7 +1,8 @@
 #include "utils/common.h"
-
+#include "utils/convert.h"
 #include <sqlite3.h>
 
+#include "config.h"
 #include "card_data.h"
 #include "scene_mgr.h"
 
@@ -159,172 +160,143 @@ namespace ygopro
     }
     
     std::wstring DataMgr::GetAttributeString(uint32_t attr) {
-        std::wstring attname;
+        std::string attname;
         if(attr & 0x1)
-            attname.append(stringCfg["attribtue_earth"]).append(L"|");
+            attname.append(stringCfg["attribtue_earth"].to_string()).append("|");
         if(attr & 0x2)
-            attname.append(stringCfg["attribtue_water"]).append(L"|");
+            attname.append(stringCfg["attribtue_water"].to_string()).append("|");
         if(attr & 0x4)
-            attname.append(stringCfg["attribtue_fire"]).append(L"|");
+            attname.append(stringCfg["attribtue_fire"].to_string()).append("|");
         if(attr & 0x8)
-            attname.append(stringCfg["attribtue_wind"]).append(L"|");
+            attname.append(stringCfg["attribtue_wind"].to_string()).append("|");
         if(attr & 0x10)
-            attname.append(stringCfg["attribtue_light"]).append(L"|");
+            attname.append(stringCfg["attribtue_light"].to_string()).append("|");
         if(attr & 0x20)
-            attname.append(stringCfg["attribtue_dark"]).append(L"|");
+            attname.append(stringCfg["attribtue_dark"].to_string()).append("|");
         if(attr & 0x40)
-            attname.append(stringCfg["attribtue_divine"]).append(L"|");
+            attname.append(stringCfg["attribtue_divine"].to_string()).append("|");
         if(attname.length() > 0)
             attname.resize(attname.length() - 1);
-        return std::move(attname);
+        return To<std::wstring>(attname);
     }
     
     std::wstring DataMgr::GetRaceString(uint32_t race) {
-        std::wstring racname;
+        std::string racname;
         if(race & 0x1)
-            racname.append(stringCfg["race_warrior"]).append(L"|");
+            racname.append(stringCfg["race_warrior"].to_string()).append("|");
         if(race & 0x2)
-            racname.append(stringCfg["race_spellcaster"]).append(L"|");
+            racname.append(stringCfg["race_spellcaster"].to_string()).append("|");
         if(race & 0x4)
-            racname.append(stringCfg["race_fairy"]).append(L"|");
+            racname.append(stringCfg["race_fairy"].to_string()).append("|");
         if(race & 0x8)
-            racname.append(stringCfg["race_fiend"]).append(L"|");
+            racname.append(stringCfg["race_fiend"].to_string()).append("|");
         if(race & 0x10)
-            racname.append(stringCfg["race_zombie"]).append(L"|");
+            racname.append(stringCfg["race_zombie"].to_string()).append("|");
         if(race & 0x20)
-            racname.append(stringCfg["race_machine"]).append(L"|");
+            racname.append(stringCfg["race_machine"].to_string()).append("|");
         if(race & 0x40)
-            racname.append(stringCfg["race_aqua"]).append(L"|");
+            racname.append(stringCfg["race_aqua"].to_string()).append("|");
         if(race & 0x80)
-            racname.append(stringCfg["race_pyro"]).append(L"|");
+            racname.append(stringCfg["race_pyro"].to_string()).append("|");
         if(race & 0x100)
-            racname.append(stringCfg["race_rock"]).append(L"|");
+            racname.append(stringCfg["race_rock"].to_string()).append("|");
         if(race & 0x200)
-            racname.append(stringCfg["race_windbeast"]).append(L"|");
+            racname.append(stringCfg["race_windbeast"].to_string()).append("|");
         if(race & 0x400)
-            racname.append(stringCfg["race_plant"]).append(L"|");
+            racname.append(stringCfg["race_plant"].to_string()).append("|");
         if(race & 0x800)
-            racname.append(stringCfg["race_insect"]).append(L"|");
+            racname.append(stringCfg["race_insect"].to_string()).append("|");
         if(race & 0x1000)
-            racname.append(stringCfg["race_thunder"]).append(L"|");
+            racname.append(stringCfg["race_thunder"].to_string()).append("|");
         if(race & 0x2000)
-            racname.append(stringCfg["race_dragon"]).append(L"|");
+            racname.append(stringCfg["race_dragon"].to_string()).append("|");
         if(race & 0x4000)
-            racname.append(stringCfg["race_beast"]).append(L"|");
+            racname.append(stringCfg["race_beast"].to_string()).append("|");
         if(race & 0x8000)
-            racname.append(stringCfg["race_beastwarrior"]).append(L"|");
+            racname.append(stringCfg["race_beastwarrior"].to_string()).append("|");
         if(race & 0x10000)
-            racname.append(stringCfg["race_dinosaur"]).append(L"|");
+            racname.append(stringCfg["race_dinosaur"].to_string()).append("|");
         if(race & 0x20000)
-            racname.append(stringCfg["race_fish"]).append(L"|");
+            racname.append(stringCfg["race_fish"].to_string()).append("|");
         if(race & 0x40000)
-            racname.append(stringCfg["race_seaserpent"]).append(L"|");
+            racname.append(stringCfg["race_seaserpent"].to_string()).append("|");
         if(race & 0x80000)
-            racname.append(stringCfg["race_reptile"]).append(L"|");
+            racname.append(stringCfg["race_reptile"].to_string()).append("|");
         if(race & 0x100000)
-            racname.append(stringCfg["race_psychic"]).append(L"|");
+            racname.append(stringCfg["race_psychic"].to_string()).append("|");
         if(race & 0x200000)
-            racname.append(stringCfg["race_divine"]).append(L"|");
+            racname.append(stringCfg["race_divine"].to_string()).append("|");
         if(race & 0x400000)
-            racname.append(stringCfg["race_creatorgod"]).append(L"|");
+            racname.append(stringCfg["race_creatorgod"].to_string()).append("|");
         if(race & 0x800000)
-            racname.append(stringCfg["race_phantomdragon"]).append(L"|");
+            racname.append(stringCfg["race_phantomdragon"].to_string()).append("|");
         if(racname.length() > 0)
             racname.resize(racname.length() - 1);
-        return std::move(racname);
+        return To<std::wstring>(racname);
     }
     
     std::wstring DataMgr::GetTypeString(uint32_t arctype) {
-        std::wstring tpname;
+        std::string tpname;
         if(arctype & 0x1) {
             if(arctype & 0x8020c0) {
                 if(arctype & 0x800000)
-                    tpname.append(stringCfg["type_xyz"]);
+                    tpname.append(stringCfg["type_xyz"].to_string());
                 else if(arctype & 0x2000)
-                    tpname.append(stringCfg["type_synchro"]);
+                    tpname.append(stringCfg["type_synchro"].to_string());
                 else if(arctype & 0x80)
-                    tpname.append(stringCfg["type_ritual"]);
+                    tpname.append(stringCfg["type_ritual"].to_string());
                 else
-                    tpname.append(stringCfg["type_fusion"]);
-                tpname.append(stringCfg["type_monster"]);
+                    tpname.append(stringCfg["type_fusion"].to_string());
+                tpname.append(stringCfg["type_monster"].to_string());
                 if(arctype & 0x20)
-                    tpname.append(L"|").append(stringCfg["type_effect"]);
+                    tpname.append("|").append(stringCfg["type_effect"].to_string());
             } else {
                 if(arctype & 0x20)
-                    tpname.append(stringCfg["type_effect"]);
+                    tpname.append(stringCfg["type_effect"].to_string());
                 else
-                    tpname .append(stringCfg["type_normal"]);
-                tpname.append(stringCfg["type_monster"]);
+                    tpname .append(stringCfg["type_normal"].to_string());
+                tpname.append(stringCfg["type_monster"].to_string());
             }
             if(arctype & 0x200)
-                tpname.append(L"|").append(stringCfg["type_spirit"]);
+                tpname.append("|").append(stringCfg["type_spirit"].to_string());
             if(arctype & 0x400)
-                tpname.append(L"|").append(stringCfg["type_union"]);
+                tpname.append("|").append(stringCfg["type_union"].to_string());
             if(arctype & 0x800)
-                tpname.append(L"|").append(stringCfg["type_dual"]);
+                tpname.append("|").append(stringCfg["type_dual"].to_string());
             if(arctype & 0x1000)
-                tpname.append(L"|").append(stringCfg["type_tuner"]);
+                tpname.append("|").append(stringCfg["type_tuner"].to_string());
             if(arctype & 0x4000)
-                tpname.append(L"|").append(stringCfg["type_token"]);
+                tpname.append("|").append(stringCfg["type_token"].to_string());
             if(arctype & 0x200000)
-                tpname.append(L"|").append(stringCfg["type_flip"]);
+                tpname.append("|").append(stringCfg["type_flip"].to_string());
             if(arctype & 0x400000)
-                tpname.append(L"|").append(stringCfg["type_toon"]);
+                tpname.append("|").append(stringCfg["type_toon"].to_string());
             if(arctype & 0x1000000)
-                tpname.append(L"|").append(stringCfg["type_pendulum"]);
+                tpname.append("|").append(stringCfg["type_pendulum"].to_string());
         } else if(arctype & 0x2) {
             if(arctype == 0x2)
-                tpname.append(stringCfg["type_normal"]);
+                tpname.append(stringCfg["type_normal"].to_string());
             else if(arctype & 0x80)
-                tpname.append(stringCfg["type_ritual"]);
+                tpname.append(stringCfg["type_ritual"].to_string());
             else if(arctype & 0x10000)
-                tpname.append(stringCfg["type_quickplay"]);
+                tpname.append(stringCfg["type_quickplay"].to_string());
             else if(arctype & 0x20000)
-                tpname.append(stringCfg["type_continuous"]);
+                tpname.append(stringCfg["type_continuous"].to_string());
             else if(arctype & 0x40000)
-                tpname.append(stringCfg["type_equip"]);
+                tpname.append(stringCfg["type_equip"].to_string());
             else if(arctype & 0x80000)
-                tpname.append(stringCfg["type_field"]);
-            tpname.append(stringCfg["type_spell"]);
+                tpname.append(stringCfg["type_field"].to_string());
+            tpname.append(stringCfg["type_spell"].to_string());
         } else {
             if(arctype == 0x4)
-                tpname.append(stringCfg["type_normal"]);
+                tpname.append(stringCfg["type_normal"].to_string());
             else if(arctype & 0x20000)
-                tpname.append(stringCfg["type_continuous"]);
+                tpname.append(stringCfg["type_continuous"].to_string());
             else if(arctype & 0x100000)
-                tpname.append(stringCfg["type_counter"]);
-            tpname.append(stringCfg["type_trap"]);
+                tpname.append(stringCfg["type_counter"].to_string());
+            tpname.append(stringCfg["type_trap"].to_string());
         }
-        return std::move(tpname);
-    }
-    
-    std::wstring DataMgr::GetTypeString2(uint32_t arctype) {
-        switch(arctype) {
-            case 0x1: return stringCfg["type_monster"];
-            case 0x2: return stringCfg["type_spell"];
-            case 0x4: return stringCfg["type_trap"];
-            case 0x10: return stringCfg["type_normal"];
-            case 0x20: return stringCfg["type_effect"];
-            case 0x40: return stringCfg["type_fusion"];
-            case 0x80: return stringCfg["type_ritual"];
-            case 0x100: return stringCfg["type_trapmonster"];
-            case 0x200: return stringCfg["type_spirit"];
-            case 0x400: return stringCfg["type_union"];
-            case 0x800: return stringCfg["type_dual"];
-            case 0x1000: return stringCfg["type_tuner"];
-            case 0x2000: return stringCfg["type_synchro"];
-            case 0x4000: return stringCfg["type_token"];
-            case 0x10000: return stringCfg["type_quickplay"];
-            case 0x20000: return stringCfg["type_continuous"];
-            case 0x40000: return stringCfg["type_equip"];
-            case 0x80000: return stringCfg["type_field"];
-            case 0x100000: return stringCfg["type_counter"];
-            case 0x200000: return stringCfg["type_flip"];
-            case 0x400000: return stringCfg["type_toon"];
-            case 0x800000: return stringCfg["type_xyz"];
-            case 0x1000000: return stringCfg["type_pendulum"];
-        }
-        return L"";
+        return To<std::wstring>(tpname);
     }
     
 }

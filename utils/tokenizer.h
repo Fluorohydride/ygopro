@@ -35,7 +35,7 @@ public:
     inline token_iterator begin() { return sep_strings.begin(); }
     inline token_iterator end() { return sep_strings.end(); }
     inline size_t size() { return sep_strings.size(); }
-    inline std::string& operator[](size_t idx) { return sep_strings[idx]; }
+    inline string_type& operator[](size_t idx) { return sep_strings[idx]; }
 
 private:
     std::vector<string_type> sep_strings;

@@ -67,7 +67,7 @@
       "path" : {
         "type" : "textedit",
         "readonly" : true,
-        "position" : [10, 50, -20, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "position" : [10, 50, -20, 40, 0, 0, 1.0, 0.0, 0.0, 0.0]
       },
       "file list" : {
         "type" : "listbox",
@@ -83,5 +83,218 @@
         "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
       },
     }
-  }
+  },
+  "filter dialog" : {
+    "type" : "panel",
+    "position" : [0, 0, 500, 500, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "keyword label" : {
+        "type" : "label",
+        "text" : "eui_filter_keyword",
+        "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "type label" : {
+        "type" : "label",
+        "text" : "eui_filter_type",
+        "position" : [0, 60, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "limit label" : {
+        "type" : "label",
+        "text" : "eui_filter_limit",
+        "position" : [0, 150, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "pool label" : {
+        "type" : "label",
+        "text" : "eui_filter_limit",
+        "position" : [0, 195, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "attrib label" : {
+        "type" : "label",
+        "text" : "eui_filter_attribute",
+        "position" : [0, 240, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "race label" : {
+        "type" : "label",
+        "text" : "eui_filter_race",
+        "position" : [0, 285, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "attack label" : {
+        "type" : "label",
+        "text" : "eui_filter_attack",
+        "position" : [0, 330, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "defence label" : {
+        "type" : "label",
+        "text" : "eui_filter_defence",
+        "position" : [0, 375, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "star label" : {
+        "type" : "label",
+        "text" : "eui_filter_star",
+        "position" : [0, 420, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "scale label" : {
+        "type" : "label",
+        "text" : "eui_filter_pscale",
+        "position" : [0, 465, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "keyword" : {
+        "type" : "textedit",
+        "position" : [120, 15, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "arctype" : {
+        "type" : "combobox",
+        "position" : [120, 60, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "items" : "type list",
+        "selection" : 0
+      },
+      "subtype" : {
+        "type" : "combobox",
+        "position" : [120, 105, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "items" : "no type",
+        "selection" : 0
+      },
+      "limit" : {
+        "type" : "combobox",
+        "position" : [120, 150, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "items" : "limit list",
+        "selection" : 0
+      },
+      "pool" : {
+        "type" : "combobox",
+        "position" : [120, 195, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "items" : "pool list",
+        "selection" : 0
+      },
+      "attribute" : {
+        "type" : "combobox",
+        "position" : [120, 240, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "items" : "attribute list",
+        "selection" : 0
+      },
+      "race" : {
+        "type" : "combobox",
+        "position" : [120, 285, -130, 40, 0, 0, 1.0, 0.0, 0.0, 0.0],
+        "items" : "race list",
+        "selection" : 0
+      },
+      "attack" : {
+        "type" : "textedit",
+        "position" : [120, 330, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "defence" : {
+        "type" : "textedit",
+        "position" : [120, 375, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "star" : {
+        "type" : "textedit",
+        "position" : [120, 420, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "pscale" : {
+        "type" : "textedit",
+        "position" : [120, 465, -130, 0, 0, 0, 1.0, 0.0, 0.0, 0.0]
+      },
+      "search" : {
+        "type" : "text button",
+        "text" : ["eui_filter_search", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      },
+      "clear" : {
+        "type" : "text button",
+        "text" : ["eui_filter_clear", "0x000000ff"],
+        "position" : [0, 50, 0, 0, 0.5, 0, 0.0, 0.0, -0.5, 0.0]
+      }
+    }
+  },
+  "item lists" : {
+    "type list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "type_monster" : ["0x000000ff", 1],
+      "type_spell" : ["0x000000ff", 2],
+      "type_trap" : ["0x000000ff", 4],
+    },
+    "no type" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+    },
+    "monster types" : {
+      "eui_filter_na" : ["0x000000ff", 31458287],
+      "type_normal" : ["0x000000ff", 16],
+      "type_effect" : ["0x000000ff", 32],
+      "type_fusion" : ["0x000000ff", 64],
+      "type_ritual" : ["0x000000ff", 128],
+      "type_tuner" : ["0x000000ff", 4096],
+      "type_synchro" : ["0x000000ff", 8192],
+      "type_xyz" : ["0x000000ff", 8388608],
+      "type_pendulum" : ["0x000000ff", 16777216],
+      "type_flip" : ["0x000000ff", 2097152],
+      "type_dual" : ["0x000000ff", 2048],
+      "type_spirit" : ["0x000000ff", 512],
+      "type_union" : ["0x000000ff", 1024],
+      "type_toon" : ["0x000000ff", 4194304],
+    },
+    "spell types" : {
+      "eui_filter_na" : ["0x000000ff", 983170],
+      "type_normal" : ["0x000000ff", 2],
+      "type_ritual" : ["0x000000ff", 128],
+      "type_quickplay" : ["0x000000ff", 65536],
+      "type_continuous" : ["0x000000ff", 131072],
+      "type_equip" : ["0x000000ff", 262144],
+      "type_field" : ["0x000000ff", 524288],
+    },
+    "trap types" : {
+      "eui_filter_na" : ["0x000000ff", 1179652],
+      "type_normal" : ["0x000000ff", 4],
+      "type_continuous" : ["0x000000ff", 131072],
+      "type_counter" : ["0x000000ff", 1048576],
+    },
+    "limit list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "pool_limit0" : ["0x000000ff", 1],
+      "pool_limit1" : ["0x000000ff", 2],
+      "pool_limit2" : ["0x000000ff", 3],
+    },
+    "pool list" : {
+      "pool_all" : ["0x000000ff", 7],
+      "pool_ocg" : ["0x000000ff", 1],
+      "pool_tcg" : ["0x000000ff", 2],
+      "pool_kcg" : ["0x000000ff", 4],
+    },
+    "attribute list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "attribtue_earth" : ["0x000000ff", 1],
+      "attribtue_water" : ["0x000000ff", 2],
+      "attribtue_fire" : ["0x000000ff", 4],
+      "attribtue_wind" : ["0x000000ff", 8],
+      "attribtue_light" : ["0x000000ff", 16],
+      "attribtue_dark" : ["0x000000ff", 32],
+      "attribtue_divine" : ["0x000000ff", 64],
+    },
+    "race list" : {
+      "eui_filter_na" : ["0x000000ff", 0],
+      "race_warrior" : ["0x000000ff", 1],
+      "race_spellcaster" : ["0x000000ff", 2],
+      "race_fairy" : ["0x000000ff", 4],
+      "race_fiend" : ["0x000000ff", 8],
+      "race_zombie" : ["0x000000ff", 16],
+      "race_machine" : ["0x000000ff", 32],
+      "race_aqua" : ["0x000000ff", 64],
+      "race_pyro" : ["0x000000ff", 128],
+      "race_rock" : ["0x000000ff", 256],
+      "race_windbeast" : ["0x000000ff", 512],
+      "race_plant" : ["0x000000ff", 1024],
+      "race_insect" : ["0x000000ff", 2048],
+      "race_thunder" : ["0x000000ff", 4096],
+      "race_dragon" : ["0x000000ff", 8192],
+      "race_beast" : ["0x000000ff", 16384],
+      "race_beastwarrior" : ["0x000000ff", 32768],
+      "race_dinosaur" : ["0x000000ff", 65536],
+      "race_fish" : ["0x000000ff", 131072],
+      "race_seaserpent" : ["0x000000ff", 262144],
+      "race_reptile" : ["0x000000ff", 524288],
+      "race_psychic" : ["0x000000ff", 1048576],
+      "race_divine" : ["0x000000ff", 2097152],
+      "race_creatorgod" : ["0x000000ff", 4194304],
+      "race_phantomdragon" : ["0x000000ff", 8388608],
+    }
+  },
 }
