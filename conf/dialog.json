@@ -206,6 +206,22 @@
       }
     }
   },
+  "info dialog" : {
+    "type" : "panel",
+    "position" : [0, 0, 600, 400, 0.5, 0.5, 0.0, 0.0, -0.5, -0.5],
+    "children" : {
+      "card image" : {
+        "type" : "sprite",
+        "text" : "eui_filter_keyword",
+        "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "keyword label" : {
+        "type" : "label",
+        "text" : "eui_filter_keyword",
+        "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      }
+    }
+  },
   "item lists" : {
     "type list" : {
       "eui_filter_na" : ["0x000000ff", 0],
@@ -296,5 +312,5 @@
       "race_creatorgod" : ["0x000000ff", 4194304],
       "race_phantomdragon" : ["0x000000ff", 8388608],
     }
-  },
+  }
 }

@@ -504,7 +504,7 @@ namespace ygopro
     void FilterDialog::Show(v2i pos) {
         if(!window.expired())
             return;
-        auto wnd = LoadDialogAs<sgui::SGWindow>("filter dialog");
+        auto wnd = LoadDialogAs<sgui::SGPanel>("filter dialog");
         if(!wnd)
             return;
         window = wnd->CastPtr<sgui::SGWidgetContainer>();
@@ -726,13 +726,19 @@ namespace ygopro
     void InfoPanel::ShowInfo(uint32_t code, v2i pos, v2i sz) {
         if(this->code == code)
             return;
-        std::shared_ptr<sgui::SGWidgetContainer> wd = window.lock();
+        if(!window.expired())
+            return;
+        auto wnd = LoadDialogAs<sgui::SGPanel>("info dialog");
+        if(!wnd)
+            return;
+        window = wnd->CastPtr<sgui::SGWidgetContainer>();
+        
         int32_t ch = sz.y - 10;
         int32_t cw = (sz.y - 10) * 20 / 29;
         int32_t mw = sz.x - 20 - cw;
-        if(wd == nullptr) {
-            wd = sgui::SGPanel::Create(nullptr, pos, sz);
-            window = wd;
+        if(wnd == nullptr) {
+            wnd = sgui::SGPanel::Create(nullptr, pos, sz);
+            window = wnd;
             imageBox = sgui::SGSprite::Create(wd, {5, 5}, {cw, ch});
             misc = sgui::SGSprite::Create(wd, {cw + 10, 10}, {10, 10});
             cardName = sgui::SGLabel::Create(wd, {cw + 15, 10}, L"", mw);
