@@ -2786,6 +2786,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 8: {
 		card* target = core.msetable_cards[returns.ivalue[0] >> 16];
+		core.summon_cancelable = TRUE;
 		add_process(PROCESSOR_MSET, 0, 0, (group*)target, target->current.controler, 0);
 		core.units.begin()->step = -1;
 		return FALSE;

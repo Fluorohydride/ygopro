@@ -61,6 +61,7 @@ field::field(duel* pduel) {
 		core.opp_mzone[i] = 0;
 	core.summoning_card = 0;
 	core.summon_depth = 0;
+	core.summon_cancelable = FALSE;
 	core.chain_limit = 0;
 	core.chain_limit_p = 0;
 	core.chain_solving = FALSE;
