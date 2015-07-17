@@ -1210,14 +1210,16 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		uint32 adv = is_player_can_summon(SUMMON_TYPE_ADVANCE, sumplayer, target);
 		if(max == 0 || !adv) {
 			returns.bvalue[0] = 0;
+			core.units.begin()->step = 3;
 		} else {
 			core.release_cards.clear();
 			core.release_cards_ex.clear();
 			core.release_cards_ex_sum.clear();
 			int32 rcount = get_summon_release_list(target, &core.release_cards, &core.release_cards_ex, &core.release_cards_ex_sum);
-			if(rcount == 0)
+			if(rcount == 0) {
 				returns.bvalue[0] = 0;
-			else {
+				core.units.begin()->step = 3;
+			} else {
 				int32 fcount = get_useable_count(sumplayer, LOCATION_MZONE, sumplayer, LOCATION_REASON_TOFIELD);
 				if(min == 0 && (fcount > 0)) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, sumplayer, 90);
@@ -1245,7 +1247,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 				min = -core.temp_var[1] + 1;
 			}
 			core.temp_var[0] = min + (max << 16);
-			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer, core.temp_var[0]);
+			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, sumplayer + ((uint32)core.summon_cancelable << 16), core.temp_var[0]);
 		}
 		return FALSE;
 	}
@@ -1340,10 +1342,7 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 				(*cit)->current.reason_card = target;
 			target->set_material(tributes);
 			release(tributes, 0, REASON_SUMMON | REASON_MATERIAL, sumplayer);
-			if(tributes->size())
-				target->summon_info = SUMMON_TYPE_NORMAL | SUMMON_TYPE_ADVANCE | (LOCATION_HAND << 16);
-			else
-				target->summon_info = SUMMON_TYPE_NORMAL | (LOCATION_HAND << 16);
+			target->summon_info = SUMMON_TYPE_NORMAL | SUMMON_TYPE_ADVANCE | (LOCATION_HAND << 16);
 			delete tributes;
 			core.units.begin()->peffect = 0;
 			adjust_all();
@@ -1679,14 +1678,6 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		int32 res = target->filter_set_procedure(setplayer, &eset, ignore_count, min_tribute);
 		if((proc && res < 0) || res == -2)
 			return TRUE;
-		eset.clear();
-		target->filter_effect(EFFECT_MSET_COST, &eset);
-		for(int32 i = 0; i < eset.size(); ++i) {
-			if(eset[i]->operation) {
-				core.sub_solving_event.push_back(nil_event);
-				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, setplayer, 0);
-			}
-		}
 		return FALSE;
 	}
 	case 1: {
@@ -1725,61 +1716,99 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		int32 max = required >> 16;
 		if(min < min_tribute)
 			min = min_tribute;
+		required = min + (max << 16);
 		uint32 adv = is_player_can_mset(SUMMON_TYPE_ADVANCE, setplayer, target);
-		if(max == 0 || !adv)
+		if(max == 0 || !adv) {
 			returns.bvalue[0] = 0;
-		else {
+			core.units.begin()->step = 3;
+		} else {
 			core.release_cards.clear();
 			core.release_cards_ex.clear();
 			core.release_cards_ex_sum.clear();
 			int32 rcount = get_summon_release_list(target, &core.release_cards, &core.release_cards_ex, &core.release_cards_ex_sum);
-			if(rcount == 0)
+			if(rcount == 0) {
 				returns.bvalue[0] = 0;
-			else {
+				core.units.begin()->step = 3;
+			} else {
 				int32 fcount = get_useable_count(setplayer, LOCATION_MZONE, setplayer, LOCATION_REASON_TOFIELD);
 				if(min == 0 && fcount > 0) {
 					add_process(PROCESSOR_SELECT_YESNO, 0, 0, 0, setplayer, 90);
 					core.temp_var[0] = required;
 					core.temp_var[1] = fcount;
-					core.units.begin()->step = 9;
 				} else {
 					if(min < -fcount + 1) {
 						min = -fcount + 1;
 						required = min + (max << 16);
 					}
-					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, required);
+					add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer + ((uint32)core.summon_cancelable << 16), required);
+					core.units.begin()->step = 3;
 				}
 			}
 		}
 		return FALSE;
 	}
 	case 3: {
+		if(returns.ivalue[0])
+			returns.bvalue[0] = 0;
+		else {
+			int32 min = 1;
+			int32 max = core.temp_var[0] >> 16;
+			if(min < -core.temp_var[1] + 1) {
+				min = -core.temp_var[1] + 1;
+			}
+			core.temp_var[0] = min + (max << 16);
+			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer + ((uint32)core.summon_cancelable << 16), core.temp_var[0]);
+		}
+		return FALSE;
+	}
+	case 4: {
+		if(proc)
+			core.units.begin()->step = 5;
+		else {
+			if(returns.ivalue[0] == -1) {
+				return TRUE;
+			}
+			if(returns.bvalue[0]) {
+				card_set* tributes = new card_set;
+				for(int32 i = 0; i < returns.bvalue[0]; ++i)
+					tributes->insert(core.select_cards[returns.bvalue[i + 1]]);
+				core.units.begin()->peffect = (effect*)tributes;
+			}
+		}
+		effect_set eset;
+		target->filter_effect(EFFECT_MSET_COST, &eset);
+		for(int32 i = 0; i < eset.size(); ++i) {
+			if(eset[i]->operation) {
+				core.sub_solving_event.push_back(nil_event);
+				add_process(PROCESSOR_EXECUTE_OPERATION, 0, eset[i], 0, setplayer, 0);
+			}
+		}
+		return FALSE;
+	}
+	case 5: {
+		card_set* tributes = (card_set*)proc;
 		effect* pextra = 0;
 		if(!ignore_count && !core.extra_summon[setplayer])
 			pextra = target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
-		if(returns.bvalue[0]) {
-			card_set tributes;
-			for(int32 i = 0; i < returns.bvalue[0]; ++i) {
-				tributes.insert(core.select_cards[returns.bvalue[i + 1]]);
-				core.select_cards[returns.bvalue[i + 1]]->current.reason_card = target;
-			}
-			target->set_material(&tributes);
-			release(&tributes, 0, REASON_SUMMON | REASON_MATERIAL, setplayer);
-			if(tributes.size())
-				target->summon_info = SUMMON_TYPE_NORMAL | SUMMON_TYPE_ADVANCE | (LOCATION_HAND << 16);
-			else
-				target->summon_info = SUMMON_TYPE_NORMAL | (LOCATION_HAND << 16);
+		if(tributes) {
+			for(auto cit = tributes->begin(); cit != tributes->end(); ++cit)
+				(*cit)->current.reason_card = target;
+			target->set_material(tributes);
+			release(tributes, 0, REASON_SUMMON | REASON_MATERIAL, setplayer);
+			target->summon_info = SUMMON_TYPE_NORMAL | SUMMON_TYPE_ADVANCE | (LOCATION_HAND << 16);
+			delete tributes;
+			core.units.begin()->peffect = 0;
 			adjust_all();
 		} else
 			target->summon_info = SUMMON_TYPE_NORMAL | (LOCATION_HAND << 16);
 		target->summon_player = setplayer;
 		target->current.reason_effect = 0;
 		target->current.reason_player = setplayer;
-		core.units.begin()->step = 4;
+		core.units.begin()->step = 6;
 		core.temp_var[0] = (ptr)pextra;
 		return FALSE;
 	}
-	case 4: {
+	case 6: {
 		effect* pextra = 0;
 		if(!ignore_count && !core.extra_summon[setplayer])
 			pextra = target->is_affected_by_effect(EFFECT_EXTRA_SET_COUNT);
@@ -1793,7 +1822,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		core.temp_var[0] = (ptr)pextra;
 		return FALSE;
 	}
-	case 5: {
+	case 7: {
 		break_effect();
 		if(!ignore_count) {
 			returns.ivalue[0] = FALSE;
@@ -1810,7 +1839,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			returns.ivalue[0] = TRUE;
 		return FALSE;
 	}
-	case 6: {
+	case 8: {
 		if(!returns.ivalue[0])
 			core.summon_count[setplayer]++;
 		else if(core.temp_var[0]) {
@@ -1833,7 +1862,7 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		move_to_field(target, setplayer, targetplayer, LOCATION_MZONE, positions);
 		return FALSE;
 	}
-	case 7: {
+	case 9: {
 		uint8 targetplayer = target->current.controler;
 		if(target->owner != targetplayer)
 			set_control(target, targetplayer, 0, 0);
@@ -1856,21 +1885,6 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, FALSE);
 		}
 		return TRUE;
-	}
-	case 10: {
-		if(returns.ivalue[0])
-			returns.bvalue[0] = 0;
-		else {
-			int32 min = 1;
-			int32 max = core.temp_var[0] >> 16;
-			if(min < -core.temp_var[1] + 1) {
-				min = -core.temp_var[1] + 1;
-			}
-			core.temp_var[0] = min + (max << 16);
-			add_process(PROCESSOR_SELECT_TRIBUTE, 0, 0, 0, setplayer, core.temp_var[0]);
-		}
-		core.units.begin()->step = 2;
-		return false;
 	}
 	}
 	return TRUE;
