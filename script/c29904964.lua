@@ -37,7 +37,7 @@ function c29904964.ntcon(e,c,minc)
 		and Duel.GetFieldGroupCount(tp,0,LOCATION_MZONE)>Duel.GetFieldGroupCount(tp,LOCATION_MZONE,0)
 end
 function c29904964.spfilter(c,e,tp)
-	return c:IsSetCard(0xcd) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+	return c:IsSetCard(0xcf) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 		and not c:IsHasEffect(EFFECT_NECRO_VALLEY)
 end
 function c29904964.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -53,7 +53,7 @@ function c29904964.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c29904964.rlevel(e,rc)
 	local c=e:GetHandler()
-	if c:IsLocation(LOCATION_GRAVE) and not c:IsSetCard(0xcd) then
+	if c:IsLocation(LOCATION_GRAVE) and not c:IsSetCard(0xcf) then
 		return -1
 	else return c:GetLevel() end
 end
