@@ -208,8 +208,8 @@ struct processor {
 	effect_set_v extraz_effects;
 	effect_set_v extraz_effects_e;
 	std::set<effect*> reseted_effects;
-	effect_vector delayed_tp;
-	effect_vector delayed_ntp;
+	std::list<effect*> delayed_tp;
+	std::list<effect*> delayed_ntp;
 	event_list delayed_tev;
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
@@ -228,6 +228,7 @@ struct processor {
 	int32 chain_limit_p;
 	uint8 chain_limp_p;
 	uint8 chain_solving;
+	uint8 conti_solving;
 	uint8 win_player;
 	uint8 win_reason;
 	uint8 re_adjust;
@@ -284,6 +285,7 @@ struct processor {
 	uint8 battle_phase_action;
 	uint32 hint_timing[2];
 	uint8 current_player;
+	uint8 conti_player;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > normalsummon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > spsummon_counter;
