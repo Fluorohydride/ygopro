@@ -1022,7 +1022,7 @@ int32 field::control_adjust(uint16 step) {
 	};
 	case 5: {
 		if(core.destroy_set.size())
-			send_to(&core.destroy_set, 0, REASON_RULE, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
+			destroy(&core.destroy_set, 0, REASON_RULE, PLAYER_NONE);
 		return TRUE;
 	}
 	}
