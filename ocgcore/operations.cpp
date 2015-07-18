@@ -2454,6 +2454,7 @@ int32 field::special_summon_step(uint16 step, group * targets, card * target) {
 		returns.ivalue[0] = TRUE;
 		if(target->owner != target->current.controler)
 			set_control(target, target->current.controler, 0, 0);
+		target->set_status(STATUS_SPSUMMON_STEP, TRUE);
 		return TRUE;
 	}
 	}
@@ -2512,6 +2513,7 @@ int32 field::special_summon(uint16 step, effect * reason_effect, uint8 reason_pl
 		for(auto cit = spsummon_once_set[1].begin(); cit != spsummon_once_set[1].end(); ++cit)
 			core.spsummon_once_map[1][*cit]++;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
+			(*cit)->set_status(STATUS_SPSUMMON_STEP, FALSE);
 			(*cit)->set_status(STATUS_SUMMON_TURN, TRUE);
 			if((*cit)->is_position(POS_FACEUP))
 				(*cit)->enable_field_effect(TRUE);
@@ -3616,7 +3618,6 @@ int32 field::move_to_field(uint16 step, card * target, uint32 enable, uint32 ret
 				target->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
 				target->set_status(STATUS_SET_TURN, FALSE);
 				target->set_status(STATUS_FORM_CHANGED, FALSE);
-				target->set_status(STATUS_ATTACKED, FALSE);
 			}
 		}
 		target->temp.sequence = seq;

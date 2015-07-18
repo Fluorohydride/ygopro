@@ -934,8 +934,9 @@ int32 field::filter_matching_card(int32 findex, uint8 self, uint32 location1, ui
 		if(location & LOCATION_MZONE) {
 			for(uint32 i = 0; i < 5; ++i) {
 				pcard = player[self].list_mzone[i];
-				if(pcard && !pcard->is_status(STATUS_SUMMONING) && !pcard->is_status(STATUS_SUMMON_DISABLED) && pcard != pexception
-				        && pduel->lua->check_matching(pcard, findex, extraargs) && (!is_target || pcard->is_capable_be_effect_target(core.reason_effect, core.reason_player))) {
+				if(pcard && !pcard->is_status(STATUS_SUMMONING) && !pcard->is_status(STATUS_SUMMON_DISABLED) && !pcard->is_status(STATUS_SPSUMMON_STEP) 
+						&& pcard != pexception && pduel->lua->check_matching(pcard, findex, extraargs) 
+						&& (!is_target || pcard->is_capable_be_effect_target(core.reason_effect, core.reason_player))) {
 					if(pret) {
 						*pret = pcard;
 						return TRUE;
