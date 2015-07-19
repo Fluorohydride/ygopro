@@ -1310,6 +1310,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					mainGame->HideElement(mainGame->wQuery, true);
 					break;
 				}
+				break;
 			}
 			case MSG_SELECT_SUM: {
 				if(mainGame->wQuery->isVisible()) {
