@@ -110,9 +110,13 @@ function c10000080.retcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c10000080.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetOwner()
-	if c:GetControler()~=c:GetOwner() then
-		Duel.GetControl(c,c:GetOwner())
-	end
+	c:ResetEffect(EFFECT_SET_CONTROL,RESET_CODE)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_CONTROL)
+	e1:SetValue(c:GetOwner())
+	e1:SetReset(RESET_EVENT+0xec0000)
+	c:RegisterEffect(e1)
 end
 function c10000080.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsReleasable() end
