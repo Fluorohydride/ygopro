@@ -2737,7 +2737,7 @@ int32 field::destroy(uint16 step, group * targets, effect * reason_effect, uint3
 		auto pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, sendtargets, 0, 0);
-		add_process(PROCESSOR_SENDTO, 1, reason_effect, sendtargets, reason + REASON_DESTROY, reason_player);
+		add_process(PROCESSOR_SENDTO, 1, reason_effect, sendtargets, reason | REASON_DESTROY, reason_player);
 		return FALSE;
 	}
 	case 5: {
@@ -2919,7 +2919,7 @@ int32 field::release(uint16 step, group * targets, effect * reason_effect, uint3
 		auto pr = effects.continuous_effect.equal_range(EFFECT_SEND_REPLACE);
 		for (; pr.first != pr.second; ++pr.first)
 			add_process(PROCESSOR_OPERATION_REPLACE, 5, pr.first->second, sendtargets, 0, 0);
-		add_process(PROCESSOR_SENDTO, 1, reason_effect, sendtargets, reason + REASON_RELEASE, reason_player);
+		add_process(PROCESSOR_SENDTO, 1, reason_effect, sendtargets, reason | REASON_RELEASE, reason_player);
 		return FALSE;
 	}
 	case 4: {
