@@ -40,17 +40,20 @@ function c45627618.initial_effect(c)
 	c:RegisterEffect(e4)
 end
 c45627618.pendulum_level=7
+function c45627618.pcfilter(c)
+	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
+end
 function c45627618.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local seq=e:GetHandler():GetSequence()
 	if chk==0 then return Duel.CheckLocation(tp,LOCATION_SZONE,13-seq)
-		and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_DECK,0,1,nil,TYPE_PENDULUM) end
+		and Duel.IsExistingMatchingCard(c45627618.pcfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c45627618.pcop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local seq=e:GetHandler():GetSequence()
 	if not Duel.CheckLocation(tp,LOCATION_SZONE,13-seq) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK,0,1,1,nil,TYPE_PENDULUM)
+	local g=Duel.SelectMatchingCard(tp,c45627618.pcfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
