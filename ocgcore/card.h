@@ -199,6 +199,7 @@ public:
 	void cancel_card_target(card* pcard);
 	
 	void filter_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
+	void filter_single_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_single_continuous_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_immune_effect();
 	void filter_disable_related_cards();

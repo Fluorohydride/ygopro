@@ -371,7 +371,7 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 	add_card(playerid, pcard, location, sequence);
 }
 void field::set_control(card* pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count) {
-	if(core.remove_brainwashing || pcard->refresh_control_status() == playerid)
+	if((core.remove_brainwashing && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) || pcard->refresh_control_status() == playerid)
 		return;
 	effect* peffect = pduel->new_effect();
 	if(core.reason_effect)

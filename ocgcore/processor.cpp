@@ -5221,6 +5221,34 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 4: {
+		//remove brainwashing
+		effect_set eset;
+		uint32 res = 0;
+		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
+			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
+			res = eset.size() ? TRUE : FALSE;
+			if(res) {
+				card* pcard;
+				effect_set ctrleff;
+				for(uint8 p = 0; p < 2; ++p) {
+					for(uint8 i = 0; i < 5; ++i) {
+						pcard = player[p].list_mzone[i];
+						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) {
+							ctrleff.clear();
+							pcard->filter_single_effect(EFFECT_SET_CONTROL, &ctrleff, FALSE);
+							for(int32 i = 0; i < ctrleff.size(); ++i) {
+								pcard->remove_effect(ctrleff[i]);
+								core.re_adjust = TRUE;
+							}
+						}
+					}
+				}
+			}
+			core.remove_brainwashing = res;
+		}
+		return FALSE;
+	}
+	case 5: {
 		//1-4 control
 		card* pcard;
 		uint8 cur, ref;
@@ -5243,9 +5271,6 @@ int32 field::adjust_step(uint16 step) {
 			add_process(PROCESSOR_CONTROL_ADJUST, 0, 0, 0, 0, 0);
 		}
 		core.units.begin()->step = 7;
-		return FALSE;
-	}
-	case 5: {
 		return FALSE;
 	}
 	case 6: {
@@ -5346,7 +5371,7 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 13: {
-		//reverse_deck && remove brainwashing
+		//reverse_deck
 		effect_set eset;
 		uint32 res = 0;
 		if(core.global_flag & GLOBALFLAG_DECK_REVERSE_CHECK) {
@@ -5380,25 +5405,6 @@ int32 field::adjust_step(uint16 step) {
 				}
 			}
 			core.deck_reversed = res;
-			eset.clear();
-		}
-		if(core.global_flag & GLOBALFLAG_BRAINWASHING_CHECK) {
-			filter_field_effect(EFFECT_REMOVE_BRAINWASHING, &eset, FALSE);
-			res = eset.size() ? TRUE : FALSE;
-			if(res && !core.remove_brainwashing) {
-				for(int i = 0; i < 5; ++i) {
-					card* pcard = player[0].list_mzone[i];
-					if(pcard)
-						pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-				}
-				for(int i = 0; i < 5; ++i) {
-					card* pcard = player[1].list_mzone[i];
-					if(pcard)
-						pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-				}
-				core.re_adjust = TRUE;
-			}
-			core.remove_brainwashing = res;
 		}
 		return FALSE;
 	}

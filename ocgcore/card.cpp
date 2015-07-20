@@ -1272,7 +1272,7 @@ int32 card::refresh_disable_status() {
 }
 uint8 card::refresh_control_status() {
 	uint8 final = owner;
-	if(pduel->game_field->core.remove_brainwashing)
+	if(pduel->game_field->core.remove_brainwashing && is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING))
 		return final;
 	effect_set eset;
 	filter_effect(EFFECT_SET_CONTROL, &eset);
@@ -1468,6 +1468,17 @@ void card::filter_effect(int32 code, effect_set* eset, uint8 sort) {
 		peffect = rg.first->second;
 		if (!(peffect->flag & EFFECT_FLAG_PLAYER_TARGET) && peffect->is_available()
 		        && peffect->is_target(this) && is_affect_by_effect(peffect))
+			eset->add_item(peffect);
+	}
+	if(sort)
+		eset->sort();
+}
+void card::filter_single_effect(int32 code, effect_set* eset, uint8 sort) {
+	effect* peffect;
+	auto rg = single_effect.equal_range(code);
+	for (; rg.first != rg.second; ++rg.first) {
+		peffect = rg.first->second;
+		if (peffect->is_available() && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE))
 			eset->add_item(peffect);
 	}
 	if(sort)
