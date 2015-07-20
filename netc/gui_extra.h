@@ -70,35 +70,36 @@ namespace ygopro
         
     protected:
         std::function<void (const FilterCondition&, int32_t)> cbOK;
-        std::weak_ptr<sgui::SGTextEdit> keyword;
-        std::weak_ptr<sgui::SGComboBox> arctype;
-        std::weak_ptr<sgui::SGComboBox> subtype;
-        std::weak_ptr<sgui::SGComboBox> limit_type;
-        std::weak_ptr<sgui::SGComboBox> pool_type;
-        std::weak_ptr<sgui::SGComboBox> attribute;
-        std::weak_ptr<sgui::SGComboBox> race;
-        std::weak_ptr<sgui::SGTextEdit> attack;
-        std::weak_ptr<sgui::SGTextEdit> defence;
-        std::weak_ptr<sgui::SGTextEdit> star;
-        std::weak_ptr<sgui::SGTextEdit> scale;
+        sgui::SGTextEdit* keyword = nullptr;
+        sgui::SGComboBox* arctype = nullptr;
+        sgui::SGComboBox* subtype = nullptr;
+        sgui::SGComboBox* limit_type = nullptr;
+        sgui::SGComboBox* pool_type = nullptr;
+        sgui::SGComboBox* attribute = nullptr;
+        sgui::SGComboBox* race = nullptr;
+        sgui::SGTextEdit* attack = nullptr;
+        sgui::SGTextEdit* defence = nullptr;
+        sgui::SGTextEdit* star = nullptr;
+        sgui::SGTextEdit* scale = nullptr;
         std::wstring con_text[5];
         int32_t sel[6] = {0};
     };
 
     class InfoPanel : public CommonDialog {
     public:
-        void ShowInfo(uint32_t code, v2i pos, v2i sz);
+        void ShowInfo(uint32_t code, v2i pos);
         void Destroy();
         
     protected:
         uint32_t code = 0;
-        std::weak_ptr<sgui::SGImage> imageBox;
-        std::weak_ptr<sgui::SGImage> misc;
-        std::weak_ptr<sgui::SGLabel> cardName;
-        std::weak_ptr<sgui::SGLabel> penText;
-        std::weak_ptr<sgui::SGLabel> cardText;
-        std::weak_ptr<sgui::SGLabel> adText;
-        std::weak_ptr<sgui::SGLabel> extraText;
+        sgui::SGImage* card_image = nullptr;
+        sgui::SGLabel* card_name = nullptr;
+        sgui::SGLabel* info_text = nullptr;
+        sgui::SGLabel* pen_text = nullptr;
+        sgui::SGLabel* card_text = nullptr;        
+        sgui::SGLabel* ad_text = nullptr;
+        sgui::SGLabel* extra_text = nullptr;
+        sgui::SGImage* misc = nullptr;
     };
 }
 

@@ -49,6 +49,10 @@ int32_t main(int32_t argc, char* argv[]) {
         jsonfile.Load(FileSystem::UTF8ToLocalFilename(commonCfg["textures_conf"].to_string()));
         if(!textureCfg.parse(jsonfile.Data(), jsonfile.Length()))
             return 0;
+        stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
+            std::wstring setname = To<std::wstring>(name);
+            DataMgr::Get().RegisterSetCode(To<uint32_t>(node.to_string()), setname);
+        });
     }
     int32_t width = (int32_t)commonCfg["window_width"].to_integer();
     int32_t height = (int32_t)commonCfg["window_height"].to_integer();;
@@ -98,10 +102,6 @@ int32_t main(int32_t argc, char* argv[]) {
     }
     LimitRegulationMgr::Get().LoadLimitRegulation(FileSystem::UTF8ToLocalFilename(commonCfg["limit_regulation"].to_string()),
                                                   To<std::wstring>(stringCfg["eui_list_default"].to_string()));
-    stringCfg["setname"].for_each([](const std::string& name, jaweson::JsonNode<>& node) {
-        std::wstring setname = To<std::wstring>(name);
-        DataMgr::Get().RegisterSetCode(To<uint32_t>(node.to_string()), setname);
-    });
     
     SceneMgr::Get().Init();
     SceneMgr::Get().SetSceneSize({bwidth, bheight});

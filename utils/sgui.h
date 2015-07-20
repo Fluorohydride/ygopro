@@ -245,14 +245,56 @@ namespace sgui
         uint32_t color = 0xffffffff;
     };
     
+    struct UIVertex {
+        v2i offset = {0, 0};
+        v2f prop = {0.0f, 0.0f};
+        v2i texcoord = {0, 0};
+        uint32_t color = 0xffffffff;
+    };
+    
+    class UISpriteVerts {
+    public:
+        inline UISpriteVerts& Offset(recti pos) {
+            verts[0].offset = {pos.left, pos.top};
+            verts[1].offset = {pos.left + pos.width, pos.top};
+            verts[2].offset = {pos.left, pos.top + pos.height};
+            verts[3].offset = {pos.left + pos.width, pos.top + pos.height};
+        }
+        
+        inline UISpriteVerts& Proportion(rectf prop) {
+            verts[0].prop = {prop.left, prop.top};
+            verts[1].prop = {prop.left + prop.width, prop.top};
+            verts[2].prop = {prop.left, prop.top + prop.height};
+            verts[3].prop = {prop.left + prop.width, prop.top + prop.height};
+        }
+        
+        inline UISpriteVerts& Texcoord(recti tex) {
+            verts[0].texcoord = {tex.left, tex.top};
+            verts[1].texcoord = {tex.left + tex.width, tex.top};
+            verts[2].texcoord = {tex.left, tex.top + tex.height};
+            verts[3].texcoord = {tex.left + tex.width, tex.top + tex.height};
+            
+        }
+        
+        inline UISpriteVerts& Texcoord(texi4 tex) {
+            verts[0].texcoord = tex.vert[0];
+            verts[1].texcoord = tex.vert[1];
+            verts[2].texcoord = tex.vert[2];
+            verts[3].texcoord = tex.vert[3];
+        }
+        
+        inline UISpriteVerts& Color(uint32_t cl) {
+            verts[0].color = verts[1].color = verts[2].color = verts[3].color = cl;
+        }
+        
+        inline const UIVertex* GetVertPtr() { return verts; }
+        
+    protected:
+        UIVertex verts[4];
+    };
+    
     class UIVertexList : public UIComponent {
     public:
-        struct UIVertex {
-            v2i offset = {0, 0};
-            v2f prop = {0.0f, 0.0f};
-            v2i texcoord = {0, 0};
-            uint32_t color = 0xffffffff;
-        };
         
         virtual bool CheckAvailable() { return texture != nullptr; }
         virtual int32_t GetTextureId() { return texture ? texture->GetTextureId() : 0; }
@@ -345,18 +387,7 @@ namespace sgui
         }
         
         void AddSprite(UIVertex* v) {
-            auto cur_size = points.size() / 4;
-            if(cur_size == capacity) {
-                if(cur_size == 0)
-                    capacity = 8;
-                else
-                    capacity = capacity * 1.5;
-                vertices.resize(capacity * 4);
-                indices.resize(capacity * 6);
-                points.resize(capacity * 4);
-                SetRedraw(true);
-            } else
-                SetUpdate();
+            CheckCapacity(1);
             points.insert(points.end(), v, v + 4);
         }
         
@@ -373,6 +404,23 @@ namespace sgui
             for(int32_t i = 0; i < 4; ++i)
                 points[index * 4 + i].color = color;
             SetUpdate();
+        }
+        
+        void CheckCapacity(int32_t inc) {
+            auto cur_size = points.size() / 4;
+            if(cur_size + inc > capacity) {
+                while(cur_size + inc > capacity) {
+                    if(cur_size == 0)
+                        capacity = 8;
+                    else
+                        capacity = capacity * 1.5;
+                }
+                vertices.resize(capacity * 4);
+                indices.resize(capacity * 6);
+                points.resize(capacity * 4);
+                SetRedraw(true);
+            } else
+                SetUpdate();
         }
         
         inline int32_t GetCapacity() { return capacity; }
@@ -409,7 +457,7 @@ namespace sgui
                 v[i].color = color;
         }
         
-        inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(true); }
+        inline void SetTexture(base::Texture* tex) { if(texture == tex) return; texture = tex; SetRedraw(true); }
         inline void SetTextureRect(recti rct) { tex_rect = rct; SetUpdate(); }
     protected:
         recti tex_rect = {0, 0, 0, 0};
@@ -1431,6 +1479,14 @@ namespace sgui
         int64_t animation_ver = 0;
     };
     
+    class SGCommonUISpriteList: public SGCommonUIWidget<UISpriteList> {
+    public:
+        virtual void InitUIComponentsExtra(jaweson::JsonNode<>& node) {
+            common_ui->SetPositionSize({0, 0}, {0, 0}, {0.0f, 0.0f}, {1.0f, 1.0f});
+        }
+        inline UISpriteList* GetSpriteUI() { return common_ui; }
+    };
+    
     class SGCommonUIText : public SGCommonUIWidget<UIText> {
     public:
         virtual void InitUIComponentsExtra(jaweson::JsonNode<>& node) {
@@ -1509,6 +1565,15 @@ namespace sgui
             InitUIComponentsExtra(image_node);
         }
         
+    };
+    
+    class SGImageList : public SGCommonUISpriteList {
+    public:
+        SGImageList() { allow_focus = false; }
+        
+        virtual void InitUIComponents() {
+            SGCommonUISpriteList::InitUIComponents();
+        }
     };
     
     const static int32_t STATUS_NORMAL = 0;
@@ -2637,7 +2702,7 @@ namespace sgui
         }
         
         void UpdateBackTex() {
-            std::array<UIVertexList::UIVertex, 4> v;
+            std::array<UIVertex, 4> v;
             auto back_surface = static_cast<UISpriteList*>(ui_components[1]);
             for(int32_t i = 0; i < back_surface->GetCapacity(); ++i) {
                 auto item_color = ((i + item_begin) == selection) ? color[2] : ((i + item_begin) % 2) ? color[0] : color[1];
@@ -2649,7 +2714,7 @@ namespace sgui
             back_surface->SetPositionSizeR({bounds.left, back_offset}, {-bounds.left - bounds.width, item_count * item_height});
         }
         
-        void UpdateBackSprite(int32_t index, int32_t bcolor, UIVertexList::UIVertex* v) {
+        void UpdateBackSprite(int32_t index, int32_t bcolor, UIVertex* v) {
             v[0].offset = {0, item_height * index};
             v[0].prop = {0.0f, 0.0f};
             v[0].texcoord = {sel_tex.left, sel_tex.top},

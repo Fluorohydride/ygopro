@@ -212,7 +212,6 @@
     "children" : {
       "card image" : {
         "type" : "sprite",
-        "text" : "eui_filter_keyword",
         "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
       "keyword label" : {

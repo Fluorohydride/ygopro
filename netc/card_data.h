@@ -69,7 +69,7 @@ namespace ygopro
         
         uint32_t GetSetCode(const std::wstring& name) {
             auto iter = _setnames.find(name);
-            if(iter == _setcodes.end())
+            if(iter == _setnames.end())
                 return 0;
             return iter->second;
         }

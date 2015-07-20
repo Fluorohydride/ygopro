@@ -508,93 +508,70 @@ namespace ygopro
         if(!wnd)
             return;
         window = wnd->CastPtr<sgui::SGWidgetContainer>();
-        
-        auto pkeyword = wnd->FindWidgetAs<sgui::SGTextEdit>("keyword");
-        if(pkeyword)
-            keyword = pkeyword->CastPtr<sgui::SGTextEdit>();
-        
-        auto ptype1 = wnd->FindWidgetAs<sgui::SGComboBox>("arctype");
-        auto ptype2 = wnd->FindWidgetAs<sgui::SGComboBox>("subtype");
-        if(ptype1 && ptype2) {
-            arctype = ptype1->CastPtr<sgui::SGComboBox>();
-            subtype = ptype2->CastPtr<sgui::SGComboBox>();
-            ptype1->event_sel_change += [ptype2](sgui::SGWidget& sender, int32_t index)->bool {
-                ptype2->ClearItems();
-                if(index == 0) {
-                    LoadItemList(ptype2, dialogCfg["no type"]);
-                } else if(index == 1) {
-                    LoadItemList(ptype2, dialogCfg["monster types"]);
-                } else if(index == 2) {
-                    LoadItemList(ptype2, dialogCfg["spell types"]);
-                } else {
-                    LoadItemList(ptype2, dialogCfg["trap types"]);
-                }
-                ptype2->SetSelection(0);
-                return true;
-            };
-        }
-        auto plimit = wnd->FindWidgetAs<sgui::SGComboBox>("limit");
-        if(plimit)
-            limit_type = plimit->CastPtr<sgui::SGComboBox>();
-        auto ppool = wnd->FindWidgetAs<sgui::SGComboBox>("limit");
-        if(ppool)
-            pool_type = ppool->CastPtr<sgui::SGComboBox>();
-        auto pattribute = wnd->FindWidgetAs<sgui::SGComboBox>("attribute");
-        if(pattribute)
-            attribute = pattribute->CastPtr<sgui::SGComboBox>();
-        auto prace = wnd->FindWidgetAs<sgui::SGComboBox>("race");
-        if(prace)
-            race = prace->CastPtr<sgui::SGComboBox>();
-        auto pattack = wnd->FindWidgetAs<sgui::SGTextEdit>("attack");
-        if(pattack)
-            attack = pattack->CastPtr<sgui::SGTextEdit>();
-        auto pdefence = wnd->FindWidgetAs<sgui::SGTextEdit>("defence");
-        if(pdefence)
-            defence = pdefence->CastPtr<sgui::SGTextEdit>();
-        auto pstar = wnd->FindWidgetAs<sgui::SGTextEdit>("star");
-        if(pstar)
-            star = pstar->CastPtr<sgui::SGTextEdit>();
-        auto pscale = wnd->FindWidgetAs<sgui::SGTextEdit>("pscale");
-        if(pscale)
-            scale = pscale->CastPtr<sgui::SGTextEdit>();
-        
+        keyword = wnd->FindWidgetAs<sgui::SGTextEdit>("keyword");
+        arctype = wnd->FindWidgetAs<sgui::SGComboBox>("arctype");
+        subtype = wnd->FindWidgetAs<sgui::SGComboBox>("subtype");
+        limit_type = wnd->FindWidgetAs<sgui::SGComboBox>("limit");
+        pool_type = wnd->FindWidgetAs<sgui::SGComboBox>("pool");
+        attribute = wnd->FindWidgetAs<sgui::SGComboBox>("attribute");
+        race = wnd->FindWidgetAs<sgui::SGComboBox>("race");
+        attack = wnd->FindWidgetAs<sgui::SGTextEdit>("attack");
+        defence = wnd->FindWidgetAs<sgui::SGTextEdit>("defence");
+        star = wnd->FindWidgetAs<sgui::SGTextEdit>("star");
+        scale = wnd->FindWidgetAs<sgui::SGTextEdit>("pscale");
         auto sch = wnd->FindWidgetAs<sgui::SGTextButton>("search");
         auto clr = wnd->FindWidgetAs<sgui::SGTextButton>("clear");
         if(sch)
             sch->event_click += [this](sgui::SGWidget& sender)->bool { BeginSearch(); return true; };
         if(clr)
             clr->event_click += [this](sgui::SGWidget& sender)->bool { ClearCondition(); return true; };
-        
-        pkeyword->SetFocus();
 
         sgui::SGGUIRoot::GetSingleton().PopupObject(wnd->shared_from_this());
-        if(pkeyword)
-            pkeyword->GetTextUI()->SetText(con_text[0], 0xff000000);
-        if(pattack)
-            pattack->GetTextUI()->SetText(con_text[1], 0xff000000);
-        if(pdefence)
-            pdefence->GetTextUI()->SetText(con_text[1], 0xff000000);
-        if(pstar)
-            pstar->GetTextUI()->SetText(con_text[1], 0xff000000);
-        if(pscale)
-            pscale->GetTextUI()->SetText(con_text[1], 0xff000000);
-        if(ptype1)
-            ptype1->SetSelection(sel[0]);
-        if(ptype2)
-            ptype2->SetSelection(sel[1]);
-        if(plimit)
-            plimit->SetSelection(sel[2]);
-        if(ppool)
-            ppool->SetSelection(sel[3]);
-        if(pattribute)
-            pattribute->SetSelection(sel[4]);
-        if(prace)
-            prace->SetSelection(sel[5]);
+        if(keyword) {
+            keyword->SetFocus();
+            keyword->GetTextUI()->SetText(con_text[0], 0xff000000);
+        }
+        if(attack)
+            attack->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(defence)
+            defence->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(star)
+            star->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(scale)
+            scale->GetTextUI()->SetText(con_text[1], 0xff000000);
+        if(arctype)
+            arctype->SetSelection(sel[0]);
+        if(subtype)
+            subtype->SetSelection(sel[1]);
+        if(arctype && subtype) {
+            arctype->event_sel_change += [this](sgui::SGWidget& sender, int32_t index)->bool {
+                subtype->ClearItems();
+                if(index == 0) {
+                    LoadItemList(subtype, dialogCfg["no type"]);
+                } else if(index == 1) {
+                    LoadItemList(subtype, dialogCfg["monster types"]);
+                } else if(index == 2) {
+                    LoadItemList(subtype, dialogCfg["spell types"]);
+                } else {
+                    LoadItemList(subtype, dialogCfg["trap types"]);
+                }
+                subtype->SetSelection(0);
+                return true;
+            };
+        }
+        if(limit_type)
+            limit_type->SetSelection(sel[2]);
+        if(pool_type)
+            pool_type->SetSelection(sel[3]);
+        if(attribute)
+            attribute->SetSelection(sel[4]);
+        if(race)
+            race->SetSelection(sel[5]);
     }
     
     void FilterDialog::BeginSearch() {
         FilterCondition fc;
-        std::wstring keystr = keyword.expired() ? L"" : keyword.lock()->GetTextUI()->GetText();
+        std::wstring keystr = keyword? L"" : keyword->GetTextUI()->GetText();
         con_text[0] = keystr;
         Tokenizer<wchar_t> tokens(keystr, L" ");
         for(size_t i = 0; i < tokens.size(); ++i) {
@@ -616,32 +593,32 @@ namespace ygopro
                     fc.keywords.push_back(sep_keyword);
             }
         }
-        if(!arctype.expired()) {
-            sel[0] = arctype.lock()->GetSelection();
-            fc.type = arctype.lock()->GetItemCustomValue(sel[0]);
+        if(arctype) {
+            sel[0] = arctype->GetSelection();
+            fc.type = arctype->GetItemCustomValue(sel[0]);
         }
-        if(!subtype.expired()) {
-            sel[1] = subtype.lock()->GetSelection();
-            fc.subtype = subtype.lock()->GetItemCustomValue(sel[1]);
+        if(subtype) {
+            sel[1] = subtype->GetSelection();
+            fc.subtype = subtype->GetItemCustomValue(sel[1]);
         }
-        if(!limit_type.expired()) {
-            sel[2] = limit_type.lock()->GetSelection();
+        if(limit_type) {
+            sel[2] = limit_type->GetSelection();
         }
-        if(!pool_type.expired()) {
-            sel[3] = pool_type.lock()->GetSelection();
-            fc.pool = pool_type.lock()->GetItemCustomValue(sel[3]);
+        if(pool_type) {
+            sel[3] = pool_type->GetSelection();
+            fc.pool = pool_type->GetItemCustomValue(sel[3]);
         }
         if((fc.type == 0) || (fc.type == 0x1)) {
-            if(!attribute.expired()) {
-                sel[4] = attribute.lock()->GetSelection();
-                fc.attribute = attribute.lock()->GetItemCustomValue(sel[4]);
+            if(attribute) {
+                sel[4] = attribute->GetSelection();
+                fc.attribute = attribute->GetItemCustomValue(sel[4]);
             }
-            if(!race.expired()) {
-                sel[4] = race.lock()->GetSelection();
-                fc.race = race.lock()->GetItemCustomValue(sel[4]);
+            if(race) {
+                sel[4] = race->GetSelection();
+                fc.race = race->GetItemCustomValue(sel[4]);
             }
-            if(!attack.expired()) {
-                auto t1 = ParseValue(attack.lock()->GetTextUI()->GetText());
+            if(attack) {
+                auto t1 = ParseValue(attack->GetTextUI()->GetText());
                 switch(std::get<0>(t1)) {
                     case 0: break;
                     case 1: fc.atkmin = fc.atkmax = -2; break;
@@ -650,8 +627,8 @@ namespace ygopro
                     default: break;
                 }
             }
-            if(!defence.expired()) {
-                auto t2 = ParseValue(defence.lock()->GetTextUI()->GetText());
+            if(defence) {
+                auto t2 = ParseValue(defence->GetTextUI()->GetText());
                 switch(std::get<0>(t2)) {
                     case 0: break;
                     case 1: fc.defmin = fc.defmax = -2; break;
@@ -660,8 +637,8 @@ namespace ygopro
                     default: break;
                 }
             }
-            if(!star.expired()) {
-                auto t3 = ParseValue(star.lock()->GetTextUI()->GetText());
+            if(star) {
+                auto t3 = ParseValue(star->GetTextUI()->GetText());
                 switch(std::get<0>(t3)) {
                     case 0: case 1: break;
                     case 2: fc.lvmin = fc.lvmax = std::get<1>(t3); break;
@@ -669,8 +646,8 @@ namespace ygopro
                     default: break;
                 }
             }
-            if(!scale.expired()) {
-                auto t4 = ParseValue(star.lock()->GetTextUI()->GetText());
+            if(scale) {
+                auto t4 = ParseValue(scale->GetTextUI()->GetText());
                 switch(std::get<0>(t4)) {
                     case 0: case 1: break;
                     case 2: fc.scalemin = fc.scalemax = std::get<1>(t4); break;
@@ -684,16 +661,28 @@ namespace ygopro
     }
     
     void FilterDialog::ClearCondition() {
-        keyword.lock()->GetTextUI()->Clear();
-        attack.lock()->GetTextUI()->Clear();
-        defence.lock()->GetTextUI()->Clear();
-        star.lock()->GetTextUI()->Clear();
-        arctype.lock()->SetSelection(0);
-        subtype.lock()->SetSelection(0);
-        limit_type.lock()->SetSelection(0);
-        pool_type.lock()->SetSelection(0);
-        attribute.lock()->SetSelection(0);
-        race.lock()->SetSelection(0);
+        if(keyword)
+            keyword->GetTextUI()->Clear();
+        if(attack)
+            attack->GetTextUI()->Clear();
+        if(defence)
+            defence->GetTextUI()->Clear();
+        if(star)
+            star->GetTextUI()->Clear();
+        if(scale)
+            scale->GetTextUI()->Clear();
+        if(arctype)
+            arctype->SetSelection(0);
+        if(subtype)
+            subtype->SetSelection(0);
+        if(limit_type)
+            limit_type->SetSelection(0);
+        if(pool_type)
+            pool_type->SetSelection(0);
+        if(attribute)
+            attribute->SetSelection(0);
+        if(race)
+            race->SetSelection(0);
         for(int32_t i = 0; i < 5; ++i)
             con_text[i].clear();
         for(int32_t i = 0; i < 6; ++i)
@@ -723,83 +712,75 @@ namespace ygopro
         return v;
     }
 	
-    void InfoPanel::ShowInfo(uint32_t code, v2i pos, v2i sz) {
+    void InfoPanel::ShowInfo(uint32_t code, v2i pos) {
         if(this->code == code)
             return;
-        if(!window.expired())
-            return;
-        auto wnd = LoadDialogAs<sgui::SGPanel>("info dialog");
-        if(!wnd)
-            return;
-        window = wnd->CastPtr<sgui::SGWidgetContainer>();
-        
-        int32_t ch = sz.y - 10;
-        int32_t cw = (sz.y - 10) * 20 / 29;
-        int32_t mw = sz.x - 20 - cw;
-        if(wnd == nullptr) {
-            wnd = sgui::SGPanel::Create(nullptr, pos, sz);
-            window = wnd;
-            imageBox = sgui::SGSprite::Create(wd, {5, 5}, {cw, ch});
-            misc = sgui::SGSprite::Create(wd, {cw + 10, 10}, {10, 10});
-            cardName = sgui::SGLabel::Create(wd, {cw + 15, 10}, L"", mw);
-            penText = sgui::SGLabel::Create(wd, {cw + 42, 60}, L"", mw - 64);
-            cardText = sgui::SGLabel::Create(wd, {cw + 15, 60}, L"", mw - 10);
-            adText = sgui::SGLabel::Create(wd, {0, sz.y - 30}, L"");
-            extraText = sgui::SGLabel::Create(wd, {0, sz.y - 30}, L"");
+        sgui::SGPanel* wnd = nullptr;
+        if(window.expired()) {
+            wnd = LoadDialogAs<sgui::SGPanel>("info dialog");
+            if(!wnd)
+                return;
+            card_image = wnd->FindWidgetAs<sgui::SGImage>("card image");
+            card_name = wnd->FindWidgetAs<sgui::SGLabel>("card name");
+            info_text = wnd->FindWidgetAs<sgui::SGLabel>("info text");
+            pen_text = wnd->FindWidgetAs<sgui::SGLabel>("pendulum text");
+            card_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
+            ad_text = wnd->FindWidgetAs<sgui::SGLabel>("ad text");
+            extra_text = wnd->FindWidgetAs<sgui::SGLabel>("extra text");
+            window = wnd->CastPtr<sgui::SGWidgetContainer>();
         }
+        
         this->code = code;
         auto data = DataMgr::Get()[code];
-        auto img = imageBox.lock();
-        auto ctex = ImageMgr::Get().LoadBigCardTexture(code);
-        img->SetImage(ctex, {0, 0, img->GetSize().x, img->GetSize().y});
-        if(ctex)
-            img->AddTexRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
-        auto name = cardName.lock();
-        name->ClearText();
-        name->SetSpacing(1, 5);
-        name->AppendText(data->name, 0xff000000);
-        name->AppendText(L"\n", 0xff000000);
-        name->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
-        if(data->type & 0x1) {
-            name->AppendText(L"  ", 0xff000000);
-            name->AppendText(DataMgr::Get().GetAttributeString(data->attribute), 0xff000000);
-            name->AppendText(L"/", 0xff000000);
-            name->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
-        }
-        auto extra = extraText.lock();
-        extra->ClearText();
-        extra->SetSpacing(1, 5);
-        extra->SetPosition({cw + 15, sz.y - 50});
-        uint64_t setcode = data->setcode;
-        if(data->alias) {
-            auto aliasdata = DataMgr::Get()[data->alias];
-            if(aliasdata)
-                setcode = aliasdata->setcode;
-        }
-        if(setcode) {
-            extra->AppendText(stringCfg["eui_msg_setcode"], 0xff000000);
-            for(int32_t i = 0; i < 4; ++i) {
-                uint16_t sd = (setcode >> (i * 16)) & 0xffff;
-                if(sd) {
-                    extra->AppendText(L"#", 0xff000000);
-                    extra->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
-                    extra->AppendText(L" ", 0xff000000);
-                }
+        if(card_image) {
+            auto ctex = ImageMgr::Get().LoadBigCardTexture(code);
+            if(ctex) {
+                card_image->GetSpriteUI()->SetTexture(ctex);
+                card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
             }
         }
-        extra->AppendText(L"\n", 0xff000000);
-        uint32_t ccode = (data->alias == 0
+        if(card_name) {
+            card_name->GetTextUI()->SetText(data->name, 0xff000000);
+        }
+        if(info_text) {
+            info_text->GetTextUI()->Clear();
+            info_text->GetTextUI()->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
+            if(data->type & 0x1) {
+                info_text->GetTextUI()->AppendText(DataMgr::Get().GetAttributeString(data->attribute), 0xff000000);
+                info_text->GetTextUI()->AppendText(L"/", 0xff000000);
+                info_text->GetTextUI()->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
+            }
+        }
+        if(extra_text) {
+            extra_text->GetTextUI()->Clear();
+            uint64_t setcode = data->setcode;
+            if(data->alias) {
+                auto aliasdata = DataMgr::Get()[data->alias];
+                if(aliasdata)
+                    setcode = aliasdata->setcode;
+            }
+            if(setcode) {
+                extra_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
+                for(int32_t i = 0; i < 4; ++i) {
+                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
+                    if(sd) {
+                        extra_text->GetTextUI()->AppendText(L"#", 0xff000000);
+                        extra_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
+                        extra_text->GetTextUI()->AppendText(L" ", 0xff000000);
+                    }
+                }
+            }
+            extra_text->GetTextUI()->AppendText(L"\n", 0xff000000);
+            uint32_t ccode = (data->alias == 0
                               || (data->alias > data->code && data->alias - data->code > 10)
                               || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
-        extra->AppendText(L" @", 0xff000000);
-        extra->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
-        auto text = cardText.lock();
-        auto pent = penText.lock();
-        auto ad = adText.lock();
-        auto imgs = misc.lock();
+            extra_text->GetTextUI()->AppendText(L" @", 0xff000000);
+            extra_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
+        }
         std::vector<v2i> verts;
         std::vector<v2f> coords;
         std::vector<uint32_t> colors;
+        
         auto pushvert = [&verts, &coords, &colors](v2i pos, v2i sz, ti4& ti, uint32_t cl = 0xffffffff) {
             verts.push_back({pos.x, pos.y});
             coords.push_back(ti.vert[0]);
@@ -834,7 +815,7 @@ namespace ygopro
             ad->ClearText();
         }
         if(data->lscale || data->rscale) {
-            std::wstring pdelimiter = stringCfg["pendulum_delimiter"];
+            std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
             auto pd = data->texts.find(pdelimiter);
             if(pd > 0)
                 pent->SetText(data->texts.substr(0, pd - 1), 0xff000000);
