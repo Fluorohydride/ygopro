@@ -34,7 +34,7 @@ function c92510265.rmtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return Duel.IsExistingTarget(c92510265.rgfilter,tp,LOCATION_REMOVED,0,1,nil)
 		and Duel.IsExistingTarget(Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,aux.Stringid(92510265,2))
-	local g1=Duel.SelectTarget(tp,c5861.rgfilter,tp,LOCATION_REMOVED,0,1,1,nil)
+	local g1=Duel.SelectTarget(tp,c92510265.rgfilter,tp,LOCATION_REMOVED,0,1,1,nil)
 	e:SetLabelObject(g1:GetFirst())
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g2=Duel.SelectTarget(tp,Card.IsAbleToRemove,tp,0,LOCATION_ONFIELD,1,1,nil)
@@ -46,7 +46,7 @@ function c92510265.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS)
 	local lc=tg:GetFirst()
 	if lc==tc then lc=tg:GetNext() end
-	if tc:IsRelateToEffect(e) and Duel.SendtoGrave(tc,REASON_EFFECT+REASON_RETURN)~=0 and lc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) and Duel.SendtoGrave(tc,REASON_EFFECT+REASON_RETURN)~=0 and lc:IsRelateToEffect(e) and lc:IsControler(1-tp) then
 		Duel.Remove(lc,POS_FACEUP,REASON_EFFECT)
 	end
 end
