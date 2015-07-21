@@ -27,9 +27,12 @@ function c94937430.initial_effect(c)
 	e3:SetOperation(c94937430.drop)
 	c:RegisterEffect(e3)
 end
+function c94937430.cfilter(c,tp)
+	return c:IsLocation(LOCATION_EXTRA) and c:IsControler(tp)
+end
 function c94937430.acop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if eg:IsExists(Card.IsLocation,1,nil,LOCATION_EXTRA) then
+	if eg:IsExists(c94937430.cfilter,1,nil,tp) then
 		c:AddCounter(0x3001,1)
 	end
 end
@@ -37,8 +40,8 @@ function c94937430.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetCounter(0x3001)==3
 end
 function c94937430.drcost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
-	Duel.Remove(e:GetHandler(),POS_FACEUP,REASON_COST)
+	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
+	Duel.SendtoGrave(e:GetHandler(),REASON_COST)
 end
 function c94937430.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,2) end

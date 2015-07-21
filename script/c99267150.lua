@@ -14,11 +14,8 @@ function c99267150.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c99267150.splimit)
+	e3:SetValue(aux.fuslimit)
 	c:RegisterEffect(e3)
-end
-function c99267150.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c99267150.batfilter(e,c)
 	return c:IsAttribute(0x2f)

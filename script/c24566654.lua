@@ -12,16 +12,8 @@ function c24566654.cfilter(c)
 	return c:IsFaceup() and c:IsCode(70902743)
 end
 function c24566654.condition(e,tp,eg,ep,ev,re,r,rp)
-	if re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and not re:IsHasType(EFFECT_TYPE_ACTIVATE) then return false end
-	if rp==tp or not Duel.IsExistingMatchingCard(c24566654.cfilter,tp,LOCATION_ONFIELD,0,1,nil) then return false end
-	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
-	if ex then return true end
-	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
-	if not ex then return false end
-	if cp~=PLAYER_ALL then return Duel.IsPlayerAffectedByEffect(cp,EFFECT_REVERSE_RECOVER)
-	else return Duel.IsPlayerAffectedByEffect(0,EFFECT_REVERSE_RECOVER)
-		or Duel.IsPlayerAffectedByEffect(1,EFFECT_REVERSE_RECOVER)
-	end
+	return Duel.IsExistingMatchingCard(c24566654.cfilter,tp,LOCATION_ONFIELD,0,1,nil) and ep~=tp and re:IsHasType(EFFECT_TYPE_ACTIVATE) 
+		and aux.damcon1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c24566654.operation(e,tp,eg,ep,ev,re,r,rp)
 	local cid=Duel.GetChainInfo(ev,CHAININFO_CHAIN_ID)

@@ -76,12 +76,16 @@ function Auxiliary.EnableDualAttribute(c)
 	c:RegisterEffect(e1)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
-	e2:SetCode(EFFECT_CHANGE_TYPE)
+	e2:SetCode(EFFECT_ADD_TYPE)
 	e2:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e2:SetRange(LOCATION_MZONE+LOCATION_GRAVE)
 	e2:SetCondition(aux.DualNormalCondition)
-	e2:SetValue(TYPE_NORMAL+TYPE_DUAL+TYPE_MONSTER)
+	e2:SetValue(TYPE_NORMAL)
 	c:RegisterEffect(e2)
+	local e3=e2:Clone()
+	e3:SetCode(EFFECT_REMOVE_TYPE)
+	e3:SetValue(TYPE_EFFECT)
+	c:RegisterEffect(e3)
 end
 function Auxiliary.TargetEqualFunction(f,value,a,b,c)
 	return	function(effect,target)
@@ -123,6 +127,7 @@ end
 function Auxiliary.SynCondition(f1,f2,minct,maxc)
 	return	function(e,c,smat,mg)
 				if c==nil then return true end
+				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				local minc=minct
@@ -164,6 +169,8 @@ end
 function Auxiliary.XyzAlterFilter(c,alterf,xyzc)
 	return alterf(c) and c:IsCanBeXyzMaterial(xyzc)
 end
+--Xyz monster, lv k*n
+--set c.xyz_filter, c.xyz_count
 function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	if c.xyz_filter==nil then
 		local code=c:GetOriginalCode()
@@ -191,10 +198,12 @@ function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	e1:SetValue(SUMMON_TYPE_XYZ)
 	c:RegisterEffect(e1)
 end
+--Xyz Summon(normnal)
 function Auxiliary.XyzCondition(f,lv,minc,maxc)
 	--og: use special material
 	return	function(e,c,og)
 				if c==nil then return true end
+				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
 				if minc<=ct then return false end
@@ -229,9 +238,11 @@ function Auxiliary.XyzOperation(f,lv,minc,maxc)
 				end
 			end
 end
+--Xyz summon(alterf)
 function Auxiliary.XyzCondition2(f,lv,minc,maxc,alterf,desc,op)
 	return	function(e,c,og)
 				if c==nil then return true end
+				if c:IsType(TYPE_PENDULUM) and c:IsFaceup() then return false end
 				local tp=c:GetControler()
 				local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 				local ct=-ft
@@ -332,23 +343,17 @@ function Auxiliary.FConditionCode2(code1,code2,sub,insf)
 					end
 				end
 				local b1=0 local b2=0 local bs=0
-				local f1=false local f2=false local fs=false
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
 					local code=tc:GetCode()
-					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then f1=true end
-					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then f2=true end
-					elseif tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
 					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					if sub then	return (b1~=0 and f1 and b2+bs~=0) or (b2~=0 and f2 and b1+bs~=0) or (bs~=0 and fs and b1+b2~=0)
-					else return (b1~=0 and f1 and b2==1) or (b2~=0 and f2 and b1==1) end
-				else
-					if sub then return b1+b2+bs>1
-					else return b1+b2==2 end
-				end
+				return b1+b2+bs>=2 and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCode2(code1,code2,sub,insf)
@@ -430,26 +435,18 @@ function Auxiliary.FConditionCode3(code1,code2,code3,sub,insf)
 					end
 				end
 				local b1=0 local b2=0 local b3=0 local bs=0
-				local f1=false local f2=false local f3=false local fs=false
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
 					local code=tc:GetCode()
-					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then f1=true end
-					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then f2=true end
-					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then f3=true end
-					elseif tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
 					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					if sub then	return (b1~=0 and f1 and b2+b3+bs>1) or (b2~=0 and f2 and b1+b3+bs>1)
-						or (b3~=0 and f3 and b1+b2+bs>1) or (bs~=0 and fs and b1+b2+b3>1)
-					else return (b1~=0 and f1 and b2+b3==2) or (b2~=0 and f2 and b1+b3==2)
-						or (b3~=0 and f3 and b1+b2==2) end
-				else
-					if sub then return b1+b2+b3+bs>2
-					else return b1+b2+b3==3 end
-				end
+				return b1+b2+b3+bs>=3 and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
@@ -540,28 +537,19 @@ function Auxiliary.FConditionCode4(code1,code2,code3,code4,sub,insf)
 					end
 				end
 				local b1=0 local b2=0 local b3=0 local b4=0 local bs=0
-				local f1=false local f2=false local f3=false local f4=false local fs=false
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
 					local code=tc:GetCode()
-					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then f1=true end
-					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then f2=true end
-					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then f3=true end
-					elseif code==code4 then b4=1 if Auxiliary.FConditionCheckF(tc,chkf) then f4=true end
-					elseif tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					if code==code1 then b1=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code2 then b2=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code3 then b3=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif code==code4 then b4=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+					elseif sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE) then bs=1 if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
 					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					if sub then	return (b1~=0 and f1 and b2+b3+b4+bs>2) or (b2~=0 and f2 and b1+b3+b4+bs>2)
-						or (b3~=0 and f3 and b1+b2+b4+bs>2) or (b4~=0 and f4 and b1+b2+b3+bs>2)
-						or (bs~=0 and fs and b1+b2+b3+b4>2)
-					else return (b1~=0 and f1 and b2+b3+b4==3) or (b2~=0 and f2 and b1+b3+b4==3)
-						or (b3~=0 and f3 and b1+b2+b4==3) or (b4~=0 and f4 and b1+b2+b3==3) end
-				else
-					if sub then return b1+b2+b3+b4+bs>3
-					else return b1+b2+b3+b4==4 end
-				end
+				return b1+b2+b3+b4+bs>=4 and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
@@ -652,17 +640,23 @@ function Auxiliary.FConditionCodeFun(code,f,cc,sub,insf)
 						end
 					else return false end
 				end
-				local g1=Group.CreateGroup() local g2=Group.CreateGroup() local fs=false
+				local b1=0 local b2=0 local bw=0
+				local fs=false
 				local tc=g:GetFirst()
 				while tc do
-					if tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
-						then g1:AddCard(tc) if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end end
-					if f(tc) then g2:AddCard(tc) if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end end
+					local c1=tc:IsCode(code) or (sub and tc:IsHasEffect(EFFECT_FUSION_SUBSTITUTE))
+					local c2=f(tc)
+					if c1 or c2 then
+						if Auxiliary.FConditionCheckF(tc,chkf) then fs=true end
+						if c1 and c2 then bw=bw+1
+						elseif c1 then b1=1
+						else b2=b2+1
+						end
+					end
 					tc=g:GetNext()
 				end
-				if chkf~=PLAYER_NONE then
-					return fs and g1:IsExists(Auxiliary.FConditionFilterCF,1,nil,g2,cc)
-				else return g1:IsExists(Auxiliary.FConditionFilterCF,1,nil,g2,cc) end
+				if b2>cc then b2=cc end
+				return b1+b2+bw>=1+cc and (fs or chkf==PLAYER_NONE)
 			end
 end
 function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
@@ -1058,6 +1052,7 @@ function Auxiliary.RPEOperation2(filter)
 				end
 			end
 end
+--add procedure to Pendulum monster
 function Auxiliary.AddPendulumProcedure(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
@@ -1120,14 +1115,9 @@ function Auxiliary.PendOperation()
 				Duel.HintSelection(Group.FromCards(rpz))
 			end
 end
+--card effect disable filter(target)
 function Auxiliary.disfilter1(c)
-	return c:IsFaceup() and not c:IsDisabled()
-		and (c:IsType(TYPE_SPELL+TYPE_TRAP+TYPE_EFFECT) or bit.band(c:GetOriginalType(),TYPE_EFFECT)~=0)
-end
---reset op of chain attack
-function Auxiliary.atrst(e,tp,eg,ep,ev,re,r,rp)
-	local e1=e:GetLabelObject()
-	if eg:GetFirst()~=e1:GetHandler() then e1:Reset() end
+	return c:IsFaceup() and not c:IsDisabled() and (not c:IsType(TYPE_NORMAL) or bit.band(c:GetOriginalType(),TYPE_EFFECT)~=0)
 end
 --condition of EVENT_BATTLE_DESTROYING
 function Auxiliary.bdcon(e,tp,eg,ep,ev,re,r,rp)
@@ -1157,7 +1147,7 @@ function Auxiliary.chainreg(e,tp,eg,ep,ev,re,r,rp)
 		e:GetHandler():RegisterFlagEffect(1,RESET_EVENT+0x1fc0000+RESET_CHAIN,0,1)
 	end
 end
---default filter for EFFECT_CANNOT_BE_BATTLE_TARGET
+--default filter for EFFECT_CANNOT_BE_BATTLE_TARGET/EFFECT_MUST_BE_ATTACKED
 function Auxiliary.imval1(e,c)
 	return not c:IsImmuneToEffect(e)
 end
@@ -1176,4 +1166,48 @@ end
 --filter for non-zero DEF
 function Auxiliary.nzdef(c)
 	return c:IsFaceup() and c:GetDefence()>0
+end
+--flag effect for summon/sp_summon turn
+function Auxiliary.sumreg(e,tp,eg,ep,ev,re,r,rp)
+	local tc=eg:GetFirst()
+	local code=e:GetLabel()
+	while tc do
+		if tc:GetOriginalCode()==code then 
+			tc:RegisterFlagEffect(code,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1) 
+		end
+		tc=eg:GetNext()
+	end
+end
+--sp_summon condition for fusion monster
+function Auxiliary.fuslimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
+end
+--sp_summon condition for ritual monster
+function Auxiliary.ritlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_RITUAL)==SUMMON_TYPE_RITUAL
+end
+--sp_summon condition for synchro monster
+function Auxiliary.synlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_SYNCHRO)==SUMMON_TYPE_SYNCHRO
+end
+--sp_summon condition for xyz monster
+function Auxiliary.xyzlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_XYZ)==SUMMON_TYPE_XYZ
+end
+--sp_summon condition for pendulum monster
+function Auxiliary.penlimit(e,se,sp,st)
+	return bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
+end
+--effects inflicting damage to tp
+function Auxiliary.damcon1(e,tp,eg,ep,ev,re,r,rp)
+	local e1=Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_DAMAGE)
+	local e2=Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_RECOVER)
+	local rd=e1 and not e2
+	local rr=not e1 and e2
+	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
+	if ex and (cp==tp or cp==PLAYER_ALL) and not rd and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_NO_EFFECT_DAMAGE) then 
+		return true 
+	end
+	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
+	return ex and (cp==tp or cp==PLAYER_ALL) and rr and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_NO_EFFECT_DAMAGE)
 end

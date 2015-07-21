@@ -20,7 +20,7 @@ function c92746535.initial_effect(c)
 	--cannot be material
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
-	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCode(EFFECT_CANNOT_BE_FUSION_MATERIAL)
 	e3:SetValue(c92746535.splimit)
 	c:RegisterEffect(e3)
@@ -44,7 +44,7 @@ function c92746535.thtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return sc:IsDestructable()
 		and Duel.IsExistingMatchingCard(c92746535.thfilter,tp,LOCATION_DECK,0,1,nil,sc:GetOriginalCode()) end
 	Duel.SetTargetCard(sc)
-	Duel.SetOperationInfo(0,CATEGORY_DESTROY,e:GetHandler(),1,0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DESTROY,sc,1,0,0)
 	Duel.SetOperationInfo(0,CATEGORY_TOHAND,nil,1,tp,LOCATION_DECK)
 end
 function c92746535.thop(e,tp,eg,ep,ev,re,r,rp)

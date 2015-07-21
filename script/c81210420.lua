@@ -1,4 +1,5 @@
 --マジカルシルクハット
+--destroy is not fully implemented
 function c81210420.initial_effect(c)
 	--Activate
 	local e1=Effect.CreateEffect(c)
@@ -83,6 +84,7 @@ function c81210420.activate(e,tp,eg,ep,ev,re,r,rp)
 	de:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 	de:SetCode(EVENT_PHASE+PHASE_BATTLE)
 	de:SetReset(RESET_PHASE+PHASE_BATTLE)
+	de:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 	de:SetCountLimit(1)
 	de:SetLabel(fid)
 	de:SetLabelObject(sg)
@@ -97,5 +99,5 @@ function c81210420.desop(e,tp,eg,ep,ev,re,r,rp)
 	local fid=e:GetLabel()
 	local tg=g:Filter(c81210420.desfilter,nil,fid)
 	g:DeleteGroup()
-	Duel.Destroy(tg,REASON_RULE)
+	Duel.Destroy(tg,REASON_EFFECT)
 end

@@ -59,6 +59,7 @@ end
 function c19048328.aclimit(e,re,tp)
 	local att=e:GetLabelObject():GetLabel()
 	return re:IsActiveType(TYPE_MONSTER) and bit.band(att,re:GetHandler():GetOriginalAttribute())~=0
+		and not re:GetHandler():IsImmuneToEffect(e)
 end
 function c19048328.thcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()

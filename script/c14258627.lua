@@ -23,6 +23,7 @@ function c14258627.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c14258627.mtcon)
 	e3:SetOperation(c14258627.mtop)
 	c:RegisterEffect(e3)
 end
@@ -59,8 +60,10 @@ function c14258627.addown(e,tp,eg,ep,ev,re,r,rp)
 	e2:SetValue(tc:GetDefence()/2)
 	tc:RegisterEffect(e2)
 end
+function c14258627.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c14258627.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.IsExistingMatchingCard(c14258627.filter,tp,LOCATION_GRAVE,0,1,nil)
 		and Duel.SelectYesNo(tp,aux.Stringid(14258627,0)) then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)

@@ -13,7 +13,7 @@ function c39357122.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c39357122.filter(c,atk)
-	return c:IsFaceup() and c:IsDefenceBelow(atk) and c:IsDestructable()
+	return c:IsFaceup() and c:GetDefence()<atk and c:IsDestructable()
 end
 function c39357122.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local atk=e:GetHandler():GetAttack()

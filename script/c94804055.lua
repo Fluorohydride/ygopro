@@ -27,6 +27,7 @@ function c94804055.initial_effect(c)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c94804055.mtcon)
 	e3:SetOperation(c94804055.mtop)
 	c:RegisterEffect(e3)
 end
@@ -74,8 +75,10 @@ function c94804055.target2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chk==0 then return tg:IsOnField() and tg:IsCanBeEffectTarget(e) end
 	Duel.SetTargetCard(tg)
 end
+function c94804055.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c94804055.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>500 and Duel.SelectYesNo(tp,aux.Stringid(94804055,2)) then
 		Duel.PayLPCost(tp,500)
 	else

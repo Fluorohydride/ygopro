@@ -29,12 +29,15 @@ function c5237827.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_REMOVED)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 		e1:SetCountLimit(1)
+		e1:SetCondition(c5237827.thcon)
 		e1:SetOperation(c5237827.thop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		tc:RegisterEffect(e1)
 	end
 end
+function c5237827.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c5237827.thop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	Duel.SendtoHand(e:GetHandler(),nil,REASON_EFFECT)
 end

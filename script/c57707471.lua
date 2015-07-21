@@ -45,7 +45,7 @@ function c57707471.xyzcon(e,c,og)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local ct=-ft
 	if 2<=ct then return false end
-	if ct<1 and Duel.IsExistingMatchingCard(c57707471.ovfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) then
+	if ct<1 and not og and Duel.IsExistingMatchingCard(c57707471.ovfilter,tp,LOCATION_MZONE,0,1,nil,tp,c) then
 		return true
 	end
 	return Duel.CheckXyzMaterial(c,nil,6,2,2,og)

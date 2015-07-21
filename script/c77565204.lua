@@ -62,7 +62,8 @@ function c77565204.activate(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCountLimit(1)
 		e1:SetReset(RESET_EVENT+0x1ff0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
 		e1:SetRange(LOCATION_SZONE)
-		e1:SetOperation(c77565204.proc)
+		e1:SetCondition(c77565204.proccon)
+		e1:SetOperation(c77565204.procop)
 		e1:SetLabel(code)
 		e1:SetLabelObject(e)
 		c:RegisterEffect(e1)
@@ -71,8 +72,10 @@ end
 function c77565204.procfilter(c,code,e,tp)
 	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false)
 end
-function c77565204.proc(e,tp,eg,ep,ev,re,r,rp)
-	if tp~=Duel.GetTurnPlayer() then return end
+function c77565204.proccon(e,tp,eg,ep,ev,re,r,rp)
+	return tp==Duel.GetTurnPlayer()
+end
+function c77565204.procop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local ct=c:GetTurnCounter()
 	ct=ct+1

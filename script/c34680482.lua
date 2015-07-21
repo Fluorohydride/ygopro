@@ -81,5 +81,6 @@ function c34680482.tdcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c34680482.tdop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=e:GetLabelObject()
+	Duel.Hint(HINT_CARD,0,34680482)
 	Duel.SendtoDeck(tc,nil,2,REASON_EFFECT)
 end

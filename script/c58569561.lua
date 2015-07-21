@@ -22,7 +22,6 @@ function c58569561.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c58569561.actcon(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLP(tp)<=Duel.GetLP(1-tp) then return false end
 	local ac=Duel.GetAttacker()
 	return ac and ac:IsControler(tp) and ac:IsRace(RACE_PLANT)
 end
@@ -34,9 +33,14 @@ function c58569561.actop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e1:SetTargetRange(0,1)
+	e1:SetCondition(c58569561.accon)
 	e1:SetValue(c58569561.actlimit)
 	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_DAMAGE)
 	c:RegisterEffect(e1)
+end
+function c58569561.accon(e)
+	local tp=e:GetHandlerPlayer()
+	return Duel.GetLP(tp)>Duel.GetLP(1-tp)
 end
 function c58569561.actlimit(e,re,tp)
 	return re:IsActiveType(TYPE_MONSTER) and not re:GetHandler():IsImmuneToEffect(e)
@@ -46,7 +50,7 @@ function c58569561.poscon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c58569561.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end
-	if chk==0 then return true end
+	if chk==0 then return ep==tp and e:GetHandler():IsRelateToEffect(e) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
 	local g=Duel.SelectTarget(tp,Card.IsFaceup,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_POSITION,g,g:GetCount(),0,0)

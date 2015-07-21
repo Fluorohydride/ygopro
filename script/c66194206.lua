@@ -13,6 +13,7 @@ function c66194206.initial_effect(c)
 	e2:SetCategory(CATEGORY_TOHAND+CATEGORY_SEARCH)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e2:SetCode(EVENT_TO_GRAVE)
+	e2:SetProperty(EFFECT_FLAG_DELAY)
 	e2:SetCondition(c66194206.thcon)
 	e2:SetTarget(c66194206.thtg)
 	e2:SetOperation(c66194206.thop)
@@ -30,7 +31,8 @@ function c66194206.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c66194206.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x38)
+	return e:GetHandler():IsPreviousLocation(LOCATION_DECK) and re:IsActiveType(TYPE_MONSTER) and re:GetHandler():IsSetCard(0x38) 
+		and bit.band(r,REASON_EFFECT)~=0
 end
 function c66194206.thfilter(c)
 	return c:IsCode(57774843) and c:IsAbleToHand()

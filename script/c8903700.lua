@@ -18,18 +18,21 @@ function c8903700.condition(e,tp,eg,ep,ev,re,r,rp)
 	return r==REASON_RITUAL
 end
 function c8903700.operation(e,tp,eg,ep,ev,re,r,rp)
-	local rc=e:GetHandler():GetReasonCard()
-	if rc:GetFlagEffect(8903700)==0 then
-		--cannot special summon
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(8903700,0))
-		e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetType(EFFECT_TYPE_FIELD)
-		e1:SetRange(LOCATION_MZONE)
-		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		e1:SetAbsoluteRange(rp,0,1)
-		rc:RegisterEffect(e1,true)
-		rc:RegisterFlagEffect(8903700,RESET_EVENT+0x1fe0000,0,1)
+	local rc=eg:GetFirst()
+	while rc do
+		if rc:GetFlagEffect(8903700)==0 then
+			--cannot special summon
+			local e1=Effect.CreateEffect(e:GetHandler())
+			e1:SetDescription(aux.Stringid(8903700,0))
+			e1:SetProperty(EFFECT_FLAG_CLIENT_HINT+EFFECT_FLAG_PLAYER_TARGET)
+			e1:SetType(EFFECT_TYPE_FIELD)
+			e1:SetRange(LOCATION_MZONE)
+			e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
+			e1:SetReset(RESET_EVENT+0x1fe0000)
+			e1:SetAbsoluteRange(rp,0,1)
+			rc:RegisterEffect(e1,true)
+			rc:RegisterFlagEffect(8903700,RESET_EVENT+0x1fe0000,0,1)
+		end
+		rc=eg:GetNext()
 	end
 end

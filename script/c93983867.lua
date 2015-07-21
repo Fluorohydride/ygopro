@@ -1,11 +1,12 @@
 --トリック・ボックス
 function c93983867.initial_effect(c)
+	Duel.EnableGlobalFlag(GLOBALFLAG_DELAYED_QUICKEFFECT)
 	--activate
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_CONTROL+CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_TO_GRAVE)
-	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
 	e1:SetCondition(c93983867.condition)
 	e1:SetTarget(c93983867.target)
 	e1:SetOperation(c93983867.activate)
@@ -57,7 +58,11 @@ function c93983867.activate(e,tp,eg,ep,ev,re,r,rp)
 end
 function c93983867.retop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetControler()~=c:GetOwner() then
-		Duel.GetControl(c,c:GetOwner())
-	end
+	c:ResetEffect(EFFECT_SET_CONTROL,RESET_CODE)
+	local e1=Effect.CreateEffect(c)
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_SET_CONTROL)
+	e1:SetValue(c:GetOwner())
+	e1:SetReset(RESET_EVENT+0xec0000)
+	c:RegisterEffect(e1)
 end

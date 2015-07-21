@@ -35,7 +35,7 @@ function c59785059.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		and (ct<=0 or Duel.IsExistingTarget(c59785059.desfilter,tp,LOCATION_MZONE,0,ct,nil)) end
 	local g=nil
 	if ct>0 then
-		local tg=Duel.GetMatchingGroup(c59785059.desfilter2,tp,0,LOCATION_ONFIELD,nil,e)
+		local tg=Duel.GetMatchingGroup(c59785059.desfilter2,tp,LOCATION_ONFIELD,0,nil,e)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 		g=tg:FilterSelect(tp,Card.IsLocation,ct,ct,nil,LOCATION_MZONE)
 		if ct<3 then

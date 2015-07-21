@@ -22,14 +22,17 @@ function c36995273.initial_effect(c)
 	e3:SetRange(LOCATION_SZONE)
 	e3:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e3:SetCountLimit(1)
+	e3:SetCondition(c36995273.costcon)
 	e3:SetOperation(c36995273.costop)
 	c:RegisterEffect(e3)
 end
 function c36995273.rmtg(e,c)
 	return c:IsLocation(LOCATION_MZONE) or bit.band(c:GetOriginalType(),TYPE_MONSTER)~=0
 end
+function c36995273.costcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c36995273.costop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.GetLP(tp)>=500 then
 		Duel.PayLPCost(tp,500)
 	else

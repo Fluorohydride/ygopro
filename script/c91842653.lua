@@ -1,13 +1,6 @@
 --トゥーン・デーモン
 function c91842653.initial_effect(c)
 	c:EnableReviveLimit()
-	--cannot special summon
-	local e1=Effect.CreateEffect(c)
-	e1:SetType(EFFECT_TYPE_SINGLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
-	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c91842653.splimit)
-	c:RegisterEffect(e1)
 	--special summon
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_FIELD)
@@ -56,35 +49,22 @@ function c91842653.initial_effect(c)
 	e8:SetOperation(c91842653.atop)
 	c:RegisterEffect(e8)
 end
-function c91842653.splimit(e,se,sp,st,spos,tgp)
-	return Duel.IsExistingMatchingCard(c91842653.cfilter,tgp,LOCATION_ONFIELD,0,1,nil)
-end
 function c91842653.cfilter(c)
 	return c:IsFaceup() and c:IsCode(15259703)
 end
 function c91842653.spcon(e,c)
 	if c==nil then return true end
 	local tp=c:GetControler()
-	if not Duel.IsExistingMatchingCard(c91842653.cfilter,tp,LOCATION_ONFIELD,0,1,nil) then return false end
-	local lv=c:GetLevel()
-	if lv<5 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-	elseif lv<7 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.CheckReleaseGroup(tp,nil,1,nil)
-	else return Duel.GetLocationCount(tp,LOCATION_MZONE)>-2 and Duel.CheckReleaseGroup(tp,nil,2,nil) end
+	return Duel.IsExistingMatchingCard(c91842653.cfilter,tp,LOCATION_ONFIELD,0,1,nil) 
+		and Duel.GetLocationCount(tp,LOCATION_MZONE)>-1 and Duel.CheckReleaseGroup(tp,nil,1,nil)
 end
 function c91842653.spop(e,tp,eg,ep,ev,re,r,rp,c)
-	local lv=c:GetLevel()
 	local tp=c:GetControler()
-	if lv<5 then 
-	elseif lv<7 then
-		local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
-		Duel.Release(g,REASON_COST)
-	else
-		local g=Duel.SelectReleaseGroup(tp,nil,2,2,nil)
-		Duel.Release(g,REASON_COST)
-	end
+	local g=Duel.SelectReleaseGroup(tp,nil,1,1,nil)
+	Duel.Release(g,REASON_COST)
 end
 function c91842653.sfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c91842653.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c91842653.sfilter,1,nil)

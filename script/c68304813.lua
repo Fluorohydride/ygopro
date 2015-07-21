@@ -22,7 +22,7 @@ function c68304813.initial_effect(c)
 end
 function c68304813.condition(e,tp,eg,ep,ev,re,r,rp)
 	local tc=eg:GetFirst()
-	return bit.band(tc:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE and tc:GetMaterialCount()>=2 and tc:IsControler(tp)
+	return bit.band(tc:GetSummonType(),SUMMON_TYPE_ADVANCE)==SUMMON_TYPE_ADVANCE and tc:GetMaterialCount()>=2 and tc:GetSummonPlayer()==tp
 end
 function c68304813.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -29,6 +29,7 @@ function c8102334.initial_effect(c)
 	e4:SetRange(LOCATION_MZONE)
 	e4:SetTargetRange(0,0xff)
 	e4:SetCode(EFFECT_CANNOT_SELECT_EFFECT_TARGET)
+	e4:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e4:SetValue(c8102334.tglimit)
 	c:RegisterEffect(e4)
 end

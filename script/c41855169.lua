@@ -19,8 +19,11 @@ function c41855169.initial_effect(c)
 	e2:SetOperation(c41855169.operation)
 	c:RegisterEffect(e2)
 end
+function c41855169.cfilter(c)
+	return c:IsDiscardable() and c:IsAbleToGraveAsCost() and not c:IsHasEffect(81674782)
+end
 function c41855169.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(Card.IsDiscardable,tp,LOCATION_HAND,0,1,nil) end
+	if chk==0 then return Duel.IsExistingMatchingCard(c41855169.cfilter,tp,LOCATION_HAND,0,1,nil) end
 	local g=Duel.GetFieldGroup(tp,LOCATION_HAND,0)
 	local sg=g:RandomSelect(tp,1)
 	Duel.SendtoGrave(sg,REASON_COST+REASON_DISCARD)

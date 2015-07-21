@@ -28,9 +28,6 @@ function c88643579.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and c:IsFaceup() and c:GetAttack()>=500 and c:GetDefence()>=500 then
-		if tc and tc:IsRelateToEffect(e) then
-			Duel.SendtoGrave(tc,REASON_EFFECT)
-		end
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetProperty(EFFECT_FLAG_COPY_INHERIT)
@@ -41,5 +38,8 @@ function c88643579.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e2=e1:Clone()
 		e2:SetCode(EFFECT_UPDATE_DEFENCE)
 		c:RegisterEffect(e2)
+		if tc and tc:IsControler(1-tp) and tc:IsRelateToEffect(e) and not c:IsHasEffect(EFFECT_REVERSE_UPDATE) then
+			Duel.SendtoGrave(tc,REASON_EFFECT)
+		end
 	end
 end

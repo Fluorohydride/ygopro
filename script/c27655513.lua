@@ -27,5 +27,10 @@ function c27655513.operation(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 		local sg=g:Select(tp,2,2,nil)
 		Duel.SendtoGrave(sg,REASON_EFFECT)
+	elseif Duel.IsPlayerCanDiscardDeck(tp,2) then
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
 	end
 end

@@ -91,6 +91,7 @@ function c3300267.spop(e,tp,eg,ep,ev,re,r,rp)
 		local cg2=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
 		Duel.ConfirmCards(1-tp,cg1)
 		Duel.ConfirmCards(1-tp,cg2)
+		Duel.ConfirmCards(tp,cg2)
 		Duel.ShuffleHand(tp)
 		Duel.ShuffleDeck(tp)
 	end

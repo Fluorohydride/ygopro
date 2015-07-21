@@ -16,6 +16,7 @@ function c31222701.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c31222701.filter,tp,LOCATION_SZONE,LOCATION_SZONE,1,nil) end
 	local g=Duel.GetMatchingGroup(c31222701.filter,tp,LOCATION_SZONE,LOCATION_SZONE,nil)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_DAMAGE,nil,0,1-tp,500)
 end
 function c31222701.thfilter1(c)
 	return c:IsType(TYPE_PENDULUM) and c:IsAbleToHand()

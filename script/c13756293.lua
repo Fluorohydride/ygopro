@@ -7,6 +7,7 @@ function c13756293.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CANNOT_SELECT_EFFECT_TARGET)
+	e1:SetProperty(EFFECT_FLAG_SET_AVAILABLE)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetTargetRange(0,0xff)
 	e1:SetValue(c13756293.etarget)
@@ -28,7 +29,7 @@ end
 function c13756293.filter(c,e,tp)
 	return c:IsRace(RACE_DRAGON) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c13756293.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c13756293.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c13756293.filter,tp,LOCATION_HAND,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,tp,LOCATION_HAND)

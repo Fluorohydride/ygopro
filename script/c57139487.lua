@@ -35,14 +35,9 @@ function c57139487.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=sg:GetFirst()
 	while tc do
 		if tc:IsLocation(LOCATION_REMOVED) then
-			local g1=nil
 			local tpe=tc:GetType()
-			if bit.band(tpe,0x802040)~=0 then
-				g1=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_EXTRA,nil,tc:GetCode())
-				rg:Merge(g1)
-			elseif bit.band(tpe,TYPE_TOKEN)~=0 then
-			else
-				g1=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_HAND,nil,tc:GetCode())
+			if bit.band(tpe,TYPE_TOKEN)==0 then
+				local g1=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_DECK+LOCATION_HAND,nil,tc:GetCode())
 				rg:Merge(g1)
 			end
 		end

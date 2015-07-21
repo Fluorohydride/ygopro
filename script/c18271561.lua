@@ -12,12 +12,10 @@ function c18271561.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c18271561.filter(c,tp)
-	local pos=c:GetPreviousPosition()
-	if c:IsReason(REASON_BATTLE) then pos=c:GetBattlePosition() end
-	return c:IsPreviousLocation(LOCATION_MZONE) and bit.band(pos,POS_FACEUP)~=0
+	return c:IsPreviousLocation(LOCATION_MZONE) and c:IsPreviousPosition(POS_FACEUP)
 		and c:GetPreviousControler()==tp and c:IsReason(REASON_DESTROY)
 end
-function c18271561.condition(e,tp,eg,ep,ev,re,r,rp,chk)
+function c18271561.condition(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c18271561.filter,1,nil,tp)
 end
 function c18271561.target(e,tp,eg,ep,ev,re,r,rp,chk)

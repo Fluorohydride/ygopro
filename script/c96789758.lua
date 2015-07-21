@@ -33,7 +33,7 @@ function c96789758.drcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp
 end
 function c96789758.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return true end
+	if chk==0 then return ep==tp and e:GetHandler():IsRelateToEffect(e) end
 	Duel.SetTargetPlayer(tp)
 	Duel.SetTargetParam(1)
 	Duel.SetOperationInfo(0,CATEGORY_DRAW,nil,0,tp,1)

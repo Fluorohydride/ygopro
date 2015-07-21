@@ -2,6 +2,7 @@
 function c68819554.initial_effect(c)
 	--negate
 	local e1=Effect.CreateEffect(c)
+	e1:SetDescription(aux.Stringid(68819554,0))
 	e1:SetCategory(CATEGORY_DESTROY+CATEGORY_NEGATE)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
 	e1:SetCode(EVENT_CHAINING)
@@ -14,6 +15,7 @@ function c68819554.initial_effect(c)
 	c:RegisterEffect(e1)
 	--reduce damage
 	local e2=Effect.CreateEffect(c)
+	e2:SetDescription(aux.Stringid(68819554,1))
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetRange(LOCATION_HAND)
@@ -35,13 +37,10 @@ end
 function c68819554.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsDiscardable() end
 	Duel.SendtoGrave(e:GetHandler(),REASON_COST+REASON_DISCARD)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c68819554.negcon(e,tp,eg,ep,ev,re,r,rp)
-	if not Duel.IsChainNegatable(ev) then return false end
-	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
-	if ex and (cp==tp or cp==PLAYER_ALL) then return true end
-	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
-	return ex and (cp==tp or cp==PLAYER_ALL) and Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_RECOVER)
+	return Duel.IsChainNegatable(ev) and aux.damcon1(e,tp,eg,ep,ev,re,r,rp)
 end
 function c68819554.negtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

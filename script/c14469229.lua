@@ -19,7 +19,7 @@ function c14469229.initial_effect(c)
 	--double
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(14469229,0))
-	e3:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_PRE_DAMAGE_CALCULATE)
 	e3:SetRange(LOCATION_MZONE+LOCATION_HAND)
 	e3:SetCost(c14469229.cost)

@@ -40,10 +40,9 @@ function c19221310.spop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c19221310.filter,tp,LOCATION_ONFIELD+LOCATION_HAND+LOCATION_DECK,0,1,1,nil)
-	if Duel.SendtoGrave(g,REASON_EFFECT)~=0 then
-		if c:IsRelateToEffect(e) then
-			Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
-		end
+	local tc=g:GetFirst()
+	if Duel.SendtoGrave(tc,REASON_EFFECT)~=0 and tc:IsLocation(LOCATION_GRAVE) and c:IsRelateToEffect(e) then
+		Duel.SpecialSummon(c,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
 function c19221310.destg(e,tp,eg,ep,ev,re,r,rp,chk)

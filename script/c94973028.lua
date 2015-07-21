@@ -67,6 +67,7 @@ function c94973028.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,0,0)
 end
 function c94973028.spop(e,tp,eg,ep,ev,re,r,rp)
+	if not c94973028.spcon(e,tp,eg,ep,ev,re,r,rp) then return end
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=1 then return end
 	if Duel.IsPlayerCanSpecialSummonMonster(tp,31533705,0x101b,0x4011,0,0,3,RACE_MACHINE,ATTRIBUTE_WIND) then
 		local token=Duel.CreateToken(tp,94973029)

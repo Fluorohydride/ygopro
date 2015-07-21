@@ -22,7 +22,7 @@ function c93368494.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c93368494.splimit)
+	e3:SetValue(aux.penlimit)
 	c:RegisterEffect(e3)
 	--cannot disable
 	local e4=Effect.CreateEffect(c)
@@ -55,6 +55,15 @@ function c93368494.initial_effect(c)
 	e7:SetTarget(c93368494.rettg)
 	e7:SetOperation(c93368494.retop)
 	c:RegisterEffect(e7)
+	if not c93368494.global_check then
+		c93368494.global_check=true
+		local ge1=Effect.CreateEffect(c)
+		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		ge1:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge1:SetLabel(93368494)
+		ge1:SetOperation(aux.sumreg)
+		Duel.RegisterEffect(ge1,0)
+	end
 end
 function c93368494.atkcon(e,tp,eg,ep,ev,re,r,rp)
 	local at=Duel.GetAttacker()
@@ -72,9 +81,6 @@ function c93368494.atkop(e,tp,eg,ep,ev,re,r,rp)
 		at:RegisterEffect(e1)
 	end
 end
-function c93368494.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
-end
 function c93368494.thtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsOnField() and chkc:IsAbleToHand() end
 	if chk==0 then return Duel.IsExistingTarget(Card.IsAbleToHand,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,nil) end
@@ -89,8 +95,7 @@ function c93368494.thop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c93368494.retcon(e,tp,eg,ep,ev,re,r,rp)
-	local c=e:GetHandler()
-	return c:IsStatus(STATUS_SUMMON_TURN) and bit.band(c:GetSummonType(),SUMMON_TYPE_SPECIAL)==SUMMON_TYPE_SPECIAL
+	return e:GetHandler():GetFlagEffect(93368494)~=0
 end
 function c93368494.rettg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

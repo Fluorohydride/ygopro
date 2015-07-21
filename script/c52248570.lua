@@ -7,6 +7,7 @@ function c52248570.initial_effect(c)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
+	e1:SetCondition(c52248570.mtcon)
 	e1:SetOperation(c52248570.mtop)
 	c:RegisterEffect(e1)
 	--atkup
@@ -22,8 +23,10 @@ function c52248570.initial_effect(c)
 	e2:SetOperation(c52248570.atkop)
 	c:RegisterEffect(e2)
 end
+function c52248570.mtcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetTurnPlayer()==tp
+end
 function c52248570.mtop(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return end
 	if Duel.CheckLPCost(tp,1000) then
 		Duel.PayLPCost(tp,1000)
 	else

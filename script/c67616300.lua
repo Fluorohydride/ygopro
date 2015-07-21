@@ -13,12 +13,18 @@ function c67616300.initial_effect(c)
 	e2:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
 	e2:SetTargetRange(1,0)
 	e2:SetCondition(c67616300.damcon1)
-	e2:SetValue(c67616300.damval)
+	e2:SetValue(0)
 	c:RegisterEffect(e2)
+	local e7=e2:Clone()
+	e7:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	c:RegisterEffect(e7)
 	local e3=e2:Clone()
 	e3:SetTargetRange(0,1)
 	e3:SetCondition(c67616300.damcon2)
 	c:RegisterEffect(e3)
+	local e8=e3:Clone()
+	e8:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	c:RegisterEffect(e8)
 	--draw
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(67616300,0))
@@ -64,12 +70,10 @@ function c67616300.damcon2(e)
 	local tp=e:GetHandlerPlayer()
 	return Duel.GetLP(1-tp)<Duel.GetLP(tp)
 end
-function c67616300.damval(e,re,val,r,rp,rc)
-	return 0
-end
 function c67616300.effcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckLPCost(tp,1000) end
 	Duel.PayLPCost(tp,1000)
+	Duel.Hint(HINT_OPSELECTED,1-tp,e:GetDescription())
 end
 function c67616300.drtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanDraw(tp,1) end
