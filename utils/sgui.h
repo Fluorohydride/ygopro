@@ -287,7 +287,7 @@ namespace sgui
             verts[0].color = verts[1].color = verts[2].color = verts[3].color = cl;
         }
         
-        inline const UIVertex* GetVertPtr() { return verts; }
+        inline UIVertex* GetVertPtr() { return verts; }
         
     protected:
         UIVertex verts[4];
@@ -2436,7 +2436,7 @@ namespace sgui
     public:
         SGEventHandler<SGWidget, int32_t> event_sel_change;
         
-        virtual void AddItem(const std::wstring& str, int32_t cl, int32_t cvalue) = 0;
+        virtual void AddItem(const std::wstring& str, uint32_t cl, int32_t cvalue) = 0;
         virtual void RemoveItem(int32_t index) = 0;
         virtual const std::wstring& GetItemText(int32_t index) = 0;
         virtual int32_t GetItemCustomValue(int32_t) = 0;
@@ -2611,7 +2611,7 @@ namespace sgui
             color[2] = SGJsonUtil::ConvertRGBA(lb_node["sel_bcolor"]);
         }
         
-        virtual void AddItem(const std::wstring& str, int32_t cl, int32_t cvalue  = 0) {
+        virtual void AddItem(const std::wstring& str, uint32_t cl, int32_t cvalue  = 0) {
             UIText* item_surface = SGGUIRoot::GetSingleton().NewObject<UIText>();
             item_surface->SetContainer(this);
             item_surface->SetCapacity(16);
@@ -2884,7 +2884,7 @@ namespace sgui
             }
         }
         
-        virtual void AddItem(const std::wstring it, uint32_t cl, int32_t cvalue  = 0) {
+        virtual void AddItem(const std::wstring& it, uint32_t cl, int32_t cvalue = 0) {
             items.push_back(it);
             color.push_back(cl);
             custom_value.push_back(cvalue);

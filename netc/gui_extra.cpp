@@ -28,6 +28,7 @@ namespace ygopro
         TextEdit = 14,
         ScrollBar = 15,
         ScrollArea = 16,
+        SpriteList = 17,
     };
     
     void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonNode<>& node) {
@@ -53,7 +54,8 @@ namespace ygopro
             {"combobox", WidgetType::ComboBox},
             {"textedit", WidgetType::TextEdit},
             {"scrollbar", WidgetType::ScrollBar},
-            {"scrollarea", WidgetType::ScrollArea}
+            {"scrollarea", WidgetType::ScrollArea},
+            {"spritelist", WidgetType::SpriteList}
         };
         std::map<int32_t, sgui::SGRadio<>*> radio_groups;
         std::string widget_type = node["type"].to_string();
@@ -304,6 +306,12 @@ namespace ygopro
                     }
                 });
                 return area;
+            }
+            case WidgetType::SpriteList: {
+                auto sl = parent->NewChild<sgui::SGImageList>();
+                sl->SetName(child_name);
+                sl->SetPositionSize({0, 0}, {0, 0}, {0.0f, 0.0f}, {1.0f, 1.0f});
+                return sl;
             }
         }
         return nullptr;
@@ -721,6 +729,7 @@ namespace ygopro
             if(!wnd)
                 return;
             card_image = wnd->FindWidgetAs<sgui::SGImage>("card image");
+            misc_image = wnd->FindWidgetAs<sgui::SGImageList>("misc");
             card_name = wnd->FindWidgetAs<sgui::SGLabel>("card name");
             info_text = wnd->FindWidgetAs<sgui::SGLabel>("info text");
             pen_text = wnd->FindWidgetAs<sgui::SGLabel>("pendulum text");
@@ -730,6 +739,8 @@ namespace ygopro
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
         }
         
+        auto hmask = ImageMgr::Get().GetTexture("mmask");
+        auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
         auto data = DataMgr::Get()[code];
         if(card_image) {
@@ -777,55 +788,49 @@ namespace ygopro
             extra_text->GetTextUI()->AppendText(L" @", 0xff000000);
             extra_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
         }
-        std::vector<v2i> verts;
-        std::vector<v2f> coords;
-        std::vector<uint32_t> colors;
-        
-        auto pushvert = [&verts, &coords, &colors](v2i pos, v2i sz, ti4& ti, uint32_t cl = 0xffffffff) {
-            verts.push_back({pos.x, pos.y});
-            coords.push_back(ti.vert[0]);
-            verts.push_back({pos.x + sz.x, pos.y});
-            coords.push_back(ti.vert[1]);
-            verts.push_back({pos.x, pos.y + sz.y});
-            coords.push_back(ti.vert[2]);
-            verts.push_back({pos.x + sz.x, pos.y + sz.y});
-            coords.push_back(ti.vert[3]);
-            for(int32_t i = 0; i < 4; ++i)
-                colors.push_back(cl);
-        };
-        auto hmask = ImageMgr::Get().GetTexture("mmask");
-        auto star = ImageMgr::Get().GetTexture("mstar");
-        
-        pushvert({0, 0}, {mw, 40}, hmask);
-        if(data->type & 0x1) {
-            for(uint32_t i = 0; i < data->star; ++i)
-                pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
-            std::string adstr;
-            if(data->attack >= 0)
-                adstr.append(To<std::string>("ATK/% 4ld", data->attack));
-            else
-                adstr.append("ATK/  ? ");
-            if(data->defence >= 0)
-                adstr.append(To<std::string>(" DEF/% 4ld", data->defence));
-            else
-                adstr.append(" DEF/  ? ");
-            ad->SetText(To<std::wstring>(adstr), 0xff000000);
-            ad->SetPosition({sz.x - 15 - ad->GetSize().x, sz.y - 30});
-        } else {
-            ad->ClearText();
+
+        if(misc_image) {
+            pushvert({0, 0}, {mw, 40}, hmask);
+            if(data->type & 0x1) {
+                for(uint32_t i = 0; i < data->star; ++i)
+                    pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
+            }
         }
+        
+        if(ad_text) {
+            if(data->type & 0x1) {
+                std::string adstr;
+                if(data->attack >= 0)
+                    adstr.append(To<std::string>("ATK/% 4ld", data->attack));
+                else
+                    adstr.append("ATK/  ? ");
+                if(data->defence >= 0)
+                    adstr.append(To<std::string>(" DEF/% 4ld", data->defence));
+                else
+                    adstr.append(" DEF/  ? ");
+                ad_text->GetTextUI()->SetText(To<std::wstring>(adstr), 0xff000000);
+            } else
+                ad_text->GetTextUI()->Clear();
+        }
+
         if(data->lscale || data->rscale) {
             std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
             auto pd = data->texts.find(pdelimiter);
-            if(pd > 0)
-                pent->SetText(data->texts.substr(0, pd - 1), 0xff000000);
-            else
-                pent->ClearText();
-            text->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
-            int32_t ph = pent->GetSize().y + 13;
+            int32_t ph = 0;
+            if(pen_text) {
+                if(pd > 0)
+                    pen_text->GetTextUI()->SetText(data->texts.substr(0, pd - 1), 0xff000000);
+                else
+                    pen_text->GetTextUI()->Clear();
+                ph = pen_text->GetAbsoluteSize().y + 13;
+            }
+            if(card_text) {
+                card_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+                card_text->SetPosition({cw + 15, 63 + ph});
+            }
             if(ph < 55)
                 ph = 55;
-            text->SetPosition({cw + 15, 63 + ph});
+            
             pushvert({0, 45}, {mw, ph}, hmask, 0xc0ffffff);
             pushvert({0, 50 + ph}, {mw, sz.y - 70 - ph}, hmask, 0xc0ffffff);
             auto lscale = ImageMgr::Get().GetTexture("lscale");
