@@ -151,7 +151,7 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
 	}
 	if ((pcard->data.type & TYPE_PENDULUM) && (location == LOCATION_GRAVE)
-	        && !pcard->is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && is_player_can_send_to_deck(playerid, pcard)
+	        && pcard->is_capable_send_to_extra(playerid) 
 	        && (((pcard->previous.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
 	        || ((pcard->previous.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
 		location = LOCATION_EXTRA;
@@ -2154,8 +2154,6 @@ int32 field::is_player_can_send_to_grave(uint8 playerid, card * pcard) {
 }
 int32 field::is_player_can_send_to_hand(uint8 playerid, card * pcard) {
 	effect_set eset;
-	if((pcard->current.location == LOCATION_EXTRA) && (pcard->data.type & (TYPE_FUSION + TYPE_SYNCHRO + TYPE_XYZ)))
-		return FALSE;
 	filter_player_effect(playerid, EFFECT_CANNOT_TO_HAND, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		if(!eset[i]->target)
@@ -2170,8 +2168,6 @@ int32 field::is_player_can_send_to_hand(uint8 playerid, card * pcard) {
 }
 int32 field::is_player_can_send_to_deck(uint8 playerid, card * pcard) {
 	effect_set eset;
-	if((pcard->current.location == LOCATION_EXTRA) && (pcard->data.type & (TYPE_FUSION + TYPE_SYNCHRO + TYPE_XYZ)))
-		return FALSE;
 	filter_player_effect(playerid, EFFECT_CANNOT_TO_DECK, &eset);
 	for(int32 i = 0; i < eset.size(); ++i) {
 		if(!eset[i]->target)

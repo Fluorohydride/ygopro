@@ -2203,6 +2203,8 @@ int32 card::is_capable_send_to_grave(uint8 playerid) {
 int32 card::is_capable_send_to_hand(uint8 playerid) {
 	if(is_status(STATUS_LEAVE_CONFIRMED))
 		return FALSE;
+	if((current.location == LOCATION_EXTRA) && (data.type & (TYPE_FUSION + TYPE_SYNCHRO + TYPE_XYZ)))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_TO_HAND))
 		return FALSE;
 	if(!pduel->game_field->is_player_can_send_to_hand(playerid, this))
@@ -2212,6 +2214,8 @@ int32 card::is_capable_send_to_hand(uint8 playerid) {
 int32 card::is_capable_send_to_deck(uint8 playerid) {
 	if(is_status(STATUS_LEAVE_CONFIRMED))
 		return FALSE;
+	if((current.location == LOCATION_EXTRA) && (data.type & (TYPE_FUSION + TYPE_SYNCHRO + TYPE_XYZ)))
+		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_TO_DECK))
 		return FALSE;
 	if(!pduel->game_field->is_player_can_send_to_deck(playerid, this))
@@ -2219,7 +2223,7 @@ int32 card::is_capable_send_to_deck(uint8 playerid) {
 	return TRUE;
 }
 int32 card::is_capable_send_to_extra(uint8 playerid) {
-	if(!(data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)))
+	if(!(data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ | TYPE_PENDULUM)))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_CANNOT_TO_DECK))
 		return FALSE;
