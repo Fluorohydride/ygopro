@@ -146,6 +146,17 @@ void field::add_card(uint8 playerid, card* pcard, uint8 location, uint8 sequence
 		return;
 	if (!is_location_useable(playerid, location, sequence))
 		return;
+	if ((pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && (location == LOCATION_HAND || location == LOCATION_DECK)) {
+		location = LOCATION_EXTRA;
+		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
+	}
+	if ((pcard->data.type & TYPE_PENDULUM) && (location == LOCATION_GRAVE)
+	        && !pcard->is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && is_player_can_send_to_deck(playerid, pcard)
+	        && (((pcard->previous.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
+	        || ((pcard->previous.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
+		location = LOCATION_EXTRA;
+		pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEUP_DEFENCE << 24);
+	}
 	pcard->current.controler = playerid;
 	pcard->current.location = location;
 	switch (location) {
@@ -353,20 +364,8 @@ void field::move_card(uint8 playerid, card* pcard, uint8 location, uint8 sequenc
 				}
 				return;
 			}
-		} else {
-			if((pcard->data.type & (TYPE_FUSION | TYPE_SYNCHRO | TYPE_XYZ)) && (location & (LOCATION_HAND | LOCATION_DECK))) {
-				location = LOCATION_EXTRA;
-				pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEDOWN_DEFENCE << 24);
-			}
-			if((pcard->data.type & TYPE_PENDULUM) && (location == LOCATION_GRAVE)
-			        && !pcard->is_affected_by_effect(EFFECT_CANNOT_TO_DECK) && is_player_can_send_to_deck(playerid, pcard)
-			        && (((pcard->current.location == LOCATION_MZONE) && !pcard->is_status(STATUS_SUMMON_DISABLED))
-			        || ((pcard->current.location == LOCATION_SZONE) && !pcard->is_status(STATUS_ACTIVATE_DISABLED)))) {
-				location = LOCATION_EXTRA;
-				pcard->operation_param = (pcard->operation_param & 0x00ffffff) | (POS_FACEUP_DEFENCE << 24);
-			}
+		} else
 			remove_card(pcard);
-		}
 	}
 	add_card(playerid, pcard, location, sequence);
 }
