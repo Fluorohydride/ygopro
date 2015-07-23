@@ -199,6 +199,7 @@ public:
 	void cancel_card_target(card* pcard);
 	
 	void filter_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
+	void filter_single_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_single_continuous_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_immune_effect();
 	void filter_disable_related_cards();
@@ -208,7 +209,7 @@ public:
 	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
 	effect* is_affected_by_effect(int32 code, card* target);
-	effect* check_equip_control_effect();
+	effect* check_control_effect();
 	int32 fusion_check(group* fusion_m, card* cg, int32 chkf);
 	void fusion_select(uint8 playerid, group* fusion_m, card* cg, int32 chkf);
 	
