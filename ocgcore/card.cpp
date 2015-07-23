@@ -2479,8 +2479,6 @@ int32 card::is_can_be_synchro_material(card* scard, card* tuner) {
 	return TRUE;
 }
 int32 card::is_can_be_ritual_material(card* scard) {
-	if(data.type & TYPE_TOKEN)
-		return FALSE;
 	if(!(get_type() & TYPE_MONSTER))
 		return FALSE;
 	if(current.location == LOCATION_GRAVE) {
