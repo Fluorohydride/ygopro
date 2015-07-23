@@ -5236,8 +5236,8 @@ int32 field::adjust_step(uint16 step) {
 						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) {
 							ctrleff.clear();
 							pcard->filter_single_effect(EFFECT_SET_CONTROL, &ctrleff, FALSE);
-							for(int32 i = 0; i < ctrleff.size(); ++i) {
-								pcard->remove_effect(ctrleff[i]);
+							if(ctrleff.size()) {
+								pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
 								core.re_adjust = TRUE;
 							}
 						}

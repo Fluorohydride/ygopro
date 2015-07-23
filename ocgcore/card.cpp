@@ -1228,7 +1228,7 @@ void card::reset(uint32 id, uint32 reset_type) {
 			}
 		}
 		if(id & RESET_TURN_SET) {
-			effect* peffect = check_equip_control_effect();
+			effect* peffect = check_control_effect();
 			if(peffect) {
 				effect* new_effect = pduel->new_effect();
 				new_effect->id = peffect->id;
@@ -1715,7 +1715,7 @@ effect* card::is_affected_by_effect(int32 code, card* target) {
 	}
 	return 0;
 }
-effect* card::check_equip_control_effect() {
+effect* card::check_control_effect() {
 	effect* ret_effect = 0;
 	for (auto cit = equiping_cards.begin(); cit != equiping_cards.end(); ++cit) {
 		auto rg = (*cit)->equip_effect.equal_range(EFFECT_SET_CONTROL);
@@ -1724,6 +1724,14 @@ effect* card::check_equip_control_effect() {
 			if(!ret_effect || peffect->id > ret_effect->id)
 				ret_effect = peffect;
 		}
+	}
+	auto rg = single_effect.equal_range(EFFECT_SET_CONTROL);
+	for (; rg.first != rg.second; ++rg.first) {
+		effect* peffect = rg.first->second;
+		if(!(peffect->flag & EFFECT_FLAG_SINGLE_RANGE))
+			continue;
+		if(!ret_effect || peffect->id > ret_effect->id)
+			ret_effect = peffect;
 	}
 	return ret_effect;
 }
