@@ -363,7 +363,8 @@ int32 effect::is_target(card* pcard) {
 		return FALSE;
 	if((type & EFFECT_TYPE_SINGLE) || (type & EFFECT_TYPE_EQUIP))
 		return TRUE;
-	if(pcard && !(flag & EFFECT_FLAG_SET_AVAILABLE) && (pcard->current.location & LOCATION_ONFIELD) && !pcard->is_position(POS_FACEUP))
+	if(pcard && !(flag & EFFECT_FLAG_SET_AVAILABLE) && (pcard->current.location & LOCATION_ONFIELD) 
+			&& !pcard->is_position(POS_FACEUP))
 		return FALSE;
 	if(!(flag & EFFECT_FLAG_IGNORE_RANGE)) {
 		if(pcard->get_status(STATUS_SUMMONING + STATUS_SUMMON_DISABLED))
@@ -441,7 +442,8 @@ int32 effect::is_chainable(uint8 tp) {
 	if((type & EFFECT_TYPE_ACTIVATE) && (sp <= 1) && !(flag & EFFECT_FLAG_COF))
 		return FALSE;
 	if(pduel->game_field->core.current_chain.size()) {
-		if(!(flag & EFFECT_FLAG_FIELD_ONLY) && (type & EFFECT_TYPE_TRIGGER_O) && (handler->current.location == LOCATION_HAND)) {
+		if(!(flag & EFFECT_FLAG_FIELD_ONLY) && (type & EFFECT_TYPE_TRIGGER_O) 
+				&& (handler->current.location == LOCATION_HAND)) {
 			if(pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed() > 2)
 				return FALSE;
 		} else if(sp < pduel->game_field->core.current_chain.rbegin()->triggering_effect->get_speed())
@@ -486,7 +488,8 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 			return FALSE;
 		uint8 pid = get_handler_player();
 		uint8 tp = handler->pduel->game_field->infos.turn_player;
-		if((((reset_flag & RESET_SELF_TURN) && pid == tp) || ((reset_flag & RESET_OPPO_TURN) && pid != tp)) && (reset_level & 0xff & reset_flag))
+		if((((reset_flag & RESET_SELF_TURN) && pid == tp) || ((reset_flag & RESET_OPPO_TURN) && pid != tp)) 
+				&& (reset_level & 0xff & reset_flag))
 			reset_count--;
 		if((reset_count & 0xff) == 0)
 			return TRUE;
@@ -494,7 +497,8 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 		break;
 	}
 	case RESET_CODE: {
-		return (code == reset_level) && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS);
+		return (code == reset_level) && (type & EFFECT_TYPE_SINGLE) && !(type & EFFECT_TYPE_ACTIONS) 
+			&& !(flag & EFFECT_FLAG_SINGLE_RANGE);
 		break;
 	}
 	case RESET_COPY: {
