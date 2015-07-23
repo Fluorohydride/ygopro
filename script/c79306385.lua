@@ -31,7 +31,7 @@ function c79306385.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tg=Duel.SelectMatchingCard(tp,c79306385.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
 	local tc=tg:GetFirst()
 	if tc then
-		mg:RemoveCard(tc)
+		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 		local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
 		tc:SetMaterial(mat)

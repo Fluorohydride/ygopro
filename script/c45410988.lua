@@ -13,7 +13,7 @@ function c45410988.filter(c,e,tp,m1,m2)
 	if not c:IsCode(19025379) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
 	local mg=m1:Filter(Card.IsCanBeRitualMaterial,c,c)
 	mg:Merge(m2)
-	return mg:CheckWithSumEqual(Card.GetRitualLevel,8,1,99,c)
+	return mg:CheckWithSumGreater(Card.GetRitualLevel,8,c)
 end
 function c45410988.mfilter(c)
 	return c:IsSetCard(0x3b) and c:IsType(TYPE_MONSTER) and c:IsAbleToRemove()
