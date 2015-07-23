@@ -78,12 +78,12 @@ function c44968687.efilter(e,te)
 	return te:IsActiveType(TYPE_SPELL+TYPE_TRAP)
 end
 function c44968687.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.IsExistingMatchingCard(nil,tp,0,LOCATION_REMOVED,1,nil) end
-	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_REMOVED,nil)
+	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_REMOVED)>0 end
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_REMOVED)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,g:GetCount(),0,0)
 end
 function c44968687.damop(e,tp,eg,ep,ev,re,r,rp)
-	local g=Duel.GetMatchingGroup(nil,tp,0,LOCATION_REMOVED,nil)
+	local g=Duel.GetFieldGroup(tp,0,LOCATION_REMOVED)
 	if Duel.SendtoGrave(g,REASON_EFFECT+REASON_RETURN)~=0 then
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_FIELD)

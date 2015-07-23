@@ -53,7 +53,7 @@ function c29904964.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c29904964.rlevel(e,rc)
 	local c=e:GetHandler()
-	if c:IsLocation(LOCATION_GRAVE) and not c:IsSetCard(0xcf) then
+	if c:IsLocation(LOCATION_GRAVE) and not rc:IsSetCard(0xcf) then
 		return -1
 	else return c:GetLevel() end
 end
