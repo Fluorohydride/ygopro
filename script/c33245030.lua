@@ -14,6 +14,7 @@ function c33245030.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE)
 	e2:SetCode(EFFECT_EXTRA_RITUAL_MATERIAL)
+	e2:SetValue(1)
 	c:RegisterEffect(e2)
 end
 function c33245030.condition(e,tp,eg,ep,ev,re,r,rp)

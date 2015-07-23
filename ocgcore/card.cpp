@@ -2460,7 +2460,7 @@ int32 card::is_can_be_fusion_material(uint8 ignore_mon) {
 int32 card::is_can_be_synchro_material(card* scard, card* tuner) {
 	if(data.type & TYPE_XYZ)
 		return FALSE;
-	if(!(get_type()&TYPE_MONSTER))
+	if(!(get_type() & TYPE_MONSTER))
 		return FALSE;
 	if(scard && current.controler != scard->current.controler && !is_affected_by_effect(EFFECT_SYNCHRO_MATERIAL))
 		return FALSE;
@@ -2478,10 +2478,25 @@ int32 card::is_can_be_synchro_material(card* scard, card* tuner) {
 			return FALSE;
 	return TRUE;
 }
+int32 card::is_can_be_ritual_material(card* scard) {
+	if(data.type & TYPE_TOKEN)
+		return FALSE;
+	if(!(get_type() & TYPE_MONSTER))
+		return FALSE;
+	if(current.location == LOCATION_GRAVE) {
+		effect_set eset;
+		filter_effect(EFFECT_EXTRA_RITUAL_MATERIAL, &eset);
+		for(int32 i = 0; i < eset.size(); ++i)
+			if(eset[i]->get_value(scard))
+				return TRUE;
+		return FALSE;
+	}
+	return TRUE;
+}
 int32 card::is_can_be_xyz_material(card* scard) {
 	if(data.type & TYPE_TOKEN)
 		return FALSE;
-	if(!(get_type()&TYPE_MONSTER))
+	if(!(get_type() & TYPE_MONSTER))
 		return FALSE;
 	if(is_affected_by_effect(EFFECT_FORBIDDEN))
 		return FALSE;

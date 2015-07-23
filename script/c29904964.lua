@@ -23,12 +23,8 @@ function c29904964.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_EXTRA_RITUAL_MATERIAL)
+	e3:SetValue(c29904964.mtval)
 	c:RegisterEffect(e3)
-	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_SINGLE)
-	e4:SetCode(EFFECT_RITUAL_LEVEL)
-	e4:SetValue(c29904964.rlevel)
-	c:RegisterEffect(e4)
 end
 function c29904964.ntcon(e,c,minc)
 	if c==nil then return true end
@@ -51,9 +47,6 @@ function c29904964.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummon(g,0,tp,tp,false,false,POS_FACEUP)
 	end
 end
-function c29904964.rlevel(e,rc)
-	local c=e:GetHandler()
-	if c:IsLocation(LOCATION_GRAVE) and not rc:IsSetCard(0xcf) then
-		return -1
-	else return c:GetLevel() end
+function c29904964.mtval(e,c)
+	return c:IsSetCard(0xcf)
 end
