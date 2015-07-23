@@ -5234,12 +5234,7 @@ int32 field::adjust_step(uint16 step) {
 					for(uint8 i = 0; i < 5; ++i) {
 						pcard = player[p].list_mzone[i];
 						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) {
-							ctrleff.clear();
-							pcard->filter_single_effect(EFFECT_SET_CONTROL, &ctrleff, FALSE);
-							if(ctrleff.size()) {
-								pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-								core.re_adjust = TRUE;
-							}
+							pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
 						}
 					}
 				}
