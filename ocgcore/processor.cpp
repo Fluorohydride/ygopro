@@ -5229,13 +5229,11 @@ int32 field::adjust_step(uint16 step) {
 			res = eset.size() ? TRUE : FALSE;
 			if(res) {
 				card* pcard;
-				effect_set ctrleff;
 				for(uint8 p = 0; p < 2; ++p) {
 					for(uint8 i = 0; i < 5; ++i) {
 						pcard = player[p].list_mzone[i];
-						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING)) {
+						if(pcard && pcard->is_affected_by_effect(EFFECT_REMOVE_BRAINWASHING))
 							pcard->reset(EFFECT_SET_CONTROL, RESET_CODE);
-						}
 					}
 				}
 			}
