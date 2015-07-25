@@ -76,7 +76,6 @@ function c41141943.spop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetMatchingGroup(c41141943.spfilter,tp,LOCATION_HAND,0,nil,e,tp)
 	if g:GetCount()==0 then return end
 	local ft=Duel.GetLocationCount(1-tp,LOCATION_MZONE)
-	if ft>g:GetCount() then ft=g:GetCount() end
 	if ft>2 then ft=2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local sg=g:Select(tp,1,ft,nil)

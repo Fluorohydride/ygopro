@@ -26,7 +26,7 @@ function c97211663.filter(c,e,tp,m)
 	local mg=m:Filter(Card.IsCanBeRitualMaterial,c,c)
 	if c:IsCode(21105106) then return c:ritual_custom_condition(mg) end
 	if c.mat_filter then
-		mg=m:Filter(c.mat_filter,c)
+		mg=mg:Filter(c.mat_filter,nil)
 	end
 	return mg:CheckWithSumEqual(Card.GetRitualLevel,c:GetLevel(),1,99,c)
 end
