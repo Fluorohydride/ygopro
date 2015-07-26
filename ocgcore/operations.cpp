@@ -2340,11 +2340,11 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 					cset.insert(pcard);
 			}
 		}
-		if(cset.size() == 0)
-			return FALSE;
-		send_to(&cset, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
-		adjust_instant();
-		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		if(cset.size()) {
+			send_to(&cset, 0, REASON_RULE, sumplayer, sumplayer, LOCATION_GRAVE, 0, 0);
+			adjust_instant();
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
+		}
 		if(pgroup->container.size() == 0)
 			return TRUE;
 		return FALSE;
