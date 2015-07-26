@@ -15,7 +15,8 @@ function c15978426.initial_effect(c)
 	c:RegisterEffect(e2)
 end
 function c15978426.filter(c,tohand)
-	return c:IsSetCard(0x9f) and c:IsType(TYPE_MONSTER) and (c:IsAbleToGrave() or (tohand and c:IsAbleToHand()))
+	return c:IsSetCard(0x9f) and not c:IsCode(15978426) and c:IsType(TYPE_MONSTER)
+		and (c:IsAbleToGrave() or (tohand and c:IsAbleToHand()))
 end
 function c15978426.tgtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
