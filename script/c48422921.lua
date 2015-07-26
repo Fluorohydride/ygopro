@@ -23,12 +23,12 @@ function c48422921.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if reg then val=val-reg end
 	Duel.Hint(HINT_SELECTMSG,tp,562)
 	local att=Duel.AnnounceAttribute(tp,1,val)
-	Duel.SetTargetParam(att)
+	e:SetLabel(att)
 end
 function c48422921.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() then
-		local att=Duel.GetChainInfo(0,CHAININFO_TARGET_PARAM)
+		local att=e:GetLabel()
 		local e1=Effect.CreateEffect(e:GetHandler())
 		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 		e1:SetCode(EVENT_BATTLE_START)

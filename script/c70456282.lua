@@ -32,7 +32,7 @@ function c70456282.spop(e,tp,eg,ep,ev,re,r,rp,c)
 	e1:SetCode(EFFECT_ADD_TYPE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetValue(TYPE_TUNER)
-	e1:SetReset(RESET_EVENT+0x1fe0000)
+	e1:SetReset(RESET_EVENT+0xfe0000)
 	c:RegisterEffect(e1)
 end
 function c70456282.filter(c)
