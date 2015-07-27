@@ -2345,8 +2345,10 @@ int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, ui
 			adjust_instant();
 			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 		}
-		if(pgroup->container.size() == 0)
+		if(pgroup->container.size() == 0) {
+			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, FALSE, 0);
 			return TRUE;
+		}
 		return FALSE;
 	}
 	case 27: {
