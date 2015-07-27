@@ -22,5 +22,10 @@ function c96384007.operation(e,tp,eg,ep,ev,re,r,rp)
 	if tc then
 		Duel.SendtoHand(tc,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,tc)
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
 	end
 end
