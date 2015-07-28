@@ -60,17 +60,8 @@ function c40061558.immcon(e)
 	return bit.band(e:GetHandler():GetSummonType(),SUMMON_TYPE_NORMAL)==SUMMON_TYPE_NORMAL
 end
 function c40061558.efilter(e,te)
-	if te:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return true end
-	if te:IsActiveType(TYPE_MONSTER) and (te:IsHasType(0x7e0) or te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
-		local lv=e:GetHandler():GetLevel()
-		local ec=te:GetOwner()
-		if ec:IsType(TYPE_XYZ) then
-			return ec:GetOriginalRank()<lv
-		else
-			return ec:GetOriginalLevel()<lv
-		end
-	end
-	return false
+	if te:IsActiveType(TYPE_SPELL+TYPE_TRAP) then return true
+	else return aux.qlifilter(e,te) end
 end
 function c40061558.cttg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and chkc:IsControlerCanBeChanged() end

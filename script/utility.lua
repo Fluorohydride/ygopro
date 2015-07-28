@@ -1199,3 +1199,19 @@ function Auxiliary.damcon1(e,tp,eg,ep,ev,re,r,rp)
 	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
 	return ex and (cp==tp or cp==PLAYER_ALL) and rr and not Duel.IsPlayerAffectedByEffect(tp,EFFECT_NO_EFFECT_DAMAGE)
 end
+--filter for the immune effetc of qli monsters
+function Auxiliary.qlifilter(e,te)
+	if te:IsActiveType(TYPE_MONSTER) 
+		and (te:IsHasType(0x7e0) or (te:IsHasProperty(EFFECT_FLAG_FIELD_ONLY) and not te:IsHasProperty(EFFECT_FLAG_CONTINUOUS)) 
+			or te:IsHasProperty(EFFECT_FLAG_OWNER_RELATE)) then
+		local lv=e:GetHandler():GetLevel()
+		local ec=te:GetOwner()
+		if ec:IsType(TYPE_XYZ) then
+			return ec:GetOriginalRank()<lv
+		else
+			return ec:GetOriginalLevel()<lv
+		end
+	else
+		return false
+	end
+end
