@@ -27,10 +27,12 @@ function c48144509.filter2(c,e,tp,m,f,chkf)
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
 function c48144509.filter3(c,e,tp,m,f,chkf)
+	local mg=m:Clone()
+	mg:RemoveCard(c)
 	if c:IsType(TYPE_FUSION) and c:IsRace(RACE_DRAGON) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) then
-		if c.check_fusion_material_48144509 then return c.check_fusion_material_48144509(m,chkf) end
-		return c:CheckFusionMaterial(m,nil,chkf)
+		if c.check_fusion_material_48144509 then return c.check_fusion_material_48144509(mg,chkf) end
+		return c:CheckFusionMaterial(mg,nil,chkf)
 	else return false end
 end
 function c48144509.target(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -78,6 +80,7 @@ function c48144509.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 		local tg=sg:Select(tp,1,1,nil)
 		local tc=tg:GetFirst()
+		mg1:RemoveCard(tc)
 		if sg1:IsContains(tc) and (sg2==nil or not sg2:IsContains(tc) or not Duel.SelectYesNo(tp,ce:GetDescription())) then
 			local mat1=nil
 			if tc.select_fusion_material_48144509 then
