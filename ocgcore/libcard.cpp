@@ -512,7 +512,7 @@ int32 scriptlib::card_is_status(lua_State *L) {
 	check_param_count(L, 2);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	uint32 tstatus = lua_tointeger(L, 2);
+	uint32 tstatus = lua_tounsigned(L, 2);
 	if(pcard->status & tstatus)
 		lua_pushboolean(L, 1);
 	else
@@ -536,7 +536,7 @@ int32 scriptlib::card_set_status(lua_State *L) {
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	if(pcard->status & STATUS_COPYING_EFFECT)
 		return 0;
-	uint32 tstatus = lua_tointeger(L, 2);
+	uint32 tstatus = lua_tounsigned(L, 2);
 	int32 enable = lua_toboolean(L, 3);
 	pcard->set_status(tstatus, enable);
 	return 0;
