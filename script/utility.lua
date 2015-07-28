@@ -302,6 +302,9 @@ end
 function Auxiliary.FConditionCheckF(c,chkf)
 	return c:IsOnField() and c:IsControler(chkf)
 end
+--Fusion monster, name + name
+--material_count: number of different names in material list
+--material: names in material list
 function Auxiliary.AddFusionProcCode2(c,code1,code2,sub,insf)
 	if c.material_count==nil then
 		local code=c:GetOriginalCode()
@@ -385,6 +388,7 @@ function Auxiliary.FOperationCode2(code1,code2,sub,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+--Fusion monster, name + name + name
 function Auxiliary.AddFusionProcCode3(c,code1,code2,code3,sub,insf)
 	if c.material_count==nil then
 		local code=c:GetOriginalCode()
@@ -485,6 +489,7 @@ function Auxiliary.FOperationCode3(code1,code2,code3,sub,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+--Fusion monster, name + name + name + name
 function Auxiliary.AddFusionProcCode4(c,code1,code2,code3,code4,sub,insf)
 	if c.material_count==nil then
 		local code=c:GetOriginalCode()
@@ -598,6 +603,7 @@ function Auxiliary.FOperationCode4(code1,code2,code3,code4,sub,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+--Fusion monster, name + condition
 function Auxiliary.AddFusionProcCodeFun(c,code1,f,cc,sub,insf)
 	if c.material_count==nil then
 		local code=c:GetOriginalCode()
@@ -738,6 +744,7 @@ function Auxiliary.FOperationCodeFun(code,f,cc,sub,insf)
 				end
 			end
 end
+--Fusion monster, condition + condition
 function Auxiliary.AddFusionProcFun2(c,f1,f2,insf)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
@@ -802,6 +809,7 @@ function Auxiliary.FOperationFun2(f1,f2,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+--Fusion monster, name * n
 function Auxiliary.AddFusionProcCodeRep(c,code1,cc,sub,insf)
 	if c.material_count==nil then
 		local code=c:GetOriginalCode()
@@ -861,6 +869,7 @@ function Auxiliary.FOperationCodeRep(code,cc,sub,insf)
 				Duel.SetFusionMaterial(g1)
 			end
 end
+--Fusion monster, condition * n
 function Auxiliary.AddFusionProcFunRep(c,f,cc,insf)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)

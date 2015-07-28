@@ -26,6 +26,8 @@ function c48144509.filter2(c,e,tp,m,f,chkf)
 	return c:IsType(TYPE_FUSION) and c:IsRace(RACE_DRAGON) and (not f or f(c))
 		and c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_FUSION,tp,false,false) and c:CheckFusionMaterial(m,nil,chkf)
 end
+--fusion monster filter
+--check_fusion_material_48144509: for dragon-type monsters that >2 odd-eye is possible
 function c48144509.filter3(c,e,tp,m,f,chkf)
 	local mg=m:Clone()
 	mg:RemoveCard(c)
