@@ -465,8 +465,9 @@ int32 effect::is_chainable(uint8 tp) {
 	}
 	return TRUE;
 }
-//return: this can be reset or not
-//RESET_CODE can only reset single effect
+//return: this can be reset by reset_level or not
+//RESET_CODE can only reset single effects without EFFECT_FLAG_SINGLE_RANGE
+//RESET_DISABLE is valid only when owner == handler
 int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 	switch (reset_type) {
 	case RESET_EVENT: {

@@ -2777,7 +2777,8 @@ int32 field::process_idle_command(uint16 step) {
 			add_process(PROCESSOR_SELECT_POSITION, 0, 0, 0, infos.turn_player + (positions << 16), target->data.code);
 			core.units.begin()->step = 12;
 			return FALSE;
-		} else add_process(PROCESSOR_FLIP_SUMMON, 0, 0, (group*)target, target->current.controler, 0);
+		} else 
+			add_process(PROCESSOR_FLIP_SUMMON, 0, 0, (group*)target, target->current.controler, 0);
 		target->set_status(STATUS_FORM_CHANGED, TRUE);
 		core.units.begin()->step = -1;
 		return FALSE;
@@ -5242,7 +5243,7 @@ int32 field::adjust_step(uint16 step) {
 		return FALSE;
 	}
 	case 5: {
-		//1-4 control
+		//1-5 control
 		card* pcard;
 		uint8 cur, ref;
 		core.control_adjust_set[0].clear();
