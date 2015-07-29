@@ -24,6 +24,7 @@ function c2572890.initial_effect(c)
 end
 function c2572890.cfilter(c)
 	return c:IsRace(RACE_SPELLCASTER) and c:IsAttribute(ATTRIBUTE_WIND)
+		and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c2572890.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c2572890.cfilter,1,nil) end
