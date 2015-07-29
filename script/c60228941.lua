@@ -47,5 +47,10 @@ function c60228941.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.BreakEffect()
 			Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP_DEFENCE)
 		end
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
 	end
 end

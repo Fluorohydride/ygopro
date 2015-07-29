@@ -30,6 +30,20 @@ function c75043725.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc2=g2:GetFirst()
 	g1:Merge(g2)
 	Duel.SendtoHand(g1,nil,REASON_EFFECT)
-	if tc1 then Duel.ConfirmCards(1-tp,tc1) end
-	if tc2 then	Duel.ConfirmCards(tp,tc2) end
+	if tc1 then
+		Duel.ConfirmCards(1-tp,tc1)
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
+	end
+	if tc2 then
+		Duel.ConfirmCards(tp,tc2)
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
+	end
 end

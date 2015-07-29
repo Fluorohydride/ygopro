@@ -53,5 +53,10 @@ function c82293134.thop(e,tp,eg,ep,ev,re,r,rp)
 	if g:GetCount()>0 then
 		Duel.SendtoHand(g,nil,REASON_EFFECT)
 		Duel.ConfirmCards(1-tp,g)
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
 	end
 end

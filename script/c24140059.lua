@@ -19,5 +19,10 @@ function c24140059.operation(e,tp,eg,ep,ev,re,r,rp)
 			Duel.MoveSequence(tc,0)
 			Duel.ConfirmDecktop(tp,1)
 		end
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_DECK,0)
+		Duel.ConfirmCards(1-tp,cg)
+		Duel.ConfirmCards(tp,cg)
+		Duel.ShuffleDeck(tp)
 	end
 end
