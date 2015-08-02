@@ -4,9 +4,13 @@ function c811734.initial_effect(c)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_ATTACK_ANNOUNCE)
+	e1:SetCondition(c811734.condition)
 	e1:SetTarget(c811734.target)
 	e1:SetOperation(c811734.activate)
 	c:RegisterEffect(e1)
+end
+function c811734.condition(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetAttacker():IsControler(1-tp)
 end
 function c811734.atkfilter(c)
 	return c:IsSetCard(0x10af) and c:GetAttack()>0 and c:IsAbleToRemove()

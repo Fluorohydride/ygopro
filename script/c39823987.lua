@@ -46,48 +46,36 @@ function c39823987.regcon(e,tp,eg,ep,ev,re,r,rp)
 end
 function c39823987.regop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())
-	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e1:SetDescription(aux.Stringid(39823987,2))
+	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
+	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
 	e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
 	e1:SetCountLimit(1)
-	e1:SetLabel(Duel.GetTurnCount())
-	e1:SetCondition(c39823987.spcon1)
-	e1:SetOperation(c39823987.spop1)
+	e1:SetCondition(c39823987.spcon)
+	e1:SetTarget(c39823987.sptg)
+	e1:SetOperation(c39823987.spop)
 	e1:SetReset(RESET_PHASE+PHASE_END,2)
+	e1:SetLabel(Duel.GetTurnCount())
 	Duel.RegisterEffect(e1,tp)
 end
-function c39823987.spcon1(e,tp,eg,ep,ev,re,r,rp)
+function c39823987.spcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnCount()~=e:GetLabel()
-end
-function c39823987.spop1(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingTarget(c39823987.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp)
-		and Duel.SelectYesNo(tp,aux.Stringid(39823987,1)) then
-		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetDescription(aux.Stringid(39823987,2))
-		e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
-		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetCountLimit(1)
-		e1:SetTarget(c39823987.sptg2)
-		e1:SetOperation(c39823987.spop2)
-		e1:SetReset(RESET_PHASE+PHASE_END)
-		Duel.RegisterEffect(e1,tp)
-	end
 end
 function c39823987.spfilter(c,e,tp)
 	return c:IsCode(66818682) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
-function c39823987.sptg2(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
+function c39823987.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsControler(tp) and c39823987.spfilter(chkc,e,tp) end
-	if chk==0 then return true end
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		and Duel.IsExistingTarget(c39823987.spfilter,tp,LOCATION_GRAVE,0,1,nil,e,tp) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local g=Duel.SelectTarget(tp,c39823987.spfilter,tp,LOCATION_GRAVE,0,1,1,nil,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,1,0,0)
 end
-function c39823987.spop2(e,tp,eg,ep,ev,re,r,rp)
+function c39823987.spop(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
-	if tc and tc:IsRelateToEffect(e) then
+	if tc:IsRelateToEffect(e) then
 		Duel.SpecialSummon(tc,0,tp,tp,false,false,POS_FACEUP)
 	end
 end

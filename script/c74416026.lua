@@ -39,7 +39,7 @@ function c74416026.activate(e,tp,eg,ep,ev,re,r,rp)
 		if tg:GetCount()>0 and sg:GetCount()>0 and Duel.SelectYesNo(tp,aux.Stringid(74416026,0)) then
 			Duel.BreakEffect()
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
-			local tc=tg:Select(tp,1,1,nil)
+			local tc=tg:Select(tp,1,1,nil):GetFirst()
 			if Duel.SendtoGrave(tc,REASON_EFFECT)==0 or not tc:IsLocation(LOCATION_GRAVE) then return end
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local sc=sg:Select(tp,1,1,nil):GetFirst()
