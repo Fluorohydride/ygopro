@@ -27,9 +27,12 @@ end
 function c59718521.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
+function c59718521.filter(c)
+	return c:IsReleasable() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+end
 function c59718521.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.CheckReleaseGroup(tp,Card.IsRace,1,nil,RACE_PSYCHO) end
-	local g=Duel.SelectReleaseGroup(tp,Card.IsRace,1,1,nil,RACE_PSYCHO)
+	local g=Duel.GetMatchingGroup(Card.IsRace,tp,LOCATION_MZONE,0,nil,RACE_PSYCHO)
+	if chk==0 then return g:GetCount()>0 and g:FilterCount(c59718521.filter,nil)==g:GetCount() end
 	Duel.Release(g,REASON_COST)
 end
 function c59718521.target1(e,tp,eg,ep,ev,re,r,rp,chk)
