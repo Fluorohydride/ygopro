@@ -250,47 +250,58 @@ namespace sgui
         v2f prop = {0.0f, 0.0f};
         v2i texcoord = {0, 0};
         uint32_t color = 0xffffffff;
+        
     };
     
-    class UISpriteVerts {
-    public:
-        inline UISpriteVerts& Offset(recti pos) {
+    template<int32_t VERT_COUNT>
+    struct UIVertexArray {
+        inline UIVertexArray& BuildSprite(recti o, rectf p, recti t, uint32_t c) {
+            SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); return *this;
+        }
+        inline UIVertexArray& BuildSprite(recti o, rectf p, texi4 t, uint32_t c) {
+            SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); return *this;
+        }
+        
+        inline UIVertexArray& SpriteOffset(recti pos) {
+            static_assert(VERT_COUNT >= 4, "");
             verts[0].offset = {pos.left, pos.top};
             verts[1].offset = {pos.left + pos.width, pos.top};
             verts[2].offset = {pos.left, pos.top + pos.height};
             verts[3].offset = {pos.left + pos.width, pos.top + pos.height};
         }
         
-        inline UISpriteVerts& Proportion(rectf prop) {
+        inline UIVertexArray& SpriteProp(rectf prop) {
+            static_assert(VERT_COUNT >= 4, "");
             verts[0].prop = {prop.left, prop.top};
             verts[1].prop = {prop.left + prop.width, prop.top};
             verts[2].prop = {prop.left, prop.top + prop.height};
             verts[3].prop = {prop.left + prop.width, prop.top + prop.height};
         }
         
-        inline UISpriteVerts& Texcoord(recti tex) {
+        inline UIVertexArray& SpriteTexcoord(recti tex) {
+            static_assert(VERT_COUNT >= 4, "");
             verts[0].texcoord = {tex.left, tex.top};
             verts[1].texcoord = {tex.left + tex.width, tex.top};
             verts[2].texcoord = {tex.left, tex.top + tex.height};
             verts[3].texcoord = {tex.left + tex.width, tex.top + tex.height};
-            
         }
         
-        inline UISpriteVerts& Texcoord(texi4 tex) {
+        inline UIVertexArray& SpriteTexcoord(texi4 tex) {
+            static_assert(VERT_COUNT >= 4, "");
             verts[0].texcoord = tex.vert[0];
             verts[1].texcoord = tex.vert[1];
             verts[2].texcoord = tex.vert[2];
             verts[3].texcoord = tex.vert[3];
         }
         
-        inline UISpriteVerts& Color(uint32_t cl) {
+        inline UIVertexArray& SpriteColor(uint32_t cl) {
+            static_assert(VERT_COUNT >= 4, "");
             verts[0].color = verts[1].color = verts[2].color = verts[3].color = cl;
         }
         
-        inline UIVertex* GetVertPtr() { return verts; }
+        inline UIVertex* Ptr() { return verts; }
         
-    protected:
-        UIVertex verts[4];
+        UIVertex verts[VERT_COUNT];
     };
     
     class UIVertexList : public UIComponent {
@@ -2702,36 +2713,38 @@ namespace sgui
         }
         
         void UpdateBackTex() {
-            std::array<UIVertex, 4> v;
+            UIVertexArray<4> v;
             auto back_surface = static_cast<UISpriteList*>(ui_components[1]);
             for(int32_t i = 0; i < back_surface->GetCapacity(); ++i) {
                 auto item_color = ((i + item_begin) == selection) ? color[2] : ((i + item_begin) % 2) ? color[0] : color[1];
-                UpdateBackSprite(i, item_color, &v[0]);
-                back_surface->SetSprite(&v[0], i);
+                //UpdateBackSprite(i, item_color, &v[0]);
+                //back_surface->SetSprite(&v[0], i);
+                v.BuildSprite({0, item_height * i, 0, item_height}, {0.0f, 0.0f, 1.0f, 0.0f}, sel_tex, item_color);
+                back_surface->SetSprite(v.Ptr(), i);
             }
             auto back_offset = bounds.top + item_begin * item_height - item_offset;
             auto item_count = (area_size.absolute.y - bounds.top - bounds.height) / item_height + 1;
             back_surface->SetPositionSizeR({bounds.left, back_offset}, {-bounds.left - bounds.width, item_count * item_height});
         }
         
-        void UpdateBackSprite(int32_t index, int32_t bcolor, UIVertex* v) {
-            v[0].offset = {0, item_height * index};
-            v[0].prop = {0.0f, 0.0f};
-            v[0].texcoord = {sel_tex.left, sel_tex.top},
-            v[0].color = bcolor;
-            v[1].offset = {0, item_height * index};
-            v[1].prop = {1.0f, 0.0f};
-            v[1].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top},
-            v[1].color = bcolor;
-            v[2].offset = {0, item_height * index + item_height};
-            v[2].prop = {0.0f, 0.0f};
-            v[2].texcoord = {sel_tex.left, sel_tex.top + sel_tex.width},
-            v[2].color = bcolor;
-            v[3].offset = {0, item_height * index + item_height};
-            v[3].prop = {1.0f, 0.0f};
-            v[3].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top + sel_tex.width};
-            v[3].color = bcolor;
-        }
+//        void UpdateBackSprite(int32_t index, int32_t bcolor, UIVertex* v) {
+//            v[0].offset = {0, item_height * index};
+//            v[0].prop = {0.0f, 0.0f};
+//            v[0].texcoord = {sel_tex.left, sel_tex.top},
+//            v[0].color = bcolor;
+//            v[1].offset = {0, item_height * index};
+//            v[1].prop = {1.0f, 0.0f};
+//            v[1].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top},
+//            v[1].color = bcolor;
+//            v[2].offset = {0, item_height * index + item_height};
+//            v[2].prop = {0.0f, 0.0f};
+//            v[2].texcoord = {sel_tex.left, sel_tex.top + sel_tex.width},
+//            v[2].color = bcolor;
+//            v[3].offset = {0, item_height * index + item_height};
+//            v[3].prop = {1.0f, 0.0f};
+//            v[3].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top + sel_tex.width};
+//            v[3].color = bcolor;
+//        }
         
         virtual void SetSelection(int32_t sel, bool trigger = true) {
             if(selection == sel)

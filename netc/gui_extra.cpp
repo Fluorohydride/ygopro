@@ -750,9 +750,12 @@ namespace ygopro
                 card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
             }
         }
+        int32_t card_name_height = 0;
         if(card_name) {
             card_name->GetTextUI()->SetText(data->name, 0xff000000);
+            card_name_height = card_name->GetAbsoluteSize().y;
         }
+        int32_t info_text_height = 0;
         if(info_text) {
             info_text->GetTextUI()->Clear();
             info_text->GetTextUI()->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
@@ -761,7 +764,9 @@ namespace ygopro
                 info_text->GetTextUI()->AppendText(L"/", 0xff000000);
                 info_text->GetTextUI()->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
             }
+            info_text_height = info_text->GetAbsoluteSize().y;
         }
+        int32_t extra_text_height = 0;
         if(extra_text) {
             extra_text->GetTextUI()->Clear();
             uint64_t setcode = data->setcode;
@@ -787,16 +792,9 @@ namespace ygopro
                               || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
             extra_text->GetTextUI()->AppendText(L" @", 0xff000000);
             extra_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
+            extra_text_height = extra_text->GetAbsoluteSize().y;
         }
-
-        if(misc_image) {
-            pushvert({0, 0}, {mw, 40}, hmask);
-            if(data->type & 0x1) {
-                for(uint32_t i = 0; i < data->star; ++i)
-                    pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
-            }
-        }
-        
+        int32_t ad_text_height = 0;
         if(ad_text) {
             if(data->type & 0x1) {
                 std::string adstr;
@@ -809,10 +807,13 @@ namespace ygopro
                 else
                     adstr.append(" DEF/  ? ");
                 ad_text->GetTextUI()->SetText(To<std::wstring>(adstr), 0xff000000);
+                ad_text_height = ad_text->GetAbsoluteSize().y;
             } else
                 ad_text->GetTextUI()->Clear();
         }
 
+        int32_t pen_height = 0;
+        int32_t desc_height = 0;
         if(data->lscale || data->rscale) {
             std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
             auto pd = data->texts.find(pdelimiter);
@@ -826,6 +827,7 @@ namespace ygopro
             }
             if(card_text) {
                 card_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+                desc_height = card_text->GetAbsoluteSize().y;
                 card_text->SetPosition({cw + 15, 63 + ph});
             }
             if(ph < 55)
@@ -853,8 +855,17 @@ namespace ygopro
             text->SetText(data->texts, 0xff000000);
             text->SetPosition({cw + 15, 60});
         }
-        imgs->SetImage(ImageMgr::Get().GetRawMiscTexture(), verts, colors);
-        imgs->AddTexcoord(coords);
+        
+        sgui::UIVertexArray<4> v;
+        if(misc_image) {
+            misc_image->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            misc_image->GetSpriteUI()->AddSprite(v.BuildSprite({}, {}, hmask, 0xffffffff).Ptr());
+            if(data->type & 0x1) {
+                for(uint32_t i = 0; i < data->star; ++i)
+                    pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
+            }
+        }
+        
     }
     
     void InfoPanel::Destroy() {
