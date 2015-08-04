@@ -254,17 +254,7 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 		for(uint32 i = 0; i < core.select_cards.size(); ++i) {
 			pcard = core.select_cards[i];
 			pduel->write_buffer32(pcard->data.code);
-			if(pcard->overlay_target) {
-				pduel->write_buffer8(pcard->overlay_target->current.controler);
-				pduel->write_buffer8(pcard->overlay_target->current.location | LOCATION_OVERLAY);
-				pduel->write_buffer8(pcard->overlay_target->current.sequence);
-				pduel->write_buffer8(pcard->current.sequence);
-			} else {
-				pduel->write_buffer8(pcard->current.controler);
-				pduel->write_buffer8(pcard->current.location);
-				pduel->write_buffer8(pcard->current.sequence);
-				pduel->write_buffer8(pcard->current.position);
-			}
+			pduel->write_buffer32(pcard->get_info_location());
 		}
 		return FALSE;
 	} else {

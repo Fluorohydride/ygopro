@@ -1095,7 +1095,7 @@ int32 field::equip(uint16 step, uint8 equip_player, card * equip_card, card * ta
 			else
 				peffect->value = TYPE_EQUIP + TYPE_SPELL;
 			peffect->flag = EFFECT_FLAG_CANNOT_DISABLE;
-			peffect->reset_flag = RESET_EVENT + 0x1fe0000;
+			peffect->reset_flag = RESET_EVENT + 0x17e0000;
 			equip_card->add_effect(peffect);
 		}
 		equip_card->effect_target_cards.insert(target);
@@ -1204,9 +1204,10 @@ int32 field::summon(uint16 step, uint8 sumplayer, card * target, effect * proc, 
 		int32 required = target->get_summon_tribute_count();
 		int32 min = required & 0xffff;
 		int32 max = required >> 16;
-		if(min < min_tribute)
+		if(min < min_tribute) {
 			min = min_tribute;
-		required = min + (max << 16);
+			required = min + (max << 16);
+		}
 		uint32 adv = is_player_can_summon(SUMMON_TYPE_ADVANCE, sumplayer, target);
 		if(max == 0 || !adv) {
 			returns.bvalue[0] = 0;
@@ -1714,9 +1715,10 @@ int32 field::mset(uint16 step, uint8 setplayer, card * target, effect * proc, ui
 		int32 required = target->get_set_tribute_count();
 		int32 min = required & 0xffff;
 		int32 max = required >> 16;
-		if(min < min_tribute)
+		if(min < min_tribute) {
 			min = min_tribute;
-		required = min + (max << 16);
+			required = min + (max << 16);
+		}
 		uint32 adv = is_player_can_mset(SUMMON_TYPE_ADVANCE, setplayer, target);
 		if(max == 0 || !adv) {
 			returns.bvalue[0] = 0;
