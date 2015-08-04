@@ -31,8 +31,8 @@ function c91078716.filter(c)
 	return c:IsReleasable() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c91078716.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	local g=Duel.GetMatchingGroup(Card.IsRace,tp,LOCATION_MZONE,0,nil,RACE_PLANT)
-	if chk==0 then return g:GetCount()>0 and g:FilterCount(c91078716.filter,nil)==g:GetCount() end
+	if chk==0 then return Duel.CheckReleaseGroup(tp,c91078716.filter,1,nil,RACE_PLANT) end
+	local g=Duel.SelectReleaseGroup(tp,c91078716.filter,1,1,nil,RACE_PLANT)
 	Duel.Release(g,REASON_COST)
 end
 function c91078716.target1(e,tp,eg,ep,ev,re,r,rp,chk)
