@@ -729,6 +729,7 @@ namespace ygopro
             if(!wnd)
                 return;
             card_image = wnd->FindWidgetAs<sgui::SGImage>("card image");
+            scroll_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
             misc_image = wnd->FindWidgetAs<sgui::SGImageList>("misc");
             card_name = wnd->FindWidgetAs<sgui::SGLabel>("card name");
             info_text = wnd->FindWidgetAs<sgui::SGLabel>("info text");
@@ -738,17 +739,23 @@ namespace ygopro
             extra_text = wnd->FindWidgetAs<sgui::SGLabel>("extra text");
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
         }
-        
+        int32_t info_margin = (int32_t)dialogCfg["info margin"].to_integer();
         auto hmask = ImageMgr::Get().GetTexture("mmask");
         auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
         auto data = DataMgr::Get()[code];
+        int32_t card_image_width = 0;
         if(card_image) {
             auto ctex = ImageMgr::Get().LoadBigCardTexture(code);
             if(ctex) {
                 card_image->GetSpriteUI()->SetTexture(ctex);
                 card_image->GetSpriteUI()->SetTextureRect({0, 0, ctex->GetImgWidth(), ctex->GetImgHeight()});
+                card_image_width = ctex->GetImgWidth() + info_margin;
             }
+        }
+        if(scroll_area) {
+            scroll_area->SetPositionSize({-info_margin, -info_margin}, {-card_image_width - info_margin * 2, -info_margin * 2},
+                                         {0.0f, 0.0f}, {1.0f, 1.0f}, {-1.0f, -1.0f});
         }
         int32_t card_name_height = 0;
         if(card_name) {

@@ -1,6 +1,7 @@
 {
   "default text color" : "0x000000ff",
   "default input color" : "0x000000ff",
+  "info margin" : 5,
   "messagebox ok" : {
     "type" : "window",
     "close button" : false,
@@ -212,12 +213,19 @@
     "children" : {
       "card image" : {
         "type" : "sprite",
-        "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
       },
-      "keyword label" : {
-        "type" : "label",
-        "text" : "eui_filter_keyword",
-        "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+      "scroll area" : {
+        "type" : "scrollarea",
+        "children" : {
+          "misc image" : {
+            "type" : "spritelist",
+            "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+          },
+          "card name" : {
+            "type" : "label",
+            "position" : [0, 15, 100, 40, 0, 0, 0.0, 0.0, 0.0, 0.0]
+          }
+        }
       }
     }
   },
