@@ -95,12 +95,9 @@ namespace ygopro
         sgui::SGImage* card_image = nullptr;
         sgui::SGScrollArea* scroll_area = nullptr;
         sgui::SGImageList* misc_image = nullptr;
-        sgui::SGLabel* card_name = nullptr;
         sgui::SGLabel* info_text = nullptr;
         sgui::SGLabel* pen_text = nullptr;
-        sgui::SGLabel* card_text = nullptr;        
-        sgui::SGLabel* ad_text = nullptr;
-        sgui::SGLabel* extra_text = nullptr;
+        sgui::SGLabel* desc_text = nullptr;
     };
 }
 

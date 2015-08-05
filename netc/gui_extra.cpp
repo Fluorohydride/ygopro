@@ -585,7 +585,7 @@ namespace ygopro
         for(size_t i = 0; i < tokens.size(); ++i) {
             auto& sep_keyword = tokens[i];
             if(sep_keyword.length() > 0) {
-                if(sep_keyword[0] == L'!') {
+                if(sep_keyword[0] == L'=') {
                     fc.code = ParseInt(&sep_keyword[1], (int32_t)sep_keyword.length() - 1);
                     if(fc.code == 0)
                         fc.code = 1;
@@ -731,15 +731,12 @@ namespace ygopro
             card_image = wnd->FindWidgetAs<sgui::SGImage>("card image");
             scroll_area = wnd->FindWidgetAs<sgui::SGScrollArea>("scroll area");
             misc_image = wnd->FindWidgetAs<sgui::SGImageList>("misc");
-            card_name = wnd->FindWidgetAs<sgui::SGLabel>("card name");
             info_text = wnd->FindWidgetAs<sgui::SGLabel>("info text");
             pen_text = wnd->FindWidgetAs<sgui::SGLabel>("pendulum text");
-            card_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
-            ad_text = wnd->FindWidgetAs<sgui::SGLabel>("ad text");
-            extra_text = wnd->FindWidgetAs<sgui::SGLabel>("extra text");
+            desc_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
         }
-        int32_t info_margin = (int32_t)dialogCfg["info margin"].to_integer();
+        int32_t info_margin = (int32_t)dialogCfg["info dialog"]["info margin"].to_integer();
         auto hmask = ImageMgr::Get().GetTexture("mmask");
         auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
@@ -757,53 +754,20 @@ namespace ygopro
             scroll_area->SetPositionSize({-info_margin, -info_margin}, {-card_image_width - info_margin * 2, -info_margin * 2},
                                          {0.0f, 0.0f}, {1.0f, 1.0f}, {-1.0f, -1.0f});
         }
-        int32_t card_name_height = 0;
-        if(card_name) {
-            card_name->GetTextUI()->SetText(data->name, 0xff000000);
-            card_name_height = card_name->GetAbsoluteSize().y;
-        }
         int32_t info_text_height = 0;
         if(info_text) {
             info_text->GetTextUI()->Clear();
+            //card name
+            info_text->GetTextUI()->AppendText(data->name, 0xff000000);
+            info_text->GetTextUI()->AppendText(L"\n", 0xff000000);
+            // types
             info_text->GetTextUI()->AppendText(DataMgr::Get().GetTypeString(data->type), 0xff000000);
             if(data->type & 0x1) {
+                info_text->GetTextUI()->AppendText(L" ", 0xff000000);
                 info_text->GetTextUI()->AppendText(DataMgr::Get().GetAttributeString(data->attribute), 0xff000000);
                 info_text->GetTextUI()->AppendText(L"/", 0xff000000);
                 info_text->GetTextUI()->AppendText(DataMgr::Get().GetRaceString(data->race), 0xff000000);
-            }
-            info_text_height = info_text->GetAbsoluteSize().y;
-        }
-        int32_t extra_text_height = 0;
-        if(extra_text) {
-            extra_text->GetTextUI()->Clear();
-            uint64_t setcode = data->setcode;
-            if(data->alias) {
-                auto aliasdata = DataMgr::Get()[data->alias];
-                if(aliasdata)
-                    setcode = aliasdata->setcode;
-            }
-            if(setcode) {
-                extra_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
-                for(int32_t i = 0; i < 4; ++i) {
-                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
-                    if(sd) {
-                        extra_text->GetTextUI()->AppendText(L"#", 0xff000000);
-                        extra_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
-                        extra_text->GetTextUI()->AppendText(L" ", 0xff000000);
-                    }
-                }
-            }
-            extra_text->GetTextUI()->AppendText(L"\n", 0xff000000);
-            uint32_t ccode = (data->alias == 0
-                              || (data->alias > data->code && data->alias - data->code > 10)
-                              || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
-            extra_text->GetTextUI()->AppendText(L" @", 0xff000000);
-            extra_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
-            extra_text_height = extra_text->GetAbsoluteSize().y;
-        }
-        int32_t ad_text_height = 0;
-        if(ad_text) {
-            if(data->type & 0x1) {
+                info_text->GetTextUI()->AppendText(L" ", 0xff000000);
                 std::string adstr;
                 if(data->attack >= 0)
                     adstr.append(To<std::string>("ATK/% 4ld", data->attack));
@@ -813,10 +777,31 @@ namespace ygopro
                     adstr.append(To<std::string>(" DEF/% 4ld", data->defence));
                 else
                     adstr.append(" DEF/  ? ");
-                ad_text->GetTextUI()->SetText(To<std::wstring>(adstr), 0xff000000);
-                ad_text_height = ad_text->GetAbsoluteSize().y;
-            } else
-                ad_text->GetTextUI()->Clear();
+                info_text->GetTextUI()->AppendText(To<std::wstring>(adstr), 0xff000000);
+            }
+            uint64_t setcode = data->setcode;
+            if(data->alias) {
+                auto aliasdata = DataMgr::Get()[data->alias];
+                if(aliasdata)
+                    setcode = aliasdata->setcode;
+            }
+            uint32_t ccode = (data->alias == 0
+                              || (data->alias > data->code && data->alias - data->code > 10)
+                              || (data->alias < data->code && data->code - data->alias > 10)) ? data->code : data->alias;
+            info_text->GetTextUI()->AppendText(L"\n=", 0xff000000);
+            info_text->GetTextUI()->AppendText(To<std::wstring>(To<std::string>("%08d", ccode)), 0xffff0000);
+            if(setcode) {
+                info_text->GetTextUI()->AppendText(To<std::wstring>(stringCfg["eui_msg_setcode"].to_string()), 0xff000000);
+                for(int32_t i = 0; i < 4; ++i) {
+                    uint16_t sd = (setcode >> (i * 16)) & 0xffff;
+                    if(sd) {
+                        info_text->GetTextUI()->AppendText(L" @", 0xff000000);
+                        info_text->GetTextUI()->AppendText(DataMgr::Get().GetSetName(sd), 0xffff0000);
+                        info_text->GetTextUI()->AppendText(L" ", 0xff000000);
+                    }
+                }
+            }
+            info_text_height = info_text->GetAbsoluteSize().y;
         }
 
         int32_t pen_height = 0;
@@ -830,12 +815,12 @@ namespace ygopro
                     pen_text->GetTextUI()->SetText(data->texts.substr(0, pd - 1), 0xff000000);
                 else
                     pen_text->GetTextUI()->Clear();
-                ph = pen_text->GetAbsoluteSize().y + 13;
+                ph = pen_text->GetAbsoluteSize().y + info_margin;
             }
-            if(card_text) {
-                card_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
-                desc_height = card_text->GetAbsoluteSize().y;
-                card_text->SetPosition({cw + 15, 63 + ph});
+            if(desc_text) {
+                desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+                desc_height = desc_text->GetAbsoluteSize().y;
+                desc_text->SetPosition({cw + 15, 63 + ph});
             }
             if(ph < 55)
                 ph = 55;

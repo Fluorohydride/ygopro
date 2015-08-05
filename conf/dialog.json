@@ -1,7 +1,6 @@
 {
   "default text color" : "0x000000ff",
   "default input color" : "0x000000ff",
-  "info margin" : 5,
   "messagebox ok" : {
     "type" : "window",
     "close button" : false,
@@ -227,7 +226,10 @@
           }
         }
       }
-    }
+    },
+    "info margin" : 5,
+    "min pendilum text height" : 55,
+    "pendilum scale width" : 20
   },
   "item lists" : {
     "type list" : {
