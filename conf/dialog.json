@@ -229,7 +229,8 @@
     },
     "info margin" : 5,
     "min pendilum text height" : 55,
-    "pendilum scale width" : 20
+    "pendilum scale blank" : 20,
+    "pendilum scale size" : [14, 20]
   },
   "item lists" : {
     "type list" : {

@@ -736,7 +736,12 @@ namespace ygopro
             desc_text = wnd->FindWidgetAs<sgui::SGLabel>("card text");
             window = wnd->CastPtr<sgui::SGWidgetContainer>();
         }
-        int32_t info_margin = (int32_t)dialogCfg["info dialog"]["info margin"].to_integer();
+        auto& dlg_node = dialogCfg["info dialog"];
+        int32_t info_margin = (int32_t)dlg_node["info margin"].to_integer();
+        int32_t min_pen_height = (int32_t)dlg_node["min pendilum text height"].to_integer();
+        int32_t scale_width = (int32_t)dlg_node["pendilum scale blank"].to_integer();
+        v2i scale_size = sgui::SGJsonUtil::ConvertV2i(dlg_node["pendilum scale size"], 0);
+        
         auto hmask = ImageMgr::Get().GetTexture("mmask");
         auto star = ImageMgr::Get().GetTexture("mstar");
         this->code = code;
@@ -803,66 +808,63 @@ namespace ygopro
             }
             info_text_height = info_text->GetAbsoluteSize().y;
         }
-
+        
+        sgui::UIVertexArray<4> v;
         int32_t pen_height = 0;
         int32_t desc_height = 0;
+        std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
+        auto pd = data->texts.find(pdelimiter);
+        if(desc_text) {
+            desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
+            desc_height = desc_text->GetAbsoluteSize().y;
+        }
+        if(misc_image) {
+            misc_image->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawMiscTexture());
+            v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
+            misc_image->GetSpriteUI()->AddSprite(v.Ptr());
+            if(data->type & 0x1) {
+//                for(uint32_t i = 0; i < data->star; ++i)
+//                    pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
+            }
+        }
+        int32_t ph = 0;
         if(data->lscale || data->rscale) {
-            std::wstring pdelimiter = To<std::wstring>(stringCfg["pendulum_delimiter"].to_string());
-            auto pd = data->texts.find(pdelimiter);
-            int32_t ph = 0;
             if(pen_text) {
                 if(pd > 0)
                     pen_text->GetTextUI()->SetText(data->texts.substr(0, pd - 1), 0xff000000);
                 else
                     pen_text->GetTextUI()->Clear();
-                ph = pen_text->GetAbsoluteSize().y + info_margin;
+                ph = pen_text->GetAbsoluteSize().y;
+                if(ph < min_pen_height)
+                    ph = min_pen_height;
             }
-            if(desc_text) {
-                desc_text->GetTextUI()->SetText(data->texts.substr(pd + pdelimiter.length()), 0xff000000);
-                desc_height = desc_text->GetAbsoluteSize().y;
-                desc_text->SetPosition({cw + 15, 63 + ph});
-            }
-            if(ph < 55)
-                ph = 55;
+            v.BuildSprite({0, desc_height + info_margin, 0, ph}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
+            misc_image->GetSpriteUI()->AddSprite(v.Ptr());
             
-            pushvert({0, 45}, {mw, ph}, hmask, 0xc0ffffff);
-            pushvert({0, 50 + ph}, {mw, sz.y - 70 - ph}, hmask, 0xc0ffffff);
             auto lscale = ImageMgr::Get().GetTexture("lscale");
             auto rscale = ImageMgr::Get().GetTexture("rscale");
-            pushvert({0, 50}, {30, 23}, lscale);
-            pushvert({mw - 30, 50}, {30, 23}, rscale);
-            if(data->lscale >= 10) {
-                pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale / 10)), 0xff000000);
-                pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale % 10)), 0xff000000);
-            } else
-                pushvert({8, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->lscale), 0xff000000);
-            if(data->rscale >= 10) {
-                pushvert({mw - 29, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale / 10)), 0xff000000);
-                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale % 10)), 0xff000000);
-            } else
-                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->rscale), 0xff000000);
-        } else {
-            pushvert({0, 45}, {mw, sz.y - 65}, hmask, 0xc0ffffff);
-            pent->SetText(L"", 0xff000000);
-            text->SetText(data->texts, 0xff000000);
-            text->SetPosition({cw + 15, 60});
-        }
-        
-        sgui::UIVertexArray<4> v;
-        if(misc_image) {
-            misc_image->GetSpriteUI()->SetTexture(ImageMgr::Get().GetRawMiscTexture());
-            misc_image->GetSpriteUI()->AddSprite(v.BuildSprite({}, {}, hmask, 0xffffffff).Ptr());
-            if(data->type & 0x1) {
-                for(uint32_t i = 0; i < data->star; ++i)
-                    pushvert({(int32_t)(mw - 21 - 16 * i), 20}, {16, 16}, star);
-            }
-        }
+//            pushvert({0, 50}, {30, 23}, lscale);
+//            pushvert({mw - 30, 50}, {30, 23}, rscale);
+//            if(data->lscale >= 10) {
+//                pushvert({1, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale / 10)), 0xff000000);
+//                pushvert({15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->lscale % 10)), 0xff000000);
+//            } else
+//                pushvert({8, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->lscale), 0xff000000);
+//            if(data->rscale >= 10) {
+//                pushvert({mw - 29, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale / 10)), 0xff000000);
+//                pushvert({mw - 15, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + (data->rscale % 10)), 0xff000000);
+//            } else
+//                pushvert({mw - 22, 73}, {14, 20}, ImageMgr::Get().GetCharTex(L'0' + data->rscale), 0xff000000);
+        } else
+            pen_text->GetTextUI()->Clear();
+        v.BuildSprite({0, 0, 0, desc_height}, {0.0f, 0.0f, 1.0f, 0.0f}, hmask, 0xffffffff);
+        misc_image->GetSpriteUI()->AddSprite(v.Ptr());
         
     }
     
     void InfoPanel::Destroy() {
         if(!window.expired())
-            window.lock()->Destroy();
+            window.lock()->RemoveFromParent();
         code = 0;
     }
     
