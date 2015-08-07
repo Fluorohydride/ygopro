@@ -27,9 +27,10 @@ function c34460239.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c34460239.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
+	local code=tc:GetCode()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) and Duel.Destroy(tc,REASON_EFFECT)>0 then
 		Duel.BreakEffect()
-		local hc=Duel.GetFirstMatchingCard(c34460239.filter2,tp,LOCATION_DECK,0,nil,tc:GetCode())
+		local hc=Duel.GetFirstMatchingCard(c34460239.filter2,tp,LOCATION_DECK,0,nil,code)
 		if hc then
 			Duel.SendtoHand(hc,nil,REASON_EFFECT)
 			Duel.ConfirmCards(1-tp,hc)
