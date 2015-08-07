@@ -61,7 +61,7 @@ function c82044279.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c82044279.atkcon(e,tp,eg,ep,ev,re,r,rp)
-	return bit.band(r,REASON_EFFECT)~=0 and re and re:GetHandler()==e:GetHandler()
+	return bit.band(r,REASON_EFFECT)~=0 and re and re:GetOwner()==e:GetHandler()
 		and eg:IsExists(Card.IsType,1,nil,TYPE_MONSTER)
 end
 function c82044279.atkop(e,tp,eg,ep,ev,re,r,rp)

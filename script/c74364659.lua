@@ -42,5 +42,5 @@ end
 function c74364659.ctcon(e)
 	local c=e:GetOwner()
 	local h=e:GetHandler()
-	return h:IsAttribute(ATTRIBUTE_FIRE) and c:IsHasCardTarget(h)
+	return h:IsAttribute(ATTRIBUTE_WATER) and c:IsHasCardTarget(h)
 end
