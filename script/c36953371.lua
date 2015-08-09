@@ -18,6 +18,13 @@ function c36953371.initial_effect(c)
 	e2:SetTarget(c36953371.destg)
 	e2:SetOperation(c36953371.desop)
 	c:RegisterEffect(e2)
+	--add setcode
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_ADD_SETCODE)
+	e3:SetValue(0x9a)
+	c:RegisterEffect(e3)
 end
 function c36953371.descon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler():GetSummonType()==SUMMON_TYPE_SYNCHRO

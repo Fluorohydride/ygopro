@@ -29,21 +29,21 @@ function c32542011.desfilter(c)
 	return c:IsDestructable()
 end
 function c32542011.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return 
-		(Duel.IsExistingMatchingCard(c32542011.cfilter2,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_FIRE)
-		and Duel.IsExistingMatchingCard(c32542011.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil))
-		or
-		(Duel.GetLocationCount(tp,LOCATION_MZONE)>0
-		and Duel.IsExistingMatchingCard(c32542011.cfilter2,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_WATER)
-		and Duel.IsExistingMatchingCard(c32542011.spfilter,tp,LOCATION_GRAVE,0,1,nil,Duel.GetTurnCount(),e,tp))
-	end
-	if Duel.IsExistingMatchingCard(c32542011.cfilter2,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_FIRE) then
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local b1=Duel.IsExistingMatchingCard(c32542011.cfilter2,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_FIRE)
+		and Duel.IsExistingMatchingCard(c32542011.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil)
+	local b2=Duel.IsExistingMatchingCard(c32542011.cfilter2,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_WATER)
+		and ft>0 and Duel.IsExistingMatchingCard(c32542011.spfilter,tp,LOCATION_GRAVE,0,1,nil,Duel.GetTurnCount(),e,tp)
+	if chk==0 then return b1 or b2 end
+	if b1 then
 		local g=Duel.GetMatchingGroup(c32542011.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,nil)
 		Duel.SetOperationInfo(0,CATEGORY_DESTROY,g,1,0,0)
 	end
-	if Duel.IsExistingMatchingCard(c32542011.cfilter2,tp,LOCATION_MZONE,0,1,nil,ATTRIBUTE_WATER) then
+	if b2 then
 		local g=Duel.GetMatchingGroup(c32542011.spfilter,tp,LOCATION_GRAVE,0,nil,Duel.GetTurnCount(),e,tp)
-		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,Duel.GetLocationCount(tp,LOCATION_MZONE),0,0)
+		Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,ft,0,0)
+		local dg=Duel.GetMatchingGroup(c32542011.desfilter,tp,LOCATION_MZONE,0,nil)
+		Duel.SetOperationInfo(0,CATEGORY_DESTROY,dg,1,0,0)
 	end
 end
 function c32542011.activate(e,tp,eg,ep,ev,re,r,rp)

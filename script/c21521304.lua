@@ -25,6 +25,13 @@ function c21521304.initial_effect(c)
 	e2:SetTarget(c21521304.sptg)
 	e2:SetOperation(c21521304.spop)
 	c:RegisterEffect(e2)
+	--add setcode
+	local e3=Effect.CreateEffect(c)
+	e3:SetType(EFFECT_TYPE_SINGLE)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
+	e3:SetCode(EFFECT_ADD_SETCODE)
+	e3:SetValue(0x7f)
+	c:RegisterEffect(e3)
 end
 c21521304.xyz_number=39
 function c21521304.atkcon(e,tp,eg,ep,ev,re,r,rp)

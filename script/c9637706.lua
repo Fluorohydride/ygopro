@@ -8,6 +8,9 @@ function c9637706.initial_effect(c)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(c9637706.damval)
 	c:RegisterEffect(e1)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	c:RegisterEffect(e2)
 end
 function c9637706.damval(e,re,val,r,rp,rc)
 	if bit.band(r,REASON_EFFECT)~=0 then return 0

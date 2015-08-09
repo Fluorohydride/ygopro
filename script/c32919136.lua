@@ -59,7 +59,6 @@ function c32919136.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c32919136.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c32919136.descon(e) then Duel.Destroy(c,REASON_EFFECT) end
 	local tc=Duel.GetFirstTarget()
 	if c:IsRelateToEffect(e) and tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.Equip(tp,c,tc)

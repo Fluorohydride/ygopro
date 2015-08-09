@@ -199,6 +199,7 @@ public:
 	void cancel_card_target(card* pcard);
 	
 	void filter_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
+	void filter_single_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_single_continuous_effect(int32 code, effect_set* eset, uint8 sort = TRUE);
 	void filter_immune_effect();
 	void filter_disable_related_cards();
@@ -208,7 +209,7 @@ public:
 	void filter_spsummon_procedure_g(uint8 playerid, effect_set* eset);
 	effect* is_affected_by_effect(int32 code);
 	effect* is_affected_by_effect(int32 code, card* target);
-	effect* check_equip_control_effect();
+	effect* check_control_effect();
 	int32 fusion_check(group* fusion_m, card* cg, int32 chkf);
 	void fusion_select(uint8 playerid, group* fusion_m, card* cg, int32 chkf);
 	
@@ -252,6 +253,7 @@ public:
 	int32 is_capable_be_effect_target(effect* peffect, uint8 playerid);
 	int32 is_can_be_fusion_material(uint8 ignore_mon = FALSE);
 	int32 is_can_be_synchro_material(card* scard, card* tuner = 0);
+	int32 is_can_be_ritual_material(card* scard);
 	int32 is_can_be_xyz_material(card* scard);
 };
 
@@ -380,7 +382,7 @@ public:
 #define STATUS_SET_TURN				0x0010	//
 #define STATUS_NO_LEVEL				0x0020	//
 #define STATUS_REVIVE_LIMIT			0x0040	//
-#define STATUS_ATTACKED				0x0080	//
+#define STATUS_SPSUMMON_STEP		0x0080	//
 #define STATUS_FORM_CHANGED			0x0100	//
 #define STATUS_SUMMONING			0x0200	//
 #define STATUS_EFFECT_ENABLED		0x0400	//

@@ -35,15 +35,28 @@ function c83546647.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONFIRM)
 	local g=Duel.SelectMatchingCard(tp,c83546647.spfilter,tp,LOCATION_HAND,0,1,1,nil,e,tp)
+	local tc=g:GetFirst()
 	Duel.ConfirmCards(1-tp,g)
-	Duel.ShuffleHand(tp)
+	local e1=Effect.CreateEffect(e:GetHandler())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_PUBLIC)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_CHAIN)
+	tc:RegisterEffect(e1)
+	local e2=Effect.CreateEffect(e:GetHandler())
+	e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e2:SetCode(EVENT_CHAIN_SOLVED)
+	e2:SetRange(LOCATION_HAND)
+	e2:SetOperation(c83546647.clearop)
+	e2:SetReset(RESET_EVENT+0x1fe0000+RESET_CHAIN)
+	e2:SetLabel(Duel.GetCurrentChain())
+	e2:SetLabelObject(e1)
+	tc:RegisterEffect(e2)
 	Duel.SetTargetCard(g)
-	e:SetLabelObject(g:GetFirst())
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_HAND+LOCATION_DECK)
 end
 function c83546647.activate(e,tp,eg,ep,ev,re,r,rp)
 	if Duel.GetLocationCount(tp,LOCATION_MZONE)<2 then return end
-	local tc1=e:GetLabelObject()
+	local tc1=Duel.GetFirstTarget()
 	if not tc1:IsRelateToEffect(e) or not tc1:IsCanBeSpecialSummoned(e,0,tp,false,false) then return end
 	local tc2=Duel.GetFirstMatchingCard(c83546647.spfilter2,tp,LOCATION_DECK,0,nil,e,tp,tc1:GetCode())
 	if tc2 then
@@ -51,4 +64,9 @@ function c83546647.activate(e,tp,eg,ep,ev,re,r,rp)
 		Duel.SpecialSummonStep(tc2,0,tp,tp,false,false,POS_FACEUP)
 		Duel.SpecialSummonComplete()
 	end
+end
+function c83546647.clearop(e,tp,eg,ep,ev,re,r,rp)
+	if ev~=e:GetLabel() then return end
+	e:GetLabelObject():Reset()
+	e:Reset()
 end

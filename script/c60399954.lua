@@ -2,7 +2,6 @@
 function c60399954.initial_effect(c)
 	--atkup
 	local e1=Effect.CreateEffect(c)
-	e1:SetCategory(CATEGORY_ATKCHANGE)
 	e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e1:SetType(EFFECT_TYPE_ACTIVATE)
 	e1:SetCode(EVENT_FREE_CHAIN)
@@ -32,17 +31,12 @@ end
 function c60399954.operation(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
-		local atk=0
-		local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,tc)
-		local bc=g:GetFirst()
-		while bc do
-			atk=atk+bc:GetAttack()
-			bc=g:GetNext()
-		end
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE)
-		e1:SetCode(EFFECT_UPDATE_ATTACK)
-		e1:SetValue(atk)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_PHASE_START+PHASE_BATTLE)
+		e1:SetRange(LOCATION_MZONE)
+		e1:SetCountLimit(1)
+		e1:SetOperation(c60399954.atkop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		tc:RegisterEffect(e1)
 		local e2=Effect.CreateEffect(e:GetHandler())
@@ -54,4 +48,20 @@ function c60399954.operation(e,tp,eg,ep,ev,re,r,rp)
 end
 function c60399954.ftarget(e,c)
 	return e:GetLabel()~=c:GetFieldID()
+end
+function c60399954.atkop(e,tp,eg,ep,ev,re,r,rp)
+	local c=e:GetHandler()
+	local atk=0
+	local g=Duel.GetMatchingGroup(Card.IsFaceup,tp,LOCATION_MZONE,0,c)
+	local tc=g:GetFirst()
+	while tc do
+		atk=atk+tc:GetAttack()
+		tc=g:GetNext()
+	end
+	local e1=Effect.CreateEffect(e:GetOwner())
+	e1:SetType(EFFECT_TYPE_SINGLE)
+	e1:SetCode(EFFECT_UPDATE_ATTACK)
+	e1:SetValue(atk)
+	e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_BATTLE)
+	c:RegisterEffect(e1)
 end

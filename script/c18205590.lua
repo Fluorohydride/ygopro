@@ -42,10 +42,10 @@ function c18205590.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetRange(LOCATION_MZONE)
 		e1:SetCode(EFFECT_CANNOT_SPECIAL_SUMMON)
 		e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-		e1:SetTargetRange(1,0)
+		e1:SetAbsoluteRange(tp,1,0)
 		e1:SetTarget(c18205590.splimit)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
-		g:GetFirst():RegisterEffect(e1)
+		g:GetFirst():RegisterEffect(e1,true)
 	end
 end
 function c18205590.splimit(e,c)

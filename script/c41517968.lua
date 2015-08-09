@@ -8,7 +8,7 @@ function c41517968.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c41517968.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--pierce
 	local e2=Effect.CreateEffect(c)
@@ -32,9 +32,6 @@ function c41517968.initial_effect(c)
 	e4:SetTarget(c41517968.destg)
 	e4:SetOperation(c41517968.desop)
 	c:RegisterEffect(e4)
-end
-function c41517968.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c41517968.poscon(e,tp,eg,ep,ev,re,r,rp)
 	return e:GetHandler()==Duel.GetAttacker() and e:GetHandler():IsRelateToBattle()

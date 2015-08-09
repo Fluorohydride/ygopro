@@ -32,12 +32,13 @@ end
 function c73872164.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=Duel.GetFirstTarget()
 	if tc:IsRelateToEffect(e) and tc:IsFaceup() and Duel.Destroy(tc,REASON_EFFECT)~=0 then
+		Duel.BreakEffect()
 		local code=tc:GetCode()
 		local g=Duel.GetMatchingGroup(Card.IsCode,tp,0,LOCATION_HAND,nil,code)
 		local hg=Duel.GetFieldGroup(tp,0,LOCATION_HAND)
 		Duel.ConfirmCards(tp,hg)
 		if g:GetCount()>0 then
-			Duel.SendtoGrave(g,REASON_EFFECT+REASON_DISCARD)
+			Duel.SendtoGrave(g,REASON_EFFECT)
 		end
 		Duel.ShuffleHand(1-tp)
 	end

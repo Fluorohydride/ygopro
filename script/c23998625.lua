@@ -80,5 +80,10 @@ function c23998625.spop(e,tp,eg,ep,ev,re,r,rp)
 		Duel.Overlay(tc,cg)
 		Duel.SpecialSummon(tc,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)
 		tc:CompleteProcedure()
+	else
+		local cg=Duel.GetFieldGroup(tp,LOCATION_EXTRA,0)
+		if cg:IsExists(Card.IsFacedown,1,nil) and Duel.IsPlayerCanSpecialSummon(tp) then
+			Duel.ConfirmCards(1-tp,cg)
+		end
 	end
 end

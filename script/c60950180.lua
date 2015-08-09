@@ -29,18 +29,13 @@ function c60950180.initial_effect(c)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_SUMMON_SUCCESS)
-		ge1:SetOperation(c60950180.checkop)
+		ge1:SetLabel(60950180)
+		ge1:SetOperation(aux.sumreg)
 		Duel.RegisterEffect(ge1,0)
 		local ge2=ge1:Clone()
 		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge2:SetLabel(60950180)
 		Duel.RegisterEffect(ge2,0)
-	end
-end
-function c60950180.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		tc:RegisterFlagEffect(60950180,RESET_EVENT+0x1fc0000+RESET_PHASE+PHASE_END,0,1)
-		tc=eg:GetNext()
 	end
 end
 function c60950180.poscon(e,tp,eg,ep,ev,re,r,rp)

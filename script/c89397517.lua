@@ -47,7 +47,7 @@ function c89397517.activate(e,tp,eg,ep,ev,re,r,rp)
 		rmg:Remove(Card.IsCode,nil,tc:GetCode())
 		g:AddCard(tc)
 		ct=ct-1
-	until ct<1 or not Duel.SelectYesNo(tp,aux.Stringid(89397517,1))
+	until ct<1 or not Duel.SelectYesNo(tp,aux.Stringid(89397517,0))
 	Duel.Remove(g,POS_FACEUP,REASON_EFFECT)
 	ct=g:FilterCount(Card.IsLocation,nil,LOCATION_REMOVED)
 	while ct>0 do

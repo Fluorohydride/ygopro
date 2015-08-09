@@ -22,6 +22,7 @@ function c32543380.initial_effect(c)
 	e3:SetProperty(EFFECT_FLAG_SINGLE_RANGE)
 	e3:SetCode(EFFECT_MUST_BE_ATTACKED)
 	e3:SetRange(LOCATION_MZONE)
+	e3:SetValue(aux.imval1)
 	c:RegisterEffect(e3)
 	--special summon
 	local e4=Effect.CreateEffect(c)

@@ -33,7 +33,7 @@ function c74371660.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
 end
 function c74371660.filter(c,atk)
-	return c:IsFaceup() and c:GetAttack()<atk
+	return aux.disfilter1(c) and c:GetAttack()<atk
 end
 function c74371660.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c74371660.filter,tp,0,LOCATION_MZONE,1,nil,e:GetHandler():GetAttack()) end

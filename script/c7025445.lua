@@ -65,6 +65,10 @@ function c7025445.damop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(c7025445.damval)
 	e1:SetReset(RESET_PHASE+PHASE_DAMAGE)
 	Duel.RegisterEffect(e1,tp)
+	local e2=e1:Clone()
+	e2:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	e2:SetReset(RESET_PHASE+PHASE_DAMAGE)
+	Duel.RegisterEffect(e2,tp)
 end
 function c7025445.damval(e,re,val,r,rp,rc)
 	if bit.band(r,REASON_EFFECT)~=0 then return 0

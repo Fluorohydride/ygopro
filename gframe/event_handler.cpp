@@ -303,6 +303,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 						for(size_t i = 0; i < remove[command_controler].size(); ++i)
 							if(remove[command_controler][i]->cmdFlag & COMMAND_ACTIVATE)
 								selectable_cards.push_back(remove[command_controler][i]);
+						selectable_cards.reserve(selectable_cards.size() + conti_cards.size());
+						selectable_cards.insert(selectable_cards.end(), conti_cards.begin(), conti_cards.end());
 						break;
 					}
 					case LOCATION_EXTRA: {
@@ -314,7 +316,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 					}
 					mainGame->wCardSelect->setText(dataManager.GetSysString(566));
 					list_command = COMMAND_ACTIVATE;
-					ShowSelectCard();
+					ShowSelectCard(true, true);
 				}
 				break;
 			}
@@ -762,7 +764,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				CardString cstr;
 				CardData cd;
 				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
-					&& !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
+					&& (cd.code == 78734254 || cd.code == 13857930 || !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -776,7 +778,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						auto cp = dataManager.GetCodePointer(cit->first);
-						if(!cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
+						if(cp->second.code == 78734254 || cp->second.code == 13857930 
+								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
 							ancard.push_back(cit->first);
 						}
@@ -795,7 +798,7 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				CardString cstr;
 				CardData cd;
 				if(dataManager.GetString(trycode, &cstr) && dataManager.GetData(trycode, &cd) 
-					&& !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
+					&& (cd.code == 78734254 || cd.code == 13857930 || !cd.alias && !((cd.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN)))) {
 					mainGame->lstANCard->clear();
 					ancard.clear();
 					mainGame->lstANCard->addItem(cstr.name);
@@ -809,7 +812,8 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				for(auto cit = dataManager._strings.begin(); cit != dataManager._strings.end(); ++cit) {
 					if(wcsstr(cit->second.name, pname) != 0) {
 						auto cp = dataManager.GetCodePointer(cit->first);
-						if(!cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
+						if(cp->second.code == 78734254 || cp->second.code == 13857930 
+								|| !cp->second.alias && !((cp->second.type & (TYPE_MONSTER + TYPE_TOKEN)) == (TYPE_MONSTER + TYPE_TOKEN))) {
 							mainGame->lstANCard->addItem(cit->second.name);
 							ancard.push_back(cit->first);
 						}
@@ -1021,11 +1025,14 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				case LOCATION_REMOVED: {
 					int command_flag = 0;
-					if(remove[hovered_controler].size() == 0)
+					if(remove[hovered_controler].size() == 0 && conti_cards.size() == 0)
 						break;
 					for(size_t i = 0; i < remove[hovered_controler].size(); ++i)
 						command_flag |= remove[hovered_controler][i]->cmdFlag;
-					command_flag |= COMMAND_LIST;
+					if(conti_cards.size())
+						command_flag |= COMMAND_ACTIVATE;
+					if(remove[hovered_controler].size())
+						command_flag |= COMMAND_LIST;
 					list_command = 1;
 					ShowMenu(command_flag, x, y);
 					break;
@@ -1283,7 +1290,28 @@ bool ClientField::OnEvent(const irr::SEvent& event) {
 				}
 				break;
 			}
-			case MSG_SELECT_TRIBUTE:
+			case MSG_SELECT_TRIBUTE: {
+				if(selected_cards.size() == 0) {
+					if(select_cancelable) {
+						DuelClient::SetResponseI(-1);
+						if(mainGame->wCardSelect->isVisible())
+							mainGame->HideElement(mainGame->wCardSelect, true);
+						else
+							DuelClient::SendResponse();
+					}
+					break;
+				}
+				if(mainGame->wQuery->isVisible()) {
+					unsigned char respbuf[64];
+					respbuf[0] = selected_cards.size();
+					for (size_t i = 0; i < selected_cards.size(); ++i)
+						respbuf[i + 1] = selected_cards[i]->select_seq;
+					DuelClient::SetResponseB(respbuf, selected_cards.size() + 1);
+					mainGame->HideElement(mainGame->wQuery, true);
+					break;
+				}
+				break;
+			}
 			case MSG_SELECT_SUM: {
 				if(mainGame->wQuery->isVisible()) {
 					unsigned char respbuf[64];

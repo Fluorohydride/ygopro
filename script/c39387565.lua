@@ -42,10 +42,8 @@ function c39387565.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	else
 		e:SetCategory(0)
 		e:SetProperty(0)
-		e:SetOperation(c39387565.nop)
+		e:SetOperation(nil)
 	end
-end
-function c39387565.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c39387565.cfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3b)

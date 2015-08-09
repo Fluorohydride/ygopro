@@ -254,17 +254,7 @@ int32 field::select_card(uint16 step, uint8 playerid, uint8 cancelable, uint8 mi
 		for(uint32 i = 0; i < core.select_cards.size(); ++i) {
 			pcard = core.select_cards[i];
 			pduel->write_buffer32(pcard->data.code);
-			if(pcard->overlay_target) {
-				pduel->write_buffer8(pcard->overlay_target->current.controler);
-				pduel->write_buffer8(pcard->overlay_target->current.location | LOCATION_OVERLAY);
-				pduel->write_buffer8(pcard->overlay_target->current.sequence);
-				pduel->write_buffer8(pcard->current.sequence);
-			} else {
-				pduel->write_buffer8(pcard->current.controler);
-				pduel->write_buffer8(pcard->current.location);
-				pduel->write_buffer8(pcard->current.sequence);
-				pduel->write_buffer8(pcard->current.position);
-			}
+			pduel->write_buffer32(pcard->get_info_location());
 		}
 		return FALSE;
 	} else {
@@ -317,7 +307,10 @@ int32 field::select_chain(uint16 step, uint8 playerid, uint8 spe_count, uint8 fo
 		for(uint32 i = 0; i < core.select_chains.size(); ++i) {
 			effect* peffect = core.select_chains[i].triggering_effect;
 			card* pcard = peffect->handler;
-			pduel->write_buffer32(pcard->data.code);
+			if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+				pduel->write_buffer32(1000000000 + pcard->data.code);
+			else
+				pduel->write_buffer32(pcard->data.code);
 			pduel->write_buffer32(pcard->get_info_location());
 			pduel->write_buffer32(peffect->description);
 		}
@@ -449,6 +442,8 @@ int32 field::select_tribute(uint16 step, uint8 playerid, uint8 cancelable, uint8
 		}
 		return FALSE;
 	} else {
+		if(cancelable && returns.ivalue[0] == -1)
+			return TRUE;
 		byte c[64];
 		memset(c, 0, 64);
 		if(returns.bvalue[0] > max) {

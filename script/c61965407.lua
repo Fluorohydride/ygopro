@@ -114,7 +114,6 @@ function c61965407.tgtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.SetOperationInfo(0,CATEGORY_TOGRAVE,g,1,0,0)
 end
 function c61965407.operation(e,tp,eg,ep,ev,re,r,rp)
-	if c61965407.sdcon(e) then return end
 	if e:GetLabel()==0 or not e:GetHandler():IsRelateToEffect(e) then return end
 	local tc=Duel.GetFirstTarget()
 	if not tc:IsRelateToEffect(e) then return end

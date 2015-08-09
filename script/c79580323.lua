@@ -30,7 +30,7 @@ function c79580323.initial_effect(c)
 	c:RegisterEffect(e3)
 end
 function c79580323.splimit(e,se,sp,st)
-	return st==(SUMMON_TYPE_SPECIAL+101)
+	return st==(SUMMON_TYPE_SPECIAL+101) or bit.band(st,SUMMON_TYPE_PENDULUM)==SUMMON_TYPE_PENDULUM
 end
 function c79580323.sfilter(c)
 	return c:IsSetCard(0x19) and c:IsType(TYPE_EQUIP) and c:IsAbleToHand()

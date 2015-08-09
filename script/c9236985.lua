@@ -30,7 +30,7 @@ function c9236985.activate(e,tp,eg,ep,ev,re,r,rp)
 	local tc=tg:GetFirst()
 	if tc then
 		Duel.PayLPCost(tp,tc:GetLevel()*500)
-		tc:SetMaterial(Group.CreateGroup())
+		tc:SetMaterial(nil)
 		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
 		tc:CompleteProcedure()
 	end

@@ -50,7 +50,7 @@ function c10248389.atkval(e,c)
 end
 function c10248389.disop(e,tp,eg,ep,ev,re,r,rp)
 	local tl=Duel.GetChainInfo(ev,CHAININFO_TRIGGERING_LOCATION)
-	if rp~=tp and tl==LOCATION_SZONE then
+	if rp~=tp and (tl==LOCATION_MZONE or tl==LOCATION_SZONE) then
 		Duel.NegateEffect(ev)
 	end
 end

@@ -191,6 +191,8 @@ struct processor {
 	card_set special_summoning;
 	card_set equiping_cards;
 	card_set control_adjust_set[2];
+	card_set self_destroy_set;
+	card_set self_tograve_set;
 	card_set release_cards;
 	card_set release_cards_ex;
 	card_set release_cards_ex_sum;
@@ -206,8 +208,8 @@ struct processor {
 	effect_set_v extraz_effects;
 	effect_set_v extraz_effects_e;
 	std::set<effect*> reseted_effects;
-	effect_vector delayed_tp;
-	effect_vector delayed_ntp;
+	std::list<effect*> delayed_tp;
+	std::list<effect*> delayed_ntp;
 	event_list delayed_tev;
 	event_list delayed_ntev;
 	std::unordered_map<card*, uint32> readjust_map;
@@ -226,6 +228,7 @@ struct processor {
 	int32 chain_limit_p;
 	uint8 chain_limp_p;
 	uint8 chain_solving;
+	uint8 conti_solving;
 	uint8 win_player;
 	uint8 win_reason;
 	uint8 re_adjust;
@@ -233,6 +236,7 @@ struct processor {
 	uint8 reason_player;
 	card* summoning_card;
 	uint8 summon_depth;
+	uint8 summon_cancelable;
 	card* attacker;
 	card* sub_attacker;
 	card* attack_target;
@@ -241,6 +245,7 @@ struct processor {
 	group* limit_xyz;
 	group* limit_syn;
 	uint8 attack_cancelable;
+	uint8 attack_rollback;
 	uint8 effect_damage_step;
 	int32 battle_damage[2];
 	int32 summon_count[2];
@@ -280,6 +285,7 @@ struct processor {
 	uint8 battle_phase_action;
 	uint32 hint_timing[2];
 	uint8 current_player;
+	uint8 conti_player;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > summon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > normalsummon_counter;
 	std::unordered_map<uint32, std::pair<uint32, uint32> > spsummon_counter;
@@ -349,7 +355,7 @@ public:
 
 	int32 get_release_list(uint8 playerid, card_set* release_list, card_set* ex_list, int32 use_con, int32 use_hand, int32 fun, int32 exarg, card* exp);
 	int32 check_release_list(uint8 playerid, int32 count, int32 use_con, int32 use_hand, int32 fun, int32 exarg, card* exp);
-	int32 get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_sum, group* mg = 0);
+	int32 get_summon_release_list(card* target, card_set* release_list, card_set* ex_list, card_set* ex_list_sum, group* mg = 0, uint32 ex = 0);
 	int32 get_summon_count_limit(uint8 playerid);
 	int32 get_draw_count(uint8 playerid);
 	void get_ritual_material(uint8 playerid, effect* peffect, card_set* material);
@@ -360,6 +366,7 @@ public:
 	void update_disable_check_list(effect* peffect);
 	void add_to_disable_check_list(card* pcard);
 	void adjust_disable_check_list();
+	void adjust_self_destroy_set();
 	void add_unique_card(card* pcard);
 	void remove_unique_card(card* pcard);
 	effect* check_unique_onfield(card* pcard, uint8 controler);
@@ -387,6 +394,7 @@ public:
 	int32 is_player_can_discard_deck(uint8 playerid, int32 count);
 	int32 is_player_can_discard_deck_as_cost(uint8 playerid, int32 count);
 	int32 is_player_can_discard_hand(uint8 playerid, card* pcard, effect* peffect, uint32 reason);
+	int32 is_player_can_summon(uint8 playerid);
 	int32 is_player_can_summon(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_mset(uint32 sumtype, uint8 playerid, card* pcard);
 	int32 is_player_can_sset(uint8 playerid, card* pcard);
@@ -476,6 +484,7 @@ public:
 	int32 get_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard, uint8 playerid, uint16 reset_phase, uint8 reset_count);
 	int32 swap_control(uint16 step, effect* reason_effect, uint8 reason_player, card* pcard1, card* pcard2, uint16 reset_phase, uint8 reset_count);
 	int32 control_adjust(uint16 step);
+	int32 self_destroy(uint16 step);
 	int32 equip(uint16 step, uint8 equip_player, card* equip_card, card* target, uint32 up, uint32 is_step);
 	int32 draw(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, uint8 playerid, uint32 count);
 	int32 damage(uint16 step, effect* reason_effect, uint32 reason, uint8 reason_player, card* pcard, uint8 playerid, uint32 amount);
@@ -646,6 +655,7 @@ public:
 #define PROCESSOR_GET_CONTROL		74
 #define PROCESSOR_SWAP_CONTROL		75
 #define PROCESSOR_CONTROL_ADJUST	76
+#define PROCESSOR_SELF_DESTROY		77
 #define PROCESSOR_PAY_LPCOST		80
 #define PROCESSOR_REMOVE_COUNTER	81
 #define PROCESSOR_ATTACK_DISABLE	82

@@ -33,12 +33,13 @@ function c31829185.spop(e,tp,eg,ep,ev,re,r,rp,c)
 end
 function c31829185.tgop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	if c:GetPreviousControler()==tp and c:GetPreviousLocation()~=LOCATION_SZONE
+	if c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_MZONE)
 		and rp~=tp and bit.band(r,REASON_DESTROY)~=0 then
 		--equip action
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_F)
 		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
 		e1:SetRange(LOCATION_GRAVE)
 		e1:SetCountLimit(1)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
@@ -51,7 +52,7 @@ function c31829185.filter(c)
 	return c:IsFaceup() and c:IsControlerCanBeChanged()
 end
 function c31829185.eqtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:GetLocation()==LOCATION_MZONE and chkc:GetControler()~=tp and c31829185.filter(chkc) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(1-tp) and c31829185.filter(chkc) end
 	if chk==0 then return true end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_CONTROL)
 	local g=Duel.SelectTarget(tp,c31829185.filter,tp,0,LOCATION_MZONE,1,1,nil)

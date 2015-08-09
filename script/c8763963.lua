@@ -56,7 +56,7 @@ end
 function c8763963.operation(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
-	if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:GetAttack()>0 then
+	if tc:IsFaceup() and tc:IsRelateToEffect(e) and tc:GetAttack()>0 and not tc:IsImmuneToEffect(e) then
 		local e1=Effect.CreateEffect(c)
 		e1:SetType(EFFECT_TYPE_SINGLE)
 		e1:SetCode(EFFECT_SET_ATTACK_FINAL)
@@ -64,6 +64,8 @@ function c8763963.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetReset(RESET_EVENT+0x1fe0000)
 		tc:RegisterEffect(e1)
 		Duel.Recover(tp,tc:GetBaseAttack(),REASON_EFFECT)
+	end
+	if c:IsRelateToEffect(e) then
 		local e2=Effect.CreateEffect(c)
 		e2:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
 		e2:SetRange(LOCATION_MZONE)

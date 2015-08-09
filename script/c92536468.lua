@@ -35,6 +35,9 @@ function c92536468.initial_effect(c)
 	e4:SetTargetRange(1,0)
 	e4:SetValue(c92536468.damval)
 	c:RegisterEffect(e4)
+	local e5=e4:Clone()
+	e5:SetCode(EFFECT_NO_EFFECT_DAMAGE)
+	c:RegisterEffect(e5)
 end
 function c92536468.effcon(e,tp,eg,ep,ev,re,r,rp)
 	return ep==tp and bit.band(r,REASON_EFFECT)~=0

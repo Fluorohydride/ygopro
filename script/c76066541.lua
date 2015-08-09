@@ -15,7 +15,9 @@ function c76066541.initial_effect(c)
 end
 function c76066541.condition(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp~=tp and c:IsReason(REASON_DESTROY) and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return (c:IsReason(REASON_BATTLE)
+		or rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp)
+		and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c76066541.filter(c,e,tp)
 	return c:IsType(TYPE_PENDULUM) and c:IsAttribute(ATTRIBUTE_EARTH)

@@ -38,28 +38,22 @@ function c45627618.initial_effect(c)
 	e4:SetTarget(c45627618.pentg)
 	e4:SetOperation(c45627618.penop)
 	c:RegisterEffect(e4)
-	--spsummon limit
-	local e5=Effect.CreateEffect(c)
-	e5:SetType(EFFECT_TYPE_SINGLE)
-	e5:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_SINGLE_RANGE)
-	e5:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e5:SetRange(LOCATION_EXTRA)
-	e5:SetCondition(c45627618.spcon)
-	e5:SetValue(c45627618.splimit)
-	c:RegisterEffect(e5)
 end
 c45627618.pendulum_level=7
+function c45627618.pcfilter(c)
+	return c:IsType(TYPE_PENDULUM) and not c:IsForbidden()
+end
 function c45627618.pctg(e,tp,eg,ep,ev,re,r,rp,chk)
 	local seq=e:GetHandler():GetSequence()
 	if chk==0 then return Duel.CheckLocation(tp,LOCATION_SZONE,13-seq)
-		and Duel.IsExistingMatchingCard(Card.IsType,tp,LOCATION_DECK,0,1,nil,TYPE_PENDULUM) end
+		and Duel.IsExistingMatchingCard(c45627618.pcfilter,tp,LOCATION_DECK,0,1,nil) end
 end
 function c45627618.pcop(e,tp,eg,ep,ev,re,r,rp)
 	if not e:GetHandler():IsRelateToEffect(e) then return end
 	local seq=e:GetHandler():GetSequence()
 	if not Duel.CheckLocation(tp,LOCATION_SZONE,13-seq) then return end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOFIELD)
-	local g=Duel.SelectMatchingCard(tp,Card.IsType,tp,LOCATION_DECK,0,1,1,nil,TYPE_PENDULUM)
+	local g=Duel.SelectMatchingCard(tp,c45627618.pcfilter,tp,LOCATION_DECK,0,1,1,nil)
 	if g:GetCount()>0 then
 		Duel.MoveToField(g:GetFirst(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
@@ -111,13 +105,7 @@ function c45627618.penop(e,tp,eg,ep,ev,re,r,rp)
 	local lsc=Duel.GetFieldCard(tp,LOCATION_SZONE,6)
 	local rsc=Duel.GetFieldCard(tp,LOCATION_SZONE,7)
 	local g=Group.FromCards(lsc,rsc)
-	if Duel.Destroy(g,REASON_EFFECT)~=0 then
+	if Duel.Destroy(g,REASON_EFFECT)~=0 and e:GetHandler():IsRelateToEffect(e) then
 		Duel.MoveToField(e:GetHandler(),tp,tp,LOCATION_SZONE,POS_FACEUP,true)
 	end
-end
-function c45627618.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsFaceup()
-end
-function c45627618.splimit(e,se,sp,st)
-	return e:GetHandler():IsStatus(STATUS_PROC_COMPLETE) and bit.band(st,SUMMON_TYPE_XYZ)~=SUMMON_TYPE_XYZ
 end

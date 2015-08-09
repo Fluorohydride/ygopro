@@ -82,7 +82,7 @@ function c50485594.spfilter2(c,code,e,tp)
 	return c:IsCode(code) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c50485594.sptg(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>1
+	if chk==0 then return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.IsExistingMatchingCard(c50485594.spfilter,tp,LOCATION_EXTRA,0,1,nil,e,tp) end
 	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,2,tp,LOCATION_DECK)
 end

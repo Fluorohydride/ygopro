@@ -150,8 +150,8 @@ function c19261966.splimit(e,se,sp,st)
 	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c19261966.sumlimit(e,c,sump,sumtype,sumpos,targetp,se)
-	return se:IsActiveType(TYPE_SPELL+TYPE_TRAP) and c:IsLocation(LOCATION_GRAVE+LOCATION_HAND)
-		and bit.band(sumtype,SUMMON_TYPE_PENDULUM)~=SUMMON_TYPE_PENDULUM
+	return se:IsActiveType(TYPE_SPELL+TYPE_TRAP) and se:IsHasType(EFFECT_TYPE_ACTIONS) 
+		and c:IsLocation(LOCATION_GRAVE+LOCATION_HAND)
 end
 function c19261966.thcon(e,tp,eg,ep,ev,re,r,rp)
 	return not e:GetHandler():IsReason(REASON_RETURN)

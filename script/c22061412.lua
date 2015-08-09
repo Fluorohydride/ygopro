@@ -27,12 +27,8 @@ function c22061412.initial_effect(c)
 	e4:SetType(EFFECT_TYPE_SINGLE)
 	e4:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e4:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e4:SetValue(c22061412.splimit)
+	e4:SetValue(aux.fuslimit)
 	c:RegisterEffect(e4)
-	c:EnableReviveLimit()
-end
-function c22061412.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c22061412.atkfilter(c)
 	return c:IsFaceup() and c:IsSetCard(0x3008)

@@ -37,8 +37,10 @@ function c19891310.condition(e,tp,eg,ep,ev,re,r,rp)
 	return bt and bt:IsControler(tp) and bt:IsRace(RACE_MACHINE)
 end
 function c19891310.cost(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
-	e:GetHandler():RemoveOverlayCard(tp,1,1,REASON_COST)
+	local c=e:GetHandler()
+	if chk==0 then return c:CheckRemoveOverlayCard(tp,1,REASON_COST) and c:GetFlagEffect(19891310)==0 end
+	c:RemoveOverlayCard(tp,1,1,REASON_COST)
+	c:RegisterFlagEffect(19891310,RESET_CHAIN,0,1)
 end
 function c19891310.operation(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(e:GetHandler())

@@ -29,11 +29,8 @@ function c98502113.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e3:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e3:SetValue(c98502113.splimit)
+	e3:SetValue(aux.fuslimit)
 	c:RegisterEffect(e3)
-end
-function c98502113.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c98502113.val(e,c)
 	return Duel.GetMatchingGroupCount(c98502113.filter,0,0x14,0x14,nil)*500

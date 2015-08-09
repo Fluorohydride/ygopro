@@ -36,6 +36,7 @@ public:
 	std::vector<ClientCard*> reposable_cards;
 	std::vector<ClientCard*> activatable_cards;
 	std::vector<ClientCard*> attackable_cards;
+	std::vector<ClientCard*> conti_cards;
 	std::vector<int> activatable_descs;
 	std::vector<int> select_options;
 	std::vector<ChainInfo> chains;
@@ -81,7 +82,7 @@ public:
 	void ClearCommandFlag();
 	void ClearSelect();
 	void ClearChainSelect();
-	void ShowSelectCard(bool buttonok = false);
+	void ShowSelectCard(bool buttonok = false, bool chain = false);
 	void ShowChainCard();
 	void ReplaySwap();
 	void RefreshAllCards();

@@ -48,8 +48,8 @@ function c78610936.activate(e,tp,eg,ep,ev,re,r,rp)
 					e1:SetValue(-1)
 					e1:SetReset(RESET_EVENT+0x1fe0000)
 					tc:RegisterEffect(e1)
-					tc=g:GetNext()
 				end
+				tc=g:GetNext()
 			end
 			Duel.SpecialSummonComplete()
 		end

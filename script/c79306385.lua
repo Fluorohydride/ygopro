@@ -10,16 +10,9 @@ function c79306385.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c79306385.filter(c,e,tp,m)
-	local cd=c:GetCode()
-	if cd~=48546368 or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,true,false) then return false end
-	if m:IsContains(c) then
-		m:RemoveCard(c)
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
-		m:AddCard(c)
-	else
-		result=m:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
-	end
-	return result
+	if not c:IsCode(48546368) or not c:IsCanBeSpecialSummoned(e,SUMMON_TYPE_RITUAL,tp,false,true) then return false end
+	local mg=m:Filter(Card.IsCanBeRitualMaterial,c,c)
+	return mg:CheckWithSumGreater(Card.GetRitualLevel,c:GetLevel(),c)
 end
 function c79306385.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -36,15 +29,15 @@ function c79306385.activate(e,tp,eg,ep,ev,re,r,rp)
 	local mg=Duel.GetRitualMaterial(tp)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 	local tg=Duel.SelectMatchingCard(tp,c79306385.filter,tp,LOCATION_HAND,0,1,1,nil,e,tp,mg)
-	if tg:GetCount()>0 then
-		local tc=tg:GetFirst()
-		mg:RemoveCard(tc)
+	local tc=tg:GetFirst()
+	if tc then
+		mg=mg:Filter(Card.IsCanBeRitualMaterial,tc,tc)
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_RELEASE)
 		local mat=mg:SelectWithSumGreater(tp,Card.GetRitualLevel,tc:GetLevel(),tc)
 		tc:SetMaterial(mat)
 		Duel.ReleaseRitualMaterial(mat)
 		Duel.BreakEffect()
-		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,true,false,POS_FACEUP)
+		Duel.SpecialSummon(tc,SUMMON_TYPE_RITUAL,tp,tp,false,true,POS_FACEUP)
 		tc:CompleteProcedure()
 	end
 end

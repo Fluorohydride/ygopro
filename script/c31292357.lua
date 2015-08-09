@@ -16,7 +16,7 @@ function c31292357.initial_effect(c)
 	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetCode(EVENT_CHAINING)
 	e2:SetRange(LOCATION_MZONE)
-	e2:SetCondition(c31292357.ctcon)
+	e2:SetCondition(aux.damcon1)
 	e2:SetTarget(c31292357.cttg)
 	e2:SetOperation(c31292357.ctop)
 	c:RegisterEffect(e2)
@@ -32,12 +32,6 @@ function c31292357.spcon(e,c)
 	local tp=c:GetControler()
 	return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
 		and Duel.GetFieldGroupCount(tp,LOCATION_MZONE,LOCATION_MZONE)>=2
-end
-function c31292357.ctcon(e,tp,eg,ep,ev,re,r,rp)
-	local ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_DAMAGE)
-	if ex and (cp==tp or cp==PLAYER_ALL) then return true end
-	ex,cg,ct,cp,cv=Duel.GetOperationInfo(ev,CATEGORY_RECOVER)
-	return ex and (cp==tp or cp==PLAYER_ALL) and Duel.IsPlayerAffectedByEffect(tp,EFFECT_REVERSE_RECOVER)
 end
 function c31292357.cttg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsCanAddCounter(0x3036,1) end

@@ -27,7 +27,7 @@ function c86516889.activate(e,tp,eg,ep,ev,re,r,rp)
 	local ct=g:FilterCount(Card.IsSetCard,nil,0x8d)
 	if ct>0 then
 		Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_POSCHANGE)
-		local sg=Duel.SelectMatchingCard(tp,Card.IsFaceup,tp,0,LOCATION_MZONE,1,ct,nil)
+		local sg=Duel.SelectMatchingCard(tp,Card.IsCanTurnSet,tp,0,LOCATION_MZONE,1,ct,nil)
 		if sg:GetCount()>0 then
 			Duel.HintSelection(sg)
 			Duel.ChangePosition(sg,POS_FACEDOWN_DEFENCE)

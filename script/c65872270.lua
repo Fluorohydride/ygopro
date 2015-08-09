@@ -36,10 +36,8 @@ function c65872270.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		c65872270.destg(e,tp,eg,ep,ev,re,r,rp,1)
 	else
 		e:SetCategory(0)
-		e:SetOperation(c65872270.nop)
+		e:SetOperation(nil)
 	end
-end
-function c65872270.nop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c65872270.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()==tp

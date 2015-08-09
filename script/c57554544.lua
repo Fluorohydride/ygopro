@@ -88,7 +88,8 @@ function c57554544.spop(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c57554544.descon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsPreviousLocation(LOCATION_ONFIELD) and e:GetHandler():IsPreviousPosition(POS_FACEUP)
+	local c=e:GetHandler()
+	return c:IsPreviousLocation(LOCATION_SZONE) and c:GetPreviousSequence()==5 and c:IsPreviousPosition(POS_FACEUP)
 end
 function c57554544.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end

@@ -8,7 +8,7 @@ function c10383554.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c10383554.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--destroy
 	local e2=Effect.CreateEffect(c)
@@ -21,9 +21,6 @@ function c10383554.initial_effect(c)
 	e2:SetTarget(c10383554.target)
 	e2:SetOperation(c10383554.operation)
 	c:RegisterEffect(e2)
-end
-function c10383554.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end
 function c10383554.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsDirectAttacked() end

@@ -2,10 +2,16 @@
 function c20630765.initial_effect(c)
 	c:SetCounterLimit(0x16,1)
 	--Add counter
+	local e0=Effect.CreateEffect(c)
+	e0:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
+	e0:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+	e0:SetCode(EVENT_CHAINING)
+	e0:SetRange(LOCATION_MZONE)
+	e0:SetOperation(aux.chainreg)
+	c:RegisterEffect(e0)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_CONTINUOUS+EFFECT_TYPE_FIELD)
-	e1:SetCode(EVENT_CHAIN_SOLVING)
-	e1:SetProperty(EFFECT_FLAG_DELAY)
+	e1:SetCode(EVENT_CHAIN_SOLVED)
 	e1:SetRange(LOCATION_MZONE)
 	e1:SetCountLimit(1)
 	e1:SetOperation(c20630765.ctop)
@@ -33,7 +39,7 @@ function c20630765.initial_effect(c)
 end
 function c20630765.ctop(e,tp,eg,ep,ev,re,r,rp)
 	local c=re:GetHandler()
-	if c:IsType(TYPE_MONSTER) and c~=e:GetHandler() then
+	if re:IsActiveType(TYPE_MONSTER) and c~=e:GetHandler() and e:GetHandler():GetFlagEffect(1)>0 then
 		e:GetHandler():AddCounter(0x16,1)
 	end
 end

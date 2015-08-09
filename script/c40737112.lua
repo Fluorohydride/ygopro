@@ -27,6 +27,7 @@ function c40737112.initial_effect(c)
 	local e3=Effect.CreateEffect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE)
 	e3:SetCode(EFFECT_LEAVE_FIELD_REDIRECT)
+	e3:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e3:SetCondition(c40737112.recon)
 	e3:SetValue(LOCATION_REMOVED)
 	c:RegisterEffect(e3)
@@ -35,18 +36,13 @@ function c40737112.initial_effect(c)
 		local ge1=Effect.CreateEffect(c)
 		ge1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		ge1:SetCode(EVENT_SUMMON_SUCCESS)
-		ge1:SetOperation(c40737112.checkop)
+		ge1:SetLabel(40737112)
+		ge1:SetOperation(aux.sumreg)
 		Duel.RegisterEffect(ge1,0)
 		local ge2=ge1:Clone()
 		ge2:SetCode(EVENT_SPSUMMON_SUCCESS)
+		ge2:SetLabel(40737112)
 		Duel.RegisterEffect(ge2,0)
-	end
-end
-function c40737112.checkop(e,tp,eg,ep,ev,re,r,rp)
-	local tc=eg:GetFirst()
-	while tc do
-		tc:RegisterFlagEffect(40737112,RESET_EVENT+0x1ec0000+RESET_PHASE+PHASE_END,0,1)
-		tc=eg:GetNext()
 	end
 end
 function c40737112.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
@@ -82,7 +78,7 @@ function c40737112.rmtg(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c40737112.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local bc=e:GetLabelObject()
-	if bc:IsRelateToBattle() then
+	if bc:IsRelateToBattle() and bc:IsAbleToRemove() then
 		Duel.Remove(bc,POS_FACEUP,REASON_EFFECT)
 	end
 end

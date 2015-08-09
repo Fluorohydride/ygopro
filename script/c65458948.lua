@@ -58,7 +58,7 @@ function c65458948.spcon(e,c)
 		and Duel.IsExistingMatchingCard(c65458948.cfilter,tp,LOCATION_ONFIELD,0,1,nil) 
 end
 function c65458948.sfilter(c)
-	return c:IsReason(REASON_DESTROY) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
+	return c:IsReason(REASON_DESTROY) and c:IsPreviousPosition(POS_FACEUP) and c:GetPreviousCodeOnField()==15259703 and c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c65458948.sdescon(e,tp,eg,ep,ev,re,r,rp)
 	return eg:IsExists(c65458948.sfilter,1,nil)

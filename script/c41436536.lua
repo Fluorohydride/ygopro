@@ -8,7 +8,7 @@ function c41436536.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE+EFFECT_FLAG_UNCOPYABLE)
 	e1:SetCode(EFFECT_SPSUMMON_CONDITION)
-	e1:SetValue(c41436536.splimit)
+	e1:SetValue(aux.fuslimit)
 	c:RegisterEffect(e1)
 	--indes
 	local e2=Effect.CreateEffect(c)
@@ -16,7 +16,4 @@ function c41436536.initial_effect(c)
 	e2:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
 	e2:SetValue(1)
 	c:RegisterEffect(e2)
-end
-function c41436536.splimit(e,se,sp,st)
-	return bit.band(st,SUMMON_TYPE_FUSION)==SUMMON_TYPE_FUSION
 end

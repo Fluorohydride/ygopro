@@ -8,7 +8,7 @@ function c17016362.initial_effect(c)
 	e1:SetType(EFFECT_TYPE_FIELD)
 	e1:SetCode(EFFECT_CHANGE_DAMAGE)
 	e1:SetRange(LOCATION_MZONE)
-	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e1:SetProperty(EFFECT_FLAG_PLAYER_TARGET+EFFECT_FLAG_AVAILABLE_BD)
 	e1:SetTargetRange(1,0)
 	e1:SetValue(c17016362.damval)
 	c:RegisterEffect(e1)
@@ -41,7 +41,7 @@ function c17016362.damval(e,re,val,r,rp,rc)
 	if val<=atk then return 0 else return val end
 end
 function c17016362.mtcon(e,tp,eg,ep,ev,re,r,rp)
-	return Duel.IsAbleToEnterBP()
+	return Duel.GetCurrentPhase()==PHASE_MAIN1 and Duel.IsAbleToEnterBP()
 end
 function c17016362.mtcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST) end
@@ -70,10 +70,11 @@ function c17016362.mtop(e,tp,eg,ep,ev,re,r,rp)
 		local e2=Effect.CreateEffect(e:GetHandler())
 		e2:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e2:SetCode(EVENT_PHASE+PHASE_BATTLE)
+		e2:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e2:SetRange(LOCATION_MZONE)
 		e2:SetCountLimit(1)
 		e2:SetOperation(c17016362.desop)
-		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_BATTLE)
+		e2:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+RESET_END)
 		tc:RegisterEffect(e2)
 	end
 end
@@ -81,7 +82,9 @@ function c17016362.desop(e,tp,eg,ep,ev,re,r,rp)
 	Duel.Destroy(e:GetHandler(),REASON_EFFECT)
 end
 function c17016362.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return rp~=tp and e:GetHandler():IsReason(REASON_DESTROY)
+	local c=e:GetHandler()
+	return c:IsReason(REASON_BATTLE)
+		or (rp~=tp and c:IsReason(REASON_DESTROY) and c:GetPreviousControler()==tp)
 end
 function c17016362.spfilter(c,e,tp)
 	return c:IsSetCard(0xc6) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
