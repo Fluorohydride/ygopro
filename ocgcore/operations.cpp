@@ -3346,7 +3346,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		targets = param->targets;
 		delete param;
 		uint8 nloc;
-		card_set tohand, todeck, tograve, remove, released, destroyed;
+		card_set tohand, todeck, tograve, remove, released, destroyed, retgrave;
 		card_set equipings, overlays;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			card* pcard = *cit;
@@ -3371,10 +3371,16 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 					todeck.insert(pcard);
 					pcard->reset(RESET_TODECK, RESET_EVENT);
 					raise_single_event(pcard, 0, EVENT_TO_DECK, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-				} else if(nloc == LOCATION_GRAVE && !(pcard->current.reason & REASON_RETURN)) {
-					tograve.insert(pcard);
+				} else if(nloc == LOCATION_GRAVE) {
 					pcard->reset(RESET_TOGRAVE, RESET_EVENT);
-					raise_single_event(pcard, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+					if(pcard->current.reason & REASON_RETURN) {
+						retgrave.insert(pcard);
+						raise_single_event(pcard, 0, EVENT_RETURN_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+					}
+					else {
+						tograve.insert(pcard);					
+						raise_single_event(pcard, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
+					}
 				}
 			}
 			if(nloc == LOCATION_REMOVED || ((pcard->data.type & TYPE_TOKEN) && ((pcard->operation_param >> 8) & 0xff) == LOCATION_REMOVED)) {
@@ -3410,6 +3416,8 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			raise_event(&released, EVENT_RELEASE, reason_effect, reason, reason_player, 0, 0);
 		if(destroyed.size())
 			raise_event(&destroyed, EVENT_DESTROYED, reason_effect, reason, reason_player, 0, 0);
+		if(retgrave.size())
+			raise_event(&retgrave, EVENT_RETURN_TO_GRAVE, reason_effect, reason, reason_player, 0, 0);
 		process_single_event();
 		process_instant_event();
 		if(equipings.size())
