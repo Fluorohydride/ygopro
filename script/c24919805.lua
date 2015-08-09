@@ -15,7 +15,6 @@ function c24919805.initial_effect(c)
 	local e2=Effect.CreateEffect(c)
 	e2:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
 	e2:SetCode(EVENT_TO_GRAVE)
-	e2:SetCondition(c24919805.regcon)
 	e2:SetOperation(c24919805.regop)
 	c:RegisterEffect(e2)
 end
@@ -38,9 +37,6 @@ end
 function c24919805.damop(e,tp,eg,ep,ev,re,r,rp)
 	local p,d=Duel.GetChainInfo(0,CHAININFO_TARGET_PLAYER,CHAININFO_TARGET_PARAM)
 	Duel.Damage(p,d,REASON_EFFECT)
-end
-function c24919805.regcon(e,tp,eg,ep,ev,re,r,rp)
-	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c24919805.regop(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
