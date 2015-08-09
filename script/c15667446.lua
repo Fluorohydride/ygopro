@@ -30,9 +30,9 @@ function c15667446.sptg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 end
 function c15667446.spop(e,tp,eg,ep,ev,re,r,rp)
 	if e:GetHandler():IsRelateToEffect(e) and Duel.SpecialSummon(e:GetHandler(),0,tp,tp,false,false,POS_FACEUP)>0 then
-		Duel.BreakEffect()
 		local tc=Duel.GetFirstTarget()
 		if tc and tc:IsFaceup() and tc:IsRelateToEffect(e) then
+			Duel.BreakEffect()
 			local e1=Effect.CreateEffect(e:GetHandler())
 			e1:SetType(EFFECT_TYPE_SINGLE)
 			e1:SetCode(EFFECT_UPDATE_ATTACK)
