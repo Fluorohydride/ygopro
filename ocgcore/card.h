@@ -34,6 +34,7 @@ struct card_data {
 
 struct card_state {
 	uint32 code;
+	uint32 code2;
 	uint32 type;
 	uint32 level;
 	uint32 rank;

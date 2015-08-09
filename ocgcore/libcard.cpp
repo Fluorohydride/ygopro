@@ -258,6 +258,10 @@ int32 scriptlib:: card_get_previous_code_onfield(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->previous.code);
+	if(pcard->previous.code2) {
+		lua_pushinteger(L, pcard->previous.code2);
+		return 2;
+	}
 	return 1;
 }
 int32 scriptlib::card_get_previous_type_onfield(lua_State *L) {

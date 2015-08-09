@@ -3022,6 +3022,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 			if((pcard->current.location & LOCATION_ONFIELD)) {
 				if(pcard->current.position & POS_FACEUP) {
 					pcard->previous.code = pcard->get_code();
+					pcard->previous.code2 = pcard->get_another_code();
 					pcard->previous.type = pcard->get_type();
 					if(pcard->current.location & LOCATION_MZONE) {
 						pcard->previous.level = pcard->get_level();
@@ -3032,7 +3033,16 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 						pcard->previous.defence = pcard->get_defence();
 					}
 				} else {
-					pcard->previous.code = pcard->data.code;
+					if(pcard->data.alias)
+						pcard->previous.code = pcard->data.alias;
+					else
+						pcard->previous.code = pcard->data.code;
+					effect_set eset;
+					pcard->filter_effect(EFFECT_ADD_CODE, &eset);
+					if(eset.size())
+						pcard->previous.code2 = eset.get_last()->get_value(pcard);
+					else
+						pcard->previous.code2 = 0;
 					pcard->previous.type = pcard->data.type;
 					pcard->previous.level = pcard->data.level;
 					pcard->previous.rank = pcard->data.level;
