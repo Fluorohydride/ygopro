@@ -118,11 +118,11 @@ int32 effect::is_available() {
 }
 int32 effect::check_count_limit(uint8 playerid) {
 	if((flag & EFFECT_FLAG_COUNT_LIMIT)) {
-		if(count_code == 0) {
+		uint32 code = count_code & 0xfffffff;
+		if(code == 0) {
 			if((reset_count & 0xf00) == 0)
 				return FALSE;
 		} else {
-			uint32 code = count_code & 0xfffffff;
 			uint32 count = (reset_count >> 12) & 0xf;
 			if(code == 1) {
 				if(pduel->game_field->get_effect_code((count_code & 0xf0000000) | handler->fieldid, PLAYER_NONE) >= count)
@@ -514,20 +514,18 @@ int32 effect::reset(uint32 reset_level, uint32 reset_type) {
 void effect::dec_count(uint32 playerid) {
 	if(!(flag & EFFECT_FLAG_COUNT_LIMIT))
 		return;
-	if(count_code == 0) {
+	uint32 code = count_code & 0xfffffff;
+	if(code == 0) {
 		if((reset_count & 0xf00) == 0)
 			return;
 		reset_count -= 0x100;
-	} else {
-		uint32 code = count_code & 0xfffffff;
-		if(code == 1)
-			pduel->game_field->add_effect_code((count_code & 0xf0000000) | handler->fieldid, PLAYER_NONE);
-		else
-			pduel->game_field->add_effect_code(count_code, playerid);
-	}
+	} else if(code == 1)
+		pduel->game_field->add_effect_code((count_code & 0xf0000000) | handler->fieldid, PLAYER_NONE);
+	else
+		pduel->game_field->add_effect_code(count_code, playerid);
 }
 void effect::recharge() {
-	if((flag & EFFECT_FLAG_COUNT_LIMIT) && (count_code == 0)) {
+	if((flag & EFFECT_FLAG_COUNT_LIMIT) && ((count_code & 0xfffffff) == 0)) {
 		reset_count &= 0xf0ff;
 		reset_count |= (reset_count >> 4) & 0xf00;
 	}
