@@ -3033,12 +3033,12 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 						pcard->previous.defence = pcard->get_defence();
 					}
 				} else {
-					if(pcard->data.alias)
+					effect_set eset;
+					pcard->filter_effect(EFFECT_ADD_CODE, &eset);
+					if(pcard->data.alias && !eset.size())
 						pcard->previous.code = pcard->data.alias;
 					else
 						pcard->previous.code = pcard->data.code;
-					effect_set eset;
-					pcard->filter_effect(EFFECT_ADD_CODE, &eset);
 					if(eset.size())
 						pcard->previous.code2 = eset.get_last()->get_value(pcard);
 					else

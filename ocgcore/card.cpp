@@ -232,7 +232,7 @@ uint32 card::get_code() {
 		code = effects.get_last()->get_value(this);
 	temp.code = 0xffffffff;
 	if (code == data.code) {
-		if(data.alias)
+		if(data.alias && !is_affected_by_effect(EFFECT_ADD_CODE))
 			code = data.alias;
 	} else {
 		card_data dat;

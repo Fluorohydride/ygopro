@@ -47,12 +47,12 @@ int32 scriptlib::card_get_origin_code_rule(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
-	if(pcard->data.alias)
+	effect_set eset;
+	pcard->filter_effect(EFFECT_ADD_CODE, &eset);
+	if(pcard->data.alias && !eset.size())
 		lua_pushinteger(L, pcard->data.alias);
 	else {
 		lua_pushinteger(L, pcard->data.code);
-		effect_set eset;
-		pcard->filter_effect(EFFECT_ADD_CODE, &eset);
 		if(eset.size()) {
 			uint32 otcode = eset.get_last()->get_value(pcard);
 			lua_pushinteger(L, otcode);
