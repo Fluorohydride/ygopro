@@ -12,8 +12,8 @@ function c40854824.initial_effect(c)
 	Duel.AddCustomActivityCounter(40854824,ACTIVITY_CHAIN,c40854824.chainfilter)
 end
 function c40854824.chainfilter(re,tp,cid)
-	local code=re:GetHandler():GetOriginalCode()
-	return not (re:IsActiveType(TYPE_MONSTER) and (code==79407975 or code==79856792))
+	local code1,code2=re:GetHandler():GetOriginalCodeRule()
+	return not (re:IsActiveType(TYPE_MONSTER) and (code1==79407975 or code1==79856792 or code2==79407975 or code2==79856792))
 end
 function c40854824.condition(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCustomActivityCount(40854824,tp,ACTIVITY_CHAIN)~=0

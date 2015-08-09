@@ -20,6 +20,7 @@ public:
 	//card lib
 	static int32 card_get_code(lua_State *L);
 	static int32 card_get_origin_code(lua_State *L);
+	static int32 card_get_origin_code_rule(lua_State *L);
 	static int32 card_is_set_card(lua_State *L);
 	static int32 card_get_type(lua_State *L);
 	static int32 card_get_origin_type(lua_State *L);
