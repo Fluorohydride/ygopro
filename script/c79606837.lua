@@ -33,6 +33,7 @@ function c79606837.initial_effect(c)
 	e3:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_O)
 	e3:SetCode(EVENT_TO_GRAVE)
 	e3:SetProperty(EFFECT_FLAG_DAMAGE_STEP+EFFECT_FLAG_DELAY)
+	e3:SetCondition(c79606837.thcon)
 	e3:SetTarget(c79606837.thtg)
 	e3:SetOperation(c79606837.thop)
 	c:RegisterEffect(e3)
@@ -61,6 +62,9 @@ function c79606837.disop(e,tp,eg,ep,ev,re,r,rp)
 	if re:GetHandler():IsRelateToEffect(re) then
 		Duel.Destroy(eg,REASON_EFFECT)
 	end
+end
+function c79606837.thcon(e,tp,eg,ep,ev,re,r,rp)
+	return not e:GetHandler():IsReason(REASON_RETURN)
 end
 function c79606837.filter(c)
 	return c:IsType(TYPE_RITUAL) and c:IsAbleToHand()
