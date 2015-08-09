@@ -1039,8 +1039,10 @@ int32 field::self_destroy(uint16 step) {
 	}
 	case 1: {
 		core.self_destroy_set.clear();
-		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE))
+		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE)) {
+			core.operated_set.clear();
 			return TRUE;
+		}
 		core.units.begin()->arg1 = returns.ivalue[0];
 		if(!core.self_tograve_set.empty())
 			send_to(&core.self_tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
@@ -1050,6 +1052,7 @@ int32 field::self_destroy(uint16 step) {
 	}
 	case 2: {
 		core.self_tograve_set.clear();
+		core.operated_set.clear();
 		returns.ivalue[0] += core.units.begin()->arg1;
 		return TRUE;
 	}
