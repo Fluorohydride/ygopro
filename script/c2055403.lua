@@ -10,7 +10,8 @@ function c2055403.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c2055403.filter(c,tp)
-	return c:GetSummonPlayer()~=tp and bit.band(c:GetSummonLocation(),LOCATION_HAND+LOCATION_EXTRA)~=0 and c:IsAbleToDeck()
+	return c:GetSummonPlayer()~=tp and bit.band(c:GetSummonLocation(),LOCATION_HAND+LOCATION_EXTRA)~=0
+		and c:IsAbleToDeck() and c:IsLocation(LOCATION_MZONE)
 end
 function c2055403.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local g=eg:Filter(c2055403.filter,nil,tp)

@@ -43,7 +43,7 @@ function c80889750.mfilter2(c)
 	return c:IsSetCard(0xa9) or c:IsSetCard(0xc3)
 end
 function c80889750.fscon(e,mg,gc)
-	if mg==nil then return false end
+	if mg==nil then return true end
 	if gc then return false end
 	return mg:IsExists(c80889750.mfilter1,1,nil,mg)
 end
