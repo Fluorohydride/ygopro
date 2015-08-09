@@ -71,6 +71,7 @@ function c57734012.activate(e,tp,eg,ep,ev,re,r,rp)
 		local g2=Duel.SelectMatchingCard(tp,c57734012.filter2,tp,LOCATION_EXTRA,0,1,1,nil,e,tp,tc1,m.xyz_number)
 		local tc2=g2:GetFirst()
 		if tc2 then
+			Duel.BreakEffect()
 			tc2:SetMaterial(g1)
 			Duel.Overlay(tc2,g1)
 			Duel.SpecialSummon(tc2,SUMMON_TYPE_XYZ,tp,tp,false,false,POS_FACEUP)

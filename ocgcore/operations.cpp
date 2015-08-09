@@ -3368,7 +3368,7 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 					todeck.insert(pcard);
 					pcard->reset(RESET_TODECK, RESET_EVENT);
 					raise_single_event(pcard, 0, EVENT_TO_DECK, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
-				} else if(nloc == LOCATION_GRAVE) {
+				} else if(nloc == LOCATION_GRAVE && !(pcard->current.reason & REASON_RETURN)) {
 					tograve.insert(pcard);
 					pcard->reset(RESET_TOGRAVE, RESET_EVENT);
 					raise_single_event(pcard, 0, EVENT_TO_GRAVE, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
