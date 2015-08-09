@@ -26,7 +26,7 @@ function c12247206.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	end
 	tc:CreateEffectRelation(e)
 	local g=Duel.GetMatchingGroup(c12247206.filter,tp,0x13,0,nil,tc,e,tp)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),0,0)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),PLAYER_ALL,0)
 end
 function c12247206.filter(c,tc,e,tp)
 	return c12247206.nfilter(c,tc) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
