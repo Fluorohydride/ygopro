@@ -34,6 +34,7 @@ function c38844957.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 		e:SetLabel(0)
 		return Duel.IsExistingMatchingCard(c38844957.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,nil)
 	end
+	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local g=Duel.SelectMatchingCard(tp,c38844957.filter,tp,LOCATION_HAND+LOCATION_GRAVE,0,1,1,nil)
 	local te=g:GetFirst():CheckActivateEffect(true,true,false)

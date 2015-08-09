@@ -81,6 +81,7 @@ function c6511113.target(e,tp,eg,ep,ev,re,r,rp,chk)
 		return e:GetHandler():CheckRemoveOverlayCard(tp,1,REASON_COST)
 			and Duel.IsExistingMatchingCard(c6511113.filter1,tp,LOCATION_DECK,0,1,nil)
 	end
+	e:SetLabel(0)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TOGRAVE)
 	local g=Duel.SelectMatchingCard(tp,c6511113.filter1,tp,LOCATION_DECK,0,1,1,nil)
 	local te,ceg,cep,cev,cre,cr,crp=g:GetFirst():CheckActivateEffect(false,true,true)
