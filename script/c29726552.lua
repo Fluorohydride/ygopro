@@ -54,15 +54,15 @@ function c29726552.spcon2(e,c)
 		and Duel.IsExistingMatchingCard(c29726552.cfilter,tp,0,LOCATION_MZONE,1,nil)
 end
 function c29726552.filter(c,tp)
-	return c:IsFaceup() and c:IsControler(1-tp)
+	return c:IsFaceup() and c:GetSummonPlayer()==tp
 end
 function c29726552.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsCanRemoveCounter(tp,1,1,0x37,2,REASON_COST) end
 	Duel.RemoveCounter(tp,1,1,0x37,2,REASON_COST)
 end
 function c29726552.target(e,tp,eg,ep,ev,re,r,rp,chk)
-	if chk==0 then return eg:IsExists(c29726552.filter,1,nil,tp) end
-	local g=eg:Filter(c29726552.filter,nil,tp)
+	if chk==0 then return eg:IsExists(c29726552.filter,1,nil,1-tp) end
+	local g=eg:Filter(c29726552.filter,nil,1-tp)
 	Duel.SetTargetCard(g)
 end
 function c29726552.operation(e,tp,eg,ep,ev,re,r,rp)
@@ -83,7 +83,6 @@ function c29726552.operation(e,tp,eg,ep,ev,re,r,rp)
 		local e3=Effect.CreateEffect(c)
 		e3:SetType(EFFECT_TYPE_SINGLE)
 		e3:SetCode(EFFECT_DISABLE_EFFECT)
-		e3:SetValue(RESET_TURN_SET)
 		e3:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END,2)
 		tc:RegisterEffect(e3)
 		tc=g:GetNext()
