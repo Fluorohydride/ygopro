@@ -2,9 +2,10 @@
 #define _IMAGE_MGR_H_
 
 #include "utils/singleton.h"
-#include "utils/render_base.h"
-#include "utils/render_util.h"
 #include "utils/zip_reader.h"
+
+#include "render_base.h"
+#include "render_util.h"
 
 namespace ygopro
 {

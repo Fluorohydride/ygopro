@@ -1,4 +1,4 @@
-#include "common.h"
+#include "utils/common.h"
 
 #define STBI_NO_SIMD
 #define STB_IMAGE_IMPLEMENTATION
@@ -8,7 +8,7 @@
 #define STBI_NO_HDR
 #define STBI_NO_PIC
 #define STBI_NO_PNM
-#include "stb_image.h"
+#include "utils/stb_image.h"
 
 #include "render_base.h"
 
@@ -288,11 +288,11 @@ namespace base {
             glBindTexture(GL_TEXTURE_2D, texture_id);
     }
     
-    TextureInfo<4> Texture::GetTextureInfo() {
-        static TextureInfo<4> ti;
+    TextureInfo<float, 4> Texture::GetTextureInfo() {
+        static TextureInfo<float, 4> ti;
         if(!texture_id)
             return ti;
-        TextureInfo<4> ret;
+        TextureInfo<float, 4> ret;
         ret.vert[0] = {0.0f, 0.0f};
         ret.vert[1] = {(float)img_width / tex_width, 0.0f};
         ret.vert[2] = {0.0f, (float)img_height / tex_height};

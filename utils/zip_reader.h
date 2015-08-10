@@ -182,7 +182,7 @@ public:
         if(iter->second.compressed) {
             uint8_t* raw = new uint8_t[iter->second.comp_size];
             zip_file.read((char*)raw, iter->second.comp_size);
-            int32_t ret = stbi_zlib_decode_noheader_buffer((char*)iter->second.datas, (int)iter->second.file_size, (char const*)raw, iter->second.comp_size);
+            int32_t ret = stbi_zlib_decode_noheader_buffer((char*)iter->second.datas, (int)iter->second.file_size, (char const*)raw, (int)iter->second.comp_size);
             delete []raw;
             if(ret == -1) {
                 delete[] iter->second.datas;

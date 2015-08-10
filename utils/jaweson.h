@@ -187,7 +187,7 @@ namespace jaweson
         virtual int64_t to_integer() { return 0; }
         virtual double to_double() { return 0.0; }
         virtual bool to_bool() { return false; }
-        virtual const std::string& to_string() { return ""; }
+        virtual const std::string& to_string() { static std::string empty_str; return empty_str; }
         virtual JsonNode<ALLOC_TYPE>& operator [] (const std::string& key);
         virtual JsonNode<ALLOC_TYPE>& operator [] (int32_t index);
         virtual bool insert(const std::string& key, JsonValue<ALLOC_TYPE>* value) { return false; }

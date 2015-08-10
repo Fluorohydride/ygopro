@@ -43,6 +43,3 @@ include_directories (
 if (WIN32)
     target_link_libraries (netc ws2_32 winmm gdi32 kernel32 user32 imm32 opengl32)
 endif ()
-
-create_target_launcher(netc WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-create_default_target_launcher(netc WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

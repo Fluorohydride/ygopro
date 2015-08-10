@@ -26,7 +26,7 @@ namespace ygopro
         std::weak_ptr<DeckCardData> hover_obj;
         bool show_info = false;
         bool show_info_begin = false;
-        double show_info_time = 0.0;
+        int64_t show_info_time = 0;
     };
     
 }

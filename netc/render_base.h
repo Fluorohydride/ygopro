@@ -20,7 +20,10 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
+#ifndef _DEBUG
 #define _DEBUG
+#endif
+
 #ifdef _DEBUG
 void GLCheckError(const std::string& file, int32_t line);
 #else
@@ -259,7 +262,7 @@ namespace base {
         vector2<T> vert[TCOUNT];
 	};
     
-    inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<4>& ti, uint32_t cl = 0xffffffff) {
+    inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<float, 4>& ti, uint32_t cl = 0xffffffff) {
         vt[0].vertex = {pos.x, pos.y};
         vt[0].texcoord = ti.vert[0];
         vt[0].color = cl;
@@ -336,7 +339,7 @@ namespace base {
         void Update(const uint8_t* data, int32_t offx, int32_t offy, int32_t width, int32_t height);
         void Bind();
         inline uint32_t GetTextureId() { return texture_id; }
-        TextureInfo<4> GetTextureInfo();
+        TextureInfo<float, 4> GetTextureInfo();
         inline int32_t GetWidth() { return tex_width; }
         inline int32_t GetHeight() { return tex_height; }
         inline int32_t GetImgWidth() { return img_width; }

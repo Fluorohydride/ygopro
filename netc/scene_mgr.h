@@ -2,7 +2,8 @@
 #define _GAME_SCENE_H_
 
 #include "utils/singleton.h"
-#include "utils/render_util.h"
+
+#include "render_util.h"
 
 namespace ygopro
 {

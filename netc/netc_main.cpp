@@ -4,8 +4,8 @@
 
 #include "utils/textfile.h"
 #include "utils/filesystem.h"
-#include "utils/sgui.h"
 
+#include "sgui.h"
 #include "config.h"
 
 #include "scene_mgr.h"

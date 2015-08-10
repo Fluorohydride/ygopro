@@ -1,12 +1,13 @@
 #ifndef _SGUI_H_
 #define _SGUI_H_
 
+#include "utils/textfile.h"
+#include "utils/convert.h"
+#include "utils/jaweson.h"
+#include "utils/timer.h"
+#include "utils/clock.h"
+
 #include "render_base.h"
-#include "textfile.h"
-#include "convert.h"
-#include "jaweson.h"
-#include "timer.h"
-#include "clock.h"
 
 #include <GLFW/glfw3.h>
 

@@ -1,10 +1,11 @@
-#include "buildin/common.h"
+#include "utils/common.h"
 
-#include "../base/render_base.h"
-#include "../base/sungui.h"
+#include "../render_base.h"
+#include "../sgui.h"
 #include "../image_mgr.h"
 #include "../card_data.h"
 #include "../deck_data.h"
+
 #include "build_scene_handler.h"
 #include "build_scene.h"
 

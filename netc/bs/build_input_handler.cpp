@@ -1,6 +1,6 @@
-#include "buildin/common.h"
+#include "utils/common.h"
 
-#include "../base/sungui.h"
+#include "../sgui.h"
 #include "../card_data.h"
 #include "../scene_mgr.h"
 #include "../gui_extra.h"
@@ -20,26 +20,26 @@ namespace ygopro
     bool BuildInputHandler::UpdateInput() {
         if(show_info_begin) {
             auto pscene = build_scene.lock();
-            double now = SceneMgr::Get().GetGameTime();
-            if(now - show_info_time >= 0.5) {
+            auto now = SceneMgr::GetSingleton().GetSysClock();
+            if(now - show_info_time >= 500) {
                 show_info = true;
                 show_info_begin = false;
                 click_pos.first = 0;
                 pscene->ShowSelectedInfo(hover_pos.first, hover_pos.second);
-                sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Bind([this](sgui::SGWidget& sender, sgui::MouseButtonEvent evt)->bool {
-                    if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
+                sgui::SGGUIRoot::GetSingleton().event_mouse_up.Bind([this](sgui::SGWidget& sender, int32_t btn, int32_t mods, int32_t x, int32_t y)->bool {
+                    if(btn == GLFW_MOUSE_BUTTON_LEFT) {
                         show_info = false;
                         show_info_begin = false;
                         build_scene.lock()->HideCardInfo();
-                        sgui::SGGUIRoot::GetSingleton().eventMouseMove.Reset();
-                        sgui::SGGUIRoot::GetSingleton().eventMouseButtonUp.Reset();
+                        sgui::SGGUIRoot::GetSingleton().event_mouse_move.Remove(this);
+                        sgui::SGGUIRoot::GetSingleton().event_mouse_up.Remove(this);
                     }
                     return true;
-                });
-                sgui::SGGUIRoot::GetSingleton().eventMouseMove.Bind([this](sgui::SGWidget& sender, sgui::MouseMoveEvent evt)->bool {
-                    MouseMove(evt);
+                }, this);
+                sgui::SGGUIRoot::GetSingleton().event_mouse_move.Bind([this](sgui::SGWidget& sender, int32_t x, int32_t y)->bool {
+                    MouseMove(x, y);
                     return true;
-                });
+                }, this);
             }
         }
         return true;
@@ -49,7 +49,7 @@ namespace ygopro
         std::shared_ptr<DeckCardData> dcd = nullptr;
         auto pscene = build_scene.lock();
         auto pre = hover_obj.lock();
-        auto hov = pscene->GetHoverPos(evt.x, evt.y);
+        auto hov = pscene->GetHoverPos(x, y);
         if(hov.first == 4) {
             pscene->SetCurrentSelection(hov.second, show_info);
         } else {
@@ -75,7 +75,7 @@ namespace ygopro
     
     void BuildInputHandler::MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y) {
         click_pos = hover_pos;
-        if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
+        if(button == GLFW_MOUSE_BUTTON_LEFT) {
             show_info_begin = true;
             show_info_time = SceneMgr::Get().GetGameTime();
         }

@@ -1,10 +1,11 @@
 #include "utils/common.h"
-#include "utils/render_base.h"
-#include "utils/render_util.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "utils/stb_image_write.h"
-#include "utils/sgui.h"
+
+#include "render_base.h"
+#include "render_util.h"
+#include "sgui.h"
 
 #include "config.h"
 #include "scene_mgr.h"

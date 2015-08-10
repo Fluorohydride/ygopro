@@ -1,8 +1,9 @@
 #ifndef _RENDER_UTIL_H_
 #define _RENDER_UTIL_H_
 
+#include "utils/clock.h"
+
 #include "render_base.h"
-#include "clock.h"
 
 namespace base
 {
@@ -225,13 +226,13 @@ namespace base
             glBindBuffer(GL_ARRAY_BUFFER, IRenderState<VTYPE>::vbo_id);
             if(vertex_buffer.size() > pre_vert_size) {
                 glBufferData(GL_ARRAY_BUFFER, sizeof(VTYPE) * vertex_buffer.size(), &vertex_buffer[0], GL_DYNAMIC_DRAW);
-                pre_vert_size = vertex_buffer.size();
+                pre_vert_size = (int32_t)vertex_buffer.size();
             } else
                 glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(VTYPE) * vertex_buffer.size(), &vertex_buffer[0]);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, IRenderState<VTYPE>::vbo_idx);
             if(index_buffer.size() > pre_index_size) {
                 glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int16_t) * index_buffer.size(), &index_buffer[0], GL_DYNAMIC_DRAW);
-                pre_index_size = index_buffer.size();
+                pre_index_size = (int32_t)index_buffer.size();
             } else
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(int16_t) * index_buffer.size(), &index_buffer[0]);
         }

@@ -1,8 +1,9 @@
 #ifndef _BUILD_SCENE_H_
 #define _BUILD_SCENE_H_
 
-#include "../base/animator.h"
+#include "utils/action.h"
 
+#include "../render_util.h"
 #include "../deck_data.h"
 #include "../scene_mgr.h"
 
@@ -11,15 +12,19 @@ namespace ygopro
     
     struct FilterCondition;
     
-    struct BuilderCard : public DeckCardExtraData {
-        MutableAttribute<v2f> pos;
-        MutableAttribute<v2f> size;
-        MutableAttribute<float> hl;
-        uint32_t buffer_index = 0;
-        ti4 card_tex;
+    class BuilderCard : public DeckCardExtraData, public base::RenderUnit<v2i> {
+    public:
+        virtual ~BuilderCard() {}
+        virtual void PushVertices() {}
+        virtual void UpdateVertices() {}
+        
+        v2f pos;
+        v2f size;
+        float hl;
         bool show_limit = true;
         bool show_exclusive = true;
         bool updating = false;
+        texf4 card_tex;
     };
     
     class BuildScene : public Scene {
@@ -97,12 +102,12 @@ namespace ygopro
         float offsety[3] = {0.0f, 0.0f, 0.0f};
         float dx[3] = {0.0f, 0.0f, 0.0f};
         bool show_exclusive = true;
-        std::array<ti4, 3> limit;
-        std::array<ti4, 3> pool;
-        ti4 hmask;
+        std::array<texf4, 3> limit;
+        std::array<texf4, 3> pool;
+        texf4 hmask;
         std::list<std::weak_ptr<DeckCardData>> updating_cards;
         std::array<CardData*, 10> result_data;
-        std::array<ti4, 10> result_tex;
+        std::array<texf4, 10> result_tex;
         int32_t current_sel_result = -1;
         int32_t result_show_size = 0;
     };

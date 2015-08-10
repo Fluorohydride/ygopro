@@ -17,7 +17,8 @@ namespace ygopro
     struct CardData;
     struct FilterCondition;
     
-    struct DeckCardExtraData {
+    class DeckCardExtraData {
+    public:
         virtual ~DeckCardExtraData() = default;
     };
     
