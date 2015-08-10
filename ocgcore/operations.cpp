@@ -992,22 +992,27 @@ int32 field::control_adjust(uint16 step) {
 			pduel->write_buffer8(pcard1->current.sequence);
 			pduel->write_buffer8(pcard1->current.position);
 		}
-		core.operated_set.insert(cit1, core.control_adjust_set[0].end());
-		core.operated_set.insert(cit2, core.control_adjust_set[1].end());
+		card_set* adjust_set = new card_set;
+		core.units.begin()->ptarget = (group*)adjust_set;
+		adjust_set->insert(cit1, core.control_adjust_set[0].end());
+		adjust_set->insert(cit2, core.control_adjust_set[1].end());
 		return FALSE;
 	}
 	case 3: {
-		if(core.operated_set.size() == 0)
+		card_set* adjust_set = (card_set*)core.units.begin()->ptarget;
+		if(adjust_set->empty())
 			return FALSE;
-		auto cit = core.operated_set.begin();
+		auto cit = adjust_set->begin();
 		card* pcard = *cit;
-		core.operated_set.erase(cit);
+		adjust_set->erase(cit);
 		pcard->reset(RESET_CONTROL, RESET_EVENT);
 		move_to_field(pcard, 1 - pcard->current.controler, 1 - pcard->current.controler, LOCATION_MZONE, pcard->current.position);
 		core.units.begin()->step = 2;
 		return FALSE;
 	}
 	case 4: {
+		card_set* adjust_set = (card_set*)core.units.begin()->ptarget;
+		delete adjust_set;
 		core.control_adjust_set[0].insert(core.control_adjust_set[1].begin(), core.control_adjust_set[1].end());
 		for(auto cit = core.control_adjust_set[0].begin(); cit != core.control_adjust_set[0].end(); ++cit) {
 			(*cit)->filter_disable_related_cards();
@@ -1039,10 +1044,9 @@ int32 field::self_destroy(uint16 step) {
 	}
 	case 1: {
 		core.self_destroy_set.clear();
-		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE)) {
-			core.operated_set.clear();
+		core.operated_set.clear();
+		if(!(core.global_flag & GLOBALFLAG_SELF_TOGRAVE))
 			return TRUE;
-		}
 		core.units.begin()->arg1 = returns.ivalue[0];
 		if(!core.self_tograve_set.empty())
 			send_to(&core.self_tograve_set, 0, REASON_EFFECT, PLAYER_NONE, PLAYER_NONE, LOCATION_GRAVE, 0, POS_FACEUP);
