@@ -4653,14 +4653,8 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 		effect* peffect = cait->triggering_effect;
 		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_negatable(cait->chain_count)) {
 			remove_oath_effect(peffect);
-			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT)) {
-				if(peffect->count_code == 0) {
-					if((peffect->flag & EFFECT_FLAG_REPEAT))
-						peffect->reset_count += 0x100;
-				} else {
-					if(peffect->count_code & EFFECT_COUNT_CODE_OATH)
-						dec_effect_code(peffect->count_code, cait->triggering_player);
-				}
+			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->count_code & EFFECT_COUNT_CODE_OATH)) {
+				dec_effect_code(peffect->count_code, cait->triggering_player);
 			}
 			check_chain_counter(peffect, cait->triggering_player, cait->chain_count, true);
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);
