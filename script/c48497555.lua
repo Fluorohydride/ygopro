@@ -24,8 +24,7 @@ function c48497555.initial_effect(c)
 end
 function c48497555.condition(e,tp,eg,ep,ev,re,r,rp)
 	local rc=re:GetHandler()
-	return rc:IsOnField() and rc:IsControler(1-tp) and rc:IsType(TYPE_SPELL+TYPE_TRAP)
-		and not re:IsHasType(EFFECT_TYPE_ACTIVATE)
+	return rc:IsOnField() and rc:IsControler(1-tp) and re:IsActiveType(TYPE_SPELL+TYPE_TRAP) and not re:IsHasType(EFFECT_TYPE_ACTIVATE)
 end
 function c48497555.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return re:GetHandler():IsDestructable() end
