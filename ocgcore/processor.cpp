@@ -1750,7 +1750,8 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 			uint8 tp = clit->triggering_player;
 			bool act = true;
 			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-			        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3) || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
+			        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3) 
+						|| !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 					if(tp == infos.turn_player) {
 						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
@@ -1852,7 +1853,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 		uint8 tp = clit->triggering_player;
 		bool act = true;
 		if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-		        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
+		        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3)
 		            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 			if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && clit->triggering_location == LOCATION_HAND
 			        && (((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->handler->is_has_relation(peffect))
@@ -1913,7 +1914,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 				continue;
 			bool act = true;
 			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-			        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
+			        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3)
 			            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 				if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && clit->triggering_location == LOCATION_HAND
 				        && (((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->handler->is_has_relation(peffect))
