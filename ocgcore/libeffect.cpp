@@ -115,6 +115,7 @@ int32 scriptlib::effect_set_target_range(lua_State *L) {
 	int32 o = lua_tointeger(L, 3);
 	peffect->s_range = s;
 	peffect->o_range = o;
+	peffect->flag &= ~EFFECT_FLAG_ABSOLUTE_TARGET;
 	return 0;
 }
 int32 scriptlib::effect_set_absolute_range(lua_State *L) {
@@ -189,7 +190,7 @@ int32 scriptlib::effect_set_property(lua_State *L) {
 	check_param(L, PARAM_TYPE_EFFECT, 1);
 	effect* peffect = *(effect**) lua_touserdata(L, 1);
 	uint32 v = lua_tounsigned(L, 2);
-	peffect->flag |= v & 0xfffffff0;
+	peffect->flag = (peffect->flag & 0x4f) | (v & ~0x4f);
 	return 0;
 }
 int32 scriptlib::effect_set_label(lua_State *L) {
