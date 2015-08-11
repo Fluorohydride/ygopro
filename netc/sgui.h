@@ -26,7 +26,7 @@ namespace sgui
     public:
         template<typename OT>
         void Bind(OT* obj, bool (OT::*fun)(ST&, ET...), void* object = nullptr) {
-            auto lambda = [obj, fun](ST& sender, ET... evt)->bool { return (obj->*fun)(sender, evt...); };
+            auto lambda = [obj, fun](ST& sender, ET... evt)->bool { return (obj->*fun)(sender, std::forward<ET>(evt)...); };
             auto ptr = std::make_shared<function_type>(lambda);
             operate_ptrs.push_back(std::make_pair(ptr, object));
             if(!lock)
@@ -72,7 +72,7 @@ namespace sgui
             bool ret = false;
             lock = true;
             for(auto& ptr : delegate_ptrs)
-                ret = ptr->operator()(sender, evt...) || ret;
+                ret = ptr->operator()(sender, std::forward<ET>(evt)...) || ret;
             lock = false;
             SyncPtrs();
             return ret;

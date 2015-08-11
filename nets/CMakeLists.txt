@@ -21,6 +21,3 @@ endif ()
 if (WIN32)
     target_link_libraries (nets ws2_32 winmm kernel32 user32 imm32)
 endif ()
-
-create_target_launcher(nets WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})
-create_default_target_launcher(nets WORKING_DIRECTORY ${CMAKE_SOURCE_DIR})

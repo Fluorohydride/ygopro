@@ -123,25 +123,33 @@ protected:
 
 template<typename TIME_TYPE>
 class ActionRepeat : public Action<TIME_TYPE> {
+    using repcb_type = std::function<bool(bool)>;
 public:
-    ActionRepeat(std::shared_ptr<Action<TIME_TYPE>> ac, int32_t count = 0) : rep_action(ac), rep_count(count) {}
-    virtual void InitStartTime(TIME_TYPE tm) { if(rep_action) rep_action->InitStartTime(tm); cur_count = 0; }
+    ActionRepeat(std::shared_ptr<Action<TIME_TYPE>> ac, repcb_type cb) : rep_action(ac), callback(cb) {}
+    ActionRepeat(std::shared_ptr<Action<TIME_TYPE>> ac, int32_t count) : rep_action(ac) {
+        int32_t cur_count = 0;
+        callback = [cur_count, count](bool init) mutable ->bool {
+            if(init) { cur_count = 0; return true; }
+            return ++cur_count >= count;
+        };
+    }
+    
+    virtual void InitStartTime(TIME_TYPE tm) { if(rep_action) rep_action->InitStartTime(tm); if(callback) callback(true); }
     virtual bool Perform(TIME_TYPE cur_time) {
         if(!rep_action)
             return false;
         if(!rep_action->Perform(cur_time)) {
-            cur_count++;
-            if(rep_count && cur_count >= rep_count)
+            if(callback && !callback(false))
                 return false;
             rep_action->InitStartTime(cur_time);
             return true;
         }
         return true;
     }
+
 protected:
     std::shared_ptr<Action<TIME_TYPE>> rep_action;
-    int32_t rep_count = 0;
-    int32_t cur_count = 0;
+    repcb_type callback;
 };
 
 template<typename TIME_TYPE>
@@ -158,7 +166,7 @@ protected:
 
 template<typename TIME_TYPE>
 class ActionCallback : public Action<TIME_TYPE> {
-    typedef std::function<void()> cb_type;
+    using cb_type = std::function<void()>;
 public:
     ActionCallback(cb_type cb) : callback(cb) {}
     virtual bool Perform(TIME_TYPE cur_time) {
@@ -172,7 +180,7 @@ protected:
 
 template<typename TIME_TYPE, typename OBJ_TYPE>
 class LerpAnimator : public Action<TIME_TYPE> {
-    typedef std::function<bool(OBJ_TYPE*, double)> lerp_cb;
+    using lerp_cb = std::function<bool(OBJ_TYPE*, double)>; // return false to exit
 public:
     LerpAnimator(TIME_TYPE tm, std::shared_ptr<OBJ_TYPE> obj, lerp_cb cb, std::shared_ptr<TGen<TIME_TYPE>> gobj)
         : last_time(tm), ani_obj(obj), callback(cb), tgen_obj(gobj) {}
@@ -197,7 +205,7 @@ protected:
 template<typename TIME_TYPE>
 class ActionMgr {
 public:
-    inline void InitStartTime(TIME_TYPE tm) { cur_time = tm; }
+    inline void InitActionTime(TIME_TYPE tm) { cur_time = tm; }
     
     ActionMgr& operator << (std::shared_ptr<Action<TIME_TYPE>> ani) {
         ani->InitStartTime(cur_time);
@@ -205,7 +213,7 @@ public:
         return *this;
     }
     
-    void UpdateTime(TIME_TYPE tm) {
+    void UpdateActionTime(TIME_TYPE tm) {
         auto iter = actions.begin();
         while(iter != actions.end()) {
             auto cur = iter++;

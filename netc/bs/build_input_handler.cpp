@@ -1,5 +1,6 @@
 #include "utils/common.h"
 
+#include "../config.h"
 #include "../sgui.h"
 #include "../card_data.h"
 #include "../scene_mgr.h"
@@ -20,7 +21,7 @@ namespace ygopro
     bool BuildInputHandler::UpdateInput() {
         if(show_info_begin) {
             auto pscene = build_scene.lock();
-            auto now = SceneMgr::GetSingleton().GetSysClock();
+            auto now = SceneMgr::Get().GetSysClock();
             if(now - show_info_time >= 500) {
                 show_info = true;
                 show_info_begin = false;
@@ -61,12 +62,16 @@ namespace ygopro
         if(dcd != pre) {
             if(pre) {
                 auto ptr = std::static_pointer_cast<BuilderCard>(pre->extra);
-                ptr->hl.Reset(0.0f);
+                ptr->SetHL(0);
             }
             if(dcd) {
                 auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-                ptr->hl.SetAnimator(std::make_shared<LerpAnimator<float, TGenPeriodicRet>>(0.2f, 0.8f, SceneMgr::Get().GetGameTime(), 1.0));
-                pscene->AddUpdatingCard(dcd);
+                auto act = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(0, ptr, [](BuilderCard* bc, double t)->bool {
+                    if(bc->hl == 0)
+                        return false;
+                    bc->SetHL((t * 0.6f + 0.2f) * 255 + 0xffffff00);
+                    return true;
+                }, std::make_shared<TGenPeriodicRet<int64_t>>(1000));
             }
         }
         hover_pos = hov;
@@ -77,12 +82,12 @@ namespace ygopro
         click_pos = hover_pos;
         if(button == GLFW_MOUSE_BUTTON_LEFT) {
             show_info_begin = true;
-            show_info_time = SceneMgr::Get().GetGameTime();
+            show_info_time = SceneMgr::Get().GetSysClock();
         }
     }
     
     void BuildInputHandler::MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y) {
-        if(evt.button == GLFW_MOUSE_BUTTON_LEFT)
+        if(button == GLFW_MOUSE_BUTTON_LEFT)
             show_info_begin = false;
         if(hover_pos != click_pos)
             return;
@@ -93,13 +98,13 @@ namespace ygopro
         if(pos > 0 && pos < 4) {
             if(index < 0)
                 return;
-            if(evt.button == GLFW_MOUSE_BUTTON_LEFT) {
+            if(button == GLFW_MOUSE_BUTTON_LEFT) {
                 pscene->MoveCard(pos, index);
             } else {
                 pscene->RemoveCard(pos, index);
             }
         } else if(pos == 4) {
-            pscene->InsertSearchResult(index, evt.button != GLFW_MOUSE_BUTTON_LEFT);
+            pscene->InsertSearchResult(index, button != GLFW_MOUSE_BUTTON_LEFT);
         }
     }
     
@@ -109,40 +114,40 @@ namespace ygopro
     
     void BuildInputHandler::KeyDown(int32_t key, int32_t mods) {
         auto pscene = build_scene.lock();
-        switch(evt.key) {
+        switch(key) {
             case GLFW_KEY_1:
-                if(evt.mods & GLFW_MOD_CONTROL)
+                if(mods & GLFW_MOD_CONTROL)
                     pscene->SortDeck();
-                else if(evt.mods & GLFW_MOD_ALT)
-                    pscene->GetSceneHandler<BuildSceneHandler>()->ViewRegulation(0);
+                else if(mods & GLFW_MOD_ALT)
+                    std::static_pointer_cast<BuildSceneHandler>(pscene->GetSceneHandler())->ViewRegulation(0);
                 break;
             case GLFW_KEY_2:
-                if(evt.mods & GLFW_MOD_CONTROL)
+                if(mods & GLFW_MOD_CONTROL)
                     pscene->ShuffleDeck();
-                else if(evt.mods & GLFW_MOD_ALT)
-                    pscene->GetSceneHandler<BuildSceneHandler>()->ViewRegulation(1);
+                else if(mods & GLFW_MOD_ALT)
+                    std::static_pointer_cast<BuildSceneHandler>(pscene->GetSceneHandler())->ViewRegulation(1);
                 break;
             case GLFW_KEY_3:
-                if(evt.mods & GLFW_MOD_CONTROL) {
+                if(mods & GLFW_MOD_CONTROL) {
                     pscene->ClearDeck();
                     pscene->SetDeckDirty();
-                } else if(evt.mods & GLFW_MOD_ALT)
-                    pscene->GetSceneHandler<BuildSceneHandler>()->ViewRegulation(2);
+                } else if(mods & GLFW_MOD_ALT)
+                    std::static_pointer_cast<BuildSceneHandler>(pscene->GetSceneHandler())->ViewRegulation(2);
                 break;
             case GLFW_KEY_C:
-                if(evt.mods & GLFW_MOD_CONTROL) {
+                if(mods & GLFW_MOD_CONTROL) {
                     std::string deck_string;
                     deck_string.append("ydk://").append(build_scene.lock()->SaveDeckToString());
                     glfwSetClipboardString(nullptr, deck_string.c_str());
-                    MessageBox::ShowOK(L"", stringCfg["eui_msg_deck_tostr_ok"]);
+                    MessageBox::ShowOK(L"", To<std::wstring>(stringCfg["eui_msg_deck_tostr_ok"].to_string()), nullptr);
                 }
                 break;
             case GLFW_KEY_V:
-                if(evt.mods & GLFW_MOD_CONTROL) {
+                if(mods & GLFW_MOD_CONTROL) {
                     auto pscene = build_scene.lock();
                     std::string deck_string = glfwGetClipboardString(nullptr);
                     pscene->LoadDeckFromString(deck_string);
-                    pscene->GetSceneHandler<BuildSceneHandler>()->StopViewRegulation();
+                    std::static_pointer_cast<BuildSceneHandler>(pscene->GetSceneHandler())->StopViewRegulation();
                 }
                 break;
             default:

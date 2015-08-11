@@ -16,10 +16,9 @@ else ()
     add_executable (netc ${AUTO_FILES_RESULT})
 endif ()
 
-target_link_libraries (netc utils ocgcore)
+target_link_libraries (netc utils)
 
 target_link_libraries (netc
-    ${LUA_LIBRARIES}
     ${LIBEVENT_LIBRARIES}
     ${SQLITE_LIBRARIES}
     ${GLFW3_LIBRARIES}
@@ -30,7 +29,6 @@ target_link_libraries (netc
 
 include_directories (
     ${CMAKE_SOURCE_DIR}
-    ${LUA_INCLUDE_DIR}
     ${LIBEVENT_INCLUDE_DIR}
     ${SQLITE_INCLUDE_DIRS}
     ${OPENGL_INCLUDE_DIR}

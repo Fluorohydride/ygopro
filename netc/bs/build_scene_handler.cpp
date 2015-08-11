@@ -1,5 +1,6 @@
 #include "utils/common.h"
 
+#include "../config.h"
 #include "../sgui.h"
 #include "../card_data.h"
 #include "build_scene.h"
@@ -17,10 +18,13 @@ namespace ygopro
     }
     
     bool BuildSceneHandler::UpdateEvent() {
+        UpdateActionTime(SceneMgr::Get().GetSysClock());
         return true;
     }
     
     void BuildSceneHandler::BeginHandler() {
+        InitActionTime(SceneMgr::Get().GetSysClock());
+        
         auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
         pnl->SetSize({-20, 35}, {1.0f, 0.0f});
         pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
@@ -38,40 +42,40 @@ namespace ygopro
         deck_label = icon_label;
         auto menu_deck = sgui::SGButton::Create(pnl, {250, 5}, {70, 25});
         menu_deck->SetText(stringCfg["eui_menu_deck"], 0xff000000);
-        menu_deck->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int32_t id){
+        menu_deck->event_click.Bind([this](sgui::SGWidget& sender)->bool {
+            PopupMenu::Create(SceneMgr::Get().GetMousePosition(), [this](int32_t id) {
                 OnMenuDeck(id);
             })
-            .AddButton(stringCfg["eui_deck_load"])
-            .AddButton(stringCfg["eui_deck_save"])
-            .AddButton(stringCfg["eui_deck_saveas"])
-            .AddButton(stringCfg["eui_deck_loadstr"])
-            .AddButton(stringCfg["eui_deck_savestr"])
+            .AddButton(To<std::wstring>(stringCfg["eui_deck_load"].to_string()), 0)
+            .AddButton(To<std::wstring>(stringCfg["eui_deck_save"].to_string()), 1)
+            .AddButton(To<std::wstring>(stringCfg["eui_deck_saveas"].to_string()), 2)
+            .AddButton(To<std::wstring>(stringCfg["eui_deck_loadstr"].to_string()), 3)
+            .AddButton(To<std::wstring>(stringCfg["eui_deck_savestr"].to_string()), 4)
             .End();
             return true;
         });
         auto menu_tool = sgui::SGButton::Create(pnl, {325, 5}, {70, 25});
         menu_tool->SetText(stringCfg["eui_menu_tool"], 0xff000000);
-        menu_tool->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int32_t id){
+        menu_tool->event_click.Bind([this](sgui::SGWidget& sender)->bool {
+            PopupMenu::Create(SceneMgr::Get().GetMousePosition(), [this](int32_t id){
                 OnMenuTool(id);
             })
-            .AddButton(stringCfg["eui_tool_sort"])
-            .AddButton(stringCfg["eui_tool_shuffle"])
-            .AddButton(stringCfg["eui_tool_clear"])
-            .AddButton(stringCfg["eui_tool_browser"])
+            .AddButton(To<std::wstring>(stringCfg["eui_tool_sort"].to_string()), 0)
+            .AddButton(To<std::wstring>(stringCfg["eui_tool_shuffle"].to_string()), 1)
+            .AddButton(To<std::wstring>(stringCfg["eui_tool_clear"].to_string()), 2)
+            .AddButton(To<std::wstring>(stringCfg["eui_tool_browser"].to_string()), 3)
             .End();
             return true;
         });
         auto menu_list = sgui::SGButton::Create(pnl, {400, 5}, {70, 25});
         menu_list->SetText(stringCfg["eui_menu_list"], 0xff000000);
-        menu_list->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Begin(SceneMgr::Get().GetMousePosition(), 100, [this](int32_t id){
+        menu_list->event_click.Bind([this](sgui::SGWidget& sender)->bool {
+            PopupMenu::Create(SceneMgr::Get().GetMousePosition(), [this](int32_t id){
                 OnMenuList(id);
             })
-            .AddButton(stringCfg["eui_list_forbidden"])
-            .AddButton(stringCfg["eui_list_limit"])
-            .AddButton(stringCfg["eui_list_semilimit"])
+            .AddButton(To<std::wstring>(stringCfg["eui_list_forbidden"].to_string()), 0)
+            .AddButton(To<std::wstring>(stringCfg["eui_list_limit"].to_string()), 1)
+            .AddButton(To<std::wstring>(stringCfg["eui_list_semilimit"].to_string()), 2)
             .End();
             return true;
         });

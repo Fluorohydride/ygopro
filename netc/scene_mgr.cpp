@@ -1,4 +1,5 @@
 #include "utils/common.h"
+#include "utils/filesystem.h"
 
 #define STB_IMAGE_WRITE_IMPLEMENTATION
 #include "utils/stb_image_write.h"
@@ -14,7 +15,6 @@ namespace ygopro
 {
 
     void SceneMgr::Init() {
-
     }
     
     void SceneMgr::Uninit() {
@@ -68,7 +68,8 @@ namespace ygopro
         sprintf(file, "/%d%02d%02d-%ld.png", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, t);
         std::string path = commonCfg["screenshot_path"].to_string();
         path.append(file);
-        stbi_write_png(path.c_str(), clip.width, clip.height, 4, clip_buff, 0);
+        auto localfile = FileSystem::UTF8ToLocalFilename(path);
+        stbi_write_png(localfile.c_str(), clip.width, clip.height, 4, clip_buff, 0);
         delete[] clip_buff;
         delete[] image_buff;
     }

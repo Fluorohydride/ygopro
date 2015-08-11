@@ -15,7 +15,7 @@ namespace ygopro
         virtual void MouseMove(int32_t x, int32_t y);
         virtual void MouseButtonDown(int32_t button, int32_t mods, int32_t x, int32_t y);
         virtual void MouseButtonUp(int32_t button, int32_t mods, int32_t x, int32_t y);
-        virtual void MouseWheel(int32_t deltax, int32_t deltay);
+        virtual void MouseWheel(float deltax, float deltay);
         virtual void KeyDown(int32_t key, int32_t mods);
         virtual void KeyUp(int32_t key, int32_t mods);
         

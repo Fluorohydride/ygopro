@@ -2,6 +2,7 @@
 #define _BUILD_SCENE_HANDLER_H_
 
 #include "utils/timer.h"
+#include "utils/action.h"
 
 #include "../scene_mgr.h"
 #include "../gui_extra.h"
@@ -11,7 +12,7 @@ namespace ygopro
     
     class BuildScene;
     
-    class BuildSceneHandler : public SceneHandler {
+    class BuildSceneHandler : public SceneHandler, public ActionMgr<int64_t> {
     public:
         BuildSceneHandler(std::shared_ptr<BuildScene> pscene);
         virtual bool UpdateEvent();
@@ -34,10 +35,11 @@ namespace ygopro
     protected:
         std::weak_ptr<BuildScene> build_scene;
         
-        std::weak_ptr<sgui::SGIconLabel> deck_label;
         std::shared_ptr<FileDialog> file_dialog;
         std::shared_ptr<FilterDialog> filter_dialog;
         std::shared_ptr<InfoPanel> info_panel;
+        
+        std::weak_ptr<sgui::SGLabel> deck_label;
         std::weak_ptr<sgui::SGLabel> label_result;
         std::weak_ptr<sgui::SGLabel> label_page;
         bool deck_edited = false;

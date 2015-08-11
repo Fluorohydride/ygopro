@@ -78,6 +78,13 @@ public:
         return std::move(std::string(buffer));
     }
     
+    static std::string WSTRToLocalFilename(const std::wstring& wstr_name) {
+        char buffer[2048];
+        size_t count = wcstombs(buffer, wstr_name.c_str(), 2047);
+        buffer[count] = 0;
+        return std::move(std::string(buffer));
+    }
+    
 };
 
 #else
@@ -143,6 +150,10 @@ public:
     
     static std::string UTF8ToLocalFilename(const std::string& utf8_name) {
         return utf8_name;
+    }
+    
+    static std::string WSTRToLocalFilename(const std::wstring& wstr_name) {
+        return std::move(To<std::string>(wstr_name));
     }
     
 };
