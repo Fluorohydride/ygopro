@@ -78,7 +78,10 @@ function c89544521.spop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c89544521.desfilter2(c)
 	return c:IsFaceup() and c:IsSetCard(0xab) and c:IsDestructable()
-		and Duel.IsExistingTarget(Card.IsDestructable,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+		and Duel.IsExistingTarget(c89544521.desfilter3,0,LOCATION_ONFIELD,LOCATION_ONFIELD,1,c)
+end
+function c89544521.desfilter3(c)
+	return c:IsFaceup() and c:IsDestructable()
 end
 function c89544521.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return false end
@@ -86,7 +89,7 @@ function c89544521.destg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
 	local g1=Duel.SelectTarget(tp,c89544521.desfilter2,tp,LOCATION_ONFIELD,0,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_DESTROY)
-	local g2=Duel.SelectTarget(tp,Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,g1:GetFirst())
+	local g2=Duel.SelectTarget(tp,c89544521.desfilter3,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,1,1,g1:GetFirst())
 	g1:Merge(g2)
 	Duel.SetOperationInfo(0,CATEGORY_DESTROY,g1,2,0,0)
 end
