@@ -28,7 +28,7 @@ function c59718521.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
 function c59718521.filter(c)
-	return c:IsReleasable() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
+	return c:IsReleasable() and c:IsRace(RACE_PSYCHO) and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c59718521.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.CheckReleaseGroup(tp,c59718521.filter,1,nil,RACE_PSYCHO) end
