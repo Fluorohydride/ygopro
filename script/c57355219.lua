@@ -25,7 +25,7 @@ function c57355219.condition1(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetCurrentChain()==0
 end
 function c57355219.cfilter(c)
-	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsAbleToRemoveAsCost()
+	return c:IsFaceup() and c:IsType(TYPE_FUSION) and c:IsAbleToRemoveAsCost() and not c:IsStatus(STATUS_BATTLE_DESTROYED)
 end
 function c57355219.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c57355219.cfilter,tp,LOCATION_MZONE,0,1,nil) end
