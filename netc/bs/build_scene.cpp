@@ -22,6 +22,13 @@ namespace ygopro
         pool[2] = ImageMgr::Get().GetTexture("pool_ex");
         hmask = ImageMgr::Get().GetTexture("cmask");
         result_data.fill(nullptr);
+        bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
+        misc_renderer = std::make_shared<base::RenderObject2DLayout>();
+        card_renderer = std::make_shared<base::RenderObject2DLayout>();
+        PushObject(ImageMgr::Get());
+        PushObject(bg_renderer.get());
+        PushObject(misc_renderer.get());
+        PushObject(misc_renderer.get());
     }
     
     BuildScene::~BuildScene() {
@@ -34,18 +41,17 @@ namespace ygopro
     }
     
     bool BuildScene::Update() {
-        if(scene_handler)
-            scene_handler->UpdateEvent();
         if(input_handler)
             input_handler->UpdateInput();
-        UpdateBackGround();
-        UpdateCard();
+        if(scene_handler)
+            scene_handler->UpdateEvent();
         UpdateMisc();
         UpdateResult();
         return IsActive();
     }
     
     void BuildScene::Draw() {
+        Render();
 //        glViewport(0, 0, scene_size.x, scene_size.y);
 //        auto& shader = base::Shader::GetDefaultShader();
 //        shader.Use();
@@ -101,10 +107,12 @@ namespace ygopro
         dx[1] = (rc1 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc1 - 1);
         int32_t rc2 = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
         dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
+        bg_renderer->SetScreenSize(sz);
+        misc_renderer->SetScreenSize(sz);
+        card_renderer->SetScreenSize(sz);
+        bg_renderer->ClearVertices();
+        bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), {0, 0, sz.x, sz.y}, ImageMgr::Get().GetTexture("bg"));
         UpdateAllCard();
-        update_misc = true;
-        update_result = true;
-        GLCheckError(__FILE__, __LINE__);
     }
     
     recti BuildScene::GetScreenshotClip() {
@@ -163,7 +171,7 @@ namespace ygopro
     
     bool BuildScene::LoadDeckFromFile(const std::wstring& file) {
         DeckData tempdeck;
-        if(tempdeck.LoadFromFile(file)) {
+        if(tempdeck.LoadFromFile(FileSystem::WSTRToLocalFilename(file))) {
             ClearDeck();
             current_deck = tempdeck;
             update_misc = true;
@@ -225,7 +233,7 @@ namespace ygopro
         auto deckfile = file;
         if(deckfile.find(L".ydk") != deckfile.length() - 4)
             deckfile.append(L".ydk");
-        current_deck.SaveToFile(deckfile);
+        current_deck.SaveToFile(FileSystem::WSTRToLocalFilename(file));
         return true;
     }
     
@@ -233,81 +241,40 @@ namespace ygopro
         return std::move(current_deck.SaveToString());
     }
     
-    void BuildScene::UpdateBackGround() {
-        if(!update_bg)
-            return;
-        update_bg = false;
-        auto ti = ImageMgr::Get().GetTexture("bg");
-        std::array<base::v2ct, 4> verts;
-        base::FillVertex(&verts[0], {-1.0f, 1.0f}, {2.0f, -2.0f}, ti);
-        glBindBuffer(GL_ARRAY_BUFFER, back_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(base::v2ct) * verts.size(), &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
-    }
-    
-    void BuildScene::UpdateCard() {
-        double tm = SceneMgr::Get().GetGameTime();
-        glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
-        for(auto iter = updating_cards.begin(); iter != updating_cards.end();) {
-            auto cur = iter++;
-            auto dcd = (*cur).lock();
-            if(dcd == nullptr) {
-                updating_cards.erase(cur);
-                continue;
-            }
-            auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-            bool up = ptr->pos.NeedUpdate();
-            ptr->pos.Update(tm);
-            ptr->size.Update(tm);
-            ptr->hl.Update(tm);
-            if(up)
-                RefreshCardPos(dcd);
-            else
-                RefreshHL(dcd);
-            if(!ptr->pos.NeedUpdate() && !ptr->size.NeedUpdate() && !ptr->hl.NeedUpdate()) {
-                ptr->updating = false;
-                updating_cards.erase(cur);
-            }
-        }
-    }
-    
     void BuildScene::UpdateAllCard() {
         size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
         if(deck_sz == 0)
             return;
         for(size_t i = 0; i < current_deck.main_deck.size(); ++i) {
-            auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[i]->extra);
-            ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenMove>>(ptr->pos.Get(), cpos, SceneMgr::Get().GetGameTime(), 1.0, 10));
-            if(!ptr->updating) {
-                ptr->updating = true;
-                updating_cards.push_back(current_deck.main_deck[i]);
-            }
+            auto bpos = ptr->pos;
+            auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
+            auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
+                bc->SetPos(bpos + (cpos - bpos) * t);
+            }, std::make_shared<TGenMove<int64_t>>(10));
         }
         for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
-            auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[i]->extra);
-            ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenMove>>(ptr->pos.Get(), cpos, SceneMgr::Get().GetGameTime(), 1.0, 10));
-            if(!ptr->updating) {
-                ptr->updating = true;
-                updating_cards.push_back(current_deck.extra_deck[i]);
-            }
+            auto bpos = ptr->pos;
+            auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
+            auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
+                bc->SetPos(bpos + (cpos - bpos) * t);
+            }, std::make_shared<TGenMove<int64_t>>(10));
         }
         for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
-            auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[i]->extra);
-            ptr->pos.SetAnimator(std::make_shared<LerpAnimator<v2f, TGenMove>>(ptr->pos.Get(), cpos, SceneMgr::Get().GetGameTime(), 1.0, 10));
-            if(!ptr->updating) {
-                ptr->updating = true;
-                updating_cards.push_back(current_deck.side_deck[i]);
-            }
+            auto bpos = ptr->pos;
+            auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
+            auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
+                bc->SetPos(bpos + (cpos - bpos) * t);
+            }, std::make_shared<TGenMove<int64_t>>(10));
         }
     }
     
     void BuildScene::RefreshParams() {
         main_row_count = max_row_count;
         if((int32_t)current_deck.main_deck.size() > main_row_count * 4)
-            main_row_count = (current_deck.main_deck.size() - 1) / 4 + 1;
+            main_row_count = (int32_t)((current_deck.main_deck.size() - 1) / 4 + 1);
         dx[0] = (maxx - minx - card_size.x) / (main_row_count - 1);
         int32_t rc1 = std::max((int32_t)current_deck.extra_deck.size(), max_row_count);
         dx[1] = (rc1 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc1 - 1);

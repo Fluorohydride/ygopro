@@ -15,8 +15,13 @@ namespace ygopro
     class BuilderCard : public DeckCardExtraData, public base::RenderUnit<base::v2ct> {
     public:
         virtual ~BuilderCard() {}
-        virtual void PushVertices() {}
-        virtual void UpdateVertices() {}
+        virtual void PushVertices() {
+            SyncVersion();
+        }
+        virtual void UpdateVertices() {
+            if(!CheckUpdateVersion())
+                return;
+        }
         
         inline void SetPos(v2f p) { pos = p; SetUpdate(); }
         inline void SetSize(v2f s) { size = s; SetUpdate(); }
@@ -32,7 +37,7 @@ namespace ygopro
         texi4 card_tex;
     };
     
-    class BuildScene : public Scene, public base::RenderObject<base::v2ct> {
+    class BuildScene : public Scene, public base::RenderCompositor {
     public:
         BuildScene();
         virtual ~BuildScene();
@@ -54,8 +59,6 @@ namespace ygopro
         bool SaveDeckToFile(const std::wstring& file);
         std::string SaveDeckToString();
         
-        void UpdateBackGround();
-        void UpdateCard();
         void UpdateAllCard();
         void RefreshParams();
         void RefreshAllCard();
@@ -101,6 +104,9 @@ namespace ygopro
         std::array<texi4, 10> result_tex;
         int32_t current_sel_result = -1;
         int32_t result_show_size = 0;
+        std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
+        std::shared_ptr<base::RenderObject2DLayout> misc_renderer;
+        std::shared_ptr<base::RenderObject2DLayout> card_renderer;
     };
     
 }

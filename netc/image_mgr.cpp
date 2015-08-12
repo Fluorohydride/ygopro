@@ -42,7 +42,7 @@ namespace ygopro
                         cti.tex_info.vert[3] = {bx + bw, by + bh};
                         cti.ref_block = blockid;
                         card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
-                        image_render->AddVertices(&card_image, {bx, by, bw, bh}, {0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
+                        image_render->AddVertices(&card_image, {bx, by, bw, bh}, recti{0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
                     } else {
                         FreeBlock(blockid, false);
                         cti.tex_info = misc_textures["unknown"];

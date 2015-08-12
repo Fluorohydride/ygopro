@@ -543,6 +543,26 @@ namespace base
             need_redraw = true;
         }
         
+        void AddVertices(Texture* texture, recti vert, texi4 tex_rect, uint32_t cl = 0xffffffff) {
+            auto sz = BeginPrimitive(GL_TRIANGLES, texture->GetTextureId());
+            int16_t idx[6] = {0, 1, 2, 2, 1, 3};
+            for(int32_t i = 0; i < 6; ++i)
+                idx[i] += std::get<1>(sz);
+            v2ct verts[4];
+            verts[0].vertex = ConvScreenCoord({vert.left, vert.top});
+            verts[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
+            verts[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
+            verts[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
+            verts[0].texcoord = texture->ConvTexCoord(tex_rect.vert[0]);
+            verts[1].texcoord = texture->ConvTexCoord(tex_rect.vert[1]);
+            verts[2].texcoord = texture->ConvTexCoord(tex_rect.vert[2]);
+            verts[3].texcoord = texture->ConvTexCoord(tex_rect.vert[3]);
+            for(int32_t i = 0; i < 4; ++i)
+                verts[i].color = cl;
+            PushVertices(verts, idx, 4, 6);
+            need_redraw = true;
+        }
+        
         virtual bool PrepareRender() {
             if(need_redraw)
                 UploadVertices();
