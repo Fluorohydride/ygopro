@@ -38,7 +38,7 @@ c23187256.xyz_number=93
 function c23187256.mfilter(c,xyzc)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(0x48) and c:GetOverlayCount()>0 and c:IsCanBeXyzMaterial(xyzc)
 end
-function c23187256.xyzfilter1(c,g)
+function c23187256.xyzfilter1(c,g,ct)
 	return g:IsExists(c23187256.xyzfilter2,1,c,c:GetRank())
 end
 function c23187256.xyzfilter2(c,rk)
@@ -49,17 +49,17 @@ function c23187256.xyzcon(e,c,og)
 	local tp=c:GetControler()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local ct=-ft
-	if 2<=ct then return false end
 	local mg=Duel.GetMatchingGroup(c23187256.mfilter,tp,LOCATION_MZONE,0,nil,c)
-	return mg:IsExists(c23187256.xyzfilter1,1,nil,mg)
+	return mg:IsExists(c23187256.xyzfilter1,1,nil,mg,ct)
 end
 function c23187256.xyzop(e,tp,eg,ep,ev,re,r,rp,c,og)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+	local ct=-ft
 	local mg=Duel.GetMatchingGroup(c23187256.mfilter,tp,LOCATION_MZONE,0,nil,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local g1=mg:FilterSelect(tp,c23187256.xyzfilter1,1,1,nil,mg)
+	local g1=mg:FilterSelect(tp,c23187256.xyzfilter1,1,1,nil,mg,ct)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
-	local g2=mg:FilterSelect(tp,c23187256.xyzfilter2,1,63,g1:GetFirst(),g1:GetFirst():GetRank())
+	local g2=mg:FilterSelect(tp,c23187256.xyzfilter2,ct,63,g1:GetFirst(),g1:GetFirst():GetRank())
 	g1:Merge(g2)
 	local sg=Group.CreateGroup()
 	local tc=g1:GetFirst()
@@ -84,32 +84,30 @@ function c23187256.gfilter(c,rank)
 	return c:GetRank()==rank
 end
 function c23187256.operation(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 then return end
+	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
 	local c=e:GetHandler()
 	local g1=Duel.GetMatchingGroup(c23187256.filter,tp,LOCATION_EXTRA,0,nil,e,tp)
 	local ct=c:GetOverlayGroup():GetClassCount(Card.GetCode)
+	if ct>ft then ct=ft end
 	if g1:GetCount()>0 and ct>0 then
 		repeat
 			Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
 			local g2=g1:Select(tp,1,1,nil)
-			if g2:GetCount()>0 then
-				local tc=g2:GetFirst()
-				Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
-				local e1=Effect.CreateEffect(c)
-				e1:SetType(EFFECT_TYPE_SINGLE)
-				e1:SetCode(EFFECT_DISABLE)
-				e1:SetReset(RESET_EVENT+0x1fe0000)
-				tc:RegisterEffect(e1)
-				local e2=Effect.CreateEffect(c)
-				e2:SetType(EFFECT_TYPE_SINGLE)
-				e2:SetCode(EFFECT_DISABLE_EFFECT)
-				e2:SetReset(RESET_EVENT+0x1fe0000)
-				tc:RegisterEffect(e2)
-				g1:Filter(c23187256.filter,nil,e,tp)
-				g1:Remove(c23187256.gfilter,nil,tc:GetRank())
-				ct=ct-1
-			end
-		until g1:GetCount()==0 or ct==0 or Duel.GetLocationCount(tp,LOCATION_MZONE)<=0 or not Duel.SelectYesNo(tp,aux.Stringid(23187256,1))
+			local tc=g2:GetFirst()
+			Duel.SpecialSummonStep(tc,0,tp,tp,false,false,POS_FACEUP)
+			local e1=Effect.CreateEffect(c)
+			e1:SetType(EFFECT_TYPE_SINGLE)
+			e1:SetCode(EFFECT_DISABLE)
+			e1:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e1)
+			local e2=Effect.CreateEffect(c)
+			e2:SetType(EFFECT_TYPE_SINGLE)
+			e2:SetCode(EFFECT_DISABLE_EFFECT)
+			e2:SetReset(RESET_EVENT+0x1fe0000)
+			tc:RegisterEffect(e2)
+			g1:Remove(c23187256.gfilter,nil,tc:GetRank())
+			ct=ct-1
+		until g1:GetCount()==0 or ct==0 or not Duel.SelectYesNo(tp,aux.Stringid(23187256,1))
 		Duel.SpecialSummonComplete()
 		Duel.BreakEffect()
 		c:RemoveOverlayCard(tp,1,1,REASON_EFFECT)
