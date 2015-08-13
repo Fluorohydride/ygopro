@@ -39,7 +39,7 @@ function c23187256.mfilter(c,xyzc)
 	return c:IsFaceup() and c:IsType(TYPE_XYZ) and c:IsSetCard(0x48) and c:GetOverlayCount()>0 and c:IsCanBeXyzMaterial(xyzc)
 end
 function c23187256.xyzfilter1(c,g,ct)
-	return g:IsExists(c23187256.xyzfilter2,1,c,c:GetRank())
+	return g:IsExists(c23187256.xyzfilter2,ct,c,c:GetRank())
 end
 function c23187256.xyzfilter2(c,rk)
 	return c:GetRank()==rk
