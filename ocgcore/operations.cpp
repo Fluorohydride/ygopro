@@ -2043,10 +2043,6 @@ int32 field::sset_g(uint16 step, uint8 setplayer, uint8 toplayer, group* ptarget
 int32 field::special_summon_rule(uint16 step, uint8 sumplayer, card * target, uint32 summon_type) {
 	switch(step) {
 	case 0: {
-		if(!(target->data.type & TYPE_MONSTER))
-			return FALSE;
-		if(target->current.location & (LOCATION_GRAVE + LOCATION_REMOVED) && !target->is_status(STATUS_REVIVE_LIMIT))
-			return FALSE;
 		effect_set eset;
 		card* tuner = core.limit_tuner;
 		group* materials = core.limit_xyz;
