@@ -78,14 +78,18 @@ function c88482761.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
 	Duel.SelectTarget(tp,c88482761.atkfilter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TARGET)
-	Duel.SelectTarget(tp,c88482761.atkfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	local g2=Duel.SelectTarget(tp,c88482761.atkfilter,tp,0,LOCATION_MZONE,1,1,nil)
+	e:SetLabelObject(g2:GetFirst())
 end
 function c88482761.atkop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetChainInfo(0,CHAININFO_TARGET_CARDS):Filter(Card.IsRelateToEffect,nil,e)
 	if g:GetCount()==2 then
 		local c1=g:GetFirst()
 		local c2=g:GetNext()
-		if c1:IsControler(tp) then c1,c2=c2,c1 end
-		Duel.CalculateDamage(c1,c2)
+		if c1~=e:GetLabelObject() then c1,c2=c2,c1 end
+		if c1:IsControler(1-tp) and c1:IsPosition(POS_FACEUP_ATTACK) and not c1:IsImmuneToEffect(e)
+			and c2:IsControler(tp) then
+			Duel.CalculateDamage(c1,c2)
+		end
 	end
 end
