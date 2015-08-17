@@ -20,10 +20,10 @@ function c2542230.filter(c)
 	return c:IsFaceup() and c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO)
 end
 function c2542230.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
-	if chkc then return chkc:IsLocation(LOCATION_MZONE) and c2542230.filter(chkc) end
-	if chk==0 then return Duel.IsExistingTarget(c2542230.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
+	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsControler(tp) and c2542230.filter(chkc) end
+	if chk==0 then return Duel.IsExistingTarget(c2542230.filter,tp,LOCATION_MZONE,0,1,nil) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_EQUIP)
-	Duel.SelectTarget(tp,c2542230.filter,tp,LOCATION_MZONE,LOCATION_MZONE,1,1,nil)
+	Duel.SelectTarget(tp,c2542230.filter,tp,LOCATION_MZONE,0,1,1,nil)
 	Duel.SetOperationInfo(0,CATEGORY_EQUIP,e:GetHandler(),1,0,0)
 end
 function c2542230.activate(e,tp,eg,ep,ev,re,r,rp)
@@ -53,7 +53,7 @@ end
 function c2542230.eqlimit(e,c)
 	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO)
 end
-function c2542230.discon(e,tp,eg,ep,ev,re,r,rp)
+function c2542230.discon(e)
 	local ec=e:GetHandler():GetEquipTarget()
 	return Duel.GetAttacker()==ec or Duel.GetAttackTarget()==ec
 end

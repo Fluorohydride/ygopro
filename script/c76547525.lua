@@ -18,13 +18,13 @@ function c76547525.initial_effect(c)
 	c:RegisterEffect(e1)
 end
 function c76547525.cfilter(c,atk)
-	return c:IsPosition(POS_FACEUP) and c:GetAttack()>atk
+	return c:IsFaceup() and c:GetAttack()>atk
 end
 function c76547525.descon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.IsExistingMatchingCard(c76547525.cfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil,e:GetHandler():GetAttack())
 end
 function c76547525.desfilter(c)
-	return c:IsPosition(POS_FACEUP) and c:IsDestructable()
+	return c:IsFaceup() and c:IsDestructable()
 end
 function c76547525.destg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsExistingMatchingCard(c76547525.desfilter,tp,LOCATION_MZONE,LOCATION_MZONE,1,nil) end
