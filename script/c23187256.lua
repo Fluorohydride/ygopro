@@ -48,13 +48,13 @@ function c23187256.xyzcon(e,c,og)
 	if c==nil then return true end
 	local tp=c:GetControler()
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local ct=-ft
+	local ct=math.max(1,-ft)
 	local mg=Duel.GetMatchingGroup(c23187256.mfilter,tp,LOCATION_MZONE,0,nil,c)
 	return mg:IsExists(c23187256.xyzfilter1,1,nil,mg,ct)
 end
 function c23187256.xyzop(e,tp,eg,ep,ev,re,r,rp,c,og)
 	local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-	local ct=-ft
+	local ct=math.max(1,-ft)
 	local mg=Duel.GetMatchingGroup(c23187256.mfilter,tp,LOCATION_MZONE,0,nil,c)
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 	local g1=mg:FilterSelect(tp,c23187256.xyzfilter1,1,1,nil,mg,ct)

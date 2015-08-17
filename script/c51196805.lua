@@ -60,5 +60,4 @@ function c51196805.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local g=Duel.GetDecktopGroup(1-tp,ac)
 	Duel.DisableShuffleCheck()
 	Duel.Remove(g,POS_FACEDOWN,REASON_EFFECT)
-	Duel.ConfirmCards(1-tp,g)
 end
