@@ -6,6 +6,10 @@
 namespace ygopro
 {
 
+    sgui::SGWidgetContainer* LoadDialog(const std::string& templ);
+    template<typename T>
+    T* LoadDialogAs(const std::string& templ) { return dynamic_cast<T*>(LoadDialog(templ)); }
+    
     class CommonDialog {
     public:
         virtual ~CommonDialog() {
@@ -42,6 +46,7 @@ namespace ygopro
         
     public:
         static PopupMenu& Create(v2i pos, std::function<void (int32_t)> cb = nullptr);
+        static PopupMenu& Load(const std::string& name, v2i pos, std::function<void (int32_t)> cb = nullptr);
     };
     
     class FileDialog : public CommonDialog {

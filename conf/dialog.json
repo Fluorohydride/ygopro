@@ -232,6 +232,54 @@
     "pendilum scale blank" : 20,
     "pendilum scale size" : [14, 20]
   },
+  "build panel" : {
+    "type" : "panel",
+    "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0],
+    "children" : {
+      "deck name" : {
+        "type" : "label",
+        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu deck" : {
+        "type" : "button",
+        "text" : "eui_menu_deck",
+        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu tool" : {
+        "type" : "button",
+        "text" : "eui_menu_tool",
+        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      },
+      "menu list" : {
+        "type" : "button",
+        "text" : "eui_menu_list",
+        "position" : [10, 10, -20, 40, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      }
+    },
+  },
+  "result panel" : {
+    "type" : "panel"
+  },
+  "menus" : {
+    "menu deck" : {
+      "eui_deck_load" : 0,
+      "eui_deck_save" : 1,
+      "eui_deck_saveas" : 2,
+      "eui_deck_loadstr" : 3,
+      "eui_deck_savestr" : 4,
+    },
+    "menu tool" : {
+      "eui_tool_sort" : 0,
+      "eui_tool_shuffle" : 1,
+      "eui_deck_clear" : 2,
+      "eui_deck_browser" : 3,
+    },
+    "menu list" : {
+      "eui_list_forbidden" : 0,
+      "eui_list_limit" : 1,
+      "eui_list_semilimit" : 2,
+    }
+  },
   "item lists" : {
     "type list" : {
       "eui_filter_na" : ["0x000000ff", 0],

@@ -324,9 +324,6 @@ namespace ygopro
         return static_cast<sgui::SGWidgetContainer*>(LoadChild(&sgui::SGGUIRoot::GetSingleton(), templ, node));
     }
     
-    template<typename T>
-    T* LoadDialogAs(const std::string& templ) { return dynamic_cast<T*>(LoadDialog(templ)); }
-    
     void MessageBox::ShowOK(const std::wstring& title, const std::wstring msg, std::function<void ()> cb) {
         auto wnd = LoadDialogAs<sgui::SGWindow>("messagebox ok");
         auto color = sgui::SGJsonUtil::ConvertRGBA(dialogCfg["default text color"]);
@@ -428,6 +425,18 @@ namespace ygopro
         menu->pnl = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGPanel>();
         menu->btn_cb = cb;
         return *menu;
+    }
+    
+    PopupMenu& PopupMenu::Load(const std::string& name, v2i pos, std::function<void (int32_t)> cb) {
+        auto& menu_node = dialogCfg["menus"][name];
+        auto& menu = Create(pos, cb);
+        if(!menu_node.is_empty()) {
+            menu_node.for_each([&menu](const std::string& key, jaweson::JsonNode<>& node)->void {
+                menu.AddButton(To<std::wstring>(stringCfg[key]), (intptr_t)node.to_integer());
+            });
+        }
+        menu.End();
+        return menu;
     }
     
     void FileDialog::Show(const std::wstring& title, const std::wstring& root, const std::wstring& filter) {

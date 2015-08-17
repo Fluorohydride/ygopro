@@ -166,7 +166,6 @@ namespace ygopro
     
     void BuildScene::SetDeckDirty() {
         std::static_pointer_cast<BuildSceneHandler>(GetSceneHandler())->SetDeckEdited();
-        update_misc = true;
     }
     
     bool BuildScene::LoadDeckFromFile(const std::wstring& file) {
@@ -174,7 +173,6 @@ namespace ygopro
         if(tempdeck.LoadFromFile(FileSystem::WSTRToLocalFilename(file))) {
             ClearDeck();
             current_deck = tempdeck;
-            update_misc = true;
             for(auto& dcd : current_deck.main_deck) {
                 auto exdata = std::make_shared<BuilderCard>();
                 exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
@@ -251,6 +249,7 @@ namespace ygopro
             auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
             auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
                 bc->SetPos(bpos + (cpos - bpos) * t);
+                return true;
             }, std::make_shared<TGenMove<int64_t>>(10));
         }
         for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
@@ -259,6 +258,7 @@ namespace ygopro
             auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
             auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
                 bc->SetPos(bpos + (cpos - bpos) * t);
+                return true;
             }, std::make_shared<TGenMove<int64_t>>(10));
         }
         for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
@@ -267,6 +267,7 @@ namespace ygopro
             auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
             auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
                 bc->SetPos(bpos + (cpos - bpos) * t);
+                return true;
             }, std::make_shared<TGenMove<int64_t>>(10));
         }
     }
@@ -287,12 +288,9 @@ namespace ygopro
         if(deck_sz == 0)
             return;
         RefreshParams();
-        glBindBuffer(GL_ARRAY_BUFFER, deck_buffer);
-        uint32_t index = 0;
         for(size_t i = 0; i < current_deck.main_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[i]->extra);
-            ptr->buffer_index = index++;
             ptr->pos = cpos;
             ptr->size = card_size;
             RefreshCardPos(current_deck.main_deck[i]);
@@ -300,7 +298,6 @@ namespace ygopro
         for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[i]->extra);
-            ptr->buffer_index = index++;
             ptr->pos = cpos;
             ptr->size = card_size;
             RefreshCardPos(current_deck.extra_deck[i]);
@@ -308,34 +305,17 @@ namespace ygopro
         for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
             auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[i]->extra);
-            ptr->buffer_index = index++;
             ptr->pos = cpos;
             ptr->size = card_size;
             RefreshCardPos(current_deck.side_deck[i]);
         }
     }
     
-    void BuildScene::RefreshAllIndex() {
-        uint32_t index = 0;
-        for(size_t i = 0; i < current_deck.main_deck.size(); ++i) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[i]->extra);
-            ptr->buffer_index = index++;
-        }
-        for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[i]->extra);
-            ptr->buffer_index = index++;
-        }
-        for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[i]->extra);
-            ptr->buffer_index = index++;
-        }
-    }
-    
     void BuildScene::RefreshCardPos(std::shared_ptr<DeckCardData> dcd) {
         auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
         std::array<base::v2ct, 16> verts;
-        auto& pos = ptr->pos.Get();
-        auto& sz = ptr->size.Get();
+        auto& pos = ptr->pos;
+        auto& sz = ptr->size;
         base::FillVertex(&verts[0], ptr->pos, {sz.x, -sz.y}, ptr->card_tex);
         uint32_t cl = (((uint32_t)((float)ptr->hl * 255) & 0xff) << 24) | 0xffffff;
         base::FillVertex(&verts[4], ptr->pos, {sz.x, -sz.y}, hmask, cl);
@@ -348,8 +328,6 @@ namespace ygopro
             auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
             base::FillVertex(&verts[12], {px, pos.y - sz.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
         }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(base::v2ct) * ptr->buffer_index * 16, sizeof(base::v2ct) * 16, &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
     }
     
     void BuildScene::UpdateMisc() {

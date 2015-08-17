@@ -1765,6 +1765,9 @@ namespace sgui
     template<bool USE_SPRITE9 = false>
     class SGCheckBox : public SGAutoSizeTextWidget {
     public:
+        SGEventHandler<SGWidget, bool> event_check_change;
+        
+    public:
         SGCheckBox(bool chk = false) : checked(chk) {}
         
         virtual void InitUIComponents() {
@@ -1859,6 +1862,7 @@ namespace sgui
                 return;
             checked = chk;
             static_cast<UISprite9*>(this->ui_components[0])->SetTextureRect(style[status + (checked ? 3 : 0)]);
+            event_check_change.Trigger(*this, checked);
         }
         
     protected:
@@ -1940,6 +1944,7 @@ namespace sgui
             }
             this->checked = chk;
             static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(this->style[this->status + (this->checked ? 3 : 0)]);
+            this->event_check_change.Trigger(*this, chk);
         }
         
     protected:

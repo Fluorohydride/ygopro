@@ -24,107 +24,91 @@ namespace ygopro
     
     void BuildSceneHandler::BeginHandler() {
         InitActionTime(SceneMgr::Get().GetSysClock());
-        
-        auto pnl = sgui::SGPanel::Create(nullptr, {10, 5}, {0, 35});
-        pnl->SetSize({-20, 35}, {1.0f, 0.0f});
-        pnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
-            build_scene.lock()->GetInputHandler()->KeyDown(evt);
-            return true;
-        });
-        auto rpnl = sgui::SGPanel::Create(nullptr, {0, 0}, {200, 60});
-        rpnl->SetPosition({0, 40}, {0.795f, 0.0f});
-        rpnl->SetSize({-10, 60}, {0.205f, 0.0f});
-        rpnl->eventKeyDown.Bind([this](sgui::SGWidget& sender, sgui::KeyEvent evt)->bool {
-            build_scene.lock()->GetInputHandler()->KeyDown(evt);
-            return true;
-        });
-        auto icon_label = sgui::SGIconLabel::Create(pnl, {10, 7}, std::wstring(L"\ue08c").append(stringCfg["eui_msg_new_deck"]));
-        deck_label = icon_label;
-        auto menu_deck = sgui::SGButton::Create(pnl, {250, 5}, {70, 25});
-        menu_deck->SetText(stringCfg["eui_menu_deck"], 0xff000000);
-        menu_deck->event_click.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Create(SceneMgr::Get().GetMousePosition(), [this](int32_t id) {
-                OnMenuDeck(id);
-            })
-            .AddButton(To<std::wstring>(stringCfg["eui_deck_load"].to_string()), 0)
-            .AddButton(To<std::wstring>(stringCfg["eui_deck_save"].to_string()), 1)
-            .AddButton(To<std::wstring>(stringCfg["eui_deck_saveas"].to_string()), 2)
-            .AddButton(To<std::wstring>(stringCfg["eui_deck_loadstr"].to_string()), 3)
-            .AddButton(To<std::wstring>(stringCfg["eui_deck_savestr"].to_string()), 4)
-            .End();
-            return true;
-        });
-        auto menu_tool = sgui::SGButton::Create(pnl, {325, 5}, {70, 25});
-        menu_tool->SetText(stringCfg["eui_menu_tool"], 0xff000000);
-        menu_tool->event_click.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Create(SceneMgr::Get().GetMousePosition(), [this](int32_t id){
-                OnMenuTool(id);
-            })
-            .AddButton(To<std::wstring>(stringCfg["eui_tool_sort"].to_string()), 0)
-            .AddButton(To<std::wstring>(stringCfg["eui_tool_shuffle"].to_string()), 1)
-            .AddButton(To<std::wstring>(stringCfg["eui_tool_clear"].to_string()), 2)
-            .AddButton(To<std::wstring>(stringCfg["eui_tool_browser"].to_string()), 3)
-            .End();
-            return true;
-        });
-        auto menu_list = sgui::SGButton::Create(pnl, {400, 5}, {70, 25});
-        menu_list->SetText(stringCfg["eui_menu_list"], 0xff000000);
-        menu_list->event_click.Bind([this](sgui::SGWidget& sender)->bool {
-            PopupMenu::Create(SceneMgr::Get().GetMousePosition(), [this](int32_t id){
-                OnMenuList(id);
-            })
-            .AddButton(To<std::wstring>(stringCfg["eui_list_forbidden"].to_string()), 0)
-            .AddButton(To<std::wstring>(stringCfg["eui_list_limit"].to_string()), 1)
-            .AddButton(To<std::wstring>(stringCfg["eui_list_semilimit"].to_string()), 2)
-            .End();
-            return true;
-        });
-        auto menu_search = sgui::SGButton::Create(pnl, {475, 5}, {70, 25});
-        menu_search->SetText(stringCfg["eui_menu_search"], 0xff000000);
-        menu_search->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            filter_dialog->Show(SceneMgr::Get().GetMousePosition());
-            filter_dialog->SetOKCallback([this](const FilterCondition fc, int32_t lmt)->void {
-                Search(fc, lmt);
-            });
-            return true;
-        });
-        auto limit_reg = sgui::SGComboBox::Create(pnl, {550, 2}, {150, 30});
-        auto& lrs = LimitRegulationMgr::Get().GetLimitRegulations();
-        for(uint32_t i = 0; i < lrs.size(); ++i)
-            limit_reg->AddItem(lrs[i].name, 0xff000000);
-        limit_reg->SetSelection(0);
-        limit_reg->eventSelChange.Bind([this](sgui::SGWidget& sender, int32_t index)->bool {
-            auto v = view_regulation;
-            build_scene.lock()->ChangeRegulation(index, view_regulation);
-            view_regulation = v;
-            return true;
-        });
-        auto show_ex = sgui::SGCheckbox::Create(pnl, {710, 7}, {100, 30});
-        show_ex->SetText(stringCfg["eui_show_exclusive"], 0xff000000);
-        show_ex->SetChecked(true);
-        show_ex->eventCheckChange.Bind([this](sgui::SGWidget& sender, bool check)->bool {
-            build_scene.lock()->ChangeExclusive(check);
-            return true;
-        });
-        auto lblres = sgui::SGLabel::Create(rpnl, {0, 10}, L"");
-        lblres->SetPosition({0, 10}, {-1.0, 0.0f});
-        label_result = lblres;
-        auto lblpage = sgui::SGLabel::Create(rpnl, {0, 33}, L"");
-        lblpage->SetPosition({0, 33}, {-1.0, 0.0f});
-        label_page = lblpage;
-        auto btn1 = sgui::SGButton::Create(rpnl, {10, 35}, {15, 15});
-        auto btn2 = sgui::SGButton::Create(rpnl, {170, 35}, {15, 15});
-        btn2->SetPosition({-30, 35}, {1.0f, 0.0f});
-        btn1->SetTextureRect({136, 74, 15, 15}, {136, 90, 15, 15}, {136, 106, 15, 15});
-        btn2->SetTextureRect({154, 74, 15, 15}, {154, 90, 15, 15}, {154, 106, 15, 15});
-        btn1->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            ResultPrevPage();
-            return true;
-        });
-        btn2->eventButtonClick.Bind([this](sgui::SGWidget& sender)->bool {
-            ResultNextPage();
-            return true;
-        });
+        auto pnl_build = LoadDialogAs<sgui::SGPanel>("build panel");
+        if(pnl_build) {
+            pnl_build->event_key_down += [this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
+                build_scene.lock()->GetInputHandler()->KeyDown(key, mods);
+                return true;
+            };
+            auto menu_deck = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu deck");
+            if(menu_deck) {
+                menu_deck->event_click += [this](sgui::SGWidget& sender)->bool {
+                    PopupMenu::Load("menu deck", SceneMgr::Get().GetMousePosition(), [this](int32_t id) {
+                        OnMenuDeck(id);
+                    });
+                    return true;
+                };
+            }
+            auto menu_tool = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu tool");
+            if(menu_tool) {
+                menu_tool->event_click += [this](sgui::SGWidget& sender)->bool {
+                    PopupMenu::Load("menu tool", SceneMgr::Get().GetMousePosition(), [this](int32_t id) {
+                        OnMenuTool(id);
+                    });
+                    return true;
+                };
+            }
+            auto menu_list = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu list");
+            if(menu_list) {
+                menu_list->event_click += [this](sgui::SGWidget& sender)->bool {
+                    PopupMenu::Load("menu list", SceneMgr::Get().GetMousePosition(), [this](int32_t id){
+                        OnMenuList(id);
+                    });
+                    return true;
+                };
+            }
+            auto menu_search = pnl_build->FindWidgetAs<sgui::SGTextButton>("menu search");
+            if(menu_search) {
+                menu_search->event_click += [this](sgui::SGWidget& sender)->bool {
+                    filter_dialog->Show(SceneMgr::Get().GetMousePosition());
+                    filter_dialog->SetOKCallback([this](const FilterCondition fc, int32_t lmt)->void {
+                        Search(fc, lmt);
+                    });
+                    return true;
+                };
+            }
+            auto limit_reg = pnl_build->FindWidgetAs<sgui::SGComboBox>("limit reg");
+            if(limit_reg) {
+                auto& lrs = LimitRegulationMgr::Get().GetLimitRegulations();
+                for(uint32_t i = 0; i < lrs.size(); ++i)
+                    limit_reg->AddItem(lrs[i].name, 0xff000000);
+                limit_reg->SetSelection(0);
+                limit_reg->event_sel_change += [this](sgui::SGWidget& sender, int32_t index)->bool {
+                    auto v = view_regulation;
+                    build_scene.lock()->ChangeRegulation(index, view_regulation);
+                    view_regulation = v;
+                    return true;
+                };
+            }
+            auto show_ex = pnl_build->FindWidgetAs<sgui::SGCheckBox<>>("show ex");
+            if(show_ex) {
+                show_ex->event_check_change += [this](sgui::SGWidget& sender, bool check)->bool {
+                    build_scene.lock()->ChangeExclusive(check);
+                    return true;
+                };
+            }
+        }
+        auto pnl_result = LoadDialogAs<sgui::SGPanel>("result panel");
+        if(pnl_result) {
+            pnl_result->event_key_down += [this](sgui::SGWidget& sender, int32_t key, int32_t mods)->bool {
+                build_scene.lock()->GetInputHandler()->KeyDown(key, mods);
+                return true;
+            };
+            auto btn_prev = pnl_result->FindWidgetAs<sgui::SGTextButton>("prev page");
+            if(btn_prev) {
+                btn_prev->event_click += [this](sgui::SGWidget& sender)->bool {
+                    ResultPrevPage();
+                    return true;
+                };
+            }
+            auto btn_next = pnl_result->FindWidgetAs<sgui::SGTextButton>("next page");
+            if(btn_next) {
+                btn_next->event_click += [this](sgui::SGWidget& sender)->bool {
+                    ResultNextPage();
+                    return true;
+                };
+            }
+        }
     }
     
     void BuildSceneHandler::ViewRegulation(int32_t limit) {
@@ -134,18 +118,18 @@ namespace ygopro
         deck_edited = false;
         std::wstring title = L"\ue07a";
         if(limit == 0)
-            title.append(stringCfg["eui_list_forbidden"]);
+            title.append(To<std::wstring>(stringCfg["eui_list_forbidden"].to_string()));
         else if(limit == 1)
-            title.append(stringCfg["eui_list_limit"]);
+            title.append(To<std::wstring>(stringCfg["eui_list_limit"].to_string()));
         else
-            title.append(stringCfg["eui_list_semilimit"]);
+            title.append(To<std::wstring>(stringCfg["eui_list_semilimit"].to_string()));
         SetDeckLabel(title, 0xff000000);
     }
     
     void BuildSceneHandler::SetDeckEdited() {
         if(!deck_edited) {
             if(current_file.length() == 0)
-                SetDeckLabel(std::wstring(L"\ue08c").append(stringCfg["eui_msg_new_deck"]).append(L"*"), 0xff000000);
+                SetDeckLabel(std::wstring(L"\ue08c").append(To<std::wstring>(stringCfg["eui_msg_new_deck"].to_string())).append(L"*"), 0xff000000);
             else
                 SetDeckLabel(std::wstring(L"\ue08c").append(current_file).append(L"*"), 0xff000000);
             deck_edited = true;
@@ -156,7 +140,7 @@ namespace ygopro
     void BuildSceneHandler::OnMenuDeck(int32_t id) {
         switch(id) {
             case 0:
-                file_dialog->Show(stringCfg["eui_msg_deck_load"], commonCfg["deck_path"], L".ydk");
+                file_dialog->Show(To<std::wstring>(stringCfg["eui_msg_deck_load"].to_string()), To<std::wstring>(commonCfg["deck_path"].to_string()), L".ydk");
                 file_dialog->SetOKCallback([this](const std::wstring& deck_file)->void {
                     if(deck_edited || deck_file != current_file) {
                         build_scene.lock()->LoadDeckFromFile(deck_file);
@@ -169,7 +153,7 @@ namespace ygopro
                 break;
             case 1:
                 if(current_file.length() == 0) {
-                    file_dialog->Show(stringCfg["eui_msg_deck_save"], commonCfg["deck_path"], L".ydk");
+                    file_dialog->Show(To<std::wstring>(stringCfg["eui_msg_deck_save"].to_string()), To<std::wstring>(commonCfg["deck_path"].to_string()), L".ydk");
                     file_dialog->SetOKCallback([this](const std::wstring& deck_file)->void {
                         if(build_scene.lock()->SaveDeckToFile(deck_file)) {
                             current_file = deck_file;
@@ -185,7 +169,7 @@ namespace ygopro
                 }
                 break;
             case 2:
-                file_dialog->Show(stringCfg["eui_msg_deck_save"], commonCfg["deck_path"], L".ydk");
+                file_dialog->Show(To<std::wstring>(stringCfg["eui_msg_deck_save"].to_string()), To<std::wstring>(commonCfg["deck_path"].to_string()), L".ydk");
                 file_dialog->SetOKCallback([this](const std::wstring& deck_file)->void {
                     if(build_scene.lock()->SaveDeckToFile(deck_file)) {
                         current_file = deck_file;
@@ -204,7 +188,7 @@ namespace ygopro
                 std::string deck_string;
                 deck_string.append("ydk://").append(build_scene.lock()->SaveDeckToString());
                 glfwSetClipboardString(nullptr, deck_string.c_str());
-                MessageBox::ShowOK(L"", stringCfg["eui_msg_deck_tostr_ok"]);
+                MessageBox::ShowOK(L"", To<std::wstring>(stringCfg["eui_msg_deck_tostr_ok"].to_string()), nullptr);
             }
                 break;
             default:
@@ -225,7 +209,7 @@ namespace ygopro
                 build_scene.lock()->SetDeckDirty();
                 break;
             case 3: {
-                std::wstring neturl = commonCfg["deck_neturl"];
+                std::wstring neturl = To<std::wstring>(commonCfg["deck_neturl"].to_string());
                 std::wstring deck_string = To<std::wstring>(build_scene.lock()->SaveDeckToString());
                 auto ntpos = neturl.find(L"{amp}");
                 while(ntpos != std::wstring::npos) {

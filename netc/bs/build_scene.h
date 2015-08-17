@@ -62,7 +62,6 @@ namespace ygopro
         void UpdateAllCard();
         void RefreshParams();
         void RefreshAllCard();
-        void RefreshAllIndex();
         void UpdateMisc();
         void UpdateResult();
         
