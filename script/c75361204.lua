@@ -57,7 +57,8 @@ function c75361204.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c75361204.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetEquipTarget()
+	return e:GetHandler():GetEquipTarget() and Duel.GetTurnPlayer()==tp
+		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function c75361204.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end
