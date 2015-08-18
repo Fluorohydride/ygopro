@@ -51,7 +51,7 @@ function c2542230.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c2542230.eqlimit(e,c)
-	return c:IsRace(RACE_DRAGON) and c:IsType(TYPE_SYNCHRO)
+	return c:GetControler()==e:GetHandlerPlayer() or e:GetHandler():GetEquipTarget()==c
 end
 function c2542230.discon(e)
 	local ec=e:GetHandler():GetEquipTarget()
@@ -63,15 +63,21 @@ function c2542230.regop(e,tp,eg,ep,ev,re,r,rp)
 		local e1=Effect.CreateEffect(c)
 		e1:SetDescription(aux.Stringid(2542230,0))
 		e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
-		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_TRIGGER_O)
+		e1:SetType(EFFECT_TYPE_QUICK_O)
 		e1:SetProperty(EFFECT_FLAG_CARD_TARGET)
-		e1:SetCode(EVENT_PHASE+PHASE_END)
+		e1:SetCode(EVENT_FREE_CHAIN)
 		e1:SetRange(LOCATION_GRAVE)
+		e1:SetHintTiming(TIMING_END_PHASE)
+		e1:SetCountLimit(1)
+		e1:SetCondition(c2542230.spcon)
 		e1:SetTarget(c2542230.sptg)
 		e1:SetOperation(c2542230.spop)
 		e1:SetReset(RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_END)
 		c:RegisterEffect(e1)
 	end
+end
+function c2542230.spcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()==PHASE_END
 end
 function c2542230.spfilter(c,e,tp)
 	return c:IsCode(70902743) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
