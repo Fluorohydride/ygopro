@@ -25,11 +25,12 @@ function c37364101.initial_effect(c)
 	c:RegisterEffect(e3)
 	--damage change
 	local e4=Effect.CreateEffect(c)
-	e4:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+	e4:SetType(EFFECT_TYPE_FIELD)
+	e4:SetCode(EFFECT_CHANGE_DAMAGE)
 	e4:SetRange(LOCATION_SZONE)
-	e4:SetCode(EVENT_PRE_BATTLE_DAMAGE)
-	e4:SetCondition(c37364101.damcon)
-	e4:SetOperation(c37364101.damop)
+	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
+	e4:SetTargetRange(0,1)
+	e4:SetValue(c37364101.damval)
 	c:RegisterEffect(e4)
 	--
 	local e5=Effect.CreateEffect(c)
@@ -76,11 +77,10 @@ end
 function c37364101.atkval(e,c)
 	return Duel.GetOverlayCount(e:GetHandlerPlayer(),1,0)*600
 end
-function c37364101.damcon(e,tp,eg,ep,ev,re,r,rp)
-	return eg:GetFirst()==e:GetHandler():GetEquipTarget() and ep~=tp and eg:GetFirst():GetBattleTarget()~=nil
-end
-function c37364101.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.ChangeBattleDamage(ep,ev*2)
+function c37364101.damval(e,re,dam,r,rp,rc)
+	if bit.band(r,REASON_BATTLE)~=0 and rc==e:GetHandler():GetEquipTarget() and rc:GetBattleTarget()~=nil then
+		return dam*2
+	else return dam end
 end
 function c37364101.tgcon(e,tp,eg,ep,ev,re,r,rp)
 	return Duel.GetTurnPlayer()~=tp

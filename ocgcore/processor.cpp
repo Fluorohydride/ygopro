@@ -1750,7 +1750,8 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 			uint8 tp = clit->triggering_player;
 			bool act = true;
 			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-			        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3) || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
+			        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3) 
+						|| !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 				if(peffect->flag & EFFECT_FLAG_CHAIN_UNIQUE) {
 					if(tp == infos.turn_player) {
 						for(auto tpit = core.tpchain.begin(); tpit != core.tpchain.end(); ++tpit) {
@@ -1852,7 +1853,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 		uint8 tp = clit->triggering_player;
 		bool act = true;
 		if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-		        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
+		        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3)
 		            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 			if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && clit->triggering_location == LOCATION_HAND
 			        && (((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->handler->is_has_relation(peffect))
@@ -1913,7 +1914,7 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 				continue;
 			bool act = true;
 			if(peffect->is_chainable(tp) && peffect->is_activateable(tp, clit->evt, TRUE)
-			        && ((peffect->code == EVENT_FLIP) || (clit->triggering_location & 0x3)
+			        && (peffect->code == EVENT_FLIP && infos.phase == PHASE_DAMAGE || (clit->triggering_location & 0x3)
 			            || !(peffect->handler->current.location & 0x3) || peffect->handler->is_status(STATUS_IS_PUBLIC))) {
 				if(!(peffect->flag & EFFECT_FLAG_FIELD_ONLY) && clit->triggering_location == LOCATION_HAND
 				        && (((peffect->type & EFFECT_TYPE_SINGLE) && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE) && peffect->handler->is_has_relation(peffect))
@@ -2751,6 +2752,7 @@ int32 field::process_idle_command(uint16 step) {
 	}
 	case 6: {
 		card* target = core.spsummonable_cards[returns.ivalue[0] >> 16];
+		core.summon_cancelable = TRUE;
 		special_summon_rule(infos.turn_player, target, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
@@ -4014,6 +4016,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 					continue;
 				pcard->set_status(STATUS_SUMMON_TURN, FALSE);
 				pcard->set_status(STATUS_FLIP_SUMMON_TURN, FALSE);
+				pcard->set_status(STATUS_SPSUMMON_TURN, FALSE);
 				pcard->set_status(STATUS_SET_TURN, FALSE);
 				pcard->set_status(STATUS_FORM_CHANGED, FALSE);
 				pcard->announce_count = 0;
@@ -4652,14 +4655,8 @@ int32 field::solve_chain(uint16 step, uint32 chainend_arg1, uint32 chainend_arg2
 		effect* peffect = cait->triggering_effect;
 		if(cait->flag & CHAIN_DISABLE_ACTIVATE && is_chain_negatable(cait->chain_count)) {
 			remove_oath_effect(peffect);
-			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT)) {
-				if(peffect->count_code == 0) {
-					if((peffect->flag & EFFECT_FLAG_REPEAT))
-						peffect->reset_count += 0x100;
-				} else {
-					if(peffect->count_code & EFFECT_COUNT_CODE_OATH)
-						dec_effect_code(peffect->count_code, cait->triggering_player);
-				}
+			if((peffect->flag & EFFECT_FLAG_COUNT_LIMIT) && (peffect->count_code & EFFECT_COUNT_CODE_OATH)) {
+				dec_effect_code(peffect->count_code, cait->triggering_player);
 			}
 			check_chain_counter(peffect, cait->triggering_player, cait->chain_count, true);
 			raise_event((card*)0, EVENT_CHAIN_NEGATED, peffect, 0, cait->triggering_player, cait->triggering_player, cait->chain_count);

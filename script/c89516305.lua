@@ -30,11 +30,13 @@ function c89516305.initial_effect(c)
 	--atkup
 	local e3=Effect.CreateEffect(c)
 	e3:SetDescription(aux.Stringid(89516305,2))
-	e3:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e3:SetProperty(EFFECT_FLAG_CARD_TARGET+EFFECT_FLAG_DAMAGE_STEP)
 	e3:SetType(EFFECT_TYPE_QUICK_O)
 	e3:SetCode(EVENT_FREE_CHAIN)
 	e3:SetRange(LOCATION_MZONE)
 	e3:SetCountLimit(1,EFFECT_COUNT_CODE_SINGLE)
+	e3:SetHintTiming(TIMING_DAMAGE_STEP)
+	e3:SetCondition(c89516305.atkcon)
 	e3:SetCost(c89516305.cost)
 	e3:SetTarget(c89516305.atktg)
 	e3:SetOperation(c89516305.atkop)
@@ -86,6 +88,9 @@ function c89516305.setop(e,tp,eg,ep,ev,re,r,rp)
 	if tc:IsFaceup() and tc:IsRelateToEffect(e) then
 		Duel.ChangePosition(tc,POS_FACEDOWN_DEFENCE)
 	end
+end
+function c89516305.atkcon(e,tp,eg,ep,ev,re,r,rp)
+	return Duel.GetCurrentPhase()~=PHASE_DAMAGE or not Duel.IsDamageCalculated()
 end
 function c89516305.atktg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_MZONE) and chkc:IsFaceup() end

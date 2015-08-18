@@ -33,13 +33,13 @@ function c56111151.initial_effect(c)
 	e4:SetOperation(c56111151.desrepop)
 	c:RegisterEffect(e4)
 end
-function c56111151.cfilter(c,tp)
+function c56111151.cfilter(c)
 	return c:IsPreviousLocation(LOCATION_ONFIELD)
 end
 function c56111151.counter(e,tp,eg,ep,ev,re,r,rp)
-	local ct=eg:FilterCount(c56111151.cfilter,nil,tp)
+	local ct=eg:FilterCount(c56111151.cfilter,nil)
 	if ct>0 then
-		e:GetHandler():AddCounter(0x37,1)
+		e:GetHandler():AddCounter(0x37,ct)
 	end
 end
 function c56111151.thfilter(c)
@@ -63,7 +63,7 @@ function c56111151.thop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c56111151.desreptg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return not e:GetHandler():IsReason(REASON_RULE)
-		and e:GetHandler():GetCounter(0x37)>0 end
+		and e:GetHandler():IsCanRemoveCounter(tp,0x37,1,REASON_EFFECT) end
 	return Duel.SelectYesNo(tp,aux.Stringid(56111151,0))
 end
 function c56111151.desrepop(e,tp,eg,ep,ev,re,r,rp)

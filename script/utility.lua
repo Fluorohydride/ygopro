@@ -120,6 +120,7 @@ function Auxiliary.AddSynchroProcedure(c,f1,f2,ct)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCondition(Auxiliary.SynCondition(f1,f2,ct,99))
+	e1:SetTarget(Auxiliary.SynTarget(f1,f2,ct,99))
 	e1:SetOperation(Auxiliary.SynOperation(f1,f2,ct,99))
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
@@ -138,8 +139,8 @@ function Auxiliary.SynCondition(f1,f2,minct,maxc)
 				return Duel.CheckSynchroMaterial(c,f1,f2,minc,maxc,smat,mg)
 			end
 end
-function Auxiliary.SynOperation(f1,f2,minct,maxc)
-	return	function(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
+function Auxiliary.SynTarget(f1,f2,minct,maxc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,smat,mg)
 				local g=nil
 				local ft=Duel.GetLocationCount(c:GetControler(),LOCATION_MZONE)
 				local ct=-ft
@@ -150,8 +151,19 @@ function Auxiliary.SynOperation(f1,f2,minct,maxc)
 				else
 					g=Duel.SelectSynchroMaterial(c:GetControler(),c,f1,f2,minc,maxc,smat,mg)
 				end
+				if g then
+					g:KeepAlive()
+					e:SetLabelObject(g)
+					return true
+				else return false end
+			end
+end
+function Auxiliary.SynOperation(f1,f2,minct,maxc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,c,smat,mg)
+				local g=e:GetLabelObject()
 				c:SetMaterial(g)
 				Duel.SendtoGrave(g,REASON_MATERIAL+REASON_SYNCHRO)
+				g:DeleteGroup()
 			end
 end
 --Synchro monster, 1 tuner + 1 monster
@@ -162,6 +174,7 @@ function Auxiliary.AddSynchroProcedure2(c,f1,f2)
 	e1:SetProperty(EFFECT_FLAG_UNCOPYABLE+EFFECT_FLAG_IGNORE_IMMUNE)
 	e1:SetRange(LOCATION_EXTRA)
 	e1:SetCondition(Auxiliary.SynCondition(f1,f2,1,1))
+	e1:SetTarget(Auxiliary.SynTarget(f1,f2,1,1))
 	e1:SetOperation(Auxiliary.SynOperation(f1,f2,1,1))
 	e1:SetValue(SUMMON_TYPE_SYNCHRO)
 	c:RegisterEffect(e1)
@@ -190,9 +203,11 @@ function Auxiliary.AddXyzProcedure(c,f,lv,ct,alterf,desc,maxct,op)
 	if not maxct then maxct=ct end
 	if alterf then
 		e1:SetCondition(Auxiliary.XyzCondition2(f,lv,ct,maxct,alterf,desc,op))
+		e1:SetTarget(Auxiliary.XyzTarget2(f,lv,ct,maxct,alterf,desc,op))
 		e1:SetOperation(Auxiliary.XyzOperation2(f,lv,ct,maxct,alterf,desc,op))
 	else
 		e1:SetCondition(Auxiliary.XyzCondition(f,lv,ct,maxct))
+		e1:SetTarget(Auxiliary.XyzTarget(f,lv,ct,maxct))
 		e1:SetOperation(Auxiliary.XyzOperation(f,lv,ct,maxct))
 	end
 	e1:SetValue(SUMMON_TYPE_XYZ)
@@ -210,6 +225,20 @@ function Auxiliary.XyzCondition(f,lv,minc,maxc)
 				return Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
 			end
 end
+function Auxiliary.XyzTarget(f,lv,minc,maxc)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,og)
+				if og then
+					return true
+				else
+					local g=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
+					if g then
+						g:KeepAlive()
+						e:SetLabelObject(g)
+						return true
+					else return false end
+				end
+			end
+end
 function Auxiliary.XyzOperation(f,lv,minc,maxc)
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,og)
 				if og then
@@ -224,7 +253,7 @@ function Auxiliary.XyzOperation(f,lv,minc,maxc)
 					c:SetMaterial(og)
 					Duel.Overlay(c,og)
 				else
-					local mg=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
+					local mg=e:GetLabelObject()
 					local sg=Group.CreateGroup()
 					local tc=mg:GetFirst()
 					while tc do
@@ -235,6 +264,7 @@ function Auxiliary.XyzOperation(f,lv,minc,maxc)
 					Duel.SendtoGrave(sg,REASON_RULE)
 					c:SetMaterial(mg)
 					Duel.Overlay(c,mg)
+					mg:DeleteGroup()
 				end
 			end
 end
@@ -254,6 +284,31 @@ function Auxiliary.XyzCondition2(f,lv,minc,maxc,alterf,desc,op)
 				return Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
 			end
 end
+function Auxiliary.XyzTarget2(f,lv,minc,maxc,alterf,desc,op)
+	return	function(e,tp,eg,ep,ev,re,r,rp,chk,c,og)
+				if og then
+					return true
+				else
+					local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
+					local ct=-ft
+					local b1=Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
+					local b2=ct<1 and Duel.IsExistingMatchingCard(Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,nil,alterf,c)
+						and (not op or op(e,tp,0))
+					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
+						e:SetLabel(1)
+						return true
+					else
+						e:SetLabel(0)
+						local g=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
+						if g then
+							g:KeepAlive()
+							e:SetLabelObject(g)
+							return true
+						else return false end
+					end
+				end
+			end
+end
 function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 	return	function(e,tp,eg,ep,ev,re,r,rp,c,og)
 				if og then
@@ -268,12 +323,7 @@ function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 					c:SetMaterial(og)
 					Duel.Overlay(c,og)
 				else
-					local ft=Duel.GetLocationCount(tp,LOCATION_MZONE)
-					local ct=-ft
-					local b1=Duel.CheckXyzMaterial(c,f,lv,minc,maxc,og)
-					local b2=ct<1 and Duel.IsExistingMatchingCard(Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,nil,alterf,c)
-						and (not op or op(e,tp,0))
-					if b2 and (not b1 or Duel.SelectYesNo(tp,desc)) then
+					if e:GetLabel()==1 then
 						if op then op(e,tp,1) end
 						Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_XMATERIAL)
 						local mg=Duel.SelectMatchingCard(tp,Auxiliary.XyzAlterFilter,tp,LOCATION_MZONE,0,1,1,nil,alterf,c)
@@ -284,7 +334,7 @@ function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
 					else
-						local mg=Duel.SelectXyzMaterial(tp,c,f,lv,minc,maxc)
+						local mg=e:GetLabelObject()
 						local sg=Group.CreateGroup()
 						local tc=mg:GetFirst()
 						while tc do
@@ -295,6 +345,7 @@ function Auxiliary.XyzOperation2(f,lv,minc,maxc,alterf,desc,op)
 						Duel.SendtoGrave(sg,REASON_RULE)
 						c:SetMaterial(mg)
 						Duel.Overlay(c,mg)
+						mg:DeleteGroup()
 					end
 				end
 			end

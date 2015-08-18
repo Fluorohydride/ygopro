@@ -25,6 +25,8 @@ int32 scriptlib::card_get_code(lua_State *L) {
 	}
 	return 1;
 }
+// GetOriginalCode(): get the original code printed on card
+// return: 1 int
 int32 scriptlib::card_get_origin_code(lua_State *L) {
 	check_param_count(L, 1);
 	check_param(L, PARAM_TYPE_CARD, 1);
@@ -37,6 +39,26 @@ int32 scriptlib::card_get_origin_code(lua_State *L) {
 			lua_pushinteger(L, pcard->data.code);
 	} else
 		lua_pushinteger(L, pcard->data.code);
+	return 1;
+}
+// GetOriginalCodeRule(): get the original code in duel (can be different from printed code)
+// return: 1-2 int
+int32 scriptlib::card_get_origin_code_rule(lua_State *L) {
+	check_param_count(L, 1);
+	check_param(L, PARAM_TYPE_CARD, 1);
+	card* pcard = *(card**) lua_touserdata(L, 1);
+	effect_set eset;
+	pcard->filter_effect(EFFECT_ADD_CODE, &eset);
+	if(pcard->data.alias && !eset.size())
+		lua_pushinteger(L, pcard->data.alias);
+	else {
+		lua_pushinteger(L, pcard->data.code);
+		if(eset.size()) {
+			uint32 otcode = eset.get_last()->get_value(pcard);
+			lua_pushinteger(L, otcode);
+			return 2;
+		}
+	}
 	return 1;
 }
 int32 scriptlib::card_is_set_card(lua_State *L) {
@@ -236,6 +258,10 @@ int32 scriptlib:: card_get_previous_code_onfield(lua_State *L) {
 	check_param(L, PARAM_TYPE_CARD, 1);
 	card* pcard = *(card**) lua_touserdata(L, 1);
 	lua_pushinteger(L, pcard->previous.code);
+	if(pcard->previous.code2) {
+		lua_pushinteger(L, pcard->previous.code2);
+		return 2;
+	}
 	return 1;
 }
 int32 scriptlib::card_get_previous_type_onfield(lua_State *L) {

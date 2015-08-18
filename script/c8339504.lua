@@ -18,11 +18,15 @@ function c8339504.cost(e,tp,eg,ep,ev,re,r,rp,chk)
 end
 function c8339504.cfilter(c,e,tp)
 	local rk=c:GetRank()
-	return rk>0 and Duel.IsExistingMatchingCard(c8339504.spfilter,tp,LOCATION_EXTRA,0,1,nil,rk,c:GetRace(),c:GetAttribute(),c:GetCode(),e,tp)
+	return rk>0 and Duel.IsExistingMatchingCard(c8339504.spfilter1,tp,LOCATION_EXTRA,0,1,nil,c,e,tp)
 end
-function c8339504.spfilter(c,rk,rc,att,code,e,tp)
-	return c:GetRank()==rk and c:IsRace(rc) and c:IsAttribute(att) and not c:IsCode(code)
-		and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+function c8339504.spfilter1(c,tc,e,tp)
+	return c:GetRank()==tc:GetRank() and c:IsRace(tc:GetRace()) and c:IsAttribute(tc:GetAttribute())
+		and not c:IsCode(tc:GetCode()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
+end
+function c8339504.spfilter2(c,tc,e,tp)
+	return c:GetRank()==tc:GetPreviousRankOnField() and c:IsRace(tc:GetPreviousRaceOnField()) and c:IsAttribute(tc:GetPreviousAttributeOnField())
+		and not c:IsCode(tc:GetPreviousCodeOnField()) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)
 end
 function c8339504.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then
@@ -42,7 +46,7 @@ function c8339504.activate(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
 	local tc=Duel.GetFirstTarget()
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_SPSUMMON)
-	local g=Duel.SelectMatchingCard(tp,c8339504.spfilter,tp,LOCATION_EXTRA,0,1,1,nil,tc:GetPreviousRankOnField(),tc:GetPreviousRaceOnField(),tc:GetPreviousAttributeOnField(),tc:GetPreviousCodeOnField(),e,tp)
+	local g=Duel.SelectMatchingCard(tp,c8339504.spfilter2,tp,LOCATION_EXTRA,0,1,1,nil,tc,e,tp)
 	local sc=g:GetFirst()
 	if sc then
 		Duel.SpecialSummon(sc,0,tp,tp,false,false,POS_FACEUP)

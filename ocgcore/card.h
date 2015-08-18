@@ -34,6 +34,7 @@ struct card_data {
 
 struct card_state {
 	uint32 code;
+	uint32 code2;
 	uint32 type;
 	uint32 level;
 	uint32 rank;
@@ -405,6 +406,7 @@ public:
 #define STATUS_ACT_FROM_HAND		0x8000000
 #define STATUS_OPPO_BATTLE			0x10000000
 #define STATUS_FLIP_SUMMON_TURN		0x20000000
+#define STATUS_SPSUMMON_TURN		0x40000000
 //Counter
 #define COUNTER_NEED_PERMIT		0x1000
 #define COUNTER_NEED_ENABLE		0x2000

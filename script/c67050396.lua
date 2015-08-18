@@ -49,7 +49,7 @@ function c67050396.poscost(e,tp,eg,ep,ev,re,r,rp,chk)
 	Duel.PayLPCost(tp,500)
 end
 function c67050396.posfilter(c)
-	return c:IsPosition(POS_FACEUP) and c:IsCanTurnSet()
+	return c:IsFaceup() and c:IsCanTurnSet()
 end
 function c67050396.postg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsControler(1-tp) and chkc:IsLocation(LOCATION_MZONE) and c67050396.posfilter(chkc) end

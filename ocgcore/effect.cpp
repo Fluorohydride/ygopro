@@ -158,7 +158,8 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 						return FALSE;
 					if(pduel->game_field->player[playerid].list_szone[6] && pduel->game_field->player[playerid].list_szone[7])
 						return FALSE;
-				} else if(!(handler->data.type & TYPE_FIELD) && pduel->game_field->get_useable_count(playerid, LOCATION_SZONE, playerid, LOCATION_REASON_TOFIELD) <= 0)
+				} else if(!(handler->data.type & TYPE_FIELD) 
+						&& pduel->game_field->get_useable_count(playerid, LOCATION_SZONE, playerid, LOCATION_REASON_TOFIELD) <= 0)
 					return FALSE;
 			} else if(handler->current.location == LOCATION_SZONE) {
 				if(handler->is_position(POS_FACEUP))
@@ -204,7 +205,8 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 					&& (!handler->is_position(POS_FACEUP) || !handler->is_status(STATUS_EFFECT_ENABLED)))
 				return FALSE;
 			if(!(type & (EFFECT_TYPE_FLIP | EFFECT_TYPE_TRIGGER_F)) 
-					&& !((type & EFFECT_TYPE_SINGLE) && (code == EVENT_TO_GRAVE || code == EVENT_DESTROYED || code == EVENT_SPSUMMON_SUCCESS))) {
+					&& !((type & EFFECT_TYPE_SINGLE) 
+						&& (code == EVENT_TO_GRAVE || code == EVENT_DESTROYED || code == EVENT_SPSUMMON_SUCCESS || code == EVENT_TO_HAND))) {
 				if((code < 1132 || code > 1149) && pduel->game_field->infos.phase == PHASE_DAMAGE && !(flag & EFFECT_FLAG_DAMAGE_STEP))
 					return FALSE;
 				if((code < 1134 || code > 1136) && pduel->game_field->infos.phase == PHASE_DAMAGE_CAL && !(flag & EFFECT_FLAG_DAMAGE_CAL))
@@ -248,6 +250,7 @@ int32 effect::is_activateable(uint8 playerid, const tevent& e, int32 neglect_con
 	pduel->game_field->restore_lp_cost();
 	return result;
 }
+// check EFFECT_CANNOT_ACTIVATE
 int32 effect::is_action_check(uint8 playerid) {
 	effect_set eset;
 	pduel->game_field->filter_player_effect(playerid, EFFECT_CANNOT_ACTIVATE, &eset);
@@ -273,6 +276,7 @@ int32 effect::is_action_check(uint8 playerid) {
 	}
 	return TRUE;
 }
+// check condition, cost(chk=0), target(chk=0)
 int32 effect::is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_cond, int32 neglect_cost, int32 neglect_target) {
 	if (!neglect_cond && condition) {
 		pduel->lua->add_param(this, PARAM_TYPE_EFFECT);
@@ -318,7 +322,7 @@ int32 effect::is_activate_ready(uint8 playerid, const tevent& e, int32 neglect_c
 	return TRUE;
 }
 int32 effect::is_condition_check(uint8 playerid, const tevent& e) {
-	if(!(type & EFFECT_TYPE_ACTIVATE) && (handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && (!handler->is_position(POS_FACEUP)))
+	if(!(type & EFFECT_TYPE_ACTIVATE) && (handler->current.location & (LOCATION_ONFIELD | LOCATION_REMOVED)) && !handler->is_position(POS_FACEUP))
 		return FALSE;
 	if(!condition)
 		return TRUE;

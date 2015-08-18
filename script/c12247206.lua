@@ -21,10 +21,12 @@ function c12247206.target(e,tp,eg,ep,ev,re,r,rp,chk)
 	local tc=eg:GetFirst()
 	if chk==0 then
 		local g=Duel.GetMatchingGroup(c12247206.nfilter,tp,0x13,0,nil,tc)
-		return g:GetCount()==g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,0,tp,false,false) and Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+		return Duel.GetLocationCount(tp,LOCATION_MZONE)>0
+			and g:GetCount()>0 and g:GetCount()==g:FilterCount(Card.IsCanBeSpecialSummoned,nil,e,0,tp,false,false)
 	end
 	tc:CreateEffectRelation(e)
-	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,nil,1,PLAYER_ALL,0x13)
+	local g=Duel.GetMatchingGroup(c12247206.filter,tp,0x13,0,nil,tc,e,tp)
+	Duel.SetOperationInfo(0,CATEGORY_SPECIAL_SUMMON,g,g:GetCount(),PLAYER_ALL,0)
 end
 function c12247206.filter(c,tc,e,tp)
 	return c12247206.nfilter(c,tc) and c:IsCanBeSpecialSummoned(e,0,tp,false,false)

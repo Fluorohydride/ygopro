@@ -213,6 +213,7 @@ uint32 card::get_info_location() {
 		return c + (l << 8) + (s << 16) + (ss << 24);
 	}
 }
+// get the current code
 uint32 card::get_code() {
 	if(assume_type == ASSUME_CODE)
 		return assume_value;
@@ -231,7 +232,7 @@ uint32 card::get_code() {
 		code = effects.get_last()->get_value(this);
 	temp.code = 0xffffffff;
 	if (code == data.code) {
-		if(data.alias)
+		if(data.alias && !is_affected_by_effect(EFFECT_ADD_CODE))
 			code = data.alias;
 	} else {
 		card_data dat;
@@ -241,6 +242,7 @@ uint32 card::get_code() {
 	}
 	return code;
 }
+// get the current second-code
 uint32 card::get_another_code() {
 	if(is_affected_by_effect(EFFECT_CHANGE_CODE))
 		return 0;
@@ -251,8 +253,6 @@ uint32 card::get_another_code() {
 	uint32 otcode = eset.get_last()->get_value(this);
 	if(get_code() != otcode)
 		return otcode;
-	if(data.alias == otcode)
-		return data.code;
 	return 0;
 }
 int32 card::is_set_card(uint32 set_code) {
@@ -433,17 +433,9 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 	for (int32 i = 0; i < eset.size(); ++i) {
 		switch (eset[i]->code) {
 		case EFFECT_UPDATE_ATTACK:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
-				for (int32 j = 0; j < effects_atk.size(); ++j) {
-					if (effects_atk[j]->flag & EFFECT_FLAG_REPEAT) {
-						base_atk = effects_atk[j]->get_value(this);
-						up_atk = 0;
-						upc_atk = 0;
-						temp.attack = base_atk;
-					}
-				}
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up_atk += eset[i]->get_value(this);
-			} else
+			else
 				upc_atk += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_ATTACK:
@@ -460,17 +452,9 @@ void card::calc_attack_defence(int32 *patk, int32 *pdef) {
 				effects_atk.add_item(eset[i]);
 			break;
 		case EFFECT_UPDATE_DEFENCE:
-			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE)) {
-				for (int32 j = 0; j < effects_def.size(); ++j) {
-					if (effects_def[j]->flag & EFFECT_FLAG_REPEAT) {
-						base_def = effects_def[j]->get_value(this);
-						up_def = 0;
-						upc_def = 0;
-						temp.defence = base_def;
-					}
-				}
+			if ((eset[i]->type & EFFECT_TYPE_SINGLE) && !(eset[i]->flag & EFFECT_FLAG_SINGLE_RANGE))
 				up_def += eset[i]->get_value(this);
-			} else
+			else
 				upc_def += eset[i]->get_value(this);
 			break;
 		case EFFECT_SET_DEFENCE:
@@ -1923,7 +1907,7 @@ int32 card::get_set_tribute_count() {
 	return min + (max << 16);
 }
 int32 card::is_can_be_flip_summoned(uint8 playerid) {
-	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
+	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_SPSUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
 		return FALSE;
@@ -2379,7 +2363,7 @@ int32 card::is_capable_attack_announce(uint8 playerid) {
 	return TRUE;
 }
 int32 card::is_capable_change_position(uint8 playerid) {
-	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
+	if(is_status(STATUS_SUMMON_TURN) || is_status(STATUS_FLIP_SUMMON_TURN) || is_status(STATUS_SPSUMMON_TURN) || is_status(STATUS_FORM_CHANGED))
 		return FALSE;
 	if(announce_count > 0)
 		return FALSE;

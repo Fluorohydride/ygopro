@@ -44,8 +44,9 @@ function c75361204.operation(e,tp,eg,ep,ev,re,r,rp)
 		c:RegisterEffect(e2)
 		local e3=Effect.CreateEffect(c)
 		e3:SetCategory(CATEGORY_DESTROY+CATEGORY_SPECIAL_SUMMON)
-		e3:SetType(EFFECT_TYPE_IGNITION)
+		e3:SetType(EFFECT_TYPE_QUICK_O)
 		e3:SetRange(LOCATION_SZONE)
+		e3:SetCode(EVENT_FREE_CHAIN)
 		e3:SetCountLimit(1,75361204)
 		e3:SetCondition(c75361204.spcon)
 		e3:SetCost(c75361204.spcost)
@@ -56,7 +57,8 @@ function c75361204.operation(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c75361204.spcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetEquipTarget()
+	return e:GetHandler():GetEquipTarget() and Duel.GetTurnPlayer()==tp
+		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function c75361204.spcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToGraveAsCost() end

@@ -43,7 +43,7 @@ function c80889750.mfilter2(c)
 	return c:IsSetCard(0xa9) or c:IsSetCard(0xc3)
 end
 function c80889750.fscon(e,mg,gc)
-	if mg==nil then return false end
+	if mg==nil then return true end
 	if gc then return false end
 	return mg:IsExists(c80889750.mfilter1,1,nil,mg)
 end
@@ -84,7 +84,6 @@ function c80889750.indop(e,tp,eg,ep,ev,re,r,rp)
 	local e1=Effect.CreateEffect(c)
 	e1:SetType(EFFECT_TYPE_SINGLE)
 	e1:SetCode(EFFECT_INDESTRUCTABLE_BATTLE)
-	e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
 	e1:SetValue(1)
 	e1:SetReset(RESET_EVENT+0x1fe0000)
 	c:RegisterEffect(e1)

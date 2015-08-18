@@ -234,6 +234,7 @@ int32 scriptlib::duel_special_summon_rule(lua_State *L) {
 		return 0;
 	card* pcard = *(card**)lua_touserdata(L, 2);
 	duel * pduel = pcard->pduel;
+	pduel->game_field->core.summon_cancelable = FALSE;
 	pduel->game_field->special_summon_rule(playerid, pcard, 0);
 	return lua_yield(L, 0);
 }
@@ -260,6 +261,7 @@ int32 scriptlib::duel_synchro_summon(lua_State *L) {
 	duel * pduel = pcard->pduel;
 	pduel->game_field->core.limit_tuner = tuner;
 	pduel->game_field->core.limit_syn = mg;
+	pduel->game_field->core.summon_cancelable = FALSE;
 	pduel->game_field->special_summon_rule(playerid, pcard, SUMMON_TYPE_SYNCHRO);
 	return lua_yield(L, 0);
 }
@@ -278,6 +280,7 @@ int32 scriptlib::duel_xyz_summon(lua_State *L) {
 	}
 	duel * pduel = pcard->pduel;
 	pduel->game_field->core.limit_xyz = materials;
+	pduel->game_field->core.summon_cancelable = FALSE;
 	pduel->game_field->special_summon_rule(playerid, pcard, SUMMON_TYPE_XYZ);
 	return lua_yield(L, 0);
 }
