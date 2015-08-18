@@ -1,6 +1,6 @@
 --Kozmo Farmgirl
 function c31061682.initial_effect(c)
-	--special summon
+	--spsummon
 	local e1=Effect.CreateEffect(c)
 	e1:SetCategory(CATEGORY_SPECIAL_SUMMON)
 	e1:SetType(EFFECT_TYPE_QUICK_O)
