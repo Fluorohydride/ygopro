@@ -187,51 +187,8 @@ namespace sgui
     
     // == basic ui elements =
     
-    class UIComponent : public RegionObject, public base::RenderUnit<base::v2ct> {
+    class UIComponent : public RegionObject, public base::RenderUnit<vt2> {
     public:
-        virtual bool CheckAvailable() = 0;
-        virtual int32_t GetPrimitiveType() = 0;
-        virtual int32_t GetTextureId() = 0;
-        
-        virtual void RefreshVertices() {}
-        
-        virtual void PushVertices() {
-            if(!CheckAvailable())
-                return;
-            SyncVersion();
-            auto new_idx = manager->BeginPrimitive(GetPrimitiveType(), GetTextureId());
-            Update(std::get<0>(new_idx), std::get<1>(new_idx));
-            manager->PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
-            ShowPushInfo();
-        }
-        
-        virtual void UpdateVertices() {
-            if(!CheckUpdateVersion())
-                return;
-            Update(vert_index, index_index);
-            manager->UpdateVertices(&vertices[0], vert_index, vertices.size());
-            manager->Updateindices(&indices[0], index_index, indices.size());
-            ShowUpdateInfo();
-        }
-        
-        virtual void ShowPushInfo() {}
-        virtual void ShowUpdateInfo() {}
-        
-        inline void Update(int16_t vidx, int16_t iidx) {
-            index_index = iidx;
-            if(!need_update && !manager->AllUnitNeedUpdate()) {
-                if(vert_index != vidx) {
-                    for(auto& ind : indices)
-                        ind += vidx - vert_index;
-                    vert_index = vidx;
-                }
-                return;
-            }
-            vert_index = vidx;
-            RefreshVertices();
-            need_update = false;
-        }
-        
         virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
             auto ret = RegionObject::OnPositionSizeChange(re_pos, re_size);
             if(ret.first || ret.second)
@@ -251,7 +208,6 @@ namespace sgui
         v2f prop = {0.0f, 0.0f};
         v2i texcoord = {0, 0};
         uint32_t color = 0xffffffff;
-        
     };
     
     template<int32_t VERT_COUNT>
@@ -453,7 +409,7 @@ namespace sgui
             FillQuad(&vertices[0], &indices[0]);
         }
         
-        void FillQuad(base::v2ct* v, int16_t* idx) {
+        void FillQuad(vt2* v, int16_t* idx) {
             static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
             v[0].vertex = ConvScreenCoord({area_pos.absolute.x, area_pos.absolute.y});
             v[1].vertex = ConvScreenCoord({area_pos.absolute.x + area_size.absolute.x, area_pos.absolute.y});
@@ -484,7 +440,7 @@ namespace sgui
             FillQuad9(&vertices[0], &indices[0]);
         }
         
-        void FillQuad9(base::v2ct* v, int16_t* idx) {
+        void FillQuad9(vt2* v, int16_t* idx) {
             static const int16_t quad9_idx[] = {    16,17,18,18,17,19,
                 0, 1, 4, 4, 1, 5, 1, 2, 5, 5, 2, 6, 2, 3, 6, 6, 3, 7,
                 4, 5, 8, 8, 5, 9, 5, 6, 9, 9, 6, 10,6, 7, 10,10,7, 11,
@@ -1180,7 +1136,7 @@ namespace sgui
         std::weak_ptr<SGWidget> hoving_widget;
         std::weak_ptr<SGWidget> focus_widget;
         std::vector<std::shared_ptr<SGWidget>> children;
-        base::RenderCmdBeginGlobalAlpha<base::v2ct>* alpha_cmd = nullptr;
+        base::RenderCmdBeginGlobalAlpha<vt2>* alpha_cmd = nullptr;
     };
     
     class SGGUIRoot : public SGWidgetContainer, public base::RenderObject2DLayout, public SysClock, public Timer<uint64_t> {
@@ -2446,7 +2402,7 @@ namespace sgui
         v2i view_pos = {0, 0};
         v2i view_size = {0, 0};
         v2i view_offset = {0, 0};
-        base::RenderCmdBeginScissor<base::v2ct>* cmd = nullptr;
+        base::RenderCmdBeginScissor<vt2>* cmd = nullptr;
     };
     
     class SGItemListWidget {
@@ -2790,7 +2746,7 @@ namespace sgui
         v2i item_size_rel = {0, 0};
         v2f item_size_pro = {0, 0};
         v2f item_self_factor = {0, 0};
-        base::RenderCmdBeginScissor<base::v2ct>* cmd = nullptr;
+        base::RenderCmdBeginScissor<vt2>* cmd = nullptr;
         std::vector<int32_t> custom_value;
     };
     
@@ -3637,7 +3593,7 @@ namespace sgui
         recti sel_tex = {0, 0, 0, 0};
         recti cursor_tex = {0, 0, 0, 0};
         recti text_area = {0, 0, 0, 0};
-        base::RenderCmdBeginScissor<base::v2ct>* cmd = nullptr;
+        base::RenderCmdBeginScissor<vt2>* cmd = nullptr;
     };
     
 }

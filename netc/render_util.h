@@ -31,13 +31,21 @@ namespace base
         friend class RenderObject<VTYPE>;
     public:
         virtual ~RenderUnit() {}
-        virtual void PushVertices() {}
-        virtual void UpdateVertices() {}
+        virtual void PushVertices();
+        virtual void UpdateVertices();
+        virtual void Update(int16_t vidx, int16_t iidx);
+        virtual void ShowPushInfo() {}
+        virtual void ShowUpdateInfo() {}
         
         inline void SetUpdate();
         inline void SetRedraw(bool up);
         inline void SyncVersion();
         inline bool CheckUpdateVersion();
+        
+        virtual bool CheckAvailable() = 0;
+        virtual int32_t GetPrimitiveType() = 0;
+        virtual int32_t GetTextureId() = 0;
+        virtual void RefreshVertices() = 0;
         
     protected:
         bool need_update = true;
@@ -360,6 +368,43 @@ namespace base
     };
     
     template<typename VTYPE>
+    void RenderUnit<VTYPE>::PushVertices() {
+        if(!CheckAvailable())
+            return;
+        SyncVersion();
+        auto new_idx = manager->BeginPrimitive(GetPrimitiveType(), GetTextureId());
+        Update(std::get<0>(new_idx), std::get<1>(new_idx));
+        manager->PushVertices(&vertices[0], &indices[0], vertices.size(), indices.size());
+        ShowPushInfo();
+    }
+    
+    template<typename VTYPE>
+    void RenderUnit<VTYPE>::UpdateVertices() {
+        if(!CheckUpdateVersion())
+            return;
+        Update(vert_index, index_index);
+        manager->UpdateVertices(&vertices[0], vert_index, vertices.size());
+        manager->Updateindices(&indices[0], index_index, indices.size());
+        ShowUpdateInfo();
+    }
+    
+    template<typename VTYPE>
+    void RenderUnit<VTYPE>::Update(int16_t vidx, int16_t iidx) {
+        index_index = iidx;
+        if(!need_update && !manager->AllUnitNeedUpdate()) {
+            if(vert_index != vidx) {
+                for(auto& ind : indices)
+                    ind += vidx - vert_index;
+                vert_index = vidx;
+            }
+            return;
+        }
+        vert_index = vidx;
+        RefreshVertices();
+        need_update = false;
+    }
+    
+    template<typename VTYPE>
     inline void RenderUnit<VTYPE>::SetUpdate() {
         need_update = true;
         if(this->render_version != manager->GetRenderVersion())
@@ -384,7 +429,7 @@ namespace base
         return render_version == manager->GetRenderVersion();
     }
     
-    class RenderObject2DLayout : public base::RenderObject<base::v2ct> {
+    class RenderObject2DLayout : public base::RenderObject<vt2> {
     public:
         virtual void SetScreenSize(v2i sz) {
             if(sz == screen_size)
@@ -524,39 +569,29 @@ namespace base
         inline void ClearVertices() { this->Clear(); }
         
         void AddVertices(Texture* texture, recti vert, recti tex_rect, uint32_t cl = 0xffffffff) {
-            auto sz = BeginPrimitive(GL_TRIANGLES, texture->GetTextureId());
-            int16_t idx[6] = {0, 1, 2, 2, 1, 3};
-            for(int32_t i = 0; i < 6; ++i)
-                idx[i] += std::get<1>(sz);
-            v2ct verts[4];
-            verts[0].vertex = ConvScreenCoord({vert.left, vert.top});
-            verts[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
-            verts[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
-            verts[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
-            verts[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
-            verts[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
-            verts[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
-            verts[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
-            for(int32_t i = 0; i < 4; ++i)
-                verts[i].color = cl;
-            PushVertices(verts, idx, 4, 6);
-            need_redraw = true;
+            texi4 tex = {{
+                {tex_rect.left, tex_rect.top},
+                {tex_rect.left + tex_rect.width, tex_rect.top},
+                {tex_rect.left, tex_rect.top + tex_rect.height},
+                {tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height}
+            }};
+            AddVertices(texture, vert, tex, cl);
         }
         
-        void AddVertices(Texture* texture, recti vert, texi4 tex_rect, uint32_t cl = 0xffffffff) {
+        void AddVertices(Texture* texture, recti vert, texi4 tex, uint32_t cl = 0xffffffff) {
             auto sz = BeginPrimitive(GL_TRIANGLES, texture->GetTextureId());
             int16_t idx[6] = {0, 1, 2, 2, 1, 3};
             for(int32_t i = 0; i < 6; ++i)
                 idx[i] += std::get<1>(sz);
-            v2ct verts[4];
+            vt2 verts[4];
             verts[0].vertex = ConvScreenCoord({vert.left, vert.top});
             verts[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
             verts[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
             verts[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
-            verts[0].texcoord = texture->ConvTexCoord(tex_rect.vert[0]);
-            verts[1].texcoord = texture->ConvTexCoord(tex_rect.vert[1]);
-            verts[2].texcoord = texture->ConvTexCoord(tex_rect.vert[2]);
-            verts[3].texcoord = texture->ConvTexCoord(tex_rect.vert[3]);
+            verts[0].texcoord = texture->ConvTexCoord(tex.vert[0]);
+            verts[1].texcoord = texture->ConvTexCoord(tex.vert[1]);
+            verts[2].texcoord = texture->ConvTexCoord(tex.vert[2]);
+            verts[3].texcoord = texture->ConvTexCoord(tex.vert[3]);
             for(int32_t i = 0; i < 4; ++i)
                 verts[i].color = cl;
             PushVertices(verts, idx, 4, 6);

@@ -16,17 +16,13 @@ namespace ygopro
 
     struct CardData;
     struct FilterCondition;
-    
-    class DeckCardExtraData {
-    public:
-        virtual ~DeckCardExtraData() = default;
-    };
+    class BuilderCard;
     
     struct DeckCardData {
         DeckCardData(CardData* d, uint32_t l): data(d), limit(l) {}
         CardData* data;
         uint32_t limit;
-        std::shared_ptr<DeckCardExtraData> extra;
+        std::shared_ptr<BuilderCard> builder_card;
     };
     
 	struct DeckData {

@@ -12,14 +12,41 @@
 
 namespace ygopro
 {
+    std::array<texi4, 3> limit_tex;
+    texi4 hmask;
+    int32_t max_row_count = 0;
+    int32_t main_row_count = 0;
+    v2f card_size = {0.0f, 0.0f};
+    v2f icon_size = {0.0f, 0.0f};
+    float minx = 0.0f;
+    float maxx = 0.0f;
+    float main_y_spacing = 0.0f;
+    float offsety[3] = {0.0f, 0.0f, 0.0f};
+    float dx[3] = {0.0f, 0.0f, 0.0f};
+    std::array<CardData*, 10> result_data;
+    std::array<texi4, 10> result_tex;
+    int32_t current_sel_result = -1;
+    int32_t result_show_size = 0;
+    
+    int32_t BuilderCard::GetTextureId() {
+        return ImageMgr::Get().GetRawCardTexture()->GetTextureId();
+    }
+    
+    void BuilderCard::RefreshVertices() {
+        vertices.resize(8);
+        indices.resize(12);
+        auto tex = ImageMgr::Get().GetRawCardTexture();
+        vt2::Fill(&vertices[0], pos, {size.x, -size.y}, tex->ConvTextureInfo(card_tex), 0xffffffff, hl);
+        if(limit < 3) {
+            auto& lti = limit_tex[limit];
+            vt2::Fill(&vertices[4], pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, tex->ConvTextureInfo(lti));
+        }
+    }
     
     BuildScene::BuildScene() {
-        limit[0] = ImageMgr::Get().GetTexture("limit0");
-        limit[1] = ImageMgr::Get().GetTexture("limit1");
-        limit[2] = ImageMgr::Get().GetTexture("limit2");
-        pool[0] = ImageMgr::Get().GetTexture("pool_ocg");
-        pool[1] = ImageMgr::Get().GetTexture("pool_tcg");
-        pool[2] = ImageMgr::Get().GetTexture("pool_ex");
+        limit_tex[0] = ImageMgr::Get().GetTexture("limit0");
+        limit_tex[1] = ImageMgr::Get().GetTexture("limit1");
+        limit_tex[2] = ImageMgr::Get().GetTexture("limit2");
         hmask = ImageMgr::Get().GetTexture("cmask");
         result_data.fill(nullptr);
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
@@ -154,13 +181,11 @@ namespace ygopro
     
     void BuildScene::SortDeck() {
         current_deck.Sort();
-        RefreshAllIndex();
         UpdateAllCard();
     }
     
     void BuildScene::ShuffleDeck() {
         current_deck.Shuffle();
-        RefreshAllIndex();
         UpdateAllCard();
     }
     
@@ -174,22 +199,19 @@ namespace ygopro
             ClearDeck();
             current_deck = tempdeck;
             for(auto& dcd : current_deck.main_deck) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-                exdata->show_exclusive = show_exclusive;
-                dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+                auto bc = std::make_shared<BuilderCard>();
+                bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
+                dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.extra_deck) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-                exdata->show_exclusive = show_exclusive;
-                dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+                auto bc = std::make_shared<BuilderCard>();
+                bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
+                dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.side_deck) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-                exdata->show_exclusive = show_exclusive;
-                dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+                auto bc = std::make_shared<BuilderCard>();
+                bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
+                dcd->builder_card = bc;
             }
             RefreshAllCard();
             return true;
@@ -204,22 +226,19 @@ namespace ygopro
             current_deck = tempdeck;
             SetDeckDirty();
             for(auto& dcd : current_deck.main_deck) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-                exdata->show_exclusive = show_exclusive;
-                dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+                auto bc = std::make_shared<BuilderCard>();
+                bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
+                dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.extra_deck) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-                exdata->show_exclusive = show_exclusive;
-                dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+                auto bc = std::make_shared<BuilderCard>();
+                bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
+                dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.side_deck) {
-                auto exdata = std::make_shared<BuilderCard>();
-                exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-                exdata->show_exclusive = show_exclusive;
-                dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
+                auto bc = std::make_shared<BuilderCard>();
+                bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
+                dcd->builder_card = bc;
             }
             RefreshAllCard();
             return true;
@@ -244,7 +263,7 @@ namespace ygopro
         if(deck_sz == 0)
             return;
         for(size_t i = 0; i < current_deck.main_deck.size(); ++i) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[i]->extra);
+            auto ptr = current_deck.main_deck[i]->builder_card;
             auto bpos = ptr->pos;
             auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
             auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
@@ -253,7 +272,7 @@ namespace ygopro
             }, std::make_shared<TGenMove<int64_t>>(10));
         }
         for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[i]->extra);
+            auto ptr = current_deck.extra_deck[i]->builder_card;
             auto bpos = ptr->pos;
             auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
             auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
@@ -262,7 +281,7 @@ namespace ygopro
             }, std::make_shared<TGenMove<int64_t>>(10));
         }
         for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[i]->extra);
+            auto ptr = current_deck.side_deck[i]->builder_card;
             auto bpos = ptr->pos;
             auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
             auto action = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(1000, ptr, [bpos, cpos](BuilderCard* bc, double t) ->bool {
@@ -290,43 +309,21 @@ namespace ygopro
         RefreshParams();
         for(size_t i = 0; i < current_deck.main_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[0] * (i % main_row_count), offsety[0] - main_y_spacing * (i / main_row_count)};
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.main_deck[i]->extra);
-            ptr->pos = cpos;
-            ptr->size = card_size;
-            RefreshCardPos(current_deck.main_deck[i]);
+            auto ptr = current_deck.main_deck[i]->builder_card;
+            ptr->SetPos(cpos);
+            ptr->SetSize(card_size);
         }
         for(size_t i = 0; i < current_deck.extra_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[1] * i, offsety[1]};
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.extra_deck[i]->extra);
-            ptr->pos = cpos;
-            ptr->size = card_size;
-            RefreshCardPos(current_deck.extra_deck[i]);
+            auto ptr = current_deck.extra_deck[i]->builder_card;
+            ptr->SetPos(cpos);
+            ptr->SetSize(card_size);
         }
         for(size_t i = 0; i < current_deck.side_deck.size(); ++i) {
             auto cpos = (v2f){minx + dx[2] * i, offsety[2]};
-            auto ptr = std::static_pointer_cast<BuilderCard>(current_deck.side_deck[i]->extra);
-            ptr->pos = cpos;
-            ptr->size = card_size;
-            RefreshCardPos(current_deck.side_deck[i]);
-        }
-    }
-    
-    void BuildScene::RefreshCardPos(std::shared_ptr<DeckCardData> dcd) {
-        auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<base::v2ct, 16> verts;
-        auto& pos = ptr->pos;
-        auto& sz = ptr->size;
-        base::FillVertex(&verts[0], ptr->pos, {sz.x, -sz.y}, ptr->card_tex);
-        uint32_t cl = (((uint32_t)((float)ptr->hl * 255) & 0xff) << 24) | 0xffffff;
-        base::FillVertex(&verts[4], ptr->pos, {sz.x, -sz.y}, hmask, cl);
-        if((ptr->show_limit) && dcd->limit < 3) {
-            auto& lti = limit[dcd->limit];
-            base::FillVertex(&verts[8], pos + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
-        }
-        if((ptr->show_exclusive) && dcd->data->pool != 3) {
-            float px = pos.x + sz.x / 2.0f - icon_size.x * 0.75f;
-            auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            base::FillVertex(&verts[12], {px, pos.y - sz.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
+            auto ptr = current_deck.side_deck[i]->builder_card;
+            ptr->SetPos(cpos);
+            ptr->SetSize(card_size);
         }
     }
     
@@ -334,7 +331,7 @@ namespace ygopro
         if(!update_misc)
             return;
         update_misc = false;
-        std::array<base::v2ct, 33 * 4> verts;
+        std::array<vt2, 33 * 4> verts;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
         float yrate = 1.0f - 40.0f / scene_size.y;
@@ -352,7 +349,7 @@ namespace ygopro
         float my = offsety[0] - main_y_spacing * 3 - card_size.y + th;
         float ey = offsety[1] - card_size.y + th;
         float sy = offsety[2] - card_size.y + th;
-        auto numblock = [&nw, &nh, &nbk](base::v2ct* v, v2f pos, uint32_t cl1, uint32_t cl2, int32_t val) {
+        auto numblock = [&nw, &nh, &nbk](vt2* v, v2f pos, uint32_t cl1, uint32_t cl2, int32_t val) {
             base::FillVertex(&v[0], {pos.x, pos.y}, {nw, -nh}, nbk, cl1);
             if(val >= 10) {
                 base::FillVertex(&v[4], {pos.x + nw * 0.1f, pos.y - nh * 0.2f}, {nw * 0.4f, -nh * 0.6f}, ImageMgr::Get().GetCharTex(L'0' + (val % 100) / 10), cl2);
@@ -375,9 +372,6 @@ namespace ygopro
         numblock(&verts[96], {nx, my + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.main_deck.size());
         numblock(&verts[108], {nx, ey + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.extra_deck.size());
         numblock(&verts[120], {nx, sy + card_size.y - th}, 0x80ffffff, 0xff000000, current_deck.side_deck.size());
-        glBindBuffer(GL_ARRAY_BUFFER, misc_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(base::v2ct) * 33 * 4, &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
     }
     
     void BuildScene::UpdateResult() {
@@ -400,7 +394,7 @@ namespace ygopro
         float offy = (height - cheight) * 0.5f;
         float iheight = 0.08f / 0.29f * cheight;
         float iwidth = iheight * scene_size.y / scene_size.x;
-        std::array<base::v2ct, 160> verts;
+        std::array<vt2, 160> verts;
         for(int32_t i = 0; i < 10 ; ++i) {
             if(result_data[i] == nullptr)
                 continue;
@@ -415,70 +409,7 @@ namespace ygopro
                 base::FillVertex(&pvert[8], {left + (i % 2) * width + width / 2 - cwidth / 2 - 0.01f, top - (i / 2) * height - offy + 0.01f},
                                    {iwidth, -iheight}, limit[lmt]);
             }
-            if(show_exclusive && pdata->pool != 3) {
-                auto& pti = (pdata->pool == 1) ? pool[0] : pool[1];
-                base::FillVertex(&pvert[12], {left + (i % 2) * width + width / 2 - iwidth * 0.75f, top - (i / 2) * height + offy - height + iheight * 0.75f - 0.01f},
-                                   {iwidth * 1.5f, -iheight * 0.75f}, pti);
-            }
         }
-        glBindBuffer(GL_ARRAY_BUFFER, result_buffer);
-        glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(base::v2ct) * result_show_size * 16, &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
-    }
-    
-    void BuildScene::RefreshHL(std::shared_ptr<DeckCardData> dcd) {
-        auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<base::v2ct, 4> verts;
-        uint32_t cl = (((uint32_t)(ptr->hl.Get() * 255) & 0xff) << 24) | 0xffffff;
-        auto& sz = ptr->size.Get();
-        base::FillVertex(&verts[0], ptr->pos.Get(), {sz.x, -sz.y}, hmask, cl);
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(base::v2ct) * (ptr->buffer_index * 16 + 4), sizeof(base::v2ct) * 4, &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
-    }
-    
-    void BuildScene::RefreshLimit(std::shared_ptr<DeckCardData> dcd) {
-        auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<base::v2ct, 4> verts;
-        if((ptr->show_limit) && dcd->limit < 3) {
-            auto lti = limit[dcd->limit];
-            base::FillVertex(&verts[0], ptr->pos.Get() + v2f{-0.01f, 0.01f}, {icon_size.x, -icon_size.y}, lti);
-        }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(base::v2ct) * (ptr->buffer_index * 16 + 8), sizeof(base::v2ct) * 4, &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
-    }
-    
-    void BuildScene::RefreshEx(std::shared_ptr<DeckCardData> dcd) {
-        auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-        std::array<base::v2ct, 4> verts;
-        if((ptr->show_exclusive) && dcd->data->pool != 3) {
-            auto& pos = ptr->pos.Get();
-            auto& sz = ptr->size.Get();
-            float px = pos.x + sz.x / 2.0f - icon_size.x * 0.75f;
-            auto& pti = (dcd->data->pool == 1) ? pool[0] : pool[1];
-            base::FillVertex(&verts[0], {px, pos.y - sz.y + icon_size.y * 0.75f - 0.01f}, {icon_size.x * 1.5f, -icon_size.y * 0.75f}, pti);
-        }
-        glBufferSubData(GL_ARRAY_BUFFER, sizeof(base::v2ct) * (ptr->buffer_index * 16 + 12), sizeof(base::v2ct) * 4, &verts[0]);
-        GLCheckError(__FILE__, __LINE__);
-    }
-    
-    void BuildScene::ChangeExclusive(bool check) {
-        show_exclusive = check;
-        for(auto& dcd : current_deck.main_deck) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-            ptr->show_exclusive = show_exclusive;
-            RefreshEx(dcd);
-        }
-        for(auto& dcd : current_deck.extra_deck) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-            ptr->show_exclusive = show_exclusive;
-            RefreshEx(dcd);
-        }
-        for(auto& dcd : current_deck.side_deck) {
-            auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
-            ptr->show_exclusive = show_exclusive;
-            RefreshEx(dcd);
-        }
-        update_result = true;
     }
     
     void BuildScene::ChangeRegulation(int32_t index, int32_t view_regulation) {
@@ -497,19 +428,16 @@ namespace ygopro
         for(auto& dcd : current_deck.main_deck) {
             auto exdata = std::make_shared<BuilderCard>();
             exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-            exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
         for(auto& dcd : current_deck.extra_deck) {
             auto exdata = std::make_shared<BuilderCard>();
             exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-            exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
         for(auto& dcd : current_deck.side_deck) {
             auto exdata = std::make_shared<BuilderCard>();
             exdata->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
-            exdata->show_exclusive = show_exclusive;
             dcd->extra = std::static_pointer_cast<DeckCardExtraData>(exdata);
         }
         update_misc = true;

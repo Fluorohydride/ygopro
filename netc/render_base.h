@@ -91,120 +91,27 @@ namespace base {
         T height;
     };
     
-    struct v2ct {
-        vector2<float> vertex = {0.0f, 0.0f};
-        uint32_t color = 0xffffffff;
-        vector2<float> texcoord = {0.0f, 0.0f};
-        static const int32_t color_offset = 8;
-        static const int32_t tex_offset = 12;
-        static uint32_t InitVao(uint32_t vbo, uint32_t ibo) {
-            uint32_t vao_id;
-            glGenVertexArrays(1, &vao_id);
-            glBindVertexArray(vao_id);
-            glEnableVertexAttribArray(0);
-            glEnableVertexAttribArray(1);
-            glEnableVertexAttribArray(2);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(v2ct), 0);
-            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v2ct), (const GLvoid*)v2ct::color_offset);
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(v2ct), (const GLvoid*)v2ct::tex_offset);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-            glBindVertexArray(0);
-            return vao_id;
-        }
-        static void DrawBegin(uint32_t vbo, uint32_t ibo, uint32_t vao) {
-            if(vao) {
-                glBindVertexArray(vao);
-            } else {
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glEnableClientState(GL_INDEX_ARRAY);
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glBindBuffer(GL_ARRAY_BUFFER, vbo);
-                glVertexPointer(2, GL_FLOAT, sizeof(v2ct), 0);
-                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v2ct), (const GLvoid*)v2ct::color_offset);
-                glTexCoordPointer(2, GL_FLOAT, sizeof(v2ct), (const GLvoid*)v2ct::tex_offset);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-                glIndexPointer(GL_UNSIGNED_SHORT, sizeof(GL_UNSIGNED_SHORT), 0);
-            }
-        }
-        static void DrawEnd(uint32_t vbo, uint32_t ibo, uint32_t vao) {
-            if(vao) {
-                glBindVertexArray(0);
-            } else {
-                glDisableClientState(GL_VERTEX_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                glDisableClientState(GL_INDEX_ARRAY);
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            }
-        }
+    template<typename T, int32_t TCOUNT>
+    struct TextureInfo {
+        vector2<T> vert[TCOUNT];
     };
     
-    struct v3ct {
-        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
-        uint32_t color = 0xffffffff;
-        vector2<float> texcoord = {0.0f, 0.0f};
-        static const int32_t color_offset = 12;
-        static const int32_t tex_offset = 16;
-        static uint32_t InitVao(uint32_t vbo, uint32_t ibo) {
-            uint32_t vao_id;
-            glGenVertexArrays(1, &vao_id);
-            glBindVertexArray(vao_id);
-            glEnableVertexAttribArray(0);
-            glEnableVertexAttribArray(1);
-            glEnableVertexAttribArray(2);
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(v3ct), 0);
-            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3ct), (const GLvoid*)v3ct::color_offset);
-            glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(v3ct), (const GLvoid*)v3ct::tex_offset);
-            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-            glBindVertexArray(0);
-            return vao_id;
-        }
-        static void DrawBegin(uint32_t vbo, uint32_t ibo, uint32_t vao) {
-            if(vao) {
-                glBindVertexArray(vao);
-            } else {
-                glEnableClientState(GL_VERTEX_ARRAY);
-                glEnableClientState(GL_COLOR_ARRAY);
-                glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-                glEnableClientState(GL_INDEX_ARRAY);
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glBindBuffer(GL_ARRAY_BUFFER, vbo);
-                glVertexPointer(3, GL_FLOAT, sizeof(v3ct), 0);
-                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v3ct), (const GLvoid*)v3ct::color_offset);
-                glTexCoordPointer(2, GL_FLOAT, sizeof(v3ct), (const GLvoid*)v3ct::tex_offset);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-                glIndexPointer(GL_UNSIGNED_SHORT, sizeof(GL_UNSIGNED_SHORT), 0);
-            }
-        }
-        static void DrawEnd(uint32_t vbo, uint32_t ibo, uint32_t vao) {
-            if(vao) {
-                glBindVertexArray(0);
-            } else {
-                glDisableClientState(GL_VERTEX_ARRAY);
-                glDisableClientState(GL_COLOR_ARRAY);
-                glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-                glDisableClientState(GL_INDEX_ARRAY);
-                glDisableClientState(GL_NORMAL_ARRAY);
-                glBindBuffer(GL_ARRAY_BUFFER, 0);
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-            }
-        }
-    };
+    template<int32_t VC>
+    struct VEC_TYPE_TRAITS { using vec_type = vector2<float>; };
     
-    struct v3hct {
-        vector3<float> vertex = {0.0f, 0.0f, 0.0f};
+    template<>
+    struct VEC_TYPE_TRAITS<3> { using vec_type = vector3<float>; };
+    
+    template<int32_t VCOUNT>
+    struct vtch {
+        typename VEC_TYPE_TRAITS<VCOUNT>::vec_type vertex;
+        vector2<float> texcoord = {0.0f, 0.0f};
         uint32_t color = 0xffffffff;
         uint32_t hcolor = 0;
-        vector2<float> texcoord = {0.0f, 0.0f};
-        static const int32_t color_offset = 12;
-        static const int32_t hcolor_offset = 16;
-        static const int32_t tex_offset = 20;
+        static const int32_t tex_offset = VCOUNT * 4;
+        static const int32_t color_offset = VCOUNT * 4 + 8;
+        static const int32_t hcolor_offset = VCOUNT * 4 + 12;
+        
         static uint32_t InitVao(uint32_t vbo, uint32_t ibo) {
             uint32_t vao_id;
             glGenVertexArrays(1, &vao_id);
@@ -214,10 +121,10 @@ namespace base {
             glEnableVertexAttribArray(2);
             glEnableVertexAttribArray(3);
             glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(v3hct), 0);
-            glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3hct), (const GLvoid*)v3hct::color_offset);
-            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(v3hct), (const GLvoid*)v3hct::hcolor_offset);
-            glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(v3hct), (const GLvoid*)v3hct::tex_offset);
+            glVertexAttribPointer(0, VCOUNT, GL_FLOAT, GL_FALSE, sizeof(vtch), 0);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(vtch), (const GLvoid*)vtch::tex_offset);
+            glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vtch), (const GLvoid*)vtch::color_offset);
+            glVertexAttribPointer(3, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vtch), (const GLvoid*)vtch::hcolor_offset);
             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
             glBindVertexArray(0);
             return vao_id;
@@ -233,10 +140,10 @@ namespace base {
                 glEnableClientState(GL_INDEX_ARRAY);
                 glDisableClientState(GL_NORMAL_ARRAY);
                 glBindBuffer(GL_ARRAY_BUFFER, vbo);
-                glVertexPointer(3, GL_FLOAT, sizeof(v3hct), 0);
-                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v3hct), (const GLvoid*)v3hct::color_offset);
-                glSecondaryColorPointer(4, GL_UNSIGNED_BYTE, sizeof(v3hct), (const GLvoid*)v3hct::hcolor_offset);
-                glTexCoordPointer(2, GL_FLOAT, sizeof(v3hct), (const GLvoid*)v3hct::tex_offset);
+                glVertexPointer(VCOUNT, GL_FLOAT, sizeof(vtch), 0);
+                glTexCoordPointer(2, GL_FLOAT, sizeof(vtch), (const GLvoid*)vtch::tex_offset);
+                glColorPointer(4, GL_UNSIGNED_BYTE, sizeof(vtch), (const GLvoid*)vtch::color_offset);
+                glSecondaryColorPointer(4, GL_UNSIGNED_BYTE, sizeof(vtch), (const GLvoid*)vtch::hcolor_offset);
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
                 glIndexPointer(GL_UNSIGNED_SHORT, sizeof(GL_UNSIGNED_SHORT), 0);
             }
@@ -255,28 +162,26 @@ namespace base {
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
             }
         }
+        static inline void Fill(vtch* vt, vector2<float> pos, vector2<float> sz, TextureInfo<float, 4> ti, uint32_t cl = 0xffffffff, uint32_t hcl = 0) {
+            vt[0].vertex = {pos.x, pos.y};
+            vt[0].texcoord = ti.vert[0];
+            vt[0].color = cl;
+            vt[0].hcolor = hcl;
+            vt[1].vertex = {pos.x + sz.x, pos.y};
+            vt[1].texcoord = ti.vert[1];
+            vt[1].color = cl;
+            vt[1].hcolor = hcl;
+            vt[2].vertex = {pos.x, pos.y + sz.y};
+            vt[2].texcoord = ti.vert[2];
+            vt[2].color = cl;
+            vt[2].hcolor = hcl;
+            vt[3].vertex = {pos.x + sz.x, pos.y + sz.y};
+            vt[3].texcoord = ti.vert[3];
+            vt[3].color = cl;
+            vt[3].hcolor = hcl;
+        };
     };
-    
-    template<typename T, int32_t TCOUNT>
-	struct TextureInfo {
-        vector2<T> vert[TCOUNT];
-	};
-    
-    inline void FillVertex(v2ct* vt, vector2<float> pos, vector2<float> sz, TextureInfo<float, 4>& ti, uint32_t cl = 0xffffffff) {
-        vt[0].vertex = {pos.x, pos.y};
-        vt[0].texcoord = ti.vert[0];
-        vt[0].color = cl;
-        vt[1].vertex = {pos.x + sz.x, pos.y};
-        vt[1].texcoord = ti.vert[1];
-        vt[1].color = cl;
-        vt[2].vertex = {pos.x, pos.y + sz.y};
-        vt[2].texcoord = ti.vert[2];
-        vt[2].color = cl;
-        vt[3].vertex = {pos.x + sz.x, pos.y + sz.y};
-        vt[3].texcoord = ti.vert[3];
-        vt[3].color = cl;
-    };
-    
+
     class Shader {
     public:
         ~Shader();
@@ -338,8 +243,10 @@ namespace base {
         void Unload();
         void Update(const uint8_t* data, int32_t offx, int32_t offy, int32_t width, int32_t height);
         void Bind();
+        TextureInfo<float, 4> ConvTextureInfo(TextureInfo<int32_t, 4> tinfo);
+        TextureInfo<float, 4> GetTextureInfo(rect<int32_t> tinfo);
+        inline TextureInfo<float, 4> GetTextureInfo() { return GetTextureInfo({0, 0, img_width, img_height}); }
         inline uint32_t GetTextureId() { return texture_id; }
-        TextureInfo<float, 4> GetTextureInfo();
         inline int32_t GetWidth() { return tex_width; }
         inline int32_t GetHeight() { return tex_height; }
         inline int32_t GetImgWidth() { return img_width; }
@@ -394,14 +301,16 @@ namespace base {
     
 }
 
-typedef base::vector2<int32_t> v2i;
-typedef base::vector2<float> v2f;
-typedef base::vector3<int32_t> v3i;
-typedef base::vector3<float> v3f;
-typedef base::rect<int32_t> recti;
-typedef base::rect<float> rectf;
-typedef base::TextureInfo<int32_t, 4> texi4;
-typedef base::TextureInfo<float, 4> texf4;
+using v2i = base::vector2<int32_t>;
+using v2f = base::vector2<float>;
+using v3i = base::vector3<int32_t>;
+using v3f = base::vector3<float>;
+using recti = base::rect<int32_t>;
+using rectf = base::rect<float>;
+using texi4 = base::TextureInfo<int32_t, 4>;
+using texf4 = base::TextureInfo<float, 4>;
+using vt2 = base::vtch<2>;
+using vt3 = base::vtch<3>;
 
 #include "render_util.h"
 

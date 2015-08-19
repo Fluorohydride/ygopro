@@ -178,19 +178,23 @@ namespace base {
         static const char* vert_shader =
         "#version 330\n"
         "layout (location = 0) in vec2 v_position;\n"
-        "layout (location = 1) in vec4 v_color;\n"
-        "layout (location = 2) in vec2 v_texcoord;\n"
-        "out vec4 color;\n"
+        "layout (location = 1) in vec2 v_texcoord;\n"
+        "layout (location = 2) in vec4 v_color;\n"
+        "layout (location = 3) in vec4 v_hcolor;\n"
         "out vec2 texcoord;\n"
+        "out vec4 color;\n"
+        "out vec4 hcolor;\n"
         "void main() {\n"
-        "color = v_color;\n"
         "texcoord = v_texcoord;\n"
+        "color = v_color;\n"
+        "hcolor = v_hcolor;\n"
         "gl_Position = vec4(v_position, 0.0, 1.0);\n"
         "}\n";
         static const char* frag_shader =
         "#version 330\n"
-        "in vec4 color;\n"
         "in vec2 texcoord;\n"
+        "in vec4 color;\n"
+        "in vec4 hcolor;\n"
         "layout (location = 0) out vec4 frag_color;\n"
         "uniform sampler2D texid;\n"
         "uniform float alpha;\n"
@@ -288,15 +292,21 @@ namespace base {
             glBindTexture(GL_TEXTURE_2D, texture_id);
     }
     
-    TextureInfo<float, 4> Texture::GetTextureInfo() {
-        static TextureInfo<float, 4> ti;
-        if(!texture_id)
-            return ti;
+    TextureInfo<float, 4> Texture::ConvTextureInfo(TextureInfo<int32_t, 4> tinfo) {
         TextureInfo<float, 4> ret;
-        ret.vert[0] = {0.0f, 0.0f};
-        ret.vert[1] = {(float)img_width / tex_width, 0.0f};
-        ret.vert[2] = {0.0f, (float)img_height / tex_height};
-        ret.vert[3] = {(float)img_width / tex_width, (float)img_height / tex_height};
+        ret.vert[0] = ConvTexCoord(tinfo.vert[0]);
+        ret.vert[1] = ConvTexCoord(tinfo.vert[1]);
+        ret.vert[2] = ConvTexCoord(tinfo.vert[2]);
+        ret.vert[3] = ConvTexCoord(tinfo.vert[3]);
+        return ret;
+    }
+    
+    TextureInfo<float, 4> Texture::GetTextureInfo(rect<int32_t> tinfo) {
+        TextureInfo<float, 4> ret;
+        ret.vert[0] = ConvTexCoord({tinfo.left, tinfo.top});
+        ret.vert[1] = ConvTexCoord({tinfo.left + tinfo.width, tinfo.top});
+        ret.vert[2] = ConvTexCoord({tinfo.left, tinfo.top + tinfo.height});
+        ret.vert[3] = ConvTexCoord({tinfo.left + tinfo.width, tinfo.top + tinfo.height});
         return ret;
     }
     
