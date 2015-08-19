@@ -1351,51 +1351,53 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			cn_count++;
 		}
 		core.spe_effect[check_player] = 0;
-		pr = effects.trigger_o_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			to_count++;
-			core.spe_effect[check_player]++;
-		}
-		if(phase == PHASE_DRAW)
-			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
-		else if(phase == PHASE_STANDBY)
-			core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
-		else if(phase == PHASE_BATTLE)
-			core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
-		else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
+		if(!core.hand_adjusted) {
+			pr = effects.trigger_o_effect.equal_range(phase_event);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				core.select_chains.push_back(newchain);
+				to_count++;
 				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
-		}
-		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
-				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
+			}
+			if(phase == PHASE_DRAW)
+				core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
+			else if(phase == PHASE_STANDBY)
+				core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
+			else if(phase == PHASE_BATTLE)
+				core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
+			else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
+			pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				if(check_hint_timing(peffect))
+					core.spe_effect[check_player]++;
+				core.select_chains.push_back(newchain);
+				fc_count++;
+			}
+			pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				if(check_hint_timing(peffect))
+					core.spe_effect[check_player]++;
+				core.select_chains.push_back(newchain);
+				fc_count++;
+			}
 		}
 		if(core.select_chains.size() == 0) {
 			returns.ivalue[0] = -1;
@@ -1520,53 +1522,55 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			cn_count++;
 		}
 		core.spe_effect[check_player] = 0;
-		pr = effects.trigger_o_effect.equal_range(phase_event);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			core.select_chains.push_back(newchain);
-			to_count++;
-			core.spe_effect[check_player]++;
-		}
-		if(phase == PHASE_DRAW)
-			core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
-		else if(phase == PHASE_STANDBY)
-			core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
-		else if(phase == PHASE_BATTLE)
-			core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
-		else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
-		pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
+		if(!core.hand_adjusted) {
+			pr = effects.trigger_o_effect.equal_range(phase_event);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				core.select_chains.push_back(newchain);
+				to_count++;
 				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
-		}
-		pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
-		for(; pr.first != pr.second; ++pr.first) {
-			peffect = pr.first->second;
-			peffect->s_range = peffect->handler->current.location;
-			peffect->o_range = peffect->handler->current.sequence;
-			if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
-				continue;
-			peffect->id = infos.field_id++;
-			newchain.triggering_effect = peffect;
-			if(check_hint_timing(peffect))
-				core.spe_effect[check_player]++;
-			core.select_chains.push_back(newchain);
-			fc_count++;
+			}
+			if(phase == PHASE_DRAW)
+				core.hint_timing[infos.turn_player] = TIMING_DRAW_PHASE;
+			else if(phase == PHASE_STANDBY)
+				core.hint_timing[infos.turn_player] = TIMING_STANDBY_PHASE;
+			else if(phase == PHASE_BATTLE)
+				core.hint_timing[infos.turn_player] = TIMING_BATTLE_END;
+			else core.hint_timing[infos.turn_player] = TIMING_END_PHASE;
+			pr = effects.activate_effect.equal_range(EVENT_FREE_CHAIN);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				if(check_hint_timing(peffect))
+					core.spe_effect[check_player]++;
+				core.select_chains.push_back(newchain);
+				fc_count++;
+			}
+			pr = effects.quick_o_effect.equal_range(EVENT_FREE_CHAIN);
+			for(; pr.first != pr.second; ++pr.first) {
+				peffect = pr.first->second;
+				peffect->s_range = peffect->handler->current.location;
+				peffect->o_range = peffect->handler->current.sequence;
+				if(!peffect->is_chainable(check_player) || !peffect->is_activateable(check_player, nil_event))
+					continue;
+				peffect->id = infos.field_id++;
+				newchain.triggering_effect = peffect;
+				if(check_hint_timing(peffect))
+					core.spe_effect[check_player]++;
+				core.select_chains.push_back(newchain);
+				fc_count++;
+			}
 		}
 		if(core.select_chains.size() == 0) {
 			returns.ivalue[0] = -1;
@@ -1691,6 +1695,7 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		return FALSE;
 	}
 	case 22: {
+		core.hand_adjusted = TRUE;
 		add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
 		core.units.begin()->step = -1;
 		return FALSE;
@@ -1702,11 +1707,6 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		return FALSE;
 	}
 	case 26: {
-		if(core.new_fchain.size() || core.new_ochain.size()) {
-			add_process(PROCESSOR_POINT_EVENT, 0, 0, 0, 0, 0);
-			core.units.begin()->step = -1;
-			return FALSE;
-		}
 		core.quick_f_chain.clear();
 		core.instant_event.clear();
 		core.point_event.clear();
@@ -2018,9 +2018,10 @@ int32 field::process_point_event(int16 step, int32 skip_trigger, int32 skip_free
 	case 9: {
 		infos.priorities[0] = 0;
 		infos.priorities[1] = 0;
-		if(core.current_chain.size() == 0)
-			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, infos.turn_player);
-		else
+		if(core.current_chain.size() == 0) {
+			if(!core.hand_adjusted)
+				add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, infos.turn_player);
+		} else
 			add_process(PROCESSOR_QUICK_EFFECT, 0, 0, 0, skip_freechain, 1 - core.current_chain.back().triggering_player);
 		return FALSE;
 	}
@@ -4086,6 +4087,7 @@ int32 field::process_turn(uint16 step, uint8 turn_player) {
 		}
 		infos.phase = PHASE_DRAW;
 		core.phase_action = FALSE;
+		core.hand_adjusted = FALSE;
 		raise_event((card*)0, EVENT_PHASE_START + PHASE_DRAW, 0, 0, 0, turn_player, 0);
 		process_instant_event();
 		adjust_all();
