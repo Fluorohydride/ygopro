@@ -65,7 +65,7 @@ namespace base {
     
     template<typename T, typename S>
     inline vector2<T> operator * (const vector2<T>& a, S scalar) {
-        return vector2<T>{a.x * scalar, a.y * scalar};
+        return vector2<T>{(T)(a.x * scalar), (T)(a.y * scalar)};
     }
     
     template<typename T>
@@ -80,7 +80,7 @@ namespace base {
     
     template<typename T, typename S>
     inline vector3<T> operator * (const vector3<T>& a, S scalar) {
-        return vector3<T>{a.x * scalar, a.y * scalar, a.z * scalar};
+        return vector3<T>{(T)(a.x * scalar), (T)(a.y * scalar), (T)(a.z * scalar)};
     }
     
     template<typename T>
@@ -244,6 +244,7 @@ namespace base {
         void Update(const uint8_t* data, int32_t offx, int32_t offy, int32_t width, int32_t height);
         void Bind();
         TextureInfo<float, 4> ConvTextureInfo(TextureInfo<int32_t, 4> tinfo);
+        rect<float> ConvTextureInfo(rect<int32_t> tinfo);
         TextureInfo<float, 4> GetTextureInfo(rect<int32_t> tinfo);
         inline TextureInfo<float, 4> GetTextureInfo() { return GetTextureInfo({0, 0, img_width, img_height}); }
         inline uint32_t GetTextureId() { return texture_id; }

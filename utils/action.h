@@ -31,7 +31,7 @@ public:
         v0 = k / (1.0 - pow(2.718281828, -k * tm));
     }
     virtual double GetT(TIME_TYPE start_time, TIME_TYPE cur_time) {
-        if(cur_time >= this->start_time + last_time)
+        if(cur_time >= start_time + last_time)
             return 1.0;
         TIME_TYPE tm = (cur_time - start_time);
         return v0 / k_coff * (1.0 - pow(2.718281828, -k_coff * tm));

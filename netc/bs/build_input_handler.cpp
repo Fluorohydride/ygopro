@@ -61,11 +61,10 @@ namespace ygopro
         }
         if(dcd != pre) {
             if(pre) {
-                auto ptr = std::static_pointer_cast<BuilderCard>(pre->extra);
-                ptr->SetHL(0);
+                pre->builder_card->SetHL(0);
             }
             if(dcd) {
-                auto ptr = std::static_pointer_cast<BuilderCard>(dcd->extra);
+                auto ptr = dcd->builder_card;
                 auto act = std::make_shared<LerpAnimator<int64_t, BuilderCard>>(0, ptr, [](BuilderCard* bc, double t)->bool {
                     if(bc->hl == 0)
                         return false;

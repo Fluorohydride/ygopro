@@ -80,13 +80,6 @@ namespace ygopro
                     return true;
                 };
             }
-            auto show_ex = pnl_build->FindWidgetAs<sgui::SGCheckBox<>>("show ex");
-            if(show_ex) {
-                show_ex->event_check_change += [this](sgui::SGWidget& sender, bool check)->bool {
-                    build_scene.lock()->ChangeExclusive(check);
-                    return true;
-                };
-            }
         }
         auto pnl_result = LoadDialogAs<sgui::SGPanel>("result panel");
         if(pnl_result) {
@@ -261,7 +254,7 @@ namespace ygopro
         int32_t w = 700;
         int32_t h = 320;
         auto scene_size = SceneMgr::Get().GetSceneSize();
-        info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2}, {w, h});
+        info_panel->ShowInfo(code, {scene_size.x / 2 - w / 2, scene_size.y / 2 - h / 2});
     }
     
     void BuildSceneHandler::HideCardInfo() {
@@ -270,7 +263,7 @@ namespace ygopro
     
     void BuildSceneHandler::SetDeckLabel(const std::wstring& str, uint32_t cl) {
         if(!deck_label.expired())
-            deck_label.lock()->SetText(str, 0xff000000);
+            deck_label.lock()->GetTextUI()->SetText(str, 0xff000000);
     }
     
     void BuildSceneHandler::ResultPrevPage() {
@@ -287,9 +280,9 @@ namespace ygopro
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
-            int32_t pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / 10) + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
-            ptr->SetText(s, 0xff000000);
+            ptr->GetTextUI()->SetText(s, 0xff000000);
         }
     }
     
@@ -307,9 +300,9 @@ namespace ygopro
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_page.lock();
         if(ptr != nullptr) {
-            int32_t pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / 10) + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
-            ptr->SetText(s, 0xff000000);
+            ptr->GetTextUI()->SetText(s, 0xff000000);
         }
     }
     
@@ -330,18 +323,18 @@ namespace ygopro
         build_scene.lock()->RefreshSearchResult(new_results);
         auto ptr = label_result.lock();
         if(ptr != nullptr) {
-            std::wstring s = stringCfg["eui_filter_count"];
+            std::wstring s = To<std::wstring>(stringCfg["eui_filter_count"].to_string());
             std::wstring ct = To<std::wstring>(To<std::string>("%ld", search_result.size()));
             size_t pos = s.find(L"{count}");
             if(pos != std::wstring::npos)
                 s.replace(pos, 7, ct);
-            ptr->SetText(s, 0xff000000);
+            ptr->GetTextUI()->SetText(s, 0xff000000);
         }
         auto ptr2 = label_page.lock();
         if(ptr2 != nullptr) {
-            int32_t pageall = (search_result.size() == 0) ? 0 : (search_result.size() - 1) / 10 + 1;
+            int32_t pageall = (search_result.size() == 0) ? 0 : (int32_t)((search_result.size() - 1) / 10) + 1;
             std::wstring s = To<std::wstring>(To<std::string>("%d/%d", result_page + 1, pageall));
-            ptr2->SetText(s, 0xff000000);
+            ptr2->GetTextUI()->SetText(s, 0xff000000);
         }
     }
     

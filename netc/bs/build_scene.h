@@ -29,7 +29,17 @@ namespace ygopro
         v2f size = {0.0f, 0.0f};
         uint32_t hl = 0;
         int16_t limit = 3;
-        texi4 card_tex;
+        texf4 card_tex;
+    };
+    
+    class MiscRenderer : public base::RenderObject2DLayout {
+    public:
+        virtual void PushVerticesAll();
+    };
+    
+    class CardRenderer : public base::RenderObject2DLayout {
+    public:
+        virtual void PushVerticesAll();
     };
     
     class BuildScene : public Scene, public base::RenderCompositor {
@@ -57,7 +67,6 @@ namespace ygopro
         void UpdateAllCard();
         void RefreshParams();
         void RefreshAllCard();
-        void UpdateMisc();
         void UpdateResult();
         
         void ChangeRegulation(int32_t index, int32_t vr);
@@ -73,12 +82,9 @@ namespace ygopro
         std::pair<int32_t, int32_t> GetHoverPos(int32_t posx, int32_t posy);
         
     protected:
-        int32_t update_status = 0;
-        DeckData current_deck;
-        v2i scene_size = {0, 0};
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
-        std::shared_ptr<base::RenderObject2DLayout> misc_renderer;
-        std::shared_ptr<base::RenderObject2DLayout> card_renderer;
+        std::shared_ptr<MiscRenderer> misc_renderer;
+        std::shared_ptr<CardRenderer> card_renderer;
     };
     
 }

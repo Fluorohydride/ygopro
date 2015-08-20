@@ -33,7 +33,7 @@ namespace ygopro
     
     void LoadItemList(sgui::SGItemListWidget* widget, jaweson::JsonNode<>& node) {
         node.for_each([widget](const std::string& name, jaweson::JsonNode<>& item_node) {
-            widget->AddItem(To<std::wstring>(stringCfg[name]), (uint32_t)item_node[0].to_integer(), (int32_t)item_node[1].to_integer());
+            widget->AddItem(To<std::wstring>(stringCfg[name].to_string()), (uint32_t)item_node[0].to_integer(), (int32_t)item_node[1].to_integer());
         });
     }
     
@@ -70,7 +70,7 @@ namespace ygopro
                     } else if(name == "style") {
                         wnd->SetStyle(sub_node);
                     } else if(name == "caption") {
-                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         wnd->GetCaption()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "close button") {
                         wnd->SetCloseButtonVisible(sub_node.to_bool());
@@ -125,7 +125,7 @@ namespace ygopro
                     if(name == "position") {
                         sgui::SGJsonUtil::SetUIPositionSize(sub_node, lbl, {0, 0});
                     } else if(name == "text") {
-                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         lbl->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     }
                 });
@@ -164,7 +164,7 @@ namespace ygopro
                     } else if(name == "style") {
                         btn->SetStyle(sub_node);
                     } else if(name == "text") {
-                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         btn->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     }
                 });
@@ -271,7 +271,7 @@ namespace ygopro
                     } else if(name == "input color") {
                         te->SetDefaultTextColor(sgui::SGJsonUtil::ConvertRGBA(sub_node));
                     } else if(name == "text") {
-                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()]);
+                        auto text = To<std::wstring>(stringCfg[sub_node[0].to_string()].to_string());
                         te->GetTextUI()->SetText(text, sgui::SGJsonUtil::ConvertRGBA(sub_node[1]));
                     } else if(name == "readonly") {
                         te->SetReadonly(sub_node.to_bool());
@@ -335,9 +335,10 @@ namespace ygopro
             label->GetTextUI()->SetText(msg, color);
         auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
         if(ok_button) {
-            ok_button->event_click += [wnd, cb](sgui::SGWidget& sender) {
+            ok_button->event_click += [wnd, cb](sgui::SGWidget& sender)->bool {
                 if(cb) cb();
                 wnd->RemoveFromParent();
+                return true;
             };
         }
     }
@@ -353,16 +354,18 @@ namespace ygopro
             label->GetTextUI()->SetText(msg, color);
         auto ok_button = wnd->FindWidgetAs<sgui::SGTextButton>("ok button");
         if(ok_button) {
-            ok_button->event_click += [wnd, cb1](sgui::SGWidget& sender) {
+            ok_button->event_click += [wnd, cb1](sgui::SGWidget& sender)->bool {
                 if(cb1) cb1();
                 wnd->RemoveFromParent();
+                return true;
             };
         }
         auto cancel_button = wnd->FindWidgetAs<sgui::SGTextButton>("cancel button");
         if(cancel_button) {
-            cancel_button->event_click += [wnd, cb2](sgui::SGWidget& sender) {
+            cancel_button->event_click += [wnd, cb2](sgui::SGWidget& sender)->bool {
                 if(cb2) cb2();
                 wnd->RemoveFromParent();
+                return true;
             };
         }
     }
@@ -378,16 +381,18 @@ namespace ygopro
             label->GetTextUI()->SetText(msg, color);
         auto yes_button = wnd->FindWidgetAs<sgui::SGTextButton>("yes button");
         if(yes_button) {
-            yes_button->event_click += [wnd, cb1](sgui::SGWidget& sender) {
+            yes_button->event_click += [wnd, cb1](sgui::SGWidget& sender)->bool {
                 if(cb1) cb1();
                 wnd->RemoveFromParent();
+                return true;
             };
         }
         auto no_button = wnd->FindWidgetAs<sgui::SGTextButton>("no button");
         if(no_button) {
-            no_button->event_click += [wnd, cb2](sgui::SGWidget& sender) {
+            no_button->event_click += [wnd, cb2](sgui::SGWidget& sender)->bool {
                 if(cb2) cb2();
                 wnd->RemoveFromParent();
+                return true;
             };
         }
     }
@@ -432,7 +437,7 @@ namespace ygopro
         auto& menu = Create(pos, cb);
         if(!menu_node.is_empty()) {
             menu_node.for_each([&menu](const std::string& key, jaweson::JsonNode<>& node)->void {
-                menu.AddButton(To<std::wstring>(stringCfg[key]), (intptr_t)node.to_integer());
+                menu.AddButton(To<std::wstring>(stringCfg[key].to_string()), (intptr_t)node.to_integer());
             });
         }
         menu.End();

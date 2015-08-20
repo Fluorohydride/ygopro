@@ -568,8 +568,9 @@ namespace base
         
         inline void ClearVertices() { this->Clear(); }
         
-        void AddVertices(Texture* texture, recti vert, recti tex_rect, uint32_t cl = 0xffffffff) {
-            texi4 tex = {{
+        template<typename V, typename T>
+        void AddVertices(Texture* texture, rect<V> vert, rect<T> tex_rect, uint32_t cl = 0xffffffff) {
+            TextureInfo<T, 4> tex = {{
                 {tex_rect.left, tex_rect.top},
                 {tex_rect.left + tex_rect.width, tex_rect.top},
                 {tex_rect.left, tex_rect.top + tex_rect.height},
@@ -578,24 +579,47 @@ namespace base
             AddVertices(texture, vert, tex, cl);
         }
         
-        void AddVertices(Texture* texture, recti vert, texi4 tex, uint32_t cl = 0xffffffff) {
+        template<typename V, typename T>
+        void AddVertices(Texture* texture, rect<V> vert, TextureInfo<T, 4> tex, uint32_t cl = 0xffffffff) {
             auto sz = BeginPrimitive(GL_TRIANGLES, texture->GetTextureId());
             int16_t idx[6] = {0, 1, 2, 2, 1, 3};
             for(int32_t i = 0; i < 6; ++i)
                 idx[i] += std::get<1>(sz);
             vt2 verts[4];
-            verts[0].vertex = ConvScreenCoord({vert.left, vert.top});
-            verts[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
-            verts[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
-            verts[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
-            verts[0].texcoord = texture->ConvTexCoord(tex.vert[0]);
-            verts[1].texcoord = texture->ConvTexCoord(tex.vert[1]);
-            verts[2].texcoord = texture->ConvTexCoord(tex.vert[2]);
-            verts[3].texcoord = texture->ConvTexCoord(tex.vert[3]);
+            SetVertex(verts, vert);
+            SetTexcoord(verts, texture, tex);
             for(int32_t i = 0; i < 4; ++i)
                 verts[i].color = cl;
             PushVertices(verts, idx, 4, 6);
             need_redraw = true;
+        }
+        
+        inline void SetVertex(vt2* verts, recti& vert) {
+            verts[0].vertex = ConvScreenCoord({vert.left, vert.top});
+            verts[1].vertex = ConvScreenCoord({vert.left + vert.width, vert.top});
+            verts[2].vertex = ConvScreenCoord({vert.left, vert.top + vert.height});
+            verts[3].vertex = ConvScreenCoord({vert.left + vert.width, vert.top + vert.height});
+        }
+        
+        inline void SetVertex(vt2* verts, rectf& vert) {
+            verts[0].vertex = {vert.left, vert.top};
+            verts[1].vertex = {vert.left + vert.width, vert.top};
+            verts[2].vertex = {vert.left, vert.top + vert.height};
+            verts[3].vertex = {vert.left + vert.width, vert.top + vert.height};
+        }
+        
+        inline void SetTexcoord(vt2* verts, Texture* texture, texi4& tex) {
+            verts[0].texcoord = texture->ConvTexCoord(tex.vert[0]);
+            verts[1].texcoord = texture->ConvTexCoord(tex.vert[1]);
+            verts[2].texcoord = texture->ConvTexCoord(tex.vert[2]);
+            verts[3].texcoord = texture->ConvTexCoord(tex.vert[3]);
+        }
+        
+        inline void SetTexcoord(vt2* verts, Texture* texture, texf4& tex) {
+            verts[0].texcoord = tex.vert[0];
+            verts[1].texcoord = tex.vert[1];
+            verts[2].texcoord = tex.vert[2];
+            verts[3].texcoord = tex.vert[3];
         }
         
         virtual bool PrepareRender() {

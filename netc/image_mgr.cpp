@@ -10,7 +10,7 @@
 namespace ygopro
 {
 
-	texi4& ImageMgr::GetCardTexture(uint32_t id) {
+	texf4& ImageMgr::GetCardTexture(uint32_t id) {
 		auto iter = card_textures.find(id);
 		if(iter == card_textures.end()) {
             std::string file = To<std::string>("%d.jpg", id);
@@ -36,13 +36,13 @@ namespace ygopro
                         int32_t by = (blockid / 20) * 145;
                         int32_t bw = 100;
                         int32_t bh = 145;
-                        cti.tex_info.vert[0] = {bx, by};
-                        cti.tex_info.vert[1] = {bx + bw, by};
-                        cti.tex_info.vert[2] = {bx, by + bh};
-                        cti.tex_info.vert[3] = {bx + bw, by + bh};
+                        cti.tex_info.vert[0] = {bx / 2048.0f, by / 2048.0f};
+                        cti.tex_info.vert[1] = {(bx + bw) / 2048.0f, by / 2048.0f};
+                        cti.tex_info.vert[2] = {bx / 2048.0f, (by + bh) / 2048.0f};
+                        cti.tex_info.vert[3] = {(bx + bw) / 2048.0f, (by + bh) / 2048.0f};
                         cti.ref_block = blockid;
                         card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
-                        image_render->AddVertices(&card_image, {bx, by, bw, bh}, recti{0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
+                        image_render->AddVertices(&card_image, recti{bx, by, bw, bh}, recti{0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
                     } else {
                         FreeBlock(blockid, false);
                         cti.tex_info = misc_textures["unknown"];
@@ -56,7 +56,7 @@ namespace ygopro
 		return iter->second.tex_info;
 	}
     
-    texi4& ImageMgr::GetTexture(const std::string& name) {
+    texf4& ImageMgr::GetTexture(const std::string& name) {
         return misc_textures[name];
     }
     
@@ -88,7 +88,7 @@ namespace ygopro
         return pre_ret;
     }
     
-    texi4& ImageMgr::GetCharTex(wchar_t ch) {
+    texf4& ImageMgr::GetCharTex(wchar_t ch) {
         if(ch < L'*' || ch > L'9')
             return char_textures[2];
         return char_textures[ch - L'*'];
@@ -215,10 +215,10 @@ namespace ygopro
                 ptex = &bg_texture;
             if(ptex) {
                 auto& ti = misc_textures[name];
-                int32_t x = (int32_t)node[1].to_integer();
-                int32_t y = (int32_t)node[2].to_integer();
-                int32_t w = (int32_t)node[3].to_integer();
-                int32_t h = (int32_t)node[4].to_integer();
+                float x = (float)node[1].to_integer() / ptex->GetWidth();
+                float y = (float)node[2].to_integer() / ptex->GetHeight();
+                float w = (float)node[3].to_integer() / ptex->GetWidth();
+                float h = (float)node[4].to_integer() / ptex->GetHeight();
                 ti.vert[0] = {x, y};
                 ti.vert[1] = {x + w, y};
                 ti.vert[2] = {x, y + h};
@@ -236,9 +236,11 @@ namespace ygopro
                 ptex = &bg_texture;
             if(ptex) {
                 auto& ti = misc_textures[name];
-                int32_t val[8];
-                for(int32_t i = 0; i < 8; ++i)
-                    val[i] = (int32_t)node[i + 1].to_integer();
+                float val[8];
+                for(int32_t i = 0; i < 8; i += 2) {
+                    val[i] = (float)node[i + 1].to_integer() / ptex->GetWidth();
+                    val[i + 1] = (float)node[i + 1].to_integer() / ptex->GetHeight();
+                }
                 ti.vert[0] = {val[0], val[1]};
                 ti.vert[1] = {val[2], val[3]};
                 ti.vert[2] = {val[4], val[5]};
@@ -246,15 +248,15 @@ namespace ygopro
             }
         });
         auto& char_tex = misc_textures["char"];
-        int32_t difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
-        int32_t dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
+        float difx = (char_tex.vert[1].x - char_tex.vert[0].x) / 4;
+        float dify = (char_tex.vert[2].y - char_tex.vert[0].y) / 4;
         for(int32_t i = 0; i < 16; ++i) {
             int32_t x = i % 4;
             int32_t y = i / 4;
-            char_textures[i].vert[0] = char_tex.vert[0] + v2i{difx * x, dify * y};
-            char_textures[i].vert[1] = char_tex.vert[0] + v2i{difx * (x + 1), dify * y};
-            char_textures[i].vert[2] = char_tex.vert[0] + v2i{difx * x, dify * (y + 1)};
-            char_textures[i].vert[3] = char_tex.vert[0] + v2i{difx * (x + 1), dify * (y + 1)};
+            char_textures[i].vert[0] = char_tex.vert[0] + v2f{difx * x, dify * y};
+            char_textures[i].vert[1] = char_tex.vert[0] + v2f{difx * (x + 1), dify * y};
+            char_textures[i].vert[2] = char_tex.vert[0] + v2f{difx * x, dify * (y + 1)};
+            char_textures[i].vert[3] = char_tex.vert[0] + v2f{difx * (x + 1), dify * (y + 1)};
         }
         return true;
 	}

@@ -301,6 +301,13 @@ namespace base {
         return ret;
     }
     
+    rect<float> Texture::ConvTextureInfo(rect<int32_t> r) {
+        if(!frame_tex)
+            return rect<float>{(float)r.left / tex_width, (float)r.top / tex_height, (float)r.width / tex_width, (float)r.height / tex_height};
+        else
+            return rect<float>{(float)r.left / tex_width, ymax - (float)r.top / tex_height, (float)r.width / tex_width, -(float)r.height / tex_height};
+    }
+    
     TextureInfo<float, 4> Texture::GetTextureInfo(rect<int32_t> tinfo) {
         TextureInfo<float, 4> ret;
         ret.vert[0] = ConvTexCoord({tinfo.left, tinfo.top});

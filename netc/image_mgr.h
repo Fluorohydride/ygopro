@@ -11,7 +11,7 @@ namespace ygopro
 {
     
     struct CardTextureInfo {
-		texi4 tex_info;
+		texf4 tex_info;
         uint16_t ref_block = 0;
 	};
     
@@ -19,14 +19,14 @@ namespace ygopro
 	public:
         ImageMgr() : base::FrameBufferRenderer(2048, 2048, false, false) {}
         
-		texi4& GetCardTexture(uint32_t id);
-        texi4& GetTexture(const std::string& name);
+		texf4& GetCardTexture(uint32_t id);
+        texf4& GetTexture(const std::string& name);
         base::Texture* LoadBigCardTexture(uint32_t id);
         base::Texture* GetRawCardTexture() { return render_tex; }
         base::Texture* GetRawMiscTexture() { return &misc_texture; }
         base::Texture* GetRawBGTexture() { return &bg_texture; }
         base::Texture* GetRawCardImage() { return &card_image; }
-        texi4& GetCharTex(wchar_t ch);
+        texf4& GetCharTex(wchar_t ch);
         void UnloadCardTexture(uint32_t id);
 		void UnloadAllCardTexture();
         
@@ -40,8 +40,8 @@ namespace ygopro
         
     protected:
         std::unordered_map<uint32_t, CardTextureInfo> card_textures;
-        std::unordered_map<std::string, texi4> misc_textures;
-        std::array<texi4, 16> char_textures;
+        std::unordered_map<std::string, texf4> misc_textures;
+        std::array<texf4, 16> char_textures;
         std::list<uint16_t> unused_block;
         std::list<uint16_t> reserved_block;
         std::vector<std::pair<int32_t, uint32_t>> ref_count;

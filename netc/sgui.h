@@ -105,7 +105,7 @@ namespace sgui
         };
         
     public:
-        void SetPositionSize(v2i pos, v2i sz, v2f ppos = {0.0f, 0.0f}, v2f psz = {0.0f, 0.0f}, v2f af = {0.0f, 0.0f}) {
+        inline void SetPositionSize(v2i pos, v2i sz, v2f ppos = {0.0f, 0.0f}, v2f psz = {0.0f, 0.0f}, v2f af = {0.0f, 0.0f}) {
             area_pos.relative = pos;
             area_pos.proportion = ppos;
             area_size.relative = sz;
@@ -113,41 +113,41 @@ namespace sgui
             self_factor = af;
             OnPositionSizeChange(true, true);
         }
-        void SetPosition(v2i pos, v2f ppos = {0.0f, 0.0f}, v2f af = {0.0f, 0.0f}) {
+        inline void SetPosition(v2i pos, v2f ppos = {0.0f, 0.0f}, v2f af = {0.0f, 0.0f}) {
             area_pos.relative = pos;
             area_pos.proportion = ppos;
             self_factor = af;
             OnPositionSizeChange(true, false);
         }
-        void SetSize(v2i sz, v2f psz = {0.0f, 0.0f}) {
+        inline void SetSize(v2i sz, v2f psz = {0.0f, 0.0f}) {
             area_size.relative = sz;
             area_size.proportion = psz;
             OnPositionSizeChange(false, true);
         }
-        void SetPositionSizeR(v2i pos, v2i sz) {
+        inline void SetPositionSizeR(v2i pos, v2i sz) {
             area_pos.relative = pos;
             area_size.relative = sz;
             OnPositionSizeChange(true, true);
         }
-        void SetPositionR(v2i pos) {
+        inline void SetPositionR(v2i pos) {
             area_pos.relative = pos;
             OnPositionSizeChange(true, false);
         }
-        void SetSizeR(v2i sz) {
+        inline void SetSizeR(v2i sz) {
             area_size.relative = sz;
             OnPositionSizeChange(false, true);
         }
-        void SetPositionSizeP(v2f pos, v2f sz, v2f af) {
+        inline void SetPositionSizeP(v2f pos, v2f sz, v2f af) {
             area_pos.proportion = pos;
             area_size.proportion = sz;
             self_factor = af;
             OnPositionSizeChange(true, true);
         }
-        void SetPositionP(v2f pos) {
+        inline void SetPositionP(v2f pos) {
             area_pos.proportion = pos;
             OnPositionSizeChange(true, false);
         }
-        void SetSizeP(v2f sz) {
+        inline void SetSizeP(v2f sz) {
             area_size.proportion = sz;
             OnPositionSizeChange(false, true);
         }
@@ -159,24 +159,7 @@ namespace sgui
         inline const AreaAttr& GetPosAttr() { return area_pos; }
         inline const AreaAttr& GetSizeAttr() { return area_size; }
         
-        virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
-            auto pre_pos = area_pos.absolute;
-            auto pre_size = area_size.absolute;
-            if(container) {
-                auto offset = container->GetAbsolutePosition();
-                auto pprop = container->GetAbsoluteSize();
-                if(re_size)
-                    area_size.absolute = area_size.relative + DotFactor(pprop, area_size.proportion);
-                if(re_pos)
-                    area_pos.absolute = area_pos.relative + offset + DotFactor(pprop, area_pos.proportion) + DotFactor(area_size.absolute, self_factor);
-            } else {
-                if(re_size)
-                    area_size.absolute = area_size.relative;
-                if(re_pos)
-                    area_pos.absolute = area_pos.relative + DotFactor(area_size.absolute, self_factor);
-            }
-            return std::make_pair(pre_pos != area_pos.absolute, pre_size != area_size.absolute);
-        }
+        virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size);
         
     protected:
         RegionObject* container = nullptr;
@@ -189,12 +172,7 @@ namespace sgui
     
     class UIComponent : public RegionObject, public base::RenderUnit<vt2> {
     public:
-        virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
-            auto ret = RegionObject::OnPositionSizeChange(re_pos, re_size);
-            if(ret.first || ret.second)
-                SetUpdate();
-            return ret;
-        }
+        virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size);
         
         inline v2f ConvScreenCoord(v2i pos) { return (static_cast<base::RenderObject2DLayout*>(manager))->ConvScreenCoord(pos);}
         inline void SetColor(uint32_t cl)   { if(color == cl) return; color = cl; SetUpdate(); }
@@ -206,16 +184,16 @@ namespace sgui
     struct UIVertex {
         v2i offset = {0, 0};
         v2f prop = {0.0f, 0.0f};
-        v2i texcoord = {0, 0};
+        v2f texcoord = {0, 0};
         uint32_t color = 0xffffffff;
     };
     
     template<int32_t VERT_COUNT>
     struct UIVertexArray {
-        inline UIVertexArray& BuildSprite(recti o, rectf p, recti t, uint32_t c) {
+        inline UIVertexArray& BuildSprite(recti o, rectf p, rectf t, uint32_t c) {
             SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); return *this;
         }
-        inline UIVertexArray& BuildSprite(recti o, rectf p, texi4 t, uint32_t c) {
+        inline UIVertexArray& BuildSprite(recti o, rectf p, texf4 t, uint32_t c) {
             SpriteOffset(o); SpriteProp(p); SpriteTexcoord(t); SpriteColor(c); return *this;
         }
         
@@ -225,6 +203,7 @@ namespace sgui
             verts[1].offset = {pos.left + pos.width, pos.top};
             verts[2].offset = {pos.left, pos.top + pos.height};
             verts[3].offset = {pos.left + pos.width, pos.top + pos.height};
+            return *this;
         }
         
         inline UIVertexArray& SpriteProp(rectf prop) {
@@ -233,27 +212,31 @@ namespace sgui
             verts[1].prop = {prop.left + prop.width, prop.top};
             verts[2].prop = {prop.left, prop.top + prop.height};
             verts[3].prop = {prop.left + prop.width, prop.top + prop.height};
+            return *this;
         }
         
-        inline UIVertexArray& SpriteTexcoord(recti tex) {
+        inline UIVertexArray& SpriteTexcoord(rectf tex) {
             static_assert(VERT_COUNT >= 4, "");
             verts[0].texcoord = {tex.left, tex.top};
             verts[1].texcoord = {tex.left + tex.width, tex.top};
             verts[2].texcoord = {tex.left, tex.top + tex.height};
             verts[3].texcoord = {tex.left + tex.width, tex.top + tex.height};
+            return *this;
         }
         
-        inline UIVertexArray& SpriteTexcoord(texi4 tex) {
+        inline UIVertexArray& SpriteTexcoord(texf4 tex) {
             static_assert(VERT_COUNT >= 4, "");
             verts[0].texcoord = tex.vert[0];
             verts[1].texcoord = tex.vert[1];
             verts[2].texcoord = tex.vert[2];
             verts[3].texcoord = tex.vert[3];
+            return *this;
         }
         
         inline UIVertexArray& SpriteColor(uint32_t cl) {
             static_assert(VERT_COUNT >= 4, "");
             verts[0].color = verts[1].color = verts[2].color = verts[3].color = cl;
+            return *this;
         }
         
         inline UIVertex* Ptr() { return verts; }
@@ -263,9 +246,8 @@ namespace sgui
     
     class UIVertexList : public UIComponent {
     public:
-        
-        virtual bool CheckAvailable() { return texture != nullptr; }
-        virtual int32_t GetTextureId() { return texture ? texture->GetTextureId() : 0; }
+        virtual bool CheckAvailable();
+        virtual int32_t GetTextureId();
         
         inline void SetTexture(base::Texture* tex) { texture = tex; SetRedraw(true); }
         inline void SetPoints(std::vector<UIVertex> pts) {
@@ -300,51 +282,16 @@ namespace sgui
     
     class UIConvexRegion : public UIVertexList {
     public:
-        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
-        
-        virtual void RefreshVertices() {
-            size_t vsize = points.size();
-            if(vsize < 3) {
-                vertices.clear();
-                indices.clear();
-            } else {
-                vertices.resize(vsize);
-                indices.resize(vsize * 3 - 6);
-                for(size_t i = 0; i < vsize; ++i) {
-                    vertices[i].vertex = CalUIVertex(points[i]);
-                    vertices[i].texcoord = texture->ConvTexCoord(points[i].texcoord);
-                    vertices[i].color = points[i].color;
-                }
-                for(size_t i = 0; i < vsize - 2; ++i) {
-                    indices[i * 3] = vert_index;
-                    indices[i * 3 + 1] = vert_index + i + 1;
-                    indices[i * 3 + 2] = vert_index + i + 2;
-                }
-            }
-        }
+        virtual int32_t GetPrimitiveType();
+        virtual void RefreshVertices();
     };
     
     class UISpriteList : public UIVertexList {
     public:
-        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
+        virtual int32_t GetPrimitiveType();
+        virtual void RefreshVertices();
         
-        virtual void RefreshVertices() {
-            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
-            for(size_t i = 0; i < points.size(); ++i) {
-                vertices[i].vertex = CalUIVertex(points[i]);
-                vertices[i].texcoord = texture->ConvTexCoord(points[i].texcoord);
-                vertices[i].color = points[i].color;
-            }
-            size_t pt_size = points.size() / 4;
-            for(size_t i = 0; i < pt_size; ++i) {
-                for(size_t j = 0; j < 6; ++j)
-                    indices[i * 6 + j] = vert_index + i * 4 + quad_idx[j];
-            }
-            for(size_t i = pt_size * 6; i < indices.size(); ++i)
-                indices[i] = 0;
-        }
-        
-        void SetCapacity(int32_t sz) {
+        inline void SetCapacity(int32_t sz) {
             if(sz == capacity)
                 return;
             capacity = sz;
@@ -354,19 +301,19 @@ namespace sgui
             SetRedraw(true);
         }
         
-        void AddSprite(UIVertex* v) {
+        inline void AddSprite(UIVertex* v) {
             CheckCapacity(1);
             points.insert(points.end(), v, v + 4);
         }
         
-        void SetSprite(UIVertex* v, int32_t index) {
+        inline void SetSprite(UIVertex* v, int32_t index) {
             if(index * 4 >= points.size())
                 return;
             memcpy(&points[index * 4], v, sizeof(UIVertex) * 4);
             SetUpdate();
         }
         
-        void SetSpriteColor(uint32_t color, int32_t index) {
+        inline void SetSpriteColor(uint32_t color, int32_t index) {
             if(index * 4 >= points.size())
                 return;
             for(int32_t i = 0; i < 4; ++i)
@@ -374,22 +321,7 @@ namespace sgui
             SetUpdate();
         }
         
-        void CheckCapacity(int32_t inc) {
-            auto cur_size = points.size() / 4;
-            if(cur_size + inc > capacity) {
-                while(cur_size + inc > capacity) {
-                    if(cur_size == 0)
-                        capacity = 8;
-                    else
-                        capacity = capacity * 1.5;
-                }
-                vertices.resize(capacity * 4);
-                indices.resize(capacity * 6);
-                points.resize(capacity * 4);
-                SetRedraw(true);
-            } else
-                SetUpdate();
-        }
+        void CheckCapacity(int32_t inc);
         
         inline int32_t GetCapacity() { return capacity; }
         
@@ -399,31 +331,12 @@ namespace sgui
     
     class UISprite : public UIComponent {
     public:
-        virtual bool CheckAvailable() { return texture != nullptr; }
-        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
-        virtual int32_t GetTextureId() { return texture ? texture->GetTextureId() : 0; }
-        
-        virtual void RefreshVertices() {
-            vertices.resize(4);
-            indices.resize(6);
-            FillQuad(&vertices[0], &indices[0]);
-        }
-        
-        void FillQuad(vt2* v, int16_t* idx) {
-            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
-            v[0].vertex = ConvScreenCoord({area_pos.absolute.x, area_pos.absolute.y});
-            v[1].vertex = ConvScreenCoord({area_pos.absolute.x + area_size.absolute.x, area_pos.absolute.y});
-            v[2].vertex = ConvScreenCoord({area_pos.absolute.x, area_pos.absolute.y + area_size.absolute.y});
-            v[3].vertex = ConvScreenCoord({area_pos.absolute.x + area_size.absolute.x, area_pos.absolute.y + area_size.absolute.y});
-            v[0].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
-            v[1].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top});
-            v[2].texcoord = texture->ConvTexCoord({tex_rect.left, tex_rect.top + tex_rect.height});
-            v[3].texcoord = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
-            for(int16_t i = 0; i < 6; ++i)
-                idx[i] = vert_index + quad_idx[i];
-            for(int16_t i = 0; i < 4; ++i)
-                v[i].color = color;
-        }
+        virtual bool CheckAvailable();
+        virtual int32_t GetPrimitiveType();
+        virtual int32_t GetTextureId();
+        virtual void RefreshVertices();
+
+        void FillQuad(vt2* v, int16_t* idx);
         
         inline void SetTexture(base::Texture* tex) { if(texture == tex) return; texture = tex; SetRedraw(true); }
         inline void SetTextureRect(recti rct) { tex_rect = rct; SetUpdate(); }
@@ -434,46 +347,9 @@ namespace sgui
     
     class UISprite9 : public UISprite {
     public:
-        virtual void RefreshVertices() {
-            vertices.resize(20);
-            indices.resize(60);
-            FillQuad9(&vertices[0], &indices[0]);
-        }
+        virtual void RefreshVertices();
         
-        void FillQuad9(vt2* v, int16_t* idx) {
-            static const int16_t quad9_idx[] = {    16,17,18,18,17,19,
-                0, 1, 4, 4, 1, 5, 1, 2, 5, 5, 2, 6, 2, 3, 6, 6, 3, 7,
-                4, 5, 8, 8, 5, 9, 5, 6, 9, 9, 6, 10,6, 7, 10,10,7, 11,
-                8, 9, 12,12,9, 13,9, 10,13,13,10,14,10,11,14,14,11,15
-            };
-            v2f verts[4], texcoord[4];
-            verts[0] = ConvScreenCoord(area_pos.absolute);
-            verts[1] = ConvScreenCoord(area_pos.absolute + v2i{border.left, border.top});
-            verts[2] = ConvScreenCoord(area_pos.absolute + area_size.absolute - v2i{border.width, border.height});
-            verts[3] = ConvScreenCoord(area_pos.absolute + area_size.absolute);
-            texcoord[0] = texture->ConvTexCoord({tex_rect.left, tex_rect.top});
-            texcoord[1] = texture->ConvTexCoord({tex_rect.left + border_tex.left, tex_rect.top + border_tex.top});
-            texcoord[2] = texture->ConvTexCoord({tex_rect.left + tex_rect.width - border_tex.width, tex_rect.top + tex_rect.height - border_tex.height});
-            texcoord[3] = texture->ConvTexCoord({tex_rect.left + tex_rect.width, tex_rect.top + tex_rect.height});
-            for(int32_t i = 0; i < 4; ++i) {
-                for(int32_t j = 0; j < 4; ++j) {
-                    v[i * 4 + j].vertex = v2f{verts[j].x, verts[i].y};
-                    v[i * 4 + j].texcoord = v2f{texcoord[j].x, texcoord[i].y};
-                }
-            }
-            v[16].vertex = ConvScreenCoord(area_pos.absolute + v2i{back.left, back.top});
-            v[17].vertex = ConvScreenCoord(area_pos.absolute + v2i{area_size.absolute.x - back.width, back.top});
-            v[18].vertex = ConvScreenCoord(area_pos.absolute + v2i{back.left, area_size.absolute.y - back.height});
-            v[19].vertex = ConvScreenCoord(area_pos.absolute + area_size.absolute - v2i{back.width, back.height});
-            v[16].texcoord = texture->ConvTexCoord({back_tex.left, back_tex.top});
-            v[17].texcoord = texture->ConvTexCoord({back_tex.left + back_tex.width, back_tex.top});
-            v[18].texcoord = texture->ConvTexCoord({back_tex.left, back_tex.top + back_tex.height});
-            v[19].texcoord = texture->ConvTexCoord({back_tex.left + back_tex.width, back_tex.top + back_tex.height});
-            for(int32_t i = 0; i < 60; ++i)
-                idx[i] = vert_index + quad9_idx[i];
-            for(int16_t i = 0; i < 20; ++i)
-                v[i].color = color;
-        }
+        void FillQuad9(vt2* v, int16_t* idx);
         
         inline void SetBackRect(recti bk, recti bkt) { back = bk; back_tex = bkt; SetUpdate(); }
         inline void SetBorderRect(recti bd, recti bdt) {border = bd; border_tex = bdt; SetUpdate();}
@@ -491,117 +367,14 @@ namespace sgui
     
     class UIText : public UIComponent {
     public:
-        virtual bool CheckAvailable() { return text_font != nullptr; }
-        virtual int32_t GetPrimitiveType() { return GL_TRIANGLES; }
-        virtual int32_t GetTextureId() { return text_font ? text_font->GetTexture().GetTextureId() : 0; }
+        virtual bool CheckAvailable();
+        virtual int32_t GetPrimitiveType();
+        virtual int32_t GetTextureId();
+        virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size);
+        virtual void RefreshVertices();
         
-        virtual std::pair<bool, bool> OnPositionSizeChange(bool re_pos, bool re_size) {
-            auto pre_pos = area_pos.absolute;
-            if(re_pos) {
-                if(container) {
-                    auto offset = container->GetAbsolutePosition();
-                    auto pprop = container->GetAbsoluteSize();
-                    area_pos.absolute = area_pos.relative + offset + DotFactor(pprop, area_pos.proportion) + DotFactor(area_size.absolute, self_factor);
-                } else
-                    area_pos.absolute = area_pos.relative + DotFactor(area_size.absolute, self_factor);
-                if(pre_pos != area_pos.absolute)
-                    SetUpdate();
-            }
-            return std::make_pair(pre_pos != area_pos.absolute, false);
-        }
-        
-        virtual void RefreshVertices() {
-            static const int16_t quad_idx[] = {0, 1, 2, 2, 1, 3};
-            advance.x = 0;
-            advance.y = 0;
-            line_spacing = 0;
-            int32_t actual_size = 0;
-            for(size_t i = 0; i < texts.length(); ++i) {
-                auto ch = texts[i];
-                if(ch < L' ') {
-                    if(ch == L'\n') {
-                        advance.x = 0;
-                        advance.y += line_spacing;
-                        line_spacing = 0;
-                    }
-                    continue;
-                }
-                auto color = colors[i];
-                auto& gl = text_font->GetGlyph(ch);
-                if((uint32_t)(advance.x + gl.advance) > max_width) {
-                    advance.x = 0;
-                    advance.y += line_spacing;
-                    line_spacing = 0;
-                }
-                auto final_offset = area_pos.absolute + advance + offset;
-                auto v = &vertices[actual_size * 4];
-                auto idx = &indices[actual_size * 6];
-                v[0].vertex = ConvScreenCoord(v2i{gl.bounds.left, gl.bounds.top} + final_offset);
-                v[1].vertex = ConvScreenCoord(v2i{gl.bounds.left + gl.bounds.width, gl.bounds.top} + final_offset);
-                v[2].vertex = ConvScreenCoord(v2i{gl.bounds.left, gl.bounds.top + gl.bounds.height} + final_offset);
-                v[3].vertex = ConvScreenCoord(v2i{gl.bounds.left + gl.bounds.width, gl.bounds.top + gl.bounds.height} + final_offset);
-                v[0].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top});
-                v[1].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left + gl.textureRect.width, gl.textureRect.top});
-                v[2].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left, gl.textureRect.top + gl.textureRect.height});
-                v[3].texcoord = text_font->GetTexture().ConvTexCoord({gl.textureRect.left + gl.textureRect.width, gl.textureRect.top + gl.textureRect.height});
-                for(int16_t j = 0; j < 6; ++j)
-                    idx[j] = vert_index + actual_size * 4 + quad_idx[j];
-                if(!text_font->IsEmoji(ch))
-                    for(int16_t j = 0; j < 4; ++j)
-                        v[j].color = color;
-                advance.x += gl.advance;
-                line_spacing = std::max(text_font->GetLineSpacing(ch), line_spacing);
-                actual_size++;
-            }
-            for(int32_t i = vert_size; i < vert_cap; ++i) {
-                auto idx = &indices[i * 6];
-                for(auto j = 0; j < 6; ++j)
-                    idx[j] = 0;
-            }
-        }
-        
-        void EvaluateSize() {
-            area_size.absolute = v2i{0, 0};
-            evaluate_info = v2i{0, 0};
-            text_pos.clear();
-            EvaluateSize(L"");
-        }
-        
-        void EvaluateSize(const std::wstring& txt) {
-            auto pre_size = area_size.absolute;
-            for(auto ch : txt) {
-                text_pos.push_back(v2i{evaluate_info.x, area_size.absolute.y - evaluate_info.y});
-                if(ch < L' ') {
-                    if((ch == L'\n') && (max_width != 0xffffffff)) {
-                        if(evaluate_info.x > area_size.absolute.x)
-                            area_size.absolute.x = evaluate_info.x;
-                        if(evaluate_info.x == 0)
-                            area_size.absolute.y += text_font->GetFontSize();
-                        evaluate_info = v2i{0, 0};
-                    }
-                    continue;
-                }
-                auto& gl = text_font->GetGlyph(ch);
-                if((max_width != 0xffffffff) && ((uint32_t)(evaluate_info.x + gl.advance) > max_width)) {
-                    if(evaluate_info.x > area_size.absolute.x)
-                        area_size.absolute.x = evaluate_info.x;
-                    evaluate_info = v2i{0, 0};
-                }
-                evaluate_info.x += gl.advance;
-                if(text_font->GetLineSpacing(ch) > evaluate_info.y) {
-                    area_size.absolute.y += text_font->GetLineSpacing(ch) - evaluate_info.y;
-                    evaluate_info.y = text_font->GetLineSpacing(ch);
-                }
-            }
-            last_text_pos = {evaluate_info.x, area_size.absolute.y - evaluate_info.y};
-            if(evaluate_info.x > area_size.absolute.x)
-                area_size.absolute.x = evaluate_info.x;
-            if(area_size.absolute != pre_size) {
-                OnPositionSizeChange(true, true);
-                if(size_cb)
-                    size_cb(area_size.absolute);
-            }
-        }
+        void EvaluateSize();
+        void EvaluateSize(const std::wstring& txt);
         
         inline void SetFont(base::Font* ft) { if(!ft || ft == text_font) return; text_font = ft; EvaluateSize(); SetRedraw(true); }
         inline void SetMaxWidth(int32_t mw) { if(max_width == mw) return; max_width = mw; EvaluateSize(); SetUpdate(); }
@@ -612,7 +385,7 @@ namespace sgui
         inline int32_t GetFontSize() { return text_font ? text_font->GetFontSize() : 0; }
         inline v2i GetTextPosition(int32_t index) { return (index >= 0 && index < text_pos.size()) ? text_pos[index] : last_text_pos; }
         
-        void SetCapacity(int32_t cap) {
+        inline void SetCapacity(int32_t cap) {
             if(vert_cap >= cap)
                 return;
             vertices.resize(cap * 4);
@@ -621,88 +394,11 @@ namespace sgui
             SetRedraw(false);
         }
         
-        void InsertText(int32_t start, const std::wstring& txt, uint32_t cl) {
-            if(start >= (int32_t)texts.size())
-                start = (int32_t)texts.size();
-            auto new_texts = std::move(texts);
-            auto new_color = std::move(colors);
-            new_texts.insert(new_texts.begin() + start, txt.begin(), txt.end());
-            new_color.insert(new_color.begin() + start, txt.length(), cl);
-            vert_size = 0;
-            EvaluateSize();
-            AppendText(new_texts, 0);
-            colors = std::move(new_color);
-        }
-        
-        void RemoveText(int32_t start, int32_t len) {
-            if(start >= texts.size() || len <= 0)
-                return;
-            if(start + len > texts.size())
-                len = (int32_t)texts.size() - start;
-            auto new_texts = std::move(texts);
-            auto new_color = std::move(colors);
-            new_texts.erase(new_texts.begin() + start, new_texts.begin() + start + len);
-            new_color.erase(new_color.begin() + start, new_color.begin() + start + len);
-            vert_size = 0;
-            EvaluateSize();
-            AppendText(new_texts, 0);
-            colors = std::move(new_color);
-        }
-        
-        void ReplaceText(int32_t start, int32_t len, const std::wstring& txt, uint32_t cl) {
-            if(start >= texts.size() || len <= 0)
-                return;
-            if(start + len > texts.size())
-                len = (int32_t)texts.size() - start;
-            auto new_texts = std::move(texts);
-            auto new_color = std::move(colors);
-            new_texts.erase(new_texts.begin() + start, new_texts.begin() + start + len);
-            new_color.erase(new_color.begin() + start, new_color.begin() + start + len);
-            new_texts.insert(new_texts.begin() + start, txt.begin(), txt.end());
-            new_color.insert(new_color.begin() + start, txt.length(), cl);
-            vert_size = 0;
-            EvaluateSize();
-            AppendText(new_texts, 0);
-            colors = std::move(new_color);
-        }
-        
-        void AppendText(const std::wstring& txt, uint32_t cl) {
-            int32_t app_size = 0;
-            for(auto& ch : txt) {
-                if(ch >= ' ')
-                    app_size++;
-            }
-            auto redraw = false;
-            if(vert_size + app_size > vert_cap) {
-                while(vert_size + app_size > vert_cap) {
-                    if(vert_cap == 0)
-                        vert_cap = 8;
-                    else
-                        vert_cap *= 2;
-                }
-                vertices.resize(vert_cap * 4);
-                indices.resize(vert_cap * 6);
-                redraw = true;
-            }
-            texts.append(txt);
-            colors.insert(colors.end(), txt.length(), cl);
-            vert_size += app_size;
-            EvaluateSize(txt);
-            if(redraw)
-                SetRedraw(true);
-            else
-                SetUpdate();
-        }
-        
-        int32_t CheckHitPositionSingleLine(int32_t x) {
-            for(size_t i = 0; i < texts.size(); ++i)
-                if(text_pos[i].x > x)
-                    return (i > 0) ? ((int32_t)i - 1) : 0;
-            if(last_text_pos.x > x)
-                return (int32_t)texts.size() - 1;
-            else
-                return (int32_t)texts.size();;
-        }
+        void InsertText(int32_t start, const std::wstring& txt, uint32_t cl);
+        void RemoveText(int32_t start, int32_t len);
+        void ReplaceText(int32_t start, int32_t len, const std::wstring& txt, uint32_t cl);
+        void AppendText(const std::wstring& txt, uint32_t cl);
+        int32_t CheckHitPositionSingleLine(int32_t x);
         
     protected:
         base::Font* text_font = nullptr;
@@ -725,49 +421,11 @@ namespace sgui
     
     class SGJsonUtil {
     public:
-        static v2i ConvertV2i(jaweson::JsonNode<>& node, int32_t index) {
-            v2i ret = {0, 0};
-            if(node.is_array()) {
-                ret.x = (int32_t)node[index].to_integer();
-                ret.y = (int32_t)node[index + 1].to_integer();
-            }
-            return ret;
-        }
-        
-        static v2f ConvertV2f(jaweson::JsonNode<>& node, int32_t index) {
-            v2f ret = {0.0f, 0.0f};
-            if(node.is_array()) {
-                ret.x = node[index].to_double();
-                ret.y = node[index + 1].to_double();
-            }
-            return ret;
-        }
-        
-        static recti ConvertRect(jaweson::JsonNode<>& node) {
-            recti ret = {0, 0, 0, 0};
-            if(node.is_array()) {
-                ret.left = (int32_t)node[0].to_integer();
-                ret.top = (int32_t)node[1].to_integer();
-                ret.width = (int32_t)node[2].to_integer();
-                ret.height = (int32_t)node[3].to_integer();
-            }
-            return ret;
-        }
-        
-        static uint32_t ConvertRGBA(jaweson::JsonNode<>& node) {
-            std::string rgba = node.to_string();
-            uint32_t agbr = To<uint32_t>(rgba);
-            return ((agbr >> 24) & 0xff) | (((agbr >> 8) & 0xff00)) | ((agbr << 8) & 0xff0000) | ((agbr << 24) & 0xff000000);
-        }
-        
-        static void SetUIPositionSize(jaweson::JsonNode<>& node, RegionObject* obj, v2i offset) {
-            v2i pos_relative = SGJsonUtil::ConvertV2i(node, 0);
-            v2i sz_relative = SGJsonUtil::ConvertV2i(node, 2);
-            v2f pos_prop = SGJsonUtil::ConvertV2f(node, 4);
-            v2f sz_prop = SGJsonUtil::ConvertV2f(node, 6);
-            v2f self_factor = SGJsonUtil::ConvertV2f(node, 8);
-            obj->SetPositionSize(pos_relative + offset, sz_relative, pos_prop, sz_prop, self_factor);
-        }
+        static v2i ConvertV2i(jaweson::JsonNode<>& node, int32_t index);
+        static v2f ConvertV2f(jaweson::JsonNode<>& node, int32_t index);
+        static recti ConvertRect(jaweson::JsonNode<>& node);
+        static uint32_t ConvertRGBA(jaweson::JsonNode<>& node);
+        static void SetUIPositionSize(jaweson::JsonNode<>& node, RegionObject* obj, v2i offset);
     };
     
     //
@@ -796,34 +454,9 @@ namespace sgui
         SGClickingMgr() {}
         
     public:
-        bool DragBegin(std::shared_ptr<SGClickableObject> dr, int32_t x, int32_t y) {
-            if(!draging_object.expired())
-                draging_object.lock()->OnDragEnd(x, y);
-            draging_object = dr;
-            start_point = {x, y};
-            diff_value = {0, 0};
-            if(dr)
-                return dr->OnDragBegin(x, y);
-            return false;
-        }
-        
-        bool DragEnd(int32_t x, int32_t y) {
-            if(!draging_object.expired()) {
-                auto ret = draging_object.lock()->OnDragEnd(x, y);
-                draging_object.reset();
-                return ret;
-            }
-            return false;
-        }
-        
-        bool DragUpdate(int32_t dx, int32_t dy) {
-            if(!draging_object.expired()) {
-                auto ret = draging_object.lock()->OnDragUpdate(start_point.x, start_point.y, dx, dy);
-                start_point = v2i{dx, dy};
-                return ret;
-            }
-            return false;
-        }
+        bool DragBegin(std::shared_ptr<SGClickableObject> dr, int32_t x, int32_t y);
+        bool DragEnd(int32_t x, int32_t y);
+        bool DragUpdate(int32_t dx, int32_t dy);
         
         inline v2i& GetDiffValue() { return diff_value; }
         inline void CancelDrag() { draging_object.reset(); }
@@ -831,7 +464,7 @@ namespace sgui
         inline void SetClickingObject(std::shared_ptr<SGClickableObject> target) { clicking_object = target; }
 
     public:
-        static SGClickingMgr& GetSingleton() { static SGClickingMgr mgr; return mgr; }
+        static inline SGClickingMgr& GetSingleton() { static SGClickingMgr mgr; return mgr; }
         std::weak_ptr<SGClickableObject> clicking_object;
         std::weak_ptr<SGClickableObject> draging_object;
         v2i start_point = {0, 0};
@@ -936,7 +569,7 @@ namespace sgui
         virtual SGWidget* FindWidget(const std::string& nm) { return name == nm ? this : nullptr; }
         
         template<typename T>
-        inline T* FindWidgetAs(const std::string& nm) { return dynamic_cast<T>(FindWidget(nm)); }
+        inline T* FindWidgetAs(const std::string& nm) { return dynamic_cast<T*>(FindWidget(nm)); }
         
     protected:
         bool is_visible = true;
@@ -2677,36 +2310,16 @@ namespace sgui
         void UpdateBackTex() {
             UIVertexArray<4> v;
             auto back_surface = static_cast<UISpriteList*>(ui_components[1]);
+            auto sel_texf = SGGUIRoot::GetSingleton().GetGuiTexture()->ConvTextureInfo(sel_tex);
             for(int32_t i = 0; i < back_surface->GetCapacity(); ++i) {
                 auto item_color = ((i + item_begin) == selection) ? color[2] : ((i + item_begin) % 2) ? color[0] : color[1];
-                //UpdateBackSprite(i, item_color, &v[0]);
-                //back_surface->SetSprite(&v[0], i);
-                v.BuildSprite({0, item_height * i, 0, item_height}, {0.0f, 0.0f, 1.0f, 0.0f}, sel_tex, item_color);
+                v.BuildSprite({0, item_height * i, 0, item_height}, {0.0f, 0.0f, 1.0f, 0.0f}, sel_texf, item_color);
                 back_surface->SetSprite(v.Ptr(), i);
             }
             auto back_offset = bounds.top + item_begin * item_height - item_offset;
             auto item_count = (area_size.absolute.y - bounds.top - bounds.height) / item_height + 1;
             back_surface->SetPositionSizeR({bounds.left, back_offset}, {-bounds.left - bounds.width, item_count * item_height});
         }
-        
-//        void UpdateBackSprite(int32_t index, int32_t bcolor, UIVertex* v) {
-//            v[0].offset = {0, item_height * index};
-//            v[0].prop = {0.0f, 0.0f};
-//            v[0].texcoord = {sel_tex.left, sel_tex.top},
-//            v[0].color = bcolor;
-//            v[1].offset = {0, item_height * index};
-//            v[1].prop = {1.0f, 0.0f};
-//            v[1].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top},
-//            v[1].color = bcolor;
-//            v[2].offset = {0, item_height * index + item_height};
-//            v[2].prop = {0.0f, 0.0f};
-//            v[2].texcoord = {sel_tex.left, sel_tex.top + sel_tex.width},
-//            v[2].color = bcolor;
-//            v[3].offset = {0, item_height * index + item_height};
-//            v[3].prop = {1.0f, 0.0f};
-//            v[3].texcoord = {sel_tex.left + sel_tex.width, sel_tex.top + sel_tex.width};
-//            v[3].color = bcolor;
-//        }
         
         virtual void SetSelection(int32_t sel, bool trigger = true) {
             if(selection == sel)
