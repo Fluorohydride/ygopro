@@ -62,7 +62,7 @@ function c87602890.operation(e,tp,eg,ep,ev,re,r,rp)
 		local att=0
 		if tc:IsFaceup() then att=tc:GetAttribute() end
 		if Duel.Destroy(tc,REASON_EFFECT)==0 or bit.band(att,ATTRIBUTE_LIGHT)==0 then return end
-		local lv=tc:GetLevel()
+		local lv=tc:GetOriginalLevel()
 		if tc:IsType(TYPE_XYZ) then
 			lv=tc:GetRank()
 		end
