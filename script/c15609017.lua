@@ -29,6 +29,7 @@ function c15609017.target(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	end
 	e:SetLabel(0)
 	local rt=Duel.GetTargetCount(Card.IsDestructable,tp,LOCATION_ONFIELD,LOCATION_ONFIELD,e:GetHandler())
+	if rt>2 then rt=2 end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_REMOVE)
 	local cg=Duel.SelectMatchingCard(tp,c15609017.costfilter,tp,LOCATION_GRAVE,0,1,rt,nil)
 	local ct=cg:GetCount()

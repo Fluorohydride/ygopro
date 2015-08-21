@@ -272,6 +272,7 @@ struct processor {
 	uint8 remove_brainwashing;
 	uint8 flip_delayed;
 	uint8 damage_calculated;
+	uint8 hand_adjusted;
 	uint8 summon_state_count[2];
 	uint8 normalsummon_state_count[2];
 	uint8 flipsummon_state_count[2];
