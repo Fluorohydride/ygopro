@@ -1053,8 +1053,8 @@ int32 card::add_effect(effect* peffect) {
 	}
 	if(peffect->type & EFFECT_TYPE_SINGLE && peffect->code == EFFECT_UPDATE_LEVEL && !(peffect->flag & EFFECT_FLAG_SINGLE_RANGE)) {
 		int32 val = peffect->get_value(this);
-		if(val > 0) {
-			pduel->game_field->raise_single_event(this, 0, EVENT_LEVEL_UP, peffect, 0, 0, 0, val);
+		if(val != 0) {
+			pduel->game_field->raise_single_event(this, 0, EVENT_LEVEL_CHANGE, peffect, 0, 0, 0, val);
 			pduel->game_field->process_single_event();
 		}
 	}
