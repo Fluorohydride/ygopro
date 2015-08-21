@@ -27,7 +27,8 @@ function c82971335.initial_effect(c)
 	e4:SetCategory(CATEGORY_DAMAGE)
 	e4:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_TRIGGER_F)
 	e4:SetProperty(EFFECT_FLAG_PLAYER_TARGET)
-	e4:SetCode(EVENT_LEVEL_UP)
+	e4:SetCode(EVENT_LEVEL_CHANGE)
+	e4:SetCondition(c82971335.damcon)
 	e4:SetTarget(c82971335.damtg)
 	e4:SetOperation(c82971335.damop)
 	c:RegisterEffect(e4)
@@ -47,6 +48,9 @@ function c82971335.lvop(e,tp,eg,ep,ev,re,r,rp)
 	e1:SetValue(1)
 	e1:SetReset(RESET_EVENT+0x1ff0000)
 	c:RegisterEffect(e1)
+end
+function c82971335.damcon(e,tp,eg,ep,ev,re,r,rp)
+	return ev and ev>0
 end
 function c82971335.damtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return true end
