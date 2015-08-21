@@ -797,10 +797,7 @@ namespace sgui
         std::weak_ptr<SGClickableObject> drag_target;
     };
     
-    class SGClickingMgr {
-    protected:
-        SGClickingMgr() {}
-        
+    class SGClickingMgr : public Singleton<SGClickingMgr> {
     public:
         bool DragBegin(std::shared_ptr<SGClickableObject> dr, int32_t x, int32_t y) {
             if(!draging_object.expired())
@@ -837,7 +834,6 @@ namespace sgui
         inline void SetClickingObject(std::shared_ptr<SGClickableObject> target) { clicking_object = target; }
 
     public:
-        static SGClickingMgr& GetSingleton() { static SGClickingMgr mgr; return mgr; }
         std::weak_ptr<SGClickableObject> clicking_object;
         std::weak_ptr<SGClickableObject> draging_object;
         v2i start_point = {0, 0};
@@ -907,10 +903,10 @@ namespace sgui
             auto ret = is_entity;
             ret = event_mouse_down.Trigger(*this, button, mods, x, y) || ret;
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
-                SGClickingMgr::GetSingleton().SetClickingObject(ptr);
+                SGClickingMgr::Get().SetClickingObject(ptr);
                 auto dr = GetDragTarget();
                 if(dr)
-                    ret = SGClickingMgr::GetSingleton().DragBegin(dr, x, y) || ret;
+                    ret = SGClickingMgr::Get().DragBegin(dr, x, y) || ret;
             }
             return ret;
         }
@@ -919,7 +915,7 @@ namespace sgui
             auto ret = is_entity;
             ret = event_mouse_up.Trigger(*this, button, mods, x, y) || ret;
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
-                if(SGClickingMgr::GetSingleton().GetClickingObject().get() == this)
+                if(SGClickingMgr::Get().GetClickingObject().get() == this)
                     event_click.Trigger(*this);
             }
             return ret;
@@ -1088,7 +1084,7 @@ namespace sgui
             } else {
                 auto dr = GetDragTarget();
                 if(dr && (button == GLFW_MOUSE_BUTTON_LEFT))
-                    ret = SGClickingMgr::GetSingleton().DragBegin(dr, x, y) || ret;
+                    ret = SGClickingMgr::Get().DragBegin(dr, x, y) || ret;
                 return ret;
             }
         }
@@ -1273,7 +1269,7 @@ namespace sgui
         bool InjectMouseMoveEvent(int32_t x, int32_t y) {
             if(!inside_scene)
                 OnMouseEnter();
-            SGClickingMgr::GetSingleton().DragUpdate(x, y);
+            SGClickingMgr::Get().DragUpdate(x, y);
             mouse_pos = {x, y};
             return OnMouseMove(x, y);
         }
@@ -1321,8 +1317,8 @@ namespace sgui
         bool InjectMouseButtonUpEvent(int32_t button, int32_t mods, int32_t x, int32_t y) {
             auto ret = OnMouseUp(button, mods, x, y);
             if(button == GLFW_MOUSE_BUTTON_LEFT) {
-                SGClickingMgr::GetSingleton().DragEnd(x, y);
-                SGClickingMgr::GetSingleton().SetClickingObject(nullptr);
+                SGClickingMgr::Get().DragEnd(x, y);
+                SGClickingMgr::Get().SetClickingObject(nullptr);
             }
             return ret;
         }
@@ -1584,7 +1580,7 @@ namespace sgui
         
         virtual bool OnMouseEnter() {
             if(!is_push_button) {
-                if((status == STATUS_DOWN) && SGClickingMgr::GetSingleton().GetClickingObject().get() == this) {
+                if((status == STATUS_DOWN) && SGClickingMgr::Get().GetClickingObject().get() == this) {
                     static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(style[STATUS_DOWN]);
                     if(this->common_ui)
                         this->common_ui->SetPositionR(common_ui_offset + press_offset);
@@ -1594,7 +1590,7 @@ namespace sgui
                 }
             } else {
                 if(status == STATUS_NORMAL) {
-                    if(SGClickingMgr::GetSingleton().GetClickingObject().get() == this) {
+                    if(SGClickingMgr::Get().GetClickingObject().get() == this) {
                         static_cast<UISprite*>(this->ui_components[0])->SetTextureRect(style[STATUS_DOWN]);
                         if(this->common_ui)
                             this->common_ui->SetPositionR(common_ui_offset + press_offset);
@@ -1787,7 +1783,7 @@ namespace sgui
         }
         
         virtual bool OnMouseEnter() {
-            if((status == STATUS_DOWN) && SGClickingMgr::GetSingleton().GetClickingObject().get() == this) {
+            if((status == STATUS_DOWN) && SGClickingMgr::Get().GetClickingObject().get() == this) {
                 static_cast<UISprite9*>(this->ui_components[0])->SetTextureRect(style[STATUS_DOWN + (checked ? 3 : 0)]);
             } else {
                 status = STATUS_HOVING;
@@ -2028,7 +2024,7 @@ namespace sgui
         
         virtual bool OnDragBegin(int32_t x, int32_t y) {
             if(slength == 0 || !is_enabled) {
-                SGClickingMgr::GetSingleton().CancelDrag();
+                SGClickingMgr::Get().CancelDrag();
                 return true;
             }
             if(status == STATUS_HOVING) {
@@ -2046,7 +2042,7 @@ namespace sgui
                     else
                         AddValue(0.1f);
                 }
-                SGClickingMgr::GetSingleton().CancelDrag();
+                SGClickingMgr::Get().CancelDrag();
                 OnMouseMove(x, y);
             }
             return true;
@@ -2062,7 +2058,7 @@ namespace sgui
             if(slength == 0 || !is_enabled)
                 return true;
             int32_t prepos = current_pos;
-            auto& diff = SGClickingMgr::GetSingleton().GetDiffValue();
+            auto& diff = SGClickingMgr::Get().GetDiffValue();
             if(is_horizontal)
                 current_pos += dx - sx + diff.x;
             else
@@ -2228,7 +2224,7 @@ namespace sgui
                 auto pos = area_pos.absolute + v2i{dx - sx, dy - sy};
                 SetPosition(pos);
             } else {
-                auto& diff_size = SGClickingMgr::GetSingleton().GetDiffValue();
+                auto& diff_size = SGClickingMgr::Get().GetDiffValue();
                 auto sz = area_size.absolute + v2i{dx - sx, dy - sy} + diff_size;
                 if(sz.x < min_size.x) {
                     diff_size.x = sz.x - min_size.x;
@@ -3506,10 +3502,10 @@ namespace sgui
             auto xoff = x - (area_pos.absolute.x + text_area.left + text_offset.x - display_offset);
             int32_t beg = txt->CheckHitPositionSingleLine(xoff);
             SetCursorPos(beg);
-            SGClickingMgr::GetSingleton().GetDiffValue().x = beg;
+            SGClickingMgr::Get().GetDiffValue().x = beg;
             auto last_check = SGGUIRoot::GetSingleton().GetSysClock();
             SGGUIRoot::GetSingleton().RegisterTimerEvent([this, last_check]() mutable ->uint64_t {
-                if(SGClickingMgr::GetSingleton().GetClickingObject().get() != this)
+                if(SGClickingMgr::Get().GetClickingObject().get() != this)
                     return 0;
                 auto now = SGGUIRoot::GetSingleton().GetSysClock();
                 if(now - last_check > 50) {
@@ -3543,7 +3539,7 @@ namespace sgui
             auto txt = static_cast<UIText*>(this->ui_components[2]);
             auto xoff = ex - (area_pos.absolute.x + text_area.left + text_offset.x - display_offset);
             int32_t end = txt->CheckHitPositionSingleLine(xoff);
-            int32_t beg = SGClickingMgr::GetSingleton().GetDiffValue().x;
+            int32_t beg = SGClickingMgr::Get().GetDiffValue().x;
             if(end >= beg) {
                 SetSelectedText(beg, end + 1);
             } else {
