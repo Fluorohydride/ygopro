@@ -45,11 +45,17 @@ function c37192109.rmop(e,tp,eg,ep,ev,re,r,rp)
 	if not c:IsRelateToEffect(e) or not tc:IsRelateToEffect(e) then return end
 	local g=Group.FromCards(c,tc)
 	if Duel.Remove(g,0,REASON_EFFECT+REASON_TEMPORARY)~=0 then
-		local fid=e:GetHandler():GetFieldID()
+		local fid=c:GetFieldID()
+		local rct=1
+		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then rct=2 end
 		local og=Duel.GetOperatedGroup()
 		local oc=og:GetFirst()
 		while oc do
-			oc:RegisterFlagEffect(37192109,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,2,fid)
+			if oc:IsControler(tp) then
+				oc:RegisterFlagEffect(37192109,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,rct,fid)
+			else
+				oc:RegisterFlagEffect(37192109,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,0,1,fid)
+			end
 			oc=og:GetNext()
 		end
 		og:KeepAlive()
@@ -57,12 +63,18 @@ function c37192109.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		e1:SetCountLimit(1)
 		e1:SetLabel(fid)
 		e1:SetLabelObject(og)
 		e1:SetCondition(c37192109.retcon)
 		e1:SetOperation(c37192109.retop)
+		if Duel.GetTurnPlayer()==tp and Duel.GetCurrentPhase()==PHASE_STANDBY then
+			e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,2)
+			e1:SetValue(Duel.GetTurnCount())
+		else
+			e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
+			e1:SetValue(0)
+		end
 		Duel.RegisterEffect(e1,tp)
 	end
 end
@@ -70,7 +82,7 @@ function c37192109.retfilter(c,fid)
 	return c:GetFlagEffectLabel(37192109)==fid
 end
 function c37192109.retcon(e,tp,eg,ep,ev,re,r,rp)
-	if Duel.GetTurnPlayer()~=tp then return false end
+	if Duel.GetTurnPlayer()~=tp or Duel.GetTurnCount()==e:GetValue() then return false end
 	local g=e:GetLabelObject()
 	if not g:IsExists(c37192109.retfilter,1,nil,e:GetLabel()) then
 		g:DeleteGroup()

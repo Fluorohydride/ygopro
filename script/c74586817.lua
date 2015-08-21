@@ -55,11 +55,15 @@ function c74586817.rmop(e,tp,eg,ep,ev,re,r,rp)
 	local rs=g:RandomSelect(1-tp,1)
 	local rg=Group.FromCards(c,rs:GetFirst())
 	if Duel.Remove(rg,POS_FACEUP,REASON_EFFECT+REASON_TEMPORARY)~=0 then
-		local fid=e:GetHandler():GetFieldID()
+		local fid=c:GetFieldID()
 		local og=Duel.GetOperatedGroup()
 		local oc=og:GetFirst()
 		while oc do
-			oc:RegisterFlagEffect(74586817,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY,0,2,fid)
+			if oc:IsControler(tp) then
+				oc:RegisterFlagEffect(74586817,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN,0,1,fid)
+			else
+				oc:RegisterFlagEffect(74586817,RESET_EVENT+0x1fe0000+RESET_PHASE+PHASE_STANDBY+RESET_OPPO_TURN,0,1,fid)
+			end
 			oc=og:GetNext()
 		end
 		og:KeepAlive()
@@ -67,12 +71,12 @@ function c74586817.rmop(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
 		e1:SetProperty(EFFECT_FLAG_IGNORE_IMMUNE)
 		e1:SetCode(EVENT_PHASE+PHASE_STANDBY)
-		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		e1:SetCountLimit(1)
 		e1:SetLabel(fid)
 		e1:SetLabelObject(og)
 		e1:SetCondition(c74586817.retcon)
 		e1:SetOperation(c74586817.retop)
+		e1:SetReset(RESET_PHASE+PHASE_STANDBY+RESET_SELF_TURN)
 		Duel.RegisterEffect(e1,tp)
 	end
 end
@@ -121,7 +125,7 @@ function c74586817.retop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c74586817.tdtg(e,tp,eg,ep,ev,re,r,rp,chk,chkc)
 	if chkc then return chkc:IsLocation(LOCATION_GRAVE) and chkc:IsAbleToDeck() and chkc~=e:GetHandler() end
-	if chk==0 then return e:GetHandler():IsAbleToDeck()
+	if chk==0 then return e:GetHandler():IsAbleToExtra()
 		and Duel.IsExistingTarget(Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,e:GetHandler()) end
 	Duel.Hint(HINT_SELECTMSG,tp,HINTMSG_TODECK)
 	local g=Duel.SelectTarget(tp,Card.IsAbleToDeck,tp,LOCATION_GRAVE,LOCATION_GRAVE,1,1,e:GetHandler())
