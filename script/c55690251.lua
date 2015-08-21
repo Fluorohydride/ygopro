@@ -23,7 +23,7 @@ function c55690251.initial_effect(c)
 	--send to grave
 	local e4=Effect.CreateEffect(c)
 	e4:SetDescription(aux.Stringid(55690251,1))
-	e4:SetCategory(CATEGORY_REMOVE)
+	e4:SetCategory(CATEGORY_TOGRAVE)
 	e4:SetProperty(EFFECT_FLAG_CARD_TARGET)
 	e4:SetType(EFFECT_TYPE_IGNITION)
 	e4:SetCountLimit(1)
@@ -66,7 +66,7 @@ function c55690251.operation(e,tp,eg,ep,ev,re,r,rp)
 		e1:SetCode(EFFECT_UPDATE_ATTACK)
 		e1:SetValue(-1000)
 		c:RegisterEffect(e1)
-		if tc and tc:IsRelateToEffect(e) then
+		if tc and tc:IsRelateToEffect(e) and not c:IsHasEffect(EFFECT_REVERSE_UPDATE) then
 			Duel.SendtoGrave(tc,REASON_EFFECT)
 		end
 	end
