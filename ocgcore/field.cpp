@@ -1733,18 +1733,26 @@ int32 field::check_synchro_material(card* pcard, int32 findex1, int32 findex2, i
 		if(eset.size())
 			return check_tuner_material(pcard, eset[0]->handler, findex1, findex2, min, max, smat, mg);
 	}
-	for(uint8 p = 0; p < 2; ++p) {
-		for(int32 i = 0; i < 5; ++i) {
-			tuner = player[p].list_mzone[i];
+	if(mg) {
+		for(auto cit = mg->container.begin(); cit != mg->container.end(); ++cit) {
+			tuner = *cit;
 			if(check_tuner_material(pcard, tuner, findex1, findex2, min, max, smat, mg))
 				return TRUE;
+		}
+	} else {
+		for(uint8 p = 0; p < 2; ++p) {
+			for(int32 i = 0; i < 5; ++i) {
+				tuner = player[p].list_mzone[i];
+				if(check_tuner_material(pcard, tuner, findex1, findex2, min, max, smat, mg))
+					return TRUE;
+			}
 		}
 	}
 	return FALSE;
 }
 int32 field::check_tuner_material(card* pcard, card* tuner, int32 findex1, int32 findex2, int32 min, int32 max, card* smat, group* mg) {
 	effect* peffect;
-	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type()&TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
+	if(tuner && tuner->is_position(POS_FACEUP) && (tuner->get_type() & TYPE_TUNER) && tuner->is_can_be_synchro_material(pcard)) {
 		effect* pcheck = tuner->is_affected_by_effect(EFFECT_SYNCHRO_CHECK);
 		if(pcheck)
 			pcheck->get_value(tuner);
