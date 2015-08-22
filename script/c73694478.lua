@@ -14,9 +14,10 @@ function c73694478.initial_effect(c)
 	--tohand
 	local e2=Effect.CreateEffect(c)
 	e2:SetCategory(CATEGORY_TOHAND)
-	e2:SetType(EFFECT_TYPE_IGNITION)
+	e2:SetType(EFFECT_TYPE_QUICK_O)
 	e2:SetRange(LOCATION_GRAVE)
 	e2:SetProperty(EFFECT_FLAG_CARD_TARGET)
+	e2:SetCode(EVENT_FREE_CHAIN)
 	e2:SetCondition(c73694478.thcon)
 	e2:SetCost(c73694478.thcost)
 	e2:SetTarget(c73694478.thtg)
@@ -51,7 +52,8 @@ function c73694478.activate(e,tp,eg,ep,ev,re,r,rp)
 	end
 end
 function c73694478.thcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount()
+	return e:GetHandler():GetTurnID()~=Duel.GetTurnCount() and Duel.GetTurnPlayer()==tp
+		and (Duel.GetCurrentPhase()==PHASE_MAIN1 or Duel.GetCurrentPhase()==PHASE_MAIN2)
 end
 function c73694478.thcost(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return e:GetHandler():IsAbleToRemoveAsCost() end
