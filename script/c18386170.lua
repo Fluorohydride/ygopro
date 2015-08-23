@@ -69,7 +69,7 @@ function c18386170.drop(e,tp,eg,ep,ev,re,r,rp)
 end
 function c18386170.hdcon(e,tp,eg,ep,ev,re,r,rp)
 	local c=e:GetHandler()
-	return rp~=tp and (c:IsReason(REASON_BATTLE) or (c:IsReason(REASON_EFFECT) and c:GetPreviousControler()==tp))
+	return (rp~=tp and c:IsReason(REASON_EFFECT) and c:GetPreviousControler()==tp and c:IsPreviousLocation(LOCATION_ONFIELD)) or c:IsReason(REASON_BATTLE)
 end
 function c18386170.hdtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.GetFieldGroupCount(tp,0,LOCATION_HAND)>0 end
