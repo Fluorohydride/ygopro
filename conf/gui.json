@@ -1,12 +1,12 @@
 {
-  "gui_texture": "./gui.png",
+  "gui_texture": "./conf/gui.png",
   "emoji": {
-    "texture" : "./emoji.png",
+    "texture" : "./conf/emoji.png",
     "size" : [20, 20],
     "count" : [12, 12]
   },
   "fonts" : {
-    "default" : ["./wqy-zenhei.ttc", 28, "regular", 0, 24]
+    "default" : ["./conf/wqy-zenhei.ttc", 28, "regular", 0, 24]
   },
   "image" : {
     "sprite_offset" : [0, 0, 0, 0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0]

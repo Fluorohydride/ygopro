@@ -88,6 +88,7 @@ struct ToInner<std::string, std::wstring> {
     static std::wstring C(const std::string& val) {
         static std::vector<wchar_t> buffer(2048);
         const char* p = val.c_str();
+        buffer.clear();
         while(*p != 0) {
             if((*p & 0x80) == 0) {
                 buffer.push_back(*p);

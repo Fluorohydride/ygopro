@@ -119,7 +119,8 @@ namespace ygopro
 				cd.race = sqlite3_column_int(pStmt, 8);
 				cd.attribute = sqlite3_column_int(pStmt, 9);
 				cd.category = sqlite3_column_int(pStmt, 10);
-                cd.name = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 12)));
+                std::string str((const char*)sqlite3_column_text(pStmt, 12));
+                cd.name = To<std::wstring>(str);
                 cd.texts = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 13)));
                 for(uint32_t i = 0; i < 16; ++i)
                     cd.desc[i] = To<std::wstring>(std::string((const char*)sqlite3_column_text(pStmt, 14 + i)));
