@@ -3705,6 +3705,7 @@ int32 field::process_battle_command(uint16 step) {
 		card_set ing;
 		card_set ed;
 		if(core.attacker->is_status(STATUS_BATTLE_DESTROYED) 
+				&& !(core.attacker->current.reason & REASON_RULE) 
 				&& !((core.attacker->current.reason & REASON_EFFECT + REASON_DESTROY) == REASON_EFFECT + REASON_DESTROY)) {
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_DESTROYING, 0, core.attacker->current.reason, core.attack_target->current.controler, 0, 1);
 			raise_single_event(core.attacker, 0, EVENT_BATTLE_DESTROYED, 0, core.attacker->current.reason, core.attack_target->current.controler, 0, 0);
@@ -3712,6 +3713,7 @@ int32 field::process_battle_command(uint16 step) {
 			ed.insert(core.attacker);
 		}
 		if(core.attack_target && core.attack_target->is_status(STATUS_BATTLE_DESTROYED) 
+				&& !(core.attack_target->current.reason & REASON_RULE) 
 				&& !((core.attack_target->current.reason & REASON_EFFECT + REASON_DESTROY) == REASON_EFFECT + REASON_DESTROY)) {
 			raise_single_event(core.attacker, 0, EVENT_BATTLE_DESTROYING, 0, core.attack_target->current.reason, core.attacker->current.controler, 0, 0);
 			raise_single_event(core.attack_target, 0, EVENT_BATTLE_DESTROYED, 0, core.attack_target->current.reason, core.attacker->current.controler, 0, 1);
