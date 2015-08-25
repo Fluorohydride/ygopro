@@ -182,8 +182,18 @@ void ClientField::AddCard(ClientCard* pcard, int controler, int location, int se
 		break;
 	}
 	case LOCATION_EXTRA: {
-		extra[controler].push_back(pcard);
-		pcard->sequence = extra[controler].size() - 1;
+		if (sequence != 0 || extra[controler].size() == 0) {
+			extra[controler].push_back(pcard);
+			pcard->sequence = extra[controler].size() - 1;
+		} else {
+			extra[controler].push_back(0);
+			for(int i = extra[controler].size() - 1; i > 0; --i) {
+				extra[controler][i] = extra[controler][i - 1];
+				extra[controler][i]->sequence++;
+			}
+			extra[controler][0] = pcard;
+			pcard->sequence = 0;
+		}
 		break;
 	}
 	}
