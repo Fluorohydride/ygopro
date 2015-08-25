@@ -1350,6 +1350,24 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			core.select_chains.push_back(newchain);
 			cn_count++;
 		}
+		for(auto eit = effects.pheff.begin(); eit != effects.pheff.end(); ++eit) {
+			peffect = *eit;
+			if(peffect->code != EFFECT_SET_CONTROL)
+				continue;
+			if(peffect->get_owner_player() != check_player)
+				continue;
+			if(!(peffect->reset_flag & phase))
+				continue;
+			uint8 pid = peffect->get_handler_player();
+			uint8 tp = infos.turn_player;
+			if(!(((peffect->reset_flag & RESET_SELF_TURN) && pid == tp) || ((peffect->reset_flag & RESET_OPPO_TURN) && pid != tp)))
+				continue;
+			if((peffect->reset_count & 0xff) != 1)
+				continue;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			cn_count++;
+		}
 		core.spe_effect[check_player] = 0;
 		if(!core.hand_adjusted) {
 			pr = effects.trigger_o_effect.equal_range(phase_event);
@@ -1449,7 +1467,14 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		core.units.begin()->arg2 = 2;
 		newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
-		if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
+		if(!(peffect->type & EFFECT_TYPE_ACTIONS)) {
+			if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+				remove_effect(peffect);
+			else
+				peffect->handler->remove_effect(peffect);
+			adjust_all();
+			core.units.begin()->step = 3;
+		} else if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
 			newchain.flag = 0;
 			newchain.chain_id = infos.field_id++;
 			newchain.evt = nil_event;
@@ -1517,6 +1542,24 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 			if(peffect->get_handler_player() != check_player || !peffect->is_activateable(check_player, nil_event))
 				continue;
 			peffect->id = infos.field_id++;
+			newchain.triggering_effect = peffect;
+			core.select_chains.push_back(newchain);
+			cn_count++;
+		}
+		for(auto eit = effects.pheff.begin(); eit != effects.pheff.end(); ++eit) {
+			peffect = *eit;
+			if(peffect->code != EFFECT_SET_CONTROL)
+				continue;
+			if(peffect->get_owner_player() != check_player)
+				continue;
+			if(!(peffect->reset_flag & phase))
+				continue;
+			uint8 pid = peffect->get_handler_player();
+			uint8 tp = infos.turn_player;
+			if(!(((peffect->reset_flag & RESET_SELF_TURN) && pid == tp) || ((peffect->reset_flag & RESET_OPPO_TURN) && pid != tp)))
+				continue;
+			if((peffect->reset_count & 0xff) != 1)
+				continue;
 			newchain.triggering_effect = peffect;
 			core.select_chains.push_back(newchain);
 			cn_count++;
@@ -1622,7 +1665,14 @@ int32 field::process_phase_event(int16 step, int32 phase) {
 		core.units.begin()->arg2 = 2;
 		newchain = core.select_chains[returns.ivalue[0]];
 		effect* peffect = newchain.triggering_effect;
-		if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
+		if(!(peffect->type & EFFECT_TYPE_ACTIONS)) {
+			if(peffect->flag & EFFECT_FLAG_FIELD_ONLY)
+				remove_effect(peffect);
+			else
+				peffect->handler->remove_effect(peffect);
+			adjust_all();
+			core.units.begin()->step = 13;
+		} else if(!(peffect->type & EFFECT_TYPE_CONTINUOUS)) {
 			newchain.flag = 0;
 			newchain.chain_id = infos.field_id++;
 			newchain.evt = nil_event;
