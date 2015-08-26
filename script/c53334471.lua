@@ -99,7 +99,7 @@ function c53334471.adjustop(e,tp,eg,ep,ev,re,r,rp)
 	end
 	g1:Merge(g2)
 	if g1:GetCount()>0 then
-		Duel.SendtoGrave(g1,REASON_EFFECT)
+		Duel.SendtoGrave(g1,REASON_RULE)
 		Duel.Readjust()
 	end
 end

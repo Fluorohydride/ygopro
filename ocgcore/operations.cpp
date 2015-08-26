@@ -3028,7 +3028,9 @@ int32 field::send_to(uint16 step, group * targets, effect * reason_effect, uint3
 		card_set leave_p, destroying;
 		for(auto cit = targets->container.begin(); cit != targets->container.end(); ++cit) {
 			card* pcard = *cit;
-			if((pcard->current.location == LOCATION_MZONE) && pcard->is_status(STATUS_BATTLE_DESTROYED) && !(pcard->current.reason & (REASON_DESTROY | REASON_EFFECT))) {
+			if((pcard->current.location == LOCATION_MZONE) && pcard->is_status(STATUS_BATTLE_DESTROYED) 
+					&& !(pcard->current.reason & REASON_RULE) 
+					&& (pcard->current.reason & (REASON_DESTROY | REASON_EFFECT)) != (REASON_DESTROY | REASON_EFFECT)) {
 				pcard->current.reason |= REASON_DESTROY | REASON_BATTLE;
 				raise_single_event(pcard, 0, EVENT_DESTROY, pcard->current.reason_effect, pcard->current.reason, pcard->current.reason_player, 0, 0);
 				destroying.insert(pcard);
