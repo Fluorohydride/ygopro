@@ -29,9 +29,10 @@ namespace ygopro
         return true;
     }
     
-    void SceneMgr::Draw() {
+    bool SceneMgr::Draw() {
         if(current_scene != nullptr)
-            current_scene->Draw();
+            return current_scene->Draw();
+        return false;
     }
     
     void SceneMgr::SetSceneSize(v2i sz) {

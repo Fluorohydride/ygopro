@@ -27,8 +27,8 @@ namespace ygopro
     std::array<texf4, 10> result_tex;
     int32_t current_sel_result = -1;
     int32_t result_show_size = 0;
-    DeckData current_deck;
     v2i scene_size = {1, 1};
+    DeckData current_deck;
     
     int32_t BuilderCard::GetTextureId() {
         return ImageMgr::Get().GetRawCardTexture()->GetTextureId();
@@ -102,10 +102,14 @@ namespace ygopro
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
         misc_renderer = std::make_shared<MiscRenderer>();
         card_renderer = std::make_shared<CardRenderer>();
+        bg_renderer->SetShader(&base::Shader::GetDefaultShader());
+        misc_renderer->SetShader(&base::Shader::GetDefaultShader());
+        card_renderer->SetShader(&base::Shader::GetDefaultShader());
         PushObject(ImageMgr::Get());
         PushObject(bg_renderer.get());
-        PushObject(misc_renderer.get());
-        PushObject(misc_renderer.get());
+        //PushObject(misc_renderer.get());
+        //PushObject(card_renderer.get());
+        PushObject(sgui::SGGUIRoot::GetSingleton());
     }
     
     BuildScene::~BuildScene() {
@@ -125,39 +129,11 @@ namespace ygopro
         return IsActive();
     }
     
-    void BuildScene::Draw() {
-        Render();
-//        glViewport(0, 0, scene_size.x, scene_size.y);
-//        auto& shader = base::Shader::GetDefaultShader();
-//        shader.Use();
-//        shader.SetParam1i("texid", 0);
-//        // background
-//        ImageMgr::Get().GetRawBGTexture()->Bind();
-//        glBindVertexArray(back_vao);
-//        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-//        GLCheckError(__FILE__, __LINE__);
-//        // miscs
-//        ImageMgr::Get().GetRawMiscTexture()->Bind();
-//        glBindVertexArray(misc_vao);
-//        glDrawElements(GL_TRIANGLES, 33 * 6, GL_UNSIGNED_SHORT, 0);
-//        GLCheckError(__FILE__, __LINE__);
-//        // cards
-//        ImageMgr::Get().GetRawCardTexture()->Bind();
-//        // result
-//        if(result_show_size) {
-//            glBindVertexArray(result_vao);
-//            glDrawElements(GL_TRIANGLES, result_show_size * 24, GL_UNSIGNED_SHORT, 0);
-//            GLCheckError(__FILE__, __LINE__);
-//        }
-//        // deck
-//        size_t deck_sz = current_deck.main_deck.size() + current_deck.extra_deck.size() + current_deck.side_deck.size();
-//        if(deck_sz > 0) {
-//            glBindVertexArray(deck_vao);
-//            glDrawElements(GL_TRIANGLES, deck_sz * 24, GL_UNSIGNED_SHORT, 0);
-//        }
-//        GLCheckError(__FILE__, __LINE__);
-//        glBindVertexArray(0);
-//        shader.Unuse();
+    bool BuildScene::Draw() {
+        auto need_render = PrepareRender();
+        if(need_render)
+            Render();
+        return need_render;
     }
     
     void BuildScene::SetSceneSize(v2i sz) {
@@ -183,8 +159,11 @@ namespace ygopro
         dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
         scene_size = sz;
         bg_renderer->SetScreenSize(sz);
+        bg_renderer->SetViewport({0, 0, sz.x, sz.y});
         misc_renderer->SetScreenSize(sz);
+        misc_renderer->SetViewport({0, 0, sz.x, sz.y});
         card_renderer->SetScreenSize(sz);
+        card_renderer->SetViewport({0, 0, sz.x, sz.y});
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), recti{0, 0, sz.x, sz.y}, ImageMgr::Get().GetTexture("bg"));
         UpdateAllCard();

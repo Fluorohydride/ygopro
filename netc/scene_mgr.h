@@ -30,7 +30,7 @@ namespace ygopro
         virtual ~Scene() = default;
         virtual void Activate() = 0;
         virtual bool Update() = 0;
-        virtual void Draw() = 0;
+        virtual bool Draw() = 0;
         virtual void SetSceneSize(v2i sz) = 0;
         virtual recti GetScreenshotClip() = 0;
         virtual bool IsActive() { return is_active; }
@@ -53,7 +53,7 @@ namespace ygopro
         void Init();
         void Uninit();
         bool Update();
-        void Draw();
+        bool Draw();
         void SetSceneSize(v2i sz);
         inline v2i GetSceneSize() { return scene_size; }
         void ScreenShot();

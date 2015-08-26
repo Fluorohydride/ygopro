@@ -291,6 +291,7 @@ namespace base
             glDisable(GL_DEPTH_TEST);
             SetBlendFunc(blend_mode);
             glActiveTexture(GL_TEXTURE0);
+            glViewport(viewport.left, viewport.top, viewport.width, viewport.height);
             GLCheckError(__FILE__, __LINE__);
         }
         
@@ -344,6 +345,7 @@ namespace base
         inline void RequestUpdate() { need_update = true; }
         inline bool AllUnitNeedUpdate() { return all_need_update; }
         inline int32_t GetRenderVersion() { return render_version; }
+        inline void SetViewport(recti v) { viewport = v; }
         
         static void SetBlendFunc(BlendMode bm) {
             switch(bm) {
@@ -362,6 +364,7 @@ namespace base
         bool need_redraw = true;
         bool need_update = false;
         bool all_need_update = false;
+        recti viewport = {0, 0, 1, 1};
         std::vector<RenderCmd<VTYPE>*> render_commands;
         std::set<RenderUnit<VTYPE>*> all_units;     // owner
         std::set<RenderUnit<VTYPE>*> update_units;  // weak reference
@@ -454,7 +457,7 @@ namespace base
     
     class FrameControler : public SysClock {
     public:
-        inline void Init() { InitSysClock(); }
+        inline void InitFrameControler() { InitSysClock(); }
         
         void SetFrameRate(int32_t rate) {
             frame_interval = 1000L / rate;
@@ -479,7 +482,6 @@ namespace base
         inline void PushObject(IRenderer* obj) { renderer.push_back(obj); }
         inline void PushObject(IRenderer& obj) { renderer.push_back(&obj); }
         inline void Clear() { renderer.clear(); }
-        inline void SetViewport(recti v) { viewport = v; }
         
         virtual bool PrepareRender() {
             bool need_render = false;
@@ -490,7 +492,6 @@ namespace base
         
         virtual void Render() {
             GLCheckError(__FILE__, __LINE__);
-            glViewport(viewport.left, viewport.top, viewport.width, viewport.height);
             glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
             glClear(GL_COLOR_BUFFER_BIT);
             GLCheckError(__FILE__, __LINE__);
@@ -500,7 +501,6 @@ namespace base
         
     protected:
         std::vector<IRenderer*> renderer;
-        recti viewport = {0, 0, 1, 1};
     };
     
     class FrameBufferRenderer : public IRenderer {

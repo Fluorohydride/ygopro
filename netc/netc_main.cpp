@@ -188,64 +188,18 @@ int32_t main(int32_t argc, char* argv[]) {
         glfwSwapInterval(1);
     else
         glfwSwapInterval(0);
-//    while (!glfwWindowShouldClose(window)) {
-//        SceneMgr::Get().CheckFrameRate();
-//        auto& shader = base::Shader::GetDefaultShader();
-//        shader.Use();
-//        shader.SetParam1i("texID", 0);
-//        glfwPollEvents();
-//        if(!SceneMgr::Get().Update())
-//            break;
-//        shader.Unuse();
-//        if(need_draw) {
-//            SceneMgr::Get().Draw();
-//            sgui::SGGUIRoot::GetSingleton().Render();
-//        }
-//        glfwSwapBuffers(window);
-//    }
+    
     sgui::SGGUIRoot::GetSingleton().SetShader(&base::Shader::GetDefaultShader());
-    auto ptr = sgui::SGGUIRoot::GetSingleton().NewChild<sgui::SGWindow>();
-    ptr->SetDragable(true);
-    ptr->SetPositionSize({0, 0}, {0, 0}, {0.5f, 0.5f}, {0.5f, 0.5f}, {-0.5f, -0.5f});
-    ptr->GetCaption()->SetText(L"\ue020\ue021\ue022\ue023", 0xff00ffff);
+    SceneMgr::Get().InitFrameControler();
+    SceneMgr::Get().SetFrameRate(60);
     
-    base::FrameBufferRenderer fbr(bwidth, bheight, true);
-    fbr.SetRenderObject(&sgui::SGGUIRoot::GetSingleton());
-    base::SimpleTextureRenderer str(base::BlendMode::DrawFrameBuffer);
-    str.SetScreenSize({bwidth, bheight});
-    str.SetShader(&base::Shader::GetDefaultShader());
-    str.AddVertices(fbr.GetFrameBufferTexture(), recti{0, 0, bwidth, bheight}, recti{0, 0, bwidth, bheight});
-    base::RenderCompositor com;
-    com.SetViewport({0, 0, bwidth, bheight});
-    com.PushObject(fbr);
-    com.PushObject(str);
-    com.PushObject(&sgui::SGGUIRoot::GetSingleton());
-    
-    ActionMgr<int64_t> al;
-    al.InitActionTime(0);
-    auto as = std::make_shared<ActionSequence<int64_t>>(
-                                                        std::make_shared<ActionWait<int64_t>>(2000),
-                                                        std::make_shared<ActionCallback<int64_t>>([](){ std::cout << "Hello!" << std::endl; }),
-                                                        std::make_shared<ActionWait<int64_t>>(2000),
-                                                        std::make_shared<LerpAnimator<int64_t, sgui::SGWindow>>(5000, ptr->CastPtr<sgui::SGWindow>(), [](sgui::SGWindow* w, double t)->bool {
-        w->SetContainerAlpha(0.1 + 0.8 * t);
-        return true;
-    }, std::make_shared<TGenHarmonic<int64_t>>(2000)));
-    auto ar = std::make_shared<ActionRepeat<int64_t>>(as, 0);
-    al << ar;
-    base::FrameControler fc;
-    fc.Init();
-    fc.SetFrameRate(60);
     while (!glfwWindowShouldClose(window)) {
-        fc.CheckFrameRate();
+        SceneMgr::Get().CheckFrameRate();
         glfwPollEvents();
-        if(need_draw) {
-            al.UpdateActionTime(sgui::SGGUIRoot::GetSingleton().GetSysClock());
-            if(com.PrepareRender()) {
-                com.Render();
-                glfwSwapBuffers(window);
-            }
-        }
+        if(!SceneMgr::Get().Update())
+            break;
+        if(need_draw && SceneMgr::Get().Draw())
+            glfwSwapBuffers(window);
     }
     
     SceneMgr::Get().Uninit();

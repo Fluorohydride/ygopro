@@ -48,7 +48,7 @@ namespace ygopro
         virtual ~BuildScene();
         virtual void Activate();
         virtual bool Update();
-        virtual void Draw();
+        virtual bool Draw();
         virtual void SetSceneSize(v2i sz);
         virtual recti GetScreenshotClip();
         void ShowSelectedInfo(uint32_t pos, uint32_t index);
