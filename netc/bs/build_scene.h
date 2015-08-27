@@ -34,11 +34,13 @@ namespace ygopro
     
     class MiscRenderer : public base::RenderObject2DLayout {
     public:
+        MiscRenderer() { InitGLState(true); }
         virtual void PushVerticesAll();
     };
     
     class CardRenderer : public base::RenderObject2DLayout {
     public:
+        CardRenderer() { InitGLState(true); }
         virtual void PushVerticesAll();
     };
     
@@ -85,6 +87,7 @@ namespace ygopro
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
         std::shared_ptr<MiscRenderer> misc_renderer;
         std::shared_ptr<CardRenderer> card_renderer;
+        std::shared_ptr<base::RenderCompositorWithViewport> mix_renderer;
     };
     
 }

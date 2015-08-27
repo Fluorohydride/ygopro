@@ -20,6 +20,8 @@ namespace ygopro
     v2f icon_size = {0.0f, 0.0f};
     float minx = 0.0f;
     float maxx = 0.0f;
+    float miny = 0.0f;
+    float maxy = 0.0f;
     float main_y_spacing = 0.0f;
     float offsety[3] = {0.0f, 0.0f, 0.0f};
     float dx[3] = {0.0f, 0.0f, 0.0f};
@@ -46,8 +48,9 @@ namespace ygopro
     
     void MiscRenderer::PushVerticesAll() {
         base::RenderObject2DLayout::PushVerticesAll();
-        BeginPrimitive(GL_TRIANGLES, 0);
+        BeginPrimitive(GL_TRIANGLES, ImageMgr::Get().GetRawMiscTexture()->GetTextureId());
         std::array<vt2, 33 * 4> verts;
+        std::array<int16_t, 33 * 6> indices;
         auto msk = ImageMgr::Get().GetTexture("mmask");
         auto nbk = ImageMgr::Get().GetTexture("numback");
         float yrate = 1.0f - 40.0f / screen_size.y;
@@ -88,9 +91,18 @@ namespace ygopro
         numblock(&verts[96], {nx, my + card_size.y - th}, 0x80ffffff, 0xff000000, (int32_t)current_deck.main_deck.size());
         numblock(&verts[108], {nx, ey + card_size.y - th}, 0x80ffffff, 0xff000000, (int32_t)current_deck.extra_deck.size());
         numblock(&verts[120], {nx, sy + card_size.y - th}, 0x80ffffff, 0xff000000, (int32_t)current_deck.side_deck.size());
+        vt2::GenQuadIndex(indices.data(), 33);
+        PushVertices(verts.data(), indices.data(), 33 * 4, 33 * 6);
     }
     
     void CardRenderer::PushVerticesAll() {
+        base::RenderObject2DLayout::PushVerticesAll();
+        for(auto& iter : current_deck.main_deck)
+            iter->builder_card->PushVertices();
+        for(auto& iter : current_deck.extra_deck)
+            iter->builder_card->PushVertices();
+        for(auto& iter : current_deck.side_deck)
+            iter->builder_card->PushVertices();
     }
     
     BuildScene::BuildScene() {
@@ -102,13 +114,15 @@ namespace ygopro
         bg_renderer = std::make_shared<base::SimpleTextureRenderer>();
         misc_renderer = std::make_shared<MiscRenderer>();
         card_renderer = std::make_shared<CardRenderer>();
+        mix_renderer = std::make_shared<base::RenderCompositorWithViewport>();
         bg_renderer->SetShader(&base::Shader::GetDefaultShader());
         misc_renderer->SetShader(&base::Shader::GetDefaultShader());
         card_renderer->SetShader(&base::Shader::GetDefaultShader());
-        PushObject(ImageMgr::Get());
-        PushObject(bg_renderer.get());
-        //PushObject(misc_renderer.get());
+        mix_renderer->PushObject(bg_renderer.get());
+        mix_renderer->PushObject(misc_renderer.get());
         //PushObject(card_renderer.get());
+        PushObject(ImageMgr::Get());
+        PushObject(mix_renderer.get());
         PushObject(sgui::SGGUIRoot::GetSingleton());
     }
     
@@ -158,12 +172,10 @@ namespace ygopro
         int32_t rc2 = std::max((int32_t)current_deck.side_deck.size(), max_row_count);
         dx[2] = (rc2 == 1) ? 0.0f : (maxx - minx - card_size.x) / (rc2 - 1);
         scene_size = sz;
+        mix_renderer->SetViewport({0, 0, sz.x, sz.y});
         bg_renderer->SetScreenSize(sz);
-        bg_renderer->SetViewport({0, 0, sz.x, sz.y});
         misc_renderer->SetScreenSize(sz);
-        misc_renderer->SetViewport({0, 0, sz.x, sz.y});
         card_renderer->SetScreenSize(sz);
-        card_renderer->SetViewport({0, 0, sz.x, sz.y});
         bg_renderer->ClearVertices();
         bg_renderer->AddVertices(ImageMgr::Get().GetRawBGTexture(), recti{0, 0, sz.x, sz.y}, ImageMgr::Get().GetTexture("bg"));
         UpdateAllCard();
@@ -226,17 +238,17 @@ namespace ygopro
             ClearDeck();
             current_deck = tempdeck;
             for(auto& dcd : current_deck.main_deck) {
-                auto bc = std::make_shared<BuilderCard>();
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.extra_deck) {
-                auto bc = std::make_shared<BuilderCard>();
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.side_deck) {
-                auto bc = std::make_shared<BuilderCard>();
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 dcd->builder_card = bc;
             }
@@ -253,17 +265,17 @@ namespace ygopro
             current_deck = tempdeck;
             SetDeckDirty();
             for(auto& dcd : current_deck.main_deck) {
-                auto bc = std::make_shared<BuilderCard>();
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.extra_deck) {
-                auto bc = std::make_shared<BuilderCard>();
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 dcd->builder_card = bc;
             }
             for(auto& dcd : current_deck.side_deck) {
-                auto bc = std::make_shared<BuilderCard>();
+                auto bc = card_renderer->NewSharedObject<BuilderCard>();
                 bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
                 dcd->builder_card = bc;
             }
@@ -402,17 +414,17 @@ namespace ygopro
         ClearDeck();
         LimitRegulationMgr::Get().LoadCurrentListToDeck(current_deck, limit);
         for(auto& dcd : current_deck.main_deck) {
-            auto bc = std::make_shared<BuilderCard>();
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
             dcd->builder_card = bc;
         }
         for(auto& dcd : current_deck.extra_deck) {
-            auto bc = std::make_shared<BuilderCard>();
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
             dcd->builder_card = bc;
         }
         for(auto& dcd : current_deck.side_deck) {
-            auto bc = std::make_shared<BuilderCard>();
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->card_tex = ImageMgr::Get().GetCardTexture(dcd->data->code);
             dcd->builder_card = bc;
         }
@@ -512,7 +524,7 @@ namespace ygopro
         else
             ptr = current_deck.InsertCard(3, -1, data->code, true);
         if(ptr != nullptr) {
-            auto bc = std::make_shared<BuilderCard>();
+            auto bc = card_renderer->NewSharedObject<BuilderCard>();
             bc->card_tex = ImageMgr::Get().GetCardTexture(data->code);
             auto mpos = SceneMgr::Get().GetMousePosition();
             bc->pos = (v2f){(float)mpos.x / scene_size.x * 2.0f - 1.0f, 1.0f - (float)mpos.y / scene_size.y * 2.0f};

@@ -189,11 +189,8 @@ namespace base
         }
         
         virtual ~RenderObject() {
-            for(auto unit : all_units)
-                delete unit;
             for(auto& rc : render_commands)
                 delete rc;
-            all_units.clear();
         }
         
         std::tuple<int16_t, int16_t> BeginPrimitive(int16_t pri_type, int16_t texid) {
@@ -291,7 +288,6 @@ namespace base
             glDisable(GL_DEPTH_TEST);
             SetBlendFunc(blend_mode);
             glActiveTexture(GL_TEXTURE0);
-            glViewport(viewport.left, viewport.top, viewport.width, viewport.height);
             GLCheckError(__FILE__, __LINE__);
         }
         
@@ -309,8 +305,18 @@ namespace base
         template<typename ALLOC_TYPE, typename... TR>
         ALLOC_TYPE* NewObject(TR... tr) {
             static_assert(std::is_base_of<RenderUnit<VTYPE>, ALLOC_TYPE>::value, "object type should be subclass of RenderUnit.");
-            auto ptr = new ALLOC_TYPE(std::forward<TR>(tr)...);
+            auto ptr = std::make_shared<ALLOC_TYPE>(std::forward<TR>(tr)...);
             ptr->manager = this;
+            all_units[ptr.get()] = ptr;
+            return ptr.get();
+        }
+        
+        template<typename ALLOC_TYPE, typename... TR>
+        std::shared_ptr<ALLOC_TYPE> NewSharedObject(TR... tr) {
+            static_assert(std::is_base_of<RenderUnit<VTYPE>, ALLOC_TYPE>::value, "object type should be subclass of RenderUnit.");
+            auto ptr = std::make_shared<ALLOC_TYPE>(std::forward<TR>(tr)...);
+            ptr->manager = this;
+            all_units[ptr.get()] = ptr;
             return ptr;
         }
         
@@ -345,7 +351,6 @@ namespace base
         inline void RequestUpdate() { need_update = true; }
         inline bool AllUnitNeedUpdate() { return all_need_update; }
         inline int32_t GetRenderVersion() { return render_version; }
-        inline void SetViewport(recti v) { viewport = v; }
         
         static void SetBlendFunc(BlendMode bm) {
             switch(bm) {
@@ -364,9 +369,8 @@ namespace base
         bool need_redraw = true;
         bool need_update = false;
         bool all_need_update = false;
-        recti viewport = {0, 0, 1, 1};
         std::vector<RenderCmd<VTYPE>*> render_commands;
-        std::set<RenderUnit<VTYPE>*> all_units;     // owner
+        std::map<RenderUnit<VTYPE>*, std::shared_ptr<RenderUnit<VTYPE>>> all_units;     // owner
         std::set<RenderUnit<VTYPE>*> update_units;  // weak reference
     };
     
@@ -482,6 +486,12 @@ namespace base
         inline void PushObject(IRenderer* obj) { renderer.push_back(obj); }
         inline void PushObject(IRenderer& obj) { renderer.push_back(&obj); }
         inline void Clear() { renderer.clear(); }
+        inline void SetClearColor(float r, float g, float b, float a) {
+            clear_color[0] = r;
+            clear_color[1] = g;
+            clear_color[2] = b;
+            clear_color[3] = a;
+        }
         
         virtual bool PrepareRender() {
             bool need_render = false;
@@ -492,7 +502,7 @@ namespace base
         
         virtual void Render() {
             GLCheckError(__FILE__, __LINE__);
-            glClearColor(0.2f, 0.2f, 0.2f, 1.0f);
+            glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
             glClear(GL_COLOR_BUFFER_BIT);
             GLCheckError(__FILE__, __LINE__);
             for(auto& r : renderer)
@@ -500,7 +510,25 @@ namespace base
         }
         
     protected:
+        float clear_color[4] = {0.2f, 0.2f, 0.2f, 1.0f};
         std::vector<IRenderer*> renderer;
+    };
+    
+    class RenderCompositorWithViewport : public RenderCompositor {
+    public:
+        void SetViewport(recti v) { viewport = v; }
+        virtual void Render() {
+            GLCheckError(__FILE__, __LINE__);
+            glClearColor(clear_color[0], clear_color[1], clear_color[2], clear_color[3]);
+            glClear(GL_COLOR_BUFFER_BIT);
+            glViewport(viewport.left, viewport.top, viewport.width, viewport.height);
+            GLCheckError(__FILE__, __LINE__);
+            for(auto& r : renderer)
+                r->Render();
+        }
+        
+    protected:
+        recti viewport = {0, 0, 1, 1};
     };
     
     class FrameBufferRenderer : public IRenderer {

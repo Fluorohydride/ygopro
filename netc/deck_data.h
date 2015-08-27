@@ -22,7 +22,7 @@ namespace ygopro
         DeckCardData(CardData* d, uint32_t l): data(d), limit(l) {}
         CardData* data;
         uint32_t limit;
-        std::shared_ptr<BuilderCard> builder_card;
+        std::shared_ptr<BuilderCard> builder_card = nullptr;
     };
     
 	struct DeckData {
