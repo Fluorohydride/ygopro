@@ -56,7 +56,7 @@ function c22404675.splimit(e,c,sump,sumtype,sumpos,targetp,se)
 	return c:IsLocation(LOCATION_EXTRA)
 end
 function c22404675.sumcon(e,tp,eg,ep,ev,re,r,rp)
-	return e:GetHandler():IsReason(REASON_SUMMON)
+	return e:GetHandler():IsReason(REASON_SUMMON) and Duel.GetTurnPlayer()==tp
 end
 function c22404675.sumtg(e,tp,eg,ep,ev,re,r,rp,chk)
 	if chk==0 then return Duel.IsPlayerCanSummon(tp) end
