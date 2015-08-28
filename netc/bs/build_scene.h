@@ -12,7 +12,15 @@ namespace ygopro
     
     struct FilterCondition;
     
-    class BuilderCard : public base::RenderUnit<vt2> {
+    enum class CardLocation {
+        Main = 0,
+        Extra = 1,
+        Side = 2,
+        Result = 3,
+        Null = 4,
+    };
+    
+    class BuilderCard : public base::RenderUnit<vt2>, public std::enable_shared_from_this<BuilderCard> {
     public:
         virtual ~BuilderCard() {}
         virtual bool CheckAvailable() { return true; }
@@ -20,6 +28,12 @@ namespace ygopro
         virtual int32_t GetTextureId();
         virtual void RefreshVertices();
         
+        v2f GetCurrentPos(CardLocation loc, int32_t seq);
+        void SetNewIndex(int16_t idx);
+        void PushIndices(std::vector<int16_t>& idx);
+        void LoadCardTexture(uint32_t cid);
+        
+        inline int16_t GetIndex() { return index_index; }
         inline void SetPos(v2f p) { pos = p; SetUpdate(); }
         inline void SetSize(v2f s) { size = s; SetUpdate(); }
         inline void SetHL(uint32_t h) { hl = h; SetUpdate(); }
@@ -42,9 +56,10 @@ namespace ygopro
     public:
         CardRenderer() { InitGLState(true); }
         virtual void PushVerticesAll();
+        void RefreshIndex();
     };
     
-    class BuildScene : public Scene, public base::RenderCompositor {
+    class BuildScene : public Scene, public ActionMgr<int64_t>, public base::RenderCompositorWithViewport {
     public:
         BuildScene();
         virtual ~BuildScene();
@@ -87,7 +102,6 @@ namespace ygopro
         std::shared_ptr<base::SimpleTextureRenderer> bg_renderer;
         std::shared_ptr<MiscRenderer> misc_renderer;
         std::shared_ptr<CardRenderer> card_renderer;
-        std::shared_ptr<base::RenderCompositorWithViewport> mix_renderer;
     };
     
 }

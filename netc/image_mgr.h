@@ -19,7 +19,8 @@ namespace ygopro
 	public:
         ImageMgr() : base::FrameBufferRenderer(2048, 2048, false, false) {}
         
-		texf4& GetCardTexture(uint32_t id);
+        texf4& GetCardTexture(uint32_t id, std::function<void(texf4)> loaded_cb);
+        void LoadCardTextureFromList(int32_t load_count);
         texf4& GetTexture(const std::string& name);
         base::Texture* LoadBigCardTexture(uint32_t id);
         base::Texture* GetRawCardTexture() { return render_tex; }
@@ -51,6 +52,7 @@ namespace ygopro
         base::Texture card_image;
         ZipReader imageZip;
         std::shared_ptr<base::SimpleTextureRenderer> image_render;
+        std::list<std::pair<uint32_t, std::function<void(texf4)>>> loading_card;
 	};
 
 }

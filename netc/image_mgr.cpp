@@ -10,51 +10,68 @@
 namespace ygopro
 {
 
-	texf4& ImageMgr::GetCardTexture(uint32_t id) {
+	texf4& ImageMgr::GetCardTexture(uint32_t id, std::function<void(texf4)> loaded_cb) {
 		auto iter = card_textures.find(id);
-		if(iter == card_textures.end()) {
-            std::string file = To<std::string>("%d.jpg", id);
-			auto& cti = card_textures[id];
-            size_t length = imageZip.GetFileLength(file);
-            if(length == 0) {
-                file = To<std::string>("%d.png", id);
-                length = imageZip.GetFileLength(file);
-            }
-			if(length == 0) {
-				cti.tex_info = misc_textures["unknown"];
+		if(iter != card_textures.end()) {
+            IncreaseRef(iter->second.ref_block);
+            return iter->second.tex_info;
+        } else {
+            loading_card.push_back(std::make_pair(id, loaded_cb));
+            return misc_textures["unknown"];
+        }
+	}
+    
+    void ImageMgr::LoadCardTextureFromList(int32_t load_count) {
+        for(int32_t i = 0; i < load_count; ++i) {
+            if(loading_card.empty())
+                return;
+            auto id = loading_card.front().first;
+            auto& loaded_cb = loading_card.front().second;
+            auto iter = card_textures.find(id);
+            if(iter == card_textures.end()) {
+                std::string file = To<std::string>("%d.jpg", id);
+                auto& cti = card_textures[id];
+                cti.tex_info = misc_textures["unknown"];
                 cti.ref_block = 0xffff;
-			} else {
-                uint16_t blockid = AllocBlock(id);
-                if(blockid == 0xffff) {
-                    cti.tex_info = misc_textures["unknown"];
-                    cti.ref_block = 0xffff;
-                } else {
-                    base::Image img;
-                    auto fileinfo = imageZip.ReadFile(file);
-                    if(img.LoadMemory(fileinfo.first, (uint32_t)length)) {
-                        int32_t bx = (blockid % 20) * 100;
-                        int32_t by = (blockid / 20) * 145;
-                        int32_t bw = 100;
-                        int32_t bh = 145;
-                        cti.tex_info.vert[0] = {bx / 2048.0f, by / 2048.0f};
-                        cti.tex_info.vert[1] = {(bx + bw) / 2048.0f, by / 2048.0f};
-                        cti.tex_info.vert[2] = {bx / 2048.0f, (by + bh) / 2048.0f};
-                        cti.tex_info.vert[3] = {(bx + bw) / 2048.0f, (by + bh) / 2048.0f};
-                        cti.ref_block = blockid;
-                        card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
-                        image_render->AddVertices(&card_image, recti{bx, by, bw, bh}, recti{0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
-                    } else {
-                        FreeBlock(blockid, false);
-                        cti.tex_info = misc_textures["unknown"];
-                        cti.ref_block = 0xffff;
+                size_t length = imageZip.GetFileLength(file);
+                if(length == 0) {
+                    file = To<std::string>("%d.png", id);
+                    length = imageZip.GetFileLength(file);
+                }
+                if(length != 0) {
+                    uint16_t blockid = AllocBlock(id);
+                    if(blockid != 0xffff) {
+                        base::Image img;
+                        auto fileinfo = imageZip.ReadFile(file);
+                        if(img.LoadMemory(fileinfo.first, (uint32_t)length)) {
+                            int32_t bx = (blockid % 20) * 100;
+                            int32_t by = (blockid / 20) * 145;
+                            int32_t bw = 100;
+                            int32_t bh = 145;
+                            cti.tex_info.vert[0] = {bx / 2048.0f, by / 2048.0f};
+                            cti.tex_info.vert[1] = {(bx + bw) / 2048.0f, by / 2048.0f};
+                            cti.tex_info.vert[2] = {bx / 2048.0f, (by + bh) / 2048.0f};
+                            cti.tex_info.vert[3] = {(bx + bw) / 2048.0f, (by + bh) / 2048.0f};
+                            cti.ref_block = blockid;
+                            card_image.Load(img.GetRawData(), img.GetWidth(), img.GetHeight());
+                            image_render->ClearVertices();
+                            image_render->AddVertices(&card_image, recti{bx, by, bw, bh}, recti{0, 0, card_image.GetImgWidth(), card_image.GetImgHeight()});
+                            PrepareRender();
+                            Render();
+                        } else
+                            FreeBlock(blockid, false);
                     }
                 }
-			}
-            return cti.tex_info;;
-		}
-        IncreaseRef(iter->second.ref_block);
-		return iter->second.tex_info;
-	}
+                if(loaded_cb)
+                    loaded_cb(cti.tex_info);
+            } else {
+                IncreaseRef(iter->second.ref_block);
+                if(loaded_cb)
+                    loaded_cb(iter->second.tex_info);
+            }
+            loading_card.pop_front();
+        }
+    }
     
     texf4& ImageMgr::GetTexture(const std::string& name) {
         return misc_textures[name];

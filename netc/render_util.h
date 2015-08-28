@@ -220,7 +220,7 @@ namespace base
                 glBufferSubData(GL_ARRAY_BUFFER, sizeof(VTYPE) * start_index, sizeof(VTYPE) * count, vert_data);
         }
         
-        void Updateindices(const int16_t* index_data, int16_t start_index, int16_t count) {
+        void UpdateIndices(const int16_t* index_data, int16_t start_index, int16_t count) {
             if(count > 0)
                 glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, sizeof(int16_t) * start_index, sizeof(int16_t) * count, index_data);
         }
@@ -391,7 +391,7 @@ namespace base
             return;
         Update(vert_index, index_index);
         manager->UpdateVertices(&vertices[0], vert_index, vertices.size());
-        manager->Updateindices(&indices[0], index_index, indices.size());
+        manager->UpdateIndices(&indices[0], index_index, indices.size());
         ShowUpdateInfo();
     }
     

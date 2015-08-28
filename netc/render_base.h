@@ -180,15 +180,15 @@ namespace base {
             vt[3].color = cl;
             vt[3].hcolor = hcl;
         }
-        static inline void GenQuadIndex(int16_t* idx, int32_t count) {
+        static inline void GenQuadIndex(int16_t* idx, int32_t count, int32_t base = 0) {
             static int16_t index[] = {0, 1, 2, 2, 1, 3};
             for(int32_t i = 0; i < count; ++i) {
-                idx[i * 6 + 0] = index[0] + i * 4;
-                idx[i * 6 + 1] = index[1] + i * 4;
-                idx[i * 6 + 2] = index[2] + i * 4;
-                idx[i * 6 + 3] = index[3] + i * 4;
-                idx[i * 6 + 4] = index[4] + i * 4;
-                idx[i * 6 + 5] = index[5] + i * 4;
+                idx[i * 6 + 0] = base + index[0] + i * 4;
+                idx[i * 6 + 1] = base + index[1] + i * 4;
+                idx[i * 6 + 2] = base + index[2] + i * 4;
+                idx[i * 6 + 3] = base + index[3] + i * 4;
+                idx[i * 6 + 4] = base + index[4] + i * 4;
+                idx[i * 6 + 5] = base + index[5] + i * 4;
             }
         }
     };

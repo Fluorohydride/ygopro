@@ -207,6 +207,12 @@ class ActionMgr {
 public:
     inline void InitActionTime(TIME_TYPE tm) { cur_time = tm; }
     
+    ActionMgr& PushAction(std::shared_ptr<Action<TIME_TYPE>> ani) {
+        ani->InitStartTime(cur_time);
+        actions.push_back(ani);
+        return *this;
+    }
+    
     ActionMgr& operator << (std::shared_ptr<Action<TIME_TYPE>> ani) {
         ani->InitStartTime(cur_time);
         actions.push_back(ani);
