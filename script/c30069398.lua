@@ -20,15 +20,25 @@ function c30069398.operation(e,tp,eg,ep,ev,re,r,rp)
 	local token=Duel.CreateToken(tp,30069399)
 	if Duel.SpecialSummonStep(token,0,tp,1-tp,false,false,POS_FACEUP_DEFENCE) then
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_DESTROY)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_DESTROYED)
+		e1:SetLabelObject(token)
+		e1:SetCondition(c30069398.damcon)
 		e1:SetOperation(c30069398.damop)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		token:RegisterEffect(e1,true)
+		Duel.RegisterEffect(e1,tp)
 	end
 	Duel.SpecialSummonComplete()
 end
+function c30069398.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local tok=e:GetLabelObject()
+	if eg:IsContains(tok) then
+		return true
+	else
+		if not tok:IsLocation(LOCATION_MZONE) then e:Reset() end
+		return false
+	end
+end
 function c30069398.damop(e,tp,eg,ep,ev,re,r,rp)
-	Duel.Damage(tp,300,REASON_EFFECT)
+	local tok=e:GetLabelObject()
+	Duel.Damage(tok:GetPreviousControler(),300,REASON_EFFECT)
 end

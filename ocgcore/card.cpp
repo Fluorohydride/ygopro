@@ -297,6 +297,48 @@ int32 card::is_set_card(uint32 set_code) {
 	}
 	return FALSE;
 }
+int32 card::is_pre_set_card(uint32 set_code) {
+	uint32 code = previous.code;
+	uint64 setcode;
+	if (code == data.code) {
+		setcode = data.setcode;
+	} else {
+		card_data dat;
+		::read_card(code, &dat);
+		setcode = dat.setcode;
+	}
+	uint32 settype = set_code & 0xfff;
+	uint32 setsubtype = set_code & 0xf000;
+	while(setcode) {
+		if ((setcode & 0xfff) == settype && (setcode & 0xf000 & setsubtype) == setsubtype)
+			return TRUE;
+		setcode = setcode >> 16;
+	}
+	//add set code
+	effect_set eset;
+	filter_effect(EFFECT_ADD_SETCODE, &eset);
+	for(int32 i = 0; i < eset.size(); ++i) {
+		uint32 value = eset[i]->get_value(this);
+		if ((value & 0xfff) == settype && (value & 0xf000 & setsubtype) == setsubtype)
+			return TRUE;
+	}
+	//another code
+	uint32 code2 = previous.code2;
+	uint64 setcode2;
+	if (code2 != 0) {
+		card_data dat;
+		::read_card(code2, &dat);
+		setcode2 = dat.setcode;
+	} else {
+		return FALSE;
+	}
+	while(setcode2) {
+		if ((setcode2 & 0xfff) == settype && (setcode2 & 0xf000 & setsubtype) == setsubtype)
+			return TRUE;
+		setcode2 = setcode2 >> 16;
+	}
+	return FALSE;
+}
 uint32 card::get_type() {
 	if(assume_type == ASSUME_TYPE)
 		return assume_value;

@@ -20,17 +20,24 @@ function c86801871.spop(e,tp,eg,ep,ev,re,r,rp)
 	local token=Duel.CreateToken(tp,86801872)
 	if Duel.SpecialSummonStep(token,0,tp,tp,false,false,POS_FACEUP) then
 		local e1=Effect.CreateEffect(e:GetHandler())
-		e1:SetType(EFFECT_TYPE_SINGLE+EFFECT_TYPE_CONTINUOUS)
-		e1:SetCode(EVENT_DESTROY)
-		e1:SetProperty(EFFECT_FLAG_CANNOT_DISABLE)
+		e1:SetType(EFFECT_TYPE_FIELD+EFFECT_TYPE_CONTINUOUS)
+		e1:SetCode(EVENT_BATTLE_DESTROYED)
+		e1:SetLabelObject(token)
+		e1:SetCondition(c86801871.damcon)
 		e1:SetOperation(c86801871.damop)
-		e1:SetReset(RESET_EVENT+0x1fe0000)
-		token:RegisterEffect(e1,true)
+		Duel.RegisterEffect(e1,tp)
 	end
 	Duel.SpecialSummonComplete()
 end
-function c86801871.damop(e,tp,eg,ep,ev,re,r,rp)
-	if e:GetHandler():IsReason(REASON_BATTLE) then
-		Duel.Damage(1-tp,500,REASON_EFFECT)
+function c86801871.damcon(e,tp,eg,ep,ev,re,r,rp)
+	local tok=e:GetLabelObject()
+	if eg:IsContains(tok) then
+		return true
+	else
+		if not tok:IsLocation(LOCATION_MZONE) then e:Reset() end
+		return false
 	end
+end
+function c86801871.damop(e,tp,eg,ep,ev,re,r,rp)
+	Duel.Damage(1-tp,500,REASON_EFFECT)
 end
